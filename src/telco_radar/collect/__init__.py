@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ..config import Config, Source, Operator
@@ -19,41 +20,58 @@ def _collect_source(source: Source, region: str, operator: str | None,
     return collect_newsroom(source, region, operator, origin, http_cfg)
 
 
-def collect_all(cfg: Config, max_workers: int = 8) -> tuple[list[Item], list[str]]:
-    """Fetch every configured source concurrently.
+def collect_all(cfg: Config, max_workers: int = 8) -> tuple[list[Item], list[dict]]:
+    """Fetch every configured (crawlable) source concurrently.
 
-    Returns (items, failed_source_urls). A failing source never aborts the run.
+    Returns (items, source_results). Each source_result is a dict describing
+    what happened with that source (status/count/error) so the pipeline can
+    build a transparent run log. A failing source never aborts the run.
     """
     http_cfg = cfg.settings.get("http", {})
     jobs: list[tuple[Source, str, str | None, str]] = []
 
     for op in cfg.operators:
-        for src in op.sources:
+        for src in op.crawled_sources:
             jobs.append((src, op.region_key, op.name, "operator"))
     for src in cfg.news_sources:
         jobs.append((src, "global", None, "industry_news"))
 
     items: list[Item] = []
-    failed: list[str] = []
+    results: list[dict] = []
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {
             pool.submit(_collect_source, src, region, operator, origin, http_cfg):
-                (src, operator)
+                (src, region, operator, origin)
             for src, region, operator, origin in jobs
         }
         for fut in as_completed(futures):
-            src, operator = futures[fut]
+            src, region, operator, origin = futures[fut]
+            rec = {
+                "name": operator or src.name,
+                "operator": operator,
+                "region": region,
+                "url": src.url,
+                "kind": src.kind,
+                "label": src.label or src.kind,
+                "origin": origin,
+            }
             try:
                 got = fut.result()
                 items.extend(got)
-                log.info("OK  %-22s %-45s -> %d items",
-                         (operator or src.name)[:22], src.url[:45], len(got))
+                rec["status"] = "ok" if got else "empty"
+                rec["count"] = len(got)
+                log.info("%-5s %-22s %-45s -> %d items",
+                         rec["status"].upper(), (operator or src.name)[:22],
+                         src.url[:45], len(got))
             except Exception as exc:  # noqa: BLE001 - resilience by design
-                failed.append(src.url)
-                log.warning("FAIL %-22s %-45s -> %s: %s",
+                rec["status"] = "fail"
+                rec["count"] = 0
+                rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
+                log.warning("FAIL  %-22s %-45s -> %s",
                             (operator or src.name)[:22], src.url[:45],
-                            type(exc).__name__, str(exc)[:120])
-    return items, failed
+                            rec["error"])
+            results.append(rec)
+    return items, results
 
 
 # Single words that are too ambiguous in headlines to identify an operator

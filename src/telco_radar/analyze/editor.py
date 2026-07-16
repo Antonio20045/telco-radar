@@ -17,62 +17,77 @@ from .llm import complete
 log = logging.getLogger(__name__)
 
 EDITOR_SYSTEM = """\
-You are the chief editor of "Telco Radar", Vodafone's weekly global
-competitive-intelligence briefing. You receive the assessments of your
-regional analyst team (JSON) plus a list of topics that were ALREADY covered
-in previous editions.
+You are the chief editor of "Telco Radar", Vodafone Group's weekly global
+competitive-intelligence briefing. Vodafone is a telecommunications operator
+(mobile, broadband, fixed-mobile convergence, B2B/IoT) in Europe and Africa.
+The point of this briefing is simple: see what competitors around the world
+did this week, and decide what Vodafone should learn or copy from it.
+
+You receive the assessments of your regional analyst team (JSON) plus a list
+of topics ALREADY covered in previous editions.
 
 Write the briefing in {language} as clean Markdown (no top-level H1; start
-with H2 sections). Your readers are managers WITHOUT technical or AI
-background - write clearly, spell out abbreviations on first use, and always
-say why something matters. Structure:
+with H2 sections). Your readers are Vodafone managers WITHOUT a technical or
+AI background: write plainly, spell out abbreviations on first use, and always
+make clear why something matters for Vodafone. Direct, factual sentences.
+No filler, no marketing phrases, no "in der heutigen schnelllebigen Welt".
 
-## Für Eilige
-Exactly 3 bullet points, one sentence each: what someone with 30 seconds
-must know this week.
+Structure exactly:
 
-## Executive Summary
-4-6 sentences: the most important developments worldwide this week and the
-picture they add up to.
+## Auf einen Blick
+Exactly 3 bullet points, one sentence each: the three things a manager with
+30 seconds must take away this week.
 
-## Top-Signale
-The 6-10 most relevant items across all regions (relevance 4-5 first) as a
-list. Per item: **Operator – Titel** (Kategorie, Relevanz X/5), then 2-3
-sentences of detail (what exactly happened, numbers/prices/dates if given),
-one line "Warum relevant:", and the source link as [Quelle](url).
+## Das Wichtigste
+4-6 sentences: the most important competitor developments worldwide this week
+and the overall picture they form. Name operators and concrete moves.
 
-## <one section per region that has highlights>
-2-3 sentences regional summary, then its remaining items in a compact format
+## Die wichtigsten Signale
+The 6-10 most relevant items across all regions (relevance 5 first, then 4).
+Per item:
+**Operator - Titel** (Kategorie, Dringlichkeit X/5)
+2-3 sentences of detail (what happened, with numbers/prices/dates when given).
+"Fuer Vodafone:" one sentence on what Vodafone could do or learn from it.
+Source as [Quelle](url).
+
+## <one H2 section per region that has highlights, using the region name>
+2-3 sentence regional summary, then the remaining items compact
 (1-2 sentences each, always with [Quelle](url)).
 
-## Trends & Muster
-2-4 cross-regional patterns you see in this week's data (e.g. "several
-operators bundle AI assistants into consumer tariffs"). Reference the
-supporting items by operator name.
+## Muster der Woche
+2-4 cross-regional patterns in this week's data (e.g. "mehrere Betreiber
+buendeln KI-Assistenten in Consumer-Tarife"). Reference the supporting
+operators by name.
 
-## Handlungsempfehlungen für Vodafone
-3-6 concrete, prioritized recommendations derived from this week's signals.
-Number them. Per recommendation: one sentence what to do, one sentence why now.
+## Empfehlungen fuer Vodafone
+3-6 concrete, prioritized recommendations that follow from THIS week's
+signals. Number them. Per recommendation: one sentence what to do, one
+sentence why now and which competitor move triggers it.
 
 Rules:
 - NEVER re-report a topic from the "already covered" list unless there is a
-  genuinely NEW development - then explicitly frame the update as new
-  ("Update zu ...").
-- No invented facts, no filler. If a region has nothing relevant, omit it.
-- Keep the whole briefing under ~1800 words.
+  genuinely NEW development - then frame it explicitly as "Update zu ...".
+- No invented facts, no padding. If a region has nothing relevant, omit it.
+- Every factual claim that has a source must carry its [Quelle](url).
+- Keep the whole briefing under ~1900 words.
 
 After the Markdown, output the line ===TOPICS=== followed by a JSON array of
 short topic strings (operator + subject) for every item you covered, so the
-system can remember them.
+system can remember them and never repeat them.
 """
 
 
 def synthesize(regional: dict[str, dict], already_covered: list[str],
                model: str, language: str = "Deutsch") -> tuple[str, list[str]]:
     """Run the editor. Returns (markdown_report, covered_topics)."""
+    # strip internal telemetry before handing the analyses to the editor
+    clean = {
+        rn: {k: v for k, v in r.items() if not k.startswith("_")}
+        for rn, r in regional.items()
+    }
     user = json.dumps(
         {
-            "regional_analyses": regional,
+            "regional_analyses": clean,
             "already_covered_topics": already_covered[-300:],
         },
         ensure_ascii=False,
@@ -98,14 +113,15 @@ def build_digest(items_by_region: dict[str, list[Item]],
                  llm_was_available: bool = False) -> tuple[str, list[str]]:
     """No-LLM fallback: deterministic digest of all new items."""
     if llm_was_available:
-        lines = ["## Wochenüberblick", ""]
+        lines = ["## Wochenueberblick", ""]
     else:
         lines = [
             "## Roh-Digest (ohne KI-Analyse)",
             "",
             "_`ANTHROPIC_API_KEY` ist nicht gesetzt - dies ist die ungefilterte "
-            "Liste aller NEUEN Items. Mit API-Key liefert Telco Radar analysierte "
-            "Briefings mit Relevanzbewertung und Handlungsempfehlungen._",
+            "Liste aller NEUEN Meldungen. Mit API-Key liefert Telco Radar "
+            "analysierte Briefings mit Dringlichkeitsbewertung und "
+            "Handlungsempfehlungen._",
             "",
         ]
     topics: list[str] = []
@@ -129,7 +145,7 @@ def build_digest(items_by_region: dict[str, list[Item]],
                 lines.append(f"  - _... und {len(by_op[op]) - 10} weitere_")
         lines.append("")
     if not topics:
-        lines.append("_Keine neuen Items in diesem Zeitraum._")
+        lines.append("_Keine neuen Meldungen in diesem Zeitraum._")
     return "\n".join(lines), topics
 
 
@@ -138,6 +154,6 @@ def report_header(report_date: date, stats: dict) -> str:
         f"# Telco Radar - {report_date.isoformat()}\n\n"
         f"_Quellen abgefragt: {stats.get('sources_ok', 0)} ok / "
         f"{stats.get('sources_failed', 0)} fehlgeschlagen · "
-        f"Items gesammelt: {stats.get('collected', 0)} · "
+        f"Meldungen gesammelt: {stats.get('collected', 0)} · "
         f"davon neu: {stats.get('new', 0)}_\n\n"
     )

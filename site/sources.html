@@ -1,49 +1,47 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Telco Radar – Überwachte Quellen</title>
+  <title>Telco Radar - Quellen</title>
+  <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0f16'/><circle cx='50' cy='50' r='30' fill='none' stroke='%23e60000' stroke-width='7'/><circle cx='50' cy='50' r='9' fill='%23e60000'/></svg>">
-  <script>
-    try { document.documentElement.dataset.theme = localStorage.getItem('tr-theme') || 'dark'; } catch (e) {}
-  </script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='100' fill='%23e60000'/><path fill='%23fff' d='M96 40C72 40 54 58 54 82c0 21 15 37 36 40-8 17-22 27-40 31 8 12 10 12 10 12 36-13 62-41 62-83C122 58 120 40 96 40Z'/></svg>">
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="index.html">
-        <span class="brand-mark"><span class="brand-ring"></span></span>
-        <span class="brand-name">TELCO<em>RADAR</em></span>
+      <a class="brand" href="index.html" aria-label="Telco Radar">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vodafone">
+          <circle cx="100" cy="100" r="100" fill="#e60000"/>
+          <path fill="#ffffff" d="M96 40C72 40 54 58 54 82c0 21 15 37 36 40-8 17-22 27-40 31 8 12 10 12 10 12 36-13 62-41 62-83C122 58 120 40 96 40Z"/>
+        </svg>
+        <span class="brand-name">Telco<em>Radar</em></span>
       </a>
       <nav class="nav">
         <a href="index.html" >Bericht</a>
+        <a href="protokoll.html" >Protokoll</a>
         <a href="archive.html" >Archiv</a>
         <a href="sources.html" class="active">Quellen</a>
-        <button class="theme-toggle" id="theme-toggle" title="Hell/Dunkel umschalten" aria-label="Farbschema umschalten">
-          <span class="tt-dark">☾</span><span class="tt-light">☀</span>
-        </button>
       </nav>
     </div>
   </header>
-  
   <main>
     <div class="wrap">
       
 <section class="hero">
   <p class="eyebrow">Was der Radar beobachtet</p>
   <h1>Überwachte Quellen</h1>
-  <p class="hero-sub">Operator-Newsrooms auf allen Kontinenten plus die internationale Telco-Fachpresse.
-  Neue Quellen werden in <code>config/watchlist.yaml</code> gepflegt.</p>
+  <p class="hero-sub">Jeder Netzbetreiber wird direkt beobachtet: über seinen Newsroom und über eine
+  laufende Google-News-Abfrage. Jede Quelle ist verlinkt und nachprüfbar.</p>
 </section>
 
 
 <section class="source-region">
-  <div class="section-head"><h2>Europa <span class="count-badge">17</span></h2></div>
+  <h2>Europa <span class="count-badge">23 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -54,8 +52,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.vodafone.com/news" target="_blank" rel="noopener">vodafone.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.vodafone.com/news" target="_blank" rel="noopener">vodafone.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Vodafone%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Vodafone Group &nearr;</a>
+          
         </li>
         
       </ul>
@@ -69,8 +76,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">newsroom.vodafone.de ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">newsroom.vodafone.de &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Vodafone%20Deutschland%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Vodafone Deutschland &nearr;</a>
+          
         </li>
         
       </ul>
@@ -84,8 +100,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">telekom.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">telekom.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Deutsche%20Telekom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Deutsche Telekom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -99,8 +124,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.telefonica.de/presse.html" target="_blank" rel="noopener">telefonica.de ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.telefonica.de/presse.html" target="_blank" rel="noopener">telefonica.de &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22O2%20Telef%C3%B3nica%20Deutschland%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu O2 Telefónica Deutschland &nearr;</a>
+          
         </li>
         
       </ul>
@@ -114,8 +148,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">orange.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">orange.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Orange%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Orange &nearr;</a>
+          
         </li>
         
       </ul>
@@ -129,8 +172,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">RSS</span>
-          <a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">telefonica.com ↗</a>
+          <span class="kbadge">RSS</span>
+          
+          <a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">telefonica.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telef%C3%B3nica%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telefónica &nearr;</a>
+          
         </li>
         
       </ul>
@@ -144,8 +196,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://newsroom.bt.com/" target="_blank" rel="noopener">newsroom.bt.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://newsroom.bt.com/" target="_blank" rel="noopener">newsroom.bt.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22BT%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu BT Group &nearr;</a>
+          
         </li>
         
       </ul>
@@ -159,8 +220,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">swisscom.ch ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">swisscom.ch &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Swisscom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Swisscom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -174,8 +244,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">teliacompany.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">teliacompany.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telia%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telia &nearr;</a>
+          
         </li>
         
       </ul>
@@ -189,8 +268,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.overons.kpn/nieuws/en/" target="_blank" rel="noopener">overons.kpn ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.overons.kpn/nieuws/en/" target="_blank" rel="noopener">overons.kpn &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22KPN%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu KPN &nearr;</a>
+          
         </li>
         
       </ul>
@@ -204,8 +292,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">proximus.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">proximus.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Proximus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Proximus &nearr;</a>
+          
         </li>
         
       </ul>
@@ -219,8 +316,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">gruppotim.it ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">gruppotim.it &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22TIM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu TIM &nearr;</a>
+          
         </li>
         
       </ul>
@@ -234,8 +340,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">libertyglobal.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">libertyglobal.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Liberty%20Global%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Liberty Global &nearr;</a>
+          
         </li>
         
       </ul>
@@ -249,8 +364,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">veon.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">veon.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22VEON%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu VEON &nearr;</a>
+          
         </li>
         
       </ul>
@@ -263,8 +387,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telenor%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telenor &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -276,8 +404,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Turkcell%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Turkcell &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -289,8 +421,114 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Iliad%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Iliad &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Bouygues Telecom</h3>
+        <span class="chip">FR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Bouygues%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Bouygues Telecom &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>A1 Telekom Austria</h3>
+        <span class="chip">AT</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22A1%20Telekom%20Austria%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu A1 Telekom Austria &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Tele2</h3>
+        <span class="chip">SE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Tele2%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Tele2 &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Elisa</h3>
+        <span class="chip">FI</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Elisa%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Elisa &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Three UK</h3>
+        <span class="chip">GB</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Three%20UK%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Three UK &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Cosmote</h3>
+        <span class="chip">GR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Cosmote%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Cosmote &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -299,7 +537,7 @@
 </section>
 
 <section class="source-region">
-  <div class="section-head"><h2>Nordamerika <span class="count-badge">6</span></h2></div>
+  <h2>Nordamerika <span class="count-badge">10 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -310,8 +548,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.verizon.com/about/media-center" target="_blank" rel="noopener">verizon.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.verizon.com/about/media-center" target="_blank" rel="noopener">verizon.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Verizon%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Verizon &nearr;</a>
+          
         </li>
         
       </ul>
@@ -325,8 +572,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://about.att.com/newsroom" target="_blank" rel="noopener">about.att.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://about.att.com/newsroom" target="_blank" rel="noopener">about.att.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22AT%26T%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu AT&T &nearr;</a>
+          
         </li>
         
       </ul>
@@ -340,8 +596,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.t-mobile.com/news" target="_blank" rel="noopener">t-mobile.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.t-mobile.com/news" target="_blank" rel="noopener">t-mobile.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22T-Mobile%20US%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu T-Mobile US &nearr;</a>
+          
         </li>
         
       </ul>
@@ -355,8 +620,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">bce.ca ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">bce.ca &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Bell%20Canada%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Bell Canada &nearr;</a>
+          
         </li>
         
       </ul>
@@ -369,8 +643,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Rogers%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Rogers &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -382,8 +660,80 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telus &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Comcast</h3>
+        <span class="chip">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Comcast%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Comcast &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Charter Communications</h3>
+        <span class="chip">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Charter%20Communications%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Charter Communications &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>DISH Wireless</h3>
+        <span class="chip">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22DISH%20Wireless%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu DISH Wireless &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>UScellular</h3>
+        <span class="chip">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22UScellular%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu UScellular &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -392,7 +742,7 @@
 </section>
 
 <section class="source-region">
-  <div class="section-head"><h2>Lateinamerika <span class="count-badge">4</span></h2></div>
+  <h2>Lateinamerika <span class="count-badge">7 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -402,8 +752,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Am%C3%A9rica%20M%C3%B3vil%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu América Móvil &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -416,8 +770,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">millicom.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">millicom.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Millicom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Millicom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -430,8 +793,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22TIM%20Brasil%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu TIM Brasil &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -443,8 +810,63 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Entel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Entel &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Oi</h3>
+        <span class="chip">BR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Oi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Oi &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telecom Argentina</h3>
+        <span class="chip">AR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telecom%20Argentina%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telecom Argentina &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>WOM</h3>
+        <span class="chip">CL</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22WOM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu WOM &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -453,7 +875,7 @@
 </section>
 
 <section class="source-region">
-  <div class="section-head"><h2>Afrika & Naher Osten <span class="count-badge">9</span></h2></div>
+  <h2>Afrika & Naher Osten <span class="count-badge">12 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -464,8 +886,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.mtn.com/newsroom/" target="_blank" rel="noopener">mtn.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.mtn.com/newsroom/" target="_blank" rel="noopener">mtn.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22MTN%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu MTN Group &nearr;</a>
+          
         </li>
         
       </ul>
@@ -478,8 +909,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Vodacom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Vodacom &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -492,8 +927,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">safaricom.co.ke ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">safaricom.co.ke &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Safaricom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Safaricom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -507,8 +951,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://airtel.africa/media" target="_blank" rel="noopener">airtel.africa ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://airtel.africa/media" target="_blank" rel="noopener">airtel.africa &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Airtel%20Africa%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Airtel Africa &nearr;</a>
+          
         </li>
         
       </ul>
@@ -522,8 +975,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">stc.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">stc.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22stc%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu stc &nearr;</a>
+          
         </li>
         
       </ul>
@@ -536,8 +998,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22e%26%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu e& &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -549,8 +1015,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Ooredoo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Ooredoo &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -562,8 +1032,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Zain%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Zain &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -575,8 +1049,63 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Orange%20MEA%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Orange MEA &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>du</h3>
+        <span class="chip">AE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22du%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu du &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Maroc Telecom</h3>
+        <span class="chip">MA</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Maroc%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Maroc Telecom &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Turk Telekom</h3>
+        <span class="chip">TR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Turk%20Telekom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Turk Telekom &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -585,7 +1114,7 @@
 </section>
 
 <section class="source-region">
-  <div class="section-head"><h2>Asien <span class="count-badge">18</span></h2></div>
+  <h2>Asien <span class="count-badge">22 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -596,8 +1125,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">airtel.in ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">airtel.in &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Bharti%20Airtel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Bharti Airtel &nearr;</a>
+          
         </li>
         
       </ul>
@@ -611,8 +1149,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.jio.com/press-release" target="_blank" rel="noopener">jio.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.jio.com/press-release" target="_blank" rel="noopener">jio.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Reliance%20Jio%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Reliance Jio &nearr;</a>
+          
         </li>
         
       </ul>
@@ -625,8 +1172,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Vodafone%20Idea%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Vodafone Idea &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -639,8 +1190,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">singtel.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">singtel.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Singtel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Singtel &nearr;</a>
+          
         </li>
         
       </ul>
@@ -654,8 +1214,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">sktelecom.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">sktelecom.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22SK%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu SK Telecom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -668,8 +1237,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22KT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu KT &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -682,8 +1255,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">docomo.ne.jp ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">docomo.ne.jp &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22NTT%20Docomo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu NTT Docomo &nearr;</a>
+          
         </li>
         
       </ul>
@@ -697,8 +1279,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://newsroom.kddi.com/english/" target="_blank" rel="noopener">newsroom.kddi.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://newsroom.kddi.com/english/" target="_blank" rel="noopener">newsroom.kddi.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22KDDI%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu KDDI &nearr;</a>
+          
         </li>
         
       </ul>
@@ -712,8 +1303,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">softbank.jp ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">softbank.jp &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22SoftBank%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu SoftBank &nearr;</a>
+          
         </li>
         
       </ul>
@@ -727,8 +1327,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">corp.mobile.rakuten.co.jp ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">corp.mobile.rakuten.co.jp &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Rakuten%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Rakuten Mobile &nearr;</a>
+          
         </li>
         
       </ul>
@@ -742,8 +1351,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">chinamobileltd.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">chinamobileltd.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22China%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu China Mobile &nearr;</a>
+          
         </li>
         
       </ul>
@@ -756,8 +1374,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22China%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu China Telecom &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -770,8 +1392,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">cht.com.tw ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">cht.com.tw &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Chunghwa%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Chunghwa Telecom &nearr;</a>
+          
         </li>
         
       </ul>
@@ -785,8 +1416,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">telkomsel.com ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">telkomsel.com &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telkomsel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telkomsel &nearr;</a>
+          
         </li>
         
       </ul>
@@ -799,8 +1439,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22AIS%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu AIS &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -812,8 +1456,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Viettel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Viettel &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -825,8 +1473,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Globe%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Globe Telecom &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -838,8 +1490,80 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22PLDT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu PLDT &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Indosat Ooredoo Hutchison</h3>
+        <span class="chip">ID</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Indosat%20Ooredoo%20Hutchison%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Indosat Ooredoo Hutchison &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>CelcomDigi</h3>
+        <span class="chip">MY</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22CelcomDigi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu CelcomDigi &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Maxis</h3>
+        <span class="chip">MY</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Maxis%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Maxis &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>True Corporation</h3>
+        <span class="chip">TH</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22True%20Corporation%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu True Corporation &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -848,7 +1572,7 @@
 </section>
 
 <section class="source-region">
-  <div class="section-head"><h2>Ozeanien <span class="count-badge">5</span></h2></div>
+  <h2>Ozeanien <span class="count-badge">6 Betreiber</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
@@ -859,8 +1583,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">telstra.com.au ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">telstra.com.au &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Telstra%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Telstra &nearr;</a>
+          
         </li>
         
       </ul>
@@ -874,8 +1607,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">optus.com.au ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">optus.com.au &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Optus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Optus &nearr;</a>
+          
         </li>
         
       </ul>
@@ -888,8 +1630,12 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22TPG%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu TPG Telecom &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -902,8 +1648,17 @@
       <ul class="source-links">
         
         <li>
-          <span class="chip">NEWSROOM</span>
-          <a href="https://media.one.nz" target="_blank" rel="noopener">media.one.nz ↗</a>
+          <span class="kbadge">Newsroom</span>
+          
+          <a href="https://media.one.nz" target="_blank" rel="noopener">media.one.nz &nearr;</a>
+          
+        </li>
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22One%20NZ%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu One NZ &nearr;</a>
+          
         </li>
         
       </ul>
@@ -916,8 +1671,29 @@
       </div>
       <ul class="source-links">
         
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%22Spark%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu Spark &nearr;</a>
+          
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>2degrees</h3>
+        <span class="chip">NZ</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="kbadge">Google News</span>
+          
+          <a href="https://news.google.com/search?q=%222degrees%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">Meldungen zu 2degrees &nearr;</a>
+          
+        </li>
         
       </ul>
     </div>
@@ -927,54 +1703,78 @@
 
 
 <section class="source-region">
-  <div class="section-head"><h2>Telco-Fachpresse <span class="count-badge">6</span></h2></div>
+  <h2>Telco-Fachpresse <span class="count-badge">9 Feeds</span></h2>
   <div class="source-grid">
     
     <div class="source-card">
-      <div class="source-head"><h3>Mobile World Live</h3></div>
+      <div class="source-head"><h3>Mobile World Live</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">mobileworldlive.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">mobileworldlive.com &nearr;</a></li>
       </ul>
     </div>
     
     <div class="source-card">
-      <div class="source-head"><h3>Total Telecom</h3></div>
+      <div class="source-head"><h3>Total Telecom</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://totaltele.com/feed/" target="_blank" rel="noopener">totaltele.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://totaltele.com/feed/" target="_blank" rel="noopener">totaltele.com &nearr;</a></li>
       </ul>
     </div>
     
     <div class="source-card">
-      <div class="source-head"><h3>RCR Wireless</h3></div>
+      <div class="source-head"><h3>RCR Wireless</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">rcrwireless.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">rcrwireless.com &nearr;</a></li>
       </ul>
     </div>
     
     <div class="source-card">
-      <div class="source-head"><h3>Light Reading</h3></div>
+      <div class="source-head"><h3>Light Reading</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">lightreading.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">lightreading.com &nearr;</a></li>
       </ul>
     </div>
     
     <div class="source-card">
-      <div class="source-head"><h3>Fierce Network</h3></div>
+      <div class="source-head"><h3>Fierce Network</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">fierce-network.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">fierce-network.com &nearr;</a></li>
       </ul>
     </div>
     
     <div class="source-card">
-      <div class="source-head"><h3>Developing Telecoms</h3></div>
+      <div class="source-head"><h3>Developing Telecoms</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">developingtelecoms.com ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">developingtelecoms.com &nearr;</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Broadband TV News</h3><span class="chip">RSS</span></div>
+      <ul class="source-links">
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">broadbandtvnews.com &nearr;</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Mobile Europe</h3><span class="chip">RSS</span></div>
+      <ul class="source-links">
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">mobileeurope.co.uk &nearr;</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Telecoms Tech News</h3><span class="chip">RSS</span></div>
+      <ul class="source-links">
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">telecomstechnews.com &nearr;</a></li>
       </ul>
     </div>
     
@@ -985,12 +1785,12 @@
   </main>
   <footer class="footer">
     <div class="wrap footer-inner">
-      <div>
-        <strong>Telco Radar</strong> — automatisches Wettbewerbs-Monitoring der Telekommunikationsbranche.
-        Jede Woche werden die Presseseiten von 59 Netzbetreibern weltweit und die internationale
-        Fachpresse geprüft. Nur wirklich neue Meldungen werden bewertet und hier zusammengefasst.
+      <div style="max-width:640px">
+        <b>Telco Radar</b> beobachtet jede Woche die Presse von 80 Netzbetreibern
+        weltweit und die internationale Fachpresse. Nur wirklich neue Meldungen werden bewertet und hier
+        zusammengefasst. Jede Aussage verlinkt auf die Originalquelle.
       </div>
-      <div class="footer-meta">Alle Angaben mit Link zur Originalquelle · intern</div>
+      <div class="footer-meta">Intern &middot; für Vodafone</div>
     </div>
   </footer>
   <script src="app.js"></script>

@@ -1,0 +1,117 @@
+# =============================================================================
+# TELCO RADAR - Extra operators (merged into watchlist.yaml by region key)
+# =============================================================================
+# These operators are covered via their auto-generated Google News feed
+# (every operator gets one - see config.settings.auto_operator_news), so each
+# has a real, dated, linked source without hand-maintaining a newsroom URL.
+# Add a "sources:" block here if a clean RSS/newsroom is known.
+# =============================================================================
+
+regions:
+  europe:
+    name: "Europa"
+    operators:
+      - name: "Bouygues Telecom"
+        aliases: []
+        country: "FR"
+        sources: []
+      - name: "A1 Telekom Austria"
+        aliases: ["A1 Group", "Telekom Austria"]
+        country: "AT"
+        sources: []
+      - name: "Tele2"
+        aliases: []
+        country: "SE"
+        sources: []
+      - name: "Elisa"
+        aliases: []
+        country: "FI"
+        sources: []
+      - name: "Three UK"
+        aliases: ["CK Hutchison", "Hutchison 3"]
+        country: "GB"
+        sources: []
+      - name: "Cosmote"
+        aliases: ["OTE Group", "OTE"]
+        country: "GR"
+        sources: []
+
+  north_america:
+    name: "Nordamerika"
+    operators:
+      - name: "Comcast"
+        aliases: ["Xfinity Mobile", "Xfinity"]
+        country: "US"
+        sources: []
+      - name: "Charter Communications"
+        aliases: ["Spectrum Mobile", "Spectrum"]
+        country: "US"
+        sources: []
+      - name: "DISH Wireless"
+        aliases: ["Boost Mobile", "EchoStar"]
+        country: "US"
+        sources: []
+      - name: "UScellular"
+        aliases: ["U.S. Cellular"]
+        country: "US"
+        sources: []
+
+  latin_america:
+    name: "Lateinamerika"
+    operators:
+      - name: "Oi"
+        aliases: []
+        country: "BR"
+        sources: []
+      - name: "Telecom Argentina"
+        aliases: ["Personal"]
+        country: "AR"
+        sources: []
+      - name: "WOM"
+        aliases: []
+        country: "CL"
+        sources: []
+
+  africa_middle_east:
+    name: "Afrika & Naher Osten"
+    operators:
+      - name: "du"
+        aliases: ["EITC"]
+        country: "AE"
+        sources: []
+      - name: "Maroc Telecom"
+        aliases: []
+        country: "MA"
+        sources: []
+      - name: "Turk Telekom"
+        aliases: []
+        country: "TR"
+        sources: []
+
+  asia:
+    name: "Asien"
+    operators:
+      - name: "Indosat Ooredoo Hutchison"
+        aliases: ["Indosat"]
+        country: "ID"
+        sources: []
+      - name: "CelcomDigi"
+        aliases: []
+        country: "MY"
+        sources: []
+      - name: "Maxis"
+        aliases: []
+        country: "MY"
+        sources: []
+      - name: "True Corporation"
+        aliases: ["True Corp"]
+        country: "TH"
+        sources: []
+
+  oceania:
+    name: "Ozeanien"
+    operators:
+      - name: "2degrees"
+        aliases: []
+        country: "NZ"
+        sources: []

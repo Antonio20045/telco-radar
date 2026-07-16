@@ -5,15 +5,24 @@
 # Report language ("de" or "en")
 report_language: "de"
 
-# Anthropic model for the regional analyst + editor agents
+# ---------------------------------------------------------------------------
+# Models. Two roles, two models:
+#   analyst_model : the "grunt work" - one call per region, scores every new
+#                   item. Fast + cheap -> Sonnet.
+#   editor_model  : the orchestrator - writes the weekly briefing and sees the
+#                   whole picture. Highest quality -> Opus. (Never Fable.)
+# `model` stays as a backwards-compatible fallback for both roles.
+# ---------------------------------------------------------------------------
 model: "claude-sonnet-5"
+analyst_model: "claude-sonnet-5"
+editor_model: "claude-opus-4-8"
 
 # Only items newer than this many days are considered (items without a
 # date are kept if they were never seen before).
 lookback_days: 8
 
 # Hard cap of items handed to one regional analyst call
-max_items_per_region: 40
+max_items_per_region: 45
 
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300

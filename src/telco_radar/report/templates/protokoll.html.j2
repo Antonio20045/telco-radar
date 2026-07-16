@@ -1,0 +1,111 @@
+{% extends "base.html.j2" %}
+{% set active = 'protokoll' %}
+{% block title %}Telco Radar - Protokoll{% endblock %}
+{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Google News','trade_press':'Fachpresse'} %}
+{% block content %}
+
+<section class="hero">
+  <p class="eyebrow">Transparenz</p>
+  <h1>Was im Hintergrund lief</h1>
+  <p class="hero-sub">Jeder Lauf ist hier nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und was die KI daraus gemacht hat.</p>
+</section>
+
+{% if run %}
+<section class="section" style="padding-top:34px">
+  <div class="kpis">
+    <div class="kpi">
+      <span class="kpi-num">{{ run.source_summary.total }}</span>
+      <span class="kpi-label">Quellen abgefragt</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">{{ run.source_summary.ok }}<small>&nbsp;ok</small></span>
+      <span class="kpi-label">{{ run.source_summary.empty }} leer &middot; {{ run.source_summary.failed }} fehlgeschlagen</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">{{ (run.duration_seconds / 60) | round(1) }}<small>&nbsp;min</small></span>
+      <span class="kpi-label">Laufzeit ({{ date_de }})</span>
+    </div>
+    <div class="kpi accent">
+      <span class="kpi-num">{{ report.stats.get('new', '–') }}</span>
+      <span class="kpi-label">neue Meldungen bewertet</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">01</span> Ablauf</h2>
+    <p class="section-title">Die Schritte dieses Laufs</p>
+  </div>
+  {% for p in run.phases %}
+  <div class="phase-row">
+    <div class="phase-name">{{ p.name }}</div>
+    <div class="phase-detail">{{ p.detail }}</div>
+    <div class="phase-time">{{ p.seconds }} s</div>
+  </div>
+  {% endfor %}
+  <div class="phase-row">
+    <div class="phase-name">KI-Modelle</div>
+    <div class="phase-detail">
+      {% if run.models.analyst %}Bewertung je Region: <b>{{ run.models.analyst }}</b>{% else %}ohne KI{% endif %}{% if run.models.editor %} &middot; Wochenbericht: <b>{{ run.models.editor }}</b>{% endif %}
+    </div>
+    <div class="phase-time">{{ run.duration_seconds }} s</div>
+  </div>
+</section>
+
+{% if run.analysts %}
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">02</span> KI-Bewertung je Region</h2>
+    <p class="section-title">Was die Analyse-Agenten geprüft und behalten haben</p>
+  </div>
+  <table class="src-table">
+    <thead><tr><th>Region</th><th class="num">geprüft</th><th class="num">Blöcke</th><th class="num">relevant behalten</th><th>Modell</th></tr></thead>
+    <tbody>
+      {% for a in run.analysts %}
+      <tr>
+        <td><b>{{ a.region }}</b></td>
+        <td class="num">{{ a.items_in }}</td>
+        <td class="num">{{ a.batches_ok }}/{{ a.batches }}</td>
+        <td class="num">{{ a.highlights }}</td>
+        <td><span class="kbadge">{{ a.model }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">03</span> Alle abgefragten Quellen</h2>
+    <p class="section-title">{{ run.source_summary.total }} Quellen, sortiert nach Status</p>
+  </div>
+  <div class="log-legend">
+    <span class="s"><span class="sdot ok"></span>geliefert ({{ run.source_summary.ok }})</span>
+    <span class="s"><span class="sdot empty"></span>keine neuen Meldungen ({{ run.source_summary.empty }})</span>
+    <span class="s"><span class="sdot fail"></span>nicht erreichbar ({{ run.source_summary.failed }})</span>
+  </div>
+  <table class="src-table">
+    <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
+    <tbody>
+      {% for s in run.sources %}
+      <tr>
+        <td><span class="sdot {{ s.status }}" title="{{ s.status }}"></span></td>
+        <td><b>{{ s.name }}</b>{% if s.error %}<br><span style="color:var(--vf-mute);font-size:12.5px">{{ s.error }}</span>{% endif %}</td>
+        <td>{{ s.region if s.region != 'global' else 'Fachpresse' }}</td>
+        <td><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span></td>
+        <td class="num">{{ s.count }}</td>
+        <td><a href="{{ s.url }}" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% else %}
+<section class="section" style="padding-top:20px">
+  <p class="empty-note">Für diesen Bericht liegt noch kein Protokoll vor. Es entsteht beim nächsten Lauf der Pipeline.</p>
+</section>
+{% endif %}
+{% endblock %}

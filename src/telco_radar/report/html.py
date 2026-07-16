@@ -1,4 +1,4 @@
-"""Static report site generator - terminal-style intelligence dashboard."""
+"""Static report site generator - Vodafone light design."""
 from __future__ import annotations
 
 import html as html_lib
@@ -27,16 +27,16 @@ RELEVANCE_LABELS = {
 }
 
 CATEGORY_COLORS = {
-    "Produktlaunch": "#4c9aff",
-    "Tarif/Pricing": "#36b37e",
-    "Kampagne": "#a77bf3",
-    "Partnerschaft": "#00b8d9",
-    "Netz/Technologie": "#7a8cff",
-    "Regulierung": "#ffab00",
-    "M&A": "#ff5c5c",
-    "Finanzen": "#8993a4",
-    "Sonstiges": "#6b778c",
-    "Unbewertet": "#6b778c",
+    "Produktlaunch": "#e60000",
+    "Tarif/Pricing": "#ac1811",
+    "Kampagne": "#c2185b",
+    "Partnerschaft": "#3860be",
+    "Netz/Technologie": "#5a6b9e",
+    "Regulierung": "#8a7a2f",
+    "M&A": "#25282b",
+    "Finanzen": "#7e7e7e",
+    "Sonstiges": "#a8a8a8",
+    "Unbewertet": "#c4c4c4",
 }
 
 MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
@@ -47,6 +47,14 @@ def _fmt_date_de(iso: str) -> str:
     try:
         d = datetime.fromisoformat(iso)
         return f"{d.day}. {MONTHS_DE[d.month - 1]} {d.year}"
+    except (ValueError, IndexError):
+        return iso
+
+
+def _short_date_de(iso: str) -> str:
+    try:
+        d = datetime.fromisoformat(iso)
+        return f"{d.day}.{d.month}."
     except (ValueError, IndexError):
         return iso
 
@@ -93,7 +101,10 @@ def _flatten(report: dict) -> list[dict]:
             h["relevance"] = h.get("relevance") or 0
             h["relevance_label"] = RELEVANCE_LABELS.get(h["relevance"], "")
             h["category"] = h.get("category") or "Sonstiges"
-            h["source_domain"] = urlsplit(h.get("url") or "").netloc.removeprefix("www.")
+            dom = urlsplit(h.get("url") or "").netloc.removeprefix("www.")
+            h["source_domain"] = dom
+            # prefer the human publisher/source name over an ugly redirect host
+            h["source_label"] = h.get("source") or dom
             out.append(h)
     out.sort(key=lambda h: (h["relevance"], h.get("date") or ""), reverse=True)
     for i, h in enumerate(out):
@@ -102,28 +113,28 @@ def _flatten(report: dict) -> list[dict]:
 
 
 # --------------------------------------------------------------- SVG charts
-def _bar_chart_svg(counts: list[tuple[str, int, str]], width: int = 460,
-                   row_h: int = 34) -> str:
-    """Horizontal bar chart. counts: [(label, value, color)]."""
-    if not counts:
+def _bar_chart_svg(rows: list[tuple[str, int, str]], width: int = 520,
+                   row_h: int = 40, label_w: int = 172) -> str:
+    """Horizontal bar chart. rows: [(label, value, color)]."""
+    if not rows:
         return ""
-    maxv = max(v for _, v, _ in counts) or 1
-    label_w, value_w, pad = 150, 34, 6
+    maxv = max(v for _, v, _ in rows) or 1
+    value_w, pad = 40, 8
     bar_max = width - label_w - value_w - pad * 2
-    height = row_h * len(counts)
+    height = row_h * len(rows)
     parts = [f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" '
-             f'role="img" class="chart">']
-    for i, (label, value, color) in enumerate(counts):
+             f'role="img" class="chart" preserveAspectRatio="xMinYMin meet">']
+    for i, (label, value, color) in enumerate(rows):
         y = i * row_h
-        bw = max(3, round(bar_max * value / maxv))
-        lbl = html_lib.escape(label[:22])
+        bw = max(4, round(bar_max * value / maxv))
+        lbl = html_lib.escape(label[:26])
         parts.append(
             f'<text x="{label_w - pad}" y="{y + row_h / 2 + 4}" text-anchor="end" '
             f'class="c-label">{lbl}</text>'
-            f'<rect x="{label_w}" y="{y + 7}" width="{bar_max}" height="{row_h - 16}" '
-            f'rx="5" class="c-track"/>'
-            f'<rect x="{label_w}" y="{y + 7}" width="{bw}" height="{row_h - 16}" '
-            f'rx="5" fill="{color}"/>'
+            f'<rect x="{label_w}" y="{y + 8}" width="{bar_max}" height="{row_h - 18}" '
+            f'rx="4" class="c-track"/>'
+            f'<rect x="{label_w}" y="{y + 8}" width="{bw}" height="{row_h - 18}" '
+            f'rx="4" fill="{color}"/>'
             f'<text x="{label_w + bw + 8}" y="{y + row_h / 2 + 4}" class="c-value">'
             f'{value}</text>'
         )
@@ -131,28 +142,84 @@ def _bar_chart_svg(counts: list[tuple[str, int, str]], width: int = 460,
     return "".join(parts)
 
 
-def _charts(highlights: list[dict]) -> dict[str, str]:
-    by_region: dict[str, int] = {}
-    by_cat: dict[str, int] = {}
-    by_rel: dict[int, int] = {5: 0, 4: 0, 3: 0, 2: 0}
-    for h in highlights:
-        by_region[h["region"]] = by_region.get(h["region"], 0) + 1
-        by_cat[h["category"]] = by_cat.get(h["category"], 0) + 1
-        r = max(2, min(5, h["relevance"] or 2))
-        by_rel[r] += 1
+def _trend_svg(points: list[tuple[str, int, int]], width: int = 520,
+               height: int = 220) -> str:
+    """Multi-week column chart. points: [(short_date, total, urgent)] oldest..newest."""
+    if not points:
+        return ""
+    pad_l, pad_r, pad_t, pad_b = 34, 12, 18, 34
+    plot_w = width - pad_l - pad_r
+    plot_h = height - pad_t - pad_b
+    maxv = max((t for _, t, _ in points), default=1) or 1
+    n = len(points)
+    slot = plot_w / max(n, 1)
+    bw = min(46, slot * 0.55)
+    parts = [f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" '
+             f'role="img" class="chart" preserveAspectRatio="xMinYMin meet">']
+    # baseline
+    y0 = pad_t + plot_h
+    parts.append(f'<line x1="{pad_l}" y1="{y0}" x2="{width - pad_r}" y2="{y0}" '
+                 f'class="c-axis"/>')
+    for i, (lbl, total, urgent) in enumerate(points):
+        cx = pad_l + slot * (i + 0.5)
+        x = cx - bw / 2
+        h_total = plot_h * total / maxv
+        h_urgent = plot_h * urgent / maxv
+        parts.append(
+            f'<rect x="{x:.1f}" y="{y0 - h_total:.1f}" width="{bw:.1f}" '
+            f'height="{h_total:.1f}" rx="3" class="c-track2"/>'
+        )
+        if urgent:
+            parts.append(
+                f'<rect x="{x:.1f}" y="{y0 - h_urgent:.1f}" width="{bw:.1f}" '
+                f'height="{h_urgent:.1f}" rx="3" fill="#e60000"/>'
+            )
+        parts.append(
+            f'<text x="{cx:.1f}" y="{y0 - h_total - 6:.1f}" text-anchor="middle" '
+            f'class="c-value">{total}</text>'
+            f'<text x="{cx:.1f}" y="{y0 + 20:.1f}" text-anchor="middle" '
+            f'class="c-label">{html_lib.escape(lbl)}</text>'
+        )
+    parts.append("</svg>")
+    return "".join(parts)
 
-    region_rows = sorted(by_region.items(), key=lambda kv: -kv[1])
+
+def _charts(highlights: list[dict], reports: list[dict]) -> dict:
+    """Build the three 'Woche in Zahlen' panels."""
+    # 1) most active competitors (by number of relevant highlights)
+    by_op: dict[str, int] = {}
+    for h in highlights:
+        op = (h.get("operator") or "").strip()
+        if not op:
+            continue
+        by_op[op] = by_op.get(op, 0) + 1
+    comp_rows = sorted(by_op.items(), key=lambda kv: -kv[1])[:8]
+    competitors = _bar_chart_svg([(k, v, "#e60000") for k, v in comp_rows])
+
+    # 2) theme focus (category distribution)
+    by_cat: dict[str, int] = {}
+    for h in highlights:
+        by_cat[h["category"]] = by_cat.get(h["category"], 0) + 1
     cat_rows = sorted(by_cat.items(), key=lambda kv: -kv[1])[:8]
-    rel_colors = {5: "#ff4d4d", 4: "#ffab00", 3: "#4c9aff", 2: "#6b778c"}
+    categories = _bar_chart_svg(
+        [(k, v, CATEGORY_COLORS.get(k, "#7e7e7e")) for k, v in cat_rows])
+
+    # 3) week-over-week trend (relevant items + urgent share), oldest..newest
+    pts = []
+    for r in sorted(reports, key=lambda r: r.get("date", ""))[-10:]:
+        hs = _flatten(r)
+        total = len(hs)
+        urgent = sum(1 for h in hs if (h.get("relevance") or 0) >= 4)
+        pts.append((_short_date_de(r.get("date", "")), total, urgent))
+    trend = _trend_svg(pts)
 
     return {
-        "regions": _bar_chart_svg(
-            [(k, v, "#e60000") for k, v in region_rows]),
-        "categories": _bar_chart_svg(
-            [(k, v, CATEGORY_COLORS.get(k, "#6b778c")) for k, v in cat_rows]),
-        "relevance": _bar_chart_svg(
-            [(f"{r}/5 – {RELEVANCE_LABELS[r]}", by_rel[r], rel_colors[r])
-             for r in (5, 4, 3, 2)]),
+        "competitors": competitors,
+        "categories": categories,
+        "trend": trend,
+        "n_competitors": len(by_op),
+        "top_category": cat_rows[0][0] if cat_rows else "",
+        "n_weeks": len(pts),
     }
 
 
@@ -166,6 +233,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         (site_dir / asset).write_text(
             (_TEMPLATES / asset).read_text(encoding="utf-8"), encoding="utf-8")
 
+    num_operators = len(cfg.operators) if cfg is not None else None
+
     reports = _load_reports(reports_dir)
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),
@@ -175,20 +244,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     for i, report in enumerate(reports):
         highlights = _flatten(report)
         top = [h for h in highlights if h["relevance"] >= 4][:6]
-        ticker = [h for h in highlights if h["relevance"] >= 3][:14]
         ctx = {
             "report": report,
             "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
             "explorer_json": json.dumps(highlights, ensure_ascii=False),
             "top_priorities": top,
-            "ticker_items": ticker,
-            "charts": _charts(highlights) if highlights else None,
+            "charts": _charts(highlights, reports) if highlights else None,
             "briefing_html": _md_to_html(report.get("briefing_md", "")),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive,
             "is_latest": i == 0,
+            "num_operators": num_operators or report.get("stats", {}).get("operators"),
         }
         (site_dir / "reports" / f"{report['date']}.html").write_text(
             report_tpl.render(prefix="../", **ctx), encoding="utf-8")
@@ -200,13 +268,24 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         (site_dir / "index.html").write_text(
             report_tpl.render(prefix="", report=None, date_de="", highlights=[],
                               explorer_json="[]", top_priorities=[],
-                              ticker_items=[], charts=None, briefing_html="",
-                              regions=[], categories=[], archive=[],
-                              is_latest=True),
+                              charts=None, briefing_html="", regions=[],
+                              categories=[], archive=[], is_latest=True,
+                              num_operators=num_operators),
             encoding="utf-8")
 
+    # ---- Protokoll (transparency / run log) for the latest run
+    latest = reports[0] if reports else None
+    run = (latest or {}).get("run") if latest else None
+    (site_dir / "protokoll.html").write_text(
+        env.get_template("protokoll.html.j2").render(
+            prefix="", run=run, report=latest,
+            date_de=_fmt_date_de(latest["date"]) if latest else "",
+            num_operators=num_operators),
+        encoding="utf-8")
+
     (site_dir / "archive.html").write_text(
-        env.get_template("archive.html.j2").render(prefix="", archive=archive),
+        env.get_template("archive.html.j2").render(
+            prefix="", archive=archive, num_operators=num_operators),
         encoding="utf-8")
 
     if cfg is not None:
@@ -215,7 +294,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             by_region.setdefault(op.region_name, []).append(op)
         (site_dir / "sources.html").write_text(
             env.get_template("sources.html.j2").render(
-                prefix="", by_region=by_region, news_sources=cfg.news_sources),
+                prefix="", by_region=by_region, news_sources=cfg.news_sources,
+                num_operators=num_operators),
             encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)

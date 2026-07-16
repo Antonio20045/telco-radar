@@ -4,6 +4,7 @@
 # Global telco trade press. Items are auto-tagged to a region when an
 # operator from the watchlist is mentioned in the headline; otherwise "Global".
 # RSS preferred: entries carry publish dates -> clean freshness filtering.
+# Every feed here is validated (scripts/validate_sources.py).
 # =============================================================================
 
 news_sources:
@@ -25,3 +26,12 @@ news_sources:
   - name: "Developing Telecoms"
     type: rss
     url: "https://developingtelecoms.com/?format=feed&type=rss"
+  - name: "Broadband TV News"
+    type: rss
+    url: "https://www.broadbandtvnews.com/feed/"
+  - name: "Mobile Europe"
+    type: rss
+    url: "https://www.mobileeurope.co.uk/feed/"
+  - name: "Telecoms Tech News"
+    type: rss
+    url: "https://www.telecomstechnews.com/feed/"

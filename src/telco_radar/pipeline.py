@@ -9,8 +9,9 @@ import argparse
 import json
 import logging
 import sys
+import time
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from .analyze import editor
@@ -27,33 +28,61 @@ log = logging.getLogger("telco_radar")
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
 
+def _sort_key(item: Item):
+    """Freshest first; undated items last."""
+    pub = item.published
+    if pub is None:
+        return (0, "")
+    return (1, pub.isoformat())
+
+
 def run(root: Path, use_llm: bool | None = None,
         lookback_days: int | None = None) -> Path:
     """Execute one full radar run. Returns the path of the written report."""
+    t0 = time.monotonic()
+    started_at = datetime.now(timezone.utc)
     cfg = load_config(root)
     lookback = lookback_days or cfg.lookback_days
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
-    model = cfg.settings.get("model", "claude-sonnet-5")
-    max_items = int(cfg.settings.get("max_items_per_region", 40))
+    fallback_model = cfg.settings.get("model", "claude-sonnet-5")
+    analyst_model = cfg.settings.get("analyst_model", fallback_model)
+    editor_model = cfg.settings.get("editor_model", fallback_model)
+    max_items = int(cfg.settings.get("max_items_per_region", 45))
 
     state_dir = root / "data" / "state"
     reports_dir = root / "data" / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
 
+    phases: list[dict] = []
+
+    def phase(name: str, seconds: float, detail: str = "") -> None:
+        phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
+
     # ------------------------------------------------------------- collect
-    items, failed = collect_all(cfg)
+    tc = time.monotonic()
+    items, source_results = collect_all(cfg)
     tag_news_regions(items, cfg.operators)
-    log.info("Collected %d items (%d sources failed)", len(items), len(failed))
+    failed = [r["url"] for r in source_results if r["status"] == "fail"]
+    n_ok = sum(1 for r in source_results if r["status"] == "ok")
+    n_empty = sum(1 for r in source_results if r["status"] == "empty")
+    n_fail = len(failed)
+    phase("Sammeln", time.monotonic() - tc,
+          f"{len(source_results)} Quellen abgefragt, {len(items)} Meldungen gefunden")
+    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen)",
+             len(items), n_ok, n_empty, n_fail)
 
     # -------------------------------------------------------------- dedupe
+    td = time.monotonic()
     seen = SeenStore(state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     new_items = filter_fresh(seen.filter_new(items), lookback)
+    phase("Nur Neues", time.monotonic() - td,
+          f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)")
     log.info("Novelty filter: %d new items (seen store: %d known ids)",
              len(new_items), len(seen))
 
     items_by_region: dict[str, list[Item]] = defaultdict(list)
-    for item in new_items:
+    for item in sorted(new_items, key=_sort_key, reverse=True):
         items_by_region[item.region].append(item)
 
     # ------------------------------------------------------------- analyze
@@ -64,14 +93,21 @@ def run(root: Path, use_llm: bool | None = None,
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
     )
 
+    ta = time.monotonic()
     regional: dict[str, dict] = {}
+    analyst_telemetry: list[dict] = []
+    editor_used = False
     if use_llm and new_items:
         for region_key, region_items in items_by_region.items():
             region_name = cfg.region_names.get(region_key, region_key)
             try:
-                regional[region_name] = analyze_region(
-                    region_name, region_items, model=model,
+                res = analyze_region(
+                    region_name, region_items, model=analyst_model,
                     language=language, max_items=max_items)
+                regional[region_name] = res
+                tel = dict(res.get("_telemetry", {}))
+                tel["region"] = region_name
+                analyst_telemetry.append(tel)
             except Exception as exc:  # noqa: BLE001
                 log.error("Analyst %s failed: %s - falling back to raw list",
                           region_name, exc)
@@ -86,7 +122,9 @@ def run(root: Path, use_llm: bool | None = None,
                 }
         try:
             body, covered = editor.synthesize(
-                regional, topics_store.recent(), model=model, language=language)
+                regional, topics_store.recent(), model=editor_model,
+                language=language)
+            editor_used = True
         except Exception as exc:  # noqa: BLE001 - editor must never kill the run
             log.error("Editor failed (%s) - falling back to digest; "
                       "analyst results remain available in the dashboard", exc)
@@ -111,9 +149,16 @@ def run(root: Path, use_llm: bool | None = None,
         if first_run:
             body = (
                 "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "
-                "eingelesen. Ab dem nächsten Lauf erscheinen nur noch "
+                "eingelesen. Ab dem naechsten Lauf erscheinen nur noch "
                 "wirklich neue Meldungen.\n\n" + body
             )
+    phase("Bewerten & Schreiben", time.monotonic() - ta,
+          f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
+          f"bewertete Meldungen" if use_llm else "ohne KI (Roh-Digest)")
+
+    # strip internal telemetry from the regional dict before it is stored
+    for r in regional.values():
+        r.pop("_telemetry", None)
 
     # enrich highlights with date + source from the collected items
     by_url = {i.url: i for i in new_items}
@@ -130,16 +175,47 @@ def run(root: Path, use_llm: bool | None = None,
 
     # -------------------------------------------------------------- report
     today = date.today()
-    total_sources = sum(len(op.sources) for op in cfg.operators) + len(cfg.news_sources)
+    total_sources = sum(len(op.crawled_sources) for op in cfg.operators) \
+        + len(cfg.news_sources)
     stats = {
         "sources_total": total_sources,
-        "sources_ok": total_sources - len(failed),
-        "sources_failed": len(failed),
+        "sources_ok": n_ok,
+        "sources_empty": n_empty,
+        "sources_failed": n_fail,
         "collected": len(items),
         "new": len(new_items),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
     }
+
+    # ------------------------------------------------------- run log (transparency)
+    duration = time.monotonic() - t0
+    kind_counts: dict[str, int] = defaultdict(int)
+    for r in source_results:
+        kind_counts[r["kind"]] += 1
+    run_log = {
+        "started_at": started_at.isoformat(),
+        "finished_at": datetime.now(timezone.utc).isoformat(),
+        "duration_seconds": round(duration, 1),
+        "used_llm": bool(use_llm and new_items),
+        "editor_used": editor_used,
+        "models": {
+            "analyst": analyst_model if (use_llm and new_items) else None,
+            "editor": editor_model if editor_used else None,
+        },
+        "phases": phases,
+        "source_summary": {
+            "total": len(source_results),
+            "ok": n_ok, "empty": n_empty, "failed": n_fail,
+            "by_kind": dict(kind_counts),
+        },
+        "sources": sorted(
+            source_results,
+            key=lambda r: ({"fail": 0, "ok": 1, "empty": 2}.get(r["status"], 3),
+                           -r.get("count", 0))),
+        "analysts": analyst_telemetry,
+    }
+
     report_md = editor.report_header(today, stats) + body
     report_path = reports_dir / f"{today.isoformat()}.md"
     report_path.write_text(report_md, encoding="utf-8")
@@ -150,11 +226,12 @@ def run(root: Path, use_llm: bool | None = None,
         "stats": stats,
         "briefing_md": body,
         "regions": regional,
+        "run": run_log,
     }
     json_path = reports_dir / f"{today.isoformat()}.json"
     json_path.write_text(
         json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
-    log.info("Report written: %s (+ .json)", report_path)
+    log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
 
     # ------------------------------------------------------ persist state
     seen.add(new_items)

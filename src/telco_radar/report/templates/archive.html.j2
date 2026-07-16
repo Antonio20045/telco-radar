@@ -1,32 +1,30 @@
 {% extends "base.html.j2" %}
 {% set active = 'archive' %}
-{% block title %}Telco Radar – Archiv{% endblock %}
+{% block title %}Telco Radar - Archiv{% endblock %}
 {% block content %}
 <section class="hero">
-  <p class="eyebrow">Alle Briefings</p>
-  <h1>Archiv</h1>
+  <p class="eyebrow">Archiv</p>
+  <h1>Frühere Berichte</h1>
+  <p class="hero-sub">Alle bisherigen Wochenberichte. Jeder zeigt, was in seiner Woche neu war.</p>
 </section>
-<section>
+<section class="section" style="padding-top:26px">
   {% if archive %}
-  <div class="archive-list">
-    {% for entry in archive %}
-    <a class="archive-row" href="{{ prefix }}reports/{{ entry.date }}.html">
-      <span class="archive-date">{{ entry.date }}</span>
-      <span class="archive-stats">
-        {{ entry.stats.get('new', '–') }} neue Meldungen ·
-        {{ entry.stats.get('collected', '–') }} geprüft
-      </span>
-      {% if entry.llm %}
-      <span class="pill pill-ok">✓ Analysiert</span>
-      {% else %}
-      <span class="pill pill-warn">Roh-Daten</span>
-      {% endif %}
-      <span class="archive-arrow">→</span>
-    </a>
-    {% endfor %}
-  </div>
+  <table class="src-table">
+    <thead><tr><th>Bericht</th><th class="num">Betreiber</th><th class="num">geprüft</th><th class="num">neu</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for e in archive %}
+      <tr>
+        <td><a href="{{ prefix }}reports/{{ e.date }}.html"><b>{{ e.date_de }}</b></a></td>
+        <td class="num">{{ e.stats.get('operators','–') }}</td>
+        <td class="num">{{ e.stats.get('collected','–') }}</td>
+        <td class="num">{{ e.stats.get('new','–') }}</td>
+        <td>{% if e.llm %}<span class="kbadge">analysiert</span>{% else %}<span class="kbadge">roh</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% else %}
-  <p>Noch keine Briefings vorhanden.</p>
+  <p class="empty-note">Noch keine Berichte im Archiv.</p>
   {% endif %}
 </section>
 {% endblock %}

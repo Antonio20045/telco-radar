@@ -1,17 +1,18 @@
 {% extends "base.html.j2" %}
 {% set active = 'sources' %}
-{% block title %}Telco Radar – Überwachte Quellen{% endblock %}
+{% block title %}Telco Radar - Quellen{% endblock %}
+{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Google News','official':'Offiziell'} %}
 {% block content %}
 <section class="hero">
   <p class="eyebrow">Was der Radar beobachtet</p>
   <h1>Überwachte Quellen</h1>
-  <p class="hero-sub">Operator-Newsrooms auf allen Kontinenten plus die internationale Telco-Fachpresse.
-  Neue Quellen werden in <code>config/watchlist.yaml</code> gepflegt.</p>
+  <p class="hero-sub">Jeder Netzbetreiber wird direkt beobachtet: über seinen Newsroom und über eine
+  laufende Google-News-Abfrage. Jede Quelle ist verlinkt und nachprüfbar.</p>
 </section>
 
 {% for region, ops in by_region.items() %}
 <section class="source-region">
-  <div class="section-head"><h2>{{ region }} <span class="count-badge">{{ ops | length }}</span></h2></div>
+  <h2>{{ region }} <span class="count-badge">{{ ops | length }} Betreiber</span></h2>
   <div class="source-grid">
     {% for op in ops %}
     <div class="source-card">
@@ -22,12 +23,13 @@
       <ul class="source-links">
         {% for s in op.sources %}
         <li>
-          <span class="chip">{{ s.type | upper }}</span>
-          <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} ↗</a>
+          <span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
+          {% if s.kind == 'news_search' %}
+          <a href="{{ s.url | replace('/rss/search','/search') }}" target="_blank" rel="noopener">Meldungen zu {{ op.name }} &nearr;</a>
+          {% else %}
+          <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a>
+          {% endif %}
         </li>
-        {% else %}
-        <li><span class="chip">via Fachpresse</span>
-        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         {% endfor %}
       </ul>
     </div>
@@ -37,14 +39,14 @@
 {% endfor %}
 
 <section class="source-region">
-  <div class="section-head"><h2>Telco-Fachpresse <span class="count-badge">{{ news_sources | length }}</span></h2></div>
+  <h2>Telco-Fachpresse <span class="count-badge">{{ news_sources | length }} Feeds</span></h2>
   <div class="source-grid">
     {% for s in news_sources %}
     <div class="source-card">
-      <div class="source-head"><h3>{{ s.name }}</h3></div>
+      <div class="source-head"><h3>{{ s.name }}</h3><span class="chip">RSS</span></div>
       <ul class="source-links">
-        <li><span class="chip cat-tech">RSS</span>
-        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} ↗</a></li>
+        <li><span class="kbadge">Fachpresse</span>
+        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
       </ul>
     </div>
     {% endfor %}

@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Telco Radar{% endblock %}</title>
+  <title>Telco Radar - Protokoll</title>
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ prefix }}style.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='100' fill='%23e60000'/><path fill='%23fff' d='M96 40C72 40 54 58 54 82c0 21 15 37 36 40-8 17-22 27-40 31 8 12 10 12 10 12 36-13 62-41 62-83C122 58 120 40 96 40Z'/></svg>">
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="{{ prefix }}index.html" aria-label="Telco Radar">
+      <a class="brand" href="index.html" aria-label="Telco Radar">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vodafone">
           <circle cx="100" cy="100" r="100" fill="#e60000"/>
           <path fill="#ffffff" d="M96 40C72 40 54 58 54 82c0 21 15 37 36 40-8 17-22 27-40 31 8 12 10 12 10 12 36-13 62-41 62-83C122 58 120 40 96 40Z"/>
@@ -22,28 +22,41 @@
         <span class="brand-name">Telco<em>Radar</em></span>
       </a>
       <nav class="nav">
-        <a href="{{ prefix }}index.html" {% if active == 'dashboard' %}class="active"{% endif %}>Bericht</a>
-        <a href="{{ prefix }}protokoll.html" {% if active == 'protokoll' %}class="active"{% endif %}>Protokoll</a>
-        <a href="{{ prefix }}archive.html" {% if active == 'archive' %}class="active"{% endif %}>Archiv</a>
-        <a href="{{ prefix }}sources.html" {% if active == 'sources' %}class="active"{% endif %}>Quellen</a>
+        <a href="index.html" >Bericht</a>
+        <a href="protokoll.html" class="active">Protokoll</a>
+        <a href="archive.html" >Archiv</a>
+        <a href="sources.html" >Quellen</a>
       </nav>
     </div>
   </header>
   <main>
     <div class="wrap">
-      {% block content %}{% endblock %}
+      
+
+<section class="hero">
+  <p class="eyebrow">Transparenz</p>
+  <h1>Was im Hintergrund lief</h1>
+  <p class="hero-sub">Jeder Lauf ist hier nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und was die KI daraus gemacht hat.</p>
+</section>
+
+
+<section class="section" style="padding-top:20px">
+  <p class="empty-note">Für diesen Bericht liegt noch kein Protokoll vor. Es entsteht beim nächsten Lauf der Pipeline.</p>
+</section>
+
+
     </div>
   </main>
   <footer class="footer">
     <div class="wrap footer-inner">
       <div style="max-width:640px">
-        <b>Telco Radar</b> beobachtet jede Woche die Presse von {{ num_operators or '80' }} Netzbetreibern
+        <b>Telco Radar</b> beobachtet jede Woche die Presse von 80 Netzbetreibern
         weltweit und die internationale Fachpresse. Nur wirklich neue Meldungen werden bewertet und hier
         zusammengefasst. Jede Aussage verlinkt auf die Originalquelle.
       </div>
       <div class="footer-meta">Intern &middot; für Vodafone</div>
     </div>
   </footer>
-  <script src="{{ prefix }}app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
