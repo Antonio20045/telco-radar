@@ -84,8 +84,14 @@ def run(root: Path, use_llm: bool | None = None,
                         for i in region_items[:10]
                     ],
                 }
-        body, covered = editor.synthesize(
-            regional, topics_store.recent(), model=model, language=language)
+        try:
+            body, covered = editor.synthesize(
+                regional, topics_store.recent(), model=model, language=language)
+        except Exception as exc:  # noqa: BLE001 - editor must never kill the run
+            log.error("Editor failed (%s) - falling back to digest; "
+                      "analyst results remain available in the dashboard", exc)
+            body, covered = editor.build_digest(
+                items_by_region, cfg.region_names, llm_was_available=True)
     else:
         if use_llm and not new_items:
             log.info("No new items - writing empty briefing")
@@ -100,7 +106,8 @@ def run(root: Path, use_llm: bool | None = None,
                     for i in region_items[:max_items]
                 ],
             }
-        body, covered = editor.build_digest(items_by_region, cfg.region_names)
+        body, covered = editor.build_digest(
+            items_by_region, cfg.region_names, llm_was_available=bool(use_llm))
         if first_run:
             body = (
                 "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "

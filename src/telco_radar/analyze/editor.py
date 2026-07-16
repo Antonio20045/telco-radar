@@ -79,16 +79,20 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
 
 
 def build_digest(items_by_region: dict[str, list[Item]],
-                 region_names: dict[str, str]) -> tuple[str, list[str]]:
+                 region_names: dict[str, str],
+                 llm_was_available: bool = False) -> tuple[str, list[str]]:
     """No-LLM fallback: deterministic digest of all new items."""
-    lines = [
-        "## Roh-Digest (ohne KI-Analyse)",
-        "",
-        "_`ANTHROPIC_API_KEY` ist nicht gesetzt - dies ist die ungefilterte "
-        "Liste aller NEUEN Items. Mit API-Key liefert Telco Radar analysierte "
-        "Briefings mit Relevanzbewertung und Handlungsempfehlungen._",
-        "",
-    ]
+    if llm_was_available:
+        lines = ["## Wochenüberblick", ""]
+    else:
+        lines = [
+            "## Roh-Digest (ohne KI-Analyse)",
+            "",
+            "_`ANTHROPIC_API_KEY` ist nicht gesetzt - dies ist die ungefilterte "
+            "Liste aller NEUEN Items. Mit API-Key liefert Telco Radar analysierte "
+            "Briefings mit Relevanzbewertung und Handlungsempfehlungen._",
+            "",
+        ]
     topics: list[str] = []
     for region_key in sorted(items_by_region,
                              key=lambda k: -len(items_by_region[k])):

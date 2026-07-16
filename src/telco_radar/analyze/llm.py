@@ -19,7 +19,7 @@ def llm_available() -> bool:
 
 
 def complete(system: str, user: str, model: str,
-             max_tokens: int = 4096, retries: int = 3) -> str:
+             max_tokens: int = 4096, retries: int = 5) -> str:
     """Single-turn completion. Raises RuntimeError after exhausting retries."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -54,7 +54,7 @@ def complete(system: str, user: str, model: str,
             )
         except (httpx.HTTPError, json.JSONDecodeError) as exc:
             last_err = exc
-            wait = 5 * attempt
+            wait = min(12 * attempt, 45)  # 529/overload needs patience
             log.warning("LLM call failed (attempt %d/%d): %s - retrying in %ds",
                         attempt, retries, exc, wait)
             time.sleep(wait)
