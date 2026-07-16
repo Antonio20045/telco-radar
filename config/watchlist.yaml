@@ -8,8 +8,12 @@
 #   newsroom : HTML press/newsroom page (generic link extraction; optional
 #              CSS "item_selector" to narrow down article links)
 #
-# Maintenance: run `python scripts/validate_sources.py` to check all URLs.
-# Broken sources are logged and skipped at runtime - they never break a run.
+# Operators WITHOUT sources are intentional: their newsrooms are bot-protected
+# or JS-only. They are still covered - industry-news items mentioning them
+# (name or alias in the headline) are auto-tagged to their region.
+#
+# Maintenance: `python scripts/validate_sources.py` checks every URL.
+# A failing source is logged and skipped at runtime - it never breaks a run.
 # =============================================================================
 
 regions:
@@ -22,12 +26,24 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.vodafone.com/news"
+      - name: "Vodafone Deutschland"
+        aliases: []
+        country: "DE"
+        sources:
+          - type: newsroom
+            url: "https://newsroom.vodafone.de/"
       - name: "Deutsche Telekom"
-        aliases: ["Telekom", "T-Mobile", "T-Systems"]
+        aliases: ["Telekom", "T-Systems"]
         country: "DE"
         sources:
           - type: newsroom
             url: "https://www.telekom.com/en/media/media-information"
+      - name: "O2 Telefónica Deutschland"
+        aliases: ["O2 Telefonica", "Telefónica Deutschland"]
+        country: "DE"
+        sources:
+          - type: newsroom
+            url: "https://www.telefonica.de/presse.html"
       - name: "Orange"
         aliases: ["Orange Group"]
         country: "FR"
@@ -58,6 +74,48 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.teliacompany.com/en/newsroom"
+      - name: "KPN"
+        aliases: []
+        country: "NL"
+        sources:
+          - type: newsroom
+            url: "https://www.overons.kpn/nieuws/en/"
+      - name: "Proximus"
+        aliases: []
+        country: "BE"
+        sources:
+          - type: newsroom
+            url: "https://www.proximus.com/news.html"
+      - name: "TIM"
+        aliases: ["Telecom Italia", "Gruppo TIM"]
+        country: "IT"
+        sources:
+          - type: newsroom
+            url: "https://www.gruppotim.it/en/press-archive.html"
+      - name: "Liberty Global"
+        aliases: ["Virgin Media", "Sunrise"]
+        country: "GB"
+        sources:
+          - type: newsroom
+            url: "https://www.libertyglobal.com/news-insights/featured-news-insights/"
+      - name: "VEON"
+        aliases: ["Jazz", "Kyivstar", "Beeline"]
+        country: "NL"
+        sources:
+          - type: newsroom
+            url: "https://www.veon.com/newsroom"
+      - name: "Telenor"          # newsroom bot-protected -> trade-press coverage
+        aliases: []
+        country: "NO"
+        sources: []
+      - name: "Turkcell"         # newsroom 404s on EN paths -> trade-press coverage
+        aliases: []
+        country: "TR"
+        sources: []
+      - name: "Iliad"            # JS-heavy -> trade-press coverage
+        aliases: ["Free Mobile"]
+        country: "FR"
+        sources: []
 
   north_america:
     name: "Nordamerika"
@@ -80,22 +138,42 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.t-mobile.com/news"
+      - name: "Bell Canada"
+        aliases: ["Bell", "BCE"]
+        country: "CA"
+        sources:
+          - type: newsroom
+            url: "https://www.bce.ca/news-and-media/newsroom"
+      - name: "Rogers"           # bot-protected -> trade-press coverage
+        aliases: []
+        country: "CA"
+        sources: []
+      - name: "Telus"            # bot-protected -> trade-press coverage
+        aliases: []
+        country: "CA"
+        sources: []
 
   latin_america:
     name: "Lateinamerika"
     operators:
-      - name: "América Móvil"
+      - name: "América Móvil"    # bot-protected -> trade-press coverage
         aliases: ["America Movil", "Claro"]
         country: "MX"
-        sources:
-          - type: newsroom
-            url: "https://www.americamovil.com/English/press-room/"
+        sources: []
       - name: "Millicom"
         aliases: ["Tigo"]
         country: "LU"
         sources:
           - type: newsroom
             url: "https://www.millicom.com/media/press-releases"
+      - name: "TIM Brasil"       # covered via trade press
+        aliases: []
+        country: "BR"
+        sources: []
+      - name: "Entel"            # covered via trade press
+        aliases: []
+        country: "CL"
+        sources: []
 
   africa_middle_east:
     name: "Afrika & Naher Osten"
@@ -106,6 +184,10 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.mtn.com/newsroom/"
+      - name: "Vodacom"          # own newsroom JS-only -> trade-press coverage
+        aliases: []
+        country: "ZA"
+        sources: []
       - name: "Safaricom"
         aliases: ["M-Pesa"]
         country: "KE"
@@ -118,18 +200,28 @@ regions:
         sources:
           - type: newsroom
             url: "https://airtel.africa/media"
-      - name: "e&"
+      - name: "stc"
+        aliases: ["Saudi Telecom"]
+        country: "SA"
+        sources:
+          - type: newsroom
+            url: "https://www.stc.com/en/media-center.html"
+      - name: "e&"               # bot-protected -> trade-press coverage
         aliases: ["Etisalat", "e& Group"]
         country: "AE"
-        sources:
-          - type: newsroom
-            url: "https://www.eand.com/en/news/"
-      - name: "Ooredoo"
+        sources: []
+      - name: "Ooredoo"          # bot-protected -> trade-press coverage
         aliases: []
         country: "QA"
-        sources:
-          - type: newsroom
-            url: "https://www.ooredoo.com/en/media/"
+        sources: []
+      - name: "Zain"             # redirect-loop on press URLs -> trade press
+        aliases: []
+        country: "KW"
+        sources: []
+      - name: "Orange MEA"       # covered via Orange Group + trade press
+        aliases: ["Orange Egypt", "Orange Jordan"]
+        country: "EG"
+        sources: []
 
   asia:
     name: "Asien"
@@ -146,6 +238,10 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.jio.com/press-release"
+      - name: "Vodafone Idea"    # site 404s EN press path -> trade press
+        aliases: ["Vi India"]
+        country: "IN"
+        sources: []
       - name: "Singtel"
         aliases: []
         country: "SG"
@@ -158,6 +254,10 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.sktelecom.com/en/press/press_list.do"
+      - name: "KT"
+        aliases: ["Korea Telecom"]
+        country: "KR"
+        sources: []
       - name: "NTT Docomo"
         aliases: ["Docomo"]
         country: "JP"
@@ -165,7 +265,7 @@ regions:
           - type: newsroom
             url: "https://www.docomo.ne.jp/english/info/media_center/pr/"
       - name: "KDDI"
-        aliases: ["au"]
+        aliases: []
         country: "JP"
         sources:
           - type: newsroom
@@ -176,12 +276,50 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.softbank.jp/en/corp/news/press/"
+      - name: "Rakuten Mobile"
+        aliases: ["Rakuten"]
+        country: "JP"
+        sources:
+          - type: newsroom
+            url: "https://corp.mobile.rakuten.co.jp/english/news/press/"
+      - name: "China Mobile"
+        aliases: []
+        country: "CN"
+        sources:
+          - type: newsroom
+            url: "https://www.chinamobileltd.com/en/media/press.php"
+      - name: "China Telecom"    # covered via trade press
+        aliases: []
+        country: "CN"
+        sources: []
+      - name: "Chunghwa Telecom"
+        aliases: ["Chunghwa"]
+        country: "TW"
+        sources:
+          - type: newsroom
+            url: "https://www.cht.com.tw/en/home/cht/messages"
       - name: "Telkomsel"
         aliases: []
         country: "ID"
         sources:
           - type: newsroom
             url: "https://www.telkomsel.com/en/about-us/news"
+      - name: "AIS"              # EN press path 404 -> trade press
+        aliases: ["Advanced Info Service"]
+        country: "TH"
+        sources: []
+      - name: "Viettel"          # covered via trade press
+        aliases: []
+        country: "VN"
+        sources: []
+      - name: "Globe Telecom"    # bot-protected -> trade press
+        aliases: ["Globe"]
+        country: "PH"
+        sources: []
+      - name: "PLDT"             # bot-protected -> trade press
+        aliases: ["Smart Communications"]
+        country: "PH"
+        sources: []
 
   oceania:
     name: "Ozeanien"
@@ -198,3 +336,17 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.optus.com.au/about/media-centre"
+      - name: "TPG Telecom"      # press path 404 -> trade press
+        aliases: ["TPG"]
+        country: "AU"
+        sources: []
+      - name: "One NZ"
+        aliases: ["One New Zealand"]
+        country: "NZ"
+        sources:
+          - type: newsroom
+            url: "https://media.one.nz"
+      - name: "Spark"            # bot-protected -> trade press
+        aliases: ["Spark New Zealand"]
+        country: "NZ"
+        sources: []

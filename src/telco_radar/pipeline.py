@@ -6,6 +6,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from collections import defaultdict
@@ -63,8 +64,8 @@ def run(root: Path, use_llm: bool | None = None,
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
     )
 
+    regional: dict[str, dict] = {}
     if use_llm and new_items:
-        regional: dict[str, dict] = {}
         for region_key, region_items in items_by_region.items():
             region_name = cfg.region_names.get(region_key, region_key)
             try:
@@ -75,7 +76,7 @@ def run(root: Path, use_llm: bool | None = None,
                 log.error("Analyst %s failed: %s - falling back to raw list",
                           region_name, exc)
                 regional[region_name] = {
-                    "region_summary": f"(Analyse fehlgeschlagen: {exc})",
+                    "region_summary": "",
                     "highlights": [
                         {"title": i.title, "operator": i.operator or "",
                          "url": i.url, "category": "Sonstiges", "relevance": 2,
@@ -88,6 +89,17 @@ def run(root: Path, use_llm: bool | None = None,
     else:
         if use_llm and not new_items:
             log.info("No new items - writing empty briefing")
+        for region_key, region_items in items_by_region.items():
+            region_name = cfg.region_names.get(region_key, region_key)
+            regional[region_name] = {
+                "region_summary": "",
+                "highlights": [
+                    {"title": i.title, "operator": i.operator or i.source_name,
+                     "url": i.url, "category": "Unbewertet", "relevance": None,
+                     "summary": i.summary[:220], "why_it_matters": ""}
+                    for i in region_items[:max_items]
+                ],
+            }
         body, covered = editor.build_digest(items_by_region, cfg.region_names)
         if first_run:
             body = (
@@ -96,19 +108,46 @@ def run(root: Path, use_llm: bool | None = None,
                 "wirklich neue Meldungen.\n\n" + body
             )
 
+    # enrich highlights with date + source from the collected items
+    by_url = {i.url: i for i in new_items}
+    for region in regional.values():
+        for h in region.get("highlights", []):
+            item = by_url.get(h.get("url", ""))
+            if item is not None:
+                h.setdefault("date", item.published.date().isoformat()
+                             if item.published else None)
+                h.setdefault("source", item.source_name)
+            else:
+                h.setdefault("date", None)
+                h.setdefault("source", "")
+
     # -------------------------------------------------------------- report
     today = date.today()
     total_sources = sum(len(op.sources) for op in cfg.operators) + len(cfg.news_sources)
     stats = {
+        "sources_total": total_sources,
         "sources_ok": total_sources - len(failed),
         "sources_failed": len(failed),
         "collected": len(items),
         "new": len(new_items),
+        "operators": len(cfg.operators),
+        "regions": len(cfg.region_names) - 1,
     }
     report_md = editor.report_header(today, stats) + body
     report_path = reports_dir / f"{today.isoformat()}.md"
     report_path.write_text(report_md, encoding="utf-8")
-    log.info("Report written: %s", report_path)
+
+    report_json = {
+        "date": today.isoformat(),
+        "generated_with_llm": bool(use_llm and new_items),
+        "stats": stats,
+        "briefing_md": body,
+        "regions": regional,
+    }
+    json_path = reports_dir / f"{today.isoformat()}.json"
+    json_path.write_text(
+        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("Report written: %s (+ .json)", report_path)
 
     # ------------------------------------------------------ persist state
     seen.add(new_items)
@@ -116,7 +155,7 @@ def run(root: Path, use_llm: bool | None = None,
         topics_store.add(covered, today.isoformat())
 
     # ---------------------------------------------------------------- site
-    render_site(root / "site", reports_dir)
+    render_site(root / "site", reports_dir, cfg)
     return report_path
 
 

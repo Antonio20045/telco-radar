@@ -56,22 +56,36 @@ def collect_all(cfg: Config, max_workers: int = 8) -> tuple[list[Item], list[str
     return items, failed
 
 
+# Single words that are too ambiguous in headlines to identify an operator
+# on their own (multi-word terms containing them are still fine).
+_AMBIGUOUS_TERMS = {
+    "spark", "tim", "globe", "smart", "bell", "one", "free", "vi", "au",
+}
+
+
 def tag_news_regions(items: list[Item], operators: list[Operator]) -> None:
     """Assign industry-news items to a region if the headline names a
-    watchlist operator (longest alias wins)."""
-    terms: list[tuple[str, Operator]] = []
+    watchlist operator. Word-boundary matching, longest term wins."""
+    import re as _re
+
+    terms: list[tuple[str, "_re.Pattern[str]", Operator]] = []
     for op in operators:
         for term in op.match_terms:
-            if len(term) >= 3:
-                terms.append((term.lower(), op))
+            t = term.lower().strip()
+            if len(t) < 3:
+                continue
+            if " " not in t and t in _AMBIGUOUS_TERMS:
+                continue
+            pattern = _re.compile(r"(?<!\w)" + _re.escape(t) + r"(?!\w)")
+            terms.append((t, pattern, op))
     terms.sort(key=lambda t: -len(t[0]))
 
     for item in items:
         if item.origin != "industry_news":
             continue
         hay = item.title.lower()
-        for term, op in terms:
-            if term in hay:
+        for _t, pattern, op in terms:
+            if pattern.search(hay):
                 item.region = op.region_key
                 item.operator = op.name
                 break

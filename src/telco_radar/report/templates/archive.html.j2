@@ -1,0 +1,32 @@
+{% extends "base.html.j2" %}
+{% set active = 'archive' %}
+{% block title %}Telco Radar – Archiv{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Alle Briefings</p>
+  <h1>Archiv</h1>
+</section>
+<section>
+  {% if archive %}
+  <div class="archive-list">
+    {% for entry in archive %}
+    <a class="archive-row" href="{{ prefix }}reports/{{ entry.date }}.html">
+      <span class="archive-date">{{ entry.date }}</span>
+      <span class="archive-stats">
+        {{ entry.stats.get('new', '–') }} neue Signale ·
+        {{ entry.stats.get('collected', '–') }} Items gescannt
+      </span>
+      {% if entry.llm %}
+      <span class="pill pill-ok">KI-analysiert</span>
+      {% else %}
+      <span class="pill pill-warn">Roh-Digest</span>
+      {% endif %}
+      <span class="archive-arrow">→</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Noch keine Briefings vorhanden.</p>
+  {% endif %}
+</section>
+{% endblock %}

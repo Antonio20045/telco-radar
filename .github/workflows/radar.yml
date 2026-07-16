@@ -12,8 +12,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: radar
@@ -41,30 +39,25 @@ jobs:
           python -m telco_radar.pipeline --root . \
             --lookback-days "${{ github.event.inputs.lookback_days || 8 }}"
 
-      - name: Commit state and report
+      - name: Commit state, report and site
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/
+          git add data/ site/
           if git diff --staged --quiet; then
-            echo "No state changes to commit"
+            echo "No changes to commit"
           else
             git commit -m "radar: run $(date -u +%F)"
             git push
           fi
 
-      - name: Upload site artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/
-
-  deploy:
-    needs: radar
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Trigger Render deploy
+        if: always()
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$HOOK" ]; then
+            curl -fsS -X POST "$HOOK" > /dev/null && echo "Render deploy triggered"
+          else
+            echo "RENDER_DEPLOY_HOOK not set - skipping (Render auto-deploys on push if connected)"
+          fi

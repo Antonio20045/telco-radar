@@ -1,0 +1,50 @@
+{% extends "base.html.j2" %}
+{% set active = 'sources' %}
+{% block title %}Telco Radar – Überwachte Quellen{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Was der Radar beobachtet</p>
+  <h1>Überwachte Quellen</h1>
+  <p class="hero-sub">Operator-Newsrooms auf allen Kontinenten plus die internationale Telco-Fachpresse.
+  Neue Quellen werden in <code>config/watchlist.yaml</code> gepflegt.</p>
+</section>
+
+{% for region, ops in by_region.items() %}
+<section class="source-region">
+  <div class="section-head"><h2>{{ region }} <span class="count-badge">{{ ops | length }}</span></h2></div>
+  <div class="source-grid">
+    {% for op in ops %}
+    <div class="source-card">
+      <div class="source-head">
+        <h3>{{ op.name }}</h3>
+        {% if op.country %}<span class="chip cat-other">{{ op.country }}</span>{% endif %}
+      </div>
+      <ul class="source-links">
+        {% for s in op.sources %}
+        <li>
+          <span class="chip {{ 'cat-tech' if s.type == 'rss' else 'cat-partner' }}">{{ s.type | upper }}</span>
+          <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} ↗</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+
+<section class="source-region">
+  <div class="section-head"><h2>Telco-Fachpresse <span class="count-badge">{{ news_sources | length }}</span></h2></div>
+  <div class="source-grid">
+    {% for s in news_sources %}
+    <div class="source-card">
+      <div class="source-head"><h3>{{ s.name }}</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} ↗</a></li>
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

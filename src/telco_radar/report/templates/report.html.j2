@@ -1,33 +1,110 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Telco Radar – Briefing {{ date }}</title>
-  <link rel="stylesheet" href="../style.css">
-</head>
-<body>
-  <header class="site">
-    <div class="wrap">
-      <h1><a href="../index.html">Telco <span>Radar</span></a></h1>
-      <p>Briefing vom {{ date }}</p>
+{% extends "base.html.j2" %}
+{% set active = 'dashboard' if is_latest else 'archive' %}
+{% block title %}Telco Radar – Briefing {{ report.date if report else '' }}{% endblock %}
+{% block content %}
+{% if report %}
+<section class="hero">
+  <div class="hero-head">
+    <div>
+      <p class="eyebrow">{% if is_latest %}Aktuelles Wochenbriefing{% else %}Briefing aus dem Archiv{% endif %}</p>
+      <h1>{{ report.date }}</h1>
     </div>
-  </header>
-  <main>
-    <div class="wrap">
-      <article class="report">
-        {{ body | safe }}
-      </article>
-      <nav class="archive">
-        <h2>Archiv</h2>
-        <ul>
-          {% for entry in archive %}
-          <li><a href="../{{ entry.href }}" {% if entry.date == date %}class="current"{% endif %}>{{ entry.date }}</a></li>
-          {% endfor %}
-        </ul>
-      </nav>
+    {% if not report.generated_with_llm %}
+    <span class="pill pill-warn" title="Dieser Lauf wurde ohne KI-Analyse erstellt">Roh-Digest</span>
+    {% else %}
+    <span class="pill pill-ok">KI-analysiert</span>
+    {% endif %}
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="kpi-num">{{ report.stats.get('operators', '–') }}</span><span class="kpi-label">Operator weltweit</span></div>
+    <div class="kpi"><span class="kpi-num">{{ report.stats.get('sources_ok', '–') }}<small>/{{ report.stats.get('sources_total', '–') }}</small></span><span class="kpi-label">Quellen aktiv</span></div>
+    <div class="kpi"><span class="kpi-num">{{ report.stats.get('collected', '–') }}</span><span class="kpi-label">Items gescannt</span></div>
+    <div class="kpi kpi-accent"><span class="kpi-num">{{ report.stats.get('new', '–') }}</span><span class="kpi-label">davon neu</span></div>
+  </div>
+</section>
+
+{% if highlights %}
+<section class="signals">
+  <div class="section-head">
+    <h2>Signale <span class="count-badge" id="signal-count">{{ highlights | length }}</span></h2>
+    <div class="filters">
+      <input type="search" id="f-search" placeholder="Suchen (Operator, Thema)…" aria-label="Suche">
+      <select id="f-region" aria-label="Region">
+        <option value="">Alle Regionen</option>
+        {% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+      </select>
+      <select id="f-category" aria-label="Kategorie">
+        <option value="">Alle Kategorien</option>
+        {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+      </select>
+      <select id="f-relevance" aria-label="Relevanz">
+        <option value="">Jede Relevanz</option>
+        <option value="5">nur 5/5</option>
+        <option value="4">ab 4/5</option>
+        <option value="3">ab 3/5</option>
+      </select>
     </div>
-  </main>
-  <footer class="site">Telco Radar · automatisiert erstellt · nur für interne Zwecke</footer>
-</body>
-</html>
+  </div>
+
+  <div class="cards" id="cards">
+    {% for h in highlights %}
+    <article class="card"
+             data-region="{{ h.region }}"
+             data-category="{{ h.category or 'Sonstiges' }}"
+             data-relevance="{{ h.relevance or 0 }}"
+             data-text="{{ ((h.operator or '') ~ ' ' ~ (h.title or '') ~ ' ' ~ (h.summary or '')) | lower }}">
+      <div class="card-top">
+        <span class="chip {{ h.category | catclass }}">{{ h.category or 'Sonstiges' }}</span>
+        {% if h.relevance %}
+        <span class="relevance r{{ h.relevance }}" title="Relevanz für Vodafone">
+          {% for i in range(5) %}<i {% if i < h.relevance %}class="on"{% endif %}></i>{% endfor %}
+        </span>
+        {% endif %}
+      </div>
+      <h3 class="card-title"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.title }}</a></h3>
+      <p class="card-meta">
+        <strong>{{ h.operator or '–' }}</strong>
+        <span class="dot-sep"></span>{{ h.region }}
+        {% if h.date %}<span class="dot-sep"></span>{{ h.date }}{% endif %}
+      </p>
+      {% if h.summary %}<p class="card-summary">{{ h.summary }}</p>{% endif %}
+      {% if h.why_it_matters %}
+      <p class="card-why"><span class="why-label">Warum relevant</span>{{ h.why_it_matters }}</p>
+      {% endif %}
+      <div class="card-foot">
+        <a class="source-link" href="{{ h.url }}" target="_blank" rel="noopener">
+          {{ h.url | domain }} ↗
+        </a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  <p class="empty-filter" id="empty-filter" hidden>Keine Signale für diese Filterkombination.</p>
+</section>
+{% endif %}
+
+{% if briefing_html %}
+<section class="briefing">
+  <div class="section-head"><h2>Briefing</h2></div>
+  <article class="prose">{{ briefing_html | safe }}</article>
+</section>
+{% endif %}
+
+{% else %}
+<section class="hero"><h1>Noch kein Briefing</h1>
+<p>Der erste Pipeline-Lauf erzeugt hier das aktuelle Wochenbriefing.</p></section>
+{% endif %}
+
+{% if archive and archive | length > 1 %}
+<section class="mini-archive">
+  <div class="section-head"><h2>Frühere Briefings</h2></div>
+  <div class="pill-row">
+    {% for entry in archive %}
+    <a class="pill-link {% if report and entry.date == report.date %}current{% endif %}"
+       href="{{ prefix }}reports/{{ entry.date }}.html">{{ entry.date }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ prefix }}app.js"></script>{% endblock %}

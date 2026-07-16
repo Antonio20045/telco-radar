@@ -142,15 +142,8 @@ def parse_newsroom_html(html: str, source: Source, region: str,
 
 def collect_newsroom(source: Source, region: str, operator: str | None,
                      origin: str, http_cfg: dict) -> list[Item]:
-    timeout = float(http_cfg.get("timeout_seconds", 20))
-    headers = {
-        "User-Agent": http_cfg.get("user_agent", "TelcoRadar/1.0"),
-        "Accept": "text/html,application/xhtml+xml",
-        "Accept-Language": "en;q=0.9,de;q=0.8",
-    }
-    resp = httpx.get(source.url, timeout=timeout, headers=headers,
-                     follow_redirects=True)
-    resp.raise_for_status()
+    from .http import fetch
+    resp = fetch(source.url, http_cfg)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
     return parse_newsroom_html(resp.text, source, region, operator,
                                origin, max_links)

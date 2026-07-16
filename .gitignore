@@ -4,5 +4,6 @@ __pycache__/
 .venv/
 venv/
 .env
-site/
 .DS_Store
+run.log
+validate.log

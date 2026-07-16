@@ -31,8 +31,8 @@ Telco Radar überwacht die Newsrooms von Mobilfunkanbietern auf allen Kontinente
  └─────────────────────┬───────────────────────┘
                        ▼
  ┌─────────────────────────────────────────────┐
- │  5. PUBLISH   Markdown-Archiv + HTML-Site    │  GitHub Pages
- └─────────────────────────────────────────────┘
+ │  5. PUBLISH   Markdown-Archiv + HTML-Site    │  Render Static Site (CDN,
+ └─────────────────────────────────────────────┘  schläft nie, kostenlos)
 ```
 
 **Designprinzip:** Die Intelligenz sitzt in der Delta-Schicht, nicht in den Agents. LLM-Aufrufe sehen ausschließlich neue Items — das macht das System günstig, schnell und verhindert Wiederholungen zuverlässiger als jede Prompt-Anweisung.
@@ -62,18 +62,20 @@ open site/index.html
 
 Der **erste Lauf** ist ein Baseline-Lauf: Alle Quellen werden eingelesen und als "gesehen" markiert. Ab dem zweiten Lauf enthalten Briefings nur noch Neues.
 
-## Automatischer Betrieb (GitHub Actions)
+## Automatischer Betrieb (GitHub Actions + Render)
 
 Der Workflow [`radar.yml`](.github/workflows/radar.yml) läuft **jeden Montag 05:00 UTC** (und manuell über *Actions → Telco Radar Run → Run workflow*):
 
 1. Pipeline ausführen
-2. Neuen State (`data/`) zurück ins Repo committen
-3. Website auf GitHub Pages deployen
+2. State (`data/`) und generierte Website (`site/`) zurück ins Repo committen
+3. Render-Deploy anstoßen (Deploy Hook)
+
+Die Website läuft als **Render Static Site** (Publish Directory `site`, kein Build-Command nötig). Statische Sites liegen auf Renders CDN: **kein Spin-down, keine Kaltstarts, kostenlos.**
 
 ### Einmalige Einrichtung
 
-1. **Secret setzen:** *Settings → Secrets and variables → Actions → New repository secret* → Name `ANTHROPIC_API_KEY`, Wert = dein Anthropic-API-Key. Ohne Key läuft alles trotzdem — es erscheint dann ein Roh-Digest statt des analysierten Briefings.
-2. **Pages aktivieren:** *Settings → Pages → Source: GitHub Actions* (wird bei diesem Repo bereits automatisch konfiguriert).
+1. **Secret setzen:** *Settings → Secrets and variables → Actions* → `ANTHROPIC_API_KEY` = dein Anthropic-API-Key. Ohne Key läuft alles trotzdem — es erscheint dann ein Roh-Digest statt des analysierten Briefings.
+2. **Render:** Neue *Static Site* vom Repo (Branch `main`, Publish Directory `site`). Den *Deploy Hook* aus den Render-Settings als GitHub-Secret `RENDER_DEPLOY_HOOK` hinterlegen, damit jeder Radar-Lauf sofort deployt.
 
 ## Konfiguration
 

@@ -63,9 +63,6 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 
 def collect_rss(source: Source, region: str, operator: str | None,
                 origin: str, http_cfg: dict) -> list[Item]:
-    timeout = float(http_cfg.get("timeout_seconds", 20))
-    headers = {"User-Agent": http_cfg.get("user_agent", "TelcoRadar/1.0")}
-    resp = httpx.get(source.url, timeout=timeout, headers=headers,
-                     follow_redirects=True)
-    resp.raise_for_status()
+    from .http import fetch
+    resp = fetch(source.url, http_cfg)
     return parse_feed_bytes(resp.content, source, region, operator, origin)
