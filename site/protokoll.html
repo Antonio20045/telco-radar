@@ -40,9 +40,1310 @@
 </section>
 
 
-<section class="section" style="padding-top:20px">
-  <p class="empty-note">Für diesen Bericht liegt noch kein Protokoll vor. Es entsteht beim nächsten Lauf der Pipeline.</p>
+<section class="section" style="padding-top:34px">
+  <div class="kpis">
+    <div class="kpi">
+      <span class="kpi-num">126</span>
+      <span class="kpi-label">Quellen abgefragt</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">27<small>&nbsp;ok</small></span>
+      <span class="kpi-label">17 leer &middot; 82 fehlgeschlagen</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">7.1<small>&nbsp;min</small></span>
+      <span class="kpi-label">Laufzeit (16. Juli 2026)</span>
+    </div>
+    <div class="kpi accent">
+      <span class="kpi-num">53</span>
+      <span class="kpi-label">neue Meldungen bewertet</span>
+    </div>
+  </div>
 </section>
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">01</span> Ablauf</h2>
+    <p class="section-title">Die Schritte dieses Laufs</p>
+  </div>
+  
+  <div class="phase-row">
+    <div class="phase-name">Sammeln</div>
+    <div class="phase-detail">126 Quellen abgefragt, 361 Meldungen gefunden</div>
+    <div class="phase-time">166.0 s</div>
+  </div>
+  
+  <div class="phase-row">
+    <div class="phase-name">Nur Neues</div>
+    <div class="phase-detail">53 neue Meldungen (Gedaechtnis: 235 bekannt)</div>
+    <div class="phase-time">0.0 s</div>
+  </div>
+  
+  <div class="phase-row">
+    <div class="phase-name">Bewerten & Schreiben</div>
+    <div class="phase-detail">39 bewertete Meldungen</div>
+    <div class="phase-time">261.9 s</div>
+  </div>
+  
+  <div class="phase-row">
+    <div class="phase-name">KI-Modelle</div>
+    <div class="phase-detail">
+      Bewertung je Region: <b>claude-sonnet-5</b> &middot; Wochenbericht: <b>claude-opus-4-8</b>
+    </div>
+    <div class="phase-time">427.9 s</div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">02</span> KI-Bewertung je Region</h2>
+    <p class="section-title">Was die Analyse-Agenten geprüft und behalten haben</p>
+  </div>
+  <table class="src-table">
+    <thead><tr><th>Region</th><th class="num">geprüft</th><th class="num">Blöcke</th><th class="num">relevant behalten</th><th>Modell</th></tr></thead>
+    <tbody>
+      
+      <tr>
+        <td><b>Global</b></td>
+        <td class="num">41</td>
+        <td class="num">3/3</td>
+        <td class="num">28</td>
+        <td><span class="kbadge">claude-sonnet-5</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Europa</b></td>
+        <td class="num">6</td>
+        <td class="num">1/1</td>
+        <td class="num">6</td>
+        <td><span class="kbadge">claude-sonnet-5</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Nordamerika</b></td>
+        <td class="num">1</td>
+        <td class="num">1/1</td>
+        <td class="num">0</td>
+        <td><span class="kbadge">claude-sonnet-5</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Afrika & Naher Osten</b></td>
+        <td class="num">3</td>
+        <td class="num">1/1</td>
+        <td class="num">3</td>
+        <td><span class="kbadge">claude-sonnet-5</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Asien</b></td>
+        <td class="num">2</td>
+        <td class="num">1/1</td>
+        <td class="num">2</td>
+        <td><span class="kbadge">claude-sonnet-5</span></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</section>
+
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">03</span> Alle abgefragten Quellen</h2>
+    <p class="section-title">126 Quellen, sortiert nach Status</p>
+  </div>
+  <div class="log-legend">
+    <span class="s"><span class="sdot ok"></span>geliefert (27)</span>
+    <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (17)</span>
+    <span class="s"><span class="sdot fail"></span>nicht erreichbar (82)</span>
+  </div>
+  <table class="src-table">
+    <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
+    <tbody>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Orange</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Orange%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Orange%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Deutsche Telekom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Deutsche%20Telekom%22%20when%3A8d&hl=en-US&gl=US&cei</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Deutsche%20Telekom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Vodafone Group</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Vodafone%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Vodafone%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telefónica</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telef%C3%B3nica%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telef%C3%B3nica%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Vodafone Deutschland</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Vodafone%20Deutschland%22%20when%3A8d&hl=en-US&gl=US</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Vodafone%20Deutschland%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>O2 Telefónica Deutschland</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22O2%20Telef%C3%B3nica%20Deutschland%22%20when%3A8d&hl</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22O2%20Telef%C3%B3nica%20Deutschland%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>BT Group</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22BT%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22BT%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Swisscom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Swisscom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Swisscom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>KPN</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22KPN%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mo</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22KPN%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Liberty Global</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Liberty%20Global%22%20when%3A8d&hl=en-US&gl=US&ceid=</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Liberty%20Global%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telia</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telia%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telia%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>TIM</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22TIM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mo</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22TIM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>VEON</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22VEON%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For m</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22VEON%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Proximus</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Proximus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Proximus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telenor</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telenor%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telenor%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Turkcell</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Turkcell%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Turkcell%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Iliad</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Iliad%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Iliad%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>AT&T</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://about.att.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Bouygues Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Bouygues%20Telecom%22%20when%3A8d&hl=en-US&gl=US&cei</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Bouygues%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>A1 Telekom Austria</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22A1%20Telekom%20Austria%22%20when%3A8d&hl=en-US&gl=US</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22A1%20Telekom%20Austria%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Tele2</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Tele2%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Tele2%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Elisa</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Elisa%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Elisa%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Cosmote</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Cosmote%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Cosmote%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Three UK</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Three%20UK%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'</span></td>
+        <td>europe</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Three%20UK%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Verizon</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Verizon%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Verizon%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>T-Mobile US</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22T-Mobile%20US%22%20when%3A8d&hl=en-US&gl=US&ceid=US:</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22T-Mobile%20US%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Rogers</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Rogers%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Rogers%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>AT&T</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22AT%26T%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22AT%26T%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Charter Communications</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Charter%20Communications%22%20when%3A8d&hl=en-US&gl=</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Charter%20Communications%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Bell Canada</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Bell%20Canada%22%20when%3A8d&hl=en-US&gl=US&ceid=US:</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Bell%20Canada%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telus</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Comcast</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Comcast%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Comcast%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>DISH Wireless</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22DISH%20Wireless%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22DISH%20Wireless%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>UScellular</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22UScellular%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'</span></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22UScellular%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>América Móvil</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Am%C3%A9rica%20M%C3%B3vil%22%20when%3A8d&hl=en-US&gl</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Am%C3%A9rica%20M%C3%B3vil%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Millicom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Millicom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Millicom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Oi</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Oi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mor</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Oi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>TIM Brasil</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22TIM%20Brasil%22%20when%3A8d&hl=en-US&gl=US&ceid=US:e</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22TIM%20Brasil%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Entel</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Entel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Entel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telecom Argentina</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telecom%20Argentina%22%20when%3A8d&hl=en-US&gl=US&ce</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telecom%20Argentina%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>WOM</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22WOM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mo</span></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22WOM%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>MTN Group</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22MTN%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22MTN%20Group%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Safaricom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Safaricom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Safaricom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>stc</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22stc%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mo</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22stc%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Vodacom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Vodacom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Vodacom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Airtel Africa</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Airtel%20Africa%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Airtel%20Africa%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>e&</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22e%26%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For m</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22e%26%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Ooredoo</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Ooredoo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Ooredoo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Orange MEA</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Orange%20MEA%22%20when%3A8d&hl=en-US&gl=US&ceid=US:e</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Orange%20MEA%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>du</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22du%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mor</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22du%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Zain</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Zain%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For m</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Zain%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Turk Telekom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Turk%20Telekom%22%20when%3A8d&hl=en-US&gl=US&ceid=US</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Turk%20Telekom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Maroc Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Maroc%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Maroc%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Bharti Airtel</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Bharti%20Airtel%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Bharti%20Airtel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Reliance Jio</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Reliance%20Jio%22%20when%3A8d&hl=en-US&gl=US&ceid=US</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Reliance%20Jio%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Vodafone Idea</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Vodafone%20Idea%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Vodafone%20Idea%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Singtel</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Singtel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Singtel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>SK Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22SK%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:e</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22SK%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>NTT Docomo</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22NTT%20Docomo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:e</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22NTT%20Docomo%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>KT</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22KT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mor</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22KT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>SoftBank</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22SoftBank%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22SoftBank%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>KDDI</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22KDDI%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For m</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22KDDI%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>China Mobile</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22China%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=US</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22China%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Chunghwa Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Chunghwa%20Telecom%22%20when%3A8d&hl=en-US&gl=US&cei</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Chunghwa%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Rakuten Mobile</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Rakuten%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Rakuten%20Mobile%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>China Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22China%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22China%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telkomsel</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telkomsel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telkomsel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Viettel</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Viettel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Viettel%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>AIS</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22AIS%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For mo</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22AIS%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Indosat Ooredoo Hutchison</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Indosat%20Ooredoo%20Hutchison%22%20when%3A8d&hl=en-U</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Indosat%20Ooredoo%20Hutchison%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>PLDT</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22PLDT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For m</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22PLDT%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Globe Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Globe%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=U</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Globe%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>CelcomDigi</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22CelcomDigi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22CelcomDigi%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Maxis</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Maxis%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Maxis%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>True Corporation</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22True%20Corporation%22%20when%3A8d&hl=en-US&gl=US&cei</span></td>
+        <td>asia</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22True%20Corporation%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telecoms Tech News</b><br><span style="color:var(--vf-mute);font-size:12.5px">ValueError: unparseable feed: <unknown>:2:119: not well-formed (invalid token)</span></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Telstra</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Telstra%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+Fo</span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Telstra%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>One NZ</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22One%20NZ%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22One%20NZ%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>TPG Telecom</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22TPG%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:</span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22TPG%20Telecom%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>2degrees</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%222degrees%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+F</span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%222degrees%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Optus</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Optus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Optus%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot fail" title="fail"></span></td>
+        <td><b>Spark</b><br><span style="color:var(--vf-mute);font-size:12.5px">HTTPStatusError: Server error '503 Service Unavailable' for url 'https://news.google.com/rss/search?q=%22Spark%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en'
+For </span></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Google News</span></td>
+        <td class="num">0</td>
+        <td><a href="https://news.google.com/rss/search?q=%22Spark%22%20when%3A8d&hl=en-US&gl=US&ceid=US:en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Light Reading</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">40</td>
+        <td><a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Developing Telecoms</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">34</td>
+        <td><a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>VEON</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">30</td>
+        <td><a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Bharti Airtel</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">30</td>
+        <td><a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Rakuten Mobile</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">30</td>
+        <td><a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Mobile World Live</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">30</td>
+        <td><a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Fierce Network</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">25</td>
+        <td><a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>T-Mobile US</b></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">21</td>
+        <td><a href="https://www.t-mobile.com/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>NTT Docomo</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">20</td>
+        <td><a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Vodafone Group</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">13</td>
+        <td><a href="https://www.vodafone.com/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Telefónica</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">RSS</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Total Telecom</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">10</td>
+        <td><a href="https://totaltele.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>RCR Wireless</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Broadband TV News</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Mobile Europe</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Telkomsel</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">8</td>
+        <td><a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Orange</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">7</td>
+        <td><a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Safaricom</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">4</td>
+        <td><a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Deutsche Telekom</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Swisscom</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Proximus</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Bell Canada</b></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>MTN Group</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.mtn.com/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>O2 Telefónica Deutschland</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">1</td>
+        <td><a href="https://www.telefonica.de/presse.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Vodafone Deutschland</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">1</td>
+        <td><a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Verizon</b></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">1</td>
+        <td><a href="https://www.verizon.com/about/media-center" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>SoftBank</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">1</td>
+        <td><a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>BT Group</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://newsroom.bt.com/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Telia</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>KPN</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.overons.kpn/nieuws/en/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Liberty Global</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>TIM</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Millicom</b></td>
+        <td>latin_america</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>stc</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Airtel Africa</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://airtel.africa/media" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Reliance Jio</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.jio.com/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Singtel</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>SK Telecom</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>KDDI</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://newsroom.kddi.com/english/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>China Mobile</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Chunghwa Telecom</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Telstra</b></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Optus</b></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>One NZ</b></td>
+        <td>oceania</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://media.one.nz" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</section>
+
 
 
     </div>
