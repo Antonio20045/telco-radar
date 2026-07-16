@@ -57,6 +57,7 @@ jobs:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           if [ -n "$HOOK" ]; then
+            sleep 15  # let the git push propagate before Render clones
             curl -fsS -X POST "$HOOK" > /dev/null && echo "Render deploy triggered"
           else
             echo "RENDER_DEPLOY_HOOK not set - skipping (Render auto-deploys on push if connected)"
