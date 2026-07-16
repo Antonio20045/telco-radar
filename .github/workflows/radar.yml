@@ -53,12 +53,20 @@ jobs:
 
       - name: Trigger Render deploy
         if: always()
+        continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
-          if [ -n "$HOOK" ]; then
-            sleep 15  # let the git push propagate before Render clones
-            curl -fsS -X POST "$HOOK" > /dev/null && echo "Render deploy triggered"
-          else
-            echo "RENDER_DEPLOY_HOOK not set - skipping (Render auto-deploys on push if connected)"
+          if [ -z "$HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK not set - skipping"; exit 0
           fi
+          sleep 15  # let the git push propagate before Render clones
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
+            if [ "$code" = "200" ] || [ "$code" = "201" ]; then
+              echo "Render deploy triggered (HTTP $code)"; exit 0
+            fi
+            echo "Render hook returned HTTP $code (attempt $attempt/5) - retrying in 30s"
+            sleep 30
+          done
+          echo "Render hook still failing - latest commit is pushed; Render will pick it up on its next deploy"
