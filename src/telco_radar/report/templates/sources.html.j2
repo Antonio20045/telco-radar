@@ -17,14 +17,17 @@
     <div class="source-card">
       <div class="source-head">
         <h3>{{ op.name }}</h3>
-        {% if op.country %}<span class="chip cat-other">{{ op.country }}</span>{% endif %}
+        {% if op.country %}<span class="chip">{{ op.country }}</span>{% endif %}
       </div>
       <ul class="source-links">
         {% for s in op.sources %}
         <li>
-          <span class="chip {{ 'cat-tech' if s.type == 'rss' else 'cat-partner' }}">{{ s.type | upper }}</span>
+          <span class="chip">{{ s.type | upper }}</span>
           <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} ↗</a>
         </li>
+        {% else %}
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         {% endfor %}
       </ul>
     </div>

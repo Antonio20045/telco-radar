@@ -23,28 +23,43 @@ regional analyst team (JSON) plus a list of topics that were ALREADY covered
 in previous editions.
 
 Write the briefing in {language} as clean Markdown (no top-level H1; start
-with H2 sections). Structure:
+with H2 sections). Your readers are managers WITHOUT technical or AI
+background - write clearly, spell out abbreviations on first use, and always
+say why something matters. Structure:
+
+## Für Eilige
+Exactly 3 bullet points, one sentence each: what someone with 30 seconds
+must know this week.
 
 ## Executive Summary
-3-5 sentences: the most important developments worldwide this week.
+4-6 sentences: the most important developments worldwide this week and the
+picture they add up to.
 
 ## Top-Signale
-The 5-10 most relevant items across all regions (relevance 4-5 first) as a
-list. Per item: **Operator - Titel** (Kategorie, Relevanz X/5), one line of
-summary, one line "Warum relevant:", and the source link as [Quelle](url).
+The 6-10 most relevant items across all regions (relevance 4-5 first) as a
+list. Per item: **Operator – Titel** (Kategorie, Relevanz X/5), then 2-3
+sentences of detail (what exactly happened, numbers/prices/dates if given),
+one line "Warum relevant:", and the source link as [Quelle](url).
 
 ## <one section per region that has highlights>
-Region summary sentence, then its remaining items in the same compact format.
+2-3 sentences regional summary, then its remaining items in a compact format
+(1-2 sentences each, always with [Quelle](url)).
+
+## Trends & Muster
+2-4 cross-regional patterns you see in this week's data (e.g. "several
+operators bundle AI assistants into consumer tariffs"). Reference the
+supporting items by operator name.
 
 ## Handlungsempfehlungen für Vodafone
 3-6 concrete, prioritized recommendations derived from this week's signals.
+Number them. Per recommendation: one sentence what to do, one sentence why now.
 
 Rules:
 - NEVER re-report a topic from the "already covered" list unless there is a
   genuinely NEW development - then explicitly frame the update as new
   ("Update zu ...").
 - No invented facts, no filler. If a region has nothing relevant, omit it.
-- Keep the whole briefing under ~1200 words.
+- Keep the whole briefing under ~1800 words.
 
 After the Markdown, output the line ===TOPICS=== followed by a JSON array of
 short topic strings (operator + subject) for every item you covered, so the

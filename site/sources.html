@@ -1,29 +1,36 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Telco Radar – Überwachte Quellen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23e60000'/><circle cx='50' cy='50' r='26' fill='none' stroke='white' stroke-width='6'/><circle cx='50' cy='50' r='8' fill='white'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0f16'/><circle cx='50' cy='50' r='30' fill='none' stroke='%23e60000' stroke-width='7'/><circle cx='50' cy='50' r='9' fill='%23e60000'/></svg>">
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem('tr-theme') || 'dark'; } catch (e) {}
+  </script>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a class="brand" href="index.html">
-        <span class="brand-dot"></span>
-        <span class="brand-name">Telco <em>Radar</em></span>
+        <span class="brand-mark"><span class="brand-ring"></span></span>
+        <span class="brand-name">TELCO<em>RADAR</em></span>
       </a>
       <nav class="nav">
-        <a href="index.html" >Dashboard</a>
+        <a href="index.html" >Bericht</a>
         <a href="archive.html" >Archiv</a>
         <a href="sources.html" class="active">Quellen</a>
+        <button class="theme-toggle" id="theme-toggle" title="Hell/Dunkel umschalten" aria-label="Farbschema umschalten">
+          <span class="tt-dark">☾</span><span class="tt-light">☀</span>
+        </button>
       </nav>
     </div>
   </header>
+  
   <main>
     <div class="wrap">
       
@@ -42,12 +49,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Vodafone Group</h3>
-        <span class="chip cat-other">GB</span>
+        <span class="chip">GB</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.vodafone.com/news" target="_blank" rel="noopener">vodafone.com ↗</a>
         </li>
         
@@ -57,12 +64,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Vodafone Deutschland</h3>
-        <span class="chip cat-other">DE</span>
+        <span class="chip">DE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">newsroom.vodafone.de ↗</a>
         </li>
         
@@ -72,12 +79,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Deutsche Telekom</h3>
-        <span class="chip cat-other">DE</span>
+        <span class="chip">DE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">telekom.com ↗</a>
         </li>
         
@@ -87,12 +94,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>O2 Telefónica Deutschland</h3>
-        <span class="chip cat-other">DE</span>
+        <span class="chip">DE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.telefonica.de/presse.html" target="_blank" rel="noopener">telefonica.de ↗</a>
         </li>
         
@@ -102,12 +109,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Orange</h3>
-        <span class="chip cat-other">FR</span>
+        <span class="chip">FR</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">orange.com ↗</a>
         </li>
         
@@ -117,12 +124,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telefónica</h3>
-        <span class="chip cat-other">ES</span>
+        <span class="chip">ES</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-tech">RSS</span>
+          <span class="chip">RSS</span>
           <a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">telefonica.com ↗</a>
         </li>
         
@@ -132,12 +139,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>BT Group</h3>
-        <span class="chip cat-other">GB</span>
+        <span class="chip">GB</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://newsroom.bt.com/" target="_blank" rel="noopener">newsroom.bt.com ↗</a>
         </li>
         
@@ -147,12 +154,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Swisscom</h3>
-        <span class="chip cat-other">CH</span>
+        <span class="chip">CH</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">swisscom.ch ↗</a>
         </li>
         
@@ -162,12 +169,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telia</h3>
-        <span class="chip cat-other">SE</span>
+        <span class="chip">SE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">teliacompany.com ↗</a>
         </li>
         
@@ -177,12 +184,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>KPN</h3>
-        <span class="chip cat-other">NL</span>
+        <span class="chip">NL</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.overons.kpn/nieuws/en/" target="_blank" rel="noopener">overons.kpn ↗</a>
         </li>
         
@@ -192,12 +199,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Proximus</h3>
-        <span class="chip cat-other">BE</span>
+        <span class="chip">BE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">proximus.com ↗</a>
         </li>
         
@@ -207,12 +214,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>TIM</h3>
-        <span class="chip cat-other">IT</span>
+        <span class="chip">IT</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">gruppotim.it ↗</a>
         </li>
         
@@ -222,12 +229,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Liberty Global</h3>
-        <span class="chip cat-other">GB</span>
+        <span class="chip">GB</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">libertyglobal.com ↗</a>
         </li>
         
@@ -237,12 +244,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>VEON</h3>
-        <span class="chip cat-other">NL</span>
+        <span class="chip">NL</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">veon.com ↗</a>
         </li>
         
@@ -252,9 +259,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telenor</h3>
-        <span class="chip cat-other">NO</span>
+        <span class="chip">NO</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -262,9 +272,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Turkcell</h3>
-        <span class="chip cat-other">TR</span>
+        <span class="chip">TR</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -272,9 +285,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Iliad</h3>
-        <span class="chip cat-other">FR</span>
+        <span class="chip">FR</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -289,12 +305,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Verizon</h3>
-        <span class="chip cat-other">US</span>
+        <span class="chip">US</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.verizon.com/about/media-center" target="_blank" rel="noopener">verizon.com ↗</a>
         </li>
         
@@ -304,12 +320,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>AT&T</h3>
-        <span class="chip cat-other">US</span>
+        <span class="chip">US</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://about.att.com/newsroom" target="_blank" rel="noopener">about.att.com ↗</a>
         </li>
         
@@ -319,12 +335,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>T-Mobile US</h3>
-        <span class="chip cat-other">US</span>
+        <span class="chip">US</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.t-mobile.com/news" target="_blank" rel="noopener">t-mobile.com ↗</a>
         </li>
         
@@ -334,12 +350,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Bell Canada</h3>
-        <span class="chip cat-other">CA</span>
+        <span class="chip">CA</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">bce.ca ↗</a>
         </li>
         
@@ -349,9 +365,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Rogers</h3>
-        <span class="chip cat-other">CA</span>
+        <span class="chip">CA</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -359,9 +378,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telus</h3>
-        <span class="chip cat-other">CA</span>
+        <span class="chip">CA</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -376,9 +398,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>América Móvil</h3>
-        <span class="chip cat-other">MX</span>
+        <span class="chip">MX</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -386,12 +411,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Millicom</h3>
-        <span class="chip cat-other">LU</span>
+        <span class="chip">LU</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">millicom.com ↗</a>
         </li>
         
@@ -401,9 +426,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>TIM Brasil</h3>
-        <span class="chip cat-other">BR</span>
+        <span class="chip">BR</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -411,9 +439,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Entel</h3>
-        <span class="chip cat-other">CL</span>
+        <span class="chip">CL</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -428,12 +459,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>MTN Group</h3>
-        <span class="chip cat-other">ZA</span>
+        <span class="chip">ZA</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.mtn.com/newsroom/" target="_blank" rel="noopener">mtn.com ↗</a>
         </li>
         
@@ -443,9 +474,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Vodacom</h3>
-        <span class="chip cat-other">ZA</span>
+        <span class="chip">ZA</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -453,12 +487,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Safaricom</h3>
-        <span class="chip cat-other">KE</span>
+        <span class="chip">KE</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">safaricom.co.ke ↗</a>
         </li>
         
@@ -468,12 +502,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Airtel Africa</h3>
-        <span class="chip cat-other">NG</span>
+        <span class="chip">NG</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://airtel.africa/media" target="_blank" rel="noopener">airtel.africa ↗</a>
         </li>
         
@@ -483,12 +517,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>stc</h3>
-        <span class="chip cat-other">SA</span>
+        <span class="chip">SA</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">stc.com ↗</a>
         </li>
         
@@ -498,9 +532,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>e&</h3>
-        <span class="chip cat-other">AE</span>
+        <span class="chip">AE</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -508,9 +545,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Ooredoo</h3>
-        <span class="chip cat-other">QA</span>
+        <span class="chip">QA</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -518,9 +558,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Zain</h3>
-        <span class="chip cat-other">KW</span>
+        <span class="chip">KW</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -528,9 +571,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Orange MEA</h3>
-        <span class="chip cat-other">EG</span>
+        <span class="chip">EG</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -545,12 +591,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Bharti Airtel</h3>
-        <span class="chip cat-other">IN</span>
+        <span class="chip">IN</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">airtel.in ↗</a>
         </li>
         
@@ -560,12 +606,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Reliance Jio</h3>
-        <span class="chip cat-other">IN</span>
+        <span class="chip">IN</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.jio.com/press-release" target="_blank" rel="noopener">jio.com ↗</a>
         </li>
         
@@ -575,9 +621,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Vodafone Idea</h3>
-        <span class="chip cat-other">IN</span>
+        <span class="chip">IN</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -585,12 +634,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Singtel</h3>
-        <span class="chip cat-other">SG</span>
+        <span class="chip">SG</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">singtel.com ↗</a>
         </li>
         
@@ -600,12 +649,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>SK Telecom</h3>
-        <span class="chip cat-other">KR</span>
+        <span class="chip">KR</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">sktelecom.com ↗</a>
         </li>
         
@@ -615,9 +664,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>KT</h3>
-        <span class="chip cat-other">KR</span>
+        <span class="chip">KR</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -625,12 +677,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>NTT Docomo</h3>
-        <span class="chip cat-other">JP</span>
+        <span class="chip">JP</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">docomo.ne.jp ↗</a>
         </li>
         
@@ -640,12 +692,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>KDDI</h3>
-        <span class="chip cat-other">JP</span>
+        <span class="chip">JP</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://newsroom.kddi.com/english/" target="_blank" rel="noopener">newsroom.kddi.com ↗</a>
         </li>
         
@@ -655,12 +707,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>SoftBank</h3>
-        <span class="chip cat-other">JP</span>
+        <span class="chip">JP</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">softbank.jp ↗</a>
         </li>
         
@@ -670,12 +722,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Rakuten Mobile</h3>
-        <span class="chip cat-other">JP</span>
+        <span class="chip">JP</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">corp.mobile.rakuten.co.jp ↗</a>
         </li>
         
@@ -685,12 +737,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>China Mobile</h3>
-        <span class="chip cat-other">CN</span>
+        <span class="chip">CN</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">chinamobileltd.com ↗</a>
         </li>
         
@@ -700,9 +752,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>China Telecom</h3>
-        <span class="chip cat-other">CN</span>
+        <span class="chip">CN</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -710,12 +765,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Chunghwa Telecom</h3>
-        <span class="chip cat-other">TW</span>
+        <span class="chip">TW</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">cht.com.tw ↗</a>
         </li>
         
@@ -725,12 +780,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telkomsel</h3>
-        <span class="chip cat-other">ID</span>
+        <span class="chip">ID</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">telkomsel.com ↗</a>
         </li>
         
@@ -740,9 +795,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>AIS</h3>
-        <span class="chip cat-other">TH</span>
+        <span class="chip">TH</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -750,9 +808,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Viettel</h3>
-        <span class="chip cat-other">VN</span>
+        <span class="chip">VN</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -760,9 +821,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Globe Telecom</h3>
-        <span class="chip cat-other">PH</span>
+        <span class="chip">PH</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -770,9 +834,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>PLDT</h3>
-        <span class="chip cat-other">PH</span>
+        <span class="chip">PH</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -787,12 +854,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Telstra</h3>
-        <span class="chip cat-other">AU</span>
+        <span class="chip">AU</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">telstra.com.au ↗</a>
         </li>
         
@@ -802,12 +869,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Optus</h3>
-        <span class="chip cat-other">AU</span>
+        <span class="chip">AU</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">optus.com.au ↗</a>
         </li>
         
@@ -817,9 +884,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>TPG Telecom</h3>
-        <span class="chip cat-other">AU</span>
+        <span class="chip">AU</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -827,12 +897,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>One NZ</h3>
-        <span class="chip cat-other">NZ</span>
+        <span class="chip">NZ</span>
       </div>
       <ul class="source-links">
         
         <li>
-          <span class="chip cat-partner">NEWSROOM</span>
+          <span class="chip">NEWSROOM</span>
           <a href="https://media.one.nz" target="_blank" rel="noopener">media.one.nz ↗</a>
         </li>
         
@@ -842,9 +912,12 @@
     <div class="source-card">
       <div class="source-head">
         <h3>Spark</h3>
-        <span class="chip cat-other">NZ</span>
+        <span class="chip">NZ</span>
       </div>
       <ul class="source-links">
+        
+        <li><span class="chip">via Fachpresse</span>
+        <span title="Die eigene Presseseite blockiert automatische Abfragen – Meldungen über diesen Anbieter kommen aus der Fachpresse">wird indirekt beobachtet</span></li>
         
       </ul>
     </div>
@@ -911,10 +984,15 @@
     </div>
   </main>
   <footer class="footer">
-    <div class="wrap">
-      Telco Radar · automatisiertes Competitive-Intelligence-Briefing · Quellen: Operator-Newsrooms & Telco-Fachpresse weltweit
+    <div class="wrap footer-inner">
+      <div>
+        <strong>Telco Radar</strong> — automatisches Wettbewerbs-Monitoring der Telekommunikationsbranche.
+        Jede Woche werden die Presseseiten von 59 Netzbetreibern weltweit und die internationale
+        Fachpresse geprüft. Nur wirklich neue Meldungen werden bewertet und hier zusammengefasst.
+      </div>
+      <div class="footer-meta">Alle Angaben mit Link zur Originalquelle · intern</div>
     </div>
   </footer>
-  
+  <script src="app.js"></script>
 </body>
 </html>

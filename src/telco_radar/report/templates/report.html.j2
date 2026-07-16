@@ -1,103 +1,203 @@
 {% extends "base.html.j2" %}
 {% set active = 'dashboard' if is_latest else 'archive' %}
-{% block title %}Telco Radar – Briefing {{ report.date if report else '' }}{% endblock %}
+{% block title %}Telco Radar – Wochenbericht {{ report.date if report else '' }}{% endblock %}
+
+{% block ticker %}
+{% if ticker_items %}
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-label">TOP-MELDUNGEN</div>
+  <div class="ticker-viewport">
+    <div class="ticker-track" id="ticker-track">
+      {% for t in ticker_items %}
+      <a class="ticker-item" href="{{ t.url }}" target="_blank" rel="noopener">
+        <span class="ticker-rel r{{ t.relevance }}">{{ t.relevance }}/5</span>
+        <span class="ticker-op">{{ t.operator or t.source_domain }}</span>
+        {{ t.title | truncate(90) }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 {% if report %}
+
+<!-- ============ HERO ============ -->
 <section class="hero">
   <div class="hero-head">
     <div>
-      <p class="eyebrow">{% if is_latest %}Aktuelles Wochenbriefing{% else %}Briefing aus dem Archiv{% endif %}</p>
-      <h1>{{ report.date }}</h1>
+      <p class="eyebrow">{% if is_latest %}Aktueller Wochenbericht{% else %}Bericht aus dem Archiv{% endif %}</p>
+      <h1>{{ date_de }}</h1>
+      <p class="hero-sub">Was die Telekommunikations-Konkurrenz weltweit diese Woche Neues gemacht hat –
+      automatisch gesammelt, bewertet und zusammengefasst.</p>
     </div>
-    {% if not report.generated_with_llm %}
-    <span class="pill pill-warn" title="Dieser Lauf wurde ohne KI-Analyse erstellt">Roh-Digest</span>
-    {% else %}
-    <span class="pill pill-ok">KI-analysiert</span>
-    {% endif %}
+    <div class="hero-badges">
+      {% if report.generated_with_llm %}
+      <span class="pill pill-ok" title="Meldungen wurden automatisch analysiert, auf Relevanz bewertet und zusammengefasst">✓ Analysiert &amp; bewertet</span>
+      {% else %}
+      <span class="pill pill-warn">Roh-Daten ohne Analyse</span>
+      {% endif %}
+    </div>
   </div>
+
   <div class="kpis">
-    <div class="kpi"><span class="kpi-num">{{ report.stats.get('operators', '–') }}</span><span class="kpi-label">Operator weltweit</span></div>
-    <div class="kpi"><span class="kpi-num">{{ report.stats.get('sources_ok', '–') }}<small>/{{ report.stats.get('sources_total', '–') }}</small></span><span class="kpi-label">Quellen aktiv</span></div>
-    <div class="kpi"><span class="kpi-num">{{ report.stats.get('collected', '–') }}</span><span class="kpi-label">Items gescannt</span></div>
-    <div class="kpi kpi-accent"><span class="kpi-num">{{ report.stats.get('new', '–') }}</span><span class="kpi-label">davon neu</span></div>
+    <div class="kpi">
+      <span class="kpi-num">{{ report.stats.get('operators', '–') }}</span>
+      <span class="kpi-label">Netzbetreiber beobachtet</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">{{ report.stats.get('sources_ok', '–') }}<small> von {{ report.stats.get('sources_total', '–') }}</small></span>
+      <span class="kpi-label">Quellen abgefragt</span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-num">{{ report.stats.get('collected', '–') }}</span>
+      <span class="kpi-label">Meldungen geprüft</span>
+    </div>
+    <div class="kpi kpi-accent">
+      <span class="kpi-num">{{ report.stats.get('new', '–') }}</span>
+      <span class="kpi-label">neu seit letzter Woche</span>
+    </div>
   </div>
+
+  <details class="explainer">
+    <summary>Wie funktioniert dieser Bericht? <span class="explainer-hint">Kurz erklärt</span></summary>
+    <div class="explainer-body">
+      <p><strong>1. Sammeln:</strong> Das System liest jede Woche die offiziellen Presse-Seiten von
+      Netzbetreibern auf allen Kontinenten (Vodafone, Telekom, Verizon, Jio, MTN u.&nbsp;v.&nbsp;m.)
+      sowie die wichtigste internationale Fachpresse.</p>
+      <p><strong>2. Nur Neues:</strong> Alles, was schon einmal berichtet wurde, wird automatisch
+      aussortiert. Hier steht nur, was seit dem letzten Bericht neu dazugekommen ist.</p>
+      <p><strong>3. Bewerten:</strong> Jede neue Meldung wird automatisch eingeordnet:
+      Was ist passiert? Warum ist das für Vodafone interessant? Wie dringend ist es?
+      Die Dringlichkeit zeigt die Skala <strong>1–5</strong>:
+      <span class="legend"><i class="ldot r5"></i>5 = sofort ansehen</span>
+      <span class="legend"><i class="ldot r4"></i>4 = wichtig</span>
+      <span class="legend"><i class="ldot r3"></i>3 = beobachten</span>
+      <span class="legend"><i class="ldot r2"></i>2 = Randnotiz</span></p>
+      <p><strong>4. Nachprüfbar:</strong> Jede Aussage hat einen Link zur Originalquelle –
+      ein Klick genügt.</p>
+    </div>
+  </details>
 </section>
 
-{% if highlights %}
-<section class="signals">
+<!-- ============ TOP-PRIORITÄTEN ============ -->
+{% if top_priorities %}
+<section class="section" id="prioritaeten">
   <div class="section-head">
-    <h2>Signale <span class="count-badge" id="signal-count">{{ highlights | length }}</span></h2>
-    <div class="filters">
-      <input type="search" id="f-search" placeholder="Suchen (Operator, Thema)…" aria-label="Suche">
-      <select id="f-region" aria-label="Region">
-        <option value="">Alle Regionen</option>
-        {% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
-      </select>
-      <select id="f-category" aria-label="Kategorie">
-        <option value="">Alle Kategorien</option>
-        {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
-      </select>
-      <select id="f-relevance" aria-label="Relevanz">
-        <option value="">Jede Relevanz</option>
-        <option value="5">nur 5/5</option>
-        <option value="4">ab 4/5</option>
-        <option value="3">ab 3/5</option>
-      </select>
-    </div>
+    <h2><span class="sec-no">01</span> Das sollte Vodafone diese Woche wissen</h2>
+    <p class="section-sub">Die dringendsten Meldungen, von der Redaktion automatisch vorsortiert.</p>
   </div>
-
-  <div class="cards" id="cards">
-    {% for h in highlights %}
-    <article class="card"
-             data-region="{{ h.region }}"
-             data-category="{{ h.category or 'Sonstiges' }}"
-             data-relevance="{{ h.relevance or 0 }}"
-             data-text="{{ ((h.operator or '') ~ ' ' ~ (h.title or '') ~ ' ' ~ (h.summary or '')) | lower }}">
-      <div class="card-top">
-        <span class="chip {{ h.category | catclass }}">{{ h.category or 'Sonstiges' }}</span>
-        {% if h.relevance %}
-        <span class="relevance r{{ h.relevance }}" title="Relevanz für Vodafone">
-          {% for i in range(5) %}<i {% if i < h.relevance %}class="on"{% endif %}></i>{% endfor %}
-        </span>
-        {% endif %}
+  <div class="prio-grid">
+    {% for h in top_priorities %}
+    <article class="prio-card{% if loop.first %} prio-lead{% endif %}">
+      <div class="prio-top">
+        <span class="rel-badge r{{ h.relevance }}">{{ h.relevance }}/5 · {{ h.relevance_label }}</span>
+        <span class="chip">{{ h.category }}</span>
       </div>
-      <h3 class="card-title"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.title }}</a></h3>
-      <p class="card-meta">
-        <strong>{{ h.operator or '–' }}</strong>
-        <span class="dot-sep"></span>{{ h.region }}
-        {% if h.date %}<span class="dot-sep"></span>{{ h.date }}{% endif %}
-      </p>
-      {% if h.summary %}<p class="card-summary">{{ h.summary }}</p>{% endif %}
+      <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.title }}</a></h3>
+      <p class="prio-meta"><strong>{{ h.operator or h.source_domain }}</strong>
+        <span class="dot-sep"></span>{{ h.region }}{% if h.date %}<span class="dot-sep"></span>{{ h.date }}{% endif %}</p>
+      {% if h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
       {% if h.why_it_matters %}
-      <p class="card-why"><span class="why-label">Warum relevant</span>{{ h.why_it_matters }}</p>
+      <p class="why"><span class="why-label">Warum das zählt</span>{{ h.why_it_matters }}</p>
       {% endif %}
-      <div class="card-foot">
-        <a class="source-link" href="{{ h.url }}" target="_blank" rel="noopener">
-          {{ h.url | domain }} ↗
-        </a>
-      </div>
+      <a class="source-link" href="{{ h.url }}" target="_blank" rel="noopener">Originalquelle: {{ h.source_domain }} ↗</a>
     </article>
     {% endfor %}
   </div>
-  <p class="empty-filter" id="empty-filter" hidden>Keine Signale für diese Filterkombination.</p>
 </section>
 {% endif %}
 
+<!-- ============ WOCHENBERICHT ============ -->
 {% if briefing_html %}
-<section class="briefing">
-  <div class="section-head"><h2>Briefing</h2></div>
+<section class="section" id="bericht">
+  <div class="section-head">
+    <h2><span class="sec-no">02</span> Der Wochenbericht</h2>
+    <p class="section-sub">Zusammenhänge, Einordnung und Handlungsempfehlungen – zum Lesen in 5 Minuten.</p>
+  </div>
   <article class="prose">{{ briefing_html | safe }}</article>
 </section>
 {% endif %}
 
+<!-- ============ ZAHLEN & TRENDS ============ -->
+{% if charts %}
+<section class="section" id="trends">
+  <div class="section-head">
+    <h2><span class="sec-no">03</span> Die Woche in Zahlen</h2>
+    <p class="section-sub">Wo passiert gerade am meisten – und worum geht es?</p>
+  </div>
+  <div class="chart-grid">
+    <div class="panel">
+      <h3 class="panel-title">Neue Meldungen je Region</h3>
+      {{ charts.regions | safe }}
+    </div>
+    <div class="panel">
+      <h3 class="panel-title">Worum es geht</h3>
+      {{ charts.categories | safe }}
+    </div>
+    <div class="panel">
+      <h3 class="panel-title">Dringlichkeit</h3>
+      {{ charts.relevance | safe }}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ============ EXPLORER ============ -->
+{% if highlights %}
+<section class="section" id="explorer">
+  <div class="section-head">
+    <h2><span class="sec-no">04</span> Alle Meldungen im Detail</h2>
+    <p class="section-sub">Links blättern, rechts lesen. Filtern, suchen, sortieren – jede Meldung mit Originalquelle.</p>
+  </div>
+
+  <div class="filters panel-flat">
+    <input type="search" id="f-search" placeholder="Suchen: Operator, Thema, Stichwort …" aria-label="Suche">
+    <select id="f-region" aria-label="Region">
+      <option value="">Alle Regionen</option>
+      {% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}
+    </select>
+    <select id="f-category" aria-label="Thema">
+      <option value="">Alle Themen</option>
+      {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+    </select>
+    <select id="f-relevance" aria-label="Dringlichkeit">
+      <option value="">Jede Dringlichkeit</option>
+      <option value="5">5/5 – sofort ansehen</option>
+      <option value="4">ab 4/5 – wichtig</option>
+      <option value="3">ab 3/5 – beobachten</option>
+    </select>
+    <select id="f-sort" aria-label="Sortierung">
+      <option value="relevance">Dringlichste zuerst</option>
+      <option value="date">Neueste zuerst</option>
+      <option value="operator">Nach Operator (A–Z)</option>
+    </select>
+  </div>
+
+  <div class="explorer" id="explorer-app">
+    <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste">
+      <!-- rows rendered by app.js -->
+    </div>
+    <div class="ex-detail panel" id="ex-detail">
+      <p class="ex-detail-empty">Meldung links auswählen …</p>
+    </div>
+  </div>
+  <p class="ex-count" id="ex-count"></p>
+
+  <script type="application/json" id="explorer-data">{{ explorer_json | safe }}</script>
+</section>
+{% endif %}
+
 {% else %}
-<section class="hero"><h1>Noch kein Briefing</h1>
-<p>Der erste Pipeline-Lauf erzeugt hier das aktuelle Wochenbriefing.</p></section>
+<section class="hero"><h1>Noch kein Bericht</h1>
+<p class="hero-sub">Der erste Lauf der Pipeline erzeugt hier den aktuellen Wochenbericht.</p></section>
 {% endif %}
 
 {% if archive and archive | length > 1 %}
-<section class="mini-archive">
-  <div class="section-head"><h2>Frühere Briefings</h2></div>
+<section class="section" id="archiv">
+  <div class="section-head"><h2><span class="sec-no">05</span> Frühere Berichte</h2></div>
   <div class="pill-row">
     {% for entry in archive %}
     <a class="pill-link {% if report and entry.date == report.date %}current{% endif %}"
@@ -107,4 +207,3 @@
 </section>
 {% endif %}
 {% endblock %}
-{% block scripts %}<script src="{{ prefix }}app.js"></script>{% endblock %}
