@@ -9,6 +9,8 @@ Handles two shapes:
 from __future__ import annotations
 
 import logging
+import random
+import time
 from datetime import datetime, timezone
 
 import feedparser
@@ -92,5 +94,9 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 def collect_rss(source: Source, region: str, operator: str | None,
                 origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
+    # Spread out the many per-operator news-search feeds so they don't hit
+    # the aggregator as one synchronized burst (which triggers 429/503).
+    if source.kind == "news_search":
+        time.sleep(random.uniform(0, 3.0))
     resp = fetch(source.url, http_cfg)
     return parse_feed_bytes(resp.content, source, region, operator, origin)

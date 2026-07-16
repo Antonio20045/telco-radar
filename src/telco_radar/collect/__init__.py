@@ -20,7 +20,7 @@ def _collect_source(source: Source, region: str, operator: str | None,
     return collect_newsroom(source, region, operator, origin, http_cfg)
 
 
-def collect_all(cfg: Config, max_workers: int = 8) -> tuple[list[Item], list[dict]]:
+def collect_all(cfg: Config, max_workers: int = 5) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing
