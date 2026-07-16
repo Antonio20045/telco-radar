@@ -50,9 +50,12 @@ Rules:
 """
 
 
-def _items_payload(items: list[Item], max_items: int) -> str:
+BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
+
+
+def _items_payload(items: list[Item]) -> str:
     rows = []
-    for item in items[:max_items]:
+    for item in items:
         rows.append({
             "title": item.title,
             "operator": item.operator or "",
@@ -66,17 +69,34 @@ def _items_payload(items: list[Item], max_items: int) -> str:
 
 def analyze_region(region_name: str, items: list[Item], model: str,
                    language: str = "Deutsch", max_items: int = 40) -> dict:
-    """Run one regional analyst. Returns the parsed JSON assessment."""
+    """Run one regional analyst (in batches). Returns the merged assessment.
+
+    Items are processed in batches of BATCH_SIZE so the JSON response never
+    hits the output-token limit. A failing batch is skipped, not fatal.
+    """
     system = ANALYST_SYSTEM.format(region=region_name, language=language)
-    user = (
-        f"NEW items for region {region_name} "
-        f"({min(len(items), max_items)} of {len(items)}):\n"
-        + _items_payload(items, max_items)
-    )
-    raw = complete(system, user, model=model, max_tokens=4096)
-    result = extract_json(raw)
-    result.setdefault("highlights", [])
-    result.setdefault("region_summary", "")
-    log.info("Analyst %-25s: %d items in -> %d highlights",
-             region_name, len(items), len(result["highlights"]))
-    return result
+    capped = items[:max_items]
+    batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
+
+    highlights: list[dict] = []
+    summaries: list[str] = []
+    for n, batch in enumerate(batches, 1):
+        user = (
+            f"NEW items for region {region_name} "
+            f"(batch {n}/{len(batches)}, {len(batch)} items):\n"
+            + _items_payload(batch)
+        )
+        try:
+            raw = complete(system, user, model=model, max_tokens=8000)
+            result = extract_json(raw)
+        except (ValueError, RuntimeError, KeyError) as exc:
+            log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
+                      region_name, n, len(batches), exc)
+            continue
+        highlights.extend(result.get("highlights") or [])
+        if result.get("region_summary"):
+            summaries.append(str(result["region_summary"]))
+
+    log.info("Analyst %-25s: %d items in %d batch(es) -> %d highlights",
+             region_name, len(capped), len(batches), len(highlights))
+    return {"region_summary": " ".join(summaries), "highlights": highlights}
