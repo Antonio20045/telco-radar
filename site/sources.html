@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telco Radar – Überwachte Quellen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23e60000'/><circle cx='50' cy='50' r='26' fill='none' stroke='white' stroke-width='6'/><circle cx='50' cy='50' r='8' fill='white'/></svg>">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-dot"></span>
+        <span class="brand-name">Telco <em>Radar</em></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html" >Dashboard</a>
+        <a href="archive.html" >Archiv</a>
+        <a href="sources.html" class="active">Quellen</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      
+<section class="hero">
+  <p class="eyebrow">Was der Radar beobachtet</p>
+  <h1>Überwachte Quellen</h1>
+  <p class="hero-sub">Operator-Newsrooms auf allen Kontinenten plus die internationale Telco-Fachpresse.
+  Neue Quellen werden in <code>config/watchlist.yaml</code> gepflegt.</p>
+</section>
+
+
+<section class="source-region">
+  <div class="section-head"><h2>Europa <span class="count-badge">17</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Vodafone Group</h3>
+        <span class="chip cat-other">GB</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.vodafone.com/news" target="_blank" rel="noopener">vodafone.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Vodafone Deutschland</h3>
+        <span class="chip cat-other">DE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">newsroom.vodafone.de ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Deutsche Telekom</h3>
+        <span class="chip cat-other">DE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">telekom.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>O2 Telefónica Deutschland</h3>
+        <span class="chip cat-other">DE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.telefonica.de/presse.html" target="_blank" rel="noopener">telefonica.de ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Orange</h3>
+        <span class="chip cat-other">FR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">orange.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telefónica</h3>
+        <span class="chip cat-other">ES</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-tech">RSS</span>
+          <a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">telefonica.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>BT Group</h3>
+        <span class="chip cat-other">GB</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://newsroom.bt.com/" target="_blank" rel="noopener">newsroom.bt.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Swisscom</h3>
+        <span class="chip cat-other">CH</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">swisscom.ch ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telia</h3>
+        <span class="chip cat-other">SE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">teliacompany.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>KPN</h3>
+        <span class="chip cat-other">NL</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.overons.kpn/nieuws/en/" target="_blank" rel="noopener">overons.kpn ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Proximus</h3>
+        <span class="chip cat-other">BE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">proximus.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>TIM</h3>
+        <span class="chip cat-other">IT</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">gruppotim.it ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Liberty Global</h3>
+        <span class="chip cat-other">GB</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">libertyglobal.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>VEON</h3>
+        <span class="chip cat-other">NL</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">veon.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telenor</h3>
+        <span class="chip cat-other">NO</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Turkcell</h3>
+        <span class="chip cat-other">TR</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Iliad</h3>
+        <span class="chip cat-other">FR</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+<section class="source-region">
+  <div class="section-head"><h2>Nordamerika <span class="count-badge">6</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Verizon</h3>
+        <span class="chip cat-other">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.verizon.com/about/media-center" target="_blank" rel="noopener">verizon.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>AT&T</h3>
+        <span class="chip cat-other">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://about.att.com/newsroom" target="_blank" rel="noopener">about.att.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>T-Mobile US</h3>
+        <span class="chip cat-other">US</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.t-mobile.com/news" target="_blank" rel="noopener">t-mobile.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Bell Canada</h3>
+        <span class="chip cat-other">CA</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">bce.ca ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Rogers</h3>
+        <span class="chip cat-other">CA</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telus</h3>
+        <span class="chip cat-other">CA</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+<section class="source-region">
+  <div class="section-head"><h2>Lateinamerika <span class="count-badge">4</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>América Móvil</h3>
+        <span class="chip cat-other">MX</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Millicom</h3>
+        <span class="chip cat-other">LU</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">millicom.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>TIM Brasil</h3>
+        <span class="chip cat-other">BR</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Entel</h3>
+        <span class="chip cat-other">CL</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+<section class="source-region">
+  <div class="section-head"><h2>Afrika & Naher Osten <span class="count-badge">9</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>MTN Group</h3>
+        <span class="chip cat-other">ZA</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.mtn.com/newsroom/" target="_blank" rel="noopener">mtn.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Vodacom</h3>
+        <span class="chip cat-other">ZA</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Safaricom</h3>
+        <span class="chip cat-other">KE</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">safaricom.co.ke ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Airtel Africa</h3>
+        <span class="chip cat-other">NG</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://airtel.africa/media" target="_blank" rel="noopener">airtel.africa ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>stc</h3>
+        <span class="chip cat-other">SA</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">stc.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>e&</h3>
+        <span class="chip cat-other">AE</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Ooredoo</h3>
+        <span class="chip cat-other">QA</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Zain</h3>
+        <span class="chip cat-other">KW</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Orange MEA</h3>
+        <span class="chip cat-other">EG</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+<section class="source-region">
+  <div class="section-head"><h2>Asien <span class="count-badge">18</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Bharti Airtel</h3>
+        <span class="chip cat-other">IN</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">airtel.in ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Reliance Jio</h3>
+        <span class="chip cat-other">IN</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.jio.com/press-release" target="_blank" rel="noopener">jio.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Vodafone Idea</h3>
+        <span class="chip cat-other">IN</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Singtel</h3>
+        <span class="chip cat-other">SG</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">singtel.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>SK Telecom</h3>
+        <span class="chip cat-other">KR</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">sktelecom.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>KT</h3>
+        <span class="chip cat-other">KR</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>NTT Docomo</h3>
+        <span class="chip cat-other">JP</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">docomo.ne.jp ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>KDDI</h3>
+        <span class="chip cat-other">JP</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://newsroom.kddi.com/english/" target="_blank" rel="noopener">newsroom.kddi.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>SoftBank</h3>
+        <span class="chip cat-other">JP</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">softbank.jp ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Rakuten Mobile</h3>
+        <span class="chip cat-other">JP</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">corp.mobile.rakuten.co.jp ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>China Mobile</h3>
+        <span class="chip cat-other">CN</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">chinamobileltd.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>China Telecom</h3>
+        <span class="chip cat-other">CN</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Chunghwa Telecom</h3>
+        <span class="chip cat-other">TW</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">cht.com.tw ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telkomsel</h3>
+        <span class="chip cat-other">ID</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">telkomsel.com ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>AIS</h3>
+        <span class="chip cat-other">TH</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Viettel</h3>
+        <span class="chip cat-other">VN</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Globe Telecom</h3>
+        <span class="chip cat-other">PH</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>PLDT</h3>
+        <span class="chip cat-other">PH</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+<section class="source-region">
+  <div class="section-head"><h2>Ozeanien <span class="count-badge">5</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Telstra</h3>
+        <span class="chip cat-other">AU</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">telstra.com.au ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Optus</h3>
+        <span class="chip cat-other">AU</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">optus.com.au ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>TPG Telecom</h3>
+        <span class="chip cat-other">AU</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>One NZ</h3>
+        <span class="chip cat-other">NZ</span>
+      </div>
+      <ul class="source-links">
+        
+        <li>
+          <span class="chip cat-partner">NEWSROOM</span>
+          <a href="https://media.one.nz" target="_blank" rel="noopener">media.one.nz ↗</a>
+        </li>
+        
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head">
+        <h3>Spark</h3>
+        <span class="chip cat-other">NZ</span>
+      </div>
+      <ul class="source-links">
+        
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+
+<section class="source-region">
+  <div class="section-head"><h2>Telco-Fachpresse <span class="count-badge">6</span></h2></div>
+  <div class="source-grid">
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Mobile World Live</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">mobileworldlive.com ↗</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Total Telecom</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://totaltele.com/feed/" target="_blank" rel="noopener">totaltele.com ↗</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>RCR Wireless</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">rcrwireless.com ↗</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Light Reading</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">lightreading.com ↗</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Fierce Network</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">fierce-network.com ↗</a></li>
+      </ul>
+    </div>
+    
+    <div class="source-card">
+      <div class="source-head"><h3>Developing Telecoms</h3></div>
+      <ul class="source-links">
+        <li><span class="chip cat-tech">RSS</span>
+        <a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">developingtelecoms.com ↗</a></li>
+      </ul>
+    </div>
+    
+  </div>
+</section>
+
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="wrap">
+      Telco Radar · automatisiertes Competitive-Intelligence-Briefing · Quellen: Operator-Newsrooms & Telco-Fachpresse weltweit
+    </div>
+  </footer>
+  
+</body>
+</html>
