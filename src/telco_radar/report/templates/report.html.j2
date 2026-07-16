@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telco Radar – Briefing {{ date }}</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <h1><a href="../index.html">Telco <span>Radar</span></a></h1>
+      <p>Briefing vom {{ date }}</p>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      <article class="report">
+        {{ body | safe }}
+      </article>
+      <nav class="archive">
+        <h2>Archiv</h2>
+        <ul>
+          {% for entry in archive %}
+          <li><a href="../{{ entry.href }}" {% if entry.date == date %}class="current"{% endif %}>{{ entry.date }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </main>
+  <footer class="site">Telco Radar · automatisiert erstellt · nur für interne Zwecke</footer>
+</body>
+</html>

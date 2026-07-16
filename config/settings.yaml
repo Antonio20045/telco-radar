@@ -1,0 +1,25 @@
+# =============================================================================
+# TELCO RADAR - Settings
+# =============================================================================
+
+# Report language ("de" or "en")
+report_language: "de"
+
+# Anthropic model for the regional analyst + editor agents
+model: "claude-sonnet-5"
+
+# Only items newer than this many days are considered (items without a
+# date are kept if they were never seen before).
+lookback_days: 8
+
+# Hard cap of items handed to one regional analyst call
+max_items_per_region: 40
+
+# How many previously reported topics the editor gets as "do not repeat" memory
+reported_topics_memory: 300
+
+# HTTP settings for collectors
+http:
+  timeout_seconds: 20
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+  max_links_per_newsroom: 30

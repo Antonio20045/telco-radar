@@ -1,0 +1,27 @@
+# =============================================================================
+# TELCO RADAR - Industry news sources (second signal layer)
+# =============================================================================
+# Global telco trade press. Items are auto-tagged to a region when an
+# operator from the watchlist is mentioned in the headline; otherwise "Global".
+# RSS preferred: entries carry publish dates -> clean freshness filtering.
+# =============================================================================
+
+news_sources:
+  - name: "Mobile World Live"
+    type: rss
+    url: "https://www.mobileworldlive.com/feed/"
+  - name: "Total Telecom"
+    type: rss
+    url: "https://totaltele.com/feed/"
+  - name: "RCR Wireless"
+    type: rss
+    url: "https://www.rcrwireless.com/feed"
+  - name: "Light Reading"
+    type: rss
+    url: "https://www.lightreading.com/rss.xml"
+  - name: "Fierce Network"
+    type: rss
+    url: "https://www.fierce-network.com/rss/xml"
+  - name: "Developing Telecoms"
+    type: rss
+    url: "https://developingtelecoms.com/?format=feed&type=rss"

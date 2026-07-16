@@ -1,0 +1,70 @@
+name: Telco Radar Run
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"   # every Monday 05:00 UTC
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Only consider items newer than N days"
+        required: false
+        default: "8"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONPATH: src
+        run: |
+          python -m telco_radar.pipeline --root . \
+            --lookback-days "${{ github.event.inputs.lookback_days || 8 }}"
+
+      - name: Commit state and report
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No state changes to commit"
+          else
+            git commit -m "radar: run $(date -u +%F)"
+            git push
+          fi
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    needs: radar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

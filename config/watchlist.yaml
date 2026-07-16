@@ -1,0 +1,200 @@
+# =============================================================================
+# TELCO RADAR - Watchlist
+# =============================================================================
+# Regions -> Operators -> Sources.
+#
+# Source types:
+#   rss      : RSS/Atom feed (preferred - has publish dates)
+#   newsroom : HTML press/newsroom page (generic link extraction; optional
+#              CSS "item_selector" to narrow down article links)
+#
+# Maintenance: run `python scripts/validate_sources.py` to check all URLs.
+# Broken sources are logged and skipped at runtime - they never break a run.
+# =============================================================================
+
+regions:
+  europe:
+    name: "Europa"
+    operators:
+      - name: "Vodafone Group"
+        aliases: ["Vodafone"]
+        country: "GB"
+        sources:
+          - type: newsroom
+            url: "https://www.vodafone.com/news"
+      - name: "Deutsche Telekom"
+        aliases: ["Telekom", "T-Mobile", "T-Systems"]
+        country: "DE"
+        sources:
+          - type: newsroom
+            url: "https://www.telekom.com/en/media/media-information"
+      - name: "Orange"
+        aliases: ["Orange Group"]
+        country: "FR"
+        sources:
+          - type: newsroom
+            url: "https://www.orange.com/en/newsroom"
+      - name: "Telefónica"
+        aliases: ["Movistar", "O2", "Vivo"]
+        country: "ES"
+        sources:
+          - type: rss
+            url: "https://www.telefonica.com/en/feed/"
+      - name: "BT Group"
+        aliases: ["BT", "EE"]
+        country: "GB"
+        sources:
+          - type: newsroom
+            url: "https://newsroom.bt.com/"
+      - name: "Swisscom"
+        aliases: []
+        country: "CH"
+        sources:
+          - type: newsroom
+            url: "https://www.swisscom.ch/en/about/news.html"
+      - name: "Telia"
+        aliases: ["Telia Company"]
+        country: "SE"
+        sources:
+          - type: newsroom
+            url: "https://www.teliacompany.com/en/newsroom"
+
+  north_america:
+    name: "Nordamerika"
+    operators:
+      - name: "Verizon"
+        aliases: []
+        country: "US"
+        sources:
+          - type: newsroom
+            url: "https://www.verizon.com/about/media-center"
+      - name: "AT&T"
+        aliases: ["ATT"]
+        country: "US"
+        sources:
+          - type: newsroom
+            url: "https://about.att.com/newsroom"
+      - name: "T-Mobile US"
+        aliases: ["T-Mobile"]
+        country: "US"
+        sources:
+          - type: newsroom
+            url: "https://www.t-mobile.com/news"
+
+  latin_america:
+    name: "Lateinamerika"
+    operators:
+      - name: "América Móvil"
+        aliases: ["America Movil", "Claro"]
+        country: "MX"
+        sources:
+          - type: newsroom
+            url: "https://www.americamovil.com/English/press-room/"
+      - name: "Millicom"
+        aliases: ["Tigo"]
+        country: "LU"
+        sources:
+          - type: newsroom
+            url: "https://www.millicom.com/media/press-releases"
+
+  africa_middle_east:
+    name: "Afrika & Naher Osten"
+    operators:
+      - name: "MTN Group"
+        aliases: ["MTN"]
+        country: "ZA"
+        sources:
+          - type: newsroom
+            url: "https://www.mtn.com/newsroom/"
+      - name: "Safaricom"
+        aliases: ["M-Pesa"]
+        country: "KE"
+        sources:
+          - type: newsroom
+            url: "https://www.safaricom.co.ke/media-center-landing"
+      - name: "Airtel Africa"
+        aliases: []
+        country: "NG"
+        sources:
+          - type: newsroom
+            url: "https://airtel.africa/media"
+      - name: "e&"
+        aliases: ["Etisalat", "e& Group"]
+        country: "AE"
+        sources:
+          - type: newsroom
+            url: "https://www.eand.com/en/news/"
+      - name: "Ooredoo"
+        aliases: []
+        country: "QA"
+        sources:
+          - type: newsroom
+            url: "https://www.ooredoo.com/en/media/"
+
+  asia:
+    name: "Asien"
+    operators:
+      - name: "Bharti Airtel"
+        aliases: ["Airtel India", "Airtel"]
+        country: "IN"
+        sources:
+          - type: newsroom
+            url: "https://www.airtel.in/press-release"
+      - name: "Reliance Jio"
+        aliases: ["Jio"]
+        country: "IN"
+        sources:
+          - type: newsroom
+            url: "https://www.jio.com/press-release"
+      - name: "Singtel"
+        aliases: []
+        country: "SG"
+        sources:
+          - type: newsroom
+            url: "https://www.singtel.com/about-us/media-centre"
+      - name: "SK Telecom"
+        aliases: ["SKT"]
+        country: "KR"
+        sources:
+          - type: newsroom
+            url: "https://www.sktelecom.com/en/press/press_list.do"
+      - name: "NTT Docomo"
+        aliases: ["Docomo"]
+        country: "JP"
+        sources:
+          - type: newsroom
+            url: "https://www.docomo.ne.jp/english/info/media_center/pr/"
+      - name: "KDDI"
+        aliases: ["au"]
+        country: "JP"
+        sources:
+          - type: newsroom
+            url: "https://newsroom.kddi.com/english/"
+      - name: "SoftBank"
+        aliases: []
+        country: "JP"
+        sources:
+          - type: newsroom
+            url: "https://www.softbank.jp/en/corp/news/press/"
+      - name: "Telkomsel"
+        aliases: []
+        country: "ID"
+        sources:
+          - type: newsroom
+            url: "https://www.telkomsel.com/en/about-us/news"
+
+  oceania:
+    name: "Ozeanien"
+    operators:
+      - name: "Telstra"
+        aliases: []
+        country: "AU"
+        sources:
+          - type: newsroom
+            url: "https://www.telstra.com.au/exchange"
+      - name: "Optus"
+        aliases: []
+        country: "AU"
+        sources:
+          - type: newsroom
+            url: "https://www.optus.com.au/about/media-centre"

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Sample Telco News</title>
+    <link>https://example-telconews.com</link>
+    <item>
+      <title>Vodafone launches new eSIM roaming pass for travellers</title>
+      <link>https://example-telconews.com/2026/07/vodafone-esim-roaming-pass?utm_source=rss</link>
+      <pubDate>Tue, 14 Jul 2026 09:00:00 GMT</pubDate>
+      <description>Vodafone introduced a daily eSIM roaming pass across 80 destinations.</description>
+    </item>
+    <item>
+      <title>Jio unveils AI-powered family plan with cloud gaming bundle</title>
+      <link>https://example-telconews.com/2026/07/jio-ai-family-plan</link>
+      <pubDate>Mon, 13 Jul 2026 14:30:00 GMT</pubDate>
+      <description>Reliance Jio announced a new family tariff including cloud gaming.</description>
+    </item>
+    <item>
+      <title>Old story that should be filtered by freshness</title>
+      <link>https://example-telconews.com/2024/01/old-story</link>
+      <pubDate>Mon, 01 Jan 2024 08:00:00 GMT</pubDate>
+      <description>Ancient news.</description>
+    </item>
+  </channel>
+</rss>
