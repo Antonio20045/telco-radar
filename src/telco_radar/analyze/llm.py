@@ -71,7 +71,7 @@ def _post_with_retries(url, payload, headers, retries, parse):
             raise RuntimeError(f"LLM fatal error: {exc}")
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
-            wait = min(12 * attempt, 45)
+            wait = min(4 * attempt, 12)
             log.warning("LLM call failed (attempt %d/%d): %s - retrying in %ds",
                         attempt, retries, str(exc)[:160], wait)
             time.sleep(wait)

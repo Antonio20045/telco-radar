@@ -36,7 +36,7 @@ openai_editor_model: "deepseek-ai/deepseek-v4-pro"    # frontier-Qualitaet fuer 
 lookback_days: 8
 
 # Hard cap of items handed to one regional analyst call
-max_items_per_region: 45
+max_items_per_region: 24
 
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300

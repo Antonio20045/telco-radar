@@ -59,7 +59,7 @@ def _payload(items) -> str:
 
 
 def analyze_competitor(name: str, query: str, model: str, http_cfg: dict,
-                       language: str = "Deutsch", max_items: int = 18) -> dict:
+                       language: str = "Deutsch", max_items: int = 12) -> dict:
     """Fetch fresh news for one competitor and return a structured profile."""
     from ..collect.rss import collect_rss
     src = Source(type="rss", url=bing_news_rss(query), name=name,
