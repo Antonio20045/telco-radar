@@ -5,6 +5,7 @@ import html as html_lib
 import json
 import logging
 import re
+import shutil
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -232,6 +233,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     for asset in ("style.css", "app.js"):
         (site_dir / asset).write_text(
             (_TEMPLATES / asset).read_text(encoding="utf-8"), encoding="utf-8")
+    for binasset in ("logo.png",):
+        src = _TEMPLATES / binasset
+        if src.exists():
+            shutil.copy(src, site_dir / binasset)
 
     num_operators = len(cfg.operators) if cfg is not None else None
 

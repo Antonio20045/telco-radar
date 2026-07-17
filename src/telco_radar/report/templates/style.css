@@ -32,7 +32,7 @@ main{padding-bottom:40px}
 }
 .topbar-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand svg{display:block;width:30px;height:30px}
+.brand svg,.brand-logo{display:block;width:30px;height:30px}
 .brand-name{font-weight:800;letter-spacing:-.02em;font-size:19px;color:var(--vf-ink)}
 .brand-name em{font-style:normal;color:var(--vf-red)}
 .nav{display:flex;align-items:center;gap:30px}
