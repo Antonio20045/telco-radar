@@ -26,6 +26,11 @@ max_items_per_region: 24
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 
+# Concurrency for the independent LLM calls (regional analysts + competitor
+# profiles). Only ~10 calls/run, so this just overlaps their latency; the
+# editor synthesis still runs once, after the analysts. Same models, same output.
+llm_max_workers: 4
+
 # ---------------------------------------------------------------------------
 # Sources: every operator has its OWN official primary source (feed / json_api /
 # newsroom / newsroom_js / official-reference) - defined per source in

@@ -96,12 +96,21 @@ def analyze_competitor(name, terms, items, model, language="Deutsch",
     return result
 
 
-def analyze_all(focus, items, model, language="Deutsch"):
-    out = []
-    for c in focus:
-        name = c.get("name")
-        if not name:
-            continue
-        out.append(analyze_competitor(name, c.get("aliases") or [], items,
-                                      model, language))
-    return out
+def analyze_all(focus, items, model, language="Deutsch", max_workers=4):
+    """Competitor deep-dives are independent -> run them concurrently."""
+    from concurrent.futures import ThreadPoolExecutor
+    tasks = [(c["name"], c.get("aliases") or []) for c in focus if c.get("name")]
+    if not tasks:
+        return []
+
+    def _one(t):
+        try:
+            return analyze_competitor(t[0], t[1], items, model, language)
+        except Exception as exc:  # noqa: BLE001 - one profile must not kill the rest
+            log = __import__("logging").getLogger(__name__)
+            log.error("Competitor %s failed: %s", t[0], exc)
+            return None
+
+    with ThreadPoolExecutor(max_workers=max(1, min(max_workers, len(tasks)))) as pool:
+        results = list(pool.map(_one, tasks))
+    return [r for r in results if r]

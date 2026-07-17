@@ -12,6 +12,7 @@ import os
 import sys
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -110,20 +111,24 @@ def run(root: Path, use_llm: bool | None = None,
     analyst_telemetry: list[dict] = []
     editor_used = False
     if use_llm and new_items:
-        for region_key, region_items in items_by_region.items():
+        # Analysts are independent per region -> run them concurrently. Only
+        # ~6 calls, well under any rate cap, but overlapping their latency
+        # turns a ~9x sequential wait into ~1-2x. Same models, same output.
+        llm_workers = int(cfg.settings.get("llm_max_workers", 4))
+
+        def _analyze_one(region_key, region_items):
             region_name = cfg.region_names.get(region_key, region_key)
             try:
                 res = analyze_region(
                     region_name, region_items, model=analyst_model,
                     language=language, max_items=max_items)
-                regional[region_name] = res
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
-                analyst_telemetry.append(tel)
+                return region_name, res, tel
             except Exception as exc:  # noqa: BLE001
                 log.error("Analyst %s failed: %s - falling back to raw list",
                           region_name, exc)
-                regional[region_name] = {
+                fallback = {
                     "region_summary": "",
                     "highlights": [
                         {"title": i.title, "operator": i.operator or "",
@@ -132,6 +137,16 @@ def run(root: Path, use_llm: bool | None = None,
                         for i in region_items[:10]
                     ],
                 }
+                return region_name, fallback, None
+
+        with ThreadPoolExecutor(max_workers=max(1, llm_workers)) as _pool:
+            _futs = [_pool.submit(_analyze_one, rk, ri)
+                     for rk, ri in items_by_region.items()]
+            for _fut in as_completed(_futs):
+                region_name, res, tel = _fut.result()
+                regional[region_name] = res
+                if tel is not None:
+                    analyst_telemetry.append(tel)
         try:
             body, covered = editor.synthesize(
                 regional, topics_store.recent(), model=editor_model,
@@ -179,7 +194,8 @@ def run(root: Path, use_llm: bool | None = None,
         try:
             comp_model = cfg.settings.get("openai_analyst_model", editor_model) if use_openai else editor_model
             competitor_profiles = competitor_mod.analyze_all(
-                cfg.focus_competitors, items, comp_model, language)
+                cfg.focus_competitors, items, comp_model, language,
+                max_workers=int(cfg.settings.get('llm_max_workers', 4)))
         except Exception as exc:  # noqa: BLE001
             log.error("Competitor deep-dive failed: %s", exc)
         phase("Wettbewerber-Analyse", time.monotonic() - tcomp,
