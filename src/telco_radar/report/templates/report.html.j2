@@ -2,55 +2,49 @@
 {% set active = 'dashboard' if is_latest else 'archive' %}
 {% block title %}Telco Radar - Bericht {{ report.date if report else '' }}{% endblock %}
 
+{% macro darr(d) %}<span class="d {{ d.dir }}">{% if d.dir == 'up' %}&#9650;{{ d.abs }}{% elif d.dir == 'down' %}&#9660;{{ d.abs }}{% else %}&middot;{% endif %}</span>{% endmacro %}
+
 {% block content %}
 {% if report %}
 
 <section class="hero">
   <h1>{{ date_de }}</h1>
-  <div class="metastrip">
-    <span><b>{{ report.stats.get('operators', num_operators or '–') }}</b> Betreiber beobachtet</span>
-    <span class="dot"></span>
-    <span><b>{{ report.stats.get('sources_ok', report.stats.get('sources_total','–')) }}</b> Fachpresse-Quellen</span>
-    <span class="dot"></span>
-    <span><b>{{ report.stats.get('collected', '–') }}</b> Artikel geprüft</span>
-    <span class="dot"></span>
-    <span class="hl"><b>{{ report.stats.get('new', '–') }}</b> neu diese Woche</span>
+  <p class="hero-lead">Wettbewerbs-Monitoring &middot; {{ report.stats.get('operators', num_operators or '–') }} Netzbetreiber beobachtet &middot; {{ report.stats.get('collected', '–') }} Artikel geprüft</p>
+  {% if dash %}
+  <div class="kpis">
+    {% for k in dash.kpis %}
+    <div class="kpi{% if k.accent %} accent{% endif %}">
+      <b{% if k.text %} class="kpi-text"{% endif %}>{{ k.num }}</b>
+      <span>{{ k.label }}</span>
+    </div>
+    {% endfor %}
   </div>
+  {% endif %}
   <details class="explainer">
     <summary>Wie entsteht dieser Bericht? <span class="hint">Kurz erklärt</span></summary>
     <div class="explainer-body">
-      <p><b>Sammeln.</b> Jede Woche wird die internationale und deutsche Telco-Fachpresse ausgewertet ({{ report.stats.get('sources_total','15') }} Quellen). Jeder Artikel stammt direkt von einem Fachmedium.</p>
+      <p><b>Sammeln.</b> Jede Woche werden die offiziellen Presseseiten von {{ report.stats.get('operators', num_operators or '80') }} Netzbetreibern und die Telco-Fachpresse ausgewertet. Jede Quelle ist verlinkt und nachprüfbar.</p>
       <p><b>Nur Neues.</b> Was schon berichtet wurde, wird aussortiert. Hier steht nur, was seit dem letzten Bericht dazugekommen ist.</p>
-      <p><b>Bewerten.</b> Jede Meldung wird eingeordnet: Was ist passiert, was kann Vodafone daraus machen? Dringlichkeit 1–5
-        <span class="legend"><i class="ldot r5"></i>5 sofort</span><span class="legend"><i class="ldot r4"></i>4 wichtig</span><span class="legend"><i class="ldot r3"></i>3 beobachten</span>.</p>
-      <p><b>Nachprüfbar.</b> Jede Aussage verlinkt direkt auf den Originalartikel. Details im <a href="{{ prefix }}protokoll.html">Protokoll</a>.</p>
+      <p><b>Bewerten.</b> Jede Meldung wird eingeordnet: Was ist passiert, was kann Vodafone daraus machen? Dringlichkeit 1–5. Details im <a href="{{ prefix }}protokoll.html">Protokoll</a>.</p>
     </div>
   </details>
 </section>
 
-<nav class="pagenav">
-  {% if top_priorities %}<a href="#prioritaet">Prioritäten</a>{% endif %}
-  {% if briefing_html %}<a href="#bericht">Wochenbericht</a>{% endif %}
-  {% if charts %}<a href="#zahlen">Zahlen &amp; Insights</a>{% endif %}
-  {% if n_competitors %}<a href="{{ prefix }}wettbewerber.html">Wettbewerber &nearr;</a>{% endif %}
-  {% if highlights %}<a href="#explorer">Alle Meldungen</a>{% endif %}
-</nav>
-
 {% if top_priorities %}
 <section class="section" id="prioritaet">
-  <div class="section-head"><h2><span class="sec-no">01</span> Priorität</h2>
-    <p class="section-title">Das sollte Vodafone diese Woche wissen</p></div>
-  <div class="prio-grid">
-    {% for h in top_priorities %}
+  <div class="section-head"><h2><span class="sec-no">01</span> In 60 Sekunden</h2>
+    <p class="section-title">Das sollte Vodafone jetzt wissen</p></div>
+  <div class="prio-list">
+    {% for h in top_priorities[:3] %}
     <article class="prio-card{% if loop.first %} lead{% endif %}">
       <div class="prio-top">
-        <span class="rel-badge r{{ h.relevance }}">{{ h.relevance }}/5 · {{ h.relevance_label }}</span>
+        <span class="rel-badge r{{ h.relevance }}">{{ h.relevance }}/5 &middot; {{ h.relevance_label }}</span>
         <span class="chip">{{ h.category }}</span>
       </div>
       <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.title }}</a></h3>
       <p class="prio-meta"><b>{{ h.operator or h.source_label }}</b><span class="sep"></span>{{ h.region }}{% if h.date %}<span class="sep"></span>{{ h.date }}{% endif %}</p>
-      {% if h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
-      {% if h.why_it_matters %}<p class="why"><span class="why-label">Warum das zählt</span>{{ h.why_it_matters }}</p>{% endif %}
+      {% if h.why_it_matters %}<p class="why"><span class="why-label">Für Vodafone</span>{{ h.why_it_matters }}</p>
+      {% elif h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
       <a class="source-link" href="{{ h.url }}" target="_blank" rel="noopener">Quelle: {{ h.source_label }} &nearr;</a>
     </article>
     {% endfor %}
@@ -58,33 +52,80 @@
 </section>
 {% endif %}
 
-{% if briefing_html %}
-<section class="section" id="bericht">
-  <div class="section-head"><h2><span class="sec-no">02</span> Wochenbericht</h2>
-    <p class="section-title">Einordnung und Handlungsempfehlungen</p></div>
-  <article class="prose">{{ briefing_html | safe }}</article>
+{% if dash %}
+<section class="section" id="zahlen">
+  <div class="section-head"><h2><span class="sec-no">02</span> Zahlen &amp; Insights</h2>
+    <p class="section-title">Die Woche in Kennzahlen</p></div>
+  <div class="chart-grid two">
+    <div class="panel">
+      <h3 class="panel-title">Share of Voice</h3>
+      <p class="panel-note">Wer diese Woche die relevante Presse dominiert &middot; Δ zur Vorwoche.</p>
+      <div class="bars">
+        {% for s in dash.sov %}
+        <div class="bar-row">
+          <span class="bar-lab" title="{{ s.op }}">{{ s.op }}</span>
+          <span class="bar-track"><span class="bar-fill" style="width:{{ s.w }}%"></span></span>
+          <span class="bar-val">{{ s.n }} {{ darr(s.delta) }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="panel">
+      <h3 class="panel-title">Themen-Momentum</h3>
+      <p class="panel-note">Worauf sich die Branche verlagert &middot; Δ zur Vorwoche.</p>
+      <div class="bars">
+        {% for m in dash.momentum %}
+        <div class="bar-row">
+          <span class="bar-lab" title="{{ m.cat }}">{{ m.cat }}</span>
+          <span class="bar-track"><span class="bar-fill" style="width:{{ m.w }}%;background:{{ m.color }}"></span></span>
+          <span class="bar-val">{{ m.n }} {{ darr(m.delta) }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if dash.competitors %}
+  <div class="panel wide scoreboard">
+    <h3 class="panel-title">Fokus-Wettbewerber</h3>
+    <p class="panel-note">Aktivität und eine Einordnung je Wettbewerber diese Woche.</p>
+    {% for c in dash.competitors %}
+    <div class="score-row">
+      <div class="score-head"><span class="score-name">{{ c.name }}</span><span class="score-n">{{ c.n }} Meldungen</span></div>
+      <span class="bar-track"><span class="bar-fill" style="width:{{ c.w }}%"></span></span>
+      {% if c.impl %}<p class="score-impl"><span class="why-label">Für Vodafone</span>{{ c.impl }}</p>{% endif %}
+    </div>
+    {% endfor %}
+    {% if n_competitors %}<p class="section-more"><a href="{{ prefix }}wettbewerber.html">Detailanalyse der Wettbewerber &nearr;</a></p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if dash.trend.n > 1 %}
+  <div class="panel wide">
+    <h3 class="panel-title">Historische Trends</h3>
+    <p class="panel-note">Verlauf über die letzten {{ dash.trend.n }} Berichte &middot; {{ dash.trend.weeks | first }} bis {{ dash.trend.weeks | last }}.</p>
+    <div class="trend-grid">
+      <div class="trend-cell">
+        <div class="trend-top"><span class="trend-name">Neue Meldungen / Woche</span><span class="trend-val">{{ dash.trend.volume_last }} {{ darr(dash.trend.volume_delta) }}</span></div>
+        {{ dash.trend.volume_spark | safe }}
+      </div>
+      {% for c in dash.trend.competitors %}
+      <div class="trend-cell">
+        <div class="trend-top"><span class="trend-name">{{ c.name }}</span><span class="trend-val">{{ c.last }} {{ darr(c.delta) }}</span></div>
+        {{ c.spark | safe }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 </section>
 {% endif %}
 
-{% if charts %}
-<section class="section" id="zahlen">
-  <div class="section-head"><h2><span class="sec-no">03</span> Zahlen &amp; Insights</h2>
-    <p class="section-title">Die Woche in Kennzahlen</p></div>
-  <div class="insight-row">
-    {% for k in charts.insights %}
-    <div class="insight{% if k.accent %} accent{% endif %}">
-      <span class="insight-num{% if k.text %} text{% endif %}">{{ k.num }}</span>
-      <span class="insight-label">{{ k.label }}</span>
-    </div>
-    {% endfor %}
-  </div>
-  <div class="chart-grid two">
-    <div class="panel"><h3 class="panel-title">Aktivste Wettbewerber</h3><p class="panel-note">Wer diese Woche am meisten relevante Meldungen produziert hat.</p>{{ charts.competitors | safe }}</div>
-    <div class="panel"><h3 class="panel-title">Themen-Schwerpunkte</h3><p class="panel-note">Worum es bei den relevanten Meldungen geht.</p>{{ charts.categories | safe }}</div>
-    <div class="panel"><h3 class="panel-title">Dringlichkeit</h3><p class="panel-note">Wie viele Meldungen wie dringend sind.</p>{{ charts.urgency | safe }}</div>
-    <div class="panel"><h3 class="panel-title">Aktivste Regionen</h3><p class="panel-note">Wo diese Woche am meisten passiert.</p>{{ charts.regions | safe }}</div>
-  </div>
-  {% if n_competitors %}<p class="section-more"><a href="{{ prefix }}wettbewerber.html">Detailanalyse der wichtigsten Wettbewerber &nearr;</a></p>{% endif %}
+{% if briefing_html %}
+<section class="section" id="bericht">
+  <div class="section-head"><h2><span class="sec-no">03</span> Wochenbericht</h2>
+    <p class="section-title">Einordnung und Handlungsempfehlungen</p></div>
+  <article class="prose">{{ briefing_html | safe }}</article>
 </section>
 {% endif %}
 

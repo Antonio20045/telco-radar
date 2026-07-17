@@ -118,39 +118,131 @@ def _bar_chart_svg(rows, width=520, row_h=40, label_w=180) -> str:
 REL_COLORS = {5: "#e60000", 4: "#e07a00", 3: "#3860be", 2: "#9aa0aa"}
 
 
-def _charts(highlights) -> dict:
-    by_op, by_cat, by_reg = {}, {}, {}
-    by_rel = {5: 0, 4: 0, 3: 0, 2: 0}
-    for h in highlights:
+def _delta(cur, prev):
+    d = int(cur or 0) - int(prev or 0)
+    return {"diff": d, "abs": abs(d),
+            "dir": "up" if d > 0 else ("down" if d < 0 else "flat")}
+
+
+def _sparkline(values, w=180, h=46, color="#e60000"):
+    vals = [float(v or 0) for v in values]
+    if len(vals) < 2:
+        vals = ([0.0] + vals) if vals else [0.0, 0.0]
+    n = len(vals)
+    lo, hi = min(vals), max(vals)
+    rng = (hi - lo) or 1.0
+    pad = 5
+    xs = [pad + (w - 2 * pad) * (k / (n - 1)) for k in range(n)]
+    ys = [h - pad - (h - 2 * pad) * ((v - lo) / rng) for v in vals]
+    pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(xs, ys))
+    area = f"{xs[0]:.1f},{h - pad:.1f} " + pts + f" {xs[-1]:.1f},{h - pad:.1f}"
+    return (f'<svg viewBox="0 0 {w} {h}" class="spark" preserveAspectRatio="none" '
+            f'role="img" aria-hidden="true">'
+            f'<polygon points="{area}" fill="{color}" opacity="0.12"/>'
+            f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2" '
+            f'stroke-linejoin="round" stroke-linecap="round"/>'
+            f'<circle cx="{xs[-1]:.1f}" cy="{ys[-1]:.1f}" r="3.2" fill="{color}"/></svg>')
+
+
+def _short_de(iso):
+    try:
+        d = datetime.fromisoformat(iso)
+        return f"{d.day:02d}.{d.month:02d}."
+    except (ValueError, TypeError):
+        return iso or ""
+
+
+def _first_sentence(text, limit=160):
+    t = " ".join((text or "").split())
+    if not t:
+        return ""
+    for sep in (". ", "! ", "? "):
+        k = t.find(sep)
+        if 0 < k < limit:
+            return t[:k + 1]
+    return (t[:limit].rstrip() + "…") if len(t) > limit else t
+
+
+def _op_counts(report):
+    c = {}
+    for h in _flatten(report):
         op = (h.get("operator") or "").strip()
         if op:
-            by_op[op] = by_op.get(op, 0) + 1
-        by_cat[h["category"]] = by_cat.get(h["category"], 0) + 1
-        by_reg[h["region"]] = by_reg.get(h["region"], 0) + 1
-        r = max(2, min(5, h.get("relevance") or 2))
-        by_rel[r] += 1
+            c[op] = c.get(op, 0) + 1
+    return c
 
-    comp_rows = sorted(by_op.items(), key=lambda kv: -kv[1])[:8]
-    cat_rows = sorted(by_cat.items(), key=lambda kv: -kv[1])[:8]
-    reg_rows = sorted(by_reg.items(), key=lambda kv: -kv[1])[:8]
-    rel_rows = [(f"{r}/5 · {RELEVANCE_LABELS[r]}", by_rel[r], REL_COLORS[r])
-                for r in (5, 4, 3, 2) if by_rel[r]]
 
-    n_urgent = by_rel[5] + by_rel[4]
-    return {
-        "competitors": _bar_chart_svg([(k, v, "#e60000") for k, v in comp_rows]),
-        "categories": _bar_chart_svg(
-            [(k, v, CATEGORY_COLORS.get(k, "#7e7e7e")) for k, v in cat_rows]),
-        "regions": _bar_chart_svg([(k, v, "#3860be") for k, v in reg_rows]),
-        "urgency": _bar_chart_svg(rel_rows, label_w=150),
-        "insights": [
-            {"num": len(highlights), "label": "relevante Signale"},
-            {"num": n_urgent, "label": "dringend (4–5/5)", "accent": True},
-            {"num": len(by_op), "label": "Wettbewerber aktiv"},
-            {"num": (cat_rows[0][0] if cat_rows else "–"), "label": "Top-Thema", "text": True},
-        ],
-        "n_competitors": len(by_op),
-    }
+def _cat_counts(report):
+    c = {}
+    for h in _flatten(report):
+        c[h["category"]] = c.get(h["category"], 0) + 1
+    return c
+
+
+def _stats(report, prev_report, trend_reports):
+    highlights = _flatten(report)
+    total = len(highlights) or 1
+    cur_ops = _op_counts(report)
+    prev_ops = _op_counts(prev_report) if prev_report else {}
+    cur_cats = _cat_counts(report)
+    prev_cats = _cat_counts(prev_report) if prev_report else {}
+
+    sov = [{"op": k, "n": v, "pct": round(100 * v / total),
+            "delta": _delta(v, prev_ops.get(k, 0))}
+           for k, v in sorted(cur_ops.items(), key=lambda kv: -kv[1])[:6]]
+    sov_max = max((s["n"] for s in sov), default=1) or 1
+    for s in sov:
+        s["w"] = round(100 * s["n"] / sov_max)
+
+    momentum = [{"cat": k, "n": v, "delta": _delta(v, prev_cats.get(k, 0)),
+                 "color": CATEGORY_COLORS.get(k, "#7e7e7e")}
+                for k, v in sorted(cur_cats.items(), key=lambda kv: -kv[1])[:6]]
+    mom_max = max((m["n"] for m in momentum), default=1) or 1
+    for m in momentum:
+        m["w"] = round(100 * m["n"] / mom_max)
+
+    comps = []
+    for c in (report.get("competitors") or []):
+        comps.append({"name": c.get("name"), "n": int(c.get("n_items") or 0),
+                      "impl": _first_sentence(c.get("vodafone_implication")),
+                      "themes": (c.get("themes") or [])[:3]})
+    comp_max = max((c["n"] for c in comps), default=1) or 1
+    for c in comps:
+        c["w"] = round(100 * c["n"] / comp_max)
+
+    series = list(reversed(trend_reports or []))
+    weeks = [_short_de(r.get("date", "")) for r in series]
+    vol = [int((r.get("stats") or {}).get("new") or 0) for r in series]
+    trend = {"weeks": weeks, "n": len(series),
+             "volume_spark": _sparkline(vol) if len(series) > 1 else "",
+             "volume_last": vol[-1] if vol else 0,
+             "volume_delta": _delta(vol[-1], vol[-2]) if len(vol) > 1 else _delta(0, 0),
+             "competitors": []}
+    for c in comps:
+        vals = []
+        for r in series:
+            m = next((x for x in (r.get("competitors") or [])
+                      if x.get("name") == c["name"]), None)
+            vals.append(int((m or {}).get("n_items") or 0))
+        trend["competitors"].append({
+            "name": c["name"],
+            "spark": _sparkline(vals) if len(series) > 1 else "",
+            "last": vals[-1] if vals else 0,
+            "delta": _delta(vals[-1], vals[-2]) if len(vals) > 1 else _delta(0, 0)})
+
+    top_comp = max(comps, key=lambda c: c["n"], default=None)
+    kpis = [
+        {"num": (report.get("stats") or {}).get("new", len(highlights)),
+         "label": "neu diese Woche"},
+        {"num": sum(1 for h in highlights if h.get("relevance") == 5),
+         "label": "sofort relevant (5/5)", "accent": True},
+        {"num": (top_comp["name"] if top_comp and top_comp["n"] else "-"),
+         "label": "aktivster Wettbewerber", "text": True},
+        {"num": (momentum[0]["cat"] if momentum else "-"),
+         "label": "Top-Thema", "text": True},
+    ]
+    return {"kpis": kpis, "sov": sov, "momentum": momentum,
+            "competitors": comps, "trend": trend, "n_competitors": len(cur_ops)}
 
 
 def _prep_competitors(report: dict) -> list[dict]:
@@ -199,7 +291,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "highlights": highlights,
             "explorer_json": json.dumps(highlights, ensure_ascii=False),
             "top_priorities": top,
-            "charts": _charts(highlights) if highlights else None,
+            "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
+                           reports[i:i + 8]) if highlights else None,
             "briefing_html": _md_to_html(report.get("briefing_md", "")),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
