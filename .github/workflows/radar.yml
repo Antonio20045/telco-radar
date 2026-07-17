@@ -35,7 +35,7 @@ jobs:
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
-          LLM_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
           PYTHONPATH: src
         run: |

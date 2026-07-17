@@ -27,9 +27,9 @@ editor_model: "claude-sonnet-5"
 #   NVIDIA NIM    : https://integrate.api.nvidia.com/v1
 #   Gemini (OpenAI): https://generativelanguage.googleapis.com/v1beta/openai
 # ---------------------------------------------------------------------------
-llm_api_base: "https://api.moonshot.ai/v1"
-openai_analyst_model: "kimi-k2-0905"      # günstig, schnell, sauberes JSON
-openai_editor_model: "kimi-k2-thinking"
+llm_api_base: "https://integrate.api.nvidia.com/v1"
+openai_analyst_model: "meta/llama-3.3-70b-instruct"   # schnell, spart Credits, sauberes JSON
+openai_editor_model: "meta/llama-3.1-405b-instruct"   # frontier-Qualitaet fuer die Synthese
 
 # Only items newer than this many days are considered (items without a
 # date are kept if they were never seen before).
