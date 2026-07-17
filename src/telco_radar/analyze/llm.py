@@ -44,17 +44,31 @@ def active_backend() -> str:
     return "none"
 
 
+# Client errors that will never succeed on retry (bad key, bad request, bad model)
+_FATAL_STATUSES = {400, 401, 403, 404, 405, 422}
+
+
+class _FatalHTTP(Exception):
+    pass
+
+
 def _post_with_retries(url, payload, headers, retries, parse):
     last_err: Exception | None = None
     for attempt in range(1, retries + 1):
         try:
             resp = httpx.post(url, json=payload, headers=headers, timeout=180)
+            if resp.status_code in _FATAL_STATUSES:
+                raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
             if resp.status_code in (429, 529) or resp.status_code >= 500:
                 raise httpx.HTTPStatusError(
                     f"retryable status {resp.status_code}: {resp.text[:200]}",
                     request=resp.request, response=resp)
             resp.raise_for_status()
             return parse(resp.json())
+        except _FatalHTTP as exc:
+            # no point retrying - surface immediately so the run fails fast
+            log.error("LLM call fatal (no retry): %s", str(exc)[:300])
+            raise RuntimeError(f"LLM fatal error: {exc}")
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
             wait = min(12 * attempt, 45)
@@ -66,7 +80,7 @@ def _post_with_retries(url, payload, headers, retries, parse):
 
 def _complete_openai(system: str, user: str, model: str,
                      max_tokens: int, retries: int) -> str:
-    key = os.environ["LLM_API_KEY"]
+    key = os.environ["LLM_API_KEY"].strip()
     payload = {
         "model": model,
         "messages": [
