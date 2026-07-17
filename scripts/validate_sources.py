@@ -14,16 +14,27 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from telco_radar.collect.newsroom import collect_newsroom  # noqa: E402
+from telco_radar.collect.newsroom_js import collect_newsroom_js  # noqa: E402
+from telco_radar.collect.json_api import collect_json  # noqa: E402
 from telco_radar.collect.rss import collect_rss  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
 
 
+_COLLECTORS = {
+    "rss": collect_rss,
+    "trade_press": collect_rss,
+    "json_api": collect_json,
+    "newsroom": collect_newsroom,
+    "newsroom_js": collect_newsroom_js,
+}
+
+
 def check(source, region, operator, origin, http_cfg):
+    if source.kind == "official":
+        return ("SKIP", 0, 0, "reference-only (not crawled)")
+    fn = _COLLECTORS.get(source.kind, collect_newsroom)
     try:
-        if source.type == "rss":
-            items = collect_rss(source, region, operator, origin, http_cfg)
-        else:
-            items = collect_newsroom(source, region, operator, origin, http_cfg)
+        items = fn(source, region, operator, origin, http_cfg)
         dated = sum(1 for i in items if i.published)
         return ("OK" if items else "EMPTY", len(items), dated, "")
     except Exception as exc:  # noqa: BLE001
@@ -47,7 +58,7 @@ def main() -> int:
 
     print(f"{'STATUS':7} {'ITEMS':>5} {'DATED':>5}  {'NAME':24} URL")
     print("-" * 110)
-    counts = {"OK": 0, "EMPTY": 0, "FAIL": 0}
+    counts = {"OK": 0, "EMPTY": 0, "FAIL": 0, "SKIP": 0}
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = {
             pool.submit(check, s, r, o, g, http_cfg): (s, o) for s, r, o, g in jobs

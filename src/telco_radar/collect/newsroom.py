@@ -40,6 +40,36 @@ _TEXT_DATE = re.compile(
     r"(0?[1-9]|1[0-2]|Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
     r"Sep\w*|Oct\w*|Nov\w*|Dec\w*)[./\s,]+(20\d{2})\b", re.I
 )
+# Navigation / section labels that are not articles (exact-match, lowercased).
+_JUNK_EXACT = {
+    "frequently asked questions", "faq", "faqs", "perspectives", "newsroom",
+    "media center", "media centre", "media center landing", "press releases",
+    "press release", "our reports, studies, and publications", "sitemap",
+    "social media", "social media listing of all swisscom social media channels",
+    "press conference materials top", "emergency resource center", "read more",
+    "learn more", "see all", "view all", "all news", "back to top", "top",
+    "cookie policy", "privacy policy", "contact us", "media contacts",
+}
+# Phrases that mark a non-article link when the title is short.
+_JUNK_CONTAINS = re.compile(
+    r"^(perspectives|faq|frequently asked|social media|press conference "
+    r"materials|our reports|emergency resource|media (center|centre)|sitemap)",
+    re.I,
+)
+
+
+def _is_junk_title(title: str) -> bool:
+    norm = " ".join(title.strip().lower().split())
+    if norm in _JUNK_EXACT:
+        return True
+    if len(title) < 45 and _JUNK_CONTAINS.search(norm):
+        return True
+    words = norm.split()
+    if len(words) >= 2 and len(set(words)) == 1:  # "Perspectives Perspectives"
+        return True
+    return False
+
+
 _MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun",
      "jul", "aug", "sep", "oct", "nov", "dec"])}
@@ -110,6 +140,8 @@ def parse_newsroom_html(html: str, source: Source, region: str,
 
         title = " ".join(a.get_text(" ", strip=True).split())
         if len(title) < 25 or len(title) > 300:  # nav links are short
+            continue
+        if _is_junk_title(title):
             continue
         if url in seen_urls:
             continue

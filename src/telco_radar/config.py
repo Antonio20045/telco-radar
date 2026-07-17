@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -13,44 +12,33 @@ log = logging.getLogger(__name__)
 
 
 # --------------------------------------------------------------------------- #
-# Source kinds:
-#   newsroom     : HTML press page, scraped for article links (crawled)
-#   rss          : RSS/Atom feed (crawled, has dates)
-#   news_search  : auto-generated Google News feed for one operator (crawled)
-#   official     : operator's official press page - shown as a reference link
-#                  on the Quellen page, NOT crawled (used when the newsroom is
-#                  JS-only / bot-protected but we still want a real URL to show)
+# Source kinds. EVERY crawlable operator source points at the operator's OWN
+# official domain. Third-party telco trade press is a separate, explicitly
+# labelled second layer (see news_sources.yaml) - never an operator's primary
+# source.
+#
+#   rss         : RSS/Atom feed on the operator's domain (httpx + feedparser)
+#   json_api    : the operator newsroom's own JSON news API (httpx + json)
+#   newsroom    : operator press page whose article links are already in the
+#                 static HTML (httpx)
+#   newsroom_js : operator press page that is JavaScript-rendered -> crawled
+#                 with a headless browser (Playwright) in the run environment
+#   official    : operator press page that is bot-blocked / not yet crawlable;
+#                 shown as a VERIFIED reference link only (NOT crawled), always
+#                 with a documented plan to enable crawling later
 # --------------------------------------------------------------------------- #
-_CRAWLED_KINDS = {"newsroom", "rss", "news_search"}
-
-
-# Telecom context terms that disambiguate operator names (e.g. "Orange" the
-# operator vs. the colour/film) in a web-news search.
-_TELCO_SCOPE = "(5G OR mobile OR telecom OR network OR broadband OR tariff OR wireless OR operator)"
-
-
-def bing_news_rss(query: str) -> str:
-    """Bing News RSS search for one operator. Bing returns a redirect whose
-    `url=` param is the DIRECT publisher article URL (see collect/rss.py),
-    so links go to the real story, not an aggregator consent wall."""
-    q = f"{query} {_TELCO_SCOPE}"
-    return ("https://www.bing.com/news/search?q="
-            + urllib.parse.quote(q) + "&format=rss")
-
-
-def news_search_page(name: str) -> str:
-    """Clean, human-facing 'all news about this operator' reference page."""
-    return "https://news.google.com/search?q=" + urllib.parse.quote(f'"{name}"')
+_CRAWLED_KINDS = {"rss", "json_api", "newsroom", "newsroom_js"}
 
 
 @dataclass
 class Source:
-    type: str  # "rss" | "newsroom"
+    type: str  # yaml source type == kind (rss|json_api|newsroom|newsroom_js|official)
     url: str
     name: str = ""
     item_selector: str | None = None  # optional CSS selector for newsroom pages
-    kind: str = ""  # display kind (see above); defaults from type
-    label: str = ""  # human label for the source card, e.g. publisher/newsroom
+    kind: str = ""  # display/crawl kind (see above); defaults from type
+    label: str = ""  # human label for the source card
+    plan: str = ""   # for 'official' sources: why not yet crawled + the plan
 
     def __post_init__(self) -> None:
         if not self.kind:
@@ -67,6 +55,7 @@ class Operator:
     region_key: str
     region_name: str
     country: str = ""
+    website: str = ""
     aliases: list[str] = field(default_factory=list)
     sources: list[Source] = field(default_factory=list)
 
@@ -77,6 +66,10 @@ class Operator:
     @property
     def crawled_sources(self) -> list[Source]:
         return [s for s in self.sources if s.crawlable]
+
+    @property
+    def primary_source(self) -> "Source | None":
+        return self.sources[0] if self.sources else None
 
 
 @dataclass
@@ -105,8 +98,8 @@ def load_config(root: Path) -> Config:
     watchlist = _load_yaml(cfg_dir / "watchlist.yaml")
     news = _load_yaml(cfg_dir / "news_sources.yaml")
 
-    # Optional extra operators (kept in a separate file so the main, richly
-    # commented watchlist stays clean). Merged by region key.
+    # Optional extra operators (kept in a separate file so the main watchlist
+    # stays clean). Merged by region key.
     extra = _load_yaml(cfg_dir / "watchlist_extra.yaml")
     if extra.get("regions"):
         base_regions = watchlist.setdefault("regions", {})
@@ -117,10 +110,6 @@ def load_config(root: Path) -> Config:
             else:
                 base_regions[rk] = rgn
 
-    auto_news = bool(settings.get("auto_operator_news", True))
-    crawl_newsrooms = bool(settings.get("crawl_newsrooms", True))
-    window = int(settings.get("lookback_days", 8))
-
     operators: list[Operator] = []
     region_names: dict[str, str] = {"global": "Global"}
     for region_key, region in (watchlist.get("regions") or {}).items():
@@ -130,33 +119,21 @@ def load_config(root: Path) -> Config:
             sources: list[Source] = []
             for s in (op.get("sources") or []):
                 stype = s.get("type", "newsroom")
-                kind = s.get("kind", stype)
-                if stype == "newsroom" and not crawl_newsrooms:
-                    kind = "official"  # shown as a reference link, not crawled
                 sources.append(Source(
                     type=stype,
                     url=s["url"],
                     name=op["name"],
                     item_selector=s.get("item_selector"),
-                    kind=kind,
+                    kind=s.get("kind", stype),
                     label=s.get("label", ""),
-                ))
-            # Auto per-operator Google News feed: guarantees every operator has
-            # a crawlable, dated, linked source (unless explicitly opted out).
-            if auto_news and not op.get("no_auto_news"):
-                query = op.get("news_query") or f'"{op["name"]}"'
-                sources.append(Source(
-                    type="rss",
-                    url=bing_news_rss(query),
-                    name=op["name"],
-                    kind="news_search",
-                    label="Nachrichten-Suche",
+                    plan=s.get("plan", ""),
                 ))
             operators.append(Operator(
                 name=op["name"],
                 region_key=region_key,
                 region_name=region_name,
                 country=op.get("country", ""),
+                website=op.get("website", ""),
                 aliases=op.get("aliases") or [],
                 sources=sources,
             ))
@@ -168,10 +145,11 @@ def load_config(root: Path) -> Config:
         for s in (news.get("news_sources") or [])
     ]
 
+    n_crawled = sum(len(o.crawled_sources) for o in operators)
     log.info(
-        "Config loaded: %d operators in %d regions, %d trade-press sources, "
-        "auto-news=%s",
-        len(operators), len(region_names) - 1, len(news_sources), auto_news,
+        "Config loaded: %d operators in %d regions, %d crawlable operator "
+        "sources, %d trade-press sources",
+        len(operators), len(region_names) - 1, n_crawled, len(news_sources),
     )
     return Config(
         root=root,

@@ -8,19 +8,26 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from ..config import Config, Source, Operator
 from ..models import Item
 from .rss import collect_rss
+from .json_api import collect_json
 from .newsroom import collect_newsroom
+from .newsroom_js import collect_newsroom_js
 
 log = logging.getLogger(__name__)
 
 
 def _collect_source(source: Source, region: str, operator: str | None,
                     origin: str, http_cfg: dict) -> list[Item]:
-    if source.type == "rss":
+    """Dispatch a source to the right collector based on its kind."""
+    if source.kind in ("rss", "trade_press"):
         return collect_rss(source, region, operator, origin, http_cfg)
+    if source.kind == "json_api":
+        return collect_json(source, region, operator, origin, http_cfg)
+    if source.kind == "newsroom_js":
+        return collect_newsroom_js(source, region, operator, origin, http_cfg)
     return collect_newsroom(source, region, operator, origin, http_cfg)
 
 
-def collect_all(cfg: Config, max_workers: int = 5) -> tuple[list[Item], list[dict]]:
+def collect_all(cfg: Config, max_workers: int = 4) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing

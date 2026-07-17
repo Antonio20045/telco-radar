@@ -1,14 +1,15 @@
 {% extends "base.html.j2" %}
 {% set active = 'sources' %}
 {% block title %}Telco Radar - Quellen{% endblock %}
-{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Nachrichten-Suche','official':'Newsroom'} %}
+{% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz'} %}
 {% block content %}
 <section class="hero">
   <p class="eyebrow">Was der Radar beobachtet</p>
   <h1>Überwachte Quellen</h1>
-  <p class="hero-sub">Die Basis ist die internationale und deutsche Telco-Fachpresse (unten) - jeder
-  Artikel stammt direkt von einem Fachmedium. Meldungen werden den Betreibern über Namensnennung
-  zugeordnet. Der Newsroom-Link dient als offizielle Referenz. Alles verlinkt und nachprüfbar.</p>
+  <p class="hero-sub">Primärquelle jedes Betreibers ist <strong>seine eigene offizielle Presseseite</strong> -
+  per Feed (RSS/JSON), statischem Newsroom oder Headless-Render direkt vom Unternehmen. Kein Dritt-Medium wird
+  als Quelle eines Betreibers ausgegeben. Die Telco-Fachpresse (unten) ist eine separate, klar gekennzeichnete
+  <strong>zweite Ebene</strong>. Alles verlinkt und nachprüfbar.</p>
 </section>
 
 {% for region, ops in by_region.items() %}
@@ -21,15 +22,13 @@
         <h3>{{ op.name }}</h3>
         {% if op.country %}<span class="chip">{{ op.country }}</span>{% endif %}
       </div>
+      {% if op.website %}<p class="source-domain">{{ op.website }}</p>{% endif %}
       <ul class="source-links">
         {% for s in op.sources %}
         <li>
           <span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
-          {% if s.kind == 'news_search' %}
-          <a href="https://news.google.com/search?q=&quot;{{ op.name | urlencode }}&quot;" target="_blank" rel="noopener">Aktuelle Meldungen zu {{ op.name }} &nearr;</a>
-          {% else %}
           <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a>
-          {% endif %}
+          {% if s.kind == 'official' %}<span class="src-note" title="{{ s.plan }}">offizielle Referenz - Auto-Signal vorerst über Fachpresse (Plan hinterlegt)</span>{% endif %}
         </li>
         {% endfor %}
       </ul>
@@ -40,7 +39,10 @@
 {% endfor %}
 
 <section class="source-region">
-  <h2>Telco-Fachpresse <span class="count-badge">{{ news_sources | length }} Feeds</span></h2>
+  <h2>Telco-Fachpresse <span class="count-badge">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
+  <p class="hero-sub">Spezialisierte Telekom-Fachmedien. Dient als ergänzende Signal-Ebene und zur Abdeckung
+  bot-geblockter Betreiber - Meldungen werden über Namensnennung dem jeweiligen Betreiber zugeordnet, sind aber
+  immer als Fachpresse gekennzeichnet, nie als offizielle Quelle des Betreibers.</p>
   <div class="source-grid">
     {% for s in news_sources %}
     <div class="source-card">
