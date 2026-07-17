@@ -13,9 +13,23 @@ report_language: "de"
 #                   whole picture. Highest quality -> Opus. (Never Fable.)
 # `model` stays as a backwards-compatible fallback for both roles.
 # ---------------------------------------------------------------------------
+# Anthropic models (fallback - used only if no OpenAI-compatible key is set)
 model: "claude-sonnet-5"
 analyst_model: "claude-sonnet-5"
-editor_model: "claude-sonnet-5"   # war Opus - zu teuer, bis Provider-Wechsel steht
+editor_model: "claude-sonnet-5"
+
+# ---------------------------------------------------------------------------
+# OpenAI-compatible provider. Activated automatically when the GitHub secret
+# LLM_API_KEY is set (see .github/workflows/radar.yml). Public telco news only,
+# so a cheaper non-Anthropic model is fine. Swap provider = change these lines.
+#   Moonshot/Kimi : https://api.moonshot.ai/v1   (kimi-k2-thinking, kimi-k2-0905, k3)
+#   DeepSeek      : https://api.deepseek.com/v1  (deepseek-chat)
+#   NVIDIA NIM    : https://integrate.api.nvidia.com/v1
+#   Gemini (OpenAI): https://generativelanguage.googleapis.com/v1beta/openai
+# ---------------------------------------------------------------------------
+llm_api_base: "https://api.moonshot.ai/v1"
+openai_analyst_model: "kimi-k2-thinking"
+openai_editor_model: "kimi-k2-thinking"
 
 # Only items newer than this many days are considered (items without a
 # date are kept if they were never seen before).

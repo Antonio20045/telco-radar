@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from collections import defaultdict
@@ -16,7 +17,7 @@ from pathlib import Path
 
 from .analyze import editor
 from .analyze.agents import analyze_region
-from .analyze.llm import llm_available
+from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
 from .config import load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
@@ -45,8 +46,18 @@ def run(root: Path, use_llm: bool | None = None,
     lookback = lookback_days or cfg.lookback_days
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
-    analyst_model = cfg.settings.get("analyst_model", fallback_model)
-    editor_model = cfg.settings.get("editor_model", fallback_model)
+    # Provider selection: if an OpenAI-compatible key is present, use that
+    # provider (cheap, e.g. Moonshot/Kimi); otherwise fall back to Anthropic.
+    use_openai = bool(os.environ.get("LLM_API_KEY")) and bool(cfg.settings.get("llm_api_base"))
+    if use_openai:
+        os.environ.setdefault("LLM_API_BASE", cfg.settings["llm_api_base"])
+        analyst_model = cfg.settings.get("openai_analyst_model", fallback_model)
+        editor_model = cfg.settings.get("openai_editor_model", fallback_model)
+    else:
+        analyst_model = cfg.settings.get("analyst_model", fallback_model)
+        editor_model = cfg.settings.get("editor_model", fallback_model)
+    log.info("LLM backend: %s | analyst=%s editor=%s",
+             active_backend(), analyst_model, editor_model)
     max_items = int(cfg.settings.get("max_items_per_region", 45))
 
     state_dir = root / "data" / "state"

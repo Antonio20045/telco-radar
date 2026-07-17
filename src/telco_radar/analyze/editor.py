@@ -93,7 +93,7 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         ensure_ascii=False,
     )
     raw = complete(EDITOR_SYSTEM.format(language=language), user,
-                   model=model, max_tokens=20000)
+                   model=model, max_tokens=8000)
 
     topics: list[str] = []
     markdown = raw
