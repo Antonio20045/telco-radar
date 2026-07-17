@@ -80,7 +80,7 @@ def _post_with_retries(url, payload, headers, retries, parse):
 
 def _complete_openai(system: str, user: str, model: str,
                      max_tokens: int, retries: int) -> str:
-    key = os.environ["LLM_API_KEY"].strip()
+    key = os.environ["LLM_API_KEY"].strip().strip('"').strip("'").strip()
     payload = {
         "model": model,
         "messages": [
@@ -90,6 +90,9 @@ def _complete_openai(system: str, user: str, model: str,
         "max_tokens": max_tokens,
         "temperature": DEFAULT_TEMPERATURE,
     }
+    if "deepseek" in model.lower():
+        # NVIDIA DeepSeek NIM: turn off the reasoning trace (clean output, cheaper)
+        payload["chat_template_kwargs"] = {"thinking": False}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
     def parse(data):
