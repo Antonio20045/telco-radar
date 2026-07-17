@@ -3,882 +3,69 @@
  "generated_with_llm": true,
  "stats": {
   "sources_total": 128,
-  "sources_ok": 87,
-  "sources_empty": 39,
-  "sources_failed": 2,
-  "collected": 682,
-  "new": 115,
+  "sources_ok": 85,
+  "sources_empty": 42,
+  "sources_failed": 1,
+  "collected": 678,
+  "new": 18,
   "operators": 80,
   "regions": 6
  },
- "briefing_md": "## Auf einen Blick\n\n- Ein neuer Großaktionär steht bei Vodafone selbst: Der französische Investor Xavier Niel hat für 4,4 Milliarden Pfund den 16,2%-Anteil von e& übernommen, die Aktie sprang um 13%.\n- Künstliche Intelligenz im Netzbetrieb liefert jetzt messbare Ergebnisse – AT&T senkte damit die Kundenausfallzeit um über 12 Millionen Stunden, Deutsche Telekom bringt OpenAI in den Vollbetrieb.\n- Zero-Rating bei Großevents wird zum günstigen Kundenbindungs-Werkzeug – EE schenkte England-Fans zum WM-Halbfinale kostenloses Datenvolumen.\n\n## Das Wichtigste\n\nDie für Vodafone wichtigste Nachricht betrifft die eigene Eigentümerstruktur: Xavier Niel ist über seine Firma Vega größter Einzelaktionär geworden ([Quelle](https://247wallst.com/investing/2026/07/10/vodafone-group-spikes-13-heres-the-story/)). Bei den Wettbewerbern dominiert das Thema künstliche Intelligenz im Netz und Kundenservice: Deutsche Telekom hat seine OpenAI-Partnerschaft vom Test in den Vollbetrieb überführt ([Quelle](https://www.rcrwireless.com/20260714/tech/deutsche-telekoms-openai)), AT&T meldet konkrete Effizienzgewinne durch KI-gestütztes Störungsmanagement ([Quelle](https://www.msn.com/en-us/news/technology/at-t-built-an-ai-system-to-prevent-network-outages-it-reduced-customer-downtime-by-more-than-12-million-hours/ar-AA282T6S)). In den USA arbeiten AT&T und Verizon parallel an neuen Tarifmodellen jenseits des Familientarifs und erhöhen still Grundgebühren ([Quelle](https://www.wsj.com/tech/personal-tech/at-t-and-verizon-look-beyond-the-family-plan-4fcaf4b9)). Satelliten-Konnektivität verschärft sich als Wettbewerbsfeld – von Charters Starlink-Gesprächen bis zu Reliance Jios eigener LEO-Konstellation. Zusammen zeichnet sich ab: Betreiber weltweit setzen auf KI zur Kostensenkung, neue Tarifstrukturen zur Kundenbindung und Satellit als Abdeckungsergänzung.\n\n## Die wichtigsten Signale\n\n**Vodafone Group – Xavier Niel wird größter Aktionär** (Finanzen, Dringlichkeit 5/5)\nXavier Niel hat über seine Investmentgesellschaft Vega den 16,2%-Anteil von e& an Vodafone für 4,4 Milliarden Pfund gekauft und ist damit größter Einzelaktionär; die Aktie stieg um 13%. Ein aktivistischer Investor kann Strategie, Kapitalallokation und mögliche Portfolio-Verkäufe stark beeinflussen.\nFuer Vodafone: Das Management sollte sich frühzeitig auf mögliche Forderungen nach Restrukturierung oder höherer Aktionärsrendite einstellen. [Quelle](https://247wallst.com/investing/2026/07/10/vodafone-group-spikes-13-heres-the-story/)\n\n**Deutsche Telekom – OpenAI-Partnerschaft im Vollbetrieb** (Partnerschaft, Dringlichkeit 5/5)\nDie Telekom setzt generative künstliche Intelligenz jetzt aktiv in laufenden Kundengesprächen, in der Netzautomatisierung, im Kundenservice und in internen Tools ein – nicht mehr nur im Test. Ein direkter Wettbewerber zeigt damit, wie KI in der Praxis Kosten senkt und Service verbessert.\nFuer Vodafone: Eigene KI-Pilotprojekte in Kundenservice und Netzbetrieb schneller in den breiten Rollout bringen. [Quelle](https://www.rcrwireless.com/20260714/tech/deutsche-telekoms-openai)\n\n**EE – Gratis-Datenvolumen zum WM-Halbfinale** (Kampagne, Dringlichkeit 5/5)\nEE, offizieller Partner der englischen Fußballverbände, schaltete zum WM-Halbfinale gegen Argentinien am 15. Juli 2026 kostenloses mobiles Datenvolumen (Zero-Rating) für alle UK-Kunden frei. Eine kostengünstige, hochsichtbare Kundenbindungs-Aktion an einem Großereignis.\nFuer Vodafone: Prüfen, ob ähnliche Zero-Rating-Aktionen bei eigenen Sponsoring-Events (Bundesliga, Formel 1) möglich sind. [Quelle](https://www.thefastmode.com/services-and-innovations/49639-ee-offers-free-data-across-uk-network-as-england-fans-prepare-for-argentina-match)\n\n**AT&T und Verizon – Neue Tarifmodelle jenseits des Familientarifs** (Tarif/Pricing, Dringlichkeit 5/5)\nBeide US-Anbieter entwickeln Tarifoptionen, die über klassische Mehrlinien-Familienpläne hinausgehen, um Kunden langfristig zu binden. Verizon hat parallel den einfachen, günstigeren \"Simplicity\"-Tarif für Wechselwillige eingeführt.\nFuer Vodafone: Neue Bündelungsmodelle für das eigene Konvergenz- und Mehrlinien-Portfolio in Europa prüfen, um Abwanderung zu reduzieren. [Quelle](https://www.wsj.com/tech/personal-tech/at-t-and-verizon-look-beyond-the-family-plan-4fcaf4b9)\n\n**AT&T – KI-System senkt Kundenausfallzeit um 12 Mio. Stunden** (Netz/Technologie, Dringlichkeit 4/5)\nAT&T setzt ein KI-gestütztes Störungsmanagement ein, das laut eigenen Angaben Kundenausfallzeiten um mehr als 12 Millionen Stunden reduziert und unnötige Techniker-Einsätze vermeidet. Ein konkretes, messbares Ergebnis für KI im Netzbetrieb.\nFuer Vodafone: Vergleichbare Predictive-Maintenance-Tools könnten Netzwartungskosten senken und Service-Level verbessern. [Quelle](https://www.msn.com/en-us/news/technology/at-t-built-an-ai-system-to-prevent-network-outages-it-reduced-customer-downtime-by-more-than-12-million-hours/ar-AA282T6S)\n\n**Singtel u.a. – Erstes Multi-Operator-IoT-eSIM-Netz in Asien-Pazifik** (Partnerschaft, Dringlichkeit 4/5)\nThales, Singtel, Optus, AIS und Globe haben das weltweit erste eSIM-Netzwerk für Unternehmens-IoT über mehrere Netzbetreiber hinweg in Betrieb genommen. Direkter Wettbewerb zu Vodafones eigenem IoT-Geschäft.\nFuer Vodafone: Diesen Blueprint für Multi-Operator-eSIM-Roaming im globalen B2B-IoT-Angebot prüfen oder kontern. [Quelle](https://www.thefastmode.com/technology-solutions/49618-thales-singtel-enable-first-multi-operator-iot-esim-network-in-asia-pacific)\n\n**Verizon/KDDI – Konnektivität für BMW-Fahrzeuge in den USA** (Partnerschaft, Dringlichkeit 4/5)\nVerizon wurde Konnektivitäts-Anbieter für neu produzierte BMW-Fahrzeuge in den USA und liefert 5G-Standalone und LTE über eine Partnerschaft mit dem japanischen Betreiber KDDI. Autohersteller sichern globale Konnektivität zunehmend über Betreiber-Partnerschaften.\nFuer Vodafone: Automotive/IoT-Geschäft sollte prüfen, ob ähnliche Multi-Region-Deals mit Autoherstellern in Europa/Afrika ausbaubar sind. [Quelle](https://www.computerweekly.com/news/366645676/Verizon-gears-up-as-BMW-US-vehicle-connectivity-provider)\n\n**SK Telecom – 15 Gigawatt KI-Rechenzentrums-Kapazität geplant** (Netz/Technologie, Dringlichkeit 4/5)\nSK Telecom kündigte den Aufbau von Rechenzentrums-Kapazität für künstliche Intelligenz mit bis zu 15 Gigawatt Leistung an. Ein großer Netzbetreiber positioniert sich als KI-Infrastruktur-Anbieter statt nur als Mobilfunker.\nFuer Vodafone: Beobachten, ob dieses Modell (Betreiber als KI-Rechenzentrumsbetreiber) für eigene B2B-Cloud- und KI-Angebote relevant wird. [Quelle](https://finance.yahoo.com/technology/ai/articles/sk-telecom-skm-announces-plan-183504094.html)\n\n**Reliance Jio – Behördliche Zustimmung für eigene LEO-Satelliten** (Regulierung, Dringlichkeit 4/5)\nDie indische Weltraumbehörde IN-SPACe hat Jios Plan für eine eigene LEO-Satellitenkonstellation als technisch tragfähig eingestuft; Jio will gegen Starlink, Eutelsat OneWeb und Amazon Leo antreten. Große Betreiber bauen zunehmend eigene Satelliten-Infrastruktur statt reiner Partnerschaften.\nFuer Vodafone: Eigene Satellitenpartnerschaften auf strategische Abhängigkeit prüfen. [Quelle](https://developingtelecoms.com/telecom-technology/satellite-communications-networks/20545-in-space-grants-technical-approval-for-reliance-jios-leo-project.html)\n\n**Ethio Telecom/Inspur – Ausbau der digitalen Infrastruktur Äthiopiens** (Partnerschaft, Dringlichkeit 4/5)\nDer äthiopische Staatsanbieter Ethio Telecom verhandelt mit dem chinesischen IT-Konzern Inspur über eine Partnerschaft zum Infrastrukturausbau. Ethio Telecom ist direkter Wettbewerber von Safaricom Ethiopia, an dem Vodafone beteiligt ist.\nFuer Vodafone: Technologische Aufrüstung des Staatsanbieters erhöht den Wettbewerbsdruck im äthiopischen Wachstumsmarkt und erfordert Beobachtung. [Quelle](https://www.thefastmode.com/technology-solutions/49659-ethio-telecom-inspur-explore-strategic-partnership-for-ethiopia-digital-infrastructure)\n\n## Europa\n\nNeben der Niel-Übernahme dominieren Quartalszahlen (Telenor, Tele2) sowie zwei strategische Deutsche-Telekom-Meldungen. Telefónica richtet Infrastruktur und Firmenkundengeschäft neu aus.\n\n- **Telefónica Deutschland (O2)** gewinnt die Möbelkette JYSK mit rund 3.000 Mobilfunkanschlüssen in über 900 Filialen für Store-Digitalisierung – Vodafone Business sollte Filial-Digitalisierungsangebote für Handelsketten aktiver vermarkten. [Quelle](https://www.thefastmode.com/technology-solutions/49642-jysk-selects-telefonica-deutschland-for-store-digitalization-mobile-connectivity-transformation)\n- **Deutsche Telekom** und AIT erhielten den EU-Auftrag zum Aufbau des Quanten-Schlüsselverteilungs-Backbones EuroQCI – Vodafone sollte eigene Beteiligung an solchen Sicherheits-Infrastrukturprojekten prüfen. [Quelle](https://www.msn.com/en-us/money/other/deutsche-telekom-ait-win-eu-quantum-backbone-mandate-with-eagle-1-on-deck/ar-AA283QkQ)\n- **Telefónica** und Pontegadea bringen ihre Tower-Tochter Telxius erneut für rund 1,2 Milliarden Euro zum Verkauf – relevant für Vodafones Bewertungslogik bei eigenen Tower-Assets (Vantage Towers). [Quelle](https://www.mobileworldlive.com/spanish/telefonica-y-amancio-ortega-ponen-de-nuevo-a-la-venta-telxius-por-1-200-me/)\n- **Tele2** hat in Litauen Frequenzen für 5G-Standalone bis 2042 gesichert – Signal für langfristige 5G-Investitionsbereitschaft, das Vodafone in eigenen Märkten spiegeln sollte. [Quelle](https://www.techtimes.com/articles/320060/20260710/5g-standalone-race-heats-lithuania-tele2-locks-spectrum-2042.htm)\n- **Telenor** senkt den 2026-Ausblick nach verfehlten Q2-Zahlen (Kostensteigerungen in Norwegen, Finnland, Bangladesch), während Telenor Denmark zugleich starkes Q2 durch operative Vereinfachung meldet – nützlicher Benchmark für Vodafones Kostenkontrolle. [Quelle](https://www.globalbankingandfinance.com/telenor-cuts-2026-outlook-q2-earnings-miss/)\n\n## Nordamerika\n\nDer US-Markt bewegt sich Richtung Kostensenkung, neue Tarifmodelle und B2B-Sicherheit; Satelliten-Konkurrenz und Kabel-Konsolidierung nehmen zu.\n\n- **AT&T** integriert die Post-Quantum-Sicherheitslösung \"Quantum-Resilient SASE Fabric\" von Palo Alto Networks in sein B2B-Angebot – Vodafone Business sollte prüfen, ob eigene Sicherheitsprodukte ein vergleichbares Post-Quantum-Feature brauchen. [Quelle](https://www.sdxcentral.com/news/att-drives-palo-alto-networks-quantum-sase-fabric-into-dynamic-defense/)\n- **Comcast** erwägt laut Berichten eine Übernahme von Charter, da beide Kunden verlieren – zeigt wachsende Bedeutung von Skaleneffekten im Festnetz auch für Vodafones Europa-Strategie. [Quelle](https://www.msn.com/en-us/money/general/comcast-eyes-charter-acquisition-as-it-loses-customers/ar-AA27UKcX)\n- **Charter** verhandelt mit SpaceX über satellitengestützten Mobilfunk und parallel über eine Cox-Übernahme – Satelliten-Mobilfunk zum Schließen von Deckungslücken ist auch für ländliche Regionen Europas/Afrikas relevant. [Quelle](https://finance.yahoo.com/markets/stocks/articles/charter-communications-chtr-starlink-cox-131023832.html)\n- **AT&T** erhöht ab August still eine monatliche Gebühr – ein Modell zur Margensicherung, das Vodafone bei eigenen Zusatzgebühren beobachten kann. [Quelle](https://www.msn.com/en-us/money/personalfinance/at-t-phone-bills-are-going-up-see-why-and-by-how-much/ar-AA27YT8P)\n- **Telus** gründete mit kanadischen Finanz- und Technologiepartnern ein \"AI Consortium\" für Firmenkunden – Vodafone Business könnte ähnliche branchenübergreifende KI-Allianzen in Europa prüfen. [Quelle](https://finance.yahoo.com/technology/ai/articles/telus-tsx-t-launches-ai-191226362.html)\n\n## Asien\n\nNetzbetreiber investieren stark in künstliche Intelligenz für Netzsteuerung und eigene KI-Rechenzentren; Open RAN und Satellit gewinnen an Fahrt.\n\n- **SK Telecom** setzt seit dem 16. Juli KI-gestützte Netzsteuerung ein, um Verkehrsspitzen der Sommerferienzeit automatisch zu managen – Vorlage für Vodafone bei saisonalen Lastspitzen. [Quelle](https://www.thefastmode.com/technology-solutions/49672-sk-telecom-uses-ai-network-operation-technology-for-summer-traffic-management)\n- **Rakuten Mobile** verbaut kompakte Open-RAN-Funkmodule von Fujitsus 1Finity in seinem vollständig virtualisierten Netz – liefert Vodafone Kosten- und Performance-Referenzen für die eigene Open-RAN-Strategie. [Quelle](https://www.thefastmode.com/technology-solutions/49656-1finity-open-ran-5g-radios-deployed-in-rakuten-mobile-japan-network)\n- **Reliance Jio** tauscht vor einem geplanten 4-Milliarden-Dollar-Börsengang den CEO aus – frisches Kapital könnte den Wettbewerbsdruck erhöhen und verdient Beobachtung. [Quelle](https://telecom.economictimes.indiatimes.com/news/industry/jio-platforms-appoints-pankaj-pawar-as-ceo-ahead-of-ipo/132379099)\n\n## Afrika & Naher Osten\n\nIm Fokus stehen ein Preiskampf bei Sprachtarifen in Kenia und ein wichtiges Haftungsurteil zu SIM-Karten-Betrug.\n\n- **Safaricom** darf laut kenianischer Wettbewerbsbehörde seinen 10-Cent-Sprachtarif trotz Airtel-Beschwerde weiterführen – zeigt, dass aggressive Kampfpreise des Marktführers regulatorisch Bestand haben; relevant für Vodacom-Preisstrategien. [Quelle](https://www.msn.com/en-xl/money/general/airtel-loses-fight-against-safaricom-s-10-cents-tariff/ar-AA284Jn5)\n- Ein kenianisches Gericht verurteilte **Safaricom** (60%) und die Bank DTB (40%) zu 4,42 Mio. Schilling Schadenersatz für einen SIM-Swap-Betrug – selbst bei korrekter PIN; Vodafone sollte eigene SIM-Verifizierungs- und Betrugspräventionsprozesse in Afrika prüfen. [Quelle](https://tech-ish.com/2026/07/13/safaricom-dtb-sim-swap-ruling/)\n- **Airtel Africa** ist mit über 21 Billionen Naira Marktkapitalisierung wertvollstes Unternehmen der nigerianischen Börse geworden und kauft massiv eigene Aktien zurück – unterstreicht die Finanzkraft eines direkten Vodacom-Konkurrenten in Westafrika. [Quelle](https://businessday.ng/companies/article/airtel-africa-becomes-ngxs-most-valuable-company-with-over-n21tn-valuation/)\n\n## Muster der Woche\n\n1. **Künstliche Intelligenz verlässt die Testphase und liefert messbare Ergebnisse:** Deutsche Telekom (Vollbetrieb mit OpenAI), AT&T (12 Mio. Stunden weniger Ausfallzeit) und SK Telecom (KI-Netzsteuerung, AI-RAN) zeigen KI im produktiven Netz- und Servicebetrieb.\n2. **Betreiber positionieren sich als KI-Infrastruktur- und Rechenzentrumsanbieter:** SK Telecom (15 GW), KT (5 Billionen Won) und Telus (AI Consortium) gehen über reine Konnektivität hinaus.\n3. **Satellit wird zum ernsthaften Wettbewerbsfeld statt Nischenthema:** Reliance Jio (eigene LEO-Konstellation), Charter/SpaceX und Viasat/BMW zeigen, dass Satelliten-Konnektivität Mobilfunk und Festnetz ergänzt oder bedroht.\n4. **Neue Tarif- und Bündelungsmodelle zur Kundenbindung:** AT&T und Verizon lösen sich vom klassischen Familientarif; EE nutzt Zero-Rating an Großevents.\n\n## Empfehlungen fuer Vodafone\n\n1. **KI-Pilotprojekte in Netzbetrieb und Kundenservice beschleunigt in den Vollbetrieb bringen.** Deutsche Telekom (OpenAI-Vollbetrieb) und AT&T (12 Mio. Stunden Ausfallreduktion) beweisen jetzt konkreten Nutzen – Zögern bedeutet Kosten- und Servicerückstand.\n2. **Ein einfaches, günstiges Konvergenz-/Mehrlinien-Bündel jenseits des klassischen Familientarifs entwickeln.** AT&T, Verizon (\"Simplicity\") und EE (Zero-Rating) zeigen diese Woche, dass neue Bindungsmodelle im Markt Priorität haben.\n3. **Zero-Rating-Aktionen an eigenen Sponsoring-Events testen.** EEs Gratis-Datenvolumen zum WM-Halbfinale ist eine kostengünstige, hochsichtbare Vorlage, die Vodafone bei Bundesliga oder Formel 1 direkt kopieren kann.\n4. **Multi-Operator-eSIM und globale Automotive-Deals im B2B-IoT-Geschäft absichern.** Das Singtel-Konsortium und der Verizon/KDDI-BMW-Deal greifen genau Vodafones IoT-Kerngeschäft an, bevor sich diese Modelle festsetzen.\n5. **Betrugsprävention bei SIM-Swap in Afrika/Naher Osten überprüfen.** Das kenianische Urteil gegen Safaricom schafft einen Haftungs-Präzedenzfall, der Vodacom direkt betreffen kann.\n6. **Post-Quantum-Sicherheit ins B2B-Portfolio aufnehmen.** AT&Ts Quantum-SASE-Angebot und der EU-Auftrag der Deutschen Telekom zeigen, dass Wettbewerber dieses Sicherheitsfeld bereits kommerziell besetzen.",
+ "briefing_md": "## Wochenueberblick\n\n### Global (6 neu)\n\n- **Advanced Television**: [Competition watchdog to probe French telco merger](https://www.advanced-television.com/2026/07/17/competition-watchdog-to-probe-french-telco-merger/) (2026-07-17)\n- **Advanced Television**: [AST SpaceMobile is Europe’s D2D “frontrunner”](https://www.advanced-television.com/2026/07/17/ast-spacemobile-is-europes-d2d-frontrunner/) (2026-07-17)\n- **Advanced Television**: [Amazon Leo gains South Africa link](https://www.advanced-television.com/2026/07/17/amazon-leo-gains-south-africa-link/) (2026-07-17)\n- **Broadband TV News**: [Netflix growth slows despite higher revenues](https://www.broadbandtvnews.com/2026/07/17/netflix-growth-slows-despite-higher-revenues/) (2026-07-17)\n- **Developing Telecoms**: [Viasat and BMW demonstrate integrated satellite voice calls for connected vehicles](https://developingtelecoms.com/telecom-technology/satellite-communications-networks/20547-viasat-and-bmw-demonstrate-integrated-satellite-voice-calls-for-connected-vehicles.html) (2026-07-17)\n- **Mobile World Live**: [Micron strikes top-tier vehicle supply chain deals](https://www.mobileworldlive.com/qualcomm/micron-strikes-top-tier-vehicle-supply-chain-deals/) (2026-07-17)\n\n### Nordamerika (6 neu)\n\n- **AT&T**: [AT&T's Unlimited Phone Plans Changed in 2026. Here's What You Get for Your Money](https://www.cnet.com/tech/mobile/at-ts-unlimited-phone-plans-changed-in-2026-heres-what-you-get-for-your-money/) (2026-07-16)\n- **AT&T**: [SpaceX's Starlink threat causes Bernstein to cut Verizon, AT&T, Comcast PTs](https://invezz.com/news/2026/07/14/spacexs-starlink-threat-causes-bernstein-to-cut-verizon-att-comcast-pts/) (2026-07-13)\n- **AT&T**: [AT&T may be left out of the Starlink deal everyone wants](https://www.aol.com/articles/t-may-left-starlink-deal-181700000.html) (2026-07-09)\n- **Charter Communications**: [Charter Communications (CHTR) On Starlink And Cox Talks Faces A New Valuation Test](https://uk.finance.yahoo.com/news/charter-communications-chtr-starlink-cox-131023832.html) (2026-07-11)\n- **Telus**: [TELUS (TSX:T) AI Consortium Launch Puts Valuation Back In Focus](https://finance.yahoo.com/markets/stocks/articles/telus-tsx-t-ai-consortium-211017918.html) (2026-07-10)\n- **Verizon**: [Verizon cuts corporate jobs, trims retail footprint](https://www.mobileworldlive.com/operators/verizon-cuts-corporate-jobs-trims-retail-footprint/) (2026-07-17)\n\n### Asien (4 neu)\n\n- **Bharti Airtel**: [Bharti Airtel sets record date for Rs 24 dividend – 3 ‘must know’ details for investors](https://www.financialexpress.com/business/industry-bharti-airtel-sets-record-date-for-rs-24-dividend-3-must-know-details-for-investors-4288115/) (2026-07-09)\n- **KDDI**: [Verizon announces a second-to-none connected-vehicle experience for your new BMW](https://www.msn.com/en-us/news/technology/verizon-announces-a-second-to-none-connected-vehicle-experience-for-your-new-bmw/ar-AA27DlYz) (2026-07-10)\n- **Reliance Jio**: [Reliance Jio Secures IN-SPACe Approval for 1,600-Satellite LEO Network](https://www.thehansindia.com/tech/reliance-jio-secures-in-space-approval-for-1600-satellite-leo-network-1098403) (2026-07-17)\n- **SoftBank**: [Sierra Just Landed One of Japan's Biggest Companies. Here's Why That Matters for Conversational AI](https://www.cmswire.com/customer-experience/sierra-just-landed-one-of-japans-biggest-companies-heres-why-that-matters/) (2026-07-14)\n\n### Europa (1 neu)\n\n- **BT Group**: [Top FTSE 100 Index shares to watch next week: Airtel, BT Group, Compass Group](https://invezz.com/news/2026/07/17/top-ftse-100-index-shares-to-watch-next-week-airtel-bt-group-compass-group/) (2026-07-16)\n\n### Afrika & Naher Osten (1 neu)\n\n- **MTN Group**: [MTN Group Limited (MTNOY)](https://finance.yahoo.com/quote/MTNOY/) (2026-07-13)\n",
  "regions": {
-  "Europa": {
-   "region_summary": "Diese Woche dominieren Quartalszahlen europäischer Wettbewerber (Telenor, Tele2) sowie zwei strategisch relevante Deutsche-Telekom-Meldungen zu Quantentechnologie und künstlicher Intelligenz. Telefónica bringt zudem seine Tower-Tochter Telxius erneut zum Verkauf und gewinnt einen Großkunden im deutschen Einzelhandel – beides zeigt, wie Wettbewerber Infrastruktur und Firmenkundengeschäft neu ausrichten. Die grösste Nachricht der Woche betrifft Vodafone selbst: Der französische Milliardär Xavier Niel hat über seine Firma Vega den 16,2%-Anteil von e& an Vodafone Group für 4,4 Milliarden britische Pfund übernommen und ist damit neuer Grossaktionär, was die Vodafone-Aktie um 13% steigen liess. Daneben zeigt Tele2 in Litauen mit einer Frequenzsicherung bis 2042, wie Wettbewerber ihre 5G-Standalone-Netze langfristig absichern.",
-   "highlights": [
-    {
-     "title": "Deutsche Telekom's OpenAI partnership has scaled from pilot to full production",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.rcrwireless.com/20260714/tech/deutsche-telekoms-openai",
-     "category": "Partnerschaft",
-     "relevance": 5,
-     "summary": "Deutsche Telekom hat seine Zusammenarbeit mit OpenAI vom Testbetrieb in den Vollbetrieb überführt und setzt künstliche Intelligenz nun aktiv in laufenden Kundengesprächen, bei der Netzautomatisierung, im Kundenservice und in internen Tools ein.",
-     "why_it_matters": "Ein direkter Wettbewerber zeigt, wie generative KI in der Praxis Kosten senkt und Service verbessert - Vodafone sollte prüfen, ob eigene KI-Pilotprojekte (z. B. Kundenservice, Netzbetrieb) schneller in den breiten Rollout gebracht werden können, um nicht ins Hintertreffen zu geraten.",
-     "date": "2026-07-14",
-     "source": "rcrwireless.com"
-    },
-    {
-     "title": "JYSK Selects Telefónica Deutschland for Store Digitalization & Mobile Connectivity Transformation",
-     "operator": "O2 Telefónica Deutschland",
-     "url": "https://www.thefastmode.com/technology-solutions/49642-jysk-selects-telefonica-deutschland-for-store-digitalization-mobile-connectivity-transformation",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Die Möbelkette JYSK Deutschland lässt rund 3.000 Mobilfunkanschlüsse in über 900 Filialen von Telefónica Deutschland (O2) auf digitale Store-Lösungen und moderne Mobilfunkanbindung umstellen.",
-     "why_it_matters": "Zeigt, dass Wettbewerber im deutschen Markt aktiv Großkunden aus dem Einzelhandel für IoT- und Konnektivitätslösungen gewinnen - Vodafone Business sollte vergleichbare Filial-Digitalisierungsangebote für Handelsketten aktiv vermarkten, bevor weitere Kunden abwandern.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Telefónica y Amancio Ortega ponen de nuevo a la venta Telxius por 1.200 M€",
-     "operator": "Telefónica",
-     "url": "https://www.mobileworldlive.com/spanish/telefonica-y-amancio-ortega-ponen-de-nuevo-a-la-venta-telxius-por-1-200-me/",
-     "category": "M&A",
-     "relevance": 3,
-     "summary": "Telefónica und der Ortega-Investmentholding Pontegadea bringen ihre gemeinsame Tower-Infrastruktur-Tochter Telxius Telecom erneut für rund 1,2 Milliarden Euro zum Verkauf.",
-     "why_it_matters": "Ein weiterer großer Wettbewerber trennt sich von Mobilfunkmasten-Infrastruktur, um Kapital freizusetzen - relevant für Vodafones eigene Überlegungen zu Tower-Verkäufen bzw. -Beteiligungen (z. B. Vantage Towers) und die Bewertungslogik solcher Assets am Markt.",
-     "date": "2026-07-16",
-     "source": "Mobile World Live"
-    },
-    {
-     "title": "Deutsche Telekom, AIT win EU quantum backbone mandate with Eagle-1 on deck",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.msn.com/en-us/money/other/deutsche-telekom-ait-win-eu-quantum-backbone-mandate-with-eagle-1-on-deck/ar-AA283QkQ",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Die EU-Kommission hat Deutsche Telekom (Projekt PETRUS2) und das AIT Austrian Institute of Technology mit dem Aufbau des europäischen Quanten-Schlüsselverteilungs-Backbones EuroQCI beauftragt, ergänzt durch den Satelliten Eagle-1.",
-     "why_it_matters": "Deutsche Telekom positioniert sich als Vorreiter für hochsichere Quanten-Kommunikation in EU-Förderprojekten - Vodafone sollte prüfen, ob eigene Beteiligungen an EuroQCI oder vergleichbaren Sicherheits-Infrastrukturprojekten möglich sind, um im B2B-Sicherheitsgeschäft nicht zurückzufallen.",
-     "date": "2026-07-16",
-     "source": "msn.com"
-    },
-    {
-     "title": "Telenor sharpens Nordics focus but faces tough market",
-     "operator": "Telenor",
-     "url": "https://www.lightreading.com/finance/telenor-sharpens-nordics-focus-but-faces-tough-market",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "Telenor konzentriert sich nach dem weitgehenden Rückzug aus Asien stärker auf die nordischen Märkte, sieht sich dort aber mit Preisdruck und schwächerem Wachstum konfrontiert.",
-     "why_it_matters": "Zeigt einen Trend zur regionalen Fokussierung bei Telekom-Konzernen - relevant als Vergleichspunkt für Vodafones eigene Portfolio-Strategie in Europa und Afrika.",
-     "date": "2026-07-17",
-     "source": "Light Reading"
-    },
-    {
-     "title": "Telenor cuts 2026 outlook after Q2 earnings miss",
-     "operator": "Telenor",
-     "url": "https://www.globalbankingandfinance.com/telenor-cuts-2026-outlook-q2-earnings-miss/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Telenor senkt seine Prognose für 2026, nachdem die Q2-Zahlen die Erwartungen verfehlt haben; Gründe sind langsameres Umsatzwachstum und höhere Kosten in Norwegen, Finnland und Bangladesch.",
-     "why_it_matters": "Signalisiert, dass Marktdruck und Kostensteigerungen auch bei etablierten europäischen Betreibern die Profitabilität belasten - wichtig als Benchmark für Vodafones eigene Kostenkontrolle in ähnlichen Märkten.",
-     "date": "2026-07-15",
-     "source": "globalbankingandfinance.com"
-    },
-    {
-     "title": "Telenor Denmark Reports Strong Q2, Highlights 5G and Digital Infrastructure Investments",
-     "operator": "Telenor",
-     "url": "https://www.thefastmode.com/mobile-network-operators-g-p/49669-telenor-denmark-reports-strong-q2-highlights-5g-and-digital-infrastructure-investments",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Telenor Denmark meldet für Q2 2026 Rekord-Kundenzufriedenheit, weiteres Mobilfunk-Kundenwachstum und höheren Serviceumsatz dank vereinfachter Betriebsabläufe.",
-     "why_it_matters": "Positives Gegenbeispiel zum schwächeren Konzernausblick zeigt, dass operative Vereinfachung und 5G-Investitionen in einzelnen Märkten Wachstum bringen können - als Lernbeispiel für Vodafones nationale Landesgesellschaften nützlich.",
-     "date": "2026-07-17",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Tele2 AB (TLTZF) Q2 2026 Earnings Call Highlights: Strategic Growth Amidst Competitive Challenges",
-     "operator": "Tele2",
-     "url": "https://finance.yahoo.com/markets/stocks/articles/tele2-ab-tltzf-q2-2026-150050535.html",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Tele2 berichtet für Q2 2026 über stetiges Umsatzwachstum und neue strategische Partnerschaften, sieht sich aber weiterhin wettbewerbsbedingtem Druck ausgesetzt.",
-     "why_it_matters": "Gibt Einblick in Wettbewerbsdynamik im nordischen Markt, der für Vodafones Benchmarking bei Umsatzentwicklung und Partnerschaftsstrategien relevant ist.",
-     "date": "2026-07-16",
-     "source": "finance.yahoo.com"
-    },
-    {
-     "title": "Vodafone Group Spikes 13%: Here’s the Story",
-     "operator": "Vodafone Group",
-     "url": "https://247wallst.com/investing/2026/07/10/vodafone-group-spikes-13-heres-the-story/",
-     "category": "Finanzen",
-     "relevance": 5,
-     "summary": "Der französische Investor Xavier Niel hat über seine Investmentgesellschaft Vega den 16,2%-Anteil des Telekommunikationskonzerns e& an Vodafone Group für 4,4 Milliarden britische Pfund gekauft und ist damit grösster Einzelaktionär von Vodafone geworden; die Vodafone-Aktie stieg daraufhin um 13%, den stärksten Tagesgewinn seit Monaten.",
-     "why_it_matters": "Ein neuer aktivistischer Grossaktionär kann Strategie, Kapitalallokation und mögliche Portfolio-Entscheidungen (z.B. Verkäufe, Fusionen) von Vodafone stark beeinflussen - das Management sollte sich auf mögliche Forderungen nach Restrukturierung oder höherer Aktionärsrendite einstellen.",
-     "date": "2026-07-10",
-     "source": "247wallst.com"
-    },
-    {
-     "title": "5G Standalone Race Heats Up in Lithuania as Tele2 Locks In Spectrum to 2042",
-     "operator": "Tele2",
-     "url": "https://www.techtimes.com/articles/320060/20260710/5g-standalone-race-heats-lithuania-tele2-locks-spectrum-2042.htm",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Tele2 hat am 9. Juli bestätigt, dass es in Litauen Frequenzen für 5G Standalone bis zum Jahr 2042 gesichert hat und damit im Wettlauf um moderne Mobilfunknetze in der Region vorlegt.",
-     "why_it_matters": "Langfristige Frequenzsicherung signalisiert Investitionsbereitschaft in 5G Standalone (eigenständiges 5G-Netz ohne 4G-Unterbau) - Vodafone sollte in eigenen Märkten prüfen, ob ähnliche langfristige Frequenzstrategien nötig sind, um im Netzqualitäts-Wettbewerb nicht zurückzufallen.",
-     "date": "2026-07-10",
-     "source": "techtimes.com"
-    }
-   ]
-  },
   "Global": {
-   "region_summary": "Diese Woche zeigt sich ein Trend zu Diversifikation und neuen Wachstumsfeldern jenseits des klassischen Mobilfunks: Telekommunikationsanbieter testen Drohnenlogistik, Satelliten-Sprachtelefonie im Auto und Cloud-basierte IoT-Plattformen. Gleichzeitig baut der direkte Vodafone-Wettbewerber O2 in Großbritannien sein 5G-Netz weiter aus, was den Wettbewerbsdruck auf dem Heimatmarkt erhöht. Diese Woche dominieren im globalen Markt kleinere Technologie- und Partnerschafts-Meldungen sowie Trends rund um Satelliten-Konnektivität, Network APIs und Streaming-Werbung. Für Vodafone sind vor allem die Entwicklungen bei Satelliten-Handys, Netzwerk-APIs zur Identitätsprüfung und die Konkurrenzbewegung von Ethio Telecom in Äthiopien (wo Vodafone über Safaricom aktiv ist) relevant. Insgesamt eher Beobachtungsthemen als akuter Handlungsdruck. Diese Woche dominieren zwei Themen: kurzfristige Kampagnen rund um die Fußball-Weltmeisterschaft und weltweite Investitionen in Netzwerk- und KI-Infrastruktur. Auffällig ist, wie EE eine große Sportveranstaltung für eine sofortige Kundenbindungs-Aktion nutzt, während mehrere Anbieter (Wi-Fi 7, 5G, KI-Agenten) ihre technische Basis für kommende Dienste ausbauen.",
-   "highlights": [
-    {
-     "title": "O2 Expands 5G+ Connectivity Across Oxfordshire with Next-Gen Network Upgrade",
-     "operator": "O2 (Virgin Media O2)",
-     "url": "https://www.thefastmode.com/technology-solutions/49666-o2-expands-5g-connectivity-across-oxfordshire-with-next-gen-network-upgrade",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "O2 hat sein 5G+ Standalone-Netz in Oxfordshire (u.a. Oxford, Banbury, Didcot) live geschaltet und erreicht damit bis zu 450.000 Einwohner in 495 Orten.",
-     "why_it_matters": "O2 ist einer der wichtigsten Vodafone-Konkurrenten im UK-Markt; solche gezielten regionalen 5G-Standalone-Ausbauten setzen einen Vergleichsmaßstab, an dem Vodafone UK seine eigene Netzabdeckung und Werbeaussagen messen sollte.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Viasat Demos Automotive Satellite Voice Call Technology with BMW Group Integration",
-     "operator": "Viasat / BMW",
-     "url": "https://www.thefastmode.com/technology-solutions/49667-viasat-demos-automotive-satellite-voice-call-technology-with-bmw-group-integration",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Viasat hat zusammen mit BMW erstmals einen vollständig ins Fahrzeug integrierten Satelliten-Sprachanruf demonstriert, der auch außerhalb des Mobilfunknetzes funktioniert.",
-     "why_it_matters": "Satellitengestützte Sprachverbindungen im Auto könnten künftig klassische Mobilfunkverbindungen für Connected-Car-Dienste ergänzen oder ersetzen; Vodafone sollte diese Technologie im Blick behalten, da sie das eigene Connected-Car- und IoT-Geschäft betrifft.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Soracom Launches Cloud-Native MVNE Platform for Mobile Network Operators Worldwide",
-     "operator": "Soracom",
-     "url": "https://www.thefastmode.com/technology-solutions/49670-soracom-launches-cloud-native-mvne-platform-for-mobile-network-operators-worldwide",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Soracom bringt eine cloud-native MVNE-Plattform (Mobile Virtual Network Enabler) auf den Markt, die Mobilfunkbetreibern weltweit den Aufbau eigener virtueller Netze vereinfachen soll.",
-     "why_it_matters": "Solche Plattformen erleichtern neuen MVNO-Wettbewerbern (Mobile Virtual Network Operator) den Markteintritt und könnten den Preisdruck in Märkten erhöhen, in denen Vodafone aktiv ist; gleichzeitig zeigt es, wie Vodafone eigene IoT-Konnektivitätsangebote technisch weiterentwickeln könnte.",
-     "date": "2026-07-17",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "True launches SkyBridge platform for medical drone deliveries in remote areas",
-     "operator": "True Corp (Thailand)",
-     "url": "https://developingtelecoms.com/telecom-technology/enterprise-ecosystems/20546-true-launches-skybridge-platform-for-medical-drone-deliveries-in-remote-areas.html",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "Der thailändische Betreiber True Corp hat mit dem Gesundheitsministerium die Plattform True SkyBridge gestartet, die autonome Drohnenlieferungen von Medikamenten in entlegene Gebiete steuert.",
-     "why_it_matters": "Zeigt, wie Telekomunternehmen ihre Netzinfrastruktur für neue B2B-Anwendungsfälle wie Drohnenlogistik im Gesundheitswesen nutzen; ein interessantes Modell für Vodafones Afrika-Geschäft mit ähnlichen infrastrukturschwachen Regionen.",
-     "date": "2026-07-17",
-     "source": "Developing Telecoms"
-    },
-    {
-     "title": "Telecom Egypt scraps deal to sell stake in data centre unit to Helios",
-     "operator": "Telecom Egypt",
-     "url": "https://developingtelecoms.com/telecom-technology/data-centres-networks/20544-telecom-egypt-scraps-deal-to-sell-stake-in-data-centre-unit-to-helios.html",
-     "category": "M&A",
-     "relevance": 3,
-     "summary": "Telecom Egypt hat den geplanten Verkauf einer Mehrheitsbeteiligung an seiner Rechenzentrumssparte Regional Data Center Hub (RDH) an Helios Investment Partners abgesagt und führt RDH stattdessen als hundertprozentige Tochtergesellschaft.",
-     "why_it_matters": "Vodafone ist über Vodafone Egypt in diesem Markt aktiv; ein gescheiterter Datacenter-Deal des größten lokalen Wettbewerbers kann Signale für die Bewertung von Rechenzentrums-Assets und mögliche eigene Partnerschaftschancen in Ägypten liefern.",
-     "date": "2026-07-17",
-     "source": "Developing Telecoms"
-    },
-    {
-     "title": "WBBA Introduces AI-Net Certification to Accelerate AI-Driven Net5.5G Adoption",
-     "operator": "World Broadband Association (WBBA)",
-     "url": "https://www.thefastmode.com/technology-solutions/49663-wbba-introduces-ai-net-certification-to-accelerate-ai-driven-net5-5g-adoption",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Die World Broadband Association hat auf dem Broadband Development Summit in Asien-Pazifik ein neues Zertifizierungsprogramm namens AI-Net vorgestellt, das Ländern und Betreibern den Umstieg von reiner Konnektivität zu KI-gestützten Netzen (Net5.5G) erleichtern soll.",
-     "why_it_matters": "Ein neuer Industriestandard könnte künftig zum Referenzrahmen für Netzqualität werden; Vodafone sollte beobachten, ob Wettbewerber diese Zertifizierung als Marketinginstrument nutzen.",
-     "date": "2026-07-17",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "HubOne Selects Ribbon PSX to Unify Voice Traffic Across Applications & Networks",
-     "operator": "Hub One",
-     "url": "https://www.thefastmode.com/technology-solutions/49673-hubone-selects-ribbon-psx-to-unify-voice-traffic-across-applications-networks",
-     "category": "Partnerschaft",
-     "relevance": 2,
-     "summary": "Der französische Betreiber Hub One setzt künftig auf die Ribbon PSX-Plattform, um Sprachverkehr über verschiedene Anwendungen und Netze hinweg zu vereinheitlichen.",
-     "why_it_matters": "Zeigt einen Trend zur Konsolidierung von Sprachdiensten bei B2B-Kunden; relevant als Vergleichspunkt für Vodafones eigenes Unified-Communications-Angebot im Geschäftskundensegment.",
-     "date": "2026-07-17",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Netflix shares tumble after Q3 outlook disappoints",
-     "operator": "Netflix",
-     "url": "https://www.advanced-television.com/2026/07/17/netflix-shares-tumble-after-q3-outlook-disappoints/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Netflix verfehlte im dritten Quartal die Erwartungen bei Umsatz und Gewinn, die Aktie fiel im nachbörslichen Handel um rund 8,6 Prozent auf 67,99 US-Dollar; zudem will das Unternehmen künftig seltener Zuschauerzahlen veröffentlichen.",
-     "why_it_matters": "Netflix ist ein wichtiger Bundle-Partner in vielen Vodafone-Tarifen; eine schwächere Wachstumsdynamik bei Netflix kann die Verhandlungsmacht bei künftigen Bundle- und Preisvereinbarungen zugunsten Vodafones verschieben.",
-     "date": "2026-07-17",
-     "source": "Advanced Television"
-    },
-    {
-     "title": "GlobalData: BSNL Satellite Handset Launch Strengthens India’s Always-Connected Future",
-     "operator": "BSNL",
-     "url": "https://www.thefastmode.com/technology-and-solution-trends/49664-globaldata-bsnl-satellite-handset-launch-strengthens-india-s-always-connected-future",
-     "category": "Produktlaunch",
-     "relevance": 3,
-     "summary": "Der indische Staatsanbieter BSNL hat ein eigenes Satelliten-Handy zum Preis von umgerechnet rund 1.407 US-Dollar (inklusive Steuern) auf den Markt gebracht, um flächendeckende Erreichbarkeit auch außerhalb des Mobilfunknetzes zu ermöglichen.",
-     "why_it_matters": "Satelliten-Direktverbindung für Endgeräte wird zum Differenzierungsmerkmal - Vodafone sollte beobachten, ob ähnliche Angebote (z.B. über Partnerschaften mit Satellitenanbietern) für Randgebiete in Europa/Afrika sinnvoll wären.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "United Group’s Telemach BH Invests EUR 90 Million to Drive Digital Transformation Growth",
-     "operator": "United Group / Telemach Bosnia and Herzegovina",
-     "url": "https://www.thefastmode.com/investments-and-expansions/49661-united-group-s-telemach-bh-invests-eur-90-million-to-drive-digital-transformation-growth",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Telemach Bosnien-Herzegowina, Teil der United Group, investiert 90 Millionen Euro in die digitale Transformation und den Netzausbau im Land.",
-     "why_it_matters": "Zeigt, wie ein regionaler Wettbewerber in Südosteuropa konsequent in Infrastruktur investiert - relevant als Vergleichsmaßstab für Vodafones eigene Investitionsstrategie in ähnlichen Märkten.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Ethio telecom, Inspur Explore Strategic Partnership for Ethiopia Digital Infrastructure",
-     "operator": "Ethio telecom",
-     "url": "https://www.thefastmode.com/technology-solutions/49659-ethio-telecom-inspur-explore-strategic-partnership-for-ethiopia-digital-infrastructure",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Der äthiopische Staatsanbieter Ethio Telecom führt Gespräche mit dem chinesischen IT-Konzern Inspur über eine strategische Partnerschaft zum Ausbau der digitalen Infrastruktur des Landes.",
-     "why_it_matters": "Ethio Telecom ist direkter Wettbewerber von Safaricom Ethiopia, an dem Vodafone beteiligt ist; eine stärkere technologische Aufrüstung des Staatsanbieters erhöht den Wettbewerbsdruck in diesem wichtigen afrikanischen Wachstumsmarkt.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Vibes Launches RCS Studio Professional With Self-Serve RCS Messaging Platform",
-     "operator": "Vibes",
-     "url": "https://www.thefastmode.com/technology-solutions/49657-vibes-launches-rcs-studio-professional-with-self-serve-rcs-messaging-platform",
-     "category": "Produktlaunch",
-     "relevance": 3,
-     "summary": "Der US-Messaging-Anbieter Vibes hat mit RCS Studio Professional die erste Self-Service-Plattform für Rich Communication Services (RCS)-Messaging gestartet, mit der Unternehmen selbst RCS-Kampagnen aufsetzen können.",
-     "why_it_matters": "RCS-Messaging wird für Unternehmenskunden zunehmend zum SMS-Ersatz; Vodafone Business sollte prüfen, ob ein vergleichbares Self-Service-Angebot das eigene B2B-Messaging-Portfolio ergänzen kann.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Liberty Puerto Rico Deploys Aurora Remote MACPHY to Modernize HFC Network Infrastructure",
-     "operator": "Liberty Puerto Rico / Liberty Global",
-     "url": "https://www.thefastmode.com/technology-solutions/49653-liberty-puerto-rico-deploys-aurora-remote-macphy-to-modernize-hfc-network-infrastructure",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Liberty Puerto Rico modernisiert sein Hybrid-Fiber-Coax (HFC)-Netz mit der Remote-MACPHY-Technologie RD2322 von Aurora Networks, um Bandbreite und Netzqualität zu verbessern.",
-     "why_it_matters": "Liberty Global ist als Kabelnetz-Wettbewerber auch in europäischen Vodafone-Märkten aktiv; solche Netz-Modernisierungen zeigen den technologischen Aufholkurs bei HFC-Infrastruktur, den Vodafone im Blick behalten sollte.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Beyond Passwords and OTPs: How Network APIs Are Reshaping Digital Identity Verification",
-     "operator": "Vonage",
-     "url": "https://www.thefastmode.com/podcasts/49626-beyond-passwords-and-otps-how-network-apis-are-reshaping-digital-identity-verification",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "In einem Webcast diskutieren IDC und Vonage, wie Netzwerk-APIs klassische Passwort- und SMS-Codes bei der digitalen Identitätsprüfung ablösen können.",
-     "why_it_matters": "Netzwerk-APIs zur Identitätsprüfung sind ein Kernfeld von Vodafones eigenem Open-Gateway-Programm; die Diskussion zeigt, wie sich der Markt für API-basierte Sicherheitsdienste entwickelt und wo Vodafone Business stärker positionieren könnte.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Why the Future of BSS Will Be Composable and Agentic: Interview with Jeff Spiess of Motive at DTW Ignite 2026",
-     "operator": "Motive",
-     "url": "https://www.thefastmode.com/videos/49652-why-the-future-of-bss-will-be-composable-and-agentic-interview-with-jeff-spiess-of-motive-at-dtw-ignite-2026",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Auf der Branchenkonferenz DTW Ignite 2026 in Kopenhagen erläutert Motive, wie Abrechnungs- und Geschäftssysteme (Business Support Systems, BSS) künftig modular und KI-gesteuert (\"agentic\") aufgebaut werden sollen.",
-     "why_it_matters": "Zeigt den Trend zu flexibleren, KI-gestützten IT-Kernsystemen bei Telekommunikationsanbietern - relevant für Vodafones eigene IT-Modernisierung und Kostenreduktion im Backoffice.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Report: YouTube worth $40bn to advertisers but growth decelerating",
-     "operator": "YouTube / Google",
-     "url": "https://www.advanced-television.com/2026/07/16/youtube-is-worth-40bn-to-advertisers-but-growth-decelarating/",
-     "category": "Sonstiges",
-     "relevance": 3,
-     "summary": "YouTube erreicht rund 2,6 Milliarden monatliche Nutzer und über 40 Milliarden US-Dollar Werbeeinnahmen jährlich, wächst laut Bericht aber langsamer als bisher.",
-     "why_it_matters": "YouTube konkurriert direkt mit klassischem Fernsehen um Werbebudgets; für Vodafones eigene Medien- und Streaming-Angebote (z.B. TV-Bundles) ist die Verschiebung der Werbegelder ins Streaming ein wichtiger Marktindikator.",
-     "date": "2026-07-16",
-     "source": "Advanced Television"
-    },
-    {
-     "title": "W-Sport launches streaming app",
-     "operator": "W-Sport",
-     "url": "https://www.advanced-television.com/2026/07/17/288876/",
-     "category": "Produktlaunch",
-     "relevance": 2,
-     "summary": "Der Sender W-Sport startet mit dem \"W-Sport Player\" eine eigene Streaming-App exklusiv für Frauensport, verfügbar auf Desktop, iOS und Android in Europa, Asien und Afrika.",
-     "why_it_matters": "Nischen-Streaming-Angebote wie Frauensport gewinnen an Reichweite; als Content-Partner für Bundles könnte Vodafone solche Nischenanbieter für sein TV-Portfolio prüfen.",
-     "date": "2026-07-16",
-     "source": "Advanced Television"
-    },
-    {
-     "title": "Study: 40% say repeated ads boost brand awareness",
-     "operator": "DoubleVerify",
-     "url": "https://www.advanced-television.com/2026/07/16/study-40-say-repeated-ads-boost-brand-awareness/",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "Eine Studie von DoubleVerify zeigt, dass Zuschauer von Live-Sport-Streaming, etwa bei der Fußball-Weltmeisterschaft, wiederholte Werbung positiv für die Markenbekanntheit einschätzen.",
-     "why_it_matters": "Liefert Vodafone Erkenntnisse zur Wirksamkeit von Werbeformaten bei Live-Sport-Streaming, relevant für eigene Sponsoring- und Kampagnenplanung rund um Großereignisse.",
-     "date": null,
-     "source": ""
-    },
-    {
-     "title": "EE Offers Free Data Across UK Network as England Fans Prepare for Argentina Match",
-     "operator": "EE",
-     "url": "https://www.thefastmode.com/services-and-innovations/49639-ee-offers-free-data-across-uk-network-as-england-fans-prepare-for-argentina-match",
-     "category": "Kampagne",
-     "relevance": 5,
-     "summary": "EE, als offizieller Partner der englischen Fußballverbände, hat zum WM-Halbfinale gegen Argentinien am 15. Juli 2026 kostenloses mobiles Datenvolumen (Zero-Rating) für alle Kunden im UK-Netz freigeschaltet.",
-     "why_it_matters": "Direkte Vorlage fuer Vodafone: Grossereignisse (EM, Olympia, nationale Ligaspiele) lassen sich mit kurzfristigem Zero-Rating als kostengünstige, hochsichtbare Kundenbindungs-Aktion nutzen - Vodafone sollte pruefen, ob aehnliche Aktionen bei eigenen Sponsoring-Events (z.B. Bundesliga, Formel 1) moeglich sind.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "OnePlus se marcha de Europa y Norteamérica",
-     "operator": "OnePlus",
-     "url": "https://www.mobileworldlive.com/spanish/oneplus-se-marcha-de-europa-y-norteamerica/",
-     "category": "Sonstiges",
-     "relevance": 3,
-     "summary": "Der Smartphone-Hersteller OnePlus stellt neue Produkteinfuehrungen in Europa und Nordamerika ein.",
-     "why_it_matters": "Weniger Endgeraete-Wettbewerb im mittleren Preissegment kann Vodafones eigene Handy-Bundles und Finanzierungsangebote staerken, sollte aber im Blick behalten werden, da Kunden auf andere Marken (z.B. Xiaomi, Samsung) ausweichen koennten.",
-     "date": "2026-07-16",
-     "source": "Mobile World Live"
-    },
-    {
-     "title": "Viva Launches Armenia's First 5G+ Network Across Yerevan and Six Regions",
-     "operator": "Viva (Armenia)",
-     "url": "https://www.thefastmode.com/technology-solutions/49649-viva-launches-armenias-first-5g-network-across-yerevan-and-six-regions",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Viva hat in Armenien das erste 5G+-Netz in Jerewan und sechs weiteren Regionen (Schirak, Lori, Tavusch, Gegharkunik, Kotayk, Aragazotn) gestartet.",
-     "why_it_matters": "Zeigt, wie kleinere Marktteilnehmer schnelle landesweite 5G-Abdeckung als Alleinstellungsmerkmal vermarkten - relevant als Benchmark fuer Vodafones eigene 5G-Ausbau-Kommunikation in kleineren Maerkten.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Wi-Fi 7 Tri-Band ONT: The Gold Standard for a New Era of Gigabit Experiences",
-     "operator": "",
-     "url": "https://www.thefastmode.com/technology-solutions/49651-wi-fi-7-tri-band-ont-the-gold-standard-for-a-new-era-of-gigabit-experiences",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Der Artikel beschreibt, wie Wi-Fi-7-faehige Glasfaser-Endgeraete (ONT, Optical Network Terminal) die naechste Generation von Gigabit-Heimnetzen ermoeglichen sollen, u.a. fuer 4K/8K-Video-Streaming.",
-     "why_it_matters": "Wi-Fi 7 wird zum neuen Standard fuer Premium-Breitband-Bundles; Vodafone sollte pruefen, ob eigene Router/ONT-Angebote im Festnetz-Portfolio (z.B. GigaCube, Kabel-Router) mit Wi-Fi 7 aufgewertet werden koennen, um Differenzierung gegenueber Wettbewerbern zu sichern.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Tencent Cloud Expands AI Agent Solutions in Indonesia to Accelerate Enterprise AI Adoption",
-     "operator": "Tencent Cloud",
-     "url": "https://www.thefastmode.com/technology-solutions/49644-tencent-cloud-expands-ai-agent-solutions-in-indonesia-to-accelerate-enterprise-ai-adoption",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "Tencent Cloud hat seine internationale Palette an KI-Agenten-Loesungen auf den indonesischen Markt ausgeweitet, vorgestellt auf dem AI Executive Day.",
-     "why_it_matters": "Zeigt zunehmenden Wettbewerb grosser Cloud-Anbieter im B2B-KI-Geschaeft in Wachstumsmaerkten - relevant fuer Vodafone Business, das aehnliche KI-Agenten-Angebote fuer Unternehmenskunden in Europa und Afrika positionieren koennte.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Flexential Deploys 400 Gbps Network Infrastructure for High-Speed AI Connectivity",
-     "operator": "Flexential",
-     "url": "https://www.thefastmode.com/technology-solutions/49648-flexential-deploys-400-gbps-network-infrastructure-for-high-speed-ai-connectivity",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Der Rechenzentrumsanbieter Flexential hat sein privates Netzwerk-Backbone in mehreren US-Grossstadtregionen auf 400 Gbps aufgeruestet, um Kunden hochleistungsfaehige KI-Konnektivitaet zu bieten.",
-     "why_it_matters": "Illustriert steigenden Bandbreitenbedarf durch KI-Workloads bei Geschaeftskunden - relevantes Signal fuer Vodafone Business, eigene Hochleistungs-Backbone-Angebote fuer Rechenzentrums- und KI-Kunden auszubauen.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Se prevé que los anillos se conviertan en los reyes de los accesorios",
-     "operator": "",
-     "url": "https://www.mobileworldlive.com/spanish/se-preve-que-los-anillos-se-conviertan-en-los-reyes-de-los-accesorios/",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "Laut CCS Insight zeigen Smart Rings (intelligente Ringe) als Wearable-Kategorie trotz insgesamt schwachem Geraetemarkt vielversprechende Wachstumssignale.",
-     "why_it_matters": "Kleiner, aber wachsender Zubehoermarkt - Vodafone koennte pruefen, ob Smart Rings als Zusatzverkauf im Endgeraete-Portfolio (aehnlich Smartwatches) aufgenommen werden.",
-     "date": "2026-07-16",
-     "source": "Mobile World Live"
-    },
-    {
-     "title": "La Comisión Europea insta a Google a nivelar el campo de juego de la IA",
-     "operator": "Google",
-     "url": "https://www.mobileworldlive.com/spanish/la-comision-europea-insta-a-google-a-nivelar-el-campo-de-juego-de-la-ia/",
-     "category": "Regulierung",
-     "relevance": 2,
-     "summary": "Die Europaeische Kommission fordert Google auf sicherzustellen, dass konkurrierende KI-Plattformen fair mit Googles eigenen KI-Diensten konkurrieren koennen.",
-     "why_it_matals": "Beobachtungswert fuer Vodafone, da regulatorischer Druck auf grosse Tech-Plattformen auch Chancen fuer eigene KI-Partnerschaften (z.B. mit alternativen Anbietern) eroeffnen kann.",
-     "why_it_matters": "Beobachtungswert fuer Vodafone, da regulatorischer Druck auf grosse Tech-Plattformen auch Chancen fuer eigene KI-Partnerschaften (z.B. mit alternativen Anbietern) eroeffnen kann.",
-     "date": "2026-07-16",
-     "source": "Mobile World Live"
-    },
-    {
-     "title": "Disney+ expands to 58 languages",
-     "operator": "Disney+",
-     "url": "https://www.advanced-television.com/2026/07/16/disney-expands-to-58-languages/",
-     "category": "Produktlaunch",
-     "relevance": 2,
-     "summary": "Disney+ erweitert sein Sprachangebot um 17 weitere Sprachen auf nun insgesamt 58 Audiosprachen, die Benutzeroberflaeche ist in ueber 30 Sprachen verfuegbar.",
-     "why_it_matters": "Relevant fuer Vodafones TV- und Streaming-Bundles, da breitere Sprachverfuegbarkeit von Disney+ die Attraktivitaet als Bundle-Partner fuer internationale Kundengruppen in Europa und Afrika erhoehen kann.",
-     "date": "2026-07-16",
-     "source": "Advanced Television"
-    },
-    {
-     "title": "ITU denies Australia’s request for satellite launch delay",
-     "operator": "Optus",
-     "url": "https://www.advanced-television.com/2026/07/16/itu-denies-australias-request-for-satellite-launch-delay/",
-     "category": "Regulierung",
-     "relevance": 2,
-     "summary": "Die International Telecommunications Union (ITU) hat Australiens Antrag auf eine Fristverlaengerung fuer den Start des Optus-11-Satelliten abgelehnt, der urspruenglich bereits 2023 haette starten sollen.",
-     "why_it_matters": "Zeigt, wie streng die ITU Fristen fuer Satellitenprojekte durchsetzt - relevant fuer Vodafones eigene Satelliten- bzw. Non-Terrestrial-Network-Plaene (z.B. mit AST SpaceMobile), da Zeitplaene entsprechend eng eingehalten werden muessen.",
-     "date": "2026-07-16",
-     "source": "Advanced Television"
-    }
-   ]
-  },
-  "Asien": {
-   "region_summary": "Der asiatische Markt zeigt zwei klare Trends: Netzbetreiber investieren stark in Künstliche Intelligenz für Netzsteuerung und eigene KI-Rechenzentren (SK Telecom, KT), während gleichzeitig Open RAN und Satelliten-Internet als neue Wettbewerbsfelder an Fahrt gewinnen (Rakuten Mobile, Reliance Jio). Zusätzlich bereitet sich Jio mit einem Führungswechsel auf einen milliardenschweren Börsengang vor, was auf einen aggressiveren Wettbewerb in Indien hindeutet. In Asien zeigt sich diese Woche vor allem die Diversifizierung von Telekommunikationsanbietern in neue Geschäftsfelder: SK Telecom investiert massiv in KI-Rechenzentren, und im Automobilsektor sichert sich Verizon zusammen mit dem japanischen Anbieter KDDI einen Grosskunden im Bereich vernetzte Fahrzeuge. Klassische Mobilfunk-Themen wie Tarife oder Kampagnen liefern diese Woche kaum belastbare Signale.",
-   "highlights": [
-    {
-     "title": "IN-SPACe grants technical approval for Reliance Jio's LEO project",
-     "operator": "Reliance Jio",
-     "url": "https://developingtelecoms.com/telecom-technology/satellite-communications-networks/20545-in-space-grants-technical-approval-for-reliance-jios-leo-project.html",
-     "category": "Regulierung",
-     "relevance": 4,
-     "summary": "Die indische Weltraumbehörde IN-SPACe hat den Plan von Reliance Jio für eine eigene LEO-Satellitenkonstellation (Low Earth Orbit) als technisch tragfähig eingestuft; Jio will damit gegen Starlink, Eutelsat OneWeb und Amazon Leo antreten.",
-     "why_it_matters": "Zeigt, dass große Mobilfunkanbieter zunehmend eigene Satelliten-Infrastruktur statt reiner Partnerschaften aufbauen - Vodafone sollte seine Starlink/Satellitenpartnerschaften auf strategische Abhängigkeit prüfen und beobachten, ob dieses Modell auch in Europa/Afrika relevant wird.",
-     "date": "2026-07-17",
-     "source": "Developing Telecoms"
-    },
-    {
-     "title": "SK Telecom Uses AI Network Operation Technology for Summer Traffic Management",
-     "operator": "SK Telecom",
-     "url": "https://www.thefastmode.com/technology-solutions/49672-sk-telecom-uses-ai-network-operation-technology-for-summer-traffic-management",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "SK Telecom setzt ab dem 16. Juli KI-gestützte Netzsteuerung ein, um Verkehrsspitzen während der Sommerferienzeit automatisch zu erkennen und zu managen.",
-     "why_it_matters": "Praxisbeispiel für automatisierte Netzoptimierung per KI, das Vodafone als Vorlage für saisonale Lastspitzen (z.B. Feiertage, Großevents) im eigenen Netz nutzen könnte, um Kosten zu senken.",
-     "date": "2026-07-17",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "1Finity Open RAN 5G Radios Deployed in Rakuten Mobile Japan Network",
-     "operator": "Rakuten Mobile",
-     "url": "https://www.thefastmode.com/technology-solutions/49656-1finity-open-ran-5g-radios-deployed-in-rakuten-mobile-japan-network",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Fujitsu-Tochter 1Finity hat kompakte Open-RAN-Funkmodule im landesweiten, vollständig virtualisierten Netz von Rakuten Mobile in Japan verbaut.",
-     "why_it_matters": "Rakuten treibt die kommerzielle Reife von Open RAN weiter voran; relevant für Vodafones eigene Open-RAN-Strategie in Großbritannien und Europa als Vergleichsmaßstab für Kosten und Skalierbarkeit.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "Thales, Singtel Enable First Multi-Operator IoT eSIM Network in Asia Pacific",
-     "operator": "Singtel",
-     "url": "https://www.thefastmode.com/technology-solutions/49618-thales-singtel-enable-first-multi-operator-iot-esim-network-in-asia-pacific",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Thales, Singtel, Optus, AIS und Globe Telecom haben das weltweit erste eSIM-Netzwerk für Unternehmens-IoT (Internet of Things) über mehrere Netzbetreiber hinweg in der Asien-Pazifik-Region in Betrieb genommen.",
-     "why_it_matters": "Direkter Wettbewerb zu Vodafones eigenem IoT-Geschäft (Vodafone Business IoT); zeigt einen möglichen Blueprint für multi-operator eSIM-Roaming, den Vodafone für sein globales B2B-IoT-Angebot prüfen oder kontern sollte.",
-     "date": "2026-07-16",
-     "source": "The Fast Mode"
-    },
-    {
-     "title": "KT's 5 trillion won AI data center plan faces timing controversy",
-     "operator": "KT",
-     "url": "https://www.msn.com/en-xl/news/other/kts-5-trillion-won-ai-data-center-plan-faces-timing-controversy/ar-AA27YhDJ",
-     "category": "Finanzen",
-     "relevance": 3,
-     "summary": "KT plant den Bau eines KI-Rechenzentrums im Wert von 5 Billionen Won (rund 3,4 Milliarden Euro), die Ankündigung steht jedoch wegen ihres Timings kurz nach einer Regierungsankündigung in der Kritik.",
-     "why_it_matters": "Zeigt, wie asiatische Telekomkonzerne massiv in KI-Infrastruktur diversifizieren, um über reine Konnektivität hinauszuwachsen - relevant für Vodafones eigene Positionierung im Bereich KI/Cloud-Dienste für Geschäftskunden.",
-     "date": "2026-07-15",
-     "source": "msn.com"
-    },
-    {
-     "title": "Exclusive: KT's 1GW AI Data Center Plan Missing From Government Report",
-     "operator": "KT",
-     "url": "https://www.chosun.com/english/industry-en/2026/07/15/26COWJWN7JG3VD5RDF2OI722BA/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "KTs Plan für ein 1-Gigawatt-KI-Rechenzentrum fehlt in einem offiziellen Regierungsbericht, was Spekulationen über mangelnde Abstimmung mit staatlichen Plänen (8,4 Gigawatt) auslöst.",
-     "why_it_matters": "Ergänzt die KT-Rechenzentrumsstory um politische Reibung; für Vodafone vor allem als Hinweis, wie stark staatliche Koordination bei Großinvestitionen in KI-Infrastruktur in Asien mitentscheidet.",
-     "date": "2026-07-15",
-     "source": "chosun.com"
-    },
-    {
-     "title": "Bharti Airtel: JM Financial sees 29% rally as revenue growth remains intact",
-     "operator": "Bharti Airtel",
-     "url": "https://www.financialexpress.com/market/bharti-airtel-jm-financial-sees-29-rally-as-revenue-growth-remains-intact-4292090/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Der Analyst JM Financial sieht für Bharti Airtel ein Kurspotenzial von 29 Prozent, gestützt auf steigende Durchschnittserlöse pro Nutzer (ARPU), 5G-Ausbau und Wachstum im Festnetz-Heimgeschäft.",
-     "why_it_matters": "Signalisiert anhaltende Preissetzungsmacht und Wachstum bei Airtel in Indien - relevant als Vergleichsmaßstab für Vodafones eigene ARPU-Strategie in Schwellenmärkten wie Afrika.",
-     "date": "2026-07-14",
-     "source": "financialexpress.com"
-    },
-    {
-     "title": "Rakuten Mobile ramps up Open RAN rollout with 1Finity 5G radios deployment",
-     "operator": "Rakuten Mobile",
-     "url": "https://www.datacenterdynamics.com/en/news/rakuten-mobile-pairs-with-fujitsus-1finity-to-advance-5g-open-ran-in-japan/",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Rakuten Mobile setzt beim Ausbau seines 5G-Sub6-Netzes in Japan verstärkt auf Open-RAN-Funkmodule von Fujitsus 1Finity.",
-     "why_it_matters": "Bestätigt den Trend zu offener, herstellerunabhängiger Netztechnik; Vodafone kann Kosten- und Performance-Daten aus Japan als Referenzpunkt für die eigene Open-RAN-Ausrollung nutzen.",
-     "date": "2026-07-14",
-     "source": "datacenterdynamics.com"
-    },
-    {
-     "title": "SK Telecom tests AI-RAN to power Korea's digital highway",
-     "operator": "SK Telecom",
-     "url": "https://www.koreatimes.co.kr/business/companies/20260714/sk-telecom-tests-ai-ran-to-power-koreas-digital-highway",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "SK Telecom wurde für ein staatlich gefördertes Pilotprojekt namens 'Hyper-AI Network Infrastructure' ausgewählt, um KI-gestützte Funknetztechnik (AI-RAN) für vernetzte Straßeninfrastruktur zu testen.",
-     "why_it_matters": "Zeigt eine mögliche Zukunftsanwendung für KI-gesteuerte Netzwerke im Bereich vernetzte Mobilität/Straßenverkehr - Vodafone könnte ähnliche Pilotprojekte für Smart-City- oder Automotive-Kunden in Europa prüfen.",
-     "date": "2026-07-14",
-     "source": "koreatimes.co.kr"
-    },
-    {
-     "title": "SK Telecom expands consortium for August AI evaluation",
-     "operator": "SK Telecom",
-     "url": "https://www.msn.com/en-xl/news/other/sk-telecom-expands-consortium-for-august-ai-evaluation/ar-AA27R011",
-     "category": "Partnerschaft",
-     "relevance": 2,
-     "summary": "SK Telecom erweitert sein Konsortium für das staatliche Projekt eines 'souveränen KI-Basismodells', um die industrielle Anwendbarkeit seines eigenen KI-Modells zu stärken.",
-     "why_it_matters": "Zeigt, wie Netzbetreiber sich als KI-Plattformanbieter positionieren wollen; für Vodafone als Beobachtungspunkt relevant, ob eigene KI-Modelle für Geschäftskunden strategisch ausgebaut werden sollten.",
-     "date": "2026-07-13",
-     "source": "msn.com"
-    },
-    {
-     "title": "Globe sustains mobile leadership, sees growth in data usage and personalization",
-     "operator": "Globe Telecom",
-     "url": "https://walastech.com/news/globe-sustains-mobile-leadership-sees-growth-in-data-usage-and-personalization/",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "Globe Telecom berichtet von anhaltendem Wachstum bei Datennutzung und personalisierten Mobilfunkangeboten auf den Philippinen.",
-     "why_it_matters": "Liefert Kontext zu Wachstumstreibern im südostasiatischen Mobilfunkmarkt, insbesondere Personalisierung von Tarifen, die Vodafone für eigene Angebote in Europa als Inspiration prüfen könnte.",
-     "date": "2026-07-13",
-     "source": "walastech.com"
-    },
-    {
-     "title": "Jio Platforms replaces CEO Kiran Thomas with Pankaj Pawar ahead of IPO",
-     "operator": "Reliance Jio",
-     "url": "https://telecom.economictimes.indiatimes.com/news/industry/jio-platforms-appoints-pankaj-pawar-as-ceo-ahead-of-ipo/132379099",
-     "category": "M&A",
-     "relevance": 3,
-     "summary": "Jio Platforms tauscht CEO Kiran Thomas gegen Pankaj Pawar aus, um sich auf einen geplanten Börsengang mit einem Zielvolumen von 4 Milliarden US-Dollar vorzubereiten.",
-     "why_it_matters": "Ein börsennotiertes Jio Platforms mit frischem Kapital könnte den Wettbewerbsdruck in Indien und potenziell auch international erhöhen; Vodafone sollte Jios Investitionspläne nach dem IPO genau beobachten.",
-     "date": "2026-07-13",
-     "source": "telecom.economictimes.indiatimes.com"
-    },
-    {
-     "title": "Verizon gears up as BMW US vehicle connectivity provider",
-     "operator": "KDDI",
-     "url": "https://www.computerweekly.com/news/366645676/Verizon-gears-up-as-BMW-US-vehicle-connectivity-provider",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Verizon wurde als Konnektivitäts-Anbieter für neu produzierte BMW-Fahrzeuge in den USA benannt und liefert dafür 5G Standalone- und LTE-Verbindungen über eine Partnerschaft mit dem japanischen Netzbetreiber KDDI.",
-     "why_it_matters": "Zeigt, wie stark Automobilhersteller globale Konnektivität über Netzbetreiber-Partnerschaften absichern; Vodafone Automotive/IoT-Geschäft sollte prüfen, ob ähnliche Multi-Region-Deals mit Autoherstellern in Europa/Afrika ausbaubar sind, bevor US-Anbieter das Modell exportieren.",
-     "date": "2026-07-10",
-     "source": "computerweekly.com"
-    },
-    {
-     "title": "SK Telecom (SKM) Announces Plan for 15GW AI Data Center Capacity",
-     "operator": "SK Telecom",
-     "url": "https://finance.yahoo.com/technology/ai/articles/sk-telecom-skm-announces-plan-183504094.html",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "SK Telecom kündigte am 5. Juli den Bau von Rechenzentrums-Kapazitäten für künstliche Intelligenz mit bis zu 15 Gigawatt Leistung an.",
-     "why_it_matters": "Ein grosser asiatischer Netzbetreiber positioniert sich als KI-Infrastruktur-Anbieter statt nur als klassischer Mobilfunker; Vodafone sollte beobachten, ob dieses Geschäftsmodell (Netzbetreiber als KI-Rechenzentrumsbetreiber) auch für eigene B2B-Cloud- und KI-Angebote in Europa relevant wird.",
-     "date": "2026-07-09",
-     "source": "finance.yahoo.com"
-    },
-    {
-     "title": "Bharti Airtel fixes record date for its highest-ever dividend of Rs 24/share. What’s the last date to buy?",
-     "operator": "Bharti Airtel",
-     "url": "https://www.msn.com/en-in/money/markets/bharti-airtel-fixes-record-date-for-its-highest-ever-dividend-of-rs-24-share-what-s-the-last-date-to-buy/ar-AA27CrVG",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Bharti Airtel legt den 24. Juli als Stichtag für seine bisher höchste Jahresdividende von 24 Rupien je Aktie für das Geschäftsjahr 2026 fest.",
-     "why_it_matters": "Signalisiert starke finanzielle Verfassung und Aktionärsvertrauen bei einem wichtigen indischen Wettbewerber, ohne direkte Produkt- oder Preisrelevanz für Vodafone; nur als Kontext zur Wettbewerbsfähigkeit von Bharti Airtel beobachten.",
-     "date": "2026-07-10",
-     "source": "msn.com"
-    }
-   ]
+   "region_summary": "",
+   "highlights": []
   },
   "Nordamerika": {
-   "region_summary": "Der US-Markt bewegt sich in Richtung Kostensenkung und neue Tarifmodelle: Verizon kündigt bereits die dritte Entlassungsrunde unter dem neuen CEO an, während AT&T und Verizon parallel an Alternativen zum klassischen Familientarif arbeiten und die Grundgebühren erhöhen. Gleichzeitig verstärkt AT&T sein B2B-Sicherheits- und KI-Portfolio (Quanten-sichere Netzwerksicherheit, KI-gestützte Netzwerküberwachung), und im Kabelmarkt bahnt sich mit möglichen Comcast-Charter-Gesprächen eine weitere Konsolidierungswelle an. Analysten warnen zudem, dass Satelliten-Anbieter wie Starlink zunehmend als ernsthafte Bedrohung für klassische Telekom-Aktien gesehen werden. Der US-Markt zeigt weiter Konsolidierungsdruck: DISH Wireless kämpft ums Überleben, während Charter über Satelliten-Mobilfunk mit Starlink und eine mögliche Cox-Übernahme verhandelt. In Kanada positioniert sich Telus mit einer eigenen KI-Allianz stärker im Firmenkundengeschäft.",
-   "highlights": [
-    {
-     "title": "AT&T drives Palo Alto Networks’ quantum SASE fabric into Dynamic Defense",
-     "operator": "AT&T",
-     "url": "https://www.sdxcentral.com/news/att-drives-palo-alto-networks-quantum-sase-fabric-into-dynamic-defense/",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "AT&T Business integriert die 'Quantum-Resilient SASE Fabric' von Palo Alto Networks (Post-Quantum-Verschlüsselung, Prisma SASE) in sein bestehendes Dynamic-Defense-Sicherheitsangebot für Firmenkunden.",
-     "why_it_matters": "Zeigt, dass US-Wettbewerber Quantencomputer-Bedrohungen bereits aktiv adressieren; Vodafone Business sollte prüfen, ob eigene Sicherheitsangebote (z.B. Vodafone Business Secure) ein vergleichbares Post-Quantum-Feature brauchen, um im B2B-Markt nicht ins Hintertreffen zu geraten.",
-     "date": "2026-07-15",
-     "source": "sdxcentral.com"
-    },
-    {
-     "title": "AT&T built an AI system to prevent network outages. It reduced customer downtime by more than 12 million hours",
-     "operator": "AT&T",
-     "url": "https://www.msn.com/en-us/news/technology/at-t-built-an-ai-system-to-prevent-network-outages-it-reduced-customer-downtime-by-more-than-12-million-hours/ar-AA282T6S",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "AT&T setzt ein KI-gestütztes Störungsmanagement-System ein, das laut eigenen Angaben Kundenausfallzeiten um mehr als 12 Millionen Stunden reduziert und unnötige Techniker-Einsätze vermeidet.",
-     "why_it_matters": "Konkretes, messbares Ergebnis für KI im Netzbetrieb liefert Vodafone ein Vorbild, um eigene Netzwartungskosten zu senken und Kundenzufriedenheit (Service-Level) mit ähnlichen Predictive-Maintenance-Tools zu verbessern.",
-     "date": "2026-07-16",
-     "source": "msn.com"
-    },
-    {
-     "title": "AT&T Shows Big Improvements in Latest Carrier Report",
-     "operator": "AT&T",
-     "url": "https://www.droid-life.com/2026/07/15/att-shows-big-improvements-in-latest-carrier-report/",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Der aktuelle Ookla-Carrier-Report zeigt deutliche Verbesserungen bei AT&T, wobei alle großen US-Anbieter gute Werte erzielen.",
-     "why_it_matters": "Netzqualität bleibt ein zentrales Wettbewerbsargument im US-Markt; Vodafone sollte eigene Benchmark-Ergebnisse in Europa/Afrika ähnlich offensiv kommunizieren, wenn sie vorteilhaft sind.",
-     "date": "2026-07-15",
-     "source": "droid-life.com"
-    },
-    {
-     "title": "AT&T phone bills are going up. See why, and by how much",
-     "operator": "AT&T",
-     "url": "https://www.msn.com/en-us/money/personalfinance/at-t-phone-bills-are-going-up-see-why-and-by-how-much/ar-AA27YT8P",
-     "category": "Tarif/Pricing",
-     "relevance": 4,
-     "summary": "AT&T erhöht ab Anfang August eine monatliche Gebühr, wodurch die Rechnungen der Kunden steigen.",
-     "why_it_matters": "Zeigt, dass US-Wettbewerber trotz Preisdruck stille Gebührenerhöhungen nutzen, um Marge zu sichern – ein Modell, das Vodafone bei eigenen Zusatzgebühren (Netzausbau-Umlage o.ä.) beobachten und ggf. adaptieren kann.",
-     "date": "2026-07-15",
-     "source": "msn.com"
-    },
-    {
-     "title": "Verizon to announce third round of layoffs under CEO Daniel Schulman",
-     "operator": "Verizon",
-     "url": "https://americanbazaaronline.com/2026/07/15/verizon-to-announce-third-round-of-layoffs-under-ceo-schulman-484627/",
-     "category": "Finanzen",
-     "relevance": 3,
-     "summary": "Verizon plant unter CEO Daniel Schulman die dritte Entlassungsrunde, nachdem im November bereits 13.000 Stellen gestrichen wurden; Ziel sind Einsparungen von 5 Milliarden US-Dollar im operativen Budget.",
-     "why_it_matters": "Deutlicher Kostendruck bei einem der größten US-Wettbewerber zeigt, dass Effizienzprogramme im Telekomsektor weiter zunehmen – relevant als Vergleichsmaßstab für Vodafones eigene Kostensenkungsziele.",
-     "date": "2026-07-15",
-     "source": "americanbazaaronline.com"
-    },
-    {
-     "title": "AT&T and Verizon Look Beyond the Family Plan",
-     "operator": "AT&T",
-     "url": "https://www.wsj.com/tech/personal-tech/at-t-and-verizon-look-beyond-the-family-plan-4fcaf4b9",
-     "category": "Tarif/Pricing",
-     "relevance": 5,
-     "summary": "AT&T und Verizon entwickeln neue Tarifoptionen, die über klassische Mehrlinien-Familienpläne hinausgehen, um Kunden langfristig zu binden.",
-     "why_it_matters": "Direkter Vorlage-Kandidat für Vodafones eigenes FMC- und Mehrlinien-Portfolio: neue Bündelungsmodelle könnten helfen, Kundenbindung zu erhöhen und Abwanderung zu reduzieren – sollte für Konvergenzangebote in Europa geprüft werden.",
-     "date": "2026-07-15",
-     "source": "wsj.com"
-    },
-    {
-     "title": "Best Verizon Plans: How to Choose the Right One in 2026",
-     "operator": "Verizon",
-     "url": "https://www.cnet.com/tech/mobile/best-verizon-plans/",
-     "category": "Tarif/Pricing",
-     "relevance": 4,
-     "summary": "Verizon hat 2026 mit Preissenkungen bei Unlimited-Tarifen begonnen und danach den neuen 'Simplicity'-Tarif eingeführt, der einfache, günstigere Optionen für Wechselwillige bietet.",
-     "why_it_matters": "Ein vereinfachter, günstiger Einsteigertarif zur Kundengewinnung von Wechslern ist ein Modell, das Vodafone in preissensiblen Märkten (z.B. gegen Discounter) kopieren könnte.",
-     "date": "2026-07-15",
-     "source": "cnet.com"
-    },
-    {
-     "title": "Comcast eyes Charter acquisition as it loses customers",
-     "operator": "Comcast",
-     "url": "https://www.msn.com/en-us/money/general/comcast-eyes-charter-acquisition-as-it-loses-customers/ar-AA27UKcX",
-     "category": "M&A",
-     "relevance": 4,
-     "summary": "Comcast erwägt Berichten zufolge eine Übernahme von Charter Communications, nachdem beide Unternehmen zunehmend Kunden verlieren.",
-     "why_it_matters": "Eine mögliche Konsolidierung der größten US-Kabelanbieter würde den Wettbewerb im Festnetz-/Breitbandmarkt verändern und zeigt, dass Skaleneffekte und Bündelung auch für Vodafones Festnetzstrategie in Europa an Bedeutung gewinnen.",
-     "date": "2026-07-14",
-     "source": "msn.com"
-    },
-    {
-     "title": "Jim Cramer Warns “I Don’t Want to Own AT&T or Verizon” as Starlink Threatens Telecom Stocks",
-     "operator": "AT&T",
-     "url": "https://247wallst.com/investing/2026/07/13/jim-cramer-warns-i-dont-want-to-own-att-or-verizon-as-starlink-threatens-telecom-stocks/",
-     "category": "Sonstiges",
-     "relevance": 3,
-     "summary": "Eine Bernstein-Analyse senkt die Kursziele für den gesamten US-Telekomsektor, da Starlink zunehmend als Bedrohung über den ländlichen Raum hinaus gesehen wird.",
-     "why_it_matters": "Signalisiert wachsende Investorensorge, dass Satelliten-Internet auch städtische/urbane Mobilfunk- und Breitbandkunden abwerben könnte – Vodafone sollte die eigene Positionierung gegenüber Satelliten-Konnektivität (z.B. Partnerschaften) im Blick behalten.",
-     "date": "2026-07-13",
-     "source": "247wallst.com"
-    },
-    {
-     "title": "AT&T, Ericsson trial sensing during drone test outside AT&T Stadium",
-     "operator": "AT&T",
-     "url": "https://www.datacenterdynamics.com/en/news/att-ericsson-trial-sensing-during-drone-test-outside-att-stadium/",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "AT&T und Ericsson haben in einem genehmigten Luftraum außerhalb des AT&T-Stadions ein Netzwerk-Sensing-System getestet, das mehrere Drohnen gleichzeitig erkennen und verfolgen kann.",
-     "why_it_matters": "Netzwerk-Sensing als neue Einnahmequelle (z.B. für Sicherheits- oder Logistikanwendungen) ist ein Zukunftsfeld, das Vodafone in Partnerschaft mit Netzausrüstern ebenfalls für B2B-Anwendungen (Smart City, Industrie) evaluieren sollte.",
-     "date": "2026-07-12",
-     "source": "datacenterdynamics.com"
-    },
-    {
-     "title": "Dish Wireless and cell tower firms battle in bankruptcy court",
-     "operator": "DISH Wireless",
-     "url": "https://www.msn.com/en-us/money/bankruptcy/dish-wireless-and-cell-tower-firms-battle-in-bankruptcy-court/ar-AA27J4UP",
-     "category": "Finanzen",
-     "relevance": 3,
-     "summary": "DISH Wireless, einst als vierter großer US-Mobilfunkanbieter geplant, streitet vor Gericht mit Betreibern von Mobilfunkmasten um Zahlungen im Rahmen eines Insolvenzverfahrens.",
-     "why_it_matters": "Zeigt, wie schwer es ein Neueinsteiger ohne etabliertes Netz hat, profitabel zu werden – ein Warnsignal für eigene Expansionspläne in neue Märkte und ein Hinweis darauf, dass Netzinfrastruktur-Partnerschaften finanziell tragfähig gestaltet werden müssen.",
-     "date": "2026-07-11",
-     "source": "msn.com"
-    },
-    {
-     "title": "Charter Communications (CHTR) On Starlink And Cox Talks Faces A New Valuation Test",
-     "operator": "Charter Communications",
-     "url": "https://finance.yahoo.com/markets/stocks/articles/charter-communications-chtr-starlink-cox-131023832.html",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Kabelnetzbetreiber Charter führt Gespräche mit SpaceX über einen satellitengestützten Mobilfunkdienst (Starlink) und plant parallel möglicherweise die Übernahme von Cox Communications.",
-     "why_it_matters": "Satelliten-Mobilfunk als Ergänzung zu Festnetz/Kabel könnte auch für Vodafone in ländlichen Gebieten Europas und Afrikas relevant werden – Vodafone sollte beobachten, wie Charter Starlink in sein Angebot integriert, um Deckungslücken zu schließen.",
-     "date": "2026-07-11",
-     "source": "finance.yahoo.com"
-    },
-    {
-     "title": "TELUS (TSX:T) Launches AI Consortium With Canadian Finance And Tech Leaders",
-     "operator": "Telus",
-     "url": "https://finance.yahoo.com/technology/ai/articles/telus-tsx-t-launches-ai-191226362.html",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "Telus hat zusammen mit kanadischen Finanz- und Technologiepartnern (u.a. Bank of Nova Scotia) ein 'AI Consortium' gegründet, das sichere und skalierbare KI-Anwendungen für Unternehmen entwickeln soll.",
-     "why_it_matters": "Modell dafür, wie ein Telekom-Betreiber sich als KI-Infrastruktur-Partner für Firmenkunden positioniert – Vodafone Business könnte ähnliche branchenübergreifende KI-Allianzen in Europa prüfen, um im Enterprise-Geschäft zu punkten.",
-     "date": "2026-07-10",
-     "source": "finance.yahoo.com"
-    },
-    {
-     "title": "Network Press Release T‑Mobile Responds to Central Texas Flooding",
-     "operator": "T-Mobile US",
-     "url": "https://www.t-mobile.com/news/network/t-mobile-responds-to-central-texas-flooding",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "T-Mobile hat nach den Überschwemmungen in Zentral-Texas im Juli 2026 Notfallmaßnahmen zur Wiederherstellung und Unterstützung des Mobilfunknetzes eingeleitet.",
-     "why_it_matters": "Zeigt, wie ein Betreiber Netzresilienz bei Naturkatastrophen kommuniziert und Vertrauen aufbaut – relevant als Vorlage für Vodafones eigene Krisenkommunikation bei Unwettern in Europa.",
-     "date": null,
-     "source": "T-Mobile US"
-    }
-   ]
+   "region_summary": "",
+   "highlights": []
+  },
+  "Asien": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Europa": {
+   "region_summary": "",
+   "highlights": []
   },
   "Afrika & Naher Osten": {
-   "region_summary": "Im Fokus stehen diese Woche ein Preiskampf bei Sprachtarifen in Kenia sowie ein wichtiges Gerichtsurteil zur Haftung bei SIM-Karten-Betrug. Airtel Africa punktet zudem an der Börse mit Aktienrückkäufen und einer hohen Marktbewertung, während Safaricom sein Mobile-Money-Geschäft (M-Pesa) und dessen Kreditprodukt Fuliza weiter ausbaut.",
-   "highlights": [
-    {
-     "title": "Airtel loses fight against Safaricom's 10 cents tariff",
-     "operator": "Safaricom",
-     "url": "https://www.msn.com/en-xl/money/general/airtel-loses-fight-against-safaricom-s-10-cents-tariff/ar-AA284Jn5",
-     "category": "Tarif/Pricing",
-     "relevance": 4,
-     "summary": "Die kenianische Wettbewerbsbehörde hat eine Beschwerde von Airtel gegen Safaricom zurückgewiesen, wonach Safaricom Sprachminuten für nur 10 Cent anbietet; Safaricom darf den Tarif weiterführen.",
-     "why_it_matters": "Zeigt, dass aggressive Kampfpreise regulatorisch durchsetzbar sind, wenn der Marktführer sie anbietet - Vodafone sollte beobachten, ob ähnliche Preisstrategien in eigenen afrikanischen Märkten (z.B. über Vodacom) rechtlich Bestand hätten und wie stark Wettbewerbsbehörden solche Tarife stützen.",
-     "date": "2026-07-16",
-     "source": "msn.com"
-    },
-    {
-     "title": "Court Rules a Correct PIN Is Not a Defence: Safaricom and DTB to Pay KES 4.4M SIM Swap Victim",
-     "operator": "Safaricom",
-     "url": "https://tech-ish.com/2026/07/13/safaricom-dtb-sim-swap-ruling/",
-     "category": "Regulierung",
-     "relevance": 4,
-     "summary": "Ein kenianisches Gericht hat entschieden, dass Safaricom (60%) und die Bank DTB (40%) einem Kunden 4,42 Millionen Kenia-Schilling (rund 30.000 Euro) Schadenersatz für einen SIM-Swap-Betrug zahlen müssen, selbst wenn die richtige PIN verwendet wurde.",
-     "why_it_matters": "Präzedenzfall zur Haftung von Telekom-Betreibern bei SIM-Swap-Betrug - Vodafone sollte prüfen, ob eigene Prozesse zur SIM-Karten-Verifizierung und Betrugsprävention in Afrika/Naher Osten ausreichend robust sind, um vergleichbare Haftungsrisiken zu vermeiden.",
-     "date": "2026-07-13",
-     "source": "tech-ish.com"
-    },
-    {
-     "title": "Safaricom shares easy way to increase fuliza limit, warns defaulters who throw away SIM cards",
-     "operator": "Safaricom",
-     "url": "https://www.msn.com/en-xl/money/general/safaricom-shares-easy-way-to-increase-fuliza-limit-warns-defaulters-who-throw-away-sim-cards/ar-AA27T9R8",
-     "category": "Produktlaunch",
-     "relevance": 3,
-     "summary": "Safaricom informiert Kunden, wie sie ihr Überziehungslimit beim mobilen Kreditprodukt Fuliza einfach erhöhen können, und warnt Betrüger, die SIM-Karten wegwerfen, um Schulden zu umgehen.",
-     "why_it_matters": "Fuliza ist ein Kernbaustein von Safaricoms M-Pesa-Ökosystem und zeigt, wie eng Mobilfunk und Mikrokredite verzahnt sind - relevant als Vorlage für Vodafones eigene Mobile-Money- und Finanzdienstleistungen in Afrika, insbesondere zur Betrugsprävention bei Kreditvergabe.",
-     "date": "2026-07-14",
-     "source": "msn.com"
-    },
-    {
-     "title": "Airtel Africa ramps up 1.8m share buyback as stock rallies",
-     "operator": "Airtel Africa",
-     "url": "https://businessday.ng/companies/article/airtel-africa-ramps-up-1-8m-share-buyback-as-stock-rallies/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Airtel Africa hat innerhalb einer Handelswoche fast 2 Millionen eigene Aktien zurückgekauft, was den Aktienkurs weiter angetrieben hat.",
-     "why_it_matters": "Signalisiert starkes Anlegervertrauen in Airtel Africas Wachstumsstory in Afrika - relevant zur Einschätzung der Finanzkraft und Investitionsfähigkeit eines direkten Vodacom/Vodafone-Konkurrenten auf dem Kontinent.",
-     "date": "2026-07-14",
-     "source": "businessday.ng"
-    },
-    {
-     "title": "Airtel Africa becomes NGX’s most valuable company with over N21tn valuation",
-     "operator": "Airtel Africa",
-     "url": "https://businessday.ng/companies/article/airtel-africa-becomes-ngxs-most-valuable-company-with-over-n21tn-valuation/",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Airtel Africa ist mit einer Marktkapitalisierung von über 21 Billionen Naira (rund 13 Milliarden Euro) zum wertvollsten Unternehmen an der nigerianischen Börse NGX aufgestiegen.",
-     "why_it_matters": "Unterstreicht die wachsende finanzielle Stärke von Airtel Africa als Wettbewerber im Kernmarkt Nigeria, wo auch Vodacom-Interessen bestehen - wichtig für die Einschätzung der Wettbewerbsdynamik in Westafrika.",
-     "date": "2026-07-14",
-     "source": "businessday.ng"
-    },
-    {
-     "title": "Airtel Africa to connect 5,000 schools to free internet by 2027",
-     "operator": "Airtel Africa",
-     "url": "https://www.msn.com/en-xl/africa/nigeria/airtel-africa-to-connect-5000-schools-to-free-internet-by-2027/ar-AA27FwoB",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "Airtel Africa will über seine Stiftung bis 2027 rund 5.000 Schulen in seinen Märkten kostenlos mit Internet versorgen.",
-     "why_it_matters": "Solche CSR-Initiativen stärken Markenimage und Regierungsbeziehungen in afrikanischen Märkten - für Vodafone/Vodacom als Vergleichspunkt für eigene digitale Bildungsprogramme und PR-Wirkung relevant, aber ohne direkten Preis- oder Produktdruck.",
-     "date": "2026-07-10",
-     "source": "msn.com"
-    }
-   ]
-  },
-  "Ozeanien": {
-   "region_summary": "Für die Region Ozeanien liegt diese Woche nur eine sehr allgemeine Finanzdaten-Übersicht zu Spark New Zealand vor, ohne konkrete Produkt-, Tarif- oder Marktnews. Es gibt daher keinen erkennbaren strategisch relevanten Vorgang, auf den Vodafone reagieren müsste.",
+   "region_summary": "",
    "highlights": []
   }
  },
  "run": {
-  "started_at": "2026-07-17T08:00:15.691413+00:00",
-  "finished_at": "2026-07-17T08:08:55.136889+00:00",
-  "duration_seconds": 519.4,
+  "started_at": "2026-07-17T09:19:45.810989+00:00",
+  "finished_at": "2026-07-17T09:36:47.891643+00:00",
+  "duration_seconds": 1022.1,
   "used_llm": true,
-  "editor_used": true,
+  "editor_used": false,
   "models": {
-   "analyst": "claude-sonnet-5",
-   "editor": "claude-opus-4-8"
+   "analyst": "deepseek-ai/deepseek-v4-pro",
+   "editor": null
   },
   "phases": [
    {
     "name": "Sammeln",
-    "seconds": 49.1,
-    "detail": "128 Quellen abgefragt, 682 Meldungen gefunden"
+    "seconds": 46.9,
+    "detail": "128 Quellen abgefragt, 678 Meldungen gefunden"
    },
    {
     "name": "Nur Neues",
     "seconds": 0.0,
-    "detail": "115 neue Meldungen (Gedaechtnis: 2279 bekannt)"
+    "detail": "18 neue Meldungen (Gedaechtnis: 2394 bekannt)"
    },
    {
     "name": "Bewerten & Schreiben",
-    "seconds": 470.3,
-    "detail": "73 bewertete Meldungen"
+    "seconds": 975.1,
+    "detail": "0 bewertete Meldungen"
    }
   ],
   "source_summary": {
    "total": 128,
-   "ok": 87,
-   "empty": 39,
-   "failed": 2,
+   "ok": 85,
+   "empty": 42,
+   "failed": 1,
    "by_kind": {
     "newsroom": 36,
     "news_search": 80,
@@ -898,18 +85,6 @@
     "status": "fail",
     "count": 0,
     "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'"
-   },
-   {
-    "name": "Telecoms Tech News",
-    "operator": null,
-    "region": "global",
-    "url": "https://www.telecomstechnews.com/feed/",
-    "kind": "trade_press",
-    "label": "Telecoms Tech News",
-    "origin": "industry_news",
-    "status": "fail",
-    "count": 0,
-    "error": "ValueError: unparseable feed: <unknown>:2:119: not well-formed (invalid token)"
    },
    {
     "name": "Light Reading",
@@ -1044,6 +219,17 @@
     "count": 12
    },
    {
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Airtel%20Africa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 12
+   },
+   {
     "name": "Vodafone Idea",
     "operator": "Vodafone Idea",
     "region": "asia",
@@ -1066,10 +252,10 @@
     "count": 11
    },
    {
-    "name": "Charter Communications",
-    "operator": "Charter Communications",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Reliance%20Jio%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1077,10 +263,10 @@
     "count": 11
    },
    {
-    "name": "Airtel Africa",
-    "operator": "Airtel Africa",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Airtel%20Africa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "SK Telecom",
+    "operator": "SK Telecom",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1099,32 +285,10 @@
     "count": 10
    },
    {
-    "name": "VEON",
-    "operator": "VEON",
+    "name": "BT Group",
+    "operator": "BT Group",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22VEON%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Bharti Airtel",
-    "operator": "Bharti Airtel",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "SK Telecom",
-    "operator": "SK Telecom",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1154,6 +318,17 @@
     "count": 10
    },
    {
+    "name": "Broadband TV News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.broadbandtvnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Broadband TV News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
     "name": "Mobile Europe",
     "operator": null,
     "region": "global",
@@ -1165,12 +340,12 @@
     "count": 10
    },
    {
-    "name": "Broadband TV News",
+    "name": "Telecoms Tech News",
     "operator": null,
     "region": "global",
-    "url": "https://www.broadbandtvnews.com/feed/",
+    "url": "https://www.telecomstechnews.com/feed/",
     "kind": "trade_press",
-    "label": "Broadband TV News",
+    "label": "Telecoms Tech News",
     "origin": "industry_news",
     "status": "ok",
     "count": 10
@@ -1187,10 +362,10 @@
     "count": 10
    },
    {
-    "name": "AT&T",
-    "operator": "AT&T",
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
     "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1198,10 +373,10 @@
     "count": 9
    },
    {
-    "name": "Verizon",
-    "operator": "Verizon",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22SoftBank%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1220,10 +395,10 @@
     "count": 9
    },
    {
-    "name": "América Móvil",
-    "operator": "América Móvil",
-    "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22Am%C3%A9rica%20M%C3%B3vil%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "VEON",
+    "operator": "VEON",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22VEON%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1242,10 +417,10 @@
     "count": 8
    },
    {
-    "name": "Reliance Jio",
-    "operator": "Reliance Jio",
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Reliance%20Jio%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1286,15 +461,37 @@
     "count": 7
    },
    {
-    "name": "BT Group",
-    "operator": "BT Group",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "AT&T",
+    "operator": "AT&T",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
     "count": 7
+   },
+   {
+    "name": "Verizon",
+    "operator": "Verizon",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "América Móvil",
+    "operator": "América Móvil",
+    "region": "latin_america",
+    "url": "https://www.bing.com/news/search?q=%22Am%C3%A9rica%20M%C3%B3vil%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
    },
    {
     "name": "KT",
@@ -1330,48 +527,15 @@
     "count": 6
    },
    {
-    "name": "Vodafone Group",
-    "operator": "Vodafone Group",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
     "count": 5
-   },
-   {
-    "name": "Telus",
-    "operator": "Telus",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "SoftBank",
-    "operator": "SoftBank",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22SoftBank%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "TIM",
-    "operator": "TIM",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 4
    },
    {
     "name": "Tele2",
@@ -1407,10 +571,32 @@
     "count": 4
    },
    {
+    "name": "Telus",
+    "operator": "Telus",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
     "name": "Millicom",
     "operator": "Millicom",
     "region": "latin_america",
     "url": "https://www.bing.com/news/search?q=%22Millicom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Vodacom",
+    "operator": "Vodacom",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Vodacom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1429,21 +615,10 @@
     "count": 4
    },
    {
-    "name": "Safaricom",
-    "operator": "Safaricom",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 4
-   },
-   {
-    "name": "KDDI",
-    "operator": "KDDI",
+    "name": "Singtel",
+    "operator": "Singtel",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Singtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1462,23 +637,23 @@
     "count": 4
    },
    {
+    "name": "Vodafone Group",
+    "operator": "Vodafone Group",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
     "name": "Deutsche Telekom",
     "operator": "Deutsche Telekom",
     "region": "europe",
     "url": "https://www.telekom.com/en/media/media-information",
     "kind": "newsroom",
     "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Orange",
-    "operator": "Orange",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
     "count": 3
@@ -1506,39 +681,6 @@
     "count": 3
    },
    {
-    "name": "Telenor",
-    "operator": "Telenor",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Telenor%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Turkcell",
-    "operator": "Turkcell",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Turkcell%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Bouygues Telecom",
-    "operator": "Bouygues Telecom",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
     "name": "Bell Canada",
     "operator": "Bell Canada",
     "region": "north_america",
@@ -1550,45 +692,23 @@
     "count": 3
    },
    {
+    "name": "Rogers",
+    "operator": "Rogers",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Rogers%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
     "name": "MTN Group",
     "operator": "MTN Group",
     "region": "africa_middle_east",
     "url": "https://www.mtn.com/newsroom/",
     "kind": "newsroom",
     "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Vodacom",
-    "operator": "Vodacom",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Vodacom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Singtel",
-    "operator": "Singtel",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Singtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "AIS",
-    "operator": "AIS",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22AIS%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
     "count": 3
@@ -1627,10 +747,10 @@
     "count": 3
    },
    {
-    "name": "Swisscom",
-    "operator": "Swisscom",
+    "name": "TIM",
+    "operator": "TIM",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Swisscom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1638,10 +758,32 @@
     "count": 2
    },
    {
-    "name": "Rogers",
-    "operator": "Rogers",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Rogers%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Turkcell%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Telenor%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1653,6 +795,28 @@
     "operator": "du",
     "region": "africa_middle_east",
     "url": "https://www.bing.com/news/search?q=%22du%22%20%28Etisalat%20OR%20UAE%20OR%20Emirates%20OR%20EITC%29%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "KDDI",
+    "operator": "KDDI",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1682,10 +846,10 @@
     "count": 2
    },
    {
-    "name": "TPG Telecom",
-    "operator": "TPG Telecom",
+    "name": "Telstra",
+    "operator": "Telstra",
     "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22TPG%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1715,10 +879,10 @@
     "count": 1
    },
    {
-    "name": "Proximus",
-    "operator": "Proximus",
+    "name": "Telia",
+    "operator": "Telia",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Proximus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Telia%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1726,10 +890,21 @@
     "count": 1
    },
    {
-    "name": "Telia",
-    "operator": "Telia",
+    "name": "Swisscom",
+    "operator": "Swisscom",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Telia%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Swisscom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Proximus",
+    "operator": "Proximus",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Proximus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1759,34 +934,12 @@
     "count": 1
    },
    {
-    "name": "Elisa",
-    "operator": "Elisa",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
     "name": "Verizon",
     "operator": "Verizon",
     "region": "north_america",
     "url": "https://www.verizon.com/about/media-center",
     "kind": "newsroom",
     "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "TIM Brasil",
-    "operator": "TIM Brasil",
-    "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22TIM%20Brasil%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
     "count": 1
@@ -1803,10 +956,10 @@
     "count": 1
    },
    {
-    "name": "WOM",
-    "operator": "WOM",
+    "name": "TIM Brasil",
+    "operator": "TIM Brasil",
     "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22WOM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22TIM%20Brasil%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1814,10 +967,10 @@
     "count": 1
    },
    {
-    "name": "Ooredoo",
-    "operator": "Ooredoo",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Ooredoo%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Telecom Argentina",
+    "operator": "Telecom Argentina",
+    "region": "latin_america",
+    "url": "https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1836,6 +989,17 @@
     "count": 1
    },
    {
+    "name": "Ooredoo",
+    "operator": "Ooredoo",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Ooredoo%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
     "name": "SoftBank",
     "operator": "SoftBank",
     "region": "asia",
@@ -1847,21 +1011,10 @@
     "count": 1
    },
    {
-    "name": "Rakuten Mobile",
-    "operator": "Rakuten Mobile",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "One NZ",
-    "operator": "One NZ",
+    "name": "TPG Telecom",
+    "operator": "TPG Telecom",
     "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22One%20NZ%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22TPG%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1880,10 +1033,10 @@
     "count": 0
    },
    {
-    "name": "O2 Telefónica Deutschland",
-    "operator": "O2 Telefónica Deutschland",
+    "name": "Orange",
+    "operator": "Orange",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22O2%20Telef%C3%B3nica%20Deutschland%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1891,10 +1044,10 @@
     "count": 0
    },
    {
-    "name": "Telefónica",
-    "operator": "Telefónica",
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Telef%C3%B3nica%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22O2%20Telef%C3%B3nica%20Deutschland%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1908,6 +1061,17 @@
     "url": "https://newsroom.bt.com/",
     "kind": "newsroom",
     "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Telef%C3%B3nica%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "empty",
     "count": 0
@@ -1968,10 +1132,10 @@
     "count": 0
    },
    {
-    "name": "T-Mobile US",
-    "operator": "T-Mobile US",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22T-Mobile%20US%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2001,6 +1165,17 @@
     "count": 0
    },
    {
+    "name": "T-Mobile US",
+    "operator": "T-Mobile US",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22T-Mobile%20US%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "Millicom",
     "operator": "Millicom",
     "region": "latin_america",
@@ -2023,10 +1198,10 @@
     "count": 0
    },
    {
-    "name": "Telecom Argentina",
-    "operator": "Telecom Argentina",
+    "name": "WOM",
+    "operator": "WOM",
     "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22WOM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2078,10 +1253,10 @@
     "count": 0
    },
    {
-    "name": "Orange MEA",
-    "operator": "Orange MEA",
+    "name": "stc",
+    "operator": "stc",
     "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Orange%20MEA%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22stc%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2111,10 +1286,10 @@
     "count": 0
    },
    {
-    "name": "stc",
-    "operator": "stc",
+    "name": "Orange MEA",
+    "operator": "Orange MEA",
     "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22stc%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Orange%20MEA%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2199,10 +1374,10 @@
     "count": 0
    },
    {
-    "name": "Telkomsel",
-    "operator": "Telkomsel",
+    "name": "AIS",
+    "operator": "AIS",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Telkomsel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22AIS%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2210,10 +1385,10 @@
     "count": 0
    },
    {
-    "name": "CelcomDigi",
-    "operator": "CelcomDigi",
+    "name": "Telkomsel",
+    "operator": "Telkomsel",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22CelcomDigi%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Telkomsel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2243,6 +1418,17 @@
     "count": 0
    },
    {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Maxis%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "Optus",
     "operator": "Optus",
     "region": "oceania",
@@ -2254,21 +1440,10 @@
     "count": 0
    },
    {
-    "name": "Telstra",
-    "operator": "Telstra",
-    "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Maxis",
-    "operator": "Maxis",
+    "name": "CelcomDigi",
+    "operator": "CelcomDigi",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Maxis%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22CelcomDigi%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -2287,6 +1462,17 @@
     "count": 0
    },
    {
+    "name": "One NZ",
+    "operator": "One NZ",
+    "region": "oceania",
+    "url": "https://www.bing.com/news/search?q=%22One%20NZ%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "2degrees",
     "operator": "2degrees",
     "region": "oceania",
@@ -2300,52 +1486,44 @@
   ],
   "analysts": [
    {
-    "items_in": 19,
-    "batches": 2,
-    "batches_ok": 2,
-    "highlights": 10,
-    "model": "claude-sonnet-5",
-    "region": "Europa"
-   },
-   {
-    "items_in": 45,
-    "batches": 3,
-    "batches_ok": 3,
-    "highlights": 28,
-    "model": "claude-sonnet-5",
+    "items_in": 6,
+    "batches": 1,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "deepseek-ai/deepseek-v4-pro",
     "region": "Global"
-   },
-   {
-    "items_in": 19,
-    "batches": 2,
-    "batches_ok": 2,
-    "highlights": 15,
-    "model": "claude-sonnet-5",
-    "region": "Asien"
-   },
-   {
-    "items_in": 20,
-    "batches": 2,
-    "batches_ok": 2,
-    "highlights": 14,
-    "model": "claude-sonnet-5",
-    "region": "Nordamerika"
    },
    {
     "items_in": 6,
     "batches": 1,
-    "batches_ok": 1,
-    "highlights": 6,
-    "model": "claude-sonnet-5",
-    "region": "Afrika & Naher Osten"
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "deepseek-ai/deepseek-v4-pro",
+    "region": "Nordamerika"
+   },
+   {
+    "items_in": 4,
+    "batches": 1,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "deepseek-ai/deepseek-v4-pro",
+    "region": "Asien"
    },
    {
     "items_in": 1,
     "batches": 1,
-    "batches_ok": 1,
+    "batches_ok": 0,
     "highlights": 0,
-    "model": "claude-sonnet-5",
-    "region": "Ozeanien"
+    "model": "deepseek-ai/deepseek-v4-pro",
+    "region": "Europa"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "deepseek-ai/deepseek-v4-pro",
+    "region": "Afrika & Naher Osten"
    }
   ]
  }
