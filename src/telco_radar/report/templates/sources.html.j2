@@ -1,13 +1,14 @@
 {% extends "base.html.j2" %}
 {% set active = 'sources' %}
 {% block title %}Telco Radar - Quellen{% endblock %}
-{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Nachrichten-Suche','official':'Offiziell'} %}
+{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Nachrichten-Suche','official':'Newsroom'} %}
 {% block content %}
 <section class="hero">
   <p class="eyebrow">Was der Radar beobachtet</p>
   <h1>Überwachte Quellen</h1>
-  <p class="hero-sub">Jeder Netzbetreiber wird direkt beobachtet: über seinen Newsroom und über eine
-  laufende Google-News-Abfrage. Jede Quelle ist verlinkt und nachprüfbar.</p>
+  <p class="hero-sub">Jeder Netzbetreiber wird über eine laufende Nachrichten-Suche und über die
+  internationale Telco-Fachpresse beobachtet. Der Newsroom-Link dient als offizielle Referenz.
+  Jede Quelle ist verlinkt und nachprüfbar.</p>
 </section>
 
 {% for region, ops in by_region.items() %}

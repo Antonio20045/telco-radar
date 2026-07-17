@@ -11,6 +11,11 @@ regions:
   europe:
     name: "Europa"
     operators:
+      - name: "1&1"
+        aliases: ["1und1", "United Internet", "Drillisch"]
+        country: "DE"
+        news_query: '"1&1" (Mobilfunk OR 5G OR Netz OR Drillisch OR "United Internet" OR Tarif)'
+        sources: []
       - name: "Bouygues Telecom"
         aliases: []
         country: "FR"

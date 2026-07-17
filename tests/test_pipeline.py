@@ -15,6 +15,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 def project(tmp_path):
     """Minimal project root with real config structure."""
     shutil.copytree(PROJECT_ROOT / "config", tmp_path / "config")
+    # this end-to-end test exercises the newsroom parser, so enable that path
+    # (production keeps crawl_newsrooms: false) and drop auto Bing feeds/focus
+    settings = (tmp_path / "config" / "settings.yaml").read_text(encoding="utf-8")
+    settings += "\ncrawl_newsrooms: true\nauto_operator_news: false\nfocus_competitors: []\n"
+    (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     # shrink watchlist to one operator + one news feed for the test
     (tmp_path / "config" / "watchlist.yaml").write_text(
         """

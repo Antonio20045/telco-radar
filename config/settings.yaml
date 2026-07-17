@@ -41,6 +41,21 @@ max_items_per_region: 45
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 
+# Operator newsrooms are JS-only or yield navigation junk (audited) -> do NOT
+# crawl them; operators are covered via Bing news-search + trade-press tagging,
+# which give clean, real article links. Newsroom URLs stay as reference links.
+crawl_newsrooms: false
+
+# Focus competitors for the dedicated "Wettbewerber" deep-dive tab. Each gets a
+# fresh per-competitor news pull + an AI profile every run.
+focus_competitors:
+  - name: "Deutsche Telekom"
+    query: '"Deutsche Telekom"'
+  - name: "O2 Telefónica"
+    query: '("O2 Telefónica" OR "Telefónica Deutschland" OR "O2 Germany" OR Telefónica) (mobil OR 5G OR Netz OR Tarif OR telecom)'
+  - name: "1&1"
+    query: '"1&1" (Mobilfunk OR 5G OR Netz OR Drillisch OR "United Internet" OR Tarif)'
+
 # HTTP settings for collectors
 http:
   timeout_seconds: 20

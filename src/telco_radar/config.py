@@ -86,6 +86,7 @@ class Config:
     operators: list[Operator]
     news_sources: list[Source]
     region_names: dict[str, str]
+    focus_competitors: list[dict] = field(default_factory=list)
 
     @property
     def lookback_days(self) -> int:
@@ -117,6 +118,7 @@ def load_config(root: Path) -> Config:
                 base_regions[rk] = rgn
 
     auto_news = bool(settings.get("auto_operator_news", True))
+    crawl_newsrooms = bool(settings.get("crawl_newsrooms", True))
     window = int(settings.get("lookback_days", 8))
 
     operators: list[Operator] = []
@@ -128,12 +130,15 @@ def load_config(root: Path) -> Config:
             sources: list[Source] = []
             for s in (op.get("sources") or []):
                 stype = s.get("type", "newsroom")
+                kind = s.get("kind", stype)
+                if stype == "newsroom" and not crawl_newsrooms:
+                    kind = "official"  # shown as a reference link, not crawled
                 sources.append(Source(
                     type=stype,
                     url=s["url"],
                     name=op["name"],
                     item_selector=s.get("item_selector"),
-                    kind=s.get("kind", stype),
+                    kind=kind,
                     label=s.get("label", ""),
                 ))
             # Auto per-operator Google News feed: guarantees every operator has
@@ -174,4 +179,5 @@ def load_config(root: Path) -> Config:
         operators=operators,
         news_sources=news_sources,
         region_names=region_names,
+        focus_competitors=settings.get("focus_competitors") or [],
     )

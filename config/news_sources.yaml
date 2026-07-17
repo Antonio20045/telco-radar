@@ -38,6 +38,9 @@ news_sources:
   - name: "The Fast Mode"
     type: rss
     url: "https://www.thefastmode.com/?format=feed&type=rss"
-  - name: "Advanced Television"
+  - name: "Telecompetitor"
     type: rss
-    url: "https://advanced-television.com/feed/"
+    url: "https://www.telecompetitor.com/feed/"
+  - name: "TelecomTalk"
+    type: rss
+    url: "https://telecomtalk.info/feed/"

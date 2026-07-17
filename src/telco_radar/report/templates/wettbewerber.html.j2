@@ -1,0 +1,64 @@
+{% extends "base.html.j2" %}
+{% set active = 'wettbewerber' %}
+{% block title %}Telco Radar - Wettbewerber{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div class="hero-row">
+    <h1>Wettbewerber im Detail</h1>
+    {% if date_de %}<span class="hero-date">Stand {{ date_de }}</span>{% endif %}
+  </div>
+  <p class="hero-lead">Tiefenanalyse der wichtigsten Rivalen: was sie gerade tun und was das für Vodafone bedeutet. Jeder Punkt mit Quelle.</p>
+</section>
+
+{% if competitors and competitors|selectattr('summary')|list %}
+<nav class="pagenav">
+  {% for c in competitors %}<a href="#c{{ loop.index }}">{{ c.name }}</a>{% endfor %}
+</nav>
+
+{% for c in competitors %}
+{% if c.summary or c.moves %}
+<section class="section competitor" id="c{{ loop.index }}">
+  <div class="section-head">
+    <h2><span class="sec-no">{{ '%02d' % loop.index }}</span> Wettbewerber</h2>
+    <p class="section-title">{{ c.name }}</p>
+  </div>
+
+  <div class="comp-grid">
+    <div class="comp-main">
+      {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
+      {% if c.themes %}<div class="chip-row">{% for t in c.themes %}<span class="chip">{{ t }}</span>{% endfor %}</div>{% endif %}
+      {% if c.vodafone_implication %}
+      <div class="why"><span class="why-label">Was das für Vodafone heißt</span>{{ c.vodafone_implication }}</div>
+      {% endif %}
+    </div>
+    <aside class="comp-side">
+      <div class="stat-box"><span class="stat-num">{{ c.n_items }}</span><span class="stat-label">Meldungen ausgewertet</span></div>
+      <div class="stat-box"><span class="stat-num">{{ c.moves|length }}</span><span class="stat-label">relevante Moves</span></div>
+    </aside>
+  </div>
+
+  {% if c.moves %}
+  <h3 class="comp-moves-title">Aktuelle Moves</h3>
+  <div class="move-list">
+    {% for m in c.moves %}
+    <article class="move">
+      <span class="move-cat" style="background:{{ m.color }}">{{ m.category }}</span>
+      <div class="move-body">
+        <a class="move-title" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
+        {% if m.note %}<p class="move-note">{{ m.note }}</p>{% endif %}
+        <a class="source-link" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.domain }} &nearr;</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+{% endfor %}
+
+{% else %}
+<section class="section" style="padding-top:24px">
+  <p class="empty-note">Für diesen Lauf liegt noch keine Wettbewerber-Detailanalyse vor. Sie entsteht beim nächsten Lauf der Pipeline (benötigt die KI-Analyse).</p>
+</section>
+{% endif %}
+{% endblock %}

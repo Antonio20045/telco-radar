@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .analyze import editor
 from .analyze.agents import analyze_region
+from .analyze import competitors as competitor_mod
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
 from .config import load_config
@@ -171,6 +172,20 @@ def run(root: Path, use_llm: bool | None = None,
     for r in regional.values():
         r.pop("_telemetry", None)
 
+    # ------------------------------------------------ competitor deep-dives
+    competitor_profiles: list[dict] = []
+    if use_llm and cfg.focus_competitors:
+        tcomp = time.monotonic()
+        try:
+            competitor_profiles = competitor_mod.analyze_all(
+                cfg.focus_competitors, editor_model,
+                cfg.settings.get("http", {}), language)
+        except Exception as exc:  # noqa: BLE001
+            log.error("Competitor deep-dive failed: %s", exc)
+        phase("Wettbewerber-Analyse", time.monotonic() - tcomp,
+              f"{len(competitor_profiles)} Profile "
+              f"({sum(len(c.get('moves') or []) for c in competitor_profiles)} Moves)")
+
     # enrich highlights with date + source from the collected items
     by_url = {i.url: i for i in new_items}
     for region in regional.values():
@@ -237,6 +252,7 @@ def run(root: Path, use_llm: bool | None = None,
         "stats": stats,
         "briefing_md": body,
         "regions": regional,
+        "competitors": competitor_profiles,
         "run": run_log,
     }
     json_path = reports_dir / f"{today.isoformat()}.json"
