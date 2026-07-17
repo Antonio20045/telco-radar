@@ -346,7 +346,8 @@ regions:
         sources:
           - type: newsroom
             url: "https://media.one.nz"
-      - name: "Spark"            # bot-protected -> trade press
+      - name: "Spark"            # ambiguous name -> pin query to the NZ telco
         aliases: ["Spark New Zealand"]
         country: "NZ"
+        news_query: '"Spark New Zealand"'
         sources: []

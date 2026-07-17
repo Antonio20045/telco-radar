@@ -1,7 +1,7 @@
 {% extends "base.html.j2" %}
 {% set active = 'sources' %}
 {% block title %}Telco Radar - Quellen{% endblock %}
-{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Google News','official':'Offiziell'} %}
+{% set kmap = {'newsroom':'Newsroom','rss':'RSS','news_search':'Nachrichten-Suche','official':'Offiziell'} %}
 {% block content %}
 <section class="hero">
   <p class="eyebrow">Was der Radar beobachtet</p>
@@ -25,7 +25,7 @@
         <li>
           <span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
           {% if s.kind == 'news_search' %}
-          <a href="{{ s.url | replace('/rss/search','/search') }}" target="_blank" rel="noopener">Meldungen zu {{ op.name }} &nearr;</a>
+          <a href="https://news.google.com/search?q=&quot;{{ op.name | urlencode }}&quot;" target="_blank" rel="noopener">Aktuelle Meldungen zu {{ op.name }} &nearr;</a>
           {% else %}
           <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a>
           {% endif %}

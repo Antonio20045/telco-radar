@@ -78,6 +78,7 @@ regions:
       - name: "du"
         aliases: ["EITC"]
         country: "AE"
+        news_query: '"du" (Etisalat OR UAE OR Emirates OR EITC)'
         sources: []
       - name: "Maroc Telecom"
         aliases: []

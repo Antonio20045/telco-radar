@@ -35,3 +35,9 @@ news_sources:
   - name: "Telecoms Tech News"
     type: rss
     url: "https://www.telecomstechnews.com/feed/"
+  - name: "The Fast Mode"
+    type: rss
+    url: "https://www.thefastmode.com/?format=feed&type=rss"
+  - name: "Advanced Television"
+    type: rss
+    url: "https://advanced-television.com/feed/"

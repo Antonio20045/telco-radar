@@ -2,15 +2,18 @@
 
 Handles two shapes:
   * normal operator / trade-press feeds
-  * Google News search feeds (kind "news_search"): the entry <source> element
-    carries the real publisher, which we surface as the item's source name so
-    the report shows "Reuters" / "Light Reading" instead of "news.google.com".
+  * per-operator web-news search feeds (kind "news_search"). We use Bing News
+    RSS: its item links are redirects of the form
+    bing.com/news/apiclick.aspx?...&url=<REAL_URL>. We pull out the `url=`
+    param so the stored link is the DIRECT publisher article - not an
+    aggregator/consent page.
 """
 from __future__ import annotations
 
 import logging
 import random
 import time
+import urllib.parse
 from datetime import datetime, timezone
 
 import feedparser
@@ -25,7 +28,6 @@ MAX_ENTRIES_PER_FEED = 40
 
 
 def _strip_html(text: str) -> str:
-    """Some feeds embed HTML inside titles/summaries - flatten to plain text."""
     if "<" not in text:
         return text.strip()
     return BeautifulSoup(text, "html.parser").get_text(" ", strip=True)
@@ -42,16 +44,24 @@ def _entry_date(entry) -> datetime | None:
     return None
 
 
-def _publisher(entry, fallback: str) -> str:
-    """For Google-News-style feeds, entry.source.title is the real outlet."""
-    src = entry.get("source")
-    if src is not None:
-        title = getattr(src, "title", None)
-        if not title and isinstance(src, dict):
-            title = src.get("title")
-        if title:
-            return str(title).strip()
-    return fallback
+def _direct_url(link: str) -> str | None:
+    """Extract the real publisher URL from a Bing news redirect link.
+
+    Returns None if the link is a bare aggregator link with no target, so the
+    caller can drop it rather than store a non-article URL.
+    """
+    parts = urllib.parse.urlsplit(link)
+    host = parts.netloc.lower()
+    if "bing.com" in host and "apiclick" in parts.path:
+        qs = urllib.parse.parse_qs(parts.query)
+        target = qs.get("url", [None])[0]
+        if target and target.startswith(("http://", "https://")):
+            return target
+        return None
+    # already a direct link (some Bing items are direct)
+    if "bing.com" in host or "news.google.com" in host:
+        return None
+    return link
 
 
 def parse_feed_bytes(raw: bytes, source: Source, region: str,
@@ -69,12 +79,16 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
         link = (entry.get("link") or "").strip()
         if not title or not link:
             continue
-        # Google News appends " - Publisher" to the title; keep it clean.
+
         source_name = default_name
         if is_news_search:
-            source_name = _publisher(entry, default_name)
-            if title.endswith(f" - {source_name}"):
-                title = title[: -(len(source_name) + 3)].strip()
+            direct = _direct_url(link)
+            if not direct:
+                continue  # no real article behind it -> skip, never store a redirect
+            link = direct
+            # publisher = the article's own domain (honest + human readable)
+            source_name = urllib.parse.urlsplit(link).netloc.removeprefix("www.")
+
         summary = _strip_html(entry.get("summary") or entry.get("description") or "")
         items.append(
             Item(
@@ -94,8 +108,8 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 def collect_rss(source: Source, region: str, operator: str | None,
                 origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
-    # Spread out the many per-operator news-search feeds so they don't hit
-    # the aggregator as one synchronized burst (which triggers 429/503).
+    # Spread out the many per-operator news-search feeds so they don't hit the
+    # search engine as one synchronized burst (which triggers 429/503).
     if source.kind == "news_search":
         time.sleep(random.uniform(0, 3.0))
     resp = fetch(source.url, http_cfg)

@@ -24,14 +24,23 @@ log = logging.getLogger(__name__)
 _CRAWLED_KINDS = {"newsroom", "rss", "news_search"}
 
 
-def google_news_rss(query: str, window_days: int = 8,
-                    hl: str = "en-US", gl: str = "US",
-                    ceid: str = "US:en") -> str:
-    """Build a Google News RSS search URL for one operator/topic."""
-    q = f"{query} when:{window_days}d"
-    return ("https://news.google.com/rss/search?q="
-            + urllib.parse.quote(q)
-            + f"&hl={hl}&gl={gl}&ceid={ceid}")
+# Telecom context terms that disambiguate operator names (e.g. "Orange" the
+# operator vs. the colour/film) in a web-news search.
+_TELCO_SCOPE = "(5G OR mobile OR telecom OR network OR broadband OR tariff OR wireless OR operator)"
+
+
+def bing_news_rss(query: str) -> str:
+    """Bing News RSS search for one operator. Bing returns a redirect whose
+    `url=` param is the DIRECT publisher article URL (see collect/rss.py),
+    so links go to the real story, not an aggregator consent wall."""
+    q = f"{query} {_TELCO_SCOPE}"
+    return ("https://www.bing.com/news/search?q="
+            + urllib.parse.quote(q) + "&format=rss")
+
+
+def news_search_page(name: str) -> str:
+    """Clean, human-facing 'all news about this operator' reference page."""
+    return "https://news.google.com/search?q=" + urllib.parse.quote(f'"{name}"')
 
 
 @dataclass
@@ -133,10 +142,10 @@ def load_config(root: Path) -> Config:
                 query = op.get("news_query") or f'"{op["name"]}"'
                 sources.append(Source(
                     type="rss",
-                    url=google_news_rss(query, window_days=window),
+                    url=bing_news_rss(query),
                     name=op["name"],
                     kind="news_search",
-                    label="Google News",
+                    label="Nachrichten-Suche",
                 ))
             operators.append(Operator(
                 name=op["name"],
