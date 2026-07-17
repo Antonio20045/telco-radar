@@ -1,46 +1,26 @@
 # =============================================================================
-# TELCO RADAR - Industry news sources (second signal layer)
+# TELCO RADAR - Telco trade press (the primary, telco-only signal layer)
 # =============================================================================
-# Global telco trade press. Items are auto-tagged to a region when an
-# operator from the watchlist is mentioned in the headline; otherwise "Global".
-# RSS preferred: entries carry publish dates -> clean freshness filtering.
-# Every feed here is validated (scripts/validate_sources.py).
+# ONLY specialised telecom trade press + working operator press feeds. Every
+# item is a real telco article with a direct publisher link. Items are tagged
+# to a watchlist operator when its name/alias appears in the headline.
+# No keyword news-search (that pulled in off-topic noise). Validate: scripts/validate_sources.py
 # =============================================================================
-
 news_sources:
-  - name: "Mobile World Live"
-    type: rss
-    url: "https://www.mobileworldlive.com/feed/"
-  - name: "Total Telecom"
-    type: rss
-    url: "https://totaltele.com/feed/"
-  - name: "RCR Wireless"
-    type: rss
-    url: "https://www.rcrwireless.com/feed"
-  - name: "Light Reading"
-    type: rss
-    url: "https://www.lightreading.com/rss.xml"
-  - name: "Fierce Network"
-    type: rss
-    url: "https://www.fierce-network.com/rss/xml"
-  - name: "Developing Telecoms"
-    type: rss
-    url: "https://developingtelecoms.com/?format=feed&type=rss"
-  - name: "Broadband TV News"
-    type: rss
-    url: "https://www.broadbandtvnews.com/feed/"
-  - name: "Mobile Europe"
-    type: rss
-    url: "https://www.mobileeurope.co.uk/feed/"
-  - name: "Telecoms Tech News"
-    type: rss
-    url: "https://www.telecomstechnews.com/feed/"
-  - name: "The Fast Mode"
-    type: rss
-    url: "https://www.thefastmode.com/?format=feed&type=rss"
-  - name: "Telecompetitor"
-    type: rss
-    url: "https://www.telecompetitor.com/feed/"
-  - name: "TelecomTalk"
-    type: rss
-    url: "https://telecomtalk.info/feed/"
+  # -- international telecom trade press
+  - {name: "Mobile World Live", type: rss, url: "https://www.mobileworldlive.com/feed/"}
+  - {name: "Light Reading", type: rss, url: "https://www.lightreading.com/rss.xml"}
+  - {name: "Fierce Network", type: rss, url: "https://www.fierce-network.com/rss/xml"}
+  - {name: "Total Telecom", type: rss, url: "https://totaltele.com/feed/"}
+  - {name: "RCR Wireless", type: rss, url: "https://www.rcrwireless.com/feed"}
+  - {name: "Developing Telecoms", type: rss, url: "https://developingtelecoms.com/?format=feed&type=rss"}
+  - {name: "Mobile Europe", type: rss, url: "https://www.mobileeurope.co.uk/feed/"}
+  - {name: "Broadband TV News", type: rss, url: "https://www.broadbandtvnews.com/feed/"}
+  - {name: "Telecoms Tech News", type: rss, url: "https://www.telecomstechnews.com/feed/"}
+  - {name: "The Fast Mode", type: rss, url: "https://www.thefastmode.com/?format=feed&type=rss"}
+  - {name: "Telecompetitor", type: rss, url: "https://www.telecompetitor.com/feed/"}
+  - {name: "TelecomTalk", type: rss, url: "https://telecomtalk.info/feed/"}
+  - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
+  - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
+  # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
+  - {name: "inside digital", type: rss, url: "https://www.inside-digital.de/feed"}

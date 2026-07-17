@@ -14,6 +14,7 @@ report_language: "de"
 # `model` stays as a backwards-compatible fallback for both roles.
 # ---------------------------------------------------------------------------
 # Anthropic models (fallback - used only if no OpenAI-compatible key is set)
+auto_operator_news: false   # keine Stichwort-Nachrichtensuche
 model: "claude-sonnet-5"
 analyst_model: "claude-sonnet-5"
 editor_model: "claude-sonnet-5"
@@ -50,11 +51,11 @@ crawl_newsrooms: false
 # fresh per-competitor news pull + an AI profile every run.
 focus_competitors:
   - name: "Deutsche Telekom"
-    query: '"Deutsche Telekom"'
-  - name: "O2 Telefónica"
-    query: '("O2 Telefónica" OR "Telefónica Deutschland" OR "O2 Germany" OR Telefónica) (mobil OR 5G OR Netz OR Tarif OR telecom)'
+    aliases: ["Telekom", "T-Mobile", "T-Systems", "Magenta"]
+  - name: "Telefónica / O2"
+    aliases: ["O2", "Telefónica", "Telefonica", "Movistar", "Virgin Media O2"]
   - name: "1&1"
-    query: '"1&1" (Mobilfunk OR 5G OR Netz OR Drillisch OR "United Internet" OR Tarif)'
+    aliases: ["1&1", "1und1", "United Internet", "Drillisch"]
 
 # HTTP settings for collectors
 http:

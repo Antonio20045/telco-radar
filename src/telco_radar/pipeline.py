@@ -177,9 +177,9 @@ def run(root: Path, use_llm: bool | None = None,
     if use_llm and cfg.focus_competitors:
         tcomp = time.monotonic()
         try:
+            comp_model = cfg.settings.get("openai_analyst_model", editor_model) if use_openai else editor_model
             competitor_profiles = competitor_mod.analyze_all(
-                cfg.focus_competitors, cfg.settings.get('openai_analyst_model', editor_model) if use_openai else editor_model,
-                cfg.settings.get("http", {}), language)
+                cfg.focus_competitors, items, comp_model, language)
         except Exception as exc:  # noqa: BLE001
             log.error("Competitor deep-dive failed: %s", exc)
         phase("Wettbewerber-Analyse", time.monotonic() - tcomp,

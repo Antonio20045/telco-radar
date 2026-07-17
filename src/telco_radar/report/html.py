@@ -115,25 +115,42 @@ def _bar_chart_svg(rows, width=520, row_h=40, label_w=180) -> str:
     return "".join(parts)
 
 
+REL_COLORS = {5: "#e60000", 4: "#e07a00", 3: "#3860be", 2: "#9aa0aa"}
+
+
 def _charts(highlights) -> dict:
-    by_op = {}
+    by_op, by_cat, by_reg = {}, {}, {}
+    by_rel = {5: 0, 4: 0, 3: 0, 2: 0}
     for h in highlights:
         op = (h.get("operator") or "").strip()
         if op:
             by_op[op] = by_op.get(op, 0) + 1
-    comp_rows = sorted(by_op.items(), key=lambda kv: -kv[1])[:8]
-    competitors = _bar_chart_svg([(k, v, "#e60000") for k, v in comp_rows])
-
-    by_cat = {}
-    for h in highlights:
         by_cat[h["category"]] = by_cat.get(h["category"], 0) + 1
-    cat_rows = sorted(by_cat.items(), key=lambda kv: -kv[1])[:8]
-    categories = _bar_chart_svg(
-        [(k, v, CATEGORY_COLORS.get(k, "#7e7e7e")) for k, v in cat_rows])
+        by_reg[h["region"]] = by_reg.get(h["region"], 0) + 1
+        r = max(2, min(5, h.get("relevance") or 2))
+        by_rel[r] += 1
 
-    return {"competitors": competitors, "categories": categories,
-            "n_competitors": len(by_op),
-            "top_category": cat_rows[0][0] if cat_rows else ""}
+    comp_rows = sorted(by_op.items(), key=lambda kv: -kv[1])[:8]
+    cat_rows = sorted(by_cat.items(), key=lambda kv: -kv[1])[:8]
+    reg_rows = sorted(by_reg.items(), key=lambda kv: -kv[1])[:8]
+    rel_rows = [(f"{r}/5 · {RELEVANCE_LABELS[r]}", by_rel[r], REL_COLORS[r])
+                for r in (5, 4, 3, 2) if by_rel[r]]
+
+    n_urgent = by_rel[5] + by_rel[4]
+    return {
+        "competitors": _bar_chart_svg([(k, v, "#e60000") for k, v in comp_rows]),
+        "categories": _bar_chart_svg(
+            [(k, v, CATEGORY_COLORS.get(k, "#7e7e7e")) for k, v in cat_rows]),
+        "regions": _bar_chart_svg([(k, v, "#3860be") for k, v in reg_rows]),
+        "urgency": _bar_chart_svg(rel_rows, label_w=150),
+        "insights": [
+            {"num": len(highlights), "label": "relevante Signale"},
+            {"num": n_urgent, "label": "dringend (4–5/5)", "accent": True},
+            {"num": len(by_op), "label": "Wettbewerber aktiv"},
+            {"num": (cat_rows[0][0] if cat_rows else "–"), "label": "Top-Thema", "text": True},
+        ],
+        "n_competitors": len(by_op),
+    }
 
 
 def _prep_competitors(report: dict) -> list[dict]:

@@ -5,19 +5,21 @@
 {% block content %}
 {% if report %}
 
-<section class="hero compact">
-  <div class="hero-row">
-    <h1>{{ date_de }}</h1>
-    <div class="kpis inline">
-      <div class="kpi"><span class="kpi-num">{{ report.stats.get('operators', num_operators or '–') }}</span><span class="kpi-label">Betreiber</span></div>
-      <div class="kpi"><span class="kpi-num">{{ report.stats.get('collected', '–') }}</span><span class="kpi-label">Meldungen geprüft</span></div>
-      <div class="kpi accent"><span class="kpi-num">{{ report.stats.get('new', '–') }}</span><span class="kpi-label">neu diese Woche</span></div>
-    </div>
+<section class="hero">
+  <h1>{{ date_de }}</h1>
+  <div class="metastrip">
+    <span><b>{{ report.stats.get('operators', num_operators or '–') }}</b> Betreiber beobachtet</span>
+    <span class="dot"></span>
+    <span><b>{{ report.stats.get('sources_ok', report.stats.get('sources_total','–')) }}</b> Fachpresse-Quellen</span>
+    <span class="dot"></span>
+    <span><b>{{ report.stats.get('collected', '–') }}</b> Artikel geprüft</span>
+    <span class="dot"></span>
+    <span class="hl"><b>{{ report.stats.get('new', '–') }}</b> neu diese Woche</span>
   </div>
   <details class="explainer">
     <summary>Wie entsteht dieser Bericht? <span class="hint">Kurz erklärt</span></summary>
     <div class="explainer-body">
-      <p><b>Sammeln.</b> Jede Woche werden die internationale Telco-Fachpresse und eine laufende Nachrichten-Suche zu {{ num_operators or 80 }} Netzbetreibern ausgewertet.</p>
+      <p><b>Sammeln.</b> Jede Woche wird die internationale und deutsche Telco-Fachpresse ausgewertet ({{ report.stats.get('sources_total','15') }} Quellen). Jeder Artikel stammt direkt von einem Fachmedium.</p>
       <p><b>Nur Neues.</b> Was schon berichtet wurde, wird aussortiert. Hier steht nur, was seit dem letzten Bericht dazugekommen ist.</p>
       <p><b>Bewerten.</b> Jede Meldung wird eingeordnet: Was ist passiert, was kann Vodafone daraus machen? Dringlichkeit 1–5
         <span class="legend"><i class="ldot r5"></i>5 sofort</span><span class="legend"><i class="ldot r4"></i>4 wichtig</span><span class="legend"><i class="ldot r3"></i>3 beobachten</span>.</p>
@@ -29,7 +31,7 @@
 <nav class="pagenav">
   {% if top_priorities %}<a href="#prioritaet">Prioritäten</a>{% endif %}
   {% if briefing_html %}<a href="#bericht">Wochenbericht</a>{% endif %}
-  {% if charts %}<a href="#zahlen">Zahlen</a>{% endif %}
+  {% if charts %}<a href="#zahlen">Zahlen &amp; Insights</a>{% endif %}
   {% if n_competitors %}<a href="{{ prefix }}wettbewerber.html">Wettbewerber &nearr;</a>{% endif %}
   {% if highlights %}<a href="#explorer">Alle Meldungen</a>{% endif %}
 </nav>
@@ -66,19 +68,21 @@
 
 {% if charts %}
 <section class="section" id="zahlen">
-  <div class="section-head"><h2><span class="sec-no">03</span> Die Woche in Zahlen</h2>
-    <p class="section-title">Wer bewegt sich, worum geht es</p></div>
+  <div class="section-head"><h2><span class="sec-no">03</span> Zahlen &amp; Insights</h2>
+    <p class="section-title">Die Woche in Kennzahlen</p></div>
+  <div class="insight-row">
+    {% for k in charts.insights %}
+    <div class="insight{% if k.accent %} accent{% endif %}">
+      <span class="insight-num{% if k.text %} text{% endif %}">{{ k.num }}</span>
+      <span class="insight-label">{{ k.label }}</span>
+    </div>
+    {% endfor %}
+  </div>
   <div class="chart-grid two">
-    <div class="panel">
-      <h3 class="panel-title">Aktivste Wettbewerber</h3>
-      <p class="panel-note">Wer diese Woche die meisten relevanten Meldungen produziert hat.</p>
-      {{ charts.competitors | safe }}
-    </div>
-    <div class="panel">
-      <h3 class="panel-title">Themen-Schwerpunkte</h3>
-      <p class="panel-note">Worum es bei den relevanten Meldungen geht.</p>
-      {{ charts.categories | safe }}
-    </div>
+    <div class="panel"><h3 class="panel-title">Aktivste Wettbewerber</h3><p class="panel-note">Wer diese Woche am meisten relevante Meldungen produziert hat.</p>{{ charts.competitors | safe }}</div>
+    <div class="panel"><h3 class="panel-title">Themen-Schwerpunkte</h3><p class="panel-note">Worum es bei den relevanten Meldungen geht.</p>{{ charts.categories | safe }}</div>
+    <div class="panel"><h3 class="panel-title">Dringlichkeit</h3><p class="panel-note">Wie viele Meldungen wie dringend sind.</p>{{ charts.urgency | safe }}</div>
+    <div class="panel"><h3 class="panel-title">Aktivste Regionen</h3><p class="panel-note">Wo diese Woche am meisten passiert.</p>{{ charts.regions | safe }}</div>
   </div>
   {% if n_competitors %}<p class="section-more"><a href="{{ prefix }}wettbewerber.html">Detailanalyse der wichtigsten Wettbewerber &nearr;</a></p>{% endif %}
 </section>
