@@ -146,18 +146,11 @@
 </section>
 {% endif %}
 
-{% if briefing_sections %}
+{% if briefing_html %}
 <section class="section" id="bericht">
   <div class="section-head"><h2><span class="sec-no">04</span> Wochenbericht</h2>
-    <p class="section-title">Einordnung im Detail &ndash; aufklappen, was interessiert</p></div>
-  <div class="accordion">
-    {% for sec in briefing_sections %}
-    <details class="acc"{% if loop.first %} open{% endif %}>
-      <summary>{{ sec.title }}</summary>
-      <div class="acc-body prose">{{ sec.html | safe }}</div>
-    </details>
-    {% endfor %}
-  </div>
+    <p class="section-title">Einordnung und Handlungsempfehlungen</p></div>
+  <article class="briefing prose">{{ briefing_html | safe }}</article>
 </section>
 {% endif %}
 
