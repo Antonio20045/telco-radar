@@ -2,7 +2,7 @@ name: Telco Radar Run
 
 on:
   schedule:
-    - cron: "0 5 * * 1"   # every Monday 05:00 UTC
+    - cron: "0 10 * * 0"   # every Sunday 10:00 UTC (~12:00 in DE summer / 11:00 winter)
   workflow_dispatch:
     inputs:
       lookback_days:
