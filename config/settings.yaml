@@ -28,7 +28,7 @@ editor_model: "claude-sonnet-5"
 #   Gemini (OpenAI): https://generativelanguage.googleapis.com/v1beta/openai
 # ---------------------------------------------------------------------------
 llm_api_base: "https://integrate.api.nvidia.com/v1"
-openai_analyst_model: "deepseek-ai/deepseek-v4-pro"   # aktuelles Gratis-Frontier-Modell bei NVIDIA
+openai_analyst_model: "deepseek-ai/deepseek-v4-flash"  # schnell, für die vielen Analyse-Aufrufe
 openai_editor_model: "deepseek-ai/deepseek-v4-pro"    # frontier-Qualitaet fuer die Synthese
 
 # Only items newer than this many days are considered (items without a
