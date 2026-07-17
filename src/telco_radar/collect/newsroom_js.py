@@ -46,12 +46,10 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
             )
             page.goto(url, wait_until="domcontentloaded",
                       timeout=int(timeout_s * 1000))
-            try:
-                page.wait_for_load_state("networkidle",
-                                         timeout=int(min(timeout_s, 8) * 1000))
-            except Exception:  # noqa: BLE001 - networkidle can time out on long-poll pages
-                pass
-            page.wait_for_timeout(1500)
+            # A short settle for client-side rendering. We deliberately do NOT
+            # wait for networkidle - many telco pages keep long-poll/analytics
+            # connections open and would burn the whole timeout budget.
+            page.wait_for_timeout(1800)
             return page.content()
         finally:
             browser.close()

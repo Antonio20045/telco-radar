@@ -124,35 +124,51 @@ def _delta(cur, prev):
             "dir": "up" if d > 0 else ("down" if d < 0 else "flat")}
 
 
-def _sparkline(values, w=180, h=46, color="#e60000"):
-    vals = [float(v or 0) for v in values]
-    if len(vals) < 2:
-        vals = ([0.0] + vals) if vals else [0.0, 0.0]
-    n = len(vals)
-    lo, hi = min(vals), max(vals)
-    rng = (hi - lo) or 1.0
-    pad = 5
-    xs = [pad + (w - 2 * pad) * (k / (n - 1)) for k in range(n)]
-    ys = [h - pad - (h - 2 * pad) * ((v - lo) / rng) for v in vals]
-    pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(xs, ys))
-    area = f"{xs[0]:.1f},{h - pad:.1f} " + pts + f" {xs[-1]:.1f},{h - pad:.1f}"
-    return (f'<svg viewBox="0 0 {w} {h}" class="spark" preserveAspectRatio="none" '
-            f'role="img" aria-hidden="true">'
-            f'<polygon points="{area}" fill="{color}" opacity="0.12"/>'
-            f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2" '
-            f'stroke-linejoin="round" stroke-linecap="round"/>'
-            f'<circle cx="{xs[-1]:.1f}" cy="{ys[-1]:.1f}" r="3.2" fill="{color}"/></svg>')
+TECH_THEMES = [
+    ("5G Standalone", ["standalone", "5g sa", "5g-sa", "5g core", "sa network", "5g+"]),
+    ("Satellit / NTN", ["satellite", "satellit", "ntn", "direct-to-cell", "direct to cell",
+                          "starlink", "spacemobile", "non-terrestrial", "d2c", "leo "]),
+    ("KI / AI", [" ai ", " ai-", "a.i.", "artificial intelligence", "genai", "gen ai",
+                  "agentic", "machine learning", " llm", "copilot", " ki ", "ki-"]),
+    ("Glasfaser / FTTH", ["fiber", "fibre", "ftth", "glasfaser", "gigabit", "broadband"]),
+    ("Private Networks", ["private 5g", "private network", "campus network", "private-5g"]),
+    ("IoT / eSIM", ["iot", "esim", "e-sim", "m2m", "internet of things"]),
+    ("Cloud / Edge", ["cloud", "edge computing", "hyperscaler", "edge-computing", " mec "]),
+    ("Open RAN", ["open ran", "openran", "o-ran", "oran", "vran", "v-ran"]),
+    ("6G", ["6g"]),
+    ("FWA", ["fwa", "fixed wireless", "fixed-wireless"]),
+]
+_PRICE_RE = re.compile(
+    r"(\d+\s?(gb|tb)\b)|([\u20ac$\u00a3]\s?\d)|(\d+[.,]?\d*\s?(euro|eur|dollar))"
+    r"|\b(unlimited|allnet|flatrate|flat\b|prepaid|tarif|tariff|pricing|price cut"
+    r"|preissenkung|g\u00fcnstig|per month|/month|im monat)\b", re.I)
+_DEAL_RE = re.compile(
+    r"\b(partners? with|teams up|collaborat|acquir|acquisition|merger|merge[sd]?"
+    r"|joint venture|\bjv\b|stake|kooperation|\u00fcbernahme|to buy|invest|alliance"
+    r"|allianz|partnership)\b", re.I)
+_RISK_KW = ["druck", "risiko", "kontern", "verteidig", "angriff", "bedroh", "nachteil",
+            "verlieren", "abwander", "aufholen", "hinterher", "nachziehen", "reagieren",
+            "gefahr", "verdr\u00e4ng", "marktanteil verlier", "unter zugzwang"]
+_CHANCE_KW = ["chance", "potenzial", "potential", "nutzen", "adaptier", "adoptier",
+              "lernen", "vorbild", "m\u00f6glichkeit", "opportun", "vorreiter",
+              "vorsprung", "differenzier", "erschlie\u00df", "wachstum"]
 
 
-def _short_de(iso):
-    try:
-        d = datetime.fromisoformat(iso)
-        return f"{d.day:02d}.{d.month:02d}."
-    except (ValueError, TypeError):
-        return iso or ""
+def _tag_tech(text):
+    t = " " + (text or "").lower() + " "
+    return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
 
 
-def _first_sentence(text, limit=160):
+def _classify_angle(why):
+    w = (why or "").lower()
+    r = sum(w.count(k) for k in _RISK_KW)
+    c = sum(w.count(k) for k in _CHANCE_KW)
+    if r == 0 and c == 0:
+        return "neutral"
+    return "risk" if r >= c else "chance"
+
+
+def _first_sentence(text, limit=170):
     t = " ".join((text or "").split())
     if not t:
         return ""
@@ -160,7 +176,7 @@ def _first_sentence(text, limit=160):
         k = t.find(sep)
         if 0 < k < limit:
             return t[:k + 1]
-    return (t[:limit].rstrip() + "…") if len(t) > limit else t
+    return (t[:limit].rstrip() + "\u2026") if len(t) > limit else t
 
 
 def _op_counts(report):
@@ -172,11 +188,20 @@ def _op_counts(report):
     return c
 
 
-def _cat_counts(report):
-    c = {}
-    for h in _flatten(report):
-        c[h["category"]] = c.get(h["category"], 0) + 1
-    return c
+def _briefing_sections(md_text):
+    if not md_text:
+        return []
+    parts = re.split(r"(?m)^##\s+(.+?)\s*$", md_text)
+    sections = []
+    pre = (parts[0] or "").strip()
+    if pre:
+        sections.append({"title": "\u00dcberblick", "html": _md_to_html(pre)})
+    for i in range(1, len(parts), 2):
+        title = parts[i].strip()
+        body = (parts[i + 1] if i + 1 < len(parts) else "").strip()
+        if title or body:
+            sections.append({"title": title, "html": _md_to_html(body)})
+    return sections
 
 
 def _stats(report, prev_report, trend_reports):
@@ -184,8 +209,6 @@ def _stats(report, prev_report, trend_reports):
     total = len(highlights) or 1
     cur_ops = _op_counts(report)
     prev_ops = _op_counts(prev_report) if prev_report else {}
-    cur_cats = _cat_counts(report)
-    prev_cats = _cat_counts(prev_report) if prev_report else {}
 
     sov = [{"op": k, "n": v, "pct": round(100 * v / total),
             "delta": _delta(v, prev_ops.get(k, 0))}
@@ -194,55 +217,81 @@ def _stats(report, prev_report, trend_reports):
     for s in sov:
         s["w"] = round(100 * s["n"] / sov_max)
 
-    momentum = [{"cat": k, "n": v, "delta": _delta(v, prev_cats.get(k, 0)),
-                 "color": CATEGORY_COLORS.get(k, "#7e7e7e")}
-                for k, v in sorted(cur_cats.items(), key=lambda kv: -kv[1])[:6]]
-    mom_max = max((m["n"] for m in momentum), default=1) or 1
-    for m in momentum:
-        m["w"] = round(100 * m["n"] / mom_max)
+    # --- Tech radar (keyword themes over the news text) ---
+    tech = {}
+    for h in highlights:
+        for name in _tag_tech(f"{h.get('title','')} {h.get('summary','')}"):
+            t = tech.setdefault(name, {"theme": name, "n": 0, "ops": {}, "ex": None})
+            t["n"] += 1
+            op = (h.get("operator") or "").strip()
+            if op:
+                t["ops"][op] = t["ops"].get(op, 0) + 1
+            if t["ex"] is None or (h.get("relevance") or 0) >= 4:
+                t["ex"] = {"title": h.get("title"), "url": h.get("url")}
+    tech_radar = sorted(tech.values(), key=lambda x: -x["n"])
+    tmax = max((t["n"] for t in tech_radar), default=1) or 1
+    for t in tech_radar:
+        t["w"] = round(100 * t["n"] / tmax)
+        t["ops_top"] = ", ".join(k for k, _ in sorted(t["ops"].items(), key=lambda kv: -kv[1])[:2])
 
-    comps = []
+    # --- Pricing radar ---
+    pricing = [{"op": h.get("operator") or h.get("source_label"), "title": h.get("title"),
+                "url": h.get("url"), "region": h.get("region")}
+               for h in highlights
+               if h.get("category") == "Tarif/Pricing"
+               or _PRICE_RE.search(f"{h.get('title','')} {h.get('summary','')}")][:6]
+
+    # --- Deals & partnerships ---
+    deals = [{"op": h.get("operator") or h.get("source_label"), "title": h.get("title"),
+              "url": h.get("url"), "region": h.get("region"), "cat": h.get("category")}
+             for h in highlights
+             if h.get("category") in ("Partnerschaft", "M&A")
+             or _DEAL_RE.search(h.get("title", ""))][:6]
+
+    # --- Chances vs risks for Vodafone ---
+    risks, chances = [], []
+    for h in highlights:
+        if (h.get("relevance") or 0) < 3 or not h.get("why_it_matters"):
+            continue
+        rec = {"title": h.get("title"), "op": h.get("operator") or h.get("source_label"),
+               "url": h.get("url"), "why": h.get("why_it_matters"),
+               "cat": h.get("category"), "region": h.get("region"),
+               "rel": h.get("relevance") or 0}
+        angle = _classify_angle(h.get("why_it_matters"))
+        if angle == "risk":
+            risks.append(rec)
+        elif angle == "chance":
+            chances.append(rec)
+    risks.sort(key=lambda r: -r["rel"])
+    chances.sort(key=lambda r: -r["rel"])
+    risks, chances = risks[:5], chances[:5]
+
+    # --- Competitor move-type matrix ---
+    move_matrix = []
     for c in (report.get("competitors") or []):
-        comps.append({"name": c.get("name"), "n": int(c.get("n_items") or 0),
-                      "impl": _first_sentence(c.get("vodafone_implication")),
-                      "themes": (c.get("themes") or [])[:3]})
-    comp_max = max((c["n"] for c in comps), default=1) or 1
-    for c in comps:
-        c["w"] = round(100 * c["n"] / comp_max)
+        cats = {}
+        for m in (c.get("moves") or []):
+            cat = m.get("category") or "Sonstiges"
+            cats[cat] = cats.get(cat, 0) + 1
+        move_matrix.append({
+            "name": c.get("name"), "n": int(c.get("n_items") or 0),
+            "impl": _first_sentence(c.get("vodafone_implication")),
+            "cats": sorted(cats.items(), key=lambda kv: -kv[1])[:4]})
 
-    series = list(reversed(trend_reports or []))
-    weeks = [_short_de(r.get("date", "")) for r in series]
-    vol = [int((r.get("stats") or {}).get("new") or 0) for r in series]
-    trend = {"weeks": weeks, "n": len(series),
-             "volume_spark": _sparkline(vol) if len(series) > 1 else "",
-             "volume_last": vol[-1] if vol else 0,
-             "volume_delta": _delta(vol[-1], vol[-2]) if len(vol) > 1 else _delta(0, 0),
-             "competitors": []}
-    for c in comps:
-        vals = []
-        for r in series:
-            m = next((x for x in (r.get("competitors") or [])
-                      if x.get("name") == c["name"]), None)
-            vals.append(int((m or {}).get("n_items") or 0))
-        trend["competitors"].append({
-            "name": c["name"],
-            "spark": _sparkline(vals) if len(series) > 1 else "",
-            "last": vals[-1] if vals else 0,
-            "delta": _delta(vals[-1], vals[-2]) if len(vals) > 1 else _delta(0, 0)})
-
-    top_comp = max(comps, key=lambda c: c["n"], default=None)
+    top_comp = max(move_matrix, key=lambda c: c["n"], default=None)
     kpis = [
         {"num": (report.get("stats") or {}).get("new", len(highlights)),
-         "label": "neu diese Woche"},
+         "label": "neue Meldungen"},
         {"num": sum(1 for h in highlights if h.get("relevance") == 5),
          "label": "sofort relevant (5/5)", "accent": True},
         {"num": (top_comp["name"] if top_comp and top_comp["n"] else "-"),
          "label": "aktivster Wettbewerber", "text": True},
-        {"num": (momentum[0]["cat"] if momentum else "-"),
-         "label": "Top-Thema", "text": True},
+        {"num": (tech_radar[0]["theme"] if tech_radar else "-"),
+         "label": "Top-Technologiethema", "text": True},
     ]
-    return {"kpis": kpis, "sov": sov, "momentum": momentum,
-            "competitors": comps, "trend": trend, "n_competitors": len(cur_ops)}
+    return {"kpis": kpis, "sov": sov, "tech_radar": tech_radar, "pricing": pricing,
+            "deals": deals, "risks": risks, "chances": chances,
+            "move_matrix": move_matrix, "n_competitors": len(cur_ops)}
 
 
 def _prep_competitors(report: dict) -> list[dict]:
@@ -293,6 +342,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "top_priorities": top,
             "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
                            reports[i:i + 8]) if highlights else None,
+            "briefing_sections": _briefing_sections(report.get("briefing_md", "")),
             "briefing_html": _md_to_html(report.get("briefing_md", "")),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),

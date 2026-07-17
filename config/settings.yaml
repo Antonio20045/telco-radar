@@ -51,6 +51,6 @@ focus_competitors:
 # HTTP settings for collectors
 http:
   timeout_seconds: 20
-  render_timeout_seconds: 25   # headless (newsroom_js) page render budget
+  render_timeout_seconds: 16   # headless (newsroom_js) page render budget
   user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
   max_links_per_newsroom: 30
