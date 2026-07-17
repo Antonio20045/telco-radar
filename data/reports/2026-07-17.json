@@ -1,62 +1,49 @@
 {
  "date": "2026-07-17",
- "generated_with_llm": true,
+ "generated_with_llm": false,
  "stats": {
   "sources_total": 128,
-  "sources_ok": 88,
-  "sources_empty": 39,
+  "sources_ok": 85,
+  "sources_empty": 42,
   "sources_failed": 1,
-  "collected": 697,
-  "new": 6,
+  "collected": 675,
+  "new": 0,
   "operators": 80,
   "regions": 6
  },
- "briefing_md": "## Wochenueberblick\n\n### Global (3 neu)\n\n- **Advanced Television**: [Lockheed Martin puts $100m into UK, European ventures](https://www.advanced-television.com/2026/07/17/lockheed-martin-puts-100m-into-uk-european-ventures/) (2026-07-17)\n- **Advanced Television**: [Scottish charity joins Broadcast 2040+ campaign](https://www.advanced-television.com/2026/07/17/scottish-charity-joins-broadcast-2040-campaign/) (2026-07-16)\n- **RCR Wireless**: [Thursday (telco diary) | Satellite versus terrestrial](https://www.rcrwireless.com/20260717/carriers/telco-diary-satellite-terrestrial) (2026-07-17)\n\n### Nordamerika (2 neu)\n\n- **AT&T**: [AT&T internet outage leaves some Portland customers without service for days](https://www.msn.com/en-us/technology/general/at-t-internet-outage-leaves-some-portland-customers-without-service-for-days/ar-AA280bWI) (2026-07-15)\n- **AT&T**: [AT&T phone bills are going up. See why, and by how much](https://www.detroitnews.com/story/business/2026/07/15/att-phone-bill-increase-2026/90928508007/) (2026-07-15)\n\n### Europa (1 neu)\n\n- **Vodafone Group**: [Same service, same rules: Europe’s test of fairness in the digital age](https://www.vodafone.com/news/newsroom/public-policy/same-service-same-rules-europes-test-of-fairness-in-the-digital-age) (2026-07-17)\n",
- "regions": {
-  "Global": {
-   "region_summary": "",
-   "highlights": []
-  },
-  "Europa": {
-   "region_summary": "",
-   "highlights": []
-  },
-  "Nordamerika": {
-   "region_summary": "",
-   "highlights": []
-  }
- },
+ "briefing_md": "## Wochenueberblick\n\n_Keine neuen Meldungen in diesem Zeitraum._",
+ "regions": {},
  "run": {
-  "started_at": "2026-07-17T09:41:17.741223+00:00",
-  "finished_at": "2026-07-17T09:42:12.575995+00:00",
-  "duration_seconds": 54.8,
-  "used_llm": true,
+  "started_at": "2026-07-17T09:47:43.923030+00:00",
+  "finished_at": "2026-07-17T09:48:32.510185+00:00",
+  "duration_seconds": 48.6,
+  "used_llm": false,
   "editor_used": false,
   "models": {
-   "analyst": "deepseek-ai/deepseek-v4-pro",
+   "analyst": null,
    "editor": null
   },
   "phases": [
    {
     "name": "Sammeln",
-    "seconds": 54.1,
-    "detail": "128 Quellen abgefragt, 697 Meldungen gefunden"
+    "seconds": 48.5,
+    "detail": "128 Quellen abgefragt, 675 Meldungen gefunden"
    },
    {
     "name": "Nur Neues",
     "seconds": 0.0,
-    "detail": "6 neue Meldungen (Gedaechtnis: 2412 bekannt)"
+    "detail": "0 neue Meldungen (Gedaechtnis: 2418 bekannt)"
    },
    {
     "name": "Bewerten & Schreiben",
-    "seconds": 0.7,
+    "seconds": 0.0,
     "detail": "0 bewertete Meldungen"
    }
   ],
   "source_summary": {
    "total": 128,
-   "ok": 88,
-   "empty": 39,
+   "ok": 85,
+   "empty": 42,
    "failed": 1,
    "by_kind": {
     "newsroom": 36,
@@ -200,17 +187,6 @@
     "count": 13
    },
    {
-    "name": "BT Group",
-    "operator": "BT Group",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 12
-   },
-   {
     "name": "Comcast",
     "operator": "Comcast",
     "region": "north_america",
@@ -222,10 +198,10 @@
     "count": 12
    },
    {
-    "name": "Charter Communications",
-    "operator": "Charter Communications",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Airtel%20Africa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -255,10 +231,10 @@
     "count": 11
    },
    {
-    "name": "Airtel Africa",
-    "operator": "Airtel Africa",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Airtel%20Africa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Reliance%20Jio%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -266,10 +242,10 @@
     "count": 11
    },
    {
-    "name": "Bharti Airtel",
-    "operator": "Bharti Airtel",
+    "name": "SK Telecom",
+    "operator": "SK Telecom",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -288,32 +264,10 @@
     "count": 10
    },
    {
-    "name": "VEON",
-    "operator": "VEON",
+    "name": "BT Group",
+    "operator": "BT Group",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22VEON%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Reliance Jio",
-    "operator": "Reliance Jio",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Reliance%20Jio%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "SK Telecom",
-    "operator": "SK Telecom",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -387,32 +341,21 @@
     "count": 10
    },
    {
-    "name": "Deutsche Telekom",
-    "operator": "Deutsche Telekom",
+    "name": "Optus",
+    "operator": "Optus",
+    "region": "oceania",
+    "url": "https://www.bing.com/news/search?q=%22Optus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 9
+   },
+   {
+    "name": "VEON",
+    "operator": "VEON",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Deutsche%20Telekom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 8
-   },
-   {
-    "name": "AT&T",
-    "operator": "AT&T",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 8
-   },
-   {
-    "name": "Verizon",
-    "operator": "Verizon",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22VEON%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -431,10 +374,21 @@
     "count": 8
    },
    {
-    "name": "Optus",
-    "operator": "Optus",
-    "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22Optus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22SoftBank%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -453,6 +407,17 @@
     "count": 8
    },
    {
+    "name": "Deutsche Telekom",
+    "operator": "Deutsche Telekom",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Deutsche%20Telekom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 7
+   },
+   {
     "name": "Orange",
     "operator": "Orange",
     "region": "europe",
@@ -464,6 +429,39 @@
     "count": 7
    },
    {
+    "name": "AT&T",
+    "operator": "AT&T",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 7
+   },
+   {
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 7
+   },
+   {
+    "name": "Verizon",
+    "operator": "Verizon",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
     "name": "América Móvil",
     "operator": "América Móvil",
     "region": "latin_america",
@@ -472,7 +470,7 @@
     "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "ok",
-    "count": 7
+    "count": 6
    },
    {
     "name": "KT",
@@ -508,43 +506,10 @@
     "count": 6
    },
    {
-    "name": "Vodafone Group",
-    "operator": "Vodafone Group",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "Telus",
-    "operator": "Telus",
-    "region": "north_america",
-    "url": "https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "SoftBank",
-    "operator": "SoftBank",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22SoftBank%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "China Mobile",
-    "operator": "China Mobile",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22China%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -585,6 +550,17 @@
     "count": 4
    },
    {
+    "name": "Telus",
+    "operator": "Telus",
+    "region": "north_america",
+    "url": "https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
     "name": "Millicom",
     "operator": "Millicom",
     "region": "latin_america",
@@ -596,10 +572,10 @@
     "count": 4
    },
    {
-    "name": "Safaricom",
-    "operator": "Safaricom",
+    "name": "Vodacom",
+    "operator": "Vodacom",
     "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Vodacom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -629,10 +605,10 @@
     "count": 4
    },
    {
-    "name": "KDDI",
-    "operator": "KDDI",
+    "name": "China Mobile",
+    "operator": "China Mobile",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22China%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -651,10 +627,10 @@
     "count": 3
    },
    {
-    "name": "Orange",
-    "operator": "Orange",
+    "name": "Vodafone Group",
+    "operator": "Vodafone Group",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -673,34 +649,12 @@
     "count": 3
    },
    {
-    "name": "Turkcell",
-    "operator": "Turkcell",
+    "name": "Swisscom",
+    "operator": "Swisscom",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Turkcell%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Telenor",
-    "operator": "Telenor",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Telenor%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Bouygues Telecom",
-    "operator": "Bouygues Telecom",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
+    "url": "https://www.swisscom.ch/en/about/news.html",
+    "kind": "newsroom",
+    "label": "newsroom",
     "origin": "operator",
     "status": "ok",
     "count": 3
@@ -739,39 +693,6 @@
     "count": 3
    },
    {
-    "name": "Vodacom",
-    "operator": "Vodacom",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Vodacom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "Swisscom",
-    "operator": "Swisscom",
-    "region": "europe",
-    "url": "https://www.swisscom.ch/en/about/news.html",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
-    "name": "AIS",
-    "operator": "AIS",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22AIS%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 3
-   },
-   {
     "name": "PLDT",
     "operator": "PLDT",
     "region": "asia",
@@ -805,10 +726,43 @@
     "count": 3
    },
    {
-    "name": "Swisscom",
-    "operator": "Swisscom",
+    "name": "TIM",
+    "operator": "TIM",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Swisscom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Telenor%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Turkcell%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -827,6 +781,28 @@
     "count": 2
    },
    {
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "KDDI",
+    "operator": "KDDI",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
     "name": "Chunghwa Telecom",
     "operator": "Chunghwa Telecom",
     "region": "asia",
@@ -838,10 +814,21 @@
     "count": 2
    },
    {
-    "name": "TPG Telecom",
-    "operator": "TPG Telecom",
+    "name": "Globe Telecom",
+    "operator": "Globe Telecom",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Globe%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Telstra",
+    "operator": "Telstra",
     "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22TPG%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -871,6 +858,28 @@
     "count": 1
    },
    {
+    "name": "Swisscom",
+    "operator": "Swisscom",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Swisscom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "KPN",
+    "operator": "KPN",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22KPN%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
     "name": "Telia",
     "operator": "Telia",
     "region": "europe",
@@ -893,43 +902,10 @@
     "count": 1
    },
    {
-    "name": "KPN",
-    "operator": "KPN",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22KPN%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "TIM",
-    "operator": "TIM",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
     "name": "Iliad",
     "operator": "Iliad",
     "region": "europe",
     "url": "https://www.bing.com/news/search?q=%22Iliad%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "Elisa",
-    "operator": "Elisa",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -970,10 +946,10 @@
     "count": 1
    },
    {
-    "name": "WOM",
-    "operator": "WOM",
+    "name": "Telecom Argentina",
+    "operator": "Telecom Argentina",
     "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22WOM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1014,32 +990,10 @@
     "count": 1
    },
    {
-    "name": "Rakuten Mobile",
-    "operator": "Rakuten Mobile",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "Globe Telecom",
-    "operator": "Globe Telecom",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Globe%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "Telstra",
-    "operator": "Telstra",
+    "name": "TPG Telecom",
+    "operator": "TPG Telecom",
     "region": "oceania",
-    "url": "https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22TPG%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1051,17 +1005,6 @@
     "operator": "Vodafone Deutschland",
     "region": "europe",
     "url": "https://www.bing.com/news/search?q=%22Vodafone%20Deutschland%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Telefónica",
-    "operator": "Telefónica",
-    "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Telef%C3%B3nica%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1091,12 +1034,23 @@
     "count": 0
    },
    {
-    "name": "Telia",
-    "operator": "Telia",
+    "name": "Orange",
+    "operator": "Orange",
     "region": "europe",
-    "url": "https://www.teliacompany.com/en/newsroom",
-    "kind": "newsroom",
-    "label": "newsroom",
+    "url": "https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Telef%C3%B3nica%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "empty",
     "count": 0
@@ -1113,10 +1067,10 @@
     "count": 0
    },
    {
-    "name": "TIM",
-    "operator": "TIM",
+    "name": "Telia",
+    "operator": "Telia",
     "region": "europe",
-    "url": "https://www.gruppotim.it/en/press-archive.html",
+    "url": "https://www.teliacompany.com/en/newsroom",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
@@ -1135,10 +1089,21 @@
     "count": 0
    },
    {
-    "name": "A1 Telekom Austria",
-    "operator": "A1 Telekom Austria",
+    "name": "TIM",
+    "operator": "TIM",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22A1%20Telekom%20Austria%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.gruppotim.it/en/press-archive.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1157,10 +1122,10 @@
     "count": 0
    },
    {
-    "name": "Cosmote",
-    "operator": "Cosmote",
+    "name": "A1 Telekom Austria",
+    "operator": "A1 Telekom Austria",
     "region": "europe",
-    "url": "https://www.bing.com/news/search?q=%22Cosmote%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22A1%20Telekom%20Austria%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1179,6 +1144,17 @@
     "count": 0
    },
    {
+    "name": "Cosmote",
+    "operator": "Cosmote",
+    "region": "europe",
+    "url": "https://www.bing.com/news/search?q=%22Cosmote%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "Millicom",
     "operator": "Millicom",
     "region": "latin_america",
@@ -1190,10 +1166,10 @@
     "count": 0
    },
    {
-    "name": "Telecom Argentina",
-    "operator": "Telecom Argentina",
+    "name": "Entel",
+    "operator": "Entel",
     "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22Entel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1212,10 +1188,10 @@
     "count": 0
    },
    {
-    "name": "Entel",
-    "operator": "Entel",
+    "name": "WOM",
+    "operator": "WOM",
     "region": "latin_america",
-    "url": "https://www.bing.com/news/search?q=%22Entel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22WOM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1256,28 +1232,6 @@
     "count": 0
    },
    {
-    "name": "e&",
-    "operator": "e&",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22e%26%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Maroc Telecom",
-    "operator": "Maroc Telecom",
-    "region": "africa_middle_east",
-    "url": "https://www.bing.com/news/search?q=%22Maroc%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "Orange MEA",
     "operator": "Orange MEA",
     "region": "africa_middle_east",
@@ -1293,6 +1247,28 @@
     "operator": "Zain",
     "region": "africa_middle_east",
     "url": "https://www.bing.com/news/search?q=%22Zain%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22e%26%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Maroc Telecom",
+    "operator": "Maroc Telecom",
+    "region": "africa_middle_east",
+    "url": "https://www.bing.com/news/search?q=%22Maroc%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1322,17 +1298,6 @@
     "count": 0
    },
    {
-    "name": "Reliance Jio",
-    "operator": "Reliance Jio",
-    "region": "asia",
-    "url": "https://www.jio.com/press-release",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "KDDI",
     "operator": "KDDI",
     "region": "asia",
@@ -1344,21 +1309,10 @@
     "count": 0
    },
    {
-    "name": "China Mobile",
-    "operator": "China Mobile",
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
     "region": "asia",
-    "url": "https://www.chinamobileltd.com/en/media/press.php",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Chunghwa Telecom",
-    "operator": "Chunghwa Telecom",
-    "region": "asia",
-    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "url": "https://www.jio.com/press-release",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
@@ -1377,10 +1331,10 @@
     "count": 0
    },
    {
-    "name": "Viettel",
-    "operator": "Viettel",
+    "name": "AIS",
+    "operator": "AIS",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Viettel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.bing.com/news/search?q=%22AIS%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1388,10 +1342,32 @@
     "count": 0
    },
    {
-    "name": "Indosat Ooredoo Hutchison",
-    "operator": "Indosat Ooredoo Hutchison",
+    "name": "Chunghwa Telecom",
+    "operator": "Chunghwa Telecom",
     "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Indosat%20Ooredoo%20Hutchison%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.chinamobileltd.com/en/media/press.php",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Maxis%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
     "kind": "news_search",
     "label": "Nachrichten-Suche",
     "origin": "operator",
@@ -1410,17 +1386,6 @@
     "count": 0
    },
    {
-    "name": "Maxis",
-    "operator": "Maxis",
-    "region": "asia",
-    "url": "https://www.bing.com/news/search?q=%22Maxis%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
-    "kind": "news_search",
-    "label": "Nachrichten-Suche",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "Telstra",
     "operator": "Telstra",
     "region": "oceania",
@@ -1432,12 +1397,34 @@
     "count": 0
    },
    {
+    "name": "Viettel",
+    "operator": "Viettel",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Viettel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "Optus",
     "operator": "Optus",
     "region": "oceania",
     "url": "https://www.optus.com.au/about/media-centre",
     "kind": "newsroom",
     "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Indosat Ooredoo Hutchison",
+    "operator": "Indosat Ooredoo Hutchison",
+    "region": "asia",
+    "url": "https://www.bing.com/news/search?q=%22Indosat%20Ooredoo%20Hutchison%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss",
+    "kind": "news_search",
+    "label": "Nachrichten-Suche",
     "origin": "operator",
     "status": "empty",
     "count": 0
@@ -1476,31 +1463,6 @@
     "count": 0
    }
   ],
-  "analysts": [
-   {
-    "items_in": 3,
-    "batches": 1,
-    "batches_ok": 0,
-    "highlights": 0,
-    "model": "deepseek-ai/deepseek-v4-pro",
-    "region": "Global"
-   },
-   {
-    "items_in": 1,
-    "batches": 1,
-    "batches_ok": 0,
-    "highlights": 0,
-    "model": "deepseek-ai/deepseek-v4-pro",
-    "region": "Europa"
-   },
-   {
-    "items_in": 2,
-    "batches": 1,
-    "batches_ok": 0,
-    "highlights": 0,
-    "model": "deepseek-ai/deepseek-v4-pro",
-    "region": "Nordamerika"
-   }
-  ]
+  "analysts": []
  }
 }
