@@ -44,15 +44,15 @@
       <span class="kpi-label">Quellen abgefragt</span>
     </div>
     <div class="kpi">
-      <span class="kpi-num">86<small>&nbsp;ok</small></span>
-      <span class="kpi-label">40 leer &middot; 2 fehlgeschlagen</span>
+      <span class="kpi-num">88<small>&nbsp;ok</small></span>
+      <span class="kpi-label">39 leer &middot; 1 fehlgeschlagen</span>
     </div>
     <div class="kpi">
-      <span class="kpi-num">0.8<small>&nbsp;min</small></span>
+      <span class="kpi-num">4.5<small>&nbsp;min</small></span>
       <span class="kpi-label">Laufzeit (17. Juli 2026)</span>
     </div>
     <div class="kpi accent">
-      <span class="kpi-num">0</span>
+      <span class="kpi-num">3</span>
       <span class="kpi-label">neue Meldungen bewertet</span>
     </div>
   </div>
@@ -66,31 +66,68 @@
   
   <div class="phase-row">
     <div class="phase-name">Sammeln</div>
-    <div class="phase-detail">128 Quellen abgefragt, 687 Meldungen gefunden</div>
-    <div class="phase-time">50.9 s</div>
+    <div class="phase-detail">128 Quellen abgefragt, 698 Meldungen gefunden</div>
+    <div class="phase-time">49.3 s</div>
   </div>
   
   <div class="phase-row">
     <div class="phase-name">Nur Neues</div>
-    <div class="phase-detail">0 neue Meldungen (Gedaechtnis: 2418 bekannt)</div>
+    <div class="phase-detail">3 neue Meldungen (Gedaechtnis: 2418 bekannt)</div>
     <div class="phase-time">0.0 s</div>
   </div>
   
   <div class="phase-row">
     <div class="phase-name">Bewerten & Schreiben</div>
-    <div class="phase-detail">0 bewertete Meldungen</div>
-    <div class="phase-time">0.0 s</div>
+    <div class="phase-detail">2 bewertete Meldungen</div>
+    <div class="phase-time">217.8 s</div>
   </div>
   
   <div class="phase-row">
     <div class="phase-name">KI-Modelle</div>
     <div class="phase-detail">
-      ohne KI
+      Bewertung je Region: <b>deepseek-ai/deepseek-v4-pro</b> &middot; Wochenbericht: <b>deepseek-ai/deepseek-v4-pro</b>
     </div>
-    <div class="phase-time">50.9 s</div>
+    <div class="phase-time">267.2 s</div>
   </div>
 </section>
 
+
+<section class="section">
+  <div class="section-head">
+    <h2><span class="sec-no">02</span> KI-Bewertung je Region</h2>
+    <p class="section-title">Was die Analyse-Agenten geprüft und behalten haben</p>
+  </div>
+  <table class="src-table">
+    <thead><tr><th>Region</th><th class="num">geprüft</th><th class="num">Blöcke</th><th class="num">relevant behalten</th><th>Modell</th></tr></thead>
+    <tbody>
+      
+      <tr>
+        <td><b>Europa</b></td>
+        <td class="num">1</td>
+        <td class="num">1/1</td>
+        <td class="num">1</td>
+        <td><span class="kbadge">deepseek-ai/deepseek-v4-pro</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Asien</b></td>
+        <td class="num">1</td>
+        <td class="num">1/1</td>
+        <td class="num">0</td>
+        <td><span class="kbadge">deepseek-ai/deepseek-v4-pro</span></td>
+      </tr>
+      
+      <tr>
+        <td><b>Nordamerika</b></td>
+        <td class="num">1</td>
+        <td class="num">1/1</td>
+        <td class="num">1</td>
+        <td><span class="kbadge">deepseek-ai/deepseek-v4-pro</span></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</section>
 
 
 <section class="section">
@@ -99,9 +136,9 @@
     <p class="section-title">128 Quellen, sortiert nach Status</p>
   </div>
   <div class="log-legend">
-    <span class="s"><span class="sdot ok"></span>geliefert (86)</span>
-    <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (40)</span>
-    <span class="s"><span class="sdot fail"></span>nicht erreichbar (2)</span>
+    <span class="s"><span class="sdot ok"></span>geliefert (88)</span>
+    <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (39)</span>
+    <span class="s"><span class="sdot fail"></span>nicht erreichbar (1)</span>
   </div>
   <table class="src-table">
     <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
@@ -114,15 +151,6 @@
         <td><span class="kbadge">Newsroom</span></td>
         <td class="num">0</td>
         <td><a href="https://about.att.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot fail" title="fail"></span></td>
-        <td><b>Telecoms Tech News</b><br><span style="color:var(--vf-mute);font-size:12.5px">ValueError: unparseable feed: <unknown>:2:119: not well-formed (invalid token)</span></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -226,11 +254,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>BT Group</b></td>
-        <td>europe</td>
+        <td><b>Charter Communications</b></td>
+        <td>north_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">12</td>
-        <td><a href="https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -244,20 +272,29 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Charter Communications</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">12</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Charter%20Communications%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Vodafone Idea</b></td>
         <td>asia</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">12</td>
         <td><a href="https://www.bing.com/news/search?q=%22Vodafone%20Idea%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Bharti Airtel</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">12</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>BT Group</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">11</td>
+        <td><a href="https://www.bing.com/news/search?q=%22BT%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -276,24 +313,6 @@
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">11</td>
         <td><a href="https://www.bing.com/news/search?q=%22Airtel%20Africa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Bharti Airtel</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">11</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Bharti%20Airtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>SK Telecom</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">11</td>
-        <td><a href="https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -321,6 +340,15 @@
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">10</td>
         <td><a href="https://www.bing.com/news/search?q=%22Reliance%20Jio%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>SK Telecom</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.bing.com/news/search?q=%22SK%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -361,6 +389,15 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Telecoms Tech News</b></td>
+        <td>Fachpresse</td>
+        <td><span class="kbadge">Fachpresse</span></td>
+        <td class="num">10</td>
+        <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Advanced Television</b></td>
         <td>Fachpresse</td>
         <td><span class="kbadge">Fachpresse</span></td>
@@ -370,20 +407,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Verizon</b></td>
+        <td><b>AT&T</b></td>
         <td>north_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">9</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Deutsche Telekom</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">8</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Deutsche%20Telekom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -406,11 +434,29 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>NTT Docomo</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">8</td>
+        <td><a href="https://www.bing.com/news/search?q=%22NTT%20Docomo%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Telkomsel</b></td>
         <td>asia</td>
         <td><span class="kbadge">Newsroom</span></td>
         <td class="num">8</td>
         <td><a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Deutsche Telekom</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">7</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Deutsche%20Telekom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -424,11 +470,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>AT&T</b></td>
+        <td><b>Verizon</b></td>
         <td>north_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">7</td>
-        <td><a href="https://www.bing.com/news/search?q=%22AT%26T%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Verizon%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -442,29 +488,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telus</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">6</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>KT</b></td>
         <td>asia</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">6</td>
         <td><a href="https://www.bing.com/news/search?q=%22KT%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>NTT Docomo</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">6</td>
-        <td><a href="https://www.bing.com/news/search?q=%22NTT%20Docomo%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -478,11 +506,20 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Vodafone Group</b></td>
-        <td>europe</td>
+        <td><b>Telus</b></td>
+        <td>north_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">5</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Telus%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>KDDI</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">5</td>
+        <td><a href="https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -492,6 +529,24 @@
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">5</td>
         <td><a href="https://www.bing.com/news/search?q=%22SoftBank%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Vodafone Group</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">4</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Vodafone%20Group%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Tele2</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">4</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Tele2%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -525,18 +580,18 @@
         <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Safaricom</b></td>
         <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">4</td>
-        <td><a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Safaricom</b></td>
         <td>africa_middle_east</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td><span class="kbadge">Newsroom</span></td>
         <td class="num">4</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Safaricom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -546,15 +601,6 @@
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">4</td>
         <td><a href="https://www.bing.com/news/search?q=%22Singtel%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>KDDI</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">4</td>
-        <td><a href="https://www.bing.com/news/search?q=%22KDDI%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -577,15 +623,6 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Orange</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">3</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Proximus</b></td>
         <td>europe</td>
         <td><span class="kbadge">Newsroom</span></td>
@@ -595,11 +632,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Swisscom</b></td>
+        <td><b>TIM</b></td>
         <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">3</td>
-        <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -613,15 +650,6 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Bouygues Telecom</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">3</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Telenor</b></td>
         <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
@@ -631,11 +659,20 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Tele2</b></td>
+        <td><b>Bouygues Telecom</b></td>
         <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">3</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Tele2%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Bouygues%20Telecom%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Swisscom</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">3</td>
+        <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -712,6 +749,15 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Orange</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">2</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Orange%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Swisscom</b></td>
         <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
@@ -721,20 +767,20 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>TIM</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">2</td>
-        <td><a href="https://www.bing.com/news/search?q=%22TIM%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>du</b></td>
         <td>africa_middle_east</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">2</td>
         <td><a href="https://www.bing.com/news/search?q=%22du%22%20%28Etisalat%20OR%20UAE%20OR%20Emirates%20OR%20EITC%29%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Rakuten Mobile</b></td>
+        <td>asia</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">2</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -811,15 +857,6 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Elisa</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">1</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Verizon</b></td>
         <td>north_america</td>
         <td><span class="kbadge">Newsroom</span></td>
@@ -829,11 +866,11 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>UScellular</b></td>
-        <td>north_america</td>
+        <td><b>Elisa</b></td>
+        <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">1</td>
-        <td><a href="https://www.bing.com/news/search?q=%22UScellular%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Elisa%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -843,6 +880,15 @@
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">1</td>
         <td><a href="https://www.bing.com/news/search?q=%22TIM%20Brasil%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>UScellular</b></td>
+        <td>north_america</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">1</td>
+        <td><a href="https://www.bing.com/news/search?q=%22UScellular%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -883,15 +929,6 @@
       
       <tr>
         <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Rakuten Mobile</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">1</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Rakuten%20Mobile%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
         <td><b>Globe Telecom</b></td>
         <td>asia</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
@@ -900,12 +937,12 @@
       </tr>
       
       <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Vodafone Deutschland</b></td>
-        <td>europe</td>
+        <td><span class="sdot ok" title="ok"></span></td>
+        <td><b>Telstra</b></td>
+        <td>oceania</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Vodafone%20Deutschland%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td class="num">1</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -919,6 +956,15 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Vodafone Deutschland</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Vodafone%20Deutschland%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
         <td><b>BT Group</b></td>
         <td>europe</td>
         <td><span class="kbadge">Newsroom</span></td>
@@ -928,20 +974,20 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Telia</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
         <td><b>Telefónica</b></td>
         <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">0</td>
         <td><a href="https://www.bing.com/news/search?q=%22Telef%C3%B3nica%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Telia</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Newsroom</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -973,20 +1019,20 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>A1 Telekom Austria</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22A1%20Telekom%20Austria%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
         <td><b>Three UK</b></td>
         <td>europe</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">0</td>
         <td><a href="https://www.bing.com/news/search?q=%22Three%20UK%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>A1 Telekom Austria</b></td>
+        <td>europe</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.bing.com/news/search?q=%22A1%20Telekom%20Austria%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1018,11 +1064,11 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Telecom Argentina</b></td>
+        <td><b>Oi</b></td>
         <td>latin_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Oi%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1036,20 +1082,11 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Oi</b></td>
+        <td><b>Telecom Argentina</b></td>
         <td>latin_america</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Oi%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Airtel Africa</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://airtel.africa/media" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.bing.com/news/search?q=%22Telecom%20Argentina%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1063,11 +1100,11 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Orange MEA</b></td>
+        <td><b>Airtel Africa</b></td>
         <td>africa_middle_east</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td><span class="kbadge">Newsroom</span></td>
         <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Orange%20MEA%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://airtel.africa/media" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1081,20 +1118,29 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>stc</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22stc%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
         <td><b>Zain</b></td>
         <td>africa_middle_east</td>
         <td><span class="kbadge">Nachrichten-Suche</span></td>
         <td class="num">0</td>
         <td><a href="https://www.bing.com/news/search?q=%22Zain%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>Orange MEA</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.bing.com/news/search?q=%22Orange%20MEA%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+      </tr>
+      
+      <tr>
+        <td><span class="sdot empty" title="empty"></span></td>
+        <td><b>stc</b></td>
+        <td>africa_middle_east</td>
+        <td><span class="kbadge">Nachrichten-Suche</span></td>
+        <td class="num">0</td>
+        <td><a href="https://www.bing.com/news/search?q=%22stc%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1144,11 +1190,11 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>China Mobile</b></td>
+        <td><b>Chunghwa Telecom</b></td>
         <td>asia</td>
         <td><span class="kbadge">Newsroom</span></td>
         <td class="num">0</td>
-        <td><a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1162,11 +1208,11 @@
       
       <tr>
         <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Chunghwa Telecom</b></td>
+        <td><b>China Mobile</b></td>
         <td>asia</td>
         <td><span class="kbadge">Newsroom</span></td>
         <td class="num">0</td>
-        <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        <td><a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
@@ -1230,15 +1276,6 @@
         <td><span class="kbadge">Newsroom</span></td>
         <td class="num">0</td>
         <td><a href="https://media.one.nz" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Telstra</b></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Nachrichten-Suche</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.bing.com/news/search?q=%22Telstra%22%20%285G%20OR%20mobile%20OR%20telecom%20OR%20network%20OR%20broadband%20OR%20tariff%20OR%20wireless%20OR%20operator%29&format=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
       </tr>
       
       <tr>
