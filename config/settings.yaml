@@ -15,7 +15,7 @@ report_language: "de"
 # ---------------------------------------------------------------------------
 model: "claude-sonnet-5"
 analyst_model: "claude-sonnet-5"
-editor_model: "claude-opus-4-8"
+editor_model: "claude-sonnet-5"   # war Opus - zu teuer, bis Provider-Wechsel steht
 
 # Only items newer than this many days are considered (items without a
 # date are kept if they were never seen before).
