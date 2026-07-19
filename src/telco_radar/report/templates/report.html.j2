@@ -17,14 +17,28 @@
 {% block content %}
 {% if report %}
 
-<section class="hero">
-  <h1>{{ date_de }}</h1>
-  <p class="hero-lead">Wettbewerbs-Radar &middot; {{ report.stats.get('operators', num_operators or '–') }} Netzbetreiber &middot; {{ report.stats.get('collected', '–') }} Artikel geprüft &middot; <a href="{{ prefix }}protokoll.html">wie das entsteht</a></p>
+<section class="hero hero-brief">
+  <div class="briefing-kicker"><span>Wöchentlicher Entscheidungsbrief</span><span class="briefing-date">{{ date_de }}</span></div>
+  <div class="briefing-hero-grid">
+    <div class="briefing-intro">
+      <h1>Was Vodafone jetzt<br>wissen muss.</h1>
+      <p class="hero-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
+      <p class="briefing-method"><a href="{{ prefix }}protokoll.html">Methode und Quellenbasis ansehen &nearr;</a></p>
+    </div>
+    {% if dash and dash.lead_signal %}
+    <article class="lead-signal">
+      <div class="lead-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
+      <h2><a href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">{{ dash.lead_signal.title }}</a></h2>
+      {% if dash.lead_signal.why %}<p>{{ dash.lead_signal.why }}</p>{% endif %}
+      <div class="lead-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %}<span></span>{{ dash.lead_signal.region }}{% endif %}{% if dash.lead_signal.category %}<span></span>{{ dash.lead_signal.category }}{% endif %}</div>
+    </article>
+    {% endif %}
+  </div>
   {% if dash %}
-  <div class="kpis">
-    {% for k in dash.kpis %}
-    <div class="kpi{% if k.accent %} accent{% endif %}">
-      <b{% if k.text %} class="kpi-text"{% endif %}>{{ k.num }}</b>
+  <div class="decision-strip" aria-label="Entscheidungsrelevante Signale dieser Woche">
+    {% for k in dash.kpis[1:] %}
+    <div class="decision-fact{% if k.accent %} accent{% endif %}">
+      <b{% if k.text %} class="text"{% endif %}>{{ k.num }}</b>
       <span>{{ k.label }}</span>
     </div>
     {% endfor %}
@@ -35,7 +49,7 @@
 {% if top_priorities %}
 <section class="section" id="prioritaet">
   <div class="section-head"><h2><span class="sec-no">01</span> In 60 Sekunden</h2>
-    <p class="section-title">Das sollte Vodafone jetzt wissen</p></div>
+    <p class="section-title">Die drei Signale, die jetzt zählen</p></div>
   <div class="prio-list">
     {% for h in top_priorities[:3] %}
     <article class="prio-card{% if loop.first %} lead{% endif %}">
@@ -157,20 +171,25 @@
 {% if highlights %}
 <section class="section" id="explorer">
   <div class="section-head"><h2><span class="sec-no">05</span> Alle Meldungen</h2>
-    <p class="section-title">Suchen, filtern, im Detail lesen</p></div>
-  <div class="filters">
-    <input type="search" id="f-search" placeholder="Suchen: Operator, Thema, Stichwort …" aria-label="Suche">
-    <select id="f-region" aria-label="Region"><option value="">Alle Regionen</option>{% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}</select>
-    <select id="f-category" aria-label="Thema"><option value="">Alle Themen</option>{% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select>
-    <select id="f-relevance" aria-label="Dringlichkeit"><option value="">Jede Dringlichkeit</option><option value="5">5/5 sofort</option><option value="4">ab 4/5</option><option value="3">ab 3/5</option></select>
-    <select id="f-sort" aria-label="Sortierung"><option value="relevance">Dringlichste zuerst</option><option value="date">Neueste zuerst</option><option value="operator">Operator (A–Z)</option></select>
-  </div>
-  <div class="explorer" id="explorer-app">
-    <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste"></div>
-    <div class="ex-detail" id="ex-detail"><p class="ex-detail-empty">Meldung links auswählen.</p></div>
-  </div>
-  <p class="ex-count" id="ex-count"></p>
-  <script type="application/json" id="explorer-data">{{ explorer_json | safe }}</script>
+    <p class="section-title">Recherche und Evidenz im Detail</p></div>
+  <details class="evidence">
+    <summary><span>Alle {{ highlights | length }} Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
+    <div class="evidence-body">
+      <div class="filters">
+        <input type="search" id="f-search" placeholder="Suchen: Operator, Thema, Stichwort …" aria-label="Suche">
+        <select id="f-region" aria-label="Region"><option value="">Alle Regionen</option>{% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}</select>
+        <select id="f-category" aria-label="Thema"><option value="">Alle Themen</option>{% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select>
+        <select id="f-relevance" aria-label="Dringlichkeit"><option value="">Jede Dringlichkeit</option><option value="5">5/5 sofort</option><option value="4">ab 4/5</option><option value="3">ab 3/5</option></select>
+        <select id="f-sort" aria-label="Sortierung"><option value="relevance">Dringlichste zuerst</option><option value="date">Neueste zuerst</option><option value="operator">Operator (A–Z)</option></select>
+      </div>
+      <div class="explorer" id="explorer-app">
+        <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste"></div>
+        <div class="ex-detail" id="ex-detail"><p class="ex-detail-empty">Meldung links auswählen.</p></div>
+      </div>
+      <p class="ex-count" id="ex-count"></p>
+      <script type="application/json" id="explorer-data">{{ explorer_json | safe }}</script>
+    </div>
+  </details>
 </section>
 {% endif %}
 
