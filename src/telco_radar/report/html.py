@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 
 import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from bs4 import BeautifulSoup
 
 log = logging.getLogger(__name__)
 
@@ -48,8 +49,40 @@ def _env() -> Environment:
     return env
 
 
+_MD_TAGS = {"a", "blockquote", "br", "code", "em", "h2", "h3", "h4",
+            "li", "ol", "p", "pre", "strong", "ul"}
+_MD_DANGEROUS_TAGS = {"base", "embed", "form", "iframe", "math", "object",
+                      "script", "style", "svg"}
+
+
 def _md_to_html(text: str) -> str:
-    return md.markdown(text or "", extensions=["extra", "sane_lists"])
+    """Render the editor's Markdown while stripping raw HTML and unsafe URLs."""
+    rendered = md.markdown(text or "", extensions=["extra", "sane_lists"])
+    soup = BeautifulSoup(rendered, "html.parser")
+    for tag in soup.find_all(True):
+        if tag.name in _MD_DANGEROUS_TAGS:
+            tag.decompose()
+            continue
+        if tag.name not in _MD_TAGS:
+            tag.unwrap()
+            continue
+        for attr in list(tag.attrs):
+            if tag.name == "a" and attr == "href":
+                scheme = urlsplit(str(tag.attrs[attr]).strip()).scheme.lower()
+                if scheme in {"", "http", "https"}:
+                    continue
+            del tag.attrs[attr]
+    return str(soup)
+
+
+def _json_for_script(value: object) -> str:
+    """Serialize public source text safely inside an application/json script."""
+    return (json.dumps(value, ensure_ascii=False)
+            .replace("<", "\\u003c")
+            .replace(">", "\\u003e")
+            .replace("&", "\\u0026")
+            .replace("\u2028", "\\u2028")
+            .replace("\u2029", "\\u2029"))
 
 
 def _load_reports(reports_dir: Path) -> list[dict]:
@@ -279,6 +312,15 @@ def _stats(report, prev_report, trend_reports):
             "cats": sorted(cats.items(), key=lambda kv: -kv[1])[:4]})
 
     top_comp = max(move_matrix, key=lambda c: c["n"], default=None)
+    lead = next((h for h in highlights if (h.get("relevance") or 0) >= 4), None)
+    if lead:
+        lead = {
+            "title": lead.get("title"), "url": lead.get("url"),
+            "why": _first_sentence(lead.get("why_it_matters"), limit=250),
+            "op": lead.get("operator") or lead.get("source_label"),
+            "region": lead.get("region"), "category": lead.get("category"),
+            "rel": lead.get("relevance") or 0,
+        }
     kpis = [
         {"num": (report.get("stats") or {}).get("new", len(highlights)),
          "label": "neue Meldungen"},
@@ -289,7 +331,7 @@ def _stats(report, prev_report, trend_reports):
         {"num": (tech_radar[0]["theme"] if tech_radar else "-"),
          "label": "Top-Technologiethema", "text": True},
     ]
-    return {"kpis": kpis, "sov": sov, "tech_radar": tech_radar, "pricing": pricing,
+    return {"kpis": kpis, "lead_signal": lead, "sov": sov, "tech_radar": tech_radar, "pricing": pricing,
             "deals": deals, "risks": risks, "chances": chances,
             "move_matrix": move_matrix, "n_competitors": len(cur_ops)}
 
@@ -338,7 +380,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         ctx = {
             "report": report, "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
-            "explorer_json": json.dumps(highlights, ensure_ascii=False),
+            "explorer_json": _json_for_script(highlights),
             "top_priorities": top,
             "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
                            reports[i:i + 8]) if highlights else None,
