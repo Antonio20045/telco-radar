@@ -99,6 +99,7 @@ def run(root: Path, use_llm: bool | None = None,
         items_by_region[item.region].append(item)
 
     # ------------------------------------------------------------- analyze
+    llm_was_explicitly_disabled = use_llm is False
     if use_llm is None:
         use_llm = llm_available()
     topics_store = ReportedTopics(
@@ -152,12 +153,22 @@ def run(root: Path, use_llm: bool | None = None,
                 regional, topics_store.recent(), model=editor_model,
                 language=language)
             editor_used = True
-        except Exception as exc:  # noqa: BLE001 - editor must never kill the run
-            log.error("Editor failed (%s) - falling back to digest; "
-                      "analyst results remain available in the dashboard", exc)
-            body, covered = editor.build_digest(
-                items_by_region, cfg.region_names, llm_was_available=True)
+        except Exception as exc:  # noqa: BLE001
+            # The weekly public site is an editorial product. Publishing a raw
+            # source list after an editor/provider failure is worse than
+            # retaining last week's verified briefing, so stop before any
+            # report, state or site artefact is written.
+            raise RuntimeError(
+                "Editorial synthesis failed; refusing to publish a raw "
+                "source digest. The previous briefing remains live."
+            ) from exc
     else:
+        if (new_items and not llm_was_explicitly_disabled
+                and cfg.settings.get("publish_requires_editorial_briefing", True)):
+            raise RuntimeError(
+                "No editorial model is available; refusing to publish a raw "
+                "source digest. The previous briefing remains live."
+            )
         if use_llm and not new_items:
             log.info("No new items - writing empty briefing")
         for region_key, region_items in items_by_region.items():
