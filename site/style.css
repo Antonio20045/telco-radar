@@ -388,3 +388,41 @@ main{padding-bottom:40px}
 .briefing.prose>h2:first-child,.briefing.prose>h3:first-child{margin-top:0}
 .briefing.prose>p:first-child{margin-top:0}
 @media (max-width:880px){.briefing{padding:24px 22px}}
+
+/* ===================== redesign v6: executive first ====================== */
+.hero-brief{padding:52px 0 16px}
+.briefing-kicker{display:flex;align-items:center;justify-content:space-between;gap:18px;
+  font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--vf-red);margin-bottom:19px}
+.briefing-date{color:var(--vf-mute);letter-spacing:.08em;white-space:nowrap}
+.briefing-hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:34px;align-items:stretch}
+.briefing-intro{padding:10px 0 12px}
+.hero-brief h1{font-size:clamp(42px,5.2vw,70px);line-height:.98;letter-spacing:-.045em;margin:0 0 20px;max-width:700px}
+.hero-brief .hero-lead{font-size:19px;line-height:1.48;color:#50545a;max-width:620px;margin:0}
+.briefing-method{font-size:14px;font-weight:700;margin:22px 0 0}
+.briefing-method a{color:var(--vf-mute)}
+.briefing-method a:hover{color:var(--vf-red)}
+.lead-signal{border-radius:18px;background:var(--vf-ink);color:#fff;padding:27px 28px 24px;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
+.lead-signal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#d7d8da}
+.lead-signal .rel-badge{font-size:11px;background:var(--vf-red)}
+.lead-signal h2{font-size:23px;line-height:1.19;letter-spacing:-.02em;margin:22px 0 13px;color:#fff}
+.lead-signal h2 a:hover{color:#ffb4af}
+.lead-signal p{font-size:15.5px;line-height:1.52;color:#eceef0;margin:0 0 20px}
+.lead-signal-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto;font-size:12.5px;color:#cbced2}
+.lead-signal-meta b{color:#fff}.lead-signal-meta span{width:3px;height:3px;border-radius:50%;background:#8d9298}
+.decision-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.decision-fact{border:1px solid var(--vf-line);border-radius:12px;padding:14px 17px;background:#fff}
+.decision-fact b{display:block;font-size:22px;line-height:1.1;letter-spacing:-.025em;color:var(--vf-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.decision-fact b.text{font-size:17px;padding-top:2px}.decision-fact span{display:block;margin-top:5px;font-size:12.5px;color:var(--vf-mute);font-weight:600}
+.decision-fact.accent{background:#fdecec;border-color:#f8d4d2}.decision-fact.accent b{color:var(--vf-red)}
+
+/* The source explorer stays available, but it does not compete with the briefing. */
+.evidence{border:1px solid var(--vf-line);border-radius:16px;background:#fff;box-shadow:var(--shadow);overflow:hidden}
+.evidence>summary{padding:19px 22px;list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:16px;font-weight:750}
+.evidence>summary::-webkit-details-marker{display:none}.evidence>summary::after{content:"+";order:3;color:var(--vf-red);font-size:23px;font-weight:400;line-height:1}
+.evidence[open]>summary{border-bottom:1px solid var(--vf-line)}.evidence[open]>summary::after{content:"–"}
+.evidence>summary small{font-size:12px;color:var(--vf-mute);font-weight:600;margin-left:auto}.evidence-body{padding:20px 22px 22px}
+@media (max-width:880px){
+  .hero-brief{padding-top:36px}.briefing-hero-grid{grid-template-columns:1fr;gap:18px}.hero-brief h1{font-size:46px}
+  .decision-strip{grid-template-columns:1fr 1fr}.lead-signal{padding:24px 22px}
+}
+@media (max-width:520px){.briefing-kicker{align-items:flex-start;flex-direction:column;gap:5px}.hero-brief h1{font-size:39px}.decision-strip{grid-template-columns:1fr}.evidence>summary{padding:17px 18px}.evidence-body{padding:16px}}
