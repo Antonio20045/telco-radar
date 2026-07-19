@@ -2,7 +2,9 @@ name: Telco Radar Run
 
 on:
   schedule:
-    - cron: "0 10 * * 0"   # every Sunday 10:00 UTC (~12:00 in DE summer / 11:00 winter)
+    # Start early enough that the report is normally live before midday in
+    # Germany, even when GitHub delays a scheduled run or NVIDIA is busy.
+    - cron: "30 8 * * 0"   # every Sunday 08:30 UTC (~10:30 DE summer / 09:30 winter)
   workflow_dispatch:
     inputs:
       lookback_days:
@@ -20,6 +22,7 @@ concurrency:
 jobs:
   radar:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
@@ -55,15 +58,24 @@ jobs:
           else
             git commit -m "radar: run $(date -u +%F)"
             # Rebase onto any commits pushed while the run was in flight, then push.
+            pushed=0
             for attempt in 1 2 3; do
-              git pull --rebase --autostash origin main || true
-              if git push; then echo "pushed"; break; fi
+              if git pull --rebase --autostash origin main && git push; then
+                echo "pushed"
+                pushed=1
+                break
+              fi
+              git rebase --abort || true
               echo "push rejected (attempt $attempt) - retrying"; sleep 5
             done
+            if [ "$pushed" -ne 1 ]; then
+              echo "Could not push the completed report; refusing to deploy stale content."
+              exit 1
+            fi
           fi
 
       - name: Trigger Render deploy
-        if: always()
+        if: success()
         continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
