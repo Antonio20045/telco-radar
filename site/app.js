@@ -2,10 +2,12 @@
 (function () {
   'use strict';
 
+
   const dataEl = document.getElementById('explorer-data');
   if (!dataEl) return;
   let items = [];
   try { items = JSON.parse(dataEl.textContent); } catch (e) { return; }
+
 
   const listEl = document.getElementById('ex-list');
   const detailEl = document.getElementById('ex-detail');
@@ -17,9 +19,11 @@
   const fSort = document.getElementById('f-sort');
   if (!listEl) return;
 
+
   const REL_LABEL = { 5: 'Sofort ansehen', 4: 'Wichtig', 3: 'Beobachten', 2: 'Randnotiz', 1: 'Randnotiz', 0: 'Unbewertet' };
   let visible = [];
   let selectedId = null;
+
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -27,6 +31,7 @@
     });
   }
   function relClass(r) { return 'r' + (r >= 2 ? r : 0); }
+
 
   function matches(h) {
     const q = (fSearch.value || '').trim().toLowerCase();
@@ -41,6 +46,7 @@
     return true;
   }
 
+
   function sortItems(arr) {
     const mode = fSort.value;
     const copy = arr.slice();
@@ -53,6 +59,7 @@
     }
     return copy;
   }
+
 
   function renderList() {
     visible = sortItems(items.filter(matches));
@@ -74,6 +81,7 @@
       detailEl.innerHTML = '<p class="ex-detail-empty">Keine Meldung passt zu diesen Filtern.</p>';
     }
   }
+
 
   function select(id, scroll) {
     selectedId = id;
@@ -99,6 +107,7 @@
     if (scroll && window.innerWidth <= 880) detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+
   listEl.addEventListener('click', function (e) {
     const row = e.target.closest('.ex-row');
     if (row) select(parseInt(row.dataset.id, 10), true);
@@ -110,9 +119,11 @@
     }
   });
 
+
   let t;
   fSearch.addEventListener('input', function () { clearTimeout(t); t = setTimeout(renderList, 120); });
   [fRegion, fCategory, fRelevance, fSort].forEach(function (el) { el.addEventListener('change', renderList); });
+
 
   renderList();
 })();
