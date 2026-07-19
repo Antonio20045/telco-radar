@@ -16,6 +16,10 @@ from .llm import complete
 
 log = logging.getLogger(__name__)
 
+
+class EditorialBriefingError(RuntimeError):
+    """Raised when the editor output is not a publishable weekly briefing."""
+
 EDITOR_SYSTEM = """\
 You are the chief editor of "Telco Radar", Vodafone Group's weekly global
 competitive-intelligence briefing. Vodafone is a telecommunications operator
@@ -93,7 +97,7 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         ensure_ascii=False,
     )
     raw = complete(EDITOR_SYSTEM.format(language=language), user,
-                   model=model, max_tokens=8000)
+                   model=model, max_tokens=5000)
 
     topics: list[str] = []
     markdown = raw
@@ -105,7 +109,36 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
                 topics = [str(t) for t in parsed]
         except json.JSONDecodeError:
             log.warning("Editor topic list unparseable - continuing without")
-    return markdown.strip(), topics
+    markdown = markdown.strip()
+    validate_editorial_briefing(markdown)
+    return markdown, topics
+
+
+def validate_editorial_briefing(markdown: str) -> None:
+    """Reject a raw source list before it can replace the public report.
+
+    A technical outage at the free model provider must leave the last good
+    briefing online, not turn the homepage into a list of collected links.
+    """
+    headings = {
+        line.strip().lower()
+        .replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+        for line in markdown.splitlines()
+        if line.strip().startswith("## ")
+    }
+    required = {
+        "## auf einen blick",
+        "## das wichtigste",
+        "## die wichtigsten signale",
+        "## muster der woche",
+        "## empfehlungen fuer vodafone",
+    }
+    missing = required - headings
+    if missing or "## wochenueberblick" in headings:
+        detail = ", ".join(sorted(missing)) or "Roh-Digest erkannt"
+        raise EditorialBriefingError(
+            f"Editor output is not a publishable weekly briefing ({detail})."
+        )
 
 
 def build_digest(items_by_region: dict[str, list[Item]],
