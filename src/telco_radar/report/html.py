@@ -116,6 +116,7 @@ def _flatten(report: dict) -> list[dict]:
             dom = urlsplit(h.get("url") or "").netloc.removeprefix("www.")
             h["source_domain"] = dom
             h["source_label"] = h.get("source") or dom
+            h["de_title"] = _first_sentence(h.get("summary") or "", 150) or h.get("title") or ""
             out.append(h)
     out.sort(key=lambda h: (h["relevance"], h.get("date") or ""), reverse=True)
     for i, h in enumerate(out):
@@ -239,6 +240,22 @@ def _briefing_sections(md_text):
     return sections
 
 
+def _briefing_lead(md_text: str) -> str:
+    """Kurzer, plakativer Vorspann fuer die Uebersicht (Klartext, gekuerzt)."""
+    secs = _briefing_sections(md_text)
+    pick = None
+    for sec in secs:
+        if "wichtig" in (sec.get("title") or "").lower():
+            pick = sec
+            break
+    if pick is None:
+        pick = secs[1] if len(secs) > 1 else (secs[0] if secs else None)
+    if not pick:
+        return ""
+    txt = " ".join(re.sub(r"<[^>]+>", " ", pick["html"]).split())
+    return (txt[:360].rstrip() + "\u2026") if len(txt) > 360 else txt
+
+
 def _stats(report, prev_report, trend_reports):
     highlights = _flatten(report)
     total = len(highlights) or 1
@@ -291,7 +308,8 @@ def _stats(report, prev_report, trend_reports):
         rec = {"title": h.get("title"), "op": h.get("operator") or h.get("source_label"),
                "url": h.get("url"), "why": h.get("why_it_matters"),
                "cat": h.get("category"), "region": h.get("region"),
-               "rel": h.get("relevance") or 0}
+               "rel": h.get("relevance") or 0,
+               "de": _first_sentence(h.get("summary") or "", 150) or h.get("title")}
         angle = _classify_angle(h.get("why_it_matters"))
         if angle == "risk":
             risks.append(rec)
@@ -318,6 +336,7 @@ def _stats(report, prev_report, trend_reports):
     if lead:
         lead = {
             "title": lead.get("title"), "url": lead.get("url"),
+            "de_title": _first_sentence(lead.get("summary") or "", 150) or lead.get("title"),
             "why": _first_sentence(lead.get("why_it_matters"), limit=250),
             "op": lead.get("operator") or lead.get("source_label"),
             "region": lead.get("region"), "category": lead.get("category"),
@@ -376,6 +395,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 "llm": r.get("generated_with_llm", False)} for r in reports]
 
     report_tpl = env.get_template("report.html.j2")
+    uebersicht_tpl = env.get_template("uebersicht.html.j2")
     for i, report in enumerate(reports):
         highlights = _flatten(report)
         top = [h for h in highlights if h["relevance"] >= 4][:6]
@@ -398,8 +418,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         (site_dir / "reports" / f"{report['date']}.html").write_text(
             report_tpl.render(prefix="../", **ctx), encoding="utf-8")
         if i == 0:
-            (site_dir / "index.html").write_text(
+            (site_dir / "bericht.html").write_text(
                 report_tpl.render(prefix="", **ctx), encoding="utf-8")
+            (site_dir / "index.html").write_text(
+                uebersicht_tpl.render(
+                    prefix="", dash=ctx["dash"],
+                    top_priorities=ctx["top_priorities"], date_de=ctx["date_de"],
+                    briefing_lead=_briefing_lead(report.get("briefing_md", ""))),
+                encoding="utf-8")
 
     latest = reports[0] if reports else None
 

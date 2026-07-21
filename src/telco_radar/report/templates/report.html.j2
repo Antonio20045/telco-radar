@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% set active = 'dashboard' if is_latest else 'archive' %}
+{% set active = 'bericht' %}
 {% block title %}Telco Radar - Bericht {{ report.date if report else '' }}{% endblock %}
 
 {% macro feed(items, empty) %}
@@ -28,7 +28,7 @@
     {% if dash and dash.lead_signal %}
     <article class="lead-signal">
       <div class="lead-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
-      <h2><a href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">{{ dash.lead_signal.title }}</a></h2>
+      <h2><a href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">{{ dash.lead_signal.de_title }}</a></h2>
       {% if dash.lead_signal.why %}<p>{{ dash.lead_signal.why }}</p>{% endif %}
       <div class="lead-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %}<span></span>{{ dash.lead_signal.region }}{% endif %}{% if dash.lead_signal.category %}<span></span>{{ dash.lead_signal.category }}{% endif %}</div>
     </article>
@@ -57,7 +57,7 @@
         <span class="rel-badge r{{ h.relevance }}">{{ h.relevance }}/5 &middot; {{ h.relevance_label }}</span>
         <span class="chip">{{ h.category }}</span>
       </div>
-      <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.title }}</a></h3>
+      <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.de_title }}</a></h3>
       <p class="prio-meta"><b>{{ h.operator or h.source_label }}</b><span class="sep"></span>{{ h.region }}{% if h.date %}<span class="sep"></span>{{ h.date }}{% endif %}</p>
       {% if h.why_it_matters %}<p class="why"><span class="why-label">Für Vodafone</span>{{ h.why_it_matters }}</p>
       {% elif h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
@@ -97,7 +97,7 @@
       <h3 class="cr-title risk">Risiken &middot; was uns unter Druck setzt</h3>
       {% for r in dash.risks %}
       <article class="cr-card risk">
-        <h4><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.title }}</a></h4>
+        <h4><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.de }}</a></h4>
         <p class="cr-meta"><b>{{ r.op }}</b> &middot; {{ r.region }} &middot; {{ r.cat }}</p>
         <p class="cr-why">{{ r.why }}</p>
       </article>
@@ -107,7 +107,7 @@
       <h3 class="cr-title chance">Chancen &middot; was wir nutzen können</h3>
       {% for c in dash.chances %}
       <article class="cr-card chance">
-        <h4><a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.title }}</a></h4>
+        <h4><a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.de }}</a></h4>
         <p class="cr-meta"><b>{{ c.op }}</b> &middot; {{ c.region }} &middot; {{ c.cat }}</p>
         <p class="cr-why">{{ c.why }}</p>
       </article>

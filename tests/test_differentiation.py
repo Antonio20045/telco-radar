@@ -23,11 +23,18 @@ def test_network_ai_infra_excluded():
     assert r["total"] == 0
 
 
-def test_satellite_direct_to_cell_kept_even_as_network_tech():
-    r = build_differentiation([_hl(title="au Starlink Direct adds satellite messaging",
-                                   summary="direct-to-cell for customers",
-                                   category="Netz/Technologie", relevance=5)])
-    assert r["total"] == 1 and r["active"][0]["key"] == "satellite"
+def test_warranty_classified_as_garantie():
+    r = build_differentiation([_hl(title="Operator launches 5-year warranty and price lock",
+                                   summary="Garantie und Preisgarantie fuer Kunden",
+                                   category="Produktlaunch", relevance=5)])
+    assert r["total"] == 1 and r["active"][0]["key"] == "garantie"
+
+
+def test_trade_in_classified_as_geraete():
+    r = build_differentiation([_hl(title="Carrier expands trade-in and annual upgrade program",
+                                   summary="Inzahlungnahme und jaehrliches Upgrade",
+                                   category="Produktlaunch", relevance=4)])
+    assert r["total"] == 1 and r["active"][0]["key"] == "geraete"
 
 
 def test_consumer_ai_bundle_kept():

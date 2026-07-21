@@ -1,0 +1,87 @@
+{% extends "base.html.j2" %}
+{% set active = 'uebersicht' %}
+{% block title %}Marktrecherche · Übersicht{% endblock %}
+{% block content %}
+{% if dash %}
+<section class="ov-hero">
+  <div class="ov-hero-main">
+    <div class="kicker">Marktrecherche &middot; Stand {{ date_de }}</div>
+    <h1>Diese Woche auf einen Blick</h1>
+    <p class="ov-lead">Die relevanten Wettbewerbszüge – verdichtet auf Entscheidungen. <a href="{{ prefix }}bericht.html">Zum vollen Bericht &nearr;</a></p>
+  </div>
+  {% if dash.lead_signal %}
+  <a class="ov-signal" href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">
+    <div class="ov-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
+    <h2>{{ dash.lead_signal.de_title }}</h2>
+    {% if dash.lead_signal.why %}<p>{{ dash.lead_signal.why }}</p>{% endif %}
+    <div class="ov-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %} &middot; {{ dash.lead_signal.region }}{% endif %}</div>
+  </a>
+  {% endif %}
+</section>
+
+<div class="kpi-tiles">
+  {% for k in dash.kpis %}
+  <div class="kpi-tile{% if k.accent %} accent{% endif %}"><b{% if k.text %} class="t"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span></div>
+  {% endfor %}
+</div>
+
+<div class="ov-grid">
+  <section class="ov-panel">
+    <div class="ov-panel-head"><h3>Top-Signale</h3><a href="{{ prefix }}bericht.html">alle &nearr;</a></div>
+    {% for h in top_priorities[:3] %}
+    <a class="ov-row" href="{{ h.url }}" target="_blank" rel="noopener">
+      <span class="ov-badge r{{ h.relevance }}">{{ h.relevance }}</span>
+      <span class="ov-row-main"><b>{{ h.operator or h.source_label }}</b>{{ h.de_title }}</span>
+    </a>
+    {% else %}<p class="muted-note">Keine Top-Signale.</p>{% endfor %}
+  </section>
+
+  <section class="ov-panel">
+    <div class="ov-panel-head"><h3>Differenzierung</h3><a href="{{ prefix }}differenzierung.html">Tafel &nearr;</a></div>
+    {% for m in dash.diff.top %}
+    <a class="ov-row" href="{{ m.url }}" target="_blank" rel="noopener">
+      <span class="ov-dot" style="background:{{ m.color }}"></span>
+      <span class="ov-row-main"><b>{{ m.op }}</b>{{ m.de_title }}</span>
+    </a>
+    {% else %}<p class="muted-note">Diese Woche keine neuen Moves – die Inspirations-Tafel bleibt.</p>{% endfor %}
+  </section>
+
+  <section class="ov-panel">
+    <div class="ov-panel-head"><h3>Chancen &amp; Risiken</h3><a href="{{ prefix }}bericht.html#chancen-risiken">Details &nearr;</a></div>
+    <div class="ov-cr">
+      <div class="ov-cr-col"><span class="ov-cr-lab risk">Risiken</span>
+        {% for r in dash.risks[:2] %}<p class="ov-cr-item"><b>{{ r.op }}</b> {{ r.de }}</p>{% else %}<p class="muted-note">Keine.</p>{% endfor %}
+      </div>
+      <div class="ov-cr-col"><span class="ov-cr-lab chance">Chancen</span>
+        {% for c in dash.chances[:2] %}<p class="ov-cr-item"><b>{{ c.op }}</b> {{ c.de }}</p>{% else %}<p class="muted-note">Keine.</p>{% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="ov-panel">
+    <div class="ov-panel-head"><h3>Aktivste Wettbewerber</h3><a href="{{ prefix }}wettbewerber.html">Analyse &nearr;</a></div>
+    {% for c in dash.move_matrix[:5] %}
+    <div class="ov-bar"><span class="ov-bar-lab">{{ c.name }}</span>
+      <span class="ov-bar-track"><span class="ov-bar-fill" style="width:{{ (100 * c.n / (dash.move_matrix|map(attribute='n')|max or 1)) | round }}%"></span></span>
+      <span class="ov-bar-val">{{ c.n }}</span></div>
+    {% else %}<p class="muted-note">Keine Daten.</p>{% endfor %}
+  </section>
+
+  <section class="ov-panel">
+    <div class="ov-panel-head"><h3>Top-Themen</h3></div>
+    {% for t in dash.tech_radar[:5] %}
+    <div class="ov-bar"><span class="ov-bar-lab">{{ t.theme }}</span>
+      <span class="ov-bar-track"><span class="ov-bar-fill" style="width:{{ t.w }}%"></span></span>
+      <span class="ov-bar-val">{{ t.n }}</span></div>
+    {% else %}<p class="muted-note">Keine Themen erkannt.</p>{% endfor %}
+  </section>
+
+  <section class="ov-panel ov-panel-brief">
+    <div class="ov-panel-head"><h3>Kurzfazit der Woche</h3><a href="{{ prefix }}bericht.html">Bericht lesen &nearr;</a></div>
+    <p class="ov-brief">{{ briefing_lead }}</p>
+  </section>
+</div>
+{% else %}
+<section class="ov-hero"><div class="ov-hero-main"><h1>Noch keine Daten</h1></div></section>
+{% endif %}
+{% endblock %}

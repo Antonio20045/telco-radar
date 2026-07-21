@@ -7,23 +7,30 @@
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="index.html" aria-label="Telco Radar">
-        <img class="brand-logo" src="logo.png" alt="Vodafone" width="30" height="30">
-        <span class="brand-name">Telco<em>Radar</em></span>
+      <a class="brand" href="index.html" aria-label="Vodafone Insights">
+        <img class="brand-logo" src="logo.png" alt="Vodafone" width="26" height="26">
+        <span class="brand-name">Vodafone<em>Insights</em></span>
       </a>
-      <nav class="nav">
-        <a href="index.html" >Bericht</a>
+      <nav class="usecases" aria-label="Anwendungsfälle">
+        <a class="uc active" href="index.html">Marktrecherche</a>
+        <span class="uc soon" title="folgt">weitere folgen</span>
+      </nav>
+    </div>
+    <div class="subbar">
+      <nav class="wrap subnav" aria-label="Marktrecherche">
+        <a href="index.html" >Übersicht</a>
+        <a href="bericht.html" >Bericht</a>
         <a href="differenzierung.html" >Differenzierung</a>
         <a href="wettbewerber.html" >Wettbewerber</a>
         <a href="protokoll.html" >Protokoll</a>
-        <a href="archive.html" class="active">Archiv</a>
+        <a href="archive.html" class="on">Archiv</a>
         <a href="sources.html" >Quellen</a>
       </nav>
     </div>
@@ -81,14 +88,10 @@
 
     </div>
   </main>
-  <footer class="footer">
-    <div class="wrap footer-inner">
-      <div style="max-width:640px">
-        <b>Telco Radar</b> beobachtet jede Woche die Presse von 81 Netzbetreibern
-        weltweit und die internationale Fachpresse. Nur wirklich neue Meldungen werden bewertet und hier
-        zusammengefasst. Jede Aussage verlinkt auf die Originalquelle.
-      </div>
-      <div class="footer-meta">Intern &middot; für Vodafone</div>
+  <footer class="foot">
+    <div class="wrap foot-inner">
+      <span>Vodafone Insights &middot; Marktrecherche</span>
+      <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
     </div>
   </footer>
   <script src="app.js"></script>
