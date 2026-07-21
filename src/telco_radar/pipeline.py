@@ -20,6 +20,7 @@ from .analyze import editor
 from .analyze.agents import analyze_region
 from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
+from .analyze import idea_radar
 from .analyze.diff_curator import DiffStore
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
@@ -248,6 +249,19 @@ def run(root: Path, use_llm: bool | None = None,
                  len(added), len(diff_store))
     except Exception as exc:  # noqa: BLE001
         log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
+
+    # ------------------------------------------------- Ideen-Radar (Agent)
+    # Schreibt pro Differenzierungs-Hebel eine kompakte "Vorbild -> Idee"-Zeile
+    # aus der aktuellen Marktlage. Failsafe: Seed-Fallback, bricht nie ab.
+    try:
+        digest = "; ".join(
+            f"{(i.operator or i.source_name)}: {i.title}"
+            for i in new_items[:80] if i.title)
+        idea_radar.refresh(
+            state_dir / "idea_radar.json", digest,
+            model=editor_model, use_llm=bool(use_llm and new_items))
+    except Exception as exc:  # noqa: BLE001
+        log.error("Ideen-Radar uebersprungen: %s", exc)
 
     # -------------------------------------------------------------- report
     today = date.today()

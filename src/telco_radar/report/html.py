@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup
 
 from .differentiation import build_differentiation
 from ..analyze.diff_curator import DiffStore
+from ..analyze.idea_radar import load_or_seed as load_idea_radar
 
 log = logging.getLogger(__name__)
 
@@ -450,6 +451,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
             prefix="", diff=build_differentiation(diff_source),
+            radar=load_idea_radar(state_dir / "idea_radar.json"),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")

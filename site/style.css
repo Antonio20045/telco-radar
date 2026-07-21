@@ -603,14 +603,19 @@ main{padding-bottom:8px}
 .dz-quiet{margin-top:40px}
 .dz-quiet-head{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--vf-ink);margin:0 0 4px}
 .dz-quiet-sub{font-size:14.5px;color:var(--vf-mute);margin:0 0 20px}
-.dz-quiet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
-.dz-q{background:#fff;border:1px solid var(--vf-line);border-top:4px solid var(--c,var(--vf-red));
-  border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
-.dz-q h3{font-size:17px;font-weight:800;letter-spacing:-.01em;margin:0 0 8px;color:var(--vf-ink)}
-.dz-q-blurb{font-size:14px;line-height:1.55;color:#40444a;margin:0 0 14px}
-.dz-q-line{font-size:14px;line-height:1.55;color:#2c2f33;margin:9px 0 0}
-.dz-q-line span{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--c,var(--vf-red));margin-right:8px}
+/* Ideen-Radar: eine schlanke, scannbare Zeile pro Hebel */
+.dz-radar{list-style:none;margin:0;padding:0;border-top:1px solid var(--vf-line)}
+.dz-radar-row{display:grid;grid-template-columns:220px 1fr;gap:8px 22px;align-items:baseline;
+  padding:14px 2px;border-bottom:1px solid var(--vf-line)}
+.dz-radar-lever{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:800;
+  letter-spacing:-.01em;color:var(--vf-ink)}
+.dz-radar-dot{width:9px;height:9px;border-radius:50%;background:var(--c,var(--vf-red));flex:none}
+.dz-radar-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dz-radar-vb{font-size:14px;line-height:1.5;color:#40444a}
+.dz-radar-vb em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--vf-mute);margin-right:6px}
+.dz-radar-idee{font-size:14.5px;line-height:1.5;color:#2c2f33;font-weight:500;padding-left:20px;position:relative}
+.dz-radar-idee::before{content:"→";position:absolute;left:0;color:var(--c,var(--vf-red));font-weight:700}
 
 .dz-foot{font-size:12.5px;line-height:1.55;color:var(--vf-faint);margin:40px 0 0;
   padding-top:18px;border-top:1px solid var(--vf-line);max-width:900px}
@@ -618,7 +623,7 @@ main{padding-bottom:8px}
 @media (max-width:720px){
   .dz-card{padding:20px 18px 16px}
   .dz-context{grid-template-columns:1fr;gap:14px}
-  .dz-quiet-grid{grid-template-columns:1fr}
+  .dz-radar-row{grid-template-columns:1fr;gap:4px;padding:13px 2px}
 }
 
 

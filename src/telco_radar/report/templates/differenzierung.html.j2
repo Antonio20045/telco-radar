@@ -48,18 +48,20 @@
 
 {% if diff.quiet %}
 <section class="dz-quiet">
-  <h2 class="dz-quiet-head">Weitere Differenzierungs-Felder</h2>
-  <p class="dz-quiet-sub">Kategorien ohne frischen Move diese Woche – die Vorbilder bleiben als Inspiration.</p>
-  <div class="dz-quiet-grid">
+  <h2 class="dz-quiet-head">Ideen-Radar</h2>
+  <p class="dz-quiet-sub">Weitere Wege, sich jenseits des Preises abzuheben – je Hebel ein aktuelles Vorbild und eine konkrete Idee für Vodafone. Wöchentlich vom Agenten aus der Marktlage aktualisiert; sobald hier ein echter Move auftaucht, wandert der Hebel nach oben zu den Karten.</p>
+  <ul class="dz-radar">
     {% for t in diff.quiet %}
-    <article class="dz-q" style="--c:{{ t.color }}">
-      <h3>{{ t.label }}</h3>
-      <p class="dz-q-blurb">{{ t.blurb }}</p>
-      <p class="dz-q-line"><span>Vorbild</span>{{ t.vorbilder[0].name }}</p>
-      <p class="dz-q-line"><span>Impuls</span>{{ t.impuls }}</p>
-    </article>
+    {% set r = radar[t.key] %}
+    <li class="dz-radar-row" style="--c:{{ t.color }}">
+      <div class="dz-radar-lever"><span class="dz-radar-dot"></span>{{ t.label }}</div>
+      <div class="dz-radar-body">
+        <span class="dz-radar-vb"><em>Vorbild:</em> {{ r.vorbild if r else t.vorbilder[0].name }}</span>
+        <span class="dz-radar-idee">{{ r.idee if r else '' }}</span>
+      </div>
+    </li>
     {% endfor %}
-  </div>
+  </ul>
 </section>
 {% endif %}
 
