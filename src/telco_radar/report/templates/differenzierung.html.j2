@@ -15,16 +15,23 @@
 
 {% if diff.active %}
 {% for t in diff.active %}
-<section class="dz-theme" style="--c:{{ t.color }}">
-  <div class="dz-theme-head">
+<article class="dz-card" style="--c:{{ t.color }}">
+  <div class="dz-card-head">
     <h2>{{ t.label }}</h2>
     <span class="dz-count">{{ t.n }} {{ 'Move' if t.n == 1 else 'Moves' }}</span>
   </div>
   <p class="dz-blurb">{{ t.blurb }}</p>
   <div class="dz-context">
-    <p class="dz-vorbilder"><span>Wer macht’s vor</span>{% for v in t.vorbilder %}<b>{{ v.name }}</b>{% if not loop.last %}, {% endif %}{% endfor %}</p>
-    <p class="dz-impuls"><span>Für Vodafone</span>{{ t.impuls }}</p>
+    <div>
+      <span class="dz-lab">Wer macht’s vor</span>
+      <p>{% for v in t.vorbilder %}<b>{{ v.name }}</b>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+    </div>
+    <div>
+      <span class="dz-lab imp">Impuls für Vodafone</span>
+      <p>{{ t.impuls }}</p>
+    </div>
   </div>
+  <span class="dz-lab dz-moves-lab">Aktuelle Moves</span>
   <ul class="dz-moves">
     {% for m in t.moves[:8] %}
     <li class="dz-move">
@@ -35,28 +42,29 @@
     {% endfor %}
   </ul>
   {% if t.moves|length > 8 %}<p class="dz-more">+ {{ t.moves|length - 8 }} weitere in dieser Kategorie</p>{% endif %}
-</section>
+</article>
 {% endfor %}
 {% endif %}
 
 {% if diff.quiet %}
 <section class="dz-quiet">
   <h2 class="dz-quiet-head">Weitere Differenzierungs-Felder</h2>
+  <p class="dz-quiet-sub">Kategorien ohne frischen Move diese Woche – die Vorbilder bleiben als Inspiration.</p>
   <div class="dz-quiet-grid">
     {% for t in diff.quiet %}
-    <div class="dz-q" style="--c:{{ t.color }}">
+    <article class="dz-q" style="--c:{{ t.color }}">
       <h3>{{ t.label }}</h3>
       <p class="dz-q-blurb">{{ t.blurb }}</p>
       <p class="dz-q-line"><span>Vorbild</span>{{ t.vorbilder[0].name }}</p>
       <p class="dz-q-line"><span>Impuls</span>{{ t.impuls }}</p>
-    </div>
+    </article>
     {% endfor %}
   </div>
 </section>
 {% endif %}
 
 {% if not diff.active and not diff.quiet %}
-<section class="dz-theme"><p class="muted-note">Noch keine Differenzierungs-Moves erfasst – sie entstehen beim nächsten Lauf der Pipeline.</p></section>
+<article class="dz-card"><p class="muted-note">Noch keine Differenzierungs-Moves erfasst – sie entstehen beim nächsten Lauf der Pipeline.</p></article>
 {% endif %}
 
 <p class="dz-foot">Automatisch aus den Pressestellen von {{ num_operators or '80+' }} Netzbetreibern und der Telko-Fachpresse zusammengestellt – nur Differenzierungs-Moves, ohne reine Preis-, Netz- und B2B-Meldungen. Relevante Moves bleiben über Wochen erhalten.</p>
