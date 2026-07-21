@@ -1,0 +1,1509 @@
+{
+ "date": "2026-07-21",
+ "generated_with_llm": true,
+ "stats": {
+  "sources_total": 84,
+  "sources_ok": 54,
+  "sources_empty": 29,
+  "sources_failed": 1,
+  "collected": 855,
+  "new": 185,
+  "operators": 81,
+  "regions": 6
+ },
+ "briefing_md": "## Auf einen Blick\n- Vodafone startet mit Number Verify 2.0 eine eigene OTP-freie Authentifizierung in drei europäischen Märkten – ein direkter Hebel gegen Online-Betrug.\n- Microsoft investiert Milliarden in die europäische KI-Infrastruktur von Mistral; Vodafone muss jetzt eigene KI-Partnerschaften sichern, um im B2B-Geschäft nicht abgehängt zu werden.\n- Die geplante 2-Milliarden-Pfund-Fusion von Netomnia und nexfibre in Großbritannien steht vor einer eingehenden kartellrechtlichen Prüfung – das Ergebnis entscheidet über Vodafones Glasfaser-Optionen im UK-Markt.\n\n## Das Wichtigste\nDiese Woche zeigt einen klaren Trend: Netzbetreiber weltweit setzen auf KI-gestützte Dienste und Automatisierung, um sich von reinen Konnektivitätsanbietern zu Technologiepartnern zu entwickeln. Verizon investiert massiv in KI bei gleichzeitigem Stellenabbau, Telefónica bringt eine KI-Röntgendiagnose auf den Markt, und ein japanisches Konsortium um SoftBank gründet Noetra für physische KI. Parallel dazu verdichten sich die Signale zur Marktkonsolidierung: In Großbritannien prüft die Wettbewerbsbehörde CMA die Fusion von Netomnia und nexfibre, während e& seinen Vodafone-Anteil final verkauft hat. Für Vodafone bedeutet dies: Die eigene KI-Strategie muss beschleunigt werden, und die regulatorische Entwicklung in UK wird zum strategischen Scheideweg für das Festnetzgeschäft. Gleichzeitig liefert Vodafone selbst mit Number Verify 2.0 und dem 5G-Network-Slicing-Test in Albanien wichtige Innovationen, die nun konsequent global ausgerollt werden müssen.\n\n## Die wichtigsten Signale\n\n**Vodafone Group - Number Verify 2.0 startet in drei Ländern** (Produktlaunch, Dringlichkeit 5/5)\nVodafone hat Number Verify 2.0 in Deutschland, den Niederlanden und Großbritannien gestartet. Die Lösung authentifiziert Nutzer ohne Einmal-Passwörter (OTP) direkt über das Mobilfunknetz und soll Online-Betrug deutlich erschweren. Ein globaler Rollout ist geplant.\nFür Vodafone: Dieses Produkt muss jetzt mit höchster Priorität in alle Kernmärkte ausgerollt und als Sicherheits-Mehrwert für B2B-Kunden (Banken, E-Commerce) vermarktet werden, bevor Google oder Apple ähnliche netzbasierte Lösungen etablieren.\n[Quelle](https://www.thefastmode.com/technology-solutions/49712-vodafone-number-verify-2-0-launches-global-rollout-to-combat-online-fraud)\n\n**Microsoft / Mistral - Milliardeninvestition in europäische KI-Infrastruktur** (Partnerschaft, Dringlichkeit 5/5)\nMicrosoft investiert mehrere Milliarden Dollar in den Ausbau der GPU-Kapazitäten des französischen KI-Anbieters Mistral in Europa. Damit entsteht eine leistungsfähige, europäisch verankerte KI-Cloud-Infrastruktur.\nFür Vodafone: Vodafone sollte umgehend eine strategische Partnerschaft mit Mistral oder einem vergleichbaren europäischen KI-Anbieter prüfen, um B2B-KI-Dienste (z. B. für Industrie oder Gesundheitswesen) auf einer unabhängigen Infrastruktur anbieten zu können.\n[Quelle](https://www.mobileworldlive.com/microsoft/microsoft-to-pump-billions-into-mistral-europe-push/)\n\n**BT Group - Millionenvertrag mit Scottish Water für kritische Infrastruktur** (Partnerschaft, Dringlichkeit 4/5)\nBT Business hat einen langfristigen Millionen-Pfund-Vertrag mit Scottish Water abgeschlossen und managt nun die gesamte Konnektivität und IT-Sicherheit des Wasserunternehmens.\nFür Vodafone: Vodafone sollte gezielt Ausschreibungen für kritische Infrastrukturen (Wasser, Energie, Verkehr) in Europa identifizieren und mit gebündelten Konnektivitäts- und Sicherheitsangeboten angreifen, um langfristige B2B-Großverträge zu sichern.\n[Quelle](https://newsroom.bt.com/bt-business-secures-multi-million-pound-contract-to-enhance-critical-national-infrastructure-for-scottish-water/)\n\n**Telefónica - KI-Röntgendiagnose mit Harrison.ai** (Partnerschaft, Dringlichkeit 4/5)\nTelefónica bietet in Spanien eine KI-Lösung an, die Röntgenaufnahmen des Brustkorbs analysiert und automatisch bis zu 124 klinische Befunde erkennt – ein direkter Einstieg in den Healthcare-Markt.\nFür Vodafone: Vodafone sollte ähnliche Partnerschaften mit Medizintechnik-Startups eingehen, um ein eigenes KI-Gesundheitsangebot für Krankenhäuser und Kliniken zu entwickeln und sich im wachsenden digitalen Gesundheitsmarkt zu positionieren.\n[Quelle](https://www.telefonica.com/en/communication-room/press-room/telefonica-harrison-ai-join-forces-support-diagnosis-chest-rays-ai/)\n\n**Vodafone Albanien / Nokia - 5G Network Slicing mit Agentic AI** (Netz/Technologie, Dringlichkeit 4/5)\nVodafone Albanien und Nokia haben demonstriert, wie Agentic AI dynamisch eigene Netzwerk-Slices für Notfälle oder Großveranstaltungen erstellt – ein erster praktischer Einsatz von KI-gesteuertem Network Slicing.\nFür Vodafone: Diese Technologie sollte in weiteren Märkten pilotiert werden, um B2B-Kunden (Rettungsdienste, Eventveranstalter) garantierte Netzwerkkapazitäten als Premium-Produkt anbieten zu können.\n[Quelle](https://www.thefastmode.com/technology-solutions/49711-vodafone-albania-nokia-demonstrate-5g-network-slicing-with-agentic-ai-innovation)\n\n**Orange Belgien - SaferPhone Pack für Kinder** (Produktlaunch, Dringlichkeit 4/5)\nOrange Belgien hat ein Paket aus altersgerechtem Tarif, Kindersicherung und Smartphone für den ersten sicheren Smartphone-Einstieg von Kindern eingeführt.\nFür Vodafone: Vodafone sollte ein ähnliches Familienprodukt in Deutschland und weiteren Märkten entwickeln, um Eltern als Zielgruppe zu gewinnen und sich gegen spezialisierte Kinder-Angebote von Wettbewerbern zu behaupten.\n[Quelle](https://www.thefastmode.com/services-and-innovations/49684-orange-belgium-launches-saferphone-pack-for-safe-first-smartphone-use-by-children)\n\n**Virgin Media O2 / Netomnia - Kartellrechtliche Hürde für 2-Milliarden-Pfund-Deal** (M&A, Dringlichkeit 4/5)\nDie britische Wettbewerbsbehörde CMA leitet eine eingehende Prüfung der geplanten Übernahme von Netomnia durch VMO2 ein, da in bestimmten Gebieten bereits hohe Marktanteile bestehen.\nFür Vodafone: Sollte der Deal scheitern oder mit Auflagen versehen werden, entsteht eine strategische Chance für Vodafone, Netomnia als Partner oder Übernahmeziel für den eigenen Glasfaserausbau in UK zu nutzen.\n[Quelle](https://www.ispreview.co.uk/index.php/2026/07/point-topic-highlights-key-challenge-for-vmo2s-2bn-netomnia-broadband-deal.html)\n\n**Netomnia / nexfibre - CMA eröffnet eingehende Fusionsprüfung** (M&A, Dringlichkeit 4/5)\nParallel zum VMO2-Deal prüft die CMA auch die Fusion von Netomnia und nexfibre – ein weiterer Konsolidierungsfall im britischen Glasfasermarkt mit potenziell großer Marktwirkung.\nFür Vodafone: Vodafone muss beide Verfahren genau verfolgen und eigene Konsolidierungsoptionen (z. B. Vertiefung der Partnerschaft mit CityFibre) vorbereiten, um im UK-Festnetzmarkt nicht ins Hintertreffen zu geraten.\n[Quelle](https://totaltele.com/netomnia-ceo-defends-nexfibre-merger-as-cma-begins-in-depth-investigation/)\n\n**Verizon - KI-Investitionen bei gleichzeitigem Stellenabbau** (Netz/Technologie, Dringlichkeit 4/5)\nVerizon treibt KI-Initiativen voran, um über reine Konnektivität hinaus zu wachsen, begleitet von Filialschließungen und Personalabbau – ein klares Signal für Effizienzsteigerung durch Automatisierung.\nFür Vodafone: Vodafone sollte prüfen, ob eigene KI-Initiativen im Kundenservice und Netzmanagement ähnlich konsequent auf Kostensenkung und Umsatzsteigerung ausgerichtet sind.\n[Quelle](https://www.rcrwireless.com/20260721/carriers/telco-diary-verizon-ai-horizon)\n\n**Noetra (SoftBank, Sony, NEC, Honda) - Konsortium für physische KI in Japan** (Partnerschaft, Dringlichkeit 4/5)\n44 japanische Großunternehmen gründen Noetra, um KI-Modelle für Roboter und physische Anwendungen zu entwickeln, inklusive eines 140-Megawatt-Rechenzentrums.\nFür Vodafone: SoftBank als direkter Wettbewerber im B2B-IoT-Bereich baut hier eine schlagkräftige industrielle KI-Plattform auf. Vodafone sollte ähnliche Konsortien in Europa initiieren, um sich als Partner für industrielle KI zu positionieren.\n[Quelle](https://www.lightreading.com/ai-machine-learning/noetra-plans-140mw-data-center-to-fuel-japan-s-physical-ai-push)\n\n## Asien\nIn Asien treiben Rakuten Mobile und Reliance Jio den Wettbewerb mit Open-RAN-Ausbau und aggressiven Preistarifen voran, während CelcomDigi in Malaysia auf netzbasierte Sicherheitsdienste setzt.\n\n**Rakuten Mobile - Open-RAN-Ausbau mit 1Finity-Radios und Massive MIMO** (Netz/Technologie, Dringlichkeit 4/5)\nRakuten Mobile erweitert sein Open-RAN-Netz mit 1Finity-Radios und plant Massive-MIMO-Antennen für die nächsten zwei Jahre. Dies zeigt, dass Open RAN auch mit leistungsfähigen Antennentechnologien skalierbar ist. Für Vodafone sind die technischen Ergebnisse dieses Rollouts relevant für eigene Open-RAN-Pilotprojekte. [Quelle](https://www.rcrwireless.com/20260721/5g/rakuten-1finity-o-ran)\n\n**Reliance Jio - 799-Rupien-Tarif mit 1,5 GB täglich** (Tarif/Pricing, Dringlichkeit 4/5)\nJio bietet einen Prepaid-Tarif für umgerechnet etwa 9 Euro mit 1,5 GB Daten pro Tag – ein aggressives Angebot, das den indischen Markt unter Druck setzt. Vodafone Idea muss hier mithalten, und Vodafone sollte prüfen, ob ähnliche volumenbasierte Einstiegstarife in afrikanischen Märkten übertragbar sind. [Quelle](https://telecomtalk.info/reliance-jio-rs-799-pack-with-indians/1009868/)\n\n**CelcomDigi - Netzwerkbasierte Authentifizierung mit IPification** (Partnerschaft, Dringlichkeit 3/5)\nCelcomDigi hat eine Lösung eingeführt, die Mobilfunknummern zur Identitätsprüfung nutzt und Betrug reduzieren kann. Vodafone könnte ähnliche Dienste in Europa oder Afrika als Mehrwert für B2B-Kunden wie Banken anbieten. [Quelle](https://www.thefastmode.com/technology-solutions/49701-ipification-celcomdigi-expand-mobile-network-verification-in-malaysia)\n\n## Europa\nIn Europa dominieren KI-Innovationen und strategische Neuausrichtungen: Telia verkauft seine Contact-Center-Plattform, Elisa setzt auf Data-Center-Konnektivität, und congstar lockt in Deutschland mit Wechselboni.\n\n**Telia - Verkauf der ACE Contact-Center-Plattform an LeadDesk** (M&A, Dringlichkeit 3/5)\nTelia stößt seine Contact-Center-Plattform ab und konzentriert sich auf das Kerngeschäft. Vodafone sollte prüfen, ob eigene nicht-strategische Plattformen ähnlich veräußert werden können, um Kapital für Kerninvestitionen freizusetzen. [Quelle](https://www.thefastmode.com/mobile-network-operators-m-a/49709-telia-divests-ace-contact-center-platform-to-leaddesk-in-strategic-partnership-deal)\n\n**Elisa - Data-Center-Konnektivität als Wachstumsfeld** (Netz/Technologie, Dringlichkeit 3/5)\nElisa hat erste Deals für Glasfaseranbindungen von Rechenzentren abgeschlossen. Vodafone könnte ähnliche Produkte in Märkten mit hohem Rechenzentrumsbedarf wie Frankfurt oder London anbieten, um vom Cloud- und KI-Boom zu profitieren. [Quelle](https://www.rcrwireless.com/20260720/carriers/elisa-data-center-fiber)\n\n**congstar - Wechselbonus bis 40 Euro** (Kampagne, Dringlichkeit 3/5)\nDie Telekom-Marke congstar lockt Neukunden mit einem Wechselbonus von bis zu 40 Euro bis zum 18. August. Vodafone Deutschland sollte mit einer zeitlich begrenzten Gegenaktion oder einem verbesserten Willkommensangebot reagieren, um Abwanderung zu verhindern. [Quelle](https://www.inside-digital.de/deals/wer-jetzt-zu-congstar-wechselt-bekommt-bis-zu-40-euro-geschenkt)\n\n**htp - Migration früher FTTH-Netze auf XGS-PON** (Netz/Technologie, Dringlichkeit 3/5)\nDer regionale Anbieter htp rüstet seine ersten Glasfasernetze auf XGS-PON um, um höhere Bandbreiten und symmetrische Übertragung zu ermöglichen. Vodafone sollte prüfen, ob eigene ältere FTTH- oder FTTB-Infrastrukturen in Deutschland ebenfalls modernisiert werden müssen. [Quelle](https://totaltele.com/the-second-fiber-migration-why-germanys-ftth-pioneers-are-moving-to-xgs-pon/)\n\n## Nordamerika\nIn den USA setzen Verizon und AT&T auf KI-gestützte Effizienz und dokumentieren Rekord-Datennutzung bei Großevents, während das DISH-Modell ohne eigenes Netz scheitert.\n\n**Charter Communications / SpaceX - Spektrum als MVNO-Verhandlungsmasse** (Partnerschaft, Dringlichkeit 4/5)\nAnalysten spekulieren, dass SpaceX sein Spektrum für einen MVNO-Deal mit einem Kabelnetzbetreiber wie Charter nutzen könnte. Ein solcher Deal würde einen neuen datenstarken Wettbewerber schaffen. Vodafone sollte beobachten, ob dieses Modell durch Starlink-Partnerschaften mit Kabelnetzbetreibern auf Europa überschwappt. [Quelle](https://www.lightreading.com/satellite/is-spectrum-spacex-s-ticket-to-an-mvno-deal-)\n\n**Verizon / AT&T - Rekord-Datennutzung während der FIFA-WM** (Netz/Technologie, Dringlichkeit 3/5)\nBeide Betreiber meldeten Rekord-Datenmengen während der Weltmeisterschaft und dokumentierten umfangreiche Netz-Upgrades. Vodafone kann aus diesen Erfahrungen lernen, wie Kapazitäten für Großevents wie die EM oder Olympia skaliert und vermarktet werden. [Quelle](https://www.mobileworldlive.com/operators/verizon-att-tally-massive-data-usage-during-world-cup/)\n\n**DISH Wireless / EchoStar - Befreiung von Netzbetriebspflicht** (Regulierung, Dringlichkeit 3/5)\nEchoStar/DISH wurde von der Verpflichtung befreit, ein eigenes Mobilfunknetz zu betreiben, und kehrt ins Insolvenzverfahren zurück. Das Scheitern zeigt, dass reine Spektrumhalter ohne Infrastruktur kaum überlebensfähig sind – ein Argument für den Wert eigener Netze in Regulierungsdiskussionen. [Quelle](https://www.fierce-network.com/wireless/echostar-hook-operating-own-mobile-network)\n\n## Afrika & Naher Osten\nOrange Jordan investiert mit einer neuen Phase der Coding Academy in die digitale Bildung Jugendlicher – ein Modell für Talentförderung und Markenbindung.\n\n**Orange Jordan - Neue Phase der Coding Academy** (Sonstiges, Dringlichkeit 2/5)\nOrange Jordan startet eine neue Phase seiner Programmier-Akademie für Jugendliche. Vodafone kann dies als Benchmark für eigene Initiativen in Märkten wie Ägypten oder Südafrika nutzen, um die Marke bei jungen Zielgruppen zu stärken und künftige digitale Talente zu sichern. [Quelle](https://www.thefastmode.com/technology-solutions/49699-orange-jordan-launches-new-coding-academy-phase-to-boost-youth-digital-skills)\n\n## Muster der Woche\n- **KI als strategisches Differenzierungsmerkmal**: Mehrere Betreiber – Verizon, Telefónica, SoftBank (Noetra) – investieren massiv in KI-Dienste jenseits der Konnektivität, sei es für Gesundheitsdiagnosen, Robotik oder Netzautomatisierung. KI wird zum zentralen Hebel, um sich vom reinen Leitungsanbieter zum Technologiepartner zu entwickeln.\n- **Konsolidierung im Glasfasermarkt unter kartellrechtlicher Beobachtung**: Die CMA-Prüfungen der Netomnia-Deals mit VMO2 und nexfibre zeigen, dass die britische Regulierungsbehörde bei Festnetz-Fusionen genau hinsieht. Dies betrifft Vodafone direkt in seinem zweitwichtigsten europäischen Markt.\n- **Netzbasierte Authentifizierung als Wachstumsfeld**: Vodafone (Number Verify 2.0) und CelcomDigi (IPification) setzen beide auf Mobilfunknummern als sicheren Identitätsnachweis – ein Trend, der Betrugsbekämpfung und Kundenbindung verbindet.\n- **Fokussierung auf Kernkompetenzen**: Telia verkauft seine Contact-Center-Plattform, e& trennt sich von Vodafone-Anteilen – Betreiber straffen ihre Portfolios und konzentrieren sich auf das Kerngeschäft.\n\n## Empfehlungen fuer Vodafone\n1. **Number Verify 2.0 mit höchster Priorität global ausrollen**: Der eigene Produktvorteil muss jetzt in allen Kernmärkten aktiviert werden, bevor Wettbewerber wie Google oder Apple ähnliche netzbasierte Authentifizierung etablieren. Die CelcomDigi-Initiative zeigt, dass der Markt sich schnell bewegt.\n2. **Strategische KI-Partnerschaft mit europäischem Anbieter eingehen**: Die Microsoft-Mistral-Investition schafft eine unabhängige europäische KI-Infrastruktur. Vodafone sollte innerhalb der nächsten drei Monate eine Partnerschaft mit Mistral oder einem vergleichbaren Anbieter prüfen, um B2B-KI-Dienste auf den Markt zu bringen – Telefónicas Healthcare-KI zeigt, wie schnell Wettbewerber hier voranschreiten.\n3. **Glasfaser-Optionen in UK aktiv vorbereiten**: Die CMA-Prüfungen der Netomnia-Deals sind ein strategischer Scheideweg. Vodafone sollte sowohl eine mögliche Netomnia-Partnerschaft als auch eine Vertiefung der CityFibre-Kooperation durchrechnen und regulatorisch positionieren.\n4. **Familienprodukt nach Orange-Vorbild entwickeln**: Das SaferPhone Pack von Orange Belgien adressiert ein wachsendes Elternbedürfnis. Vodafone Deutschland sollte innerhalb von sechs Monaten ein ähnliches Angebot testen, um sich in diesem Segment gegen spezialisierte Wettbewerber zu positionieren.\n5. **B2B-Kundenbindung durch persönliche Betreuung stärken**: Die Recon-Analytics-Studie belegt, dass persönlicher Account-Manager-Kontakt der stärkste Churn-Schutz ist. Vodafone sollte ein systematisches Check-in-Programm für Geschäftskunden einführen, bevor Wettbewerber diese Erkenntnis nutzen.",
+ "regions": {
+  "Asien": {
+   "region_summary": "In Asien treiben Rakuten Mobile und 1Finity den Open-RAN-Ausbau voran, während Vodafone Idea sein 5G-Netz in Indien ausbaut. Reliance Jio setzt mit einem 799-Rupien-Tarif neue Maßstäbe im Preissegment, und CelcomDigi in Malaysia führt eine netzwerkbasierte Authentifizierungslösung ein.",
+   "highlights": [
+    {
+     "title": "Rakuten Mobile expands O-RAN footprint with 1Finity radios",
+     "operator": "Rakuten Mobile",
+     "url": "https://www.rcrwireless.com/20260721/5g/rakuten-1finity-o-ran",
+     "category": "Netz/Technologie",
+     "relevance": 4,
+     "summary": "Rakuten Mobile baut sein Open-RAN-Netz mit 1Finity-Radios aus und plant den Einsatz von Massive-MIMO-Antennen, um die Netzleistung in den nächsten zwei Jahren zu verbessern.",
+     "why_it_matters": "Open RAN ist ein strategischer Hebel für Vodafone, um Lieferantenabhängigkeiten zu reduzieren. Rakuten Mobile zeigt, dass Open RAN auch mit Massive MIMO skalierbar ist – Vodafone sollte die technischen Ergebnisse genau beobachten und ggf. in eigenen Pilotprojekten nachahmen.",
+     "date": "2026-07-21",
+     "source": "RCR Wireless"
+    },
+    {
+     "title": "Vodafone Idea 5G Expands in Sagar, Satna, and Jabalpur",
+     "operator": "Vodafone Idea",
+     "url": "https://telecomtalk.info/vodafone-idea-5g-expands-in-sagar-satna/1009886/",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Vodafone Idea (VIL) hat 5G in weiteren Städten in Madhya Pradesh, Indien, gestartet und baut sein 5G-Netz kontinuierlich aus.",
+     "why_it_matters": "VIL ist ein Joint Venture mit Vodafone Group. Der 5G-Ausbau in Indien ist wichtig für die Marktposition gegenüber Jio und Airtel. Vodafone sollte prüfen, ob VIL ausreichend Frequenzen und Investitionen hat, um wettbewerbsfähig zu bleiben.",
+     "date": "2026-07-21",
+     "source": "TelecomTalk"
+    },
+    {
+     "title": "Reliance Jio Rs 799 Pack with 1.5GB Data Suits Most Indians",
+     "operator": "Reliance Jio",
+     "url": "https://telecomtalk.info/reliance-jio-rs-799-pack-with-indians/1009868/",
+     "category": "Tarif/Pricing",
+     "relevance": 4,
+     "summary": "Reliance Jio bietet einen Prepaid-Tarif für 799 Rupien (ca. 9 Euro) mit 1,5 GB Daten pro Tag an, der auf die Bedürfnisse der meisten indischen Nutzer zugeschnitten ist.",
+     "why_it_matters": "Jio setzt mit aggressiven Preisen den Markt unter Druck. Vodafone Idea muss hier mithalten, sonst verliert es Marktanteile. Vodafone sollte prüfen, ob ähnliche volumenbasierte Tarife in anderen Märkten (z.B. Afrika) übertragbar sind.",
+     "date": "2026-07-21",
+     "source": "TelecomTalk"
+    },
+    {
+     "title": "IPification, CelcomDigi Expand Mobile Network Verification in Malaysia",
+     "operator": "CelcomDigi",
+     "url": "https://www.thefastmode.com/technology-solutions/49701-ipification-celcomdigi-expand-mobile-network-verification-in-malaysia",
+     "category": "Partnerschaft",
+     "relevance": 3,
+     "summary": "CelcomDigi hat mit IPification eine netzwerkbasierte Authentifizierungslösung eingeführt, die Mobilfunknummern zur Identitätsprüfung nutzt.",
+     "why_it_matters": "Diese Technologie kann Betrug reduzieren und die Kundenbindung verbessern. Vodafone könnte ähnliche Lösungen in Europa oder Afrika als Mehrwertdienst für B2B-Kunden (z.B. Banken) anbieten.",
+     "date": "2026-07-20",
+     "source": "The Fast Mode"
+    }
+   ]
+  },
+  "Afrika & Naher Osten": {
+   "region_summary": "In Jordan investiert Orange in die digitale Bildung der Jugend mit einer neuen Phase der Coding Academy. Dies unterstreicht den Trend, dass Telcos in Afrika und Nahost zunehmend soziale Verantwortung mit Talentförderung verbinden, um langfristig Fachkräfte und Markenloyalität aufzubauen.",
+   "highlights": [
+    {
+     "title": "Orange Jordan Launches New Coding Academy Phase to Boost Youth Digital Skills",
+     "operator": "Orange MEA",
+     "url": "https://www.thefastmode.com/technology-solutions/49699-orange-jordan-launches-new-coding-academy-phase-to-boost-youth-digital-skills",
+     "category": "Sonstiges",
+     "relevance": 2,
+     "summary": "Orange Jordan startet eine neue Phase seiner Coding Academy, um die digitalen Fähigkeiten junger Menschen zu fördern.",
+     "why_it_matters": "Vodafone kann dieses Engagement als Benchmark für eigene CSR-Initiativen in Afrika nutzen, insbesondere um die Marke bei jungen Zielgruppen zu stärken und den zukünftigen Bedarf an digitalen Talenten zu sichern. Eine ähnliche Initiative in Vodafone-Märkten wie Ägypten oder Südafrika wäre denkbar.",
+     "date": "2026-07-20",
+     "source": "The Fast Mode"
+    }
+   ]
+  },
+  "Nordamerika": {
+   "region_summary": "In Nordamerika zeichnen sich zwei Trends ab: Erstens forcieren die großen Netzbetreiber (Verizon, AT&T) den Einsatz von KI und massiven Netzausbauten für Spitzenereignisse, während sie gleichzeitig Stellen abbauen. Zweitens gerät das MVNO-/Spektrum-Modell von DISH/EchoStar unter Druck, was Spekulationen über eine Partnerschaft mit SpaceX nährt. Für Vodafone bedeutet dies: Die US-Wettbewerber setzen auf KI zur Effizienzsteigerung, und das Scheitern von DISH zeigt die Risiken eines reinen Spektrum-Ansatzes ohne eigenes Netz.",
+   "highlights": [
+    {
+     "title": "Is spectrum SpaceX's ticket to an MVNO deal?",
+     "operator": "Charter Communications",
+     "url": "https://www.lightreading.com/satellite/is-spectrum-spacex-s-ticket-to-an-mvno-deal-",
+     "category": "Partnerschaft",
+     "relevance": 4,
+     "summary": "MoffettNathanson spekuliert, dass SpaceX sein Spektrum als Verhandlungsmasse für einen MVNO-Deal mit einem Kabelnetzbetreiber wie Charter Communications nutzen könnte.",
+     "why_it_matters": "Sollte SpaceX ein MVNO mit Charter starten, entstünde ein neuer, datenstarker Wettbewerber im US-Markt. Vodafone sollte beobachten, ob dieses Modell auf Europa überschwappt – etwa durch Starlink-Partnerschaften mit Kabelnetzbetreibern.",
+     "date": "2026-07-21",
+     "source": "Light Reading"
+    },
+    {
+     "title": "Friday (telco diary) | Verizon looks to AI horizon",
+     "operator": "Verizon",
+     "url": "https://www.rcrwireless.com/20260721/carriers/telco-diary-verizon-ai-horizon",
+     "category": "Netz/Technologie",
+     "relevance": 4,
+     "summary": "Verizon investiert in KI, um über reine Konnektivität hinaus zu wachsen, begleitet von Filialschließungen und Stellenabbau.",
+     "why_it_matters": "Verizon zeigt, wie KI zur Kostensenkung und Umsatzsteigerung eingesetzt wird. Vodafone sollte prüfen, ob eigene KI-Initiativen (z.B. im Kundenservice oder Netzmanagement) ähnlich konsequent vorangetrieben werden.",
+     "date": "2026-07-21",
+     "source": "RCR Wireless"
+    },
+    {
+     "title": "Verizon, AT&T tally massive data usage during World Cup",
+     "operator": "Verizon",
+     "url": "https://www.mobileworldlive.com/operators/verizon-att-tally-massive-data-usage-during-world-cup/",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Verizon und AT&T meldeten Rekord-Datennutzung während der FIFA WM und dokumentierten umfangreiche Netz-Upgrades zur Bewältigung der Spitzennachfrage.",
+     "why_it_matters": "Die Netzperformance bei Großevents ist ein zentrales Verkaufsargument. Vodafone kann aus den US-Erfahrungen lernen, wie man Kapazitäten für Events wie die EM oder Olympia skaliert und vermarktet.",
+     "date": "2026-07-21",
+     "source": "Mobile World Live"
+    },
+    {
+     "title": "EchoStar off hook for operating own mobile network",
+     "operator": "DISH Wireless",
+     "url": "https://www.fierce-network.com/wireless/echostar-hook-operating-own-mobile-network",
+     "category": "Regulierung",
+     "relevance": 3,
+     "summary": "EchoStar/DISH Wireless wurde von der Verpflichtung befreit, ein eigenes Mobilfunknetz aufzubauen und zu betreiben, und kehrt ins Insolvenzverfahren zurück.",
+     "why_it_matters": "Das Scheitern von DISH zeigt, dass reine Spektrumhalter ohne Netzinfrastruktur kaum überlebensfähig sind. Vodafone kann dies als Argument für den Wert eigener Netze in der Regulierungsdiskussion nutzen.",
+     "date": null,
+     "source": "Fierce Network"
+    }
+   ]
+  },
+  "Lateinamerika": {
+   "region_summary": "In dieser Woche dominieren in Lateinamerika interne Werbeaktionen von TIM Brasil, die Musik-Streaming (Deezer) und YouTube Premium bewerben sowie die Migration zu Glasfaser (Ultrafibra) vorantreiben. Es gibt keine strategischen Neuerungen von Wettbewerbern, die für Vodafone unmittelbar relevant wären.",
+   "highlights": [
+    {
+     "title": "Plugin TIM Music by Deezer SRV871",
+     "operator": "TIM Brasil",
+     "url": "https://www.tim.com.br/rj/node/168116",
+     "category": "Partnerschaft",
+     "relevance": 3,
+     "summary": "TIM Brasil bietet einen Deezer-Plugin an, der werbefreies Musikhören ohne Datenverbrauch ermöglicht.",
+     "why_it_matters": "Dieses Modell zeigt, wie Vodafone Musik-Streaming als datenfreies Add-on in eigene Tarife integrieren könnte, um die Kundenbindung zu stärken.",
+     "date": "2026-07-17",
+     "source": "TIM Brasil"
+    },
+    {
+     "title": "Tapume Full - Youtube-Premium - 20/07",
+     "operator": "TIM Brasil",
+     "source": "TIM Brasil",
+     "date": "2026-07-17",
+     "url": "https://www.tim.com.br/rj/node/168071",
+     "snippet": "Tapume Full - Youtube-Premium - 20/07 Anonymous (not verified) Fri, 07/17/2026 - 09:54 Início Mon, 07/20/2026 - 07:00 Final Sun, 07/26/2026 - 07:00 Btn1_URL /home Banner https://www.tim.com.br/sites/default/files/offers/comunicacao/meutim/tapume/tapume_all/260701_banner_full_youtube_ctrl_pos.png Btn",
+     "category": "Kampagne",
+     "relevance": 3,
+     "summary": "TIM Brasil bewirbt YouTube Premium mit einer zeitlich begrenzten Aktion (20.-26. Juli) für Prepaid- und Postpaid-Kunden.",
+     "why_it_matters": "Die Promotion von YouTube Premium als datenfreies Angebot ist ein Trend, den Vodafone in Europa ebenfalls prüfen sollte, um sich von Wettbewerbern abzuheben."
+    },
+    {
+     "title": "Tapume- Full- Ultrafibra - Migração - 20/07",
+     "operator": "TIM Brasil",
+     "source": "TIM Brasil",
+     "date": "2026-07-17",
+     "url": "https://www.tim.com.br/rj/node/168066",
+     "snippet": "Tapume- Full- Ultrafibra - Migração - 20/07 Anonymous (not verified) Fri, 07/17/2026 - 09:54 Início Mon, 07/20/2026 - 07:00 Final Sun, 07/26/2026 - 07:00 Btn1_URL /home Banner https://www.tim.com.br/sites/default/files/offers/comunicacao/meutim/tapume/tapume_all/20260720-tapume-full-Migracao-Ultrafi",
+     "category": "Kampagne",
+     "relevance": 2,
+     "summary": "TIM Brasil startet eine Kampagne zur Migration von Bestandskunden auf das Glasfaserprodukt Ultrafibra.",
+     "why_it_matters": "Die Fokussierung auf Glasfaser-Migration zeigt, dass TIM Brasil die Festnetz-Breitbandbasis ausbaut – ein Signal, das Vodafone in Märkten mit eigener Glasfaserstrategie beobachten sollte."
+    }
+   ]
+  },
+  "Europa": {
+   "region_summary": "In Europa dominieren diese Woche KI- und Automatisierungsinnovationen der Netzbetreiber, von selbstoptimierenden Mobilfunkmasten bis hin zu KI-gestützten Diagnoselösungen. Gleichzeitig zeigt sich eine strategische Neuausrichtung bei Telia (Verkauf der Contact-Center-Plattform) und e& (Vodafone-Anteilsverkauf), während Orange mit einem speziellen Kinderprodukt auf gesellschaftliche Bedürfnisse reagiert.",
+   "highlights": [
+    {
+     "title": "BT Business secures multi-million pound contract to enhance critical national infrastructure for Scottish Water",
+     "operator": "BT Group",
+     "url": "https://newsroom.bt.com/bt-business-secures-multi-million-pound-contract-to-enhance-critical-national-infrastructure-for-scottish-water/",
+     "category": "Partnerschaft",
+     "relevance": 4,
+     "summary": "BT Business hat einen Millionen-Pfund-Vertrag mit Scottish Water abgeschlossen, um die gesamte Konnektivität und IT-Sicherheit des Wasserunternehmens zu managen.",
+     "why_it_matters": "Vodafone sollte prüfen, ob ähnliche ‚End-to-End‘-Managed-Connectivity-Deals mit kritischer Infrastruktur (Wasser, Energie) in Europa möglich sind, um das B2B-Geschäft auszubauen und langfristige Verträge zu sichern.",
+     "date": "2026-07-21",
+     "source": "BT Group"
+    },
+    {
+     "title": "Telefónica and Harrison.ai join forces to support the diagnosis of chest X-rays using AI",
+     "operator": "Telefónica",
+     "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-harrison-ai-join-forces-support-diagnosis-chest-rays-ai/",
+     "category": "Partnerschaft",
+     "relevance": 4,
+     "summary": "Telefónica bietet in Spanien eine KI-Lösung an, die Röntgenaufnahmen des Brustkorbs analysiert und bis zu 124 klinische Befunde automatisch erkennt.",
+     "why_it_matters": "Vodafone könnte ein eigenes KI-Gesundheitsangebot für B2B-Kunden (Krankenhäuser, Kliniken) entwickeln, indem es ähnliche Partnerschaften mit Medizintechnik-Startups eingeht, um sich im lukrativen Healthcare-Sektor zu positionieren.",
+     "date": "2026-07-21",
+     "source": "Telefónica"
+    },
+    {
+     "title": "Vodafone Launches Number Verify 2.0 for Seamless, OTP-Free Phone Number Authentication",
+     "operator": "Vodafone Group",
+     "url": "https://www.thefastmode.com/technology-solutions/49712-vodafone-number-verify-2-0-launches-global-rollout-to-combat-online-fraud",
+     "category": "Produktlaunch",
+     "relevance": 5,
+     "summary": "Vodafone hat Number Verify 2.0 in Deutschland, den Niederlanden und Großbritannien gestartet – eine OTP-freie Authentifizierungslösung zur Betrugsbekämpfung, die global ausgerollt werden soll.",
+     "why_it_matters": "Vodafone sollte dieses Produkt schnell in weiteren Märkten ausrollen und als Sicherheitsfeature für B2B- und B2C-Kunden vermarkten, um sich gegen Konkurrenz wie Googles oder Apples Authentifizierungslösungen zu differenzieren.",
+     "date": "2026-07-20",
+     "source": "The Fast Mode"
+    },
+    {
+     "title": "Vodafone Albania, Nokia Demonstrate 5G Network Slicing with Agentic AI Innovation",
+     "operator": "Vodafone Group",
+     "url": "https://www.thefastmode.com/technology-solutions/49711-vodafone-albania-nokia-demonstrate-5g-network-slicing-with-agentic-ai-innovation",
+     "category": "Netz/Technologie",
+     "relevance": 4,
+     "summary": "Vodafone Albanien und Nokia haben gezeigt, wie Agentic AI dynamisch dedizierte Netzwerk-Slices für Notfälle oder Großveranstaltungen erstellen kann.",
+     "why_it_matters": "Vodafone sollte diese Innovation in anderen Märkten testen, um B2B-Kunden (z.B. Rettungsdienste, Eventveranstalter) garantierte Netzwerkkapazitäten anzubieten und so neue Umsatzquellen zu erschließen.",
+     "date": "2026-07-20",
+     "source": "The Fast Mode"
+    },
+    {
+     "title": "Telia Divests ACE Contact Center Platform to LeadDesk in Strategic Partnership Deal",
+     "operator": "Telia",
+     "url": "https://www.thefastmode.com/mobile-network-operators-m-a/49709-telia-divests-ace-contact-center-platform-to-leaddesk-in-strategic-partnership-deal",
+     "category": "M&A",
+     "relevance": 3,
+     "summary": "Telia verkauft seine Contact-Center-Plattform ACE an LeadDesk und geht eine strategische Partnerschaft ein, um sich auf das Kerngeschäft zu konzentrieren.",
+     "why_it_matters": "Vodafone sollte beobachten, ob dieser Trend zur Fokussierung aufs Kerngeschäft bei anderen Betreibern anhält, und prüfen, ob eigene nicht-strategische Assets (z.B. Plattformen) ähnlich abgestoßen werden könnten.",
+     "date": "2026-07-20",
+     "source": "The Fast Mode"
+    },
+    {
+     "title": "Elisa targets data center growth through fiber connectivity",
+     "operator": "Elisa",
+     "url": "https://www.rcrwireless.com/20260720/carriers/elisa-data-center-fiber",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Elisa hat erste Deals im Bereich Data-Center-Konnektivität abgeschlossen und fokussiert sich auf Glasfaseranbindungen für Rechenzentren.",
+     "why_it_matters": "Vodafone könnte ähnliche Data-Center-Connectivity-Produkte in Märkten mit hohem Rechenzentrumsbedarf (z.B. Frankfurt, London) anbieten, um vom Cloud- und KI-Boom zu profitieren.",
+     "date": "2026-07-20",
+     "source": "RCR Wireless"
+    },
+    {
+     "title": "Orange Belgium Launches SaferPhone Pack for Safe First Smartphone Use by Children",
+     "operator": "Orange",
+     "url": "https://www.thefastmode.com/services-and-innovations/49684-orange-belgium-launches-saferphone-pack-for-safe-first-smartphone-use-by-children",
+     "category": "Produktlaunch",
+     "relevance": 4,
+     "summary": "Orange Belgien hat das SaferPhone Pack eingeführt – eine Kombination aus altersgerechtem Mobilfunktarif, Kindersicherung und Smartphone für den ersten sicheren Smartphone-Nutzung von Kindern.",
+     "why_it_matters": "Vodafone sollte ein ähnliches Familienprodukt in Deutschland und anderen Märkten prüfen, um Eltern als Zielgruppe zu gewinnen und sich gegen spezialisierte Kinder-Tarife von Wettbewerbern zu behaupten.",
+     "date": "2026-07-19",
+     "source": "The Fast Mode"
+    },
+    {
+     "title": "e& Finalizes Vodafone Stake Sale Generating USD 5.95 Billion in Transaction Value",
+     "operator": "Vodafone Group",
+     "url": "https://www.thefastmode.com/mobile-network-operators-m-a/49680-e-finalizes-vodafone-stake-sale-generating-usd-5-95-billion-in-transaction-value",
+     "category": "Finanzen",
+     "relevance": 3,
+     "summary": "e& hat den Verkauf seiner Vodafone-Beteiligung im Wert von 5,95 Milliarden US-Dollar abgeschlossen, wie bereits am 10. Juli 2026 angekündigt.",
+     "why_it_matters": "Vodafone sollte die neuen Aktionärsstrukturen analysieren, um mögliche Auswirkungen auf die strategische Ausrichtung oder Dividendenpolitik zu antizipieren.",
+     "date": "2026-07-19",
+     "source": "The Fast Mode"
+    }
+   ]
+  },
+  "Global": {
+   "region_summary": "Diese Woche dominieren zwei Themen: massive Investitionen in KI-Infrastruktur (Microsoft/Mistral) und Konsolidierung im britischen Breitbandmarkt (VMO2/Netomnia). Für Vodafone bedeutet dies strategischen Handlungsdruck bei KI-Partnerschaften und eine Bestätigung des Konsolidierungskurses im Festnetz. Diese Woche zeigt sich global ein Fokus auf KI-getriebene Netzinfrastruktur (6G AI-native Core, Physical AI in Japan) sowie auf Konsolidierung im Glasfasermarkt (UK) und technologische Migration (XGS-PON in Deutschland). Für Vodafone ergeben sich Chancen bei der Positionierung im B2B-Kundenmanagement und bei der strategischen Beobachtung der Netzmodernisierung.",
+   "highlights": [
+    {
+     "title": "Point Topic Highlights Key Challenge for VMO2’s £2bn Netomnia Broadband Deal",
+     "operator": "Virgin Media O2 (VMO2)",
+     "url": "https://www.ispreview.co.uk/index.php/2026/07/point-topic-highlights-key-challenge-for-vmo2s-2bn-netomnia-broadband-deal.html",
+     "category": "M&A",
+     "relevance": 4,
+     "summary": "Analyst Point Topic zeigt, dass die kartellrechtliche Prüfung der 2-Milliarden-Pfund-Übernahme von Netomnia durch VMO2 eine große Hürde darstellt, da VMO2 in bestimmten Gebieten bereits hohe Marktanteile hat.",
+     "why_it_matters": "Vodafone muss die kartellrechtliche Entwicklung genau beobachten: Sollte der Deal scheitern, entsteht eine Chance für Vodafone, Netomnia selbst zu übernehmen oder eine Partnerschaft einzugehen, um das eigene Glasfasernetz in UK auszubauen.",
+     "date": "2026-07-21",
+     "source": "ISPreview UK"
+    },
+    {
+     "title": "Microsoft to pump billions into Mistral Europe push",
+     "operator": "Microsoft / Mistral",
+     "url": "https://www.mobileworldlive.com/microsoft/microsoft-to-pump-billions-into-mistral-europe-push/",
+     "category": "Partnerschaft",
+     "relevance": 5,
+     "summary": "Microsoft investiert mehrere Milliarden Dollar in die KI-Infrastruktur von Mistral in Europa, um deren GPU-Kapazitäten auszubauen.",
+     "why_it_matters": "Diese Partnerschaft zeigt, dass Vodafone schnell eigene strategische KI-Allianzen eingehen muss, um nicht den Anschluss zu verlieren. Vodafone sollte prüfen, ob eine Partnerschaft mit Mistral oder einem anderen europäischen KI-Anbieter für B2B-KI-Dienste sinnvoll ist.",
+     "date": "2026-07-21",
+     "source": "Mobile World Live"
+    },
+    {
+     "title": "Samsung unveils AI-powered health assistant",
+     "operator": "Samsung",
+     "url": "https://www.mobileworldlive.com/samsung/samsung-unveils-ai-powered-health-assistant/",
+     "category": "Produktlaunch",
+     "relevance": 3,
+     "summary": "Samsung bringt eine Beta eines KI-gestützten Gesundheitsassistenten auf den Markt, der Daten von Galaxy-Geräten analysiert und personalisierte Gesundheitsempfehlungen gibt.",
+     "why_it_matters": "Vodafone könnte diesen Trend nutzen, um eigene KI-basierte Gesundheitsdienste für B2B-Kunden (z.B. Betriebliches Gesundheitsmanagement) oder als Zusatzdienst für Privatkunden zu entwickeln. Der Markt für digitale Gesundheit wächst rasant.",
+     "date": "2026-07-21",
+     "source": "Mobile World Live"
+    },
+    {
+     "title": "Alipay+ supports QR payments for visitors to Argentina",
+     "operator": "Alipay+ / Ant International",
+     "url": "https://developingtelecoms.com/telecom-technology/60-consumer-ecosystems/20560-alipay-supports-qr-payments-for-visitors-to-argentina.html",
+     "category": "Partnerschaft",
+     "relevance": 2,
+     "summary": "Alipay+ ermöglicht QR-Zahlungen für Reisende in Argentinien bei Millionen von Händlern.",
+     "why_it_matters": "Vodafone sollte beobachten, ob Alipay+ auch in Europa expandiert. Eine Partnerschaft mit Alipay+ könnte Vodafone-Roaming-Kunden nahtlose mobile Zahlungen im Ausland ermöglichen und so die Kundenbindung stärken.",
+     "date": "2026-07-21",
+     "source": "Developing Telecoms"
+    },
+    {
+     "title": "Japan to develop physical AI capabilities with cross-industry initiative",
+     "operator": "Noetra (SoftBank, Sony, NEC, Honda)",
+     "url": "https://www.lightreading.com/ai-machine-learning/noetra-plans-140mw-data-center-to-fuel-japan-s-physical-ai-push",
+     "category": "Partnerschaft",
+     "relevance": 4,
+     "summary": "Ein Konsortium aus 44 japanischen Großunternehmen unter Führung von SoftBank, Sony, NEC und Honda gründet Noetra, um KI-Modelle für Roboter und physische KI zu entwickeln und ein 140-MW-Rechenzentrum zu bauen.",
+     "why_it_matters": "Vodafone sollte beobachten, wie SoftBank als direkter Wettbewerber im B2B-IoT- und Edge-Computing-Bereich durch solche Partnerschaften neue KI-Dienste für Unternehmen aufbaut. Vodafone könnte ähnliche Konsortien in Europa initiieren, um sich als Partner für industrielle KI-Lösungen zu positionieren.",
+     "date": "2026-07-21",
+     "source": "Light Reading"
+    },
+    {
+     "title": "The best churn insurance in B2B telecom is a phone call",
+     "operator": "Recon Analytics (Studie)",
+     "url": "https://www.lightreading.com/customer-experience/the-best-churn-insurance-in-b2b-telecom-is-a-phone-call",
+     "category": "Sonstiges",
+     "relevance": 3,
+     "summary": "Laut Recon Analytics wechseln unzufriedene B2B-Kunden seltener den Anbieter, wenn sie eine gute Beziehung zu ihrem Account Manager haben – persönlicher Kontakt wirkt als stärkste Churn-Prävention.",
+     "why_it_matters": "Vodafone kann diese Erkenntnis nutzen, um sein B2B-Kundenmanagement zu stärken: Investitionen in persönliche Betreuung und Kundenbindungsprogramme (z. B. regelmäßige Check-in-Calls) könnten die Abwanderung in umkämpften Geschäftskundenmärkten senken.",
+     "date": "2026-07-21",
+     "source": "Light Reading"
+    },
+    {
+     "title": "The Second Fiber Migration: Why Germany’s FTTH Pioneers Are Moving to XGS-PON",
+     "operator": "htp (Regionaler Glasfaseranbieter)",
+     "url": "https://totaltele.com/the-second-fiber-migration-why-germanys-ftth-pioneers-are-moving-to-xgs-pon/",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Der regionale Anbieter htp migriert seine frühen FTTH-Netze auf XGS-PON, um höhere Bandbreiten und symmetrische Übertragung zu ermöglichen – ein Trend unter deutschen Glasfaserpionieren.",
+     "why_it_matters": "Vodafone sollte prüfen, ob eigene ältere FTTH- oder FTTB-Infrastrukturen in Deutschland ebenfalls auf XGS-PON aufgerüstet werden müssen, um wettbewerbsfähig zu bleiben und höhere Geschwindigkeiten für Geschäftskunden anbieten zu können.",
+     "date": "2026-07-21",
+     "source": "Total Telecom"
+    },
+    {
+     "title": "Netomnia CEO defends nexfibre merger as CMA begins in-depth investigation",
+     "operator": "Netomnia / nexfibre",
+     "url": "https://totaltele.com/netomnia-ceo-defends-nexfibre-merger-as-cma-begins-in-depth-investigation/",
+     "category": "M&A",
+     "relevance": 4,
+     "summary": "Die britische Wettbewerbsbehörde CMA leitet eine eingehende Untersuchung der geplanten 2-Milliarden-Pfund-Fusion von Netomnia und nexfibre ein – ein bedeutender Fall im UK-Glasfasermarkt.",
+     "why_it_matters": "Sollte die Fusion genehmigt werden, entsteht ein starker Glasfaserkonkurrent für Vodafone in Großbritannien. Vodafone muss die regulatorische Entwicklung genau verfolgen und gegebenenfalls eigene Konsolidierungsoptionen (z. B. Partnerschaft mit CityFibre) prüfen.",
+     "date": "2026-07-21",
+     "source": "Total Telecom"
+    },
+    {
+     "title": "Wer jetzt zu congstar wechselt, bekommt bis zu 40 Euro geschenkt",
+     "operator": "congstar (Telekom-Marke)",
+     "url": "https://www.inside-digital.de/deals/wer-jetzt-zu-congstar-wechselt-bekommt-bis-zu-40-euro-geschenkt",
+     "category": "Kampagne",
+     "relevance": 3,
+     "summary": "congstar lockt Neukunden mit einem Wechselbonus von bis zu 40 Euro bei Abschluss eines neuen Mobilfunkvertrags bis zum 18. August.",
+     "why_it_matters": "Vodafone muss in Deutschland auf solche aggressiven Neukunden-Angebote reagieren, um Abwanderung zu verhindern. Eine zeitlich begrenzte Bonusaktion oder ein verbessertes Willkommensangebot für Vodafone-Mobilfunk könnte als Gegenmaßnahme dienen.",
+     "date": "2026-07-21",
+     "source": "inside digital"
+    }
+   ]
+  }
+ },
+ "competitors": [
+  {
+   "name": "Deutsche Telekom",
+   "n_items": 3,
+   "moves": [
+    {
+     "title": "Deutsche Telekom deploys ChatGPT Enterprise for AI-native ops",
+     "url": "https://www.telecomstechnews.com/news/deutsche-telekom-deploys-chatgpt-enterprise-for-ai-native-ops/",
+     "category": "Netz/Technologie",
+     "note": "Telekom setzt ChatGPT Enterprise ein, um Kundenservice und Kernnetz zu optimieren – ein strategischer Schritt zur Effizienzsteigerung, den Vodafone beobachten sollte."
+    },
+    {
+     "title": "Fiber-to-the-home (FTTH)/fiber optics: o2 Telefónica and Deutsche Telekom intensify their cooperation on fiber optic connections",
+     "url": "https://www.telefonica.de/fixed/news/10420/fiber-to-the-home-ftthfiber-optics-o2-telefonica-and-deutsche-telekom-intensify-their-cooperation-on-fiber-optic-connections.html",
+     "category": "Partnerschaft",
+     "note": "Telekom und o2 Telefónica vertiefen ihre Glasfaser-Kooperation mit einem neuen Einkaufsmodell – dies stärkt Telekoms Position im Festnetz und erhöht den Druck auf Vodafone."
+    },
+    {
+     "title": "Big three wireless carriers continue improvement in first half of 2026: Ookla report",
+     "url": "https://www.telecompetitor.com/big-three-wireless-carriers-continue-improvement-in-first-half-of-2026-ookla-report/",
+     "category": "Netz/Technologie",
+     "note": "Laut Ookla verbessern die drei großen Netzbetreiber, darunter Telekom, ihre Netze weiter – ein Zeichen für anhaltende Investitionen, die Vodafone im Wettbewerb herausfordern."
+    }
+   ],
+   "summary": "Deutsche Telekom treibt aktuell die KI-Transformation voran, indem es ChatGPT Enterprise für den Kundenservice und das Kernnetz einsetzt. Gleichzeitig baut es seine Führungsposition im deutschen Glasfasermarkt durch eine verstärkte Zusammenarbeit mit o2 Telefónica aus. Laut einem Ookla-Bericht investiert der Konzern weiterhin massiv in die Netzqualität, was sich in verbesserten RootMetrics-Werten für die erste Jahreshälfte 2026 niederschlägt. Für Vodafone bedeutet dies wachsenden Wettbewerbsdruck sowohl im Festnetz als auch im Mobilfunk.",
+   "themes": [
+    "KI-Transformation",
+    "Glasfaser-Kooperation",
+    "Netzqualität",
+    "Wettbewerbsintensivierung"
+   ],
+   "vodafone_implication": "Vodafone muss seine KI-Strategie beschleunigen, um nicht im Kundenservice und Netzbetrieb hinterherzuhinken. Die verstärkte Glasfaser-Kooperation zwischen Telekom und o2 erfordert eine offensive Festnetz-Strategie, insbesondere im Ausbau und bei Partnerschaften. Zudem sollte Vodafone die Netzqualität weiter verbessern, um im Mobilfunk nicht Marktanteile zu verlieren."
+  },
+  {
+   "name": "Telefónica / O2",
+   "n_items": 16,
+   "moves": [
+    {
+     "title": "Point Topic Highlights Key Challenge for VMO2’s £2bn Netomnia Broadband Deal",
+     "url": "https://www.ispreview.co.uk/index.php/2026/07/point-topic-highlights-key-challenge-for-vmo2s-2bn-netomnia-broadband-deal.html",
+     "category": "M&A",
+     "note": "Die 2-Milliarden-Pfund-Übernahme von Netomnia durch VMO2 steht vor regulatorischen Hürden; Vodafone muss die Auswirkungen auf den britischen Breitbandmarkt beobachten."
+    },
+    {
+     "title": "O2 TV Premium: Mit Netflix, Disney+ und 50 GB Tarif für unter 30 Euro",
+     "url": "https://www.inside-digital.de/deals/o2-tv-premium-mit-netflix-disney-und-50-gb-tarif-fuer-unter-30-euro",
+     "category": "Tarif/Pricing",
+     "note": "O2 bündelt Streaming-Dienste und Mobilfunk zu einem aggressiven Preis – eine direkte Herausforderung für Vodafones eigene Konvergenzangebote in Deutschland."
+    },
+    {
+     "title": "Telefonica breathes healthcare purpose into AI",
+     "url": "https://www.mobileworldlive.com/industry/telefonica-breathes-healthcare-purpose-into-ai/",
+     "category": "Partnerschaft",
+     "note": "Telefónica schließt eine KI-Partnerschaft im Gesundheitswesen (Harrison.ai) und zeigt damit, wie sie KI jenseits von Connectivity monetarisiert – ein Bereich, den Vodafone ebenfalls besetzen sollte."
+    },
+    {
+     "title": "VMO2 achieves 500 Giga Sites milestone as CEO calls for stronger telecoms competition",
+     "url": "https://www.mobileeurope.co.uk/o2-giga-sites-uk-upgrade/",
+     "category": "Netz/Technologie",
+     "note": "VMO2 hat 500 'Giga Sites' im Rahmen eines 700-Millionen-Pfund-Modernisierungsplans aktiviert – ein klares Signal für den Netzqualitätswettbewerb in UK."
+    },
+    {
+     "title": "Telefónica launches a Global Sustainability Plan, integrated into its business strategy, to drive transformation, growth and value creation",
+     "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-launches-global-sustainability-plan-integrated-business-strategy-drive-transformation-growth-creation/",
+     "category": "Sonstiges",
+     "note": "Telefónica verankert Nachhaltigkeit strategisch im Kerngeschäft – Vodafone sollte prüfen, ob der eigene Nachhaltigkeitsplan ähnlich ambitioniert ist."
+    }
+   ],
+   "summary": "Telefónica / O2 treibt derzeit mehrere strategische Initiativen voran: In Großbritannien erreicht VMO2 mit 500 'Giga Sites' einen Meilenstein im Netzausbau und treibt die Übernahme von Netomnia voran. In Deutschland lockt O2 mit einem gebündelten TV- und Mobilfunk-Angebot (O2 TV Premium) für unter 30 Euro. Parallel dazu forciert Telefónica den Einsatz von KI im Gesundheitswesen und startet einen globalen Nachhaltigkeitsplan. Das Unternehmen positioniert sich damit als innovativer Konvergenz- und Technologieanbieter.",
+   "themes": [
+    "Netzausbau",
+    "Konvergenzangebote",
+    "KI im Gesundheitswesen",
+    "Nachhaltigkeit",
+    "Breitband-M&A"
+   ],
+   "vodafone_implication": "Vodafone muss die aggressive Konvergenzstrategie von O2 in Deutschland (TV + Mobilfunk zum Kampfpreis) ernst nehmen und das eigene Portfolio schärfen. Im UK-Großbritannien ist der Netzausbau von VMO2 (500 Giga Sites) ein Wettbewerbsfaktor, den Vodafone mit dem eigenen 5G-Ausbau und der Fusion mit Three kontern muss. Die KI-Initiativen von Telefónica im Gesundheitswesen zeigen einen neuen Monetarisierungsweg, den Vodafone nicht ignorieren sollte."
+  },
+  {
+   "name": "1&1",
+   "n_items": 7,
+   "moves": [
+    {
+     "title": "12.05.2026, 07:30 am United Internet gets off to a good start in fiscal year 2026",
+     "url": "https://www.united-internet.de/en/investor-relations/publications/announcements/announcements-detail/news/united-internet-gets-off-to-a-good-start-in-fiscal-year-2026/",
+     "category": "Finanzen",
+     "note": "United Internet meldet einen guten Start ins GJ 2026, was auf stabile operative Entwicklung hindeutet."
+    },
+    {
+     "title": "19.03.2026, 07:30 am United Internet with successful fiscal year 2025",
+     "url": "https://www.united-internet.de/en/investor-relations/publications/announcements/announcements-detail/news/united-internet-with-successful-fiscal-year-2025/",
+     "category": "Finanzen",
+     "note": "Das erfolgreiche GJ 2025 zeigt, dass 1&1 finanziell gut aufgestellt ist."
+    },
+    {
+     "title": "21.11.2025, 06:31 pm Ad-hoc Disclosure acc. to Art. 17 MAR: United Internet sells 1&1 Versatel to 1&1 AG",
+     "url": "https://www.united-internet.de/en/investor-relations/publications/announcements/announcements-detail/news/ad-hoc-disclosure-acc-to-art-17-mar-united-internet-sells-11-versatel-to-11-ag/",
+     "category": "M&A",
+     "note": "Verkauf von 1&1 Versatel an die 1&1 AG – interne Umstrukturierung zur Bündelung von Festnetz- und Mobilfunkgeschäft."
+    },
+    {
+     "title": "16.05.2025, 08:09 am Public acquisition offer for 1&1 shares at EUR 18.50 – United Internet's stake in 1&1 to be increased to up to 90%",
+     "url": "https://www.united-internet.de/en/investor-relations/publications/announcements/announcements-detail/news/public-acquisition-offer-for-11-shares-at-eur-1850-united-internets-stake-in-11-to-be-increased-to-up-to-90/",
+     "category": "M&A",
+     "note": "Übernahmeangebot zu 18,50 EUR je Aktie, um Anteil auf bis zu 90% zu erhöhen – Signal für langfristige Kontrolle und mögliche Vollintegration."
+    }
+   ],
+   "summary": "1&1 (United Internet) meldet einen erfolgreichen Start ins Geschäftsjahr 2026 und positive Ergebnisse für 2025. Im November 2025 wurde 1&1 Versatel an die 1&1 AG verkauft, und United Internet hat ein öffentliches Übernahmeangebot für 1&1-Aktien zu 18,50 EUR gestartet, um seinen Anteil auf bis zu 90% zu erhöhen. Dies deutet auf eine strategische Konsolidierung und Fokussierung hin, während das Unternehmen weiterhin solide Finanzergebnisse vorlegt.",
+   "themes": [
+    "Konsolidierung",
+    "Übernahmeangebot",
+    "Finanzergebnisse",
+    "Verkauf Versatel",
+    "Strategische Fokussierung"
+   ],
+   "vodafone_implication": "Vodafone sollte die Konsolidierung bei 1&1 genau beobachten, da eine stärkere Kontrolle durch United Internet zu aggressiveren Preis- oder Netzstrategien führen könnte. Der Verkauf von Versatel und die interne Neuordnung deuten auf eine Fokussierung auf das Mobilfunkgeschäft hin, was den Wettbewerb im deutschen Markt verschärfen könnte. Vodafone sollte seine eigenen Netz- und Tarifvorteile betonen, um Kundenabwanderung zu vermeiden."
+  }
+ ],
+ "run": {
+  "started_at": "2026-07-21T18:46:36.704615+00:00",
+  "finished_at": "2026-07-21T19:04:34.587650+00:00",
+  "duration_seconds": 1077.9,
+  "used_llm": true,
+  "editor_used": true,
+  "models": {
+   "analyst": "deepseek-ai/deepseek-v4-flash",
+   "editor": "deepseek-ai/deepseek-v4-pro"
+  },
+  "phases": [
+   {
+    "name": "Sammeln",
+    "seconds": 76.0,
+    "detail": "84 Quellen abgefragt, 855 Meldungen gefunden"
+   },
+   {
+    "name": "Nur Neues",
+    "seconds": 0.0,
+    "detail": "185 neue Meldungen (Gedaechtnis: 517 bekannt)"
+   },
+   {
+    "name": "Bewerten & Schreiben",
+    "seconds": 686.0,
+    "detail": "29 bewertete Meldungen"
+   },
+   {
+    "name": "Wettbewerber-Analyse",
+    "seconds": 64.3,
+    "detail": "3 Profile (12 Moves)"
+   }
+  ],
+  "source_summary": {
+   "total": 84,
+   "ok": 54,
+   "empty": 29,
+   "failed": 1,
+   "by_kind": {
+    "rss": 11,
+    "json_api": 1,
+    "newsroom_js": 45,
+    "newsroom": 12,
+    "trade_press": 15
+   }
+  },
+  "sources": [
+   {
+    "name": "Optus",
+    "operator": "Optus",
+    "region": "oceania",
+    "url": "https://www.optus.com.au/about/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "fail",
+    "count": 0,
+    "error": "Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.optus.com.au/about/media-centre\nCall log:\n  - navigating to \"https://www.optus.com.a"
+   },
+   {
+    "name": "DISH Wireless",
+    "operator": "DISH Wireless",
+    "region": "north_america",
+    "url": "https://api.client.notified.com/api/rss/publish/view/53068?type=press",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Comcast",
+    "operator": "Comcast",
+    "region": "north_america",
+    "url": "https://corporate.comcast.com/rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Light Reading",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.lightreading.com/rss.xml",
+    "kind": "trade_press",
+    "label": "Light Reading",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "The Fast Mode",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.thefastmode.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "The Fast Mode",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Developing Telecoms",
+    "operator": null,
+    "region": "global",
+    "url": "https://developingtelecoms.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "Developing Telecoms",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 34
+   },
+   {
+    "name": "VEON",
+    "operator": "VEON",
+    "region": "europe",
+    "url": "https://www.veon.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Vodacom",
+    "operator": "Vodacom",
+    "region": "africa_middle_east",
+    "url": "https://www.vodacom.com/press-releases.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
+    "region": "asia",
+    "url": "https://www.airtel.in/press-release",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "du",
+    "operator": "du",
+    "region": "africa_middle_east",
+    "url": "https://www.du.ae/about-us/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.softbank.jp/en/corp/news/press/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
+    "region": "asia",
+    "url": "https://corp.mobile.rakuten.co.jp/english/news/press/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "CelcomDigi",
+    "operator": "CelcomDigi",
+    "region": "asia",
+    "url": "https://corporate.celcomdigi.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Mobile World Live",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileworldlive.com/feed/",
+    "kind": "trade_press",
+    "label": "Mobile World Live",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "BT Group",
+    "operator": "BT Group",
+    "region": "europe",
+    "url": "https://newsroom.bt.com/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "KPN",
+    "operator": "KPN",
+    "region": "europe",
+    "url": "https://www.overons.kpn/nieuws/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Fierce Network",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.fierce-network.com/rss/xml",
+    "kind": "trade_press",
+    "label": "Fierce Network",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.corporate.bouyguestelecom.fr/presse-et-actualites/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 22
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "NTT Docomo",
+    "operator": "NTT Docomo",
+    "region": "asia",
+    "url": "https://www.docomo.ne.jp/english/info/media_center/pr/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "TelecomTalk",
+    "operator": null,
+    "region": "global",
+    "url": "https://telecomtalk.info/feed/",
+    "kind": "trade_press",
+    "label": "TelecomTalk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "Vodafone Group",
+    "operator": "Vodafone Group",
+    "region": "europe",
+    "url": "https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&categories=*&tags=*",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 16
+   },
+   {
+    "name": "A1 Telekom Austria",
+    "operator": "A1 Telekom Austria",
+    "region": "europe",
+    "url": "https://newsroom.a1.net/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 12
+   },
+   {
+    "name": "Singtel",
+    "operator": "Singtel",
+    "region": "asia",
+    "url": "https://www.singtel.com/about-us/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 12
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.telefonica.com/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.telenor.com/media/newsroom/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Verizon",
+    "operator": "Verizon",
+    "region": "north_america",
+    "url": "https://www.verizon.com/about/rss.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "TIM Brasil",
+    "operator": "TIM Brasil",
+    "region": "latin_america",
+    "url": "https://www.tim.com.br/rss.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "MTN Group",
+    "operator": "MTN Group",
+    "region": "africa_middle_east",
+    "url": "https://www.mtn.com/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "KDDI",
+    "operator": "KDDI",
+    "region": "asia",
+    "url": "https://newsroom.kddi.com/english/news/newsrelease.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "One NZ",
+    "operator": "One NZ",
+    "region": "oceania",
+    "url": "https://media.one.nz/index.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Total Telecom",
+    "operator": null,
+    "region": "global",
+    "url": "https://totaltele.com/feed/",
+    "kind": "trade_press",
+    "label": "Total Telecom",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "RCR Wireless",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.rcrwireless.com/feed",
+    "kind": "trade_press",
+    "label": "RCR Wireless",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Mobile Europe",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileeurope.co.uk/feed/",
+    "kind": "trade_press",
+    "label": "Mobile Europe",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Broadband TV News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.broadbandtvnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Broadband TV News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telecoms Tech News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecomstechnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecoms Tech News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telecompetitor",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecompetitor.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecompetitor",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "inside digital",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.inside-digital.de/feed",
+    "kind": "trade_press",
+    "label": "inside digital",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "CommsRisk",
+    "operator": null,
+    "region": "global",
+    "url": "https://commsrisk.com/feed/",
+    "kind": "trade_press",
+    "label": "CommsRisk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "2degrees",
+    "operator": "2degrees",
+    "region": "oceania",
+    "url": "https://www.2degrees.nz/media-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 9
+   },
+   {
+    "name": "Telkomsel",
+    "operator": "Telkomsel",
+    "region": "asia",
+    "url": "https://www.telkomsel.com/en/about-us/news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.maxis.com.my/en/about-maxis/newsroom/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "ISPreview UK",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.ispreview.co.uk/index.php/feed",
+    "kind": "trade_press",
+    "label": "ISPreview UK",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "1&1",
+    "operator": "1&1",
+    "region": "europe",
+    "url": "https://www.united-internet.de/en/newsroom/press-releases/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 7
+   },
+   {
+    "name": "Orange",
+    "operator": "Orange",
+    "region": "europe",
+    "url": "https://www.orange.com/en/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "Telia",
+    "operator": "Telia",
+    "region": "europe",
+    "url": "https://www.teliacompany.com/en/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5
+   },
+   {
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://elisa.com/corporate/news-room/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.safaricom.co.ke/media-center-landing",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Deutsche Telekom",
+    "operator": "Deutsche Telekom",
+    "region": "europe",
+    "url": "https://www.telekom.com/en/media/media-information",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Proximus",
+    "operator": "Proximus",
+    "region": "europe",
+    "url": "https://www.proximus.com/news.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Swisscom",
+    "operator": "Swisscom",
+    "region": "europe",
+    "url": "https://www.swisscom.ch/en/about/news.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Vodafone Deutschland",
+    "operator": "Vodafone Deutschland",
+    "region": "europe",
+    "url": "https://newsroom.vodafone.de/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Bell Canada",
+    "operator": "Bell Canada",
+    "region": "north_america",
+    "url": "https://www.bce.ca/news-and-media/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Tele2",
+    "operator": "Tele2",
+    "region": "europe",
+    "url": "https://www.tele2.com/media/press-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Viettel",
+    "operator": "Viettel",
+    "region": "asia",
+    "url": "https://viettel.com.vn/en/news",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Liberty Global",
+    "operator": "Liberty Global",
+    "region": "europe",
+    "url": "https://www.libertyglobal.com/news-insights/featured-news-insights/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "TIM",
+    "operator": "TIM",
+    "region": "europe",
+    "url": "https://www.gruppotim.it/en/press-archive.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Iliad",
+    "operator": "Iliad",
+    "region": "europe",
+    "url": "https://www.iliad.fr/en/press",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://medya.turkcell.com.tr/basin-bultenleri/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Cosmote",
+    "operator": "Cosmote",
+    "region": "europe",
+    "url": "https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Three UK",
+    "operator": "Three UK",
+    "region": "europe",
+    "url": "https://www.threemediacentre.co.uk/press-release-browser/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
+    "region": "north_america",
+    "url": "https://corporate.charter.com/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Millicom",
+    "operator": "Millicom",
+    "region": "latin_america",
+    "url": "https://www.millicom.com/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Oi",
+    "operator": "Oi",
+    "region": "latin_america",
+    "url": "https://www.oi.com.br/sala-de-imprensa/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "WOM",
+    "operator": "WOM",
+    "region": "latin_america",
+    "url": "https://sobrenosotros.wom.cl/wom-en-prensa/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Entel",
+    "operator": "Entel",
+    "region": "latin_america",
+    "url": "https://informacioncorporativa.entel.cl/sala-de-prensa",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "stc",
+    "operator": "stc",
+    "region": "africa_middle_east",
+    "url": "https://www.stc.com/en/media-center.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://airtel.africa/media",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.eand.com/en/news.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Orange MEA",
+    "operator": "Orange MEA",
+    "region": "africa_middle_east",
+    "url": "https://www.orange.eg/en/media-center/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Turk Telekom",
+    "operator": "Turk Telekom",
+    "region": "africa_middle_east",
+    "url": "https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
+    "region": "asia",
+    "url": "https://www.jio.com/press-release",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Vodafone Idea",
+    "operator": "Vodafone Idea",
+    "region": "asia",
+    "url": "https://www.myvi.in/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "SK Telecom",
+    "operator": "SK Telecom",
+    "region": "asia",
+    "url": "https://www.sktelecom.com/en/press/press_list.do",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "KT",
+    "operator": "KT",
+    "region": "asia",
+    "url": "https://corp.kt.com/eng/html/prcenter/report_list.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Chunghwa Telecom",
+    "operator": "Chunghwa Telecom",
+    "region": "asia",
+    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "China Telecom",
+    "operator": "China Telecom",
+    "region": "asia",
+    "url": "https://www.chinatelecom-h.com/en/media/press.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.chinamobileltd.com/en/media/press.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "AIS",
+    "operator": "AIS",
+    "region": "asia",
+    "url": "https://investor.ais.co.th/en/newsroom/set-announcements",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "True Corporation",
+    "operator": "True Corporation",
+    "region": "asia",
+    "url": "https://investor.true.th/en/newsroom/set-announcements",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Indosat Ooredoo Hutchison",
+    "operator": "Indosat Ooredoo Hutchison",
+    "region": "asia",
+    "url": "https://ioh.co.id/portal/en/iohpressrelease",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Telstra",
+    "operator": "Telstra",
+    "region": "oceania",
+    "url": "https://www.telstra.com.au/exchange",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "PLDT",
+    "operator": "PLDT",
+    "region": "asia",
+    "url": "https://main.pldt.com/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "TPG Telecom",
+    "operator": "TPG Telecom",
+    "region": "oceania",
+    "url": "https://www.tpgtelecom.com.au/media_release",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   }
+  ],
+  "analysts": [
+   {
+    "items_in": 7,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 4,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Asien"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Afrika & Naher Osten"
+   },
+   {
+    "items_in": 11,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 4,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Nordamerika"
+   },
+   {
+    "items_in": 10,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 3,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Lateinamerika"
+   },
+   {
+    "items_in": 15,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 8,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Europa"
+   },
+   {
+    "items_in": 24,
+    "batches": 2,
+    "batches_ok": 2,
+    "highlights": 9,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Global"
+   }
+  ]
+ }
+}
