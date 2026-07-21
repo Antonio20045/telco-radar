@@ -43,6 +43,7 @@ jobs:
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           PYTHONPATH: src
         run: |
           python -m telco_radar.pipeline --root . \

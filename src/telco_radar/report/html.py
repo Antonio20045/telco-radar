@@ -14,9 +14,11 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
-from .differentiation import build_differentiation
+from .differentiation import build_differentiation, DIFF_THEMES
 from ..analyze.diff_curator import DiffStore
-from ..analyze.idea_radar import load_or_seed as load_idea_radar
+from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
+
+_DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
 
 log = logging.getLogger(__name__)
 
@@ -444,14 +446,35 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # differentiation.jsonl) - so bleiben relevante Moves ueber Wochen erhalten,
     # unabhaengig davon, wie lange die Wochen-Report-JSONs aufgehoben werden.
     # Fallback (Bootstrap / erste Runde): Aggregation aller Report-Highlights.
+    # ---- Differenzierung: aus der dynamischen, quellenbelegten DB
+    # (data/state/differentiation_db.json), gepflegt vom Kategorie-Sweep.
     state_dir = reports_dir.parent / "state"
-    store = DiffStore(state_dir / "differentiation.jsonl")
-    diff_source = store.entries() if len(store) else [
-        h for rep in reports for h in _flatten(rep)]
+    from datetime import datetime, timedelta
+    db = DiffDB(state_dir / "differentiation_db.json")
+    by_theme = db.by_theme()
+    latest_date = latest["date"] if latest else date.today().isoformat()
+    try:
+        cutoff = (datetime.fromisoformat(latest_date) - timedelta(days=10)).date().isoformat()
+    except ValueError:
+        cutoff = ""
+    diff_themes = []
+    for key, label in SWEEP_THEMES:
+        entries = by_theme.get(key, [])
+        for e in entries:
+            e["neu"] = bool((e.get("first_seen") or "") > cutoff)
+            e["verified_de"] = _fmt_date_de(e.get("last_verified") or "")
+        diff_themes.append({"key": key, "label": label,
+                            "color": _DIFF_COLOR.get(key, "#e60000"),
+                            "entries": entries, "n": len(entries)})
+    diff_stats = {
+        "total": len(db), "updated_de": _fmt_date_de(db.updated or latest_date),
+        "themes_active": sum(1 for t in diff_themes if t["n"]),
+        "themes_total": len(diff_themes),
+        "new": sum(1 for t in diff_themes for e in t["entries"] if e["neu"]),
+    }
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
-            prefix="", diff=build_differentiation(diff_source),
-            radar=load_idea_radar(state_dir / "idea_radar.json"),
+            prefix="", diff_themes=diff_themes, diff_stats=diff_stats,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")

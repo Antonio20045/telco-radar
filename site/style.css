@@ -640,3 +640,16 @@ main{padding-bottom:8px}
 .br-method a{color:var(--vf-mute)}
 .br-method a:hover{color:var(--vf-red)}
 @media (max-width:640px){.br-hero h1{font-size:36px}.br-hero h1 br{display:none}}
+
+
+/* ===================== v10 — Differenzierung aus dynamischer Quellen-DB ===== */
+.dz-status{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 0;
+  font-size:13.5px;color:var(--vf-mute)}
+.dz-status b{color:var(--vf-ink);font-weight:700}
+.dz-status .dz-sep{width:4px;height:4px;border-radius:50%;background:var(--vf-line)}
+.dz-move-h{display:flex;align-items:baseline;gap:10px}
+.dz-move-h .dz-move-title{flex:1}
+.dz-move-title b{font-weight:800}
+.dz-new{flex:none;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:#fff;background:var(--c,var(--vf-red));padding:2px 8px;border-radius:100px}
+.dz-empty{font-size:14px;color:var(--vf-mute);margin:0;padding:2px 0 4px}

@@ -8,66 +8,45 @@
     <h1>Differenzierung</h1>
     {% if date_de %}<span class="dz-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="dz-lead">Wie sich Wettbewerber weltweit <b>jenseits des Preises</b> abheben – über
-  eingebundene Dienste, Garantien, KI, Perks und Ökosysteme. Als Inspiration für Vodafone,
-  Move für Move mit Quelle. Netz-, 5G- und Broadband-Ausbau bleiben bewusst außen vor.</p>
+  <p class="dz-lead">Wie sich Wettbewerber weltweit <b>jenseits des Preises</b> abheben – eingebundene
+  Dienste, Garantien, KI, Perks, Ökosysteme. Jeder Eintrag ist ein echter, belegter Move mit Quelle;
+  ein wöchentlicher Web-Sweep hält die Sammlung aktuell. Netz-, 5G- und Broadband-Ausbau bleiben außen vor.</p>
+  {% if diff_stats %}
+  <div class="dz-status">
+    <span><b>{{ diff_stats.total }}</b> belegte Moves</span><span class="dz-sep"></span>
+    <span><b>{{ diff_stats.themes_active }}</b>/{{ diff_stats.themes_total }} Kategorien aktiv</span><span class="dz-sep"></span>
+    {% if diff_stats.new %}<span><b>{{ diff_stats.new }}</b> neu</span><span class="dz-sep"></span>{% endif %}
+    <span>zuletzt aktualisiert {{ diff_stats.updated_de }}</span>
+  </div>
+  {% endif %}
 </section>
 
-{% if diff.active %}
-{% for t in diff.active %}
+{% for t in diff_themes %}
 <article class="dz-card" style="--c:{{ t.color }}">
   <div class="dz-card-head">
     <h2>{{ t.label }}</h2>
-    <span class="dz-count">{{ t.n }} {{ 'Move' if t.n == 1 else 'Moves' }}</span>
+    {% if t.n %}<span class="dz-count">{{ t.n }} {{ 'Move' if t.n == 1 else 'Moves' }}</span>{% endif %}
   </div>
-  <p class="dz-blurb">{{ t.blurb }}</p>
-  <div class="dz-context">
-    <div>
-      <span class="dz-lab">Wer macht’s vor</span>
-      <p>{% for v in t.vorbilder %}<b>{{ v.name }}</b>{% if not loop.last %}, {% endif %}{% endfor %}</p>
-    </div>
-    <div>
-      <span class="dz-lab imp">Impuls für Vodafone</span>
-      <p>{{ t.impuls }}</p>
-    </div>
-  </div>
-  <span class="dz-lab dz-moves-lab">Aktuelle Moves</span>
+  {% if t.entries %}
   <ul class="dz-moves">
-    {% for m in t.moves[:8] %}
+    {% for e in t.entries %}
     <li class="dz-move">
-      <a class="dz-move-title" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.de_title }}</a>
-      {% if m.why %}<p class="dz-move-why">{{ m.why }}</p>{% endif %}
-      <p class="dz-move-meta"><b>{{ m.op }}</b>{% if m.region %} · {{ m.region }}{% endif %}{% if m.date %} · {{ m.date | date_de }}{% endif %} · <a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.domain }} &nearr;</a></p>
+      <div class="dz-move-h">
+        <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> — {{ e.what }}</a>
+        {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
+      </div>
+      {% if e.why %}<p class="dz-move-why">{{ e.why }}</p>{% endif %}
+      <p class="dz-move-meta">{% if e.region %}{{ e.region }} · {% endif %}{% if e.date %}{{ e.date }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>{% if e.verified_de %} · geprüft {{ e.verified_de }}{% endif %}</p>
     </li>
     {% endfor %}
   </ul>
-  {% if t.moves|length > 8 %}<p class="dz-more">+ {{ t.moves|length - 8 }} weitere in dieser Kategorie</p>{% endif %}
+  {% else %}
+  <p class="dz-empty">Aktuell kein belegter Move erfasst – der wöchentliche Sweep beobachtet diese Kategorie weiter.</p>
+  {% endif %}
 </article>
 {% endfor %}
-{% endif %}
 
-{% if diff.quiet %}
-<section class="dz-quiet">
-  <h2 class="dz-quiet-head">Ideen-Radar</h2>
-  <p class="dz-quiet-sub">Weitere Wege, sich jenseits des Preises abzuheben – je Hebel ein aktuelles Vorbild und eine konkrete Idee für Vodafone. Wöchentlich vom Agenten aus der Marktlage aktualisiert; sobald hier ein echter Move auftaucht, wandert der Hebel nach oben zu den Karten.</p>
-  <ul class="dz-radar">
-    {% for t in diff.quiet %}
-    {% set r = radar[t.key] %}
-    <li class="dz-radar-row" style="--c:{{ t.color }}">
-      <div class="dz-radar-lever"><span class="dz-radar-dot"></span>{{ t.label }}</div>
-      <div class="dz-radar-body">
-        <span class="dz-radar-vb"><em>Vorbild:</em> {{ r.vorbild if r else t.vorbilder[0].name }}</span>
-        <span class="dz-radar-idee">{{ r.idee if r else '' }}</span>
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
-</section>
-{% endif %}
-
-{% if not diff.active and not diff.quiet %}
-<article class="dz-card"><p class="muted-note">Noch keine Differenzierungs-Moves erfasst – sie entstehen beim nächsten Lauf der Pipeline.</p></article>
-{% endif %}
-
-<p class="dz-foot">Automatisch aus den Pressestellen von {{ num_operators or '80+' }} Netzbetreibern und der Telko-Fachpresse zusammengestellt – nur Differenzierungs-Moves, ohne reine Preis-, Netz- und B2B-Meldungen. Relevante Moves bleiben über Wochen erhalten.</p>
+<p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
+und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises
+sucht. Jeder Eintrag trägt Quelle und Prüfdatum; Moves ohne belegbare Quelle werden nicht aufgenommen.</p>
 {% endblock %}
