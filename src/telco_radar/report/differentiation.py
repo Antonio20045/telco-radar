@@ -1,32 +1,30 @@
-"""Weekly differentiation lens.
+"""Wöchentlicher Differenzierungs-Radar.
 
-Which competitors launched NEW ways to differentiate *beyond price* this week -
-consumer-facing external services and ecosystem / platform / super-app moves they
-embed into their products (AI assistants, streaming, security, fintech, super-apps,
-cloud, smart home, gaming, satellite direct-to-cell, loyalty). Grouped by
-differentiation type, each with a best-in-class reference ("Vorbild") and an
-inspiration angle for Vodafone ("Impuls").
+Clustert die (bereits vom Analyse-Agenten bewerteten) Meldungen der letzten Wochen
+nach Differenzierungs-Typ: neue, konsumentennahe Services und Ökosystem-Moves, mit
+denen sich Wettbewerber JENSEITS DES PREISES abheben (KI-Assistenten, Streaming,
+Security, Fintech, Super-App, Cloud, Smart Home, Gaming, Satellit/Direct-to-Cell,
+Loyalty, Health). Preis-/Tarif-, Netz-/Infrastruktur- und B2B-Meldungen werden
+konsequent ausgeschlossen.
 
-Computed at render time from the weekly highlights (no LLM), same philosophy as
-report/html.py:_stats. The classifier is deliberately PRECISION-first: it keys off
-concrete consumer service/brand anchors and hard-excludes the network / B2B /
-finance news that dominates the telco feed, so the page shows real product moves,
-not infrastructure noise.
+Alles wird zur Render-Zeit in Python berechnet (kein LLM, gratis, lokal testbar) -
+dieselbe Philosophie wie report/html.py:_stats. Angezeigt wird durchgehend Deutsch:
+die Karten führen mit dem deutschen Meldungstext (dem vom Agenten verfassten
+Summary), nicht mit dem fremdsprachigen Original-Titel.
 """
 from __future__ import annotations
 
 import re
 from urllib.parse import urlsplit
 
-# Categories that are never consumer product differentiation.
+# Kategorien, die nie konsumentennahe Produkt-Differenzierung sind.
 NON_DIFF_CATEGORIES = {
     "Tarif/Pricing", "Verbal/Pricing", "Finanzen", "Regulierung", "Personal",
     "Sonstiges", "Strategie",
 }
 
-# Hard exclusions: network build-out, infrastructure, B2B/enterprise, corporate
-# finance and pure network-ops. If any appears in title+summary, the item is not a
-# consumer differentiation move, whatever else it matches.
+# Harte Ausschlüsse: Netzausbau, Infrastruktur, B2B/Enterprise, Konzernfinanzen,
+# reiner Netzbetrieb. Taucht das in Titel+Summary auf, ist es kein Consumer-Move.
 _EXCLUDE = re.compile(
     r"ai[- ]ran|open ran|o-ran|\bv-?ran\b|\bran\b|spectrum|backbone|subsea|"
     r"data cent(er|re)|ground station|network slicing|\bslicing\b|outage|"
@@ -38,35 +36,43 @@ _EXCLUDE = re.compile(
     r"\bipo\b|valuation|merger|acquisition|acquire|\bstake\b|fundrais|"
     r"\bshares\b|\bstock\b|earnings|\brevenue(s)?\b|\bprofit\b|subsidy|"
     r"billion|\bbn\b|\bm\&a\b|invests?\b|investment|raises\s|hires|"
-    r"data analytics|multi-operator|\bm2m\b|constellation|automotive|agentic network|"
-    r"connected vehicle|\bcapex\b|infrastructure upgrade|modernis",
+    r"data analytics|multi-operator|\bm2m\b|constellation|automotive|"
+    r"connected vehicle|agentic network|infrastructure upgrade|modernis",
     re.I,
 )
 
-# Each theme: key, label, colour, blurb, consumer ANCHORS (a term padded with
-# spaces matches a whole token; bare term matches as substring / German compound),
-# evergreen "vorbilder" and "impuls".
+# Jede Kategorie: key, Label, Farbe, Muster-Text (2 Sätze), Consumer-Anker,
+# Vorbilder (Name + kurze deutsche Beschreibung, was sie konkret tun) und ein
+# ausformulierter Impuls für Vodafone (bewusst im Wissen, was Vodafone schon hat).
 DIFF_THEMES = [
     {
         "key": "ki", "label": "KI & Assistenten", "color": "#7b3fe4",
-        "blurb": "Premium-KI-Assistenten gratis im Tarif oder fest im Gerät.",
+        "blurb": "Der große Differenzierungs-Trend 2025/26: Wettbewerber verschenken "
+                 "eine kostenpflichtige Premium-KI oder bauen sie fest ins Gerät ein "
+                 "und machen den KI-Assistenten zum sichtbaren Tarif-Vorteil.",
         "anchors": ["perplexity", "gemini", "chatgpt", "openai", "copilot",
                     "le chat", "mistral", " claude ", "ai assistant", "ai-assistent",
                     "ki-assistent", "ki assistent", "ai phone", "ai-phone",
                     "natural ai", " adot ", "ai translation", "translation feature",
                     "personal ai", "ai companion", "ai-companion", "sprachassistent",
                     "gen-ai assistant", "smart assistant"],
-        "vorbilder": ["Telekom · AI Phone (Perplexity Pro gratis)",
-                      "Free/Iliad · Le Chat Pro (Mistral) für alle",
-                      "SoftBank · Perplexity + Natural AI Phone",
-                      "Jio · Google Gemini gratis 18 Mon."],
-        "impuls": "Vodafone hat TOBi als Service-Bot – aber keinen kostenlosen "
-                  "Premium-KI-Assistenten als Tarif-Bonus. Ein 'Perplexity/Gemini/"
-                  "Mistral gratis'-Bundle wäre ein sofort kopierbares Signal.",
+        "vorbilder": [
+            {"name": "Telekom · AI Phone", "desc": "gibt jedem Tarifkunden 18 Monate Perplexity Pro gratis – KI fest im Smartphone, eigener Magenta-Knopf."},
+            {"name": "Free/Iliad (FR) · Le Chat Pro", "desc": "schenkt allen ~15 Mio. Mobilfunkkunden 12 Monate Mistrals Premium-KI (Thema europäische KI-Souveränität)."},
+            {"name": "SoftBank (JP) · Perplexity + Natural AI Phone", "desc": "1 Jahr Perplexity Pro gratis plus ein exklusives, KI-natives Smartphone."},
+            {"name": "Jio (IN) · Google Gemini", "desc": "18 Monate Gemini AI Pro + 2 TB Cloud gratis zum 5G-Tarif."},
+        ],
+        "impuls": "Vodafone hat mit TOBi zwar einen Service-Chatbot, aber keinen "
+                  "kostenlosen Premium-KI-Assistenten als Tarif-Bonus. Ein klar "
+                  "sichtbares „Perplexity/Gemini/Mistral gratis\"-Bundle wäre ein "
+                  "sofort verständliches Differenzierungssignal – technisch andockbar "
+                  "an die bestehende Microsoft-/Azure-Partnerschaft.",
     },
     {
         "key": "entertainment", "label": "Entertainment & Streaming", "color": "#e60000",
-        "blurb": "Streaming, Sport- und TV-Rechte als Bindungsanker statt Einzel-Abo.",
+        "blurb": "Streaming, Sport- und TV-Rechte sind der klassische Bindungsanker. "
+                 "Der nächste Schritt der Besten ist nicht „noch ein Abo\", sondern ein "
+                 "Aggregator-Erlebnis: alle Dienste in einer Oberfläche.",
         "anchors": ["netflix", "disney", "prime video", "amazon prime", "spotify",
                     "youtube premium", " dazn", "hbo max", "paramount", "apple tv",
                     "apple music", "viaplay", "crunchyroll", "fola play", "u-next",
@@ -75,17 +81,22 @@ DIFF_THEMES = [
                     "serie a", "free streaming", "streaming channel", "live-tv",
                     "pay-tv", "music streaming", "streaming-dienst", "streaming service",
                     "content bundle", "entertainment bundle", "sport-streaming"],
-        "vorbilder": ["Telekom · MagentaTV-Aggregator (ein Interface)",
-                      "Telia Play · alle Dienste in einer App",
-                      "EE · Inclusive Extras (monatlich wechselbar)",
-                      "Rakuten · U-NEXT-Tarif"],
-        "impuls": "Vodafone bündelt Disney+/Prime/YouTube als Einzel-Add-ons. Nächster "
-                  "Schritt: das Aggregator-Erlebnis – ein Interface über alle Dienste "
-                  "plus eigene/exklusive Rechte statt loser Zusatzabos.",
+        "vorbilder": [
+            {"name": "Telekom · MagentaTV", "desc": "ein Interface und eine Fernbedienung über lineares TV und alle Streaming-Apps (Netflix, Disney+, RTL+ …)."},
+            {"name": "Telia (Nordics) · Telia Play", "desc": "bündelt Netflix, Disney+, HBO Max, Viaplay & Sportrechte in EINER durchsuchbaren App."},
+            {"name": "EE (UK) · Inclusive Extras", "desc": "ein wählbarer Premium-Dienst pro Monat (Netflix, Apple One, Game Pass …), alle 30 Tage tauschbar."},
+            {"name": "Deutsche Telekom · WM-Rechte", "desc": "exklusive Sportrechte als Neukunden-Turbo (jüngst die FIFA-WM 2030 für Deutschland)."},
+        ],
+        "impuls": "Vodafone bündelt Disney+/Prime/YouTube heute als lose Einzel-"
+                  "Add-ons. Der Hebel ist das Aggregator-Erlebnis (eine Oberfläche "
+                  "über alle Dienste) plus punktuell eigene/exklusive Rechte, statt "
+                  "beliebig austauschbarer Zusatzabos.",
     },
     {
         "key": "security", "label": "Security & Vertrauen", "color": "#2f8f5b",
-        "blurb": "Schutz vor Betrug, Spam und Deepfakes – im Netz und per KI.",
+        "blurb": "Schutz vor Betrug, Spam und Deepfakes wird vom Antivirus-Add-on zum "
+                 "Marken-Asset. Die Vorreiter verlagern ihn ins Netz und machen ihn "
+                 "kostenlos und automatisch aktiv.",
         "anchors": ["secure net", "securenet", "norton", "mcafee", "f-secure",
                     " scam", "fraud detection", "betrugserkennung", "phishing",
                     "voice phishing", "anti-spam", "spam detection", "spam alert",
@@ -93,34 +104,44 @@ DIFF_THEMES = [
                     "identity protection", "identitätsschutz", "dark web",
                     "fake-anruf", "scam-schutz", "kinderschutz", "parental control",
                     "jugendschutz"],
-        "vorbilder": ["Airtel · KI-Spam-/Betrugserkennung im Netz (gratis, auto-an)",
-                      "KT · KI gegen Voice-Phishing/Deepfakes",
-                      "Orange · Cybersecure (auch für Nicht-Kunden)",
-                      "Telekom · Digital-Schutzpaket (ID & Betrug)"],
-        "impuls": "Vodafone hat Secure Net. Trend: weg vom Geräte-Antivirus, hin zu "
-                  "netz-/identitätsbasiertem Schutz plus KI-Betrugserkennung – ein "
-                  "Vertrauens-Asset, das sich als Marke führen lässt.",
+        "vorbilder": [
+            {"name": "Airtel (IN) · KI-Spam-/Betrugserkennung", "desc": "erkennt Spam- und Betrugsanrufe direkt im Netz – gratis und automatisch für alle Kunden aktiv."},
+            {"name": "KT (KR) · Voice-Phishing-KI", "desc": "erkennt KI-generierte Fake-Stimmen (Deepfakes) am Telefon in Echtzeit."},
+            {"name": "Orange (FR) · Cybersecure", "desc": "Schutzdienst, den sogar Nicht-Kunden nutzen können – Vertrauens-Positionierung über die Marke."},
+            {"name": "Telekom · Digital-Schutzpaket", "desc": "geht über Antivirus hinaus: ID-/Darkweb-Monitoring, Betrugsabsicherung, Hilfe bei Cybermobbing."},
+        ],
+        "impuls": "Vodafone hat mit Secure Net eine Basis. Der Trend geht weg vom "
+                  "Geräte-Antivirus hin zu netz- und identitätsbasiertem Schutz plus "
+                  "KI-Betrugserkennung – ein Vertrauens-Thema, das sich als eigenes "
+                  "Markenversprechen führen und bepreisen lässt.",
     },
     {
         "key": "fintech", "label": "Fintech & Payment", "color": "#c98a00",
-        "blurb": "Wallet, Kredit, Versicherung und Banking direkt in der Telco-App.",
+        "blurb": "Wallet, Kredit, Versicherung und Banking direkt in der Telco-App. In "
+                 "Wachstumsmärkten sind daraus die stärksten Ökosysteme überhaupt "
+                 "geworden – mit Mini-App-Marktplätzen obendrauf.",
         "anchors": ["m-pesa", "mpesa", "vodapay", "paypay", "gcash", " maya ",
                     "paycell", " momo", "mobile money", "e-wallet", " wallet",
                     "digital bank", "payments bank", "paypal", " bnpl",
                     "buy now pay later", "microloan", "micro-loan", "micro-insurance",
                     "mikroversicherung", "digital wallet", "super-wallet",
                     "remittance", "geldbörse"],
-        "vorbilder": ["Safaricom/Vodacom · M-Pesa & VodaPay (Mini-App-Marktplatz)",
-                      "MTN · MoMo + Ant/Alipay-Mini-Apps",
-                      "GCash / Maya · Telco-Fintech-Unicorns",
-                      "Turkcell · Paycell"],
-        "impuls": "Vodafone hat mit M-Pesa/VodaPay in Afrika das weltweit stärkste "
-                  "Telco-Fintech. Impuls: das Mini-App-Marktplatz-Modell in die "
-                  "europäischen Apps übertragen.",
+        "vorbilder": [
+            {"name": "Safaricom/Vodacom · M-Pesa & VodaPay", "desc": "Afrikas führendes Telco-Fintech – vom Wallet zum Super-App mit über 220 Mini-Apps (eigene Vodafone-Familie!)."},
+            {"name": "MTN (Afrika) · MoMo", "desc": "Fintech-Wallet, das per Alipay-Partnerschaft zum Mini-App-Marktplatz ausgebaut wird."},
+            {"name": "GCash / Maya (PH)", "desc": "aus Telcos entstandene Fintech-Unicorns – Wallet, Sparen, Kredit, digitale Bank."},
+            {"name": "Turkcell (TR) · Paycell", "desc": "eigenes Bezahlsystem als Teil der hauseigenen Digital-Suite."},
+        ],
+        "impuls": "Vodafone besitzt mit M-Pesa/VodaPay das weltweit stärkste Telco-"
+                  "Fintech – nur eben in Afrika. Der Impuls: das erprobte Mini-App-"
+                  "Marktplatz-Modell schrittweise auf die europäischen Vodafone-Apps "
+                  "übertragen, statt es als reines Afrika-Thema zu sehen.",
     },
     {
         "key": "superapp", "label": "Super-App & Ökosystem", "color": "#3860be",
-        "blurb": "Die Telco-App wird zur Alltags-Plattform mit Partner-Diensten.",
+        "blurb": "Die Telco-App wird von der Selfcare-App zur Alltags-Plattform mit "
+                 "eingebauten Partner-Diensten. Ziel ist tägliche Nutzung statt „nur "
+                 "aufladen und abmelden\".",
         "anchors": ["super app", "super-app", "superapp", "mini-app", "mini app",
                     "mini program", "mini-programm", "ayoba", "myjio", "mytelkomsel",
                     "max it", "one app", "oneapp", "everyday app", "capcut",
@@ -128,94 +149,128 @@ DIFF_THEMES = [
                     "in-app", "rewards app", "lifestyle app", "digital hub",
                     "eingebaut in", "integriert die", "in die app", "into its app",
                     "in seine app", "app-ökosystem"],
-        "vorbilder": ["Jio · MyJio-Suite",
-                      "Turkcell · eigene Digital-Suite (BiP, fizy, TV+, Paycell)",
-                      "M-Pesa · 221 Mini-Apps im Ökosystem",
-                      "EE · offene EE-ID als Alltags-Gateway",
-                      "Orange · Max it (MEA)"],
-        "impuls": "MeinVodafone könnte von der Selfcare-App zur Alltags-Plattform "
-                  "werden: offene Login-ID, Mini-Apps von Partnern, Services weit "
-                  "über den Tarif hinaus.",
+        "vorbilder": [
+            {"name": "Jio (IN) · MyJio", "desc": "eine App als Zugang zu einer ganzen Suite: Streaming, Musik, Shopping, Zahlung, Cloud, Games."},
+            {"name": "Turkcell (TR)", "desc": "hat eine komplette eigene Digital-Suite gebaut (BiP-Messenger, fizy-Musik, TV+, Lifebox-Cloud, Paycell)."},
+            {"name": "EE (UK) · EE-ID", "desc": "offene Login-ID – auch für Nicht-Kunden – als Tor zu Shop, Gaming, Versicherung; „mehr als ein Netz\"."},
+            {"name": "Orange · Max it (MEA)", "desc": "Super-App mit Konto, Orange Money, Shopping, Musik, TV und Ticketing in einem."},
+        ],
+        "impuls": "MeinVodafone könnte von der reinen Selfcare-App zur Alltags-"
+                  "Plattform werden: offene Login-ID, Mini-Apps von Partnern und "
+                  "Services deutlich über den Tarif hinaus – der klarste „Telco → "
+                  "Everyday-App\"-Weg, den EE und Orange gerade vormachen.",
     },
     {
         "key": "cloud", "label": "Cloud & Speicher", "color": "#0d9488",
-        "blurb": "Kostenloser, oft datensouveräner Cloud-Speicher als Tarif-Extra.",
+        "blurb": "Kostenloser, oft datensouveräner Cloud-Speicher als Tarif-Extra – "
+                 "günstig in der Herstellung, aber ein guter Bindungs- und "
+                 "Vertrauensanker.",
         "anchors": ["google one", "icloud", "cloud storage", "cloud-speicher",
                     "free storage", "gratis speicher", "fotospeicher", "photo storage",
                     "rakuten drive", "personal cloud", "mycloud", "onedrive bundle",
                     "backup-speicher", "gb gratis", "tb gratis"],
-        "vorbilder": ["Rakuten · 50 GB gratis (Rakuten Drive)", "Jio · AI-Cloud gratis",
-                      "Swisscom · myCloud (Schweiz-gehostet)", "O2 Spanien · Cloud bis 10 TB"],
-        "impuls": "Datensouveräner Cloud-Speicher (EU-gehostet) als kostenloses "
-                  "Tarif-Extra – zugleich Vertrauens- und Bindungsanker.",
+        "vorbilder": [
+            {"name": "Rakuten (JP) · Rakuten Drive", "desc": "50 GB Cloud-Speicher gratis zum Tarif."},
+            {"name": "Jio (IN) · AI-Cloud", "desc": "großzügiger Gratis-Speicher als Teil des 5G-Angebots."},
+            {"name": "Swisscom (CH) · myCloud", "desc": "Schweiz-gehosteter Speicher – Datensouveränität als Verkaufsargument."},
+            {"name": "O2 (ES) · Cloud", "desc": "Gratis-Speicher für Mobilfunkkunden, jüngst bis 10 TB ausgebaut."},
+        ],
+        "impuls": "Ein EU-gehosteter Gratis-Cloud-Speicher als Tarif-Extra wäre "
+                  "zugleich Vertrauens- und Bindungsanker – gerade im deutschen "
+                  "Markt ein glaubwürdiges Datenschutz-Argument.",
     },
     {
         "key": "smarthome", "label": "Smart Home & IoT", "color": "#b5551d",
-        "blurb": "Sicherheit und Steuerung fürs Zuhause am Router-Anschluss.",
+        "blurb": "Sicherheit und Steuerung fürs Zuhause am Router-Anschluss – eine "
+                 "margenstarke Zusatzwelt, die den ganzen Haushalt bindet.",
         "anchors": ["smart home", "smarthome", "smart-home", "magenta home",
                     "home security", "überwachungskamera", "smart lock", "türschloss",
                     "thermostat", "connected home", "haussteuerung", "smart wifi",
                     "hausautomation", "smart-home-paket", "alarmanlage"],
-        "vorbilder": ["Telekom · Magenta Home (eine App)",
-                      "au · au HOME (Kamera, Schloss, Notruf)",
-                      "Movistar · Prosegur-Alarm + Digitalschutz", "e& · Smart Home"],
-        "impuls": "Smart-Home/-Security als margenstarke Zusatzwelt am Router – "
-                  "bindet den ganzen Haushalt an die Vodafone-Konnektivität.",
+        "vorbilder": [
+            {"name": "Telekom · Magenta Home", "desc": "vereinheitlichte Smart-Home-App mit Routinen (Einbruchsalarm, Anwesenheits-Simulation, Heizung)."},
+            {"name": "au (JP) · au HOME", "desc": "Kamera, smartes Türschloss, Sensoren und Notruf-Dienst am Anschluss."},
+            {"name": "Movistar (ES)", "desc": "Alarmanlage (Prosegur-JV) plus digitaler Schutz aus einer Hand."},
+            {"name": "e& (VAE) · Smart Home", "desc": "Überwachung und Gerätesteuerung gebündelt mit dem Heim-Internet."},
+        ],
+        "impuls": "Smart-Home/-Security als Zusatzwelt am Vodafone-Router bindet den "
+                  "Haushalt langfristig an die Vodafone-Konnektivität – margenstark "
+                  "und gut mit Kabel/Glasfaser kombinierbar.",
     },
     {
         "key": "gaming", "label": "Gaming", "color": "#c2185b",
-        "blurb": "Cloud-Gaming als sichtbarer Beweis fürs 5G-Netz.",
+        "blurb": "Cloud-Gaming ist der sichtbarste Beweis fürs 5G-Netz: niedrige "
+                 "Latenz und Network-Slicing werden zum Erlebnis statt zur Technik-"
+                 "Folie.",
         "anchors": ["game pass", "gamepass", "geforce now", "cloud gaming",
                     "cloud-gaming", " xbox", "playstation", " ps5", "esports",
                     "e-sports", "spiele-abo", "gaming-plattform", "gameloft",
                     "gaming bundle", "gaming-bundle", "spieleplattform"],
-        "vorbilder": ["Telekom · 5G+ Gaming mit GeForce NOW",
-                      "EE · Game Pass & Cloud-Gaming-Bundles",
-                      "SKT · Xbox Game Pass in T Universe", "MTN · MTN Arcade"],
-        "impuls": "Cloud-Gaming beweist niedrige Latenz und Slicing – als Bundle "
-                  "(GeForce NOW / Game Pass) statt eigener Plattform.",
+        "vorbilder": [
+            {"name": "Telekom · 5G+ Gaming", "desc": "GeForce NOW gebündelt, vermarktet über 5G-SA, Slicing und niedrige Latenz."},
+            {"name": "EE (UK)", "desc": "Game Pass als wählbares Extra plus Cloud-Gaming-Bundles mit Hardware."},
+            {"name": "SK Telecom (KR)", "desc": "Xbox Game Pass fest im Abo-Marktplatz T Universe."},
+            {"name": "MTN (Afrika) · Arcade", "desc": "Gaming-Abo mit Premium-Titeln zum kleinen Tagespreis."},
+        ],
+        "impuls": "Cloud-Gaming als Bundle (GeForce NOW / Game Pass) statt eigener "
+                  "Plattform – ein kostengünstiger, glaubwürdiger Beweis für die "
+                  "Qualität des Vodafone-5G-Netzes.",
     },
     {
         "key": "satellite", "label": "Satellit & Direct-to-Cell", "color": "#5a6b9e",
-        "blurb": "Direktverbindung Satellit-zu-Handy – 'nie mehr kein Netz'.",
+        "blurb": "Die Direktverbindung Satellit-zu-Handy ist gerade das heißeste "
+                 "Netz-Differenzierungsthema: „nie mehr kein Netz\", ganz ohne "
+                 "Spezialgerät.",
         "anchors": ["direct-to-cell", "direct to cell", "direct-to-device",
                     "direct to device", " d2c", " d2d", " dtc ", "starlink direct",
                     "starlink", "satellite-to-phone", "text via satellite",
                     "satellite messaging", "spacemobile", "ast spacemobile",
                     "amazon leo", "amazon kuiper", "satelliten-handy",
                     "satelliten-direktverbindung", "sats-to-phone"],
-        "vorbilder": ["au · Starlink Direct (gratis für Kunden)",
-                      "Vodafone · AST SpaceMobile (Welt-Erst-5G aus dem All)",
-                      "T-Mobile US · T-Satellite (Starlink)"],
-        "impuls": "Vodafone ist mit AST SpaceMobile technisch vorn. Impuls: "
-                  "Vermarktung – Direct-to-Cell als sichtbares 'immer erreichbar'-"
-                  "Versprechen positionieren.",
+        "vorbilder": [
+            {"name": "au (JP) · Starlink Direct", "desc": "Satellit-zu-Handy, für Bestandskunden gratis – erreicht Gebiete ohne Mobilfunk."},
+            {"name": "Vodafone · AST SpaceMobile", "desc": "hat den weltweit ersten 5G-Handy-Anruf aus dem All gemacht – Vodafone ist hier technisch vorn."},
+            {"name": "T-Mobile US · T-Satellite", "desc": "Direct-to-Cell über Starlink, aggressiv als Abdeckungs-Vorteil vermarktet."},
+        ],
+        "impuls": "Vodafone ist mit AST SpaceMobile technologisch vorn – die Chance "
+                  "liegt in der Vermarktung: Direct-to-Cell als sichtbares „immer "
+                  "erreichbar\"-Versprechen für Wandern, Notfälle und Funklöcher "
+                  "positionieren, bevor es die Wettbewerber besetzen.",
     },
     {
         "key": "loyalty", "label": "Loyalty & Perks", "color": "#ac1811",
-        "blurb": "Erlebnis-Perks und Presales, die App-Öffnungen zur Gewohnheit machen.",
+        "blurb": "Erlebnis-Perks und exklusive Vorverkäufe machen das tägliche "
+                 "App-Öffnen zur Gewohnheit – Bindung über Nutzen statt über den "
+                 "Vertrag.",
         "anchors": ["veryme", "magenta moments", "o2 priority", " priority ",
                     "rewards program", "treueprogramm", "loyalty program", "payback",
                     "tuesdays", "bonga", "cashback", "erlebnis-perks", "presale",
                     "vorteilsprogramm", "bonusprogramm", "kundenvorteil", "reward-app"],
-        "vorbilder": ["O2 UK · Priority (Presales, tägliche Perks)",
-                      "Telekom · Magenta Moments",
-                      "KPN · Voor Jou (wöchentliche Überraschungen)",
-                      "Vodafone · VeryMe (schon starke Basis)"],
-        "impuls": "Vodafone hat mit VeryMe eine gute Basis. Von O2 Priority lernen: "
-                  "exklusive Presales und tägliche, lokale Erlebnis-Perks.",
+        "vorbilder": [
+            {"name": "O2 (UK) · Priority", "desc": "Goldstandard: Ticket-Vorverkäufe und tägliche, lokale Erlebnis-Perks (Kaffee, Kino …)."},
+            {"name": "Telekom · Magenta Moments", "desc": "täglich wechselnde Vorteile, Streaming-Trials, Konzert-Presales in der App."},
+            {"name": "KPN (NL) · Voor Jou", "desc": "wöchentliche Überraschungen (Event-Tickets, Partner-Perks) als fester App-Anlass."},
+            {"name": "Vodafone · VeryMe", "desc": "bereits eine starke Basis – der Ausbau Richtung Erlebnis/Presales fehlt noch."},
+        ],
+        "impuls": "Vodafone hat mit VeryMe eine gute Grundlage. Von O2 Priority "
+                  "lernen: exklusive Presales und tägliche, lokale Erlebnis-Perks, "
+                  "die einen echten Grund geben, die App täglich zu öffnen.",
     },
     {
         "key": "health", "label": "Health & Wellbeing", "color": "#2b7a9e",
-        "blurb": "Telemedizin und Wellbeing als Differenzierung mit Nutzenversprechen.",
+        "blurb": "Telemedizin und Wellbeing als Differenzierung mit gesellschaftlichem "
+                 "Nutzen – in Wachstumsmärkten bereits erfolgreich erprobt.",
         "anchors": ["telehealth", "telemedizin", "gesundheits-app", "gesundheitsapp",
                     "konsultamd", "d healthcare", "healthcare app", "wellbeing",
                     " calm ", "mental health app", "digital health app",
                     "fitness-abo", "gesundheitsdienst"],
-        "vorbilder": ["Docomo · d Healthcare (Punkte für Schritte)",
-                      "Globe · KonsultaMD (Telemedizin)"],
+        "vorbilder": [
+            {"name": "NTT Docomo (JP) · d Healthcare", "desc": "belohnt tägliche Gesundheits-Missionen (Schritte, Blutdruck) mit Punkten – 18 Mio.+ Nutzer."},
+            {"name": "Globe (PH) · KonsultaMD", "desc": "Telemedizin-Dienst mit über 1 Mio. Nutzern, gebündelt ins Telco-Ökosystem."},
+        ],
         "impuls": "Gesundheits-Services (Telemedizin, Wellbeing) als Differenzierung "
-                  "mit gesellschaftlichem Nutzen – in Wachstumsmärkten erprobt.",
+                  "mit klarem Nutzenversprechen – ein Feld mit Wachstum, das in "
+                  "anderen Märkten schon Kunden bindet.",
     },
 ]
 
@@ -248,8 +303,24 @@ def _domain(url: str) -> str:
     return urlsplit(url or "").netloc.removeprefix("www.")
 
 
+def _split_first(text: str) -> tuple[str, str]:
+    """Ersten Satz als Headline, Rest als Fließtext (beides deutsch aus dem Summary)."""
+    t = " ".join((text or "").split())
+    if not t:
+        return "", ""
+    for sep in (". ", "! ", "? "):
+        k = t.find(sep)
+        if 8 < k < 160:
+            return t[:k + 1], t[k + 2:]
+    return t, ""
+
+
 def build_differentiation(highlights: list[dict]) -> dict:
-    """Classify this week's highlights into differentiation themes (precision-first)."""
+    """Klassifiziert Highlights (mehrerer Wochen) nach Differenzierungs-Typ.
+
+    `highlights` sind die geflachten Highlight-Dicts aus html._flatten. Rückgabe:
+    Struktur für die Seite „Differenzierung" und den Dashboard-Teaser. Deduped nach
+    URL, sortiert nach Datum (neueste zuerst)."""
     moves_by_theme: dict[str, list] = {t["key"]: [] for t in DIFF_THEMES}
     seen: set[str] = set()
     total = 0
@@ -268,17 +339,14 @@ def build_differentiation(highlights: list[dict]) -> dict:
             continue
         seen.add(key)
         best = sorted(scores.items(), key=lambda kv: (-kv[1], _ORDER[kv[0]]))[0][0]
-        # Consumer differentiation is rarely tagged "Netz/Technologie" by the
-        # analyst - except satellite direct-to-cell. Drop network-tech items that
-        # land in any other theme (they are infrastructure, not a product move).
-        if cat == "Netz/Technologie" and best != "satellite":
-            continue
         theme = _THEME_BY_KEY[best]
+        head, rest = _split_first(hl.get("summary") or "")
+        de_title = head or (hl.get("summary") or hl.get("title") or "")
         moves_by_theme[best].append({
             "op": hl.get("operator") or hl.get("source_label") or _domain(hl.get("url")),
-            "title": hl.get("title"), "summary": hl.get("summary"),
-            "why": hl.get("why_it_matters"), "url": hl.get("url"),
-            "region": hl.get("region"), "date": hl.get("date"),
+            "de_title": de_title, "rest": rest,
+            "summary": hl.get("summary"), "why": hl.get("why_it_matters"),
+            "url": hl.get("url"), "region": hl.get("region"), "date": hl.get("date"),
             "cat": cat, "rel": hl.get("relevance") or 0,
             "domain": _domain(hl.get("url")), "color": theme["color"],
             "theme_label": theme["label"],
@@ -287,13 +355,15 @@ def build_differentiation(highlights: list[dict]) -> dict:
 
     themes = []
     for t in DIFF_THEMES:
-        mv = sorted(moves_by_theme[t["key"]], key=lambda m: (-m["rel"], m["op"] or ""))
+        mv = sorted(moves_by_theme[t["key"]],
+                    key=lambda m: (m.get("date") or "", m["rel"]), reverse=True)
         themes.append({**{k: t[k] for k in
                           ("key", "label", "color", "blurb", "vorbilder", "impuls")},
                        "moves": mv, "n": len(mv)})
 
     active = sorted([t for t in themes if t["n"]], key=lambda t: (-t["n"], _ORDER[t["key"]]))
     quiet = [t for t in themes if not t["n"]]
-    top = sorted([m for t in active for m in t["moves"]], key=lambda m: -m["rel"])[:3]
+    top = sorted([m for t in active for m in t["moves"]],
+                 key=lambda m: (m.get("date") or "", m["rel"]), reverse=True)[:3]
     return {"total": total, "n_active": len(active),
             "themes": themes, "active": active, "quiet": quiet, "top": top}

@@ -439,3 +439,19 @@ main{padding-bottom:40px}
 .quiet-blurb{font-size:14px;color:var(--vf-mute);margin:0 0 10px}
 .quiet-vorbild{font-size:13.5px;color:var(--vf-ink);margin:0 0 8px}
 .quiet-impuls{font-size:13.5px;color:#40444a;line-height:1.5;margin:0}
+
+
+/* ---- Differenzierung: Quellen-Note, Vorbilder-Liste, Moves-Überschrift ---- */
+.quelle-note{font-size:13.5px;line-height:1.55;color:var(--vf-mute);background:var(--vf-neutral);
+  border-radius:12px;padding:14px 18px;margin:18px 0 0;max-width:900px}
+.quelle-note b{color:var(--vf-ink)}
+.vorbilder{margin:0 0 14px}
+.vorbilder-label{display:block;font-size:11px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--vf-mute);margin:0 0 8px}
+.vorbilder ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.vorbilder li{font-size:14.5px;line-height:1.5;color:#40444a;padding-left:16px;position:relative}
+.vorbilder li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;
+  border-radius:50%;background:var(--vf-red)}
+.vorbilder li b{color:var(--vf-ink);font-weight:700}
+.moves-head{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--vf-mute);margin:22px 0 14px}

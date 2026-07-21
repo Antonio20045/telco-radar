@@ -411,10 +411,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             num_operators=num_operators),
         encoding="utf-8")
 
-    # ---- Differenzierung (weekly differentiation lens) for the latest run
+    # ---- Differenzierung (rolling multi-week differentiation lens)
+    _diff_all = [h for rep in reports for h in _flatten(rep)]
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
-            prefix="", diff=build_differentiation(_flatten(latest or {})),
+            prefix="", diff=build_differentiation(_diff_all),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")

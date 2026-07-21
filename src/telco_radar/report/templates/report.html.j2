@@ -79,12 +79,12 @@
         <span class="chip" style="background:{{ m.color }};color:#fff">{{ m.theme_label }}</span>
         <span class="chip">{{ m.cat }}</span>
       </div>
-      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a></h3>
+      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.de_title }}</a></h3>
       <p class="prio-meta"><b>{{ m.op }}</b>{% if m.region %}<span class="sep"></span>{{ m.region }}{% endif %}</p>
     </article>
     {% endfor %}
   </div>
-  <p class="section-more"><a href="{{ prefix }}differenzierung.html">Alle {{ dash.diff.total }} Differenzierungs-Moves der Woche &nearr;</a></p>
+  <p class="section-more"><a href="{{ prefix }}differenzierung.html">Alle Differenzierungs-Moves der letzten Wochen &nearr;</a></p>
 </section>
 {% endif %}
 
