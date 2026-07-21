@@ -1,0 +1,80 @@
+{% extends "base.html.j2" %}
+{% set active = 'differenzierung' %}
+{% block title %}Telco Radar - Differenzierung{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div class="hero-row">
+    <h1>Differenzierungs-Radar</h1>
+    {% if date_de %}<span class="hero-date">Woche vom {{ date_de }}</span>{% endif %}
+  </div>
+  <p class="hero-lead">Was Wettbewerber diese Woche Neues starten, um sich <b>jenseits des Preises</b> abzuheben &ndash; externe Services und Ökosystem-Moves, die sie in ihre Produkte einbauen. Preis- und Tarifsenkungen bleiben bewusst außen vor. Jede Kategorie mit Vorbild und Impuls für Vodafone.</p>
+  {% if diff.total %}
+  <div class="metastrip">
+    <span class="hl"><b>{{ diff.total }}</b> neue Differenzierungs-Moves</span><span class="dot"></span>
+    <span><b>{{ diff.n_active }}</b> Kategorien aktiv</span><span class="dot"></span>
+    <span>Fokus: Preis raus, Ökosystem rein</span>
+  </div>
+  {% else %}
+  <div class="metastrip"><span>Diese Woche keine neuen Differenzierungs-Projekte im Radar &ndash; unten die Vorbilder, an denen sich Vodafone orientieren kann.</span></div>
+  {% endif %}
+</section>
+
+{% if diff.active %}
+<nav class="pagenav">
+  {% for t in diff.active %}<a href="#t-{{ t.key }}">{{ t.label }} · {{ t.n }}</a>{% endfor %}
+</nav>
+
+{% for t in diff.active %}
+<section class="section" id="t-{{ t.key }}">
+  <div class="section-head">
+    <h2><span class="sec-no">{{ '%02d' % loop.index }}</span> Differenzierung</h2>
+    <p class="section-title" style="color:{{ t.color }}">{{ t.label }}</p>
+  </div>
+  <div class="diff-lens">
+    <p class="diff-blurb">{{ t.blurb }}</p>
+    <div class="chip-row">{% for v in t.vorbilder %}<span class="chip">{{ v }}</span>{% endfor %}</div>
+    <div class="why"><span class="why-label">Impuls für Vodafone</span>{{ t.impuls }}</div>
+  </div>
+  <div class="prio-list">
+    {% for m in t.moves %}
+    <article class="prio-card" style="border-left-color:{{ m.color }}">
+      <div class="prio-top">
+        <span class="chip" style="background:{{ m.color }};color:#fff">{{ t.label }}</span>
+        <span class="chip">{{ m.cat }}</span>
+        {% if m.rel >= 4 %}<span class="rel-badge r{{ m.rel }}">{{ m.rel }}/5</span>{% endif %}
+      </div>
+      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a></h3>
+      <p class="prio-meta"><b>{{ m.op }}</b>{% if m.region %}<span class="sep"></span>{{ m.region }}{% endif %}{% if m.date %}<span class="sep"></span>{{ m.date }}{% endif %}</p>
+      {% if m.summary %}<p class="prio-summary">{{ m.summary }}</p>{% endif %}
+      {% if m.why %}<p class="why"><span class="why-label">Für Vodafone</span>{{ m.why }}</p>{% endif %}
+      <a class="source-link" href="{{ m.url }}" target="_blank" rel="noopener">Quelle: {{ m.domain }} &nearr;</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endif %}
+
+{% if diff.quiet %}
+<section class="section" id="ruhig">
+  <div class="section-head">
+    <h2><span class="sec-no">{{ '%02d' % (diff.active|length + 1) }}</span> {% if diff.total %}Ruhig diese Woche{% else %}Vorbilder{% endif %}</h2>
+    <p class="section-title">{% if diff.total %}Kategorien ohne neuen Move &ndash; die Vorbilder bleiben{% else %}Woran sich Vodafone orientieren kann{% endif %}</p>
+  </div>
+  <div class="quiet-grid">
+    {% for t in diff.quiet %}
+    <article class="quiet-card" style="border-top:3px solid {{ t.color }}">
+      <h3>{{ t.label }}</h3>
+      <p class="quiet-blurb">{{ t.blurb }}</p>
+      <p class="quiet-vorbild"><b>Vorbild:</b> {{ t.vorbilder[0] }}</p>
+      <p class="quiet-impuls">{{ t.impuls }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <p class="muted-note">Die Moves werden bei jedem wöchentlichen Lauf automatisch aus den Meldungen der {{ num_operators or '80' }} beobachteten Netzbetreiber und der Fachpresse klassifiziert &ndash; nach Differenzierungs-Typ, ohne reine Preis-Moves. <a href="{{ prefix }}index.html" style="color:var(--vf-red);font-weight:600">Zum Wochenbericht &nearr;</a></p>
+</section>
+{% endblock %}

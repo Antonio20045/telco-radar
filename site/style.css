@@ -426,3 +426,16 @@ main{padding-bottom:40px}
   .decision-strip{grid-template-columns:1fr 1fr}.lead-signal{padding:24px 22px}
 }
 @media (max-width:520px){.briefing-kicker{align-items:flex-start;flex-direction:column;gap:5px}.hero-brief h1{font-size:39px}.decision-strip{grid-template-columns:1fr}.evidence>summary{padding:17px 18px}.evidence-body{padding:16px}}
+
+
+/* ===================== Differenzierungs-Radar ===================== */
+.diff-lens{background:var(--vf-neutral);border-radius:16px;padding:20px 24px;margin:0 0 20px}
+.diff-blurb{font-size:16px;color:#40444a;margin:0 0 14px;font-weight:500}
+.diff-lens .chip-row{margin:0 0 14px}
+.diff-lens .why{background:#fff;margin:0}
+.quiet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:16px}
+.quiet-card{background:#fff;border:1px solid var(--vf-line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.quiet-card h3{font-size:17px;font-weight:800;margin:0 0 6px;letter-spacing:-.01em}
+.quiet-blurb{font-size:14px;color:var(--vf-mute);margin:0 0 10px}
+.quiet-vorbild{font-size:13.5px;color:var(--vf-ink);margin:0 0 8px}
+.quiet-impuls{font-size:13.5px;color:#40444a;line-height:1.5;margin:0}

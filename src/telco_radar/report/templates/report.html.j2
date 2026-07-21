@@ -68,9 +68,29 @@
 </section>
 {% endif %}
 
+{% if dash and dash.diff and dash.diff.total %}
+<section class="section" id="differenzierung">
+  <div class="section-head"><h2><span class="sec-no">02</span> Differenzierung</h2>
+    <p class="section-title">Neue Projekte jenseits des Preises</p></div>
+  <div class="prio-list">
+    {% for m in dash.diff.top %}
+    <article class="prio-card" style="border-left-color:{{ m.color }}">
+      <div class="prio-top">
+        <span class="chip" style="background:{{ m.color }};color:#fff">{{ m.theme_label }}</span>
+        <span class="chip">{{ m.cat }}</span>
+      </div>
+      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a></h3>
+      <p class="prio-meta"><b>{{ m.op }}</b>{% if m.region %}<span class="sep"></span>{{ m.region }}{% endif %}</p>
+    </article>
+    {% endfor %}
+  </div>
+  <p class="section-more"><a href="{{ prefix }}differenzierung.html">Alle {{ dash.diff.total }} Differenzierungs-Moves der Woche &nearr;</a></p>
+</section>
+{% endif %}
+
 {% if dash and (dash.risks or dash.chances) %}
 <section class="section" id="chancen-risiken">
-  <div class="section-head"><h2><span class="sec-no">02</span> Chancen &amp; Risiken</h2>
+  <div class="section-head"><h2><span class="sec-no">03</span> Chancen &amp; Risiken</h2>
     <p class="section-title">Was Vodafone verteidigen &ndash; und was es nutzen sollte</p></div>
   <div class="cr-grid">
     <div class="cr-col">
@@ -99,7 +119,7 @@
 
 {% if dash %}
 <section class="section" id="zahlen">
-  <div class="section-head"><h2><span class="sec-no">03</span> Zahlen &amp; Insights</h2>
+  <div class="section-head"><h2><span class="sec-no">04</span> Zahlen &amp; Insights</h2>
     <p class="section-title">Wo die Musik spielt</p></div>
   <div class="chart-grid two">
     <div class="panel">
@@ -162,7 +182,7 @@
 
 {% if briefing_html %}
 <section class="section" id="bericht">
-  <div class="section-head"><h2><span class="sec-no">04</span> Wochenbericht</h2>
+  <div class="section-head"><h2><span class="sec-no">05</span> Wochenbericht</h2>
     <p class="section-title">Einordnung und Handlungsempfehlungen</p></div>
   <article class="briefing prose">{{ briefing_html | safe }}</article>
 </section>
@@ -170,7 +190,7 @@
 
 {% if highlights %}
 <section class="section" id="explorer">
-  <div class="section-head"><h2><span class="sec-no">05</span> Alle Meldungen</h2>
+  <div class="section-head"><h2><span class="sec-no">06</span> Alle Meldungen</h2>
     <p class="section-title">Recherche und Evidenz im Detail</p></div>
   <details class="evidence">
     <summary><span>Alle {{ highlights | length }} Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
@@ -199,7 +219,7 @@
 
 {% if archive and archive | length > 1 %}
 <section class="section" id="archiv">
-  <div class="section-head"><h2><span class="sec-no">06</span> Frühere Berichte</h2></div>
+  <div class="section-head"><h2><span class="sec-no">07</span> Frühere Berichte</h2></div>
   <div class="pill-row">
     {% for entry in archive %}<a class="pill-link {% if report and entry.date == report.date %}current{% endif %}" href="{{ prefix }}reports/{{ entry.date }}.html">{{ entry.date_de }}</a>{% endfor %}
   </div>

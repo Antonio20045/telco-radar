@@ -14,6 +14,8 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
+from .differentiation import build_differentiation
+
 log = logging.getLogger(__name__)
 
 _TEMPLATES = Path(__file__).parent / "templates"
@@ -333,7 +335,8 @@ def _stats(report, prev_report, trend_reports):
     ]
     return {"kpis": kpis, "lead_signal": lead, "sov": sov, "tech_radar": tech_radar, "pricing": pricing,
             "deals": deals, "risks": risks, "chances": chances,
-            "move_matrix": move_matrix, "n_competitors": len(cur_ops)}
+            "move_matrix": move_matrix, "n_competitors": len(cur_ops),
+            "diff": build_differentiation(highlights)}
 
 
 def _prep_competitors(report: dict) -> list[dict]:
@@ -404,6 +407,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "wettbewerber.html").write_text(
         env.get_template("wettbewerber.html.j2").render(
             prefix="", competitors=_prep_competitors(latest or {}),
+            date_de=_fmt_date_de(latest["date"]) if latest else "",
+            num_operators=num_operators),
+        encoding="utf-8")
+
+    # ---- Differenzierung (weekly differentiation lens) for the latest run
+    (site_dir / "differenzierung.html").write_text(
+        env.get_template("differenzierung.html.j2").render(
+            prefix="", diff=build_differentiation(_flatten(latest or {})),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")
