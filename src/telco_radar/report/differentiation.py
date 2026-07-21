@@ -310,26 +310,39 @@ def _split_first(text: str) -> tuple[str, str]:
     return t, ""
 
 
+def classify(hl: dict) -> str | None:
+    """Ordne ein Highlight einem Differenzierungs-Hebel zu.
+
+    Gibt den Theme-Key zurueck oder None, wenn es kein Differenzierungs-Move ist
+    (reine Preis-/Netz-/B2B-/Finanz-Meldung oder kein Anchor-Treffer). Wird von
+    build_differentiation UND vom Kurator (analyze/diff_curator.py) genutzt, damit
+    Klassifikation und Persistenz dieselbe Logik teilen.
+    """
+    cat = (hl.get("category") or "").strip()
+    if cat in NON_DIFF_CATEGORIES:
+        return None
+    text = f"{hl.get('title','')} {hl.get('summary','')}"
+    if _EXCLUDE.search(text):
+        return None
+    scores = _score(text)
+    if not scores:
+        return None
+    return sorted(scores.items(), key=lambda kv: (-kv[1], _ORDER[kv[0]]))[0][0]
+
+
 def build_differentiation(highlights: list[dict]) -> dict:
     """Klassifiziert Highlights (mehrerer Wochen) nach Differenzierungs-Hebel."""
     moves_by_theme: dict[str, list] = {t["key"]: [] for t in DIFF_THEMES}
     seen: set[str] = set()
     total = 0
     for hl in highlights or []:
-        cat = (hl.get("category") or "").strip()
-        if cat in NON_DIFF_CATEGORIES:
-            continue
-        text = f"{hl.get('title','')} {hl.get('summary','')}"
-        if _EXCLUDE.search(text):
-            continue
-        scores = _score(text)
-        if not scores:
+        best = classify(hl)
+        if best is None:
             continue
         key = (hl.get("url") or hl.get("title") or "").strip().lower()
         if key in seen:
             continue
         seen.add(key)
-        best = sorted(scores.items(), key=lambda kv: (-kv[1], _ORDER[kv[0]]))[0][0]
         theme = _THEME_BY_KEY[best]
         head, rest = _split_first(hl.get("summary") or "")
         de_title = head or (hl.get("summary") or hl.get("title") or "")
@@ -338,7 +351,7 @@ def build_differentiation(highlights: list[dict]) -> dict:
             "de_title": de_title, "rest": rest,
             "summary": hl.get("summary"), "why": hl.get("why_it_matters"),
             "url": hl.get("url"), "region": hl.get("region"), "date": hl.get("date"),
-            "cat": cat, "rel": hl.get("relevance") or 0,
+            "cat": (hl.get("category") or "").strip(), "rel": hl.get("relevance") or 0,
             "domain": _domain(hl.get("url")), "color": theme["color"],
             "theme_label": theme["label"],
         })
@@ -346,8 +359,11 @@ def build_differentiation(highlights: list[dict]) -> dict:
 
     themes = []
     for t in DIFF_THEMES:
+        # Relevanteste zuerst, Aktualität als Tiebreak: so bleibt ein starker
+        # Move (z. B. Perplexity-Bundle, 5/5) auch nach Wochen oben stehen und
+        # faellt nicht nur wegen des Datums aus der (gedeckelten) Anzeige.
         mv = sorted(moves_by_theme[t["key"]],
-                    key=lambda m: (m.get("date") or "", m["rel"]), reverse=True)
+                    key=lambda m: (m["rel"], m.get("date") or ""), reverse=True)
         themes.append({**{k: t[k] for k in
                           ("key", "label", "color", "blurb", "vorbilder", "impuls")},
                        "moves": mv, "n": len(mv)})
@@ -355,6 +371,6 @@ def build_differentiation(highlights: list[dict]) -> dict:
     active = sorted([t for t in themes if t["n"]], key=lambda t: (-t["n"], _ORDER[t["key"]]))
     quiet = [t for t in themes if not t["n"]]
     top = sorted([m for t in active for m in t["moves"]],
-                 key=lambda m: (m.get("date") or "", m["rel"]), reverse=True)[:3]
+                 key=lambda m: (m["rel"], m.get("date") or ""), reverse=True)[:3]
     return {"total": total, "n_active": len(active),
             "themes": themes, "active": active, "quiet": quiet, "top": top}

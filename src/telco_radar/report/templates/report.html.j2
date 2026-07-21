@@ -1,61 +1,26 @@
 {% extends "base.html.j2" %}
 {% set active = 'bericht' %}
-{% block title %}Telco Radar - Bericht {{ report.date if report else '' }}{% endblock %}
-
-{% macro feed(items, empty) %}
-<div class="feed">
-  {% for it in items %}
-  <a class="feed-item" href="{{ it.url }}" target="_blank" rel="noopener">
-    <span class="feed-op">{{ it.op }}</span>
-    <span class="feed-title">{{ it.title }}</span>
-    {% if it.region %}<span class="feed-reg">{{ it.region }}</span>{% endif %}
-  </a>
-  {% else %}<p class="muted-note">{{ empty }}</p>{% endfor %}
-</div>
-{% endmacro %}
+{% block title %}Marktrecherche · Bericht {{ report.date if report else '' }}{% endblock %}
 
 {% block content %}
 {% if report %}
 
-<section class="hero hero-brief">
-  <div class="briefing-kicker"><span>Wöchentlicher Entscheidungsbrief</span><span class="briefing-date">{{ date_de }}</span></div>
-  <div class="briefing-hero-grid">
-    <div class="briefing-intro">
-      <h1>Was Vodafone jetzt<br>wissen muss.</h1>
-      <p class="hero-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
-      <p class="briefing-method"><a href="{{ prefix }}protokoll.html">Methode und Quellenbasis ansehen &nearr;</a></p>
-    </div>
-    {% if dash and dash.lead_signal %}
-    <article class="lead-signal">
-      <div class="lead-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
-      <h2><a href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">{{ dash.lead_signal.de_title }}</a></h2>
-      {% if dash.lead_signal.why %}<p>{{ dash.lead_signal.why }}</p>{% endif %}
-      <div class="lead-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %}<span></span>{{ dash.lead_signal.region }}{% endif %}{% if dash.lead_signal.category %}<span></span>{{ dash.lead_signal.category }}{% endif %}</div>
-    </article>
-    {% endif %}
-  </div>
-  {% if dash %}
-  <div class="decision-strip" aria-label="Entscheidungsrelevante Signale dieser Woche">
-    {% for k in dash.kpis[1:] %}
-    <div class="decision-fact{% if k.accent %} accent{% endif %}">
-      <b{% if k.text %} class="text"{% endif %}>{{ k.num }}</b>
-      <span>{{ k.label }}</span>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %}
+<section class="br-hero">
+  <div class="br-kicker"><span>Wöchentlicher Entscheidungsbrief</span><span class="br-date">{{ date_de }}</span></div>
+  <h1>Was Vodafone jetzt<br>wissen muss.</h1>
+  <p class="br-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
+  <p class="br-method"><a href="{{ prefix }}protokoll.html">Methode und Quellenbasis ansehen &nearr;</a></p>
 </section>
 
 {% if top_priorities %}
 <section class="section" id="prioritaet">
-  <div class="section-head"><h2><span class="sec-no">01</span> In 60 Sekunden</h2>
-    <p class="section-title">Die drei Signale, die jetzt zählen</p></div>
+  <div class="section-head"><h2><span class="sec-no">01</span></h2>
+    <p class="section-title">Die wichtigsten Meldungen</p></div>
   <div class="prio-list">
     {% for h in top_priorities[:3] %}
     <article class="prio-card{% if loop.first %} lead{% endif %}">
       <div class="prio-top">
         <span class="rel-badge r{{ h.relevance }}">{{ h.relevance }}/5 &middot; {{ h.relevance_label }}</span>
-        <span class="chip">{{ h.category }}</span>
       </div>
       <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.de_title }}</a></h3>
       <p class="prio-meta"><b>{{ h.operator or h.source_label }}</b><span class="sep"></span>{{ h.region }}{% if h.date %}<span class="sep"></span>{{ h.date }}{% endif %}</p>
@@ -68,130 +33,16 @@
 </section>
 {% endif %}
 
-{% if dash and dash.diff and dash.diff.total %}
-<section class="section" id="differenzierung">
-  <div class="section-head"><h2><span class="sec-no">02</span> Differenzierung</h2>
-    <p class="section-title">Neue Projekte jenseits des Preises</p></div>
-  <div class="prio-list">
-    {% for m in dash.diff.top %}
-    <article class="prio-card" style="border-left-color:{{ m.color }}">
-      <div class="prio-top">
-        <span class="chip" style="background:{{ m.color }};color:#fff">{{ m.theme_label }}</span>
-        <span class="chip">{{ m.cat }}</span>
-      </div>
-      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.de_title }}</a></h3>
-      <p class="prio-meta"><b>{{ m.op }}</b>{% if m.region %}<span class="sep"></span>{{ m.region }}{% endif %}</p>
-    </article>
-    {% endfor %}
-  </div>
-  <p class="section-more"><a href="{{ prefix }}differenzierung.html">Alle Differenzierungs-Moves der letzten Wochen &nearr;</a></p>
-</section>
-{% endif %}
-
-{% if dash and (dash.risks or dash.chances) %}
-<section class="section" id="chancen-risiken">
-  <div class="section-head"><h2><span class="sec-no">03</span> Chancen &amp; Risiken</h2>
-    <p class="section-title">Was Vodafone verteidigen &ndash; und was es nutzen sollte</p></div>
-  <div class="cr-grid">
-    <div class="cr-col">
-      <h3 class="cr-title risk">Risiken &middot; was uns unter Druck setzt</h3>
-      {% for r in dash.risks %}
-      <article class="cr-card risk">
-        <h4><a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.de }}</a></h4>
-        <p class="cr-meta"><b>{{ r.op }}</b> &middot; {{ r.region }} &middot; {{ r.cat }}</p>
-        <p class="cr-why">{{ r.why }}</p>
-      </article>
-      {% else %}<p class="muted-note">Keine akuten Risiken diese Woche.</p>{% endfor %}
-    </div>
-    <div class="cr-col">
-      <h3 class="cr-title chance">Chancen &middot; was wir nutzen können</h3>
-      {% for c in dash.chances %}
-      <article class="cr-card chance">
-        <h4><a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.de }}</a></h4>
-        <p class="cr-meta"><b>{{ c.op }}</b> &middot; {{ c.region }} &middot; {{ c.cat }}</p>
-        <p class="cr-why">{{ c.why }}</p>
-      </article>
-      {% else %}<p class="muted-note">Keine klaren Chancen diese Woche.</p>{% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
-
-{% if dash %}
-<section class="section" id="zahlen">
-  <div class="section-head"><h2><span class="sec-no">04</span> Zahlen &amp; Insights</h2>
-    <p class="section-title">Wo die Musik spielt</p></div>
-  <div class="chart-grid two">
-    <div class="panel">
-      <h3 class="panel-title">Tech-Radar</h3>
-      <p class="panel-note">Welche Technologiethemen die Meldungen diese Woche treiben.</p>
-      <div class="bars">
-        {% for t in dash.tech_radar[:8] %}
-        <div class="bar-row">
-          <span class="bar-lab" title="{{ t.theme }}">{{ t.theme }}</span>
-          <span class="bar-track"><span class="bar-fill" style="width:{{ t.w }}%"></span></span>
-          <span class="bar-val">{{ t.n }}</span>
-        </div>
-        {% else %}<p class="muted-note">Keine Technologiethemen erkannt.</p>{% endfor %}
-      </div>
-    </div>
-    <div class="panel">
-      <h3 class="panel-title">Share of Voice</h3>
-      <p class="panel-note">Wer diese Woche die relevante Presse dominiert.</p>
-      <div class="bars">
-        {% for s in dash.sov %}
-        <div class="bar-row">
-          <span class="bar-lab" title="{{ s.op }}">{{ s.op }}</span>
-          <span class="bar-track"><span class="bar-fill" style="width:{{ s.w }}%"></span></span>
-          <span class="bar-val">{{ s.n }}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-  <div class="chart-grid two">
-    <div class="panel">
-      <h3 class="panel-title">Preis-Radar</h3>
-      <p class="panel-note">Konkrete Tarif- und Preis-Moves der Wettbewerber.</p>
-      {{ feed(dash.pricing, "Keine Preis-Signale diese Woche.") }}
-    </div>
-    <div class="panel">
-      <h3 class="panel-title">Deals &amp; Partnerschaften</h3>
-      <p class="panel-note">Wer sich mit wem zusammentut &ndash; und wer wen kauft.</p>
-      {{ feed(dash.deals, "Keine Deals oder Partnerschaften diese Woche.") }}
-    </div>
-  </div>
-
-  {% if dash.move_matrix %}
-  <div class="panel wide scoreboard">
-    <h3 class="panel-title">Fokus-Wettbewerber &middot; welche Art von Zügen</h3>
-    <p class="panel-note">Aktivität, Zug-Typen und eine Einordnung je Wettbewerber.</p>
-    {% for c in dash.move_matrix %}
-    <div class="score-row">
-      <div class="score-head"><span class="score-name">{{ c.name }}</span><span class="score-n">{{ c.n }} Meldungen</span></div>
-      {% if c.cats %}<div class="chip-row">{% for cat, n in c.cats %}<span class="chip">{{ cat }} &middot; {{ n }}</span>{% endfor %}</div>{% endif %}
-      {% if c.impl %}<p class="score-impl"><span class="why-label">Für Vodafone</span>{{ c.impl }}</p>{% endif %}
-    </div>
-    {% endfor %}
-    {% if n_competitors %}<p class="section-more"><a href="{{ prefix }}wettbewerber.html">Detailanalyse der Wettbewerber &nearr;</a></p>{% endif %}
-  </div>
-  {% endif %}
-</section>
-{% endif %}
-
 {% if briefing_html %}
 <section class="section" id="bericht">
-  <div class="section-head"><h2><span class="sec-no">05</span> Wochenbericht</h2>
-    <p class="section-title">Einordnung und Handlungsempfehlungen</p></div>
+  <div class="section-head"><p class="section-title">Der Wochenbericht</p></div>
   <article class="briefing prose">{{ briefing_html | safe }}</article>
 </section>
 {% endif %}
 
 {% if highlights %}
 <section class="section" id="explorer">
-  <div class="section-head"><h2><span class="sec-no">06</span> Alle Meldungen</h2>
-    <p class="section-title">Recherche und Evidenz im Detail</p></div>
+  <div class="section-head"><p class="section-title">Alle Meldungen</p></div>
   <details class="evidence">
     <summary><span>Alle {{ highlights | length }} Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
     <div class="evidence-body">
@@ -215,14 +66,5 @@
 
 {% else %}
 <section class="hero"><h1>Noch kein Bericht</h1></section>
-{% endif %}
-
-{% if archive and archive | length > 1 %}
-<section class="section" id="archiv">
-  <div class="section-head"><h2><span class="sec-no">07</span> Frühere Berichte</h2></div>
-  <div class="pill-row">
-    {% for entry in archive %}<a class="pill-link {% if report and entry.date == report.date %}current{% endif %}" href="{{ prefix }}reports/{{ entry.date }}.html">{{ entry.date_de }}</a>{% endfor %}
-  </div>
-</section>
 {% endif %}
 {% endblock %}

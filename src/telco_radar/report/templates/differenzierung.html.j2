@@ -1,83 +1,63 @@
 {% extends "base.html.j2" %}
 {% set active = 'differenzierung' %}
-{% block title %}Telco Radar - Differenzierung{% endblock %}
+{% block title %}Marktrecherche · Differenzierung{% endblock %}
 {% block content %}
-<section class="hero compact">
-  <div class="hero-row">
-    <h1>Differenzierungs-Radar</h1>
-    {% if date_de %}<span class="hero-date">Stand {{ date_de }}</span>{% endif %}
+
+<section class="dz-hero">
+  <div class="dz-hero-row">
+    <h1>Differenzierung</h1>
+    {% if date_de %}<span class="dz-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="hero-lead">Wie sich Wettbewerber im Endkundengeschäft <b>jenseits des Preises</b> abheben &ndash; über eingebundene externe Services <b>und</b> Value-Add-Versprechen wie Garantie, Geräte-Programme, Versicherung und Perks. International, als Inspiration. Netz-/5G-Ausbau und Broadband bleiben bewusst außen vor. Jede Kategorie mit Vorbildern und konkretem Impuls für Vodafone.</p>
-  {% if diff.total %}
-  <div class="metastrip">
-    <span class="hl"><b>{{ diff.total }}</b> Differenzierungs-Moves</span><span class="dot"></span>
-    <span><b>{{ diff.n_active }}</b> Kategorien aktiv</span><span class="dot"></span>
-    <span>Zeitraum: die letzten Wochen</span>
-  </div>
-  {% endif %}
-  <p class="quelle-note"><b>Woher die Daten kommen:</b> aus derselben Quellenbasis wie der Wochenbericht &ndash; den offiziellen Pressestellen von {{ num_operators or '81' }} Netzbetreibern weltweit und der Telko-Fachpresse. Jede Meldung wird vom KI-Agenten bewertet; hier werden nur die Differenzierungs-Moves nach Typ geclustert (Preis-, Netz- und B2B-Meldungen ausgeschlossen). Jede Aussage verlinkt auf die Originalquelle.</p>
+  <p class="dz-lead">Wie sich Wettbewerber weltweit <b>jenseits des Preises</b> abheben – über
+  eingebundene Dienste, Garantien, KI, Perks und Ökosysteme. Als Inspiration für Vodafone,
+  Move für Move mit Quelle. Netz-, 5G- und Broadband-Ausbau bleiben bewusst außen vor.</p>
 </section>
 
 {% if diff.active %}
-<nav class="pagenav">
-  {% for t in diff.active %}<a href="#t-{{ t.key }}">{{ t.label }} · {{ t.n }}</a>{% endfor %}
-</nav>
-
 {% for t in diff.active %}
-<section class="section" id="t-{{ t.key }}">
-  <div class="section-head">
-    <h2><span class="sec-no">{{ '%02d' % loop.index }}</span> Differenzierung</h2>
-    <p class="section-title" style="color:{{ t.color }}">{{ t.label }}</p>
+<section class="dz-theme" style="--c:{{ t.color }}">
+  <div class="dz-theme-head">
+    <h2>{{ t.label }}</h2>
+    <span class="dz-count">{{ t.n }} {{ 'Move' if t.n == 1 else 'Moves' }}</span>
   </div>
-  <div class="diff-lens">
-    <p class="diff-blurb">{{ t.blurb }}</p>
-    <div class="vorbilder">
-      <span class="vorbilder-label">Wer macht's vor</span>
-      <ul>{% for v in t.vorbilder %}<li><b>{{ v.name }}</b> &ndash; {{ v.desc }}</li>{% endfor %}</ul>
-    </div>
-    <div class="why"><span class="why-label">Impuls für Vodafone</span>{{ t.impuls }}</div>
+  <p class="dz-blurb">{{ t.blurb }}</p>
+  <div class="dz-context">
+    <p class="dz-vorbilder"><span>Wer macht’s vor</span>{% for v in t.vorbilder %}<b>{{ v.name }}</b>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+    <p class="dz-impuls"><span>Für Vodafone</span>{{ t.impuls }}</p>
   </div>
-  <h3 class="moves-head">Neue Moves der letzten Wochen</h3>
-  <div class="prio-list">
-    {% for m in t.moves %}
-    <article class="prio-card" style="border-left-color:{{ m.color }}">
-      <div class="prio-top">
-        <span class="chip" style="background:{{ m.color }};color:#fff">{{ t.label }}</span>
-        <span class="chip">{{ m.cat }}</span>
-        {% if m.rel >= 4 %}<span class="rel-badge r{{ m.rel }}">{{ m.rel }}/5</span>{% endif %}
-      </div>
-      <h3><a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.de_title }}</a></h3>
-      <p class="prio-meta"><b>{{ m.op }}</b>{% if m.region %}<span class="sep"></span>{{ m.region }}{% endif %}{% if m.date %}<span class="sep"></span>{{ m.date | date_de }}{% endif %}</p>
-      {% if m.rest %}<p class="prio-summary">{{ m.rest }}</p>{% endif %}
-      {% if m.why %}<p class="why"><span class="why-label">Was das für Vodafone heißt</span>{{ m.why }}</p>{% endif %}
-      <a class="source-link" href="{{ m.url }}" target="_blank" rel="noopener">Quelle: {{ m.domain }} &nearr;</a>
-    </article>
+  <ul class="dz-moves">
+    {% for m in t.moves[:8] %}
+    <li class="dz-move">
+      <a class="dz-move-title" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.de_title }}</a>
+      {% if m.why %}<p class="dz-move-why">{{ m.why }}</p>{% endif %}
+      <p class="dz-move-meta"><b>{{ m.op }}</b>{% if m.region %} · {{ m.region }}{% endif %}{% if m.date %} · {{ m.date | date_de }}{% endif %} · <a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.domain }} &nearr;</a></p>
+    </li>
     {% endfor %}
-  </div>
+  </ul>
+  {% if t.moves|length > 8 %}<p class="dz-more">+ {{ t.moves|length - 8 }} weitere in dieser Kategorie</p>{% endif %}
 </section>
 {% endfor %}
 {% endif %}
 
 {% if diff.quiet %}
-<section class="section" id="ruhig">
-  <div class="section-head">
-    <h2><span class="sec-no">{{ '%02d' % (diff.active|length + 1) }}</span> {% if diff.total %}Weitere Differenzierungs-Felder{% else %}Differenzierungs-Felder{% endif %}</h2>
-    <p class="section-title">Kategorien ohne frischen Move &ndash; die Vorbilder als Inspiration</p>
-  </div>
-  <div class="quiet-grid">
+<section class="dz-quiet">
+  <h2 class="dz-quiet-head">Weitere Differenzierungs-Felder</h2>
+  <div class="dz-quiet-grid">
     {% for t in diff.quiet %}
-    <article class="quiet-card" style="border-top:3px solid {{ t.color }}">
+    <div class="dz-q" style="--c:{{ t.color }}">
       <h3>{{ t.label }}</h3>
-      <p class="quiet-blurb">{{ t.blurb }}</p>
-      <p class="quiet-vorbild"><b>Vorbild:</b> {{ t.vorbilder[0].name }} &ndash; {{ t.vorbilder[0].desc }}</p>
-      <p class="quiet-impuls"><b>Impuls:</b> {{ t.impuls }}</p>
-    </article>
+      <p class="dz-q-blurb">{{ t.blurb }}</p>
+      <p class="dz-q-line"><span>Vorbild</span>{{ t.vorbilder[0].name }}</p>
+      <p class="dz-q-line"><span>Impuls</span>{{ t.impuls }}</p>
+    </div>
     {% endfor %}
   </div>
 </section>
 {% endif %}
 
-<section class="section">
-  <p class="muted-note">Diese Übersicht wird bei jedem wöchentlichen Lauf automatisch neu aus den Meldungen der beobachteten Netzbetreiber und der Fachpresse zusammengestellt &ndash; nach Differenzierungs-Typ, ohne reine Preis-Moves. <a href="{{ prefix }}index.html" style="color:var(--vf-red);font-weight:600">Zum Wochenbericht &nearr;</a></p>
-</section>
+{% if not diff.active and not diff.quiet %}
+<section class="dz-theme"><p class="muted-note">Noch keine Differenzierungs-Moves erfasst – sie entstehen beim nächsten Lauf der Pipeline.</p></section>
+{% endif %}
+
+<p class="dz-foot">Automatisch aus den Pressestellen von {{ num_operators or '80+' }} Netzbetreibern und der Telko-Fachpresse zusammengestellt – nur Differenzierungs-Moves, ohne reine Preis-, Netz- und B2B-Meldungen. Relevante Moves bleiben über Wochen erhalten.</p>
 {% endblock %}

@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from .differentiation import build_differentiation
+from ..analyze.diff_curator import DiffStore
 
 log = logging.getLogger(__name__)
 
@@ -437,11 +438,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             num_operators=num_operators),
         encoding="utf-8")
 
-    # ---- Differenzierung (rolling multi-week differentiation lens)
-    _diff_all = [h for rep in reports for h in _flatten(rep)]
+    # ---- Differenzierung (persistente, kuratierte Bibliothek)
+    # Primaerquelle: der git-versionierte Kurator-Speicher (data/state/
+    # differentiation.jsonl) - so bleiben relevante Moves ueber Wochen erhalten,
+    # unabhaengig davon, wie lange die Wochen-Report-JSONs aufgehoben werden.
+    # Fallback (Bootstrap / erste Runde): Aggregation aller Report-Highlights.
+    state_dir = reports_dir.parent / "state"
+    store = DiffStore(state_dir / "differentiation.jsonl")
+    diff_source = store.entries() if len(store) else [
+        h for rep in reports for h in _flatten(rep)]
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
-            prefix="", diff=build_differentiation(_diff_all),
+            prefix="", diff=build_differentiation(diff_source),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")

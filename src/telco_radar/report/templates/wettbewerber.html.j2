@@ -11,10 +11,6 @@
 </section>
 
 {% if competitors and competitors|selectattr('summary')|list %}
-<nav class="pagenav">
-  {% for c in competitors %}<a href="#c{{ loop.index }}">{{ c.name }}</a>{% endfor %}
-</nav>
-
 {% for c in competitors %}
 {% if c.summary or c.moves %}
 <section class="section competitor" id="c{{ loop.index }}">

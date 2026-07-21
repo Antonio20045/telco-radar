@@ -19,6 +19,8 @@ from pathlib import Path
 from .analyze import editor
 from .analyze.agents import analyze_region
 from .analyze import competitors as competitor_mod
+from .analyze import diff_curator
+from .analyze.diff_curator import DiffStore
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
 from .config import load_config
@@ -225,6 +227,27 @@ def run(root: Path, use_llm: bool | None = None,
             else:
                 h.setdefault("date", None)
                 h.setdefault("source", "")
+
+    # -------------------------------------------- Differenzierungs-Kurator
+    # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den
+    # persistenten Speicher auf (data/state/differentiation.jsonl), damit sie
+    # auch spaeter noch als Inspiration sichtbar bleiben. Failsafe: Fehler
+    # brechen den Lauf nicht ab.
+    try:
+        flat_new = []
+        for region_name, r in regional.items():
+            for h in r.get("highlights", []):
+                hh = dict(h)
+                hh["region"] = region_name
+                flat_new.append(hh)
+        diff_store = DiffStore(state_dir / "differentiation.jsonl")
+        added = diff_curator.curate(
+            flat_new, diff_store, date.today().isoformat(),
+            model=editor_model, use_llm=bool(use_llm and new_items))
+        log.info("Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
+                 len(added), len(diff_store))
+    except Exception as exc:  # noqa: BLE001
+        log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
 
     # -------------------------------------------------------------- report
     today = date.today()

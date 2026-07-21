@@ -47,18 +47,6 @@
   </section>
 
   <section class="ov-panel">
-    <div class="ov-panel-head"><h3>Chancen &amp; Risiken</h3><a href="{{ prefix }}bericht.html#chancen-risiken">Details &nearr;</a></div>
-    <div class="ov-cr">
-      <div class="ov-cr-col"><span class="ov-cr-lab risk">Risiken</span>
-        {% for r in dash.risks[:2] %}<p class="ov-cr-item"><b>{{ r.op }}</b> {{ r.de }}</p>{% else %}<p class="muted-note">Keine.</p>{% endfor %}
-      </div>
-      <div class="ov-cr-col"><span class="ov-cr-lab chance">Chancen</span>
-        {% for c in dash.chances[:2] %}<p class="ov-cr-item"><b>{{ c.op }}</b> {{ c.de }}</p>{% else %}<p class="muted-note">Keine.</p>{% endfor %}
-      </div>
-    </div>
-  </section>
-
-  <section class="ov-panel">
     <div class="ov-panel-head"><h3>Aktivste Wettbewerber</h3><a href="{{ prefix }}wettbewerber.html">Analyse &nearr;</a></div>
     {% for c in dash.move_matrix[:5] %}
     <div class="ov-bar"><span class="ov-bar-lab">{{ c.name }}</span>
