@@ -47,6 +47,11 @@ def test_filter_fresh():
     assert fresh in kept and undated in kept and stale not in kept
 
 
+def test_filter_fresh_rejects_far_future_dates():
+    future = _item("scheduled", "https://x.com/future", days_old=-3)
+    assert future not in filter_fresh([future], lookback_days=8)
+
+
 def test_reported_topics_memory(tmp_path):
     path = tmp_path / "topics.jsonl"
     topics = ReportedTopics(path, max_entries=2)

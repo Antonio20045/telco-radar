@@ -157,8 +157,8 @@ regions:
       - United Internet
       - Drillisch
       sources:
-      - type: newsroom
-        url: https://www.united-internet.de/en/newsroom/press-releases/
+      - type: rss
+        url: https://unternehmen.1und1.de/presse/feed
     - name: Bouygues Telecom
       country: FR
       website: bouyguestelecom.fr
@@ -213,8 +213,8 @@ regions:
       country: US
       website: verizon.com
       sources:
-      - type: rss
-        url: https://www.verizon.com/about/rss.xml
+      - type: newsroom_js
+        url: https://www.verizon.com/about/news
     - name: AT&T
       country: US
       website: att.com
@@ -321,8 +321,8 @@ regions:
       aliases:
       - TIM Brazil
       sources:
-      - type: rss
-        url: https://www.tim.com.br/rss.xml
+      - type: newsroom
+        url: https://www.tim.com.br/sobre-a-tim/sala-de-imprensa
     - name: Entel
       country: CL
       website: entel.cl

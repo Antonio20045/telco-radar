@@ -100,10 +100,11 @@ class ReportedTopics:
 
 def filter_fresh(items: list[Item], lookback_days: int) -> list[Item]:
     """Keep items published within the window; keep undated items (they are
-    new by definition if they passed the seen filter)."""
+    new by definition if they passed the seen filter). Ignore dates more than
+    one day in the future because archive pages can expose scheduled items."""
     out = []
     for item in items:
         age = item.age_days()
-        if age is None or age <= lookback_days:
+        if age is None or (-1.0 <= age <= lookback_days):
             out.append(item)
     return out

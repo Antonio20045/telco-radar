@@ -5,9 +5,9 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 ## Überblick
 
 - **81 Betreiber** in 6 Regionen, jeder mit ≥1 offizieller Quelle auf eigener Domain.
-- Direkt maschinenlesbar (Feed/JSON): **12** (11× RSS/Atom, 1× JSON-API).
+- Direkt maschinenlesbar (Feed/JSON): **11** (10× RSS/Atom, 1× JSON-API).
 - Newsroom statisch (httpx-Scrape): **12**.
-- Newsroom JS-gerendert (Headless/Playwright): **45**.
+- Newsroom JS-gerendert (Headless/Playwright): **46**.
 - Bot-geblockt → verifizierte Referenz + dokumentierter Plan: **12**.
 
 ## Europa (24)
@@ -31,7 +31,7 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 | Telenor | NO | telenor.com | https://www.telenor.com/media/newsroom/ | — | Newsroom (statisch) | statisch, 10 Artikel-Links |
 | Turkcell | TR | turkcell.com.tr | https://medya.turkcell.com.tr/basin-bultenleri/ | — | Newsroom (Headless/Playwright) | JS-gerendert; RSS nur veraltet (2016) |
 | Iliad | FR | iliad.fr | https://www.iliad.fr/en/press | — | Newsroom (Headless/Playwright) | JS-gerendert |
-| 1&1 | DE | united-internet.de | https://www.united-internet.de/en/newsroom/press-releases/ | — | Newsroom (statisch) | statisch, 49 Artikel-Links |
+| 1&1 | DE | united-internet.de | https://unternehmen.1und1.de/presse | https://unternehmen.1und1.de/presse/feed | Feed (RSS/Atom) | offizieller 1&1-Pressefeed, 10 Einträge |
 | Bouygues Telecom | FR | bouyguestelecom.fr | https://www.corporate.bouyguestelecom.fr/presse-et-actualites/ | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | A1 Telekom Austria | AT | a1.group | https://newsroom.a1.net/ | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | Tele2 | SE | tele2.com | https://www.tele2.com/media/press-releases | — | Newsroom (statisch) | statisch, 10 Artikel-Links |
@@ -43,7 +43,7 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 
 | Betreiber | Land | Website | Presse-/Newsroom-URL | Maschinen-Feed | Anbindung | Verifikation |
 |---|---|---|---|---|---|---|
-| Verizon | US | verizon.com | https://www.verizon.com/about/news-center | https://www.verizon.com/about/rss.xml | Feed (RSS/Atom) | RSS, 10 Einträge, 13.07.2026 |
+| Verizon | US | verizon.com | https://www.verizon.com/about/news | — | Newsroom (Headless/Playwright) | offizieller Newsroom; der alte RSS-Feed war ein Parenting-Feed |
 | AT&T | US | att.com | https://about.att.com/newsroom.html | — | Referenz (Bot-geblockt) + Plan | 403 Bot-Sperre |
 | T-Mobile US | US | t-mobile.com | https://www.t-mobile.com/news | — | Referenz (Bot-geblockt) + Plan | 403 Bot-Sperre |
 | Comcast | US | comcast.com | https://corporate.comcast.com/news-information | https://corporate.comcast.com/rss | Feed (RSS/Atom) | RSS, 50 Einträge, 17.07.2026 |
@@ -60,7 +60,7 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 |---|---|---|---|---|---|---|
 | América Móvil | MX | americamovil.com | https://www.americamovil.com/English/press-releases/default.aspx | — | Referenz (Bot-geblockt) + Plan | 403 (Q4-Plattform) |
 | Millicom | LU | millicom.com | https://www.millicom.com/media/press-releases | — | Newsroom (Headless/Playwright) | JS-gerendert |
-| TIM Brasil | BR | tim.com.br | https://www.tim.com.br/sobre-a-tim/sala-de-imprensa | https://www.tim.com.br/rss.xml | Feed (RSS/Atom) | RSS, 10 Einträge, 10.07.2026 (allgemeiner News-Feed) |
+| TIM Brasil | BR | tim.com.br | https://www.tim.com.br/sobre-a-tim/sala-de-imprensa | — | Newsroom (statisch) | offizieller Pressebereich; der alte RSS-Feed enthielt Smoke-Tests und CMS-Promos |
 | Entel | CL | entel.cl | https://informacioncorporativa.entel.cl/sala-de-prensa | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | Oi | BR | oi.com.br | https://www.oi.com.br/sala-de-imprensa/ | — | Newsroom (Headless/Playwright) | statisch, 11 Artikel-Links |
 | Telecom Argentina | AR | telecom.com.ar | https://institucional.telecom.com.ar/prensa | — | Referenz (Bot-geblockt) + Plan | 403 + Edge-Redirect |

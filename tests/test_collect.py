@@ -55,3 +55,16 @@ def test_newsroom_respects_item_selector():
                  name="Example Telco", item_selector="footer")
     items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
     assert items == []  # footer links are all skip-hinted or too short
+
+
+def test_newsroom_skips_navigation_and_parses_common_date_formats():
+    html = """
+    <a href="/media-relations">Media contacts for journalists</a>
+    <a href="/support/articledetail?artid=123">How to reset your router</a>
+    <article><a href="/press-release/07-2026/new-service">New customer service launch</a>
+      <time>July 9, 2026</time></article>
+    """
+    src = Source(type="newsroom", url="https://example.com/news", name="S")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    assert len(items) == 1
+    assert items[0].published.date().isoformat() == "2026-07-09"

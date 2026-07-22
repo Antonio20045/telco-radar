@@ -23,4 +23,3 @@ news_sources:
   - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
   - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
   # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
-  - {name: "inside digital", type: rss, url: "https://www.inside-digital.de/feed"}
