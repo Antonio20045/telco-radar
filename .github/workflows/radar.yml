@@ -46,8 +46,29 @@ jobs:
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           PYTHONPATH: src
         run: |
+          set -o pipefail
           python -m telco_radar.pipeline --root . \
-            --lookback-days "${{ github.event.inputs.lookback_days || 8 }}"
+            --lookback-days "${{ github.event.inputs.lookback_days || 8 }}" \
+            2>&1 | tee pipeline.log
+
+      - name: Expose pipeline failure details
+        if: failure()
+        run: |
+          {
+            echo "### Telco Radar pipeline failure"
+            echo
+            echo '```text'
+            tail -300 pipeline.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload pipeline log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telco-radar-pipeline-log-${{ github.run_id }}
+          path: pipeline.log
+          if-no-files-found: warn
 
       - name: Commit state, report and site
         run: |
