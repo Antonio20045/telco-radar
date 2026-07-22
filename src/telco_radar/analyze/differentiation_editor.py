@@ -47,25 +47,17 @@ Moves, Eintraegen, Kategorien oder Quellen als Selbstzweck.
 Antworte ausschliesslich mit sauberem Markdown, ohne H1 und ohne Vorwort.
 Verwende exakt diese H2-Ueberschriften:
 
-## Das Wichtigste
-Ein klarer Einstieg mit 2 bis 4 kurzen Absaetzen. Verdichte die auffaelligsten
-Entwicklungen im aktuellen Beobachtungszeitraum und verlinke jede konkrete
-Aussage ueber einen Betreiber direkt mit der passenden Quelle.
-
-## Wie sich Differenzierung aktuell zeigt
-Schreibe hier 3 bis 5 zusammenhaengende Abschnitte in gut lesbaren Absaetzen.
-Ordne mehrere Beispiele pro Absatz nach einer gemeinsamen Idee und verknuepfe
-sie miteinander. Keine H3-Ueberschriften pro Betreiber, keine Aufzaehlung von
-Einzelartikeln und keine Artikelzusammenfassungen hintereinander. Ein Beispiel
-ist nur ein Beleg fuer die uebergeordnete Beobachtung. Jede konkrete Aussage
-bekommt einen passenden Quellenlink.
-
-## Welche Muster dahinter liegen
-Beschreibe 3 bis 5 neutrale, globale Muster, die sich aus den Beispielen
-ergeben. Zum Beispiel: Premium-Dienste werden Teil des Tariferlebnisses,
-Schutz wird zum Markenversprechen, oder die Telko-App wird zum Zugang zu
-mehreren Alltagsdiensten. Belege die Muster mit konkreten Beispielen und
-Quellenlinks. Keine Bewertung und keine Empfehlung.
+## Konkrete Entwicklungen
+Schreibe einen direkten Bericht aus 4 bis 6 zusammenhaengenden Absaetzen.
+Beginne sofort mit konkreten Betreibern, Angeboten und Projekten aus den Daten.
+Erklaere nicht, was „Differenzierung“ bedeutet, und schreibe keine allgemeine
+Einleitung ueber Marktverschiebungen oder Kundenerlebnisse. Jeder Absatz soll
+mehrere Artikel aus einem Themenfeld zusammenfassen: Was bietet welcher
+Betreiber konkret an, in welcher Region und mit welchem Partner oder Dienst?
+Nenne die Betreiber beim Namen und verknuepfe jede konkrete Aussage direkt mit
+der passenden Quelle. Die Absaetze duerfen mit einem kurzen fettgedruckten
+Themenwort beginnen, sollen aber keine H3-Ueberschriften pro Betreiber und
+keine Bullet-Liste sein.
 
 ## Quellenbasis
 Liste die wichtigsten verwendeten Beispiele als
@@ -76,16 +68,16 @@ Regeln:
   exakte URL aus den gelieferten Daten tragen.
 - Keine Vodafone-Empfehlungen, keine Handlungsaufforderungen, kein
   „Fuer Vodafone“, kein „Vodafone sollte“ und kein „Vodafone koennte“.
-- Nicht nur Links aufzählen: Die Beispiele muessen in einem lesbaren Bericht
-  erklaert und miteinander in Beziehung gesetzt werden.
+- Der Bericht soll die gelieferten Artikel konkret zusammenfassen, nicht das
+  Thema erklaeren und keine abstrakten Muster ableiten.
+- Keine H3-Ueberschriften und keine Aufzaehlung von Einzelartikeln im Bericht.
+- Bulletpoints sind nur in der Quellenbasis erlaubt.
 - Maximal etwa 1.200 Woerter.
 """
 
 
 _REQUIRED_HEADINGS = (
-    "## das wichtigste",
-    "## wie sich differenzierung aktuell zeigt",
-    "## welche muster dahinter liegen",
+    "## konkrete entwicklungen",
     "## quellenbasis",
 )
 _FORBIDDEN_EDITORIAL_PHRASES = (
@@ -165,136 +157,52 @@ def _date_suffix(entry: dict) -> str:
 
 
 def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
-    """Build a neutral, source-linked report without an LLM."""
+    """Build a concrete article summary without an LLM."""
     entries = [e for e in entries if e.get("url") and e.get("what")]
-    by_theme: dict[str, list[dict]] = {}
-    for entry in entries:
-        by_theme.setdefault(entry.get("theme") or "_", []).append(entry)
     ordered = sorted(entries, key=lambda e: (e.get("last_verified") or "",
                                              e.get("first_seen") or ""),
                      reverse=True)
-    def examples(keys: tuple[str, ...], limit: int = 3) -> list[dict]:
-        result = []
-        seen = set()
-        for entry in ordered:
-            if entry.get("theme") not in keys:
-                continue
-            identity = (entry.get("operator"), entry.get("what"))
-            if identity in seen:
-                continue
-            result.append(entry)
-            seen.add(identity)
-            if len(result) >= limit:
-                break
-        return result
 
-    def linked_examples(items: list[dict]) -> str:
-        labels = {
-            "ki": "einen KI-Dienst als Bestandteil des Kundenangebots",
-            "entertainment": "Streaming als Bestandteil ausgewählter Tarife",
-            "cloud": "Cloud-Speicher als integrierte Leistung",
-            "gaming": "Cloud-Gaming als gebündelte Leistung",
-            "garantie": "eine mehrjährige Preis- oder Ausfallgarantie",
-            "security": "Scam- und Spam-Schutz im Telekommunikationsdienst",
-            "health": "digitale Gesundheits- und Telemedizin-Dienste",
-            "geraete": "ein Upgrade- oder Inzahlungnahmeprogramm für Geräte",
-            "loyalty": "Vorteile, Gewinnspiele oder Ticket-Presales",
-            "superapp": "eine App als Zugang zu mehreren Alltagsdiensten",
-            "fintech": "Bezahlen und Finanzdienste in der Kunden-App",
-            "smarthome": "Smart-Home-Steuerung und Sicherheit am Anschluss",
-        }
-        clauses = [
-            f"{entry.get('operator') or 'Ein Betreiber'} nutzt {labels.get(entry.get('theme'), 'ein ergänzendes Kundenerlebnis')} {_source_link(entry)}"
-            for entry in items
-        ]
-        if not clauses:
+    def move_sentence(entry: dict) -> str:
+        operator = entry.get("operator") or "Der Betreiber"
+        what = re.sub(r"^\s*" + re.escape(operator)
+                      + r"(?:\s*\([^)]*\))?\s*:?\s*", "",
+                      str(entry.get("what") or ""), flags=re.IGNORECASE)
+        if not what:
+            what = str(entry.get("what") or "")
+        if what[:1].islower():
+            text = f"{operator} {what}"
+        else:
+            text = f"{operator}: {what}"
+        return f"{text.rstrip('.')} {_source_link(entry)}"
+
+    def paragraph(lead: str, items: list[dict]) -> str:
+        if not items:
             return ""
-        if len(clauses) == 1:
-            return clauses[0] + "."
-        if len(clauses) == 2:
-            return clauses[0] + " und " + clauses[1] + "."
-        return ", ".join(clauses[:-1]) + " und " + clauses[-1] + "."
+        return f"**{lead}** " + "; ".join(move_sentence(e) for e in items) + "."
 
-    lines = ["## Das Wichtigste", ""]
-    if ordered:
-        lines.append(
-            "Im Markt verschiebt sich Differenzierung sichtbar vom reinen "
-            "Netzzugang hin zu zusätzlichen Kundenerlebnissen. Telkos machen "
-            "Dienste, Schutzversprechen und digitale Zugänge zu einem Teil des "
-            "laufenden Angebots – etwa indem sie KI-Assistenten, Streaming oder "
-            "Cloud-Speicher mit dem Mobilfunk- oder Breitbandprodukt verbinden.")
-        lines.append(
-            "Auffällig ist dabei die Spannweite der Ansätze: Manche Anbieter "
-            "bündeln etablierte digitale Leistungen, andere bauen eigene "
-            "Ökosysteme, Serviceversprechen oder Geräteprogramme auf. Die "
-            "folgende Einordnung verbindet diese konkreten Marktbeispiele, "
-            "statt sie nur einzeln nebeneinanderzustellen.")
-    else:
-        lines.append("Der aktuelle Beobachtungszeitraum enthält noch kein belegtes Beispiel.")
-
-    lines += ["", "## Wie sich Differenzierung aktuell zeigt", ""]
-    narrative_groups = (
-        (
-            "Dienste statt Rabatte.",
-            "KI, Entertainment und Cloud werden als laufender Bestandteil des "
-            "Kundenerlebnisses eingesetzt. Anbieter bündeln beispielsweise "
-            "Perplexity-Zugänge oder integrieren KI direkt in ihre Kunden-App. "
-            "Parallel machen mehrere Netzbetreiber Streaming-Dienste zu einem "
-            "sichtbaren Bestandteil ausgewählter Tarife.",
-            ("ki", "entertainment", "cloud", "gaming"),
-        ),
-        (
-            "Vertrauen und Schutz als Leistung.",
-            "Ein zweiter Strang ist die Übersetzung von Sicherheit und Verlässlichkeit "
-            "in ein konkretes Versprechen. Mehrjährige Preis- oder Ausfallgarantien "
-            "stehen neben integriertem Scam- und Spam-Schutz; auch Health-Angebote "
-            "erweitern das Leistungsbild über Konnektivität hinaus.",
-            ("garantie", "security", "health"),
-        ),
-        (
-            "Geräte und Alltag bleiben im Ökosystem.",
-            "Differenzierung entsteht außerdem dort, wo die Beziehung zum Kunden über "
-            "den einzelnen Mobilfunkvertrag hinaus verlängert wird. Geräte-Upgrades, "
-            "Vorteilsprogramme, Cloud-Speicher, Bezahldienste und Smart Home halten "
-            "den Kundenkontakt an mehreren Stellen aufrecht und machen die Telko zur "
-            "Zugangsschicht für weitere Dienste.",
-            ("geraete", "loyalty", "superapp", "fintech", "smarthome"),
-        ),
+    groups = (
+        ("KI und digitale Dienste", ("ki",)),
+        ("Streaming, Cloud und Gaming", ("entertainment", "cloud", "gaming")),
+        ("Garantien, Schutz und Gesundheit", ("garantie", "security", "health")),
+        ("Geräteprogramme, Vorteile und Smart Home", ("geraete", "loyalty", "smarthome")),
+        ("Fintech und Super-Apps", ("fintech", "superapp")),
     )
-    for lead, paragraph, keys in narrative_groups:
-        samples = examples(keys, 3)
-        if not samples:
-            continue
-        lines.append(f"**{lead}** {paragraph} " + linked_examples(samples))
-        lines.append("")
+    lines = ["## Konkrete Entwicklungen", ""]
+    used = set()
+    for lead, themes in groups:
+        items = [e for e in ordered if e.get("theme") in themes]
+        used.update(id(e) for e in items)
+        text = paragraph(lead, items)
+        if text:
+            lines.extend([text, ""])
+    remaining = [e for e in ordered if id(e) not in used]
+    if remaining:
+        lines.extend([paragraph("Weitere konkrete Angebote", remaining), ""])
+    if not ordered:
+        lines.append("Im aktuellen Beobachtungszeitraum liegt noch kein belegtes Beispiel vor.")
 
-    lines += ["## Welche Muster dahinter liegen", ""]
-    if ordered:
-        lines.append(
-            "Übergreifend werden digitale Leistungen damit vom optionalen Zusatz zum "
-            "wiederkehrenden Bestandteil des Telekommunikationsprodukts. Der Zugang "
-            "zu KI, Entertainment oder Speicher wird in Apps, Tarife und "
-            "Servicebeziehungen eingebettet. "
-            + linked_examples(examples(("ki", "entertainment", "cloud"), 2))
-        )
-        lines.append(
-            "Gleichzeitig wird Vertrauen operationalisiert: Eine Garantie, ein "
-            "Sicherheitsdienst oder ein Gesundheitsangebot macht ein abstraktes "
-            "Markenversprechen im Alltag greifbar. Das knüpft an Nutzung und "
-            "Sicherheit an, nicht nur an den Preis. "
-            + linked_examples(examples(("garantie", "security", "health"), 2))
-        )
-        lines.append(
-            "Schließlich zeigt sich ein Plattformmuster. Gerätewechsel, "
-            "Vorteilsprogramme, Bezahldienste und Smart Home halten den Kundenkontakt "
-            "an mehreren Stellen aufrecht und machen die Telko zur Zugangsschicht für "
-            "weitere Dienste. "
-            + linked_examples(examples(("geraete", "loyalty", "superapp", "fintech", "smarthome"), 2))
-        )
-    else:
-        lines.append("Weitere Muster werden sichtbar, sobald neue Beispiele bestätigt sind.")
-
-    lines += ["", "## Quellenbasis", ""]
+    lines += ["## Quellenbasis", ""]
     for entry in ordered[:12]:
         lines.append(f"- {_source_link(entry)}{_date_suffix(entry)}")
     if not ordered:

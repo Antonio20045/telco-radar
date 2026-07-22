@@ -24,8 +24,10 @@ def _entry(theme="ki", operator="Telekom"):
 def test_fallback_is_a_report_with_source_links():
     report = build_digest([_entry()], {"ki": "KI & Assistenten"})
     validate_briefing(report)
-    assert "## Das Wichtigste" in report
-    assert "## Wie sich Differenzierung aktuell zeigt" in report
+    assert "## Konkrete Entwicklungen" in report
+    assert "## Quellenbasis" in report
+    assert "## Das Wichtigste" not in report
+    assert "Welche Muster dahinter liegen" not in report
     assert "### " not in report
     assert "[Telekom – example.com](https://example.com/move)" in report
     assert "Empfehlung" not in report
@@ -42,12 +44,8 @@ def test_validation_rejects_missing_section():
 
 
 def test_validation_rejects_vodafone_advice():
-    report = """## Das Wichtigste
-Text.
-## Wie sich Differenzierung aktuell zeigt
+    report = """## Konkrete Entwicklungen
 Text [Quelle](https://example.com/move).
-## Welche Muster dahinter liegen
-Text.
 ## Quellenbasis
 [Quelle](https://example.com/move)
 Für Vodafone: Das sollte Vodafone prüfen.
