@@ -4,7 +4,7 @@ on:
   schedule:
     # Start early enough that the report is normally live before midday in
     # Germany, even when GitHub delays a scheduled run or NVIDIA is busy.
-    - cron: "30 8 * * 0"   # every Sunday 08:30 UTC (~10:30 DE summer / 09:30 winter)
+    - cron: "30 8 * * 2,5" # every Tuesday and Friday 08:30 UTC (~10:30 DE summer / 09:30 winter)
   workflow_dispatch:
     inputs:
       lookback_days:

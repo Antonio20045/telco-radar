@@ -108,7 +108,7 @@ Wichtige Dateien:
 | `site/` | Generierte Website — wird von Actions committed, Render published sie (Publish Dir `site`, Build Command nur `echo`) |
 | `src/telco_radar/report/templates/` | base/report/archive/sources.html.j2 + style.css + app.js |
 | `scripts/validate_sources.py` | Health-Check aller Quellen (OK/EMPTY/FAIL) |
-| `.github/workflows/radar.yml` | Cron Mo 05:00 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
+| `.github/workflows/radar.yml` | Cron Di + Fr 08:30 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
 | `tests/` | 15 pytest-Tests (Fixtures, kein Netz/LLM nötig) |
 
 **Secrets im Repo** (Settings → Actions): `ANTHROPIC` (Antonios API-Key —
