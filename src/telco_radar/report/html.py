@@ -108,6 +108,23 @@ def _load_reports(reports_dir: Path) -> list[dict]:
     return [reports[k] for k in sorted(reports, reverse=True)]
 
 
+def _load_latest_diff_report(reports_dir: Path) -> dict | None:
+    """Load the newest generated prose report for the differentiation tab."""
+    if not reports_dir.exists():
+        return None
+    candidates = [f for f in reports_dir.glob("*.md")
+                  if _DATE_RE.fullmatch(f.stem)]
+    if not candidates:
+        return None
+    path = max(candidates, key=lambda f: f.stem)
+    try:
+        return {"date": path.stem,
+                "briefing_md": path.read_text(encoding="utf-8")}
+    except OSError:
+        log.warning("Differenzierungsbericht nicht lesbar: %s", path)
+        return None
+
+
 def _flatten(report: dict) -> list[dict]:
     out = []
     for region_name, region in (report.get("regions") or {}).items():
@@ -432,6 +449,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 encoding="utf-8")
 
     latest = reports[0] if reports else None
+    diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
 
     # ---- Wettbewerber (competitor deep-dive) for the latest run
     (site_dir / "wettbewerber.html").write_text(
@@ -476,6 +494,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         env.get_template("differenzierung.html.j2").render(
             prefix="", diff_themes=diff_themes, diff_stats=diff_stats,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
+            diff_report=diff_report,
+            diff_report_html=_md_to_html(diff_report["briefing_md"])
+            if diff_report else "",
+            diff_report_date=_fmt_date_de(diff_report["date"])
+            if diff_report else "",
             num_operators=num_operators),
         encoding="utf-8")
 

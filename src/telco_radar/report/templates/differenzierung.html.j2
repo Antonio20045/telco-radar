@@ -21,6 +21,25 @@
   {% endif %}
 </section>
 
+{% if diff_report_html %}
+<section class="section dz-report" id="differenzbericht">
+  <div class="section-head">
+    <h2><span class="sec-no">01</span></h2>
+    <p class="section-title">Der Differenzierungsbericht</p>
+    <p class="section-sub">Die wichtigsten Muster, Lernpunkte und nächsten Fragen für Vodafone – redaktionell aus der belegten Move-Bibliothek verdichtet.</p>
+  </div>
+  <div class="dz-report-meta">Bericht vom {{ diff_report_date }} · Quellen und Detailbelege stehen direkt im Text</div>
+  <article class="briefing prose">{{ diff_report_html | safe }}</article>
+</section>
+{% endif %}
+
+<section class="section dz-library" id="belegbibliothek">
+  <div class="section-head">
+    <h2><span class="sec-no">02</span></h2>
+    <p class="section-title">Die Belegbibliothek</p>
+    <p class="section-sub">Die einzelnen Moves zum Nachprüfen: mit Betreiber, Region, Originalquelle und Prüfdatum. Der Bericht oben ist die Einordnung dazu.</p>
+  </div>
+
 {% for t in diff_themes %}
 <article class="dz-card" style="--c:{{ t.color }}">
   <div class="dz-card-head">
@@ -45,6 +64,7 @@
   {% endif %}
 </article>
 {% endfor %}
+</section>
 
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
 und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises

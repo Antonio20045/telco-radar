@@ -21,6 +21,7 @@ from .analyze.agents import analyze_region
 from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
 from .analyze import category_sweep
+from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
@@ -262,8 +263,35 @@ def run(root: Path, use_llm: bool | None = None,
     except Exception as exc:  # noqa: BLE001
         log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
-    # -------------------------------------------------------------- report
+    # ----------------------------------------- Differenzierungsbericht-Agent
+    # Der Bericht arbeitet auf der aktualisierten, versionierten DB. Er ist
+    # deshalb ein eigener Editorial-Schritt und nicht nur eine Umformatierung
+    # der darunterstehenden Move-Liste. Ohne LLM bleibt die Seite mit einem
+    # quellengebundenen Regelbericht nutzbar.
     today = date.today()
+    diff_report_dir = reports_dir / "differenzierung"
+    diff_report_dir.mkdir(parents=True, exist_ok=True)
+    diff_db = category_sweep.DiffDB(state_dir / "differentiation_db.json")
+    diff_entries = list(diff_db.entries.values())
+    theme_labels = category_sweep.THEME_LABEL
+    try:
+        if use_llm and diff_entries:
+            diff_body = differentiation_editor.synthesize(
+                diff_entries, theme_labels, model=editor_model, language=language)
+            diff_mode = "KI-Redaktion"
+        else:
+            diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
+            diff_mode = "Regelbericht"
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Differenzierungsbericht-Agent fehlgeschlagen (%s) – "
+                    "verwende Regelbericht", str(exc)[:160])
+        diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
+        diff_mode = "Regelbericht (Fallback)"
+    diff_report_path = diff_report_dir / f"{today.isoformat()}.md"
+    diff_report_path.write_text(diff_body, encoding="utf-8")
+    log.info("Differenzierungsbericht: %s (%d Moves)", diff_mode, len(diff_entries))
+
+    # -------------------------------------------------------------- report
     total_sources = sum(len(op.crawled_sources) for op in cfg.operators) \
         + len(cfg.news_sources)
     stats = {

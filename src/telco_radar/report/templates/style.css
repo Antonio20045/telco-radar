@@ -647,6 +647,9 @@ main{padding-bottom:8px}
   font-size:13.5px;color:var(--vf-mute)}
 .dz-status b{color:var(--vf-ink);font-weight:700}
 .dz-status .dz-sep{width:4px;height:4px;border-radius:50%;background:var(--vf-line)}
+.dz-report-meta{font-size:12.5px;color:var(--vf-mute);margin:-10px 0 14px}
+.dz-report .briefing{max-width:900px}
+.dz-library{padding-top:58px}
 .dz-move-h{display:flex;align-items:baseline;gap:10px}
 .dz-move-h .dz-move-title{flex:1}
 .dz-move-title b{font-weight:800}
