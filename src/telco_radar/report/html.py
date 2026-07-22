@@ -24,6 +24,10 @@ log = logging.getLogger(__name__)
 
 _TEMPLATES = Path(__file__).parent / "templates"
 _DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+# Sources removed from the configuration must not keep polluting historical
+# public pages. The raw reports remain available for auditability, but their
+# stale highlights and source-linked prose are suppressed at render time.
+_SUPPRESSED_SOURCE_DOMAINS = {"inside-digital.de"}
 
 RELEVANCE_LABELS = {
     5: "Sofort ansehen", 4: "Wichtig", 3: "Beobachten",
@@ -130,6 +134,8 @@ def _flatten(report: dict) -> list[dict]:
     for region_name, region in (report.get("regions") or {}).items():
         for h in region.get("highlights") or []:
             h = dict(h)
+            if _is_suppressed_source(h):
+                continue
             h["region"] = region_name
             h["relevance"] = h.get("relevance") or 0
             h["relevance_label"] = RELEVANCE_LABELS.get(h["relevance"], "")
@@ -143,6 +149,23 @@ def _flatten(report: dict) -> list[dict]:
     for i, h in enumerate(out):
         h["id"] = i
     return out
+
+
+def _is_suppressed_source(item: dict) -> bool:
+    host = urlsplit(item.get("url") or "").netloc.removeprefix("www.").lower()
+    source = (item.get("source") or "").strip().lower()
+    return source == "inside digital" or host in _SUPPRESSED_SOURCE_DOMAINS \
+        or any(host.endswith("." + domain) for domain in _SUPPRESSED_SOURCE_DOMAINS)
+
+
+def _strip_suppressed_source_content(text: str) -> str:
+    """Remove stale source-linked paragraphs/lines from historical briefings."""
+    blocks = re.split(r"\n\s*\n", text or "")
+    kept = [block for block in blocks if not any(
+        domain in block.lower() for domain in _SUPPRESSED_SOURCE_DOMAINS
+    ) and "inside digital" not in block.lower()]
+    cleaned = "\n\n".join(kept)
+    return re.sub(r"(?im)^.*(?:inside-digital\.de|inside digital).*$\n?", "", cleaned).strip()
 
 
 # --------------------------------------------------------------- SVG charts
@@ -409,6 +432,8 @@ def _prep_competitors(report: dict) -> list[dict]:
         moves = []
         for m in (c.get("moves") or []):
             m = dict(m)
+            if _is_suppressed_source(m):
+                continue
             m["domain"] = urlsplit(m.get("url") or "").netloc.removeprefix("www.")
             m["color"] = CATEGORY_COLORS.get(m.get("category"), "#7e7e7e")
             moves.append(m)
@@ -456,9 +481,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
                            reports[i:i + 8]) if highlights else None,
             "briefing_sections": _briefing_sections(
-                _strip_vodafone_advice(report.get("briefing_md", ""))),
+                _strip_vodafone_advice(_strip_suppressed_source_content(
+                    report.get("briefing_md", "")))),
             "briefing_html": _md_to_html(
-                _strip_vodafone_advice(report.get("briefing_md", ""))),
+                _strip_vodafone_advice(_strip_suppressed_source_content(
+                    report.get("briefing_md", "")))),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,
@@ -475,8 +502,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                     prefix="", dash=ctx["dash"],
                     top_priorities=ctx["top_priorities"], date_de=ctx["date_de"],
                     briefing_lead=_briefing_lead(
-                        _strip_vodafone_advice(report.get("briefing_md", "")))),
-                encoding="utf-8")
+                        _strip_vodafone_advice(_strip_suppressed_source_content(
+                            report.get("briefing_md", "")))),
+                ), encoding="utf-8")
 
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
@@ -534,6 +562,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
 
     # ---- Protokoll
     run = (latest or {}).get("run") if latest else None
+    if run:
+        run = dict(run)
+        run["sources"] = [s for s in run.get("sources", [])
+                           if not _is_suppressed_source(s)]
+        summary = dict(run.get("source_summary") or {})
+        summary["total"] = len(run["sources"])
+        for status in ("ok", "empty", "failed"):
+            summary[status] = sum(1 for s in run["sources"]
+                                  if s.get("status") == status)
+        run["source_summary"] = summary
     (site_dir / "protokoll.html").write_text(
         env.get_template("protokoll.html.j2").render(
             prefix="", run=run, report=latest,
