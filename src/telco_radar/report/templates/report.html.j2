@@ -5,10 +5,15 @@
 {% block content %}
 {% if report %}
 
-<section class="br-hero">
-  <div class="br-kicker"><span>Wöchentlicher Entscheidungsbrief</span><span class="br-date">{{ date_de }}</span></div>
-  <h1>Was Vodafone jetzt<br>wissen muss.</h1>
-  <p class="br-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Wöchentlicher Wettbewerbsbericht</p>
+      <h1>Was Vodafone jetzt<br>wissen muss.</h1>
+    </div>
+    <span class="page-date">{{ date_de }}</span>
+  </div>
+  <p class="page-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
   <p class="br-method"><a href="{{ prefix }}protokoll.html">Methode und Quellenbasis ansehen &nearr;</a></p>
 </section>
 
@@ -24,8 +29,7 @@
       </div>
       <h3><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.de_title }}</a></h3>
       <p class="prio-meta"><b>{{ h.operator or h.source_label }}</b><span class="sep"></span>{{ h.region }}{% if h.date %}<span class="sep"></span>{{ h.date }}{% endif %}</p>
-      {% if h.why_it_matters %}<p class="why"><span class="why-label">Für Vodafone</span>{{ h.why_it_matters }}</p>
-      {% elif h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
+      {% if h.summary %}<p class="prio-summary">{{ h.summary }}</p>{% endif %}
       <a class="source-link" href="{{ h.url }}" target="_blank" rel="noopener">Quelle: {{ h.source_label }} &nearr;</a>
     </article>
     {% endfor %}

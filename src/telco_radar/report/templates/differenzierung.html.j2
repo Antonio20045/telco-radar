@@ -3,22 +3,15 @@
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 {% block content %}
 
-<section class="dz-hero">
-  <div class="dz-hero-row">
-    <h1>Differenzierung</h1>
-    {% if date_de %}<span class="dz-date">Stand {{ date_de }}</span>{% endif %}
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Globale Marktbeobachtung</p>
+      <h1>Differenzierung</h1>
+    </div>
+    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="dz-lead">Wie sich Wettbewerber weltweit <b>jenseits des Preises</b> abheben – eingebundene
-  Dienste, Garantien, KI, Perks, Ökosysteme. Jeder Eintrag ist ein echter, belegter Move mit Quelle;
-  ein wöchentlicher Web-Sweep hält die Sammlung aktuell. Netz-, 5G- und Broadband-Ausbau bleiben außen vor.</p>
-  {% if diff_stats %}
-  <div class="dz-status">
-    <span><b>{{ diff_stats.total }}</b> belegte Moves</span><span class="dz-sep"></span>
-    <span><b>{{ diff_stats.themes_active }}</b>/{{ diff_stats.themes_total }} Kategorien aktiv</span><span class="dz-sep"></span>
-    {% if diff_stats.new %}<span><b>{{ diff_stats.new }}</b> neu</span><span class="dz-sep"></span>{% endif %}
-    <span>zuletzt aktualisiert {{ diff_stats.updated_de }}</span>
-  </div>
-  {% endif %}
+  <p class="page-lead">Welche konkreten Angebote, Programme und Projekte nutzen Telkos weltweit, um sich <b>jenseits von Netz, Tarif und Preis</b> abzuheben? Im Mittelpunkt stehen Kundenerlebnisse wie Premium-KI, Garantien, Geräteprogramme, Schutz, Entertainment und digitale Ökosysteme.</p>
 </section>
 
 {% if diff_report_html %}
@@ -26,7 +19,7 @@
   <div class="section-head">
     <h2><span class="sec-no">01</span></h2>
     <p class="section-title">Der Differenzierungsbericht</p>
-    <p class="section-sub">Die wichtigsten Muster, Lernpunkte und nächsten Fragen für Vodafone – redaktionell aus der belegten Move-Bibliothek verdichtet.</p>
+    <p class="section-sub">Ein globaler Überblick über konkrete Beispiele und die Muster, die dahinter sichtbar werden.</p>
   </div>
   <div class="dz-report-meta">Bericht vom {{ diff_report_date }} · Quellen und Detailbelege stehen direkt im Text</div>
   <article class="briefing prose">{{ diff_report_html | safe }}</article>
@@ -36,17 +29,16 @@
 <section class="section dz-library" id="belegbibliothek">
   <div class="section-head">
     <h2><span class="sec-no">02</span></h2>
-    <p class="section-title">Die Belegbibliothek</p>
-    <p class="section-sub">Die einzelnen Moves zum Nachprüfen: mit Betreiber, Region, Originalquelle und Prüfdatum. Der Bericht oben ist die Einordnung dazu.</p>
+    <p class="section-title">Beispiele nach Themen</p>
+    <p class="section-sub">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
   </div>
 
 {% for t in diff_themes %}
+{% if t.entries %}
 <article class="dz-card" style="--c:{{ t.color }}">
   <div class="dz-card-head">
     <h2>{{ t.label }}</h2>
-    {% if t.n %}<span class="dz-count">{{ t.n }} {{ 'Move' if t.n == 1 else 'Moves' }}</span>{% endif %}
   </div>
-  {% if t.entries %}
   <ul class="dz-moves">
     {% for e in t.entries %}
     <li class="dz-move">
@@ -54,19 +46,16 @@
         <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> — {{ e.what }}</a>
         {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
       </div>
-      {% if e.why %}<p class="dz-move-why">{{ e.why }}</p>{% endif %}
       <p class="dz-move-meta">{% if e.region %}{{ e.region }} · {% endif %}{% if e.date %}{{ e.date }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>{% if e.verified_de %} · geprüft {{ e.verified_de }}{% endif %}</p>
     </li>
     {% endfor %}
   </ul>
-  {% else %}
-  <p class="dz-empty">Aktuell kein belegter Move erfasst – der wöchentliche Sweep beobachtet diese Kategorie weiter.</p>
-  {% endif %}
 </article>
+{% endif %}
 {% endfor %}
 </section>
 
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
 und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises
-sucht. Jeder Eintrag trägt Quelle und Prüfdatum; Moves ohne belegbare Quelle werden nicht aufgenommen.</p>
+sucht. Jedes Beispiel trägt eine Originalquelle und ein Prüfdatum; nicht belegte Beispiele werden nicht aufgenommen.</p>
 {% endblock %}

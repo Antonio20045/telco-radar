@@ -3,21 +3,26 @@
 {% block title %}Marktrecherche · Übersicht{% endblock %}
 {% block content %}
 {% if dash %}
-<section class="ov-hero">
-  <div class="ov-hero-main">
-    <div class="kicker">Marktrecherche &middot; Stand {{ date_de }}</div>
-    <h1>Diese Woche auf einen Blick</h1>
-    <p class="ov-lead">Die relevanten Wettbewerbszüge – verdichtet auf Entscheidungen. <a href="{{ prefix }}bericht.html">Zum vollen Bericht &nearr;</a></p>
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Marktrecherche</p>
+      <h1>Diese Woche auf einen Blick</h1>
+    </div>
+    <span class="page-date">Stand {{ date_de }}</span>
   </div>
-  {% if dash.lead_signal %}
+  <p class="page-lead">Die relevanten Wettbewerbszüge – verdichtet auf Entscheidungen. <a href="{{ prefix }}bericht.html">Zum vollen Bericht &nearr;</a></p>
+</section>
+
+{% if dash.lead_signal %}
+<section class="section" style="padding-top:18px">
   <a class="ov-signal" href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">
     <div class="ov-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
     <h2>{{ dash.lead_signal.de_title }}</h2>
-    {% if dash.lead_signal.why %}<p>{{ dash.lead_signal.why }}</p>{% endif %}
     <div class="ov-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %} &middot; {{ dash.lead_signal.region }}{% endif %}</div>
   </a>
-  {% endif %}
 </section>
+{% endif %}
 
 <div class="kpi-tiles">
   {% for k in dash.kpis %}
@@ -70,6 +75,6 @@
   </section>
 </div>
 {% else %}
-<section class="ov-hero"><div class="ov-hero-main"><h1>Noch keine Daten</h1></div></section>
+<section class="page-hero"><p class="page-kicker">Marktrecherche</p><h1>Noch keine Daten</h1></section>
 {% endif %}
 {% endblock %}

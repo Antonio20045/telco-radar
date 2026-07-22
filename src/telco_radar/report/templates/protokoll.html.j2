@@ -4,10 +4,15 @@
 {% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz','trade_press':'Fachpresse'} %}
 {% block content %}
 
-<section class="hero">
-  <p class="eyebrow">Transparenz</p>
-  <h1>Was im Hintergrund lief</h1>
-  <p class="hero-sub">Jeder Lauf ist hier nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und was die KI daraus gemacht hat.</p>
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Transparenz</p>
+      <h1>Was im Hintergrund lief</h1>
+    </div>
+    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
+  </div>
+  <p class="page-lead">Jeder Lauf ist nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und wie daraus der Bericht entstanden ist.</p>
 </section>
 
 {% if run %}

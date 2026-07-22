@@ -1,16 +1,15 @@
-"""Editor-Agent fuer den woechentlichen Differenzierungsbericht.
+"""Redaktion fuer den globalen Differenzierungsbericht.
 
-Der Agent arbeitet auf der versionierten Differenzierungs-DB, nicht auf den
-Roh-Treffern der Websuche. So bleibt der Bericht quellengebunden und kann die
-dauerhaft relevanten Moves ueber mehrere Wochen in ein klares Vodafone-Narrativ
-verdichten. Ohne LLM entsteht ein deterministischer, ebenfalls belegter
-Bericht als Fallback.
+Der Bericht beschreibt konkrete Angebote und Projekte von Telkos jenseits von
+Netzausbau, Tarifen und Preisen. Er ist keine Vodafone-Empfehlung und spricht
+nicht ueber interne Entscheidungen, sondern ordnet beobachtete Beispiele
+neutral und quellengebunden ein.
 """
 from __future__ import annotations
 
 import json
 import logging
-from collections import Counter
+import re
 
 from .llm import complete
 
@@ -22,67 +21,75 @@ class DifferentiationBriefingError(RuntimeError):
 
 
 DIFFERENTIATION_EDITOR_SYSTEM = """\
-Du bist der Spezial-Editor von „Telco Radar“. Schreibe einen kurzen,
-entscheidungsorientierten Differenzierungsbericht fuer Vodafone. Deine
-Datenbasis ist eine kuratierte Bibliothek echter, quellenbelegter Moves von
-Telekom-Wettbewerbern im Endkundengeschaeft jenseits des Preises: Dienste,
-Garantien, Geraete-Programme, KI, Entertainment, Security, Fintech,
-Oekosysteme und Kunden-Perks.
+Du bist der Spezial-Redakteur fuer einen deutschsprachigen globalen
+Differenzierungsbericht ueber Telekommunikationsunternehmen.
 
-Die Leser sind Vodafone-Manager ohne technischen Hintergrund. Schreibe auf
-Deutsch, klar und konkret, ohne Marketingfloskeln. Nutze ausschliesslich die
-gelieferten Eintraege. Erfinde keine Zahlen, Zeitpunkte, Partnerschaften oder
-Vodafone-Produkte. Wenn ein Eintrag kein Datum hat, lasse das Datum weg.
+Der Bericht beantwortet eine einfache Frage: Welche konkreten Angebote,
+Programme und Projekte nutzen Telkos weltweit, um sich jenseits von
+Netzausbau, 5G, Tarifen und Preisen abzuheben? Interessant sind zum Beispiel
+Premium-KI als Kundenvorteil, Garantien und Service-Versprechen,
+Geraeteprogramme, Streaming, Betrugsschutz, Cloud, Fintech, Super-Apps,
+Loyalty-Programme, Smart Home und Health-Angebote.
+
+Die Leser wollen globale Marktbeobachtung. Schreibe deshalb nicht ueber eine
+interne Vodafone-Strategie und gib keinerlei Empfehlungen, Handlungstipps
+oder naechste Schritte fuer Vodafone. Verwende auch keine Formulierungen wie
+„Vodafone sollte“, „Vodafone koennte“, „Fuer Vodafone“ oder „Empfehlung“.
+
+Nutze ausschliesslich die gelieferten, belegten Eintraege. Erfinde keine
+Zahlen, Zeitpunkte, Partnerschaften oder Wirkungen. Wenn ein Datum fehlt,
+lasse es weg. Erklaere Fachbegriffe kurz, wenn sie fuer das Verstaendnis
+noetig sind. Schreibe anschaulich: „bietet Kunden“, „buendelt“, „integriert“,
+„garantiert“, „schuetzt“ und „macht ... zum Bestandteil des Angebots“.
+Verwende nicht den abstrakten Begriff „Sammlung“ und nenne keine Anzahl von
+Moves, Eintraegen, Kategorien oder Quellen als Selbstzweck.
 
 Antworte ausschliesslich mit sauberem Markdown, ohne H1 und ohne Vorwort.
 Verwende exakt diese H2-Ueberschriften:
 
-## Auf einen Blick
-Genau drei kurze Bulletpoints: Was ist das wichtigste Muster und warum sollte
-Vodafone jetzt hinschauen?
+## Das Wichtigste
+Ein klarer Einstieg mit 2 bis 4 kurzen Absaetzen. Verdichte die auffaelligsten
+Entwicklungen im aktuellen Beobachtungszeitraum und verlinke jede konkrete
+Aussage ueber einen Betreiber direkt mit der passenden Quelle.
 
-## Was sich aktuell abzeichnet
-Ein zusammenhaengender Absatz mit dem Gesamtbild ueber mehrere Kategorien und
-Regionen. Nenne konkrete Betreiber und Moves. Jede konkrete Aussage bekommt
-unmittelbar einen Link im Format [Quelle](URL).
+## Beispiele aus dem Markt
+Waehle 6 bis 10 besonders anschauliche Beispiele aus unterschiedlichen
+Themenfeldern und Regionen. Nutze pro Beispiel eine H3-Ueberschrift mit
+Betreiber und Thema, dann 1 bis 3 Saetze: Was wurde konkret angeboten,
+gestartet oder integriert und warum ist es ein interessantes Beispiel fuer
+Differenzierung? Jede faktische Aussage bekommt einen passenden Quellenlink.
 
-## Die stärksten Differenzierungs-Moves
-Waehle die 5 bis 8 wichtigsten oder lehrreichsten Moves. Nutze pro Move eine
-fette Zeile mit Betreiber und Kategorie, danach 1-2 Saetze: Was passiert und
-was ist daran differenzierend? Jede Faktenaussage bekommt den passenden
-Quellenlink aus den Daten.
-
-## Was Vodafone daraus lernen kann
-3 bis 5 kurze Abschnitte oder Bulletpoints. Verknuepfe die Beobachtung mit
-einem konkreten Lernpunkt fuer Vodafone. Trenne klar zwischen belegter
-Beobachtung und Vorschlag.
-
-## Empfehlungen für Vodafone
-3 bis 5 priorisierte Empfehlungen, nummeriert. Jeweils ein Satz zum konkreten
-naechsten Schritt und ein Satz, welcher belegte Move den Anlass liefert. Keine
-unbelegten Behauptungen ueber die aktuelle Vodafone-Strategie.
+## Welche Muster dahinter liegen
+Beschreibe 3 bis 5 neutrale, globale Muster, die sich aus den Beispielen
+ergeben. Zum Beispiel: Premium-Dienste werden Teil des Tariferlebnisses,
+Schutz wird zum Markenversprechen, oder die Telko-App wird zum Zugang zu
+mehreren Alltagsdiensten. Belege die Muster mit konkreten Beispielen und
+Quellenlinks. Keine Bewertung und keine Empfehlung.
 
 ## Quellenbasis
-Eine kompakte Liste der wichtigsten verwendeten Eintraege als
+Liste die wichtigsten verwendeten Beispiele als
 [Betreiber – Kurzbezeichnung](URL), mit Region und, falls vorhanden, Datum.
 
 Regeln:
-- Jede faktische Aussage ueber einen Wettbewerber muss einen Link auf eine
-  URL aus den gelieferten Daten tragen.
-- Nutze nur exakte URLs aus den gelieferten Daten; veraendere sie nicht.
-- Berichte nicht einfach alle Artikel nach, sondern verdichte Muster und
-  Konsequenzen. Die Quellenliste bleibt als Nachpruefbarkeit erhalten.
-- Der Bericht umfasst maximal etwa 1.200 Woerter.
+- Jede konkrete Aussage ueber einen Betreiber muss einen Link auf eine
+  exakte URL aus den gelieferten Daten tragen.
+- Keine Vodafone-Empfehlungen, keine Handlungsaufforderungen, kein
+  „Fuer Vodafone“, kein „Vodafone sollte“ und kein „Vodafone koennte“.
+- Nicht nur Links aufzählen: Die Beispiele muessen in einem lesbaren Bericht
+  erklaert und miteinander in Beziehung gesetzt werden.
+- Maximal etwa 1.200 Woerter.
 """
 
 
 _REQUIRED_HEADINGS = (
-    "## auf einen blick",
-    "## was sich aktuell abzeichnet",
-    "## die staerksten differenzierungs-moves",
-    "## was vodafone daraus lernen kann",
-    "## empfehlungen fuer vodafone",
+    "## das wichtigste",
+    "## beispiele aus dem markt",
+    "## welche muster dahinter liegen",
     "## quellenbasis",
+)
+_FORBIDDEN_EDITORIAL_PHRASES = (
+    "fuer vodafone", "für vodafone", "vodafone sollte", "vodafone könnte",
+    "vodafone koennte", "vodafone muss", "empfehlung", "handlungsaufforderung",
 )
 
 
@@ -91,8 +98,13 @@ def _heading_key(line: str) -> str:
             .replace("ü", "ue").replace("ß", "ss"))
 
 
+def _without_links(markdown: str) -> str:
+    """Remove Markdown links before checking editorial wording."""
+    return re.sub(r"\[[^\]]*\]\([^)]*\)", "", markdown).lower()
+
+
 def validate_briefing(markdown: str) -> None:
-    """Reject an answer that is not the requested report shape."""
+    """Reject an answer with the wrong structure or Vodafone advice."""
     headings = {_heading_key(line) for line in markdown.splitlines()
                 if line.strip().startswith("## ")}
     missing = set(_REQUIRED_HEADINGS) - headings
@@ -102,21 +114,23 @@ def validate_briefing(markdown: str) -> None:
     if "[" not in markdown or "](" not in markdown:
         raise DifferentiationBriefingError(
             "Differenzierungsbericht enthaelt keine Quellenlinks")
+    plain = _without_links(markdown)
+    if any(phrase in plain for phrase in _FORBIDDEN_EDITORIAL_PHRASES):
+        raise DifferentiationBriefingError(
+            "Differenzierungsbericht enthaelt eine Vodafone-Empfehlung")
 
 
 def _payload(entries: list[dict], theme_labels: dict[str, str]) -> str:
     rows = []
     for e in entries:
         rows.append({
-            "kategorie": theme_labels.get(e.get("theme"), e.get("theme") or ""),
+            "thema": theme_labels.get(e.get("theme"), e.get("theme") or ""),
             "betreiber": e.get("operator") or "",
             "region": e.get("region") or "",
-            "move": e.get("what") or "",
-            "bedeutung_fuer_vodafone": e.get("why") or "",
+            "konkretes_beispiel": e.get("what") or "",
             "quelle": e.get("url") or "",
-            "quellendom" : e.get("source") or "",
+            "quellendom": e.get("source") or "",
             "datum": e.get("date") or "",
-            "erstmals_erfasst": e.get("first_seen") or "",
             "zuletzt_geprueft": e.get("last_verified") or "",
         })
     return json.dumps(rows, ensure_ascii=False)
@@ -124,7 +138,7 @@ def _payload(entries: list[dict], theme_labels: dict[str, str]) -> str:
 
 def synthesize(entries: list[dict], theme_labels: dict[str, str], model: str,
                language: str = "Deutsch") -> str:
-    """Run the dedicated differentiation editor and validate its Markdown."""
+    """Run the dedicated market-observation editor and validate its Markdown."""
     if not entries:
         return build_digest(entries, theme_labels)
     raw = complete(
@@ -136,88 +150,91 @@ def synthesize(entries: list[dict], theme_labels: dict[str, str], model: str,
 
 
 def _source_link(entry: dict) -> str:
-    operator = entry.get("operator") or entry.get("source") or "Unbekannter Betreiber"
+    operator = entry.get("operator") or entry.get("source") or "Betreiber"
     url = entry.get("url") or ""
     label = entry.get("source") or "Quelle"
     return f"[{operator} – {label}]({url})"
 
 
+def _date_suffix(entry: dict) -> str:
+    date = entry.get("date")
+    region = entry.get("region")
+    bits = [str(x) for x in (region, date) if x]
+    return " · " + " · ".join(bits) if bits else ""
+
+
 def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
-    """Build a useful report without an LLM, using only DB facts and links."""
+    """Build a neutral, source-linked report without an LLM."""
     entries = [e for e in entries if e.get("url") and e.get("what")]
     by_theme: dict[str, list[dict]] = {}
     for entry in entries:
         by_theme.setdefault(entry.get("theme") or "_", []).append(entry)
-    top = sorted(entries, key=lambda e: (e.get("last_verified") or "",
-                                         e.get("first_seen") or ""), reverse=True)
-    top_by_theme = []
-    seen_themes = set()
-    for entry in top:
+    ordered = sorted(entries, key=lambda e: (e.get("last_verified") or "",
+                                             e.get("first_seen") or ""),
+                     reverse=True)
+    # One representative per theme keeps the fallback varied instead of
+    # repeating the same category four times at the top.
+    representatives: list[dict] = []
+    seen_themes: set[str] = set()
+    for entry in ordered:
         theme = entry.get("theme") or "_"
         if theme not in seen_themes:
-            top_by_theme.append(entry)
+            representatives.append(entry)
             seen_themes.add(theme)
-    operators = Counter(e.get("operator") for e in entries if e.get("operator"))
-    active_themes = sorted(by_theme, key=lambda key: len(by_theme[key]), reverse=True)
 
-    lines = [
-        "## Auf einen Blick", "",
-        f"- Die Bibliothek enthält {len(entries)} belegte Moves aus "
-        f"{len(active_themes)} Differenzierungskategorien.",
-        (f"- Am stärksten vertreten sind {theme_labels.get(active_themes[0], active_themes[0])} "
-         f"({len(by_theme[active_themes[0]])} Moves)." if active_themes else
-         "- Aktuell ist noch kein belegter Move in der Bibliothek verfügbar."),
-        (f"- Die Beobachtung umfasst {len(operators)} benannte Betreiber; die Detailbelege "
-         "stehen direkt an den jeweiligen Moves." if operators else
-         "- Sobald neue Quellen bestätigt sind, wird dieser Bericht automatisch ergänzt."),
-        "",
-        "## Was sich aktuell abzeichnet", "",
-    ]
-    if active_themes:
-        theme_text = ", ".join(theme_labels.get(k, k) for k in active_themes[:4])
+    lines = ["## Das Wichtigste", ""]
+    if representatives:
+        first = representatives[0]
         lines.append(
-            f"Die aktuelle Sammlung verteilt sich vor allem auf {theme_text}. "
-            "Sie zeigt damit mehrere Wege, wie Telkos jenseits des Preises einen "
-            "zusätzlichen Grund für die Kundenbeziehung schaffen.")
-        if top:
-            lines.append(f"Ein aktueller belegter Move von {top[0].get('operator', 'einem Betreiber')} "
-                         f"ist: {top[0].get('what', '').rstrip('.')} {_source_link(top[0])}.")
-    else:
-        lines.append("Die Datenbasis enthält derzeit noch keine bestätigten Moves.")
-    lines += ["", "## Die stärksten Differenzierungs-Moves", ""]
-    for entry in top[:8]:
-        label = theme_labels.get(entry.get("theme"), entry.get("theme") or "Differenzierung")
-        lines.append(f"**{entry.get('operator', 'Betreiber')} – {label}**")
-        lines.append(f"{entry.get('what', '').rstrip('.')} {_source_link(entry)}.")
-        if entry.get("why"):
-            lines.append(f"Für Vodafone: {entry['why'].rstrip('.')}.")
-        lines.append("")
-    lines += ["## Was Vodafone daraus lernen kann", ""]
-    if active_themes:
-        for key in active_themes[:5]:
-            sample = by_theme[key][0]
+            f"Der aktuelle Überblick zeigt, wie unterschiedlich Telkos ihr "
+            f"Leistungsversprechen erweitern. Ein anschauliches Beispiel: "
+            f"{first.get('what', '').rstrip('.')} {_source_link(first)}.")
+        if len(representatives) > 1:
+            second = representatives[1]
             lines.append(
-                f"- **{theme_labels.get(key, key)}:** {sample.get('why') or sample.get('what')} "
-                f"({_source_link(sample)}).")
+                f"Daneben steht ein anderer Ansatz: {second.get('what', '').rstrip('.')} "
+                f"{_source_link(second)}.")
+        lines.append(
+            "Gemeinsam ist diesen Beispielen, dass die Differenzierung an einem "
+            "konkreten Kundenerlebnis sichtbar wird – als Dienst, Programm, "
+            "Versprechen oder Zugang zu einem weiteren Ökosystem.")
     else:
-        lines.append("- Die Bibliothek wird mit dem nächsten bestätigten Web-Sweep aussagekräftiger.")
-    lines += ["", "## Empfehlungen für Vodafone", ""]
-    if top:
-        for i, entry in enumerate(top_by_theme[:4], 1):
-            label = theme_labels.get(entry.get("theme"), entry.get("theme") or "Differenzierung")
-            lines.append(
-                f"{i}. **{label} prüfen:** Einen kleinen Piloten oder ein konkretes "
-                f"Angebot zu diesem Hebel bewerten; Anlass ist der belegte Move von "
-                f"{entry.get('operator', 'einem Wettbewerber')} {_source_link(entry)}.")
-            lines.append("")
-    else:
-        lines.append("1. Die nächsten bestätigten Moves abwarten und anschließend priorisieren.")
+        lines.append("Der aktuelle Beobachtungszeitraum enthält noch kein belegtes Beispiel.")
+
+    lines += ["", "## Beispiele aus dem Markt", ""]
+    for entry in representatives[:10]:
+        theme = theme_labels.get(entry.get("theme"), entry.get("theme") or "Differenzierung")
+        operator = entry.get("operator") or "Betreiber"
+        lines.append(f"### {operator}: {theme}")
+        lines.append(
+            f"{entry.get('what', '').rstrip('.')} {_source_link(entry)}"
+            f"{_date_suffix(entry)}.")
         lines.append("")
-    lines += ["## Quellenbasis", ""]
-    for entry in top[:12]:
-        date = f" · {entry['date']}" if entry.get("date") else ""
-        region = f" · {entry['region']}" if entry.get("region") else ""
-        lines.append(f"- {_source_link(entry)}{region}{date}")
-    if not top:
-        lines.append("- Noch keine Quelle in der Differenzierungs-DB.")
+
+    lines += ["## Welche Muster dahinter liegen", ""]
+    group_defs = (
+        ("Dienste werden Teil des Tariferlebnisses", ("ki", "entertainment", "cloud", "gaming")),
+        ("Vertrauen und Schutz werden als Leistung sichtbar", ("garantie", "security", "health")),
+        ("Das Gerät bleibt über Programme und Zubehör im Ökosystem", ("geraete",)),
+        ("Die Telko-App öffnet den Zugang zu weiteren Alltagsdiensten", ("fintech", "superapp", "smarthome", "loyalty")),
+    )
+    added_pattern = False
+    for label, keys in group_defs:
+        sample = next((e for e in ordered if e.get("theme") in keys), None)
+        if not sample:
+            continue
+        themes = ", ".join(theme_labels.get(k, k) for k in keys
+                            if k in by_theme)
+        lines.append(
+            f"- **{label}:** Sichtbar in {themes}. Beispiel: "
+            f"{sample.get('what', '').rstrip('.')} {_source_link(sample)}.")
+        added_pattern = True
+    if not added_pattern:
+        lines.append("- Weitere Muster werden sichtbar, sobald neue Beispiele bestätigt sind.")
+
+    lines += ["", "## Quellenbasis", ""]
+    for entry in ordered[:12]:
+        lines.append(f"- {_source_link(entry)}{_date_suffix(entry)}")
+    if not ordered:
+        lines.append("- Noch keine belegte Quelle vorhanden.")
     return "\n".join(lines).strip() + "\n"

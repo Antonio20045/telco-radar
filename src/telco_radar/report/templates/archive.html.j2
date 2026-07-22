@@ -2,10 +2,14 @@
 {% set active = 'archive' %}
 {% block title %}Telco Radar - Archiv{% endblock %}
 {% block content %}
-<section class="hero">
-  <p class="eyebrow">Archiv</p>
-  <h1>Frühere Berichte</h1>
-  <p class="hero-sub">Alle bisherigen Wochenberichte. Jeder zeigt, was in seiner Woche neu war.</p>
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Archiv</p>
+      <h1>Frühere Berichte</h1>
+    </div>
+  </div>
+  <p class="page-lead">Alle bisherigen Wochenberichte – jeder zeigt, was in seiner Woche neu war.</p>
 </section>
 <section class="section" style="padding-top:26px">
   {% if archive %}

@@ -96,7 +96,9 @@ Pro gültigem Eintrag:
 - "region": eine von: Europa, Nordamerika, Lateinamerika, Afrika & Naher Osten, Asien, Ozeanien
 - "what": 1 Satz auf Deutsch, was der Betreiber konkret tut (mit Zahlen, wenn im Snippet)
 - "url": die exakte Quell-URL aus dem Treffer (nicht erfinden)
-- "why": 1 Satz auf Deutsch, was das für Vodafone bedeutet / welche Idee daraus folgt
+- "why": 1 neutraler Satz auf Deutsch, warum dieser Move als
+  Differenzierungsbeispiel interessant ist (keine Empfehlung, kein „Vodafone
+  sollte/könnte", keine Handlungsempfehlung)
 
 Wenn KEIN Treffer einen echten Move zeigt, gib [] zurück. Antworte AUSSCHLIESSLICH
 mit JSON-Array, kein weiterer Text.

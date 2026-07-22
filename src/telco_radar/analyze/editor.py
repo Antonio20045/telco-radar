@@ -1,4 +1,4 @@
-"""Editor agent: synthesizes regional analyses into one executive report.
+"""Editor agent: synthesizes regional analyses into one global market report.
 
 Gets the list of previously reported topics as "do not repeat" memory.
 If no LLM is available, build_digest() produces a deterministic raw digest
@@ -21,19 +21,19 @@ class EditorialBriefingError(RuntimeError):
     """Raised when the editor output is not a publishable weekly briefing."""
 
 EDITOR_SYSTEM = """\
-You are the chief editor of "Telco Radar", Vodafone Group's weekly global
-competitive-intelligence briefing. Vodafone is a telecommunications operator
-(mobile, broadband, fixed-mobile convergence, B2B/IoT) in Europe and Africa.
-The point of this briefing is simple: see what competitors around the world
-did this week, and decide what Vodafone should learn or copy from it.
+You are the chief editor of "Telco Radar", a weekly global
+competitive-intelligence briefing. The point of this briefing is simple:
+show what telecommunications companies around the world did this week and
+which patterns become visible across regions and operators.
 
 You receive the assessments of your regional analyst team (JSON) plus a list
 of topics ALREADY covered in previous editions.
 
 Write the briefing in {language} as clean Markdown (no top-level H1; start
-with H2 sections). Your readers are Vodafone managers WITHOUT a technical or
-AI background: write plainly, spell out abbreviations on first use, and always
-make clear why something matters for Vodafone. Direct, factual sentences.
+with H2 sections). Your readers are managers WITHOUT a technical or AI
+background: write plainly, spell out abbreviations on first use, and explain
+the concrete customer offer or project. This is market observation, not a
+recommendation memo. Direct, factual sentences.
 No filler, no marketing phrases, no "in der heutigen schnelllebigen Welt".
 
 Structure exactly:
@@ -51,7 +51,6 @@ The 6-10 most relevant items across all regions (relevance 5 first, then 4).
 Per item:
 **Operator - Titel** (Kategorie, Dringlichkeit X/5)
 2-3 sentences of detail (what happened, with numbers/prices/dates when given).
-"Fuer Vodafone:" one sentence on what Vodafone could do or learn from it.
 Source as [Quelle](url).
 
 ## <one H2 section per region that has highlights, using the region name>
@@ -63,16 +62,12 @@ Source as [Quelle](url).
 buendeln KI-Assistenten in Consumer-Tarife"). Reference the supporting
 operators by name.
 
-## Empfehlungen fuer Vodafone
-3-6 concrete, prioritized recommendations that follow from THIS week's
-signals. Number them. Per recommendation: one sentence what to do, one
-sentence why now and which competitor move triggers it.
-
 Rules:
 - NEVER re-report a topic from the "already covered" list unless there is a
   genuinely NEW development - then frame it explicitly as "Update zu ...".
 - No invented facts, no padding. If a region has nothing relevant, omit it.
 - Every factual claim that has a source must carry its [Quelle](url).
+- Do not write recommendations, action items or "Fuer Vodafone" sections.
 - Keep the whole briefing under ~1900 words.
 
 After the Markdown, output the line ===TOPICS=== followed by a JSON array of
@@ -131,7 +126,6 @@ def validate_editorial_briefing(markdown: str) -> None:
         "## das wichtigste",
         "## die wichtigsten signale",
         "## muster der woche",
-        "## empfehlungen fuer vodafone",
     }
     missing = required - headings
     if missing or "## wochenueberblick" in headings:
@@ -139,6 +133,11 @@ def validate_editorial_briefing(markdown: str) -> None:
         raise EditorialBriefingError(
             f"Editor output is not a publishable weekly briefing ({detail})."
         )
+    lowered = markdown.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+    if any(phrase in lowered for phrase in
+           ("empfehlungen fuer vodafone", "fuer vodafone:",
+            "vodafone sollte", "vodafone koennte")):
+        raise EditorialBriefingError("Editor output contains Vodafone recommendations.")
 
 
 def build_digest(items_by_region: dict[str, list[Item]],

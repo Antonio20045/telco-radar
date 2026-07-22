@@ -261,6 +261,28 @@ def _briefing_sections(md_text):
     return sections
 
 
+_ADVICE_SECTION_RE = re.compile(
+    r"(?ms)^##\s+(?:Empfehlungen|Handlungsempfehlungen)[^\n]*\n.*?(?=^##\s|\Z)")
+_ADVICE_LINE_RE = re.compile(r"(?mi)^\s*(?:Fuer|Für)\s+Vodafone\s*:.*(?:\n|$)")
+
+
+def _strip_vodafone_advice(md_text: str) -> str:
+    """Keep the public site observational, including for older reports."""
+    cleaned = _ADVICE_SECTION_RE.sub("", md_text or "")
+    cleaned = _ADVICE_LINE_RE.sub("", cleaned)
+    advice_phrases = (
+        "für vodafone", "fuer vodafone", "vodafone sollte", "vodafone könnte",
+        "vodafone koennte", "vodafone muss", "vodafone kann",
+    )
+    # Older reports sometimes put a factual sentence and an advice sentence
+    # in the same Markdown paragraph. Drop that whole block at render time so
+    # historical pages do not continue to sound like recommendation memos.
+    blocks = re.split(r"\n{2,}", cleaned)
+    blocks = [b for b in blocks
+              if not any(phrase in b.lower() for phrase in advice_phrases)]
+    return "\n\n".join(blocks).strip()
+
+
 def _briefing_lead(md_text: str) -> str:
     """Kurzer, plakativer Vorspann fuer die Uebersicht (Klartext, gekuerzt)."""
     secs = _briefing_sections(md_text)
@@ -421,15 +443,22 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         highlights = _flatten(report)
         top = [h for h in highlights if h["relevance"] >= 4][:6]
         competitors = _prep_competitors(report)
+        public_highlights = []
+        for h in highlights:
+            public_h = dict(h)
+            public_h.pop("why_it_matters", None)
+            public_highlights.append(public_h)
         ctx = {
             "report": report, "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
-            "explorer_json": _json_for_script(highlights),
+            "explorer_json": _json_for_script(public_highlights),
             "top_priorities": top,
             "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
                            reports[i:i + 8]) if highlights else None,
-            "briefing_sections": _briefing_sections(report.get("briefing_md", "")),
-            "briefing_html": _md_to_html(report.get("briefing_md", "")),
+            "briefing_sections": _briefing_sections(
+                _strip_vodafone_advice(report.get("briefing_md", ""))),
+            "briefing_html": _md_to_html(
+                _strip_vodafone_advice(report.get("briefing_md", ""))),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,
@@ -445,7 +474,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 uebersicht_tpl.render(
                     prefix="", dash=ctx["dash"],
                     top_priorities=ctx["top_priorities"], date_de=ctx["date_de"],
-                    briefing_lead=_briefing_lead(report.get("briefing_md", ""))),
+                    briefing_lead=_briefing_lead(
+                        _strip_vodafone_advice(report.get("briefing_md", "")))),
                 encoding="utf-8")
 
     latest = reports[0] if reports else None

@@ -656,3 +656,15 @@ main{padding-bottom:8px}
 .dz-new{flex:none;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   color:#fff;background:var(--c,var(--vf-red));padding:2px 8px;border-radius:100px}
 .dz-empty{font-size:14px;color:var(--vf-mute);margin:0;padding:2px 0 4px}
+
+/* ------------------------------------------------------------- shared page hero */
+.page-hero{padding:46px 0 18px;max-width:820px}
+.page-hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-kicker{margin:0 0 10px;color:var(--vf-red);font-size:12px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase}
+.page-hero h1{margin:0;color:var(--vf-ink);font-size:clamp(38px,5vw,60px);font-weight:800;
+  letter-spacing:-.04em;line-height:1.02}
+.page-date{font-size:13.5px;color:var(--vf-mute);font-weight:600;white-space:nowrap;padding-bottom:7px}
+.page-lead{margin:18px 0 0;max-width:780px;color:var(--vf-mute);font-size:18px;line-height:1.55}
+.page-lead b{color:var(--vf-ink);font-weight:700}
+@media (max-width:640px){.page-hero{padding-top:34px}.page-hero h1{font-size:39px}.page-lead{font-size:16.5px}}

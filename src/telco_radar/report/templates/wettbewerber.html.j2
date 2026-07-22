@@ -2,12 +2,15 @@
 {% set active = 'wettbewerber' %}
 {% block title %}Telco Radar - Wettbewerber{% endblock %}
 {% block content %}
-<section class="hero compact">
-  <div class="hero-row">
-    <h1>Wettbewerber im Detail</h1>
-    {% if date_de %}<span class="hero-date">Stand {{ date_de }}</span>{% endif %}
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Marktbeobachtung</p>
+      <h1>Wettbewerber im Detail</h1>
+    </div>
+    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="hero-lead">Tiefenanalyse der wichtigsten Rivalen: was sie gerade tun und was das für Vodafone bedeutet. Jeder Punkt mit Quelle.</p>
+  <p class="page-lead">Tiefenanalyse der wichtigsten Rivalen: Was sie gerade tun, mit Quelle und Einordnung.</p>
 </section>
 
 {% if competitors and competitors|selectattr('summary')|list %}
@@ -23,9 +26,6 @@
     <div class="comp-main">
       {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
       {% if c.themes %}<div class="chip-row">{% for t in c.themes %}<span class="chip">{{ t }}</span>{% endfor %}</div>{% endif %}
-      {% if c.vodafone_implication %}
-      <div class="why"><span class="why-label">Was das für Vodafone heißt</span>{{ c.vodafone_implication }}</div>
-      {% endif %}
     </div>
     <aside class="comp-side">
       <div class="stat-box"><span class="stat-num">{{ c.n_items }}</span><span class="stat-label">Meldungen ausgewertet</span></div>
@@ -41,7 +41,6 @@
       <span class="move-cat" style="background:{{ m.color }}">{{ m.category }}</span>
       <div class="move-body">
         <a class="move-title" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
-        {% if m.note %}<p class="move-note">{{ m.note }}</p>{% endif %}
         <a class="source-link" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.domain }} &nearr;</a>
       </div>
     </article>

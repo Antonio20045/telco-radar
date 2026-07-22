@@ -31,7 +31,7 @@
   function matches(h) {
     const q = (fSearch.value || '').trim().toLowerCase();
     if (q) {
-      const hay = ((h.operator || '') + ' ' + (h.title || '') + ' ' + (h.summary || '') + ' ' + (h.why_it_matters || '') + ' ' + (h.source_label || '')).toLowerCase();
+      const hay = ((h.operator || '') + ' ' + (h.title || '') + ' ' + (h.summary || '') + ' ' + (h.source_label || '')).toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (fRegion.value && h.region !== fRegion.value) return false;
@@ -94,7 +94,6 @@
         (h.date ? ' · ' + esc(h.date) : '') +
         (h.source_label ? ' · Quelle: ' + esc(h.source_label) : '') + '</p>' +
       (h.summary ? '<p class="ex-d-sum">' + esc(h.summary) + '</p>' : '') +
-      (h.why_it_matters ? '<p class="why"><span class="why-label">Warum das zählt</span>' + esc(h.why_it_matters) + '</p>' : '') +
       '<a class="source-link" href="' + esc(h.url) + '" target="_blank" rel="noopener">Originalquelle öffnen (' + esc(h.source_label || 'Link') + ') &nearr;</a>';
     if (scroll && window.innerWidth <= 880) detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
