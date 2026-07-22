@@ -147,7 +147,12 @@ Commit `2539481` (`audit: repair misleading sources and extraction filters`) wur
 - Freshness-Filter: Termine mehr als einen Tag in der Zukunft werden nicht mehr als aktuelle Meldungen analysiert.
 - Regressionstests für Navigation/Datumsformate und Zukunftsdaten ergänzt.
 - Lokale Website neu gerendert; GitHub-CI und Deploy-Site-Workflow liefen für den Commit erfolgreich.
+- Commit `1a530a6` ergänzt eine Fehlerdiagnose: Pipeline-Ausgaben werden bei einem
+  Fehlschlag im Actions-Summary und als Artefakt gesichert.
+- Commit `590bad4` blendet die entfernte Quelle auch aus historischen öffentlichen
+  Report-, Wettbewerber- und Protokollseiten aus; die Rohdaten bleiben für den
+  Audit unverändert erhalten.
 
 ## Live-Stand
 
-Render antwortet nach dem Push mit HTTP 200 für `/`, `/bericht.html`, `/differenzierung.html` und `/sources.html`. Die Live-Quellenübersicht zeigt die drei neuen URLs und keinen `inside digital`-Eintrag. Der alte 21.07.-Bericht blieb unverändert: Lauf #29 wurde manuell auf `main` gestartet, scheiterte aber auch im zweiten Versuch nach 24:56 Minuten bereits in `Run pipeline`; Commit- und Render-Schritte wurden übersprungen. Die öffentlichen Check-Run-Hinweise enthalten nur Exit-Code 1; die detaillierten Actions-Logs sind ohne Admin-Rechte nicht abrufbar (HTTP 403). Deshalb ist der neue Report mit den reparierten Quellen noch nicht live.
+Render antwortet nach dem Push mit HTTP 200 für `/`, `/bericht.html`, `/differenzierung.html`, `/protokoll.html`, `/wettbewerber.html` und `/sources.html`. Die Live-Quellenübersicht zeigt die drei neuen URLs; die entfernte Quelle erscheint auf keiner öffentlichen Seite mehr. Der alte 21.07.-Bericht blieb als Datensatz unverändert: Lauf #29 wurde manuell auf `main` gestartet, scheiterte aber auch im zweiten Versuch nach 24:56 Minuten bereits in `Run pipeline`; Commit- und Render-Schritte wurden übersprungen. Die öffentlichen Check-Run-Hinweise enthalten nur Exit-Code 1; die detaillierten Actions-Logs sind ohne Admin-Rechte nicht abrufbar (HTTP 403). Nach Codepfad und Laufzeit ist ein LLM-/Provider- oder Secret-Problem wahrscheinlicher als ein Collector- oder Render-Problem; der vollständige Collector-/Renderpfad läuft lokal ohne LLM erfolgreich. Der neue redaktionelle Report mit den reparierten Quellen ist deshalb noch nicht live.
