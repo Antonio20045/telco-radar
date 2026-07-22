@@ -150,4 +150,4 @@ Commit `2539481` (`audit: repair misleading sources and extraction filters`) wur
 
 ## Live-Stand
 
-Render antwortet nach dem Push mit HTTP 200 für `/`, `/bericht.html`, `/differenzierung.html` und `/sources.html`. Die Live-Quellenübersicht zeigt die drei neuen URLs und keinen `inside digital`-Eintrag. Der alte 21.07.-Bericht blieb bis zum nächsten Radar-Lauf unverändert; Lauf #29 wurde danach manuell auf `main` gestartet, damit die Quellenreparaturen in einen neuen Report einfließen.
+Render antwortet nach dem Push mit HTTP 200 für `/`, `/bericht.html`, `/differenzierung.html` und `/sources.html`. Die Live-Quellenübersicht zeigt die drei neuen URLs und keinen `inside digital`-Eintrag. Der alte 21.07.-Bericht blieb unverändert: Lauf #29 wurde manuell auf `main` gestartet, scheiterte aber auch im zweiten Versuch nach 24:56 Minuten bereits in `Run pipeline`; Commit- und Render-Schritte wurden übersprungen. Die öffentlichen Check-Run-Hinweise enthalten nur Exit-Code 1; die detaillierten Actions-Logs sind ohne Admin-Rechte nicht abrufbar (HTTP 403). Deshalb ist der neue Report mit den reparierten Quellen noch nicht live.
