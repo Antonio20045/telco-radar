@@ -37,6 +37,14 @@ jobs:
       - name: Install Playwright Chromium
         run: python -m playwright install --with-deps chromium
 
+      - name: Check LLM secret presence
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
+        run: |
+          if [ -n "$LLM_API_KEY" ]; then echo "LLM_API_KEY is present"; else echo "LLM_API_KEY is missing"; fi
+          if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY fallback is present"; else echo "ANTHROPIC_API_KEY fallback is missing"; fi
+
       - name: Run pipeline
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
