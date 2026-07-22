@@ -26,12 +26,14 @@
 </section>
 {% endif %}
 
-<section class="section dz-library" id="belegbibliothek">
-  <div class="section-head">
-    <h2><span class="sec-no">02</span></h2>
-    <p class="section-title">Beispiele nach Themen</p>
-    <p class="section-sub">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
-  </div>
+<details class="evidence dz-evidence" id="belegbibliothek">
+  <summary><span>Konkrete Beispiele und Quellen öffnen</span><small>Nachschlagen</small></summary>
+  <div class="evidence-body">
+    <div class="section-head">
+      <h2><span class="sec-no">02</span></h2>
+      <p class="section-title">Belege zum Bericht</p>
+      <p class="section-sub">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
+    </div>
 
 {% for t in diff_themes %}
 {% if t.entries %}
@@ -53,7 +55,8 @@
 </article>
 {% endif %}
 {% endfor %}
-</section>
+  </div>
+</details>
 
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
 und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises

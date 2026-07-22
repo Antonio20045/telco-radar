@@ -52,12 +52,13 @@ Ein klarer Einstieg mit 2 bis 4 kurzen Absaetzen. Verdichte die auffaelligsten
 Entwicklungen im aktuellen Beobachtungszeitraum und verlinke jede konkrete
 Aussage ueber einen Betreiber direkt mit der passenden Quelle.
 
-## Beispiele aus dem Markt
-Waehle 6 bis 10 besonders anschauliche Beispiele aus unterschiedlichen
-Themenfeldern und Regionen. Nutze pro Beispiel eine H3-Ueberschrift mit
-Betreiber und Thema, dann 1 bis 3 Saetze: Was wurde konkret angeboten,
-gestartet oder integriert und warum ist es ein interessantes Beispiel fuer
-Differenzierung? Jede faktische Aussage bekommt einen passenden Quellenlink.
+## Wie sich Differenzierung aktuell zeigt
+Schreibe hier 3 bis 5 zusammenhaengende Abschnitte in gut lesbaren Absaetzen.
+Ordne mehrere Beispiele pro Absatz nach einer gemeinsamen Idee und verknuepfe
+sie miteinander. Keine H3-Ueberschriften pro Betreiber, keine Aufzaehlung von
+Einzelartikeln und keine Artikelzusammenfassungen hintereinander. Ein Beispiel
+ist nur ein Beleg fuer die uebergeordnete Beobachtung. Jede konkrete Aussage
+bekommt einen passenden Quellenlink.
 
 ## Welche Muster dahinter liegen
 Beschreibe 3 bis 5 neutrale, globale Muster, die sich aus den Beispielen
@@ -83,7 +84,7 @@ Regeln:
 
 _REQUIRED_HEADINGS = (
     "## das wichtigste",
-    "## beispiele aus dem markt",
+    "## wie sich differenzierung aktuell zeigt",
     "## welche muster dahinter liegen",
     "## quellenbasis",
 )
@@ -172,65 +173,126 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
     ordered = sorted(entries, key=lambda e: (e.get("last_verified") or "",
                                              e.get("first_seen") or ""),
                      reverse=True)
-    # One representative per theme keeps the fallback varied instead of
-    # repeating the same category four times at the top.
-    representatives: list[dict] = []
-    seen_themes: set[str] = set()
-    for entry in ordered:
-        theme = entry.get("theme") or "_"
-        if theme not in seen_themes:
-            representatives.append(entry)
-            seen_themes.add(theme)
+    def examples(keys: tuple[str, ...], limit: int = 3) -> list[dict]:
+        result = []
+        seen = set()
+        for entry in ordered:
+            if entry.get("theme") not in keys:
+                continue
+            identity = (entry.get("operator"), entry.get("what"))
+            if identity in seen:
+                continue
+            result.append(entry)
+            seen.add(identity)
+            if len(result) >= limit:
+                break
+        return result
+
+    def linked_examples(items: list[dict]) -> str:
+        labels = {
+            "ki": "einen KI-Dienst als Bestandteil des Kundenangebots",
+            "entertainment": "Streaming als Bestandteil ausgewählter Tarife",
+            "cloud": "Cloud-Speicher als integrierte Leistung",
+            "gaming": "Cloud-Gaming als gebündelte Leistung",
+            "garantie": "eine mehrjährige Preis- oder Ausfallgarantie",
+            "security": "Scam- und Spam-Schutz im Telekommunikationsdienst",
+            "health": "digitale Gesundheits- und Telemedizin-Dienste",
+            "geraete": "ein Upgrade- oder Inzahlungnahmeprogramm für Geräte",
+            "loyalty": "Vorteile, Gewinnspiele oder Ticket-Presales",
+            "superapp": "eine App als Zugang zu mehreren Alltagsdiensten",
+            "fintech": "Bezahlen und Finanzdienste in der Kunden-App",
+            "smarthome": "Smart-Home-Steuerung und Sicherheit am Anschluss",
+        }
+        clauses = [
+            f"{entry.get('operator') or 'Ein Betreiber'} nutzt {labels.get(entry.get('theme'), 'ein ergänzendes Kundenerlebnis')} {_source_link(entry)}"
+            for entry in items
+        ]
+        if not clauses:
+            return ""
+        if len(clauses) == 1:
+            return clauses[0] + "."
+        if len(clauses) == 2:
+            return clauses[0] + " und " + clauses[1] + "."
+        return ", ".join(clauses[:-1]) + " und " + clauses[-1] + "."
 
     lines = ["## Das Wichtigste", ""]
-    if representatives:
-        first = representatives[0]
+    if ordered:
         lines.append(
-            f"Der aktuelle Überblick zeigt, wie unterschiedlich Telkos ihr "
-            f"Leistungsversprechen erweitern. Ein anschauliches Beispiel: "
-            f"{first.get('what', '').rstrip('.')} {_source_link(first)}.")
-        if len(representatives) > 1:
-            second = representatives[1]
-            lines.append(
-                f"Daneben steht ein anderer Ansatz: {second.get('what', '').rstrip('.')} "
-                f"{_source_link(second)}.")
+            "Im Markt verschiebt sich Differenzierung sichtbar vom reinen "
+            "Netzzugang hin zu zusätzlichen Kundenerlebnissen. Telkos machen "
+            "Dienste, Schutzversprechen und digitale Zugänge zu einem Teil des "
+            "laufenden Angebots – etwa indem sie KI-Assistenten, Streaming oder "
+            "Cloud-Speicher mit dem Mobilfunk- oder Breitbandprodukt verbinden.")
         lines.append(
-            "Gemeinsam ist diesen Beispielen, dass die Differenzierung an einem "
-            "konkreten Kundenerlebnis sichtbar wird – als Dienst, Programm, "
-            "Versprechen oder Zugang zu einem weiteren Ökosystem.")
+            "Auffällig ist dabei die Spannweite der Ansätze: Manche Anbieter "
+            "bündeln etablierte digitale Leistungen, andere bauen eigene "
+            "Ökosysteme, Serviceversprechen oder Geräteprogramme auf. Die "
+            "folgende Einordnung verbindet diese konkreten Marktbeispiele, "
+            "statt sie nur einzeln nebeneinanderzustellen.")
     else:
         lines.append("Der aktuelle Beobachtungszeitraum enthält noch kein belegtes Beispiel.")
 
-    lines += ["", "## Beispiele aus dem Markt", ""]
-    for entry in representatives[:10]:
-        theme = theme_labels.get(entry.get("theme"), entry.get("theme") or "Differenzierung")
-        operator = entry.get("operator") or "Betreiber"
-        lines.append(f"### {operator}: {theme}")
-        lines.append(
-            f"{entry.get('what', '').rstrip('.')} {_source_link(entry)}"
-            f"{_date_suffix(entry)}.")
+    lines += ["", "## Wie sich Differenzierung aktuell zeigt", ""]
+    narrative_groups = (
+        (
+            "Dienste statt Rabatte.",
+            "KI, Entertainment und Cloud werden als laufender Bestandteil des "
+            "Kundenerlebnisses eingesetzt. Anbieter bündeln beispielsweise "
+            "Perplexity-Zugänge oder integrieren KI direkt in ihre Kunden-App. "
+            "Parallel machen mehrere Netzbetreiber Streaming-Dienste zu einem "
+            "sichtbaren Bestandteil ausgewählter Tarife.",
+            ("ki", "entertainment", "cloud", "gaming"),
+        ),
+        (
+            "Vertrauen und Schutz als Leistung.",
+            "Ein zweiter Strang ist die Übersetzung von Sicherheit und Verlässlichkeit "
+            "in ein konkretes Versprechen. Mehrjährige Preis- oder Ausfallgarantien "
+            "stehen neben integriertem Scam- und Spam-Schutz; auch Health-Angebote "
+            "erweitern das Leistungsbild über Konnektivität hinaus.",
+            ("garantie", "security", "health"),
+        ),
+        (
+            "Geräte und Alltag bleiben im Ökosystem.",
+            "Differenzierung entsteht außerdem dort, wo die Beziehung zum Kunden über "
+            "den einzelnen Mobilfunkvertrag hinaus verlängert wird. Geräte-Upgrades, "
+            "Vorteilsprogramme, Cloud-Speicher, Bezahldienste und Smart Home halten "
+            "den Kundenkontakt an mehreren Stellen aufrecht und machen die Telko zur "
+            "Zugangsschicht für weitere Dienste.",
+            ("geraete", "loyalty", "superapp", "fintech", "smarthome"),
+        ),
+    )
+    for lead, paragraph, keys in narrative_groups:
+        samples = examples(keys, 3)
+        if not samples:
+            continue
+        lines.append(f"**{lead}** {paragraph} " + linked_examples(samples))
         lines.append("")
 
     lines += ["## Welche Muster dahinter liegen", ""]
-    group_defs = (
-        ("Dienste werden Teil des Tariferlebnisses", ("ki", "entertainment", "cloud", "gaming")),
-        ("Vertrauen und Schutz werden als Leistung sichtbar", ("garantie", "security", "health")),
-        ("Das Gerät bleibt über Programme und Zubehör im Ökosystem", ("geraete",)),
-        ("Die Telko-App öffnet den Zugang zu weiteren Alltagsdiensten", ("fintech", "superapp", "smarthome", "loyalty")),
-    )
-    added_pattern = False
-    for label, keys in group_defs:
-        sample = next((e for e in ordered if e.get("theme") in keys), None)
-        if not sample:
-            continue
-        themes = ", ".join(theme_labels.get(k, k) for k in keys
-                            if k in by_theme)
+    if ordered:
         lines.append(
-            f"- **{label}:** Sichtbar in {themes}. Beispiel: "
-            f"{sample.get('what', '').rstrip('.')} {_source_link(sample)}.")
-        added_pattern = True
-    if not added_pattern:
-        lines.append("- Weitere Muster werden sichtbar, sobald neue Beispiele bestätigt sind.")
+            "Übergreifend werden digitale Leistungen damit vom optionalen Zusatz zum "
+            "wiederkehrenden Bestandteil des Telekommunikationsprodukts. Der Zugang "
+            "zu KI, Entertainment oder Speicher wird in Apps, Tarife und "
+            "Servicebeziehungen eingebettet. "
+            + linked_examples(examples(("ki", "entertainment", "cloud"), 2))
+        )
+        lines.append(
+            "Gleichzeitig wird Vertrauen operationalisiert: Eine Garantie, ein "
+            "Sicherheitsdienst oder ein Gesundheitsangebot macht ein abstraktes "
+            "Markenversprechen im Alltag greifbar. Das knüpft an Nutzung und "
+            "Sicherheit an, nicht nur an den Preis. "
+            + linked_examples(examples(("garantie", "security", "health"), 2))
+        )
+        lines.append(
+            "Schließlich zeigt sich ein Plattformmuster. Gerätewechsel, "
+            "Vorteilsprogramme, Bezahldienste und Smart Home halten den Kundenkontakt "
+            "an mehreren Stellen aufrecht und machen die Telko zur Zugangsschicht für "
+            "weitere Dienste. "
+            + linked_examples(examples(("geraete", "loyalty", "superapp", "fintech", "smarthome"), 2))
+        )
+    else:
+        lines.append("Weitere Muster werden sichtbar, sobald neue Beispiele bestätigt sind.")
 
     lines += ["", "## Quellenbasis", ""]
     for entry in ordered[:12]:
