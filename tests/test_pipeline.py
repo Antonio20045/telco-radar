@@ -59,7 +59,10 @@ def fake_http(monkeypatch):
 
 
 def test_full_run_no_llm(project, fake_http):
-    report = pipeline.run(project, use_llm=False)
+    # Keep the fixture stable as the calendar advances: the newest fixture
+    # item is dated 14 Jul 2026, so the production 8-day window is borderline
+    # on 22 Jul depending on the current clock time.
+    report = pipeline.run(project, use_llm=False, lookback_days=14)
 
     assert report.exists()
     text = report.read_text(encoding="utf-8")
@@ -78,8 +81,8 @@ def test_full_run_no_llm(project, fake_http):
 
 
 def test_second_run_reports_nothing_new(project, fake_http):
-    pipeline.run(project, use_llm=False)
-    report2 = pipeline.run(project, use_llm=False)
+    pipeline.run(project, use_llm=False, lookback_days=14)
+    report2 = pipeline.run(project, use_llm=False, lookback_days=14)
 
     text = report2.read_text(encoding="utf-8")
     assert "davon neu: 0" in text             # everything already seen
