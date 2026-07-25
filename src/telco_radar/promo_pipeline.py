@@ -30,9 +30,10 @@ def _fetch_one(src, http_cfg: dict) -> dict:
     keeps this safe to parallelise like collect/__init__.py's collect_all."""
     rec = {"brand": src.name, "url": src.url, "tier": src.tier, "kind": src.kind}
     try:
-        text = fetch_snapshot(src.url, src.kind, http_cfg)
-        rec["text"] = text
-        rec["hash"] = content_hash(text)
+        snap = fetch_snapshot(src.url, src.kind, http_cfg)
+        rec["text"] = snap["text"]
+        rec["hash"] = content_hash(snap["text"])
+        rec["image_url"] = snap.get("image_url")
     except Exception as exc:  # noqa: BLE001
         rec["status"] = "fail"
         rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
@@ -74,6 +75,7 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             results.append(rec)
             continue
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
+        image_url = rec.get("image_url")
         try:
             if not snap_store.changed(src_name, h):
                 rec["status"] = "unveraendert"
@@ -85,6 +87,7 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                 for it in items:
                     it["tier"] = rec["tier"]
                     it["url"] = rec["url"]
+                    it["image_url"] = image_url
                 n_new = db.upsert(items, today)
                 checked_ids = {entry_id(src_name, it["headline"]) for it in items}
                 db.mark_stale(src_name, checked_ids, today)

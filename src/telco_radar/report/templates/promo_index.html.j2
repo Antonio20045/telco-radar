@@ -12,66 +12,89 @@
     </div>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Aktuelle Tarif-, Rabatt- und Kampagnenaktionen aller Telcos in Deutschland – Netzbetreiber und ihre Discount-/Zweitmarken, <b>jeweils mit Originalquelle</b>.</p>
+  <p class="page-lead">Auf einen Blick: welche Tarif-, Rabatt- und Kampagnenaktion gerade bei welchem Wettbewerber läuft. Jede Karte verlinkt <b>direkt auf die Original-Aktionsseite</b> des Anbieters.</p>
 </section>
 
 <div class="kpi-tiles">
-  <div class="kpi-tile"><b>{{ promo_view.active_total }}</b><span>aktive Aktionen</span></div>
-  <div class="kpi-tile accent"><b>{{ promo_view.brands_active }}</b><span>Anbieter mit laufender Aktion</span></div>
-  <div class="kpi-tile"><b>{{ promo_view.brands_tracked }}</b><span>beobachtete Anbieter</span></div>
+  <div class="kpi-tile accent"><b>{{ promo_view.active_total }}</b><span>aktive Aktionen</span></div>
+  <div class="kpi-tile"><b>{{ promo_view.brands_active }}</b><span>Wettbewerber mit laufender Aktion</span></div>
+  <div class="kpi-tile"><b>{{ promo_view.brands_tracked }}</b><span>beobachtete Wettbewerber</span></div>
 </div>
 
-{% if promo_report_html %}
-<section class="section dz-report" id="promobericht">
-  <div class="section-head">
-    <h2><span class="sec-no">01</span></h2>
-    <p class="section-title">Der Wochenüberblick</p>
-    <p class="section-sub">Zusammengefasst aus den beobachteten Aktionsseiten: was diese Woche an Rabatt- und Kampagnenaktivität auffällt.</p>
+<div class="promo-toolbar">
+  <div class="promo-filters" role="group" aria-label="Nach Anbietertyp filtern">
+    <button type="button" class="promo-filter on" data-tier="all">Alle</button>
+    <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
+    <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
+    <button type="button" class="promo-filter" data-tier="3">Festnetz, Kabel, Glasfaser</button>
   </div>
-  <div class="dz-report-meta">Bericht vom {{ promo_report_date }} · Quellen und Detailbelege stehen direkt im Text</div>
-  <article class="briefing prose">{{ promo_report_html | safe }}</article>
-</section>
-{% endif %}
+  <span class="promo-hint">Jedes Angebot verlinkt zur Originalquelle des Anbieters</span>
+</div>
 
-<details class="evidence dz-evidence" id="aktionsbibliothek" open>
-  <summary><span>Alle aktuellen Aktionen öffnen</span><small>Nachschlagen</small></summary>
-  <div class="evidence-body">
-    <div class="section-head">
-      <h2><span class="sec-no">02</span></h2>
-      <p class="section-title">Aktionen je Anbieter</p>
-      <p class="section-sub">Mit Originalquelle und Prüfdatum. Preise und Enddaten ändern sich schnell – für den aktuellen Stand immer der Quelle folgen.</p>
+<div class="promo-board" id="promo-board">
+  {% for b in promo_view.brands %}
+  <article class="promo-card{% if b.internal_reference %} promo-card--own{% endif %}{% if not b.active_count %} promo-card--empty{% endif %}" data-tier="{{ b.tier }}" style="--c:{{ b.color }}">
+    <div class="promo-media">
+      <span class="promo-media-fallback"><span class="promo-avatar">{{ b.initials }}</span></span>
+      {% if b.image_url %}<img src="{{ b.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">{% endif %}
+      <span class="promo-tier-tag">{{ b.tier_label }}</span>
+      {% if b.internal_reference %}<span class="promo-own-tag">Eigene Referenz</span>{% endif %}
     </div>
 
-    {% for tier_num, tier_label in [(1, 'Große Netzbetreiber'), (2, 'Discount- und Zweitmarken'), (3, 'Festnetz, Kabel und Glasfaser')] %}
-    {% set tier_entries = promo_view.by_tier.get(tier_num, []) %}
-    {% if tier_entries %}
-    <article class="dz-card" style="--c:#e60000">
-      <div class="dz-card-head">
-        <h2>{{ tier_label }}</h2>
-        <span class="dz-count">{{ tier_entries | selectattr('status', 'equalto', 'aktiv') | list | length }} aktiv</span>
-      </div>
-      <ul class="dz-moves">
-        {% for e in tier_entries %}
-        <li class="dz-move">
-          <div class="dz-move-h">
-            <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.brand }}</b> — {{ e.headline }}</a>
-            {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
-            {% if e.status != 'aktiv' %}<span class="dz-new" style="background:#9aa0aa">{{ e.status }}</span>{% endif %}
+    <div class="promo-card-head">
+      <h3>{{ b.name }}</h3>
+      <span class="promo-count{% if b.active_count %} live{% endif %}">{{ b.active_count }} aktiv</span>
+    </div>
+    {% if b.group and b.group != b.name %}<p class="promo-card-sub">{{ b.group }}</p>{% endif %}
+
+    {% if b.active %}
+    <ul class="promo-offers">
+      {% for o in b.active[:4] %}
+      <li class="promo-offer">
+        <div class="promo-offer-top">
+          <a class="promo-offer-title" href="{{ o.url }}" target="_blank" rel="noopener">{{ o.headline }}</a>
+          {% if o.neu %}<span class="promo-offer-new">neu</span>{% endif %}
+        </div>
+        {% if o.description %}<p class="promo-offer-desc">{{ o.description }}</p>{% endif %}
+        <p class="promo-offer-meta">{{ o.url | domain }}{% if o.valid_until %} · gültig laut Anbieter bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if b.active|length > 4 %}
+    <details class="promo-more">
+      <summary>+{{ b.active|length - 4 }} weitere Aktion{{ 'en' if b.active|length - 4 != 1 else '' }}</summary>
+      <ul class="promo-offers">
+        {% for o in b.active[4:] %}
+        <li class="promo-offer">
+          <div class="promo-offer-top">
+            <a class="promo-offer-title" href="{{ o.url }}" target="_blank" rel="noopener">{{ o.headline }}</a>
+            {% if o.neu %}<span class="promo-offer-new">neu</span>{% endif %}
           </div>
-          {% if e.description %}<p class="dz-move-why">{{ e.description }}</p>{% endif %}
-          <p class="dz-move-meta">{% if e.valid_until %}gültig laut Anbieter bis {{ e.valid_until }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.url | domain }} &nearr;</a> · geprüft {{ e.last_verified | date_de }}</p>
+          {% if o.description %}<p class="promo-offer-desc">{{ o.description }}</p>{% endif %}
+          <p class="promo-offer-meta">{{ o.url | domain }}{% if o.valid_until %} · gültig laut Anbieter bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}</p>
         </li>
         {% endfor %}
       </ul>
-    </article>
+    </details>
     {% endif %}
-    {% endfor %}
+    {% if b.stale %}
+    <p class="promo-stale-note">{{ b.stale|length }} frühere Aktion{{ 'en' if b.stale|length != 1 else '' }} evtl. ausgelaufen.</p>
+    {% endif %}
+    {% else %}
+    <p class="promo-empty">{% if b.stale %}Keine aktuell bestätigte Aktion – zuletzt {{ b.stale[0].last_verified | date_de }} beobachtet.{% else %}Noch keine belegte Aktion beobachtet.{% endif %}</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
 
-    {% if promo_view.active_total == 0 %}
-    <p class="dz-empty">Im aktuellen Beobachtungszeitraum liegt noch keine belegte aktive Aktion vor.</p>
-    {% endif %}
+{% if promo_report_html %}
+<details class="evidence" style="margin-top:34px">
+  <summary><span>Wochentext lesen: wie sich das Preis- und Aktionsbild insgesamt entwickelt</span><small>{% if promo_report_date %}{{ promo_report_date }}{% endif %}</small></summary>
+  <div class="evidence-body">
+    <article class="briefing prose">{{ promo_report_html | safe }}</article>
   </div>
 </details>
+{% endif %}
 
 <p class="dz-foot">Diese Seite beobachtet die öffentlichen Aktions- und Tarifseiten deutscher Telcos direkt (Snapshot-Vergleich von Lauf zu Lauf, keine Presse-Feeds). Jede Karte trägt eine Originalquelle und ein Prüfdatum; Preise werden bewusst nicht als dauerhaft gültig übernommen – für den aktuellen Stand gilt immer die verlinkte Seite des Anbieters. Vodafones eigene Aktionsseite wird separat als interne Referenz geführt, nicht als Wettbewerber gezählt.</p>
 {% endblock %}

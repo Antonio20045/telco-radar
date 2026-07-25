@@ -95,6 +95,8 @@ class PromoDB:
                     e["description"] = it["description"]
                 if it.get("valid_until"):
                     e["valid_until"] = it["valid_until"]
+                if it.get("image_url"):
+                    e["image_url"] = it["image_url"]
             else:
                 self.entries[eid] = {
                     "id": eid, "brand": brand, "tier": it.get("tier"),
@@ -102,6 +104,7 @@ class PromoDB:
                     "description": it.get("description", ""),
                     "valid_until": it.get("valid_until"),
                     "url": it.get("url", ""),
+                    "image_url": it.get("image_url"),
                     "first_seen": today, "last_verified": today,
                     "status": "aktiv",
                 }

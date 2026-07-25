@@ -25,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
+from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
@@ -37,6 +38,19 @@ _STRIP_TAGS = ("script", "style", "noscript", "svg", "nav", "footer", "header",
                "form", "iframe")
 _WS_RE = re.compile(r"[ \t]+")
 _BLANK_RE = re.compile(r"\n{3,}")
+
+# Meta tags that commonly carry a page's representative campaign visual, in
+# priority order. Deliberately page-level only (one "hero" image per brand
+# snapshot) - matching individual offers to individual images on a page we
+# do not control would need per-brand selector tuning or vision extraction,
+# far more fragile than this one well-supported convention. A missing/failed
+# image is never an error: the template falls back to a colour tile.
+_IMG_META = (
+    ("property", "og:image:secure_url"),
+    ("property", "og:image"),
+    ("name", "twitter:image"),
+    ("name", "twitter:image:src"),
+)
 
 
 def extract_text(html: str, max_chars: int = 12000) -> str:
@@ -57,10 +71,25 @@ def extract_text(html: str, max_chars: int = 12000) -> str:
     return text[:max_chars]
 
 
-def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> str:
-    """Fetch *url* and return its extracted visible text. Raises on failure -
-    the caller is responsible for catching and recording it as a source
-    failure, exactly like the other collectors."""
+def extract_hero_image(html: str, base_url: str) -> str | None:
+    """Best-effort representative image for the page (og:image/twitter:image
+    meta tag), resolved to an absolute URL. Returns None if the page has
+    none - that is the normal case for many of these sources, not a bug,
+    and callers must treat it as optional."""
+    soup = BeautifulSoup(html or "", "html.parser")
+    for attr, key in _IMG_META:
+        tag = soup.find("meta", attrs={attr: key})
+        content = (tag.get("content") or "").strip() if tag else ""
+        if content:
+            return urljoin(base_url, content)
+    return None
+
+
+def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> dict:
+    """Fetch *url* and return {"text": <visible text>, "image_url": <hero
+    image or None>}. Raises on failure - the caller is responsible for
+    catching and recording it as a source failure, exactly like the other
+    collectors."""
     if kind == "js":
         timeout_s = float(http_cfg.get("render_timeout_seconds",
                                         http_cfg.get("timeout_seconds", 25)))
@@ -69,7 +98,7 @@ def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> str:
     else:
         resp = fetch(url, http_cfg)
         html = resp.text
-    return extract_text(html)
+    return {"text": extract_text(html), "image_url": extract_hero_image(html, url)}
 
 
 def content_hash(text: str) -> str:

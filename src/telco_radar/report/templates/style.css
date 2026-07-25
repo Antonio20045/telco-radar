@@ -668,3 +668,77 @@ main{padding-bottom:8px}
 .page-lead{margin:18px 0 0;max-width:780px;color:var(--vf-mute);font-size:18px;line-height:1.55}
 .page-lead b{color:var(--vf-ink);font-weight:700}
 @media (max-width:640px){.page-hero{padding-top:34px}.page-hero h1{font-size:39px}.page-lead{font-size:16.5px}}
+
+
+/* ============================================================================
+   REDESIGN v11 — Promo Übersicht: Wettbewerber-Board statt Textliste
+   Bewusst eigener Namensraum (.promo-*), keine dz-*-Klassen: die Seite soll
+   sich visuell klar von Marktrecherche/Differenzierung unterscheiden.
+   ============================================================================ */
+.promo-toolbar{display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;margin:28px 0 18px}
+.promo-filters{display:flex;gap:8px;flex-wrap:wrap}
+.promo-filter{font-family:var(--font);font-size:13.5px;font-weight:700;color:var(--vf-mute);
+  background:var(--vf-neutral);border:1px solid transparent;border-radius:100px;
+  padding:8px 15px;cursor:pointer;transition:.15s}
+.promo-filter:hover{color:var(--vf-ink)}
+.promo-filter.on{background:var(--vf-ink);color:#fff}
+.promo-hint{font-size:12.5px;color:var(--vf-faint)}
+
+.promo-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(298px,1fr));gap:18px;align-items:start}
+.promo-card{background:#fff;border:1px solid var(--vf-line);border-radius:18px;
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+  transition:box-shadow .2s var(--ease),transform .2s var(--ease)}
+.promo-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.promo-card[hidden]{display:none}
+.promo-card--empty{opacity:.6}
+.promo-card--own{border:1.5px solid var(--vf-red)}
+
+.promo-media{position:relative;height:112px;background:var(--vf-neutral);overflow:hidden}
+.promo-media-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--c,#3860be),#1b1d21)}
+.promo-avatar{font-size:26px;font-weight:800;letter-spacing:.03em;color:#fff;opacity:.92}
+.promo-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.promo-tier-tag{position:absolute;top:10px;left:12px;font-size:10.5px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:#fff;background:rgba(20,22,26,.55);
+  backdrop-filter:blur(3px);padding:4px 9px;border-radius:100px}
+.promo-own-tag{position:absolute;top:10px;right:12px;font-size:10.5px;font-weight:800;
+  letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--vf-red);
+  padding:4px 9px;border-radius:100px}
+
+.promo-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:16px 18px 0}
+.promo-card-head h3{font-size:16.5px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--vf-ink)}
+.promo-count{flex:none;font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:100px;
+  background:var(--vf-neutral);color:var(--vf-mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.promo-count.live{background:#e7f5ec;color:#1a8f4c}
+.promo-card-sub{margin:3px 18px 0;font-size:12px;color:var(--vf-faint)}
+
+.promo-offers{list-style:none;margin:10px 18px 2px;padding:0;display:flex;flex-direction:column}
+.promo-offer{padding:10px 0;border-top:1px solid var(--vf-line)}
+.promo-offer:first-child{border-top:none}
+.promo-offer-top{display:flex;align-items:baseline;gap:8px}
+.promo-offer-title{flex:1;font-size:14px;font-weight:700;line-height:1.35;color:var(--vf-ink)}
+.promo-offer-title:hover{color:var(--vf-red)}
+.promo-offer-new{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;background:var(--vf-red);padding:2px 7px;border-radius:100px}
+.promo-offer-desc{font-size:12.5px;line-height:1.45;color:#575b61;margin:4px 0 0}
+.promo-offer-meta{font-size:11px;color:var(--vf-faint);margin:4px 0 0}
+
+.promo-empty{margin:0;padding:16px 18px 18px;font-size:13px;color:var(--vf-faint)}
+
+.promo-more{margin:0 18px 4px}
+.promo-more>summary{list-style:none;cursor:pointer;font-size:12px;font-weight:700;
+  color:var(--vf-mute);padding:6px 0}
+.promo-more>summary::-webkit-details-marker{display:none}
+.promo-more>summary:hover{color:var(--vf-red)}
+.promo-more[open]>summary{color:var(--vf-ink)}
+.promo-more .promo-offers{margin:0}
+
+.promo-stale-note{margin:6px 18px 14px;font-size:11px;color:var(--vf-faint)}
+.promo-card>.promo-offers:last-child,.promo-card>.promo-more:last-child{margin-bottom:16px}
+
+@media (max-width:640px){
+  .promo-board{grid-template-columns:1fr}
+  .promo-toolbar{flex-direction:column;align-items:flex-start}
+}

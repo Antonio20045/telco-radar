@@ -6,9 +6,9 @@ from telco_radar.analyze.promo_store import PromoDB, SnapshotStore, entry_id
 
 
 def _item(brand="congstar", headline="10 GB Bonus", description="", valid_until=None,
-          url="https://example.test/aktion"):
+          url="https://example.test/aktion", image_url=None):
     return {"brand": brand, "headline": headline, "description": description,
-            "valid_until": valid_until, "url": url, "tier": 2}
+            "valid_until": valid_until, "url": url, "tier": 2, "image_url": image_url}
 
 
 def test_snapshot_store_change_detection(tmp_path):
@@ -65,3 +65,24 @@ def test_persistence_roundtrip(tmp_path):
     db.upsert([_item()], "2026-07-25")
     db.save("2026-07-25")
     assert len(PromoDB(p)) == 1
+
+
+def test_upsert_stores_image_url_on_new_entry(tmp_path):
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(image_url="https://example.test/hero.jpg")], "2026-07-25")
+    entry = list(db.entries.values())[0]
+    assert entry["image_url"] == "https://example.test/hero.jpg"
+
+
+def test_upsert_updates_image_url_on_reverify_but_keeps_old_if_missing(tmp_path):
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(image_url="https://example.test/first.jpg")], "2026-07-04")
+    # Re-verified later without a fresh image (e.g. og:image tag disappeared) -
+    # the previously known image must not be silently dropped.
+    db.upsert([_item(image_url=None)], "2026-07-25")
+    entry = list(db.entries.values())[0]
+    assert entry["image_url"] == "https://example.test/first.jpg"
+    # A genuinely new image on re-verify does update it.
+    db.upsert([_item(image_url="https://example.test/second.jpg")], "2026-08-01")
+    entry = list(db.entries.values())[0]
+    assert entry["image_url"] == "https://example.test/second.jpg"

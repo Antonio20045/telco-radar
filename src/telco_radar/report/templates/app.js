@@ -115,3 +115,23 @@
 
   renderList();
 })();
+
+/* Promo Übersicht - Wettbewerber-Board: Tier-Filter (Vanilla JS, kein Framework) */
+(function () {
+  'use strict';
+  const board = document.getElementById('promo-board');
+  if (!board) return;
+  const buttons = document.querySelectorAll('.promo-filter');
+  if (!buttons.length) return;
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      buttons.forEach(function (b) { b.classList.remove('on'); });
+      btn.classList.add('on');
+      const tier = btn.dataset.tier;
+      board.querySelectorAll('.promo-card').forEach(function (card) {
+        card.hidden = tier !== 'all' && card.dataset.tier !== tier;
+      });
+    });
+  });
+})();
