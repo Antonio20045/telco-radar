@@ -4,11 +4,16 @@ name: LLM Probe
 # loest keinen Render-Deploy aus. Nur manuell startbar.
 on:
   workflow_dispatch:
+    inputs:
+      script:
+        description: "llm_probe.py (Key/Slug) oder llm_probe2.py (Request-Form)"
+        required: false
+        default: "llm_probe2.py"
 
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +29,9 @@ jobs:
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_API_BASE: https://integrate.api.nvidia.com/v1
-        run: python scripts/llm_probe.py 2>&1 | tee probe.log
+        run: |
+          python "scripts/${{ github.event.inputs.script || 'llm_probe2.py' }}" \
+            2>&1 | tee probe.log
 
       - name: Summary
         if: always()
