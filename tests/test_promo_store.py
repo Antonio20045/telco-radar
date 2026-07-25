@@ -41,6 +41,8 @@ def test_promo_db_reverify_keeps_first_seen(tmp_path):
 
 
 def test_mark_stale_flags_but_does_not_delete(tmp_path):
+    """Ein einzelner Fehltreffer markiert nur (Kulanzfrist) - loescht nie und
+    stoesst die andere, weiterhin bestaetigte Aktion nicht an."""
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="Alte Aktion"), _item(headline="Neue Aktion")], "2026-07-25")
     still_running = {entry_id("congstar", "Neue Aktion")}
@@ -49,6 +51,38 @@ def test_mark_stale_flags_but_does_not_delete(tmp_path):
     assert by_headline["Alte Aktion"]["status"] == "evtl. ausgelaufen"
     assert by_headline["Neue Aktion"]["status"] == "aktiv"
     assert len(db) == 2  # nichts geloescht
+
+
+def test_mark_stale_needs_two_consecutive_misses_before_retiring(tmp_path):
+    """Erst der ZWEITE Fehltreffer in Folge (ohne zwischenzeitliche
+    Bestaetigung) gilt als wirklich ausgelaufen - der eigentliche Bug war,
+    dass eine einzelne unvollstaendige Extraktion ein noch gueltiges Angebot
+    sofort von der Seite verschwinden liess."""
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(headline="Alte Aktion")], "2026-07-25")
+    db.mark_stale("congstar", set(), "2026-08-01")
+    assert db.entries[entry_id("congstar", "Alte Aktion")]["status"] == "evtl. ausgelaufen"
+    db.mark_stale("congstar", set(), "2026-08-08")
+    entry = db.entries[entry_id("congstar", "Alte Aktion")]
+    assert entry["status"] == "ausgelaufen"
+    assert entry["missed_checks"] == 2
+    assert len(db) == 1  # weiterhin nichts geloescht
+
+
+def test_reconfirmation_resets_missed_checks(tmp_path):
+    """Wird ein Angebot zwischen zwei Fehltreffern erneut bestaetigt, springt
+    es sofort zurueck auf 'aktiv' - ein einzelner Ausreisser darf sich nicht
+    ueber mehrere Laeufe hinweg aufsummieren."""
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(headline="Aktion")], "2026-07-25")
+    db.mark_stale("congstar", set(), "2026-08-01")
+    assert db.entries[entry_id("congstar", "Aktion")]["status"] == "evtl. ausgelaufen"
+    db.upsert([_item(headline="Aktion")], "2026-08-08")
+    entry = db.entries[entry_id("congstar", "Aktion")]
+    assert entry["status"] == "aktiv"
+    assert entry["missed_checks"] == 0
+    db.mark_stale("congstar", set(), "2026-08-15")
+    assert db.entries[entry_id("congstar", "Aktion")]["status"] == "evtl. ausgelaufen"
 
 
 def test_by_brand_groups(tmp_path):

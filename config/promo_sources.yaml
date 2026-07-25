@@ -11,8 +11,10 @@
 # URL pruefen - v.a. JS-Lastigkeit und ob die Seite wirklich noch existiert.
 #
 # Felder:
-#   tier      1 = grosse Netzbetreiber, 2 = Discount-/Zweitmarken,
-#             3 = Festnetz/Kabel/Glasfaser
+#   tier      1 = grosse Netzbetreiber, 2 = Discount-/Zweitmarken
+#             (Festnetz/Kabel/Glasfaser bewusst nicht getrackt - kein
+#             Interesse an diesem Segment, siehe claude/promo-uebersicht-
+#             umsetzung.md, dritte Session)
 #   kind      static (per HTTP) | js (Playwright, wie newsroom_js) |
 #             skip (dokumentierter Sonderfall, wird nicht gecrawlt)
 #   group     Mutterkonzern/Markenfamilie, wo bekannt (KEINE Netzbetreiber-
@@ -109,16 +111,3 @@ brands:
     url: https://www.simplytel.de/
     kind: js
     note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
-
-  # --------------------------------------- Tier 3: Festnetz/Kabel/Glasfaser
-  - name: PŸUR
-    tier: 3
-    group: Tele Columbus
-    url: https://www.pyur.com/privatkunden/angebote.html
-    kind: js
-  - name: Deutsche Glasfaser
-    tier: 3
-    group: Deutsche Glasfaser
-    url: https://www.deutsche-glasfaser.de/freunde-werben
-    kind: skip
-    note: "Sonderfall: keine bundesweite Aktionsseite, Angebote sind adress-/ortsbasiert (hunderte Ortsseiten). Vorerst nicht automatisiert crawlen, siehe claude/promo-uebersicht-konzept.md Risiko g."

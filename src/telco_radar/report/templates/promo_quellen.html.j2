@@ -52,22 +52,4 @@
   </div>
 </section>
 
-<section class="source-region">
-  <h2>Tier 3 · Festnetz, Kabel und Glasfaser <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 3) | list | length }} Anbieter</span></h2>
-  <div class="source-grid">
-    {% for s in sources if s.tier == 3 %}
-    <div class="source-card">
-      <div class="source-head">
-        <h3>{{ s.name }}</h3>
-        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
-      </div>
-      <ul class="source-links">
-        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
-        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
-      </ul>
-      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
-    </div>
-    {% endfor %}
-  </div>
-</section>
 {% endblock %}

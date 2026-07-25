@@ -8,15 +8,25 @@ die Marke hier die primaere Gruppierung, nicht der Tier. prepare_promo_view()
 baut pro beobachteter Marke eine Karte mit ihren aktiven Angeboten; Marken
 ohne aktuell bestaetigtes Angebot erscheinen trotzdem (leer/gedaempft), damit
 die Seite die tatsaechliche Beobachtungsabdeckung zeigt, statt Luecken zu
-verstecken."""
+verstecken.
+
+Sichtbarkeits-/Persistenzregel (siehe analyze/promo_store.py:mark_stale):
+ein Angebot, das im PromoDB-Status "evtl. ausgelaufen" ist (= EINMAL nicht
+erneut bestaetigt), bleibt hier trotzdem in der normalen Angebotsliste
+sichtbar - nur gedaempft und mit einem kleinen Hinweis-Tag markiert. Eine
+Karte soll nicht verschwinden, nur weil eine einzelne Aktualisierung das
+Angebot nicht erneut fand (unzuverlaessige LLM-Extraktion, leicht andere
+Formulierung o.ae.). Erst wer ZWEIMAL in Folge nicht erneut bestaetigt wurde
+(Status "ausgelaufen") gilt als wirklich beendet und faellt aus der
+Angebotsliste in die knappe Fussnote."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke",
-              3: "Festnetz, Kabel, Glasfaser"}
-TIER_COLOR = {1: "#3860be", 2: "#e07a00", 3: "#1a8f4c"}
+TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
+TIER_COLOR = {1: "#3860be", 2: "#e07a00"}
 _OWN_COLOR = "#e60000"
+_RETIRED_STATUS = "ausgelaufen"
 
 
 def _initials(name: str) -> str:
@@ -58,12 +68,20 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
             entries,
             key=lambda e: (e.get("status") == "aktiv", e.get("last_verified") or ""),
             reverse=True)
-        active = [e for e in entries if e.get("status") == "aktiv"]
-        stale = [e for e in entries if e.get("status") != "aktiv"]
+        # "aktiv" (bestaetigt) und "evtl. ausgelaufen" (einmal nicht erneut
+        # bestaetigt, Kulanzfrist) bleiben BEIDE in der sichtbaren Liste -
+        # nur wirklich "ausgelaufen" (zweimal in Folge nicht bestaetigt)
+        # verschwindet in die Fussnote. Siehe Modul-Docstring.
+        confirmed = [e for e in entries if e.get("status") == "aktiv"]
+        grace = [e for e in entries if e.get("status") == "evtl. ausgelaufen"]
+        for e in grace:
+            e["fading"] = True
+        visible = confirmed + grace
+        retired = [e for e in entries if e.get("status") == _RETIRED_STATUS]
         image_url = next((e.get("image_url") for e in entries if e.get("image_url")), None)
 
-        if not src.internal_reference and active:
-            active_total += len(active)
+        if not src.internal_reference and confirmed:
+            active_total += len(confirmed)
             brands_active += 1
 
         brands.append({
@@ -72,12 +90,16 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
             "color": _OWN_COLOR if src.internal_reference else TIER_COLOR.get(src.tier, "#3860be"),
             "group": src.group, "internal_reference": src.internal_reference,
             "initials": _initials(src.name), "image_url": image_url,
-            "active": active, "stale": stale, "active_count": len(active),
+            "active": visible, "stale": retired, "active_count": len(confirmed),
+            "has_offers": bool(visible),
         })
 
-    # Wettbewerber mit laufender Aktion zuerst, dann nach Tier/Name; Vodafones
-    # eigene Referenzkarte immer als letzte (siehe internal_reference).
-    brands.sort(key=lambda b: (b["internal_reference"], b["active_count"] == 0,
+    # Wettbewerber mit sichtbarem Angebot zuerst (bestaetigt oder in der
+    # Kulanzfrist), dann nach Tier/Name; Vodafones eigene Referenzkarte immer
+    # als letzte (siehe internal_reference). Bewusst has_offers statt
+    # active_count==0, damit eine Marke mit nur einem Kulanzfrist-Angebot
+    # nicht faelschlich wie eine unbeobachtete Marke ans Ende rutscht.
+    brands.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
                                 b["tier"], b["name"]))
 
     return {

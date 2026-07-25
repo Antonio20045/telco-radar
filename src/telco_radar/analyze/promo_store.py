@@ -14,6 +14,15 @@ branch (raw signal vs. curated display):
                  weeks (a promo does not vanish from the page just because a
                  week went by without a new snapshot) and are re-verified,
                  never silently deleted, when re-observed.
+
+Status lifecycle (two-strike, see mark_stale): "aktiv" -> (one missed
+re-verification) -> "evtl. ausgelaufen" (still shown on the site, just
+flagged - a single missed re-extraction is not proof the offer is gone,
+extraction can be noisy) -> (missed AGAIN, still not reconfirmed) ->
+"ausgelaufen" (now folded into the site's collapsed footnote, no longer an
+individual visible card). Any re-confirmation at any point resets straight
+back to "aktiv" with missed_checks=0 - a single blip never accumulates
+towards retirement. Nothing is ever deleted from the JSON itself.
 """
 from __future__ import annotations
 
@@ -91,6 +100,8 @@ class PromoDB:
                 e = self.entries[eid]
                 e["last_verified"] = today
                 e["status"] = "aktiv"
+                e["missed_checks"] = 0
+                e.pop("stale_since", None)
                 if it.get("description"):
                     e["description"] = it["description"]
                 if it.get("valid_until"):
@@ -106,22 +117,42 @@ class PromoDB:
                     "url": it.get("url", ""),
                     "image_url": it.get("image_url"),
                     "first_seen": today, "last_verified": today,
-                    "status": "aktiv",
+                    "status": "aktiv", "missed_checks": 0,
                 }
                 new += 1
         return new
 
     def mark_stale(self, brand: str, checked_ids: set, today: str) -> None:
-        """Nach einem Snapshot-Wechsel fuer *brand*: aktive Eintraege dieses
-        Brands, die NICHT unter *checked_ids* sind (also im neuen Snapshot
-        nicht mehr auftauchten), gelten als evtl. ausgelaufen. Sie werden NIE
-        stillschweigend geloescht - eine fehlgeschlagene LLM-Extraktion darf
-        keine Karte zum Verschwinden bringen, nur zur Markierung."""
+        """Nach einem Snapshot-Wechsel fuer *brand*: Eintraege dieses Brands,
+        die NICHT unter *checked_ids* sind (im neuen Snapshot nicht mehr
+        wiedergefunden), ruecken einen Schritt in Richtung "beendet" -
+        zwei Stufen, nie sofort und nie stillschweigend geloescht:
+
+          "aktiv"              -> "evtl. ausgelaufen" (1. Fehltreffer, bleibt
+                                   auf der Seite sichtbar, nur markiert)
+          "evtl. ausgelaufen"   -> "ausgelaufen" (2. Fehltreffer IN FOLGE,
+                                   gilt jetzt als wirklich beendet)
+
+        Ein einzelner Fehltreffer reicht also nie aus, um eine Karte
+        verschwinden zu lassen - das war der eigentliche Bug: eine einzelne
+        unvollstaendige LLM-Extraktion (oder eine minimal andere Formulierung
+        desselben Angebots) durfte ein noch gueltiges Angebot nicht sofort
+        aus der Ansicht werfen. Wird ein Eintrag zwischendurch wieder
+        bestaetigt (upsert), springt der Status sofort zurueck auf "aktiv"
+        mit missed_checks=0."""
         for e in self.entries.values():
-            if e.get("brand") == brand and e["id"] not in checked_ids \
-                    and e.get("status") == "aktiv":
+            if e.get("brand") != brand or e["id"] in checked_ids:
+                continue
+            status = e.get("status")
+            if status not in ("aktiv", "evtl. ausgelaufen"):
+                continue
+            e["missed_checks"] = int(e.get("missed_checks") or 0) + 1
+            if status == "aktiv":
                 e["status"] = "evtl. ausgelaufen"
                 e["stale_since"] = today
+            else:
+                e["status"] = "ausgelaufen"
+                e["ended_since"] = today
 
     def by_brand(self) -> dict[str, list[dict]]:
         out: dict[str, list[dict]] = {}

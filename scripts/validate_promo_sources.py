@@ -27,7 +27,8 @@ def check(src, http_cfg):
     if src.kind == "skip":
         return ("SKIP", 0, src.note or "dokumentierter Sonderfall, nicht automatisiert")
     try:
-        text = fetch_snapshot(src.url, src.kind, http_cfg)
+        snap = fetch_snapshot(src.url, src.kind, http_cfg)
+        text = snap["text"]
         return ("OK" if text.strip() else "EMPTY", len(text), "")
     except Exception as exc:  # noqa: BLE001
         return ("FAIL", 0, f"{type(exc).__name__}: {str(exc)[:80]}")

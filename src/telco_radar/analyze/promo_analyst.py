@@ -16,6 +16,14 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
+# Harte Obergrenze pro Brand und Lauf, unabhaengig davon, ob die
+# Prompt-Anweisung (keine SKU-fuer-SKU-Liste) tatsaechlich befolgt wird - eine
+# Karte mit 20 Einzelgeraete-Eintraegen ist nicht "auf einen Blick" lesbar.
+# Nimmt bewusst die ERSTEN Eintraege (das Modell wird angewiesen, die
+# wichtigsten/unterschiedlichsten Aktionen zuerst zu nennen), nicht die
+# groessten - eine harte Kappung ohne Rangfolge waere willkuerlich.
+_MAX_ENTRIES_PER_BRAND = 8
+
 _EXTRACT_SYSTEM = """\
 Du extrahierst fuer ein internes Vodafone-Wettbewerbsbriefing die aktuell
 laufenden Tarif-, Rabatt- und Kampagnenangebote von {brand} in Deutschland
@@ -34,6 +42,16 @@ Erfinde NIE einen Preis, Rabattbetrag oder ein Enddatum, das nicht woertlich
 oder eindeutig sinngemaess im Text steht. Wenn kein Enddatum genannt wird,
 lasse "valid_until" weg (null) - nicht raten. Beschreibe die Mechanik in
 eigenen Worten, kurz und laienverstaendlich, statt den Werbetext zu kopieren.
+
+WICHTIG - keine Geraete-/SKU-Liste: Wenn dieselbe Kampagne (gleicher Rabatt,
+gleiche Vertragsmechanik) nur mit unterschiedlichen Geraetemodellen oder
+Tarifvarianten wiederholt wird (z. B. "iPhone 17 ab X", "Galaxy S26 ab Y",
+"Xiaomi ab Z" - alle mit demselben Grundtarif), fasse das zu EINEM Eintrag
+zusammen und nenne die Preisspanne oder 1-2 Beispiele in der Beschreibung,
+statt jedes Geraetemodell einzeln aufzulisten. Ziel ist eine kleine Zahl klar
+unterscheidbarer Aktionen pro Anbieter (typischerweise 1-6), keine
+SKU-fuer-SKU-Liste - das Ergebnis muss sich auf einen Blick ueberblicken
+lassen.
 
 Pro gueltigem Eintrag:
 - "headline": kurzer Titel des Angebots auf Deutsch (max. 12 Woerter)
@@ -76,4 +94,8 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
             "valid_until": (str(row["valid_until"]).strip()
                            if row.get("valid_until") else None),
         })
+    if len(out) > _MAX_ENTRIES_PER_BRAND:
+        log.info("Promo-Extraktion (%s): %d Eintraege auf %d gekappt",
+                 brand, len(out), _MAX_ENTRIES_PER_BRAND)
+        out = out[:_MAX_ENTRIES_PER_BRAND]
     return out

@@ -60,12 +60,40 @@ def test_brands_with_active_offers_sort_before_empty_ones():
 
 
 def test_stale_entries_are_kept_separate_from_active():
+    """Nur wirklich 'ausgelaufen' (zweimal in Folge nicht bestaetigt) landet
+    in der separaten stale-Liste (Fussnote) und faellt aus active_count."""
     sources = [_src("congstar")]
-    entries = [_entry(headline="Laeuft"), _entry(headline="Ausgelaufen", status="evtl. ausgelaufen")]
+    entries = [_entry(headline="Laeuft"), _entry(headline="Beendet", status="ausgelaufen")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     card = view["brands"][0]
     assert card["active_count"] == 1
     assert len(card["stale"]) == 1
+    assert card["has_offers"] is True
+
+
+def test_grace_period_entries_stay_visible_but_flagged():
+    """'evtl. ausgelaufen' (ein einzelner Fehltreffer) darf NICHT einfach von
+    der Karte verschwinden - das war der eigentliche Bug. Es bleibt in der
+    normalen Angebotsliste, nur mit fading=True markiert, und zaehlt bewusst
+    NICHT in active_count (das soll die bestaetigte Zahl bleiben)."""
+    sources = [_src("congstar")]
+    entries = [_entry(headline="Vermutlich weg", status="evtl. ausgelaufen")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    card = view["brands"][0]
+    assert card["active_count"] == 0
+    assert card["has_offers"] is True
+    assert [o["headline"] for o in card["active"]] == ["Vermutlich weg"]
+    assert card["active"][0]["fading"] is True
+    assert card["stale"] == []
+
+
+def test_brand_with_only_grace_entries_does_not_sort_as_empty():
+    sources = [_src("klarmobil"), _src("congstar")]
+    entries = [_entry(brand="klarmobil", headline="Vermutlich weg", status="evtl. ausgelaufen")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    # klarmobil hat ein sichtbares (wenn auch verblassendes) Angebot,
+    # congstar gar keins - klarmobil soll deshalb zuerst stehen.
+    assert view["brands"][0]["name"] == "klarmobil"
 
 
 def test_neu_badge_uses_ten_day_cutoff():
