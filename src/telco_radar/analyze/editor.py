@@ -12,7 +12,7 @@ from collections import defaultdict
 from datetime import date
 
 from ..models import Item
-from .llm import complete
+from .llm import complete, llm_available
 
 log = logging.getLogger(__name__)
 
@@ -142,18 +142,38 @@ def validate_editorial_briefing(markdown: str) -> None:
 
 def build_digest(items_by_region: dict[str, list[Item]],
                  region_names: dict[str, str],
-                 llm_was_available: bool = False) -> tuple[str, list[str]]:
-    """No-LLM fallback: deterministic digest of all new items."""
+                 llm_was_available: bool = False,
+                 include_note: bool = True) -> tuple[str, list[str]]:
+    """No-LLM fallback: deterministic digest of all new items.
+
+    `include_note` is False when the caller already explains upstream why the
+    digest is raw - otherwise the page carries two notes that say the same
+    thing in different words.
+    """
     if llm_was_available:
         lines = ["## Wochenueberblick", ""]
+    elif not include_note:
+        lines = ["## Roh-Digest (ohne redaktionelle Verdichtung)", ""]
+    elif llm_available():
+        # A key IS configured - the provider just did not answer. Claiming a
+        # missing key here put a false statement on the public report page.
+        lines = [
+            "## Roh-Digest (ohne redaktionelle Verdichtung)",
+            "",
+            "_Der Analyse-Dienst war in diesem Lauf nicht erreichbar. Dies ist "
+            "die ungefilterte Liste aller NEUEN Meldungen mit ihren "
+            "Originalquellen; die redaktionelle Verdichtung wird im naechsten "
+            "Lauf erneut versucht._",
+            "",
+        ]
     else:
         lines = [
             "## Roh-Digest (ohne KI-Analyse)",
             "",
-            "_`ANTHROPIC_API_KEY` ist nicht gesetzt - dies ist die ungefilterte "
-            "Liste aller NEUEN Meldungen. Mit API-Key liefert Telco Radar "
-            "analysierte Briefings mit Dringlichkeitsbewertung und "
-            "Handlungsempfehlungen._",
+            "_Es ist kein Zugang zu einem Analyse-Modell konfiguriert - dies "
+            "ist die ungefilterte Liste aller NEUEN Meldungen. Mit "
+            "konfiguriertem Modell liefert Telco Radar analysierte Briefings "
+            "mit Dringlichkeitsbewertung._",
             "",
         ]
     topics: list[str] = []

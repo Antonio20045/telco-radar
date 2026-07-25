@@ -177,7 +177,8 @@ def run(root: Path, use_llm: bool | None = None,
                 "Editorial synthesis failed (%s); publishing a labelled "
                 "source-linked fallback digest", str(exc)[:180])
             fallback, covered = editor.build_digest(
-                items_by_region, cfg.region_names, llm_was_available=False)
+                items_by_region, cfg.region_names, llm_was_available=False,
+                include_note=False)  # the Redaktions-Fallback note below says it
             body = (
                 "## Redaktions-Fallback\n\n"
                 "> Die aktuelle Quellenliste konnte wegen einer vorübergehenden "
