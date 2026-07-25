@@ -21,7 +21,7 @@ openai_editor_model: "deepseek-ai/deepseek-v4-pro"
 lookback_days: 8
 
 # Hard cap of items handed to one regional analyst call
-max_items_per_region: 24
+max_items_per_region: 15
 
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
@@ -29,7 +29,11 @@ reported_topics_memory: 300
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the
 # editor synthesis still runs once, after the analysts. Same models, same output.
-llm_max_workers: 4
+llm_max_workers: 2
+
+# A temporary LLM outage must not leave the public site stale. The pipeline
+# publishes a clearly labelled, source-linked fallback digest instead.
+publish_requires_editorial_briefing: false
 
 # ---------------------------------------------------------------------------
 # Sources: every operator has its OWN official primary source (feed / json_api /

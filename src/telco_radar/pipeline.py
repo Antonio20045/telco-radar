@@ -158,14 +158,25 @@ def run(root: Path, use_llm: bool | None = None,
                 language=language)
             editor_used = True
         except Exception as exc:  # noqa: BLE001
-            # The weekly public site is an editorial product. Publishing a raw
-            # source list after an editor/provider failure is worse than
-            # retaining last week's verified briefing, so stop before any
-            # report, state or site artefact is written.
-            raise RuntimeError(
-                "Editorial synthesis failed; refusing to publish a raw "
-                "source digest. The previous briefing remains live."
-            ) from exc
+            if cfg.settings.get("publish_requires_editorial_briefing", True):
+                raise RuntimeError(
+                    "Editorial synthesis failed; refusing to publish a raw "
+                    "source digest. The previous briefing remains live."
+                ) from exc
+            log.warning(
+                "Editorial synthesis failed (%s); publishing a labelled "
+                "source-linked fallback digest", str(exc)[:180])
+            fallback, covered = editor.build_digest(
+                items_by_region, cfg.region_names, llm_was_available=False)
+            body = (
+                "## Redaktions-Fallback\n\n"
+                "> Die aktuelle Quellenliste konnte wegen einer vorübergehenden "
+                "Störung des Analyse-Dienstes nicht redaktionell verdichtet "
+                "werden. Die Links und Meldungen stammen trotzdem aus diesem "
+                "Lauf; die automatische Redaktion wird im nächsten Lauf erneut "
+                "versucht.\n\n" + fallback
+            )
+            editor_used = False
     else:
         if (new_items and not llm_was_explicitly_disabled
                 and cfg.settings.get("publish_requires_editorial_briefing", True)):

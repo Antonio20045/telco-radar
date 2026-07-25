@@ -127,7 +127,7 @@ def _complete_anthropic(system: str, user: str, model: str,
 
 
 def complete(system: str, user: str, model: str,
-             max_tokens: int = 4096, retries: int = 5) -> str:
+             max_tokens: int = 4096, retries: int = 3) -> str:
     """Single-turn completion via the active backend."""
     if _use_openai():
         return _complete_openai(system, user, model, max_tokens, retries)
