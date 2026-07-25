@@ -15,7 +15,22 @@ editor_model: "claude-sonnet-5"
 
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"
-openai_editor_model: "deepseek-ai/deepseek-v4-pro"
+# Gemessen am 25.07.2026 mit dem ECHTEN Editor-Prompt (14k Token Eingabe,
+# 5000 Token Ausgabe) gegen integrate.api.nvidia.com, 8 Versuche je Modell:
+#
+#   v4-pro    1 von 8 erfolgreich. Die Fehlschlaege sind Read-Timeouts nach
+#             300-600s ohne ein einziges Byte, unabhaengig von Prompt-Groesse,
+#             max_tokens, Streaming oder dem thinking-Flag. Ein geglueckter
+#             Lauf brauchte 312s, davon 305s reine Wartezeit in der Queue.
+#             Auf diesem geteilten Gratis-Endpunkt ist die Wartezeit nach oben
+#             offen - fuer einen Cron-Lauf damit unbrauchbar.
+#   v4-flash  antwortet in 8-21s, sauber beendet (finish_reason=stop, ~470
+#             Token). Die Fehlschlaege sind HTTP 503 nach 0,3-0,4s, also
+#             "gerade voll, frag gleich nochmal" - billig zu wiederholen.
+#
+# Deshalb laeuft auch die Redaktion auf flash. Wer v4-pro erneut versuchen
+# will, aendert nur diese Zeile; scripts/llm_probe4.py misst es nach.
+openai_editor_model: "deepseek-ai/deepseek-v4-flash"
 
 # Only items newer than this many days are considered.
 lookback_days: 8

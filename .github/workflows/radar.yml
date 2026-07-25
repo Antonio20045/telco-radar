@@ -23,9 +23,9 @@ jobs:
   radar:
     runs-on: ubuntu-latest
     # Headroom over the worst realistic case: collection ~2 min, analysts ~4 min,
-    # plus one exhausted retry budget on a stalled editor model (~4 min at the
-    # 75s request timeout) before the run switches to the stand-in model.
-    timeout-minutes: 45
+    # and up to four LLM stages that each exhaust their 300s call budget before
+    # giving up. Was 35, which killed runs #30 and #33 mid-pipeline.
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
 

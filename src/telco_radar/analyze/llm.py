@@ -47,11 +47,30 @@ def active_backend() -> str:
 # Client errors that will never succeed on retry (bad key, bad request, bad model)
 _FATAL_STATUSES = {400, 401, 403, 404, 405, 422}
 
-# Read timeout for a single request. A provider that accepts the connection but
-# never returns a token - NVIDIA's shared endpoint under load does exactly that
-# for the big models - must not eat the whole job budget. At 180s three retries
-# cost 9.4 min PER STAGE, which killed runs #29-#33 on the 35 min job timeout.
-DEFAULT_HTTP_TIMEOUT = 75.0
+# Read timeout for a single request. Measured on 2026-07-25 against
+# integrate.api.nvidia.com with the real editor prompt: a served request answers
+# in 8-21s, so 180s is generous. Lowering this to 75s (as an earlier attempt did)
+# only turns slow successes into failures - it does not help.
+DEFAULT_HTTP_TIMEOUT = 180.0
+
+# Wall clock for ONE logical completion, across all its retries. Replaces the
+# old "fixed number of attempts" budget, which behaved completely differently
+# depending on whether the failures were instant or slow.
+DEFAULT_CALL_BUDGET = 300.0
+
+# The two failure modes cost wildly different amounts of time, and the old code
+# treated them the same - which was the actual bug behind runs #29-#34:
+#
+#   cheap  HTTP 503 "ResourceExhausted: Worker local total request limit
+#          reached" comes back in 0.3-0.4s. It means "busy, ask again", and
+#          retrying is nearly free. The old policy gave up after 3 tries and
+#          ~24s of backoff on exactly this.
+#   slow   a read timeout burns the full HTTP timeout with nothing to show.
+#          The old policy happily spent 3x180s = 9.4 min on it, per stage.
+#
+# So: retry the cheap failures generously, the slow ones barely at all.
+MAX_SLOW_FAILURES = 2
+CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
 
 # model -> stand-in, consulted only after the preferred model failed hard.
 _FALLBACKS: dict[str, str] = {}
@@ -82,6 +101,15 @@ def http_timeout() -> float:
     return value if value > 0 else DEFAULT_HTTP_TIMEOUT
 
 
+def call_budget() -> float:
+    """Wall clock for one completion incl. retries; LLM_CALL_BUDGET overrides."""
+    try:
+        value = float(os.environ.get("LLM_CALL_BUDGET") or DEFAULT_CALL_BUDGET)
+    except ValueError:
+        return DEFAULT_CALL_BUDGET
+    return value if value > 0 else DEFAULT_CALL_BUDGET
+
+
 def set_fallback(model: str, fallback: str) -> None:
     """Register `fallback` as the stand-in for `model`."""
     if model and fallback and model != fallback:
@@ -99,8 +127,21 @@ def dead_models() -> set[str]:
 
 
 def _post_with_retries(url, payload, headers, retries, parse):
+    """Retry until the time budget is spent, weighted by what each failure cost.
+
+    `retries` is kept for call-site compatibility but now only caps the slow
+    failures; the cheap "server is busy" retries are governed by the budget.
+    """
+    budget = call_budget()
+    deadline = time.monotonic() + budget
+    slow_failures = 0
+    cheap_failures = 0
     last_err: Exception | None = None
-    for attempt in range(1, retries + 1):
+    attempt = 0
+
+    while True:
+        attempt += 1
+        started = time.monotonic()
         try:
             resp = httpx.post(url, json=payload, headers=headers,
                               timeout=http_timeout())
@@ -118,11 +159,33 @@ def _post_with_retries(url, payload, headers, retries, parse):
             raise LLMFatalError(f"LLM fatal error: {exc}")
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
-            wait = min(4 * attempt, 12)
-            log.warning("LLM call failed (attempt %d/%d): %s - retrying in %ds",
-                        attempt, retries, str(exc)[:160], wait)
+            elapsed = time.monotonic() - started
+            # A failure that came back fast is a capacity signal, not a broken
+            # request: ask again. One that ate the whole HTTP timeout is not
+            # worth repeating more than a couple of times.
+            if elapsed >= http_timeout() * 0.5:
+                slow_failures += 1
+                if slow_failures >= max(1, min(retries, MAX_SLOW_FAILURES)):
+                    raise RuntimeError(
+                        f"LLM call failed after {attempt} attempts "
+                        f"({slow_failures} slow): {last_err}")
+                wait = 2.0
+            else:
+                cheap_failures += 1
+                wait = CHEAP_BACKOFF_SECONDS[
+                    min(cheap_failures - 1, len(CHEAP_BACKOFF_SECONDS) - 1)]
+
+            remaining = deadline - time.monotonic()
+            if remaining <= wait:
+                raise RuntimeError(
+                    f"LLM call failed after {attempt} attempts / "
+                    f"{budget:.0f}s budget: {last_err}")
+            log.warning("LLM call failed (attempt %d, %s after %.1fs): %s "
+                        "- retrying in %.0fs (%.0fs budget left)",
+                        attempt, "slow" if elapsed >= http_timeout() * 0.5
+                        else "busy", elapsed, str(last_err)[:140], wait,
+                        remaining)
             time.sleep(wait)
-    raise RuntimeError(f"LLM call failed after {retries} attempts: {last_err}")
 
 
 def _complete_openai(system: str, user: str, model: str,
