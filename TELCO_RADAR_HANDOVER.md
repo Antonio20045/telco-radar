@@ -59,6 +59,17 @@ Wichtige Live-Seiten:
 | .github/workflows/radar.yml | Actions-Lauf, Commit und Render-Deploy |
 | TELCO_RADAR_QUELLEN.md | ausführliche verifizierte Quellenliste |
 | outputs/quellen-audit-2026-07-22.md | Quellen-Audit und Empfehlungen |
+| config/promo_sources.yaml | Quellen fuer "Promo Uebersicht" (Deutschland) |
+| src/telco_radar/promo_config.py | Loader fuer promo_sources.yaml |
+| src/telco_radar/collect/promo_snapshot.py | Snapshot-Diff-Collector fuer Aktionsseiten |
+| src/telco_radar/analyze/promo_store.py | SnapshotStore + PromoDB (State der Promo-Uebersicht) |
+| src/telco_radar/analyze/promo_analyst.py | LLM-Extraktion von Angeboten aus Snapshots |
+| src/telco_radar/analyze/promo_editor.py | Redaktion des woechentlichen Promo-Berichts |
+| src/telco_radar/promo_pipeline.py | Pipeline-Stufe der Promo-Uebersicht |
+| data/state/promo_snapshots.json | letzter Content-Hash je Anbieter (Diff-Erkennung) |
+| data/state/promo_db.json | kuratierte, versionierte Promo-Datenbank |
+| data/reports/promo/ | archivierte Promo-Wochenberichte |
+| scripts/validate_promo_sources.py | Health-Check der Promo-Quellen |
 
 ## 4. Pipeline
 
@@ -272,3 +283,55 @@ enthalten.
 4. seen.jsonl und aktuelle Reports gegen Links und Zusammenfassungen in site
    prüfen.
 5. Erst danach weitere Quellen oder LLM-Parameter ändern.
+
+## 12. Promo Übersicht (Deutschland, neuer zweiter Anwendungsfall)
+
+Zweiter Anwendungsfall neben Marktrecherche (eigener Tab in der Kopfzeile,
+eigene Subnav unter /promo/). Beobachtet Tarif-, Rabatt- und Kampagnen-
+aktionen aller Telcos in Deutschland (Netzbetreiber + Discount-/Zweitmarken).
+Ausfuehrliches Konzeptdokument (Premortem, Anforderungen, Quellenliste) liegt
+im verknuepften Claude-Projekt unter `claude/promo-uebersicht-konzept.md`.
+
+Warum ein eigener Zweig statt Wiederverwendung der bestehenden Presse-
+Collector: Aktionsseiten sind Live-Snapshots ohne Historie (anders als
+Presse-RSS, wo jeder Artikel ein diskretes, datiertes Signal ist). Deshalb:
+
+- **Quellen:** config/promo_sources.yaml (hand-gepflegt, NICHT von
+  scripts/build_sources.py generiert - andere Quellenart als watchlist.yaml).
+  Health-Check: `python scripts/validate_promo_sources.py`.
+- **Collector:** collect/promo_snapshot.py holt jede Aktionsseite (statisch
+  oder per Playwright, je nach `kind` in der Config), extrahiert den
+  sichtbaren Text und hasht ihn.
+- **State:** analyze/promo_store.py - SnapshotStore (data/state/
+  promo_snapshots.json, nur Hash je Anbieter fuer die Aenderungserkennung)
+  und PromoDB (data/state/promo_db.json, kuratierte, versionierte Liste mit
+  first_seen/last_verified/status - alte Eintraege werden bei Nicht-
+  Bestaetigung als "evtl. ausgelaufen" markiert, NIE stillschweigend
+  geloescht).
+- **LLM-Schicht:** analyze/promo_analyst.py extrahiert konkrete Angebote NUR
+  aus Snapshots, die sich seit dem letzten Lauf geaendert haben - erfindet
+  nie einen Preis oder ein Enddatum. analyze/promo_editor.py schreibt daraus
+  den Wochenbericht (validierte Markdown-Struktur, Quellenlink-Pflicht, keine
+  Vodafone-Handlungsempfehlung), mit regelbasiertem Fallback ohne LLM.
+- **Pipeline:** promo_pipeline.py wird aus pipeline.py aufgerufen (per
+  `promo_enabled: true` in settings.yaml abschaltbar), in try/except - ein
+  Fehler bricht den Hauptlauf nie ab. Seitenabruf laeuft nebenlaeufig
+  (ThreadPoolExecutor, wie collect_all()).
+- **Site:** report/promo.py (Anzeige-Vorbereitung) + Templates
+  promo_index.html.j2/promo_quellen.html.j2, gerendert nach site/promo/. Die
+  Kopfzeile (base.html.j2) unterscheidet jetzt per `usecase`-Variable
+  zwischen Marktrecherche und Promo Uebersicht.
+- **Vodafone selbst** ist in promo_sources.yaml mit `internal_reference:
+  true` markiert - erscheint separat, zaehlt nicht als Wettbewerber.
+- **Bekannte Grenzen (Stand Einfuehrung):** die meisten Marken-URLs sind
+  recherchiert, aber NICHT einzeln per validate_promo_sources.py verifiziert;
+  ein paar Discounter (mobilcom-debitel, PremiumSIM, simplytel) haben keine
+  saubere feste Aktionsseite, sondern Tarifkataloge - beobachten, ob die
+  Extraktion dort brauchbar bleibt. Deutsche Glasfaser ist bewusst als
+  `kind: skip` markiert (keine bundesweite Aktionsseite, nur Ortsseiten).
+- **Wichtig fuer Tests:** tests/test_pipeline.py's `project`-Fixture setzt
+  `promo_enabled: false`, weil sie den ganzen config/-Ordner kopiert (inkl.
+  promo_sources.yaml) und die "js"-Quellen dort echtes Playwright/Netzwerk
+  brauchen, das die Fixture (nur httpx.get gemockt) nicht abdeckt. Beim
+  Hinzufuegen weiterer Playwright-basierter Zweige immer pruefen, ob ein
+  offline-Test versehentlich echtes Netzwerk anstoesst.

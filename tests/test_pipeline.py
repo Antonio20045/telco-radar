@@ -19,6 +19,11 @@ def project(tmp_path):
     # (production keeps crawl_newsrooms: false) and drop auto Bing feeds/focus
     settings = (tmp_path / "config" / "settings.yaml").read_text(encoding="utf-8")
     settings += "\ncrawl_newsrooms: true\nauto_operator_news: false\nfocus_competitors: []\n"
+    # The copied config/ also brings config/promo_sources.yaml. Its "js" brands
+    # go through Playwright (collect/newsroom_js.py), which the fake_http
+    # fixture below cannot mock (it only patches httpx.get) - so leaving the
+    # promo stage on here would make this "offline" test hit the real network.
+    settings += "\npromo_enabled: false\n"
     (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     # shrink watchlist to one operator + one news feed for the test
     (tmp_path / "config" / "watchlist.yaml").write_text(

@@ -1,0 +1,73 @@
+{% extends "base.html.j2" %}
+{% set usecase = 'promo' %}
+{% set active = 'promo_quellen' %}
+{% block title %}Promo Übersicht · Quellen{% endblock %}
+{% set kmap = {'static': 'Aktionsseite', 'js': 'Aktionsseite (JS)', 'skip': 'Referenz (nicht automatisiert)'} %}
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Transparenz</p>
+      <h1>Beobachtete Anbieter</h1>
+    </div>
+  </div>
+  <p class="page-lead">Jede Zeile ist die <strong>eigene Aktions-/Tarifseite</strong> des Anbieters – keine Preisvergleichsseite gilt hier als Quelle eines Anbieters. Vergleichsportale und Fachpresse dienen höchstens als ergänzende, klar getrennte Diskoveryschicht (nicht automatisiert eingebunden).</p>
+</section>
+
+<section class="source-region">
+  <h2>Tier 1 · Große Netzbetreiber <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 1) | list | length }} Anbieter</span></h2>
+  <div class="source-grid">
+    {% for s in sources if s.tier == 1 %}
+    <div class="source-card">
+      <div class="source-head">
+        <h3>{{ s.name }}{% if s.internal_reference %} <span class="chip">eigene Marke</span>{% endif %}</h3>
+        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
+      </div>
+      <ul class="source-links">
+        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
+        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
+      </ul>
+      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="source-region">
+  <h2>Tier 2 · Discount- und Zweitmarken <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 2) | list | length }} Anbieter</span></h2>
+  <div class="source-grid">
+    {% for s in sources if s.tier == 2 %}
+    <div class="source-card">
+      <div class="source-head">
+        <h3>{{ s.name }}</h3>
+        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
+      </div>
+      <ul class="source-links">
+        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
+        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
+      </ul>
+      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="source-region">
+  <h2>Tier 3 · Festnetz, Kabel und Glasfaser <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 3) | list | length }} Anbieter</span></h2>
+  <div class="source-grid">
+    {% for s in sources if s.tier == 3 %}
+    <div class="source-card">
+      <div class="source-head">
+        <h3>{{ s.name }}</h3>
+        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
+      </div>
+      <ul class="source-links">
+        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
+        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
+      </ul>
+      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

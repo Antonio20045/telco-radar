@@ -12,6 +12,7 @@
   <link rel="icon" type="image/png" href="{{ prefix }}logo.png">
 </head>
 <body>
+  {% set uc = usecase | default('markt') %}
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a class="brand" href="{{ prefix }}index.html" aria-label="Vodafone Insights">
@@ -19,11 +20,17 @@
         <span class="brand-name">Vodafone<em>Insights</em></span>
       </a>
       <nav class="usecases" aria-label="Anwendungsfälle">
-        <a class="uc active" href="{{ prefix }}index.html">Marktrecherche</a>
-        <span class="uc soon" title="folgt">weitere folgen</span>
+        <a class="uc {% if uc=='markt' %}active{% endif %}" href="{{ prefix }}index.html">Marktrecherche</a>
+        <a class="uc {% if uc=='promo' %}active{% endif %}" href="{{ prefix }}promo/index.html">Promo Übersicht</a>
       </nav>
     </div>
     <div class="subbar">
+      {% if uc == 'promo' %}
+      <nav class="wrap subnav" aria-label="Promo Übersicht">
+        <a href="{{ prefix }}promo/index.html" {% if active=='promo_uebersicht' %}class="on"{% endif %}>Übersicht</a>
+        <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
+      </nav>
+      {% else %}
       <nav class="wrap subnav" aria-label="Marktrecherche">
         <a href="{{ prefix }}index.html" {% if active=='uebersicht' %}class="on"{% endif %}>Übersicht</a>
         <a href="{{ prefix }}bericht.html" {% if active=='bericht' %}class="on"{% endif %}>Bericht</a>
@@ -33,6 +40,7 @@
         <a href="{{ prefix }}archive.html" {% if active=='archive' %}class="on"{% endif %}>Archiv</a>
         <a href="{{ prefix }}sources.html" {% if active=='sources' %}class="on"{% endif %}>Quellen</a>
       </nav>
+      {% endif %}
     </div>
   </header>
   <main>
@@ -42,7 +50,7 @@
   </main>
   <footer class="foot">
     <div class="wrap foot-inner">
-      <span>Vodafone Insights &middot; Marktrecherche</span>
+      <span>Vodafone Insights &middot; {% if uc == 'promo' %}Promo Übersicht{% else %}Marktrecherche{% endif %}</span>
       <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
     </div>
   </footer>

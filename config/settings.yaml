@@ -69,6 +69,12 @@ editor_model_fallback: true
 # (config/news_sources.yaml).
 # ---------------------------------------------------------------------------
 
+# Promo Uebersicht (Deutschland): eigener zweiter Anwendungsfall neben der
+# globalen Marktrecherche (siehe promo_pipeline.py, config/promo_sources.yaml).
+# Eigene Quellen und eigener State - kann bei Bedarf ausgeschaltet werden,
+# ohne den Hauptlauf/die Hauptseite zu beruehren.
+promo_enabled: true
+
 # Focus competitors for the dedicated "Wettbewerber" deep-dive tab.
 focus_competitors:
   - name: "Deutsche Telekom"

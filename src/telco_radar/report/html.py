@@ -15,8 +15,10 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from .differentiation import build_differentiation, DIFF_THEMES
+from .promo import prepare_promo_view
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
+from ..promo_config import load_promo_config
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
 
@@ -559,6 +561,48 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             if diff_report else "",
             num_operators=num_operators),
         encoding="utf-8")
+
+    # ---- Promo Uebersicht: eigener zweiter Anwendungsfall neben Marktrecherche
+    # (siehe promo_pipeline.py). Eigene Quellen (config/promo_sources.yaml),
+    # eigener State (data/state/promo_db.json) - komplett getrennt vom
+    # Presse-Collect oben. Fehlt der State (z. B. render_site() ohne
+    # vorherigen Promo-Lauf), wird einfach eine leere Uebersicht gerendert.
+    if cfg is not None:
+        promo_cfg = load_promo_config(cfg.root)
+        promo_db_raw: dict = {}
+        promo_db_path = state_dir / "promo_db.json"
+        if promo_db_path.exists():
+            try:
+                promo_db_raw = json.loads(promo_db_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                log.warning("promo_db.json unlesbar - rendere leere Promo-Uebersicht")
+        promo_entries = promo_db_raw.get("entries") or []
+        promo_updated = promo_db_raw.get("updated") or (latest["date"] if latest else "")
+        promo_view = prepare_promo_view(promo_entries, promo_cfg.sources, promo_updated)
+
+        promo_report_dir = reports_dir / "promo"
+        promo_report = None
+        if promo_report_dir.exists():
+            cands = [f for f in promo_report_dir.glob("*.md") if _DATE_RE.fullmatch(f.stem)]
+            if cands:
+                p = max(cands, key=lambda f: f.stem)
+                promo_report = {"date": p.stem, "briefing_md": p.read_text(encoding="utf-8")}
+
+        promo_dir = site_dir / "promo"
+        promo_dir.mkdir(exist_ok=True)
+        (promo_dir / "index.html").write_text(
+            env.get_template("promo_index.html.j2").render(
+                prefix="../", date_de=_fmt_date_de(promo_updated),
+                promo_view=promo_view,
+                promo_report_html=_md_to_html(promo_report["briefing_md"])
+                if promo_report else "",
+                promo_report_date=_fmt_date_de(promo_report["date"])
+                if promo_report else ""),
+            encoding="utf-8")
+        (promo_dir / "quellen.html").write_text(
+            env.get_template("promo_quellen.html.j2").render(
+                prefix="../", sources=promo_cfg.sources),
+            encoding="utf-8")
 
     # ---- Protokoll
     run = (latest or {}).get("run") if latest else None

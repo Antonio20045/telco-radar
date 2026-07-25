@@ -1,0 +1,124 @@
+# =============================================================================
+# TELCO RADAR - Promo-Uebersicht: Quellen (Deutschland)
+# =============================================================================
+# Hand-gepflegt (bewusst NICHT von scripts/build_sources.py generiert): das
+# sind Endkunden-Aktions-/Tarifseiten, keine Presse-Newsrooms. Andere
+# Quellenart als config/watchlist.yaml, deshalb eigene Datei und eigener
+# Collector (siehe src/telco_radar/collect/promo_snapshot.py).
+#
+# Recherchestand: 25.07.2026 per Websuche, NICHT einzeln per
+# scripts/validate_promo_sources.py verifiziert. Vor produktivem Einsatz jede
+# URL pruefen - v.a. JS-Lastigkeit und ob die Seite wirklich noch existiert.
+#
+# Felder:
+#   tier      1 = grosse Netzbetreiber, 2 = Discount-/Zweitmarken,
+#             3 = Festnetz/Kabel/Glasfaser
+#   kind      static (per HTTP) | js (Playwright, wie newsroom_js) |
+#             skip (dokumentierter Sonderfall, wird nicht gecrawlt)
+#   group     Mutterkonzern/Markenfamilie, wo bekannt (KEINE Netzbetreiber-
+#             Behauptung - manche Discounter senden ueber mehrere Netze)
+#   internal_reference  true fuer Vodafone selbst: erscheint separat markiert,
+#             zaehlt NICHT als Wettbewerber (siehe report/promo.py)
+# =============================================================================
+brands:
+  # ---------------------------------------------------------- Tier 1: MNOs
+  - name: Telekom Deutschland
+    tier: 1
+    group: Deutsche Telekom
+    url: https://www.telekom.de/unterwegs/aktionen
+    kind: js
+  - name: Vodafone Deutschland
+    tier: 1
+    group: Vodafone
+    url: https://www.vodafone.de/handy/angebote.html
+    kind: js
+    internal_reference: true
+    note: "Eigene Marke - interne Referenz, nicht Teil der Wettbewerbsauswertung."
+  - name: O2 / Telefónica Deutschland
+    tier: 1
+    group: Telefónica Deutschland
+    url: https://www.o2online.de/deals/
+    kind: js
+  - name: 1&1 Mobilfunk
+    tier: 1
+    group: 1&1 / United Internet
+    url: https://mobile.1und1.de/handyvertrag
+    kind: js
+    note: "Kein festes /aktionen-Muster, Tarifseite mit laufenden Aktionspreisen. Presse-RSS ist bereits in config/watchlist.yaml erfasst."
+
+  # ------------------------------------------------ Tier 2: Discount-Marken
+  - name: congstar
+    tier: 2
+    group: Deutsche Telekom
+    url: https://www.congstar.de/handytarife/angebote/
+    kind: static
+  - name: Otelo
+    tier: 2
+    group: Vodafone
+    url: https://www.otelo.de/
+    kind: js
+    note: "Keine dedizierte Aktions-Unterseite gefunden, Homepage fuehrt aktuelle Kampagnen."
+  - name: Blau
+    tier: 2
+    group: Telefónica Deutschland
+    url: https://www.blau.de/handy-angebote/
+    kind: static
+  - name: ALDI TALK
+    tier: 2
+    group: MEDION / Telefónica-Netz
+    url: https://www.alditalk.de/angebote
+    kind: static
+  - name: mobilcom-debitel
+    tier: 2
+    group: freenet Group
+    url: https://www.mobilcom-debitel.de/handytarife/
+    kind: js
+    note: "Sonderfall: filterbarer Tarifkatalog statt fester Aktionsseite - Extraktion ggf. unzuverlaessig, beobachten."
+  - name: klarmobil
+    tier: 2
+    group: freenet Group
+    url: https://www.klarmobil.de/unternehmen/presse/
+    kind: static
+    note: "Presseseite als Primaerquelle gewaehlt (strukturierter als der Tarifkatalog unter klarmobil.de/handytarife/)."
+  - name: Lidl Connect
+    tier: 2
+    group: Lidl / Drillisch
+    url: https://www.lidl-connect.de/
+    kind: js
+  - name: Penny Mobil
+    tier: 2
+    group: Telekom-Netz (D1)
+    url: https://www.pennymobil.de/
+    kind: js
+    note: "Keine dedizierte Aktionsseite gefunden, Homepage als bester Fallback. connect.de deckt einzelne Kampagnen redaktionell ab."
+  - name: winSIM
+    tier: 2
+    group: 1&1 / Drillisch
+    url: https://www.winsim.de/
+    kind: js
+    note: "Rotierende Angebote auf der Startseite, kein fester Pfad."
+  - name: PremiumSIM
+    tier: 2
+    group: 1&1 / Drillisch
+    url: https://www.premiumsim.de/
+    kind: js
+    note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
+  - name: simplytel
+    tier: 2
+    group: 1&1 / Drillisch
+    url: https://www.simplytel.de/
+    kind: js
+    note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
+
+  # --------------------------------------- Tier 3: Festnetz/Kabel/Glasfaser
+  - name: PŸUR
+    tier: 3
+    group: Tele Columbus
+    url: https://www.pyur.com/privatkunden/angebote.html
+    kind: js
+  - name: Deutsche Glasfaser
+    tier: 3
+    group: Deutsche Glasfaser
+    url: https://www.deutsche-glasfaser.de/freunde-werben
+    kind: skip
+    note: "Sonderfall: keine bundesweite Aktionsseite, Angebote sind adress-/ortsbasiert (hunderte Ortsseiten). Vorerst nicht automatisiert crawlen, siehe claude/promo-uebersicht-konzept.md Risiko g."

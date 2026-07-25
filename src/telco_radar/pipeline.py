@@ -285,6 +285,24 @@ def run(root: Path, use_llm: bool | None = None,
     except Exception as exc:  # noqa: BLE001
         log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
+    # ---------------------------------------------- Promo-Uebersicht (DE)
+    # Eigener zweiter Anwendungsfall neben Marktrecherche: Tarif-/Kampagnen-
+    # aktionen aller Telcos in Deutschland, per Snapshot-Diff der jeweils
+    # eigenen Aktionsseite gesammelt statt per Presse-RSS (siehe
+    # promo_pipeline.py + config/promo_sources.yaml). Failsafe: bricht den
+    # Gesamtlauf nie ab; per settings.yaml (promo_enabled) abschaltbar.
+    promo_result: dict = {}
+    if cfg.settings.get("promo_enabled", True):
+        try:
+            from .promo_pipeline import run_promo_stage
+            promo_result = run_promo_stage(
+                root, cfg.settings.get("http", {}), bool(use_llm),
+                editor_model, language=language)
+            log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
+                     promo_result.get("mode"), promo_result.get("active", 0))
+        except Exception as exc:  # noqa: BLE001
+            log.error("Promo-Uebersicht uebersprungen: %s", exc)
+
     # ----------------------------------------- Differenzierungsbericht-Agent
     # Der Bericht arbeitet auf der aktualisierten, versionierten DB. Er ist
     # deshalb ein eigener Editorial-Schritt und nicht nur eine Umformatierung
