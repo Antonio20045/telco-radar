@@ -1,0 +1,38 @@
+name: LLM Probe
+
+# Reine Diagnose. Beruehrt data/ und site/ nicht, committet nichts und
+# loest keinen Render-Deploy aus. Nur manuell startbar.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install httpx
+        run: pip install httpx
+
+      - name: Probe LLM endpoint
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_BASE: https://integrate.api.nvidia.com/v1
+        run: python scripts/llm_probe.py 2>&1 | tee probe.log
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### LLM Probe"
+            echo
+            echo '```text'
+            cat probe.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
