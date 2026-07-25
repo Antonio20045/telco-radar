@@ -715,15 +715,29 @@ main{padding-bottom:8px}
 .promo-card-sub{margin:3px 18px 0;font-size:12px;color:var(--vf-faint)}
 
 .promo-offers{list-style:none;margin:10px 18px 2px;padding:0;display:flex;flex-direction:column}
-.promo-offer{padding:10px 0;border-top:1px solid var(--vf-line)}
+.promo-offer{padding:9px 0;border-top:1px solid var(--vf-line)}
 .promo-offer:first-child{border-top:none}
+.promo-offer--fading{opacity:.6}
 .promo-offer-top{display:flex;align-items:baseline;gap:8px}
 .promo-offer-title{flex:1;font-size:14px;font-weight:700;line-height:1.35;color:var(--vf-ink)}
 .promo-offer-title:hover{color:var(--vf-red)}
 .promo-offer-new{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   color:#fff;background:var(--vf-red);padding:2px 7px;border-radius:100px}
-.promo-offer-desc{font-size:12.5px;line-height:1.45;color:#575b61;margin:4px 0 0}
-.promo-offer-meta{font-size:11px;color:var(--vf-faint);margin:4px 0 0}
+.promo-offer-fading-tag{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.03em;
+  color:var(--vf-mute);background:var(--vf-neutral);padding:2px 7px;border-radius:100px;white-space:nowrap}
+.promo-offer-desc{font-size:12.5px;line-height:1.45;color:#575b61;margin:6px 0 0}
+.promo-offer-meta{font-size:11px;color:var(--vf-faint);margin:3px 0 0}
+/* Beschreibung ist bewusst NICHT immer sichtbar - nur Titel + Kurz-Meta
+   (Quelle/Datum) stehen standardmaessig da, damit eine Karte mit mehreren
+   Angeboten auf einen Blick lesbar bleibt. "mehr erfahren" holt den
+   erklaerenden Satz bei Bedarf ein (natives <details>, kein JS). */
+.promo-offer-desc-toggle{margin:3px 0 0}
+.promo-offer-desc-toggle>summary{list-style:none;cursor:pointer;font-size:11px;font-weight:700;
+  color:var(--vf-mute)}
+.promo-offer-desc-toggle>summary::-webkit-details-marker{display:none}
+.promo-offer-desc-toggle>summary:hover{color:var(--vf-red)}
+.promo-offer-desc-toggle[open]>summary{color:var(--vf-ink);margin-bottom:2px}
+.promo-offer-desc-toggle .promo-offer-desc{margin-top:2px}
 
 .promo-empty{margin:0;padding:16px 18px 18px;font-size:13px;color:var(--vf-faint)}
 

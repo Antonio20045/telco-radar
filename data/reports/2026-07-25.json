@@ -1,18 +1,39 @@
 {
  "date": "2026-07-25",
- "generated_with_llm": false,
+ "generated_with_llm": true,
  "stats": {
   "sources_total": 83,
-  "sources_ok": 46,
-  "sources_empty": 32,
-  "sources_failed": 5,
-  "collected": 732,
-  "new": 0,
+  "sources_ok": 52,
+  "sources_empty": 29,
+  "sources_failed": 2,
+  "collected": 835,
+  "new": 11,
   "operators": 81,
   "regions": 6
  },
- "briefing_md": "## Wochenueberblick\n\n_Keine neuen Meldungen in diesem Zeitraum._",
- "regions": {},
+ "briefing_md": "## Auf einen Blick\n- AT&T stellt sein Netzwerk auf den steigenden Datenverkehr durch Künstliche Intelligenz (KI) ein und priorisiert Upload-Geschwindigkeiten.\n- In Europa treiben mehrere Betreiber den Glasfaserausbau voran, während sich die strategische Ausrichtung auf KI und Quantencomputing verstärkt.\n- In Asien stehen weiterhin ESG- und CSR-Meldungen im Vordergrund, ohne wettbewerbsrelevante Produkt- oder Tarifankündigungen.\n\n## Das Wichtigste\nIn Nordamerika positioniert sich AT&T strategisch für den Aufwärtstrend von agentischer KI, indem es sein Netzwerk auf steigenden Upstream-Datenverkehr ausrichtet. Dies signalisiert eine Verschiebung der Netzprioritäten von Download- zu Upload-Leistung, die für andere Betreiber als Beobachtungsfeld relevant ist. In Europa treiben Proximus, Telenet und Fiberklaar den Glasfaserausbau in Flandern voran, während Telefónica mit einem KI- und Quantencomputing-Projekt zur Logistikoptimierung neue Wege geht. In Asien dominieren weiterhin ESG- und CSR-Meldungen, ohne dass konkrete Produkt- oder Tarifankündigungen erfolgen.\n\n## Die wichtigsten Signale\n\n**AT&T - Netzwerk für agentische KI optimiert** (Netz/Technologie, Dringlichkeit 3/5)\nAT&T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat. Der Fokus liegt auf Upstream-Traffic statt auf reinen Download-Geschwindigkeiten, um Echtzeit-Daten von IoT-Geräten und anderen KI-Anwendungen zu unterstützen. [Quelle](https://www.rcrwireless.com/20260725/ai/att-network-agentic-ai-wave)\n\n**Proximus, Telenet, Fiberklaar - Glasfaserausbau in Flandern** (Netz/Technologie, Dringlichkeit 4/5)\nDie drei belgischen Betreiber haben eine Vereinbarung getroffen, den Glasfaserausbau in Flandern zu beschleunigen. Ziel ist es, mehr Haushalte und Unternehmen mit schnellem Internet zu versorgen und die digitale Infrastruktur der Region zu stärken. [Quelle](https://www.proximus.com/news/2026/20260725-wyre-telenet-proximus-fiberklaar-fiber-rollout-flanders.html)\n\n**Telefónica - KI und Quantencomputing für Logistik** (Technologie/Innovation, Dringlichkeit 3/5)\nTelefónica hat gemeinsam mit dem Unternehmen Würth ein Projekt gestartet, das Künstliche Intelligenz und Quantencomputing zur Optimierung von Logistikverpackungen einsetzt. Ziel ist es, Transportvolumen und Kartonverbrauch zu reduzieren. [Quelle](https://www.telefonica.com/en/communication-room/press-room/telefonica-and-wurth-use-quantum-computing-and-ai-to-optimize-logistics-packaging/)\n\n**AT&T - Rekord bei Glasfaser- und FWA-Neukunden** (Kundenzahlen, Dringlichkeit 4/5)\nAT&T verzeichnete im zweiten Quartal 2026 einen Rekord bei den Neukundenzahlen für Glasfaser- und Fixed Wireless Access (FWA)-Anschlüsse. Dies zeigt die starke Nachfrage nach schnellen Breitbandanschlüssen in den USA. [Quelle](https://www.fierce-network.com/broadband/att-posts-record-q2-fibre-fwa-additions)\n\n**Comcast - Peacock wird profitabel** (Finanzen, Dringlichkeit 3/5)\nDer Streaming-Dienst Peacock von Comcast hat erstmals Profitabilität erreicht. Dies ist ein wichtiger Meilenstein für den Medienkonzern und zeigt, dass sich Investitionen in Streaming-Inhalte auszahlen können. [Quelle](https://www.lightreading.com/streaming/peacock-turns-profitable-as-comcast-talks-up-sky-itv-plan)\n\n**Rogers - Rekord-Datenvolumen bei FIFA WM 2026** (Netz/Technologie, Dringlichkeit 3/5)\nRogers Communications hat während der FIFA WM 2026 in Kanada ein Rekord-Datenvolumen von 510 Terabyte (TB) auf seinem 5G+-Netzwerk übertragen. Dies unterstreicht die Leistungsfähigkeit des Netzes bei Großveranstaltungen. [Quelle](https://www.rogers.com/news/rogers-delivers-record-510tb-of-data-on-5g-network-during-fifa-world-cup-in-canada)\n\n**VEON - Kyivstar startet 5G-Pilot in Kiew** (Netz/Technologie, Dringlichkeit 4/5)\nVEONs ukrainische Tochter Kyivstar hat einen 5G-Pilotdienst in Kiew gestartet. Die Testzone wurde erweitert, um mehr Nutzern die Möglichkeit zu geben, die neue Technologie zu erleben. [Quelle](https://www.veon.com/news/kyivstar-launches-5g-technology-pilot-services-across-kyiv-with-expanded-testing-zone)\n\n**Zain KSA - 5G-Advanced in Riad und Dschidda** (Netz/Technologie, Dringlichkeit 4/5)\nZain Saudi-Arabien hat die kommerziellen 5G-Advanced-Dienste in Riad und Dschidda gestartet. Dies ist ein wichtiger Schritt für die Einführung der nächsten Mobilfunkgeneration in der Region. [Quelle](https://www.zain.com/en/news/zain-ksa-brings-5g-advanced-connectivity-to-riyadh-and-jeddah)\n\n**Telefónica Deutschland - Stellenabbau und Filialschließungen** (Unternehmensstrategie, Dringlichkeit 4/5)\nTelefónica Deutschland plant den Abbau von rund 1.100 Stellen und die Schließung von Filialen im Rahmen einer Restrukturierung. Die Maßnahmen sollen Kosten in Höhe von 265 Millionen Euro einsparen. [Quelle](https://www.telefonica.de/news/2026/07/telefonica-to-cut-1100-jobs-at-german-o2-unit-in-265-million-restructuring.html)\n\n## Europa\n\nIn Europa treiben mehrere Betreiber den Glasfaserausbau voran, während sich die strategische Ausrichtung auf KI und Quantencomputing verstärkt. Telefónica Deutschland plant einen umfassenden Stellenabbau, während BT Group solide Quartalszahlen mit starkem Glasfaserwachstum vorlegt.\n\n**BT Group - Solide Quartalszahlen mit starkem Glasfaserwachstum** (Finanzen, Dringlichkeit 3/5)\nBT Group hat einen soliden Start ins Geschäftsjahr hingelegt, mit starkem Wachstum bei Glasfaseranschlüssen und 5G-Expansion. Das Unternehmen zeigt sich zuversichtlich für die weitere Entwicklung. [Quelle](https://www.bt.com/news/2026/07/bt-group-reports-solid-start-to-year-with-strong-fibre-growth-and-5g-expansion)\n\n**KPN - 5G für Heiminternet** (Netz/Technologie, Dringlichkeit 3/5)\nKPN hat damit begonnen, 5G auch für Heiminternet-Anschlüsse einzusetzen. Dies ermöglicht Kunden in Gebieten ohne Glasfaseranschluss schnelle Internetverbindungen über das Mobilfunknetz. [Quelle](https://www.kpn.com/nieuws/kpn-zet-5g-nu-ook-in-voor-thuisinternet.htm)\n\n**Virgin Media O2 - 9 Millionen Glasfaser-Haushalte** (Netz/Technologie, Dringlichkeit 3/5)\nVirgin Media O2 hat die Marke von 9 Millionen mit Glasfaser versorgten Haushalten erreicht. Trotz dieses Ausbaus verzeichnete das Unternehmen einen Rückgang bei den Breitbandkundenzahlen. [Quelle](https://www.lightreading.com/broadband/virgin-media-o2-reaches-9m-full-fibre-premises)\n\n**1&1 - TV-Angebot um Joyn erweitert** (Produkt/Angebot, Dringlichkeit 2/5)\n1&1 hat sein TV-Angebot um die Streaming-Plattform Joyn erweitert. Kunden können nun auf eine breitere Palette an Inhalten zugreifen. [Quelle](https://www.1und1.de/news/2026/07/1und1-erweitert-tv-angebot-um-die-streaming-plattform-joyn)\n\n## Nordamerika\n\nIn Nordamerika dominieren Netzoptimierungen für KI und starke Quartalszahlen. AT&T fokussiert sich auf Upload-Leistung für agentische KI, während Comcast mit Peacock Profitabilität erreicht und Rogers einen Datenrekord bei der FIFA WM aufstellt.\n\n**Charter Communications - FCC verabschiedet Upper C-Band-Auktionsplan** (Regulierung, Dringlichkeit 3/5)\nDie US-amerikanische Federal Communications Commission (FCC) hat einen Plan für die Auktion des Upper C-Bands verabschiedet. Dieses Spektrum soll für 5G und zukünftige 6G-Netze genutzt werden. [Quelle](https://www.fierce-network.com/regulatory/fcc-adopts-upper-c-band-auction-plan-5g-spectrum-expansion-2027)\n\n**Verizon - 1-Milliarde-Dollar-Datencenter-Deal mit Google** (Geschäftskunden, Dringlichkeit 4/5)\nVerizon hat einen 1-Milliarde-Dollar-Vertrag mit Google über die Anbindung von KI-Datencentern abgeschlossen. Dies ist einer der größten Einzelverträge im Bereich Datencenter-Konnektivität. [Quelle](https://www.lightreading.com/data-center/verizon-lands-1b-ai-data-center-connectivity-deal-with-google)\n\n**T-Mobile US - Höchste Kundenzufriedenheit bei Ookla** (Kundenzufriedenheit, Dringlichkeit 3/5)\nT-Mobile US hat in der ersten Jahreshälfte 2026 die höchste Kundenzufriedenheit in der Bewertung von Ookla erreicht. Das Unternehmen konnte sich damit gegen die Konkurrenz von AT&T und Verizon durchsetzen. [Quelle](https://www.fierce-network.com/wireless/t-mobile-scores-highest-consumer-sentiment-ookla-1h-2026-assessment)\n\n## Asien\n\nIn Asien stehen weiterhin ESG- und CSR-Meldungen im Vordergrund, ohne dass wettbewerbsrelevante Produkt- oder Tarifankündigungen erfolgen. PLDT auf den Philippinen dominierte die Berichterstattung mit Nachhaltigkeitsthemen.\n\n**Singtel - Unterstützung für Singapurs Entwicklung** (CSR, Dringlichkeit 2/5)\nSingtel hat anlässlich des Nationalfeiertags seine Unterstützung für die weitere Entwicklung Singapurs bekräftigt. Das Unternehmen betonte sein Engagement für die digitale Transformation des Landes. [Quelle](https://www.singtel.com/news/2026/07/singtel-group-celebrates-national-day-with-pledge-to-keep-supporting-singapore-s-development)\n\n**Telkomsel - Optimierung von 700 MHz und 2,6 GHz Spektrum** (Netz/Technologie, Dringlichkeit 3/5)\nTelkomsel hat angekündigt, das Spektrum bei 700 MHz und 2,6 GHz zu optimieren, um die digitale Erfahrung in Indonesien zu verbessern. Dies soll die Netzabdeckung und -kapazität erhöhen. [Quelle](https://www.telkomsel.com/news/2026/07/telkomsel-siap-optimalkan-spektrum-700-mhz-dan-26-ghz-untuk-perkuat-pengalaman-digital-indonesia)\n\n## Naher Osten und Afrika\n\nIm Nahen Osten und in Afrika treiben Betreiber den Ausbau von 5G-Advanced und digitalen Finanzdienstleistungen voran. Zain KSA startet 5G-A in Saudi-Arabien, während Airtel Africa den Börsengang seiner Mobile-Money-Sparte vorbereitet.\n\n**Airtel Africa - Mobile-Money-IPO in London** (Finanzen, Dringlichkeit 4/5)\nAirtel Africa hat London als Börsenplatz für den Börsengang seiner Mobile-Money-Sparte ausgewählt. Das Unternehmen meldete zudem ein starkes Wachstum im ersten Quartal. [Quelle](https://www.lightreading.com/fintech/airtel-africa-chooses-london-for-mobile-money-ipo-reports-strong-q1-growth)\n\n**Vodacom Lesotho - Investmentlösung für M-Pesa-Kunden** (Finanzdienstleistungen, Dringlichkeit 3/5)\nVodacom Lesotho hat eine neue Investmentlösung für M-Pesa-Kunden gestartet. Kunden können nun über den Mobile-Money-Dienst in verschiedene Anlageprodukte investieren. [Quelle](https://www.vodacom.com/news/2026/07/vodacom-lesotho-launches-investment-solution-for-m-pesa-customers)\n\n**MTN Group - Fokus auf wirtschaftliche Chancen in Afrika** (Strategie, Dringlichkeit 2/5)\nMTN Group hat betont, dass Afrikas Zukunft von der Schaffung wirtschaftlicher Chancen abhängt, nicht von Spaltung. Das Unternehmen setzt sich für eine inklusive digitale Wirtschaft ein. [Quelle](https://www.mtn.com/news/2026/07/africas-future-depends-on-expanded-economic-opportunity-not-division)\n\n## Muster der Woche\n\n1. **Netzoptimierung für KI-Anwendungen**: AT&T stellt sein Netzwerk auf steigenden Upstream-Datenverkehr durch agentische KI ein. Dies könnte ein Trend werden, dem andere Betreiber folgen, um KI-Anwendungen wie Echtzeit-Daten von IoT-Geräten zu unterstützen.\n\n2. **Glasfaserausbau als strategischer Schwerpunkt**: In Europa treiben mehrere Betreiber wie Proximus, Telenet und Fiberklaar den Glasfaserausbau voran. Auch in den USA verzeichnet AT&T Rekordzahlen bei Glasfaser-Neukunden.\n\n3. **KI und Quantencomputing in der Logistik**: Telefónica zeigt mit seinem Projekt mit Würth, wie KI und Quantencomputing in der Praxis eingesetzt werden können, um Prozesse zu optimieren und Kosten zu senken.\n\n4. **5G-Advanced und 5G-Pilotprojekte**: Zain KSA startet kommerzielle 5G-Advanced-Dienste, während VEONs Kyivstar einen 5G-Pilot in Kiew ausweitet. Dies zeigt die zunehmende Verbreitung der nächsten Mobilfunkgeneration.",
+ "regions": {
+  "Asien": {
+   "region_summary": "In Asien dominieren diese Woche ESG- und CSR-Meldungen von PLDT auf den Philippinen. Es gibt keine wettbewerbsrelevanten Produkt-, Tarif- oder Technologieankündigungen, die für Vodafone strategisch bedeutsam wären.",
+   "highlights": []
+  },
+  "Nordamerika": {
+   "region_summary": "In Nordamerika positioniert sich AT&T strategisch für den Aufwärtstrend von agentischer KI, indem es sein Netzwerk auf steigenden Upstream-Datenverkehr ausrichtet. Dies signalisiert eine Verschiebung der Netzprioritäten von Download- zu Upload-Leistung, die für Vodafone als Beobachtungsfeld relevant ist.",
+   "highlights": [
+    {
+     "title": "AT&T says its network is already built for the agentic AI wave",
+     "operator": "AT&T",
+     "url": "https://www.rcrwireless.com/20260725/ai/att-network-agentic-ai-wave",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "AT&T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat, mit Fokus auf Upstream-Traffic statt reiner Download-Geschwindigkeiten.",
+     "why_it_matters": "Vodafone sollte beobachten, ob AT&T mit diesem Upstream-Fokus einen Wettbewerbsvorteil bei KI-Anwendungen (z. B. Echtzeit-Daten von IoT-Geräten) erzielt. Falls ja, könnte Vodafone ähnliche Netzoptimierungen für sein B2B-IoT-Geschäft prüfen, um nicht ins Hintertreffen zu geraten.",
+     "date": "2026-07-25",
+     "source": "RCR Wireless"
+    }
+   ]
+  }
+ },
  "competitors": [
   {
    "name": "Deutsche Telekom",
@@ -22,48 +43,48 @@
      "title": "Deutsche Telekom deploys ChatGPT Enterprise for AI-native ops",
      "url": "https://www.telecomstechnews.com/news/deutsche-telekom-deploys-chatgpt-enterprise-for-ai-native-ops/",
      "category": "Netz/Technologie",
-     "note": "Telekom führt ChatGPT Enterprise ein, um KI-gestützte Abläufe in Kundenservice und Kernnetzen zu etablieren – ein Schritt zur Effizienzsteigerung."
+     "note": "Telekom setzt ChatGPT Enterprise ein, um KI-native Abläufe in Kundenservice und Kernnetz zu schaffen – ein strategischer Schritt zur Effizienzsteigerung."
     },
     {
-     "title": "Fiber-to-the-home (FTTH)/fiber optics: o2 Telefónica and Deutsche Telekom intensivieren ihre cooperation on fiber optic connections",
+     "title": "Fiber-to-the-home (FTTH)/fiber optics: o2 Telefónica and Deutsche Telekom intensify their cooperation on fiber optic connections",
      "url": "https://www.telefonica.de/fixed/news/10420/fiber-to-the-home-ftthfiber-optics-o2-telefonica-and-deutsche-telekom-intensify-their-cooperation-on-fiber-optic-connections.html",
      "category": "Partnerschaft",
-     "note": "Telekom und o2 Telefónica vertiefen die Glasfaser-Kooperation mit einem neuen Einkaufsmodell – stärkt die Marktposition im Festnetz."
+     "note": "Telekom und o2 Telefónica vereinbaren ein neues Einkaufsmodell für Glasfaseranschlüsse in Deutschland – stärkt die Marktposition gegen Vodafone."
     },
     {
      "title": "T-Mobile US dominates Opensignal network awards",
      "url": "https://www.mobileworldlive.com/att/t-mobile-us-dominates-opensignals-july-network-awards/",
      "category": "Netz/Technologie",
-     "note": "T-Mobile US gewinnt die meisten Kategorien im Opensignal-Netzwerkbericht – unterstreicht die Netzführerschaft in den USA."
+     "note": "T-Mobile US gewinnt die meisten Kategorien im Opensignal-Netzwerkbericht – untermauert die Netzführerschaft in den USA."
     },
     {
      "title": "T-Mobile scores highest in consumer sentiment in Ookla 1H 2026 assessment",
      "url": "https://www.telecompetitor.com/t-mobile-scores-highest-in-consumer-sentiment-in-ookla-1h-2026-assessment/",
      "category": "Kampagne",
-     "note": "T-Mobile erzielt den höchsten Kundenzufriedenheitswert bei Ookla – ein Signal für starke Markenwahrnehmung."
+     "note": "T-Mobile erreicht mit 3,77 von 5 Punkten den höchsten Kundenzufriedenheitswert bei Ookla – ein starkes Signal für die Markenwahrnehmung."
     },
     {
      "title": "T-Mobile US chief buoyant on customer playbook",
      "url": "https://www.mobileworldlive.com/operators/t-mobile-us-chief-buoyant-on-customer-playbook/",
      "category": "Tarif/Pricing",
-     "note": "T-Mobile US-CEO betont Erfolg kundenorientierter Initiativen und steigende Nachfrage nach Premium-Tarifen – zeigt Preispolitik."
+     "note": "T-Mobile US CEO betont Erfolg kundenorientierter Initiativen und steigende Nachfrage nach Premium-Tarifen – zeigt Preisakzeptanz im High-End-Segment."
     },
     {
-     "title": "T-Mobile looks to new JV for D2D but still tied to Starlink",
-     "url": "https://www.lightreading.com/satellite/t-mobile-looks-to-new-jv-for-d2d-but-still-tied-to-starlink",
-     "category": "Partnerschaft",
-     "note": "T-Mobile treibt D2D-Joint Venture mit AT&T und Verizon voran, bleibt aber exklusiv mit Starlink – strategische Weichenstellung im Satellitenmarkt."
+     "title": "T-Mobile eyes C-band, 2.7 GHz to shore up 5G edge",
+     "url": "https://www.fierce-network.com/wireless/t-mobile-eyes-c-band-27-ghz-shore-5g-edge",
+     "category": "Netz/Technologie",
+     "note": "T-Mobile prüft C-Band- und 2,7-GHz-Spektrum, um den 5G-Vorsprung auszubauen – strategische Frequenzsicherung für künftige Kapazitäten."
     }
    ],
-   "summary": "Deutsche Telekom treibt die Digitalisierung mit KI voran: Der Konzern setzt ChatGPT Enterprise ein, um Kundenservice und Kernnetze zu optimieren. In den USA dominiert die Tochter T-Mobile die Netzqualität (Opensignal, Ookla) und verzeichnet starke Kundenzuwächse bei Premium-Tarifen. In Deutschland intensiviert die Telekom die Glasfaser-Kooperation mit o2 Telefónica. Die Strategie zielt auf KI-native Abläufe und Netzführerschaft ab.",
+   "summary": "Deutsche Telekom treibt die KI-Transformation voran, indem es ChatGPT Enterprise für den Aufbau KI-nativer Netz- und Kundenbetriebsabläufe einsetzt. In den USA dominiert die Tochter T-Mobile die Netzqualitätsrankings von Opensignal und Ookla und verzeichnet ein starkes Kundenwachstum mit Premium-Tarifen. In Deutschland intensiviert die Telekom die Zusammenarbeit mit o2 Telefónica beim Glasfaserausbau, um die Marktdurchdringung zu erhöhen. Gleichzeitig prüft T-Mobile den Einsatz von C-Band- und 2,7-GHz-Spektrum, um den 5G-Vorsprung weiter auszubauen.",
    "themes": [
     "KI-Transformation",
-    "Netzqualität",
+    "Netzführerschaft USA",
     "Glasfaser-Kooperation",
-    "Kundenwachstum",
-    "D2D-Satelliten"
+    "5G-Spektrum-Strategie",
+    "Kundenwachstum Premium"
    ],
-   "vodafone_implication": "Vodafone muss die KI-Offensive der Telekom genau beobachten, da ChatGPT Enterprise die Effizienz und Kundenerfahrung der Telekom verbessern könnte. Die Glasfaser-Kooperation mit o2 erhöht den Wettbewerbsdruck im deutschen Festnetz. Vodafone sollte eigene KI-Initiativen beschleunigen und die D2D-Entwicklung in den USA verfolgen, um nicht ins Hintertreffen zu geraten."
+   "vodafone_implication": "Vodafone muss die KI-Offensive der Telekom genau beobachten, da ChatGPT Enterprise die Betriebskosten senken und die Kundenerfahrung verbessern könnte. Die Glasfaser-Kooperation mit o2 in Deutschland erhöht den Wettbewerbsdruck im Festnetz – Vodafone sollte eigene Partnerschaften oder Investitionen prüfen. Zudem zeigt T-Mobiles Erfolg mit Premium-Tarifen, dass Kunden bereit sind, für bessere Leistung zu zahlen; Vodafone sollte sein eigenes Premium-Angebot schärfen."
   },
   {
    "name": "Telefónica / O2",
@@ -73,49 +94,49 @@
      "title": "Telefónica to cut 1,100 jobs at German O2 unit in €265 million restructuring",
      "url": "https://www.mobileeurope.co.uk/telefonica-restructuring-o2/",
      "category": "Sonstiges",
-     "note": "Telefónica baut in Deutschland massiv Stellen ab, um die Wettbewerbsfähigkeit zu verbessern – ein Signal für mögliche Preiskämpfe oder Serviceeinschränkungen."
+     "note": "Telefónica baut in Deutschland massiv Stellen ab und schließt Filialen, um wettbewerbsfähiger zu werden – ein Signal für mögliche Preiskämpfe im deutschen Markt."
     },
     {
-     "title": "Telefónica tests Wurth of AI, quantum",
-     "url": "https://www.mobileworldlive.com/industry/telefonica-tests-wurth-of-ai-quantum/",
+     "title": "Telefónica, Würth Use Quantum Computing and AI to Optimize Logistics Packaging",
+     "url": "https://www.thefastmode.com/technology-solutions/49802-telefonica-wurth-use-quantum-computing-and-ai-to-optimize-logistics-packaging",
      "category": "Partnerschaft",
-     "note": "Gemeinsam mit Würth optimiert Telefónica Logistikprozesse durch KI und Quantencomputing, was Effizienzsteigerungen von 14% bringt – ein Zeichen für technologische Vorreiterschaft."
+     "note": "Telefónica zeigt mit Quantencomputing und KI konkrete Effizienzgewinne (14% Verpackungsverbesserung) – ein Innovationshebel, den Vodafone im Auge behalten sollte."
     },
     {
      "title": "Virgin Media O2 reaches 9m full-fibre premises",
      "url": "https://www.broadbandtvnews.com/2026/07/24/virgin-media-o2-reaches-9m-full-fibre-premises/",
      "category": "Netz/Technologie",
-     "note": "VMO2 erreicht 9 Millionen Glasfaseranschlüsse und bestätigt die Jahresprognose – ein starkes Signal für den Ausbau in Großbritannien, das Vodafone unter Druck setzt."
+     "note": "VMO2 erreicht 9 Mio. Glasfaser-Haushalte, verliert aber Breitbandkunden – zeigt Herausforderungen bei der Monetarisierung des Ausbaus."
     },
     {
      "title": "VMO2 takes aim at UK net neutrality rules",
      "url": "https://www.mobileworldlive.com/regulation/vmo2-takes-aim-at-uk-net-neutrality-rules/",
      "category": "Regulierung",
-     "note": "VMO2 fordert eine Reform der Netzneutralität, um KI und 5G zu fördern – ein strategischer Vorstoß, der die Regulierungslandschaft verändern könnte."
+     "note": "VMO2 fordert Lockerung der Netzneutralität, um 5G und KI zu fördern – könnte Wettbewerbsbedingungen in UK verschieben."
     },
     {
-     "title": "Telefónica and Harrison.ai join forces to support the diagnosis of chest X-rays using AI",
-     "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-harrison-ai-join-forces-support-diagnosis-chest-rays-ai/",
-     "category": "Partnerschaft",
-     "note": "Telefónica bietet in Spanien eine KI-Lösung zur Röntgenanalyse an – ein Schritt in Richtung Gesundheits-IT, der neue Geschäftsfelder erschließt."
-    },
-    {
-     "title": "GlobalData recognises Telefónica’s global leadership in IoT services",
-     "url": "https://www.telefonica.com/en/communication-room/press-room/globaldata-recognises-telefonicas-global-leadership-iot-services/",
+     "title": "Telefónica Recognised by GlobalData as Global Leader in IoT Services Innovation",
+     "url": "https://www.thefastmode.com/technology-solutions/49769-telefonica-recognised-by-globaldata-as-global-leader-in-iot-services-innovation",
      "category": "Produktlaunch",
-     "note": "Telefónica wird für IoT-Dienste ausgezeichnet, was seine starke Position im B2B-Bereich unterstreicht – eine Herausforderung für Vodafones IoT-Angebote."
+     "note": "Telefónica wird als IoT-Innovationsführer ausgezeichnet – stärkt ihre Position im B2B-Geschäft, wo Vodafone ebenfalls aktiv ist."
+    },
+    {
+     "title": "Virgin Media O2 Joins Media In Service of Nature to Fund UK Nature Recovery Projects",
+     "url": "https://www.thefastmode.com/technology-solutions/49803-virgin-media-o2-joins-media-in-service-of-nature-to-fund-uk-nature-recovery-projects",
+     "category": "Kampagne",
+     "note": "VMO2 investiert in Naturschutzprojekte – ein ESG-Schwerpunkt, der das Markenimage verbessern soll."
     }
    ],
-   "summary": "Telefónica/O2 konzentriert sich derzeit auf Kostensenkungen und strategische Neuausrichtung, insbesondere in Deutschland mit dem Abbau von 1.100 Stellen und der Schließung von Filialen. Gleichzeitig treibt das Unternehmen Innovationen in den Bereichen KI, Quantencomputing und IoT voran, wie Partnerschaften mit Würth und Harrison.ai zeigen. In Großbritannien erreicht Virgin Media O2 9 Millionen Glasfaseranschlüsse und fordert eine Reform der Netzneutralität, um 5G und KI voranzutreiben. Die Strategie zielt darauf ab, durch Effizienzsteigerung und Technologieführerschaft wettbewerbsfähig zu bleiben.",
+   "summary": "Telefónica / O2 fokussiert sich derzeit auf Kostensenkungen und strategische Neuausrichtung: In Deutschland werden 1.100 Stellen gestrichen und Filialen geschlossen, um 265 Millionen Euro einzusparen. Gleichzeitig treibt das Unternehmen Innovationen in den Bereichen KI, Quantencomputing und IoT voran, etwa durch Partnerschaften mit Würth und Anerkennung als globaler IoT-Führer. In Großbritannien erweitert Virgin Media O2 sein Glasfasernetz auf 9 Millionen Haushalte, kämpft aber mit einem Rückgang der Breitbandkunden. Zudem fordert VMO2 eine Reform der Netzneutralitätsregeln, um 5G und agentische KI zu fördern.",
    "themes": [
-    "Kostensenkung",
-    "KI-Innovation",
-    "Quantencomputing",
-    "Glasfaserausbau",
-    "Netzneutralität",
-    "IoT-Führerschaft"
+    "Kostensenkung/Restrukturierung",
+    "KI & Quantencomputing",
+    "IoT-Führerschaft",
+    "Glasfaserausbau UK",
+    "Netzneutralitätsdebatte",
+    "Nachhaltigkeit"
    ],
-   "vodafone_implication": "Vodafone sollte die Kostensenkungen bei O2 in Deutschland genau beobachten, da dies zu aggressiveren Preisen oder geringerem Service führen könnte, was den Wettbewerb verschärft. Gleichzeitig zeigt Telefónicas Fokus auf KI und IoT, dass Vodafone in diesen Bereichen investieren muss, um nicht zurückzufallen. Die Netzneutralitätsdebatte in Großbritannien könnte Vodafone ebenfalls betreffen – hier ist eine proaktive Positionierung ratsam."
+   "vodafone_implication": "Vodafone sollte die Restrukturierung von O2 in Deutschland genau beobachten, da Kostensenkungen zu aggressiveren Preisen oder Konsolidierung führen könnten. Die Vorstöße von VMO2 zur Netzneutralität in UK könnten den Markt verändern – Vodafone sollte eigene Positionen entwickeln. Telefónicas IoT- und KI-Innovationen erfordern eine verstärkte eigene F&E, um nicht den Anschluss zu verlieren."
   },
   {
    "name": "1&1",
@@ -125,95 +146,89 @@
      "title": "Neue Samsung Galaxy Z8-Serie bei 1&amp;1 bestellen – inklusive Google Fitbit Air und je nach Gerät bis zu max. 1.000 Euro Tauschprämie sichern, mindestens jedoch 150,-€* - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/neue-samsung-galaxy-z8-serie-bei-1-1-bestellen-inklusive-google-fitbit-air-und-tauschpraemie-sichern",
      "category": "Kampagne",
-     "note": "1&1 lockt mit hohen Tauschprämien und Fitbit-Bundle zum Vorverkauf der Galaxy Z8-Serie – aggressives Kundenbindungsinstrument."
+     "note": "1&1 lockt mit hohen Tauschprämien und Fitbit-Bundle zum Vorverkauf der Galaxy Z8-Serie – aggressive Kundenakquise im Premium-Segment."
     },
     {
      "title": "1&1 erweitert TV-Angebot um die Streaming-Plattform Joyn - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-erweitert-tv-angebot-um-die-streaming-plattform-joyn",
      "category": "Partnerschaft",
-     "note": "Integration von Joyn in 1&1 TV wertet das TV-Paket auf und erhöht die Attraktivität für Kunden, die Streaming bevorzugen."
+     "note": "Integration von Joyn+ in 1&1 TV – stärkt das TV-Ökosystem und erhöht die Kundenbindung durch exklusive Inhalte."
     },
     {
      "title": "1&1 führt neuen Router auf Basis der FRITZ!Box 7620 ein - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-standard-router-fuer-dsl-und-glasfaser-ein-naechste-generation-des-1-1-homeservers-ab-sofort-verfuegbar",
      "category": "Produktlaunch",
-     "note": "Neuer Standard-Router (FRITZ!Box 7620) ersetzt ältere Modelle – 1&1 modernisiert sein Hardware-Portfolio für DSL und Glasfaser."
+     "note": "Neuer Standard-Router (FRITZ!Box 7620) ersetzt ältere Modelle – verbessert die Netzqualität im Massenmarkt."
     },
     {
      "title": "IMTEST Festnetztest 2026: 1&1 erreicht Gesamtnote „sehr gut“ - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/imtest-festnetztest-2026-1-1-erzielt-erneut-die-gesamtnote-sehr-gut",
      "category": "Netz/Technologie",
-     "note": "Note 1,26 im IMTEST-Festnetztest bestätigt 1&1s Qualitätsanspruch – kann als Marketinginstrument gegen Vodafone eingesetzt werden."
+     "note": "Note 1,26 im Festnetztest – untermauert 1&1s Qualitätsanspruch und kann Kunden von Vodafone abziehen."
     },
     {
      "title": "1&1 HomeServer+ mit Wi‑Fi 7: Neuer Top-Router für DSL & Glasfaser - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-top-router-mit-wi-fi-7-ein-naechste-generation-des-homeserver-ab-sofort-verfuegbar",
      "category": "Produktlaunch",
-     "note": "Wi-Fi-7-Router (FRITZ!Box 7630) als neuer Top-Router – 1&1 positioniert sich technologisch vorne, was Vodafone unter Druck setzt."
-    },
-    {
-     "title": "connect professional: Testsieg für 1&1 Glasfaser-Anschlüsse - 1&1",
-     "url": "https://unternehmen.1und1.de/produkt-news/2026/connect-professional-1-1-ist-testsieger-fuer-glasfaser-anschluesse-unter-den-bundesweiten-anbietern",
-     "category": "Netz/Technologie",
-     "note": "Testsieg im SOHO-Highspeed-Test 2026 unterstreicht 1&1s Glasfaser-Qualität – relevant für Geschäftskunden."
+     "note": "Wi-Fi 7 als Standard in Top-Tarifen – technologischer Vorsprung, den Vodafone kontern muss."
     },
     {
      "title": "Größere Glasfaser-Anbietervielfalt für Deutschland: 1&1 und Tele Columbus schließen langfristige Kooperationsvereinbarung - 1&1",
      "url": "https://unternehmen.1und1.de/corporate-news/2026/groessere-glasfaser-anbietervielfalt-fuer-deutschland-1-1-und-tele-columbus-schliessen-langfristige-kooperationsvereinbarung",
      "category": "Partnerschaft",
-     "note": "Kooperation mit Tele Columbus erweitert 1&1s Glasfaser-Reichweite – direkter Wettbewerb zu Vodafones Kabel- und Glasfaserangeboten."
+     "note": "Langfristige Kooperation mit Tele Columbus – erweitert Glasfaser-Reichweite und erhöht Wettbewerbsdruck auf Vodafone im Festnetz."
     }
    ],
-   "summary": "1&1 verstärkt sein Festnetz- und Mobilfunkangebot mit neuen Routern (Wi-Fi 7), TV-Integration von Joyn und saisonalen Aktionen (Sommer-Special, WM-Trikot). Im Festnetztest von IMTEST und connect professional erzielt 1&1 Spitzennoten, insbesondere bei Glasfaser. Partnerschaftlich baut 1&1 mit Tele Columbus die Glasfaser-Anbietervielfalt aus. Das Unternehmen positioniert sich als Qualitätsanbieter mit attraktiven Bundles und zielt auf Wachstum im Privat- und SOHO-Segment.",
+   "summary": "1&1 verstärkt sein Festnetz- und Mobilfunkangebot mit neuen Routern (Wi-Fi 7), TV-Integration (Joyn) und attraktiven Smartphone-Bundles (Samsung Z8, Fitbit Air). Im Festnetz- und Glasfaserbereich erzielt das Unternehmen Spitzennoten in Tests (IMTEST, connect professional) und baut seine Netzkooperation mit Tele Columbus aus. Die Strategie zielt auf Premium-Hardware, exklusive Inhalte (WM-Trikot) und eine starke Glasfaserposition, um Kunden zu binden und Neukunden zu gewinnen.",
    "themes": [
-    "Router-Neuheiten",
-    "TV-Streaming-Partnerschaft",
-    "Test-Siege",
+    "Router-Upgrade",
+    "TV-Streaming",
     "Glasfaser-Ausbau",
-    "Saisonale Aktionen",
-    "Partnerschaften"
+    "Test-Siege",
+    "Smartphone-Bundles",
+    "Content-Partnerschaft"
    ],
-   "vodafone_implication": "Vodafone sollte die aggressive Produkt- und Marketingoffensive von 1&1 genau beobachten, insbesondere die neuen Router mit Wi-Fi 7 und die TV-Integration von Joyn. Die Testsiege und die Glasfaser-Kooperation mit Tele Columbus könnten 1&1 helfen, Marktanteile im Festnetz- und SOHO-Segment zu gewinnen. Vodafone sollte sein eigenes Hardware-Portfolio und TV-Angebot prüfen, um wettbewerbsfähig zu bleiben."
+   "vodafone_implication": "Vodafone muss die aggressive Produkt- und Content-Strategie von 1&1 ernst nehmen, insbesondere die Wi-Fi-7-Router und TV-Partnerschaften. Die Testsiege und Glasfaser-Kooperationen stärken 1&1s Position im Festnetz – Vodafone sollte eigene Netzqualität und Router-Innovationen beschleunigen, um Kundenabwanderung zu verhindern."
   }
  ],
  "run": {
-  "started_at": "2026-07-25T17:23:41.329577+00:00",
-  "finished_at": "2026-07-25T17:35:34.596496+00:00",
-  "duration_seconds": 713.3,
-  "used_llm": false,
-  "editor_used": false,
+  "started_at": "2026-07-25T21:37:58.559031+00:00",
+  "finished_at": "2026-07-25T21:48:11.034508+00:00",
+  "duration_seconds": 612.5,
+  "used_llm": true,
+  "editor_used": true,
   "models": {
-   "analyst": null,
-   "editor": null,
+   "analyst": "deepseek-ai/deepseek-v4-flash",
+   "editor": "deepseek-ai/deepseek-v4-flash",
    "unavailable": null
   },
   "phases": [
    {
     "name": "Sammeln",
-    "seconds": 71.6,
-    "detail": "83 Quellen abgefragt, 732 Meldungen gefunden"
+    "seconds": 76.3,
+    "detail": "83 Quellen abgefragt, 835 Meldungen gefunden"
    },
    {
     "name": "Nur Neues",
     "seconds": 0.0,
-    "detail": "0 neue Meldungen (Gedaechtnis: 965 bekannt)"
+    "detail": "11 neue Meldungen (Gedaechtnis: 965 bekannt)"
    },
    {
     "name": "Bewerten & Schreiben",
-    "seconds": 0.0,
-    "detail": "0 bewertete Meldungen"
+    "seconds": 123.6,
+    "detail": "1 bewertete Meldungen"
    },
    {
     "name": "Wettbewerber-Analyse",
-    "seconds": 120.7,
-    "detail": "3 Profile (19 Moves)"
+    "seconds": 67.5,
+    "detail": "3 Profile (18 Moves)"
    }
   ],
   "source_summary": {
    "total": 83,
-   "ok": 46,
-   "empty": 32,
-   "failed": 5,
+   "ok": 52,
+   "empty": 29,
+   "failed": 2,
    "by_kind": {
     "json_api": 1,
     "rss": 10,
@@ -224,16 +239,16 @@
   },
   "sources": [
    {
-    "name": "KT",
-    "operator": "KT",
-    "region": "asia",
-    "url": "https://corp.kt.com/eng/html/prcenter/report_list.html",
+    "name": "Cosmote",
+    "operator": "Cosmote",
+    "region": "europe",
+    "url": "https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases",
     "kind": "newsroom_js",
     "label": "newsroom_js",
     "origin": "operator",
     "status": "fail",
     "count": 0,
-    "error": "TimeoutError: Page.goto: Timeout 16000ms exceeded.\nCall log:\n  - navigating to \"https://corp.kt.com/eng/html/prcenter/report_list.html\", waiting until \"do"
+    "error": "TimeoutError: Page.goto: Timeout 16000ms exceeded.\nCall log:\n  - navigating to \"https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases\", waiti"
    },
    {
     "name": "Optus",
@@ -246,42 +261,6 @@
     "status": "fail",
     "count": 0,
     "error": "Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.optus.com.au/about/media-centre\nCall log:\n  - navigating to \"https://www.optus.com.a"
-   },
-   {
-    "name": "Developing Telecoms",
-    "operator": null,
-    "region": "global",
-    "url": "https://developingtelecoms.com/?format=feed&type=rss",
-    "kind": "trade_press",
-    "label": "Developing Telecoms",
-    "origin": "industry_news",
-    "status": "fail",
-    "count": 0,
-    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag"
-   },
-   {
-    "name": "The Fast Mode",
-    "operator": null,
-    "region": "global",
-    "url": "https://www.thefastmode.com/?format=feed&type=rss",
-    "kind": "trade_press",
-    "label": "The Fast Mode",
-    "origin": "industry_news",
-    "status": "fail",
-    "count": 0,
-    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag"
-   },
-   {
-    "name": "ISPreview UK",
-    "operator": null,
-    "region": "global",
-    "url": "https://www.ispreview.co.uk/index.php/feed",
-    "kind": "trade_press",
-    "label": "ISPreview UK",
-    "origin": "industry_news",
-    "status": "fail",
-    "count": 0,
-    "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'"
    },
    {
     "name": "Comcast",
@@ -315,6 +294,28 @@
     "origin": "industry_news",
     "status": "ok",
     "count": 40
+   },
+   {
+    "name": "The Fast Mode",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.thefastmode.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "The Fast Mode",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Developing Telecoms",
+    "operator": null,
+    "region": "global",
+    "url": "https://developingtelecoms.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "Developing Telecoms",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 34
    },
    {
     "name": "VEON",
@@ -570,6 +571,17 @@
     "count": 10
    },
    {
+    "name": "PLDT",
+    "operator": "PLDT",
+    "region": "asia",
+    "url": "https://main.pldt.com/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
     "name": "One NZ",
     "operator": "One NZ",
     "region": "oceania",
@@ -680,6 +692,28 @@
     "count": 8
    },
    {
+    "name": "ISPreview UK",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.ispreview.co.uk/index.php/feed",
+    "kind": "trade_press",
+    "label": "ISPreview UK",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.maxis.com.my/en/about-maxis/newsroom/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 7
+   },
+   {
     "name": "Orange",
     "operator": "Orange",
     "region": "europe",
@@ -711,6 +745,17 @@
     "origin": "operator",
     "status": "ok",
     "count": 5
+   },
+   {
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://elisa.com/corporate/news-room/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
    },
    {
     "name": "Proximus",
@@ -845,28 +890,6 @@
     "count": 0
    },
    {
-    "name": "Elisa",
-    "operator": "Elisa",
-    "region": "europe",
-    "url": "https://elisa.com/corporate/news-room/",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Cosmote",
-    "operator": "Cosmote",
-    "region": "europe",
-    "url": "https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "Three UK",
     "operator": "Three UK",
     "region": "europe",
@@ -933,17 +956,6 @@
     "count": 0
    },
    {
-    "name": "WOM",
-    "operator": "WOM",
-    "region": "latin_america",
-    "url": "https://sobrenosotros.wom.cl/wom-en-prensa/",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "Airtel Africa",
     "operator": "Airtel Africa",
     "region": "africa_middle_east",
@@ -981,6 +993,17 @@
     "operator": "Orange MEA",
     "region": "africa_middle_east",
     "url": "https://www.orange.eg/en/media-center/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "WOM",
+    "operator": "WOM",
+    "region": "latin_america",
+    "url": "https://sobrenosotros.wom.cl/wom-en-prensa/",
     "kind": "newsroom_js",
     "label": "newsroom_js",
     "origin": "operator",
@@ -1032,10 +1055,10 @@
     "count": 0
    },
    {
-    "name": "China Mobile",
-    "operator": "China Mobile",
+    "name": "KT",
+    "operator": "KT",
     "region": "asia",
-    "url": "https://www.chinamobileltd.com/en/media/press.php",
+    "url": "https://corp.kt.com/eng/html/prcenter/report_list.html",
     "kind": "newsroom_js",
     "label": "newsroom_js",
     "origin": "operator",
@@ -1065,6 +1088,17 @@
     "count": 0
    },
    {
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.chinamobileltd.com/en/media/press.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
     "name": "AIS",
     "operator": "AIS",
     "region": "asia",
@@ -1087,10 +1121,10 @@
     "count": 0
    },
    {
-    "name": "Maxis",
-    "operator": "Maxis",
-    "region": "asia",
-    "url": "https://www.maxis.com.my/en/about-maxis/newsroom/",
+    "name": "Telstra",
+    "operator": "Telstra",
+    "region": "oceania",
+    "url": "https://www.telstra.com.au/exchange",
     "kind": "newsroom_js",
     "label": "newsroom_js",
     "origin": "operator",
@@ -1109,28 +1143,6 @@
     "count": 0
    },
    {
-    "name": "PLDT",
-    "operator": "PLDT",
-    "region": "asia",
-    "url": "https://main.pldt.com/newsroom",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "Telstra",
-    "operator": "Telstra",
-    "region": "oceania",
-    "url": "https://www.telstra.com.au/exchange",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
     "name": "TPG Telecom",
     "operator": "TPG Telecom",
     "region": "oceania",
@@ -1142,6 +1154,23 @@
     "count": 0
    }
   ],
-  "analysts": []
+  "analysts": [
+   {
+    "items_in": 10,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 0,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Asien"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Nordamerika"
+   }
+  ]
  }
 }
