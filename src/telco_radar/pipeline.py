@@ -23,6 +23,7 @@ from .analyze import diff_curator
 from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
+from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
 from .config import load_config
@@ -62,8 +63,17 @@ def run(root: Path, use_llm: bool | None = None,
     else:
         analyst_model = cfg.settings.get("analyst_model", fallback_model)
         editor_model = cfg.settings.get("editor_model", fallback_model)
-    log.info("LLM backend: %s | analyst=%s editor=%s",
-             active_backend(), analyst_model, editor_model)
+    # The editor model is the big one and the first to lose its slot when the
+    # provider is oversubscribed: the connection is accepted and no token ever
+    # arrives. Four stages run on it, so without a stand-in one provider outage
+    # burns 4x the retry budget and the job timeout kills the run before it can
+    # publish anything. Register the (smaller, still-served) analyst model as
+    # the stand-in - used only after the editor model has failed hard once.
+    if cfg.settings.get("editor_model_fallback", True) and analyst_model:
+        llm.set_fallback(editor_model, analyst_model)
+    log.info("LLM backend: %s | analyst=%s editor=%s (Ausweichmodell: %s)",
+             active_backend(), analyst_model, editor_model,
+             analyst_model if analyst_model != editor_model else "keins")
     max_items = int(cfg.settings.get("max_items_per_region", 45))
 
     state_dir = root / "data" / "state"
@@ -330,6 +340,10 @@ def run(root: Path, use_llm: bool | None = None,
         "models": {
             "analyst": analyst_model if (use_llm and new_items) else None,
             "editor": editor_model if editor_used else None,
+            # Models the provider stopped serving mid-run. Visible in
+            # protokoll.html so a degraded run is recognisable as such instead
+            # of looking like a thin news week.
+            "unavailable": sorted(llm.dead_models()) or None,
         },
         "phases": phases,
         "source_summary": {

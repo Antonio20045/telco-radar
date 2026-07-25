@@ -35,6 +35,17 @@ llm_max_workers: 2
 # publishes a clearly labelled, source-linked fallback digest instead.
 publish_requires_editorial_briefing: false
 
+# NVIDIA's shared endpoint hands out worker slots by model size. Measured on
+# 2026-07-25: v4-flash answers a 400-token request in 3s, while v4-pro accepts
+# the connection and returns nothing at all (3x read timeout after 90s), with
+# the endpoint reporting "Worker local total request limit reached (170/48)".
+# Four stages run on the editor model, so when it stalls the job timeout kills
+# the run before it publishes. With this enabled, the FIRST hard failure of the
+# editor model switches the remaining stages to the analyst model for the rest
+# of that run. Nothing is persisted: the next run tries the editor model again
+# and returns to it as soon as the provider has capacity.
+editor_model_fallback: true
+
 # ---------------------------------------------------------------------------
 # Sources: every operator has its OWN official primary source (feed / json_api /
 # newsroom / newsroom_js / official-reference) - defined per source in

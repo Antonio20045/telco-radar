@@ -22,7 +22,10 @@ concurrency:
 jobs:
   radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # Headroom over the worst realistic case: collection ~2 min, analysts ~4 min,
+    # plus one exhausted retry budget on a stalled editor model (~4 min at the
+    # 75s request timeout) before the run switches to the stand-in model.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -60,7 +63,10 @@ jobs:
             2>&1 | tee pipeline.log
 
       - name: Expose pipeline failure details
-        if: failure()
+        # cancelled() matters: a job killed by timeout-minutes is "cancelled",
+        # not "failed". With if: failure() alone, runs #30 and #33 skipped this
+        # step and left no diagnostics at all.
+        if: failure() || cancelled()
         run: |
           {
             echo "### Telco Radar pipeline failure"
@@ -71,7 +77,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload pipeline log
-        if: failure()
+        if: failure() || cancelled()
         uses: actions/upload-artifact@v4
         with:
           name: telco-radar-pipeline-log-${{ github.run_id }}

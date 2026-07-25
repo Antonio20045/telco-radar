@@ -47,16 +47,63 @@ def active_backend() -> str:
 # Client errors that will never succeed on retry (bad key, bad request, bad model)
 _FATAL_STATUSES = {400, 401, 403, 404, 405, 422}
 
+# Read timeout for a single request. A provider that accepts the connection but
+# never returns a token - NVIDIA's shared endpoint under load does exactly that
+# for the big models - must not eat the whole job budget. At 180s three retries
+# cost 9.4 min PER STAGE, which killed runs #29-#33 on the 35 min job timeout.
+DEFAULT_HTTP_TIMEOUT = 75.0
+
+# model -> stand-in, consulted only after the preferred model failed hard.
+_FALLBACKS: dict[str, str] = {}
+# Models that already failed hard in this process. Later stages skip them
+# instead of retrying, so a dead model costs the run ONE timeout budget
+# rather than one per stage.
+_DEAD_MODELS: set[str] = set()
+
 
 class _FatalHTTP(Exception):
     pass
+
+
+class LLMFatalError(RuntimeError):
+    """The provider rejected the request itself (bad key, model or payload).
+
+    Distinct from a capacity/timeout failure, because falling back to another
+    model cannot help here.
+    """
+
+
+def http_timeout() -> float:
+    """Per-request read timeout; override with LLM_HTTP_TIMEOUT (seconds)."""
+    try:
+        value = float(os.environ.get("LLM_HTTP_TIMEOUT") or DEFAULT_HTTP_TIMEOUT)
+    except ValueError:
+        return DEFAULT_HTTP_TIMEOUT
+    return value if value > 0 else DEFAULT_HTTP_TIMEOUT
+
+
+def set_fallback(model: str, fallback: str) -> None:
+    """Register `fallback` as the stand-in for `model`."""
+    if model and fallback and model != fallback:
+        _FALLBACKS[model] = fallback
+
+
+def reset_model_health() -> None:
+    """Forget which models failed. Only needed by tests."""
+    _DEAD_MODELS.clear()
+
+
+def dead_models() -> set[str]:
+    """Models that stopped answering during this run (for the run protocol)."""
+    return set(_DEAD_MODELS)
 
 
 def _post_with_retries(url, payload, headers, retries, parse):
     last_err: Exception | None = None
     for attempt in range(1, retries + 1):
         try:
-            resp = httpx.post(url, json=payload, headers=headers, timeout=180)
+            resp = httpx.post(url, json=payload, headers=headers,
+                              timeout=http_timeout())
             if resp.status_code in _FATAL_STATUSES:
                 raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
             if resp.status_code in (429, 529) or resp.status_code >= 500:
@@ -68,7 +115,7 @@ def _post_with_retries(url, payload, headers, retries, parse):
         except _FatalHTTP as exc:
             # no point retrying - surface immediately so the run fails fast
             log.error("LLM call fatal (no retry): %s", str(exc)[:300])
-            raise RuntimeError(f"LLM fatal error: {exc}")
+            raise LLMFatalError(f"LLM fatal error: {exc}")
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
             wait = min(4 * attempt, 12)
@@ -126,12 +173,43 @@ def _complete_anthropic(system: str, user: str, model: str,
     return _post_with_retries(ANTHROPIC_URL, payload, headers, retries, parse)
 
 
-def complete(system: str, user: str, model: str,
-             max_tokens: int = 4096, retries: int = 3) -> str:
-    """Single-turn completion via the active backend."""
+def _dispatch(system: str, user: str, model: str,
+              max_tokens: int, retries: int) -> str:
     if _use_openai():
         return _complete_openai(system, user, model, max_tokens, retries)
     return _complete_anthropic(system, user, model, max_tokens, retries)
+
+
+def complete(system: str, user: str, model: str,
+             max_tokens: int = 4096, retries: int = 3) -> str:
+    """Single-turn completion via the active backend.
+
+    Survives a provider that stops serving one model. If `model` has a
+    registered fallback (see set_fallback) and it either already died earlier in
+    this run or exhausts its retries now, the call is served by the fallback
+    instead of failing the stage. The preference is not persisted anywhere, so
+    the next run tries the preferred model again and returns to it by itself
+    once the provider has capacity.
+
+    A fatal error (bad key, unknown model, malformed request) is NOT retried on
+    the fallback - another model would fail the same way.
+    """
+    fallback = _FALLBACKS.get(model)
+    if fallback and model in _DEAD_MODELS:
+        log.info("Model %s already unavailable in this run - using %s directly",
+                 model, fallback)
+        return _dispatch(system, user, fallback, max_tokens, retries)
+    try:
+        return _dispatch(system, user, model, max_tokens, retries)
+    except LLMFatalError:
+        raise
+    except RuntimeError as exc:
+        if not fallback:
+            raise
+        _DEAD_MODELS.add(model)
+        log.warning("Model %s did not answer (%s) - switching to %s for the "
+                    "remainder of this run", model, str(exc)[:160], fallback)
+        return _dispatch(system, user, fallback, max_tokens, retries)
 
 
 def extract_json(text: str):
