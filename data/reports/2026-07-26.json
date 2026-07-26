@@ -1,0 +1,1225 @@
+{
+ "date": "2026-07-26",
+ "generated_with_llm": true,
+ "stats": {
+  "sources_total": 83,
+  "sources_ok": 47,
+  "sources_empty": 32,
+  "sources_failed": 4,
+  "collected": 714,
+  "new": 4,
+  "operators": 81,
+  "regions": 6
+ },
+ "briefing_md": "## Auf einen Blick\n\n- Bharti Airtel bündelt in Indien 100-Mbps-Breitband mit TV und Streaming-Diensten wie Netflix und Amazon Prime, um Kunden zu binden und den Umsatz pro Nutzer zu steigern.\n- Eine britische Verbraucherumfrage kritisiert Virgin Media und Sky Broadband für schlechte Konnektivität – ein Signal für wachsenden Druck auf Netzqualität und Kundenservice.\n- Apples iOS 27 führt KI-Upgrades für Siri und iMessage ein, was das Datenvolumen und die Netzauslastung bei Betreibern weltweit beeinflussen könnte.\n\n## Das Wichtigste\n\nDiese Woche zeigt sich ein klares Muster: Betreiber setzen verstärkt auf gebündelte Angebote, um Kunden zu binden und den durchschnittlichen Umsatz pro Nutzer zu steigern. Bharti Airtel in Indien kombiniert 100-Mbps-Breitband mit TV und Streaming-Diensten wie Netflix und Amazon Prime. Parallel dazu wächst der Druck auf die Netzqualität: Eine Umfrage der britischen Verbraucherorganisation Which? kritisiert Virgin Media und Sky Broadband für schlechte Konnektivität, während Zen Internet gelobt wird. Apples Ankündigung von iOS 27 mit KI-Upgrades für Siri und iMessage könnte zudem das Datenvolumen und die Netzauslastung bei Betreibern weltweit beeinflussen.\n\n## Die wichtigsten Signale\n\n**Bharti Airtel - 100-Mbps-Breitband mit TV und Streaming gebündelt** (Tarif/Pricing, Dringlichkeit 4/5)\nBharti Airtel bietet in Indien mehrere 100-Mbps-Breitbandtarife an, die TV-Dienste sowie Streaming-Abonnements wie Amazon Prime und Netflix bündeln. Das Paket zielt darauf ab, Kunden zu binden und den durchschnittlichen Umsatz pro Nutzer zu steigern. [Quelle](https://telecomtalk.info/airtel-100-mbps-plan-that-brings-tv/1010071/)\n\n**Apple - iOS 27 mit KI-Upgrades für Siri und iMessage** (Netz/Technologie, Dringlichkeit 3/5)\nApple hat auf der WWDC 2026 iOS 27 vorgestellt, das nun als öffentliche Beta verfügbar ist. Die neuen KI-Funktionen für Siri und iMessage könnten das Datenvolumen und die Netzauslastung bei Betreibern weltweit beeinflussen. [Quelle](https://telecomtalk.info/apple-ios27-list-of-features-and-upgrades/1010088/)\n\n**Which? - Umfrage kritisiert Virgin Media und Sky Broadband** (Netz/Technologie, Dringlichkeit 3/5)\nDie Verbraucherorganisation Which? veröffentlichte eine Umfrage unter 5.235 britischen Breitbandkunden. Virgin Media und Sky Broadband wurden für schlechte Konnektivität kritisiert, während Zen Internet positive Bewertungen erhielt. [Quelle](https://www.ispreview.co.uk/index.php/2026/07/which-survey-criticises-virgin-media-and-sky-broadband-for-connectivity-woes.html)\n\n## Europa\n\nIn Großbritannien zeigt eine Verbraucherumfrage von Which? deutliche Unzufriedenheit mit der Konnektivität von Virgin Media und Sky Broadband, während Zen Internet gelobt wird. Dies unterstreicht den wachsenden Druck auf die Netzqualität und den Kundenservice.\n\n- **Virgin Media / Sky Broadband** – Die Umfrage unter 5.235 Kunden kritisiert beide Anbieter für schlechte Konnektivität. [Quelle](https://www.ispreview.co.uk/index.php/2026/07/which-survey-criticises-virgin-media-and-sky-broadband-for-connectivity-woes.html)\n\n## Asien\n\nIn Asien setzt Bharti Airtel in Indien auf gebündelte Breitband-Tarife, die TV- und Streaming-Dienste wie Amazon Prime und Netflix enthalten. Dies zeigt einen Trend zu konvergenten Angeboten, die Festnetz- und Unterhaltungsdienste kombinieren.\n\n- **Bharti Airtel** – Bietet 100-Mbps-Breitbandtarife mit TV und Streaming-Abonnements wie Amazon Prime und Netflix. [Quelle](https://telecomtalk.info/airtel-100-mbps-plan-that-brings-tv/1010071/)\n\n## Muster der Woche\n\n- **Bündelung von Breitband mit Streaming-Diensten**: Bharti Airtel in Indien kombiniert 100-Mbps-Breitband mit TV und Streaming-Diensten wie Netflix und Amazon Prime, um Kunden zu binden und den Umsatz pro Nutzer zu steigern.\n- **Wachsender Druck auf Netzqualität**: Die britische Verbraucherumfrage von Which? zeigt, dass Kunden zunehmend unzufrieden mit der Konnektivität großer Anbieter wie Virgin Media und Sky Broadband sind.\n- **KI-Upgrades in Betriebssystemen**: Apples iOS 27 führt KI-Funktionen für Siri und iMessage ein, die das Datenvolumen und die Netzauslastung bei Betreibern weltweit beeinflussen könnten.",
+ "regions": {
+  "Global": {
+   "region_summary": "Diese Woche dominieren Apple-Ankündigungen die globale Nachrichtenlage, insbesondere iOS 27 mit KI-Upgrades für Siri und iMessage. Für Vodafone als Netzbetreiber sind dies vor allem Signale, wie sich das Nutzerverhalten und die Datenlast durch neue KI-Funktionen verändern könnten.",
+   "highlights": [
+    {
+     "title": "Apple iOS 27 – List of Features and Upgrades iPhones Will Get",
+     "operator": "Apple",
+     "url": "https://telecomtalk.info/apple-ios27-list-of-features-and-upgrades/1010088/",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Apple hat auf der WWDC 2026 iOS 27 vorgestellt, das nun als öffentliche Beta verfügbar ist und zahlreiche neue Funktionen bringt.",
+     "why_it_matters": "Vodafone sollte die neuen Funktionen auf ihren Einfluss auf das Datenvolumen und die Netzauslastung prüfen. Falls iOS 27 datenintensive KI-Features einführt, könnte Vodafone spezielle Datentarife oder Add-ons für KI-Nutzung entwickeln.",
+     "date": "2026-07-26",
+     "source": "TelecomTalk"
+    },
+    {
+     "title": "Apple iOS 27 to Bring Major Siri AI Upgrade to iMessage",
+     "operator": "Apple",
+     "url": "https://telecomtalk.info/apple-ios27-bring-major-siri-ai-imessage/1010082/",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "iOS 27 bringt ein großes KI-Upgrade für Siri in iMessage, das die Art der Nachrichtenübermittlung verändert.",
+     "why_it_matters": "Diese Entwicklung zeigt, dass KI-gestützte Messaging-Funktionen zum Standard werden. Vodafone könnte dies zum Anlass nehmen, eigene KI-basierte Dienste wie intelligente Spam-Filter oder automatisierte Antwortvorschläge in der hauseigenen Messaging-App zu prüfen.",
+     "date": "2026-07-26",
+     "source": "TelecomTalk"
+    }
+   ]
+  },
+  "Europa": {
+   "region_summary": "In Großbritannien zeigt eine Verbraucherumfrage von Which? deutliche Unzufriedenheit mit der Konnektivität von Virgin Media und Sky Broadband, während Zen Internet gelobt wird. Dies unterstreicht den wachsenden Druck auf die Netzqualität und den Kundenservice, dem sich auch Vodafone stellen muss.",
+   "highlights": [
+    {
+     "title": "Which? Survey Criticises Virgin Media and Sky Broadband for Connectivity Woes",
+     "operator": "Liberty Global",
+     "url": "https://www.ispreview.co.uk/index.php/2026/07/which-survey-criticises-virgin-media-and-sky-broadband-for-connectivity-woes.html",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Die Verbraucherorganisation Which? veröffentlichte eine Umfrage unter 5.235 britischen Breitbandkunden, die Virgin Media und Sky Broadband für schlechte Konnektivität kritisiert, während Zen Internet positive Bewertungen erhält.",
+     "why_it_matters": "Vodafone sollte die Ergebnisse nutzen, um in der eigenen Kommunikation die Netzstabilität und Kundenzufriedenheit zu betonen, insbesondere im Vergleich zu den kritisierten Anbietern. Ein eigenes, unabhängiges Kundenzufriedenheitsranking könnte als Differenzierungsmerkmal dienen.",
+     "date": "2026-07-25",
+     "source": "ISPreview UK"
+    }
+   ]
+  },
+  "Asien": {
+   "region_summary": "In Asien setzt Bharti Airtel in Indien auf gebündelte Breitband-Tarife, die TV- und Streaming-Dienste wie Amazon Prime und Netflix enthalten. Dies zeigt einen Trend zu konvergenten Angeboten, die Festnetz- und Unterhaltungsdienste kombinieren, um Kunden zu binden und den durchschnittlichen Umsatz pro Nutzer zu steigern.",
+   "highlights": [
+    {
+     "title": "Airtel 100 Mbps Plan that Brings TV + Amazon Prime + Netflix and More",
+     "operator": "Bharti Airtel",
+     "url": "https://telecomtalk.info/airtel-100-mbps-plan-that-brings-tv/1010071/",
+     "category": "Tarif/Pricing",
+     "relevance": 4,
+     "summary": "Bharti Airtel bietet in Indien mehrere 100-Mbps-Breitbandtarife an, die TV-Dienste sowie Streaming-Abonnements wie Amazon Prime und Netflix bündeln.",
+     "why_it_matters": "Dieses gebündelte Angebot ist eine Vorlage für Vodafones eigene Festnetz-Mobilfunk-Konvergenzstrategie (GigaTV, GigaKombi). Vodafone sollte prüfen, ob ähnliche Pakete mit Streaming-Partnern in Deutschland oder anderen Märkten die Kundenbindung und den durchschnittlichen Umsatz pro Nutzer steigern könnten.",
+     "date": "2026-07-26",
+     "source": "TelecomTalk"
+    }
+   ]
+  }
+ },
+ "competitors": [
+  {
+   "name": "Deutsche Telekom",
+   "n_items": 10,
+   "moves": [
+    {
+     "title": "Deutsche Telekom deploys ChatGPT Enterprise for AI-native ops",
+     "url": "https://www.telecomstechnews.com/news/deutsche-telekom-deploys-chatgpt-enterprise-for-ai-native-ops/",
+     "category": "Netz/Technologie",
+     "note": "Deutsche Telekom setzt ChatGPT Enterprise ein, um KI-native Abläufe in Kundenservice und Kernnetz zu schaffen – ein strategischer Schritt zur Effizienzsteigerung."
+    },
+    {
+     "title": "T-Mobile US dominates Opensignal network awards",
+     "url": "https://www.mobileworldlive.com/att/t-mobile-us-dominates-opensignals-july-network-awards/",
+     "category": "Netz/Technologie",
+     "note": "T-Mobile US gewinnt die meisten Kategorien im Opensignal-Netzwerkbericht, was die Netzführerschaft in den USA unterstreicht."
+    },
+    {
+     "title": "T-Mobile scores highest in consumer sentiment in Ookla 1H 2026 assessment",
+     "url": "https://www.telecompetitor.com/t-mobile-scores-highest-in-consumer-sentiment-in-ookla-1h-2026-assessment/",
+     "category": "Kampagne",
+     "note": "T-Mobile US erzielt den höchsten Kundenzufriedenheitswert bei Ookla für das erste Halbjahr 2026 – ein starkes Signal für die Markenwahrnehmung."
+    },
+    {
+     "title": "Fiber-to-the-home (FTTH)/fiber optics: o2 Telefónica and Deutsche Telekom intensify their cooperation on fiber optic connections",
+     "url": "https://www.telefonica.de/fixed/news/10420/fiber-to-the-home-ftthfiber-optics-o2-telefonica-and-deutsche-telekom-intensify-their-cooperation-on-fiber-optic-connections.html",
+     "category": "Partnerschaft",
+     "note": "Deutsche Telekom und o2 Telefónica vertiefen ihre Glasfaser-Kooperation mit einem neuen Einkaufsmodell – das stärkt die Glasfaser-Penetration in Deutschland."
+    },
+    {
+     "title": "T-Mobile US chief buoyant on customer playbook",
+     "url": "https://www.mobileworldlive.com/operators/t-mobile-us-chief-buoyant-on-customer-playbook/",
+     "category": "Tarif/Pricing",
+     "note": "T-Mobile US-CEO Srini Gopalan betont den Erfolg kundenorientierter Initiativen, die zu einem Anstieg der Premium-Tarifnutzung führen – ein Zeichen für erfolgreiche Upselling-Strategie."
+    },
+    {
+     "title": "T-Mobile looks to new JV for D2D but still tied to Starlink",
+     "url": "https://www.lightreading.com/satellite/t-mobile-looks-to-new-jv-for-d2d-but-still-tied-to-starlink",
+     "category": "Partnerschaft",
+     "note": "T-Mobile treibt ein Direct-to-Device-Joint-Venture mit AT&T und Verizon voran, bleibt aber exklusiv an Starlink gebunden – ein strategischer Schritt im Satellitenmarkt."
+    }
+   ],
+   "summary": "Deutsche Telekom treibt die KI-Transformation mit dem Einsatz von ChatGPT Enterprise für Netz- und Kundenbetrieb voran. In den USA dominiert die Tochter T-Mobile die Netzqualitätsrankings von Opensignal und Ookla und verzeichnet ein starkes Kundenwachstum mit Premium-Tarifen. In Deutschland intensiviert der Konzern die Zusammenarbeit mit o2 Telefónica beim Glasfaserausbau. Die Strategie zielt auf KI-native Abläufe und Netzführerschaft ab.",
+   "themes": [
+    "KI-Transformation",
+    "Netzführerschaft USA",
+    "Glasfaser-Kooperation",
+    "Premium-Tarifstrategie",
+    "Kundenwachstum"
+   ],
+   "vodafone_implication": "Vodafone muss die KI-Offensive der Deutschen Telekom genau beobachten, da ChatGPT Enterprise die operative Effizienz und Kundenerfahrung deutlich verbessern könnte. Die starke Netzposition von T-Mobile in den USA und die Glasfaser-Kooperation in Deutschland setzen Vodafone unter Druck, eigene KI- und Netzpartnerschaften zu beschleunigen. Insbesondere die Premium-Tarifstrategie von T-Mobile zeigt, dass Kunden bereit sind, für bessere Leistung zu zahlen – Vodafone sollte sein eigenes Upselling-Potenzial prüfen."
+  },
+  {
+   "name": "Telefónica / O2",
+   "n_items": 16,
+   "moves": [
+    {
+     "title": "Telefónica to cut 1,100 jobs at German O2 unit in €265 million restructuring",
+     "url": "https://www.mobileeurope.co.uk/telefonica-restructuring-o2/",
+     "category": "Sonstiges",
+     "note": "Telefónica baut in Deutschland massiv ab – das schwächt O2 als Wettbewerber, könnte aber auch Preisdruck erhöhen."
+    },
+    {
+     "title": "Telefonica tests Wurth of AI, quantum",
+     "url": "https://www.mobileworldlive.com/industry/telefonica-tests-wurth-of-ai-quantum/",
+     "category": "Partnerschaft",
+     "note": "Telefónica zeigt mit Würth konkrete KI/Quanten-Anwendungen in der Logistik – ein Signal für Enterprise-Kunden."
+    },
+    {
+     "title": "Virgin Media O2 reaches 9m full-fibre premises",
+     "url": "https://www.broadbandtvnews.com/2026/07/24/virgin-media-o2-reaches-9m-full-fibre-premises/",
+     "category": "Netz/Technologie",
+     "note": "VMO2 baut FTTH massiv aus, verliert aber Breitbandkunden – das deutet auf intensiven Wettbewerb im UK-Markt hin."
+    },
+    {
+     "title": "VMO2 takes aim at UK net neutrality rules",
+     "url": "https://www.mobileworldlive.com/regulation/vmo2-takes-aim-at-uk-net-neutrality-rules/",
+     "category": "Regulierung",
+     "note": "VMO2 fordert Lockerung der Netzneutralität für KI – könnte Vodafone UK unter Druck setzen, ähnliche Positionen zu beziehen."
+    },
+    {
+     "title": "Telefónica and Harrison.ai join forces to support the diagnosis of chest X-rays using AI",
+     "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-harrison-ai-join-forces-support-diagnosis-chest-rays-ai/",
+     "category": "Partnerschaft",
+     "note": "Telefónica bringt KI ins Gesundheitswesen – ein neues B2B-Geschäftsfeld, das Vodafone im Auge behalten sollte."
+    },
+    {
+     "title": "GlobalData recognises Telefónica’s global leadership in IoT services",
+     "url": "https://www.telefonica.com/en/communication-room/press-room/globaldata-recognises-telefonicas-global-leadership-iot-services/",
+     "category": "Produktlaunch",
+     "note": "Telefónica wird als IoT-Weltmarktführer bestätigt – Vodafone muss seine IoT-Strategie schärfen, um nicht abgehängt zu werden."
+    }
+   ],
+   "summary": "Telefónica / O2 konzentriert sich derzeit auf Kostensenkungen und strategische Partnerschaften. In Deutschland werden 1.100 Stellen gestrichen und Filialen geschlossen, um 265 Millionen Euro einzusparen. Gleichzeitig treibt das Unternehmen KI- und Quantencomputing-Projekte voran, etwa mit Würth und Harrison.ai, und baut seine IoT-Führerschaft aus. In Großbritannien erreicht Virgin Media O2 9 Millionen FTTH-Anschlüsse, verliert aber Breitbandkunden. Telefónica setzt sich zudem für eine Reform der Netzneutralität ein, um 5G und KI zu fördern.",
+   "themes": [
+    "Kostensenkung/Restrukturierung",
+    "KI-Integration",
+    "Quantencomputing",
+    "IoT-Führerschaft",
+    "Netzneutralitätsreform",
+    "Breitbandausbau"
+   ],
+   "vodafone_implication": "Vodafone sollte die Restrukturierung von O2 in Deutschland genau beobachten: Die Stellenstreichungen könnten zu Serviceeinbußen führen, aber auch Preiskämpfe auslösen. Gleichzeitig investiert Telefónica stark in KI und IoT – Vodafone muss seine eigenen KI- und Enterprise-Angebote beschleunigen, um wettbewerbsfähig zu bleiben. Die Netzneutralitätsdebatte in UK könnte regulatorische Weichen stellen, die Vodafone aktiv mitgestalten sollte."
+  },
+  {
+   "name": "1&1",
+   "n_items": 10,
+   "moves": [
+    {
+     "title": "Neue Samsung Galaxy Z8-Serie bei 1&amp;1 bestellen – inklusive Google Fitbit Air und je nach Gerät bis zu max. 1.000 Euro Tauschprämie sichern, mindestens jedoch 150,-€* - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/neue-samsung-galaxy-z8-serie-bei-1-1-bestellen-inklusive-google-fitbit-air-und-tauschpraemie-sichern",
+     "category": "Kampagne",
+     "note": "1&1 lockt mit hohen Tauschprämien und Fitbit-Zugabe bei Top-Smartphones – aggressive Kundenbindung."
+    },
+    {
+     "title": "1&1 erweitert TV-Angebot um die Streaming-Plattform Joyn - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-erweitert-tv-angebot-um-die-streaming-plattform-joyn",
+     "category": "Produktlaunch",
+     "note": "Integration von Joyn+ in 1&1 TV wertet das TV-Produkt auf und erhöht die Attraktivität für Bestandskunden."
+    },
+    {
+     "title": "1&1 führt neuen Router auf Basis der FRITZ!Box 7620 ein - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-standard-router-fuer-dsl-und-glasfaser-ein-naechste-generation-des-1-1-homeservers-ab-sofort-verfuegbar",
+     "category": "Produktlaunch",
+     "note": "Neuer Standard-Router (FRITZ!Box 7620) ersetzt älteres Modell – 1&1 modernisiert die Kundengerätebasis."
+    },
+    {
+     "title": "IMTEST Festnetztest 2026: 1&1 erreicht Gesamtnote „sehr gut“ - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/imtest-festnetztest-2026-1-1-erzielt-erneut-die-gesamtnote-sehr-gut",
+     "category": "Netz/Technologie",
+     "note": "Note 1,26 im Festnetztest – 1&1 untermauert seine Qualitätsführerschaft im Festnetz."
+    },
+    {
+     "title": "1&1 HomeServer+ mit Wi‑Fi 7: Neuer Top-Router für DSL & Glasfaser - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-top-router-mit-wi-fi-7-ein-naechste-generation-des-homeserver-ab-sofort-verfuegbar",
+     "category": "Produktlaunch",
+     "note": "Wi-Fi 7 als neuer Standard bei 1&1 – technologischer Vorsprung im Heimnetzbereich."
+    },
+    {
+     "title": "Größere Glasfaser-Anbietervielfalt für Deutschland: 1&1 und Tele Columbus schließen langfristige Kooperationsvereinbarung - 1&1",
+     "url": "https://unternehmen.1und1.de/corporate-news/2026/groessere-glasfaser-anbietervielfalt-fuer-deutschland-1-1-und-tele-columbus-schliessen-langfristige-kooperationsvereinbarung",
+     "category": "Partnerschaft",
+     "note": "Langfristige Kooperation mit Tele Columbus erweitert 1&1s Glasfaser-Reichweite – direkter Wettbewerb zu Vodafone im Kabel- und Glasfasermarkt."
+    }
+   ],
+   "summary": "1&1 baut sein Produktportfolio kontinuierlich aus: Mit neuen Routern (Wi-Fi 7), der Integration von Joyn ins TV-Angebot und attraktiven Smartphone-Kampagnen (Samsung Z8, Fitbit Air, WM-Trikot) stärkt der Anbieter seine Position im Festnetz- und Mobilfunkmarkt. Im Festnetz- und Glasfasertest erzielt 1&1 Spitzennoten (IMTEST „sehr gut“, connect professional Testsieger). Die langfristige Kooperation mit Tele Columbus soll die Glasfaser-Anbietervielfalt erhöhen. 1&1 zeigt sich damit als agiler, kundenorientierter Wettbewerber mit Fokus auf Qualität und Partnerschaften.",
+   "themes": [
+    "Produktlaunch",
+    "TV/Streaming",
+    "Router/Hardware",
+    "Test/Qualität",
+    "Kampagne",
+    "Glasfaser-Partnerschaft"
+   ],
+   "vodafone_implication": "1&1 positioniert sich zunehmend als Qualitätsanbieter mit modernster Hardware und attraktiven Zusatzleistungen. Vodafone sollte die Entwicklung der Glasfaser-Kooperationen (Tele Columbus) genau beobachten, da diese den Wettbewerb in bisherigen Kabelgebieten verschärfen. Zudem sind die aggressiven Smartphone-Kampagnen und TV-Integrationen ein Signal, dass 1&1 Kunden mit gebündelten Angeboten binden will – Vodafone muss hier mit eigenen attraktiven Paketen und Technologievorsprung (z.B. Wi-Fi 7) gegenhalten."
+  }
+ ],
+ "run": {
+  "started_at": "2026-07-26T10:29:34.164838+00:00",
+  "finished_at": "2026-07-26T10:45:55.776845+00:00",
+  "duration_seconds": 981.6,
+  "used_llm": true,
+  "editor_used": true,
+  "models": {
+   "analyst": "deepseek-ai/deepseek-v4-flash",
+   "editor": "deepseek-ai/deepseek-v4-flash",
+   "unavailable": null
+  },
+  "phases": [
+   {
+    "name": "Sammeln",
+    "seconds": 67.9,
+    "detail": "83 Quellen abgefragt, 714 Meldungen gefunden"
+   },
+   {
+    "name": "Nur Neues",
+    "seconds": 0.0,
+    "detail": "4 neue Meldungen (Gedaechtnis: 976 bekannt)"
+   },
+   {
+    "name": "Bewerten & Schreiben",
+    "seconds": 106.0,
+    "detail": "4 bewertete Meldungen"
+   },
+   {
+    "name": "Wettbewerber-Analyse",
+    "seconds": 73.2,
+    "detail": "3 Profile (18 Moves)"
+   }
+  ],
+  "source_summary": {
+   "total": 83,
+   "ok": 47,
+   "empty": 32,
+   "failed": 4,
+   "by_kind": {
+    "json_api": 1,
+    "rss": 10,
+    "newsroom": 12,
+    "newsroom_js": 46,
+    "trade_press": 14
+   }
+  },
+  "sources": [
+   {
+    "name": "KT",
+    "operator": "KT",
+    "region": "asia",
+    "url": "https://corp.kt.com/eng/html/prcenter/report_list.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "fail",
+    "count": 0,
+    "error": "TimeoutError: Page.goto: Timeout 16000ms exceeded.\nCall log:\n  - navigating to \"https://corp.kt.com/eng/html/prcenter/report_list.html\", waiting until \"do"
+   },
+   {
+    "name": "Optus",
+    "operator": "Optus",
+    "region": "oceania",
+    "url": "https://www.optus.com.au/about/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "fail",
+    "count": 0,
+    "error": "Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.optus.com.au/about/media-centre\nCall log:\n  - navigating to \"https://www.optus.com.a"
+   },
+   {
+    "name": "Developing Telecoms",
+    "operator": null,
+    "region": "global",
+    "url": "https://developingtelecoms.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "Developing Telecoms",
+    "origin": "industry_news",
+    "status": "fail",
+    "count": 0,
+    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag"
+   },
+   {
+    "name": "The Fast Mode",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.thefastmode.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "The Fast Mode",
+    "origin": "industry_news",
+    "status": "fail",
+    "count": 0,
+    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag"
+   },
+   {
+    "name": "Comcast",
+    "operator": "Comcast",
+    "region": "north_america",
+    "url": "https://corporate.comcast.com/rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "DISH Wireless",
+    "operator": "DISH Wireless",
+    "region": "north_america",
+    "url": "https://api.client.notified.com/api/rss/publish/view/53068?type=press",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Light Reading",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.lightreading.com/rss.xml",
+    "kind": "trade_press",
+    "label": "Light Reading",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "VEON",
+    "operator": "VEON",
+    "region": "europe",
+    "url": "https://www.veon.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Vodacom",
+    "operator": "Vodacom",
+    "region": "africa_middle_east",
+    "url": "https://www.vodacom.com/press-releases.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
+    "region": "asia",
+    "url": "https://www.airtel.in/press-release",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.softbank.jp/en/corp/news/press/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
+    "region": "asia",
+    "url": "https://corp.mobile.rakuten.co.jp/english/news/press/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "CelcomDigi",
+    "operator": "CelcomDigi",
+    "region": "asia",
+    "url": "https://corporate.celcomdigi.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Mobile World Live",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileworldlive.com/feed/",
+    "kind": "trade_press",
+    "label": "Mobile World Live",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "BT Group",
+    "operator": "BT Group",
+    "region": "europe",
+    "url": "https://newsroom.bt.com/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "KPN",
+    "operator": "KPN",
+    "region": "europe",
+    "url": "https://www.overons.kpn/nieuws/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Fierce Network",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.fierce-network.com/rss/xml",
+    "kind": "trade_press",
+    "label": "Fierce Network",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.corporate.bouyguestelecom.fr/presse-et-actualites/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 22
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "NTT Docomo",
+    "operator": "NTT Docomo",
+    "region": "asia",
+    "url": "https://www.docomo.ne.jp/english/info/media_center/pr/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "TelecomTalk",
+    "operator": null,
+    "region": "global",
+    "url": "https://telecomtalk.info/feed/",
+    "kind": "trade_press",
+    "label": "TelecomTalk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "Vodafone Group",
+    "operator": "Vodafone Group",
+    "region": "europe",
+    "url": "https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&categories=*&tags=*",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 16
+   },
+   {
+    "name": "A1 Telekom Austria",
+    "operator": "A1 Telekom Austria",
+    "region": "europe",
+    "url": "https://newsroom.a1.net/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 12
+   },
+   {
+    "name": "Singtel",
+    "operator": "Singtel",
+    "region": "asia",
+    "url": "https://www.singtel.com/about-us/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 11
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.telefonica.com/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.telenor.com/media/newsroom/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "1&1",
+    "operator": "1&1",
+    "region": "europe",
+    "url": "https://unternehmen.1und1.de/presse/feed",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "MTN Group",
+    "operator": "MTN Group",
+    "region": "africa_middle_east",
+    "url": "https://www.mtn.com/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "KDDI",
+    "operator": "KDDI",
+    "region": "asia",
+    "url": "https://newsroom.kddi.com/english/news/newsrelease.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "One NZ",
+    "operator": "One NZ",
+    "region": "oceania",
+    "url": "https://media.one.nz/index.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Total Telecom",
+    "operator": null,
+    "region": "global",
+    "url": "https://totaltele.com/feed/",
+    "kind": "trade_press",
+    "label": "Total Telecom",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "RCR Wireless",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.rcrwireless.com/feed",
+    "kind": "trade_press",
+    "label": "RCR Wireless",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Broadband TV News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.broadbandtvnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Broadband TV News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Mobile Europe",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileeurope.co.uk/feed/",
+    "kind": "trade_press",
+    "label": "Mobile Europe",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telecompetitor",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecompetitor.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecompetitor",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telecoms Tech News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecomstechnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecoms Tech News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "CommsRisk",
+    "operator": null,
+    "region": "global",
+    "url": "https://commsrisk.com/feed/",
+    "kind": "trade_press",
+    "label": "CommsRisk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "2degrees",
+    "operator": "2degrees",
+    "region": "oceania",
+    "url": "https://www.2degrees.nz/media-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 9
+   },
+   {
+    "name": "Telkomsel",
+    "operator": "Telkomsel",
+    "region": "asia",
+    "url": "https://www.telkomsel.com/en/about-us/news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "ISPreview UK",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.ispreview.co.uk/index.php/feed",
+    "kind": "trade_press",
+    "label": "ISPreview UK",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Orange",
+    "operator": "Orange",
+    "region": "europe",
+    "url": "https://www.orange.com/en/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5
+   },
+   {
+    "name": "Telia",
+    "operator": "Telia",
+    "region": "europe",
+    "url": "https://www.teliacompany.com/en/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5
+   },
+   {
+    "name": "TIM Brasil",
+    "operator": "TIM Brasil",
+    "region": "latin_america",
+    "url": "https://www.tim.com.br/sobre-a-tim/sala-de-imprensa",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5
+   },
+   {
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://elisa.com/corporate/news-room/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Proximus",
+    "operator": "Proximus",
+    "region": "europe",
+    "url": "https://www.proximus.com/news.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Swisscom",
+    "operator": "Swisscom",
+    "region": "europe",
+    "url": "https://www.swisscom.ch/en/about/news.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.safaricom.co.ke/media-center-landing",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Verizon",
+    "operator": "Verizon",
+    "region": "north_america",
+    "url": "https://www.verizon.com/about/news",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 2
+   },
+   {
+    "name": "Vodafone Deutschland",
+    "operator": "Vodafone Deutschland",
+    "region": "europe",
+    "url": "https://newsroom.vodafone.de/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Tele2",
+    "operator": "Tele2",
+    "region": "europe",
+    "url": "https://www.tele2.com/media/press-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Viettel",
+    "operator": "Viettel",
+    "region": "asia",
+    "url": "https://viettel.com.vn/en/news",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Deutsche Telekom",
+    "operator": "Deutsche Telekom",
+    "region": "europe",
+    "url": "https://www.telekom.com/en/media/media-information",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Liberty Global",
+    "operator": "Liberty Global",
+    "region": "europe",
+    "url": "https://www.libertyglobal.com/news-insights/featured-news-insights/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "TIM",
+    "operator": "TIM",
+    "region": "europe",
+    "url": "https://www.gruppotim.it/en/press-archive.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Iliad",
+    "operator": "Iliad",
+    "region": "europe",
+    "url": "https://www.iliad.fr/en/press",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://medya.turkcell.com.tr/basin-bultenleri/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Cosmote",
+    "operator": "Cosmote",
+    "region": "europe",
+    "url": "https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Three UK",
+    "operator": "Three UK",
+    "region": "europe",
+    "url": "https://www.threemediacentre.co.uk/press-release-browser/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
+    "region": "north_america",
+    "url": "https://corporate.charter.com/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Millicom",
+    "operator": "Millicom",
+    "region": "latin_america",
+    "url": "https://www.millicom.com/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Bell Canada",
+    "operator": "Bell Canada",
+    "region": "north_america",
+    "url": "https://www.bce.ca/news-and-media/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Entel",
+    "operator": "Entel",
+    "region": "latin_america",
+    "url": "https://informacioncorporativa.entel.cl/sala-de-prensa",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Oi",
+    "operator": "Oi",
+    "region": "latin_america",
+    "url": "https://www.oi.com.br/sala-de-imprensa/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "WOM",
+    "operator": "WOM",
+    "region": "latin_america",
+    "url": "https://sobrenosotros.wom.cl/wom-en-prensa/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://airtel.africa/media",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "stc",
+    "operator": "stc",
+    "region": "africa_middle_east",
+    "url": "https://www.stc.com/en/media-center.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.eand.com/en/news.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Orange MEA",
+    "operator": "Orange MEA",
+    "region": "africa_middle_east",
+    "url": "https://www.orange.eg/en/media-center/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Turk Telekom",
+    "operator": "Turk Telekom",
+    "region": "africa_middle_east",
+    "url": "https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "du",
+    "operator": "du",
+    "region": "africa_middle_east",
+    "url": "https://www.du.ae/about-us/media-centre",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
+    "region": "asia",
+    "url": "https://www.jio.com/press-release",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Vodafone Idea",
+    "operator": "Vodafone Idea",
+    "region": "asia",
+    "url": "https://www.myvi.in/media/press-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "SK Telecom",
+    "operator": "SK Telecom",
+    "region": "asia",
+    "url": "https://www.sktelecom.com/en/press/press_list.do",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "China Telecom",
+    "operator": "China Telecom",
+    "region": "asia",
+    "url": "https://www.chinatelecom-h.com/en/media/press.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.chinamobileltd.com/en/media/press.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Chunghwa Telecom",
+    "operator": "Chunghwa Telecom",
+    "region": "asia",
+    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "AIS",
+    "operator": "AIS",
+    "region": "asia",
+    "url": "https://investor.ais.co.th/en/newsroom/set-announcements",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "True Corporation",
+    "operator": "True Corporation",
+    "region": "asia",
+    "url": "https://investor.true.th/en/newsroom/set-announcements",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.maxis.com.my/en/about-maxis/newsroom/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "PLDT",
+    "operator": "PLDT",
+    "region": "asia",
+    "url": "https://main.pldt.com/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Telstra",
+    "operator": "Telstra",
+    "region": "oceania",
+    "url": "https://www.telstra.com.au/exchange",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "Indosat Ooredoo Hutchison",
+    "operator": "Indosat Ooredoo Hutchison",
+    "region": "asia",
+    "url": "https://ioh.co.id/portal/en/iohpressrelease",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   },
+   {
+    "name": "TPG Telecom",
+    "operator": "TPG Telecom",
+    "region": "oceania",
+    "url": "https://www.tpgtelecom.com.au/media_release",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   }
+  ],
+  "analysts": [
+   {
+    "items_in": 2,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 2,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Global"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Europa"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "region": "Asien"
+   }
+  ]
+ }
+}
