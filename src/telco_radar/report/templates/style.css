@@ -685,26 +685,53 @@ main{padding-bottom:8px}
 .promo-filter.on{background:var(--vf-ink);color:#fff}
 .promo-hint{font-size:12.5px;color:var(--vf-faint)}
 
-.promo-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(298px,1fr));gap:18px;align-items:start}
-.promo-card{background:#fff;border:1px solid var(--vf-line);border-radius:18px;
-  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+/* Mehrspaltiges Masonry (CSS `columns`, kein JS): Karten mit 1 Angebot und
+   Karten mit 8 Angeboten fuellen sich organisch nebeneinander statt in
+   starren, gleich hohen Grid-Zeilen mit haesslichen Luecken. `column-gap`
+   deckt den horizontalen Abstand ab, vertikal braucht jede Karte ihren
+   eigenen margin-bottom (Multicol kennt kein "gap" fuer die y-Achse).
+   Leserichtung wird dadurch spaltenweise (oben->unten je Spalte, dann
+   naechste Spalte) statt zeilenweise - Prioritaet (aktive Marken zuerst,
+   siehe report/promo.py) steckt deshalb bewusst weiter im Karten-Inhalt
+   selbst (Live-Zaehler, Sortierung), nicht in der Grid-Position. */
+.promo-board{columns:4 320px;column-gap:18px}
+.promo-card{display:inline-flex;flex-direction:column;width:100%;
+  break-inside:avoid;margin:0 0 18px;background:#fff;border-radius:18px;
+  box-shadow:var(--shadow);overflow:hidden;
   transition:box-shadow .2s var(--ease),transform .2s var(--ease)}
-.promo-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.promo-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px)}
 .promo-card[hidden]{display:none}
-.promo-card--empty{opacity:.6}
-.promo-card--own{border:1.5px solid var(--vf-red)}
+.promo-card--empty{opacity:.62}
+.promo-card--own{box-shadow:0 0 0 1.5px var(--vf-red),var(--shadow)}
+.promo-card--own:hover{box-shadow:0 0 0 1.5px var(--vf-red),var(--shadow-lg)}
 
-.promo-media{position:relative;height:112px;background:var(--vf-neutral);overflow:hidden}
+/* Echtes Foto der Anbieter-Aktionsseite (Playwright-Screenshot, siehe
+   collect/promo_snapshot.py::capture_hero_image) statt eines Farbverlaufs -
+   jede Karte bekommt dadurch automatisch ein eigenes, echtes Gesicht statt
+   austauschbarer Initialen-Kacheln. Farbverlauf+Initialen bleiben der
+   Fallback fuer Marken ohne (noch) erfolgreichen Screenshot. */
+.promo-media{position:relative;aspect-ratio:16/10;background:var(--vf-neutral);overflow:hidden}
 .promo-media-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--c,#3860be),#1b1d21)}
-.promo-avatar{font-size:26px;font-weight:800;letter-spacing:.03em;color:#fff;opacity:.92}
-.promo-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.promo-tier-tag{position:absolute;top:10px;left:12px;font-size:10.5px;font-weight:800;
-  letter-spacing:.07em;text-transform:uppercase;color:#fff;background:rgba(20,22,26,.55);
-  backdrop-filter:blur(3px);padding:4px 9px;border-radius:100px}
-.promo-own-tag{position:absolute;top:10px;right:12px;font-size:10.5px;font-weight:800;
-  letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--vf-red);
-  padding:4px 9px;border-radius:100px}
+.promo-avatar{font-size:36px;font-weight:800;letter-spacing:.03em;color:#fff;opacity:.92}
+.promo-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  object-position:top center;display:block;transition:transform .4s var(--ease)}
+.promo-card:hover .promo-media img{transform:scale(1.045)}
+.promo-media-badges{position:absolute;top:10px;left:12px;right:12px;z-index:1;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:8px;pointer-events:none}
+.promo-tier-tag{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+  color:#fff;background:rgba(20,22,26,.55);backdrop-filter:blur(3px);
+  padding:4px 9px;border-radius:100px;white-space:nowrap}
+.promo-own-tag{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--vf-red);padding:4px 9px;border-radius:100px;white-space:nowrap}
+/* Markenmonogramm bleibt als kleines Siegel auf dem Foto sichtbar - so ist
+   die Marke auch dann sofort erkennbar, wenn das Foto selbst (naturgemaess)
+   nicht die Wettbewerber-Farbe traegt. */
+.promo-media-brand{position:absolute;left:12px;bottom:10px;z-index:1}
+.promo-avatar--sm{display:flex;align-items:center;justify-content:center;width:32px;height:32px;
+  border-radius:50%;background:var(--c,#3860be);border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 2px 8px rgba(20,22,26,.35);font-size:12px;opacity:1}
+.promo-card--no-photo .promo-media-brand{display:none}
 
 .promo-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:16px 18px 0}
@@ -718,11 +745,12 @@ main{padding-bottom:8px}
 .promo-offer{padding:9px 0;border-top:1px solid var(--vf-line)}
 .promo-offer:first-child{border-top:none}
 .promo-offer--fading{opacity:.6}
-.promo-offer-top{display:flex;align-items:baseline;gap:8px}
-.promo-offer-title{flex:1;font-size:14px;font-weight:700;line-height:1.35;color:var(--vf-ink)}
+.promo-offer-top{display:flex;align-items:flex-start;gap:8px}
+.promo-offer-title{flex:1;font-size:14px;font-weight:700;line-height:1.35;color:var(--vf-ink);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .promo-offer-title:hover{color:var(--vf-red)}
-.promo-offer-new{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-  color:#fff;background:var(--vf-red);padding:2px 7px;border-radius:100px}
+/* "neu" nutzt bewusst .dz-new (siehe Differenzierung) statt einer eigenen
+   Klasse - gleiche Pille sitewide, statt einer promo-eigenen Variante. */
 .promo-offer-fading-tag{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.03em;
   color:var(--vf-mute);background:var(--vf-neutral);padding:2px 7px;border-radius:100px;white-space:nowrap}
 .promo-offer-desc{font-size:12.5px;line-height:1.45;color:#575b61;margin:6px 0 0}
@@ -752,7 +780,8 @@ main{padding-bottom:8px}
 .promo-stale-note{margin:6px 18px 14px;font-size:11px;color:var(--vf-faint)}
 .promo-card>.promo-offers:last-child,.promo-card>.promo-more:last-child{margin-bottom:16px}
 
+@media (max-width:900px){.promo-board{columns:2 260px}}
 @media (max-width:640px){
-  .promo-board{grid-template-columns:1fr}
+  .promo-board{columns:1}
   .promo-toolbar{flex-direction:column;align-items:flex-start}
 }

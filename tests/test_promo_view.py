@@ -112,3 +112,35 @@ def test_image_url_picked_from_entries_when_present():
               _entry(headline="B", image_url="https://example.test/hero.jpg")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["brands"][0]["image_url"] == "https://example.test/hero.jpg"
+
+
+def test_captured_screenshot_takes_priority_over_entry_og_image():
+    """Ein echter Playwright-Screenshot (siehe promo_images.py/report/html.py)
+    soll immer vor dem per-Eintrag og:image/twitter:image-Fund gewaehlt
+    werden - og:image ist meist nur ein generisches Marken-Logo (siehe
+    claude/promo-uebersicht-umsetzung.md), der Screenshot ist die
+    verlaesslichere, "richtigere" Quelle."""
+    sources = [_src("congstar")]
+    entries = [_entry(headline="A", image_url="https://example.test/logo.png")]
+    view = prepare_promo_view(entries, sources, "2026-07-25",
+                              images={"congstar": "images/congstar.jpg"})
+    assert view["brands"][0]["image_url"] == "images/congstar.jpg"
+
+
+def test_missing_images_arg_falls_back_to_entry_image_url():
+    """Rueckwaerts-kompatibel: Aufrufer, die (noch) kein images-Mapping
+    uebergeben, verhalten sich exakt wie vor der Screenshot-Funktion."""
+    sources = [_src("congstar")]
+    entries = [_entry(headline="A", image_url="https://example.test/logo.png")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert view["brands"][0]["image_url"] == "https://example.test/logo.png"
+
+
+def test_brand_without_screenshot_or_og_image_has_none():
+    sources = [_src("congstar"), _src("klarmobil")]
+    entries = [_entry(brand="congstar", headline="A", image_url=None)]
+    view = prepare_promo_view(entries, sources, "2026-07-25",
+                              images={"klarmobil": "images/klarmobil.jpg"})
+    by_name = {b["name"]: b for b in view["brands"]}
+    assert by_name["congstar"]["image_url"] is None
+    assert by_name["klarmobil"]["image_url"] == "images/klarmobil.jpg"

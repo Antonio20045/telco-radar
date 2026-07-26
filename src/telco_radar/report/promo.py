@@ -35,12 +35,24 @@ def _initials(name: str) -> str:
     return letters or "?"
 
 
-def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) -> dict:
+def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str,
+                       images: dict[str, str] | None = None) -> dict:
     """Gruppiert PromoDB-Eintraege nach Marke fuer die Wettbewerber-Board-
     Ansicht. "neu" = seit weniger als 10 Tagen zum ersten Mal gesehen, gleiche
     Regel wie bei Differenzierung. Vodafone selbst (internal_reference=True)
     wird angezeigt, aber nicht in active_total/brands_active/brands_tracked
-    mitgezaehlt - das sind Wettbewerbskennzahlen."""
+    mitgezaehlt - das sind Wettbewerbskennzahlen.
+
+    *images* ist eine optionale Zuordnung Markenname -> site-relativer
+    Bildpfad (z. B. "images/congstar.jpg"), von report/html.py aus dem
+    Playwright-Screenshot-Cache (data/state/promo_images/, siehe
+    promo_images.py) gebaut. Ein echter Screenshot hat Vorrang vor dem
+    per-Eintrag og:image/twitter:image-Fund (meist nur ein generisches
+    Marken-Logo, siehe collect/promo_snapshot.py) - dieser bleibt nur als
+    zweite Absicherung, falls fuer eine Marke (noch) kein Screenshot
+    vorliegt. Fehlt beides, faellt die Karte auf die Farbverlauf+Initialen-
+    Kachel zurueck (siehe promo_index.html.j2)."""
+    images = images or {}
     try:
         cutoff = (datetime.fromisoformat(latest_date) - timedelta(days=10)).date().isoformat()
     except ValueError:
@@ -78,7 +90,8 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
             e["fading"] = True
         visible = confirmed + grace
         retired = [e for e in entries if e.get("status") == _RETIRED_STATUS]
-        image_url = next((e.get("image_url") for e in entries if e.get("image_url")), None)
+        image_url = images.get(src.name) or next(
+            (e.get("image_url") for e in entries if e.get("image_url")), None)
 
         if not src.internal_reference and confirmed:
             active_total += len(confirmed)

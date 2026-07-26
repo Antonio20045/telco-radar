@@ -19,10 +19,17 @@ from pathlib import Path
 from .analyze import promo_editor
 from .analyze.promo_analyst import extract_promos
 from .analyze.promo_store import PromoDB, SnapshotStore, entry_id
-from .collect.promo_snapshot import content_hash, fetch_snapshot
+from .collect.promo_snapshot import capture_hero_image, content_hash, fetch_snapshot
 from .promo_config import load_promo_config
+from .promo_images import image_path
 
 log = logging.getLogger(__name__)
+
+# Screenshot capture launches a full Chromium instance per brand and is
+# noticeably heavier than the text-only fetch above (real images/fonts/CSS
+# loaded) - a lower, separate concurrency cap keeps peak memory bounded on
+# the Actions runner regardless of what max_workers the text-fetch pass uses.
+_IMAGE_WORKERS = 3
 
 
 def _fetch_one(src, http_cfg: dict) -> dict:
@@ -67,6 +74,15 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             fetched.append(fut.result())
     fetched.sort(key=lambda r: r["brand"])  # deterministisches Protokoll
 
+    # Brands whose hero screenshot should be (re-)captured this run: either
+    # the page actually changed (the screenshot is likely stale too), or no
+    # cached screenshot exists yet at all (first rollout / a past capture
+    # failure). A page that failed to fetch is skipped here too - if plain
+    # HTTP/JS-render couldn't reach it, a fresh screenshot attempt this same
+    # run is unlikely to fare better and would just spend time other brands
+    # could use; it gets picked up automatically once the source recovers.
+    image_candidates: list[tuple[str, str]] = []
+
     results: list[dict] = []
     for rec in fetched:
         if rec.get("status") == "fail":
@@ -76,8 +92,11 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             continue
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
         image_url = rec.get("image_url")
+        changed = snap_store.changed(src_name, h)
+        if changed or not image_path(root, src_name).exists():
+            image_candidates.append((src_name, rec["url"]))
         try:
-            if not snap_store.changed(src_name, h):
+            if not changed:
                 rec["status"] = "unveraendert"
                 results.append(rec)
                 continue
@@ -106,6 +125,40 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     snap_store.save()
     db.save(today)
 
+    # Hero screenshots: a second, independent pass after the text/LLM work
+    # above (own Chromium launches, own lower concurrency cap - see
+    # _IMAGE_WORKERS) so a slow or failing screenshot can never affect the
+    # text/diff/LLM path this run's core value depends on. Failure per brand
+    # is caught individually; the card simply keeps last run's image (or the
+    # colour+initials fallback if there never was one) - never fatal.
+    images_captured = images_failed = 0
+    if image_candidates:
+        image_dir = state_dir / "promo_images"
+        image_dir.mkdir(parents=True, exist_ok=True)
+
+        def _capture_one(brand: str, url: str) -> bool:
+            data = capture_hero_image(url, http_cfg)
+            if not data:
+                return False
+            try:
+                image_path(root, brand).write_bytes(data)
+                return True
+            except OSError as exc:
+                log.warning("Promo-Hero-Bild konnte nicht gespeichert werden (%s): %s",
+                           brand, exc)
+                return False
+
+        with ThreadPoolExecutor(max_workers=_IMAGE_WORKERS) as pool:
+            futures = {pool.submit(_capture_one, brand, url): brand
+                      for brand, url in image_candidates}
+            for fut in as_completed(futures):
+                if fut.result():
+                    images_captured += 1
+                else:
+                    images_failed += 1
+        log.info("Promo-Hero-Bilder: %d von %d Kandidaten erfasst (%d fehlgeschlagen)",
+                 images_captured, len(image_candidates), images_failed)
+
     entries = list(db.entries.values())
     try:
         if use_llm and entries:
@@ -124,4 +177,5 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     active = sum(1 for e in entries if e.get("status") == "aktiv")
     log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Quellen konfiguriert)",
              mode, active, len(promo_cfg.sources))
-    return {"mode": mode, "sources": results, "db_size": len(db), "active": active}
+    return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
+            "images_captured": images_captured, "images_failed": images_failed}

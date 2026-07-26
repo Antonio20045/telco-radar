@@ -7,7 +7,7 @@
 <li class="promo-offer{% if o.fading %} promo-offer--fading{% endif %}">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="{{ o.url }}" target="_blank" rel="noopener">{{ o.headline }}</a>
-    {% if o.fading %}<span class="promo-offer-fading-tag">vermutlich ausgelaufen</span>{% elif o.neu %}<span class="promo-offer-new">neu</span>{% endif %}
+    {% if o.fading %}<span class="promo-offer-fading-tag">vermutlich ausgelaufen</span>{% elif o.neu %}<span class="dz-new">neu</span>{% endif %}
   </div>
   <p class="promo-offer-meta">{{ o.url | domain }}{% if o.valid_until %} · gültig laut Anbieter bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}</p>
   {% if o.description %}
@@ -49,12 +49,15 @@
 
 <div class="promo-board" id="promo-board">
   {% for b in promo_view.brands %}
-  <article class="promo-card{% if b.internal_reference %} promo-card--own{% endif %}{% if not b.has_offers %} promo-card--empty{% endif %}" data-tier="{{ b.tier }}" style="--c:{{ b.color }}">
+  <article class="promo-card{% if b.internal_reference %} promo-card--own{% endif %}{% if not b.has_offers %} promo-card--empty{% endif %}{% if not b.image_url %} promo-card--no-photo{% endif %}" data-tier="{{ b.tier }}" style="--c:{{ b.color }}">
     <div class="promo-media">
       <span class="promo-media-fallback"><span class="promo-avatar">{{ b.initials }}</span></span>
-      {% if b.image_url %}<img src="{{ b.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">{% endif %}
-      <span class="promo-tier-tag">{{ b.tier_label }}</span>
-      {% if b.internal_reference %}<span class="promo-own-tag">Eigene Referenz</span>{% endif %}
+      {% if b.image_url %}<img src="{{ b.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">{% endif %}
+      <span class="promo-media-badges">
+        <span class="promo-tier-tag">{{ b.tier_label }}</span>
+        {% if b.internal_reference %}<span class="promo-own-tag">Eigene Referenz</span>{% endif %}
+      </span>
+      {% if b.image_url %}<span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">{{ b.initials }}</span></span>{% endif %}
     </div>
 
     <div class="promo-card-head">

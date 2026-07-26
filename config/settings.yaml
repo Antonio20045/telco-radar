@@ -88,5 +88,9 @@ focus_competitors:
 http:
   timeout_seconds: 20
   render_timeout_seconds: 16   # headless (newsroom_js) page render budget
+  image_timeout_seconds: 17    # Promo-Uebersicht hero-screenshot page-load budget
+                                # (collect/promo_snapshot.py::capture_hero_image;
+                                # separate navigation from render_timeout_seconds
+                                # above - images/CSS load, unlike the text fetch)
   user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
   max_links_per_newsroom: 30

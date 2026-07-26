@@ -19,6 +19,7 @@ from .promo import prepare_promo_view
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..promo_config import load_promo_config
+from ..promo_images import image_path as promo_image_path
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
 
@@ -578,7 +579,23 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 log.warning("promo_db.json unlesbar - rendere leere Promo-Uebersicht")
         promo_entries = promo_db_raw.get("entries") or []
         promo_updated = promo_db_raw.get("updated") or (latest["date"] if latest else "")
-        promo_view = prepare_promo_view(promo_entries, promo_cfg.sources, promo_updated)
+
+        # Hero screenshots (data/state/promo_images/<slug>.jpg, written by
+        # promo_pipeline.py) are pipeline STATE, not site output, so they are
+        # copied into site/promo/images/ on every render, same as any other
+        # generated site asset - never edit/add files under site/ by hand.
+        promo_dir_images = site_dir / "promo" / "images"
+        promo_image_map: dict[str, str] = {}
+        for src in promo_cfg.sources:
+            cached = promo_image_path(cfg.root, src.name)
+            if not cached.exists():
+                continue
+            promo_dir_images.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(cached, promo_dir_images / cached.name)
+            promo_image_map[src.name] = f"images/{cached.name}"
+
+        promo_view = prepare_promo_view(promo_entries, promo_cfg.sources,
+                                        promo_updated, images=promo_image_map)
 
         promo_report_dir = reports_dir / "promo"
         promo_report = None
