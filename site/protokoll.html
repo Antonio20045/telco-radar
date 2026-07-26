@@ -11,925 +11,964 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body>
+<body class="uc-markt">
   
   <header class="topbar">
-    <div class="wrap topbar-inner">
+    <div class="topbar-inner">
       <a class="brand" href="index.html" aria-label="Vodafone Insights">
-        <img class="brand-logo" src="logo.png" alt="Vodafone" width="26" height="26">
-        <span class="brand-name">Vodafone<em>Insights</em></span>
+        <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="18" height="18"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
       </a>
       <nav class="usecases" aria-label="Anwendungsfälle">
         <a class="uc active" href="index.html">Marktrecherche</a>
         <a class="uc " href="promo/index.html">Promo Übersicht</a>
       </nav>
     </div>
-    <div class="subbar">
-      
-      <nav class="wrap subnav" aria-label="Marktrecherche">
-        <a href="index.html" >Übersicht</a>
-        <a href="bericht.html" >Bericht</a>
-        <a href="differenzierung.html" >Differenzierung</a>
-        <a href="wettbewerber.html" >Wettbewerber</a>
-        <a href="protokoll.html" class="on">Protokoll</a>
-        <a href="archive.html" >Archiv</a>
-        <a href="sources.html" >Quellen</a>
-      </nav>
-      
-    </div>
+    
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="index.html" >Übersicht</a>
+      <a href="bericht.html" >Bericht</a>
+      <a href="differenzierung.html" >Differenzierung</a>
+      <a href="wettbewerber.html" >Wettbewerber</a>
+      <a href="protokoll.html" class="on">Protokoll</a>
+      <a href="archive.html" >Archiv</a>
+      <a href="sources.html" >Quellen</a>
+    </nav>
+    
   </header>
   <main>
     <div class="wrap">
       
 
-<section class="page-hero">
-  <div class="page-hero-row">
+<section class="page-hero wide">
+  <p class="page-kicker">Transparenz</p>
+  <h1>Was im Hintergrund lief</h1>
+  <p class="page-lead">Jeder Lauf ist hier nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und was die KI daraus gemacht hat.</p>
+</section>
+
+
+<div class="tile-grid">
+  <div class="tile"><b>83</b><span>Quellen abgefragt</span></div>
+  <div class="tile accent"><b>47 / 32 / 0</b><span>ok / leer / fehlgeschlagen</span></div>
+  <div class="tile"><b>16.4 min</b><span>Laufzeit (26. Juli 2026)</span></div>
+  <div class="tile tint"><b>4</b><span>neue Meldungen bewertet</span></div>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <div class="card-head"><h2>Ablauf dieses Laufs</h2></div>
+  <div class="step-grid">
+    
     <div>
-      <p class="page-kicker">Transparenz</p>
-      <h1>Was im Hintergrund lief</h1>
+      <div class="step-dur">67.9 s</div>
+      <div class="step-name">Sammeln</div>
+      <div class="step-detail">83 Quellen abgefragt, 714 Meldungen gefunden</div>
     </div>
-    <span class="page-date">Stand 26. Juli 2026</span>
-  </div>
-  <p class="page-lead">Jeder Lauf ist nachvollziehbar: welche Quelle abgefragt wurde, was sie geliefert hat, und wie daraus der Bericht entstanden ist.</p>
-</section>
-
-
-<section class="section" style="padding-top:34px">
-  <div class="kpis">
-    <div class="kpi">
-      <span class="kpi-num">83</span>
-      <span class="kpi-label">Quellen abgefragt</span>
+    
+    <div>
+      <div class="step-dur">0.0 s</div>
+      <div class="step-name">Nur Neues</div>
+      <div class="step-detail">4 neue Meldungen (Gedaechtnis: 976 bekannt)</div>
     </div>
-    <div class="kpi">
-      <span class="kpi-num">47<small>&nbsp;ok</small></span>
-      <span class="kpi-label">32 leer &middot; 0 fehlgeschlagen</span>
+    
+    <div>
+      <div class="step-dur">106.0 s</div>
+      <div class="step-name">Bewerten & Schreiben</div>
+      <div class="step-detail">4 bewertete Meldungen</div>
     </div>
-    <div class="kpi">
-      <span class="kpi-num">16.4<small>&nbsp;min</small></span>
-      <span class="kpi-label">Laufzeit (26. Juli 2026)</span>
+    
+    <div>
+      <div class="step-dur">73.2 s</div>
+      <div class="step-name">Wettbewerber-Analyse</div>
+      <div class="step-detail">3 Profile (18 Moves)</div>
     </div>
-    <div class="kpi accent">
-      <span class="kpi-num">4</span>
-      <span class="kpi-label">neue Meldungen bewertet</span>
+    
+    <div>
+      <div class="step-dur">981.6 s</div>
+      <div class="step-name">KI-Modelle</div>
+      <div class="step-detail">
+        Bewertung: <b>deepseek-ai/deepseek-v4-flash</b> &middot; Wochenbericht: <b>deepseek-ai/deepseek-v4-flash</b>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
-<section class="section">
-  <div class="section-head">
-    <h2><span class="sec-no">01</span> Ablauf</h2>
-    <p class="section-title">Die Schritte dieses Laufs</p>
-  </div>
-  
-  <div class="phase-row">
-    <div class="phase-name">Sammeln</div>
-    <div class="phase-detail">83 Quellen abgefragt, 714 Meldungen gefunden</div>
-    <div class="phase-time">67.9 s</div>
-  </div>
-  
-  <div class="phase-row">
-    <div class="phase-name">Nur Neues</div>
-    <div class="phase-detail">4 neue Meldungen (Gedaechtnis: 976 bekannt)</div>
-    <div class="phase-time">0.0 s</div>
-  </div>
-  
-  <div class="phase-row">
-    <div class="phase-name">Bewerten & Schreiben</div>
-    <div class="phase-detail">4 bewertete Meldungen</div>
-    <div class="phase-time">106.0 s</div>
-  </div>
-  
-  <div class="phase-row">
-    <div class="phase-name">Wettbewerber-Analyse</div>
-    <div class="phase-detail">3 Profile (18 Moves)</div>
-    <div class="phase-time">73.2 s</div>
-  </div>
-  
-  <div class="phase-row">
-    <div class="phase-name">KI-Modelle</div>
-    <div class="phase-detail">
-      Bewertung je Region: <b>deepseek-ai/deepseek-v4-flash</b> &middot; Wochenbericht: <b>deepseek-ai/deepseek-v4-flash</b>
+
+<div class="card">
+  <div class="card-head"><h2>KI-Bewertung je Region</h2></div>
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span class="col-region">Region</span><span class="col-flex">geprüft</span>
+      <span class="col-kept">relevant behalten</span><span class="col-model">Modell</span>
     </div>
-    <div class="phase-time">981.6 s</div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">Global</span>
+      <span class="col-flex">2</span>
+      <span class="col-kept">2</span>
+      <span class="col-model">deepseek-ai/deepseek-v4-flash</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">Europa</span>
+      <span class="col-flex">1</span>
+      <span class="col-kept">1</span>
+      <span class="col-model">deepseek-ai/deepseek-v4-flash</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">Asien</span>
+      <span class="col-flex">1</span>
+      <span class="col-kept">1</span>
+      <span class="col-model">deepseek-ai/deepseek-v4-flash</span>
+    </div>
+    
   </div>
-</section>
+</div>
 
 
-<section class="section">
-  <div class="section-head">
-    <h2><span class="sec-no">02</span> KI-Bewertung je Region</h2>
-    <p class="section-title">Was die Analyse-Agenten geprüft und behalten haben</p>
+<div class="card">
+  <div class="card-head"><h2>Meistliefernde Quellen</h2><a href="sources.html">alle 83 Quellen &nearr;</a></div>
+  <div class="rowtable">
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Comcast</span>
+      <span class="col-src-type">Feed</span>
+      <span class="col-src-count">40 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">DISH Wireless</span>
+      <span class="col-src-type">Feed</span>
+      <span class="col-src-count">40 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Light Reading</span>
+      <span class="col-src-type">Fachpresse</span>
+      <span class="col-src-count">40 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">VEON</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Vodacom</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Bharti Airtel</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">SoftBank</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Rakuten Mobile</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">CelcomDigi</span>
+      <span class="col-src-type">Newsroom</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Mobile World Live</span>
+      <span class="col-src-type">Fachpresse</span>
+      <span class="col-src-count">30 Meldungen</span>
+    </div>
+    
   </div>
-  <table class="src-table">
-    <thead><tr><th>Region</th><th class="num">geprüft</th><th class="num">Blöcke</th><th class="num">relevant behalten</th><th>Modell</th></tr></thead>
-    <tbody>
-      
-      <tr>
-        <td><b>Global</b></td>
-        <td class="num">2</td>
-        <td class="num">1/1</td>
-        <td class="num">2</td>
-        <td><span class="kbadge">deepseek-ai/deepseek-v4-flash</span></td>
-      </tr>
-      
-      <tr>
-        <td><b>Europa</b></td>
-        <td class="num">1</td>
-        <td class="num">1/1</td>
-        <td class="num">1</td>
-        <td><span class="kbadge">deepseek-ai/deepseek-v4-flash</span></td>
-      </tr>
-      
-      <tr>
-        <td><b>Asien</b></td>
-        <td class="num">1</td>
-        <td class="num">1/1</td>
-        <td class="num">1</td>
-        <td><span class="kbadge">deepseek-ai/deepseek-v4-flash</span></td>
-      </tr>
-      
-    </tbody>
-  </table>
-</section>
+  <p class="card-sub" style="margin-top:16px">Von 83 abgefragten Quellen: 47 lieferten neue Meldungen, 32 waren leer, 0 nicht erreichbar (meist temporäre Fehler).</p>
+</div>
 
-
-<section class="section">
-  <div class="section-head">
-    <h2><span class="sec-no">03</span> Alle abgefragten Quellen</h2>
-    <p class="section-title">83 Quellen, sortiert nach Status</p>
-  </div>
-  <div class="log-legend">
-    <span class="s"><span class="sdot ok"></span>geliefert (47)</span>
-    <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (32)</span>
-    <span class="s"><span class="sdot fail"></span>nicht erreichbar (0)</span>
-  </div>
-  <table class="src-table">
-    <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
-    <tbody>
-      
-      <tr>
-        <td><span class="sdot fail" title="fail"></span></td>
-        <td><b>KT</b><br><span style="color:var(--vf-mute);font-size:12.5px">TimeoutError: Page.goto: Timeout 16000ms exceeded.
+<details class="evidence" style="margin-top:24px">
+  <summary><span>Alle 83 abgefragten Quellen</span><small>nach Status sortiert</small></summary>
+  <div class="evidence-body">
+    <div class="log-legend">
+      <span class="s"><span class="sdot ok"></span>geliefert (47)</span>
+      <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (32)</span>
+      <span class="s"><span class="sdot fail"></span>nicht erreichbar (0)</span>
+    </div>
+    <table class="src-table">
+      <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td><span class="sdot fail" title="fail"></span></td>
+          <td><b>KT</b><br><span style="color:var(--mute2);font-size:12.5px">TimeoutError: Page.goto: Timeout 16000ms exceeded.
 Call log:
   - navigating to "https://corp.kt.com/eng/html/prcenter/report_list.html", waiting until "do</span></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://corp.kt.com/eng/html/prcenter/report_list.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot fail" title="fail"></span></td>
-        <td><b>Optus</b><br><span style="color:var(--vf-mute);font-size:12.5px">Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.optus.com.au/about/media-centre
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://corp.kt.com/eng/html/prcenter/report_list.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot fail" title="fail"></span></td>
+          <td><b>Optus</b><br><span style="color:var(--mute2);font-size:12.5px">Error: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.optus.com.au/about/media-centre
 Call log:
   - navigating to "https://www.optus.com.a</span></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot fail" title="fail"></span></td>
-        <td><b>Developing Telecoms</b><br><span style="color:var(--vf-mute);font-size:12.5px">ValueError: unparseable feed: <unknown>:94:2: mismatched tag</span></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">0</td>
-        <td><a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot fail" title="fail"></span></td>
-        <td><b>The Fast Mode</b><br><span style="color:var(--vf-mute);font-size:12.5px">ValueError: unparseable feed: <unknown>:94:2: mismatched tag</span></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.thefastmode.com/?format=feed&type=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Comcast</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">40</td>
-        <td><a href="https://corporate.comcast.com/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>DISH Wireless</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">40</td>
-        <td><a href="https://api.client.notified.com/api/rss/publish/view/53068?type=press" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Light Reading</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">40</td>
-        <td><a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>VEON</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Vodacom</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://www.vodacom.com/press-releases.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Bharti Airtel</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>SoftBank</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Rakuten Mobile</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>CelcomDigi</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">30</td>
-        <td><a href="https://corporate.celcomdigi.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Mobile World Live</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">30</td>
-        <td><a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>BT Group</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">25</td>
-        <td><a href="https://newsroom.bt.com/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>KPN</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">25</td>
-        <td><a href="https://www.overons.kpn/nieuws/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Fierce Network</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">25</td>
-        <td><a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Bouygues Telecom</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">22</td>
-        <td><a href="https://www.corporate.bouyguestelecom.fr/presse-et-actualites/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>O2 Telefónica Deutschland</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">20</td>
-        <td><a href="https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>NTT Docomo</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">20</td>
-        <td><a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>TelecomTalk</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">20</td>
-        <td><a href="https://telecomtalk.info/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Vodafone Group</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed (API)</span></td>
-        <td class="num">16</td>
-        <td><a href="https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&categories=*&tags=*" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>A1 Telekom Austria</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">12</td>
-        <td><a href="https://newsroom.a1.net/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Singtel</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">11</td>
-        <td><a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telefónica</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telenor</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.telenor.com/media/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>1&1</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">10</td>
-        <td><a href="https://unternehmen.1und1.de/presse/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>MTN Group</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.mtn.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>KDDI</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">10</td>
-        <td><a href="https://newsroom.kddi.com/english/news/newsrelease.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>One NZ</b></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Feed</span></td>
-        <td class="num">10</td>
-        <td><a href="https://media.one.nz/index.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Total Telecom</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://totaltele.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>RCR Wireless</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Broadband TV News</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Mobile Europe</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telecompetitor</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.telecompetitor.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telecoms Tech News</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>CommsRisk</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">10</td>
-        <td><a href="https://commsrisk.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>2degrees</b></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">9</td>
-        <td><a href="https://www.2degrees.nz/media-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telkomsel</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">8</td>
-        <td><a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>ISPreview UK</b></td>
-        <td>Fachpresse</td>
-        <td><span class="kbadge">Fachpresse</span></td>
-        <td class="num">8</td>
-        <td><a href="https://www.ispreview.co.uk/index.php/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Orange</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">5</td>
-        <td><a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Telia</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">5</td>
-        <td><a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>TIM Brasil</b></td>
-        <td>latin_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">5</td>
-        <td><a href="https://www.tim.com.br/sobre-a-tim/sala-de-imprensa" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Elisa</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">4</td>
-        <td><a href="https://elisa.com/corporate/news-room/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Proximus</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">3</td>
-        <td><a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Swisscom</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">3</td>
-        <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Safaricom</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">3</td>
-        <td><a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Verizon</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">2</td>
-        <td><a href="https://www.verizon.com/about/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Vodafone Deutschland</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">1</td>
-        <td><a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Tele2</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">1</td>
-        <td><a href="https://www.tele2.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot ok" title="ok"></span></td>
-        <td><b>Viettel</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">1</td>
-        <td><a href="https://viettel.com.vn/en/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Deutsche Telekom</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Liberty Global</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>TIM</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Iliad</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.iliad.fr/en/press" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Turkcell</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://medya.turkcell.com.tr/basin-bultenleri/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Cosmote</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Three UK</b></td>
-        <td>europe</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.threemediacentre.co.uk/press-release-browser/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Charter Communications</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://corporate.charter.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Millicom</b></td>
-        <td>latin_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Bell Canada</b></td>
-        <td>north_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Entel</b></td>
-        <td>latin_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://informacioncorporativa.entel.cl/sala-de-prensa" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Oi</b></td>
-        <td>latin_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.oi.com.br/sala-de-imprensa/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>WOM</b></td>
-        <td>latin_america</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://sobrenosotros.wom.cl/wom-en-prensa/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Airtel Africa</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://airtel.africa/media" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>stc</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>e&</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.eand.com/en/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Orange MEA</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.orange.eg/en/media-center/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Turk Telekom</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>du</b></td>
-        <td>africa_middle_east</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.du.ae/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Reliance Jio</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.jio.com/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Vodafone Idea</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.myvi.in/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>SK Telecom</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>China Telecom</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.chinatelecom-h.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>China Mobile</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Chunghwa Telecom</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>AIS</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://investor.ais.co.th/en/newsroom/set-announcements" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>True Corporation</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://investor.true.th/en/newsroom/set-announcements" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Maxis</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.maxis.com.my/en/about-maxis/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>PLDT</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://main.pldt.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Telstra</b></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>Indosat Ooredoo Hutchison</b></td>
-        <td>asia</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://ioh.co.id/portal/en/iohpressrelease" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-      <tr>
-        <td><span class="sdot empty" title="empty"></span></td>
-        <td><b>TPG Telecom</b></td>
-        <td>oceania</td>
-        <td><span class="kbadge">Newsroom</span></td>
-        <td class="num">0</td>
-        <td><a href="https://www.tpgtelecom.com.au/media_release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-      </tr>
-      
-    </tbody>
-  </table>
-</section>
+          <td>oceania</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot fail" title="fail"></span></td>
+          <td><b>Developing Telecoms</b><br><span style="color:var(--mute2);font-size:12.5px">ValueError: unparseable feed: <unknown>:94:2: mismatched tag</span></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">0</td>
+          <td><a href="https://developingtelecoms.com/?format=feed&type=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot fail" title="fail"></span></td>
+          <td><b>The Fast Mode</b><br><span style="color:var(--mute2);font-size:12.5px">ValueError: unparseable feed: <unknown>:94:2: mismatched tag</span></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.thefastmode.com/?format=feed&type=rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Comcast</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">40</td>
+          <td><a href="https://corporate.comcast.com/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>DISH Wireless</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">40</td>
+          <td><a href="https://api.client.notified.com/api/rss/publish/view/53068?type=press" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Light Reading</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">40</td>
+          <td><a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>VEON</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.veon.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Vodacom</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.vodacom.com/press-releases.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Bharti Airtel</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>SoftBank</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.softbank.jp/en/corp/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Rakuten Mobile</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://corp.mobile.rakuten.co.jp/english/news/press/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>CelcomDigi</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://corporate.celcomdigi.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Mobile World Live</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>BT Group</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">25</td>
+          <td><a href="https://newsroom.bt.com/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>KPN</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">25</td>
+          <td><a href="https://www.overons.kpn/nieuws/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Fierce Network</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">25</td>
+          <td><a href="https://www.fierce-network.com/rss/xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Bouygues Telecom</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">22</td>
+          <td><a href="https://www.corporate.bouyguestelecom.fr/presse-et-actualites/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>O2 Telefónica Deutschland</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">20</td>
+          <td><a href="https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>NTT Docomo</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">20</td>
+          <td><a href="https://www.docomo.ne.jp/english/info/media_center/pr/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>TelecomTalk</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">20</td>
+          <td><a href="https://telecomtalk.info/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Vodafone Group</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed (API)</span></td>
+          <td class="num">16</td>
+          <td><a href="https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&categories=*&tags=*" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>A1 Telekom Austria</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">12</td>
+          <td><a href="https://newsroom.a1.net/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Singtel</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">11</td>
+          <td><a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telefónica</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telenor</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telenor.com/media/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>1&1</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://unternehmen.1und1.de/presse/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>MTN Group</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.mtn.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>KDDI</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://newsroom.kddi.com/english/news/newsrelease.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>One NZ</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://media.one.nz/index.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Total Telecom</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://totaltele.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>RCR Wireless</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.rcrwireless.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Broadband TV News</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Mobile Europe</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telecompetitor</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telecompetitor.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telecoms Tech News</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>CommsRisk</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://commsrisk.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>2degrees</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">9</td>
+          <td><a href="https://www.2degrees.nz/media-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telkomsel</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">8</td>
+          <td><a href="https://www.telkomsel.com/en/about-us/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>ISPreview UK</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">8</td>
+          <td><a href="https://www.ispreview.co.uk/index.php/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Orange</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">5</td>
+          <td><a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telia</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">5</td>
+          <td><a href="https://www.teliacompany.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>TIM Brasil</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">5</td>
+          <td><a href="https://www.tim.com.br/sobre-a-tim/sala-de-imprensa" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Elisa</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">4</td>
+          <td><a href="https://elisa.com/corporate/news-room/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Proximus</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">3</td>
+          <td><a href="https://www.proximus.com/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Swisscom</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">3</td>
+          <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Safaricom</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">3</td>
+          <td><a href="https://www.safaricom.co.ke/media-center-landing" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Verizon</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">2</td>
+          <td><a href="https://www.verizon.com/about/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Vodafone Deutschland</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">1</td>
+          <td><a href="https://newsroom.vodafone.de/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Tele2</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">1</td>
+          <td><a href="https://www.tele2.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Viettel</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">1</td>
+          <td><a href="https://viettel.com.vn/en/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Deutsche Telekom</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.telekom.com/en/media/media-information" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Liberty Global</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>TIM</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Iliad</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.iliad.fr/en/press" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Turkcell</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://medya.turkcell.com.tr/basin-bultenleri/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Cosmote</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Three UK</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.threemediacentre.co.uk/press-release-browser/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Charter Communications</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://corporate.charter.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Millicom</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Bell Canada</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Entel</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://informacioncorporativa.entel.cl/sala-de-prensa" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Oi</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.oi.com.br/sala-de-imprensa/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>WOM</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://sobrenosotros.wom.cl/wom-en-prensa/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Airtel Africa</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://airtel.africa/media" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>stc</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>e&</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.eand.com/en/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Orange MEA</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.orange.eg/en/media-center/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Turk Telekom</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>du</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.du.ae/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Reliance Jio</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.jio.com/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Vodafone Idea</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.myvi.in/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>SK Telecom</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>China Telecom</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.chinatelecom-h.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>China Mobile</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Chunghwa Telecom</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>AIS</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://investor.ais.co.th/en/newsroom/set-announcements" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>True Corporation</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://investor.true.th/en/newsroom/set-announcements" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Maxis</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.maxis.com.my/en/about-maxis/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>PLDT</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://main.pldt.com/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Telstra</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.telstra.com.au/exchange" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>Indosat Ooredoo Hutchison</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://ioh.co.id/portal/en/iohpressrelease" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot empty" title="empty"></span></td>
+          <td><b>TPG Telecom</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.tpgtelecom.com.au/media_release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+</details>
 
 
 
     </div>
   </main>
   <footer class="foot">
-    <div class="wrap foot-inner">
-      <span>Vodafone Insights &middot; Marktrecherche</span>
-      <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
+    <div class="foot-inner">
+      Vodafone Insights &middot; Marktrecherche Intern &middot; automatisch aktualisiert
     </div>
   </footer>
   <script src="app.js"></script>

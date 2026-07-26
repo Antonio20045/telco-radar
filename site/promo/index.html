@@ -11,78 +11,92 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../logo.png">
 </head>
-<body>
+<body class="uc-promo">
   
   <header class="topbar">
-    <div class="wrap topbar-inner">
+    <div class="topbar-inner">
       <a class="brand" href="../index.html" aria-label="Vodafone Insights">
-        <img class="brand-logo" src="../logo.png" alt="Vodafone" width="26" height="26">
-        <span class="brand-name">Vodafone<em>Insights</em></span>
+        <span class="brand-logo-wrap"><img class="brand-logo" src="../logo.png" alt="" width="18" height="18"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
       </a>
       <nav class="usecases" aria-label="Anwendungsfälle">
         <a class="uc " href="../index.html">Marktrecherche</a>
         <a class="uc active" href="../promo/index.html">Promo Übersicht</a>
       </nav>
     </div>
-    <div class="subbar">
-      
-      <nav class="wrap subnav" aria-label="Promo Übersicht">
-        <a href="../promo/index.html" class="on">Übersicht</a>
-        <a href="../promo/quellen.html" >Quellen</a>
-      </nav>
-      
-    </div>
+    
+    <nav class="subbar subnav" aria-label="Promo Übersicht">
+      <a href="../promo/index.html" class="on">Übersicht</a>
+      <a href="../promo/quellen.html" >Quellen</a>
+    </nav>
+    
   </header>
   <main>
     <div class="wrap">
       
 
-<section class="page-hero">
+
+
+<section class="page-hero wide">
+  <p class="page-kicker">Deutschland &middot; Promo-Markt</p>
   <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland</p>
-      <h1>Promo Übersicht</h1>
-    </div>
+    <h1>Wer wirbt gerade womit.</h1>
     <span class="page-date">Stand 26. Juli 2026</span>
   </div>
   <p class="page-lead">Auf einen Blick: welche Tarif-, Rabatt- und Kampagnenaktion gerade bei welchem Wettbewerber läuft. Jede Karte verlinkt <b>direkt auf die Original-Aktionsseite</b> des Anbieters.</p>
+  <div class="stat-inline-row">
+    <span class="stat-inline accent"><b>80</b><span>aktive Aktionen</span></span>
+    <span class="stat-inline"><b>11</b><span>Wettbewerber mit laufender Aktion</span></span>
+    <span class="stat-inline"><b>14</b><span>beobachtete Wettbewerber</span></span>
+  </div>
 </section>
 
-<div class="kpi-tiles">
-  <div class="kpi-tile accent"><b>80</b><span>aktive Aktionen</span></div>
-  <div class="kpi-tile"><b>11</b><span>Wettbewerber mit laufender Aktion</span></div>
-  <div class="kpi-tile"><b>14</b><span>beobachtete Wettbewerber</span></div>
+<div class="promo-tabs" role="group" aria-label="Nach Anbietertyp filtern">
+  <button type="button" class="promo-filter on" data-tier="all">Alle</button>
+  <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
+  <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
 </div>
 
-<div class="promo-toolbar">
-  <div class="promo-filters" role="group" aria-label="Nach Anbietertyp filtern">
-    <button type="button" class="promo-filter on" data-tier="all">Alle</button>
-    <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
-    <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
+<div class="promo-hero-row">
+  
+  
+  
+  <div class="promo-hero-card" style="--c:#e60000">
+    <img src="images/vodafone-deutschland.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+    
+    <div class="promo-hero-overlay"></div>
+    <div class="promo-hero-content">
+      <span class="promo-hero-badge">Top-Angebot &middot; Vodafone Deutschland</span>
+      <div class="promo-hero-headline">Samsung Galaxy Z Fold8 Vorbesteller-Angebot</div>
+      <p class="promo-hero-meta">vodafone.de · gültig laut Anbieter bis 6. August 2026 · geprüft 25. Juli 2026</p>
+      <a class="promo-hero-link" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">Zum Angebot &nearr;</a>
+    </div>
   </div>
-  <span class="promo-hint">Jedes Angebot verlinkt zur Originalquelle des Anbieters</span>
+  
+
+  <div class="promo-stat-card">
+    <div>
+      <p class="promo-stat-kicker">Was diese Woche auffällt</p>
+      <p>Die Rabattschlacht bei den Discount- und Zweitmarken erreicht diese Woche eine neue Intensität. PremiumSIM und simplytel senken die Einstiegspreise für ihre Tarife mit Allnet-Flat und 5G deutlich: So bieten sie etwa Tarife mit 10 GB für unter 7 Euro oder 60 GB für unter 14 Euro a…</p>
+    </div>
+    <a class="promo-stat-link" href="#promo-wochentext">Analyse lesen &nearr;</a>
+  </div>
+</div>
+
+<div class="promo-section-head">
+  <h2>Alle 80 Aktionen nach Anbieter</h2>
+  <span>11 Wettbewerber mit laufender Aktion</span>
 </div>
 
 <div class="promo-board" id="promo-board">
   
-  <article class="promo-card" data-tier="1" style="--c:#3860be">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">1M</span></span>
-      <img src="images/1-1-mobilfunk.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Netzbetreiber</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">1M</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="1">
     <div class="promo-card-head">
       <h3>1&1 Mobilfunk</h3>
       <span class="promo-count live">7 aktiv</span>
     </div>
     <p class="promo-card-sub">1&1 / United Internet</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -141,12 +155,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+3 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://mobile.1und1.de/handyvertrag" target="_blank" rel="noopener">Samsung Galaxy Z-Serie ab 44,99 €/Monat</a>
@@ -189,31 +197,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="1" style="--c:#3860be">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">OT</span></span>
-      <img src="images/o2-telefonica-deutschland.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Netzbetreiber</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">OT</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="1">
     <div class="promo-card-head">
       <h3>O2 / Telefónica Deutschland</h3>
       <span class="promo-count live">8 aktiv</span>
     </div>
     <p class="promo-card-sub">Telefónica Deutschland</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -272,12 +266,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+12 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.o2online.de/deals/" target="_blank" rel="noopener">Samsung 65 Zoll UHD TV für 9,50 € monatlich</a>
@@ -446,33 +434,19 @@
   
 </li>
 
-      </ul>
-    </details>
-    
+    </ul>
     
     <p class="promo-stale-note">37 frühere Aktionen ausgelaufen.</p>
     
-    
   </article>
   
-  <article class="promo-card" data-tier="1" style="--c:#3860be">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">TD</span></span>
-      <img src="images/telekom-deutschland.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Netzbetreiber</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">TD</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="1">
     <div class="promo-card-head">
       <h3>Telekom Deutschland</h3>
       <span class="promo-count live">21 aktiv</span>
     </div>
     <p class="promo-card-sub">Deutsche Telekom</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -531,12 +505,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+17 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.telekom.de/unterwegs/aktionen" target="_blank" rel="noopener">iPad (2025) A16: 400 € Preisvorteil mit PlusKarte Data</a>
@@ -775,31 +743,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">B</span></span>
-      <img src="images/blau.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">B</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>Blau</h3>
       <span class="promo-count live">3 aktiv</span>
     </div>
     <p class="promo-card-sub">Telefónica Deutschland</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -846,28 +800,15 @@
 
     </ul>
     
-    
-    
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">LC</span></span>
-      <img src="images/lidl-connect.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">LC</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>Lidl Connect</h3>
       <span class="promo-count live">6 aktiv</span>
     </div>
     <p class="promo-card-sub">Lidl / Drillisch</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -926,12 +867,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+2 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.lidl-connect.de/" target="_blank" rel="noopener">5,95 € Versand sparen – Newsletter-Gutschein</a>
@@ -960,31 +895,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">O</span></span>
-      <img src="images/otelo.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">O</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>Otelo</h3>
       <span class="promo-count live">5 aktiv</span>
     </div>
     <p class="promo-card-sub">Vodafone</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1043,12 +964,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+1 weitere Aktion</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.otelo.de/" target="_blank" rel="noopener">Freunde Werben: 3×30 Euro Gutschrift</a>
@@ -1063,31 +978,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">PM</span></span>
-      <img src="images/penny-mobil.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">PM</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>Penny Mobil</h3>
       <span class="promo-count live">4 aktiv</span>
     </div>
     <p class="promo-card-sub">Telekom-Netz (D1)</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1148,28 +1049,15 @@
 
     </ul>
     
-    
-    
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">P</span></span>
-      <img src="images/premiumsim.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">P</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>PremiumSIM</h3>
       <span class="promo-count live">6 aktiv</span>
     </div>
     <p class="promo-card-sub">1&1 / Drillisch</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1228,12 +1116,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+2 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.premiumsim.de/" target="_blank" rel="noopener">DSL-Tarif zum Tiefpreis</a>
@@ -1262,31 +1144,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">C</span></span>
-      <img src="images/congstar.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">C</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>congstar</h3>
       <span class="promo-count live">7 aktiv</span>
     </div>
     <p class="promo-card-sub">Deutsche Telekom</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1345,12 +1213,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+3 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.congstar.de/handytarife/angebote/" target="_blank" rel="noopener">Young Tarifangebot: Double your Data zum selben Preis</a>
@@ -1393,31 +1255,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">S</span></span>
-      <img src="images/simplytel.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">S</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>simplytel</h3>
       <span class="promo-count live">7 aktiv</span>
     </div>
     <p class="promo-card-sub">1&1 / Drillisch</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1476,12 +1324,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+3 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.simplytel.de/" target="_blank" rel="noopener">DSL-Deal ab 26,99 € monatlich</a>
@@ -1524,31 +1366,17 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
+    </ul>
     
   </article>
   
-  <article class="promo-card" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">W</span></span>
-      <img src="images/winsim.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">W</span></span>
-    </div>
-
+  <article class="promo-card" data-tier="2">
     <div class="promo-card-head">
       <h3>winSIM</h3>
       <span class="promo-count live">6 aktiv</span>
     </div>
     <p class="promo-card-sub">1&1 / Drillisch</p>
 
-    
     <ul class="promo-offers">
       
 <li class="promo-offer">
@@ -1607,12 +1435,6 @@
   
 </li>
 
-    </ul>
-    
-    <details class="promo-more">
-      <summary>+9 weitere Aktionen</summary>
-      <ul class="promo-offers">
-        
 <li class="promo-offer">
   <div class="promo-offer-top">
     <a class="promo-offer-title" href="https://www.winsim.de/" target="_blank" rel="noopener">Unlimited on demand mit 0€ Bereitstellung</a>
@@ -1739,191 +1561,26 @@
   
 </li>
 
-      </ul>
-    </details>
-    
-    
-    <p class="promo-stale-note">15 frühere Aktionen ausgelaufen.</p>
-    
-    
-  </article>
-  
-  <article class="promo-card promo-card--empty promo-card--no-photo" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">AT</span></span>
-      
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      
-    </div>
-
-    <div class="promo-card-head">
-      <h3>ALDI TALK</h3>
-      <span class="promo-count">0 aktiv</span>
-    </div>
-    <p class="promo-card-sub">MEDION / Telefónica-Netz</p>
-
-    
-    <p class="promo-empty">Noch keine belegte Aktion beobachtet.</p>
-    
-  </article>
-  
-  <article class="promo-card promo-card--empty" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">K</span></span>
-      <img src="images/klarmobil.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">K</span></span>
-    </div>
-
-    <div class="promo-card-head">
-      <h3>klarmobil</h3>
-      <span class="promo-count">0 aktiv</span>
-    </div>
-    <p class="promo-card-sub">freenet Group</p>
-
-    
-    <p class="promo-empty">Noch keine belegte Aktion beobachtet.</p>
-    
-  </article>
-  
-  <article class="promo-card promo-card--empty" data-tier="2" style="--c:#e07a00">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">M</span></span>
-      <img src="images/mobilcom-debitel.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Discount- und Zweitmarke</span>
-        
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">M</span></span>
-    </div>
-
-    <div class="promo-card-head">
-      <h3>mobilcom-debitel</h3>
-      <span class="promo-count">0 aktiv</span>
-    </div>
-    <p class="promo-card-sub">freenet Group</p>
-
-    
-    <p class="promo-empty">Keine aktuell bestätigte Aktion – zuletzt 25. Juli 2026 beobachtet.</p>
-    
-  </article>
-  
-  <article class="promo-card promo-card--own" data-tier="1" style="--c:#e60000">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">VD</span></span>
-      <img src="images/vodafone-deutschland.jpg" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">Netzbetreiber</span>
-        <span class="promo-own-tag">Eigene Referenz</span>
-      </span>
-      <span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">VD</span></span>
-    </div>
-
-    <div class="promo-card-head">
-      <h3>Vodafone Deutschland</h3>
-      <span class="promo-count live">5 aktiv</span>
-    </div>
-    <p class="promo-card-sub">Vodafone</p>
-
-    
-    <ul class="promo-offers">
-      
-<li class="promo-offer">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">Samsung Galaxy Z Fold8 Vorbesteller-Angebot</a>
-    <span class="dz-new">neu</span>
-  </div>
-  <p class="promo-offer-meta">vodafone.de · gültig laut Anbieter bis 6. August 2026 · geprüft 25. Juli 2026</p>
-  
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">Bei Vorbestellung des Samsung Galaxy Z Fold8 oder Z Fold8 Ultra erhalten Neukund:innen 25 % Rabatt auf den Mobilfunktarif für 24 Monate. Zusätzlich gibt es mindestens 500 € für die Inzahlungnahme eines alten Handys. Der Gerätepreis beträgt einmalig 1 €.</p>
-  </details>
-  
-</li>
-
-<li class="promo-offer">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">GigaMobil Young: Bis zu 960 € sparen</a>
-    <span class="dz-new">neu</span>
-  </div>
-  <p class="promo-offer-meta">vodafone.de · gültig laut Anbieter bis 14. Oktober 2026 · geprüft 25. Juli 2026</p>
-  
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">Neukund:innen unter 28 Jahren erhalten im GigaMobil Young XL mit unbegrenztem Datenvolumen einen Rabatt von 40 € pro Monat (insgesamt 960 €) oder im GigaMobil Young S einen Rabatt von 10 € pro Monat (insgesamt 240 €).</p>
-  </details>
-  
-</li>
-
-<li class="promo-offer">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">20 % Rabatt auf FamilyCard-Zusatzkarten</a>
-    <span class="dz-new">neu</span>
-  </div>
-  <p class="promo-offer-meta">vodafone.de · gültig laut Anbieter bis 29. Juli 2026 · geprüft 25. Juli 2026</p>
-  
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">Bestandskund:innen erhalten bei Abschluss einer FamilyCard (Zusatzkarte) 20 % Rabatt pro Monat. Beispiel: 5 GB Datenvolumen für 7,99 € statt 9,99 € pro Monat.</p>
-  </details>
-  
-</li>
-
-<li class="promo-offer">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">25 % Rabatt für Mobilfunk-Neukund:innen</a>
-    <span class="dz-new">neu</span>
-  </div>
-  <p class="promo-offer-meta">vodafone.de · geprüft 25. Juli 2026</p>
-  
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">Neukund:innen ab 28 Jahren erhalten 25 % Rabatt pro Monat auf die Tarife Mobil XS bis XL für 24 Monate. Unter 28-Jährige sparen bis zu 30 %. In den Tarifen XS, S und M gibt es zusätzlich geschenktes Extra-Datenvolumen.</p>
-  </details>
-  
-</li>
-
     </ul>
     
-    <details class="promo-more">
-      <summary>+1 weitere Aktion</summary>
-      <ul class="promo-offers">
-        
-<li class="promo-offer">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="https://www.vodafone.de/handy/angebote.html" target="_blank" rel="noopener">Aktionswoche: Handys mit Vertrag ab 1 €</a>
-    <span class="dz-new">neu</span>
-  </div>
-  <p class="promo-offer-meta">vodafone.de · geprüft 25. Juli 2026</p>
-  
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">In der Aktionswoche sind Smartphones wie iPhone 17, iPhone 17 Pro, Samsung Galaxy S26 und Google Pixel 10 mit Vertrag bereits ab einem einmaligen Gerätepreis von 1 € erhältlich.</p>
-  </details>
-  
-</li>
-
-      </ul>
-    </details>
-    
-    
+    <p class="promo-stale-note">15 frühere Aktionen ausgelaufen.</p>
     
   </article>
   
 </div>
 
 
-<details class="evidence" style="margin-top:34px">
+<div class="promo-inactive">
+  <span class="promo-inactive-label">Ohne aktuelle Aktion</span>
+  <span class="promo-inactive-op">ALDI TALK</span><span class="promo-inactive-op">klarmobil</span><span class="promo-inactive-op">mobilcom-debitel</span>
+</div>
+
+
+
+<details class="evidence" id="promo-wochentext" style="margin-top:34px">
   <summary><span>Wochentext lesen: wie sich das Preis- und Aktionsbild insgesamt entwickelt</span><small>26. Juli 2026</small></summary>
   <div class="evidence-body">
-    <article class="briefing prose"><h2>Was diese Woche auffaellt</h2>
+    <article class="prose"><h2>Was diese Woche auffaellt</h2>
 <p>Die Rabattschlacht bei den Discount- und Zweitmarken erreicht diese Woche eine neue Intensität. <strong>PremiumSIM</strong> und <strong>simplytel</strong> senken die Einstiegspreise für ihre Tarife mit Allnet-Flat und 5G deutlich: So bieten sie etwa Tarife mit 10 GB für unter 7 Euro oder 60 GB für unter 14 Euro an, jeweils ohne Bereitstellungspreis (<a href="https://www.premiumsim.de/">PremiumSIM – 16 GB Allnet Flat Premium-Deal</a>, <a href="https://www.simplytel.de/">simplytel – 10 GB Tarif für 6,99 € monatlich</a>). <strong>winSIM</strong> zieht mit ähnlich aggressiven Preisen nach und erlässt zudem befristet den Bereitstellungspreis (<a href="https://www.winsim.de/">winSIM – 5G-Tarife mit Rabatt und 0€ Bereitstellung</a>). <strong>Lidl Connect</strong> fährt eine andere Strategie: Statt den Grundpreis zu senken, lockt es mit 50 Prozent Rabatt auf den Tarifpreis und einem Mechanismus, bei dem Kunden unbegrenzt 1 GB Datenvolumen kostenlos nachbuchen können (<a href="https://www.lidl-connect.de/">Lidl Connect – 50 % sparen, 100 % surfen</a>, <a href="https://www.lidl-connect.de/">Lidl Connect – Unlimited on Demand Tarife mit 1 GB kostenlos nachbuchbar</a>). <strong>Penny Mobil</strong> kombiniert einen reduzierten Starterpreis mit einem Datenvolumen-Bonus für Neukunden und einem einmaligen Datenpolster (<a href="https://www.pennymobil.de/">Penny Mobil – Starter-Paket 50% reduziert</a>, <a href="https://www.pennymobil.de/">Penny Mobil – 5 GB extra für Neukunden</a>, <a href="https://www.pennymobil.de/">Penny Mobil – 25 GB Datenpolster kostenlos</a>). Dieses Muster zeigt: Die Discounter kämpfen nicht mehr nur über den reinen Monatspreis, sondern vor allem über großzügige Datenvolumen-Geschenke und den Wegfall von Einmalkosten.</p>
 <p>Parallel dazu setzen die Netzbetreiber auf massive Wechsler- und Treueprämien, um Kunden an sich zu binden oder von der Konkurrenz abzuwerben. <strong>Telekom</strong> und <strong>Vodafone</strong> bieten hohe Ankaufs- und Cashback-Boni für die Abgabe von Altgeräten – die Telekom etwa bis zu 500 Euro beim Kauf eines Samsung Galaxy Z Fold8 (<a href="https://www.telekom.de/unterwegs/aktionen">Telekom Deutschland – Samsung Galaxy Z Fold8 Ultra: 500 € Ankaufsbonus</a>), Vodafone mindestens 500 Euro für die Inzahlungnahme eines alten Handys beim Vorbestellen des Galaxy Z Fold8 (<a href="https://www.vodafone.de/handy/angebote.html">Vodafone Deutschland – Samsung Galaxy Z Fold8 Vorbesteller-Angebot</a>). <strong>O2</strong> lockt mit einer Altgerät-Prämie von 300 Euro beim Galaxy Z Flip8 (<a href="https://www.o2online.de/deals/">O2 / Telefónica Deutschland – Samsung Galaxy Z Flip8 + 300 € Altgerät-Prämie</a>). Die Telekom verspricht zudem bis zu 240 Euro Cashback auf MagentaMobil-Tarife (<a href="https://www.telekom.de/unterwegs/aktionen">Telekom Deutschland – Mobilfunk-Bonus: Bis zu 240 € Cashback</a>). <strong>Otelo</strong> und <strong>Blau</strong> setzen auf Empfehlungsprogramme mit Gutschriften von bis zu 90 Euro (<a href="https://www.otelo.de/">Otelo – Freunde Werben: 3×30 Euro Gutschrift</a>, <a href="https://www.blau.de/handy-angebote/">Blau – Freunde werben und 25 € Prämie sichern</a>). <strong>1&amp;1</strong> fährt eine dauerhaft aggressive Preisstrategie bei Smartphone-Bundles, etwa das iPhone 17 mit Vertrag ab 37,99 Euro monatlich (<a href="https://mobile.1und1.de/handyvertrag">1&amp;1 Mobilfunk – iPhone 17 Serie mit Vertrag ab 37,99 €/Monat</a>). Auffällig ist, dass die Netzbetreiber ihre Young-Tarife besonders stark rabattieren: Vodafone wirbt mit bis zu 960 Euro Ersparnis für unter 28-Jährige (<a href="https://www.vodafone.de/handy/angebote.html">Vodafone Deutschland – GigaMobil Young: Bis zu 960 € sparen</a>), die Telekom mit 40 Euro monatlichem Rabatt auf den XL-Young-Tarif (<a href="https://www.telekom.de/unterwegs/aktionen">Telekom Deutschland – MagentaMobil XL Young: 40 € mtl. sparen</a>), und <strong>congstar</strong> verdoppelt jungen Kunden das Datenvolumen zum gleichen Preis (<a href="https://www.congstar.de/handytarife/angebote/">congstar – Young Tarifangebot: Double your Data zum selben Preis</a>).</p>
 <p>Ein drittes, bemerkenswertes Muster ist der Trend zu Bundle-Angeboten, die über das reine Smartphone hinausgehen. <strong>O2</strong> treibt dies am weitesten: Es kombiniert ausgewählte Smartphones nicht nur mit einem Tarif, sondern mit Zusatzgeräten wie Fitnesstrackern, TV-Streamern, Tablets oder Smartwatches (<a href="https://www.o2online.de/deals/">O2 / Telefónica Deutschland – Smartphone-Deals mit Zusatzgeräten und 50 GB</a>). Noch ungewöhnlicher ist das Angebot einer PlayStation 5 inklusive zweitem Controller und 50 GB Datenvolumen (<a href="https://www.o2online.de/deals/">O2 / Telefónica Deutschland – PS5 mit zweitem Controller gratis + 50 GB</a>). <strong>Telekom</strong> und <strong>Vodafone</strong> fokussieren sich bei den Bundles stärker auf die Kombination von Top-Smartphones mit unbegrenztem Datenvolumen oder hohen Ankaufsboni. Die Telekom gewährt beim Kauf eines iPhones 24 Monate lang unbegrenztes Datenvolumen (<a href="https://www.telekom.de/unterwegs/aktionen">Telekom Deutschland – iPhone Unlimited-Vorteil: 24 Monate unbegrenztes Datenvolumen</a>), Vodafone bietet in seiner Aktionswoche Top-Handys wie das iPhone 17 oder Samsung Galaxy S26 bereits ab einem Euro Gerätepreis (<a href="https://www.vodafone.de/handy/angebote.html">Vodafone Deutschland – Aktionswoche: Handys mit Vertrag ab 1 €</a>). Diese Entwicklung zeigt, dass die Differenzierung zunehmend über attraktive Zusatzleistungen und nicht mehr nur über den reinen Tarifpreis erfolgt.</p>
@@ -1961,9 +1618,8 @@
     </div>
   </main>
   <footer class="foot">
-    <div class="wrap foot-inner">
-      <span>Vodafone Insights &middot; Promo Übersicht</span>
-      <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
+    <div class="foot-inner">
+      Vodafone Insights &middot; Promo Übersicht Intern &middot; automatisch aktualisiert
     </div>
   </footer>
   <script src="../app.js"></script>

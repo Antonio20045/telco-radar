@@ -1,34 +1,27 @@
 {% extends "base.html.j2" %}
 {% set active = 'archive' %}
+{% set wrap_class = 'wrap-narrow' %}
 {% block title %}Telco Radar - Archiv{% endblock %}
 {% block content %}
 <section class="page-hero">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Archiv</p>
-      <h1>Frühere Berichte</h1>
-    </div>
-  </div>
+  <p class="page-kicker">Archiv</p>
+  <h1>Frühere Berichte</h1>
   <p class="page-lead">Alle bisherigen Wochenberichte – jeder zeigt, was in seiner Woche neu war.</p>
 </section>
-<section class="section" style="padding-top:26px">
-  {% if archive %}
-  <table class="src-table">
-    <thead><tr><th>Bericht</th><th class="num">Betreiber</th><th class="num">geprüft</th><th class="num">neu</th><th>Status</th></tr></thead>
-    <tbody>
-      {% for e in archive %}
-      <tr>
-        <td><a href="{{ prefix }}reports/{{ e.date }}.html"><b>{{ e.date_de }}</b></a></td>
-        <td class="num">{{ e.stats.get('operators','–') }}</td>
-        <td class="num">{{ e.stats.get('collected','–') }}</td>
-        <td class="num">{{ e.stats.get('new','–') }}</td>
-        <td>{% if e.llm %}<span class="kbadge">analysiert</span>{% else %}<span class="kbadge">roh</span>{% endif %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <p class="empty-note">Noch keine Berichte im Archiv.</p>
-  {% endif %}
-</section>
+
+{% if archive %}
+<div class="list-card">
+  {% for e in archive %}
+  <a class="list-row" href="{{ prefix }}reports/{{ e.date }}.html">
+    <span class="list-row-date">{{ e.date_de }}</span>
+    <span class="list-row-meta">{{ e.stats.get('operators','–') }} Betreiber</span>
+    <span class="list-row-meta">{{ e.stats.get('collected','–') }} geprüft</span>
+    <span class="list-row-flag">{% if not e.llm %}<span class="kbadge">roh</span>{% endif %}</span>
+    <span class="list-row-new">{{ e.stats.get('new','–') }} neu</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty-note">Noch keine Berichte im Archiv.</p>
+{% endif %}
 {% endblock %}

@@ -325,6 +325,19 @@ def _briefing_lead(md_text: str) -> str:
     return (txt[:360].rstrip() + "\u2026") if len(txt) > 360 else txt
 
 
+def _promo_lead(md_text: str) -> str:
+    """Kurzer Vorspann aus dem Promo-Wochenbericht fuer die rote Stat-Karte
+    ("Was diese Woche auffaellt") auf der Promo-Uebersicht. Der Bericht
+    beginnt bereits mit einem gleichnamigen Abschnitt, es wird also nur
+    dessen erster Teil fuer die Karte gekuerzt - keine separate Zusammen-
+    fassung wird erfunden."""
+    secs = _briefing_sections(md_text)
+    if not secs:
+        return ""
+    txt = " ".join(re.sub(r"<[^>]+>", " ", secs[0]["html"]).split())
+    return (txt[:280].rstrip() + "…") if len(txt) > 280 else txt
+
+
 def _stats(report, prev_report, trend_reports):
     highlights = _flatten(report)
     total = len(highlights) or 1
@@ -417,7 +430,7 @@ def _stats(report, prev_report, trend_reports):
         {"num": sum(1 for h in highlights if h.get("relevance") == 5),
          "label": "sofort relevant (5/5)", "accent": True},
         {"num": (top_comp["name"] if top_comp and top_comp["n"] else "-"),
-         "label": "aktivster Wettbewerber", "text": True},
+         "label": "aktivster Wettbewerber", "text": True, "tint": True},
         {"num": (tech_radar[0]["theme"] if tech_radar else "-"),
          "label": "Top-Technologiethema", "text": True},
     ]
@@ -614,6 +627,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 promo_report_html=_md_to_html(promo_report["briefing_md"])
                 if promo_report else "",
                 promo_report_date=_fmt_date_de(promo_report["date"])
+                if promo_report else "",
+                promo_lead=_promo_lead(promo_report["briefing_md"])
                 if promo_report else ""),
             encoding="utf-8")
         (promo_dir / "quellen.html").write_text(

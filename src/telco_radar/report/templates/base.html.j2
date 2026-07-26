@@ -11,47 +11,44 @@
   <link rel="stylesheet" href="{{ prefix }}style.css">
   <link rel="icon" type="image/png" href="{{ prefix }}logo.png">
 </head>
-<body>
+<body class="uc-{{ usecase | default('markt') }}">
   {% set uc = usecase | default('markt') %}
   <header class="topbar">
-    <div class="wrap topbar-inner">
+    <div class="topbar-inner">
       <a class="brand" href="{{ prefix }}index.html" aria-label="Vodafone Insights">
-        <img class="brand-logo" src="{{ prefix }}logo.png" alt="Vodafone" width="26" height="26">
-        <span class="brand-name">Vodafone<em>Insights</em></span>
+        <span class="brand-logo-wrap"><img class="brand-logo" src="{{ prefix }}logo.png" alt="" width="18" height="18"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
       </a>
       <nav class="usecases" aria-label="Anwendungsfälle">
         <a class="uc {% if uc=='markt' %}active{% endif %}" href="{{ prefix }}index.html">Marktrecherche</a>
         <a class="uc {% if uc=='promo' %}active{% endif %}" href="{{ prefix }}promo/index.html">Promo Übersicht</a>
       </nav>
     </div>
-    <div class="subbar">
-      {% if uc == 'promo' %}
-      <nav class="wrap subnav" aria-label="Promo Übersicht">
-        <a href="{{ prefix }}promo/index.html" {% if active=='promo_uebersicht' %}class="on"{% endif %}>Übersicht</a>
-        <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
-      </nav>
-      {% else %}
-      <nav class="wrap subnav" aria-label="Marktrecherche">
-        <a href="{{ prefix }}index.html" {% if active=='uebersicht' %}class="on"{% endif %}>Übersicht</a>
-        <a href="{{ prefix }}bericht.html" {% if active=='bericht' %}class="on"{% endif %}>Bericht</a>
-        <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
-        <a href="{{ prefix }}wettbewerber.html" {% if active=='wettbewerber' %}class="on"{% endif %}>Wettbewerber</a>
-        <a href="{{ prefix }}protokoll.html" {% if active=='protokoll' %}class="on"{% endif %}>Protokoll</a>
-        <a href="{{ prefix }}archive.html" {% if active=='archive' %}class="on"{% endif %}>Archiv</a>
-        <a href="{{ prefix }}sources.html" {% if active=='sources' %}class="on"{% endif %}>Quellen</a>
-      </nav>
-      {% endif %}
-    </div>
+    {% if uc == 'promo' %}
+    <nav class="subbar subnav" aria-label="Promo Übersicht">
+      <a href="{{ prefix }}promo/index.html" {% if active=='promo_uebersicht' %}class="on"{% endif %}>Übersicht</a>
+      <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
+    </nav>
+    {% else %}
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="{{ prefix }}index.html" {% if active=='uebersicht' %}class="on"{% endif %}>Übersicht</a>
+      <a href="{{ prefix }}bericht.html" {% if active=='bericht' %}class="on"{% endif %}>Bericht</a>
+      <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
+      <a href="{{ prefix }}wettbewerber.html" {% if active=='wettbewerber' %}class="on"{% endif %}>Wettbewerber</a>
+      <a href="{{ prefix }}protokoll.html" {% if active=='protokoll' %}class="on"{% endif %}>Protokoll</a>
+      <a href="{{ prefix }}archive.html" {% if active=='archive' %}class="on"{% endif %}>Archiv</a>
+      <a href="{{ prefix }}sources.html" {% if active=='sources' %}class="on"{% endif %}>Quellen</a>
+    </nav>
+    {% endif %}
   </header>
   <main>
-    <div class="wrap">
+    <div class="{{ wrap_class | default('wrap') }}">
       {% block content %}{% endblock %}
     </div>
   </main>
   <footer class="foot">
-    <div class="wrap foot-inner">
-      <span>Vodafone Insights &middot; {% if uc == 'promo' %}Promo Übersicht{% else %}Marktrecherche{% endif %}</span>
-      <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
+    <div class="foot-inner">
+      Vodafone Insights &middot; {% if uc == 'promo' %}Promo Übersicht{% else %}Marktrecherche{% endif %} Intern &middot; automatisch aktualisiert
     </div>
   </footer>
   <script src="{{ prefix }}app.js"></script>

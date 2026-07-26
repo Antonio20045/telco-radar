@@ -3,7 +3,7 @@
 {% block title %}Marktrecherche · Übersicht{% endblock %}
 {% block content %}
 {% if dash %}
-<section class="page-hero">
+<section class="page-hero wide">
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Marktrecherche</p>
@@ -11,69 +11,83 @@
     </div>
     <span class="page-date">Stand {{ date_de }}</span>
   </div>
-  <p class="page-lead">Die relevanten Wettbewerbszüge – verdichtet auf Entscheidungen. <a href="{{ prefix }}bericht.html">Zum vollen Bericht &nearr;</a></p>
+  <p class="page-lead">Die relevanten Wettbewerberzüge – verdichtet auf Entscheidungen. <a href="{{ prefix }}bericht.html">Zum vollen Bericht &nearr;</a></p>
 </section>
 
-{% if dash.lead_signal %}
-<section class="section" style="padding-top:18px">
-  <a class="ov-signal" href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">
-    <div class="ov-signal-top"><span>Priorität der Woche</span><span class="rel-badge r{{ dash.lead_signal.rel }}">{{ dash.lead_signal.rel }}/5</span></div>
-    <h2>{{ dash.lead_signal.de_title }}</h2>
-    <div class="ov-signal-meta"><b>{{ dash.lead_signal.op }}</b>{% if dash.lead_signal.region %} &middot; {{ dash.lead_signal.region }}{% endif %}</div>
+<div class="bento">
+  {% if dash.lead_signal %}
+  <a class="bento-lead" href="{{ dash.lead_signal.url }}" target="_blank" rel="noopener">
+    <div>
+      <div class="bento-lead-top"><span>Priorität der Woche</span><span>&middot;</span><span>{{ dash.lead_signal.rel }}/5</span></div>
+      <p>{{ dash.lead_signal.de_title }}</p>
+    </div>
+    <div class="bento-lead-meta">
+      <span>{{ dash.lead_signal.op }}</span>
+      {% if dash.lead_signal.region %}<span>&middot;</span><span>{{ dash.lead_signal.region }}</span>{% endif %}
+      <span>Quelle &nearr;</span>
+    </div>
   </a>
-</section>
-{% endif %}
+  {% else %}
+  <div class="bento-lead"><div><p>Diese Woche keine priorisierte Meldung.</p></div></div>
+  {% endif %}
 
-<div class="kpi-tiles">
   {% for k in dash.kpis %}
-  <div class="kpi-tile{% if k.accent %} accent{% endif %}"><b{% if k.text %} class="t"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span></div>
+  <div class="bento-stat{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
+    <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b>
+    <span>{{ k.label }}</span>
+  </div>
   {% endfor %}
-</div>
 
-<div class="ov-grid">
-  <section class="ov-panel">
-    <div class="ov-panel-head"><h3>Top-Signale</h3><a href="{{ prefix }}bericht.html">alle &nearr;</a></div>
-    {% for h in top_priorities[:3] %}
-    <a class="ov-row" href="{{ h.url }}" target="_blank" rel="noopener">
-      <span class="ov-badge r{{ h.relevance }}">{{ h.relevance }}</span>
-      <span class="ov-row-main"><b>{{ h.operator or h.source_label }}</b>{{ h.de_title }}</span>
-    </a>
-    {% else %}<p class="muted-note">Keine Top-Signale.</p>{% endfor %}
-  </section>
-
-  <section class="ov-panel">
-    <div class="ov-panel-head"><h3>Differenzierung</h3><a href="{{ prefix }}differenzierung.html">Tafel &nearr;</a></div>
-    {% for m in dash.diff.top %}
-    <a class="ov-row" href="{{ m.url }}" target="_blank" rel="noopener">
-      <span class="ov-dot" style="background:{{ m.color }}"></span>
-      <span class="ov-row-main"><b>{{ m.op }}</b>{{ m.de_title }}</span>
-    </a>
-    {% else %}<p class="muted-note">Diese Woche keine neuen Moves – die Inspirations-Tafel bleibt.</p>{% endfor %}
-  </section>
-
-  <section class="ov-panel">
-    <div class="ov-panel-head"><h3>Aktivste Wettbewerber</h3><a href="{{ prefix }}wettbewerber.html">Analyse &nearr;</a></div>
+  <section class="bento-panel">
+    <div class="bento-panel-head"><h3>Aktivste Wettbewerber</h3><a href="{{ prefix }}wettbewerber.html">Analyse &nearr;</a></div>
     {% for c in dash.move_matrix[:5] %}
-    <div class="ov-bar"><span class="ov-bar-lab">{{ c.name }}</span>
-      <span class="ov-bar-track"><span class="ov-bar-fill" style="width:{{ (100 * c.n / (dash.move_matrix|map(attribute='n')|max or 1)) | round }}%"></span></span>
-      <span class="ov-bar-val">{{ c.n }}</span></div>
+    <div class="bento-bar">
+      <div class="bento-bar-top"><b>{{ c.name }}</b><span>{{ c.n }}</span></div>
+      <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ (100 * c.n / (dash.move_matrix|map(attribute='n')|max or 1)) | round }}%"></span></div>
+    </div>
     {% else %}<p class="muted-note">Keine Daten.</p>{% endfor %}
   </section>
 
-  <section class="ov-panel">
-    <div class="ov-panel-head"><h3>Top-Themen</h3></div>
+  <section class="bento-panel span1">
+    <div class="bento-panel-head"><h3>Top-Themen</h3></div>
     {% for t in dash.tech_radar[:5] %}
-    <div class="ov-bar"><span class="ov-bar-lab">{{ t.theme }}</span>
-      <span class="ov-bar-track"><span class="ov-bar-fill" style="width:{{ t.w }}%"></span></span>
-      <span class="ov-bar-val">{{ t.n }}</span></div>
+    <div class="bento-topic-row"><span>{{ t.theme }}</span><span>{{ t.n }}</span></div>
     {% else %}<p class="muted-note">Keine Themen erkannt.</p>{% endfor %}
   </section>
 
-  <section class="ov-panel ov-panel-brief">
-    <div class="ov-panel-head"><h3>Kurzfazit der Woche</h3><a href="{{ prefix }}bericht.html">Bericht lesen &nearr;</a></div>
-    <p class="ov-brief">{{ briefing_lead }}</p>
-  </section>
+  <div class="bento-mini">
+    <div>
+      <h3>Differenzierung</h3>
+      {% if dash.diff.top %}
+      <p>{{ dash.diff.top[0].de_title }}</p>
+      {% else %}
+      <p>Diese Woche keine neuen Moves.</p>
+      {% endif %}
+    </div>
+    <a href="{{ prefix }}differenzierung.html">Tafel &nearr;</a>
+  </div>
 </div>
+
+<div class="card">
+  <div class="card-head"><h2>Top-Signale</h2><a href="{{ prefix }}bericht.html">alle &nearr;</a></div>
+  <div class="signal-list">
+    {% for h in top_priorities[:5] %}
+    <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
+      <span class="signal-badge">{{ h.relevance }}</span>
+      <span class="signal-body">
+        <span class="signal-company">{{ h.operator or h.source_label }}</span>
+        <span class="signal-title">{{ h.de_title }}</span>
+      </span>
+    </a>
+    {% else %}<p class="muted-note">Keine Top-Signale.</p>{% endfor %}
+  </div>
+</div>
+
+<div class="card tan">
+  <div class="card-head"><h2>Kurzfazit der Woche</h2><a href="{{ prefix }}bericht.html">Bericht lesen &nearr;</a></div>
+  <p style="margin:0;font-size:16px;line-height:1.7;color:#4a463e;max-width:800px">{{ briefing_lead }}</p>
+</div>
+
 {% else %}
 <section class="page-hero"><p class="page-kicker">Marktrecherche</p><h1>Noch keine Daten</h1></section>
 {% endif %}

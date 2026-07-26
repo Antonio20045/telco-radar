@@ -11,56 +11,49 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../logo.png">
 </head>
-<body>
+<body class="uc-markt">
   
   <header class="topbar">
-    <div class="wrap topbar-inner">
+    <div class="topbar-inner">
       <a class="brand" href="../index.html" aria-label="Vodafone Insights">
-        <img class="brand-logo" src="../logo.png" alt="Vodafone" width="26" height="26">
-        <span class="brand-name">Vodafone<em>Insights</em></span>
+        <span class="brand-logo-wrap"><img class="brand-logo" src="../logo.png" alt="" width="18" height="18"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
       </a>
       <nav class="usecases" aria-label="Anwendungsfälle">
         <a class="uc active" href="../index.html">Marktrecherche</a>
         <a class="uc " href="../promo/index.html">Promo Übersicht</a>
       </nav>
     </div>
-    <div class="subbar">
-      
-      <nav class="wrap subnav" aria-label="Marktrecherche">
-        <a href="../index.html" >Übersicht</a>
-        <a href="../bericht.html" class="on">Bericht</a>
-        <a href="../differenzierung.html" >Differenzierung</a>
-        <a href="../wettbewerber.html" >Wettbewerber</a>
-        <a href="../protokoll.html" >Protokoll</a>
-        <a href="../archive.html" >Archiv</a>
-        <a href="../sources.html" >Quellen</a>
-      </nav>
-      
-    </div>
+    
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="../index.html" >Übersicht</a>
+      <a href="../bericht.html" class="on">Bericht</a>
+      <a href="../differenzierung.html" >Differenzierung</a>
+      <a href="../wettbewerber.html" >Wettbewerber</a>
+      <a href="../protokoll.html" >Protokoll</a>
+      <a href="../archive.html" >Archiv</a>
+      <a href="../sources.html" >Quellen</a>
+    </nav>
+    
   </header>
   <main>
-    <div class="wrap">
+    <div class="wrap-narrow">
       
 
 
 <section class="page-hero">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Wöchentlicher Wettbewerbsbericht</p>
-      <h1>Was Vodafone jetzt<br>wissen muss.</h1>
-    </div>
-    <span class="page-date">25. Juli 2026</span>
-  </div>
-  <p class="page-lead">Die relevanten Wettbewerbszüge dieser Woche – verdichtet auf Entscheidungen, nicht auf Quellen.</p>
-  <p class="br-method"><a href="../protokoll.html">Methode und Quellenbasis ansehen &nearr;</a></p>
+  <p class="page-kicker">Marktrecherche &middot; Bericht</p>
+  <h1>Was Vodafone jetzt wissen muss.</h1>
+  <p class="page-date" style="display:block;padding-bottom:0;margin-top:10px">Stand 25. Juli 2026 &middot; 11 neue Meldungen, 1 bewertet</p>
 </section>
 
 
 
 
-<section class="section" id="bericht">
-  <div class="section-head"><p class="section-title">Der Wochenbericht</p></div>
-  <article class="briefing prose"><h2>Auf einen Blick</h2>
+<div class="card">
+  <div class="card-head"><h2>Der Wochenbericht</h2>
+    <a href="../protokoll.html">Methode &amp; Quellenbasis &nearr;</a></div>
+  <article class="prose"><h2>Auf einen Blick</h2>
 <ul>
 <li>AT&amp;T stellt sein Netzwerk auf den steigenden Datenverkehr durch Künstliche Intelligenz (KI) ein und priorisiert Upload-Geschwindigkeiten.</li>
 <li>In Europa treiben mehrere Betreiber den Glasfaserausbau voran, während sich die strategische Ausrichtung auf KI und Quantencomputing verstärkt.</li>
@@ -134,31 +127,51 @@ MTN Group hat betont, dass Afrikas Zukunft von der Schaffung wirtschaftlicher Ch
 <p><strong>5G-Advanced und 5G-Pilotprojekte</strong>: Zain KSA startet kommerzielle 5G-Advanced-Dienste, während VEONs Kyivstar einen 5G-Pilot in Kiew ausweitet. Dies zeigt die zunehmende Verbreitung der nächsten Mobilfunkgeneration.</p>
 </li>
 </ol></article>
-</section>
+</div>
 
 
 
-<section class="section" id="explorer">
-  <div class="section-head"><p class="section-title">Alle Meldungen</p></div>
-  <details class="evidence">
-    <summary><span>Alle 1 Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
-    <div class="evidence-body">
-      <div class="filters">
-        <input type="search" id="f-search" placeholder="Suchen: Operator, Thema, Stichwort …" aria-label="Suche">
-        <select id="f-region" aria-label="Region"><option value="">Alle Regionen</option><option value="Nordamerika">Nordamerika</option></select>
-        <select id="f-category" aria-label="Thema"><option value="">Alle Themen</option><option value="Netz/Technologie">Netz/Technologie</option></select>
-        <select id="f-relevance" aria-label="Dringlichkeit"><option value="">Jede Dringlichkeit</option><option value="5">5/5 sofort</option><option value="4">ab 4/5</option><option value="3">ab 3/5</option></select>
-        <select id="f-sort" aria-label="Sortierung"><option value="relevance">Dringlichste zuerst</option><option value="date">Neueste zuerst</option><option value="operator">Operator (A–Z)</option></select>
-      </div>
-      <div class="explorer" id="explorer-app">
-        <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste"></div>
-        <div class="ex-detail" id="ex-detail"><p class="ex-detail-empty">Meldung links auswählen.</p></div>
-      </div>
-      <p class="ex-count" id="ex-count"></p>
-      <script type="application/json" id="explorer-data">[{"title": "AT\u0026T says its network is already built for the agentic AI wave", "operator": "AT\u0026T", "url": "https://www.rcrwireless.com/20260725/ai/att-network-agentic-ai-wave", "category": "Netz/Technologie", "relevance": 3, "summary": "AT\u0026T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat, mit Fokus auf Upstream-Traffic statt reiner Download-Geschwindigkeiten.", "date": "2026-07-25", "source": "RCR Wireless", "region": "Nordamerika", "relevance_label": "Beobachten", "source_domain": "rcrwireless.com", "source_label": "RCR Wireless", "de_title": "AT\u0026T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat, mit Fokus auf Up…", "id": 0}]</script>
+
+
+<div class="card tan">
+  <div class="card-head"><h2>Regionale Auswertung</h2></div>
+  
+  <div class="rowtable-row" style="border-bottom:1px solid var(--tan-line)">
+    <span class="col-region">Asien</span>
+    <span class="col-flex">10 geprüft</span>
+    <span class="col-kept">0 relevant</span>
+    <span class="col-model">deepseek-ai/deepseek-v4-flash</span>
+  </div>
+  
+  <div class="rowtable-row" style="border-bottom:1px solid var(--tan-line)">
+    <span class="col-region">Nordamerika</span>
+    <span class="col-flex">1 geprüft</span>
+    <span class="col-kept">1 relevant</span>
+    <span class="col-model">deepseek-ai/deepseek-v4-flash</span>
+  </div>
+  
+</div>
+
+
+
+<details class="evidence" style="margin-top:24px">
+  <summary><span>Alle 1 Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
+  <div class="evidence-body">
+    <div class="filters">
+      <input type="search" id="f-search" placeholder="Suchen: Operator, Thema, Stichwort …" aria-label="Suche">
+      <select id="f-region" aria-label="Region"><option value="">Alle Regionen</option><option value="Nordamerika">Nordamerika</option></select>
+      <select id="f-category" aria-label="Thema"><option value="">Alle Themen</option><option value="Netz/Technologie">Netz/Technologie</option></select>
+      <select id="f-relevance" aria-label="Dringlichkeit"><option value="">Jede Dringlichkeit</option><option value="5">5/5 sofort</option><option value="4">ab 4/5</option><option value="3">ab 3/5</option></select>
+      <select id="f-sort" aria-label="Sortierung"><option value="relevance">Dringlichste zuerst</option><option value="date">Neueste zuerst</option><option value="operator">Operator (A–Z)</option></select>
     </div>
-  </details>
-</section>
+    <div class="explorer" id="explorer-app">
+      <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste"></div>
+      <div class="ex-detail" id="ex-detail"><p class="ex-detail-empty">Meldung links auswählen.</p></div>
+    </div>
+    <p class="ex-count" id="ex-count"></p>
+    <script type="application/json" id="explorer-data">[{"title": "AT\u0026T says its network is already built for the agentic AI wave", "operator": "AT\u0026T", "url": "https://www.rcrwireless.com/20260725/ai/att-network-agentic-ai-wave", "category": "Netz/Technologie", "relevance": 3, "summary": "AT\u0026T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat, mit Fokus auf Upstream-Traffic statt reiner Download-Geschwindigkeiten.", "date": "2026-07-25", "source": "RCR Wireless", "region": "Nordamerika", "relevance_label": "Beobachten", "source_domain": "rcrwireless.com", "source_label": "RCR Wireless", "de_title": "AT\u0026T gab auf seiner Q2-2026-Earnings-Call bekannt, dass es sein Netzwerk für den erwarteten Anstieg von agentischer KI optimiert hat, mit Fokus auf Up…", "id": 0}]</script>
+  </div>
+</details>
 
 
 
@@ -166,9 +179,8 @@ MTN Group hat betont, dass Afrikas Zukunft von der Schaffung wirtschaftlicher Ch
     </div>
   </main>
   <footer class="foot">
-    <div class="wrap foot-inner">
-      <span>Vodafone Insights &middot; Marktrecherche</span>
-      <span class="foot-meta">Intern &middot; automatisch aktualisiert</span>
+    <div class="foot-inner">
+      Vodafone Insights &middot; Marktrecherche Intern &middot; automatisch aktualisiert
     </div>
   </footer>
   <script src="../app.js"></script>

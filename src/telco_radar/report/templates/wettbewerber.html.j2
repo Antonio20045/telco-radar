@@ -2,7 +2,7 @@
 {% set active = 'wettbewerber' %}
 {% block title %}Telco Radar - Wettbewerber{% endblock %}
 {% block content %}
-<section class="page-hero">
+<section class="page-hero wide">
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Marktbeobachtung</p>
@@ -10,50 +10,40 @@
     </div>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Tiefenanalyse der wichtigsten Rivalen: Was sie gerade tun, mit Quelle und Einordnung.</p>
+  <p class="page-lead">Tiefenanalyse der wichtigsten Rivalen: was sie gerade tun, mit Quelle und Einordnung.</p>
 </section>
 
 {% if competitors and competitors|selectattr('summary')|list %}
-{% for c in competitors %}
-{% if c.summary or c.moves %}
-<section class="section competitor" id="c{{ loop.index }}">
-  <div class="section-head">
-    <h2><span class="sec-no">{{ '%02d' % loop.index }}</span> Wettbewerber</h2>
-    <p class="section-title">{{ c.name }}</p>
-  </div>
-
-  <div class="comp-grid">
-    <div class="comp-main">
-      {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
-      {% if c.themes %}<div class="chip-row">{% for t in c.themes %}<span class="chip">{{ t }}</span>{% endfor %}</div>{% endif %}
-    </div>
-    <aside class="comp-side">
-      <div class="stat-box"><span class="stat-num">{{ c.n_items }}</span><span class="stat-label">Meldungen ausgewertet</span></div>
-      <div class="stat-box"><span class="stat-num">{{ c.moves|length }}</span><span class="stat-label">relevante Moves</span></div>
-    </aside>
-  </div>
-
-  {% if c.moves %}
-  <h3 class="comp-moves-title">Aktuelle Moves</h3>
-  <div class="move-list">
-    {% for m in c.moves %}
-    <article class="move">
-      <span class="move-cat" style="background:{{ m.color }}">{{ m.category }}</span>
-      <div class="move-body">
-        <a class="move-title" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
-        <a class="source-link" href="{{ m.url }}" target="_blank" rel="noopener">{{ m.domain }} &nearr;</a>
+<div class="comp-list">
+  {% for c in competitors %}
+  {% if c.summary or c.moves %}
+  <article class="comp-card" id="c{{ loop.index }}">
+    <div class="comp-card-head">
+      <h2>{{ c.name }}</h2>
+      <div class="comp-badges">
+        <span class="comp-badge">{{ c.n_items }} Meldungen</span>
+        <span class="comp-badge accent">{{ c.moves|length }} relevante Moves</span>
       </div>
-    </article>
-    {% endfor %}
-  </div>
-  {% endif %}
-</section>
-{% endif %}
-{% endfor %}
+    </div>
+    {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
+    {% if c.themes %}<div class="comp-tags">{% for t in c.themes %}<span class="comp-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
 
+    {% if c.moves %}
+    <p class="comp-moves-title">Aktuelle Moves</p>
+    <div class="comp-items">
+      {% for m in c.moves %}
+      <div class="comp-item">
+        <div class="comp-item-cat">{{ m.category }}</div>
+        <a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </article>
+  {% endif %}
+  {% endfor %}
+</div>
 {% else %}
-<section class="section" style="padding-top:24px">
-  <p class="empty-note">Für diesen Lauf liegt noch keine Wettbewerber-Detailanalyse vor. Sie entsteht beim nächsten Lauf der Pipeline (benötigt die KI-Analyse).</p>
-</section>
+<p class="empty-note">Für diesen Lauf liegt noch keine Wettbewerber-Detailanalyse vor. Sie entsteht beim nächsten Lauf der Pipeline (benötigt die KI-Analyse).</p>
 {% endif %}
 {% endblock %}

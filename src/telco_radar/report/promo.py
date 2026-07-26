@@ -115,8 +115,34 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str,
     brands.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
                                 b["tier"], b["name"]))
 
+    # Featured/Hero-Karte: Vodafones eigenes Top-Angebot, wenn vorhanden -
+    # das ist die Vodafone-eigene Uebersichtsseite, daher zeigt die grosse
+    # Bildkarte standardmaessig die eigene aktuelle Aktion statt eines
+    # Wettbewerbers. Nur wenn Vodafone selbst gerade kein bestaetigtes
+    # Angebot hat, faellt die Karte auf den ersten Wettbewerber mit einem
+    # sichtbaren Angebot zurueck (nie leer, aber auch nie faelschlich als
+    # "Vodafone" beschriftet - das Label nutzt immer den echten Markennamen).
+    own_brand = next((b for b in brands if b["internal_reference"]), None)
+    hero = None
+    if own_brand and own_brand["active"]:
+        hero = {"brand": own_brand, "offer": own_brand["active"][0]}
+    else:
+        fallback = next((b for b in brands if not b["internal_reference"] and b["active"]), None)
+        if fallback:
+            hero = {"brand": fallback, "offer": fallback["active"][0]}
+
+    # Die Wettbewerber-Kachel-Reihe zeigt nie die im Hero gezeigte Marke ein
+    # zweites Mal (i.d.R. ohnehin Vodafone selbst, siehe internal_reference-
+    # Filter unten - der Ausschluss per Namen greift nur im Ausnahmefall,
+    # in dem der Fallback-Wettbewerber oben als Hero einspringt).
+    hero_name = hero["brand"]["name"] if hero else None
+    grid_brands = [b for b in brands
+                   if not b["internal_reference"] and b["name"] != hero_name]
+
     return {
         "brands": brands,
+        "grid_brands": grid_brands,
+        "hero": hero,
         "active_total": active_total,
         "brands_active": brands_active,
         "brands_tracked": len([s for s in crawlable if not s.internal_reference]),

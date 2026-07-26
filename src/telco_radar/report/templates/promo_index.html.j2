@@ -20,79 +20,95 @@
 {% endmacro %}
 
 {% block content %}
+{% set active_brands = promo_view.grid_brands | selectattr('has_offers') | list %}
+{% set inactive_brands = promo_view.grid_brands | rejectattr('has_offers') | list %}
 
-<section class="page-hero">
+<section class="page-hero wide">
+  <p class="page-kicker">Deutschland &middot; Promo-Markt</p>
   <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Deutschland</p>
-      <h1>Promo Übersicht</h1>
-    </div>
+    <h1>Wer wirbt gerade womit.</h1>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
   <p class="page-lead">Auf einen Blick: welche Tarif-, Rabatt- und Kampagnenaktion gerade bei welchem Wettbewerber läuft. Jede Karte verlinkt <b>direkt auf die Original-Aktionsseite</b> des Anbieters.</p>
+  <div class="stat-inline-row">
+    <span class="stat-inline accent"><b>{{ promo_view.active_total }}</b><span>aktive Aktionen</span></span>
+    <span class="stat-inline"><b>{{ promo_view.brands_active }}</b><span>Wettbewerber mit laufender Aktion</span></span>
+    <span class="stat-inline"><b>{{ promo_view.brands_tracked }}</b><span>beobachtete Wettbewerber</span></span>
+  </div>
 </section>
 
-<div class="kpi-tiles">
-  <div class="kpi-tile accent"><b>{{ promo_view.active_total }}</b><span>aktive Aktionen</span></div>
-  <div class="kpi-tile"><b>{{ promo_view.brands_active }}</b><span>Wettbewerber mit laufender Aktion</span></div>
-  <div class="kpi-tile"><b>{{ promo_view.brands_tracked }}</b><span>beobachtete Wettbewerber</span></div>
+<div class="promo-tabs" role="group" aria-label="Nach Anbietertyp filtern">
+  <button type="button" class="promo-filter on" data-tier="all">Alle</button>
+  <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
+  <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
 </div>
 
-<div class="promo-toolbar">
-  <div class="promo-filters" role="group" aria-label="Nach Anbietertyp filtern">
-    <button type="button" class="promo-filter on" data-tier="all">Alle</button>
-    <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
-    <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
+<div class="promo-hero-row">
+  {% if promo_view.hero %}
+  {% set hb = promo_view.hero.brand %}
+  {% set ho = promo_view.hero.offer %}
+  <div class="promo-hero-card" style="--c:{{ hb.color }}">
+    {% if hb.image_url %}<img src="{{ hb.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+    {% else %}<span class="promo-hero-fallback"><span class="promo-avatar">{{ hb.initials }}</span></span>{% endif %}
+    <div class="promo-hero-overlay"></div>
+    <div class="promo-hero-content">
+      <span class="promo-hero-badge">Top-Angebot &middot; {{ hb.name }}</span>
+      <div class="promo-hero-headline">{{ ho.headline }}</div>
+      <p class="promo-hero-meta">{{ ho.url | domain }}{% if ho.valid_until %} · gültig laut Anbieter bis {{ ho.valid_until }}{% endif %} · geprüft {{ ho.last_verified | date_de }}</p>
+      <a class="promo-hero-link" href="{{ ho.url }}" target="_blank" rel="noopener">Zum Angebot &nearr;</a>
+    </div>
   </div>
-  <span class="promo-hint">Jedes Angebot verlinkt zur Originalquelle des Anbieters</span>
+  {% else %}
+  <div class="promo-hero-card" style="display:flex;align-items:center;justify-content:center;min-height:240px">
+    <p style="color:rgba(255,255,255,.75);font-size:14px;font-weight:600;margin:0">Noch keine bestätigte Aktion beobachtet.</p>
+  </div>
+  {% endif %}
+
+  <div class="promo-stat-card">
+    <div>
+      <p class="promo-stat-kicker">Was diese Woche auffällt</p>
+      <p>{{ promo_lead if promo_lead else 'Für diese Woche liegt noch keine Analyse vor.' }}</p>
+    </div>
+    {% if promo_report_html %}<a class="promo-stat-link" href="#promo-wochentext">Analyse lesen &nearr;</a>{% endif %}
+  </div>
+</div>
+
+<div class="promo-section-head">
+  <h2>Alle {{ promo_view.active_total }} Aktionen nach Anbieter</h2>
+  <span>{{ promo_view.brands_active }} Wettbewerber mit laufender Aktion</span>
 </div>
 
 <div class="promo-board" id="promo-board">
-  {% for b in promo_view.brands %}
-  <article class="promo-card{% if b.internal_reference %} promo-card--own{% endif %}{% if not b.has_offers %} promo-card--empty{% endif %}{% if not b.image_url %} promo-card--no-photo{% endif %}" data-tier="{{ b.tier }}" style="--c:{{ b.color }}">
-    <div class="promo-media">
-      <span class="promo-media-fallback"><span class="promo-avatar">{{ b.initials }}</span></span>
-      {% if b.image_url %}<img src="{{ b.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.promo-card').classList.add('promo-card--no-photo');this.remove()">{% endif %}
-      <span class="promo-media-badges">
-        <span class="promo-tier-tag">{{ b.tier_label }}</span>
-        {% if b.internal_reference %}<span class="promo-own-tag">Eigene Referenz</span>{% endif %}
-      </span>
-      {% if b.image_url %}<span class="promo-media-brand"><span class="promo-avatar promo-avatar--sm">{{ b.initials }}</span></span>{% endif %}
-    </div>
-
+  {% for b in active_brands %}
+  <article class="promo-card" data-tier="{{ b.tier }}">
     <div class="promo-card-head">
       <h3>{{ b.name }}</h3>
       <span class="promo-count{% if b.active_count %} live{% endif %}">{{ b.active_count }} aktiv</span>
     </div>
     {% if b.group and b.group != b.name %}<p class="promo-card-sub">{{ b.group }}</p>{% endif %}
 
-    {% if b.active %}
     <ul class="promo-offers">
-      {% for o in b.active[:4] %}{{ promo_offer(o) }}{% endfor %}
+      {% for o in b.active %}{{ promo_offer(o) }}{% endfor %}
     </ul>
-    {% if b.active|length > 4 %}
-    <details class="promo-more">
-      <summary>+{{ b.active|length - 4 }} weitere Aktion{{ 'en' if b.active|length - 4 != 1 else '' }}</summary>
-      <ul class="promo-offers">
-        {% for o in b.active[4:] %}{{ promo_offer(o) }}{% endfor %}
-      </ul>
-    </details>
-    {% endif %}
     {% if b.stale %}
     <p class="promo-stale-note">{{ b.stale|length }} frühere Aktion{{ 'en' if b.stale|length != 1 else '' }} ausgelaufen.</p>
-    {% endif %}
-    {% else %}
-    <p class="promo-empty">{% if b.stale %}Keine aktuell bestätigte Aktion – zuletzt {{ b.stale[0].last_verified | date_de }} beobachtet.{% else %}Noch keine belegte Aktion beobachtet.{% endif %}</p>
     {% endif %}
   </article>
   {% endfor %}
 </div>
 
+{% if inactive_brands %}
+<div class="promo-inactive">
+  <span class="promo-inactive-label">Ohne aktuelle Aktion</span>
+  {% for b in inactive_brands %}<span class="promo-inactive-op">{{ b.name }}</span>{% endfor %}
+</div>
+{% endif %}
+
 {% if promo_report_html %}
-<details class="evidence" style="margin-top:34px">
+<details class="evidence" id="promo-wochentext" style="margin-top:34px">
   <summary><span>Wochentext lesen: wie sich das Preis- und Aktionsbild insgesamt entwickelt</span><small>{% if promo_report_date %}{{ promo_report_date }}{% endif %}</small></summary>
   <div class="evidence-body">
-    <article class="briefing prose">{{ promo_report_html | safe }}</article>
+    <article class="prose">{{ promo_report_html | safe }}</article>
   </div>
 </details>
 {% endif %}

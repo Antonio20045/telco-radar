@@ -3,7 +3,7 @@
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 {% block content %}
 
-<section class="page-hero">
+<section class="page-hero wide">
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Globale Marktbeobachtung</p>
@@ -12,49 +12,67 @@
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
   <p class="page-lead">Konkrete Angebote, Projekte und Partnerschaften von Telkos weltweit – <b>jenseits von Netz, Tarif und Preis</b>.</p>
+  {% if diff_stats %}
+  <div class="dz-status">
+    <span><b>{{ diff_stats.total }}</b> Beispiele in der Bibliothek</span>
+    <span class="dz-sep"></span>
+    <span><b>{{ diff_stats.themes_active }}</b> von {{ diff_stats.themes_total }} Hebeln aktiv</span>
+    {% if diff_stats.new %}<span class="dz-sep"></span><span><b>{{ diff_stats.new }}</b> neu seit dem letzten Blick</span>{% endif %}
+  </div>
+  {% endif %}
 </section>
 
 {% if diff_report_html %}
-<section class="section dz-report" id="differenzbericht">
-  <div class="section-head">
-    <h2><span class="sec-no">01</span></h2>
-    <p class="section-title">Der Differenzierungsbericht</p>
-    <p class="section-sub">Zusammengefasst aus den beobachteten Quellen: Was Anbieter konkret starten, bündeln und ihren Kunden anbieten.</p>
-  </div>
-  <div class="dz-report-meta">Bericht vom {{ diff_report_date }} · Quellen und Detailbelege stehen direkt im Text</div>
-  <article class="briefing prose">{{ diff_report_html | safe }}</article>
-</section>
+<div class="card">
+  <div class="card-head"><h2>Der Differenzierungsbericht</h2></div>
+  <p class="card-sub">Bericht vom {{ diff_report_date }} · Quellen und Detailbelege stehen direkt im Text</p>
+  <article class="prose">{{ diff_report_html | safe }}</article>
+</div>
 {% endif %}
 
-<details class="evidence dz-evidence" id="belegbibliothek">
-  <summary><span>Konkrete Beispiele und Quellen öffnen</span><small>Nachschlagen</small></summary>
-  <div class="evidence-body">
-    <div class="section-head">
-      <h2><span class="sec-no">02</span></h2>
-      <p class="section-title">Belege zum Bericht</p>
-      <p class="section-sub">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
+<div class="theme-grid" style="margin-top:24px">
+  {% for t in diff_themes %}
+  <div class="theme-card" style="--c:{{ t.color }}">
+    <h3>{{ t.label }}</h3>
+    <span class="theme-count">{{ t.n }} Beispiel{{ 'e' if t.n != 1 else '' }}</span>
+    {% if t.entries %}
+    <div class="theme-examples">
+      {% for e in t.entries[:2] %}
+      <a class="theme-example" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> {{ e.what }}</a>
+      {% endfor %}
     </div>
-
-{% for t in diff_themes %}
-{% if t.entries %}
-<article class="dz-card" style="--c:{{ t.color }}">
-  <div class="dz-card-head">
-    <h2>{{ t.label }}</h2>
+    {% else %}
+    <p class="theme-empty">Noch keine bestätigten Beispiele.</p>
+    {% endif %}
   </div>
-  <ul class="dz-moves">
-    {% for e in t.entries %}
-    <li class="dz-move">
-      <div class="dz-move-h">
-        <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> — {{ e.what }}</a>
-        {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
+  {% endfor %}
+</div>
+
+<details class="evidence" style="margin-top:24px">
+  <summary><span>Konkrete Beispiele und Quellen öffnen</span><small>{{ diff_stats.total if diff_stats else '' }} Belege</small></summary>
+  <div class="evidence-body">
+    <p class="card-sub" style="margin-top:0">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
+    {% for t in diff_themes %}
+    {% if t.entries %}
+    <article class="dz-card" style="--c:{{ t.color }}">
+      <div class="dz-card-head">
+        <h2>{{ t.label }}</h2>
+        <span class="dz-count">{{ t.n }}</span>
       </div>
-      <p class="dz-move-meta">{% if e.region %}{{ e.region }} · {% endif %}{% if e.date %}{{ e.date }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>{% if e.verified_de %} · geprüft {{ e.verified_de }}{% endif %}</p>
-    </li>
+      <ul class="dz-moves">
+        {% for e in t.entries %}
+        <li class="dz-move">
+          <div class="dz-move-h">
+            <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> — {{ e.what }}</a>
+            {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
+          </div>
+          <p class="dz-move-meta">{% if e.region %}{{ e.region }} · {% endif %}{% if e.date %}{{ e.date }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>{% if e.verified_de %} · geprüft {{ e.verified_de }}{% endif %}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endif %}
     {% endfor %}
-  </ul>
-</article>
-{% endif %}
-{% endfor %}
   </div>
 </details>
 
