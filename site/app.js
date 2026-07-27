@@ -114,6 +114,19 @@
   [fRegion, fCategory, fRelevance, fSort].forEach(function (el) { el.addEventListener('change', renderList); });
 
   renderList();
+
+  // Ankunft ueber die globale Suche (Topbar) mit ?q=…: Suchfeld vorbelegen,
+  // Explorer-Akkordeon oeffnen und sofort filtern - kein zweites Mal tippen.
+  try {
+    var qs = new URLSearchParams(location.search);
+    var q = qs.get('q');
+    if (q) {
+      fSearch.value = q;
+      renderList();
+      var det = listEl.closest('details.evidence');
+      if (det) { det.open = true; det.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+  } catch (e) { /* URLSearchParams nicht verfuegbar - stiller Fallback */ }
 })();
 
 /* Promo Übersicht - Wettbewerber-Board: Tier-Filter (Vanilla JS, kein Framework) */
@@ -133,5 +146,116 @@
         card.hidden = tier !== 'all' && card.dataset.tier !== tier;
       });
     });
+  });
+})();
+
+/* Globale Suche (Topbar) - durchsucht search_index.json: alle Bericht-Wochen
+   PLUS die persistente Differenzierungs-Bibliothek, nicht nur die aktuelle
+   Seite. Reines Substring-Matching (kein Fuzzy/Scoring), siehe
+   claude/suche-marktrecherche-konzept.md. */
+(function () {
+  'use strict';
+  const input = document.getElementById('gsearch-input');
+  const panel = document.getElementById('gsearch-results');
+  if (!input || !panel) return;
+
+  const MAX_SHOWN = 8;
+  const KIND_LABEL = { bericht: 'Bericht', differenzierung: 'Differenzierung' };
+  let items = null;   // null = noch nicht geladen; [] = geladen, leer
+  let loading = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // Der Praefix (z. B. "" auf der Startseite, "../" unter reports/ oder
+  // promo/) steckt schon serverseitig im Brand-Link - so muss app.js (eine
+  // einzige, seitenunabhaengige Datei) ihn nicht selbst erraten.
+  function prefix() {
+    const brand = document.querySelector('.topbar .brand');
+    const href = brand ? brand.getAttribute('href') || '' : '';
+    return href.slice(0, href.length - 'index.html'.length) || '';
+  }
+
+  function loadIndex() {
+    if (items !== null) return Promise.resolve(items);
+    if (loading) return loading;
+    loading = fetch(prefix() + 'search_index.json')
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (data) { items = Array.isArray(data) ? data : []; return items; })
+      .catch(function () { items = []; return items; });
+    return loading;
+  }
+
+  function haystack(it) {
+    return [it.title, it.summary, it.operator, it.region, it.category, it.source_label]
+      .filter(Boolean).join(' — ').toLowerCase();
+  }
+
+  function snippet(it, q) {
+    const text = [it.title, it.summary].filter(Boolean).join(' — ');
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(q);
+    if (idx === -1) {
+      return esc(text.slice(0, 150)) + (text.length > 150 ? '…' : '');
+    }
+    const start = Math.max(0, idx - 55);
+    const end = Math.min(text.length, idx + q.length + 85);
+    return (start > 0 ? '…' : '') +
+      esc(text.slice(start, idx)) +
+      '<mark>' + esc(text.slice(idx, idx + q.length)) + '</mark>' +
+      esc(text.slice(idx + q.length, end)) +
+      (end < text.length ? '…' : '');
+  }
+
+  function targetHref(it, q) {
+    const p = prefix();
+    if (it.kind === 'bericht') {
+      return p + it.deep_link + '?q=' + encodeURIComponent(q);
+    }
+    return p + it.deep_link;
+  }
+
+  function render(hits, q) {
+    if (!hits.length) {
+      panel.innerHTML = '<p class="gs-empty">Keine Treffer für „' + esc(q) + '“.</p>';
+      panel.hidden = false;
+      return;
+    }
+    const shown = hits.slice(0, MAX_SHOWN);
+    panel.innerHTML = shown.map(function (it) {
+      const meta = [it.operator, it.region, it.date].filter(Boolean).join(' · ');
+      return '<a class="gs-item" href="' + esc(targetHref(it, q)) + '">' +
+        '<div class="gs-item-top">' +
+          '<span class="gs-kind ' + esc(it.kind) + '">' + esc(KIND_LABEL[it.kind] || it.kind) + '</span>' +
+          '<span class="gs-item-meta">' + esc(meta) + '</span>' +
+        '</div>' +
+        '<p class="gs-item-snip">' + snippet(it, q) + '</p>' +
+        '</a>';
+    }).join('') + (hits.length > MAX_SHOWN
+      ? '<p class="gs-more">+' + (hits.length - MAX_SHOWN) + ' weitere Treffer – Suchbegriff eingrenzen</p>'
+      : '');
+    panel.hidden = false;
+  }
+
+  function search() {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { panel.hidden = true; panel.innerHTML = ''; return; }
+    loadIndex().then(function (all) {
+      const hits = all.filter(function (it) { return haystack(it).indexOf(q) !== -1; });
+      render(hits, q);
+    });
+  }
+
+  let t;
+  input.addEventListener('input', function () { clearTimeout(t); t = setTimeout(search, 150); });
+  input.addEventListener('focus', function () { if (input.value.trim()) search(); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { panel.hidden = true; input.blur(); }
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('#gsearch')) panel.hidden = true;
   });
 })();

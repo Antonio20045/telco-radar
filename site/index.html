@@ -19,10 +19,18 @@
         <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="18" height="18"></span>
         <span class="brand-name">Vodafone <em>Insights</em></span>
       </a>
-      <nav class="usecases" aria-label="Anwendungsfälle">
-        <a class="uc active" href="index.html">Marktrecherche</a>
-        <a class="uc " href="promo/index.html">Promo Übersicht</a>
-      </nav>
+      <div class="topbar-right">
+        <nav class="usecases" aria-label="Anwendungsfälle">
+          <a class="uc active" href="index.html">Marktrecherche</a>
+          <a class="uc " href="promo/index.html">Promo Übersicht</a>
+        </nav>
+        <div class="gsearch" id="gsearch">
+          <input type="search" id="gsearch-input" class="gsearch-input" autocomplete="off"
+                 placeholder="Alle Berichte &amp; Differenzierung durchsuchen …"
+                 aria-label="Marktrecherche durchsuchen">
+          <div class="gsearch-results" id="gsearch-results" role="listbox" aria-label="Suchergebnisse" hidden></div>
+        </div>
+      </div>
     </div>
     
     <nav class="subbar subnav" aria-label="Marktrecherche">
