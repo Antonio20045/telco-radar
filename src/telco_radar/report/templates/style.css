@@ -53,21 +53,24 @@ main{padding-bottom:60px}
 .subnav a:hover{color:#fff}
 .subnav a.on{color:var(--red);background:#fff}
 
-/* ------------------------------------------------------- global search box */
+/* ------------------------------------------------------- global search box
+   v2 (siehe claude/suche-ergebnisseite-konzept.md): kein Live-Dropdown mehr -
+   das Topbar-Feld ist ein natives <form>, das bei Enter/Icon-Klick direkt zu
+   suche.html?q=... navigiert (auch ohne JS). Die .gs-item-* Bausteine bleiben
+   erhalten und werden jetzt auf der Ergebnisseite selbst wiederverwendet. */
 .topbar-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .gsearch{position:relative;width:260px;max-width:100%}
-.gsearch-input{width:100%;border:none;border-radius:var(--radius-pill);padding:8px 14px;
+.gsearch-input{width:100%;border:none;border-radius:var(--radius-pill);padding:8px 40px 8px 14px;
   font:inherit;font-size:13.5px;background:rgba(255,255,255,.16);color:#fff;
   transition:background .15s var(--ease)}
 .gsearch-input::placeholder{color:rgba(255,255,255,.7)}
 .gsearch-input:focus{outline:none;background:#fff;color:var(--ink)}
 .gsearch-input:focus::placeholder{color:var(--faint)}
-.gsearch-results{position:absolute;top:calc(100% + 8px);right:0;width:400px;max-width:88vw;
-  max-height:70vh;overflow-y:auto;background:#fff;border-radius:var(--radius-md);
-  box-shadow:var(--shadow-lg);padding:8px;z-index:80}
-.gs-empty{padding:16px 14px;color:var(--mute);font-size:13.5px}
-.gs-item{display:block;padding:12px 14px;border-radius:var(--radius-sm);color:inherit}
-.gs-item:hover,.gs-item.active{background:var(--line2)}
+.gsearch-btn{position:absolute;top:0;right:0;bottom:0;width:36px;border:none;background:none;
+  padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:rgba(255,255,255,.8)}
+.gsearch-btn:hover{color:#fff}
+.gsearch:focus-within .gsearch-btn{color:var(--red)}
 .gs-item-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
 .gs-kind{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   padding:2px 8px;border-radius:var(--radius-pill);color:#fff;background:var(--mute2)}
@@ -77,10 +80,8 @@ main{padding-bottom:60px}
 .gs-item-title{font-size:14px;font-weight:600;color:var(--ink);line-height:1.4;margin:0 0 4px}
 .gs-item-snip{font-size:12.5px;color:var(--mute);line-height:1.5;margin:0}
 .gs-item-snip mark{background:#ffe58f;color:inherit;border-radius:2px;padding:0 1px}
-.gs-more{padding:10px 14px;color:var(--faint);font-size:12px;text-align:center}
 @media (max-width:760px){
   .gsearch{width:100%;order:3}
-  .gsearch-results{left:0;right:0;width:auto;max-width:none}
 }
 
 /* ---------------------------------------------------------------- footer */
@@ -425,6 +426,22 @@ main{padding-bottom:60px}
 .pill-cloud{display:flex;flex-wrap:wrap;gap:8px}
 .pill-cloud span,.pill-cloud a{background:#fff;color:#6b6255;font-size:12.5px;font-weight:600;
   padding:7px 12px;border-radius:var(--radius-pill);display:inline-block}
+
+/* =========================================================================
+   Suche (Ergebnisseite) - siehe claude/suche-ergebnisseite-konzept.md
+   ========================================================================= */
+.suche-filters{display:flex;gap:8px;margin:4px 0 22px;flex-wrap:wrap}
+.suche-filter{appearance:none;font-family:var(--font);border:1px solid var(--line2);background:#fff;
+  border-radius:var(--radius-pill);padding:8px 16px;font-size:13.5px;font-weight:700;color:var(--mute);
+  cursor:pointer;transition:.15s}
+.suche-filter:hover{color:var(--ink);border-color:var(--faint2)}
+.suche-filter.on{background:var(--red);border-color:var(--red);color:#fff}
+.suche-count{font-size:13px;color:var(--mute);font-weight:600;margin:0 0 16px}
+.suche-list{display:flex;flex-direction:column;gap:14px}
+.suche-card{background:#fff;border-radius:var(--radius-md);padding:22px 26px}
+.suche-card-links{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px}
+.suche-context-link{font-size:12.5px;font-weight:600;color:var(--mute)}
+.suche-context-link:hover{color:var(--red)}
 
 .source-region{padding:36px 0 0}
 .source-region:first-child{padding-top:0}

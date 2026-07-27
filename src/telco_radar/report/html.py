@@ -645,6 +645,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "search_index.json").write_text(
         json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
 
+    # ---- Suche: eigene Ergebnisseite statt Topbar-Dropdown (Ausbau, siehe
+    # claude/suche-ergebnisseite-konzept.md). Rein clientseitig: app.js laedt
+    # search_index.json per fetch() und rendert die volle Trefferliste, das
+    # Template selbst braucht daher ausser der Basisnavigation keinen Kontext.
+    # Kein eigener Navigationslink in base.html.j2 - nur ueber die Topbar-
+    # Suche (native Formular-Navigation zu suche.html?q=...) erreichbar.
+    (site_dir / "suche.html").write_text(
+        env.get_template("suche.html.j2").render(prefix="", num_operators=num_operators),
+        encoding="utf-8")
+
     # ---- Promo Uebersicht: eigener zweiter Anwendungsfall neben Marktrecherche
     # (siehe promo_pipeline.py). Eigene Quellen (config/promo_sources.yaml),
     # eigener State (data/state/promo_db.json) - komplett getrennt vom
