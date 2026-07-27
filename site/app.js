@@ -149,20 +149,20 @@
   });
 })();
 
-/* Globale Suche (Topbar) - durchsucht search_index.json: alle Bericht-Wochen
-   PLUS die persistente Differenzierungs-Bibliothek, nicht nur die aktuelle
-   Seite. Reines Substring-Matching (kein Fuzzy/Scoring), siehe
-   claude/suche-marktrecherche-konzept.md. */
-(function () {
+/* Gemeinsame Matching-/Snippet-Logik der globalen Suche: durchsucht
+   search_index.json - Bericht-Highlights ALLER Wochen PLUS die persistente
+   Differenzierungs-Bibliothek, nicht nur die aktuelle Seite. Reines
+   Substring-Matching (kein Fuzzy/Scoring), siehe
+   claude/suche-marktrecherche-konzept.md. Frueher lebte diese Logik in der
+   Topbar-Dropdown-IIFE; seit dem Ausbau (claude/suche-ergebnisseite-
+   konzept.md) navigiert die Topbar per nativem <form> direkt zu suche.html,
+   das dieselben Funktionen hier nutzt statt sie zu duplizieren. */
+var TelcoSearch = (function () {
   'use strict';
-  const input = document.getElementById('gsearch-input');
-  const panel = document.getElementById('gsearch-results');
-  if (!input || !panel) return;
 
-  const MAX_SHOWN = 8;
-  const KIND_LABEL = { bericht: 'Bericht', differenzierung: 'Differenzierung' };
-  let items = null;   // null = noch nicht geladen; [] = geladen, leer
-  let loading = null;
+  var KIND_LABEL = { bericht: 'Bericht', differenzierung: 'Differenzierung' };
+  var items = null;   // null = noch nicht geladen; [] = geladen, leer
+  var loading = null;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -174,8 +174,8 @@
   // promo/) steckt schon serverseitig im Brand-Link - so muss app.js (eine
   // einzige, seitenunabhaengige Datei) ihn nicht selbst erraten.
   function prefix() {
-    const brand = document.querySelector('.topbar .brand');
-    const href = brand ? brand.getAttribute('href') || '' : '';
+    var brand = document.querySelector('.topbar .brand');
+    var href = brand ? brand.getAttribute('href') || '' : '';
     return href.slice(0, href.length - 'index.html'.length) || '';
   }
 
@@ -195,14 +195,14 @@
   }
 
   function snippet(it, q) {
-    const text = [it.title, it.summary].filter(Boolean).join(' — ');
-    const lower = text.toLowerCase();
-    const idx = lower.indexOf(q);
+    var text = [it.title, it.summary].filter(Boolean).join(' — ');
+    var lower = text.toLowerCase();
+    var idx = lower.indexOf(q);
     if (idx === -1) {
       return esc(text.slice(0, 150)) + (text.length > 150 ? '…' : '');
     }
-    const start = Math.max(0, idx - 55);
-    const end = Math.min(text.length, idx + q.length + 85);
+    var start = Math.max(0, idx - 55);
+    var end = Math.min(text.length, idx + q.length + 85);
     return (start > 0 ? '…' : '') +
       esc(text.slice(start, idx)) +
       '<mark>' + esc(text.slice(idx, idx + q.length)) + '</mark>' +
@@ -210,52 +210,106 @@
       (end < text.length ? '…' : '');
   }
 
-  function targetHref(it, q) {
-    const p = prefix();
-    if (it.kind === 'bericht') {
+  // Deep-Link zum vollen Kontext: Bericht-Treffer haengen ?q= an, damit der
+  // Explorer der jeweiligen Woche sofort gefiltert oeffnet (siehe die
+  // Explorer-IIFE weiter oben in dieser Datei); Differenzierungs-Treffer
+  // springen direkt zum Thema - dort gibt es keinen Suchbegriff-Filter.
+  function deepLinkHref(it, q) {
+    var p = prefix();
+    if (it.kind === 'bericht' && q) {
       return p + it.deep_link + '?q=' + encodeURIComponent(q);
     }
     return p + it.deep_link;
   }
 
-  function render(hits, q) {
-    if (!hits.length) {
-      panel.innerHTML = '<p class="gs-empty">Keine Treffer für „' + esc(q) + '“.</p>';
-      panel.hidden = false;
-      return;
-    }
-    const shown = hits.slice(0, MAX_SHOWN);
-    panel.innerHTML = shown.map(function (it) {
-      const meta = [it.operator, it.region, it.date].filter(Boolean).join(' · ');
-      return '<a class="gs-item" href="' + esc(targetHref(it, q)) + '">' +
-        '<div class="gs-item-top">' +
-          '<span class="gs-kind ' + esc(it.kind) + '">' + esc(KIND_LABEL[it.kind] || it.kind) + '</span>' +
-          '<span class="gs-item-meta">' + esc(meta) + '</span>' +
-        '</div>' +
-        '<p class="gs-item-snip">' + snippet(it, q) + '</p>' +
-        '</a>';
-    }).join('') + (hits.length > MAX_SHOWN
-      ? '<p class="gs-more">+' + (hits.length - MAX_SHOWN) + ' weitere Treffer – Suchbegriff eingrenzen</p>'
-      : '');
-    panel.hidden = false;
+  return {
+    KIND_LABEL: KIND_LABEL, esc: esc, prefix: prefix, loadIndex: loadIndex,
+    haystack: haystack, snippet: snippet, deepLinkHref: deepLinkHref
+  };
+})();
+
+/* Suche-Ergebnisseite (suche.html): alle Treffer zu einem Begriff an einem
+   Ort statt im 8er-gedeckelten Topbar-Dropdown - bookmarkbar/teilbar ueber
+   ?q=<begriff>. Siehe claude/suche-ergebnisseite-konzept.md. */
+(function () {
+  'use strict';
+  var input = document.getElementById('suche-input');
+  var resultsEl = document.getElementById('suche-results');
+  var countEl = document.getElementById('suche-count');
+  var chips = document.querySelectorAll('.suche-filter');
+  if (!input || !resultsEl) return;
+
+  var kind = 'all';
+  var t;
+
+  function syncUrl(q) {
+    try {
+      var url = new URL(location.href);
+      if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    } catch (e) { /* URL() nicht verfuegbar - stiller Fallback, Seite bleibt nutzbar */ }
   }
 
-  function search() {
-    const q = input.value.trim().toLowerCase();
-    if (!q) { panel.hidden = true; panel.innerHTML = ''; return; }
-    loadIndex().then(function (all) {
-      const hits = all.filter(function (it) { return haystack(it).indexOf(q) !== -1; });
-      render(hits, q);
+  function renderHits(hits, q) {
+    if (!q) {
+      resultsEl.innerHTML = '<p class="empty-note">Suchbegriff eingeben, um alle Berichte und die ' +
+        'Differenzierungs-Bibliothek zu durchsuchen.</p>';
+      countEl.textContent = '';
+      return;
+    }
+    if (!hits.length) {
+      resultsEl.innerHTML = '<p class="empty-note">Keine Treffer für „' + TelcoSearch.esc(q) + '“.</p>';
+      countEl.textContent = '0 Treffer';
+      return;
+    }
+    resultsEl.innerHTML = hits.map(function (it) {
+      var meta = [it.operator, it.region, it.date].filter(Boolean).join(' · ');
+      var ctxLabel = it.kind === 'bericht' ? 'Im Wochenbericht ansehen' : 'Im Differenzierungs-Thema ansehen';
+      return '<article class="suche-card">' +
+        '<div class="gs-item-top">' +
+          '<span class="gs-kind ' + TelcoSearch.esc(it.kind) + '">' +
+            TelcoSearch.esc(TelcoSearch.KIND_LABEL[it.kind] || it.kind) + '</span>' +
+          '<span class="gs-item-meta">' + TelcoSearch.esc(meta) + '</span>' +
+        '</div>' +
+        '<p class="gs-item-title">' + TelcoSearch.esc(it.title) + '</p>' +
+        '<p class="gs-item-snip">' + TelcoSearch.snippet(it, q) + '</p>' +
+        '<div class="suche-card-links">' +
+          '<a class="source-link" href="' + TelcoSearch.esc(it.url) + '" target="_blank" rel="noopener">' +
+            'Originalquelle öffnen &nearr;</a>' +
+          '<a class="suche-context-link" href="' + TelcoSearch.esc(TelcoSearch.deepLinkHref(it, q)) + '">' +
+            ctxLabel + ' &rsaquo;</a>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+    countEl.textContent = hits.length + ' Treffer für „' + TelcoSearch.esc(q) + '“';
+  }
+
+  function run() {
+    var q = (input.value || '').trim().toLowerCase();
+    syncUrl(q);
+    if (!q) { renderHits([], ''); return; }
+    TelcoSearch.loadIndex().then(function (all) {
+      var hits = all.filter(function (it) { return TelcoSearch.haystack(it).indexOf(q) !== -1; });
+      if (kind !== 'all') hits = hits.filter(function (it) { return it.kind === kind; });
+      renderHits(hits, q);
+      document.title = 'Suche: ' + q + ' – Vodafone Insights';
     });
   }
 
-  let t;
-  input.addEventListener('input', function () { clearTimeout(t); t = setTimeout(search, 150); });
-  input.addEventListener('focus', function () { if (input.value.trim()) search(); });
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { panel.hidden = true; input.blur(); }
+  input.addEventListener('input', function () { clearTimeout(t); t = setTimeout(run, 150); });
+  chips.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      chips.forEach(function (b) { b.classList.remove('on'); });
+      btn.classList.add('on');
+      kind = btn.dataset.kind || 'all';
+      run();
+    });
   });
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('#gsearch')) panel.hidden = true;
-  });
+
+  try {
+    var qs = new URLSearchParams(location.search);
+    var q0 = qs.get('q');
+    if (q0) input.value = q0;
+  } catch (e) { /* URLSearchParams nicht verfuegbar - stiller Fallback */ }
+  run();
 })();
