@@ -39,12 +39,21 @@ def _fetch_one(src, http_cfg: dict) -> dict:
     try:
         snap = fetch_snapshot(src.url, src.kind, http_cfg)
         rec["text"] = snap["text"]
-        rec["hash"] = content_hash(snap["text"])
+        rec["links"] = snap.get("links") or []
+        rec["hash"] = content_hash(snap["text"], rec["links"])
         rec["image_url"] = snap.get("image_url")
     except Exception as exc:  # noqa: BLE001
         rec["status"] = "fail"
         rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
     return rec
+
+
+def _resolve_item_url(item_url: str | None, brand_url: str) -> str:
+    """The LLM-selected deep link if extract_promos() found one, else the
+    brand's configured overview URL - exactly the pre-deep-links behaviour
+    in the fallback case, never worse (see
+    claude/promo-tiefenlinks-konzept.md Anforderung 2)."""
+    return (item_url or "").strip() or brand_url
 
 
 def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
@@ -91,6 +100,7 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             results.append(rec)
             continue
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
+        links = rec.pop("links", [])
         image_url = rec.get("image_url")
         changed = snap_store.changed(src_name, h)
         if changed or not image_path(root, src_name).exists():
@@ -102,10 +112,10 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                 continue
             snap_store.update(src_name, h, today)
             if use_llm and text.strip():
-                items = extract_promos(src_name, text, model)
+                items = extract_promos(src_name, text, model, links=links)
                 for it in items:
                     it["tier"] = rec["tier"]
-                    it["url"] = rec["url"]
+                    it["url"] = _resolve_item_url(it.get("url"), rec["url"])
                     it["image_url"] = image_url
                 n_new = db.upsert(items, today)
                 checked_ids = {entry_id(src_name, it["headline"]) for it in items}

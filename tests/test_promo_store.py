@@ -120,3 +120,21 @@ def test_upsert_updates_image_url_on_reverify_but_keeps_old_if_missing(tmp_path)
     db.upsert([_item(image_url="https://example.test/second.jpg")], "2026-08-01")
     entry = list(db.entries.values())[0]
     assert entry["image_url"] == "https://example.test/second.jpg"
+
+
+def test_upsert_updates_url_on_reverify_but_keeps_old_if_missing(tmp_path):
+    """The actual bug behind claude/promo-tiefenlinks-konzept.md Premortem e:
+    without this, a fixed brand-overview URL set on first sighting would
+    live forever, even once better deep links start being extracted."""
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(url="https://example.test/deep-link-1")], "2026-07-04")
+    # Re-verified later without a resolved deep link (e.g. the LLM did not
+    # pick a candidate this run) - the previously known deep link must not
+    # be silently dropped back to empty.
+    db.upsert([_item(url="")], "2026-07-25")
+    entry = list(db.entries.values())[0]
+    assert entry["url"] == "https://example.test/deep-link-1"
+    # A genuinely new/updated deep link on re-verify does update it.
+    db.upsert([_item(url="https://example.test/deep-link-2")], "2026-08-01")
+    entry = list(db.entries.values())[0]
+    assert entry["url"] == "https://example.test/deep-link-2"

@@ -6,6 +6,15 @@ Extrahiert daraus 0-N konkrete, aktuell laufende Angebote. Erfindet nie einen
 Preis oder ein Enddatum, das nicht im Text steht - Stale-Preis-Risiko ist der
 Hauptgrund, warum diese Seite ueberhaupt nur Mechaniken statt Fixpreisen
 zeigen soll (siehe claude/promo-uebersicht-konzept.md, Risiko d).
+
+Deep links (claude/promo-tiefenlinks-konzept.md): zusaetzlich zum Seitentext
+kann eine nummerierte Liste von Link-Kandidaten uebergeben werden (siehe
+collect/promo_snapshot.extract_link_candidates). Das Modell darf fuer einen
+Eintrag hoechstens EINE Kandidaten-Nummer zurueckgeben - nie eine eigene URL
+erfinden (gleiches Erfindungsverbot-Prinzip wie bei Preisen/Enddaten). Ein
+fehlender, ungueltiger oder nicht referenzierter Index bleibt einfach leer;
+promo_pipeline.py faellt dann auf die bisherige Markenseiten-URL zurueck -
+keine Verschlechterung gegenueber vorher.
 """
 from __future__ import annotations
 
@@ -64,18 +73,84 @@ zeigt, gib [] zurueck. Antworte AUSSCHLIESSLICH mit einem JSON-Array, kein
 weiterer Text.
 """
 
+# Nur angehaengt, wenn tatsaechlich Link-Kandidaten vorliegen (siehe
+# extract_promos). Getrennt vom Basis-Prompt, damit ein Aufruf ohne
+# Kandidaten (z. B. Fallback, aeltere Tests) den Prompt nicht unnoetig
+# aufblaeht oder ein Feld erwaehnt, das es dann gar nicht geben kann.
+_LINK_SELECTION_INSTRUCTIONS = """
+
+Zusaetzlich bekommst du unten eine NUMMERIERTE LISTE echter Links von dieser
+Seite ("LINK-KANDIDATEN"). Wenn einer dieser Kandidaten eindeutig und
+konkret auf die Detailseite GENAU DIESES Angebots verweist (nicht nur
+allgemein auf die Marken-/Uebersichtsseite), gib zusaetzlich
+"link_index": <Nummer> zurueck. Nutze IMMER eine Nummer aus der Liste, NIE
+eine selbst erdachte oder veraenderte URL. Bist du unsicher, welcher
+Kandidat passt, oder passt keiner wirklich zu diesem konkreten Angebot,
+lasse "link_index" ganz weg (oder setze null) - raten ist schlimmer als
+gar keinen Link vorzuschlagen."""
+
+
+def _format_link_candidates(links: list[dict]) -> str:
+    """Numbered "N. \"context\" -> href" block for the prompt. Skips
+    candidates without a usable href defensively; context is truncated so
+    one oddly long candidate cannot dominate the prompt."""
+    lines = []
+    for link in links:
+        href = (link.get("href") or "").strip()
+        if not href:
+            continue
+        text = (link.get("text") or "").strip()[:120] or "(kein Text)"
+        lines.append(f"{len(lines) + 1}. \"{text}\" -> {href}")
+    return "\n".join(lines)
+
+
+def _resolve_link_index(row: dict, links: list[dict]) -> str | None:
+    """Defensively resolve row["link_index"] (1-based, as offered in the
+    prompt) to an href. Any shape the model might return that is not a
+    clean in-range integer - missing, null, float, string, out of bounds -
+    resolves to None rather than raising, exactly like the existing
+    valid_until/headline handling in this module. NEVER falls back to a
+    free-form "url"/"link" field the model might have added on its own -
+    the only path to a URL here is a candidate the page itself offered."""
+    raw_index = row.get("link_index")
+    if raw_index is None or isinstance(raw_index, bool):
+        return None
+    idx = None
+    if isinstance(raw_index, int):
+        idx = raw_index
+    elif isinstance(raw_index, float) and raw_index.is_integer():
+        idx = int(raw_index)
+    elif isinstance(raw_index, str) and raw_index.strip().lstrip("-").isdigit():
+        idx = int(raw_index.strip())
+    if idx is None or not (1 <= idx <= len(links)):
+        return None
+    href = (links[idx - 1].get("href") or "").strip()
+    return href or None
+
 
 def extract_promos(brand: str, snapshot_text: str, model: str,
+                   links: list[dict] | None = None,
                    max_tokens: int = 1800) -> list[dict]:
     """LLM-Extraktion. Failsafe: bei jedem Fehler leere Liste - der
     bestehende PromoDB-Stand fuer diesen Brand bleibt dann einfach
-    unveraendert (kein Absturz, kein stillschweigendes Loeschen)."""
+    unveraendert (kein Absturz, kein stillschweigendes Loeschen).
+
+    *links* (optional): Kandidaten aus
+    collect/promo_snapshot.extract_link_candidates. Wird eine passende
+    Nummer vom Modell zurueckgegeben, traegt der Eintrag zusaetzlich "url" -
+    fehlt sie oder ist sie ungueltig, bleibt "url" schlicht weg und
+    promo_pipeline.py setzt die bisherige Markenseiten-URL ein."""
     if not (snapshot_text or "").strip():
         return []
+    links = links or []
+    candidates_block = _format_link_candidates(links)
+    system = _EXTRACT_SYSTEM.format(brand=brand)
+    user = snapshot_text[:10000]
+    if candidates_block:
+        system += _LINK_SELECTION_INSTRUCTIONS
+        user += "\n\nLINK-KANDIDATEN:\n" + candidates_block
     try:
-        raw = complete(
-            _EXTRACT_SYSTEM.format(brand=brand), snapshot_text[:10000],
-            model=model, max_tokens=max_tokens)
+        raw = complete(system, user, model=model, max_tokens=max_tokens)
         parsed = extract_json(raw)
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Extraktion (%s) fehlgeschlagen: %s", brand, str(exc)[:140])
@@ -87,13 +162,18 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
         headline = str(row.get("headline") or "").strip()
         if not headline:
             continue
-        out.append({
+        entry = {
             "brand": brand,
             "headline": headline,
             "description": str(row.get("description") or "").strip(),
             "valid_until": (str(row["valid_until"]).strip()
                            if row.get("valid_until") else None),
-        })
+        }
+        if links:
+            href = _resolve_link_index(row, links)
+            if href:
+                entry["url"] = href
+        out.append(entry)
     if len(out) > _MAX_ENTRIES_PER_BRAND:
         log.info("Promo-Extraktion (%s): %d Eintraege auf %d gekappt",
                  brand, len(out), _MAX_ENTRIES_PER_BRAND)

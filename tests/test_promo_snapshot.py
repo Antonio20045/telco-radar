@@ -11,7 +11,8 @@ import re
 
 from telco_radar.collect.promo_snapshot import (
     _CONSENT_SELECTORS, _CONSENT_TEXTS, _dismiss_cookie_banner,
-    capture_hero_image, content_hash, extract_hero_image, extract_text,
+    _normalize_link_for_hash, capture_hero_image, content_hash,
+    extract_hero_image, extract_link_candidates, extract_text,
 )
 
 
@@ -50,6 +51,117 @@ def test_content_hash_stable_and_sensitive():
     c = content_hash("Angebot B")
     assert a == b
     assert a != c
+
+
+def test_content_hash_without_links_matches_pre_deep_links_behaviour():
+    """Callers that never pass links (older tests, or a fetch with no
+    candidates) still get the historical text-only hash."""
+    assert content_hash("Angebot A") == content_hash("Angebot A", links=[])
+    assert content_hash("Angebot A") == content_hash("Angebot A", links=None)
+
+
+def test_content_hash_changes_when_link_target_changes_but_text_does_not():
+    """The actual bug this closes: a brand swaps a button's link target
+    while the visible text stays identical - the old text-only hash would
+    never notice, so the stale deep link would never be re-extracted."""
+    same_text = "Jetzt sichern"
+    links_a = [{"href": "https://example.test/geraet-a", "text": "Jetzt sichern"}]
+    links_b = [{"href": "https://example.test/geraet-b", "text": "Jetzt sichern"}]
+    assert content_hash(same_text, links_a) != content_hash(same_text, links_b)
+
+
+def test_content_hash_ignores_tracking_param_differences():
+    """A pure tracking/campaign-id churn (utm_*, FF_*) must not look like a
+    content change every single run."""
+    links_a = [{"href": "https://example.test/p?FF_CAMPAIGN=123&id=42"}]
+    links_b = [{"href": "https://example.test/p?FF_CAMPAIGN=999&id=42"}]
+    assert content_hash("text", links_a) == content_hash("text", links_b)
+
+
+def test_normalize_link_for_hash_strips_tracking_but_keeps_functional_params():
+    normalized = _normalize_link_for_hash(
+        "https://www.o2online.de/e-shop/details?tarif=x&ratenzahlung=36&utm_source=news")
+    assert "utm_source" not in normalized
+    assert "tarif=x" in normalized
+    assert "ratenzahlung=36" in normalized
+
+
+def test_extract_link_candidates_same_origin_only():
+    html = """
+    <html><body>
+      <main>
+        <article><h2>Galaxy A57</h2><a href="/e-shop/galaxy-a57">Nur 27,49 EUR</a></article>
+        <article><h2>Affiliate-Angebot</h2>
+          <a href="https://affiliate.example/redirect?to=galaxy">Mehr erfahren</a>
+        </article>
+      </main>
+    </body></html>
+    """
+    candidates = extract_link_candidates(html, "https://www.o2online.de/deals/")
+    hrefs = [c["href"] for c in candidates]
+    assert "https://www.o2online.de/e-shop/galaxy-a57" in hrefs
+    assert not any("affiliate.example" in h for h in hrefs)
+
+
+def test_extract_link_candidates_uses_heading_as_context_for_price_only_anchor_text():
+    """Reproduces the o2online.de case from the concept doc: the anchor
+    text alone is only the price CTA, the product name sits in a heading
+    just before it in the same card."""
+    html = """
+    <main><article>
+      <h2>Samsung Galaxy A57 128GB Awesome Navy</h2>
+      <a href="/e-shop/samsung/galaxy-a57-details?tarif=m-plus">Nur 27,49 EUR monatlich</a>
+    </article></main>
+    """
+    candidates = extract_link_candidates(html, "https://example.test/deals/")
+    assert len(candidates) == 1
+    assert "Samsung Galaxy A57" in candidates[0]["text"]
+    assert "27,49" in candidates[0]["text"]
+
+
+def test_extract_link_candidates_ignores_nav_footer_and_non_http_hrefs():
+    html = """
+    <html><body>
+      <nav><a href="/menu-punkt">Menu</a></nav>
+      <footer><a href="/impressum">Impressum</a></footer>
+      <main>
+        <a href="#top">Nach oben</a>
+        <a href="javascript:void(0)">Klick mich</a>
+        <a href="mailto:info@example.test">Kontakt</a>
+        <a href="tel:+490000000">Anruf</a>
+        <article><h2>Echtes Angebot</h2><a href="/echtes-angebot">Ansehen</a></article>
+      </main>
+    </body></html>
+    """
+    candidates = extract_link_candidates(html, "https://example.test/")
+    hrefs = [c["href"] for c in candidates]
+    assert hrefs == ["https://example.test/echtes-angebot"]
+
+
+def test_extract_link_candidates_dedupes_same_resolved_url():
+    html = """
+    <main>
+      <article><h2>Angebot X</h2><a href="/x">Details</a></article>
+      <article><a href="/x">Nochmal Details</a></article>
+    </main>
+    """
+    candidates = extract_link_candidates(html, "https://example.test/")
+    assert len(candidates) == 1
+    assert candidates[0]["href"] == "https://example.test/x"
+
+
+def test_extract_link_candidates_respects_max_candidates():
+    links_html = "".join(
+        f'<article><h2>Angebot {i}</h2><a href="/a{i}">Details</a></article>'
+        for i in range(80))
+    html = f"<main>{links_html}</main>"
+    candidates = extract_link_candidates(html, "https://example.test/", max_candidates=10)
+    assert len(candidates) == 10
+
+
+def test_extract_link_candidates_returns_empty_list_on_missing_html():
+    assert extract_link_candidates(None, "https://example.test/") == []
+    assert extract_link_candidates("", "https://example.test/") == []
 
 
 def test_extract_hero_image_prefers_og_image():

@@ -106,6 +106,8 @@ class PromoDB:
                     e["description"] = it["description"]
                 if it.get("valid_until"):
                     e["valid_until"] = it["valid_until"]
+                if it.get("url"):
+                    e["url"] = it["url"]
                 if it.get("image_url"):
                     e["image_url"] = it["image_url"]
             else:
