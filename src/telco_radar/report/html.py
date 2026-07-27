@@ -458,6 +458,66 @@ def _prep_competitors(report: dict) -> list[dict]:
     return out
 
 
+# ------------------------------------------------------------- search index
+def _search_entry_bericht(h: dict, report_date: str) -> dict:
+    """Ein Bericht-Highlight fuer den siteweiten Suchindex (search_index.json)."""
+    return {
+        "kind": "bericht",
+        "title": h.get("de_title") or h.get("title") or "",
+        "summary": h.get("summary") or "",
+        "operator": h.get("operator") or h.get("source_label") or "",
+        "region": h.get("region") or "",
+        "category": h.get("category") or "",
+        "date": report_date,
+        "source_label": h.get("source_label") or h.get("source") or "",
+        "url": h.get("url") or "",
+        "deep_link": f"reports/{report_date}.html",
+    }
+
+
+def _search_entry_diff(e: dict, theme_label: str) -> dict:
+    """Ein Differenzierungs-Eintrag (data/state/differentiation_db.json) fuer
+    den siteweiten Suchindex."""
+    theme_key = e.get("theme") or ""
+    return {
+        "kind": "differenzierung",
+        "title": e.get("what") or "",
+        "summary": e.get("why") or "",
+        "operator": e.get("operator") or "",
+        "region": e.get("region") or "",
+        "category": theme_label or theme_key,
+        "date": e.get("first_seen") or e.get("last_verified") or "",
+        "source_label": e.get("source") or "",
+        "url": e.get("url") or "",
+        "deep_link": f"differenzierung.html#dz-theme-{theme_key}",
+    }
+
+
+def _build_search_index(reports: list[dict], diff_entries: list[dict],
+                         theme_label_map: dict[str, str]) -> list[dict]:
+    """Aggregiert Bericht-Highlights ALLER Wochen (nicht nur der aktuellen) plus
+    die persistente Differenzierungs-Bibliothek zu einem einzigen, siteweiten
+    Suchindex.
+
+    v1 macht bewusst nur Substring-Matching (in app.js) auf diesen Feldern -
+    keine Tokenisierung/kein Scoring hier. Beide Quellen muessen zusammen rein:
+    ein Themenbegriff wie "Perplexity" taucht fast ausschliesslich in der
+    Differenzierungs-Bibliothek auf, nicht in den woechentlichen
+    Bericht-Highlights derselben Woche - eine Suche, die nur den aktuellen
+    Bericht abdeckt, wuerde beim ersten Ernstfall leer laufen (siehe
+    claude/suche-marktrecherche-konzept.md, Pre-Mortem Punkt 2)."""
+    out: list[dict] = []
+    for report in reports:
+        for h in _flatten(report):
+            public_h = dict(h)
+            public_h.pop("why_it_matters", None)
+            out.append(_search_entry_bericht(public_h, report["date"]))
+    for e in diff_entries:
+        theme_key = e.get("theme") or ""
+        out.append(_search_entry_diff(e, theme_label_map.get(theme_key, theme_key)))
+    return out
+
+
 # ------------------------------------------------------------------- render
 def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     env = _env()
@@ -541,7 +601,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # ---- Differenzierung: aus der dynamischen, quellenbelegten DB
     # (data/state/differentiation_db.json), gepflegt vom Kategorie-Sweep.
     state_dir = reports_dir.parent / "state"
-    from datetime import datetime, timedelta
+    from datetime import date, datetime, timedelta
     db = DiffDB(state_dir / "differentiation_db.json")
     by_theme = db.by_theme()
     latest_date = latest["date"] if latest else date.today().isoformat()
@@ -575,6 +635,15 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             if diff_report else "",
             num_operators=num_operators),
         encoding="utf-8")
+
+    # ---- Suchindex (siteweit): Bericht-Highlights aller Wochen + persistente
+    # Differenzierungs-Bibliothek in einem Index, den app.js im Browser
+    # durchsucht (reines Filtern eines JSON-Arrays, kein Suchserver noetig -
+    # siehe claude/suche-marktrecherche-konzept.md).
+    theme_label_map = dict(SWEEP_THEMES)
+    search_index = _build_search_index(reports, list(db.entries.values()), theme_label_map)
+    (site_dir / "search_index.json").write_text(
+        json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
 
     # ---- Promo Uebersicht: eigener zweiter Anwendungsfall neben Marktrecherche
     # (siehe promo_pipeline.py). Eigene Quellen (config/promo_sources.yaml),

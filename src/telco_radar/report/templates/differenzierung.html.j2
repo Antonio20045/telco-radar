@@ -54,7 +54,7 @@
     <p class="card-sub" style="margin-top:0">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
     {% for t in diff_themes %}
     {% if t.entries %}
-    <article class="dz-card" style="--c:{{ t.color }}">
+    <article class="dz-card" id="dz-theme-{{ t.key }}" style="--c:{{ t.color }}">
       <div class="dz-card-head">
         <h2>{{ t.label }}</h2>
         <span class="dz-count">{{ t.n }}</span>
