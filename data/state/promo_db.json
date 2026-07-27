@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-26",
+ "updated": "2026-07-27",
  "entries": [
   {
    "id": "4579c71aed782b5b",
@@ -11,19 +11,22 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d2696242b0d96e97",
    "brand": "1&1 Mobilfunk",
    "tier": 1,
    "headline": "iPhone 17 Serie mit Vertrag ab 37,99 €/Monat",
-   "description": "Dauerhaft günstiger Tarif: iPhone 17 inklusive 1&1 All-Net-Flat S für monatlich 37,99 Euro, ohne zeitliche Befristung.",
+   "description": "Das iPhone 17 oder ein Modell der iPhone-17-Serie wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 37,99 Euro angeboten. Der Preis gilt dauerhaft.",
    "valid_until": null,
-   "url": "https://mobile.1und1.de/handyvertrag",
+   "url": "https://mobile.1und1.de/iphone-17-serie#angebot",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "2a2306d249c6df4c",
@@ -35,7 +38,9 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f0544957af51ef76",
@@ -47,7 +52,9 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "0b074f4551590ee8",
@@ -59,7 +66,9 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "225d8fd0b9137036",
@@ -71,7 +80,9 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "a9ff1116f28fe285",
@@ -83,19 +94,106 @@
    "url": "https://mobile.1und1.de/handyvertrag",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "c045c570e3338f35",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "Samsung Galaxy S26 Serie mit Vertrag ab 32,99 €/Monat",
+   "description": "Ein Smartphone der Samsung Galaxy S26-Serie wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 32,99 Euro angeboten. Der Preis gilt dauerhaft.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/galaxy-s26-serie#angebot",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "4569e89b66aaeef9",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "Weitere iPhones (z.B. iPhone 16) mit Vertrag ab 27,99 €/Monat",
+   "description": "Ältere iPhone-Modelle wie das iPhone 16 oder iPhone 16e werden zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 27,99 Euro angeboten. Der Preis gilt dauerhaft.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/iphone-16-serie#angebot",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "a49da7742d711ac9",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "Samsung Galaxy Z-Serie mit Vertrag ab 44,99 €/Monat",
+   "description": "Ein Falt-Smartphone der Samsung Galaxy Z-Serie (z.B. Galaxy Z Flip8) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 44,99 Euro angeboten. Der Preis gilt dauerhaft.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/galaxy-z-serie",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "d87433f3cd693c5f",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "Xiaomi 17T-Serie mit Vertrag ab 27,99 €/Monat",
+   "description": "Ein Smartphone der Xiaomi 17T-Serie (z.B. Xiaomi 17T) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 27,99 Euro angeboten. Der Preis gilt dauerhaft.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/xiaomi-17t-serie",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "53614b0c62bb2a61",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "Google Pixel 10-Serie mit Vertrag ab 24,99 €/Monat",
+   "description": "Ein Smartphone der Google Pixel 10-Serie (z.B. Pixel 10a) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 24,99 Euro angeboten. Der Preis gilt dauerhaft.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/pixel-10-serie#angebot",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "3c350bb86ab7b622",
+   "brand": "ALDI TALK",
+   "tier": 2,
+   "headline": "XPLORA XGO2 Kidswatch im SALE",
+   "description": "Die XPLORA XGO2 Kinder-Smartwatch ist reduziert von 59,99 € auf 49,99 €. Dazu gibt es eine passende Kidswatch-Tarifoption mit Daten- und Sprach-Flat für 3,99 € pro 4 Wochen.",
+   "valid_until": null,
+   "url": "https://www.alditalk.de/p/fitnessarmbander-xplora-xgo2-kidswatch-schwarz-130039073A1?FF_QUERY=-sk-260720-Angebote&FF_POS=2&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=707f0abc-d7e7-4e09-aab9-54ae17038e77&FF_CAMPAIGN_PAGE_ID=",
+   "image_url": "https://media.medion.com/cms/medion/alditalkde/alditalk_og.jpg",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "0f8b975bbff19454",
    "brand": "Blau",
    "tier": 2,
    "headline": "Freunde werben und 25 € Prämie sichern",
-   "description": "Empfiehl Blau an Freunde oder Familie und erhalte eine Prämie von bis zu 25 €.",
+   "description": "Empfehle Blau an Freunde und Familie und erhalte eine Prämie von bis zu 25 € für jede erfolgreiche Vermittlung.",
    "valid_until": null,
-   "url": "https://www.blau.de/handy-angebote/",
+   "url": "https://www.blau.de/freunde-werben/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "25f937a05e4ceebf",
@@ -107,7 +205,9 @@
    "url": "https://www.blau.de/handy-angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "91207751dbad9ec6",
@@ -119,7 +219,9 @@
    "url": "https://www.blau.de/handy-angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "3417f6a52666012c",
@@ -131,7 +233,9 @@
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "28996f6107f8a278",
@@ -143,7 +247,9 @@
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "35412e78d7d84b07",
@@ -155,7 +261,9 @@
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "9d71dfa986538d37",
@@ -167,31 +275,77 @@
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "2225c8a140acd30c",
    "brand": "Lidl Connect",
    "tier": 2,
    "headline": "5,95 € Versand sparen – Newsletter-Gutschein",
-   "description": "Bei Anmeldung zum Newsletter erhält man einen Gutschein, der die Versandkosten von 5,95 € spart.",
+   "description": "Bei Anmeldung zum Newsletter gibt es einen Gutschein, mit dem die Versandkosten von 5,95 € entfallen.",
    "valid_until": null,
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "f78fc093c4a62285",
    "brand": "Lidl Connect",
    "tier": 2,
    "headline": "10 € Startguthaben bei Aktivierung",
-   "description": "Bei erstmaliger Aktivierung der SIM-Karte erhält der Kunde ein Startguthaben von 10 € gutgeschrieben.",
+   "description": "Neukunden erhalten bei erstmaliger Aktivierung der SIM-Karte ein Startguthaben von 10 € gutgeschrieben.",
    "valid_until": null,
    "url": "https://www.lidl-connect.de/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "14cba5af9795107a",
+   "brand": "Lidl Connect",
+   "tier": 2,
+   "headline": "Unlimited on Demand: Unendlich oft 1 GB nachbuchen",
+   "description": "In den Unlimited-Tarifen kann man nach Verbrauch des Inklusiv-Volumens unbegrenzt oft 1 GB kostenlos nachbuchen. Die Tarife kosten 9,99 € (50 Mbit/s), 14,99 € (100 Mbit/s) oder 19,99 € (150 Mbit/s) pro 4 Wochen.",
+   "valid_until": null,
+   "url": "https://www.lidl-connect.de/",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "f98b84eedb41c482",
+   "brand": "Lidl Connect",
+   "tier": 2,
+   "headline": "SMART-Tarife mit 5G und Flatrate",
+   "description": "Die SMART-Tarife (XS, S, M, L) enthalten eine Telefonie- und SMS-Flatrate sowie Datenvolumen von 2 GB bis 100 GB. Die Preise liegen zwischen 4,99 € und 18,99 € pro 4 Wochen. Alle Tarife surfen mit bis zu 100 Mbit/s im 5G-Netz.",
+   "valid_until": null,
+   "url": "https://www.lidl-connect.de/",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "42c0ad4774f86984",
+   "brand": "Lidl Connect",
+   "tier": 2,
+   "headline": "Jahrestarife: Einmal zahlen, ein Jahr mobil sein",
+   "description": "Drei Jahrestarife mit 100 Mbit/s: für 69,99 €, 99,99 € oder 149,00 € einmalig. Enthalten sind Datenvolumen sowie Telefonie- und SMS-Flatrates (Details je nach Tarifstufe).",
+   "valid_until": null,
+   "url": "https://www.lidl-connect.de/",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "6e8996f3908ca548",
@@ -213,14 +367,13 @@
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
    "headline": "Bis zu 25 € Rabatt auf jeden weiteren Tarif",
-   "description": "Dauerhafter monatlicher Rabatt von bis zu 25 € auf jeden weiteren Mobilfunk-Tarif ab dem zweiten Vertrag.",
+   "description": "Bestandskunden erhalten dauerhaft bis zu 25 Euro monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif, den sie abschließen.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/kombiangebote/#id-2271586",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25"
   },
   {
@@ -777,9 +930,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "462ebb5e611f6ddc",
@@ -792,9 +946,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "eea0a6e607c3e391",
@@ -807,9 +962,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "5972dede06f167f4",
@@ -822,9 +978,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "16b3c08de9bebb89",
@@ -837,9 +994,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "8f4d71ceb86810b0",
@@ -852,9 +1010,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "dcc41ce633965250",
@@ -867,9 +1026,10 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "003f3d8d0478b017",
@@ -882,21 +1042,22 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "90943f1536791ef6",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
    "headline": "Mein O2 App: 10 GB einmalig + 500 MB monatlich gratis",
-   "description": "Neukunden und Bestandskunden erhalten nach Download der Mein O2 App einmalig 10 GB zusätzliches Datenvolumen sowie dauerhaft 500 MB pro Monat kostenlos.",
+   "description": "Neukunden und Bestandskunden erhalten beim Download der Mein O2 App einmalig 10 GB und dauerhaft jeden Monat 500 MB zusätzliches Datenvolumen geschenkt.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/",
    "image_url": null,
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   },
@@ -911,8 +1072,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "eef43daf81cef806",
@@ -925,8 +1087,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "a6ca0200332a1268",
@@ -939,8 +1102,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "b7d4225b4d71c39d",
@@ -953,8 +1117,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "8c15748ddfdb83b6",
@@ -967,8 +1132,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "6dab1ebea12ee2f6",
@@ -981,8 +1147,9 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d3f07f3cb0ca583b",
@@ -995,6 +1162,91 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "b2dd0e73a9a987b3",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Smartphone-Deals mit Gadget-Zugabe und 50 GB",
+   "description": "Ausgewählte Smartphones (z. B. Samsung Galaxy A57 mit Fitnesstracker, Google Pixel 10 Pro mit Google TV Streamer, Xiaomi 17T Pro mit Redmi Pad 2, Nothing Phone (4a) Pro mit Smartwatch) inklusive 50 GB Datenvolumen und einem kostenlosen Gadget. Preise zwischen 27,49 € und 34,99 € monatlich.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "167949ddc888c7d2",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "PS5 mit zweitem Controller gratis ab 31,99 € mtl.",
+   "description": "Sichere dir eine PlayStation 5 inklusive eines gratis DualSense-Controllers und 50 GB Datenvolumen für monatlich ab 31,99 Euro.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/sony?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "b5e47717de720f0e",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Samsung 65-Zoll UHD TV für 9,50 € mtl.",
+   "description": "Ein 65-Zoll-4K-UHD-Fernseher von Samsung ist per Ratenzahlung für monatlich 9,50 Euro erhältlich – ohne Tarif.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-tv-gu65u7079fuxzg-details?ratenzahlung=36&ohne-tarif=ja",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "6005b7c184ec5579",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Samsung Galaxy Z Flip8 mit 300 € Altgeräteprämie",
+   "description": "Das Samsung Galaxy Z Flip8 inklusive 50 GB Datenvolumen, 300 Euro für dein Altgerät und Google AI Pro für 6 Monate – monatlich ab 44,99 Euro.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "bd8b135062d53ebf",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro Max mit 150 GB+ ab 63,49 € mtl.",
+   "description": "Das iPhone 17 Pro Max mit mindestens 150 GB Datenvolumen, inklusive O2 Pay Stop – monatlich ab 63,49 Euro.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-details?tarif=o2-mobile-l-plus&ohne-tarif=nein&ratenzahlung=36&vertragsart=ratenzahlung&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "5bef6ed13c276899",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro Max + AirPods Pro 3 ab 65,49 € mtl.",
+   "description": "Das iPhone 17 Pro Max oder iPhone 17 Pro mit AirPods Pro 3 und 50 GB Datenvolumen – monatlich ab 61,49 Euro.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-mit-airpods-pro-3-weiss-details?tarif=o2-mobile-on-demand-m-plus&ohne-tarif=nein&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   },
@@ -1003,48 +1255,56 @@
    "brand": "Otelo",
    "tier": 2,
    "headline": "100 Mbit/s statt 50",
-   "description": "Kunden erhalten in bestimmten Tarifen eine verdoppelte Surfgeschwindigkeit von bis zu 100 Mbit/s statt der üblichen 50 Mbit/s.",
+   "description": "Neukunden erhalten in bestimmten Tarifen die doppelte Surf-Geschwindigkeit von 100 Mbit/s statt der üblichen 50 Mbit/s.",
    "valid_until": null,
-   "url": "https://www.otelo.de/",
+   "url": "https://www.otelo.de/handytarife?selectedTariff=N41",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
   },
   {
    "id": "2ab38f7fba24878e",
    "brand": "Otelo",
    "tier": 2,
    "headline": "Galaxy A57 + Unlimited on Demand",
-   "description": "Das Samsung Galaxy A57 5G wird zusammen mit dem Tarif Unlimited on Demand als unschlagbares Duo angeboten.",
+   "description": "Samsung Galaxy A57 5G in Kombination mit dem Unlimited on Demand Tarif zu einem Aktionspreis.",
    "valid_until": null,
-   "url": "https://www.otelo.de/",
+   "url": "https://www.otelo.de/handy-mit-vertrag/samsung/galaxy-a57/tarife?selectedHardware=N6565&selectedTariff=N43",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
   },
   {
    "id": "be8178c003140767",
    "brand": "Otelo",
    "tier": 2,
    "headline": "Young Unlimited Deal für unter 30",
-   "description": "Der Tarif Unlimited kostet für Kunden unter 30 Jahren nur 26,99 Euro pro Monat und beinhaltet 100 GB Datenvolumen, das unendlich oft nachgebucht werden kann.",
+   "description": "Unbegrenztes Datenvolumen (100 GB, unendlich oft nachbuchbar) für 26,99 € pro Monat, exklusiv für Kunden unter 30 Jahren.",
    "valid_until": null,
-   "url": "https://www.otelo.de/",
+   "url": "https://www.otelo.de/handytarife?selectedTariff=N2429",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
   },
   {
    "id": "06379424d9af31ed",
    "brand": "Otelo",
    "tier": 2,
    "headline": "Smartphone Deals ab 1 Euro einmalig",
-   "description": "Ausgewählte Smartphones von Xiaomi, Google oder Samsung sind bereits ab 1 Euro einmalig erhältlich.",
+   "description": "Ausgewählte Smartphones von Xiaomi, Google oder Samsung bereits ab 1 Euro einmalig bei Vertragsabschluss.",
    "valid_until": null,
-   "url": "https://www.otelo.de/",
+   "url": "https://www.otelo.de/handy-mit-vertrag",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
   },
   {
    "id": "d6d26e28a0212191",
@@ -1056,7 +1316,23 @@
    "url": "https://www.otelo.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "ffc5361991b39db2",
+   "brand": "Otelo",
+   "tier": 2,
+   "headline": "Freunde werben: 3×30 € + 120 €",
+   "description": "Bei erfolgreicher Vermittlung erhält der Werber eine Gutschrift von 3×30 € und der geworbene Freund 120 €.",
+   "valid_until": null,
+   "url": "https://www.otelo.de/freunde-werben",
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "b454efe08b52b571",
@@ -1068,7 +1344,9 @@
    "url": "https://www.pennymobil.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "eddd60bf489bcb34",
@@ -1080,7 +1358,9 @@
    "url": "https://www.pennymobil.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "0855ad234187d45a",
@@ -1092,19 +1372,51 @@
    "url": "https://www.pennymobil.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "0bc9162202605d3c",
    "brand": "Penny Mobil",
    "tier": 2,
    "headline": "10 € Wechselbonus bei Rufnummernmitnahme",
-   "description": "Wer seine alte Rufnummer zu Penny Mobil mitbringt, erhält einen einmaligen Bonus von 10 €.",
+   "description": "Wer seine alte Rufnummer zu Penny Mobil mitbringt, erhält einmalig 10 Euro Startguthaben.",
    "valid_until": null,
-   "url": "https://www.pennymobil.de/",
+   "url": "https://www.pennymobil.de/hilfe-und-service/rufnummernmitnahme/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.pennymobil.de/assets/images/pennymobil-social-media.jpg"
+  },
+  {
+   "id": "b913aa0a707b736e",
+   "brand": "Penny Mobil",
+   "tier": 2,
+   "headline": "Doppeltes Datenvolumen im Prepaid Basic",
+   "description": "Neukunden erhalten im Tarif Prepaid Basic statt 1 GB nun 2 GB Datenvolumen zum gleichen Preis.",
+   "valid_until": null,
+   "url": "https://www.pennymobil.de/tarife/prepaid-basic",
+   "image_url": "https://www.pennymobil.de/assets/images/pennymobil-social-media.jpg",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "65d5b9ab0ca3c8d8",
+   "brand": "Penny Mobil",
+   "tier": 2,
+   "headline": "25 GB Extra-Datenpolster kostenlos für ein Jahr",
+   "description": "In allen Smart-Tarifen (Smart, Smart Plus, Smart Max) gibt es einmalig 25 GB zusätzliches Datenvolumen, das ein Jahr lang genutzt werden kann – ohne Aufpreis.",
+   "valid_until": null,
+   "url": "https://www.pennymobil.de/optionen/datenvolumen/smart-tarife/",
+   "image_url": "https://www.pennymobil.de/assets/images/pennymobil-social-media.jpg",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "d7c36130fae6c61b",
@@ -1116,7 +1428,9 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "7a4530a0c0f4fd2c",
@@ -1128,7 +1442,9 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "a2b1028edb25c640",
@@ -1140,7 +1456,9 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f924ed2e15ec492f",
@@ -1152,7 +1470,9 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d75172fc56af846c",
@@ -1164,7 +1484,9 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "41c0faae98f3d68d",
@@ -1176,7 +1498,93 @@
    "url": "https://www.premiumsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "2380a07694880287",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "16 GB Allnet Flat zum Premium-Deal-Preis",
+   "description": "Der Tarif mit 16 GB Datenvolumen, Allnet-Flat und 5G kostet statt 13,99 € nur 10,99 € pro Monat. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "7fc08bf75c71d619",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "6 GB Allnet Flat zum Aktionspreis",
+   "description": "Der Tarif mit 6 GB Datenvolumen, Allnet-Flat und 5G kostet statt 8,99 € nur 6,99 € pro Monat. Der Bereitstellungspreis beträgt 0 € statt 9,99 €.",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "76c4d537a2d4b018",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "12 GB Allnet Flat zum Aktionspreis",
+   "description": "Der Tarif mit 12 GB Datenvolumen, Allnet-Flat und 5G kostet statt 11,99 € nur 8,99 € pro Monat. Der Bereitstellungspreis beträgt 0 € statt 19,99 €.",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "f64669798daeaa31",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "60 GB Allnet Flat zum Aktionspreis",
+   "description": "Der Tarif mit 60 GB Datenvolumen, Allnet-Flat und 5G kostet statt 29,99 € nur 19,99 € pro Monat. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "1c5a9e3c2ce040b5",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "DSL-Tarif ab 19,99 € monatlich",
+   "description": "DSL 100 Mbit/s für dauerhaft günstige 26,99 € pro Monat oder ab 19,99 € monatlich (Startpreis).",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/dsl",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "1bb42f11aeb656d7",
+   "brand": "PremiumSIM",
+   "tier": 2,
+   "headline": "iPhone 17 Pro Max mit Allnet Flat ab 59,99 €",
+   "description": "Nur für kurze Zeit: iPhone 17 Pro Max inklusive Allnet Flat-Tarif ab 59,99 € monatlich sichern.",
+   "valid_until": null,
+   "url": "https://www.premiumsim.de/handys/apple/iphone-17-pro-max",
+   "image_url": "https://imagepool.premiumsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "b1cdbf9770fd6ec8",
@@ -1284,7 +1692,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "04fbe58fdd45c68f",
@@ -1296,7 +1706,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "bcd428efd598e438",
@@ -1308,7 +1720,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "626d4d0cf5d87e16",
@@ -1320,7 +1734,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "cd6ab3e85fe4ccc5",
@@ -1332,7 +1748,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "faa320b748dc9f62",
@@ -1344,7 +1762,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "e72c5e59657bd3b1",
@@ -1356,7 +1776,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d191bbfd9821f1e6",
@@ -1368,7 +1790,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "88086e25870a70a5",
@@ -1380,7 +1804,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f02b775cd6b42f4a",
@@ -1392,7 +1818,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f7b91f88bc65a8b7",
@@ -1404,7 +1832,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "a82b1f7cda045a3a",
@@ -1416,7 +1846,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "1919b1e03a476846",
@@ -1428,7 +1860,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "297f49eb7dedcf20",
@@ -1440,7 +1874,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "9f09a5f948a75daf",
@@ -1452,7 +1888,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f18648bcf97cbe2f",
@@ -1464,7 +1902,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "42cd60d2c41ca5b8",
@@ -1476,7 +1916,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "823ef305c34f962b",
@@ -1488,7 +1930,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "67afec896dab5425",
@@ -1500,7 +1944,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "90158fe5fcddb322",
@@ -1512,7 +1958,9 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "521584dd61b3fb15",
@@ -1524,7 +1972,121 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "bad1ce87b1b2032d",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro mit unbegrenztem Datenvolumen",
+   "description": "Beim Kauf eines iPhone 17 Pro erhalten Sie 24 Monate unbegrenztes Datenvolumen im Tarif MagentaMobil M, L oder L Young. Das Gerät kostet 999 € statt 1.299 €, Anzahlung 99 €, danach 24,75 € mtl. bei 36 Raten. Der Unlimited-Vorteil wird nach Kauf in der MeinMagenta App aktiviert.",
+   "valid_until": "31.08.2026",
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/cosmic-orange-256-gb?currentPage=1&tariffId=MF_17743&itemPerPage=24&excludedCurrentPage=1&tariffCategoryId=page-1679&categoryId=smartphones&installmentValue=25&instalmentId=36&changedAttr%255B%255D=changedAttr.colour%253D%2523f77e37",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "1e8cccf8b4b9140a",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "iPad (2025) A16 zum Aktionspreis mit PlusKarte Data",
+   "description": "Sichern Sie sich das iPad (2025) A16 für 241 € statt 649 € (400 € Preisvorteil) bei Buchung der PlusKarte Data. Anzahlung 1 €, danach 10 € mtl. bei 24 Raten. Exklusiv in der MeinMagenta App.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/unterwegs/aktionen",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "d9052ed795337e9c",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro für Kunden unter 28 Jahren",
+   "description": "Kunden unter 28 Jahren erhalten das iPhone 17 Pro für 901 € statt 1.299 € (390 € Preisvorteil) inklusive 24 Monate unbegrenztem Datenvolumen im Tarif MagentaMobil L Young. Anzahlung 1 €, danach 25 € mtl. bei 36 Raten.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/cosmic-orange-256-gb?currentPage=1&tariffId=MF_17743&itemPerPage=24&excludedCurrentPage=1&tariffCategoryId=page-1679&categoryId=smartphones&installmentValue=25&instalmentId=36&changedAttr%255B%255D=changedAttr.colour%253D%2523f77e37",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "8370bfaf29f527d9",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "MagentaZuhause L zum Aktionspreis",
+   "description": "Der MagentaZuhause L Tarif (100 MBit/s) kostet durchschnittlich 29,49 € mtl., ohne Bereitstellungspreis. Exklusiv online buchbar.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/tarife/internet-tarife?tariffId=FN_89987848_89987851",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "6accbfb06b09854e",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "MagentaZuhause L Young für Kunden unter 28 Jahren",
+   "description": "Der MagentaZuhause L Young Tarif (100 MBit/s) kostet durchschnittlich 29,28 € mtl. Exklusiv online buchbar.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/tarife/internet-tarife-young?tariffId=FN_89987848_89987851",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "0ba5ae4deb258342",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Glasfaser 150 zum Aktionspreis",
+   "description": "Der Glasfaser 150 Tarif (150 MBit/s) kostet durchschnittlich 33,95 € mtl. Exklusiv online buchbar.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/tarife/internet-tarife?tariffId=FN_50289744_50289741",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "a79c28b519174475",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Bis zu 240 € Cashback in MagentaMobil Tarifen",
+   "description": "Bei Abschluss eines neuen MagentaMobil Tarifs (XS bis XL) erhalten Sie bis zu 240 € Cashback, einlösbar über die MeinMagenta App.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/tarife/smartphone-tarife",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "975472a46a98d2c8",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Smartphones ab 1 € Anzahlung mit Ankaufsbonus",
+   "description": "Viele Android-Smartphones (z. B. Samsung Galaxy Z Fold8 Ultra, Google Pixel 10a, Xiaomi 17, Samsung Galaxy S26) sind ab 1 € Anzahlung und monatlichen Raten ab 10,50 € bei 36 Raten im passenden MagentaMobil Tarif erhältlich. Zusätzlich gibt es bis zu 200 € Ankaufsbonus beim Gerätetausch.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/unterwegs/aktionen",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "7c497c85439018b9",
@@ -1536,31 +2098,35 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "2ba62f8fbc033982",
    "brand": "Vodafone Deutschland",
    "tier": 1,
    "headline": "GigaMobil Young: Bis zu 960 € sparen",
-   "description": "Neukund:innen unter 28 Jahren erhalten im GigaMobil Young XL mit unbegrenztem Datenvolumen einen Rabatt von 40 € pro Monat (insgesamt 960 €) oder im GigaMobil Young S einen Rabatt von 10 € pro Monat (insgesamt 240 €).",
-   "valid_until": "14. Oktober 2026",
-   "url": "https://www.vodafone.de/handy/angebote.html",
+   "description": "Für Kunden unter 28 Jahren: Neukunden sparen im GigaMobil Young XL 960 € (40 €/Monat für 24 Monate) oder im GigaMobil Young S 240 € (10 €/Monat für 24 Monate).",
+   "valid_until": "14. Oktober",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/junge-leute.html",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "2cec4f8f2c14a367",
    "brand": "Vodafone Deutschland",
    "tier": 1,
    "headline": "20 % Rabatt auf FamilyCard-Zusatzkarten",
-   "description": "Bestandskund:innen erhalten bei Abschluss einer FamilyCard (Zusatzkarte) 20 % Rabatt pro Monat. Beispiel: 5 GB Datenvolumen für 7,99 € statt 9,99 € pro Monat.",
-   "valid_until": "29. Juli 2026",
-   "url": "https://www.vodafone.de/handy/angebote.html",
+   "description": "Bestandskunden erhalten auf alle FamilyCard-Zusatzkarten 20 % Rabatt pro Monat. Beispiel: 5 GB Datenvolumen für 7,99 € statt 9,99 € pro Monat.",
+   "valid_until": "29. Juli",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "01a01ae8cedbed62",
@@ -1572,7 +2138,9 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "880172e1d1b9d8ad",
@@ -1584,7 +2152,51 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "bc6c06c68b70655a",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "Samsung Galaxy Z Fold8 Vorbesteller-Aktion",
+   "description": "Bei Vorbestellung eines Galaxy Z Fold8 oder Z Fold8 Ultra: Mindestens 500 € für das alte Handy beim Verkauf an Vodafone. Neukunden erhalten zusätzlich 25 % Rabatt auf den Tarifpreis für 24 Monate. Gerät ab 1 € einmalig.",
+   "valid_until": "6. August",
+   "url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "18abba0792661c0c",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "25 % Rabatt für Neukunden auf Mobil-Tarife",
+   "description": "Neukunden erhalten 25 % Rabatt auf den monatlichen Tarifpreis in den Tarifen Vodafone Mobil XS bis XL für 24 Monate. Kunden unter 28 Jahren sparen bis zu 30 %. In den Tarifen XS, S und M gibt es zusätzlich Extra-Datenvolumen geschenkt.",
+   "valid_until": null,
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "2e3ec87cf1b4144a",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "Aktionswoche: Top-Smartphones ab 1 €",
+   "description": "Ausgewählte High-End-Smartphones wie iPhone 17, iPhone 17 Pro, Samsung Galaxy S26 und Google Pixel 10 sind mit Vertrag ab einmalig 1 € erhältlich.",
+   "valid_until": null,
+   "url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "image_url": null,
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "26cdf7923a1575a0",
@@ -1596,7 +2208,9 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "80d2867752b6f855",
@@ -1605,10 +2219,12 @@
    "headline": "Allnet Flat M mit Upgrade-Versprechen: 125 GB statt 100 GB",
    "description": "Neukunden erhalten im Tarif Allnet Flat M dauerhaft 125 GB Datenvolumen zum Preis von 100 GB.",
    "valid_until": null,
-   "url": "https://www.congstar.de/handytarife/angebote/",
+   "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
   },
   {
    "id": "c8ac71f4c90e6685",
@@ -1620,7 +2236,9 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "9e9c506688d9e8b1",
@@ -1632,31 +2250,37 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "84a4e51cc4cbefc8",
    "brand": "congstar",
    "tier": 2,
    "headline": "Young Tarifangebot: Double your Data zum selben Preis",
-   "description": "Kunden von 18 bis 27 Jahren erhalten in den Young-Tarifen das doppelte Datenvolumen zum gleichen Preis, auch mit Smartphone.",
+   "description": "Kunden von 18 bis 27 Jahren erhalten in den Young-Tarifen die doppelte Datenmenge zum gleichen Preis, auch mit Smartphone.",
    "valid_until": null,
-   "url": "https://www.congstar.de/handytarife/angebote/",
+   "url": "https://www.congstar.de/young/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
   },
   {
    "id": "1d45e1771b77d972",
    "brand": "congstar",
    "tier": 2,
    "headline": "Partnerkarte: 11 € sparen auf Allnet Flat M",
-   "description": "Bestandskunden können eine Partnerkarte hinzubuchen und sparen damit monatlich 11 Euro auf die Allnet Flat M.",
+   "description": "Bestandskunden können eine Partnerkarte abschließen und sparen monatlich 11 Euro auf die Allnet Flat M.",
    "valid_until": null,
-   "url": "https://www.congstar.de/handytarife/angebote/",
+   "url": "https://www.congstar.de/partnerkarte/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
   },
   {
    "id": "aab5f61f8d009fce",
@@ -1668,7 +2292,51 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "ca96aee0ec0e78f9",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "0 € Bereitstellungspreis auf alle Tarife",
+   "description": "Neukunden zahlen keinen einmaligen Bereitstellungspreis bei Abschluss eines Allnet Flat Tarifs, Internet für Zuhause oder Homespot Tarifs.",
+   "valid_until": "Nur für kurze Zeit",
+   "url": "https://www.congstar.de/handytarife/angebote/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "67546409aa0f8b11",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "Prepaid Allnet M für 10 € / 4 Wochen",
+   "description": "Prepaid-Tarif mit 25 GB Datenvolumen für 10 Euro alle 4 Wochen, ohne Vertragsbindung.",
+   "valid_until": null,
+   "url": "https://www.congstar.de/prepaid/tarife/prepaid-allnet-m/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "365d677e413a7e3f",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "congstar Kennenlernen – 1 Monat unverbindlich testen",
+   "description": "Neukunden können congstar einen Monat lang ohne Vertragsbindung testen.",
+   "valid_until": null,
+   "url": "https://www.congstar.de/congstar-kennenlernen/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "4c6eaa48f29fda61",
@@ -1725,7 +2393,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d8191d9662d78d70",
@@ -1737,7 +2407,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "63e26a687734453d",
@@ -1749,7 +2421,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "d11793b48ba93c23",
@@ -1761,7 +2435,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "ab546bf26791e407",
@@ -1773,7 +2449,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "f23a91ce20da22ad",
@@ -1785,7 +2463,9 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "170e61ee7302b7f7",
@@ -1797,7 +2477,79 @@
    "url": "https://www.simplytel.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "aktiv"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "b21c15d4a9cb68b7",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "10 GB Tarif für 6,99 € mtl.",
+   "description": "Der 10-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 6,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+   "valid_until": null,
+   "url": "https://www.simplytel.de/",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "964196f006b60baa",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "30 GB Tarif für 8,99 € mtl.",
+   "description": "Der 30-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 8,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+   "valid_until": null,
+   "url": "https://www.simplytel.de/",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "3d9cf76b8a8fedb2",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "60 GB Tarif für 13,99 € mtl.",
+   "description": "Der 60-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 13,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+   "valid_until": null,
+   "url": "https://www.simplytel.de/",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "b69423f4d18ee851",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "100 GB Tarif für 19,99 € mtl.",
+   "description": "Der 100-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 19,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+   "valid_until": null,
+   "url": "https://www.simplytel.de/",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "71780a2b56352dc0",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "DSL-Deal ab 26,99 € mtl.",
+   "description": "DSL-Tarif wird ab 26,99 € monatlich als Tiefpreis-Aktion beworben.",
+   "valid_until": null,
+   "url": "https://www.simplytel.de/dsl",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
   },
   {
    "id": "5c4988000ab8115b",
@@ -1809,10 +2561,11 @@
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26"
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "8bff470dfc71f501",
@@ -1824,10 +2577,11 @@
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26"
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "3d6ed6b79d9013c2",
@@ -1854,10 +2608,11 @@
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26"
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "0d53c4c40b1e83c2",
@@ -2092,9 +2847,10 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "248f53cbe9742b97",
@@ -2107,9 +2863,10 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "3e8fcf37a6c0dfef",
@@ -2122,9 +2879,10 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "e94bf36b0bbb7daf",
@@ -2137,9 +2895,10 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-26"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-26",
+   "ended_since": "2026-07-27"
   },
   {
    "id": "26432d39378a1c7c",
@@ -2152,20 +2911,21 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "a66025330d118d87",
    "brand": "winSIM",
    "tier": 2,
    "headline": "Handy-Angebote mit Allnet Flat",
-   "description": "Smartphones wie Samsung Galaxy S26 (ab 24,99€ mtl.), Apple iPhone 17 Pro (ab 39,99€ mtl.), Samsung Galaxy A57 5G (ab 14,99€ mtl.) und Xiaomi 17T Pro (ab 19,99€ mtl.) werden mit einer Allnet-Flat angeboten.",
+   "description": "Smartphones wie Samsung Galaxy S26, iPhone 17 Pro, Galaxy A57 5G oder Xiaomi 17T Pro in Kombination mit einer Allnet Flat ab 14,99€ mtl. (Galaxy A57) bis 39,99€ mtl. (iPhone 17 Pro).",
    "valid_until": null,
    "url": "https://www.winsim.de/",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   },
@@ -2174,12 +2934,12 @@
    "brand": "winSIM",
    "tier": 2,
    "headline": "Tablet-Angebote mit SIM-Karte",
-   "description": "Tablets wie das Samsung Galaxy Tab S11 5G (ab 39,99€ mtl.) und das Apple iPad Air 11 (M4) (ab 34,99€ mtl.) werden inklusive SIM-Karte angeboten.",
+   "description": "Tablets wie Samsung Galaxy Tab S11 5G oder Apple iPad Air 11 (M4) inklusive SIM-Karte ab 34,99€ mtl.",
    "valid_until": null,
    "url": "https://www.winsim.de/",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   },
@@ -2188,12 +2948,12 @@
    "brand": "winSIM",
    "tier": 2,
    "headline": "DSL 100 MBit/s zum Tiefpreis",
-   "description": "Der DSL 100 MBit/s-Anschluss ist dauerhaft günstig für 26,99€ mtl. (statt 34,99€) erhältlich, gültig bis zum 05.08. (11 Uhr).",
+   "description": "DSL-Anschluss mit 100 MBit/s für dauerhaft günstige 26,99€ mtl. statt 34,99€. Aktion gültig bis 05.08. 11 Uhr.",
    "valid_until": "05.08. 11 Uhr",
    "url": "https://www.winsim.de/",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   },
@@ -2208,8 +2968,9 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
   },
   {
    "id": "7f6765fe9f34ec60",
@@ -2222,6 +2983,35 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-27"
+  },
+  {
+   "id": "391beff634480572",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "5G Mobilfunk-Tarife mit Rabatt und 0€ Bereitstellung",
+   "description": "Mehrere 5G-Tarife (10 GB bis Unlimited) sind stark reduziert, z.B. 10 GB für 6,99€ statt 14,99€, 40 GB für 10,99€ statt 24,99€ oder Unlimited on demand für 19,99€ statt 34,99€. Bei Bestellung bis 28.07. 11 Uhr (40 GB) bzw. für kurze Zeit entfällt der Bereitstellungspreis (0€ statt 19,99€) oder kostet 9,99€.",
+   "valid_until": "28.07. 11 Uhr (für 40 GB), sonst 'Nur für kurze Zeit'",
+   "url": "https://www.winsim.de/",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv",
+   "missed_checks": 0
+  },
+  {
+   "id": "5d799cd513e037a2",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "Kindertarif mit Kinderschutz",
+   "description": "Günstiger Handytarif speziell für Kinder mit integriertem Kinderschutz und Kostenkontrolle.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0
   }

@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-26",
+ "updated": "2026-07-27",
  "entries": [
   {
    "id": "https://thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers",
@@ -12,7 +12,7 @@
    "date": "2026",
    "why": "Großzügiger, EU-gehosteter Gratis-Speicher als Bindungs- und Datensouveränitäts-Argument.",
    "first_seen": "2026-06-15",
-   "last_verified": "2026-07-21",
+   "last_verified": "2026-07-27",
    "status": "aktiv"
   },
   {
@@ -27,6 +27,34 @@
    "why": "Gratis-Cloud als Tarif-Extra im Massenmarkt.",
    "first_seen": "2026-06-15",
    "last_verified": "2026-07-21",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://verizon.com/support/cloud-storage-perk-faqs",
+   "theme": "cloud",
+   "operator": "Verizon",
+   "region": "Nordamerika",
+   "what": "Verizon bietet Unlimited Cloud Storage als kostenpflichtiges Zusatzfeature für 10 US-Dollar pro Monat bei ausgewählten Mobilfunk- und Internet-Tarifen an.",
+   "url": "https://www.verizon.com/support/cloud-storage-perk-faqs/",
+   "source": "verizon.com",
+   "date": null,
+   "why": "Dieser Move zeigt, wie ein Netzbetreiber Cloud-Speicher als optionales, aber günstiges Add-on zur Kundenbindung und Tarifaufwertung einsetzt.",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://att.com/support/article/wireless/KM1216661",
+   "theme": "cloud",
+   "operator": "AT&T",
+   "region": "Nordamerika",
+   "what": "AT&T stellt Kunden mit dem AT&T Prepaid Ultra-Tarif den AT&T Personal Cloud-Dienst zum Sichern, Synchronisieren und Teilen von Inhalten zur Verfügung.",
+   "url": "https://www.att.com/support/article/wireless/KM1216661/",
+   "source": "att.com",
+   "date": null,
+   "why": "Dieser Move zeigt, wie AT&T Cloud-Speicher als exklusives Prepaid-Perks einsetzt, um sich im hart umkämpften Prepaid-Markt zu differenzieren.",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
    "status": "aktiv"
   },
   {
@@ -506,6 +534,20 @@
    "status": "aktiv"
   },
   {
+   "id": "https://aimagazine.com/news/telco-giants-launch-network-ai-to-stop-deepfake-vocie-scams",
+   "theme": "security",
+   "operator": "Deutsche Telekom, e&, Singtel Group, SK Telecom, SoftBank",
+   "region": "Asien",
+   "what": "Die fünf großen Telekommunikationsanbieter haben ein gemeinsames KI-Joint-Venture gegründet, um Deepfake-Sprachbetrug zu bekämpfen.",
+   "url": "https://aimagazine.com/news/telco-giants-launch-network-ai-to-stop-deepfake-vocie-scams",
+   "source": "aimagazine.com",
+   "date": null,
+   "why": "Dieser branchenübergreifende Zusammenschluss ist interessant, weil er zeigt, wie konkurrierende Netzbetreiber gemeinsam eine hochkomplexe Sicherheitsbedrohung adressieren.",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv"
+  },
+  {
    "id": "https://omdia.tech.informa.com/om022869/the-new-magenta-home-app-marks-the-launch-of-deutsche-telekoms-unified-service-approach-for-the-smart-home",
    "theme": "smarthome",
    "operator": "Deutsche Telekom",
@@ -559,6 +601,34 @@
    "why": "Ein Zugang für viele Dienste über den Tarif hinaus.",
    "first_seen": "2026-06-15",
    "last_verified": "2026-07-21",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://techcabal.com/2025/09/06/safaricom-is-quietly-adding-utility-services-into-m-pesa",
+   "theme": "superapp",
+   "operator": "Safaricom",
+   "region": "Afrika & Naher Osten",
+   "what": "Safaricom testet, Funktionen aus mySafaricom in die M-PESA-App zu integrieren, um Alltagsdienste zu bündeln.",
+   "url": "https://techcabal.com/2025/09/06/safaricom-is-quietly-adding-utility-services-into-m-pesa/",
+   "source": "techcabal.com",
+   "date": null,
+   "why": "Dieser Schritt zeigt, wie ein afrikanischer Betreiber seine starke Mobile-Money-Plattform zur zentralen Super-App ausbaut und so die Kundenbindung über reine Telekomdienste hinaus stärkt.",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://techtrendske.co.ke/2026/04/24/super-apps-africa-viability-orange-safaricom",
+   "theme": "superapp",
+   "operator": "Safaricom",
+   "region": "Afrika & Naher Osten",
+   "what": "Safaricom konsolidiert sein Ökosystem mit Safaricom My OneApp, das Finanz- und Telekomdienste in einer App vereint.",
+   "url": "https://techtrendske.co.ke/2026/04/24/super-apps-africa-viability-orange-safaricom/",
+   "source": "techtrendske.co.ke",
+   "date": null,
+   "why": "Die Konsolidierung mehrerer Dienste in einer App ist ein strategischer Differenzierungsmove, der Nutzerkomfort erhöht und Wechselbarrieren aufbaut.",
+   "first_seen": "2026-07-27",
+   "last_verified": "2026-07-27",
    "status": "aktiv"
   }
  ]
