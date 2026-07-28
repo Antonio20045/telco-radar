@@ -16,6 +16,10 @@ on:
         required: false
         default: false
         type: boolean
+      inspect_sources:
+        description: "Diagnostic only: space-separated operator names to dump DOM structure for (scripts/inspect_dom.py)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -75,8 +79,19 @@ jobs:
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
+      - name: Inspect DOM structure (diagnostic)
+        if: ${{ inputs.inspect_sources != '' }}
+        env:
+          PYTHONPATH: src
+        run: |
+          {
+            echo '```text'
+            python scripts/inspect_dom.py --only ${{ inputs.inspect_sources }}
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Run pipeline
-        if: ${{ !inputs.sources_only }}
+        if: ${{ !inputs.sources_only && inputs.inspect_sources == '' }}
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
@@ -113,7 +128,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit state, report and site
-        if: ${{ !inputs.sources_only }}
+        if: ${{ !inputs.sources_only && inputs.inspect_sources == '' }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -140,7 +155,7 @@ jobs:
           fi
 
       - name: Trigger Render deploy
-        if: ${{ success() && !inputs.sources_only }}
+        if: ${{ success() && !inputs.sources_only && inputs.inspect_sources == '' }}
         continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
