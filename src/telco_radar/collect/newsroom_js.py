@@ -12,6 +12,7 @@ source failure - it never aborts the run.
 from __future__ import annotations
 
 import logging
+import os
 
 from ..config import Source
 from ..models import Item
@@ -27,18 +28,28 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
     """Render *url* in headless Chromium and return the final DOM HTML."""
     from playwright.sync_api import sync_playwright
 
+    launch_args = ["--no-sandbox", "--disable-dev-shm-usage",
+                   "--disable-gpu", "--disable-blink-features=AutomationControlled",
+                   # Some sites (e.g. Optus) fail HTTP/2 negotiation from
+                   # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
+                   # HTTP/1.1 for the whole browser session is a safe,
+                   # widely-used workaround since virtually every server also
+                   # speaks HTTP/1.1.
+                   "--disable-http2"]
+    launch_kwargs: dict = {"headless": True, "args": launch_args}
+    # Dev-sandbox escape hatch only: some local dev environments front all
+    # outbound traffic with a TLS-terminating proxy whose ClientHello parser
+    # chokes on Chromium's own handshake (GREASE/post-quantum extensions),
+    # resetting every connection. Unset in CI/production, so this is a no-op
+    # there. When set, point it at a local proxy that itself uses a normal
+    # TLS stack for the outbound leg (see scripts/inspect_dom.py docs).
+    proxy_server = os.environ.get("PLAYWRIGHT_PROXY_SERVER")
+    if proxy_server:
+        launch_kwargs["proxy"] = {"server": proxy_server}
+        launch_args.append("--ignore-certificate-errors")
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=["--no-sandbox", "--disable-dev-shm-usage",
-                  "--disable-gpu", "--disable-blink-features=AutomationControlled",
-                  # Some sites (e.g. Optus) fail HTTP/2 negotiation from
-                  # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
-                  # HTTP/1.1 for the whole browser session is a safe,
-                  # widely-used workaround since virtually every server also
-                  # speaks HTTP/1.1.
-                  "--disable-http2"],
-        )
+        browser = p.chromium.launch(**launch_kwargs)
         try:
             page = browser.new_page(
                 user_agent=ua,

@@ -494,11 +494,8 @@ regions:
       aliases:
       - Jio
       sources:
-      - type: official
-        url: https://www.jio.com/press-release
-        plan: '127 Links im DOM sind ausschliesslich Self-Care-/Account-Navigation (SIM, JioFiber,
-          Support), keine Pressemeldungen. Kein Feed gefunden. Plan: wie stc
-          (API-Reverse-Engineering); bis dahin Referenz.'
+      - type: json_api
+        url: https://www.jio.com/jcms-api/v1-press-release-page
     - name: Vodafone Idea
       country: IN
       website: myvi.in
@@ -612,19 +609,18 @@ regions:
       aliases:
       - Smart Communications
       sources:
-      - type: newsroom_js
-        url: https://main.pldt.com/newsroom
+      - type: json_api
+        url: https://cms.pldt.com/drupal/api/v1/newsroom-article-list
+        link_template: 'https://cms.pldt.com{view_node}'
     - name: Indosat Ooredoo Hutchison
       country: ID
       website: ioh.co.id
       aliases:
       - Indosat
       sources:
-      - type: official
-        url: https://ioh.co.id/portal/en/iohpressrelease
-        plan: '18 Links im DOM sind interne SPA-Hash-Routen (z.B. "ioh-sustainability"), keine
-          echten Artikel-URLs. Presseliste laedt per API. Plan: wie stc
-          (API-Reverse-Engineering); bis dahin Referenz.'
+      - type: json_api
+        url: https://web-api.ioh.co.id/api/content-hub/public?page=1&limit=20&paginateDisable=false&site=&type=Press%20Release&lang=EN&language=EN
+        link_template: 'https://ioh.co.id/EN/contents?slug={slug}'
     - name: CelcomDigi
       country: MY
       website: celcomdigi.com

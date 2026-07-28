@@ -22,7 +22,8 @@ log = logging.getLogger(__name__)
 
 _TITLE_KEYS = ("newsTitle", "title", "headline", "name")
 _URL_KEYS = ("newsUrl", "url", "link", "href", "path")
-_DATE_KEYS = ("newsDate", "date", "published", "publishedDate", "pubDate")
+_DATE_KEYS = ("newsDate", "date", "published", "publishedDate", "pubDate",
+             "releaseDate", "publishedAt")
 _DESC_KEYS = ("newsDesc", "description", "summary", "excerpt")
 
 _DATE_FORMATS = (
@@ -36,6 +37,19 @@ def _first(d: dict, keys) -> str:
         v = d.get(k)
         if isinstance(v, str) and v.strip():
             return v.strip()
+    return ""
+
+
+_SPLIT_DATE_KEYS = (("year", "month", "day"), ("Year", "Month", "Day"))
+
+
+def _split_date(rec: dict) -> str:
+    """Some CMS APIs (e.g. PLDT) expose year/month/day as separate string
+    fields instead of one combined date string."""
+    for year_k, month_k, day_k in _SPLIT_DATE_KEYS:
+        year, month, day = rec.get(year_k), rec.get(month_k), rec.get(day_k)
+        if year and month and day:
+            return f"{day} {month} {year}"
     return ""
 
 
@@ -54,15 +68,56 @@ def _parse_date(raw: str) -> datetime | None:
         return None
 
 
+def _looks_like_record(rec: dict) -> bool:
+    keys = {k.lower() for k in rec}
+    return any(k.lower() in keys for k in _TITLE_KEYS)
+
+
+def _find_record_lists(node, depth: int = 0, max_depth: int = 8) -> list[list[dict]]:
+    """Recursively collect every list-of-dicts in *node* that looks like a
+    set of press-release records (title-ish key present). Some newsroom
+    JSON APIs bury the actual list several levels deep (e.g. grouped by
+    month, or nested under result/collection wrappers) instead of exposing
+    a single flat array, so a fixed set of top-level keys isn't enough."""
+    found: list[list[dict]] = []
+    if depth > max_depth:
+        return found
+    if isinstance(node, list):
+        dict_items = [x for x in node if isinstance(x, dict)]
+        if dict_items and sum(_looks_like_record(d) for d in dict_items) >= max(1, len(dict_items) // 2):
+            found.append(dict_items)
+            return found  # a matched list's own items aren't recursed into
+        for item in node:
+            found.extend(_find_record_lists(item, depth + 1, max_depth))
+    elif isinstance(node, dict):
+        for val in node.values():
+            found.extend(_find_record_lists(val, depth + 1, max_depth))
+    return found
+
+
 def _records(payload) -> list[dict]:
     if isinstance(payload, list):
-        return [r for r in payload if isinstance(r, dict)]
+        cand = [r for r in payload if isinstance(r, dict)]
+        if cand:
+            return cand
     if isinstance(payload, dict):
         for key in ("data", "items", "results", "news", "articles", "entries"):
             val = payload.get(key)
             if isinstance(val, list):
                 return [r for r in val if isinstance(r, dict)]
-    return []
+    # Fallback: recursively hunt for record-shaped lists anywhere in the
+    # payload (grouped/nested APIs) and merge them, de-duplicating by title.
+    merged: list[dict] = []
+    seen_titles: set[str] = set()
+    for lst in _find_record_lists(payload):
+        for rec in lst:
+            title = _first(rec, _TITLE_KEYS)
+            if title and title in seen_titles:
+                continue
+            if title:
+                seen_titles.add(title)
+            merged.append(rec)
+    return merged
 
 
 def parse_json_bytes(raw: bytes, source: Source, region: str,
@@ -73,7 +128,14 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
     for rec in _records(payload)[:40]:
         title = _first(rec, _TITLE_KEYS)
         rel = _first(rec, _URL_KEYS)
-        if not title or not rel:
+        if not title:
+            continue
+        if not rel and source.link_template:
+            try:
+                rel = source.link_template.format_map(rec)
+            except (KeyError, IndexError):
+                rel = ""
+        if not rel:
             continue
         url = rel if rel.startswith("http") else urljoin(site_root + "/", rel.lstrip("/"))
         items.append(Item(
@@ -82,7 +144,7 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
             source_name=source.name or urlsplit(url).netloc.removeprefix("www."),
             region=region,
             operator=operator,
-            published=_parse_date(_first(rec, _DATE_KEYS)),
+            published=_parse_date(_first(rec, _DATE_KEYS) or _split_date(rec)),
             summary=_first(rec, _DESC_KEYS)[:600],
             origin=origin,
         ))

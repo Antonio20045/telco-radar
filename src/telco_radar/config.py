@@ -39,6 +39,10 @@ class Source:
     kind: str = ""  # display/crawl kind (see above); defaults from type
     label: str = ""  # human label for the source card
     plan: str = ""   # for 'official' sources: why not yet crawled + the plan
+    link_template: str | None = None  # json_api: build item URL from a record
+    # field when the payload has no direct url/link field, e.g. only a slug
+    # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
+    # against the raw record dict.
 
     def __post_init__(self) -> None:
         if not self.kind:
@@ -127,6 +131,7 @@ def load_config(root: Path) -> Config:
                     kind=s.get("kind", stype),
                     label=s.get("label", ""),
                     plan=s.get("plan", ""),
+                    link_template=s.get("link_template"),
                 ))
             operators.append(Operator(
                 name=op["name"],
