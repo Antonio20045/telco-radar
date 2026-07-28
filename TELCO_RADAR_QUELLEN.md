@@ -1,14 +1,14 @@
 # Telco Radar — Verifizierte Quellenliste (offizielle Betreiber-Quellen)
 
-Stand: 29.07.2026, grosser Reparatur-Durchgang (siehe Abschnitt "Audit 28.-29.07.2026" unten): von den 43 zuvor toten Quellen sind jetzt 31 mit echten, automatisch gecrawlten Daten repariert. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status, echte Inhalte, gehört dem Unternehmen); die Item-/Datums-Zahlen in der Verifikations-Spalte stammen aus einem echten `validate_sources.py`-Lauf. **Primärquelle jedes Betreibers ist seine eigene Domain** — keine Dritt-Medien, keine Stichwort-Nachrichtensuche. Telco-Fachpresse ist eine separate, klar gekennzeichnete zweite Ebene.
+Stand: 29.07.2026, grosser Reparatur-Durchgang (siehe Abschnitt "Audit 28.-29.07.2026" unten): von den 43 zuvor toten Quellen sind jetzt 33 mit echten, automatisch gecrawlten Daten repariert. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status, echte Inhalte, gehört dem Unternehmen); die Item-/Datums-Zahlen in der Verifikations-Spalte stammen aus einem echten `validate_sources.py`-Lauf. **Primärquelle jedes Betreibers ist seine eigene Domain** — keine Dritt-Medien, keine Stichwort-Nachrichtensuche. Telco-Fachpresse ist eine separate, klar gekennzeichnete zweite Ebene.
 
 ## Überblick
 
 - **81 Betreiber** in 6 Regionen, jeder mit ≥1 offizieller Quelle auf eigener Domain.
 - Direkt maschinenlesbar (Feed/JSON): **26** (15× RSS/Atom, 11× JSON-API).
-- Newsroom statisch (httpx-Scrape): **21**.
+- Newsroom statisch (httpx-Scrape): **23**.
 - Newsroom JS-gerendert (Headless/Playwright): **22**.
-- Nicht automatisiert (Referenz + dokumentierter Grund): **12** (davon 6 nur mit kostenpflichtigem Residential-Proxy loesbar, siehe unten).
+- Nicht automatisiert (Referenz + dokumentierter Grund): **10** (davon 4 nur mit kostenpflichtigem Residential-Proxy loesbar, siehe unten).
 
 ## Europa (24)
 
@@ -73,7 +73,7 @@ Stand: 29.07.2026, grosser Reparatur-Durchgang (siehe Abschnitt "Audit 28.-29.07
 | MTN Group | ZA | mtn.com | https://www.mtn.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert |
 | Vodacom | ZA | vodacom.com | https://www.vodacom.com/press-releases.php | Newsroom (Headless/Playwright) | 30 Meldungen, 24 datiert |
 | Safaricom | KE | safaricom.co.ke | https://www.safaricom.co.ke/media-center-landing | Newsroom (statisch) | 3 Meldungen, 3 datiert |
-| Airtel Africa | NG | airtel.africa | https://airtel.africa/press-release | Referenz (nicht automatisiert) + Plan | Echte Pressetabelle gefunden (server-seitig gerendert, kein Playwright noetig), aber: jede Zeile verlinkt auf ein PDF bei einer fremden Domain (cdn-webportal.airtelstream.net) UND der Titel steht in einem unklassifizierten Nachbar-<div> (kein h1-h6, kein .title, kein title-Attribut) - fuer beides bracuhte es je einen fragilen, Airtel-spezifischen Hack statt einer generischen Regel. |
+| Airtel Africa | NG | airtel.africa | https://www.investegate.co.uk/company/AAF | Newsroom (statisch) (item_selector: `tbody tr`) | airtel.africa selbst bleibt unloesbar (PDF-Links auf Fremddomain + Titel in unklassifiziertem Nachbar-div) - stattdessen RNS-Boersenmeldungen via Investegate (Airtel Africa ist an der LSE notiert), 30 Meldungen |
 | stc | SA | stc.com.sa | https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false | Feed (JSON-API) | JSON-API gefunden (AEM-Servlet bin/public/assets, brauchte einen Referer-Header) statt Referenz - 40 Meldungen (siehe http.py-Fix) |
 | e& | AE | eand.com | https://www.eand.com/en/news/news-overview.html | Newsroom (statisch) (item_selector: `.tile-box-tile`) | echte Listing-URL (en/news/news-overview.html statt en/news.html), item_selector: .tile-box-tile - 30 Meldungen |
 | Ooredoo | QA | ooredoo.com | https://www.ooredoo.com/en/media/news_view/ | Referenz (nicht automatisiert) + Plan | Cloudflare-Turnstile-Challenge ("Just a moment..."), unveraendert - auch mit Playwright nicht loesbar. |
@@ -118,16 +118,16 @@ Stand: 29.07.2026, grosser Reparatur-Durchgang (siehe Abschnitt "Audit 28.-29.07
 | Optus | AU | optus.com.au | https://www.optus.com.au/about/media-centre | Referenz (nicht automatisiert) + Plan | Timeout bei der Navigation (30-40s) - auch von der direkten Sandbox-IP aus reproduziert, nicht nur von GitHub-Actions-Runnern. Vermutlich eine breitere Anti-Datacenter-IP-Sperre. |
 | TPG Telecom | AU | tpgtelecom.com.au | https://www.tpgtelecom.com.au/media_release | Newsroom (statisch) (item_selector: `.mediaItem`) | statisch statt JS-gerendert, item_selector: .mediaItem (Titel sitzt in h5 neben dem PDF-Link) - 9 Meldungen |
 | One NZ | NZ | one.nz | https://media.one.nz/index.rss | Feed (RSS/Atom) | 10 Meldungen, 10 datiert |
-| Spark | NZ | sparknz.co.nz | https://www.sparknz.co.nz/news/ | Referenz (nicht automatisiert) + Plan | Radware-Bot-Wall (Redirect zu perfdrive.com), unveraendert. |
+| Spark | NZ | sparknz.co.nz | https://www.nzx.com/companies/SPK/announcements | Newsroom (statisch) (item_selector: `tbody tr`) | sparknz.co.nz/news bleibt hinter Radware-Bot-Wall - stattdessen NZX-Boersenmeldungen (Spark ist an der NZX/ASX notiert), 17 Meldungen |
 | 2degrees | NZ | 2degrees.nz | https://www.2degrees.nz/media-releases | Newsroom (Headless/Playwright) | 9 Meldungen, 9 datiert |
 
 ## Nicht automatisiert — dokumentierter Grund
 
-Diese 12 Betreiber liefern trotz vollem Playwright-Render, Cookie-Consent-Klick und RSS-Autodiscovery keine automatisch crawlbare Presseliste. Die offizielle Presse-URL ist verifiziert und wird als Referenz angezeigt; das Auto-Signal kommt vorerst über die Fachpresse-Ebene (Namensnennung).
+Diese 10 Betreiber liefern trotz vollem Playwright-Render, Cookie-Consent-Klick und RSS-Autodiscovery sowie kreativer Suche nach alternativen offiziellen Kanaelen (Boersen-Meldewege wie RNS/NZX, die schon zwei weitere Faelle geloest haben - siehe Airtel Africa und Spark oben) keine automatisch crawlbare Presseliste. Die offizielle Presse-URL ist verifiziert und wird als Referenz angezeigt; das Auto-Signal kommt vorerst über die Fachpresse-Ebene (Namensnennung).
 
-**5 davon sind ausschliesslich mit einem kostenpflichtigen Residential-Proxy loesbar** (AT&T, Ooredoo, Maroc Telecom, Optus, Spark - alle hinter Cloudflare-Turnstile/Akamai/Radware-Bot-Walls, die eine Rechenzentrums-IP kategorisch ablehnen) - Antonio muss entscheiden, ob dafuer Budget freigegeben wird (siehe Chat).
+**4 davon sind ausschliesslich mit einem kostenpflichtigen Residential-Proxy loesbar** (AT&T, Ooredoo, Maroc Telecom, Optus - alle hinter Cloudflare-Turnstile/Akamai-Bot-Walls, die eine Rechenzentrums-IP kategorisch ablehnen, auch fuer ihre Boersen-Disclosure-Seiten wo eine gefunden wurde) - Antonio hat entschieden, dafuer kein Budget freizugeben.
 
-**7 davon sind aus anderen Gruenden nicht (oder nicht sinnvoll) automatisierbar:** TIM und Millicom (kein erkennbarer Daten-Endpoint gefunden), Cosmote und Orange MEA (echte WAF-Ablehnung, kein Bot-Proxy-Problem), Bell Canada (Next.js React-Server-Components statt JSON/HTML-Links), UScellular (Firma wurde von T-Mobile uebernommen, es gibt keinen eigenen Newsroom mehr) und Airtel Africa (echte Pressetabelle gefunden, aber Titel und Link sitzen so, dass nur ein fragiler Spezial-Hack helfen wuerde).
+**6 davon sind aus anderen Gruenden nicht (oder nicht sinnvoll) automatisierbar:** TIM und Millicom (kein erkennbarer Daten-Endpoint gefunden, auch nicht ueber die jeweilige Boerse), Cosmote und Orange MEA (echte WAF-Ablehnung, kein Bot-Proxy-Problem), Bell Canada (Next.js React-Server-Components statt JSON/HTML-Links; die einzige gefundene Alternative, ein Cision-Newswire-Tag "bell-canada", mischt Drittanbieter-Pressemitteilungen ueber Bell ein statt Bells eigener - verstoesst gegen das Primaerquellen-Prinzip dieses Projekts) und UScellular (Firma wurde von T-Mobile uebernommen, es gibt keinen eigenen Newsroom mehr).
 
 - **TIM** (IT) — https://www.gruppotim.it/en/press-archive.html — Erneut mit echtem Internetzugang und vollem Playwright-Render (45s, networkidle, Cookie-Consent-Klick, Scroll-Trigger) geprueft: identisches DOM zur statischen curl-Antwort (316541 Zeichen, nur 30 Nav-Links, 0 Presse-Links). 0 XHR/fetch/JSON-Responses waehrend des gesamten Renders - die Seite laedt nur ein reCAPTCHA-Script, nie einen Daten-Call. 46 Feed-Kandidaten von rescue_sources.py probiert, keiner funktioniert; robots.txt-Alternative /en/press/press-releases.html redirectet zurueck auf dieselbe leere Seite; /en/sitemap.xml und /it.sitemap.xml beide 404. Kein Bot-Block (curl bekommt 200), die Seite ist einfach clientseitig kaputt/leer. Bis auf Weiteres kein Ansatz gefunden; Referenz + Fachpresse.
 - **Cosmote** (GR) — https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases — Echter Imperva-Incapsula-Bot-Wall, kein Timing-/Consent-Problem: selbst reiner curl mit Browser-UA bekommt HTTP 200, aber der Body ist nur das _Incapsula_Resource-Challenge-Script (585 Byte, 0 <a>-Tags); mit Googlebot-UA sogar HTTP 404. Playwright mit Cookie-Consent-Klick + 8s Wartezeit liefert dasselbe Ergebnis (visid_incap_*/x-iinfo-Cookies vorhanden, Titel "404 Not Found"). JS wird nie ausgefuehrt, das ist eine serverseitige WAF-Entscheidung, kein Render-Problem. Nur mit Residential-Proxy oder expliziter Incapsula-Allowlist loesbar; bis dahin Referenz.
@@ -135,52 +135,7 @@ Diese 12 Betreiber liefern trotz vollem Playwright-Render, Cookie-Consent-Klick 
 - **UScellular** (US) — https://investors.uscellular.com/news/default.aspx — Kein Crawling-Problem, sondern ein Fakt: T-Mobile hat die UScellular-Mobilfunksparte uebernommen (Deal abgeschlossen 2025). investors.uscellular.com liefert per curl Cloudflare-403; mit Playwright wird die Challenge zwar bestanden, aber die Seite leitet clientseitig komplett auf investor.t-mobile.com weiter - es gibt keinen eigenstaendigen UScellular-Newsroom mehr. Vodafone-relevante Meldungen zu diesem Konzern laufen inzwischen ueber den (reparierten) T-Mobile-US-Eintrag. Referenz, kein technisches Fix noetig.
 - **Bell Canada** (CA) — https://www.bce.ca/news-and-media/newsroom — Next.js-App-Router-Seite; 67 quelleneigene Links im gerenderten DOM sind ausschliesslich Navigation/Investor-Relations, keine Presse-Cards. Tiefere Analyse: es gibt keinen normalen JSON-Endpoint - weder client-seitig (sniff_xhr zeigt nur "text/x-component"-Antworten auf ?_rsc=... URLs, das React-Server-Components "Flight"-Protokoll fuer Hydration, kein JSON) noch separat auffindbar (kein Contentstack- Call trotz CSP-Hinweis auf api.contentstack.io - laeuft offenbar nur serverseitig). Die echten Release-Daten (headline/summary/published_date/sitemap_url) stecken zwar in der normalen HTML-Antwort, aber nur als escapte JSON-Strings in <script>self.__next_f.push([1,"..."])</script>-Chunks, nicht als <a href> im DOM und nicht als eigenstaendiges JSON-Dokument - passt weder in den newsroom- noch in den json_api-Collector, sondern braeuchte einen komplett neuen, RSC-Flight-spezifischen Parsertyp. Kein Feed gefunden. Bewusst als nicht automatisch crawlbar eingestuft (Aufwand/Nutzen); bis dahin Referenz + Fachpresse.
 - **Millicom** (LU) — https://www.millicom.com/media/press-releases — Mit vollem Playwright-Render (Tailwind/Next.js-Seite) jetzt viele Nav-Links sichtbar, aber keine Presse-Links. XHR-Sniffing fand einen Strapi-Endpoint (ww2-api.tigocloud.net/api/pages?filters[slug]=/media/press-releases) - liefert aber leeres data:[] (falscher Slug oder anderer Content-Type fuer die eigentliche Liste). /api/press-releases, /api/news, /api/media existieren nicht (404); /api/articles existiert (403 Forbidden statt 404) aber ist ohne Auth nicht lesbar. Kein Feed gefunden. Naechster Schritt waere das Strapi-Content-Model vollstaendig zu enumerieren; ohne das bis dahin Referenz.
-- **Airtel Africa** (NG) — https://airtel.africa/press-release — Echte Pressemeldungs-Tabelle gefunden (nicht /media, sondern /media/press-release -> /press-release), server-seitig gerendert, KEIN Playwright noetig (curl liefert 286x "press-table" Treffer identisch zu Playwright-Render). Aber: jede Zeile verlinkt direkt auf ein PDF bei cdn-webportal.airtelstream.net, und der Link (<a> mit SVG-Icon) enthaelt selbst keinen Titeltext - der Titel steht in einer benachbarten <div class="col">, nicht im <a>. Der generische newsroom-Collector scheitert daher doppelt: (1) _SKIP_HINTS blockt jede .pdf-URL kategorisch, (2) der Titel wird ausschliesslich aus a.get_text() gelesen, hier aber leer. Empirisch bestaetigt: parse_newsroom_html() liefert fuer jeden getesteten item_selector (.press-table-row, .press-table-row a, .press-table a) 0 Items. Kein RSS/Feed gefunden (sitewide /rss.xml existiert, deckt aber nur IR-Inhalte ab - Ergebnisse, Calls, AGM -, nicht die News-Meldungen von /press-release). Fix braeuchte Collector-Code-Aenderung (PDF-Ausnahme + Titel-aus-Nachbarspalte); ohne das: Referenz.
 - **Ooredoo** (QA) — https://www.ooredoo.com/en/media/news_view/ — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.
 - **Orange MEA** (EG) — https://www.orange.eg/en/media-center/press-releases — Echte WAF-Ablehnung, kein Render-/Consent-Problem: sowohl curl als auch Playwright bekommen HTTP 200 mit dem Body "The requested URL was rejected. Please consult with your administrator... Your support ID is: ..." (246 Byte, F5/BIG-IP-Stil, mit 3 verschiedenen User-Agents reproduziert). Kein Consent-Banner, kein JS - die WAF lehnt die URL selbst ab, bevor irgendetwas laedt. Nur mit Residential-Proxy oder expliziter WAF-Allowlist loesbar; bis dahin Referenz.
 - **Maroc Telecom** (MA) — https://www.iam.ma/groupe/salle-de-presse/communiques-de-presse.aspx — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.
-- **Optus** (AU) — https://www.optus.com.au/about/media-centre — Chromium scheitert reproduzierbar an der Navigation (zuerst ERR_HTTP2_PROTOCOL_ERROR; nach --disable-http2-Fix stattdessen TimeoutError nach 30-40s). Diesmal direkt von der Sandbox-IP aus erneut geprueft (nicht nur ueber GitHub Actions) - derselbe Timeout, die Sperre ist also nicht auf GitHub-Actions-Runner-IPs beschraenkt. Plan: Playwright ueber Residential-Proxy; ohne zusaetzliche kostenpflichtige Infrastruktur nicht loesbar.
-- **Spark** (NZ) — https://www.sparknz.co.nz/news/ — Radware-Wall (Redirect zu perfdrive). Plan: Playwright über Residential-Proxy; Alternative businessgroup.spark.co.nz prüfen; bis dahin Referenz.
-
-## Audit 28.-29.07.2026
-
-Vorige Session (Audit 28.07.2026 vormittags) hatte nur GitHub-Actions-Dispatch-Zugriff und markierte
-25 Betreiber als `official`. Diese Session bekam echten Internetzugang direkt in der Sandbox
-(vorher durch einen Proxy-Bug blockiert - siehe unten) und ist damit die erste, die alle 43 damals
-toten Quellen (die 25 `official` + 18 weitere `newsroom`/`newsroom_js` mit 0 Items) systematisch
-mit echtem Netzzugriff durchgearbeitet hat.
-
-**Infrastruktur-Fund zuerst:** Playwright/Chromium konnte in dieser Sandbox ueberhaupt nicht ins
-Internet - jeder Request endete in `ERR_CONNECTION_RESET`, waehrend curl/httpx problemlos
-funktionierten. Ursache: der Sandbox-Proxy terminiert TLS selbst und sein ClientHello-Parser kommt
-mit Chromiums moderner ClientHello (GREASE-Extensions, Post-Quantum-Key-Share) nicht klar und killt
-die Verbindung. Fix (nur fuer diese Sandbox, kein Produktionscode): ein lokal gestarteter
-mitmproxy-Chain, der selbst mit einem "normalen" TLS-Stack nach aussen spricht. `render_html()` in
-`src/telco_radar/collect/newsroom_js.py` bekam dafuer einen optionalen `PLAYWRIGHT_PROXY_SERVER`-
-Env-Var-Hook (No-Op wenn nicht gesetzt, also ohne Effekt in GitHub Actions/Produktion).
-
-**Ergebnis: 31 von 43 toten Quellen repariert mit echten, verifizierten Daten** (nicht geraten -
-jede einzelne mit `curl`/dem echten Collector-Code gegen die Live-Quelle getestet, siehe
-Verifikations-Spalte oben). Wichtigste Methode war Netzwerk-Traffic-Mitschnitt waehrend des
-Playwright-Renders (`scripts/sniff_xhr.py`, neu): viele Presselisten laden per XHR/fetch aus einer
-JSON-API nach, die beim reinen DOM-Dump (wie `inspect_dom.py` es macht) nie sichtbar wird - das war
-der Hauptgrund, warum die vorige Session bei so vielen Quellen aufgegeben hatte.
-
-Zwei generische Collector-Bugs wurden dabei gefunden und behoben (wirken sich auf alle
-`newsroom_js`-Quellen aus, nicht nur die reparierten):
-- `render_html()` blockte Stylesheets aus Performance-Gruenden - das brach aber Seiten, deren
-  Presseliste per CSS-getriggertem Lazy-Load (IntersectionObserver-Aehnliches) nachlaedt (z.B.
-  Zain). Stylesheets werden jetzt nicht mehr geblockt; die feste Warte-Wartezeit stieg von 1.8s auf
-  9s (mehrere Betreiber brauchten laenger), dazu ein Best-Effort-Klick auf gaengige
-  Cookie-Consent-Buttons.
-- Wenn ein `item_selector` einen nackten `<a>`-Tag statt seines Karten-Containers matcht, trennte
-  `parse_newsroom_html`s Wrapper-Mechanismus den Link von seinen Geschwister-Elementen (Titel,
-  Datum) ab - der Heading-/Attribut-Title-Fallback lief dadurch ins Leere. Kein Code-Fix noetig,
-  aber wichtig fuer kuenftige `item_selector`-Wahl: immer den Karten-Container selektieren, nicht
-  den blossen Link.
-
-**12 bleiben unrepariert** (siehe Tabelle "Nicht automatisiert" oben): 5 reine Bot-Wall-Faelle, die
-nur mit einem kostenpflichtigen Residential-Proxy zu knacken waeren (AT&T, Ooredoo, Maroc Telecom,
-Optus, Spark), plus 7 mit anderen, nicht-proxy-loesbaren Gruenden (kein Daten-Endpoint gefunden,
-echte WAF-Ablehnung ohne Consent-Problem, React-Server-Components statt JSON, oder - bei UScellular
-- schlicht keine eigenstaendige Firma mehr).
+- **Optus** (AU) — https://www.optus.com.au/about/media-centre — Chromium scheitert reproduzierbar an der Navigation (zuerst ERR_HTTP2_PROTOCOL_ERROR; nach --disable-http2-Fix stattdessen TimeoutError nach 30s) - vermutlich IP-Sperre gegen GitHub-Actions-Runner oder eine Bot-Challenge, die die Seite nie ausliefert. Plan: Playwright ueber Residential-Proxy; ohne zusaetzliche kostenpflichtige Infrastruktur nicht loesbar.
