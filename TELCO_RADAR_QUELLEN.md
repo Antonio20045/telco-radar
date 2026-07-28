@@ -26,10 +26,10 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 | KPN | NL | kpn.com | https://www.overons.kpn/nieuws/en/ | https://www.overons.kpn/nieuws/feed/en | Feed (RSS/Atom) | RSS, 25 Einträge, 09.07.2026 |
 | Proximus | BE | proximus.com | https://www.proximus.com/news.html | — | Newsroom (statisch) | statisch, 4 Artikel-Links |
 | TIM | IT | gruppotim.it | https://www.gruppotim.it/en/press-archive.html | — | Newsroom (Headless/Playwright) | JS-gerendert |
-| Liberty Global | GB | libertyglobal.com | https://www.libertyglobal.com/news-insights/featured-news-insights/ | — | Newsroom (Headless/Playwright) | JS-gerendert |
+| Liberty Global | GB | libertyglobal.com | https://www.libertyglobal.com/news-insights/featured-news-insights/ | https://www.libertyglobal.com/feed | Feed (RSS/Atom) | War 4 Läufe in Folge EMPTY (Playwright fand 0 Links); RSS via scripts/rescue_sources.py am 28.07.2026 gefunden, 10 echte Einträge |
 | VEON | NL | veon.com | https://www.veon.com/newsroom | — | Newsroom (statisch) | statisch, 32 Artikel-Links |
 | Telenor | NO | telenor.com | https://www.telenor.com/media/newsroom/ | — | Newsroom (statisch) | statisch, 10 Artikel-Links |
-| Turkcell | TR | turkcell.com.tr | https://medya.turkcell.com.tr/basin-bultenleri/ | — | Newsroom (Headless/Playwright) | JS-gerendert; RSS nur veraltet (2016) |
+| Turkcell | TR | turkcell.com.tr | https://medya.turkcell.com.tr/basin-bultenleri/ | https://medya.turkcell.com.tr/feed | Feed (RSS/Atom) | War 4 Läufe in Folge EMPTY; RSS via scripts/rescue_sources.py am 28.07.2026 gefunden (anderer Pfad als der 2016 als veraltet verworfene) - Daten prüfen, ob wirklich aktuell |
 | Iliad | FR | iliad.fr | https://www.iliad.fr/en/press | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | 1&1 | DE | united-internet.de | https://unternehmen.1und1.de/presse | https://unternehmen.1und1.de/presse/feed | Feed (RSS/Atom) | offizieller 1&1-Pressefeed, 10 Einträge |
 | Bouygues Telecom | FR | bouyguestelecom.fr | https://www.corporate.bouyguestelecom.fr/presse-et-actualites/ | — | Newsroom (Headless/Playwright) | JS-gerendert |
@@ -73,7 +73,7 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 | MTN Group | ZA | mtn.com | https://www.mtn.com/newsroom/ | https://www.mtn.com/feed/ | Feed (RSS/Atom) | RSS (WordPress) |
 | Vodacom | ZA | vodacom.com | https://www.vodacom.com/press-releases.php | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | Safaricom | KE | safaricom.co.ke | https://www.safaricom.co.ke/media-center-landing | — | Newsroom (statisch) | statisch, 9 Artikel-Links |
-| Airtel Africa | NG | airtel.africa | https://airtel.africa/media | — | Newsroom (Headless/Playwright) | JS-gerendert |
+| Airtel Africa | NG | airtel.africa | https://airtel.africa/media | https://airtel.africa/rss.xml | Feed (RSS/Atom) | War 4 Läufe in Folge EMPTY; RSS via scripts/rescue_sources.py am 28.07.2026 gefunden, 10 Einträge (teils IR-Ankündigungen, nicht nur PR) |
 | stc | SA | stc.com.sa | https://www.stc.com/en/media-center.html | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | e& | AE | eand.com | https://www.eand.com/en/news.html | — | Newsroom (Headless/Playwright) | JS-gerendert |
 | Ooredoo | QA | ooredoo.com | https://www.ooredoo.com/en/media/news_view/ | — | Referenz (Bot-geblockt) + Plan | 403 Bot-Sperre |

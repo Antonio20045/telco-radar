@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 _BLOCK_TYPES = {"image", "media", "font", "stylesheet"}
 
 
-def render_html(url: str, timeout_s: float, ua: str) -> str:
+def render_html(url: str, timeout_s: float, ua: str, settle_ms: int = 1800) -> str:
     """Render *url* in headless Chromium and return the final DOM HTML."""
     from playwright.sync_api import sync_playwright
 
@@ -49,7 +49,7 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
             # A short settle for client-side rendering. We deliberately do NOT
             # wait for networkidle - many telco pages keep long-poll/analytics
             # connections open and would burn the whole timeout budget.
-            page.wait_for_timeout(1800)
+            page.wait_for_timeout(settle_ms)
             return page.content()
         finally:
             browser.close()
@@ -59,7 +59,8 @@ def collect_newsroom_js(source: Source, region: str, operator: str | None,
                         origin: str, http_cfg: dict) -> list[Item]:
     timeout_s = float(http_cfg.get("render_timeout_seconds",
                                    http_cfg.get("timeout_seconds", 25)))
+    settle_ms = int(http_cfg.get("render_settle_ms", 1800))
     ua = http_cfg.get("user_agent", BROWSER_UA)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
-    html = render_html(source.url, timeout_s, ua)
+    html = render_html(source.url, timeout_s, ua, settle_ms)
     return parse_newsroom_html(html, source, region, operator, origin, max_links)

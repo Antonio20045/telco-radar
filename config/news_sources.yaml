@@ -35,6 +35,6 @@ news_sources:
   #    next run's report (data/reports/*.json -> run.sources); recheck there
   #    or with scripts/validate_sources.py if one looks off.
   - {name: "The Next Platform", type: rss, url: "https://www.nextplatform.com/feed/", group: tech}
-  - {name: "IEEE Spectrum: Telecom", type: rss, url: "https://spectrum.ieee.org/feeds/topic/telecom.rss", group: tech}
+  - {name: "IEEE Spectrum", type: rss, url: "https://spectrum.ieee.org/rss", group: tech}
   - {name: "IEEE Spectrum: Semiconductors", type: rss, url: "https://spectrum.ieee.org/feeds/topic/semiconductors.rss", group: tech}
   - {name: "VentureBeat AI", type: rss, url: "https://venturebeat.com/category/ai/feed/", group: tech}

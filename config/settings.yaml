@@ -117,7 +117,12 @@ focus_competitors:
 # HTTP settings for collectors
 http:
   timeout_seconds: 20
-  render_timeout_seconds: 16   # headless (newsroom_js) page render budget
+  render_timeout_seconds: 30   # headless (newsroom_js) page render budget
+  render_settle_ms: 4000       # extra client-side-render settle after domcontentloaded
+                                # (bumped from 16s/1800ms 2026-07-28: real audit via
+                                # scripts/rescue_sources.py showed PLDT and du were
+                                # empty purely from being too slow, not blocked -
+                                # collect phase has ~45min of unused headroom in a run)
   image_timeout_seconds: 17    # Promo-Uebersicht hero-screenshot page-load budget
                                 # (collect/promo_snapshot.py::capture_hero_image;
                                 # separate navigation from render_timeout_seconds

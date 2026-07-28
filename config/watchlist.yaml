@@ -116,8 +116,8 @@ regions:
       - Virgin Media
       - Sunrise
       sources:
-      - type: newsroom_js
-        url: https://www.libertyglobal.com/news-insights/featured-news-insights/
+      - type: rss
+        url: https://www.libertyglobal.com/feed
     - name: VEON
       country: NL
       website: veon.com
@@ -138,8 +138,8 @@ regions:
       country: TR
       website: turkcell.com.tr
       sources:
-      - type: newsroom_js
-        url: https://medya.turkcell.com.tr/basin-bultenleri/
+      - type: rss
+        url: https://medya.turkcell.com.tr/feed
     - name: Iliad
       country: FR
       website: iliad.fr
@@ -379,8 +379,8 @@ regions:
       country: NG
       website: airtel.africa
       sources:
-      - type: newsroom_js
-        url: https://airtel.africa/media
+      - type: rss
+        url: https://airtel.africa/rss.xml
     - name: stc
       country: SA
       website: stc.com.sa
