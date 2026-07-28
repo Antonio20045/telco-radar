@@ -11,6 +11,11 @@ on:
         description: "Only consider items newer than N days"
         required: false
         default: "8"
+      sources_only:
+        description: "Diagnostic only: run scripts/validate_sources.py (no LLM, no commit, no deploy)"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -48,7 +53,19 @@ jobs:
           if [ -n "$LLM_API_KEY" ]; then echo "LLM_API_KEY is present"; else echo "LLM_API_KEY is missing"; fi
           if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY fallback is present"; else echo "ANTHROPIC_API_KEY fallback is missing"; fi
 
+      - name: Validate sources only (diagnostic)
+        if: inputs.sources_only
+        env:
+          PYTHONPATH: src
+        run: |
+          {
+            echo '```text'
+            python scripts/validate_sources.py
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Run pipeline
+        if: ${{ !inputs.sources_only }}
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
@@ -85,6 +102,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit state, report and site
+        if: ${{ !inputs.sources_only }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -111,7 +129,7 @@ jobs:
           fi
 
       - name: Trigger Render deploy
-        if: success()
+        if: ${{ success() && !inputs.sources_only }}
         continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
