@@ -2,482 +2,73 @@
  "date": "2026-07-28",
  "generated_with_llm": true,
  "stats": {
-  "sources_total": 83,
-  "sources_ok": 80,
+  "sources_total": 85,
+  "sources_ok": 82,
   "sources_empty": 3,
   "sources_failed": 0,
-  "collected": 1340,
-  "new": 187,
+  "collected": 1387,
+  "new": 9,
   "operators": 81,
   "regions": 6
  },
- "briefing_md": "## Auf einen Blick\n\n*   **Glasfaser-Konsolidierung in Belgien:** Liberty Global, Telenet, Proximus und Fiberklaar bündeln ihre Kräfte, um den Glasfaserausbau in Flandern massiv zu beschleunigen.\n*   **5G-Advanced für Endkunden:** e& in den VAE und Zain in Saudi-Arabien schalten die nächste Mobilfunkgeneration für Privatkunden frei – ein neuer Qualitätsstandard im Nahen Osten.\n*   **Satelliten-Mobilfunk wird praktisch:** Telstra in Australien erweitert seinen Satelliten-zu-Mobilfunk-Dienst von SMS auf leichte Datenanwendungen und macht ländliche Konnektivität alltagstauglich.\n\n## Das Wichtigste\n\nDiese Woche zeigt sich ein klares Bild: Während in Europa und Nordamerika der Wettbewerb um Glasfaser-Kunden und B2B-Cloud-Verträge (Deutsche Telekom mit Volkswagen, Liberty Global in Belgien) weiter an Fahrt gewinnt, setzen Betreiber im Nahen Osten (e&, Zain, stc) auf technologische Führerschaft bei 5G-Advanced und Cloud-Partnerschaften (stc mit Alibaba). In Ozeanien macht Telstra mit satellitengestützter Mobilfunkvernetzung einen großen Schritt nach vorne und definiert damit die Erwartungen an ländliche Abdeckung neu. Charter Communications in den USA zeigt mit einem neuen Premium-Mobilfunktarif, wie Kabelnetzbetreiber ihre Konvergenzangebote aufwerten. Gleichzeitig wächst der regulatorische Druck auf Rechenzentren weltweit, wie ein temporärer Anschlussstopp in Israel zeigt.\n\n## Die wichtigsten Signale\n\n**Telstra - Satelliten-Mobilfunk erweitert von SMS auf Daten-Apps** (Netz/Technologie, Dringlichkeit 5/5)\nTelstra hat seinen Satelliten-zu-Mobilfunk-Dienst in Australien von reinen SMS auf leichte Datenanwendungen ausgeweitet. Kunden können nun auch in Gebieten ohne Mobilfunknetz grundlegende Apps nutzen. [Quelle](https://www.telstra.com.au/exchange/satellite-to-mobile-lite-data-)\n\n**Liberty Global - Glasfaser-Kooperation in Flandern** (Netz/Technologie, Dringlichkeit 5/5)\nWyre (Liberty Global), Telenet, Proximus und Fiberklaar schließen sich zusammen, um den Glasfaserausbau in der belgischen Region Flandern zu beschleunigen und auszuweiten. Dies schafft einen starken Wettbewerber im Festnetz. [Quelle](https://www.libertyglobal.com/wyre-telenet-proximus-and-fiberklaar-join-forces-to-expand-and-accelerate-the-roll-out-of-fibre-networks-in-flanders/)\n\n**Deutsche Telekom - Volkswagen setzt auf T Cloud** (Partnerschaft, Dringlichkeit 5/5)\nDie Volkswagen Group hat einen bedeutenden Großkundenvertrag mit T-Systems für die Nutzung der T Cloud als Cloud-Infrastruktur abgeschlossen. Dies ist ein Prestigevertrag für die Telekom im B2B-Cloud-Markt. [Quelle](https://www.telekom.com/en/media/media-information/archive/major-contract-volkswagen-group-relying-on-t-cloud-1105586)\n\n**e& - Höchste 5.5G-Modulation aktiviert** (Netz/Technologie, Dringlichkeit 4/5)\ne& hat in den Vereinigten Arabischen Emiraten die höchste 5.5G-Modulation aktiviert. Das Netz-Upgrade verspricht höhere Datenraten und niedrigere Latenzen für Endkunden. [Quelle](https://www.eand.com/en/news/24-07-26-eand-uae-highest-5-5g-modulation.html)\n\n**Zain - Erster kommerzieller 5G+-Dienst für Privatkunden** (Netz/Technologie, Dringlichkeit 4/5)\nZain hat in Saudi-Arabien den ersten kommerziellen 5G-Advanced-Dienst („5G+“) für Privatkunden gestartet. Damit setzt das Unternehmen einen neuen Standard für Mobilfunkgeschwindigkeiten in der Region. [Quelle](https://www.zain.com/en/press-release/zainksa_5gadvanced)\n\n**stc - Cloud-Joint-Venture mit Alibaba** (Partnerschaft, Dringlichkeit 4/5)\nstc und Alibaba Cloud gründen ein Joint Venture für Cloud-Computing in Saudi-Arabien. Dies stärkt stcs Position im B2B-Cloud-Markt erheblich. [Quelle](https://www.stc.com/en/media-center/press-release/press-release-detail.html?id=stc-group-and-alibaba-establish-ali-baba-cloud)\n\n**Charter Communications - Premium-Mobilfunktarif \"Unlimited Plus Premium\"** (Tarif/Pricing, Dringlichkeit 4/5)\nCharter bringt mit \"Unlimited Plus Premium\" einen neuen Premium-Mobilfunktarif auf den Markt, der exklusive Features und integrierte Sparvorteile für Bestandskunden bietet. [Quelle](https://corporate.charter.com/newsroom/spectrum-mobile-introduces-unlimited-plus-premium)\n\n**Cisco - Plattform für \"agentische Netzwerke\"** (Netz/Technologie, Dringlichkeit 4/5)\nCisco skizziert eine Architektur für \"agentische Netzwerke\", die KI direkt mit Netzwerkdaten verbindet und autonome Betriebsabläufe ermöglicht. Dies könnte den Standard für KI-gesteuerte Netzautomatisierung definieren. [Quelle](https://www.rcrwireless.com/20260728/ai-infrastructure/cisco-platform-agentic-operations)\n\n**Deutsche Telekom - KI-Angebot für Lieferketten** (Produktlaunch, Dringlichkeit 4/5)\nT-Systems launcht ein KI-Angebot für Lieferketten, das Logistik und Bestandsmanagement optimiert. Das Produkt zielt auf B2B-Kunden ab. [Quelle](https://www.telekom.com/en/media/media-information/archive/t-systems-brings-ai-into-the-supply-chain-1105624)\n\n**Deutsche Telekom - Souveräne KI-Plattform für Bundesregierung** (Partnerschaft, Dringlichkeit 4/5)\nDie Telekom erhält den Auftrag, eine souveräne KI-Plattform für die deutsche Bundesregierung aufzubauen. Dies stärkt ihre Position im öffentlichen Sektor. [Quelle](https://www.telekom.com/en/media/media-information/archive/telekom-to-build-sovereign-ai-platform-for-the-german-federal-government-1105278)\n\n## Europa\n\nIn Europa dominieren strategische Partnerschaften und B2B-Großaufträge der Deutschen Telekom. Die Kooperation in Flandern zeigt, dass der Glasfaserausbau durch Konsortien beschleunigt wird.\n\n**Deutsche Telekom - Partnerschaft mit n8n für KI-Agenten** (Partnerschaft, Dringlichkeit 4/5)\nDie Telekom kooperiert mit n8n, um Unternehmen den schnellen Einsatz von KI-Agenten zu ermöglichen. [Quelle](https://www.telekom.com/en/media/media-information/archive/n8n-and-deutsche-telekom-the-fast-track-to-ai-agents-1105534)\n\n**Deutsche Telekom - Souveräne Cloud-Infrastruktur für Verwaltung** (Produktlaunch, Dringlichkeit 4/5)\nDie Telekom bringt eine souveräne Cloud-Infrastruktur für die deutsche öffentliche Verwaltung auf den Markt. [Quelle](https://www.telekom.com/en/media/media-information/archive/telekom-brings-sovereign-cloud-infrastructure-to-german-public-administration-1105064)\n\n**Deutsche Telekom - Drohnen-Abwehrschild mit Rheinmetall** (Partnerschaft, Dringlichkeit 3/5)\nRheinmetall und Telekom planen die Entwicklung eines Drohnen-Abwehrschilds zum Schutz kritischer Infrastruktur. [Quelle](https://www.telekom.com/en/media/media-information/archive/rheinmetall-and-telekom-plan-to-develop-a-drone-defense-shield-1104888)\n\n**Deutsche Telekom - Ford-Zulieferer in Catena-X integriert** (Partnerschaft, Dringlichkeit 3/5)\nT-Systems integriert Ford-Zulieferer in das Automobil-Datenaustauschnetzwerk Catena-X. [Quelle](https://www.telekom.com/en/media/media-information/archive/t-systems-brings-ford-s-suppliers-in-catena-x-1104712)\n\n## Nordamerika\n\nIn Nordamerika setzen T-Mobile US und Charter ihre offensive Wachstumsstrategie fort. T-Mobile meldet starkes Kundenwachstum, während Spectrum mit einem Premium-Mobilfunktarif und gezieltem Glasfaserausbau in ländlichen Gebieten punktet.\n\n**T-Mobile US - Starkes Kundenwachstum im Q2 2026** (Finanzen, Dringlichkeit 3/5)\nT-Mobile US meldet für Q2 2026 starkes Konto-Wachstum und branchenführendes Service-Umsatzwachstum, getrieben durch zunehmende Differenzierung im Markt. [Quelle](https://www.t-mobile.com/news/business/t-mobile-q2-2026-earnings)\n\n**Comcast - Exklusive Internet-Angebote für Studierende** (Tarif/Pricing, Dringlichkeit 3/5)\nComcast/Xfinity bietet in Atlanta exklusive Internet-Angebote für Studierende, die aus dem Campus-Wohnheim in eigene Wohnungen ziehen. [Quelle](https://corporate.comcast.com/stories/local/georgia/moving-off-campus-in-atlanta-ga-xfinity-has-new-internet-deals-exclusively-for-university-students)\n\n**T-Mobile US - Netzvorbereitung für Großevents** (Netz/Technologie, Dringlichkeit 3/5)\nT-Mobile US beschreibt, wie es sein Netz für eines der größten Live-Events der US-Geschichte (mutmaßlich FIFA WM 2026) mit temporären Kapazitäten und mobiler Infrastruktur vorbereitet hat. [Quelle](https://www.t-mobile.com/news/network/t-mobile-built-a-network-ready-for-largest-live-events-in-u-s-history)\n\n## Afrika & Naher Osten\n\nDiese Woche dominieren Netztechnologie-Nachrichten aus dem Nahen Osten: e& und Zain schalten 5.5G bzw. 5G+ für Endkunden frei, während stc mit Nokia und MediaTek 5G Carrier Aggregation testet.\n\n**stc - Erste 5G mit 4-facher Carrier Aggregation in der Region** (Netz/Technologie, Dringlichkeit 3/5)\nstc hat mit Nokia und MediaTek als erster Betreiber im Nahen Osten und Afrika 5G mit 4-facher Carrier Aggregation (4CC-CA) aktiviert. [Quelle](https://www.stc.com/en/media-center/press-release/press-release-detail.html?id=stc-nokia-mediatek)\n\n**ZainTECH - Network-as-a-Service (NaaS) für Unternehmen** (Partnerschaft, Dringlichkeit 3/5)\nZainTECH (Zains B2B-Einheit) kooperiert mit Nile, um Network-as-a-Service (NaaS)-Lösungen für Unternehmen im KI-Zeitalter anzubieten. [Quelle](https://www.zain.com/en/press-release/zaintech_nile)\n\n**e& - Partnerschaft mit Globe für Sprachverkehr** (Partnerschaft, Dringlichkeit 3/5)\ne& Carrier & Wholesale Services und der philippinische Betreiber Globe schließen eine strategische Partnerschaft zur Steuerung von Globes internationalem Sprachverkehr. [Quelle](https://developingtelecoms.com/telecom-technology/oss-service-management/20599-globe-and-e-agree-voice-traffic-management-partnership.html)\n\n## Ozeanien\n\nIn Ozeanien treibt Telstra die satellitengestützte Mobilfunkvernetzung voran und erweitert die Dienste von SMS auf Daten-Apps. Gleichzeitig reagiert der Konzern auf Netzausfälle und regulatorische Anfragen.\n\n**Telstra - Erstes Satelliten-SMS-Produkt für Mobilfunkkunden** (Produktlaunch, Dringlichkeit 4/5)\nTelstra hat das erste Satelliten-SMS-Produkt für Mobilfunkkunden in Australien gestartet, das Textnachrichten auch ohne Mobilfunknetz ermöglicht. [Quelle](https://www.telstra.com.au/exchange/telstra-launch-satellite-messaging)\n\n**Telstra - Netzausfall aufgeklärt** (Netz/Technologie, Dringlichkeit 3/5)\nTelstra berichtet über einen kürzlichen Netzausfall, der mobile Anrufe und Datendienste beeinträchtigte, und erläutert die Ursachen und die Behebung. [Quelle](https://www.telstra.com.au/exchange/some-mobile-calls-and-data-services-are-affected-today--here-s-w)\n\n**Telstra - CEO vor Senatsausschuss zu Notruf-Diensten** (Regulierung, Dringlichkeit 3/5)\nTelstra-CEO Vicki Brady gibt eine Eröffnungsaussage vor einem Senatsausschuss zu Notruf-Diensten (Triple Zero) ab, was auf regulatorische Prüfung der Netzverfügbarkeit hindeutet. [Quelle](https://www.telstra.com.au/exchange/triple-zero-senate-inquiry--opening-statement-from-vicki-brady)\n\n## Muster der Woche\n\n1.  **5G-Advanced wird für Endkunden greifbar:** Sowohl e& in den VAE als auch Zain in Saudi-Arabien haben 5.5G bzw. 5G+ für Privatkunden freigeschaltet. Die Technologie wird nicht nur getestet, sondern als neuer Qualitätsstandard im Wettbewerb positioniert.\n2.  **Glasfaserausbau durch Konsortien:** In Belgien bündeln Liberty Global, Telenet, Proximus und Fiberklaar ihre Kräfte. Dieses Modell der gemeinsamen Infrastrukturinvestitionen könnte Schule machen, um Kosten zu teilen und den Ausbau zu beschleunigen.\n3.  **Satelliten-Mobilfunk wird praktisch:** Telstra in Australien erweitert seinen Dienst von SMS auf Daten-Apps. Damit wird die satellitengestützte Konnektivität für abgelegene Gebiete alltagstauglich und setzt neue Maßstäbe für ländliche Abdeckung.\n4.  **B2B-Cloud und KI als Wachstumsfeld:** Die Deutsche Telekom sichert sich mit der Volkswagen Group einen prestigeträchtigen Cloud-Großkunden, während stc in Saudi-Arabien ein Cloud-Joint-Venture mit Alibaba gründet. Große Industriekunden werden zunehmend zum Ziel für Cloud- und KI-Dienstleistungen der Netzbetreiber.",
+ "briefing_md": "## Auf einen Blick\n\n- **Indosat Ooredoo Hutchison** hat mit seinem Neocloud-Geschäft über 1 Milliarde US-Dollar an Vertragseinnahmen erzielt – ein Beleg für das Umsatzpotenzial eigener Cloud-Plattformen von Telekommunikationsanbietern.\n- **Vodacom** baut mit der University of Johannesburg und Amazon Web Services eine KI-Talent-Pipeline in Südafrika auf.\n- **Telkomsel** und **China Telecom** wollen gemeinsam integrierte 5G-, KI- und IoT-Lösungen für den indonesischen Markt entwickeln.\n\n## Das Wichtigste\n\nDiese Woche zeigt sich ein klares Muster: Telekommunikationsanbieter in Asien und Afrika investieren gezielt in Cloud- und KI-Kompetenz, um neue Umsatzquellen zu erschließen. Indosat Ooredoo Hutchison in Indonesien hat mit seinem Neocloud-Geschäft bereits über 1 Milliarde US-Dollar an Vertragseinnahmen erzielt – ein starkes Signal für das Potenzial eigener Cloud-Plattformen. Telkomsel geht mit China Telecom eine Partnerschaft für 5G-, KI- und IoT-Lösungen ein. In Afrika setzt Vodacom auf den Aufbau lokaler KI-Talente durch eine Kooperation mit der University of Johannesburg und Amazon Web Services. In Neuseeland treibt Spark eine strategische Überprüfung seiner Digital Services voran.\n\n## Die wichtigsten Signale\n\n**Indosat Ooredoo Hutchison - Neocloud-Geschäft erzielt über 1 Milliarde US-Dollar Vertragseinnahmen** (Finanzen, Dringlichkeit 5/5)\nIndosat Ooredoo Hutchison hat über 1 Milliarde US-Dollar an vertraglichen Einnahmen aus seinem Neocloud-Geschäft erzielt. Die Nachfrage kommt von Hyperscalern, Unternehmen und Verbrauchern. [Quelle](https://www.fierce-network.com/cloud/indosat-ooredoo-hutchinson-bags-1b-contracted-neocloud-revenue)\n\n**Telkomsel - Partnerschaft mit China Telecom für 5G-, KI- und IoT-Lösungen** (Partnerschaft, Dringlichkeit 4/5)\nTelkomsel und China Telecom haben auf der MWC Shanghai eine Partnerschaft vereinbart. Gemeinsam wollen sie integrierte digitale Lösungen auf Basis von 5G, KI, IoT und ICT entwickeln. [Quelle](https://www.telkomsel.com/about-us/news/dari-mwc-shanghai-untuk-industri-indonesia-telkomsel-gandeng-china-telecom-jajaki)\n\n**Vodacom - KI-Talent-Pipeline mit Universität und AWS** (Partnerschaft, Dringlichkeit 4/5)\nVodacom startet eine Partnerschaft mit der University of Johannesburg und Amazon Web Services, um in Südafrika KI-Talente aufzubauen. Das Programm umfasst Ausbildung und Zertifizierung von Studierenden und Mitarbeitern. [Quelle](https://www.vodacom.com/news-article.php?articleID=16947)\n\n## Asien\n\nIn Asien zeichnet sich ein Trend zu strategischen Partnerschaften ab, die 5G, KI und Cloud-Dienste kombinieren, um neue Umsatzquellen zu erschließen. Telkomsel und Indosat Ooredoo Hutchison zeigen, wie etablierte Telekommunikationsanbieter durch Kooperationen mit Technologiepartnern und den Aufbau eigener Cloud-Plattformen das B2B-Geschäft transformieren.\n\n**Spark - Strategische Überprüfung der Digital Services** (Sonstiges, Dringlichkeit 3/5)\nSpark, der neuseeländische Telekommunikationsanbieter, hat eine strategische Überprüfung seiner Digital Services gestartet, die sich in einem fortgeschrittenen Stadium befindet. [Quelle](https://www.nzx.com/announcements/476684)\n\n## Muster der Woche\n\n- **Cloud-Plattformen als Umsatztreiber**: Indosat Ooredoo Hutchison zeigt mit über 1 Milliarde US-Dollar Vertragseinnahmen, dass Telekommunikationsanbieter durch den Aufbau eigener Cloud-Plattformen (Neocloud) massive Umsätze generieren können.\n- **KI-Kompetenzaufbau als strategisches Thema**: Sowohl Vodacom in Südafrika als auch Telkomsel in Indonesien investieren in KI-Partnerschaften und Talententwicklung, um sich für das B2B-Geschäft zu positionieren.",
  "regions": {
-  "Nordamerika": {
-   "region_summary": "In Nordamerika setzen T-Mobile US und Charter (Spectrum) ihre offensive Wachstumsstrategie fort: T-Mobile meldet starkes Kundenwachstum und neue Tarife, während Spectrum mit einem Premium-Mobilfunktarif und gezieltem Glasfaserausbau in ländlichen Gebieten punktet. Für Vodafone sind vor allem die aggressiven Bündel- und Premium-Angebote der US-Kabelnetzbetreiber sowie die Netzvorbereitung für Großevents von T-Mobile als Benchmark für eigene FMC- und Event-Kampagnen relevant.",
-   "highlights": [
-    {
-     "title": "Spectrum Mobile Introduces Unlimited Plus Premium With Built-In Savings and Exclusive Features",
-     "operator": "Charter Communications",
-     "url": "https://corporate.charter.com/newsroom/spectrum-mobile-introduces-unlimited-plus-premium",
-     "category": "Tarif/Pricing",
-     "relevance": 4,
-     "summary": "Charter bringt mit 'Unlimited Plus Premium' einen neuen Premium-Mobilfunktarif auf den Markt, der exklusive Features und integrierte Sparvorteile für Bestandskunden bietet.",
-     "why_it_matters": "Dies zeigt, wie Kabelnetzbetreiber ihre Mobilfunkangebote aufwerten, um Kunden im FMC-Bündel zu halten. Vodafone sollte prüfen, ob ein ähnliches 'Premium-Add-on' für Vodafone-One-Kunden in Deutschland oder anderen Märkten sinnvoll ist.",
-     "date": "2026-07-22",
-     "source": "Charter Communications"
-    },
-    {
-     "title": "T‑Mobile Delivers Continued Strong Account Growth, Translating into Industry-Leading Service Revenue Growth Driven by Widening Differentiation",
-     "operator": "T-Mobile US",
-     "source": "T-Mobile US",
-     "date": "2026-07-23",
-     "url": "https://www.t-mobile.com/news/business/t-mobile-q2-2026-earnings",
-     "category": "Finanzen",
-     "relevance": 3,
-     "summary": "T-Mobile US meldet für Q2 2026 starkes Konto-Wachstum und branchenführendes Service-Umsatzwachstum, getrieben durch zunehmende Differenzierung im Markt.",
-     "why_it_matters": "T-Mobile US beweist, dass sich Investitionen in Netzqualität und Kundenerlebnis auszahlen. Vodafone sollte die spezifischen Differenzierungsmerkmale (z.B. 5G-Abdeckung, Kundenbindungsprogramme) analysieren und auf die eigenen Kernmärkte übertragen."
-    },
-    {
-     "title": "Moving Off Campus in Atlanta, GA? Xfinity Has New Internet Deals Exclusively for University Students",
-     "operator": "Comcast",
-     "source": "Comcast",
-     "date": "2026-07-22",
-     "url": "https://corporate.comcast.com/stories/local/georgia/moving-off-campus-in-atlanta-ga-xfinity-has-new-internet-deals-exclusively-for-university-students",
-     "category": "Tarif/Pricing",
-     "relevance": 3,
-     "summary": "Comcast/Xfinity bietet in Atlanta exklusive Internet-Angebote für Studierende, die aus dem Campus-Wohnheim in eigene Wohnungen ziehen.",
-     "why_it_matters": "Eine gezielte studentische Zielgruppenansprache zum Semesterstart – Vodafone könnte ähnliche 'Auszugs'-Tarife für Studierende in Deutschland (z.B. in Unistädten) auflegen, um junge Kunden früh an FMC-Bündel zu binden."
-    },
-    {
-     "title": "How T‑Mobile Built a Network Ready for One of the Largest Live Events in U.S. History",
-     "operator": "T-Mobile US",
-     "source": "T-Mobile US",
-     "date": "2026-07-24",
-     "url": "https://www.t-mobile.com/news/network/t-mobile-built-a-network-ready-for-largest-live-events-in-u-s-history",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "T-Mobile US beschreibt, wie es sein Netz für eines der größten Live-Events der US-Geschichte (mutmaßlich FIFA WM 2026) vorbereitet hat – mit temporären Kapazitäten und mobiler Infrastruktur.",
-     "why_it_matters": "Vodafone kann von T-Mobiles Playbook für temporäre Netzkapazität bei Großevents lernen, insbesondere im Hinblick auf die anstehende FIFA WM 2026 in Deutschland oder andere Großveranstaltungen in Vodafone-Märkten."
-    },
-    {
-     "title": "Spectrum Expands Fiber Internet to Serve Even More People and Places in Coshocton County, Ohio",
-     "operator": "Charter Communications",
-     "source": "Charter Communications",
-     "date": "2026-07-22",
-     "url": "https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-coshocton-county-ohio",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Spectrum baut sein Glasfasernetz in Coshocton County, Ohio, aus und erschließt über 1.700 weitere Haushalte und Unternehmen.",
-     "why_it_matters": "Der kontinuierliche Glasfaserausbau in ländlichen Gebieten zeigt, dass Spectrum auf langfristige FMC-Penetration setzt. Vodafone sollte dies als Bestätigung für den eigenen Glasfaserausbau in ländlichen Regionen Deutschlands sehen und die Fördermöglichkeiten nutzen."
-    },
-    {
-     "title": "Spectrum Launches High-Speed Internet to More Than 2,000 Homes and Small Businesses in Osceola County, Florida",
-     "operator": "Charter Communications",
-     "source": "Charter Communications",
-     "date": "2026-07-21",
-     "url": "https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-osceola-county-florida",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Spectrum bringt Hochgeschwindigkeits-Internet zu über 2.000 Haushalten und kleinen Unternehmen in Osceola County, Florida, im Rahmen einer mehrjährigen ländlichen Bauinitiative.",
-     "why_it_matters": "Weiterer Beleg für den strategischen Fokus auf ländlichen Glasfaserausbau in den USA. Vodafone kann dies als Benchmark für eigene Breitband-Förderprojekte in ländlichen Gebieten nutzen."
-    },
-    {
-     "title": "Spectrum Expands Fiber Broadband Access in Missaukee County, Michigan",
-     "operator": "Charter Communications",
-     "source": "Charter Communications",
-     "date": "2026-07-21",
-     "url": "https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-missaukee-county-michigan",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Spectrum erweitert sein Glasfasernetz in Missaukee County, Michigan, um über 2.200 weitere Haushalte und Unternehmen.",
-     "why_it_matters": "Dritter Glasfaserausbau in einer Woche – Spectrum beschleunigt sein ländliches Ausbauprogramm. Vodafone sollte die Effizienz dieser Ausbauprojekte (Kosten pro Haushalt, Zeitplan) analysieren, um eigene Ausbaupläne zu optimieren."
-    }
-   ]
-  },
-  "Global": {
-   "region_summary": "Diese Woche zeigen sich in der globalen Telekombranche zwei Trends: Konsolidierung im Glasfasermarkt (Swyft Fiber kauft Teile von Fastwyre) und der zunehmende Druck durch Rechenzentren auf Energie- und Wasserressourcen, der regulatorische Eingriffe auslöst. Für Vodafone sind vor allem die Entwicklungen im Bereich KI-gestützter Netzautomatisierung (Cisco) und die strategische Partnerschaft im Wholesale-Verkehr (Globe/e&) von Bedeutung.",
-   "highlights": [
-    {
-     "title": "Swyft Fiber acquires portions of Fastwyre’s fiber network in three southern states",
-     "operator": "Swyft Fiber",
-     "url": "https://www.telecompetitor.com/swyft-fiber-acquires-portions-of-fastwyres-fiber-network-in-three-southern-states/",
-     "category": "M&A",
-     "relevance": 2,
-     "summary": "Swyft Fiber, ein US-amerikanischer Glasfaseranbieter, kauft Teile des Fastwyre-Glasfasernetzes in Louisiana, Texas und Alabama. Finanzielle Details wurden nicht genannt.",
-     "why_it_matters": "Die Konsolidierung im US-Glasfasermarkt zeigt, dass kleinere Anbieter durch Zukäufe wachsen. Vodafone sollte beobachten, ob ähnliche Konsolidierungswellen in Europa aufkommen, die eigene Kooperations- oder Zukaufsmöglichkeiten eröffnen.",
-     "date": "2026-07-28",
-     "source": "Telecompetitor"
-    },
-    {
-     "title": "The Agentic Network — Cisco on the platform path to agentic operations",
-     "operator": "Cisco",
-     "url": "https://www.rcrwireless.com/20260728/ai-infrastructure/cisco-platform-agentic-operations",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "Cisco skizziert eine Architektur für 'agentische Netzwerke', die KI direkt mit Netzwerkdaten verbindet und autonome Betriebsabläufe ermöglicht.",
-     "why_it_matters": "Cisco definiert den Standard für KI-gesteuerte Netzautomatisierung. Vodafone sollte prüfen, ob und wie die eigene Netzautomatisierungsstrategie (z.B. mit KI in der Netzsteuerung) an diese Plattform anknüpfen kann, um Betriebskosten zu senken und Servicequalität zu verbessern.",
-     "date": "2026-07-28",
-     "source": "RCR Wireless"
-    },
-    {
-     "title": "Globe and e& agree voice traffic management partnership",
-     "operator": "e&",
-     "source": "Developing Telecoms",
-     "date": "2026-07-28",
-     "url": "https://developingtelecoms.com/telecom-technology/oss-service-management/20599-globe-and-e-agree-voice-traffic-management-partnership.html",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "e& Carrier & Wholesale Services und der philippinische Betreiber Globe schließen eine strategische Partnerschaft zur Steuerung von Globes internationalem Sprachverkehr.",
-     "why_it_matters": "Diese Partnerschaft zeigt, wie große Wholesale-Anbieter ihre Position im internationalen Sprachverkehr ausbauen. Vodafone sollte prüfen, ob eigene Wholesale-Kapazitäten ähnlich genutzt werden können, um neue Umsatzquellen zu erschließen oder Kosten zu senken."
-    },
-    {
-     "title": "Concern grows about data centre pressure on power and water",
-     "operator": "",
-     "source": "Developing Telecoms",
-     "date": "2026-07-28",
-     "url": "https://developingtelecoms.com/telecom-technology/data-centres-networks/20598-concern-grows-about-data-centre-pressure-on-power-and-water.html",
-     "category": "Regulierung",
-     "relevance": 3,
-     "summary": "Israel stoppt für 140 Tage die Netzanschlüsse neuer Rechenzentren wegen Überlastung der Strom- und Wasserressourcen. Die Diskussion über ähnliche Maßnahmen in anderen Ländern nimmt zu.",
-     "why_it_matters": "Regulatorische Einschränkungen für Rechenzentren könnten auch in Europa kommen und Vodafones eigene Rechenzentrums- und Edge-Strategie beeinflussen. Vodafone sollte frühzeitig in Energieeffizienz und nachhaltige Kühlung investieren, um sich gegen mögliche Auflagen zu wappnen."
-    }
-   ]
-  },
   "Afrika & Naher Osten": {
-   "region_summary": "Diese Woche dominieren Netztechnologie-Nachrichten aus dem Nahen Osten: e& und Zain schalten 5.5G bzw. 5G+ für Endkunden frei, während stc mit Nokia und MediaTek 5G Carrier Aggregation testet. Für Vodafone in Afrika und Europa sind dies Signale, dass die Konkurrenz bei Netzqualität und Geschwindigkeit aufrüstet – ein potenzieller Differenzierungsfaktor, den Vodafone im Auge behalten sollte.",
+   "region_summary": "Diese Woche dominieren Finanz- und Personalmitteilungen von Airtel Africa, die für Vodafone keine strategische Relevanz haben. Einziger Lichtblick: Vodacom baut mit der University of Johannesburg und AWS eine KI-Talent-Pipeline in Südafrika auf – ein Signal, dass Vodafone-Konzerntöchter in Afrika aktiv in KI-Kompetenz investieren.",
    "highlights": [
     {
-     "title": "e& UAE activates the highest 5.5G modulation",
-     "operator": "e&",
-     "url": "https://www.eand.com/en/news/24-07-26-eand-uae-highest-5-5g-modulation.html",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "e& hat in den VAE die höchste 5.5G-Modulation aktiviert – ein Netz-Upgrade, das höhere Datenraten und niedrigere Latenzen verspricht.",
-     "why_it_matters": "Zeigt, dass e& bei 5G-Advanced vorprescht. Vodafone sollte prüfen, ob eigene 5.5G-Pläne in Europa oder Afrika beschleunigt werden müssen, um nicht als technologisch rückständig wahrgenommen zu werden.",
-     "date": "2026-07-24",
-     "source": "e&"
-    },
-    {
-     "title": "Zain KSA Launched Saudi Arabia’s First 5G advanced “5G+” Commercial Rollout for Consumers",
-     "operator": "Zain",
-     "url": "https://www.zain.com/en/press-release/zainksa_5gadvanced",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "Zain hat in Saudi-Arabien den ersten kommerziellen 5G-Advanced-Dienst („5G+“) für Privatkunden gestartet.",
-     "why_it_matters": "Erstes kommerzielles 5G+ für Endkunden in der Region – setzt neuen Standard. Vodafone sollte beobachten, ob Zain damit Premium-Tarife durchsetzt und ob eine ähnliche Positionierung in Vodafone-Märkten (z.B. Ägypten) sinnvoll ist.",
-     "date": "2026-07-23",
-     "source": "Zain"
-    },
-    {
-     "title": "ZainTECH and Nile partner to deliver transformational Network-as-a-Service (NaaS) solutions for the AI-era",
-     "operator": "Zain",
-     "url": "https://www.zain.com/en/press-release/zaintech_nile",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "ZainTECH (Zains B2B-Einheit) kooperiert mit Nile, um Network-as-a-Service (NaaS)-Lösungen für Unternehmen im KI-Zeitalter anzubieten.",
-     "why_it_matters": "NaaS ist ein wachsender B2B-Trend. Vodafone sollte prüfen, ob eigene NaaS-Angebote (z.B. über Vodafone Business) erweitert werden müssen, um nicht gegenüber Zain in der Region an Boden zu verlieren.",
-     "date": "2026-07-22",
-     "source": "Zain"
-    },
-    {
-     "title": "stc, Nokia and MediaTek first to switch on 5G 4 Component Carrier Aggregation (4CC-CA) in the Middle East and Africa",
-     "operator": "stc",
-     "url": "https://www.stc.com/en/media-center/press-release/press-release-detail.html?id=stc-nokia-mediatek",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "stc hat mit Nokia und MediaTek als erster Betreiber im Nahen Osten und Afrika 5G mit 4-facher Carrier Aggregation (4CC-CA) aktiviert.",
-     "why_it_matters": "Technologieführerschaft bei 5G-Geschwindigkeit. Vodafone sollte testen, ob 4CC-CA auch in eigenen Netzen (z.B. in Deutschland oder Südafrika) einen Wettbewerbsvorteil bringen könnte.",
-     "date": null,
-     "source": "stc"
-    },
-    {
-     "title": "stc group and Alibaba establish Ali Baba Cloud for cloud computing in Saudi Arabia",
-     "operator": "stc",
-     "url": "https://www.stc.com/en/media-center/press-release/press-release-detail.html?id=stc-group-and-alibaba-establish-ali-baba-cloud",
+     "title": "Vodacom, the University of Johannesburg and AWS collaborate to grow South Africa's AI talent pipeline",
+     "operator": "Vodacom",
+     "url": "https://www.vodacom.com/news-article.php?articleID=16947",
      "category": "Partnerschaft",
      "relevance": 4,
-     "summary": "stc und Alibaba Cloud gründen ein Joint Venture für Cloud-Computing in Saudi-Arabien und haben sechs Absichtserklärungen mit internationalen Firmen unterzeichnet.",
-     "why_it_matters": "Stärkt stcs Position im B2B-Cloud-Markt massiv. Vodafone sollte prüfen, ob eigene Cloud-Partnerschaften (z.B. mit AWS, Azure) in Afrika ausgebaut werden müssen, um nicht von stc überholt zu werden.",
+     "summary": "Vodacom startet eine Partnerschaft mit der University of Johannesburg und Amazon Web Services, um in Südafrika KI-Talente aufzubauen – ein Programm zur Ausbildung und Zertifizierung von Studierenden und Mitarbeitern.",
+     "why_it_matters": "Vodafone kann dieses Modell auf andere afrikanische Märkte (z.B. Vodafone Ghana, Safaricom) übertragen, um frühzeitig lokale KI-Expertise aufzubauen und sich als attraktiver Arbeitgeber für Tech-Talente zu positionieren.",
      "date": null,
-     "source": "stc"
-    },
-    {
-     "title": "stc reveals a Whitepaper in collaboration with GCC Open RAN Consortium",
-     "operator": "stc",
-     "url": "https://www.stc.com/en/media-center/press-release/press-release-detail.html?id=stc-reveals-whitepaper-collaboration-gcc",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "stc hat ein Whitepaper zum Thema Open RAN in Zusammenarbeit mit dem GCC Open RAN Consortium veröffentlicht.",
-     "why_it_matters": "Open RAN bleibt ein strategisches Thema für Kosteneffizienz. Vodafone sollte die Entwicklungen im GCC-Raum beobachten, da Open RAN langfristig auch in afrikanischen Märkten relevant werden könnte.",
-     "date": null,
-     "source": "stc"
-    }
-   ]
-  },
-  "Asien": {
-   "region_summary": "",
-   "highlights": []
-  },
-  "Lateinamerika": {
-   "region_summary": "Diese Woche in Lateinamerika dominieren Krisenkommunikation und B2B-Initiativen von Entel in Chile. Der Fokus liegt auf der Unterstützung von Unwetteropfern durch kostenfreie Dienste und auf der Roadshow für Geschäftskunden zu digitalen Zukunftsthemen.",
-   "highlights": [
-    {
-     "title": "Entel extiende la liberación de servicios para apoyar a los afectados por el temporal en diversas comunas",
-     "operator": "Entel",
-     "url": "https://informacioncorporativa.entel.cl/comunicados-de-prensa/entel-extiende-la-liberacion-de-servicios-para-apoyar-a-los-afectados-por-el-temporal-en-diversas-comunas",
-     "category": "Kampagne",
-     "relevance": 3,
-     "summary": "Entel verlängert die kostenfreie Freischaltung von Diensten (z.B. Daten, Anrufe) für von Unwettern betroffene Gemeinden in Chile.",
-     "why_it_matters": "Zeigt, wie ein Operator in Krisenzeiten Kundenbindung und soziale Verantwortung umsetzt. Vodafone kann prüfen, ob eigene Krisenprotokolle für Naturkatastrophen in Europa ähnlich schnell und sichtbar kommuniziert werden.",
-     "date": "2026-07-25",
-     "source": "Entel"
-    },
-    {
-     "title": "Gira Entel Empresas da inicio a su recorrido 2026 con foco en los desafíos futuros de los negocios",
-     "operator": "Entel",
-     "source": "Entel",
-     "date": "2026-07-24",
-     "url": "https://informacioncorporativa.entel.cl/comunicados-de-prensa/gira-entel-empresas-da-inicio-a-su-recorrido-2026-con-foco-en-los-desafios-futuros-de-los-negocios",
-     "snippet": ""
-    },
-    {
-     "title": "¿Dudas sobre cómo activar el Roaming de emergencia o el SMS satelital? Entel entrega recomendaciones de conectividad",
-     "operator": "Entel",
-     "source": "Entel",
-     "date": "2026-07-21",
-     "url": "https://informacioncorporativa.entel.cl/comunicados-de-prensa/dudas-sobre-como-activar-el-roaming-de-emergencia-o-el-sms-satelital-entel-entrega-recomendaciones-de-conectividad",
-     "snippet": ""
+     "source": "Vodacom"
     }
    ]
   },
   "Ozeanien": {
-   "region_summary": "In Ozeanien treibt Telstra die satellitengestützte Mobilfunkvernetzung voran und erweitert die Dienste von SMS auf Daten-Apps. Gleichzeitig reagiert der Konzern auf Netzausfälle und regulatorische Anfragen, was auf einen zunehmenden Fokus auf Netzresilienz und Abdeckung hindeutet.",
+   "region_summary": "In Ozeanien steht Spark, der neuseeländische Telekommunikationsanbieter, im Fokus: Das Unternehmen treibt eine strategische Überprüfung seiner Digital Services voran und besetzt die Position des Chief Operating Officer neu. Diese Entwicklungen deuten auf eine strategische Neuausrichtung hin, die für Vodafone als Benchmark für eigene Digitalisierungsstrategien interessant sein könnte.",
    "highlights": [
     {
-     "title": "A first for Australia: satellite to mobile connectivity expands from text to apps",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/satellite-to-mobile-lite-data-",
-     "category": "Netz/Technologie",
-     "relevance": 5,
-     "summary": "Telstra erweitert seinen Satelliten-zu-Mobilfunk-Dienst von reinen SMS auf leichte Datenanwendungen (Apps). Dies ist ein erster Schritt in Australien, der die Konnektivität in ländlichen Gebieten verbessert.",
-     "why_it_matters": "Vodafone sollte diese Entwicklung genau beobachten, da sie einen neuen Standard für ländliche Abdeckung setzt. Vodafone könnte prüfen, ob eine Partnerschaft mit einem Satellitenanbieter (z.B. Starlink) für ein ähnliches Angebot in Europa oder Afrika sinnvoll ist.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "Australia’s first satellite to mobile text messaging product for mobile customers",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/telstra-launch-satellite-messaging",
-     "category": "Produktlaunch",
-     "relevance": 4,
-     "summary": "Telstra hat das erste Satelliten-SMS-Produkt für Mobilfunkkunden in Australien gestartet, das Textnachrichten auch ohne Mobilfunknetz ermöglicht.",
-     "why_it_matters": "Dies ist ein konkretes Produkt, das Vodafone als Vorlage für ein eigenes Angebot in abgelegenen Regionen dienen könnte. Vodafone sollte die technische Umsetzung und die Kundenakzeptanz analysieren.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "Network Our mobile network outage has been resolved: Here’s what happened",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/some-mobile-calls-and-data-services-are-affected-today--here-s-w",
-     "category": "Netz/Technologie",
+     "title": "SPK-30 advanced with strategic review of Digital Services",
+     "operator": "Spark",
+     "url": "https://www.nzx.com/announcements/476684",
+     "category": "Sonstiges",
      "relevance": 3,
-     "summary": "Telstra berichtet über einen kürzlichen Netzausfall, der mobile Anrufe und Datendienste beeinträchtigte, und erläutert die Ursachen und die Behebung.",
-     "why_it_matters": "Netzausfälle sind ein Risiko für alle Betreiber. Vodafone kann aus Telstras Kommunikationsstrategie lernen, um bei eigenen Störungen transparent und kundenorientiert zu reagieren.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "NETWORK Triple Zero Senate Inquiry: Opening statement from Vicki Brady",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/triple-zero-senate-inquiry--opening-statement-from-vicki-brady",
-     "category": "Regulierung",
-     "relevance": 3,
-     "summary": "Telstra-CEO Vicki Brady gibt eine Eröffnungsaussage vor einem Senatsausschuss zu Notruf-Diensten (Triple Zero) ab, was auf regulatorische Prüfung der Netzverfügbarkeit hindeutet.",
-     "why_it_matters": "Regulatorische Entwicklungen in Australien könnten auf Europa übergreifen. Vodafone sollte die Diskussion um Notruf-Zuverlässigkeit verfolgen, um auf ähnliche Anforderungen vorbereitet zu sein.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "MOBILE NETWORKS Explaining the new changes to our mobile coverage maps",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/australia-s-mobile-coverage-maps-are-changing--what-the-new-nati",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Telstra aktualisiert seine Mobilfunkabdeckungskarten, um genauere und national standardisierte Daten zur Netzverfügbarkeit zu liefern.",
-     "why_it_matters": "Transparenz bei der Netzabdeckung wird für Kunden immer wichtiger. Vodafone könnte prüfen, ob die eigenen Karten ähnlich detailliert und aktuell sind.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "A look into the future of monitoring mobile networks with quantum reservoirs",
-     "operator": "Telstra",
-     "url": "https://www.telstra.com.au/exchange/sqc-quantum-reservoir-trial",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Telstra testet den Einsatz von Quanten-Reservoir-Computing zur Überwachung und Optimierung von Mobilfunknetzen.",
-     "why_it_matters": "Dies ist eine langfristige Technologie-Innovation. Vodafone sollte die Ergebnisse des Trials beobachten, um frühzeitig Potenziale für das eigene Netzwerkmanagement zu erkennen.",
-     "date": null,
-     "source": "Telstra"
-    },
-    {
-     "title": "How to report a scam to us on 7226",
-     "operator": "Telstra",
-     "source": "Telstra",
-     "date": null,
-     "url": "https://www.telstra.com.au/exchange/keep-snitching-on-scammers--how-our-new-7226-reporting-number-is",
-     "category": "Kampagne",
-     "relevance": 2,
-     "summary": "Telstra führt eine neue Kurzwahl (7226) ein, über die Kunden Betrugsversuche melden können, und startet eine begleitende Aufklärungskampagne.",
-     "why_it_matters": "Betrugsbekämpfung ist ein wichtiges Kundenthema. Vodafone könnte ein ähnliches Meldesystem prüfen, um das Vertrauen der Kunden zu stärken."
-    },
-    {
-     "title": "How we're raising the alarm on potentially suspicious phone calls",
-     "operator": "Telstra",
-     "source": "Telstra",
-     "date": null,
-     "url": "https://www.telstra.com.au/exchange/suspicious-phone-calls--what-telstra-is-doing-to-raise-the-alarm",
-     "category": "Kampagne",
-     "relevance": 2,
-     "summary": "Telstra informiert über Maßnahmen zur Erkennung und Warnung vor verdächtigen Anrufen, um Kunden vor Betrug zu schützen.",
-     "why_it_matters": "Vodafone kann diese Maßnahmen als Benchmark für eigene Sicherheitsdienste nutzen und prüfen, ob ähnliche Warnsysteme in den Märkten eingeführt werden sollten."
-    },
-    {
-     "title": "Call spoofing: why you keep getting weird calls from random numbers",
-     "operator": "Telstra",
-     "source": "Telstra",
-     "date": null,
-     "url": "https://www.telstra.com.au/exchange/fake-calls-what-is-call-spoofing",
-     "category": "Kampagne",
-     "relevance": 2,
-     "summary": "Telstra klärt über Call-Spoofing auf und gibt Tipps, wie Kunden sich schützen können.",
-     "why_it_matters": "Aufklärungskampagnen sind kostengünstig und stärken die Kundenbindung. Vodafone könnte ähnliche Inhalte für die eigenen Märkte adaptieren."
-    },
-    {
-     "title": "Why don't I get 4G or 5G coverage after 3G was switched off?",
-     "operator": "Telstra",
-     "source": "Telstra",
-     "date": null,
-     "url": "https://www.telstra.com.au/exchange/3g-network-closure--why-don-t-i-get-4g-or-5g-coverage-",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Telstra erklärt Kunden, warum nach der 3G-Abschaltung in manchen Gebieten keine 4G/5G-Abdeckung besteht, und verweist auf notwendige Geräte-Upgrades.",
-     "why_it_matters": "Die 3G-Abschaltung steht auch in Europa an. Vodafone kann aus Telstras Kommunikation lernen, um Kundenfragen proaktiv zu beantworten und Upgrade-Prozesse zu optimieren."
-    },
-    {
-     "title": "Telstra Blue Tick: how we test for regional Australia",
-     "operator": "Telstra",
-     "source": "Telstra",
-     "date": null,
-     "url": "https://www.telstra.com.au/exchange/telstra-blue-tick--how-we-test-for-regional-australia",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Telstra erläutert seinen 'Blue Tick'-Testprozess, der die Netzqualität in ländlichen Gebieten zertifiziert.",
-     "why_it_matters": "Ein Qualitätssiegel für ländliche Abdeckung könnte auch für Vodafone in Europa ein Differenzierungsmerkmal sein. Vodafone sollte prüfen, ob ein ähnliches Label für den eigenen Markt sinnvoll ist."
+     "summary": "Spark hat eine strategische Überprüfung seiner Digital Services gestartet, die sich in einem fortgeschrittenen Stadium befindet.",
+     "why_it_matters": "Vodafone sollte die Ergebnisse dieser Überprüfung beobachten, da sie Aufschluss über erfolgreiche Digitalisierungsstrategien geben könnte, die Vodafone für sein eigenes B2B- oder Consumer-Digitalgeschäft adaptieren kann.",
+     "date": "2026-07-27",
+     "source": "Spark"
     }
    ]
   },
-  "Europa": {
-   "region_summary": "In Europa dominieren diese Woche strategische Partnerschaften und B2B-Cloud/AI-Verträge der Deutschen Telekom, während Liberty Global mit Partnern den Glasfaserausbau in Flandern beschleunigt. Für Vodafone sind vor allem die Glasfaser-Kooperation in Belgien und die AI-/Cloud-Großaufträge der Telekom relevante Signale, die zeigen, wo der Wettbewerb investiert.",
+  "Asien": {
+   "region_summary": "In Asien zeichnet sich ein Trend zu strategischen Partnerschaften ab, die 5G, KI und Cloud-Dienste kombinieren, um neue Umsatzquellen zu erschließen. Telkomsel und Indosat Ooredoo Hutchison zeigen, wie etablierte Telekommunikationsanbieter durch Kooperationen mit Technologiepartnern und den Aufbau eigener Cloud-Plattformen das B2B-Geschäft transformieren.",
    "highlights": [
     {
-     "title": "Wyre, Telenet, Proximus and Fiberklaar join forces to expand and accelerate the roll-out of fibre networks in Flanders",
-     "operator": "Liberty Global",
-     "url": "https://www.libertyglobal.com/wyre-telenet-proximus-and-fiberklaar-join-forces-to-expand-and-accelerate-the-roll-out-of-fibre-networks-in-flanders/",
-     "category": "Netz/Technologie",
+     "title": "Dari MWC Shanghai untuk Industri Indonesia, Telkomsel Gandeng China Telecom Jajaki Solusi Digital Terintegrasi Berbasis 5G, AI, IoT, dan ICT 28 Jul 2026",
+     "operator": "Telkomsel",
+     "url": "https://www.telkomsel.com/about-us/news/dari-mwc-shanghai-untuk-industri-indonesia-telkomsel-gandeng-china-telecom-jajaki",
+     "category": "Partnerschaft",
+     "relevance": 4,
+     "summary": "Telkomsel und China Telecom haben auf der MWC Shanghai eine Partnerschaft vereinbart, um gemeinsam integrierte digitale Lösungen auf Basis von 5G, KI, IoT und ICT zu entwickeln.",
+     "why_it_matters": "Vodafone sollte diese Partnerschaft als Blaupause für eigene Kooperationen mit chinesischen Technologiepartnern nutzen, insbesondere um in Europa oder Afrika skalierbare B2B-Lösungen für Industrie 4.0 und Smart Cities anzubieten. Die Kombination von 5G und KI ist ein wachsender Markt, den Vodafone nicht den asiatischen Playern überlassen sollte.",
+     "date": "2026-07-28",
+     "source": "Telkomsel"
+    },
+    {
+     "title": "Indosat Ooredoo Hutchison bags $1B+ in contracted neocloud revenue",
+     "operator": "Indosat Ooredoo Hutchison",
+     "url": "https://www.fierce-network.com/cloud/indosat-ooredoo-hutchinson-bags-1b-contracted-neocloud-revenue",
+     "category": "Finanzen",
      "relevance": 5,
-     "summary": "Liberty Global (Wyre), Telenet, Proximus und Fiberklaar bündeln ihre Kräfte, um den Glasfaserausbau in Flandern zu beschleunigen und auszuweiten.",
-     "why_it_matters": "Diese Kooperation schafft einen starken Glasfaser-Wettbewerber in Belgien, der Vodafone in seinem Festnetzmarkt unter Druck setzt. Vodafone sollte prüfen, ob ähnliche Konsortien in anderen europäischen Märkten sinnvoll sind, um eigene Glasfaser-Investitionen zu hebeln.",
-     "date": "2026-07-23",
-     "source": "Liberty Global"
-    },
-    {
-     "title": "T-Systems brings AI into the supply chain",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/t-systems-brings-ai-into-the-supply-chain-1105624",
-     "category": "Produktlaunch",
-     "relevance": 4,
-     "summary": "T-Systems launcht ein KI-Angebot für Lieferketten, das Logistik und Bestandsmanagement optimiert.",
-     "why_it_matters": "Vodafone sollte dieses B2B-KI-Produkt genau beobachten und prüfen, ob es eine Lücke im eigenen Portfolio gibt. Ein eigenes KI-gestütztes Supply-Chain-Angebot könnte für Vodafone Business-Kunden attraktiv sein.",
+     "summary": "Indosat Ooredoo Hutchison hat über 1 Milliarde US-Dollar an vertraglichen Einnahmen aus seinem Neocloud-Geschäft erzielt, angetrieben durch Nachfrage von Hyperscalern, Unternehmen und Verbrauchern.",
+     "why_it_matters": "Dies zeigt, dass Telekommunikationsanbieter durch den Aufbau eigener Cloud-Plattformen (Neocloud) massive Umsätze generieren können. Vodafone sollte prüfen, ob es ähnliche Cloud-Kapazitäten in seinen Kernmärkten aufbauen oder Partnerschaften mit Hyperscalern eingehen kann, um nicht den Anschluss an dieses profitable B2B-Segment zu verlieren.",
      "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "Volkswagen Group relying on T Cloud",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/major-contract-volkswagen-group-relying-on-t-cloud-1105586",
-     "category": "Partnerschaft",
-     "relevance": 5,
-     "summary": "Die Volkswagen Group setzt auf die T Cloud von T-Systems als Cloud-Infrastruktur – ein bedeutender Großkundenvertrag.",
-     "why_it_matters": "Dieser Prestigevertrag zeigt, dass die Telekom im B2B-Cloud-Markt Großkunden gewinnt. Vodafone muss seine eigene Cloud-Strategie (z.B. über Partnerschaften mit Hyperscalern) schärfen, um nicht bei großen Industriekunden ins Hintertreffen zu geraten.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "n8n and Deutsche Telekom – the fast track to AI agents",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/n8n-and-deutsche-telekom-the-fast-track-to-ai-agents-1105534",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Deutsche Telekom kooperiert mit n8n, um Unternehmen den schnellen Einsatz von KI-Agenten zu ermöglichen.",
-     "why_it_matters": "Vodafone sollte diese Partnerschaft als Signal für einen wachsenden Markt für KI-Agenten-Plattformen werten. Eine eigene Partnerschaft mit einem Low-Code-Automation-Tool könnte Vodafone B2B-Kunden einen ähnlichen Mehrwert bieten.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "Telekom to Build Sovereign AI Platform for the German Federal Government",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/telekom-to-build-sovereign-ai-platform-for-the-german-federal-government-1105278",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Die Telekom erhält den Auftrag, eine souveräne KI-Plattform für die deutsche Bundesregierung aufzubauen.",
-     "why_it_matters": "Dieser Auftrag stärkt die Position der Telekom im öffentlichen Sektor. Vodafone sollte prüfen, ob es ähnliche souveräne Cloud- und KI-Angebote für Behörden in seinen Kernmärkten entwickeln kann, um nicht von diesem Wachstumssegment ausgeschlossen zu werden.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "Telekom brings sovereign cloud infrastructure to German public administration.",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/telekom-brings-sovereign-cloud-infrastructure-to-german-public-administration-1105064",
-     "category": "Produktlaunch",
-     "relevance": 4,
-     "summary": "Die Telekom bringt eine souveräne Cloud-Infrastruktur für die deutsche öffentliche Verwaltung auf den Markt.",
-     "why_it_matters": "Vodafone sollte dieses Angebot als Benchmark für eigene Sovereign-Cloud-Lösungen nutzen. Der öffentliche Sektor ist ein strategisch wichtiger Kundenkreis, den Vodafone mit einem ähnlichen Produkt adressieren könnte.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "Rheinmetall and Telekom Plan to Develop a Drone Defense Shield",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/rheinmetall-and-telekom-plan-to-develop-a-drone-defense-shield-1104888",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "Rheinmetall und Telekom planen die Entwicklung eines Drohnen-Abwehrschilds, der kritische Infrastruktur schützen soll.",
-     "why_it_matters": "Dies zeigt, dass Telekom in sicherheitskritische B2B-Lösungen investiert. Vodafone sollte beobachten, ob sich daraus ein neues Marktsegment für Netzwerksicherheit entwickelt, und eigene Angebote für kritische Infrastrukturen prüfen.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "T-Systems brings Ford’s suppliers in Catena-X",
-     "operator": "Deutsche Telekom",
-     "url": "https://www.telekom.com/en/media/media-information/archive/t-systems-brings-ford-s-suppliers-in-catena-x-1104712",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "T-Systems integriert Ford-Zulieferer in das Automobil-Datenaustauschnetzwerk Catena-X.",
-     "why_it_matters": "Vodafone sollte Catena-X als Plattform für eigene B2B-Datendienste in der Automobilindustrie prüfen. Eine Beteiligung könnte Vodafone Zugang zu einem wichtigen Industrie-Ökosystem verschaffen.",
-     "date": null,
-     "source": "Deutsche Telekom"
-    },
-    {
-     "title": "23 Temmuz 2026 Basın Bültenleri Faturasız müşterilere kazandıran yeni dünya: Turkcell Yıldız Müşterilerinin talep ve beklentilerine yönelik yenilikçi çözümler geliştirmeyi sürdüren Turkcell, faturasız müşterileri için Turkcell Yıldız programını HABERİ OKU",
-     "operator": "Turkcell",
-     "url": "https://medya.turkcell.com.tr/bulletins/faturasiz-musterilere-kazandiran-yeni-dunya-turkcell-yildiz/",
-     "category": "Kampagne",
-     "relevance": 2,
-     "summary": "Turkcell launcht das 'Turkcell Yıldız'-Programm für Prepaid-Kunden, das diesen Vorteile und Prämien bietet.",
-     "why_it_matters": "Turkcell führt ein neues Treueprogramm für Prepaid-Kunden ein. Vodafone in der Türkei sollte dies beobachten und gegebenenfalls eigene Prepaid-Benefits anpassen, um Kundenbindung zu sichern.",
-     "date": null,
-     "source": "Turkcell"
+     "source": "Fierce Network"
     }
    ]
   }
@@ -491,49 +82,49 @@
      "title": "T-Mobile service 'fully restored' after outage impacts thousands",
      "url": "https://www.lightreading.com/5g/t-mobile-service-fully-restored-after-outage-impacts-thousands",
      "category": "Netz/Technologie",
-     "note": "Großflächiger Ausfall bei T-Mobile US mit über 60.000 betroffenen Nutzern – zeigt Verwundbarkeit des US-Netzes und könnte Kunden zu Vodafone US-Partnern treiben."
+     "note": "Großflächiger Ausfall bei T-Mobile USA mit über 60.000 betroffenen Nutzern – zeigt Verwundbarkeit des US-Netzes und könnte Kundenvertrauen schwächen."
     },
     {
      "title": "T-Mobile looks to new JV for D2D but still tied to Starlink",
      "url": "https://www.lightreading.com/satellite/t-mobile-looks-to-new-jv-for-d2d-but-still-tied-to-starlink",
      "category": "Partnerschaft",
-     "note": "T-Mobile treibt Direct-to-Device-Joint-Venture mit AT&T und Verizon voran, bleibt aber exklusiv an Starlink gebunden – Vodafone sollte eigene D2D-Partnerschaften prüfen."
+     "note": "T-Mobile treibt D2D-Joint-Venture mit AT&T und Verizon voran, bleibt aber exklusiv an Starlink gebunden – strategische Weichenstellung für Satelliten-Konnektivität."
     },
     {
      "title": "Deutsche Telekom deploys ChatGPT Enterprise for AI-native ops",
      "url": "https://www.telecomstechnews.com/news/deutsche-telekom-deploys-chatgpt-enterprise-for-ai-native-ops/",
      "category": "Netz/Technologie",
-     "note": "Einführung von ChatGPT Enterprise für KI-native Netz- und Kundenbetriebsprozesse – DT setzt neuen Standard für operative Effizienz, dem Vodafone folgen muss."
+     "note": "Einführung von ChatGPT Enterprise für KI-native Betriebsabläufe in Kundenservice und Kernnetz – beschleunigt Automatisierung und Effizienzgewinne."
     },
     {
      "title": "Fiber-to-the-home (FTTH)/fiber optics: o2 Telefónica and Deutsche Telekom intensify their cooperation on fiber optic connections",
      "url": "https://www.telefonica.de/fixed/news/10420/fiber-to-the-home-ftthfiber-optics-o2-telefonica-and-deutsche-telekom-intensify-their-cooperation-on-fiber-optic-connections.html",
      "category": "Partnerschaft",
-     "note": "Neues Einkaufsmodell für Glasfaser-Vermarktung zwischen DT und o2 – stärkt DTs Position im deutschen Festnetz und erhöht Druck auf Vodafones Glasfaserstrategie."
+     "note": "Neues Einkaufsmodell für Glasfaser-Vermarktung mit o2 Telefónica – stärkt die Marktposition im deutschen Festnetz und schafft Druck auf Vodafone."
     },
     {
      "title": "Telekom to Build Sovereign AI Platform for the German Federal Government",
      "url": "https://www.telekom.com/en/media/media-information/archive/telekom-to-build-sovereign-ai-platform-for-the-german-federal-government-1105278",
      "category": "Produktlaunch",
-     "note": "DT baut souveräne KI-Plattform für die Bundesregierung – stärkt DTs Position im Public-Sector-Geschäft, wo Vodafone kaum präsent ist."
+     "note": "Aufbau einer souveränen KI-Plattform für die Bundesregierung – positioniert Telekom als vertrauenswürdigen Digitalpartner im öffentlichen Sektor."
     },
     {
      "title": "Rheinmetall and Telekom Plan to Develop a Drone Defense Shield",
      "url": "https://www.telekom.com/en/media/media-information/archive/rheinmetall-and-telekom-plan-to-develop-a-drone-defense-shield-1104888",
      "category": "Partnerschaft",
-     "note": "Gemeinsame Entwicklung eines Drohnenabwehrschilds mit Rheinmetall – DT erschließt neues Sicherheitsgeschäft, Vodafone sollte Verteidigungsmarkt evaluieren."
+     "note": "Allianz mit Rheinmetall zur Drohnenabwehr – erschließt neues Geschäftsfeld in der Sicherheits- und Verteidigungstechnik."
     }
    ],
-   "summary": "Deutsche Telekom treibt aktuell massiv den Einsatz von KI in Netz- und Kundenbetrieb voran, unter anderem durch die Einführung von ChatGPT Enterprise und den Aufbau einer souveränen KI-Plattform für die Bundesregierung. Parallel dazu intensiviert der Konzern die Zusammenarbeit mit o2 Telefónica im Glasfaserausbau und baut mit Rheinmetall eine Drohnenabwehr auf. In den USA kämpft T-Mobile mit einem großflächigen Netzausfall und treibt ein Direct-to-Device-Joint-Venture mit AT&T und Verizon voran. Für Vodafone bedeutet dies wachsenden Wettbewerbsdruck im deutschen Festnetz und bei KI-gestützten Diensten.",
+   "summary": "Deutsche Telekom treibt die KI-Transformation massiv voran: Mit ChatGPT Enterprise baut der Konzern KI-native Betriebsabläufe in Kundenservice und Kernnetz auf, während T-Systems KI in Lieferketten und eine souveräne KI-Plattform für die Bundesregierung bringt. Parallel intensiviert die Telekom die Glasfaser-Kooperation mit o2 Telefónica, startet eine Drohnenabwehr-Allianz mit Rheinmetall und führt in Shops die „Magenta Silent Hour“ ein. In den USA erholt sich T-Mobile von einem großflächigen Ausfall (60.000+ betroffene Nutzer) und treibt eine D2D-Joint-Venture mit AT&T und Verizon voran, bleibt aber exklusiv an Starlink gebunden.",
    "themes": [
     "KI-Transformation",
     "Glasfaser-Kooperation",
-    "Netzstörungen",
-    "Direct-to-Device",
     "Souveräne Cloud/Plattform",
-    "Sicherheit/Verteidigung"
+    "Drohnenabwehr",
+    "US-Netzstörung",
+    "D2D-Partnerschaft"
    ],
-   "vodafone_implication": "Vodafone muss die KI-Offensive der Telekom genau beobachten und eigene KI-Investitionen in Netz- und Kundenbetrieb beschleunigen, um nicht den Anschluss zu verlieren. Die Glasfaser-Kooperation zwischen DT und o2 erfordert eine Überprüfung der eigenen Festnetz-Partnerschaften und Ausbaupläne in Deutschland. Zudem sollte Vodafone die D2D-Entwicklung in den USA verfolgen und gegebenenfalls eigene Satelliten-Partnerschaften anstreben."
+   "vodafone_implication": "Vodafone muss die beschleunigte KI-Transformation der Telekom genau beobachten, da ChatGPT Enterprise zu deutlichen Effizienzvorteilen in Netz und Kundenservice führen kann. Die verstärkte Glasfaser-Kooperation mit o2 Telefónica erhöht den Wettbewerbsdruck im deutschen Festnetz – Vodafone sollte seine eigenen Glasfaser-Partnerschaften und das Vectoring-Angebot schärfen. Zudem signalisiert die Drohnenabwehr-Allianz mit Rheinmetall, dass Telekom neue B2B-Märkte jenseits der klassischen Telko-Dienste erschließt, was Vodafone zu einer strategischen Prüfung eigener Sicherheits- und Government-Lösungen veranlassen sollte."
   },
   {
    "name": "Telefónica / O2",
@@ -543,61 +134,61 @@
      "title": "Giffgaff Grows to 4.26 Million UK Mobile Customers as 671 Take Broadband",
      "url": "https://www.ispreview.co.uk/index.php/2026/07/giffgaff-grows-to-4-26-million-uk-mobile-customers-as-671-take-broadband.html",
      "category": "Kampagne",
-     "note": "giffgaff wächst auf 4,26 Mio. Mobilfunkkunden – zeigt, dass O2s MVNO-Strategie im UK weiterhin Marktanteile gewinnt."
+     "note": "Die VMO2-Tochter giffgaff wächst auf 4,26 Mio. Mobilfunkkunden – ein Zeichen für erfolgreiche Low-Cost-Strategie im UK-Markt."
     },
     {
      "title": "Drones, artificial intelligence and 5G: how Telefónica is transforming the smart management of critical infrastructure",
      "url": "https://www.telefonica.com/en/communication-room/blog/drones-ai-5g-critical-infrastructure/",
      "category": "Netz/Technologie",
-     "note": "Telefónica kombiniert Drohnen, 5G, KI und Edge Computing für Infrastruktur-Management – ein Hebel für B2B-Geschäft, den Vodafone im Auge behalten sollte."
+     "note": "Telefónica kombiniert Drohnen, 5G, KI und Edge Computing für sicherere Inspektionen kritischer Infrastrukturen – ein B2B-Angebot mit hohem Margenpotenzial."
     },
     {
      "title": "Virgin Media O2 Preps 2Gbps UK Broadband Speed for Coax Network UPDATE2",
      "url": "https://www.ispreview.co.uk/index.php/2026/07/virgin-media-o2-possibly-preps-2gbps-uk-broadband-speed-for-coax-network.html",
      "category": "Netz/Technologie",
-     "note": "VMO2 bereitet 2-Gbit/s-Downloads über das bestehende Koax-Netz vor – ein Upgrade, das den Wettbewerbsdruck auf Vodafones UK-Breitband erhöht."
+     "note": "VMO2 bereitet 2 GBit/s über das bestehende Koax-Netz vor – das erhöht den Wettbewerbsdruck auf Vodafones Kabel- und Glasfaserprodukte in UK."
     },
     {
      "title": "Telefónica and Würth Use Quantum Computing to Logistics Packaging to Reduce Transport Volume and Cardboard Consumption",
      "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-wurth-quantum-computing-logistics-packaging-reduce-transport-volume-cardboard-consumption/",
      "category": "Partnerschaft",
-     "note": "Telefónica und Würth optimieren mit Quantencomputing und KI die Logistik – ein innovativer B2B-Ansatz, der Effizienzgewinne von bis zu 14% verspricht."
+     "note": "Gemeinsam mit Würth optimiert Telefónica mit Quantencomputing und KI die Logistik – Einsparungen von 14% bei der Verpackungseffizienz zeigen konkreten Business-Value."
     },
     {
      "title": "GlobalData recognises Telefónica’s global leadership in IoT services",
      "url": "https://www.telefonica.com/en/communication-room/press-room/globaldata-recognises-telefonicas-global-leadership-iot-services/",
      "category": "Sonstiges",
-     "note": "GlobalData bestätigt Telefónicas IoT-Führerschaft – ein klares Signal, dass der Konzern im IoT-Segment die Nase vorn hat."
+     "note": "Telefónica wird von GlobalData als globaler IoT-Marktführer anerkannt – das stärkt ihre Position im wachsenden B2B-IoT-Markt."
     },
     {
      "title": "Telefónica and Harrison.ai join forces to support the diagnosis of chest X-rays using AI",
      "url": "https://www.telefonica.com/en/communication-room/press-room/telefonica-harrison-ai-join-forces-support-diagnosis-chest-rays-ai/",
      "category": "Partnerschaft",
-     "note": "Telefónica bietet in Spanien eine KI-Lösung zur Röntgenanalyse an – ein weiterer Schritt in Richtung KI-gestützter Gesundheitsdienste."
+     "note": "Telefónica bringt eine KI-Lösung für die Analyse von Röntgenbildern in Spanien auf den Markt – ein weiterer Schritt in Richtung Healthcare-Digitalisierung."
     },
     {
      "title": "“More Than Just Mobile” | Telefónica Deutschland is developing the o2 brand into a combined service provider",
      "url": "https://www.telefonica.de/fixed/news/10837/more-than-just-mobile-telefonica-deutschland-is-developing-the-o2-brand-into-a-combined-service-provider.html",
      "category": "Produktlaunch",
-     "note": "Telefónica Deutschland baut o2 zum gebündelten Anbieter für Mobilfunk, Festnetz, TV und Streaming aus – direkte Konkurrenz zu Vodafones Kabel- und DSL-Angeboten."
+     "note": "o2 wird in Deutschland zum gebündelten Anbieter für Mobilfunk, Festnetz, TV und Streaming – direkter Angriff auf Vodafones Konvergenzstrategie."
     },
     {
      "title": "Virgin Media O2 and egg Power begin 10-year solar energy deal to advance net zero ambitions",
      "url": "https://www.libertyglobal.com/virgin-media-o2-egg-power-power-purchase-agreement/",
      "category": "Partnerschaft",
-     "note": "VMO2 schließt 10-jährigen Solarstromvertrag – unterstreicht den Nachhaltigkeitsfokus, der auch für Vodafones grüne Positionierung relevant ist."
+     "note": "VMO2 schließt einen 10-Jahres-Stromabnahmevertrag für Solarenergie – das unterstreicht den Nachhaltigkeitsfokus und senkt langfristig die Betriebskosten."
     }
    ],
-   "summary": "Telefónica / O2 treibt aktuell die Transformation vom reinen Mobilfunker zum gebündelten Digitalhaushalts-Anbieter voran, insbesondere in Deutschland mit der o2-Marke. Gleichzeitig forciert der Konzern KI- und Quantencomputing-Lösungen für Unternehmenskunden und kritische Infrastrukturen. Im UK-Breitbandmarkt bereitet Virgin Media O2 einen 2-Gbit/s-DOCSIS-Ausbau vor, während die giffgaff-Marke auf 4,26 Mio. Mobilfunkkunden wächst. Die strategische Richtung ist klar: KI-getriebene Services, IoT-Führerschaft und nachhaltige Energiepartnerschaften.",
+   "summary": "Telefónica / O2 treibt derzeit die Transformation zu einem digitalen Ökosystem voran: In Deutschland wird die Marke o2 vom reinen Mobilfunkanbieter zum gebündelten Service-Provider für den digitalen Haushalt („More Than Just Mobile“). Parallel setzt der Konzern stark auf KI, 5G und Quantencomputing für kritische Infrastrukturen und Logistik (z.B. mit Würth). In Großbritannien bereitet Virgin Media O2 2-GBit/s über das Koax-Netz vor, während die Tochter giffgaff auf 4,26 Mio. Mobilfunkkunden wächst. Die strategische Richtung ist klar: Telefónica will als Technologiepartner für Unternehmen und als breiter Anbieter für Privatkunden profitabel wachsen.",
    "themes": [
-    "KI-Integration",
-    "Quantencomputing",
-    "IoT-Führerschaft",
-    "Breitbandausbau",
+    "KI-Transformation",
+    "5G-Industrieanwendungen",
+    "Breitband-Ausbau",
     "Markenentwicklung",
-    "Nachhaltigkeit"
+    "Nachhaltigkeit",
+    "Quantencomputing"
    ],
-   "vodafone_implication": "Vodafone sollte die Expansion von o2 zum Komplettanbieter in Deutschland genau beobachten, da dies den Wettbewerb im Festnetz- und TV-Markt verschärft. Im UK setzt VMO2 mit dem 2-Gbit/s-Koax-Upgrade und dem Wachstum von giffgaff neue Maßstäbe – hier muss Vodafone mit eigenen Geschwindigkeits- und Preisoffensiven reagieren. Telefónicas KI- und Quantencomputing-Partnerschaften zeigen zudem, dass der Konzern im B2B-Sektor technologisch aufrüstet; Vodafone sollte sein eigenes KI-Portfolio für Unternehmenskunden schärfen."
+   "vodafone_implication": "Vodafone muss die Entwicklung von o2 zum Konvergenzanbieter in Deutschland genau beobachten, da dies den Wettbewerb um Festnetz-Mobilfunk-Bündel verschärft. Die KI- und Quantencomputing-Partnerschaften von Telefónica zeigen, dass sie im B2B-Bereich auf innovative Technologielösungen setzen – Vodafone sollte hier eigene Partnerschaften und Use Cases vorantreiben, um nicht den Anschluss zu verlieren. Zudem erhöht VMO2 mit 2 GBit/s über Koax den Druck auf Vodafones Breitbandprodukte in UK, was eine Reaktion in der Preis- oder Produktstrategie erfordert."
   },
   {
    "name": "1&1",
@@ -607,60 +198,55 @@
      "title": "Neue Samsung Galaxy Z8-Serie bei 1&amp;1 bestellen – inklusive Google Fitbit Air und je nach Gerät bis zu max. 1.000 Euro Tauschprämie sichern, mindestens jedoch 150,-€* - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/neue-samsung-galaxy-z8-serie-bei-1-1-bestellen-inklusive-google-fitbit-air-und-tauschpraemie-sichern",
      "category": "Kampagne",
-     "note": "1&1 lockt mit hohen Tauschprämien und Fitbit-Zugabe bei neuen Samsung-Foldables – direkter Angriff auf Vodafone im Premium-Segment."
+     "note": "1&1 startet Vorverkauf der Samsung Galaxy Z8-Serie mit hohen Tauschprämien und Google Fitbit Air – aggressive Kundenbindung im Premium-Segment."
     },
     {
      "title": "1&1 erweitert TV-Angebot um die Streaming-Plattform Joyn - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-erweitert-tv-angebot-um-die-streaming-plattform-joyn",
-     "category": "Partnerschaft",
-     "note": "Integration von Joyn+ in 1&1 TV wertet das Konvergenzprodukt auf – Vodafone muss sein TV-Angebot (GigaTV) nachschärfen."
+     "category": "Produktlaunch",
+     "note": "Integration von Joyn in 1&1 TV wertet das TV-Produkt auf und erhöht die Attraktivität für Kunden, die Streaming bevorzugen."
     },
     {
      "title": "1&1 führt neuen Router auf Basis der FRITZ!Box 7620 ein - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-standard-router-fuer-dsl-und-glasfaser-ein-naechste-generation-des-1-1-homeservers-ab-sofort-verfuegbar",
      "category": "Netz/Technologie",
-     "note": "Neuer Standard-Router (FRITZ!Box 7620) ersetzt älteres Modell – 1&1 modernisiert die Kundengerätebasis, was die Servicequalität verbessert."
-    },
-    {
-     "title": "IMTEST Festnetztest 2026: 1&1 erreicht Gesamtnote „sehr gut“ - 1&1",
-     "url": "https://unternehmen.1und1.de/produkt-news/2026/imtest-festnetztest-2026-1-1-erzielt-erneut-die-gesamtnote-sehr-gut",
-     "category": "Netz/Technologie",
-     "note": "Note 1,26 im Festnetztest – 1&1 positioniert sich als Qualitätsführer, was Vodafone unter Druck setzt, eigene Testergebnisse zu verbessern."
+     "note": "Neuer Standard-Router (FRITZ!Box 7620) ersetzt die FRITZ!Box 7520 – technische Aufwertung des DSL/Glasfaser-Angebots."
     },
     {
      "title": "1&1 HomeServer+ mit Wi‑Fi 7: Neuer Top-Router für DSL & Glasfaser - 1&1",
      "url": "https://unternehmen.1und1.de/produkt-news/2026/1-1-fuehrt-neuen-top-router-mit-wi-fi-7-ein-naechste-generation-des-homeserver-ab-sofort-verfuegbar",
      "category": "Netz/Technologie",
-     "note": "Wi-Fi 7 als neuer Standard bei 1&1 – Vodafone muss bei eigener Router-Strategie (z.B. CableBox) aufholen."
-    },
-    {
-     "title": "connect professional: Testsieg für 1&1 Glasfaser-Anschlüsse - 1&1",
-     "url": "https://unternehmen.1und1.de/corporate-news/2026/groessere-glasfaser-anbietervielfalt-fuer-deutschland-1-1-und-tele-columbus-schliessen-langfristige-kooperationsvereinbarung",
-     "category": "Netz/Technologie",
-     "note": "Testsieg im SOHO-Highspeed-Test – 1&1 stärkt seine Position im Geschäftskunden-Glasfasermarkt, direkte Konkurrenz zu Vodafone Business."
+     "note": "Einführung des Wi-Fi-7-Routers HomeServer+ (FRITZ!Box 7630) als neuer Standard in vielen Tarifen – Technologieführerschaft im Heimnetz."
     },
     {
      "title": "Größere Glasfaser-Anbietervielfalt für Deutschland: 1&1 und Tele Columbus schließen langfristige Kooperationsvereinbarung - 1&1",
      "url": "https://unternehmen.1und1.de/corporate-news/2026/groessere-glasfaser-anbietervielfalt-fuer-deutschland-1-1-und-tele-columbus-schliessen-langfristige-kooperationsvereinbarung",
      "category": "Partnerschaft",
-     "note": "Kooperation mit Tele Columbus erweitert Glasfaser-Reichweite von 1&1 – Vodafone muss sein eigenes Glasfaser-Ausbauprogramm beschleunigen."
+     "note": "Langfristige Kooperation mit Tele Columbus erweitert das Glasfasernetz von 1&1 – direkter Wettbewerb zu Vodafone in Kabel- und Glasfaser-Regionen."
+    },
+    {
+     "title": "connect professional: Testsieg für 1&1 Glasfaser-Anschlüsse - 1&1",
+     "url": "https://unternehmen.1und1.de/produkt-news/2026/connect-professional-1-1-ist-testsieger-fuer-glasfaser-anschluesse-unter-den-bundesweiten-anbietern",
+     "category": "Netz/Technologie",
+     "note": "Testsieg im SOHO-Highspeed-Test 2026 von connect professional – 1&1 positioniert sich als Qualitätsführer bei Glasfaser für Geschäftskunden."
     }
    ],
-   "summary": "1&1 erweitert sein Produktportfolio mit neuen Routern (Wi-Fi 7), TV-Integration von Joyn und Sommeraktionen (Samsung Galaxy Z8, Google Fitbit Air, WM-Trikot). Im Festnetz- und Glasfaserbereich erzielt das Unternehmen Spitzenbewertungen (IMTEST „sehr gut“, connect professional Testsieger). Strategisch baut 1&1 seine Glasfaser-Kooperation mit Tele Columbus aus und zeigt sich mit einem guten Jahresauftakt finanziell stabil. Für Vodafone bedeutet dies verstärkten Wettbewerb im Festnetz- und Mobilfunkmarkt, insbesondere bei Glasfaser und attraktiven Bundle-Angeboten.",
+   "summary": "1&1 baut sein Festnetz- und Mobilfunkangebot kontinuierlich aus: Neue Router-Generationen mit Wi-Fi 7 (HomeServer+ auf Basis FRITZ!Box 7630), Testsiege bei Glasfaser (connect professional) und Festnetz (IMTEST), sowie die Integration der Streaming-Plattform Joyn in 1&1 TV. Im Mobilfunk lockt 1&1 mit Sommer-Specials (Google Fitbit Air) und WM-Trikot-Aktionen. Strategisch stärkt 1&1 die Glasfaser-Kooperation mit Tele Columbus und zeigt sich mit gutem Jahresauftakt 2026 finanziell solide.",
    "themes": [
-    "Produktlaunch",
-    "Tarif/Pricing",
-    "Partnerschaft",
-    "Netz/Technologie",
-    "Kampagne"
+    "Router-Neuheiten",
+    "Glasfaser-Ausbau",
+    "TV-Streaming-Integration",
+    "Mobilfunk-Kampagnen",
+    "Test-Erfolge",
+    "Partnerschaften"
    ],
-   "vodafone_implication": "Vodafone sollte die aggressive Produkt- und Marketingoffensive von 1&1 genau beobachten, insbesondere die Kombination aus hochwertigen Routern, TV-Streaming und hohen Tauschprämien. Um nicht Marktanteile zu verlieren, muss Vodafone sein eigenes Konvergenzangebot (GigaTV, Router, Mobilfunk) attraktiver gestalten und die Glasfaser-Strategie forcieren. Zudem sind die Testerfolge von 1&1 ein Signal, dass Vodafone in Qualitätsrankings (connect, IMTEST) wieder besser abschneiden muss."
+   "vodafone_implication": "Vodafone muss die aggressive Produkt- und Partnerstrategie von 1&1 im Glasfaser- und TV-Bereich ernst nehmen, insbesondere die Kooperation mit Tele Columbus und die Wi-Fi-7-Router-Offensive. Um nicht Marktanteile zu verlieren, sollte Vodafone sein eigenes TV-Streaming-Angebot (z.B. GigaTV) aufwerten und bei Glasfaser-Kooperationen nachziehen. Zudem ist die hohe Kundenbindung durch Tauschprämien und Hardware-Upgrades ein Signal, dass 1&1 im Mobilfunk-Premiumsegment angreift."
   }
  ],
  "run": {
-  "started_at": "2026-07-28T19:15:58.864076+00:00",
-  "finished_at": "2026-07-28T19:40:38.561736+00:00",
-  "duration_seconds": 1479.7,
+  "started_at": "2026-07-28T20:11:00.255629+00:00",
+  "finished_at": "2026-07-28T20:30:36.039171+00:00",
+  "duration_seconds": 1175.8,
   "used_llm": true,
   "editor_used": true,
   "models": {
@@ -671,34 +257,34 @@
   "phases": [
    {
     "name": "Sammeln",
-    "seconds": 132.1,
-    "detail": "83 Quellen abgefragt, 1340 Meldungen gefunden"
+    "seconds": 130.5,
+    "detail": "85 Quellen abgefragt, 1387 Meldungen gefunden"
    },
    {
     "name": "Nur Neues",
     "seconds": 0.0,
-    "detail": "187 neue Meldungen (Gedaechtnis: 1195 bekannt)"
+    "detail": "9 neue Meldungen (Gedaechtnis: 1382 bekannt)"
    },
    {
     "name": "Bewerten & Schreiben",
-    "seconds": 370.5,
-    "detail": "40 bewertete Meldungen"
+    "seconds": 143.9,
+    "detail": "4 bewertete Meldungen"
    },
    {
     "name": "Wettbewerber-Analyse",
-    "seconds": 84.1,
-    "detail": "3 Profile (21 Moves)"
+    "seconds": 158.7,
+    "detail": "3 Profile (20 Moves)"
    }
   ],
   "source_summary": {
-   "total": 83,
-   "ok": 80,
+   "total": 85,
+   "ok": 82,
    "empty": 3,
    "failed": 0,
    "by_kind": {
-    "json_api": 11,
-    "newsroom": 21,
+    "newsroom": 23,
     "rss": 15,
+    "json_api": 11,
     "newsroom_js": 22,
     "trade_press": 14
    }
@@ -810,6 +396,17 @@
     "url": "https://www.veon.com/newsroom",
     "kind": "newsroom",
     "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://www.investegate.co.uk/company/AAF",
+    "kind": "newsroom",
+    "label": "RNS (Regulatory News Service) via Investegate - Airtel Africa ist an der London Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen. airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain + Titel in Nachbar-div ohne Klasse/Heading).",
     "origin": "operator",
     "status": "ok",
     "count": 30
@@ -1077,6 +674,17 @@
     "origin": "operator",
     "status": "ok",
     "count": 18
+   },
+   {
+    "name": "Spark",
+    "operator": "Spark",
+    "region": "oceania",
+    "url": "https://www.nzx.com/companies/SPK/announcements",
+    "kind": "newsroom",
+    "label": "NZX-Boersenmeldungen statt sparknz.co.nz/news (Radware-Bot-Wall unveraendert blockiert; businessgroup.spark.co.nz ist nur eine B2B-Microsite ohne Presseliste)",
+    "origin": "operator",
+    "status": "ok",
+    "count": 17
    },
    {
     "name": "Vodafone Group",
@@ -1620,60 +1228,28 @@
   ],
   "analysts": [
    {
-    "items_in": 15,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 7,
-    "model": "deepseek-ai/deepseek-v4-flash",
-    "region": "Nordamerika"
-   },
-   {
     "items_in": 5,
     "batches": 1,
     "batches_ok": 1,
-    "highlights": 4,
-    "model": "deepseek-ai/deepseek-v4-flash",
-    "region": "Global"
-   },
-   {
-    "items_in": 15,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 6,
+    "highlights": 1,
     "model": "deepseek-ai/deepseek-v4-flash",
     "region": "Afrika & Naher Osten"
    },
    {
-    "items_in": 15,
-    "batches": 1,
-    "batches_ok": 0,
-    "highlights": 0,
-    "model": "deepseek-ai/deepseek-v4-flash",
-    "region": "Asien"
-   },
-   {
-    "items_in": 3,
+    "items_in": 2,
     "batches": 1,
     "batches_ok": 1,
-    "highlights": 3,
-    "model": "deepseek-ai/deepseek-v4-flash",
-    "region": "Lateinamerika"
-   },
-   {
-    "items_in": 15,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 11,
+    "highlights": 1,
     "model": "deepseek-ai/deepseek-v4-flash",
     "region": "Ozeanien"
    },
    {
-    "items_in": 15,
+    "items_in": 2,
     "batches": 1,
     "batches_ok": 1,
-    "highlights": 9,
+    "highlights": 2,
     "model": "deepseek-ai/deepseek-v4-flash",
-    "region": "Europa"
+    "region": "Asien"
    }
   ]
  }

@@ -546,11 +546,11 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://airtel.africa/press-release" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.investegate.co.uk/company/AAF" target="_blank" rel="noopener">
           <span class="op-row-name">Airtel Africa</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="Echte Pressemeldungs-Tabelle gefunden (nicht /media, sondern /media/press-release -> /press-release), server-seitig gerendert, KEIN Playwright noetig (curl liefert 286x "press-table" Treffer identisch zu Playwright-Render). Aber: jede Zeile verlinkt direkt auf ein PDF bei cdn-webportal.airtelstream.net, und der Link (<a> mit SVG-Icon) enthaelt selbst keinen Titeltext - der Titel steht in einer benachbarten <div class="col">, nicht im <a>. Der generische newsroom-Collector scheitert daher doppelt: (1) _SKIP_HINTS blockt jede .pdf-URL kategorisch, (2) der Titel wird ausschliesslich aus a.get_text() gelesen, hier aber leer. Empirisch bestaetigt: parse_newsroom_html() liefert fuer jeden getesteten item_selector (.press-table-row, .press-table-row a, .press-table a) 0 Items. Kein RSS/Feed gefunden (sitewide /rss.xml existiert, deckt aber nur IR-Inhalte ab - Ergebnisse, Calls, AGM -, nicht die News-Meldungen von /press-release). Fix braeuchte Collector-Code-Aenderung (PDF-Ausnahme + Titel-aus-Nachbarspalte); ohne das: Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -910,11 +910,11 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.sparknz.co.nz/news/" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.nzx.com/companies/SPK/announcements" target="_blank" rel="noopener">
           <span class="op-row-name">Spark</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="Radware-Wall (Redirect zu perfdrive). Plan: Playwright über Residential-Proxy; Alternative businessgroup.spark.co.nz prüfen; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
