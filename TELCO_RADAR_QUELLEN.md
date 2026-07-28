@@ -1,14 +1,71 @@
 # Telco Radar — Verifizierte Quellenliste (offizielle Betreiber-Quellen)
 
-Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status, echte Inhalte, gehört dem Unternehmen). Feeds wurden mit `feedparser` geparst (Eintragszahl + Datum als Beleg). **Primärquelle jedes Betreibers ist seine eigene Domain** — keine Dritt-Medien, keine Stichwort-Nachrichtensuche. Telco-Fachpresse ist eine separate, klar gekennzeichnete zweite Ebene.
+Stand: 17.07.2026, siehe aber den **Audit vom 28.07.2026** unten - der ist der
+aktuelle Stand für Quellen-Gesundheit; die Tabellen darunter sind das
+ursprüngliche Onboarding-Snapshot und teilweise veraltet. Jede URL wurde live
+geprüft (Browser-User-Agent, HTTP-Status, echte Inhalte, gehört dem
+Unternehmen). Feeds wurden mit `feedparser` geparst (Eintragszahl + Datum als
+Beleg). **Primärquelle jedes Betreibers ist seine eigene Domain** — keine
+Dritt-Medien, keine Stichwort-Nachrichtensuche. Telco-Fachpresse ist eine
+separate, klar gekennzeichnete zweite Ebene.
+
+## Audit 28.07.2026 — Quellen-Gesundheit
+
+Ausgangslage: die letzten 4 Produktivläufe (25.–28.07.) zeigten ~30 Quellen,
+die **konstant EMPTY/FAIL** waren - Betreiber, die im Dashboard "abgedeckt"
+wirkten, aber null Meldungen beitrugen. Statt das zu ignorieren: Ein neues
+Diagnose-Duo (`scripts/validate_sources.py` + `scripts/rescue_sources.py` +
+`scripts/inspect_dom.py`, alle über `radar.yml`s `sources_only`/
+`inspect_sources`-Dispatch-Modus in echtem CI mit echtem Netz laufen lassen,
+da diese Sandbox-Session selbst keinen allgemeinen Internetzugriff hat)
+wurde gebaut, um jede tote Quelle einzeln zu diagnostizieren und wo möglich
+mit echten, verifizierten Daten zu reparieren statt zu raten.
+
+**17 von ~31 dauerhaft toten Quellen wieder zum Laufen gebracht**, alle mit
+echten zurückgelieferten Items verifiziert:
+
+- **Echte RSS-Feeds gefunden**, die niemand verdrahtet hatte: Liberty Global,
+  Turkcell, Airtel Africa.
+- **Hint-Wörter waren englisch/deutsch-only**: WOM, Oi nutzen "prensa"/
+  "imprensa" (Spanisch/Portugiesisch für Presse) in der URL - `_ARTICLE_HINTS`
+  in `collect/newsroom.py` erweitert.
+- **PDFs wurden pauschal verworfen** (gegen Finanzbericht-Spam gedacht), aber
+  China Mobile/China Telecom veröffentlichen echte Pressemeldungen als PDF
+  unter einem `/press/`-Pfad, TPG Telecom über ein hand-ausgewähltes
+  `item_selector`-Element - beides jetzt durchgelassen.
+- **Item-Selector + zwei Parser-Fixes** für Deutsche Telekom, Bell Canada
+  (am Ende doch nicht lösbar, siehe unten), Turk Telekom, Vodafone Idea,
+  Telstra, Chunghwa Telecom, AIS, TPG Telecom, Charter Communications: viele
+  Betreiber haben Karten-Layouts, bei denen der `<a>` nur eine Miniatur
+  umschließt und die echte Überschrift in einem Geschwister-Element oder im
+  `title=`-Attribut steckt, nicht im Linktext. Der Parser fällt jetzt auf den
+  längsten "titelgroßen" Text im ganzen Container zurück, inklusive
+  `title=`-Attributen.
+- **PLDT, du**: einfach zu kurzes Render-Budget (16s+1.8s). Sammelphase
+  nutzt nur ~1 Minute eines ~30-Minuten-Laufs - `render_timeout_seconds`
+  16→30, neues `render_settle_ms` 1800→4000.
+- **Cookie-Consent-Overlays**: Playwright versucht jetzt automatisch, gängige
+  CMP-"Alle akzeptieren"-Buttons zu klicken (OneTrust, Cookiebot, Didomi,
+  Usercentrics), bevor der Inhalt ausgelesen wird.
+
+**15 Quellen bleiben nach alldem tot** und wurden ehrlich auf `type: official`
+(Referenz, nicht gecrawlt) umgestellt statt weiter so zu tun als würden sie
+aktiv beobachtet: Iliad, TIM, Cosmote, Millicom, Three UK, Bell Canada, stc,
+e&, Orange MEA, Reliance Jio, SK Telecom, KT, Indosat Ooredoo Hutchison, True
+Corporation, Optus. Diagnose pro Betreiber (leeres DOM vs. Timeout vs.
+JS-Routing ohne echten Link) steht als `plan`-Feld direkt in
+`config/watchlist.yaml` bzw. unten in der erweiterten Referenz-Liste.
+
+Nicht angefasst, weil schon funktionierend (nur gelegentlich langsam/flaky,
+kein Dauerzustand): China Mobile, China Telecom.
 
 ## Überblick
 
 - **81 Betreiber** in 6 Regionen, jeder mit ≥1 offizieller Quelle auf eigener Domain.
-- Direkt maschinenlesbar (Feed/JSON): **11** (10× RSS/Atom, 1× JSON-API).
+- Direkt maschinenlesbar (Feed/JSON): **11** (10× RSS/Atom, 1× JSON-API) — Stand 17.07.; siehe Audit oben für die seither hinzugekommenen Feeds (Liberty Global, Turkcell, Airtel Africa).
 - Newsroom statisch (httpx-Scrape): **12**.
-- Newsroom JS-gerendert (Headless/Playwright): **46**.
-- Bot-geblockt → verifizierte Referenz + dokumentierter Plan: **12**.
+- Newsroom JS-gerendert (Headless/Playwright): **46** Stand 17.07., nach dem Audit einige mit `item_selector` präzisiert oder auf Referenz umgestellt.
+- Referenz + dokumentierter Plan (Bot-Wall, leeres DOM oder Timeout - nicht (noch) automatisiert erfassbar): **27** (12 ursprünglich + 15 aus dem 28.07.-Audit).
 
 ## Europa (24)
 
@@ -121,9 +178,15 @@ Stand: 17.07.2026. Jede URL wurde live geprüft (Browser-User-Agent, HTTP-Status
 | Spark | NZ | sparknz.co.nz | https://www.sparknz.co.nz/news/ | — | Referenz (Bot-geblockt) + Plan | Radware-Bot-Wall |
 | 2degrees | NZ | 2degrees.nz | https://www.2degrees.nz/media-releases | — | Newsroom (Headless/Playwright) | JS-gerendert; RSS veraltet (2021) |
 
-## Bot-geblockte Betreiber — dokumentierter Plan (Phase 2)
+## Referenz statt Crawl — dokumentierter Plan
 
-Diese Betreiber liefern automatisierten Clients 403/307 bzw. eine Bot-Wall. Die offizielle Presse-URL ist verifiziert und wird als Referenz angezeigt; das Auto-Signal kommt vorerst über die Fachpresse-Ebene (Namensnennung). Plan zur Freischaltung:
+Diese Betreiber sind nicht (noch) automatisiert erfassbar - aus drei
+unterschiedlichen Gründen (Bot-Wall/403, leeres DOM auch nach Consent-Dismiss
++ 30s Render, oder Navigation ohne echten `<a href>`/mit Timeout). Die
+offizielle Presse-URL ist verifiziert und wird als Referenz angezeigt; das
+Auto-Signal kommt vorerst über die Fachpresse-Ebene (Namensnennung).
+
+**403/Bot-Wall (Stand 17.07.2026):**
 
 - **AT&T** (US) — https://about.att.com/newsroom.html — Newsroom liefert Bots 403. Plan: Playwright über Residential-Proxy oder offizielle Media-API; bis dahin Referenz + Fachpresse-Zuordnung.
 - **T-Mobile US** (US) — https://www.t-mobile.com/news — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.
@@ -137,3 +200,23 @@ Diese Betreiber liefern automatisierten Clients 403/307 bzw. eine Bot-Wall. Die 
 - **Maroc Telecom** (MA) — https://www.iam.ma/groupe/salle-de-presse/communiques-de-presse.aspx — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.
 - **Globe Telecom** (PH) — https://www.globe.com.ph/about-us/newsroom — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.
 - **Spark** (NZ) — https://www.sparknz.co.nz/news/ — Radware-Wall (Redirect zu perfdrive). Plan: Playwright über Residential-Proxy; Alternative businessgroup.spark.co.nz prüfen; bis dahin Referenz.
+
+**Leeres/unvollständiges DOM auch nach Consent-Dismiss + 30s Render, oder
+Timeout, oder JS-Routing ohne echten Link (alle neu diagnostiziert am
+28.07.2026 über `scripts/rescue_sources.py`/`scripts/inspect_dom.py`):**
+
+- **TIM** (IT) — https://www.gruppotim.it/en/press-archive.html — nur 30 Links im ganzen DOM, 0 mit brauchbarem Titeltext. Plan: echten API-Endpunkt der Liste identifizieren.
+- **Iliad** (FR) — https://www.iliad.fr/en/press — nur 1 brauchbarer Link im ganzen DOM. Plan: echten API-Endpunkt identifizieren.
+- **Cosmote** (GR) — https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases — 0 `<a>`-Tags, komplett leeres DOM. Plan: prüfen ob Interaktion nötig ist oder Bot-Wall.
+- **Three UK** (GB) — https://www.threemediacentre.co.uk/press-release-browser/ — RSS unter /feed ist nur WordPress-Platzhalter ("Hello world!"). Plan: echten Feed-Pfad/Selector identifizieren.
+- **Millicom** (LU) — https://www.millicom.com/media/press-releases — nur 4 `<a>`-Tags im ganzen DOM. Plan: echten API-Endpunkt identifizieren.
+- **Bell Canada** (CA) — https://www.bce.ca/news-and-media/newsroom — Karten haben echte Titel, aber kein `<a href>` bis 4 Eltern-Ebenen hoch; reines JS-Routing. Plan: zugrunde liegende JSON/GraphQL-API identifizieren.
+- **stc** (SA) — https://www.stc.com/en/media-center.html — nur Investor-Navigation, keine Presseliste. Plan: Lazy-Load-Trigger/API identifizieren.
+- **e&** (AE) — https://www.eand.com/en/news.html — nur Investor-Navigation, keine Presseliste. Plan: Lazy-Load-Trigger/API identifizieren.
+- **Orange MEA** (EG) — https://www.orange.eg/en/media-center/press-releases — nur 1 `<a>`-Tag im ganzen DOM. Plan: prüfen ob Interaktion nötig ist oder Bot-Wall.
+- **Reliance Jio** (IN) — https://www.jio.com/press-release — nur Navigation, keine Presseliste. Plan: Lazy-Load-Trigger/API identifizieren.
+- **SK Telecom** (KR) — https://www.sktelecom.com/en/press/press_list.do — nur 4 `<a>`-Tags im ganzen DOM. Plan: echten API-Endpunkt identifizieren.
+- **KT** (KR) — https://corp.kt.com/eng/html/prcenter/report_list.html — Navigation hängt konstant (Timeout nach 30-35s). Plan: Playwright über Residential-Proxy oder Slow-Lane-Job.
+- **Indosat Ooredoo Hutchison** (ID) — https://ioh.co.id/portal/en/iohpressrelease — nur Unternehmens-Navigation, keine Presseliste. Plan: Lazy-Load-Trigger/API identifizieren.
+- **True Corporation** (TH) — https://investor.true.th/en/newsroom/set-announcements — 0 `<a>`-Tags, komplett leeres DOM (das baugleiche AIS-Pendant funktioniert). Plan: prüfen ob eine Bot-Wall speziell diese Domain betrifft.
+- **Optus** (AU) — https://www.optus.com.au/about/media-centre — net::ERR_HTTP2_PROTOCOL_ERROR bzw. Timeout in jedem Lauf, auch mit `--disable-http2`. Plan: Playwright über Residential-Proxy.

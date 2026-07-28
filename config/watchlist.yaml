@@ -108,8 +108,11 @@ regions:
       - Telecom Italia
       - Gruppo TIM
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.gruppotim.it/en/press-archive.html
+        plan: 'Auch nach 30s Render + Consent-Dismiss nur 30 Links, 0 mit brauchbarem Titeltext -
+          Presseliste laedt clientseitig nicht mit. Plan: echten API-Endpunkt der Liste
+          identifizieren; bis dahin Referenz + Fachpresse.'
     - name: Liberty Global
       country: GB
       website: libertyglobal.com
@@ -148,8 +151,11 @@ regions:
       - Free Mobile
       - Free
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.iliad.fr/en/press
+        plan: 'Auch nach 30s Render + Consent-Dismiss nur 1 brauchbarer Link auf der ganzen
+          Seite - Presseliste laedt clientseitig nicht mit. Plan: echten API-Endpunkt
+          der Liste identifizieren; bis dahin Referenz + Fachpresse.'
     - name: 1&1
       country: DE
       website: united-internet.de
@@ -196,8 +202,12 @@ regions:
       - CK Hutchison
       - Hutchison 3
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.threemediacentre.co.uk/press-release-browser/
+        plan: 'RSS unter /feed existiert, ist aber nur der WordPress-Standard-Platzhalter
+          ("Hello world!"), kein echter Feed. JS-Render der Presseseite selbst findet
+          ebenfalls nichts Brauchbares. Plan: echten Feed-Pfad oder Selector identifizieren;
+          bis dahin Referenz + Fachpresse.'
     - name: Cosmote
       country: GR
       website: cosmote.gr
@@ -205,8 +215,11 @@ regions:
       - OTE Group
       - OTE
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases
+        plan: 'Seite rendert 0 <a>-Tags, auch nach Consent-Dismiss und 30s - komplett leeres
+          DOM, nicht nur eine leere Liste. Plan: pruefen ob eine Interaktion (Klick/Scroll)
+          noetig ist oder ob es sich um eine Bot-Wall handelt; bis dahin Referenz + Fachpresse.'
   north_america:
     name: Nordamerika
     operators:
@@ -280,9 +293,12 @@ regions:
       - Bell
       - BCE
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.bce.ca/news-and-media/newsroom
-        item_selector: "._cardLockup_1scj3_1"
+        plan: 'Card-Layout (._cardLockup_1scj3_1) hat echte Titel, aber nirgendwo im DOM ein
+          <a href> - bis zu 4 Eltern-Ebenen geprueft. Navigation laeuft rein per
+          JS-Routing, keine echten Links zum Extrahieren. Plan: zugrunde liegende
+          JSON/GraphQL-API des Karten-Feeds identifizieren; bis dahin Referenz + Fachpresse.'
     - name: Rogers
       country: CA
       website: rogers.com
@@ -316,8 +332,11 @@ regions:
       aliases:
       - Tigo
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.millicom.com/media/press-releases
+        plan: 'Seite rendert nur 4 <a>-Tags insgesamt, auch nach Consent-Dismiss und 30s -
+          Presseliste laedt clientseitig nicht mit. Plan: echten API-Endpunkt der Liste
+          identifizieren; bis dahin Referenz + Fachpresse.'
     - name: TIM Brasil
       country: BR
       website: tim.com.br
@@ -390,8 +409,11 @@ regions:
       aliases:
       - Saudi Telecom
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.stc.com/en/media-center.html
+        plan: 'Rendert nur Investor-/Nachhaltigkeits-Navigation, keine echte Presseliste -
+          vermutlich per Scroll/Klick nachgeladen. Plan: Lazy-Load-Trigger oder API
+          identifizieren; bis dahin Referenz + Fachpresse.'
     - name: e&
       country: AE
       website: eand.com
@@ -399,8 +421,11 @@ regions:
       - Etisalat
       - e& Group
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.eand.com/en/news.html
+        plan: 'Rendert nur Investor-Navigation, keine echte Presseliste - vermutlich per
+          Scroll/Klick nachgeladen. Plan: Lazy-Load-Trigger oder API identifizieren;
+          bis dahin Referenz + Fachpresse.'
     - name: Ooredoo
       country: QA
       website: ooredoo.com
@@ -422,8 +447,11 @@ regions:
       - Orange Egypt
       - Orange Jordan
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.orange.eg/en/media-center/press-releases
+        plan: 'Seite rendert nur 1 <a>-Tag insgesamt, auch nach Consent-Dismiss und 30s -
+          praktisch leeres DOM. Plan: pruefen ob eine Interaktion noetig ist oder ob
+          es sich um eine Bot-Wall handelt; bis dahin Referenz + Fachpresse.'
     - name: du
       country: AE
       website: du.ae
@@ -472,8 +500,11 @@ regions:
       aliases:
       - Jio
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.jio.com/press-release
+        plan: 'Rendert nur Navigation (International Services, JioBusiness), keine echte
+          Presseliste - vermutlich per Scroll/Klick nachgeladen. Plan: Lazy-Load-Trigger
+          oder API identifizieren; bis dahin Referenz + Fachpresse.'
     - name: Vodafone Idea
       country: IN
       website: myvi.in
@@ -496,16 +527,22 @@ regions:
       aliases:
       - SKT
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.sktelecom.com/en/press/press_list.do
+        plan: 'Seite rendert nur 4 <a>-Tags insgesamt, auch nach Consent-Dismiss und 30s -
+          Presseliste laedt clientseitig nicht mit. Plan: echten API-Endpunkt der Liste
+          identifizieren; bis dahin Referenz + Fachpresse.'
     - name: KT
       country: KR
       website: corp.kt.com
       aliases:
       - Korea Telecom
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://corp.kt.com/eng/html/prcenter/report_list.html
+        plan: 'Navigation haengt konstant (Timeout nach 30-35s, kein DOMContentLoaded).
+          Plan: Playwright über Residential-Proxy oder laengeren Timeout in einem
+          dedizierten Slow-Lane-Job pruefen; bis dahin Referenz + Fachpresse.'
     - name: NTT Docomo
       country: JP
       website: docomo.ne.jp
@@ -593,8 +630,11 @@ regions:
       aliases:
       - Indosat
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://ioh.co.id/portal/en/iohpressrelease
+        plan: 'Rendert nur Unternehmens-Navigation (Vision/Mission/History), keine echte
+          Presseliste - vermutlich per Scroll/Klick nachgeladen. Plan: Lazy-Load-Trigger
+          oder API identifizieren; bis dahin Referenz + Fachpresse.'
     - name: CelcomDigi
       country: MY
       website: celcomdigi.com
@@ -613,8 +653,12 @@ regions:
       aliases:
       - True Corp
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://investor.true.th/en/newsroom/set-announcements
+        plan: 'Seite rendert 0 <a>-Tags, auch nach Consent-Dismiss und 30s - komplett leeres
+          DOM. Das baugleiche AIS-Aequivalent (investor.ais.co.th) funktioniert, hier aber
+          konstant leer. Plan: pruefen ob eine Bot-Wall speziell diese Domain betrifft;
+          bis dahin Referenz + Fachpresse.'
   oceania:
     name: Ozeanien
     operators:
@@ -629,8 +673,12 @@ regions:
       country: AU
       website: optus.com.au
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.optus.com.au/about/media-centre
+        plan: 'net::ERR_HTTP2_PROTOCOL_ERROR bzw. Timeout in jedem Lauf, auch mit
+          --disable-http2. Verbindung wird gegen diesen CI-Fingerprint aktiv
+          zurueckgesetzt. Plan: Playwright über Residential-Proxy; bis dahin Referenz
+          + Fachpresse.'
     - name: TPG Telecom
       country: AU
       website: tpgtelecom.com.au
