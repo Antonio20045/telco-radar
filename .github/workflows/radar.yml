@@ -11,6 +11,15 @@ on:
         description: "Only consider items newer than N days"
         required: false
         default: "8"
+      sources_only:
+        description: "Diagnostic only: run validate_sources.py + rescue_sources.py, no LLM/commit/deploy"
+        required: false
+        type: boolean
+        default: false
+      inspect_sources:
+        description: "Diagnostic only: comma-separated operator names to DOM-dump via inspect_dom.py"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -40,7 +49,35 @@ jobs:
       - name: Install Playwright Chromium
         run: python -m playwright install --with-deps chromium
 
+      - name: Diagnose sources
+        # Diagnostic-only dispatch: never touches the LLM, never commits, never
+        # deploys. sources_only runs the health check + feed-rescue probe over
+        # every source; inspect_sources DOM-dumps the named operators only.
+        if: ${{ github.event.inputs.sources_only == 'true' || github.event.inputs.inspect_sources != '' }}
+        env:
+          PYTHONPATH: src
+        run: |
+          {
+            if [ "${{ github.event.inputs.sources_only }}" = "true" ]; then
+              echo "### validate_sources.py"
+              echo '```text'
+              python scripts/validate_sources.py
+              echo '```'
+              echo "### rescue_sources.py (kind=official)"
+              echo '```text'
+              python scripts/rescue_sources.py
+              echo '```'
+            fi
+            if [ -n "${{ github.event.inputs.inspect_sources }}" ]; then
+              echo "### inspect_dom.py"
+              echo '```text'
+              python scripts/inspect_dom.py --names "${{ github.event.inputs.inspect_sources }}"
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Check LLM secret presence
+        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
@@ -49,6 +86,7 @@ jobs:
           if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY fallback is present"; else echo "ANTHROPIC_API_KEY fallback is missing"; fi
 
       - name: Run pipeline
+        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
           # (OpenAI-compatible) automatically; otherwise it falls back to Anthropic.
@@ -85,6 +123,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit state, report and site
+        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -111,7 +150,7 @@ jobs:
           fi
 
       - name: Trigger Render deploy
-        if: success()
+        if: ${{ success() && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
