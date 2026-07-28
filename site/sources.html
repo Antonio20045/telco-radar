@@ -199,15 +199,15 @@
           <span class="op-row-name">TIM</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="JS-Routing: Pressemeldungen laden nur nach Klick/API-Call nach, im gerenderten DOM nach 1.8s nur 30 Nav-Links, keine Artikel. Kein Feed gefunden. Plan: State-basierter Crawler (Klick-Interaktion) oder API-Reverse-Engineering noetig; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Erneut mit echtem Internetzugang und vollem Playwright-Render (45s, networkidle, Cookie-Consent-Klick, Scroll-Trigger) geprueft: identisches DOM zur statischen curl-Antwort (316541 Zeichen, nur 30 Nav-Links, 0 Presse-Links). 0 XHR/fetch/JSON-Responses waehrend des gesamten Renders - die Seite laedt nur ein reCAPTCHA-Script, nie einen Daten-Call. 46 Feed-Kandidaten von rescue_sources.py probiert, keiner funktioniert; robots.txt-Alternative /en/press/press-releases.html redirectet zurueck auf dieselbe leere Seite; /en/sitemap.xml und /it.sitemap.xml beide 404. Kein Bot-Block (curl bekommt 200), die Seite ist einfach clientseitig kaputt/leer. Bis auf Weiteres kein Ansatz gefunden; Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.libertyglobal.com/news-insights/featured-news-insights/" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.libertyglobal.com/feed/" target="_blank" rel="noopener">
           <span class="op-row-name">Liberty Global</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed</span>
         </a>
         
         
@@ -245,11 +245,11 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.iliad.fr/en/press" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&year=all&tag=all" target="_blank" rel="noopener">
           <span class="op-row-name">Iliad</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
-        <span class="op-row-note" title="Presseliste laedt clientseitig nach, im DOM nur Navigation (Publications, Contact, Documentation), keine Artikel. Kein Feed gefunden. Plan: wie TIM (State-basierter Crawler oder API-Reverse-Engineering); bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -319,7 +319,7 @@
           <span class="op-row-name">Cosmote</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="DOM bleibt nach Render fast leer (338 Zeichen, 0 <a>-Tags) - vermutlich Cookie-/Bot-Challenge blockiert das Rendering komplett. Plan: Cookie-Consent-Handling oder Playwright-Stealth-Profil testen; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Echter Imperva-Incapsula-Bot-Wall, kein Timing-/Consent-Problem: selbst reiner curl mit Browser-UA bekommt HTTP 200, aber der Body ist nur das _Incapsula_Resource-Challenge-Script (585 Byte, 0 <a>-Tags); mit Googlebot-UA sogar HTTP 404. Playwright mit Cookie-Consent-Klick + 8s Wartezeit liefert dasselbe Ergebnis (visid_incap_*/x-iinfo-Cookies vorhanden, Titel "404 Not Found"). JS wird nie ausgefuehrt, das ist eine serverseitige WAF-Entscheidung, kein Render-Problem. Nur mit Residential-Proxy oder expliziter Incapsula-Allowlist loesbar; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -354,9 +354,9 @@
         
         <a class="op-row-line" href="https://www.t-mobile.com/news" target="_blank" rel="noopener">
           <span class="op-row-name">T-Mobile US</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -372,9 +372,9 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://corporate.charter.com/newsroom" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://corporate.charter.com/page-data/sq/d/2336972469.json" target="_blank" rel="noopener">
           <span class="op-row-name">Charter Communications</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
         
         
@@ -396,7 +396,7 @@
           <span class="op-row-name">UScellular</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="IR-Newsroom (Q4) blockt Bots. Plan: Q4-JSON-API prüfen; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Kein Crawling-Problem, sondern ein Fakt: T-Mobile hat die UScellular-Mobilfunksparte uebernommen (Deal abgeschlossen 2025). investors.uscellular.com liefert per curl Cloudflare-403; mit Playwright wird die Challenge zwar bestanden, aber die Seite leitet clientseitig komplett auf investor.t-mobile.com weiter - es gibt keinen eigenstaendigen UScellular-Newsroom mehr. Vodafone-relevante Meldungen zu diesem Konzern laufen inzwischen ueber den (reparierten) T-Mobile-US-Eintrag. Referenz, kein technisches Fix noetig.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -406,7 +406,7 @@
           <span class="op-row-name">Bell Canada</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="Newsroom ist eine Tailwind-SPA; 67 quelleneigene Links im gerenderten DOM sind ausschliesslich Navigation/Investor-Relations, keine Presse-Cards - die Liste laedt vermutlich per separatem API-Call, der im Render-Fenster nicht sichtbar wird. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Next.js-App-Router-Seite; 67 quelleneigene Links im gerenderten DOM sind ausschliesslich Navigation/Investor-Relations, keine Presse-Cards. Tiefere Analyse: es gibt keinen normalen JSON-Endpoint - weder client-seitig (sniff_xhr zeigt nur "text/x-component"-Antworten auf ?_rsc=... URLs, das React-Server-Components "Flight"-Protokoll fuer Hydration, kein JSON) noch separat auffindbar (kein Contentstack- Call trotz CSP-Hinweis auf api.contentstack.io - laeuft offenbar nur serverseitig). Die echten Release-Daten (headline/summary/published_date/sitemap_url) stecken zwar in der normalen HTML-Antwort, aber nur als escapte JSON-Strings in <script>self.__next_f.push([1,"..."])</script>-Chunks, nicht als <a href> im DOM und nicht als eigenstaendiges JSON-Dokument - passt weder in den newsroom- noch in den json_api-Collector, sondern braeuchte einen komplett neuen, RSC-Flight-spezifischen Parsertyp. Kein Feed gefunden. Bewusst als nicht automatisch crawlbar eingestuft (Aufwand/Nutzen); bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -422,11 +422,11 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.telus.com/en/about/news-and-events" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.telus.com/en/about/newsroom" target="_blank" rel="noopener">
           <span class="op-row-name">Telus</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -439,11 +439,11 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.americamovil.com/English/press-releases/default.aspx" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.americamovil.com/rss/pressrelease.aspx?LanguageId=1" target="_blank" rel="noopener">
           <span class="op-row-name">América Móvil</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Feed</span>
         </a>
-        <span class="op-row-note" title="Plan: Q4-JSON-API prüfen; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -453,7 +453,7 @@
           <span class="op-row-name">Millicom</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="DOM nach Render praktisch leer (nur 4 Links, alles Cookie-Footer). Presseliste laedt per nicht sichtbarem API-Call. Kein Feed gefunden. Plan: wie Bell Canada (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Mit vollem Playwright-Render (Tailwind/Next.js-Seite) jetzt viele Nav-Links sichtbar, aber keine Presse-Links. XHR-Sniffing fand einen Strapi-Endpoint (ww2-api.tigocloud.net/api/pages?filters[slug]=/media/press-releases) - liefert aber leeres data:[] (falscher Slug oder anderer Content-Type fuer die eigentliche Liste). /api/press-releases, /api/news, /api/media existieren nicht (404); /api/articles existiert (403 Forbidden statt 404) aber ist ohne Auth nicht lesbar. Kein Feed gefunden. Naechster Schritt waere das Strapi-Content-Model vollstaendig zu enumerieren; ohne das bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -469,7 +469,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://informacioncorporativa.entel.cl/sala-de-prensa" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://informacioncorporativa.entel.cl/comunicados-de-prensa" target="_blank" rel="noopener">
           <span class="op-row-name">Entel</span>
           <span class="op-row-type">Newsroom</span>
         </a>
@@ -489,19 +489,19 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://institucional.telecom.com.ar/prensa" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://institucional.telecom.com.ar/prensa/noticias" target="_blank" rel="noopener">
           <span class="op-row-name">Telecom Argentina</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://sobrenosotros.wom.cl/wom-en-prensa/" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20" target="_blank" rel="noopener">
           <span class="op-row-name">WOM</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
         
         
@@ -546,31 +546,31 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://airtel.africa/media" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://airtel.africa/press-release" target="_blank" rel="noopener">
           <span class="op-row-name">Airtel Africa</span>
+          <span class="op-row-type">Referenz</span>
+        </a>
+        <span class="op-row-note" title="Echte Pressemeldungs-Tabelle gefunden (nicht /media, sondern /media/press-release -> /press-release), server-seitig gerendert, KEIN Playwright noetig (curl liefert 286x "press-table" Treffer identisch zu Playwright-Render). Aber: jede Zeile verlinkt direkt auf ein PDF bei cdn-webportal.airtelstream.net, und der Link (<a> mit SVG-Icon) enthaelt selbst keinen Titeltext - der Titel steht in einer benachbarten <div class="col">, nicht im <a>. Der generische newsroom-Collector scheitert daher doppelt: (1) _SKIP_HINTS blockt jede .pdf-URL kategorisch, (2) der Titel wird ausschliesslich aus a.get_text() gelesen, hier aber leer. Empirisch bestaetigt: parse_newsroom_html() liefert fuer jeden getesteten item_selector (.press-table-row, .press-table-row a, .press-table a) 0 Items. Kein RSS/Feed gefunden (sitewide /rss.xml existiert, deckt aber nur IR-Inhalte ab - Ergebnisse, Calls, AGM -, nicht die News-Meldungen von /press-release). Fix braeuchte Collector-Code-Aenderung (PDF-Ausnahme + Titel-aus-Nachbarspalte); ohne das: Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
+      </div>
+      
+      <div class="op-row">
+        
+        <a class="op-row-line" href="https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false" target="_blank" rel="noopener">
+          <span class="op-row-name">stc</span>
+          <span class="op-row-type">Feed (API)</span>
+        </a>
+        
+        
+      </div>
+      
+      <div class="op-row">
+        
+        <a class="op-row-line" href="https://www.eand.com/en/news/news-overview.html" target="_blank" rel="noopener">
+          <span class="op-row-name">e&</span>
           <span class="op-row-type">Newsroom</span>
         </a>
         
-        
-      </div>
-      
-      <div class="op-row">
-        
-        <a class="op-row-line" href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">
-          <span class="op-row-name">stc</span>
-          <span class="op-row-type">Referenz</span>
-        </a>
-        <span class="op-row-note" title="DOM enthaelt 188 Links, aber ausschliesslich das komplette mobile Mega-Menu (Investors, Sustainability, ...), keine einzige Pressemeldung - die Liste laedt vermutlich per separatem Endpoint. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
-        
-      </div>
-      
-      <div class="op-row">
-        
-        <a class="op-row-line" href="https://www.eand.com/en/news.html" target="_blank" rel="noopener">
-          <span class="op-row-name">e&</span>
-          <span class="op-row-type">Referenz</span>
-        </a>
-        <span class="op-row-note" title="62 Links im DOM sind ausschliesslich Hauptnavigation (Governance, Investors, ...), die Presseliste fehlt komplett im gerenderten DOM. Kein Feed gefunden. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -588,9 +588,9 @@
         
         <a class="op-row-line" href="https://www.zain.com/en/media-center" target="_blank" rel="noopener">
           <span class="op-row-name">Zain</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="307-Edge-Challenge. Plan: Playwright über Residential-Proxy; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -600,7 +600,7 @@
           <span class="op-row-name">Orange MEA</span>
           <span class="op-row-type">Referenz</span>
         </a>
-        <span class="op-row-note" title="DOM bleibt nach Render fast leer (246 Zeichen, 1 Link) - vermutlich Bot-/Cookie-Challenge blockiert das Rendering. Plan: wie Cosmote (Cookie-Consent-Handling oder Playwright-Stealth-Profil); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        <span class="op-row-note" title="Echte WAF-Ablehnung, kein Render-/Consent-Problem: sowohl curl als auch Playwright bekommen HTTP 200 mit dem Body "The requested URL was rejected. Please consult with your administrator... Your support ID is: ..." (246 Byte, F5/BIG-IP-Stil, mit 3 verschiedenen User-Agents reproduziert). Kein Consent-Banner, kein JS - die WAF lehnt die URL selbst ab, bevor irgendetwas laedt. Nur mit Residential-Proxy oder expliziter WAF-Allowlist loesbar; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -663,19 +663,19 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.jio.com/press-release" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.jio.com/jcms-api/v1-press-release-page" target="_blank" rel="noopener">
           <span class="op-row-name">Reliance Jio</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
-        <span class="op-row-note" title="127 Links im DOM sind ausschliesslich Self-Care-/Account-Navigation (SIM, JioFiber, Support), keine Pressemeldungen. Kein Feed gefunden. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.myvi.in/media/press-releases" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.myvi.in/bin/vodafoneideadigital/newssearchservlet?search=%7B%22q%22%3A%22%2A%22%2C%22newsType%22%3A%22press%22%2C%22newsCategory%22%3A%22%2A%22%2C%22newsCircle%22%3A%22%2A%22%2C%22newsYear%22%3A0%2C%22pageNumber%22%3A1%7D" target="_blank" rel="noopener">
           <span class="op-row-name">Vodafone Idea</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
         
         
@@ -693,21 +693,21 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.sktelecom.com/en/press/press.do" target="_blank" rel="noopener">
           <span class="op-row-name">SK Telecom</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="DOM bleibt nach Render fast leer (5390 Zeichen, 4 Links ohne Text) - Presseliste laedt clientseitig per API nach. Plan: wie Cosmote (Cookie-Consent-Handling oder Playwright-Stealth-Profil); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://corp.kt.com/eng/html/prcenter/report_list.html" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1" target="_blank" rel="noopener">
           <span class="op-row-name">KT</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
-        <span class="op-row-note" title="DOM nach Render komplett leer (0 <a>-Tags) - vermutlich Bot-Wall oder Consent-Screen blockiert das Rendering. Plan: wie Cosmote; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -743,9 +743,9 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.chinamobileltd.com/en/media/press.php" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes" target="_blank" rel="noopener">
           <span class="op-row-name">China Mobile</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed</span>
         </a>
         
         
@@ -753,9 +753,9 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.chinatelecom-h.com/en/media/press.php" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes" target="_blank" rel="noopener">
           <span class="op-row-name">China Telecom</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed</span>
         </a>
         
         
@@ -805,16 +805,6 @@
         
         <a class="op-row-line" href="https://www.globe.com.ph/about-us/newsroom" target="_blank" rel="noopener">
           <span class="op-row-name">Globe Telecom</span>
-          <span class="op-row-type">Referenz</span>
-        </a>
-        <span class="op-row-note" title="403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
-        
-      </div>
-      
-      <div class="op-row">
-        
-        <a class="op-row-line" href="https://main.pldt.com/newsroom" target="_blank" rel="noopener">
-          <span class="op-row-name">PLDT</span>
           <span class="op-row-type">Newsroom</span>
         </a>
         
@@ -823,11 +813,21 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://ioh.co.id/portal/en/iohpressrelease" target="_blank" rel="noopener">
-          <span class="op-row-name">Indosat Ooredoo Hutchison</span>
-          <span class="op-row-type">Referenz</span>
+        <a class="op-row-line" href="https://cms.pldt.com/drupal/api/v1/newsroom-article-list" target="_blank" rel="noopener">
+          <span class="op-row-name">PLDT</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
-        <span class="op-row-note" title="18 Links im DOM sind interne SPA-Hash-Routen (z.B. "ioh-sustainability"), keine echten Artikel-URLs. Presseliste laedt per API. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
+        
+      </div>
+      
+      <div class="op-row">
+        
+        <a class="op-row-line" href="https://web-api.ioh.co.id/api/content-hub/public?page=1&limit=20&paginateDisable=false&site=&type=Press%20Release&lang=EN&language=EN" target="_blank" rel="noopener">
+          <span class="op-row-name">Indosat Ooredoo Hutchison</span>
+          <span class="op-row-type">Feed (API)</span>
+        </a>
+        
         
       </div>
       
@@ -843,9 +843,9 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.maxis.com.my/en/about-maxis/newsroom/" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://www.maxis.com.my/en/about-maxis/newsroom/jcr:content/content/section_container/section_container/container/repository_search_co.newsroom.json?keyword=*:*" target="_blank" rel="noopener">
           <span class="op-row-name">Maxis</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Feed (API)</span>
         </a>
         
         
@@ -855,9 +855,9 @@
         
         <a class="op-row-line" href="https://investor.true.th/en/newsroom/set-announcements" target="_blank" rel="noopener">
           <span class="op-row-name">True Corporation</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Newsroom</span>
         </a>
-        <span class="op-row-note" title="DOM nach Render komplett leer (0 <a>-Tags) - Investor-SET-Portal vermutlich hinter JS-Challenge/Login-Wall. Plan: wie Cosmote; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
