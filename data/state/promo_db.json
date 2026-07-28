@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-27",
+ "updated": "2026-07-28",
  "entries": [
   {
    "id": "4579c71aed782b5b",
@@ -13,7 +13,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 0,
+    "mechanic": "preisnachlass",
+    "evidence": "einen besonderen Preisvorteil verspricht",
+    "evidence_ok": true,
+    "reason": "Das Angebot ist vage und nennt keinen konkreten Vorteil, daher ist es kaum beachtenswert.",
+    "basis": "1e8bc35cc5827e84",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 0,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 45,
+   "score_reason": "Das Angebot ist vage und nennt keinen konkreten Vorteil, daher ist es kaum beachtenswert.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d2696242b0d96e97",
@@ -26,7 +49,30 @@
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "iPhone 17 oder ein Modell der iPhone-17-Serie wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 37,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein aktuelles Top-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "9d245047e05acbcd",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein aktuelles Top-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "2a2306d249c6df4c",
@@ -40,7 +86,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Samsung Galaxy S26 inklusive 1&1 All-Net-Flat S für monatlich 32,99 Euro",
+    "evidence_ok": true,
+    "reason": "Ein Flaggschiff-Smartphone mit einem günstigen Tarif kombiniert bietet einen klaren Hardware-Vorteil.",
+    "basis": "c41bcb2417d38b93",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein Flaggschiff-Smartphone mit einem günstigen Tarif kombiniert bietet einen klaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "f0544957af51ef76",
@@ -54,7 +123,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "iPhone 16 oder weitere Modelle inklusive 1&1 All-Net-Flat S ab 27,99 Euro monatlich",
+    "evidence_ok": true,
+    "reason": "Ein aktuelles iPhone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "a00cc5f85bf1b7ce",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein aktuelles iPhone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "0b074f4551590ee8",
@@ -68,7 +160,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Samsung Galaxy Z Flip8 inklusive 1&1 All-Net-Flat S für monatlich 44,99 Euro",
+    "evidence_ok": true,
+    "reason": "Ein Falt-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "54bb288c566d550e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein Falt-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "225d8fd0b9137036",
@@ -82,7 +197,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Xiaomi 17T inklusive 1&1 All-Net-Flat S für monatlich 27,99 Euro",
+    "evidence_ok": true,
+    "reason": "Ein Mittelklasse-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+    "basis": "690a230c05ecbc5b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Ein Mittelklasse-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a9ff1116f28fe285",
@@ -96,7 +234,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Google Pixel 10a inklusive 1&1 All-Net-Flat S für monatlich 24,99 Euro",
+    "evidence_ok": true,
+    "reason": "Ein Einsteiger-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+    "basis": "1237112aa53567d1",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Ein Einsteiger-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "c045c570e3338f35",
@@ -110,7 +271,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ein Smartphone der Samsung Galaxy S26-Serie wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 32,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein Flaggschiff-Smartphone mit einem günstigen Tarif kombiniert bietet einen klaren Hardware-Vorteil.",
+    "basis": "7522a4f37cea4027",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein Flaggschiff-Smartphone mit einem günstigen Tarif kombiniert bietet einen klaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "4569e89b66aaeef9",
@@ -124,7 +308,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ältere iPhone-Modelle wie das iPhone 16 oder iPhone 16e werden zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 27,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein aktuelles iPhone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "138035e9277adf21",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein aktuelles iPhone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "a49da7742d711ac9",
@@ -138,7 +345,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ein Falt-Smartphone der Samsung Galaxy Z-Serie (z.B. Galaxy Z Flip8) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 44,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein Falt-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "ca1470d1319ac5b5",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Ein Falt-Smartphone mit einem günstigen Tarif gebündelt bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "d87433f3cd693c5f",
@@ -152,7 +382,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ein Smartphone der Xiaomi 17T-Serie (z.B. Xiaomi 17T) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 27,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein Mittelklasse-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+    "basis": "9eaf39171a82b6ad",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Ein Mittelklasse-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "53614b0c62bb2a61",
@@ -166,7 +419,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ein Smartphone der Google Pixel 10-Serie (z.B. Pixel 10a) wird zusammen mit dem Tarif 1&1 All-Net-Flat S zu einem monatlichen Paketpreis ab 24,99 Euro angeboten",
+    "evidence_ok": true,
+    "reason": "Ein Einsteiger-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+    "basis": "c915ee90f9094a80",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Ein Einsteiger-Smartphone mit einem günstigen Tarif gebündelt bietet einen kleinen Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "3c350bb86ab7b622",
@@ -180,7 +456,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "reduziert von 59,99 € auf 49,99 €",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 10 Euro auf die Smartwatch ist klein und die Tarifoption ist nicht vergünstigt, sodass das Angebot nur einen geringen Anreiz für einen Anbieterwechsel bietet.",
+    "basis": "2d32c693a3c56934",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Der Preisvorteil von 10 Euro auf die Smartwatch ist klein und die Tarifoption ist nicht vergünstigt, sodass das Angebot nur einen geringen Anreiz für einen Anbieterwechsel bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "0f8b975bbff19454",
@@ -193,7 +492,30 @@
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 1,
+    "mechanic": "wechselpraemie",
+    "evidence": "Empfehle Blau an Freunde und Familie und erhalte eine Prämie von bis zu 25 € für jede erfolgreiche Vermittlung.",
+    "evidence_ok": true,
+    "reason": "Das Angebot zahlt dem Werber eine Prämie für die Gewinnung eines Neukunden und senkt so direkt die Wechselhürde.",
+    "basis": "26567160971f1c8b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 67,
+   "score_reason": "Das Angebot zahlt dem Werber eine Prämie für die Gewinnung eines Neukunden und senkt so direkt die Wechselhürde.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "25f937a05e4ceebf",
@@ -207,7 +529,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 3,
+    "depth": 0,
+    "mechanic": "bindungsfrei",
+    "evidence": "monatlich kündbar",
+    "evidence_ok": true,
+    "reason": "Die monatliche Kündbarkeit beseitigt die Bindung an eine Mindestlaufzeit und macht den Wechsel jederzeit risikolos.",
+    "basis": "753a7bbbdec06fb1",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "bindungsfrei",
+   "score_axes": {
+    "lever": 3,
+    "depth": 0,
+    "reach": 2,
+    "momentum": 1,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Die monatliche Kündbarkeit beseitigt die Bindung an eine Mindestlaufzeit und macht den Wechsel jederzeit risikolos.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "91207751dbad9ec6",
@@ -221,7 +566,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Sichere dir ein erneuertes Top-Handy inklusive Tarif mit Allnet Flat zu einem günstigen Preis.",
+    "evidence_ok": true,
+    "reason": "Ein gebrauchtes Handy in sehr gutem Zustand wird mit einem Tarif gebündelt, der Preisvorteil ist aber nicht beziffert.",
+    "basis": "7ae6e18423a1f98d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Ein gebrauchtes Handy in sehr gutem Zustand wird mit einem Tarif gebündelt, der Preisvorteil ist aber nicht beziffert.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "3417f6a52666012c",
@@ -235,7 +603,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "50 % Rabatt auf den Tarifpreis",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von 50 Prozent auf den Tarifpreis ist ein sehr großer Preisvorteil, der einen starken Wechselanreiz bietet.",
+    "basis": "03be2b52ad1eaab4",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Der Rabatt von 50 Prozent auf den Tarifpreis ist ein sehr großer Preisvorteil, der einen starken Wechselanreiz bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "28996f6107f8a278",
@@ -249,7 +640,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "unendlich oft 1 GB Datenvolumen kostenlos nachgebucht werden",
+    "evidence_ok": true,
+    "reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
+    "basis": "33988b95dc54244b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "35412e78d7d84b07",
@@ -263,7 +677,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "ab 4,99 € pro 4 Wochen",
+    "evidence_ok": true,
+    "reason": "Der Einstiegspreis von 4,99 Euro ist ein günstiger Tarif, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
+    "basis": "aa4033766b9985ca",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Der Einstiegspreis von 4,99 Euro ist ein günstiger Tarif, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "9d71dfa986538d37",
@@ -277,7 +714,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "einmalig 69,99 €, 99,99 € oder 149,00 €",
+    "evidence_ok": true,
+    "reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
+    "basis": "aef568bd8fa412ff",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2225c8a140acd30c",
@@ -290,7 +750,30 @@
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "gebuehrenerlass",
+    "evidence": "Versandkosten von 5,95 € entfallen",
+    "evidence_ok": true,
+    "reason": "Der Wegfall der Versandkosten ist ein kleiner Anreiz, aber kein direkter Wechselhebel.",
+    "basis": "0334bae8498c9cbc",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "gebuehrenerlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 42,
+   "score_reason": "Der Wegfall der Versandkosten ist ein kleiner Anreiz, aber kein direkter Wechselhebel.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f78fc093c4a62285",
@@ -303,7 +786,30 @@
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 1,
+    "mechanic": "wechselpraemie",
+    "evidence": "Startguthaben von 10 €",
+    "evidence_ok": true,
+    "reason": "Das Startguthaben von 10 Euro ist eine direkte Wechselprämie, die den Kunden einen sofortigen finanziellen Vorteil bietet.",
+    "basis": "0b54f658b8d26b04",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 67,
+   "score_reason": "Das Startguthaben von 10 Euro ist eine direkte Wechselprämie, die den Kunden einen sofortigen finanziellen Vorteil bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "14cba5af9795107a",
@@ -317,7 +823,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "unbegrenzt oft 1 GB kostenlos nachbuchen",
+    "evidence_ok": true,
+    "reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
+    "basis": "0938a63a4c3820e3",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f98b84eedb41c482",
@@ -331,7 +860,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "zwischen 4,99 € und 18,99 € pro 4 Wochen",
+    "evidence_ok": true,
+    "reason": "Die Preisspanne ist günstig, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
+    "basis": "f41a795da1d11841",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Die Preisspanne ist günstig, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "42c0ad4774f86984",
@@ -345,7 +897,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "für 69,99 €, 99,99 € oder 149,00 € einmalig",
+    "evidence_ok": true,
+    "reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
+    "basis": "1d81d39e97f9b557",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "6e8996f3908ca548",
@@ -360,7 +935,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "417301cd42941b61",
@@ -372,9 +948,33 @@
    "url": "https://www.o2online.de/kombiangebote/#id-2271586",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0,
-   "ended_since": "2026-07-25"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "ended_since": "2026-07-25",
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Bis zu 25 € Rabatt auf jeden weiteren Tarif",
+    "evidence_ok": true,
+    "reason": "Das Angebot richtet sich nur an Bestandskunden und bietet einen dauerhaften Preisnachlass auf Zusatztarife, was einen spürbaren monatlichen Vorteil darstellt.",
+    "basis": "1a74b37dd0cbfc27",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 62,
+   "score_reason": "Das Angebot richtet sich nur an Bestandskunden und bietet einen dauerhaften Preisnachlass auf Zusatztarife, was einen spürbaren monatlichen Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "351c0d8b16d0277e",
@@ -389,7 +989,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "6b4c5472097afe62",
@@ -404,7 +1005,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "f544d4249526f879",
@@ -419,7 +1021,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "4fea832c9b7c92ce",
@@ -434,7 +1037,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "5da1c9d9e66ec247",
@@ -449,7 +1053,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "58e982a0c21dd5c4",
@@ -464,7 +1069,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "e4705922695b9bd1",
@@ -479,7 +1085,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "8b35859bfa9f149d",
@@ -494,7 +1101,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "b9cbb466cc3d60df",
@@ -509,7 +1117,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "4b7ce709d949d627",
@@ -524,7 +1133,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "771366b7f1f47499",
@@ -539,7 +1149,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "b0ce4d3f7b148372",
@@ -554,7 +1165,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "5dcb4bb1d724d1e9",
@@ -569,7 +1181,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "688284cc69a54334",
@@ -584,7 +1197,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "545c14d1a7e133a8",
@@ -599,7 +1213,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "3e3a7059160dcdbf",
@@ -614,7 +1229,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "314cc92a23639265",
@@ -629,7 +1245,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "00f29071b8f4c3f8",
@@ -645,23 +1262,46 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "f8db2f34b1f3e226",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
    "headline": "Dauerhaft bis zu 25 € Rabatt auf jeden weiteren Tarif",
-   "description": "Bestandskunden erhalten auf jeden weiteren Mobilfunk-Tarif dauerhaft bis zu 25 Euro monatlichen Rabatt.",
+   "description": "Bestandskunden sparen dauerhaft bis zu 25 Euro monatlich auf jeden zusätzlichen Mobilfunkvertrag (ab dem 2. Tarif).",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/kombiangebote/#id-2271586",
    "image_url": null,
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "ended_since": "2026-07-26",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Dauerhaft bis zu 25 € Rabatt auf jeden weiteren Tarif",
+    "evidence_ok": true,
+    "reason": "Bestandskunden erhalten einen dauerhaften monatlichen Rabatt auf zusätzliche Verträge, was einen klaren finanziellen Anreiz zum Abschluss weiterer Tarife bietet.",
+    "basis": "30066ad814b1331f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 62,
+   "score_reason": "Bestandskunden erhalten einen dauerhaften monatlichen Rabatt auf zusätzliche Verträge, was einen klaren finanziellen Anreiz zum Abschluss weiterer Tarife bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "06307a7bd919625f",
@@ -677,7 +1317,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "5d101f4a5d4eff32",
@@ -693,7 +1334,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "467d9be51ace81ad",
@@ -709,7 +1351,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "5859cc8f5e8105c5",
@@ -725,7 +1368,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "ba7d721d60c0f424",
@@ -741,7 +1385,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "2757e782ab161d7d",
@@ -757,7 +1402,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "71d21de491c07663",
@@ -773,7 +1419,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "bc0ce3f93b8f7fe0",
@@ -789,7 +1436,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "87b081daa94cde57",
@@ -805,7 +1453,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "96ff55264427f077",
@@ -821,7 +1470,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "035594bf99c0f1e1",
@@ -837,7 +1487,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "392086949b1153a7",
@@ -853,7 +1504,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "363fddf56e2f349b",
@@ -869,7 +1521,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "2dc9be9e4e44056c",
@@ -885,7 +1538,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "2feb47012adf77c4",
@@ -901,7 +1555,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "2510e5ebf4ff470c",
@@ -917,7 +1572,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "6ba844640de3a72a",
@@ -933,7 +1589,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "462ebb5e611f6ddc",
@@ -949,7 +1606,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "eea0a6e607c3e391",
@@ -965,7 +1623,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "5972dede06f167f4",
@@ -981,7 +1640,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "16b3c08de9bebb89",
@@ -997,7 +1657,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "8f4d71ceb86810b0",
@@ -1013,7 +1674,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "dcc41ce633965250",
@@ -1029,23 +1691,46 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "003f3d8d0478b017",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
    "headline": "O2 Prepaid M: 50 GB statt 40 GB für 12 Wochen",
-   "description": "Der Prepaid-Tarif O2 Prepaid M enthält für die ersten 12 Wochen 50 GB statt 40 GB Datenvolumen, inklusive Allnet-Flat und unbegrenztem Weitersurfen mit 1 MBit/s.",
+   "description": "Der Prepaid-Tarif M mit Allnet-Flat enthält für 12 Wochen 50 GB statt der üblichen 40 GB Datenvolumen.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/mobilfunk/prepaid/prepaid-m",
    "image_url": null,
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "ended_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "50 GB statt 40 GB für 12 Wochen",
+    "evidence_ok": true,
+    "reason": "Das Angebot gewährt für einen begrenzten Zeitraum 10 GB mehr Datenvolumen, was einen kleinen, aber zeitlich befristeten Vorteil darstellt.",
+    "basis": "039d7f5f40f51b5c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das Angebot gewährt für einen begrenzten Zeitraum 10 GB mehr Datenvolumen, was einen kleinen, aber zeitlich befristeten Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "90943f1536791ef6",
@@ -1058,8 +1743,32 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "10 GB einmalig + 500 MB monatlich gratis",
+    "evidence_ok": true,
+    "reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
+    "basis": "e79ef70299141537",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "4cdac81f2fa19742",
@@ -1072,9 +1781,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "eef43daf81cef806",
@@ -1087,9 +1798,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a6ca0200332a1268",
@@ -1102,9 +1815,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b7d4225b4d71c39d",
@@ -1117,9 +1832,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "8c15748ddfdb83b6",
@@ -1132,9 +1849,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "6dab1ebea12ee2f6",
@@ -1147,9 +1866,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d3f07f3cb0ca583b",
@@ -1162,9 +1883,11 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b2dd0e73a9a987b3",
@@ -1177,8 +1900,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Smartphone-Deals mit Gadget-Zugabe und 50 GB",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
+    "basis": "1f2cd2c6144b11ec",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "167949ddc888c7d2",
@@ -1191,8 +1938,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "PS5 mit zweitem Controller gratis ab 31,99 € mtl.",
+    "evidence_ok": true,
+    "reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
+    "basis": "5d187b0ad2d3805c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "b5e47717de720f0e",
@@ -1205,8 +1976,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 0,
+    "depth": 0,
+    "mechanic": "sonstiges",
+    "evidence": "Samsung 65-Zoll UHD TV für 9,50 € mtl.",
+    "evidence_ok": true,
+    "reason": "Das Angebot bietet einen Fernseher zur Ratenzahlung ohne Tarifbindung, was keinen Wechselanreiz für Mobilfunkkunden darstellt.",
+    "basis": "2c93400cf52d89e1",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "sonstiges",
+   "score_axes": {
+    "lever": 0,
+    "depth": 0,
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "score": 20,
+   "score_reason": "Das Angebot bietet einen Fernseher zur Ratenzahlung ohne Tarifbindung, was keinen Wechselanreiz für Mobilfunkkunden darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "6005b7c184ec5579",
@@ -1219,8 +2014,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "300 € Altgeräteprämie",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
+    "basis": "5c863d8dadec6bd6",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "bd8b135062d53ebf",
@@ -1233,8 +2052,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "iPhone 17 Pro Max mit 150 GB+ ab 63,49 € mtl.",
+    "evidence_ok": true,
+    "reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
+    "basis": "9fe91579edcfedc5",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "5bef6ed13c276899",
@@ -1247,8 +2090,254 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "iPhone 17 Pro Max + AirPods Pro 3 ab 65,49 € mtl.",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
+    "basis": "f836a85b73228b53",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "118db98c22e10d87",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Exklusiv in der Mein O2 App: 10 GB + 500 MB Gratis-Daten",
+   "description": "Neukunden und Bestandskunden erhalten beim Download der Mein O2 App einmalig 10 GB und dauerhaft jeden Monat 500 MB zusätzliches Datenvolumen geschenkt.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "10 GB + 500 MB Gratis-Daten",
+    "evidence_ok": true,
+    "reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
+    "basis": "55c0241da3a9c239",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "6069231b683c7aab",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Smartphone-Deals mit 50 GB, 300 MBit/s und Bundle-Zugabe",
+   "description": "Verschiedene Smartphones (z. B. Samsung Galaxy A57 + Fitnesstracker, Google Pixel 10 Pro, Xiaomi 17T Pro + Tablet, Nothing Phone (4a) Pro + Smartwatch) im Tarif mit 50 GB Datenvolumen und bis zu 300 MBit/s. Preise zwischen 27,49 € und 34,99 € monatlich.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Smartphone-Deals mit 50 GB, 300 MBit/s und Bundle-Zugabe",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
+    "basis": "28f924e421ed6032",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "d3b2722cd80a99df",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "PS5 + zweiter Controller gratis im 50-GB-Tarif",
+   "description": "Im Tarif mit 50 GB Datenvolumen und bis zu 300 MBit/s gibt es eine PlayStation 5 inklusive eines gratis DualSense-Controllers. Monatlicher Preis ab 31,99 €.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/sony?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "PS5 + zweiter Controller gratis im 50-GB-Tarif",
+    "evidence_ok": true,
+    "reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
+    "basis": "9e7c5c59aeedefa4",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "5c6f3629df1267ef",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "Samsung Galaxy Z Flip8 mit 300 € Altgeräte-Prämie",
+   "description": "Das Samsung Galaxy Z Flip8 im Tarif mit 50 GB+ Datenvolumen. Enthält eine Wechselprämie von 300 Euro für das alte Smartphone. Monatlicher Durchschnittspreis 37,80 €.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "300 € Altgeräte-Prämie",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
+    "basis": "626a83a8f7095155",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "ce49feffd5281c92",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro Max mit 150 GB+ und O2 Pay Stop",
+   "description": "Das iPhone 17 Pro Max im Tarif mit mindestens 150 GB Datenvolumen und inklusive O2 Pay Stop (Schutz vor Kostenfallen). Monatlicher Preis 63,49 €.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-details?tarif=o2-mobile-l-plus&ohne-tarif=nein&ratenzahlung=36&vertragsart=ratenzahlung&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "iPhone 17 Pro Max mit 150 GB+ und O2 Pay Stop",
+    "evidence_ok": true,
+    "reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
+    "basis": "1570d11ed0e49e3c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "37b25acaa137aacb",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro Max + AirPods Pro 3 im 50-GB-Tarif",
+   "description": "Das iPhone 17 Pro Max oder iPhone 17 Pro zusammen mit den AirPods Pro 3 im Tarif mit 50 GB Datenvolumen und bis zu 300 MBit/s. Preise: 65,49 € bzw. 61,49 € monatlich.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-mit-airpods-pro-3-weiss-details?tarif=o2-mobile-on-demand-m-plus&ohne-tarif=nein&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "iPhone 17 Pro Max + AirPods Pro 3 im 50-GB-Tarif",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
+    "basis": "8d2df47324e5a2fe",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "29fd6aed75f49a77",
@@ -1262,7 +2351,30 @@
    "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "Neukunden erhalten in bestimmten Tarifen die doppelte Surf-Geschwindigkeit von 100 Mbit/s statt der üblichen 50 Mbit/s.",
+    "evidence_ok": true,
+    "reason": "Das Angebot verdoppelt die Surf-Geschwindigkeit für Neukunden, was einen spürbaren Leistungsvorteil darstellt.",
+    "basis": "88f0360cc4fce0da",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Das Angebot verdoppelt die Surf-Geschwindigkeit für Neukunden, was einen spürbaren Leistungsvorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2ab38f7fba24878e",
@@ -1276,7 +2388,30 @@
    "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Samsung Galaxy A57 5G in Kombination mit dem Unlimited on Demand Tarif zu einem Aktionspreis.",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein aktuelles Smartphone mit einem unlimitierten Tarif zu einem Aktionspreis, was einen starken Anreiz für Neukunden bietet.",
+    "basis": "949d3c13ba6d4283",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 65,
+   "score_reason": "Das Angebot kombiniert ein aktuelles Smartphone mit einem unlimitierten Tarif zu einem Aktionspreis, was einen starken Anreiz für Neukunden bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "be8178c003140767",
@@ -1290,7 +2425,30 @@
    "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "zielgruppe",
+    "evidence": "Unbegrenztes Datenvolumen (100 GB, unendlich oft nachbuchbar) für 26,99 € pro Monat, exklusiv für Kunden unter 30 Jahren.",
+    "evidence_ok": true,
+    "reason": "Das Angebot bietet jungen Kunden unbegrenztes Datenvolumen zu einem günstigen Festpreis, was einen klaren Preisvorteil darstellt.",
+    "basis": "ac38cb623163e131",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zielgruppe",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 50,
+   "score_reason": "Das Angebot bietet jungen Kunden unbegrenztes Datenvolumen zu einem günstigen Festpreis, was einen klaren Preisvorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "06379424d9af31ed",
@@ -1304,7 +2462,30 @@
    "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg"
+   "image_url": "https://www.otelo.de/media/cache/opengraph/default_images/otelo-meta.jpg",
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ausgewählte Smartphones von Xiaomi, Google oder Samsung bereits ab 1 Euro einmalig bei Vertragsabschluss.",
+    "evidence_ok": true,
+    "reason": "Das Angebot subventioniert Smartphones stark, sodass Kunden ein hochwertiges Gerät für eine symbolische Zahlung erhalten.",
+    "basis": "592fe1dee7df6657",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 73,
+   "score_reason": "Das Angebot subventioniert Smartphones stark, sodass Kunden ein hochwertiges Gerät für eine symbolische Zahlung erhalten.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "d6d26e28a0212191",
@@ -1318,7 +2499,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 3,
+    "depth": 2,
+    "mechanic": "wechselpraemie",
+    "evidence": "Bei erfolgreicher Werbung erhält der Werber eine Gutschrift von 3×30 Euro und der geworbene Freund 120 Euro.",
+    "evidence_ok": true,
+    "reason": "Das Angebot belohnt sowohl den Werber als auch den Neukunden mit einer direkten Geldprämie, was einen starken Wechselanreiz schafft.",
+    "basis": "3a4eb741e2e9771d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 75,
+   "score_reason": "Das Angebot belohnt sowohl den Werber als auch den Neukunden mit einer direkten Geldprämie, was einen starken Wechselanreiz schafft.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "ffc5361991b39db2",
@@ -1332,7 +2536,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 2,
+    "mechanic": "wechselpraemie",
+    "evidence": "Bei erfolgreicher Vermittlung erhält der Werber eine Gutschrift von 3×30 € und der geworbene Freund 120 €.",
+    "evidence_ok": true,
+    "reason": "Das Angebot belohnt sowohl den Werber als auch den Neukunden mit einer direkten Geldprämie, was einen starken Wechselanreiz schafft.",
+    "basis": "f4f55f1e05bb0660",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 75,
+   "score_reason": "Das Angebot belohnt sowohl den Werber als auch den Neukunden mit einer direkten Geldprämie, was einen starken Wechselanreiz schafft.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "b454efe08b52b571",
@@ -1346,7 +2573,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "Das Starter-Paket für den Prepaid Smart Tarif kostet bis zum 26.07. nur 4,98 € statt 9,95 €.",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von knapp 5 Euro auf das Starterpaket ist zu gering, um einen echten Wechselanreiz zu setzen.",
+    "basis": "71141a34510ddf2f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 50,
+   "score_reason": "Der Preisvorteil von knapp 5 Euro auf das Starterpaket ist zu gering, um einen echten Wechselanreiz zu setzen.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "eddd60bf489bcb34",
@@ -1360,7 +2610,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "Neukunden erhalten in den ersten 24 Monaten jeden Monat 5 GB zusätzliches Datenvolumen kostenlos dazu.",
+    "evidence_ok": true,
+    "reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
+    "basis": "fff9e7af8023325d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "0855ad234187d45a",
@@ -1374,7 +2647,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "In allen Smart Tarifen gibt es einmalig 25 GB Extra-Datenvolumen, das ein Jahr lang genutzt werden kann – kostenlos.",
+    "evidence_ok": true,
+    "reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+    "basis": "f68e2995e849d287",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "0bc9162202605d3c",
@@ -1388,7 +2684,30 @@
    "last_verified": "2026-07-27",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.pennymobil.de/assets/images/pennymobil-social-media.jpg"
+   "image_url": "https://www.pennymobil.de/assets/images/pennymobil-social-media.jpg",
+   "judged": {
+    "lever": 3,
+    "depth": 1,
+    "mechanic": "wechselpraemie",
+    "evidence": "Wer seine alte Rufnummer zu Penny Mobil mitbringt, erhält einmalig 10 Euro Startguthaben.",
+    "evidence_ok": true,
+    "reason": "Die Wechselprämie von 10 Euro ist ein direkter finanzieller Anreiz, aber der Betrag ist zu niedrig, um wirklich zu überzeugen.",
+    "basis": "d7c3bc483c3c7f69",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 67,
+   "score_reason": "Die Wechselprämie von 10 Euro ist ein direkter finanzieller Anreiz, aber der Betrag ist zu niedrig, um wirklich zu überzeugen.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b913aa0a707b736e",
@@ -1402,7 +2721,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "Neukunden erhalten im Tarif Prepaid Basic statt 1 GB nun 2 GB Datenvolumen zum gleichen Preis.",
+    "evidence_ok": true,
+    "reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
+    "basis": "40aea91cc13b633e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "65d5b9ab0ca3c8d8",
@@ -1416,7 +2758,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "In allen Smart-Tarifen (Smart, Smart Plus, Smart Max) gibt es einmalig 25 GB zusätzliches Datenvolumen, das ein Jahr lang genutzt werden kann – ohne Aufpreis.",
+    "evidence_ok": true,
+    "reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+    "basis": "5061653368792c9f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 47,
+   "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d7c36130fae6c61b",
@@ -1430,7 +2795,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 16 GB Datenvolumen, Allnet-Flat und 5G kostet statt 13,99 € nur 10,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert einen spürbaren monatlichen Preisnachlass mit dem Wegfall der Bereitstellungsgebühr, was einen klaren Wechselanreiz schafft.",
+    "basis": "8fdfa05d6301ab0e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Das Angebot kombiniert einen spürbaren monatlichen Preisnachlass mit dem Wegfall der Bereitstellungsgebühr, was einen klaren Wechselanreiz schafft.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "7a4530a0c0f4fd2c",
@@ -1444,7 +2832,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 6 GB Datenvolumen, Allnet-Flat und 5G kostet statt 8,99 € nur 6,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 9,99 €).",
+    "evidence_ok": true,
+    "reason": "Der monatliche Preisvorteil von 2 Euro ist gering, aber der Wegfall der Bereitstellungsgebühr erhöht den Gesamtanreiz für Wechsler.",
+    "basis": "4d33e8445969d6b4",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 40,
+   "score_reason": "Der monatliche Preisvorteil von 2 Euro ist gering, aber der Wegfall der Bereitstellungsgebühr erhöht den Gesamtanreiz für Wechsler.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a2b1028edb25c640",
@@ -1458,7 +2869,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 12 GB Datenvolumen, Allnet-Flat und 5G kostet statt 11,99 € nur 8,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+    "evidence_ok": true,
+    "reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
+    "basis": "8b774a17021661e0",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f924ed2e15ec492f",
@@ -1472,7 +2906,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 60 GB Datenvolumen, Allnet-Flat und 5G kostet statt 29,99 € nur 19,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+    "evidence_ok": true,
+    "reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
+    "basis": "b3018f639af97ee6",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d75172fc56af846c",
@@ -1486,7 +2943,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "DSL 100 MBit/s für dauerhaft günstige 26,99 € monatlich.",
+    "evidence_ok": true,
+    "reason": "Ohne Streichpreis oder Vergleichswert ist der Vorteil nicht bezifferbar, der reine Aktionspreis bietet aber einen kleinen Anreiz.",
+    "basis": "7885a5809d09856a",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 40,
+   "score_reason": "Ohne Streichpreis oder Vergleichswert ist der Vorteil nicht bezifferbar, der reine Aktionspreis bietet aber einen kleinen Anreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "41c0faae98f3d68d",
@@ -1500,7 +2980,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Aktion 'Alles auf Pro': iPhone 17 Pro Max mit Allnet Flat ab 59,99 € monatlich sichern. Nur für kurze Zeit.",
+    "evidence_ok": true,
+    "reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "1d3b9c6ea918e13b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 58,
+   "score_reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2380a07694880287",
@@ -1514,7 +3017,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 16 GB Datenvolumen, Allnet-Flat und 5G kostet statt 13,99 € nur 10,99 € pro Monat. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus monatlichem Preisnachlass und entfallender Bereitstellungsgebühr ergibt einen spürbaren Wechselanreiz.",
+    "basis": "49268665774d3191",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Die Kombination aus monatlichem Preisnachlass und entfallender Bereitstellungsgebühr ergibt einen spürbaren Wechselanreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "7fc08bf75c71d619",
@@ -1528,7 +3054,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 6 GB Datenvolumen, Allnet-Flat und 5G kostet statt 8,99 € nur 6,99 € pro Monat. Der Bereitstellungspreis beträgt 0 € statt 9,99 €.",
+    "evidence_ok": true,
+    "reason": "Der kleine monatliche Preisvorteil und der Wegfall der Bereitstellungsgebühr bieten einen begrenzten, aber vorhandenen Anreiz.",
+    "basis": "c1281932936f436e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 40,
+   "score_reason": "Der kleine monatliche Preisvorteil und der Wegfall der Bereitstellungsgebühr bieten einen begrenzten, aber vorhandenen Anreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "76c4d537a2d4b018",
@@ -1542,7 +3091,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 12 GB Datenvolumen, Allnet-Flat und 5G kostet statt 11,99 € nur 8,99 € pro Monat. Der Bereitstellungspreis beträgt 0 € statt 19,99 €.",
+    "evidence_ok": true,
+    "reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
+    "basis": "b198086435ed2746",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f64669798daeaa31",
@@ -1556,7 +3128,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Tarif mit 60 GB Datenvolumen, Allnet-Flat und 5G kostet statt 29,99 € nur 19,99 € pro Monat. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+    "evidence_ok": true,
+    "reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
+    "basis": "e6e3d53c89b5932e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "1c5a9e3c2ce040b5",
@@ -1570,7 +3165,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "DSL 100 Mbit/s für dauerhaft günstige 26,99 € pro Monat oder ab 19,99 € monatlich (Startpreis).",
+    "evidence_ok": true,
+    "reason": "Der Startpreis von 19,99 Euro bietet einen zeitlich begrenzten Preisvorteil, der ohne konkreten Vergleichswert aber schwer einzuordnen ist.",
+    "basis": "4e42c6651fecb90e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 40,
+   "score_reason": "Der Startpreis von 19,99 Euro bietet einen zeitlich begrenzten Preisvorteil, der ohne konkreten Vergleichswert aber schwer einzuordnen ist.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "1bb42f11aeb656d7",
@@ -1584,7 +3202,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Nur für kurze Zeit: iPhone 17 Pro Max inklusive Allnet Flat-Tarif ab 59,99 € monatlich sichern.",
+    "evidence_ok": true,
+    "reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
+    "basis": "a67deda0fdf5b546",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 58,
+   "score_reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b1cdbf9770fd6ec8",
@@ -1692,9 +3333,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "04fbe58fdd45c68f",
@@ -1706,9 +3349,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "bcd428efd598e438",
@@ -1720,9 +3365,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "626d4d0cf5d87e16",
@@ -1734,9 +3381,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "cd6ab3e85fe4ccc5",
@@ -1748,9 +3397,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "faa320b748dc9f62",
@@ -1762,9 +3413,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "e72c5e59657bd3b1",
@@ -1776,9 +3429,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d191bbfd9821f1e6",
@@ -1790,9 +3445,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "88086e25870a70a5",
@@ -1804,9 +3461,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f02b775cd6b42f4a",
@@ -1818,9 +3477,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f7b91f88bc65a8b7",
@@ -1832,9 +3493,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a82b1f7cda045a3a",
@@ -1846,9 +3509,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "1919b1e03a476846",
@@ -1860,9 +3525,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "297f49eb7dedcf20",
@@ -1874,9 +3541,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "9f09a5f948a75daf",
@@ -1888,9 +3557,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f18648bcf97cbe2f",
@@ -1902,9 +3573,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "42cd60d2c41ca5b8",
@@ -1916,9 +3589,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "823ef305c34f962b",
@@ -1930,9 +3605,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "67afec896dab5425",
@@ -1944,9 +3621,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "90158fe5fcddb322",
@@ -1958,9 +3637,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "521584dd61b3fb15",
@@ -1972,9 +3653,11 @@
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "bad1ce87b1b2032d",
@@ -1987,22 +3670,69 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "geraetesubvention",
+    "evidence": "Das Gerät kostet 999 € statt 1.299 €",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert einen spürbaren Geräterabatt mit einem wertvollen Unlimited-Datenvolumen, das für Wechsler einen echten Mehrwert darstellt.",
+    "basis": "331e1dc2d6ab2c51",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 2
+   },
+   "score": 87,
+   "score_reason": "Das Angebot kombiniert einen spürbaren Geräterabatt mit einem wertvollen Unlimited-Datenvolumen, das für Wechsler einen echten Mehrwert darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "1e8cccf8b4b9140a",
    "brand": "Telekom Deutschland",
    "tier": 1,
    "headline": "iPad (2025) A16 zum Aktionspreis mit PlusKarte Data",
-   "description": "Sichern Sie sich das iPad (2025) A16 für 241 € statt 649 € (400 € Preisvorteil) bei Buchung der PlusKarte Data. Anzahlung 1 €, danach 10 € mtl. bei 24 Raten. Exklusiv in der MeinMagenta App.",
+   "description": "Exklusiv in der MeinMagenta App: Das iPad (2025) A16 gibt es mit der PlusKarte Data für 1 € Anzahlung und 10 € monatlich über 24 Monate – ein Preisvorteil von über 400 € (241 € statt 649 €).",
    "valid_until": null,
    "url": "https://www.telekom.de/unterwegs/aktionen",
    "image_url": null,
    "first_seen": "2026-07-27",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "geraetesubvention",
+    "evidence": "ein Preisvorteil von über 400 € (241 € statt 649 €)",
+    "evidence_ok": true,
+    "reason": "Der sehr hohe Preisvorteil von über 400 Euro macht das Angebot für preisbewusste Kunden extrem attraktiv.",
+    "basis": "77b7c8cf8057454e",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 80,
+   "score_reason": "Der sehr hohe Preisvorteil von über 400 Euro macht das Angebot für preisbewusste Kunden extrem attraktiv.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "d9052ed795337e9c",
@@ -2015,8 +3745,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "zielgruppe",
+    "evidence": "Kunden unter 28 Jahren erhalten das iPhone 17 Pro für 901 € statt 1.299 € (390 € Preisvorteil)",
+    "evidence_ok": true,
+    "reason": "Das Angebot richtet sich spezifisch an eine junge Zielgruppe und bietet einen sehr hohen Geräterabatt sowie unbegrenztes Datenvolumen.",
+    "basis": "8e4726ae90fe5532",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zielgruppe",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 75,
+   "score_reason": "Das Angebot richtet sich spezifisch an eine junge Zielgruppe und bietet einen sehr hohen Geräterabatt sowie unbegrenztes Datenvolumen.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "8370bfaf29f527d9",
@@ -2029,8 +3783,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "gebuehrenerlass",
+    "evidence": "kostet durchschnittlich 29,49 € mtl., ohne Bereitstellungspreis",
+    "evidence_ok": true,
+    "reason": "Der entfallende Bereitstellungspreis ist ein kleiner Anreiz, der Preisvorteil gegenüber dem Normalpreis bleibt aber unklar.",
+    "basis": "151fc3c0ef4aaa50",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "gebuehrenerlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der entfallende Bereitstellungspreis ist ein kleiner Anreiz, der Preisvorteil gegenüber dem Normalpreis bleibt aber unklar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "6accbfb06b09854e",
@@ -2043,8 +3821,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "zielgruppe",
+    "evidence": "kostet durchschnittlich 29,28 € mtl.",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil ist nicht beziffert und der Tarif richtet sich an eine junge Zielgruppe, was den Wechselanreiz begrenzt.",
+    "basis": "5ba0b5b88a5d4db4",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zielgruppe",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der Preisvorteil ist nicht beziffert und der Tarif richtet sich an eine junge Zielgruppe, was den Wechselanreiz begrenzt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "0ba5ae4deb258342",
@@ -2057,8 +3859,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet durchschnittlich 33,95 € mtl.",
+    "evidence_ok": true,
+    "reason": "Ohne Nennung eines Vergleichspreises oder einer Ersparnis ist der Vorteil für den Kunden nicht greifbar.",
+    "basis": "f0ba408910b1c4d0",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Ohne Nennung eines Vergleichspreises oder einer Ersparnis ist der Vorteil für den Kunden nicht greifbar.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a79c28b519174475",
@@ -2071,8 +3897,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "bis zu 240 € Cashback",
+    "evidence_ok": true,
+    "reason": "Der direkte Cashback von bis zu 240 Euro ist ein starker Wechselanreiz, der den Kunden sofort einen hohen Geldbetrag verschafft.",
+    "basis": "5c3d7c92ed12a6f0",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Der direkte Cashback von bis zu 240 Euro ist ein starker Wechselanreiz, der den Kunden sofort einen hohen Geldbetrag verschafft.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "975472a46a98d2c8",
@@ -2085,8 +3935,217 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "Zusätzlich gibt es bis zu 200 € Ankaufsbonus beim Gerätetausch",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus günstiger Gerätefinanzierung und einem hohen Ankaufsbonus für das Altgerät macht den Wechsel besonders lukrativ.",
+    "basis": "e57cd01517d5f014",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Die Kombination aus günstiger Gerätefinanzierung und einem hohen Ankaufsbonus für das Altgerät macht den Wechsel besonders lukrativ.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "31098658efd6c8b8",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt",
+   "description": "Beim Kauf eines iPhone 17 Pro im MagentaMobil M Tarif erhalten Kunden 24 Monate unbegrenztes Datenvolumen und sparen 300 € auf das Gerät (999 € statt 1.299 €). Anzahlung 99 €, danach 24,75 € monatlich für 36 Monate.",
+   "valid_until": "31.08.2026",
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/cosmic-orange-256-gb?currentPage=1&tariffId=MF_17743&itemPerPage=24&excludedCurrentPage=1&tariffCategoryId=page-1679&categoryId=smartphones&installmentValue=25&instalmentId=36&changedAttr%255B%255D=changedAttr.colour%253D%2523f77e37",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "geraetesubvention",
+    "evidence": "sparen 300 € auf das Gerät (999 € statt 1.299 €)",
+    "evidence_ok": true,
+    "reason": "Der spürbare Geräterabatt von 300 Euro in Kombination mit unbegrenztem Datenvolumen ist ein starkes Angebot für Wechsler.",
+    "basis": "6dd1b667a4dbe68c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 2
+   },
+   "score": 87,
+   "score_reason": "Der spürbare Geräterabatt von 300 Euro in Kombination mit unbegrenztem Datenvolumen ist ein starkes Angebot für Wechsler.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "ea3f198e2db9dded",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "iPhone 17 Pro für Kunden unter 28 Jahren mit Unlimited",
+   "description": "Junge Leute unter 28 Jahren erhalten das iPhone 17 Pro im MagentaMobil L Young Tarif mit 24 Monaten unbegrenztem Datenvolumen. Preisvorteil über 390 € (901 € statt 1.299 €), Anzahlung 1 €, monatlich 25 € für 36 Monate.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/geraet/apple/apple-iphone-17-pro/cosmic-orange-256-gb?currentPage=1&tariffId=MF_17743&itemPerPage=24&excludedCurrentPage=1&tariffCategoryId=page-1679&categoryId=smartphones&installmentValue=25&instalmentId=36&changedAttr%255B%255D=changedAttr.colour%253D%2523f77e37",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 3,
+    "mechanic": "zielgruppe",
+    "evidence": "Preisvorteil über 390 € (901 € statt 1.299 €)",
+    "evidence_ok": true,
+    "reason": "Der sehr hohe Geräterabatt und das unbegrenzte Datenvolumen machen das Angebot für die junge Zielgruppe extrem attraktiv.",
+    "basis": "db2a3f9546937889",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zielgruppe",
+   "score_axes": {
+    "lever": 2,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 75,
+   "score_reason": "Der sehr hohe Geräterabatt und das unbegrenzte Datenvolumen machen das Angebot für die junge Zielgruppe extrem attraktiv.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "7fc231d3785dc0c0",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Bis zu 240 € Cashback in allen MagentaMobil Tarifen",
+   "description": "Bei Abschluss eines neuen MagentaMobil Tarifs (XS bis XL) gibt es bis zu 240 € Cashback, einlösbar über die MeinMagenta App.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/shop/tarife/smartphone-tarife",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "bis zu 240 € Cashback",
+    "evidence_ok": true,
+    "reason": "Der direkte Cashback von bis zu 240 Euro ist ein starker Wechselanreiz, der den Kunden sofort einen hohen Geldbetrag verschafft.",
+    "basis": "efc6d242253f431b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Der direkte Cashback von bis zu 240 Euro ist ein starker Wechselanreiz, der den Kunden sofort einen hohen Geldbetrag verschafft.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "66ef3b2272f2bdff",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Smartphone-Angebote ab 1 € mit Ankaufsbonus",
+   "description": "Viele Android-Smartphones (z. B. Samsung Galaxy Z Fold8 Ultra, Google Pixel 10a, Xiaomi 17, Samsung Galaxy S26) sind ab 1 € Anzahlung plus monatlicher Rate über 36 Monate erhältlich. Zusätzlich gibt es bis zu 200 € Ankaufsbonus beim Eintausch eines Altgeräts.",
+   "valid_until": null,
+   "url": "https://www.telekom.de/unterwegs/aktionen",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "Zusätzlich gibt es bis zu 200 € Ankaufsbonus beim Eintausch eines Altgeräts",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus günstiger Gerätefinanzierung und einem hohen Ankaufsbonus für das Altgerät macht den Wechsel besonders lukrativ.",
+    "basis": "f2c6de5f3e10e48b",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Die Kombination aus günstiger Gerätefinanzierung und einem hohen Ankaufsbonus für das Altgerät macht den Wechsel besonders lukrativ.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "2df9f2a164fea83e",
+   "brand": "Telekom Deutschland",
+   "tier": 1,
+   "headline": "Kids Watches XPLORA X6 Play und Anio 6 zum Aktionspreis",
+   "description": "Die Kinderuhren XPLORA X6 Play eSIM und Anio 6 kosten 1 € einmalig. Dazu gibt es den Tarif Smart Connect S für 3 Monate zu 5 € statt 9,95 € monatlich.",
+   "valid_until": "03.08.",
+   "url": "https://www.telekom.de/shop/iot/kids-watch",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Die Kinderuhren XPLORA X6 Play eSIM und Anio 6 kosten 1 € einmalig",
+    "evidence_ok": true,
+    "reason": "Der sehr günstige Gerätepreis von nur einem Euro ist ein starker Anreiz für Familien, ein neues Kinderprodukt auszuprobieren.",
+    "basis": "bf7bda2cd34f591a",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 75,
+   "score_reason": "Der sehr günstige Gerätepreis von nur einem Euro ist ein starker Anreiz für Familien, ein neues Kinderprodukt auszuprobieren.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "7c497c85439018b9",
@@ -2098,9 +4157,11 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2ba62f8fbc033982",
@@ -2112,21 +4173,68 @@
    "url": "https://www.vodafone.de/privat/handys-tablets-tarife/junge-leute.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Neukunden sparen im GigaMobil Young XL 960 € (40 €/Monat für 24 Monate) oder im GigaMobil Young S 240 € (10 €/Monat für 24 Monate).",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von bis zu 960 Euro ist ein sehr großer Preisvorteil, der Wechsler direkt anspricht, aber als reiner Tarifrabatt nicht die Hürde des Anbieterwechsels selbst adressiert.",
+    "basis": "80a1738ed656c3c2",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 73,
+   "score_reason": "Der Rabatt von bis zu 960 Euro ist ein sehr großer Preisvorteil, der Wechsler direkt anspricht, aber als reiner Tarifrabatt nicht die Hürde des Anbieterwechsels selbst adressiert.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "2cec4f8f2c14a367",
    "brand": "Vodafone Deutschland",
    "tier": 1,
    "headline": "20 % Rabatt auf FamilyCard-Zusatzkarten",
-   "description": "Bestandskunden erhalten auf alle FamilyCard-Zusatzkarten 20 % Rabatt pro Monat. Beispiel: 5 GB Datenvolumen für 7,99 € statt 9,99 € pro Monat.",
-   "valid_until": "29. Juli",
+   "description": "Bestandskunden mit einem Mobilfunktarif erhalten auf alle FamilyCard-Zusatzkarten 20 % Rabatt pro Monat. Beispiel: 5 GB Datenvolumen für 7,99 € statt 9,99 € monatlich.",
+   "valid_until": "29. Juli 2026",
    "url": "https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 0,
+    "depth": 1,
+    "mechanic": "preisnachlass",
+    "evidence": "Bestandskunden mit einem Mobilfunktarif erhalten auf alle FamilyCard-Zusatzkarten 20 % Rabatt pro Monat.",
+    "evidence_ok": true,
+    "reason": "Der Rabatt richtet sich ausschließlich an Bestandskunden und bietet keinen Anreiz für einen Anbieterwechsel.",
+    "basis": "7a9dc995d54f36d5",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 0,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 47,
+   "score_reason": "Der Rabatt richtet sich ausschließlich an Bestandskunden und bietet keinen Anreiz für einen Anbieterwechsel.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "01a01ae8cedbed62",
@@ -2138,9 +4246,11 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "880172e1d1b9d8ad",
@@ -2152,9 +4262,11 @@
    "url": "https://www.vodafone.de/handy/angebote.html",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "bc6c06c68b70655a",
@@ -2167,8 +4279,32 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "Mindestens 500 € für das alte Handy beim Verkauf an Vodafone. Neukunden erhalten zusätzlich 25 % Rabatt auf den Tarifpreis für 24 Monate. Gerät ab 1 € einmalig.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus einer hohen Ankaufprämie von mindestens 500 Euro und einem Tarifrabatt von 25 Prozent bietet einen sehr großen finanziellen Vorteil und adressiert die Wechselhürde direkt.",
+    "basis": "3830934d749a2372",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 93,
+   "score_reason": "Die Kombination aus einer hohen Ankaufprämie von mindestens 500 Euro und einem Tarifrabatt von 25 Prozent bietet einen sehr großen finanziellen Vorteil und adressiert die Wechselhürde direkt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
   },
   {
    "id": "18abba0792661c0c",
@@ -2181,22 +4317,180 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Neukunden erhalten 25 % Rabatt auf den monatlichen Tarifpreis in den Tarifen Vodafone Mobil XS bis XL für 24 Monate.",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von 25 Prozent auf den Tarifpreis ist ein spürbarer Vorteil, aber als reiner Preisnachlass kein direkter Wechselanreiz.",
+    "basis": "8d47850debdc5198",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 62,
+   "score_reason": "Der Rabatt von 25 Prozent auf den Tarifpreis ist ein spürbarer Vorteil, aber als reiner Preisnachlass kein direkter Wechselanreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2e3ec87cf1b4144a",
    "brand": "Vodafone Deutschland",
    "tier": 1,
    "headline": "Aktionswoche: Top-Smartphones ab 1 €",
-   "description": "Ausgewählte High-End-Smartphones wie iPhone 17, iPhone 17 Pro, Samsung Galaxy S26 und Google Pixel 10 sind mit Vertrag ab einmalig 1 € erhältlich.",
+   "description": "Ausgewählte High-End-Smartphones wie iPhone 17, iPhone 17 Pro, Samsung Galaxy S26 und Google Pixel 10 sind mit Vertrag bereits ab einmalig 1 € erhältlich.",
    "valid_until": null,
    "url": "https://www.vodafone.de/privat/handys/iphone-17.html",
    "image_url": null,
    "first_seen": "2026-07-27",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Ausgewählte High-End-Smartphones wie iPhone 17, iPhone 17 Pro, Samsung Galaxy S26 und Google Pixel 10 sind mit Vertrag bereits ab einmalig 1 € erhältlich.",
+    "evidence_ok": true,
+    "reason": "Die Subvention eines High-End-Smartphones auf einen Euro ist ein spürbarer Vorteil, aber ohne zusätzliche Wechselprämie kein direkter Anreiz für den Anbieterwechsel.",
+    "basis": "ec3c8d63d7bf0ee7",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Die Subvention eines High-End-Smartphones auf einen Euro ist ein spürbarer Vorteil, aber ohne zusätzliche Wechselprämie kein direkter Anreiz für den Anbieterwechsel.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "13dec564668e040f",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "Samsung Galaxy Z Fold8: 500 € Trade-in + 25 % Rabatt",
+   "description": "Bei Vorbestellung eines Galaxy Z Fold8 oder Z Fold8 Ultra erhalten Neukunden 25 % Rabatt auf den Mobilfunktarif für 24 Monate. Zusätzlich gibt es mindestens 500 € beim Verkauf des alten Handys. Das Smartphone kostet einmalig 1 €.",
+   "valid_until": "6. August 2026",
+   "url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "Bei Vorbestellung eines Galaxy Z Fold8 oder Z Fold8 Ultra erhalten Neukunden 25 % Rabatt auf den Mobilfunktarif für 24 Monate. Zusätzlich gibt es mindestens 500 € beim Verkauf des alten Handys. Das Smartphone kostet einmalig 1 €.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus einer hohen Ankaufprämie von mindestens 500 Euro und einem Tarifrabatt von 25 Prozent bietet einen sehr großen finanziellen Vorteil und adressiert die Wechselhürde direkt.",
+    "basis": "2148f33abad122b2",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 93,
+   "score_reason": "Die Kombination aus einer hohen Ankaufprämie von mindestens 500 Euro und einem Tarifrabatt von 25 Prozent bietet einen sehr großen finanziellen Vorteil und adressiert die Wechselhürde direkt.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "00ce831d021c7a84",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "GigaMobil Young: Bis zu 960 € sparen (U28)",
+   "description": "Neukunden unter 28 Jahren erhalten im GigaMobil Young XL mit unbegrenztem Datenvolumen 960 € Rabatt über 24 Monate (40 €/Monat) oder im GigaMobil Young S mit 100 GB 240 € Rabatt (10 €/Monat).",
+   "valid_until": "14. Oktober 2026",
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/junge-leute.html",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Neukunden unter 28 Jahren erhalten im GigaMobil Young XL mit unbegrenztem Datenvolumen 960 € Rabatt über 24 Monate (40 €/Monat) oder im GigaMobil Young S mit 100 GB 240 € Rabatt (10 €/Monat).",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von bis zu 960 Euro ist ein sehr großer Preisvorteil, der Wechsler direkt anspricht, aber als reiner Tarifrabatt nicht die Hürde des Anbieterwechsels selbst adressiert.",
+    "basis": "cf8b6c09d7053b45",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 73,
+   "score_reason": "Der Rabatt von bis zu 960 Euro ist ein sehr großer Preisvorteil, der Wechsler direkt anspricht, aber als reiner Tarifrabatt nicht die Hürde des Anbieterwechsels selbst adressiert.",
+   "scored_at": "2026-07-28",
+   "highlight": true
+  },
+  {
+   "id": "9a15df41978db35c",
+   "brand": "Vodafone Deutschland",
+   "tier": 1,
+   "headline": "25 % Rabatt auf alle Mobil-Tarife (Neukunden)",
+   "description": "Neukunden erhalten 25 % Rabatt auf den monatlichen Tarifpreis in den Tarifen Vodafone Mobil XS bis XL für 24 Monate. Unter 28-Jährige sparen bis zu 30 %. In den Tarifen XS, S und M gibt es zusätzlich Extra-Datenvolumen geschenkt.",
+   "valid_until": null,
+   "url": "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html",
+   "image_url": null,
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Neukunden erhalten 25 % Rabatt auf den monatlichen Tarifpreis in den Tarifen Vodafone Mobil XS bis XL für 24 Monate.",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von 25 Prozent auf den Tarifpreis ist ein spürbarer Vorteil, aber als reiner Preisnachlass kein direkter Wechselanreiz.",
+    "basis": "827f07e247849262",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 62,
+   "score_reason": "Der Rabatt von 25 Prozent auf den Tarifpreis ist ein spürbarer Vorteil, aber als reiner Preisnachlass kein direkter Wechselanreiz.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "26cdf7923a1575a0",
@@ -2208,23 +4502,48 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "80d2867752b6f855",
    "brand": "congstar",
    "tier": 2,
    "headline": "Allnet Flat M mit Upgrade-Versprechen: 125 GB statt 100 GB",
-   "description": "Neukunden erhalten im Tarif Allnet Flat M dauerhaft 125 GB Datenvolumen zum Preis von 100 GB.",
+   "description": "Der Tarif Allnet Flat M enthält dauerhaft 125 GB Datenvolumen zum Preis der sonst üblichen 100 GB.",
    "valid_until": null,
    "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "125 GB statt 100 GB",
+    "evidence_ok": true,
+    "reason": "Das Angebot bietet 25 Prozent mehr Datenvolumen zum gleichen Preis, was einen spürbaren Mehrwert darstellt.",
+    "basis": "1f2713c806fc0f61",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Das Angebot bietet 25 Prozent mehr Datenvolumen zum gleichen Preis, was einen spürbaren Mehrwert darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "c8ac71f4c90e6685",
@@ -2236,37 +4555,85 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "9e9c506688d9e8b1",
    "brand": "congstar",
    "tier": 2,
    "headline": "congstar Kennenlernen: 1 Monat unverbindlich testen",
-   "description": "Neukunden können congstar einen Monat lang ohne langfristige Bindung testen.",
+   "description": "Neukunden können einen congstar-Tarif einen Monat lang ohne Vertragsbindung testen.",
    "valid_until": null,
-   "url": "https://www.congstar.de/handytarife/angebote/",
+   "url": "https://www.congstar.de/congstar-kennenlernen/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "judged": {
+    "lever": 3,
+    "depth": 1,
+    "mechanic": "bindungsfrei",
+    "evidence": "1 Monat unverbindlich testen",
+    "evidence_ok": true,
+    "reason": "Die Testphase ohne Vertragsbindung senkt die Wechselhürde für Neukunden erheblich.",
+    "basis": "947ddce1c68eca16",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "bindungsfrei",
+   "score_axes": {
+    "lever": 3,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 1,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Testphase ohne Vertragsbindung senkt die Wechselhürde für Neukunden erheblich.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "84a4e51cc4cbefc8",
    "brand": "congstar",
    "tier": 2,
    "headline": "Young Tarifangebot: Double your Data zum selben Preis",
-   "description": "Kunden von 18 bis 27 Jahren erhalten in den Young-Tarifen die doppelte Datenmenge zum gleichen Preis, auch mit Smartphone.",
+   "description": "Kunden zwischen 18 und 27 Jahren erhalten in den Young-Tarifen die doppelte Datenmenge zum regulären Preis, auch mit Smartphone-Option.",
    "valid_until": null,
    "url": "https://www.congstar.de/young/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
    "missed_checks": 0,
-   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "datenbonus",
+    "evidence": "Double your Data zum selben Preis",
+    "evidence_ok": true,
+    "reason": "Junge Kunden erhalten die doppelte Datenmenge zum regulären Preis, was einen sehr großen Leistungsvorteil darstellt.",
+    "basis": "f6e6d315513bf715",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Junge Kunden erhalten die doppelte Datenmenge zum regulären Preis, was einen sehr großen Leistungsvorteil darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "1d45e1771b77d972",
@@ -2278,9 +4645,33 @@
    "url": "https://www.congstar.de/partnerkarte/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0,
-   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png"
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "11 € sparen auf Allnet Flat M",
+    "evidence_ok": true,
+    "reason": "Bestandskunden sparen monatlich 11 Euro auf den Tarif, was einem spürbaren Preisnachlass von etwa 30 Prozent entspricht.",
+    "basis": "db8da4da906bafa6",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Bestandskunden sparen monatlich 11 Euro auf den Tarif, was einem spürbaren Preisnachlass von etwa 30 Prozent entspricht.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "aab5f61f8d009fce",
@@ -2292,9 +4683,11 @@
    "url": "https://www.congstar.de/handytarife/angebote/",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-25",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "ca96aee0ec0e78f9",
@@ -2307,8 +4700,32 @@
    "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "gebuehrenerlass",
+    "evidence": "0 € Bereitstellungspreis auf alle Tarife",
+    "evidence_ok": true,
+    "reason": "Der entfallende Bereitstellungspreis ist ein kleiner einmaliger Vorteil für Neukunden.",
+    "basis": "e713ad1183810ef8",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "gebuehrenerlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 2,
+    "campaign": 1
+   },
+   "score": 45,
+   "score_reason": "Der entfallende Bereitstellungspreis ist ein kleiner einmaliger Vorteil für Neukunden.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "67546409aa0f8b11",
@@ -2321,8 +4738,32 @@
    "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "10 € / 4 Wochen",
+    "evidence_ok": true,
+    "reason": "Der günstige Preis von 10 Euro alle 4 Wochen für 25 GB ist ein attraktives Einstiegsangebot ohne Vertragsbindung.",
+    "basis": "55dc584b6c8380a6",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Der günstige Preis von 10 Euro alle 4 Wochen für 25 GB ist ein attraktives Einstiegsangebot ohne Vertragsbindung.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "365d677e413a7e3f",
@@ -2335,8 +4776,143 @@
    "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 3,
+    "depth": 1,
+    "mechanic": "bindungsfrei",
+    "evidence": "1 Monat unverbindlich testen",
+    "evidence_ok": true,
+    "reason": "Die Testphase ohne Vertragsbindung senkt die Wechselhürde für Neukunden erheblich.",
+    "basis": "8e3cb49249684a4c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "bindungsfrei",
+   "score_axes": {
+    "lever": 3,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 1,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Testphase ohne Vertragsbindung senkt die Wechselhürde für Neukunden erheblich.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "7e574a1b9ef0e966",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "0 € Bereitstellungspreis auf Allnet Flat Tarife",
+   "description": "Neukunden zahlen keinen einmaligen Bereitstellungspreis bei Abschluss eines Allnet Flat Mobilfunktarifs.",
+   "valid_until": null,
+   "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "gebuehrenerlass",
+    "evidence": "0 € Bereitstellungspreis auf Allnet Flat Tarife",
+    "evidence_ok": true,
+    "reason": "Der entfallende Bereitstellungspreis ist ein kleiner einmaliger Vorteil für Neukunden.",
+    "basis": "e90132b593f87e14",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "gebuehrenerlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 2,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 42,
+   "score_reason": "Der entfallende Bereitstellungspreis ist ein kleiner einmaliger Vorteil für Neukunden.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "03e4bca3e1b19c06",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "Prepaid Allnet M für 10 € pro 4 Wochen",
+   "description": "Prepaid-Tarif mit 25 GB Datenvolumen, Allnet-Flat und SMS-Flat für 10 Euro alle 4 Wochen.",
+   "valid_until": null,
+   "url": "https://www.congstar.de/prepaid/tarife/prepaid-allnet-m/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "10 € pro 4 Wochen",
+    "evidence_ok": true,
+    "reason": "Der günstige Preis von 10 Euro alle 4 Wochen für 25 GB ist ein attraktives Einstiegsangebot ohne Vertragsbindung.",
+    "basis": "522874c9fe6ecea8",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Der günstige Preis von 10 Euro alle 4 Wochen für 25 GB ist ein attraktives Einstiegsangebot ohne Vertragsbindung.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "ef70a13413b4de22",
+   "brand": "congstar",
+   "tier": 2,
+   "headline": "Partnerkarte: 11 € Rabatt auf Allnet Flat M",
+   "description": "Bestandskunden sparen monatlich 11 Euro auf die Allnet Flat M, wenn sie eine Partnerkarte für eine zweite SIM im selben Haushalt abschließen.",
+   "valid_until": null,
+   "url": "https://www.congstar.de/partnerkarte/",
+   "image_url": "https://www.congstar.de/_assets/8f060ee4806b33ef42b7f65d95c06d18/Images/Frontend/congstar-logo.png",
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "11 € Rabatt auf Allnet Flat M",
+    "evidence_ok": true,
+    "reason": "Bestandskunden sparen monatlich 11 Euro auf den Tarif, was einem spürbaren Preisnachlass von etwa 30 Prozent entspricht.",
+    "basis": "b869b675b54a978f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 55,
+   "score_reason": "Bestandskunden sparen monatlich 11 Euro auf den Tarif, was einem spürbaren Preisnachlass von etwa 30 Prozent entspricht.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "4c6eaa48f29fda61",
@@ -2351,7 +4927,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "71fb01a579f66c51",
@@ -2366,7 +4943,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "338e3f6b22cdc085",
@@ -2381,7 +4959,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "4361701626d99315",
@@ -2395,7 +4974,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "10 GB Datenvolumen, Allnet-Flat und SMS-Flat für einen monatlichen Festpreis von 6,99 €, ohne Vertragslaufzeit und mit 0 € Bereitstellungspreis.",
+    "evidence_ok": true,
+    "reason": "Der extrem niedrige Festpreis von 6,99 Euro für 10 GB inklusive Allnet-Flat ist ein starker Preisvorteil gegenüber vergleichbaren Tarifen.",
+    "basis": "ac10744e72c9e5d7",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der extrem niedrige Festpreis von 6,99 Euro für 10 GB inklusive Allnet-Flat ist ein starker Preisvorteil gegenüber vergleichbaren Tarifen.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d8191d9662d78d70",
@@ -2409,7 +5011,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "30 GB Datenvolumen, Allnet-Flat und SMS-Flat für einen monatlichen Festpreis von 8,99 €, ohne Vertragslaufzeit und mit 0 € Bereitstellungspreis.",
+    "evidence_ok": true,
+    "reason": "Der Preis von 8,99 Euro für 30 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+    "basis": "70d5332ec13f825c",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der Preis von 8,99 Euro für 30 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "63e26a687734453d",
@@ -2423,7 +5048,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "60 GB Datenvolumen, Allnet-Flat und SMS-Flat für einen monatlichen Festpreis von 13,99 €, ohne Vertragslaufzeit und mit 0 € Bereitstellungspreis.",
+    "evidence_ok": true,
+    "reason": "Der Preis von 13,99 Euro für 60 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+    "basis": "82a3068d0ef5bf03",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der Preis von 13,99 Euro für 60 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "d11793b48ba93c23",
@@ -2437,7 +5085,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "100 GB Datenvolumen, Allnet-Flat und SMS-Flat für einen monatlichen Festpreis von 19,99 €, ohne Vertragslaufzeit und mit 0 € Bereitstellungspreis.",
+    "evidence_ok": true,
+    "reason": "Der Preis von 19,99 Euro für 100 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+    "basis": "7e48778f815870cb",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der Preis von 19,99 Euro für 100 GB ist ein spürbarer Preisvorteil gegenüber dem Marktdurchschnitt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "ab546bf26791e407",
@@ -2451,7 +5122,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Ein DSL-Angebot zum Tiefpreis, verfügbar ab 26,99 € monatlich.",
+    "evidence_ok": true,
+    "reason": "Der DSL-Tiefpreis von 26,99 Euro ist ein spürbarer Preisvorteil gegenüber vergleichbaren Angeboten.",
+    "basis": "326d8ec0e851592d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der DSL-Tiefpreis von 26,99 Euro ist ein spürbarer Preisvorteil gegenüber vergleichbaren Angeboten.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "f23a91ce20da22ad",
@@ -2465,7 +5159,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "Neukunden erhalten bei Buchung eines Tarifs dreimal 10 GB zusätzliches Datenvolumen gratis.",
+    "evidence_ok": true,
+    "reason": "Der Bonus von 30 GB zusätzlichem Datenvolumen ist ein spürbarer Leistungsvorteil für Neukunden.",
+    "basis": "9e113903c1bfcfa6",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der Bonus von 30 GB zusätzlichem Datenvolumen ist ein spürbarer Leistungsvorteil für Neukunden.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "170e61ee7302b7f7",
@@ -2479,7 +5196,30 @@
    "last_verified": "2026-07-25",
    "status": "evtl. ausgelaufen",
    "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "stale_since": "2026-07-27",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "datenbonus",
+    "evidence": "In allen Tarifen ist eine Geschwindigkeitserhöhung von 50 MBit/s auf 100 MBit/s ohne Aufpreis enthalten.",
+    "evidence_ok": true,
+    "reason": "Die Verdopplung der Geschwindigkeit ohne Aufpreis ist ein spürbarer Leistungsvorteil.",
+    "basis": "551915ebca166d70",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Die Verdopplung der Geschwindigkeit ohne Aufpreis ist ein spürbarer Leistungsvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b21c15d4a9cb68b7",
@@ -2493,7 +5233,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Der 10-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 6,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+    "basis": "9a9ca683bd8449ec",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "964196f006b60baa",
@@ -2507,7 +5270,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Der 30-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 8,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+    "basis": "f4dd20d6c58ecc00",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "3d9cf76b8a8fedb2",
@@ -2521,7 +5307,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Der 60-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 13,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+    "basis": "9a3721d568aa2222",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b69423f4d18ee851",
@@ -2535,7 +5344,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Der 100-GB-Tarif (50 MBit/s, Allnet-Flat) wird für monatlich 19,99 € beworben, inklusive 0 € Bereitstellungspreis und 3x 10 GB gratis Datenvolumen-Bonus.",
+    "evidence_ok": true,
+    "reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+    "basis": "2a2b47f17f5403f9",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Die Kombination aus niedrigem Preis und 30 GB Datenbonus ist ein sehr starker Preis- und Leistungsvorteil.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "71780a2b56352dc0",
@@ -2549,7 +5381,30 @@
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "DSL-Tarif wird ab 26,99 € monatlich als Tiefpreis-Aktion beworben.",
+    "evidence_ok": true,
+    "reason": "Der DSL-Tiefpreis von 26,99 Euro ist ein spürbarer Preisvorteil gegenüber vergleichbaren Angeboten.",
+    "basis": "12fd3cba76947489",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 48,
+   "score_reason": "Der DSL-Tiefpreis von 26,99 Euro ist ein spürbarer Preisvorteil gegenüber vergleichbaren Angeboten.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "5c4988000ab8115b",
@@ -2565,7 +5420,8 @@
    "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "8bff470dfc71f501",
@@ -2581,7 +5437,8 @@
    "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "3d6ed6b79d9013c2",
@@ -2596,7 +5453,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "87848207e0cf2ae4",
@@ -2612,7 +5470,8 @@
    "missed_checks": 2,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "0d53c4c40b1e83c2",
@@ -2627,7 +5486,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "e1521d13fd10660b",
@@ -2642,7 +5502,8 @@
    "status": "ausgelaufen",
    "stale_since": "2026-07-25",
    "missed_checks": 1,
-   "ended_since": "2026-07-25"
+   "ended_since": "2026-07-25",
+   "highlight": false
   },
   {
    "id": "ea1f5f03b4aa7954",
@@ -2658,7 +5519,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "df4f9eedeb3bb96e",
@@ -2674,7 +5536,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "222374be0da6f0b3",
@@ -2690,7 +5553,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "e3a2802ef4ff8e13",
@@ -2706,7 +5570,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "bc4bdad6b5c33760",
@@ -2722,7 +5587,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "9fd6a10452d88dcb",
@@ -2738,7 +5604,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "44f2c55bf029bce2",
@@ -2754,7 +5621,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "a69ba81609592c5c",
@@ -2770,7 +5638,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "192f0b21bf070744",
@@ -2786,7 +5655,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "be66743cce7b7a78",
@@ -2802,7 +5672,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "69837d8ae72029d6",
@@ -2818,7 +5689,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "de2c47f3cb0ed99a",
@@ -2834,7 +5706,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-25",
-   "ended_since": "2026-07-26"
+   "ended_since": "2026-07-26",
+   "highlight": false
   },
   {
    "id": "e67fbbb059dbef16",
@@ -2850,7 +5723,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "248f53cbe9742b97",
@@ -2866,7 +5740,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "3e8fcf37a6c0dfef",
@@ -2882,7 +5757,8 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "e94bf36b0bbb7daf",
@@ -2898,50 +5774,119 @@
    "status": "ausgelaufen",
    "missed_checks": 2,
    "stale_since": "2026-07-26",
-   "ended_since": "2026-07-27"
+   "ended_since": "2026-07-27",
+   "highlight": false
   },
   {
    "id": "26432d39378a1c7c",
    "brand": "winSIM",
    "tier": 2,
    "headline": "5G-Tarife mit Rabatt und 0€ Bereitstellung",
-   "description": "Mehrere 5G-Tarife (10 GB für 6,99€, 20 GB für 8,99€, 40 GB für 10,99€, 60 GB für 14,99€, Unlimited on demand für 19,99€) sind zeitlich befristet reduziert. Zusätzlich gibt es bei Bestellung bis zum 28.07. (11 Uhr) für den 40-GB-Tarif und bei anderen Tarifen für kurze Zeit den Bereitstellungspreis von 19,99€ erlassen.",
+   "description": "Die 5G-Mobilfunktarife von winSIM sind stark reduziert: 10 GB für 6,99 € statt 14,99 €, 20 GB für 8,99 € statt 19,99 €, 40 GB für 10,99 € statt 24,99 €, 60 GB für 14,99 € statt 29,99 € und Unlimited on demand für 19,99 € statt 34,99 €. Zusätzlich entfällt der Bereitstellungspreis von 19,99 € bei Bestellung bis zum 28.07. (nur 40-GB-Tarif) bzw. für kurze Zeit (andere Tarife).",
    "valid_until": "28.07. 11 Uhr",
-   "url": "https://www.winsim.de/",
+   "url": "https://www.winsim.de/tarife",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "10 GB für 6,99 € statt 14,99 €, 20 GB für 8,99 € statt 19,99 €, 40 GB für 10,99 € statt 24,99 €, 60 GB für 14,99 € statt 29,99 € und Unlimited on demand für 19,99 € statt 34,99 €. Zusätzlich entfällt der Bereitstellungspreis von 19,99 €",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert einen spürbaren Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen klaren Wechselanreiz darstellt.",
+    "basis": "d6becb1f382e032d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 52,
+   "score_reason": "Das Angebot kombiniert einen spürbaren Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen klaren Wechselanreiz darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a66025330d118d87",
    "brand": "winSIM",
    "tier": 2,
    "headline": "Handy-Angebote mit Allnet Flat",
-   "description": "Smartphones wie Samsung Galaxy S26, iPhone 17 Pro, Galaxy A57 5G oder Xiaomi 17T Pro in Kombination mit einer Allnet Flat ab 14,99€ mtl. (Galaxy A57) bis 39,99€ mtl. (iPhone 17 Pro).",
+   "description": "Smartphones wie Samsung Galaxy S26 (ab 24,99 € mtl.), Apple iPhone 17 Pro (ab 39,99 € mtl.), Samsung Galaxy A57 5G (ab 14,99 € mtl.) und Xiaomi 17T Pro (ab 19,99 € mtl.) werden mit einer Allnet-Flat kombiniert.",
    "valid_until": null,
-   "url": "https://www.winsim.de/",
+   "url": "https://www.winsim.de/handys",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Smartphones wie Samsung Galaxy S26 (ab 24,99 € mtl.), Apple iPhone 17 Pro (ab 39,99 € mtl.)",
+    "evidence_ok": true,
+    "reason": "Die Kombination eines aktuellen Smartphones mit einer Allnet-Flat zu einem monatlichen Gesamtpreis bietet einen geldwerten Vorteil durch die Gerätesubvention.",
+    "basis": "ea0087bc1809b828",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 58,
+   "score_reason": "Die Kombination eines aktuellen Smartphones mit einer Allnet-Flat zu einem monatlichen Gesamtpreis bietet einen geldwerten Vorteil durch die Gerätesubvention.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "2941461dd1c64b4b",
    "brand": "winSIM",
    "tier": 2,
    "headline": "Tablet-Angebote mit SIM-Karte",
-   "description": "Tablets wie Samsung Galaxy Tab S11 5G oder Apple iPad Air 11 (M4) inklusive SIM-Karte ab 34,99€ mtl.",
+   "description": "Tablets wie das Samsung Galaxy Tab S11 5G (ab 39,99 € mtl.) und das Apple iPad Air 11 (M4) (ab 34,99 € mtl.) werden mit einer SIM-Karte angeboten.",
    "valid_until": null,
-   "url": "https://www.winsim.de/",
+   "url": "https://www.winsim.de/tablets",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-27",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Tablets wie das Samsung Galaxy Tab S11 5G (ab 39,99 € mtl.) und das Apple iPad Air 11 (M4) (ab 34,99 € mtl.) werden mit einer SIM-Karte angeboten.",
+    "evidence_ok": true,
+    "reason": "Das Angebot subventioniert ein hochwertiges Tablet über den monatlichen Gesamtpreis, was für Kunden mit Tablet-Bedarf attraktiv ist.",
+    "basis": "05fff823970e1096",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 58,
+   "score_reason": "Das Angebot subventioniert ein hochwertiges Tablet über den monatlichen Gesamtpreis, was für Kunden mit Tablet-Bedarf attraktiv ist.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "b3241f750c57fba3",
@@ -2954,8 +5899,32 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "DSL-Anschluss mit 100 MBit/s für dauerhaft günstige 26,99€ mtl. statt 34,99€.",
+    "evidence_ok": true,
+    "reason": "Der dauerhafte Preisnachlass von 8 Euro monatlich auf den DSL-Tarif ist ein klassischer Rabatt, der Wechsler anlockt.",
+    "basis": "2b096df31c352074",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 52,
+   "score_reason": "Der dauerhafte Preisnachlass von 8 Euro monatlich auf den DSL-Tarif ist ein klassischer Rabatt, der Wechsler anlockt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "a01c689a10e8a743",
@@ -2968,9 +5937,11 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "7f6765fe9f34ec60",
@@ -2983,9 +5954,11 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-26",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "stale_since": "2026-07-27"
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "stale_since": "2026-07-27",
+   "ended_since": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "391beff634480572",
@@ -2998,8 +5971,32 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "aktiv",
-   "missed_checks": 0
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "10 GB für 6,99€ statt 14,99€, 40 GB für 10,99€ statt 24,99€ oder Unlimited on demand für 19,99€ statt 34,99€. Bei Bestellung bis 28.07. 11 Uhr (40 GB) bzw. für kurze Zeit entfällt der Bereitstellungspreis (0€ statt 19,99€)",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert einen deutlichen Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen starken Wechselanreiz bietet.",
+    "basis": "5f249c207dba3995",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 2,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 52,
+   "score_reason": "Das Angebot kombiniert einen deutlichen Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen starken Wechselanreiz bietet.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   },
   {
    "id": "5d799cd513e037a2",
@@ -3012,8 +6009,69 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
+   "stale_since": "2026-07-28",
+   "judged": {
+    "lever": 1,
+    "depth": 0,
+    "mechanic": "zielgruppe",
+    "evidence": "Günstiger Handytarif speziell für Kinder mit integriertem Kinderschutz und Kostenkontrolle.",
+    "evidence_ok": true,
+    "reason": "Der Tarif adressiert eine spezifische Zielgruppe mit besonderen Schutzfunktionen, bietet aber keinen bezifferbaren finanziellen Vorteil gegenüber anderen Angeboten.",
+    "basis": "cc8e7ed2f9130953",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zielgruppe",
+   "score_axes": {
+    "lever": 1,
+    "depth": 0,
+    "reach": 1,
+    "momentum": 2,
+    "campaign": 0
+   },
+   "score": 27,
+   "score_reason": "Der Tarif adressiert eine spezifische Zielgruppe mit besonderen Schutzfunktionen, bietet aber keinen bezifferbaren finanziellen Vorteil gegenüber anderen Angeboten.",
+   "scored_at": "2026-07-28",
+   "highlight": false
+  },
+  {
+   "id": "8f6d112061dfb57d",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "Unlimited on demand zum Aktionspreis",
+   "description": "Der Unlimited-on-demand-Tarif ist für kurze Zeit zum Preis von 19,99 € mtl. statt 34,99 € mtl. erhältlich, inklusive 0€ Bereitstellungspreis.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/unbegrenztes-datenvolumen",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
    "status": "aktiv",
-   "missed_checks": 0
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "Der Unlimited-on-demand-Tarif ist für kurze Zeit zum Preis von 19,99 € mtl. statt 34,99 € mtl. erhältlich, inklusive 0€ Bereitstellungspreis.",
+    "evidence_ok": true,
+    "reason": "Der Tarif bietet einen erheblichen Preisnachlass von 15 Euro monatlich und den Erlass der Bereitstellungsgebühr, was einen starken finanziellen Anreiz darstellt.",
+    "basis": "0aceaa9a6717e340",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 57,
+   "score_reason": "Der Tarif bietet einen erheblichen Preisnachlass von 15 Euro monatlich und den Erlass der Bereitstellungsgebühr, was einen starken finanziellen Anreiz darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false
   }
  ]
 }
