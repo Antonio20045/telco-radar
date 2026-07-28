@@ -64,6 +64,17 @@ jobs:
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
+      - name: Rescue dead sources (diagnostic)
+        if: inputs.sources_only
+        env:
+          PYTHONPATH: src
+        run: |
+          {
+            echo '```text'
+            python scripts/rescue_sources.py
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Run pipeline
         if: ${{ !inputs.sources_only }}
         env:
