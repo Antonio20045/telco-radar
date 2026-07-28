@@ -42,6 +42,22 @@ def inspect(url: str, ua: str, item_selector: str | None = None) -> str:
         p(f"item_selector {item_selector!r} matched {len(matched)} elements")
         for node in matched[:2]:
             p(f"  --- raw HTML of one matched element ---\n{str(node)[:1500]}")
+            has_anchor = node.find("a", href=True) is not None
+            p(f"  (contains a real <a href>: {has_anchor})")
+            if not has_anchor:
+                # The link probably wraps this node from a level up - walk
+                # up to the nearest ancestor that has one, or a few levels
+                # if none does, so a corrected selector can be picked.
+                ancestor = node.parent
+                for _ in range(4):
+                    if ancestor is None:
+                        break
+                    if ancestor.find("a", href=True) is not None:
+                        p(f"  --- nearest ancestor with a real <a href> "
+                          f"(<{ancestor.name} class={ancestor.get('class')}>) ---\n"
+                          f"{str(ancestor)[:1500]}")
+                        break
+                    ancestor = ancestor.parent
         if not matched:
             return out.getvalue()
 
