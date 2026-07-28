@@ -254,7 +254,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://corporate.charter.com/newsroom
-        item_selector: ".news"
+        item_selector: ".paragraph__card_trio_card"
     - name: DISH Wireless
       country: US
       website: dish.com
