@@ -68,3 +68,59 @@ def test_newsroom_skips_navigation_and_parses_common_date_formats():
     items = parse_newsroom_html(html, src, "europe", "Example", "operator")
     assert len(items) == 1
     assert items[0].published.date().isoformat() == "2026-07-09"
+
+
+def test_newsroom_recognises_non_english_article_hints():
+    html = """
+    <a href="/wom-en-prensa/ceo-anuncia-nueva-red-5g-en-todo-el-pais">CEO anuncia nueva red 5G en todo el pais</a>
+    <a href="/sala-de-imprensa/nova-parceria-de-fibra-otica-anunciada-hoje">Nova parceria de fibra optica anunciada hoje</a>
+    """
+    src = Source(type="newsroom", url="https://example.com/prensa", name="S")
+    items = parse_newsroom_html(html, src, "latin_america", "Example", "operator")
+    assert len(items) == 2
+
+
+def test_newsroom_item_selector_bypasses_article_hint_requirement():
+    # Real article slugs with no news/press/media keyword at all (e.g. Turkish
+    # operator press releases) - only a real item_selector should let them in.
+    html = """
+    <div class="relases-card">
+      <a href="/turk-telekom-yeni-5g-yatirimi-aciklandi">Turk Telekom yeni 5G yatirimi acikladi bugun</a>
+    </div>
+    <a href="/turk-telekom-yeni-5g-yatirimi-disaridan">Should be dropped without item_selector present</a>
+    """
+    src_no_selector = Source(type="newsroom", url="https://example.com/basin", name="S")
+    assert parse_newsroom_html(html, src_no_selector, "europe", "Example", "operator") == []
+
+    src_with_selector = Source(type="newsroom", url="https://example.com/basin",
+                               name="S", item_selector=".relases-card")
+    items = parse_newsroom_html(html, src_with_selector, "europe", "Example", "operator")
+    assert len(items) == 1
+    assert "5G yatirimi" in items[0].title
+
+
+def test_newsroom_item_selector_falls_back_to_container_text_for_short_anchor():
+    # Card layout where the <a> only wraps a thumbnail/date, real headline
+    # lives in a sibling element inside the same selected container.
+    html = """
+    <div class="mediaItem">
+      <a href="/media/press/2026-07-launch"><span class="mediaDate">28 Jul</span></a>
+      <div class="mediaExcerpt">Operator launches new nationwide 5G rollout across regional areas</div>
+    </div>
+    """
+    src = Source(type="newsroom", url="https://example.com/news",
+                 name="S", item_selector=".mediaItem")
+    items = parse_newsroom_html(html, src, "asia", "Example", "operator")
+    assert len(items) == 1
+    assert "nationwide 5G rollout" in items[0].title
+
+
+def test_newsroom_allows_pdf_press_releases_but_not_other_pdfs():
+    html = """
+    <a href="/media/press/p260326.pdf">China Mobile Announces 2025 Annual Results Today</a>
+    <a href="/esg/cg/sc.pdf">Sustainability Committee Terms of Reference Document</a>
+    """
+    src = Source(type="newsroom", url="https://example.com/media/press.php", name="S")
+    items = parse_newsroom_html(html, src, "asia", "Example", "operator")
+    assert len(items) == 1
+    assert "Annual Results" in items[0].title

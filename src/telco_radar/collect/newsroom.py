@@ -21,9 +21,15 @@ from ..models import Item
 
 log = logging.getLogger(__name__)
 
-# URL path fragments that indicate an article-like page
+# URL path fragments that indicate an article-like page. English + the
+# non-English equivalents that show up on operator press pages we track
+# (Spanish/Portuguese "prensa"/"imprensa", Turkish "basin", etc.) - added
+# 2026-07-28 after scripts/inspect_dom.py showed several operators (WOM, Oi)
+# have perfectly good generic-heuristic-shaped links that were only being
+# dropped because the hint list was English/German-only.
 _ARTICLE_HINTS = re.compile(
-    r"(news|press|media|release|announce|story|article|aktuell|presse)", re.I
+    r"(news|press|media|release|announce|story|article|aktuell|presse|"
+    r"prensa|imprensa|comunicado|noticias|basin|haber)", re.I
 )
 # Path fragments that indicate navigation/utility pages -> skip
 _SKIP_HINTS = re.compile(
@@ -36,8 +42,14 @@ _SKIP_HINTS = re.compile(
     r"/articledetail(?:/|\?|$)|/official[-_]?(?:channels|website)(?:/|$)|"
     r"/ansprechpartner(?:/|$)|/frequently[-_]asked[-_]questions(?:/|$)|"
     r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$)|"
-    r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$)", re.I
+    r"\.(jpg|jpeg|png|gif|svg|mp4|zip)$)", re.I
 )
+# PDFs are usually financial-report spam, so they're dropped by default - but
+# some operators (Hong Kong-listed China Mobile/China Telecom) file their
+# actual press releases as PDFs under a /press/ path. Only that specific case
+# is let through.
+_PDF_EXT = re.compile(r"\.pdf$", re.I)
+_PRESS_PATH = re.compile(r"/press/", re.I)
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
 _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
@@ -168,19 +180,42 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         parts = urlsplit(url)
         if _SKIP_HINTS.search(url):
             continue
+        if _PDF_EXT.search(parts.path) and not _PRESS_PATH.search(parts.path):
+            continue
         if parts.scheme not in ("http", "https"):
             continue
         # stay on the operator's domain (subdomains allowed)
         host = parts.netloc.removeprefix("www.")
         if host != base_host and not host.endswith("." + base_host):
             continue
-        if not _ARTICLE_HINTS.search(parts.path):
+        # An explicit item_selector already scoped us to the operator's real
+        # article list (hand-picked per source, see watchlist.yaml) - trust
+        # it instead of also requiring an English/Spanish/... hint word in
+        # the path, which many real article slugs simply don't contain.
+        if not source.item_selector and not _ARTICLE_HINTS.search(parts.path):
             continue
         # article pages have a real path, not just the section root
         if parts.path.rstrip("/") == urlsplit(source.url).path.rstrip("/"):
             continue
 
         title = " ".join(a.get_text(" ", strip=True).split())
+        if source.item_selector and len(title) < 25:
+            # Card-style layouts often wrap only a thumbnail/date in the
+            # anchor itself and put the real headline in a sibling element.
+            # Fall back to the longest title-sized text anywhere inside the
+            # selected container (the top-level node scripts/inspect_dom.py
+            # would have shown for this operator).
+            container = a
+            while container.parent is not None and container.parent is not scope:
+                container = container.parent
+            candidates = [title]
+            for el in container.find_all(True):
+                candidates.append(" ".join(el.get_text(" ", strip=True).split()))
+            candidates.append(" ".join(container.get_text(" ", strip=True).split()))
+            best = max((c for c in candidates if 25 <= len(c) <= 200),
+                      key=len, default="")
+            if best:
+                title = best
         if len(title) < 25 or len(title) > 300:  # nav links are short
             continue
         if _is_junk_title(title):

@@ -38,6 +38,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.telekom.com/en/media/media-information
+        item_selector: ".media-link"
     - name: O2 Telefónica Deutschland
       country: DE
       website: telefonica.de
@@ -280,6 +281,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.bce.ca/news-and-media/newsroom
+        item_selector: "._cardLockup_1scj3_1"
     - name: Rogers
       country: CA
       website: rogers.com
@@ -442,6 +444,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller
+        item_selector: ".relases-card"
   asia:
     name: Asien
     operators:
@@ -479,6 +482,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.myvi.in/media/press-releases
+        item_selector: ".card"
     - name: Singtel
       country: SG
       website: singtel.com
@@ -543,6 +547,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.cht.com.tw/en/home/cht/messages
+        item_selector: ".list-item"
     - name: Telkomsel
       country: ID
       website: telkomsel.com
@@ -557,6 +562,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://investor.ais.co.th/en/newsroom/set-announcements
+        item_selector: ".card--set-announcement"
     - name: Viettel
       country: VN
       website: viettel.com.vn
@@ -617,6 +623,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.telstra.com.au/exchange
+        item_selector: ".tcom-article-box__link"
     - name: Optus
       country: AU
       website: optus.com.au
@@ -631,6 +638,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.tpgtelecom.com.au/media_release
+        item_selector: ".mediaItem"
     - name: One NZ
       country: NZ
       website: one.nz
