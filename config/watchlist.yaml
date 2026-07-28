@@ -110,9 +110,15 @@ regions:
       sources:
       - type: official
         url: https://www.gruppotim.it/en/press-archive.html
-        plan: 'JS-Routing: Pressemeldungen laden nur nach Klick/API-Call nach, im gerenderten DOM nach
-          1.8s nur 30 Nav-Links, keine Artikel. Kein Feed gefunden. Plan: State-basierter Crawler
-          (Klick-Interaktion) oder API-Reverse-Engineering noetig; bis dahin Referenz + Fachpresse.'
+        plan: 'Erneut mit echtem Internetzugang und vollem Playwright-Render (45s, networkidle,
+          Cookie-Consent-Klick, Scroll-Trigger) geprueft: identisches DOM zur statischen
+          curl-Antwort (316541 Zeichen, nur 30 Nav-Links, 0 Presse-Links). 0 XHR/fetch/JSON-Responses
+          waehrend des gesamten Renders - die Seite laedt nur ein reCAPTCHA-Script, nie einen
+          Daten-Call. 46 Feed-Kandidaten von rescue_sources.py probiert, keiner funktioniert;
+          robots.txt-Alternative /en/press/press-releases.html redirectet zurueck auf dieselbe
+          leere Seite; /en/sitemap.xml und /it.sitemap.xml beide 404. Kein Bot-Block (curl bekommt
+          200), die Seite ist einfach clientseitig kaputt/leer. Bis auf Weiteres kein Ansatz
+          gefunden; Referenz + Fachpresse.'
     - name: Liberty Global
       country: GB
       website: libertyglobal.com
@@ -213,9 +219,13 @@ regions:
       sources:
       - type: official
         url: https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases
-        plan: 'DOM bleibt nach Render fast leer (338 Zeichen, 0 <a>-Tags) - vermutlich Cookie-/Bot-Challenge
-          blockiert das Rendering komplett. Plan: Cookie-Consent-Handling oder Playwright-Stealth-Profil
-          testen; bis dahin Referenz.'
+        plan: 'Echter Imperva-Incapsula-Bot-Wall, kein Timing-/Consent-Problem: selbst reiner curl
+          mit Browser-UA bekommt HTTP 200, aber der Body ist nur das
+          _Incapsula_Resource-Challenge-Script (585 Byte, 0 <a>-Tags); mit Googlebot-UA sogar HTTP 404.
+          Playwright mit Cookie-Consent-Klick + 8s Wartezeit liefert dasselbe Ergebnis
+          (visid_incap_*/x-iinfo-Cookies vorhanden, Titel "404 Not Found"). JS wird nie ausgefuehrt,
+          das ist eine serverseitige WAF-Entscheidung, kein Render-Problem. Nur mit
+          Residential-Proxy oder expliziter Incapsula-Allowlist loesbar; bis dahin Referenz.'
   north_america:
     name: Nordamerika
     operators:
@@ -279,7 +289,12 @@ regions:
       sources:
       - type: official
         url: https://investors.uscellular.com/news/default.aspx
-        plan: 'IR-Newsroom (Q4) blockt Bots. Plan: Q4-JSON-API prüfen; bis dahin Referenz.'
+        plan: 'Kein Crawling-Problem, sondern ein Fakt: T-Mobile hat die UScellular-Mobilfunksparte
+          uebernommen (Deal abgeschlossen 2025). investors.uscellular.com liefert per curl
+          Cloudflare-403; mit Playwright wird die Challenge zwar bestanden, aber die Seite leitet
+          clientseitig komplett auf investor.t-mobile.com weiter - es gibt keinen eigenstaendigen
+          UScellular-Newsroom mehr. Vodafone-relevante Meldungen zu diesem Konzern laufen inzwischen
+          ueber den (reparierten) T-Mobile-US-Eintrag. Referenz, kein technisches Fix noetig.'
     - name: Bell Canada
       country: CA
       website: bce.ca
@@ -312,9 +327,8 @@ regions:
       country: CA
       website: telus.com
       sources:
-      - type: official
-        url: https://www.telus.com/en/about/news-and-events
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.'
+      - type: newsroom_js
+        url: https://www.telus.com/en/about/newsroom
   latin_america:
     name: Lateinamerika
     operators:
@@ -335,9 +349,14 @@ regions:
       sources:
       - type: official
         url: https://www.millicom.com/media/press-releases
-        plan: 'DOM nach Render praktisch leer (nur 4 Links, alles Cookie-Footer). Presseliste laedt
-          per nicht sichtbarem API-Call. Kein Feed gefunden. Plan: wie Bell Canada
-          (API-Reverse-Engineering); bis dahin Referenz.'
+        plan: 'Mit vollem Playwright-Render (Tailwind/Next.js-Seite) jetzt viele Nav-Links sichtbar,
+          aber keine Presse-Links. XHR-Sniffing fand einen Strapi-Endpoint
+          (ww2-api.tigocloud.net/api/pages?filters[slug]=/media/press-releases) - liefert aber
+          leeres data:[] (falscher Slug oder anderer Content-Type fuer die eigentliche Liste).
+          /api/press-releases, /api/news, /api/media existieren nicht (404); /api/articles
+          existiert (403 Forbidden statt 404) aber ist ohne Auth nicht lesbar. Kein Feed gefunden.
+          Naechster Schritt waere das Strapi-Content-Model vollstaendig zu enumerieren; ohne das
+          bis dahin Referenz.'
     - name: TIM Brasil
       country: BR
       website: tim.com.br
@@ -461,9 +480,12 @@ regions:
       sources:
       - type: official
         url: https://www.orange.eg/en/media-center/press-releases
-        plan: 'DOM bleibt nach Render fast leer (246 Zeichen, 1 Link) - vermutlich Bot-/Cookie-Challenge
-          blockiert das Rendering. Plan: wie Cosmote (Cookie-Consent-Handling oder
-          Playwright-Stealth-Profil); bis dahin Referenz.'
+        plan: 'Echte WAF-Ablehnung, kein Render-/Consent-Problem: sowohl curl als auch Playwright
+          bekommen HTTP 200 mit dem Body "The requested URL was rejected. Please consult with
+          your administrator... Your support ID is: ..." (246 Byte, F5/BIG-IP-Stil, mit 3
+          verschiedenen User-Agents reproduziert). Kein Consent-Banner, kein JS - die WAF
+          lehnt die URL selbst ab, bevor irgendetwas laedt. Nur mit Residential-Proxy oder
+          expliziter WAF-Allowlist loesbar; bis dahin Referenz.'
     - name: du
       country: AE
       website: du.ae
