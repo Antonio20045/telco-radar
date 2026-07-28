@@ -24,7 +24,7 @@ from telco_radar.collect.http import BROWSER_UA  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
 
 
-def inspect(url: str, ua: str) -> str:
+def inspect(url: str, ua: str, item_selector: str | None = None) -> str:
     out = io.StringIO()
     p = lambda *a: print(*a, file=out)  # noqa: E731
 
@@ -36,6 +36,15 @@ def inspect(url: str, ua: str) -> str:
         return out.getvalue()
 
     soup = BeautifulSoup(html, "html.parser")
+
+    if item_selector:
+        matched = soup.select(item_selector)
+        p(f"item_selector {item_selector!r} matched {len(matched)} elements")
+        for node in matched[:2]:
+            p(f"  --- raw HTML of one matched element ---\n{str(node)[:1500]}")
+        if not matched:
+            return out.getvalue()
+
     anchors = soup.find_all("a")
     p(f"total <a> tags: {len(anchors)}")
 
@@ -99,17 +108,18 @@ def main() -> int:
             if src.kind != "newsroom_js" or src.url in seen:
                 continue
             seen.add(src.url)
-            jobs.append((op.name, src.url))
+            jobs.append((op.name, src.url, src.item_selector))
 
     print(f"Inspecting {len(jobs)} sources with {args.workers} workers...")
     results = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = {pool.submit(inspect, url, ua): (name, url) for name, url in jobs}
+        futures = {pool.submit(inspect, url, ua, sel): (name, url)
+                  for name, url, sel in jobs}
         for fut in as_completed(futures):
             name, url = futures[fut]
             results[(name, url)] = fut.result()
 
-    for name, url in jobs:  # print in stable, requested order
+    for name, url, _sel in jobs:  # print in stable, requested order
         print(f"\n######## {name} ########")
         print(results[(name, url)])
     return 0

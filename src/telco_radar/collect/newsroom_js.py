@@ -22,6 +22,36 @@ log = logging.getLogger(__name__)
 
 _BLOCK_TYPES = {"image", "media", "font", "stylesheet"}
 
+# Consent-management platforms whose overlay can block the whole page (no
+# scroll, sometimes no client-side data fetch either) until dismissed. Best
+# effort: try each known "accept all" button, short timeout, ignore misses.
+# Order matters only for speed (most common CMPs first).
+_CONSENT_SELECTORS = [
+    "#onetrust-accept-btn-handler",                      # OneTrust
+    "#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll",  # Cookiebot
+    "#CybotCookiebotDialogBodyButtonAccept",
+    "button#didomi-notice-agree-button",                 # Didomi
+    ".didomi-continue-without-agreeing",
+    "button[data-testid='uc-accept-all-button']",        # Usercentrics
+    "#usercentrics-root >>> button[data-testid='uc-accept-all-button']",
+    "button:has-text('Accept All')",
+    "button:has-text('Accept all')",
+    "button:has-text('I Accept')",
+    "button:has-text('Alle akzeptieren')",
+    "button:has-text('Aceptar todo')",
+    "button:has-text('Tümünü Kabul Et')",
+]
+
+
+def _dismiss_consent_banner(page) -> None:
+    for selector in _CONSENT_SELECTORS:
+        try:
+            page.click(selector, timeout=800)
+            page.wait_for_timeout(300)
+            return
+        except Exception:  # noqa: BLE001 - best effort, most selectors won't match
+            continue
+
 
 def render_html(url: str, timeout_s: float, ua: str, settle_ms: int = 1800) -> str:
     """Render *url* in headless Chromium and return the final DOM HTML."""
@@ -50,6 +80,11 @@ def render_html(url: str, timeout_s: float, ua: str, settle_ms: int = 1800) -> s
             )
             page.goto(url, wait_until="domcontentloaded",
                       timeout=int(timeout_s * 1000))
+            # A cookie-consent overlay can block client-side rendering
+            # entirely on some sites (real content never fetches/mounts
+            # until dismissed) - try the common "accept all" buttons before
+            # the settle wait, not after.
+            _dismiss_consent_banner(page)
             # A short settle for client-side rendering. We deliberately do NOT
             # wait for networkidle - many telco pages keep long-poll/analytics
             # connections open and would burn the whole timeout budget.
