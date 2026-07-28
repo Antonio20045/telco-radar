@@ -8,6 +8,7 @@ when possible; undated items rely on the seen-store for novelty.
 """
 from __future__ import annotations
 
+import json
 import logging
 import re
 from datetime import datetime, timezone
@@ -35,8 +36,15 @@ _SKIP_HINTS = re.compile(
     r"/stockholders?(?:/|$)|/capex(?:[-_/]|$)|/support(?:[-_/]|$)|"
     r"/articledetail(?:/|\?|$)|/official[-_]?(?:channels|website)(?:/|$)|"
     r"/ansprechpartner(?:/|$)|/frequently[-_]asked[-_]questions(?:/|$)|"
-    r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$)|"
-    r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$)", re.I
+    r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$))", re.I
+)
+# Binary/document file extensions. Normally skipped (they're rarely articles),
+# but some operators (e.g. TPG Telecom) publish releases as a heading + a PDF
+# download with no separate HTML article page - there the PDF *is* the
+# article, so a configured item_selector (which already narrows the DOM to
+# verified article cards) is allowed to keep them.
+_SKIP_FILE_EXT = re.compile(
+    r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I
 )
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
 _URL_DATE = re.compile(
@@ -88,6 +96,108 @@ def _is_junk_title(title: str) -> bool:
 _MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun",
      "jul", "aug", "sep", "oct", "nov", "dec"])}
+# Spanish month abbreviations that don't already coincide with the English
+# ones above (mar/may/jun/jul/feb/sep/oct/nov overlap and need no alias).
+_MONTHS.update({"ene": 1, "abr": 4, "ago": 8, "set": 9, "dic": 12})
+
+# Web-component "card" widgets (seen on Modyo/Andino-based CMSs, e.g. Entel)
+# embed the whole item list as a JSON array inside a custom element attribute
+# instead of rendering plain <a> links - the markup looks like
+# <andino-card-general eds-card='[{"text": "...", "href": "...", "badge":
+# {"text": "25 Jul, 2026"}}]'></andino-card-general>. This is already present
+# in the *static* HTML (no JS needed), so a dedicated extractor - tried before
+# the generic <a>-based heuristic below - picks it up directly.
+_EMBEDDED_CARD_ATTR_RE = re.compile(r"\beds-card\s*=\s*'(\[.*?\])'", re.S)
+_ES_DATE_RE = re.compile(r"(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\.?,?\s+(\d{4})")
+
+
+def _parse_badge_date(raw: str) -> datetime | None:
+    m = _ES_DATE_RE.match(raw.strip())
+    if not m:
+        return None
+    day, mon_raw, year = m.groups()
+    month = _MONTHS.get(mon_raw.lower()[:3])
+    if not month:
+        return None
+    try:
+        return datetime(int(year), month, int(day), tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def _extract_embedded_cards(html: str, source: Source, region: str,
+                            operator: str | None, origin: str,
+                            max_links: int) -> list[Item]:
+    site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
+    base_host = urlsplit(source.url).netloc.removeprefix("www.")
+    items: list[Item] = []
+    seen_urls: set[str] = set()
+    for block in _EMBEDDED_CARD_ATTR_RE.findall(html):
+        try:
+            records = json.loads(block)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(records, list):
+            continue
+        for rec in records:
+            if not isinstance(rec, dict):
+                continue
+            title = " ".join(str(rec.get("text") or "").split())
+            href = str(rec.get("href") or "").strip()
+            if not title or not href:
+                continue
+            url = href if href.startswith("http") else urljoin(site_root + "/", href.lstrip("/"))
+            host = urlsplit(url).netloc.removeprefix("www.")
+            if host != base_host and not host.endswith("." + base_host):
+                continue
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            badge = rec.get("badge") or {}
+            items.append(Item(
+                title=title,
+                url=url,
+                source_name=source.name or base_host,
+                region=region,
+                operator=operator,
+                published=_parse_badge_date(str(badge.get("text") or "")),
+                origin=origin,
+            ))
+            if len(items) >= max_links:
+                return items
+    return items
+
+
+def _heading_title_for(a, item_root) -> str:
+    """Nearest heading text within the item's own container.
+
+    Some CMS card layouts (e.g. TPG Telecom, e&) put the headline in an
+    <h1>-<h6> tag next to the link instead of inside it (the link itself is
+    just a "View PDF"/"Read more"/"Load More" button) - a configured
+    item_selector already narrows the DOM to one container per item, so
+    it's safe to fall back to the heading text for the title in that scope.
+    """
+    # `item_root` is the synthetic wrapper soup built around the selected
+    # item nodes (one direct child of `item_root.div` per matched item) -
+    # stop climbing once we reach that direct child, not the shared wrapper
+    # itself, or every item would resolve to the very first heading in
+    # document order.
+    boundary = getattr(item_root, "div", item_root)
+    node = a
+    while node.parent is not None and node.parent is not boundary:
+        node = node.parent
+    if not hasattr(node, "find_all"):
+        return ""
+    headings = node.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
+    if not headings:
+        return ""
+    # A card can carry more than one heading level - e.g. e& tiles have a
+    # short <h5> category badge ("Strategy & Operations") *before* the real
+    # <h2> headline in document order. Picking the first match would grab
+    # the badge, so take the longest heading text instead - the real
+    # headline is reliably the longest string among short badges/labels.
+    best = max(headings, key=lambda h: len(h.get_text(strip=True)))
+    return " ".join(best.get_text(" ", strip=True).split())
 
 
 def _date_from_url(url: str) -> tuple[datetime | None, bool]:
@@ -146,6 +256,11 @@ def parse_newsroom_html(html: str, source: Source, region: str,
                         operator: str | None, origin: str,
                         max_links: int = 30) -> list[Item]:
     """Extract article-like links from a newsroom page (testable, no I/O)."""
+    if "eds-card=" in html:
+        embedded = _extract_embedded_cards(html, source, region, operator, origin, max_links)
+        if embedded:
+            return embedded
+
     soup = BeautifulSoup(html, "html.parser")
     scope = soup
     selector_matched = False
@@ -170,6 +285,12 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         parts = urlsplit(url)
         if _SKIP_HINTS.search(url):
             continue
+        # Binary file links (PDF/etc.) are normally not articles, but some
+        # operators (e.g. TPG Telecom) publish releases as heading + PDF
+        # download with no separate HTML page - there the PDF *is* the
+        # article, so trust an explicit item_selector over this heuristic.
+        if _SKIP_FILE_EXT.search(url) and not selector_matched:
+            continue
         if parts.scheme not in ("http", "https"):
             continue
         # stay on the operator's domain (subdomains allowed)
@@ -186,6 +307,16 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             continue
 
         title = " ".join(a.get_text(" ", strip=True).split())
+        # Some card layouts (e.g. e& newsroom) put the headline in a sibling
+        # <h1>-<h6> inside the card and reserve the anchor text for a generic
+        # "Read more"/"Load More" label - only worth searching once the
+        # selector already narrowed us to a real article container.
+        if selector_matched and (len(title) < 25 or len(title) > 300
+                                  or _is_junk_title(title)):
+            heading_title = _heading_title_for(a, scope)
+            if heading_title and 25 <= len(heading_title) <= 300 \
+                    and not _is_junk_title(heading_title):
+                title = heading_title
         if len(title) < 25 or len(title) > 300:  # nav links are short
             continue
         if _is_junk_title(title):
@@ -200,6 +331,16 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             context = a.find_parent(["article", "li", "div"])
             if context is not None:
                 published = _date_from_text(context.get_text(" ", strip=True)[:400])
+        if published is None and selector_matched:
+            # Nearest small div (above) may sit inside the card without the
+            # date, which is often a sibling elsewhere in the same item -
+            # widen the search to the whole item container as a last resort.
+            boundary = getattr(scope, "div", scope)
+            node = a
+            while node.parent is not None and node.parent is not boundary:
+                node = node.parent
+            if hasattr(node, "get_text"):
+                published = _date_from_text(node.get_text(" ", strip=True)[:600])
         if published is None:
             published = url_date  # month precision is better than nothing
 

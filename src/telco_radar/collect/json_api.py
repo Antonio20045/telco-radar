@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import datetime, timezone
 from urllib.parse import urljoin, urlsplit
 
@@ -20,11 +21,12 @@ from ..models import Item
 
 log = logging.getLogger(__name__)
 
-_TITLE_KEYS = ("newsTitle", "title", "headline", "name")
+_TITLE_KEYS = ("newsTitle", "title", "headline", "name", "articleSubtitle",
+              "alternative")
 _URL_KEYS = ("newsUrl", "url", "link", "href", "path")
 _DATE_KEYS = ("newsDate", "date", "published", "publishedDate", "pubDate",
-             "releaseDate", "publishedAt")
-_DESC_KEYS = ("newsDesc", "description", "summary", "excerpt")
+             "releaseDate", "publishedAt", "field_news_date_raw", "publishDate")
+_DESC_KEYS = ("newsDesc", "description", "summary", "excerpt", "field_summary")
 
 _DATE_FORMATS = (
     "%d %b %Y", "%d %B %Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S",
@@ -32,11 +34,41 @@ _DATE_FORMATS = (
 )
 
 
-def _first(d: dict, keys) -> str:
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+# Some CMS content-fragment models (e.g. stc's press-release fragments) use
+# a generic "call to action" label as the subtitle/title field on older
+# records instead of the real headline ({"articleSubtitle": "Details", ...})
+# - the real headline for those records is only recoverable from a longer
+# text field (description/body), never from this field, so treat these
+# values as absent rather than returning a useless title.
+_TITLE_PLACEHOLDERS = {"details", "read more", "more", "more details",
+                       "learn more", "view details", "click here"}
+
+
+def _first(d: dict, keys, skip_values: frozenset[str] = frozenset()) -> str:
     for k in keys:
         v = d.get(k)
-        if isinstance(v, str) and v.strip():
+        if isinstance(v, str) and v.strip() and v.strip().lower() not in skip_values:
             return v.strip()
+        # WordPress REST API (wp-json/wp/v2/posts and friends) nests text
+        # fields as {"rendered": "..."} instead of a bare string, e.g.
+        # {"title": {"rendered": "Headline"}}. Unwrap that shape too.
+        if isinstance(v, dict):
+            rendered = v.get("rendered")
+            if isinstance(rendered, str) and rendered.strip():
+                return " ".join(_TAG_RE.sub(" ", rendered).split())
+    # Gatsby GraphQL nodes (e.g. Charter Communications' page-data static
+    # query dumps) compute derived values - notably the page path/URL - into
+    # a nested "fields" object instead of a top-level key, e.g.
+    # {"title": "...", "fields": {"url": "/newsroom/..."}}. Check there too.
+    fields = d.get("fields")
+    if isinstance(fields, dict):
+        for k in keys:
+            v = fields.get(k)
+            if isinstance(v, str) and v.strip() and v.strip().lower() not in skip_values:
+                return v.strip()
     return ""
 
 

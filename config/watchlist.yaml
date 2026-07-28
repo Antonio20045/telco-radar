@@ -119,8 +119,8 @@ regions:
       - Virgin Media
       - Sunrise
       sources:
-      - type: newsroom_js
-        url: https://www.libertyglobal.com/news-insights/featured-news-insights/
+      - type: rss
+        url: https://www.libertyglobal.com/feed/
     - name: VEON
       country: NL
       website: veon.com
@@ -261,8 +261,8 @@ regions:
       - Spectrum Mobile
       - Spectrum
       sources:
-      - type: newsroom_js
-        url: https://corporate.charter.com/newsroom
+      - type: json_api
+        url: https://corporate.charter.com/page-data/sq/d/2336972469.json
     - name: DISH Wireless
       country: US
       website: dish.com
@@ -343,8 +343,8 @@ regions:
       country: CL
       website: entel.cl
       sources:
-      - type: newsroom_js
-        url: https://informacioncorporativa.entel.cl/sala-de-prensa
+      - type: newsroom
+        url: https://informacioncorporativa.entel.cl/comunicados-de-prensa
     - name: Oi
       country: BR
       website: oi.com.br
@@ -364,8 +364,8 @@ regions:
       country: CL
       website: wom.cl
       sources:
-      - type: newsroom_js
-        url: https://sobrenosotros.wom.cl/wom-en-prensa/
+      - type: json_api
+        url: https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20
   africa_middle_east:
     name: Afrika & Naher Osten
     operators:
@@ -395,8 +395,22 @@ regions:
       country: NG
       website: airtel.africa
       sources:
-      - type: newsroom_js
-        url: https://airtel.africa/media
+      - type: official
+        url: https://airtel.africa/press-release
+        plan: 'Echte Pressemeldungs-Tabelle gefunden (nicht /media, sondern /media/press-release
+          -> /press-release), server-seitig gerendert, KEIN Playwright noetig (curl liefert
+          286x "press-table" Treffer identisch zu Playwright-Render). Aber: jede Zeile
+          verlinkt direkt auf ein PDF bei cdn-webportal.airtelstream.net, und der Link
+          (<a> mit SVG-Icon) enthaelt selbst keinen Titeltext - der Titel steht in einer
+          benachbarten <div class="col">, nicht im <a>. Der generische newsroom-Collector
+          scheitert daher doppelt: (1) _SKIP_HINTS blockt jede .pdf-URL kategorisch, (2)
+          der Titel wird ausschliesslich aus a.get_text() gelesen, hier aber leer. Empirisch
+          bestaetigt: parse_newsroom_html() liefert fuer jeden getesteten item_selector
+          (.press-table-row, .press-table-row a, .press-table a) 0 Items. Kein RSS/Feed
+          gefunden (sitewide /rss.xml existiert, deckt aber nur IR-Inhalte ab - Ergebnisse,
+          Calls, AGM -, nicht die News-Meldungen von /press-release). Fix braeuchte
+          Collector-Code-Aenderung (PDF-Ausnahme + Titel-aus-Nachbarspalte); ohne das:
+          Referenz.'
     - name: stc
       country: SA
       website: stc.com.sa
@@ -558,14 +572,14 @@ regions:
       country: CN
       website: chinamobileltd.com
       sources:
-      - type: newsroom_js
-        url: https://www.chinamobileltd.com/en/media/press.php
+      - type: rss
+        url: https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes
     - name: China Telecom
       country: CN
       website: chinatelecom-h.com
       sources:
-      - type: newsroom_js
-        url: https://www.chinatelecom-h.com/en/media/press.php
+      - type: rss
+        url: https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes
     - name: Chunghwa Telecom
       country: TW
       website: cht.com.tw
@@ -631,8 +645,8 @@ regions:
       country: MY
       website: maxis.com.my
       sources:
-      - type: newsroom_js
-        url: https://www.maxis.com.my/en/about-maxis/newsroom/
+      - type: json_api
+        url: https://www.maxis.com.my/en/about-maxis/newsroom/jcr:content/content/section_container/section_container/container/repository_search_co.newsroom.json?keyword=*:*
     - name: True Corporation
       country: TH
       website: truecorp.co.th
@@ -669,8 +683,9 @@ regions:
       aliases:
       - TPG
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://www.tpgtelecom.com.au/media_release
+        item_selector: .mediaItem
     - name: One NZ
       country: NZ
       website: one.nz
