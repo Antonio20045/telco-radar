@@ -197,9 +197,9 @@
         
         <a class="op-row-line" href="https://www.gruppotim.it/en/press-archive.html" target="_blank" rel="noopener">
           <span class="op-row-name">TIM</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="JS-Routing: Pressemeldungen laden nur nach Klick/API-Call nach, im gerenderten DOM nach 1.8s nur 30 Nav-Links, keine Artikel. Kein Feed gefunden. Plan: State-basierter Crawler (Klick-Interaktion) oder API-Reverse-Engineering noetig; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -247,9 +247,9 @@
         
         <a class="op-row-line" href="https://www.iliad.fr/en/press" target="_blank" rel="noopener">
           <span class="op-row-name">Iliad</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="Presseliste laedt clientseitig nach, im DOM nur Navigation (Publications, Contact, Documentation), keine Artikel. Kein Feed gefunden. Plan: wie TIM (State-basierter Crawler oder API-Reverse-Engineering); bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -317,9 +317,9 @@
         
         <a class="op-row-line" href="https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases" target="_blank" rel="noopener">
           <span class="op-row-name">Cosmote</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM bleibt nach Render fast leer (338 Zeichen, 0 <a>-Tags) - vermutlich Cookie-/Bot-Challenge blockiert das Rendering komplett. Plan: Cookie-Consent-Handling oder Playwright-Stealth-Profil testen; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -404,19 +404,19 @@
         
         <a class="op-row-line" href="https://www.bce.ca/news-and-media/newsroom" target="_blank" rel="noopener">
           <span class="op-row-name">Bell Canada</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="Newsroom ist eine Tailwind-SPA; 67 quelleneigene Links im gerenderten DOM sind ausschliesslich Navigation/Investor-Relations, keine Presse-Cards - die Liste laedt vermutlich per separatem API-Call, der im Render-Fenster nicht sichtbar wird. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://about.rogers.com/news-ideas/" target="_blank" rel="noopener">
+        <a class="op-row-line" href="https://about.rogers.com/feed" target="_blank" rel="noopener">
           <span class="op-row-name">Rogers</span>
-          <span class="op-row-type">Referenz</span>
+          <span class="op-row-type">Feed</span>
         </a>
-        <span class="op-row-note" title="403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
+        
         
       </div>
       
@@ -451,9 +451,9 @@
         
         <a class="op-row-line" href="https://www.millicom.com/media/press-releases" target="_blank" rel="noopener">
           <span class="op-row-name">Millicom</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM nach Render praktisch leer (nur 4 Links, alles Cookie-Footer). Presseliste laedt per nicht sichtbarem API-Call. Kein Feed gefunden. Plan: wie Bell Canada (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -558,9 +558,9 @@
         
         <a class="op-row-line" href="https://www.stc.com/en/media-center.html" target="_blank" rel="noopener">
           <span class="op-row-name">stc</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM enthaelt 188 Links, aber ausschliesslich das komplette mobile Mega-Menu (Investors, Sustainability, ...), keine einzige Pressemeldung - die Liste laedt vermutlich per separatem Endpoint. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -568,9 +568,9 @@
         
         <a class="op-row-line" href="https://www.eand.com/en/news.html" target="_blank" rel="noopener">
           <span class="op-row-name">e&</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="62 Links im DOM sind ausschliesslich Hauptnavigation (Governance, Investors, ...), die Presseliste fehlt komplett im gerenderten DOM. Kein Feed gefunden. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -598,9 +598,9 @@
         
         <a class="op-row-line" href="https://www.orange.eg/en/media-center/press-releases" target="_blank" rel="noopener">
           <span class="op-row-name">Orange MEA</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM bleibt nach Render fast leer (246 Zeichen, 1 Link) - vermutlich Bot-/Cookie-Challenge blockiert das Rendering. Plan: wie Cosmote (Cookie-Consent-Handling oder Playwright-Stealth-Profil); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -665,9 +665,9 @@
         
         <a class="op-row-line" href="https://www.jio.com/press-release" target="_blank" rel="noopener">
           <span class="op-row-name">Reliance Jio</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="127 Links im DOM sind ausschliesslich Self-Care-/Account-Navigation (SIM, JioFiber, Support), keine Pressemeldungen. Kein Feed gefunden. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -695,9 +695,9 @@
         
         <a class="op-row-line" href="https://www.sktelecom.com/en/press/press_list.do" target="_blank" rel="noopener">
           <span class="op-row-name">SK Telecom</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM bleibt nach Render fast leer (5390 Zeichen, 4 Links ohne Text) - Presseliste laedt clientseitig per API nach. Plan: wie Cosmote (Cookie-Consent-Handling oder Playwright-Stealth-Profil); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -705,9 +705,9 @@
         
         <a class="op-row-line" href="https://corp.kt.com/eng/html/prcenter/report_list.html" target="_blank" rel="noopener">
           <span class="op-row-name">KT</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM nach Render komplett leer (0 <a>-Tags) - vermutlich Bot-Wall oder Consent-Screen blockiert das Rendering. Plan: wie Cosmote; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -825,9 +825,9 @@
         
         <a class="op-row-line" href="https://ioh.co.id/portal/en/iohpressrelease" target="_blank" rel="noopener">
           <span class="op-row-name">Indosat Ooredoo Hutchison</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="18 Links im DOM sind interne SPA-Hash-Routen (z.B. "ioh-sustainability"), keine echten Artikel-URLs. Presseliste laedt per API. Plan: wie stc (API-Reverse-Engineering); bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -855,9 +855,9 @@
         
         <a class="op-row-line" href="https://investor.true.th/en/newsroom/set-announcements" target="_blank" rel="noopener">
           <span class="op-row-name">True Corporation</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="DOM nach Render komplett leer (0 <a>-Tags) - Investor-SET-Portal vermutlich hinter JS-Challenge/Login-Wall. Plan: wie Cosmote; bis dahin Referenz.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
@@ -882,9 +882,9 @@
         
         <a class="op-row-line" href="https://www.optus.com.au/about/media-centre" target="_blank" rel="noopener">
           <span class="op-row-name">Optus</span>
-          <span class="op-row-type">Newsroom</span>
+          <span class="op-row-type">Referenz</span>
         </a>
-        
+        <span class="op-row-note" title="Chromium scheitert reproduzierbar an der Navigation (zuerst ERR_HTTP2_PROTOCOL_ERROR; nach --disable-http2-Fix stattdessen TimeoutError nach 30s) - vermutlich IP-Sperre gegen GitHub-Actions-Runner oder eine Bot-Challenge, die die Seite nie ausliefert. Plan: Playwright ueber Residential-Proxy; ohne zusaetzliche kostenpflichtige Infrastruktur nicht loesbar.">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>
         
       </div>
       
