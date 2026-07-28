@@ -948,9 +948,9 @@
    "url": "https://www.o2online.de/kombiangebote/#id-2271586",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
-   "ended_since": "2026-07-25",
+   "status": "ausgelaufen",
+   "missed_checks": 2,
+   "ended_since": "2026-07-28",
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -980,17 +980,38 @@
    "id": "351c0d8b16d0277e",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Samsung Galaxy A57 + Fitnesstracker",
-   "description": "Smartphone Samsung Galaxy A57 inklusive Galaxy Fit3 und 50 GB Datenvolumen für 27,49 € monatlich.",
+   "headline": "Samsung Galaxy A57 + Fitnesstracker ab 27,49 €",
+   "description": "Smartphone-Bundle mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Galaxy Fit3 und Google Gemini, zum monatlichen Preis von 27,49 Euro.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Smartphone-Bundle mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Galaxy Fit3 und Google Gemini, zum monatlichen Preis von 27,49 Euro.",
+    "evidence_ok": true,
+    "reason": "Das Angebot kombiniert ein Smartphone mit einem Fitnesstracker, bietet aber keinen bezifferbaren Preisvorteil oder Wechselanreiz über die reine Gerätesubvention hinaus.",
+    "basis": "6b8b340240eb7d73",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Das Angebot kombiniert ein Smartphone mit einem Fitnesstracker, bietet aber keinen bezifferbaren Preisvorteil oder Wechselanreiz über die reine Gerätesubvention hinaus.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "6b4c5472097afe62",
@@ -1012,49 +1033,112 @@
    "id": "f544d4249526f879",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Xiaomi 17T Pro + Redmi Pad 2",
-   "description": "Xiaomi 17T Pro inklusive Redmi Pad 2 (Wert 199 €) und 50 GB Datenvolumen für 34,99 € monatlich.",
+   "headline": "Xiaomi 17T Pro + Redmi Pad 2 ab 34,99 €",
+   "description": "Bundle aus Smartphone und Tablet (Redmi Pad 2, Wert 199 Euro) mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 34,99 Euro.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-blau-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": true,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Bundle aus Smartphone und Tablet (Redmi Pad 2, Wert 199 Euro) mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 34,99 Euro.",
+    "evidence_ok": true,
+    "reason": "Das Bundle mit einem Tablet im Wert von 199 Euro bietet einen spürbaren Gegenwert, der den monatlichen Preis attraktiv macht, aber es fehlt ein direkter Wechselanreiz wie eine Prämie.",
+    "basis": "5da9161d32cff6ed",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Das Bundle mit einem Tablet im Wert von 199 Euro bietet einen spürbaren Gegenwert, der den monatlichen Preis attraktiv macht, aber es fehlt ein direkter Wechselanreiz wie eine Prämie.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "4fea832c9b7c92ce",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Nothing Phone (4a) Pro + Smartwatch",
-   "description": "Nothing Phone (4a) Pro inklusive CMF Watch 3 Pro (Wert 99 €) und 50 GB Datenvolumen für 29,49 € monatlich.",
+   "headline": "Nothing Phone (4a) Pro + Smartwatch ab 29,49 €",
+   "description": "Bundle aus Smartphone und CMF Watch 3 Pro (Wert 99 Euro) mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 29,49 Euro.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-silber-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Bundle aus Smartphone und CMF Watch 3 Pro (Wert 99 Euro) mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 29,49 Euro.",
+    "evidence_ok": true,
+    "reason": "Die beigelegte Smartwatch im Wert von 99 Euro ist ein kleinerer Anreiz, der den Tarifpreis nur geringfügig aufwertet, ohne einen echten Wechselhebel zu bieten.",
+    "basis": "4f01de2847da0dba",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Die beigelegte Smartwatch im Wert von 99 Euro ist ein kleinerer Anreiz, der den Tarifpreis nur geringfügig aufwertet, ohne einen echten Wechselhebel zu bieten.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "5da1c9d9e66ec247",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "PS5 + zweiter Controller gratis",
-   "description": "PlayStation 5 inklusive gratis DualSense-Controller und 50 GB Datenvolumen für 31,99 € monatlich.",
+   "headline": "PS5 + zweiter Controller gratis ab 31,99 €",
+   "description": "Gaming-Bundle mit PlayStation 5 und gratis DualSense-Controller, 50 GB Datenvolumen (max. 300 MBit/s), monatlich ab 31,99 Euro.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/sony?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": true,
+   "judged": {
+    "lever": 2,
+    "depth": 2,
+    "mechanic": "geraetesubvention",
+    "evidence": "Gaming-Bundle mit PlayStation 5 und gratis DualSense-Controller, 50 GB Datenvolumen (max. 300 MBit/s), monatlich ab 31,99 Euro.",
+    "evidence_ok": true,
+    "reason": "Die PlayStation 5 als Hardware-Bundle ist ein starker Anreiz für Neukunden, aber der fehlende Vergleichspreis oder Wechselbonus hält den Hebel auf reiner Subventionsebene.",
+    "basis": "2eb75e5f899820c7",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 72,
+   "score_reason": "Die PlayStation 5 als Hardware-Bundle ist ein starker Anreiz für Neukunden, aber der fehlende Vergleichspreis oder Wechselbonus hält den Hebel auf reiner Subventionsebene.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "58e982a0c21dd5c4",
@@ -1252,18 +1336,39 @@
    "id": "00f29071b8f4c3f8",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "10 GB gratis + 500 MB monatlich in der Mein O2 App",
-   "description": "Einmalig 10 GB und jeden Monat 500 MB zusätzliches Datenvolumen kostenlos sichern, exklusiv über die Mein O2 App.",
+   "headline": "10 GB + 500 MB Gratis-Daten in Mein o2 App",
+   "description": "Neukunden und Bestandskunden erhalten beim Download der Mein o2 App einmalig 10 GB und dauerhaft jeden Monat 500 MB zusätzliches Datenvolumen gratis.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/",
    "image_url": null,
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-25",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 1,
+    "mechanic": "datenbonus",
+    "evidence": "Neukunden und Bestandskunden erhalten beim Download der Mein o2 App einmalig 10 GB und dauerhaft jeden Monat 500 MB zusätzliches Datenvolumen gratis.",
+    "evidence_ok": true,
+    "reason": "Das zusätzliche Datenvolumen ist ein kleiner Vorteil für Bestands- und Neukunden, aber kein direkter Wechselanreiz, da es an die App-Nutzung gebunden ist.",
+    "basis": "46b478294f501c2a",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "datenbonus",
+   "score_axes": {
+    "lever": 1,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 53,
+   "score_reason": "Das zusätzliche Datenvolumen ist ein kleiner Vorteil für Bestands- und Neukunden, aber kein direkter Wechselanreiz, da es an die App-Nutzung gebunden ist.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "f8db2f34b1f3e226",
@@ -1276,8 +1381,8 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "ended_since": "2026-07-26",
    "judged": {
     "lever": 1,
@@ -1301,7 +1406,8 @@
    "score": 62,
    "score_reason": "Bestandskunden erhalten einen dauerhaften monatlichen Rabatt auf zusätzliche Verträge, was einen klaren finanziellen Anreiz zum Abschluss weiterer Tarife bietet.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "06307a7bd919625f",
@@ -1324,18 +1430,39 @@
    "id": "5d101f4a5d4eff32",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Google Pixel 10 Pro + Google TV Streamer für 34,99 € mtl.",
-   "description": "Google Pixel 10 Pro inklusive Google TV Streamer und 50 GB Datenvolumen mit bis zu 300 MBit/s für monatlich 34,99 Euro.",
+   "headline": "Google Pixel 10 Pro ab 34,99 € monatlich",
+   "description": "High-End-Smartphone mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 34,99 Euro.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "image_url": null,
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-25",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "High-End-Smartphone mit 50 GB Datenvolumen (max. 300 MBit/s), inklusive Google Gemini, zum monatlichen Preis von 34,99 Euro.",
+    "evidence_ok": true,
+    "reason": "Das High-End-Smartphone ist ein klassisches Subventionsangebot ohne bezifferbaren Preisvorteil oder Wechselprämie, was den Hebel auf reiner Gerätefinanzierung belässt.",
+    "basis": "09868f88131cd294",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Das High-End-Smartphone ist ein klassisches Subventionsangebot ohne bezifferbaren Preisvorteil oder Wechselprämie, was den Hebel auf reiner Gerätefinanzierung belässt.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "467d9be51ace81ad",
@@ -1705,8 +1832,8 @@
    "image_url": null,
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "ended_since": "2026-07-27",
    "judged": {
     "lever": 1,
@@ -1730,7 +1857,8 @@
    "score": 53,
    "score_reason": "Das Angebot gewährt für einen begrenzten Zeitraum 10 GB mehr Datenvolumen, was einen kleinen, aber zeitlich befristeten Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "90943f1536791ef6",
@@ -1743,8 +1871,8 @@
    "image_url": null,
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -1768,24 +1896,46 @@
    "score": 53,
    "score_reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "4cdac81f2fa19742",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Dauerhaft bis zu 25 € Rabatt auf Zweittarif",
-   "description": "Bestandskunden erhalten auf jeden weiteren Mobilfunk-Tarif (ab dem zweiten) einen dauerhaften monatlichen Rabatt von bis zu 25 €.",
+   "headline": "Bis zu 25 € Rabatt auf Zweittarif",
+   "description": "Bestandskunden erhalten dauerhaft bis zu 25 Euro monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif (ab dem 2. Tarif).",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/kombiangebote/#id-2271586",
    "image_url": null,
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-27",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 0,
+    "depth": 2,
+    "mechanic": "preisnachlass",
+    "evidence": "Bestandskunden erhalten dauerhaft bis zu 25 Euro monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif (ab dem 2. Tarif).",
+    "evidence_ok": true,
+    "reason": "Der Rabatt von bis zu 25 Euro pro Monat auf Zweittarife ist ein spürbarer Preisvorteil, richtet sich aber ausschließlich an Bestandskunden und bietet keinen Wechselanreiz.",
+    "basis": "f8f43dd76d0e7461",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 0,
+    "depth": 2,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 52,
+   "score_reason": "Der Rabatt von bis zu 25 Euro pro Monat auf Zweittarife ist ein spürbarer Preisvorteil, richtet sich aber ausschließlich an Bestandskunden und bietet keinen Wechselanreiz.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "eef43daf81cef806",
@@ -1842,18 +1992,39 @@
    "id": "8c15748ddfdb83b6",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Samsung Galaxy Z Flip8 + 300 € Altgerät-Prämie",
-   "description": "Das Samsung Galaxy Z Flip8 inklusive 50 GB Datenvolumen, 300 € für dein Altgerät und 0 € Anschlusspreis – monatlich ab 44,99 €.",
+   "headline": "Samsung Galaxy Z Flip8 ab 44,99 € + 300 € Altgerät",
+   "description": "Falt-Smartphone mit 50 GB+ Datenvolumen, inklusive 300 Euro Wechselbonus für das Altgerät, zum monatlichen Preis von 44,99 Euro (0 Euro Anschlusspreis).",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?tarif=o2-mobile-on-demand-m-plus&ratenzahlung=36&zielgruppe=privatkunden",
    "image_url": null,
    "first_seen": "2026-07-26",
-   "last_verified": "2026-07-26",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-27",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-28",
-   "highlight": false
+   "highlight": true,
+   "judged": {
+    "lever": 3,
+    "depth": 3,
+    "mechanic": "wechselpraemie",
+    "evidence": "Falt-Smartphone mit 50 GB+ Datenvolumen, inklusive 300 Euro Wechselbonus für das Altgerät, zum monatlichen Preis von 44,99 Euro (0 Euro Anschlusspreis).",
+    "evidence_ok": true,
+    "reason": "Der Wechselbonus von 300 Euro für das Altgerät ist ein direkter finanzieller Anreiz für den Anbieterwechsel, der den Hebel auf die höchste Stufe hebt.",
+    "basis": "4d8d0f61e1a9e62f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "wechselpraemie",
+   "score_axes": {
+    "lever": 3,
+    "depth": 3,
+    "reach": 3,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 90,
+   "score_reason": "Der Wechselbonus von 300 Euro für das Altgerät ist ein direkter finanzieller Anreiz für den Anbieterwechsel, der den Hebel auf die höchste Stufe hebt.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "6dab1ebea12ee2f6",
@@ -1900,8 +2071,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 2,
@@ -1925,7 +2096,8 @@
    "score": 72,
    "score_reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "167949ddc888c7d2",
@@ -1938,8 +2110,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 2,
@@ -1963,7 +2135,8 @@
    "score": 72,
    "score_reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "b5e47717de720f0e",
@@ -1976,8 +2149,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 0,
@@ -2001,7 +2174,8 @@
    "score": 20,
    "score_reason": "Das Angebot bietet einen Fernseher zur Ratenzahlung ohne Tarifbindung, was keinen Wechselanreiz für Mobilfunkkunden darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "6005b7c184ec5579",
@@ -2014,8 +2188,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 3,
@@ -2039,7 +2213,8 @@
    "score": 90,
    "score_reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "bd8b135062d53ebf",
@@ -2052,8 +2227,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -2077,7 +2252,8 @@
    "score": 53,
    "score_reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "5bef6ed13c276899",
@@ -2090,8 +2266,8 @@
    "image_url": null,
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 2,
@@ -2115,7 +2291,8 @@
    "score": 72,
    "score_reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "118db98c22e10d87",
@@ -2128,8 +2305,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 1,
@@ -2152,7 +2329,8 @@
    "score": 53,
    "score_reason": "Das Angebot verschenkt Datenvolumen an alle Kunden, was einen direkten und dauerhaften Mehrwert ohne zusätzliche Kosten bietet.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "6069231b683c7aab",
@@ -2165,8 +2343,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 2,
     "depth": 2,
@@ -2189,7 +2367,8 @@
    "score": 72,
    "score_reason": "Das Angebot kombiniert ein Smartphone mit einem kostenlosen Gadget und einem Datentarif, was einen spürbaren Hardware-Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": true,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "d3b2722cd80a99df",
@@ -2202,8 +2381,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 2,
     "depth": 2,
@@ -2226,7 +2405,8 @@
    "score": 72,
    "score_reason": "Das Angebot subventioniert eine PlayStation 5 mit Zubehör in einem Tarif, was einen hohen geldwerten Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": true,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "5c6f3629df1267ef",
@@ -2239,8 +2419,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 3,
     "depth": 3,
@@ -2263,7 +2443,8 @@
    "score": 90,
    "score_reason": "Das Angebot kombiniert eine hohe Wechselprämie mit einem subventionierten Smartphone, was einen sehr starken Wechselanreiz bietet.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": true,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "ce49feffd5281c92",
@@ -2276,8 +2457,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 1,
@@ -2300,7 +2481,8 @@
    "score": 53,
    "score_reason": "Das Angebot bietet ein High-End-Smartphone mit viel Datenvolumen, aber ohne bezifferbaren Preisvorteil oder Wechselanreiz.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "37b25acaa137aacb",
@@ -2313,8 +2495,8 @@
    "image_url": null,
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 2,
     "depth": 2,
@@ -2337,7 +2519,8 @@
    "score": 72,
    "score_reason": "Das Angebot kombiniert ein Premium-Smartphone mit kostenlosen Kopfhörern, was einen spürbaren Hardware-Vorteil darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": true
+   "highlight": true,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "29fd6aed75f49a77",
@@ -2442,10 +2625,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 1,
     "campaign": 0
    },
-   "score": 50,
+   "score": 45,
    "score_reason": "Das Angebot bietet jungen Kunden unbegrenztes Datenvolumen zu einem günstigen Festpreis, was einen klaren Preisvorteil darstellt.",
    "scored_at": "2026-07-28",
    "highlight": false
@@ -3764,10 +3947,10 @@
     "lever": 2,
     "depth": 3,
     "reach": 3,
-    "momentum": 2,
+    "momentum": 1,
     "campaign": 0
    },
-   "score": 75,
+   "score": 70,
    "score_reason": "Das Angebot richtet sich spezifisch an eine junge Zielgruppe und bietet einen sehr hohen Geräterabatt sowie unbegrenztes Datenvolumen.",
    "scored_at": "2026-07-28",
    "highlight": true
@@ -3840,10 +4023,10 @@
     "lever": 1,
     "depth": 1,
     "reach": 3,
-    "momentum": 2,
+    "momentum": 1,
     "campaign": 0
    },
-   "score": 48,
+   "score": 43,
    "score_reason": "Der Preisvorteil ist nicht beziffert und der Tarif richtet sich an eine junge Zielgruppe, was den Wechselanreiz begrenzt.",
    "scored_at": "2026-07-28",
    "highlight": false
@@ -4028,10 +4211,10 @@
     "lever": 2,
     "depth": 3,
     "reach": 3,
-    "momentum": 2,
+    "momentum": 1,
     "campaign": 0
    },
-   "score": 75,
+   "score": 70,
    "score_reason": "Der sehr hohe Geräterabatt und das unbegrenzte Datenvolumen machen das Angebot für die junge Zielgruppe extrem attraktiv.",
    "scored_at": "2026-07-28",
    "highlight": true
@@ -4918,49 +5101,115 @@
    "id": "4c6eaa48f29fda61",
    "brand": "mobilcom-debitel",
    "tier": 2,
-   "headline": "Allnet Flat 40 GB mit 60% Ersparnis",
-   "description": "Der Tarif bietet 40 GB Datenvolumen, 5G, Telefonie- und SMS-Flat für monatlich 11,99 € statt 29,99 €, mit 24 Monaten Laufzeit und einmaligem Anschlusspreis von 19,99 €.",
+   "headline": "60% Ersparnis: Allnet Flat 40 GB",
+   "description": "Der Tarif 'Allnet Flat 40 GB' ist für 11,99 € pro Monat statt 29,99 € erhältlich. Enthält 40 GB Datenvolumen, 5G und eine Allnet-Flat. 24 Monate Laufzeit, Anschlusspreis 19,99 €.",
    "valid_until": null,
-   "url": "https://www.mobilcom-debitel.de/handytarife/",
+   "url": "https://www.mobilcom-debitel.de/handytarife/ohne-handy/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "image_url": "http://www.freenet.de/img/apple-touch-icon.png",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "11,99 € pro Monat statt 29,99 €",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 60 Prozent ist ein starker Wechselanreiz, der die monatliche Belastung deutlich senkt.",
+    "basis": "d5a340a1fc28e3f0",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Der Preisvorteil von 60 Prozent ist ein starker Wechselanreiz, der die monatliche Belastung deutlich senkt.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "71fb01a579f66c51",
    "brand": "mobilcom-debitel",
    "tier": 2,
-   "headline": "Allnet Flat 25 GB mit 50% Ersparnis",
-   "description": "Der Tarif bietet 25 GB Datenvolumen, 5G, Telefonie- und SMS-Flat für monatlich 14,99 € statt 29,99 €, mit 24 Monaten Laufzeit und einmaligem Anschlusspreis von 19,99 €.",
+   "headline": "50% Ersparnis: Allnet Flat 25 GB",
+   "description": "Der Tarif 'Allnet Flat 25 GB' ist für 14,99 € pro Monat statt 29,99 € erhältlich. Enthält 25 GB Datenvolumen, 5G und eine Allnet-Flat. 24 Monate Laufzeit, Anschlusspreis 19,99 €.",
    "valid_until": null,
-   "url": "https://www.mobilcom-debitel.de/handytarife/",
+   "url": "https://www.mobilcom-debitel.de/handytarife/ohne-handy/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "image_url": "http://www.freenet.de/img/apple-touch-icon.png",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "14,99 € pro Monat statt 29,99 €",
+    "evidence_ok": true,
+    "reason": "Die Ersparnis von 50 Prozent ist ein klarer Preisvorteil, der den Tarif im Vergleich zum Normalpreis attraktiv macht.",
+    "basis": "6b6df9ffafa1561a",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Die Ersparnis von 50 Prozent ist ein klarer Preisvorteil, der den Tarif im Vergleich zum Normalpreis attraktiv macht.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "338e3f6b22cdc085",
    "brand": "mobilcom-debitel",
    "tier": 2,
-   "headline": "Unlimited L mit 47% Ersparnis",
-   "description": "Der Tarif bietet unbegrenztes Datenvolumen mit bis zu 300 Mbit/s, 5G, Telefonie- und SMS-Flat für monatlich 31,99 € statt 59,99 €, mit 24 Monaten Laufzeit und einmaligem Anschlusspreis von 29,99 €.",
+   "headline": "47% Ersparnis: Unlimited L",
+   "description": "Der Tarif 'Unlimited L' mit unbegrenztem Datenvolumen und max. 300 Mbit/s ist für 31,99 € pro Monat statt 59,99 € erhältlich. Enthält 5G und eine Allnet-Flat. 24 Monate Laufzeit, Anschlusspreis 29,99 €.",
    "valid_until": null,
-   "url": "https://www.mobilcom-debitel.de/handytarife/",
+   "url": "https://www.mobilcom-debitel.de/handytarife/ohne-handy/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "image_url": "http://www.freenet.de/img/apple-touch-icon.png",
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "31,99 € pro Monat statt 59,99 €",
+    "evidence_ok": true,
+    "reason": "Die Ersparnis von 47 Prozent bei unbegrenztem Datenvolumen ist ein sehr großer wirtschaftlicher Vorteil.",
+    "basis": "eda0a2d1d2e603fc",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 2,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 63,
+   "score_reason": "Die Ersparnis von 47 Prozent bei unbegrenztem Datenvolumen ist ein sehr großer wirtschaftlicher Vorteil.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "4361701626d99315",
@@ -5411,34 +5660,76 @@
    "brand": "winSIM",
    "tier": 2,
    "headline": "10 GB 5G-Tarif für 6,99 € mtl.",
-   "description": "Der 10-GB-Tarif (50 MBit/s) kostet statt 14,99 € nur 6,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €). Gültig nur für kurze Zeit.",
-   "valid_until": null,
+   "description": "Der 10-GB-Tarif (100 MBit/s, Allnet-Flat) kostet statt 14,99 € nur 6,99 € monatlich. Der Bereitstellungspreis entfällt bei Bestellung bis 31.07. 11 Uhr, ansonsten 9,99 €.",
+   "valid_until": "31.07. 11 Uhr",
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26",
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet statt 14,99 € nur 6,99 € monatlich",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 8 Euro monatlich entspricht über 24 Monate einer Ersparnis von 192 Euro, was einen sehr großen wirtschaftlichen Vorteil darstellt.",
+    "basis": "8141929268792575",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der Preisvorteil von 8 Euro monatlich entspricht über 24 Monate einer Ersparnis von 192 Euro, was einen sehr großen wirtschaftlichen Vorteil darstellt.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "8bff470dfc71f501",
    "brand": "winSIM",
    "tier": 2,
    "headline": "20 GB 5G-Tarif für 8,99 € mtl.",
-   "description": "Der 20-GB-Tarif (50 MBit/s) kostet statt 19,99 € nur 8,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €). Gültig nur für kurze Zeit.",
-   "valid_until": null,
+   "description": "Der 20-GB-Tarif (100 MBit/s, Allnet-Flat) kostet statt 19,99 € nur 8,99 € monatlich. Der Bereitstellungspreis entfällt bei Bestellung bis 31.07. 11 Uhr, ansonsten 9,99 €.",
+   "valid_until": "31.07. 11 Uhr",
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26",
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet statt 19,99 € nur 8,99 € monatlich",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 11 Euro monatlich summiert sich auf 264 Euro über die Laufzeit, ein sehr großer Vorteil für den Kunden.",
+    "basis": "9f25e50f6ead76e0",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der Preisvorteil von 11 Euro monatlich summiert sich auf 264 Euro über die Laufzeit, ein sehr großer Vorteil für den Kunden.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "3d6ed6b79d9013c2",
@@ -5460,18 +5751,39 @@
    "id": "87848207e0cf2ae4",
    "brand": "winSIM",
    "tier": 2,
-   "headline": "60 GB 5G-Tarif für 14,99 € mtl.",
-   "description": "Der 60-GB-Tarif (50 MBit/s) kostet statt 29,99 € nur 14,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €). Gültig nur für kurze Zeit.",
-   "valid_until": null,
+   "headline": "60 GB 5G-Tarif für 14,99 € mtl. (mehr Datenvolumen)",
+   "description": "Der 60-GB-Tarif (100 MBit/s, Allnet-Flat) kostet statt 29,99 € nur 14,99 € monatlich. Enthält 60 GB statt der üblichen 50 GB. Bereitstellungspreis 0 € bis 31.07. 11 Uhr, sonst 9,99 €.",
+   "valid_until": "31.07. 11 Uhr",
    "url": "https://www.winsim.de/",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
-   "stale_since": "2026-07-26",
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet statt 29,99 € nur 14,99 € monatlich",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 15 Euro monatlich ergibt 360 Euro Ersparnis über 24 Monate, zudem gibt es 10 GB mehr Datenvolumen als üblich.",
+    "basis": "36e809517954c158",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der Preisvorteil von 15 Euro monatlich ergibt 360 Euro Ersparnis über 24 Monate, zudem gibt es 10 GB mehr Datenvolumen als üblich.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "0d53c4c40b1e83c2",
@@ -5713,35 +6025,77 @@
    "id": "e67fbbb059dbef16",
    "brand": "winSIM",
    "tier": 2,
-   "headline": "40 GB 5G-Tarif für 10,99 € mtl.",
-   "description": "Der 40-GB-Tarif (50 MBit/s) kostet statt 24,99 € nur 10,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €). Aktion gültig bis 28.07. 11 Uhr.",
-   "valid_until": "28.07. 11 Uhr",
+   "headline": "40 GB 5G-Tarif für 10,99 € mtl. (doppeltes Datenvolumen)",
+   "description": "Der 40-GB-Tarif (100 MBit/s, Allnet-Flat) kostet statt 19,99 € nur 10,99 € monatlich. Enthält 40 GB statt der üblichen 20 GB. Bereitstellungspreis 0 € bis 31.07. 11 Uhr, sonst 9,99 €.",
+   "valid_until": "31.07. 11 Uhr",
    "url": "https://www.winsim.de/",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-26",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet statt 19,99 € nur 10,99 € monatlich",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 9 Euro monatlich summiert sich auf 216 Euro über die Laufzeit, und das doppelte Datenvolumen bietet zusätzlichen Mehrwert.",
+    "basis": "0b164aa5a272058f",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der Preisvorteil von 9 Euro monatlich summiert sich auf 216 Euro über die Laufzeit, und das doppelte Datenvolumen bietet zusätzlichen Mehrwert.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "248f53cbe9742b97",
    "brand": "winSIM",
    "tier": 2,
    "headline": "Unlimited on demand für 19,99 € mtl.",
-   "description": "Der Unlimited-Tarif (30 GB Basisvolumen, danach unbegrenzt 1-GB-Schritte per Klick zubuchbar, 50 MBit/s) kostet statt 34,99 € nur 19,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €). Gültig nur für kurze Zeit.",
-   "valid_until": null,
-   "url": "https://www.winsim.de/",
+   "description": "Der Unlimited-Tarif (30 GB Basisvolumen, danach per Klick unbegrenzt weiteres Highspeed-Volumen in 1-GB-Schritten zubuchbar, 100 MBit/s, Allnet-Flat) kostet statt 34,99 € nur 19,99 € monatlich. Bereitstellungspreis 0 € bis 31.07. 11 Uhr, sonst 9,99 €.",
+   "valid_until": "31.07. 11 Uhr",
+   "url": "https://www.winsim.de/unbegrenztes-datenvolumen",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-26",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "kostet statt 34,99 € nur 19,99 € monatlich",
+    "evidence_ok": true,
+    "reason": "Der Preisvorteil von 15 Euro monatlich ergibt 360 Euro Ersparnis über 24 Monate, und die unbegrenzte Datenoption ist ein starkes Leistungsmerkmal.",
+    "basis": "63ed81afaafec47d",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der Preisvorteil von 15 Euro monatlich ergibt 360 Euro Ersparnis über 24 Monate, und die unbegrenzte Datenoption ist ein starkes Leistungsmerkmal.",
+   "scored_at": "2026-07-28"
   },
   {
    "id": "3e8fcf37a6c0dfef",
@@ -5788,8 +6142,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 2,
@@ -5812,7 +6166,8 @@
    "score": 52,
    "score_reason": "Das Angebot kombiniert einen spürbaren Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen klaren Wechselanreiz darstellt.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "a66025330d118d87",
@@ -5825,8 +6180,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 2,
     "depth": 2,
@@ -5849,16 +6204,17 @@
    "score": 58,
    "score_reason": "Die Kombination eines aktuellen Smartphones mit einer Allnet-Flat zu einem monatlichen Gesamtpreis bietet einen geldwerten Vorteil durch die Gerätesubvention.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-07-28"
   },
   {
    "id": "2941461dd1c64b4b",
    "brand": "winSIM",
    "tier": 2,
-   "headline": "Tablet-Angebote mit SIM-Karte",
-   "description": "Tablets wie das Samsung Galaxy Tab S11 5G (ab 39,99 € mtl.) und das Apple iPad Air 11 (M4) (ab 34,99 € mtl.) werden mit einer SIM-Karte angeboten.",
+   "headline": "Tablet-Tarife mit SIM-Karte (Samsung, Apple)",
+   "description": "Tablet-Tarife mit SIM-Karte und Allnet-Flat: Samsung Galaxy Tab S11 5G ab 39,99 €/Monat, Apple iPad Air 11 (M4) ab 34,99 €/Monat.",
    "valid_until": null,
-   "url": "https://www.winsim.de/tablets",
+   "url": "https://www.winsim.de/",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-28",
@@ -5866,25 +6222,25 @@
    "missed_checks": 0,
    "judged": {
     "lever": 2,
-    "depth": 2,
+    "depth": 1,
     "mechanic": "geraetesubvention",
-    "evidence": "Tablets wie das Samsung Galaxy Tab S11 5G (ab 39,99 € mtl.) und das Apple iPad Air 11 (M4) (ab 34,99 € mtl.) werden mit einer SIM-Karte angeboten.",
+    "evidence": "Tablet-Tarife mit SIM-Karte und Allnet-Flat: Samsung Galaxy Tab S11 5G ab 39,99 €/Monat",
     "evidence_ok": true,
-    "reason": "Das Angebot subventioniert ein hochwertiges Tablet über den monatlichen Gesamtpreis, was für Kunden mit Tablet-Bedarf attraktiv ist.",
-    "basis": "05fff823970e1096",
+    "reason": "Das Angebot kombiniert einen Tablet-Tarif mit einem hochwertigen Gerät, bietet aber keinen bezifferbaren Preisvorteil gegenüber Einzelkauf.",
+    "basis": "d83a92808a9a90fc",
     "model": "deepseek-ai/deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
    "score_axes": {
     "lever": 2,
-    "depth": 2,
+    "depth": 1,
     "reach": 1,
     "momentum": 3,
     "campaign": 0
    },
-   "score": 58,
-   "score_reason": "Das Angebot subventioniert ein hochwertiges Tablet über den monatlichen Gesamtpreis, was für Kunden mit Tablet-Bedarf attraktiv ist.",
+   "score": 50,
+   "score_reason": "Das Angebot kombiniert einen Tablet-Tarif mit einem hochwertigen Gerät, bietet aber keinen bezifferbaren Preisvorteil gegenüber Einzelkauf.",
    "scored_at": "2026-07-28",
    "highlight": false
   },
@@ -5899,8 +6255,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-26",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -5924,7 +6280,8 @@
    "score": 52,
    "score_reason": "Der dauerhafte Preisnachlass von 8 Euro monatlich auf den DSL-Tarif ist ein klassischer Rabatt, der Wechsler anlockt.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "a01c689a10e8a743",
@@ -5971,8 +6328,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -5996,7 +6353,8 @@
    "score": 52,
    "score_reason": "Das Angebot kombiniert einen deutlichen Preisnachlass auf den Tarif mit dem Erlass der Bereitstellungsgebühr, was einen starken Wechselanreiz bietet.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "5d799cd513e037a2",
@@ -6009,8 +6367,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "stale_since": "2026-07-28",
    "judged": {
     "lever": 1,
@@ -6034,7 +6392,8 @@
    "score": 27,
    "score_reason": "Der Tarif adressiert eine spezifische Zielgruppe mit besonderen Schutzfunktionen, bietet aber keinen bezifferbaren finanziellen Vorteil gegenüber anderen Angeboten.",
    "scored_at": "2026-07-28",
-   "highlight": false
+   "highlight": false,
+   "ended_since": "2026-07-28"
   },
   {
    "id": "8f6d112061dfb57d",
@@ -6047,8 +6406,8 @@
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-28",
    "last_verified": "2026-07-28",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 3,
@@ -6070,6 +6429,44 @@
    },
    "score": 57,
    "score_reason": "Der Tarif bietet einen erheblichen Preisnachlass von 15 Euro monatlich und den Erlass der Bereitstellungsgebühr, was einen starken finanziellen Anreiz darstellt.",
+   "scored_at": "2026-07-28",
+   "highlight": false,
+   "stale_since": "2026-07-28"
+  },
+  {
+   "id": "60071a4e1be35ffe",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "Handy-Tarife mit Smartphone (Samsung, Apple, Xiaomi)",
+   "description": "Smartphone-Tarife mit Allnet-Flat und aktuellem Gerät: Samsung Galaxy S26 ab 24,99 €/Monat, Apple iPhone 17 Pro ab 39,99 €/Monat, Samsung Galaxy A57 5G ab 14,99 €/Monat, Xiaomi 17T Pro ab 19,99 €/Monat.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-07-28",
+   "last_verified": "2026-07-28",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 2,
+    "depth": 1,
+    "mechanic": "geraetesubvention",
+    "evidence": "Smartphone-Tarife mit Allnet-Flat und aktuellem Gerät: Samsung Galaxy S26 ab 24,99 €/Monat",
+    "evidence_ok": true,
+    "reason": "Das Angebot subventioniert ein aktuelles Smartphone über den Tarif, der genaue Vorteil ist ohne Vergleichspreis aber nicht bezifferbar.",
+    "basis": "2021e1c983852a50",
+    "model": "deepseek-ai/deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "geraetesubvention",
+   "score_axes": {
+    "lever": 2,
+    "depth": 1,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 0
+   },
+   "score": 50,
+   "score_reason": "Das Angebot subventioniert ein aktuelles Smartphone über den Tarif, der genaue Vorteil ist ohne Vergleichspreis aber nicht bezifferbar.",
    "scored_at": "2026-07-28",
    "highlight": false
   }
