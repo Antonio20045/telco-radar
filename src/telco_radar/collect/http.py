@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import random
 import time
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -34,12 +35,19 @@ def fetch(url: str, http_cfg: dict) -> httpx.Response:
     primary = http_cfg.get("user_agent", BROWSER_UA)
     fallback = BOT_UA if primary != BOT_UA else BROWSER_UA
 
+    # A same-origin Referer mimics a normal in-site navigation. Most sources
+    # do not care, but some AEM/CMS "public" backend servlets (e.g. stc's
+    # bin/public/assets) reject requests with no Referer at all as a light
+    # CSRF/hotlink guard - sending one costs nothing and fixes those.
+    site_root = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}/"
+
     last_exc: Exception | None = None
     for ua in (primary, fallback):
         headers = {
             "User-Agent": ua,
             "Accept": "text/html,application/xhtml+xml,application/xml,*/*",
             "Accept-Language": "en;q=0.9,de;q=0.8",
+            "Referer": site_root,
         }
         # attempt 0 immediate, then one retry per backoff wait
         for wait in (0.0, *_BACKOFF_WAITS):

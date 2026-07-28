@@ -158,15 +158,30 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     items: list[Item] = []
     for rec in _records(payload)[:40]:
-        title = _first(rec, _TITLE_KEYS)
-        rel = _first(rec, _URL_KEYS)
+        title = _first(rec, _TITLE_KEYS, skip_values=_TITLE_PLACEHOLDERS)
+        if not title:
+            # The title field held only a generic CTA label (or was empty) -
+            # some records' only readable headline is a short HTML-wrapped
+            # description (e.g. stc's press-release fragments), so strip
+            # tags and use that as a last resort before giving up.
+            desc_raw = _first(rec, _DESC_KEYS)
+            if desc_raw:
+                title = " ".join(_TAG_RE.sub(" ", desc_raw).split())
         if not title:
             continue
-        if not rel and source.link_template:
+        rel = ""
+        if source.link_template:
+            # A configured link_template always wins over a raw url/link
+            # field: some APIs expose a bare slug under a key that *looks*
+            # like a URL (e.g. Iliad's "url": "free-max-plan-...") which
+            # would otherwise be resolved against the wrong host (the API's,
+            # not the public site's) by the generic urljoin below.
             try:
                 rel = source.link_template.format_map(rec)
             except (KeyError, IndexError):
                 rel = ""
+        if not rel:
+            rel = _first(rec, _URL_KEYS)
         if not rel:
             continue
         url = rel if rel.startswith("http") else urljoin(site_root + "/", rel.lstrip("/"))

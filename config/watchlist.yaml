@@ -36,8 +36,9 @@ regions:
       - T-Mobile
       - Magenta
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://www.telekom.com/en/media/media-information
+        item_selector: a.media-link[title]
     - name: O2 Telefónica Deutschland
       country: DE
       website: telefonica.de
@@ -141,8 +142,9 @@ regions:
       country: TR
       website: turkcell.com.tr
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://medya.turkcell.com.tr/basin-bultenleri/
+        item_selector: a.latest-bulletins-item
     - name: Iliad
       country: FR
       website: iliad.fr
@@ -150,11 +152,9 @@ regions:
       - Free Mobile
       - Free
       sources:
-      - type: official
-        url: https://www.iliad.fr/en/press
-        plan: 'Presseliste laedt clientseitig nach, im DOM nur Navigation (Publications, Contact,
-          Documentation), keine Artikel. Kein Feed gefunden. Plan: wie TIM (State-basierter Crawler
-          oder API-Reverse-Engineering); bis dahin Referenz + Fachpresse.'
+      - type: json_api
+        url: https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&year=all&tag=all
+        link_template: 'https://www.iliad.fr/en/actualites/article/{url}'
     - name: 1&1
       country: DE
       website: united-internet.de
@@ -242,9 +242,8 @@ regions:
       - T-Mobile
       - Metro
       sources:
-      - type: official
+      - type: newsroom
         url: https://www.t-mobile.com/news
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.'
     - name: Comcast
       country: US
       website: comcast.com
@@ -290,10 +289,19 @@ regions:
       sources:
       - type: official
         url: https://www.bce.ca/news-and-media/newsroom
-        plan: 'Newsroom ist eine Tailwind-SPA; 67 quelleneigene Links im gerenderten DOM sind
-          ausschliesslich Navigation/Investor-Relations, keine Presse-Cards - die Liste laedt
-          vermutlich per separatem API-Call, der im Render-Fenster nicht sichtbar wird. Kein Feed
-          gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.'
+        plan: 'Next.js-App-Router-Seite; 67 quelleneigene Links im gerenderten DOM sind
+          ausschliesslich Navigation/Investor-Relations, keine Presse-Cards. Tiefere Analyse:
+          es gibt keinen normalen JSON-Endpoint - weder client-seitig (sniff_xhr zeigt nur
+          "text/x-component"-Antworten auf ?_rsc=... URLs, das React-Server-Components
+          "Flight"-Protokoll fuer Hydration, kein JSON) noch separat auffindbar (kein Contentstack-
+          Call trotz CSP-Hinweis auf api.contentstack.io - laeuft offenbar nur serverseitig). Die
+          echten Release-Daten (headline/summary/published_date/sitemap_url) stecken zwar in der
+          normalen HTML-Antwort, aber nur als escapte JSON-Strings in
+          <script>self.__next_f.push([1,"..."])</script>-Chunks, nicht als <a href> im DOM und
+          nicht als eigenstaendiges JSON-Dokument - passt weder in den newsroom- noch in den
+          json_api-Collector, sondern braeuchte einen komplett neuen, RSC-Flight-spezifischen
+          Parsertyp. Kein Feed gefunden. Bewusst als nicht automatisch crawlbar eingestuft
+          (Aufwand/Nutzen); bis dahin Referenz + Fachpresse.'
     - name: Rogers
       country: CA
       website: rogers.com
@@ -317,9 +325,8 @@ regions:
       - America Movil
       - Claro
       sources:
-      - type: official
-        url: https://www.americamovil.com/English/press-releases/default.aspx
-        plan: 'Plan: Q4-JSON-API prüfen; bis dahin Referenz + Fachpresse.'
+      - type: rss
+        url: https://www.americamovil.com/rss/pressrelease.aspx?LanguageId=1
     - name: Millicom
       country: LU
       website: millicom.com
@@ -349,17 +356,18 @@ regions:
       country: BR
       website: oi.com.br
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://www.oi.com.br/sala-de-imprensa/
+        item_selector: .news__item
     - name: Telecom Argentina
       country: AR
       website: telecom.com.ar
       aliases:
       - Personal
       sources:
-      - type: official
-        url: https://institucional.telecom.com.ar/prensa
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.'
+      - type: newsroom_js
+        url: https://institucional.telecom.com.ar/prensa/noticias
+        item_selector: article.lastest-news-card
     - name: WOM
       country: CL
       website: wom.cl
@@ -417,12 +425,9 @@ regions:
       aliases:
       - Saudi Telecom
       sources:
-      - type: official
-        url: https://www.stc.com/en/media-center.html
-        plan: 'DOM enthaelt 188 Links, aber ausschliesslich das komplette mobile Mega-Menu
-          (Investors, Sustainability, ...), keine einzige Pressemeldung - die Liste laedt vermutlich
-          per separatem Endpoint. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin
-          Referenz.'
+      - type: json_api
+        url: https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false
+        link_template: 'https://www.stc.com/en/media-center/press-release/press-release-detail.html?id={id}'
     - name: e&
       country: AE
       website: eand.com
@@ -430,11 +435,9 @@ regions:
       - Etisalat
       - e& Group
       sources:
-      - type: official
-        url: https://www.eand.com/en/news.html
-        plan: '62 Links im DOM sind ausschliesslich Hauptnavigation (Governance, Investors, ...),
-          die Presseliste fehlt komplett im gerenderten DOM. Kein Feed gefunden. Plan: wie stc
-          (API-Reverse-Engineering); bis dahin Referenz.'
+      - type: newsroom
+        url: https://www.eand.com/en/news/news-overview.html
+        item_selector: .tile-box-tile
     - name: Ooredoo
       country: QA
       website: ooredoo.com
@@ -446,9 +449,9 @@ regions:
       country: KW
       website: zain.com
       sources:
-      - type: official
+      - type: newsroom_js
         url: https://www.zain.com/en/media-center
-        plan: '307-Edge-Challenge. Plan: Playwright über Residential-Proxy; bis dahin Referenz.'
+        item_selector: .PressCard
     - name: Orange MEA
       country: EG
       website: orange.eg
@@ -480,8 +483,9 @@ regions:
       country: TR
       website: turktelekom.com.tr
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller
+        item_selector: a.relases-card
   asia:
     name: Asien
     operators:
@@ -517,8 +521,8 @@ regions:
       - Vi India
       - Vi
       sources:
-      - type: newsroom_js
-        url: https://www.myvi.in/media/press-releases
+      - type: json_api
+        url: https://www.myvi.in/bin/vodafoneideadigital/newssearchservlet?search=%7B%22q%22%3A%22%2A%22%2C%22newsType%22%3A%22press%22%2C%22newsCategory%22%3A%22%2A%22%2C%22newsCircle%22%3A%22%2A%22%2C%22newsYear%22%3A0%2C%22pageNumber%22%3A1%7D
     - name: Singtel
       country: SG
       website: singtel.com
@@ -614,9 +618,9 @@ regions:
       aliases:
       - Globe
       sources:
-      - type: official
+      - type: newsroom_js
         url: https://www.globe.com.ph/about-us/newsroom
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.'
+        item_selector: .media-card
     - name: PLDT
       country: PH
       website: pldt.com

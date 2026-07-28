@@ -190,6 +190,13 @@ def _heading_title_for(a, item_root) -> str:
         return ""
     headings = node.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
     if not headings:
+        # Some card layouts (e.g. Telecom Argentina) style the headline as a
+        # <p class="...title..."> instead of a semantic heading tag - only
+        # trust a <p> whose class name says "title" to avoid grabbing an
+        # unrelated body paragraph.
+        headings = [p for p in node.find_all("p")
+                   if any("title" in c.lower() for c in (p.get("class") or []))]
+    if not headings:
         return ""
     # A card can carry more than one heading level - e.g. e& tiles have a
     # short <h5> category badge ("Strategy & Operations") *before* the real
@@ -317,6 +324,17 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             if heading_title and 25 <= len(heading_title) <= 300 \
                     and not _is_junk_title(heading_title):
                 title = heading_title
+        if selector_matched and (len(title) < 25 or len(title) > 300
+                                  or _is_junk_title(title)):
+            # Some icon-only links (e.g. Deutsche Telekom's media-link
+            # anchors) carry the real headline only in a title/aria-label
+            # attribute, often prefixed with a generic category label
+            # ("Media information: <headline>") - strip that prefix.
+            attr_title = (a.get("title") or a.get("aria-label") or "").strip()
+            attr_title = re.sub(r"^[\w][\w \-]{2,30}:\s*", "", attr_title)
+            if attr_title and 25 <= len(attr_title) <= 300 \
+                    and not _is_junk_title(attr_title):
+                title = attr_title
         if len(title) < 25 or len(title) > 300:  # nav links are short
             continue
         if _is_junk_title(title):
