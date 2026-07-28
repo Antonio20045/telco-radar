@@ -76,6 +76,7 @@ _JUNK_EXACT = {
     "press conference materials top", "emergency resource center", "read more",
     "learn more", "see all", "view all", "all news", "back to top", "top",
     "cookie policy", "privacy policy", "contact us", "media contacts",
+    "regulatory news service (regulatory)",
 }
 # Phrases that mark a non-article link when the title is short.
 _JUNK_CONTAINS = re.compile(
@@ -359,7 +360,14 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             if attr_title and 25 <= len(attr_title) <= 300 \
                     and not _is_junk_title(attr_title):
                 title = attr_title
-        if len(title) < 25 or len(title) > 300:  # nav links are short
+        # nav links are short; but some real content is legitimately terse
+        # (e.g. RNS/regulatory-announcement titles like "Q1 Results") - a
+        # source explicitly opts in via allow_short_titles rather than this
+        # being a blanket relaxation for any item_selector, since most
+        # item_selector-scoped nav-link false positives (e.g. "About Us")
+        # are exactly as short.
+        min_title_len = 6 if source.allow_short_titles else 25
+        if len(title) < min_title_len or len(title) > 300:
             continue
         if _is_junk_title(title):
             continue
@@ -378,7 +386,12 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             if date_el:
                 published = _date_from_text(date_el.get_text(" ", strip=True)[:100])
         if published is None:
-            context = a.find_parent(["article", "li", "div"])
+            # A <tr> (e.g. RNS/regulatory-announcement tables like
+            # Investegate's) must be tried before the broader div/li/article
+            # fallback: several <a> siblings can share one outer div/table,
+            # so climbing straight past the row would give every item in
+            # that table the same (wrong) date.
+            context = a.find_parent("tr") or a.find_parent(["article", "li", "div"])
             if context is not None:
                 published = _date_from_text(context.get_text(" ", strip=True)[:400])
         if published is None and selector_matched:

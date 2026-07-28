@@ -422,22 +422,14 @@ regions:
       country: NG
       website: airtel.africa
       sources:
-      - type: official
-        url: https://airtel.africa/press-release
-        plan: 'Echte Pressemeldungs-Tabelle gefunden (nicht /media, sondern /media/press-release
-          -> /press-release), server-seitig gerendert, KEIN Playwright noetig (curl liefert
-          286x "press-table" Treffer identisch zu Playwright-Render). Aber: jede Zeile
-          verlinkt direkt auf ein PDF bei cdn-webportal.airtelstream.net, und der Link
-          (<a> mit SVG-Icon) enthaelt selbst keinen Titeltext - der Titel steht in einer
-          benachbarten <div class="col">, nicht im <a>. Der generische newsroom-Collector
-          scheitert daher doppelt: (1) _SKIP_HINTS blockt jede .pdf-URL kategorisch, (2)
-          der Titel wird ausschliesslich aus a.get_text() gelesen, hier aber leer. Empirisch
-          bestaetigt: parse_newsroom_html() liefert fuer jeden getesteten item_selector
-          (.press-table-row, .press-table-row a, .press-table a) 0 Items. Kein RSS/Feed
-          gefunden (sitewide /rss.xml existiert, deckt aber nur IR-Inhalte ab - Ergebnisse,
-          Calls, AGM -, nicht die News-Meldungen von /press-release). Fix braeuchte
-          Collector-Code-Aenderung (PDF-Ausnahme + Titel-aus-Nachbarspalte); ohne das:
-          Referenz.'
+      - type: newsroom
+        url: https://www.investegate.co.uk/company/AAF
+        item_selector: tbody tr
+        allow_short_titles: true
+        label: 'RNS (Regulatory News Service) via Investegate - Airtel Africa ist an der London
+          Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen.
+          airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain +
+          Titel in Nachbar-div ohne Klasse/Heading).'
     - name: stc
       country: SA
       website: stc.com.sa

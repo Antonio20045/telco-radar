@@ -43,6 +43,11 @@ class Source:
     # field when the payload has no direct url/link field, e.g. only a slug
     # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
     # against the raw record dict.
+    allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
+    # the 25-char title-length floor down to 6, for sources whose real
+    # content is legitimately terse (e.g. RNS/regulatory-announcement
+    # tables like "Q1 Results") - NOT a general item_selector relaxation,
+    # since that would also let short nav-link text ("About Us") through.
 
     def __post_init__(self) -> None:
         if not self.kind:
@@ -132,6 +137,7 @@ def load_config(root: Path) -> Config:
                     label=s.get("label", ""),
                     plan=s.get("plan", ""),
                     link_template=s.get("link_template"),
+                    allow_short_titles=s.get("allow_short_titles", False),
                 ))
             operators.append(Operator(
                 name=op["name"],
