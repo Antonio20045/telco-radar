@@ -77,6 +77,19 @@ def test_newsroom_item_selector_still_applies_skip_hints():
     assert items == []  # mailto: link is still skip-hinted even with a selector
 
 
+def test_newsroom_parses_ordinal_day_month_year_dates():
+    # UK-style press dates ("28th May 2026") appear as plain surrounding text,
+    # not in the URL - seen on threemediacentre.co.uk press-release cards.
+    html = """
+    <article><a href="/news/example-telco-launches-a-thing">Example Telco launches a thing</a>
+      <span>Press release 28th May 2026</span></article>
+    """
+    src = Source(type="newsroom", url="https://example.com/news", name="S")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    assert len(items) == 1
+    assert items[0].published.date().isoformat() == "2026-05-28"
+
+
 def test_newsroom_skips_navigation_and_parses_common_date_formats():
     html = """
     <a href="/media-relations">Media contacts for journalists</a>

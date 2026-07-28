@@ -107,8 +107,11 @@ regions:
       - Telecom Italia
       - Gruppo TIM
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.gruppotim.it/en/press-archive.html
+        plan: 'JS-Routing: Pressemeldungen laden nur nach Klick/API-Call nach, im gerenderten DOM nach
+          1.8s nur 30 Nav-Links, keine Artikel. Kein Feed gefunden. Plan: State-basierter Crawler
+          (Klick-Interaktion) oder API-Reverse-Engineering noetig; bis dahin Referenz + Fachpresse.'
     - name: Liberty Global
       country: GB
       website: libertyglobal.com
@@ -147,8 +150,11 @@ regions:
       - Free Mobile
       - Free
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.iliad.fr/en/press
+        plan: 'Presseliste laedt clientseitig nach, im DOM nur Navigation (Publications, Contact,
+          Documentation), keine Artikel. Kein Feed gefunden. Plan: wie TIM (State-basierter Crawler
+          oder API-Reverse-Engineering); bis dahin Referenz + Fachpresse.'
     - name: 1&1
       country: DE
       website: united-internet.de
@@ -205,8 +211,11 @@ regions:
       - OTE Group
       - OTE
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.cosmote.gr/otegroupcompanysite/en/media/press-releases
+        plan: 'DOM bleibt nach Render fast leer (338 Zeichen, 0 <a>-Tags) - vermutlich Cookie-/Bot-Challenge
+          blockiert das Rendering komplett. Plan: Cookie-Consent-Handling oder Playwright-Stealth-Profil
+          testen; bis dahin Referenz.'
   north_america:
     name: Nordamerika
     operators:
@@ -279,8 +288,12 @@ regions:
       - Bell
       - BCE
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.bce.ca/news-and-media/newsroom
+        plan: 'Newsroom ist eine Tailwind-SPA; 67 quelleneigene Links im gerenderten DOM sind
+          ausschliesslich Navigation/Investor-Relations, keine Presse-Cards - die Liste laedt
+          vermutlich per separatem API-Call, der im Render-Fenster nicht sichtbar wird. Kein Feed
+          gefunden. Plan: API-Reverse-Engineering; bis dahin Referenz.'
     - name: Rogers
       country: CA
       website: rogers.com
@@ -313,8 +326,11 @@ regions:
       aliases:
       - Tigo
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.millicom.com/media/press-releases
+        plan: 'DOM nach Render praktisch leer (nur 4 Links, alles Cookie-Footer). Presseliste laedt
+          per nicht sichtbarem API-Call. Kein Feed gefunden. Plan: wie Bell Canada
+          (API-Reverse-Engineering); bis dahin Referenz.'
     - name: TIM Brasil
       country: BR
       website: tim.com.br
@@ -387,8 +403,12 @@ regions:
       aliases:
       - Saudi Telecom
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.stc.com/en/media-center.html
+        plan: 'DOM enthaelt 188 Links, aber ausschliesslich das komplette mobile Mega-Menu
+          (Investors, Sustainability, ...), keine einzige Pressemeldung - die Liste laedt vermutlich
+          per separatem Endpoint. Kein Feed gefunden. Plan: API-Reverse-Engineering; bis dahin
+          Referenz.'
     - name: e&
       country: AE
       website: eand.com
@@ -396,8 +416,11 @@ regions:
       - Etisalat
       - e& Group
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.eand.com/en/news.html
+        plan: '62 Links im DOM sind ausschliesslich Hauptnavigation (Governance, Investors, ...),
+          die Presseliste fehlt komplett im gerenderten DOM. Kein Feed gefunden. Plan: wie stc
+          (API-Reverse-Engineering); bis dahin Referenz.'
     - name: Ooredoo
       country: QA
       website: ooredoo.com
@@ -419,8 +442,11 @@ regions:
       - Orange Egypt
       - Orange Jordan
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.orange.eg/en/media-center/press-releases
+        plan: 'DOM bleibt nach Render fast leer (246 Zeichen, 1 Link) - vermutlich Bot-/Cookie-Challenge
+          blockiert das Rendering. Plan: wie Cosmote (Cookie-Consent-Handling oder
+          Playwright-Stealth-Profil); bis dahin Referenz.'
     - name: du
       country: AE
       website: du.ae
@@ -468,8 +494,11 @@ regions:
       aliases:
       - Jio
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.jio.com/press-release
+        plan: '127 Links im DOM sind ausschliesslich Self-Care-/Account-Navigation (SIM, JioFiber,
+          Support), keine Pressemeldungen. Kein Feed gefunden. Plan: wie stc
+          (API-Reverse-Engineering); bis dahin Referenz.'
     - name: Vodafone Idea
       country: IN
       website: myvi.in
@@ -491,16 +520,21 @@ regions:
       aliases:
       - SKT
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.sktelecom.com/en/press/press_list.do
+        plan: 'DOM bleibt nach Render fast leer (5390 Zeichen, 4 Links ohne Text) - Presseliste
+          laedt clientseitig per API nach. Plan: wie Cosmote (Cookie-Consent-Handling oder
+          Playwright-Stealth-Profil); bis dahin Referenz.'
     - name: KT
       country: KR
       website: corp.kt.com
       aliases:
       - Korea Telecom
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://corp.kt.com/eng/html/prcenter/report_list.html
+        plan: 'DOM nach Render komplett leer (0 <a>-Tags) - vermutlich Bot-Wall oder
+          Consent-Screen blockiert das Rendering. Plan: wie Cosmote; bis dahin Referenz.'
     - name: NTT Docomo
       country: JP
       website: docomo.ne.jp
@@ -586,8 +620,11 @@ regions:
       aliases:
       - Indosat
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://ioh.co.id/portal/en/iohpressrelease
+        plan: '18 Links im DOM sind interne SPA-Hash-Routen (z.B. "ioh-sustainability"), keine
+          echten Artikel-URLs. Presseliste laedt per API. Plan: wie stc
+          (API-Reverse-Engineering); bis dahin Referenz.'
     - name: CelcomDigi
       country: MY
       website: celcomdigi.com
@@ -606,8 +643,10 @@ regions:
       aliases:
       - True Corp
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://investor.true.th/en/newsroom/set-announcements
+        plan: 'DOM nach Render komplett leer (0 <a>-Tags) - Investor-SET-Portal vermutlich hinter
+          JS-Challenge/Login-Wall. Plan: wie Cosmote; bis dahin Referenz.'
   oceania:
     name: Ozeanien
     operators:
@@ -621,8 +660,13 @@ regions:
       country: AU
       website: optus.com.au
       sources:
-      - type: newsroom_js
+      - type: official
         url: https://www.optus.com.au/about/media-centre
+        plan: 'Chromium scheitert reproduzierbar an der Navigation (zuerst ERR_HTTP2_PROTOCOL_ERROR;
+          nach --disable-http2-Fix stattdessen TimeoutError nach 30s) - vermutlich IP-Sperre gegen
+          GitHub-Actions-Runner oder eine Bot-Challenge, die die Seite nie ausliefert. Plan:
+          Playwright ueber Residential-Proxy; ohne zusaetzliche kostenpflichtige Infrastruktur nicht
+          loesbar.'
     - name: TPG Telecom
       country: AU
       website: tpgtelecom.com.au

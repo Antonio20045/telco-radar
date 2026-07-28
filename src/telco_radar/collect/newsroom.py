@@ -43,7 +43,7 @@ _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
 )
 _TEXT_DATE = re.compile(
-    r"\b(0?[1-9]|[12]\d|3[01])[./\s]"
+    r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+"
     r"(0?[1-9]|1[0-2]|Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
     r"Sep\w*|Oct\w*|Nov\w*|Dec\w*)[./\s,]+(20\d{2})\b", re.I
 )
