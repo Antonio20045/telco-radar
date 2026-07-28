@@ -124,3 +124,33 @@ def test_newsroom_allows_pdf_press_releases_but_not_other_pdfs():
     items = parse_newsroom_html(html, src, "asia", "Example", "operator")
     assert len(items) == 1
     assert "Annual Results" in items[0].title
+
+
+def test_newsroom_item_selector_allows_pdf_attachment_outside_press_path():
+    # TPG Telecom: the real release is a PDF attached from an explicitly
+    # hand-picked card, not under any /press/ path - item_selector alone
+    # should be enough of a signal to let it through.
+    html = """
+    <div class="mediaItem">
+      <h5>TPG Telecom achieves its 100 per cent renewable electricity commitment</h5>
+      <a href="/sites/default/files/media-release/tpg-renewable.pdf">View PDF</a>
+    </div>
+    """
+    src = Source(type="newsroom", url="https://example.com/media_release",
+                 name="S", item_selector=".mediaItem")
+    items = parse_newsroom_html(html, src, "oceania", "Example", "operator")
+    assert len(items) == 1
+    assert "renewable electricity" in items[0].title
+
+
+def test_newsroom_item_selector_falls_back_to_title_attribute():
+    # Deutsche Telekom: a self-closing <a> whose only text lives in title=.
+    html = """
+    <a class="media-link" href="/en/media/media-information/archive/quantum-link"
+       title="Media information: European Quantum Communication Infrastructure"></a>
+    """
+    src = Source(type="newsroom", url="https://example.com/en/media/media-information",
+                 name="S", item_selector=".media-link")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    assert len(items) == 1
+    assert "Quantum Communication" in items[0].title

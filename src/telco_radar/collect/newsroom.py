@@ -46,8 +46,9 @@ _SKIP_HINTS = re.compile(
 )
 # PDFs are usually financial-report spam, so they're dropped by default - but
 # some operators (Hong Kong-listed China Mobile/China Telecom) file their
-# actual press releases as PDFs under a /press/ path. Only that specific case
-# is let through.
+# actual press releases as PDFs under a /press/ path, and others (TPG Telecom)
+# attach the release as a PDF from an explicitly hand-picked item_selector
+# card - in both cases it's a deliberate signal, not noise, so it's let through.
 _PDF_EXT = re.compile(r"\.pdf$", re.I)
 _PRESS_PATH = re.compile(r"/press/", re.I)
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
@@ -180,7 +181,8 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         parts = urlsplit(url)
         if _SKIP_HINTS.search(url):
             continue
-        if _PDF_EXT.search(parts.path) and not _PRESS_PATH.search(parts.path):
+        if _PDF_EXT.search(parts.path) and not _PRESS_PATH.search(parts.path) \
+                and not source.item_selector:
             continue
         if parts.scheme not in ("http", "https"):
             continue
@@ -208,9 +210,13 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             container = a
             while container.parent is not None and container.parent is not scope:
                 container = container.parent
-            candidates = [title]
+            # Some operators (Deutsche Telekom) render a self-closing <a>
+            # whose only text is its title="..." attribute - no sibling
+            # element has it either, so that has to be a candidate source too.
+            candidates = [title, (a.get("title") or "").strip()]
             for el in container.find_all(True):
                 candidates.append(" ".join(el.get_text(" ", strip=True).split()))
+                candidates.append((el.get("title") or "").strip())
             candidates.append(" ".join(container.get_text(" ", strip=True).split()))
             best = max((c for c in candidates if 25 <= len(c) <= 200),
                       key=len, default="")
