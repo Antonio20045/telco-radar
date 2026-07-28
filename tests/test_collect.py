@@ -57,6 +57,26 @@ def test_newsroom_respects_item_selector():
     assert items == []  # footer links are all skip-hinted or too short
 
 
+def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
+    # Some CMS card layouts (e.g. Presspage) use opaque slugs with no
+    # news/press/media keyword in the path - only a configured item_selector
+    # can tell these apart from navigation, since the URL heuristic can't.
+    html = (FIXTURES / "sample_card_newsroom.html").read_text()
+    src = Source(type="newsroom_js", url="https://www.example-telco.com/press-browser/",
+                 name="Example Telco", item_selector="a.card")
+    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    assert len(items) == 2
+    assert all("/content/" in i.url for i in items)
+
+
+def test_newsroom_item_selector_still_applies_skip_hints():
+    html = (FIXTURES / "sample_card_newsroom.html").read_text()
+    src = Source(type="newsroom_js", url="https://www.example-telco.com/press-browser/",
+                 name="Example Telco", item_selector="nav a")
+    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    assert items == []  # mailto: link is still skip-hinted even with a selector
+
+
 def test_newsroom_skips_navigation_and_parses_common_date_formats():
     html = """
     <a href="/media-relations">Media contacts for journalists</a>

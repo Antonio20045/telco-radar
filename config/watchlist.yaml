@@ -197,6 +197,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.threemediacentre.co.uk/press-release-browser/
+        item_selector: a.card
     - name: Cosmote
       country: GR
       website: cosmote.gr
@@ -284,9 +285,8 @@ regions:
       country: CA
       website: rogers.com
       sources:
-      - type: official
-        url: https://about.rogers.com/news-ideas/
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz + Fachpresse.'
+      - type: rss
+        url: https://about.rogers.com/feed
     - name: Telus
       country: CA
       website: telus.com

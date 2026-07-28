@@ -148,6 +148,7 @@ def parse_newsroom_html(html: str, source: Source, region: str,
     """Extract article-like links from a newsroom page (testable, no I/O)."""
     soup = BeautifulSoup(html, "html.parser")
     scope = soup
+    selector_matched = False
     if source.item_selector:
         selected = soup.select(source.item_selector)
         if selected:
@@ -155,6 +156,7 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             for node in selected:
                 wrapper.div.append(node)
             scope = wrapper
+            selector_matched = True
 
     base_host = urlsplit(source.url).netloc.removeprefix("www.")
     items: list[Item] = []
@@ -174,7 +176,10 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         host = parts.netloc.removeprefix("www.")
         if host != base_host and not host.endswith("." + base_host):
             continue
-        if not _ARTICLE_HINTS.search(parts.path):
+        # A configured item_selector already narrows the DOM to verified
+        # article containers (e.g. CMS card layouts whose URLs are opaque
+        # slugs with no news/press keyword) - trust it over the URL heuristic.
+        if not selector_matched and not _ARTICLE_HINTS.search(parts.path):
             continue
         # article pages have a real path, not just the section root
         if parts.path.rstrip("/") == urlsplit(source.url).path.rstrip("/"):

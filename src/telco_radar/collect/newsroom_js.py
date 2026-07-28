@@ -31,7 +31,13 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
         browser = p.chromium.launch(
             headless=True,
             args=["--no-sandbox", "--disable-dev-shm-usage",
-                  "--disable-gpu", "--disable-blink-features=AutomationControlled"],
+                  "--disable-gpu", "--disable-blink-features=AutomationControlled",
+                  # Some sites (e.g. Optus) fail HTTP/2 negotiation from
+                  # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
+                  # HTTP/1.1 for the whole browser session is a safe,
+                  # widely-used workaround since virtually every server also
+                  # speaks HTTP/1.1.
+                  "--disable-http2"],
         )
         try:
             page = browser.new_page(

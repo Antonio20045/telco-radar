@@ -54,7 +54,7 @@ def dump_source(op_name: str, source, timeout: float) -> None:
     print(f"  DOM size: {len(html)} chars | <a> tags: {len(all_links)} "
           f"| same-host-ish: {len(same_host)}")
 
-    print("  --- sample anchors (first 25 with non-trivial text) ---")
+    print("  --- sample anchors (first 60 with non-trivial text) ---")
     shown = 0
     for a in all_links:
         text = " ".join(a.get_text(" ", strip=True).split())
@@ -63,7 +63,7 @@ def dump_source(op_name: str, source, timeout: float) -> None:
         cls = " ".join(a.get("class") or [])
         print(f"    href={a['href'][:90]!r} class={cls!r} text={text[:70]!r}")
         shown += 1
-        if shown >= 25:
+        if shown >= 60:
             break
     if shown == 0:
         print("    (no anchor had >=10 chars of text - likely icon-only nav "
