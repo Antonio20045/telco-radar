@@ -535,21 +535,18 @@ regions:
       aliases:
       - SKT
       sources:
-      - type: official
-        url: https://www.sktelecom.com/en/press/press_list.do
-        plan: 'DOM bleibt nach Render fast leer (5390 Zeichen, 4 Links ohne Text) - Presseliste
-          laedt clientseitig per API nach. Plan: wie Cosmote (Cookie-Consent-Handling oder
-          Playwright-Stealth-Profil); bis dahin Referenz.'
+      - type: newsroom
+        url: https://www.sktelecom.com/en/press/press.do
+        item_selector: a.link
     - name: KT
       country: KR
       website: corp.kt.com
       aliases:
       - Korea Telecom
       sources:
-      - type: official
-        url: https://corp.kt.com/eng/html/prcenter/report_list.html
-        plan: 'DOM nach Render komplett leer (0 <a>-Tags) - vermutlich Bot-Wall oder
-          Consent-Screen blockiert das Rendering. Plan: wie Cosmote; bis dahin Referenz.'
+      - type: json_api
+        url: https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1
+        link_template: 'https://corp.kt.com/html/promote/news/report_detail.html?datNo={datNo}'
     - name: NTT Docomo
       country: JP
       website: docomo.ne.jp
@@ -606,6 +603,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://investor.ais.co.th/en/newsroom/set-announcements
+        item_selector: a.card--set-announcement
     - name: Viettel
       country: VN
       website: viettel.com.vn
@@ -657,10 +655,9 @@ regions:
       aliases:
       - True Corp
       sources:
-      - type: official
+      - type: newsroom_js
         url: https://investor.true.th/en/newsroom/set-announcements
-        plan: 'DOM nach Render komplett leer (0 <a>-Tags) - Investor-SET-Portal vermutlich hinter
-          JS-Challenge/Login-Wall. Plan: wie Cosmote; bis dahin Referenz.'
+        item_selector: a.card--news
   oceania:
     name: Ozeanien
     operators:
@@ -670,6 +667,7 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.telstra.com.au/exchange
+        item_selector: a.tcom-article-box__link
     - name: Optus
       country: AU
       website: optus.com.au

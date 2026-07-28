@@ -46,6 +46,10 @@ _SKIP_HINTS = re.compile(
 _SKIP_FILE_EXT = re.compile(
     r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I
 )
+# Third-party stock-exchange filing/IR vendors some operators route their
+# regulatory announcements through instead of hosting them on their own
+# domain (see the same-domain check below).
+_TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
 _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
@@ -61,7 +65,7 @@ _TEXT_DATE_MDY = re.compile(
     r"(?:st|nd|rd|th)?[./\s,]+(20\d{2})\b", re.I
 )
 _TEXT_DATE_ISO = re.compile(
-    r"\b(20\d{2})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])\b"
+    r"\b(20\d{2})[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12]\d|3[01])\b"
 )
 # Navigation / section labels that are not articles (exact-match, lowercased).
 _JUNK_EXACT = {
@@ -300,9 +304,17 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             continue
         if parts.scheme not in ("http", "https"):
             continue
-        # stay on the operator's domain (subdomains allowed)
+        # stay on the operator's domain (subdomains allowed) - with a narrow
+        # exception for known third-party stock-exchange filing vendors,
+        # which several APAC-listed telcos (e.g. True Corporation) use to
+        # host their regulatory/SET announcements instead of their own
+        # domain. Only trusted once an explicit item_selector already
+        # verified the surrounding container is a real announcement card.
         host = parts.netloc.removeprefix("www.")
-        if host != base_host and not host.endswith("." + base_host):
+        on_domain = host == base_host or host.endswith("." + base_host)
+        on_trusted_vendor = selector_matched and any(
+            host == d or host.endswith("." + d) for d in _TRUSTED_EXTERNAL_HOSTS)
+        if not on_domain and not on_trusted_vendor:
             continue
         # A configured item_selector already narrows the DOM to verified
         # article containers (e.g. CMS card layouts whose URLs are opaque
@@ -314,6 +326,18 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             continue
 
         title = " ".join(a.get_text(" ", strip=True).split())
+        # Some card layouts (e.g. SK Telecom) wrap the whole card - headline
+        # AND a long summary paragraph - inside one <a>, so a.get_text()
+        # returns thousands of characters and fails the length filter below.
+        # A descendant literally classed "title" is a common enough
+        # convention to check first, before falling back to the length
+        # heuristics that assume the anchor text IS the headline.
+        if selector_matched and len(title) > 300:
+            title_el = a.select_one(".title")
+            if title_el:
+                narrowed = " ".join(title_el.get_text(" ", strip=True).split())
+                if narrowed and 25 <= len(narrowed) <= 300 and not _is_junk_title(narrowed):
+                    title = narrowed
         # Some card layouts (e.g. e& newsroom) put the headline in a sibling
         # <h1>-<h6> inside the card and reserve the anchor text for a generic
         # "Read more"/"Load More" label - only worth searching once the
@@ -345,6 +369,14 @@ def parse_newsroom_html(html: str, source: Source, region: str,
 
         url_date, url_has_day = _date_from_url(url)
         published = url_date if url_has_day else None
+        if published is None and hasattr(a, "select_one"):
+            # A descendant classed "date" (e.g. SK Telecom's "reg-date") is a
+            # precise, common convention - worth trying before the truncated
+            # whole-card text search below, which can miss a date sitting
+            # after a long summary paragraph within the same [:400] cutoff.
+            date_el = a.select_one("[class*=date]")
+            if date_el:
+                published = _date_from_text(date_el.get_text(" ", strip=True)[:100])
         if published is None:
             context = a.find_parent(["article", "li", "div"])
             if context is not None:
