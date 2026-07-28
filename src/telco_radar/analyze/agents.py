@@ -31,6 +31,14 @@ angle. For each real signal decide: what happened, and what Vodafone could
 actually DO with this insight (copy it, defend against it, watch it, learn
 from it).
 
+The region "Global" also contains general technology, AI and hardware news
+(new chips, AI models, network/cloud infrastructure, semiconductors) that is
+NOT about a telco competitor at all - e.g. a vendor like Nvidia, Broadcom,
+OpenAI or ARM. Judge these the same way: would this development plausibly
+change Vodafone's network costs, capabilities, or product roadmap if it
+plays out? If yes, it is a real signal - "operator" is then simply the
+vendor/company name, not a telco.
+
 Respond with ONLY valid JSON, no markdown, matching this schema:
 {{
   "region_summary": "<2-3 sentences in {language}: what is happening in this region this week and the direction it points>",
@@ -50,12 +58,18 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
 Scoring guide (be strict - most PR is noise):
 - 5: a competitor move Vodafone should react to or copy quickly (aggressive new
      tariff, disruptive consumer product, FMC/eSIM/roaming/AI-in-tariff launch,
-     major partnership that shifts the market).
-- 4: clearly relevant strategic development worth a manager's attention.
+     major partnership that shifts the market); OR a major AI/hardware/network
+     technology breakthrough (new AI chip, AI-RAN, foundation model, energy-
+     efficient network hardware) that would materially change how telcos run
+     networks or build products if adopted.
+- 4: clearly relevant strategic development worth a manager's attention,
+     including a significant AI/hardware advance worth watching even if no
+     telco has adopted it yet.
 - 3: worth monitoring, not urgent.
 - 2: minor / contextual.
 - Drop everything below 2 (sponsorships, HR moves, ESG boilerplate, generic
-  PR fluff, pure finance calendar notices) - do NOT put them in "highlights".
+  PR fluff, pure finance calendar notices, consumer-gadget reviews with no
+  network/infrastructure angle) - do NOT put them in "highlights".
 
 Rules:
 - Only include items with relevance >= 2 in "highlights".

@@ -39,6 +39,7 @@ class Source:
     kind: str = ""  # display/crawl kind (see above); defaults from type
     label: str = ""  # human label for the source card
     plan: str = ""   # for 'official' sources: why not yet crawled + the plan
+    group: str = "telco"  # news_sources.yaml only: "telco" or "tech" (see sources.html)
 
     def __post_init__(self) -> None:
         if not self.kind:
@@ -141,7 +142,7 @@ def load_config(root: Path) -> Config:
     news_sources = [
         Source(type=s.get("type", "rss"), url=s["url"],
                name=s.get("name", s["url"]), kind="trade_press",
-               label=s.get("name", ""))
+               label=s.get("name", ""), group=s.get("group", "telco"))
         for s in (news.get("news_sources") or [])
     ]
 

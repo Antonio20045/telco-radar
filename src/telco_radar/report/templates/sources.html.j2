@@ -8,8 +8,8 @@
   <h1>Überwachte Quellen</h1>
   <p class="page-lead">Primärquelle jedes Betreibers ist <b>seine eigene offizielle Presseseite</b> –
   per Feed (RSS/JSON), statischem Newsroom oder Headless-Render direkt vom Unternehmen. Kein Dritt-Medium wird
-  als Quelle eines Betreibers ausgegeben. Die Telco-Fachpresse (unten) ist eine separate, klar gekennzeichnete
-  <b>zweite Ebene</b>. Alles verlinkt und nachprüfbar.</p>
+  als Quelle eines Betreibers ausgegeben. Die Telco-Fachpresse ist eine separate, klar gekennzeichnete
+  <b>zweite Ebene</b>, allgemeine Technologie- und KI-Neuigkeiten eine <b>dritte</b> (beide unten). Alles verlinkt und nachprüfbar.</p>
 </section>
 
 <div class="region-tiles">
@@ -42,10 +42,20 @@
 </div>
 
 <div class="card tan" style="margin-top:20px">
-  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span style="color:#a89c8c;font-weight:500">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span style="color:#a89c8c;font-weight:500">zweite Ebene · {{ news_sources | selectattr('group', 'equalto', 'telco') | list | length }} Feeds</span></h2>
   <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>
   <div class="pill-cloud">
-    {% for s in news_sources %}
+    {% for s in news_sources if s.group == 'telco' %}
+    <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card tan" style="margin-top:20px">
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Technologie- &amp; KI-Trends <span style="color:#a89c8c;font-weight:500">dritte Ebene · {{ news_sources | selectattr('group', 'equalto', 'tech') | list | length }} Feeds</span></h2>
+  <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Allgemeine KI-, Hardware- und Technologie-Neuigkeiten – nicht telco-spezifisch, aber mit möglicher Bedeutung fürs Geschäft. Nie als Betreiber-Quelle ausgegeben.</p>
+  <div class="pill-cloud">
+    {% for s in news_sources if s.group == 'tech' %}
     <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a>
     {% endfor %}
   </div>
