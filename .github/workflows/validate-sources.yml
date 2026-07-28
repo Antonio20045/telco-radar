@@ -1,0 +1,36 @@
+name: Validate Sources
+
+# Reine Diagnose (health check aller Quellen: OK/EMPTY/FAIL). Beruehrt
+# data/ und site/ nicht, committet nichts, ruft keine LLM auf, loest keinen
+# Render-Deploy aus. Nur manuell startbar - fuer schnelle Iteration beim
+# Reparieren einzelner Quellen (siehe scripts/validate_sources.py).
+on:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Validate all sources
+        env:
+          PYTHONPATH: src
+        run: |
+          {
+            echo '```text'
+            python scripts/validate_sources.py
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
