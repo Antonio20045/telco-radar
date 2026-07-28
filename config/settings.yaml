@@ -75,6 +75,36 @@ editor_model_fallback: true
 # ohne den Hauptlauf/die Hauptseite zu beruehren.
 promo_enabled: true
 
+# Wichtigkeits-Score der Promo-Uebersicht (src/telco_radar/analyze/promo_ranker.py).
+# Methodisch ein composite indicator nach OECD/JRC-Handbuch: fuenf Achsen mit
+# je 0-3 Punkten und FESTEN Ankertexten, gewichtete Summe, skaliert auf 0-100.
+#
+#   lever     Wechselhebel        (LLM)   Praemie/Abloesung > Geraetesubvention
+#                                         > reiner Rabatt
+#   depth     Angebotstiefe       (LLM)   bezifferbarer wirtschaftlicher Vorteil
+#   reach     Marktreichweite     (Code)  Feld "reach" in promo_sources.yaml
+#   momentum  Marktbewegung       (Code)  wie viele andere Marken fahren gerade
+#                                         dieselbe Mechanik
+#   campaign  Kampagnencharakter  (Code)  befristete Aktion vs. Dauerpreis
+#
+# Die Gewichte sind Trade-off-Raten, keine "Wichtigkeiten" im Alltagssinn -
+# wer sie dreht, sollte danach einmal die Rangfolge gegenpruefen (Paruolo/
+# Saisana/Saltelli 2013, "Ratings and rankings: voodoo or science?").
+# Werte muessen nicht auf 1.0 summieren, sie werden normiert.
+promo_score:
+  weights:
+    lever: 0.30
+    depth: 0.25
+    reach: 0.20
+    momentum: 0.15
+    campaign: 0.10
+  # Hysterese-Band gegen Flackern an der Grenze: ein Angebot wird ab
+  # highlight_enter zum Highlight und faellt erst unter highlight_exit wieder
+  # heraus. Kalibriert am echten Bestand vom 27.07.2026 (72 aktive Angebote);
+  # nach dem ersten echten Bewertungslauf gegenpruefen.
+  highlight_enter: 68
+  highlight_exit: 60
+
 # Focus competitors for the dedicated "Wettbewerber" deep-dive tab.
 focus_competitors:
   - name: "Deutsche Telekom"

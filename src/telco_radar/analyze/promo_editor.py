@@ -64,6 +64,8 @@ Regeln:
   aus den gelieferten Daten.
 - Keine erfundenen Preise, Rabattbetraege oder Enddaten.
 - Keine Handlungsempfehlung fuer Vodafone ("Vodafone sollte/koennte").
+- Manche Eintraege tragen ein Feld "wichtigkeit" (0-100). Nutze es nur als
+  Hinweis darauf, womit du anfaengst - nenne die Zahl NIE im Text.
 - Maximal etwa 900 Woerter.
 """
 
@@ -101,7 +103,7 @@ def validate_briefing(markdown: str) -> None:
 def _payload(entries: list[dict]) -> str:
     rows = []
     for e in entries:
-        rows.append({
+        row = {
             "anbieter": e.get("brand") or "",
             "titel": e.get("headline") or "",
             "beschreibung": e.get("description") or "",
@@ -109,7 +111,14 @@ def _payload(entries: list[dict]) -> str:
             "quelle": e.get("url") or "",
             "seit": e.get("first_seen") or "",
             "geprueft": e.get("last_verified") or "",
-        })
+        }
+        # Wichtigkeits-Score aus analyze/promo_ranker.py, sofern schon
+        # bewertet. Nur ein Hinweis fuer die Gewichtung im Text - der Editor
+        # soll die Zahl selbst NICHT nennen (die Rangfolge steht sichtbar
+        # oben auf der Seite, im Fliesstext waere sie nur Ballast).
+        if e.get("score") is not None:
+            row["wichtigkeit"] = e["score"]
+        rows.append(row)
     return json.dumps(rows, ensure_ascii=False)
 
 
@@ -118,6 +127,12 @@ def synthesize(entries: list[dict], model: str, language: str = "Deutsch") -> st
     active = [e for e in entries if e.get("status") == "aktiv"]
     if not active:
         return build_digest(entries)
+    # Wichtigste zuerst in den Prompt: bei ~70 aktiven Aktionen und begrenztem
+    # Kontext entscheidet die Reihenfolge mit darueber, worueber der Text
+    # ueberhaupt schreibt. Unbewertete Eintraege bleiben hinten, statt sie zu
+    # verwerfen - sie sind nicht unwichtig, nur noch nicht beurteilt.
+    active = sorted(active, key=lambda e: (e.get("score") is not None,
+                                           e.get("score") or 0), reverse=True)
     raw = complete(
         PROMO_EDITOR_SYSTEM + f"\nBerichtssprache: {language}.",
         _payload(active), model=model, max_tokens=3200)

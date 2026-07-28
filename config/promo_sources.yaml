@@ -21,15 +21,23 @@
 #             Behauptung - manche Discounter senden ueber mehrere Netze)
 #   internal_reference  true fuer Vodafone selbst: erscheint separat markiert,
 #             zaehlt NICHT als Wettbewerber (siehe report/promo.py)
+#   reach     1-3, Marktreichweite der Marke - Achse C des Wichtigkeits-Scores
+#             (src/telco_radar/analyze/promo_ranker.py). 3 = Netzbetreiber,
+#             2 = breit distribuierte Zweit-/Handelsmarke (Filialnetz, Discounter-
+#             Regal, grosser Vertriebspartner), 1 = reine Online-Zweitmarke.
+#             Bewusst getrennt vom Tier: ALDI TALK und simplytel sind beide
+#             Tier 2, erreichen aber voellig unterschiedlich viele Menschen.
 # =============================================================================
 brands:
   # ---------------------------------------------------------- Tier 1: MNOs
   - name: Telekom Deutschland
+    reach: 3
     tier: 1
     group: Deutsche Telekom
     url: https://www.telekom.de/unterwegs/aktionen
     kind: js
   - name: Vodafone Deutschland
+    reach: 3
     tier: 1
     group: Vodafone
     url: https://www.vodafone.de/handy/angebote.html
@@ -37,11 +45,13 @@ brands:
     internal_reference: true
     note: "Eigene Marke - interne Referenz, nicht Teil der Wettbewerbsauswertung."
   - name: O2 / Telefónica Deutschland
+    reach: 3
     tier: 1
     group: Telefónica Deutschland
     url: https://www.o2online.de/deals/
     kind: js
   - name: 1&1 Mobilfunk
+    reach: 3
     tier: 1
     group: 1&1 / United Internet
     url: https://mobile.1und1.de/handyvertrag
@@ -50,62 +60,73 @@ brands:
 
   # ------------------------------------------------ Tier 2: Discount-Marken
   - name: congstar
+    reach: 2
     tier: 2
     group: Deutsche Telekom
     url: https://www.congstar.de/handytarife/angebote/
     kind: static
   - name: Otelo
+    reach: 2
     tier: 2
     group: Vodafone
     url: https://www.otelo.de/
     kind: js
     note: "Keine dedizierte Aktions-Unterseite gefunden, Homepage fuehrt aktuelle Kampagnen."
   - name: Blau
+    reach: 2
     tier: 2
     group: Telefónica Deutschland
     url: https://www.blau.de/handy-angebote/
     kind: static
   - name: ALDI TALK
+    reach: 2
     tier: 2
     group: MEDION / Telefónica-Netz
     url: https://www.alditalk.de/angebote
     kind: static
   - name: mobilcom-debitel
+    reach: 2
     tier: 2
     group: freenet Group
     url: https://www.mobilcom-debitel.de/handytarife/
     kind: js
     note: "Sonderfall: filterbarer Tarifkatalog statt fester Aktionsseite - Extraktion ggf. unzuverlaessig, beobachten."
   - name: klarmobil
+    reach: 2
     tier: 2
     group: freenet Group
     url: https://www.klarmobil.de/unternehmen/presse/
     kind: static
     note: "Presseseite als Primaerquelle gewaehlt (strukturierter als der Tarifkatalog unter klarmobil.de/handytarife/)."
   - name: Lidl Connect
+    reach: 2
     tier: 2
     group: Lidl / Drillisch
     url: https://www.lidl-connect.de/
     kind: js
   - name: Penny Mobil
+    reach: 2
     tier: 2
     group: Telekom-Netz (D1)
     url: https://www.pennymobil.de/
     kind: js
     note: "Keine dedizierte Aktionsseite gefunden, Homepage als bester Fallback. connect.de deckt einzelne Kampagnen redaktionell ab."
   - name: winSIM
+    reach: 1
     tier: 2
     group: 1&1 / Drillisch
     url: https://www.winsim.de/
     kind: js
     note: "Rotierende Angebote auf der Startseite, kein fester Pfad."
   - name: PremiumSIM
+    reach: 1
     tier: 2
     group: 1&1 / Drillisch
     url: https://www.premiumsim.de/
     kind: js
     note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
   - name: simplytel
+    reach: 1
     tier: 2
     group: 1&1 / Drillisch
     url: https://www.simplytel.de/

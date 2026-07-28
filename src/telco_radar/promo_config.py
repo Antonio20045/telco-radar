@@ -24,6 +24,12 @@ class PromoSource:
     group: str = ""               # Mutter-/Markenfamilie, sofern bekannt
     internal_reference: bool = False
     note: str = ""
+    # Achse C des Wichtigkeits-Scores (analyze/promo_ranker.py): Marktreich-
+    # weite der Marke, 1-3. Bewusst ein eigenes Feld statt einer Ableitung
+    # aus dem Tier - eine Handelsmarke wie ALDI TALK erreicht deutlich mehr
+    # Menschen als eine reine Online-Zweitmarke, obwohl beide Tier 2 sind.
+    # Fehlt das Feld, faellt promo_ranker.reach_axis() auf das Tier zurueck.
+    reach: int | None = None
 
     @property
     def crawlable(self) -> bool:
@@ -57,6 +63,7 @@ def load_promo_config(root: Path) -> PromoConfig:
             kind=b.get("kind", "static"), group=b.get("group", ""),
             internal_reference=bool(b.get("internal_reference", False)),
             note=b.get("note", ""),
+            reach=int(b["reach"]) if str(b.get("reach", "")).strip().isdigit() else None,
         )
         for b in (raw.get("brands") or []) if b.get("name") and b.get("url")
     ]

@@ -297,7 +297,8 @@ def run(root: Path, use_llm: bool | None = None,
             from .promo_pipeline import run_promo_stage
             promo_result = run_promo_stage(
                 root, cfg.settings.get("http", {}), bool(use_llm),
-                editor_model, language=language)
+                editor_model, language=language, settings=cfg.settings,
+                score_model=analyst_model or editor_model)
             log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
                      promo_result.get("mode"), promo_result.get("active", 0))
         except Exception as exc:  # noqa: BLE001

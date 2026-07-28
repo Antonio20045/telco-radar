@@ -144,3 +144,102 @@ def test_brand_without_screenshot_or_og_image_has_none():
     by_name = {b["name"]: b for b in view["brands"]}
     assert by_name["congstar"]["image_url"] is None
     assert by_name["klarmobil"]["image_url"] == "images/klarmobil.jpg"
+
+
+# ------------------------------------------------------------- Highlights
+# Die Auswahl selbst trifft analyze/promo_ranker.py (Score + Hysterese) - hier
+# wird nur geprueft, dass die Anzeige das Flag respektiert und nichts eigenes
+# dazuerfindet.
+
+def _scored(brand="congstar", headline="A", score=80, highlight=True,
+            reason="Weil.", mechanic="wechselpraemie", **kw):
+    e = _entry(brand=brand, headline=headline, **kw)
+    e.update({"score": score, "highlight": highlight, "score_reason": reason,
+              "mechanic": mechanic})
+    return e
+
+
+def test_highlights_are_ranked_by_score():
+    sources = [_src("congstar"), _src("klarmobil"), _src("Blau")]
+    entries = [_scored(brand="congstar", score=71),
+               _scored(brand="klarmobil", score=88),
+               _scored(brand="Blau", score=79)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [h["brand"]["name"] for h in view["highlights"]] == [
+        "klarmobil", "Blau", "congstar"]
+    assert view["highlight_count"] == 3
+    assert view["hero"]["brand"]["name"] == "klarmobil"
+    assert view["hero"]["reason"] == "Weil."
+
+
+def test_only_flagged_offers_become_highlights():
+    """Ein hoher Score allein reicht nicht - das Flag kommt aus der Hysterese
+    im Ranker, die Anzeige darf die Schwelle nicht selbst nachbilden."""
+    sources = [_src("congstar")]
+    entries = [_scored(headline="A", score=95, highlight=False),
+               _scored(headline="B", score=70, highlight=True)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [h["offer"]["headline"] for h in view["highlights"]] == ["B"]
+
+
+def test_unscored_offers_never_become_highlights():
+    sources = [_src("congstar")]
+    entries = [_entry(headline="A")]
+    entries[0]["highlight"] = True          # Flag ohne Zahl darf nicht greifen
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert view["highlights"] == []
+    assert view["scored_total"] == 0
+
+
+def test_own_brand_is_an_anchor_not_part_of_the_ranking():
+    sources = [_src("congstar"), _src("Vodafone Deutschland", internal_reference=True)]
+    entries = [_scored(brand="congstar", score=71),
+               _scored(brand="Vodafone Deutschland", headline="Eigenes", score=99)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [h["brand"]["name"] for h in view["highlights"]] == ["congstar"]
+    assert view["own_anchor"]["brand"]["name"] == "Vodafone Deutschland"
+    assert view["own_anchor"]["offer"]["headline"] == "Eigenes"
+    assert view["hero"]["brand"]["name"] == "congstar"
+
+
+def test_own_anchor_picks_the_best_scored_own_offer():
+    sources = [_src("Vodafone Deutschland", internal_reference=True)]
+    entries = [_scored(brand="Vodafone Deutschland", headline="schwach", score=20,
+                       highlight=False),
+               _scored(brand="Vodafone Deutschland", headline="stark", score=77,
+                       highlight=False)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert view["own_anchor"]["offer"]["headline"] == "stark"
+
+
+def test_hero_falls_back_to_old_behaviour_without_any_scores():
+    """Vor dem ersten Bewertungslauf (und bei LLM-Ausfall) darf die Seite
+    nicht leer wirken - dann gilt wieder das bisherige Verhalten."""
+    sources = [_src("congstar"), _src("Vodafone Deutschland", internal_reference=True)]
+    entries = [_entry(brand="congstar"), _entry(brand="Vodafone Deutschland")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert view["highlights"] == []
+    assert view["hero"]["brand"]["name"] == "Vodafone Deutschland"
+
+
+def test_highlight_list_is_capped_and_reports_the_remainder():
+    sources = [_src(f"Marke{i}") for i in range(12)]
+    entries = [_scored(brand=f"Marke{i}", score=70 + i) for i in range(12)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert view["highlight_count"] == 9
+    assert view["highlight_dropped"] == 3
+    assert len(view["highlight_rest"]) == 8      # ohne die Hero-Karte
+
+
+def test_only_the_best_offer_per_brand_reaches_the_highlights():
+    """Gegen SKU-Flut: an den echten Daten vom 27.07.2026 kamen neun der
+    besten fuenfzehn Treffer von der Telekom - dieselbe Geraeteaktion, einmal
+    je Modell. Oben gehoert Marktbreite hin, nicht der groesste Katalog."""
+    sources = [_src("Telekom"), _src("congstar")]
+    entries = [_scored(brand="Telekom", headline="Gerät A", score=90),
+               _scored(brand="Telekom", headline="Gerät B", score=88),
+               _scored(brand="Telekom", headline="Gerät C", score=86),
+               _scored(brand="congstar", headline="Bonus", score=70)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [h["offer"]["headline"] for h in view["highlights"]] == ["Gerät A", "Bonus"]
+    assert view["highlight_dropped"] == 2      # Gerät B und C stehen unten

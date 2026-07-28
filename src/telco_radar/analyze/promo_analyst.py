@@ -47,6 +47,11 @@ Menuereste, rechtliche Fussnoten, Cookie-Hinweise, allgemeine
 Markenaussagen ohne konkretes Angebot und alles, was nicht wie ein Angebot
 fuer Endkunden aussieht.
 
+NUR MOBILFUNK. Verwirf Festnetz-, DSL-, Kabel- und Glasfaserangebote
+(z. B. MagentaZuhause, "Internet fuer Zuhause", Homespot-/Router-Tarife) -
+dieses Segment wird bewusst nicht beobachtet. Mobile Datentarife fuer
+Tablet, Smartwatch oder Multi-SIM gehoeren dagegen dazu.
+
 Erfinde NIE einen Preis, Rabattbetrag oder ein Enddatum, das nicht woertlich
 oder eindeutig sinngemaess im Text steht. Wenn kein Enddatum genannt wird,
 lasse "valid_until" weg (null) - nicht raten. Beschreibe die Mechanik in

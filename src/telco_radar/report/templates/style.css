@@ -477,21 +477,41 @@ main{padding-bottom:60px}
 
 /* featured row: hero image card + red "was diese Woche auffällt" stat card */
 .promo-hero-row{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+/* Bild und Verlauf liegen absolut hinter dem Inhalt, der Inhalt selbst steht
+   im normalen Fluss (margin-top:auto schiebt ihn nach unten). Vorher war auch
+   der Inhalt absolut positioniert - mit Score-Kachel und Begruendungssatz
+   lief er auf schmalen Viewports oben aus der Karte heraus. */
 .promo-hero-card{position:relative;grid-column:span 1;border-radius:var(--radius-lg);
-  overflow:hidden;min-height:240px;background:linear-gradient(135deg,var(--c,#3860be),#1b1d21)}
+  overflow:hidden;min-height:240px;display:flex;flex-direction:column;
+  background:linear-gradient(135deg,var(--c,#3860be),#1b1d21)}
 .promo-hero-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   object-position:top center;display:block}
 .promo-hero-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .promo-hero-fallback .promo-avatar{font-size:56px;font-weight:800;letter-spacing:.03em;color:#fff;opacity:.9}
 .promo-hero-overlay{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(0deg,rgba(20,10,8,.88) 0%,rgba(20,10,8,.15) 60%)}
-.promo-hero-content{position:absolute;left:0;right:0;bottom:0;padding:26px 28px}
+  background:linear-gradient(0deg,rgba(20,10,8,.94) 0%,rgba(20,10,8,.86) 34%,
+    rgba(20,10,8,.52) 62%,rgba(20,10,8,.12) 88%)}
+.promo-hero-content{position:relative;margin-top:auto;padding:26px 28px}
+.promo-hero-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .promo-hero-badge{display:inline-block;background:var(--red);color:#fff;font-size:11px;
   font-weight:700;padding:5px 11px;border-radius:var(--radius-pill);
   text-transform:uppercase;letter-spacing:.04em}
 .promo-hero-headline{font-size:21px;font-weight:800;color:#fff;letter-spacing:-.3px;
   line-height:1.28;margin:12px 0 4px;max-width:88%}
+.promo-hero-reason{font-size:14px;line-height:1.5;color:rgba(255,255,255,.92);
+  margin:0 0 8px;max-width:88%;font-weight:600;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .promo-hero-meta{font-size:13px;color:rgba(255,255,255,.78);margin:0}
+/* Wichtigkeits-Score der Hero-Karte: bewusst oben rechts, ausserhalb des
+   dunklen Textverlaufs unten, damit die Zahl auch auf hellen Screenshots
+   lesbar bleibt. */
+.promo-hero-score{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;
+  background:rgba(20,10,8,.55);border:1px solid rgba(255,255,255,.28);
+  border-radius:var(--radius-pill)}
+.promo-hero-score b{font-size:15px;font-weight:800;color:#fff;line-height:1.2;
+  font-variant-numeric:tabular-nums}
+.promo-hero-score span{font-size:9.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:rgba(255,255,255,.75)}
 .promo-hero-link{display:inline-block;margin-top:12px;font-size:13px;font-weight:700;
   color:#fff;text-decoration:underline}
 .promo-hero-link:hover{color:#fff;opacity:.82}
@@ -504,6 +524,71 @@ main{padding-bottom:60px}
 .promo-stat-link{display:inline-block;align-self:flex-start;margin-top:16px;
   font-size:12.5px;font-weight:700;color:#fff;text-decoration:underline}
 .promo-stat-link:hover{color:#fff;opacity:.82}
+
+/* ------------------------------------------- Highlights ("was ist wichtig")
+   Die Rangfolge selbst entsteht in analyze/promo_ranker.py; hier steht nur
+   die Darstellung. Bewusst eigene, kompakte Kartenform statt der grossen
+   Markenkarten des Boards weiter unten: eine Highlight-Karte zeigt EIN
+   Angebot mit Score und Begruendung, keine Markenuebersicht. */
+.promo-top-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+  gap:14px;margin-top:14px}
+/* min-width:0 ist hier NICHT kosmetisch: die Fusszeile enthaelt eine einzeilig
+   gekuerzte Freitextangabe (white-space:nowrap). Ohne min-width:0 nimmt das
+   Grid-Item die volle Textbreite als Mindestbreite an und schiebt auf dem Handy
+   die ganze Seite ueber den Viewport hinaus. */
+.promo-top-card{background:#fff;border:1px solid var(--tan-line);border-radius:var(--radius-md);
+  padding:18px 20px;display:flex;flex-direction:column;min-width:0;
+  transition:box-shadow .2s var(--ease),transform .2s var(--ease)}
+.promo-top-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+/* Vodafones eigenes Angebot ist Vergleichsanker, kein Ranglistenplatz -
+   deshalb warmer Grund und roter Ring statt Score-Pille. */
+.promo-top-card--own{background:var(--pink);border-color:#f6cfcd;
+  box-shadow:inset 0 0 0 1px rgba(230,0,0,.14)}
+.promo-top-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.promo-top-brand{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--c,var(--mute))}
+.promo-top-score{flex:none;font-size:13px;font-weight:800;color:#fff;background:var(--red);
+  min-width:34px;text-align:center;padding:3px 8px;border-radius:var(--radius-pill);
+  font-variant-numeric:tabular-nums}
+.promo-top-anchor-tag{flex:none;font-size:9.5px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--red);background:#fff;padding:3px 9px;
+  border-radius:var(--radius-pill)}
+.promo-top-headline{display:block;margin:9px 0 0;font-size:15px;font-weight:800;
+  line-height:1.3;letter-spacing:-.01em;color:var(--ink)}
+.promo-top-headline:hover{color:var(--red)}
+.promo-top-reason{margin:7px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-body);
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.promo-top-meta{margin:auto 0 0;padding-top:12px;font-size:11px;color:var(--faint);
+  display:flex;align-items:center;gap:7px;min-width:0}
+/* Gueltigkeitsangaben sind Anbieter-Freitext ("bis 28.07. 11 Uhr (fuer 40 GB),
+   sonst ...") und wuerden die Fusszeile sonst mehrzeilig sprengen. Sauber
+   einzeilig kuerzen statt hart abschneiden - der volle Text steht ohnehin
+   unten auf der Markenkarte. */
+.promo-top-metatext{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.promo-top-mech{flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--mute);
+  background:var(--line2);padding:2px 8px;border-radius:var(--radius-pill)}
+.promo-top-card--own .promo-top-mech{background:#fff}
+.promo-top-note{margin:12px 0 0;font-size:12px;color:var(--faint)}
+
+/* Methodenkasten: standardmaessig zu. Wer die Reihenfolge hinterfragt, soll
+   sie nachlesen koennen, ohne dass die Seite mit Methodik beginnt. */
+.promo-method{margin-top:16px;background:var(--tan);border-radius:var(--radius-md);
+  padding:16px 22px}
+.promo-method>summary{list-style:none;cursor:pointer;font-size:12.5px;font-weight:700;
+  color:var(--mute)}
+.promo-method>summary::-webkit-details-marker{display:none}
+.promo-method>summary:hover{color:var(--red)}
+.promo-method[open]>summary{color:var(--ink);margin-bottom:10px}
+.promo-method-body p{margin:0 0 10px;font-size:13px;line-height:1.6;color:var(--ink-body)}
+.promo-method-body ul{margin:0 0 10px;padding-left:18px}
+.promo-method-body li{font-size:13px;line-height:1.6;color:var(--ink-body);margin-bottom:4px}
+.promo-method-caveat{border-top:1px solid var(--tan-line);padding-top:10px;margin-bottom:0 !important}
+
+/* Score-Punkt an einem Angebot im Marken-Board unten - nur bei Highlights,
+   damit man ein oben gezeigtes Angebot unten wiederfindet. */
+.promo-score-dot{flex:none;font-size:10.5px;font-weight:800;color:#fff;background:var(--red);
+  min-width:28px;text-align:center;padding:2px 7px;border-radius:var(--radius-pill);
+  font-variant-numeric:tabular-nums}
 
 .promo-section-head{display:flex;align-items:baseline;justify-content:space-between;
   gap:12px;margin:40px 0 16px;flex-wrap:wrap}
@@ -559,5 +644,6 @@ main{padding-bottom:60px}
   text-transform:uppercase;letter-spacing:.04em}
 .promo-inactive-op{font-size:13.5px;font-weight:600;color:#6b6255}
 
-@media (max-width:900px){.promo-hero-row{grid-template-columns:1fr}.promo-board{columns:1}}
+@media (max-width:900px){.promo-hero-row{grid-template-columns:1fr}.promo-board{columns:1}
+  .promo-top-grid{grid-template-columns:1fr}}
 @media (max-width:640px){.promo-tabs{gap:16px}}

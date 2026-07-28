@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
 
-from .analyze import promo_editor
+from .analyze import promo_editor, promo_ranker
 from .analyze.promo_analyst import extract_promos
 from .analyze.promo_store import PromoDB, SnapshotStore, entry_id
 from .collect.promo_snapshot import capture_hero_image, content_hash, fetch_snapshot
@@ -57,7 +57,9 @@ def _resolve_item_url(item_url: str | None, brand_url: str) -> str:
 
 
 def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
-                    language: str = "Deutsch", max_workers: int = 4) -> dict:
+                    language: str = "Deutsch", max_workers: int = 4,
+                    settings: dict | None = None,
+                    score_model: str | None = None) -> dict:
     """Fuehrt den Promo-Uebersicht-Zweig aus. Gibt einen Status-Dict fuer das
     Protokoll zurueck. Wirft nur bei fatalen Konfigurationsfehlern - einzelne
     Quellenfehler werden pro Quelle abgefangen und geloggt.
@@ -133,6 +135,30 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         results.append(rec)
 
     snap_store.save()
+
+    # Wichtigkeits-Score: laeuft ueber ALLE nicht-ausgelaufenen Eintraege der
+    # DB, nicht nur ueber die dieses Mal neu extrahierten - ein Angebot, das
+    # seit drei Wochen unveraendert laeuft, ist deshalb ja nicht unwichtig.
+    # Die teuren LLM-Achsen werden trotzdem nur einmal je Angebotstext
+    # angefragt und danach eingefroren (siehe promo_ranker.needs_judgement),
+    # der Dauerbetrieb kostet also nur die paar wirklich neuen Angebote.
+    # Failsafe wie ueberall hier: ein Fehler laesst die Scores unveraendert,
+    # bricht aber weder diesen Zweig noch den Gesamtlauf ab.
+    score_summary: dict = {}
+    try:
+        score_summary = promo_ranker.score_all(
+            list(db.entries.values()), promo_cfg.sources, today,
+            model=score_model or model, use_llm=use_llm, settings=settings,
+            max_workers=max_workers)
+        log.info("Promo-Bewertung: %d Angebote bewertet, %d neu beurteilt, "
+                 "%d ohne Urteil, %d Highlights (Schwelle %d/%d)",
+                 score_summary.get("scored", 0), score_summary.get("judged_new", 0),
+                 score_summary.get("judged_failed", 0),
+                 score_summary.get("highlights", 0),
+                 score_summary.get("enter", 0), score_summary.get("exit", 0))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Promo-Bewertung uebersprungen: %s", str(exc)[:160])
+
     db.save(today)
 
     # Hero screenshots: a second, independent pass after the text/LLM work
@@ -188,4 +214,5 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Quellen konfiguriert)",
              mode, active, len(promo_cfg.sources))
     return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
-            "images_captured": images_captured, "images_failed": images_failed}
+            "images_captured": images_captured, "images_failed": images_failed,
+            "score": score_summary}

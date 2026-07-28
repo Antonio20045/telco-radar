@@ -1,11 +1,21 @@
 """End-to-end pipeline test with mocked HTTP (no network, no LLM)."""
 import shutil
+from datetime import date
 from pathlib import Path
 
 import httpx
 import pytest
 
 from telco_radar import pipeline
+
+# Die Fixture-Meldungen tragen feste Daten (13./14. Juli 2026, plus eine alte
+# von 2024, an der der Freshness-Filter geprueft wird). Ein fest verdrahtetes
+# lookback_days laeuft mit dem Kalender zwangslaeufig irgendwann aus dem
+# Fenster - genau das ist am 28.07.2026 passiert, als der Test mit
+# lookback_days=FIXTURE_LOOKBACK ploetzlich rot wurde, ohne dass sich Code geaendert hatte.
+# Stattdessen relativ zum aeltesten frischen Fixture-Datum rechnen: das Fenster
+# waechst mit dem Kalender mit, die Meldung von 2024 bleibt trotzdem draussen.
+FIXTURE_LOOKBACK = (date.today() - date(2026, 7, 13)).days + 1
 
 FIXTURES = Path(__file__).parent / "fixtures"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -67,7 +77,7 @@ def test_full_run_no_llm(project, fake_http):
     # Keep the fixture stable as the calendar advances: the newest fixture
     # item is dated 14 Jul 2026, so the production 8-day window is borderline
     # on 22 Jul depending on the current clock time.
-    report = pipeline.run(project, use_llm=False, lookback_days=14)
+    report = pipeline.run(project, use_llm=False, lookback_days=FIXTURE_LOOKBACK)
 
     assert report.exists()
     text = report.read_text(encoding="utf-8")
@@ -86,8 +96,8 @@ def test_full_run_no_llm(project, fake_http):
 
 
 def test_second_run_reports_nothing_new(project, fake_http):
-    pipeline.run(project, use_llm=False, lookback_days=14)
-    report2 = pipeline.run(project, use_llm=False, lookback_days=14)
+    pipeline.run(project, use_llm=False, lookback_days=FIXTURE_LOOKBACK)
+    report2 = pipeline.run(project, use_llm=False, lookback_days=FIXTURE_LOOKBACK)
 
     text = report2.read_text(encoding="utf-8")
     assert "davon neu: 0" in text             # everything already seen
