@@ -23,8 +23,9 @@ def test_snapshot_store_change_detection(tmp_path):
 
 def test_promo_db_upsert_and_dedup(tmp_path):
     db = PromoDB(tmp_path / "db.json")
-    n = db.upsert([_item(), _item()], "2026-07-25")
+    n, ids = db.upsert([_item(), _item()], "2026-07-25")
     assert n == 1 and len(db) == 1
+    assert ids == {entry_id("congstar", "10 GB Bonus")}
 
 
 def test_promo_db_reverify_keeps_first_seen(tmp_path):
@@ -38,6 +39,41 @@ def test_promo_db_reverify_keeps_first_seen(tmp_path):
     assert entry["first_seen"] == "2026-07-04"
     assert entry["last_verified"] == "2026-07-25"
     assert entry["status"] == "aktiv"
+
+
+def test_upsert_recognises_reworded_headline_as_same_offer(tmp_path):
+    """Der eigentliche Bug (siehe claude/wichtigkeits-score-pruefung.md):
+    dieselbe Aktion, am naechsten Tag nur leicht umformuliert (gleiche URL),
+    darf keinen zweiten Eintrag erzeugen - sonst faedelt sie gleichzeitig als
+    'neu' UND der alte Eintrag als 'moeglicherweise ausgelaufen' ein, obwohl
+    sie ununterbrochen lief. Beispiel 1:1 aus den echten Produktivdaten."""
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(headline="iPhone 17 Pro mit unbegrenztem Datenvolumen")], "2026-07-27")
+    n, ids = db.upsert(
+        [_item(headline="iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt")],
+        "2026-07-28")
+    assert n == 0  # kein zweiter Eintrag
+    assert len(db) == 1
+    entry = list(db.entries.values())[0]
+    assert entry["first_seen"] == "2026-07-27"        # Historie bleibt erhalten
+    assert entry["last_verified"] == "2026-07-28"
+    assert entry["status"] == "aktiv"
+    assert entry["headline"] == "iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt"
+    assert ids == {entry["id"]}
+
+
+def test_upsert_does_not_merge_similar_but_distinct_offers(tmp_path):
+    """Sicherheitsnetz gegen den Zahlen-Fall: '10 GB Bonus' und '20 GB Bonus'
+    sind sich textlich sehr aehnlich, aber verschiedene Angebote - duerfen
+    nicht ineinanderfallen, nur weil die Umformulierungs-Erkennung sonst zu
+    grosszuegig waere."""
+    db = PromoDB(tmp_path / "db.json")
+    db.upsert([_item(headline="10 GB Bonus")], "2026-07-27")
+    n, ids = db.upsert([_item(headline="20 GB Bonus")], "2026-07-28")
+    assert n == 1
+    assert len(db) == 2
+    assert len(ids) == 1
+    assert ids == {entry_id("congstar", "20 GB Bonus")}
 
 
 def test_mark_stale_flags_but_does_not_delete(tmp_path):

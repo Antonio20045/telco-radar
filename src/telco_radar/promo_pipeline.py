@@ -18,7 +18,7 @@ from pathlib import Path
 
 from .analyze import promo_editor, promo_ranker
 from .analyze.promo_analyst import extract_promos
-from .analyze.promo_store import PromoDB, SnapshotStore, entry_id
+from .analyze.promo_store import PromoDB, SnapshotStore
 from .collect.promo_snapshot import capture_hero_image, content_hash, fetch_snapshot
 from .promo_config import load_promo_config
 from .promo_images import image_path
@@ -119,9 +119,8 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                     it["tier"] = rec["tier"]
                     it["url"] = _resolve_item_url(it.get("url"), rec["url"])
                     it["image_url"] = image_url
-                n_new = db.upsert(items, today)
-                checked_ids = {entry_id(src_name, it["headline"]) for it in items}
-                db.mark_stale(src_name, checked_ids, today)
+                n_new, matched_ids = db.upsert(items, today)
+                db.mark_stale(src_name, matched_ids, today)
                 rec["status"] = "ok"
                 rec["new_items"] = n_new
                 rec["extracted"] = len(items)

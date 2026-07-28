@@ -116,7 +116,7 @@
 {% endif %}
 
 {% if promo_view.highlight_dropped %}
-<p class="promo-top-note">{{ promo_view.highlight_dropped }} weitere Aktion{{ 'en' if promo_view.highlight_dropped != 1 else '' }} liegt ebenfalls über der Schwelle und ist unten bei der jeweiligen Marke mit ihrem Score zu finden.</p>
+<p class="promo-top-note">{{ promo_view.highlight_dropped }} weitere Aktion{{ 'en' if promo_view.highlight_dropped != 1 else '' }} {{ 'liegen' if promo_view.highlight_dropped != 1 else 'liegt' }} ebenfalls über der Schwelle und {{ 'sind' if promo_view.highlight_dropped != 1 else 'ist' }} unten bei der jeweiligen Marke mit ihrem Score zu finden.</p>
 {% endif %}
 
 <details class="promo-method">

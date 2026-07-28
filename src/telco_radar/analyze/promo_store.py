@@ -29,9 +29,54 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 from pathlib import Path
 
 log = logging.getLogger(__name__)
+
+# Ab diesem Wort-Ueberlappungswert gilt eine neu extrahierte Ueberschrift als
+# dieselbe Aktion wie ein bestehender Eintrag, nur umformuliert - siehe
+# _same_offer(). Ueberlappungs-Koeffizient (gemeinsame Woerter / Woerter der
+# kuerzeren Headline) statt reiner Zeichen-Aehnlichkeit, weil generische, aber
+# UNTERSCHIEDLICHE Kurz-Headlines ("Alte Aktion" / "Neue Aktion") sich
+# zeichenweise taeuschend aehnlich sind, obwohl sie kaum Woerter teilen. An
+# echten Produktivdaten beobachtete Umformulierungen derselben Aktion lagen
+# bei 0.67-1.0 Ueberlappung; unabhaengige Aktionen derselben Marke lagen bei
+# 0.0-0.5. 0.6 liegt sicher dazwischen.
+_FUZZY_HEADLINE_THRESHOLD = 0.6
+
+
+def _normalize_headline(headline: str) -> str:
+    return " ".join((headline or "").lower().split())
+
+
+def _numbers(text: str) -> set[str]:
+    return set(re.findall(r"\d+", text or ""))
+
+
+def _word_overlap(headline_a: str, headline_b: str) -> float:
+    words_a = set(_normalize_headline(headline_a).split())
+    words_b = set(_normalize_headline(headline_b).split())
+    if not words_a or not words_b:
+        return 0.0
+    return len(words_a & words_b) / min(len(words_a), len(words_b))
+
+
+def _same_offer(headline_a: str, headline_b: str) -> bool:
+    """Heuristik fuer 'gleiches Angebot, nur anders formuliert'. Wort-
+    Ueberlappung allein reicht nicht: "10 GB Bonus" und "20 GB Bonus" teilen
+    sich fast alle Woerter, sind aber verschiedene Angebote - deshalb
+    zusaetzlich ein Zahlen-Waechter: enthalten beide Headlines Zahlen (GB,
+    Euro-Betraege, Alters-/Preisgrenzen - genau das, was ein Angebot von
+    einem sonst fast gleich klingenden anderen unterscheidet) und haben sie
+    KEINE einzige davon gemeinsam, ist es kein Match, egal wie aehnlich der
+    Text sonst ist."""
+    if _word_overlap(headline_a, headline_b) < _FUZZY_HEADLINE_THRESHOLD:
+        return False
+    nums_a, nums_b = _numbers(headline_a), _numbers(headline_b)
+    if nums_a and nums_b and nums_a.isdisjoint(nums_b):
+        return False
+    return True
 
 
 class SnapshotStore:
@@ -85,19 +130,51 @@ class PromoDB:
     def __len__(self) -> int:
         return len(self.entries)
 
-    def upsert(self, items: list[dict], today: str) -> int:
+    def _find_existing_id(self, brand: str, headline: str) -> str | None:
+        """Sucht unter den bestehenden Eintraegen derselben Marke nach einem,
+        der laut _same_offer() dieselbe Aktion ist, nur umformuliert -
+        Sicherheitsnetz fuer entry_id(), dessen exakter Text-Hash bei jeder
+        Umformulierung (z. B. ein ergaenztes "und 300 EUR Rabatt") eine neue
+        ID erzeugen wuerde, obwohl es dasselbe Angebot ist. Gibt bei mehreren
+        Kandidaten den textlich aehnlichsten zurueck."""
+        norm_brand = brand.strip().lower()
+        best_id, best_overlap = None, 0.0
+        for eid, e in self.entries.items():
+            if (e.get("brand") or "").strip().lower() != norm_brand:
+                continue
+            existing_headline = e.get("headline") or ""
+            if not _same_offer(headline, existing_headline):
+                continue
+            overlap = _word_overlap(headline, existing_headline)
+            if overlap > best_overlap:
+                best_id, best_overlap = eid, overlap
+        return best_id
+
+    def upsert(self, items: list[dict], today: str) -> tuple[int, set[str]]:
         """Neue Aktionen aufnehmen bzw. bekannte re-verifizieren (gleicher
-        Brand + gleiche Kernaussage taucht im neuen Snapshot wieder auf).
-        Gibt die Anzahl NEU aufgenommener Eintraege zurueck."""
+        Brand + gleiche oder nur umformulierte Kernaussage taucht im neuen
+        Snapshot wieder auf - siehe _find_existing_id()). Gibt (Anzahl NEU
+        aufgenommener Eintraege, IDs aller in diesem Aufruf gesehenen
+        Eintraege) zurueck; letzteres muss mark_stale() als checked_ids
+        uebergeben werden, NICHT ein frisch aus den rohen Item-Headlines
+        berechneter entry_id() - sonst wuerde ein per Umformulierung wieder-
+        erkannter, hier bereits aktualisierter Eintrag im selben Atemzug
+        faelschlich als Fehltreffer gezaehlt."""
         new = 0
+        matched_ids: set[str] = set()
         for it in items:
             brand = (it.get("brand") or "").strip()
             headline = (it.get("headline") or "").strip()
             if not brand or not headline:
                 continue
             eid = entry_id(brand, headline)
+            if eid not in self.entries:
+                fuzzy_id = self._find_existing_id(brand, headline)
+                if fuzzy_id is not None:
+                    eid = fuzzy_id
             if eid in self.entries:
                 e = self.entries[eid]
+                e["headline"] = headline
                 e["last_verified"] = today
                 e["status"] = "aktiv"
                 e["missed_checks"] = 0
@@ -122,7 +199,8 @@ class PromoDB:
                     "status": "aktiv", "missed_checks": 0,
                 }
                 new += 1
-        return new
+            matched_ids.add(eid)
+        return new, matched_ids
 
     def mark_stale(self, brand: str, checked_ids: set, today: str) -> None:
         """Nach einem Snapshot-Wechsel fuer *brand*: Eintraege dieses Brands,
