@@ -79,13 +79,16 @@ def inspect(url: str, ua: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("."))
-    parser.add_argument("--only", nargs="+", required=True)
+    parser.add_argument("--only", required=True,
+                        help="Comma-separated operator names/substrings "
+                             "(comma-separated so shell quoting of names "
+                             "like 'e&' or multi-word names is a non-issue)")
     parser.add_argument("--workers", type=int, default=6)
     args = parser.parse_args()
 
     cfg = load_config(args.root.resolve())
     ua = cfg.settings.get("http", {}).get("user_agent", BROWSER_UA)
-    needles = [n.lower() for n in args.only]
+    needles = [n.strip().lower() for n in args.only.split(",") if n.strip()]
 
     jobs = []
     seen = set()

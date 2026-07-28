@@ -17,7 +17,7 @@ on:
         default: false
         type: boolean
       inspect_sources:
-        description: "Diagnostic only: space-separated operator names to dump DOM structure for (scripts/inspect_dom.py)"
+        description: "Diagnostic only: comma-separated operator names to dump DOM structure for (scripts/inspect_dom.py)"
         required: false
         default: ""
 
@@ -86,7 +86,7 @@ jobs:
         run: |
           {
             echo '```text'
-            python scripts/inspect_dom.py --only ${{ inputs.inspect_sources }}
+            python scripts/inspect_dom.py --only "${{ inputs.inspect_sources }}"
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
