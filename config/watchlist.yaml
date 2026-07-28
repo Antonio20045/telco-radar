@@ -717,10 +717,12 @@ regions:
       aliases:
       - Spark New Zealand
       sources:
-      - type: official
-        url: https://www.sparknz.co.nz/news/
-        plan: 'Radware-Wall (Redirect zu perfdrive). Plan: Playwright über Residential-Proxy; Alternative businessgroup.spark.co.nz
-          prüfen; bis dahin Referenz.'
+      - type: newsroom
+        url: https://www.nzx.com/companies/SPK/announcements
+        item_selector: tbody tr
+        allow_short_titles: true
+        label: 'NZX-Boersenmeldungen statt sparknz.co.nz/news (Radware-Bot-Wall unveraendert
+          blockiert; businessgroup.spark.co.nz ist nur eine B2B-Microsite ohne Presseliste)'
     - name: 2degrees
       country: NZ
       website: 2degrees.nz
