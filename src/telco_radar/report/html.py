@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import markdown as md
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader
 from bs4 import BeautifulSoup
 
 from .differentiation import build_differentiation, DIFF_THEMES
@@ -55,8 +55,17 @@ def _fmt_date_de(iso: str) -> str:
 
 
 def _env() -> Environment:
-    env = Environment(loader=FileSystemLoader(_TEMPLATES),
-                      autoescape=select_autoescape(["html"]))
+    # select_autoescape(["html"]) checks whether the TEMPLATE FILENAME ends in
+    # ".html" - every template here is "*.html.j2", so that check always
+    # failed and autoescaping was silently off site-wide. That matters: item
+    # titles/summaries come from third-party RSS feeds and scraped newsroom
+    # HTML, so unescaped output is a real stored-XSS surface, not just
+    # cosmetic. The templates already mark the few genuinely pre-rendered
+    # HTML fields with `| safe` (briefing_html, explorer_json, ...), which
+    # only makes sense if autoescape is otherwise on - so turning it on here
+    # restores what the templates were written to expect, it doesn't change
+    # their design.
+    env = Environment(loader=FileSystemLoader(_TEMPLATES), autoescape=True)
     env.filters["domain"] = lambda u: urlsplit(u or "").netloc.removeprefix("www.")
     env.filters["date_de"] = _fmt_date_de
     return env
