@@ -133,3 +133,29 @@ def test_url_date_ignores_numeric_id_after_a_year_in_the_slug():
     # real date paths keep working
     assert _date_from_url("https://x.test/news/2026/07/31/foo") == (
         datetime(2026, 7, 31, tzinfo=timezone.utc), True)
+
+
+def test_newsroom_reads_aem_datamodel_article_list():
+    """Optus ships its media releases as HTML-escaped JSON in a
+    datamodel="..." attribute; Akamai blocks the headless browser, so the
+    static HTML is the only way in - and it already holds everything."""
+    html = (
+        '<div class="articlelist" datamodel="'
+        '{&quot;articles&quot;:[{&quot;title&quot;:&quot;Optus completes world-first trial&quot;,'
+        '&quot;link&quot;:&quot;/about/media-centre/media-releases/2026/07/world-first&quot;,'
+        '&quot;description&quot;:&quot;&lt;p&gt;A trial.&lt;/p&gt;&quot;,'
+        '&quot;curatorAsDate&quot;:1783585800000,'
+        '&quot;curator&quot;:&quot;7 July 2026, 08:30 AM&quot;}],'
+        '&quot;totalPages&quot;:3,&quot;view&quot;:&quot;list&quot;}"></div>'
+    )
+    src = Source(type="newsroom", name="Optus",
+                 url="https://www.optus.com.au/about/media-centre/media-releases")
+    items = parse_newsroom_html(html, src, "oceania", "Optus", "operator")
+    assert len(items) == 1
+    assert items[0].title == "Optus completes world-first trial"
+    assert items[0].url == ("https://www.optus.com.au/about/media-centre/"
+                            "media-releases/2026/07/world-first")
+    assert items[0].published is not None
+    # the printed label wins over curatorAsDate (which is a day earlier in UTC)
+    assert items[0].published.date().isoformat() == "2026-07-07"
+    assert items[0].summary == "A trial."

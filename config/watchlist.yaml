@@ -211,8 +211,10 @@ regions:
       - CK Hutchison
       - Hutchison 3
       sources:
-      - type: newsroom_js
-        url: https://www.threemediacentre.co.uk/press-release-browser/
+      # /press-release-browser/ endet statisch bei 28.05.2026; die Startseite
+      # desselben Newsrooms hat die aktuellen Karten. Headless ist unnoetig.
+      - type: newsroom
+        url: https://www.threemediacentre.co.uk/
         item_selector: a.card
     - name: Cosmote
       country: GR
@@ -687,13 +689,12 @@ regions:
       country: AU
       website: optus.com.au
       sources:
-      - type: official
-        url: https://www.optus.com.au/about/media-centre
-        plan: 'Chromium scheitert reproduzierbar an der Navigation (zuerst ERR_HTTP2_PROTOCOL_ERROR;
-          nach --disable-http2-Fix stattdessen TimeoutError nach 30s) - vermutlich IP-Sperre gegen
-          GitHub-Actions-Runner oder eine Bot-Challenge, die die Seite nie ausliefert. Plan:
-          Playwright ueber Residential-Proxy; ohne zusaetzliche kostenpflichtige Infrastruktur nicht
-          loesbar.'
+      # Akamai blockt Chromium (deshalb die alte newsroom_js-Sperre), aber nicht
+      # curl: das statische HTML enthaelt die Meldungen als JSON im
+      # datamodel-Attribut der AEM-ArticleList. Siehe
+      # _extract_datamodel_articles in collect/newsroom.py.
+      - type: newsroom
+        url: https://www.optus.com.au/about/media-centre/media-releases
     - name: TPG Telecom
       country: AU
       website: tpgtelecom.com.au

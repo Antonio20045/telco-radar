@@ -12,6 +12,7 @@ import json
 import logging
 import re
 from datetime import datetime, timedelta, timezone
+from html import unescape
 from urllib.parse import urljoin, urlsplit
 
 import httpx
@@ -118,6 +119,7 @@ _MONTHS.update({"ene": 1, "abr": 4, "ago": 8, "set": 9, "dic": 12})
 # in the *static* HTML (no JS needed), so a dedicated extractor - tried before
 # the generic <a>-based heuristic below - picks it up directly.
 _EMBEDDED_CARD_ATTR_RE = re.compile(r"\beds-card\s*=\s*'(\[.*?\])'", re.S)
+_TAG_RE = re.compile(r"<[^>]+>")
 _ES_DATE_RE = re.compile(r"(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\.?,?\s+(\d{4})")
 
 
@@ -171,6 +173,76 @@ def _extract_embedded_cards(html: str, source: Source, region: str,
                 region=region,
                 operator=operator,
                 published=_parse_badge_date(str(badge.get("text") or "")),
+                origin=origin,
+            ))
+            if len(items) >= max_links:
+                return items
+    return items
+
+
+# AEM component pages (Optus) ship their article list the same way, but as an
+# HTML-escaped JSON object in a datamodel="..." attribute, with the records
+# under an "articles" key. The rendered page builds the cards from it in the
+# browser, so there are no <a> elements to scrape and a headless render is
+# defeated by the bot wall - the static HTML already holds everything.
+_DATAMODEL_ATTR_RE = re.compile(r'\bdatamodel\s*=\s*"([^"]{200,})"')
+
+
+def _epoch_ms_to_date(value) -> datetime | None:
+    if not isinstance(value, (int, float)) or value <= 0:
+        return None
+    try:
+        return datetime.fromtimestamp(value / 1000.0, tz=timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+
+
+def _extract_datamodel_articles(html: str, source: Source, region: str,
+                                operator: str | None, origin: str,
+                                max_links: int) -> list[Item]:
+    site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
+    base_host = urlsplit(source.url).netloc.removeprefix("www.")
+    items: list[Item] = []
+    seen_urls: set[str] = set()
+    for block in _DATAMODEL_ATTR_RE.findall(html):
+        try:
+            model = json.loads(unescape(block))
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(model, dict):
+            continue
+        records = model.get("articles")
+        if not isinstance(records, list):
+            continue
+        for rec in records:
+            if not isinstance(rec, dict):
+                continue
+            title = " ".join(str(rec.get("title") or "").split())
+            href = str(rec.get("link") or "").strip()
+            if not title or not href:
+                continue
+            url = href if href.startswith("http") else urljoin(site_root + "/", href.lstrip("/"))
+            host = urlsplit(url).netloc.removeprefix("www.")
+            if host != base_host and not host.endswith("." + base_host):
+                continue
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            # The printed label ("15 July 2026, 08:30 AM") is the operator's
+            # own local date; curatorAsDate is the same moment in epoch ms and
+            # lands a day earlier once converted to UTC. Prefer what the site
+            # says, fall back to the timestamp.
+            published = _date_from_text(str(rec.get("curator") or "")[:60])
+            if published is None:
+                published = _epoch_ms_to_date(rec.get("curatorAsDate"))
+            items.append(Item(
+                title=title,
+                url=url,
+                source_name=source.name or base_host,
+                region=region,
+                operator=operator,
+                published=published,
+                summary=" ".join(_TAG_RE.sub(" ", str(rec.get("description") or "")).split())[:600],
                 origin=origin,
             ))
             if len(items) >= max_links:
@@ -283,6 +355,11 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         embedded = _extract_embedded_cards(html, source, region, operator, origin, max_links)
         if embedded:
             return embedded
+    if "datamodel=" in html:
+        embedded = _extract_datamodel_articles(html, source, region, operator,
+                                               origin, max_links)
+        if embedded:
+            return embedded
 
     soup = BeautifulSoup(html, "html.parser")
     scope = soup
@@ -350,6 +427,18 @@ def parse_newsroom_html(html: str, source: Source, region: str,
                 narrowed = " ".join(title_el.get_text(" ", strip=True).split())
                 if narrowed and 25 <= len(narrowed) <= 300 and not _is_junk_title(narrowed):
                     title = narrowed
+        # Cards that print a metadata line inside the same anchor (Three UK:
+        # "Press release 22nd Jul 2026 Deals <headline>") pass the length
+        # filter, so the check above never fires and the label ends up in the
+        # headline. A descendant classed heading/title is the headline itself
+        # - accept it only when it SHORTENS the title, so this can only ever
+        # narrow a card down to its own heading, never widen it.
+        if selector_matched and hasattr(a, "select_one"):
+            heading_el = a.select_one("[class*=heading], [class*=title]")
+            if heading_el:
+                narrowed = " ".join(heading_el.get_text(" ", strip=True).split())
+                if 25 <= len(narrowed) < len(title) and not _is_junk_title(narrowed):
+                    title = narrowed
         # Some card layouts (e.g. e& newsroom) put the headline in a sibling
         # <h1>-<h6> inside the card and reserve the anchor text for a generic
         # "Read more"/"Load More" label - only worth searching once the
@@ -396,6 +485,12 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             date_el = a.select_one("[class*=date]")
             if date_el:
                 published = _date_from_text(date_el.get_text(" ", strip=True)[:100])
+        if published is None and selector_matched and hasattr(a, "get_text"):
+            # When the selector already narrowed us to one card, the card's
+            # OWN text beats anything found by climbing upwards: Three UK's
+            # a.card elements are siblings under one div, so the parent search
+            # below handed every release the first card's date.
+            published = _date_from_text(a.get_text(" ", strip=True)[:400])
         if published is None:
             # A <tr> (e.g. RNS/regulatory-announcement tables like
             # Investegate's) must be tried before the broader div/li/article
