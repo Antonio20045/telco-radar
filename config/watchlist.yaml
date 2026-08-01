@@ -472,8 +472,13 @@ regions:
       - Orange Egypt
       - Orange Jordan
       sources:
-      - type: official
-        url: https://www.orange.eg/en/media-center/press-releases
+      # orange.eg blockt den Presse-Pfad per F5-WAF ("Request Rejected", 246 B),
+      # die Startseite verlinkt keinen Newsroom. Orange Jordanien ist im
+      # selben Eintrag bereits als Alias gefuehrt und liefert datierte
+      # Meldungen - stellvertretend fuer die MEA-Praesenz.
+      - type: newsroom
+        url: https://orange.jo/en/corporate/media-center
+        item_selector: div.card
         plan: 'Echte WAF-Ablehnung, kein Render-/Consent-Problem: sowohl curl als auch Playwright
           bekommen HTTP 200 mit dem Body "The requested URL was rejected. Please consult with
           your administrator... Your support ID is: ..." (246 Byte, F5/BIG-IP-Stil, mit 3
