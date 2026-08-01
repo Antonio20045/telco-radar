@@ -60,10 +60,13 @@ _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
     r"(?![0-9])"
 )
+# The month group accepts any word, not a fixed list of English names: the
+# _MONTHS lookup below is what decides whether it really is a month, so this
+# one regex serves every language in _MONTHS. "de" between the parts covers
+# Portuguese/Spanish ("30 de julho de 2026").
 _TEXT_DATE = re.compile(
-    r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+"
-    r"(0?[1-9]|1[0-2]|Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
-    r"Sep\w*|Oct\w*|Nov\w*|Dec\w*)[./\s,]+(20\d{2})\b", re.I
+    r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+(?:de\s+)?"
+    r"(0?[1-9]|1[0-2]|[^\W\d_]{3,12})[./\s,]+(?:de\s+)?(20\d{2})\b", re.I
 )
 _TEXT_DATE_MDY = re.compile(
     r"\b(Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
@@ -107,9 +110,22 @@ def _is_junk_title(title: str) -> bool:
 _MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun",
      "jul", "aug", "sep", "oct", "nov", "dec"])}
-# Spanish month abbreviations that don't already coincide with the English
-# ones above (mar/may/jun/jul/feb/sep/oct/nov overlap and need no alias).
-_MONTHS.update({"ene": 1, "abr": 4, "ago": 8, "set": 9, "dic": 12})
+# Non-English month names, keyed by their first three letters. Only aliases
+# that don't already coincide with the English ones above are listed, and only
+# unambiguous ones - French "jui" is left out because it cannot tell juin (6)
+# from juillet (7). Without these, a newsroom that prints its date in the local
+# language ("24 Temmuz 2026", Turk Telekom) yields undated items, and undated
+# items sort below the analyst's per-region cap - the source is collected and
+# then never read.
+_MONTHS.update({
+    "ene": 1, "abr": 4, "ago": 8, "set": 9, "dic": 12,          # es
+    "fev": 2, "mai": 5, "out": 10, "dez": 12,                    # pt
+    "mär": 3, "okt": 10,                                         # de
+    "mei": 5, "agu": 8, "des": 12,                               # id
+    "oca": 1, "şub": 2, "sub": 2, "nis": 4, "haz": 6, "tem": 7,  # tr
+    "ağu": 8, "eyl": 9, "eki": 10, "kas": 11, "ara": 12,         # tr
+    "fév": 2, "avr": 4, "aoû": 8, "aou": 8, "déc": 12,           # fr
+})
 
 # Web-component "card" widgets (seen on Modyo/Andino-based CMSs, e.g. Entel)
 # embed the whole item list as a JSON array inside a custom element attribute

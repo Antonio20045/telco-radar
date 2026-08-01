@@ -159,3 +159,23 @@ def test_newsroom_reads_aem_datamodel_article_list():
     # the printed label wins over curatorAsDate (which is a day earlier in UTC)
     assert items[0].published.date().isoformat() == "2026-07-07"
     assert items[0].summary == "A trial."
+
+
+def test_dates_in_local_languages_are_parsed():
+    """A newsroom that prints its date in the local language yielded undated
+    items, and undated items sort below the analyst's per-region cap - Turk
+    Telekom delivered 10 releases a run and was never read."""
+    from telco_radar.collect.newsroom import _date_from_text
+
+    cases = {
+        "24 Temmuz 2026": (2026, 7, 24),        # tr
+        "30 de julho de 2026": (2026, 7, 30),   # pt
+        "5 Agustus 2026": (2026, 8, 5),         # id
+        "1. Oktober 2026": (2026, 10, 1),       # de
+        "3 avril 2026": (2026, 4, 3),           # fr
+        "20 Jul 2026": (2026, 7, 20),           # en, unveraendert
+    }
+    for text, (y, m, d) in cases.items():
+        assert _date_from_text(text) == datetime(y, m, d, tzinfo=timezone.utc), text
+    # a word that is not a month must stay unparsed
+    assert _date_from_text("15 Werke 2026") is None
