@@ -654,9 +654,16 @@ regions:
       aliases:
       - Advanced Info Service
       sources:
-      - type: newsroom_js
-        url: https://investor.ais.co.th/en/newsroom/set-announcements
-        item_selector: a.card--set-announcement
+      # Vorher die SET-Boersenmeldungen: datiert, aber inhaltlich AGM-Protokolle
+      # und F24-1-Formulare. Der echte Newsroom liefert 30 Pressemeldungen -
+      # allerdings zeigt AIS dort NIRGENDS ein Datum (weder Karte noch URL noch
+      # ein JSON dahinter), die Items kommen also undatiert an. Seit die
+      # Auswahl reihum ueber die Betreiber laeuft, bekommt AIS trotzdem einen
+      # Platz beim Analysten; vorher waeren undatierte Items unsichtbar
+      # gewesen. Inhalt schlaegt hier Formalie.
+      - type: newsroom
+        url: https://www.ais.th/en/about-us/pr-news
+        item_selector: .content-list-div
     - name: Viettel
       country: VN
       website: viettel.com.vn
