@@ -223,12 +223,25 @@ def _extract_embedded_cards(html: str, source: Source, region: str,
     return items
 
 
-# AEM component pages (Optus) ship their article list the same way, but as an
+# AEM component pages (Optus, Singtel) ship their article list as an
 # HTML-escaped JSON object in a datamodel="..." attribute, with the records
 # under an "articles" key. The rendered page builds the cards from it in the
 # browser, so there are no <a> elements to scrape and a headless render is
-# defeated by the bot wall - the static HTML already holds everything.
+# defeated by the bot wall - the static HTML already holds everything. The two
+# sites use the same shape with different field names, hence the key tuples.
 _DATAMODEL_ATTR_RE = re.compile(r'\bdatamodel\s*=\s*"([^"]{200,})"')
+_DM_TITLE_KEYS = ("title", "articleHeading", "heading")
+_DM_LINK_KEYS = ("link", "pagePath", "url")
+_DM_DESC_KEYS = ("description", "articleDesc", "summary")
+_DM_DATE_KEYS = ("curator", "publishDate", "date", "publishedDate")
+
+
+def _dm_first(rec: dict, keys) -> str:
+    for k in keys:
+        v = rec.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+    return ""
 
 
 def _epoch_ms_to_date(value) -> datetime | None:
@@ -260,8 +273,8 @@ def _extract_datamodel_articles(html: str, source: Source, region: str,
         for rec in records:
             if not isinstance(rec, dict):
                 continue
-            title = " ".join(str(rec.get("title") or "").split())
-            href = str(rec.get("link") or "").strip()
+            title = " ".join(_dm_first(rec, _DM_TITLE_KEYS).split())
+            href = _dm_first(rec, _DM_LINK_KEYS)
             if not title or not href:
                 continue
             url = href if href.startswith("http") else urljoin(site_root + "/", href.lstrip("/"))
@@ -275,7 +288,7 @@ def _extract_datamodel_articles(html: str, source: Source, region: str,
             # own local date; curatorAsDate is the same moment in epoch ms and
             # lands a day earlier once converted to UTC. Prefer what the site
             # says, fall back to the timestamp.
-            published = _date_from_text(str(rec.get("curator") or "")[:60])
+            published = _date_from_text(_dm_first(rec, _DM_DATE_KEYS)[:60])
             if published is None:
                 published = _epoch_ms_to_date(rec.get("curatorAsDate"))
             items.append(Item(
@@ -285,7 +298,7 @@ def _extract_datamodel_articles(html: str, source: Source, region: str,
                 region=region,
                 operator=operator,
                 published=published,
-                summary=" ".join(_TAG_RE.sub(" ", str(rec.get("description") or "")).split())[:600],
+                summary=" ".join(_TAG_RE.sub(" ", _dm_first(rec, _DM_DESC_KEYS)).split())[:600],
                 origin=origin,
             ))
             if len(items) >= max_links:

@@ -568,7 +568,10 @@ regions:
       country: SG
       website: singtel.com
       sources:
-      - type: newsroom_js
+      # Der Render zog IR-Kacheln ("Stock Exchange Announcements") und
+      # verklebte Titel. Die Meldungsliste steht als JSON im
+      # datamodel-Attribut des statischen HTML - gleiche Bauart wie Optus.
+      - type: newsroom
         url: https://www.singtel.com/about-us/media-centre
     - name: SK Telecom
       country: KR

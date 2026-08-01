@@ -230,3 +230,23 @@ def test_leading_date_label_is_stripped_from_title():
     # undated items keep their title - the label is the only date they have
     assert _strip_leading_date_label("Jul 31, 2026 Something happened here ok",
                                      None) == "Jul 31, 2026 Something happened here ok"
+
+
+def test_datamodel_extractor_handles_alternate_field_names():
+    """Optus and Singtel ship the same AEM datamodel shape under different
+    field names (title/link vs articleHeading/pagePath)."""
+    html = (
+        '<div datamodel="'
+        '{&quot;articles&quot;:[{&quot;articleHeading&quot;:&quot;Singtel Group celebrates National Day&quot;,'
+        '&quot;pagePath&quot;:&quot;/about-us/media-centre/news-releases/national-day&quot;,'
+        '&quot;articleDesc&quot;:&quot;A tribute film.&quot;,'
+        '&quot;publishDate&quot;:&quot;24 Jul 2026&quot;}],'
+        '&quot;totalPages&quot;:2}"></div>'
+    )
+    src = Source(type="newsroom", name="Singtel",
+                 url="https://www.singtel.com/about-us/media-centre")
+    items = parse_newsroom_html(html, src, "asien", "Singtel", "operator")
+    assert len(items) == 1
+    assert items[0].title == "Singtel Group celebrates National Day"
+    assert items[0].published == datetime(2026, 7, 24, tzinfo=timezone.utc)
+    assert items[0].summary == "A tribute film."
