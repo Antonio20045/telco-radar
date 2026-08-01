@@ -20,28 +20,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from telco_radar.collect.newsroom import collect_newsroom  # noqa: E402
-from telco_radar.collect.newsroom_js import collect_newsroom_js  # noqa: E402
-from telco_radar.collect.json_api import collect_json  # noqa: E402
-from telco_radar.collect.rss import collect_rss  # noqa: E402
+from telco_radar.collect import collect_source  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
-
-
-_COLLECTORS = {
-    "rss": collect_rss,
-    "trade_press": collect_rss,
-    "json_api": collect_json,
-    "newsroom": collect_newsroom,
-    "newsroom_js": collect_newsroom_js,
-}
 
 
 def check(source, region, operator, origin, http_cfg, lookback):
     if source.kind == "official":
         return ("SKIP", 0, 0, None, 0, "reference-only (not crawled)")
-    fn = _COLLECTORS.get(source.kind, collect_newsroom)
     try:
-        items = fn(source, region, operator, origin, http_cfg)
+        items = collect_source(source, region, operator, origin, http_cfg)
         dates = [i.published for i in items if i.published]
         newest = max(dates) if dates else None
         fresh = sum(1 for i in items

@@ -38,15 +38,8 @@ KIND_LABEL = {
 
 def _validate(cfg) -> dict[str, str]:
     """Ruft jede Quelle einmal ab und liefert je Quelle eine Belegzeile."""
-    from telco_radar.collect.json_api import collect_json
-    from telco_radar.collect.newsroom import collect_newsroom
-    from telco_radar.collect.newsroom_js import collect_newsroom_js
-    from telco_radar.collect.rss import collect_rss
+    from telco_radar.collect import collect_source
 
-    collectors = {
-        "rss": collect_rss, "trade_press": collect_rss, "json_api": collect_json,
-        "newsroom": collect_newsroom, "newsroom_js": collect_newsroom_js,
-    }
     http_cfg = cfg.settings.get("http", {})
     lookback = int(cfg.settings.get("lookback_days", 8))
 
@@ -56,11 +49,17 @@ def _validate(cfg) -> dict[str, str]:
     def one(source, region, name):
         if source.kind == "official":
             return name, source.url, "nicht gecrawlt (Referenz)"
-        fn = collectors.get(source.kind, collect_newsroom)
         try:
-            items = fn(source, region, name, "operator", http_cfg)
+            items = collect_source(source, region, name, "operator", http_cfg)
         except Exception as exc:  # noqa: BLE001
-            return name, source.url, f"FEHLER: {type(exc).__name__}: {str(exc)[:60]}"
+            text = str(exc)
+            if "BrowserType.launch" in text or "Executable doesn't exist" in text:
+                # Sandbox ohne Headless-Browser: das sagt nichts ueber die
+                # Quelle aus, in GitHub Actions laeuft sie normal. Als Fehler
+                # ins Dokument zu schreiben waere schlicht falsch.
+                return name, source.url, ("hier nicht pruefbar (kein "
+                                          "Headless-Browser), laeuft in GitHub Actions")
+            return name, source.url, f"FEHLER: {type(exc).__name__}: {text[:60]}"
         dated = [i for i in items if i.published]
         fresh = sum(1 for i in items if i.age_days() is not None
                     and -1 <= i.age_days() <= lookback)

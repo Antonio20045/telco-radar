@@ -1,8 +1,8 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-07-16, Ende Session 1. Dieses Dokument enthält alles, was eine
-neue Session braucht, um das Projekt zu verstehen, darauf zuzugreifen und
-weiterzuarbeiten.
+Stand: 2026-08-01, Ende Session 3 (Quellen-Audit). Dieses Dokument enthält
+alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
+zuzugreifen und weiterzuarbeiten.
 
 ---
 
@@ -10,8 +10,8 @@ weiterzuarbeiten.
 
 **Telco Radar** ist ein automatisches Competitive-Intelligence-System für
 Antonios Kollegin bei **Vodafone**. Es beobachtet wöchentlich die Presse-
-Newsrooms von **59 Netzbetreibern in 6 Regionen** (Europa, Nordamerika,
-Lateinamerika, Afrika & Naher Osten, Asien, Ozeanien) plus **6 internationale
+Newsrooms von **81 Netzbetreibern in 6 Regionen** (Europa, Nordamerika,
+Lateinamerika, Afrika & Naher Osten, Asien, Ozeanien) plus **14 internationale
 Telco-Fachpresse-Feeds**, erkennt **nur wirklich neue** Meldungen, lässt sie
 von Claude-Agents bewerten („Warum ist das für Vodafone interessant?",
 Dringlichkeit 1–5) und veröffentlicht einen deutschsprachigen Wochenbericht
@@ -140,11 +140,15 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   schon mal 24 min — normal sind 7–8 min.
 - **Push→Hook-Race:** Render klont sofort; der Workflow wartet 15s zwischen
   git push und Hook-Curl. Beim manuellen Nachdeployen dran denken.
-- **Newsrooms:** ~17 Quellen sind JS-gerendert (EMPTY) oder bot-geschützt
-  (403). Der Fetcher (collect/http.py) probiert Browser-UA und Bot-UA. Harte
-  Fälle stehen ohne `sources` in der Watchlist und laufen über
-  Fachpresse-Tagging (Wortgrenzen-Matching, Ambiguous-Blocklist in
-  collect/__init__.py: „spark", „tim", „globe" …).
+- **Newsrooms:** Der Fetcher (collect/http.py) probiert Browser-UA und
+  Bot-UA. Harte Fälle stehen als `type: official` in der Watchlist und werden
+  nicht gecrawlt (Stand 08/2026 noch fünf: TIM, Cosmote, UScellular, Ooredoo,
+  Maroc Telecom).
+- **„Wird über Fachpresse-Tagging abgedeckt" stimmt nur teilweise.** Gemessen
+  an 1611 gesammelten Meldungen wird AT&T 27-mal im Titel genannt, Ooredoo
+  3-mal — **Maroc Telecom, Cosmote und UScellular kein einziges Mal**. Diese
+  drei sind echte blinde Flecken, keine abgedeckten Quellen. UScellular hat
+  seit der Übernahme durch T-Mobile keinen eigenen Newsroom mehr.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max

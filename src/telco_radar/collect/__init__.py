@@ -36,6 +36,18 @@ def _collect_source(source: Source, region: str, operator: str | None,
     return items
 
 
+def collect_source(source: Source, region: str, operator: str | None = None,
+                   origin: str = "operator", http_cfg: dict | None = None) -> list[Item]:
+    """Public entry point for a single source - same path the pipeline takes.
+
+    Tools that check sources (validate_sources.py, build_quellen_doc.py) must
+    go through this rather than calling a collector directly, otherwise they
+    report numbers the pipeline never sees (e.g. Verizon's Spanish mirrors,
+    which exclude_url_pattern drops).
+    """
+    return _collect_source(source, region, operator, origin, http_cfg or {})
+
+
 def collect_all(cfg: Config, max_workers: int = 4) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
