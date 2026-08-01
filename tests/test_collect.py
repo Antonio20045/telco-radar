@@ -250,3 +250,40 @@ def test_datamodel_extractor_handles_alternate_field_names():
     assert items[0].title == "Singtel Group celebrates National Day"
     assert items[0].published == datetime(2026, 7, 24, tzinfo=timezone.utc)
     assert items[0].summary == "A tribute film."
+
+
+def test_rss_refetches_when_the_body_is_not_a_feed():
+    """Telecoms Tech News answers with a WAF captcha page instead of RSS in
+    roughly 4 of 10 runs; the HTTP layer sees a success, so only a re-fetch
+    after the parse failure helps."""
+    from telco_radar.collect import rss as rss_mod
+
+    captcha = b"<html><head><meta http-equiv=refresh content=0></head></html>"
+    good = b"""<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>FCC opens C-band proceeding</title>
+        <link>https://example.com/c-band</link>
+        <pubDate>Thu, 30 Jul 2026 10:00:00 GMT</pubDate></item>
+    </channel></rss>"""
+    bodies = [captcha, good]
+
+    class _Resp:
+        def __init__(self, content):
+            self.content = content
+
+    calls = []
+
+    def fake_fetch(url, http_cfg, timeout=None, headers=None):
+        calls.append(url)
+        return _Resp(bodies[min(len(calls) - 1, len(bodies) - 1)])
+
+    import telco_radar.collect.http as http_mod
+    original_fetch, original_wait = http_mod.fetch, rss_mod._PARSE_RETRY_WAIT
+    http_mod.fetch, rss_mod._PARSE_RETRY_WAIT = fake_fetch, 0
+    try:
+        src = Source(type="rss", url="https://example.com/feed", name="TTN")
+        items = rss_mod.collect_rss(src, "global", None, "industry_news", {})
+    finally:
+        http_mod.fetch, rss_mod._PARSE_RETRY_WAIT = original_fetch, original_wait
+
+    assert len(calls) == 2  # first body was not a feed
+    assert [i.title for i in items] == ["FCC opens C-band proceeding"]

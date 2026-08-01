@@ -7,6 +7,7 @@ provenance and has been removed.
 from __future__ import annotations
 
 import logging
+import time
 from datetime import datetime, timezone
 
 import feedparser
@@ -79,8 +80,28 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
     return items
 
 
+_PARSE_RETRIES = 2
+_PARSE_RETRY_WAIT = 1.5
+
+
 def collect_rss(source: Source, region: str, operator: str | None,
                 origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
-    resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
-    return parse_feed_bytes(resp.content, source, region, operator, origin)
+
+    # A feed can answer with HTTP 200 (or 202) and still not be a feed: Telecoms
+    # Tech News serves a WAF captcha page instead of RSS in roughly 4 of 10
+    # runs, and two Joomla feeds (The Fast Mode, Developing Telecoms) hand back
+    # truncated XML now and then. The HTTP layer sees nothing wrong, so only a
+    # re-fetch after the parse failure helps - and it does: the same feeds
+    # answer correctly on the immediate next try.
+    last_exc: ValueError | None = None
+    for attempt in range(_PARSE_RETRIES + 1):
+        resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
+        try:
+            return parse_feed_bytes(resp.content, source, region, operator, origin)
+        except ValueError as exc:
+            last_exc = exc
+            if attempt < _PARSE_RETRIES:
+                log.info("Feed %s did not parse (%s) - retrying", source.url, exc)
+                time.sleep(_PARSE_RETRY_WAIT * (attempt + 1))
+    raise last_exc
