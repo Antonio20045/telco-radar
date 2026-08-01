@@ -193,7 +193,9 @@ def run(root: Path, use_llm: bool | None = None,
         try:
             body, covered = editor.synthesize(
                 regional, topics_store.recent(), model=editor_model,
-                language=language)
+                language=language,
+                highlight_budget=int(
+                    cfg.settings.get("editor_max_highlights", 0) or 0))
             editor_used = True
         except Exception as exc:  # noqa: BLE001
             if cfg.settings.get("publish_requires_editorial_briefing", True):

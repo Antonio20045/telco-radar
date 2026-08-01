@@ -76,15 +76,24 @@ system can remember them and never repeat them.
 """
 
 
-# Every new item is assessed by an analyst (there is no cap - see
-# analyze_region), so a busy week produces far more highlights than a weekly
-# briefing can carry. The editor gets a prioritised selection instead of the
-# full set; the complete assessment stays in the report JSON and drives the
-# website's explorer, so nothing is lost for the reader.
-EDITOR_HIGHLIGHT_BUDGET = 90
+# The editor sees EVERY assessed item by default (0 = no limit). A weekly
+# briefing that silently skips half the week is not a briefing, and there is
+# no second chance: the seen-store marks every new item as known, so whatever
+# the editor never sees never comes back.
+#
+# The cost is input length. Measured against a real analyst run: ~750
+# characters per assessed item, so a 362-item week is roughly 265 KB or ~68k
+# tokens of editor input. That needs a model with a large context window -
+# claude-sonnet-5 (200k) handles it, the deepseek-v4-flash configured for the
+# free NVIDIA endpoint does not. If a provider forces a smaller prompt, set
+# editor_max_highlights in settings.yaml; the selection below then keeps the
+# strongest per region, round-robin, so one busy region cannot crowd out the
+# rest - but that is a fallback, not the intended mode.
+EDITOR_HIGHLIGHT_BUDGET = 0
 
 
 def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
+    """budget <= 0 means: hand over everything, unchanged."""
     """Keep the strongest highlights per region, round-robin across regions.
 
     Round-robin rather than one global ranking: a single busy region would
@@ -97,7 +106,7 @@ def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
         for rn, r in clean.items()
     }
     total = sum(len(v) for v in ranked.values())
-    if total <= budget:
+    if budget <= 0 or total <= budget:
         return clean, 0
 
     kept: dict[str, list] = {rn: [] for rn in ranked}
@@ -137,6 +146,12 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
             "report data, so do not claim this is everything that happened."
         )
     user = json.dumps(payload, ensure_ascii=False)
+    n_highlights = sum(len(r.get("highlights") or []) for r in clean.values())
+    # Printed on every run: with no cap the editor prompt grows with the week,
+    # and this is the number that decides whether the configured model can
+    # still take it (~4 characters per token).
+    log.info("Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
+             n_highlights, len(user) / 1024, len(user) // 4000, model)
     raw = complete(EDITOR_SYSTEM.format(language=language), user,
                    model=model, max_tokens=5000)
 

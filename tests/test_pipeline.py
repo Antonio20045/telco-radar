@@ -182,9 +182,20 @@ def _mk_item(n):
                 published=datetime(2026, 7, 30, tzinfo=timezone.utc))
 
 
+def test_editor_gets_everything_by_default():
+    """Default is no limit: a weekly briefing that silently skips half the
+    week is not a briefing, and the seen-store gives no second chance."""
+    from telco_radar.analyze.editor import EDITOR_HIGHLIGHT_BUDGET, _select_for_editor
+
+    assert EDITOR_HIGHLIGHT_BUDGET == 0
+    clean = {"Global": {"highlights": [{"t": i, "relevance": 1} for i in range(500)]}}
+    out, omitted = _select_for_editor(clean, EDITOR_HIGHLIGHT_BUDGET)
+    assert out == clean and omitted == 0
+
+
 def test_editor_budget_keeps_breadth_across_regions():
-    """A single busy region must not fill the editor's whole budget - the
-    briefing exists to show what happened ACROSS regions."""
+    """Fallback for providers that force a shorter prompt: one busy region
+    must not crowd out the rest."""
     from telco_radar.analyze.editor import _select_for_editor
 
     clean = {

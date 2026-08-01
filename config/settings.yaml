@@ -46,6 +46,19 @@ lookback_days: 8
 # 25 statt 7 Aufrufe pro Lauf.
 max_items_per_region: 0
 
+# Wie viele bewertete Meldungen die Redaktion (Editor-Agent) zu sehen bekommt.
+# 0 = alle, und so ist es gedacht: ein Wochenbericht, der die Haelfte der Woche
+# stillschweigend auslaesst, ist keiner.
+# Preis dafuer ist die Prompt-Laenge. An einem echten Analysten-Lauf gemessen:
+# rund 750 Zeichen je bewerteter Meldung, eine Woche mit 362 Meldungen sind also
+# etwa 265 KB oder ~68k Token Eingabe. Das braucht ein Modell mit grossem
+# Kontextfenster - claude-sonnet-5 (200k) schafft das, das fuer den kostenlosen
+# NVIDIA-Endpunkt konfigurierte deepseek-v4-flash nicht. Nur wenn ein Anbieter
+# einen kuerzeren Prompt erzwingt, hier eine Zahl eintragen: dann behaelt die
+# Auswahl die staerksten Meldungen je Region reihum, damit nicht eine volle
+# Region alle anderen verdraengt.
+editor_max_highlights: 0
+
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 
