@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -19,12 +20,20 @@ def _collect_source(source: Source, region: str, operator: str | None,
                     origin: str, http_cfg: dict) -> list[Item]:
     """Dispatch a source to the right collector based on its kind."""
     if source.kind in ("rss", "trade_press"):
-        return collect_rss(source, region, operator, origin, http_cfg)
-    if source.kind == "json_api":
-        return collect_json(source, region, operator, origin, http_cfg)
-    if source.kind == "newsroom_js":
-        return collect_newsroom_js(source, region, operator, origin, http_cfg)
-    return collect_newsroom(source, region, operator, origin, http_cfg)
+        items = collect_rss(source, region, operator, origin, http_cfg)
+    elif source.kind == "json_api":
+        items = collect_json(source, region, operator, origin, http_cfg)
+    elif source.kind == "newsroom_js":
+        items = collect_newsroom_js(source, region, operator, origin, http_cfg)
+    else:
+        items = collect_newsroom(source, region, operator, origin, http_cfg)
+    if source.exclude_url_pattern:
+        # e.g. Verizon mirrors 7 of every 25 releases in Spanish under
+        # /about/news/es/ - a different URL, so the seen-store treats it as a
+        # separate story and the same news enters the report twice.
+        drop = re.compile(source.exclude_url_pattern)
+        items = [i for i in items if not drop.search(i.url)]
+    return items
 
 
 def collect_all(cfg: Config, max_workers: int = 4) -> tuple[list[Item], list[dict]]:

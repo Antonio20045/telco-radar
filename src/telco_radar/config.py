@@ -43,6 +43,12 @@ class Source:
     # field when the payload has no direct url/link field, e.g. only a slug
     # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
     # against the raw record dict.
+    headers: dict | None = None  # extra HTTP headers for this source, e.g. the
+    # public client apikey a newsroom's own JSON API expects (Verizon). Not a
+    # secret of ours - it is embedded in the operator's public page.
+    exclude_url_pattern: str | None = None  # drop items whose URL matches this
+    # regex. Some newsrooms mirror every release in a second language under a
+    # path like /news/es/, which would otherwise enter as a separate item.
     timeout_seconds: float | None = None  # per-source HTTP timeout override,
     # for hosts that are simply slow to reach from the CI runner (KT's Korean
     # API ran into the global 20s connect timeout in 3 of 9 runs).
@@ -140,6 +146,8 @@ def load_config(root: Path) -> Config:
                     label=s.get("label", ""),
                     plan=s.get("plan", ""),
                     link_template=s.get("link_template"),
+                    headers=s.get("headers"),
+                    exclude_url_pattern=s.get("exclude_url_pattern"),
                     timeout_seconds=s.get("timeout_seconds"),
                     allow_short_titles=s.get("allow_short_titles", False),
                 ))

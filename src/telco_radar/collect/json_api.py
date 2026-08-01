@@ -243,5 +243,5 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
 def collect_json(source: Source, region: str, operator: str | None,
                  origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
-    resp = fetch(source.url, http_cfg, source.timeout_seconds)
+    resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
     return parse_json_bytes(resp.content, source, region, operator, origin)

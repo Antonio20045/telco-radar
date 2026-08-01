@@ -30,7 +30,8 @@ _BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
 
 
 def fetch(url: str, http_cfg: dict,
-          timeout_override: float | None = None) -> httpx.Response:
+          timeout_override: float | None = None,
+          extra_headers: dict | None = None) -> httpx.Response:
     """GET with UA fallback + short backoff on rate limits."""
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
     primary = http_cfg.get("user_agent", BROWSER_UA)
@@ -50,6 +51,8 @@ def fetch(url: str, http_cfg: dict,
             "Accept-Language": "en;q=0.9,de;q=0.8",
             "Referer": site_root,
         }
+        if extra_headers:
+            headers.update(extra_headers)
         # attempt 0 immediate, then one retry per backoff wait
         for wait in (0.0, *_BACKOFF_WAITS):
             if wait:

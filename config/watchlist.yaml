@@ -149,6 +149,7 @@ regions:
       sources:
       - type: newsroom
         url: https://www.telenor.com/media/newsroom/
+        item_selector: a.link-wrap
     - name: Turkcell
       country: TR
       website: turkcell.com.tr
@@ -239,8 +240,16 @@ regions:
       country: US
       website: verizon.com
       sources:
-      - type: newsroom_js
-        url: https://www.verizon.com/about/news
+      # /about/news lieferte Eltern-Ratgeber ("A busy parent guide to students
+      # using AI") und Nav-Links. Die newsroom-eigene JSON-API filtert auf
+      # type=press_release. Der apikey ist der oeffentliche Client-Key aus der
+      # Seite selbst, kein Geheimnis von uns - faellt er weg, schlaegt nur
+      # diese eine Quelle fehl.
+      - type: json_api
+        url: https://www.verizon.com/about/nextgen/api/articles?limit=25&type=press_release
+        headers:
+          apikey: QOQZl9rcsiV1w70xBD635aDfwSyqubQcl5b2fs2jUEPGkaDA
+        exclude_url_pattern: /about/news/es/
     - name: AT&T
       country: US
       website: att.com
@@ -267,8 +276,10 @@ regions:
       - Xfinity Mobile
       - Xfinity
       sources:
+      # corporate.comcast.com/rss ist zu zwei Dritteln hyperlokales Marketing
+      # ("Now Available in <Ort>"); der IR-Feed hat die Konzernmeldungen.
       - type: rss
-        url: https://corporate.comcast.com/rss
+        url: https://www.cmcsa.com/rss/news-releases.xml
     - name: Charter Communications
       country: US
       website: charter.com
@@ -365,8 +376,10 @@ regions:
       aliases:
       - TIM Brazil
       sources:
+      # ohne Selektor kamen Asset-Namen statt Meldungen ("Tapume Full -Tim-Fun-")
       - type: newsroom
         url: https://www.tim.com.br/sobre-a-tim/sala-de-imprensa
+        item_selector: div.artigo-sem-imagem
     - name: Entel
       country: CL
       website: entel.cl

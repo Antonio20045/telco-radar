@@ -179,3 +179,32 @@ def test_dates_in_local_languages_are_parsed():
         assert _date_from_text(text) == datetime(y, m, d, tzinfo=timezone.utc), text
     # a word that is not a month must stay unparsed
     assert _date_from_text("15 Werke 2026") is None
+
+
+def test_exclude_url_pattern_drops_language_mirrors():
+    """Verizon mirrors 7 of every 25 releases in Spanish under /about/news/es/.
+    Different URL, so the seen-store counts it as a separate story and the
+    same news would enter the report twice."""
+    import re as _re
+    from telco_radar.collect import _collect_source
+
+    src = Source(type="rss", url="https://example.com/feed", name="X",
+                 exclude_url_pattern="/about/news/es/")
+    raw = b"""<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>Verizon kicks off NFL season</title>
+        <link>https://example.com/about/news/nfl-season</link>
+        <pubDate>Thu, 30 Jul 2026 10:00:00 GMT</pubDate></item>
+      <item><title>Verizon inicia la temporada de la NFL</title>
+        <link>https://example.com/about/news/es/nfl-temporada</link>
+        <pubDate>Thu, 30 Jul 2026 10:00:00 GMT</pubDate></item>
+    </channel></rss>"""
+
+    import telco_radar.collect as collect_mod
+    original = collect_mod.collect_rss
+    collect_mod.collect_rss = lambda s, r, o, g, h: parse_feed_bytes(raw, s, r, o, g)
+    try:
+        items = _collect_source(src, "north_america", "Verizon", "operator", {})
+    finally:
+        collect_mod.collect_rss = original
+    assert [i.title for i in items] == ["Verizon kicks off NFL season"]
+    assert _re.search("/about/news/es/", items[0].url) is None
