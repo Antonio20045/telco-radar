@@ -80,8 +80,16 @@ def run(root: Path, use_llm: bool | None = None,
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
     # Provider selection: if an OpenAI-compatible key is present, use that
     # provider (cheap, e.g. Moonshot/Kimi); otherwise fall back to Anthropic.
-    use_openai = bool(os.environ.get("LLM_API_KEY")) and bool(cfg.settings.get("llm_api_base"))
-    if use_openai:
+    # Bedrock wins when its token is present: it is the only backend whose model
+    # ids carry the "anthropic." prefix, so the ids must switch with it.
+    use_bedrock = bool(os.environ.get("AWS_BEARER_TOKEN_BEDROCK"))
+    use_openai = (not use_bedrock
+                  and bool(os.environ.get("LLM_API_KEY"))
+                  and bool(cfg.settings.get("llm_api_base")))
+    if use_bedrock:
+        analyst_model = cfg.settings.get("bedrock_analyst_model", fallback_model)
+        editor_model = cfg.settings.get("bedrock_editor_model", fallback_model)
+    elif use_openai:
         os.environ.setdefault("LLM_API_BASE", cfg.settings["llm_api_base"])
         analyst_model = cfg.settings.get("openai_analyst_model", fallback_model)
         editor_model = cfg.settings.get("openai_editor_model", fallback_model)

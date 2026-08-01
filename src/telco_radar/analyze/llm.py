@@ -1,12 +1,20 @@
 """LLM client.
 
-Two backends, chosen by environment:
-  * OpenAI-compatible chat-completions endpoint  -> used when LLM_API_KEY is set
+Three backends, chosen by environment (first match wins):
+  * Amazon Bedrock Messages API  -> AWS_BEARER_TOKEN_BEDROCK (+ BEDROCK_REGION)
+  * OpenAI-compatible chat-completions endpoint -> LLM_API_KEY (+ LLM_API_BASE)
     (works for Moonshot/Kimi, DeepSeek, NVIDIA NIM, Gemini-OpenAI, Groq, ...)
-  * Anthropic Messages API                        -> fallback (ANTHROPIC_API_KEY)
+  * Anthropic Messages API       -> ANTHROPIC_API_KEY
 
 This keeps the provider swappable with one env var + the base URL, without
 touching the agents. Public telco news only, so a non-Anthropic model is fine.
+
+Bedrock note: the "Mantle" endpoint speaks the native Anthropic Messages API,
+so it shares the payload and the response parser with the Anthropic backend -
+only the URL and the auth header differ. Model ids carry an "anthropic." prefix
+there (anthropic.claude-sonnet-5); the endpoint resolves the regional inference
+profile itself, so the us./eu. prefixes the raw bedrock-runtime API requires are
+not needed here.
 """
 from __future__ import annotations
 
@@ -22,6 +30,20 @@ log = logging.getLogger(__name__)
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 DEFAULT_TEMPERATURE = 0.3
+BEDROCK_DEFAULT_REGION = "us-east-1"
+
+
+def _bedrock_region() -> str:
+    return (os.environ.get("BEDROCK_REGION") or BEDROCK_DEFAULT_REGION).strip()
+
+
+def _bedrock_url() -> str:
+    return (f"https://bedrock-mantle.{_bedrock_region()}.api.aws"
+            "/anthropic/v1/messages")
+
+
+def _use_bedrock() -> bool:
+    return bool(os.environ.get("AWS_BEARER_TOKEN_BEDROCK"))
 
 
 def _openai_base() -> str:
@@ -33,10 +55,13 @@ def _use_openai() -> bool:
 
 
 def llm_available() -> bool:
-    return _use_openai() or bool(os.environ.get("ANTHROPIC_API_KEY"))
+    return (_use_bedrock() or _use_openai()
+            or bool(os.environ.get("ANTHROPIC_API_KEY")))
 
 
 def active_backend() -> str:
+    if _use_bedrock():
+        return f"bedrock ({_bedrock_region()})"
     if _use_openai():
         return f"openai-compatible ({_openai_base()})"
     if os.environ.get("ANTHROPIC_API_KEY"):
@@ -236,8 +261,33 @@ def _complete_anthropic(system: str, user: str, model: str,
     return _post_with_retries(ANTHROPIC_URL, payload, headers, retries, parse)
 
 
+def _complete_bedrock(system: str, user: str, model: str,
+                      max_tokens: int, retries: int) -> str:
+    key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
+    if not key:
+        raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set")
+    payload = {
+        "model": model,
+        "max_tokens": max_tokens,
+        "system": system,
+        "messages": [{"role": "user", "content": user}],
+    }
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "content-type": "application/json",
+    }
+
+    def parse(data):
+        return "".join(b.get("text", "") for b in data.get("content", [])
+                       if b.get("type") == "text")
+
+    return _post_with_retries(_bedrock_url(), payload, headers, retries, parse)
+
+
 def _dispatch(system: str, user: str, model: str,
               max_tokens: int, retries: int) -> str:
+    if _use_bedrock():
+        return _complete_bedrock(system, user, model, max_tokens, retries)
     if _use_openai():
         return _complete_openai(system, user, model, max_tokens, retries)
     return _complete_anthropic(system, user, model, max_tokens, retries)

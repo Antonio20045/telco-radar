@@ -13,6 +13,21 @@ model: "claude-sonnet-5"
 analyst_model: "claude-sonnet-5"
 editor_model: "claude-sonnet-5"
 
+# Amazon Bedrock. Aktiv, SOBALD das Secret AWS_BEARER_TOKEN_BEDROCK gesetzt ist -
+# dann hat es Vorrang vor NVIDIA. Modell-IDs tragen dort das Präfix "anthropic.".
+# Region über BEDROCK_REGION (Standard us-east-1); der Mantle-Endpunkt loest das
+# regionale Inference Profile selbst auf, das us./eu.-Präfix entfaellt hier.
+#
+# STAND 01.08.2026, mit echten Aufrufen gegen Antonios Bedrock-Konto geprueft:
+#   Sonnet 5 / Opus 5 / Fable 5 / Opus 4.8 / 4.7 -> HTTP 403, kein Kontozugriff
+#   Sonnet 4.6 / Opus 4.6 / 4.5 / Sonnet 4.5 / Haiku 4.5 -> HTTP 404,
+#     "Anthropic use case details form" im Bedrock-Konsolen-Konto nicht ausgefuellt
+#   Claude 3 Haiku -> HTTP 429, Tageskontingent erschoepft
+# Das Secret also erst setzen, wenn der Zugriff wirklich freigeschaltet ist -
+# sonst laeuft jeder Aufruf in einen 403 und der Lauf publiziert nur den Digest.
+bedrock_analyst_model: "anthropic.claude-sonnet-5"
+bedrock_editor_model: "anthropic.claude-sonnet-5"
+
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"
 # Gemessen am 25.07.2026 mit dem ECHTEN Editor-Prompt (14k Token Eingabe,
