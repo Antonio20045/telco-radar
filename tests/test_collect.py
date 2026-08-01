@@ -208,3 +208,25 @@ def test_exclude_url_pattern_drops_language_mirrors():
         collect_mod.collect_rss = original
     assert [i.title for i in items] == ["Verizon kicks off NFL season"]
     assert _re.search("/about/news/es/", items[0].url) is None
+
+
+def test_leading_date_label_is_stripped_from_title():
+    """Wire newsrooms print the timestamp inside the headline element
+    ("Jul 31, 2026, 16:15 ET Rebecca McKillican joins ..."). The date is
+    already parsed into published, so in the title it is only noise the
+    report would print verbatim."""
+    from telco_radar.collect.newsroom import _strip_leading_date_label
+
+    when = datetime(2026, 7, 31, tzinfo=timezone.utc)
+    assert _strip_leading_date_label(
+        "Jul 31, 2026, 16:15 ET Rebecca McKillican joins the Board of BCE Inc.",
+        when) == "Rebecca McKillican joins the Board of BCE Inc."
+    assert _strip_leading_date_label(
+        "16/07/2026 - Students from Kiambu National Polytechnic gain skills",
+        when) == "Students from Kiambu National Polytechnic gain skills"
+    # a year inside a real headline must not be treated as a label
+    headline = "Vodafone launches 5G in 2026 across ten more cities right now"
+    assert _strip_leading_date_label(headline, when) == headline
+    # undated items keep their title - the label is the only date they have
+    assert _strip_leading_date_label("Jul 31, 2026 Something happened here ok",
+                                     None) == "Jul 31, 2026 Something happened here ok"

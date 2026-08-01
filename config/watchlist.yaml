@@ -30,8 +30,11 @@ regions:
       country: DE
       website: vodafone.de
       sources:
-      - type: newsroom_js
-        url: https://newsroom.vodafone.de/
+      # Der Newsroom rendert die Kacheln clientseitig; der Render lieferte pro
+      # Lauf ein Mediathek-Album und "Zu den Ansprechpartnern". Der Newsroom
+      # hat einen RSS-Feed, der nirgends verlinkt ist.
+      - type: rss
+        url: https://newsroom.vodafone.de/rss
     - name: Deutsche Telekom
       country: DE
       website: telekom.com
@@ -92,8 +95,13 @@ regions:
       aliases:
       - Telia Company
       sources:
-      - type: newsroom_js
-        url: https://www.teliacompany.com/en/newsroom
+      # teliacompany.com/en/newsroom ist eine React-SPA (3,9-kB-Shell), der
+      # Render zog Evergreen-Policyseiten ("Anti bribery and corruption").
+      # Cision ist Telias offizieller Verbreitungsweg - wie bei Millicom eine
+      # bewusste Ausnahme vom Grundsatz "eigene Domain".
+      - type: newsroom
+        url: https://news.cision.com/telia-company
+        item_selector: .card-item
     - name: KPN
       country: NL
       website: kpn.com
@@ -319,21 +327,13 @@ regions:
       - Bell
       - BCE
       sources:
-      - type: official
-        url: https://www.bce.ca/news-and-media/newsroom
-        plan: 'Next.js-App-Router-Seite; 67 quelleneigene Links im gerenderten DOM sind
-          ausschliesslich Navigation/Investor-Relations, keine Presse-Cards. Tiefere Analyse:
-          es gibt keinen normalen JSON-Endpoint - weder client-seitig (sniff_xhr zeigt nur
-          "text/x-component"-Antworten auf ?_rsc=... URLs, das React-Server-Components
-          "Flight"-Protokoll fuer Hydration, kein JSON) noch separat auffindbar (kein Contentstack-
-          Call trotz CSP-Hinweis auf api.contentstack.io - laeuft offenbar nur serverseitig). Die
-          echten Release-Daten (headline/summary/published_date/sitemap_url) stecken zwar in der
-          normalen HTML-Antwort, aber nur als escapte JSON-Strings in
-          <script>self.__next_f.push([1,"..."])</script>-Chunks, nicht als <a href> im DOM und
-          nicht als eigenstaendiges JSON-Dokument - passt weder in den newsroom- noch in den
-          json_api-Collector, sondern braeuchte einen komplett neuen, RSC-Flight-spezifischen
-          Parsertyp. Kein Feed gefunden. Bewusst als nicht automatisch crawlbar eingestuft
-          (Aufwand/Nutzen); bis dahin Referenz + Fachpresse.'
+      # bce.ca liefert nur Next.js-RSC-Flight-Chunks, im DOM stehen bloss
+      # Navigations- und IR-Links (daher "Media contacts"/"Media library" im
+      # Seen-Store). Newswire ist BCEs offizieller Verbreitungsweg - wie bei
+      # Millicom und Telia eine bewusste Ausnahme vom Grundsatz eigene Domain.
+      - type: newsroom
+        url: https://www.newswire.ca/news/bce-inc./
+        item_selector: .newsCards
     - name: Rogers
       country: CA
       website: rogers.com
@@ -431,8 +431,10 @@ regions:
       aliases:
       - M-Pesa
       sources:
+      # Die Landing-Page zeigt nur 3 Meldungen und daneben FAQ-Kacheln;
+      # die Unterseite listet den vollen Bestand.
       - type: newsroom
-        url: https://www.safaricom.co.ke/media-center-landing
+        url: https://www.safaricom.co.ke/media-center-landing/press-releases
     - name: Airtel Africa
       country: NG
       website: airtel.africa
@@ -504,8 +506,13 @@ regions:
       aliases:
       - EITC
       sources:
-      - type: newsroom_js
-        url: https://www.du.ae/about-us/media-centre
+      # /about-us/media-centre leitet auf eine Seite um, deren Liste per AJAX
+      # nachgeladen wird - der Render zog nur Mega-Menue und Support-Seiten
+      # ("Useful short codes for my prepaid mobile"). Dies ist der Endpunkt
+      # dahinter; ohne den Selektor kippt die Extraktion zurueck in Navigation.
+      - type: newsroom
+        url: https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0
+        item_selector: '#pMediaCentreNews .news'
     - name: Maroc Telecom
       country: MA
       website: iam.ma

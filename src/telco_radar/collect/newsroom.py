@@ -95,6 +95,33 @@ _JUNK_CONTAINS = re.compile(
 )
 
 
+def _strip_leading_date_label(title: str, published) -> str:
+    """Drop a date/time label the card prints in front of the headline.
+
+    Wire newsrooms and several CMS card layouts put the timestamp inside the
+    same element as the headline ("Jul 31, 2026, 16:15 ET Rebecca McKillican
+    joins ...", "16/07/2026 - Students from ...", "Press release * 8 juli,
+    2026 Telenor acquires ..."). The date is already parsed into `published`,
+    so in the title it is only noise that the report would print verbatim.
+    Only applied to items that HAVE a date, and only when a real headline is
+    left over.
+    """
+    if published is None:
+        return title
+    for pattern in (_TEXT_DATE, _TEXT_DATE_MDY, _TEXT_DATE_ISO):
+        m = pattern.search(title[:60])
+        if not m or m.start() > 30:
+            continue
+        rest = title[m.end():]
+        # trailing time and timezone that belong to the same label
+        rest = re.sub(r"^,?\s*\d{1,2}[:.]\d{2}\s*(?:[APap]\.?[Mm]\.?)?"
+                      r"\s*(?:[A-Z]{2,4})?", "", rest)
+        rest = rest.lstrip(" \t-–—|:•·,")
+        if len(rest) >= 25 and not _is_junk_title(rest):
+            return rest
+    return title
+
+
 def _is_junk_title(title: str) -> bool:
     norm = " ".join(title.strip().lower().split())
     if norm in _JUNK_EXACT:
@@ -528,6 +555,8 @@ def parse_newsroom_html(html: str, source: Source, region: str,
                 published = _date_from_text(node.get_text(" ", strip=True)[:600])
         if published is None:
             published = url_date  # month precision is better than nothing
+
+        title = _strip_leading_date_label(title, published)
 
         items.append(
             Item(
