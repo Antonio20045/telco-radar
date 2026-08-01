@@ -119,7 +119,18 @@ _JUNK_CONTAINS = re.compile(
 )
 
 
-def _strip_leading_date_label(title: str, published) -> str:
+# Words that may stand in front of a date label without being part of the
+# headline. Anything else means the date sits INSIDE a real sentence
+# ("Vodafone announces on 15 July 2026 the launch of ...") and must stay.
+_LABEL_WORDS = {
+    "press", "release", "releases", "regulatory", "media", "news", "notice",
+    "announcement", "announcements", "update", "updates", "corporate",
+    "company", "group", "story", "article", "pressemitteilung", "presse",
+    "communique", "comunicado", "noticia", "bulteni", "bulten",
+}
+
+
+def _strip_leading_date_label(title: str, published, operator: str | None = None) -> str:
     """Drop a date/time label the card prints in front of the headline.
 
     Wire newsrooms and several CMS card layouts put the timestamp inside the
@@ -132,10 +143,16 @@ def _strip_leading_date_label(title: str, published) -> str:
     """
     if published is None:
         return title
+    allowed = set(_LABEL_WORDS)
+    if operator:
+        allowed.update(w.lower() for w in re.findall(r"[^\W\d_]+", operator))
     for pattern in (_TEXT_DATE, _TEXT_DATE_MDY, _TEXT_DATE_ISO):
-        m = pattern.search(title[:60])
-        if not m or m.start() > 30:
+        m = pattern.search(title[:70])
+        if not m:
             continue
+        prefix_words = re.findall(r"[^\W\d_]+", title[:m.start()])
+        if any(w.lower() not in allowed for w in prefix_words):
+            continue  # the date sits inside a real sentence
         rest = title[m.end():]
         # trailing time and timezone that belong to the same label
         rest = re.sub(r"^,?\s*\d{1,2}[:.]\d{2}\s*(?:[APap]\.?[Mm]\.?)?"
@@ -618,7 +635,7 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         if published is None:
             published = url_date  # month precision is better than nothing
 
-        title = _strip_leading_date_label(title, published)
+        title = _strip_leading_date_label(title, published, operator)
 
         items.append(
             Item(

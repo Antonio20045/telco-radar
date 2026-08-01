@@ -212,14 +212,23 @@ regions:
       country: SE
       website: tele2.com
       sources:
+      # Ohne Selektor nahm der Parser den kompletten Kartentext (Label + Datum
+      # + Teaser, oft ueber 300 Zeichen) als Titel und verwarf die Karte dann
+      # wegen Ueberlaenge - es kamen 2 statt 5 Meldungen an.
       - type: newsroom
         url: https://www.tele2.com/media/press-releases
+        item_selector: a.item
     - name: Elisa
       country: FI
       website: elisa.com
       sources:
-      - type: newsroom_js
-        url: https://elisa.com/corporate/news-room/
+      # Das JS-Widget auf der Seite hat maxResults:4 fest verdrahtet, deshalb
+      # kamen pro Lauf nur 4 Karten an. Dies ist der Endpunkt dahinter.
+      # WICHTIG: nur der Tag "press" - "national-press" schleppt Meldungen
+      # FREMDER Firmen ein (daher "TenForce recognized for..." im Seen-Store).
+      - type: json_api
+        url: https://cms-rest-api-public.csf.elisa.fi/public/bulletins?tags=corporate.elisa.com:press&maxResults=30
+        link_template: https://elisa.com/corporate/news-room/press-releases/press-release/{id}/
     - name: Three UK
       country: GB
       website: three.co.uk
