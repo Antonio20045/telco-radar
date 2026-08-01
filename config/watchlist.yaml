@@ -55,6 +55,13 @@ regions:
       - Telefónica Deutschland
       - O2
       sources:
+      # category_id=11 ist "Products & Services" - eine schmale Rubrik mit rund
+      # vier Beitraegen im Jahr; die Quelle sah deshalb seit Mai tot aus. Der
+      # lebende Presse-Feed ist category_id=10 ("Company"). Beide zusammen
+      # ergeben Konzern- UND Produktmeldungen; das Reihum-Verfahren verteilt
+      # pro Betreiber, zwei Feeds verschaffen also keinen Volumenvorteil.
+      - type: rss
+        url: https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1
       - type: rss
         url: https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1
     - name: Telefónica
