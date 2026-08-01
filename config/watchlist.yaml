@@ -351,16 +351,12 @@ regions:
       aliases:
       - Tigo
       sources:
-      - type: official
-        url: https://www.millicom.com/media/press-releases
-        plan: 'Mit vollem Playwright-Render (Tailwind/Next.js-Seite) jetzt viele Nav-Links sichtbar,
-          aber keine Presse-Links. XHR-Sniffing fand einen Strapi-Endpoint
-          (ww2-api.tigocloud.net/api/pages?filters[slug]=/media/press-releases) - liefert aber
-          leeres data:[] (falscher Slug oder anderer Content-Type fuer die eigentliche Liste).
-          /api/press-releases, /api/news, /api/media existieren nicht (404); /api/articles
-          existiert (403 Forbidden statt 404) aber ist ohne Auth nicht lesbar. Kein Feed gefunden.
-          Naechster Schritt waere das Strapi-Content-Model vollstaendig zu enumerieren; ohne das
-          bis dahin Referenz.'
+      # millicom.com ist eine Angular-SPA ohne auffindbaren Datenendpunkt (jeder
+      # Pfad liefert dieselbe 5-kB-Shell). mfn.se ist Millicoms offizieller
+      # Verbreitungsweg fuer Boersen-/Pressemitteilungen - eigene Domain war
+      # nicht erreichbar, dieser Feed ist es.
+      - type: rss
+        url: https://mfn.se/all/a/millicom.rss
     - name: TIM Brasil
       country: BR
       website: tim.com.br
@@ -606,8 +602,9 @@ regions:
       aliases:
       - Chunghwa
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://www.cht.com.tw/en/home/cht/messages
+        item_selector: a.list-item-head-link
     - name: Telkomsel
       country: ID
       website: telkomsel.com
@@ -674,9 +671,8 @@ regions:
       aliases:
       - True Corp
       sources:
-      - type: newsroom_js
-        url: https://investor.true.th/en/newsroom/set-announcements
-        item_selector: a.card--news
+      - type: rss
+        url: https://www.true.th/blog/en/feed/
   oceania:
     name: Ozeanien
     operators:
