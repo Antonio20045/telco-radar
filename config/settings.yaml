@@ -35,8 +35,16 @@ openai_editor_model: "deepseek-ai/deepseek-v4-flash"
 # Only items newer than this many days are considered.
 lookback_days: 8
 
-# Hard cap of items handed to one regional analyst call
-max_items_per_region: 15
+# Obergrenze der Meldungen, die EIN Regional-Analyst zu sehen bekommt.
+# 0 = keine Kappung, und das ist die richtige Einstellung: der Seen-Store
+# markiert jede neue Meldung als bekannt, egal ob ein Analyst sie gelesen hat.
+# Eine hier verworfene Meldung ist damit dauerhaft weg, nicht auf den naechsten
+# Lauf verschoben. Mit 15 wurden im Lauf vom 31.07.2026 von 220 neuen
+# Meldungen nur 70 bewertet.
+# Kosten: der Analyst arbeitet in Stapeln zu BATCH_SIZE (15) Meldungen, ein
+# LLM-Aufruf je Stapel. Ohne Kappung sind das bei ~360 neuen Meldungen rund
+# 25 statt 7 Aufrufe pro Lauf.
+max_items_per_region: 0
 
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300

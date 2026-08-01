@@ -76,21 +76,67 @@ system can remember them and never repeat them.
 """
 
 
+# Every new item is assessed by an analyst (there is no cap - see
+# analyze_region), so a busy week produces far more highlights than a weekly
+# briefing can carry. The editor gets a prioritised selection instead of the
+# full set; the complete assessment stays in the report JSON and drives the
+# website's explorer, so nothing is lost for the reader.
+EDITOR_HIGHLIGHT_BUDGET = 90
+
+
+def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
+    """Keep the strongest highlights per region, round-robin across regions.
+
+    Round-robin rather than one global ranking: a single busy region would
+    otherwise fill the whole budget and the briefing would lose its point,
+    which is showing what happened ACROSS regions.
+    """
+    ranked = {
+        rn: sorted(r.get("highlights") or [],
+                   key=lambda h: (h.get("relevance") or 0), reverse=True)
+        for rn, r in clean.items()
+    }
+    total = sum(len(v) for v in ranked.values())
+    if total <= budget:
+        return clean, 0
+
+    kept: dict[str, list] = {rn: [] for rn in ranked}
+    picked = 0
+    for rank in range(max((len(v) for v in ranked.values()), default=0)):
+        for rn, hs in ranked.items():
+            if rank < len(hs) and picked < budget:
+                kept[rn].append(hs[rank])
+                picked += 1
+        if picked >= budget:
+            break
+    out = {rn: {**r, "highlights": kept.get(rn, [])} for rn, r in clean.items()}
+    return out, total - picked
+
+
 def synthesize(regional: dict[str, dict], already_covered: list[str],
-               model: str, language: str = "Deutsch") -> tuple[str, list[str]]:
+               model: str, language: str = "Deutsch",
+               highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET) -> tuple[str, list[str]]:
     """Run the editor. Returns (markdown_report, covered_topics)."""
     # strip internal telemetry before handing the analyses to the editor
     clean = {
         rn: {k: v for k, v in r.items() if not k.startswith("_")}
         for rn, r in regional.items()
     }
-    user = json.dumps(
-        {
-            "regional_analyses": clean,
-            "already_covered_topics": already_covered[-300:],
-        },
-        ensure_ascii=False,
-    )
+    clean, omitted = _select_for_editor(clean, highlight_budget)
+    if omitted:
+        log.info("Editor gets %d highlights, %d weaker ones omitted "
+                 "(all remain in the report JSON)", highlight_budget, omitted)
+    payload = {
+        "regional_analyses": clean,
+        "already_covered_topics": already_covered[-300:],
+    }
+    if omitted:
+        payload["note"] = (
+            f"{omitted} further assessed items were left out of this payload "
+            "because they scored lower on relevance. They are published in the "
+            "report data, so do not claim this is everything that happened."
+        )
+    user = json.dumps(payload, ensure_ascii=False)
     raw = complete(EDITOR_SYSTEM.format(language=language), user,
                    model=model, max_tokens=5000)
 

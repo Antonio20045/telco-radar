@@ -99,7 +99,8 @@ def run(root: Path, use_llm: bool | None = None,
     log.info("LLM backend: %s | analyst=%s editor=%s (Ausweichmodell: %s)",
              active_backend(), analyst_model, editor_model,
              analyst_model if analyst_model != editor_model else "keins")
-    max_items = int(cfg.settings.get("max_items_per_region", 45))
+    # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
+    max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
 
     state_dir = root / "data" / "state"
     reports_dir = root / "data" / "reports"
@@ -232,7 +233,8 @@ def run(root: Path, use_llm: bool | None = None,
                     {"title": i.title, "operator": i.operator or i.source_name,
                      "url": i.url, "category": "Unbewertet", "relevance": None,
                      "summary": i.summary[:220], "why_it_matters": ""}
-                    for i in region_items[:max_items]
+                    for i in (region_items if not max_items
+                              else region_items[:max_items])
                 ],
             }
         body, covered = editor.build_digest(

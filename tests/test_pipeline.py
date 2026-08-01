@@ -142,3 +142,61 @@ def test_interleave_keeps_dated_sources_ahead_of_undated():
     undated = Item(title="undated", url="https://x.test/b", source_name="B",
                    region="europa", operator="B", published=None)
     assert _interleave_by_source([undated, dated])[0].title == "dated"
+
+
+def test_analyst_reads_every_item_when_uncapped():
+    """The seen-store marks every new item as known regardless of whether an
+    analyst read it, so a dropped item is dropped for good. max_items=None
+    (config 0) therefore means: assess everything."""
+    from unittest.mock import patch
+
+    from telco_radar.analyze import agents
+
+    items = [_mk_item(n) for n in range(37)]
+    seen_batches = []
+
+    def fake_complete(system, user, model=None, max_tokens=None):
+        seen_batches.append(user)
+        return '{"region_summary": "s", "highlights": []}'
+
+    with patch.object(agents, "complete", fake_complete):
+        agents.analyze_region("Europa", items, model="m", max_items=None)
+    # 37 items in batches of 15 -> 3 calls, nothing dropped
+    assert len(seen_batches) == 3
+    for n in range(37):
+        assert any(f"item-{n}\n" in b or f"item-{n} " in b or f"item-{n}" in b
+                   for b in seen_batches), n
+
+    seen_batches.clear()
+    with patch.object(agents, "complete", fake_complete):
+        agents.analyze_region("Europa", items, model="m", max_items=15)
+    assert len(seen_batches) == 1  # old behaviour still available
+
+
+def _mk_item(n):
+    from datetime import datetime, timezone
+
+    from telco_radar.models import Item
+    return Item(title=f"item-{n}", url=f"https://x.test/{n}", source_name="S",
+                region="europa", operator=f"Op{n}",
+                published=datetime(2026, 7, 30, tzinfo=timezone.utc))
+
+
+def test_editor_budget_keeps_breadth_across_regions():
+    """A single busy region must not fill the editor's whole budget - the
+    briefing exists to show what happened ACROSS regions."""
+    from telco_radar.analyze.editor import _select_for_editor
+
+    clean = {
+        "Global": {"highlights": [{"t": i, "relevance": 5} for i in range(120)]},
+        "Ozeanien": {"highlights": [{"t": "o", "relevance": 3}]},
+    }
+    out, omitted = _select_for_editor(clean, 90)
+    assert len(out["Ozeanien"]["highlights"]) == 1
+    assert len(out["Global"]["highlights"]) == 89
+    assert omitted == 31
+
+    # under budget: nothing is touched
+    small = {"Europa": {"highlights": [{"t": 1, "relevance": 2}]}}
+    out2, omitted2 = _select_for_editor(small, 90)
+    assert out2 == small and omitted2 == 0

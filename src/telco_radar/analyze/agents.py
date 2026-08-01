@@ -83,15 +83,19 @@ def _items_payload(items: list[Item]) -> str:
 
 
 def analyze_region(region_name: str, items: list[Item], model: str,
-                   language: str = "Deutsch", max_items: int = 45) -> dict:
+                   language: str = "Deutsch", max_items: int | None = None) -> dict:
     """Run one regional analyst (in batches). Returns the merged assessment.
 
     Items are processed in batches of BATCH_SIZE so the JSON response never
     hits the output-token limit. A failing batch is skipped, not fatal.
     Also returns lightweight per-batch telemetry for the run log.
+
+    max_items=None means "no cap", which is the point: the seen-store marks
+    every new item as known regardless of whether an analyst ever read it, so
+    anything dropped here is dropped for good, not deferred to the next run.
     """
     system = ANALYST_SYSTEM.format(region=region_name, language=language)
-    capped = items[:max_items]
+    capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
     highlights: list[dict] = []
