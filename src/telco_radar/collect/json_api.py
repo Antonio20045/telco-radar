@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+from html import unescape
 from datetime import datetime, timezone
 from urllib.parse import urljoin, urlsplit
 
@@ -41,6 +42,12 @@ _DATE_FORMATS = (
 
 
 _TAG_RE = re.compile(r"<[^>]+>")
+
+# Records are read up to MAX_RECORDS, then sorted newest-first and cut to
+# MAX_ITEMS, so a long unsorted archive still yields its newest releases.
+MAX_RECORDS = 400
+MAX_ITEMS = 40
+_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
 # Some CMS content-fragment models (e.g. stc's press-release fragments) use
@@ -199,7 +206,11 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
     payload = json.loads(raw)
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     items: list[Item] = []
-    for rec in _records(payload)[:40]:
+    # Do NOT cap before sorting: an API's natural record order is not
+    # necessarily chronological. stc returns 281 releases whose first 40 are
+    # from 2021/2022, so the newsroom looked four years stale while the 2026
+    # releases sat further down the same response.
+    for rec in _records(payload)[:MAX_RECORDS]:
         title = _first(rec, _TITLE_KEYS, skip_values=_TITLE_PLACEHOLDERS)
         if not title:
             # The title field held only a generic CTA label (or was empty) -
@@ -208,7 +219,7 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
             # tags and use that as a last resort before giving up.
             desc_raw = _first(rec, _DESC_KEYS)
             if desc_raw:
-                title = " ".join(_TAG_RE.sub(" ", desc_raw).split())
+                title = " ".join(_TAG_RE.sub(" ", unescape(desc_raw)).split())
         if not title:
             continue
         rel = ""
@@ -228,16 +239,18 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
             continue
         url = rel if rel.startswith("http") else urljoin(site_root + "/", rel.lstrip("/"))
         items.append(Item(
-            title=title,
+            title=unescape(title),
             url=url,
             source_name=source.name or urlsplit(url).netloc.removeprefix("www."),
             region=region,
             operator=operator,
             published=_parse_date(_first(rec, _DATE_KEYS) or _split_date(rec)),
-            summary=_first(rec, _DESC_KEYS)[:600],
+            summary=" ".join(_TAG_RE.sub(" ", unescape(_first(rec, _DESC_KEYS))).split())[:600],
             origin=origin,
         ))
-    return items
+    items.sort(key=lambda i: (i.published is not None,
+                             i.published or _EPOCH), reverse=True)
+    return items[:MAX_ITEMS]
 
 
 def collect_json(source: Source, region: str, operator: str | None,

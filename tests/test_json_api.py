@@ -112,3 +112,32 @@ def test_date_embedded_in_label_like_vodafone_idea():
     items = parse_json_bytes(payload, src, "asien", "Vodafone Idea", "operator")
     assert len(items) == 1
     assert items[0].published == datetime(2026, 6, 10, tzinfo=timezone.utc)
+
+
+def test_records_are_sorted_by_date_before_the_cap():
+    """stc returns 281 releases whose first 40 are from 2021/2022, so capping
+    before sorting made the newsroom look four years stale while the current
+    releases sat further down the same response."""
+    payload = json.dumps([
+        {"title": f"Old release {n}", "link": f"https://example.com/old-{n}",
+         "date": "May 27, 2021"} for n in range(45)
+    ] + [
+        {"title": "Current release", "link": "https://example.com/current",
+         "date": "Jun 25, 2026"},
+    ]).encode()
+    src = Source(type="json_api", url="https://example.com/api", name="stc")
+    items = parse_json_bytes(payload, src, "africa", "stc", "operator")
+    assert items[0].title == "Current release"
+    assert len(items) == 40
+
+
+def test_html_entities_in_titles_are_decoded():
+    """stc's content fragments carry &quot; literally; the report would print
+    it verbatim."""
+    payload = json.dumps([
+        {"title": "stc wins the &quot;Excellence Award&quot; at WSIS &amp; more",
+         "link": "https://example.com/a", "date": "2026-07-01"},
+    ]).encode()
+    src = Source(type="json_api", url="https://example.com/api", name="stc")
+    items = parse_json_bytes(payload, src, "africa", "stc", "operator")
+    assert items[0].title == 'stc wins the "Excellence Award" at WSIS & more'
