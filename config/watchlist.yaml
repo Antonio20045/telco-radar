@@ -403,6 +403,11 @@ regions:
       country: BR
       website: oi.com.br
       sources:
+      # Geprueft 01.08.2026: die statische Seite enthaelt nur Meldungen bis
+      # 01/2025, aktuellere werden per JS nachgeladen. Kein Feed (/feed, /rss
+      # -> 404), ri.oi.com.br/rss liefert 1,2 kB ohne Eintraege, die
+      # IR-Mitteilungsseite ist 404. Oi ist in Restrukturierung und publiziert
+      # kaum noch - die Quelle bleibt, liefert aber realistisch wenig.
       - type: newsroom
         url: https://www.oi.com.br/sala-de-imprensa/
         item_selector: .news__item
