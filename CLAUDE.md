@@ -107,9 +107,10 @@ Wichtige Dateien:
 | `data/reports/YYYY-MM-DD.{md,json}` | Bericht als Prosa (md) + strukturiert (json: stats, regions→highlights) |
 | `site/` | Generierte Website — wird von Actions committed, Render published sie (Publish Dir `site`, Build Command nur `echo`) |
 | `src/telco_radar/report/templates/` | base/report/archive/sources.html.j2 + style.css + app.js |
-| `scripts/validate_sources.py` | Health-Check aller Quellen (OK/EMPTY/FAIL) |
+| `scripts/validate_sources.py` | Health-Check aller Quellen: Status, Item-Zahl, wie viele datiert, **neuestes Datum**, **wie viele im Frischefenster** + Liste „liefert Inhalte, aber nichts Frisches" |
+| `scripts/build_quellen_doc.py` | Erzeugt `TELCO_RADAR_QUELLEN.md` aus der Watchlist; mit `--validate` mit echten Abrufzahlen |
 | `.github/workflows/radar.yml` | Cron Di + Fr 08:30 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
-| `tests/` | 15 pytest-Tests (Fixtures, kein Netz/LLM nötig) |
+| `tests/` | pytest-Suite (Fixtures, kein Netz/LLM nötig) |
 
 **Secrets im Repo** (Settings → Actions): `ANTHROPIC` (Antonios API-Key —
 der Workflow akzeptiert `ANTHROPIC_API_KEY` ODER `ANTHROPIC`) und
@@ -148,13 +149,33 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
   45s → lange Läufe via GitHub Actions, Polling mit `gh run list`.
+- **Kein Headless-Browser in der Sandbox:** Chromium startet zwar, kommt aber
+  durch den Agent-Proxy nicht ins Netz (`ERR_CONNECTION_RESET`, auch mit
+  `--proxy-server`). `newsroom_js`-Quellen sind lokal deshalb NICHT testbar —
+  sie erscheinen in `validate_sources.py` als FAIL. In GitHub Actions laufen
+  sie normal. Praktische Folge: bei einer JS-Quelle immer erst nach dem
+  darunterliegenden Endpunkt suchen (`__NEXT_DATA__`, `/wp-json/wp/v2/posts`,
+  `?format=feed`, JSON in HTML-Attributen). In Session 2 waren 6 von 8
+  angeblich „JS-toten" Quellen in Wahrheit statisch abrufbar.
+- **`scripts/build_sources.py` ist gesperrt:** Es würde `config/watchlist.yaml`
+  überschreiben und dabei `item_selector`, `link_template`, `timeout_seconds`
+  und `allow_short_titles` verlieren — Felder, die seine Tabelle `M` gar nicht
+  kennt. Die **Watchlist wird direkt editiert**. Die Quellen-Doku erzeugt
+  `scripts/build_quellen_doc.py --validate` (schreibt nichts nach `config/`).
+- **Der Analyst sieht nur die ersten `max_items_per_region` Meldungen** (15).
+  Im Lauf vom 31.07. waren 220 Meldungen neu und 70 wurden bewertet. Die
+  Reihenfolge entscheidet also, was überhaupt gelesen wird: `pipeline.py`
+  mischt die Quellen deshalb reihum (`_interleave_by_source`), und
+  **undatierte Meldungen sortieren ans Ende**. Eine Quelle ohne erkanntes
+  Datum ist damit faktisch unsichtbar — bei jeder neuen Quelle zuerst prüfen,
+  ob `published` gesetzt ist, nicht nur ob Items ankommen.
 
 ## 7. Lokal arbeiten & testen
 
 ```bash
 pip install -r requirements.txt --break-system-packages
 export PYTHONPATH=src
-pytest -q                                   # 15 Tests, offline
+pytest -q                                   # Tests, offline
 python scripts/validate_sources.py          # Quellen-Health (Netz nötig)
 python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 # Site nur neu rendern (ohne Crawl): render_site() aus report/html.py nutzen
