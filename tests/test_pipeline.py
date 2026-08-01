@@ -102,3 +102,43 @@ def test_second_run_reports_nothing_new(project, fake_http):
     text = report2.read_text(encoding="utf-8")
     assert "davon neu: 0" in text             # everything already seen
     assert "Unlimited 5G+" not in text        # not re-reported
+
+
+def test_interleave_gives_every_source_a_slot():
+    """The analyst only reads the first `max_items_per_region` items, so one
+    high-volume feed must not take the whole budget from the operator
+    newsrooms."""
+    from datetime import datetime, timezone
+
+    from telco_radar.models import Item
+    from telco_radar.pipeline import _interleave_by_source
+
+    def mk(source, day, operator=None):
+        return Item(title=f"{source} {day}", url=f"https://x.test/{source}/{day}",
+                    source_name=source, region="europa", operator=operator,
+                    published=datetime(2026, 7, day, tzinfo=timezone.utc))
+
+    items = [mk("Light Reading", d) for d in (31, 30, 29, 28, 27)]
+    items += [mk("Orange Newsroom", 26, "Orange"), mk("Telia Newsroom", 25, "Telia")]
+
+    ordered = _interleave_by_source(items)
+    # both operator newsrooms must appear within the first three items
+    top3 = {i.operator or i.source_name for i in ordered[:3]}
+    assert "Orange" in top3 and "Telia" in top3
+    # nothing is lost, and the freshest item still leads
+    assert len(ordered) == len(items)
+    assert ordered[0].source_name == "Light Reading"
+
+
+def test_interleave_keeps_dated_sources_ahead_of_undated():
+    from datetime import datetime, timezone
+
+    from telco_radar.models import Item
+    from telco_radar.pipeline import _interleave_by_source
+
+    dated = Item(title="dated", url="https://x.test/a", source_name="A",
+                 region="europa", operator="A",
+                 published=datetime(2026, 7, 30, tzinfo=timezone.utc))
+    undated = Item(title="undated", url="https://x.test/b", source_name="B",
+                   region="europa", operator="B", published=None)
+    assert _interleave_by_source([undated, dated])[0].title == "dated"

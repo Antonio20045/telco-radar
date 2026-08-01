@@ -29,9 +29,10 @@ _BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then giv
 _BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
 
 
-def fetch(url: str, http_cfg: dict) -> httpx.Response:
+def fetch(url: str, http_cfg: dict,
+          timeout_override: float | None = None) -> httpx.Response:
     """GET with UA fallback + short backoff on rate limits."""
-    timeout = float(http_cfg.get("timeout_seconds", 20))
+    timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
     primary = http_cfg.get("user_agent", BROWSER_UA)
     fallback = BOT_UA if primary != BOT_UA else BROWSER_UA
 

@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 
 from ..config import Source
 from ..models import Item
+from .newsroom import _date_from_text
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +35,17 @@ def _entry_date(entry) -> datetime | None:
                 return datetime(*parsed[:6], tzinfo=timezone.utc)
             except (TypeError, ValueError):
                 continue
+    # feedparser only pre-parses RFC822/ISO stamps. Feeds that print a human
+    # date instead (Fierce Network: "Jul 31, 2026 12:57pm") leave *_parsed
+    # empty, and an undated item sinks below the analyst's per-region cap -
+    # so the busiest trade-press feed would never be read. Fall back to the
+    # same text parser the newsroom scraper uses.
+    for key in ("published", "updated", "date", "dc_date", "pubDate"):
+        raw = entry.get(key)
+        if isinstance(raw, str) and raw.strip():
+            parsed_text = _date_from_text(raw[:60])
+            if parsed_text:
+                return parsed_text
     return None
 
 
@@ -70,5 +82,5 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 def collect_rss(source: Source, region: str, operator: str | None,
                 origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
-    resp = fetch(source.url, http_cfg)
+    resp = fetch(source.url, http_cfg, source.timeout_seconds)
     return parse_feed_bytes(resp.content, source, region, operator, origin)

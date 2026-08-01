@@ -101,3 +101,35 @@ def test_newsroom_skips_navigation_and_parses_common_date_formats():
     items = parse_newsroom_html(html, src, "europe", "Example", "operator")
     assert len(items) == 1
     assert items[0].published.date().isoformat() == "2026-07-09"
+
+
+def test_rss_falls_back_to_human_readable_date():
+    """Fierce Network prints "Jul 31, 2026 12:57pm" instead of RFC822, so
+    feedparser leaves published_parsed empty. Undated items sort below the
+    analyst's per-region cap, so the busiest trade-press feed would never be
+    read - the collector must parse the raw string instead."""
+    raw = b"""<?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0"><channel><title>Fierce-style</title>
+      <item>
+        <title>NTIA tees up 4.4 GHz band</title>
+        <link>https://example.com/ntia-4-4-ghz</link>
+        <description>Spectrum news.</description>
+        <pubDate>Jul 31, 2026 12:57pm</pubDate>
+      </item>
+    </channel></rss>"""
+    src = Source(type="rss", url="https://example.com/rss/xml", name="Fierce-style")
+    items = parse_feed_bytes(raw, src, "global", None, "industry_news")
+    assert len(items) == 1
+    assert items[0].published == datetime(2026, 7, 31, tzinfo=timezone.utc)
+
+
+def test_url_date_ignores_numeric_id_after_a_year_in_the_slug():
+    """Deutsche Telekom's ".../fifa-wm-2030-1116606" parsed as 16 Nov 2030,
+    so the release was discarded as "published in the future" instead of
+    using the date printed on the card."""
+    from telco_radar.collect.newsroom import _date_from_url
+
+    assert _date_from_url("https://x.test/detail/fifa-wm-2030-1116606") == (None, False)
+    # real date paths keep working
+    assert _date_from_url("https://x.test/news/2026/07/31/foo") == (
+        datetime(2026, 7, 31, tzinfo=timezone.utc), True)

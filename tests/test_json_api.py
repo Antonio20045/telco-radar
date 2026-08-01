@@ -85,3 +85,30 @@ def test_records_without_title_or_url_are_skipped():
     src = Source(type="json_api", url="https://example.com/api", name="Example")
     items = parse_json_bytes(payload, src, "europa", "Example", "operator")
     assert items == []
+
+
+def test_publication_date_key_like_iliad():
+    """Iliad's Strapi backend dates records under "publication_date"; without
+    that key every one of its 40 items arrived undated and sank below the
+    analyst's per-region cap."""
+    payload = json.dumps({"newsItems": [
+        {"title": "Free Max Plan adds destinations", "url": "free-max-plan",
+         "publication_date": "2026-07-21T07:00:00.000Z"},
+    ]}).encode()
+    src = Source(type="json_api", url="https://api.example.fr/news", name="Iliad")
+    items = parse_json_bytes(payload, src, "europa", "Iliad", "operator")
+    assert len(items) == 1
+    assert items[0].published == datetime(2026, 7, 21, tzinfo=timezone.utc)
+
+
+def test_date_embedded_in_label_like_vodafone_idea():
+    """Vodafone Idea returns {"newsDate": "Tamil Nadu | 10 Jun, 2026"} - the
+    date has to be pulled out of the surrounding label."""
+    payload = json.dumps([
+        {"newsTitle": "Vi launches 5G", "newsUrl": "/news/vi-5g",
+         "newsDate": "Tamil Nadu | 10 Jun, 2026"},
+    ]).encode()
+    src = Source(type="json_api", url="https://www.myvi.in/api/news", name="Vodafone Idea")
+    items = parse_json_bytes(payload, src, "asien", "Vodafone Idea", "operator")
+    assert len(items) == 1
+    assert items[0].published == datetime(2026, 6, 10, tzinfo=timezone.utc)

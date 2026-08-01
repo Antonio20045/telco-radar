@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin, urlsplit
 
 import httpx
@@ -51,8 +51,13 @@ _SKIP_FILE_EXT = re.compile(
 # domain (see the same-domain check below).
 _TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
+# The trailing (?![0-9]) matters: without it the numeric id in a slug like
+# ".../fifa-wm-2030-1116606" parses as 16 Nov 2030, and the item is then
+# thrown away by the freshness filter as "published in the future" instead of
+# falling back to the correct date printed on the card.
 _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
+    r"(?![0-9])"
 )
 _TEXT_DATE = re.compile(
     r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+"
@@ -231,9 +236,15 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
         has_day = reverse.group(3) is not None
         day = int(reverse.group(3)) if has_day else 1
     try:
-        return datetime(year, month, day, tzinfo=timezone.utc), has_day
+        parsed = datetime(year, month, day, tzinfo=timezone.utc)
     except ValueError:
         return None, False
+    # A year in the headline ("Strategie 2030") can still slip through as a
+    # date. Treat anything from the future as no date at all, so the card's
+    # own date text gets a chance instead.
+    if parsed > datetime.now(timezone.utc) + timedelta(days=1):
+        return None, False
+    return parsed, has_day
 
 
 def _date_from_text(text: str) -> datetime | None:
@@ -426,7 +437,7 @@ def parse_newsroom_html(html: str, source: Source, region: str,
 def collect_newsroom(source: Source, region: str, operator: str | None,
                      origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
-    resp = fetch(source.url, http_cfg)
+    resp = fetch(source.url, http_cfg, source.timeout_seconds)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
     return parse_newsroom_html(resp.text, source, region, operator,
                                origin, max_links)

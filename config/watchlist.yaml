@@ -37,8 +37,8 @@ regions:
       - Magenta
       sources:
       - type: newsroom
-        url: https://www.telekom.com/en/media/media-information
-        item_selector: a.media-link[title]
+        url: https://www.telekom.com/de/medien/medieninformationen
+        item_selector: div.content-wrapper
     - name: O2 Telefónica Deutschland
       country: DE
       website: telefonica.de
@@ -148,9 +148,8 @@ regions:
       country: TR
       website: turkcell.com.tr
       sources:
-      - type: newsroom
-        url: https://medya.turkcell.com.tr/basin-bultenleri/
-        item_selector: a.latest-bulletins-item
+      - type: rss
+        url: https://medya.turkcell.com.tr/bulletins/feed/
     - name: Iliad
       country: FR
       website: iliad.fr
@@ -177,7 +176,7 @@ regions:
       aliases:
       - Bouygues
       sources:
-      - type: newsroom_js
+      - type: newsroom
         url: https://www.corporate.bouyguestelecom.fr/presse-et-actualites/
     - name: A1 Telekom Austria
       country: AT
@@ -560,6 +559,7 @@ regions:
       sources:
       - type: json_api
         url: https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1
+        timeout_seconds: 45
         link_template: 'https://corp.kt.com/html/promote/news/report_detail.html?datNo={datNo}'
     - name: NTT Docomo
       country: JP

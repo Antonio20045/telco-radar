@@ -13,6 +13,7 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from itertools import zip_longest
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -42,6 +43,30 @@ def _sort_key(item: Item):
     if pub is None:
         return (0, "")
     return (1, pub.isoformat())
+
+
+def _interleave_by_source(items: list[Item]) -> list[Item]:
+    """Order a region's items so every operator gets a slot before any
+    operator gets a second one.
+
+    The analyst reads at most `max_items_per_region` items, so the order here
+    decides what is even looked at. Straight recency ordering let one
+    high-volume feed take the whole budget: in the 2026-07-31 run 220 new
+    items produced only 70 analysed ones, and the operator newsrooms - the
+    entire point of the watchlist - lost every slot to the trade press.
+    Round-robin over the sources keeps the breadth; within a source the
+    freshest item still comes first.
+    """
+    buckets: dict[str, list[Item]] = defaultdict(list)
+    for item in sorted(items, key=_sort_key, reverse=True):
+        buckets[item.operator or item.source_name].append(item)
+    # Operators with a dated newest item go first, so a source that publishes
+    # undated pages cannot outrank one with a verifiable fresh release.
+    order = sorted(buckets.values(), key=lambda b: _sort_key(b[0]), reverse=True)
+    out: list[Item] = []
+    for round_items in zip_longest(*order):
+        out.extend(i for i in round_items if i is not None)
+    return out
 
 
 def run(root: Path, use_llm: bool | None = None,
@@ -111,6 +136,8 @@ def run(root: Path, use_llm: bool | None = None,
     items_by_region: dict[str, list[Item]] = defaultdict(list)
     for item in sorted(new_items, key=_sort_key, reverse=True):
         items_by_region[item.region].append(item)
+    for region_key, region_items in items_by_region.items():
+        items_by_region[region_key] = _interleave_by_source(region_items)
 
     # ------------------------------------------------------------- analyze
     llm_was_explicitly_disabled = use_llm is False

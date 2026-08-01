@@ -43,6 +43,9 @@ class Source:
     # field when the payload has no direct url/link field, e.g. only a slug
     # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
     # against the raw record dict.
+    timeout_seconds: float | None = None  # per-source HTTP timeout override,
+    # for hosts that are simply slow to reach from the CI runner (KT's Korean
+    # API ran into the global 20s connect timeout in 3 of 9 runs).
     allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
     # the 25-char title-length floor down to 6, for sources whose real
     # content is legitimately terse (e.g. RNS/regulatory-announcement
@@ -137,6 +140,7 @@ def load_config(root: Path) -> Config:
                     label=s.get("label", ""),
                     plan=s.get("plan", ""),
                     link_template=s.get("link_template"),
+                    timeout_seconds=s.get("timeout_seconds"),
                     allow_short_titles=s.get("allow_short_titles", False),
                 ))
             operators.append(Operator(
