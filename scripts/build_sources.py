@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Single source of truth for the operator watchlist.
+"""VERALTET - config/watchlist.yaml wird direkt gepflegt (siehe Sperre unten).
+
+Urspruenglich der Generator fuer die Watchlist.
 
 Generates config/watchlist.yaml + config/watchlist_extra.yaml AND the human
 verification document. Every operator has exactly one PRIMARY source on its
@@ -8,7 +10,7 @@ OWN domain (feed / json_api / newsroom / newsroom_js / official-reference).
 Run: python scripts/build_sources.py
 """
 from __future__ import annotations
-import io, os, yaml
+import io, os, sys, yaml
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -290,6 +292,19 @@ def build_doc():
         f.write("\n".join(lines))
 
 if __name__=="__main__":
+    # Die Tabelle M oben ist seit dem Reparatur-Durchgang vom Juli 2026 nicht
+    # mehr aktuell, und sie kann die inzwischen noetigen Felder gar nicht
+    # ausdruecken: item_selector, link_template, timeout_seconds,
+    # allow_short_titles. Ein Lauf wuerde config/watchlist.yaml ueberschreiben
+    # und damit die geprueften Reparaturen mehrerer Sessions loeschen.
+    # config/watchlist.yaml ist die Wahrheitsquelle - dort direkt editieren.
+    if "--force" not in sys.argv:
+        print(__doc__)
+        print("ABBRUCH: dieses Skript wuerde config/watchlist.yaml ueberschreiben\n"
+              "und dabei item_selector / link_template / timeout_seconds /\n"
+              "allow_short_titles verlieren. Die Watchlist wird direkt gepflegt.\n"
+              "Wer die Tabelle M wirklich neu ausrollen will: --force.")
+        raise SystemExit(1)
     build_yaml(); build_doc()
     print(f"Generated: {len(M)} operators")
     kc={}
