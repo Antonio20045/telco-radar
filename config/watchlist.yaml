@@ -271,10 +271,13 @@ regions:
       aliases:
       - ATT
       sources:
-      - type: official
-        url: https://about.att.com/newsroom.html
-        plan: 'Newsroom liefert Bots 403. Plan: Playwright über Residential-Proxy oder offizielle Media-API; bis dahin Referenz
-          + Fachpresse-Zuordnung.'
+      # about.att.com ist vollstaendig hinter Akamai (403 mit Browser- UND
+      # Bot-UA, auch fuer einzelne Story-URLs). Die IR-Meldungsliste auf der
+      # Schwester-Subdomain ist frei zugaenglich und verlinkt genau die
+      # about.att.com-Meldungen, an die wir sonst nicht herankommen.
+      - type: newsroom
+        url: https://investors.att.com/news-and-events/news-releases
+        item_selector: tr[class*=yr-]
     - name: T-Mobile US
       country: US
       website: t-mobile.com
@@ -311,8 +314,11 @@ regions:
       - Boost Mobile
       - EchoStar
       sources:
+      # Der DISH-Brand-Feed ist technisch in Ordnung, seine juengste Meldung
+      # aber vom 05.05.2026: nach der Uebernahme publiziert der Konzern unter
+      # EchoStar.
       - type: rss
-        url: https://api.client.notified.com/api/rss/publish/view/53068?type=press
+        url: https://ir.echostar.com/rss/news-releases.xml
     - name: UScellular
       country: US
       website: uscellular.com

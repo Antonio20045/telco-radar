@@ -287,3 +287,36 @@ def test_rss_refetches_when_the_body_is_not_a_feed():
 
     assert len(calls) == 2  # first body was not a feed
     assert [i.title for i in items] == ["FCC opens C-band proceeding"]
+
+
+def test_sibling_subdomain_and_table_layout_like_att():
+    """AT&T's newsroom is Akamai-blocked, but its IR release list is not - and
+    that list keeps the headline in a sibling cell, repeats the column header
+    as a screen-reader label, and links every story to a sibling subdomain."""
+    html = """<table><tbody>
+      <tr class="yr-2026">
+        <th class="pr-date-field"><span class="pr-mobi-headers">Date</span>July 28, 2026</th>
+        <td class="pr-title-field"><span class="pr-mobi-headers">Title</span>AT&amp;T Closes Acquisition of Spectrum Licenses</td>
+        <td class="pr-document-field"><a class="icon-lnk"
+           href="https://about.att.com/story/2026/echostar-spectrum.html"><span></span></a></td>
+      </tr>
+    </tbody></table>"""
+    src = Source(type="newsroom", name="AT&T",
+                 url="https://investors.att.com/news-and-events/news-releases",
+                 item_selector="tr[class*=yr-]")
+    items = parse_newsroom_html(html, src, "north_america", "AT&T", "operator")
+    assert len(items) == 1
+    assert items[0].title == "AT&T Closes Acquisition of Spectrum Licenses"
+    assert items[0].published == datetime(2026, 7, 28, tzinfo=timezone.utc)
+    assert items[0].url.startswith("https://about.att.com/")
+
+
+def test_parent_site_never_widens_to_a_public_suffix():
+    """Dropping a label off tim.com.br must not leave com.br, which would
+    match every Brazilian site."""
+    from telco_radar.collect.newsroom import _parent_site
+
+    assert _parent_site("investors.att.com") == "att.com"
+    assert _parent_site("www.tim.com.br") == "tim.com.br"
+    assert _parent_site("tim.com.br") == ""      # would be com.br
+    assert _parent_site("att.com") == ""

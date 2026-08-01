@@ -51,6 +51,30 @@ _SKIP_FILE_EXT = re.compile(
 # regulatory announcements through instead of hosting them on their own
 # domain (see the same-domain check below).
 _TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
+# Multi-label public suffixes: without this guard, dropping one label off
+# "tim.com.br" would leave "com.br" and match every Brazilian site.
+_PUBLIC_SUFFIXES = {
+    "com.br", "com.au", "co.uk", "com.tr", "co.za", "com.mx", "co.nz",
+    "com.ar", "com.sa", "co.ke", "com.my", "com.ph", "com.sg", "co.th",
+    "com.cn", "co.jp", "co.kr", "com.tw", "com.hk", "com.eg", "com.pk",
+    "co.id", "com.vn", "com.co", "com.pe", "com.ng", "com.kw", "com.qa",
+}
+
+
+def _parent_site(host: str) -> str:
+    """Drop the leading label so sibling subdomains can be recognised.
+
+    AT&T lists its releases on investors.att.com but links every story to
+    about.att.com - the same company, a different host. Only applied when a
+    real parent domain is left over (never down to a public suffix).
+    """
+    labels = host.split(".")
+    if len(labels) < 3:
+        return ""
+    parent = ".".join(labels[1:])
+    if parent in _PUBLIC_SUFFIXES or len(parent.split(".")) < 2:
+        return ""
+    return parent
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
 # The trailing (?![0-9]) matters: without it the numeric id in a slug like
 # ".../fifa-wm-2030-1116606" parses as 16 Nov 2030, and the item is then
@@ -418,6 +442,14 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             return embedded
 
     soup = BeautifulSoup(html, "html.parser")
+    # Screen-reader-only labels are never part of a headline. AT&T's release
+    # table repeats its column headers in every row as
+    # <span class="pr-mobi-headers">Title</span>, which ended up glued to the
+    # front of each extracted title.
+    for hidden in soup.select(
+            '[class*=sr-only], [class*=visually-hidden], [class*=screen-reader],'
+            ' [class*=mobi-header], [class*=visuallyhidden]'):
+        hidden.decompose()
     scope = soup
     selector_matched = False
     if source.item_selector:
@@ -457,6 +489,10 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         # verified the surrounding container is a real announcement card.
         host = parts.netloc.removeprefix("www.")
         on_domain = host == base_host or host.endswith("." + base_host)
+        if not on_domain:
+            parent = _parent_site(base_host)
+            on_domain = bool(parent) and (host == parent
+                                          or host.endswith("." + parent))
         on_trusted_vendor = selector_matched and any(
             host == d or host.endswith("." + d) for d in _TRUSTED_EXTERNAL_HOSTS)
         if not on_domain and not on_trusted_vendor:
@@ -499,6 +535,19 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         # <h1>-<h6> inside the card and reserve the anchor text for a generic
         # "Read more"/"Load More" label - only worth searching once the
         # selector already narrowed us to a real article container.
+        if selector_matched and (len(title) < 25 or len(title) > 300
+                                  or _is_junk_title(title)):
+            # Table-style newsrooms (AT&T's IR release list) keep the headline
+            # in a sibling cell and leave the link itself as a bare icon, so
+            # the anchor carries no text at all. Look for a title-classed
+            # element in the item's own container before the heading search.
+            container = a.find_parent("tr") or a.parent
+            if container is not None and hasattr(container, "select_one"):
+                cell = container.select_one("[class*=title]")
+                if cell is not None:
+                    labelled = " ".join(cell.get_text(" ", strip=True).split())
+                    if 25 <= len(labelled) <= 300 and not _is_junk_title(labelled):
+                        title = labelled
         if selector_matched and (len(title) < 25 or len(title) > 300
                                   or _is_junk_title(title)):
             heading_title = _heading_title_for(a, scope)
