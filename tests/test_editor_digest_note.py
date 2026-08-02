@@ -24,6 +24,7 @@ def _items():
 def test_kein_key_konfiguriert_nennt_die_konfiguration(monkeypatch):
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("AWS_BEARER_TOKEN_BEDROCK", raising=False)
     body, _ = build_digest(_items(), REGIONS)
     assert "kein Zugang zu einem Analyse-Modell konfiguriert" in body
     assert "ANTHROPIC_API_KEY" not in body

@@ -9,12 +9,13 @@ Three backends, chosen by environment (first match wins):
 This keeps the provider swappable with one env var + the base URL, without
 touching the agents. Public telco news only, so a non-Anthropic model is fine.
 
-Bedrock note: the "Mantle" endpoint speaks the native Anthropic Messages API,
-so it shares the payload and the response parser with the Anthropic backend -
-only the URL and the auth header differ. Model ids carry an "anthropic." prefix
-there (anthropic.claude-sonnet-5); the endpoint resolves the regional inference
-profile itself, so the us./eu. prefixes the raw bedrock-runtime API requires are
-not needed here.
+Bedrock note: this uses the classic bedrock-runtime invoke endpoint, NOT the
+newer "Mantle" endpoint. Both speak the Anthropic Messages payload, but they
+are gated separately, and measured on 01.08.2026 Mantle answers 403 for models
+bedrock-runtime happily serves (Haiku 4.5: 403 on Mantle, reachable on
+runtime). Runtime differences: the model id goes in the URL rather than the
+body, it needs the regional inference-profile prefix ("us."), and the body
+carries anthropic_version instead of a model field.
 """
 from __future__ import annotations
 
@@ -37,9 +38,31 @@ def _bedrock_region() -> str:
     return (os.environ.get("BEDROCK_REGION") or BEDROCK_DEFAULT_REGION).strip()
 
 
-def _bedrock_url() -> str:
-    return (f"https://bedrock-mantle.{_bedrock_region()}.api.aws"
-            "/anthropic/v1/messages")
+BEDROCK_API_VERSION = "bedrock-2023-05-31"
+
+
+def _bedrock_profile(model: str) -> str:
+    """Prefix a bare model id with its regional inference profile.
+
+    Every current Claude model on Bedrock is INFERENCE_PROFILE-only (checked
+    against the account's own foundation-models listing), so a bare
+    "anthropic.claude-..." id is rejected. The prefix is derived from the
+    region so an eu-* region does not silently ask for US capacity.
+    """
+    if model.split(".", 1)[0] in ("us", "eu", "apac", "global"):
+        return model
+    region = _bedrock_region()
+    prefix = "eu" if region.startswith("eu-") else (
+        "apac" if region.startswith("ap-") else "us")
+    return f"{prefix}.{model}"
+
+
+def _bedrock_url(model: str) -> str:
+    from urllib.parse import quote
+    # ":" stays literal - it is part of the versioned model id
+    # (…-v1:0) and Bedrock does not accept it percent-encoded.
+    return (f"https://bedrock-runtime.{_bedrock_region()}.amazonaws.com"
+            f"/model/{quote(_bedrock_profile(model), safe=':')}/invoke")
 
 
 def _use_bedrock() -> bool:
@@ -151,6 +174,14 @@ def dead_models() -> set[str]:
     return set(_DEAD_MODELS)
 
 
+def _is_daily_quota(resp) -> bool:
+    """A 429 that means "come back tomorrow", not "come back in a second"."""
+    if resp.status_code != 429:
+        return False
+    body = resp.text[:300].lower()
+    return "per day" in body or "daily" in body
+
+
 def _post_with_retries(url, payload, headers, retries, parse):
     """Retry until the time budget is spent, weighted by what each failure cost.
 
@@ -172,6 +203,15 @@ def _post_with_retries(url, payload, headers, retries, parse):
                               timeout=http_timeout())
             if resp.status_code in _FATAL_STATUSES:
                 raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
+            if _is_daily_quota(resp):
+                # Bedrock answers a spent DAILY token allowance with the same
+                # 429 it uses for "slow down a moment". Retrying that one is
+                # pointless by definition - and expensive: the cheap-failure
+                # path would spend the full call budget (300s) on it, per
+                # stage. Give up on this model at once so the run either falls
+                # back or publishes the digest in seconds instead of hours.
+                raise RuntimeError(
+                    f"daily token quota exhausted: {resp.text[:200]}")
             if resp.status_code in (429, 529) or resp.status_code >= 500:
                 raise httpx.HTTPStatusError(
                     f"retryable status {resp.status_code}: {resp.text[:200]}",
@@ -266,8 +306,10 @@ def _complete_bedrock(system: str, user: str, model: str,
     key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
     if not key:
         raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set")
+    # The model is addressed by URL here, so the body carries the Bedrock API
+    # version in its place - sending "model" as well is rejected.
     payload = {
-        "model": model,
+        "anthropic_version": BEDROCK_API_VERSION,
         "max_tokens": max_tokens,
         "system": system,
         "messages": [{"role": "user", "content": user}],
@@ -281,7 +323,8 @@ def _complete_bedrock(system: str, user: str, model: str,
         return "".join(b.get("text", "") for b in data.get("content", [])
                        if b.get("type") == "text")
 
-    return _post_with_retries(_bedrock_url(), payload, headers, retries, parse)
+    return _post_with_retries(_bedrock_url(model), payload, headers,
+                              retries, parse)
 
 
 def _dispatch(system: str, user: str, model: str,

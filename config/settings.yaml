@@ -14,17 +14,25 @@ analyst_model: "claude-sonnet-5"
 editor_model: "claude-sonnet-5"
 
 # Amazon Bedrock. Aktiv, SOBALD das Secret AWS_BEARER_TOKEN_BEDROCK gesetzt ist -
-# dann hat es Vorrang vor NVIDIA. Modell-IDs tragen dort das Präfix "anthropic.".
-# Region über BEDROCK_REGION (Standard us-east-1); der Mantle-Endpunkt loest das
-# regionale Inference Profile selbst auf, das us./eu.-Präfix entfaellt hier.
+# dann hat es Vorrang vor NVIDIA. Modell-IDs tragen dort das Präfix "anthropic.";
+# das regionale Inference-Profil ("us."/"eu.") setzt llm.py selbst davor, denn
+# jedes aktuelle Claude-Modell auf Bedrock ist INFERENCE_PROFILE-only.
+# Region über BEDROCK_REGION (Standard us-east-1).
 #
-# STAND 01.08.2026, mit echten Aufrufen gegen Antonios Bedrock-Konto geprueft:
-#   Sonnet 5 / Opus 5 / Fable 5 / Opus 4.8 / 4.7 -> HTTP 403, kein Kontozugriff
-#   Sonnet 4.6 / Opus 4.6 / 4.5 / Sonnet 4.5 / Haiku 4.5 -> HTTP 404,
-#     "Anthropic use case details form" im Bedrock-Konsolen-Konto nicht ausgefuellt
-#   Claude 3 Haiku -> HTTP 429, Tageskontingent erschoepft
-# Das Secret also erst setzen, wenn der Zugriff wirklich freigeschaltet ist -
-# sonst laeuft jeder Aufruf in einen 403 und der Lauf publiziert nur den Digest.
+# STAND 02.08.2026, mit echten Aufrufen gegen Antonios Bedrock-Konto geprueft.
+# Zwei VERSCHIEDENE Sperren, die nacheinander fallen muessen:
+#   1. Sonnet 5 / Opus 5 / Fable 5 / Opus 4.8 / 4.7 -> HTTP 403
+#      "is not available for this account ... contact AWS Sales".
+#      Kein Self-Service, das schaltet nur der AWS-Vertrieb frei.
+#   2. Alle uebrigen (Sonnet 4.6, Opus 4.6/4.5, Sonnet 4.5, Haiku 4.5) -> HTTP 403
+#      "INVALID_PAYMENT_INSTRUMENT: A valid payment instrument must be provided".
+#      Das Konto hat keine gueltige Zahlungsmethode; die Marketplace-Subscription
+#      der Modelle kommt deshalb nicht zustande. Davor kam zeitweise ein 429
+#      "Too many tokens per day" - das Gratis-Tageskontingent.
+# Die Modelle stehen in der foundation-models-Liste des Kontos also alle als
+# ACTIVE, abrufbar ist aber keines. Das Secret erst setzen, wenn ein echter
+# Testaufruf durchgeht - sonst laeuft jeder Call in einen 403 und der Lauf
+# publiziert nur den Notfall-Digest.
 bedrock_analyst_model: "anthropic.claude-sonnet-5"
 bedrock_editor_model: "anthropic.claude-sonnet-5"
 
