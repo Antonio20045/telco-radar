@@ -33,8 +33,22 @@ editor_model: "claude-sonnet-5"
 # ACTIVE, abrufbar ist aber keines. Das Secret erst setzen, wenn ein echter
 # Testaufruf durchgeht - sonst laeuft jeder Call in einen 403 und der Lauf
 # publiziert nur den Notfall-Digest.
-bedrock_analyst_model: "anthropic.claude-sonnet-5"
-bedrock_editor_model: "anthropic.claude-sonnet-5"
+# Praeferenzkette, bestes Modell zuerst. Der Lauf probiert sie der Reihe nach
+# ab und nimmt das erste, das dieses Konto wirklich bedient - ein Modell, das
+# mit "not available for this account" / "payment instrument" abgelehnt wird,
+# gilt fuer den Rest des Laufs als tot und wird uebersprungen. So muss hier
+# niemand raten, welche Freigabe gerade steht: sobald AWS Sonnet 5 aufmacht,
+# nutzt der naechste Lauf es von selbst, ohne Aenderung an dieser Datei.
+bedrock_model_chain:
+  - "anthropic.claude-sonnet-5"
+  - "anthropic.claude-sonnet-4-6"
+  - "anthropic.claude-opus-4-6-v1"
+  - "anthropic.claude-sonnet-4-5-20250929-v1:0"
+  - "anthropic.claude-haiku-4-5-20251001-v1:0"
+
+# Kopf der Kette; nur setzen, wenn die Kette NICHT benutzt werden soll.
+bedrock_analyst_model: ""
+bedrock_editor_model: ""
 
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"

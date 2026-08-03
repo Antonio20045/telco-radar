@@ -140,6 +140,38 @@ class LLMFatalError(RuntimeError):
     """
 
 
+class LLMModelUnavailable(LLMFatalError):
+    """This ONE model is not usable on this account - another one may be.
+
+    The exception to the rule above. Bedrock rejects a model the account has
+    no agreement for with a 403, which looks fatal but says nothing about the
+    other models: on 02.08.2026 Sonnet 5 answered "not available for this
+    account" while Sonnet 4.6 got as far as the quota check. Treating that as
+    plain-fatal would abort the run on the first model instead of moving down
+    the preference chain.
+    """
+
+
+# Substrings that identify a per-MODEL access rejection rather than a broken
+# request. Kept narrow on purpose: a genuinely malformed payload or a bad key
+# must stay fatal, otherwise the run would walk the whole chain failing the
+# same way each time.
+_MODEL_ACCESS_MARKERS = (
+    "is not available for this account",
+    "invalid_payment_instrument",
+    "model access is denied",
+    "marketplace subscription",
+    "does not exist",
+    "provided model identifier is invalid",
+    "use case details",
+)
+
+
+def _is_model_access_error(body: str) -> bool:
+    low = body.lower()
+    return any(marker in low for marker in _MODEL_ACCESS_MARKERS)
+
+
 def http_timeout() -> float:
     """Per-request read timeout; override with LLM_HTTP_TIMEOUT (seconds)."""
     try:
@@ -162,6 +194,36 @@ def set_fallback(model: str, fallback: str) -> None:
     """Register `fallback` as the stand-in for `model`."""
     if model and fallback and model != fallback:
         _FALLBACKS[model] = fallback
+
+
+def set_model_chain(models: list[str]) -> str:
+    """Register a preference chain (best first) and return its head.
+
+    Each model falls back to the next, so the run uses the best model the
+    provider actually serves without anyone having to know in advance which
+    one that is. Duplicates and empty entries are ignored; an existing
+    fallback for a model is not overwritten, so a caller-set editor->analyst
+    preference still wins over the chain's own next link.
+    """
+    ordered: list[str] = []
+    for name in models:
+        name = (name or "").strip()
+        if name and name not in ordered:
+            ordered.append(name)
+    for current, following in zip(ordered, ordered[1:]):
+        _FALLBACKS.setdefault(current, following)
+    return ordered[0] if ordered else ""
+
+
+def _chain_from(model: str) -> list[str]:
+    """Walk the registered fallbacks into a list, guarding against cycles."""
+    chain, seen = [], set()
+    current = model
+    while current and current not in seen:
+        chain.append(current)
+        seen.add(current)
+        current = _FALLBACKS.get(current, "")
+    return chain
 
 
 def reset_model_health() -> None:
@@ -220,6 +282,9 @@ def _post_with_retries(url, payload, headers, retries, parse):
             return parse(resp.json())
         except _FatalHTTP as exc:
             # no point retrying - surface immediately so the run fails fast
+            if _is_model_access_error(str(exc)):
+                log.warning("Model not usable on this account: %s", str(exc)[:300])
+                raise LLMModelUnavailable(f"model not available: {exc}")
             log.error("LLM call fatal (no retry): %s", str(exc)[:300])
             raise LLMFatalError(f"LLM fatal error: {exc}")
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
@@ -347,25 +412,39 @@ def complete(system: str, user: str, model: str,
     the next run tries the preferred model again and returns to it by itself
     once the provider has capacity.
 
-    A fatal error (bad key, unknown model, malformed request) is NOT retried on
-    the fallback - another model would fail the same way.
+    Fallbacks chain: if the stand-in has a stand-in of its own, the call keeps
+    walking down until one model answers. That is what makes "use the best
+    model this account actually has" work without hard-coding the answer.
+
+    A fatal error (bad key, malformed request) is NOT retried on the fallback -
+    another model would fail the same way. A per-MODEL access rejection
+    (LLMModelUnavailable) is the exception and does move to the next link.
     """
-    fallback = _FALLBACKS.get(model)
-    if fallback and model in _DEAD_MODELS:
-        log.info("Model %s already unavailable in this run - using %s directly",
-                 model, fallback)
-        return _dispatch(system, user, fallback, max_tokens, retries)
-    try:
-        return _dispatch(system, user, model, max_tokens, retries)
-    except LLMFatalError:
-        raise
-    except RuntimeError as exc:
-        if not fallback:
+    chain = [m for m in _chain_from(model) if m not in _DEAD_MODELS]
+    if not chain:
+        # every link died earlier in this run - try the preferred one anyway so
+        # the caller gets a real error rather than an IndexError
+        chain = [model]
+    last_exc: Exception | None = None
+
+    for position, candidate in enumerate(chain):
+        if position:
+            log.warning("Falling back to %s", candidate)
+        try:
+            return _dispatch(system, user, candidate, max_tokens, retries)
+        except LLMModelUnavailable as exc:
+            _DEAD_MODELS.add(candidate)
+            last_exc = exc
+            log.warning("Model %s is not usable on this account - skipping it "
+                        "for the rest of this run", candidate)
+        except LLMFatalError:
             raise
-        _DEAD_MODELS.add(model)
-        log.warning("Model %s did not answer (%s) - switching to %s for the "
-                    "remainder of this run", model, str(exc)[:160], fallback)
-        return _dispatch(system, user, fallback, max_tokens, retries)
+        except RuntimeError as exc:
+            _DEAD_MODELS.add(candidate)
+            last_exc = exc
+            log.warning("Model %s did not answer (%s)", candidate, str(exc)[:160])
+
+    raise last_exc if last_exc else RuntimeError(f"no model answered for {model}")
 
 
 def extract_json(text: str):

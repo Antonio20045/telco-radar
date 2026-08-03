@@ -87,8 +87,15 @@ def run(root: Path, use_llm: bool | None = None,
                   and bool(os.environ.get("LLM_API_KEY"))
                   and bool(cfg.settings.get("llm_api_base")))
     if use_bedrock:
-        analyst_model = cfg.settings.get("bedrock_analyst_model", fallback_model)
-        editor_model = cfg.settings.get("bedrock_editor_model", fallback_model)
+        # Which Claude models a Bedrock account may call is per-account and
+        # changes without notice (agreements, quotas, AWS Sales). Instead of
+        # pinning one id, register the configured preference chain and let the
+        # run settle on the best model that actually answers.
+        chain_head = llm.set_model_chain(cfg.settings.get("bedrock_model_chain") or [])
+        analyst_model = (cfg.settings.get("bedrock_analyst_model")
+                         or chain_head or fallback_model)
+        editor_model = (cfg.settings.get("bedrock_editor_model")
+                        or chain_head or fallback_model)
     elif use_openai:
         os.environ.setdefault("LLM_API_BASE", cfg.settings["llm_api_base"])
         analyst_model = cfg.settings.get("openai_analyst_model", fallback_model)
