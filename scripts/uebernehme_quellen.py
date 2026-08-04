@@ -62,7 +62,16 @@ THEMEN_TITEL = {
 
 
 def _yaml_wert(v) -> str:
-    """Ein YAML-Skalar so schreiben, dass es sicher wieder eingelesen wird."""
+    """Ein YAML-Skalar so schreiben, dass es sicher wieder eingelesen wird.
+
+    Zeichenketten IMMER in Anfuehrungszeichen: die Eintraege stehen im
+    Fluss-Stil ({name: ..., url: ...}), und dort beendet ein Fragezeichen
+    oder Komma in einer URL das Mapping. Genau daran ist der erste Versuch
+    gescheitert - abgefangen vom Sicherheitsnetz, aber vermeidbar. JSON ist
+    hier zugleich gueltiges YAML mit doppelten Anfuehrungszeichen.
+    """
+    if isinstance(v, str):
+        return json.dumps(v, ensure_ascii=False)
     return yaml.safe_dump(v, allow_unicode=True, default_flow_style=True,
                           width=10_000).strip().removesuffix("...").strip()
 

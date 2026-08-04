@@ -1,3 +1,74 @@
-# All operators now live in watchlist.yaml (generated). This file is kept
-# for backward compatibility and merged by region key if populated.
-regions: {}
+# Zusaetzliche Betreiber. Wird von config.load_config nach Regionsschluessel
+# mit config/watchlist.yaml verschmolzen. Neue Betreiber kommen hierher,
+# damit die gepflegte Hauptdatei lesbar bleibt; Zweitkanaele bestehender
+# Betreiber gehoeren dagegen in die Watchlist, direkt zu ihrem Betreiber.
+# Erzeugt/erweitert von scripts/uebernehme_quellen.py.
+regions:
+  europe:
+    operators:
+    - name: Magenta Telekom
+      country: Österreich
+      website: https://newsroom.magenta.at
+      aliases:
+      - Magenta Telekom
+      - Magenta Austria
+      - T-Mobile Austria
+      sources:
+      - type: rss
+        url: https://newsroom.magenta.at/feed/
+        herkunft: Welle 1 (Breitensuche + Musteruebertragung)
+        abgenommen: '2026-08-04'
+    - name: Hrvatski Telekom
+      country: Kroatien
+      website: https://www.t.ht.hr
+      aliases:
+      - Hrvatski Telekom
+      - Croatian Telekom
+      - HT
+      sources:
+      - type: newsroom
+        url: https://www.t.ht.hr/en/Press/press-releases
+        herkunft: Welle 1 (Breitensuche + Musteruebertragung)
+        abgenommen: '2026-08-04'
+    - name: eir
+      country: Irland
+      website: https://www.eir.ie
+      aliases:
+      - eir
+      - eircom
+      - eir Mobile
+      - GoMo
+      sources:
+      - type: newsroom
+        url: https://www.eir.ie/pressroom/press_releases/
+        herkunft: Welle 1 (Breitensuche + Musteruebertragung)
+        abgenommen: '2026-08-04'
+  north_america:
+    operators:
+    - name: Optimum
+      country: USA
+      website: https://www.optimum.com
+      aliases:
+      - Optimum
+      - Altice USA
+      - Suddenlink
+      - Optimum Mobile
+      sources:
+      - type: newsroom
+        url: https://www.optimum.com/about-us/news/press-release
+        herkunft: Welle 1 (Breitensuche + Musteruebertragung)
+        abgenommen: '2026-08-04'
+  asia:
+    operators:
+    - name: Dialog Axiata
+      country: Sri Lanka
+      website: https://www.dialog.lk
+      aliases:
+      - Dialog Axiata
+      - Dialog Sri Lanka
+      - Dialog
+      sources:
+      - type: newsroom
+        url: https://www.dialog.lk/news-media-announcements-archive
+        herkunft: Welle 1 (Breitensuche + Musteruebertragung)
+        abgenommen: '2026-08-04'

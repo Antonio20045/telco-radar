@@ -92,17 +92,31 @@ andere (Settings, Logs) das Render-Dashboard per Chrome bedienen.
 Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
 
 ```
-1. COLLECT   RSS- & Newsroom-Collector, parallel, fehlertolerant
-             (src/telco_radar/collect/: rss.py, newsroom.py, http.py)
+1. COLLECT   Quellen nach HOST gruppiert; Gruppen parallel, innerhalb einer
+             Gruppe nacheinander mit Mindestabstand → viel Parallelität ohne
+             429/403. Stillgelegte Quellen (Quarantäne) werden übersprungen.
+             (src/telco_radar/collect/: __init__.py::sammelplan, rss.py,
+             newsroom.py, http.py)
 2. DELTA     Seen-Store + Freshness-Filter → nur NEUE Items
-             (src/telco_radar/dedupe.py; State: data/state/seen.jsonl)
+             (src/telco_radar/dedupe.py; State: data/state/seen.tsv,
+             ~22 Byte je Eintrag, datierte Einträge verfallen nach 18 Monaten)
 3. ANALYZE   1 Analyst-Agent pro Region UND pro Themenfeld, Batches à 15
              Items (parallel, analyst_batch_workers), 8k Tokens.
              Themenfelder bekommen TECH_ANALYST_SYSTEM statt ANALYST_SYSTEM -
              ein Chiphersteller ist kein Wettbewerber.
              (src/telco_radar/analyze/agents.py; API direkt via httpx: llm.py)
-4. EDIT      Editor-Agent: deutscher Wochenbericht (20k Tokens!) +
-             Topic-Memory gegen Wiederholungen (analyze/editor.py)
+4. EDIT      ZWEISTUFIG (seit dem Skalierungs-Auftrag):
+             a) Bereichsredakteure - ein Aufruf je Region und je Themenfeld,
+                parallel, auf dem Analysten-Modell. Liefern Abschnitt,
+                Kurzfassung und ihre stärksten Meldungen in vier Blöcken
+                mit Trennmarken (kein JSON: Markdown mit Zeilenumbrüchen
+                in einem JSON-String bricht regelmäßig).
+             b) Chefredaktion - sieht NUR Kurzfassungen und Top-Meldungen,
+                schreibt Auf einen Blick / Das Wichtigste / Die wichtigsten
+                Signale / Muster der Woche. Die Bereichsabschnitte werden
+                darunter montiert, nicht neu geschrieben.
+             Damit hängt der Chef-Prompt an der Zahl der BEREICHE, nicht an
+             der Zahl der Meldungen. (analyze/editor.py)
 5. PUBLISH   Markdown + JSON nach data/reports/, statische Site nach site/
              (report/html.py + templates/), Commit + Render-Hook
 ```

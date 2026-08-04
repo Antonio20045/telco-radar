@@ -167,6 +167,12 @@ def auswerten(reports_dir: Path, config_urls: dict[str, dict] | None = None,
         for rec in quellen:
             sch = _schluessel(rec.get("url", "")) or f"name:{rec.get('name', '')}"
             b = bilanz(sch)
+            if rec.get("status") == "quarantaene":
+                # Stillgelegt und deshalb gar nicht abgerufen. Das als Fehler
+                # zu zaehlen wuerde die Quarantaene zur selbsterfuellenden
+                # Prophezeiung machen: je laenger eine Quelle ruht, desto
+                # schlechter saehe ihre Bilanz aus.
+                continue
             b.name = rec.get("name") or b.name
             b.url = rec.get("url") or b.url
             b.origin = rec.get("origin") or b.origin

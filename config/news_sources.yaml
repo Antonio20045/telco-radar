@@ -23,3 +23,310 @@ news_sources:
   - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
   - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
   # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
+  # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
+  # Groesstes indisches Telko-Fachmedium (Economic Times). Abruf: 20 Items, 20
+  # datiert, neuestes 2026-08-04, 20/20 im 8-Tage-Fenster. Reine
+  # Telekom-Redaktion, taeglich mehrere Meldungen. Abnahme: 20 Meldungen, 20
+  # datiert, 20 im Frischefenster.
+  - {name: "ET Telecom - Recent Stories (IN)", type: "rss", url: "https://telecom.economictimes.indiatimes.com/rss/recentstories", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Regulierungs-Ressort desselben Hauses: TRAI, DoT, Spektrumauktionen,
+  # Lizenzrecht. Abruf: 20 Items, 20 datiert, neuestes 2026-08-04, 20/20
+  # frisch. Teilueberschneidung mit recentstories moeglich - wenn nur eine
+  # ET-Quelle gewuenscht ist, diese nehmen, sie hat den hoeheren
+  # Regulierungsanteil. Abnahme: 20 Meldungen, 20 datiert, 20 im
+  # Frischefenster.
+  - {name: "ET Telecom - Policy & Regulation (IN)", type: "rss", url: "https://telecom.economictimes.indiatimes.com/rss/policy", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # B2B-Telko-Publikation mit internationaler Ausrichtung (Betreiber,
+  # Ausruester, Marktzahlen). Abruf: 10 Items, 10 datiert, neuestes
+  # 2026-08-04, 10/10 frisch. Abnahme: 10 Meldungen, 10 datiert, 10 im
+  # Frischefenster.
+  - {name: "TelecomLead (IN)", type: "rss", url: "https://www.telecomlead.com/feed", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Indische Telko-Fachzeitschrift, taegliche Onlineausgabe. Abruf: 10 Items,
+  # 10 datiert, neuestes 2026-08-04, 10/10 frisch. Abnahme: 10 Meldungen, 10
+  # datiert, 10 im Frischefenster.
+  - {name: "Communications Today (IN)", type: "rss", url: "https://www.communicationstoday.co.in/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Fuehrendes indisches Portal fuer Digital- und Telekompolitik
+  # (TRAI-Konsultationen, Netzneutralitaet, Datenschutz, Satelliten-Spektrum).
+  # Abruf: 10 Items, 10 datiert, neuestes 2026-08-04, 10/10 frisch. Kein
+  # reines Telko-Medium, aber Telekomregulierung ist Kernressort. Abnahme: 10
+  # Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "MediaNama (IN)", type: "rss", url: "https://www.medianama.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Pakistanisches Telko-Fachmedium: Jazz, Zong, Ufone, Telenor Pakistan,
+  # PTA-Regulierung, Spektrum. Abruf: 10 Items, 10 datiert, neuestes
+  # 2026-08-04, 10/10 frisch. Abnahme: 10 Meldungen, 10 datiert, 10 im
+  # Frischefenster.
+  - {name: "PhoneWorld (PK)", type: "rss", url: "https://www.phoneworld.com.pk/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Telekom-Ressortfeed der groessten englischsprachigen Tageszeitung
+  # Bangladeschs (BTRC, Grameenphone, Robi, Banglalink). Abruf: 10 Items, 10
+  # datiert, neuestes 2026-08-03, aber nur 2 im 8-Tage-Fenster - geringe
+  # Taktung. WARNUNG: die <title>-Elemente enthalten HTML (<a
+  # href=...>Titel</a>); vor der Aufnahme pruefen, ob der Parser den Ankertext
+  # sauber extrahiert. Abnahme: 10 Meldungen, 10 datiert, 1 im Frischefenster.
+  - {name: "The Daily Star - Telecom (BD)", type: "rss", url: "https://www.thedailystar.net/business/telecom/rss.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Mobilfunk-Ressort von ITmedia: NTT Docomo, KDDI, SoftBank, Rakuten Mobile,
+  # Tarife, Endgeraete, MIC-Regulierung. Abruf: 20 Items, 21 Datumsfelder,
+  # neuestes 2026-08-05, alles frisch. Abnahme: 20 Meldungen, 20 datiert, 20
+  # im Frischefenster.
+  - {name: "ITmedia Mobile (JP)", type: "rss", url: "https://rss.itmedia.co.jp/rss/2.0/mobile.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Schwesterpublikation mit Schwerpunkt Festnetz/Breitband/ISP/Glasfaser -
+  # ergaenzt Ketai Watch (mobil) sinnvoll. Abruf: 20 Items, 21 Datumsfelder,
+  # neuestes 2026-08-05, alles frisch. Ebenfalls RDF. Abnahme: 20 Meldungen,
+  # 20 datiert, 20 im Frischefenster.
+  - {name: "INTERNET Watch / Impress (JP)", type: "rss", url: "https://internet.watch.impress.co.jp/data/rss/1.0/iw/feed.rdf", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Ressortfeed 'Tongsin' (Telekommunikation) der wichtigsten koreanischen
+  # IT-Fachzeitung Jeonja Sinmun: SKT, KT, LG U+, MSIT-Regulierung, 5G/6G.
+  # Abruf: 50 Items, 51 Datumsfelder, neuestes 2026-08-05, alles frisch.
+  # Hinweis: nur ueber http:// erreichbar (rss.etnews.com), https liefert 404.
+  # Abnahme: 40 Meldungen, 40 datiert, 40 im Frischefenster.
+  - {name: "ETNews - Telekommunikation (KR)", type: "rss", url: "http://rss.etnews.com/03.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Taiwanesisches Branchenmedium fuer die ICT-Lieferkette (Chips, Endgeraete,
+  # Netzausruester, Asien-Marktzahlen). Abruf: 53 Items, 53 datiert, neuestes
+  # 2026-08-04, 53/53 frisch. Volltexte sind teilweise kostenpflichtig - Titel
+  # und Teaser im Feed sind frei und fuer die Bewertung ausreichend. Abnahme:
+  # 40 Meldungen, 40 datiert, 40 im Frischefenster.
+  - {name: "DIGITIMES Asia (TW)", type: "rss", url: "https://www.digitimes.com/rss/daily.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Telko-Titel des TechDay-Netzwerks fuer Asien. Abruf: 10 Items, 10 datiert,
+  # neuestes 2026-08-04, 10/10 frisch. WARNUNG: die Schwesterseiten
+  # telconews.com.au und telconews.co.nz teilen sich den Grossteil der
+  # Meldungen (beim Abruf 2 von 3 Titeln identisch) - nur EINE der drei
+  # aufnehmen, sonst gibt es Dubletten, die der URL-Dedup nicht faengt.
+  # Inhaltlich viel Anbieter-PR. Abnahme: 10 Meldungen, 10 datiert, 10 im
+  # Frischefenster.
+  - {name: "TelcoNews Asia (SG/regional)", type: "rss", url: "https://telconews.asia/rss", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Indonesisches Telko- und Digitalmedium seit 2000, eigenstaendig
+  # telekomfokussiert (Telkomsel, Indosat, XLSmart, Komdigi). Abruf: 9 Items,
+  # 9 datiert, neuestes 2026-08-04, 9/9 frisch. Abnahme: 9 Meldungen, 9
+  # datiert, 9 im Frischefenster.
+  - {name: "Selular.ID (ID)", type: "rss", url: "https://selular.id/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Fachblog des langjaehrigen neuseelaendischen Telekomjournalisten: Chorus,
+  # UFB-Glasfaser, Mobilfunkmarkt, Commerce-Commission-Verfahren. Abruf: 15
+  # Items, 15 datiert, neuestes 2026-07-30, aber nur 1 im 8-Tage-Fenster -
+  # Einzelautor, entsprechend seltene Beitraege. Nur als Ergaenzung sinnvoll.
+  # Abnahme: 15 Meldungen, 15 datiert, 1 im Frischefenster.
+  - {name: "Bill Bennett - NZ Telecommunications (NZ)", type: "rss", url: "https://billbennett.co.nz/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Wichtigstes deutsches Telko-Fachportal: Tarife, Netzausbau, Regulierung,
+  # Anbietervergleiche, taeglich mehrere Meldungen. Abruf lieferte 50 Items,
+  # alle mit pubDate, neueste vom Abruftag. Die kleinere Variante /20.rss2
+  # steht als rel=alternate im HTML, /50.rss2 funktioniert ebenso. Abnahme: 40
+  # Meldungen, 40 datiert, 40 im Frischefenster.
+  - {name: "teltarif.de (DE)", type: "rss", url: "https://www.teltarif.de/feed/news/50.rss2", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Deutsches B2B-Fachblatt fuer den TK-Fachhandel und -Vertrieb; berichtet
+  # ueber Tarifpolitik, Provisionen, Netzbetreiber-Strategien im deutschen
+  # Markt. Feed-URL stammt aus dem rel=alternate der Startseite, Abruf
+  # lieferte 50 datierte Items. Abnahme: 40 Meldungen, 40 datiert, 16 im
+  # Frischefenster.
+  - {name: "Telecom Handel (DE)", type: "rss", url: "https://www.telecom-handel.de/feed/rss", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Ressort-Feed (nicht der allgemeine Golem-Feed): ausschliesslich
+  # Telekommunikation. Abruf lieferte 40 datierte Items mit Schlagzeilen wie
+  # '1&1: Unlimited-Tarife' und 'Vodafone baut DOCSIS 4.0 Hardware'. Der
+  # allgemeine Golem-Feed wurde bewusst verworfen (enthaelt
+  # Anzeigen/Amazon-Deals). Abnahme: 40 Meldungen, 40 datiert, 22 im
+  # Frischefenster.
+  - {name: "Golem.de - Telekommunikation (DE)", type: "rss", url: "https://rss.golem.de/rss.php?ms=telekommunikation&feed=RSS2.0", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Eines der aktivsten franzoesischen Telko-Portale; taegliche Meldungen zu
+  # Free, Orange, SFR, Bouygues, zu Tarifen, Boxen und Netzabdeckung. 25
+  # datierte Items. Achtung: /rss.xml ist 404, nur /feed funktioniert.
+  # Abnahme: 25 Meldungen, 25 datiert, 25 im Frischefenster.
+  - {name: "Univers Freebox (FR)", type: "rss", url: "https://www.universfreebox.com/feed", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Franzoesisches Portal fuer Breitband und Mobilfunk mit redaktionellem
+  # Nachrichtenteil zu Glasfaserausbau, Arcep-Regulierung und
+  # Operator-Tarifen. Groesster gemessener Feed der FR-Gruppe: 63 datierte
+  # Items, alle innerhalb der letzten Tage. Feed-URL aus rel=alternate (/feed
+  # ist 404). Abnahme: 40 Meldungen, 40 datiert, 40 im Frischefenster.
+  - {name: "Ariase (FR)", type: "rss", url: "https://www.ariase.com/blog/rss.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Franzoesisches Mobilfunkmedium mit Fokus auf Forfaits, Netzqualitaet und
+  # Betreiberankuendigungen. 35 datierte Items, neueste vom Abruftag. Abnahme:
+  # 35 Meldungen, 35 datiert, 27 im Frischefenster.
+  - {name: "Les Mobiles (FR)", type: "rss", url: "https://www.lesmobiles.com/rss.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Redaktionelles Portal rund um Free/Iliad, deckt aber auch
+  # Arcom/Arcep-Entscheidungen und den franzoesischen Wettbewerb ab. 25
+  # datierte Items. Anbieterlastig - deshalb nur als Ergaenzung zu Univers
+  # Freebox und Ariase gedacht. Abnahme: 25 Meldungen, 25 datiert, 4 im
+  # Frischefenster.
+  - {name: "Freenews (FR)", type: "rss", url: "https://www.freenews.fr/feed", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Franzoesisches Tarifportal mit taeglichem Newsteil; Beispieltitel aus dem
+  # Abruf: 'Bouygues Telecom ouvre le bal des offres de rentree avec une Bbox
+  # fibre a 27,99 euros'. 20 datierte Items. Tarifsignale sind fuer
+  # Wettbewerbsbeobachtung besonders direkt verwertbar. Abnahme: 20 Meldungen,
+  # 20 datiert, 20 im Frischefenster.
+  - {name: "AlloForfait (FR)", type: "rss", url: "https://www.alloforfait.fr/feed", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Spaniens bekanntestes Breitband-/Mobilfunkportal mit sehr dichter
+  # Berichterstattung zu Movistar, Vodafone, Orange, MasOrange, Digi und den
+  # MVNOs. Atom-Feed mit 50 datierten Eintraegen; Beispieltitel: 'Simyo
+  # aumenta la velocidad de la fibra, pero encarece el precio'. Feed-URL aus
+  # rel=alternate (/rss ist 404). Abnahme: 40 Meldungen, 40 datiert, 12 im
+  # Frischefenster.
+  - {name: "Bandaancha.eu (ES)", type: "rss", url: "https://bandaancha.eu/portada.atom", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Spanisches B2B-Fachmedium fuer Netze und Telekommunikation. Klar
+  # wettbewerbsrelevante Titel im Abruf: 'Nueva licitacion de Adif para
+  # servicios de telecomunicaciones', 'Mundial de Futbol 2026: banco de
+  # pruebas para redes telco'. 10 datierte Items. Abnahme: 10 Meldungen, 10
+  # datiert, 10 im Frischefenster.
+  - {name: "Redes&Telecom (ES)", type: "rss", url: "https://www.redestelecom.es/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Italienisches Leitmedium fuer Telekommunikation und Digitalpolitik. Abruf
+  # zeigte genau die gesuchte Ebene: 'Mobile e deep learning, i prossimi passi
+  # per arrivare a reti veramente AI-native', 'Private 5G, il giro d'affari
+  # quintuplichera da qui al 2032'. 10 datierte Items. Abnahme: 10 Meldungen,
+  # 10 datiert, 10 im Frischefenster.
+  - {name: "CorCom - Corriere Comunicazioni (IT)", type: "rss", url: "https://www.corrierecomunicazioni.it/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Italienisches Portal mit sehr engem Fokus auf Mobilfunk- und
+  # Festnetzangebote von TIM, Vodafone/Fastweb, WindTre, Iliad. 15 datierte
+  # Items, neueste vom Abruftag. Liefert Tarifaenderungen frueh und
+  # detailliert. Abnahme: 15 Meldungen, 15 datiert, 15 im Frischefenster.
+  - {name: "MondoMobileWeb (IT)", type: "rss", url: "https://www.mondomobileweb.it/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Polnisches B2B-Fachmedium fuer Telekommunikation - genau die Ebene, die
+  # fehlt. Beispieltitel aus dem Abruf: 'UKE chce umozliwic uzupelnianie
+  # danych o punktach adresowych' (Regulierungsbehoerde UKE). 20 datierte
+  # Items. Feed-URL aus rel=alternate. Abnahme: 20 Meldungen, 20 datiert, 20
+  # im Frischefenster.
+  - {name: "TELKO.in (PL)", type: "rss", url: "https://www.telko.in/rss", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Grosses polnisches Telko-Portal (Orange Polska, Play, Plus, T-Mobile PL,
+  # Tarife und Netzausbau). 50 datierte Items, neueste vom Abruftag. Feed-URL
+  # aus rel=alternate. Abnahme: 40 Meldungen, 40 datiert, 40 im
+  # Frischefenster.
+  - {name: "Telepolis (PL)", type: "rss", url: "https://www.telepolis.pl/rss", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Polnisches Mobilfunk- und Breitbandportal. Der Sammelfeed 'Wszystkie
+  # informacje' lieferte 30 datierte Items, u.a. 'Swiatlowod Inwestycje: 62
+  # proc. zamowien realizowanych w ciagu...' (Glasfaser-Joint-Venture
+  # Orange/APG). Die Rubrikfeeds (/feed/testy-smartfonow etc.) waeren zu eng.
+  # Abnahme: 30 Meldungen, 30 datiert, 30 im Frischefenster.
+  - {name: "GSMONLINE.pl - Wszystkie informacje (PL)", type: "rss", url: "https://www.gsmonline.pl/feed/wszystkie-informacje", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Tschechisches Fachmedium fuer Internet, Telekommunikation und Medien;
+  # deckt O2 CZ, T-Mobile CZ, Vodafone CZ und den Regulierer CTU ab. 20
+  # datierte Items, neueste vom Abruftag. Der Schwesterfeed
+  # digizone.cz/rss/clanky/ liefert dieselben Inhalte als Themenausschnitt und
+  # wurde deshalb nicht zusaetzlich aufgenommen. Abnahme: 20 Meldungen, 20
+  # datiert, 18 im Frischefenster.
+  - {name: "Lupa.cz (CZ)", type: "rss", url: "https://www.lupa.cz/rss/clanky/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Britisches Telko-Fachmedium mit klarer Betreiberperspektive. Abruf
+  # lieferte 24 datierte Items mit Titeln wie 'Italy's FiberCop plots 100 edge
+  # datacentres' und 'What's up with... NTT Docomo, Liberty Global, TIM'.
+  # Feed-URL aus rel=alternate. Abnahme: 24 Meldungen, 24 datiert, 12 im
+  # Frischefenster.
+  - {name: "TelecomTV (UK)", type: "rss", url: "https://www.telecomtv.com/content/news/rss.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Britisches Fachmedium fuer Wholesale-Telekommunikation, Seekabel,
+  # Interconnection und Rechenzentren - eine Ebene, die in den bestehenden 14
+  # Feeds bisher fehlt. 10 datierte Items, neueste vom Abruftag. Abnahme: 10
+  # Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "Capacity Media (UK)", type: "rss", url: "https://www.capacitymedia.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Britisches B2B-Fachblatt fuer den Mobilfunk-Channel; Abruf zeigte eSIM-
+  # und Reise-Konnektivitaetsmeldungen ('Starling joins travel eSIM market
+  # utilising Gigs platform'). 10 datierte Items. Abnahme: 10 Meldungen, 10
+  # datiert, 7 im Frischefenster.
+  - {name: "Mobile News (UK)", type: "rss", url: "https://www.mobilenewscwp.co.uk/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Das brasilianische Leitmedium fuer Telekommunikation, Internet, Satellit
+  # und Mobilfunkdienste. Feed liefert 30 Eintraege, alle 30 datiert, neuester
+  # vom Abruftag. Titel zeigen Anatel-Regulierung, Oi-Restrukturierung,
+  # Netzausbau. Abnahme: 30 Meldungen, 30 datiert, 30 im Frischefenster.
+  - {name: "TELETIME News (BR)", type: "rss", url: "https://teletime.com.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Telko-, Internet- und IKT-Portal aus Brasilia mit sehr hoher Taktung. Feed
+  # liefert 100 Eintraege, alle datiert, neuester vom Abruftag. Inhalte:
+  # Anatel, Satelliten-LEO, Rechenzentren, Glasfaser. Abnahme: 40 Meldungen,
+  # 40 datiert, 40 im Frischefenster.
+  - {name: "TeleSintese (BR)", type: "rss", url: "https://telesintese.com.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Auf Mobilfunk, Mobile Money und Apps spezialisiertes brasilianisches
+  # Fachmedium. 20 Eintraege, alle datiert, neuester vom Abruftag. Abnahme: 20
+  # Meldungen, 20 datiert, 20 im Frischefenster.
+  - {name: "Mobile Time (BR)", type: "rss", url: "https://www.mobiletime.com.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Aeltestes brasilianisches Telko-/IKT-Fachportal, starker Fokus auf
+  # Regulierung und Marktpolitik. 10 Eintraege, alle datiert, neuester vom
+  # Abruftag. Abnahme: 10 Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "Convergencia Digital (BR)", type: "rss", url: "https://www.convergenciadigital.com.br/rss/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Brasilianisches IKT-Fachmedium mit eigener Telecom-Redaktion. 30
+  # Eintraege, alle datiert, neuester vom Abruftag. Breiter als reines Telko -
+  # deckt auch IT-Markt ab. Abnahme: 30 Meldungen, 30 datiert, 29 im
+  # Frischefenster.
+  - {name: "TI Inside Online (BR)", type: "rss", url: "https://tiinside.com.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Beobachtet gezielt die brasilianischen Betreiber, ihre Tarife und
+  # Netzabdeckung - genau die Ebene, die Betreiber-Newsrooms verschweigen. 12
+  # Eintraege, alle datiert, neuester vom Abruftag. Abnahme: 12 Meldungen, 12
+  # datiert, 12 im Frischefenster.
+  - {name: "Minha Operadora (BR)", type: "rss", url: "https://www.minhaoperadora.com.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Verbandsnachrichten der brasilianischen Internetanbieter, Schwerpunkt
+  # Regulierung und Breitbandpolitik. 10 Eintraege, alle datiert, neuester vom
+  # Abruftag. Abnahme: 10 Meldungen, 10 datiert, 8 im Frischefenster.
+  - {name: "ABRANET - Brasilianischer Internetprovider-Verband (BR)", type: "rss", url: "https://www.abranet.org.br/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Das lateinamerikanische Telko-Fachmedium schlechthin, deckt alle Maerkte
+  # der Region ab (Spektrum, Glasfaser, Regulierer). 10 Eintraege, alle
+  # datiert, neuester vom Abruftag. Hinweis: /blog/feed/ liefert 0 Eintraege,
+  # korrekt ist /feed/. Abnahme: 10 Meldungen, 10 datiert, 10 im
+  # Frischefenster.
+  - {name: "TeleSemana (LatAm)", type: "rss", url: "https://www.telesemana.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Spanischsprachige Schwester von Mobile Time, Mobilfunk und Mobile Money in
+  # Mexiko, Chile, Kolumbien, Argentinien. 20 Eintraege, alle datiert,
+  # neuester vom Abruftag. Abnahme: 20 Meldungen, 20 datiert, 20 im
+  # Frischefenster.
+  - {name: "Mobile Time Latinoamerica (LatAm)", type: "rss", url: "https://mobiletime.la/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Digital Policy & Law, mexikanisch gegruendet, berichtet ueber
+  # Telko-Regulierung in ganz Lateinamerika (CRT, CRC, Subtel, Osiptel). 10
+  # Eintraege, alle datiert, neuester vom Abruftag. Achtung: die alte Domain
+  # digitalpolicylaw.com liefert nur einen toten Feed von 2023. Abnahme: 10
+  # Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "DPL News (MX/LatAm)", type: "rss", url: "https://dplnews.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Argentinisches Fachmagazin fuer Telekommunikation und IT in Lateinamerika.
+  # 10 Eintraege, alle datiert, neuester vom Abruftag. Abnahme: 10 Meldungen,
+  # 10 datiert, 10 im Frischefenster.
+  - {name: "Prensario TILA (AR/LatAm)", type: "rss", url: "https://prensariotila.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Suedafrikas groesstes IKT-Fachmedium mit eigener Telecoms-Redaktion;
+  # direkt relevant fuer Vodacom, MTN, Telkom, ICASA. 37 Eintraege, alle
+  # datiert, neuester vom Abruftag. Kategoriefeeds (/rss/telecoms) existieren
+  # nicht, nur der Gesamtfeed. Abnahme: 37 Meldungen, 37 datiert, 29 im
+  # Frischefenster.
+  - {name: "ITWeb (ZA)", type: "rss", url: "https://www.itweb.co.za/rss", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Fuehrendes suedafrikanisches Tech-/Telko-Nachrichtenmedium, taeglich
+  # Meldungen zu Vodacom, MTN, MultiChoice, Spektrum. 20 Eintraege, alle
+  # datiert, neuester vom Abruftag. Abnahme: 20 Meldungen, 20 datiert, 20 im
+  # Frischefenster.
+  - {name: "TechCentral (ZA)", type: "rss", url: "https://techcentral.co.za/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Kategoriefeed statt Gesamtfeed - liefert nur Mobilfunk-/Telko-Meldungen,
+  # dadurch hohe Trefferdichte (im Abruf u.a. Telkom, Netzeffizienz). 16
+  # Eintraege, alle datiert, neuester einen Tag alt. Der Gesamtfeed /feed/ ist
+  # instabil (mal 403, mal Abbruch), der Kategoriefeed lief in beiden
+  # Messungen. Abnahme: 16 Meldungen, 16 datiert, 2 im Frischefenster.
+  - {name: "IT News Africa - Mobile & Telecoms (ZA)", type: "rss", url: "https://www.itnewsafrica.com/category/mobile-and-telecoms/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Panafrikanisches Telko-Fachmedium aus dem Light-Reading-Umfeld, aber
+  # eigenstaendige Redaktion und eigene Domain. 50 Eintraege, alle datiert,
+  # neuester vom Abruftag; Titel u.a. 5G-Lizenzen Ghana, Breitband Accra.
+  # Abnahme: 40 Meldungen, 40 datiert, 11 im Frischefenster.
+  - {name: "Connecting Africa (Pan-Afrika)", type: "rss", url: "https://www.connectingafrica.com/rss.xml", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Fachmagazin fuer Mobilfunk, Satellit, Breitband und Buendelfunk in Afrika.
+  # 10 Eintraege, alle datiert, neuester vom Abruftag. Abnahme: 10 Meldungen,
+  # 10 datiert, 10 im Frischefenster.
+  - {name: "African Wireless Communications (Pan-Afrika)", type: "rss", url: "https://africanwirelesscomms.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Sektionsfeed der Telekom-/Digitalredaktion von Ecofin. Im Abruf u.a.
+  # Safaricom Ethiopia, Inwi-Netzausbau Marokko, digitale Steuer in der DR
+  # Kongo - also genau Vodafone-Maerkte. 30 Eintraege, alle datiert, neuester
+  # vom Abruftag. Wichtig: die franzoesische Domain agenceecofin.com liefert
+  # 403, ecofinagency.com funktioniert. Feed hat ein fuehrendes Leerzeichen
+  # vor der XML-Deklaration - Parser muss das tolerieren. Abnahme: 30
+  # Meldungen, 30 datiert, 23 im Frischefenster.
+  - {name: "Ecofin Agency - Telecom & Digital (Pan-Afrika)", type: "rss", url: "https://www.ecofinagency.com/component/obrss/agency-rss-tags-tech", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Wichtigstes nigerianisches Tech-Wirtschaftsmedium mit ausfuehrlicher
+  # Telko-Berichterstattung (im Abruf Glo-Teilnehmerzahlen,
+  # 90.000-km-Glasfasernetz). 10 Eintraege, alle datiert, neuester vom
+  # Abruftag. Abnahme: 10 Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "TechCabal (NG)", type: "rss", url: "https://techcabal.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Nigerianisches Tech-Medium mit Betreiber-Analysen (im Abruf MTN Nigeria
+  # Umsatz/Fintech). 10 Eintraege, alle datiert, neuester vom Abruftag.
+  # Abnahme: 10 Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "Technext (NG)", type: "rss", url: "https://technext24.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Ausdruecklich auf Telekommunikation und Rundfunk spezialisiertes
+  # nigerianisches Fachblatt (NCC, NBC). 10 Eintraege, alle datiert, neuester
+  # einen Tag alt. Abnahme: 10 Meldungen, 10 datiert, 10 im Frischefenster.
+  - {name: "Nigeria CommunicationsWeek (NG)", type: "rss", url: "https://nigeriacommunicationsweek.com.ng/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Franzoesischsprachiges Fachmedium fuer Telekommunikation und
+  # Digitalwirtschaft in Afrika, Redaktion in Kamerun. 15 Eintraege, alle
+  # datiert, neuester vom Abruftag. Abnahme: 15 Meldungen, 15 datiert, 15 im
+  # Frischefenster.
+  - {name: "Digital Business Africa (frankophones Afrika)", type: "rss", url: "https://www.digitalbusiness.africa/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Fuehrendes Telko-Fachmagazin der Golfregion (Saudi-Arabien, VAE); im Abruf
+  # saudische Lizenz- und Cyberthemen, 6-GHz-Spektrum. 10 Eintraege, alle
+  # datiert, neuester vom Abruftag. Der Joomla-Pfad index.php?format=feed
+  # liefert HTML, korrekt ist /feed/. Abnahme: 10 Meldungen, 10 datiert, 10 im
+  # Frischefenster.
+  - {name: "Telecom Review (Naher Osten)", type: "rss", url: "https://www.telecomreview.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
+  # Tuerkisches Fachportal fuer Internet und Telekommunikation, inkl.
+  # Regulierung und Netzbetrieb. 12 Eintraege, alle datiert, neuester vom
+  # Abruftag. Ohne www aufrufen - www.turk-internet.com/portal/rss.php ist
+  # tot. Abnahme: 12 Meldungen, 12 datiert, 12 im Frischefenster.
+  - {name: "Turk-Internet.com (TR)", type: "rss", url: "https://turk-internet.com/feed/", herkunft: "Welle 1 (Breitensuche + Musteruebertragung)", abgenommen: "2026-08-04"}
