@@ -130,7 +130,12 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload pipeline log
-        if: failure() || cancelled()
+        # IMMER, nicht nur bei Fehlschlag. Laeufe #69 und #70 sind formal
+        # gelungen und haben trotzdem 42 von 72 bzw. 28 von 44
+        # Analysten-Stapeln verloren - warum, stand nur im Log, und das gab
+        # es nicht, weil der Job ja "erfolgreich" war. Ein Artefakt je Lauf
+        # kostet nichts und ist der Unterschied zwischen Diagnose und Raten.
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: telco-radar-pipeline-log-${{ github.run_id }}
