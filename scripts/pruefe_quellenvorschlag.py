@@ -235,6 +235,7 @@ class Befund:
     n_frisch: int = 0
     neuestes: str = ""
     titelprobe: list[str] = field(default_factory=list)
+    item_urls: list[str] = field(default_factory=list)
     fehler: str = ""
 
     def pruefe(self, nummer: int, name: str, ok: bool, detail: str = "") -> bool:
@@ -275,6 +276,7 @@ class Befund:
             "n_frisch": self.n_frisch,
             "neuestes": self.neuestes,
             "titelprobe": self.titelprobe,
+            "item_urls": self.item_urls,
             "kriterien": self.kriterien,
             "fehler": self.fehler,
         }
@@ -474,6 +476,11 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
                  + ("" if stabil else " - die Seite antwortet wechselhaft"))
 
     b.n_items = len(items)
+    # Die Meldungs-URLs mitnehmen: erst damit lassen sich die Kandidaten am
+    # Ende auch GEGENEINANDER auf Dubletten pruefen. Ohne das bestehen zwei
+    # Pfade derselben Seite beide - im Lauf vom 04.08.2026 waren das 4 von 15
+    # Treffern (Turkcell /rss und /rss.xml, MTN mit und ohne _embed, ...).
+    b.item_urls = sorted({normalize_url(i.url) for i in items})[:80]
     datiert = [i for i in items if i.published]
     b.n_datiert = len(datiert)
     if datiert:
@@ -716,6 +723,34 @@ def main(argv: list[str] | None = None) -> int:
 
     reihenfolge = {normalize_url(k.url): n for n, k in enumerate(kandidaten)}
     ergebnisse.sort(key=lambda e: reihenfolge.get(normalize_url(e["url"]), 0))
+
+    # --- Kriterium 7c: die Kandidaten GEGENEINANDER.
+    # Der Check vergleicht jeden Vorschlag mit dem Bestand - aber zwei
+    # Vorschlaege, die dieselbe Seite unter zwei Pfaden treffen, bestehen
+    # beide. Bei 101 mechanisch gefundenen Kandidaten waren das 4 von 15
+    # Treffern (Turkcell /rss und /rss.xml, MTN mit und ohne _embed).
+    # Laeuft NACH dem Cache, weil das Ergebnis von der ganzen Liste abhaengt.
+    angenommen: list[tuple[str, set]] = []
+    for e in ergebnisse:
+        if not e.get("bestanden"):
+            continue
+        eigene = set(e.get("item_urls") or [])
+        if not eigene:
+            angenommen.append((e["url"], eigene))
+            continue
+        for andere_url, andere in angenommen:
+            ueberlappung = len(eigene & andere) / len(eigene)
+            if ueberlappung > MAX_ITEM_OVERLAP:
+                e["bestanden"] = False
+                e.setdefault("kriterien", []).append({
+                    "nr": 7, "name": "keine Dublette unter den Kandidaten",
+                    "ok": False,
+                    "detail": f"{ueberlappung:.0%} gemeinsame Meldungen mit "
+                              f"{andere_url} - dieselbe Seite unter zwei "
+                              f"Pfaden ist EINE Quelle"})
+                break
+        else:
+            angenommen.append((e["url"], eigene))
 
     bestanden = [e for e in ergebnisse if e.get("bestanden")]
     print(f"{'ERGEBNIS':9} {'ITEMS':>5} {'DAT':>4} {'FRISCH':>6} {'NEUESTES':>11}  "

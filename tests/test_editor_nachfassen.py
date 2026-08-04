@@ -34,14 +34,17 @@ REGIONAL = {"Europa": {"highlights": [
     {"title": "Ein Titel", "operator": "Telekom", "url": "https://example.com/a",
      "relevance": 4, "summary": "Etwas ist passiert."}]}}
 
-BEREICH_ANTWORT = json.dumps({
-    "kurzfassung": "In Europa passierte dies und das.",
-    "abschnitt": "Zwei Saetze zur Region. "
-                 "- **Telekom**: Etwas. [Quelle](https://example.com/a)",
-    "top": [{"title": "Ein Titel", "operator": "Telekom",
-             "url": "https://example.com/a", "relevance": 4, "warum": "stark"}],
-    "themen": ["Telekom: Titel"],
-}, ensure_ascii=False)
+BEREICH_ANTWORT = """===KURZFASSUNG===
+In Europa passierte dies und das.
+===ABSCHNITT===
+Zwei Saetze zur Region.
+- **Telekom**: Etwas. [Quelle](https://example.com/a)
+===TOP===
+[{"title": "Ein Titel", "operator": "Telekom", "url": "https://example.com/a",
+  "relevance": 4, "warum": "stark"}]
+===THEMEN===
+["Telekom: Titel"]
+"""
 
 
 def _antworten(monkeypatch, folge: list[str]) -> list[str]:
@@ -135,10 +138,8 @@ def test_empfehlung_aus_einem_bereichsabschnitt_wird_auch_gefunden(monkeypatch):
     Bereichsredakteur die Regel unterlaufen, die fuer die Chefredaktion gilt."""
     def fake_complete(system, user, model, max_tokens=5000):
         if system.startswith("You are the section editor"):
-            return json.dumps({
-                "kurzfassung": "k",
-                "abschnitt": "Vodafone sollte hier reagieren.",
-                "top": [], "themen": []})
+            return ("===KURZFASSUNG===\nk\n===ABSCHNITT===\n"
+                    "Vodafone sollte hier reagieren.\n")
         return GUELTIG
 
     monkeypatch.setattr(editor, "complete", fake_complete)

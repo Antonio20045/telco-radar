@@ -126,19 +126,29 @@ concrete offer or project. Market observation, not a recommendation memo.
 No filler, no marketing phrases, no advice for Vodafone.
 
 You receive the assessed items of YOUR area only, plus the topics already
-covered in earlier editions. Respond with ONLY valid JSON, no markdown fence:
+covered in earlier editions. Answer in EXACTLY four blocks, each introduced
+by its marker line, in this order and with nothing before the first marker:
 
-{{
-  "kurzfassung": "<3-5 sentences in {language}: what happened in this area this week and where it points. This is what the chief editor sees - it must stand on its own.>",
-  "abschnitt": "<the finished section as Markdown, WITHOUT a heading (the heading is added by the system). Start with 2-3 sentences on the area, then the items, most relevant first, 1-2 sentences each, EVERY one with its [Quelle](url). Use \\n for line breaks.>",
-  "top": [
-    {{"title": "<verbatim title>", "operator": "<company>", "url": "<verbatim url>", "relevance": <1-5>, "warum": "<one sentence: why this is one of the strongest items of the area>"}}
-  ],
-  "themen": ["<short topic string per item you covered, e.g. 'Orange: eSIM-Tarif'>"]
-}}
+===KURZFASSUNG===
+3-5 sentences in {language}: what happened in this area this week and where
+it points. This is the ONLY thing the chief editor sees of your area - it
+must stand on its own.
+
+===ABSCHNITT===
+The finished section as Markdown, WITHOUT a heading (the heading is added by
+the system). Start with 2-3 sentences on the area, then the items, most
+relevant first, 1-2 sentences each, EVERY one with its [Quelle](url).
+
+===TOP===
+A JSON array of at most {top_n} objects, the strongest items of your area,
+relevance 5 first:
+[{{"title": "<verbatim title>", "operator": "<company>", "url": "<verbatim url>", "relevance": <1-5>, "warum": "<one sentence: why this is one of the strongest items>"}}]
+
+===THEMEN===
+A JSON array of short topic strings, one per item you covered, e.g.
+["Orange: eSIM-Tarif", "Telefonica: Glasfaser-Ausbau"]
 
 Rules:
-- "top" holds the {top_n} strongest items at most, relevance 5 first.
 - Never invent items or URLs. Use only what is in the input list.
 - Items whose topic is already in "already_covered" belong in the section
   only if there is a genuinely new development - then as "Update zu ...".
@@ -295,6 +305,63 @@ def _notabschnitt(bereich: str, daten: dict) -> dict:
     }
 
 
+_MARKEN = ("===KURZFASSUNG===", "===ABSCHNITT===", "===TOP===",
+           "===THEMEN===")
+
+
+def zerlege_bereichsantwort(roh: str) -> dict:
+    """Die vier Bloecke eines Bereichsredakteurs auseinandernehmen.
+
+    Warum Trennmarken statt JSON: der Abschnitt ist mehrzeiliges Markdown,
+    und mehrzeiliger Text in einem JSON-String ist die klassische Stelle, an
+    der ein Modell den rohen Zeilenumbruch stehen laesst. json.loads wirft
+    dann, der Bereich faellt in den Notabschnitt, und im Bericht steht statt
+    einer Redaktion eine Linkliste - fuer JEDEN Bereich, weil alle denselben
+    Prompt bekommen. Mit Trennmarken kann der Abschnitt aussehen, wie er
+    will. Dieselbe Bauart benutzt der Chefredaktions-Prompt seit jeher fuer
+    seine Themenliste (===TOPICS===).
+
+    Fehlende Bloecke sind kein Fehler: ohne "top" bekommt die Chefredaktion
+    fuer diesen Bereich eben nur die Kurzfassung. Ohne Abschnitt schon - das
+    prueft der Aufrufer.
+    """
+    text = roh.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[-1]
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+    bloecke: dict[str, str] = {}
+    aktuell = ""
+    for zeile in text.splitlines():
+        marke = zeile.strip().upper()
+        if marke in _MARKEN:
+            aktuell = marke
+            bloecke[aktuell] = ""
+            continue
+        if aktuell:
+            bloecke[aktuell] += zeile + "\n"
+
+    def _liste(marke: str) -> list:
+        inhalt = (bloecke.get(marke) or "").strip().strip("`")
+        if not inhalt:
+            return []
+        try:
+            wert = json.loads(inhalt[inhalt.find("["):] if "[" in inhalt
+                              else inhalt)
+        except (json.JSONDecodeError, ValueError):
+            log.warning("Bereichsredaktion: %s unlesbar - wird uebergangen",
+                        marke)
+            return []
+        return wert if isinstance(wert, list) else []
+
+    return {
+        "kurzfassung": (bloecke.get("===KURZFASSUNG===") or "").strip(),
+        "abschnitt": (bloecke.get("===ABSCHNITT===") or "").strip(),
+        "top": _liste("===TOP==="),
+        "themen": [str(t) for t in _liste("===THEMEN===")],
+    }
+
+
 def bereichsredaktion(bereich: str, daten: dict, model: str,
                       language: str, already_covered: list[str],
                       ist_thema: bool = False) -> dict:
@@ -314,12 +381,9 @@ def bereichsredaktion(bereich: str, daten: dict, model: str,
     }, ensure_ascii=False)
     try:
         roh = complete(system, user, model=model, max_tokens=BEREICH_MAX_TOKENS)
-        ergebnis = extract_json(roh)
-        if not str(ergebnis.get("abschnitt") or "").strip():
+        ergebnis = zerlege_bereichsantwort(roh)
+        if not ergebnis["abschnitt"]:
             raise ValueError("leerer Abschnitt")
-        ergebnis.setdefault("kurzfassung", "")
-        ergebnis.setdefault("top", [])
-        ergebnis.setdefault("themen", [])
         return ergebnis
     except (ValueError, RuntimeError, KeyError, TypeError) as exc:
         log.error("Bereichsredaktion %s fehlgeschlagen (%s) - Notabschnitt",

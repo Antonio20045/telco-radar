@@ -47,15 +47,16 @@ def _regional(bereiche: dict[str, int]) -> dict:
     }
 
 
-def _bereichsantwort(bereich: str) -> str:
-    return json.dumps({
-        "kurzfassung": f"Kurzfassung {bereich}.",
-        "abschnitt": f"Abschnitt {bereich}. [Quelle](https://example.com/q)",
-        "top": [{"title": f"{bereich} Meldung 0", "operator": "Firma0",
-                 "url": f"https://example.com/{bereich}/0", "relevance": 5,
-                 "warum": "stark"}],
-        "themen": [f"{bereich}: Thema"],
-    }, ensure_ascii=False)
+def _bereichsantwort(bereich: str, abschnitt: str | None = None) -> str:
+    """Die vier Bloecke, wie ein Bereichsredakteur sie liefert."""
+    top = json.dumps([{"title": f"{bereich} Meldung 0", "operator": "Firma0",
+                       "url": f"https://example.com/{bereich}/0",
+                       "relevance": 5, "warum": "stark"}], ensure_ascii=False)
+    return (f"===KURZFASSUNG===\nKurzfassung {bereich}.\n"
+            f"===ABSCHNITT===\n"
+            f"{abschnitt or f'Abschnitt {bereich}. [Quelle](https://example.com/q)'}\n"
+            f"===TOP===\n{top}\n"
+            f"===THEMEN===\n[\"{bereich}: Thema\"]\n")
 
 
 def _aufrufe(monkeypatch, chef: str = CHEF) -> list[dict]:
@@ -224,7 +225,7 @@ def test_ausgefallener_bereichsredakteur_verliert_keine_meldung(monkeypatch):
 def test_unbrauchbare_antwort_gilt_als_ausfall(monkeypatch):
     def fake_complete(system, user, model, max_tokens=5000):
         if system.startswith("You are the section editor"):
-            return json.dumps({"kurzfassung": "da", "abschnitt": "  "})
+            return "===KURZFASSUNG===\nda\n===ABSCHNITT===\n   \n"
         return CHEF
 
     monkeypatch.setattr(editor, "complete", fake_complete)
@@ -262,10 +263,8 @@ def test_ueberschriften_im_bereichsabschnitt_bleiben_unter_ihrer_klammer(monkeyp
     Gliederung des ganzen Berichts."""
     def fake_complete(system, user, model, max_tokens=5000):
         if system.startswith("You are the section editor"):
-            return json.dumps({
-                "kurzfassung": "k",
-                "abschnitt": "## Eigenmaechtige Ueberschrift\nText dazu.",
-                "top": [], "themen": []})
+            return _bereichsantwort(
+                "X", "## Eigenmaechtige Ueberschrift\nText dazu.")
         return CHEF
 
     monkeypatch.setattr(editor, "complete", fake_complete)

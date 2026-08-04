@@ -57,10 +57,8 @@ def _stufen(monkeypatch, chef: str = BASIS) -> list[str]:
     def fake_complete(system, user, model, max_tokens=5000):
         gesehen.append(system)
         if system.startswith("You are the section editor"):
-            return json.dumps({
-                "kurzfassung": "Kurz.",
-                "abschnitt": "Abschnittstext. [Quelle](https://example.com/x)",
-                "top": [], "themen": []})
+            return ("===KURZFASSUNG===\nKurz.\n===ABSCHNITT===\n"
+                    "Abschnittstext. [Quelle](https://example.com/x)\n")
         return chef
 
     monkeypatch.setattr(editor, "complete", fake_complete)
