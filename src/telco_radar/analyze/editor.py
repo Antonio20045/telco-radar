@@ -152,8 +152,44 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
     # still take it (~4 characters per token).
     log.info("Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
              n_highlights, len(user) / 1024, len(user) // 4000, model)
-    raw = complete(EDITOR_SYSTEM.format(language=language), user,
-                   model=model, max_tokens=5000)
+    system = EDITOR_SYSTEM.format(language=language)
+    try:
+        return _ein_versuch(system, user, model)
+    except EditorialBriefingError as exc:
+        # Der Wochenbericht ist das Herzstueck der Seite. Ihn beim ersten
+        # Formfehler wegzuwerfen und stattdessen den Roh-Digest zu
+        # veroeffentlichen, ist die teuerste moegliche Reaktion - der Inhalt
+        # war ja da, nur die Gliederung stimmte nicht. Also einmal gezielt
+        # nachfassen, mit den Ueberschriften woertlich im Auftrag.
+        log.warning("Editor-Ausgabe abgelehnt (%s) - ein Korrekturversuch", exc)
+        return _ein_versuch(system + NACHFASSEN, user, model)
+
+
+# Wird nur an den zweiten Versuch angehaengt.
+NACHFASSEN = """
+
+WICHTIG - der vorherige Versuch wurde verworfen, weil die Gliederung nicht
+stimmte. Die Ueberschriften muessen WOERTLICH und als H2 ("## ") vorkommen,
+in genau dieser Schreibweise, ohne Nummerierung und ohne Zusaetze:
+
+## Auf einen Blick
+## Das Wichtigste
+## Die wichtigsten Signale
+## Muster der Woche
+
+Beginne die Antwort unmittelbar mit "## Auf einen Blick" - kein Vorwort, kein
+Titel, kein Code-Block darum.
+"""
+
+# Der Bericht selbst bleibt unter ~1900 Woertern, aber danach folgt noch die
+# Themenliste mit einem Eintrag je behandelter Meldung. In einer Woche mit 147
+# bewerteten Meldungen ist die allein mehrere tausend Token lang - mit den
+# alten 5000 waere die Antwort mitten im Anhang abgerissen.
+EDITOR_MAX_TOKENS = 8000
+
+
+def _ein_versuch(system: str, user: str, model: str) -> tuple[str, list[str]]:
+    raw = complete(system, user, model=model, max_tokens=EDITOR_MAX_TOKENS)
 
     topics: list[str] = []
     markdown = raw
@@ -166,6 +202,13 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         except json.JSONDecodeError:
             log.warning("Editor topic list unparseable - continuing without")
     markdown = markdown.strip()
+    # Ein Modell, das die Gliederung sonst richtig hat, packt die Antwort
+    # gelegentlich in einen Markdown-Codeblock. Dann beginnt keine Zeile mit
+    # "## " und der Bericht faellt aus formalen Gruenden durch.
+    if markdown.startswith("```"):
+        markdown = markdown.split("\n", 1)[-1]
+        if markdown.rstrip().endswith("```"):
+            markdown = markdown.rstrip()[:-3].rstrip()
     validate_editorial_briefing(markdown)
     return markdown, topics
 
@@ -191,8 +234,17 @@ def validate_editorial_briefing(markdown: str) -> None:
     missing = required - headings
     if missing or "## wochenueberblick" in headings:
         detail = ", ".join(sorted(missing)) or "Roh-Digest erkannt"
+        # Was der Editor STATTDESSEN geliefert hat, gehoert in die Meldung.
+        # Im Lauf vom 04.08.2026 fehlten alle vier Pflicht-Ueberschriften,
+        # auch die erste - damit war aus dem Protokoll nicht zu erkennen, ob
+        # das Modell andere Titel waehlte, die Antwort abgeschnitten wurde
+        # oder etwas ganz anderes zurueckkam. Ohne diese Zeilen bleibt nur
+        # Raten.
+        gefunden = ", ".join(sorted(headings)[:8]) or "keine H2-Ueberschrift"
+        anfang = " ".join(markdown[:300].split())
         raise EditorialBriefingError(
-            f"Editor output is not a publishable weekly briefing ({detail})."
+            f"Editor output is not a publishable weekly briefing ({detail}). "
+            f"Gefunden: {gefunden}. Anfang: {anfang!r}"
         )
     lowered = markdown.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
     if any(phrase in lowered for phrase in

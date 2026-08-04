@@ -37,6 +37,14 @@ jobs:
     timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Ohne das klont checkout flach (depth 1). Der Commit-Schritt unten
+          # rebast auf den Standard-Branch; ohne gemeinsame Historie haelt git
+          # dann JEDE Datei fuer neu und bricht mit "CONFLICT (add/add)" ab.
+          # Auf dem Standard-Branch faellt das nicht auf (dort ist HEAD schon
+          # der Rebase-Zielpunkt), auf jedem anderen Branch schon: Lauf #63 hat
+          # den fertigen Bericht deshalb erzeugt und dann verworfen.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -135,7 +143,8 @@ jobs:
             # Rebase onto any commits pushed while the run was in flight, then push.
             pushed=0
             for attempt in 1 2 3; do
-              if git pull --rebase --autostash origin main && git push; then
+              if git pull --rebase --autostash origin "$GITHUB_REF_NAME" \
+               && git push origin "HEAD:$GITHUB_REF_NAME"; then
                 echo "pushed"
                 pushed=1
                 break
