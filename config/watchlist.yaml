@@ -417,18 +417,14 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.telus.com/en/about/newsroom
-      # Cision Kanada (newswire.ca) ist Telus' offizieller Verbreitungsweg -
-      # dieselbe Ausnahme vom Grundsatz "eigene Domain" wie bei Telia und
-      # Bell Canada, die beide schon ueber Cision laufen. Anders als der
-      # JS-Newsroom ist diese Quelle statisch abrufbar und damit ueberhaupt
-      # pruefbar; sie fuehrt zusaetzlich die Ad-hoc- und Dividendenmeldungen
-      # der TELUS Corporation.
-      # Bewusst ZUSAETZLICH statt als Ersatz: der JS-Newsroom liefert in
-      # GitHub Actions zuverlaessig. Eine gewisse Ueberschneidung auf
-      # Story-Ebene ist der Preis dafuer - messen liess sie sich nicht, weil
-      # der JS-Newsroom lokal gar nicht abrufbar ist.
-      - type: newsroom
-        url: https://www.newswire.ca/news/telus-communications-inc/
+      # VERWORFEN, nicht vergessen: https://www.newswire.ca/news/telus-communications-inc/
+      # bestand den Abnahme-Check im Einzelabruf mit 23 von 23 datierten
+      # Meldungen - im Gesamtlauf und bei zwei Wiederholungen lieferte
+      # dieselbe URL dann 30 Meldungen mit NULL Datum. newswire.ca liefert das
+      # Kartenlayout offenbar wechselnd mit und ohne Zeitstempel aus. Eine
+      # undatierte Meldung sortiert ans Ende und wird faktisch nie gelesen,
+      # also ist eine Quelle, die das bei jedem zweiten Abruf tut, unbrauchbar.
+      # Dasselbe betrifft die bestehende Bell-Canada-Quelle (siehe dort).
   latin_america:
     name: Lateinamerika
     operators:

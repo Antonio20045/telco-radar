@@ -297,7 +297,7 @@ class Bestand:
 
 
 def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
-                  ueberlappung_pruefen: bool) -> Befund:
+                  ueberlappung_pruefen: bool, zweimal: bool = False) -> Befund:
     b = Befund(kandidat=kand)
     http_cfg = bestand.http_cfg
 
@@ -360,6 +360,34 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
         return b
     b.pruefe(1, "Abruf ueber collect_source", True,
              f"{len(items)} Meldungen")
+
+    # --- Kriterium 1b: derselbe Abruf ein zweites Mal.
+    # Am 04.08.2026 teuer gelernt: newswire.ca lieferte im Einzelabruf 23 von
+    # 23 Meldungen SAUBER DATIERT und beim naechsten Abruf 30 Meldungen ganz
+    # OHNE Datum - dasselbe Kartenlayout, einmal mit und einmal ohne
+    # Zeitstempel. Eine undatierte Meldung sortiert ans Ende und wird faktisch
+    # nie bewertet; eine Quelle, die das bei jedem zweiten Abruf tut, ist
+    # unbrauchbar, besteht aber jeden Check, der nur einmal hinsieht.
+    # Nur fuer geparste Seiten sinnvoll - ein RSS-Feed hat das Problem nicht -,
+    # und nur auf Wunsch, weil es jeden Abruf verdoppelt.
+    if zweimal and kand.type in ("newsroom", "json_api"):
+        try:
+            zweite = collect_source(kand.als_source(), region,
+                                    kand.operator or None, origin, http_cfg)
+        except Exception as exc:  # noqa: BLE001
+            zweite = []
+            b.fehler = f"2. Abruf: {type(exc).__name__}: {str(exc)[:120]}"
+        d1 = sum(1 for i in items if i.published)
+        d2 = sum(1 for i in zweite if i.published)
+        a1 = d1 / len(items) if items else 0.0
+        a2 = d2 / len(zweite) if zweite else 0.0
+        stabil = (len(zweite) >= MIN_ITEMS
+                  and abs(a1 - a2) <= 0.2
+                  and a2 >= MIN_DATED_SHARE)
+        b.pruefe(1, "zweiter Abruf stabil", stabil,
+                 f"1. Abruf {len(items)} Meldungen/{a1:.0%} datiert, "
+                 f"2. Abruf {len(zweite)} Meldungen/{a2:.0%} datiert"
+                 + ("" if stabil else " - die Seite antwortet wechselhaft"))
 
     b.n_items = len(items)
     datiert = [i for i in items if i.published]
@@ -479,6 +507,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--no-overlap", action="store_true",
                    help="Inhaltsdubletten-Pruefung (Kriterium 7b) ueberspringen "
                         "- spart Abrufe, uebersieht aber zwei Pfade derselben Seite")
+    p.add_argument("--zweimal", action="store_true",
+                   help="geparste Seiten (newsroom/json_api) ein zweites Mal "
+                        "abrufen und auf gleiche Ausbeute pruefen - faengt "
+                        "Seiten, die wechselnd mit und ohne Datum ausliefern")
     p.add_argument("--nur-bestanden", action="store_true",
                    help="Nur die bestandenen Kandidaten ausgeben")
     args = p.parse_args(argv)
@@ -507,7 +539,8 @@ def main(argv: list[str] | None = None) -> int:
     befunde: list[Befund] = []
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         futs = {pool.submit(_pruefe_einen, k, bestand, lookback,
-                            not args.no_overlap): k for k in kandidaten}
+                            not args.no_overlap, args.zweimal): k
+                for k in kandidaten}
         for fut in as_completed(futs):
             befunde.append(fut.result())
 

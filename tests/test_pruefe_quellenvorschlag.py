@@ -56,13 +56,54 @@ def _items(n: int, *, datiert: int | None = None, frisch: int = 3,
     return out
 
 
-def _pruefe(kand: pq.Kandidat, items, bestand=None, overlap=False):
+def _pruefe(kand: pq.Kandidat, items, bestand=None, overlap=False,
+            zweimal=False, zweite=None):
+    """`zweite` erlaubt es, dem zweiten Abruf ein ANDERES Ergebnis zu geben -
+    genau der Fall, den Kriterium 1b faengt."""
     original = pq.collect_source
-    pq.collect_source = lambda *a, **k: items
+    antworten = [items] if zweite is None else [items, zweite]
+
+    def fake(*a, **k):
+        return antworten.pop(0) if len(antworten) > 1 else antworten[0]
+
+    pq.collect_source = fake
     try:
-        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap)
+        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap,
+                                zweimal)
     finally:
         pq.collect_source = original
+
+
+def test_wechselhafte_quelle_faellt_beim_zweiten_abruf_durch():
+    """newswire.ca, 04.08.2026: erster Abruf 23 von 23 datiert, zweiter Abruf
+    30 Meldungen ganz ohne Datum. Ein Check, der nur einmal hinsieht, laesst
+    so etwas durch - und undatierte Meldungen liest kein Analyst je."""
+    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
+                    operator="Beispiel", website="example.com")
+    gut = _items(23)
+    schlecht = _items(30, datiert=0, frisch=0)
+    b = _pruefe(k, gut, zweimal=True, zweite=schlecht)
+    assert not b.bestanden
+    assert not _grund(b, 1, "zweiter Abruf")["ok"]
+    # Ohne den zweiten Abruf haette dieselbe Quelle bestanden.
+    assert _pruefe(k, gut).bestanden
+
+
+def test_stabile_quelle_besteht_auch_den_zweiten_abruf():
+    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(23), zweimal=True, zweite=_items(23))
+    assert b.bestanden, b.durchgefallen
+
+
+def test_zweiter_abruf_gilt_nur_fuer_geparste_seiten():
+    """Ein RSS-Feed hat das Problem nicht - der doppelte Abruf waere nur
+    doppelte Last."""
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(12), zweimal=True)
+    assert b.bestanden
+    assert not [x for x in b.kriterien if "zweiter Abruf" in x["name"]]
 
 
 def _grund(befund, nr, name_enthaelt=""):
