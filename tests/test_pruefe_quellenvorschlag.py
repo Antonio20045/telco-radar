@@ -132,6 +132,25 @@ def test_navigationslabels_fallen_durch():
     assert not _grund(b, 5)["ok"]
 
 
+def test_identische_titel_fallen_durch():
+    """Gemessen am SEC-EDGAR-Feed von AT&T: 40 sauber datierte Meldungen,
+    alle mit dem Titel "8-K - Current report". Technisch tadellos, inhaltlich
+    wertlos - und die Navigationslabel-Regel greift dort nicht."""
+    k = pq.Kandidat(url="https://www.sec.gov/edgar", type="rss",
+                    operator="Beispiel", website="example.com",
+                    ausnahme_domain="SEC EDGAR")
+    from datetime import datetime, timezone
+    formulare = [Item(title="8-K - Current report",
+                      url=f"https://www.sec.gov/e{i}", source_name="X",
+                      published=datetime.now(timezone.utc)) for i in range(20)]
+    b = _pruefe(k, formulare)
+    assert not b.bestanden
+    assert not _grund(b, 5, "unterscheidbar")["ok"]
+    # Als Navigationslabel gilt so ein Titel gerade NICHT - genau die Luecke,
+    # die dieser Check schliesst.
+    assert _grund(b, 5, "echte")["ok"]
+
+
 def test_fremde_domain_faellt_durch_ohne_ausnahme():
     k = pq.Kandidat(url="https://news.cision.com/beispiel", type="newsroom",
                     operator="Beispiel", website="example.com")

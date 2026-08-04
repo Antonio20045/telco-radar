@@ -54,6 +54,19 @@ themen:
       # der Newsroom meldet Vertraege und Partnerschaften. Inhaltlich getrennt,
       # deshalb keine Dublette.
       - {name: "Nvidia Newsroom", type: rss, url: "https://nvidianews.nvidia.com/releases.xml"}
+      # Anthropic hat keinen Feed; die Newsroom-Seite ist statisch abrufbar.
+      # Einschraenkung, ehrlich benannt: der Parser bekommt Ueberschrift,
+      # Datum und Anrisstext als EINE Zeile ("Introducing Claude Opus 5
+      # Product Jul 24, 2026 Opus 5 is a step change ..."). Die Ueberschrift
+      # steht vorn, der Titel bleibt also lesbar - schoen ist er nicht. Vier
+      # item_selector-Varianten wurden probiert, keine trennt sauber.
+      - {name: "Anthropic", type: newsroom, url: "https://www.anthropic.com/news", item_selector: "article"}
+      # Microsofts offizieller Azure-Blog. blogs.microsoft.com/ai ist seit
+      # 2026 abgeschaltet (HTTP 410); hier laufen die Telco-relevanten
+      # Meldungen ("AT&T and Microsoft scale trillion-token workloads").
+      # Publiziert unregelmaessig, im Abruf lag die neueste Meldung genau auf
+      # der Grenze des Frischefensters.
+      - {name: "Microsoft Azure", type: rss, url: "https://azure.microsoft.com/en-us/blog/feed/"}
 
   geraete:
     name: "Geräte"
@@ -72,6 +85,11 @@ themen:
       - {name: "Android", type: rss, url: "https://blog.google/products/android/rss/"}
       # Lenovo fuehrt Motorola; Motorola-Geraetestarts laufen ueber diesen Feed.
       - {name: "Lenovo / Motorola", type: rss, url: "https://news.lenovo.com/feed/"}
+      # Pixel ist Googles Referenzgeraet: was hier zuerst erscheint (eSIM,
+      # Satellit, KI-Funktionen), muessen Betreiber spaeter unterstuetzen.
+      # Der Blog publiziert schubweise rund um Geraetestarts - im Abruf war
+      # die neueste Meldung vom 14.07.2026 und damit ausserhalb des Fensters.
+      - {name: "Google Pixel", type: rss, url: "https://blog.google/products-and-platforms/devices/pixel/rss/"}
 
   chips:
     name: "Chips & Modems"
@@ -85,6 +103,14 @@ themen:
       # Broadcom veroeffentlicht seine Produkt- und Vertragsmeldungen ueber
       # die Investor-Relations-Seite; ein separater Presse-Feed existiert nicht.
       - {name: "Broadcom", type: rss, url: "https://investors.broadcom.com/rss/news-releases.xml"}
+      # MediaTek beliefert die Mittelklasse, also den Massenmarkt der
+      # Betreiber. Die Meldungen sind ungewoehnlich netznah ("MediaTek and
+      # Samsung Achieve 3Tx 5-Layer Uplink Breakthrough"). Publiziert
+      # monatlich; neueste Meldung im Abruf vom 03.06.2026.
+      - {name: "MediaTek", type: rss, url: "https://www.mediatek.com/press-room/rss.xml"}
+      # Intel ist ueber Netzwerk-Silizium und Edge-Infrastruktur im Spiel,
+      # nicht ueber Smartphone-Modems - fuer den Netzbetrieb trotzdem relevant.
+      - {name: "Intel", type: rss, url: "https://newsroom.intel.com/feed"}
 
   netzausruester:
     name: "Netzausrüster"
@@ -92,14 +118,27 @@ themen:
       Ericsson, Nokia, Huawei & Co. bauen die Netze, ueber die alles laeuft.
       Ihre Ankuendigungen zeigen Monate vorher, welche Funktionen Betreiber
       als naechstes ausrollen koennen.
-    quellen: []
+    quellen:
+      # ericsson.com sperrt jeden Abruf aus der Sandbox mit 403. Cision ist
+      # Ericssons offizieller Verbreitungsweg - dieselbe Ausnahme wie bei
+      # Telia in der Watchlist, und mit demselben item_selector.
+      - {name: "Ericsson", type: newsroom, url: "https://news.cision.com/ericsson", item_selector: ".card-item"}
+      # HPE hat Juniper uebernommen und fuehrt dessen Carrier-Geschaeft
+      # weiter; der Newsroom ist der einzige der grossen westlichen
+      # Ausruester-Feeds, der zuverlaessig antwortet.
+      - {name: "HPE (Juniper)", type: rss, url: "https://www.hpe.com/us/en/newsroom/rss.xml"}
 
   satellit:
     name: "Satellit & NTN"
     beschreibung: >-
       Direct-to-Cell verschiebt gerade die Grenze zwischen Mobilfunk und
       Satellit - und damit die Frage, wofuer Kunden ihren Betreiber brauchen.
-    quellen: []
+    quellen:
+      # AST SpaceMobile baut das Direct-to-Cell-Netz, mit dem Vodafone in
+      # Europa arbeitet - die Meldungen zu Satellitenstarts sagen direkt,
+      # wann der Dienst wo verfuegbar wird. Publiziert um Starts herum;
+      # neueste Meldung im Abruf vom 17.06.2026.
+      - {name: "AST SpaceMobile", type: rss, url: "https://ast-science.com/feed/"}
 
   regulierung:
     name: "Regulierung & Verbände"
@@ -113,3 +152,14 @@ themen:
       # DG CNECT der EU-Kommission: Digital Networks Act, KI-Verordnung,
       # Frequenzpolitik - die Regeln, unter denen der europaeische Markt steht.
       - {name: "EU-Kommission (DG CNECT)", type: rss, url: "https://digital-strategy.ec.europa.eu/en/rss.xml"}
+      # ETSI normt, was europaeische Netze koennen muessen - Standards
+      # erscheinen hier Jahre vor dem Produkt.
+      - {name: "ETSI", type: rss, url: "https://www.etsi.org/newsroom/feed/"}
+      # Die ITU ist die UN-Organisation fuer Telekommunikation: Frequenzen,
+      # weltweite Standards, Marktzahlen.
+      - {name: "ITU", type: rss, url: "https://www.itu.int/hub/feed/"}
+      # TRAI reguliert den groessten Mobilfunkmarkt der Welt und
+      # veroeffentlicht ungewoehnlich konkrete Messberichte zur Netzqualitaet.
+      # Vollstaendig telekomspezifisch - anders als die zunaechst geprueften
+      # allgemeinen Wettbewerbsbehoerden.
+      - {name: "TRAI (Indien)", type: rss, url: "https://www.trai.gov.in/rss.xml"}

@@ -35,6 +35,35 @@ regions:
       # hat einen RSS-Feed, der nirgends verlinkt ist.
       - type: rss
         url: https://newsroom.vodafone.de/rss
+    # Vodafones britische Landesgesellschaft. Nach dem Zusammenschluss mit
+    # Three UK der groesste Mobilfunkanbieter Grossbritanniens - und ein
+    # eigener Absender: das News Centre meldet Endkundenangebote und
+    # Netzausbau, die in der Konzernmitteilung von vodafone.com nie auftauchen.
+    - name: Vodafone UK
+      country: GB
+      website: vodafone.co.uk
+      aliases:
+      - Vodafone UK
+      - VodafoneThree
+      sources:
+      - type: rss
+        url: https://www.vodafone.co.uk/newscentre/feed/
+    # Britisches Gemeinschaftsunternehmen von Telefónica und Liberty Global -
+    # in der Watchlist stehen bisher nur die beiden Muttergesellschaften. Der
+    # eigene Newsroom fuehrt die O2- und Virgin-Media-Angebote, um die es im
+    # britischen Wettbewerb tatsaechlich geht.
+    - name: Virgin Media O2
+      country: GB
+      website: o2.co.uk
+      aliases:
+      # Bewusst OHNE das blosse "Virgin Media": das ist bereits ein Alias von
+      # Liberty Global, und das Fachpresse-Tagging nimmt bei gleicher Laenge
+      # den zuerst eingetragenen Betreiber. Der volle Name "Virgin Media O2"
+      # gewinnt ohnehin, weil laengere Begriffe zuerst geprueft werden.
+      - VMO2
+      sources:
+      - type: rss
+        url: https://news.o2.co.uk/feed/
     - name: Deutsche Telekom
       country: DE
       website: telekom.com
@@ -47,6 +76,14 @@ regions:
       - type: newsroom
         url: https://www.telekom.com/de/medien/medieninformationen
         item_selector: div.content-wrapper
+      # Investor-Relations-Feed. Er publiziert selten (5 Meldungen im Abruf,
+      # neueste vom 13.05.2026) und liegt damit ausserhalb des Frischefensters -
+      # aber genau das ist der im Auftrag vorgesehene Ausnahmefall: hier stehen
+      # Konzernzahlen und Grossvorhaben ("Rheinmetall and Telekom Plan to
+      # Develop a Drone Defense Shield"), die in den taeglichen
+      # Medieninformationen untergehen oder gar nicht erscheinen.
+      - type: rss
+        url: https://www.telekom.com/service/rss/427676/feed.rss
     - name: O2 Telefónica Deutschland
       country: DE
       website: telefonica.de
@@ -296,6 +333,12 @@ regions:
       sources:
       - type: newsroom
         url: https://www.t-mobile.com/news
+      # Investor-Relations-Feed auf T-Mobiles Q4-Plattform. Andere Meldungen
+      # als der Endkunden-Newsroom: Quartalszahlen, Kundenwachstum,
+      # Netzinvestitionen - und teilweise frueher ("T-Mobile Delivers
+      # Continued Strong Account Growth ...").
+      - type: rss
+        url: https://investor.t-mobile.com/rss/pressrelease.aspx?T=1
     - name: Comcast
       country: US
       website: comcast.com
@@ -316,6 +359,12 @@ regions:
       sources:
       - type: json_api
         url: https://corporate.charter.com/page-data/sq/d/2336972469.json
+      # Investor-Relations-Feed. Publiziert etwa monatlich (neueste Meldung im
+      # Abruf vom 24.07.2026, also knapp ausserhalb des 8-Tage-Fensters) und
+      # traegt die Finanz- und Strukturmeldungen - Quartalszahlen,
+      # Anleihetausch -, die der Gatsby-Newsroom nicht fuehrt.
+      - type: rss
+        url: https://ir.charter.com/rss/news-releases.xml
     - name: DISH Wireless
       country: US
       website: dish.com
@@ -368,6 +417,18 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.telus.com/en/about/newsroom
+      # Cision Kanada (newswire.ca) ist Telus' offizieller Verbreitungsweg -
+      # dieselbe Ausnahme vom Grundsatz "eigene Domain" wie bei Telia und
+      # Bell Canada, die beide schon ueber Cision laufen. Anders als der
+      # JS-Newsroom ist diese Quelle statisch abrufbar und damit ueberhaupt
+      # pruefbar; sie fuehrt zusaetzlich die Ad-hoc- und Dividendenmeldungen
+      # der TELUS Corporation.
+      # Bewusst ZUSAETZLICH statt als Ersatz: der JS-Newsroom liefert in
+      # GitHub Actions zuverlaessig. Eine gewisse Ueberschneidung auf
+      # Story-Ebene ist der Preis dafuer - messen liess sie sich nicht, weil
+      # der JS-Newsroom lokal gar nicht abrufbar ist.
+      - type: newsroom
+        url: https://www.newswire.ca/news/telus-communications-inc/
   latin_america:
     name: Lateinamerika
     operators:
@@ -492,6 +553,16 @@ regions:
       sources:
       - type: newsroom
         url: https://www.eand.com/en/news/news-overview.html
+      # Boersenpflichtmeldungen an die ADX - anderer Inhalt als die
+      # allgemeine PR: Beteiligungen und Kapitalmassnahmen ("e& Group
+      # completed the sale of its stake in Vodafone Group for a total
+      # consideration of USD 5.95 billion"). exclude_url_pattern wirft die
+      # wiederkehrenden Formularmeldungen zu Vorstandssitzungen heraus, die
+      # sonst als immer gleiche Titelzeile im Bericht stuenden.
+      - type: newsroom
+        url: https://www.eand.com/en/investors/corporate-announcements.html
+        item_selector: .report-block-tile
+        exclude_url_pattern: (?i)board-meeting|board-resolution|board-notification
         item_selector: .tile-box-tile
     - name: Ooredoo
       country: QA
@@ -499,7 +570,20 @@ regions:
       sources:
       - type: official
         url: https://www.ooredoo.com/en/media/news_view/
-        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.'
+        plan: '403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.
+          Seit 04.08.2026 praktisch abgeloest durch die Landesgesellschaft
+          Ooredoo Katar (unten) - der Konzern-Newsroom bleibt gesperrt, die
+          Meldungen des Heimatmarkts sind damit aber wieder im Radar.'
+      # Ooredoo Katar, der Heimatmarkt. Der Konzern-Newsroom oben ist seit
+      # Monaten mit 403 gesperrt und war damit ein echter blinder Fleck -
+      # Ooredoo kam in 1611 gesammelten Meldungen nur dreimal vor. Die
+      # katarische Landesgesellschaft betreibt einen offenen WordPress-
+      # Newsroom mit Datum je Eintrag.
+      # Publiziert alle zwei bis vier Wochen; die neueste Meldung im Abruf war
+      # vom 20.07.2026 und lag damit knapp ausserhalb des Frischefensters.
+      - type: newsroom
+        url: https://www.ooredoo.qa/web/en/press-release/
+        item_selector: article.press-post
     - name: Zain
       country: KW
       website: zain.com
@@ -565,6 +649,12 @@ regions:
       sources:
       - type: rss
         url: https://newsroom.kddi.com/english/news/newsrelease.xml
+      # Investor-Relations-Feed. Publiziert unregelmaessig (neueste Meldung im
+      # Abruf vom 08.07.2026) und liegt damit ausserhalb des Frischefensters -
+      # traegt dafuer Kapitalmassnahmen und Beteiligungen, die im
+      # Produkt-Newsroom nicht vorkommen.
+      - type: rss
+        url: https://newsroom.kddi.com/english/ir-news/rss.xml
     - name: Bharti Airtel
       country: IN
       website: airtel.in
@@ -608,6 +698,12 @@ regions:
       sources:
       - type: newsroom
         url: https://www.sktelecom.com/en/press/press.do
+      # Zweite, redaktionell gepflegte Newsroom-Plattform von SK Telecom. Sie
+      # fuehrt die KI- und Rechenzentrumsstrategie ausfuehrlicher als die
+      # Pressemitteilungsliste ("SK Telecom Launches Dedicated AI Data Center
+      # Business Development Company").
+      - type: rss
+        url: https://news.sktelecom.com/en/feed
         item_selector: a.link
     - name: KT
       country: KR
@@ -633,6 +729,13 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.softbank.jp/en/corp/news/press/
+      # SB News ist SoftBanks englisches Nachrichtenmagazin und - anders als
+      # die JS-gerenderte Presseliste darueber - statisch abrufbar, also
+      # ueberhaupt pruefbar. Inhaltlich naeher an Technik und Strategie
+      # ("SoftBank Corp. Prepares for its First HAPS Flight"), was fuer den
+      # Radar mehr hergibt als die reinen Pflichtmitteilungen.
+      - type: newsroom
+        url: https://www.softbank.jp/en/sbnews/
     - name: Rakuten Mobile
       country: JP
       website: rakuten.co.jp
@@ -641,6 +744,11 @@ regions:
       sources:
       - type: newsroom
         url: https://corp.mobile.rakuten.co.jp/english/news/press/
+      # Konzern-Newsroom der Rakuten Group. Rakuten Symphony (Open RAN) und
+      # die KI-Vorhaben laufen dort und nicht unter Rakuten Mobile - fuer den
+      # Radar der interessantere Teil des Konzerns.
+      - type: newsroom
+        url: https://global.rakuten.com/corp/news/press/
     - name: China Mobile
       country: CN
       website: chinamobileltd.com
@@ -653,6 +761,22 @@ regions:
       sources:
       - type: rss
         url: https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes
+    # Chinas dritter Netzbetreiber - bisher gar nicht beobachtet, obwohl
+    # China Mobile und China Telecom seit Langem drinstehen. Gleicher
+    # Verbreitungsweg wie die beiden (irasia, Hongkonger Boersenmeldungen).
+    # Der Feed publiziert selten: neueste Meldung im Abruf vom 26.05.2026,
+    # also ausserhalb des Frischefensters. Dafuer sind es echte Meldungen
+    # ("China Unicom Announces 2025 Annual Results - Free Cash Flow Up by
+    # Nearly 30%") und keine Formularzeilen - die Variante t=a desselben
+    # Dienstes liefert nur "Monthly Return - JUL 26" und wurde verworfen.
+    - name: China Unicom
+      country: CN
+      website: chinaunicom.com.hk
+      aliases:
+      - China Unicom
+      sources:
+      - type: rss
+        url: https://www.irasia.com/cgi-local/news/rss.cgi?id=chinaunicom&loc=hk&t=p&title_for_section=yes
     - name: Chunghwa Telecom
       country: TW
       website: cht.com.tw
@@ -775,6 +899,20 @@ regions:
       sources:
       - type: rss
         url: https://media.one.nz/index.rss
+    # Australischer Glasfaser- und Wholesale-Netzbetreiber, bisher nicht
+    # beobachtet. Mit der Uebernahme des TPG-Festnetzes 2026 einer der
+    # groessten Infrastrukturanbieter des Landes - und damit ein Absender,
+    # der ueber Netzausbau berichtet, den sonst niemand meldet.
+    - name: Vocus Group
+      country: AU
+      website: vocus.com.au
+      aliases:
+      - Vocus
+      - Dodo
+      sources:
+      - type: newsroom
+        url: https://www.vocus.com.au/vocus-news
+        item_selector: a.article-card
     - name: Spark
       country: NZ
       website: sparknz.co.nz
@@ -793,3 +931,8 @@ regions:
       sources:
       - type: newsroom_js
         url: https://www.2degrees.nz/media-releases
+      # Statisch gerendertes Archiv derselben Meldungen - anders als die
+      # Kartenansicht darueber ueberhaupt pruefbar, und im Abruf mit 30
+      # datierten Meldungen ergiebiger.
+      - type: newsroom
+        url: https://www.2degrees.nz/media-release-archives

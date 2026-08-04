@@ -70,6 +70,13 @@ MIN_ITEMS = 5           # Kriterium 2
 MIN_DATED_SHARE = 0.80  # Kriterium 3
 MIN_FRESH = 1           # Kriterium 4
 MAX_NAV_SHARE = 0.20    # Kriterium 5: Anteil verdaechtiger "Titel"
+# Kriterium 5, zweite Haelfte: Anteil VERSCHIEDENER Titel. Gemessen am
+# SEC-EDGAR-Feed von AT&T, der technisch sauber 40 datierte Meldungen liefert -
+# alle mit dem Titel "8-K - Current report". Formal Ueberschriften, inhaltlich
+# Formularbezeichnungen: der Analyst kann daraus nichts machen und im Bericht
+# stuenden 40 identische Zeilen. Die Navigationslabel-Regel greift dort nicht,
+# weil so ein Titel weder kurz noch ein Menuepunkt ist.
+MIN_DISTINCT_SHARE = 0.60
 # Kriterium 7: ab diesem Anteil gemeinsamer Meldungs-URLs gilt eine Quelle als
 # derselbe Inhalt unter anderem Pfad - also als Dublette, nicht als zweite Quelle.
 MAX_ITEM_OVERLAP = 0.70
@@ -389,6 +396,17 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
     b.pruefe(5, "echte Ueberschriften", nav_anteil <= MAX_NAV_SHARE,
              f"{len(verdaechtig)}/{len(items)} verdaechtig ({nav_anteil:.0%})"
              + (f", z. B. {verdaechtig[:3]}" if verdaechtig else ""))
+
+    # --- Kriterium 5b: Titel muessen sich unterscheiden
+    verschieden = len({" ".join(i.title.lower().split()) for i in items})
+    anteil_verschieden = (verschieden / len(items)) if items else 0.0
+    b.pruefe(5, "unterscheidbare Titel",
+             anteil_verschieden >= MIN_DISTINCT_SHARE,
+             f"{verschieden}/{len(items)} verschieden "
+             f"({anteil_verschieden:.0%})"
+             + ("" if anteil_verschieden >= MIN_DISTINCT_SHARE else
+                " - die Quelle liefert Formularbezeichnungen oder Rubriken "
+                "statt Ueberschriften; im Bericht stuenden identische Zeilen"))
 
     # --- Kriterium 7b: Inhaltsdublette gegen die bestehenden Quellen desselben
     # Betreibers. Zwei Pfade derselben Seite sind EINE Quelle.
