@@ -146,6 +146,63 @@ def _items_payload(items: list[Item]) -> str:
     return json.dumps(rows, ensure_ascii=False)
 
 
+def analyze_bereiche(bereiche: list[tuple[str, list[Item], bool]], model: str,
+                     language: str = "Deutsch", max_items: int | None = None,
+                     workers: int = 12) -> dict[str, dict]:
+    """Alle Bereiche in EINEM Stapel-Pool bewerten.
+
+    Warum nicht je Bereich ein eigener Pool
+    ---------------------------------------
+    Bis Lauf #69 lief je Bereich ein eigener Pool, und die Bereiche selbst
+    liefen zu dritt: hoechstens llm_max_workers x analyst_batch_workers
+    Aufrufe gleichzeitig, aber nur, wenn sich die Arbeit gleichmaessig auf
+    die Bereiche verteilt. Genau das tut sie nicht mehr. In Lauf #69 lagen
+    793 von 984 neuen Meldungen im Bereich "Global" - jede Fachpresse-
+    meldung, deren Titel keinen Betreiber der Watchlist nennt. Dieser eine
+    Bereich hatte 53 Stapel, die zwoelf anderen zusammen 19. Waehrend Global
+    seine 53 Stapel zu viert abarbeitete, lagen die uebrigen Worker still.
+
+    Mit 70 Fachpressequellen ist das kein Ausreisser, sondern der Normalfall,
+    und bei 1000 Quellen wird er ausgepraegter. Deshalb wandern jetzt ALLE
+    Stapel aller Bereiche in einen Pool. Die Obergrenze gleichzeitiger
+    Aufrufe bleibt dieselbe - sie wird nur tatsaechlich ausgenutzt.
+    """
+    system_je_bereich = {
+        name: (TECH_ANALYST_SYSTEM if ist_thema else ANALYST_SYSTEM).format(
+            region=name, language=language)
+        for name, _items, ist_thema in bereiche
+    }
+    gekappt = {name: (items if not max_items else items[:max_items])
+               for name, items, _t in bereiche}
+    stapel: list[tuple[str, int, int, list[Item]]] = []
+    for name, _items, _t in bereiche:
+        eigene = gekappt[name]
+        teile = [eigene[i:i + BATCH_SIZE]
+                 for i in range(0, len(eigene), BATCH_SIZE)]
+        for n, teil in enumerate(teile, 1):
+            stapel.append((name, n, len(teile), teil))
+
+    def _einer(auftrag) -> dict | None:
+        name, n, gesamt, batch = auftrag
+        return _ein_stapel(system_je_bereich[name], name, n, gesamt, batch,
+                           model)
+
+    log.info("Analyse: %d Stapel aus %d Bereichen, %d gleichzeitig",
+             len(stapel), len(bereiche), workers)
+    if stapel:
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            ergebnisse = list(pool.map(_einer, stapel))
+    else:
+        ergebnisse = []
+
+    je_bereich: dict[str, list] = {name: [] for name, _i, _t in bereiche}
+    for (name, _n, _gesamt, batch), ergebnis in zip(stapel, ergebnisse):
+        je_bereich[name].append((ergebnis, batch))
+    return {name: _zusammenfassen(name, gekappt[name], je_bereich[name],
+                                  workers, model)
+            for name, _items, _t in bereiche}
+
+
 def analyze_region(region_name: str, items: list[Item], model: str,
                    language: str = "Deutsch", max_items: int | None = None,
                    is_theme: bool = False, batch_workers: int = 1) -> dict:
@@ -175,30 +232,41 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
-    def _ein_stapel(n: int, batch: list[Item]) -> dict | None:
-        user = (
-            f"NEW items for region {region_name} "
-            f"(batch {n}/{len(batches)}, {len(batch)} items):\n"
-            + _items_payload(batch)
-        )
-        try:
-            raw = complete(system, user, model=model, max_tokens=8000)
-            return extract_json(raw)
-        except (ValueError, RuntimeError, KeyError) as exc:
-            log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
-                      region_name, n, len(batches), exc)
-            return None
+    def _einer(p):
+        return _ein_stapel(system, region_name, p[0], len(batches), p[1], model)
 
     if batch_workers > 1 and len(batches) > 1:
         with ThreadPoolExecutor(max_workers=batch_workers) as pool:
             # Reihenfolge erhalten: der Bericht sortiert zwar nach Relevanz,
             # aber ein Lauf soll bei gleicher Eingabe dieselbe Ausgabe liefern.
             ergebnisse = list(pool.map(
-                lambda p: _ein_stapel(p[0], p[1]),
-                [(n, b) for n, b in enumerate(batches, 1)]))
+                _einer, [(n, b) for n, b in enumerate(batches, 1)]))
     else:
-        ergebnisse = [_ein_stapel(n, b) for n, b in enumerate(batches, 1)]
+        ergebnisse = [_einer((n, b)) for n, b in enumerate(batches, 1)]
 
+    return _zusammenfassen(region_name, capped,
+                           list(zip(ergebnisse, batches)), batch_workers, model)
+
+
+def _ein_stapel(system: str, bereich: str, n: int, gesamt: int,
+                batch: list[Item], model: str) -> dict | None:
+    """Ein Analysten-Aufruf. Ein gescheiterter Stapel ist kein Laufabbruch."""
+    user = (f"NEW items for region {bereich} "
+            f"(batch {n}/{gesamt}, {len(batch)} items):\n"
+            + _items_payload(batch))
+    try:
+        raw = complete(system, user, model=model, max_tokens=8000)
+        return extract_json(raw)
+    except (ValueError, RuntimeError, KeyError) as exc:
+        log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
+                  bereich, n, gesamt, exc)
+        return None
+
+
+def _zusammenfassen(bereich: str, gelesen: list[Item],
+                    ergebnisse: list[tuple[dict | None, list[Item]]],
+                    parallel: int, model: str) -> dict:
+    """Die Stapel eines Bereichs zu einem Ergebnis verschmelzen."""
     highlights: list[dict] = []
     summaries: list[str] = []
     batches_ok = 0
@@ -207,10 +275,12 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     # erledigt und werden nie wieder gesammelt. Der Schutz aus Lauf #64 wirkte
     # nur, wenn eine Region KOMPLETT ausfiel; im Lauf #67 (04.08.2026)
     # scheiterten 2 von 3 Stapeln des Themenfelds KI-Anbieter und 1 von 2 bei
-    # Regulierung - rund 33 Meldungen wanderten ungelesen in den Store. Mit
-    # mehr Quellen gibt es mehr Stapel und damit mehr solcher Teilausfaelle.
+    # Regulierung - rund 33 Meldungen wanderten ungelesen in den Store. In
+    # Lauf #69 waren es 607 von 984, weil der Anbieter unter der Last der
+    # ersten Ausbauwelle 42 von 72 Stapeln abwies: der Schutz hat sie
+    # zurueckgehalten, und der naechste Lauf hat sie erneut vorgelegt.
     ungelesen: list[str] = []
-    for result, batch in zip(ergebnisse, batches):
+    for result, batch in ergebnisse:
         if result is None:
             ungelesen.extend(i.id for i in batch)
             continue
@@ -221,14 +291,14 @@ def analyze_region(region_name: str, items: list[Item], model: str,
 
     log.info("Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d "
              "highlights, %d ungelesen",
-             region_name, len(capped), len(batches), batch_workers,
+             bereich, len(gelesen), len(ergebnisse), parallel,
              len(highlights), len(ungelesen))
     return {
         "region_summary": " ".join(summaries),
         "highlights": highlights,
         "_telemetry": {
-            "items_in": len(capped),
-            "batches": len(batches),
+            "items_in": len(gelesen),
+            "batches": len(ergebnisse),
             "batches_ok": batches_ok,
             "highlights": len(highlights),
             "unread_items": len(ungelesen),

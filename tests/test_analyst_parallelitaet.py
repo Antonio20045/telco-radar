@@ -89,3 +89,74 @@ def test_ein_gescheiterter_stapel_kostet_nur_seine_meldungen(monkeypatch):
     titel = {h["title"] for h in res["highlights"]}
     assert "Meldung 0" in titel and "Meldung 30" in titel
     assert "Meldung 15" not in titel
+
+
+# --------------------------------------------------- ein Pool fuer alle
+# Lauf #69: 793 von 984 neuen Meldungen lagen im Bereich "Global" - jede
+# Fachpressemeldung ohne Betreiber im Titel. 53 Stapel dort, 19 in den
+# zwoelf anderen Bereichen zusammen. Mit einem Pool JE BEREICH arbeitete
+# Global zu viert, waehrend die uebrigen Worker stillagen.
+
+def test_ein_grosser_bereich_nutzt_den_ganzen_pool(monkeypatch):
+    hoechststand = 0
+    gleichzeitig = 0
+    sperre = threading.Lock()
+
+    def fake_complete(system, user, model, max_tokens):
+        nonlocal gleichzeitig, hoechststand
+        with sperre:
+            gleichzeitig += 1
+            hoechststand = max(hoechststand, gleichzeitig)
+        threading.Event().wait(0.02)
+        with sperre:
+            gleichzeitig -= 1
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    bereiche = [("Global", _items(agents.BATCH_SIZE * 20), False),
+                ("Europa", _items(agents.BATCH_SIZE), False)]
+
+    ergebnisse = agents.analyze_bereiche(bereiche, model="m", workers=12)
+
+    assert hoechststand > 4, f"nur {hoechststand} gleichzeitig - der Pool " \
+        "wird von einem grossen Bereich nicht ausgenutzt"
+    assert set(ergebnisse) == {"Global", "Europa"}
+    assert ergebnisse["Global"]["_telemetry"]["batches"] == 20
+    assert ergebnisse["Europa"]["_telemetry"]["batches"] == 1
+
+
+def test_gescheiterte_stapel_bleiben_je_bereich_zugeordnet(monkeypatch):
+    def fake_complete(system, user, model, max_tokens):
+        if "Europa" in user:
+            raise RuntimeError("Anbieter ueberlastet")
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    bereiche = [("Global", _items(agents.BATCH_SIZE), False),
+                ("Europa", _items(agents.BATCH_SIZE * 2), False)]
+
+    ergebnisse = agents.analyze_bereiche(bereiche, model="m", workers=4)
+
+    assert ergebnisse["Global"]["_telemetry"]["unread_items"] == 0
+    assert ergebnisse["Europa"]["_telemetry"]["unread_items"] == \
+        agents.BATCH_SIZE * 2
+    assert len(ergebnisse["Europa"]["_ungelesen"]) == agents.BATCH_SIZE * 2
+
+
+def test_themenfelder_bekommen_ihren_eigenen_prompt(monkeypatch):
+    gesehen: list[str] = []
+
+    def fake_complete(system, user, model, max_tokens):
+        gesehen.append(system)
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    agents.analyze_bereiche([("Europa", _items(2), False),
+                             ("Chips & Modems", _items(2), True)],
+                            model="m", workers=2)
+
+    assert any("NOT from competing operators" in s for s in gesehen)
+    assert any("competitive-intelligence analyst" in s for s in gesehen)

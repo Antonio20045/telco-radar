@@ -12,13 +12,12 @@ import os
 import sys
 import time
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import zip_longest
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 from .analyze import editor
-from .analyze.agents import analyze_region
+from .analyze.agents import analyze_bereiche
 from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
 from .analyze import category_sweep
@@ -286,53 +285,41 @@ def run(root: Path, use_llm: bool | None = None,
     ungelesene_meldungen: set[str] = set()
     editor_used = False
     if use_llm and new_items:
-        # Analysts are independent per region -> run them concurrently. Only
-        # ~6 calls, well under any rate cap, but overlapping their latency
-        # turns a ~9x sequential wait into ~1-2x. Same models, same output.
+        # EIN Pool fuer alle Stapel aller Bereiche. Bis Lauf #69 lief je
+        # Bereich ein eigener Pool und die Bereiche zu dritt - hoechstens
+        # llm_max_workers x analyst_batch_workers Aufrufe gleichzeitig, aber
+        # nur bei gleichmaessiger Verteilung. In Lauf #69 lagen 793 von 984
+        # neuen Meldungen im Bereich "Global": 53 Stapel dort, 19 in den
+        # zwoelf anderen zusammen. Waehrend Global zu viert arbeitete, lagen
+        # die uebrigen Worker still. Mit 70 Fachpressequellen ist das der
+        # Normalfall, nicht der Ausreisser.
         llm_workers = int(cfg.settings.get("llm_max_workers", 4))
-        # Zweite Ebene der Parallelitaet: die Stapel INNERHALB einer Region.
-        # Ohne sie haengt die Laufzeit an der groessten Region - und die ist
-        # seit dem Quellen-Ausbau deutlich groesser geworden.
         batch_workers = int(cfg.settings.get("analyst_batch_workers", 1) or 1)
-
-        def _analyze_one(region_key, region_items):
-            region_name = cfg.bereich_names.get(region_key, region_key)
-            try:
-                res = analyze_region(
-                    region_name, region_items, model=analyst_model,
-                    language=language, max_items=max_items,
-                    is_theme=is_theme_key(region_key),
-                    batch_workers=batch_workers)
-                tel = dict(res.get("_telemetry", {}))
-                tel["region"] = region_name
-                if tel.get("batches") and not tel.get("batches_ok"):
-                    # Jeder Stapel gescheitert - die Meldungen sind ungelesen.
-                    unanalysierte_regionen.add(region_key)
-                return region_name, res, tel
-            except Exception as exc:  # noqa: BLE001
-                log.error("Analyst %s failed: %s - falling back to raw list",
-                          region_name, exc)
-                unanalysierte_regionen.add(region_key)
-                fallback = {
-                    "region_summary": "",
-                    "highlights": [
-                        {"title": i.title, "operator": i.operator or "",
-                         "url": i.url, "category": "Sonstiges", "relevance": 2,
-                         "summary": i.summary[:200], "why_it_matters": ""}
-                        for i in region_items[:10]
-                    ],
-                }
-                return region_name, fallback, None
-
-        with ThreadPoolExecutor(max_workers=max(1, llm_workers)) as _pool:
-            _futs = [_pool.submit(_analyze_one, rk, ri)
-                     for rk, ri in items_by_region.items()]
-            for _fut in as_completed(_futs):
-                region_name, res, tel = _fut.result()
-                ungelesene_meldungen.update(res.pop("_ungelesen", []) or [])
-                regional[region_name] = res
-                if tel is not None:
-                    analyst_telemetry.append(tel)
+        bereiche = [(cfg.bereich_names.get(rk, rk), ri, is_theme_key(rk))
+                    for rk, ri in items_by_region.items()]
+        name_zu_key = {cfg.bereich_names.get(rk, rk): rk
+                       for rk in items_by_region}
+        try:
+            ergebnisse = analyze_bereiche(
+                bereiche, model=analyst_model, language=language,
+                max_items=max_items,
+                workers=max(1, llm_workers) * max(1, batch_workers))
+        except Exception as exc:  # noqa: BLE001
+            # Ein Absturz der ganzen Stufe - nicht einzelner Stapel, die faengt
+            # analyze_bereiche selbst ab. Kein Bereich gilt dann als gelesen.
+            log.error("Analysestufe abgestuerzt: %s - keine Meldung gilt als "
+                      "gelesen", exc)
+            ergebnisse = {}
+            unanalysierte_regionen.update(items_by_region)
+        for region_name, res in ergebnisse.items():
+            tel = dict(res.get("_telemetry", {}))
+            tel["region"] = region_name
+            if tel.get("batches") and not tel.get("batches_ok"):
+                # Jeder Stapel gescheitert - die Meldungen sind ungelesen.
+                unanalysierte_regionen.add(name_zu_key[region_name])
+            ungelesene_meldungen.update(res.pop("_ungelesen", []) or [])
+            regional[region_name] = res
+            analyst_telemetry.append(tel)
         # Nur die Themenfelder, die in DIESEM Lauf auch bewertete Meldungen
         # haben - sonst verlangt der Editor-Check eine Ueberschrift, zu der es
         # nichts zu schreiben gibt.
