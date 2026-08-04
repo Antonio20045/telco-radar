@@ -1,10 +1,15 @@
-"""Der Editor bekommt einen zweiten Versuch, bevor der Wochenbericht faellt.
+"""Die Chefredaktion bekommt einen zweiten Versuch, bevor der Bericht faellt.
 
 Im Lauf #63 (04.08.2026) hatte Sonnet 5 den Bericht geschrieben - Inhalt war
 da, nur die Gliederung stimmte nicht. Ergebnis war trotzdem der Roh-Digest auf
 der Startseite. Das ist die teuerste moegliche Reaktion auf einen Formfehler.
+
+Seit der zweistufigen Redaktion gilt der Korrekturversuch der zweiten Stufe:
+die Bereichsabschnitte stehen dann schon und gehen nicht verloren.
 """
 from __future__ import annotations
+
+import json
 
 import pytest
 
@@ -25,14 +30,31 @@ Detail. [Quelle](https://example.com/a)
 Ein Muster.
 """
 
-REGIONAL = {"Europa": {"highlights": [{"title": "x"}]}}
+REGIONAL = {"Europa": {"highlights": [
+    {"title": "Ein Titel", "operator": "Telekom", "url": "https://example.com/a",
+     "relevance": 4, "summary": "Etwas ist passiert."}]}}
+
+BEREICH_ANTWORT = json.dumps({
+    "kurzfassung": "In Europa passierte dies und das.",
+    "abschnitt": "Zwei Saetze zur Region. "
+                 "- **Telekom**: Etwas. [Quelle](https://example.com/a)",
+    "top": [{"title": "Ein Titel", "operator": "Telekom",
+             "url": "https://example.com/a", "relevance": 4, "warum": "stark"}],
+    "themen": ["Telekom: Titel"],
+}, ensure_ascii=False)
 
 
 def _antworten(monkeypatch, folge: list[str]) -> list[str]:
-    """Gibt die Antworten der Reihe nach zurueck; sammelt die System-Prompts."""
+    """Stufe 1 antwortet immer sauber; Stufe 2 bekommt `folge` der Reihe nach.
+
+    Gesammelt werden nur die System-Prompts der Chefredaktion - um die geht
+    es in diesen Tests.
+    """
     gesehen: list[str] = []
 
     def fake_complete(system, user, model, max_tokens=5000):
+        if system.startswith("You are the section editor"):
+            return BEREICH_ANTWORT
         gesehen.append(system)
         return folge[len(gesehen) - 1]
 
@@ -106,3 +128,20 @@ def test_fundstelle_steht_in_der_fehlermeldung():
         editor.validate_editorial_briefing(MIT_EMPFEHLUNG)
     assert exc.value.grund == "empfehlungen"
     assert "Vodafone sollte X tun" in str(exc.value), "die Fundstelle fehlt"
+
+
+def test_empfehlung_aus_einem_bereichsabschnitt_wird_auch_gefunden(monkeypatch):
+    """Die Pruefung laeuft auf dem MONTIERTEN Bericht - sonst koennte ein
+    Bereichsredakteur die Regel unterlaufen, die fuer die Chefredaktion gilt."""
+    def fake_complete(system, user, model, max_tokens=5000):
+        if system.startswith("You are the section editor"):
+            return json.dumps({
+                "kurzfassung": "k",
+                "abschnitt": "Vodafone sollte hier reagieren.",
+                "top": [], "themen": []})
+        return GUELTIG
+
+    monkeypatch.setattr(editor, "complete", fake_complete)
+    with pytest.raises(editor.EditorialBriefingError) as exc:
+        editor.synthesize(REGIONAL, [], model="m")
+    assert exc.value.grund == "empfehlungen"

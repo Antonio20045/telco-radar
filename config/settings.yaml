@@ -125,6 +125,25 @@ max_items_per_region: 0
 # Region alle anderen verdraengt.
 editor_max_highlights: 0
 
+# Zweistufige Redaktion (analyze/editor.py).
+# Stufe 1 schreibt je Region und je Themenfeld einen Bereichsabschnitt plus
+# eine Kurzfassung, Stufe 2 sieht NUR diese Kurzfassungen und die staerksten
+# Meldungen je Bereich. Damit haengt die Eingabe der Chefredaktion an der Zahl
+# der BEREICHE statt an der Zahl der Meldungen - bei 1000 Quellen waeren es
+# sonst ~650 Meldungen und ~122k Token in einem Aufruf.
+#
+# Stufe 1 laeuft auf dem Analysten-Modell: das ist die Mengenarbeit, ein
+# Aufruf je Bereich. Auf true steht hier das teure Editor-Modell auch fuer
+# die Bereichsabschnitte - nur einschalten, wenn die Abschnitte zu duenn
+# ausfallen, und dann die Kosten gegenrechnen.
+bereichsredaktion_auf_editor_modell: false
+
+# Wie viele Bereichsredakteure gleichzeitig laufen. Sie sind voneinander
+# unabhaengig und reine Wartezeit auf den Anbieter. Zusammen mit den
+# Analysten-Stapeln ist das die zweite Stelle, an der gleichzeitige
+# LLM-Aufrufe entstehen - beide laufen aber nacheinander, nicht zugleich.
+bereichsredaktion_workers: 6
+
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 

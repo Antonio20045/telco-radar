@@ -1,16 +1,20 @@
-"""Der Themenabschnitt im Wochenbericht.
+"""Die Themen-Klammer im Wochenbericht.
 
 Mit den Themenfeldern (config/tech_sources.yaml) kommen Meldungen von
 Zulieferern, Geraeteherstellern und Regulierern in den Bericht. Ohne eigenen
-Abschnitt verteilt der Editor sie auf die Regionsabschnitte, wo sie zwischen
-den Betreibermeldungen untergehen - der Bericht wird zur Linkliste, genau das,
-was der Ausbau-Auftrag verhindern will.
+Abschnitt stehen sie zwischen den Betreibermeldungen, gehen dort unter und
+machen den Bericht zur Linkliste - genau das, was der Ausbau-Auftrag
+verhindern will.
 
-Der Abschnitt ist deshalb bedingt: Prompt UND Pflichtpruefung haengen am
-selben Schalter. Ein Lauf ohne Themenmeldungen darf keine Ueberschrift
-verlangen, zu der es nichts zu schreiben gibt.
+Seit der zweistufigen Redaktion setzt der Code die Klammer: eine gemeinsame
+H2-Ueberschrift, darunter je Themenfeld ein H3-Abschnitt seines Redakteurs.
+Die Klammer ist bedingt - ein Lauf ohne Themenmeldungen darf keine
+Ueberschrift verlangen, zu der es nichts zu schreiben gibt. Aufbau UND
+Pflichtpruefung haengen deshalb am selben Schalter.
 """
 from __future__ import annotations
+
+import json
 
 import pytest
 
@@ -35,7 +39,32 @@ MIT_THEMEN = BASIS.replace(
     "## Technologie, Geräte & Regulierung\nQualcomm liefert. "
     "[Quelle](https://example.com/b)\n\n## Muster der Woche")
 
-REGIONAL = {"Europa": {"highlights": [{"title": "x"}]}}
+
+def _regional(*bereiche: str) -> dict:
+    return {
+        b: {"region_summary": f"Lage in {b}.",
+            "highlights": [{"title": f"Titel {b}", "operator": "Firma",
+                            "url": f"https://example.com/{b}",
+                            "relevance": 4, "summary": "Etwas passierte."}]}
+        for b in bereiche
+    }
+
+
+def _stufen(monkeypatch, chef: str = BASIS) -> list[str]:
+    """Beide Stufen bedienen; liefert die gesehenen System-Prompts."""
+    gesehen: list[str] = []
+
+    def fake_complete(system, user, model, max_tokens=5000):
+        gesehen.append(system)
+        if system.startswith("You are the section editor"):
+            return json.dumps({
+                "kurzfassung": "Kurz.",
+                "abschnitt": "Abschnittstext. [Quelle](https://example.com/x)",
+                "top": [], "themen": []})
+        return chef
+
+    monkeypatch.setattr(editor, "complete", fake_complete)
+    return gesehen
 
 
 def test_ohne_themen_bleibt_die_pflicht_unveraendert():
@@ -53,37 +82,44 @@ def test_mit_themen_ist_der_abschnitt_pflicht():
         MIT_THEMEN, frozenset({editor.THEMEN_UEBERSCHRIFT}))
 
 
-def test_synthesize_setzt_abschnitt_nur_bei_themen(monkeypatch):
-    gesehen: list[str] = []
+def test_klammer_erscheint_nur_bei_themen(monkeypatch):
+    _stufen(monkeypatch)
 
-    def fake_complete(system, user, model, max_tokens):
-        gesehen.append(system)
-        return MIT_THEMEN if "Technologie" in system else BASIS
+    ohne, _ = editor.synthesize(_regional("Europa"), [], model="m")
+    assert editor.THEMEN_TITEL not in ohne
 
-    monkeypatch.setattr(editor, "complete", fake_complete)
-
-    editor.synthesize(REGIONAL, [], model="m")
-    assert "## Technologie, Geräte & Regulierung" not in gesehen[-1]
-
-    editor.synthesize(REGIONAL, [], model="m",
-                      themenbereiche=["KI-Anbieter", "Chips & Modems"])
-    assert "## Technologie, Geräte & Regulierung" in gesehen[-1]
-    # Die aktiven Themenfelder stehen namentlich im Prompt, damit der Editor
-    # weiss, worueber er den Abschnitt schreibt.
-    assert "KI-Anbieter" in gesehen[-1] and "Chips & Modems" in gesehen[-1]
+    mit, _ = editor.synthesize(
+        _regional("Europa", "KI-Anbieter", "Chips & Modems"), [], model="m",
+        themenbereiche=["KI-Anbieter", "Chips & Modems"])
+    assert f"## {editor.THEMEN_TITEL}" in mit
+    # Die Themenfelder stehen als H3 UNTER der gemeinsamen Klammer, die
+    # Region bleibt eine eigene H2.
+    assert "### KI-Anbieter" in mit and "### Chips & Modems" in mit
+    assert "## Europa" in mit and "### Europa" not in mit
+    assert mit.index(f"## {editor.THEMEN_TITEL}") < mit.index("### KI-Anbieter")
 
 
-def test_fehlender_themenabschnitt_loest_korrekturversuch_aus(monkeypatch):
-    """Ein vergessener Abschnitt darf den Wochenbericht nicht kosten -
-    dafuer gibt es den einen Nachfass-Versuch."""
-    antworten = [BASIS, MIT_THEMEN]
+def test_themenredakteur_bekommt_den_zulieferer_prompt(monkeypatch):
+    """Ein Chiphersteller ist kein Wettbewerber - der Prompt muss das sagen."""
+    gesehen = _stufen(monkeypatch)
+    editor.synthesize(_regional("Europa", "KI-Anbieter"), [], model="m",
+                      themenbereiche=["KI-Anbieter"])
 
-    def fake_complete(system, user, model, max_tokens):
-        return antworten.pop(0)
+    bereichs_prompts = [s for s in gesehen
+                        if s.startswith("You are the section editor")]
+    thema = next(s for s in bereichs_prompts if "KI-Anbieter" in s)
+    region = next(s for s in bereichs_prompts if "Europa" in s)
+    assert "NOT competing operators" in thema
+    assert "NOT competing operators" not in region
 
-    monkeypatch.setattr(editor, "complete", fake_complete)
-    markdown, _ = editor.synthesize(REGIONAL, [], model="m",
-                                    themenbereiche=["KI-Anbieter"])
 
-    assert "## Technologie, Geräte & Regulierung" in markdown
-    assert not antworten  # beide Versuche wurden gebraucht
+def test_ohne_themenmeldungen_keine_leere_klammer(monkeypatch):
+    """Ein Themenfeld ohne bewertete Meldung darf keine Ueberschrift erzwingen."""
+    _stufen(monkeypatch)
+    regional = _regional("Europa")
+    regional["KI-Anbieter"] = {"region_summary": "", "highlights": []}
+
+    bericht, _ = editor.synthesize(regional, [], model="m",
+                                   themenbereiche=["KI-Anbieter"])
+
+    assert editor.THEMEN_TITEL not in bericht

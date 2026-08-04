@@ -1,18 +1,45 @@
-"""Editor agent: synthesizes regional analyses into one global market report.
+"""Redaktion: aus den Analysen der Bereiche wird EIN Wochenbericht.
 
-Gets the list of previously reported topics as "do not repeat" memory.
-If no LLM is available, build_digest() produces a deterministic raw digest
-so the pipeline always delivers something useful.
+Zweistufig, seit dem Skalierungs-Auftrag
+----------------------------------------
+Bis Session 4 bekam ein einziger Editor-Aufruf saemtliche bewerteten
+Meldungen. Das hielt bis rund 150 Meldungen. Hochgerechnet auf 1000 Quellen
+waeren es ~650 Meldungen, ~477 KB, ~122k Token Eingabe - das passt zwar
+formal in das Kontextfenster, ist aber trotzdem der falsche Weg: ein Modell,
+das 650 Meldungen zu 1900 Woertern verdichten soll, produziert Brei, ein
+einziger fehlgeschlagener Aufruf kostet den ganzen Wochenbericht, und die
+Latenz eines 120k-Token-Calls ist nach oben offen.
+
+Deshalb jetzt:
+
+1. **Bereichsredakteure** - ein Aufruf je Region und je Themenfeld, parallel.
+   Jeder sieht nur die bewerteten Meldungen SEINES Bereichs und liefert den
+   fertigen Bereichsabschnitt plus eine Kurzfassung von 3-5 Saetzen und seine
+   staerksten Meldungen.
+2. **Chefredaktion** - sieht NUR die Kurzfassungen und die staerksten
+   Meldungen je Bereich, nie die Rohliste, und schreibt daraus "Auf einen
+   Blick", "Das Wichtigste", "Die wichtigsten Signale" und "Muster der
+   Woche".
+
+Damit haengt die Eingabelaenge der Chefredaktion an der Zahl der BEREICHE,
+nicht an der Zahl der Meldungen. Die Bereichsabschnitte werden unter den
+Chefteil montiert, nicht neu geschrieben.
+
+Faellt ein Bereichsredakteur aus, tritt an seine Stelle ein deterministischer
+Abschnitt aus denselben Meldungen - ein Bereich verschwindet nie stumm aus
+dem Bericht. Faellt die Chefredaktion aus, greift wie bisher der eine
+Korrekturversuch und danach der Notfall-Digest der Pipeline.
 """
 from __future__ import annotations
 
 import json
 import logging
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 from ..models import Item
-from .llm import complete, llm_available
+from .llm import complete, extract_json, llm_available
 
 log = logging.getLogger(__name__)
 
@@ -31,85 +58,146 @@ class EditorialBriefingError(RuntimeError):
         super().__init__(message)
         self.grund = grund
 
-EDITOR_SYSTEM = """\
+CHEF_SYSTEM = """\
 You are the chief editor of "Telco Radar", a weekly global
 competitive-intelligence briefing. The point of this briefing is simple:
 show what telecommunications companies around the world did this week and
 which patterns become visible across regions and operators.
 
-You receive the assessments of your regional analyst team (JSON) plus a list
-of topics ALREADY covered in previous editions.
+You do NOT see the raw item list. Your section editors have already written
+their own sections; you receive per area (region or theme area) a short
+summary and that area's strongest items, plus a list of topics ALREADY
+covered in previous editions. Your job is the top of the briefing and the
+cross-area view - nothing else.
 
-Write the briefing in {language} as clean Markdown (no top-level H1; start
-with H2 sections). Your readers are managers WITHOUT a technical or AI
-background: write plainly, spell out abbreviations on first use, and explain
-the concrete customer offer or project. This is market observation, not a
-recommendation memo. Direct, factual sentences.
-No filler, no marketing phrases, no "in der heutigen schnelllebigen Welt".
+Write in {language} as clean Markdown (no top-level H1; start with H2).
+Your readers are managers WITHOUT a technical or AI background: write
+plainly, spell out abbreviations on first use, explain the concrete customer
+offer or project. This is market observation, not a recommendation memo.
+Direct, factual sentences. No filler, no marketing phrases.
 
-Structure exactly:
+Write EXACTLY these four sections, in this order and with these headings:
 
 ## Auf einen Blick
 Exactly 3 bullet points, one sentence each: the three things a manager with
 30 seconds must take away this week.
 
 ## Das Wichtigste
-4-6 sentences: the most important competitor developments worldwide this week
-and the overall picture they form. Name operators and concrete moves.
+4-6 sentences: the most important developments worldwide this week and the
+overall picture they form. Name companies and concrete moves.
 
 ## Die wichtigsten Signale
-The 6-10 most relevant items across all regions (relevance 5 first, then 4).
+The 6-10 most relevant items across ALL areas (relevance 5 first, then 4).
 Per item:
 **Operator - Titel** (Kategorie, Dringlichkeit X/5)
 2-3 sentences of detail (what happened, with numbers/prices/dates when given).
 Source as [Quelle](url).
 
-## <one H2 section per region that has highlights, using the region name>
-2-3 sentence regional summary, then the remaining items compact
-(1-2 sentences each, always with [Quelle](url)).
-
-{themenabschnitt}
 ## Muster der Woche
-2-4 cross-regional patterns in this week's data (e.g. "mehrere Betreiber
+2-4 cross-area patterns in this week's data (e.g. "mehrere Betreiber
 buendeln KI-Assistenten in Consumer-Tarife"). Reference the supporting
-operators by name.
+companies by name.
 
 Rules:
+- Write NO area sections. They are added below your text automatically.
+  Do not repeat them and do not announce them.
 - NEVER re-report a topic from the "already covered" list unless there is a
   genuinely NEW development - then frame it explicitly as "Update zu ...".
-- No invented facts, no padding. If a region has nothing relevant, omit it.
+- No invented facts, no padding. Use only what is in the input.
 - Every factual claim that has a source must carry its [Quelle](url).
 - Do not write recommendations, action items or "Fuer Vodafone" sections.
-- Keep the whole briefing under ~1900 words.
+- Keep your four sections under ~900 words together.
 
 After the Markdown, output the line ===TOPICS=== followed by a JSON array of
 short topic strings (operator + subject) for every item you covered, so the
 system can remember them and never repeat them.
 """
 
-# Eigener Abschnitt fuer die Themenfelder (config/tech_sources.yaml). Ohne ihn
-# verteilt der Editor Nvidia-, Qualcomm- und Ofcom-Meldungen auf die
-# Regionsabschnitte, wo sie zwischen den Betreibermeldungen untergehen und den
-# Bericht zur Linkliste machen - genau das, was der Auftrag verhindern will.
-# Der Abschnitt kommt NUR in den Prompt, wenn dieser Lauf auch Themenmeldungen
-# hat; sonst wuerde eine Pflicht-Ueberschrift verlangt, zu der es nichts zu
-# schreiben gibt. Deshalb haengen Prompt und Pflichtpruefung am selben Schalter
-# (siehe validate_editorial_briefing).
-THEMEN_ABSCHNITT = """
-## Technologie, Geräte & Regulierung
-The theme sections below ("{themen}") are NOT operators - they are suppliers,
-device and chip makers, AI providers, satellite operators and regulators.
-Give them ONE joint section of 4-8 sentences: what changed in the operators'
-supply chain, in the devices their customers buy and in the rules they work
-under, and what those changes have in common. Name the companies and the
-concrete announcement, always with [Quelle](url). Do NOT list every item -
-pick what actually moves a network operator. Never present these companies as
-Vodafone's competitors.
+# ---------------------------------------------------------------------------
+# Stufe 1: ein Redakteur je Bereich. Zwei Varianten, aus demselben Grund, aus
+# dem es zwei Analysten-Prompts gibt: ein Chiphersteller ist kein Wettbewerber
+# von Vodafone, und ein Prompt, der ihn dazu erklaert, liefert systematisch
+# falsche Saetze ("Preisdruck, den Vodafone kontern muss").
+# ---------------------------------------------------------------------------
+_BEREICH_GEMEINSAM = """\
+Write in {language}. Your readers are managers WITHOUT a technical or AI
+background: plain language, spell out abbreviations on first use, explain the
+concrete offer or project. Market observation, not a recommendation memo.
+No filler, no marketing phrases, no advice for Vodafone.
+
+You receive the assessed items of YOUR area only, plus the topics already
+covered in earlier editions. Respond with ONLY valid JSON, no markdown fence:
+
+{{
+  "kurzfassung": "<3-5 sentences in {language}: what happened in this area this week and where it points. This is what the chief editor sees - it must stand on its own.>",
+  "abschnitt": "<the finished section as Markdown, WITHOUT a heading (the heading is added by the system). Start with 2-3 sentences on the area, then the items, most relevant first, 1-2 sentences each, EVERY one with its [Quelle](url). Use \\n for line breaks.>",
+  "top": [
+    {{"title": "<verbatim title>", "operator": "<company>", "url": "<verbatim url>", "relevance": <1-5>, "warum": "<one sentence: why this is one of the strongest items of the area>"}}
+  ],
+  "themen": ["<short topic string per item you covered, e.g. 'Orange: eSIM-Tarif'>"]
+}}
+
+Rules:
+- "top" holds the {top_n} strongest items at most, relevance 5 first.
+- Never invent items or URLs. Use only what is in the input list.
+- Items whose topic is already in "already_covered" belong in the section
+  only if there is a genuinely new development - then as "Update zu ...".
+- Keep the section under ~{woerter} words. Skip weak items rather than
+  padding: the weekly briefing must not become a link list.
 """
+
+BEREICH_SYSTEM = """\
+You are the section editor for the region "{bereich}" of "Telco Radar", a
+weekly global competitive-intelligence briefing for Vodafone Group's strategy
+team. You write the section about what competing operators in this region did
+this week.
+""" + _BEREICH_GEMEINSAM
+
+THEMA_BEREICH_SYSTEM = """\
+You are the section editor for the theme area "{bereich}" of "Telco Radar",
+a weekly briefing for Vodafone Group's strategy team.
+
+The companies in this area are NOT competing operators. They are suppliers,
+device and chip makers, AI providers, satellite operators, regulators or
+industry bodies - they shape the market a network operator works in. Write
+about what changes for a network OPERATOR: a new network capability, a device
+feature customers will ask for, a cost or supply shift, a rule that
+constrains or enables an offer. Never present these companies as Vodafone's
+competitors.
+""" + _BEREICH_GEMEINSAM
+
+# Eigener Abschnitt fuer die Themenfelder (config/tech_sources.yaml). Ohne ihn
+# verteilt der Bericht Nvidia-, Qualcomm- und Ofcom-Meldungen zwischen die
+# Betreibermeldungen, wo sie untergehen und den Bericht zur Linkliste machen -
+# genau das, was der Auftrag verhindern will. Seit der zweistufigen Redaktion
+# ist es eine gemeinsame KLAMMER: die Ueberschrift setzt der Code, darunter
+# steht je Themenfeld ein H3-Abschnitt seines Redakteurs.
+# Die Klammer erscheint NUR, wenn dieser Lauf auch Themenmeldungen hat; sonst
+# stuende eine Pflicht-Ueberschrift da, zu der es nichts zu schreiben gibt.
+# Deshalb haengen Aufbau und Pflichtpruefung am selben Schalter (siehe
+# validate_editorial_briefing).
+THEMEN_TITEL = "Technologie, Geräte & Regulierung"
+THEMEN_VORSPANN = (
+    "_Die folgenden Meldungen stammen nicht von Wettbewerbern, sondern von "
+    "Zulieferern, Geräte- und Chipherstellern, KI-Anbietern, "
+    "Satellitenbetreibern und Behörden — also von denen, die den Rahmen "
+    "setzen, in dem Netzbetreiber arbeiten._"
+)
 
 # Ueberschrift dieses Abschnitts, normalisiert wie in
 # validate_editorial_briefing (klein, Umlaute aufgeloest).
 THEMEN_UEBERSCHRIFT = "## technologie, geraete & regulierung"
+
+# Wie viele Meldungen ein Bereichsredakteur der Chefredaktion vorlegt. Genug,
+# dass die Chefredaktion aus jedem Bereich waehlen kann, wenig genug, dass ihre
+# Eingabe an der Zahl der BEREICHE haengt und nicht an der Zahl der Meldungen -
+# das ist der ganze Zweck der zweiten Stufe.
+TOP_JE_BEREICH = 5
+
+# Eigenes Budget je Bereichsabschnitt. Grosszuegig, weil bei 1000 Quellen ein
+# Bereich mehrere Dutzend Meldungen tragen kann und ein abgeschnittener
+# Abschnitt schlimmer ist als ein langer.
+BEREICH_MAX_TOKENS = 12000
 
 
 # The editor sees EVERY assessed item by default (0 = no limit). A weekly
@@ -158,15 +246,129 @@ def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
     return out, total - picked
 
 
+def _sortiert(highlights: list[dict]) -> list[dict]:
+    return sorted(highlights, key=lambda h: (h.get("relevance") or 0),
+                  reverse=True)
+
+
+def _notabschnitt(bereich: str, daten: dict) -> dict:
+    """Deterministischer Ersatz, wenn ein Bereichsredakteur ausfaellt.
+
+    Ein Bereich darf nie stumm aus dem Bericht verschwinden: die Meldungen
+    sind bewertet, sie stehen im Berichts-JSON, und der Seen-Store hat sie
+    als erledigt vermerkt - sie kommen also kein zweites Mal. Lieber eine
+    nuechterne Liste mit Quellenlinks als eine Luecke, die aussieht wie eine
+    ruhige Woche.
+    """
+    highlights = _sortiert(daten.get("highlights") or [])
+    zeilen: list[str] = []
+    if daten.get("region_summary"):
+        zeilen.append(str(daten["region_summary"]).strip())
+        zeilen.append("")
+    zeilen.append("_Dieser Abschnitt wurde ohne redaktionelle Verdichtung "
+                  "erzeugt; die Meldungen stehen unverändert mit ihrer "
+                  "Originalquelle._")
+    zeilen.append("")
+    for h in highlights:
+        titel = h.get("title") or "(ohne Titel)"
+        wer = h.get("operator") or ""
+        url = h.get("url") or ""
+        text = (h.get("summary") or "").strip()
+        kopf = f"- **{wer} – {titel}**" if wer else f"- **{titel}**"
+        quelle = f" [Quelle]({url})" if url else ""
+        zeilen.append(f"{kopf}: {text}{quelle}".rstrip())
+    return {
+        "kurzfassung": (str(daten.get("region_summary") or "").strip()
+                        or f"{len(highlights)} bewertete Meldungen aus dem "
+                           f"Bereich {bereich}, ohne redaktionelle "
+                           f"Zusammenfassung."),
+        "abschnitt": "\n".join(zeilen),
+        "top": [
+            {"title": h.get("title"), "operator": h.get("operator"),
+             "url": h.get("url"), "relevance": h.get("relevance"),
+             "warum": h.get("why_it_matters") or ""}
+            for h in highlights[:TOP_JE_BEREICH]
+        ],
+        "themen": [f"{h.get('operator') or bereich}: "
+                   f"{str(h.get('title') or '')[:120]}" for h in highlights],
+        "_notfall": True,
+    }
+
+
+def bereichsredaktion(bereich: str, daten: dict, model: str,
+                      language: str, already_covered: list[str],
+                      ist_thema: bool = False) -> dict:
+    """Stufe 1: EIN Bereich, ein Aufruf. Faellt er aus, kommt der Notabschnitt."""
+    highlights = _sortiert(daten.get("highlights") or [])
+    if not highlights:
+        return {"kurzfassung": "", "abschnitt": "", "top": [], "themen": []}
+    vorlage = THEMA_BEREICH_SYSTEM if ist_thema else BEREICH_SYSTEM
+    system = vorlage.format(bereich=bereich, language=language,
+                            top_n=TOP_JE_BEREICH,
+                            woerter=min(900, 120 + 45 * len(highlights)))
+    user = json.dumps({
+        "bereich": bereich,
+        "zusammenfassung_der_analysten": daten.get("region_summary", ""),
+        "items": highlights,
+        "already_covered": already_covered[-300:],
+    }, ensure_ascii=False)
+    try:
+        roh = complete(system, user, model=model, max_tokens=BEREICH_MAX_TOKENS)
+        ergebnis = extract_json(roh)
+        if not str(ergebnis.get("abschnitt") or "").strip():
+            raise ValueError("leerer Abschnitt")
+        ergebnis.setdefault("kurzfassung", "")
+        ergebnis.setdefault("top", [])
+        ergebnis.setdefault("themen", [])
+        return ergebnis
+    except (ValueError, RuntimeError, KeyError, TypeError) as exc:
+        log.error("Bereichsredaktion %s fehlgeschlagen (%s) - Notabschnitt",
+                  bereich, str(exc)[:160])
+        return _notabschnitt(bereich, daten)
+
+
+def _montiere(chef_markdown: str, regionen: list[tuple[str, str]],
+              themen: list[tuple[str, str]]) -> str:
+    """Bereichsabschnitte unter den Chefteil setzen.
+
+    "Muster der Woche" bleibt der Schluss des Berichts - die Bereiche werden
+    davor eingeschoben. Findet sich die Ueberschrift nicht (dann haette die
+    Pruefung ohnehin angeschlagen), haengen die Abschnitte hinten an.
+    """
+    teile: list[str] = []
+    for name, text in regionen:
+        teile.append(f"## {name}\n\n{text.strip()}\n")
+    if themen:
+        teile.append(f"## {THEMEN_TITEL}\n\n{THEMEN_VORSPANN}\n")
+        for name, text in themen:
+            teile.append(f"### {name}\n\n{text.strip()}\n")
+    bereiche = "\n".join(teile)
+    if not bereiche.strip():
+        return chef_markdown
+
+    marke = "## Muster der Woche"
+    kopf, treffer, schluss = chef_markdown.partition(marke)
+    if not treffer:
+        return chef_markdown.rstrip() + "\n\n" + bereiche
+    return f"{kopf.rstrip()}\n\n{bereiche}\n{treffer}{schluss}"
+
+
 def synthesize(regional: dict[str, dict], already_covered: list[str],
                model: str, language: str = "Deutsch",
                highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET,
-               themenbereiche: list[str] | None = None) -> tuple[str, list[str]]:
-    """Run the editor. Returns (markdown_report, covered_topics).
+               themenbereiche: list[str] | None = None,
+               bereichs_model: str | None = None,
+               bereichs_workers: int = 4) -> tuple[str, list[str]]:
+    """Zweistufige Redaktion. Liefert (Markdown-Bericht, behandelte Themen).
 
     `themenbereiche` sind die Anzeigenamen der Themenfelder, die in DIESEM
-    Lauf bewertete Meldungen haben (z. B. ["KI & Modelle", "Netzausruester"]).
-    Ist die Liste leer, verhaelt sich der Editor exakt wie vorher.
+    Lauf bewertete Meldungen haben (z. B. ["KI-Anbieter", "Netzausruester"]).
+    Ist die Liste leer, entfaellt die Themen-Klammer samt Pflichtpruefung.
+
+    `bereichs_model` ist das Modell der ersten Stufe. Getrennt vom
+    Chefredaktions-Modell, weil die erste Stufe die Mengenarbeit ist (ein
+    Aufruf je Bereich, bei 1000 Quellen ein Dutzend und mehr) und die zweite
+    die Synthese - teures Modell nur dort, wo es den Unterschied macht.
     """
     # strip internal telemetry before handing the analyses to the editor
     clean = {
@@ -177,8 +379,47 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
     if omitted:
         log.info("Editor gets %d highlights, %d weaker ones omitted "
                  "(all remain in the report JSON)", highlight_budget, omitted)
+
+    themen_namen = [t for t in (themenbereiche or []) if t]
+    mit_inhalt = [rn for rn, r in clean.items() if r.get("highlights")]
+    n_highlights = sum(len(clean[rn].get("highlights") or []) for rn in mit_inhalt)
+
+    # ------------------------------------------------ Stufe 1: die Bereiche
+    stufe1 = bereichs_model or model
+    log.info("Bereichsredaktion: %d Bereiche, %d bewertete Meldungen, "
+             "Modell=%s, %d parallel",
+             len(mit_inhalt), n_highlights, stufe1, bereichs_workers)
+    ergebnisse: dict[str, dict] = {}
+    if mit_inhalt:
+        with ThreadPoolExecutor(max_workers=max(1, bereichs_workers)) as pool:
+            gestartet = {
+                rn: pool.submit(bereichsredaktion, rn, clean[rn], stufe1,
+                                language, already_covered,
+                                rn in themen_namen)
+                for rn in mit_inhalt
+            }
+            for rn, fut in gestartet.items():
+                try:
+                    ergebnisse[rn] = fut.result()
+                except Exception as exc:  # noqa: BLE001 - nie den Lauf kosten
+                    log.error("Bereichsredaktion %s abgestuerzt: %s", rn, exc)
+                    ergebnisse[rn] = _notabschnitt(rn, clean[rn])
+    notfaelle = sum(1 for e in ergebnisse.values() if e.get("_notfall"))
+    if notfaelle:
+        log.warning("%d von %d Bereichsabschnitten kommen aus dem "
+                    "Notfallweg (ohne redaktionelle Verdichtung)",
+                    notfaelle, len(ergebnisse))
+
+    # ---------------------------------------------- Stufe 2: Chefredaktion
+    bereiche_fuer_chef = [
+        {"bereich": rn,
+         "art": "Themenfeld" if rn in themen_namen else "Region",
+         "kurzfassung": ergebnisse[rn].get("kurzfassung", ""),
+         "staerkste_meldungen": ergebnisse[rn].get("top", [])[:TOP_JE_BEREICH]}
+        for rn in mit_inhalt if ergebnisse.get(rn)
+    ]
     payload = {
-        "regional_analyses": clean,
+        "bereiche": bereiche_fuer_chef,
         "already_covered_topics": already_covered[-300:],
     }
     if omitted:
@@ -188,20 +429,14 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
             "report data, so do not claim this is everything that happened."
         )
     user = json.dumps(payload, ensure_ascii=False)
-    n_highlights = sum(len(r.get("highlights") or []) for r in clean.values())
-    # Printed on every run: with no cap the editor prompt grows with the week,
-    # and this is the number that decides whether the configured model can
-    # still take it (~4 characters per token).
-    log.info("Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
-             n_highlights, len(user) / 1024, len(user) // 4000, model)
-    themen = [t for t in (themenbereiche or []) if t]
-    system = EDITOR_SYSTEM.format(
-        language=language,
-        themenabschnitt=(THEMEN_ABSCHNITT.format(themen='", "'.join(themen))
-                         if themen else ""))
-    pflicht = frozenset({THEMEN_UEBERSCHRIFT}) if themen else frozenset()
+    # Die Zahl, an der sich der ganze Umbau messen laesst: sie haengt jetzt an
+    # der Zahl der Bereiche, nicht mehr an der Zahl der Meldungen.
+    log.info("Chefredaktion: %d Bereiche, %.0f KB (~%dk Token), Modell=%s",
+             len(bereiche_fuer_chef), len(user) / 1024, len(user) // 4000, model)
+
+    system = CHEF_SYSTEM.format(language=language)
     try:
-        return _ein_versuch(system, user, model, pflicht)
+        chef_md, themen_chef = _ein_versuch(system, user, model)
     except EditorialBriefingError as exc:
         # Der Wochenbericht ist das Herzstueck der Seite. Ihn beim ersten
         # Formfehler wegzuwerfen und stattdessen den Roh-Digest zu
@@ -209,10 +444,28 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         # war ja da, nur die Gliederung stimmte nicht. Also einmal gezielt
         # nachfassen, mit den Ueberschriften woertlich im Auftrag.
         log.warning("Editor-Ausgabe abgelehnt (%s) - ein Korrekturversuch", exc)
-        nachfassen = NACHFASSEN[exc.grund]
-        if exc.grund == "gliederung" and themen:
-            nachfassen += "## Technologie, Geräte & Regulierung\n"
-        return _ein_versuch(system + nachfassen, user, model, pflicht)
+        chef_md, themen_chef = _ein_versuch(
+            system + NACHFASSEN[exc.grund], user, model)
+
+    # ------------------------------------------------------------- Montage
+    regionen = [(rn, ergebnisse[rn]["abschnitt"]) for rn in mit_inhalt
+                if rn not in themen_namen and ergebnisse[rn].get("abschnitt")]
+    themen = [(rn, ergebnisse[rn]["abschnitt"]) for rn in mit_inhalt
+              if rn in themen_namen and ergebnisse[rn].get("abschnitt")]
+    bericht = _montiere(chef_md, regionen, themen)
+
+    pflicht = frozenset({THEMEN_UEBERSCHRIFT}) if themen else frozenset()
+    validate_editorial_briefing(bericht, pflicht)
+
+    themen_gesamt = list(themen_chef)
+    for rn in mit_inhalt:
+        themen_gesamt.extend(str(t) for t in (ergebnisse[rn].get("themen") or []))
+    # Reihenfolge erhalten, Dubletten raus - das Themengedaechtnis ist eine
+    # Liste, keine Menge, und derselbe Eintrag zweimal verkuerzt es nur.
+    gesehen: set[str] = set()
+    eindeutig = [t for t in themen_gesamt
+                 if not (t in gesehen or gesehen.add(t))]
+    return bericht, eindeutig
 
 
 # Wird nur an den zweiten Versuch angehaengt, passend zum Ablehnungsgrund.

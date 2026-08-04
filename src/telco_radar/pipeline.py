@@ -327,7 +327,18 @@ def run(root: Path, use_llm: bool | None = None,
                 language=language,
                 highlight_budget=int(
                     cfg.settings.get("editor_max_highlights", 0) or 0),
-                themenbereiche=themen_mit_inhalt)
+                themenbereiche=themen_mit_inhalt,
+                # Stufe 1 ist die Mengenarbeit (ein Aufruf je Bereich), Stufe 2
+                # die Synthese. Das teure Modell nur dort, wo es den
+                # Unterschied macht - per Schalter umstellbar, falls die
+                # Bereichsabschnitte einmal zu duenn ausfallen.
+                bereichs_model=(
+                    editor_model
+                    if cfg.settings.get("bereichsredaktion_auf_editor_modell",
+                                        False)
+                    else (analyst_model or editor_model)),
+                bereichs_workers=int(
+                    cfg.settings.get("bereichsredaktion_workers", 6) or 6))
             editor_used = True
         except Exception as exc:  # noqa: BLE001
             if cfg.settings.get("publish_requires_editorial_briefing", True):
