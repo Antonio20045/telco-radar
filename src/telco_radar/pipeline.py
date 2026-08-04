@@ -212,6 +212,10 @@ def run(root: Path, use_llm: bool | None = None,
     ta = time.monotonic()
     regional: dict[str, dict] = {}
     analyst_telemetry: list[dict] = []
+    # Regionen, deren Analyse vollstaendig ausgefallen ist. Ihre Meldungen
+    # duerfen NICHT in den Seen-Store: dort gelten sie sonst als erledigt und
+    # tauchen nie wieder auf, obwohl sie kein Analyst je gelesen hat.
+    unanalysierte_regionen: set[str] = set()
     editor_used = False
     if use_llm and new_items:
         # Analysts are independent per region -> run them concurrently. Only
@@ -227,10 +231,14 @@ def run(root: Path, use_llm: bool | None = None,
                     language=language, max_items=max_items)
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
+                if tel.get("batches") and not tel.get("batches_ok"):
+                    # Jeder Stapel gescheitert - die Meldungen sind ungelesen.
+                    unanalysierte_regionen.add(region_key)
                 return region_name, res, tel
             except Exception as exc:  # noqa: BLE001
                 log.error("Analyst %s failed: %s - falling back to raw list",
                           region_name, exc)
+                unanalysierte_regionen.add(region_key)
                 fallback = {
                     "region_summary": "",
                     "highlights": [
@@ -488,9 +496,29 @@ def run(root: Path, use_llm: bool | None = None,
     log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
 
     # ------------------------------------------------------ persist state
-    seen.add(new_items)
-    if covered:
+    # Der Seen-Store ist ein Einbahnschild: was hier hineingeht, gilt als
+    # erledigt und wird nie wieder gesammelt. Meldungen einer Region, deren
+    # Analyse komplett gescheitert ist, gehoeren deshalb NICHT hinein - sie
+    # waeren sonst still verloren. Lauf #64 (04.08.2026) hat genau das getan:
+    # das Anthropic-Guthaben war leer, jeder Analysten-Stapel scheiterte mit
+    # HTTP 400, und trotzdem wanderten 223 ungelesene Meldungen in den Store.
+    # Beim naechsten Lauf mit Guthaben waeren sie nicht mehr aufgetaucht.
+    zu_merken = [i for i in new_items if i.region not in unanalysierte_regionen]
+    uebersprungen = len(new_items) - len(zu_merken)
+    if uebersprungen:
+        log.warning("%d Meldungen aus %d Region(en) ohne Analyse NICHT als "
+                    "gesehen markiert - der naechste Lauf holt sie erneut",
+                    uebersprungen, len(unanalysierte_regionen))
+    seen.add(zu_merken)
+    # Dieselbe Logik fuer das Themengedaechtnis: Themen aus einem Notfall-
+    # Digest als "schon berichtet" abzulegen wuerde die Redaktion daran
+    # hindern, sie spaeter richtig zu behandeln.
+    if covered and editor_used:
         topics_store.add(covered, today.isoformat())
+    elif covered:
+        log.warning("%d Themen stammen aus dem Notfall-Digest, nicht aus der "
+                    "Redaktion - sie werden NICHT als berichtet gemerkt",
+                    len(covered))
 
     # ---------------------------------------------------------------- site
     render_site(root / "site", reports_dir, cfg)
