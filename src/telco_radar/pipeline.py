@@ -244,6 +244,11 @@ def run(root: Path, use_llm: bool | None = None,
     # duerfen NICHT in den Seen-Store: dort gelten sie sonst als erledigt und
     # tauchen nie wieder auf, obwohl sie kein Analyst je gelesen hat.
     unanalysierte_regionen: set[str] = set()
+    # Einzelne Meldungen aus gescheiterten Stapeln - dieselbe Logik eine Ebene
+    # feiner. Der Regionsschutz allein reicht nicht: im Lauf #67 fielen 2 von
+    # 3 Stapeln eines Themenfelds aus, die Region galt damit als analysiert,
+    # und rund 33 ungelesene Meldungen wanderten trotzdem in den Seen-Store.
+    ungelesene_meldungen: set[str] = set()
     editor_used = False
     if use_llm and new_items:
         # Analysts are independent per region -> run them concurrently. Only
@@ -289,6 +294,7 @@ def run(root: Path, use_llm: bool | None = None,
                      for rk, ri in items_by_region.items()]
             for _fut in as_completed(_futs):
                 region_name, res, tel = _fut.result()
+                ungelesene_meldungen.update(res.pop("_ungelesen", []) or [])
                 regional[region_name] = res
                 if tel is not None:
                     analyst_telemetry.append(tel)
@@ -555,12 +561,16 @@ def run(root: Path, use_llm: bool | None = None,
     # das Anthropic-Guthaben war leer, jeder Analysten-Stapel scheiterte mit
     # HTTP 400, und trotzdem wanderten 223 ungelesene Meldungen in den Store.
     # Beim naechsten Lauf mit Guthaben waeren sie nicht mehr aufgetaucht.
-    zu_merken = [i for i in new_items if i.region not in unanalysierte_regionen]
+    zu_merken = [i for i in new_items
+                 if i.region not in unanalysierte_regionen
+                 and i.id not in ungelesene_meldungen]
     uebersprungen = len(new_items) - len(zu_merken)
     if uebersprungen:
-        log.warning("%d Meldungen aus %d Region(en) ohne Analyse NICHT als "
-                    "gesehen markiert - der naechste Lauf holt sie erneut",
-                    uebersprungen, len(unanalysierte_regionen))
+        log.warning("%d Meldungen NICHT als gesehen markiert (%d Region(en) "
+                    "ganz ohne Analyse, %d Meldungen aus gescheiterten "
+                    "Stapeln) - der naechste Lauf holt sie erneut",
+                    uebersprungen, len(unanalysierte_regionen),
+                    len(ungelesene_meldungen))
     seen.add(zu_merken)
     # Dieselbe Logik fuer das Themengedaechtnis: Themen aus einem Notfall-
     # Digest als "schon berichtet" abzulegen wuerde die Redaktion daran

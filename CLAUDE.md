@@ -190,6 +190,14 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   einmal ohne Zeitstempel. Undatiert heißt unsichtbar. `--zweimal` fängt das
   ab; **Bell Canada hängt weiter an dieser Seite** und fällt deshalb
   unvorhersehbar aus dem Bericht (bce.ca liefert nur leere Next.js-Chunks).
+- **Der Seen-Store-Schutz wirkt jetzt pro STAPEL, nicht pro Region.** Lauf #67
+  hat die alte Luecke gezeigt: im Themenfeld KI-Anbieter scheiterten 2 von 3
+  Analysten-Stapeln, bei Regulierung 1 von 2. Beide Bereiche galten als
+  analysiert, weil je ein Stapel durchkam — rund 33 ungelesene Meldungen
+  wanderten trotzdem in `seen.jsonl` und waeren dauerhaft weg gewesen. Mehr
+  Quellen heisst mehr Stapel heisst mehr Teilausfaelle, deshalb meldet
+  `analyze_region()` jetzt die Meldungen gescheiterter Stapel als
+  `_ungelesen` zurueck und die Pipeline haelt sie aus dem Store.
 - **Laufzeit: parallelisieren, nicht kappen.** Der Lauf vom 31.07. brauchte mit
   220 neuen Meldungen 49 von 50 zulässigen Minuten, weil jede Region ihre
   Stapel nacheinander abarbeitete. Stellschrauben sind `collect_max_workers`

@@ -202,16 +202,27 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     highlights: list[dict] = []
     summaries: list[str] = []
     batches_ok = 0
-    for result in ergebnisse:
+    # Meldungen aus gescheiterten Stapeln. Sie hat kein Analyst gesehen und
+    # sie duerfen deshalb NICHT in den Seen-Store - sonst gelten sie als
+    # erledigt und werden nie wieder gesammelt. Der Schutz aus Lauf #64 wirkte
+    # nur, wenn eine Region KOMPLETT ausfiel; im Lauf #67 (04.08.2026)
+    # scheiterten 2 von 3 Stapeln des Themenfelds KI-Anbieter und 1 von 2 bei
+    # Regulierung - rund 33 Meldungen wanderten ungelesen in den Store. Mit
+    # mehr Quellen gibt es mehr Stapel und damit mehr solcher Teilausfaelle.
+    ungelesen: list[str] = []
+    for result, batch in zip(ergebnisse, batches):
         if result is None:
+            ungelesen.extend(i.id for i in batch)
             continue
         batches_ok += 1
         highlights.extend(result.get("highlights") or [])
         if result.get("region_summary"):
             summaries.append(str(result["region_summary"]))
 
-    log.info("Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d highlights",
-             region_name, len(capped), len(batches), batch_workers, len(highlights))
+    log.info("Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d "
+             "highlights, %d ungelesen",
+             region_name, len(capped), len(batches), batch_workers,
+             len(highlights), len(ungelesen))
     return {
         "region_summary": " ".join(summaries),
         "highlights": highlights,
@@ -220,6 +231,8 @@ def analyze_region(region_name: str, items: list[Item], model: str,
             "batches": len(batches),
             "batches_ok": batches_ok,
             "highlights": len(highlights),
+            "unread_items": len(ungelesen),
             "model": model,
         },
+        "_ungelesen": ungelesen,
     }
