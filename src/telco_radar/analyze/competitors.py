@@ -14,6 +14,13 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
+# Reasoning-Modelle zaehlen ihr Nachdenken gegen max_tokens. Reicht das Budget
+# nur dafuer, kommt eine LEERE Antwort zurueck - ohne Fehler, ohne
+# finish_reason. Im Laufprotokoll von #72 traf das diese Stufe zweimal, die
+# Promo-Bewertung neunmal. Vorher waren es 3500 Token. Abgerechnet werden
+# erzeugte Token, nicht das Budget - grosszuegig sein kostet hier nichts.
+COMPETITOR_MAX_TOKENS = 12000
+
 COMPETITOR_SYSTEM = """\
 You are a senior competitive-intelligence analyst at Vodafone Group. You get a
 JSON list of recent telecom trade-press articles that mention "{name}". Write a
@@ -80,7 +87,7 @@ def analyze_competitor(name, terms, items, model, language="Deutsch",
     try:
         parsed = extract_json(complete(
             COMPETITOR_SYSTEM.format(name=name, language=language), user,
-            model=model, max_tokens=3500))
+            model=model, max_tokens=COMPETITOR_MAX_TOKENS))
         result["summary"] = str(parsed.get("summary", ""))
         result["themes"] = [str(t) for t in (parsed.get("themes") or [])][:6]
         result["vodafone_implication"] = str(parsed.get("vodafone_implication", ""))

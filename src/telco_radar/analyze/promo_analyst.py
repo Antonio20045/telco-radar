@@ -135,7 +135,7 @@ def _resolve_link_index(row: dict, links: list[dict]) -> str | None:
 
 def extract_promos(brand: str, snapshot_text: str, model: str,
                    links: list[dict] | None = None,
-                   max_tokens: int = 1800) -> list[dict]:
+                   max_tokens: int = 12000) -> list[dict]:
     """LLM-Extraktion. Failsafe: bei jedem Fehler leere Liste - der
     bestehende PromoDB-Stand fuer diesen Brand bleibt dann einfach
     unveraendert (kein Absturz, kein stillschweigendes Loeschen).

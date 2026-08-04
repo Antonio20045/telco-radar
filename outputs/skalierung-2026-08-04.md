@@ -199,6 +199,30 @@ ungelesenen Meldungen (984 − 607 = 377, dann 613 − 417 = 196, dann
 im nächsten Lauf erneut. Das ist die Kerngarantie unter echter Last, und sie
 hat gehalten, während drei andere Dinge gleichzeitig schiefgingen.
 
+### Lauf #72 belegt die Diagnose
+
+Mit 24 000 Token je Aufruf und dem korrigierten Modellnamen:
+
+| | #71 (vorher) | #72 (nachher) |
+|---|---:|---:|
+| Analysten-Stapel | 30 | 19 |
+| davon erfolgreich | 13 (43 %) | **19 (100 %)** |
+| ungelesene Meldungen | 252 | **0** |
+| Abschnitte aus dem Notfallweg | 2 von 3 | **0** |
+| bewertete Meldungen | 78 | **148** |
+| HTTP-Fehler im ganzen Lauf | 6 (alle 400) | **0** |
+| Laufzeit | 27,7 min | **19,2 min** |
+
+Der Rückstand ist damit abgearbeitet: 984 → 613 → 422 → 257 neue Meldungen
+über vier Läufe, ohne dass eine einzige verloren ging.
+
+Das Protokoll von #72 zeigt allerdings, dass dieselbe Ursache auch die
+Nebenstufen trifft: 14 weitere leere Antworten in der Promo-Bewertung (9), den
+Wettbewerber-Profilen (2), der Promo-Analyse (2) und dem Kategorie-Sweep (1) —
+alle mit Budgets zwischen 1 500 und 3 500 Token. Sie stehen jetzt ebenfalls
+bei 12 000. Der Effekt war dort dieselbe stille Verarmung: Wettbewerber-Profile
+ohne Moves sehen aus wie eine ruhige Woche.
+
 Zwei Lehren, die über diesen Fall hinausgehen:
 
 1. **Ein formal erfolgreicher Lauf kann zur Hälfte ausgefallen sein.** Ohne

@@ -348,7 +348,11 @@ statt 1000.** Die vollständige Auswertung mit allen Zahlen steht in
   länger, die Eingabe größer, das Nachdenken teurer; 8 000 Token reichten
   nicht mehr. Analyst und Bereichsredaktion stehen jetzt bei 24 000.
   **Abgerechnet werden erzeugte Token, nicht das Budget** — großzügig sein
-  kostet hier nichts.
+  kostet hier nichts. Lauf #72 belegt es: 19 von 19 Stapeln erfolgreich, null
+  ungelesene Meldungen, null Notfall-Abschnitte, doppelt so viele bewertete
+  Meldungen wie im Lauf davor. Dieselbe Ursache traf die Nebenstufen
+  (Promo-Bewertung, Wettbewerber-Profile, Kategorie-Sweep) — auch dort steht
+  das Budget jetzt bei 12 000.
 - **Ein formal erfolgreicher Lauf kann zur Hälfte ausgefallen sein.** Deshalb
   lädt der Workflow das Laufprotokoll jetzt bei JEDEM Lauf als Artefakt hoch.
   Ohne das wäre die falsche Diagnose (Rate-Limit) stehengeblieben, samt der
