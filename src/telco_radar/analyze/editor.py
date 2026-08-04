@@ -39,7 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 from ..models import Item
-from .llm import complete, extract_json, llm_available
+from .llm import complete, llm_available
 
 log = logging.getLogger(__name__)
 
