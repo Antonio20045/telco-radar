@@ -65,8 +65,8 @@ def _host(url: str) -> str:
     return netloc.split("@")[-1].split(":")[0].removeprefix("www.")
 
 
-def sammelplan(jobs: list[tuple[Source, str, str | None, str]],
-               host_parallel: int = 1) -> list[list[tuple[Source, str, str | None, str]]]:
+def sammelplan(jobs: list, host_parallel: int = 1,
+               url_von=lambda job: job[0].url) -> list[list]:
     """Jobs in Gruppen schneiden, die parallel laufen duerfen.
 
     Eine Gruppe wird von genau einem Worker der Reihe nach abgearbeitet.
@@ -81,10 +81,14 @@ def sammelplan(jobs: list[tuple[Source, str, str | None, str]],
     Die groessten Gruppen kommen zuerst (LPT-Scheduling): sonst startet der
     Host mit 20 Quellen zufaellig zuletzt und bestimmt allein die Laufzeit
     der ganzen Phase.
+
+    `url_von` macht den Plan auch fuer andere Aufgaben nutzbar - der
+    Abnahme-Check prueft bei 1000 Kandidaten mit denselben Regeln, statt
+    eine zweite, ungetestete Drosselung danebenzustellen.
     """
     nach_host: dict[str, list] = defaultdict(list)
     for job in jobs:
-        nach_host[_host(job[0].url)].append(job)
+        nach_host[_host(url_von(job))].append(job)
     gruppen: list[list] = []
     for host_jobs in nach_host.values():
         n = max(1, min(int(host_parallel), len(host_jobs)))

@@ -28,11 +28,16 @@ _spec.loader.exec_module(pq)
 class FakeBestand:
     """Ein Bestand ohne Config und ohne Netz."""
 
-    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None):
+    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None,
+                 item_index: dict | None = None):
         self.http_cfg: dict = {}
         self.lookback = 8
         self._bekannt = bekannt or {}
         self.je_operator = je_operator or {}
+        # Meldungs-URL -> Quelle. Seit dem Massenbetrieb wird die
+        # Inhaltsdublette gegen diesen einmal aufgebauten Index geprueft,
+        # nicht mehr gegen Live-Abrufe je Kandidat.
+        self.item_index = item_index or {}
 
     def kennt(self, url: str) -> str:
         return self._bekannt.get(url, "")
@@ -221,15 +226,40 @@ def test_bekannte_url_ist_eine_dublette():
 
 def test_inhaltsdublette_wird_erkannt():
     """Zwei Pfade derselben Seite sind EINE Quelle, nicht zwei."""
-    from telco_radar.config import Source
+    from telco_radar.models import normalize_url
     gleiche = _items(10)
-    bestand = FakeBestand(je_operator={
-        "Beispiel": [Source(type="rss", url="https://example.com/alt")]})
+    bestand = FakeBestand(item_index={
+        normalize_url(i.url): "Beispiel (https://example.com/alt)"
+        for i in gleiche})
     k = pq.Kandidat(url="https://example.com/neu", type="rss",
                     operator="Beispiel", website="example.com")
     b = _pruefe(k, gleiche, bestand, overlap=True)
     assert not b.bestanden
     assert "100%" in _grund(b, 7, "Inhaltsdublette")["detail"]
+
+
+def test_inhaltsdublette_greift_auch_ueber_betreiber_hinweg():
+    """Die alte Pruefung sah nur Quellen DESSELBEN Betreibers - dieselbe
+    Landesgesellschaft unter anderem Namen fiel damit durchs Raster."""
+    from telco_radar.models import normalize_url
+    gleiche = _items(10)
+    bestand = FakeBestand(item_index={
+        normalize_url(i.url): "Ganz anderer Betreiber" for i in gleiche})
+    k = pq.Kandidat(url="https://example.com/neu", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, gleiche, bestand, overlap=True)
+    assert not b.bestanden
+
+
+def test_teilweise_ueberschneidung_ist_noch_keine_dublette():
+    from telco_radar.models import normalize_url
+    eigene = _items(10)
+    bestand = FakeBestand(item_index={
+        normalize_url(i.url): "Bestand" for i in eigene[:3]})
+    k = pq.Kandidat(url="https://example.com/neu", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, eigene, bestand, overlap=True)
+    assert b.bestanden, b.durchgefallen
 
 
 def test_newsroom_js_ist_nicht_abnehmbar():
@@ -288,3 +318,47 @@ def test_echte_ueberschrift_erkannt(titel):
 ])
 def test_registrierbare_domain(host, erwartet):
     assert pq._registrable(host) == erwartet
+
+
+# --------------------------------------------------------- Massenbetrieb
+# Kriterium 10: bei 1000 Kandidaten muss der Check einen Abbruch ueberleben
+# und darf nicht fuer jeden Kandidaten den halben Bestand neu abrufen.
+
+def test_cache_schluessel_haengt_an_den_collector_feldern():
+    a = pq.Kandidat(url="https://example.com/news", type="newsroom")
+    b = pq.Kandidat(url="https://example.com/news/", type="newsroom")
+    c = pq.Kandidat(url="https://example.com/news", type="newsroom",
+                    item_selector=".card")
+    d = pq.Kandidat(url="https://example.com/news", type="rss")
+
+    assert pq.cache_schluessel(a) == pq.cache_schluessel(b), \
+        "dieselbe URL, nur anders geschrieben"
+    assert pq.cache_schluessel(a) != pq.cache_schluessel(c), \
+        "ein neuer item_selector ist ein neuer Vorschlag"
+    assert pq.cache_schluessel(a) != pq.cache_schluessel(d)
+
+
+def test_cache_ueberlebt_den_abbruch(tmp_path):
+    pfad = tmp_path / "cache.json"
+    k = pq.Kandidat(url="https://example.com/news", type="newsroom")
+
+    cache = pq.Ergebniscache(pfad)
+    assert cache.hole(k) is None
+    cache.merke(k, {"url": k.url, "bestanden": True, "n_items": 12})
+
+    # Neuer Prozess, dieselbe Datei - der Kandidat ist erledigt.
+    wieder = pq.Ergebniscache(pfad)
+    assert wieder.hole(k)["n_items"] == 12
+
+
+def test_kaputter_cache_kostet_den_lauf_nicht(tmp_path):
+    pfad = tmp_path / "cache.json"
+    pfad.write_text("{kein json")
+    cache = pq.Ergebniscache(pfad)
+    assert cache.hole(pq.Kandidat(url="https://example.com/x")) is None
+
+
+def test_ohne_cachedatei_wird_nichts_geschrieben(tmp_path):
+    cache = pq.Ergebniscache(None)
+    cache.merke(pq.Kandidat(url="https://example.com/x"), {"bestanden": True})
+    assert list(tmp_path.iterdir()) == []
