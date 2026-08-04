@@ -385,11 +385,32 @@ naheliegenden Länder und Kategorien sind jetzt abgegrast.
   Maroc Telecom) sind weiter nicht crawlbar. Für Cosmote decken jetzt drei
   griechische Fachmedien einen Teil ab.
 
+### Die Welle hat die Erwartung eingelöst
+
+Die Trefferquote, neu ausgewertet nach den Läufen #68–#72, misst die neuen
+Quellen zum ersten Mal exakt (über `source_url` statt über den Quellennamen):
+
+| Ebene | Quellen | bewertet/Lauf | im Bericht/Lauf | Bewertungsquote |
+|---|---:|---:|---:|---:|
+| Betreiber | 140 | 0,08 | 0,06 | 0,3 % |
+| Themenfelder | 49 | 0,16 | 0,12 | 1,1 % |
+| Fachpresse | 70 | **1,99** | **0,53** | **7,4 %** |
+
+Die Spitzenplätze belegen ausnahmslos Quellen aus dieser Welle: der
+Golem-Ressortfeed Telekommunikation bringt **5 Meldungen je Lauf** in den
+Wochenbericht, Ariase (FR) 4, MondoMobileWeb (IT) 4, Univers Freebox (FR) und
+TelecomTV (UK) je 2. Zum Vergleich: der beste Bestandsfeed lag vor der Welle
+bei 0,67. Die Entscheidung, den Ausbau an der Trefferquote statt an einer
+Vorabannahme auszurichten, ist damit belegt — und die nächste Welle hat eine
+belastbare Grundlage statt eines Bauchgefühls.
+
+Einschränkung: Das sind ein bis fünf Läufe je Quelle, alle am selben Tag. Die
+Rangfolge ist ein erster Befund, keine Saisonbereinigung.
+
 ### Was als Nächstes zu tun ist
 
-1. **Trefferquote nach zwei bis drei Läufen neu auswerten** — mit `source_url`
-   ist sie ab Lauf #68 exakt, und erst dann lässt sich sagen, ob die 56 neuen
-   Fachpressequellen die Erwartung einlösen.
+1. **Trefferquote nach zwei bis drei regulären Wochen neu auswerten** — die
+   heutige Messung stammt aus fünf Läufen desselben Tages.
 2. **Gesamtbudget je Quelle** in der Sammelphase (siehe 2.1).
 3. **DeepSeek-Rate-Limit messen**, bevor die Parallelität steigt.
 4. Nächste Welle entlang der Kategorien, die sich in Schritt 1 als tragend
