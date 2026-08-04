@@ -1,0 +1,1169 @@
+{
+ "date": "2026-08-04",
+ "generated_with_llm": true,
+ "stats": {
+  "sources_total": 91,
+  "sources_ok": 88,
+  "sources_empty": 1,
+  "sources_failed": 2,
+  "collected": 1573,
+  "new": 223,
+  "operators": 81,
+  "regions": 6
+ },
+ "briefing_md": "## Redaktions-Fallback\n\n> Die aktuelle Quellenliste konnte wegen einer vorübergehenden Störung des Analyse-Dienstes nicht redaktionell verdichtet werden. Die Links und Meldungen stammen trotzdem aus diesem Lauf; die automatische Redaktion wird im nächsten Lauf erneut versucht.\n\n## Roh-Digest (ohne redaktionelle Verdichtung)\n\n### Global (104 neu)\n\n- **Broadband TV News**: [Fifty5Blue in talks to invest in UK cross-media measurement platform Origin](https://www.broadbandtvnews.com/2026/08/03/fifty5blue-in-talks-to-invest-in-uk-cross-media-measurement-platform-origin/) (2026-08-03)\n- **Broadband TV News**: [STV Player launches on LG smart TVs](https://www.broadbandtvnews.com/2026/08/03/stv-player-launches-on-lg-smart-tvs/) (2026-08-03)\n- **Broadband TV News**: [Disney+ restoring 4K UHD after patent ruling](https://www.broadbandtvnews.com/2026/08/03/disney-removes-4k-and-hdr-from-premium-tier-following-patent-ruling/) (2026-08-03)\n- **Broadband TV News**: [Ampere: UK and US consumers build increasingly diverse media diets](https://www.broadbandtvnews.com/2026/08/03/ampere-uk-and-us-consumers-build-increasingly-diverse-media-diets/) (2026-08-03)\n- **Broadband TV News**: [Sportdigital secures Liga Portugal rights until 2028](https://www.broadbandtvnews.com/2026/08/03/sportdigital-secures-liga-portugal-rights-until-2028/) (2026-08-03)\n- **Broadband TV News**: [AKIBA ANIME unveils expansion plans and new anime films at AnimagiC](https://www.broadbandtvnews.com/2026/08/03/akiba-anime-unveils-expansion-plans-and-new-anime-films-at-animagic/) (2026-08-03)\n- **CommsRisk**: [Hong Kong SMS Blaster Broadcasts WhatsApp Account Hijacking Scam](https://commsrisk.com/hong-kong-sms-blaster-broadcasts-whatsapp-account-hijacking-scam/) (2026-08-03)\n- **Developing Telecoms**: [Huawei lands US$97.6m Shariah-compliant facility from MBSB for U Mobile rollout](https://developingtelecoms.com/telecom-business/telecom-investment-mergers/20627-huawei-lands-us-97-6m-shariah-compliant-facility-from-mbsb-for-u-mobile-rollout.html) (2026-08-04)\n- **Developing Telecoms**: [Trans-Caspian subsea cable connecting Azerbaijan and Kazakhstan now being laid](https://developingtelecoms.com/telecom-technology/optical-fixed-networks/20625-trans-caspian-subsea-cable-connecting-azerbaijan-and-kazakhstan-now-being-laid.html) (2026-08-04)\n- **Developing Telecoms**: [Lesotho secures major data centre and hydropower deal](https://developingtelecoms.com/telecom-business/telecom-investment-mergers/20624-lesotho-secures-major-data-centre-and-hydropower-deal.html) (2026-08-03)\n- **Developing Telecoms**: [What next for Hughes after bankruptcy filing?](https://developingtelecoms.com/telecom-technology/satellite-communications-networks/20623-what-next-for-hughes-after-bankruptcy-filing.html) (2026-08-03)\n- **Developing Telecoms**: [SES to provide inflight connectivity to LATAM Airlines fleet](https://developingtelecoms.com/telecom-technology/satellite-communications-networks/20621-ses-to-provide-inflight-connectivity-to-latam-airlines-fleet.html) (2026-08-03)\n- **Developing Telecoms**: [MegaFon Tajikistan upgrades and expands 4G sites and fibre transport](https://developingtelecoms.com/telecom-business/operator-news/20619-megafon-tajikistan-upgrades-and-expands-4g-sites-and-fibre-transport.html) (2026-08-03)\n- **Developing Telecoms**: [Philippine telcos submit US$500m national subsea cable plan to DICT](https://developingtelecoms.com/telecom-technology/optical-fixed-networks/20618-philippine-telcos-submit-us-500m-national-subsea-cable-plan-to-dict.html) (2026-08-03)\n- **Developing Telecoms**: [Liberty and CANTV to build subsea cable linking Curaçao and Venezuela](https://developingtelecoms.com/telecom-technology/optical-fixed-networks/20617-liberty-and-cantv-to-build-subsea-cable-linking-curacao-and-venezuela.html) (2026-08-03)\n- **Fierce Network**: [Uniti’s wholesale fiber transport booms, but fiber broadband suffers ARPU decline](https://www.fierce-network.com/broadband/unitis-wholesale-fiber-transport-booms-fiber-broadband-suffers-arpu-decline) (2026-08-03)\n- **Fierce Network**: [Hyperscalers face growing investor doubts over AI data center spending spree](https://www.fierce-network.com/cloud/hyperscalers-face-growing-investor-doubts-over-ai-data-center-spending-spree) (2026-08-03)\n- **Fierce Network**: [AMD is 1:1 with Nvidia in many neoclouds, says VAST exec](https://www.fierce-network.com/fierce-network-tv/neoclouds-are-buying-amd-1-1-nvidia-vast-says) (2026-07-31)\n- **Fierce Network**: [NTIA tees up 4.4 GHz band for 6G study](https://www.fierce-network.com/wireless/ntia-tees-44-ghz-band-6g-study) (2026-07-31)\n- **Fierce Network**: [Opinion: The dumb-money AI window is closing — Hurry!](https://www.fierce-network.com/fierce-network-tv/opinion-dumb-money-ai-window-closing-hurry) (2026-07-31)\n- **Fierce Network**: [Corning expects an annualized revenue run rate of $20B for 2026](https://www.fierce-network.com/broadband/corning-expects-annualized-revenue-run-rate-20b-2026) (2026-07-31)\n- **Fierce Network**: [Amazon's AI infrastructure bill just got $20B bigger](https://www.fierce-network.com/cloud/memory-drives-amazon-capex-another-20b-2026) (2026-07-31)\n- **Fierce Network**: [AI data center boom exposes labor crunch](https://www.fierce-network.com/fierce-network-tv/ai-data-center-boom-exposes-labor-crunch) (2026-07-30)\n- **ISPreview UK**: [Ookla H1 2026 Study Names the Fastest Big UK Fixed Broadband Providers](https://www.ispreview.co.uk/index.php/2026/08/ookla-h1-2026-study-names-the-fastest-big-uk-fixed-broadband-providers.html) (2026-08-04)\n- **ISPreview UK**: [RootMetrics Awards EE as the BEST UK Mobile Operator in H1 2026 Study](https://www.ispreview.co.uk/index.php/2026/08/rootmetrics-awards-ee-as-the-best-uk-mobile-operator-in-h1-2026-study.html) (2026-08-04)\n- **ISPreview UK**: [BT, Sky, Grain and Hyperoptic Comment on Nexfibre’s £2bn Move to Buy Netomnia](https://www.ispreview.co.uk/index.php/2026/08/bt-sky-grain-and-hyperoptic-comment-on-nexfibres-2bn-move-to-buy-netomnia.html) (2026-08-03)\n- **ISPreview UK**: [Part of Fusion Fibre’s UK Broadband Network Suffering Protracted Outage UPDATE2](https://www.ispreview.co.uk/index.php/2026/08/part-of-fusion-fibres-uk-broadband-network-suffering-protracted-outage.html) (2026-08-03)\n- **ISPreview UK**: [GoFibre Boost Speeds and Update on FTTP Broadband Rollout in North East Scotland](https://www.ispreview.co.uk/index.php/2026/08/gofibre-boost-speeds-and-update-on-fttp-broadband-rollout-in-north-east-scotland.html) (2026-08-03)\n- **ISPreview UK**: [Grain Connect Offers up to £100 in Bill Credits to New UK Broadband Customers](https://www.ispreview.co.uk/index.php/2026/08/grain-connect-offers-up-to-100-in-bill-credits-to-new-uk-broadband-customers.html) (2026-08-03)\n- **ISPreview UK**: [Broadband ISP TalkTalk Sells 120,000 UK Customers to Rise Fibre UPDATE](https://www.ispreview.co.uk/index.php/2026/08/broadband-isp-talktalk-sells-130000-uk-customers-to-rise-fibre.html) (2026-08-03)\n- **Light Reading**: [New US 6G alliance must show it can make a difference](https://www.lightreading.com/6g/new-us-6g-alliance-must-show-it-can-make-a-difference) (2026-08-03)\n- **Light Reading**: [Greenwatch: Heat is on for networks as Europe burns](https://www.lightreading.com/sustainability/greenwatch-heat-is-on-for-networks-as-europe-burns) (2026-08-03)\n- **Light Reading**: [The Divide: Why digital inclusion needs a new funding model](https://www.lightreading.com/broadband/the-divide-why-digital-inclusion-needs-a-new-funding-model) (2026-08-03)\n- **Light Reading**: [Philippine telcos pool resources for $500M domestic subsea cable system](https://www.lightreading.com/cable-technology/philippine-telcos-pool-resources-for-500m-domestic-subsea-cable-system) (2026-08-03)\n- **Light Reading**: [Ericsson kicks off Vonage revival plan after years of losses](https://www.lightreading.com/5g/ericsson-kicks-off-vonage-revival-plan-after-years-of-losses) (2026-08-03)\n- **Light Reading**: [Starlink targets D2C trial in Malaysia amid D2C boom across APAC](https://www.lightreading.com/satellite/starlink-targets-d2c-trial-in-malaysia-amid-d2c-boom-across-apac) (2026-07-31)\n- **Light Reading**: [Each carrier nailed its Q2 plan but buried the number that shows the cost](https://www.lightreading.com/wireless/each-carrier-nailed-its-q2-plan-but-buried-the-number-that-shows-the-cost) (2026-07-31)\n- **Light Reading**: [Broadband access, cable outside plant revenues set to rise – Dell'Oro](https://www.lightreading.com/broadband/broadband-access-cable-outside-plant-revenues-set-to-rise-dell-oro) (2026-07-31)\n- **Light Reading**: [The Buildout: Brightspeed builds on in several states](https://www.lightreading.com/broadband/the-buildout-brightspeed-builds-on-in-several-states) (2026-07-31)\n- **Light Reading**: [FCC: Dish $2.4B trust fund only for outsiders that built its 5G network](https://www.lightreading.com/regulatory-politics/fcc-dish-2-4b-trust-fund-only-for-outsiders-that-built-its-5g-network) (2026-07-31)\n  - _... und 2 weitere_\n- **Mobile Europe**: [Apple renews court battle over UK demand for encrypted iCloud access](https://www.mobileeurope.co.uk/apple-icloud-access/) (2026-08-04)\n- **Mobile Europe**: [EU launches €30bn AI Gigafactory plan with AMD, Nvidia & Qualcomm backing](https://www.mobileeurope.co.uk/eu-ai-gigafactory-nvidia/) (2026-08-03)\n- **Mobile Europe**: [TalkTalk offloads 120,000 customers to Rise Fibre](https://www.mobileeurope.co.uk/talktalk-rise-fibre/) (2026-08-03)\n- **Mobile World Live**: [US operators launch SIM-based security](https://www.mobileworldlive.com/att/us-operators-launch-sim-based-security/) (2026-08-04)\n- **Mobile World Live**: [ChatGPT dominates early AI spending by US Congress](https://www.mobileworldlive.com/ai-cloud/chatgpt-dominates-early-ai-spending-by-us-congress/) (2026-08-04)\n- **Mobile World Live**: [TIM details €550M green plan to mitigate digital impact](https://www.mobileworldlive.com/europe/tim-details-e550m-green-plan-to-mitigate-digital-impact/) (2026-08-03)\n- **Mobile World Live**: [NTT advances OptQC quantum collaboration](https://www.mobileworldlive.com/industry/ntt-advances-optqc-quantum-collaboration/) (2026-08-03)\n- **Mobile World Live**: [Google pulls Earth AI-image generator tool](https://www.mobileworldlive.com/ai-cloud/google-pulls-earth-ai-image-generator-tool/) (2026-08-03)\n- **Mobile World Live**: [Alibaba continues AI push with latest Qwen model](https://www.mobileworldlive.com/asia-pacific/alibaba-continues-ai-push-with-latest-qwen-model/) (2026-08-03)\n- **Mobile World Live**: [NTIA approves US 4.4GHz 6G research](https://www.mobileworldlive.com/regulation/ntia-approves-us-4-4ghz-6g-research/) (2026-08-03)\n- **Mobile World Live**: [Smartphone revenue hits $109B as Apple claims record share](https://www.mobileworldlive.com/devices/smartphone-revenue-hits-109b-as-apple-claims-record-share/) (2026-07-31)\n- **Mobile World Live**: [Hisdesat picks team for next secure satellite build](https://www.mobileworldlive.com/industry/hisdesat-picks-team-for-next-secure-satellite-build/) (2026-07-31)\n- **Mobile World Live**: [Samsung combina pérdidas en móviles con un récord en memoria](https://www.mobileworldlive.com/spanish/samsung-combina-perdidas-en-moviles-con-un-record-en-memoria/) (2026-07-30)\n  - _... und 3 weitere_\n- **RCR Wireless**: [Poste deal advances as TIM eyes growth in AI services, mission-critical industries](https://www.rcrwireless.com/20260803/5g/tim-poste-deal-advances) (2026-08-03)\n- **RCR Wireless**: [Physical AI is exposing a data sovereignty gap (Reader Forum)](https://www.rcrwireless.com/20260803/internet-of-things/physical-ai-data-sovereignty-gap-flolive) (2026-08-03)\n- **RCR Wireless**: [Friday (telco diary) | Telcos in AI and ISAC arms race](https://www.rcrwireless.com/20260803/opinion/telco-diary-ai-isac-arms-race) (2026-08-03)\n- **RCR Wireless**: [Building the AI backbone, waiting on the AI billions](https://www.rcrwireless.com/20260731/network-infrastructure/ai-backbone-billions-telcos) (2026-07-31)\n- **TelecomTalk**: [OPPO F35 India Launch Timeline Tipped](https://telecomtalk.info/oppo-f35-india-launch-timeline-tipped/1010397/) (2026-08-04)\n- **TelecomTalk**: [Net Neutrality Back in Focus with 5G, DoT Tells TRAI to Review Shift](https://telecomtalk.info/net-neutrality-back-in-focus-with-5g/1010395/) (2026-08-04)\n- **TelecomTalk**: [iQOO Z11 India Design Revealed: iPhone Air Like Camera Island](https://telecomtalk.info/iqoo-z11-india-design-revealed-iphone-air/1010393/) (2026-08-04)\n- **TelecomTalk**: [Boltt to Launch its First Smartphone in India: Details Revealed](https://telecomtalk.info/boltt-to-launch-its-first-smartphone-in-india-details-revealed/1010375/) (2026-08-04)\n- **TelecomTalk**: [JioTag 2 vs Galaxy SmartTag2 vs UGREEN FineTrack: Which One Should You Buy?](https://telecomtalk.info/jiotag2-galaxysmarttag2-ugreenfinetrack-which-tracker-should-buy/1010387/) (2026-08-04)\n- **TelecomTalk**: [Samsung Galaxy F70 Pro 5G VS Galaxy M47 – Full Comparison](https://telecomtalk.info/samsunggalaxyf70pro-5g-vs-galaxym47-full-comparison-details/1010370/) (2026-08-03)\n- **TelecomTalk**: [Samsung Galaxy Tab S12 Ultra Chip Confirmed through Geekbench](https://telecomtalk.info/samsung-galaxy-tab-s12-ultra-chip-confirmed/1010372/) (2026-08-03)\n- **TelecomTalk**: [Samsung Galaxy Z Fold 8 Ultra Price Offers in India](https://telecomtalk.info/samsung-galaxy-z-fold-8-ultra-price/1010362/) (2026-08-03)\n- **TelecomTalk**: [Samsung Galaxy S27 Ultra To Get New Design, Si-C Battery](https://telecomtalk.info/samsunggalaxys27ultra-to-get-new-design-sic-battery/1010356/) (2026-08-03)\n- **TelecomTalk**: [Google Pixel 11 Pro With Pixel Glow to Get Less RAM](https://telecomtalk.info/googlepixel11pro-with-pixelglow-to-get-less-ram/1010343/) (2026-08-03)\n  - _... und 1 weitere_\n- **Telecoms Tech News**: [AST SpaceMobile targets beta D2D service with next BlueBird launch](https://www.telecomstechnews.com/news/ast-spacemobile-d2d-network-bluebird-launch/) (2026-08-04)\n- **Telecoms Tech News**: [The RAN market is selling AI as a cure. Its economics say otherwise](https://www.telecomstechnews.com/news/ai-ran-economics-ran-market/) (2026-07-30)\n- **The Fast Mode**: [Liberty Networks, CANTV Launch Fénix Submarine Cable to Boost Venezuela Connectivity](https://www.thefastmode.com/technology-solutions/50013-liberty-networks-cantv-launch-fenix-submarine-cable-to-boost-venezuela-connectivity) (2026-08-04)\n- **The Fast Mode**: [SES Launches Multi-Orbit Satellite Connectivity Across LATAM Airbus and Embraer Fleet](https://www.thefastmode.com/technology-solutions/50011-ses-launches-multi-orbit-satellite-connectivity-across-latam-airbus-and-embraer-fleet) (2026-08-04)\n- **The Fast Mode**: [HCLTech Completes HPE Telco Solutions Acquisition to Expand AI-Driven Telecom Capabilities](https://www.thefastmode.com/solution-vendors-m-a/50010-hcltech-completes-hpe-telco-solutions-acquisition-to-expand-ai-driven-telecom-capabilities) (2026-08-04)\n- **The Fast Mode**: [KKR Closes $19.2 Billion Infrastructure Fund Focused on Critical Global Assets](https://www.thefastmode.com/investments-and-expansions/50006-kkr-closes-19-2-billion-infrastructure-fund-focused-on-critical-global-assets) (2026-08-03)\n- **The Fast Mode**: [Ethio Telecom Launches 8th Round Seedling Planting Program Nationwide for Green Ethiopia Goals](https://www.thefastmode.com/technology-solutions/50005-ethio-telecom-launches-8th-round-seedling-planting-program-nationwide-for-green-ethiopia-goals) (2026-08-03)\n- **The Fast Mode**: [NTT, OptQC Form Capital Alliance to Advance Optical Quantum Computers](https://www.thefastmode.com/technology-solutions/50003-ntt-optqc-form-capital-alliance-to-advance-optical-quantum-computers) (2026-08-03)\n- **The Fast Mode**: [Cato Networks Launches Agentic Threat Prevention to Stop AI-Assisted Attacks](https://www.thefastmode.com/technology-solutions/50002-cato-networks-launches-agentic-threat-prevention-to-stop-ai-assisted-attacks) (2026-08-03)\n- **The Fast Mode**: [TPx Launches Managed Endpoint Security Powered by SentinelOne for Advanced Cybersecurity Protection](https://www.thefastmode.com/technology-solutions/50001-tpx-launches-managed-endpoint-security-powered-by-sentinelone-for-advanced-cybersecurity-protection) (2026-08-03)\n- **The Fast Mode**: [Armadin, TENEX.ai Execute Largest Controlled Live AI Cyberattack Demonstration](https://www.thefastmode.com/technology-solutions/49999-armadin-tenex-ai-execute-largest-controlled-live-ai-cyberattack-demonstration) (2026-08-03)\n- **The Fast Mode**: [Xsight Labs Raises $300 Million Funding at $2.8 Billion Valuation for AI Networks](https://www.thefastmode.com/investments-and-expansions/49998-xsight-labs-raises-300-million-funding-at-2-8-billion-valuation-for-ai-networks) (2026-08-03)\n  - _... und 19 weitere_\n\n### Asien (52 neu)\n\n- **AIS**: [AIS Business advances enterprise IoT connectivity](https://www.ais.th/en/about-us/pr-news/bridge-alliance)\n- **AIS**: [AIS Announces Partnership with UC3](https://www.ais.th/en/about-us/pr-news/uc3)\n- **AIS**: [ครั้งแรกในไทย! AIS PLAY ปล่อยแพ็กใหม่ “PLAY ALL”](https://www.ais.th/en/about-us/pr-news/play-all-package)\n- **AIS**: [AIS and Bangkok Land Join Forces to Deploy Smart Infrastructure](https://www.ais.th/en/about-us/pr-news/muangthong-next)\n- **AIS**: [Thailand’s First AI Readiness Index: MHESI, through NXPO,](https://www.ais.th/en/about-us/pr-news/tari)\n- **AIS**: [AIS Join Forces with Match Group and Tinder to Advance Human Connection Campaign](https://www.ais.th/en/about-us/pr-news/human-connection)\n- **AIS**: [AIS Unveils 2026 SROI Research Findings of Green Energy Green Network for THAIs](https://www.ais.th/en/about-us/pr-news/sroi)\n- **AIS**: [AIS Presents Intelligent Digital Technologies at the Global Telecom AIoT Summit 2026](https://www.ais.th/en/about-us/pr-news/aiot-summer-2026)\n- **AIS**: [AIS Business and Microsoft launch “AI Ready for SMEs”](https://www.ais.th/en/about-us/pr-news/ai-ready-for-smes)\n- **AIS**: [AIS ร่วมกับ Wisesight ยกระดับ Thailand Social AIS Gaming Awards](https://www.ais.th/en/about-us/pr-news/ais-gaming-award)\n  - _... und 20 weitere_\n- **Bharti Airtel**: [Breaking: Airtel Revamps Rs 200 Pack as Box Office Pack with Added OTT Benefits](https://telecomtalk.info/airtel-revamps-rs200-pack-box-office-pack/1010380/) (2026-08-03)\n- **Bharti Airtel**: [Airtel Surpasses Call Centre Accessibility Benchmarks Across All Circles in May 2026](https://telecomtalk.info/airtel-surpasses-call-centre-accessibility-benchmarks-may2026/1010350/) (2026-08-03)\n- **China Mobile**: [True Corp refutes report that China Mobile plans to sell its entire stake](https://developingtelecoms.com/telecom-business/telecom-investment-mergers/20626-true-corp-refutes-report-that-china-mobile-plans-to-sell-its-entire-stake.html) (2026-08-04)\n- **China Telecom**: [China Telecom Honored with \"Asia's Best CSR\" Award by Corporate Governance Asia for 7 Consecutive Years](http://doc.irasia.com/listco/hk/chinatelecom/press/p260804a.pdf) (2026-08-04)\n- **China Telecom**: [China Telecom was Honored with Seven Awards by FinanceAsia](http://doc.irasia.com/listco/hk/chinatelecom/press/p260804.pdf) (2026-08-04)\n- **Indosat Ooredoo Hutchison**: [First Time Ever! Indosat Delivers HoYo FEST 2026, Bringing the Gaming Experience to Life with Indosat 5G](https://ioh.co.id/EN/contents?slug=first-time-ever-indosat-delivers-hoyo-fest-2026-bringing-the-gaming-experience-to-life-with-indosat-5g) (2026-08-01)\n- **NTT Docomo**: [DOCOMO Completes Japan’s First Ericsson RAN Processor 6672 Commercial Deployment for 5G](https://www.thefastmode.com/technology-solutions/50009-docomo-completes-japan-s-first-ericsson-ran-processor-6672-commercial-deployment-for-5g) (2026-08-04)\n- **NTT Docomo**: [Ericsson lands DOCOMO contract for AI-ready RAN infrastructure](https://www.mobileeurope.co.uk/ericcson-docomo-ran/) (2026-08-03)\n- **NTT Docomo**: [Docomo picks Ericsson RAN baseband](https://www.mobileworldlive.com/docomo/docomo-picks-ericsson-ran-baseband/) (2026-07-31)\n- **NTT Docomo**: [Ericsson lands NTT DOCOMO deal to supply AI-ready RAN Compute platform for Japan 5G network](https://www.fierce-network.com/wireless/ericsson-lands-ntt-docomo-deal-supply-ai-ready-ran-compute-platform-japan-5g-network) (2026-07-31)\n- **PLDT**: [PLDT, Smart back PTFOMS-led workshop for boosting protection, resilience of women journalists in Cebu](https://cms.pldt.com/drupal/article/pldt-smart-back-ptfoms-led-workshop-boosting-protection-resilience-women-journalists-cebu) (2026-08-03)\n- **Rakuten Mobile**: [Rakuten expands medical app abilities](https://www.mobileworldlive.com/industry/rakuten-expands-medical-app-abilities/) (2026-08-03)\n- **Reliance Jio**: [Reliance Jio Launches 3-in-1 Jio Home Packs Starting at Rs 400](https://telecomtalk.info/reliancejio-launches-jio-home-packs-starting-rs400/1010322/) (2026-08-03)\n- **SK Telecom**: [SK Telecom Provides AI Picture Diary Solution for Digital Seed Education Project](https://www.thefastmode.com/technology-solutions/50004-sk-telecom-provides-ai-picture-diary-solution-for-digital-seed-education-project) (2026-08-03)\n- **SoftBank**: [Earnings Results for Q1 FY2026](https://www.softbank.jp/en/corp/news/press/sbkk/2026/20260804_01/) (2026-08-04)\n- **Telkomsel**: [Transformasi BUMN di Bawah Danantara Perkuat Layanan Publik, Telkomsel Tumbuh Sehat di Semester I 2026 01 Aug 2026](https://www.telkomsel.com/about-us/news/transformasi-bumn-di-bawah-danantara-perkuat-layanan-publik-telkomsel-tumbuh-sehat-di) (2026-08-01)\n- **True Corporation**: [Launch of “Quantum Club Thailand”, Government, Private Sector and Researchers Join Forces to Establish Thailand’s Quantum Ecosystem, Connecting Research with Real-World Industry Applications MHESI, CP Group, Arise, True, QTRic and qBraid Collaborate to Build a National Quantum Platform with Four Core Missions: Talent Development–Research Acceleration–Industry Enablement–Innovation Creation, Aiming to Propel Thailand toward Becoming a Co-Creator of Quantum Technology on the Global Stage](https://www.true.th/blog/en/quantum-club-thailand-2/) (2026-08-03)\n- **True Corporation**: [True Corporation Empowers the Future Workforce through “True Alpha Internship 2026”, Turning Business Challenges into AI-Powered Innovations with Real-World Potential](https://www.true.th/blog/en/true-alpha-internship-2026-2/) (2026-08-03)\n- **Vodafone Idea**: [Breaking: Vodafone Idea Launches Prepaid Packs With Spotify Premium Benefit](https://telecomtalk.info/vodafone-idea-prepaid-packs-spotify-premium-benefit/1010399/) (2026-08-04)\n- **Vodafone Idea**: [Vodafone Idea Offering Unlimited Data at Just Rs 288 Every 28 Days](https://telecomtalk.info/vodafone-idea-offering-unlimited-data-at-just/1010374/) (2026-08-04)\n- **Vodafone Idea**: [Vodafone Idea Turns Mumbai Stores into Monsoon Shelters for Rain-Stranded Citizens](https://telecomtalk.info/vodafone-idea-mumbai-stores-into-monsoon-shelters/1010384/) (2026-08-03)\n- **Vodafone Idea**: [Vodafone Idea Maintains Strong Customer Service Metrics in June 2026](https://telecomtalk.info/vodafone-idea-customer-service-metrics-in-june2026/1010354/) (2026-08-03)\n\n### Europa (35 neu)\n\n- **A1 Telekom Austria**: [Hoch hinaus für beste Verbindung: A1 modernisiert Richtfunk-Technik am Großglockner und Feuerkogel](https://newsroom.a1.net/news-hoch-hinaus-fuer-beste-verbindung-a1-modernisiert-richtfunk-technik-am-grossglockner-und-feuerkogel?id=246012&menueid=13051&l=deutsch) (2026-08-04)\n- **A1 Telekom Austria**: [A1 erhält Auszeichnung für das größte Glasfasernetz Österreichs](https://newsroom.a1.net/news-a1-erhaelt-auszeichnung-fuer-das-groesste-glasfasernetz-oesterreichs?id=245955&menueid=13051&l=deutsch) (2026-08-03)\n- **BT Group**: [BT and EE score historic double award win as studies reveal UK's best connectivity](https://newsroom.bt.com/bt-and-ee-score-historic-double-award-win-as-studies-reveal-uks-best-connectivity/) (2026-08-04)\n- **Deutsche Telekom**: [T-Mobile pivots to premium as wireless pricing lanes blur: Navi](https://www.fierce-network.com/wireless/t-mobile-pivots-premium-wireless-pricing-lanes-blur-navi) (2026-08-03)\n- **Deutsche Telekom**: [Hrvatski Telekom Completes PRO-PING Acquisition to Expand Broadband Networks in Croatia](https://www.thefastmode.com/mobile-network-operators-m-a/49964-hrvatski-telekom-completes-pro-ping-acquisition-to-expand-broadband-networks-in-croatia) (2026-08-02)\n- **Deutsche Telekom**: [Telekom gewinnt Ookla Speedtests](https://www.telekom.com/de/medien/medieninformationen/detail/telekom-gewinnt-ookla-speedtests-1106338) (2026-07-30)\n- **Deutsche Telekom**: [Nach der XXL-WM: Fußball live bei MagentaTV und MagentaSport im August.](https://www.telekom.com/de/medien/medieninformationen/detail/fussball-live-bei-magentatv-und-magentasport-im-august-1106248) (2026-07-30)\n- **Deutsche Telekom**: [Telekom nimmt 71 neue Mobilfunkstandorte in Betrieb](https://www.telekom.com/de/medien/medieninformationen/detail/telekom-nimmt-71-neue-mobilfunkstandorte-in-betrieb-1106244) (2026-07-28)\n- **Deutsche Telekom**: [Telekom baut 240.000 Glasfaseranschlüsse im Juni](https://www.telekom.com/de/medien/medieninformationen/detail/telekom-baut-240-000-glasfaseranschluesse-im-juni-1106230) (2026-07-28)\n- **Iliad**: [Thomas Cook Harness Travel eSIM to Give Every Customer 1GB of Free Mobile Data](https://www.ispreview.co.uk/index.php/2026/08/thomas-cook-harness-travel-esim-to-give-every-customer-1gb-of-free-mobile-data.html) (2026-08-03)\n- **KPN**: [KPN keeps ESPN free for broadband and TV customers](https://www.broadbandtvnews.com/2026/08/03/kpn-keeps-espn-free-for-broadband-and-tv-customers/) (2026-08-03)\n- **KPN**: [ESPN remains free for football fans with KPN](https://www.overons.kpn/nieuws/en/espn-remains-free-for-football-fans-with-kpn/) (2026-08-03)\n- **Liberty Global**: [Liberty Global Completes Buyout of VodafoneZiggo](https://www.libertyglobal.com/liberty-global-completes-buyout-of-vodafoneziggo/) (2026-08-03)\n- **Liberty Global**: [Liberty Global takes full control of VodafoneZiggo](https://www.mobileworldlive.com/operators/liberty-global-takes-full-control-of-vodafoneziggo/) (2026-08-03)\n- **Liberty Global**: [Vodafone exits VodafoneZiggo as Liberty Global prepares new Benelux telecom giant](https://www.mobileeurope.co.uk/vodafone-ziggo-liberty-global/) (2026-08-03)\n- **Liberty Global**: [Liberty Global completes VodafoneZiggo buyout](https://www.broadbandtvnews.com/2026/08/03/liberty-global-completes-vodafoneziggo-buyout/) (2026-08-03)\n- **Orange**: [Orange Belgium Launches Orange Sports TV Package with Premium Sports Content](https://www.thefastmode.com/technology-solutions/49984-orange-belgium-launches-orange-sports-tv-package-with-premium-sports-content) (2026-08-03)\n- **Orange**: [Orange Belgium Launches Orange Sports TV Package with Premium Football and Sports Content](https://www.thefastmode.com/technology-solutions/49975-orange-belgium-launches-orange-sports-tv-package-with-premium-football-and-sports-content) (2026-08-02)\n- **Orange**: [French state reduces Orange stake in €1.1B sale](https://www.mobileworldlive.com/orange/french-state-reduces-orange-stake-in-e1-1b-sale/) (2026-07-31)\n- **Orange**: [France to sell part of €1.1bn Orange stake](https://www.mobileeurope.co.uk/france-to-sell-part-of-e1-1bn-orange-stake/) (2026-07-31)\n- **Telefónica**: [Vivo S2 Details Confirmed Before India Launch](https://telecomtalk.info/vivo-s2-details-confirmed-before-india-launch/1010366/) (2026-08-03)\n- **Telefónica**: [Vivo X500, OPPO Find X10 Series India Launch Tipped](https://telecomtalk.info/vivo-x500-oppo-find-x10-series-india/1010364/) (2026-08-03)\n- **Telefónica**: [Education and artificial intelligence: how to learn better in the age of AI without losing our ability to think](https://www.telefonica.com/en/communication-room/blog/education-artificial-intelligence-learn-age-ai-losing-ability/) (2026-08-03)\n- **Turkcell**: [Sporda yeni sezon TV+’tan izlenecek](https://medya.turkcell.com.tr/bulletins/sporda-yeni-sezon-tvtan-izlenecek/) (2026-08-04)\n- **Turkcell**: [Kulüpler Birliği Vakfı Başkanı Ertuğrul Doğan’dan Turkcell Yönetim Kurulu Başkanı Şenol Kazancı’ya Ziyaret](https://medya.turkcell.com.tr/bulletins/kulupler-birligi-vakfi-baskani-ertugrul-dogandan-turkcell-yonetim-kurulu-baskani-senol-kazanciya-ziyaret/) (2026-08-03)\n- **VEON**: [Eurobites: Kyivstar shines in Q2](https://www.lightreading.com/operations/eurobites-kyivstar-shines-in-q2) (2026-08-03)\n- **VEON**: [VEON Reports 2Q26 Results as Digital Revenue Climbs 53.6% and Outlook Rises](https://www.thefastmode.com/mobile-network-operators-g-p/49985-veon-reports-2q26-results-as-digital-revenue-climbs-53-6-and-outlook-rises) (2026-08-03)\n- **Vodafone Deutschland**: [Business Prime Tarife mit unbegrenztem Datenvolumen ab 20 Euro](https://newsroom.vodafone.de/business-prime-tarife-unlimited-ab-20-euro) (2026-07-31)\n- **Vodafone Deutschland**: [Wacken-Besucher nutzten ihre Handys mehr als alle anderen](https://newsroom.vodafone.de/wackenbesucher-nutzten-ihre-handys-mehr-als-alle-anderen) (2026-07-31)\n- **Vodafone Deutschland**: [Gigabit-Internet jetzt für 31 Millionen Haushalte](https://newsroom.vodafone.de/gigabit-internet-jetzt-fuer-31-millionen-haushalte) (2026-07-30)\n- **Vodafone Deutschland**: [Mehr Daten, mehr Tempo & weniger Ausfälle](https://newsroom.vodafone.de/mehr-daten-mehr-speed-weniger-ausfaelle) (2026-07-29)\n- **Vodafone Deutschland**: [CallYa Jahrespaket M: Mit mehr Datenvolumen ins neue Schuljahr](https://newsroom.vodafone.de/callya-jahrespaket-m-mit-mehr-datenvolumen-ins-neue-schuljahr) (2026-07-27)\n- **Vodafone Deutschland**: [Wie das Fernsehkabelnetz zur Datenautobahn wurde](https://newsroom.vodafone.de/wie-das-fernsehkabelnetz-zur-datenautobahn-wurde) (2026-07-27)\n- **Vodafone Group**: [Why Vodafone won't revive Samsung Networks without a Huawei ban](https://www.lightreading.com/5g/why-vodafone-won-t-revive-samsung-networks-without-a-huawei-ban) (2026-08-04)\n- **Vodafone Group**: [Sale of shareholding in VodafoneZiggo completes](https://www.vodafone.com/news/newsroom/corporate-and-financial/sale-of-shareholding-in-vodafoneziggo-completes) (2026-08-03)\n\n### Nordamerika (19 neu)\n\n- **AT&T**: [FirstNet, AT&T Launch Dedicated 5G SA Core Built for Public Safety Communications](https://www.thefastmode.com/technology-solutions/49983-firstnet-at-t-launch-dedicated-5g-sa-core-built-for-public-safety-communications) (2026-08-03)\n- **AT&T**: [AZIO AI Signs Agreement with AT&T for 500MW Texas AI Data Campus Fiber Network](https://www.thefastmode.com/technology-solutions/49972-azio-ai-signs-agreement-with-at-t-for-500mw-texas-ai-data-campus-fiber-network) (2026-08-02)\n- **AT&T**: [Azio taps AT&T for fibre link to Texas AI campus](https://www.mobileworldlive.com/att/azio-taps-att-for-fibre-link-to-texas-ai-campus/) (2026-07-31)\n- **AT&T**: [FirstNet launches 5G SA core built by AT&T for public safety sector](https://www.fierce-network.com/newswire/firstnet-launches-5g-sa-core-built-att-public-safety-sector) (2026-07-31)\n- **AT&T**: [AT&T Closes Acquisition of Spectrum Licenses from EchoStar](https://about.att.com/story/2026/echostar-spectrum.html) (2026-07-28)\n- **Bell Canada**: [Rebecca McKillican joins the Board of Directors of BCE Inc. BCE (TSX: BCE) (NYSE: BCE) today announced the appointment of Rebecca McKillican as a director of BCE Inc. and Bell Canada. Ms. McKillican served as Chief Executive Officer of McKesson Canada from...](https://www.newswire.ca/news-releases/rebecca-mckillican-joins-the-board-of-directors-of-bce-inc--828748549.html) (2026-07-31)\n- **Bell Canada**: [Bell first carrier in Canada to detect and protect against spoofed calls with AI](https://www.newswire.ca/news-releases/bell-first-carrier-in-canada-to-detect-and-protect-against-spoofed-calls-with-ai-867836104.html) (2026-07-28)\n- **Charter Communications**: [Florida Residents Stream, Surf and Save With Spectrum Community Solutions](https://corporate.charter.com/newsroom/florida-residents-stream-surf-and-save-with-spectrum-community-solutions) (2026-08-03)\n- **Charter Communications**: [Spectrum Expands Fiber Broadband to Connect 1,300 Additional Knox County Homes and Businesses](https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-knox-county-ohio) (2026-07-31)\n- **Charter Communications**: [AT&T closes $23B EchoStar spectrum deal to boost 5G capacity](https://www.telecomstechnews.com/news/att-closes-23b-echostar-spectrum-deal-boost-5g-capacity/) (2026-07-29)\n- **Comcast**: [NBCUniversal Names Christopher Halpin as Chief Financial Officer](https://www.cmcsa.com/news-releases/news-release-details/nbcuniversal-names-christopher-halpin-chief-financial-officer) (2026-07-30)\n- **DISH Wireless**: [Hughes seeks bankruptcy shelter, as EchoStar sheds subs in Q2](https://www.lightreading.com/satellite/hughes-seeks-bankruptcy-shelter-as-echostar-sheds-subs-in-q2) (2026-08-03)\n- **DISH Wireless**: [EchoStar-owned Hughes files for bankruptcy](https://www.mobileworldlive.com/dish-network/echostar-owned-hughes-files-for-bankruptcy/) (2026-08-03)\n- **DISH Wireless**: [Hughes Files Chapter 11 Voluntary Reorganization to Strengthen Capital Structure and Evolve Business to Meet Market Demand](https://ir.echostar.com/news-releases/news-release-details/hughes-files-chapter-11-voluntary-reorganization-strengthen) (2026-08-03)\n- **DISH Wireless**: [EchoStar Announces Financial Results for the Three and Six Months Ended June 30, 2026](https://ir.echostar.com/news-releases/news-release-details/echostar-announces-financial-results-three-and-six-months-8) (2026-08-03)\n- **DISH Wireless**: [EchoStar’s Hughes Network files for Chapter 11](https://www.fierce-network.com/wireless/echostars-hughes-network-files-chapter-11) (2026-08-03)\n- **DISH Wireless**: [EchoStar Corporation Announces Conference Call for Second Quarter 2026 Financial Results](https://ir.echostar.com/news-releases/news-release-details/echostar-corporation-announces-conference-call-second-quarter-14) (2026-07-29)\n- **T-Mobile US**: [Network Press Release T‑Mobile Supports Spokane as Devastating Fires Impact Region (PM Update 8/3) August 02, 2026 | 4 min read](https://www.t-mobile.com/news/network/t-mobile-supports-spokane) (2026-08-02)\n- **Telus**: [TELUS reports second quarter 2026 financial and operational results Dividend reset realigned with capital priorities with clear path to 3.0-times or lower leverage by year-end 2028](https://www.telus.com/about/news-and-events/media-releases/telus-reports-second-quarter-2026-financial-and-operational-results-and-resets-quarterly-dividend-to-support-deleveraging-and-fuel-long-term-growth) (2026-07-31)\n\n### Afrika & Naher Osten (11 neu)\n\n- **Airtel Africa**: [Transaction in Own Shares](https://www.investegate.co.uk/announcement/rns/airtel-africa--aaf/transaction-in-own-shares/9702378) (2026-08-04)\n- **Airtel Africa**: [Total Voting Rights](https://www.investegate.co.uk/announcement/rns/airtel-africa--aaf/total-voting-rights/9702129) (2026-08-03)\n- **MTN Group**: [MTN Ghana reports service revenue growth following fintech separation](https://developingtelecoms.com/telecom-business/operator-news/20622-mtn-ghana-reports-service-revenue-growth-following-fintech-separation.html) (2026-08-03)\n- **MTN Group**: [MTN Group denies Clydestone claims as legal dispute heads to Ghana court](https://developingtelecoms.com/telecom-business/operator-news/20616-mtn-group-denies-clydestone-claims-as-legal-dispute-heads-to-ghana-court.html) (2026-07-31)\n- **Orange MEA**: [Orange Jordan Digital Schools Students Excel in WikiChallenge 2026 Competition](https://www.thefastmode.com/investments-and-expansions/49974-orange-jordan-digital-schools-students-excel-in-wikichallenge-2026-competition) (2026-08-02)\n- **Orange MEA**: [Under Orange Foundation Global & “Madrasati” Umbrella: Digital Schools’ Students Excel in WikiChallenge International Competition](https://orange.jo/en/corporate/media-center/news/wiki-challenge) (2026-08-02)\n- **Safaricom**: [Safaricom PLC Pays a Record Dividend at KES 80.13 Billion for FY26](https://www.safaricom.co.ke/media-center-landing/press-releases/safaricom-plc-pays-a-record-dividend-at-kes-80-13-billion-for-fy26) (2026-07-31)\n- **Turk Telekom**: [Türk Telekom'un eğitim çözümleri Vitamin LGS ve Raunt’tan 2026 sınav sonuçlarında güçlü performans](https://medya.turktelekom.com.tr/turk-telekomun-egitim-cozumleri-vitamin-lgs-ve-raunt-tan-2026-sinav-sonuclarinda-guclu-performans/) (2026-08-03)\n- **Vodacom**: [Vodafone Egypt Launches the Region's Largest Sports Investment in a Historic Move to Strengthen Technology's Role and Redefine the Future of Egyptian Sports](https://www.vodacom.com/news-article.php?articleID=16951)\n- **stc**: [stc pay, PayPal Launch Cross-Border Fund Transfers in Bahrain for Users](https://www.thefastmode.com/technology-solutions/50012-stc-pay-paypal-launch-cross-border-fund-transfers-in-bahrain-for-users) (2026-08-04)\n- **stc**: [Stc pay Bahrain links with PayPal to launch cross-border payments](https://developingtelecoms.com/telecom-technology/financial-services/20620-stc-pay-bahrain-links-with-paypal-to-launch-cross-border-payments.html) (2026-08-03)\n\n### Lateinamerika (2 neu)\n\n- **Millicom**: [Millicom (Tigo) notice of second quarter 2026 results and video conference](https://mfn.se/one/a/millicom/millicom-tigo-notice-of-second-quarter-2026-results-and-video-conference-8ce24cab) (2026-07-27)\n- **WOM**: [Adiós a los descuentos que vencen: WOM vuelve a mover el mercado y anuncia nueva propuesta de precios](https://sobrenosotros.wom.cl/adios-a-los-descuentos-que-vencen-wom-vuelve-a-mover-el-mercado-y-anuncia-nueva-propuesta-de-precios/) (2026-07-31)\n",
+ "regions": {
+  "Asien": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Europa": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Global": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Afrika & Naher Osten": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Lateinamerika": {
+   "region_summary": "",
+   "highlights": []
+  },
+  "Nordamerika": {
+   "region_summary": "",
+   "highlights": []
+  }
+ },
+ "competitors": [
+  {
+   "name": "Deutsche Telekom",
+   "n_items": 16,
+   "moves": [],
+   "summary": "",
+   "themes": [],
+   "vodafone_implication": ""
+  },
+  {
+   "name": "Telefónica / O2",
+   "n_items": 16,
+   "moves": [],
+   "summary": "",
+   "themes": [],
+   "vodafone_implication": ""
+  },
+  {
+   "name": "1&1",
+   "n_items": 10,
+   "moves": [],
+   "summary": "",
+   "themes": [],
+   "vodafone_implication": ""
+  }
+ ],
+ "run": {
+  "started_at": "2026-08-04T09:32:06.143757+00:00",
+  "finished_at": "2026-08-04T09:39:13.180232+00:00",
+  "duration_seconds": 427.0,
+  "used_llm": true,
+  "editor_used": false,
+  "models": {
+   "analyst": "claude-sonnet-5",
+   "editor": null,
+   "unavailable": null
+  },
+  "phases": [
+   {
+    "name": "Sammeln",
+    "seconds": 340.4,
+    "detail": "91 Quellen abgefragt, 1573 Meldungen gefunden"
+   },
+   {
+    "name": "Nur Neues",
+    "seconds": 0.0,
+    "detail": "223 neue Meldungen (Gedaechtnis: 1611 bekannt)"
+   },
+   {
+    "name": "Bewerten & Schreiben",
+    "seconds": 1.6,
+    "detail": "0 bewertete Meldungen"
+   },
+   {
+    "name": "Wettbewerber-Analyse",
+    "seconds": 0.5,
+    "detail": "3 Profile (0 Moves)"
+   }
+  ],
+  "source_summary": {
+   "total": 91,
+   "ok": 88,
+   "empty": 1,
+   "failed": 2,
+   "by_kind": {
+    "newsroom": 33,
+    "rss": 20,
+    "json_api": 13,
+    "newsroom_js": 11,
+    "trade_press": 14
+   }
+  },
+  "sources": [
+   {
+    "name": "Telecompetitor",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecompetitor.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecompetitor",
+    "origin": "industry_news",
+    "status": "fail",
+    "count": 0,
+    "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'"
+   },
+   {
+    "name": "KT",
+    "operator": "KT",
+    "region": "asia",
+    "url": "https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "fail",
+    "count": 0,
+    "error": "ConnectTimeout: timed out"
+   },
+   {
+    "name": "Iliad",
+    "operator": "Iliad",
+    "region": "europe",
+    "url": "https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&year=all&tag=all",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
+    "region": "north_america",
+    "url": "https://corporate.charter.com/page-data/sq/d/2336972469.json",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Millicom",
+    "operator": "Millicom",
+    "region": "latin_america",
+    "url": "https://mfn.se/all/a/millicom.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "stc",
+    "operator": "stc",
+    "region": "africa_middle_east",
+    "url": "https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Reliance Jio",
+    "operator": "Reliance Jio",
+    "region": "asia",
+    "url": "https://www.jio.com/jcms-api/v1-press-release-page",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Light Reading",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.lightreading.com/rss.xml",
+    "kind": "trade_press",
+    "label": "Light Reading",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "The Fast Mode",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.thefastmode.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "The Fast Mode",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 40
+   },
+   {
+    "name": "Developing Telecoms",
+    "operator": null,
+    "region": "global",
+    "url": "https://developingtelecoms.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "Developing Telecoms",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 34
+   },
+   {
+    "name": "VEON",
+    "operator": "VEON",
+    "region": "europe",
+    "url": "https://www.veon.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Elisa",
+    "operator": "Elisa",
+    "region": "europe",
+    "url": "https://cms-rest-api-public.csf.elisa.fi/public/bulletins?tags=corporate.elisa.com:press&maxResults=30",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.safaricom.co.ke/media-center-landing/press-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Airtel Africa",
+    "operator": "Airtel Africa",
+    "region": "africa_middle_east",
+    "url": "https://www.investegate.co.uk/company/AAF",
+    "kind": "newsroom",
+    "label": "RNS (Regulatory News Service) via Investegate - Airtel Africa ist an der London Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen. airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain + Titel in Nachbar-div ohne Klasse/Heading).",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.eand.com/en/news/news-overview.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "du",
+    "operator": "du",
+    "region": "africa_middle_east",
+    "url": "https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
+    "region": "asia",
+    "url": "https://www.airtel.in/press-release",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Singtel",
+    "operator": "Singtel",
+    "region": "asia",
+    "url": "https://www.singtel.com/about-us/media-centre",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Vodacom",
+    "operator": "Vodacom",
+    "region": "africa_middle_east",
+    "url": "https://www.vodacom.com/press-releases.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
+    "region": "asia",
+    "url": "https://corp.mobile.rakuten.co.jp/english/news/press/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "AIS",
+    "operator": "AIS",
+    "region": "asia",
+    "url": "https://www.ais.th/en/about-us/pr-news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.softbank.jp/en/corp/news/press/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "CelcomDigi",
+    "operator": "CelcomDigi",
+    "region": "asia",
+    "url": "https://corporate.celcomdigi.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "Mobile World Live",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileworldlive.com/feed/",
+    "kind": "trade_press",
+    "label": "Mobile World Live",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 30
+   },
+   {
+    "name": "BT Group",
+    "operator": "BT Group",
+    "region": "europe",
+    "url": "https://newsroom.bt.com/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "KPN",
+    "operator": "KPN",
+    "region": "europe",
+    "url": "https://www.overons.kpn/nieuws/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "AT&T",
+    "operator": "AT&T",
+    "region": "north_america",
+    "url": "https://investors.att.com/news-and-events/news-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Bell Canada",
+    "operator": "Bell Canada",
+    "region": "north_america",
+    "url": "https://www.newswire.ca/news/bce-inc./",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Fierce Network",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.fierce-network.com/rss/xml",
+    "kind": "trade_press",
+    "label": "Fierce Network",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 25
+   },
+   {
+    "name": "Telia",
+    "operator": "Telia",
+    "region": "europe",
+    "url": "https://news.cision.com/telia-company",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 23
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "T-Mobile US",
+    "operator": "T-Mobile US",
+    "region": "north_america",
+    "url": "https://www.t-mobile.com/news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "Entel",
+    "operator": "Entel",
+    "region": "latin_america",
+    "url": "https://informacioncorporativa.entel.cl/comunicados-de-prensa",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "WOM",
+    "operator": "WOM",
+    "region": "latin_america",
+    "url": "https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "NTT Docomo",
+    "operator": "NTT Docomo",
+    "region": "asia",
+    "url": "https://www.docomo.ne.jp/english/info/media_center/pr/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "China Telecom",
+    "operator": "China Telecom",
+    "region": "asia",
+    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "Indosat Ooredoo Hutchison",
+    "operator": "Indosat Ooredoo Hutchison",
+    "region": "asia",
+    "url": "https://web-api.ioh.co.id/api/content-hub/public?page=1&limit=20&paginateDisable=false&site=&type=Press%20Release&lang=EN&language=EN",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "TelecomTalk",
+    "operator": null,
+    "region": "global",
+    "url": "https://telecomtalk.info/feed/",
+    "kind": "trade_press",
+    "label": "TelecomTalk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 20
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.corporate.bouyguestelecom.fr/presse-et-actualites/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 18
+   },
+   {
+    "name": "Verizon",
+    "operator": "Verizon",
+    "region": "north_america",
+    "url": "https://www.verizon.com/about/nextgen/api/articles?limit=25&type=press_release",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 18
+   },
+   {
+    "name": "Three UK",
+    "operator": "Three UK",
+    "region": "europe",
+    "url": "https://www.threemediacentre.co.uk/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 18
+   },
+   {
+    "name": "Maxis",
+    "operator": "Maxis",
+    "region": "asia",
+    "url": "https://www.maxis.com.my/en/about-maxis/newsroom/jcr:content/content/section_container/section_container/container/repository_search_co.newsroom.json?keyword=*:*",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 18
+   },
+   {
+    "name": "Spark",
+    "operator": "Spark",
+    "region": "oceania",
+    "url": "https://www.nzx.com/companies/SPK/announcements",
+    "kind": "newsroom",
+    "label": "NZX-Boersenmeldungen statt sparknz.co.nz/news (Radware-Bot-Wall unveraendert blockiert; businessgroup.spark.co.nz ist nur eine B2B-Microsite ohne Presseliste)",
+    "origin": "operator",
+    "status": "ok",
+    "count": 17
+   },
+   {
+    "name": "Vodafone Group",
+    "operator": "Vodafone Group",
+    "region": "europe",
+    "url": "https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&categories=*&tags=*",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 16
+   },
+   {
+    "name": "Telstra",
+    "operator": "Telstra",
+    "region": "oceania",
+    "url": "https://www.telstra.com.au/exchange",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 16
+   },
+   {
+    "name": "Deutsche Telekom",
+    "operator": "Deutsche Telekom",
+    "region": "europe",
+    "url": "https://www.telekom.com/de/medien/medieninformationen",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 13
+   },
+   {
+    "name": "A1 Telekom Austria",
+    "operator": "A1 Telekom Austria",
+    "region": "europe",
+    "url": "https://newsroom.a1.net/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 12
+   },
+   {
+    "name": "Vodafone Deutschland",
+    "operator": "Vodafone Deutschland",
+    "region": "europe",
+    "url": "https://newsroom.vodafone.de/rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.telefonica.com/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Liberty Global",
+    "operator": "Liberty Global",
+    "region": "europe",
+    "url": "https://www.libertyglobal.com/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.telenor.com/media/newsroom/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "1&1",
+    "operator": "1&1",
+    "region": "europe",
+    "url": "https://unternehmen.1und1.de/presse/feed",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://medya.turkcell.com.tr/bulletins/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Comcast",
+    "operator": "Comcast",
+    "region": "north_america",
+    "url": "https://www.cmcsa.com/rss/news-releases.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "DISH Wireless",
+    "operator": "DISH Wireless",
+    "region": "north_america",
+    "url": "https://ir.echostar.com/rss/news-releases.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Rogers",
+    "operator": "Rogers",
+    "region": "north_america",
+    "url": "https://about.rogers.com/feed",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "América Móvil",
+    "operator": "América Móvil",
+    "region": "latin_america",
+    "url": "https://www.americamovil.com/rss/pressrelease.aspx?LanguageId=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "MTN Group",
+    "operator": "MTN Group",
+    "region": "africa_middle_east",
+    "url": "https://www.mtn.com/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Turk Telekom",
+    "operator": "Turk Telekom",
+    "region": "africa_middle_east",
+    "url": "https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "KDDI",
+    "operator": "KDDI",
+    "region": "asia",
+    "url": "https://newsroom.kddi.com/english/news/newsrelease.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "SK Telecom",
+    "operator": "SK Telecom",
+    "region": "asia",
+    "url": "https://www.sktelecom.com/en/press/press.do",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Chunghwa Telecom",
+    "operator": "Chunghwa Telecom",
+    "region": "asia",
+    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "PLDT",
+    "operator": "PLDT",
+    "region": "asia",
+    "url": "https://cms.pldt.com/drupal/api/v1/newsroom-article-list",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "True Corporation",
+    "operator": "True Corporation",
+    "region": "asia",
+    "url": "https://www.true.th/blog/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Optus",
+    "operator": "Optus",
+    "region": "oceania",
+    "url": "https://www.optus.com.au/about/media-centre/media-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "One NZ",
+    "operator": "One NZ",
+    "region": "oceania",
+    "url": "https://media.one.nz/index.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Total Telecom",
+    "operator": null,
+    "region": "global",
+    "url": "https://totaltele.com/feed/",
+    "kind": "trade_press",
+    "label": "Total Telecom",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "RCR Wireless",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.rcrwireless.com/feed",
+    "kind": "trade_press",
+    "label": "RCR Wireless",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Mobile Europe",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.mobileeurope.co.uk/feed/",
+    "kind": "trade_press",
+    "label": "Mobile Europe",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Broadband TV News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.broadbandtvnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Broadband TV News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "Telecoms Tech News",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.telecomstechnews.com/feed/",
+    "kind": "trade_press",
+    "label": "Telecoms Tech News",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "CommsRisk",
+    "operator": null,
+    "region": "global",
+    "url": "https://commsrisk.com/feed/",
+    "kind": "trade_press",
+    "label": "CommsRisk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10
+   },
+   {
+    "name": "TPG Telecom",
+    "operator": "TPG Telecom",
+    "region": "oceania",
+    "url": "https://www.tpgtelecom.com.au/media_release",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 9
+   },
+   {
+    "name": "2degrees",
+    "operator": "2degrees",
+    "region": "oceania",
+    "url": "https://www.2degrees.nz/media-releases",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 9
+   },
+   {
+    "name": "Telus",
+    "operator": "Telus",
+    "region": "north_america",
+    "url": "https://www.telus.com/en/about/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Vodafone Idea",
+    "operator": "Vodafone Idea",
+    "region": "asia",
+    "url": "https://www.myvi.in/bin/vodafoneideadigital/newssearchservlet?search=%7B%22q%22%3A%22%2A%22%2C%22newsType%22%3A%22press%22%2C%22newsCategory%22%3A%22%2A%22%2C%22newsCircle%22%3A%22%2A%22%2C%22newsYear%22%3A0%2C%22pageNumber%22%3A1%7D",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Telkomsel",
+    "operator": "Telkomsel",
+    "region": "asia",
+    "url": "https://www.telkomsel.com/en/about-us/news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "ISPreview UK",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.ispreview.co.uk/index.php/feed",
+    "kind": "trade_press",
+    "label": "ISPreview UK",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 8
+   },
+   {
+    "name": "Orange",
+    "operator": "Orange",
+    "region": "europe",
+    "url": "https://www.orange.com/en/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "TIM Brasil",
+    "operator": "TIM Brasil",
+    "region": "latin_america",
+    "url": "https://www.tim.com.br/sobre-a-tim/sala-de-imprensa",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "Oi",
+    "operator": "Oi",
+    "region": "latin_america",
+    "url": "https://www.oi.com.br/sala-de-imprensa/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "Orange MEA",
+    "operator": "Orange MEA",
+    "region": "africa_middle_east",
+    "url": "https://orange.jo/en/corporate/media-center",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 6
+   },
+   {
+    "name": "Tele2",
+    "operator": "Tele2",
+    "region": "europe",
+    "url": "https://www.tele2.com/media/press-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5
+   },
+   {
+    "name": "Proximus",
+    "operator": "Proximus",
+    "region": "europe",
+    "url": "https://www.proximus.com/news.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Zain",
+    "operator": "Zain",
+    "region": "africa_middle_east",
+    "url": "https://www.zain.com/en/media-center",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Globe Telecom",
+    "operator": "Globe Telecom",
+    "region": "asia",
+    "url": "https://www.globe.com.ph/about-us/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 4
+   },
+   {
+    "name": "Swisscom",
+    "operator": "Swisscom",
+    "region": "europe",
+    "url": "https://www.swisscom.ch/en/about/news.html",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 3
+   },
+   {
+    "name": "Viettel",
+    "operator": "Viettel",
+    "region": "asia",
+    "url": "https://viettel.com.vn/en/news",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 1
+   },
+   {
+    "name": "Telecom Argentina",
+    "operator": "Telecom Argentina",
+    "region": "latin_america",
+    "url": "https://institucional.telecom.com.ar/prensa/noticias",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0
+   }
+  ],
+  "analysts": [
+   {
+    "items_in": 52,
+    "batches": 4,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Asien"
+   },
+   {
+    "items_in": 35,
+    "batches": 3,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Europa"
+   },
+   {
+    "items_in": 104,
+    "batches": 7,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Global"
+   },
+   {
+    "items_in": 11,
+    "batches": 1,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Afrika & Naher Osten"
+   },
+   {
+    "items_in": 2,
+    "batches": 1,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Lateinamerika"
+   },
+   {
+    "items_in": 19,
+    "batches": 2,
+    "batches_ok": 0,
+    "highlights": 0,
+    "model": "claude-sonnet-5",
+    "region": "Nordamerika"
+   }
+  ]
+ }
+}
