@@ -260,7 +260,27 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Website darf **nie einschlafen** (deshalb Static Site, kein Web Service).
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
-## 9. Offene Ideen / Roadmap
+## 9. Nächster Auftrag: Skalierung auf 1000 Quellen
+
+Liegt als `AUFTRAG_SKALIERUNG_1000.md` im Repo und ist der eigentliche
+nächste Schritt. Kurzfassung der vier Engpässe, die VOR den Quellen kommen —
+alle an Lauf #67 gemessen:
+
+1. **Sammeln.** 20 s·Worker je Quelle. 1000 Quellen bei den heutigen 8 Workern
+   sind 42 min, also allein schon über dem Job-Timeout. Braucht Parallelität
+   *mit Host-Drosselung*, nicht nur mehr Worker.
+2. **Redaktion.** Der Editor bekommt heute alle bewerteten Meldungen in EINEM
+   Aufruf. Bei 1000 Quellen wären das ~650 Meldungen ≈ 122k Token — passt ins
+   Kontextfenster und ergibt trotzdem Brei. Braucht zwei Stufen:
+   Bereichsredakteure je Region/Thema, dann eine Chefredaktion, die nur deren
+   Kurzfassungen sieht.
+3. **Seen-Store.** ~308 Byte je Eintrag, git-versioniert, komplett in den
+   Speicher geladen. Bei 1000 Quellen ~233 000 Einträge/Jahr ≈ 67 MB/Jahr;
+   GitHubs Limit je Datei liegt bei 100 MB. Das ist ein Ablaufdatum.
+4. **Kosten und Rate-Limits.** ~150 Analysten-Aufrufe je Lauf statt heute 14.
+   Vor dem Hochdrehen der Parallelität das DeepSeek-Limit messen.
+
+## 10. Offene Ideen / Roadmap
 
 - E-Mail-/Teams-Versand des Briefings nach jedem Lauf
 - Firecrawl/Crawl4AI als Fetcher für JS-Newsrooms (AT&T, Singtel, Telia, …)
