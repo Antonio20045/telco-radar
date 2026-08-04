@@ -92,7 +92,7 @@ def test_full_run_no_llm(project, fake_http):
     assert list((site / "reports").glob("*.html"))
 
     # state persisted
-    assert (project / "data" / "state" / "seen.jsonl").exists()
+    assert (project / "data" / "state" / "seen.tsv").exists()
 
 
 def test_second_run_reports_nothing_new(project, fake_http):

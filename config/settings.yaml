@@ -128,6 +128,18 @@ editor_max_highlights: 0
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 
+# Nach wie vielen Monaten ein Eintrag im Seen-Store verfaellt. 0 = nie.
+# Der Store ist git-versioniert; bei 1000 Quellen kommen ~233 000 Eintraege
+# im Jahr dazu. Im kompakten Format (~22 Byte je Zeile) sind das ~5 MB/Jahr,
+# mit 18 Monaten Verfall pendelt sich die Datei bei ~8 MB ein - weit unter
+# GitHubs 100-MB-Grenze je Datei.
+# Die Kerngarantie ("was einmal berichtet wurde, kommt nie wieder") bleibt
+# unangetastet, weil nur DATIERTE Eintraege verfallen: taucht so eine
+# Meldung nach 18 Monaten erneut auf einer Quellenseite auf, wirft der
+# Frischefilter sie wegen ihres Datums weg. Undatierte Eintraege, die der
+# Frischefilter nicht abfangen kann, bleiben dauerhaft stehen.
+seen_store_months: 18
+
 # Parallelitaet der Sammelphase (collect/__init__.py::collect_all).
 # Mit dem Quellen-Ausbau vom 04.08.2026 hat sich die Zahl der Quellen mehr als
 # verdoppelt. Die Sammelphase ist fast reine Wartezeit auf fremde Server, also
@@ -136,10 +148,29 @@ reported_topics_memory: 300
 # eine Kappung der Meldungen waere die falsche Antwort, weil eine nicht
 # gesammelte Meldung von keinem Analysten je gelesen wird und der Seen-Store
 # sie nie wieder anbietet.
-# Nicht beliebig hochdrehen: dieselbe Quelle mit vielen gleichzeitigen
-# Verbindungen anzufassen provoziert 429/403 - die Erhoehung von 4 auf 8 ist
-# gemessen unkritisch, weil je Host ohnehin nur wenige Quellen liegen.
-collect_max_workers: 8
+# Seit dem Umbau auf Host-Gruppen (04.08.2026) ist das die Zahl der
+# gleichzeitig bearbeiteten HOSTS, nicht mehr der Quellen. Eine Gruppe sind
+# alle Quellen eines Hosts, und die laufen darin der Reihe nach - dieselbe
+# Domain wird also nie gleichzeitig angefasst, egal wie hoch diese Zahl
+# steht. Damit ist der Wert nach oben nur noch durch Threads und die eigene
+# Bandbreite begrenzt, nicht durch fremde Rate-Limits.
+# Rechnung fuer 1000 Quellen bei gemessenen 20 s x Worker je Quelle:
+#   8 Worker -> 42 min (ueber dem Job-Timeout), 48 -> 7 min, 64 -> 5 min.
+collect_max_workers: 48
+
+# Wie viele Verbindungen HOECHSTENS gleichzeitig zu einem Host gehen.
+# 1 ist die sichere Einstellung und kostet fast nichts, weil heute nur
+# wenige Hosts mehr als eine Quelle tragen (blog.google hat drei). Erst wenn
+# eine Domain zweistellig viele Quellen traegt, lohnt 2 - dann aber mit einem
+# Blick ins Protokoll, ob dort 429er auftauchen.
+collect_host_parallel: 1
+
+# Mindestabstand zwischen zwei Abrufen DESSELBEN Hosts, in Sekunden.
+# Gegen genau den Fehler, der wie eine tote Quelle aussieht: ein Host, der
+# fuenf Anfragen in einer Sekunde mit 429 beantwortet, steht danach fuenfmal
+# als "fail" im Protokoll. Kostet nur bei Hosts mit mehreren Quellen etwas
+# und laeuft parallel zu allen anderen Gruppen.
+collect_host_delay_seconds: 1.0
 
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the

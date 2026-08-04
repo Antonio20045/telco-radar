@@ -214,7 +214,15 @@ def run(root: Path, use_llm: bool | None = None,
 
     # -------------------------------------------------------------- dedupe
     td = time.monotonic()
-    seen = SeenStore(state_dir / "seen.jsonl")
+    # Verfall in Tagen. 0/leer heisst: kein Verfall. Der Standard von 18
+    # Monaten haelt die git-versionierte Datei bei 1000 Quellen dauerhaft im
+    # einstelligen MB-Bereich, ohne die Kerngarantie anzutasten - verfallen
+    # koennen nur DATIERTE Eintraege, und die faengt der Frischefilter ab,
+    # falls eine Quelle sie Jahre spaeter noch einmal auflistet.
+    seen_monate = int(cfg.settings.get("seen_store_months", 18) or 0)
+    seen = SeenStore(state_dir / "seen.tsv",
+                     max_age_days=int(seen_monate * 30.44) if seen_monate else None,
+                     legacy_path=state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     new_items = filter_fresh(seen.filter_new(items), lookback)
     # Wie viele NEUE Meldungen je Quelle - der Nenner der Trefferquote. Aus

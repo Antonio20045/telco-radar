@@ -4,7 +4,9 @@ from __future__ import annotations
 import logging
 import re
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urlsplit
 
 from ..config import Config, Source, Operator
 from ..models import Item
@@ -54,22 +56,83 @@ def collect_source(source: Source, region: str, operator: str | None = None,
     return _collect_source(source, region, operator, origin, http_cfg or {})
 
 
-def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item], list[dict]]:
+def _host(url: str) -> str:
+    """Registrierbarer Host einer Quelle, klein geschrieben, ohne www."""
+    try:
+        netloc = urlsplit(url).netloc.lower()
+    except ValueError:
+        return url.lower()
+    return netloc.split("@")[-1].split(":")[0].removeprefix("www.")
+
+
+def sammelplan(jobs: list[tuple[Source, str, str | None, str]],
+               host_parallel: int = 1) -> list[list[tuple[Source, str, str | None, str]]]:
+    """Jobs in Gruppen schneiden, die parallel laufen duerfen.
+
+    Eine Gruppe wird von genau einem Worker der Reihe nach abgearbeitet.
+    Zwei Quellen desselben Hosts landen deshalb nie gleichzeitig im Netz -
+    das ist der ganze Trick: statt Threads an einer Host-Sperre warten zu
+    lassen (was bei 1000 Quellen den Pool blockiert, waehrend andere Hosts
+    unangetastet bleiben), wird die Host-Serialitaet in den PLAN gelegt.
+
+    `host_parallel` > 1 erlaubt mehrere gleichzeitige Verbindungen je Host,
+    indem dessen Jobs auf entsprechend viele Gruppen verteilt werden.
+
+    Die groessten Gruppen kommen zuerst (LPT-Scheduling): sonst startet der
+    Host mit 20 Quellen zufaellig zuletzt und bestimmt allein die Laufzeit
+    der ganzen Phase.
+    """
+    nach_host: dict[str, list] = defaultdict(list)
+    for job in jobs:
+        nach_host[_host(job[0].url)].append(job)
+    gruppen: list[list] = []
+    for host_jobs in nach_host.values():
+        n = max(1, min(int(host_parallel), len(host_jobs)))
+        for i in range(n):
+            teil = host_jobs[i::n]
+            if teil:
+                gruppen.append(teil)
+    gruppen.sort(key=len, reverse=True)
+    return gruppen
+
+
+def collect_all(cfg: Config, max_workers: int | None = None,
+                ueberspringen: set[str] | None = None
+                ) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing
-    what happened with that source (status/count/error) so the pipeline can
-    build a transparent run log. A failing source never aborts the run.
+    what happened with that source (status/count/error/seconds) so the
+    pipeline can build a transparent run log. A failing source never aborts
+    the run.
 
-    max_workers kommt aus settings.yaml (collect_max_workers). Mit dem
-    Quellen-Ausbau ist das der Stellhebel gegen die Laufzeit: die Sammelphase
-    ist reine Wartezeit auf fremde Server, also skaliert sie fast linear mit
-    der Parallelitaet. Eine Kappung der Meldungen waere die falsche Antwort -
-    was hier nicht gesammelt wird, sieht kein Analyst je.
+    Parallelitaet MIT Host-Drosselung
+    ---------------------------------
+    Die Sammelphase ist reine Wartezeit auf fremde Server und skaliert
+    deshalb fast linear mit der Parallelitaet: gemessen an Lauf #67 kostet
+    eine Quelle 20 Sekunden mal Worker, 1000 Quellen bei den alten 8 Workern
+    waeren also ~42 min gewesen - allein das sprengt das Job-Timeout, bevor
+    eine einzige Meldung bewertet ist.
+
+    Einfach den Pool zu vergroessern reicht aber nicht. Bei 1000 Quellen
+    liegen zwangslaeufig mehrere auf derselben Domain (blog.google hat heute
+    schon drei), und viele gleichzeitige Verbindungen zum selben Host
+    provozieren 429/403 - ein Fehler, den der Collector als "Quelle tot"
+    protokolliert, obwohl nur zu schnell gefragt wurde. Deshalb: global viel
+    Parallelitaet, je Host hoechstens `collect_host_parallel` gleichzeitig
+    und dazwischen `collect_host_delay_seconds` Abstand.
+
+    `ueberspringen` enthaelt die URLs stillgelegter Quellen (Quarantaene).
+    Sie werden nicht abgerufen, erscheinen aber mit Status "quarantaene" im
+    Protokoll - eine still verschwundene Quelle waere schlimmer als eine
+    tote.
     """
     http_cfg = cfg.settings.get("http", {})
     if max_workers is None:
         max_workers = int(cfg.settings.get("collect_max_workers", 4) or 4)
+    host_parallel = int(cfg.settings.get("collect_host_parallel", 1) or 1)
+    host_delay = float(cfg.settings.get("collect_host_delay_seconds", 0.0) or 0.0)
+    ueberspringen = ueberspringen or set()
     jobs: list[tuple[Source, str, str | None, str]] = []
 
     for op in cfg.operators:
@@ -84,41 +147,69 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
         if src.crawlable:
             jobs.append((src, src.theme, src.name, "tech_watch"))
 
-    items: list[Item] = []
-    results: list[dict] = []
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        futures = {
-            pool.submit(_collect_source, src, region, operator, origin, http_cfg):
-                (src, region, operator, origin)
-            for src, region, operator, origin in jobs
+    def _protokoll(src: Source, region: str, operator: str | None,
+                   origin: str) -> dict:
+        return {
+            "name": operator or src.name,
+            "operator": operator,
+            "region": region,
+            "url": src.url,
+            "kind": src.kind,
+            "label": src.label or src.kind,
+            "origin": origin,
         }
-        for fut in as_completed(futures):
-            src, region, operator, origin = futures[fut]
-            rec = {
-                "name": operator or src.name,
-                "operator": operator,
-                "region": region,
-                "url": src.url,
-                "kind": src.kind,
-                "label": src.label or src.kind,
-                "origin": origin,
-            }
+
+    results: list[dict] = []
+    stillgelegt = [j for j in jobs if j[0].url in ueberspringen]
+    for src, region, operator, origin in stillgelegt:
+        rec = _protokoll(src, region, operator, origin)
+        rec.update(status="quarantaene", count=0, seconds=0.0)
+        results.append(rec)
+    if stillgelegt:
+        log.info("%d Quelle(n) stillgelegt (Quarantaene) - nicht abgefragt",
+                 len(stillgelegt))
+    jobs = [j for j in jobs if j[0].url not in ueberspringen]
+
+    def _eine_gruppe(gruppe: list) -> list[tuple[dict, list[Item]]]:
+        """Eine Host-Gruppe der Reihe nach abarbeiten."""
+        ausgabe: list[tuple[dict, list[Item]]] = []
+        for n, (src, region, operator, origin) in enumerate(gruppe):
+            if n and host_delay:
+                time.sleep(host_delay)
+            rec = _protokoll(src, region, operator, origin)
+            t0 = time.monotonic()
             try:
-                got = fut.result()
-                items.extend(got)
+                got = _collect_source(src, region, operator, origin, http_cfg)
                 rec["status"] = "ok" if got else "empty"
                 rec["count"] = len(got)
                 log.info("%-5s %-22s %-45s -> %d items",
                          rec["status"].upper(), (operator or src.name)[:22],
                          src.url[:45], len(got))
             except Exception as exc:  # noqa: BLE001 - resilience by design
+                got = []
                 rec["status"] = "fail"
                 rec["count"] = 0
                 rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
                 log.warning("FAIL  %-22s %-45s -> %s",
                             (operator or src.name)[:22], src.url[:45],
                             rec["error"])
-            results.append(rec)
+            # Sekunden je Quelle: die Zahl, an der sich Host-Drosselung und
+            # Timeouts nachrechnen lassen, statt sie zu schaetzen.
+            rec["seconds"] = round(time.monotonic() - t0, 2)
+            ausgabe.append((rec, got))
+        return ausgabe
+
+    gruppen = sammelplan(jobs, host_parallel)
+    log.info("Sammelplan: %d Quellen in %d Gruppen (max %d gleichzeitig, "
+             "je Host %d parallel, %.1fs Abstand)",
+             len(jobs), len(gruppen), max_workers, host_parallel, host_delay)
+
+    items: list[Item] = []
+    with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
+        for fut in as_completed([pool.submit(_eine_gruppe, g) for g in gruppen]):
+            for rec, got in fut.result():
+                items.extend(got)
+                results.append(rec)
     return items, results
 
 
