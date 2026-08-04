@@ -150,40 +150,93 @@ mit Backoff ab; gewonnen ist damit nichts.
 zu 360. Das ist der billigste Hebel überhaupt — aber erst nachdem die Phasen
 gemessen sind, nicht als Ersatz für Parallelität.
 
-## 4. Woher 1000 Quellen kommen — Taxonomie statt Stochern
+## 4. Woher 1000 Quellen kommen
 
-Ad-hoc-Suche skaliert nicht auf 1000. Arbeite die Felder systematisch ab und
-führe je Feld eine Zielzahl:
+**Die Mischung wird NICHT vorab festgelegt.** Kein Anteil, keine Quote, keine
+Zielzahl je Kategorie. Wer vorher entscheidet, dass es „200 Betreiber und 80
+Regulierer" sein sollen, hat die interessanteste Frage schon weggeworfen —
+nämlich welche Art von Quelle für diesen Bericht tatsächlich etwas taugt.
 
-| Feld | Zielzahl | Hinweise |
-|---|---|---|
-| Netzbetreiber, weltweit | ~200 Betreiber | Die GSMA führt >750 MNOs; sinnvoll sind die ~200 mit relevanter Größe. Heute: 85. |
-| Zweit-/Drittkanäle je Betreiber | ~350 | IR, Technik-Blog, Landesgesellschaft, Produkt-Newsroom. Heute haben 10 von 85 Betreibern mehr als einen Kanal — hier liegt der größte einfache Zugewinn. |
-| Nationale Regulierungsbehörden | ~100 | Ein Land, eine Behörde. Fast alle haben RSS. Heute: 5. |
-| Netzausrüster & Zulieferer | ~80 | Heute 3. Große Lücke. |
-| Geräte- und Chiphersteller | ~50 | Heute 9. |
-| Satellit / NTN | ~30 | Heute 1. Größte Lücke gemessen am Thema. |
-| Fachpresse international + regional | ~80 | Heute 14, alle englischsprachig. Regionale und anderssprachige Fachpresse fehlt komplett. |
-| Verbände, Normung, Foren | ~40 | GSMA, ETSI, ITU, 3GPP, O-RAN Alliance, TM Forum, nationale Verbände. |
-| Tower-, Glasfaser-, Rechenzentrumsbetreiber | ~40 | Cellnex, Vantage, American Tower, Equinix … |
-| MVNO- und eSIM-Plattformen | ~30 | |
+Der Grund ist kein Prinzip, sondern eine Messung. In Lauf #67 lag die Ausbeute
+je Quelle in allen drei Ebenen praktisch gleich:
 
-Summe: ~1 000.
+| Ebene | Quellen | Meldungen | je Quelle |
+|---|---|---|---|
+| Betreiber (`operator`) | 91 | 1 448 | **15,9** |
+| Themenfelder (`tech_watch`) | 25 | 466 | **18,6** |
+| Fachpresse (`industry_news`) | 14 | 247 | **17,6** |
 
-**Die ergiebigste Quelle für Kandidaten ist der Bestand selbst.** Zwei
-Verfahren, die mechanisch funktionieren und kein Modell brauchen:
+Es gibt also keinen Beleg dafür, dass Betreiberquellen wertvoller wären als
+Fachpresse oder Themenquellen. Gut möglich, dass am Ende sehr viel Fachpresse
+das Richtige ist — regional, mehrsprachig, dicht. Das entscheidet die Messung,
+nicht der Auftrag.
 
-1. `scripts/finde_quellen.py` über alle bekannten Unternehmensdomains laufen
-   lassen (`rel=alternate` plus Kandidatenpfade). Es ist heute auf einzelne
-   Ziele ausgelegt — bau es auf Massenbetrieb um.
-2. **Muster übertragen.** Wenn ein Betreiber auf einer IR-Plattform liegt,
-   liegen Dutzende andere auf derselben. Bekannte Muster im Bestand:
-   `q4web.com`/`investor.<firma>.com/rss/pressrelease.aspx?T=1` (T-Mobile),
+### Was stattdessen zu tun ist: die Mischung messbar machen
+
+Die Zahl „Meldungen je Quelle" sagt nur, wie viel eine Quelle liefert, nicht
+wie viel davon taugt. Diese zweite Zahl gibt es heute nicht, und sie ist die
+wichtigste Kennzahl des ganzen Ausbaus. **Bau sie zuerst.** Je Quelle über
+mehrere Läufe hinweg:
+
+- wie viele ihrer Meldungen ein Analyst überhaupt bewertet hat (Relevanz ≥ 2)
+- wie viele davon Relevanz ≥ 3 bzw. ≥ 4 bekamen
+- wie viele es in den Wochenbericht geschafft haben
+- wie oft die Quelle leer war oder gescheitert ist
+
+Die Daten dafür liegen schon vor: `data/reports/*.json` enthält je Highlight
+`source` und `relevance`, das Laufprotokoll je Quelle `status` und `count`.
+Es braucht also keinen neuen Sammelvorgang, nur eine Auswertung über das
+Archiv — und danach eine Seite oder einen Report, der die Quellen nach
+Trefferquote sortiert.
+
+**Erst mit dieser Kennzahl wird der Ausbau steuerbar:** in Kategorien
+investieren, die nachweislich liefern, und in Wellen nachsteuern statt vorab
+zu quotieren.
+
+### Suchinventar (Fundorte, ausdrücklich KEINE Quoten)
+
+Eine Liste, wo man überhaupt suchen kann, damit keine Kategorie schlicht
+vergessen wird. In welchem Verhältnis sie am Ende vertreten sind, ergibt die
+Messung oben:
+
+- Netzbetreiber weltweit (die GSMA führt >750 MNOs; heute beobachtet: 85)
+- Zweit- und Drittkanäle bestehender Betreiber: Investor Relations,
+  Technik-Blog, Landesgesellschaft, Produkt-Newsroom
+- Fachpresse — international, **regional und anderssprachig**. Heute sind alle
+  14 Feeds englischsprachig; das ist die auffälligste Lücke im Bestand.
+- Nationale Regulierungsbehörden (heute 5)
+- Netzausrüster und Zulieferer (heute 3)
+- Geräte- und Chiphersteller (heute 9)
+- Satellit / NTN (heute 1)
+- Verbände, Normung, Foren: ETSI, ITU, 3GPP, O-RAN Alliance, TM Forum,
+  nationale Verbände
+- Tower-, Glasfaser- und Rechenzentrumsbetreiber
+- MVNO- und eSIM-Plattformen
+- Marktforschung und Analysten, soweit frei zugänglich
+
+Wenn sich unterwegs zeigt, dass eine dieser Kategorien nichts bringt: streichen
+und in der Schlussliste begründen. Wenn sich zeigt, dass eine andere trägt:
+ausbauen, auch weit über jedes Bauchgefühl hinaus.
+
+### Der billigste Zugewinn — unabhängig von der Mischung
+
+Zwei Verfahren, die mechanisch funktionieren und kein Modell brauchen:
+
+1. **Zweitkanäle bestehender Betreiber.** Erst 10 von 85 Betreibern haben mehr
+   als einen eigenen Kanal. Hier ist kein einziger neuer Betreiber zu
+   recherchieren — die Firmen stehen schon in der Watchlist.
+2. **Muster übertragen.** Liegt ein Betreiber auf einer IR-Plattform, liegen
+   Dutzende andere auf derselben. Bekannte Muster im Bestand:
+   `q4web.com` bzw. `investor.<firma>.com/rss/pressrelease.aspx?T=1` (T-Mobile),
    `<ir-host>/rss/news-releases.xml` (Charter, Broadcom),
    `news.cision.com/<firma>` mit `item_selector: .card-item` (Telia, Ericsson),
    `irasia.com/.../rss.cgi?id=<firma>&t=p` (China Mobile/Telecom/Unicom),
    `/wp-json/wp/v2/posts?per_page=25` (WOM), `?format=feed&type=rss` (Joomla).
    Ein Muster auf 50 Firmen anzuwenden kostet 50 Abrufe und null Token.
+
+`scripts/finde_quellen.py` macht genau das (`rel=alternate` plus
+Kandidatenpfade), ist aber auf einzelne Ziele ausgelegt — bau es auf
+Massenbetrieb um.
 
 ## 5. Harte Abnahmekriterien
 
@@ -236,10 +289,9 @@ Alle Punkte aus `CLAUDE.md` Abschnitt 6 gelten weiter. Zusätzlich für diese
 Größenordnung:
 
 - **Der Check prüft Form, nicht Wert.** Bei 1000 Quellen wird niemand jede von
-  Hand bewerten können. Überleg dir ein Verfahren, das Rauschquellen
-  mechanisch erkennt — z. B. Anteil der Meldungen, die der Analyst mit
-  Relevanz < 2 verwirft, über mehrere Läufe gemessen. Eine Quelle, deren
-  Meldungen nie im Bericht landen, ist Ballast.
+  Hand bewerten können — dafür ist die Trefferquote aus Abschnitt 4 da. Eine
+  Quelle, deren Meldungen über mehrere Läufe nie im Bericht landen, ist
+  Ballast, egal wie sauber sie den Abnahme-Check besteht.
 - **Sprache.** Ab ~300 Quellen ist der englischsprachige Vorrat erschöpft. Der
   Analyst versteht andere Sprachen, aber der Datums-Parser in
   `collect/newsroom.py` kennt nur die Monatsnamen, die dort eingetragen sind.
@@ -264,14 +316,19 @@ Größenordnung:
    aufzugeben — mit Migration des Bestands.
 4. Quellenregister mit Herkunft, Abnahmedatum, letztem Erfolg; automatische
    Quarantäne toter Quellen.
-5. Der Weg zu 1000 Quellen in Wellen, jede Welle mit echtem Actions-Lauf und
+5. Die Trefferquote je Quelle (Abschnitt 4), ausgewertet über das
+   vorhandene Berichtsarchiv — vor der ersten neuen Quelle.
+6. Der Weg zu 1000 Quellen in Wellen, jede Welle mit echtem Actions-Lauf und
    ausgewertet: Quellen ok/leer/fehlerhaft, gesammelte und neue Meldungen,
-   Laufzeit je Phase, **vor/nach im Vergleich**.
-6. Kostenrechnung je Lauf und je Monat.
-7. `pytest -q` grün, `python scripts/build_quellen_doc.py --validate` neu erzeugt.
-8. `CLAUDE.md` fortgeschrieben.
-9. Eine ehrliche Schlussliste: wie viele Quellen es wirklich geworden sind,
-   welche verworfen wurden und warum, wo blinde Flecken bleiben. **Lieber 600
+   Laufzeit je Phase, **vor/nach im Vergleich**. Nach jeder Welle die
+   Trefferquote neu auswerten und die nächste Welle danach ausrichten.
+7. Kostenrechnung je Lauf und je Monat.
+8. `pytest -q` grün, `python scripts/build_quellen_doc.py --validate` neu erzeugt.
+9. `CLAUDE.md` fortgeschrieben.
+10. Eine ehrliche Schlussliste: wie viele Quellen es wirklich geworden sind,
+   **wie die Mischung am Ende aussieht und warum sie so aussieht** (belegt mit
+   der Trefferquote, nicht mit einer Vorabannahme), welche verworfen wurden und
+   warum, wo blinde Flecken bleiben. **Lieber 600
    belegte als 1000 behauptete.** Wenn 1000 nicht sinnvoll erreichbar sind,
    sag das mit Zahlen — Antonio will einen funktionierenden Radar, keine
    Zahl im Changelog.
@@ -282,6 +339,10 @@ Größenordnung:
   bleiben bei 0). Wer nicht bewertet wird, ist über den Seen-Store dauerhaft
   verloren.
 - Keine Keyword-Nachrichtensuche als Quelle.
+- **Keine vorab festgelegte Mischung.** Nicht entscheiden, wie viel Prozent
+  Betreiber, Fachpresse oder Regulierer es sein sollen. Gemessen an Lauf #67
+  liefern alle drei Ebenen praktisch gleich viel je Quelle; welche davon
+  wertvoll sind, weiss heute niemand. Das entscheidet die Trefferquote.
 - Keine Quelle eintragen, die nicht durch den Abnahme-Check gelaufen ist.
 - `data/state/` und `data/reports/` nicht aus lokalen Läufen committen.
 - Kein `newsroom_js` als Ersatz für „ich habe den statischen Endpunkt nicht

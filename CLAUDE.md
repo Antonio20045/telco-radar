@@ -280,6 +280,16 @@ alle an Lauf #67 gemessen:
 4. **Kosten und Rate-Limits.** ~150 Analysten-Aufrufe je Lauf statt heute 14.
    Vor dem Hochdrehen der Parallelität das DeepSeek-Limit messen.
 
+Und eine Regel, die im Auftrag steht, weil sie beim Schreiben fast falsch
+gemacht worden wäre: **die Mischung der Quellen wird nicht vorab festgelegt.**
+Kein Anteil Betreiber / Fachpresse / Regulierung. In Lauf #67 lag die Ausbeute
+je Quelle in allen drei Ebenen praktisch gleich (15,9 / 17,6 / 18,6 Meldungen),
+es gibt also keinerlei Beleg, dass eine Kategorie wertvoller wäre. Was fehlt,
+ist die Trefferquote je Quelle — wie viele ihrer Meldungen ein Analyst
+überhaupt bewertet und wie viele im Bericht landen. Die lässt sich aus dem
+vorhandenen Berichtsarchiv auswerten und ist vor der ersten neuen Quelle zu
+bauen; danach steuert sie den Ausbau.
+
 ## 10. Offene Ideen / Roadmap
 
 - E-Mail-/Teams-Versand des Briefings nach jedem Lauf
