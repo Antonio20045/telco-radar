@@ -32,8 +32,25 @@ _BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
 def fetch(url: str, http_cfg: dict,
           timeout_override: float | None = None,
           extra_headers: dict | None = None) -> httpx.Response:
-    """GET with UA fallback + short backoff on rate limits."""
+    """GET with UA fallback + short backoff on rate limits.
+
+    Gesamtbudget je Quelle
+    ----------------------
+    Zwei User-Agents mal drei Versuche mal Timeout plus 13 s Backoff - im
+    schlimmsten Fall wartet ein einziger Abruf minutenlang. Solange die
+    Sammelphase an der Zahl der Quellen hing, fiel das nicht auf. Seit sie
+    host-gedrosselt parallel laeuft, haengt sie an der LANGSAMSTEN EINZELNEN
+    Quelle: in Lauf #68 lag der Median bei 3,2 s, aber KT brauchte 299,8 s
+    und bestimmte damit die 303-Sekunden-Phase im Alleingang.
+
+    `source_budget_seconds` deckelt das. Ueberschritten wird es nur von
+    Quellen, die ohnehin gerade nicht antworten - der letzte Fehler wird
+    unveraendert geworfen, die Quelle steht also weiter als "fail" im
+    Protokoll und nicht als leise uebersprungen.
+    """
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
+    budget = float(http_cfg.get("source_budget_seconds", 0) or 0)
+    frist = (time.monotonic() + budget) if budget else None
     primary = http_cfg.get("user_agent", BROWSER_UA)
     fallback = BOT_UA if primary != BOT_UA else BROWSER_UA
 
@@ -55,6 +72,10 @@ def fetch(url: str, http_cfg: dict,
             headers.update(extra_headers)
         # attempt 0 immediate, then one retry per backoff wait
         for wait in (0.0, *_BACKOFF_WAITS):
+            if frist is not None and time.monotonic() >= frist:
+                log.info("Budget von %.0fs fuer %s erschoepft - Abbruch",
+                         budget, url[:60])
+                break
             if wait:
                 time.sleep(wait + random.uniform(0, 1.0))
             try:
@@ -79,5 +100,7 @@ def fetch(url: str, http_cfg: dict,
         if isinstance(last_exc, httpx.HTTPStatusError) and \
                 last_exc.response is not None and \
                 last_exc.response.status_code in _BACKOFF_STATUSES:
+            break
+        if frist is not None and time.monotonic() >= frist:
             break
     raise last_exc if last_exc else RuntimeError(f"fetch failed: {url}")

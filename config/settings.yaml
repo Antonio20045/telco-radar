@@ -296,6 +296,14 @@ focus_competitors:
 # HTTP settings for collectors
 http:
   timeout_seconds: 20
+  # Gesamtbudget je Quelle. Zwei User-Agents mal drei Versuche mal Timeout
+  # plus 13 s Backoff koennen einen einzigen Abruf minutenlang hinziehen.
+  # Seit die Sammelphase host-gedrosselt parallel laeuft, haengt sie an der
+  # LANGSAMSTEN EINZELNEN Quelle: in Lauf #68 lag der Median bei 3,2 s, aber
+  # KT brauchte 299,8 s und bestimmte damit die 303-Sekunden-Phase allein.
+  # 90 s reichen fuer jede Quelle, die ueberhaupt antwortet - der Median
+  # liegt zwei Groessenordnungen darunter. 0 schaltet das Budget ab.
+  source_budget_seconds: 90
   render_timeout_seconds: 16   # headless (newsroom_js) page render budget
   image_timeout_seconds: 17    # Promo-Uebersicht hero-screenshot page-load budget
                                 # (collect/promo_snapshot.py::capture_hero_image;

@@ -213,3 +213,51 @@ def test_jede_meldung_traegt_ihre_quelle(monkeypatch):
 
     assert {i.source_url for i in items} == {"https://a.example/feed",
                                              "https://b.example/feed"}
+
+
+# ------------------------------------------------------- Budget je Quelle
+
+def test_gesamtbudget_bricht_eine_haengende_quelle_ab(monkeypatch):
+    """Lauf #68: KT allein 299,8s von 303s Sammelphase. Seit die Phase
+    parallel laeuft, bestimmt die langsamste EINZELNE Quelle sie."""
+    import httpx
+    from telco_radar.collect import http as chttp
+
+    versuche: list[float] = []
+    uhr = {"t": 0.0}
+    monkeypatch.setattr(chttp.time, "monotonic", lambda: uhr["t"])
+    monkeypatch.setattr(chttp.time, "sleep",
+                        lambda s: uhr.__setitem__("t", uhr["t"] + s))
+
+    def haengt(url, **kw):
+        versuche.append(uhr["t"])
+        uhr["t"] += 20.0            # Timeout
+        raise httpx.ConnectTimeout("timed out")
+
+    monkeypatch.setattr(chttp.httpx, "get", haengt)
+
+    with pytest.raises(httpx.HTTPError):
+        chttp.fetch("https://tot.example/feed",
+                    {"timeout_seconds": 20, "source_budget_seconds": 90})
+
+    assert uhr["t"] <= 120, f"Budget nicht eingehalten: {uhr['t']:.0f}s"
+    # ohne Budget waeren es 6 Versuche (2 UAs x 3), mit Budget weniger
+    assert len(versuche) < 6
+
+
+def test_ohne_budget_bleibt_das_verhalten_unveraendert(monkeypatch):
+    import httpx
+    from telco_radar.collect import http as chttp
+
+    versuche: list[int] = []
+    monkeypatch.setattr(chttp.time, "sleep", lambda s: None)
+
+    def haengt(url, **kw):
+        versuche.append(1)
+        raise httpx.ConnectTimeout("timed out")
+
+    monkeypatch.setattr(chttp.httpx, "get", haengt)
+    with pytest.raises(httpx.HTTPError):
+        chttp.fetch("https://tot.example/feed", {"timeout_seconds": 1})
+
+    assert len(versuche) == 6      # 2 User-Agents x 3 Versuche
