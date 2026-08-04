@@ -2,461 +2,211 @@
  "date": "2026-08-04",
  "generated_with_llm": true,
  "stats": {
-  "sources_total": 130,
-  "sources_ok": 123,
+  "sources_total": 132,
+  "sources_ok": 122,
   "sources_empty": 4,
-  "sources_failed": 3,
-  "collected": 2161,
-  "new": 124,
+  "sources_failed": 6,
+  "collected": 2135,
+  "new": 28,
+  "sources_quarantaene": 0,
   "operators": 85,
   "regions": 6,
   "themes": 6
  },
- "briefing_md": "## Auf einen Blick\n- T-Mobile US streicht sämtliche Vorabkosten beim Anbieterwechsel und beseitigt so eine der größten Wechselhürden im Mobilfunk.\n- Virgin Media O2 versorgt Feuerwehrleute bei einem Waldbrand in Derbyshire mit Satelliten‑Konnektivität – ein echter Notfalleinsatz.\n- SoftBank steigert Umsatz und Gewinn dank KI‑ und Cloud‑Diensten und investiert 634 Millionen US‑Dollar in eine KI‑Partnerschaft mit 7‑Eleven.\n\n## Das Wichtigste\nT‑Mobile US beseitigt mit dem Wegfall aller Anzahlungen eine der größten Hürden für den Anbieterwechsel – ein Schritt, der den Preisdruck im Breitband‑ und Mobilfunkmarkt international verschärfen kann. Virgin Media O2 beweist mit O2 Satellite, dass Satelliten‑Konnektivität nicht nur ein Versprechen ist, sondern im Notfall echte Verbindung liefert. SoftBank zeigt, dass KI‑ und Cloud‑Geschäft bei Netzbetreibern messbar zum Umsatzwachstum beiträgt – ein klares Signal, dass Telcos zunehmend zu KI‑Plattformen werden. In den USA setzt Astound zum Schulanfang aggressive Gigabit‑Angebote ab 30 US‑Dollar monatlich ein, was den Preiswettbewerb weiter befeuert. Cellnex sieht KI, 5G und digitale Souveränität als Treiber des nächsten Infrastrukturzyklus in Europa – eine Einschätzung, die Investitionen in KI‑fähige Netze untermauert.\n\n## Die wichtigsten Signale\n**T‑Mobile US – Introducing Nothing: T‑Mobile Eliminates Upfront Costs** (Tarif/Pricing, Dringlichkeit 5/5)  \nT‑Mobile US verlangt bei einem Anbieterwechsel keinerlei Anzahlungen mehr. Das Unternehmen will damit nach eigener Aussage die größte Hürde für den Wechsel beseitigen. Konkrete Preise oder Laufzeiten nennt die Ankündigung nicht, sie positioniert den Schritt als grundsätzliche Absage an Einstiegshürden. [Quelle](https://investor.t-mobile.com/events-and-presentations/news/news-details/2026/Introducing-Nothing--T-Mobile-Eliminates-Upfront-Costs--One-of-Wireless-Biggest-Barriers-to-Switching/default.aspx)\n\n**Virgin Media O2 – O2 Satellite Helps Firefighters Stay Connected During Derbyshire Wildfire Response** (Netz/Technologie, Dringlichkeit 4/5)  \nIn einem Gebiet ohne Mobilfunkempfang hat Virgin Media O2 Einsatzkräfte mit O2 Satellite versorgt. Der Einsatz bei einem realen Waldbrand zeigt die Praxistauglichkeit von Satelliten‑Konnektivität als Ergänzung zum terrestrischen Netz. Der Vorfall belegt, dass solche Lösungen im Notfall echten Mehrwert stiften und sich als fester Bestandteil der Flächenabdeckung etablieren können. [Quelle](https://news.virginmediao2.co.uk/o2-satellite-helps-firefighters-stay-connected-during-derbyshire-wildfire-response/)\n\n**SoftBank – SoftBank Boosts Earnings with Help from AI and Cloud Services** (Finanzen, Dringlichkeit 3/5)  \nSoftBank verzeichnet ein Umsatzplus von rund 3 Prozent, getrieben durch KI‑ und Cloud‑Dienste. Zusätzlich investiert das Unternehmen 634 Millionen US‑Dollar in eine Partnerschaft mit 7‑Eleven für eine „Next‑Gen Lifestyle‑Infrastruktur“. Die Zahlen belegen, dass KI/Cloud bei Telcos direkt zum Wachstum beitragen kann. [Quelle](https://www.lightreading.com/finance/softbank-boosts-earnings-with-help-from-ai-and-cloud-services)\n\n**Astound – Astound Debuts Back‑to‑School Deals** (Tarif/Pricing, Dringlichkeit 3/5)  \nAstound bietet neuen Kunden bis zum 30. September 1‑Gigabit‑Breitband für 30 US‑Dollar monatlich oder Tarife ab 9,95 US‑Dollar. Die zeitlich befristete Aktion zielt auf junge Haushalte in der Umzugs‑ und Studienstartphase. Der Preis von 30 US‑Dollar für 1 Gigabit zeigt zugleich, wie stark der internationale Breitband‑Preisdruck bleibt. [Quelle](https://www.lightreading.com/broadband/astound-debuts-back-to-school-deals)\n\n**Cellnex – Cellnex Sees AI, 5G and Digital Sovereignty Driving Europe’s Next Infrastructure Cycle** (Netz/Technologie, Dringlichkeit 3/5)  \nCellnex schätzt, dass Europa sich in der Mitte des 5G‑Einführungszyklus befindet und etwa die Hälfte aller Mobilfunkverbindungen 5G‑fähig ist. Als nächste Treiber nennt der Infrastrukturkonzern KI, 5G und digitale Souveränität. Die Einschätzung stärkt die Argumentation für Investitionen in KI‑fähige Netze und lässt sich im B2B‑Vertrieb als Differenzierungsmerkmal nutzen. [Quelle](https://www.rcrwireless.com/20260804/5g/cellnex-ai-5g-europe)\n\n## Asien\nIn Japan und Südkorea treiben die Betreiber KI und alternative Konnektivität voran. SoftBank nutzt KI für Umsatzsprünge und testet erstmals eine Stratosphären‑Plattform. Die Entwicklung zeigt: Asiatische Telcos bauen ihr Geschäft über die reine Konnektivität hinaus zu KI‑Plattformen aus.\n\n- **SoftBank bereitet ersten HAPS‑Flug und Konnektivitätstest vor:** SoftBank will eine High Altitude Platform Station (HAPS) über Japan in die Luft bringen und Konnektivität testen. Die Stratosphären‑Lösung könnte ländliche Gebiete oder Notfalleinsätze ergänzen. [Quelle](https://www.softbank.jp/en/sbnews/entry/20260731_01)\n\n## Global\nWeltweit setzen kleine und mittlere Anbieter auf schnellen Glasfaserausbau und aggressive Preismodelle. Parallel warnt die Branche davor, Netze bei KI‑Projekten zu unterschätzen.\n\n- **LightSpeed Broadband verdoppelt Umsatz:** Der britische FTTP‑Anbieter erreicht 22.000 Kunden und 360.000 angeschlossene Gebäude in 36 Städten. Das zeigt, wie regionale Glasfaser‑Player Marktanteile gewinnen. [Quelle](https://www.ispreview.co.uk/index.php/2026/08/lightspeed-broadband-sees-revenues-double-as-uk-customers-top-22000.html)\n- **Squirrel Internet startet 2,3‑Gbit/s‑Breitbandtarif:** Über das MS3‑Netz in Hull und Nord‑Lincolnshire bietet der ISP einen ultraschnellen Tarif mit Premium‑Service‑Leveln an. Das setzt etablierte Anbieter unter Druck, ihre Gigabit‑Angebote nachzuziehen. [Quelle](https://www.ispreview.co.uk/index.php/2026/08/squirrel-internet-launch-2-3gbps-broadband-offer-via-ms3-and-new-premium-service-levels.html)\n\n## Europa\nNeben dem Satelliten‑Einsatz von Virgin Media O2 setzt Vodafone selbst Akzente mit Campus‑5G und Sport‑Digitalisierung. Der Fokus liegt auf Lösungen für Organisationen und ergänzender Netzkonnektivität.\n\n- **Vodafone Ägypten und Sport‑Digitalisierung:** Vodafone Ägypten schließt neue Vereinbarungen zur Digitalisierung des Fan‑Erlebnisses. Die Initiative zeigt, wie Sponsoring in digitale Stadion‑ und Fan‑Dienste überführt werden kann. [Quelle](https://www.mobileworldlive.com/industry/vodafone-advances-egyptian-sporting-goals/)\n- **Vodafone Business und Swansea University:** Vodafone hat an zwei Campus‑Standorten 5G und verlässliches 4G für Bildungs‑ und Gesundheitsdienste eingeführt. Das Referenzprojekt liefert eine Blaupause für den Vertrieb an Hochschulen und Institutionen. [Quelle](https://www.vodafone.co.uk/newscentre/press-release/vodafone-business-swansea-university-5g-plus/)\n\n## Nordamerika\nT‑Mobile US geht mit der kompletten Abschaffung von Vorabkosten voran und setzt den Preisdruck fort. Weitere nennenswerte neue Meldungen von Wettbewerbern gab es in dieser Woche nicht.\n\n## Ozeanien\nIn Neuseeland dominiert 2degrees mit KI‑Studien, Branchenkooperationen und 3G‑Abschaltung – alle diese Themen wurden bereits in früheren Ausgaben behandelt. Neue Entwicklungen liegen nicht vor.\n\n## Technologie, Geräte & Regulierung\nIntel Foundry stellt mit Advanced Packaging eine Methode vor, mehrere Spezialchips zu einer leistungsfähigen KI‑Einheit zu verbinden. Das Verfahren verbessert künftige KI‑Infrastruktur für Netzautomatisierung und Dienste und kann gleichzeitig Lieferketten stabilisieren [Quelle](https://newsroom.intel.com/intel-foundry/intels-us-advanced-packaging-enables-next-generation-ai-semiconductors). HPE (Juniper) warnt, dass die Migration auf Post‑Quanten‑Kryptografie bereits jetzt ein konkretes Geschäftsrisiko darstellt – ein Planungsthema für Netzbetreiber, noch bevor eine Regulierung greift [Quelle](https://www.hpe.com/us/en/newsroom/blog-post/2026/08/post-quantum-cryptography-is-already-a-business-risk.html). Cisco und DE‑CIX‑Manager mahnen, dass Unternehmen ihre KI‑Vorhaben gefährden, wenn sie das Netzwerk als Engpass ignorieren. Für Betreiber eröffnet sich daraus die Chance, „KI‑ready Network“‑Angebote und Managed‑Connectivity zu vermarkten [Quelle](https://www.fierce-network.com/cloud/enterprises-think-theyre-ready-ai-theyre-not).\n\n## Muster der Woche\n- **KI wird zum Umsatztreiber bei Netzbetreibern:** SoftBank belegt mit konkreten Zahlen, dass KI‑ und Cloud‑Dienste das Wachstum beschleunigen. Das Muster, Telcos zu KI‑Plattformen auszubauen, verdichtet sich.\n- **Satelliten‑Konnektivität im operativen Einsatz:** Virgin Media O2 setzt Satelliten‑Konnektivität bei einem realen Notfall ein. Das zeigt, dass Direct‑to‑Device‑ und stratosphärische Lösungen von der Ankündigung in den praktischen Betrieb übergehen.\n- **Radikale Vereinfachung des Anbieterwechsels:** T‑Mobile US eliminiert sämtliche Vorabkosten und senkt damit eine zentrale Wechselbarriere. Dieses Vorgehen könnte den Preis‑ und Servicewettbewerb auf andere Märkte übertragen.\n- **Preiskampf mit Gigabit‑Angeboten:** Astounds Back‑to‑School‑Deal mit 1 Gigabit für 30 US‑Dollar unterstreicht, dass Breitbandanbieter mit aggressiven Lockangeboten um junge Haushalte buhlen – ein Modell, das international Schule machen kann.",
+ "briefing_md": "## Auf einen Blick\n- SoftBank meldet ein Umsatzwachstum von 31 Prozent bei Cloud- und Künstlicher Intelligenz (KI)-Diensten und erwartet, dass diese Rate jährlich anhält.\n- Die Deutsche Telekom setzt mit neuen Tarifen in Europa auf Smartphone-Ratenfinanzierung ohne Anzahlung, um die Einstiegshürden für Kunden zu senken.\n- Ciena und Toshiba zeigen in einem Live-Netztest, dass quantensichere Kommunikation auf bestehenden Glasfasernetzen praktisch umsetzbar ist.\n\n## Das Wichtigste\nDie Woche stand im Zeichen konkreter Schritte, mit denen Netzbetreiber und Infrastrukturanbieter die Themen KI, Sicherheit und Kundenzugang vorantreiben. In Asien unterstreicht SoftBank mit einem Sprung der Cloud- und KI-Umsätze um 31 Prozent, dass etablierte Betreiber vom Boom digitaler Dienste direkt profitieren. In Europa senkt die Deutsche Telekom mit den Tarifen „Experience“ und „Essentials 2.0“ die finanzielle Einstiegshürde für Neugeräte, indem sie auf Anzahlungen verzichtet und einen Ratenplan anbietet. Gleichzeitig zeigt der erfolgreiche Test von Ciena und Toshiba zur quantensicheren Datenübertragung über ein Live-Glasfasernetz im Mittleren Westen der USA, dass das Thema abhörsichere Kommunikation für Unternehmen aus Finanz- und Regierungssektor praxisreif wird. Der Einstieg von Intel in die OCUDU Ecosystem Foundation erhöht die industrielle Reife von offenen Funkzugangsnetzen (Open RAN) und könnte die Abhängigkeit von einzelnen Zulieferern verringern.\n\n## Die wichtigsten Signale\n**SoftBank - Cloud- und KI-Umsatz steigt im ersten Fiskalquartal um 31 Prozent** (Asien, Dringlichkeit 4/5)\nDer japanische Konzern meldet einen Anstieg der Umsätze mit Cloud-Diensten und KI um 31 Prozent im Vergleich zum Vorjahr. Vorstandschef Junichi Miyakawa rechnet damit, dass dieses Wachstum mit durchschnittlich 30 Prozent pro Jahr anhält. [Quelle](https://www.fierce-network.com/newswire/cloud-ai-revenue-jumps-31-softbank-corps-fiscal-q1)\n\n**Ciena/Toshiba - Quantennetzwerk-Test auf live Midwest-Netz abgeschlossen** (Global, Dringlichkeit 4/5)\nDie Unternehmen erprobten erfolgreich quantensichere Übertragung auf einem bestehenden Glasfasernetz im Mittleren Westen der USA. Der Test zeigt einen praxistauglichen Weg zu abhörsicherer Kommunikation für Kunden aus dem Finanz- und Regierungssektor. [Quelle](https://www.fierce-network.com/modernization/ciena-toshiba-complete-live-quantum-networking-trial-live-midwest-network)\n\n**OCUDU Ecosystem Foundation / Intel - Intel tritt als Premier Member bei** (Global, Dringlichkeit 4/5)\nDer Einstieg von Intel in das Ökosystem für offene Funkzugangsnetze (Open RAN) erhöht die industrielle Reife dieses Ansatzes. Die Mitgliedschaft könnte die Abhängigkeit von einzelnen Zulieferern bei der Software für Funkzugangsnetze verringern. [Quelle](https://www.lightreading.com/open-ran/ocudu-ecosystem-foundation-welcomes-intel-as-a-premier-member)\n\n**Deutsche Telekom - Neue Tarife mit Ratenfinanzierung ohne Anzahlung** (Europa, Dringlichkeit 4/5)\nMit den Tarifen „Experience“ und „Essentials 2.0“ können Kunden ein Smartphone ohne Vorabkosten erhalten und zahlen es über einen Ratenplan ab. Das Modell senkt die Einstiegshürde für Neugeräte und zeigt, wie Ratenzahlung zum zentralen Wettbewerbsinstrument in Europa wird. [Quelle](https://www.fierce-network.com/wireless/t-mobile-launches-nothing-so-whats-big-deal)\n\n## Europa\n\nDie Deutsche Telekom treibt in Europa das Thema Ratenfinanzierung weiter voran. Während die Konkurrenz vor allem über reine Tarifpreise kämpft, setzt der Bonner Konzern darauf, die Gerätekosten in den monatlichen Mobilfunkpreis zu integrieren.\n\n- **Update zu T-Mobile: Null-Anzahlung bei Smartphone-Finanzierung** – Mit den neuen Tarifen „Experience“ und „Essentials 2.0“ können Kunden über einen Equipment Installment Plan (EIP) ein Smartphone ohne Anzahlung bekommen; die Gerätekosten werden in Raten abbezahlt. Das Modell senkt die Einstiegshürde für Neugeräte und dürfte den Wettbewerb um preissensible Kunden weiter anheizen. [Quelle](https://www.fierce-network.com/wireless/t-mobile-launches-nothing-so-whats-big-deal)\n\n## Global\n\nDie globalen Meldungen dieser Woche drehen sich vor allem um technologische Weichenstellungen: quantensichere Netze, offene Funkzugangsnetze (Open RAN) und Wi-Fi 8. Parallel expandiert der KI-Cloud-Anbieter CoreWeave in neue Regionen. Aus den USA kommt mit der Kritik am Förderprogramm BEAD (Broadband Equity, Access, and Deployment Program) eine Debatte über die Sinnhaftigkeit von Breitband-Subventionen.\n\n**Ciena/Toshiba: Quantensicherer Live-Test.** Ciena und Toshiba haben auf dem Live-Netz von Quantum Corridor im Mittleren Westen der USA einen Quanten-Netzwerktest abgeschlossen. Dabei kombinierten sie die Transporttechnologie WaveLogic 6 Extreme mit Quantenschlüssel-Verteilung (QKD) und Post-Quanten-Kryptografie, um bestehende Infrastruktur quantensicher zu machen, ohne sie neu aufzubauen. [Quelle](https://www.fierce-network.com/modernization/ciena-toshiba-complete-live-quantum-networking-trial-live-midwest-network)\n\n**OCUDU/Intel: Open-RAN-Ökosystem wächst.** Intel ist der OCUDU Ecosystem Foundation als Premier Member (höchste Mitgliedsstufe) beigetreten und bringt dort Cloud-native, Silizium- und Telekom-Expertise in die gemeinsame Software-Entwicklung für offene Funkzugangsnetze ein. Die Beteiligung eines großen Chip-Herstellers gilt als Schritt zu mehr Reife und breiterer Lieferkette bei Open RAN. [Quelle](https://www.lightreading.com/open-ran/ocudu-ecosystem-foundation-welcomes-intel-as-a-premier-member)\n\n**Dell'Oro: Wi-Fi 8 kommt wohl früher.** Wegen Engpässen bei Speicherbauteilen rechnet das Marktforschungsunternehmen Dell'Oro mit einer früheren Einführung von Wi-Fi 8. Gleichzeitig dürfte Wi-Fi 7 höhere Umsätze erzielen als jede Vorgängerversion – die Geräte-Roadmaps der Branche verschieben sich damit spürbar. [Quelle](https://www.lightreading.com/wifi/memory-component-shortages-point-to-early-wi-fi-8-introduction-dell-oro)\n\n**CoreWeave: KI-Cloud in Indonesien.** CoreWeave baut seine KI-Cloud-Plattform mit Standorten in Indonesien aus – der erste Schritt des Anbieters in die Region Asien-Pazifik. Spezialisierte KI-Cloud-Anbieter dringen damit in Märkte vor, die bisher von Hyperscalern und lokalen Telekommunikationskonzernen dominiert wurden. [Quelle](https://www.lightreading.com/ai-machine-learning/coreweave-expands-cloud-ai-platform-to-indonesia)\n\n**Moffett: Kritik an US-Breitbandförderung.** Der Analyst Craig Moffett kritisiert das US-Förderprogramm BEAD: Viele ländliche Breitbandziele seien obsolet, weil der Markt sie vor der Subventionierung bereits erreicht habe. Die Debatte verdeutlicht das Risiko, dass Förderprogramme an der realen Nachfrage vorbeiplanen. [Quelle](https://www.fierce-network.com/broadband/telecom-analyst-craig-moffett-beefs-about-bead)\n\n## Asien\n\nDie asiatischen Telekomkonzerne treiben den Wandel vom klassischen Netzbetreiber zum Anbieter digitaler Dienste voran. Diese Woche liefert SoftBank dafür das stärkste Signal: Der japanische Konzern meldet für das erste Fiskalquartal ein Plus von 31 Prozent bei den Umsätzen mit Cloud-Diensten und Künstlicher Intelligenz (KI) im Jahresvergleich. Vorstandschef Junichi Miyakawa rechnet damit, dass dieses Geschäft langfristig um durchschnittlich 30 Prozent pro Jahr wächst.\n\n- **Update zu SoftBank: Cloud- und KI-Umsatz steigt um 31 Prozent.** Der Anstieg im ersten Fiskalquartal bestätigt den Kurs des Konzerns, sich stärker auf digitale Dienste für Unternehmen zu konzentrieren. Miyakawa erwartet ein anhaltendes Wachstum von rund 30 Prozent pro Jahr. [Quelle](https://www.fierce-network.com/newswire/cloud-ai-revenue-jumps-31-softbank-corps-fiscal-q1)\n\n## Nordamerika\n\nIn Nordamerika stand diese Woche der Ausbau der Glasfaserinfrastruktur im ländlichen Raum im Mittelpunkt. Charter Communications (Marke Spectrum) hat sein Glasfasernetz im Lincoln County, Wisconsin, um mehr als 3.500 Haushalte und Unternehmen erweitert. Neu angeschlossene Kunden erhalten Internet, Mobilfunk, TV und Telefon aus einer Hand. Das Projekt ist ein weiteres Beispiel dafür, wie US-Kabelnetzbetreiber auch dünn besiedelte Regionen fiberbasiert anbinden. Damit setzt sich der Trend zu Glasfaser über Städte hinaus fort. [Quelle](https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-lincoln-county-wisconsin)\n\n## Technologie, Geräte & Regulierung\n\n_Die folgenden Meldungen stammen nicht von Wettbewerbern, sondern von Zulieferern, Geräte- und Chipherstellern, KI-Anbietern, Satellitenbetreibern und Behörden — also von denen, die den Rahmen setzen, in dem Netzbetreiber arbeiten._\n\n### Geräte\n\nDie Gerätewoche gehört vor allem Samsung. Der Hersteller treibt sowohl die Bildqualität beim Streaming als auch die nächste Gerätekategorie nach dem Smartphone voran – beides Themen, die für Netzbetreiber bei TV-Angeboten, Datenverträgen und Gerätepartnerschaften relevant werden. Lenovo ergänzt das Feld mit einem Vorstoß bei Nachhaltigkeitskennzeichnungen.\n\n- **Samsung: HDR10+ ADVANCED auf Prime Video** – Samsung bringt mit Prime Video den ersten Streaming-Dienst mit HDR10+ ADVANCED an den Start. Der Standard passt Helligkeit und Kontrast automatisch Bild für Bild an und verlangt mehr Datenrate; ab August 2026 läuft er auf Samsungs TV-Modellen des Jahrgangs 2026. Für TV- und Breitbandanbieter steigt damit die Messlatte bei der Streaming-Qualität, auch für eigene Boxen und Content-Deals. [Quelle](https://news.samsung.com/global/samsung-launches-worlds-first-hdr10-advanced-streaming-experience-on-prime-video)\n\n- **Samsung: KI-Brille als nächste mobile Schnittstelle** – Auf dem Galaxy Unpacked im Juli 2026 stellte Samsung intelligente Eyewear vor, die als erster Schritt zu einer KI-gestützten Brille gilt. Solche Brillen sind auf die Anbindung an Smartphones angewiesen (Bluetooth, WLAN, Mobilfunk) und schaffen damit eine neue Gerätekategorie, die Netzbetreiber mit Konnektivität und Datendiensten begleiten können. [Quelle](https://news.samsung.com/global/interview-galaxy-unpacked-july-2026-intelligent-eyewear-the-first-step-toward-the-next-mobile-ai-interface)\n\n- **Lenovo: Nachhaltigkeitslabels verständlicher machen** – Lenovo beteiligt sich als „EPEAT 2.0 Launch Partner“ daran, die Umweltkennzeichnung für Technikprodukte klarer zu machen. EPEAT ist ein weltweit genutztes Label für nachhaltige Elektronik; es gewinnt in Ausschreibungen und im Firmenkundengeschäft an Bedeutung. Für das eigene Gerätesortiment wird der Nachhaltigkeitsstatus damit zu einem sichtbareren Kriterium. [Quelle](https://news.lenovo.com/making-sustainable-technology-epeat/)\n\n## Muster der Woche\n**KI-Wachstum als Umsatztreiber für etablierte Betreiber:** SoftBanks starkes Cloud- und KI-Wachstum von 31 Prozent zeigt, dass Netzbetreiber zunehmend vom Boom digitaler Dienste profitieren. Parallel expandiert der spezialisierte KI-Cloud-Anbieter CoreWeave nach Indonesien und verschärft den Wettbewerb um Geschäftskunden außerhalb der USA.\n\n**Neue Gerätezugänge durch Finanzierung und KI-Interfaces:** Während die Deutsche Telekom mit Ratenmodellen die Gerätehürde senkt, stellt Samsung mit intelligenter Eyewear eine KI-Brille als neue Gerätekategorie vor, die auf Mobilfunkkonnektivität angewiesen ist. Beide Entwicklungen deuten darauf hin, dass das Geräteportfolio der Betreiber künftig breiter und der Verkauf flexibler wird.\n\n**Quantensicherheit und offene Netze gewinnen an industrieller Reife:** Der Live-Test von Ciena und Toshiba und der Intel-Einstieg bei OCUDU sind zwei Seiten derselben Medaille: Netzinfrastruktur wird sicherer und herstellerunabhängiger. Beide Entwicklungen zielen direkt auf Geschäftskunden, die abhörsichere und flexibel beziehbare Netzdienste benötigen.\n\n**Streaming-Qualität und Nachhaltigkeit als Differenzierungsmerkmale:** Samsung setzt mit HDR10+ ADVANCED einen neuen Streaming-Standard für Prime Video, der die Qualitätserwartungen an TV-Plattformen der Betreiber erhöht. Lenovo treibt verständlichere Nachhaltigkeitslabels voran, die in Ausschreibungen und im Gerätegeschäft an Bedeutung gewinnen.",
  "regions": {
-  "Asien": {
-   "region_summary": "In Asien treiben japanische und koreanische Player KI massiv voran: SoftBank wächst dank KI- und Cloud-Geschäft, SK Telecom launcht ein eigenes großes KI-Modell und Rakuten verbindet KI mit PC-Hardware. Parallel testet SoftBank neue Konnektivität aus der Stratosphäre. Die Richtung ist klar: Telcos in der Region werden zunehmend zu KI-Plattformen und erweitern ihr Geschäft über das klassische Netz hinaus.",
+  "Lateinamerika": {
+   "region_summary": "In Lateinamerika sind diese Woche nur zwei Meldungen des chilenischen Anbieters Entel eingegangen: eine Hilfsaktion für Hochwasseropfer gemeinsam mit einer Stiftung sowie eine B2B-Roadshow in Iquique. Beides sind lokale PR- und Vertriebsaktivitäten ohne strategische Signale für Vodafone.",
+   "highlights": []
+  },
+  "Europa": {
+   "region_summary": "In dieser Woche setzt Deutsche Telekom mit neuen Tarifen und einer Null-anzahlung-Geraetefinanzierung ein Zeichen im Kampf um Kunden. Der Trend geht weiter in Richtung attraktive Ratenmodelle, um die Anschaffungskosten fuer Smartphones zu senken.",
    "highlights": [
     {
-     "title": "SoftBank boosts earnings with help from AI and cloud services",
-     "operator": "SoftBank",
-     "url": "https://www.lightreading.com/finance/softbank-boosts-earnings-with-help-from-ai-and-cloud-services",
-     "category": "Finanzen",
-     "relevance": 3,
-     "summary": "SoftBank steigert die Erträge mit Unterstützung von KI und Cloud um 3 Prozent und investiert 634 Millionen US-Dollar in eine Partnerschaft mit 7-Eleven für „Next-Gen Lifestyle-Infrastruktur“.",
-     "why_it_matters": "Zeigt Vodafone, dass KI/Cloud bei Telcos messbar zum Wachstum beitragen kann; als Benchmark für die eigene Monetarisierung von KI-Diensten und für Kooperationen über das Kerngeschäft hinaus nutzen.",
-     "date": "2026-08-04",
-     "source": "Light Reading"
-    },
-    {
-     "title": "SK Telecom Unveils A.X K2,Driving AI Adoption in Industry and Daily Life",
-     "operator": "SK Telecom",
-     "url": "https://news.sktelecom.com/en/3204",
-     "category": "Produktlaunch",
+     "title": "T-Mobile launches ‘Nothing,’ so what’s the big deal?",
+     "operator": "Deutsche Telekom",
+     "url": "https://www.fierce-network.com/wireless/t-mobile-launches-nothing-so-whats-big-deal",
+     "category": "Tarif/Pricing",
      "relevance": 4,
-     "summary": "SK Telecom stellt das KI-Modell A.X K2 mit 688 Milliarden Parametern sowie drei leichtgewichtige Modelle vor und adressiert damit Industrie, Verteidigung, Bio und Startups.",
-     "why_it_matters": "Das ist eine Vorlage für Vodafone, KI nicht nur in Tarife zu packen, sondern als plattformbasiertes B2B-Angebot für vertikale Branchen zu entwickeln; Vodafone sollte prüfen, ob es ähnliche branchenspezifische KI-Modelle braucht.",
-     "date": "2026-07-29",
-     "source": "SK Telecom"
-    },
-    {
-     "title": "SoftBank Corp. Q1 FY2026 Earnings: Increased Revenue and Profits, Accelerating Growth Initiatives",
-     "operator": "SoftBank",
-     "url": "https://www.softbank.jp/en/sbnews/entry/20260804_01",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "SoftBank meldet für Q1 des Geschäftsjahres 2026 gestiegene Umsätze und Gewinne; Wachstumstreiber sind KI- und Cloud-Initiativen.",
-     "why_it_matters": "Bestätigt den Trend, dass asiatische Telcos KI/Cloud zu zentralen Wachstumsfeldern ausbauen; Vodafone sollte die eigene Finanzkommunikation stärker auf KI- und Cloud-Monetarisierung ausrichten.",
+     "summary": "Deutsche Telekom stellt neue Tarife 'Experience' und 'Essentials 2.0' vor, bei denen Kunden ueber eine Geraetefinanzierung (EIP) ein neues Smartphone mit null Euro Anschaffungskosten erhalten - also 'nichts' zahlen.",
+     "why_it_matters": "Das zeigt, wie Telekom ueber Ratenmodelle die Einstiegshuerde senkt. Vodafone sollte pruefen, ob ahnliche Null-Anzahlungs-Angebote im europaischen Markt notwendig sind, um bei Preissensiblen Kunden nicht ins Hintertreffen zu geraten.",
      "date": "2026-08-04",
-     "source": "SoftBank"
-    },
-    {
-     "title": "Rakuten and HP Launch Rakuten AI for Desktop on HP PCs, Bringing Hybrid AI to HP Customers in Japan",
-     "operator": "Rakuten Mobile",
-     "url": "https://global.rakuten.com/corp/news/press/2026/0729_01.html",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Rakuten bringt zusammen mit HP den KI-Assistenten „Rakuten AI for Desktop“ als Hybrid-KI auf HP-PCs in Japan; ein Teil der KI läuft lokal auf dem Gerät.",
-     "why_it_matters": "Vorlage für Vodafone, mit PC-Herstellern eigene Hybrid-KI-Angebote vorzuinstallieren und so tägliche Berührungspunkte mit Endkunden im Gerätemarkt aufzubauen.",
-     "date": "2026-07-29",
-     "source": "Rakuten Mobile"
-    },
-    {
-     "title": "Stratospheric Ambition: SoftBank Corp. Prepares for its First HAPS Flight and Connectivity Test Over Japan",
-     "operator": "SoftBank",
-     "url": "https://www.softbank.jp/en/sbnews/entry/20260731_01",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "SoftBank bereitet seinen ersten Flug und Konnektivitätstest mit einer High Altitude Platform Station (HAPS) über Japan vor.",
-     "why_it_matters": "Vodafone sollte HAPS-Entwicklungen beobachten: Stratosphären-Plattformen könnten ländliche Gebiete ergänzend zum Mobilfunknetz oder nach Katastrophen kostengünstiger versorgen.",
-     "date": "2026-07-31",
-     "source": "SoftBank"
-    },
-    {
-     "title": "SoftBank Corp. and Quantinuum Issue White Paper that Maps Commercially Relevant Quantum Computing Use Cases",
-     "operator": "SoftBank",
-     "url": "https://www.softbank.jp/en/sbnews/entry/20260729_01",
-     "category": "Partnerschaft",
-     "relevance": 2,
-     "summary": "SoftBank und Quantinuum veröffentlichen ein Whitepaper mit kommerziell relevanten Anwendungsfällen für Quantencomputing.",
-     "why_it_matters": "Für Vodafone eher langfristig relevant: Quantencomputing kann Netzoptimierung und Verschlüsselung verändern; ein Monitoring und frühe Tests eigener Anwendungsfälle lohnen sich.",
-     "date": "2026-07-29",
-     "source": "SoftBank"
+     "source": "Fierce Network",
+     "source_url": "https://www.fierce-network.com/rss/xml"
     }
    ]
   },
   "Global": {
-   "region_summary": "In den globalen Meldungen stehen KI-getriebene Netztechnik (AI-RAN, integrierte Sensorik gegen Drohnen) und der Glasfaserausbau kleiner Anbieter in UK und Afrika im Vordergrund. Für Vodafone ergeben sich daraus vor allem strategische Lernfelder: KI-Netzbereitschaft als B2B-Verkaufsargument, schnelle Glasfaser- und Premium-Angebote im UK-Markt und Echtzeit-Payments in Afrika nach dem Vorbild von TerraPay. Diese Woche zeigt drei Richtungen: US-Breitbandanbieter setzen zum Schulanfang auf aggressive Preiskampagnen, Indien will mit Steueranreizen die Technikproduktion ausbauen, und Infrastrukturanbieter sehen KI, 5G und digitale Souveränität als Treiber der nächsten Investitionswelle in Europa. Für Vodafone heißt das: Preisdruck im Breitband beobachten, Lieferketten- und Endgerätepreise im Blick behalten und den digitalen Souveränitäts-Trend im B2B-Geschäft nutzen.",
+   "region_summary": "Diese Woche zeigen globale Meldungen zwei Richtungen: Einerseits rückt die Vorbereitung auf künftige Netztechnologien in den Fokus (Wi-Fi 8, Quantensicherheit, Open-RAN-Ökosystem), andererseits drängen Cloud- und KI-Anbieter wie CoreWeave in neue Regionen. Für Vodafone sind vor allem die technologischen Weichenstellungen relevant, weniger die US-spezifische Förderdiskussion.",
    "highlights": [
     {
-     "title": "LightSpeed Broadband Sees Revenues Double as UK Customers Top 22,000",
-     "operator": "LightSpeed Broadband",
-     "url": "https://www.ispreview.co.uk/index.php/2026/08/lightspeed-broadband-sees-revenues-double-as-uk-customers-top-22000.html",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Der britische Glasfaser-Netzbetreiber LightSpeed verdoppelt seinen Umsatz und versorgt nun 22.000 Kunden über ein Glasfaser-netz (FTTP) mit 360.000 angeschlossenen Gebäuden in 36 Städten in Ostengland und den Midlands.",
-     "why_it_matters": "Zeigt, wie regionale Glasfaser-Player im UK-Markt an Dynamik gewinnen; Vodafone UK sollte Preis- und Bündelangebote gegen Nischenanbieter absichern.",
-     "date": "2026-08-04",
-     "source": "ISPreview UK"
-    },
-    {
-     "title": "PON in data centers keeps growing – Dell’Oro",
-     "operator": "Dell'Oro Group",
-     "url": "https://www.lightreading.com/fttx/pon-in-data-centers-keeps-growing-dell-oro",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "Laut Dell'Oro werden die weltweiten Ausgaben für PON-Ausrüstung (passives optisches Netz) in Rechenzentren von 2026 bis 2030 insgesamt mehr als 3 Milliarden US-Dollar betragen.",
-     "why_it_matters": "Signal für den Ausbau optischer Netze in Rechenzentren; Vodafone sollte bei eigenen Datenzentren und Enterprise-Angeboten PON als kostengünstigen Glasfaseranschluss prüfen.",
-     "date": "2026-08-04",
-     "source": "Light Reading"
-    },
-    {
-     "title": "TerraPay announces multiple payment services deals in Vietnam",
-     "operator": "TerraPay",
-     "url": "https://developingtelecoms.com/telecom-technology/financial-services/20631-terrapay-announces-multiple-payment-services-deals-in-vietnam.html",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "TerraPay kooperiert mit HDBank und ermöglicht Echtzeit-Auszahlungen von Vietnam auf Bankkonten und Mobile Wallets weltweit; weitere Deals in Vietnam folgen.",
-     "why_it_matters": "Vorlage für M-Pesa: internationale Echtzeit-Remittances und Wallet-to-Wallet-Interoperabilität als Wachstumshebel; Vodafone sollte dieses Modell für Afrika prüfen.",
-     "date": "2026-08-04",
-     "source": "Developing Telecoms"
-    },
-    {
-     "title": "Enterprises think they’re ready for AI – they’re not",
-     "operator": "Cisco / DE-CIX",
-     "url": "https://www.fierce-network.com/cloud/enterprises-think-theyre-ready-ai-theyre-not",
-     "category": "Sonstiges",
-     "relevance": 3,
-     "summary": "Cisco- und DE-CIX-Manager warnen, dass Unternehmen ihre KI-Pläne gefährden, wenn sie das Netzwerk als Engpass ignorieren.",
-     "why_it_matters": "Vodafone Business sollte dieses Thema mit einer „KI-ready Network“-Kampagne und Managed-Connectivity-Angeboten besetzen.",
-     "date": "2026-08-04",
-     "source": "Fierce Network"
-    },
-    {
-     "title": "Ericsson lands prime role in Korean AI-RAN project",
-     "operator": "Ericsson",
-     "url": "https://www.mobileworldlive.com/industry/ericsson-lands-prime-role-in-korean-ai-ran-project/",
+     "title": "Memory component shortages point to early Wi-Fi 8 introduction – Dell'Oro",
+     "operator": "Dell'Oro",
+     "url": "https://www.lightreading.com/wifi/memory-component-shortages-point-to-early-wi-fi-8-introduction-dell-oro",
      "category": "Netz/Technologie",
      "relevance": 3,
-     "summary": "Ericsson wird zentraler Technologiepartner des südkoreanischen „Hyper-AI Network Infrastructure Demonstration Project“ für Physical-AI- und 6G-Entwicklung.",
-     "why_it_matters": "Bestätigt den Trend zu KI-gesteuerten Funkzugangsnetzen (AI-RAN); Vodafone sollte mit Ericsson und anderen Lieferanten eigene AI-RAN-Pilotprojekte definieren.",
+     "summary": "Laut Dell'Oro führt die Knappheit von Speicherbauteilen zu einer früheren Einführung von Wi-Fi 8, während Wi-Fi 7 noch höhere Umsätze als jede Vorgängerversion erzielen dürfte.",
+     "why_it_matters": "Vodafone sollte die Wi-Fi-8-Roadmap für Router und TV-Boxen beobachten, um im eigenen Geräteportfolio nicht von Bauteilengpässen überrascht zu werden. Ein früher Umstieg könnte zudem ein Differenzierungsmerkmal im Breitband-Wettbewerb sein.",
      "date": "2026-08-04",
-     "source": "Mobile World Live"
+     "source": "Light Reading",
+     "source_url": "https://www.lightreading.com/rss.xml"
     },
     {
-     "title": "Squirrel Internet Launch 2.3Gbps Broadband Offer via MS3 and New Premium Service Levels",
-     "operator": "Squirrel Internet",
-     "url": "https://www.ispreview.co.uk/index.php/2026/08/squirrel-internet-launch-2-3gbps-broadband-offer-via-ms3-and-new-premium-service-levels.html",
-     "category": "Tarif/Pricing",
-     "relevance": 2,
-     "summary": "Der britische ISP Squirrel Internet bietet im MS3-Glasfasernetz (Hull und Nord-Lincolnshire) einen 2,3-Gbit/s-Tarif plus neue Premium-Service-Level an.",
-     "why_it_matters": "Vorlage für schnelle Glasfasertarife im UK-Markt; Vodafone UK muss Gigabit-Angebote und Premium-Services im Wettbewerb klar positionieren.",
+     "title": "Ciena, Toshiba complete quantum networking trial on live Midwest network",
+     "operator": "Ciena/Toshiba",
+     "url": "https://www.fierce-network.com/modernization/ciena-toshiba-complete-live-quantum-networking-trial-live-midwest-network",
+     "category": "Netz/Technologie",
+     "relevance": 4,
+     "summary": "In einem Live-Test auf dem Netz von Quantum Corridor kombinierten Ciena (WaveLogic 6 Extreme) und Toshiba (Quantum Key Distribution) post-quantum Kryptografie mit bestehender Infrastruktur – ein Weg zu quantensicherer Vernetzung ohne Netzumbau.",
+     "why_it_matters": "Quantensichere Übertragung wird auch für Telekomnetze in Europa relevant, gerade für B2B-Kunden aus Finanz- und Regierungssektor. Vodafone sollte prüfen, ob ähnliche Post-Quantum-Lösungen auf der eigenen Glasfaser- und Transportinfrastruktur getestet werden können, um frühzeitig ein Sicherheitsargument im Enterprise-Geschäft aufzubauen.",
      "date": "2026-08-04",
-     "source": "ISPreview UK"
+     "source": "Fierce Network",
+     "source_url": "https://www.fierce-network.com/rss/xml"
     },
     {
-     "title": "Dimension Data releases funds for Nigerian fibre expansion",
-     "operator": "Dimension Data",
-     "url": "https://developingtelecoms.com/telecom-business/telecom-investment-mergers/20630-dimension-data-releases-funds-for-nigerian-fibre-expansion.html",
-     "category": "Finanzen",
-     "relevance": 2,
-     "summary": "Dimension Data hat nach erfolgreicher Zeichnung einer Anleihe über 4,05 Milliarden Naira (ca. 2,9 Millionen US-Dollar) die Mittel für den Glasfaserausbau in Nigeria freigegeben.",
-     "why_it_matters": "Afrika-Fokus: alternative Anbieter finanzieren gezielt Glasfaser in Nigeria; Vodafone/Vodacom sollte die Ausbaudynamik und mögliche Kooperationen in Afrika beobachten.",
-     "date": "2026-08-04",
-     "source": "Developing Telecoms"
-    },
-    {
-     "title": "From missiles to pizzas – why 6G drone sensing has been fast-tracked for 5G",
-     "operator": "Ericsson",
-     "url": "https://www.rcrwireless.com/20260804/5g/missiles-pizzas-isac-6g-drone-sensing-5g",
+     "title": "CoreWeave expands cloud AI Platform to Indonesia",
+     "operator": "CoreWeave",
+     "url": "https://www.lightreading.com/ai-machine-learning/coreweave-expands-cloud-ai-platform-to-indonesia",
      "category": "Netz/Technologie",
      "relevance": 3,
-     "summary": "Die 6G-Funktion „Integrated Sensing and Communication“ (ISAC) wird vorgezogen in 5G-Netze integriert, um Drohnen per Mobilfunkradar zu erkennen; Ericsson erläutert den Einsatz.",
-     "why_it_matters": "Netz als Sensor eröffnet neue B2B- und Public-Safety-Produkte; Vodafone sollte ISAC-Anwendungen für Drohnenabwehr und Logistik frühzeitig testen.",
+     "summary": "CoreWeave baut seine KI-Cloud-Plattform mit neuen Standorten in Indonesien aus – der erste Schritt des Anbieters in die Region Asien-Pazifik.",
+     "why_it_matters": "Der Ausbau von spezialisierten KI-Cloud-Anbietern erhöht den Wettbewerb im B2B-Cloud-Markt, auf dem auch Vodafone mit eigenen Angeboten aktiv ist. Vodafone sollte beobachten, ob CoreWeave mit lokalen Partnern in Europa ähnliche Schritte plant, und rechtzeitig die eigene Positionierung im KI-Infrastrukturgeschäft schärfen.",
      "date": "2026-08-04",
-     "source": "RCR Wireless"
+     "source": "Light Reading",
+     "source_url": "https://www.lightreading.com/rss.xml"
     },
     {
-     "title": "Astound debuts back-to-school deals",
-     "operator": "Astound",
-     "url": "https://www.lightreading.com/broadband/astound-debuts-back-to-school-deals",
-     "category": "Tarif/Pricing",
-     "relevance": 3,
-     "summary": "Astound bietet neuen Kunden in ausgewählten Gebieten bis zum 30. September 1-Gigabit-Breitband für 30 US-Dollar pro Monat oder Tarife ab 9,95 US-Dollar pro Monat an.",
-     "why_it_matters": "Das ist eine Vorlage für eigene zeitlich befristete Back-to-School-Angebote: Vodafone könnte mit einem 1-Gig-Einstiegstarif junge Haushalte in der Studienstart- und Umzugsphase gewinnen. Der Preis von 30 US-Dollar für 1 Gigbit zeigt zugleich, wie stark der internationale Breitband-Preisdruck bleibt.",
-     "date": "2026-08-04",
-     "source": "Light Reading"
-    },
-    {
-     "title": "India to solidify tech manufacturing with new tax deal",
-     "operator": "Indische Regierung",
-     "url": "https://www.mobileworldlive.com/apple/india-to-solidify-tech-manufacturing-with-new-tax-deal/",
+     "title": "Craig Moffett has a beef with BEAD. What's right, what's missing?",
+     "operator": "Craig Moffett",
+     "url": "https://www.fierce-network.com/broadband/telecom-analyst-craig-moffett-beefs-about-bead",
      "category": "Regulierung",
      "relevance": 2,
-     "summary": "Die indische Regierung plant längere Steuerbefreiungen für globale Technologieunternehmen, um Investitionen in lokale Fertigungsstandorte als Alternative zu China zu fördern.",
-     "why_it_matters": "Für Vodafone ist das vor allem indirekt relevant: Günstigere Endgerätefertigung in Indien kann Smartphone-Preise und mobilen Datennachfrage in Schwellenländern stützen. Vodafone sollte beobachten, ob sich dadurch Lieferketten und Endgerätepreise in Afrika und anderen Emerging Markets verschieben.",
+     "summary": "Analyst Craig Moffett kritisiert das US-Förderprogramm BEAD: Viele ländliche Breitbandziele seien obsolet, weil der Markt sie bereits vor der Subventionierung erreicht habe.",
+     "why_it_matters": "Auch in Europa laufen Förderprogramme Gefahr, an der tatsächlichen Nachfrage vorbei zu planen. Vodafone sollte bei eigenen Infrastrukturanträgen argumentieren, dass Fördermittel flexibler an reale Versorgungslücken gekoppelt werden müssen, statt starre Ausbauziele zu bedienen.",
      "date": "2026-08-04",
-     "source": "Mobile World Live"
+     "source": "Fierce Network",
+     "source_url": "https://www.fierce-network.com/rss/xml"
     },
     {
-     "title": "Cellnex sees AI, 5G and digital sovereignty driving Europe’s next infrastructure cycle",
-     "operator": "Cellnex",
-     "url": "https://www.rcrwireless.com/20260804/5g/cellnex-ai-5g-europe",
+     "title": "OCUDU Ecosystem Foundation welcomes Intel as a premier member",
+     "operator": "OCUDU Ecosystem Foundation / Intel",
+     "url": "https://www.lightreading.com/open-ran/ocudu-ecosystem-foundation-welcomes-intel-as-a-premier-member",
      "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Cellnex sieht Europa in der Mitte des 5G-Einführungszyklus: In Westeuropa seien bereits rund die Hälfte aller Mobilfunkverbindungen 5G-fähig. KI, 5G und digitale Souveränität sollen die nächste Infrastrukturwelle antreiben.",
-     "why_it_matters": "Das bestätigt Vodafones Richtung, in 5G-Standalone und KI-fähige Netze zu investieren. Der Aspekt der digitalen Souveränität lässt sich zudem im B2B-Vertrieb als Differenzierungsmerkmal nutzen, etwa bei Angeboten für Unternehmen und öffentliche Auftraggeber.",
+     "relevance": 4,
+     "summary": "Intel wird Premier Member der OCUDU Ecosystem Foundation und bringt Cloud-native-, Silizium- und Telekom-Expertise in das gemeinsame Open-RAN-Software-Ökosystem ein.",
+     "why_it_matters": "Vodafone treibt Open RAN aktiv voran; Intels Einstieg stärkt die Lieferketten- und Software-Reife des Ökosystems. Das könnte helfen, eigene Open-RAN-Ausbauziele schneller und günstiger zu erreichen – Vodafone sollte prüfen, ob eine engere Zusammenarbeit mit OCUDU/Intel die eigene Netzstrategie beschleunigt.",
      "date": "2026-08-04",
-     "source": "RCR Wireless"
+     "source": "Light Reading",
+     "source_url": "https://www.lightreading.com/rss.xml"
     }
    ]
   },
-  "KI-Anbieter": {
-   "region_summary": "In dieser Woche dominieren Ankündigungen von OpenAI das Thema KI-Anbieter: Im Mittelpunkt stehen Effizienzverbesserungen des Modells GPT-5.6, ein Benchmark-Bericht sowie Programme für akademische Forscher. Für einen Netzbetreiber ergeben sich daraus keine unmittelbaren operativen Änderungen – es handelt sich um Modell- und Forschungsneuigkeiten ohne direkten Bezug zu Netzfunktionen, Geräten oder Regulierung.",
-   "highlights": []
-  },
-  "Europa": {
-   "region_summary": "Die Woche ist geprägt von Marketing- und PR-Meldungen, vor allem aus Großbritannien. Strategisch relevant sind der Praxiseinsatz von Satelliten-Konnektivität bei Virgin Media O2 sowie zwei Vodafone-eigene Meldungen zu 5G für Geschäftskunden und Sport-Digitalisierung. Die Richtung: Netze werden über den klassischen Mobilfunk hinaus ergänzt, und Lösungen für Organisationen rücken in den Vordergrund.",
+  "Asien": {
+   "region_summary": "Aus Asien kommt diese Woche ein starkes Signal: SoftBank verzeichnet im ersten Fiskalquartal ein deutliches Wachstum bei Cloud- und KI-Umsätzen und plant, dies mit 30 Prozent Jahreswachstum fortzusetzen. Das zeigt, dass klassische Netzbetreiber in der Region den Wandel zum Digitaldienstleister erfolgreich beschleunigen.",
    "highlights": [
     {
-     "title": "Vodafone advances Egyptian sporting goals",
-     "operator": "Vodafone Group",
-     "url": "https://www.mobileworldlive.com/industry/vodafone-advances-egyptian-sporting-goals/",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "Vodafone Ägypten hat neue Vereinbarungen zur Digitalisierung und Verbesserung des Fan-Erlebnisses im Sport abgeschlossen; Details zu Partnern und Volumen nennt die Meldung nicht.",
-     "why_it_matters": "Vorlage für ein eigenes Vorgehen: Vodafone kann Sponsoring systematisch in digitale Stadien- und Fan-Dienste überführen und diesen Ansatz auf europäische Sportpartnerschaften ausrollen.",
-     "date": "2026-08-04",
-     "source": "Mobile World Live"
-    },
-    {
-     "title": "Vodafone Business and Swansea University deliver improved Vodafone 5G+",
-     "operator": "Vodafone UK",
-     "url": "https://www.vodafone.co.uk/newscentre/press-release/vodafone-business-swansea-university-5g-plus/",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Vodafone Business hat an zwei Standorten der Swansea University 5G und verlässliches 4G eingeführt, um Bildungs- und Gesundheitsdienste auf dem Campus zu unterstützen.",
-     "why_it_matters": "Dieses Referenzprojekt können Vodafone-Vertriebsteams in ganz Europa nutzen, um Hochschulen und andere institutionelle Kunden mit konkreten 5G-Use-Cases für Bildung und Gesundheit zu überzeugen.",
-     "date": "2026-07-29",
-     "source": "Vodafone UK"
-    },
-    {
-     "title": "O2 Satellite helps firefighters stay connected during Derbyshire wildfire response",
-     "operator": "Virgin Media O2",
-     "url": "https://news.virginmediao2.co.uk/o2-satellite-helps-firefighters-stay-connected-during-derbyshire-wildfire-response/",
-     "category": "Netz/Technologie",
+     "title": "Cloud, AI revenue jumps 31% in SoftBank Corp's fiscal Q1",
+     "operator": "SoftBank",
+     "url": "https://www.fierce-network.com/newswire/cloud-ai-revenue-jumps-31-softbank-corps-fiscal-q1",
+     "category": "Finanzen",
      "relevance": 4,
-     "summary": "Virgin Media O2 hat Einsatzkräfte bei einem Waldbrand in Derbyshire mit O2 Satellite in einem Gebiet ohne herkömmlichen Mobilfunkempfang mit Konnektivität versorgt.",
-     "why_it_matters": "Zeigt, dass Satelliten-Konnektivität im Notfall echten Mehrwert bietet – Vodafone muss hier Schritt halten und eigene Satelliten-Partnerschaften, etwa mit AST SpaceMobile, offensiv als Flächen- und Notfalllösung kommunizieren und im B2B-Geschäft anbieten.",
-     "date": "2026-07-29",
-     "source": "Virgin Media O2"
+     "summary": "SoftBank Corp meldet für das erste Fiskalquartal einen Anstieg der Cloud- und KI-Umsätze um 31 Prozent im Jahresvergleich; CEO Junichi Miyakawa erwartet, dass das Wachstum mit einer durchschnittlichen jährlichen Rate von 30 Prozent anhält.",
+     "why_it_matters": "Das ist ein Benchmark für Vodafones eigene B2B-Cloud- und KI-Strategie: Wenn ein etablierter Telko wie SoftBank so stark wächst, zeigt das, dass Vodafone seine Cloud-/KI-Offensive im Firmenkundengeschäft aggressiver ausbauen und skizzieren kann, um nicht gegenüber Telkos mit hohem digitalem Anteil zurückzufallen.",
+     "date": "2026-08-04",
+     "source": "Fierce Network",
+     "source_url": "https://www.fierce-network.com/rss/xml"
     }
    ]
   },
   "Nordamerika": {
-   "region_summary": "In Nordamerika geht T-Mobile US diese Woche offensiv auf Kundenzuwachs: Mit der Streichung sämtlicher Vorabkosten will das Unternehmen die größte Wechselhürde im Mobilfunkmarkt beseitigen. Der Trend geht damit weiter in Richtung radikale Vereinfachung des Anbieterwechsels – ein Muster, das auch nach Europa ausstrahlen kann.",
+   "region_summary": "In Nordamerika treibt Charter Communications den Glasfaserausbau in ländlichen Gebieten weiter voran. Der Trend geht zu fiberbasierter Konnektivität auch in dünn besiedelten Regionen – für Vodafone ein interessantes Beobachtungsfeld, aber keine akute Bedrohung im eigenen Markt.",
    "highlights": [
     {
-     "title": "Introducing Nothing. T-Mobile Eliminates Upfront Costs — One of Wireless’ Biggest Barriers to Switching",
-     "operator": "T-Mobile US",
-     "url": "https://investor.t-mobile.com/events-and-presentations/news/news-details/2026/Introducing-Nothing--T-Mobile-Eliminates-Upfront-Costs--One-of-Wireless-Biggest-Barriers-to-Switching/default.aspx",
-     "category": "Tarif/Pricing",
-     "relevance": 5,
-     "summary": "T-Mobile US hat angekündigt, beim Anbieterwechsel keine Vorabkosten mehr zu verlangen, um die aus Sicht des Unternehmens größte Hürde für einen Wechsel zu beseitigen. Die Meldung nennt keine konkreten Preise oder Konditionen, sondern positioniert den Schritt als grundsätzliche Absage an Einstiegshürden.",
-     "why_it_matters": "Das ist eine direkte Vorlage für Vodafone: Ein Angebot mit null Euro Anzahlung beim Tarifwechsel könnte die Wechselbereitschaft in Deutschland spürbar erhöhen – gerade im Wettbewerb mit der Deutschen Telekom, die als Mutter von T-Mobile US dieses Muster auf andere Märkte übertragen könnte. Vodafone sollte beobachten, ob Telekom diesen Hebel auch in Europa einsetzt, und parallel eigene Wechselangebote ohne Vorabkosten testen.",
+     "title": "Spectrum Rural Expansion Connects More Residents and Businesses Throughout Lincoln County, Wisconsin",
+     "operator": "Charter Communications",
+     "url": "https://corporate.charter.com/newsroom/spectrum-expands-fiber-broadband-network-in-lincoln-county-wisconsin",
+     "category": "Netz/Technologie",
+     "relevance": 2,
+     "summary": "Charter Communications hat sein Glasfasernetz in Lincoln County, Wisconsin, um mehr als 3.500 Haushalte und Unternehmen erweitert und bietet dort Internet, Mobilfunk, TV und Telefon an.",
+     "why_it_matters": "Zeigt, wie ein US-Kabelnetzbetreiber ländliche Räume fiberbasiert erschließt – Vodafone kann dies als Referenz für eigene Glasfaserausbau-Projekte in unterversorgten Gebieten in Europa nutzen.",
      "date": "2026-08-04",
-     "source": "T-Mobile US"
+     "source": "Charter Communications",
+     "source_url": "https://corporate.charter.com/page-data/sq/d/2336972469.json"
     }
    ]
   },
-  "Regulierung & Verbände": {
-   "region_summary": "Im Fokus dieser Woche steht die GSMA mit dem RCS Universal Profile 4.1: Ende-zu-Ende-Verschlüsselung wird zum Standard für netzbetreiberübergreifendes Messaging und stärkt RCS gegenüber proprietären Messenger-Apps. Daneben signalisiert die indische Regulierungsbehörde TRAI mit ihrer überarbeiteten MyCall-App, dass Netzqualität künftig stärker über Verbraucher-Feedback gemessen werden könnte – ein Trend, den auch Regulierer in anderen Märkten aufgreifen könnten.",
-   "highlights": [
-    {
-     "title": "RCS Universal Profile 4.1: Stronger foundations for secure messaging",
-     "operator": "GSMA",
-     "url": "https://www.gsma.com/newsroom/article/rcs-universal-profile-4-1-stronger-foundations-for-secure-messaging/",
-     "category": "Netz/Technologie",
-     "relevance": 5,
-     "summary": "Die GSMA hat das RCS Universal Profile 4.1 veröffentlicht; die Ende-zu-Ende-Verschlüsselung (E2EE) wird ausgerollt und baut auf Version 3.1 auf. Das Profil standardisiert sicheres Messaging einheitlich über Netze und Geräte hinweg.",
-     "why_it_matters": "Ermöglicht Vodafone, RCS-Messaging als sicheren, interoperablen Standard zu vermarkten und gegenüber proprietären Messaging-Apps zu positionieren. Kunden werden verschlüsseltes RCS künftig als Standard erwarten, sobald Geräte und Netze das Profil vollständig unterstützen.",
-     "date": "2026-07-28",
-     "source": "GSMA"
-    },
-    {
-     "title": "TRAI revamps TRAI MyCall mobile application to assess voice call quality through consumer feedback",
-     "operator": "TRAI (Indien)",
-     "url": "http://www.trai.gov.in/notifications/press-release/trai-revamps-trai-mycall-mobile-application-assess-voice-call-quality",
-     "category": "Regulierung",
-     "relevance": 2,
-     "summary": "Die indische Regulierungsbehörde TRAI hat ihre App 'MyCall' überarbeitet, um Sprachqualität direkt über Verbraucher-Feedback zu erfassen (Pressemitteilung Nr. 107, August 2026).",
-     "why_it_matters": "Zeigt einen Regulierungstrend weg von reinen Messtouren hin zur Bewertung der Netzqualität durch Kundenfeedback – ein Ansatz, der die Messlatte für Sprachqualität auch in anderen Märkten verändern könnte.",
-     "date": "2026-08-03",
-     "source": "TRAI (Indien)"
-    }
-   ]
+  "KI-Anbieter": {
+   "region_summary": "Die aktuellen Meldungen der KI-Anbieter betreffen Personalien und Bildungsangebote: Anthropic holt einen hochrangigen Regierungs- und Politikmanager, OpenAI bringt Lernfunktionen für ChatGPT Work und Codex auf den Markt. Für Vodafone als Netzbetreiber sind daraus kurzfristig keine neuen Anforderungen, Kosten oder Produktoptionen abzuleiten.",
+   "highlights": []
   },
   "Netzausrüster": {
-   "region_summary": "Die Ausrüsterseite rückt diese Woche die Zukunftsfähigkeit der Netze in den Mittelpunkt: Ericsson liefert seine RAN-Compute-Plattform an NTT DOCOMO und unterstreicht damit den Trend zu softwaredefinierten Funkzugangsnetzen. HPE (Juniper) mahnt zugleich, dass die Migration auf Post-Quanten-Kryptografie bereits jetzt als Geschäftsrisiko behandelt werden muss. Für Vodafone heißt das: Planungen für virtualisierte Netze und quantensichere Verschlüsselung werden konkreter.",
-   "highlights": [
-    {
-     "title": "Post-Quantum Cryptography is already a business risk",
-     "operator": "HPE (Juniper)",
-     "url": "https://www.hpe.com/us/en/newsroom/blog-post/2026/08/post-quantum-cryptography-is-already-a-business-risk.html",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "HPE (Juniper) warnt in einem Blogbeitrag vom 4. August 2026, dass die Post-Quanten-Kryptografie bereits in die Planungsphase eingetreten ist und die größte Gefahr nicht der Zeitpunkt eines Quantencomputers ist, sondern fehlende Vorbereitung.",
-     "why_it_matters": "Für Vodafone als Netzbetreiber wird die Umstellung auf quantensichere Verfahren in Netzkomponenten, Endgeräten und Diensten ein konkretes Planungsthema – noch bevor eine Regulierung sie vorschreibt.",
-     "date": "2026-08-04",
-     "source": "HPE (Juniper)"
-    },
-    {
-     "title": "Ericsson supplies RAN Compute platform for NTT DOCOMO in Japan",
-     "operator": "Ericsson",
-     "url": "https://news.cision.com/ericsson/r/ericsson-supplies-ran-compute-platform-for-ntt-docomo-in-japan,c4378816",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Laut Meldung vom 31. Juli 2026 liefert Ericsson seine RAN-Compute-Plattform an NTT DOCOMO in Japan. Weitere Details zu Umfang und Laufzeit enthält die Ankündigung nicht.",
-     "why_it_matters": "Die Referenz bei NTT DOCOMO bestätigt die Einsatzreife von Ericssons RAN-Compute-Plattform im Massenmarkt; Vodafone kann diese Technologie für seine eigene Netzmodernisierung einplanen, ohne ein unerprobtes System einzuführen.",
-     "date": "2026-07-31",
-     "source": "Ericsson"
-    }
-   ]
-  },
-  "Chips & Modems": {
-   "region_summary": "Diese Woche dominiert in Chips & Modems das Thema KI-Fähigkeiten und Lieferketten: Arm treibt neurale Grafiktechnik für mobiles Gaming voran, während Intel den US-amerikanischen Chipfertigungsstandort und Advanced Packaging stärkt. Für einen Netzbetreiber bedeutet das: Künftige Geräte werden KI-lastiger, und die strategische Absicherung von Chip-Lieferketten wird wichtiger.",
-   "highlights": [
-    {
-     "title": "Arm Neural Technology gaining momentum across the mobile gaming ecosystem",
-     "operator": "Arm",
-     "url": "https://newsroom.arm.com/blog/arm-neural-technology-mobile-gaming-ecosystem",
-     "category": "Partnerschaft",
-     "relevance": 2,
-     "summary": "Arm arbeitet mit Spieleentwicklern, Engine-Anbietern, Entwicklertools, Geräteherstellern und Chip-Partnern daran, neurale Grafiktechnologie für die nächste Generation mobiler Spiele praxistauglich zu machen.",
-     "why_it_matters": "Kunden werden in neuen Smartphones KI-beschleunigte Grafik erwarten; das kann datenintensives Gaming und entsprechende Netznutzung verstärken, die Betreiber einplanen müssen.",
-     "date": "2026-08-04",
-     "source": "Arm"
-    },
-    {
-     "title": "Intel’s U.S. Advanced Packaging Enables Next-Generation AI Semiconductors",
-     "operator": "Intel",
-     "url": "https://newsroom.intel.com/intel-foundry/intels-us-advanced-packaging-enables-next-generation-ai-semiconductors",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Intel Foundry beschreibt Advanced Packaging als Methode, mehrere Spezialchips zu einer leistungsfähigen Einheit zu verbinden, um die Anforderungen von KI-Systemen zu erfüllen.",
-     "why_it_matters": "Ermöglicht leistungsfähigere KI-Chips ohne ein einzelnes Riesenbauteil; für den Netzbetreiber verbessert das künftig die KI-Infrastruktur für Automatisierung und Dienste.",
-     "date": "2026-07-29",
-     "source": "Intel"
-    },
-    {
-     "title": "Intel Completes RAMP-C Program, Accelerating Momentum for Secure Enclave",
-     "operator": "Intel",
-     "url": "https://newsroom.intel.com/intel-foundry/intel-completes-ramp-c-program-accelerating-momentum-for-secure-enclave",
-     "category": "Netz/Technologie",
-     "relevance": 3,
-     "summary": "Intel Foundry hat das RAMP-C-Programm (Rapid Assured Microelectronics Prototypes – Commercial) abgeschlossen, das seit September 2021 die Produktion moderner Chips in den USA förderte und die Basis für Secure Enclave legt.",
-     "why_it_matters": "Schafft eine sichere, regionale Quelle für Halbleiter, verringert Beschaffungsrisiken und kann langfristig Angebot und Preise von Netzwerk-Komponenten beeinflussen.",
-     "date": "2026-07-28",
-     "source": "Intel"
-    }
-   ]
-  },
-  "Ozeanien": {
-   "region_summary": "In Ozeanien treibt in Neuseeland vor allem 2degrees das Geschäft voran: B2B-Themen wie private 5G-Netze und KI-Studien, neue Partnerschaften für Handwerker sowie die abgeschlossene 3G-Abschaltung und ein branchenweiter Betrugsschutz. Die Richtung weist auf mehr KI-Anwendungen, Vertrauenslösungen und branchenspezifische Konnektivität, während in Australien der Markt eher von Marken-Auszeichnungen geprägt ist.",
-   "highlights": [
-    {
-     "title": "New Zealand businesses move beyond COVID recovery story as resilience and growth take centre stage, 2degrees study finds 09 Jun 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/NZ-business-move-beyond-COVID",
-     "category": "Sonstiges",
-     "relevance": 2,
-     "summary": "2degrees veröffentlichte im Juni 2026 eine Studie, wonach neuseeländische Unternehmen die Corona-Erholung hinter sich gelassen haben und Resilienz und Wachstum in den Mittelpunkt rücken.",
-     "why_it_matters": "Zeigt, wie ein kleinerer Wettbewerber mit Studien Führungsanspruch im B2B-Geschäft aufbaut. Vodafone kann ähnliche Insights in seinen B2B-Marketingkampagnen als Kundenbindungsinstrument nutzen.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "AI moves from hype to hard results for Kiwi businesses, 2degrees study reveals 28 Apr 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/AI-moves-from-hype-to-hard-results-for-kiwi-businesses",
-     "category": "Sonstiges",
-     "relevance": 3,
-     "summary": "Eine 2degrees-Studie aus dem April 2026 zeigt, dass Unternehmen in Neuseeland KI inzwischen für konkrete Geschäftsergebnisse einsetzen statt nur über Hype zu reden.",
-     "why_it_matters": "Für Vodafone ein Signal, dass KI im B2B-Markt zum Standard wird. Wir sollten unsere KI-basierten Lösungen stärker als praxiserprobte Ergebnisse mit klaren Kennzahlen positionieren.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "Kiwis are Communicating More but Feeling Less Connected - The Humble Phone Call Could Be the Answer 01 Apr 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/kiwis-are-communicating-more-but-feeling-less-connected",
-     "category": "Kampagne",
-     "relevance": 3,
-     "summary": "2degrees veröffentlichte im April 2026 eine Consumer-Studie: Neuseeländer kommunizieren häufiger, fühlen sich aber weniger verbunden – klassische Telefonate sollen laut Studie helfen.",
-     "why_it_matters": "Kann Vodafone als Vorlage für eigene Kampagnen dienen, die Sprachtelefonie und persönliche Verbindung in den Fokus stellen – ein Differenzierungsmerkmal gegenüber reiner Datenflat.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "New Zealand telcos announce new collaboration that will enable real-time fraud and scam protections for customers 04 Mar 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/nz-telcos-collaborate-for-real-time-fraud-and-scam-protection",
-     "category": "Partnerschaft",
-     "relevance": 4,
-     "summary": "Im März 2026 kündigten neuseeländische Telekommunikationsanbieter eine gemeinsame Kooperation für Echtzeit-Schutz gegen Betrug und Abzocke an.",
-     "why_it_matters": "Das ist eine Vorlage für Vodafone: Branchenweite Zusammenarbeit gegen Scams ist auch in Europa denkbar. Wir sollten prüfen, ob wir mit anderen Anbietern gemeinsame Warnsysteme und Filter etablieren.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "2degrees and Ericsson deliver private 5G network for Lyttelton Port Company 03 Mar 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/lyttleton-port-company-private-network",
-     "category": "Netz/Technologie",
-     "relevance": 4,
-     "summary": "2degrees und Ericsson haben im März 2026 für die Lyttelton Port Company in Neuseeland ein privates 5G-Netz gebaut.",
-     "why_it_matters": "Untermauert den Trend zu privaten 5G-Netzen in Häfen und Logistik. Vodafone kann diese Fallstudie nutzen, um eigene Angebote für Hafen- und Industriekunden in Europa zu schärfen.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "2degrees and Bunnings team up with new partnership to keep tradies connected 02 Mar 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/2degrees-and-Bunnings-team-up",
-     "category": "Partnerschaft",
-     "relevance": 3,
-     "summary": "2degrees startete im März 2026 eine Partnerschaft mit der Baumarktkette Bunnings, um Handwerker mit passenden Mobilfunkangeboten zu versorgen.",
-     "why_it_matters": "Vodafone sollte dieses Segment beobachten: Eine Kooperation mit Baumärkten wäre auch in Deutschland oder Großbritannien denkbar, um Handwerker und Gewerbekunden gezielt zu erreichen.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "2degrees completes 3G shutdown 03 Feb 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-release/2degrees-completes-3G-shutdown",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "2degrees hat im Februar 2026 die Abschaltung des 3G-Netzes in Neuseeland abgeschlossen.",
-     "why_it_matters": "Bestätigt den Trend zur 3G-Abschaltung auch bei kleineren Wettbewerbern. Vodafone muss die Migration der Bestandskunden auf 4G/5G konsequent kommunizieren, um Service ohne Brüche zu gewährleisten.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    },
-    {
-     "title": "2degrees delays 3G shutdown due to state of emergency 27 Jan 2026",
-     "operator": "2degrees",
-     "url": "https://www.2degrees.nz/media-releases/2degrees-delays-3g-shutdown",
-     "category": "Netz/Technologie",
-     "relevance": 2,
-     "summary": "2degrees verschob im Januar 2026 den Abschalttermin für 3G wegen eines örtlichen Ausnahmezustands.",
-     "why_it_matters": "Zeigt, dass Netzabschaltungen flexibel gehandhabt werden müssen. Vodafone kann daraus lernen, bei der eigenen 2G/3G-Abschaltung Notfall- und Sicherheitsanforderungen einzuplanen.",
-     "date": "2026-07-29",
-     "source": "2degrees"
-    }
-   ]
+   "region_summary": "Diese Woche gab es bei Nokia lediglich zwei Pflichtmeldungen zu Aktiengeschäften von Führungskräften im Rahmen der EU-Marktmissbrauchsverordnung. Für die Netz- und Produktstrategie eines Betreibers haben diese Vorgänge keinerlei Bedeutung; es sind reine Compliance-Mitteilungen.",
+   "highlights": []
   },
   "Geräte": {
-   "region_summary": "",
-   "highlights": []
+   "region_summary": "Die Woche ist von Apple und Samsung geprägt: Samsung bringt mit HDR10+ ADVANCED und KI-Brillen neue Technologien voran, Apple startet mit Apple Upgrade ein direktes Leasing für iPhones, während Lenovo bei Nachhaltigkeitslabels vorangeht. Für Vodafone als Netzbetreiber werden neue Gerätekategorien, Finanzierungsmodelle und höhere Streaming-Qualitätsstandards relevant.",
+   "highlights": [
+    {
+     "title": "Samsung Launches World’s First HDR10+ ADVANCED Streaming Experience on Prime Video",
+     "operator": "Samsung",
+     "url": "https://news.samsung.com/global/samsung-launches-worlds-first-hdr10-advanced-streaming-experience-on-prime-video",
+     "category": "Netz/Technologie",
+     "relevance": 3,
+     "summary": "Samsung hat angekündigt, dass Prime Video ab August 2026 als erster Streaming-Dienst HDR10+ ADVANCED weltweit anbietet; verfügbar zunächst auf Samsungs TV-Modellen des Jahrgangs 2026.",
+     "why_it_matters": "Für Vodafone als TV- und Broadband-Anbieter steigt damit die Messlatte bei der Streaming-Qualität; eigene TV-Boxen und Content-Deals müssen den Standard unterstützen, wenn sie bei Premium-Kunden mithalten wollen.",
+     "date": "2026-08-04",
+     "source": "Samsung",
+     "source_url": "https://news.samsung.com/global/feed"
+    },
+    {
+     "title": "Making sustainable technology easier to understand",
+     "operator": "Lenovo / Motorola",
+     "url": "https://news.lenovo.com/making-sustainable-technology-epeat/",
+     "category": "Sonstiges",
+     "relevance": 2,
+     "summary": "Lenovo beteiligt sich als „EPEAT 2.0 Launch Partner“ daran, Nachhaltigkeitskennzeichnungen für Technik verständlicher zu machen.",
+     "why_it_matters": "Nachhaltigkeitslabels wie EPEAT werden in Ausschreibungen und Enterprise-Verträgen wichtiger; Vodafone sollte den EPEAT-Status von Lenovo- und Motorola-Geräten im eigenen Sortiment berücksichtigen.",
+     "date": "2026-07-30",
+     "source": "Lenovo / Motorola",
+     "source_url": "https://news.lenovo.com/feed/"
+    },
+    {
+     "title": "Apple Upgrade launches in the United States",
+     "operator": "Apple",
+     "url": "https://www.apple.com/newsroom/2026/07/apple-upgrade-launches-in-the-united-states/",
+     "category": "Sonstiges",
+     "relevance": 4,
+     "summary": "Apple hat in den USA mit „Apple Upgrade“ ein neues Hardware-Leasing-Programm gestartet, erhältlich im Apple Store online, in der Apple Store App und in den Filialen.",
+     "why_it_matters": "Wenn Apple iPhones zunehmend direkt an Kunden verleast, sinkt die Bedeutung klassischer Geräte-Raten über den Netzbetreiber; Vodafone muss seine iPhone-Upgrade-Angebote entsprechend positionieren.",
+     "date": "2026-07-28",
+     "source": "Apple",
+     "source_url": "https://www.apple.com/newsroom/rss-feed.rss"
+    },
+    {
+     "title": "[Interview] [Galaxy Unpacked July 2026] Intelligent Eyewear: The First Step Toward the Next Mobile AI Interface",
+     "operator": "Samsung",
+     "url": "https://news.samsung.com/global/interview-galaxy-unpacked-july-2026-intelligent-eyewear-the-first-step-toward-the-next-mobile-ai-interface",
+     "category": "Produktlaunch",
+     "relevance": 3,
+     "summary": "Samsung hat auf dem Galaxy Unpacked im Juli 2026 intelligente Eyewear vorgestellt – einen ersten Schritt, um KI-Brillen zur nächsten mobilen KI-Schnittstelle zu machen.",
+     "why_it_matters": "KI-Brillen erfordern nahtlose Anbindung an Smartphones und Konnektivität (Bluetooth, WLAN, Mobilfunk); das eröffnet Netzbetreibern eine neue Gerätekategorie und potenzielle Datendienste.",
+     "date": "2026-07-31",
+     "source": "Samsung",
+     "source_url": "https://news.samsung.com/global/feed"
+    },
+    {
+     "title": "Samsung Electronics Announces Second Quarter 2026 Results",
+     "operator": "Samsung",
+     "url": "https://news.samsung.com/global/samsung-electronics-announces-second-quarter-2026-results",
+     "category": "Finanzen",
+     "relevance": 2,
+     "summary": "Samsung meldet für das zweite Quartal 2026 einen Umsatz von 171,5 Billionen KRW (Rekordhoch, +28 % zum Vorquartal) und ein ebenfalls rekordhohes operatives Ergebnis.",
+     "why_it_matters": "Samsungs starke Ergebnisse signalisieren robuste Nachfrage nach Premium-Endgeräten und stabile Lieferketten – relevant für die Verfügbarkeit und den Absatz von Samsung-Geräten im Vodafone-Portfolio.",
+     "date": "2026-07-30",
+     "source": "Samsung",
+     "source_url": "https://news.samsung.com/global/feed"
+    }
+   ]
   }
  },
  "competitors": [
@@ -486,9 +236,9 @@
   }
  ],
  "run": {
-  "started_at": "2026-08-04T16:39:01.783762+00:00",
-  "finished_at": "2026-08-04T17:00:56.552519+00:00",
-  "duration_seconds": 1314.8,
+  "started_at": "2026-08-04T19:46:20.443768+00:00",
+  "finished_at": "2026-08-04T20:01:29.367731+00:00",
+  "duration_seconds": 908.9,
   "used_llm": true,
   "editor_used": true,
   "models": {
@@ -499,18 +249,18 @@
   "phases": [
    {
     "name": "Sammeln",
-    "seconds": 324.9,
-    "detail": "130 Quellen abgefragt, 2161 Meldungen gefunden"
+    "seconds": 303.1,
+    "detail": "132 Quellen abgefragt, 2135 Meldungen gefunden"
    },
    {
     "name": "Nur Neues",
     "seconds": 0.0,
-    "detail": "124 neue Meldungen (Gedaechtnis: 1858 bekannt)"
+    "detail": "28 neue Meldungen (Gedaechtnis: 1968 bekannt)"
    },
    {
     "name": "Bewerten & Schreiben",
-    "seconds": 447.2,
-    "detail": "36 bewertete Meldungen"
+    "seconds": 185.8,
+    "detail": "13 bewertete Meldungen"
    },
    {
     "name": "Wettbewerber-Analyse",
@@ -519,17 +269,28 @@
    }
   ],
   "source_summary": {
-   "total": 130,
-   "ok": 123,
+   "total": 132,
+   "ok": 122,
    "empty": 4,
-   "failed": 3,
+   "failed": 6,
+   "quarantaene": 0,
    "by_kind": {
-    "json_api": 13,
-    "rss": 51,
     "newsroom": 41,
-    "newsroom_js": 11,
-    "trade_press": 14
+    "json_api": 13,
+    "rss": 53,
+    "trade_press": 14,
+    "newsroom_js": 11
    }
+  },
+  "quellenregister": {
+   "lauf_nummer": 1,
+   "neu": 132,
+   "neu_stillgelegt": [],
+   "wieder_aktiv": [],
+   "quellen_gesamt": 132,
+   "in_quarantaene": 0,
+   "quarantaene": [],
+   "ohne_erfolg": []
   },
   "sources": [
    {
@@ -542,7 +303,37 @@
     "origin": "industry_news",
     "status": "fail",
     "count": 0,
-    "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'"
+    "error": "HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...'",
+    "seconds": 1.49,
+    "new": 0
+   },
+   {
+    "name": "Developing Telecoms",
+    "operator": null,
+    "region": "global",
+    "url": "https://developingtelecoms.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "Developing Telecoms",
+    "origin": "industry_news",
+    "status": "fail",
+    "count": 0,
+    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag",
+    "seconds": 7.98,
+    "new": 0
+   },
+   {
+    "name": "The Fast Mode",
+    "operator": null,
+    "region": "global",
+    "url": "https://www.thefastmode.com/?format=feed&type=rss",
+    "kind": "trade_press",
+    "label": "The Fast Mode",
+    "origin": "industry_news",
+    "status": "fail",
+    "count": 0,
+    "error": "ValueError: unparseable feed: <unknown>:94:2: mismatched tag",
+    "seconds": 7.87,
+    "new": 0
    },
    {
     "name": "Telecoms Tech News",
@@ -554,7 +345,23 @@
     "origin": "industry_news",
     "status": "fail",
     "count": 0,
-    "error": "ConnectTimeout: timed out"
+    "error": "ValueError: unparseable feed: <unknown>:2:119: not well-formed (invalid token)",
+    "seconds": 9.47,
+    "new": 0
+   },
+   {
+    "name": "Orange MEA",
+    "operator": "Orange MEA",
+    "region": "africa_middle_east",
+    "url": "https://orange.jo/en/corporate/media-center",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "fail",
+    "count": 0,
+    "error": "ConnectError: [Errno 111] Connection refused",
+    "seconds": 32.13,
+    "new": 0
    },
    {
     "name": "KT",
@@ -566,51 +373,9 @@
     "origin": "operator",
     "status": "fail",
     "count": 0,
-    "error": "ConnectTimeout: timed out"
-   },
-   {
-    "name": "Iliad",
-    "operator": "Iliad",
-    "region": "europe",
-    "url": "https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&year=all&tag=all",
-    "kind": "json_api",
-    "label": "json_api",
-    "origin": "operator",
-    "status": "ok",
-    "count": 40
-   },
-   {
-    "name": "Charter Communications",
-    "operator": "Charter Communications",
-    "region": "north_america",
-    "url": "https://corporate.charter.com/page-data/sq/d/2336972469.json",
-    "kind": "json_api",
-    "label": "json_api",
-    "origin": "operator",
-    "status": "ok",
-    "count": 40
-   },
-   {
-    "name": "Millicom",
-    "operator": "Millicom",
-    "region": "latin_america",
-    "url": "https://mfn.se/all/a/millicom.rss",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 40
-   },
-   {
-    "name": "stc",
-    "operator": "stc",
-    "region": "africa_middle_east",
-    "url": "https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false",
-    "kind": "json_api",
-    "label": "json_api",
-    "origin": "operator",
-    "status": "ok",
-    "count": 40
+    "error": "ConnectTimeout: timed out",
+    "seconds": 299.84,
+    "new": 0
    },
    {
     "name": "Reliance Jio",
@@ -621,7 +386,35 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 40
+    "count": 40,
+    "seconds": 3.07,
+    "new": 0
+   },
+   {
+    "name": "Millicom",
+    "operator": "Millicom",
+    "region": "latin_america",
+    "url": "https://mfn.se/all/a/millicom.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40,
+    "seconds": 6.5,
+    "new": 0
+   },
+   {
+    "name": "stc",
+    "operator": "stc",
+    "region": "africa_middle_east",
+    "url": "https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 40,
+    "seconds": 5.8,
+    "new": 0
    },
    {
     "name": "Light Reading",
@@ -632,29 +425,9 @@
     "label": "Light Reading",
     "origin": "industry_news",
     "status": "ok",
-    "count": 40
-   },
-   {
-    "name": "The Fast Mode",
-    "operator": null,
-    "region": "global",
-    "url": "https://www.thefastmode.com/?format=feed&type=rss",
-    "kind": "trade_press",
-    "label": "The Fast Mode",
-    "origin": "industry_news",
-    "status": "ok",
-    "count": 40
-   },
-   {
-    "name": "OpenAI",
-    "operator": "OpenAI",
-    "region": "thema:ki",
-    "url": "https://openai.com/news/rss.xml",
-    "kind": "rss",
-    "label": "OpenAI",
-    "origin": "tech_watch",
-    "status": "ok",
-    "count": 40
+    "count": 40,
+    "seconds": 3.36,
+    "new": 3
    },
    {
     "name": "Google DeepMind",
@@ -665,18 +438,22 @@
     "label": "Google DeepMind",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 40
+    "count": 40,
+    "seconds": 2.73,
+    "new": 0
    },
    {
-    "name": "Samsung",
-    "operator": "Samsung",
-    "region": "thema:geraete",
-    "url": "https://news.samsung.com/global/feed",
-    "kind": "rss",
-    "label": "Samsung",
-    "origin": "tech_watch",
+    "name": "Iliad",
+    "operator": "Iliad",
+    "region": "europe",
+    "url": "https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&year=all&tag=all",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
     "status": "ok",
-    "count": 40
+    "count": 40,
+    "seconds": 11.75,
+    "new": 0
    },
    {
     "name": "Lenovo / Motorola",
@@ -687,29 +464,48 @@
     "label": "Lenovo / Motorola",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 40
+    "count": 40,
+    "seconds": 3.32,
+    "new": 4
    },
    {
-    "name": "Developing Telecoms",
-    "operator": null,
-    "region": "global",
-    "url": "https://developingtelecoms.com/?format=feed&type=rss",
-    "kind": "trade_press",
-    "label": "Developing Telecoms",
-    "origin": "industry_news",
-    "status": "ok",
-    "count": 34
-   },
-   {
-    "name": "VEON",
-    "operator": "VEON",
-    "region": "europe",
-    "url": "https://www.veon.com/newsroom",
-    "kind": "newsroom",
-    "label": "newsroom",
+    "name": "Charter Communications",
+    "operator": "Charter Communications",
+    "region": "north_america",
+    "url": "https://corporate.charter.com/page-data/sq/d/2336972469.json",
+    "kind": "json_api",
+    "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 30
+    "count": 40,
+    "seconds": 12.77,
+    "new": 1
+   },
+   {
+    "name": "Samsung",
+    "operator": "Samsung",
+    "region": "thema:geraete",
+    "url": "https://news.samsung.com/global/feed",
+    "kind": "rss",
+    "label": "Samsung",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 40,
+    "seconds": 4.88,
+    "new": 7
+   },
+   {
+    "name": "OpenAI",
+    "operator": "OpenAI",
+    "region": "thema:ki",
+    "url": "https://openai.com/news/rss.xml",
+    "kind": "rss",
+    "label": "OpenAI",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 40,
+    "seconds": 9.83,
+    "new": 1
    },
    {
     "name": "Elisa",
@@ -720,7 +516,22 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 2.91,
+    "new": 0
+   },
+   {
+    "name": "VEON",
+    "operator": "VEON",
+    "region": "europe",
+    "url": "https://www.veon.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 4.86,
+    "new": 0
    },
    {
     "name": "Airtel Africa",
@@ -731,40 +542,9 @@
     "label": "RNS (Regulatory News Service) via Investegate - Airtel Africa ist an der London Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen. airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain + Titel in Nachbar-div ohne Klasse/Heading).",
     "origin": "operator",
     "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "Safaricom",
-    "operator": "Safaricom",
-    "region": "africa_middle_east",
-    "url": "https://www.safaricom.co.ke/media-center-landing/press-releases",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "Bharti Airtel",
-    "operator": "Bharti Airtel",
-    "region": "asia",
-    "url": "https://www.airtel.in/press-release",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "du",
-    "operator": "du",
-    "region": "africa_middle_east",
-    "url": "https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 4.76,
+    "new": 0
    },
    {
     "name": "Singtel",
@@ -775,7 +555,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 3.48,
+    "new": 0
    },
    {
     "name": "Rakuten Mobile",
@@ -786,62 +568,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "Vodacom",
-    "operator": "Vodacom",
-    "region": "africa_middle_east",
-    "url": "https://www.vodacom.com/press-releases.php",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "AIS",
-    "operator": "AIS",
-    "region": "asia",
-    "url": "https://www.ais.th/en/about-us/pr-news",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "Rakuten Mobile",
-    "operator": "Rakuten Mobile",
-    "region": "asia",
-    "url": "https://corp.mobile.rakuten.co.jp/english/news/press/",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "CelcomDigi",
-    "operator": "CelcomDigi",
-    "region": "asia",
-    "url": "https://corporate.celcomdigi.com/newsroom",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
-   },
-   {
-    "name": "2degrees",
-    "operator": "2degrees",
-    "region": "oceania",
-    "url": "https://www.2degrees.nz/media-release-archives",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 5.18,
+    "new": 0
    },
    {
     "name": "Mobile World Live",
@@ -852,18 +581,48 @@
     "label": "Mobile World Live",
     "origin": "industry_news",
     "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 3.21,
+    "new": 0
    },
    {
-    "name": "SoftBank",
-    "operator": "SoftBank",
+    "name": "Rakuten Mobile",
+    "operator": "Rakuten Mobile",
     "region": "asia",
-    "url": "https://www.softbank.jp/en/corp/news/press/",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
+    "url": "https://corp.mobile.rakuten.co.jp/english/news/press/",
+    "kind": "newsroom",
+    "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 6.49,
+    "new": 0
+   },
+   {
+    "name": "Bharti Airtel",
+    "operator": "Bharti Airtel",
+    "region": "asia",
+    "url": "https://www.airtel.in/press-release",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 7.55,
+    "new": 0
+   },
+   {
+    "name": "CelcomDigi",
+    "operator": "CelcomDigi",
+    "region": "asia",
+    "url": "https://corporate.celcomdigi.com/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 5.01,
+    "new": 0
    },
    {
     "name": "HPE (Juniper)",
@@ -874,7 +633,100 @@
     "label": "HPE (Juniper)",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 30
+    "count": 30,
+    "seconds": 2.79,
+    "new": 0
+   },
+   {
+    "name": "AIS",
+    "operator": "AIS",
+    "region": "asia",
+    "url": "https://www.ais.th/en/about-us/pr-news",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 10.1,
+    "new": 0
+   },
+   {
+    "name": "du",
+    "operator": "du",
+    "region": "africa_middle_east",
+    "url": "https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 20.04,
+    "new": 0
+   },
+   {
+    "name": "Vodacom",
+    "operator": "Vodacom",
+    "region": "africa_middle_east",
+    "url": "https://www.vodacom.com/press-releases.php",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 30.09,
+    "new": 0
+   },
+   {
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.softbank.jp/en/corp/news/press/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 29.61,
+    "new": 0
+   },
+   {
+    "name": "2degrees",
+    "operator": "2degrees",
+    "region": "oceania",
+    "url": "https://www.2degrees.nz/media-release-archives",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 0.95,
+    "new": 0
+   },
+   {
+    "name": "Safaricom",
+    "operator": "Safaricom",
+    "region": "africa_middle_east",
+    "url": "https://www.safaricom.co.ke/media-center-landing/press-releases",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 30,
+    "seconds": 59.15,
+    "new": 0
+   },
+   {
+    "name": "CRTC (Kanada)",
+    "operator": "CRTC (Kanada)",
+    "region": "thema:regulierung",
+    "url": "https://crtc.gc.ca/eng/rss/news.xml",
+    "kind": "rss",
+    "label": "CRTC (Kanada)",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 28,
+    "seconds": 1.09,
+    "new": 0
    },
    {
     "name": "KPN",
@@ -885,18 +737,9 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 25
-   },
-   {
-    "name": "BT Group",
-    "operator": "BT Group",
-    "region": "europe",
-    "url": "https://newsroom.bt.com/feed/en",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 25
+    "count": 25,
+    "seconds": 3.62,
+    "new": 0
    },
    {
     "name": "AT&T",
@@ -907,7 +750,22 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 25
+    "count": 25,
+    "seconds": 4.48,
+    "new": 0
+   },
+   {
+    "name": "BT Group",
+    "operator": "BT Group",
+    "region": "europe",
+    "url": "https://newsroom.bt.com/feed/en",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 25,
+    "seconds": 6.45,
+    "new": 0
    },
    {
     "name": "Bell Canada",
@@ -918,7 +776,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 25
+    "count": 25,
+    "seconds": 6.64,
+    "new": 0
    },
    {
     "name": "Fierce Network",
@@ -929,7 +789,22 @@
     "label": "Fierce Network",
     "origin": "industry_news",
     "status": "ok",
-    "count": 25
+    "count": 25,
+    "seconds": 1.28,
+    "new": 4
+   },
+   {
+    "name": "Nokia",
+    "operator": "Nokia",
+    "region": "thema:netzausruester",
+    "url": "https://www.nokia.com/newsroom/feed/",
+    "kind": "rss",
+    "label": "Nokia",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 25,
+    "seconds": 4.57,
+    "new": 2
    },
    {
     "name": "Telia",
@@ -940,7 +815,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 23
+    "count": 23,
+    "seconds": 5.46,
+    "new": 0
    },
    {
     "name": "Ericsson",
@@ -951,40 +828,9 @@
     "label": "Ericsson",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 23
-   },
-   {
-    "name": "O2 Telefónica Deutschland",
-    "operator": "O2 Telefónica Deutschland",
-    "region": "europe",
-    "url": "https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "O2 Telefónica Deutschland",
-    "operator": "O2 Telefónica Deutschland",
-    "region": "europe",
-    "url": "https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "T-Mobile US",
-    "operator": "T-Mobile US",
-    "region": "north_america",
-    "url": "https://www.t-mobile.com/news",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
+    "count": 23,
+    "seconds": 3.98,
+    "new": 0
    },
    {
     "name": "Entel",
@@ -995,18 +841,48 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 1.06,
+    "new": 2
    },
    {
-    "name": "WOM",
-    "operator": "WOM",
-    "region": "latin_america",
-    "url": "https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20",
-    "kind": "json_api",
-    "label": "json_api",
+    "name": "T-Mobile US",
+    "operator": "T-Mobile US",
+    "region": "north_america",
+    "url": "https://www.t-mobile.com/news",
+    "kind": "newsroom",
+    "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 2.84,
+    "new": 0
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20,
+    "seconds": 3.17,
+    "new": 0
+   },
+   {
+    "name": "O2 Telefónica Deutschland",
+    "operator": "O2 Telefónica Deutschland",
+    "region": "europe",
+    "url": "https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20,
+    "seconds": 2.11,
+    "new": 0
    },
    {
     "name": "NTT Docomo",
@@ -1017,40 +893,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "China Mobile",
-    "operator": "China Mobile",
-    "region": "asia",
-    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "China Telecom",
-    "operator": "China Telecom",
-    "region": "asia",
-    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "China Unicom",
-    "operator": "China Unicom",
-    "region": "asia",
-    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinaunicom&loc=hk&t=p&title_for_section=yes",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 3.34,
+    "new": 0
    },
    {
     "name": "Indosat Ooredoo Hutchison",
@@ -1061,18 +906,9 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "TelecomTalk",
-    "operator": null,
-    "region": "global",
-    "url": "https://telecomtalk.info/feed/",
-    "kind": "trade_press",
-    "label": "TelecomTalk",
-    "origin": "industry_news",
-    "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 3.01,
+    "new": 0
    },
    {
     "name": "Google AI",
@@ -1083,29 +919,9 @@
     "label": "Google AI",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "Nvidia Newsroom",
-    "operator": "Nvidia Newsroom",
-    "region": "thema:ki",
-    "url": "https://nvidianews.nvidia.com/releases.xml",
-    "kind": "rss",
-    "label": "Nvidia Newsroom",
-    "origin": "tech_watch",
-    "status": "ok",
-    "count": 20
-   },
-   {
-    "name": "Apple",
-    "operator": "Apple",
-    "region": "thema:geraete",
-    "url": "https://www.apple.com/newsroom/rss-feed.rss",
-    "kind": "rss",
-    "label": "Apple",
-    "origin": "tech_watch",
-    "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 2.86,
+    "new": 0
    },
    {
     "name": "Android",
@@ -1116,7 +932,9 @@
     "label": "Android",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 2.22,
+    "new": 0
    },
    {
     "name": "Google Pixel",
@@ -1127,18 +945,100 @@
     "label": "Google Pixel",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 20
+    "count": 20,
+    "seconds": 2.13,
+    "new": 0
    },
    {
-    "name": "Bouygues Telecom",
-    "operator": "Bouygues Telecom",
-    "region": "europe",
-    "url": "https://www.corporate.bouyguestelecom.fr/presse-et-actualites/",
-    "kind": "newsroom",
-    "label": "newsroom",
+    "name": "China Mobile",
+    "operator": "China Mobile",
+    "region": "asia",
+    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes",
+    "kind": "rss",
+    "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 18
+    "count": 20,
+    "seconds": 1.81,
+    "new": 0
+   },
+   {
+    "name": "China Telecom",
+    "operator": "China Telecom",
+    "region": "asia",
+    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20,
+    "seconds": 2.84,
+    "new": 0
+   },
+   {
+    "name": "China Unicom",
+    "operator": "China Unicom",
+    "region": "asia",
+    "url": "https://www.irasia.com/cgi-local/news/rss.cgi?id=chinaunicom&loc=hk&t=p&title_for_section=yes",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20,
+    "seconds": 2.92,
+    "new": 0
+   },
+   {
+    "name": "Apple",
+    "operator": "Apple",
+    "region": "thema:geraete",
+    "url": "https://www.apple.com/newsroom/rss-feed.rss",
+    "kind": "rss",
+    "label": "Apple",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 20,
+    "seconds": 1.15,
+    "new": 3
+   },
+   {
+    "name": "TelecomTalk",
+    "operator": null,
+    "region": "global",
+    "url": "https://telecomtalk.info/feed/",
+    "kind": "trade_press",
+    "label": "TelecomTalk",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 20,
+    "seconds": 3.19,
+    "new": 0
+   },
+   {
+    "name": "Nvidia Newsroom",
+    "operator": "Nvidia Newsroom",
+    "region": "thema:ki",
+    "url": "https://nvidianews.nvidia.com/releases.xml",
+    "kind": "rss",
+    "label": "Nvidia Newsroom",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 20,
+    "seconds": 2.06,
+    "new": 0
+   },
+   {
+    "name": "WOM",
+    "operator": "WOM",
+    "region": "latin_america",
+    "url": "https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
+    "status": "ok",
+    "count": 20,
+    "seconds": 13.2,
+    "new": 0
    },
    {
     "name": "Verizon",
@@ -1149,7 +1049,9 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 18
+    "count": 18,
+    "seconds": 1.08,
+    "new": 0
    },
    {
     "name": "Three UK",
@@ -1160,7 +1062,22 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 18
+    "count": 18,
+    "seconds": 3.02,
+    "new": 0
+   },
+   {
+    "name": "Bouygues Telecom",
+    "operator": "Bouygues Telecom",
+    "region": "europe",
+    "url": "https://www.corporate.bouyguestelecom.fr/presse-et-actualites/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 18,
+    "seconds": 3.13,
+    "new": 0
    },
    {
     "name": "Maxis",
@@ -1171,7 +1088,9 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 18
+    "count": 18,
+    "seconds": 2.63,
+    "new": 0
    },
    {
     "name": "Nvidia Blog",
@@ -1182,7 +1101,9 @@
     "label": "Nvidia Blog",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 18
+    "count": 18,
+    "seconds": 4.12,
+    "new": 0
    },
    {
     "name": "Spark",
@@ -1193,7 +1114,9 @@
     "label": "NZX-Boersenmeldungen statt sparknz.co.nz/news (Radware-Bot-Wall unveraendert blockiert; businessgroup.spark.co.nz ist nur eine B2B-Microsite ohne Presseliste)",
     "origin": "operator",
     "status": "ok",
-    "count": 17
+    "count": 17,
+    "seconds": 2.32,
+    "new": 0
    },
    {
     "name": "Vodafone Group",
@@ -1204,7 +1127,9 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 16
+    "count": 16,
+    "seconds": 1.16,
+    "new": 0
    },
    {
     "name": "Telstra",
@@ -1215,7 +1140,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 16
+    "count": 16,
+    "seconds": 27.98,
+    "new": 0
    },
    {
     "name": "ETSI",
@@ -1226,7 +1153,9 @@
     "label": "ETSI",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 15
+    "count": 15,
+    "seconds": 2.81,
+    "new": 0
    },
    {
     "name": "Deutsche Telekom",
@@ -1237,29 +1166,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 13
-   },
-   {
-    "name": "A1 Telekom Austria",
-    "operator": "A1 Telekom Austria",
-    "region": "europe",
-    "url": "https://newsroom.a1.net/",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "ok",
-    "count": 12
-   },
-   {
-    "name": "SoftBank",
-    "operator": "SoftBank",
-    "region": "asia",
-    "url": "https://www.softbank.jp/en/sbnews/",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 12
+    "count": 13,
+    "seconds": 3.35,
+    "new": 0
    },
    {
     "name": "Anthropic",
@@ -1270,7 +1179,9 @@
     "label": "Anthropic",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 12
+    "count": 13,
+    "seconds": 6.16,
+    "new": 1
    },
    {
     "name": "ITU",
@@ -1281,106 +1192,35 @@
     "label": "ITU",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 12
+    "count": 12,
+    "seconds": 2.65,
+    "new": 0
    },
    {
-    "name": "Virgin Media O2",
-    "operator": "Virgin Media O2",
-    "region": "europe",
-    "url": "https://news.o2.co.uk/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Vodafone Deutschland",
-    "operator": "Vodafone Deutschland",
-    "region": "europe",
-    "url": "https://newsroom.vodafone.de/rss",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Telefónica",
-    "operator": "Telefónica",
-    "region": "europe",
-    "url": "https://www.telefonica.com/en/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Vodafone UK",
-    "operator": "Vodafone UK",
-    "region": "europe",
-    "url": "https://www.vodafone.co.uk/newscentre/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Liberty Global",
-    "operator": "Liberty Global",
-    "region": "europe",
-    "url": "https://www.libertyglobal.com/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Telenor",
-    "operator": "Telenor",
-    "region": "europe",
-    "url": "https://www.telenor.com/media/newsroom/",
+    "name": "SoftBank",
+    "operator": "SoftBank",
+    "region": "asia",
+    "url": "https://www.softbank.jp/en/sbnews/",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 12,
+    "seconds": 0.89,
+    "new": 0
    },
    {
-    "name": "1&1",
-    "operator": "1&1",
+    "name": "A1 Telekom Austria",
+    "operator": "A1 Telekom Austria",
     "region": "europe",
-    "url": "https://unternehmen.1und1.de/presse/feed",
-    "kind": "rss",
-    "label": "rss",
+    "url": "https://newsroom.a1.net/",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "T-Mobile US",
-    "operator": "T-Mobile US",
-    "region": "north_america",
-    "url": "https://investor.t-mobile.com/rss/pressrelease.aspx?T=1",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Comcast",
-    "operator": "Comcast",
-    "region": "north_america",
-    "url": "https://www.cmcsa.com/rss/news-releases.xml",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
+    "count": 12,
+    "seconds": 32.73,
+    "new": 0
    },
    {
     "name": "Charter Communications",
@@ -1391,40 +1231,35 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.15,
+    "new": 0
    },
    {
-    "name": "DISH Wireless",
-    "operator": "DISH Wireless",
+    "name": "Comcast",
+    "operator": "Comcast",
     "region": "north_america",
-    "url": "https://ir.echostar.com/rss/news-releases.xml",
+    "url": "https://www.cmcsa.com/rss/news-releases.xml",
     "kind": "rss",
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.23,
+    "new": 0
    },
    {
-    "name": "Turkcell",
-    "operator": "Turkcell",
-    "region": "europe",
-    "url": "https://medya.turkcell.com.tr/bulletins/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Rogers",
-    "operator": "Rogers",
+    "name": "T-Mobile US",
+    "operator": "T-Mobile US",
     "region": "north_america",
-    "url": "https://about.rogers.com/feed",
+    "url": "https://investor.t-mobile.com/rss/pressrelease.aspx?T=1",
     "kind": "rss",
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.25,
+    "new": 0
    },
    {
     "name": "América Móvil",
@@ -1435,7 +1270,126 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.27,
+    "new": 0
+   },
+   {
+    "name": "DISH Wireless",
+    "operator": "DISH Wireless",
+    "region": "north_america",
+    "url": "https://ir.echostar.com/rss/news-releases.xml",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 1.6,
+    "new": 0
+   },
+   {
+    "name": "Liberty Global",
+    "operator": "Liberty Global",
+    "region": "europe",
+    "url": "https://www.libertyglobal.com/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.37,
+    "new": 0
+   },
+   {
+    "name": "Telefónica",
+    "operator": "Telefónica",
+    "region": "europe",
+    "url": "https://www.telefonica.com/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.61,
+    "new": 0
+   },
+   {
+    "name": "Vodafone Deutschland",
+    "operator": "Vodafone Deutschland",
+    "region": "europe",
+    "url": "https://newsroom.vodafone.de/rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.89,
+    "new": 0
+   },
+   {
+    "name": "1&1",
+    "operator": "1&1",
+    "region": "europe",
+    "url": "https://unternehmen.1und1.de/presse/feed",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.94,
+    "new": 0
+   },
+   {
+    "name": "Rogers",
+    "operator": "Rogers",
+    "region": "north_america",
+    "url": "https://about.rogers.com/feed",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 3.17,
+    "new": 0
+   },
+   {
+    "name": "Virgin Media O2",
+    "operator": "Virgin Media O2",
+    "region": "europe",
+    "url": "https://news.o2.co.uk/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 3.25,
+    "new": 0
+   },
+   {
+    "name": "Telenor",
+    "operator": "Telenor",
+    "region": "europe",
+    "url": "https://www.telenor.com/media/newsroom/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 4.03,
+    "new": 0
+   },
+   {
+    "name": "Vodafone UK",
+    "operator": "Vodafone UK",
+    "region": "europe",
+    "url": "https://www.vodafone.co.uk/newscentre/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 4.78,
+    "new": 0
    },
    {
     "name": "MTN Group",
@@ -1446,18 +1400,9 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Ooredoo",
-    "operator": "Ooredoo",
-    "region": "africa_middle_east",
-    "url": "https://www.ooredoo.qa/web/en/press-release/",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 4.45,
+    "new": 0
    },
    {
     "name": "Turk Telekom",
@@ -1468,7 +1413,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 3.11,
+    "new": 0
    },
    {
     "name": "KDDI",
@@ -1479,7 +1426,9 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 3.03,
+    "new": 0
    },
    {
     "name": "KDDI",
@@ -1490,7 +1439,22 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.82,
+    "new": 0
+   },
+   {
+    "name": "Turkcell",
+    "operator": "Turkcell",
+    "region": "europe",
+    "url": "https://medya.turkcell.com.tr/bulletins/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 5.99,
+    "new": 0
    },
    {
     "name": "SK Telecom",
@@ -1501,40 +1465,9 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Chunghwa Telecom",
-    "operator": "Chunghwa Telecom",
-    "region": "asia",
-    "url": "https://www.cht.com.tw/en/home/cht/messages",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "True Corporation",
-    "operator": "True Corporation",
-    "region": "asia",
-    "url": "https://www.true.th/blog/en/feed/",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "PLDT",
-    "operator": "PLDT",
-    "region": "asia",
-    "url": "https://cms.pldt.com/drupal/api/v1/newsroom-article-list",
-    "kind": "json_api",
-    "label": "json_api",
-    "origin": "operator",
-    "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 3.15,
+    "new": 0
    },
    {
     "name": "Optus",
@@ -1545,7 +1478,22 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.13,
+    "new": 0
+   },
+   {
+    "name": "Ooredoo",
+    "operator": "Ooredoo",
+    "region": "africa_middle_east",
+    "url": "https://www.ooredoo.qa/web/en/press-release/",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 6.0,
+    "new": 0
    },
    {
     "name": "One NZ",
@@ -1556,18 +1504,9 @@
     "label": "rss",
     "origin": "operator",
     "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Total Telecom",
-    "operator": null,
-    "region": "global",
-    "url": "https://totaltele.com/feed/",
-    "kind": "trade_press",
-    "label": "Total Telecom",
-    "origin": "industry_news",
-    "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.31,
+    "new": 0
    },
    {
     "name": "RCR Wireless",
@@ -1578,7 +1517,22 @@
     "label": "RCR Wireless",
     "origin": "industry_news",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.12,
+    "new": 0
+   },
+   {
+    "name": "Chunghwa Telecom",
+    "operator": "Chunghwa Telecom",
+    "region": "asia",
+    "url": "https://www.cht.com.tw/en/home/cht/messages",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 3.88,
+    "new": 0
    },
    {
     "name": "Mobile Europe",
@@ -1589,7 +1543,22 @@
     "label": "Mobile Europe",
     "origin": "industry_news",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.66,
+    "new": 0
+   },
+   {
+    "name": "Total Telecom",
+    "operator": null,
+    "region": "global",
+    "url": "https://totaltele.com/feed/",
+    "kind": "trade_press",
+    "label": "Total Telecom",
+    "origin": "industry_news",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.36,
+    "new": 0
    },
    {
     "name": "Broadband TV News",
@@ -1600,7 +1569,9 @@
     "label": "Broadband TV News",
     "origin": "industry_news",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 2.51,
+    "new": 0
    },
    {
     "name": "CommsRisk",
@@ -1611,18 +1582,9 @@
     "label": "CommsRisk",
     "origin": "industry_news",
     "status": "ok",
-    "count": 10
-   },
-   {
-    "name": "Meta",
-    "operator": "Meta",
-    "region": "thema:ki",
-    "url": "https://about.fb.com/news/feed/",
-    "kind": "rss",
-    "label": "Meta",
-    "origin": "tech_watch",
-    "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 2.41,
+    "new": 0
    },
    {
     "name": "Broadcom",
@@ -1633,7 +1595,22 @@
     "label": "Broadcom",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.08,
+    "new": 0
+   },
+   {
+    "name": "True Corporation",
+    "operator": "True Corporation",
+    "region": "asia",
+    "url": "https://www.true.th/blog/en/feed/",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 10,
+    "seconds": 4.87,
+    "new": 0
    },
    {
     "name": "MediaTek",
@@ -1644,18 +1621,22 @@
     "label": "MediaTek",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.49,
+    "new": 0
    },
    {
-    "name": "Intel",
-    "operator": "Intel",
-    "region": "thema:chips",
-    "url": "https://newsroom.intel.com/feed",
-    "kind": "rss",
-    "label": "Intel",
-    "origin": "tech_watch",
+    "name": "PLDT",
+    "operator": "PLDT",
+    "region": "asia",
+    "url": "https://cms.pldt.com/drupal/api/v1/newsroom-article-list",
+    "kind": "json_api",
+    "label": "json_api",
+    "origin": "operator",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 6.28,
+    "new": 0
    },
    {
     "name": "AST SpaceMobile",
@@ -1666,7 +1647,22 @@
     "label": "AST SpaceMobile",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.53,
+    "new": 0
+   },
+   {
+    "name": "Meta",
+    "operator": "Meta",
+    "region": "thema:ki",
+    "url": "https://about.fb.com/news/feed/",
+    "kind": "rss",
+    "label": "Meta",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 10,
+    "seconds": 3.34,
+    "new": 0
    },
    {
     "name": "GSMA",
@@ -1677,7 +1673,22 @@
     "label": "GSMA",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.38,
+    "new": 0
+   },
+   {
+    "name": "Intel",
+    "operator": "Intel",
+    "region": "thema:chips",
+    "url": "https://newsroom.intel.com/feed",
+    "kind": "rss",
+    "label": "Intel",
+    "origin": "tech_watch",
+    "status": "ok",
+    "count": 10,
+    "seconds": 2.45,
+    "new": 0
    },
    {
     "name": "EU-Kommission (DG CNECT)",
@@ -1688,7 +1699,9 @@
     "label": "EU-Kommission (DG CNECT)",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 1.85,
+    "new": 0
    },
    {
     "name": "TRAI (Indien)",
@@ -1699,7 +1712,9 @@
     "label": "TRAI (Indien)",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 3.01,
+    "new": 0
    },
    {
     "name": "Microsoft Azure",
@@ -1710,7 +1725,9 @@
     "label": "Microsoft Azure",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 10
+    "count": 10,
+    "seconds": 10.57,
+    "new": 0
    },
    {
     "name": "TPG Telecom",
@@ -1721,7 +1738,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 9
+    "count": 9,
+    "seconds": 2.79,
+    "new": 0
    },
    {
     "name": "2degrees",
@@ -1732,7 +1751,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 9
+    "count": 9,
+    "seconds": 34.21,
+    "new": 0
    },
    {
     "name": "Vodafone Idea",
@@ -1743,29 +1764,9 @@
     "label": "json_api",
     "origin": "operator",
     "status": "ok",
-    "count": 8
-   },
-   {
-    "name": "Telus",
-    "operator": "Telus",
-    "region": "north_america",
-    "url": "https://www.telus.com/en/about/newsroom",
-    "kind": "newsroom_js",
-    "label": "newsroom_js",
-    "origin": "operator",
-    "status": "ok",
-    "count": 8
-   },
-   {
-    "name": "Telkomsel",
-    "operator": "Telkomsel",
-    "region": "asia",
-    "url": "https://www.telkomsel.com/en/about-us/news",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 8
+    "count": 8,
+    "seconds": 2.81,
+    "new": 0
    },
    {
     "name": "ISPreview UK",
@@ -1776,18 +1777,35 @@
     "label": "ISPreview UK",
     "origin": "industry_news",
     "status": "ok",
-    "count": 8
+    "count": 8,
+    "seconds": 2.9,
+    "new": 0
    },
    {
-    "name": "TIM Brasil",
-    "operator": "TIM Brasil",
-    "region": "latin_america",
-    "url": "https://www.tim.com.br/sobre-a-tim/sala-de-imprensa",
+    "name": "Telkomsel",
+    "operator": "Telkomsel",
+    "region": "asia",
+    "url": "https://www.telkomsel.com/en/about-us/news",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 6
+    "count": 8,
+    "seconds": 8.95,
+    "new": 0
+   },
+   {
+    "name": "Telus",
+    "operator": "Telus",
+    "region": "north_america",
+    "url": "https://www.telus.com/en/about/newsroom",
+    "kind": "newsroom_js",
+    "label": "newsroom_js",
+    "origin": "operator",
+    "status": "ok",
+    "count": 8,
+    "seconds": 34.47,
+    "new": 0
    },
    {
     "name": "Oi",
@@ -1798,29 +1816,22 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 6
+    "count": 6,
+    "seconds": 4.71,
+    "new": 0
    },
    {
-    "name": "Orange MEA",
-    "operator": "Orange MEA",
-    "region": "africa_middle_east",
-    "url": "https://orange.jo/en/corporate/media-center",
+    "name": "TIM Brasil",
+    "operator": "TIM Brasil",
+    "region": "latin_america",
+    "url": "https://www.tim.com.br/sobre-a-tim/sala-de-imprensa",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 6
-   },
-   {
-    "name": "Vocus Group",
-    "operator": "Vocus Group",
-    "region": "oceania",
-    "url": "https://www.vocus.com.au/vocus-news",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "ok",
-    "count": 6
+    "count": 6,
+    "seconds": 5.79,
+    "new": 0
    },
    {
     "name": "Arm",
@@ -1831,29 +1842,22 @@
     "label": "Arm",
     "origin": "tech_watch",
     "status": "ok",
-    "count": 6
+    "count": 6,
+    "seconds": 2.08,
+    "new": 0
    },
    {
-    "name": "Deutsche Telekom",
-    "operator": "Deutsche Telekom",
-    "region": "europe",
-    "url": "https://www.telekom.com/service/rss/427676/feed.rss",
-    "kind": "rss",
-    "label": "rss",
-    "origin": "operator",
-    "status": "ok",
-    "count": 5
-   },
-   {
-    "name": "Orange",
-    "operator": "Orange",
-    "region": "europe",
-    "url": "https://www.orange.com/en/newsroom",
+    "name": "Vocus Group",
+    "operator": "Vocus Group",
+    "region": "oceania",
+    "url": "https://www.vocus.com.au/vocus-news",
     "kind": "newsroom",
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 5
+    "count": 6,
+    "seconds": 8.59,
+    "new": 0
    },
    {
     "name": "Tele2",
@@ -1864,7 +1868,35 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 5
+    "count": 5,
+    "seconds": 3.71,
+    "new": 0
+   },
+   {
+    "name": "Deutsche Telekom",
+    "operator": "Deutsche Telekom",
+    "region": "europe",
+    "url": "https://www.telekom.com/service/rss/427676/feed.rss",
+    "kind": "rss",
+    "label": "rss",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5,
+    "seconds": 1.93,
+    "new": 0
+   },
+   {
+    "name": "Orange",
+    "operator": "Orange",
+    "region": "europe",
+    "url": "https://www.orange.com/en/newsroom",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "ok",
+    "count": 5,
+    "seconds": 6.46,
+    "new": 0
    },
    {
     "name": "Proximus",
@@ -1875,7 +1907,9 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "ok",
-    "count": 4
+    "count": 4,
+    "seconds": 5.0,
+    "new": 0
    },
    {
     "name": "Zain",
@@ -1886,7 +1920,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 4
+    "count": 4,
+    "seconds": 34.44,
+    "new": 0
    },
    {
     "name": "Globe Telecom",
@@ -1897,7 +1933,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 4
+    "count": 4,
+    "seconds": 31.64,
+    "new": 0
    },
    {
     "name": "Swisscom",
@@ -1908,7 +1946,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 3
+    "count": 3,
+    "seconds": 34.01,
+    "new": 0
    },
    {
     "name": "Viettel",
@@ -1919,29 +1959,9 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "ok",
-    "count": 1
-   },
-   {
-    "name": "e&",
-    "operator": "e&",
-    "region": "africa_middle_east",
-    "url": "https://www.eand.com/en/news/news-overview.html",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
-   },
-   {
-    "name": "e&",
-    "operator": "e&",
-    "region": "africa_middle_east",
-    "url": "https://www.eand.com/en/investors/corporate-announcements.html",
-    "kind": "newsroom",
-    "label": "newsroom",
-    "origin": "operator",
-    "status": "empty",
-    "count": 0
+    "count": 1,
+    "seconds": 29.09,
+    "new": 0
    },
    {
     "name": "SK Telecom",
@@ -1952,7 +1972,35 @@
     "label": "newsroom",
     "origin": "operator",
     "status": "empty",
-    "count": 0
+    "count": 0,
+    "seconds": 3.24,
+    "new": 0
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.eand.com/en/news/news-overview.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0,
+    "seconds": 10.22,
+    "new": 0
+   },
+   {
+    "name": "e&",
+    "operator": "e&",
+    "region": "africa_middle_east",
+    "url": "https://www.eand.com/en/investors/corporate-announcements.html",
+    "kind": "newsroom",
+    "label": "newsroom",
+    "origin": "operator",
+    "status": "empty",
+    "count": 0,
+    "seconds": 4.98,
+    "new": 0
    },
    {
     "name": "Telecom Argentina",
@@ -1963,87 +2011,81 @@
     "label": "newsroom_js",
     "origin": "operator",
     "status": "empty",
-    "count": 0
+    "count": 0,
+    "seconds": 25.38,
+    "new": 0
    }
   ],
   "analysts": [
    {
-    "items_in": 9,
+    "items_in": 2,
     "batches": 1,
-    "batches_ok": 1,
-    "highlights": 6,
-    "model": "deepseek-v4-flash",
-    "region": "Asien"
-   },
-   {
-    "items_in": 18,
-    "batches": 2,
-    "batches_ok": 2,
-    "highlights": 11,
-    "model": "deepseek-v4-flash",
-    "region": "Global"
-   },
-   {
-    "items_in": 34,
-    "batches": 3,
     "batches_ok": 1,
     "highlights": 0,
+    "unread_items": 0,
     "model": "deepseek-v4-flash",
-    "region": "KI-Anbieter"
-   },
-   {
-    "items_in": 8,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 3,
-    "model": "deepseek-v4-flash",
-    "region": "Europa"
+    "region": "Lateinamerika"
    },
    {
     "items_in": 1,
     "batches": 1,
     "batches_ok": 1,
     "highlights": 1,
+    "unread_items": 0,
+    "model": "deepseek-v4-flash",
+    "region": "Europa"
+   },
+   {
+    "items_in": 5,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 5,
+    "unread_items": 0,
+    "model": "deepseek-v4-flash",
+    "region": "Global"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "unread_items": 0,
+    "model": "deepseek-v4-flash",
+    "region": "Asien"
+   },
+   {
+    "items_in": 1,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 1,
+    "unread_items": 0,
     "model": "deepseek-v4-flash",
     "region": "Nordamerika"
    },
    {
-    "items_in": 21,
-    "batches": 2,
-    "batches_ok": 1,
-    "highlights": 2,
-    "model": "deepseek-v4-flash",
-    "region": "Regulierung & Verbände"
-   },
-   {
-    "items_in": 3,
+    "items_in": 2,
     "batches": 1,
     "batches_ok": 1,
-    "highlights": 2,
+    "highlights": 0,
+    "unread_items": 0,
+    "model": "deepseek-v4-flash",
+    "region": "KI-Anbieter"
+   },
+   {
+    "items_in": 2,
+    "batches": 1,
+    "batches_ok": 1,
+    "highlights": 0,
+    "unread_items": 0,
     "model": "deepseek-v4-flash",
     "region": "Netzausrüster"
    },
    {
-    "items_in": 7,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 3,
-    "model": "deepseek-v4-flash",
-    "region": "Chips & Modems"
-   },
-   {
-    "items_in": 9,
-    "batches": 1,
-    "batches_ok": 1,
-    "highlights": 8,
-    "model": "deepseek-v4-flash",
-    "region": "Ozeanien"
-   },
-   {
     "items_in": 14,
     "batches": 1,
-    "batches_ok": 0,
-    "highlights": 0,
+    "batches_ok": 1,
+    "highlights": 5,
+    "unread_items": 0,
     "model": "deepseek-v4-flash",
     "region": "Geräte"
    }
