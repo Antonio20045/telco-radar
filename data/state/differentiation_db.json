@@ -520,6 +520,20 @@
    "status": "aktiv"
   },
   {
+   "id": "https://prepaid.t-mobile.com/benefits",
+   "theme": "loyalty",
+   "operator": "T-Mobile",
+   "region": "Nordamerika",
+   "what": "T-Mobile bietet Prepaid-Kunden das Programm 'T-Mobile Tuesdays' mit wöchentlichen Gratis-Geschenken sowie Partnerrabatten über den 'Magenta Status'.",
+   "url": "https://prepaid.t-mobile.com/benefits",
+   "source": "prepaid.t-mobile.com",
+   "date": null,
+   "why": "Das Programm zeigt, wie ein Betreiber auch Prepaid-Kunden durch regelmäßige, nicht-preisliche Vorteile langfristig binden kann.",
+   "first_seen": "2026-08-04",
+   "last_verified": "2026-08-04",
+   "status": "aktiv"
+  },
+  {
    "id": "https://t-mobile.com/benefits/scam-shield",
    "theme": "security",
    "operator": "T-Mobile US",
