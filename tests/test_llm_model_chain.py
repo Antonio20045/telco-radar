@@ -102,3 +102,24 @@ def test_gesetzter_vorzug_schlaegt_die_kette():
 ])
 def test_nur_modellbezogene_ablehnungen_gelten_als_modellfehler(text, erwartet):
     assert llm._is_model_access_error(text) is erwartet
+
+
+def test_leere_antwort_wird_erklaert(caplog):
+    """Ohne stop_reason und Blocktypen ist eine leere Antwort nicht deutbar."""
+    import logging
+    with caplog.at_level(logging.WARNING):
+        text = llm._anthropic_text({
+            "content": [{"type": "thinking", "thinking": "..."}],
+            "stop_reason": "max_tokens",
+            "usage": {"output_tokens": 8000},
+        })
+    assert text == ""
+    assert "max_tokens" in caplog.text and "thinking" in caplog.text
+
+
+def test_normale_antwort_meldet_nichts(caplog):
+    import logging
+    with caplog.at_level(logging.WARNING):
+        assert llm._anthropic_text(
+            {"content": [{"type": "text", "text": "Hallo"}]}) == "Hallo"
+    assert caplog.text == ""

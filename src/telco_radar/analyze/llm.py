@@ -236,6 +236,25 @@ def dead_models() -> set[str]:
     return set(_DEAD_MODELS)
 
 
+def _anthropic_text(data: dict) -> str:
+    """Text aus einer Anthropic-Antwort ziehen - und erklaeren, wenn keiner da ist.
+
+    Im Lauf #65 (04.08.2026) kam die Editor-Antwort nach 80s Rechenzeit voellig
+    leer zurueck, zweimal. Aus "Ausgabe ist leer" allein laesst sich nicht
+    ableiten, warum: eine am Token-Limit abgeschnittene Antwort, eine Antwort
+    ganz ohne Textbloecke und eine inhaltliche Verweigerung sehen an dieser
+    Stelle identisch aus. stop_reason und die Blocktypen unterscheiden sie.
+    """
+    bloecke = data.get("content") or []
+    text = "".join(b.get("text", "") for b in bloecke if b.get("type") == "text")
+    if not text.strip():
+        log.warning("Leere Modellantwort: stop_reason=%s, Blocktypen=%s, "
+                    "Verbrauch=%s", data.get("stop_reason"),
+                    [b.get("type") for b in bloecke] or "keine",
+                    data.get("usage"))
+    return text
+
+
 def _is_daily_quota(resp) -> bool:
     """A 429 that means "come back tomorrow", not "come back in a second"."""
     if resp.status_code != 429:
@@ -360,8 +379,7 @@ def _complete_anthropic(system: str, user: str, model: str,
     }
 
     def parse(data):
-        return "".join(b.get("text", "") for b in data.get("content", [])
-                       if b.get("type") == "text")
+        return _anthropic_text(data)
 
     return _post_with_retries(ANTHROPIC_URL, payload, headers, retries, parse)
 
@@ -385,8 +403,7 @@ def _complete_bedrock(system: str, user: str, model: str,
     }
 
     def parse(data):
-        return "".join(b.get("text", "") for b in data.get("content", [])
-                       if b.get("type") == "text")
+        return _anthropic_text(data)
 
     return _post_with_retries(_bedrock_url(model), payload, headers,
                               retries, parse)
