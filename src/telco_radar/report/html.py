@@ -55,8 +55,21 @@ def _fmt_date_de(iso: str) -> str:
 
 
 def _env() -> Environment:
+    # "j2" MUSS in der Liste stehen. select_autoescape() sieht nur die LETZTE
+    # Dateiendung an, und jede Vorlage hier heisst "*.html.j2" - mit
+    # ["html"] allein war das Escaping also auf JEDER Seite aus. Aufgefallen
+    # am 04.08.2026: Themenlabels wie "Chips & Modems" landeten als rohes "&"
+    # im HTML. Das ist die harmlose Seite davon. Die ernste: in den Bericht
+    # fliessen Ueberschriften FREMDER Newsrooms und Fachpresse-Feeds
+    # (h.de_title, h.url) - ohne Escaping steht dort, was ein beliebiger
+    # beobachteter Anbieter in seinen Titel schreibt. Mit dem Quellen-Ausbau
+    # sind das rund 130 Absender.
+    # Die vier Stellen, an denen absichtlich fertiges HTML eingesetzt wird
+    # (briefing_html, diff_report_html, promo_report_html, explorer_json),
+    # tragen bereits "| safe" - die Vorlagen waren also immer fuer aktives
+    # Escaping geschrieben, es war nur nie eingeschaltet.
     env = Environment(loader=FileSystemLoader(_TEMPLATES),
-                      autoescape=select_autoescape(["html"]))
+                      autoescape=select_autoescape(["html", "htm", "xml", "j2"]))
     env.filters["domain"] = lambda u: urlsplit(u or "").netloc.removeprefix("www.")
     env.filters["date_de"] = _fmt_date_de
     return env
