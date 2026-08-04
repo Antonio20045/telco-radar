@@ -7,15 +7,17 @@ report_language: "de"
 
 # ---------------------------------------------------------------------------
 # Welcher Anbieter den Lauf bedient.
+#   deepseek   DeepSeek-API direkt (LLM_API_KEY + deepseek_api_base)
 #   anthropic  Anthropic-API direkt (Secret ANTHROPIC bzw. ANTHROPIC_API_KEY)
-#   openai     OpenAI-kompatibler Endpunkt (LLM_API_KEY + llm_api_base, NVIDIA)
+#   openai     NVIDIA-Endpunkt, OpenAI-kompatibel (LLM_API_KEY + llm_api_base)
 #   bedrock    Amazon Bedrock (AWS_BEARER_TOKEN_BEDROCK)
 #   auto       nimmt, was gerade an Schluesseln da ist: bedrock > openai >
 #              anthropic
-# Bewusst explizit: unter "auto" gewinnt der NVIDIA-Schluessel, solange er im
-# Repo liegt, und Anthropic kaeme nie zum Zug. Ein Anbieterwechsel soll eine
-# Zeile hier sein, kein Loeschen von Secrets.
-llm_provider: "anthropic"
+# Bewusst explizit: unter "auto" gewinnt der zuerst gefundene Schluessel, und
+# ein Anbieterwechsel soll eine Zeile hier sein, kein Loeschen von Secrets.
+# ACHTUNG: deepseek und openai teilen sich das Secret LLM_API_KEY - dort muss
+# der Schluessel des Anbieters liegen, der hier eingetragen ist.
+llm_provider: "deepseek"
 
 # ---------------------------------------------------------------------------
 # Models (fallback Anthropic; OpenAI-compatible provider used when LLM_API_KEY
@@ -62,6 +64,21 @@ bedrock_model_chain:
 bedrock_analyst_model: ""
 bedrock_editor_model: ""
 
+# DeepSeek direkt (api-docs.deepseek.com). Nicht zu verwechseln mit den
+# DeepSeek-Modellen auf NVIDIAs Gratis-Endpunkt weiter unten: das ist ein
+# anderer Betreiber mit anderer Verfuegbarkeit. Die Warnung dort vor v4-pro
+# stammt aus Messungen gegen NVIDIA und gilt hier NICHT.
+# Beide Modelle haben 1M Kontext - der Editor-Prompt (147 Meldungen ~ 32k
+# Token) passt also mit weitem Abstand, anders als beim NVIDIA-Endpunkt.
+# Preis je 1M Token (Stand 08/2026): flash 0,14 $ ein / 0,28 $ aus,
+# pro 0,435 $ ein / 0,87 $ aus. Zu Pekinger Stosszeiten (9-12 und 14-18 Uhr)
+# kuendigt DeepSeek doppelte Preise an.
+# Deshalb pro fuer die Redaktion (ein Aufruf je Lauf, traegt den Wochenbericht)
+# und flash fuer die Analysten (~25 Aufrufe je Lauf).
+deepseek_api_base: "https://api.deepseek.com"
+deepseek_analyst_model: "deepseek-v4-flash"
+deepseek_editor_model: "deepseek-v4-pro"
+
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"
 # Gemessen am 25.07.2026 mit dem ECHTEN Editor-Prompt (14k Token Eingabe,
@@ -101,8 +118,8 @@ max_items_per_region: 0
 # Preis dafuer ist die Prompt-Laenge. An einem echten Analysten-Lauf gemessen:
 # rund 750 Zeichen je bewerteter Meldung, eine Woche mit 362 Meldungen sind also
 # etwa 265 KB oder ~68k Token Eingabe. Das braucht ein Modell mit grossem
-# Kontextfenster - claude-sonnet-5 (200k) schafft das, das fuer den kostenlosen
-# NVIDIA-Endpunkt konfigurierte deepseek-v4-flash nicht. Nur wenn ein Anbieter
+# Kontextfenster; die aktuell konfigurierten schaffen das mit Abstand
+# (deepseek-v4-pro 1M, claude-sonnet-5 1M). Nur wenn ein Anbieter
 # einen kuerzeren Prompt erzwingt, hier eine Zahl eintragen: dann behaelt die
 # Auswahl die staerksten Meldungen je Region reihum, damit nicht eine volle
 # Region alle anderen verdraengt.

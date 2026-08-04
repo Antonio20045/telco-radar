@@ -36,11 +36,22 @@ log = logging.getLogger("telco_radar")
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
-ANBIETER = ("auto", "anthropic", "openai", "bedrock")
+# Anbieter, die das OpenAI-Chat-Protokoll sprechen, mit ihren
+# Konfigurationsschluesseln: (Basis-URL, Analyst-Modell, Editor-Modell).
+# Sie teilen sich EINEN Schluessel (LLM_API_KEY) - es kann also immer nur
+# einer davon aktiv sein, was genau richtig ist: sonst muesste man im Secret
+# raten, zu welchem Endpunkt der hinterlegte Schluessel gehoert.
+OPENAI_KOMPATIBEL = {
+    "openai": ("llm_api_base", "openai_analyst_model", "openai_editor_model"),
+    "deepseek": ("deepseek_api_base", "deepseek_analyst_model",
+                 "deepseek_editor_model"),
+}
+
+ANBIETER = ("auto", "anthropic", "bedrock", *OPENAI_KOMPATIBEL)
 
 
-def _waehle_anbieter(settings: dict) -> tuple[bool, bool]:
-    """Legt den LLM-Anbieter fest; liefert (use_bedrock, use_openai).
+def _waehle_anbieter(settings: dict) -> str:
+    """Legt den LLM-Anbieter fest und liefert seinen Namen.
 
     "auto" behaelt die alte Reihenfolge (Bedrock > OpenAI-kompatibel >
     Anthropic) und nimmt damit, welcher Schluessel gerade da ist. Genau das
@@ -59,34 +70,47 @@ def _waehle_anbieter(settings: dict) -> tuple[bool, bool]:
         wanted = "auto"
 
     has_bedrock = bool(os.environ.get("AWS_BEARER_TOKEN_BEDROCK"))
-    has_openai = (bool(os.environ.get("LLM_API_KEY"))
-                  and bool(settings.get("llm_api_base")))
+    has_key = bool(os.environ.get("LLM_API_KEY"))
 
     if wanted == "auto":
-        return has_bedrock, (not has_bedrock and has_openai)
+        if has_bedrock:
+            return "bedrock"
+        return "openai" if (has_key and settings.get("llm_api_base")) else "anthropic"
 
-    use_bedrock = wanted == "bedrock"
-    use_openai = wanted == "openai"
+    base_url = ""
+    if wanted in OPENAI_KOMPATIBEL:
+        base_url = str(settings.get(OPENAI_KOMPATIBEL[wanted][0]) or "")
+
     # Ein gewaehlter Anbieter ohne seinen Schluessel laesst jede Stufe
     # scheitern - das einmal deutlich sagen, statt es jeden Aufruf einzeln
     # herausfinden zu lassen.
-    fehlt = ((use_bedrock and not has_bedrock)
-             or (use_openai and not has_openai)
+    fehlt = ((wanted == "bedrock" and not has_bedrock)
+             or (wanted in OPENAI_KOMPATIBEL and not (has_key and base_url))
              or (wanted == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY")))
     if fehlt:
-        log.warning("llm_provider=%s, aber der zugehoerige Schluessel fehlt - "
+        log.warning("llm_provider=%s, aber Schluessel oder Basis-URL fehlen - "
                     "der Lauf faellt auf den Notfall-Digest zurueck", wanted)
-    if not use_bedrock:
+
+    if wanted != "bedrock":
         os.environ.pop("AWS_BEARER_TOKEN_BEDROCK", None)
-    if not use_openai:
+    if wanted not in OPENAI_KOMPATIBEL:
         os.environ.pop("LLM_API_KEY", None)
-    elif settings.get("llm_api_base"):
+    elif base_url:
         # Muss HIER passieren, nicht erst beim Setzen der Modell-IDs: llm.py
         # erkennt den OpenAI-Zweig nur an LLM_API_KEY *und* LLM_API_BASE.
-        # Fehlt die Basis-URL, waehlt es still Anthropic - die Wahl waere
-        # getroffen und nicht umgesetzt.
-        os.environ.setdefault("LLM_API_BASE", settings["llm_api_base"])
-    return use_bedrock, use_openai
+        # Fehlt die Basis-URL, waehlt es still einen anderen Anbieter - die
+        # Wahl waere getroffen und nicht umgesetzt. Kein setdefault: beim
+        # Wechsel von NVIDIA auf DeepSeek stuende sonst eine von aussen
+        # gesetzte alte URL gegen den konfigurierten Anbieter.
+        os.environ["LLM_API_BASE"] = base_url
+    if wanted != "anthropic":
+        # Auch den Anthropic-Schluessel entfernen. llm.py behandelt ihn sonst
+        # als letzte Rueckfallebene: bei einem Tippfehler in der DeepSeek-URL
+        # liefe der ganze Lauf still ueber Anthropic - also genau ueber den
+        # teuren Anbieter, von dem hier gerade weggeschaltet wurde. Die
+        # Warnung oben verspricht den Notfall-Digest; das hier haelt sie ein.
+        os.environ.pop("ANTHROPIC_API_KEY", None)
+    return wanted
 
 
 def _sort_key(item: Item):
@@ -130,7 +154,9 @@ def run(root: Path, use_llm: bool | None = None,
     lookback = lookback_days or cfg.lookback_days
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
-    use_bedrock, use_openai = _waehle_anbieter(cfg.settings)
+    anbieter = _waehle_anbieter(cfg.settings)
+    use_bedrock = anbieter == "bedrock"
+    use_openai = anbieter in OPENAI_KOMPATIBEL
     if use_bedrock:
         # Which Claude models a Bedrock account may call is per-account and
         # changes without notice (agreements, quotas, AWS Sales). Instead of
@@ -142,9 +168,11 @@ def run(root: Path, use_llm: bool | None = None,
         editor_model = (cfg.settings.get("bedrock_editor_model")
                         or chain_head or fallback_model)
     elif use_openai:
-        os.environ.setdefault("LLM_API_BASE", cfg.settings["llm_api_base"])
-        analyst_model = cfg.settings.get("openai_analyst_model", fallback_model)
-        editor_model = cfg.settings.get("openai_editor_model", fallback_model)
+        # Die Basis-URL hat _waehle_anbieter bereits gesetzt; hier nur noch
+        # die Modelle des gewaehlten Endpunkts.
+        _, analyst_key, editor_key = OPENAI_KOMPATIBEL[anbieter]
+        analyst_model = cfg.settings.get(analyst_key) or fallback_model
+        editor_model = cfg.settings.get(editor_key) or fallback_model
     else:
         analyst_model = cfg.settings.get("analyst_model", fallback_model)
         editor_model = cfg.settings.get("editor_model", fallback_model)

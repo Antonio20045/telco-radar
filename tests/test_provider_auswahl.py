@@ -14,6 +14,17 @@ from telco_radar.analyze import llm
 ALLE_SCHLUESSEL = ("AWS_BEARER_TOKEN_BEDROCK", "LLM_API_KEY", "ANTHROPIC_API_KEY")
 
 
+@pytest.fixture(autouse=True)
+def _keine_basis_url_von_vorher(monkeypatch):
+    """LLM_API_BASE setzt die Anbieterwahl DIREKT in os.environ.
+
+    monkeypatch raeumt nur auf, was es selbst kennt - ohne dieses delenv
+    schleppt ein Test die URL des vorherigen mit und besteht dann aus dem
+    falschen Grund.
+    """
+    monkeypatch.delenv("LLM_API_BASE", raising=False)
+
+
 @pytest.fixture
 def umgebung(monkeypatch):
     """Alle drei Schluessel gesetzt - der Streitfall, um den es geht."""
@@ -35,7 +46,8 @@ def _aktives_backend(settings: dict) -> str:
     return llm.active_backend()
 
 
-BASIS = {"llm_api_base": "https://example.invalid/v1"}
+BASIS = {"llm_api_base": "https://nvidia.invalid/v1",
+         "deepseek_api_base": "https://deepseek.invalid"}
 
 
 def test_anthropic_gewinnt_trotz_gesetztem_nvidia_schluessel(umgebung):
@@ -44,6 +56,40 @@ def test_anthropic_gewinnt_trotz_gesetztem_nvidia_schluessel(umgebung):
 
 def test_openai_erzwingbar_obwohl_bedrock_token_da_ist(umgebung):
     assert _aktives_backend({**BASIS, "llm_provider": "openai"}).startswith("openai")
+
+
+def test_deepseek_benutzt_seine_eigene_basis_url(umgebung):
+    """deepseek und openai teilen LLM_API_KEY - nur die URL unterscheidet sie.
+    Waere sie falsch, ginge der DeepSeek-Schluessel an NVIDIA."""
+    assert "deepseek.invalid" in _aktives_backend({**BASIS,
+                                                   "llm_provider": "deepseek"})
+
+
+def test_wechsel_ueberschreibt_eine_alte_basis_url(umgebung, monkeypatch):
+    """Ohne Ueberschreiben bliebe beim Wechsel die alte URL stehen."""
+    monkeypatch.setenv("LLM_API_BASE", "https://nvidia.invalid/v1")
+    assert "deepseek.invalid" in _aktives_backend({**BASIS,
+                                                   "llm_provider": "deepseek"})
+
+
+def test_deepseek_ohne_basis_url_laeuft_nirgendwo_sonst(umgebung):
+    """Ein Tippfehler in der DeepSeek-URL darf den Lauf weder an NVIDIA noch
+    an Anthropic geben - sonst zahlt man still beim teuren Anbieter weiter,
+    von dem man gerade weggeschaltet hat."""
+    backend = _aktives_backend({"llm_api_base": "https://nvidia.invalid/v1",
+                                "llm_provider": "deepseek"})
+    assert backend == "none", f"still auf {backend} ausgewichen"
+
+
+def test_deepseek_weicht_nicht_auf_anthropic_aus(umgebung):
+    """Gewaehlt ist gewaehlt - auch wenn ein Anthropic-Schluessel bereitliegt.
+
+    Je Test nur EIN Aufruf: die Wahl entfernt die Schluessel der Verlierer aus
+    der Prozessumgebung, ein zweiter Aufruf saehe also eine halb abgeraeumte
+    Umgebung. Ein Lauf waehlt genau einmal.
+    """
+    assert "deepseek.invalid" in _aktives_backend({**BASIS,
+                                                   "llm_provider": "deepseek"})
 
 
 def test_bedrock_erzwingbar(umgebung):
