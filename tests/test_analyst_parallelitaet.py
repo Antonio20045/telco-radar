@@ -219,3 +219,23 @@ def test_ohne_ausfall_kein_nachlauf(monkeypatch):
     agents.analyze_bereiche([("Global", _items(agents.BATCH_SIZE * 3), False)],
                             model="m", workers=4)
     assert aufrufe["n"] == 3
+
+
+def test_analysten_budget_reicht_fuer_das_nachdenken():
+    """Lauf #71: 22 von 30 Stapeln kamen LEER zurueck - json.loads("") -,
+    kein einziger 429. Bei einem Reasoning-Modell zaehlt das Nachdenken
+    gegen max_tokens; reicht das Budget nur dafuer, kommt nichts zurueck."""
+    assert agents.ANALYST_MAX_TOKENS >= 16000
+
+
+def test_stapel_nutzt_das_konfigurierte_budget(monkeypatch):
+    gesehen: list[int] = []
+
+    def fake_complete(system, user, model, max_tokens):
+        gesehen.append(max_tokens)
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    agents.analyze_bereiche([("Europa", _items(2), False)], model="m")
+    assert gesehen == [agents.ANALYST_MAX_TOKENS]

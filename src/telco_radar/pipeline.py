@@ -409,7 +409,16 @@ def run(root: Path, use_llm: bool | None = None,
     if use_llm and cfg.focus_competitors:
         tcomp = time.monotonic()
         try:
-            comp_model = cfg.settings.get("openai_analyst_model", editor_model) if use_openai else editor_model
+            # analyst_model, NICHT openai_analyst_model: die beiden
+            # OpenAI-kompatiblen Anbieter benennen dasselbe Modell
+            # verschieden. Unter llm_provider=deepseek stand hier die
+            # NVIDIA-Schreibweise ("deepseek-ai/deepseek-v4-flash"), und die
+            # DeepSeek-API antwortet darauf mit HTTP 400 - jedes Mal, in
+            # jedem Lauf. Im Protokoll von #71 nachweisbar: drei
+            # Wettbewerber-Profile, dreimal derselbe 400er, "0 Moves".
+            # analyst_model traegt bereits den Namen des GEWAEHLTEN Anbieters
+            # (siehe OPENAI_KOMPATIBEL weiter oben).
+            comp_model = analyst_model or editor_model
             competitor_profiles = competitor_mod.analyze_all(
                 cfg.focus_competitors, items, comp_model, language,
                 max_workers=int(cfg.settings.get('llm_max_workers', 4)))

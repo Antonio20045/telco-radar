@@ -207,7 +207,13 @@ TOP_JE_BEREICH = 5
 # Eigenes Budget je Bereichsabschnitt. Grosszuegig, weil bei 1000 Quellen ein
 # Bereich mehrere Dutzend Meldungen tragen kann und ein abgeschnittener
 # Abschnitt schlimmer ist als ein langer.
-BEREICH_MAX_TOKENS = 12000
+#
+# Auf 24000 erhoeht, aus demselben belegten Grund wie beim Analysten: im Lauf
+# #71 kamen 2 von 3 Bereichsabschnitten aus dem Notfallweg, weil das Modell
+# eine LEERE Antwort schickte. Bei einem Reasoning-Modell zaehlt das
+# Nachdenken gegen max_tokens; reicht das Budget nur dafuer, kommt nichts
+# zurueck - ohne Fehler. Abgerechnet werden erzeugte Token, nicht das Budget.
+BEREICH_MAX_TOKENS = 24000
 
 
 # The editor sees EVERY assessed item by default (0 = no limit). A weekly

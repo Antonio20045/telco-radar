@@ -132,6 +132,26 @@ Rules:
 
 BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
 
+# Token-Budget je Analysten-Aufruf.
+#
+# Am Laufprotokoll von #71 gemessen und NICHT geraten: von 30 Stapeln
+# scheiterten 22, und zwar alle mit derselben Meldung - "Expecting value:
+# line 1 column 1 (char 0)". Das ist json.loads("") : der Anbieter hat
+# geantwortet, aber NICHTS geschickt. Im ganzen Lauf gab es keinen einzigen
+# 429 und keinen 503; die Vermutung, hier stosse man an ein Rate-Limit, war
+# falsch.
+#
+# Die Ursache ist dieselbe, die den Editor 2026 auf 32000 Token gebracht hat:
+# deepseek-v4-flash ist ein Reasoning-Modell, und sein Nachdenken zaehlt gegen
+# max_tokens. Reicht das Budget nur fuer das Nachdenken, kommt eine voellig
+# leere Antwort zurueck - ohne Fehler, ohne finish_reason=length, ohne
+# Hinweis. Mit der Fachpresse sind die Anrisse laenger geworden, damit die
+# Eingabe groesser und das Nachdenken teurer: 8000 Token reichten nicht mehr.
+#
+# Kosten spielen dabei keine Rolle: abgerechnet werden ERZEUGTE Token, nicht
+# das Budget. Ein Stapel erzeugt real ~1500.
+ANALYST_MAX_TOKENS = 24000
+
 # Pause vor dem Nachlauf gescheiterter Stapel. Lang genug, dass die
 # Anbieter-Warteschlange sich leert, kurz genug, dass sie im Job-Timeout
 # nicht auffaellt.
@@ -290,7 +310,7 @@ def _ein_stapel(system: str, bereich: str, n: int, gesamt: int,
             f"(batch {n}/{gesamt}, {len(batch)} items):\n"
             + _items_payload(batch))
     try:
-        raw = complete(system, user, model=model, max_tokens=8000)
+        raw = complete(system, user, model=model, max_tokens=ANALYST_MAX_TOKENS)
         return extract_json(raw)
     except (ValueError, RuntimeError, KeyError) as exc:
         log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
