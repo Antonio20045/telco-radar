@@ -127,6 +127,15 @@ themen:
       # weiter; der Newsroom ist der einzige der grossen westlichen
       # Ausruester-Feeds, der zuverlaessig antwortet.
       - {name: "HPE (Juniper)", type: rss, url: "https://www.hpe.com/us/en/newsroom/rss.xml"}
+      # Nokia. Achtung bei der Bewertung dieser Quelle: nokia.com antwortet
+      # unter Last zeitweise mit 403 - beim ersten Anlauf sah der Feed deshalb
+      # tot aus. In sechs Abrufen hintereinander lieferte er dann sechsmal 25
+      # von 25 datierten Meldungen. Der 403 ist eine Drosselung, kein Block.
+      # Der Feed mischt Insider-Meldepflichten ("Managers' transactions") mit
+      # den eigentlichen Produktmeldungen ("Nokia defines the next era of
+      # radio with the industry's first AI-native RAN platform"); der Analyst
+      # sortiert Ersteres aus.
+      - {name: "Nokia", type: rss, url: "https://www.nokia.com/newsroom/feed/"}
 
   satellit:
     name: "Satellit & NTN"
@@ -163,3 +172,10 @@ themen:
       # Vollstaendig telekomspezifisch - anders als die zunaechst geprueften
       # allgemeinen Wettbewerbsbehoerden.
       - {name: "TRAI (Indien)", type: rss, url: "https://www.trai.gov.in/rss.xml"}
+      # Die kanadische Regulierungsbehoerde - zustaendig fuer den Markt, in
+      # dem mit Bell, Rogers und Telus drei beobachtete Betreiber sitzen.
+      # Publiziert etwa monatlich; neueste Meldung im Abruf vom 16.06.2026.
+      # Anders als die zunaechst geprueften allgemeinen Wettbewerbsbehoerden
+      # ist die CRTC ausschliesslich fuer Telekommunikation und Rundfunk
+      # zustaendig.
+      - {name: "CRTC (Kanada)", type: rss, url: "https://crtc.gc.ca/eng/rss/news.xml"}
