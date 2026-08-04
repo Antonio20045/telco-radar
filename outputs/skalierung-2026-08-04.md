@@ -188,6 +188,39 @@ bewährt, für die er gebaut wurde. Die Website blieb ebenfalls nutzbar: statt
 eines halben Berichts steht dort der ausdrücklich als solcher gekennzeichnete
 Fallback-Digest mit allen Quellenlinks.
 
+### Lauf #70: der Radar heilt sich selbst — aber nur halb
+
+Der unmittelbar folgende Lauf hat genau die 607 zurückgehaltenen Meldungen
+erneut vorgelegt:
+
+| | Lauf #69 | Lauf #70 |
+|---|---:|---:|
+| neue Meldungen | 984 | 613 (607 davon zurückgehalten) |
+| Analysten-Stapel | 72 | 44 |
+| davon erfolgreich | 30 | 16 |
+| Redaktion | fehlgeschlagen | **erfolgreich** |
+| Seen-Store wächst um | 377 | 196 |
+
+Der Wochenbericht ist damit wieder ein richtiger Bericht (vollständige
+Gliederung, Bereichsabschnitte, ein einziger Abschnitt aus dem Notfallweg).
+Die Ausfallquote der Analysten blieb aber bei rund zwei Dritteln — das ist
+kein einmaliger Aussetzer, sondern die Kapazitätsgrenze bei diesem Volumen.
+
+Die Ursache liegt in einer Politik, die für einen anderen Fall richtig ist:
+`llm.py` unterscheidet „billige" Fehlschläge (HTTP 503 nach 0,3 s, beliebig
+oft wiederholbar) von „langsamen" (der Anbieter nimmt die Verbindung an und
+liefert nichts) und gibt nach **zwei langsamen** auf — damit ein toter
+Endpunkt nicht den ganzen Lauf frisst. Unter Dauerlast sind aber fast alle
+Fehlschläge langsam, und die Politik greift genau falsch.
+
+Deshalb bekommen gescheiterte Stapel jetzt einen **Nachlauf**: eine halbe
+Minute Pause, dann noch einmal mit einem Viertel der Gleichzeitigkeit. Das
+trifft den Anbieter, wenn die Welle durch ist — der Fall, den die
+Wiederholung *innerhalb* des Aufrufs prinzipiell nicht abdecken kann. Und das
+Laufprotokoll wird ab sofort bei **jedem** Lauf als Artefakt hochgeladen, nicht
+nur bei Fehlschlägen: die Läufe #69 und #70 galten formal als erfolgreich, und
+genau deshalb gab es kein Log, mit dem sich die Fehlerart hätte belegen lassen.
+
 Der Lauf hat noch einen zweiten, strukturellen Befund geliefert, den man
 vorher nicht sehen konnte: **793 der 984 neuen Meldungen lagen im Bereich
 „Global"** — jede Fachpressemeldung, deren Titel keinen Betreiber der
