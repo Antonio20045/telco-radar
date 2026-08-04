@@ -339,10 +339,23 @@ statt 1000.** Die vollständige Auswertung mit allen Zahlen steht in
   1 212 s — aber KT allein 299,8 s, und damit war die Phase 303 s lang. Der
   nächste Hebel ist deshalb ein Gesamtbudget je Quelle, nicht mehr
   Parallelität.
-- **Das DeepSeek-Rate-Limit ist nicht gemessen** (der Schlüssel liegt als
-  Secret vor und ist aus der Sandbox nicht erreichbar). Lauf #68 lief mit 12
-  gleichzeitigen Aufrufen ohne einen 429 durch — mehr ist nicht belegt. Vor
-  dem Hochdrehen messen.
+- **Der Anbieter ist die Grenze, nicht die Laufzeit.** Lauf #69 — der erste
+  mit 223 Quellen und 984 neuen Meldungen — hat **42 von 72 Analysten-Stapeln
+  verloren** und auch die Chefredaktion; veröffentlicht wurde der
+  Fallback-Digest. Kein Modell war tot, es war Überlast unter dem Burst.
+  Lauf #68 lief mit denselben 12 gleichzeitigen Aufrufen, aber nur 9 Stapeln,
+  sauber durch. **Die Grenze hängt an der Stapelrate, nicht an der
+  Gleichzeitigkeit allein — mehr Parallelität ist hier der falsche Hebel.**
+  Was fehlt, ist eine Drosselung der Stapelrate, wie sie die Sammelphase je
+  Host schon hat.
+- **Der Stapelschutz hat unter dieser Last gehalten**: der Seen-Store wuchs um
+  genau 377 Einträge (984 neue minus 607 ungelesene), die 607 kamen im
+  nächsten Lauf erneut. Wer an `agents.py` oder `pipeline.py` arbeitet, darf
+  diesen Pfad nicht antasten, ohne ihn zu prüfen.
+- **Ein Bereich kann alle anderen erdrücken.** In Lauf #69 lagen 793 von 984
+  neuen Meldungen im Bereich „Global" — jede Fachpressemeldung ohne Betreiber
+  im Titel. Mit 70 Fachpressequellen ist das der Normalfall. Deshalb laufen
+  alle Analysten-Stapel jetzt in EINEM Pool statt in einem je Bereich.
 - **Kosten sind kein Engpass**: 0,17 $ je Lauf bei 1000 Quellen zur Pekinger
   Stoßzeit, 1,43 $ im Monat. Teuer wird nur der Erstlauf nach einer großen
   Welle (~2 $, ~1 100 Analysten-Aufrufe) — dafür steht das Job-Timeout auf 120

@@ -59,28 +59,28 @@ Worker-Pool bei 1000 Quellen produziert hätte.
 | effektive Nebenläufigkeit | 7,1× | **28,2×** |
 | gefundene Meldungen | 2 101 | 2 118 |
 
-**In GitHub Actions, echter Lauf:**
+**In GitHub Actions, drei echte Läufe:**
 
-| | Lauf #67 (vorher) | Lauf #68 (nachher) |
-|---|---:|---:|
-| Quellen | 130 | 132 |
-| Sammelphase | 324,9 s | **303,1 s** |
-| Arbeitszeit je Quelle | 20,0 s·Worker | **9,2 s·Worker** |
-| Gesamtlaufzeit | 1 314,8 s (21,9 min) | **908,9 s (15,1 min)** |
+| | #67 (vorher) | #68 (neue Architektur) | #69 (nach der Welle) |
+|---|---:|---:|---:|
+| Quellen | 130 | 132 | **223** |
+| Sammelphase | 324,9 s | 303,1 s | **48,5 s** |
+| Wanduhr je Quelle | 2,50 s | 2,30 s | **0,22 s** |
+| gesammelte Meldungen | 2 161 | 2 135 | **3 847** |
 
-Die Wanduhr der Sammelphase sinkt in Actions nur wenig — und das ist der
-eigentliche Befund: **sie hängt jetzt nicht mehr an der Zahl der Quellen,
-sondern an der langsamsten einzelnen Quelle.** Der Median liegt bei 3,2 s je
-Quelle, die Summe aller Abrufzeiten bei 1 212 s — aber KT (Korea) brauchte
-allein 299,8 s, bis seine Verbindungsversuche aufgaben, und bestimmt damit
-die Phase praktisch im Alleingang. Bei 1000 Quellen bleibt die Phase deshalb
-in derselben Größenordnung, solange die Worker-Zahl mit der Zahl der Hosts
-mitwächst.
+Das ist das eigentliche Ergebnis: **70 % mehr Quellen bei einem Sechstel der
+Zeit.** In Lauf #68 hing die Phase noch an einer einzigen Quelle — KT (Korea)
+brauchte 299,8 s, bis seine Verbindungsversuche aufgaben, bei einem Median von
+3,2 s. In #69 lag der Median bei 3,5 s und das Maximum bei 39 s; die Summe
+aller Abrufzeiten betrug 1 224 s, die Wanduhr 48,5 s — also **25-fache
+effektive Nebenläufigkeit**.
 
-Daraus folgt der nächste Hebel, der noch offen ist: ein **Gesamtbudget je
-Quelle**. `collect/http.py` probiert zwei User-Agents mit je drei Versuchen und
-zwei Backoff-Pausen; im schlimmsten Fall sind das sechs Timeouts plus 26 s
-Warten. Eine einzige unerreichbare Quelle kostet damit fünf Minuten Wanduhr.
+Damit die #68-Erfahrung nicht wiederkommt, hat `fetch()` seit diesem Lauf ein
+**Gesamtbudget je Quelle** (`http.source_budget_seconds`, 90 s). Zwei
+User-Agents mal drei Versuche mal Timeout plus 13 s Backoff können sonst
+minutenlang laufen; überschritten wird das Budget nur von Quellen, die ohnehin
+nicht antworten, und der Fehler wird unverändert geworfen statt still
+übersprungen.
 
 ### 2.2 Redaktion — zweistufig
 
@@ -153,12 +153,56 @@ Analysten-Aufrufe. Bei den heute 12 gleichzeitigen LLM-Aufrufen sind das ~92
 Runden; bei 20 s je Aufruf rund 30 Minuten allein für die Analyse. Dafür ist
 das Job-Timeout auf 120 Minuten erhöht (GitHub erlaubt 360).
 
-**Nicht gemessen: das Rate-Limit von DeepSeek.** Der Schlüssel liegt als
+### Der Erstlauf nach der Welle hat den Anbieter überfordert — und das ist die Rate-Limit-Messung
+
+Lauf #69, der erste mit 223 Quellen, ist **teilweise gescheitert**, und das
+gehört als Erstes in diesen Bericht:
+
+| | Lauf #69 |
+|---|---:|
+| neue Meldungen | 984 |
+| Analysten-Stapel | 72 |
+| davon erfolgreich | **30** |
+| ungelesene Meldungen | **607** |
+| Redaktion | **fehlgeschlagen → Fallback-Digest veröffentlicht** |
+| Gesamtlaufzeit | 1 905 s (31,8 min von 120 erlaubten) |
+
+42 von 72 Analysten-Aufrufen wurden vom Anbieter abgewiesen, nachdem `llm.py`
+seine fünf Wiederholungen mit bis zu 45 s Backoff aufgebraucht hatte; die
+Chefredaktion ebenfalls. Kein Modell wurde als dauerhaft nicht verfügbar
+markiert — es war Überlast unter dem Burst, nicht ein toter Endpunkt.
+
+**Das ist die Rate-Limit-Messung, die der Auftrag verlangt** — nicht als
+Laborwert, sondern unter genau der Last, um die es geht. Sie sagt: bei rund 12
+gleichzeitigen Aufrufen und einem Burst von 72 Stapeln bricht DeepSeek weg.
+Für 1000 Quellen mit hochgerechnet ~1 100 Stapeln im Erstlauf heißt das:
+**mehr Parallelität ist der falsche Hebel; nötig ist eine Drosselung der
+Stapelrate, wie sie die Sammelphase je Host schon hat.**
+
+**Wichtiger als der Fehler ist, was NICHT passiert ist.** Der Seen-Store wuchs
+um genau 377 Einträge — 984 neue minus 607 ungelesene. Die 607 Meldungen, die
+kein Analyst gesehen hat, wurden zurückgehalten und im nächsten Lauf erneut
+vorgelegt. Die Kerngarantie hat unter echter Last gehalten, und der
+Stapelschutz aus Session 4 hat sich zum ersten Mal in einer Größenordnung
+bewährt, für die er gebaut wurde. Die Website blieb ebenfalls nutzbar: statt
+eines halben Berichts steht dort der ausdrücklich als solcher gekennzeichnete
+Fallback-Digest mit allen Quellenlinks.
+
+Der Lauf hat noch einen zweiten, strukturellen Befund geliefert, den man
+vorher nicht sehen konnte: **793 der 984 neuen Meldungen lagen im Bereich
+„Global"** — jede Fachpressemeldung, deren Titel keinen Betreiber der
+Watchlist nennt. Mit 70 statt 14 Fachpressequellen ist das der Normalfall. Ein
+Bereich hatte damit 53 Stapel, die zwölf anderen zusammen 19; die alte Planung
+(ein Pool je Bereich, drei Bereiche gleichzeitig) ließ acht von zwölf Workern
+stillstehen. Alle Stapel laufen deshalb jetzt in **einem** Pool.
+
+**Nicht gemessen: das nominelle Rate-Limit von DeepSeek.** Der Schlüssel liegt als
 GitHub-Secret vor und ist aus der Sandbox nicht erreichbar; eine Messung wäre
-nur über einen eigenen Actions-Lauf möglich gewesen. Lauf #68 lief mit 12
-gleichzeitigen Aufrufen ohne einen einzigen 429 durch — mehr lässt sich
-belegen nicht sagen. **Vor dem Hochdrehen der Parallelität ist das zu messen**,
-nicht anzunehmen.
+nur über einen eigenen Actions-Lauf möglich. Was oben steht, ist die
+Beobachtung unter Last, nicht die dokumentierte Grenze: Lauf #68 lief mit 12
+gleichzeitigen Aufrufen und 9 Stapeln sauber durch, Lauf #69 mit denselben 12
+und 72 Stapeln fiel zu 58 % aus. Die Grenze liegt also irgendwo dazwischen und
+hängt an der Stapelrate, nicht an der Gleichzeitigkeit allein.
 
 ---
 
