@@ -33,6 +33,12 @@ def _collect_source(source: Source, region: str, operator: str | None,
         # separate story and the same news enters the report twice.
         drop = re.compile(source.exclude_url_pattern)
         items = [i for i in items if not drop.search(i.url)]
+    # Herkunft zentral stempeln statt in jedem Collector: die Trefferquote je
+    # Quelle braucht den KANAL, und source_name traegt bei Betreibern nur den
+    # Firmennamen. Hier steht der einzige Punkt, an dem jede gesammelte
+    # Meldung garantiert vorbeikommt.
+    for item in items:
+        item.source_url = source.url
     return items
 
 

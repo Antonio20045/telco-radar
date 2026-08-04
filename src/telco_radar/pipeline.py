@@ -217,6 +217,14 @@ def run(root: Path, use_llm: bool | None = None,
     seen = SeenStore(state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     new_items = filter_fresh(seen.filter_new(items), lookback)
+    # Wie viele NEUE Meldungen je Quelle - der Nenner der Trefferquote. Aus
+    # dem Archiv liess sich bisher nur "gesammelt" ablesen, und darin stecken
+    # zum grossen Teil Meldungen, die der Seen-Store laengst kennt.
+    neu_je_quelle: dict[str, int] = defaultdict(int)
+    for _i in new_items:
+        neu_je_quelle[_i.source_url] += 1
+    for _rec in source_results:
+        _rec["new"] = neu_je_quelle.get(_rec["url"], 0)
     phase("Nur Neues", time.monotonic() - td,
           f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)")
     log.info("Novelty filter: %d new items (seen store: %d known ids)",
@@ -395,9 +403,14 @@ def run(root: Path, use_llm: bool | None = None,
                 h.setdefault("date", item.published.date().isoformat()
                              if item.published else None)
                 h.setdefault("source", item.source_name)
+                # Der Kanal, nicht die Firma: erst damit laesst sich im
+                # Nachhinein sagen, WELCHE Quelle eine bewertete Meldung
+                # geliefert hat (scripts/trefferquote.py).
+                h.setdefault("source_url", item.source_url)
             else:
                 h.setdefault("date", None)
                 h.setdefault("source", "")
+                h.setdefault("source_url", "")
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den

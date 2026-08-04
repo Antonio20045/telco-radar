@@ -38,7 +38,16 @@ class Item:
     operator: Optional[str] = None
     published: Optional[datetime] = None
     summary: str = ""
-    origin: str = "operator"  # "operator" | "industry_news"
+    origin: str = "operator"  # "operator" | "industry_news" | "tech_watch"
+    # URL der QUELLE, aus der diese Meldung stammt (nicht die der Meldung).
+    # Bis Session 4 liess sich eine bewertete Meldung nur ueber source_name
+    # einer Quelle zuordnen - und source_name ist bei Betreibern der
+    # Firmenname, nicht der Kanal. Zwei Kanaele desselben Betreibers waren
+    # damit ununterscheidbar, und genau diese Unterscheidung braucht die
+    # Trefferquote je Quelle (Auftrag Skalierung, Abschnitt 4). Wird zentral
+    # in collect._collect_source gesetzt, damit kein Collector es vergessen
+    # kann.
+    source_url: str = ""
     id: str = field(default="")
 
     def __post_init__(self) -> None:
@@ -66,6 +75,7 @@ class Item:
             published=published,
             summary=d.get("summary", ""),
             origin=d.get("origin", "operator"),
+            source_url=d.get("source_url", ""),
             id=d.get("id", ""),
         )
 
