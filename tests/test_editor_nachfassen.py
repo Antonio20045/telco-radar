@@ -79,5 +79,5 @@ def test_fehlermeldung_nennt_die_tatsaechliche_ausgabe():
 
 
 def test_themenliste_passt_in_das_token_budget():
-    """147 Themen brauchen mehr als die alten 5000 Token."""
-    assert editor.EDITOR_MAX_TOKENS >= 8000
+    """Nachdenken + Themenliste + Bericht teilen sich EIN Budget (Lauf #65)."""
+    assert editor.EDITOR_MAX_TOKENS >= 32000

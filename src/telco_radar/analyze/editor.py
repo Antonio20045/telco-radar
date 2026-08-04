@@ -181,11 +181,22 @@ Beginne die Antwort unmittelbar mit "## Auf einen Blick" - kein Vorwort, kein
 Titel, kein Code-Block darum.
 """
 
-# Der Bericht selbst bleibt unter ~1900 Woertern, aber danach folgt noch die
-# Themenliste mit einem Eintrag je behandelter Meldung. In einer Woche mit 147
-# bewerteten Meldungen ist die allein mehrere tausend Token lang - mit den
-# alten 5000 waere die Antwort mitten im Anhang abgerissen.
-EDITOR_MAX_TOKENS = 8000
+# Am echten Editor-Prompt aus Lauf #65 gemessen (155 Meldungen, 34k Token
+# Eingabe), gegen deepseek-v4-pro:
+#   8000  erster Versuch voellig leer, zweiter Versuch bricht vor dem letzten
+#         Abschnitt ab ("## Muster der Woche" fehlte).
+# Drei Posten teilen sich dieses Budget, und die ersten beiden werden bei
+# einer Aufgabe dieser Groesse leicht unterschaetzt:
+#   1. das Nachdenken des Modells - bei Reasoning-Modellen (DeepSeek V4,
+#      Claude mit adaptive thinking) zaehlt es gegen max_tokens. Reicht das
+#      Budget nur dafuer, kommt eine voellig LEERE Antwort zurueck, ohne
+#      Fehler. Genau so sahen die Fehlschlaege in den Laeufen #63 und #65 aus.
+#   2. die Themenliste hinter ===TOPICS===, ein Eintrag je behandelter
+#      Meldung - bei 155 Meldungen allein mehrere tausend Token.
+#   3. der Bericht selbst, unter ~1900 Woertern also ~3000 Token.
+# 32000 gibt allen dreien Luft. Kosten spielen dabei keine Rolle: abgerechnet
+# werden erzeugte Token, nicht das Budget.
+EDITOR_MAX_TOKENS = 32000
 
 
 def _ein_versuch(system: str, user: str, model: str) -> tuple[str, list[str]]:
