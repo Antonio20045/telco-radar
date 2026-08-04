@@ -501,25 +501,25 @@
    "missed_checks": 1,
    "judged": {
     "lever": 0,
-    "depth": 2,
+    "depth": 1,
     "mechanic": "geraetesubvention",
     "evidence": "reduziert von 59,99 € auf 49,99 €",
     "evidence_ok": true,
-    "reason": "Es handelt sich um einen moderaten Preisnachlass auf eine Kinder-Smartwatch mit eigenem Kleinsttarif, der keinen Anreiz zum Wechsel des Hauptmobilfunkvertrags bietet.",
+    "reason": "Der Preisvorteil von zehn Euro bei der Kinder-Smartwatch ist überschaubar und die Tarifoption stellt keinen eigenständigen Wechselanreiz dar.",
     "basis": "2d32c693a3c56934",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
    "score_axes": {
     "lever": 0,
-    "depth": 2,
+    "depth": 1,
     "reach": 2,
     "momentum": 3,
     "campaign": 0
    },
-   "score": 45,
-   "score_reason": "Es handelt sich um einen moderaten Preisnachlass auf eine Kinder-Smartwatch mit eigenem Kleinsttarif, der keinen Anreiz zum Wechsel des Hauptmobilfunkvertrags bietet.",
+   "score": 37,
+   "score_reason": "Der Preisvorteil von zehn Euro bei der Kinder-Smartwatch ist überschaubar und die Tarifoption stellt keinen eigenständigen Wechselanreiz dar.",
    "scored_at": "2026-08-04",
    "highlight": false,
    "stale_since": "2026-08-04"
@@ -700,10 +700,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -883,10 +883,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -2828,10 +2828,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Das Angebot verdoppelt die Surf-Geschwindigkeit für Neukunden, was einen spürbaren Leistungsvorteil darstellt.",
    "scored_at": "2026-08-04",
    "highlight": false,
@@ -3052,10 +3052,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Das dauerhaft zusätzliche Datenvolumen ist ein klarer Leistungsvorteil ohne zeitliche Begrenzung.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -3126,10 +3126,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -3163,10 +3163,10 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 47,
+   "score": 42,
    "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -3237,10 +3237,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -3274,10 +3274,10 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 47,
+   "score": 42,
    "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
    "scored_at": "2026-08-04",
    "highlight": false
@@ -5181,10 +5181,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 55,
+   "score": 50,
    "score_reason": "Das Angebot bietet 25 Prozent mehr Datenvolumen zum gleichen Preis, was einen spürbaren Mehrwert darstellt.",
    "scored_at": "2026-08-04",
    "highlight": false,
@@ -5273,10 +5273,10 @@
     "lever": 1,
     "depth": 3,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 63,
+   "score": 58,
    "score_reason": "Junge Kunden erhalten die doppelte Datenmenge zum regulären Preis, was einen sehr großen Leistungsvorteil darstellt.",
    "scored_at": "2026-08-04",
    "highlight": false,
@@ -5587,11 +5587,11 @@
     "lever": 1,
     "depth": 3,
     "mechanic": "preisnachlass",
-    "evidence": "monatlich 11,99 € statt 29,99 €",
+    "evidence": "11,99 € statt 29,99 €",
     "evidence_ok": true,
-    "reason": "Ein dauerhafter Rabatt von 60 Prozent auf den monatlichen Preis ist ein spuerbarer, aber klassischer Preisvorteil ohne zusaetzlichen Wechselanreiz.",
+    "reason": "Der Tarif senkt den Monatspreis für 24 Monate um 18 Euro und schafft damit einen klaren Wechselanreiz.",
     "basis": "584786d968451ae4",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
@@ -5603,7 +5603,7 @@
     "campaign": 0
    },
    "score": 63,
-   "score_reason": "Ein dauerhafter Rabatt von 60 Prozent auf den monatlichen Preis ist ein spuerbarer, aber klassischer Preisvorteil ohne zusaetzlichen Wechselanreiz.",
+   "score_reason": "Der Tarif senkt den Monatspreis für 24 Monate um 18 Euro und schafft damit einen klaren Wechselanreiz.",
    "scored_at": "2026-08-04",
    "stale_since": "2026-08-04"
   },
@@ -5626,11 +5626,11 @@
     "lever": 1,
     "depth": 3,
     "mechanic": "preisnachlass",
-    "evidence": "monatlich 14,99 € statt 29,99 €",
+    "evidence": "14,99 € statt 29,99 €",
     "evidence_ok": true,
-    "reason": "Ein 50-prozentiger Rabatt auf den Tarifpreis bietet einen erheblichen finanziellen Vorteil, bleibt aber ein reiner Preisnachlass ohne direkten Wechselanreiz.",
+    "reason": "Der monatliche Preisvorteil von 15 Euro ergibt über die Laufzeit eine Ersparnis von mehreren hundert Euro.",
     "basis": "f843efacb17a8b3d",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
@@ -5642,7 +5642,7 @@
     "campaign": 0
    },
    "score": 63,
-   "score_reason": "Ein 50-prozentiger Rabatt auf den Tarifpreis bietet einen erheblichen finanziellen Vorteil, bleibt aber ein reiner Preisnachlass ohne direkten Wechselanreiz.",
+   "score_reason": "Der monatliche Preisvorteil von 15 Euro ergibt über die Laufzeit eine Ersparnis von mehreren hundert Euro.",
    "scored_at": "2026-08-04",
    "stale_since": "2026-08-04"
   },
@@ -5665,11 +5665,11 @@
     "lever": 1,
     "depth": 3,
     "mechanic": "preisnachlass",
-    "evidence": "unbegrenztes 5G-Volumen",
+    "evidence": "31,99 € statt 59,99 €",
     "evidence_ok": true,
-    "reason": "Neben einem fast 50-prozentigen Preisnachlass gibt es unbegrenztes Datenvolumen, was den wirtschaftlichen Vorteil besonders gross macht, jedoch ohne speziellen Wechselanreiz.",
+    "reason": "Unbegrenztes Datenvolumen zu einem deutlich reduzierten Monatspreis ist ein sehr starker Anreiz zu wechseln.",
     "basis": "dc8dcb2405040aed",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
@@ -5681,7 +5681,7 @@
     "campaign": 0
    },
    "score": 63,
-   "score_reason": "Neben einem fast 50-prozentigen Preisnachlass gibt es unbegrenztes Datenvolumen, was den wirtschaftlichen Vorteil besonders gross macht, jedoch ohne speziellen Wechselanreiz.",
+   "score_reason": "Unbegrenztes Datenvolumen zu einem deutlich reduzierten Monatspreis ist ein sehr starker Anreiz zu wechseln.",
    "scored_at": "2026-08-04",
    "stale_since": "2026-08-04"
   },
@@ -6162,8 +6162,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "judged": {
     "lever": 1,
     "depth": 3,
@@ -6187,7 +6187,8 @@
    "score_reason": "Ein 5G-Tarif wird um rund die Hälfte reduziert, was einen deutlichen Preisvorteil für Wechselwillige darstellt.",
    "scored_at": "2026-08-04",
    "highlight": false,
-   "stale_since": "2026-08-04"
+   "stale_since": "2026-08-04",
+   "ended_since": "2026-08-04"
   },
   {
    "id": "ec57c7b2ed9a1abc",
@@ -6200,8 +6201,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "judged": {
     "lever": 0,
     "depth": 2,
@@ -6225,7 +6226,8 @@
    "score_reason": "Bestandskunden erhalten spürbar mehr Datenvolumen, was aber keinen Anreiz für einen Anbieterwechsel bietet.",
    "scored_at": "2026-08-04",
    "highlight": false,
-   "stale_since": "2026-08-04"
+   "stale_since": "2026-08-04",
+   "ended_since": "2026-08-04"
   },
   {
    "id": "55ff8074ae2e20b8",
@@ -6238,8 +6240,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "judged": {
     "lever": 1,
     "depth": 3,
@@ -6263,7 +6265,8 @@
    "score_reason": "Die Verdopplung der Surfgeschwindigkeit bietet einen sehr grossen, klar spürbaren Leistungsvorteil im Tarif.",
    "scored_at": "2026-08-04",
    "highlight": false,
-   "stale_since": "2026-08-04"
+   "stale_since": "2026-08-04",
+   "ended_since": "2026-08-04"
   },
   {
    "id": "5c4988000ab8115b",
