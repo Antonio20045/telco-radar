@@ -65,8 +65,9 @@ regions:
       - type: rss
         url: https://news.o2.co.uk/feed/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 25 Meldungen, 25
-      # datiert, 5 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 25 Meldungen, 25 datiert, 5 im
+      # Frischefenster.
       - type: "json_api"
         url: "https://news.virginmediao2.co.uk/wp-json/wp/v2/posts?per_page=25&_embed=1"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -109,8 +110,9 @@ regions:
       - type: rss
         url: https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 20 Meldungen, 20
-      # datiert, 7 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 20 Meldungen, 20 datiert, 7 im
+      # Frischefenster.
       - type: "rss"
         url: "https://www.telefonica.de/o2/rss/news?group_id=62;pubdate=1"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -200,8 +202,9 @@ regions:
       - type: rss
         url: https://www.libertyglobal.com/feed/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 25 Meldungen, 25
-      # datiert, 1 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 25 Meldungen, 25 datiert, 1 im
+      # Frischefenster.
       - type: "json_api"
         url: "https://www.libertyglobal.com/wp-json/wp/v2/posts?per_page=25&_embed=1"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -230,8 +233,9 @@ regions:
       - type: rss
         url: https://medya.turkcell.com.tr/bulletins/feed/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 40 Meldungen, 40
-      # datiert, 2 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 40 Meldungen, 40 datiert, 2 im
+      # Frischefenster.
       - type: "rss"
         url: "https://www.turkcell.com.tr/rss"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -532,8 +536,9 @@ regions:
       - type: rss
         url: https://www.mtn.com/feed/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 25 Meldungen, 25
-      # datiert, 1 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 25 Meldungen, 25 datiert, 1 im
+      # Frischefenster.
       - type: "json_api"
         url: "https://www.mtn.com/wp-json/wp/v2/posts?per_page=25&_embed=1"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -737,8 +742,9 @@ regions:
         url: https://news.sktelecom.com/en/feed
         item_selector: a.link
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 30 Meldungen, 30
-      # datiert, 22 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 30 Meldungen, 30 datiert, 22 im
+      # Frischefenster.
       - type: "rss"
         url: "https://news.sktelecom.com/feed"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -775,8 +781,9 @@ regions:
       - type: newsroom
         url: https://www.softbank.jp/en/sbnews/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 30 Meldungen, 30
-      # datiert, 4 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 30 Meldungen, 30 datiert, 4 im
+      # Frischefenster.
       - type: "rss"
         url: "https://www.softbank.jp/en/sbnews/feed"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
@@ -907,8 +914,9 @@ regions:
       - type: rss
         url: https://www.true.th/blog/en/feed/
       # ---- Welle 1 (Breitensuche + Musteruebertragung), abgenommen 2026-08-04
-      # mechanisch gefunden - noch nicht abgenommen. Abnahme: 10 Meldungen, 10
-      # datiert, 5 im Frischefenster.
+      # mechanisch gefunden (finde_quellen.py, Musteruebertragung) und
+      # anschliessend abgenommen. Abnahme: 10 Meldungen, 10 datiert, 5 im
+      # Frischefenster.
       - type: "rss"
         url: "https://www.true.th/blog/feed"
         herkunft: "Welle 1 (Breitensuche + Musteruebertragung)"
