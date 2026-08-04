@@ -327,6 +327,26 @@ def bereichsredaktion(bereich: str, daten: dict, model: str,
         return _notabschnitt(bereich, daten)
 
 
+def _tiefer(text: str, mindestens: int) -> str:
+    """Ueberschriften eines Bereichsabschnitts unter seine Klammer druecken.
+
+    Der Prompt verlangt einen Abschnitt OHNE eigene Ueberschrift, aber ein
+    Modell setzt gelegentlich doch eine. Bliebe sie als H2 stehen, waere die
+    Gliederung des Wochenberichts hin: der Abschnitt eines Themenfelds
+    stuende dann neben der Themen-Klammer statt darunter, und die
+    Pflichtpruefung faende Ueberschriften, die niemand angefordert hat.
+    """
+    zeilen = []
+    for zeile in text.splitlines():
+        blank = zeile.lstrip()
+        if blank.startswith("#"):
+            ebene = len(blank) - len(blank.lstrip("#"))
+            if ebene < mindestens:
+                zeile = "#" * mindestens + blank.lstrip("#")
+        zeilen.append(zeile)
+    return "\n".join(zeilen)
+
+
 def _montiere(chef_markdown: str, regionen: list[tuple[str, str]],
               themen: list[tuple[str, str]]) -> str:
     """Bereichsabschnitte unter den Chefteil setzen.
@@ -337,11 +357,11 @@ def _montiere(chef_markdown: str, regionen: list[tuple[str, str]],
     """
     teile: list[str] = []
     for name, text in regionen:
-        teile.append(f"## {name}\n\n{text.strip()}\n")
+        teile.append(f"## {name}\n\n{_tiefer(text.strip(), 3)}\n")
     if themen:
         teile.append(f"## {THEMEN_TITEL}\n\n{THEMEN_VORSPANN}\n")
         for name, text in themen:
-            teile.append(f"### {name}\n\n{text.strip()}\n")
+            teile.append(f"### {name}\n\n{_tiefer(text.strip(), 4)}\n")
     bereiche = "\n".join(teile)
     if not bereiche.strip():
         return chef_markdown

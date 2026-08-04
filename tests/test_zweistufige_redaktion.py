@@ -254,3 +254,27 @@ def test_leerer_lauf_bleibt_ohne_bereichsaufruf(monkeypatch):
     protokoll = _aufrufe(monkeypatch)
     editor.synthesize({}, [], model="m")
     assert [a["stufe"] for a in protokoll] == [2]
+
+
+def test_ueberschriften_im_bereichsabschnitt_bleiben_unter_ihrer_klammer(monkeypatch):
+    """Der Prompt verlangt einen Abschnitt ohne Ueberschrift - ein Modell
+    setzt trotzdem gelegentlich eine, und als H2 zerlegte sie die
+    Gliederung des ganzen Berichts."""
+    def fake_complete(system, user, model, max_tokens=5000):
+        if system.startswith("You are the section editor"):
+            return json.dumps({
+                "kurzfassung": "k",
+                "abschnitt": "## Eigenmaechtige Ueberschrift\nText dazu.",
+                "top": [], "themen": []})
+        return CHEF
+
+    monkeypatch.setattr(editor, "complete", fake_complete)
+    bericht, _ = editor.synthesize(
+        _regional({"Europa": 2, "KI-Anbieter": 2}), [], model="m",
+        themenbereiche=["KI-Anbieter"])
+
+    ebenen = {z.split(" ")[0] for z in bericht.splitlines()
+              if z.endswith("Eigenmaechtige Ueberschrift")}
+    assert ebenen == {"###", "####"}, ebenen   # unter Region bzw. Themenfeld
+    editor.validate_editorial_briefing(
+        bericht, frozenset({editor.THEMEN_UEBERSCHRIFT}))
