@@ -129,7 +129,14 @@ Wichtige Dateien:
 | `config/news_sources.yaml` | Fachpresse-RSS (Mobile World Live, Light Reading, …) |
 | `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene): KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
 | `config/settings.yaml` | Sprache (de), Modell (`claude-sonnet-5`), Lookback (8 Tage), HTTP |
-| `data/state/seen.jsonl` | Dedup-Gedächtnis (Hash normalisierter URLs) — git-versioniert |
+| `data/state/seen.tsv` | Dedup-Gedächtnis (Hash normalisierter URLs + Tagesnummer, ~22 Byte je Zeile) — git-versioniert. Datierte Einträge verfallen nach `seen_store_months` (18); undatierte NIE, weil der Frischefilter sie nicht abfangen kann |
+| `data/state/quellen_register.json` | Je Quelle Herkunft, Abnahmedatum, erster Lauf, letzter Erfolg, Bilanz und Quarantänestand. Wird von der Pipeline fortgeschrieben |
+| `scripts/trefferquote.py` | **Die Steuergröße des Ausbaus.** Wertet das Berichtsarchiv aus: je Quelle bewertete Meldungen, Relevanz ≥3/≥4, wie viele im Wochenbericht landen, wie oft sie leer/fehlerhaft war |
+| `scripts/finde_quellen.py` | Mechanische Breitensuche im Massenbetrieb: `--aus-watchlist` macht jeden Betreiber zum Ziel, `--muster` überträgt die IR-/Plattform-Muster, die im Bestand nachweislich funktionieren |
+| `scripts/uebernehme_quellen.py` | Trägt NUR bestandene Kandidaten ein und sortiert sie selbst in Watchlist / news_sources / tech_sources / watchlist_extra. Setzt bei Zahlenabweichung alles aus dem Backup zurück |
+| `scripts/mess_sammelphase.py` | Sammelphase messen (Wanduhr, Sekunden je Quelle, langsamste Hosts) — für vorher/nachher beim Drehen an der Parallelität |
+| `scripts/kostenrechnung.py` | Kosten je Lauf und Monat, für 130 bis 1000 Quellen, mit und ohne Pekinger Stoßzeit |
+| `scripts/migriere_seen_store.py` | Einmalige Überführung des alten JSONL ins kompakte Format |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
 | `data/reports/YYYY-MM-DD.{md,json}` | Bericht als Prosa (md) + strukturiert (json: stats, regions→highlights) |
 | `site/` | Generierte Website — wird von Actions committed, Render published sie (Publish Dir `site`, Build Command nur `echo`) |
@@ -274,7 +281,50 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Website darf **nie einschlafen** (deshalb Static Site, kein Web Service).
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
-## 9. Nächster Auftrag: Skalierung auf 1000 Quellen
+## 9. Stand der Skalierung (Session 5, 04.08.2026)
+
+Der Auftrag `AUFTRAG_SKALIERUNG_1000.md` ist zur Hälfte abgearbeitet: **die
+vier Engpässe sind beseitigt und gemessen, der Quellenausbau steht bei 206
+statt 1000.** Die vollständige Auswertung mit allen Zahlen steht in
+`outputs/skalierung-2026-08-04.md`; hier nur, was eine neue Session wissen muss:
+
+- **Die Steuergröße ist die Trefferquote je Quelle**, nicht „Meldungen je
+  Quelle". Gemessen über sechs Läufe bringt eine Fachpressequelle 0,67
+  Meldungen je Lauf in den Wochenbericht, eine Betreiberquelle 0,03 — Faktor
+  22. Deshalb bestand Welle 1 zu 80 % aus Fachpresse, davon 45 nicht
+  englischsprachig. **Vor der nächsten Welle die Trefferquote neu auswerten**
+  (`scripts/trefferquote.py --ab <datum>`); ab Lauf #68 ist sie über
+  `source_url` exakt statt über den Quellennamen geschätzt.
+- **Betreiberquellen bleiben trotzdem unverzichtbar** — sie liefern die
+  Provenienz, die Fachpresse liefert die Auswahl. Die Messung sagt nur, wo
+  ZUSÄTZLICHE Quellen mehr bringen.
+- **Die Sammelphase hängt nicht mehr an der Zahl der Quellen, sondern an der
+  langsamsten einzelnen Quelle.** Lauf #68: Median 3,2 s je Quelle, Summe
+  1 212 s — aber KT allein 299,8 s, und damit war die Phase 303 s lang. Der
+  nächste Hebel ist deshalb ein Gesamtbudget je Quelle, nicht mehr
+  Parallelität.
+- **Das DeepSeek-Rate-Limit ist nicht gemessen** (der Schlüssel liegt als
+  Secret vor und ist aus der Sandbox nicht erreichbar). Lauf #68 lief mit 12
+  gleichzeitigen Aufrufen ohne einen 429 durch — mehr ist nicht belegt. Vor
+  dem Hochdrehen messen.
+- **Kosten sind kein Engpass**: 0,17 $ je Lauf bei 1000 Quellen zur Pekinger
+  Stoßzeit, 1,43 $ im Monat. Teuer wird nur der Erstlauf nach einer großen
+  Welle (~2 $, ~1 100 Analysten-Aufrufe) — dafür steht das Job-Timeout auf 120
+  Minuten.
+
+### Der Weg für die nächste Welle
+
+1. `scripts/finde_quellen.py --aus-watchlist --muster` (mechanisch, null Token)
+2. Agent-Breitensuche je Kategorie, Ausgabe im Kandidatenformat
+3. **Alles zusammen** durch `scripts/pruefe_quellenvorschlag.py` — die
+   Gesamtliste zentral, nicht je Agent
+4. Handprüfung der Bestandenen: in Welle 1 fielen dabei **72 von 141** Quellen,
+   die jede Formprüfung bestanden hatten (Gadget-Blogs, Enterprise-IT-Presse,
+   Geschwisterseiten mit identischem Inhalt)
+5. `scripts/uebernehme_quellen.py` trägt ein, `--probe` zeigt vorher, wohin
+6. Echter Actions-Lauf, danach Trefferquote neu auswerten
+
+## 10. Der ursprüngliche Auftrag (Kontext, teilweise erledigt)
 
 Liegt als `AUFTRAG_SKALIERUNG_1000.md` im Repo und ist der eigentliche
 nächste Schritt. Kurzfassung der vier Engpässe, die VOR den Quellen kommen —

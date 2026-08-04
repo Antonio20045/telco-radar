@@ -112,6 +112,14 @@ themen:
       # nicht ueber Smartphone-Modems - fuer den Netzbetrieb trotzdem relevant.
       - {name: "Intel", type: rss, url: "https://newsroom.intel.com/feed"}
 
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # UWB, NFC und Secure Elements - die Bausteine hinter eSIM, digitalem
+      # Autoschluessel und Bezahlen im Handy. 10/10 datiert, 10 eindeutige
+      # Titel, neueste 04.08.2026 ("NXP Trimension Ultra-Wideband Powers BMW
+      # Group's Digital Key Plus"). Gute Mischung aus Produkt und
+      # Finanzkalender. Abnahme: 10 Meldungen, 10 datiert, 2 im
+      # Frischefenster.
+      - {name: "NXP Semiconductors", type: "rss", url: "https://investors.nxp.com/rss/news-releases.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
   netzausruester:
     name: "Netzausrüster"
     beschreibung: >-
@@ -137,6 +145,46 @@ themen:
       # sortiert Ersteres aus.
       - {name: "Nokia", type: rss, url: "https://www.nokia.com/newsroom/feed/"}
 
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # Optischer Transportnetz-Ausruester; Blue-Planet-Automatisierung laeuft
+      # bei europaeischen Betreibern. 10 von 10 Meldungen datiert, 10
+      # eindeutige Titel, neueste vom 04.08.2026. Inhalt ist ueberwiegend
+      # echte Technik- und Kundenmeldung, nicht Finanzkalender ("Telefonica
+      # Deutschland and Blue Planet Demonstrate How AI Agents Can Accelerate
+      # 5G Network Slicing"). ciena.com selbst antwortet mit Cloudflare-403 -
+      # nur der IR-Host ist erreichbar. Abnahme: 10 Meldungen, 10 datiert, 1
+      # im Frischefenster.
+      - {name: "Ciena", type: "rss", url: "https://investor.ciena.com/rss/pressrelease.aspx?T=1", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Glasfaser-Zugangstechnik (PON) und Netzsynchronisation, seit der
+      # ADVA-Uebernahme auch in Europa relevant. 10/10 datiert, 10 eindeutige
+      # Titel, neueste 04.08.2026, darunter "TOHKnet and Adtran conduct
+      # Japan's first 50G PON trial on a live network" - genau die Art
+      # Meldung, die Monate vor dem Betreiber-Rollout kommt. Etwa jede dritte
+      # Zeile ist Finanzkalender. Abnahme: 10 Meldungen, 10 datiert, 2 im
+      # Frischefenster.
+      - {name: "Adtran", type: "rss", url: "https://investors.adtran.com/rss/pressrelease.aspx?T=1", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Groesster Glasfaser-Hersteller der Welt; Kapazitaets- und
+      # Preisentscheidungen hier schlagen auf jeden Glasfaserausbau durch.
+      # 10/10 datiert, 9 von 10 eindeutigen Titeln (die Dividendenmeldung
+      # wiederholt sich), neueste 28.07.2026. EINSCHRAENKUNG ehrlich benannt:
+      # im Abruf waren 7 der 10 Meldungen Finanzkalender/Dividende. Wert der
+      # Quelle haengt daran, ob der Analyst die Kapazitaetsmeldungen
+      # ("Springboard Plan") erkennt. Abnahme: 10 Meldungen, 10 datiert, 1 im
+      # Frischefenster.
+      - {name: "Corning", type: "rss", url: "https://investor.corning.com/rss/pressrelease.aspx?T=1", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Ergiebigste Quelle dieser Runde: 30 Meldungen je Abruf, 30/30 datiert,
+      # 30 eindeutige Titel, neueste 29.07.2026. NEC baut Open-RAN-Radios und
+      # Seekabelsysteme und ist Nokias und Ericssons Herausforderer in Japan.
+      # HINWEIS: der Feed ist Konzernbreite - es laufen auch Halbleiter-,
+      # Bahn- und Behoerdenmeldungen mit, der Themenanalyst muss aussortieren.
+      # Abnahme: 30 Meldungen, 30 datiert, 1 im Frischefenster.
+      - {name: "NEC", type: "rss", url: "https://www.nec.com/en/press/rss.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Sprachkern (IMS/VoIP) und optische Aggregation - der Teil des Netzes,
+      # den Vodafone gerade von TDM auf IP umbaut. 10/10 datiert, 10
+      # eindeutige Titel, neueste 28.07.2026, Mischung aus Kundenmeldungen und
+      # Quartalszahlen. Abnahme: 10 Meldungen, 10 datiert, 1 im
+      # Frischefenster.
+      - {name: "Ribbon Communications", type: "rss", url: "https://investors.ribboncommunications.com/rss/news-releases.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
   satellit:
     name: "Satellit & NTN"
     beschreibung: >-
@@ -149,6 +197,14 @@ themen:
       # neueste Meldung im Abruf vom 17.06.2026.
       - {name: "AST SpaceMobile", type: rss, url: "https://ast-science.com/feed/"}
 
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # Betreibt das L-Band-Netz (Inmarsat) und arbeitet mit Skylo an
+      # Direct-to- Device - der direkte Gegenspieler zu Starlinks D2C. 10/10
+      # datiert, 10 eindeutige Titel, neueste 29.07.2026, darunter "Viasat
+      # demonstrates first integrated automotive satellite voice call
+      # capability with BMW Group". Abnahme: 10 Meldungen, 10 datiert, 1 im
+      # Frischefenster.
+      - {name: "Viasat", type: "rss", url: "https://investors.viasat.com/rss/news-releases.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
   regulierung:
     name: "Regulierung & Verbände"
     beschreibung: >-
@@ -179,3 +235,139 @@ themen:
       # ist die CRTC ausschliesslich fuer Telekommunikation und Rundfunk
       # zustaendig.
       - {name: "CRTC (Kanada)", type: rss, url: "https://crtc.gc.ca/eng/rss/news.xml"}
+
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # Rumaenische Regulierungsbehoerde fuer Kommunikation (Telekom und
+      # Post), keine allgemeine Wettbewerbsbehoerde. Vodafone Romania ist
+      # beobachteter Markt. Abruf: 10 Meldungen, 10 datiert, neueste
+      # 2026-08-04, mit substanziellen Titeln (Konsultation zur
+      # Frequenzinventarisierung, Jahresbericht zu Netzstoerungen,
+      # GPAI/KI-Verordnung in Rumaenien). EINSCHRAENKUNG: 2 der 10 Eintraege
+      # waren Beschaffungsbekanntmachungen der eigenen Verwaltung ("Comanda
+      # servicii dezinsectie si deratizare"). Kein reiner Ausschreibungsfeed,
+      # aber der Analyst wird solche Zeilen sehen. Abnahme: 10 Meldungen, 10
+      # datiert, 6 im Frischefenster.
+      - {name: "ANCOM (RO)", type: "rss", url: "https://www.ancom.ro/rss", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Chilenische Telekom-Aufsicht (Subsecretaria de Telecomunicaciones),
+      # ausschliesslich Telekommunikation. WordPress-Feed, sehr aktuell.
+      # Abruf: 10 Meldungen, 10 datiert, neueste 2026-08-03, mit direkt
+      # wettbewerbsrelevanten Titeln ("Subsecretaria de Telecomunicaciones
+      # ordena cobro integro de garantias a WOM por incumplimiento"). Abnahme:
+      # 10 Meldungen, 10 datiert, 1 im Frischefenster.
+      - {name: "SUBTEL (CL)", type: "rss", url: "https://www.subtel.gob.cl/feed/", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Kenianische Kommunikationsbehoerde - Regulierer fuer Mobilfunk,
+      # Breitband und Rundfunk in einem Markt, in dem Vodafone ueber Vodacom
+      # und Safaricom vertreten ist. Abruf: 10 Meldungen, 10 datiert, neueste
+      # 2026-07-29. Titel echt und teils regulatorisch relevant ("Authority
+      # weighs light-touch rules as OTT platforms reshape Kenya's digital
+      # economy", "Cyber Security Report Q4 2025-2026"), teils
+      # Oeffentlichkeitsarbeit (Computerspenden an Schulen). Abnahme: 10
+      # Meldungen, 10 datiert, 3 im Frischefenster.
+      - {name: "Communications Authority of Kenya", type: "rss", url: "https://www.ca.go.ke/rss.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Nigerian Communications Commission, reine Telekomregulierung im
+      # groessten afrikanischen Mobilfunkmarkt. Abruf: 10 Meldungen, 10
+      # datiert, neueste 2026-08-04, klar fachliche Titel ("Cyber Resilience
+      # Framework for Nigeria Communication Sector", "NCC, African Regulators
+      # Push Stronger Collaboration for Smarter Digital Governance"). Abnahme:
+      # 10 Meldungen, 10 datiert, 3 im Frischefenster.
+      - {name: "NCC (NG)", type: "rss", url: "https://www.ncc.gov.ng/rss.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # National Telecommunications and Information Administration - die
+      # US-Regierungsstelle fuer Frequenzpolitik und Breitbandfoerderung
+      # (BEAD-Programm). Ergaenzt die bereits vorhandene FCC: die FCC
+      # entscheidet, die NTIA verwaltet das Bundesspektrum und das Geld.
+      # Abruf: 10 Meldungen, 10 datiert, neueste 2026-07-28 ("Call to Action
+      # for 6G Leadership and Security"). Hinweis: einzelne Eintraege sind
+      # Foerderprogramm-Verwaltung ("Round 4 Frequently Asked Questions").
+      # Abnahme: 10 Meldungen, 10 datiert, 1 im Frischefenster.
+      - {name: "NTIA (US)", type: "rss", url: "https://www.ntia.gov/rss.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Das Forschungs- und Normungskonsortium der Kabelnetzbetreiber (DOCSIS,
+      # 10G, Konvergenz Kabel/Mobilfunk). Relevant, weil Vodafone in
+      # Deutschland selbst Kabelnetzbetreiber ist und Kabel-MVNOs in mehreren
+      # Maerkten die Hauptkonkurrenz stellen. Abruf: 12 Meldungen, 12 datiert,
+      # neueste 2026-07-28. Hinweis: mischt Personalmeldungen ("CableLabs
+      # Names Mark Bridges President") unter die technischen Beitraege.
+      # Abnahme: 12 Meldungen, 12 datiert, 1 im Frischefenster.
+      - {name: "CableLabs", type: "rss", url: "https://www.cablelabs.com/feed", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Deutscher Digitalverband - Studien und Positionen zu TKG-Novelle,
+      # Netzausbau und KI-Regulierung, im deutschen Heimatmarkt von Vodafone
+      # meinungsbildend. WICHTIG: der naheliegende Pfad
+      # https://www.bitkom.org/rss.xml liefert Muell (leere Titel,
+      # Navigationsseiten wie "Get Started Mitgliedschaft", 6 verwertbare von
+      # 10) - der richtige Pfad ist /feed und steht als rel-Verweis auf
+      # bitkom.org/Presse. Abruf /feed: 20 Meldungen, 20 datiert, neueste
+      # 2026-08-04, echte Pressetitel ("EU-Digitalranking: Deutschland auf
+      # Platz 17"). Thematisch breiter als Telekommunikation. Abnahme: 20
+      # Meldungen, 20 datiert, 6 im Frischefenster.
+      - {name: "Bitkom", type: "rss", url: "https://www.bitkom.org/feed", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Verband der Anbieter von Telekommunikations- und Mehrwertdiensten -
+      # die Wettbewerber der Deutschen Telekom, also Vodafones eigenes Lager
+      # im deutschen Regulierungsstreit. Abruf: 10 Meldungen, 10 datiert,
+      # neueste 2026-07-31 ("Netzanschlusspaket: Zentrale Luecken fuer den
+      # Mobilfunkausbau bleiben"). Enthaelt auch Mitgliedermeldungen
+      # regionaler Glasfaserbauer. Abnahme: 10 Meldungen, 10 datiert, 8 im
+      # Frischefenster.
+      - {name: "VATM", type: "rss", url: "https://www.vatm.de/feed/", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Bundesverband Breitbandkommunikation - der Glasfaserverband, dessen
+      # Stellungnahmen bei jeder Bundesnetzagentur-Entscheidung zum Netzzugang
+      # auftauchen. Abruf: 10 Meldungen, 10 datiert, neueste 2026-08-04,
+      # unmittelbar regulatorisch ("BREKO Stellungnahme zum Regierungsentwurf
+      # des Gesetzes zur Aenderung des Telekommunikationsgesetzes", "BREKO
+      # Pressestatement zur Entscheidung der Bundesnetzagentur ueber den
+      # Zugang zu Leerrohren"). Abnahme: 10 Meldungen, 10 datiert, 1 im
+      # Frischefenster.
+      - {name: "BREKO", type: "rss", url: "https://www.brekoverband.de/feed/", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # AUSDRUECKLICH ALS NEWSROOM VORGESCHLAGEN - der Verband hat sich 2026
+      # von FTTH Council Europe in Fibre Council Europe umbenannt und die
+      # Domain gewechselt; unter ftthcouncil.eu und fibrecouncil.eu sind
+      # /feed, /feed/ und /rss.xml jeweils 404. Die Nachrichtenseite ist
+      # statisch und wird vom Collector geparst: 5 Meldungen, 5 davon datiert,
+      # neueste 2026-07-29 ("FTTH Council Europe becomes Fibre Council
+      # Europe"). Nur 5 Eintraege - knapp an der Untergrenze des
+      # Abnahmekriteriums, bitte im Pruefskript beobachten. Abnahme: 5
+      # Meldungen, 5 datiert, 1 im Frischefenster.
+      - {name: "Fibre Council Europe (ehemals FTTH Council Europe)", type: "newsroom", url: "https://fibrecouncil.eu/news", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+  infrastruktur:
+    name: "Türme, Glasfaser & Rechenzentren"
+    quellen:
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # Grosser Glasfaser-Grosshaendler; verkauft Kapazitaet an Hyperscaler
+      # und Betreiber und ist damit ein Fruehindikator fuer Transportpreise.
+      # 10/10 datiert, 10 eindeutige Titel, neueste 04.08.2026. HINWEIS ZUR
+      # ABGRENZUNG: Lumen ist am US-Markt auch Betreiber - hier bewusst als
+      # Infrastruktur gefuehrt, damit das Fachpresse-Alias-Tagging nicht
+      # greift. Abnahme: 10 Meldungen, 10 datiert, 2 im Frischefenster.
+      - {name: "Lumen Technologies", type: "rss", url: "https://ir.lumen.com/rss/pressrelease.aspx?T=1", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Dritter grosser Turmbetreiber, stark in Lateinamerika und Afrika.
+      # 10/10 datiert, 10 eindeutige Titel, neueste 03.08.2026. EINSCHRAENKUNG
+      # wie bei American Tower: im Abruf waren alle zehn Zeilen Quartals- und
+      # Konferenzmeldungen. Sachlich richtig einsortiert, praktisch duenn.
+      # Abnahme: 10 Meldungen, 10 datiert, 1 im Frischefenster.
+      - {name: "SBA Communications", type: "rss", url: "https://www.sbasite.com/rss/pressrelease.aspx?T=1", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+  plattformen:
+    name: "eSIM-, MVNO- & Kommunikationsplattformen"
+    quellen:
+      # ---- Welle 2 (Themenfelder und Regulierung), abgenommen 2026-08-04
+      # Einer der drei grossen SIM-/eSIM-Personalisierer weltweit. 10/10
+      # datiert, 10 eindeutige Titel, neueste 04.08.2026 - die aktuellste und
+      # thematisch passgenaueste Quelle dieser Runde ("SABESP Partners with
+      # Vivo and IDEMIA Secure Transactions, to Power the World's Largest IoT
+      # ..."). Direkt relevant fuer eSIM-Umstellung, IoT-Profile und digitale
+      # Identitaet. Abnahme: 10 Meldungen, 10 datiert, 2 im Frischefenster.
+      - {name: "IDEMIA", type: "rss", url: "https://www.idemia.com/feed", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # Zweiter grosser eSIM-/Digital-Identity-Anbieter (frueher Gemalto).
+      # 10/10 datiert, 10 eindeutige Titel, neueste 04.08.2026. WARNUNG: das
+      # ist der Konzernfeed eines Ruestungs- und Luftfahrtkonzerns - im Abruf
+      # lief unter anderem "Design of uncrewed vessels for new ASW frigates"
+      # mit. Der Telko-Anteil ist eine Minderheit; ein themenspezifischer Feed
+      # existiert nicht
+      # (thalesgroup.com/en/markets/digital-identity-and-security/press-release
+      # ist JS-gerendert, ohne statischen Endpunkt). Abnahme: 10 Meldungen, 10
+      # datiert, 9 im Frischefenster.
+      - {name: "Thales", type: "rss", url: "https://www.thalesgroup.com/en/rss.xml", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
+      # CPaaS-Anbieter und einer der groessten A2P-/RCS-Aggregatoren - also
+      # derjenige, der zwischen Unternehmen und Vodafones SMS-/RCS-Umsatz
+      # steht. 10/10 datiert, 10 eindeutige Titel, neueste 29.07.2026, mit
+      # konkreten Marktzahlen ("Infobip reports 169.3% global RCS traffic
+      # growth"). Der Nachrichten-Feed, nicht der Blog-Feed. Abnahme: 10
+      # Meldungen, 10 datiert, 2 im Frischefenster.
+      - {name: "Infobip", type: "rss", url: "https://www.infobip.com/news/feed", herkunft: "Welle 2 (Themenfelder und Regulierung)", abgenommen: "2026-08-04"}
