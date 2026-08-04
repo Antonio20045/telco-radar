@@ -1,6 +1,6 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-08-01, Ende Session 3 (Quellen-Audit). Dieses Dokument enthält
+Stand: 2026-08-04, Ende Session 4 (Quellen-Ausbau). Dieses Dokument enthält
 alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
 zuzugreifen und weiterzuarbeiten.
 
@@ -9,13 +9,22 @@ zuzugreifen und weiterzuarbeiten.
 ## 1. Was ist das & was ist das Ziel?
 
 **Telco Radar** ist ein automatisches Competitive-Intelligence-System für
-Antonios Kollegin bei **Vodafone**. Es beobachtet wöchentlich die Presse-
-Newsrooms von **81 Netzbetreibern in 6 Regionen** (Europa, Nordamerika,
-Lateinamerika, Afrika & Naher Osten, Asien, Ozeanien) plus **14 internationale
-Telco-Fachpresse-Feeds**, erkennt **nur wirklich neue** Meldungen, lässt sie
-von Claude-Agents bewerten („Warum ist das für Vodafone interessant?",
-Dringlichkeit 1–5) und veröffentlicht einen deutschsprachigen Wochenbericht
-als Website.
+Antonios Kollegin bei **Vodafone**. Es beobachtet wöchentlich **drei
+Signalebenen**, erkennt **nur wirklich neue** Meldungen, lässt sie von
+Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
+1–5) und veröffentlicht einen deutschsprachigen Wochenbericht als Website:
+
+1. **85 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
+   Afrika & Naher Osten, Asien, Ozeanien) über **91 crawlbare Quellen** —
+   seit Session 4 haben zehn Betreiber mehr als einen eigenen Kanal
+   (Presse-Newsroom **plus** Investor Relations, Technik-Blog oder
+   Landesgesellschaft).
+2. **14 internationale Telco-Fachpresse-Feeds** (`config/news_sources.yaml`).
+3. **25 Themenquellen in 6 Themenfeldern** (`config/tech_sources.yaml`):
+   KI-Anbieter, Geräte, Chips & Modems, Netzausrüster, Satellit & NTN,
+   Regulierung & Verbände. Das sind **keine Wettbewerber**, sondern die
+   Unternehmen und Behörden, die den Rahmen setzen — eigener Analyst mit
+   eigenem Prompt, eigener Abschnitt im Bericht.
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
 nicht in den Agents. LLM-Calls sehen nur neue Items → günstig, keine
@@ -87,7 +96,10 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              (src/telco_radar/collect/: rss.py, newsroom.py, http.py)
 2. DELTA     Seen-Store + Freshness-Filter → nur NEUE Items
              (src/telco_radar/dedupe.py; State: data/state/seen.jsonl)
-3. ANALYZE   1 Analyst-Agent pro Region, Batches à 15 Items, 8k Tokens
+3. ANALYZE   1 Analyst-Agent pro Region UND pro Themenfeld, Batches à 15
+             Items (parallel, analyst_batch_workers), 8k Tokens.
+             Themenfelder bekommen TECH_ANALYST_SYSTEM statt ANALYST_SYSTEM -
+             ein Chiphersteller ist kein Wettbewerber.
              (src/telco_radar/analyze/agents.py; API direkt via httpx: llm.py)
 4. EDIT      Editor-Agent: deutscher Wochenbericht (20k Tokens!) +
              Topic-Memory gegen Wiederholungen (analyze/editor.py)
@@ -101,6 +113,7 @@ Wichtige Dateien:
 |---|---|
 | `config/watchlist.yaml` | Regionen → Operator → Quellen. Operator OHNE sources = bot-geschützt, wird via Fachpresse-Tagging abgedeckt (Aliase!) |
 | `config/news_sources.yaml` | Fachpresse-RSS (Mobile World Live, Light Reading, …) |
+| `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene): KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
 | `config/settings.yaml` | Sprache (de), Modell (`claude-sonnet-5`), Lookback (8 Tage), HTTP |
 | `data/state/seen.jsonl` | Dedup-Gedächtnis (Hash normalisierter URLs) — git-versioniert |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
@@ -109,6 +122,8 @@ Wichtige Dateien:
 | `src/telco_radar/report/templates/` | base/report/archive/sources.html.j2 + style.css + app.js |
 | `scripts/validate_sources.py` | Health-Check aller Quellen: Status, Item-Zahl, wie viele datiert, **neuestes Datum**, **wie viele im Frischefenster** + Liste „liefert Inhalte, aber nichts Frisches" |
 | `scripts/build_quellen_doc.py` | Erzeugt `TELCO_RADAR_QUELLEN.md` aus der Watchlist; mit `--validate` mit echten Abrufzahlen |
+| `scripts/pruefe_quellenvorschlag.py` | **Abnahme-Check für neue Quellen.** Schickt jeden Vorschlag durch `collect_source` und prüft neun Kriterien maschinell. Ohne PASS hier kommt keine Quelle in die Config |
+| `scripts/finde_quellen.py` | Mechanische Breitensuche: `rel=alternate` der Newsroom-Seiten + die Kandidatenpfade, die in dieser Branche wirklich vorkommen |
 | `.github/workflows/radar.yml` | Cron Di + Fr 08:30 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
 | `tests/` | pytest-Suite (Fixtures, kein Netz/LLM nötig) |
 
@@ -149,6 +164,46 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   3-mal — **Maroc Telecom, Cosmote und UScellular kein einziges Mal**. Diese
   drei sind echte blinde Flecken, keine abgedeckten Quellen. UScellular hat
   seit der Übernahme durch T-Mobile keinen eigenen Newsroom mehr.
+- **Neue Quellen NUR über `scripts/pruefe_quellenvorschlag.py`.** Das Skript
+  schickt jeden Vorschlag durch `collect_source` — also genau den Pfad der
+  Pipeline — und prüft neun Kriterien im Code. Ein Modell, das „ich habe es
+  geprüft" sagt, zählt nicht: in Session 4 bestand von zwölf Vorschlägen einer
+  Recherche-Runde genau **einer** die zentrale Nachprüfung. Wer Agents suchen
+  lässt, muss die Gesamtliste am Ende selbst noch einmal durchlaufen lassen.
+- **Der Check prüft Form, nicht Wert — die Bewertung bleibt Handarbeit.**
+  Beispiele aus Session 4, die alle Kriterien bestanden und trotzdem
+  verworfen wurden: der ESG-Kategorie-Feed von Telefónica (genau das
+  Boilerplate, das der Analyst verwerfen soll), `corporate.comcast.com/rss`
+  (hyperlokales Marketing — stand seit einer früheren Session sogar als
+  Warnung im YAML-Kommentar, wurde vom Agent trotzdem erneut vorgeschlagen),
+  der Blog von Hugging Face (40 Entwicklermeldungen je Abruf), die spanische
+  CNMC (Wettbewerbs-, keine Telekom-Behörde). **Vor jedem Eintrag die
+  bestehenden YAML-Kommentare lesen** — dort steht, was schon einmal
+  abgelehnt wurde.
+- **SEC EDGAR und Börsen-Filing-Feeds sind gesperrt.** Sie liefern technisch
+  saubere, datierte Meldungen — aber alle mit demselben Titel („8-K -
+  Current report", „Monthly Return - JUL 26"). Im Bericht stünden identische
+  Zeilen. Dafür gibt es jetzt Kriterium 5b (unterscheidbare Titel).
+- **Eine Quelle zweimal messen, wenn sie geparst wird.** `newswire.ca` bestand
+  den Check mit 23 von 23 datierten Meldungen und lieferte beim nächsten Abruf
+  30 Meldungen ganz **ohne** Datum — dasselbe Kartenlayout, einmal mit und
+  einmal ohne Zeitstempel. Undatiert heißt unsichtbar. `--zweimal` fängt das
+  ab; **Bell Canada hängt weiter an dieser Seite** und fällt deshalb
+  unvorhersehbar aus dem Bericht (bce.ca liefert nur leere Next.js-Chunks).
+- **Laufzeit: parallelisieren, nicht kappen.** Der Lauf vom 31.07. brauchte mit
+  220 neuen Meldungen 49 von 50 zulässigen Minuten, weil jede Region ihre
+  Stapel nacheinander abarbeitete. Stellschrauben sind `collect_max_workers`
+  (8) und `analyst_batch_workers` (4, mal `llm_max_workers` 3 = max. 12
+  gleichzeitige LLM-Aufrufe). Kappungen sind ausgeschlossen: der Seen-Store
+  merkt sich jede neue Meldung als erledigt, egal ob ein Analyst sie gelesen
+  hat.
+- **Themenfelder gehören NICHT in die Watchlist.** Dort bekämen Nvidia oder
+  die GSMA eine Region und einen Alias-Eintrag, und das Fachpresse-Tagging
+  würde jede Meldung mit „Nvidia" im Titel einer Region zuschlagen. Sie leben
+  in `config/tech_sources.yaml` und laufen unter `thema:<key>` als eigene
+  Analysten. Wer den Editor-Themenabschnitt ändert, muss **Prompt und
+  `validate_editorial_briefing` gemeinsam** anfassen — sie hängen am selben
+  Schalter.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
