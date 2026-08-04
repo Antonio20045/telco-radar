@@ -34,7 +34,14 @@ jobs:
     # Headroom over the worst realistic case: collection ~2 min, analysts ~4 min,
     # and up to four LLM stages that each exhaust their 300s call budget before
     # giving up. Was 35, which killed runs #30 and #33 mid-pipeline.
-    timeout-minutes: 50
+    #
+    # Auf 120 erhoeht (04.08.2026, Skalierungs-Auftrag). GitHub erlaubt bis
+    # 360; das Timeout ist der billigste Hebel ueberhaupt, aber ausdruecklich
+    # KEIN Ersatz fuer Parallelitaet - die Sammelphase drosselt seither je
+    # Host, und die Redaktion laeuft zweistufig. Gebraucht wird die Reserve
+    # vor allem beim ERSTEN Lauf nach einer Ausbauwelle: dann liefern alle
+    # neuen Quellen ihr volles Frischefenster auf einmal.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -159,7 +166,10 @@ jobs:
           fi
 
       - name: Trigger Render deploy
-        if: ${{ success() && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        # Nur vom Standard-Branch aus. Der Hook deployt IMMER den Stand von
+        # main - ein Lauf auf einem Entwicklungsbranch wuerde also einen
+        # Deploy ausloesen, der mit seinem eigenen Ergebnis nichts zu tun hat.
+        if: ${{ success() && github.ref_name == github.event.repository.default_branch && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         continue-on-error: true   # a transient Render hiccup must not red-fail the run
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
