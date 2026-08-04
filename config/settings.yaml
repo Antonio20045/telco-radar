@@ -6,6 +6,18 @@
 report_language: "de"
 
 # ---------------------------------------------------------------------------
+# Welcher Anbieter den Lauf bedient.
+#   anthropic  Anthropic-API direkt (Secret ANTHROPIC bzw. ANTHROPIC_API_KEY)
+#   openai     OpenAI-kompatibler Endpunkt (LLM_API_KEY + llm_api_base, NVIDIA)
+#   bedrock    Amazon Bedrock (AWS_BEARER_TOKEN_BEDROCK)
+#   auto       nimmt, was gerade an Schluesseln da ist: bedrock > openai >
+#              anthropic
+# Bewusst explizit: unter "auto" gewinnt der NVIDIA-Schluessel, solange er im
+# Repo liegt, und Anthropic kaeme nie zum Zug. Ein Anbieterwechsel soll eine
+# Zeile hier sein, kein Loeschen von Secrets.
+llm_provider: "anthropic"
+
+# ---------------------------------------------------------------------------
 # Models (fallback Anthropic; OpenAI-compatible provider used when LLM_API_KEY
 # is set - see .github/workflows/radar.yml).
 # ---------------------------------------------------------------------------

@@ -36,6 +36,58 @@ log = logging.getLogger("telco_radar")
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
+ANBIETER = ("auto", "anthropic", "openai", "bedrock")
+
+
+def _waehle_anbieter(settings: dict) -> tuple[bool, bool]:
+    """Legt den LLM-Anbieter fest; liefert (use_bedrock, use_openai).
+
+    "auto" behaelt die alte Reihenfolge (Bedrock > OpenAI-kompatibel >
+    Anthropic) und nimmt damit, welcher Schluessel gerade da ist. Genau das
+    ist das Problem, das llm_provider loest: solange der NVIDIA-Schluessel im
+    Repo liegt, gewinnt er, und Anthropic kaeme nie zum Zug.
+
+    Bei einer expliziten Wahl werden die Schluessel der unterlegenen Anbieter
+    aus der Prozessumgebung entfernt. Das ist noetig, weil llm.py seinen
+    Backend allein aus der Umgebung ableitet - sonst wuerde hier der eine
+    Anbieter die Modell-IDs bestimmen, waehrend dort der andere aufgerufen
+    wird. Nur die Kopie dieses Prozesses ist betroffen.
+    """
+    wanted = str(settings.get("llm_provider", "auto") or "auto").lower()
+    if wanted not in ANBIETER:
+        log.warning("Unbekannter llm_provider %r - benutze auto", wanted)
+        wanted = "auto"
+
+    has_bedrock = bool(os.environ.get("AWS_BEARER_TOKEN_BEDROCK"))
+    has_openai = (bool(os.environ.get("LLM_API_KEY"))
+                  and bool(settings.get("llm_api_base")))
+
+    if wanted == "auto":
+        return has_bedrock, (not has_bedrock and has_openai)
+
+    use_bedrock = wanted == "bedrock"
+    use_openai = wanted == "openai"
+    # Ein gewaehlter Anbieter ohne seinen Schluessel laesst jede Stufe
+    # scheitern - das einmal deutlich sagen, statt es jeden Aufruf einzeln
+    # herausfinden zu lassen.
+    fehlt = ((use_bedrock and not has_bedrock)
+             or (use_openai and not has_openai)
+             or (wanted == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY")))
+    if fehlt:
+        log.warning("llm_provider=%s, aber der zugehoerige Schluessel fehlt - "
+                    "der Lauf faellt auf den Notfall-Digest zurueck", wanted)
+    if not use_bedrock:
+        os.environ.pop("AWS_BEARER_TOKEN_BEDROCK", None)
+    if not use_openai:
+        os.environ.pop("LLM_API_KEY", None)
+    elif settings.get("llm_api_base"):
+        # Muss HIER passieren, nicht erst beim Setzen der Modell-IDs: llm.py
+        # erkennt den OpenAI-Zweig nur an LLM_API_KEY *und* LLM_API_BASE.
+        # Fehlt die Basis-URL, waehlt es still Anthropic - die Wahl waere
+        # getroffen und nicht umgesetzt.
+        os.environ.setdefault("LLM_API_BASE", settings["llm_api_base"])
+    return use_bedrock, use_openai
+
 
 def _sort_key(item: Item):
     """Freshest first; undated items last."""
@@ -78,14 +130,7 @@ def run(root: Path, use_llm: bool | None = None,
     lookback = lookback_days or cfg.lookback_days
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
-    # Provider selection: if an OpenAI-compatible key is present, use that
-    # provider (cheap, e.g. Moonshot/Kimi); otherwise fall back to Anthropic.
-    # Bedrock wins when its token is present: it is the only backend whose model
-    # ids carry the "anthropic." prefix, so the ids must switch with it.
-    use_bedrock = bool(os.environ.get("AWS_BEARER_TOKEN_BEDROCK"))
-    use_openai = (not use_bedrock
-                  and bool(os.environ.get("LLM_API_KEY"))
-                  and bool(cfg.settings.get("llm_api_base")))
+    use_bedrock, use_openai = _waehle_anbieter(cfg.settings)
     if use_bedrock:
         # Which Claude models a Bedrock account may call is per-account and
         # changes without notice (agreements, quotas, AWS Sales). Instead of
