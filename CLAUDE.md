@@ -1,6 +1,6 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-08-04, Ende Session 4 (Quellen-Ausbau). Dieses Dokument enthält
+Stand: 2026-08-04, Ende Session 5 (Skalierung). Dieses Dokument enthält
 alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
 zuzugreifen und weiterzuarbeiten.
 
@@ -14,17 +14,19 @@ Signalebenen**, erkennt **nur wirklich neue** Meldungen, lässt sie von
 Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
 1–5) und veröffentlicht einen deutschsprachigen Wochenbericht als Website:
 
-1. **85 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
-   Afrika & Naher Osten, Asien, Ozeanien) über **91 crawlbare Quellen** —
-   seit Session 4 haben zehn Betreiber mehr als einen eigenen Kanal
-   (Presse-Newsroom **plus** Investor Relations, Technik-Blog oder
-   Landesgesellschaft).
-2. **14 internationale Telco-Fachpresse-Feeds** (`config/news_sources.yaml`).
-3. **25 Themenquellen in 6 Themenfeldern** (`config/tech_sources.yaml`):
+1. **90 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
+   Afrika & Naher Osten, Asien, Ozeanien) über **104 crawlbare Quellen** —
+   achtzehn Betreiber haben mehr als einen eigenen Kanal (Presse-Newsroom
+   **plus** Investor Relations, Technik-Blog oder Landesgesellschaft).
+2. **70 Telco-Fachpresse-Feeds** (`config/news_sources.yaml`) aus 20 Ländern
+   und 16 Sprachen. Seit Session 5 der größte Block — die Trefferquote je
+   Quelle sagt, dass hier der Ertrag liegt (siehe Abschnitt 9).
+3. **49 Themenquellen in 8 Themenfeldern** (`config/tech_sources.yaml`):
    KI-Anbieter, Geräte, Chips & Modems, Netzausrüster, Satellit & NTN,
-   Regulierung & Verbände. Das sind **keine Wettbewerber**, sondern die
-   Unternehmen und Behörden, die den Rahmen setzen — eigener Analyst mit
-   eigenem Prompt, eigener Abschnitt im Bericht.
+   Regulierung & Verbände, Türme/Glasfaser/Rechenzentren sowie
+   eSIM-/MVNO-/Kommunikationsplattformen. Das sind **keine Wettbewerber**,
+   sondern die Unternehmen und Behörden, die den Rahmen setzen — eigener
+   Analyst mit eigenem Prompt, eigener Abschnitt im Bericht.
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
 nicht in den Agents. LLM-Calls sehen nur neue Items → günstig, keine
@@ -127,7 +129,8 @@ Wichtige Dateien:
 |---|---|
 | `config/watchlist.yaml` | Regionen → Operator → Quellen. Operator OHNE sources = bot-geschützt, wird via Fachpresse-Tagging abgedeckt (Aliase!) |
 | `config/news_sources.yaml` | Fachpresse-RSS (Mobile World Live, Light Reading, …) |
-| `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene): KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
+| `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene), acht Stück: KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung, Türme/Glasfaser/Rechenzentren, Plattformen. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
+| `config/watchlist_extra.yaml` | Neue Betreiber aus dem Ausbau. Wird nach Regionsschlüssel mit der Watchlist verschmolzen, damit die gepflegte Hauptdatei lesbar bleibt |
 | `config/settings.yaml` | Sprache (de), Modell (`claude-sonnet-5`), Lookback (8 Tage), HTTP |
 | `data/state/seen.tsv` | Dedup-Gedächtnis (Hash normalisierter URLs + Tagesnummer, ~22 Byte je Zeile) — git-versioniert. Datierte Einträge verfallen nach `seen_store_months` (18); undatierte NIE, weil der Frischefilter sie nicht abfangen kann |
 | `data/state/quellen_register.json` | Je Quelle Herkunft, Abnahmedatum, erster Lauf, letzter Erfolg, Bilanz und Quarantänestand. Wird von der Pipeline fortgeschrieben |
@@ -170,6 +173,31 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   `data/reports/` NICHT einchecken, sonst findet der Actions-Lauf „0 neue
   Items". Baseline-Reset = die vier State-/Report-Dateien per `git rm`
   entfernen, pushen, Workflow triggern.
+- **Die Sammelphase hängt an der langsamsten EINZELNEN Quelle**, nicht mehr an
+  der Zahl der Quellen. In Lauf #68 lag der Median bei 3,2 s je Quelle und die
+  Summe aller Abrufzeiten bei 1 212 s — aber KT allein brauchte 299,8 s, bis
+  seine Verbindungsversuche aufgaben, und bestimmte damit die 303-s-Phase im
+  Alleingang. `collect/http.py` probiert zwei User-Agents mit je drei
+  Versuchen und zwei Backoff-Pausen; im schlimmsten Fall sind das sechs
+  Timeouts plus 26 s Warten. **Mehr Worker helfen dagegen nicht** — ein
+  Gesamtbudget je Quelle wäre der nächste Hebel.
+- **Ein Modell, das mehrzeiliges Markdown in JSON schreiben soll, bricht.**
+  Die Bereichsredakteure antworten deshalb in vier Blöcken mit Trennmarken.
+  Wer das zurückdreht, riskiert nicht einen ausgefallenen Abschnitt, sondern
+  alle: sie teilen sich denselben Prompt.
+- **Der Abnahme-Check prüft Kandidaten auch GEGENEINANDER** (Kriterium 7c).
+  Ohne das bestehen zwei Pfade derselben Seite beide — bei den 101
+  mechanisch gefundenen Kandidaten waren das 4 von 15 Treffern.
+- **`uebernehme_quellen.py` schreibt YAML im Fluss-Stil**, und dort beendet
+  ein Fragezeichen in einer URL das Mapping. Zeichenketten deshalb immer in
+  Anführungszeichen. Das Sicherheitsnetz (Konfiguration neu laden, zählen,
+  sonst Backup zurückspielen) hat genau diesen Fehler zweimal abgefangen —
+  es ist kein Zierrat.
+- **Die Wertprüfung bleibt Handarbeit, und sie ist die halbe Arbeit.** In
+  Welle 1 fielen 72 von 141 formal bestandenen Quellen: Gadget-Blogs,
+  Enterprise-IT- und CIO-Presse, drei Geschwisterseiten mit identischem
+  Inhalt, ein Feed mit fremdsprachigen Fremdinhalten. Die Ablehnungsgründe
+  stehen in `outputs/skalierung-2026-08-04.md`.
 - **Anthropic 529 (overloaded):** kommt vor; llm.py hat 5 Retries mit bis zu
   45s Backoff, Analysten-Batches werden übersprungen statt zu crashen, der
   Editor fällt notfalls auf einen Digest zurück. Ein Lauf dauerte deshalb
@@ -266,6 +294,14 @@ export PYTHONPATH=src
 pytest -q                                   # Tests, offline
 python scripts/validate_sources.py          # Quellen-Health (Netz nötig)
 python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
+
+# Skalierungs-Werkzeuge (Session 5)
+python scripts/trefferquote.py --ab 2026-07-25       # Steuergröße des Ausbaus
+python scripts/mess_sammelphase.py --worker 48       # Sammelphase messen
+python scripts/kostenrechnung.py                     # Kosten je Lauf/Monat
+python scripts/finde_quellen.py --aus-watchlist --muster --out k.yaml
+python scripts/pruefe_quellenvorschlag.py k.yaml --json e.json
+python scripts/uebernehme_quellen.py e.json --probe   # zeigt, wohin es ginge
 # Site nur neu rendern (ohne Crawl): render_site() aus report/html.py nutzen
 ```
 
