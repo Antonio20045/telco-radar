@@ -181,16 +181,27 @@ diesem Lauf).
 
 | Stufe | Zahl |
 |---|---:|
-| Kandidaten aus sechs parallelen Breitensuchen | 196 |
+| Kandidaten aus sechs parallelen Breitensuchen | 228 |
 | Kandidaten aus der mechanischen Musterübertragung (4 796 probierte URLs) | 101 |
-| **gesamt geprüft** | **297** |
-| Abnahme-Check bestanden | 141 von 262 (Stand erste Runde) |
-| davon von Hand verworfen | 72 |
-| **eingetragen** | **69** |
+| **gesamt zentral geprüft** | **329** |
+| Abnahme-Check bestanden | **175** |
+| davon bei der Wertprüfung von Hand verworfen | **84** |
+| **eingetragen** | **91** |
 
-### Warum 72 Quellen von Hand geflogen sind
+Aufgeteilt in zwei Wellen, weil die Agents zu unterschiedlichen Zeiten fertig
+wurden: Welle 1 (69 Quellen, Schwerpunkt Fachpresse) und Welle 2 (22 Quellen,
+Themenfelder und Regulierung). Beide Male lief die **Gesamtliste** durch den
+Check, nicht die Teillisten je Agent — das ist der Punkt, an dem in Session 4
+von zwölf Agent-Vorschlägen genau einer überlebte.
 
-Der Check prüft Form, nicht Wert. Alle 72 haben ≥ 5 datierte Meldungen mit
+Der Bestand wächst damit von **132 auf 228 Quellen** (+73 %): 104 crawlbare
+Betreiberquellen bei 90 Betreibern, 70 Fachpresse-Feeds, 49 Themenquellen in
+acht Themenfeldern (zwei davon neu: Türme/Glasfaser/Rechenzentren und
+eSIM-/MVNO-/Kommunikationsplattformen).
+
+### Warum 84 Quellen von Hand geflogen sind
+
+Der Check prüft Form, nicht Wert. Alle 84 haben ≥ 5 datierte Meldungen mit
 echten Überschriften geliefert und trotzdem im Radar nichts zu suchen:
 
 - **31 Consumer-Gadget- und allgemeine Tech-Portale.** Titelproben wie „Mini-PC
@@ -208,6 +219,11 @@ echten Überschriften geliefert und trotzdem im Radar nichts zu suchen:
   zweiter WOM-Kanal auf denselben Newsroom.
 - **1 kompromittierter Feed**: TeleAnalysis (IN) lieferte indonesische
   Food-Blog-Einträge.
+- **12 aus Welle 2**: IR-Feeds mit ausschließlich Quartalszahlen (Qorvo,
+  Skyworks, Garmin, American Tower), reine Terminankündigungen (Harmonic),
+  ein Newsletter-Archiv, in dem jeder Titel eine Sammelzeile ist (Connect
+  Europe), Verwaltungsnotizen einer Regulierungsbehörde (CRC Kolumbien),
+  Gremieninterna (IETF, Small Cell Forum) und drei Marketingblogs.
 
 ### Was dazugekommen ist
 
@@ -228,6 +244,12 @@ gefunden von der Musterübertragung, ohne einen einzigen Modellaufruf.
 **5 neue Betreiber**: Liberty Global, Magenta Telekom, eir, Optimum, Dialog
 Axiata.
 
+**22 Themen- und Regulierungsquellen** (Welle 2): Netzausrüster hatte drei
+Quellen, Satellit eine, Regulierung fünf. Dazugekommen sind unter anderem
+Ciena, Corning, Adtran, NEC, Ribbon, NXP, Viasat, Lumen, SBA Communications,
+Thales, IDEMIA, Infobip sowie die Regulierer ANCOM (RO), SUBTEL (CL), NCC
+(NG), CA (KE), NTIA (US) und die Verbände Bitkom, VATM, BREKO, CableLabs.
+
 ### Was die Musterübertragung wirklich gebracht hat
 
 4 796 probierte URLs über alle 85 Betreiber, 101 Kandidaten, davon **15
@@ -246,18 +268,19 @@ Zwei Muster haben sich als produktiv erwiesen und gehören in die nächste Runde
 ## 5. Ehrliche Einordnung: 1000 sind das nicht
 
 Der Auftrag nennt 1000 Quellen als Ziel und sagt zugleich: „Lieber 600 belegte
-als 1000 behauptete." Der Stand nach dieser Session ist **206 konfigurierte
+als 1000 behauptete." Der Stand nach dieser Session ist **228 konfigurierte
 Quellen** — von 132. Der Weg auf 1000 ist damit nicht gegangen, sondern
 befahrbar gemacht: die vier Engpässe, an denen ein naives Verzehnfachen
 gescheitert wäre, sind beseitigt und gemessen, und der Apparat (Suche →
 zentraler Check → Übernahme → Register) läuft im Massenbetrieb.
 
 Was der Zahl im Weg steht, ist nicht die Technik, sondern der Vorrat an
-Quellen, die den Abnahme-Check **und** die Wertprüfung bestehen. Von 297
-mechanisch und agentisch gefundenen Kandidaten blieben 69 übrig — eine Quote
-von 23 %. Auf 1000 Quellen hochgerechnet hieße das rund 3 700 zu prüfende
-Kandidaten. Das ist machbar, aber es ist Arbeit für mehrere Wellen, nicht für
-eine Session.
+Quellen, die den Abnahme-Check **und** die Wertprüfung bestehen. Von 329
+mechanisch und agentisch gefundenen Kandidaten blieben 91 übrig — eine Quote
+von 28 %. Auf 1000 Quellen hochgerechnet hieße das rund 2 800 weitere zu
+prüfende Kandidaten. Das ist machbar, aber es ist Arbeit für mehrere Wellen,
+nicht für eine Session. Und die Quote wird eher fallen als steigen: die
+naheliegenden Länder und Kategorien sind jetzt abgegrast.
 
 ### Wo blinde Flecken bleiben
 
