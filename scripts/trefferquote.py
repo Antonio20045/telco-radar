@@ -192,7 +192,14 @@ def auswerten(reports_dir: Path, config_urls: dict[str, dict] | None = None,
                 b.neu += int(rec.get("new") or 0)
                 b.laeufe_mit_neu += 1
 
-        berichtet = _berichtete_urls(bericht.get("briefing_md", ""))
+        # In einem Lauf mit Notfall-Digest ist "im Bericht" wertlos: der
+        # Digest listet ALLE neuen Meldungen mit Link. Wer das mitzaehlt,
+        # bekommt fuer diesen Lauf eine Trefferquote von fast 100 % - und
+        # damit genau die Zahl kaputt, wegen der es diese Auswertung gibt.
+        # Gesammelt und bewertet zaehlen weiter; nur die Berichtsquote nicht.
+        redaktion_lief = bool(run.get("editor_used", True))
+        berichtet = (_berichtete_urls(bericht.get("briefing_md", ""))
+                     if redaktion_lief else set())
         bewertet_im_lauf = 0
         for region in (bericht.get("regions") or {}).values():
             for h in region.get("highlights") or []:
@@ -222,6 +229,7 @@ def auswerten(reports_dir: Path, config_urls: dict[str, dict] | None = None,
 
         laeufe.append({
             "datum": datum,
+            "redaktion": redaktion_lief,
             "quellen": len(quellen),
             "gesammelt": (bericht.get("stats") or {}).get("collected", 0),
             "neu": (bericht.get("stats") or {}).get("new", 0),
@@ -287,9 +295,17 @@ def markdown(bilanzen: dict[str, Quellenbilanz], laeufe: list[dict],
     zeilen: list[str] = []
     zeilen.append("# Trefferquote je Quelle")
     zeilen.append("")
+    ohne_redaktion = sum(1 for l in laeufe if not l.get("redaktion", True))
     zeilen.append(f"Ausgewertet: {len(laeufe)} Laeufe "
                   f"({laeufe[0]['datum']} bis {laeufe[-1]['datum']}), "
                   f"{len(bilanzen)} Quellen." if laeufe else "Keine Laeufe.")
+    if ohne_redaktion:
+        zeilen.append("")
+        zeilen.append(f"In {ohne_redaktion} dieser Laeufe ist die Redaktion "
+                      "ausgefallen und ein Notfall-Digest erschienen. Deren "
+                      "Meldungen zaehlen als gesammelt und bewertet, aber "
+                      "NICHT als \"im Bericht\" - der Digest verlinkt alles, "
+                      "und die Berichtsquote waere fuer diese Laeufe wertlos.")
     zeilen.append("")
     zeilen.append("`~` heisst: in mindestens einem Lauf nur ueber den "
                   "Quellennamen zugeordnet (Altdaten ohne `source_url`), "
