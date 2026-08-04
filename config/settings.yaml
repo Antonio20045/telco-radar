@@ -191,6 +191,23 @@ collect_host_parallel: 1
 # und laeuft parallel zu allen anderen Gruppen.
 collect_host_delay_seconds: 1.0
 
+# Automatische Quarantaene (src/telco_radar/quellen_register.py).
+# Nach wie vielen Laeufen AM STUECK ohne Inhalt (leer oder Fehler) eine
+# Quelle stillgelegt wird. Bei 1000 Quellen faellt eine tote sonst niemandem
+# mehr auf - die Konfiguration verrottet still. Stillgelegte Quellen werden
+# nicht abgerufen, stehen aber weiter mit Status "quarantaene" im Protokoll.
+# 0 schaltet die Quarantaene ab.
+# 6 Laeufe sind bei zwei Laeufen pro Woche drei Wochen - lang genug, dass
+# eine IR-Seite mit seltenen Meldungen nicht dafuer bestraft wird, dass sie
+# selten meldet (leer heisst hier: keine Meldung im Frischefenster gab es
+# nicht, sondern die Seite lieferte ueberhaupt nichts).
+quarantaene_nach_laeufen: 6
+
+# Bewaehrungslauf: jeder N-te Lauf ruft auch die stillgelegten Quellen ab.
+# Ohne das waere ein zweiwoechiger Serverausfall beim Betreiber ein
+# dauerhaftes Todesurteil, und niemand wuerde es je bemerken.
+quarantaene_probe_alle: 10
+
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the
 # editor synthesis still runs once, after the analysts. Same models, same output.

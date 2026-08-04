@@ -30,6 +30,7 @@ from .collect import collect_all, tag_news_regions
 from .config import is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
+from .quellen_register import QuellenRegister
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -192,6 +193,8 @@ def run(root: Path, use_llm: bool | None = None,
 
     state_dir = root / "data" / "state"
     reports_dir = root / "data" / "reports"
+    today = date.today()
+    today_iso = today.isoformat()
     reports_dir.mkdir(parents=True, exist_ok=True)
 
     phases: list[dict] = []
@@ -200,17 +203,33 @@ def run(root: Path, use_llm: bool | None = None,
         phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
 
     # ------------------------------------------------------------- collect
+    # Das Register weiss, welche Quellen stillgelegt sind. Ohne diese Stufe
+    # verrottet eine Konfiguration dieser Groesse still: eine Quelle, die seit
+    # Wochen nichts liefert, faellt in einer Liste von 1000 niemandem auf.
+    register = QuellenRegister(
+        state_dir / "quellen_register.json",
+        quarantaene_nach=int(cfg.settings.get("quarantaene_nach_laeufen", 6) or 0),
+        probe_alle=int(cfg.settings.get("quarantaene_probe_alle", 10) or 10))
     tc = time.monotonic()
-    items, source_results = collect_all(cfg)
+    items, source_results = collect_all(cfg, ueberspringen=register.stillgelegt())
     tag_news_regions(items, cfg.operators)
     failed = [r["url"] for r in source_results if r["status"] == "fail"]
     n_ok = sum(1 for r in source_results if r["status"] == "ok")
     n_empty = sum(1 for r in source_results if r["status"] == "empty")
     n_fail = len(failed)
+    n_quarantaene = sum(1 for r in source_results
+                        if r["status"] == "quarantaene")
+    ereignisse = register.aktualisieren(source_results, today_iso,
+                                        cfg.quellen_metadaten())
+    register.speichern()
     phase("Sammeln", time.monotonic() - tc,
           f"{len(source_results)} Quellen abgefragt, {len(items)} Meldungen gefunden")
-    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen)",
-             len(items), n_ok, n_empty, n_fail)
+    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen / "
+             "%d stillgelegt)", len(items), n_ok, n_empty, n_fail,
+             n_quarantaene)
+    if ereignisse["stillgelegt"] or ereignisse["befreit"]:
+        log.warning("Quellenregister: %d neu stillgelegt, %d wieder aktiv",
+                    len(ereignisse["stillgelegt"]), len(ereignisse["befreit"]))
 
     # -------------------------------------------------------------- dedupe
     td = time.monotonic()
@@ -453,7 +472,7 @@ def run(root: Path, use_llm: bool | None = None,
                 flat_new.append(hh)
         diff_store = DiffStore(state_dir / "differentiation.jsonl")
         added = diff_curator.curate(
-            flat_new, diff_store, date.today().isoformat(),
+            flat_new, diff_store, today_iso,
             model=editor_model, use_llm=bool(use_llm and new_items))
         log.info("Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
                  len(added), len(diff_store))
@@ -496,7 +515,6 @@ def run(root: Path, use_llm: bool | None = None,
     # deshalb ein eigener Editorial-Schritt und nicht nur eine Umformatierung
     # der darunterstehenden Move-Liste. Ohne LLM bleibt die Seite mit einem
     # quellengebundenen Regelbericht nutzbar.
-    today = date.today()
     diff_report_dir = reports_dir / "differenzierung"
     diff_report_dir.mkdir(parents=True, exist_ok=True)
     diff_db = category_sweep.DiffDB(state_dir / "differentiation_db.json")
@@ -515,7 +533,7 @@ def run(root: Path, use_llm: bool | None = None,
                     "verwende Regelbericht", str(exc)[:160])
         diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
         diff_mode = "Regelbericht (Fallback)"
-    diff_report_path = diff_report_dir / f"{today.isoformat()}.md"
+    diff_report_path = diff_report_dir / f"{today_iso}.md"
     diff_report_path.write_text(diff_body, encoding="utf-8")
     log.info("Differenzierungsbericht: %s (%d Moves)", diff_mode, len(diff_entries))
 
@@ -530,6 +548,7 @@ def run(root: Path, use_llm: bool | None = None,
         "sources_failed": n_fail,
         "collected": len(items),
         "new": len(new_items),
+        "sources_quarantaene": n_quarantaene,
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
@@ -558,7 +577,21 @@ def run(root: Path, use_llm: bool | None = None,
         "source_summary": {
             "total": len(source_results),
             "ok": n_ok, "empty": n_empty, "failed": n_fail,
+            "quarantaene": n_quarantaene,
             "by_kind": dict(kind_counts),
+        },
+        # Quellenregister: was in DIESEM Lauf stillgelegt oder wieder
+        # aktiviert wurde, plus der aktuelle Stand. Ohne diese Zeilen im
+        # Protokoll verschwaende eine Quelle stumm - der Fehler, den die
+        # Quarantaene gerade verhindern soll.
+        "quellenregister": {
+            "lauf_nummer": register.lauf_nummer,
+            "neu": len(ereignisse["neu"]),
+            "neu_stillgelegt": [register.eintrag(u).get("name") or u
+                                for u in ereignisse["stillgelegt"]],
+            "wieder_aktiv": [register.eintrag(u).get("name") or u
+                             for u in ereignisse["befreit"]],
+            **register.uebersicht(),
         },
         "sources": sorted(
             source_results,
@@ -568,11 +601,11 @@ def run(root: Path, use_llm: bool | None = None,
     }
 
     report_md = editor.report_header(today, stats) + body
-    report_path = reports_dir / f"{today.isoformat()}.md"
+    report_path = reports_dir / f"{today_iso}.md"
     report_path.write_text(report_md, encoding="utf-8")
 
     report_json = {
-        "date": today.isoformat(),
+        "date": today_iso,
         "generated_with_llm": bool(use_llm and new_items),
         "stats": stats,
         "briefing_md": body,
@@ -580,7 +613,7 @@ def run(root: Path, use_llm: bool | None = None,
         "competitors": competitor_profiles,
         "run": run_log,
     }
-    json_path = reports_dir / f"{today.isoformat()}.json"
+    json_path = reports_dir / f"{today_iso}.json"
     json_path.write_text(
         json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
     log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
@@ -608,7 +641,7 @@ def run(root: Path, use_llm: bool | None = None,
     # Digest als "schon berichtet" abzulegen wuerde die Redaktion daran
     # hindern, sie spaeter richtig zu behandeln.
     if covered and editor_used:
-        topics_store.add(covered, today.isoformat())
+        topics_store.add(covered, today_iso)
     elif covered:
         log.warning("%d Themen stammen aus dem Notfall-Digest, nicht aus der "
                     "Redaktion - sie werden NICHT als berichtet gemerkt",

@@ -67,6 +67,13 @@ class Source:
     # ("ki", "geraete", "chips", ...). Operators carry a region instead; a
     # theme source has no region, which is exactly why it lives in its own
     # file and not in the watchlist (see config/tech_sources.yaml).
+    # Herkunft und Abnahmedatum. Bei 130 Quellen reichte ein deutscher
+    # Kommentar je Eintrag; bei 1000 weiss sonst in sechs Monaten niemand
+    # mehr, woher eine Quelle kam und wann sie geprueft wurde. Beides wandert
+    # ins Quellenregister (data/state/quellen_register.json), das zusaetzlich
+    # festhaelt, wann die Quelle zuletzt wirklich geliefert hat.
+    herkunft: str = ""     # z. B. "Musteruebertragung q4web", "Welle 2"
+    abgenommen: str = ""   # JJJJ-MM-TT, Datum des bestandenen Abnahme-Checks
     allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
     # the 25-char title-length floor down to 6, for sources whose real
     # content is legitimately terse (e.g. RNS/regulatory-announcement
@@ -135,6 +142,32 @@ class Config:
         """(Schluessel, Anzeigename) je Themenfeld, in Konfigurationsreihenfolge."""
         return list(self.theme_names.items())
 
+    @property
+    def alle_quellen(self) -> list[tuple[Source, str, str]]:
+        """Jede konfigurierte Quelle als (Quelle, Bereich, Herkunftsebene)."""
+        out: list[tuple[Source, str, str]] = []
+        for op in self.operators:
+            for src in op.sources:
+                out.append((src, op.region_key, "operator"))
+        for src in self.news_sources:
+            out.append((src, "global", "industry_news"))
+        for src in self.tech_sources:
+            out.append((src, src.theme, "tech_watch"))
+        return out
+
+    def quellen_metadaten(self) -> dict[str, dict]:
+        """URL -> gepflegte Angaben aus der YAML (Herkunft, Abnahmedatum).
+
+        Das Register mischt sie mit den gemessenen Werten; gepflegte Angaben
+        gewinnen dort immer, denn sie sind Aussagen, keine Messwerte.
+        """
+        return {
+            src.url: {"herkunft": src.herkunft, "abgenommen": src.abgenommen,
+                      "name": src.name, "origin": origin, "region": bereich,
+                      "kind": src.kind}
+            for src, bereich, origin in self.alle_quellen
+        }
+
 
 def _load_yaml(path: Path) -> dict:
     with open(path, "r", encoding="utf-8") as fh:
@@ -181,6 +214,8 @@ def load_config(root: Path) -> Config:
                     headers=s.get("headers"),
                     exclude_url_pattern=s.get("exclude_url_pattern"),
                     timeout_seconds=s.get("timeout_seconds"),
+                    herkunft=s.get("herkunft", ""),
+                    abgenommen=str(s.get("abgenommen", "") or ""),
                     allow_short_titles=s.get("allow_short_titles", False),
                 ))
             operators.append(Operator(
@@ -196,7 +231,11 @@ def load_config(root: Path) -> Config:
     news_sources = [
         Source(type=s.get("type", "rss"), url=s["url"],
                name=s.get("name", s["url"]), kind="trade_press",
-               label=s.get("name", ""))
+               label=s.get("name", ""),
+               herkunft=s.get("herkunft", ""),
+               abgenommen=str(s.get("abgenommen", "") or ""),
+               timeout_seconds=s.get("timeout_seconds"),
+               headers=s.get("headers"))
         for s in (news.get("news_sources") or [])
     ]
 
@@ -256,6 +295,8 @@ def _load_tech_sources(path: Path) -> tuple[list[Source], dict[str, str]]:
                 exclude_url_pattern=s.get("exclude_url_pattern"),
                 timeout_seconds=s.get("timeout_seconds"),
                 theme=key,
+                herkunft=s.get("herkunft", ""),
+                abgenommen=str(s.get("abgenommen", "") or ""),
                 allow_short_titles=s.get("allow_short_titles", False),
             ))
     return sources, names
