@@ -75,7 +75,11 @@ def _env() -> Environment:
     return env
 
 
-_MD_TAGS = {"a", "blockquote", "br", "code", "em", "h2", "h3", "h4",
+# h5 gehoert dazu, seit die Montage eigenmaechtige Ueberschriften eines
+# Bereichsabschnitts unter ihre Klammer drueckt: eine H3 im Abschnitt eines
+# Themenfelds wird dabei zu H4, eine H4 zu H5. Ohne h5 hier verlaere so eine
+# Zeile ihre Form (der Text bliebe, die Ueberschrift nicht).
+_MD_TAGS = {"a", "blockquote", "br", "code", "em", "h2", "h3", "h4", "h5",
             "li", "ol", "p", "pre", "strong", "ul"}
 _MD_DANGEROUS_TAGS = {"base", "embed", "form", "iframe", "math", "object",
                       "script", "style", "svg"}
