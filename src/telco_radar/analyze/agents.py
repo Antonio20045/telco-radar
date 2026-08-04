@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from ..models import Item
 from .llm import complete, extract_json
@@ -147,7 +148,7 @@ def _items_payload(items: list[Item]) -> str:
 
 def analyze_region(region_name: str, items: list[Item], model: str,
                    language: str = "Deutsch", max_items: int | None = None,
-                   is_theme: bool = False) -> dict:
+                   is_theme: bool = False, batch_workers: int = 1) -> dict:
     """Run one regional analyst (in batches). Returns the merged assessment.
 
     Items are processed in batches of BATCH_SIZE so the JSON response never
@@ -160,16 +161,21 @@ def analyze_region(region_name: str, items: list[Item], model: str,
 
     is_theme=True schaltet auf TECH_ANALYST_SYSTEM um - fuer die Themenfelder
     aus config/tech_sources.yaml, deren Absender keine Wettbewerber sind.
+
+    batch_workers > 1 laesst die Stapel EINER Region ueberlappen. Das ist der
+    Hebel gegen die Laufzeit, seit der Quellen-Ausbau die Zahl der Meldungen
+    vervielfacht: die Stapel sind voneinander unabhaengig, jeder ist reine
+    Wartezeit auf den Anbieter, und der Lauf vom 31.07.2026 brauchte mit 220
+    neuen Meldungen bereits 49 von 50 zulaessigen Minuten. Eine Kappung waere
+    die falsche Antwort - der Seen-Store merkt sich jede neue Meldung als
+    erledigt, egal ob ein Analyst sie gelesen hat.
     """
     vorlage = TECH_ANALYST_SYSTEM if is_theme else ANALYST_SYSTEM
     system = vorlage.format(region=region_name, language=language)
     capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
-    highlights: list[dict] = []
-    summaries: list[str] = []
-    batches_ok = 0
-    for n, batch in enumerate(batches, 1):
+    def _ein_stapel(n: int, batch: list[Item]) -> dict | None:
         user = (
             f"NEW items for region {region_name} "
             f"(batch {n}/{len(batches)}, {len(batch)} items):\n"
@@ -177,18 +183,35 @@ def analyze_region(region_name: str, items: list[Item], model: str,
         )
         try:
             raw = complete(system, user, model=model, max_tokens=8000)
-            result = extract_json(raw)
+            return extract_json(raw)
         except (ValueError, RuntimeError, KeyError) as exc:
             log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
                       region_name, n, len(batches), exc)
+            return None
+
+    if batch_workers > 1 and len(batches) > 1:
+        with ThreadPoolExecutor(max_workers=batch_workers) as pool:
+            # Reihenfolge erhalten: der Bericht sortiert zwar nach Relevanz,
+            # aber ein Lauf soll bei gleicher Eingabe dieselbe Ausgabe liefern.
+            ergebnisse = list(pool.map(
+                lambda p: _ein_stapel(p[0], p[1]),
+                [(n, b) for n, b in enumerate(batches, 1)]))
+    else:
+        ergebnisse = [_ein_stapel(n, b) for n, b in enumerate(batches, 1)]
+
+    highlights: list[dict] = []
+    summaries: list[str] = []
+    batches_ok = 0
+    for result in ergebnisse:
+        if result is None:
             continue
         batches_ok += 1
         highlights.extend(result.get("highlights") or [])
         if result.get("region_summary"):
             summaries.append(str(result["region_summary"]))
 
-    log.info("Analyst %-25s: %d items in %d batch(es) -> %d highlights",
-             region_name, len(capped), len(batches), len(highlights))
+    log.info("Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d highlights",
+             region_name, len(capped), len(batches), batch_workers, len(highlights))
     return {
         "region_summary": " ".join(summaries),
         "highlights": highlights,

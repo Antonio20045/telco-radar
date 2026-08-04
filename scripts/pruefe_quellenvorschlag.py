@@ -166,6 +166,14 @@ class Kandidat:
     allow_short_titles: bool = False
     ausnahme_frische: str = ""
     ausnahme_domain: str = ""
+    # Rein beschreibende Felder. Sie beeinflussen die Pruefung nicht, werden
+    # aber mit ins Ergebnis geschrieben, damit aus der bestandenen Liste ohne
+    # zweiten Durchgang ein Watchlist-Eintrag werden kann.
+    kanal: str = ""            # IR | Technik-Blog | Landesgesellschaft | Produkt
+    neuer_betreiber: bool = False
+    country: str = ""
+    region: str = ""
+    aliases: list[str] = field(default_factory=list)
 
     @property
     def bezeichnung(self) -> str:
@@ -217,6 +225,20 @@ class Befund:
             "type": self.kandidat.type,
             "operator": self.kandidat.operator,
             "thema": self.kandidat.thema,
+            "kanal": self.kandidat.kanal,
+            "neuer_betreiber": self.kandidat.neuer_betreiber,
+            "country": self.kandidat.country,
+            "region": self.kandidat.region,
+            "website": self.kandidat.website,
+            "aliases": self.kandidat.aliases,
+            "item_selector": self.kandidat.item_selector,
+            "link_template": self.kandidat.link_template,
+            "headers": self.kandidat.headers,
+            "exclude_url_pattern": self.kandidat.exclude_url_pattern,
+            "timeout_seconds": self.kandidat.timeout_seconds,
+            "allow_short_titles": self.kandidat.allow_short_titles,
+            "ausnahme_frische": self.kandidat.ausnahme_frische,
+            "ausnahme_domain": self.kandidat.ausnahme_domain,
             "begruendung": self.kandidat.begruendung,
             "bestanden": self.bestanden,
             "n_items": self.n_items,

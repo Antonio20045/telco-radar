@@ -144,7 +144,19 @@ collect_max_workers: 8
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the
 # editor synthesis still runs once, after the analysts. Same models, same output.
-llm_max_workers: 2
+llm_max_workers: 3
+
+# Wie viele Stapel EINER Region gleichzeitig laufen (analyze/agents.py).
+# Bis zum Quellen-Ausbau lief jede Region ihre Stapel strikt nacheinander ab.
+# Das war die eigentliche Laufzeitbremse: der Lauf vom 31.07.2026 brauchte mit
+# 220 neuen Meldungen 49 von 50 zulaessigen Minuten, und mit doppelt so vielen
+# Quellen waere er ins Job-Timeout gelaufen. Die Stapel sind unabhaengig
+# voneinander und reine Wartezeit auf den Anbieter - also parallelisierbar.
+# Obergrenze der gleichzeitigen LLM-Aufrufe ist llm_max_workers x
+# analyst_batch_workers, hier also 12. Wer hoeher geht, sollte vorher pruefen,
+# ob der Anbieter das ohne 429 mitmacht; llm.py faengt sie zwar mit Backoff ab,
+# aber gewonnen ist damit nichts.
+analyst_batch_workers: 4
 
 # A temporary LLM outage must not leave the public site stale. The pipeline
 # publishes a clearly labelled, source-linked fallback digest instead.

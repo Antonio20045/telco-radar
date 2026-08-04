@@ -250,6 +250,10 @@ def run(root: Path, use_llm: bool | None = None,
         # ~6 calls, well under any rate cap, but overlapping their latency
         # turns a ~9x sequential wait into ~1-2x. Same models, same output.
         llm_workers = int(cfg.settings.get("llm_max_workers", 4))
+        # Zweite Ebene der Parallelitaet: die Stapel INNERHALB einer Region.
+        # Ohne sie haengt die Laufzeit an der groessten Region - und die ist
+        # seit dem Quellen-Ausbau deutlich groesser geworden.
+        batch_workers = int(cfg.settings.get("analyst_batch_workers", 1) or 1)
 
         def _analyze_one(region_key, region_items):
             region_name = cfg.bereich_names.get(region_key, region_key)
@@ -257,7 +261,8 @@ def run(root: Path, use_llm: bool | None = None,
                 res = analyze_region(
                     region_name, region_items, model=analyst_model,
                     language=language, max_items=max_items,
-                    is_theme=is_theme_key(region_key))
+                    is_theme=is_theme_key(region_key),
+                    batch_workers=batch_workers)
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
                 if tel.get("batches") and not tel.get("batches_ok"):
@@ -394,8 +399,16 @@ def run(root: Path, use_llm: bool | None = None,
     # auch spaeter noch als Inspiration sichtbar bleiben. Failsafe: Fehler
     # brechen den Lauf nicht ab.
     try:
+        # Die Themenfelder bleiben hier bewusst aussen vor: die
+        # Differenzierungs-Bibliothek sammelt Moves, mit denen sich ein
+        # BETREIBER von anderen Betreibern abhebt. Eine Chip- oder
+        # Regulierungsmeldung ist kein solcher Move - sie wuerde den Speicher
+        # fuellen, ohne je als Vorbild taugen zu koennen.
+        themen_namen = set(cfg.theme_names.values())
         flat_new = []
         for region_name, r in regional.items():
+            if region_name in themen_namen:
+                continue
             for h in r.get("highlights", []):
                 hh = dict(h)
                 hh["region"] = region_name
