@@ -6162,8 +6162,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 3,
@@ -6186,7 +6186,8 @@
    "score": 60,
    "score_reason": "Ein 5G-Tarif wird um rund die Hälfte reduziert, was einen deutlichen Preisvorteil für Wechselwillige darstellt.",
    "scored_at": "2026-08-04",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-08-04"
   },
   {
    "id": "ec57c7b2ed9a1abc",
@@ -6199,8 +6200,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 0,
     "depth": 2,
@@ -6223,7 +6224,8 @@
    "score": 42,
    "score_reason": "Bestandskunden erhalten spürbar mehr Datenvolumen, was aber keinen Anreiz für einen Anbieterwechsel bietet.",
    "scored_at": "2026-08-04",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-08-04"
   },
   {
    "id": "55ff8074ae2e20b8",
@@ -6236,8 +6238,8 @@
    "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-08-04",
    "last_verified": "2026-08-04",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 1,
     "depth": 3,
@@ -6260,7 +6262,8 @@
    "score": 45,
    "score_reason": "Die Verdopplung der Surfgeschwindigkeit bietet einen sehr grossen, klar spürbaren Leistungsvorteil im Tarif.",
    "scored_at": "2026-08-04",
-   "highlight": false
+   "highlight": false,
+   "stale_since": "2026-08-04"
   },
   {
    "id": "5c4988000ab8115b",
