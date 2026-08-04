@@ -153,73 +153,60 @@ Analysten-Aufrufe. Bei den heute 12 gleichzeitigen LLM-Aufrufen sind das ~92
 Runden; bei 20 s je Aufruf rund 30 Minuten allein für die Analyse. Dafür ist
 das Job-Timeout auf 120 Minuten erhöht (GitHub erlaubt 360).
 
-### Der Erstlauf nach der Welle hat den Anbieter überfordert — und das ist die Rate-Limit-Messung
+### Der Erstlauf nach der Welle ist halb gescheitert — und die naheliegende Erklärung war falsch
 
-Lauf #69, der erste mit 223 Quellen, ist **teilweise gescheitert**, und das
-gehört als Erstes in diesen Bericht:
+Lauf #69, der erste mit 223 Quellen, hat 42 von 72 Analysten-Stapeln verloren
+und auch die Chefredaktion; veröffentlicht wurde der Fallback-Digest. Die
+Folgeläufe #70 und #71 arbeiteten den Rückstand ab (984 → 613 → 422 neue
+Meldungen) und lieferten wieder richtige Wochenberichte, verloren aber
+weiterhin rund zwei Drittel der Stapel.
 
-| | Lauf #69 |
-|---|---:|
-| neue Meldungen | 984 |
-| Analysten-Stapel | 72 |
-| davon erfolgreich | **30** |
-| ungelesene Meldungen | **607** |
-| Redaktion | **fehlgeschlagen → Fallback-Digest veröffentlicht** |
-| Gesamtlaufzeit | 1 905 s (31,8 min von 120 erlaubten) |
+Die naheliegende Erklärung war ein Rate-Limit des Anbieters unter dem Burst.
+**Sie war falsch, und das ließ sich erst belegen, nachdem das Laufprotokoll
+bei jedem Lauf als Artefakt hochgeladen wird** — bis dahin gab es kein Log,
+weil die Läufe formal als erfolgreich galten.
 
-42 von 72 Analysten-Aufrufen wurden vom Anbieter abgewiesen, nachdem `llm.py`
-seine fünf Wiederholungen mit bis zu 45 s Backoff aufgebraucht hatte; die
-Chefredaktion ebenfalls. Kein Modell wurde als dauerhaft nicht verfügbar
-markiert — es war Überlast unter dem Burst, nicht ein toter Endpunkt.
+Im Protokoll von Lauf #71 steht:
 
-**Das ist die Rate-Limit-Messung, die der Auftrag verlangt** — nicht als
-Laborwert, sondern unter genau der Last, um die es geht. Sie sagt: bei rund 12
-gleichzeitigen Aufrufen und einem Burst von 72 Stapeln bricht DeepSeek weg.
-Für 1000 Quellen mit hochgerechnet ~1 100 Stapeln im Erstlauf heißt das:
-**mehr Parallelität ist der falsche Hebel; nötig ist eine Drosselung der
-Stapelrate, wie sie die Sammelphase je Host schon hat.**
+- **43 leere Antworten.** Jeder gescheiterte Stapel meldet
+  `Expecting value: line 1 column 1 (char 0)` — das ist `json.loads("")`.
+  Der Anbieter hat geantwortet und nichts geschickt.
+- **Kein einziger 429, kein einziger 503.** Die sechs HTTP-Fehler im ganzen
+  Lauf waren 400er aus einer anderen Ecke (siehe unten).
 
-**Wichtiger als der Fehler ist, was NICHT passiert ist.** Der Seen-Store wuchs
-um genau 377 Einträge — 984 neue minus 607 ungelesene. Die 607 Meldungen, die
-kein Analyst gesehen hat, wurden zurückgehalten und im nächsten Lauf erneut
-vorgelegt. Die Kerngarantie hat unter echter Last gehalten, und der
-Stapelschutz aus Session 4 hat sich zum ersten Mal in einer Größenordnung
-bewährt, für die er gebaut wurde. Die Website blieb ebenfalls nutzbar: statt
-eines halben Berichts steht dort der ausdrücklich als solcher gekennzeichnete
-Fallback-Digest mit allen Quellenlinks.
+Die Ursache ist dieselbe, die den Editor 2026 auf 32 000 Token gebracht hat:
+`deepseek-v4-flash` ist ein Reasoning-Modell, und sein Nachdenken zählt gegen
+`max_tokens`. Reicht das Budget nur für das Nachdenken, kommt eine völlig
+leere Antwort zurück — ohne Fehler, ohne `finish_reason=length`, ohne
+Hinweis. Mit der Fachpresse sind die Anrisse länger geworden, damit die
+Eingabe größer und das Nachdenken teurer. **8 000 Token reichten nicht mehr.**
 
-### Lauf #70: der Radar heilt sich selbst — aber nur halb
+Analyst und Bereichsredaktion stehen deshalb jetzt bei 24 000 Token.
+Abgerechnet werden erzeugte Token, nicht das Budget — ein Stapel erzeugt real
+rund 1 500, die Änderung kostet also nichts.
 
-Der unmittelbar folgende Lauf hat genau die 607 zurückgehaltenen Meldungen
-erneut vorgelegt:
+Dasselbe Protokoll hat einen zweiten, älteren Fehler aufgedeckt: die
+**Wettbewerber-Analyse bekam unter `llm_provider=deepseek` die
+NVIDIA-Schreibweise des Modellnamens** (`deepseek-ai/deepseek-v4-flash`) und
+lief damit in jedem Lauf in einen HTTP 400. Daher stand dort seit dem
+Anbieterwechsel immer „3 Profile (0 Moves)" — ein Ausfall, den niemand als
+solchen erkannt hatte, weil er wie eine ruhige Woche aussah.
 
-| | Lauf #69 | Lauf #70 |
-|---|---:|---:|
-| neue Meldungen | 984 | 613 (607 davon zurückgehalten) |
-| Analysten-Stapel | 72 | 44 |
-| davon erfolgreich | 30 | 16 |
-| Redaktion | fehlgeschlagen | **erfolgreich** |
-| Seen-Store wächst um | 377 | 196 |
+**Was in allen drei Läufen gehalten hat**, ist der Schutz ungelesener
+Meldungen. Der Seen-Store wuchs um exakt die Differenz aus neuen und
+ungelesenen Meldungen (984 − 607 = 377, dann 613 − 417 = 196, dann
+422 − 252 = 170). Kein einziger ungelesener Beitrag ging verloren; jeder kam
+im nächsten Lauf erneut. Das ist die Kerngarantie unter echter Last, und sie
+hat gehalten, während drei andere Dinge gleichzeitig schiefgingen.
 
-Der Wochenbericht ist damit wieder ein richtiger Bericht (vollständige
-Gliederung, Bereichsabschnitte, ein einziger Abschnitt aus dem Notfallweg).
-Die Ausfallquote der Analysten blieb aber bei rund zwei Dritteln — das ist
-kein einmaliger Aussetzer, sondern die Kapazitätsgrenze bei diesem Volumen.
+Zwei Lehren, die über diesen Fall hinausgehen:
 
-Die Ursache liegt in einer Politik, die für einen anderen Fall richtig ist:
-`llm.py` unterscheidet „billige" Fehlschläge (HTTP 503 nach 0,3 s, beliebig
-oft wiederholbar) von „langsamen" (der Anbieter nimmt die Verbindung an und
-liefert nichts) und gibt nach **zwei langsamen** auf — damit ein toter
-Endpunkt nicht den ganzen Lauf frisst. Unter Dauerlast sind aber fast alle
-Fehlschläge langsam, und die Politik greift genau falsch.
-
-Deshalb bekommen gescheiterte Stapel jetzt einen **Nachlauf**: eine halbe
-Minute Pause, dann noch einmal mit einem Viertel der Gleichzeitigkeit. Das
-trifft den Anbieter, wenn die Welle durch ist — der Fall, den die
-Wiederholung *innerhalb* des Aufrufs prinzipiell nicht abdecken kann. Und das
-Laufprotokoll wird ab sofort bei **jedem** Lauf als Artefakt hochgeladen, nicht
-nur bei Fehlschlägen: die Läufe #69 und #70 galten formal als erfolgreich, und
-genau deshalb gab es kein Log, mit dem sich die Fehlerart hätte belegen lassen.
+1. **Ein formal erfolgreicher Lauf kann zur Hälfte ausgefallen sein.** Ohne
+   das Laufprotokoll wäre die falsche Diagnose stehengeblieben — samt der
+   falschen Gegenmaßnahme (Parallelität drosseln), die nichts geholfen hätte.
+2. **Ein leeres Modellergebnis ist kein Fehler, den man an HTTP-Codes
+   erkennt.** Wer Reasoning-Modelle einsetzt, muss das Token-Budget als
+   Betriebsgröße behandeln, nicht als Obergrenze, die man einmal setzt.
 
 Der Lauf hat noch einen zweiten, strukturellen Befund geliefert, den man
 vorher nicht sehen konnte: **793 der 984 neuen Meldungen lagen im Bereich
@@ -229,13 +216,11 @@ Bereich hatte damit 53 Stapel, die zwölf anderen zusammen 19; die alte Planung
 (ein Pool je Bereich, drei Bereiche gleichzeitig) ließ acht von zwölf Workern
 stillstehen. Alle Stapel laufen deshalb jetzt in **einem** Pool.
 
-**Nicht gemessen: das nominelle Rate-Limit von DeepSeek.** Der Schlüssel liegt als
-GitHub-Secret vor und ist aus der Sandbox nicht erreichbar; eine Messung wäre
-nur über einen eigenen Actions-Lauf möglich. Was oben steht, ist die
-Beobachtung unter Last, nicht die dokumentierte Grenze: Lauf #68 lief mit 12
-gleichzeitigen Aufrufen und 9 Stapeln sauber durch, Lauf #69 mit denselben 12
-und 72 Stapeln fiel zu 58 % aus. Die Grenze liegt also irgendwo dazwischen und
-hängt an der Stapelrate, nicht an der Gleichzeitigkeit allein.
+**Das Rate-Limit von DeepSeek ist weiterhin nicht gemessen — es war in vier
+Läufen mit bis zu 72 Stapeln bei 12 gleichzeitigen Aufrufen schlicht nie das
+Problem.** Über alle Läufe hinweg gab es keinen einzigen 429 und keinen 503.
+Wer die Parallelität weiter hochdreht, sollte trotzdem messen; belegt ist nur,
+dass die heutige Einstellung nicht daran scheitert.
 
 ---
 

@@ -339,19 +339,28 @@ statt 1000.** Die vollständige Auswertung mit allen Zahlen steht in
   1 212 s — aber KT allein 299,8 s, und damit war die Phase 303 s lang. Der
   nächste Hebel ist deshalb ein Gesamtbudget je Quelle, nicht mehr
   Parallelität.
-- **Der Anbieter ist die Grenze, nicht die Laufzeit.** Lauf #69 — der erste
-  mit 223 Quellen und 984 neuen Meldungen — hat **42 von 72 Analysten-Stapeln
-  verloren** und auch die Chefredaktion; veröffentlicht wurde der
-  Fallback-Digest. Kein Modell war tot, es war Überlast unter dem Burst.
-  Lauf #68 lief mit denselben 12 gleichzeitigen Aufrufen, aber nur 9 Stapeln,
-  sauber durch. **Die Grenze hängt an der Stapelrate, nicht an der
-  Gleichzeitigkeit allein — mehr Parallelität ist hier der falsche Hebel.**
-  Was fehlt, ist eine Drosselung der Stapelrate, wie sie die Sammelphase je
-  Host schon hat.
-- **Der Stapelschutz hat unter dieser Last gehalten**: der Seen-Store wuchs um
-  genau 377 Einträge (984 neue minus 607 ungelesene), die 607 kamen im
-  nächsten Lauf erneut. Wer an `agents.py` oder `pipeline.py` arbeitet, darf
-  diesen Pfad nicht antasten, ohne ihn zu prüfen.
+- **Ein leeres Modellergebnis sieht aus wie ein Rate-Limit und ist keins.**
+  Läufe #69–#71 verloren zwei Drittel der Analysten-Stapel. Das Protokoll
+  zeigt: **43 leere Antworten** (`json.loads("")`), **kein einziger 429 oder
+  503**. `deepseek-v4-flash` ist ein Reasoning-Modell, sein Nachdenken zählt
+  gegen `max_tokens`, und reicht das Budget nur dafür, kommt nichts zurück —
+  ohne Fehler, ohne `finish_reason`. Mit der Fachpresse wurden die Anrisse
+  länger, die Eingabe größer, das Nachdenken teurer; 8 000 Token reichten
+  nicht mehr. Analyst und Bereichsredaktion stehen jetzt bei 24 000.
+  **Abgerechnet werden erzeugte Token, nicht das Budget** — großzügig sein
+  kostet hier nichts.
+- **Ein formal erfolgreicher Lauf kann zur Hälfte ausgefallen sein.** Deshalb
+  lädt der Workflow das Laufprotokoll jetzt bei JEDEM Lauf als Artefakt hoch.
+  Ohne das wäre die falsche Diagnose (Rate-Limit) stehengeblieben, samt der
+  wirkungslosen Gegenmaßnahme.
+- **Der Schutz ungelesener Meldungen hat unter dieser Last dreimal gehalten**:
+  der Seen-Store wuchs jeweils um exakt die Differenz aus neuen und
+  ungelesenen Meldungen (984−607, 613−417, 422−252). Wer an `agents.py` oder
+  `pipeline.py` arbeitet, darf diesen Pfad nicht antasten, ohne ihn zu prüfen.
+- **Modellnamen sind anbieterspezifisch.** Die Wettbewerber-Analyse bekam
+  unter `llm_provider=deepseek` die NVIDIA-Schreibweise
+  (`deepseek-ai/deepseek-v4-flash`) und lief in JEDEM Lauf in einen HTTP 400 —
+  sichtbar nur als „3 Profile (0 Moves)", also wie eine ruhige Woche.
 - **Ein Bereich kann alle anderen erdrücken.** In Lauf #69 lagen 793 von 984
   neuen Meldungen im Bereich „Global" — jede Fachpressemeldung ohne Betreiber
   im Titel. Mit 70 Fachpressequellen ist das der Normalfall. Deshalb laufen
