@@ -35,10 +35,17 @@ def _collect_source(source: Source, region: str, operator: str | None,
         # separate story and the same news enters the report twice.
         drop = re.compile(source.exclude_url_pattern)
         items = [i for i in items if not drop.search(i.url)]
-    # Herkunft zentral stempeln statt in jedem Collector: die Trefferquote je
-    # Quelle braucht den KANAL, und source_name traegt bei Betreibern nur den
-    # Firmennamen. Hier steht der einzige Punkt, an dem jede gesammelte
-    # Meldung garantiert vorbeikommt.
+    return items
+
+
+def _stemple_herkunft(items: list[Item], source: Source) -> list[Item]:
+    """Jeder Meldung ihren KANAL mitgeben.
+
+    Nicht in den Collectors, sondern an den beiden Stellen, an denen
+    Meldungen das Modul verlassen: die Trefferquote je Quelle braucht den
+    Kanal, und source_name traegt bei Betreibern nur den Firmennamen - zwei
+    Kanaele desselben Betreibers waeren sonst ununterscheidbar.
+    """
     for item in items:
         item.source_url = source.url
     return items
@@ -53,7 +60,9 @@ def collect_source(source: Source, region: str, operator: str | None = None,
     report numbers the pipeline never sees (e.g. Verizon's Spanish mirrors,
     which exclude_url_pattern drops).
     """
-    return _collect_source(source, region, operator, origin, http_cfg or {})
+    return _stemple_herkunft(
+        _collect_source(source, region, operator, origin, http_cfg or {}),
+        source)
 
 
 def _host(url: str) -> str:
@@ -183,7 +192,9 @@ def collect_all(cfg: Config, max_workers: int | None = None,
             rec = _protokoll(src, region, operator, origin)
             t0 = time.monotonic()
             try:
-                got = _collect_source(src, region, operator, origin, http_cfg)
+                got = _stemple_herkunft(
+                    _collect_source(src, region, operator, origin, http_cfg),
+                    src)
                 rec["status"] = "ok" if got else "empty"
                 rec["count"] = len(got)
                 log.info("%-5s %-22s %-45s -> %d items",

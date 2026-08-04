@@ -140,3 +140,18 @@ def test_alias_tagging_fasst_themenmeldungen_nicht_an(tmp_path):
 
     assert (thema.region, thema.operator) == ("thema:ki", None)
     assert (presse.region, presse.operator) == ("europe", "Example Telco")
+
+
+def test_quellen_metadaten_liefern_herkunft_und_abnahmedatum(tmp_path):
+    """Das Quellenregister mischt gepflegte Angaben aus der YAML mit
+    gemessenen Werten - dafuer muss die Konfiguration sie herausgeben."""
+    cfg = load_config(_projekt(tmp_path))
+    meta = cfg.quellen_metadaten()
+
+    assert "https://openai.example/news.xml" in meta
+    assert meta["https://openai.example/news.xml"]["origin"] == "tech_watch"
+    assert meta["https://example.com/feed"]["origin"] == "operator"
+    assert meta["https://presse.example/feed"]["origin"] == "industry_news"
+    # Ohne gepflegte Angaben stehen die Felder leer da, statt zu fehlen.
+    assert meta["https://example.com/feed"]["herkunft"] == ""
+    assert meta["https://example.com/feed"]["abgenommen"] == ""

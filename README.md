@@ -91,7 +91,8 @@ Die Website läuft als **Render Static Site** (Publish Directory `site`, kein Bu
 
 | Pfad | Inhalt |
 |---|---|
-| `data/state/seen.jsonl` | Alle jemals gesehenen Item-IDs (Hash der normalisierten URL). **Das Dedup-Gedächtnis.** |
+| `data/state/seen.tsv` | Alle jemals gesehenen Item-IDs (Hash der normalisierten URL) plus Tagesnummer, ~22 Byte je Zeile. **Das Dedup-Gedächtnis.** Datierte Einträge verfallen nach `seen_store_months`; undatierte nie. |
+| `data/state/quellen_register.json` | Je Quelle Herkunft, Abnahmedatum, letzter Erfolg und Quarantänestand. |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen — der Editor bekommt sie als "nicht wiederholen"-Kontext. |
 | `data/reports/YYYY-MM-DD.md` | Archiv aller Briefings (Markdown). |
 | `site/` | Generierte Website (nicht eingecheckt; wird von Actions deployt). |

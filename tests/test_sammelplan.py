@@ -195,3 +195,21 @@ def test_jede_quelle_erscheint_genau_einmal(monkeypatch, workers):
     _, results = collect_all(cfg)
 
     assert sorted(r["url"] for r in results) == sorted(urls)
+
+
+# ------------------------------------------------------------- Herkunft
+
+def test_jede_meldung_traegt_ihre_quelle(monkeypatch):
+    """Die Trefferquote je Quelle haengt daran: source_name ist bei
+    Betreibern der Firmenname, nicht der Kanal."""
+    def fake_collect(source, region, operator, origin, http_cfg):
+        return [Item(title="Eine Meldung mit ausreichender Laenge",
+                     url=source.url + "/1", source_name=source.name)]
+
+    monkeypatch.setattr("telco_radar.collect._collect_source", fake_collect)
+    cfg = _config(["https://a.example/feed", "https://b.example/feed"])
+
+    items, _ = collect_all(cfg)
+
+    assert {i.source_url for i in items} == {"https://a.example/feed",
+                                             "https://b.example/feed"}

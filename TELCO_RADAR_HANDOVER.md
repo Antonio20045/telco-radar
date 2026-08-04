@@ -49,7 +49,8 @@ Wichtige Live-Seiten:
 | src/telco_radar/pipeline.py | Ablauf von Collection bis Veröffentlichung |
 | src/telco_radar/report/ | JSON/Markdown-Ausgabe und HTML-Rendering |
 | scripts/validate_sources.py | Health-Check der konfigurierten Quellen |
-| data/state/seen.jsonl | Dedup-Gedächtnis bereits gesehener URLs |
+| data/state/seen.tsv | Dedup-Gedächtnis bereits gesehener URLs (kompakt, ~22 Byte je Zeile) |
+| data/state/quellen_register.json | Herkunft, Abnahmedatum, letzter Erfolg und Quarantäne je Quelle |
 | data/state/reported_topics.jsonl | Editor-Gedächtnis bereits berichteter Themen |
 | data/state/differentiation_db.json | Differenzierungszustand |
 | data/state/differentiation.jsonl | Differenzierungs-Items und Laufhistorie |
@@ -227,7 +228,7 @@ Nach einem erfolgreichen Radar-Lauf:
 
 1. git pull --rebase origin main ausführen.
 2. Neuen data/reports/YYYY-MM-DD.md- und JSON-Satz prüfen.
-3. seen.jsonl, reported_topics.jsonl und die Differenzierungsdateien auf
+3. seen.tsv, reported_topics.jsonl und die Differenzierungsdateien auf
    plausible Zunahmen prüfen.
 4. In site/bericht.html und site/differenzierung.html Titel, Datum,
    Original-URLs und Quellenlinks stichprobenartig prüfen.
@@ -254,7 +255,7 @@ enthalten.
 
 ## 10. Stolpersteine
 
-- seen.jsonl ist das Dedup-Gedächtnis. Nicht löschen oder mit lokalen Testdaten
+- seen.tsv ist das Dedup-Gedächtnis. Nicht löschen oder mit lokalen Testdaten
   überschreiben, sonst kann der nächste Lauf fälschlich null neue Meldungen
   melden.
 - HTTP 200 kann trotzdem nur eine JS-Hülle bedeuten.
@@ -280,7 +281,7 @@ enthalten.
    telco-radar-pipeline-log-<run_id> prüfen; nicht raten.
 3. Quellen-Health-Check erneut ausführen und dauerhafte Fehler von temporären,
    JS- und Bot-Problemen trennen.
-4. seen.jsonl und aktuelle Reports gegen Links und Zusammenfassungen in site
+4. seen.tsv und aktuelle Reports gegen Links und Zusammenfassungen in site
    prüfen.
 5. Erst danach weitere Quellen oder LLM-Parameter ändern.
 
