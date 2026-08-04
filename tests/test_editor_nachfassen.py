@@ -81,3 +81,28 @@ def test_fehlermeldung_nennt_die_tatsaechliche_ausgabe():
 def test_themenliste_passt_in_das_token_budget():
     """Nachdenken + Themenliste + Bericht teilen sich EIN Budget (Lauf #65)."""
     assert editor.EDITOR_MAX_TOKENS >= 32000
+
+
+MIT_EMPFEHLUNG = GUELTIG + "\n## Empfehlungen fuer Vodafone\nVodafone sollte X tun.\n"
+
+
+def test_korrekturversuch_passt_zum_ablehnungsgrund(monkeypatch):
+    """Einem Bericht, der an den Empfehlungen scheitert, die Ueberschriften zu
+    diktieren, laesst ihn ein zweites Mal am selben Punkt scheitern."""
+    gesehen = _antworten(monkeypatch, [MIT_EMPFEHLUNG, GUELTIG])
+    editor.synthesize(REGIONAL, [], model="m")
+    assert "Ratschlaege" in gesehen[1], "der Hinweis sprach nicht von Empfehlungen"
+    assert "## Auf einen Blick\n## Das Wichtigste" not in gesehen[1]
+
+
+def test_gliederungsfehler_bekommt_weiterhin_den_gliederungshinweis(monkeypatch):
+    gesehen = _antworten(monkeypatch, ["## Falsch\na", GUELTIG])
+    editor.synthesize(REGIONAL, [], model="m")
+    assert "Gliederung" in gesehen[1]
+
+
+def test_fundstelle_steht_in_der_fehlermeldung():
+    with pytest.raises(editor.EditorialBriefingError) as exc:
+        editor.validate_editorial_briefing(MIT_EMPFEHLUNG)
+    assert exc.value.grund == "empfehlungen"
+    assert "Vodafone sollte X tun" in str(exc.value), "die Fundstelle fehlt"

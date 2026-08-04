@@ -18,7 +18,18 @@ log = logging.getLogger(__name__)
 
 
 class EditorialBriefingError(RuntimeError):
-    """Raised when the editor output is not a publishable weekly briefing."""
+    """Raised when the editor output is not a publishable weekly briefing.
+
+    `grund` benennt maschinenlesbar, WAS nicht stimmte ("gliederung" oder
+    "empfehlungen"). Der Korrekturversuch braucht das: einem Bericht, der an
+    den Vodafone-Empfehlungen scheitert, die Ueberschriften zu diktieren,
+    laesst ihn ein zweites Mal am selben Punkt scheitern - genau das ist im
+    Test vom 04.08.2026 passiert.
+    """
+
+    def __init__(self, message: str, grund: str = "gliederung"):
+        super().__init__(message)
+        self.grund = grund
 
 EDITOR_SYSTEM = """\
 You are the chief editor of "Telco Radar", a weekly global
@@ -162,11 +173,12 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         # war ja da, nur die Gliederung stimmte nicht. Also einmal gezielt
         # nachfassen, mit den Ueberschriften woertlich im Auftrag.
         log.warning("Editor-Ausgabe abgelehnt (%s) - ein Korrekturversuch", exc)
-        return _ein_versuch(system + NACHFASSEN, user, model)
+        return _ein_versuch(system + NACHFASSEN[exc.grund], user, model)
 
 
-# Wird nur an den zweiten Versuch angehaengt.
-NACHFASSEN = """
+# Wird nur an den zweiten Versuch angehaengt, passend zum Ablehnungsgrund.
+NACHFASSEN = {
+    "gliederung": """
 
 WICHTIG - der vorherige Versuch wurde verworfen, weil die Gliederung nicht
 stimmte. Die Ueberschriften muessen WOERTLICH und als H2 ("## ") vorkommen,
@@ -179,7 +191,22 @@ in genau dieser Schreibweise, ohne Nummerierung und ohne Zusaetze:
 
 Beginne die Antwort unmittelbar mit "## Auf einen Blick" - kein Vorwort, kein
 Titel, kein Code-Block darum.
-"""
+""",
+    "empfehlungen": """
+
+WICHTIG - der vorherige Versuch wurde verworfen, weil er Vodafone Ratschlaege
+gegeben hat. Dieser Bericht ist reine Marktbeobachtung fuer ein Publikum, das
+selbst entscheidet. Verboten sind deshalb:
+  - jeder Abschnitt oder Satz, der sagt, was Vodafone tun sollte oder koennte
+  - Formulierungen wie "Empfehlungen fuer Vodafone", "Fuer Vodafone:",
+    "Vodafone sollte", "Vodafone koennte"
+  - Handlungsempfehlungen, Massnahmen, To-dos, "Implikationen fuer uns"
+
+Vodafone darf vorkommen - aber nur als beobachteter Marktteilnehmer, genau
+wie jeder andere Betreiber ("Vodafone hat X angekuendigt"). Schreibe, WAS
+passiert ist, nicht, was jemand daraus machen soll.
+""",
+}
 
 # Am echten Editor-Prompt aus Lauf #65 gemessen (155 Meldungen, 34k Token
 # Eingabe), gegen deepseek-v4-pro:
@@ -258,10 +285,18 @@ def validate_editorial_briefing(markdown: str) -> None:
             f"Gefunden: {gefunden}. Anfang: {anfang!r}"
         )
     lowered = markdown.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
-    if any(phrase in lowered for phrase in
-           ("empfehlungen fuer vodafone", "fuer vodafone:",
-            "vodafone sollte", "vodafone koennte")):
-        raise EditorialBriefingError("Editor output contains Vodafone recommendations.")
+    for phrase in ("empfehlungen fuer vodafone", "fuer vodafone:",
+                   "vodafone sollte", "vodafone koennte"):
+        pos = lowered.find(phrase)
+        if pos < 0:
+            continue
+        # Die Fundstelle mitgeben: ohne sie ist nicht zu unterscheiden, ob das
+        # Modell wirklich einen Empfehlungsteil geschrieben hat oder ob eine
+        # harmlose Formulierung die Regel ausloest.
+        stelle = " ".join(markdown[max(0, pos - 80):pos + 120].split())
+        raise EditorialBriefingError(
+            f"Editor output contains Vodafone recommendations "
+            f"({phrase!r}). Stelle: ...{stelle}...", grund="empfehlungen")
 
 
 def build_digest(items_by_region: dict[str, list[Item]],
