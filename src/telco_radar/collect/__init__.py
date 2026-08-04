@@ -48,14 +48,22 @@ def collect_source(source: Source, region: str, operator: str | None = None,
     return _collect_source(source, region, operator, origin, http_cfg or {})
 
 
-def collect_all(cfg: Config, max_workers: int = 4) -> tuple[list[Item], list[dict]]:
+def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing
     what happened with that source (status/count/error) so the pipeline can
     build a transparent run log. A failing source never aborts the run.
+
+    max_workers kommt aus settings.yaml (collect_max_workers). Mit dem
+    Quellen-Ausbau ist das der Stellhebel gegen die Laufzeit: die Sammelphase
+    ist reine Wartezeit auf fremde Server, also skaliert sie fast linear mit
+    der Parallelitaet. Eine Kappung der Meldungen waere die falsche Antwort -
+    was hier nicht gesammelt wird, sieht kein Analyst je.
     """
     http_cfg = cfg.settings.get("http", {})
+    if max_workers is None:
+        max_workers = int(cfg.settings.get("collect_max_workers", 4) or 4)
     jobs: list[tuple[Source, str, str | None, str]] = []
 
     for op in cfg.operators:
@@ -63,6 +71,12 @@ def collect_all(cfg: Config, max_workers: int = 4) -> tuple[list[Item], list[dic
             jobs.append((src, op.region_key, op.name, "operator"))
     for src in cfg.news_sources:
         jobs.append((src, "global", None, "industry_news"))
+    # Themenquellen laufen unter ihrem Themenschluessel als "Region" - so
+    # bekommt jedes Themenfeld einen eigenen Analysten, ohne dass die
+    # Regionslogik der Watchlist es fuer einen Betreiber haelt.
+    for src in cfg.tech_sources:
+        if src.crawlable:
+            jobs.append((src, src.theme, src.name, "tech_watch"))
 
     items: list[Item] = []
     results: list[dict] = []

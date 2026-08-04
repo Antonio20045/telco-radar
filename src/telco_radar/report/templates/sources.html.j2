@@ -41,6 +41,26 @@
   {% endfor %}
 </div>
 
+{% if tech_themes %}
+<div class="card" style="margin-top:20px">
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700">Technologie, Geräte &amp; Regulierung <span style="color:var(--faint2);font-weight:500">dritte Ebene · {{ n_tech_sources }} Quellen in {{ tech_themes | length }} Themenfeldern</span></h2>
+  <p style="margin:0 0 16px;font-size:13.5px;color:var(--faint2);max-width:760px">Was den Telco-Markt verändert, kommt nicht nur von anderen Netzbetreibern:
+  KI-Anbieter, Geräte- und Chiphersteller, Netzausrüster, Satellitenbetreiber und Regulierungsbehörden entscheiden mit, was ein Netz kann,
+  was ein Handy unterstützt und was erlaubt ist. Diese Quellen sind <b>keine Wettbewerber</b> – sie werden im Bericht in einem eigenen Abschnitt geführt.
+  Jeweils der offizielle eigene Kanal des Unternehmens bzw. der Behörde.</p>
+  {% for t in tech_themes %}
+  <div style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">{{ t.label }} <span style="color:var(--faint2);font-weight:500">· {{ t.sources | length }}</span></div>
+    <div class="pill-cloud">
+      {% for s in t.sources %}
+      <a href="{{ s.url }}" target="_blank" rel="noopener" title="{{ s.url | domain }}">{{ s.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 <div class="card tan" style="margin-top:20px">
   <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span style="color:#a89c8c;font-weight:500">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
   <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>

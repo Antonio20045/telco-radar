@@ -752,9 +752,20 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         by_region: dict[str, list] = {}
         for op in cfg.operators:
             by_region.setdefault(op.region_name, []).append(op)
+        # Themenfelder (config/tech_sources.yaml) bekommen einen eigenen Block
+        # auf der Quellenseite - sie sind weder Betreiber noch Fachpresse,
+        # und die Seite verspricht Nachpruefbarkeit ueber ALLE Quellen.
+        tech_themes = []
+        for key, label in cfg.themes:
+            quellen = [s for s in cfg.tech_sources if s.theme == key]
+            if quellen:
+                tech_themes.append({"key": key, "label": label,
+                                    "sources": quellen})
         (site_dir / "sources.html").write_text(
             env.get_template("sources.html.j2").render(
                 prefix="", by_region=by_region, news_sources=cfg.news_sources,
+                tech_themes=tech_themes,
+                n_tech_sources=sum(len(t["sources"]) for t in tech_themes),
                 num_operators=num_operators),
             encoding="utf-8")
 

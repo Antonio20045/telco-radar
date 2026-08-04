@@ -56,6 +56,11 @@ def main() -> int:
             jobs.append((src, op.region_key, op.name, "operator"))
     for src in cfg.news_sources:
         jobs.append((src, "global", None, "industry_news"))
+    # Themenquellen (config/tech_sources.yaml) gehoeren in denselben
+    # Gesundheits-Check - sie sind seit dem Quellen-Ausbau eine dritte
+    # Signalebene und keine Nebensache.
+    for src in cfg.tech_sources:
+        jobs.append((src, src.theme, src.name, "tech_watch"))
 
     print(f"{'STATUS':7} {'ITEMS':>5} {'DATED':>5} {'NEWEST':>11} {'FRESH':>5}  "
           f"{'NAME':24} URL")

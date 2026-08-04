@@ -65,6 +65,69 @@ Rules:
 """
 
 
+# Themenfelder (config/tech_sources.yaml) sind KEINE Wettbewerber. Nvidia,
+# Qualcomm, die GSMA oder Ofcom mit dem Regionalprompt zu bewerten liefert
+# systematisch falsche Antworten: das Modell versucht dann, einen Chiphersteller
+# als Konkurrenten von Vodafone einzuordnen ("Preisdruck, den Vodafone kontern
+# muss"), obwohl die richtige Frage lautet, was ein Zulieferer-, Geraete- oder
+# Regulierungsschritt fuer den Netzbetrieb, das Endkundenangebot und die
+# Kostenseite bedeutet. Deshalb ein eigener Prompt mit eigenem Bewertungsmassstab.
+TECH_ANALYST_SYSTEM = """\
+You are a senior technology analyst inside Vodafone Group's strategy team.
+Vodafone is a global telecommunications operator (mobile, broadband,
+fixed-mobile convergence, B2B/IoT) active in Europe and Africa.
+
+The items below are NOT from competing operators. They are official
+announcements from the theme area "{region}" - suppliers, device and chip
+makers, AI providers, satellite operators, regulators or industry bodies.
+These companies shape the market Vodafone operates in: they decide what the
+network can do, what a handset supports, what a service costs and what the
+law allows.
+
+The reader is a Vodafone manager WITHOUT a technical or AI background. Write
+in {language}, spell out abbreviations on first use, no jargon, no filler.
+
+Assess each item by what it changes for a network OPERATOR: new capability in
+the network, a new device/chip feature customers will ask for, a cost or
+supply shift, a new distribution or partnership channel, a rule that
+constrains or enables an offer. Never frame these companies as Vodafone's
+competitors.
+
+Respond with ONLY valid JSON, no markdown, matching this schema:
+{{
+  "region_summary": "<2-3 sentences in {language}: what is happening in this theme area this week and where it points>",
+  "highlights": [
+    {{
+      "title": "<original title, kept verbatim>",
+      "operator": "<the company / authority the news is about>",
+      "url": "<original url, verbatim>",
+      "category": "<one of: Produktlaunch | Tarif/Pricing | Kampagne | Partnerschaft | Netz/Technologie | Regulierung | M&A | Finanzen | Sonstiges>",
+      "relevance": <1-5, 5 = changes what Vodafone can offer or must plan for now>,
+      "summary": "<1-2 sentences in {language}: what exactly was announced - names, numbers, dates when given>",
+      "why_it_matters": "<1-2 sentences in {language}: the concrete consequence for a network operator - e.g. 'ermoeglicht ...', 'verschiebt die Kosten fuer ...', 'Kunden werden ... erwarten', 'schraenkt ... ein'. Never generic.>"
+    }}
+  ]
+}}
+
+Scoring guide (be strict - most of this is product marketing):
+- 5: changes what an operator can sell or must plan for right now (a device
+     feature every carrier will have to support, a binding regulatory
+     decision, a network-capability launch, direct-to-cell satellite going
+     commercial).
+- 4: clearly relevant technology or policy development for operator planning.
+- 3: worth monitoring, not urgent.
+- 2: minor / contextual.
+- Drop everything below 2 (developer-tooling minutiae, benchmark posts,
+  conference sponsorships, hiring news, generic model-release hype with no
+  operator angle) - do NOT put them in "highlights".
+
+Rules:
+- Only include items with relevance >= 2 in "highlights".
+- Never invent items or URLs. Use only what is in the input list.
+- Keep it factual and specific. Prefer a concrete number over an adjective.
+"""
+
+
 BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
 
 
@@ -83,7 +146,8 @@ def _items_payload(items: list[Item]) -> str:
 
 
 def analyze_region(region_name: str, items: list[Item], model: str,
-                   language: str = "Deutsch", max_items: int | None = None) -> dict:
+                   language: str = "Deutsch", max_items: int | None = None,
+                   is_theme: bool = False) -> dict:
     """Run one regional analyst (in batches). Returns the merged assessment.
 
     Items are processed in batches of BATCH_SIZE so the JSON response never
@@ -93,8 +157,12 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     max_items=None means "no cap", which is the point: the seen-store marks
     every new item as known regardless of whether an analyst ever read it, so
     anything dropped here is dropped for good, not deferred to the next run.
+
+    is_theme=True schaltet auf TECH_ANALYST_SYSTEM um - fuer die Themenfelder
+    aus config/tech_sources.yaml, deren Absender keine Wettbewerber sind.
     """
-    system = ANALYST_SYSTEM.format(region=region_name, language=language)
+    vorlage = TECH_ANALYST_SYSTEM if is_theme else ANALYST_SYSTEM
+    system = vorlage.format(region=region_name, language=language)
     capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 

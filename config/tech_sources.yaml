@@ -1,0 +1,115 @@
+# =============================================================================
+# TELCO RADAR - Themenfelder (dritte Signalebene)
+# =============================================================================
+# Was den Telco-Markt veraendert, kommt laengst nicht nur von anderen
+# Netzbetreibern: KI-Anbieter, Geraete- und Chiphersteller, Netzausruester,
+# Satellitenbetreiber und Regulierer entscheiden mit, was ein Netz kann, was
+# ein Handy unterstuetzt, was etwas kostet und was erlaubt ist.
+#
+# WARUM EINE EIGENE DATEI und nicht die Watchlist:
+# Nvidia, Qualcomm, die GSMA oder Ofcom sind keine Netzbetreiber. In der
+# Watchlist braeuchten sie eine Region und einen Alias-Eintrag - beides falsch.
+# Schlimmer: das Alias-Tagging der Fachpresse wuerde anfangen, jede Meldung
+# mit "Nvidia" im Titel einer Region zuzuschlagen, und die Rundlauf-Sortierung
+# wuerde sie gegen echte Betreibermeldungen antreten lassen. Hier tragen sie
+# stattdessen ein Themen-Tag; jedes Themenfeld laeuft als eigener Analyst
+# (mit eigenem Prompt, siehe analyze/agents.py::TECH_ANALYST_SYSTEM) und
+# bekommt im Wochenbericht einen eigenen Abschnitt.
+#
+# ABNAHME: Jede Quelle hier ist mit
+#   python scripts/pruefe_quellenvorschlag.py <datei> --no-overlap
+# durch die Kriterien aus AUFTRAG_QUELLEN_AUSBAU.md Abschnitt 4 gelaufen
+# (>= 5 Meldungen, >= 80 % datiert, >= 1 im Frischefenster, echte
+# Ueberschriften, eigene Domain, keine Dublette, kein newsroom_js).
+# Nichts kommt hier ohne PASS hinein.
+#
+# Quellentypen wie in der Watchlist: rss | json_api | newsroom.
+# =============================================================================
+
+themen:
+  ki:
+    name: "KI-Anbieter"
+    beschreibung: >-
+      Die Anbieter der Modelle, die Betreiber in Tarife, Kundenservice und
+      Netzbetrieb einbauen. Sie bestimmen, was ein "KI-Tarif" ueberhaupt
+      enthalten kann und was er kostet.
+    quellen:
+      # Der offizielle News-Feed von OpenAI. Produkt- und Partnerschafts-
+      # meldungen laufen hier zuerst - inklusive der Telco-Deals, die spaeter
+      # als Betreiber-Pressemitteilung erscheinen.
+      - {name: "OpenAI", type: rss, url: "https://openai.com/news/rss.xml"}
+      # Google DeepMind: Modellgenerationen und Forschung, die 6-12 Monate
+      # spaeter in Android- und Pixel-Funktionen landen.
+      - {name: "Google DeepMind", type: rss, url: "https://deepmind.google/blog/rss.xml"}
+      # Googles eigener KI-Blog - naeher am Produkt als DeepMind und damit
+      # naeher an dem, was Endkunden bei ihrem Mobilfunkanbieter erwarten.
+      - {name: "Google AI", type: rss, url: "https://blog.google/technology/ai/rss/"}
+      # Metas Newsroom. Relevant weniger wegen der Modelle als wegen WhatsApp
+      # und der Business-Messaging-Umsaetze, an denen Betreiber mitverdienen.
+      - {name: "Meta", type: rss, url: "https://about.fb.com/news/feed/"}
+      # Nvidia steht im Auftrag unter den KI-Anbietern, nicht unter Chips:
+      # fuer Betreiber zaehlt vor allem das AI-RAN- und Edge-Geschaeft.
+      - {name: "Nvidia Blog", type: rss, url: "https://blogs.nvidia.com/feed/"}
+      # Zweiter Nvidia-Kanal, bewusst zusaetzlich: der Blog erklaert Technik,
+      # der Newsroom meldet Vertraege und Partnerschaften. Inhaltlich getrennt,
+      # deshalb keine Dublette.
+      - {name: "Nvidia Newsroom", type: rss, url: "https://nvidianews.nvidia.com/releases.xml"}
+
+  geraete:
+    name: "Geräte"
+    beschreibung: >-
+      Was ein Endgeraet kann, entscheidet, was ein Betreiber verkaufen kann -
+      von eSIM ueber Satellitenfunk bis zu KI-Funktionen, die Datenvolumen
+      erzeugen.
+    quellen:
+      # Apples Newsroom ist der Taktgeber fuer eSIM, Satelliten-Notruf und
+      # Geraetefinanzierung - alles Themen, die direkt auf Tarife durchschlagen.
+      - {name: "Apple", type: rss, url: "https://www.apple.com/newsroom/rss-feed.rss"}
+      # Samsung Global Newsroom: Geraetestarts und Netzsparte in einem Feed.
+      - {name: "Samsung", type: rss, url: "https://news.samsung.com/global/feed"}
+      # Androids Produktblog. Systemfunktionen (RCS, eSIM-Transfer, Satellit)
+      # erscheinen hier, bevor die Betreiber sie unterstuetzen muessen.
+      - {name: "Android", type: rss, url: "https://blog.google/products/android/rss/"}
+      # Lenovo fuehrt Motorola; Motorola-Geraetestarts laufen ueber diesen Feed.
+      - {name: "Lenovo / Motorola", type: rss, url: "https://news.lenovo.com/feed/"}
+
+  chips:
+    name: "Chips & Modems"
+    beschreibung: >-
+      Modem- und SoC-Generationen legen Jahre im Voraus fest, welche
+      Netzfunktionen (5G-SA, NTN, RedCap) ueberhaupt in Geraeten ankommen.
+    quellen:
+      # Arm-Newsroom: Architektur-Ankuendigungen, die den gesamten
+      # Smartphone- und Basisstationsmarkt betreffen.
+      - {name: "Arm", type: rss, url: "https://newsroom.arm.com/rss"}
+      # Broadcom veroeffentlicht seine Produkt- und Vertragsmeldungen ueber
+      # die Investor-Relations-Seite; ein separater Presse-Feed existiert nicht.
+      - {name: "Broadcom", type: rss, url: "https://investors.broadcom.com/rss/news-releases.xml"}
+
+  netzausruester:
+    name: "Netzausrüster"
+    beschreibung: >-
+      Ericsson, Nokia, Huawei & Co. bauen die Netze, ueber die alles laeuft.
+      Ihre Ankuendigungen zeigen Monate vorher, welche Funktionen Betreiber
+      als naechstes ausrollen koennen.
+    quellen: []
+
+  satellit:
+    name: "Satellit & NTN"
+    beschreibung: >-
+      Direct-to-Cell verschiebt gerade die Grenze zwischen Mobilfunk und
+      Satellit - und damit die Frage, wofuer Kunden ihren Betreiber brauchen.
+    quellen: []
+
+  regulierung:
+    name: "Regulierung & Verbände"
+    beschreibung: >-
+      Frequenzvergaben, Fusionsentscheidungen, Roaming- und KI-Regeln setzen
+      den Rahmen, in dem sich jedes Angebot bewegen muss.
+    quellen:
+      # Die GSMA ist der Branchenverband der Mobilfunkbetreiber; ihre
+      # Veroeffentlichungen setzen den Rahmen fuer Standards und MWC-Themen.
+      - {name: "GSMA", type: rss, url: "https://www.gsma.com/newsroom/feed/"}
+      # DG CNECT der EU-Kommission: Digital Networks Act, KI-Verordnung,
+      # Frequenzpolitik - die Regeln, unter denen der europaeische Markt steht.
+      - {name: "EU-Kommission (DG CNECT)", type: rss, url: "https://digital-strategy.ec.europa.eu/en/rss.xml"}

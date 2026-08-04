@@ -29,6 +29,17 @@ log = logging.getLogger(__name__)
 # --------------------------------------------------------------------------- #
 _CRAWLED_KINDS = {"rss", "json_api", "newsroom", "newsroom_js"}
 
+# Praefix der Pseudo-Regionsschluessel, unter denen die Themenfelder durch die
+# Pipeline laufen. Ein Themenfeld bekommt damit einen eigenen Analysten (wie
+# eine Region), ohne dass die Regionslogik der Watchlist es je fuer einen
+# Betreiber haelt: Alias-Tagging und Rundlauf-Sortierung fassen nur an, was
+# unter einem echten Regionsschluessel steht.
+THEME_PREFIX = "thema:"
+
+
+def is_theme_key(key: str) -> bool:
+    return key.startswith(THEME_PREFIX)
+
 
 @dataclass
 class Source:
@@ -52,6 +63,10 @@ class Source:
     timeout_seconds: float | None = None  # per-source HTTP timeout override,
     # for hosts that are simply slow to reach from the CI runner (KT's Korean
     # API ran into the global 20s connect timeout in 3 of 9 runs).
+    theme: str = ""  # tech_sources.yaml only: the theme key this source feeds
+    # ("ki", "geraete", "chips", ...). Operators carry a region instead; a
+    # theme source has no region, which is exactly why it lives in its own
+    # file and not in the watchlist (see config/tech_sources.yaml).
     allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
     # the 25-char title-length floor down to 6, for sources whose real
     # content is legitimately terse (e.g. RNS/regulatory-announcement
@@ -98,10 +113,27 @@ class Config:
     news_sources: list[Source]
     region_names: dict[str, str]
     focus_competitors: list[dict] = field(default_factory=list)
+    # Themenfelder (config/tech_sources.yaml): KI-Anbieter, Geraete, Chips,
+    # Netzausruester, Satellit, Regulierung. Kein Betreiber, keine Region -
+    # deshalb eine eigene Liste und ein eigener Namensraum. Die Schluessel
+    # tragen das Praefix THEME_PREFIX, damit sie sich in items_by_region nie
+    # mit einem Regionsschluessel der Watchlist ueberschneiden koennen.
+    tech_sources: list[Source] = field(default_factory=list)
+    theme_names: dict[str, str] = field(default_factory=dict)
 
     @property
     def lookback_days(self) -> int:
         return int(self.settings.get("lookback_days", 8))
+
+    @property
+    def bereich_names(self) -> dict[str, str]:
+        """Regionen UND Themenfelder - alles, was ein eigener Analyst ist."""
+        return {**self.region_names, **self.theme_names}
+
+    @property
+    def themes(self) -> list[tuple[str, str]]:
+        """(Schluessel, Anzeigename) je Themenfeld, in Konfigurationsreihenfolge."""
+        return list(self.theme_names.items())
 
 
 def _load_yaml(path: Path) -> dict:
@@ -168,11 +200,14 @@ def load_config(root: Path) -> Config:
         for s in (news.get("news_sources") or [])
     ]
 
+    tech_sources, theme_names = _load_tech_sources(cfg_dir / "tech_sources.yaml")
+
     n_crawled = sum(len(o.crawled_sources) for o in operators)
     log.info(
         "Config loaded: %d operators in %d regions, %d crawlable operator "
-        "sources, %d trade-press sources",
+        "sources, %d trade-press sources, %d theme sources in %d themes",
         len(operators), len(region_names) - 1, n_crawled, len(news_sources),
+        len(tech_sources), len(theme_names),
     )
     return Config(
         root=root,
@@ -181,4 +216,46 @@ def load_config(root: Path) -> Config:
         news_sources=news_sources,
         region_names=region_names,
         focus_competitors=settings.get("focus_competitors") or [],
+        tech_sources=tech_sources,
+        theme_names=theme_names,
     )
+
+
+def _load_tech_sources(path: Path) -> tuple[list[Source], dict[str, str]]:
+    """Themenquellen laden (config/tech_sources.yaml).
+
+    Bewusst eine eigene Datei statt zusaetzlicher Eintraege in der Watchlist:
+    Nvidia, die GSMA oder Qualcomm sind keine Netzbetreiber. In der Watchlist
+    haetten sie eine Region und einen Alias-Eintrag - beides falsch, und das
+    Alias-Tagging der Fachpresse wuerde anfangen, jede Meldung mit "Nvidia" im
+    Titel einer Region zuzuschlagen. Hier tragen sie stattdessen ein
+    Themen-Tag und laufen als eigener Analyst durch die Pipeline.
+
+    Fehlt die Datei, laeuft alles wie vorher - der Ausbau ist additiv.
+    """
+    if not path.exists():
+        return [], {}
+    raw = _load_yaml(path)
+    sources: list[Source] = []
+    names: dict[str, str] = {}
+    for theme_key, theme in (raw.get("themen") or {}).items():
+        key = THEME_PREFIX + theme_key
+        names[key] = theme.get("name", theme_key)
+        for s in (theme.get("quellen") or []):
+            stype = s.get("type", "rss")
+            sources.append(Source(
+                type=stype,
+                url=s["url"],
+                name=s.get("name", s["url"]),
+                item_selector=s.get("item_selector"),
+                kind=s.get("kind", stype),
+                label=s.get("label", "") or s.get("name", ""),
+                plan=s.get("plan", ""),
+                link_template=s.get("link_template"),
+                headers=s.get("headers"),
+                exclude_url_pattern=s.get("exclude_url_pattern"),
+                timeout_seconds=s.get("timeout_seconds"),
+                theme=key,
+                allow_short_titles=s.get("allow_short_titles", False),
+            ))
+    return sources, names

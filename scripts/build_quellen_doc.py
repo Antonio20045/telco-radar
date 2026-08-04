@@ -45,6 +45,7 @@ def _validate(cfg) -> dict[str, str]:
 
     jobs = [(s, o.region_key, o.name) for o in cfg.operators for s in o.sources]
     jobs += [(s, "global", s.name) for s in cfg.news_sources]
+    jobs += [(s, s.theme, s.name) for s in cfg.tech_sources]
 
     def one(source, region, name):
         if source.kind == "official":
@@ -115,7 +116,10 @@ def main() -> int:
     L.append(f"- Newsroom statisch: **{kinds.get('newsroom', 0)}**.")
     L.append(f"- Newsroom JS-gerendert: **{kinds.get('newsroom_js', 0)}**.")
     L.append(f"- Nicht automatisiert (Referenz + Begruendung): **{kinds.get('official', 0)}**.")
-    L.append(f"- Fachpresse: **{len(cfg.news_sources)}** Feeds.\n")
+    L.append(f"- Fachpresse: **{len(cfg.news_sources)}** Feeds.")
+    L.append(f"- Themenfelder (Technologie, Geraete, Regulierung): "
+             f"**{len(cfg.tech_sources)}** Quellen in {len(cfg.theme_names)} "
+             f"Themen (`config/tech_sources.yaml`).\n")
 
     by_region: dict[str, list] = {}
     for op in cfg.operators:
@@ -136,6 +140,25 @@ def main() -> int:
                          f"{KIND_LABEL.get(s.kind, s.kind)}{extra} | {note} |")
         L.append("")
 
+    if cfg.tech_sources:
+        L.append("## Themenfelder (dritte Ebene)\n")
+        L.append("Keine Netzbetreiber, sondern die Unternehmen und Behoerden, "
+                 "die den Rahmen setzen: KI-Anbieter, Geraete- und Chiphersteller, "
+                 "Netzausruester, Satellitenbetreiber, Regulierer. Eigener "
+                 "Analyst je Thema, eigener Abschnitt im Wochenbericht.\n")
+        for key, label in cfg.themes:
+            quellen = [s for s in cfg.tech_sources if s.theme == key]
+            if not quellen:
+                continue
+            L.append(f"### {label} ({len(quellen)})\n")
+            L.append("| Quelle | Adresse | Anbindung | Verifikation |")
+            L.append("|---|---|---|---|")
+            for s in quellen:
+                L.append(f"| {s.name} | {s.url} | "
+                         f"{KIND_LABEL.get(s.kind, s.kind)} | "
+                         f"{checks.get(f'{s.name}|{s.url}', '')} |")
+            L.append("")
+
     L.append("## Fachpresse (zweite Ebene)\n")
     L.append("| Quelle | Feed | Verifikation |")
     L.append("|---|---|---|")
@@ -145,7 +168,8 @@ def main() -> int:
 
     args.out.write_text("\n".join(L), encoding="utf-8")
     print(f"Geschrieben: {args.out} ({len(cfg.operators)} Betreiber, "
-          f"{len(cfg.news_sources)} Fachpresse-Feeds"
+          f"{len(cfg.news_sources)} Fachpresse-Feeds, "
+          f"{len(cfg.tech_sources)} Themenquellen"
           + (", live geprueft" if args.validate else "") + ")")
     return 0
 

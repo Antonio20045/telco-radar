@@ -1,0 +1,230 @@
+"""Der Abnahme-Check muss selbst geprueft sein.
+
+Er ist die einzige Instanz, die im Quellen-Ausbau "ja" sagen darf. Ein Fehler
+hier laesst genau die Quellen durch, gegen die er gebaut wurde: die, die ueber
+den echten Collector 0 Meldungen liefern, undatiert sind oder in Wahrheit
+Navigationslabels als "Ueberschriften" ausgeben.
+
+Kein Netz noetig - collect_source wird ersetzt.
+"""
+from __future__ import annotations
+
+import importlib.util
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import pytest
+
+from telco_radar.models import Item
+
+_PFAD = Path(__file__).resolve().parents[1] / "scripts" / "pruefe_quellenvorschlag.py"
+_spec = importlib.util.spec_from_file_location("pruefe_quellenvorschlag", _PFAD)
+pq = importlib.util.module_from_spec(_spec)
+sys.modules["pruefe_quellenvorschlag"] = pq
+_spec.loader.exec_module(pq)
+
+
+class FakeBestand:
+    """Ein Bestand ohne Config und ohne Netz."""
+
+    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None):
+        self.http_cfg: dict = {}
+        self.lookback = 8
+        self._bekannt = bekannt or {}
+        self.je_operator = je_operator or {}
+
+    def kennt(self, url: str) -> str:
+        return self._bekannt.get(url, "")
+
+
+def _items(n: int, *, datiert: int | None = None, frisch: int = 3,
+           titel: str = "Betreiber startet neuen Tarif mit 50 GB Datenvolumen"):
+    """n Meldungen, davon `datiert` mit Datum und `frisch` im Fenster."""
+    datiert = n if datiert is None else datiert
+    jetzt = datetime.now(timezone.utc)
+    out = []
+    for i in range(n):
+        if i < frisch:
+            pub = jetzt - timedelta(days=1)
+        elif i < datiert:
+            pub = jetzt - timedelta(days=200)
+        else:
+            pub = None
+        out.append(Item(title=f"{titel} Nr. {i}", url=f"https://example.com/a{i}",
+                        source_name="X", published=pub))
+    return out
+
+
+def _pruefe(kand: pq.Kandidat, items, bestand=None, overlap=False):
+    original = pq.collect_source
+    pq.collect_source = lambda *a, **k: items
+    try:
+        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap)
+    finally:
+        pq.collect_source = original
+
+
+def _grund(befund, nr, name_enthaelt=""):
+    """Kriterium 7 wird zweimal geprueft (URL-Dublette und Inhaltsdublette) -
+    deshalb optional zusaetzlich nach dem Namen filtern."""
+    treffer = [k for k in befund.kriterien if k["nr"] == nr
+               and name_enthaelt in k["name"]]
+    assert treffer, f"Kriterium {nr} ({name_enthaelt!r}) wurde nicht geprueft"
+    return treffer[0]
+
+
+# ------------------------------------------------------------------ Kriterien
+def test_gute_quelle_besteht():
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(12))
+    assert b.bestanden, b.durchgefallen
+    assert (b.n_items, b.n_datiert, b.n_frisch) == (12, 12, 3)
+    assert len(b.titelprobe) == 3
+
+
+def test_zu_wenige_meldungen_fallen_durch():
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(4))
+    assert not b.bestanden
+    assert not _grund(b, 2)["ok"]
+
+
+def test_undatierte_meldungen_fallen_durch():
+    """Kriterium 3: undatiert sortiert ans Ende und ist faktisch unsichtbar."""
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(10, datiert=7))
+    assert not b.bestanden
+    assert "7/10" in _grund(b, 3)["detail"]
+
+
+def test_keine_frische_meldung_faellt_durch_ohne_ausnahme():
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(10, frisch=0))
+    assert not b.bestanden
+    assert not _grund(b, 4)["ok"]
+
+
+def test_belegte_ausnahme_ersetzt_die_frische():
+    k = pq.Kandidat(url="https://example.com/ir", type="rss",
+                    operator="Beispiel", website="example.com",
+                    ausnahme_frische="IR-Seite, publiziert quartalsweise")
+    b = _pruefe(k, _items(10, frisch=0))
+    assert b.bestanden, b.durchgefallen
+    assert "quartalsweise" in _grund(b, 4)["detail"]
+
+
+def test_navigationslabels_fallen_durch():
+    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
+                    operator="Beispiel", website="example.com")
+    nav = [Item(title=t, url=f"https://example.com/n{i}", source_name="X",
+                published=datetime.now(timezone.utc))
+           for i, t in enumerate(
+               ["Mehr erfahren", "Presse", "12.03.2026", "Alle anzeigen",
+                "Kontakt", "Datenschutz",
+                "Betreiber startet neuen Tarif mit 50 GB Datenvolumen"])]
+    b = _pruefe(k, nav)
+    assert not b.bestanden
+    assert not _grund(b, 5)["ok"]
+
+
+def test_fremde_domain_faellt_durch_ohne_ausnahme():
+    k = pq.Kandidat(url="https://news.cision.com/beispiel", type="newsroom",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(12))
+    assert not b.bestanden
+    assert not _grund(b, 6)["ok"]
+
+
+def test_verbreitungsdienst_mit_begruendung_ist_erlaubt():
+    k = pq.Kandidat(url="https://news.cision.com/beispiel", type="newsroom",
+                    operator="Beispiel", website="example.com",
+                    ausnahme_domain="Cision ist der offizielle Verbreitungsweg")
+    b = _pruefe(k, _items(12))
+    assert b.bestanden, b.durchgefallen
+
+
+def test_bekannte_url_ist_eine_dublette():
+    bestand = FakeBestand(bekannt={"https://example.com/feed": "Beispiel (rss)"})
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(12), bestand)
+    assert not b.bestanden
+    assert not _grund(b, 7)["ok"]
+    # Bei einer Dublette wird gar nicht erst abgerufen.
+    assert b.n_items == 0
+
+
+def test_inhaltsdublette_wird_erkannt():
+    """Zwei Pfade derselben Seite sind EINE Quelle, nicht zwei."""
+    from telco_radar.config import Source
+    gleiche = _items(10)
+    bestand = FakeBestand(je_operator={
+        "Beispiel": [Source(type="rss", url="https://example.com/alt")]})
+    k = pq.Kandidat(url="https://example.com/neu", type="rss",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, gleiche, bestand, overlap=True)
+    assert not b.bestanden
+    assert "100%" in _grund(b, 7, "Inhaltsdublette")["detail"]
+
+
+def test_newsroom_js_ist_nicht_abnehmbar():
+    k = pq.Kandidat(url="https://example.com/news", type="newsroom_js",
+                    operator="Beispiel", website="example.com")
+    b = _pruefe(k, _items(30))
+    assert not b.bestanden
+    assert not _grund(b, 8)["ok"]
+    assert b.n_items == 0  # kein Abruf
+
+
+def test_abrufsfehler_wird_als_fehler_gemeldet():
+    k = pq.Kandidat(url="https://example.com/feed", type="rss",
+                    operator="Beispiel", website="example.com")
+    original = pq.collect_source
+
+    def boom(*a, **kw):
+        raise RuntimeError("404 Not Found")
+
+    pq.collect_source = boom
+    try:
+        b = pq._pruefe_einen(k, FakeBestand(), 8, False)
+    finally:
+        pq.collect_source = original
+    assert not b.bestanden
+    assert "404" in b.fehler
+    assert not _grund(b, 1)["ok"]
+
+
+# ---------------------------------------------------------------- Hilfsstuecke
+@pytest.mark.parametrize("titel", [
+    "Mehr erfahren", "Read more", "Presse", "Newsroom", "12.03.2026",
+    "2026-03-12", "March 12, 2026", "Alle anzeigen", "Cookie-Einstellungen",
+    "About Us", "", "   ",
+])
+def test_navigationslabel_erkannt(titel):
+    assert pq._ist_navigationslabel(titel)
+
+
+@pytest.mark.parametrize("titel", [
+    "Telekom startet 5G-Standalone in 200 Staedten",
+    "Q1 Results 2026 published by the group board",
+    "Vodafone and AST SpaceMobile complete first video call via satellite",
+])
+def test_echte_ueberschrift_erkannt(titel):
+    assert not pq._ist_navigationslabel(titel)
+
+
+@pytest.mark.parametrize("host,erwartet", [
+    ("www.telekom.com", "telekom.com"),
+    ("newsroom.bt.com", "bt.com"),
+    ("www.three.co.uk", "three.co.uk"),
+    ("investors.att.com", "att.com"),
+    ("tim.com.br", "tim.com.br"),
+    ("example.com", "example.com"),
+])
+def test_registrierbare_domain(host, erwartet):
+    assert pq._registrable(host) == erwartet

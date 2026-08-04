@@ -27,7 +27,7 @@ from .analyze.diff_curator import DiffStore
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
-from .config import load_config
+from .config import is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
 from .report.html import render_site
@@ -252,11 +252,12 @@ def run(root: Path, use_llm: bool | None = None,
         llm_workers = int(cfg.settings.get("llm_max_workers", 4))
 
         def _analyze_one(region_key, region_items):
-            region_name = cfg.region_names.get(region_key, region_key)
+            region_name = cfg.bereich_names.get(region_key, region_key)
             try:
                 res = analyze_region(
                     region_name, region_items, model=analyst_model,
-                    language=language, max_items=max_items)
+                    language=language, max_items=max_items,
+                    is_theme=is_theme_key(region_key))
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
                 if tel.get("batches") and not tel.get("batches_ok"):
@@ -286,12 +287,20 @@ def run(root: Path, use_llm: bool | None = None,
                 regional[region_name] = res
                 if tel is not None:
                     analyst_telemetry.append(tel)
+        # Nur die Themenfelder, die in DIESEM Lauf auch bewertete Meldungen
+        # haben - sonst verlangt der Editor-Check eine Ueberschrift, zu der es
+        # nichts zu schreiben gibt.
+        themen_mit_inhalt = [
+            cfg.theme_names[tk] for tk in cfg.theme_names
+            if regional.get(cfg.theme_names[tk], {}).get("highlights")
+        ]
         try:
             body, covered = editor.synthesize(
                 regional, topics_store.recent(), model=editor_model,
                 language=language,
                 highlight_budget=int(
-                    cfg.settings.get("editor_max_highlights", 0) or 0))
+                    cfg.settings.get("editor_max_highlights", 0) or 0),
+                themenbereiche=themen_mit_inhalt)
             editor_used = True
         except Exception as exc:  # noqa: BLE001
             if cfg.settings.get("publish_requires_editorial_briefing", True):
@@ -303,7 +312,7 @@ def run(root: Path, use_llm: bool | None = None,
                 "Editorial synthesis failed (%s); publishing a labelled "
                 "source-linked fallback digest", str(exc)[:180])
             fallback, covered = editor.build_digest(
-                items_by_region, cfg.region_names, llm_was_available=False,
+                items_by_region, cfg.bereich_names, llm_was_available=False,
                 include_note=False)  # the Redaktions-Fallback note below says it
             body = (
                 "## Redaktions-Fallback\n\n"
@@ -324,7 +333,7 @@ def run(root: Path, use_llm: bool | None = None,
         if use_llm and not new_items:
             log.info("No new items - writing empty briefing")
         for region_key, region_items in items_by_region.items():
-            region_name = cfg.region_names.get(region_key, region_key)
+            region_name = cfg.bereich_names.get(region_key, region_key)
             regional[region_name] = {
                 "region_summary": "",
                 "highlights": [
@@ -336,7 +345,7 @@ def run(root: Path, use_llm: bool | None = None,
                 ],
             }
         body, covered = editor.build_digest(
-            items_by_region, cfg.region_names, llm_was_available=bool(use_llm))
+            items_by_region, cfg.bereich_names, llm_was_available=bool(use_llm))
         if first_run:
             body = (
                 "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "
@@ -461,7 +470,8 @@ def run(root: Path, use_llm: bool | None = None,
 
     # -------------------------------------------------------------- report
     total_sources = sum(len(op.crawled_sources) for op in cfg.operators) \
-        + len(cfg.news_sources)
+        + len(cfg.news_sources) \
+        + sum(1 for s in cfg.tech_sources if s.crawlable)
     stats = {
         "sources_total": total_sources,
         "sources_ok": n_ok,
@@ -471,6 +481,7 @@ def run(root: Path, use_llm: bool | None = None,
         "new": len(new_items),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
+        "themes": len(cfg.theme_names),
     }
 
     # ------------------------------------------------------- run log (transparency)

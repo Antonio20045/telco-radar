@@ -68,6 +68,7 @@ Source as [Quelle](url).
 2-3 sentence regional summary, then the remaining items compact
 (1-2 sentences each, always with [Quelle](url)).
 
+{themenabschnitt}
 ## Muster der Woche
 2-4 cross-regional patterns in this week's data (e.g. "mehrere Betreiber
 buendeln KI-Assistenten in Consumer-Tarife"). Reference the supporting
@@ -85,6 +86,30 @@ After the Markdown, output the line ===TOPICS=== followed by a JSON array of
 short topic strings (operator + subject) for every item you covered, so the
 system can remember them and never repeat them.
 """
+
+# Eigener Abschnitt fuer die Themenfelder (config/tech_sources.yaml). Ohne ihn
+# verteilt der Editor Nvidia-, Qualcomm- und Ofcom-Meldungen auf die
+# Regionsabschnitte, wo sie zwischen den Betreibermeldungen untergehen und den
+# Bericht zur Linkliste machen - genau das, was der Auftrag verhindern will.
+# Der Abschnitt kommt NUR in den Prompt, wenn dieser Lauf auch Themenmeldungen
+# hat; sonst wuerde eine Pflicht-Ueberschrift verlangt, zu der es nichts zu
+# schreiben gibt. Deshalb haengen Prompt und Pflichtpruefung am selben Schalter
+# (siehe validate_editorial_briefing).
+THEMEN_ABSCHNITT = """
+## Technologie, Geräte & Regulierung
+The theme sections below ("{themen}") are NOT operators - they are suppliers,
+device and chip makers, AI providers, satellite operators and regulators.
+Give them ONE joint section of 4-8 sentences: what changed in the operators'
+supply chain, in the devices their customers buy and in the rules they work
+under, and what those changes have in common. Name the companies and the
+concrete announcement, always with [Quelle](url). Do NOT list every item -
+pick what actually moves a network operator. Never present these companies as
+Vodafone's competitors.
+"""
+
+# Ueberschrift dieses Abschnitts, normalisiert wie in
+# validate_editorial_briefing (klein, Umlaute aufgeloest).
+THEMEN_UEBERSCHRIFT = "## technologie, geraete & regulierung"
 
 
 # The editor sees EVERY assessed item by default (0 = no limit). A weekly
@@ -135,8 +160,14 @@ def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
 
 def synthesize(regional: dict[str, dict], already_covered: list[str],
                model: str, language: str = "Deutsch",
-               highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET) -> tuple[str, list[str]]:
-    """Run the editor. Returns (markdown_report, covered_topics)."""
+               highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET,
+               themenbereiche: list[str] | None = None) -> tuple[str, list[str]]:
+    """Run the editor. Returns (markdown_report, covered_topics).
+
+    `themenbereiche` sind die Anzeigenamen der Themenfelder, die in DIESEM
+    Lauf bewertete Meldungen haben (z. B. ["KI & Modelle", "Netzausruester"]).
+    Ist die Liste leer, verhaelt sich der Editor exakt wie vorher.
+    """
     # strip internal telemetry before handing the analyses to the editor
     clean = {
         rn: {k: v for k, v in r.items() if not k.startswith("_")}
@@ -163,9 +194,14 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
     # still take it (~4 characters per token).
     log.info("Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
              n_highlights, len(user) / 1024, len(user) // 4000, model)
-    system = EDITOR_SYSTEM.format(language=language)
+    themen = [t for t in (themenbereiche or []) if t]
+    system = EDITOR_SYSTEM.format(
+        language=language,
+        themenabschnitt=(THEMEN_ABSCHNITT.format(themen='", "'.join(themen))
+                         if themen else ""))
+    pflicht = frozenset({THEMEN_UEBERSCHRIFT}) if themen else frozenset()
     try:
-        return _ein_versuch(system, user, model)
+        return _ein_versuch(system, user, model, pflicht)
     except EditorialBriefingError as exc:
         # Der Wochenbericht ist das Herzstueck der Seite. Ihn beim ersten
         # Formfehler wegzuwerfen und stattdessen den Roh-Digest zu
@@ -173,7 +209,10 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
         # war ja da, nur die Gliederung stimmte nicht. Also einmal gezielt
         # nachfassen, mit den Ueberschriften woertlich im Auftrag.
         log.warning("Editor-Ausgabe abgelehnt (%s) - ein Korrekturversuch", exc)
-        return _ein_versuch(system + NACHFASSEN[exc.grund], user, model)
+        nachfassen = NACHFASSEN[exc.grund]
+        if exc.grund == "gliederung" and themen:
+            nachfassen += "## Technologie, Geräte & Regulierung\n"
+        return _ein_versuch(system + nachfassen, user, model, pflicht)
 
 
 # Wird nur an den zweiten Versuch angehaengt, passend zum Ablehnungsgrund.
@@ -226,7 +265,8 @@ passiert ist, nicht, was jemand daraus machen soll.
 EDITOR_MAX_TOKENS = 32000
 
 
-def _ein_versuch(system: str, user: str, model: str) -> tuple[str, list[str]]:
+def _ein_versuch(system: str, user: str, model: str,
+                 zusatz_pflicht: frozenset[str] = frozenset()) -> tuple[str, list[str]]:
     raw = complete(system, user, model=model, max_tokens=EDITOR_MAX_TOKENS)
 
     topics: list[str] = []
@@ -247,15 +287,23 @@ def _ein_versuch(system: str, user: str, model: str) -> tuple[str, list[str]]:
         markdown = markdown.split("\n", 1)[-1]
         if markdown.rstrip().endswith("```"):
             markdown = markdown.rstrip()[:-3].rstrip()
-    validate_editorial_briefing(markdown)
+    validate_editorial_briefing(markdown, zusatz_pflicht)
     return markdown, topics
 
 
-def validate_editorial_briefing(markdown: str) -> None:
+def validate_editorial_briefing(
+        markdown: str,
+        zusatz_pflicht: frozenset[str] = frozenset()) -> None:
     """Reject a raw source list before it can replace the public report.
 
     A technical outage at the free model provider must leave the last good
     briefing online, not turn the homepage into a list of collected links.
+
+    `zusatz_pflicht` enthaelt Ueberschriften, die NUR in bestimmten Laeufen
+    Pflicht sind - aktuell der Themenabschnitt, der genau dann verlangt wird,
+    wenn synthesize() ihn auch in den Prompt geschrieben hat. Prompt und
+    Pruefung haengen deshalb am selben Schalter; wer den einen aendert, aendert
+    den anderen mit.
     """
     headings = {
         line.strip().lower()
@@ -268,7 +316,7 @@ def validate_editorial_briefing(markdown: str) -> None:
         "## das wichtigste",
         "## die wichtigsten signale",
         "## muster der woche",
-    }
+    } | set(zusatz_pflicht)
     missing = required - headings
     if missing or "## wochenueberblick" in headings:
         detail = ", ".join(sorted(missing)) or "Roh-Digest erkannt"
