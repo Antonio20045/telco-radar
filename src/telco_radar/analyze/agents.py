@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from ..models import Item
@@ -131,6 +132,11 @@ Rules:
 
 BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
 
+# Pause vor dem Nachlauf gescheiterter Stapel. Lang genug, dass die
+# Anbieter-Warteschlange sich leert, kurz genug, dass sie im Job-Timeout
+# nicht auffaellt.
+NACHLAUF_PAUSE = 30.0
+
 
 def _items_payload(items: list[Item]) -> str:
     rows = []
@@ -194,6 +200,35 @@ def analyze_bereiche(bereiche: list[tuple[str, list[Item], bool]], model: str,
             ergebnisse = list(pool.map(_einer, stapel))
     else:
         ergebnisse = []
+
+    # Zweiter Durchgang fuer die gescheiterten Stapel, deutlich entdrosselt.
+    # Lauf #69 (04.08.2026, erster Lauf nach der Ausbauwelle) hat 42 von 72
+    # Stapeln verloren - nicht an einem toten Endpunkt, sondern an Ueberlast
+    # unter dem Burst: 984 neue Meldungen auf einmal. llm.py hatte da schon
+    # fuenf Wiederholungen mit bis zu 45 s Backoff hinter sich, aber alle
+    # INNERHALB des Bursts. Ein Nachlauf, wenn die Welle durch ist und nur
+    # noch ein Bruchteil der Aufrufe gleichzeitig laeuft, trifft auf einen
+    # freieren Anbieter.
+    #
+    # Der Nachlauf ist kein Ersatz fuer den Schutz ungelesener Meldungen: was
+    # auch hier scheitert, bleibt ungelesen und kommt im naechsten Lauf
+    # wieder. Er verkleinert nur den Schaden eines Bursts.
+    offen = [(i, s) for i, (s, e) in enumerate(zip(stapel, ergebnisse))
+             if e is None]
+    if offen and len(offen) < len(stapel):
+        nachlauf_workers = max(1, workers // 4)
+        log.warning("%d von %d Stapeln gescheitert - Nachlauf mit %d "
+                    "gleichzeitigen Aufrufen", len(offen), len(stapel),
+                    nachlauf_workers)
+        time.sleep(NACHLAUF_PAUSE)
+        with ThreadPoolExecutor(max_workers=nachlauf_workers) as pool:
+            zweite = list(pool.map(lambda p: _einer(p[1]), offen))
+        gerettet = 0
+        for (i, _s), ergebnis in zip(offen, zweite):
+            if ergebnis is not None:
+                ergebnisse[i] = ergebnis
+                gerettet += 1
+        log.warning("Nachlauf: %d von %d Stapeln gerettet", gerettet, len(offen))
 
     je_bereich: dict[str, list] = {name: [] for name, _i, _t in bereiche}
     for (name, _n, _gesamt, batch), ergebnis in zip(stapel, ergebnisse):

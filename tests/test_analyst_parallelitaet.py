@@ -127,6 +127,8 @@ def test_ein_grosser_bereich_nutzt_den_ganzen_pool(monkeypatch):
 
 
 def test_gescheiterte_stapel_bleiben_je_bereich_zugeordnet(monkeypatch):
+    monkeypatch.setattr(agents.time, "sleep", lambda s: None)
+
     def fake_complete(system, user, model, max_tokens):
         if "Europa" in user:
             raise RuntimeError("Anbieter ueberlastet")
@@ -160,3 +162,60 @@ def test_themenfelder_bekommen_ihren_eigenen_prompt(monkeypatch):
 
     assert any("NOT from competing operators" in s for s in gesehen)
     assert any("competitive-intelligence analyst" in s for s in gesehen)
+
+
+def test_gescheiterte_stapel_bekommen_einen_nachlauf(monkeypatch):
+    """Lauf #69: 42 von 72 Stapeln fielen aus, weil der Anbieter unter dem
+    Burst wegbrach - nicht, weil er tot war. Ein entdrosselter zweiter
+    Durchgang trifft ihn freier an."""
+    monkeypatch.setattr(agents.time, "sleep", lambda s: None)
+    runde = {"n": 0}
+
+    def fake_complete(system, user, model, max_tokens):
+        runde["n"] += 1
+        if runde["n"] <= 3:            # der Burst scheitert
+            raise RuntimeError("Anbieter ueberlastet")
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    ergebnisse = agents.analyze_bereiche(
+        [("Global", _items(agents.BATCH_SIZE * 5), False)],
+        model="m", workers=8)
+
+    tel = ergebnisse["Global"]["_telemetry"]
+    assert tel["batches"] == 5
+    assert tel["batches_ok"] == 5, "der Nachlauf hat nichts gerettet"
+    assert tel["unread_items"] == 0
+
+
+def test_was_auch_im_nachlauf_scheitert_bleibt_ungelesen(monkeypatch):
+    """Der Nachlauf ist kein Ersatz fuer den Schutz - nur eine Milderung."""
+    monkeypatch.setattr(agents.time, "sleep", lambda s: None)
+
+    def fake_complete(system, user, model, max_tokens):
+        if "Meldung 0" in user:
+            raise RuntimeError("dauerhaft kaputt")
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    ergebnisse = agents.analyze_bereiche(
+        [("Global", _items(agents.BATCH_SIZE * 3), False)],
+        model="m", workers=4)
+
+    assert ergebnisse["Global"]["_telemetry"]["unread_items"] == agents.BATCH_SIZE
+
+
+def test_ohne_ausfall_kein_nachlauf(monkeypatch):
+    aufrufe = {"n": 0}
+
+    def fake_complete(system, user, model, max_tokens):
+        aufrufe["n"] += 1
+        rows = json.loads(user.split("\n", 1)[1])
+        return _antwort([r["title"] for r in rows])
+
+    monkeypatch.setattr(agents, "complete", fake_complete)
+    agents.analyze_bereiche([("Global", _items(agents.BATCH_SIZE * 3), False)],
+                            model="m", workers=4)
+    assert aufrufe["n"] == 3
