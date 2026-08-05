@@ -12,15 +12,15 @@ news_sources:
   - {name: "Light Reading", type: rss, url: "https://www.lightreading.com/rss.xml"}
   - {name: "Fierce Network", type: rss, url: "https://www.fierce-network.com/rss/xml"}
   - {name: "Total Telecom", type: rss, url: "https://totaltele.com/feed/"}
-  - {name: "RCR Wireless", type: rss, url: "https://www.rcrwireless.com/feed"}
+  - {name: "RCR Wireless", type: rss, url: "https://www.rcrwireless.com/feed", region: north_america}
   - {name: "Developing Telecoms", type: rss, url: "https://developingtelecoms.com/?format=feed&type=rss"}
-  - {name: "Mobile Europe", type: rss, url: "https://www.mobileeurope.co.uk/feed/"}
+  - {name: "Mobile Europe", type: rss, url: "https://www.mobileeurope.co.uk/feed/", region: europe}
   - {name: "Broadband TV News", type: rss, url: "https://www.broadbandtvnews.com/feed/"}
   - {name: "Telecoms Tech News", type: rss, url: "https://www.telecomstechnews.com/feed/"}
   - {name: "The Fast Mode", type: rss, url: "https://www.thefastmode.com/?format=feed&type=rss"}
-  - {name: "Telecompetitor", type: rss, url: "https://www.telecompetitor.com/feed/"}
-  - {name: "TelecomTalk", type: rss, url: "https://telecomtalk.info/feed/"}
-  - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
+  - {name: "Telecompetitor", type: rss, url: "https://www.telecompetitor.com/feed/", region: north_america}
+  - {name: "TelecomTalk", type: rss, url: "https://telecomtalk.info/feed/", region: asia}
+  - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed", region: europe}
   - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
   # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
 
@@ -54,38 +54,38 @@ news_sources:
   # -- Deutsch
   # Rein telekommunikationsspezifisch, taeglich, mit Tarifdetails - genau die
   # Ebene, auf der die Kollegin arbeitet.
-  - {name: "teltarif", type: rss, url: "https://www.teltarif.de/feed/news/20.rss2", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "teltarif", type: rss, url: "https://www.teltarif.de/feed/news/20.rss2", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05", region: europe}
   # Handelsblatt des Telekommunikationsvertriebs: Tarife, Endgeraete, Handel.
-  - {name: "Telecom Handel", type: rss, url: "https://www.telecom-handel.de/feed/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Handel", type: rss, url: "https://www.telecom-handel.de/feed/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05", region: europe}
 
   # -- Franzoesisch
   # Deckt den franzoesischen Markt (Orange, SFR, Bouygues, Free) taeglich ab.
-  - {name: "Univers Freebox", type: rss, url: "https://www.universfreebox.com/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Univers Freebox", type: rss, url: "https://www.universfreebox.com/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: europe}
 
   # -- Spanisch (Spanien)
-  - {name: "Xataka Móvil", type: rss, url: "https://www.xatakamovil.com/feedburner.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
-  - {name: "ADSLZone", type: rss, url: "https://www.adslzone.net/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Xataka Móvil", type: rss, url: "https://www.xatakamovil.com/feedburner.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05", region: europe}
+  - {name: "ADSLZone", type: rss, url: "https://www.adslzone.net/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: europe}
 
   # -- Italienisch
-  - {name: "Corriere Comunicazioni", type: rss, url: "https://www.corrierecomunicazioni.it/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni", type: rss, url: "https://www.corrierecomunicazioni.it/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: europe}
 
   # -- Portugiesisch / Spanisch (Lateinamerika)
   # Der brasilianische Markt war bisher nur ueber die Betreiber selbst
   # sichtbar; TeleSintese lieferte im Abruf 40 von 40 Meldungen im
   # Frischefenster.
-  - {name: "TeleSíntese (BR)", type: rss, url: "https://telesintese.com.br/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "TeleSemana (LatAm)", type: rss, url: "https://www.telesemana.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TeleSíntese (BR)", type: rss, url: "https://telesintese.com.br/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "TeleSemana (LatAm)", type: rss, url: "https://www.telesemana.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: latin_america}
 
   # -- Regionale englischsprachige Fachpresse (Asien, Afrika, Indien)
   # Nicht "noch ein internationaler Feed": diese vier berichten ueber Maerkte,
   # die in der bestehenden Fachpresse praktisch nicht vorkommen.
-  - {name: "Communications Today (Indien)", type: rss, url: "https://www.communicationstoday.co.in/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Asia", type: rss, url: "https://www.telecomreviewasia.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Africa", type: rss, url: "https://www.telecomreviewafrica.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Communications Today (Indien)", type: rss, url: "https://www.communicationstoday.co.in/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: asia}
+  - {name: "Telecom Review Asia", type: rss, url: "https://www.telecomreviewasia.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: asia}
+  - {name: "Telecom Review Africa", type: rss, url: "https://www.telecomreviewafrica.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: africa_middle_east}
   # Suedafrika ist der groesste Markt, in dem Vodacom und MTN aufeinander
   # treffen - und war bisher nur ueber die Betreiber selbst sichtbar.
-  - {name: "ITWeb (Südafrika)", type: rss, url: "https://www.itweb.co.za/rss", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "TechCentral (Südafrika)", type: rss, url: "https://techcentral.co.za/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "ITWeb (Südafrika)", type: rss, url: "https://www.itweb.co.za/rss", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: africa_middle_east}
+  - {name: "TechCentral (Südafrika)", type: rss, url: "https://techcentral.co.za/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: africa_middle_east}
 
   # -- International, aber im Bestand bisher nicht vertreten
   - {name: "TelecomTV", type: rss, url: "https://www.telecomtv.com/content/news/rss.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
@@ -93,7 +93,7 @@ news_sources:
   # Grosshandel, Seekabel, Interconnect - die Kostenseite, ueber die sonst
   # niemand berichtet.
   - {name: "Capacity Media", type: json_api, url: "https://capacityglobal.com/wp-json/wp/v2/posts?per_page=25&_embed=1", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "Broadband Communities", type: rss, url: "https://bbcmag.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Broadband Communities", type: rss, url: "https://bbcmag.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05", region: north_america}
   # Frequenzpolitik weltweit - die einzige Quelle im Bestand, die
   # Auktionsverfahren und Bandvergaben systematisch verfolgt.
   - {name: "PolicyTracker", type: rss, url: "https://www.policytracker.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
@@ -114,17 +114,17 @@ news_sources:
   # spezifischen Titel im Bestand.
   # Ebenfalls verworfen: die "comments/feed"-Varianten mehrerer Titel - das
   # sind Leserkommentare, keine Artikel.
-  - {name: "Telepolis (Polen)", type: rss, url: "https://www.telepolis.pl/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Lupa (Tschechien)", type: rss, url: "https://www.lupa.cz/rss/clanky/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Netzwoche (Schweiz)", type: rss, url: "https://www.netzwoche.ch/taxonomy/term/31/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "digi.no (Norwegen)", type: rss, url: "https://www.digi.no/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead (Indien)", type: rss, url: "https://telecomlead.com/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "MediaNama (Indien)", type: rss, url: "https://www.medianama.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Mobile Time (Brasilien)", type: rss, url: "https://www.mobiletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "TELETIME (Brasilien)", type: rss, url: "https://teletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Telepolis (Polen)", type: rss, url: "https://www.telepolis.pl/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: europe}
+  - {name: "Lupa (Tschechien)", type: rss, url: "https://www.lupa.cz/rss/clanky/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: europe}
+  - {name: "Netzwoche (Schweiz)", type: rss, url: "https://www.netzwoche.ch/taxonomy/term/31/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: europe}
+  - {name: "digi.no (Norwegen)", type: rss, url: "https://www.digi.no/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: europe}
+  - {name: "TelecomLead (Indien)", type: rss, url: "https://telecomlead.com/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: asia}
+  - {name: "MediaNama (Indien)", type: rss, url: "https://www.medianama.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: asia}
+  - {name: "Mobile Time (Brasilien)", type: rss, url: "https://www.mobiletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "TELETIME (Brasilien)", type: rss, url: "https://teletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: africa_middle_east}
+  - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05", region: africa_middle_east}
 
   # ===========================================================================
   # RUBRIKFEEDS BESTEHENDER TITEL - Welle 3 (05.08.2026)
@@ -199,45 +199,45 @@ news_sources:
   # bbcmag ai gegen innovation).
 
   # -- RCR Wireless (US/international, taeglich)
-  - {name: "RCR Wireless — 5G", type: rss, url: "https://www.rcrwireless.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "RCR Wireless — 6G", type: rss, url: "https://www.rcrwireless.com/category/6g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "RCR Wireless — KI-Infrastruktur", type: rss, url: "https://www.rcrwireless.com/category/ai-infrastructure/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "RCR Wireless — 5G", type: rss, url: "https://www.rcrwireless.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
+  - {name: "RCR Wireless — 6G", type: rss, url: "https://www.rcrwireless.com/category/6g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
+  - {name: "RCR Wireless — KI-Infrastruktur", type: rss, url: "https://www.rcrwireless.com/category/ai-infrastructure/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
   # -- Mobile Europe
-  - {name: "Mobile Europe — 5G", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/5g-beyond/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Mobile Europe — Automatisierung & KI", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/automation-ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Mobile Europe — Cloud & NFV", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/cloud-nfv/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Mobile Europe — Finanzen & Regulierung", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/financial-regulation/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Mobile Europe — Satellit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/satellite/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Mobile Europe — Sicherheit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — 5G", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/5g-beyond/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Mobile Europe — Automatisierung & KI", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/automation-ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Mobile Europe — Cloud & NFV", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/cloud-nfv/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Mobile Europe — Finanzen & Regulierung", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/financial-regulation/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Mobile Europe — Satellit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/satellite/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Mobile Europe — Sicherheit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
   # -- Total Telecom
-  - {name: "Total Telecom — 5G", type: rss, url: "https://totaltele.com/category/technology/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Total Telecom — 5G", type: rss, url: "https://totaltele.com/category/technology/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
   # -- Corriere Comunicazioni (Italien)
-  - {name: "Corriere Comunicazioni — 5G", type: rss, url: "https://www.corrierecomunicazioni.it/telco/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Corriere Comunicazioni — Frequenzen", type: rss, url: "https://www.corrierecomunicazioni.it/telco/frequenze/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Corriere Comunicazioni — Cloud", type: rss, url: "https://www.corrierecomunicazioni.it/digital-economy/cloud/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Corriere Comunicazioni — Cybersicherheit", type: rss, url: "https://www.corrierecomunicazioni.it/cyber-security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni — 5G", type: rss, url: "https://www.corrierecomunicazioni.it/telco/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Corriere Comunicazioni — Frequenzen", type: rss, url: "https://www.corrierecomunicazioni.it/telco/frequenze/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Corriere Comunicazioni — Cloud", type: rss, url: "https://www.corrierecomunicazioni.it/digital-economy/cloud/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Corriere Comunicazioni — Cybersicherheit", type: rss, url: "https://www.corrierecomunicazioni.it/cyber-security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
   # -- Indien
-  - {name: "TelecomTalk — 5G", type: rss, url: "https://telecomtalk.info/category/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TelecomTalk — 6G", type: rss, url: "https://telecomtalk.info/category/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Communications Today — 5G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/page_5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Communications Today — 6G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Communications Today — KI", type: rss, url: "https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead — 5G", type: rss, url: "https://telecomlead.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead — Breitband", type: rss, url: "https://telecomlead.com/category/broadband/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead — Satellit", type: rss, url: "https://telecomlead.com/category/satellite/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead — Netztechnik", type: rss, url: "https://telecomlead.com/category/telecom-equipment/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomTalk — 5G", type: rss, url: "https://telecomtalk.info/category/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "TelecomTalk — 6G", type: rss, url: "https://telecomtalk.info/category/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "Communications Today — 5G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/page_5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "Communications Today — 6G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "Communications Today — KI", type: rss, url: "https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "TelecomLead — 5G", type: rss, url: "https://telecomlead.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "TelecomLead — Breitband", type: rss, url: "https://telecomlead.com/category/broadband/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "TelecomLead — Satellit", type: rss, url: "https://telecomlead.com/category/satellite/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "TelecomLead — Netztechnik", type: rss, url: "https://telecomlead.com/category/telecom-equipment/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   # -- Telecom Review (Naher Osten / Asien / Afrika)
-  - {name: "Telecom Review — Betreiber", type: rss, url: "https://www.telecomreview.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Asia — Netze", type: rss, url: "https://www.telecomreviewasia.com/news/network-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Asia — Technik", type: rss, url: "https://www.telecomreviewasia.com/news/technology-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Africa — Betreiber", type: rss, url: "https://www.telecomreviewafrica.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review — Betreiber", type: rss, url: "https://www.telecomreview.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
+  - {name: "Telecom Review Asia — Netze", type: rss, url: "https://www.telecomreviewasia.com/news/network-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "Telecom Review Asia — Technik", type: rss, url: "https://www.telecomreviewasia.com/news/technology-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  - {name: "Telecom Review Africa — Betreiber", type: rss, url: "https://www.telecomreviewafrica.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
   # -- DPL News (Lateinamerika)
-  - {name: "DPL News — 5G", type: rss, url: "https://dplnews.com/category/redes/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "DPL News — 6G", type: rss, url: "https://dplnews.com/category/redes/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "DPL News — KI", type: rss, url: "https://dplnews.com/category/tecnologia/inteligencia-artificial/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "DPL News — 5G", type: rss, url: "https://dplnews.com/category/redes/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "DPL News — 6G", type: rss, url: "https://dplnews.com/category/redes/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: latin_america}
+  - {name: "DPL News — KI", type: rss, url: "https://dplnews.com/category/tecnologia/inteligencia-artificial/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: latin_america}
   # -- weitere
   - {name: "CommsRisk — Betrug & Sicherheit", type: rss, url: "https://commsrisk.com/category/risk-fraud-security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Broadband Communities — Regulierung", type: rss, url: "https://bbcmag.com/category/law-policy/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Broadband Communities — Regulierung", type: rss, url: "https://bbcmag.com/category/law-policy/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
   # Ookla misst Netzqualitaet weltweit; die 5G-Rubrik traegt die Laender-
   # vergleiche, mit denen Betreiber werben.
   - {name: "Ookla Insights — 5G", type: rss, url: "https://www.ookla.com/articles/tag/5g/rss", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
@@ -275,12 +275,12 @@ news_sources:
   #   convergenciadigital.com.br, digitalnewsasia.com
   #                     Maerkte, die im Bestand schon mehrfach abgedeckt sind
   #                     (Italien, Pakistan, Indien, Brasilien)
-  - {name: "Bandaancha (Spanien)", type: rss, url: "https://bandaancha.eu/portada.atom", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Ariase (Frankreich)", type: rss, url: "https://www.ariase.com/blog/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Broadband Breakfast (USA)", type: rss, url: "https://broadbandbreakfast.com/rss/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "GSMonline (Polen)", type: rss, url: "https://www.gsmonline.pl/feed/artykuly", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Telko.in (Polen)", type: rss, url: "https://www.telko.in/rss", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "Comunic.ro (Rumänien)", type: rss, url: "https://comunic.ro/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
-  - {name: "TechCabal (Afrika)", type: rss, url: "https://techcabal.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Bandaancha (Spanien)", type: rss, url: "https://bandaancha.eu/portada.atom", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Ariase (Frankreich)", type: rss, url: "https://www.ariase.com/blog/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Broadband Breakfast (USA)", type: rss, url: "https://broadbandbreakfast.com/rss/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: north_america}
+  - {name: "GSMonline (Polen)", type: rss, url: "https://www.gsmonline.pl/feed/artykuly", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Telko.in (Polen)", type: rss, url: "https://www.telko.in/rss", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "Comunic.ro (Rumänien)", type: rss, url: "https://comunic.ro/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: europe}
+  - {name: "TechCabal (Afrika)", type: rss, url: "https://techcabal.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
   - {name: "Wireless Estimator (Funktürme)", type: rss, url: "https://wirelessestimator.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
   - {name: "DigiTimes (Lieferkette)", type: rss, url: "https://www.digitimes.com/rss/daily.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}

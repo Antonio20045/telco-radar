@@ -113,7 +113,11 @@ def collect_all(cfg: Config, max_workers: int | None = None,
         for src in op.crawled_sources:
             jobs.append((src, op.region_key, op.name, "operator"))
     for src in cfg.news_sources:
-        jobs.append((src, "global", None, "industry_news"))
+        # Vorgabe-Region der Quelle, sonst "global". tag_news_regions
+        # ueberschreibt das gleich wieder, sobald ein Betreibername in der
+        # Ueberschrift steht - die Vorgabe greift also nur dort, wo bisher
+        # ueberhaupt keine Zuordnung zustande kam.
+        jobs.append((src, src.region or "global", None, "industry_news"))
     # Themenquellen laufen unter ihrem Themenschluessel als "Region" - so
     # bekommt jedes Themenfeld einen eigenen Analysten, ohne dass die
     # Regionslogik der Watchlist es fuer einen Betreiber haelt.
