@@ -67,6 +67,16 @@ jobs:
         run: |
           {
             if [ "${{ github.event.inputs.sources_only }}" = "true" ]; then
+              # Sammelphase MESSEN, nicht nur pruefen. Lokal ist die Zahl
+              # wertlos: die Sandbox hat kein Netz-Chromium (alle
+              # newsroom_js-Quellen fallen dort sofort durch) und eine andere
+              # Anbindung. Der Vergleich "alte Einstellung / neue Einstellung"
+              # gehoert deshalb in genau die Umgebung, in der der Lauf spaeter
+              # stattfindet - und diese Diagnose fasst weder State noch LLM an.
+              echo "### miss_sammelphase.py (Drosselung: vorher/nachher)"
+              echo '```text'
+              python scripts/miss_sammelphase.py --vergleich 8:1000:0 64:2:0.5
+              echo '```'
               echo "### validate_sources.py"
               echo '```text'
               python scripts/validate_sources.py

@@ -16,7 +16,8 @@ from pathlib import Path
 
 import pytest
 
-from telco_radar.models import Item
+from telco_radar.config import Source
+from telco_radar.models import Item, normalize_url
 
 _PFAD = Path(__file__).resolve().parents[1] / "scripts" / "pruefe_quellenvorschlag.py"
 _spec = importlib.util.spec_from_file_location("pruefe_quellenvorschlag", _PFAD)
@@ -28,11 +29,15 @@ _spec.loader.exec_module(pq)
 class FakeBestand:
     """Ein Bestand ohne Config und ohne Netz."""
 
-    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None):
+    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None,
+                 item_index: dict | None = None):
         self.http_cfg: dict = {}
         self.lookback = 8
         self._bekannt = bekannt or {}
         self.je_operator = je_operator or {}
+        # Leer heisst "kein Index aufgebaut" - dann prueft der Check die
+        # Inhaltsdublette wie bisher live (siehe Kriterium 10).
+        self.item_index = item_index or {}
 
     def kennt(self, url: str) -> str:
         return self._bekannt.get(url, "")
@@ -288,3 +293,104 @@ def test_echte_ueberschrift_erkannt(titel):
 ])
 def test_registrierbare_domain(host, erwartet):
     assert pq._registrable(host) == erwartet
+
+
+# =========================================================================== #
+# Massenbetrieb (Kriterium 10): Wiederaufnahme, Cache, Dubletten-Index.
+#
+# Bei 1000 Kandidaten ist der Check selbst ein Engpass. Vorher rief die
+# Inhaltsdublettenpruefung fuer JEDEN Kandidaten alle bestehenden Quellen
+# seines Betreibers live ab, und ein Abbruch nach 800 Kandidaten bedeutete,
+# von vorn anzufangen.
+# =========================================================================== #
+
+def _kandidat(url="https://a.de/feed", **kw):
+    return pq.Kandidat(url=url, **kw)
+
+
+def test_cache_schluessel_trennt_verschiedene_anlaeufe():
+    """Dieselbe URL mit anderem Selektor ist ein ANDERER Vorschlag - sonst
+    wuerde der zweite Anlauf das Ergebnis des ersten erben."""
+    a = _kandidat(type="newsroom")
+    b = _kandidat(type="newsroom", item_selector=".card")
+    c = _kandidat(type="rss")
+    assert len({pq._cache_schluessel(k) for k in (a, b, c)}) == 3
+
+
+def test_cache_schluessel_ignoriert_url_kosmetik():
+    assert (pq._cache_schluessel(_kandidat("https://www.a.de/feed/"))
+            == pq._cache_schluessel(_kandidat("https://a.de/feed")))
+
+
+def test_cache_wird_geschrieben_und_gelesen(tmp_path):
+    pfad = tmp_path / "cache.json"
+    befund = pq.Befund(kandidat=_kandidat(), bestanden=True, n_items=9)
+    pq.schreibe_cache(pfad, [befund.as_dict()], {})
+
+    gelesen = pq.lade_cache(pfad)
+    assert len(gelesen) == 1
+    assert gelesen[pq._cache_schluessel(_kandidat())]["n_items"] == 9
+
+
+def test_cache_behaelt_frueher_geprueftes(tmp_path):
+    """Wiederaufnahme nach Abbruch: Welle 2 darf Welle 1 nicht ueberschreiben."""
+    pfad = tmp_path / "cache.json"
+    erste = pq.Befund(kandidat=_kandidat("https://a.de/feed"), bestanden=True)
+    pq.schreibe_cache(pfad, [erste.as_dict()], {})
+
+    vorher = pq.lade_cache(pfad)
+    zweite = pq.Befund(kandidat=_kandidat("https://b.de/feed"), bestanden=False)
+    pq.schreibe_cache(pfad, [zweite.as_dict()], vorher)
+
+    assert len(pq.lade_cache(pfad)) == 2
+
+
+def test_defekter_cache_wird_ignoriert(tmp_path):
+    pfad = tmp_path / "cache.json"
+    pfad.write_text("{kaputt", encoding="utf-8")
+    assert pq.lade_cache(pfad) == {}
+
+
+def test_fehlender_cache_ist_leer(tmp_path):
+    assert pq.lade_cache(tmp_path / "gibt-es-nicht.json") == {}
+    assert pq.lade_cache(None) == {}
+
+
+def test_dublette_wird_gegen_den_index_erkannt(monkeypatch):
+    """Ohne Live-Abruf der bestehenden Quelle - das ist der ganze Punkt."""
+    abrufe = []
+
+    def _collect(source, *a, **k):
+        abrufe.append(source.url)
+        return _items(10)
+
+    monkeypatch.setattr(pq, "collect_source", _collect)
+    bestand = FakeBestand(item_index={"Alpha": {
+        "https://alpha.de/presse": {normalize_url(i.url) for i in _items(10)}}})
+
+    befund = pq._pruefe_einen(
+        _kandidat("https://alpha.de/news", operator="Alpha",
+                  website="alpha.de", type="rss"),
+        bestand, 8, True)
+
+    dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
+    assert dublette and not dublette[0]["ok"]
+    # nur der Kandidat selbst wurde geholt, nicht die Vergleichsquelle
+    assert abrufe == ["https://alpha.de/news"]
+
+
+def test_ohne_index_wird_live_verglichen(monkeypatch):
+    abrufe = []
+
+    def _collect(source, *a, **k):
+        abrufe.append(source.url)
+        return _items(10)
+
+    monkeypatch.setattr(pq, "collect_source", _collect)
+    bestand = FakeBestand(je_operator={"Alpha": [
+        Source(type="rss", url="https://alpha.de/presse", name="Alpha")]})
+
+    pq._pruefe_einen(_kandidat("https://alpha.de/news", operator="Alpha",
+                               website="alpha.de", type="rss"),
+                     bestand, 8, True)
+    assert "https://alpha.de/presse" in abrufe

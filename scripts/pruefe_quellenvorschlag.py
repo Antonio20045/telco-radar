@@ -58,6 +58,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from telco_radar.collect import collect_source  # noqa: E402
+from telco_radar.collect.http import configure_throttle  # noqa: E402
 from telco_radar.config import Source, load_config  # noqa: E402
 from telco_radar.models import normalize_url  # noqa: E402
 
@@ -255,6 +256,7 @@ class Befund:
             "titelprobe": self.titelprobe,
             "kriterien": self.kriterien,
             "fehler": self.fehler,
+            "cache_schluessel": _cache_schluessel(self.kandidat),
         }
 
 
@@ -267,6 +269,14 @@ class Bestand:
         self.root = root
         self.nach_url: dict[str, str] = {}      # normalisierte URL -> Beschreibung
         self.je_operator: dict[str, list[Source]] = {}
+        # Kriterium 10: Meldungs-URLs der BESTEHENDEN Quellen, einmal
+        # eingesammelt statt je Kandidat neu. Vorher rief die
+        # Inhaltsdublettenpruefung fuer jeden Kandidaten alle Quellen seines
+        # Betreibers live ab - bei 1000 Kandidaten waeren das mehrere tausend
+        # zusaetzliche Abrufe gegen dieselben Server, also genau der Weg in
+        # 429/403. Leer heisst "nicht aufgebaut": dann faellt die Pruefung auf
+        # den alten Live-Weg zurueck.
+        self.item_index: dict[str, dict[str, set[str]]] = {}
         try:
             cfg = load_config(root)
         except Exception:  # noqa: BLE001 - der Check soll auch ohne Config laufen
@@ -294,6 +304,52 @@ class Bestand:
 
     def kennt(self, url: str) -> str:
         return self.nach_url.get(normalize_url(url), "")
+
+    # ------------------------------------------------------------- Index
+
+    def baue_item_index(self, workers: int = 12,
+                        cache: Path | None = None) -> int:
+        """Einmal alle bestehenden Quellen abrufen und ihre Meldungs-URLs merken.
+
+        Das ist der teure Teil des Abnahme-Checks (ein Abruf je bestehender
+        Quelle), aber er faellt jetzt EINMAL an statt je Kandidat. Mit --index
+        wird er ausserdem auf Platte gelegt und beim naechsten Durchgang
+        wiederverwendet - bei mehreren hundert Kandidaten in Wellen ist das der
+        Unterschied zwischen Minuten und Stunden.
+        """
+        if cache and cache.exists():
+            try:
+                roh = json.loads(cache.read_text(encoding="utf-8"))
+                self.item_index = {op: {u: set(v) for u, v in quellen.items()}
+                                   for op, quellen in roh.items()}
+                return sum(len(q) for q in self.item_index.values())
+            except (json.JSONDecodeError, AttributeError):
+                print(f"Index-Cache {cache} unlesbar - wird neu aufgebaut")
+
+        auftraege = [(op, src) for op, quellen in self.je_operator.items()
+                     for src in quellen]
+
+        def _hole(auftrag):
+            op, src = auftrag
+            try:
+                items = collect_source(src, "europe", op, "operator",
+                                       self.http_cfg)
+                return op, src.url, {normalize_url(i.url) for i in items}
+            except Exception:  # noqa: BLE001 - eine tote Quelle ist kein Grund
+                return op, src.url, set()   # den Check abzubrechen
+
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            for op, url, urls in pool.map(_hole, auftraege):
+                if urls:
+                    self.item_index.setdefault(op, {})[url] = urls
+
+        if cache:
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            cache.write_text(json.dumps(
+                {op: {u: sorted(v) for u, v in quellen.items()}
+                 for op, quellen in self.item_index.items()},
+                ensure_ascii=False), encoding="utf-8")
+        return sum(len(q) for q in self.item_index.values())
 
 
 def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
@@ -442,17 +498,27 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
         eigene = {normalize_url(i.url) for i in items}
         schlimmste = 0.0
         wer = ""
-        for src in bestand.je_operator.get(kand.operator, []):
-            try:
-                andere = {normalize_url(i.url) for i in collect_source(
-                    src, region, kand.operator, "operator", http_cfg)}
-            except Exception:  # noqa: BLE001
-                continue
+        # Gegen den einmal aufgebauten Index, wenn es ihn gibt (Kriterium 10);
+        # sonst wie bisher live. Der Live-Weg bleibt fuer Einzelpruefungen -
+        # dort kostet ein Index mehr, als er spart.
+        indiziert = bestand.item_index.get(kand.operator)
+        if indiziert:
+            vergleich = indiziert.items()
+        else:
+            vergleich = []
+            for src in bestand.je_operator.get(kand.operator, []):
+                try:
+                    vergleich.append((src.url, {
+                        normalize_url(i.url) for i in collect_source(
+                            src, region, kand.operator, "operator", http_cfg)}))
+                except Exception:  # noqa: BLE001
+                    continue
+        for quelle_url, andere in vergleich:
             if not andere:
                 continue
             ueberlappung = len(eigene & andere) / len(eigene)
             if ueberlappung > schlimmste:
-                schlimmste, wer = ueberlappung, src.url
+                schlimmste, wer = ueberlappung, quelle_url
         b.pruefe(7, "keine Inhaltsdublette", schlimmste <= MAX_ITEM_OVERLAP,
                  f"{schlimmste:.0%} gemeinsame Meldungen"
                  + (f" mit {wer}" if wer else " (keine Vergleichsquelle)"))
@@ -489,6 +555,43 @@ def lade_kandidaten(pfad: Path, root: Path) -> list[Kandidat]:
     return out
 
 
+def _cache_schluessel(k: Kandidat) -> str:
+    """Was einen Kandidaten fuer den Cache identifiziert.
+
+    Nicht nur die URL: ein zweiter Anlauf mit anderem item_selector oder
+    anderem Typ ist ein ANDERER Vorschlag und muss neu geprueft werden.
+    """
+    return "|".join([normalize_url(k.url), k.type, k.item_selector or "",
+                     k.link_template or "", str(k.allow_short_titles)])
+
+
+def lade_cache(pfad: Path | None) -> dict[str, dict]:
+    if not pfad or not pfad.exists():
+        return {}
+    try:
+        roh = json.loads(pfad.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        print(f"Cache {pfad} unlesbar - wird ignoriert")
+        return {}
+    return {e["cache_schluessel"]: e for e in roh
+            if isinstance(e, dict) and e.get("cache_schluessel")}
+
+
+def schreibe_cache(pfad: Path, befunde_dicts: list[dict],
+                   vorher: dict[str, dict]) -> None:
+    """Alles Bekannte behalten, das Neue dazuschreiben.
+
+    Wiederaufnahme nach Abbruch (Kriterium 10) haengt daran, dass der Cache
+    nach JEDER Welle geschrieben wird und die frueheren Ergebnisse ueberlebt.
+    """
+    zusammen = dict(vorher)
+    for d in befunde_dicts:
+        zusammen[d["cache_schluessel"]] = d
+    pfad.parent.mkdir(parents=True, exist_ok=True)
+    pfad.write_text(json.dumps(list(zusammen.values()), ensure_ascii=False,
+                               indent=1), encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         description="Prueft Quellenvorschlaege maschinell gegen die "
@@ -503,14 +606,23 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--item-selector", default=None)
     p.add_argument("--lookback", type=int, default=None)
     p.add_argument("--json", type=Path, help="Ergebnis als JSON schreiben")
-    p.add_argument("--workers", type=int, default=6)
+    p.add_argument("--workers", type=int, default=24,
+                   help="parallele Kandidatenpruefungen (mit Host-Drosselung)")
     p.add_argument("--no-overlap", action="store_true",
                    help="Inhaltsdubletten-Pruefung (Kriterium 7b) ueberspringen "
                         "- spart Abrufe, uebersieht aber zwei Pfade derselben Seite")
-    p.add_argument("--zweimal", action="store_true",
-                   help="geparste Seiten (newsroom/json_api) ein zweites Mal "
-                        "abrufen und auf gleiche Ausbeute pruefen - faengt "
-                        "Seiten, die wechselnd mit und ohne Datum ausliefern")
+    p.add_argument("--einmal", action="store_true",
+                   help="geparste Seiten NUR EINMAL abrufen. Standard ist der "
+                        "zweite Abruf (Kriterium 11): newswire.ca lieferte "
+                        "einmal 23/23 datiert und beim naechsten Abruf 30/0")
+    p.add_argument("--cache", type=Path,
+                   help="Ergebnisse hier ablegen und bereits gepruefte "
+                        "Kandidaten ueberspringen (Wiederaufnahme nach Abbruch)")
+    p.add_argument("--erneut-pruefen", action="store_true",
+                   help="Cache ignorieren und alles neu pruefen")
+    p.add_argument("--index", type=Path,
+                   help="Meldungs-Index der bestehenden Quellen hier "
+                        "zwischenspeichern (Dublettenpruefung ohne Live-Abrufe)")
     p.add_argument("--nur-bestanden", action="store_true",
                    help="Nur die bestandenen Kandidaten ausgeben")
     args = p.parse_args(argv)
@@ -518,6 +630,11 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
     bestand = Bestand(root)
     lookback = args.lookback or getattr(bestand, "lookback", 8)
+
+    # Ohne Drosselung wuerden 24 gleichzeitige Pruefungen bei einer Welle von
+    # Kandidaten derselben Firma auf denselben Server einschlagen - und der
+    # Check wuerde 429 als "Quelle taugt nichts" protokollieren.
+    configure_throttle(2, 0.5)
 
     if args.url:
         kandidaten = [Kandidat(url=args.url, type=args.type,
@@ -536,43 +653,80 @@ def main(argv: list[str] | None = None) -> int:
     else:
         p.error("Entweder eine Kandidatendatei oder --url angeben")
 
+    # --- Wiederaufnahme: was der Cache schon kennt, wird nicht neu geholt
+    cache = {} if args.erneut_pruefen else lade_cache(args.cache)
+    aus_cache = [cache[_cache_schluessel(k)] for k in kandidaten
+                 if _cache_schluessel(k) in cache]
+    offen = [k for k in kandidaten if _cache_schluessel(k) not in cache]
+    if aus_cache:
+        print(f"{len(aus_cache)} von {len(kandidaten)} Kandidaten aus dem "
+              f"Cache ({args.cache}), {len(offen)} werden geprueft")
+
+    # --- Index der bestehenden Quellen: einmal, nicht je Kandidat
+    if offen and not args.no_overlap and any(k.operator for k in offen):
+        n = bestand.baue_item_index(workers=max(8, args.workers),
+                                    cache=args.index)
+        print(f"Dubletten-Index: {n} bestehende Quellen erfasst")
+
     befunde: list[Befund] = []
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         futs = {pool.submit(_pruefe_einen, k, bestand, lookback,
-                            not args.no_overlap, args.zweimal): k
-                for k in kandidaten}
+                            not args.no_overlap, not args.einmal): k
+                for k in offen}
         for fut in as_completed(futs):
             befunde.append(fut.result())
 
-    reihenfolge = {k.url: n for n, k in enumerate(kandidaten)}
-    befunde.sort(key=lambda b: reihenfolge.get(b.kandidat.url, 0))
+    ergebnisse = [b.as_dict() for b in befunde]
+    if args.cache:
+        schreibe_cache(args.cache, ergebnisse, cache)
+    ergebnisse.extend(aus_cache)
 
-    bestanden = [b for b in befunde if b.bestanden]
+    reihenfolge = {normalize_url(k.url): n for n, k in enumerate(kandidaten)}
+    ergebnisse.sort(key=lambda d: reihenfolge.get(normalize_url(d["url"]), 0))
+
+    bestanden = [d for d in ergebnisse if d["bestanden"]]
     print(f"{'ERGEBNIS':9} {'ITEMS':>5} {'DAT':>4} {'FRISCH':>6} {'NEUESTES':>11}  "
           f"{'BEZEICHNUNG':28} URL")
     print("-" * 140)
-    for b in befunde:
-        if args.nur_bestanden and not b.bestanden:
+    for d in ergebnisse:
+        if args.nur_bestanden and not d["bestanden"]:
             continue
-        status = "PASS" if b.bestanden else "FAIL"
-        print(f"{status:9} {b.n_items:>5} {b.n_datiert:>4} {b.n_frisch:>6} "
-              f"{b.neuestes or '-':>11}  {b.kandidat.bezeichnung[:28]:28} "
-              f"{b.kandidat.url}")
-        if not b.bestanden:
-            for grund in b.durchgefallen:
-                print(f"          -> {grund}")
-        for t in b.titelprobe:
+        status = "PASS" if d["bestanden"] else "FAIL"
+        print(f"{status:9} {d['n_items']:>5} {d['n_datiert']:>4} "
+              f"{d['n_frisch']:>6} {d['neuestes'] or '-':>11}  "
+              f"{d['bezeichnung'][:28]:28} {d['url']}")
+        if not d["bestanden"]:
+            for k in d["kriterien"]:
+                if not k["ok"]:
+                    print(f"          -> K{k['nr']} {k['name']}: {k['detail']}")
+        for t in d["titelprobe"]:
             print(f"          | {t[:110]}")
     print("-" * 140)
-    print(f"{len(bestanden)}/{len(befunde)} bestanden")
+    print(f"{len(bestanden)}/{len(ergebnisse)} bestanden")
+
+    # Woran die Durchgefallenen gescheitert sind - bei 1000 Kandidaten ist das
+    # die einzige Zeile, die man wirklich liest.
+    if len(bestanden) < len(ergebnisse):
+        gruende: dict[str, int] = {}
+        for d in ergebnisse:
+            if d["bestanden"]:
+                continue
+            for k in d["kriterien"]:
+                if not k["ok"]:
+                    gruende[f"K{k['nr']} {k['name']}"] = \
+                        gruende.get(f"K{k['nr']} {k['name']}", 0) + 1
+        print("Haeufigste Ablehnungsgruende: " + ", ".join(
+            f"{grund} ({n})" for grund, n
+            in sorted(gruende.items(), key=lambda x: -x[1])))
 
     if args.json:
+        args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(
-            json.dumps([b.as_dict() for b in befunde],
-                       ensure_ascii=False, indent=1), encoding="utf-8")
+            json.dumps(ergebnisse, ensure_ascii=False, indent=1),
+            encoding="utf-8")
         print(f"Ergebnis geschrieben: {args.json}")
 
-    return 0 if len(bestanden) == len(befunde) else 1
+    return 0 if len(bestanden) == len(ergebnisse) else 1
 
 
 if __name__ == "__main__":

@@ -122,11 +122,24 @@ def active_gate() -> HostGate:
 
 def fetch(url: str, http_cfg: dict,
           timeout_override: float | None = None,
-          extra_headers: dict | None = None) -> httpx.Response:
-    """GET with UA fallback + short backoff on rate limits."""
+          extra_headers: dict | None = None,
+          schnell: bool = False) -> httpx.Response:
+    """GET with UA fallback + short backoff on rate limits.
+
+    `schnell=True` schaltet beides ab: ein User-Agent, ein Versuch, kein
+    Backoff. Gedacht fuer die BREITENSUCHE (scripts/finde_quellen.py), wo
+    neun von zehn geprobten Adressen erwartungsgemaess 404 sind. Dort ist die
+    Ausdauer oben nicht Robustheit, sondern der Engpass: eine tote Adresse
+    kostet sonst zwei User-Agents mal drei Versuche plus 4 s und 9 s Backoff,
+    also ueber eine Minute - mal sechs Adressen je Firma mal hunderte Firmen.
+    Fuer den LAUF selbst bleibt die Ausdauer richtig und Standard: dort ist
+    jede Quelle ausgewaehlt, und ein verlorener Abruf kostet eine Woche.
+    """
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
     primary = http_cfg.get("user_agent", BROWSER_UA)
     fallback = BOT_UA if primary != BOT_UA else BROWSER_UA
+    uas = (primary,) if schnell else (primary, fallback)
+    wartezeiten = (0.0,) if schnell else (0.0, *_BACKOFF_WAITS)
 
     # A same-origin Referer mimics a normal in-site navigation. Most sources
     # do not care, but some AEM/CMS "public" backend servlets (e.g. stc's
@@ -135,7 +148,7 @@ def fetch(url: str, http_cfg: dict,
     site_root = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}/"
 
     last_exc: Exception | None = None
-    for ua in (primary, fallback):
+    for ua in uas:
         headers = {
             "User-Agent": ua,
             "Accept": "text/html,application/xhtml+xml,application/xml,*/*",
@@ -145,7 +158,7 @@ def fetch(url: str, http_cfg: dict,
         if extra_headers:
             headers.update(extra_headers)
         # attempt 0 immediate, then one retry per backoff wait
-        for wait in (0.0, *_BACKOFF_WAITS):
+        for wait in wartezeiten:
             if wait:
                 time.sleep(wait + random.uniform(0, 1.0))
             try:
