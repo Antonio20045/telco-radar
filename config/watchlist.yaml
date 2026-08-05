@@ -306,6 +306,36 @@ regions:
           (visid_incap_*/x-iinfo-Cookies vorhanden, Titel "404 Not Found"). JS wird nie ausgefuehrt,
           das ist eine serverseitige WAF-Entscheidung, kein Render-Problem. Nur mit
           Residential-Proxy oder expliziter Incapsula-Allowlist loesbar; bis dahin Referenz.'
+    # Schwedische Landesgesellschaft von Telia, 05.08.2026. Der Konzern-Feed
+    # (news.cision.com/telia-company) meldet Konzernthemen; dieser
+    # Presseserver meldet das schwedische Endkundengeschaeft - Tarife,
+    # Netzausbau, lokale Partnerschaften.
+    - name: Telia Sverige
+      country: SE
+      website: telia.se
+      aliases:
+      - Telia Sverige
+      sources:
+      # Frische-Ausnahme belegt: neueste Meldung im Abruf 20.07.2026.
+      # press.telia.se ist Telias eigener Presseserver, keine Fremddomain.
+      - type: rss
+        url: https://press.telia.se/rss/current_news/55401
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
+    # Rumaenien war bisher gar nicht abgedeckt. Orange Romania ist dort
+    # Marktfuehrer; der Feed lieferte 40 Meldungen im Abruf.
+    - name: Orange Romania
+      country: RO
+      website: orange.ro
+      aliases:
+      - Orange Romania
+      sources:
+      # Frische-Ausnahme belegt: die Landesgesellschaft publiziert schubweise,
+      # neueste Meldung im Abruf 02.07.2026.
+      - type: rss
+        url: https://www.orange.ro/index.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
   north_america:
     name: Nordamerika
     operators:
@@ -377,6 +407,12 @@ regions:
       # Anleihetausch -, die der Gatsby-Newsroom nicht fuehrt.
       - type: rss
         url: https://ir.charter.com/rss/news-releases.xml
+      # Investor Relations, 05.08.2026. Quartalsgetaktet, deshalb mit
+      # belegter Frische-Ausnahme; neueste Meldung im Abruf 24.07.2026.
+      - type: rss
+        url: https://ir.charter.com/rss.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
     - name: DISH Wireless
       country: US
       website: dish.com
@@ -504,6 +540,22 @@ regions:
       sources:
       - type: json_api
         url: https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20
+    # Der karibisch-lateinamerikanische Arm von Liberty Global, seit 2018
+    # eigenstaendig boersennotiert - eigene Meldungen, eigene Maerkte
+    # (Puerto Rico, Chile, Panama, Karibik).
+    - name: Liberty Latin America
+      country: PR
+      website: lla.com
+      aliases:
+      - Liberty Latin America
+      - LLA
+      sources:
+      # Frische-Ausnahme belegt: Konzernmeldungen etwa monatlich, neueste im
+      # Abruf 27.07.2026.
+      - type: rss
+        url: https://www.lla.com/rss.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
   africa_middle_east:
     name: Afrika & Naher Osten
     operators:
@@ -543,6 +595,13 @@ regions:
           Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen.
           airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain +
           Titel in Nachbar-div ohne Klasse/Heading).'
+      # Zweiter Kanal, 05.08.2026: der Konzern-Feed neben der
+      # Boersenmeldungsseite. Frische-Ausnahme belegt - Konzernmeldungen
+      # erscheinen etwa monatlich, neueste im Abruf 23.07.2026.
+      - type: rss
+        url: https://www.airtel.africa/rss.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
     - name: stc
       country: SA
       website: stc.com.sa
@@ -660,6 +719,21 @@ regions:
       - type: newsroom
         url: https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller
         item_selector: a.relases-card
+    # Marktfuehrer im Senegal und Ankerbeteiligung von Orange in Westafrika -
+    # eine Region, die im Bestand bisher nur ueber MTN und Airtel sichtbar war.
+    - name: Sonatel
+      country: SN
+      website: sonatel.sn
+      aliases:
+      - Sonatel
+      - Orange Senegal
+      sources:
+      # Frische-Ausnahme belegt: publiziert unregelmaessig, neueste Meldung im
+      # Abruf 25.07.2026.
+      - type: rss
+        url: https://sonatel.sn/feed/
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
   asia:
     name: Asien
     operators:
@@ -899,6 +973,35 @@ regions:
       sources:
       - type: rss
         url: https://www.true.th/blog/en/feed/
+    # Der dritte philippinische Netzbetreiber neben Globe und PLDT, seit 2021
+    # im Markt - der Preisbrecher, an dem sich die beiden anderen abarbeiten.
+    - name: DITO Telecommunity
+      country: PH
+      website: dito.ph
+      aliases:
+      - DITO
+      sources:
+      # Frische-Ausnahme belegt: publiziert monatlich, neueste 01.07.2026.
+      - type: rss
+        url: https://dito.ph/news/rss.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
+    # Kein Endkundenanbieter, sondern einer der groessten Grosshandels-Carrier
+    # der Welt - Seekabel, IP-Transit, IoT-Konnektivitaet. Bewusst hier und
+    # nicht im Themenfeld: Tata Communications tritt gegenueber Betreibern als
+    # Wettbewerber um Grosskunden auf, nicht nur als Zulieferer.
+    - name: Tata Communications
+      country: IN
+      website: tatacommunications.com
+      aliases:
+      - Tata Communications
+      sources:
+      # Frische-Ausnahme belegt: Meldungen etwa zweiwoechentlich, neueste
+      # 28.07.2026.
+      - type: rss
+        url: https://www.tatacommunications.com/press-release/rss.xml
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
   oceania:
     name: Ozeanien
     operators:

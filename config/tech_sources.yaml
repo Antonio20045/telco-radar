@@ -147,12 +147,26 @@ themen:
       # sortiert Ersteres aus.
       - {name: "Nokia", type: rss, url: "https://www.nokia.com/newsroom/feed/"}
 
+      # Open-RAN-Anbieter, der Betreibern die Alternative zu Ericsson/Nokia
+      # verkauft - relevant fuer jede Ausschreibung. Frische-Ausnahme belegt:
+      # Meldungen im Monatsrhythmus, neueste 22.06.2026.
+      - {name: "Mavenir", type: json_api, url: "https://www.mavenir.com/wp-json/wp/v2/posts?per_page=25&_embed=1", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # Kleinzellen und Inhouse-Versorgung - die Technik, mit der Betreiber
+      # Stadien, Bahnhoefe und Buerotuerme abdecken. Frische-Ausnahme belegt:
+      # neueste Meldung im Abruf 20.07.2026.
+      - {name: "JMA Wireless", type: rss, url: "https://jmawireless.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+
   satellit:
     name: "Satellit & NTN"
     beschreibung: >-
       Direct-to-Cell verschiebt gerade die Grenze zwischen Mobilfunk und
       Satellit - und damit die Frage, wofuer Kunden ihren Betreiber brauchen.
     quellen:
+      # Das duennste Themenfeld im Bestand hatte genau eine Quelle. Omnispace
+      # baut ein 5G-NTN-Netz und fusioniert gerade mit Lynk Global - also
+      # genau die Direct-to-Device-Frage, die Betreiber betrifft.
+      # Frische-Ausnahme belegt: publiziert quartalsweise, neueste 31.03.2026.
+      - {name: "Omnispace", type: rss, url: "https://omnispace.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
       # AST SpaceMobile baut das Direct-to-Cell-Netz, mit dem Vodafone in
       # Europa arbeitet - die Meldungen zu Satellitenstarts sagen direkt,
       # wann der Dienst wo verfuegbar wird. Publiziert um Starts herum;
@@ -208,6 +222,16 @@ themen:
       # Wettbewerber der Telekom. Naeher am deutschen Marktgeschehen als jede
       # internationale Quelle.
       - {name: "VATM", type: rss, url: "https://www.vatm.de/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # BEREC ist das Gremium ALLER europaeischen Regulierungsbehoerden - was
+      # hier beschlossen wird, setzen die nationalen Behoerden anschliessend um.
+      # Frische-Ausnahme belegt: publiziert zu den Plenarterminen, neueste
+      # Meldung im Abruf 02.07.2026.
+      - {name: "BEREC", type: rss, url: "https://www.berec.europa.eu/index%2ephp/en/rss.xml", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # Die Wi-Fi Alliance zertifiziert, was in jedem Router und jedem Handy
+      # steckt - fuer einen Betreiber die Frage, was sein Heimnetz-Angebot
+      # kann. Frische-Ausnahme belegt: Meldungen zu Standardfreigaben,
+      # neueste 10.06.2026.
+      - {name: "Wi-Fi Alliance", type: rss, url: "https://www.wi-fi.org/rss.xml", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
       # Das Telecom Infra Project ist das Gegenstueck zur O-RAN Alliance auf
       # der Betreiberseite: hier wird ausgehandelt, welche offenen
       # Netzarchitekturen ueberhaupt beschaffbar werden.
@@ -237,6 +261,10 @@ themen:
     quellen:
       # Italiens groesster Turmbetreiber, hervorgegangen aus TIM und Vodafone.
       - {name: "INWIT", type: rss, url: "https://www.inwit.it/en/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Glasfaser-Grosshandel in Nordamerika: wer Zayo mietet, baut nicht
+      # selbst - und Zayos Preise sind die Kostenseite vieler Betreiber.
+      # Frische-Ausnahme belegt: Meldungen etwa monatlich, neueste 23.07.2026.
+      - {name: "Zayo", type: rss, url: "https://www.zayo.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
 
   # ===========================================================================
   # NEUES THEMENFELD (05.08.2026): MVNO, eSIM & Kommunikationsplattformen
@@ -270,3 +298,15 @@ themen:
       # Industriekunden ihre Geraete NICHT mehr bei einem einzelnen Betreiber
       # anbinden.
       - {name: "Transatel", type: rss, url: "https://www.transatel.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # eSIM fuer Geschaeftskunden - der Anbieter, der Konzernen Mobilfunk
+      # ueber Laendergrenzen verkauft, ohne dass ein Betreiber den Vertrag
+      # sieht. Frische-Ausnahme belegt: 40 Meldungen im Abruf, neueste
+      # 28.07.2026.
+      - {name: "1GLOBAL (Truphone)", type: rss, url: "https://www.1global.com/rss", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # Roaming- und Interconnect-Grosshandel (Tochter von Proximus): der
+      # Zwischenhaendler, ueber den Roaming-Erloese laufen.
+      # Frische-Ausnahme belegt: neueste Meldung im Abruf 16.07.2026.
+      - {name: "BICS", type: rss, url: "https://www.bics.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # Zweite grosse CPaaS-Plattform neben Infobip. Frische-Ausnahme belegt:
+      # neueste Meldung im Abruf 20.07.2026.
+      - {name: "Sinch", type: rss, url: "https://sinch.com/blog/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
