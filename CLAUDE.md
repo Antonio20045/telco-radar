@@ -241,21 +241,52 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   jede Fachpresse ein Feed war, fiel das nicht auf; die erste mit JSON-API
   (Capacity Media) scheiterte mit „unparseable feed: syntax error". Behoben —
   der Typ gewinnt jetzt.
-- **Zweitkanäle sind über den FEED-Sucher abgeschöpft, nicht als Idee.** In
-  Session 5 blieb von 142 mechanisch gefundenen Kandidaten bei bereits
-  beobachteten Firmen genau einer übrig — aber `finde_quellen.py` sucht nur
-  Feeds. Presse-Newsroom plus Investor Relations plus Technik-Blog plus
-  Rubrik-Feeds sind weiterhin der billigste Zugewinn, sie sind nur mechanisch
-  noch nicht erreichbar.
-- **`finde_quellen.py` ignoriert drei Viertel des Webs.** Es akzeptiert nur
-  RSS und JSON-API als Kandidaten. Moderne Konzernseiten haben aber meist
-  keinen Feed: von 604 gesuchten Firmen brachten in Session 5 **418 (69 %)
-  null Kandidaten** — und zwar bei RICHTIGER Domain. Telenor Norwegen,
-  Vodafone Italien, Orange Spanien, Free, Fastweb und Deutsche Telekom
-  antworten alle mit HTTP 200 und haben Presseseiten, nur eben keinen Feed.
-  Die Pipeline kann so etwas längst lesen (52 der 205 Quellen sind
-  `type: newsroom`), der SUCHER kann es nur nicht vorschlagen. Das ist der
-  größte offene Hebel im ganzen Ausbau.
+- **Der Sucher kann seit Session 6 auch Seiten ohne Feed vorschlagen.** Bis
+  dahin akzeptierte `finde_quellen.py` nur RSS und JSON-API; von 604 gesuchten
+  Firmen brachten in Session 5 deshalb 418 (69 %) null Kandidaten — bei
+  RICHTIGER Domain. Jetzt gibt es Stufe 4: Presseseite über die Links der
+  ohnehin geholten Seiten finden (in der Landessprache, endungstolerant,
+  zweistufig, weil die verlinkte Presseseite oft nur eine Drehscheibe ist),
+  `item_selector` aus dem DOM ableiten, als `type: newsroom` ausgeben. Drei
+  Dinge, die man dabei wissen muss:
+  * **Hauptnavigationen sehen wie Artikellisten aus.** DNA lieferte über
+    `li.ds-main-nav__item--level-2` 28 saubere „Meldungen" — die zweite Ebene
+    des Menüs. Dagegen stehen der Ausschluss von Menü-Klassennamen und
+    `_artikelanteil()`: der Anteil der Treffer, deren ADRESSE nach einer
+    Meldung aussieht (Slug mit mehreren Bindestrichen, Jahreszahl, ID).
+  * **Die Startseite einer Telco besteht den Formcheck zufällig**, ist aber ein
+    Produktregal. Deshalb `_ist_pressepfad()`: gibt es auf einer Domain eine
+    echte Presseseite, ist alles andere dort Beifang und fällt weg.
+  * **Der Datumsanteil wird im Sucher bewusst NICHT gefiltert.** Ob eine echte
+    Meldungsliste datiert gelesen wird, hängt am Datums-Parser — und wer das
+    schon im Sucher wegfiltert, kann den Parser nicht mehr messen.
+- **Rubrikfeeds sind der billigste Zugewinn und laufen jetzt mechanisch.**
+  `finde_quellen.py --rubriken` liest die WordPress-Kategorieschnittstelle,
+  sonst die Rubriknavigation der Site. Der Hauptfeed einer Fachpresse zeigt
+  immer nur die letzten 10 bis 30 Meldungen; zwischen zwei Läufen sieht man
+  von einem täglich publizierenden Titel also einen Ausschnitt.
+- **Monatsnamen sind Stämme, keine Drei-Buchstaben-Kürzel.** Das war nach dem
+  Sucher die zweitgrößte Verlustquelle: in Welle 2 lieferten 82 Kandidaten
+  Meldungen und fielen NUR am Datumsformat durch. Seit Session 6 gewinnt der
+  längste passende Stamm — finnisch „marraskuuta" (November) fängt mit „mar"
+  an und wurde vorher als März gelesen. Dazu kommen drei Datumsformen:
+  Jahr-Monatswort-Tag (ungarisch), CJK mit 年月日 bzw. 년월일 und die
+  vietnamesische ngay/thang/nam-Form. **Bewusst weggelassen** und im Code
+  begründet: tschechisch „červen"/„červenec" sind als Stamm nicht trennbar,
+  kroatisch „listopad" heißt Oktober statt November (die polnisch/tschechische
+  Lesart gewinnt, weil dafür Quellen konfiguriert sind), und thailändische
+  Monatsnamen hängen an der buddhistischen Jahreszählung.
+  Gemessen wird das mit `scripts/miss_datumsparser.py`: jede Quelle wird
+  EINMAL abgerufen und ZWEIMAL geparst, einmal mit den Tabellen von vorher.
+  Ein Nacheinander würde Parser und Tagesform des Servers vermischen.
+- **Der Abnahme-Check prüft Dubletten gegen den BESTAND, nicht gegen die
+  anderen Kandidaten.** Zwei Rubriken derselben Site, die dasselbe ausliefern,
+  bestehen deshalb beide. In Welle 3 viermal passiert (SK Telecom
+  `category/ai-service` gegen `tag/AI`, Mobile Europe `cloud-nfv` gegen
+  `edge`, Nvidia `generative-ai` gegen `enterprise`, bbcmag `ai` gegen
+  `innovation`) — alle vier zeigten dieselbe erste Meldung. Das muss von Hand
+  auffallen: **immer die erste Titelprobe der bestandenen Kandidaten
+  nebeneinander lesen.**
 - **Der Deckel der Sammelphase ist die LANGSAMSTE EINZELQUELLE.** Lauf #75:
   303,7 s Sammelphase, davon 302,6 s eine einzige tote Quelle (KT, mit
   `timeout_seconds: 30` mal zwei User-Agents mal drei Versuche plus Backoff).
