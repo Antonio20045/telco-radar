@@ -734,6 +734,22 @@ regions:
         url: https://sonatel.sn/feed/
         herkunft: Firmenliste (Breitensuche)
         abgenommen: '2026-08-05'
+    # Panafrikanischer Glasfaser- und Cloud-Anbieter (frueher Liquid Telecom),
+    # aktiv in ueber 20 Laendern. Kein Endkundenanbieter im Mobilfunk, aber
+    # der Netzbetreiber, ueber dessen Backbone ein grosser Teil des
+    # afrikanischen Verkehrs laeuft - und damit ein Wettbewerber um
+    # Geschaeftskunden.
+    - name: Liquid Intelligent Technologies
+      country: ZA
+      website: liquid.tech
+      aliases:
+      - Liquid Telecom
+      - Liquid Intelligent Technologies
+      sources:
+      - type: rss
+        url: https://liquid.tech/feed/
+        herkunft: Firmenliste Welle 2
+        abgenommen: '2026-08-05'
   asia:
     name: Asien
     operators:
@@ -1001,6 +1017,19 @@ regions:
       - type: rss
         url: https://www.tatacommunications.com/press-release/rss.xml
         herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
+    # Japans groesster unabhaengiger Internetanbieter und einer der
+    # groessten MVNOs des Landes - der Gegenpol zu NTT, KDDI und SoftBank.
+    - name: Internet Initiative Japan
+      country: JP
+      website: iij.ad.jp
+      aliases:
+      - IIJ
+      - Internet Initiative Japan
+      sources:
+      - type: rss
+        url: https://www.iij.ad.jp/rss-temp/press/index.xml
+        herkunft: Firmenliste Welle 2
         abgenommen: '2026-08-05'
   oceania:
     name: Ozeanien

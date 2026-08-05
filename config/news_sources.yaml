@@ -100,3 +100,28 @@ news_sources:
   # Ookla misst Netzqualitaet weltweit und veroeffentlicht die Vergleiche, mit
   # denen Betreiber werben - also die Zahlen hinter den Werbeaussagen.
   - {name: "Ookla Insights", type: rss, url: "https://www.ookla.com/articles/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+
+  # -- Welle 2 (05.08.2026): weitere Sprachen und Regionen
+  # Wieder gilt: der Check prueft Form, nicht Wert. Von 35 gesuchten
+  # Fachpressetiteln bestanden 22 den Check, eingetragen sind 11. Verworfen
+  # wurde durchweg ALLGEMEINE IT- und Verbraucherpresse, die zwar sauber
+  # datierte Artikel liefert, aber kaum Telekommunikation: Computerwoche
+  # ("Die besten Android Launcher"), Computerworld PL, Data Manager IT,
+  # Silicon FR, Muy Computer Pro, Les Numeriques und Frandroid (Testberichte),
+  # Der Standard (allgemeine Nachrichten), inside digital und Tuttoandroid
+  # (Schnaeppchen-Feeds), Emerce NL, Datanews BE (Wirtschaft), Tivi FI.
+  # Fuer die betroffenen Maerkte gibt es jeweils schon einen telekom-
+  # spezifischen Titel im Bestand.
+  # Ebenfalls verworfen: die "comments/feed"-Varianten mehrerer Titel - das
+  # sind Leserkommentare, keine Artikel.
+  - {name: "Telepolis (Polen)", type: rss, url: "https://www.telepolis.pl/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Lupa (Tschechien)", type: rss, url: "https://www.lupa.cz/rss/clanky/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Netzwoche (Schweiz)", type: rss, url: "https://www.netzwoche.ch/taxonomy/term/31/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "digi.no (Norwegen)", type: rss, url: "https://www.digi.no/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead (Indien)", type: rss, url: "https://telecomlead.com/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "MediaNama (Indien)", type: rss, url: "https://www.medianama.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Mobile Time (Brasilien)", type: rss, url: "https://www.mobiletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "TELETIME (Brasilien)", type: rss, url: "https://teletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}

@@ -120,6 +120,9 @@ themen:
       # AMD liefert die Rechenkerne fuer Edge- und Kernnetz-Rechenzentren und
       # ist damit die Alternative zu Nvidia, an der die Kostenseite von
       # AI-RAN haengt.
+      # Modems fuer IoT und 5G-RedCap - die Chips in Zaehlern, Trackern und
+      # Industrieanlagen, die Betreiber als Konnektivitaet verkaufen.
+      - {name: "Sequans", type: rss, url: "https://sequans.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
       - {name: "AMD", type: rss, url: "https://newsroom.amd.com/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   netzausruester:
@@ -166,6 +169,10 @@ themen:
       # baut ein 5G-NTN-Netz und fusioniert gerade mit Lynk Global - also
       # genau die Direct-to-Device-Frage, die Betreiber betrifft.
       # Frische-Ausnahme belegt: publiziert quartalsweise, neueste 31.03.2026.
+      # Einer der grossen Satelliten-Breitbandanbieter; seit dem
+      # Chapter-11-Verfahren im Umbau, was fuer den Markt selbst eine
+      # Nachricht ist.
+      - {name: "Hughes Network Systems", type: rss, url: "https://www.hughes.com/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
       - {name: "Omnispace", type: rss, url: "https://omnispace.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
       # AST SpaceMobile baut das Direct-to-Cell-Netz, mit dem Vodafone in
       # Europa arbeitet - die Meldungen zu Satellitenstarts sagen direkt,
@@ -232,6 +239,20 @@ themen:
       # kann. Frische-Ausnahme belegt: Meldungen zu Standardfreigaben,
       # neueste 10.06.2026.
       - {name: "Wi-Fi Alliance", type: rss, url: "https://www.wi-fi.org/rss.xml", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # Welle 2 (05.08.2026): nationale Regulierer. Von 40 gesuchten Behoerden
+      # haben 11 einen abnahmefaehigen Feed, eingetragen sind 6. Verworfen:
+      # NMHH Ungarn (der Feed besteht ueberwiegend aus Bauantrags-
+      # Bescheiden) und TKK Estland (allgemeine Verbraucherschutzbehoerde,
+      # erste Meldung im Abruf betraf eine insolvente Fluggesellschaft).
+      - {name: "ANCOM (Rumänien)", type: rss, url: "https://www.ancom.ro/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+      - {name: "ČTÚ (Tschechien)", type: rss, url: "https://ctu.gov.cz/en/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+      # Subtel greift sichtbar durch: erste Meldung im Abruf war die
+      # Einziehung der Sicherheiten von WOM wegen Ausbauversaeumnissen - also
+      # eine Massnahme gegen einen beobachteten Betreiber.
+      - {name: "Subtel (Chile)", type: rss, url: "https://www.subtel.gob.cl/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+      - {name: "CA (Kenia)", type: rss, url: "https://www.ca.go.ke/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+      - {name: "UCC (Uganda)", type: rss, url: "https://www.ucc.co.ug/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+      - {name: "NCA (Ghana)", type: rss, url: "https://nca.org.gh/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
       # Das Telecom Infra Project ist das Gegenstueck zur O-RAN Alliance auf
       # der Betreiberseite: hier wird ausgehandelt, welche offenen
       # Netzarchitekturen ueberhaupt beschaffbar werden.
