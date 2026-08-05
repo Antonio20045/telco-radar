@@ -140,3 +140,28 @@ def test_alias_tagging_fasst_themenmeldungen_nicht_an(tmp_path):
 
     assert (thema.region, thema.operator) == ("thema:ki", None)
     assert (presse.region, presse.operator) == ("europe", "Example Telco")
+
+
+def test_fachpresse_mit_json_api_laeuft_nicht_in_den_rss_parser(tmp_path):
+    """Bis 08/2026 stand fuer jede Fachpressequelle fest kind="trade_press",
+    und collect_rss nimmt beide Werte an. Solange jede Fachpresse ein RSS-Feed
+    war, fiel das nicht auf. Capacity Media ist die erste mit JSON-API und
+    scheiterte deshalb mit "unparseable feed: syntax error" - eine sauber
+    abgenommene Quelle, die der Lauf trotzdem nicht lesen konnte."""
+    from telco_radar.config import load_config
+
+    cfg_dir = tmp_path / "config"
+    cfg_dir.mkdir()
+    (cfg_dir / "settings.yaml").write_text("report_language: de\n", encoding="utf-8")
+    (cfg_dir / "watchlist.yaml").write_text("regions: {}\n", encoding="utf-8")
+    (cfg_dir / "watchlist_extra.yaml").write_text("regions: {}\n", encoding="utf-8")
+    (cfg_dir / "news_sources.yaml").write_text(
+        'news_sources:\n'
+        '  - {name: "Feed-Presse", type: rss, url: "https://a.de/feed"}\n'
+        '  - {name: "JSON-Presse", type: json_api, url: "https://b.de/api"}\n',
+        encoding="utf-8")
+
+    quellen = {s.name: s for s in load_config(tmp_path).news_sources}
+    assert quellen["Feed-Presse"].kind == "trade_press"
+    assert quellen["JSON-Presse"].kind == "json_api"
+    assert quellen["JSON-Presse"].crawlable

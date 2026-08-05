@@ -80,6 +80,15 @@ MAX_NAV_SHARE = 0.20    # Kriterium 5: Anteil verdaechtiger "Titel"
 MIN_DISTINCT_SHARE = 0.60
 # Kriterium 7: ab diesem Anteil gemeinsamer Meldungs-URLs gilt eine Quelle als
 # derselbe Inhalt unter anderem Pfad - also als Dublette, nicht als zweite Quelle.
+#
+# Gerechnet wird gegen die KLEINERE der beiden Mengen (Ueberdeckungskoeffizient
+# |A geschnitten B| / min(|A|,|B|)), nicht gegen die Kandidatenmenge. Der
+# Unterschied ist nicht akademisch: libertyglobal.com/wp-json liefert 25
+# Meldungen und enthaelt alle 10 des konfigurierten libertyglobal.com/feed.
+# Gegen die Kandidatenmenge gerechnet waeren das 40 % - unauffaellig, obwohl
+# die bestehende Quelle vollstaendig darin aufgeht. Gegen die kleinere Menge
+# sind es 100 %, und das ist die richtige Antwort: eine Obermenge derselben
+# Meldungen ist eine Dublette, keine zweite Quelle.
 MAX_ITEM_OVERLAP = 0.70
 
 # Verbreitungsdienste, die als Fremddomain ausdruecklich erlaubt sind
@@ -276,7 +285,21 @@ class Bestand:
         # zusaetzliche Abrufe gegen dieselben Server, also genau der Weg in
         # 429/403. Leer heisst "nicht aufgebaut": dann faellt die Pruefung auf
         # den alten Live-Weg zurueck.
+        #
+        # Geschluesselt nach DOMAIN, nicht nach Betreiber. Der Grund ist teuer
+        # gelernt: die Betreiberschluesselung liess Themenquellen komplett
+        # ungeprueft durch, weil sie gar keinen Betreiber tragen. Im ersten
+        # Massendurchgang bestanden dadurch 15 von 34 Kandidaten, die in
+        # Wahrheit nur URL-Varianten bereits konfigurierter Quellen waren -
+        # newsroom.arm.com/feed neben newsroom.arm.com/rss, apple.com/
+        # newsroom/rss-feed.rss/rss neben .../rss-feed.rss. Ueber die Domain
+        # greift die Pruefung fuer JEDEN Kandidaten, mit und ohne Betreiber.
         self.item_index: dict[str, dict[str, set[str]]] = {}
+        self.alle_quellen: list[Source] = []
+        # Domains, auf denen ueberhaupt schon eine Quelle konfiguriert ist.
+        # Gebraucht, um "keine Vergleichsquelle" von "Vergleichsquelle war
+        # beim Indexbau tot" zu unterscheiden - siehe Kriterium 7b.
+        self.domains_mit_quelle: set[str] = set()
         try:
             cfg = load_config(root)
         except Exception:  # noqa: BLE001 - der Check soll auch ohne Config laufen
@@ -289,8 +312,15 @@ class Bestand:
                 self.nach_url[normalize_url(src.url)] = f"{op.name} ({src.kind})"
                 if src.crawlable:
                     self.je_operator.setdefault(op.name, []).append(src)
+                    self.alle_quellen.append(src)
         for src in cfg.news_sources:
             self.nach_url[normalize_url(src.url)] = f"Fachpresse {src.name}"
+            self.alle_quellen.append(src)
+        for src in cfg.tech_sources:
+            if src.crawlable:
+                self.alle_quellen.append(src)
+        self.domains_mit_quelle = {_registrable(_host(s.url))
+                                   for s in self.alle_quellen}
         # Themenquellen liegen in einer eigenen Datei (siehe tech_sources.yaml);
         # sie zaehlen fuer die Dublettenpruefung genauso.
         tech = self.root / "config" / "tech_sources.yaml"
@@ -326,22 +356,19 @@ class Bestand:
             except (json.JSONDecodeError, AttributeError):
                 print(f"Index-Cache {cache} unlesbar - wird neu aufgebaut")
 
-        auftraege = [(op, src) for op, quellen in self.je_operator.items()
-                     for src in quellen]
-
-        def _hole(auftrag):
-            op, src = auftrag
+        def _hole(src):
+            schluessel = _registrable(_host(src.url))
             try:
-                items = collect_source(src, "europe", op, "operator",
-                                       self.http_cfg)
-                return op, src.url, {normalize_url(i.url) for i in items}
+                items = collect_source(src, "europe", src.name or None,
+                                       "operator", self.http_cfg)
+                return schluessel, src.url, {normalize_url(i.url) for i in items}
             except Exception:  # noqa: BLE001 - eine tote Quelle ist kein Grund
-                return op, src.url, set()   # den Check abzubrechen
+                return schluessel, src.url, set()   # den Check abzubrechen
 
         with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-            for op, url, urls in pool.map(_hole, auftraege):
+            for schluessel, url, urls in pool.map(_hole, self.alle_quellen):
                 if urls:
-                    self.item_index.setdefault(op, {})[url] = urls
+                    self.item_index.setdefault(schluessel, {})[url] = urls
 
         if cache:
             cache.parent.mkdir(parents=True, exist_ok=True)
@@ -494,14 +521,16 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
 
     # --- Kriterium 7b: Inhaltsdublette gegen die bestehenden Quellen desselben
     # Betreibers. Zwei Pfade derselben Seite sind EINE Quelle.
-    if ueberlappung_pruefen and kand.operator and items:
+    if ueberlappung_pruefen and items:
         eigene = {normalize_url(i.url) for i in items}
         schlimmste = 0.0
         wer = ""
         # Gegen den einmal aufgebauten Index, wenn es ihn gibt (Kriterium 10);
         # sonst wie bisher live. Der Live-Weg bleibt fuer Einzelpruefungen -
         # dort kostet ein Index mehr, als er spart.
-        indiziert = bestand.item_index.get(kand.operator)
+        indiziert = (getattr(bestand, "item_index", {}).get(kand_dom)
+                     or (bestand.item_index.get(kand.operator)
+                         if kand.operator else None))
         if indiziert:
             vergleich = indiziert.items()
         else:
@@ -513,15 +542,31 @@ def _pruefe_einen(kand: Kandidat, bestand: Bestand, lookback: int,
                             src, region, kand.operator, "operator", http_cfg)}))
                 except Exception:  # noqa: BLE001
                     continue
+        verglichen = 0
         for quelle_url, andere in vergleich:
             if not andere:
                 continue
-            ueberlappung = len(eigene & andere) / len(eigene)
+            verglichen += 1
+            ueberlappung = len(eigene & andere) / min(len(eigene), len(andere))
             if ueberlappung > schlimmste:
                 schlimmste, wer = ueberlappung, quelle_url
-        b.pruefe(7, "keine Inhaltsdublette", schlimmste <= MAX_ITEM_OVERLAP,
-                 f"{schlimmste:.0%} gemeinsame Meldungen"
-                 + (f" mit {wer}" if wer else " (keine Vergleichsquelle)"))
+
+        # Wenn auf dieser Domain schon eine Quelle konfiguriert ist, aber
+        # keine davon Meldungen zum Vergleich lieferte, ist die Dublette NICHT
+        # geprueft - und dann darf der Kandidat auch nicht bestehen. Genau so
+        # rutschte overons.kpn/nieuws/feed/en/feed/ durch: die konfigurierte
+        # Quelle .../nieuws/feed/en war beim Indexbau leer, der Vergleich fiel
+        # still aus, und derselbe Feed waere ein zweites Mal eingetragen
+        # worden. "Nicht pruefbar" ist kein PASS.
+        unpruefbar = (verglichen == 0
+                      and kand_dom in getattr(bestand, "domains_mit_quelle", set()))
+        b.pruefe(7, "keine Inhaltsdublette",
+                 not unpruefbar and schlimmste <= MAX_ITEM_OVERLAP,
+                 f"{schlimmste:.0%} gemeinsame Meldungen mit {wer}" if wer
+                 else ("auf dieser Domain ist bereits eine Quelle "
+                       "konfiguriert, die beim Vergleich nichts lieferte - "
+                       "Dublette nicht pruefbar" if unpruefbar
+                       else "keine Vergleichsquelle auf dieser Domain"))
 
     b.bestanden = all(k["ok"] for k in b.kriterien)
     return b
@@ -663,7 +708,7 @@ def main(argv: list[str] | None = None) -> int:
               f"Cache ({args.cache}), {len(offen)} werden geprueft")
 
     # --- Index der bestehenden Quellen: einmal, nicht je Kandidat
-    if offen and not args.no_overlap and any(k.operator for k in offen):
+    if offen and not args.no_overlap:
         n = bestand.baue_item_index(workers=max(8, args.workers),
                                     cache=args.index)
         print(f"Dubletten-Index: {n} bestehende Quellen erfasst")

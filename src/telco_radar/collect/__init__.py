@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -17,6 +18,16 @@ from .newsroom_js import collect_newsroom_js
 log = logging.getLogger(__name__)
 
 
+# Gleichzeitige Headless-Browser. Anders als ein HTTP-Abruf ist ein
+# newsroom_js-Abruf NICHT reine Wartezeit: jeder startet einen Chromium und
+# rendert eine Seite, und der GitHub-Runner hat zwei Kerne. Im Diagnoselauf
+# #74 (05.08.2026) fiel bei 64 Workern Viettel mit "Page.goto: Timeout 16000ms
+# exceeded" aus, das bei 8 Workern durchlief - die Seite war nicht langsamer,
+# der Rechner war voll. Die Zahl der Worker darf also steigen, die Zahl
+# gleichzeitiger Renderings nicht.
+_JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
+
+
 def _collect_source(source: Source, region: str, operator: str | None,
                     origin: str, http_cfg: dict) -> list[Item]:
     """Dispatch a source to the right collector based on its kind."""
@@ -25,7 +36,8 @@ def _collect_source(source: Source, region: str, operator: str | None,
     elif source.kind == "json_api":
         items = collect_json(source, region, operator, origin, http_cfg)
     elif source.kind == "newsroom_js":
-        items = collect_newsroom_js(source, region, operator, origin, http_cfg)
+        with _JS_GLEICHZEITIG:
+            items = collect_newsroom_js(source, region, operator, origin, http_cfg)
     else:
         items = collect_newsroom(source, region, operator, origin, http_cfg)
     if source.exclude_url_pattern:

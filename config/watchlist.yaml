@@ -92,6 +92,18 @@ regions:
       - Telefónica Deutschland
       - O2
       sources:
+      # Dritter Kanal, 05.08.2026: ein anderes Feed-System (group_id statt
+      # category_id) mit den regionalen NETZAUSBAU-Meldungen, die in den
+      # beiden Konzern-Feeds nicht vorkommen ("Besseres Netz fuer die
+      # Suedheide | Telefonica Deutschland bringt 5G nach Weyhausen"). Die
+      # Inhaltspruefung gegen die bestehenden Feeds hat keine Ueberschneidung
+      # gefunden. Relevant, weil O2 Deutschland in der Trefferquote bisher
+      # 201 gesammelte und 0 bewertete Meldungen hat - der Betreiber war da,
+      # seine konkreten Marktschritte nicht.
+      - type: rss
+        url: https://www.telefonica.de/o2/rss/news?group_id=62;pubdate=1
+        herkunft: Breitensuche (Kandidatenpfad)
+        abgenommen: '2026-08-05'
       # category_id=11 ist "Products & Services" - eine schmale Rubrik mit rund
       # vier Beitraegen im Jahr; die Quelle sah deshalb seit Mai tot aus. Der
       # lebende Presse-Feed ist category_id=10 ("Company"). Beide zusammen
@@ -560,6 +572,20 @@ regions:
         item_selector: .report-block-tile
         exclude_url_pattern: (?i)board-meeting|board-resolution|board-notification
         item_selector: .tile-box-tile
+    # Bahrains ehemaliger Monopolist (frueher Batelco), heute Beyon. Neuer
+    # Betreiber, 05.08.2026 - der Golfraum war bisher nur ueber stc, e&, du,
+    # Zain und Ooredoo abgedeckt.
+    - name: Beyon
+      country: BH
+      website: beyon.com
+      aliases:
+      - Batelco
+      - Beyon Group
+      sources:
+      - type: rss
+        url: https://www.beyon.com/feed/
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
     - name: Ooredoo
       country: QA
       website: ooredoo.com
@@ -711,6 +737,22 @@ regions:
         url: https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1
         timeout_seconds: 45
         link_template: 'https://corp.kt.com/html/promote/news/report_detail.html?datNo={datNo}'
+    # Der Konzern ueber NTT Docomo, 05.08.2026. Bewusst zusaetzlich und nicht
+    # statt: Docomo meldet das japanische Endkundengeschaeft, die Konzern-
+    # mitteilung die globale Seite - Rechenzentren, Seekabel, IOWN und die
+    # Beteiligungen, ueber die NTT in Europa auftritt. Andere Domain, andere
+    # Meldungen; die Inhaltspruefung fand keine Ueberschneidung.
+    - name: NTT Group
+      country: JP
+      website: group.ntt
+      aliases:
+      - NTT Corporation
+      - NTT Data
+      sources:
+      - type: rss
+        url: https://www.group.ntt/en/newsrelease/rss/release.rdf
+        herkunft: Firmenliste (Breitensuche)
+        abgenommen: '2026-08-05'
     - name: NTT Docomo
       country: JP
       website: docomo.ne.jp

@@ -132,3 +132,34 @@ def test_drosselung_wird_aus_den_settings_gesetzt(monkeypatch):
                       "collect_host_min_interval_seconds": 0.25}))
     assert active_gate().max_parallel == 3
     assert active_gate().min_interval == 0.25
+
+
+def test_headless_renderings_werden_getrennt_begrenzt(monkeypatch):
+    """Ein newsroom_js-Abruf ist keine reine Wartezeit: er startet einen
+    Chromium. Im Diagnoselauf #74 fiel bei 64 Workern eine Quelle mit
+    "Page.goto: Timeout 16000ms exceeded" aus, die bei 8 Workern durchlief -
+    die Seite war nicht langsamer, der Runner war voll."""
+    import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
+
+    gleichzeitig = {"jetzt": 0, "max": 0}
+    sperre = __import__("threading").Lock()
+
+    def _render(source, *a, **k):
+        with sperre:
+            gleichzeitig["jetzt"] += 1
+            gleichzeitig["max"] = max(gleichzeitig["max"], gleichzeitig["jetzt"])
+        __import__("time").sleep(0.05)
+        with sperre:
+            gleichzeitig["jetzt"] -= 1
+        return [Item(title="Meldung", url=source.url + "/1", source_name="X")]
+
+    monkeypatch.setattr(collect_mod, "collect_newsroom_js", _render)
+    cfg = _Cfg({"collect_max_workers": 16})
+    cfg.news_sources = [Source(type="newsroom_js", url=f"https://js{i}.de/news",
+                               name=f"JS{i}", kind="newsroom_js")
+                        for i in range(12)]
+
+    items, _ = collect_all(cfg)
+    assert len(items) == 12
+    assert gleichzeitig["max"] <= 4

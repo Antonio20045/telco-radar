@@ -23,3 +23,80 @@ news_sources:
   - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
   - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
   # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
+
+  # ===========================================================================
+  # REGIONALE UND NICHT-ENGLISCHE FACHPRESSE (05.08.2026)
+  # ===========================================================================
+  # Bis hierher waren ALLE 14 Feeds englischsprachig - laut
+  # AUFTRAG_SKALIERUNG_1000.md die auffaelligste Luecke im ganzen Bestand. Ein
+  # spanischer Tarifkrieg, eine franzoesische Frequenzauktion oder ein
+  # brasilianischer Glasfaserdeal erscheinen in der internationalen
+  # Fachpresse fruehestens Tage spaeter und meist gar nicht.
+  #
+  # Der Analyst versteht diese Sprachen; die Grenze ist der Datums-Parser in
+  # collect/newsroom.py, der nur die eingetragenen Monatsnamen kennt. Genau
+  # deshalb ist jede Quelle hier durch Kriterium 3 gelaufen (>= 80 % datiert) -
+  # was der Parser nicht lesen kann, ist gar nicht erst hereingekommen.
+  #
+  # Alle mit scripts/pruefe_quellenvorschlag.py abgenommen (05.08.2026),
+  # gefunden mit scripts/finde_quellen.py --firmen.
+  #
+  # BEWUSST NICHT AUFGENOMMEN, obwohl sie den Check bestanden haben - der
+  # prueft Form, nicht Wert:
+  #   golem.de/rss.php          allgemeine IT-Presse, 39 Meldungen je Abruf,
+  #                             davon die wenigsten Telekommunikation
+  #   zdnet.fr/feed             Unternehmens-IT, kaum Telekommunikation
+  #   expansion.com/rss/...     allgemeine Wirtschaftsnachrichten
+  #   gov.br/rss.xml            das ganze brasilianische Regierungsportal,
+  #                             nicht Anatel (erste Meldung im Abruf: ein
+  #                             Studienplatz-Auswahlverfahren der UFMG)
+
+  # -- Deutsch
+  # Rein telekommunikationsspezifisch, taeglich, mit Tarifdetails - genau die
+  # Ebene, auf der die Kollegin arbeitet.
+  - {name: "teltarif", type: rss, url: "https://www.teltarif.de/feed/news/20.rss2", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  # Handelsblatt des Telekommunikationsvertriebs: Tarife, Endgeraete, Handel.
+  - {name: "Telecom Handel", type: rss, url: "https://www.telecom-handel.de/feed/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+
+  # -- Franzoesisch
+  # Deckt den franzoesischen Markt (Orange, SFR, Bouygues, Free) taeglich ab.
+  - {name: "Univers Freebox", type: rss, url: "https://www.universfreebox.com/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # -- Spanisch (Spanien)
+  - {name: "Xataka Móvil", type: rss, url: "https://www.xatakamovil.com/feedburner.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "ADSLZone", type: rss, url: "https://www.adslzone.net/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # -- Italienisch
+  - {name: "Corriere Comunicazioni", type: rss, url: "https://www.corrierecomunicazioni.it/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # -- Portugiesisch / Spanisch (Lateinamerika)
+  # Der brasilianische Markt war bisher nur ueber die Betreiber selbst
+  # sichtbar; TeleSintese lieferte im Abruf 40 von 40 Meldungen im
+  # Frischefenster.
+  - {name: "TeleSíntese (BR)", type: rss, url: "https://telesintese.com.br/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TeleSemana (LatAm)", type: rss, url: "https://www.telesemana.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # -- Regionale englischsprachige Fachpresse (Asien, Afrika, Indien)
+  # Nicht "noch ein internationaler Feed": diese vier berichten ueber Maerkte,
+  # die in der bestehenden Fachpresse praktisch nicht vorkommen.
+  - {name: "Communications Today (Indien)", type: rss, url: "https://www.communicationstoday.co.in/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Asia", type: rss, url: "https://www.telecomreviewasia.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Africa", type: rss, url: "https://www.telecomreviewafrica.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  # Suedafrika ist der groesste Markt, in dem Vodacom und MTN aufeinander
+  # treffen - und war bisher nur ueber die Betreiber selbst sichtbar.
+  - {name: "ITWeb (Südafrika)", type: rss, url: "https://www.itweb.co.za/rss", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TechCentral (Südafrika)", type: rss, url: "https://techcentral.co.za/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # -- International, aber im Bestand bisher nicht vertreten
+  - {name: "TelecomTV", type: rss, url: "https://www.telecomtv.com/content/news/rss.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "Telecoms.com", type: rss, url: "https://www.telecoms.com/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  # Grosshandel, Seekabel, Interconnect - die Kostenseite, ueber die sonst
+  # niemand berichtet.
+  - {name: "Capacity Media", type: json_api, url: "https://capacityglobal.com/wp-json/wp/v2/posts?per_page=25&_embed=1", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Broadband Communities", type: rss, url: "https://bbcmag.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  # Frequenzpolitik weltweit - die einzige Quelle im Bestand, die
+  # Auktionsverfahren und Bandvergaben systematisch verfolgt.
+  - {name: "PolicyTracker", type: rss, url: "https://www.policytracker.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  # Ookla misst Netzqualitaet weltweit und veroeffentlicht die Vergleiche, mit
+  # denen Betreiber werben - also die Zahlen hinter den Werbeaussagen.
+  - {name: "Ookla Insights", type: rss, url: "https://www.ookla.com/articles/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}

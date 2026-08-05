@@ -394,3 +394,96 @@ def test_ohne_index_wird_live_verglichen(monkeypatch):
                                website="alpha.de", type="rss"),
                      bestand, 8, True)
     assert "https://alpha.de/presse" in abrufe
+
+
+def test_dublette_wird_ueber_die_domain_erkannt(monkeypatch):
+    """Die teuerste Luecke des ersten Massendurchgangs.
+
+    Der Index war nach BETREIBER geschluesselt, Themenquellen tragen aber
+    keinen Betreiber - fuer sie lief die Inhaltspruefung deshalb gar nicht.
+    Ergebnis: 15 von 34 "bestandenen" Kandidaten waren blosse URL-Varianten
+    bereits konfigurierter Quellen (newsroom.arm.com/feed neben
+    newsroom.arm.com/rss). Ueber die Domain greift die Pruefung auch ohne
+    Betreiber.
+    """
+    monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
+    bestand = FakeBestand(item_index={"arm.com": {
+        "https://newsroom.arm.com/rss": {normalize_url(i.url)
+                                         for i in _items(10)}}})
+
+    befund = pq._pruefe_einen(
+        pq.Kandidat(url="https://newsroom.arm.com/feed", type="rss",
+                    thema="chips", name="Arm"),
+        bestand, 8, True)
+
+    assert not befund.bestanden
+    dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
+    assert dublette and not dublette[0]["ok"]
+
+
+def test_zweiter_kanal_derselben_domain_bleibt_erlaubt(monkeypatch):
+    """Nicht jede zweite URL auf derselben Domain ist eine Dublette: der
+    Technik-Blog neben dem Presse-Newsroom ist genau der Zugewinn, den der
+    Auftrag sucht. Entscheidend ist die Ueberschneidung der MELDUNGEN."""
+    monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
+    andere = {f"https://example.com/ganz-anders-{i}" for i in range(10)}
+    bestand = FakeBestand(item_index={"arm.com": {
+        "https://newsroom.arm.com/rss": andere}})
+
+    befund = pq._pruefe_einen(
+        pq.Kandidat(url="https://newsroom.arm.com/blog/feed", type="rss",
+                    thema="chips", name="Arm"),
+        bestand, 8, True)
+    assert befund.bestanden, befund.durchgefallen
+
+
+def test_nicht_pruefbare_dublette_ist_kein_pass(monkeypatch):
+    """overons.kpn/nieuws/feed/en/feed/ bestand, obwohl .../nieuws/feed/en
+    bereits konfiguriert war: die bestehende Quelle lieferte beim Indexbau
+    nichts, der Vergleich fiel still aus. Ein nicht durchgefuehrter Vergleich
+    darf nicht wie ein bestandener aussehen."""
+    monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
+    bestand = FakeBestand(item_index={})
+    bestand.domains_mit_quelle = {"overons.kpn"}
+
+    befund = pq._pruefe_einen(
+        pq.Kandidat(url="https://www.overons.kpn/nieuws/feed/en/feed/",
+                    type="rss", operator="KPN", website="overons.kpn"),
+        bestand, 8, True)
+    assert not befund.bestanden
+    dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
+    assert dublette and "nicht pruefbar" in dublette[0]["detail"]
+
+
+def test_domain_ganz_ohne_bestand_bleibt_erlaubt(monkeypatch):
+    """Eine voellig neue Firma hat keine Vergleichsquelle - das ist der
+    Normalfall beim Ausbau und kein Ablehnungsgrund."""
+    monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
+    bestand = FakeBestand(item_index={})
+    bestand.domains_mit_quelle = {"andere.de"}
+
+    befund = pq._pruefe_einen(
+        pq.Kandidat(url="https://neu.de/feed", type="rss", operator="Neu",
+                    website="neu.de"),
+        bestand, 8, True)
+    assert befund.bestanden, befund.durchgefallen
+
+
+def test_obermenge_einer_bestehenden_quelle_ist_eine_dublette(monkeypatch):
+    """libertyglobal.com/wp-json liefert 25 Meldungen und enthaelt alle 10 des
+    konfigurierten libertyglobal.com/feed. Gegen die Kandidatenmenge gerechnet
+    waeren das unauffaellige 40 %."""
+    kandidat_items = _items(25)
+    monkeypatch.setattr(pq, "collect_source", lambda *a, **k: kandidat_items)
+    bestehende = {normalize_url(i.url) for i in kandidat_items[:10]}
+    bestand = FakeBestand(item_index={"example.com": {
+        "https://www.example.com/feed/": bestehende}})
+    bestand.domains_mit_quelle = {"example.com"}
+
+    befund = pq._pruefe_einen(
+        pq.Kandidat(url="https://www.example.com/wp-json/wp/v2/posts",
+                    type="json_api", operator="Beispiel", website="example.com"),
+        bestand, 8, True)
+    assert not befund.bestanden
+    dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
+    assert dublette and "100%" in dublette[0]["detail"]

@@ -203,13 +203,28 @@ def load_config(root: Path) -> Config:
                 sources=sources,
             ))
 
-    news_sources = [
-        Source(type=s.get("type", "rss"), url=s["url"],
-               name=s.get("name", s["url"]), kind="trade_press",
-               label=s.get("name", ""), herkunft=s.get("herkunft", ""),
-               abgenommen=str(s.get("abgenommen", "") or ""))
-        for s in (news.get("news_sources") or [])
-    ]
+    # `kind` steuert BEIDES: welcher Collector laeuft (collect/__init__.py) und
+    # wie die Quelle auf der Website beschriftet wird. Bis 08/2026 stand hier
+    # fest "trade_press" - was funktionierte, solange jede Fachpressequelle ein
+    # RSS-Feed war, weil collect_rss beide Werte annimmt. Beim Quellen-Ausbau
+    # ist die erste Fachpresse mit JSON-API dazugekommen (Capacity Media), und
+    # die lief damit in den RSS-Parser: "unparseable feed: syntax error". Der
+    # Typ gewinnt jetzt, "trade_press" bleibt nur der Normalfall RSS.
+    news_sources = []
+    for s in (news.get("news_sources") or []):
+        stype = s.get("type", "rss")
+        news_sources.append(Source(
+            type=stype, url=s["url"], name=s.get("name", s["url"]),
+            kind=s.get("kind") or ("trade_press" if stype == "rss" else stype),
+            label=s.get("name", ""),
+            item_selector=s.get("item_selector"),
+            link_template=s.get("link_template"),
+            headers=s.get("headers"),
+            exclude_url_pattern=s.get("exclude_url_pattern"),
+            timeout_seconds=s.get("timeout_seconds"),
+            allow_short_titles=s.get("allow_short_titles", False),
+            herkunft=s.get("herkunft", ""),
+            abgenommen=str(s.get("abgenommen", "") or "")))
 
     tech_sources, theme_names = _load_tech_sources(cfg_dir / "tech_sources.yaml")
 

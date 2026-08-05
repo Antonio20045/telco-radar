@@ -60,6 +60,11 @@ themen:
       # Product Jul 24, 2026 Opus 5 is a step change ..."). Die Ueberschrift
       # steht vorn, der Titel bleibt also lesbar - schoen ist er nicht. Vier
       # item_selector-Varianten wurden probiert, keine trennt sauber.
+      # Mistral ist der einzige grosse europaeische Modellanbieter. Fuer einen
+      # europaeischen Netzbetreiber ist das keine Nebensache: Datenhaltung in
+      # der EU entscheidet mit, welches Modell ueberhaupt in einen Tarif oder
+      # in den Kundenservice darf.
+      - {name: "Mistral AI", type: rss, url: "https://mistral.ai/news/rss", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
       - {name: "Anthropic", type: newsroom, url: "https://www.anthropic.com/news", item_selector: "article"}
       # Microsofts offizieller Azure-Blog. blogs.microsoft.com/ai ist seit
       # 2026 abgeschaltet (HTTP 410); hier laufen die Telco-relevanten
@@ -111,6 +116,11 @@ themen:
       # Intel ist ueber Netzwerk-Silizium und Edge-Infrastruktur im Spiel,
       # nicht ueber Smartphone-Modems - fuer den Netzbetrieb trotzdem relevant.
       - {name: "Intel", type: rss, url: "https://newsroom.intel.com/feed"}
+
+      # AMD liefert die Rechenkerne fuer Edge- und Kernnetz-Rechenzentren und
+      # ist damit die Alternative zu Nvidia, an der die Kostenseite von
+      # AI-RAN haengt.
+      - {name: "AMD", type: rss, url: "https://newsroom.amd.com/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   netzausruester:
     name: "Netzausrüster"
@@ -179,3 +189,84 @@ themen:
       # ist die CRTC ausschliesslich fuer Telekommunikation und Rundfunk
       # zustaendig.
       - {name: "CRTC (Kanada)", type: rss, url: "https://crtc.gc.ca/eng/rss/news.xml"}
+      # Die US-Fernmeldeverwaltung: Frequenzplanung und die milliardenschweren
+      # Breitband-Foerderprogramme, an denen die amerikanischen Betreiber
+      # haengen. Reine Telekommunikationsbehoerde.
+      - {name: "NTIA (USA)", type: rss, url: "https://www.ntia.gov/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Nigeria ist der groesste Mobilfunkmarkt Afrikas, in dem mit MTN und
+      # Airtel zwei beobachtete Betreiber konkurrieren - bisher war die
+      # Regulierungsseite dieses Marktes gar nicht sichtbar.
+      - {name: "NCC (Nigeria)", type: rss, url: "https://www.ncc.gov.ng/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Der Verband der europaeischen Netzbetreiber (frueher ETNO). Er
+      # formuliert die Position, mit der die Branche in Bruessel auftritt -
+      # also das, was Vodafone und seine Wettbewerber GEMEINSAM fordern.
+      - {name: "Connect Europe", type: rss, url: "https://www.connecteurope.org/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Bitkom ist der deutsche Digitalverband; seine Zahlen und Positionen
+      # bestimmen die deutsche Debatte mit, in der die Kollegin arbeitet.
+      - {name: "Bitkom", type: rss, url: "https://www.bitkom.org/Presse/Presseinformation/index.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+      # Der Verband der alternativen deutschen Netzbetreiber - also der
+      # Wettbewerber der Telekom. Naeher am deutschen Marktgeschehen als jede
+      # internationale Quelle.
+      - {name: "VATM", type: rss, url: "https://www.vatm.de/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Das Telecom Infra Project ist das Gegenstueck zur O-RAN Alliance auf
+      # der Betreiberseite: hier wird ausgehandelt, welche offenen
+      # Netzarchitekturen ueberhaupt beschaffbar werden.
+      - {name: "Telecom Infra Project", type: rss, url: "https://www.telecominfraproject.com/blog-feed.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # ===========================================================================
+  # NEUES THEMENFELD (05.08.2026): Passive Infrastruktur
+  # ===========================================================================
+  # Funktuerme, Glasfaser und Rechenzentren. Wer diese Anlagen besitzt,
+  # bestimmt die groesste Kostenposition eines Netzbetreibers und darueber,
+  # wie schnell er ueberhaupt ausbauen kann - naeher am Geschaeft als mancher
+  # Chiphersteller. Vodafone hat mit Vantage Towers selbst einen Turmbetreiber
+  # abgespalten, die Frage ist also nicht theoretisch.
+  #
+  # Bewusst klein gestartet: ob die Kategorie traegt, entscheidet die
+  # Trefferquote (scripts/quellen_trefferquote.py) nach den ersten Laeufen,
+  # nicht eine Annahme beim Eintragen. Von 18 gesuchten Firmen hat genau eine
+  # einen abnahmefaehigen Kanal - die uebrigen liefern entweder gar keinen
+  # Feed oder reine SEO-Ratgeberblogs (Deutsche Glasfaser: "Handy kostenlos
+  # orten: So finden Sie ein verlorenes Smartphone wieder").
+  infrastruktur:
+    name: "Türme, Glasfaser & Rechenzentren"
+    beschreibung: >-
+      Die Eigentuemer der passiven Infrastruktur - Funktuerme, Glasfasernetze
+      und Rechenzentren. Sie bestimmen die Kostenseite und das Tempo des
+      Netzausbaus, ohne selbst Endkunden zu haben.
+    quellen:
+      # Italiens groesster Turmbetreiber, hervorgegangen aus TIM und Vodafone.
+      - {name: "INWIT", type: rss, url: "https://www.inwit.it/en/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+
+  # ===========================================================================
+  # NEUES THEMENFELD (05.08.2026): MVNO, eSIM & Kommunikationsplattformen
+  # ===========================================================================
+  # Die Anbieter, die Betreibern Umsatz abnehmen, ohne ein Netz zu besitzen:
+  # eSIM-Reisepakete statt Roaming, CPaaS-Plattformen statt SMS-Geschaeft,
+  # IoT-Konnektivitaet quer ueber alle Netze. Genau die Stelle, an der einem
+  # Netzbetreiber heute Erloese wegbrechen - und die Anbieter melden ihre
+  # Abschluesse selbst, oft Monate bevor ein Betreiber es zugibt.
+  #
+  # Auch hier gilt: die Kategorie ist ein Versuch, keine Setzung. Nicht
+  # aufgenommen wurden Twilio (reiner Entwicklerblog) und Thales (Konzern von
+  # Ruestung bis Chipkarte, entsprechend wenig Telekommunikation je Abruf).
+  mvno:
+    name: "MVNO, eSIM & Plattformen"
+    beschreibung: >-
+      Anbieter ohne eigenes Netz, die Betreibern Erloese abnehmen: eSIM- und
+      Reisedatenpakete, Nachrichtenplattformen (CPaaS) und netzuebergreifende
+      IoT-Konnektivitaet.
+    quellen:
+      # eSIM- und SIM-Technik fuer Betreiber weltweit; meldet die Vertraege,
+      # bevor die Betreiber sie kommunizieren.
+      - {name: "IDEMIA", type: rss, url: "https://www.idemia.com/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Eine der grossen CPaaS-Plattformen: geschaeftliche Nachrichten laufen
+      # ueber sie statt ueber die SMS-Abrechnung des Netzbetreibers.
+      - {name: "Infobip", type: rss, url: "https://www.infobip.com/news/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Sponsored Roaming und eSIM-Anbindung - genau das Geschaeft, das
+      # klassische Roaming-Erloese ersetzt.
+      - {name: "Telna", type: rss, url: "https://www.telna.com/blog/rss.xml", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Netzuebergreifende IoT-Konnektivitaet (Tochter von NTT). Zeigt, welche
+      # Industriekunden ihre Geraete NICHT mehr bei einem einzelnen Betreiber
+      # anbinden.
+      - {name: "Transatel", type: rss, url: "https://www.transatel.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
