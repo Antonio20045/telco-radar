@@ -40,10 +40,29 @@ ein Lauf wirklich abfragt.
 |---|---:|
 | vor Welle 3 (Ende Session 5) | 205 |
 | nach Welle 3a — Rubrikfeeds | 238 |
-| nach Welle 3b — Newsroom-Suche | **249** |
+| nach Welle 3b — Newsroom-Suche über die Liste aus Session 5 | 249 |
+| nach Welle 3c — Recherche: Regulierer und Fachpresse | 272 |
+| nach Welle 3d — Recherche: gemischt | 284 |
+| nach Lauf #77: sieben Rubrikfeeds wieder ausgebaut (403) | 277 |
+| nach Welle 3e — Recherche: kleinere Betreiber | **285** |
 
-**Das Ziel 1000 ist nicht erreicht.** Abschnitt 5 rechnet vor, wo die Grenze
-wirklich liegt, und sie liegt nicht dort, wo der Auftrag sie vermutet hat.
+**+80 Quellen, +39 %.** Das Ziel 1000 ist nicht erreicht. Abschnitt 5 rechnet
+vor, wo die Grenze wirklich liegt — sie liegt nicht dort, wo der Auftrag sie
+vermutet hat.
+
+### Die Ausbeute je Welle
+
+| Welle | Suchaufträge | Kandidaten | bestanden | eingetragen |
+|---|---:|---:|---:|---:|
+| 3a Rubrikfeeds | 249 Sites | 138 | 53 | 26 |
+| 3b Firmenliste aus Session 5 | 338 | 257 | 48 | 11 |
+| 3c Recherche: Regulierer + Fachpresse | 234 | 308 | 63 | 23 |
+| 3d Recherche: gemischt | 226 | 318 | 46 | 12 |
+| 3e Recherche: kleinere Betreiber | 444 | 341 | 24 | 8 |
+| **gesamt** | **1 491** | **1 362** | **234** | **80** |
+
+Der Abstand zwischen „bestanden" und „eingetragen" ist die Wertprüfung: von
+234 formal einwandfreien Quellen sind 154 von Hand verworfen worden.
 
 ---
 
@@ -72,9 +91,15 @@ nennt: `saladeprensa.vodafone.es`, `tdcbrands.dk/en/press`,
 
 Die Latte aus dem Auftrag lautete: „Wenn die Newsroom-Erkennung daraus keine
 100 Quellen macht, taugt sie nicht." 106 Firmen sind neu erreichbar, 128
-Kandidaten neu vorschlagbar, 25 davon bestehen den Abnahme-Check. **Die Latte
-ist an Kandidaten gerissen, an eingetragenen Quellen nicht** — dazu
-Abschnitt 4.
+Kandidaten neu vorschlagbar, 25 davon bestehen den Abnahme-Check, 11 sind
+eingetragen worden. **An Kandidaten ist die Latte gerissen, an eingetragenen
+Quellen nicht.**
+
+Das ist kein Fehler der Erkennung, sondern die Eigenart der Restmenge: Firmen
+ohne Feed sind genau die, deren Presseseite auch sonst schwach ist. Über alle
+fünf Wellen hat die Newsroom-Erkennung **248 Kandidaten** beigesteuert, die
+der alte Sucher nie hätte vorschlagen können — davon sind 24 eingetragen
+worden, also fast ein Drittel aller 80 neuen Quellen.
 
 Zwei Fallen, die beim Bauen zugeschnappt sind und jetzt Tests haben:
 
@@ -118,17 +143,19 @@ gibt es jetzt das Skript.
 ### 3.3 Rubrikfeeds: tragen
 
 `finde_quellen.py --rubriken` liest die WordPress-Kategorieschnittstelle,
-sonst die Rubriknavigation der Site. 138 Kandidaten → 53 bestanden → **33
-eingetragen**. Häufigster Ablehnungsgrund war Kriterium 4 (84-mal): eine
-Rubrik, die seit acht Tagen nichts veröffentlicht hat, trägt zum
-Wochenbericht nichts bei.
+sonst die Rubriknavigation der Site. 138 Kandidaten → 53 bestanden → 33
+eingetragen → **26 übrig**, nachdem Lauf #77 sieben davon als HTTP 403
+entlarvt hat (Abschnitt 7). Häufigster Ablehnungsgrund im Check war
+Kriterium 4 (84-mal): eine Rubrik, die seit acht Tagen nichts veröffentlicht
+hat, trägt zum Wochenbericht nichts bei.
 
 ---
 
 ## 4. Was verworfen wurde — und warum das die halbe Arbeit ist
 
-Der Check prüft Form, nicht Wert. Von 101 bestandenen Kandidaten (53 + 48)
-sind **44 eingetragen** worden.
+Der Check prüft Form, nicht Wert. Von **234 bestandenen Kandidaten sind 80
+eingetragen** worden — 154 sind von Hand verworfen worden. Das ist der
+zweite Deckel neben der Wanduhr, und er ist genauso hart.
 
 **Sechs Vorschläge standen bereits als Warnung in den YAML-Kommentaren und
 wurden trotzdem erneut vorgeschlagen** — genau das, wovor der Auftrag warnt:
@@ -183,11 +210,22 @@ blieb, was keinen Feed hat — genau die Sorte, die die Newsroom-Erkennung
 findet, und genau die Sorte, die am Abnahme-Check am häufigsten scheitert.
 Für eine frische Liste ist 7,8 % die realistischere Zahl.
 
-Damit die Rechnung für +751 Quellen:
+Nach fünf Wellen ist die Zahl belastbarer als die Schätzung von vorhin. Die
+Ausbeute hängt massiv an der SORTE der gesuchten Firmen:
+
+| Sorte | eingetragen je Suchauftrag |
+|---|---:|
+| Regulierer und Fachpresse (Welle 3c) | **9,8 %** |
+| gemischt (Welle 3d) | 5,3 % |
+| bereits abgeerntete Liste (Welle 3b) | 3,3 % |
+| kleinere Betreiber (Welle 3e) | **1,8 %** |
+
+Damit die Rechnung für die fehlenden 715 Quellen, mit der BESTEN gemessenen
+Sorte gerechnet:
 
 ```
-751 Quellen / 0,078 je Suchauftrag  ≈  9 600 Suchaufträge
-9 600 Firmen / 4,2 Firmen pro Minute ≈  2 290 Minuten ≈ 38 Stunden reine Suche
+715 Quellen / 0,098 je Suchauftrag   ≈  7 300 Suchaufträge
+7 300 Firmen / 4,2 Firmen pro Minute ≈  1 740 Minuten ≈ 29 Stunden reine Suche
 ```
 
 Dazu kommt der Abnahme-Check (er ruft jeden Kandidaten ein- bis zweimal ab
@@ -203,26 +241,47 @@ bereits von hochgerechnet zwei Stunden auf 80 Minuten gedrückt. Mehr wäre
 unhöflich und provoziert genau die 429/403, die einen Kandidaten
 fälschlicherweise als tot ausweisen.
 
-**Realistisch sind rund 250 zusätzliche Quellen je Session**, wenn die
-Firmenliste frisch ist. Von 249 aus sind das drei bis vier weitere Sessions
-bis 1000 — nicht eine.
+**Realistisch sind 60 bis 80 zusätzliche Quellen je Session** — das war in
+dieser Session, mit fünf Wellen und rund 1 500 Suchaufträgen, auch das
+Ergebnis. Von 285 aus sind das **neun bis zwölf weitere Sessions** bis 1000.
+
+Das ist die ehrliche Antwort auf die Frage des Auftrags. Sie lässt sich mit
+drei Stellschrauben verbessern, keine davon ist eine Abkürzung:
+
+* **Nur noch Regulierer und Fachpresse je Land suchen** (9,8 % statt 1,8 %).
+  Das allein halbiert den Aufwand gegenüber einer gemischten Liste.
+* **Die Wertprüfung ist der zweite Deckel**: 154 von 234 bestandenen
+  Kandidaten wurden von Hand verworfen. Ein Teil davon ließe sich
+  maschinell erkennen — Kampagnen-SKUs, hyperlokale Ausbaumeldungen,
+  Terminkalender und Anbieter-Blogs sind wiederkehrende Muster, keine
+  Einzelfälle. Das wäre der nächste sinnvolle Werkzeugbau.
+* **Mehrere Kanäle je Host gehen nach hinten los** (Abschnitt 7).
 
 ---
 
 ## 6. Was für die nächste Session bereitliegt
 
-`config/kandidaten_firmen_welle3.yaml` — **678 Suchaufträge**, aus der
+`config/kandidaten_firmen_welle3.yaml` — **882 Suchaufträge** aus der
 Sonnet-Recherche, entdoppelt und gegen den Bestand abgeglichen. Die Agents
 haben ausdrücklich Websuche benutzt statt aus dem Modellwissen zu schreiben;
 genau daran ist Session 5 bei 604 Firmen hängengeblieben. Der Rohtext liegt
 als `outputs/welle3/recherche_roh.txt` daneben.
 
-Die Liste ist **noch nicht durchsucht** — das ist der 38-Stunden-Posten aus
-Abschnitt 5. Sie deckt Sprachen und Regionen ab, für die der erweiterte
-Datums-Parser gebaut wurde (Abschnitt 3.2), und ist damit gleichzeitig die
-Messmenge, an der sich zeigen muss, ob er etwas taugt.
+**Diese Liste ist abgearbeitet** (Wellen 3c, 3d, 3e). Sie liegt als Beleg im
+Repo, nicht als Vorrat — wer sie noch einmal durchsucht, bekommt Welle 3b
+zurück, also fast nichts.
 
-**Der nächste Schritt ist also nicht Recherche, sondern Suche.**
+**Der nächste Schritt ist deshalb doch wieder Recherche — aber eine engere.**
+Nach der Messung in Abschnitt 5 lohnen sich nationale Regulierungsbehörden
+und Fachpresse je Land und Sprache (9,8 % Ausbeute), während kleinere
+Betreiber sich nicht lohnen (1,8 %). Eine Recherche, die nur noch diese
+beiden Sorten sucht, ist die billigste verfügbare Verbesserung.
+
+Der erweiterte Datums-Parser hat in dieser Session seine Messmenge übrigens
+bekommen: die Wellen 3c bis 3e enthielten polnische, ungarische, russische,
+koreanische und arabische Seiten. Der Gewinn blieb trotzdem klein, weil diese
+Seiten überwiegend RSS liefern — und RSS trägt sein Datum im Protokoll, nicht
+im Text. **Der Parser hilft nur bei `newsroom`-Quellen.**
 
 ---
 
