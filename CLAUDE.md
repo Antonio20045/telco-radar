@@ -241,10 +241,21 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   jede Fachpresse ein Feed war, fiel das nicht auf; die erste mit JSON-API
   (Capacity Media) scheiterte mit „unparseable feed: syntax error". Behoben —
   der Typ gewinnt jetzt.
-- **Zweitkanäle sind abgeschöpft.** Der Auftrag nannte sie „den billigsten
-  Zugewinn"; das galt für Session 4. In Session 5 blieb von 142 mechanisch
-  gefundenen Kandidaten bei bereits beobachteten Firmen genau **einer** übrig.
-  Der Ertrag liegt bei NEUEN Firmen, und dort bei regionaler Fachpresse.
+- **Zweitkanäle sind über den FEED-Sucher abgeschöpft, nicht als Idee.** In
+  Session 5 blieb von 142 mechanisch gefundenen Kandidaten bei bereits
+  beobachteten Firmen genau einer übrig — aber `finde_quellen.py` sucht nur
+  Feeds. Presse-Newsroom plus Investor Relations plus Technik-Blog plus
+  Rubrik-Feeds sind weiterhin der billigste Zugewinn, sie sind nur mechanisch
+  noch nicht erreichbar.
+- **`finde_quellen.py` ignoriert drei Viertel des Webs.** Es akzeptiert nur
+  RSS und JSON-API als Kandidaten. Moderne Konzernseiten haben aber meist
+  keinen Feed: von 604 gesuchten Firmen brachten in Session 5 **418 (69 %)
+  null Kandidaten** — und zwar bei RICHTIGER Domain. Telenor Norwegen,
+  Vodafone Italien, Orange Spanien, Free, Fastweb und Deutsche Telekom
+  antworten alle mit HTTP 200 und haben Presseseiten, nur eben keinen Feed.
+  Die Pipeline kann so etwas längst lesen (52 der 205 Quellen sind
+  `type: newsroom`), der SUCHER kann es nur nicht vorschlagen. Das ist der
+  größte offene Hebel im ganzen Ausbau.
 - **Der Deckel der Sammelphase ist die LANGSAMSTE EINZELQUELLE.** Lauf #75:
   303,7 s Sammelphase, davon 302,6 s eine einzige tote Quelle (KT, mit
   `timeout_seconds: 30` mal zwei User-Agents mal drei Versuche plus Backoff).
@@ -320,6 +331,17 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
 ## 9. Stand der Skalierung — und was als Nächstes kommt
+
+> **Der nächste Auftrag steht in `AUFTRAG_1000_QUELLEN_WELLE3.md`.** Er
+> benennt die zwei Hebel, die bisher niemand gezogen hat, und ist der Text,
+> mit dem die nächste Session anfängt.
+
+**Die aktuelle Zahl bekommst du mit `python scripts/quellen_zaehlen.py`.**
+Sie ist die einzige, die zählt: crawlbare Quellen, also was ein Lauf wirklich
+abfragt. Zähle NIE mit `grep -c "url:"` über die YAMLs — das zählt die nicht
+crawlbaren `official`-Referenzen mit, und genau daran ist Session 5 mit einer
+falschen Zahl in ihren eigenen Bericht gelaufen.
+
 
 Der Auftrag `AUFTRAG_SKALIERUNG_1000.md` ist zur Hälfte erledigt. Die
 Schlussliste mit allen Zahlen steht in `outputs/skalierung-2026-08-05.md`.
