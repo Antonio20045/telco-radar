@@ -1,6 +1,6 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-08-04, Ende Session 4 (Quellen-Ausbau). Dieses Dokument enthält
+Stand: 2026-08-05, Ende Session 5 (Skalierung). Dieses Dokument enthält
 alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
 zuzugreifen und weiterzuarbeiten.
 
@@ -14,17 +14,20 @@ Signalebenen**, erkennt **nur wirklich neue** Meldungen, lässt sie von
 Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
 1–5) und veröffentlicht einen deutschsprachigen Wochenbericht als Website:
 
-1. **85 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
-   Afrika & Naher Osten, Asien, Ozeanien) über **91 crawlbare Quellen** —
-   seit Session 4 haben zehn Betreiber mehr als einen eigenen Kanal
-   (Presse-Newsroom **plus** Investor Relations, Technik-Blog oder
-   Landesgesellschaft).
-2. **14 internationale Telco-Fachpresse-Feeds** (`config/news_sources.yaml`).
-3. **25 Themenquellen in 6 Themenfeldern** (`config/tech_sources.yaml`):
+1. **87 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
+   Afrika & Naher Osten, Asien, Ozeanien) über **94 crawlbare Quellen**.
+2. **33 Telco-Fachpresse-Feeds** (`config/news_sources.yaml`) — seit
+   Session 5 auch auf Deutsch, Französisch, Spanisch, Italienisch und
+   Portugiesisch sowie regional für Indien, Asien und Afrika. Bis dahin waren
+   alle 14 Feeds englischsprachig; das war die auffälligste Lücke im Bestand.
+3. **40 Themenquellen in 8 Themenfeldern** (`config/tech_sources.yaml`):
    KI-Anbieter, Geräte, Chips & Modems, Netzausrüster, Satellit & NTN,
-   Regulierung & Verbände. Das sind **keine Wettbewerber**, sondern die
-   Unternehmen und Behörden, die den Rahmen setzen — eigener Analyst mit
-   eigenem Prompt, eigener Abschnitt im Bericht.
+   Regulierung & Verbände sowie seit Session 5 „Türme, Glasfaser &
+   Rechenzentren" und „MVNO, eSIM & Plattformen". Das sind **keine
+   Wettbewerber**, sondern die Unternehmen und Behörden, die den Rahmen
+   setzen — eigener Analyst mit eigenem Prompt, eigener Abschnitt im Bericht.
+
+Gesamt: **167 crawlbare Quellen** (Stand 05.08.2026).
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
 nicht in den Agents. LLM-Calls sehen nur neue Items → günstig, keine
@@ -101,8 +104,15 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              Themenfelder bekommen TECH_ANALYST_SYSTEM statt ANALYST_SYSTEM -
              ein Chiphersteller ist kein Wettbewerber.
              (src/telco_radar/analyze/agents.py; API direkt via httpx: llm.py)
-4. EDIT      Editor-Agent: deutscher Wochenbericht (20k Tokens!) +
-             Topic-Memory gegen Wiederholungen (analyze/editor.py)
+4. EDIT      EIN- oder ZWEISTUFIG, je nach Menge (editor_modus, Schwelle
+             editor_zweistufig_ab_meldungen = 120 bewertete Meldungen):
+             einstufig  = ein Editor-Aufruf ueber alles (wie bisher)
+             zweistufig = ein Bereichsredakteur je Region/Themenfeld
+                          (parallel, sieht NUR seinen Bereich) + eine
+                          Chefredaktion, die NUR deren Kurzfassungen und je
+                          fuenf Meldungen sieht. Die Bereichsabschnitte
+                          werden montiert, nicht neu geschrieben.
+             Beides mit Topic-Memory gegen Wiederholungen (analyze/editor.py)
 5. PUBLISH   Markdown + JSON nach data/reports/, statische Site nach site/
              (report/html.py + templates/), Commit + Render-Hook
 ```
@@ -114,8 +124,10 @@ Wichtige Dateien:
 | `config/watchlist.yaml` | Regionen → Operator → Quellen. Operator OHNE sources = bot-geschützt, wird via Fachpresse-Tagging abgedeckt (Aliase!) |
 | `config/news_sources.yaml` | Fachpresse-RSS (Mobile World Live, Light Reading, …) |
 | `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene): KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
-| `config/settings.yaml` | Sprache (de), Modell (`claude-sonnet-5`), Lookback (8 Tage), HTTP |
-| `data/state/seen.jsonl` | Dedup-Gedächtnis (Hash normalisierter URLs) — git-versioniert |
+| `config/settings.yaml` | Sprache (de), Modell, Lookback (8 Tage), HTTP, Sammel-Parallelität + Host-Drosselung, Redaktionsmodus, Quarantäne-Schwelle |
+| `config/kandidaten_firmen.yaml` | Suchaufträge (Name + Domain) für `finde_quellen.py --firmen`. Sagt WO gesucht wird, nicht was wertvoll ist |
+| `data/state/seen.jsonl` | Dedup-Gedächtnis. Seit 08/2026 **kompaktes v2-Format**: ein Hash je Zeile (17 statt ~300 Byte) |
+| `data/state/quellen_register.json` | Je Quelle: Herkunft, Abnahmedatum, Läufe, Erfolge, letzter Erfolg, Fehlserie, Quarantäne |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
 | `data/reports/YYYY-MM-DD.{md,json}` | Bericht als Prosa (md) + strukturiert (json: stats, regions→highlights) |
 | `site/` | Generierte Website — wird von Actions committed, Render published sie (Publish Dir `site`, Build Command nur `echo`) |
@@ -123,7 +135,11 @@ Wichtige Dateien:
 | `scripts/validate_sources.py` | Health-Check aller Quellen: Status, Item-Zahl, wie viele datiert, **neuestes Datum**, **wie viele im Frischefenster** + Liste „liefert Inhalte, aber nichts Frisches" |
 | `scripts/build_quellen_doc.py` | Erzeugt `TELCO_RADAR_QUELLEN.md` aus der Watchlist; mit `--validate` mit echten Abrufzahlen |
 | `scripts/pruefe_quellenvorschlag.py` | **Abnahme-Check für neue Quellen.** Schickt jeden Vorschlag durch `collect_source` und prüft neun Kriterien maschinell. Ohne PASS hier kommt keine Quelle in die Config |
-| `scripts/finde_quellen.py` | Mechanische Breitensuche: `rel=alternate` der Newsroom-Seiten + die Kandidatenpfade, die in dieser Branche wirklich vorkommen |
+| `scripts/finde_quellen.py` | Mechanische Breitensuche in Stufen (`rel=alternate` zuerst, Kandidatenpfade nur wenn das leer blieb). Massenbetrieb: `--aus-watchlist`, `--firmen`, `--cache` |
+| `scripts/quellen_trefferquote.py` | **Die Kennzahl, die den Ausbau steuert**: bewertet / NEU je Quelle, über das Berichtsarchiv |
+| `scripts/miss_sammelphase.py` | Sammelphase messen (Wanduhr, Sekunden je Quelle, 429/403), `--vergleich` für vorher/nachher |
+| `scripts/kostenrechnung.py` | Kosten je Lauf und Monat, hochgerechnet auf N Quellen |
+| `scripts/migriere_seen_store.py` | Seen-Store v1 → v2, prüft selbst nach und bricht bei Hash-Verlust ab |
 | `.github/workflows/radar.yml` | Cron Di + Fr 08:30 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
 | `tests/` | pytest-Suite (Fixtures, kein Netz/LLM nötig) |
 
@@ -198,6 +214,37 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   Quellen heisst mehr Stapel heisst mehr Teilausfaelle, deshalb meldet
   `analyze_region()` jetzt die Meldungen gescheiterter Stapel als
   `_ungelesen` zurueck und die Pipeline haelt sie aus dem Store.
+- **Der Abnahme-Check prüfte Dubletten nur für Kandidaten MIT Betreiber.**
+  Themenquellen tragen keinen — für sie lief die Inhaltsprüfung gar nicht. Im
+  ersten Massendurchgang der Session 5 waren deshalb **15 von 34 „bestandenen"
+  Kandidaten** bloße URL-Varianten bereits konfigurierter Quellen
+  (`newsroom.arm.com/feed` neben `.../rss`). Der Index ist jetzt nach DOMAIN
+  geschlüsselt. Zweiter Fehler derselben Prüfung: der Überlappungswert rechnete
+  gegen die Kandidatenmenge, eine Quelle die eine bestehende *enthält* sah
+  dadurch neu aus. Jetzt gegen die kleinere Menge. Und ein Vergleich, der
+  mangels lieferfähiger Vergleichsquelle gar nicht stattfinden konnte, gilt
+  als Durchfaller — „nicht prüfbar" ist kein PASS.
+- **Die Sandbox misst die Sammelphase falsch.** Dort ergab die Host-Drosselung
+  185,6 s → 22,2 s (Faktor 8,4), in GitHub Actions 62,5 s → 39,7 s (Faktor
+  1,6). Die Sandbox-Zahl hing fast vollständig an EINER langsamen Quelle.
+  **Laufzeitzahlen gehören in einen `sources_only`-Diagnoselauf**, den der
+  Workflow dafür ausführt (`miss_sammelphase.py --vergleich`) — er fasst weder
+  State noch LLM an.
+- **`newsroom_js` ist keine reine Wartezeit.** Jeder solche Abruf startet einen
+  Chromium, und der Runner hat zwei Kerne. Im Diagnoselauf #74 fiel bei 64
+  Workern Viettel mit „Page.goto: Timeout 16000ms exceeded" aus, das bei 8
+  Workern durchlief. Headless-Renderings laufen deshalb durch ein eigenes
+  Limit (`_JS_GLEICHZEITIG`, 4). Wer `collect_max_workers` erhöht, darf dieses
+  Limit NICHT mitziehen.
+- **`news_sources.yaml` konnte lange nur RSS.** Der Loader erzwang
+  `kind="trade_press"`, und das schickt jede Quelle in den RSS-Parser. Solange
+  jede Fachpresse ein Feed war, fiel das nicht auf; die erste mit JSON-API
+  (Capacity Media) scheiterte mit „unparseable feed: syntax error". Behoben —
+  der Typ gewinnt jetzt.
+- **Zweitkanäle sind abgeschöpft.** Der Auftrag nannte sie „den billigsten
+  Zugewinn"; das galt für Session 4. In Session 5 blieb von 142 mechanisch
+  gefundenen Kandidaten bei bereits beobachteten Firmen genau **einer** übrig.
+  Der Ertrag liegt bei NEUEN Firmen, und dort bei regionaler Fachpresse.
 - **Laufzeit: parallelisieren, nicht kappen.** Der Lauf vom 31.07. brauchte mit
   220 neuen Meldungen 49 von 50 zulässigen Minuten, weil jede Region ihre
   Stapel nacheinander abarbeitete. Stellschrauben sind `collect_max_workers`
@@ -260,35 +307,50 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Website darf **nie einschlafen** (deshalb Static Site, kein Web Service).
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
-## 9. Nächster Auftrag: Skalierung auf 1000 Quellen
+## 9. Stand der Skalierung — und was als Nächstes kommt
 
-Liegt als `AUFTRAG_SKALIERUNG_1000.md` im Repo und ist der eigentliche
-nächste Schritt. Kurzfassung der vier Engpässe, die VOR den Quellen kommen —
-alle an Lauf #67 gemessen:
+Der Auftrag `AUFTRAG_SKALIERUNG_1000.md` ist zur Hälfte erledigt. Die
+Schlussliste mit allen Zahlen steht in `outputs/skalierung-2026-08-05.md`.
 
-1. **Sammeln.** 20 s·Worker je Quelle. 1000 Quellen bei den heutigen 8 Workern
-   sind 42 min, also allein schon über dem Job-Timeout. Braucht Parallelität
-   *mit Host-Drosselung*, nicht nur mehr Worker.
-2. **Redaktion.** Der Editor bekommt heute alle bewerteten Meldungen in EINEM
-   Aufruf. Bei 1000 Quellen wären das ~650 Meldungen ≈ 122k Token — passt ins
-   Kontextfenster und ergibt trotzdem Brei. Braucht zwei Stufen:
-   Bereichsredakteure je Region/Thema, dann eine Chefredaktion, die nur deren
-   Kurzfassungen sieht.
-3. **Seen-Store.** ~308 Byte je Eintrag, git-versioniert, komplett in den
-   Speicher geladen. Bei 1000 Quellen ~233 000 Einträge/Jahr ≈ 67 MB/Jahr;
-   GitHubs Limit je Datei liegt bei 100 MB. Das ist ein Ablaufdatum.
-4. **Kosten und Rate-Limits.** ~150 Analysten-Aufrufe je Lauf statt heute 14.
-   Vor dem Hochdrehen der Parallelität das DeepSeek-Limit messen.
+**Die Architektur trägt 1000 Quellen. Die Quellen sind es noch nicht:**
 
-Und eine Regel, die im Auftrag steht, weil sie beim Schreiben fast falsch
-gemacht worden wäre: **die Mischung der Quellen wird nicht vorab festgelegt.**
-Kein Anteil Betreiber / Fachpresse / Regulierung. In Lauf #67 lag die Ausbeute
-je Quelle in allen drei Ebenen praktisch gleich (15,9 / 17,6 / 18,6 Meldungen),
-es gibt also keinerlei Beleg, dass eine Kategorie wertvoller wäre. Was fehlt,
-ist die Trefferquote je Quelle — wie viele ihrer Meldungen ein Analyst
-überhaupt bewertet und wie viele im Bericht landen. Die lässt sich aus dem
-vorhandenen Berichtsarchiv auswerten und ist vor der ersten neuen Quelle zu
-bauen; danach steuert sie den Ausbau.
+| Engpass | Stand |
+|---|---|
+| Sammeln | gelöst. Host-Drosselung + 64 Worker; in Actions 62,5 s → 39,7 s bei 132 Quellen, hochgerechnet 5 min für 1000 |
+| Redaktion | gebaut (Bereichsredakteure + Chefredaktion), 21 Tests — **aber noch nie gegen ein echtes Modell gelaufen** |
+| Seen-Store | gelöst. 17 statt 300 Byte je Eintrag, 3,9 statt 68 MB/Jahr, Bestand verlustfrei migriert |
+| Kosten | kein Problem: 1,45 $/Monat bei 1000 Quellen im teuersten Fall |
+| Quellen | 130 → **167**. Für 1000 fehlen Firmenlisten, keine Werkzeuge |
+
+**Die Trefferquote steht** (`scripts/quellen_trefferquote.py`) und ist die
+Kennzahl, an der der weitere Ausbau hängt. Über 11 Läufe gemessen:
+Fachpresse 12,2 %, Betreiber 10,5 %, Themenfelder 10,8 % — die drei Ebenen
+liegen weiterhin gleichauf, es gibt also **weiterhin keinen Beleg**, dass eine
+Kategorie wertvoller wäre. Der Nenner ist dabei entscheidend: gerechnet wird
+gegen die NEUEN Meldungen, nicht gegen die gesammelten. Gegen „gesammelt"
+gerechnet misst die Kennzahl die Abrufhäufigkeit statt den Wert (1,9 % gegen
+11,6 %).
+
+**Die nächsten vier Schritte, in dieser Reihenfolge:**
+
+1. Ein echter Lauf mit `editor_modus: zweistufig`. Die zweite Stufe ist
+   getestet, aber nur mit Fixtures.
+2. Zwei bis drei normale Läufe abwarten, dann die Trefferquote neu auswerten —
+   ab jetzt je KANAL, weil das Laufprotokoll `new` und `source_url` mitführt.
+   Erst dann steht fest, was die 29 neuen Quellen und die zwei neuen
+   Themenfelder taugen.
+3. Die belegten Ballast-Quellen aussortieren. 11 Quellen haben über 11 Läufe
+   mindestens 10 neue Meldungen geliefert, von denen KEINE je bewertet wurde
+   (Iliad 40, stc 33, AIS 30, PLDT 21, Deutsche Telekom 19, …).
+4. Die nächste Firmenliste bauen. Die Ausbeute dieser Session: 450
+   Suchaufträge → 313 Kandidaten → 74 abnahmefähig → 29 wertvoll, also **6,4 %
+   je Suchauftrag**. Für 1000 Quellen braucht es rund 13 000 weitere
+   Suchaufträge. Lohnend nach dieser Messung: regionale Fachpresse je Land und
+   nationale Regulierungsbehörden — beide sauber datiert und klar abgegrenzt.
+
+**Die Regel aus dem Auftrag gilt unverändert: die Mischung wird NICHT vorab
+festgelegt.** Kein Anteil Betreiber / Fachpresse / Regulierung. Was taugt,
+entscheidet die Trefferquote nach den Läufen.
 
 ## 10. Offene Ideen / Roadmap
 
