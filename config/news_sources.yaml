@@ -125,3 +125,119 @@ news_sources:
   - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
   - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
   - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+
+  # ===========================================================================
+  # RUBRIKFEEDS BESTEHENDER TITEL - Welle 3 (05.08.2026)
+  # ===========================================================================
+  # Der Hebel aus AUFTRAG_1000_QUELLEN_WELLE3.md Abschnitt 3: eine Firma ist
+  # nicht eine Quelle. Fast jede Fachpresse-Site liefert zu jeder Rubrik einen
+  # eigenen Feed, und der Hauptfeed zeigt immer nur die letzten 10 bis 30
+  # Meldungen. Wer nur den Hauptfeed abfragt, sieht von einem taeglich
+  # publizierenden Titel zwischen zwei Laeufen einen Ausschnitt.
+  #
+  # Gefunden mit `scripts/finde_quellen.py --rubriken` (WordPress-Kategorie-
+  # Schnittstelle, sonst die Rubriknavigation der Site), abgenommen mit
+  # scripts/pruefe_quellenvorschlag.py: 138 Kandidaten -> 53 bestanden ->
+  # 33 eingetragen. Haeufigster Ablehnungsgrund war Kriterium 4 (84-mal) -
+  # eine Rubrik, die seit acht Tagen nichts veroeffentlicht hat, traegt zum
+  # Wochenbericht nichts bei.
+  #
+  # BEWUSST NICHT AUFGENOMMEN, obwohl sie den Check bestanden haben - er
+  # prueft Form, nicht Wert:
+  #   corrierecomunicazioni.it/whitepaper/intelligenza-artificiale/
+  #                             Whitepaper-Rubrik, also Advertorial ("ERP
+  #                             evoluto: il prerequisito per un'AI che
+  #                             funziona davvero")
+  #   telecomreview*/technology-pick/ (drei Titel)
+  #                             dieselbe syndizierte Gadget-Strecke auf allen
+  #                             drei Schwestertiteln ("Autonomous Skin Cancer
+  #                             Detection Arrives on Smartphones")
+  #   bbcmag.com/category/technology/ai/ und /innovation/
+  #                             beide lieferten dieselbe Konferenzwerbung
+  #                             ("How Summit 2026 will dive into the future
+  #                             of Multifamily")
+  #   bbcmag.com/category/technology/fiber-broadband/
+  #                             hyperlokale US-ISP-Rundschau ("ISP Roundup:
+  #                             Wire 3 begins construction in Anderson, SC") -
+  #                             derselbe Fehler wie corporate.comcast.com/rss
+  #                             in Session 4
+  #   telecomtalk.info/category/ai/
+  #                             driftet in allgemeine IT ("Google AI Finds
+  #                             Sandbox Escape Bug in Chrome's Codebase")
+  #   dplnews.com/category/redes/cloud/ und /brasil/redes-sociais/
+  #                             Unternehmens-IT (Oracle/Gemini) bzw. soziale
+  #                             Netze - keine Telekommunikation
+  #   rcrwireless.com/category/ai-ml/
+  #                             Reader Forum, also Meinung, und ueberschneidet
+  #                             sich mit ai-infrastructure
+  #   mobileeurope.co.uk/.../edge/
+  #                             erste Meldung identisch mit cloud-nfv
+  #   totaltele.com/category/technology/
+  #                             Oberrubrik von technology/5g und damit fast
+  #                             der Hauptfeed
+  #   telecomlead.com/category/4g-lte/
+  #                             4G ist Altbestand
+  #   telefonica.com/es/tag/inteligencia-artificial/ und
+  #   liquid.tech/category/cyber-security/
+  #                             Konzern-Thought-Leadership ("Educacion e
+  #                             inteligencia artificial: como aprender mejor
+  #                             en la era de la IA") - dieselbe Sorte wie der
+  #                             in Session 4 verworfene ESG-Kategoriefeed
+  #   blogs.nvidia.com/.../generative-ai/ und /enterprise/
+  #                             identische erste Meldung, und Nvidia Blog wie
+  #                             Nvidia Newsroom stehen schon im Bestand
+  #   news.sktelecom.com/category/ai-service/ und /tag/AI/
+  #                             derselbe Newsroom, den SK Telecom mit
+  #                             news.sktelecom.com/en/feed schon auf Englisch
+  #                             im Bestand hat - nur auf Koreanisch
+  #
+  # WICHTIG fuer die naechste Runde: der Dublettencheck des Abnahme-Skripts
+  # vergleicht gegen den BESTAND, nicht gegen die anderen Kandidaten. Zwei
+  # Rubriken derselben Site, die dasselbe ausliefern, bestehen deshalb beide -
+  # das muss von Hand auffallen (hier: SK Telecom ai-service gegen tag/AI,
+  # Mobile Europe cloud-nfv gegen edge, Nvidia generative-ai gegen enterprise,
+  # bbcmag ai gegen innovation).
+
+  # -- RCR Wireless (US/international, taeglich)
+  - {name: "RCR Wireless — 5G", type: rss, url: "https://www.rcrwireless.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "RCR Wireless — 6G", type: rss, url: "https://www.rcrwireless.com/category/6g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "RCR Wireless — KI-Infrastruktur", type: rss, url: "https://www.rcrwireless.com/category/ai-infrastructure/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- Mobile Europe
+  - {name: "Mobile Europe — 5G", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/5g-beyond/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — Automatisierung & KI", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/automation-ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — Cloud & NFV", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/cloud-nfv/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — Finanzen & Regulierung", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/financial-regulation/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — Satellit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/satellite/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Mobile Europe — Sicherheit", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- Total Telecom
+  - {name: "Total Telecom — 5G", type: rss, url: "https://totaltele.com/category/technology/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- Corriere Comunicazioni (Italien)
+  - {name: "Corriere Comunicazioni — 5G", type: rss, url: "https://www.corrierecomunicazioni.it/telco/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni — Frequenzen", type: rss, url: "https://www.corrierecomunicazioni.it/telco/frequenze/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni — Cloud", type: rss, url: "https://www.corrierecomunicazioni.it/digital-economy/cloud/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni — Cybersicherheit", type: rss, url: "https://www.corrierecomunicazioni.it/cyber-security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- Indien
+  - {name: "TelecomTalk — 5G", type: rss, url: "https://telecomtalk.info/category/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomTalk — 6G", type: rss, url: "https://telecomtalk.info/category/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Communications Today — 5G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/page_5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Communications Today — 6G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Communications Today — KI", type: rss, url: "https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead — 5G", type: rss, url: "https://telecomlead.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead — Breitband", type: rss, url: "https://telecomlead.com/category/broadband/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead — Satellit", type: rss, url: "https://telecomlead.com/category/satellite/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead — Netztechnik", type: rss, url: "https://telecomlead.com/category/telecom-equipment/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- Telecom Review (Naher Osten / Asien / Afrika)
+  - {name: "Telecom Review — Betreiber", type: rss, url: "https://www.telecomreview.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Asia — Netze", type: rss, url: "https://www.telecomreviewasia.com/news/network-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Asia — Technik", type: rss, url: "https://www.telecomreviewasia.com/news/technology-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Africa — Betreiber", type: rss, url: "https://www.telecomreviewafrica.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- DPL News (Lateinamerika)
+  - {name: "DPL News — 5G", type: rss, url: "https://dplnews.com/category/redes/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "DPL News — 6G", type: rss, url: "https://dplnews.com/category/redes/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "DPL News — KI", type: rss, url: "https://dplnews.com/category/tecnologia/inteligencia-artificial/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # -- weitere
+  - {name: "CommsRisk — Betrug & Sicherheit", type: rss, url: "https://commsrisk.com/category/risk-fraud-security/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Broadband Communities — Regulierung", type: rss, url: "https://bbcmag.com/category/law-policy/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # Ookla misst Netzqualitaet weltweit; die 5G-Rubrik traegt die Laender-
+  # vergleiche, mit denen Betreiber werben.
+  - {name: "Ookla Insights — 5G", type: rss, url: "https://www.ookla.com/articles/tag/5g/rss", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
