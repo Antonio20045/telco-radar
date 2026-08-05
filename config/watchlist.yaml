@@ -655,6 +655,20 @@ regions:
         url: https://www.beyon.com/feed/
         herkunft: Firmenliste (Breitensuche)
         abgenommen: '2026-08-05'
+    # Welle 3e: die katarische Vodafone-Landesgesellschaft. Fuer die Kollegin
+    # besonders nuetzlich - was eine Vodafone-Opco im Golfmarkt ankuendigt,
+    # ist der eigene Konzern, nicht der Wettbewerb.
+    - name: Vodafone Qatar
+      country: QA
+      website: vodafone.qa
+      aliases:
+      - Vodafone Qatar
+      sources:
+      - type: newsroom
+        url: https://www.vodafone.qa/newsroom
+        item_selector: .grid__item--gutter-vertical
+        herkunft: Sonnet-Recherche Welle 3
+        abgenommen: '2026-08-05'
     - name: Ooredoo
       country: QA
       website: ooredoo.com
@@ -759,6 +773,28 @@ regions:
       - type: rss
         url: https://liquid.tech/feed/
         herkunft: Firmenliste Welle 2
+        abgenommen: '2026-08-05'
+    # Welle 3e: Moldawien war bisher gar nicht abgedeckt. Moldcell gehoert
+    # zur CG Corp Global und meldet auch Beteiligungszukaeufe.
+    - name: Moldcell
+      country: MD
+      website: moldcell.md
+      sources:
+      - type: rss
+        url: https://moldcell.md/rom/rss
+        herkunft: Sonnet-Recherche Welle 3
+        abgenommen: '2026-08-05'
+    # Welle 3e: M-net ist der groesste regionale Glasfaserbetreiber Bayerns.
+    # Im Heimatmarkt der Kollegin ist die regionale Ebene die, auf der der
+    # Ausbauwettbewerb tatsaechlich stattfindet.
+    - name: M-net
+      country: DE
+      website: m-net.de
+      sources:
+      - type: newsroom
+        url: https://www.m-net.de/ueber-m-net/presse
+        item_selector: div.news-item-col
+        herkunft: Sonnet-Recherche Welle 3
         abgenommen: '2026-08-05'
     # Welle 3: Kroatien war bisher gar nicht abgedeckt. Hrvatski Telekom ist
     # die Deutsche-Telekom-Landesgesellschaft und der Marktfuehrer dort; die
@@ -969,6 +1005,16 @@ regions:
         item_selector: div.news-list
         herkunft: Firmenliste Welle 3
         abgenommen: '2026-08-05'
+    # Welle 3e: Zentralasien war bisher blind. MegaFon Tadschikistan meldet
+    # den Netzausbau der Region.
+    - name: MegaFon Tadschikistan
+      country: TJ
+      website: megafon.tj
+      sources:
+      - type: newsroom
+        url: https://www.megafon.tj/news?page=1&year=2026&tags=
+        herkunft: Sonnet-Recherche Welle 3
+        abgenommen: '2026-08-05'
     # Welle 3: Pakistan war bisher gar nicht abgedeckt. Jazz ist der groesste
     # Betreiber des Landes (VEON-Tochter) und meldet auch die Netztechnik
     # dahinter ("Jazz Completes SDM Virtualization with Nokia").
@@ -1097,6 +1143,20 @@ regions:
   oceania:
     name: Ozeanien
     operators:
+    # Welle 3e: die pazifischen Inselstaaten waren komplett blind. Solomon
+    # Telekom meldet unter anderem die Seekabelanbindung der Region
+    # ("M-SELEN Docks at Y-Sato Marine").
+    - name: Solomon Telekom
+      country: SB
+      website: ourtelekom.com.sb
+      aliases:
+      - Our Telekom
+      sources:
+      - type: newsroom
+        url: https://www.ourtelekom.com.sb/news/
+        item_selector: a.item
+        herkunft: Sonnet-Recherche Welle 3
+        abgenommen: '2026-08-05'
     - name: Telstra
       country: AU
       website: telstra.com.au

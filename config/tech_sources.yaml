@@ -186,6 +186,10 @@ themen:
       Direct-to-Cell verschiebt gerade die Grenze zwischen Mobilfunk und
       Satellit - und damit die Frage, wofuer Kunden ihren Betreiber brauchen.
     quellen:
+      # Welle 3e: Tuerksat betreibt die tuerkischen Satelliten und ist damit
+      # der einzige nationale Satellitenbetreiber im Bestand neben den
+      # globalen Konstellationen.
+      - {name: "Türksat", type: rss, url: "https://www.turksat.com.tr/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # Das duennste Themenfeld im Bestand hatte genau eine Quelle. Omnispace
       # baut ein 5G-NTN-Netz und fusioniert gerade mit Lynk Global - also
       # genau die Direct-to-Device-Frage, die Betreiber betrifft.
@@ -372,6 +376,13 @@ themen:
       # Welle 3d: das europaeische Gegenstueck. Der Verband hat sich gerade von
       # FTTH Council Europe in Fibre Council Europe umbenannt.
       - {name: "Fibre Council Europe", type: newsroom, url: "https://fibrecouncil.eu/news/news-library", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Welle 3e: AirTrunk baut die grossen Rechenzentren im asiatisch-
+      # pazifischen Raum - dort entscheidet sich, wo die KI-Last der Region
+      # liegt und welche Netze sie anbinden.
+      - {name: "AirTrunk (Asien-Pazifik)", type: rss, url: "https://airtrunk.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Emitel ist Polens Sende- und Funkturmbetreiber, also das polnische
+      # Gegenstueck zu Vantage Towers.
+      - {name: "Emitel (Polen)", type: rss, url: "https://emitel.pl/en/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # Italiens groesster Turmbetreiber, hervorgegangen aus TIM und Vodafone.
       - {name: "INWIT", type: rss, url: "https://www.inwit.it/en/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
       # Glasfaser-Grosshandel in Nordamerika: wer Zayo mietet, baut nicht
