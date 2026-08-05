@@ -1,0 +1,2929 @@
+firmen:
+- name: Slovak Telekom
+  domain: telekom.sk
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Slovensko
+  domain: orange.sk
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: O2 Slovakia
+  domain: o2.sk
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: 4ka
+  domain: 4ka.sk
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: RU / TeleOff
+  domain: teleoff.gov.sk
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: T-2
+  domain: t-2.net
+  country: SI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telemach Slovenija
+  domain: telemach.si
+  country: SI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: A1 Slovenija
+  domain: a1.si
+  country: SI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AKOS
+  domain: akos-rs.si
+  country: SI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: One Hungary
+  domain: one.hu
+  country: HU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NMHH
+  domain: nmhh.hu
+  country: HU
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Mobilarena
+  domain: mobilarena.hu
+  country: HU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: HWSW
+  domain: hwsw.hu
+  country: HU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: ATIC
+  domain: atic.org.ro
+  country: RO
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: COMUNICATII Mobile
+  domain: comunic.ro
+  country: RO
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: CRC
+  domain: crc.bg
+  country: BG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TechNews.bg
+  domain: technews.bg
+  country: BG
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: A1 Hrvatska
+  domain: a1.hr
+  country: HR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telemach Hrvatska
+  domain: telemach.hr
+  country: HR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: HAKOM
+  domain: hakom.hr
+  country: HR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Telekom Srbija
+  domain: mts.rs
+  country: RS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: A1 Srbija
+  domain: a1.rs
+  country: RS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: RATEL
+  domain: ratel.rs
+  country: RS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: BH Telecom
+  domain: bhtelecom.ba
+  country: BA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: m:tel
+  domain: mtel.ba
+  country: BA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: HT Eronet
+  domain: eronet.ba
+  country: BA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: RAK
+  domain: rak.ba
+  country: BA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: One Crna Gora
+  domain: one.me
+  country: ME
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Crnogorski Telekom
+  domain: telekom.me
+  country: ME
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: m:tel Crna Gora
+  domain: mtel.me
+  country: ME
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: EKIP
+  domain: ekip.me
+  country: ME
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: A1 Makedonija
+  domain: a1.mk
+  country: MK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Makedonski Telekom
+  domain: telekom.mk
+  country: MK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AEC
+  domain: aec.mk
+  country: MK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: One Albania
+  domain: one.al
+  country: AL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AKEP
+  domain: akep.al
+  country: AL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: EETT
+  domain: eett.gr
+  country: GR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ADSLgr.com
+  domain: adslgr.com
+  country: GR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Epic
+  domain: epic.com.cy
+  country: CY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: PrimeTel
+  domain: primetel.com.cy
+  country: CY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Cablenet
+  domain: cablenet.com.cy
+  country: CY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: OCECPR
+  domain: ocecpr.org.cy
+  country: CY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Kyivstar
+  domain: kyivstar.ua
+  country: UA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Lifecell
+  domain: lifecell.ua
+  country: UA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NCEC
+  domain: nkek.gov.ua
+  country: UA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ITC.ua
+  domain: itc.ua
+  country: UA
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Moldcell
+  domain: moldcell.md
+  country: MD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moldtelecom
+  domain: moldtelecom.md
+  country: MD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ANRCETI
+  domain: anrceti.md
+  country: MD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Tre
+  domain: tre.se
+  country: SE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ice
+  domain: ice.no
+  country: 'NO'
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Norlys
+  domain: norlys.dk
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Erhvervsstyrelsen
+  domain: erhvervsstyrelsen.dk
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ålcom
+  domain: alcom.ax
+  country: FI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Nova
+  domain: nova.is
+  country: IS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Syn
+  domain: syn.is
+  country: IS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Fjarskiptastofa
+  domain: fjarskiptastofa.is
+  country: IS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TTJA
+  domain: ttja.ee
+  country: EE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Levira
+  domain: levira.com
+  country: EE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Bite Latvija
+  domain: bite.lv
+  country: LV
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: SPRK
+  domain: sprk.gov.lv
+  country: LV
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Bite Lietuva
+  domain: bite.lt
+  country: LT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: RRT
+  domain: rrt.lt
+  country: LT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TeleTower
+  domain: teletower.lt
+  country: LT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Netia
+  domain: netia.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vectra
+  domain: vectra.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: UKE
+  domain: uke.gov.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: PIIT
+  domain: piit.org.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: TELKO.in
+  domain: telko.in
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: GSMonline.pl
+  domain: gsmonline.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Emitel
+  domain: emitel.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: MobilMania
+  domain: mobilmania.zive.cz
+  country: CZ
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: NetCologne
+  domain: netcologne.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: M-net
+  domain: m-net.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: EWE Tel
+  domain: ewe.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: PYUR
+  domain: pyur.com
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: freenet
+  domain: freenet.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: swb
+  domain: swb.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: osnatel
+  domain: osnatel.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NetAachen
+  domain: netaachen.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: htp
+  domain: htp.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BREKO
+  domain: brekoverband.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ANGA
+  domain: anga.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: mobiFlip
+  domain: mobiflip.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: inside digital
+  domain: inside-digital.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Salzburg AG
+  domain: salzburg-ag.at
+  country: AT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: LIWEST
+  domain: liwest.at
+  country: AT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: KabelPlus
+  domain: kabelplus.at
+  country: AT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ISPA Austria
+  domain: ispa.at
+  country: AT
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Quickline
+  domain: quickline.ch
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Init7
+  domain: init7.net
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Suissedigital
+  domain: suissedigital.ch
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ComCom
+  domain: comcom.admin.ch
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Coriolis Telecom
+  domain: coriolis.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: La Poste Mobile
+  domain: lapostemobile.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Prixtel
+  domain: prixtel.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Auchan Telecom
+  domain: auchantelecom.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NRJ Mobile
+  domain: nrjmobile.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: K-Net
+  domain: k-net.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Axione
+  domain: axione.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Altitude Infra
+  domain: altitudeinfra.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Covage
+  domain: covage.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: FFTelecoms
+  domain: fftelecoms.org
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Frandroid
+  domain: frandroid.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Ariase
+  domain: ariase.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: DELTA Fiber
+  domain: deltafiber.nl
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Youfone
+  domain: youfone.nl
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tweakers
+  domain: tweakers.net
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Mobile Vikings
+  domain: mobilevikings.be
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Data News
+  domain: datanews.be
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: POST Luxembourg
+  domain: post.lu
+  country: LU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tango
+  domain: tango.lu
+  country: LU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Luxembourg
+  domain: orange.lu
+  country: LU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ILR
+  domain: ilr.lu
+  country: LU
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Hyperoptic
+  domain: hyperoptic.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Community Fibre
+  domain: communityfibre.co.uk
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Gigaclear
+  domain: gigaclear.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Trooli
+  domain: trooli.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: YouFibre
+  domain: youfibre.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Zzoomm
+  domain: zzoomm.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Fibrus
+  domain: fibrus.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: toob
+  domain: toob.co.uk
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: KCOM
+  domain: kcom.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Voneus
+  domain: voneus.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: giffgaff
+  domain: giffgaff.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tesco Mobile
+  domain: tescomobile.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: iD Mobile
+  domain: idmobile.co.uk
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Lebara
+  domain: lebara.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: EXA Infrastructure
+  domain: exainfra.net
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Virgin Media Ireland
+  domain: virginmedia.ie
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ComReg
+  domain: comreg.ie
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: PosteMobile
+  domain: postemobile.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CoopVoce
+  domain: coopvoce.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Linkem
+  domain: linkem.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tiscali Italia
+  domain: tiscali.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Retelit
+  domain: retelit.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Sparkle
+  domain: tisparkle.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Asstel
+  domain: asstel.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: MondoMobileWeb
+  domain: mondomobileweb.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Euskaltel
+  domain: euskaltel.com
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: R Cable
+  domain: mundo-r.com
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Adamo
+  domain: adamo.es
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BandaAncha
+  domain: bandaancha.eu
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: GO plc
+  domain: go.com.mt
+  country: MT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Melita
+  domain: melita.com
+  country: MT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Epic
+  domain: epic.com.mt
+  country: MT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MCA
+  domain: mca.org.mt
+  country: MT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Digi Portugal
+  domain: digi.pt
+  country: PT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Voice&Data
+  domain: voicendata.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: COAI
+  domain: coai.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: DoT India
+  domain: dot.gov.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: RailTel
+  domain: railtel.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Indus Towers
+  domain: industowers.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: ACT Fibernet
+  domain: actcorp.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: PTA
+  domain: pta.gov.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Zong
+  domain: zong.com.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ufone
+  domain: ufone.com
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telenor Pakistan
+  domain: telenor.com.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: PTCL
+  domain: ptcl.com.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ProPakistani
+  domain: propakistani.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: PhoneWorld
+  domain: phoneworld.com.pk
+  country: PK
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: BTRC
+  domain: btrc.gov.bd
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Banglalink
+  domain: banglalink.net
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Teletalk
+  domain: teletalk.com.bd
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BTCL
+  domain: btcl.gov.bd
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AMTOB
+  domain: amtob.org.bd
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: TechShohor
+  domain: techshohor.com
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Digi Bangla
+  domain: digibanglatech.news
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TechVision24
+  domain: en.techvision24.com
+  country: BD
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TRCSL
+  domain: trc.gov.lk
+  country: LK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Hutch Sri Lanka
+  domain: hutch.lk
+  country: LK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: SLT-Mobitel
+  domain: mobitel.lk
+  country: LK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NTA Nepal
+  domain: nta.gov.np
+  country: NP
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ncell
+  domain: ncell.com.np
+  country: NP
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Nepal Telecom
+  domain: ntc.net.np
+  country: NP
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MPT Myanmar
+  domain: mpt.com.mm
+  country: MM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ooredoo Myanmar
+  domain: ooredoo.com.mm
+  country: MM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mytel
+  domain: mytel.com.mm
+  country: MM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ATOM Myanmar
+  domain: atom.com.mm
+  country: MM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NBTC
+  domain: nbtc.go.th
+  country: TH
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: National Telecom
+  domain: ntplc.co.th
+  country: TH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: VNTA
+  domain: vnta.gov.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: VNPT
+  domain: vnpt.com.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MobiFone
+  domain: mobifone.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vietnamobile
+  domain: vietnamobile.com.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Gmobile
+  domain: gmobile.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: FPT Telecom
+  domain: fpt.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ICTnews
+  domain: ictnews.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: ICT Vietnam
+  domain: ictvietnam.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TRC Cambodia
+  domain: trc.gov.kh
+  country: KH
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Cellcard
+  domain: cellcard.com.kh
+  country: KH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Smart Axiata
+  domain: smart.com.kh
+  country: KH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Metfone
+  domain: metfone.com.kh
+  country: KH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Unitel Laos
+  domain: unitel.com.la
+  country: LA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MCMC
+  domain: mcmc.gov.my
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Telekom Malaysia
+  domain: tm.com.my
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: YTL Communications
+  domain: yes.my
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Digital Nasional Berhad
+  domain: dnb.com.my
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Digital News Asia
+  domain: digitalnewsasia.com
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: MyRepublic
+  domain: myrepublic.net
+  country: SG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Circles.Life
+  domain: circles.life
+  country: SG
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Komdigi
+  domain: komdigi.go.id
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Selular.ID
+  domain: selular.id
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: NTC Philippines
+  domain: ntc.gov.ph
+  country: PH
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Converge ICT
+  domain: convergeict.com
+  country: PH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AITI
+  domain: aiti.gov.bn
+  country: BN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: DST
+  domain: dst.com.bn
+  country: BN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: imagine
+  domain: imagine.com.bn
+  country: BN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Progresif
+  domain: progresif.com
+  country: BN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: APT
+  domain: apt.int
+  country: --
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: China Unicom
+  domain: chinaunicom.com.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: China Telecom
+  domain: 189.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: China Broadnet
+  domain: chinabroadnet.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: China Tower
+  domain: china-tower.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: MIIT
+  domain: miit.gov.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: C114
+  domain: c114.com.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: CMHK
+  domain: hk.chinamobile.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: csl
+  domain: hkt.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: 3 Hong Kong
+  domain: three.com.hk
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: SmarTone
+  domain: smartone.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: OFCA
+  domain: ofca.gov.hk
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CTM
+  domain: ctm.net
+  country: MO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: 3 Macau
+  domain: three.com.mo
+  country: MO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NCC Taiwan
+  domain: ncc.gov.tw
+  country: TW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: DIGITIMES
+  domain: digitimes.com
+  country: TW
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: MIC Japan
+  domain: soumu.go.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Impress Watch
+  domain: watch.impress.co.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: RBB Today
+  domain: rbbtoday.com
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: ETNews
+  domain: etnews.com
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: KCC
+  domain: kcc.go.kr
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Mobicom
+  domain: mobicom.mn
+  country: MN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Unitel
+  domain: unitel.mn
+  country: MN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Skytel
+  domain: skytel.mn
+  country: MN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: G-Mobile
+  domain: gmobile.mn
+  country: MN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Kcell
+  domain: kcell.kz
+  country: KZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Beeline Kazakhstan
+  domain: beeline.kz
+  country: KZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tele2 Kazakhstan
+  domain: tele2.kz
+  country: KZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Altel
+  domain: altel.kz
+  country: KZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ucell
+  domain: ucell.uz
+  country: UZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Beeline Uzbekistan
+  domain: beeline.uz
+  country: UZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mobiuz
+  domain: mobiuz.uz
+  country: UZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Uztelecom
+  domain: uztelecom.uz
+  country: UZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Perfectum Mobile
+  domain: perfectum.uz
+  country: UZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MegaCom
+  domain: megacom.kg
+  country: KG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Beeline Kyrgyzstan
+  domain: beeline.kg
+  country: KG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tcell
+  domain: tcell.tj
+  country: TJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MegaFon Tajikistan
+  domain: megafon.tj
+  country: TJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Babilon Mobile
+  domain: babilon-m.tj
+  country: TJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Communications Service Tajikistan
+  domain: cs.gov.tj
+  country: TJ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Altyn Asyr
+  domain: tmcell.tm
+  country: TM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Azercell
+  domain: azercell.com
+  country: AZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Bakcell
+  domain: bakcell.com
+  country: AZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Nar Mobile
+  domain: nar.az
+  country: AZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Magticom
+  domain: magticom.ge
+  country: GE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Silknet
+  domain: silknet.com
+  country: GE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Cellfie
+  domain: cellfie.ge
+  country: GE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Communications Commission Georgia
+  domain: comcom.ge
+  country: GE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Viva-MTS
+  domain: mts.am
+  country: AM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Team Telecom Armenia
+  domain: team.am
+  country: AM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ucom
+  domain: ucom.am
+  country: AM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ACMA
+  domain: acma.gov.au
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CommsDay
+  domain: commsday.com
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: AirTrunk
+  domain: airtrunk.com
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: NEXTDC
+  domain: nextdc.com
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: amaysim
+  domain: amaysim.com.au
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: felix mobile
+  domain: felixmobile.com.au
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Reseller News
+  domain: reseller.co.nz
+  country: NZ
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Digicel PNG
+  domain: digicelpacific.com
+  country: PG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telikom PNG
+  domain: telikompng.com.pg
+  country: PG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodafone PNG
+  domain: vodafone.com.pg
+  country: PG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NICTA
+  domain: nicta.gov.pg
+  country: PG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Vodafone Fiji
+  domain: vodafone.com.fj
+  country: FJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Digicel Fiji
+  domain: digicelfiji.com
+  country: FJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telecom Fiji Limited
+  domain: tfl.com.fj
+  country: FJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TAF
+  domain: taf.org.fj
+  country: FJ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: OPT-NC
+  domain: opt.nc
+  country: NC
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vini
+  domain: vini.pf
+  country: PF
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodafone Samoa
+  domain: vodafone.com.ws
+  country: WS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tonga Communications Corporation
+  domain: tcc.to
+  country: TO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TVL
+  domain: tvl.net.vu
+  country: VU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Our Telekom
+  domain: ourtelekom.com.sb
+  country: SB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: bmobile Solomon Islands
+  domain: bmobile.com.sb
+  country: SB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: GTA TeleGuam
+  domain: gta.net
+  country: GU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Docomo Pacific
+  domain: docomopacific.com
+  country: GU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: IT&E
+  domain: ite.net
+  country: GU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: PITA
+  domain: pita.org.fj
+  country: FJ
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: MTN Nigeria
+  domain: mtnonline.com
+  country: NG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: 9mobile
+  domain: 9mobile.com.ng
+  country: NG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Ghana
+  domain: mtn.com.gh
+  country: GH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodafone Ghana
+  domain: vodafone.com.gh
+  country: GH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AirtelTigo Ghana
+  domain: airteltigo.com.gh
+  country: GH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodafone Egypt
+  domain: vodafone.com.eg
+  country: EG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telecom Egypt
+  domain: te.eg
+  country: EG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NTRA Egypt
+  domain: tra.gov.eg
+  country: EG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Airtel Kenya
+  domain: airtel.co.ke
+  country: KE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telkom Kenya
+  domain: telkom.co.ke
+  country: KE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Communications Authority of Kenya
+  domain: ca.go.ke
+  country: KE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Vodacom Tanzania
+  domain: vodacom.co.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Tanzania
+  domain: airtel.co.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Yas Tanzania
+  domain: yas.co.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Halotel
+  domain: halotel.co.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TTCL
+  domain: ttcl.co.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TCRA
+  domain: tcra.go.tz
+  country: TZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MTN Uganda
+  domain: mtn.co.ug
+  country: UG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Uganda
+  domain: airtel.co.ug
+  country: UG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Rwanda
+  domain: mtn.co.rw
+  country: RW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Rwanda
+  domain: airtel.co.rw
+  country: RW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: RURA
+  domain: rura.rw
+  country: RW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Vodacom Congo
+  domain: vodacom.cd
+  country: CD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange RDC
+  domain: orange.cd
+  country: CD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel RDC
+  domain: airtel.cd
+  country: CD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Zamtel
+  domain: zamtel.zm
+  country: ZM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Zambia
+  domain: mtn.zm
+  country: ZM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Zambia
+  domain: airtel.co.zm
+  country: ZM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ZICTA
+  domain: zicta.zm
+  country: ZM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Econet Wireless Zimbabwe
+  domain: econet.co.zw
+  country: ZW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NetOne Zimbabwe
+  domain: netone.co.zw
+  country: ZW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telecel Zimbabwe
+  domain: telecel.co.zw
+  country: ZW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: POTRAZ
+  domain: potraz.gov.zw
+  country: ZW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Movitel
+  domain: movitel.co.mz
+  country: MZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodacom Mozambique
+  domain: vodacom.co.mz
+  country: MZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TDM
+  domain: tdm.co.mz
+  country: MZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Unitel Angola
+  domain: unitel.ao
+  country: AO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Movicel
+  domain: movicel.co.ao
+  country: AO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Angola Telecom
+  domain: angolatelecom.co.ao
+  country: AO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mobilis
+  domain: mobilis.dz
+  country: DZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Djezzy
+  domain: djezzy.dz
+  country: DZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ooredoo Algeria
+  domain: ooredoo.dz
+  country: DZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ARPT Algeria
+  domain: arpt.dz
+  country: DZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Orange Maroc
+  domain: orange.ma
+  country: MA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ANRT
+  domain: anrt.ma
+  country: MA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ooredoo Tunisia
+  domain: ooredoo.tn
+  country: TN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Tunisie
+  domain: orange.tn
+  country: TN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tunisie Telecom
+  domain: tunisietelecom.tn
+  country: TN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: INT Tunisia
+  domain: intt.tn
+  country: TN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Libyana
+  domain: libyana.ly
+  country: LY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Al Madar
+  domain: almadar.ly
+  country: LY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Libya Telecom & Technology
+  domain: ltt.ly
+  country: LY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Zain Sudan
+  domain: sd.zain.com
+  country: SD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Sudani
+  domain: sudani.sd
+  country: SD
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: NTC Sudan
+  domain: ntc.gov.sd
+  country: SD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Orange Cote d'Ivoire
+  domain: orange.ci
+  country: CI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Cote d'Ivoire
+  domain: mtn.ci
+  country: CI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Cote d'Ivoire
+  domain: moov-africa.ci
+  country: CI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ARTCI
+  domain: artci.ci
+  country: CI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Orange Cameroun
+  domain: orange.cm
+  country: CM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Cameroon
+  domain: mtn.cm
+  country: CM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Camtel
+  domain: camtel.cm
+  country: CM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ART Cameroun
+  domain: art.cm
+  country: CM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Expresso Senegal
+  domain: expressotelecom.sn
+  country: SN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Free Senegal
+  domain: free.sn
+  country: SN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ARTP Senegal
+  domain: artp.sn
+  country: SN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Orange Mali
+  domain: orange.ml
+  country: ML
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Malitel
+  domain: malitel.ml
+  country: ML
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Burkina Faso
+  domain: orange.bf
+  country: BF
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Burkina Faso
+  domain: moov-africa.bf
+  country: BF
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ARCEP Burkina Faso
+  domain: arcep.bf
+  country: BF
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Lonestar Cell MTN
+  domain: lonestarcell.com
+  country: LR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Liberia
+  domain: orange.com.lr
+  country: LR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: LTA Liberia
+  domain: lta.gov.lr
+  country: LR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Orange Guinee
+  domain: orange-guinee.com
+  country: GN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Guinee
+  domain: mtn.com.gn
+  country: GN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Sierra Leone
+  domain: orange.sl
+  country: SL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Africell Sierra Leone
+  domain: africell.sl
+  country: SL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Qcell
+  domain: qcell.sl
+  country: SL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Benin
+  domain: moov-africa.bj
+  country: BJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Benin
+  domain: mtn.bj
+  country: BJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ARCEP Benin
+  domain: arcep.bj
+  country: BJ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Togocom
+  domain: togocom.tg
+  country: TG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Togo
+  domain: moov-africa.tg
+  country: TG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Niger
+  domain: airtel.ne
+  country: NE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Niger
+  domain: orange.ne
+  country: NE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Niger
+  domain: moov-africa.ne
+  country: NE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Gabon
+  domain: airtel.ga
+  country: GA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Moov Africa Gabon
+  domain: moov-africa.ga
+  country: GA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Congo
+  domain: airtel.cg
+  country: CG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Congo
+  domain: mtncongo.net
+  country: CG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mauritel
+  domain: moov-africa.mr
+  country: MR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Chinguitel
+  domain: chinguitel.mr
+  country: MR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telma
+  domain: telma.mg
+  country: MG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Madagascar
+  domain: orange.mg
+  country: MG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Madagascar
+  domain: airtel.mg
+  country: MG
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Emtel
+  domain: emtel.com
+  country: MU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mauritius Telecom
+  domain: telecom.mu
+  country: MU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mascom
+  domain: mascom.bw
+  country: BW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Orange Botswana
+  domain: orange.co.bw
+  country: BW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BTC Botswana
+  domain: btc.bw
+  country: BW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BOCRA
+  domain: bocra.org.bw
+  country: BW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MTC Namibia
+  domain: mtc.com.na
+  country: NA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TN Mobile
+  domain: tnmobile.com.na
+  country: NA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telecom Namibia
+  domain: telecom.na
+  country: NA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CRAN Namibia
+  domain: cran.na
+  country: NA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TNM Malawi
+  domain: tnm.co.mw
+  country: MW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Airtel Malawi
+  domain: airtel.mw
+  country: MW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MACRA
+  domain: macra.org.mw
+  country: MW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Hormuud Telecom
+  domain: hormuud.com
+  country: SO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Somtel
+  domain: somtel.com
+  country: SO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Golis Telecom
+  domain: golistelecom.com
+  country: SO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Djibouti Telecom
+  domain: djiboutitelecom.dj
+  country: DJ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodacom Lesotho
+  domain: vodacom.co.ls
+  country: LS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Econet Telecom Lesotho
+  domain: etl.co.ls
+  country: LS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTN Eswatini
+  domain: mtn.co.sz
+  country: SZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Agence Ecofin
+  domain: agenceecofin.com
+  country: CI
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Balancing Act Africa
+  domain: balancingact-africa.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TechCabal
+  domain: techcabal.com
+  country: NG
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Umniah
+  domain: umniah.com
+  country: JO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Mobily
+  domain: mobily.com.sa
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Zain Saudi Arabia
+  domain: sa.zain.com
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: GO Telecom
+  domain: go.com.sa
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Integrated Telecom Company
+  domain: itc.sa
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CST
+  domain: cst.gov.sa
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TDRA
+  domain: tdra.gov.ae
+  country: AE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Vodafone Qatar
+  domain: vodafone.qa
+  country: QA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CRA Qatar
+  domain: cra.gov.qa
+  country: QA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Zain Kuwait
+  domain: kw.zain.com
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ooredoo Kuwait
+  domain: ooredoo.com.kw
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: stc Kuwait
+  domain: stc.com.kw
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CITRA
+  domain: citra.gov.kw
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Qualitynet
+  domain: qualitynet.net
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Fasttelco
+  domain: fasttelco.com
+  country: KW
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Batelco
+  domain: batelco.com
+  country: BH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Zain Bahrain
+  domain: bh.zain.com
+  country: BH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: stc Bahrain
+  domain: stc.com.bh
+  country: BH
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TRA Bahrain
+  domain: tra.org.bh
+  country: BH
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Omantel
+  domain: omantel.om
+  country: OM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ooredoo Oman
+  domain: ooredoo.om
+  country: OM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Awasr
+  domain: awasr.om
+  country: OM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TRA Oman
+  domain: tra.gov.om
+  country: OM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Zain Jordan
+  domain: jo.zain.com
+  country: JO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TRC Jordan
+  domain: trc.gov.jo
+  country: JO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: touch
+  domain: touch.com.lb
+  country: LB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Alfa
+  domain: alfa.com.lb
+  country: LB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ogero
+  domain: ogero.gov.lb
+  country: LB
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TRA Lebanon
+  domain: tra.gov.lb
+  country: LB
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Zain Iraq
+  domain: iq.zain.com
+  country: IQ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Asiacell
+  domain: asiacell.com
+  country: IQ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Korek Telecom
+  domain: korektel.com
+  country: IQ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Earthlink Iraq
+  domain: earthlink.iq
+  country: IQ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CMC Iraq
+  domain: cmc.iq
+  country: IQ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Pelephone
+  domain: pelephone.co.il
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Bezeq
+  domain: bezeq.co.il
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Golan Telecom
+  domain: golantelecom.co.il
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: HOT
+  domain: hot.net.il
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Paltel Group
+  domain: paltelgroup.ps
+  country: PS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Jawwal
+  domain: jawwal.ps
+  country: PS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ooredoo Palestine
+  domain: ooredoo.ps
+  country: PS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Yemen Mobile
+  domain: yemenmobile.com.ye
+  country: YE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Sabafon
+  domain: sabafon.com
+  country: YE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vodafone Turkey
+  domain: vodafone.com.tr
+  country: TR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Türksat
+  domain: turksat.com.tr
+  country: TR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: BTK
+  domain: btk.gov.tr
+  country: TR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: AICTO
+  domain: aicto.org
+  country: TN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: TradeArabia
+  domain: tradearabia.com
+  country: BH
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: CommsUpdate
+  domain: commsupdate.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Cogeco
+  domain: cogeco.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Shaw Communications
+  domain: shaw.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Freedom Mobile
+  domain: freedommobile.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Northwestel
+  domain: nwtel.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TekSavvy
+  domain: teksavvy.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Xplornet
+  domain: xplornet.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Beanfield
+  domain: beanfield.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Oxio
+  domain: oxio.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: C Spire
+  domain: cspire.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: GCI
+  domain: gci.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ziply Fiber
+  domain: ziplyfiber.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Metronet
+  domain: metronet.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Brightspeed
+  domain: brightspeed.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Alaska Communications
+  domain: alaskacommunications.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: altafiber
+  domain: altafiber.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TDS Telecom
+  domain: tdstelecom.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Puerto Rico
+  domain: claropr.com
+  country: PR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Liberty Puerto Rico
+  domain: libertypr.com
+  country: PR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Appalachian Wireless
+  domain: appalachianwireless.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Carolina West Wireless
+  domain: carolinawest.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Union Wireless
+  domain: unionwireless.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Cellcom
+  domain: cellcom.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Nex-Tech Wireless
+  domain: nex-techwireless.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Viaero Wireless
+  domain: viaero.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Consumer Cellular
+  domain: consumercellular.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: US Mobile
+  domain: usmobile.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Ting Mobile
+  domain: ting.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Red Pocket Mobile
+  domain: redpocket.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Twigby
+  domain: twigby.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Patriot Mobile
+  domain: patriotmobile.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Helium Mobile
+  domain: heliummobile.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TextNow
+  domain: textnow.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Pure Talk
+  domain: puretalkusa.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Breezeline
+  domain: breezeline.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Astound Broadband
+  domain: astound.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Midco
+  domain: midco.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vyve Broadband
+  domain: vyvebroadband.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Armstrong
+  domain: armstrongonewire.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Buckeye Broadband
+  domain: buckeyebroadband.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Shentel
+  domain: shentel.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Comporium
+  domain: comporium.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Gigapower
+  domain: gigapower.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Vexus Fiber
+  domain: vexusfiber.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Allo Communications
+  domain: allocommunications.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Segra
+  domain: segra.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Bug Tussel Wireless
+  domain: btussel.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Thumb Cellular
+  domain: thumbcellular.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Golden West Telecommunications
+  domain: goldenwest.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Chariton Valley Communications
+  domain: cvalley.net
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Copper Valley Telecom
+  domain: cvtc.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: MTA Solutions
+  domain: mtasolutions.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: USTelecom
+  domain: ustelecom.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: NTCA - The Rural Broadband Association
+  domain: ntca.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Competitive Carriers Association
+  domain: ccamobile.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Fiber Broadband Association
+  domain: fiberbroadband.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: INCOMPAS
+  domain: incompas.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Wireless Infrastructure Association
+  domain: wia.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Rural Wireless Association
+  domain: ruralwireless.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ACA Connects
+  domain: acaconnects.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Vertical Bridge
+  domain: verticalbridge.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Uniti Group
+  domain: uniti.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: EdgeConneX
+  domain: edgeconnex.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Somos
+  domain: somos.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: CyrusOne
+  domain: cyrusone.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Compass Datacenters
+  domain: compassdatacenters.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Vantage Data Centers
+  domain: vantage-dc.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Neustar
+  domain: home.neustar
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Bandwidth Inc
+  domain: bandwidth.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Inside Towers
+  domain: insidetowers.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Wireless Estimator
+  domain: wirelessestimator.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Telecom Ramblings
+  domain: telecomramblings.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Cablefax
+  domain: cablefax.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Broadband Breakfast
+  domain: broadbandbreakfast.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: ISED Canada
+  domain: ised-isde.canada.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Telcel
+  domain: telcel.com
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: AT&T Mexico
+  domain: att.com.mx
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Altan Redes
+  domain: altanredes.com
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Claro Brasil
+  domain: claro.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Brisanet
+  domain: brisanet.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Unifique
+  domain: unifique.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Sercomtel
+  domain: sercomtel.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Argentina
+  domain: claro.com.ar
+  country: AR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telecentro
+  domain: telecentro.com.ar
+  country: AR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Grupo GTD
+  domain: gtd.cl
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: VTR
+  domain: vtr.com
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Colombia
+  domain: claro.com.co
+  country: CO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ETB
+  domain: etb.com.co
+  country: CO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Movistar Peru
+  domain: movistar.com.pe
+  country: PE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Peru
+  domain: claro.com.pe
+  country: PE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Bitel
+  domain: bitel.com.pe
+  country: PE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Entel Peru
+  domain: entel.pe
+  country: PE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Movistar Ecuador
+  domain: movistar.com.ec
+  country: EC
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Ecuador
+  domain: claro.com.ec
+  country: EC
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CNT EP
+  domain: cnt.gob.ec
+  country: EC
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Entel Bolivia
+  domain: entel.bo
+  country: BO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tigo Bolivia
+  domain: tigo.com.bo
+  country: BO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Viva Bolivia
+  domain: viva.com.bo
+  country: BO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tigo Paraguay
+  domain: tigo.com.py
+  country: PY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Paraguay
+  domain: claro.com.py
+  country: PY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Personal Paraguay
+  domain: personal.com.py
+  country: PY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: COPACO
+  domain: copaco.com.py
+  country: PY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Movistar Uruguay
+  domain: movistar.com.uy
+  country: UY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Uruguay
+  domain: claro.com.uy
+  country: UY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: CANTV
+  domain: cantv.com.ve
+  country: VE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Digitel
+  domain: digitel.com.ve
+  country: VE
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Guatemala
+  domain: claro.com.gt
+  country: GT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Movistar Guatemala
+  domain: movistar.com.gt
+  country: GT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tigo Guatemala
+  domain: tigo.com.gt
+  country: GT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Honduras
+  domain: claro.com.hn
+  country: HN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Hondutel
+  domain: hondutel.hn
+  country: HN
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro El Salvador
+  domain: claro.com.sv
+  country: SV
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tigo El Salvador
+  domain: tigo.com.sv
+  country: SV
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Nicaragua
+  domain: claro.com.ni
+  country: NI
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Grupo ICE / koelbi
+  domain: grupoice.com
+  country: CR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Costa Rica
+  domain: claro.cr
+  country: CR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Tigo Panama
+  domain: tigo.com.pa
+  country: PA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Panama
+  domain: claro.com.pa
+  country: PA
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Claro Dominicana
+  domain: claro.com.do
+  country: DO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Altice Dominicana
+  domain: altice.com.do
+  country: DO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Viva Dominicana
+  domain: viva.com.do
+  country: DO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Wind Telecom
+  domain: wind.com.do
+  country: DO
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: ETECSA
+  domain: etecsa.cu
+  country: CU
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Flow Jamaica
+  domain: flowjamaica.com
+  country: JM
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: TSTT
+  domain: tstt.co.tt
+  country: TT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Flow Trinidad
+  domain: flow.tt
+  country: TT
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: One Communications Guyana
+  domain: onecomm.gy
+  country: GY
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telesur
+  domain: telesur.sr
+  country: SR
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Digi Belize
+  domain: livedigi.com
+  country: BZ
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: BTC Bahamas
+  domain: btcbahamas.com
+  country: BS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Aliv
+  domain: bealiv.com
+  country: BS
+  herkunft: Sonnet-Recherche Welle 3 (betreiber)
+- name: Telesites
+  domain: telesites.com.mx
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: IFT
+  domain: ift.org.mx
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Anatel
+  domain: anatel.gov.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ENACOM
+  domain: enacom.gob.ar
+  country: AR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Subtel
+  domain: subtel.cl
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CRC Colombia
+  domain: crcom.gov.co
+  country: CO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MinTIC
+  domain: mintic.gov.co
+  country: CO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ANE Colombia
+  domain: ane.gov.co
+  country: CO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: OSIPTEL
+  domain: osiptel.gob.pe
+  country: PE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCOTEL
+  domain: arcotel.gob.ec
+  country: EC
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ATT Bolivia
+  domain: att.gob.bo
+  country: BO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CONATEL Paraguay
+  domain: conatel.gov.py
+  country: PY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: URSEC
+  domain: ursec.gub.uy
+  country: UY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: SIT Guatemala
+  domain: sit.gob.gt
+  country: GT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CONATEL Honduras
+  domain: conatel.gob.hn
+  country: HN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: SIGET
+  domain: siget.gob.sv
+  country: SV
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TELCOR
+  domain: telcor.gob.ni
+  country: NI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: SUTEL
+  domain: sutel.go.cr
+  country: CR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ASEP Panama
+  domain: asep.gob.pa
+  country: PA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: INDOTEL
+  domain: indotel.gob.do
+  country: DO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: OUR Jamaica
+  domain: our.org.jm
+  country: JM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TATT
+  domain: tatt.org.tt
+  country: TT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: JRTPR
+  domain: jrtpr.pr.gov
+  country: PR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: BNamericas
+  domain: bnamericas.com
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Convergencia Latina
+  domain: convergencialatina.com
+  country: AR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Convergencia Digital
+  domain: convergenciadigital.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Diario TI
+  domain: diarioti.com
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: OCECPR
+  domain: ocecpr.ee.cy
+  country: CY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: SDFI
+  domain: sdfi.dk
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARKEP
+  domain: arkep-rks.org
+  country: XK
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: NKRZI
+  domain: nkrzi.gov.ua
+  country: UA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: URCA
+  domain: urcabahamas.bs
+  country: BS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: SUBTEL
+  domain: subtel.gob.cl
+  country: CL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: PUC Guyana
+  domain: puc.org.gy
+  country: GY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CONATEL Haiti
+  domain: conatel.gouv.ht
+  country: HT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TAS Suriname
+  domain: tas.sr
+  country: SR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CONATEL Venezuela
+  domain: conatel.gob.ve
+  country: VE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ECTEL
+  domain: ectel.int
+  country: LC
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ICTA Cayman
+  domain: icta.ky
+  country: KY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: NTRC St. Kitts und Nevis
+  domain: ntrc.kn
+  country: KN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Belize PUC
+  domain: puc.bz
+  country: BZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: BT&P Curacao
+  domain: btnp.org
+  country: CW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Anguilla PUC
+  domain: pucanguilla.com
+  country: AI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Antigua and Barbuda Telecommunications Division
+  domain: telecom.gov.ag
+  country: AG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Afghanistan Telecom Regulatory Authority
+  domain: atra.gov.af
+  country: AF
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MINCOM Aserbaidschan
+  domain: mincom.gov.az
+  country: AZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: BICMA Bhutan
+  domain: bicma.gov.bt
+  country: BT
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CRA Iran
+  domain: cra.ir
+  country: IR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ministry of Communications Israel
+  domain: moc.gov.il
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ministry of Digital Development Kasachstan
+  domain: mic.gov.kz
+  country: KZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ministry of Transport and Communication Kirgistan
+  domain: piumotc.kg
+  country: KG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: GDTTI Macau
+  domain: telecommunications.ctt.gov.mo
+  country: MO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CAM Malediven
+  domain: cam.gov.mv
+  country: MV
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ministry of Telecommunications Palaestina
+  domain: mtde.gov.ps
+  country: PS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MCT Syrien
+  domain: moct.gov.sy
+  country: SY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ministry of Transport and Communications Tadschikistan
+  domain: khoja.tj
+  country: TJ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Communications Commission Tonga
+  domain: mic.gov.to
+  country: TO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Turkmenaragatnashyk
+  domain: online.tm
+  country: TM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARPCE Algerien
+  domain: arpce.dz
+  country: DZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: INACOM Angola
+  domain: inacom.gov.ao
+  country: AO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCT Burundi
+  domain: arct.gov.bi
+  country: BI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ANAC Kap Verde
+  domain: anac.cv
+  country: CV
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCEP Zentralafrikanische Republik
+  domain: arcep.cf
+  country: CF
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCEP Tschad
+  domain: arcep.td
+  country: TD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ANRTIC Komoren
+  domain: anrtic.co.km
+  country: KM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARPCE Republik Kongo
+  domain: arpce.cg
+  country: CG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARPTC DR Kongo
+  domain: arptc.gouv.cd
+  country: CD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ORTEL Aequatorialguinea
+  domain: ortel.gq
+  country: GQ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ESCCOM Eswatini
+  domain: esccom.org.sz
+  country: SZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Ethiopian Communications Authority
+  domain: eca.gov.et
+  country: ET
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCEP Gabun
+  domain: arcep.ga
+  country: GA
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: PURA Gambia
+  domain: pura.gm
+  country: GM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARPT Guinea
+  domain: arptguinee.org
+  country: GN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARN Guinea-Bissau
+  domain: arn.gw
+  country: GW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: LCA Lesotho
+  domain: lca.org.ls
+  country: LS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: GTA Libyen
+  domain: cim.gov.ly
+  country: LY
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARTEC Madagaskar
+  domain: artec.mg
+  country: MG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: MACRA Malawi
+  domain: macra.mw
+  country: MW
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: AMRTP Mali
+  domain: amrtp.ml
+  country: ML
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARE Mauretanien
+  domain: are.mr
+  country: MR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ICTA Mauritius
+  domain: icta.mu
+  country: MU
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: INCM Mosambik
+  domain: incm.gov.mz
+  country: MZ
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCEP Niger
+  domain: arcep.ne
+  country: NE
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ANRTIC Seychellen
+  domain: misd.gov.sc
+  country: SC
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: NATCOM Sierra Leone
+  domain: natcom.gov.sl
+  country: SL
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: NCA Somalia
+  domain: nca.gov.so
+  country: SO
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: NCA Suedsudan
+  domain: nca.gov.ss
+  country: SS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: TPRA Sudan
+  domain: tpra.gov.sd
+  country: SD
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ARCEP Togo
+  domain: arcep.tg
+  country: TG
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CCK Kiribati
+  domain: cck.ki
+  country: KI
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Office of the Regulator Samoa
+  domain: regulator.gov.ws
+  country: WS
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: PTD Myanmar
+  domain: ptd.gov.mm
+  country: MM
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: CRC Mongolei
+  domain: crc.gov.mn
+  country: MN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: African Telecommunications Union
+  domain: atuuat.africa
+  country: ET
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
