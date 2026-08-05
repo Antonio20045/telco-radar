@@ -38,7 +38,13 @@ class Item:
     operator: Optional[str] = None
     published: Optional[datetime] = None
     summary: str = ""
-    origin: str = "operator"  # "operator" | "industry_news"
+    origin: str = "operator"  # "operator" | "industry_news" | "tech_watch"
+    # URL der QUELLE (nicht der Meldung). source_name traegt nur den
+    # Anzeigenamen, und der ist bei einem Betreiber mit mehreren Kanaelen fuer
+    # alle gleich - die Trefferquote je Kanal waere ohne dieses Feld nicht
+    # berechenbar. Wird zentral in collect/_collect_source gestempelt, damit
+    # kein Collector es vergessen kann.
+    source_url: str = ""
     id: str = field(default="")
 
     def __post_init__(self) -> None:
@@ -66,6 +72,7 @@ class Item:
             published=published,
             summary=d.get("summary", ""),
             origin=d.get("origin", "operator"),
+            source_url=d.get("source_url", ""),
             id=d.get("id", ""),
         )
 

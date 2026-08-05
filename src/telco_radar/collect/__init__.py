@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ..config import Config, Source, Operator
 from ..models import Item
+from .http import configure_throttle
 from .rss import collect_rss
 from .json_api import collect_json
 from .newsroom import collect_newsroom
@@ -33,6 +34,11 @@ def _collect_source(source: Source, region: str, operator: str | None,
         # separate story and the same news enters the report twice.
         drop = re.compile(source.exclude_url_pattern)
         items = [i for i in items if not drop.search(i.url)]
+    # Zentral statt in jedem Collector: die Trefferquote je KANAL braucht die
+    # Quellen-URL, und ein Betreiber mit Newsroom plus Investor Relations
+    # traegt in beiden denselben source_name.
+    for item in items:
+        item.source_url = source.url
     return items
 
 
@@ -60,10 +66,20 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
     ist reine Wartezeit auf fremde Server, also skaliert sie fast linear mit
     der Parallelitaet. Eine Kappung der Meldungen waere die falsche Antwort -
     was hier nicht gesammelt wird, sieht kein Analyst je.
+
+    Der Worker-Pool allein reicht dafuer aber nicht: er sagt nur, wie viele
+    Quellen gleichzeitig laufen, nicht wie viele davon denselben Server
+    treffen. Die Begrenzung je Host macht deshalb collect/http.py (HostGate),
+    hier konfiguriert aus settings.yaml. Erst beides zusammen erlaubt einen
+    grossen Pool, ohne 429/403 zu ernten.
     """
     http_cfg = cfg.settings.get("http", {})
     if max_workers is None:
         max_workers = int(cfg.settings.get("collect_max_workers", 4) or 4)
+    configure_throttle(
+        int(cfg.settings.get("collect_host_max_parallel", 2) or 2),
+        float(cfg.settings.get("collect_host_min_interval_seconds", 0.0) or 0.0),
+    )
     jobs: list[tuple[Source, str, str | None, str]] = []
 
     for op in cfg.operators:
@@ -78,11 +94,27 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
         if src.crawlable:
             jobs.append((src, src.theme, src.name, "tech_watch"))
 
+    def _timed(src, region, operator, origin):
+        """Wanduhr je Quelle - ohne sie ist nicht zu sehen, WELCHE Quelle die
+        Sammelphase aufhaelt, und genau das entscheidet bei 1000 Quellen.
+
+        Liefert (items, sekunden, fehler); ein Fehler wird mitgegeben statt
+        geworfen, damit die Dauer auch bei einer gescheiterten Quelle im
+        Protokoll steht.
+        """
+        t0 = time.monotonic()
+        try:
+            got = _collect_source(src, region, operator, origin, http_cfg)
+            return got, time.monotonic() - t0, None
+        except Exception as exc:  # noqa: BLE001 - resilience by design
+            return None, time.monotonic() - t0, exc
+
     items: list[Item] = []
     results: list[dict] = []
+    t_start = time.monotonic()
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {
-            pool.submit(_collect_source, src, region, operator, origin, http_cfg):
+            pool.submit(_timed, src, region, operator, origin):
                 (src, region, operator, origin)
             for src, region, operator, origin in jobs
         }
@@ -97,22 +129,31 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
                 "label": src.label or src.kind,
                 "origin": origin,
             }
-            try:
-                got = fut.result()
-                items.extend(got)
-                rec["status"] = "ok" if got else "empty"
-                rec["count"] = len(got)
-                log.info("%-5s %-22s %-45s -> %d items",
-                         rec["status"].upper(), (operator or src.name)[:22],
-                         src.url[:45], len(got))
-            except Exception as exc:  # noqa: BLE001 - resilience by design
+            got, dauer, exc = fut.result()
+            rec["seconds"] = round(dauer, 2)
+            if exc is not None:
                 rec["status"] = "fail"
                 rec["count"] = 0
                 rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
-                log.warning("FAIL  %-22s %-45s -> %s",
+                log.warning("FAIL  %-22s %-45s -> %s (%.1fs)",
                             (operator or src.name)[:22], src.url[:45],
-                            rec["error"])
+                            rec["error"], dauer)
+            else:
+                items.extend(got)
+                rec["status"] = "ok" if got else "empty"
+                rec["count"] = len(got)
+                log.info("%-5s %-22s %-45s -> %d items (%.1fs)",
+                         rec["status"].upper(), (operator or src.name)[:22],
+                         src.url[:45], len(got), dauer)
             results.append(rec)
+
+    wanduhr = time.monotonic() - t_start
+    arbeit = sum(r.get("seconds", 0.0) for r in results)
+    log.info("Sammelphase: %d Quellen in %.1fs Wanduhr (%.1fs Arbeit, Faktor "
+             "%.1f bei %d Workern, max. %d je Host)",
+             len(results), wanduhr, arbeit,
+             arbeit / wanduhr if wanduhr else 0.0, max_workers,
+             int(cfg.settings.get("collect_host_max_parallel", 2) or 2))
     return items, results
 
 

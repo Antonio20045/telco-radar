@@ -137,9 +137,44 @@ reported_topics_memory: 300
 # gesammelte Meldung von keinem Analysten je gelesen wird und der Seen-Store
 # sie nie wieder anbietet.
 # Nicht beliebig hochdrehen: dieselbe Quelle mit vielen gleichzeitigen
-# Verbindungen anzufassen provoziert 429/403 - die Erhoehung von 4 auf 8 ist
-# gemessen unkritisch, weil je Host ohnehin nur wenige Quellen liegen.
-collect_max_workers: 8
+# Verbindungen anzufassen provoziert 429/403. Genau dagegen steht die
+# Host-Drosselung darunter - erst mit ihr ist ein grosser Pool vertretbar.
+#
+# GEMESSEN am 05.08.2026 mit scripts/miss_sammelphase.py ueber alle 132
+# crawlbaren Quellen, drei Laeufe hintereinander gegen dieselben Server:
+#
+#   Worker | je Host | Abstand | Wanduhr | Arbeit/Quelle | ok/leer/Fehler | 403
+#        8 |    ohne |       - | 185,6 s |        2,90 s |     115/4/13   |  1
+#       48 |       2 |   0,5 s |  97,1 s |        6,88 s |     115/4/13   |  1
+#       64 |       2 |   0,5 s |  22,2 s |        5,17 s |     115/4/13   |  1
+#
+# Entscheidend ist die rechte Haelfte: Status und Meldungszahl (2101) sind in
+# allen drei Laeufen IDENTISCH. Die Drosselung kostet also keine Quelle, und
+# der grosse Pool holt sich keine zusaetzlichen Sperren - der einzige 403
+# (Telecompetitor) kommt auch beim langsamsten Lauf.
+#
+# Die Spalte "Arbeit/Quelle" STEIGT dabei, und das ist kein Widerspruch: die
+# Wartezeit vor dem Host-Gate zaehlt als Arbeitszeit der Quelle. Was zaehlt,
+# ist die Wanduhr. Sie faellt um Faktor 8,4.
+#
+# Warnung fuer die naechste Messung: die Wanduhr haengt bei diesen Zahlen fast
+# nur noch an der LANGSAMSTEN Quelle. Telecoms Tech News allein brauchte im
+# Baseline-Lauf 165 s von 186 s (drei Leseversuche in den Timeout). Wer die
+# Zahl unten weiter hochdreht, gewinnt deshalb wenig - der naechste Hebel ist
+# das Timeout je Quelle, nicht der Pool.
+collect_max_workers: 64
+
+# Host-Drosselung (collect/http.py::HostGate). Bei 1000 Quellen liegen
+# zwangslaeufig mehrere Quellen auf derselben Domain - blog.google hat heute
+# schon drei. Ohne diese Grenze wuerde ein Pool von 64 Workern denselben
+# Server mit einem Schlag anfassen und sich 429/403 einhandeln; eine so
+# gesperrte Quelle kostet dann drei Versuche mit 4 s und 9 s Backoff, die
+# Parallelitaet macht den Lauf also langsamer statt schneller.
+# Das Gate sitzt in fetch(), nicht in collect_all() - so zaehlen auch die
+# Wiederholungen der Collectors (rss.py holt bei kaputtem XML bis zu drei Mal)
+# und die Folgeabrufe der Newsroom-Parser mit.
+collect_host_max_parallel: 2
+collect_host_min_interval_seconds: 0.5
 
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the

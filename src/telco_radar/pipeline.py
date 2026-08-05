@@ -217,6 +217,17 @@ def run(root: Path, use_llm: bool | None = None,
     seen = SeenStore(state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     new_items = filter_fresh(seen.filter_new(items), lookback)
+    # Neue Meldungen JE QUELLE ins Laufprotokoll. Das ist der Nenner der
+    # Trefferquote (scripts/quellen_trefferquote.py): "gesammelt" taugt dafuer
+    # nicht, weil ein Newsroom bei jedem Abruf dieselben 30 Meldungen liefert -
+    # eine Quelle saehe damit schlecht aus, nur weil sie eine statische Seite
+    # hat. Seit dem kompakten Seen-Store steht die Zuordnung Meldung -> Quelle
+    # auch nirgends sonst mehr.
+    neu_je_quelle: dict[str, int] = defaultdict(int)
+    for i in new_items:
+        neu_je_quelle[i.source_url] += 1
+    for rec in source_results:
+        rec["new"] = neu_je_quelle.get(rec["url"], 0)
     phase("Nur Neues", time.monotonic() - td,
           f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)")
     log.info("Novelty filter: %d new items (seen store: %d known ids)",
@@ -395,9 +406,16 @@ def run(root: Path, use_llm: bool | None = None,
                 h.setdefault("date", item.published.date().isoformat()
                              if item.published else None)
                 h.setdefault("source", item.source_name)
+                # Der Anzeigename allein reicht nicht: ein Betreiber mit
+                # Newsroom UND Investor Relations traegt in beiden denselben.
+                # Ohne die Kanal-URL waere die Trefferquote je Kanal - und
+                # damit die Frage, welcher Zweitkanal sich lohnt - nicht
+                # berechenbar.
+                h.setdefault("source_url", item.source_url)
             else:
                 h.setdefault("date", None)
                 h.setdefault("source", "")
+                h.setdefault("source_url", "")
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den
