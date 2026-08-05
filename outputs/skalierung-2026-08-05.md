@@ -15,13 +15,13 @@ keine fehlende Zeit.**
 | Auftrag | Stand |
 |---|---|
 | 1. Sammel-Parallelität mit Host-Drosselung, gemessen | **fertig**, in GitHub Actions gemessen |
-| 2. Zweistufige Redaktion mit Tests | **fertig**, 21 Tests |
+| 2. Zweistufige Redaktion mit Tests | **fertig**, 21 Tests, im Lauf #75 abgenommen |
 | 3. Seen-Store für 200 000 Einträge/Jahr | **fertig**, Faktor 17,6, Bestand migriert |
 | 4. Quellenregister + automatische Quarantäne | **fertig**, 14 Tests |
 | 5. Trefferquote je Quelle über das Archiv | **fertig**, vor der ersten neuen Quelle |
-| 6. Quellen in Wellen, jede mit echtem Actions-Lauf | **teilweise**: eine Welle, +29 Quellen |
+| 6. Quellen in Wellen, jede mit echtem Actions-Lauf | **teilweise**: eine Welle, +29 Quellen, Diagnoselauf #74 + Volllauf #75 |
 | 7. Kostenrechnung je Lauf und Monat | **fertig** |
-| 8. `pytest -q` grün, Quellen-Doku neu | **fertig**, 407 Tests |
+| 8. `pytest -q` grün, Quellen-Doku neu | **fertig**, 410 Tests |
 | 9. `CLAUDE.md` fortgeschrieben | **fertig** |
 | 10. Ehrliche Schlussliste | dieser Text |
 
