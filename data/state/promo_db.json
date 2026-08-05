@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-04",
+ "updated": "2026-08-05",
  "entries": [
   {
    "id": "4579c71aed782b5b",
@@ -72,7 +72,7 @@
    },
    "score": 63,
    "score_reason": "Ein Smartphone-Bundle mit Vertrag ohne genannten Vergleichspreis bietet einen soliden, aber nicht konkret bezifferten Kaufanreiz.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -146,7 +146,7 @@
    },
    "score": 63,
    "score_reason": "Ein guenstigeres Geraete-Vertragsbundle ohne Streichpreis wirkt attraktiv, der genaue Vorteil bleibt aber unklar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -297,7 +297,7 @@
    },
    "score": 63,
    "score_reason": "Ein aktuelles Top-Smartphone im Vertragsbundle ist ein klassischer Kaufanreiz ohne bezifferten Rabatt.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -334,7 +334,7 @@
    },
    "score": 63,
    "score_reason": "Ein dauerhaft guenstiger Paketpreis fuer ein aelteres iPhone-Modell ist ein moderater Kaufanreiz ohne konkreten Ersparnisbetrag.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-07-31"
   },
@@ -372,7 +372,7 @@
    },
    "score": 63,
    "score_reason": "Ein Premium-Falt-Smartphone im Vertragsbundle spricht eine spezielle Zielgruppe an, ohne dass ein konkreter Preisvorteil genannt wird.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -409,7 +409,7 @@
    },
    "score": 63,
    "score_reason": "Ein preiswertes Smartphone-Bundle bietet einen Einstiegsanreiz, dessen tatsaechlicher Vorteil aber nicht beziffert wird.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -446,7 +446,7 @@
    },
    "score": 63,
    "score_reason": "Ein guenstiges Einsteiger-Smartphone im Vertragsbundle ist ein moderater Kaufanreiz ohne genannten Vergleichswert.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -483,7 +483,7 @@
    },
    "score": 63,
    "score_reason": "Eine saisonale Sammelaktion mit mehreren Geraete-Vertragsbundles bietet Kaufanreize, ohne dass konkrete Ersparnisse genannt werden.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -520,7 +520,7 @@
    },
    "score": 37,
    "score_reason": "Der Preisvorteil von zehn Euro bei der Kinder-Smartwatch ist überschaubar und die Tarifoption stellt keinen eigenständigen Wechselanreiz dar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -540,11 +540,11 @@
     "lever": 3,
     "depth": 1,
     "mechanic": "wechselpraemie",
-    "evidence": "eine Prämie von bis zu 25 € für jede erfolgreiche Vermittlung",
+    "evidence": "bis zu 25 € für jede erfolgreiche Vermittlung.",
     "evidence_ok": true,
-    "reason": "Eine Empfehlungspraemie belohnt direkt die Neukundengewinnung, faellt mit bis zu 25 Euro aber eher gering aus.",
+    "reason": "Die Empfehlungsprämie belohnt das Gewinnen neuer Kunden mit einem kleinen, klar bezifferten Geldbetrag.",
     "basis": "26567160971f1c8b",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "wechselpraemie",
@@ -556,8 +556,8 @@
     "campaign": 0
    },
    "score": 67,
-   "score_reason": "Eine Empfehlungspraemie belohnt direkt die Neukundengewinnung, faellt mit bis zu 25 Euro aber eher gering aus.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Die Empfehlungsprämie belohnt das Gewinnen neuer Kunden mit einem kleinen, klar bezifferten Geldbetrag.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -577,11 +577,11 @@
     "lever": 3,
     "depth": 0,
     "mechanic": "bindungsfrei",
-    "evidence": "monatlich kündbar ist und dir maximale Flexibilität bietet",
+    "evidence": "monatlich kündbar",
     "evidence_ok": true,
-    "reason": "Der Wegfall jeder Mindestvertragslaufzeit senkt die Wechselhuerde stark, ein bezifferbarer Geldvorteil wird aber nicht genannt.",
+    "reason": "Die monatliche Kündbarkeit nimmt Wechslern die langfristige Bindung, ohne dass sich daraus ein bezifferbarer Geldvorteil ergibt.",
     "basis": "753a7bbbdec06fb1",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "bindungsfrei",
@@ -593,8 +593,8 @@
     "campaign": 0
    },
    "score": 48,
-   "score_reason": "Der Wegfall jeder Mindestvertragslaufzeit senkt die Wechselhuerde stark, ein bezifferbarer Geldvorteil wird aber nicht genannt.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Die monatliche Kündbarkeit nimmt Wechslern die langfristige Bindung, ohne dass sich daraus ein bezifferbarer Geldvorteil ergibt.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -611,27 +611,27 @@
    "missed_checks": 1,
    "stale_since": "2026-07-27",
    "judged": {
-    "lever": 2,
+    "lever": 1,
     "depth": 0,
     "mechanic": "geraetesubvention",
-    "evidence": "erneuertes Top-Handy inklusive Tarif mit Allnet Flat zu einem günstigen Preis",
+    "evidence": "zu einem günstigen Preis",
     "evidence_ok": true,
-    "reason": "Ein vergünstigtes Gerät im Bundle mit Tarif setzt einen Kaufanreiz, ohne dass ein konkreter Preisvorteil genannt wird.",
+    "reason": "Das Angebot kombiniert ein erneuertes Smartphone mit einem Allnet-Tarif zu einem pauschal behaupteten günstigen Preis, ohne den Vorteil zu beziffern.",
     "basis": "7ae6e18423a1f98d",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
    "score_axes": {
-    "lever": 2,
+    "lever": 1,
     "depth": 0,
     "reach": 2,
     "momentum": 3,
     "campaign": 0
    },
-   "score": 48,
-   "score_reason": "Ein vergünstigtes Gerät im Bundle mit Tarif setzt einen Kaufanreiz, ohne dass ein konkreter Preisvorteil genannt wird.",
-   "scored_at": "2026-08-04",
+   "score": 38,
+   "score_reason": "Das Angebot kombiniert ein erneuertes Smartphone mit einem Allnet-Tarif zu einem pauschal behaupteten günstigen Preis, ohne den Vorteil zu beziffern.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -668,7 +668,7 @@
    },
    "score": 63,
    "score_reason": "Der Rabatt von 50 Prozent auf den Tarifpreis ist ein sehr großer Preisvorteil, der einen starken Wechselanreiz bietet.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -700,12 +700,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -742,7 +742,7 @@
    },
    "score": 47,
    "score_reason": "Der Einstiegspreis von 4,99 Euro ist ein günstiger Tarif, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -779,7 +779,7 @@
    },
    "score": 47,
    "score_reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -810,12 +810,12 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 1,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 37,
+   "score": 42,
    "score_reason": "Der Wegfall der Versandkosten ist ein kleiner Anreiz, aber kein direkter Wechselhebel.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -851,7 +851,7 @@
    },
    "score": 67,
    "score_reason": "Das Startguthaben von 10 Euro ist eine direkte Wechselprämie, die den Kunden einen sofortigen finanziellen Vorteil bietet.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -883,12 +883,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -925,7 +925,7 @@
    },
    "score": 47,
    "score_reason": "Die Preisspanne ist günstig, aber ohne direkten Vergleichswert ist der Vorteil nicht genau bezifferbar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -962,7 +962,7 @@
    },
    "score": 47,
    "score_reason": "Die Jahrestarife bieten eine klare Kostenersparnis durch einmalige Zahlung, aber ohne Vergleich zu monatlichen Kosten ist der Vorteil nicht genau bezifferbar.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -1321,17 +1321,22 @@
    "id": "4b7ce709d949d627",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "iPhone 17 Pro Max + AirPods Pro 3",
-   "description": "iPhone 17 Pro Max inklusive AirPods Pro 3 und 50 GB Datenvolumen für 65,49 € monatlich, reduzierter Anschlusspreis.",
+   "headline": "Reduzierter Anschlusspreis: iPhone 17 Pro Max + AirPods Pro 3",
+   "description": "Bundle aus iPhone 17 Pro Max und AirPods Pro 3 mit 50 GB Datenvolumen für 65,49 €/Monat bei reduziertem Anschlusspreis.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-mit-airpods-pro-3-weiss-details?tarif=o2-mobile-on-demand-m-plus&ohne-tarif=nein&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": false,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   }
   },
   {
    "id": "771366b7f1f47499",
@@ -1391,14 +1396,14 @@
    "id": "5dcb4bb1d724d1e9",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Summer Special: O2 Prepaid M mit 10 GB extra",
-   "description": "Der O2 Prepaid M Tarif enthält für 12 Wochen 50 GB statt 40 GB Datenvolumen, inklusive Allnet-Flat und 15 € Startguthaben, für 14,99 € pro 4 Wochen ohne Vertragsbindung.",
+   "headline": "Summer Special: 10 GB extra im O2 Prepaid M",
+   "description": "Statt 40 GB jetzt 50 GB Datenvolumen für 12 Wochen, inklusive 15 € Startguthaben und Allnet-Flat für 14,99 €/4 Wochen – danach unendlich weitersurfen mit 1 MBit/s.",
    "valid_until": null,
    "url": "https://www.o2online.de/mobilfunk/prepaid/prepaid-m",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-31",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-08-04",
    "highlight": false,
    "judged": {
@@ -1422,8 +1427,7 @@
    },
    "score": 53,
    "score_reason": "Der Kunde erhält für zwölf Wochen 25 Prozent mehr Datenvolumen ohne Aufpreis, was einen spürbaren Mehrwert bietet.",
-   "scored_at": "2026-08-04",
-   "stale_since": "2026-08-04"
+   "scored_at": "2026-08-05"
   },
   {
    "id": "688284cc69a54334",
@@ -1477,17 +1481,22 @@
    "id": "314cc92a23639265",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Xplora X6 Play (Gen. 2) mit gratis Displayschutz",
-   "description": "Kinder-Smartwatch Xplora X6 Play (Gen. 2) inklusive gratis Displayschutz und 0 Euro Anschlusspreis.",
+   "headline": "Xplora X6 Play (Gen. 2) mit 0 € Anschlusspreis und Tarif – zum Schulstart",
+   "description": "Kinder-Smartwatch mit 500 MB Datenvolumen, Allnet-Flat und gratis Displayschutz für 9,99 €/Monat, ohne Anschlusspreis.",
    "valid_until": null,
-   "url": "https://www.o2online.de/deals/",
+   "url": "https://www.o2online.de/e-shop/xplora/xplora-x6-play-kidswatch-2025-details?tarif=o2-iot-m&ratenzahlung=24&zielgruppe=privatkunden",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-25",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-26",
-   "highlight": false
+   "highlight": false,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   }
   },
   {
    "id": "00f29071b8f4c3f8",
@@ -2800,6 +2809,90 @@
    "ended_since": "2026-07-28"
   },
   {
+   "id": "f6b9130ce160931a",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "15 € monatliche Ersparnis auf ausgewählte Smartphone-Bundles",
+   "description": "iPhone 17 Pro Max ab 58,49 €/Monat, mit AirPods Pro 3 ab 70,49 €/Monat oder mit Watch Ultra 3 ab 82,49 €/Monat – jeweils mit 50 oder 150 GB Datenvolumen und 0 € Anschlusspreis.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/deals/",
+   "image_url": null,
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "04f4e56573190131",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "0 € Anschlusspreis auf Samsung Galaxy S26 Ultra",
+   "description": "Samsung Galaxy S26 Ultra mit 150 GB+ Datenvolumen für 59,99 €/Monat ohne Anschlusspreis.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?tarif=o2-mobile-l-plus&ratenzahlung=36&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "9e7ca471f981f984",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "PS5 Slim Digital Edition Bundle mit 15 € monatlicher Ersparnis",
+   "description": "PlayStation 5 Slim Digital Edition inklusive 50 GB+ Datenvolumen und O2 Pay Stop für 31,99 €/Monat – 15 € günstiger als der reguläre Preis.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/e-shop/sony/sony-playstation-5-slim-digital-edition-details?tarif=o2-mobile-on-demand-m-plus&zielgruppe=privatkunden",
+   "image_url": null,
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "04def0d0c3e38a15",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "O2 Mobile Tarif: 50 GB für 19,99 € statt 29,99 €",
+   "description": "Monatlicher Rabatt von 10 € auf den Tarif mit 50 GB Datenvolumen (bis 300 MBit/s) und kostenlosem 1-GB-Reload.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/deals/",
+   "image_url": null,
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
    "id": "29fd6aed75f49a77",
    "brand": "Otelo",
    "tier": 2,
@@ -2828,12 +2921,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das Angebot verdoppelt die Surf-Geschwindigkeit für Neukunden, was einen spürbaren Leistungsvorteil darstellt.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-07-31"
   },
@@ -2871,7 +2964,7 @@
    },
    "score": 65,
    "score_reason": "Das Angebot kombiniert ein vergünstigtes Smartphone mit einem Tarif, was einen spürbaren Hardware-Vorteil darstellt.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -2903,12 +2996,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 1,
+    "momentum": 0,
     "campaign": 0
    },
-   "score": 45,
+   "score": 40,
    "score_reason": "Der Tarif richtet sich an eine spezifische Zielgruppe und bietet ein unbegrenztes Datenvolumen zu einem vergleichsweise niedrigen Preis.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -2945,7 +3038,7 @@
    },
    "score": 73,
    "score_reason": "Die einmalige Zuzahlung von nur einem Euro für ein Smartphone ist eine starke Geraetesubvention.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -3020,7 +3113,7 @@
    },
    "score": 75,
    "score_reason": "Das Empfehlungsprogramm belohnt sowohl den Werber als auch den Neukunden mit direkten Geldbeträgen.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": true
   },
   {
@@ -3052,12 +3145,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das dauerhaft zusätzliche Datenvolumen ist ein klarer Leistungsvorteil ohne zeitliche Begrenzung.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3076,25 +3169,25 @@
    "judged": {
     "lever": 1,
     "depth": 1,
-    "mechanic": "preisnachlass",
-    "evidence": "Das Starter-Paket für den Prepaid Smart Tarif kostet bis zum 26.07. nur 4,98 € statt 9,95 €.",
+    "mechanic": "gebuehrenerlass",
+    "evidence": "nur 4,98 € statt 9,95 €",
     "evidence_ok": true,
-    "reason": "Der Preisvorteil von knapp 5 Euro auf das Starterpaket ist zu gering, um einen echten Wechselanreiz zu setzen.",
+    "reason": "Die Halbierung des Starterpaket-Preises senkt die Einstiegshürde, bleibt aber ein einmaliger, kleiner Anreiz.",
     "basis": "71141a34510ddf2f",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
-   "mechanic": "preisnachlass",
+   "mechanic": "gebuehrenerlass",
    "score_axes": {
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 3,
+    "momentum": 2,
     "campaign": 1
    },
-   "score": 50,
-   "score_reason": "Der Preisvorteil von knapp 5 Euro auf das Starterpaket ist zu gering, um einen echten Wechselanreiz zu setzen.",
-   "scored_at": "2026-08-04",
+   "score": 45,
+   "score_reason": "Die Halbierung des Starterpaket-Preises senkt die Einstiegshürde, bleibt aber ein einmaliger, kleiner Anreiz.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3112,26 +3205,26 @@
    "stale_since": "2026-07-27",
    "judged": {
     "lever": 1,
-    "depth": 2,
+    "depth": 1,
     "mechanic": "datenbonus",
-    "evidence": "Neukunden erhalten in den ersten 24 Monaten jeden Monat 5 GB zusätzliches Datenvolumen kostenlos dazu.",
+    "evidence": "jeden Monat 5 GB zusätzliches Datenvolumen kostenlos",
     "evidence_ok": true,
-    "reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
+    "reason": "Der monatliche Datenbonus für 24 Monate ist ein klassischer Leistungsanreiz für Neukunden, dessen finanzieller Wert ohne Vergleichspreis offen bleibt.",
     "basis": "fff9e7af8023325d",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "datenbonus",
    "score_axes": {
     "lever": 1,
-    "depth": 2,
+    "depth": 1,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
-   "score_reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
-   "scored_at": "2026-08-04",
+   "score": 47,
+   "score_reason": "Der monatliche Datenbonus für 24 Monate ist ein klassischer Leistungsanreiz für Neukunden, dessen finanzieller Wert ohne Vergleichspreis offen bleibt.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3151,11 +3244,11 @@
     "lever": 1,
     "depth": 1,
     "mechanic": "datenbonus",
-    "evidence": "In allen Smart Tarifen gibt es einmalig 25 GB Extra-Datenvolumen, das ein Jahr lang genutzt werden kann – kostenlos.",
+    "evidence": "25 GB Datenpolster kostenlos",
     "evidence_ok": true,
-    "reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+    "reason": "Das einmalige 25-GB-Datenpolster für ein Jahr ist ein netter Zusatznutzen, aber ohne Preisbezug kein starkes Wechselargument.",
     "basis": "f68e2995e849d287",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "datenbonus",
@@ -3163,12 +3256,12 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 42,
-   "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
-   "scored_at": "2026-08-04",
+   "score": 47,
+   "score_reason": "Das einmalige 25-GB-Datenpolster für ein Jahr ist ein netter Zusatznutzen, aber ohne Preisbezug kein starkes Wechselargument.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3188,11 +3281,11 @@
     "lever": 3,
     "depth": 1,
     "mechanic": "wechselpraemie",
-    "evidence": "Wer seine alte Rufnummer zu Penny Mobil mitbringt, erhält einmalig 10 Euro Startguthaben.",
+    "evidence": "einmalig 10 Euro Startguthaben",
     "evidence_ok": true,
-    "reason": "Die Wechselprämie von 10 Euro ist ein direkter finanzieller Anreiz, aber der Betrag ist zu niedrig, um wirklich zu überzeugen.",
+    "reason": "Die Wechselprämie für die Rufnummernmitnahme ist ein direkter, aber mit zehn Euro schwacher Anreiz zum Anbieterwechsel.",
     "basis": "d7c3bc483c3c7f69",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "wechselpraemie",
@@ -3204,8 +3297,8 @@
     "campaign": 0
    },
    "score": 67,
-   "score_reason": "Die Wechselprämie von 10 Euro ist ein direkter finanzieller Anreiz, aber der Betrag ist zu niedrig, um wirklich zu überzeugen.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Die Wechselprämie für die Rufnummernmitnahme ist ein direkter, aber mit zehn Euro schwacher Anreiz zum Anbieterwechsel.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3223,26 +3316,26 @@
    "missed_checks": 0,
    "judged": {
     "lever": 1,
-    "depth": 2,
+    "depth": 3,
     "mechanic": "datenbonus",
-    "evidence": "Neukunden erhalten im Tarif Prepaid Basic statt 1 GB nun 2 GB Datenvolumen zum gleichen Preis.",
+    "evidence": "statt 1 GB nun 2 GB Datenvolumen zum gleichen Preis",
     "evidence_ok": true,
-    "reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
+    "reason": "Die Verdopplung des Inklusivvolumens zum gleichen Preis ist ein sehr deutlich spürbarer Leistungsvorteil, auch wenn es nur ein Gigabyte mehr ist.",
     "basis": "40aea91cc13b633e",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "datenbonus",
    "score_axes": {
     "lever": 1,
-    "depth": 2,
+    "depth": 3,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
-   "score_reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
-   "scored_at": "2026-08-04",
+   "score": 63,
+   "score_reason": "Die Verdopplung des Inklusivvolumens zum gleichen Preis ist ein sehr deutlich spürbarer Leistungsvorteil, auch wenn es nur ein Gigabyte mehr ist.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3262,11 +3355,11 @@
     "lever": 1,
     "depth": 1,
     "mechanic": "datenbonus",
-    "evidence": "In allen Smart-Tarifen (Smart, Smart Plus, Smart Max) gibt es einmalig 25 GB zusätzliches Datenvolumen, das ein Jahr lang genutzt werden kann – ohne Aufpreis.",
+    "evidence": "25 GB Extra-Datenpolster kostenlos",
     "evidence_ok": true,
-    "reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
+    "reason": "Das 25-GB-Extra-Datenvolumen in den Smart-Tarifen ist ein zusätzlicher Anreiz, dessen wirtschaftlicher Wert aber nicht angegeben ist.",
     "basis": "5061653368792c9f",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "datenbonus",
@@ -3274,12 +3367,12 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 42,
-   "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
-   "scored_at": "2026-08-04",
+   "score": 47,
+   "score_reason": "Das 25-GB-Extra-Datenvolumen in den Smart-Tarifen ist ein zusätzlicher Anreiz, dessen wirtschaftlicher Wert aber nicht angegeben ist.",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3316,7 +3409,7 @@
    },
    "score": 48,
    "score_reason": "Das Angebot kombiniert einen spürbaren monatlichen Preisnachlass mit dem Wegfall der Bereitstellungsgebühr, was einen klaren Wechselanreiz schafft.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3353,7 +3446,7 @@
    },
    "score": 40,
    "score_reason": "Der monatliche Preisvorteil von 2 Euro ist gering, aber der Wegfall der Bereitstellungsgebühr erhöht den Gesamtanreiz für Wechsler.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3390,7 +3483,7 @@
    },
    "score": 48,
    "score_reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3427,7 +3520,7 @@
    },
    "score": 48,
    "score_reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3464,7 +3557,7 @@
    },
    "score": 40,
    "score_reason": "Ohne Streichpreis oder Vergleichswert ist der Vorteil nicht bezifferbar, der reine Aktionspreis bietet aber einen kleinen Anreiz.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3501,7 +3594,7 @@
    },
    "score": 58,
    "score_reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3538,7 +3631,7 @@
    },
    "score": 48,
    "score_reason": "Die Kombination aus monatlichem Preisnachlass und entfallender Bereitstellungsgebühr ergibt einen spürbaren Wechselanreiz.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3575,7 +3668,7 @@
    },
    "score": 40,
    "score_reason": "Der kleine monatliche Preisvorteil und der Wegfall der Bereitstellungsgebühr bieten einen begrenzten, aber vorhandenen Anreiz.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3612,7 +3705,7 @@
    },
    "score": 48,
    "score_reason": "Die monatliche Ersparnis von 3 Euro und der Wegfall der Bereitstellungsgebühr ergeben einen spürbaren Gesamtvorteil.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3649,7 +3742,7 @@
    },
    "score": 48,
    "score_reason": "Der hohe monatliche Rabatt von 10 Euro und der Wegfall der Bereitstellungsgebühr machen das Angebot für datenhungrige Wechsler sehr attraktiv.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3686,7 +3779,7 @@
    },
    "score": 40,
    "score_reason": "Der Startpreis von 19,99 Euro bietet einen zeitlich begrenzten Preisvorteil, der ohne konkreten Vergleichswert aber schwer einzuordnen ist.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -3723,7 +3816,7 @@
    },
    "score": 58,
    "score_reason": "Das Bündel aus einem teuren Smartphone und einem Tarif zu einem monatlichen Gesamtpreis bietet einen spürbaren Hardware-Vorteil.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false
   },
   {
@@ -4177,9 +4270,9 @@
     "mechanic": "geraetesubvention",
     "evidence": "999 € statt 1.299 € (300 € Preisvorteil)",
     "evidence_ok": true,
-    "reason": "Das iPhone 17 Pro wird durch einen kraeftigen Preisnachlass und zwei Jahre unbegrenztes Datenvolumen deutlich attraktiver gemacht.",
+    "reason": "Die Kombination aus 300 Euro Preisvorteil beim iPhone 17 Pro und unbegrenztem Datenvolumen macht das Angebot für wechselwillige Kunden sehr attraktiv.",
     "basis": "2c20980585a720b6",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
@@ -4191,8 +4284,8 @@
     "campaign": 2
    },
    "score": 87,
-   "score_reason": "Das iPhone 17 Pro wird durch einen kraeftigen Preisnachlass und zwei Jahre unbegrenztes Datenvolumen deutlich attraktiver gemacht.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Die Kombination aus 300 Euro Preisvorteil beim iPhone 17 Pro und unbegrenztem Datenvolumen macht das Angebot für wechselwillige Kunden sehr attraktiv.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4215,9 +4308,9 @@
     "mechanic": "geraetesubvention",
     "evidence": "Preisvorteil über 400 € (241 € statt 649 €)",
     "evidence_ok": true,
-    "reason": "Das iPad wird mit einem sehr hohen Rabatt von ueber 400 Euro beworben, was einen starken Kaufanreiz schafft.",
+    "reason": "Der hohe Preisvorteil von über 400 Euro bei einem aktuellen iPad setzt ein starkes Signal im Tablet-Markt.",
     "basis": "953d988553d89648",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
@@ -4229,8 +4322,8 @@
     "campaign": 0
    },
    "score": 80,
-   "score_reason": "Das iPad wird mit einem sehr hohen Rabatt von ueber 400 Euro beworben, was einen starken Kaufanreiz schafft.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Der hohe Preisvorteil von über 400 Euro bei einem aktuellen iPad setzt ein starkes Signal im Tablet-Markt.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4445,15 +4538,15 @@
    "judged": {
     "lever": 3,
     "depth": 2,
-    "mechanic": "wechselpraemie",
-    "evidence": "Ankaufsbonus von bis zu 200 € beim Eintausch eines Altgeräts",
+    "mechanic": "geraetesubvention",
+    "evidence": "Zusätzlich gibt es einen Ankaufsbonus von bis zu 200 € beim Eintausch eines Altgeräts.",
     "evidence_ok": true,
-    "reason": "Der zusaetzliche Ankaufsbonus fuer das alte Geraet zahlt dem Kunden den Wechsel direkt aus und senkt die Wechselhuerde spuerbar.",
+    "reason": "Der Ankaufsbonus von bis zu 200 Euro ist ein zusätzlicher Anreiz, der den Umstieg auf ein neues Android-Smartphone erleichtert.",
     "basis": "581531aa0cb66971",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
-   "mechanic": "wechselpraemie",
+   "mechanic": "geraetesubvention",
    "score_axes": {
     "lever": 3,
     "depth": 2,
@@ -4462,8 +4555,8 @@
     "campaign": 0
    },
    "score": 82,
-   "score_reason": "Der zusaetzliche Ankaufsbonus fuer das alte Geraet zahlt dem Kunden den Wechsel direkt aus und senkt die Wechselhuerde spuerbar.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Der Ankaufsbonus von bis zu 200 Euro ist ein zusätzlicher Anreiz, der den Umstieg auf ein neues Android-Smartphone erleichtert.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4562,11 +4655,11 @@
     "lever": 3,
     "depth": 3,
     "mechanic": "wechselpraemie",
-    "evidence": "bis zu 240 € Cashback",
+    "evidence": "Bis zu 240 € Cashback",
     "evidence_ok": true,
-    "reason": "Ein direktes Cashback bei Vertragsabschluss belohnt den Wechsel finanziell und ist damit ein starker Anreiz.",
+    "reason": "Ein Cashback von bis zu 240 Euro senkt die Wechselhürde für Tarifkunden spürbar.",
     "basis": "e6d1927ba2b06446",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "wechselpraemie",
@@ -4578,8 +4671,8 @@
     "campaign": 0
    },
    "score": 90,
-   "score_reason": "Ein direktes Cashback bei Vertragsabschluss belohnt den Wechsel finanziell und ist damit ein starker Anreiz.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Ein Cashback von bis zu 240 Euro senkt die Wechselhürde für Tarifkunden spürbar.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4638,25 +4731,25 @@
    "judged": {
     "lever": 2,
     "depth": 1,
-    "mechanic": "zielgruppe",
-    "evidence": "kosten 1 € einmalig, kombiniert mit dem Tarif Smart Connect S für 5 € statt 9,95 € monatlich in den ersten drei Monaten",
+    "mechanic": "geraetesubvention",
+    "evidence": "kosten 1 € einmalig, kombiniert mit dem Tarif Smart Connect S für 5 € statt 9,95 € monatlich in den ersten drei Monaten.",
     "evidence_ok": true,
-    "reason": "Ein guenstiges Einstiegsangebot fuer Kinderuhren mit leicht reduziertem Tarifpreis, aber ohne grossen finanziellen Wechselanreiz.",
+    "reason": "Der Vorteil beschränkt sich auf eine günstige Uhr und einen kurzen Tarifrabatt, bleibt aber preislich überschaubar.",
     "basis": "038a9e39da770286",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
-   "mechanic": "zielgruppe",
+   "mechanic": "geraetesubvention",
    "score_axes": {
     "lever": 2,
     "depth": 1,
     "reach": 3,
-    "momentum": 1,
+    "momentum": 3,
     "campaign": 1
    },
-   "score": 57,
-   "score_reason": "Ein guenstiges Einstiegsangebot fuer Kinderuhren mit leicht reduziertem Tarifpreis, aber ohne grossen finanziellen Wechselanreiz.",
-   "scored_at": "2026-08-04",
+   "score": 67,
+   "score_reason": "Der Vorteil beschränkt sich auf eine günstige Uhr und einen kurzen Tarifrabatt, bleibt aber preislich überschaubar.",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -4679,9 +4772,9 @@
     "mechanic": "geraetesubvention",
     "evidence": "Preisvorteil über 390 € (901 € statt 1.299 €)",
     "evidence_ok": true,
-    "reason": "Fuer junge Kunden gibt es einen erheblichen Preisvorteil beim iPhone 17 Pro sowie zwei Jahre unbegrenztes Datenvolumen.",
+    "reason": "Mit fast 400 Euro Preisvorteil und unbegrenztem Datenvolumen ist das Young-Angebot ein starkes Lockmittel für junge Kunden.",
     "basis": "4e6abb4670bef65e",
-    "model": "claude-sonnet-5",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
@@ -4693,8 +4786,8 @@
     "campaign": 0
    },
    "score": 80,
-   "score_reason": "Fuer junge Kunden gibt es einen erheblichen Preisvorteil beim iPhone 17 Pro sowie zwei Jahre unbegrenztes Datenvolumen.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Mit fast 400 Euro Preisvorteil und unbegrenztem Datenvolumen ist das Young-Angebot ein starkes Lockmittel für junge Kunden.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4752,11 +4845,11 @@
     "lever": 1,
     "depth": 3,
     "mechanic": "preisnachlass",
-    "evidence": "40€ Rabatt pro Monat (insgesamt 960€ in 24 Monaten)",
+    "evidence": "960€ in 24 Monaten",
     "evidence_ok": true,
-    "reason": "Der Rabatt von 960 Euro ist ein sehr großer, klar bezifferbarer Preisvorteil für eine klar definierte Zielgruppe.",
+    "reason": "Der Rabatt von insgesamt 960 Euro in 24 Monaten ist ein sehr hoher Preisvorteil, der junge Wechsler direkt anspricht.",
     "basis": "2c2c423c1007f2ab",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
@@ -4768,8 +4861,8 @@
     "campaign": 1
    },
    "score": 73,
-   "score_reason": "Der Rabatt von 960 Euro ist ein sehr großer, klar bezifferbarer Preisvorteil für eine klar definierte Zielgruppe.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Der Rabatt von insgesamt 960 Euro in 24 Monaten ist ein sehr hoher Preisvorteil, der junge Wechsler direkt anspricht.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "stale_since": "2026-08-04"
   },
@@ -4843,26 +4936,26 @@
    "highlight": true,
    "judged": {
     "lever": 2,
-    "depth": 3,
+    "depth": 1,
     "mechanic": "geraetesubvention",
     "evidence": "ab einmalig 1€",
     "evidence_ok": true,
-    "reason": "Die stark subventionierte Hardware für einen Euro ist ein geldwerter Vorteil, der den Wechsel zu Vodafone attraktiv macht.",
+    "reason": "Ein Top-Smartphone für einen Euro ist ein starker Hardware-Anreiz, auch wenn der Vertragspreis nicht genannt wird.",
     "basis": "ab38276cfbdfff3d",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "geraetesubvention",
    "score_axes": {
     "lever": 2,
-    "depth": 3,
+    "depth": 1,
     "reach": 3,
     "momentum": 3,
     "campaign": 0
    },
-   "score": 80,
-   "score_reason": "Die stark subventionierte Hardware für einen Euro ist ein geldwerter Vorteil, der den Wechsel zu Vodafone attraktiv macht.",
-   "scored_at": "2026-08-04",
+   "score": 63,
+   "score_reason": "Ein Top-Smartphone für einen Euro ist ein starker Hardware-Anreiz, auch wenn der Vertragspreis nicht genannt wird.",
+   "scored_at": "2026-08-05",
    "stale_since": "2026-08-04"
   },
   {
@@ -4884,9 +4977,9 @@
     "mechanic": "wechselpraemie",
     "evidence": "mindestens 500€ beim Verkauf des alten Handys",
     "evidence_ok": true,
-    "reason": "Die Kombination aus einer Altgeräteprämie von mindestens 500 Euro und einem vergünstigten Tarif bietet einen sehr hohen Wechselanreiz.",
+    "reason": "Die Kombination aus mindestens 500 Euro Altgeräteprämie, 25 Prozent Tarifrabatt und einem Euro Gerätepreis ist ein außergewöhnlich hoher Wechselanreiz.",
     "basis": "088d890133a23e61",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "wechselpraemie",
@@ -4898,8 +4991,8 @@
     "campaign": 1
    },
    "score": 93,
-   "score_reason": "Die Kombination aus einer Altgeräteprämie von mindestens 500 Euro und einem vergünstigten Tarif bietet einen sehr hohen Wechselanreiz.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Die Kombination aus mindestens 500 Euro Altgeräteprämie, 25 Prozent Tarifrabatt und einem Euro Gerätepreis ist ein außergewöhnlich hoher Wechselanreiz.",
+   "scored_at": "2026-08-05",
    "highlight": true,
    "ended_since": "2026-07-28",
    "stale_since": "2026-08-04"
@@ -4923,9 +5016,9 @@
     "mechanic": "preisnachlass",
     "evidence": "25% Rabatt auf den monatlichen Tarifpreis",
     "evidence_ok": true,
-    "reason": "Der prozentuale Rabatt auf den Tarif ist ein spürbarer Preisvorteil, der durch zusätzliches Datenvolumen aufgewertet wird.",
+    "reason": "Ein Viertel weniger Monatspreis über zwei Jahre ist ein spürbarer Vorteil, der durch Extra-Datenvolumen noch aufgewertet wird.",
     "basis": "18c882937d9f9d7a",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
@@ -4937,8 +5030,8 @@
     "campaign": 0
    },
    "score": 62,
-   "score_reason": "Der prozentuale Rabatt auf den Tarif ist ein spürbarer Preisvorteil, der durch zusätzliches Datenvolumen aufgewertet wird.",
-   "scored_at": "2026-08-04",
+   "score_reason": "Ein Viertel weniger Monatspreis über zwei Jahre ist ein spürbarer Vorteil, der durch Extra-Datenvolumen noch aufgewertet wird.",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5113,26 +5206,26 @@
    "missed_checks": 1,
    "judged": {
     "lever": 0,
-    "depth": 1,
+    "depth": 3,
     "mechanic": "preisnachlass",
     "evidence": "statt 39,99€ nur 24,99€ pro Monat",
     "evidence_ok": true,
-    "reason": "Der monatliche Rabatt von 15 Euro auf eine Zweitkarte ist ein kleiner, aber klar bezifferbarer Vorteil für Bestandskunden.",
+    "reason": "Die FamilyCard senkt den Preis für unbegrenztes Datenvolumen um mehr als ein Drittel, richtet sich aber nur an bestehende Kunden.",
     "basis": "a263058430e88b60",
-    "model": "deepseek-ai/deepseek-v4-flash",
+    "model": "deepseek-v4-flash",
     "rubric_version": 2
    },
    "mechanic": "preisnachlass",
    "score_axes": {
     "lever": 0,
-    "depth": 1,
+    "depth": 3,
     "reach": 3,
     "momentum": 3,
     "campaign": 1
    },
-   "score": 47,
-   "score_reason": "Der monatliche Rabatt von 15 Euro auf eine Zweitkarte ist ein kleiner, aber klar bezifferbarer Vorteil für Bestandskunden.",
-   "scored_at": "2026-08-04",
+   "score": 63,
+   "score_reason": "Die FamilyCard senkt den Preis für unbegrenztes Datenvolumen um mehr als ein Drittel, richtet sich aber nur an bestehende Kunden.",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5181,12 +5274,12 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das Angebot bietet 25 Prozent mehr Datenvolumen zum gleichen Preis, was einen spürbaren Mehrwert darstellt.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5240,7 +5333,7 @@
    },
    "score": 57,
    "score_reason": "Die Testphase ohne Vertragsbindung senkt die Wechselhürde für Neukunden erheblich.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5273,12 +5366,12 @@
     "lever": 1,
     "depth": 3,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 58,
+   "score": 63,
    "score_reason": "Junge Kunden erhalten die doppelte Datenmenge zum regulären Preis, was einen sehr großen Leistungsvorteil darstellt.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5483,12 +5576,12 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 1,
+    "momentum": 2,
     "campaign": 0
    },
-   "score": 37,
+   "score": 42,
    "score_reason": "Der entfallende Bereitstellungspreis ist ein kleiner einmaliger Vorteil für Neukunden.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5526,7 +5619,7 @@
    },
    "score": 55,
    "score_reason": "Der günstige Preis von 10 Euro alle 4 Wochen für 25 GB ist ein attraktives Einstiegsangebot ohne Vertragsbindung.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5564,7 +5657,7 @@
    },
    "score": 55,
    "score_reason": "Bestandskunden sparen monatlich 11 Euro auf den Tarif, was einem spürbaren Preisnachlass von etwa 30 Prozent entspricht.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "highlight": false,
    "stale_since": "2026-08-04"
   },
@@ -5604,7 +5697,7 @@
    },
    "score": 63,
    "score_reason": "Der Tarif senkt den Monatspreis für 24 Monate um 18 Euro und schafft damit einen klaren Wechselanreiz.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "stale_since": "2026-08-04"
   },
   {
@@ -5643,7 +5736,7 @@
    },
    "score": 63,
    "score_reason": "Der monatliche Preisvorteil von 15 Euro ergibt über die Laufzeit eine Ersparnis von mehreren hundert Euro.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "stale_since": "2026-08-04"
   },
   {
@@ -5682,7 +5775,7 @@
    },
    "score": 63,
    "score_reason": "Unbegrenztes Datenvolumen zu einem deutlich reduzierten Monatspreis ist ein sehr starker Anreiz zu wechseln.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-05",
    "stale_since": "2026-08-04"
   },
   {
@@ -6269,6 +6362,43 @@
    "ended_since": "2026-08-04"
   },
   {
+   "id": "15d043dd77eac970",
+   "brand": "simplytel",
+   "tier": 2,
+   "headline": "EINFACH MEGA! 5G-Tarifaktion mit mehr Datenvolumen, Speed-Upgrade und Extra-Daten",
+   "description": "Aktionspreise auf alle 5G-Mobilfunktarife: dauerhaft mehr Datenvolumen (z.B. 25 GB statt 15 GB), dauerhaftes Speed-Upgrade von 50 auf 100 MBit/s und für die ersten 3 Monate je 10 GB Extra-Datenvolumen gratis. Wahlweise mit 0 € oder 9,99 € Bereitstellungspreis. Monatliche Kosten: 10 GB für 6,99 € (statt 14,99 €), 25 GB für 8,99 € (statt 17,99 €), 50 GB für 11,99 € (statt 24,99 €), 75 GB für 14,99 € (statt 29,99 €).",
+   "valid_until": "18.08. 11 Uhr",
+   "url": "https://www.simplytel.de/",
+   "image_url": "https://imagepool.simplytel.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "judged": {
+    "lever": 1,
+    "depth": 3,
+    "mechanic": "preisnachlass",
+    "evidence": "10 GB für 6,99 € (statt 14,99 €)",
+    "evidence_ok": true,
+    "reason": "Der dauerhaft um rund die Hälfte reduzierte Monatspreis macht den Wechselvorteil sofort bezifferbar, zusätzlich wachsen Datenvolumen und Geschwindigkeit.",
+    "basis": "5c79c69c83c4a741",
+    "model": "deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "preisnachlass",
+   "score_axes": {
+    "lever": 1,
+    "depth": 3,
+    "reach": 1,
+    "momentum": 3,
+    "campaign": 1
+   },
+   "score": 60,
+   "score_reason": "Der dauerhaft um rund die Hälfte reduzierte Monatspreis macht den Wechselvorteil sofort bezifferbar, zusätzlich wachsen Datenvolumen und Geschwindigkeit.",
+   "scored_at": "2026-08-05",
+   "highlight": false
+  },
+  {
    "id": "5c4988000ab8115b",
    "brand": "winSIM",
    "tier": 2,
@@ -6428,17 +6558,23 @@
    "id": "0d53c4c40b1e83c2",
    "brand": "winSIM",
    "tier": 2,
-   "headline": "Unlimited on demand 5G-Tarif für 19,99 € mtl.",
-   "description": "Der Tarif mit 30 GB Basisvolumen und unbegrenzt zubuchbarem Highspeed-Datenvolumen in 1-GB-Schritten per Klick kostet statt 34,99 € nur 19,99 € monatlich. Der Bereitstellungspreis entfällt (0 € statt 19,99 €).",
+   "headline": "Unlimited on demand für 19,99 €/Monat",
+   "description": "Unbegrenzter Tarif: 30 GB Basisdaten, bei Bedarf können unbegrenzt weitere kostenlose 1-GB-Highspeed-Pakete per Klick nachgebucht werden. Statt 34,99 € jetzt nur 19,99 €/Monat. Bereitstellungspreis reduziert auf 0 € oder 9,99 € (statt 19,99 €). Inklusive Allnet-Flat, SMS-Flat und EU-Roaming mit bis zu 30 GB/Monat. Laufzeit: nur für kurze Zeit.",
    "valid_until": null,
-   "url": "https://www.winsim.de/",
+   "url": "https://www.winsim.de/unbegrenztes-datenvolumen",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "stale_since": "2026-07-25",
-   "missed_checks": 1,
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-25",
-   "highlight": false
+   "highlight": false,
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   }
   },
   {
    "id": "e1521d13fd10660b",
@@ -6786,18 +6922,23 @@
    "id": "3e8fcf37a6c0dfef",
    "brand": "winSIM",
    "tier": 2,
-   "headline": "Smartphones & Tablets mit Allnet-Flat ab 14,99 € mtl.",
-   "description": "Neue Smartphones (z. B. Samsung Galaxy S26 ab 24,99 €, Apple iPhone 17 Pro ab 39,99 €, Samsung Galaxy A57 5G ab 14,99 €, Xiaomi 17T Pro ab 19,99 €) und Tablets (z. B. Samsung Galaxy Tab S11 5G ab 39,99 €, Apple iPad Air 11 (M4) ab 34,99 €) inklusive Allnet-Flat-Tarif.",
+   "headline": "Smartphones mit Allnet-Flat ab 14,99 €/Monat",
+   "description": "Handy-Bundles mit Vertrag: z. B. Samsung Galaxy A57 5G ab 14,99 €, Xiaomi 17T Pro ab 19,99 €, Samsung Galaxy S26 ab 24,99 € und Apple iPhone 17 Pro ab 39,99 € monatlich. Alle Angebote inklusive 5G-Allnet-Flat. Weitere Modelle erhältlich.",
    "valid_until": null,
-   "url": "https://www.winsim.de/",
+   "url": "https://www.winsim.de/handys",
    "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-25",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
-   "stale_since": "2026-07-26",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-27",
-   "highlight": false
+   "highlight": false,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   }
   },
   {
    "id": "e94bf36b0bbb7daf",
@@ -7278,6 +7419,90 @@
    "highlight": false,
    "stale_since": "2026-07-28",
    "ended_since": "2026-07-31"
+  },
+  {
+   "id": "0345c2e059839e57",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "10 & 20 GB Tarife zu Sonderpreisen: 6,99 € und 8,99 €",
+   "description": "Die winSIM-Tarife 10 GB und 20 GB sind stark reduziert. 10 GB monatlich für 6,99 € statt 14,99 €, 20 GB für 8,99 € statt 19,99 €. Der Bereitstellungspreis beträgt wahlweise 0 € oder 9,99 € (statt 19,99 €). Inklusive 5G mit bis zu 100 MBit/s, Allnet-Flat, SMS-Flat, EU-Roaming und einer Aktion mit 3x10 GB Extra-Daten. Laufzeit unbestimmt („nur für kurze Zeit“).",
+   "valid_until": null,
+   "url": "https://www.winsim.de/handyvertrag-ohne-handy",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "3027e65c90e1bad2",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "60 GB Tarif mit 10 GB Extra-Daten: 14,99 €/Monat",
+   "description": "Der 60-GB-Tarif (60 GB statt regulär 50 GB) kostet nur 14,99 € statt 29,99 €. Zusätzlich gibt es im Rahmen der Aktion 3x10 GB Gratis-Daten. Bereitstellungspreis auf 0 € oder 9,99 € reduziert. Enthält 5G mit bis zu 100 MBit/s, Allnet-/SMS-Flat und EU-Roaming. Nur für kurze Zeit.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/handyvertrag-ohne-handy",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "591126a2b4804ee4",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "40 GB Doppeltes Datenvolumen: 10,99 €/Monat, nur bis 07.08.",
+   "description": "Aktionstarif mit 40 GB Datenvolumen (statt 20 GB) für 10,99 € statt 19,99 €. Zusätzlich 3x10 GB Extra-Daten und 100 MBit/s. Bereitstellungspreis wahlweise 0 € oder 9,99 € (statt 19,99 €). Die Aktion endet am 07.08. um 11 Uhr.",
+   "valid_until": "07.08.2025 11:00",
+   "url": "https://www.winsim.de/handyvertrag-ohne-handy",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
+   "id": "fe6534a90a667c1d",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "Tablets mit Datentarif ab 36,99 €/Monat",
+   "description": "Tablet-Angebote mit SIM-Karte und Datenflat: Samsung Galaxy Tab S11 5G ab 39,99 €/Monat, Apple iPad Air 11 (M4) ab 36,99 €/Monat. Geeignet für mobiles Internet auf dem Tablet.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/tablets",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
   }
  ]
 }
