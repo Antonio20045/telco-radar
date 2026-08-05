@@ -245,6 +245,18 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   Zugewinn"; das galt für Session 4. In Session 5 blieb von 142 mechanisch
   gefundenen Kandidaten bei bereits beobachteten Firmen genau **einer** übrig.
   Der Ertrag liegt bei NEUEN Firmen, und dort bei regionaler Fachpresse.
+- **Der Deckel der Sammelphase ist die LANGSAMSTE EINZELQUELLE.** Lauf #75:
+  303,7 s Sammelphase, davon 302,6 s eine einzige tote Quelle (KT, mit
+  `timeout_seconds: 30` mal zwei User-Agents mal drei Versuche plus Backoff).
+  Gegen den langsamsten Einzelfall hilft keine Parallelität. Jede Quelle hat
+  deshalb eine harte Frist (`_QUELLEN_FRIST`, 75 s) — sie bricht nur die
+  WIEDERHOLUNGEN ab, das Timeout des einzelnen Versuchs bleibt.
+- **Regionale Fachpresse landet im Bereich „Global", nicht in ihrer Region.**
+  `tag_news_regions` ordnet eine Fachpresse-Meldung nur zu, wenn ein
+  Betreibername in der Überschrift steht. Lauf #75 schloss Europa mit NULL
+  bewerteten Meldungen ab, während Global 62 von 92 bekam. Mit 19 neuen
+  regionalen Feeds ist das der wichtigste offene Punkt: eine Fachpressequelle
+  müsste eine Vorgabe-Region tragen dürfen.
 - **Laufzeit: parallelisieren, nicht kappen.** Der Lauf vom 31.07. brauchte mit
   220 neuen Meldungen 49 von 50 zulässigen Minuten, weil jede Region ihre
   Stapel nacheinander abarbeitete. Stellschrauben sind `collect_max_workers`
@@ -317,7 +329,7 @@ Schlussliste mit allen Zahlen steht in `outputs/skalierung-2026-08-05.md`.
 | Engpass | Stand |
 |---|---|
 | Sammeln | gelöst. Host-Drosselung + 64 Worker; in Actions 62,5 s → 39,7 s bei 132 Quellen, hochgerechnet 5 min für 1000 |
-| Redaktion | gebaut (Bereichsredakteure + Chefredaktion), 21 Tests — **aber noch nie gegen ein echtes Modell gelaufen** |
+| Redaktion | gelöst und **abgenommen im Lauf #75**: 14 Bereichsredakteure + Chefredaktion, 92 bewertete Meldungen, 24,8 min, Gliederung korrekt montiert |
 | Seen-Store | gelöst. 17 statt 300 Byte je Eintrag, 3,9 statt 68 MB/Jahr, Bestand verlustfrei migriert |
 | Kosten | kein Problem: 1,45 $/Monat bei 1000 Quellen im teuersten Fall |
 | Quellen | 130 → **167**. Für 1000 fehlen Firmenlisten, keine Werkzeuge |
@@ -333,8 +345,11 @@ gerechnet misst die Kennzahl die Abrufhäufigkeit statt den Wert (1,9 % gegen
 
 **Die nächsten vier Schritte, in dieser Reihenfolge:**
 
-1. Ein echter Lauf mit `editor_modus: zweistufig`. Die zweite Stufe ist
-   getestet, aber nur mit Fixtures.
+1. **Vorgabe-Region für Fachpressequellen.** Lauf #75 schloss Europa mit null
+   bewerteten Meldungen ab, während „Global" 62 von 92 bekam — die neuen
+   deutschen, französischen, spanischen und italienischen Feeds landen dort,
+   weil `tag_news_regions` nur nach Betreibernamen in der Überschrift tagt.
+   Je mehr regionale Quellen dazukommen, desto leerer wird der Regionsteil.
 2. Zwei bis drei normale Läufe abwarten, dann die Trefferquote neu auswerten —
    ab jetzt je KANAL, weil das Laufprotokoll `new` und `source_url` mitführt.
    Erst dann steht fest, was die 29 neuen Quellen und die zwei neuen

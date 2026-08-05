@@ -102,3 +102,69 @@ def test_standardgate_drosselt_nicht():
     """Tests und Einzelabrufe sollen ohne Konfiguration laufen wie bisher."""
     from telco_radar.collect.http import active_gate
     assert active_gate().max_parallel > 1000
+
+
+# ======================================================================== #
+# Harte Frist je Quelle.
+#
+# Im Lauf #75 brauchte EINE tote Quelle (KT, timeout_seconds: 30 mal zwei
+# User-Agents mal drei Versuche plus Backoff) 302,6 s - und die gesamte
+# Sammelphase dauerte 303,7 s. Gegen den langsamsten Einzelfall hilft keine
+# Parallelitaet.
+# ======================================================================== #
+
+def test_frist_bricht_die_wiederholungen_ab(monkeypatch):
+    import httpx
+    from telco_radar.collect import http as http_mod
+
+    versuche = []
+
+    def _langsam(url, **kw):
+        versuche.append(url)
+        time.sleep(0.15)
+        raise httpx.ConnectError("nicht erreichbar")
+
+    monkeypatch.setattr(http_mod.httpx, "get", _langsam)
+    # Ohne Frist: 2 User-Agents x 3 Versuche = 6 Abrufe (plus 13 s Backoff)
+    with http_mod.deadline(0.3):
+        with pytest.raises(httpx.HTTPError):
+            http_mod.fetch("https://tot.de/feed", {"timeout_seconds": 1})
+    assert len(versuche) <= 3, versuche
+
+
+def test_ohne_frist_bleibt_die_ausdauer_erhalten(monkeypatch):
+    """Fuer eine ausgewaehlte Quelle im Lauf ist die Leiter richtig - ein
+    verlorener Abruf kostet dort eine Woche."""
+    import httpx
+    from telco_radar.collect import http as http_mod
+
+    versuche = []
+
+    def _kaputt(url, **kw):
+        versuche.append(url)
+        raise httpx.ConnectError("nicht erreichbar")
+
+    monkeypatch.setattr(http_mod.httpx, "get", _kaputt)
+    monkeypatch.setattr(http_mod, "_BACKOFF_WAITS", (0.0, 0.0))
+    with pytest.raises(httpx.HTTPError):
+        http_mod.fetch("https://tot.de/feed", {"timeout_seconds": 1})
+    assert len(versuche) == 6
+
+
+def test_frist_gilt_nur_im_eigenen_thread():
+    """threading.local: eine Quelle darf die Frist einer anderen nicht erben."""
+    from telco_radar.collect import http as http_mod
+
+    gesehen = []
+
+    def _pruefe():
+        gesehen.append(http_mod._frist_abgelaufen())
+
+    with http_mod.deadline(0.001):
+        time.sleep(0.01)
+        assert http_mod._frist_abgelaufen()
+        t = threading.Thread(target=_pruefe)
+        t.start()
+        t.join()
+    assert gesehen == [False]
+    assert not http_mod._frist_abgelaufen()

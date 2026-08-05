@@ -120,6 +120,43 @@ def active_gate() -> HostGate:
     return _gate
 
 
+# --------------------------------------------------------------------------- #
+# Frist je QUELLE
+#
+# Die Ausdauer von fetch() (zwei User-Agents, drei Versuche, 4 s und 9 s
+# Backoff) ist richtig - aber sie multipliziert sich mit dem Timeout der
+# Quelle. KT hat timeout_seconds: 30 eingetragen, weil sein koreanischer
+# Endpunkt langsam zu erreichen ist; im Lauf #75 war er ganz tot, und die
+# Leiter brauchte 302,6 s, um das festzustellen. Die gesamte Sammelphase
+# dauerte 303,7 s - EINE Quelle war die Wanduhr.
+#
+# Bei 167 Quellen ist das aergerlich, bei 1000 ist es der Deckel: die
+# Parallelitaet hilft nicht gegen den langsamsten Einzelfall. Deshalb bekommt
+# jede Quelle eine harte Frist; ist sie abgelaufen, wird nicht mehr
+# wiederholt. Das Timeout des einzelnen Versuchs bleibt davon unberuehrt -
+# eine langsame, aber lebende Quelle darf ihre 30 s haben, sie bekommt sie nur
+# nicht sechsmal.
+# --------------------------------------------------------------------------- #
+
+_frist = threading.local()
+
+
+@contextmanager
+def deadline(sekunden: float | None):
+    """Frist fuer alle fetch()-Aufrufe dieses Threads."""
+    vorher = getattr(_frist, "ende", None)
+    _frist.ende = (time.monotonic() + sekunden) if sekunden else None
+    try:
+        yield
+    finally:
+        _frist.ende = vorher
+
+
+def _frist_abgelaufen() -> bool:
+    ende = getattr(_frist, "ende", None)
+    return ende is not None and time.monotonic() >= ende
+
+
 def fetch(url: str, http_cfg: dict,
           timeout_override: float | None = None,
           extra_headers: dict | None = None,
@@ -160,7 +197,11 @@ def fetch(url: str, http_cfg: dict,
         # attempt 0 immediate, then one retry per backoff wait
         for wait in wartezeiten:
             if wait:
+                if _frist_abgelaufen():
+                    break
                 time.sleep(wait + random.uniform(0, 1.0))
+            if _frist_abgelaufen():
+                break
             try:
                 with _gate.slot(url):
                     resp = httpx.get(url, timeout=timeout, headers=headers,
@@ -184,5 +225,7 @@ def fetch(url: str, http_cfg: dict,
         if isinstance(last_exc, httpx.HTTPStatusError) and \
                 last_exc.response is not None and \
                 last_exc.response.status_code in _BACKOFF_STATUSES:
+            break
+        if _frist_abgelaufen():
             break
     raise last_exc if last_exc else RuntimeError(f"fetch failed: {url}")

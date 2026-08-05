@@ -9,13 +9,21 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ..config import Config, Source, Operator
 from ..models import Item
-from .http import configure_throttle
+from .http import configure_throttle, deadline
 from .rss import collect_rss
 from .json_api import collect_json
 from .newsroom import collect_newsroom
 from .newsroom_js import collect_newsroom_js
 
 log = logging.getLogger(__name__)
+
+
+# Harte Frist je Quelle. Im Lauf #75 brauchte EINE tote Quelle (KT, mit
+# timeout_seconds: 30 und der vollen Retry-Leiter) 302,6 s - und die gesamte
+# Sammelphase dauerte 303,7 s. Bei 1000 Quellen hilft keine Parallelitaet
+# gegen den langsamsten Einzelfall, also bekommt jede Quelle einen Deckel.
+# 75 s lassen einer wirklich langsamen Quelle zwei volle Versuche mit 30 s.
+_QUELLEN_FRIST = 75.0
 
 
 # Gleichzeitige Headless-Browser. Anders als ein HTTP-Abruf ist ein
@@ -31,6 +39,12 @@ _JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
 def _collect_source(source: Source, region: str, operator: str | None,
                     origin: str, http_cfg: dict) -> list[Item]:
     """Dispatch a source to the right collector based on its kind."""
+    with deadline(_QUELLEN_FRIST):
+        return _dispatch(source, region, operator, origin, http_cfg)
+
+
+def _dispatch(source: Source, region: str, operator: str | None,
+              origin: str, http_cfg: dict) -> list[Item]:
     if source.kind in ("rss", "trade_press"):
         items = collect_rss(source, region, operator, origin, http_cfg)
     elif source.kind == "json_api":

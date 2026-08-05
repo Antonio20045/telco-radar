@@ -143,7 +143,13 @@ editor_max_highlights: 0
 # ~650 bewertete Meldungen; die Schwelle greift also lange vorher, naemlich bei
 # der ersten groesseren Quellenwelle - und wird damit im echten Betrieb
 # ausprobiert, statt beim ersten Grosslauf zum ersten Mal zu laufen.
-editor_modus: "zweistufig"   # VORUEBERGEHEND fuer den Abnahmelauf #75 - danach zurueck auf auto
+# ABGENOMMEN im Lauf #75 (05.08.2026, erzwungen zweistufig): 167 Quellen,
+# 426 neue Meldungen, 92 bewertet, 14 Bereichsredakteure plus Chefredaktion,
+# 24,8 min. Der montierte Bericht hielt die Pflichtgliederung ein
+# (Chefteil -> Regionen -> Themen-H2 mit H3 je Themenfeld -> Muster der
+# Woche), 2 877 Woerter. Bereiche ohne bewertete Meldungen bekommen korrekt
+# keinen Abschnitt.
+editor_modus: "auto"
 editor_zweistufig_ab_meldungen: 120
 
 # How many previously reported topics the editor gets as "do not repeat" memory

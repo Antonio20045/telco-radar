@@ -93,6 +93,15 @@ Vergleich 185,6 s → 22,2 s, also Faktor 8,4. Diese Zahl war aufgeblasen: sie
 hing fast vollständig an *einer* Quelle (Telecoms Tech News, 165 s von 186 s
 in drei Leseversuche). Die belastbare Zahl ist die aus Actions.
 
+**Der eigentliche Deckel ist die langsamste Einzelquelle.** Im Volllauf #75
+brauchte die Sammelphase 303,7 s — und **302,6 s davon waren eine einzige
+tote Quelle**: KT hat `timeout_seconds: 30` eingetragen (sein koreanischer
+Endpunkt ist langsam zu erreichen), und die Retry-Leiter multipliziert das mit
+zwei User-Agents und drei Versuchen. Gegen den langsamsten Einzelfall hilft
+keine Parallelität. Jede Quelle hat deshalb jetzt eine harte Frist von 75 s;
+das Timeout des einzelnen Versuchs bleibt unberührt — eine langsame, aber
+lebende Quelle darf ihre 30 s haben, sie bekommt sie nur nicht sechsmal.
+
 **Und ein Nebenbefund, der wichtiger ist als der Zeitgewinn:** bei 64 Workern
 fiel Viettel mit `Page.goto: Timeout 16000ms exceeded` aus, das bei 8 Workern
 durchlief. Nicht die Seite war langsamer — der Runner war voll. Ein
@@ -130,10 +139,13 @@ Umschaltung über `editor_modus` (auto|einstufig|zweistufig) mit Schwelle bei
 wie in Lauf #67 schreibt ein einzelner Aufruf den zusammenhängenderen Bericht
 und kostet ein Zwölftel.
 
-**Offen und ehrlich benannt:** die zweistufige Redaktion ist mit Fixtures
-getestet, aber noch **nicht gegen ein echtes Modell** gelaufen — mit 167
-Quellen bleibt der Lauf unter der Schwelle. Der erste Lauf mit
-`editor_modus: zweistufig` steht aus.
+**Abgenommen im Lauf #75** (05.08.2026, `editor_modus` erzwungen
+zweistufig): 167 Quellen, 426 neue Meldungen, 92 bewertet, **14
+Bereichsredakteure plus Chefredaktion**, 24,8 min. Der montierte Bericht hielt
+die Pflichtgliederung ein — Chefteil, dann sechs Regionsabschnitte, dann die
+gemeinsame H2 „Technologie, Geräte & Regulierung" mit fünf H3-Themenfeldern,
+zuletzt „Muster der Woche"; 2 877 Wörter. Die drei Bereiche ohne bewertete
+Meldungen (Europa, Geräte, Netzausrüster) bekamen korrekt keinen Abschnitt.
 
 ### 3.3 Seen-Store — Faktor 17,6
 
@@ -299,8 +311,17 @@ Renderlimit für Headless-Browser.
 
 In dieser Reihenfolge:
 
-1. **Einen echten Lauf mit `editor_modus: zweistufig`** — die zweite Stufe ist
-   getestet, aber noch nie gegen ein echtes Modell gelaufen.
+1. **Die europäische Fachpresse landet im Bereich „Global", nicht in
+   „Europa".** Lauf #75 hat Europa mit **null** bewerteten Meldungen
+   abgeschlossen, während „Global" 62 bekam — von 92 insgesamt. Der Grund ist
+   kein Fehler, sondern eine Regel, die mit dieser Welle an ihre Grenze kommt:
+   `tag_news_regions` ordnet eine Fachpresse-Meldung nur dann einer Region zu,
+   wenn ein Betreibername aus der Watchlist in der Überschrift steht. Bei 14
+   internationalen Feeds ging das; bei teltarif, Univers Freebox, ADSLZone und
+   Corriere Comunicazioni ist die Heimatregion aber schon durch die Quelle
+   bekannt. Eine Fachpressequelle sollte eine Vorgabe-Region tragen dürfen —
+   sonst wird der Regionsteil des Berichts leerer, je mehr regionale Quellen
+   dazukommen. **Das ist der wichtigste offene Punkt.**
 2. **Zwei bis drei normale Läufe abwarten**, dann die Trefferquote neu
    auswerten. Erst dann steht je Kanal (nicht nur je Anzeigename) fest, was
    die 29 neuen Quellen taugen — insbesondere die zwei neuen Themenfelder mit
@@ -324,4 +345,6 @@ In dieser Reihenfolge:
 - Seen-Store: 588 KB → **33 KB** (Faktor 17,6), 68 → **3,9 MB/Jahr**
 - Sammelphase in Actions: 62,5 s → **39,7 s** bei 132 Quellen
 - Kosten bei 1000 Quellen: **1,45 $/Monat** im teuersten Fall
-- 321 → **407** Tests
+- 321 → **410** Tests
+- Volllauf #75 mit zweistufiger Redaktion: 426 neue Meldungen, 92 bewertet,
+  14 Bereiche, 24,8 min (Job-Timeout 50 min)
