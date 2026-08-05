@@ -332,7 +332,15 @@ Schlussliste mit allen Zahlen steht in `outputs/skalierung-2026-08-05.md`.
 | Redaktion | gelöst und **abgenommen im Lauf #75**: 14 Bereichsredakteure + Chefredaktion, 92 bewertete Meldungen, 24,8 min, Gliederung korrekt montiert |
 | Seen-Store | gelöst. 17 statt 300 Byte je Eintrag, 3,9 statt 68 MB/Jahr, Bestand verlustfrei migriert |
 | Kosten | kein Problem: 1,45 $/Monat bei 1000 Quellen im teuersten Fall |
-| Quellen | 130 → **167**. Für 1000 fehlen Firmenlisten, keine Werkzeuge |
+| Quellen | 130 → **167** (+37). Für 1000 fehlen Firmenlisten, keine Werkzeuge |
+
+**Basislinie über die Sessions**, gezählt an `stats.sources_total` aus dem
+Laufprotokoll (nicht geschätzt): 85 Quellen vor Session 4 → 130 danach
+(+45, dritte Signalebene neu) → **167** nach Session 5 (+37). Wer die nächste
+Session beginnt: diese Zahl steht in jedem `data/reports/*.json` unter
+`stats.sources_total` — sie ist die einzige, die zählt, was ein Lauf wirklich
+abgefragt hat. Ein `grep -c "url:"` über die YAMLs zählt die nicht crawlbaren
+`official`-Referenzen mit und liegt deshalb zu hoch.
 
 **Die Trefferquote steht** (`scripts/quellen_trefferquote.py`) und ist die
 Kennzahl, an der der weitere Ausbau hängt. Über 11 Läufe gemessen:
@@ -352,14 +360,14 @@ gerechnet misst die Kennzahl die Abrufhäufigkeit statt den Wert (1,9 % gegen
    Je mehr regionale Quellen dazukommen, desto leerer wird der Regionsteil.
 2. Zwei bis drei normale Läufe abwarten, dann die Trefferquote neu auswerten —
    ab jetzt je KANAL, weil das Laufprotokoll `new` und `source_url` mitführt.
-   Erst dann steht fest, was die 29 neuen Quellen und die zwei neuen
+   Erst dann steht fest, was die 35 neuen Quellen und die zwei neuen
    Themenfelder taugen.
 3. Die belegten Ballast-Quellen aussortieren. 11 Quellen haben über 11 Läufe
    mindestens 10 neue Meldungen geliefert, von denen KEINE je bewertet wurde
    (Iliad 40, stc 33, AIS 30, PLDT 21, Deutsche Telekom 19, …).
 4. Die nächste Firmenliste bauen. Die Ausbeute dieser Session: 450
-   Suchaufträge → 313 Kandidaten → 74 abnahmefähig → 29 wertvoll, also **6,4 %
-   je Suchauftrag**. Für 1000 Quellen braucht es rund 13 000 weitere
+   Suchaufträge → 313 Kandidaten → 74 abnahmefähig → 35 wertvoll, also **7,8 %
+   je Suchauftrag**. Für 1000 Quellen braucht es rund 10 700 weitere
    Suchaufträge. Lohnend nach dieser Messung: regionale Fachpresse je Land und
    nationale Regulierungsbehörden — beide sauber datiert und klar abgegrenzt.
 

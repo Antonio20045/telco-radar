@@ -5,8 +5,34 @@ Abschnitt 8.10 — was wirklich erreicht wurde, was nicht, und mit welchen
 Zahlen belegt.
 
 **Kurzfassung: Die Architektur trägt jetzt 1000 Quellen. Die Quellen sind es
-noch nicht — es sind 167 statt 130. Und der Grund dafür ist eine Messung,
+noch nicht — es sind 167 statt 132. Und der Grund dafür ist eine Messung,
 keine fehlende Zeit.**
+
+### Basislinie über die Sessions
+
+Diese Tabelle fehlte in der ersten Fassung dieses Textes, und ihr Fehlen hat
+prompt zu einer falschen Zahl geführt (siehe unten). Sie steht deshalb ganz
+vorn. Gezählt ist, was die Pipeline in `stats.sources_total` selbst
+protokolliert hat — also die Quellen, die ein Lauf wirklich abgefragt hat:
+
+| Lauf | Quellen | Betreiber | Themenfelder | |
+|---|---:|---:|---:|---|
+| 2026-07-31 | 85 | 81 | – | vor Session 4 |
+| 2026-08-04 | **130** | 85 | 6 | nach Session 4: **+45**, dritte Signalebene neu |
+| 2026-08-05 | **167** | 87 | 8 | nach Session 5: **+37** |
+
+Session 4 hat den Bestand also um 53 % vergrößert und dabei die Themenfelder
+von null aufgebaut. Diese Session hat um weitere 28 % vergrößert.
+
+**Korrektur an der ersten Fassung dieses Textes:** dort stand „138 → 167,
++29 Quellen". Beides war falsch. Die 138 stammten aus einem groben
+`grep -c "url:"` über die Watchlist, das die fünf nicht crawlbaren
+`official`-Referenzen und eine Kommentarzeile mitzählte; crawlbar waren es
+132. Und die +29 waren schlicht falsch addiert — es sind 35 (19 Fachpresse,
+6 Regulierung, 4 MVNO, 3 Betreiberkanäle, je 1 KI, Chips und Infrastruktur;
+nachgezählt per Diff der Konfiguration, keine Quelle entfernt). Die beiden
+Fehler waren in sich stimmig (138 + 29 = 167), deshalb ist keiner von beiden
+beim Schreiben aufgefallen.
 
 ---
 
@@ -19,7 +45,7 @@ keine fehlende Zeit.**
 | 3. Seen-Store für 200 000 Einträge/Jahr | **fertig**, Faktor 17,6, Bestand migriert |
 | 4. Quellenregister + automatische Quarantäne | **fertig**, 14 Tests |
 | 5. Trefferquote je Quelle über das Archiv | **fertig**, vor der ersten neuen Quelle |
-| 6. Quellen in Wellen, jede mit echtem Actions-Lauf | **teilweise**: eine Welle, +29 Quellen, Diagnoselauf #74 + Volllauf #75 |
+| 6. Quellen in Wellen, jede mit echtem Actions-Lauf | **teilweise**: eine Welle, +35 Quellen, Diagnoselauf #74 + Volllauf #75 |
 | 7. Kostenrechnung je Lauf und Monat | **fertig** |
 | 8. `pytest -q` grün, Quellen-Doku neu | **fertig**, 410 Tests |
 | 9. `CLAUDE.md` fortgeschrieben | **fertig** |
@@ -204,9 +230,9 @@ und nichts liefert, ist genauso tot wie eine mit 404.
 | | Ziele | gefunden | Check bestanden | eingetragen |
 |---|---:|---:|---:|---:|
 | Zweitkanäle bestehender Firmen | 112 | 142 | 12 | **1** |
-| Neue Firmen (`config/kandidaten_firmen.yaml`) | 338 | 171 | 62 | **28** |
+| Neue Firmen (`config/kandidaten_firmen.yaml`) | 338 | 171 | 62 | **34** |
 
-**138 → 167 crawlbare Quellen.** Nach dem Eintragen zentral nachgeprüft:
+**132 → 167 crawlbare Quellen** (+35). Nach dem Eintragen zentral nachgeprüft:
 167 Quellen, 149 ok / 4 leer / 14 Fehler, 2 723 Meldungen (vorher 2 101).
 
 ### Was die Welle über den Ausbau gelernt hat
@@ -220,7 +246,7 @@ Sprachausgaben derselben Meldungen (SK Telecom koreanisch neben englisch) oder
 Marketing-Feeds ohne Nachrichtenwert. Der Auftrag nannte Zweitkanäle „den
 billigsten Zugewinn" — das galt für Session 4, die ihn abgeschöpft hat.
 
-**Der Ertrag liegt bei neuen Firmen, und dort bei der Fachpresse.** 19 der 29
+**Der Ertrag liegt bei neuen Firmen, und dort bei der Fachpresse.** 19 der 35
 neuen Quellen sind regionale und nicht-englische Fachpresse: teltarif und
 Telecom Handel (deutsch), Univers Freebox (französisch), Xataka Móvil und
 ADSLZone (spanisch), Corriere Comunicazioni (italienisch), TeleSíntese und
@@ -262,9 +288,9 @@ sie niemand erneut vorschlägt:
 Um es mit Zahlen zu sagen statt mit Zeitmangel:
 
 Aus 450 mechanischen Suchaufträgen (112 bestehende Firmen + 338 neue) sind
-**313 Kandidaten** entstanden, davon **74 abnahmefähig** und **29 wertvoll**.
-Das ist eine Ausbeute von **6,4 % je Suchauftrag**. Auf 1000 Quellen
-hochgerechnet hieße das rund **13 000 weitere Suchaufträge** — also 13 000
+**313 Kandidaten** entstanden, davon **74 abnahmefähig** und **35 wertvoll**.
+Das ist eine Ausbeute von **7,8 % je Suchauftrag**. Auf 1000 Quellen
+hochgerechnet hieße das rund **10 700 weitere Suchaufträge** — also 10 700
 recherchierte Firmen mit Domain.
 
 Das ist machbar, aber es ist eine andere Aufgabe als diese Session: es braucht
@@ -324,7 +350,7 @@ In dieser Reihenfolge:
    dazukommen. **Das ist der wichtigste offene Punkt.**
 2. **Zwei bis drei normale Läufe abwarten**, dann die Trefferquote neu
    auswerten. Erst dann steht je Kanal (nicht nur je Anzeigename) fest, was
-   die 29 neuen Quellen taugen — insbesondere die zwei neuen Themenfelder mit
+   die 35 neuen Quellen taugen — insbesondere die zwei neuen Themenfelder mit
    je einer bzw. vier Quellen.
 3. **Die belegten Ballast-Quellen aussortieren** (Abschnitt 2), sobald die
    Trefferquote sie über weitere Läufe bestätigt. Iliad, stc, AIS und PLDT
@@ -339,7 +365,7 @@ In dieser Reihenfolge:
 
 ## 8. Zahlen dieser Session
 
-- 138 → **167** crawlbare Quellen (+21 %)
+- 132 → **167** crawlbare Quellen (+35, +27 %) — zum Vergleich: Session 4 ging von 85 auf 130
 - 2 101 → **2 723** gesammelte Meldungen je Lauf (+30 %)
 - 6 → **8** Themenfelder, 14 → **33** Fachpresse-Feeds
 - Seen-Store: 588 KB → **33 KB** (Faktor 17,6), 68 → **3,9 MB/Jahr**
