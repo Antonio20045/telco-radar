@@ -84,21 +84,44 @@ _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
     r"(?![0-9])"
 )
+# One character of a month name. [^\W\d_] alone is not enough for Indic
+# scripts: Hindi "अगस्त" (August) carries a virama, a combining mark that
+# Python does not count as a word character, so the match broke apart in the
+# middle of the word and the date was lost.
+_MW = r"(?:[^\W\d_]|[ऀ-ൿ̀-ͯ])"
 # The month group accepts any word, not a fixed list of English names: the
-# _MONTHS lookup below is what decides whether it really is a month, so this
-# one regex serves every language in _MONTHS. "de" between the parts covers
+# month table below is what decides whether it really is a month, so this one
+# regex serves every language in that table. "de" between the parts covers
 # Portuguese/Spanish ("30 de julho de 2026").
 _TEXT_DATE = re.compile(
     r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+(?:de\s+)?"
-    r"(0?[1-9]|1[0-2]|[^\W\d_]{3,12})[./\s,]+(?:de\s+)?(20\d{2})\b", re.I
+    rf"(0?[1-9]|1[0-2]|{_MW}{{3,14}})[./\s,]+(?:de\s+)?(20\d{{2}})\b", re.I
 )
+# Like _TEXT_DATE, open to any word: the month table below is what decides
+# whether it really is a month. This used to hold a fixed list of English
+# names, so a page printing "Julho 15, 2026" stayed undated.
 _TEXT_DATE_MDY = re.compile(
-    r"\b(Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
-    r"Sep\w*|Oct\w*|Nov\w*|Dec\w*)\s+(0?[1-9]|[12]\d|3[01])"
+    rf"\b({_MW}{{3,14}})\.?\s+(0?[1-9]|[12]\d|3[01])"
     r"(?:st|nd|rd|th)?[./\s,]+(20\d{2})\b", re.I
 )
 _TEXT_DATE_ISO = re.compile(
     r"\b(20\d{2})[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12]\d|3[01])\b"
+)
+# Year first, month as a word: Hungarian "2026. julius 15.", but also
+# "2026 July 15" on several Asian pages.
+_TEXT_DATE_YMD_WORT = re.compile(
+    rf"\b(20\d{{2}})\.?\s+({_MW}{{3,14}})\.?\s+(0?[1-9]|[12]\d|3[01])\b"
+)
+# CJK: 2026年7月15日 (ja/zh) and 2026년 7월 15일 (ko). The characters are the
+# separator, so this needs no month names at all.
+_TEXT_DATE_CJK = re.compile(
+    r"(20\d{2})\s*[年년]\s*(0?[1-9]|1[0-2])\s*[月월]\s*"
+    r"(0?[1-9]|[12]\d|3[01])\s*[日일]"
+)
+# Vietnamese: "ngay 15 thang 7 nam 2026"
+_TEXT_DATE_VI = re.compile(
+    r"ng[àa]y\s*(0?[1-9]|[12]\d|3[01])\s*th[áa]ng\s*(0?[1-9]|1[0-2])"
+    r"\s*n[ăa]m\s*(20\d{2})", re.I
 )
 # Navigation / section labels that are not articles (exact-match, lowercased).
 _JUNK_EXACT = {
@@ -146,9 +169,15 @@ def _strip_leading_date_label(title: str, published, operator: str | None = None
     allowed = set(_LABEL_WORDS)
     if operator:
         allowed.update(w.lower() for w in re.findall(r"[^\W\d_]+", operator))
-    for pattern in (_TEXT_DATE, _TEXT_DATE_MDY, _TEXT_DATE_ISO):
+    # The month group of the first two patterns matches ANY word - the month
+    # table is what decides. Validate here too, or a headline like "Vodafone
+    # 15, 2026 launches ..." reads as a date label and loses its first word.
+    for pattern, monatsgruppe in ((_TEXT_DATE, 2), (_TEXT_DATE_MDY, 1),
+                                  (_TEXT_DATE_ISO, 0)):
         m = pattern.search(title[:70])
         if not m:
+            continue
+        if monatsgruppe and not _ist_monat(m.group(monatsgruppe)):
             continue
         prefix_words = re.findall(r"[^\W\d_]+", title[:m.start()])
         if any(w.lower() not in allowed for w in prefix_words):
@@ -195,6 +224,112 @@ _MONTHS.update({
     "fév": 2, "avr": 4, "aoû": 8, "aou": 8, "déc": 12,           # fr
 })
 
+# --------------------------------------------------------------------------- #
+# Month names as STEMS instead of three-letter abbreviations.
+#
+# The abbreviation form was the second-largest loss in the source expansion:
+# in wave 2, 82 candidates delivered items and failed ONLY on the date format
+# (criterion 3). Those are parser gaps, not bad sources - an undated item
+# sorts to the end of the run and is effectively never read by an analyst.
+#
+# Why stems and not three letters: Finnish "marraskuuta" (November) starts
+# with "mar" and would have been read as March. The lookup therefore takes the
+# LONGEST matching stem - "marras" beats "mar".
+#
+# Deliberately NOT included, because the abbreviation is ambiguous within one
+# language or across two:
+#   * Czech "cerven" (June) and "cervenec" (July): the genitive "cervence"
+#     starts with "cerven", so no stem can separate the two.
+#   * French "jui" (juin/juillet) - the full forms are listed instead.
+#   * Croatian/Serbian: "listopad" means OCTOBER there, but NOVEMBER in Poland
+#     and Czechia, and "lipanj" is June against Polish "lipiec" July. The
+#     Polish/Czech reading is the one listed, because sources exist for those
+#     languages. On a Croatian page this yields a date off by one month - the
+#     item then drops out of the freshness window, so it goes missing rather
+#     than being reported wrongly.
+#   * Thai month names: Thailand counts Buddhist years (2569 for 2026), so the
+#     year would have to be converted along with the month.
+# --------------------------------------------------------------------------- #
+_MONATSSTAEMME: dict[str, int] = dict(_MONTHS)
+_MONATSSTAEMME.update({
+    # fr - juin/juillet only separable at full length
+    "juin": 6, "juillet": 7, "janv": 1, "juil": 7,
+    # it
+    "gen": 1, "mag": 5, "giu": 6, "lug": 7, "ott": 10,
+    # nl (mrt/maart; bare "maa" would collide with Finnish "maa" = land)
+    "maart": 3, "mrt": 3,
+    # pl
+    "sty": 1, "lut": 2, "kwi": 4, "maj": 5, "cze": 6, "lip": 7, "sie": 8,
+    "wrz": 9, "paz": 10, "paź": 10, "lis": 11, "gru": 12,
+    # cs / sk
+    "led": 1, "unor": 2, "únor": 2, "brez": 3, "břez": 3, "dub": 4,
+    "kvet": 5, "květ": 5, "srp": 8, "zar": 9, "zář": 9, "rij": 10,
+    "říj": 10, "pros": 12,
+    # hu
+    "már": 3, "ápr": 4, "máj": 5, "jún": 6, "júl": 7, "sze": 9,
+    # ro
+    "ian": 1, "iun": 6, "iul": 7, "noi": 11,
+    # fi
+    "tam": 1, "hel": 2, "maalis": 3, "huh": 4, "tou": 5, "kes": 6,
+    "hei": 7, "elo": 8, "syy": 9, "lok": 10, "marras": 11, "jou": 12,
+    # et (longer stems on purpose: "vee"/"det" are ordinary words)
+    "jaan": 1, "veeb": 2, "juuni": 6, "juuli": 7, "dets": 12,
+    # lv
+    "jūn": 6, "jūl": 7,
+    # lt
+    "sau": 1, "vas": 2, "kov": 3, "bal": 4, "geg": 5, "bir": 6, "lie": 7,
+    "rugp": 8, "rugs": 9, "spa": 10, "lap": 11,
+    # sl / hr / sr (Latin, non-ambiguous forms only)
+    "avg": 8, "marec": 3,
+    # el
+    "ιαν": 1, "φεβ": 2, "μαρ": 3, "απρ": 4, "μαΐ": 5, "μαι": 5, "ιουν": 6,
+    "ιουλ": 7, "αυγ": 8, "σεπ": 9, "οκτ": 10, "νοε": 11, "δεκ": 12,
+    # ru
+    "янв": 1, "фев": 2, "мар": 3, "апр": 4, "май": 5, "мая": 5, "июн": 6,
+    "июл": 7, "авг": 8, "сен": 9, "окт": 10, "ноя": 11, "дек": 12,
+    # uk
+    "січ": 1, "лют": 2, "бер": 3, "квіт": 4, "трав": 5, "черв": 6,
+    "лип": 7, "серп": 8, "вер": 9, "жовт": 10, "листоп": 11, "груд": 12,
+    # ar
+    "يناير": 1, "فبراير": 2, "مارس": 3, "أبريل": 4, "ابريل": 4, "مايو": 5,
+    "يونيو": 6, "يوليو": 7, "أغسطس": 8, "اغسطس": 8, "سبتمبر": 9,
+    "أكتوبر": 10, "اكتوبر": 10, "نوفمبر": 11, "ديسمبر": 12,
+    # hi
+    "जनवरी": 1, "फरवरी": 2, "मार्च": 3, "अप्रैल": 4, "जून": 6, "जुलाई": 7,
+    "अगस्त": 8, "सितंबर": 9, "अक्टूबर": 10, "नवंबर": 11, "दिसंबर": 12,
+})
+_STAMM_MAX = max(len(s) for s in _MONATSSTAEMME)
+_STAMM_MIN = 3
+
+
+def _monat(wort: str) -> int | None:
+    """Month number for a word in any of the languages above.
+
+    Longest stem wins, so "marraskuuta" resolves to November (11) and not to
+    March via "mar".
+    """
+    w = (wort or "").strip().strip(".,").lower()
+    if len(w) < _STAMM_MIN:
+        return None
+    for laenge in range(min(len(w), _STAMM_MAX), _STAMM_MIN - 1, -1):
+        treffer = _MONATSSTAEMME.get(w[:laenge])
+        if treffer:
+            return treffer
+    return None
+
+
+def _ist_monat(rohwert: str) -> bool:
+    """Numeric 1-12 or a known month word.
+
+    Needed by _strip_leading_date_label: the patterns above match any word, so
+    without this check "Vodafone 15, 2026 launches ..." would look like a date
+    label and the headline would lose its first word.
+    """
+    r = (rohwert or "").strip()
+    if r.isdigit():
+        return 1 <= int(r) <= 12
+    return _monat(r) is not None
+
 # Web-component "card" widgets (seen on Modyo/Andino-based CMSs, e.g. Entel)
 # embed the whole item list as a JSON array inside a custom element attribute
 # instead of rendering plain <a> links - the markup looks like
@@ -212,7 +347,7 @@ def _parse_badge_date(raw: str) -> datetime | None:
     if not m:
         return None
     day, mon_raw, year = m.groups()
-    month = _MONTHS.get(mon_raw.lower()[:3])
+    month = _monat(mon_raw)
     if not month:
         return None
     try:
@@ -416,31 +551,55 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
     return parsed, has_day
 
 
+def _baue(year, month, day) -> datetime | None:
+    try:
+        return datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
+    except (ValueError, TypeError):
+        return None
+
+
 def _date_from_text(text: str) -> datetime | None:
+    # Most specific first: the CJK and Vietnamese forms carry their own
+    # separators and cannot be confused with anything else.
+    m = _TEXT_DATE_CJK.search(text)
+    if m:
+        treffer = _baue(m.group(1), m.group(2), m.group(3))
+        if treffer:
+            return treffer
+    m = _TEXT_DATE_VI.search(text)
+    if m:
+        treffer = _baue(m.group(3), m.group(2), m.group(1))
+        if treffer:
+            return treffer
     m = _TEXT_DATE.search(text)
     if m:
-        day, mon_raw, year = m.group(1), m.group(2).lower(), int(m.group(3))
-        month = _MONTHS.get(mon_raw[:3]) if not mon_raw.isdigit() else int(mon_raw)
+        mon_raw = m.group(2).lower()
+        month = int(mon_raw) if mon_raw.isdigit() else _monat(mon_raw)
         if month:
-            try:
-                return datetime(year, month, int(day), tzinfo=timezone.utc)
-            except ValueError:
-                pass
+            treffer = _baue(m.group(3), month, m.group(1))
+            if treffer:
+                return treffer
     m = _TEXT_DATE_MDY.search(text)
     if m:
-        mon_raw, day, year = m.group(1).lower(), m.group(2), int(m.group(3))
-        month = _MONTHS.get(mon_raw[:3])
+        month = _monat(m.group(1))
         if month:
-            try:
-                return datetime(year, month, int(day), tzinfo=timezone.utc)
-            except ValueError:
-                pass
+            treffer = _baue(m.group(3), month, m.group(2))
+            if treffer:
+                return treffer
     m = _TEXT_DATE_ISO.search(text)
     if m:
-        try:
-            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=timezone.utc)
-        except ValueError:
-            pass
+        treffer = _baue(m.group(1), m.group(2), m.group(3))
+        if treffer:
+            return treffer
+    # Last, because it is the loosest: any "<year> <word> <day>" run. Only a
+    # word the month table knows gets through, so "Awards 2026 5" does not.
+    m = _TEXT_DATE_YMD_WORT.search(text)
+    if m:
+        month = _monat(m.group(2))
+        if month:
+            treffer = _baue(m.group(1), month, m.group(3))
+            if treffer:
+                return treffer
     return None
 
 
