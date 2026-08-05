@@ -6,13 +6,13 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 
 ## Ueberblick
 
-- **98 Betreiber** in 6 Regionen.
-- Direkt maschinenlesbar (Feed/JSON): **54** (41x RSS/Atom, 13x JSON-API).
-- Newsroom statisch: **44**.
+- **103 Betreiber** in 6 Regionen.
+- Direkt maschinenlesbar (Feed/JSON): **55** (42x RSS/Atom, 13x JSON-API).
+- Newsroom statisch: **48**.
 - Newsroom JS-gerendert: **11**.
 - Nicht automatisiert (Referenz + Begruendung): **5**.
-- Fachpresse: **78** Feeds.
-- Themenfelder (Technologie, Geraete, Regulierung): **62** Quellen in 8 Themen (`config/tech_sources.yaml`).
+- Fachpresse: **84** Feeds.
+- Themenfelder (Technologie, Geraete, Regulierung): **87** Quellen in 8 Themen (`config/tech_sources.yaml`).
 
 ## Europa (28)
 
@@ -82,7 +82,7 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | Telecom Argentina | AR | telecom.com.ar | https://institucional.telecom.com.ar/prensa/noticias | Newsroom (Headless/Playwright) (item_selector: `article.lastest-news-card`) | hier nicht pruefbar (kein Headless-Browser), laeuft in GitHub Actions |
 | WOM | CL | wom.cl | https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&per_page=20 | Feed (JSON-API) | 20 Meldungen, 20 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
 
-## Afrika & Naher Osten (16)
+## Afrika & Naher Osten (19)
 
 | Betreiber | Land | Website | Quelle | Anbindung | Verifikation |
 |---|---|---|---|---|---|
@@ -91,8 +91,10 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | Beyon | BH | beyon.com | https://www.beyon.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-30, 1 im 8-Tage-Fenster |
 | Hrvatski Telekom | HR | t.ht.hr | https://www.t.ht.hr/en/press/press-releases | Newsroom (statisch) | 22 Meldungen, 22 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
 | Liquid Intelligent Technologies | ZA | liquid.tech | https://liquid.tech/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 1 im 8-Tage-Fenster |
+| M-net | DE | m-net.de | https://www.m-net.de/ueber-m-net/presse | Newsroom (statisch) (item_selector: `div.news-item-col`) | 10 Meldungen, 10 datiert, neuestes 2026-07-30, 1 im 8-Tage-Fenster |
 | MTN Group | ZA | mtn.com | https://www.mtn.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 2 im 8-Tage-Fenster |
 | Maroc Telecom | MA | iam.ma | https://www.iam.ma/groupe/salle-de-presse/communiques-de-presse.aspx | Referenz (nicht automatisiert) | nicht gecrawlt (Referenz) — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz. |
+| Moldcell | MD | moldcell.md | https://moldcell.md/rom/rss | Feed (RSS/Atom) | 40 Meldungen, 40 datiert, neuestes 2026-08-04, 1 im 8-Tage-Fenster |
 | Ooredoo | QA | ooredoo.com | https://www.ooredoo.com/en/media/news_view/ | Referenz (nicht automatisiert) | nicht gecrawlt (Referenz) — 403. Plan: Playwright über Residential-Proxy; bis dahin Referenz. Seit 04.08.2026 praktisch abgeloest durch die Landesgesellschaft Ooredoo Katar (unten) - der Konzern-Newsroom bleibt gesperrt, die Meldungen des Heimatmarkts sind damit aber wieder im Radar. |
 | Ooredoo | QA | ooredoo.com | https://www.ooredoo.qa/web/en/press-release/ | Newsroom (statisch) (item_selector: `article.press-post`) | 10 Meldungen, 10 datiert, neuestes 2026-07-20, 0 im 8-Tage-Fenster |
 | Orange MEA | EG | orange.eg | https://orange.jo/en/corporate/media-center | Newsroom (statisch) (item_selector: `div.card`) | 6 Meldungen, 6 datiert, neuestes 2026-08-02, 1 im 8-Tage-Fenster |
@@ -100,18 +102,19 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | Sonatel | SN | sonatel.sn | https://sonatel.sn/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-25, 0 im 8-Tage-Fenster |
 | Turk Telekom | TR | turktelekom.com.tr | https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller | Newsroom (statisch) (item_selector: `a.relases-card`) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 3 im 8-Tage-Fenster |
 | Vodacom | ZA | vodacom.com | https://www.vodacom.com/press-releases.php | Newsroom (Headless/Playwright) | hier nicht pruefbar (kein Headless-Browser), laeuft in GitHub Actions |
+| Vodafone Qatar | QA | vodafone.qa | https://www.vodafone.qa/newsroom | Newsroom (statisch) (item_selector: `.grid__item--gutter-vertical`) | 10 Meldungen, 8 datiert, neuestes 2026-08-01, 1 im 8-Tage-Fenster |
 | Zain | KW | zain.com | https://www.zain.com/en/media-center | Newsroom (Headless/Playwright) (item_selector: `.PressCard`) | hier nicht pruefbar (kein Headless-Browser), laeuft in GitHub Actions |
 | du | AE | du.ae | https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0 | Newsroom (statisch) (item_selector: `#pMediaCentreNews .news`) | 30 Meldungen, 30 datiert, neuestes 2026-07-27, 0 im 8-Tage-Fenster |
 | e& | AE | eand.com | https://www.eand.com/en/news/news-overview.html | Newsroom (statisch) | 0 Meldungen |
 | e& | AE | eand.com | https://www.eand.com/en/investors/corporate-announcements.html | Newsroom (statisch) (item_selector: `.tile-box-tile`) | 0 Meldungen |
 | stc | SA | stc.com.sa | https://www.stc.com/bin/public/assets?root=/content/dam/stc/content-fragments/press-release&isContentFragment=true&getJCRProps=false | Feed (JSON-API) | 40 Meldungen, 40 datiert, neuestes 2026-06-25, 0 im 8-Tage-Fenster |
 
-## Asien (29)
+## Asien (30)
 
 | Betreiber | Land | Website | Quelle | Anbindung | Verifikation |
 |---|---|---|---|---|---|
 | AIS | TH | ais.co.th | https://www.ais.th/en/about-us/pr-news | Newsroom (statisch) (item_selector: `.content-list-div`) | 30 Meldungen, 0 datiert, neuestes -, 0 im 8-Tage-Fenster |
-| Bharti Airtel | IN | airtel.in | https://www.airtel.in/press-release | Newsroom (statisch) | 30 Meldungen, 30 datiert, neuestes 2026-07-01, 0 im 8-Tage-Fenster |
+| Bharti Airtel | IN | airtel.in | https://www.airtel.in/press-release | Newsroom (statisch) | FEHLER: HTTPStatusError: 403 with UA 'TelcoRadar/1.0 (+https:/...' |
 | CelcomDigi | MY | celcomdigi.com | https://corporate.celcomdigi.com/newsroom | Newsroom (statisch) | 30 Meldungen, 30 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | China Mobile | CN | chinamobileltd.com | https://www.irasia.com/cgi-local/news/rss.cgi?id=chinamobile&loc=hk&t=p&title_for_section=yes | Feed (RSS/Atom) | 20 Meldungen, 20 datiert, neuestes 2026-03-26, 0 im 8-Tage-Fenster |
 | China Telecom | CN | chinatelecom-h.com | https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&loc=hk&t=p&title_for_section=yes | Feed (RSS/Atom) | 20 Meldungen, 20 datiert, neuestes 2026-08-04, 2 im 8-Tage-Fenster |
@@ -126,6 +129,7 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | KDDI | JP | kddi.com | https://newsroom.kddi.com/english/ir-news/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-08, 0 im 8-Tage-Fenster |
 | KT | KR | corp.kt.com | https://rdi.kt.com/corp/presses/v1.0/channels/KOR/sections/ALL?limit=20&offset=1 | Feed (JSON-API) | 20 Meldungen, 20 datiert, neuestes 2026-08-04, 5 im 8-Tage-Fenster |
 | Maxis | MY | maxis.com.my | https://www.maxis.com.my/en/about-maxis/newsroom/jcr:content/content/section_container/section_container/container/repository_search_co.newsroom.json?keyword=*:* | Feed (JSON-API) | 18 Meldungen, 18 datiert, neuestes 2026-07-22, 0 im 8-Tage-Fenster |
+| MegaFon Tadschikistan | TJ | megafon.tj | https://www.megafon.tj/news?page=1&year=2026&tags= | Newsroom (statisch) | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | NTT Docomo | JP | docomo.ne.jp | https://www.docomo.ne.jp/english/info/media_center/pr/ | Newsroom (statisch) | 20 Meldungen, 20 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
 | NTT Group | JP | group.ntt | https://www.group.ntt/en/newsrelease/rss/release.rdf | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
 | NTT Group | JP | group.ntt | https://www.group.ntt/en/news/ | Newsroom (statisch) (item_selector: `li.c-list-1__item`) | 9 Meldungen, 9 datiert, neuestes 2026-08-05, 3 im 8-Tage-Fenster |
@@ -145,7 +149,7 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | Viettel | VN | viettel.com.vn | https://viettel.com.vn/en/news | Newsroom (Headless/Playwright) | hier nicht pruefbar (kein Headless-Browser), laeuft in GitHub Actions |
 | Vodafone Idea | IN | myvi.in | https://www.myvi.in/bin/vodafoneideadigital/newssearchservlet?search=%7B%22q%22%3A%22%2A%22%2C%22newsType%22%3A%22press%22%2C%22newsCategory%22%3A%22%2A%22%2C%22newsCircle%22%3A%22%2A%22%2C%22newsYear%22%3A0%2C%22pageNumber%22%3A1%7D | Feed (JSON-API) | 8 Meldungen, 8 datiert, neuestes 2026-06-10, 0 im 8-Tage-Fenster |
 
-## Ozeanien (7)
+## Ozeanien (8)
 
 | Betreiber | Land | Website | Quelle | Anbindung | Verifikation |
 |---|---|---|---|---|---|
@@ -153,6 +157,7 @@ Erzeugt am 05.08.2026 mit `scripts/build_quellen_doc.py` --validate aus `config/
 | 2degrees | NZ | 2degrees.nz | https://www.2degrees.nz/media-release-archives | Newsroom (statisch) | 30 Meldungen, 30 datiert, neuestes 2026-07-29, 10 im 8-Tage-Fenster |
 | One NZ | NZ | one.nz | https://media.one.nz/index.rss | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-28, 1 im 8-Tage-Fenster |
 | Optus | AU | optus.com.au | https://www.optus.com.au/about/media-centre/media-releases | Newsroom (statisch) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 1 im 8-Tage-Fenster |
+| Solomon Telekom | SB | ourtelekom.com.sb | https://www.ourtelekom.com.sb/news/ | Newsroom (statisch) (item_selector: `a.item`) | 6 Meldungen, 6 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | Spark | NZ | sparknz.co.nz | https://www.nzx.com/companies/SPK/announcements | Newsroom (statisch) (item_selector: `tbody tr`) | 0 Meldungen |
 | TPG Telecom | AU | tpgtelecom.com.au | https://www.tpgtelecom.com.au/media_release | Newsroom (statisch) (item_selector: `.mediaItem`) | 9 Meldungen, 9 datiert, neuestes 2026-05-15, 0 im 8-Tage-Fenster |
 | Telstra | AU | telstra.com.au | https://www.telstra.com.au/exchange | Newsroom (Headless/Playwright) (item_selector: `a.tcom-article-box__link`) | hier nicht pruefbar (kein Headless-Browser), laeuft in GitHub Actions |
@@ -186,13 +191,15 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | Lenovo / Motorola | https://news.lenovo.com/feed/ | Feed (RSS/Atom) | 40 Meldungen, 40 datiert, neuestes 2026-07-30, 1 im 8-Tage-Fenster |
 | Google Pixel | https://blog.google/products-and-platforms/devices/pixel/rss/ | Feed (RSS/Atom) | 20 Meldungen, 20 datiert, neuestes 2026-07-14, 0 im 8-Tage-Fenster |
 
-### Chips & Modems (7)
+### Chips & Modems (9)
 
 | Quelle | Adresse | Anbindung | Verifikation |
 |---|---|---|---|
 | Arm | https://newsroom.arm.com/rss | Feed (RSS/Atom) | 6 Meldungen, 6 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
 | Broadcom | https://investors.broadcom.com/rss/news-releases.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 1 im 8-Tage-Fenster |
 | Marvell | https://www.marvell.com/company/newsroom/press-releases.html | Newsroom (statisch) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 4 im 8-Tage-Fenster |
+| Quectel | https://www.quectel.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 8 im 8-Tage-Fenster |
+| Sierra Wireless | https://www.sierrawireless.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-28, 1 im 8-Tage-Fenster |
 | MediaTek | https://www.mediatek.com/press-room/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-06-03, 0 im 8-Tage-Fenster |
 | Intel | https://newsroom.intel.com/feed | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | Sequans | https://sequans.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 1 im 8-Tage-Fenster |
@@ -210,15 +217,16 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | Mavenir | https://www.mavenir.com/wp-json/wp/v2/posts?per_page=25&_embed=1 | Feed (JSON-API) | 25 Meldungen, 25 datiert, neuestes 2026-06-22, 0 im 8-Tage-Fenster |
 | JMA Wireless | https://jmawireless.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-20, 0 im 8-Tage-Fenster |
 
-### Satellit & NTN (3)
+### Satellit & NTN (4)
 
 | Quelle | Adresse | Anbindung | Verifikation |
 |---|---|---|---|
+| Türksat | https://www.turksat.com.tr/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
 | Hughes Network Systems | https://www.hughes.com/feed | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | Omnispace | https://omnispace.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-03-31, 0 im 8-Tage-Fenster |
 | AST SpaceMobile | https://ast-science.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 1 im 8-Tage-Fenster |
 
-### Regulierung & Verbände (22)
+### Regulierung & Verbände (40)
 
 | Quelle | Adresse | Anbindung | Verifikation |
 |---|---|---|---|
@@ -228,9 +236,27 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | ITU | https://www.itu.int/hub/feed/ | Feed (RSS/Atom) | 12 Meldungen, 12 datiert, neuestes 2026-08-03, 1 im 8-Tage-Fenster |
 | AGCOM (Italien) | https://www.agcom.it/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
 | ICASA (Suedafrika) | https://www.icasa.org.za/news | Newsroom (statisch) | 6 Meldungen, 6 datiert, neuestes 2026-08-05, 2 im 8-Tage-Fenster |
+| ARTCI (Côte d'Ivoire) | https://artci.ci/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
+| INACOM (Angola) | https://inacom.gov.ao/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 2 im 8-Tage-Fenster |
+| INDOTEL (Dominikanische Republik) | https://indotel.gob.do/feed/json/ | Feed (JSON-API) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 2 im 8-Tage-Fenster |
+| CRC (Kolumbien) | https://www.crcom.gov.co/es/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| MCA (Malta) | https://www.mca.org.mt/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 5 im 8-Tage-Fenster |
+| AKOS (Slowenien) | https://www.akos-rs.si | Newsroom (statisch) | 30 Meldungen, 30 datiert, neuestes 2026-07-29, 29 im 8-Tage-Fenster |
+| MIIT (China) | https://www.miit.gov.cn | Newsroom (statisch) | 30 Meldungen, 28 datiert, neuestes 2026-08-04, 15 im 8-Tage-Fenster |
+| NMHH Forschung (Ungarn) | https://nmhh.hu/feed/kutatasok-hu.xml | Feed (RSS/Atom) | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 1 im 8-Tage-Fenster |
+| BREKO (Deutschland) | https://brekoverband.de/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 1 im 8-Tage-Fenster |
+| Asstel (Italien) | https://www.asstel.it/feed/ | Feed (RSS/Atom) | 9 Meldungen, 9 datiert, neuestes 2026-08-05, 1 im 8-Tage-Fenster |
+| PIIT (Polen) | https://piit.org.pl/feed | Feed (RSS/Atom) | 5 Meldungen, 5 datiert, neuestes 2026-08-04, 3 im 8-Tage-Fenster |
+| African Telecommunications Union | https://atuuat.africa/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| AICTO (Arabische IKT-Organisation) | https://www.aicto.org/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| ATIS (Nordamerika) | https://atis.org/news/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| GSA (Global mobile Suppliers Association) | https://gsacom.com/paper/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
+| LoRa Alliance | https://lora-alliance.org/feed/ | Feed (RSS/Atom) | 40 Meldungen, 40 datiert, neuestes 2026-08-04, 1 im 8-Tage-Fenster |
+| Communications Alliance (Australien) | https://www.austelco.org.au/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 2 im 8-Tage-Fenster |
+| eco (Deutschland) | https://www.eco.de/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 7 im 8-Tage-Fenster |
 | TRAI (Indien) | https://www.trai.gov.in/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
 | CRTC (Kanada) | https://crtc.gc.ca/eng/rss/news.xml | Feed (RSS/Atom) | 28 Meldungen, 28 datiert, neuestes 2026-06-16, 0 im 8-Tage-Fenster |
-| NTIA (USA) | https://www.ntia.gov/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-28, 1 im 8-Tage-Fenster |
+| NTIA (USA) | https://www.ntia.gov/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-28, 0 im 8-Tage-Fenster |
 | NCC (Nigeria) | https://www.ncc.gov.ng/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 1 im 8-Tage-Fenster |
 | Connect Europe | https://www.connecteurope.org/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-30, 1 im 8-Tage-Fenster |
 | Bitkom | https://www.bitkom.org/Presse/Presseinformation/index.xml | Feed (RSS/Atom) | 20 Meldungen, 20 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
@@ -242,13 +268,17 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | Subtel (Chile) | https://www.subtel.gob.cl/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 3 im 8-Tage-Fenster |
 | CA (Kenia) | https://www.ca.go.ke/rss.xml | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 2 im 8-Tage-Fenster |
 | UCC (Uganda) | https://www.ucc.co.ug/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 2 im 8-Tage-Fenster |
-| NCA (Ghana) | https://nca.org.gh/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| NCA (Ghana) | https://nca.org.gh/feed/ | Feed (RSS/Atom) | FEHLER: ReadTimeout: The read operation timed out |
 | Telecom Infra Project | https://www.telecominfraproject.com/blog-feed.xml | Feed (RSS/Atom) | 20 Meldungen, 20 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
 
-### Türme, Glasfaser & Rechenzentren (2)
+### Türme, Glasfaser & Rechenzentren (6)
 
 | Quelle | Adresse | Anbindung | Verifikation |
 |---|---|---|---|
+| Fiber Broadband Association | https://www.fiberbroadband.org/wp-json/wp/v2/posts?per_page=25&_embed=1 | Feed (JSON-API) | 25 Meldungen, 25 datiert, neuestes 2026-07-31, 6 im 8-Tage-Fenster |
+| Fibre Council Europe | https://fibrecouncil.eu/news/news-library | Newsroom (statisch) | 5 Meldungen, 5 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
+| AirTrunk (Asien-Pazifik) | https://airtrunk.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
+| Emitel (Polen) | https://emitel.pl/en/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 1 im 8-Tage-Fenster |
 | INWIT | https://www.inwit.it/en/feed/ | Feed (RSS/Atom) | 12 Meldungen, 12 datiert, neuestes 2026-08-05, 2 im 8-Tage-Fenster |
 | Zayo | https://www.zayo.com/feed/ | Feed (RSS/Atom) | 10 Meldungen, 10 datiert, neuestes 2026-07-23, 0 im 8-Tage-Fenster |
 
@@ -312,9 +342,7 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | DPL News (Lateinamerika) | https://dplnews.com/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
 | Connecting Africa | https://www.connectingafrica.com/rss.xml | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 12 im 8-Tage-Fenster |
 | Telecom Review (Naher Osten) | https://www.telecomreview.com/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 10 im 8-Tage-Fenster |
-| RCR Wireless — 5G | https://www.rcrwireless.com/category/5g/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 6 im 8-Tage-Fenster |
 | RCR Wireless — 6G | https://www.rcrwireless.com/category/6g/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 2 im 8-Tage-Fenster |
-| RCR Wireless — KI-Infrastruktur | https://www.rcrwireless.com/category/ai-infrastructure/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 9 im 8-Tage-Fenster |
 | Mobile Europe — 5G | https://www.mobileeurope.co.uk/category/content-categories/5g-beyond/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 7 im 8-Tage-Fenster |
 | Mobile Europe — Automatisierung & KI | https://www.mobileeurope.co.uk/category/content-categories/automation-ai/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 5 im 8-Tage-Fenster |
 | Mobile Europe — Cloud & NFV | https://www.mobileeurope.co.uk/category/content-categories/cloud-nfv/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 4 im 8-Tage-Fenster |
@@ -328,17 +356,12 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | Corriere Comunicazioni — Cybersicherheit | https://www.corrierecomunicazioni.it/cyber-security/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 4 im 8-Tage-Fenster |
 | TelecomTalk — 5G | https://telecomtalk.info/category/5g/feed/ | 20 Meldungen, 20 datiert, neuestes 2026-08-04, 5 im 8-Tage-Fenster |
 | TelecomTalk — 6G | https://telecomtalk.info/category/6g/feed/ | 20 Meldungen, 20 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
-| Communications Today — 5G | https://www.communicationstoday.co.in/category/carriers/page_5g/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-07-30, 3 im 8-Tage-Fenster |
-| Communications Today — 6G | https://www.communicationstoday.co.in/category/carriers/6g/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 2 im 8-Tage-Fenster |
-| Communications Today — KI | https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 8 im 8-Tage-Fenster |
 | TelecomLead — 5G | https://telecomlead.com/category/5g/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
 | TelecomLead — Breitband | https://telecomlead.com/category/broadband/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 5 im 8-Tage-Fenster |
 | TelecomLead — Satellit | https://telecomlead.com/category/satellite/feed | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 3 im 8-Tage-Fenster |
 | TelecomLead — Netztechnik | https://telecomlead.com/category/telecom-equipment/feed | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
-| Telecom Review — Betreiber | https://www.telecomreview.com/articles/telecom-operators/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 4 im 8-Tage-Fenster |
 | Telecom Review Asia — Netze | https://www.telecomreviewasia.com/news/network-news/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 2 im 8-Tage-Fenster |
 | Telecom Review Asia — Technik | https://www.telecomreviewasia.com/news/technology-news/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
-| Telecom Review Africa — Betreiber | https://www.telecomreviewafrica.com/articles/telecom-operators/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 2 im 8-Tage-Fenster |
 | DPL News — 5G | https://dplnews.com/category/redes/5g/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 2 im 8-Tage-Fenster |
 | DPL News — 6G | https://dplnews.com/category/redes/6g/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-07-29, 1 im 8-Tage-Fenster |
 | DPL News — KI | https://dplnews.com/category/tecnologia/inteligencia-artificial/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
@@ -346,3 +369,16 @@ Keine Netzbetreiber, sondern die Unternehmen und Behoerden, die den Rahmen setze
 | Broadband Communities — Regulierung | https://bbcmag.com/category/law-policy/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-04, 2 im 8-Tage-Fenster |
 | Ookla Insights — 5G | https://www.ookla.com/articles/tag/5g/rss | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 1 im 8-Tage-Fenster |
 | PolicyTracker — Weekly Wrap | https://www.policytracker.com/blog/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-07-31, 1 im 8-Tage-Fenster |
+| Bandaancha (Spanien) | https://bandaancha.eu/portada.atom | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 12 im 8-Tage-Fenster |
+| Ariase (Frankreich) | https://www.ariase.com/blog/rss.xml | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 40 im 8-Tage-Fenster |
+| Broadband Breakfast (USA) | https://broadbandbreakfast.com/rss/ | 15 Meldungen, 15 datiert, neuestes 2026-08-05, 15 im 8-Tage-Fenster |
+| GSMonline (Polen) | https://www.gsmonline.pl/feed/artykuly | 30 Meldungen, 30 datiert, neuestes 2026-08-05, 30 im 8-Tage-Fenster |
+| Telko.in (Polen) | https://www.telko.in/rss | 20 Meldungen, 20 datiert, neuestes 2026-08-04, 20 im 8-Tage-Fenster |
+| Comunic.ro (Rumänien) | https://comunic.ro/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-03, 6 im 8-Tage-Fenster |
+| TechCabal (Afrika) | https://techcabal.com/feed/ | 10 Meldungen, 10 datiert, neuestes 2026-08-05, 10 im 8-Tage-Fenster |
+| Wireless Estimator (Funktürme) | https://wirelessestimator.com/feed/ | 20 Meldungen, 20 datiert, neuestes 2026-08-04, 3 im 8-Tage-Fenster |
+| DigiTimes (Lieferkette) | https://www.digitimes.com/rss/daily.xml | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 40 im 8-Tage-Fenster |
+| Dégrouptest (Frankreich) | https://www.degrouptest.com/rss.xml | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 32 im 8-Tage-Fenster |
+| IT News Africa | https://www.itnewsafrica.com/feed/ | 11 Meldungen, 11 datiert, neuestes 2026-08-03, 11 im 8-Tage-Fenster |
+| Digital Daily (Korea) | https://www.ddaily.co.kr/rss.xml | 40 Meldungen, 40 datiert, neuestes 2026-08-05, 40 im 8-Tage-Fenster |
+| ComNews (Russland) | https://www.comnews.ru/rss | 12 Meldungen, 12 datiert, neuestes 2026-08-04, 12 im 8-Tage-Fenster |

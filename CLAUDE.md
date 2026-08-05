@@ -1,6 +1,6 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-08-05, Ende Session 5 (Skalierung). Dieses Dokument enthält
+Stand: 2026-08-05, Ende Session 6 (Welle 3). Dieses Dokument enthält
 alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
 zuzugreifen und weiterzuarbeiten.
 
@@ -14,20 +14,21 @@ Signalebenen**, erkennt **nur wirklich neue** Meldungen, lässt sie von
 Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
 1–5) und veröffentlicht einen deutschsprachigen Wochenbericht als Website:
 
-1. **87 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
-   Afrika & Naher Osten, Asien, Ozeanien) über **94 crawlbare Quellen**.
-2. **33 Telco-Fachpresse-Feeds** (`config/news_sources.yaml`) — seit
-   Session 5 auch auf Deutsch, Französisch, Spanisch, Italienisch und
-   Portugiesisch sowie regional für Indien, Asien und Afrika. Bis dahin waren
-   alle 14 Feeds englischsprachig; das war die auffälligste Lücke im Bestand.
-3. **40 Themenquellen in 8 Themenfeldern** (`config/tech_sources.yaml`):
+1. **103 Netzbetreiber in 6 Regionen** (Europa, Nordamerika, Lateinamerika,
+   Afrika & Naher Osten, Asien, Ozeanien) über **114 crawlbare Quellen**.
+2. **84 Telco-Fachpresse-Feeds** (`config/news_sources.yaml`) — seit
+   Session 5 auch nicht-englisch, seit Session 6 zusätzlich als
+   **Rubrikfeeds** derselben Titel (`/category/5g/feed` & Co.) und mit einer
+   **Vorgabe-Region** je Quelle, ohne die alles Regionale in „Global" landet.
+3. **87 Themenquellen in 8 Themenfeldern** (`config/tech_sources.yaml`):
    KI-Anbieter, Geräte, Chips & Modems, Netzausrüster, Satellit & NTN,
-   Regulierung & Verbände sowie seit Session 5 „Türme, Glasfaser &
-   Rechenzentren" und „MVNO, eSIM & Plattformen". Das sind **keine
-   Wettbewerber**, sondern die Unternehmen und Behörden, die den Rahmen
-   setzen — eigener Analyst mit eigenem Prompt, eigener Abschnitt im Bericht.
+   Regulierung & Verbände, „Türme, Glasfaser & Rechenzentren" und „MVNO,
+   eSIM & Plattformen". Das sind **keine Wettbewerber**, sondern die
+   Unternehmen und Behörden, die den Rahmen setzen — eigener Analyst mit
+   eigenem Prompt, eigener Abschnitt im Bericht.
 
-Gesamt: **167 crawlbare Quellen** (Stand 05.08.2026).
+Gesamt: **285 crawlbare Quellen** (Stand 05.08.2026, Ende Session 6).
+Die Zahl holst du dir mit `python scripts/quellen_zaehlen.py`, nie mit grep.
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
 nicht in den Agents. LLM-Calls sehen nur neue Items → günstig, keine
@@ -381,9 +382,10 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 9. Stand der Skalierung — und was als Nächstes kommt
 
-> **Der nächste Auftrag steht in `AUFTRAG_1000_QUELLEN_WELLE3.md`.** Er
-> benennt die zwei Hebel, die bisher niemand gezogen hat, und ist der Text,
-> mit dem die nächste Session anfängt.
+> **Der Auftrag `AUFTRAG_1000_QUELLEN_WELLE3.md` ist abgearbeitet.** Die
+> Schlussliste mit allen Zahlen steht in
+> `outputs/welle3/schlussliste-2026-08-05.md`, die Messung der beiden Hebel
+> in `outputs/welle3/messung-hebel.md`.
 
 **Die aktuelle Zahl bekommst du mit `python scripts/quellen_zaehlen.py`.**
 Sie ist die einzige, die zählt: crawlbare Quellen, also was ein Lauf wirklich
@@ -391,60 +393,59 @@ abfragt. Zähle NIE mit `grep -c "url:"` über die YAMLs — das zählt die nich
 crawlbaren `official`-Referenzen mit, und genau daran ist Session 5 mit einer
 falschen Zahl in ihren eigenen Bericht gelaufen.
 
+**Basislinie über die Sessions** (aus `stats.sources_total` der Laufprotokolle,
+nicht geschätzt): 85 vor Session 4 → 130 nach Session 4 → 205 nach Session 5 →
+**285 nach Session 6**.
 
-Der Auftrag `AUFTRAG_SKALIERUNG_1000.md` ist zur Hälfte erledigt. Die
-Schlussliste mit allen Zahlen steht in `outputs/skalierung-2026-08-05.md`.
+### Was Session 6 gebaut hat
 
-**Die Architektur trägt 1000 Quellen. Die Quellen sind es noch nicht:**
-
-| Engpass | Stand |
+| Hebel | Ergebnis, gemessen |
 |---|---|
-| Sammeln | gelöst. Host-Drosselung + 64 Worker; in Actions 62,5 s → 39,7 s bei 132 Quellen, hochgerechnet 5 min für 1000 |
-| Redaktion | gelöst und **abgenommen im Lauf #75**: 14 Bereichsredakteure + Chefredaktion, 92 bewertete Meldungen, 24,8 min, Gliederung korrekt montiert |
-| Seen-Store | gelöst. 17 statt 300 Byte je Eintrag, 3,9 statt 68 MB/Jahr, Bestand verlustfrei migriert |
-| Kosten | kein Problem: 1,45 $/Monat bei 1000 Quellen im teuersten Fall |
-| Quellen | 130 → **167** (+37). Für 1000 fehlen Firmenlisten, keine Werkzeuge |
+| Newsroom-Erkennung im Sucher | Auf derselben Firmenliste wie Session 5: **184 von 338 Firmen liefern jetzt einen Kandidaten (54 %, vorher 31 %)**, 128 davon vom Typ `newsroom` — eine Sorte, die der Sucher vorher gar nicht vorschlagen konnte. **106 Firmen liefern ausschließlich darüber.** |
+| Rubriksuche (`--rubriken`) | 138 Kandidaten, 53 bestanden, 33 eingetragen — davon 7 nach Lauf #77 wieder ausgebaut (403, siehe Abschnitt 6) |
+| Datums-Parser | **2 von 128**, nicht die erwarteten 82. Die Messmenge war west-/mitteleuropäisch, also in Formaten, die der alte Parser schon las. Die neuen Tabellen zahlen sich erst mit einer sprachlich breiteren Firmenliste aus. |
+| Vorgabe-Region für Fachpresse | Lauf #77 schloss Europa, Nordamerika und Afrika mit NULL bewerteten Meldungen ab, „Global" bekam 86. 68 der 84 Fachpressequellen haben jetzt eine Vorgabe-Region. |
 
-**Basislinie über die Sessions**, gezählt an `stats.sources_total` aus dem
-Laufprotokoll (nicht geschätzt): 85 Quellen vor Session 4 → 130 danach
-(+45, dritte Signalebene neu) → **167** nach Session 5 (+37). Wer die nächste
-Session beginnt: diese Zahl steht in jedem `data/reports/*.json` unter
-`stats.sources_total` — sie ist die einzige, die zählt, was ein Lauf wirklich
-abgefragt hat. Ein `grep -c "url:"` über die YAMLs zählt die nicht crawlbaren
-`official`-Referenzen mit und liegt deshalb zu hoch.
+### Die Ausbeute je Welle — und was daraus folgt
 
-**Die Trefferquote steht** (`scripts/quellen_trefferquote.py`) und ist die
-Kennzahl, an der der weitere Ausbau hängt. Über 11 Läufe gemessen:
-Fachpresse 12,2 %, Betreiber 10,5 %, Themenfelder 10,8 % — die drei Ebenen
-liegen weiterhin gleichauf, es gibt also **weiterhin keinen Beleg**, dass eine
-Kategorie wertvoller wäre. Der Nenner ist dabei entscheidend: gerechnet wird
-gegen die NEUEN Meldungen, nicht gegen die gesammelten. Gegen „gesammelt"
-gerechnet misst die Kennzahl die Abrufhäufigkeit statt den Wert (1,9 % gegen
-11,6 %).
+| Welle | Suchaufträge | Kandidaten | bestanden | eingetragen |
+|---|---:|---:|---:|---:|
+| 3a Rubrikfeeds | 249 Sites | 138 | 53 | 26 |
+| 3b Firmenliste aus Session 5 | 338 | 257 | 48 | 11 |
+| 3c Recherche, Regulierer + Presse | 234 | 308 | 63 | 23 |
+| 3d Recherche, gemischt | 226 | 318 | 46 | 12 |
+| 3e Recherche, kleinere Betreiber | 444 | 341 | 24 | 8 |
 
-**Die nächsten vier Schritte, in dieser Reihenfolge:**
+**Drei Lehren, die die nächste Session Zeit sparen:**
 
-1. **Vorgabe-Region für Fachpressequellen.** Lauf #75 schloss Europa mit null
-   bewerteten Meldungen ab, während „Global" 62 von 92 bekam — die neuen
-   deutschen, französischen, spanischen und italienischen Feeds landen dort,
-   weil `tag_news_regions` nur nach Betreibernamen in der Überschrift tagt.
-   Je mehr regionale Quellen dazukommen, desto leerer wird der Regionsteil.
-2. Zwei bis drei normale Läufe abwarten, dann die Trefferquote neu auswerten —
-   ab jetzt je KANAL, weil das Laufprotokoll `new` und `source_url` mitführt.
-   Erst dann steht fest, was die 35 neuen Quellen und die zwei neuen
-   Themenfelder taugen.
-3. Die belegten Ballast-Quellen aussortieren. 11 Quellen haben über 11 Läufe
-   mindestens 10 neue Meldungen geliefert, von denen KEINE je bewertet wurde
-   (Iliad 40, stc 33, AIS 30, PLDT 21, Deutsche Telekom 19, …).
-4. Die nächste Firmenliste bauen. Die Ausbeute dieser Session: 450
-   Suchaufträge → 313 Kandidaten → 74 abnahmefähig → 35 wertvoll, also **7,8 %
-   je Suchauftrag**. Für 1000 Quellen braucht es rund 10 700 weitere
-   Suchaufträge. Lohnend nach dieser Messung: regionale Fachpresse je Land und
-   nationale Regulierungsbehörden — beide sauber datiert und klar abgegrenzt.
+1. **Eine bereits abgeerntete Firmenliste bringt fast nichts.** Welle 3b lief
+   über dieselben 338 Firmen wie Session 5 und brachte 11 Quellen; die frische
+   Liste brachte in Welle 3c aus weniger Suchaufträgen 23. Was einen Feed
+   hatte, steht längst in der Konfiguration. **Immer mit der frischen Liste
+   anfangen.**
+2. **Kleine Betreiber lohnen sich nicht.** Welle 3e bestand überwiegend aus
+   kleineren Anbietern: 444 Suchaufträge, 8 Quellen. Was durchkam, war
+   Gerätemarketing („Nova Galaxy Z serija je stigla!"), Sponsoring und CSR —
+   kleine Betreiber haben oft keinen Newsroom, sondern eine Werbeseite.
+   **Regulierer und Fachpresse je Land sind die ergiebigste Sorte** (Welle 3c),
+   genau wie Session 5 vermutet hatte.
+3. **Die Grenze ist die Wanduhr, nicht das Werkzeug.** Ein Suchdurchgang
+   schafft rund **4,2 Firmen pro Minute** (40 Worker, 8 Verbindungen je
+   Server); mehr Parallelität hilft nicht, weil eine Firma ein Server ist und
+   alle ~40 Adressen eines Suchauftrags gegen genau diesen einen laufen. Für
+   die fehlenden 715 Quellen bis 1000 braucht es bei der Ausbeute von Welle 3c
+   rund 7 300 Suchaufträge ≈ **29 Stunden reine Suche**, plus Abnahme-Check
+   und die Wertprüfung, die Handarbeit bleibt. **Realistisch sind 60 bis 80
+   Quellen je Session** — das waren es in Session 6 auch.
 
-**Die Regel aus dem Auftrag gilt unverändert: die Mischung wird NICHT vorab
-festgelegt.** Kein Anteil Betreiber / Fachpresse / Regulierung. Was taugt,
-entscheidet die Trefferquote nach den Läufen.
+### Was bereitliegt
+
+`config/kandidaten_firmen_welle3.yaml` enthält **882 Suchaufträge** aus der
+Sonnet-Recherche. Sie sind in Session 6 in drei Wellen durchsucht worden (3c,
+3d, 3e) und damit **abgearbeitet** — die Datei ist als Beleg da, nicht als
+Vorrat. Für die nächste Welle braucht es eine NEUE Recherche —
+und die lohnt sich nach Lehre 2 vor allem für **nationale Regulierungs-
+behörden und Fachpresse je Land und Sprache**.
 
 ## 10. Offene Ideen / Roadmap
 
