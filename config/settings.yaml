@@ -125,6 +125,27 @@ max_items_per_region: 0
 # Region alle anderen verdraengt.
 editor_max_highlights: 0
 
+# ---------------------------------------------------------------------------
+# Zweistufige Redaktion (analyze/editor.py::synthesize_zweistufig)
+#
+#   auto        unter der Schwelle einstufig, ab der Schwelle zweistufig
+#   einstufig   immer EIN Editor-Aufruf ueber alle Meldungen (Stand bis 08/2026)
+#   zweistufig  immer Bereichsredakteure + Chefredaktion
+#
+# Warum eine Schwelle und keine Grundsatzentscheidung: bei 36 bewerteten
+# Meldungen (Lauf #67) schreibt ein einzelner Aufruf den besseren, weil
+# zusammenhaengenderen Bericht - und kostet ein Zwoelftel. Ab einigen hundert
+# Meldungen kippt das: dann kann ein Aufruf nicht mehr abwaegen, sondern nur
+# noch aufzaehlen, ein Fehlschlag kostet den ganzen Wochenbericht, und die
+# Latenz eines 120k-Token-Calls ist nach oben offen.
+#
+# 120 ist bewusst niedrig angesetzt. Hochgerechnet auf 1000 Quellen waeren es
+# ~650 bewertete Meldungen; die Schwelle greift also lange vorher, naemlich bei
+# der ersten groesseren Quellenwelle - und wird damit im echten Betrieb
+# ausprobiert, statt beim ersten Grosslauf zum ersten Mal zu laufen.
+editor_modus: "auto"
+editor_zweistufig_ab_meldungen: 120
+
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 

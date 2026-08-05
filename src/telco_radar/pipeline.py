@@ -113,6 +113,31 @@ def _waehle_anbieter(settings: dict) -> str:
     return wanted
 
 
+def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
+    """Entscheidet, ob die zweistufige Redaktion laeuft.
+
+    Beides hat seine Groesse: bei 36 bewerteten Meldungen (Lauf #67) schreibt
+    EIN Aufruf einen besseren, zusammenhaengenderen Bericht als dreizehn, und
+    er kostet ein Zwoelftel. Ab ein paar hundert Meldungen kippt es - dann kann
+    ein einzelner Aufruf nicht mehr abwaegen, sondern nur noch aufzaehlen, und
+    ein Fehlschlag kostet den ganzen Wochenbericht.
+
+    Deshalb eine Schwelle statt einer Grundsatzentscheidung. "auto" ist der
+    Normalfall; "einstufig"/"zweistufig" erzwingen einen Modus, was der
+    Abnahme neuer Wellen dient (ein echter Lauf mit erzwungener Zweistufigkeit,
+    bevor die Meldungsmenge sie ohnehin ausloest).
+    """
+    modus = str(settings.get("editor_modus", "auto") or "auto").lower()
+    if modus == "zweistufig":
+        return True
+    if modus == "einstufig":
+        return False
+    if modus != "auto":
+        log.warning("Unbekannter editor_modus %r - benutze auto", modus)
+    schwelle = int(settings.get("editor_zweistufig_ab_meldungen", 120) or 120)
+    return bewertete >= schwelle
+
+
 def _sort_key(item: Item):
     """Freshest first; undated items last."""
     pub = item.published
@@ -316,13 +341,21 @@ def run(root: Path, use_llm: bool | None = None,
             cfg.theme_names[tk] for tk in cfg.theme_names
             if regional.get(cfg.theme_names[tk], {}).get("highlights")
         ]
+        bewertete = sum(len(r.get("highlights") or []) for r in regional.values())
+        zweistufig = _redaktion_zweistufig(cfg.settings, bewertete)
         try:
-            body, covered = editor.synthesize(
-                regional, topics_store.recent(), model=editor_model,
-                language=language,
-                highlight_budget=int(
-                    cfg.settings.get("editor_max_highlights", 0) or 0),
-                themenbereiche=themen_mit_inhalt)
+            if zweistufig:
+                body, covered = editor.synthesize_zweistufig(
+                    regional, topics_store.recent(), model=editor_model,
+                    language=language, themenbereiche=themen_mit_inhalt,
+                    workers=int(cfg.settings.get("llm_max_workers", 4)))
+            else:
+                body, covered = editor.synthesize(
+                    regional, topics_store.recent(), model=editor_model,
+                    language=language,
+                    highlight_budget=int(
+                        cfg.settings.get("editor_max_highlights", 0) or 0),
+                    themenbereiche=themen_mit_inhalt)
             editor_used = True
         except Exception as exc:  # noqa: BLE001
             if cfg.settings.get("publish_requires_editorial_briefing", True):

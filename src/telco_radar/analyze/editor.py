@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import logging
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 
 from ..models import Item
@@ -345,6 +346,329 @@ def validate_editorial_briefing(
         raise EditorialBriefingError(
             f"Editor output contains Vodafone recommendations "
             f"({phrase!r}). Stelle: ...{stelle}...", grund="empfehlungen")
+
+
+# =========================================================================== #
+# Zweistufige Redaktion
+#
+# Warum (AUFTRAG_SKALIERUNG_1000.md 3.2): heute bekommt der Editor in EINEM
+# Aufruf alle bewerteten Meldungen. Bei 1000 Quellen waeren das hochgerechnet
+# ~650 Meldungen, ~477 KB, ~122k Token. Das passt formal in das Kontextfenster
+# der konfigurierten Modelle und ist trotzdem der falsche Weg:
+#   * ein Modell, das 650 Meldungen zu 1900 Woertern verdichten soll, schreibt
+#     Brei - es kann nicht mehr abwaegen, sondern nur noch aufzaehlen;
+#   * ein einziger fehlgeschlagener Aufruf kostet den ganzen Wochenbericht;
+#   * die Latenz eines 120k-Token-Calls ist nach oben offen.
+#
+# Deshalb zwei Stufen:
+#   1. Bereichsredakteure - einer je Region und je Themenfeld, parallel. Jeder
+#      sieht NUR seinen Bereich, schreibt dessen fertigen Abschnitt und eine
+#      Kurzfassung von 3-5 Saetzen.
+#   2. Chefredaktion - bekommt NUR die Kurzfassungen und die staerksten
+#      Meldungen je Bereich, nie die Rohliste. Schreibt "Auf einen Blick",
+#      "Das Wichtigste", "Die wichtigsten Signale" und "Muster der Woche".
+#
+# Damit haengt die Eingabelaenge der Chefredaktion an der Zahl der BEREICHE,
+# nicht an der Zahl der Meldungen. Die Bereichsabschnitte werden unter den
+# Chefteil montiert, nicht neu geschrieben.
+# =========================================================================== #
+
+BEREICH_SYSTEM = """\
+You are the section editor for "{bereich}" in the weekly "Telco Radar"
+briefing. You receive the assessments of your analyst team for THIS AREA ONLY
+(JSON) plus a list of topics already covered in previous editions.
+
+Write in {language} as clean Markdown. Your readers are managers WITHOUT a
+technical or AI background: write plainly, spell out abbreviations on first
+use, explain the concrete customer offer or project. This is market
+observation, not a recommendation memo. Direct, factual sentences, no filler.
+
+Output EXACTLY this, nothing before and nothing after:
+
+{ueberschrift} {bereich}
+A 2-3 sentence summary of what happened in this area this week and where it
+points. Then the individual items, strongest first, 1-2 sentences each, always
+with [Quelle](url). Do not list every item - leave out what a manager would
+skip. Aim for {woerter} words in total.
+
+===KURZFASSUNG===
+3-5 sentences for the chief editor: the essence of this area this week. No
+markdown, no links, no bullet points - flowing text. This is what the chief
+editor uses to see the whole week at once, so name the operators and the
+concrete moves, not "several developments".
+
+===TOPICS===
+A JSON array of short topic strings (operator + subject) for every item you
+covered.
+
+Rules:
+- NEVER re-report a topic from the "already covered" list unless there is a
+  genuinely NEW development - then frame it explicitly as "Update zu ...".
+- No invented facts, no invented URLs. Use only what is in the input.
+- Every factual claim that has a source carries its [Quelle](url).
+- Do not write recommendations, action items or "Fuer Vodafone" sections.
+"""
+
+CHEF_SYSTEM = """\
+You are the chief editor of "Telco Radar", a weekly global
+competitive-intelligence briefing. The point of this briefing is simple: show
+what telecommunications companies around the world did this week and which
+patterns become visible across regions and operators.
+
+Your section editors have already written their area sections. You receive
+their SUMMARIES and their strongest items - not the raw list. Your job is the
+overall picture, not a repetition of their work: the area sections are mounted
+below your part unchanged.
+
+Write in {language} as clean Markdown (no top-level H1). Your readers are
+managers WITHOUT a technical or AI background. Direct, factual sentences.
+No filler, no marketing phrases.
+
+Structure exactly, and nothing else:
+
+## Auf einen Blick
+Exactly 3 bullet points, one sentence each: the three things a manager with
+30 seconds must take away this week.
+
+## Das Wichtigste
+4-6 sentences: the most important competitor developments worldwide this week
+and the overall picture they form. Name operators and concrete moves.
+
+## Die wichtigsten Signale
+The 6-10 most relevant items across ALL areas (relevance 5 first, then 4).
+Per item:
+**Operator - Titel** (Kategorie, Dringlichkeit X/5)
+2-3 sentences of detail (what happened, with numbers/prices/dates when given).
+Source as [Quelle](url).
+
+## Muster der Woche
+2-4 cross-area patterns in this week's data (e.g. "mehrere Betreiber buendeln
+KI-Assistenten in Consumer-Tarife"). Reference the supporting operators by
+name. A pattern must be visible in at least two areas - otherwise it is a
+single event and belongs in "Die wichtigsten Signale".
+
+Rules:
+- Write ONLY these four sections. Do NOT repeat the area sections and do NOT
+  write your own regional sections - they already exist below your part.
+- NEVER re-report a topic from the "already covered" list unless there is a
+  genuinely NEW development - then frame it explicitly as "Update zu ...".
+- No invented facts, no invented URLs. Use only what is in the input.
+- Do not write recommendations, action items or "Fuer Vodafone" sections.
+- Keep your part under ~900 words.
+
+After the Markdown, output the line ===TOPICS=== followed by a JSON array of
+short topic strings for every item you covered.
+"""
+
+# Ueberschrift, unter der ALLE Themenfelder gemeinsam stehen. Der Auftrag will
+# einen Abschnitt, nicht sechs verstreute - und validate_editorial_briefing
+# verlangt genau diese Zeile, wenn es in diesem Lauf Themenmeldungen gibt.
+THEMEN_H2 = "## Technologie, Geräte & Regulierung"
+
+# Ein Bereichsabschnitt ist kurz; die Chefredaktion laeuft ueber _ein_versuch()
+# und teilt sich das grosse Budget (EDITOR_MAX_TOKENS) mit dem einstufigen
+# Editor - dieselbe Aufgabe, dieselbe Denk- und Themenlistenlast.
+BEREICH_MAX_TOKENS = 8000
+
+# Wie viele Meldungen eines Bereichs die Chefredaktion zu sehen bekommt. Der
+# ganze Sinn der zweiten Stufe ist, dass ihre Eingabe an der Zahl der BEREICHE
+# haengt und nicht an der Zahl der Meldungen - eine Obergrenze je Bereich ist
+# deshalb keine Kappung des Berichts, sondern der Mechanismus selbst. Die
+# uebrigen Meldungen stehen vollstaendig im Bereichsabschnitt und im JSON.
+CHEF_MELDUNGEN_JE_BEREICH = 5
+
+
+def _staerkste(highlights: list[dict], anzahl: int) -> list[dict]:
+    """Die relevantesten Meldungen eines Bereichs, knapp fuer die Chefredaktion."""
+    sortiert = sorted(highlights, key=lambda h: (h.get("relevance") or 0),
+                      reverse=True)
+    return [{
+        "title": h.get("title", ""),
+        "operator": h.get("operator", ""),
+        "url": h.get("url", ""),
+        "category": h.get("category", ""),
+        "relevance": h.get("relevance"),
+        "summary": h.get("summary", ""),
+    } for h in sortiert[:anzahl]]
+
+
+def _teile_antwort(raw: str) -> tuple[str, str, list[str]]:
+    """(Abschnitt, Kurzfassung, Topics) aus der Antwort eines Bereichsredakteurs."""
+    rest = raw.strip()
+    if rest.startswith("```"):
+        rest = rest.split("\n", 1)[-1]
+        if rest.rstrip().endswith("```"):
+            rest = rest.rstrip()[:-3].rstrip()
+
+    topics: list[str] = []
+    if "===TOPICS===" in rest:
+        rest, _, tail = rest.partition("===TOPICS===")
+        try:
+            parsed = json.loads(tail.strip().strip("`"))
+            if isinstance(parsed, list):
+                topics = [str(t) for t in parsed]
+        except json.JSONDecodeError:
+            log.warning("Themenliste eines Bereichsredakteurs unlesbar")
+
+    kurz = ""
+    if "===KURZFASSUNG===" in rest:
+        rest, _, kurz = rest.partition("===KURZFASSUNG===")
+    return rest.strip(), " ".join(kurz.split()), topics
+
+
+def _notfall_abschnitt(bereich: str, highlights: list[dict],
+                       ueberschrift: str) -> str:
+    """Regelbasierter Abschnitt, wenn ein Bereichsredakteur ausfaellt.
+
+    Ein Bereich darf nicht deshalb aus dem Bericht verschwinden, weil EIN
+    Aufruf gescheitert ist - die Meldungen sind bewertet, die Quellen stehen
+    fest, und der Seen-Store merkt sie sich ohnehin als erledigt. Lieber eine
+    nuechterne Liste als ein Loch im Wochenbericht.
+    """
+    zeilen = [f"{ueberschrift} {bereich}", "",
+              "_Dieser Abschnitt konnte in diesem Lauf nicht redaktionell "
+              "verdichtet werden; die Meldungen stehen unveraendert mit ihren "
+              "Originalquellen._", ""]
+    for h in sorted(highlights, key=lambda x: (x.get("relevance") or 0),
+                    reverse=True):
+        titel = h.get("title", "").strip()
+        url = h.get("url", "")
+        betreiber = h.get("operator", "")
+        text = h.get("summary", "").strip()
+        kopf = f"- **{betreiber}**: {titel}" if betreiber else f"- {titel}"
+        zeilen.append(f"{kopf} — {text} [Quelle]({url})" if url
+                      else f"{kopf} — {text}")
+    zeilen.append("")
+    return "\n".join(zeilen)
+
+
+def _ein_bereich(bereich: str, daten: dict, already_covered: list[str],
+                 model: str, language: str, ist_thema: bool) -> dict:
+    """Einen Bereichsredakteur laufen lassen. Faellt nie hart aus."""
+    highlights = daten.get("highlights") or []
+    # Themenfelder stehen als H3 unter der gemeinsamen H2; Regionen sind H2.
+    ueberschrift = "###" if ist_thema else "##"
+    # Ein grosser Bereich darf laenger schreiben als ein kleiner - sonst
+    # bekommt Europa mit 40 Meldungen so viel Platz wie Ozeanien mit zweien.
+    woerter = max(120, min(600, 60 + 25 * len(highlights)))
+    system = BEREICH_SYSTEM.format(bereich=bereich, language=language,
+                                   ueberschrift=ueberschrift, woerter=woerter)
+    user = json.dumps({
+        "bereich": bereich,
+        "ist_themenfeld": ist_thema,
+        "analyse": {k: v for k, v in daten.items() if not k.startswith("_")},
+        "already_covered_topics": already_covered[-300:],
+    }, ensure_ascii=False)
+    try:
+        raw = complete(system, user, model=model, max_tokens=BEREICH_MAX_TOKENS)
+        abschnitt, kurz, topics = _teile_antwort(raw)
+        if not abschnitt.lstrip().startswith("#"):
+            raise ValueError(f"kein Abschnitt mit Ueberschrift: {abschnitt[:120]!r}")
+    except (ValueError, RuntimeError, KeyError) as exc:
+        log.error("Bereichsredaktion %s gescheitert (%s) - Regelabschnitt",
+                  bereich, str(exc)[:160])
+        abschnitt = _notfall_abschnitt(bereich, highlights, ueberschrift)
+        kurz = str(daten.get("region_summary") or "")[:600]
+        topics = [f"{h.get('operator','')}: {h.get('title','')[:120]}"
+                  for h in highlights]
+    return {"bereich": bereich, "abschnitt": abschnitt, "kurzfassung": kurz,
+            "topics": topics, "ist_thema": ist_thema,
+            "staerkste": _staerkste(highlights, CHEF_MELDUNGEN_JE_BEREICH),
+            "anzahl": len(highlights)}
+
+
+def synthesize_zweistufig(
+        regional: dict[str, dict], already_covered: list[str], model: str,
+        language: str = "Deutsch", themenbereiche: list[str] | None = None,
+        workers: int = 4) -> tuple[str, list[str]]:
+    """Bereichsredakteure parallel, dann Chefredaktion. Wie synthesize()."""
+    themen = set(t for t in (themenbereiche or []) if t)
+    bereiche = [(name, daten) for name, daten in regional.items()
+                if (daten.get("highlights") or [])]
+    if not bereiche:
+        raise EditorialBriefingError(
+            "Keine bewerteten Meldungen - nichts zu redigieren")
+
+    log.info("Zweistufige Redaktion: %d Bereiche (%d davon Themenfelder), "
+             "%d bewertete Meldungen, %d parallel",
+             len(bereiche), sum(1 for n, _ in bereiche if n in themen),
+             sum(len(d.get("highlights") or []) for _, d in bereiche), workers)
+
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+        ergebnisse = list(pool.map(
+            lambda p: _ein_bereich(p[0], p[1], already_covered, model,
+                                   language, p[0] in themen),
+            bereiche))
+
+    regionen = [e for e in ergebnisse if not e["ist_thema"]]
+    themenfelder = [e for e in ergebnisse if e["ist_thema"]]
+    # Der groesste Bereich zuerst - er traegt die Woche.
+    regionen.sort(key=lambda e: -e["anzahl"])
+    themenfelder.sort(key=lambda e: -e["anzahl"])
+
+    # ------------------------------------------------------- Chefredaktion
+    chef_eingabe = json.dumps({
+        "bereiche": [{"bereich": e["bereich"],
+                      "ist_themenfeld": e["ist_thema"],
+                      "bewertete_meldungen": e["anzahl"],
+                      "kurzfassung": e["kurzfassung"],
+                      "staerkste_meldungen": e["staerkste"]}
+                     for e in regionen + themenfelder],
+        "already_covered_topics": already_covered[-300:],
+    }, ensure_ascii=False)
+    log.info("Chefredaktion: %d Bereiche, %.0f KB (~%dk Token) - unabhaengig "
+             "von der Zahl der Meldungen",
+             len(ergebnisse), len(chef_eingabe) / 1024, len(chef_eingabe) // 4000)
+
+    system = CHEF_SYSTEM.format(language=language)
+    pflicht = frozenset()  # der Themenabschnitt wird montiert, nicht geschrieben
+    try:
+        chefteil, chef_topics = _ein_versuch(system, chef_eingabe, model, pflicht)
+    except EditorialBriefingError as exc:
+        log.warning("Chefredaktion abgelehnt (%s) - ein Korrekturversuch", exc)
+        nachfassen = NACHFASSEN[exc.grund]
+        chefteil, chef_topics = _ein_versuch(system + nachfassen, chef_eingabe,
+                                             model, pflicht)
+
+    # ---------------------------------------------------------- Montage
+    # Die Bereichsabschnitte kommen ZWISCHEN "Die wichtigsten Signale" und
+    # "Muster der Woche": die Muster sollen die Woche abschliessen, nicht
+    # mitten im Bericht stehen.
+    kopf, muster = _teile_am_muster(chefteil)
+    teile = [kopf.strip(), ""]
+    teile += [e["abschnitt"].strip() + "\n" for e in regionen]
+    if themenfelder:
+        teile.append(THEMEN_H2 + "\n")
+        teile += [e["abschnitt"].strip() + "\n" for e in themenfelder]
+    if muster:
+        teile.append(muster.strip() + "\n")
+
+    markdown = "\n".join(teile).strip() + "\n"
+    pflicht_gesamt = frozenset({THEMEN_UEBERSCHRIFT}) if themenfelder else frozenset()
+    validate_editorial_briefing(markdown, pflicht_gesamt)
+
+    topics = list(chef_topics)
+    for e in ergebnisse:
+        topics.extend(e["topics"])
+    # Reihenfolge erhalten, Dubletten raus (Chef und Bereich nennen dasselbe).
+    gesehen: set[str] = set()
+    topics = [t for t in topics if not (t in gesehen or gesehen.add(t))]
+    return markdown, topics
+
+
+def _teile_am_muster(chefteil: str) -> tuple[str, str]:
+    """Chefteil vor/ab "## Muster der Woche" trennen.
+
+    Ohne diese Trennung stuenden die Muster der Woche VOR den Regionen - der
+    Bericht wuerde mit seinem Fazit enden, bevor die Belege dafuer kommen.
+    """
+    for zeile in chefteil.splitlines():
+        norm = (zeile.strip().lower().replace("ä", "ae")
+                .replace("ö", "oe").replace("ü", "ue"))
+        if norm.startswith("## muster der woche"):
+            pos = chefteil.index(zeile)
+            return chefteil[:pos], chefteil[pos:]
+    return chefteil, ""
 
 
 def build_digest(items_by_region: dict[str, list[Item]],
