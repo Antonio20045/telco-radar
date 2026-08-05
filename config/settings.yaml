@@ -143,7 +143,7 @@ editor_max_highlights: 0
 # ~650 bewertete Meldungen; die Schwelle greift also lange vorher, naemlich bei
 # der ersten groesseren Quellenwelle - und wird damit im echten Betrieb
 # ausprobiert, statt beim ersten Grosslauf zum ersten Mal zu laufen.
-editor_modus: "auto"
+editor_modus: "zweistufig"   # VORUEBERGEHEND fuer den Abnahmelauf #75 - danach zurueck auf auto
 editor_zweistufig_ab_meldungen: 120
 
 # How many previously reported topics the editor gets as "do not repeat" memory
