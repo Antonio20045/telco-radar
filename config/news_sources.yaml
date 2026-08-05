@@ -199,9 +199,11 @@ news_sources:
   # bbcmag ai gegen innovation).
 
   # -- RCR Wireless (US/international, taeglich)
-  - {name: "RCR Wireless — 5G", type: rss, url: "https://www.rcrwireless.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "RCR Wireless — 5G", type: rss, url: "https://www.rcrwireless.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
   - {name: "RCR Wireless — 6G", type: rss, url: "https://www.rcrwireless.com/category/6g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
-  - {name: "RCR Wireless — KI-Infrastruktur", type: rss, url: "https://www.rcrwireless.com/category/ai-infrastructure/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "RCR Wireless — KI-Infrastruktur", type: rss, url: "https://www.rcrwireless.com/category/ai-infrastructure/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: north_america}
   # -- Mobile Europe
   - {name: "Mobile Europe — 5G", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/5g-beyond/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
   - {name: "Mobile Europe — Automatisierung & KI", type: rss, url: "https://www.mobileeurope.co.uk/category/content-categories/automation-ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: europe}
@@ -219,18 +221,23 @@ news_sources:
   # -- Indien
   - {name: "TelecomTalk — 5G", type: rss, url: "https://telecomtalk.info/category/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "TelecomTalk — 6G", type: rss, url: "https://telecomtalk.info/category/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
-  - {name: "Communications Today — 5G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/page_5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
-  - {name: "Communications Today — 6G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
-  - {name: "Communications Today — KI", type: rss, url: "https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "Communications Today — 5G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/page_5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "Communications Today — 6G", type: rss, url: "https://www.communicationstoday.co.in/category/carriers/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "Communications Today — KI", type: rss, url: "https://www.communicationstoday.co.in/category/enterprise-networks/ai/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "TelecomLead — 5G", type: rss, url: "https://telecomlead.com/category/5g/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "TelecomLead — Breitband", type: rss, url: "https://telecomlead.com/category/broadband/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "TelecomLead — Satellit", type: rss, url: "https://telecomlead.com/category/satellite/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "TelecomLead — Netztechnik", type: rss, url: "https://telecomlead.com/category/telecom-equipment/feed", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   # -- Telecom Review (Naher Osten / Asien / Afrika)
-  - {name: "Telecom Review — Betreiber", type: rss, url: "https://www.telecomreview.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "Telecom Review — Betreiber", type: rss, url: "https://www.telecomreview.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
   - {name: "Telecom Review Asia — Netze", type: rss, url: "https://www.telecomreviewasia.com/news/network-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
   - {name: "Telecom Review Asia — Technik", type: rss, url: "https://www.telecomreviewasia.com/news/technology-news/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: asia}
-  - {name: "Telecom Review Africa — Betreiber", type: rss, url: "https://www.telecomreviewafrica.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
+  # LAUF #77: HTTP 403 - siehe Kommentar unten
+  #- {name: "Telecom Review Africa — Betreiber", type: rss, url: "https://www.telecomreviewafrica.com/articles/telecom-operators/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
   # -- DPL News (Lateinamerika)
   - {name: "DPL News — 5G", type: rss, url: "https://dplnews.com/category/redes/5g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: latin_america}
   - {name: "DPL News — 6G", type: rss, url: "https://dplnews.com/category/redes/6g/feed/", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05", region: latin_america}
@@ -312,3 +319,23 @@ news_sources:
   # kein Vodafone-Markt, aber VEONs Beeline und die Ausruesterfrage (Huawei,
   # ZTE) laufen dort - deshalb ohne Vorgabe-Region unter Global.
   - {name: "ComNews (Russland)", type: rss, url: "https://www.comnews.ru/rss", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+
+  # ===========================================================================
+  # NACHTRAG ZU DEN RUBRIKFEEDS (Lauf #77, 05.08.2026)
+  # ===========================================================================
+  # Sieben der oben eingetragenen Rubrikfeeds sind im ersten echten Lauf mit
+  # HTTP 403 gescheitert - obwohl sie den Abnahme-Check in der Sandbox
+  # bestanden hatten. Betroffen sind genau die Hosts, von denen der Lauf jetzt
+  # MEHRERE Adressen abfragt: RCR Wireless, Telecom Review, Telecom Review
+  # Africa und Communications Today. Deren Hauptfeeds liefen im selben Lauf
+  # normal.
+  #
+  # Die Ursache ist also nicht die einzelne Rubrik, sondern ihre Zahl: vier
+  # Abrufe gegen denselben Server in einem Lauf loesen dessen Schutzregeln
+  # aus. Die betroffenen Zeilen sind auskommentiert statt geloescht - sie sind
+  # nicht schlecht, sie sind zu viele.
+  #
+  # REGEL FUER DIE NAECHSTE WELLE: hoechstens zwei bis drei Kanaele je Host
+  # eintragen, und nach jeder Welle in run.sources des Berichts-JSON nachsehen,
+  # welche Quellen im echten Lauf gescheitert sind. Ein PASS des Abnahme-Checks
+  # misst die Sandbox, nicht den GitHub-Actions-Runner.

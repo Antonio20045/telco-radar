@@ -265,6 +265,24 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   sonst die Rubriknavigation der Site. Der Hauptfeed einer Fachpresse zeigt
   immer nur die letzten 10 bis 30 Meldungen; zwischen zwei Läufen sieht man
   von einem täglich publizierenden Titel also einen Ausschnitt.
+- **ABER: mehrere Kanäle desselben Hosts lösen dessen Schutzregeln aus.**
+  Der teuerste Befund aus Lauf #77 und die wichtigste Grenze der Rubriksuche.
+  Sieben der 33 neuen Rubrikfeeds antworteten im echten Lauf mit **HTTP 403**,
+  obwohl sie den Abnahme-Check in der Sandbox bestanden hatten — und zwar
+  genau die, deren Hauptfeed im selben Lauf normal lief: RCR Wireless (2
+  Rubriken), Telecom Review und Telecom Review Africa (je 1), Communications
+  Today (3). Ein Lauf fragt jetzt vier statt einer Adresse bei rcrwireless.com
+  ab, und die WAF des Hosts macht dicht.
+  Zwei Folgerungen:
+  * **Der Abnahme-Check misst die Sandbox, der Lauf misst GitHub Actions.**
+    Ein PASS ist keine Zusage, dass die Quelle im Lauf funktioniert. Nach
+    jeder Welle mit Rubrikfeeds gehört ein Blick in
+    `run.sources` des Berichts-JSON: `[s for s in run["sources"]
+    if s["status"] != "ok"]`.
+  * **Höchstens zwei bis drei Kanäle je Host**, sonst kostet der vierte die
+    anderen drei mit. `RUBRIK_MAX_JE_SITE` steht auf 8 — das ist die
+    Kappung der SUCHE, nicht die des Eintrags, und die Eintragsgrenze muss
+    von Hand gezogen werden.
 - **Monatsnamen sind Stämme, keine Drei-Buchstaben-Kürzel.** Das war nach dem
   Sucher die zweitgrößte Verlustquelle: in Welle 2 lieferten 82 Kandidaten
   Meldungen und fielen NUR am Datumsformat durch. Seit Session 6 gewinnt der
