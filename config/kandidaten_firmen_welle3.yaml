@@ -32,20 +32,10 @@ firmen:
   domain: a1.si
   country: SI
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: AKOS
-  domain: akos-rs.si
-  country: SI
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: One Hungary
   domain: one.hu
   country: HU
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: NMHH
-  domain: nmhh.hu
-  country: HU
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: Mobilarena
   domain: mobilarena.hu
   country: HU
@@ -59,10 +49,6 @@ firmen:
   country: RO
   herkunft: Sonnet-Recherche Welle 3 (verband)
   thema: regulierung
-- name: COMUNICATII Mobile
-  domain: comunic.ro
-  country: RO
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: CRC
   domain: crc.bg
   country: BG
@@ -290,19 +276,6 @@ firmen:
   country: PL
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
   thema: regulierung
-- name: PIIT
-  domain: piit.org.pl
-  country: PL
-  herkunft: Sonnet-Recherche Welle 3 (verband)
-  thema: regulierung
-- name: TELKO.in
-  domain: telko.in
-  country: PL
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
-- name: GSMonline.pl
-  domain: gsmonline.pl
-  country: PL
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: Emitel
   domain: emitel.pl
   country: PL
@@ -348,11 +321,6 @@ firmen:
   domain: htp.de
   country: DE
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: BREKO
-  domain: brekoverband.de
-  country: DE
-  herkunft: Sonnet-Recherche Welle 3 (verband)
-  thema: regulierung
 - name: ANGA
   domain: anga.de
   country: DE
@@ -447,10 +415,6 @@ firmen:
   thema: regulierung
 - name: Frandroid
   domain: frandroid.com
-  country: FR
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
-- name: Ariase
-  domain: ariase.com
   country: FR
   herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: DELTA Fiber
@@ -586,11 +550,6 @@ firmen:
   country: IT
   herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
   thema: infrastruktur
-- name: Asstel
-  domain: asstel.it
-  country: IT
-  herkunft: Sonnet-Recherche Welle 3 (verband)
-  thema: regulierung
 - name: MondoMobileWeb
   domain: mondomobileweb.it
   country: IT
@@ -607,10 +566,6 @@ firmen:
   domain: adamo.es
   country: ES
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: BandaAncha
-  domain: bandaancha.eu
-  country: ES
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: GO plc
   domain: go.com.mt
   country: MT
@@ -623,11 +578,6 @@ firmen:
   domain: epic.com.mt
   country: MT
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: MCA
-  domain: mca.org.mt
-  country: MT
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: Digi Portugal
   domain: digi.pt
   country: PT
@@ -916,11 +866,6 @@ firmen:
   country: CN
   herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
   thema: infrastruktur
-- name: MIIT
-  domain: miit.gov.cn
-  country: CN
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: C114
   domain: c114.com.cn
   country: CN
@@ -959,10 +904,6 @@ firmen:
   country: TW
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
   thema: regulierung
-- name: DIGITIMES
-  domain: digitimes.com
-  country: TW
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: MIC Japan
   domain: soumu.go.jp
   country: JP
@@ -1461,11 +1402,6 @@ firmen:
   domain: moov-africa.ci
   country: CI
   herkunft: Sonnet-Recherche Welle 3 (betreiber)
-- name: ARTCI
-  domain: artci.ci
-  country: CI
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: Orange Cameroun
   domain: orange.cm
   country: CM
@@ -1710,10 +1646,6 @@ firmen:
   domain: balancingact-africa.com
   country: GB
   herkunft: Sonnet-Recherche Welle 3 (fachpresse)
-- name: TechCabal
-  domain: techcabal.com
-  country: NG
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: Umniah
   domain: umniah.com
   country: JO
@@ -1908,11 +1840,6 @@ firmen:
   domain: btk.gov.tr
   country: TR
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
-- name: AICTO
-  domain: aicto.org
-  country: TN
-  herkunft: Sonnet-Recherche Welle 3 (verband)
   thema: regulierung
 - name: TradeArabia
   domain: tradearabia.com
@@ -2141,11 +2068,6 @@ firmen:
   country: US
   herkunft: Sonnet-Recherche Welle 3 (verband)
   thema: regulierung
-- name: Fiber Broadband Association
-  domain: fiberbroadband.org
-  country: US
-  herkunft: Sonnet-Recherche Welle 3 (verband)
-  thema: regulierung
 - name: INCOMPAS
   domain: incompas.org
   country: US
@@ -2215,20 +2137,12 @@ firmen:
   domain: insidetowers.com
   country: US
   herkunft: Sonnet-Recherche Welle 3 (fachpresse)
-- name: Wireless Estimator
-  domain: wirelessestimator.com
-  country: US
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: Telecom Ramblings
   domain: telecomramblings.com
   country: US
   herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: Cablefax
   domain: cablefax.com
-  country: US
-  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
-- name: Broadband Breakfast
-  domain: broadbandbreakfast.com
   country: US
   herkunft: Sonnet-Recherche Welle 3 (fachpresse)
 - name: ISED Canada
@@ -2484,11 +2398,6 @@ firmen:
 - name: Subtel
   domain: subtel.cl
   country: CL
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
-- name: CRC Colombia
-  domain: crcom.gov.co
-  country: CO
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
   thema: regulierung
 - name: MinTIC
@@ -2752,11 +2661,6 @@ firmen:
   country: DZ
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
   thema: regulierung
-- name: INACOM Angola
-  domain: inacom.gov.ao
-  country: AO
-  herkunft: Sonnet-Recherche Welle 3 (regulierer)
-  thema: regulierung
 - name: ARCT Burundi
   domain: arct.gov.bi
   country: BI
@@ -2922,8 +2826,1113 @@ firmen:
   country: MN
   herkunft: Sonnet-Recherche Welle 3 (regulierer)
   thema: regulierung
-- name: African Telecommunications Union
-  domain: atuuat.africa
-  country: ET
+- name: eco Verband der Internetwirtschaft
+  domain: eco.de
+  country: DE
   herkunft: Sonnet-Recherche Welle 3 (verband)
   thema: regulierung
+- name: futurezone
+  domain: futurezone.at
+  country: AT
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: inside-it.ch
+  domain: inside-it.ch
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: DegroupTest (ex-Degroupnews)
+  domain: degrouptest.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Zone ADSL & Fibre
+  domain: zoneadsl.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Movilonia
+  domain: movilonia.com
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Data Manager Online
+  domain: datamanager.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Baguete
+  domain: baguete.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: ITBusiness.hu
+  domain: itbusiness.hu
+  country: HU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Telkoder
+  domain: telkoder.org.tr
+  country: TR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ComNews
+  domain: comnews.ru
+  country: RU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TelecomDaily
+  domain: telecomdaily.ru
+  country: RU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: IKS Media
+  domain: iksmedia.ru
+  country: RU
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Ketai Watch (Impress)
+  domain: k-tai.watch.impress.co.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: TCA Japan
+  domain: tca.or.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ITmedia Mobile
+  domain: mobile.itmedia.co.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: CCTime (飞象网)
+  domain: cctime.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: MSIT
+  domain: msit.go.kr
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: Digital Daily
+  domain: ddaily.co.kr
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Telset
+  domain: telset.id
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Beartai
+  domain: beartai.com
+  country: TH
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: MIC Vietnam
+  domain: mic.gov.vn
+  country: VN
+  herkunft: Sonnet-Recherche Welle 3 (regulierer)
+  thema: regulierung
+- name: ETTelecom
+  domain: telecom.economictimes.indiatimes.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: Techweez
+  domain: techweez.com
+  country: KE
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: IT News Africa
+  domain: itnewsafrica.com
+  country: ZA
+  herkunft: Sonnet-Recherche Welle 3 (fachpresse)
+- name: CITEL
+  domain: citel.oas.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: CEPT
+  domain: cept.org
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Caribbean Telecommunications Union
+  domain: ctu.int
+  country: TT
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ATIS
+  domain: atis.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ARIB
+  domain: arib.or.jp
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: China Communications Standards Association
+  domain: ccsa.org.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Telecommunications Technology Association
+  domain: tta.or.kr
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Telecommunication Standards Development Society India
+  domain: tsdsi.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Australian Telecommunications Alliance
+  domain: austelco.org.au
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Small Cell Forum
+  domain: smallcellforum.org
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: NGMN Alliance
+  domain: ngmn.org
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: 5G Americas
+  domain: 5gamericas.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Next G Alliance
+  domain: nextgalliance.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: GSA
+  domain: gsacom.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Dynamic Spectrum Alliance
+  domain: dynamicspectrumalliance.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Mobile UK
+  domain: mobileuk.org
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Mplify
+  domain: mplify.net
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Wireless Broadband Alliance
+  domain: wballiance.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Satellite Industry Association
+  domain: sia.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Fibre Council Europe
+  domain: fibrecouncil.eu
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: INCA
+  domain: inca.coop
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Smart Africa
+  domain: smartafrica.org
+  country: RW
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Canadian Telecommunications Association
+  domain: canadatelecoms.ca
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: New Zealand Telecommunications Forum
+  domain: tcf.org.nz
+  country: NZ
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Conexis Brasil Digital
+  domain: conexis.org.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: DigitalES
+  domain: digitales.es
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: OnGo Alliance
+  domain: ongoalliance.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: LoRa Alliance
+  domain: lora-alliance.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: InfraNum
+  domain: infranum.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: oneM2M
+  domain: onem2m.org
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: NLconnect
+  domain: nlconnect.nl
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: TESPOK
+  domain: tespok.co.ke
+  country: KE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ATSI Indonesia
+  domain: atsi.or.id
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: ISPAI
+  domain: ispai.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Broadband India Forum
+  domain: broadbandindiaforum.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: TelComp
+  domain: telcomp.org.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Bluetooth SIG
+  domain: bluetooth.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: IEEE Standards Association
+  domain: standards.ieee.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Open RAN Policy Coalition
+  domain: openranpolicy.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: GSOA
+  domain: gsoa.space
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Telecommunications Industry Association
+  domain: tiaonline.org
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: 5G-ACIA
+  domain: 5g-acia.org
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: KAIT
+  domain: kait.or.kr
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: AfICTA
+  domain: aficta.africa
+  country: NG
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: 5G Forum
+  domain: 5gforum.org
+  country: KR
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: CANIETI
+  domain: canieti.org
+  country: MX
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Connectivity UK
+  domain: connectivityuk.org
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: CAICT
+  domain: caict.ac.cn
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: EWIA
+  domain: ewia.eu
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (verband)
+  thema: regulierung
+- name: Airalo
+  domain: airalo.com
+  country: SG
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Nomad (LotusFlare)
+  domain: nomadesim.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: LotusFlare
+  domain: lotusflare.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Ubigi
+  domain: ubigi.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: GigSky
+  domain: gigsky.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: eSIM Go
+  domain: esimgo.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Saily
+  domain: saily.com
+  country: LT
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Flexiroam
+  domain: flexiroam.com
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Truphone
+  domain: truphone.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Zendit
+  domain: zendit.io
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Celitech
+  domain: celitech.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Gigs
+  domain: gigs.com
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Workz Group
+  domain: workz.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Monty Mobile
+  domain: montymobile.com
+  country: AE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Redtea Mobile
+  domain: redteamobile.com
+  country: SG
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Sierra Wireless
+  domain: sierrawireless.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Telit Cinterion
+  domain: telit.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: u-blox
+  domain: u-blox.com
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Quectel
+  domain: quectel.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Nordic Semiconductor
+  domain: nordicsemi.com
+  country: 'NO'
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Kigen
+  domain: kigen.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Wireless Logic
+  domain: wirelesslogic.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: KORE Wireless
+  domain: korewireless.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Emnify
+  domain: emnify.com
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Hologram
+  domain: hologram.io
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: floLIVE
+  domain: flolive.net
+  country: IL
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Soracom
+  domain: soracom.io
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Eseye
+  domain: eseye.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Aeris
+  domain: aeris.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Cubic Telecom
+  domain: cubictelecom.com
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: 1NCE
+  domain: 1nce.com
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Onomondo
+  domain: onomondo.com
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Comfone
+  domain: comfone.com
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Mobileum
+  domain: mobileum.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Transaction Network Services
+  domain: tnsi.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: iBasis
+  domain: ibasis.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Cellusys
+  domain: cellusys.com
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: TOMIA
+  domain: tomiaglobal.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Arelion
+  domain: arelion.com
+  country: SE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Console Connect (PCCW Global)
+  domain: pccwglobal.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: HGC Global Communications
+  domain: hgc.com.hk
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: CITIC Telecom CPC
+  domain: citictel-cpc.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Syniverse
+  domain: syniverse.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Xintec
+  domain: xintec.com
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Yaana Technologies
+  domain: yaanatech.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Squire Technologies
+  domain: squire-technologies.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Enea
+  domain: enea.com
+  country: SE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Broadforward
+  domain: broadforward.com
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: P1 Security
+  domain: p1sec.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: SecurityGen
+  domain: security-gen.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: NetNumber
+  domain: netnumber.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Openmind Networks
+  domain: openmindnetworks.com
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Nexign
+  domain: nexign.com
+  country: RU
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: PROTEI
+  domain: protei.com
+  country: EE
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Segron
+  domain: segron.com
+  country: SK
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Optiva
+  domain: optiva.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: MATRIXX Software
+  domain: matrixx.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Totogi
+  domain: totogi.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: CSG International
+  domain: csgi.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Cerillion
+  domain: cerillion.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Comviva
+  domain: comviva.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Alepo
+  domain: alepo.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Synchronoss
+  domain: synchronoss.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Federated Wireless
+  domain: federatedwireless.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Celona
+  domain: celona.io
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Athonet
+  domain: athonet.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Druid Software
+  domain: druidsoftware.com
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Betacom
+  domain: betacom.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Boldyn Networks
+  domain: boldyn.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Highway 9 Networks
+  domain: highway9.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Airspan Networks
+  domain: airspan.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Baicells Technologies
+  domain: baicells.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: ip.access
+  domain: ipaccess.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Comba Telecom
+  domain: comba-telecom.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Sercomm
+  domain: sercomm.com
+  country: TW
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Anritsu
+  domain: anritsu.com
+  country: JP
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Rohde & Schwarz
+  domain: rohde-schwarz.com
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: EXFO
+  domain: exfo.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Spirent Communications
+  domain: spirent.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: VeEX
+  domain: veexinc.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Calnex Solutions
+  domain: calnexsol.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: NetScout
+  domain: netscout.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Twilio
+  domain: twilio.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Vonage
+  domain: vonage.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Telnyx
+  domain: telnyx.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Plivo
+  domain: plivo.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Bird (MessageBird)
+  domain: bird.com
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Route Mobile (Proximus Global)
+  domain: proximusglobal.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Tanla Platforms
+  domain: tanla.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Gupshup
+  domain: gupshup.io
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Kaleyra
+  domain: kaleyra.com
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: IntelePeer
+  domain: intelepeer.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Mitto
+  domain: mitto.ch
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: GMS
+  domain: gms.net
+  country: CH
+  herkunft: Sonnet-Recherche Welle 3 (plattform)
+  thema: mvno
+- name: Tower Bersama Infrastructure
+  domain: tower-bersama.com
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Mitratel (Dayamitra Telekomunikasi)
+  domain: mitratel.co.id
+  country: ID
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Open Fiber
+  domain: openfiber.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Telxius
+  domain: telxius.com
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: WIOCC
+  domain: wiocc.net
+  country: MU
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Raxio Group
+  domain: raxiogroup.com
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Africa Data Centres
+  domain: africadatacentres.com
+  country: ZA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Paratus Group
+  domain: paratus.africa
+  country: ZA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: V.tal
+  domain: vtal.com
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Highline do Brasil
+  domain: highline.com.br
+  country: BR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: GTL Infrastructure
+  domain: gtlinfra.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Nxtra Data
+  domain: nxtra.in
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Altius Infra (ex-Summit Digitel)
+  domain: altiusinfra.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Yotta Infrastructure
+  domain: yotta.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: CtrlS Datacenters
+  domain: ctrls.com
+  country: IN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: GDS Holdings
+  domain: gds-services.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: VNET Group
+  domain: vnet.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Chindata Group
+  domain: chindatagroup.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: ST Telemedia Global Data Centres
+  domain: sttelemediagdc.com
+  country: SG
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Khazna Data Centers
+  domain: khaznadatacenters.com
+  country: AE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Thuraya
+  domain: thuraya.com
+  country: AE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: APT Satellite (APSTAR)
+  domain: apstar.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: AsiaSat
+  domain: asiasat.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: MEASAT
+  domain: measat.com
+  country: MY
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Hispasat
+  domain: hispasat.com
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Arabsat
+  domain: arabsat.com
+  country: SA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Nilesat
+  domain: nilesat.org
+  country: EG
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Es'hailSat
+  domain: eshailsat.qa
+  country: QA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: China Satcom
+  domain: chinasatcom.com
+  country: CN
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Rivada Space Networks
+  domain: rivada.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Kepler Communications
+  domain: kepler.space
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Astranis
+  domain: astranis.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Sateliot
+  domain: sateliot.space
+  country: ES
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Cornerstone (CTIL)
+  domain: cornerstone.network
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Nexfibre
+  domain: nexfibre.co.uk
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Netomnia
+  domain: netomnia.com
+  country: GB
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: SIRO
+  domain: siro.ie
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: National Broadband Ireland
+  domain: nbi.ie
+  country: IE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: GlasfaserPlus
+  domain: glasfaserplus.de
+  country: DE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: TDF
+  domain: tdf.fr
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: EI Towers
+  domain: eitowers.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Rai Way
+  domain: raiway.it
+  country: IT
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Orange Marine
+  domain: marine.orange.com
+  country: FR
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: GTT Communications
+  domain: gtt.net
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Console Connect (PCCW Global)
+  domain: consoleconnect.com
+  country: HK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Megaport
+  domain: megaport.com
+  country: AU
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Zenlayer
+  domain: zenlayer.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Aligned Data Centers
+  domain: alignedenergy.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Cologix
+  domain: cologix.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: atNorth
+  domain: atnorth.com
+  country: IS
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: GlobalConnect
+  domain: globalconnect.dk
+  country: DK
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Fiberklaar
+  domain: fiberklaar.be
+  country: BE
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Eurofiber
+  domain: eurofiber.com
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Glaspoort
+  domain: glaspoort.nl
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Open Dutch Fiber
+  domain: opendutchfiber.nl
+  country: NL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: eStruxture
+  domain: estruxture.com
+  country: CA
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Switch Inc
+  domain: switch.com
+  country: US
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur
+- name: Nexera
+  domain: nexera.pl
+  country: PL
+  herkunft: Sonnet-Recherche Welle 3 (infrastruktur)
+  thema: infrastruktur

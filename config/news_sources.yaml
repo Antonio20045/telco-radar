@@ -245,3 +245,42 @@ news_sources:
   # der Woche zusammen ("Weekly Wrap: Are we on the cusp of a spectrum trade
   # war?") - Einordnung, die der Meldungsfeed nicht traegt.
   - {name: "PolicyTracker — Weekly Wrap", type: rss, url: "https://www.policytracker.com/blog/feed/", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
+
+  # ===========================================================================
+  # WELLE 3c (05.08.2026) - aus der Sonnet-Recherche, erste frische Firmenliste
+  # ===========================================================================
+  # 234 Suchauftraege -> 308 Kandidaten -> 63 bestanden -> 23 eingetragen
+  # (9 hier, 14 in tech_sources.yaml). Die frische Liste liefert deutlich mehr
+  # Kandidaten je Suchauftrag als die in Session 5 schon abgeerntete (1,3
+  # gegen 0,76) - was dort einen Feed hatte, steht laengst in der Config.
+  #
+  # BEWUSST NICHT AUFGENOMMEN, obwohl sie den Check bestanden haben:
+  #   frandroid.com/feed und inside-digital.de/feed
+  #                     standen schon in Session 5 als abgelehnt im YAML und
+  #                     wurden erneut vorgeschlagen (Testberichte bzw.
+  #                     Schnaeppchen: "Preishammer bei Netto")
+  #   mobiflip.de, hwsw.hu, technews.bg, reseller.co.nz, diarioti.com
+  #                     allgemeine IT- und Verbraucherpresse; erste Meldungen
+  #                     u. a. ueber Avatar-Filme und eine EA-Uebernahme
+  #   rbbtoday.com, watch.impress.co.jp
+  #                     japanische Boulevard- bzw. Verbrauchertechnik
+  #   gsmonline.pl: 4 der 5 Rubrikfeeds
+  #                     najnowsze-promocje (Kampagnen), testy-smartfonow
+  #                     (Testberichte), newsy-o-nowym-sprzecie und
+  #                     wszystkie-informacje (Obermenge) - eingetragen ist nur
+  #                     /feed/artykuly
+  #   technews.bg/comments/feed und reseller.co.nz/comments/feed
+  #                     Leserkommentare, keine Artikel
+  #   mondomobileweb.it, phoneworld.com.pk, voicendata.com,
+  #   convergenciadigital.com.br, digitalnewsasia.com
+  #                     Maerkte, die im Bestand schon mehrfach abgedeckt sind
+  #                     (Italien, Pakistan, Indien, Brasilien)
+  - {name: "Bandaancha (Spanien)", type: rss, url: "https://bandaancha.eu/portada.atom", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Ariase (Frankreich)", type: rss, url: "https://www.ariase.com/blog/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Broadband Breakfast (USA)", type: rss, url: "https://broadbandbreakfast.com/rss/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "GSMonline (Polen)", type: rss, url: "https://www.gsmonline.pl/feed/artykuly", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Telko.in (Polen)", type: rss, url: "https://www.telko.in/rss", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Comunic.ro (Rumänien)", type: rss, url: "https://comunic.ro/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "TechCabal (Afrika)", type: rss, url: "https://techcabal.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Wireless Estimator (Funktürme)", type: rss, url: "https://wirelessestimator.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "DigiTimes (Lieferkette)", type: rss, url: "https://www.digitimes.com/rss/daily.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}

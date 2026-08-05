@@ -220,6 +220,48 @@ themen:
       # entscheidet ueber die Frequenzvergaben, an denen Vodacom und MTN
       # haengen ("ICASA Publishes Draft IMT Roadmap and Implementation Plans").
       - {name: "ICASA (Suedafrika)", type: newsroom, url: "https://www.icasa.org.za/news", item_selector: "div.news", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
+      # --- Welle 3c (05.08.2026), aus der Sonnet-Recherche.
+      # Nationale Telekom-Regulierer und Branchenverbaende. Der Auftrag nennt
+      # genau diese Sorte als lohnend: sauber datiert und klar abgegrenzt.
+      # NICHT aufgenommen, obwohl sie den Check bestanden haben:
+      #   asep.gob.pa, our.org.jm  Mehrspartenregulierer (erste Meldung von
+      #                            ASEP handelt vom Strommarkt) - derselbe
+      #                            Grund, aus dem die spanische CNMC in
+      #                            Session 4 verworfen wurde
+      #   ttja.ee                  estnische Verbraucherschutzbehoerde, erste
+      #                            Meldung ueber zahlungsunfaehige Fluglinien
+      #   lta.gov.lr, rrt.lt       Titel sind "PRESS RELEASE" bzw. ein
+      #                            Menuelabel, keine Ueberschriften
+      #   akep.al, bicma.gov.bt, incm.gov.mz, telcor.gob.ni
+      #                            nur Verwaltungs- und Personalmitteilungen
+      #                            in der Stichprobe
+      #   cs.gov.tj (3 Sprachen)   veroeffentlicht fremde Weltnachrichten
+      #                            ("Orange Expands Investments in France")
+      #   nmhh.hu/feed/rss-hu.xml  40 Meldungen je Abruf, ueberwiegend
+      #                            Baugenehmigungsbescheide - eingetragen ist
+      #                            nur der Forschungsfeed
+      #   coai.com, apt.int        abgeschnittene Titel bzw. Terminkalender
+      #   ntca.org                 erste Meldung ein persoenlicher Blogbeitrag
+      - {name: "ARTCI (Côte d'Ivoire)", type: rss, url: "https://artci.ci/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "INACOM (Angola)", type: rss, url: "https://inacom.gov.ao/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "INDOTEL (Dominikanische Republik)", type: json_api, url: "https://indotel.gob.do/feed/json/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "CRC (Kolumbien)", type: rss, url: "https://www.crcom.gov.co/es/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "MCA (Malta)", type: rss, url: "https://www.mca.org.mt/rss.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "AKOS (Slowenien)", type: newsroom, url: "https://www.akos-rs.si", item_selector: "span.news-related-news-date", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Das chinesische Industrieministerium ist der Regulierer fuer den
+      # groessten Mobilfunkmarkt der Welt und fehlte bisher komplett.
+      - {name: "MIIT (China)", type: newsroom, url: "https://www.miit.gov.cn", item_selector: "li", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Der Forschungsfeed der ungarischen Behoerde: Marktzahlen und
+      # Mediennutzungsstudien statt Verwaltungsbescheide.
+      - {name: "NMHH Forschung (Ungarn)", type: rss, url: "https://nmhh.hu/feed/kutatasok-hu.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # BREKO ist der groesste deutsche Glasfaserverband und kommentiert jede
+      # TKG-Novelle - fuer den Heimatmarkt der Kollegin die relevanteste
+      # Verbandsstimme.
+      - {name: "BREKO (Deutschland)", type: rss, url: "https://brekoverband.de/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "Asstel (Italien)", type: rss, url: "https://www.asstel.it/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "PIIT (Polen)", type: rss, url: "https://piit.org.pl/feed", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "African Telecommunications Union", type: rss, url: "https://atuuat.africa/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      - {name: "AICTO (Arabische IKT-Organisation)", type: rss, url: "https://www.aicto.org/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # TRAI reguliert den groessten Mobilfunkmarkt der Welt und
       # veroeffentlicht ungewoehnlich konkrete Messberichte zur Netzqualitaet.
       # Vollstaendig telekomspezifisch - anders als die zunaechst geprueften
@@ -302,6 +344,9 @@ themen:
       und Rechenzentren. Sie bestimmen die Kostenseite und das Tempo des
       Netzausbaus, ohne selbst Endkunden zu haben.
     quellen:
+      # Welle 3c: der US-Glasfaserverband. Er buendelt, was die amerikanischen
+      # Netzbetreiber gemeinsam beim Ausbau planen und fordern.
+      - {name: "Fiber Broadband Association", type: json_api, url: "https://www.fiberbroadband.org/wp-json/wp/v2/posts?per_page=25&_embed=1", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # Italiens groesster Turmbetreiber, hervorgegangen aus TIM und Vodafone.
       - {name: "INWIT", type: rss, url: "https://www.inwit.it/en/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
       # Glasfaser-Grosshandel in Nordamerika: wer Zayo mietet, baut nicht
