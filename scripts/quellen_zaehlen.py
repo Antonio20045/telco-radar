@@ -138,4 +138,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except BrokenPipeError:
+        # `... | head` schliesst die Pipe - kein Fehler, sondern der Normalfall
+        # beim Nachschauen.
+        raise SystemExit(0)
