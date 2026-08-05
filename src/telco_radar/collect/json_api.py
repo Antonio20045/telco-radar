@@ -45,8 +45,8 @@ _TAG_RE = re.compile(r"<[^>]+>")
 
 # Records are read up to MAX_RECORDS, then sorted newest-first and cut to
 # MAX_ITEMS, so a long unsorted archive still yields its newest releases.
-MAX_RECORDS = 400
-MAX_ITEMS = 40
+MAX_RECORDS = 1200
+MAX_ITEMS = 250
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 

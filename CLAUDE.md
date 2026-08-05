@@ -278,7 +278,21 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   und `allow_short_titles` verlieren — Felder, die seine Tabelle `M` gar nicht
   kennt. Die **Watchlist wird direkt editiert**. Die Quellen-Doku erzeugt
   `scripts/build_quellen_doc.py --validate` (schreibt nichts nach `config/`).
-- **Der Analyst sieht nur die ersten `max_items_per_region` Meldungen** (15).
+- **Die letzte Kappung sass im Collector, nicht in der Analyse.** Bis Lauf #72
+  las ein RSS-Feed hoechstens 40 Eintraege, eine Newsroom-Seite 30, eine
+  JSON-API 40. Gemessen lagen **45 von 223 Quellen exakt auf dieser Grenze** —
+  darunter ausgerechnet die ertragreichsten Fachpressefeeds. Gegenprobe am
+  echten Netz: Ariase liefert 63 statt 40 Meldungen, teltarif und Light
+  Reading je 50. Alle drei Grenzen haengen jetzt an
+  `http.max_items_per_source` (250). **Was der Collector wegwirft, sieht kein
+  Analyst, kein Editor und keine Auswertung — es existiert fuer den Radar
+  nicht.**
+- **Was NICHT kappt und deshalb nicht als Kappung missverstanden werden darf:**
+  der Analyst laesst Meldungen mit Relevanz < 2 aus seiner Highlight-Liste
+  (er hat sie gelesen und verworfen), und ein Bereichsredakteur erwaehnt im
+  Prosaabschnitt nicht jede bewertete Meldung. Alle bewerteten Meldungen
+  stehen vollstaendig im Berichts-JSON, im Explorer und in den Charts.
+- **Der Analyst sah frueher nur die ersten `max_items_per_region` Meldungen** (15).
   Im Lauf vom 31.07. waren 220 Meldungen neu und 70 wurden bewertet. Die
   Reihenfolge entscheidet also, was überhaupt gelesen wird: `pipeline.py`
   mischt die Quellen deshalb reihum (`_interleave_by_source`), und

@@ -310,4 +310,20 @@ http:
                                 # separate navigation from render_timeout_seconds
                                 # above - images/CSS load, unlike the text fetch)
   user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-  max_links_per_newsroom: 30
+  # Wie viele Meldungen eine Quelle hoechstens liefert.
+  #
+  # Das ist die letzte verbliebene Kappung im ganzen Lauf, und sie sass an der
+  # teuersten Stelle: was hier wegfaellt, sieht kein Analyst, kein Editor und
+  # keine Auswertung - es existiert fuer den Radar nicht. Gemessen an Lauf #72
+  # lagen 45 von 223 Quellen exakt auf ihrer alten Grenze (30 bzw. 40),
+  # darunter ausgerechnet die ertragreichsten Fachpressefeeds: Golem
+  # Telekommunikation, teltarif, Ariase, Telepolis, ETNews, Light Reading. Bei
+  # denen wurde also genau das abgeschnitten, wofuer sie aufgenommen wurden.
+  #
+  # Der Wert ist bewusst hoch angesetzt. Gegen Muell schuetzen nicht diese
+  # Zahl, sondern der Frischefilter (nur die letzten 8 Tage), der Seen-Store
+  # (nur wirklich Neues) und die Titelpruefung der Parser. Wer ihn senkt, muss
+  # begruenden, WELCHE Meldungen er nicht sehen will.
+  max_items_per_source: 250
+  # Alter Name, weiter unterstuetzt; max_items_per_source gewinnt.
+  max_links_per_newsroom: 250

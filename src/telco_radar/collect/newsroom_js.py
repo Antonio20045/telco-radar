@@ -108,6 +108,7 @@ def collect_newsroom_js(source: Source, region: str, operator: str | None,
     timeout_s = float(http_cfg.get("render_timeout_seconds",
                                    http_cfg.get("timeout_seconds", 25)))
     ua = http_cfg.get("user_agent", BROWSER_UA)
-    max_links = int(http_cfg.get("max_links_per_newsroom", 30))
+    max_links = int(http_cfg.get("max_items_per_source")
+                    or http_cfg.get("max_links_per_newsroom", 250))
     html = render_html(source.url, timeout_s, ua)
     return parse_newsroom_html(html, source, region, operator, origin, max_links)

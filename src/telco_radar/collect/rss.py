@@ -19,7 +19,11 @@ from .newsroom import _date_from_text
 
 log = logging.getLogger(__name__)
 
-MAX_ENTRIES_PER_FEED = 40
+# Nur noch eine Notbremse gegen ein voellig entgleistes Feed, keine
+# Auswahl mehr: der wirksame Wert kommt aus settings.yaml
+# (http.max_items_per_source). Siehe die Begruendung dort - was hier
+# wegfaellt, sieht kein Analyst je.
+MAX_ENTRIES_PER_FEED = 250
 
 
 def _strip_html(text: str) -> str:
@@ -51,7 +55,8 @@ def _entry_date(entry) -> datetime | None:
 
 
 def parse_feed_bytes(raw: bytes, source: Source, region: str,
-                     operator: str | None, origin: str) -> list[Item]:
+                     operator: str | None, origin: str,
+                     max_entries: int = MAX_ENTRIES_PER_FEED) -> list[Item]:
     """Parse feed content into Items (separated from fetching for testability)."""
     feed = feedparser.parse(raw)
     if feed.bozo and not feed.entries:
@@ -59,7 +64,7 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 
     default_name = source.name or source.url
     items: list[Item] = []
-    for entry in feed.entries[:MAX_ENTRIES_PER_FEED]:
+    for entry in feed.entries[:max_entries]:
         title = _strip_html(entry.get("title") or "")
         link = (entry.get("link") or "").strip()
         if not title or not link:
@@ -98,7 +103,10 @@ def collect_rss(source: Source, region: str, operator: str | None,
     for attempt in range(_PARSE_RETRIES + 1):
         resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
         try:
-            return parse_feed_bytes(resp.content, source, region, operator, origin)
+            return parse_feed_bytes(
+                resp.content, source, region, operator, origin,
+                max_entries=int(http_cfg.get("max_items_per_source",
+                                             MAX_ENTRIES_PER_FEED)))
         except ValueError as exc:
             last_exc = exc
             if attempt < _PARSE_RETRIES:

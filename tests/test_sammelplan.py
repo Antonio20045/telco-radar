@@ -261,3 +261,26 @@ def test_ohne_budget_bleibt_das_verhalten_unveraendert(monkeypatch):
         chttp.fetch("https://tot.example/feed", {"timeout_seconds": 1})
 
     assert len(versuche) == 6      # 2 User-Agents x 3 Versuche
+
+
+# ------------------------------------------------- keine Kappung je Quelle
+
+def test_kein_feed_wird_bei_vierzig_abgeschnitten(monkeypatch):
+    """Was der Collector wegwirft, sieht kein Analyst, kein Editor und keine
+    Auswertung. In Lauf #72 lagen 45 von 223 Quellen exakt auf ihrer alten
+    Grenze - darunter ausgerechnet die ertragreichsten Fachpressefeeds."""
+    from telco_radar.collect.rss import parse_feed_bytes
+
+    eintraege = "".join(
+        f"<item><title>Meldung Nummer {i} mit ausreichender Laenge</title>"
+        f"<link>https://example.com/{i}</link>"
+        f"<pubDate>Mon, 03 Aug 2026 10:00:00 GMT</pubDate></item>"
+        for i in range(180))
+    feed = (f"<?xml version='1.0'?><rss version='2.0'><channel>"
+            f"<title>Viel</title>{eintraege}</channel></rss>").encode()
+    src = Source(type="rss", url="https://example.com/feed", name="Viel")
+
+    items = parse_feed_bytes(feed, src, "global", None, "industry_news",
+                             max_entries=250)
+
+    assert len(items) == 180, "der Feed wurde gekappt"

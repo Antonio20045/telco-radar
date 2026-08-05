@@ -657,6 +657,7 @@ def collect_newsroom(source: Source, region: str, operator: str | None,
                      origin: str, http_cfg: dict) -> list[Item]:
     from .http import fetch
     resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
-    max_links = int(http_cfg.get("max_links_per_newsroom", 30))
+    max_links = int(http_cfg.get("max_items_per_source")
+                    or http_cfg.get("max_links_per_newsroom", 250))
     return parse_newsroom_html(resp.text, source, region, operator,
                                origin, max_links)

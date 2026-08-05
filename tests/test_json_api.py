@@ -115,12 +115,14 @@ def test_date_embedded_in_label_like_vodafone_idea():
 
 
 def test_records_are_sorted_by_date_before_the_cap():
-    """stc returns 281 releases whose first 40 are from 2021/2022, so capping
-    before sorting made the newsroom look four years stale while the current
-    releases sat further down the same response."""
+    """stc returns 281 releases whose ersten Eintraege von 2021/2022 sind, so
+    capping before sorting made the newsroom look four years stale while the
+    current releases sat further down the same response."""
+    from telco_radar.collect.json_api import MAX_ITEMS
+
     payload = json.dumps([
         {"title": f"Old release {n}", "link": f"https://example.com/old-{n}",
-         "date": "May 27, 2021"} for n in range(45)
+         "date": "May 27, 2021"} for n in range(MAX_ITEMS + 20)
     ] + [
         {"title": "Current release", "link": "https://example.com/current",
          "date": "Jun 25, 2026"},
@@ -128,7 +130,18 @@ def test_records_are_sorted_by_date_before_the_cap():
     src = Source(type="json_api", url="https://example.com/api", name="stc")
     items = parse_json_bytes(payload, src, "africa", "stc", "operator")
     assert items[0].title == "Current release"
-    assert len(items) == 40
+    assert len(items) == MAX_ITEMS
+
+
+def test_die_obergrenze_je_quelle_ist_grosszuegig():
+    """Was der Collector wegwirft, sieht kein Analyst und keine Auswertung.
+    In Lauf #72 lagen 45 von 223 Quellen exakt auf ihrer alten Grenze -
+    darunter die ertragreichsten Fachpressefeeds."""
+    from telco_radar.collect.json_api import MAX_ITEMS, MAX_RECORDS
+    from telco_radar.collect.rss import MAX_ENTRIES_PER_FEED
+
+    assert MAX_ITEMS >= 200 and MAX_RECORDS >= MAX_ITEMS
+    assert MAX_ENTRIES_PER_FEED >= 200
 
 
 def test_html_entities_in_titles_are_decoded():
