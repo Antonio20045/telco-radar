@@ -286,7 +286,11 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   Reading je 50. Alle drei Grenzen haengen jetzt an
   `http.max_items_per_source` (250). **Was der Collector wegwirft, sieht kein
   Analyst, kein Editor und keine Auswertung — es existiert fuer den Radar
-  nicht.**
+  nicht.** Wirkung in Lauf #73: 6 339 statt 3 852 gesammelte Meldungen (+65 %),
+  276 statt 148 bewertete, 47 von 47 Stapeln erfolgreich. Gegengeprueft, ob
+  250 selbst noch kappt: bei vier der acht Quellen an der Grenze mit 800
+  abgerufen — jenseits von Position 250 liegt bei keiner etwas im
+  Frischefenster.
 - **Was NICHT kappt und deshalb nicht als Kappung missverstanden werden darf:**
   der Analyst laesst Meldungen mit Relevanz < 2 aus seiner Highlight-Liste
   (er hat sie gelesen und verworfen), und ein Bereichsredakteur erwaehnt im

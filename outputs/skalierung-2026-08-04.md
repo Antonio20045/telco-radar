@@ -385,6 +385,47 @@ naheliegenden Länder und Kategorien sind jetzt abgegrast.
   Maroc Telecom) sind weiter nicht crawlbar. Für Cosmote decken jetzt drei
   griechische Fachmedien einen Teil ab.
 
+### Die letzte Kappung saß im Collector — und sie war die teuerste
+
+`max_items_per_region` und `editor_max_highlights` stehen seit Langem auf 0.
+Drei weitere Kappungen saßen aber eine Stufe früher, im Collector selbst: ein
+RSS-Feed las höchstens **40** Einträge, eine Newsroom-Seite **30** Links, eine
+JSON-API **40** Datensätze.
+
+Das ist die teuerste Stelle für eine Kappung, weil dort Weggeworfenes
+**nirgends** auftaucht: kein Analyst sieht es, kein Editor, keine Auswertung,
+und der Seen-Store vermerkt es nicht einmal als übersprungen. Es existiert für
+den Radar schlicht nicht.
+
+Gemessen an Lauf #72 lagen **45 von 223 Quellen exakt auf dieser Grenze** —
+darunter ausgerechnet die ertragreichsten der neu aufgenommenen
+Fachpressefeeds. Alle drei Grenzen hängen jetzt an einem Schalter,
+`http.max_items_per_source` (250).
+
+**Wirkung, Lauf #73 gegen #72:**
+
+| | #72 (mit Kappung) | #73 (ohne) |
+|---|---:|---:|
+| gesammelte Meldungen | 3 852 | **6 339** (+65 %) |
+| neue Meldungen | 257 | 633 |
+| bewertete Meldungen | 148 | **276** |
+| Analysten-Stapel erfolgreich | 19 von 19 | **47 von 47** |
+| ungelesene Meldungen | 0 | **0** |
+| Wettbewerber-Moves | 0 | **23** |
+| Sammelphase | 46,7 s | 117,2 s |
+| Laufzeit | 19,2 min | 28,4 min |
+
+**Ein Drittel der gesammelten Meldungen fehlte vorher.** Die 23
+Wettbewerber-Moves sind der Nebeneffekt des korrigierten Modellnamens — die
+Stufe hatte seit dem Anbieterwechsel nie ein Ergebnis geliefert.
+
+Gegenprobe, ob 250 selbst noch kappt: bei OpenAI, Vodacom, Safaricom und
+Bharti Airtel — vier der acht Quellen, die jetzt an der Grenze liegen — wurde
+mit 800 statt 250 abgerufen und gezählt, wie viele Meldungen **jenseits von
+Position 250** noch im Frischefenster liegen. Antwort: **null, bei allen
+vieren.** Die Grenze ist damit kein Filter mehr, sondern ein Netz gegen ein
+entgleistes Archiv.
+
 ### Die Welle hat die Erwartung eingelöst
 
 Die Trefferquote, neu ausgewertet nach den Läufen #68–#72, misst die neuen
