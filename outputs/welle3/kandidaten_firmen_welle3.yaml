@@ -1,0 +1,2241 @@
+kandidaten:
+- url: https://www.proximus.com/rss/news
+  type: rss
+  operator: Proximus Group
+  name: Proximus Group
+  website: proximus.com
+  country: BE
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.proximus.com/rss/pressreleases.xml
+  type: rss
+  operator: Proximus Group
+  name: Proximus Group
+  website: proximus.com
+  country: BE
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.vodafone.es/c/particulares/es/
+  type: newsroom
+  operator: Vodafone España
+  name: Vodafone España
+  website: vodafone.es
+  country: ES
+  region: europe
+  item_selector: a.ws10-m-card-rate-simple__button
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 0 datiert (0%), 50% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.saladeprensa.vodafone.es/c/sp/notas-de-prensa/
+  type: newsroom
+  operator: Vodafone España
+  name: Vodafone España
+  website: vodafone.es
+  country: ES
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 0 datiert (0%), 50% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.salt.ch/en/rss.xml
+  type: rss
+  operator: Salt Mobile
+  name: Salt Mobile
+  website: salt.ch
+  country: CH
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telenor.dk
+  type: newsroom
+  operator: Telenor Danmark
+  name: Telenor Danmark
+  website: telenor.dk
+  country: DK
+  region: europe
+  item_selector: div.carousel__item
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 13 Meldungen, davon 0 datiert (0%), 69% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.sasktel.com/sitemap/sitemap.xml
+  type: rss
+  operator: SaskTel
+  name: SaskTel
+  website: sasktel.com
+  country: CA
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.tdcbrands.dk/en/press
+  type: newsroom
+  operator: TDC / Nuuday
+  name: TDC / Nuuday
+  website: nuuday.dk
+  country: DK
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 6 datiert
+    (60%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www2.telenet.be/corporate/nl/leveranciers.html
+  type: newsroom
+  operator: Telenet
+  name: Telenet
+  website: telenet.be
+  country: BE
+  region: europe
+  item_selector: a.align-items--start
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 6 Meldungen, davon 0 datiert (0%), 50% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.turkcell.com.tr/rss
+  type: rss
+  operator: Turkcell Investor
+  name: Turkcell Investor
+  website: turkcell.com.tr
+  country: TR
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.turkcell.com.tr/rss.xml
+  type: rss
+  operator: Turkcell Investor
+  name: Turkcell Investor
+  website: turkcell.com.tr
+  country: TR
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://mediacomcable.com/rss/news
+  type: rss
+  operator: Mediacom
+  name: Mediacom
+  website: mediacomcable.com
+  country: US
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://mediacomcable.com/rss/pressreleases.xml
+  type: rss
+  operator: Mediacom
+  name: Mediacom
+  website: mediacomcable.com
+  country: US
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.t.ht.hr/en/press/press-releases
+  type: newsroom
+  operator: Hrvatski Telekom
+  name: Hrvatski Telekom
+  website: t.ht.hr
+  country: HR
+  region: europe
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 22 Meldungen, davon 22 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.t.ht.hr/en/press
+  type: newsroom
+  operator: Hrvatski Telekom
+  name: Hrvatski Telekom
+  website: t.ht.hr
+  country: HR
+  region: europe
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 5 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.vodafoneziggo.nl/api/news/
+  type: json_api
+  operator: VodafoneZiggo
+  name: VodafoneZiggo
+  website: vodafoneziggo.nl
+  country: NL
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.t-mobile.cz/blog/rss.xml
+  type: rss
+  operator: T-Mobile Czech
+  name: T-Mobile Czech
+  website: t-mobile.cz
+  country: CZ
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://newsroom.frontier.com/feed/
+  type: rss
+  operator: Frontier Communications
+  name: Frontier Communications
+  website: frontier.com
+  country: US
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://newsroom.frontier.com/comments/feed/
+  type: rss
+  operator: Frontier Communications
+  name: Frontier Communications
+  website: frontier.com
+  country: US
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://newsroom.ee.co.uk
+  type: newsroom
+  operator: EE
+  name: EE
+  website: ee.co.uk
+  country: GB
+  region: europe
+  item_selector: div.pp-block-item
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 12 Meldungen, davon 12 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telekom.si
+  type: newsroom
+  operator: Telekom Slovenije
+  name: Telekom Slovenije
+  website: telekom.si
+  country: SI
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 7 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.fastweb.it/corporate/
+  type: newsroom
+  operator: Fastweb
+  name: Fastweb
+  website: fastweb.it
+  country: IT
+  region: europe
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 20 Meldungen, davon 0 datiert (0%), 95% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.orange.be
+  type: newsroom
+  operator: Orange Belgium
+  name: Orange Belgium
+  website: orange.be
+  country: BE
+  region: europe
+  item_selector: div.obe-card
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 7 Meldungen, davon 3 datiert (43%), 57% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.windtre.it
+  type: newsroom
+  operator: WindTre
+  name: WindTre
+  website: windtre.it
+  country: IT
+  region: europe
+  item_selector: div.cmp-card-catalogo
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 14 Meldungen, davon 0 datiert (0%), 79% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.optimum.com/about-us/rss.xml
+  type: rss
+  operator: Altice USA
+  name: Altice USA
+  website: alticeusa.com
+  country: US
+  region: north_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.iliad.it
+  type: newsroom
+  operator: Iliad Italia
+  name: Iliad Italia
+  website: iliad.it
+  country: IT
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 7 Meldungen, davon 0 datiert (0%), 71% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.vivacom.bg
+  type: newsroom
+  operator: Vivacom
+  name: Vivacom
+  website: vivacom.bg
+  country: BG
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 14 Meldungen, davon 0 datiert (0%), 64% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.tele2.se
+  type: newsroom
+  operator: Tele2 Sverige
+  name: Tele2 Sverige
+  website: tele2.se
+  country: SE
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 6 Meldungen, davon 0 datiert (0%), 50% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://press.telia.se/rss/source/49926/contact_person
+  type: rss
+  operator: Telia Sverige
+  name: Telia Sverige
+  website: telia.se
+  country: SE
+  region: europe
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://spolecnost.o2.cz/tiskove-centrum/tiskove-zpravy-o2
+  type: newsroom
+  operator: O2 Czech Republic
+  name: O2 Czech Republic
+  website: o2.cz
+  country: CZ
+  region: europe
+  item_selector: a.d2-guidepost__item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://grupapolsatplus.pl/pl/biuro-prasowe/kalendarz
+  type: newsroom
+  operator: Plus / Polkomtel
+  name: Plus / Polkomtel
+  website: plus.pl
+  country: PL
+  region: europe
+  item_selector: tbody tr
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://grupapolsatplus.pl/pl/biuro-prasowe
+  type: newsroom
+  operator: Plus / Polkomtel
+  name: Plus / Polkomtel
+  website: plus.pl
+  country: PL
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 6 datiert
+    (55%), 55% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.tim.com.br/rj/rss.xml
+  type: rss
+  operator: TIM Brasil
+  name: TIM Brasil
+  website: tim.com.br
+  country: BR
+  region: latin_america
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://corporate.dna.fi/medialle/dnan-tutkimukset
+  type: newsroom
+  operator: DNA Finnland
+  name: DNA Finnland
+  website: dna.fi
+  country: FI
+  region: europe
+  item_selector: div.dna-card__content--text
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 12 Meldungen, davon 0 datiert (0%), 58% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.skygroup.sky
+  type: newsroom
+  operator: Sky UK
+  name: Sky UK
+  website: skygroup.sky
+  country: GB
+  region: europe
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.beyon.com/comments/feed/
+  type: rss
+  operator: Batelco / Beyon
+  name: Batelco / Beyon
+  website: beyon.com
+  country: BH
+  region: africa_middle_east
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.claro.com.co/personas/
+  type: newsroom
+  operator: Claro Colombia
+  name: Claro Colombia
+  website: claro.com.co
+  country: CO
+  region: latin_america
+  item_selector: div.c05_v3SldCardInf
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.safaricom.co.ke/?format=feed&type=rss
+  type: rss
+  operator: Safaricom Kenia
+  name: Safaricom Kenia
+  website: safaricom.co.ke
+  country: KE
+  region: africa_middle_east
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.t-mobile.com/news/stories
+  type: newsroom
+  operator: T-Mobile US
+  name: T-Mobile US
+  website: t-mobile.com
+  country: US
+  region: north_america
+  item_selector: article.card-grid-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 17 Meldungen, davon 17 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.t-mobile.com/news/press
+  type: newsroom
+  operator: T-Mobile US
+  name: T-Mobile US
+  website: t-mobile.com
+  country: US
+  region: north_america
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 16 Meldungen, davon 16 datiert
+    (100%), 94% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://sonatel.sn/comments/feed/
+  type: rss
+  operator: Sonatel
+  name: Sonatel
+  website: sonatel.sn
+  country: SN
+  region: africa_middle_east
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.lumen.com/en-us/news/press-resources.html
+  type: newsroom
+  operator: Lumen Technologies
+  name: Lumen Technologies
+  website: lumen.com
+  country: US
+  region: north_america
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 0 datiert
+    (0%), 90% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.personal.com.ar/tech/novedades/noticias
+  type: newsroom
+  operator: Personal / Telecom Argentina
+  name: Personal / Telecom Argentina
+  website: telecom.com.ar
+  country: AR
+  region: latin_america
+  item_selector: article
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.nos.pt/pt/institucional/media
+  type: newsroom
+  operator: NOS Portugal
+  name: NOS Portugal
+  website: nos.pt
+  country: PT
+  region: europe
+  item_selector: div.card-standard-wrapper
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 7 Meldungen, davon 1 datiert (14%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.nos.pt/pt/institucional/media/5g
+  type: newsroom
+  operator: NOS Portugal
+  name: NOS Portugal
+  website: nos.pt
+  country: PT
+  region: europe
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 0 datiert (0%), 60% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.vodacom.co.za
+  type: newsroom
+  operator: Vodacom South Africa
+  name: Vodacom South Africa
+  website: vodacom.co.za
+  country: ZA
+  region: africa_middle_east
+  item_selector: div.product-items
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://ww2.movistar.cl/
+  type: newsroom
+  operator: Movistar Chile
+  name: Movistar Chile
+  website: movistar.cl
+  country: CL
+  region: latin_america
+  item_selector: .lp-cyber-destacados-box-card
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 13 Meldungen, davon 0 datiert (0%), 54% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.tatacommunications.com/blog/rss.xml
+  type: rss
+  operator: Tata Communications
+  name: Tata Communications
+  website: tatacommunications.com
+  country: IN
+  region: asia
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.lla.com/news
+  type: newsroom
+  operator: Liberty Latin America
+  name: Liberty Latin America
+  website: lla.com
+  country: PR
+  region: latin_america
+  item_selector: td.views-field-field-news-link
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ooredoo.qa/web/ar/about-us/corporate-governance/
+  type: newsroom
+  operator: Ooredoo Qatar
+  name: Ooredoo Qatar
+  website: ooredoo.qa
+  country: QA
+  region: africa_middle_east
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 10 Meldungen, davon 4 datiert (40%), 60% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ooredoo.qa/web/en/
+  type: newsroom
+  operator: Ooredoo Qatar
+  name: Ooredoo Qatar
+  website: ooredoo.qa
+  country: QA
+  region: africa_middle_east
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 6 Meldungen, davon 2 datiert (33%), 67% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.omantel.om/ar/about-us/corporate-governance
+  type: newsroom
+  operator: Omantel
+  name: Omantel
+  website: omantel.om
+  country: OM
+  region: africa_middle_east
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 4 datiert (80%), 80% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://dito.ph/blog/rss.xml
+  type: rss
+  operator: DITO Telecommunity
+  name: DITO Telecommunity
+  website: dito.ph
+  country: PH
+  region: asia
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.fetnet.net/content/cbu/tw/index.html
+  type: newsroom
+  operator: Far EasTone
+  name: Far EasTone
+  website: fetnet.net
+  country: TW
+  region: asia
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 30 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.group.ntt/en/news/
+  type: newsroom
+  operator: NTT Group
+  name: NTT Group
+  website: group.ntt
+  country: JP
+  region: asia
+  item_selector: li.c-list-1__item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 9 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.turktelekom.com.tr
+  type: newsroom
+  operator: Turk Telekom
+  name: Turk Telekom
+  website: turktelekom.com.tr
+  country: TR
+  region: africa_middle_east
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 22 Meldungen, davon 0 datiert (0%), 55% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.ooredoo.tn/Personal/fr/
+  type: newsroom
+  operator: Ooredoo Tunisie
+  name: Ooredoo Tunisie
+  website: ooredoo.tn
+  country: TN
+  region: africa_middle_east
+  item_selector: .align-items-center
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 13 Meldungen, davon 0 datiert (0%), 77% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.antel.com.uy
+  type: newsroom
+  operator: Antel Uruguay
+  name: Antel Uruguay
+  website: antel.com.uy
+  country: UY
+  region: latin_america
+  item_selector: div.planes_cards_item
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 11 Meldungen, davon 0 datiert (0%), 73% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecom-handel.de/feed/atom
+  type: rss
+  thema: fachpresse
+  name: Telecom Handel
+  website: telecom-handel.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.universfreebox.com/rubrique/news,breve,actu-telecom/feed
+  type: rss
+  thema: fachpresse
+  name: Univers Freebox
+  website: universfreebox.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.jio.com
+  type: newsroom
+  operator: Jio Platforms
+  name: Jio Platforms
+  website: jio.com
+  country: IN
+  region: asia
+  item_selector: div.j-card
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 10 Meldungen, davon 0 datiert (0%), 60% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.telkom.co.id/sites/berita/id_ID/page/news-about-telkom-122
+  type: newsroom
+  operator: Telkom Indonesia
+  name: Telkom Indonesia
+  website: telkom.co.id
+  country: ID
+  region: asia
+  item_selector: div.news-list
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 9 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.corrierecomunicazioni.it/media/feed/
+  type: rss
+  thema: fachpresse
+  name: Telecom Italia Corriere
+  website: corrierecomunicazioni.it
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://e01-expansion.uecdn.es/rss/portada.xml
+  type: rss
+  thema: fachpresse
+  name: Expansión Tecnología
+  website: expansion.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.expansion.com/rss/googlenews/portada.xml
+  type: rss
+  thema: fachpresse
+  name: Expansión Tecnología
+  website: expansion.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://rss.golem.de/rss.php
+  type: rss
+  thema: fachpresse
+  name: Golem Telekommunikation
+  website: golem.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.optus.com.au/about/media-centre
+  type: newsroom
+  operator: Optus
+  name: Optus
+  website: optus.com.au
+  country: AU
+  region: oceania
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 12 Meldungen, davon 12 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.adslzone.net/sitemap-news.xml
+  type: rss
+  thema: fachpresse
+  name: ADSLZone
+  website: adslzone.net
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zdnet.fr/feed
+  type: rss
+  thema: fachpresse
+  name: ZDNet France
+  website: zdnet.fr
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zdnet.fr/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: fachpresse
+  name: ZDNet France
+  website: zdnet.fr
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zdnet.fr/sitemap-news.xml
+  type: rss
+  thema: fachpresse
+  name: ZDNet France
+  website: zdnet.fr
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecomreviewasia.com/comments/feed/
+  type: rss
+  thema: fachpresse
+  name: Telecom Review Asia
+  website: telecomreviewasia.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecomreviewasia.com/news/feed/
+  type: rss
+  thema: fachpresse
+  name: Telecom Review Asia
+  website: telecomreviewasia.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecomreviewafrica.com/comments/feed/
+  type: rss
+  thema: fachpresse
+  name: Telecom Review Africa
+  website: telecomreviewafrica.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.key4biz.it/News-1998-08-03-Pubblicita-Legge-n-269-del-3-agosto-1998-4203/77957/feed/
+  type: rss
+  thema: fachpresse
+  name: Key4biz
+  website: key4biz.it
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://telesintese.com.br/comments/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSíntese
+  website: telesintese.com.br
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.communicationstoday.co.in/comments/feed/
+  type: rss
+  thema: fachpresse
+  name: Communications Today India
+  website: communicationstoday.co.in
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.communicationstoday.co.in/press-release-israels-coralogix-expands-its-india-operations-with-aws-regional-server-support/feed/
+  type: rss
+  thema: fachpresse
+  name: Communications Today India
+  website: communicationstoday.co.in
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.communicationstoday.co.in/media-and-broadcast-in-2025-on-crossroads-of-technology-and-regulation/feed/
+  type: rss
+  thema: fachpresse
+  name: Communications Today India
+  website: communicationstoday.co.in
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://jazz.com.pk/media-center
+  type: newsroom
+  operator: Jazz Pakistan
+  name: Jazz Pakistan
+  website: jazz.com.pk
+  country: PK
+  region: asia
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 97% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.teltarif.de/sitemap-news.xml
+  type: rss
+  thema: fachpresse
+  name: teltarif
+  website: teltarif.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.5gradar.com/feeds.xml
+  type: rss
+  thema: fachpresse
+  name: 5G Radar
+  website: 5gradar.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.5gradar.com/feeds/articletype/news
+  type: rss
+  thema: fachpresse
+  name: 5G Radar
+  website: 5gradar.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://web.telecompaper.com/sitemap-news.xml
+  type: rss
+  thema: fachpresse
+  name: Nordic Telecom News
+  website: telecompaper.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.mobileworldlive.com/rss
+  type: rss
+  thema: fachpresse
+  name: Mobile World Live Asia
+  website: mobileworldlive.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: http://capacityglobal.com/feed/
+  type: rss
+  thema: fachpresse
+  name: Capacity Media
+  website: capacitymedia.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: http://capacityglobal.com/news/feed/
+  type: rss
+  thema: fachpresse
+  name: Capacity Media
+  website: capacitymedia.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.techcentral.co.za/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: fachpresse
+  name: TechCentral SA
+  website: techcentral.co.za
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://bbcmag.com/comments/feed/
+  type: rss
+  thema: fachpresse
+  name: Broadband Communities
+  website: bbcmag.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.u.com.my/en/about-us/newsroom/press-releases
+  type: newsroom
+  operator: U Mobile
+  name: U Mobile
+  website: u.com.my
+  country: MY
+  region: asia
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 97% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/news/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/blog/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/en/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/de/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/press/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/presse/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/media/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/newsroom/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesemana.com/press-releases/feed/
+  type: rss
+  thema: fachpresse
+  name: TeleSemana
+  website: telesemana.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://rethinkresearch.biz/feed/
+  type: rss
+  thema: fachpresse
+  name: Rethink Research
+  website: rethinkresearch.biz
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://rethinkresearch.biz/news/feed/
+  type: rss
+  thema: fachpresse
+  name: Rethink Research
+  website: rethinkresearch.biz
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://rethinkresearch.biz/press-releases/feed/
+  type: rss
+  thema: fachpresse
+  name: Rethink Research
+  website: rethinkresearch.biz
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.policytracker.com/blog/feed/
+  type: rss
+  thema: fachpresse
+  name: Policy Tracker
+  website: policytracker.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.agcom.it/rss.xml
+  type: rss
+  thema: regulierung
+  name: AGCOM
+  website: agcom.it
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.agcom.it/en/rss.xml
+  type: rss
+  thema: regulierung
+  name: AGCOM
+  website: agcom.it
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecomstechnews.com/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: fachpresse
+  name: Telecoms Tech News
+  website: telecomstechnews.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Aktuelles_neu.xml
+  type: rss
+  thema: regulierung
+  name: Bundesnetzagentur
+  website: bundesnetzagentur.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bundesnetzagentur.de/rss/news
+  type: rss
+  thema: regulierung
+  name: Bundesnetzagentur
+  website: bundesnetzagentur.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bundesnetzagentur.de/rss/pressreleases.xml
+  type: rss
+  thema: regulierung
+  name: Bundesnetzagentur
+  website: bundesnetzagentur.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gov.br/rss.xml
+  type: rss
+  thema: regulierung
+  name: ANATEL Brasilien
+  website: gov.br
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gov.br/atom.xml
+  type: rss
+  thema: regulierung
+  name: ANATEL Brasilien
+  website: gov.br
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gov.br/en/rss.xml
+  type: rss
+  thema: regulierung
+  name: ANATEL Brasilien
+  website: gov.br
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecomtv.com/content/news/
+  type: newsroom
+  thema: fachpresse
+  name: TelecomTV
+  website: telecomtv.com
+  item_selector: h4.card-title
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 27 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.berec.europa.eu/en/rss.xml
+  type: rss
+  thema: regulierung
+  name: BEREC
+  website: berec.europa.eu
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.connect.de/news/
+  type: newsroom
+  thema: fachpresse
+  name: connect
+  website: connect.de
+  item_selector: a.wkTeaser__introwrapper
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 26 Meldungen, davon 26 datiert
+    (100%), 96% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://dialog.lk/news-media-announcements-archive
+  type: newsroom
+  operator: Dialog Axiata
+  name: Dialog Axiata
+  website: dialog.lk
+  country: LK
+  region: asia
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 30 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://dialog.lk/
+  type: newsroom
+  operator: Dialog Axiata
+  name: Dialog Axiata
+  website: dialog.lk
+  country: LK
+  region: asia
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 10 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.lemondeinformatique.fr/actualites/speciale-tests-270.html
+  type: newsroom
+  thema: fachpresse
+  name: Le Monde Informatique
+  website: lemondeinformatique.fr
+  item_selector: article.item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 9 datiert
+    (90%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.lemondeinformatique.fr//actualites/chroniques.html
+  type: newsroom
+  thema: fachpresse
+  name: Le Monde Informatique
+  website: lemondeinformatique.fr
+  item_selector: article.item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 22 Meldungen, davon 15 datiert
+    (68%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.axiata.com/media
+  type: newsroom
+  operator: Axiata Group
+  name: Axiata Group
+  website: axiata.com
+  country: MY
+  region: asia
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 24 Meldungen, davon 23 datiert (96%), 96% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.etsi.org/feed/
+  type: rss
+  thema: regulierung
+  name: ETSI
+  website: etsi.org
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.etsi.org/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: regulierung
+  name: ETSI
+  website: etsi.org
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gsma.com/feed/
+  type: rss
+  thema: regulierung
+  name: GSMA
+  website: gsma.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gsma.com/news/feed/
+  type: rss
+  thema: regulierung
+  name: GSMA
+  website: gsma.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.convergencialatina.com/Media-Satellite
+  type: newsroom
+  thema: fachpresse
+  name: Convergencia Latina
+  website: convergencialatina.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 0 datiert
+    (0%), 55% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.lightreading.com
+  type: newsroom
+  thema: fachpresse
+  name: Light Reading Europe
+  website: lightreading.com
+  item_selector: div.VerticalCard
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 16 Meldungen, davon 14 datiert (88%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bipt.be/rss.xml
+  type: rss
+  thema: regulierung
+  name: BIPT Belgien
+  website: bipt.be
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.vatm.de/comments/feed/
+  type: rss
+  thema: regulierung
+  name: VATM
+  website: vatm.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.uke.gov.pl
+  type: newsroom
+  thema: regulierung
+  name: UKE Polen
+  website: uke.gov.pl
+  item_selector: div.news
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.bitkom.org/rss.xml
+  type: rss
+  thema: regulierung
+  name: Bitkom
+  website: bitkom.org
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.o-ran.org/blog/rss.xml
+  type: rss
+  thema: regulierung
+  name: O-RAN Alliance
+  website: o-ran.org
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bakom.admin.ch/en
+  type: newsroom
+  thema: regulierung
+  name: BAKOM Schweiz
+  website: bakom.admin.ch
+  item_selector: div.card__content
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 10 Meldungen, davon 9 datiert (90%), 50% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.icasa.org.za/news
+  type: newsroom
+  thema: regulierung
+  name: ICASA Suedafrika
+  website: icasa.org.za
+  item_selector: div.news
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 6 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ntia.gov/press-release/2026/ntia-launches-global-call-action-6g-leadership-and-security
+  type: newsroom
+  thema: regulierung
+  name: NTIA
+  website: ntia.gov
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ntia.gov/press-release/2026/administration-clears-plan-44-ghz-study-major-milestone-6g-leadership
+  type: newsroom
+  thema: regulierung
+  name: NTIA
+  website: ntia.gov
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.3gpp.org/?format=feed&type=rss
+  type: rss
+  thema: regulierung
+  name: 3GPP
+  website: 3gpp.org
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ncta.com/feed
+  type: rss
+  thema: regulierung
+  name: NCTA
+  website: ncta.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.amdocs.com/rss.xml
+  type: rss
+  thema: netzausruester
+  name: Amdocs
+  website: amdocs.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.traficom.fi/en/news
+  type: newsroom
+  thema: regulierung
+  name: Traficom Finnland
+  website: traficom.fi
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 15 Meldungen, davon 0 datiert
+    (0%), 73% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.pts.se/nyheter-och-pressmeddelanden
+  type: newsroom
+  thema: regulierung
+  name: PTS Schweden
+  website: pts.se
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 8 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.broadband-forum.org/news
+  type: newsroom
+  thema: regulierung
+  name: Broadband Forum
+  website: broadband-forum.org
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://nkom.no/presse
+  type: newsroom
+  thema: regulierung
+  name: Nkom Norwegen
+  website: nkom.no
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 87% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://jmawireless.com/comments/feed/
+  type: rss
+  thema: netzausruester
+  name: JMA Wireless
+  website: jmawireless.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zdnet.com
+  type: newsroom
+  thema: fachpresse
+  name: ZDNet Deutschland
+  website: zdnet.de
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 0 datiert (0%), 90% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.zdnet.com/topic/social-media/
+  type: newsroom
+  thema: fachpresse
+  name: ZDNet Deutschland
+  website: zdnet.de
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 30 Meldungen, davon 0 datiert (0%), 93% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.connecteurope.org/news
+  type: newsroom
+  thema: regulierung
+  name: Connect Europe
+  website: connecteurope.org
+  item_selector: article.large-teaser-enabled
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 6 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.comcom.govt.nz/news-and-media/news-and-events/
+  type: newsroom
+  thema: regulierung
+  name: ComCom Neuseeland
+  website: comcom.govt.nz
+  item_selector: div.card__content
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.comcom.govt.nz/news-and-media/events/
+  type: newsroom
+  thema: regulierung
+  name: ComCom Neuseeland
+  website: comcom.govt.nz
+  item_selector: h3.card__title
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 5 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.acm.nl/en/news
+  type: newsroom
+  thema: regulierung
+  name: ACM Niederlande
+  website: acm.nl
+  item_selector: h3.m-card__title
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://connecteurope.org/news/connectnews
+  type: newsroom
+  thema: regulierung
+  name: ETNO
+  website: etno.eu
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 8 Meldungen, davon 8 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.rtr.at/medien/aktuelles/neuigkeiten/Uebersicht.de.html
+  type: newsroom
+  thema: regulierung
+  name: RTR Österreich
+  website: rtr.at
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 12 Meldungen, davon 10 datiert
+    (83%), 83% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.rtr.at/medien/presse/Startseite1.de.html
+  type: newsroom
+  thema: regulierung
+  name: RTR Österreich
+  website: rtr.at
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 29 Meldungen, davon 13 datiert
+    (45%), 66% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telecominfraproject.com
+  type: newsroom
+  thema: regulierung
+  name: Telecom Infra Project
+  website: telecominfraproject.com
+  item_selector: div.post-list-item-wrapper
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 0 datiert (0%), 88% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.nokia.com/newsroom/
+  type: newsroom
+  thema: netzausruester
+  name: Nokia
+  website: nokia.com
+  item_selector: div.pp-block-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 6 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.imda.gov.sg/resources/press-releases-factsheets-and-speeches
+  type: newsroom
+  thema: regulierung
+  name: IMDA Singapur
+  website: imda.gov.sg
+  item_selector: div.teaser-card
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 9 Meldungen, davon 9 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.imda.gov.sg
+  type: newsroom
+  thema: regulierung
+  name: IMDA Singapur
+  website: imda.gov.sg
+  item_selector: article.thumbnail-card-portrait
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 5 datiert (100%), 80% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ncc.gov.ng
+  type: newsroom
+  thema: regulierung
+  name: NCC Nigeria
+  website: ncc.gov.ng
+  item_selector: div.carousel-item
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 1 datiert (20%), 80% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.heise.de/newsticker
+  type: newsroom
+  thema: fachpresse
+  name: heise online
+  website: heise.de
+  item_selector: div.bg-card
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 16 datiert
+    (53%), 50% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://themediaonline.co.za/web-stories/feed/
+  type: rss
+  thema: netzausruester
+  name: Parallel Wireless
+  website: parallelwireless.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.netcracker.com/news/press-releases
+  type: newsroom
+  thema: netzausruester
+  name: Netcracker
+  website: netcracker.com
+  item_selector: article
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 20 Meldungen, davon 20 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.huawei.com/en/media-center
+  type: newsroom
+  thema: netzausruester
+  name: Huawei Carrier
+  website: huawei.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 18 Meldungen, davon 4 datiert
+    (22%), 78% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.wi-fi.org/press-releases
+  type: newsroom
+  thema: regulierung
+  name: Wi-Fi Alliance
+  website: wi-fi.org
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.garmin.com/en-US/newsroom/feed/
+  type: rss
+  thema: geraete
+  name: Garmin
+  website: garmin.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.garmin.com/en-US/newsroom/comments/feed/
+  type: rss
+  thema: geraete
+  name: Garmin
+  website: garmin.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://ast-science.com/comments/feed/
+  type: rss
+  thema: satellit
+  name: AST SpaceMobile
+  website: ast-science.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.fairphone.com/feed
+  type: rss
+  thema: geraete
+  name: Fairphone
+  website: fairphone.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.fairphone.com/de/feed
+  type: rss
+  thema: geraete
+  name: Fairphone
+  website: fairphone.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.trai.gov.in/notifications/press-release
+  type: newsroom
+  thema: regulierung
+  name: TRAI Indien
+  website: trai.gov.in
+  item_selector: div.views-view-grid__item-inner
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 30 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.trai.gov.in/broadcasting/other-initiatives/media-ownership
+  type: newsroom
+  thema: regulierung
+  name: TRAI Indien
+  website: trai.gov.in
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 0 datiert
+    (0%), 56% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.oneplus.com/us/rss.xml
+  type: rss
+  thema: geraete
+  name: OnePlus
+  website: oneplus.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.adtran.com/en/newsroom
+  type: newsroom
+  thema: netzausruester
+  name: Adtran
+  website: adtran.com
+  item_selector: article
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 11 datiert
+    (100%), 73% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.aboutamazon.com/rss/feed.rss
+  type: rss
+  thema: satellit
+  name: Amazon Leo / Kuiper
+  website: aboutamazon.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.itu.int/en/mediacentre/pages/all-pr.aspx
+  type: newsroom
+  thema: regulierung
+  name: ITU
+  website: itu.int
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 10 Meldungen, davon 10 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.itu.int/web/pp-18/en/page/105-media
+  type: newsroom
+  thema: regulierung
+  name: ITU
+  website: itu.int
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 16 Meldungen, davon 11 datiert (69%), 94% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesat.com/feed/
+  type: rss
+  thema: satellit
+  name: Telesat
+  website: telesat.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.telesat.com/comments/feed/
+  type: rss
+  thema: satellit
+  name: Telesat
+  website: telesat.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.commscope.com/news-center/
+  type: newsroom
+  thema: netzausruester
+  name: Casa Systems
+  website: casa-systems.com
+  item_selector: div.grouped-content-child-item-body
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 22 Meldungen, davon 22 datiert
+    (100%), 82% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://lynk.world/feed/
+  type: rss
+  thema: satellit
+  name: Lynk Global
+  website: lynk.world
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://lynk.world/comments/feed/
+  type: rss
+  thema: satellit
+  name: Lynk Global
+  website: lynk.world
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://research.ibm.com/rss
+  type: rss
+  thema: ki
+  name: IBM Research
+  website: research.ibm.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.mavenir.com/newsroom/news/
+  type: newsroom
+  thema: netzausruester
+  name: Mavenir
+  website: mavenir.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 0 datiert
+    (0%), 82% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.mavenir.com/newsroom/
+  type: newsroom
+  thema: netzausruester
+  name: Mavenir
+  website: mavenir.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 0 datiert
+    (0%), 82% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.oppo.com/en/
+  type: newsroom
+  thema: geraete
+  name: Oppo
+  website: oppo.com
+  item_selector: div.carousel_2-item
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.viavisolutions.com/en-us/corporate/news-and-events/news
+  type: newsroom
+  thema: netzausruester
+  name: Viavi Solutions
+  website: viavisolutions.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 70% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.databricks.com/feed
+  type: rss
+  thema: ki
+  name: Databricks
+  website: databricks.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://stability.ai/news-updates?format=rss
+  type: rss
+  thema: ki
+  name: Stability AI
+  website: stability.ai
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://stability.ai/press?format=rss
+  type: rss
+  thema: ki
+  name: Stability AI
+  website: stability.ai
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.qorvo.com/about/news-events/news-releases
+  type: newsroom
+  thema: chips
+  name: Qorvo
+  website: qorvo.com
+  item_selector: article.StandardResultCard_result-item__tFA4Q
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.salesforce.com/news/feed/?bc=OTH
+  type: rss
+  thema: ki
+  name: Salesforce AI
+  website: salesforce.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.salesforce.com/news/comments/feed/?bc=OTH
+  type: rss
+  thema: ki
+  name: Salesforce AI
+  website: salesforce.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.marvell.com/company/newsroom/press-releases.html
+  type: newsroom
+  thema: chips
+  name: Marvell
+  website: marvell.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.cellnex.com/home/feed/
+  type: rss
+  thema: infrastruktur
+  name: Cellnex
+  website: cellnex.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.cellnex.com/nl-en/home/feed/
+  type: rss
+  thema: infrastruktur
+  name: Cellnex
+  website: cellnex.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://hub.radisys.com/press-release
+  type: newsroom
+  thema: netzausruester
+  name: Radisys
+  website: radisys.com
+  item_selector: li.tile
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 20 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://investors.viasat.com/press-releases
+  type: newsroom
+  thema: satellit
+  name: Viasat
+  website: viasat.com
+  item_selector: article
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://news.samsung.com/us/news/
+  type: newsroom
+  thema: netzausruester
+  name: Samsung Networks
+  website: samsung.com
+  item_selector: div.post-details
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 12 Meldungen, davon 12 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://aws.amazon.com/about-aws/whats-new/recent/feed/
+  type: rss
+  thema: ki
+  name: AWS Machine Learning
+  website: aws.amazon.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.apple.com/newsroom/
+  type: newsroom
+  thema: geraete
+  name: Apple Newsroom
+  website: apple.com
+  item_selector: li.ac-gf-directory-column-section-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 0 datiert
+    (0%), 60% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.eutelsat.com/media-press/media-centre
+  type: newsroom
+  thema: satellit
+  name: Eutelsat / OneWeb
+  website: eutelsat.com
+  item_selector: div.card
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 14 Meldungen, davon 5 datiert
+    (36%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.eutelsat.com/media-press/events
+  type: newsroom
+  thema: satellit
+  name: Eutelsat / OneWeb
+  website: eutelsat.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 13 Meldungen, davon 0 datiert
+    (0%), 54% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zte.com.cn/global/
+  type: newsroom
+  thema: netzausruester
+  name: ZTE
+  website: zte.com.cn
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 7 Meldungen, davon 6 datiert (86%), 86% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.zte.com.cn/global/about/news.html
+  type: newsroom
+  thema: netzausruester
+  name: ZTE
+  website: zte.com.cn
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 2 datiert (25%), 88% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://www.micron.com/about/press/news
+  type: newsroom
+  thema: chips
+  name: Micron
+  website: micron.com
+  item_selector: div.cmp-teaser__tile
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 12 Meldungen, davon 12 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.vantagetowers.com/rss.xml
+  type: rss
+  thema: infrastruktur
+  name: Vantage Towers
+  website: vantagetowers.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.vantagetowers.com/en/rss.xml
+  type: rss
+  thema: infrastruktur
+  name: Vantage Towers
+  website: vantagetowers.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.zayo.com/comments/feed/
+  type: rss
+  thema: infrastruktur
+  name: Zayo
+  website: zayo.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.esa.int/Newsroom
+  type: newsroom
+  thema: satellit
+  name: ESA Telecommunications
+  website: esa.int
+  item_selector: .story
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 5 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://global.fujitsu/en-global/newsroom/perspectives
+  type: newsroom
+  thema: netzausruester
+  name: Fujitsu Network
+  website: fujitsu.com
+  item_selector: div.js-more-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 17 Meldungen, davon 1 datiert
+    (6%), 94% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ses.com/news
+  type: newsroom
+  thema: satellit
+  name: Intelsat
+  website: intelsat.com
+  item_selector: div.card__info
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 12 Meldungen, davon 12 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://investor.iridium.com/press-releases
+  type: newsroom
+  thema: satellit
+  name: Iridium
+  website: iridium.com
+  item_selector: li.wd_item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.iridium.com/company/news-media
+  type: newsroom
+  thema: satellit
+  name: Iridium
+  website: iridium.com
+  item_selector: div.press-releases-card-content
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 3 datiert
+    (50%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ses.com/news/newsrooms
+  type: newsroom
+  thema: satellit
+  name: SES
+  website: ses.com
+  item_selector: div.card__info
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 7 Meldungen, davon 7 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.mediatek.com/press-room
+  type: newsroom
+  thema: chips
+  name: MediaTek
+  website: mediatek.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 9 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.inwit.it/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: infrastruktur
+  name: INWIT
+  website: inwit.it
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.deutsche-glasfaser.de/blog/feed/
+  type: rss
+  thema: infrastruktur
+  name: Deutsche Glasfaser
+  website: deutsche-glasfaser.de
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.thalesgroup.com/en/rss.xml
+  type: rss
+  thema: mvno
+  name: Thales Digital Identity
+  website: thalesgroup.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.transatel.com/de/feed/
+  type: rss
+  thema: mvno
+  name: Transatel
+  website: transatel.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.transatel.com/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: mvno
+  name: Transatel
+  website: transatel.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://investors.globalstar.com/news-releases
+  type: newsroom
+  thema: satellit
+  name: Globalstar
+  website: globalstar.com
+  item_selector: article.node--type-nir-news
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 9 Meldungen, davon 9 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/blog/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/en/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/de/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/press/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/presse/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/media/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://vantage-dc.com/newsroom/feed/
+  type: rss
+  thema: infrastruktur
+  name: Vantage Data Centers
+  website: vantage-dc.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.skylo.tech/newsroom
+  type: newsroom
+  thema: satellit
+  name: Skylo
+  website: skylo.tech
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 24 Meldungen, davon 24 datiert
+    (100%), 96% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bics.com/wp-json/wp/v2/posts?per_page=25&_embed=1
+  type: json_api
+  thema: mvno
+  name: BICS
+  website: bics.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.bics.com/newsroom/feed/
+  type: rss
+  thema: mvno
+  name: BICS
+  website: bics.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.twilio.com/en-us/blog.feed.xml
+  type: rss
+  thema: mvno
+  name: Twilio
+  website: twilio.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.infobip.com/feed
+  type: rss
+  thema: mvno
+  name: Infobip
+  website: infobip.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.infobip.com/blog/feed
+  type: rss
+  thema: mvno
+  name: Infobip
+  website: infobip.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.infobip.com/de/feed
+  type: rss
+  thema: mvno
+  name: Infobip
+  website: infobip.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ais.th/business/news-and-activity
+  type: newsroom
+  operator: AIS Thailand
+  name: AIS Thailand
+  website: ais.th
+  country: TH
+  region: asia
+  item_selector: .item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 73% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.ais.th/business/news-and-activity/articles
+  type: newsroom
+  operator: AIS Thailand
+  name: AIS Thailand
+  website: ais.th
+  country: TH
+  region: asia
+  item_selector: .item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://sinch.com/feed/
+  type: rss
+  thema: mvno
+  name: Sinch
+  website: sinch.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://sinch.com/news/feed/
+  type: rss
+  thema: mvno
+  name: Sinch
+  website: sinch.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://sinch.com/de/feed/
+  type: rss
+  thema: mvno
+  name: Sinch
+  website: sinch.com
+  begruendung: mechanisch gefunden - noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://cohere.com/newsroom
+  type: newsroom
+  thema: ki
+  name: Cohere
+  website: cohere.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 25 Meldungen, davon 14 datiert
+    (56%), 56% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://eunetworks.com/news/
+  type: newsroom
+  thema: infrastruktur
+  name: euNetworks
+  website: eunetworks.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 11 Meldungen, davon 11 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.1global.com
+  type: newsroom
+  thema: mvno
+  name: Truphone / 1GLOBAL
+  website: 1global.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 6 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://cityfibre.com/news
+  type: newsroom
+  thema: infrastruktur
+  name: CityFibre
+  website: cityfibre.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 2 datiert
+    (40%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.digitalrealty.com/about/newsroom
+  type: newsroom
+  thema: infrastruktur
+  name: Digital Realty
+  website: digitalrealty.com
+  item_selector: div.item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 0 datiert
+    (0%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.honor.com/global/news/
+  type: newsroom
+  thema: geraete
+  name: Honor
+  website: hihonor.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 8 datiert
+    (80%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.honor.com/global/news/honor-and-arri-collaboration/
+  type: newsroom
+  thema: geraete
+  name: Honor
+  website: hihonor.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 3 datiert
+    (60%), 80% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.openreach.com/news
+  type: newsroom
+  thema: infrastruktur
+  name: Openreach
+  website: openreach.com
+  item_selector: div.pp-block-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 6 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.syniverse.com/news-and-events
+  type: newsroom
+  thema: mvno
+  name: Syniverse
+  website: syniverse.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 16 Meldungen, davon 16 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.heliostowers.com/media/press-releases
+  type: newsroom
+  thema: infrastruktur
+  name: Helios Towers
+  website: heliostowers.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 6 Meldungen, davon 0 datiert
+    (0%), 50% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://newsroom.equinix.com/press-releases-india
+  type: newsroom
+  thema: infrastruktur
+  name: Equinix
+  website: equinix.com
+  item_selector: li.wd_item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 10 Meldungen, davon 10 datiert
+    (100%), 90% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://gigs.com/press
+  type: newsroom
+  thema: mvno
+  name: Gigs
+  website: gigs.com
+  item_selector: null
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 30 Meldungen, davon 0 datiert
+    (0%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.gi-de.com/en/
+  type: newsroom
+  thema: mvno
+  name: Giesecke+Devrient
+  website: gi-de.com
+  item_selector: a.b_spotlight-teaser__teaser
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 5 Meldungen, davon 0 datiert (0%), 100% artikelhafte Adressen; noch nicht
+    abgenommen
+  herkunft: Firmenliste
+- url: https://newsroom.amd.com
+  type: newsroom
+  thema: chips
+  name: AMD
+  website: amd.com
+  item_selector: li
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 15 Meldungen, davon 15 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.amd.com/en.html
+  type: newsroom
+  thema: chips
+  name: AMD
+  website: amd.com
+  item_selector: div.card-body
+  begruendung: HTML-Newsroom ohne Feed (kein Pressepfad in der URL - Beifang) - im
+    Suchlauf 8 Meldungen, davon 8 datiert (100%), 100% artikelhafte Adressen; noch
+    nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.tatacommunications.com/press-release
+  type: newsroom
+  thema: mvno
+  name: Kaleyra
+  website: kaleyra.com
+  item_selector: div.item-content
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 5 Meldungen, davon 5 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
+- url: https://www.colt.net/about/newsroom
+  type: newsroom
+  thema: infrastruktur
+  name: Colt Technology
+  website: colt.net
+  item_selector: div.w-dyn-item
+  begruendung: HTML-Newsroom ohne Feed - im Suchlauf 8 Meldungen, davon 8 datiert
+    (100%), 100% artikelhafte Adressen; noch nicht abgenommen
+  herkunft: Firmenliste
