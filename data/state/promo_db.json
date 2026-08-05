@@ -497,8 +497,8 @@
    "image_url": "https://media.medion.com/cms/medion/alditalkde/alditalk_og.jpg",
    "first_seen": "2026-07-27",
    "last_verified": "2026-07-27",
-   "status": "evtl. ausgelaufen",
-   "missed_checks": 1,
+   "status": "ausgelaufen",
+   "missed_checks": 2,
    "judged": {
     "lever": 0,
     "depth": 1,
@@ -522,7 +522,29 @@
    "score_reason": "Der Preisvorteil von zehn Euro bei der Kinder-Smartwatch ist überschaubar und die Tarifoption stellt keinen eigenständigen Wechselanreiz dar.",
    "scored_at": "2026-08-05",
    "highlight": false,
-   "stale_since": "2026-08-04"
+   "stale_since": "2026-08-04",
+   "ended_since": "2026-08-05"
+  },
+  {
+   "id": "1b770169ec2f1389",
+   "brand": "ALDI TALK",
+   "tier": 2,
+   "headline": "imoo Kinder-Smartwatches mit 2 kostenlosen Kinogutscheinen",
+   "description": "Kaufe eine imoo Watch Phone (Modell Z1, Z3 oder Z7) und erhalte nach Registrierung 2 MovieChoice-Kinogutscheine. Preise: ab 89,99 € (Z1), 129,00 € (Z3), 185,00 € (Z7).",
+   "valid_until": "16.08.2026",
+   "url": "https://www.alditalk.de/angebote",
+   "image_url": "https://media.medion.com/cms/medion/alditalkde/alditalk_og.jpg",
+   "first_seen": "2026-08-05",
+   "last_verified": "2026-08-05",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 2,
+    "momentum": 0,
+    "campaign": 3
+   },
+   "highlight": false
   },
   {
    "id": "0f8b975bbff19454",
