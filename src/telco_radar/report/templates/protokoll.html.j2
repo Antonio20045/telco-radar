@@ -13,6 +13,7 @@
 {% if run %}
 <div class="tile-grid">
   <div class="tile"><b>{{ run.source_summary.total }}</b><span>Quellen abgefragt</span></div>
+  {% if run.source_summary.get('quarantaene') %}<div class="tile"><b>{{ run.source_summary.quarantaene }}</b><span>stillgelegt (liefern seit Wochen nichts)</span></div>{% endif %}
   <div class="tile accent"><b>{{ run.source_summary.ok }} / {{ run.source_summary.empty }} / {{ run.source_summary.failed }}</b><span>ok / leer / fehlgeschlagen</span></div>
   <div class="tile"><b>{{ (run.duration_seconds / 60) | round(1) }} min</b><span>Laufzeit ({{ date_de }})</span></div>
   <div class="tile tint"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen bewertet</span></div>
@@ -69,7 +70,7 @@
     </div>
     {% endfor %}
   </div>
-  <p class="card-sub" style="margin-top:16px">Von {{ run.source_summary.total }} abgefragten Quellen: {{ run.source_summary.ok }} lieferten neue Meldungen, {{ run.source_summary.empty }} waren leer, {{ run.source_summary.failed }} nicht erreichbar (meist temporäre Fehler).</p>
+  <p class="card-sub" style="margin-top:16px">Von {{ run.source_summary.total }} abgefragten Quellen: {{ run.source_summary.ok }} lieferten neue Meldungen, {{ run.source_summary.empty }} waren leer, {{ run.source_summary.failed }} nicht erreichbar (meist temporäre Fehler).{% if run.source_summary.get('quarantaene') %} Zusätzlich wurden {{ run.source_summary.quarantaene }} Quellen gar nicht erst abgefragt: sie haben in mehreren Läufen hintereinander nichts geliefert und sind automatisch stillgelegt. Sie werden regelmäßig erneut geprüft und kehren zurück, sobald sie wieder liefern.{% endif %}</p>
 </div>
 
 <details class="evidence" style="margin-top:24px">
@@ -79,6 +80,7 @@
       <span class="s"><span class="sdot ok"></span>geliefert ({{ run.source_summary.ok }})</span>
       <span class="s"><span class="sdot empty"></span>keine neuen Meldungen ({{ run.source_summary.empty }})</span>
       <span class="s"><span class="sdot fail"></span>nicht erreichbar ({{ run.source_summary.failed }})</span>
+      {% if run.source_summary.get('quarantaene') %}<span class="s"><span class="sdot empty"></span>stillgelegt ({{ run.source_summary.quarantaene }})</span>{% endif %}
     </div>
     <table class="src-table">
       <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>

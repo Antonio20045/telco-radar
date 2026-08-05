@@ -54,7 +54,8 @@ def collect_source(source: Source, region: str, operator: str | None = None,
     return _collect_source(source, region, operator, origin, http_cfg or {})
 
 
-def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item], list[dict]]:
+def collect_all(cfg: Config, max_workers: int | None = None,
+                register=None) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing
@@ -93,6 +94,31 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
     for src in cfg.tech_sources:
         if src.crawlable:
             jobs.append((src, src.theme, src.name, "tech_watch"))
+
+    # Stillgelegte Quellen ueberspringen. Das ist bei 1000 Quellen kein
+    # Komfort, sondern Laufzeit: eine tote Quelle, die in jeden Timeout
+    # laeuft, kostet mehr als eine lebende. Der Bewaehrungsabruf (siehe
+    # quellen_register.py) holt sie regelmaessig zurueck in die Liste.
+    uebersprungen: list[dict] = []
+    if register is not None:
+        aktiv = []
+        for job in jobs:
+            src = job[0]
+            if register.wird_abgerufen(src.url):
+                aktiv.append(job)
+            else:
+                e = register.eintrag(src.url)
+                uebersprungen.append({
+                    "name": job[2] or src.name, "operator": job[2],
+                    "region": job[1], "url": src.url, "kind": src.kind,
+                    "label": src.label or src.kind, "origin": job[3],
+                    "status": "quarantaene", "count": 0, "seconds": 0.0,
+                    "error": e.quarantaene_grund if e else "",
+                })
+        if uebersprungen:
+            log.info("Quarantaene: %d von %d Quellen werden nicht abgerufen",
+                     len(uebersprungen), len(jobs))
+        jobs = aktiv
 
     def _timed(src, region, operator, origin):
         """Wanduhr je Quelle - ohne sie ist nicht zu sehen, WELCHE Quelle die
@@ -147,6 +173,7 @@ def collect_all(cfg: Config, max_workers: int | None = None) -> tuple[list[Item]
                          src.url[:45], len(got), dauer)
             results.append(rec)
 
+    results.extend(uebersprungen)
     wanduhr = time.monotonic() - t_start
     arbeit = sum(r.get("seconds", 0.0) for r in results)
     log.info("Sammelphase: %d Quellen in %.1fs Wanduhr (%.1fs Arbeit, Faktor "

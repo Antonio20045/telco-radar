@@ -30,6 +30,7 @@ from .collect import collect_all, tag_news_regions
 from .config import is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
+from .quellen_register import Quellenregister, quellen_der_config
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -215,6 +216,9 @@ def run(root: Path, use_llm: bool | None = None,
     # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
     max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
 
+    today = date.today()
+    today_iso = today.isoformat()
+
     state_dir = root / "data" / "state"
     reports_dir = root / "data" / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -226,16 +230,20 @@ def run(root: Path, use_llm: bool | None = None,
 
     # ------------------------------------------------------------- collect
     tc = time.monotonic()
-    items, source_results = collect_all(cfg)
+    register = Quellenregister(state_dir / "quellen_register.json")
+    items, source_results = collect_all(cfg, register=register)
     tag_news_regions(items, cfg.operators)
     failed = [r["url"] for r in source_results if r["status"] == "fail"]
     n_ok = sum(1 for r in source_results if r["status"] == "ok")
     n_empty = sum(1 for r in source_results if r["status"] == "empty")
+    n_quarantaene = sum(1 for r in source_results if r["status"] == "quarantaene")
     n_fail = len(failed)
     phase("Sammeln", time.monotonic() - tc,
-          f"{len(source_results)} Quellen abgefragt, {len(items)} Meldungen gefunden")
-    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen)",
-             len(items), n_ok, n_empty, n_fail)
+          f"{len(source_results) - n_quarantaene} Quellen abgefragt, "
+          f"{len(items)} Meldungen gefunden"
+          + (f", {n_quarantaene} stillgelegt" if n_quarantaene else ""))
+    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen / "
+             "%d stillgelegt)", len(items), n_ok, n_empty, n_fail, n_quarantaene)
 
     # -------------------------------------------------------------- dedupe
     td = time.monotonic()
@@ -253,6 +261,14 @@ def run(root: Path, use_llm: bool | None = None,
         neu_je_quelle[i.source_url] += 1
     for rec in source_results:
         rec["new"] = neu_je_quelle.get(rec["url"], 0)
+    # Erst JETZT verbuchen: die Quarantaene entscheidet an "hat geliefert",
+    # und die Zahl der neuen Meldungen steht erst nach der Delta-Schicht fest.
+    register_zusammenfassung = register.verbuche_lauf(
+        source_results, today_iso,
+        quarantaene_nach=int(cfg.settings.get(
+            "quellen_quarantaene_nach_laeufen", 6) or 6),
+        quellen_der_config=quellen_der_config(cfg))
+    register.speichern()
     phase("Nur Neues", time.monotonic() - td,
           f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)")
     log.info("Novelty filter: %d new items (seen store: %d known ids)",
@@ -515,7 +531,6 @@ def run(root: Path, use_llm: bool | None = None,
     # deshalb ein eigener Editorial-Schritt und nicht nur eine Umformatierung
     # der darunterstehenden Move-Liste. Ohne LLM bleibt die Seite mit einem
     # quellengebundenen Regelbericht nutzbar.
-    today = date.today()
     diff_report_dir = reports_dir / "differenzierung"
     diff_report_dir.mkdir(parents=True, exist_ok=True)
     diff_db = category_sweep.DiffDB(state_dir / "differentiation_db.json")
@@ -577,8 +592,13 @@ def run(root: Path, use_llm: bool | None = None,
         "source_summary": {
             "total": len(source_results),
             "ok": n_ok, "empty": n_empty, "failed": n_fail,
+            "quarantaene": n_quarantaene,
             "by_kind": dict(kind_counts),
         },
+        # Ohne diesen Block waere bei 1000 Quellen nirgends zu sehen, dass
+        # eine Quelle stillgelegt wurde - genau das ist der Unterschied
+        # zwischen einer gepflegten und einer verrottenden Konfiguration.
+        "register": register_zusammenfassung,
         "sources": sorted(
             source_results,
             key=lambda r: ({"fail": 0, "ok": 1, "empty": 2}.get(r["status"], 3),

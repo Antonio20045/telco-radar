@@ -67,6 +67,14 @@ class Source:
     # ("ki", "geraete", "chips", ...). Operators carry a region instead; a
     # theme source has no region, which is exactly why it lives in its own
     # file and not in the watchlist (see config/tech_sources.yaml).
+    # Redaktionelle Angaben, die bei der ABNAHME der Quelle bekannt sind und
+    # nicht gemessen werden koennen. Bei 130 Quellen reichte dafuer ein
+    # deutscher Kommentar im YAML; bei 1000 nicht mehr, weil dann niemand mehr
+    # nachlesen kann, woher eine Quelle stammt und ob sie je geprueft wurde.
+    # Das Gegenstueck - seit wann bekannt, wann zuletzt geliefert - pflegt die
+    # Pipeline in data/state/quellen_register.json.
+    herkunft: str = ""    # z. B. "muster:cision", "rel=alternate", "Recherche"
+    abgenommen: str = ""  # ISO-Datum des bestandenen Abnahme-Checks
     allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
     # the 25-char title-length floor down to 6, for sources whose real
     # content is legitimately terse (e.g. RNS/regulatory-announcement
@@ -181,6 +189,8 @@ def load_config(root: Path) -> Config:
                     headers=s.get("headers"),
                     exclude_url_pattern=s.get("exclude_url_pattern"),
                     timeout_seconds=s.get("timeout_seconds"),
+                    herkunft=s.get("herkunft", ""),
+                    abgenommen=str(s.get("abgenommen", "") or ""),
                     allow_short_titles=s.get("allow_short_titles", False),
                 ))
             operators.append(Operator(
@@ -196,7 +206,8 @@ def load_config(root: Path) -> Config:
     news_sources = [
         Source(type=s.get("type", "rss"), url=s["url"],
                name=s.get("name", s["url"]), kind="trade_press",
-               label=s.get("name", ""))
+               label=s.get("name", ""), herkunft=s.get("herkunft", ""),
+               abgenommen=str(s.get("abgenommen", "") or ""))
         for s in (news.get("news_sources") or [])
     ]
 
@@ -255,6 +266,8 @@ def _load_tech_sources(path: Path) -> tuple[list[Source], dict[str, str]]:
                 headers=s.get("headers"),
                 exclude_url_pattern=s.get("exclude_url_pattern"),
                 timeout_seconds=s.get("timeout_seconds"),
+                herkunft=s.get("herkunft", ""),
+                abgenommen=str(s.get("abgenommen", "") or ""),
                 theme=key,
                 allow_short_titles=s.get("allow_short_titles", False),
             ))

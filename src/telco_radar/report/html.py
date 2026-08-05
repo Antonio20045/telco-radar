@@ -739,6 +739,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         for status in ("ok", "empty", "failed"):
             summary[status] = sum(1 for s in run["sources"]
                                   if s.get("status") == status)
+        # Stillgelegte Quellen zaehlen nicht als "abgefragt" - sonst sieht die
+        # Bilanz besser aus, je mehr Quellen aufgegeben wurden.
+        summary["quarantaene"] = sum(1 for s in run["sources"]
+                                     if s.get("status") == "quarantaene")
+        summary["total"] -= summary["quarantaene"]
         run["source_summary"] = summary
     (site_dir / "protokoll.html").write_text(
         env.get_template("protokoll.html.j2").render(

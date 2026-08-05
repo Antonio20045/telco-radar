@@ -197,6 +197,20 @@ collect_max_workers: 64
 collect_host_max_parallel: 2
 collect_host_min_interval_seconds: 0.5
 
+# Automatische Quarantaene (src/telco_radar/quellen_register.py).
+# Nach so vielen Laeufen ohne eine einzige Meldung wird eine Quelle stillgelegt
+# und nicht mehr abgerufen. 6 sind bei zwei Laeufen die Woche drei Wochen: lang
+# genug, dass ein Relaunch oder eine zeitweise Sperre nicht sofort zur
+# Stilllegung fuehrt, kurz genug, dass tote Quellen nicht ein halbes Jahr
+# Laufzeit kosten. Bei 130 Quellen faellt eine tote Quelle beim Lesen des
+# Protokolls auf; bei 1000 faellt gar nichts mehr auf.
+# Kein Loeschen: die Quelle bleibt in der Konfiguration, bleibt im Register
+# sichtbar und bekommt alle 10 Laeufe einen Bewaehrungsabruf. Ein einziger
+# Erfolg hebt die Quarantaene auf - Telecompetitor antwortet mal mit 403 und
+# mal mit 200, eine Quelle, die nie wieder probiert wird, waere dauerhaft weg,
+# obwohl ihr Server nur zeitweise dicht war.
+quellen_quarantaene_nach_laeufen: 6
+
 # Concurrency for the independent LLM calls (regional analysts + competitor
 # profiles). Only ~10 calls/run, so this just overlaps their latency; the
 # editor synthesis still runs once, after the analysts. Same models, same output.
