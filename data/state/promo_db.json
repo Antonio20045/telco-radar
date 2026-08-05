@@ -538,13 +538,29 @@
    "last_verified": "2026-08-05",
    "status": "aktiv",
    "missed_checks": 0,
-   "score": null,
+   "score": 32,
    "score_axes": {
+    "lever": 0,
+    "depth": 1,
     "reach": 2,
     "momentum": 0,
     "campaign": 3
    },
-   "highlight": false
+   "highlight": false,
+   "judged": {
+    "lever": 0,
+    "depth": 1,
+    "mechanic": "zugabe",
+    "evidence": "erhalte nach Registrierung 2 MovieChoice-Kinogutscheine",
+    "evidence_ok": true,
+    "reason": "Der Kauf einer Kinder-Smartwatch bringt zwei Kinogutscheine dazu, doch ein Mobilfunktarif- oder Anbieterwechsel wird damit nicht adressiert.",
+    "basis": "0398810cab4100e0",
+    "model": "deepseek-v4-flash",
+    "rubric_version": 2
+   },
+   "mechanic": "zugabe",
+   "score_reason": "Der Kauf einer Kinder-Smartwatch bringt zwei Kinogutscheine dazu, doch ein Mobilfunktarif- oder Anbieterwechsel wird damit nicht adressiert.",
+   "scored_at": "2026-08-05"
   },
   {
    "id": "0f8b975bbff19454",
