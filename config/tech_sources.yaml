@@ -112,6 +112,13 @@ themen:
       # hinter KI-Rechenzentren und optischen Transportnetzen - die Ebene,
       # auf der sich entscheidet, was ein Betreibernetz an KI-Last traegt.
       - {name: "Marvell", type: newsroom, url: "https://www.marvell.com/company/newsroom/press-releases.html", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
+      # Welle 3d: Quectel ist der groesste IoT-Modulhersteller der Welt. Was
+      # seine Module koennen (RedCap, NTN, Wi-Fi HaLow), entscheidet, welches
+      # IoT-Geschaeft ein Betreiber ueberhaupt verkaufen kann.
+      - {name: "Quectel", type: rss, url: "https://www.quectel.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Sierra Wireless (Semtech) beliefert dasselbe Segment und rechnet
+      # offen vor, was 4G gegen 5G RedCap ueber die Lebensdauer kostet.
+      - {name: "Sierra Wireless", type: rss, url: "https://www.sierrawireless.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # MediaTek beliefert die Mittelklasse, also den Massenmarkt der
       # Betreiber. Die Meldungen sind ungewoehnlich netznah ("MediaTek and
       # Samsung Achieve 3Tx 5-Layer Uplink Breakthrough"). Publiziert
@@ -262,6 +269,21 @@ themen:
       - {name: "PIIT (Polen)", type: rss, url: "https://piit.org.pl/feed", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       - {name: "African Telecommunications Union", type: rss, url: "https://atuuat.africa/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       - {name: "AICTO (Arabische IKT-Organisation)", type: rss, url: "https://www.aicto.org/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # --- Welle 3d: Normungs- und Branchengremien
+      # ATIS normt in Nordamerika, was 3GPP global normt - und fuehrt die
+      # US-6G-Initiative ("Why Has the US Launched a 6G Leadership Initiative?").
+      - {name: "ATIS (Nordamerika)", type: rss, url: "https://atis.org/news/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Die GSA zaehlt weltweit, welche Geraete und Netze welche Baender und
+      # Funktionen unterstuetzen - die Zahlenbasis hinter jeder 5G-Aussage.
+      - {name: "GSA (Global mobile Suppliers Association)", type: rss, url: "https://gsacom.com/paper/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # LoRaWAN ist die Konkurrenz zu NB-IoT und LTE-M, also zum IoT-Geschaeft
+      # der Betreiber.
+      - {name: "LoRa Alliance", type: rss, url: "https://lora-alliance.org/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Communications Alliance ist der australische Branchenverband.
+      - {name: "Communications Alliance (Australien)", type: rss, url: "https://www.austelco.org.au/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # eco ist der Verband der deutschen Internetwirtschaft und der
+      # Gegenpol zu BREKO: Netzbetreiber gegen Diensteanbieter.
+      - {name: "eco (Deutschland)", type: rss, url: "https://www.eco.de/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # TRAI reguliert den groessten Mobilfunkmarkt der Welt und
       # veroeffentlicht ungewoehnlich konkrete Messberichte zur Netzqualitaet.
       # Vollstaendig telekomspezifisch - anders als die zunaechst geprueften
@@ -347,6 +369,9 @@ themen:
       # Welle 3c: der US-Glasfaserverband. Er buendelt, was die amerikanischen
       # Netzbetreiber gemeinsam beim Ausbau planen und fordern.
       - {name: "Fiber Broadband Association", type: json_api, url: "https://www.fiberbroadband.org/wp-json/wp/v2/posts?per_page=25&_embed=1", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+      # Welle 3d: das europaeische Gegenstueck. Der Verband hat sich gerade von
+      # FTTH Council Europe in Fibre Council Europe umbenannt.
+      - {name: "Fibre Council Europe", type: newsroom, url: "https://fibrecouncil.eu/news/news-library", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
       # Italiens groesster Turmbetreiber, hervorgegangen aus TIM und Vodafone.
       - {name: "INWIT", type: rss, url: "https://www.inwit.it/en/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
       # Glasfaser-Grosshandel in Nordamerika: wer Zayo mietet, baut nicht

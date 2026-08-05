@@ -284,3 +284,31 @@ news_sources:
   - {name: "TechCabal (Afrika)", type: rss, url: "https://techcabal.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05", region: africa_middle_east}
   - {name: "Wireless Estimator (Funktürme)", type: rss, url: "https://wirelessestimator.com/feed/", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
   - {name: "DigiTimes (Lieferkette)", type: rss, url: "https://www.digitimes.com/rss/daily.xml", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+
+  # -- Welle 3d (05.08.2026): weitere Sprachraeume
+  # 226 Suchauftraege -> 318 Kandidaten -> 46 bestanden -> 12 eingetragen
+  # (4 hier, 8 in tech_sources.yaml).
+  # BEWUSST NICHT AUFGENOMMEN, obwohl sie den Check bestanden haben:
+  #   glasfaserplus.de, nbi.ie, siro.ie   hyperlokale Ausbaumeldungen
+  #                     ("Spatenstich in Poppenhausen", "Over 4,000 Offaly
+  #                     homes connected") - derselbe Grund wie bei Openreach
+  #   alepo.com, netscout.com, montymobile.com, megaport.com, telnyx.com,
+  #   korewireless.com, atnorth.com, druidsoftware.com
+  #                     Anbieter-Blogs mit Erklaerstuecken und Produktnews,
+  #                     kein Nachrichtenkanal
+  #   futurezone.at, itbusiness.hu, inside-it.ch, datamanager.it,
+  #   techweez.com, baguete.com.br
+  #                     allgemeine IT- und Verbraucherpresse; erste Meldung
+  #                     bei futurezone war eine US-Hyperschallkanone
+  #   bluetooth.com, smallcellforum.org, mplify.net
+  #                     Gremien ausserhalb des Telco-Kerns bzw. reine
+  #                     Mitgliederbekanntgaben
+  #   boldyn.com        erste "Meldung" war "Visit our United States website"
+  #   movilonia.com/comments/feed   Leserkommentare
+  - {name: "Dégrouptest (Frankreich)", type: rss, url: "https://www.degrouptest.com/rss.xml", region: europe, herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "IT News Africa", type: rss, url: "https://www.itnewsafrica.com/feed/", region: africa_middle_east, herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  - {name: "Digital Daily (Korea)", type: rss, url: "https://www.ddaily.co.kr/rss.xml", region: asia, herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
+  # ComNews ist der fuehrende russische Telekommunikationstitel. Russland ist
+  # kein Vodafone-Markt, aber VEONs Beeline und die Ausruesterfrage (Huawei,
+  # ZTE) laufen dort - deshalb ohne Vorgabe-Region unter Global.
+  - {name: "ComNews (Russland)", type: rss, url: "https://www.comnews.ru/rss", herkunft: "Sonnet-Recherche Welle 3", abgenommen: "2026-08-05"}
