@@ -487,3 +487,42 @@ def test_obermenge_einer_bestehenden_quelle_ist_eine_dublette(monkeypatch):
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
     assert dublette and "100%" in dublette[0]["detail"]
+
+
+# --------------------------------------------------------------------------- #
+# Kriterium 6 hat lange gar nicht gegriffen
+# --------------------------------------------------------------------------- #
+
+def test_host_versteht_auch_eine_blosse_domain():
+    """Die Vergleichs-Website steht ueberall als blosse Domain.
+
+    urlsplit("casa-systems.com") liest das als PFAD, netloc bleibt leer - und
+    Kriterium 6 fiel dadurch in den Zweig "keine Vergleichs-Website
+    hinterlegt", also auf PASS. In Welle 3 sind so zwei Kandidaten
+    durchgelaufen, deren Domain gar nicht zur Firma gehoerte.
+    """
+    assert pq._host("casa-systems.com") == "casa-systems.com"
+    assert pq._host("www.casa-systems.com") == "casa-systems.com"
+    assert pq._host("https://www.commscope.com/news-center/") == "commscope.com"
+    assert pq._host("") == ""
+
+
+def test_fremde_domain_faellt_an_kriterium_6_durch(monkeypatch):
+    """casa-systems.com leitet nach der Uebernahme auf commscope.com."""
+    kand = pq.Kandidat(url="https://www.commscope.com/news-center/",
+                       type="newsroom", operator="Casa Systems",
+                       website="casa-systems.com")
+    befund = pq._pruefe_einen(kand, FakeBestand(), 8, False)
+    k6 = [k for k in befund.kriterien if k["nr"] == 6]
+    assert k6 and not k6[0]["ok"]
+    assert not befund.bestanden
+
+
+def test_eigene_domain_besteht_kriterium_6(monkeypatch):
+    monkeypatch.setattr(pq, "collect_source",
+                        lambda *a, **k: _items(8, dated=8))
+    kand = pq.Kandidat(url="https://newsroom.ee.co.uk/", type="newsroom",
+                       operator="EE", website="ee.co.uk")
+    befund = pq._pruefe_einen(kand, FakeBestand(), 8, False)
+    k6 = [k for k in befund.kriterien if k["nr"] == 6]
+    assert k6 and k6[0]["ok"]

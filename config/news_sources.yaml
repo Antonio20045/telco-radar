@@ -241,3 +241,7 @@ news_sources:
   # Ookla misst Netzqualitaet weltweit; die 5G-Rubrik traegt die Laender-
   # vergleiche, mit denen Betreiber werben.
   - {name: "Ookla Insights — 5G", type: rss, url: "https://www.ookla.com/articles/tag/5g/rss", herkunft: "Rubriksuche Welle 3", abgenommen: "2026-08-05"}
+  # Zweitkanal von PolicyTracker (Welle 3): der Blog fasst die Frequenzpolitik
+  # der Woche zusammen ("Weekly Wrap: Are we on the cusp of a spectrum trade
+  # war?") - Einordnung, die der Meldungsfeed nicht traegt.
+  - {name: "PolicyTracker — Weekly Wrap", type: rss, url: "https://www.policytracker.com/blog/feed/", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}

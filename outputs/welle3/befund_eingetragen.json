@@ -1,0 +1,1112 @@
+[
+ {
+  "bezeichnung": "Hrvatski Telekom",
+  "url": "https://www.t.ht.hr/en/press/press-releases",
+  "type": "newsroom",
+  "operator": "Hrvatski Telekom",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "HR",
+  "region": "europe",
+  "website": "t.ht.hr",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (22 Meldungen, 1 frisch)",
+  "bestanden": true,
+  "n_items": 22,
+  "n_datiert": 22,
+  "n_frisch": 1,
+  "neuestes": "2026-07-31",
+  "titelprobe": [
+   "Hrvatski Telekom completes acquisition of PRO-PING",
+   "Business results for the first six months of 2026",
+   "Conference call for analysts - Repeated notification"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "ht.hr"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "22 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 22 Meldungen/100% datiert, 2. Abruf 22 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "22 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "22/22 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "1 frisch, neuestes 2026-07-31"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/22 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "22/22 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://t.ht.hr/en/press/press-releases|newsroom|||False"
+ },
+ {
+  "bezeichnung": "EE",
+  "url": "https://newsroom.ee.co.uk",
+  "type": "newsroom",
+  "operator": "EE",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "GB",
+  "region": "europe",
+  "website": "ee.co.uk",
+  "aliases": [],
+  "item_selector": "div.pp-block-item",
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (12 Meldungen, 2 frisch)",
+  "bestanden": true,
+  "n_items": 12,
+  "n_datiert": 12,
+  "n_frisch": 2,
+  "neuestes": "2026-08-04",
+  "titelprobe": [
+   "BT AND EE SCORE HISTORIC DOUBLE AWARD WIN AS STUDIES REVEAL UK'S BEST CONNECTIVITY",
+   "EE BECOMES FIRST MAJOR UK PROVIDER TO OFFER 8GBPS SPEEDS ON ADVANCED FULL FIBRE BROADBAND USING XGS-PON TECHNOLOGY",
+   "SAMSUNG GALAXY Z FOLD8, GALAXY Z FOLD8 ULTRA AND GALAXY Z FLIP8 AVAILABLE TO PRE-ORDER NOW ON EE’S AWARD WINNING NETWORK"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "ee.co.uk"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "12 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 12 Meldungen/100% datiert, 2. Abruf 12 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "12 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "12/12 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "2 frisch, neuestes 2026-08-04"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/12 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "12/12 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://newsroom.ee.co.uk|newsroom|div.pp-block-item||False"
+ },
+ {
+  "bezeichnung": "NTT Group",
+  "url": "https://www.group.ntt/en/news/",
+  "type": "newsroom",
+  "operator": "NTT Group",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "JP",
+  "region": "asia",
+  "website": "group.ntt",
+  "aliases": [],
+  "item_selector": "li.c-list-1__item",
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (9 Meldungen, 3 frisch)",
+  "bestanden": true,
+  "n_items": 9,
+  "n_datiert": 9,
+  "n_frisch": 3,
+  "neuestes": "2026-08-05",
+  "titelprobe": [
+   "NTT Disaster Relief for the 2026 Kumamoto Earthquake",
+   "NTT Notice regarding the Status of Stock Repurchases (Under the Provisions of NTT's Articles of Incorporation pursuant to Paragraph 2, Article 165 of the Companies Act of Japan)",
+   "NTT NTT and OptQC Sign New Capital and Business Alliance Agreement Toward the Practical Application of Optical Quantum Computers"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "group.ntt"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "9 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 9 Meldungen/100% datiert, 2. Abruf 9 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "9 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "9/9 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "3 frisch, neuestes 2026-08-05"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/9 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "9/9 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "33% gemeinsame Meldungen mit https://www.group.ntt/en/newsrelease/rss/release.rdf"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://group.ntt/en/news|newsroom|li.c-list-1__item||False"
+ },
+ {
+  "bezeichnung": "Telkom Indonesia",
+  "url": "https://www.telkom.co.id/sites/berita/id_ID/page/news-about-telkom-122",
+  "type": "newsroom",
+  "operator": "Telkom Indonesia",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "ID",
+  "region": "asia",
+  "website": "telkom.co.id",
+  "aliases": [],
+  "item_selector": "div.news-list",
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (9 Meldungen, 6 frisch)",
+  "bestanden": true,
+  "n_items": 9,
+  "n_datiert": 9,
+  "n_frisch": 6,
+  "neuestes": "2026-08-04",
+  "titelprobe": [
+   "Transformasi TelkomGroup Mulai Tunjukkan Hasil, InfraNexia Catat Kinerja Positif Perkuat Infrastruktur Digital Nasional",
+   "Lebih dari 718 Ribu Siswa Manfaatkan PIJAR, Telkom Perluas Pemanfaatan Pendidikan Digital",
+   "Laporan Keuangan Telkom Semester I 2026: Akselerasi Transformasi TLKM 30: Pendapatan, EBITDA, dan Laba Bersih Normalisasi Telkom Tumbuh Kuat di Paruh Pertama 2026"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "telkom.co.id"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "9 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 9 Meldungen/100% datiert, 2. Abruf 9 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "9 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "9/9 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "6 frisch, neuestes 2026-08-04"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/9 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "9/9 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://telkom.co.id/sites/berita/id_ID/page/news-about-telkom-122|newsroom|div.news-list||False"
+ },
+ {
+  "bezeichnung": "Jazz Pakistan",
+  "url": "https://jazz.com.pk/media-center",
+  "type": "newsroom",
+  "operator": "Jazz Pakistan",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "PK",
+  "region": "asia",
+  "website": "jazz.com.pk",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (30 Meldungen, 1 frisch)",
+  "bestanden": true,
+  "n_items": 30,
+  "n_datiert": 30,
+  "n_frisch": 1,
+  "neuestes": "2026-08-03",
+  "titelprobe": [
+   "JazzWorld Revenue Grows 23% to Over PKR 269 Billion in H1 2026",
+   "JazzWorld Wins Best InsureTech Award, Outlines Vision for Pakistan’s Digital Financial and Insurance Ecosystem",
+   "Jazz Completes SDM Virtualization with Nokia, Accelerating Its Cloud-Native Network Transformation"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "jazz.com.pk"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "30 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 30 Meldungen/100% datiert, 2. Abruf 30 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "30 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "30/30 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "1 frisch, neuestes 2026-08-03"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/30 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "30/30 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://jazz.com.pk/media-center|newsroom|||False"
+ },
+ {
+  "bezeichnung": "policytracker.com",
+  "url": "https://www.policytracker.com/blog/feed/",
+  "type": "rss",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "policytracker.com",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (10 Meldungen, 1 frisch)",
+  "bestanden": true,
+  "n_items": 10,
+  "n_datiert": 10,
+  "n_frisch": 1,
+  "neuestes": "2026-07-31",
+  "titelprobe": [
+   "Weekly Wrap: Are we on the cusp of a spectrum trade war?",
+   "Weekly Wrap: Spectrum policy faces its memory test",
+   "Weekly Wrap: Australia’s Universal Outdoor Mobile Obligation asks the right questions"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "rss"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "policytracker.com"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "10/10 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "1 frisch, neuestes 2026-07-31"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/10 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "10/10 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://policytracker.com/blog/feed|rss|||False"
+ },
+ {
+  "bezeichnung": "agcom.it",
+  "url": "https://www.agcom.it/rss.xml",
+  "type": "rss",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "agcom.it",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (10 Meldungen, 10 frisch)",
+  "bestanden": true,
+  "n_items": 10,
+  "n_datiert": 10,
+  "n_frisch": 10,
+  "neuestes": "2026-08-05",
+  "titelprobe": [
+   "Comunicazioni fraudolente a nome dell’AGCOM",
+   "Il consumo di informazione politico-elettorale durante la campagna referendaria 2026",
+   "29.07.2026 - Il Nord Est e il divieto di consumare alcolici per strada (Osservatorio sul Nord Est) - Demos & Pi e Demetra"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "rss"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "agcom.it"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "10/10 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "10 frisch, neuestes 2026-08-05"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "2/10 verdaechtig (20%), z. B. ['Determina 26/26/DTC/CP', 'Determina 25/26/DTC/CP']"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "10/10 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://agcom.it/rss.xml|rss|||False"
+ },
+ {
+  "bezeichnung": "icasa.org.za",
+  "url": "https://www.icasa.org.za/news",
+  "type": "newsroom",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "icasa.org.za",
+  "aliases": [],
+  "item_selector": "div.news",
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (6 Meldungen, 2 frisch)",
+  "bestanden": true,
+  "n_items": 6,
+  "n_datiert": 6,
+  "n_frisch": 2,
+  "neuestes": "2026-08-05",
+  "titelprobe": [
+   "ICASA Remains Operational Amid Planned Industrial Action",
+   "ICASA announces an innovative Electronic Frequency Information System providing Online Digital Access to the National Radio Frequency Plan 2026",
+   "ICASA Publishes Draft IMT Roadmap and Implementation Plans"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "icasa.org.za"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "6 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 6 Meldungen/100% datiert, 2. Abruf 6 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "6 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "6/6 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "2 frisch, neuestes 2026-08-05"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/6 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "6/6 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://icasa.org.za/news|newsroom|div.news||False"
+ },
+ {
+  "bezeichnung": "adtran.com",
+  "url": "https://www.adtran.com/en/newsroom",
+  "type": "newsroom",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "adtran.com",
+  "aliases": [],
+  "item_selector": "article",
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (11 Meldungen, 4 frisch)",
+  "bestanden": true,
+  "n_items": 11,
+  "n_datiert": 11,
+  "n_frisch": 4,
+  "neuestes": "2026-08-04",
+  "titelprobe": [
+   "4 August 2026 Press release",
+   "TOHKnet and Adtran conduct Japan’s first 50G PON trial on a live network",
+   "The young broadband builders growing fiber from the ground up"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "adtran.com"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "11 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 11 Meldungen/100% datiert, 2. Abruf 11 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "11 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "11/11 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "4 frisch, neuestes 2026-08-04"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/11 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "11/11 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://adtran.com/en/newsroom|newsroom|article||False"
+ },
+ {
+  "bezeichnung": "marvell.com",
+  "url": "https://www.marvell.com/company/newsroom/press-releases.html",
+  "type": "newsroom",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "marvell.com",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (10 Meldungen, 4 frisch)",
+  "bestanden": true,
+  "n_items": 10,
+  "n_datiert": 10,
+  "n_frisch": 4,
+  "neuestes": "2026-08-04",
+  "titelprobe": [
+   "Marvell Advances AI Memory Infrastructure Portfolio to Accelerate Agentic AI Inference",
+   "Marvell Technology, Inc. Announces Conference Call to Review Second Quarter of Fiscal Year 2027 Financial Results; Announces Investor Day on October 6, 2026",
+   "Marvell to Showcase Advanced AI Memory and Storage Infrastructure Portfolio for Agentic AI Inference at FMS 2026"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "marvell.com"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 10 Meldungen/100% datiert, 2. Abruf 10 Meldungen/100% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "10 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "10/10 = 100%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "4 frisch, neuestes 2026-08-04"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/10 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "10/10 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://marvell.com/company/newsroom/press-releases.html|newsroom|||False"
+ },
+ {
+  "bezeichnung": "zte.com.cn",
+  "url": "https://www.zte.com.cn/global/",
+  "type": "newsroom",
+  "operator": "",
+  "thema": "",
+  "kanal": "",
+  "neuer_betreiber": false,
+  "country": "",
+  "region": "",
+  "website": "zte.com.cn",
+  "aliases": [],
+  "item_selector": null,
+  "link_template": null,
+  "headers": null,
+  "exclude_url_pattern": null,
+  "timeout_seconds": null,
+  "allow_short_titles": false,
+  "ausnahme_frische": "",
+  "ausnahme_domain": "",
+  "begruendung": "Welle 3, Wertpruefung bestanden (7 Meldungen, 4 frisch)",
+  "bestanden": true,
+  "n_items": 7,
+  "n_datiert": 6,
+  "n_frisch": 4,
+  "neuestes": "2026-08-04",
+  "titelprobe": [
+   "ZTE and SKY47 Unveil Pakistan’s Largest Purpose-Built Data Center – Sky47 Karakoram-01 2026-08-04",
+   "ZTE's Complete OTN Portfolio Secures EUCC Substantial-Level Certification 2026-07-29",
+   "News ZTE's Complete OTN Portfolio Secures EUCC Substantial-Level Certification Learn More"
+  ],
+  "kriterien": [
+   {
+    "nr": 8,
+    "name": "kein newsroom_js",
+    "ok": true,
+    "detail": "newsroom"
+   },
+   {
+    "nr": 7,
+    "name": "keine Dublette",
+    "ok": true,
+    "detail": "URL neu"
+   },
+   {
+    "nr": 6,
+    "name": "eigene Domain",
+    "ok": true,
+    "detail": "zte.com.cn"
+   },
+   {
+    "nr": 1,
+    "name": "Abruf ueber collect_source",
+    "ok": true,
+    "detail": "7 Meldungen"
+   },
+   {
+    "nr": 1,
+    "name": "zweiter Abruf stabil",
+    "ok": true,
+    "detail": "1. Abruf 7 Meldungen/86% datiert, 2. Abruf 7 Meldungen/86% datiert"
+   },
+   {
+    "nr": 2,
+    "name": ">= 5 Meldungen",
+    "ok": true,
+    "detail": "7 Meldungen"
+   },
+   {
+    "nr": 3,
+    "name": ">= 80% datiert",
+    "ok": true,
+    "detail": "6/7 = 86%"
+   },
+   {
+    "nr": 4,
+    "name": ">= 1 im 8-Tage-Fenster",
+    "ok": true,
+    "detail": "4 frisch, neuestes 2026-08-04"
+   },
+   {
+    "nr": 5,
+    "name": "echte Ueberschriften",
+    "ok": true,
+    "detail": "0/7 verdaechtig (0%)"
+   },
+   {
+    "nr": 5,
+    "name": "unterscheidbare Titel",
+    "ok": true,
+    "detail": "7/7 verschieden (100%)"
+   },
+   {
+    "nr": 7,
+    "name": "keine Inhaltsdublette",
+    "ok": true,
+    "detail": "keine Vergleichsquelle auf dieser Domain"
+   }
+  ],
+  "fehler": "",
+  "cache_schluessel": "https://zte.com.cn/global|newsroom|||False"
+ }
+]

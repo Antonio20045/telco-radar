@@ -146,7 +146,24 @@ def _registrable(host: str) -> str:
 
 
 def _host(url: str) -> str:
-    return urlsplit(url or "").netloc.lower().removeprefix("www.")
+    """Host einer Adresse ODER einer blossen Domain.
+
+    Der Zusatz ist nicht kosmetisch, er hat Kriterium 6 stillgelegt: die
+    Vergleichs-Website steht ueberall im Projekt als BLOSSE DOMAIN
+    ("telekom.com", "casa-systems.com") - in der Watchlist, in
+    kandidaten_firmen.yaml und in dem, was finde_quellen.py ausgibt.
+    urlsplit() liest so etwas ohne Schema aber als PFAD, netloc bleibt leer,
+    und der Domainvergleich fiel in den Zweig "keine Vergleichs-Website
+    hinterlegt" - also auf PASS. In Welle 3 sind dadurch zwei Kandidaten
+    durchgelaufen, deren Domain gar nicht zur Firma gehoerte: Casa Systems
+    (uebernommen, casa-systems.com leitet auf commscope.com) und Intelsat
+    (uebernommen, intelsat.com leitet auf ses.com). Beide lieferten sauber
+    datierte Meldungen - der falschen Firma.
+    """
+    roh = (url or "").strip()
+    if roh and "//" not in roh:
+        roh = "//" + roh
+    return urlsplit(roh).netloc.lower().removeprefix("www.")
 
 
 def _ist_navigationslabel(titel: str) -> bool:

@@ -108,6 +108,10 @@ themen:
       # Broadcom veroeffentlicht seine Produkt- und Vertragsmeldungen ueber
       # die Investor-Relations-Seite; ein separater Presse-Feed existiert nicht.
       - {name: "Broadcom", type: rss, url: "https://investors.broadcom.com/rss/news-releases.xml"}
+      # Welle 3: Marvell baut die Custom-Silicon- und Speicherinfrastruktur
+      # hinter KI-Rechenzentren und optischen Transportnetzen - die Ebene,
+      # auf der sich entscheidet, was ein Betreibernetz an KI-Last traegt.
+      - {name: "Marvell", type: newsroom, url: "https://www.marvell.com/company/newsroom/press-releases.html", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
       # MediaTek beliefert die Mittelklasse, also den Massenmarkt der
       # Betreiber. Die Meldungen sind ungewoehnlich netznah ("MediaTek and
       # Samsung Achieve 3Tx 5-Layer Uplink Breakthrough"). Publiziert
@@ -136,6 +140,16 @@ themen:
       # Ericssons offizieller Verbreitungsweg - dieselbe Ausnahme wie bei
       # Telia in der Watchlist, und mit demselben item_selector.
       - {name: "Ericsson", type: newsroom, url: "https://news.cision.com/ericsson", item_selector: ".card-item"}
+      # Welle 3: ZTE fehlte bisher ganz, obwohl es nach Huawei der zweite
+      # grosse chinesische Ausruester ist. Der globale Auftritt traegt die
+      # Vertrags- und Technikmeldungen ("ZTE and SKY47 Unveil Pakistan's
+      # Largest Purpose-Built Data Center").
+      - {name: "ZTE", type: newsroom, url: "https://www.zte.com.cn/global/", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
+      # Welle 3: Adtran ist der Glasfaser- und PON-Ausruester der europaeischen
+      # Netzbetreiber ("TOHKnet and Adtran conduct Japan's first 50G PON
+      # trial"). Achtung: die erste Kachel der Seite traegt statt einer
+      # Ueberschrift die Zeile "<Datum> Press release" - der Rest ist sauber.
+      - {name: "Adtran", type: newsroom, url: "https://www.adtran.com/en/newsroom", item_selector: "article", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
       # HPE hat Juniper uebernommen und fuehrt dessen Carrier-Geschaeft
       # weiter; der Newsroom ist der einzige der grossen westlichen
       # Ausruester-Feeds, der zuverlaessig antwortet.
@@ -198,6 +212,14 @@ themen:
       # Die ITU ist die UN-Organisation fuer Telekommunikation: Frequenzen,
       # weltweite Standards, Marktzahlen.
       - {name: "ITU", type: rss, url: "https://www.itu.int/hub/feed/"}
+      # Welle 3: AGCOM reguliert den italienischen Telekommunikations- und
+      # Medienmarkt - Frequenzen, Netzzugang, Verbraucherschutz. Italien ist
+      # ein Vodafone-Kernmarkt und war auf der Regulierungsebene blind.
+      - {name: "AGCOM (Italien)", type: rss, url: "https://www.agcom.it/rss.xml", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
+      # Welle 3: ICASA ist die suedafrikanische Regulierungsbehoerde. Sie
+      # entscheidet ueber die Frequenzvergaben, an denen Vodacom und MTN
+      # haengen ("ICASA Publishes Draft IMT Roadmap and Implementation Plans").
+      - {name: "ICASA (Suedafrika)", type: newsroom, url: "https://www.icasa.org.za/news", item_selector: "div.news", herkunft: "Firmenliste Welle 3", abgenommen: "2026-08-05"}
       # TRAI reguliert den groessten Mobilfunkmarkt der Welt und
       # veroeffentlicht ungewoehnlich konkrete Messberichte zur Netzqualitaet.
       # Vollstaendig telekomspezifisch - anders als die zunaechst geprueften

@@ -139,6 +139,16 @@ regions:
       sources:
       - type: rss
         url: https://newsroom.bt.com/feed/en
+      # Welle 3: EE hat einen eigenen Newsroom, den der BT-Feed nicht traegt -
+      # dort stehen die Endkundenmeldungen (Tarife, Netzausbau, Geraete), also
+      # genau die Ebene, auf der die Kollegin arbeitet. Kein eigener Operator,
+      # weil EE oben schon als Alias von BT steht und das Fachpresse-Tagging
+      # sonst doppelt zuschlagen wuerde.
+      - type: newsroom
+        url: https://newsroom.ee.co.uk
+        item_selector: div.pp-block-item
+        herkunft: Firmenliste Welle 3
+        abgenommen: '2026-08-05'
     - name: Swisscom
       country: CH
       website: swisscom.ch
@@ -750,6 +760,20 @@ regions:
         url: https://liquid.tech/feed/
         herkunft: Firmenliste Welle 2
         abgenommen: '2026-08-05'
+    # Welle 3: Kroatien war bisher gar nicht abgedeckt. Hrvatski Telekom ist
+    # die Deutsche-Telekom-Landesgesellschaft und der Marktfuehrer dort; die
+    # englische Presseseite meldet Uebernahmen und Quartalszahlen.
+    - name: Hrvatski Telekom
+      country: HR
+      website: t.ht.hr
+      aliases:
+      - HT Croatia
+      - Hrvatski Telekom
+      sources:
+      - type: newsroom
+        url: https://www.t.ht.hr/en/press/press-releases
+        herkunft: Firmenliste Welle 3
+        abgenommen: '2026-08-05'
   asia:
     name: Asien
     operators:
@@ -843,6 +867,15 @@ regions:
         url: https://www.group.ntt/en/newsrelease/rss/release.rdf
         herkunft: Firmenliste (Breitensuche)
         abgenommen: '2026-08-05'
+      # Welle 3: die redaktionelle Nachrichtenseite neben dem
+      # Pressemitteilungs-Feed. Sie traegt Allianzen und Beteiligungen ("NTT
+      # and OptQC Sign New Capital and Business Alliance Agreement"), die im
+      # reinen Release-Feed nicht auftauchen.
+      - type: newsroom
+        url: https://www.group.ntt/en/news/
+        item_selector: li.c-list-1__item
+        herkunft: Firmenliste Welle 3
+        abgenommen: '2026-08-05'
     - name: NTT Docomo
       country: JP
       website: docomo.ne.jp
@@ -920,6 +953,36 @@ regions:
       sources:
       - type: newsroom
         url: https://www.telkomsel.com/en/about-us/news
+    # Welle 3: der Konzern hinter Telkomsel. Der Mutterkonzern meldet
+    # Infrastruktur, Rechenzentren und Konzernumbau ("Transformasi TelkomGroup
+    # Mulai Tunjukkan Hasil, InfraNexia Catat Kinerja Positif") - die
+    # Mobilfunktochter meldet das Endkundengeschaeft. Zwei Ebenen, zwei Quellen.
+    - name: Telkom Indonesia
+      country: ID
+      website: telkom.co.id
+      aliases:
+      - TelkomGroup
+      - Telkom Indonesia
+      sources:
+      - type: newsroom
+        url: https://www.telkom.co.id/sites/berita/id_ID/page/news-about-telkom-122
+        item_selector: div.news-list
+        herkunft: Firmenliste Welle 3
+        abgenommen: '2026-08-05'
+    # Welle 3: Pakistan war bisher gar nicht abgedeckt. Jazz ist der groesste
+    # Betreiber des Landes (VEON-Tochter) und meldet auch die Netztechnik
+    # dahinter ("Jazz Completes SDM Virtualization with Nokia").
+    - name: Jazz Pakistan
+      country: PK
+      website: jazz.com.pk
+      aliases:
+      - Jazz
+      - Mobilink
+      sources:
+      - type: newsroom
+        url: https://jazz.com.pk/media-center
+        herkunft: Firmenliste Welle 3
+        abgenommen: '2026-08-05'
     - name: AIS
       country: TH
       website: ais.co.th
