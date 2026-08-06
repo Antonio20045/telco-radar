@@ -157,10 +157,24 @@ der Workflow akzeptiert `ANTHROPIC_API_KEY` ODER `ANTHROPIC`) und
 > Beschreibung folgte, baute eine dritte Designsprache. Diese Fassung ist am
 > ausgelieferten `site/` nachgemessen.
 
-**Design:** heller Cream-Canvas (`--bg:#faf8f5`), roter Sticky-Topbar,
-Inter, Vodafone-Rot `#e60000`, große abgerundete Karten. **Kein Dark-Mode**
-(auch kein Toggle — 0 Vorkommen von `prefers-color-scheme` im CSS). Alles
-Vanilla JS (`app.js`), kein Framework, kein CDN-JS.
+**Design: Zeitungsausgabe** (Etappe 4, 06.08.2026). Newsprint-Untergrund
+(`--paper:#f6f4ee`), **Serife** (Source Serif 4) für alles, was gelesen wird,
+**Grotesk** (Libre Franklin) nur für Etiketten — Rubriken, Datumszeile,
+Navigation, Meta. **Linien statt Kästen**: keine Schatten, kein Radius;
+Hierarchie kommt aus Linienstärke (3px Rubrikleiste, 1px Trenner, Haarlinie).
+**Rot ist Akzent, keine Fläche** — die rote Kopfzeile ist weg, Rot markiert
+nur Rubriken, Dringlichkeit und Links. Mittiger Zeitungskopf, darunter eine
+Datumszeile (Ausgabe / Ressort / Quellenzahl). **Kein Dark-Mode**. Alles
+Vanilla JS (`app.js`), kein Framework, kein CDN-JS (die zwei Schriften kommen
+von Google Fonts, mit lokalen Rückfallschriften im CSS).
+
+> Davor galt bis zum 06.08.2026 der helle Cream-Canvas mit rotem
+> Sticky-Topbar, Inter und großen abgerundeten Karten
+> („Design-Modernisierung Juli 2026"). Der Redesign-Plan hatte in seinem
+> Abschnitt 5 ausdrücklich festgeschrieben, dass diese Designsprache
+> **bleibt** — das war die falsche Vorgabe, und Antonio hat sie kassiert.
+> **Wer den Plan liest, muss Abschnitt 5 und 9 dort zusammen mit diesem
+> Absatz lesen.**
 
 **Vier Seiten**, geschnitten nach der Frage des Lesers (vorher sieben, siehe
 `PLAN_MARKTRECHERCHE_REDESIGN.md`):

@@ -14,6 +14,21 @@
 > Alle Zahlen in diesem Text sind gemessen, nicht geschätzt. Abschnitt 10
 > enthält die Befehle, mit denen man sie nachrechnet.
 
+> **NACHTRAG vom 06.08.2026, nach der Umsetzung.** Dieser Plan hat den
+> falschen Schnitt gemacht. Er plant Korrektheit und Seitenarchitektur und
+> **verbietet in Abschnitt 5 und 9 ausdrücklich die visuelle
+> Neugestaltung** — im Pre-Mortem steht eine neue Designsprache sogar als
+> Fehlschlag-Szenario. Genau die war gefragt: eine Zeitung im Sinn von WSJ,
+> kein Dashboard. Deshalb gibt es jetzt eine **Etappe 4 (Abschnitt 4.5)**,
+> und Abschnitt 5 ist entsprechend korrigiert. Etappen 0–3 gelten
+> unverändert und sind umgesetzt; die Schlussliste steht in
+> `outputs/redesign-2026-08-06.md`.
+>
+> **Lehre für den nächsten Plan:** „was ausdrücklich bleibt" ist der
+> gefährlichste Abschnitt eines Plans. Er hält fest, was niemand hinterfragt
+> hat — und wenn der Auftraggeber genau das ändern wollte, hat der Plan die
+> Frage nie gestellt.
+
 ---
 
 ## 0. Kurzfassung
@@ -256,11 +271,29 @@ Unabhängig vom Rest. Auch einzeln auslieferbar.
 
 ---
 
-## 5. Designregeln — was ausdrücklich bleibt
+### Etappe 4 — Visuelle Neugestaltung (nachgetragen)
 
-- **Die Cream-/Rot-Designsprache aus `style.css` bleibt.** Keine dritte
-  Sprache. Wer sie ändern will, tut das als eigener Auftrag, nicht nebenbei
-  in diesem Umbau.
+Nicht Teil der ursprünglichen Fassung; siehe Nachtrag oben.
+
+17. **Zeitungssatz statt Dashboard.** Serife (Source Serif 4) für alles, was
+    gelesen wird; Grotesk (Libre Franklin) nur für Etiketten. Linien statt
+    Kästen — keine Schatten, kein Radius. Rot ist Akzent, keine Fläche.
+    Newsprint statt Weiß.
+18. **Zeitungskopf**: mittiges Wortzeichen, Datumszeile (Ausgabe / Ressort /
+    Quellenzahl), Rubrikleiste unter schwerer Linie.
+19. **Titelseite als Titelseite**: Schlagzeile, Aufmacher, darunter
+    zweispaltig — Fließtext mit Initial links, Rail mit Zahlen, dringendsten
+    Signalen und Themenradar rechts. Spaltensatz für „Auf einen Blick",
+    Druck-Stylesheet.
+20. **Die Regel aus Abschnitt 5 wird damit aufgehoben** — nicht
+    stillschweigend, sondern hier notiert.
+
+## 5. Designregeln — was bleibt (korrigiert am 06.08.2026)
+
+- ~~**Die Cream-/Rot-Designsprache aus `style.css` bleibt.**~~ **Aufgehoben
+  am 06.08.2026.** Sie war genau das, was weg sollte. Es gilt jetzt die
+  Zeitungsausgabe (Etappe 4); die Regeln dazu stehen im Kopf von
+  `style.css` und in `CLAUDE.md` §5.
 - **Der Prosabericht bleibt das Herzstück** (CLAUDE.md §8). Der Umbau macht
   ihn zugänglicher, er ersetzt ihn nicht durch Kacheln.
 - **Jede Aussage behält ihren Quellenlink.** Nachprüfbarkeit war explizite
@@ -308,6 +341,12 @@ Angenommen, der Umbau ist fertig und war ein Fehlschlag. Warum?
 3. **„Jemand hat CLAUDE.md §5 gelesen und eine dritte Designsprache
    gebaut."** Gegenmittel: Schritt 16 gehört in dieselbe Auslieferung wie der
    Umbau, nicht ans Ende.
+   **Eingetreten, in der eigenen Umsetzung:** CLAUDE.md §5 wurde nach Etappe 3
+   auf den Cream-Stand gezogen — und Etappe 4 hat genau den ersetzt. Die
+   Doku beschrieb danach wieder eine Website, die es nicht gibt. Der
+   Pre-Mortem war richtig, die Gegenmaßnahme (§5 zuletzt schreiben) falsch:
+   **die Designbeschreibung gehört in denselben Commit wie die letzte
+   Designänderung, nicht in den letzten Commit des Plans.**
 4. **„Die Wochenseite ist jetzt riesig."** 120 KB Bericht plus 12 KB
    Übersicht klingt nach 132 KB. Es sind ~45 KB, weil der Explorer-JSON
    (78,5 KB) auf `meldungen.html` umzieht. **Diese Zahl ist nach dem Umbau
@@ -351,8 +390,8 @@ Ohne diese Punkte ist der Umbau nicht fertig:
 - **Keine Änderung an der Sammel-, Delta- oder Analyseschicht.** Dieser Plan
   betrifft `report/`, nicht `collect/` oder `analyze/`. Ausnahme: der
   Wettbewerber-Fehler aus 1.2, weil er eine Seite leer lässt.
-- **Keine dritte Designsprache**, siehe Abschnitt 5.
-- **Kein Dark-Mode** in diesem Umbau.
+- ~~**Keine dritte Designsprache**~~ — aufgehoben, siehe Etappe 4.
+- **Kein Dark-Mode.** Gilt weiter, auch nach Etappe 4.
 - **Keine neue Kappung von Meldungen.** Was nicht bewertet wird, ist über den
   Seen-Store dauerhaft verloren (CLAUDE.md §6). Die Anzeige darf kappen, die
   Pipeline nicht.
