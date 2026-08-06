@@ -114,6 +114,37 @@ def _waehle_anbieter(settings: dict) -> str:
     return wanted
 
 
+def _modelle_fuer_anbieter(settings: dict, anbieter: str,
+                           fallback_model: str) -> tuple[str, str]:
+    """Liefert (Analystenmodell, Editormodell) des GEWAEHLTEN Anbieters.
+
+    Als eigene Funktion herausgezogen, weil das Auseinanderlaufen von
+    Anbieter und Modell-ID sich nicht selbst meldet: der Endpunkt antwortet
+    einfach mit "unbekanntes Modell", die aufrufende Stufe faengt den Fehler
+    ab, und der Lauf gilt als erfolgreich. Genau so stand die
+    Wettbewerber-Seite zwei Laeufe lang leer da (siehe unten im
+    Wettbewerber-Zweig). Jede Stufe holt ihr Modell ab jetzt hier.
+    """
+    if anbieter == "bedrock":
+        # Which Claude models a Bedrock account may call is per-account and
+        # changes without notice (agreements, quotas, AWS Sales). Instead of
+        # pinning one id, register the configured preference chain and let the
+        # run settle on the best model that actually answers.
+        chain_head = llm.set_model_chain(settings.get("bedrock_model_chain") or [])
+        return ((settings.get("bedrock_analyst_model") or chain_head or fallback_model),
+                (settings.get("bedrock_editor_model") or chain_head or fallback_model))
+    if anbieter in OPENAI_KOMPATIBEL:
+        # Die Basis-URL hat _waehle_anbieter bereits gesetzt; hier nur noch
+        # die Modelle des gewaehlten Endpunkts. NIE die Schluessel eines
+        # anderen OpenAI-kompatiblen Anbieters lesen - sie zeigen auf einen
+        # Endpunkt, der gerade nicht aktiv ist.
+        _, analyst_key, editor_key = OPENAI_KOMPATIBEL[anbieter]
+        return (settings.get(analyst_key) or fallback_model,
+                settings.get(editor_key) or fallback_model)
+    return (settings.get("analyst_model", fallback_model),
+            settings.get("editor_model", fallback_model))
+
+
 def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
     """Entscheidet, ob die zweistufige Redaktion laeuft.
 
@@ -181,27 +212,9 @@ def run(root: Path, use_llm: bool | None = None,
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
     anbieter = _waehle_anbieter(cfg.settings)
-    use_bedrock = anbieter == "bedrock"
     use_openai = anbieter in OPENAI_KOMPATIBEL
-    if use_bedrock:
-        # Which Claude models a Bedrock account may call is per-account and
-        # changes without notice (agreements, quotas, AWS Sales). Instead of
-        # pinning one id, register the configured preference chain and let the
-        # run settle on the best model that actually answers.
-        chain_head = llm.set_model_chain(cfg.settings.get("bedrock_model_chain") or [])
-        analyst_model = (cfg.settings.get("bedrock_analyst_model")
-                         or chain_head or fallback_model)
-        editor_model = (cfg.settings.get("bedrock_editor_model")
-                        or chain_head or fallback_model)
-    elif use_openai:
-        # Die Basis-URL hat _waehle_anbieter bereits gesetzt; hier nur noch
-        # die Modelle des gewaehlten Endpunkts.
-        _, analyst_key, editor_key = OPENAI_KOMPATIBEL[anbieter]
-        analyst_model = cfg.settings.get(analyst_key) or fallback_model
-        editor_model = cfg.settings.get(editor_key) or fallback_model
-    else:
-        analyst_model = cfg.settings.get("analyst_model", fallback_model)
-        editor_model = cfg.settings.get("editor_model", fallback_model)
+    analyst_model, editor_model = _modelle_fuer_anbieter(
+        cfg.settings, anbieter, fallback_model)
     # The editor model is the big one and the first to lose its slot when the
     # provider is oversubscribed: the connection is accepted and no token ever
     # arrives. Four stages run on it, so without a stand-in one provider outage
@@ -436,7 +449,15 @@ def run(root: Path, use_llm: bool | None = None,
     if use_llm and cfg.focus_competitors:
         tcomp = time.monotonic()
         try:
-            comp_model = cfg.settings.get("openai_analyst_model", editor_model) if use_openai else editor_model
+            # Das Analystenmodell des AKTIVEN Anbieters, nicht der fest
+            # verdrahtete openai-Schluessel. Solange "openai" der einzige
+            # OpenAI-kompatible Anbieter war, war beides dasselbe; seit
+            # c9c30f1 (DeepSeek, 04.08.2026) nicht mehr - die Wettbewerber-
+            # Analyse schickte "deepseek-ai/deepseek-v4-flash" an den
+            # DeepSeek-Endpunkt, der nur "deepseek-v4-flash" kennt, und alle
+            # drei Profile scheiterten in 0,6 s. Zwei Laeufe lang stand die
+            # Seite deshalb leer da (Lauf #74 und #75).
+            comp_model = analyst_model if use_openai else editor_model
             competitor_profiles = competitor_mod.analyze_all(
                 cfg.focus_competitors, items, comp_model, language,
                 max_workers=int(cfg.settings.get('llm_max_workers', 4)))

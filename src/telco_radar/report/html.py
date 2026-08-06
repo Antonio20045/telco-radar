@@ -748,6 +748,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "protokoll.html").write_text(
         env.get_template("protokoll.html.j2").render(
             prefix="", run=run, report=latest,
+            # Die Zahl, die die Seite wirklich zeigen kann: bewertete
+            # Meldungen nach dem Ausfiltern stillgelegter Quellen. NICHT
+            # stats.new - das sind die neu GESAMMELTEN.
+            n_bewertet=len(_flatten(latest)) if latest else 0,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             num_operators=num_operators),
         encoding="utf-8")

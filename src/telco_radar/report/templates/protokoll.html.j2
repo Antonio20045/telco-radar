@@ -16,8 +16,21 @@
   {% if run.source_summary.get('quarantaene') %}<div class="tile"><b>{{ run.source_summary.quarantaene }}</b><span>stillgelegt (liefern seit Wochen nichts)</span></div>{% endif %}
   <div class="tile accent"><b>{{ run.source_summary.ok }} / {{ run.source_summary.empty }} / {{ run.source_summary.failed }}</b><span>ok / leer / fehlgeschlagen</span></div>
   <div class="tile"><b>{{ (run.duration_seconds / 60) | round(1) }} min</b><span>Laufzeit ({{ date_de }})</span></div>
-  <div class="tile tint"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen bewertet</span></div>
+  <div class="tile"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen gelesen</span></div>
+  <div class="tile tint"><b>{{ n_bewertet }}</b><span>davon relevant</span></div>
 </div>
+{# Bis zum 06.08.2026 stand hier EINE Kachel: "426 neue Meldungen bewertet".
+   Das waren zwei verschiedene Zahlen unter einem Label - am 05.08. wurden
+   426 neue Meldungen gelesen und 92 davon als relevant behalten. Getrennt
+   ausweisen und den Abstand erklaeren, statt ihn zu verstecken. #}
+{% if report and report.stats and report.stats.get('new') and n_bewertet < report.stats.get('new') %}
+<p class="muted-note" style="margin:14px 0 0;max-width:760px">
+  Warum die zweite Zahl kleiner ist: <b>jede</b> neue Meldung wird einem
+  Analysten vorgelegt – gekappt wird nichts. Er behält nur, was für Vodafone
+  eine Nachricht ist, und verwirft Routine, Doppelmeldungen und Werbung. Die
+  Tabelle unten zeigt das je Bereich.
+</p>
+{% endif %}
 
 <div class="card" style="margin-top:20px">
   <div class="card-head"><h2>Ablauf dieses Laufs</h2></div>

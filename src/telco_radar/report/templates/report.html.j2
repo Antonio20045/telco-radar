@@ -9,7 +9,7 @@
 <section class="page-hero">
   <p class="page-kicker">Marktrecherche &middot; Bericht</p>
   <h1>Was Vodafone jetzt wissen muss.</h1>
-  <p class="page-date" style="display:block;padding-bottom:0;margin-top:10px">Stand {{ date_de }}{% if report.stats %} &middot; {{ report.stats.get('new', '–') }} neue Meldungen, {{ highlights|length }} bewertet{% endif %}</p>
+  <p class="page-date" style="display:block;padding-bottom:0;margin-top:10px">Stand {{ date_de }}{% if report.stats %} &middot; {{ report.stats.get('new', '–') }} neue Meldungen gelesen, {{ highlights|length }} relevant{% endif %}</p>
 </section>
 
 {% if top_priorities %}
@@ -32,8 +32,15 @@
 {% endif %}
 
 {% if top_priorities %}
+{# Bis zum 06.08.2026 stand hier "Alle Signale dieser Woche" ueber einer
+   Liste, die html.py auf relevance>=4 und dann auf 6 Eintraege kappt - am
+   05.08. also 6 von 92. Die Ueberschrift nennt jetzt, was sie zeigt, und
+   verlinkt auf die vollstaendige Liste. #}
 <div class="card">
-  <div class="card-head"><h2>Alle Signale dieser Woche</h2></div>
+  <div class="card-head">
+    <h2>Die {{ top_priorities|length }} dringendsten Signale</h2>
+    <a href="#alle-meldungen">alle {{ highlights|length }} Meldungen &darr;</a>
+  </div>
   <div class="signal-list">
     {% for h in top_priorities %}
     <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
@@ -63,7 +70,7 @@
 {% endif %}
 
 {% if highlights %}
-<details class="evidence" style="margin-top:24px">
+<details class="evidence" id="alle-meldungen" style="margin-top:24px">
   <summary><span>Alle {{ highlights | length }} Meldungen durchsuchen</span><small>bei Bedarf öffnen</small></summary>
   <div class="evidence-body">
     <div class="filters">

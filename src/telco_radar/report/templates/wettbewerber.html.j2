@@ -43,6 +43,18 @@
   {% endif %}
   {% endfor %}
 </div>
+{% elif competitors and competitors|selectattr('error')|list %}
+{# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht.
+   Am 04. und 05.08.2026 scheiterten alle drei Profile in 0,6 s an einer
+   falschen Modell-ID - die Seite sagte beide Male, die Analyse "entstehe
+   beim naechsten Lauf". #}
+<p class="empty-note">
+  <b>Die Wettbewerber-Analyse des Laufs vom {{ date_de }} ist gescheitert.</b>
+  Die Meldungen wurden gesammelt und zugeordnet
+  ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Auswertung
+  hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll; die
+  Auswertung wird beim nächsten Lauf erneut versucht.
+</p>
 {% else %}
 <p class="empty-note">Für diesen Lauf liegt noch keine Wettbewerber-Detailanalyse vor. Sie entsteht beim nächsten Lauf der Pipeline (benötigt die KI-Analyse).</p>
 {% endif %}

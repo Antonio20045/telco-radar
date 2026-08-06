@@ -73,7 +73,8 @@ def analyze_competitor(name, terms, items, model, language="Deutsch",
     matched = matched[:max_items]
 
     result = {"name": name, "n_items": len(matched), "moves": [],
-              "summary": "", "themes": [], "vodafone_implication": ""}
+              "summary": "", "themes": [], "vodafone_implication": "",
+              "error": ""}
     if not matched:
         return result
     user = f'Recent telecom trade-press articles mentioning "{name}":\n' + _payload(matched)
@@ -90,7 +91,13 @@ def analyze_competitor(name, terms, items, model, language="Deutsch",
                 "category": str(m.get("category", "Sonstiges")),
                 "note": str(m.get("note", ""))})
     except (ValueError, RuntimeError, KeyError) as exc:
+        # Der Fehler muss die Seite erreichen. Bis zum 06.08.2026 wurde er nur
+        # geloggt, das Profil kam leer zurueck, und die Wettbewerber-Seite
+        # sagte dem Leser "entsteht beim naechsten Lauf" - obwohl der Lauf
+        # gerade stattgefunden hatte und gescheitert war. Zwei Laeufe lang
+        # (#74, #75) hat das niemand gemerkt.
         log.error("Competitor analysis failed for %s: %s", name, exc)
+        result["error"] = f"{type(exc).__name__}: {exc}"
     log.info("Competitor %-20s: %d matched items -> %d moves", name,
              len(matched), len(result["moves"]))
     return result
@@ -107,9 +114,13 @@ def analyze_all(focus, items, model, language="Deutsch", max_workers=4):
         try:
             return analyze_competitor(t[0], t[1], items, model, language)
         except Exception as exc:  # noqa: BLE001 - one profile must not kill the rest
-            log = __import__("logging").getLogger(__name__)
             log.error("Competitor %s failed: %s", t[0], exc)
-            return None
+            # Nicht None: ein verschwundenes Profil ist von "diese Woche gab
+            # es nichts" nicht zu unterscheiden. Der Platzhalter traegt den
+            # Fehler bis auf die Seite.
+            return {"name": t[0], "n_items": 0, "moves": [], "summary": "",
+                    "themes": [], "vodafone_implication": "",
+                    "error": f"{type(exc).__name__}: {exc}"}
 
     with ThreadPoolExecutor(max_workers=max(1, min(max_workers, len(tasks)))) as pool:
         results = list(pool.map(_one, tasks))
