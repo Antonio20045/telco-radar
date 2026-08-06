@@ -176,13 +176,40 @@ von Google Fonts, mit lokalen Rückfallschriften im CSS).
 > **Wer den Plan liest, muss Abschnitt 5 und 9 dort zusammen mit diesem
 > Absatz lesen.**
 
+**Raster mit Gewichtung** (Nachrichtenportal-Umbau, 06.08.2026, Schlussliste
+`outputs/nachrichtenportal-2026-08-06.md`). Bis dahin kannte die Titelseite
+zwei Gewichtsstufen — Aufmacher plus drei gleich große Anreißer — und
+Antonio sagte nach fünf Runden: *„Mir gefällt die Seite immer noch überhaupt
+nicht."* Eine Zeitungsseite entsteht nicht aus Schriftart plus Bild, sondern
+aus einem **Raster mit Gewichtung**. Jetzt:
+
+| Stufe | Vorlage | Regel |
+|---|---|---|
+| Aufmacher | `.aufmacher` | 1 Meldung, Bild **≥ 800 px** |
+| zweite Reihe | `.reihe-zwei .stueck-mittel` | 2 Meldungen, Bild ≥ 800 px |
+| dritte Reihe | `.reihe-vier .stueck-klein` | 4 Meldungen, Bild beliebig |
+| „Was wichtig ist" | `.front-wichtig` | 7 nummerierte Zeilen, **ohne** Bild |
+| Ressortblöcke | `.ressort-raster` | 6 Ressorts, je Aufmacher + 4 Zeilen |
+
+Ressorts kommen aus der `category` der Meldung (`RESSORTS` in `html.py`),
+mit **einer** Ausnahme: Satellit/NTN wird über den Themen-Tagger
+abgespalten, sonst hätte „Netz & Technik" ein Drittel der Ausgabe.
+„Vermischtes" steht auf der Titelseite nicht. Kein Absender darf oberhalb
+der Falz mehr als zweimal vorkommen — ohne diese Regel standen fünf von
+sieben Zeilen unter drei Schreibweisen von „SpaceX".
+
+**Jede Schlagzeile jeder Vorlage trägt die Klasse `szl`.** Daran hängen die
+Wahrheitstests (keine Dublette, keine abgeschnittene Überschrift, Zahl der
+Geschichten oberhalb der Falz). Wer eine Schlagzeile ergänzt und die Klasse
+vergisst, fällt aus allen dreien heraus.
+
 **Vier Seiten**, geschnitten nach der Frage des Lesers (vorher sieben, siehe
 `PLAN_MARKTRECHERCHE_REDESIGN.md`):
 
 | Seite | Frage | Inhalt |
 |---|---|---|
-| `index.html` **Diese Woche** | „Was ist passiert?" | Hero, Leitmeldung, KPI-Kacheln, Themenradar, Kurzfazit, **der volle Prosabericht mit Sprungnavigation**, die 6 dringendsten Signale, Deutschland-Fokus, Auswertung je Bereich |
-| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | Volltextsuche über alle Wochen (`search_index.json`), Split-View-Explorer der aktuellen Woche, Wochenarchiv |
+| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, dann 6 Ressortblöcke, dann **der volle Prosabericht zweispaltig mit Sprungnavigation**, Zahlen der Woche, Deutschland-Fokus, Auswertung je Bereich |
+| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | alle Meldungen **nach Ressort gruppiert und innerhalb gewichtet** (Aufmacher / 4 mittlere / zweispaltige Zeilen), Ressort-Sprungleiste, Filter, Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | persistente, kuratierte Bibliothek (eigene Frage, eigener State) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
 
@@ -199,6 +226,25 @@ Meta-Refresh plus sichtbarer Link (`_redirect_html()` in `report/html.py`).
 Archivwoche) · `meldungen` · `transparenz` · `differenzierung` ·
 `_explorer` (Teilvorlage, an zwei Orten eingebunden) · `promo_index` ·
 `promo_quellen`.
+
+**Bilder** (`report/bilder.py`, neu geschrieben am 06.08.2026): jede Meldung
+wird versucht — kein Deckel —, und die **Größe entscheidet, nicht die
+Herkunft. Feed-Bild UND `og:image` werden geholt, mit Pillow gemessen, das
+breitere gewinnt.** Vorher galt „Feed zuerst", und Feeds tragen ein
+`media:thumbnail`: 18 der 31 Bilder waren schmaler als 860 px, der Aufmacher
+der Ausgabe vom 6.8. lag bei 120 × 90. Ergebnis jetzt: 147 von 193 (76 %),
+38,9 s nebenläufig. Abgelegt wird als JPEG auf 1280 px (die 40
+dringendsten) bzw. 800 px — sonst wäre das Repo mehrere hundert MB im Jahr
+schwerer. **`site/images/` spiegelt den Bildordner, es sammelt nicht**, und
+`render_site()` streicht jeden `image`-Verweis, zu dem keine Datei mehr da
+ist (sonst zeigen Archivwochen leere Kästen, nachdem `raeume_auf()` ihre
+Bilder gelöscht hat).
+
+**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst acht
+Kriterien gegen die wirklich gerenderte Seite, drei davon mit echtem
+Chromium bei 1440 × 900 — unter anderem, ob **irgendein** Bild
+hochskaliert dargestellt wird. Nichts an der Optik gilt als erledigt, bevor
+dieses Skript grün ist.
 
 ## 6. Bekannte Fallstricke (alle in Session 1 gelernt!)
 
@@ -397,14 +443,20 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **`AUFTRAG_NACHRICHTENPORTAL.md` ist der Text, mit dem die nächste Session
-> anfängt.** Die Seite ist funktional in Ordnung und sieht immer noch nicht
-> aus wie ein Nachrichtenportal. Der Auftrag benennt mit gemessenen Zahlen,
-> warum: 31 von 193 Meldungen haben ein Bild (153 wurden nie versucht — ein
-> Deckel im Code, keine fehlenden Quellen), 18 der 31 Bilder sind zu klein
-> und deshalb unscharf, und die Titelseite kennt nur zwei Gewichtsstufen
-> statt vier. Der Quellenausbau (`AUFTRAG_1000_QUELLEN_WELLE3.md`) läuft
-> parallel weiter, hat aber Vorrang NACH dem Portal.
+> **`AUFTRAG_NACHRICHTENPORTAL.md` ist abgearbeitet**
+> (Schlussliste: `outputs/nachrichtenportal-2026-08-06.md`). Alle acht
+> Prüfungen von `scripts/pruefe_portal.py` sind grün, 458 Tests laufen.
+> Offen aus diesem Auftrag bleiben zwei Punkte, beide dort begründet:
+> die Verifikation auf der Live-Site (der Branch war noch nicht in `main`)
+> und der **Platzbedarf im Repo** — rund 17 MB Bilder je Lauf in zwei
+> Kopien, hochgerechnet ~1,5 GB im Jahr in der git-Historie. Die Lösung
+> wäre, den Zwischenspeicher abzuschaffen und `site/images/` als einzigen
+> Ort zu führen; das dreht aber die Grenze „Pipeline-State ≠ Site-Ausgabe"
+> um und ist eine Architekturentscheidung, keine Aufräumarbeit.
+>
+> **Der nächste Auftrag ist damit `AUFTRAG_1000_QUELLEN_WELLE3.md`**
+> (Quellenausbau) — beziehungsweise die vier Schritte aus §9 unten, deren
+> erster (Vorgabe-Region für Fachpressequellen) unverändert offen ist.
 
 ## 9. Stand der Skalierung — und was als Nächstes kommt
 

@@ -494,19 +494,21 @@ def run(root: Path, use_llm: bool | None = None,
                 h.setdefault("source_url", "")
 
     # ------------------------------------------------------------- Bilder
-    # Eine Zeitung ohne Bilder ist eine Textwueste. Nur die dringendsten
-    # Meldungen bekommen eins, und ein Fehlschlag ist folgenlos - der Layout
-    # kommt ohne Bild aus (viele Fachpresseseiten weisen den direkten Abruf
-    # mit 403 ab).
+    # Eine Zeitung ohne Bilder ist eine Textwueste. JEDE Meldung wird
+    # versucht - bis zum 06.08.2026 lag hier ein Deckel bei 40, und 153 von
+    # 193 Meldungen wurden nie auch nur gefragt. Ein Fehlschlag bleibt
+    # folgenlos: der Satz kommt ohne Bild aus (viele Fachpresseseiten weisen
+    # den direkten Abruf mit 403 ab).
     tbild = time.monotonic()
     alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
     try:
-        n_bilder = report_bilder.hole_bilder(alle_highlights, root)
+        bild_bilanz = report_bilder.hole_bilder(alle_highlights, root)
     except Exception as exc:  # noqa: BLE001 - Bilder duerfen nie den Lauf kippen
         log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
-        n_bilder = 0
+        bild_bilanz = {}
+    n_bilder = bild_bilanz.get("geladen", 0)
     phase("Bilder", time.monotonic() - tbild,
-          f"{n_bilder} von {min(len(alle_highlights), 40)} Meldungen mit Bild")
+          f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild")
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den

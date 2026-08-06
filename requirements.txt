@@ -6,3 +6,7 @@ Jinja2>=3.1
 Markdown>=3.6
 pytest>=8.0
 playwright>=1.44
+# report/bilder.py misst jeden Bildkandidaten, bevor es einen auswaehlt, und
+# rechnet ihn auf Zeitungsmasse herunter. Ohne Pillow gaebe es weder das eine
+# noch das andere - und die Titelseite haette wieder 120x90-Bilder.
+Pillow>=10.0

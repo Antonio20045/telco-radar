@@ -1,22 +1,38 @@
-{# Die Titelseite der Ausgabe.
+{# Die Titelseite der Ausgabe - ein Zeitungsraster mit vier Gewichtsstufen.
 
-   Aufbau wie eine Zeitungstitelseite, nicht wie ein Dashboard:
-     AUFMACHER   ein grosses Bild, eine grosse Schlagzeile, ein Vorspann.
-                 Er nimmt die obere Haelfte der Seite ein und ist der
-                 einzige Block, der gross sein darf.
-     ZWEITE REIHE drei bebilderte Anreisser unter dem Aufmacher.
-     HAUPTSPALTE der Wochenbericht mit Sprungnavigation und Initial.
-     RAIL        Zahlen, weitere Meldungen, Themenradar - schmal, ruhig.
+   Bis zum 06.08.2026 standen hier zwei Stufen: ein Aufmacher, drei gleich
+   grosse Anreisser, dann der Fliesstext. Antonio nach fuenf Runden: "Mir
+   gefaellt die Seite immer noch ueberhaupt nicht." Der Grund war nicht die
+   Schrift und nicht das Bild, sondern das fehlende RASTER MIT GEWICHTUNG -
+   eine Zeitungsseite entsteht daraus, dass eine Geschichte dominiert, zwei
+   mittel sind und zwanzig Zeilen sind.
 
-   Das Datum steht EINMAL, in der Datumszeile des Zeitungskopfs. Es stand
-   am 06.08.2026 zehnmal auf der Seite, und die Ueberschriften waren so
-   zahlreich, dass die Seite unruhig wirkte. Wer hier eine Rubrik ergaenzt,
-   sollte vorher eine streichen.
+     AUFMACHER      gross, Bild >= 800 px, Vorspann.
+     WAS WICHTIG IST  daneben, sieben nummerierte Textzeilen. Ohne diese
+                    Spalte stehen oberhalb der Falz nur vier Geschichten.
+     ZWEITE REIHE   zwei mittlere Bildgeschichten.
+     DRITTE REIHE   vier kleine.
+     RESSORTS       je Ressort ein Aufmacher plus vier Zeilen.
+     WOCHENBERICHT  vollstaendig, zweispaltig - das Herzstueck (CLAUDE.md
+                    §8), aber eine Titelseite fuehrt mit Nachrichten, nicht
+                    mit einem Essay.
 
+   Jede Schlagzeile traegt die Klasse `szl`. Daran haengt der Wahrheitstest
+   in tests/test_seiten_zahlen.py: keine doppelte Meldung, keine
+   abgeschnittene Ueberschrift. Wer eine Schlagzeile ergaenzt und die Klasse
+   vergisst, faellt aus beiden Pruefungen heraus.
+
+   Das Datum steht EINMAL, in der Datumszeile des Zeitungskopfs.
    Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html. #}
 {% extends "base.html.j2" %}
 {% set active = 'woche' %}
 {% block title %}{% if is_latest %}Vodafone Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
+
+{% macro bild(h, klasse, eager=false) %}
+{%- if h.image %}<span class="{{ klasse }}"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+     {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
+     loading="{{ 'eager' if eager else 'lazy' }}"></span>{% endif -%}
+{% endmacro %}
 
 {% block content %}
 {% if report %}
@@ -26,44 +42,138 @@
   <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
 {% endif %}
 
-{# ====================================================== AUFMACHER ==== #}
-{% if aufmacher %}
-<article class="aufmacher{% if not aufmacher.image %} ohne-bild{% endif %}{% if (aufmacher.schlagzeile or "")|length <= 70 %} kurz{% endif %}">
-  <p class="page-kicker">{{ aufmacher.category or 'Aufmacher' }}{% if aufmacher.region %} · {{ aufmacher.region }}{% endif %}</p>
-  <h1>{{ aufmacher.schlagzeile or aufmacher.de_title }}</h1>
-  {% if aufmacher.image %}
-  <figure class="aufmacher-bild">
-    <img src="{{ prefix }}images/{{ aufmacher.image }}" alt="" loading="eager">
-    <figcaption>{{ aufmacher.operator or aufmacher.source_label }} · Bild: {{ aufmacher.source_label }}</figcaption>
-  </figure>
-  {% endif %}
-  <div class="aufmacher-text">
-    {% if aufmacher.vorspann %}<p class="aufmacher-vorspann">{{ aufmacher.vorspann }}</p>{% endif %}
-    <p class="aufmacher-meta">
-      <b>{{ aufmacher.operator or aufmacher.source_label }}</b>
-      <span class="rel-badge r{{ aufmacher.relevance }}">Priorität {{ aufmacher.relevance }}/5</span>
-      <a href="{{ aufmacher.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
-    </p>
-  </div>
-</article>
-{% else %}
-<section class="page-hero"><h1>Diese Woche keine priorisierte Meldung.</h1></section>
-{% endif %}
+{# ================================================= OBERHALB DER FALZ ==== #}
+<div class="front-oben">
+  <div class="front-haupt">
 
-{# =================================================== ZWEITE REIHE ==== #}
-{% if zweite_reihe %}
-<div class="zweite-reihe">
-  {% for h in zweite_reihe %}
-  <a class="anreisser{% if not h.image %} ohne-bild{% endif %}" href="{{ h.url }}" target="_blank" rel="noopener">
-    {% if h.image %}<span class="anreisser-bild"><img src="{{ prefix }}images/{{ h.image }}" alt="" loading="lazy"></span>{% endif %}
-    <span class="anreisser-kicker">{{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}</span>
-    <span class="anreisser-titel">{{ h.schlagzeile or h.de_title }}</span>
-  </a>
+    {% if front.aufmacher %}
+    {% set a = front.aufmacher %}
+    <article class="aufmacher{% if not a.image %} ohne-bild{% endif %}{% if (a.schlagzeile or '')|length <= 70 %} kurz{% endif %}">
+      <p class="page-kicker">{{ a.ressort_label }}{% if a.operator %} · {{ a.operator }}{% endif %}</p>
+      <h1 class="szl"><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.schlagzeile }}</a></h1>
+      {% if a.image %}
+      <figure class="aufmacher-bild">
+        <img src="{{ prefix }}images/{{ a.image }}" alt=""
+             {% if a.image_w %}width="{{ a.image_w }}" height="{{ a.image_h }}"{% endif %}
+             loading="eager">
+        <figcaption>{{ a.operator or a.source_label }} · Bild: {{ a.source_label }}</figcaption>
+      </figure>
+      {% endif %}
+      <div class="aufmacher-text">
+        {% if a.vorspann %}<p class="aufmacher-vorspann">{{ a.vorspann }}</p>{% endif %}
+        <p class="aufmacher-meta">
+          <b>{{ a.operator or a.source_label }}</b>
+          <span class="rel-badge r{{ a.relevance }}">Priorität {{ a.relevance }}/5</span>
+          <a href="{{ a.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
+        </p>
+      </div>
+    </article>
+    {% else %}
+    <section class="page-hero"><h1 class="szl">Diese Woche keine priorisierte Meldung.</h1></section>
+    {% endif %}
+
+    {% if front.zwei %}
+    <div class="reihe reihe-zwei">
+      {% for h in front.zwei %}
+      <article class="stueck stueck-mittel{% if not h.image %} ohne-bild{% endif %}">
+        <a href="{{ h.url }}" target="_blank" rel="noopener">
+          {{ bild(h, 'stueck-bild') }}
+          <span class="stueck-kicker">{{ h.ressort_label }} · {{ h.operator or h.source_label }}</span>
+          <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
+          {% if h.anriss %}<span class="stueck-anriss">{{ h.anriss }}</span>{% endif %}
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if front.vier %}
+    <div class="reihe reihe-vier">
+      {% for h in front.vier %}
+      <article class="stueck stueck-klein{% if not h.image %} ohne-bild{% endif %}">
+        <a href="{{ h.url }}" target="_blank" rel="noopener">
+          {{ bild(h, 'stueck-bild') }}
+          <span class="stueck-kicker">{{ h.ressort_label }}</span>
+          <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  {# Die Textspalte neben dem Aufmacher. Ohne sie stehen oberhalb der Falz
+     vier Geschichten; mit ihr elf. Bewusst OHNE Bilder - die gehoeren in
+     die Bildpositionen links, nicht in eine Digest-Spalte. #}
+  {% if front.wichtig %}
+  <aside class="front-wichtig">
+    <div class="rubrik"><h2>Was wichtig ist</h2></div>
+    <ol class="wichtig-liste">
+      {% for h in front.wichtig %}
+      <li class="wichtig-zeile">
+        <a href="{{ h.url }}" target="_blank" rel="noopener">
+          <span class="wichtig-kicker">{{ h.operator or h.source_label }}</span>
+          <span class="wichtig-titel szl">{{ h.schlagzeile }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="ex-count">
+      {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
+      {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
+    </p>
+
+    {# Der Themenradar steht hier oben, nicht unten neben dem Bericht: die
+       Rail neben Aufmacher und den beiden Reihen waere sonst ab der Haelfte
+       leer, und Weissraum an dieser Stelle liest sich als Fehler. #}
+    {% if dash and dash.tech_radar %}
+    <div class="card">
+      <div class="card-head"><h2>Themen der Woche</h2></div>
+      {% for t in dash.tech_radar[:7] %}
+      <div class="bento-bar">
+        <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </aside>
+  {% endif %}
+</div>
+
+{# ======================================================= RESSORTS ====== #}
+{% if front.ressorts %}
+<div class="ressort-raster">
+  {% for r in front.ressorts %}
+  <section class="ressort">
+    <div class="rubrik">
+      <h2>{{ r.label }}</h2>
+      <a href="{{ prefix }}meldungen.html#ressort-{{ r.key }}">alle {{ r.n }}</a>
+    </div>
+    <article class="ressort-lead{% if not r.lead.image %} ohne-bild{% endif %}">
+      <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
+        {{ bild(r.lead, 'ressort-lead-bild') }}
+        <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}</span>
+        <span class="ressort-lead-titel szl">{{ r.lead.schlagzeile }}</span>
+        {% if r.lead.anriss %}<span class="stueck-anriss">{{ r.lead.anriss }}</span>{% endif %}
+      </a>
+    </article>
+    {% if r.zeilen %}
+    <ul class="ressort-zeilen">
+      {% for h in r.zeilen %}
+      <li><a href="{{ h.url }}" target="_blank" rel="noopener">
+        <span class="ressort-zeile-titel szl">{{ h.schlagzeile }}</span>
+        <span class="ressort-zeile-meta">{{ h.operator or h.source_label }}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
   {% endfor %}
 </div>
 {% endif %}
 
-{# ======================================================== RASTER ===== #}
+{# ================================================== DER WOCHENBERICHT == #}
 <div class="frontpage">
   <div class="frontpage-main">
     {% if briefing_html %}
@@ -80,7 +190,7 @@
         {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
       </nav>
       {% endif %}
-      <article class="prose">{{ briefing_html | safe }}</article>
+      <article class="prose prose-zwei">{{ briefing_html | safe }}</article>
     </div>
     {% endif %}
   </div>
@@ -92,41 +202,6 @@
       {% for k in dash.kpis %}
       <div class="tile{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
         <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    {% if weitere_signale %}
-    <div class="card">
-      <div class="card-head">
-        <h2>Die {{ weitere_signale|length }} nächsten Signale</h2>
-      </div>
-      <div class="signal-list">
-        {% for h in weitere_signale %}
-        <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
-          <span class="signal-badge r{{ h.relevance }}">{{ h.relevance }}</span>
-          <span class="signal-body">
-            <span class="signal-company">{{ h.operator or h.source_label }} &middot; {{ h.region }}</span>
-            <span class="signal-title">{{ h.schlagzeile }}</span>
-          </span>
-        </a>
-        {% endfor %}
-      </div>
-      <p class="ex-count" style="margin-top:12px">
-        {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
-        {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
-      </p>
-    </div>
-    {% endif %}
-
-    {% if dash and dash.tech_radar %}
-    <div class="card">
-      <div class="card-head"><h2>Themen der Woche</h2></div>
-      {% for t in dash.tech_radar[:6] %}
-      <div class="bento-bar">
-        <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
-        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
       </div>
       {% endfor %}
     </div>

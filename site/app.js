@@ -323,29 +323,57 @@ var TelcoSearch = (function () {
 
 /* Meldungsliste (meldungen.html): filtert die serverseitig gerenderten
    Meldungen. Bewusst KEIN Explorer mit Split-View - die Seite soll gelesen
-   werden koennen wie eine Zeitungsseite, nicht bedient wie ein Werkzeug. */
+   werden koennen wie eine Zeitungsseite, nicht bedient wie ein Werkzeug.
+
+   Seit die Seite nach Ressorts gegliedert ist, muss der Filter zwei Dinge
+   mehr tun: ein Ressort ohne Treffer ganz ausblenden (sonst steht eine
+   Rubrikleiste ueber Leere) und die Zahl in der Ressortleiste mitfuehren
+   (sonst verspricht sie 46 Meldungen und zeigt zwei). */
 (function () {
   'use strict';
   var input = document.getElementById('meldung-filter');
-  var liste = document.getElementById('meldungs-liste');
   var zahl = document.getElementById('meldung-zahl');
   var leer = document.getElementById('meldung-leer');
-  if (!input || !liste) return;
+  var ressorts = Array.prototype.slice.call(
+    document.querySelectorAll('.mressort'));
+  if (!input || !ressorts.length) return;
 
-  var zeilen = Array.prototype.slice.call(liste.querySelectorAll('.meldung'));
+  var nav = {};
+  Array.prototype.slice.call(document.querySelectorAll('.ressort-nav a'))
+    .forEach(function (a) {
+      var id = (a.getAttribute('href') || '').slice(1);
+      if (id) nav[id] = a.querySelector('b');
+    });
+
+  var bloecke = ressorts.map(function (sec) {
+    return {
+      sec: sec,
+      zaehler: nav[sec.id] || null,
+      gesamt: sec.querySelectorAll('[data-such]').length,
+      zeilen: Array.prototype.slice.call(sec.querySelectorAll('[data-such]'))
+    };
+  });
+  var gesamt = bloecke.reduce(function (n, b) { return n + b.gesamt; }, 0);
   var t;
 
   function filtern() {
     var q = (input.value || '').trim().toLowerCase();
     var sichtbar = 0;
-    zeilen.forEach(function (z) {
-      var treffer = !q || (z.dataset.such || '').indexOf(q) !== -1;
-      z.hidden = !treffer;
-      if (treffer) sichtbar++;
+    bloecke.forEach(function (b) {
+      var n = 0;
+      b.zeilen.forEach(function (z) {
+        var treffer = !q || (z.dataset.such || '').indexOf(q) !== -1;
+        z.hidden = !treffer;
+        if (treffer) n++;
+      });
+      b.sec.hidden = n === 0;
+      if (b.zaehler) b.zaehler.textContent = n;
+      if (nav[b.sec.id]) nav[b.sec.id].parentNode.hidden = n === 0;
+      sichtbar += n;
     });
     if (zahl) {
-      zahl.textContent = q ? sichtbar + ' von ' + zeilen.length + ' Meldungen'
-                           : zeilen.length + ' Meldungen';
+      zahl.textContent = q ? sichtbar + ' von ' + gesamt + ' Meldungen'
+                           : gesamt + ' Meldungen';
     }
     if (leer) leer.hidden = sichtbar !== 0;
   }

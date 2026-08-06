@@ -23,22 +23,28 @@ import json
 import re
 
 import pytest
+from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
 
 
-def _highlight(i: int, relevance: int) -> dict:
-    return {
+def _highlight(i: int, relevance: int, category: str = "Netz/Technologie",
+               image_w: int = 0) -> dict:
+    h = {
         "title": f"Meldung {i}",
         "operator": f"Betreiber {i}",
         "url": f"https://example.com/{i}",
-        "category": "Netz/Technologie",
+        "category": category,
         "relevance": relevance,
         "summary": f"Zusammenfassung der Meldung {i}.",
         "why_it_matters": "Interne Einordnung.",
         "date": "2026-08-05",
         "source": "Beispielquelle",
     }
+    if image_w:
+        h |= {"image": f"bild{i}.jpg", "image_w": image_w,
+              "image_h": round(image_w * 9 / 16)}
+    return h
 
 
 # 12 relevante Meldungen, davon 8 mit relevance >= 4: mehr als der Deckel von
@@ -49,16 +55,50 @@ HIGHLIGHTS = ([_highlight(i, 5) for i in range(4)]
               + [_highlight(i, 3) for i in range(8, 12)])
 NEU_GESAMMELT = 426
 
+# Eine Ausgabe in der Groessenordnung einer echten (193 Meldungen am
+# 06.08.2026): genug Meldungen fuer alle vier Gewichtsstufen der Titelseite
+# UND fuer Ressortbloecke danach. Mit den zwoelf oben ist die Titelseite
+# schon vor den Ressorts leergeraeumt - dann pruefte kein Test das Raster.
+KATEGORIEN = ["Netz/Technologie", "Tarif/Pricing", "Regulierung", "M&A",
+              "Partnerschaft", "Sonstiges", "Finanzen", "Produktlaunch"]
+PORTAL = [
+    _highlight(100 + i, 5 - (i % 3), KATEGORIEN[i % len(KATEGORIEN)],
+               # jede zweite Meldung mit Bild, davon jede vierte zu klein
+               # fuer eine grosse Position - genau die Mischung, in der sich
+               # die Auswahl bewaehren muss
+               image_w=(0 if i % 2 else (520 if i % 4 == 2 else 1200)))
+    for i in range(48)
+]
 
-def _render(tmp_path, *, competitors=None, stats=None):
-    reports = tmp_path / "reports"
+
+def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
+            bilder_anlegen=True):
+    from telco_radar.report.bilder import bildordner
+
+    # data/reports/ wie im echten Projekt: render_site() leitet den
+    # Bildordner ueber `reports_dir.parent.parent` her. Lag der Bericht flach
+    # unter tmp_path, zeigte das auf das GEMEINSAME pytest-Wurzelverzeichnis -
+    # und ein Test sah die Bilddateien eines anderen.
+    reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
+    hs = HIGHLIGHTS if highlights is None else highlights
+    # Die Bilddateien muessen wirklich existieren: render_site() streicht
+    # jeden `image`-Verweis, zu dem keine Datei mehr im Bildordner liegt
+    # (sonst zeigen Archivwochen leere Kaesten, nachdem raeume_auf() ihre
+    # Bilder geloescht hat). Ohne diese Dateien pruefte der Bildtest unten
+    # eine Seite ganz ohne Bilder - also nichts.
+    if bilder_anlegen:
+        ordner = bildordner(reports.parent.parent)
+        ordner.mkdir(parents=True, exist_ok=True)
+        for h in hs:
+            if h.get("image"):
+                (ordner / h["image"]).write_bytes(b"nicht wirklich ein Bild")
     (reports / "2026-08-05.json").write_text(json.dumps({
         "date": "2026-08-05",
         "generated_with_llm": True,
         "stats": stats if stats is not None else {"new": NEU_GESAMMELT},
         "briefing_md": "## Auf einen Blick\n\nText.\n\n## Europa\n\nMehr Text.",
-        "regions": {"Europa": {"region_summary": "", "highlights": HIGHLIGHTS}},
+        "regions": {"Europa": {"region_summary": "", "highlights": hs}},
         "competitors": competitors if competitors is not None else [],
         "run": {"duration_seconds": 1487.8, "models": {"analyst": "m", "editor": "m"},
                 "phases": [], "analysts": [], "sources": [],
@@ -67,6 +107,22 @@ def _render(tmp_path, *, competitors=None, stats=None):
     site = tmp_path / "site"
     render_site(site, reports)
     return site
+
+
+def _schlagzeilen(html: str, wurzel: str = "") -> list[str]:
+    """Alle Schlagzeilen einer Seite, ueber die Klasse `szl`.
+
+    Vorher listete jeder Test vier Regexe fuer vier Vorlagenklassen auf. Wer
+    eine fuenfte Position ergaenzte, fiel damit still aus der Pruefung
+    heraus - und genau so kam am 06.08.2026 eine doppelte Meldung auf die
+    Titelseite. Jetzt traegt jede Schlagzeile in jeder Vorlage `szl`, und
+    diese Funktion findet sie alle.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    bereich = soup.select_one(wurzel) if wurzel else soup
+    if bereich is None:
+        return []
+    return [e.get_text(" ", strip=True) for e in bereich.select(".szl")]
 
 
 def _seite(site, name: str) -> str:
@@ -96,20 +152,115 @@ def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
 
 
 # ------------------------------------------------------------------ Bericht
-def test_signalliste_verspricht_nicht_mehr_als_sie_zeigt(tmp_path):
-    """Die Ueberschrift muss der Zahl der gerenderten Zeilen entsprechen."""
-    html = _seite(_render(tmp_path), "index.html")
+def test_ressortleiste_verspricht_nicht_mehr_als_es_gibt(tmp_path):
+    """Jede Ressortzahl auf der Titelseite muss der Datenlage entsprechen.
 
-    gezeigt = html.count('class="signal-row"')
-    m = re.search(r"<h2>Die (\d+) [a-zä]+ Signale</h2>", html)
-    assert m, "Ueberschrift der Signalliste fehlt"
-    assert int(m.group(1)) == gezeigt, (
-        f"Ueberschrift sagt {m.group(1)}, gerendert sind {gezeigt}")
+    Der Nachfolger von `test_signalliste_verspricht_nicht_mehr_als_sie_zeigt`:
+    die Signalliste ist beim Portal-Umbau durch Ressortbloecke ersetzt
+    worden, das Verbot bleibt dasselbe. Ein Block, der "alle 46" verspricht
+    und zu einer Seite mit 12 fuehrt, ist genau der Fehler von damals.
+    """
+    from telco_radar.report.html import _flatten, _nach_ressort
 
-    # Das eigentliche Verbot: keine Ueberschrift, die "alle" behauptet,
-    # solange gekappt wird.
-    assert gezeigt < len(HIGHLIGHTS)
+    site = _render(tmp_path, highlights=PORTAL)
+    html = _seite(site, "index.html")
+    bericht = json.loads((tmp_path / "data" / "reports" / "2026-08-05.json")
+                         .read_text(encoding="utf-8"))
+    echt = {r["label"]: r["n"] for r in _nach_ressort(_flatten(bericht))}
+
+    soup = BeautifulSoup(html, "html.parser")
+    rubriken = soup.select(".ressort .rubrik")
+    assert rubriken, "Die Titelseite zeigt keine Ressortbloecke"
+    for rubrik in rubriken:
+        label = rubrik.h2.get_text(strip=True)
+        m = re.fullmatch(r"alle (\d+)", rubrik.a.get_text(strip=True))
+        assert m, f"Ressort {label} verlinkt seine Meldungszahl nicht"
+        assert int(m.group(1)) == echt[label], (
+            f"{label}: Seite sagt {m.group(1)}, Daten sagen {echt[label]}")
+
+    # Und keine Ueberschrift, die "alle" behauptet, waehrend gekappt wird.
+    assert len(_schlagzeilen(html)) < len(PORTAL)
     assert "Alle Signale dieser Woche" not in html
+
+
+def test_oberhalb_der_falz_stehen_mindestens_sechs_geschichten(tmp_path):
+    """Abnahmekriterium 1 des Auftrags, als Test.
+
+    Bis zum 06.08.2026 standen dort vier: ein Aufmacher und drei gleich
+    grosse Anreisser. Das war der Kern von Antonios Befund - eine
+    Titelseite mit vier Geschichten ist keine.
+    """
+    html = _seite(_render(tmp_path, highlights=PORTAL), "index.html")
+    oben = _schlagzeilen(html, ".front-oben")
+    assert len(oben) >= 6, f"Nur {len(oben)} Geschichten oberhalb der Falz"
+
+
+def test_kein_kleines_bild_in_einer_grossen_position(tmp_path):
+    """Abnahmekriterium 3: kein Bild im Aufmacher oder in der zweiten Reihe
+    unter 800 px Breite.
+
+    Am 06.08.2026 war der Aufmacher der Ausgabe ein 120x90-Vorschaubild aus
+    einem Feed, auf rund 620 px hochskaliert. Die Ursache war die Auswahl
+    ("Feed-Bild zuerst"), aber die Seite muss sich auch dann wehren, wenn
+    die Beschaffung wieder etwas Kleines liefert.
+    """
+    from telco_radar.report.bilder import MIND_BREITE_GROSS
+
+    site = _render(tmp_path, highlights=PORTAL)
+    soup = BeautifulSoup(_seite(site, "index.html"), "html.parser")
+    gross = soup.select(".aufmacher-bild img, .reihe-zwei .stueck-bild img")
+    assert gross, "Weder Aufmacher noch zweite Reihe tragen ein Bild"
+    for img in gross:
+        breite = int(img.get("width") or 0)
+        assert breite >= MIND_BREITE_GROSS, (
+            f"Bild mit {breite} px in einer grossen Position "
+            f"({img.get('src')})")
+
+
+def test_geloeschtes_bild_hinterlaesst_keinen_leeren_kasten(tmp_path):
+    """Eine Berichtsdatei behaelt ihre `image`-Verweise fuer immer, der
+    Bildordner nicht: `raeume_auf()` loescht die Bilder aelterer Ausgaben.
+    Jede Archivwoche jenseits der Aufbewahrungsfrist zeigte dadurch leere
+    Bildkaesten - gefunden am 06.08.2026 an reports/2026-08-05.html."""
+    site = _render(tmp_path, highlights=PORTAL, bilder_anlegen=False)
+    for name in ("index.html", "meldungen.html", "reports/2026-08-05.html"):
+        html = _seite(site, name)
+        assert "images/bild" not in html, f"{name} verweist auf ein fehlendes Bild"
+    # Gegenprobe: mit vorhandenen Dateien stehen die Bilder auch da.
+    assert "images/bild" in _seite(_render(tmp_path / "mit", highlights=PORTAL),
+                                   "index.html")
+
+
+def test_site_images_sammelt_nicht(tmp_path):
+    """site/images/ spiegelt den Bildordner, es sammelt nicht.
+
+    Bis zum 06.08.2026 wurde dorthin nur kopiert und nie geloescht.
+    `raeume_auf()` beschnitt den Zwischenspeicher, site/images/ behielt
+    jedes je geladene Bild - bei rund 130 Bildern je Lauf und zwei Laeufen
+    pro Woche waeren das mehrere Gigabyte im Jahr, fuer Bilder, auf die
+    keine Seite mehr zeigt."""
+    from telco_radar.report.bilder import bildordner
+
+    site = _render(tmp_path, highlights=PORTAL)
+    (site / "images" / "aus-einem-alten-lauf.jpg").write_bytes(b"alt")
+    # Zweiter Renderlauf mit unveraendertem Bildordner.
+    render_site(site, tmp_path / "data" / "reports")
+
+    assert not (site / "images" / "aus-einem-alten-lauf.jpg").exists()
+    assert {p.name for p in (site / "images").iterdir()} == \
+        {p.name for p in bildordner(tmp_path).iterdir()}
+
+
+def test_jede_meldung_bekommt_genau_ein_ressort():
+    """Ohne diese Zusicherung faellt beim Gruppieren still etwas heraus."""
+    from telco_radar.report.html import _flatten, _nach_ressort
+
+    bericht = {"date": "2026-08-05", "stats": {},
+               "regions": {"Europa": {"highlights": PORTAL}}}
+    highlights = _flatten(bericht)
+    verteilt = sum(r["n"] for r in _nach_ressort(highlights))
+    assert verteilt == len(highlights)
+    assert all(h.get("ressort") and h.get("ressort_label") for h in highlights)
 
 
 def test_bericht_verlinkt_die_vollstaendige_liste(tmp_path):
@@ -127,10 +278,41 @@ def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
 
 def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
     """Die Zahl im Kopf muss zu den gerenderten Meldungen passen - und die
-    Meldungen muessen ohne Klick dastehen, nicht hinter einem Werkzeug."""
-    html = _seite(_render(tmp_path), "meldungen.html")
-    assert html.count('class="meldung"') == len(HIGHLIGHTS)
-    assert f"{len(HIGHLIGHTS)} Meldungen" in html
+    Meldungen muessen ohne Klick dastehen, nicht hinter einem Werkzeug.
+
+    Seit dem Portal-Umbau steht jede Meldung in einer von drei Gewichtungen
+    (Ressortaufmacher, mittel, Zeile). Gezaehlt wird deshalb ueber das
+    Filterattribut, das alle drei tragen - sonst wuerde ein Umbau, der eine
+    Stufe verliert, hier nicht auffallen."""
+    site = _render(tmp_path, highlights=PORTAL)
+    soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
+    assert len(soup.select("[data-such]")) == len(PORTAL)
+    assert f"{len(PORTAL)} Meldungen" in _seite(site, "meldungen.html")
+
+
+def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
+    """Abnahmekriterium 4: Ressorts statt einer flachen Liste, und innerhalb
+    eines Ressorts drei Groessen statt einer.
+
+    Vorher rendete die Seite 193-mal denselben Block. Antonio nannte das
+    "extrem beschissenes Layout" - zu Recht, das war eine Datenbankausgabe.
+    """
+    soup = BeautifulSoup(
+        _seite(_render(tmp_path, highlights=PORTAL), "meldungen.html"),
+        "html.parser")
+
+    ressorts = soup.select(".mressort")
+    assert len(ressorts) >= 3, "Die Seite ist nicht nach Ressorts gegliedert"
+    # Jedes Ressort fuehrt mit genau einem Aufmacher ...
+    for sec in ressorts:
+        assert len(sec.select(".mlead")) == 1
+    # ... und mindestens eines nutzt alle drei Gewichtungen.
+    assert any(sec.select(".mlead") and sec.select(".mzwei") and sec.select(".mz")
+               for sec in ressorts)
+    # Die Ressortzahlen der Sprungleiste summieren sich auf die Gesamtzahl.
+    aus_leiste = [int(b.get_text(strip=True))
+                  for b in soup.select(".ressort-nav a b")]
+    assert sum(aus_leiste) == len(PORTAL)
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -382,17 +564,20 @@ def test_archivkopie_gibt_sich_als_archiv_zu_erkennen(tmp_path):
 
 
 # ---------------------------------------------- Titelseite: keine Dubletten
-def test_aufmacher_steht_nicht_zweimal_auf_der_titelseite(tmp_path):
+@pytest.mark.parametrize("hs", [HIGHLIGHTS, PORTAL], ids=["klein", "portal"])
+def test_keine_meldung_steht_zweimal_auf_der_titelseite(tmp_path, hs):
     """Der Aufmacher wird fuer die Anzeige kopiert. Wurde er danach ueber
     Objektidentitaet aus den Anreissern gefiltert, stand dieselbe Meldung
-    mit demselben Bild ein zweites Mal darunter - gefunden am 06.08.2026."""
-    html = _seite(_render(tmp_path), "index.html")
+    mit demselben Bild ein zweites Mal darunter - gefunden am 06.08.2026.
 
-    titel = re.findall(r'<h1>(.*?)</h1>', html, re.S)
-    anreisser = re.findall(r'class="anreisser-titel">(.*?)</span>', html, re.S)
-    weitere = re.findall(r'class="signal-title">(.*?)</span>', html, re.S)
-    alle = [t.strip() for t in titel + anreisser + weitere]
-    assert len(alle) == len(set(alle)), f"Doppelte Meldung auf der Titelseite: {alle}"
+    Geprueft wird ueber die Klasse `szl`, also ueber ALLE Positionen der
+    Seite: Aufmacher, zweite und dritte Reihe, "Was wichtig ist" und jeden
+    Ressortblock. Die alte Fassung listete vier Regexe auf und haette einen
+    fuenften Platz stillschweigend uebersehen.
+    """
+    alle = _schlagzeilen(_seite(_render(tmp_path, highlights=hs), "index.html"))
+    doppelt = {t for t in alle if alle.count(t) > 1}
+    assert not doppelt, f"Doppelte Meldung auf der Titelseite: {doppelt}"
 
 
 def test_schlagzeile_bricht_nicht_mitten_im_wort(tmp_path):
@@ -435,16 +620,46 @@ def test_bilder_alter_wochen_werden_aufgeraeumt(tmp_path):
 def test_keine_ueberschrift_ist_abgeschnitten(tmp_path):
     """Der Kern der Kritik vom 06.08.2026: auf der Titelseite standen
     Ueberschriften, die mitten im Satz mit "…" aufhoerten - der Leser
-    erfuhr nicht, worum es geht. Keine Ueberschrift darf so enden."""
-    site = _render(tmp_path)
+    erfuhr nicht, worum es geht. Keine Ueberschrift darf so enden.
+
+    Ueber `szl` gilt das jetzt fuer jede Position beider Seiten, nicht nur
+    fuer die vier, die jemand einmal in ein Regex geschrieben hat."""
+    site = _render(tmp_path, highlights=PORTAL)
     for seite in ("index.html", "meldungen.html"):
-        html = _seite(site, seite)
-        for muster in (r'<h1>(.*?)</h1>', r'<h2><a[^>]*>(.*?)</a></h2>',
-                       r'class="anreisser-titel">(.*?)</span>',
-                       r'class="signal-title">(.*?)</span>'):
-            for treffer in re.findall(muster, html, re.S):
-                assert not treffer.strip().endswith("…"), (
-                    f"Abgeschnittene Ueberschrift auf {seite}: {treffer[:70]}")
+        gefunden = _schlagzeilen(_seite(site, seite))
+        assert gefunden, f"{seite} traegt keine erkennbare Schlagzeile"
+        for treffer in gefunden:
+            assert not treffer.endswith("…"), (
+                f"Abgeschnittene Ueberschrift auf {seite}: {treffer[:70]}")
+
+
+def test_satztrenner_bricht_nicht_an_einer_datumszahl():
+    """"AST SpaceMobile hat am 5. August 2026 drei Satelliten gestartet"
+    endete im Anriss der zweiten Reihe nach vier Woertern: "hat am 5."
+    Ordnungszahlen sind im Deutschen keine Satzenden."""
+    from telco_radar.report.html import _first_sentence
+
+    text = ("AST SpaceMobile hat am 5. August 2026 drei Satelliten gestartet. "
+            "Der naechste Start folgt.")
+    assert _first_sentence(text, 150) == (
+        "AST SpaceMobile hat am 5. August 2026 drei Satelliten gestartet.")
+    # Gegenprobe: ein echtes Satzende wird weiterhin erkannt.
+    assert _first_sentence("Erster Satz. Zweiter Satz.", 150) == "Erster Satz."
+
+
+def test_platzhalter_im_betreiberfeld_erscheint_nicht_als_absender():
+    """Der Analyst traegt bei branchenweiten Meldungen "kein spezifischer
+    Betreiber" ein. Ueber einer Titelseiten-Schlagzeile gelesen ist das kein
+    Absender - dann steht dort die Quelle."""
+    from telco_radar.report.html import _flatten
+
+    bericht = {"date": "2026-08-05", "stats": {}, "regions": {"Global": {
+        "highlights": [dict(_highlight(1, 5), operator="kein spezifischer Betreiber"),
+                       dict(_highlight(2, 5), operator="Branche"),
+                       dict(_highlight(3, 5), operator="Deutsche Telekom")]}}}
+    ops = [h["operator"] for h in _flatten(bericht)]
+    assert ops.count("") == 2
+    assert "Deutsche Telekom" in ops
 
 
 def test_originalueberschrift_schlaegt_den_gekuerzten_satz():

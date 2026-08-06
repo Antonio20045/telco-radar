@@ -1,52 +1,98 @@
-{# Alle Meldungen der Woche - als Zeitungsseite, nicht als Werkzeug.
+{# Alle Meldungen der Woche - als Ressortseite, nicht als Datenbankausgabe.
 
-   Bis zum 06.08.2026 stand hier zuerst eine Ueberschrift, dann ein
-   Erklaerabsatz, dann ein Suchfeld, dann Filterknoepfe, dann noch eine
-   Ueberschrift mit Unterzeile - und ERST DANN die Meldungen. Wer die
-   Meldungen sehen wollte, musste an fuenf Abschnitten vorbeiscrollen.
+   Bis zum 06.08.2026 standen hier 193 identisch gebaute Bloecke
+   untereinander: Bild links, Ueberschrift, Beschreibung, Quelle. Jeder rund
+   150 px hoch, keine Gruppierung, keine Gewichtung. Antonio: "extrem
+   beschissenes Layout" - und er hatte recht, das war eine Tabelle mit
+   Serifenschrift.
 
-   Jetzt: eine Zeile Kopf, eine Zeile Suche, dann die Meldungen. Jede mit
-   Bild (wenn eins da ist), vollstaendiger Ueberschrift und einer kurzen
-   Beschreibung. Das Archiv frueherer Ausgaben steht am Ende, wo es
-   hingehoert. #}
+   Jetzt: nach Ressort gruppiert, innerhalb gewichtet. Je Ressort ein
+   Aufmacher mit grossem Bild, zwei mittlere daneben, der Rest als
+   zweispaltige Zeilen mit kleinem Bild. Die Rubrikleiste nennt das Ressort
+   und seine Meldungszahl; die Filterleiste oben springt zu den Ressorts und
+   filtert weiterhin ueber alle.
+
+   Jede Schlagzeile traegt `szl` - daran haengen die Wahrheitstests. #}
 {% extends "base.html.j2" %}
 {% set active = 'meldungen' %}
 {% block title %}Vodafone Insights · Alle Meldungen{% endblock %}
+
+{% macro zeile(h) %}
+<article class="mz" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
+  <a href="{{ h.url }}" target="_blank" rel="noopener">
+    {% if h.image %}<span class="mz-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+       {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
+    <span class="mz-text">
+      <span class="mz-titel szl">{{ h.schlagzeile }}</span>
+      <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}{% if h.date %} · {{ h.date }}{% endif %}</span>
+    </span>
+  </a>
+</article>
+{% endmacro %}
+
 {% block content %}
 
-<section class="page-hero wide">
-  <h1>Alle Meldungen</h1>
-  <p class="page-lead">Jede Meldung, die die Auswertung dieser Woche als relevant behalten hat –
-  mit Betreiber, Bereich, Datum und Link zur Originalquelle.</p>
-</section>
-
-<div class="meldungen-suche">
-  <input type="search" id="meldung-filter" placeholder="Filtern: Betreiber, Thema, Stichwort …"
-         aria-label="Meldungen filtern" autocomplete="off">
-  <span class="meldungen-zahl" id="meldung-zahl">{{ highlights|length }} Meldungen</span>
+<div class="meldungen-kopf">
+  <div>
+    <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
+    <h1>Alle Meldungen</h1>
+  </div>
+  <div class="meldungen-suche">
+    <input type="search" id="meldung-filter" placeholder="Filtern: Betreiber, Thema, Stichwort …"
+           aria-label="Meldungen filtern" autocomplete="off">
+    <span class="meldungen-zahl" id="meldung-zahl">{{ highlights|length }} Meldungen</span>
+  </div>
 </div>
 
-{% if highlights %}
-<div class="meldungs-liste" id="meldungs-liste">
-  {% for h in highlights %}
-  <article class="meldung" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
-    {% if h.image %}
-    <a class="meldung-bild" href="{{ h.url }}" target="_blank" rel="noopener">
-      <img src="{{ prefix }}images/{{ h.image }}" alt="" loading="lazy">
-    </a>
-    {% endif %}
-    <div class="meldung-text">
-      <p class="meldung-kicker">
-        <span class="meldung-rel r{{ h.relevance }}">{{ h.relevance }}</span>
-        {{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}{% if h.date %} · {{ h.date }}{% endif %}
-      </p>
-      <h2><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a></h2>
-      {% if h.summary %}<p class="meldung-text-body">{{ h.summary }}</p>{% endif %}
-      <p class="meldung-quelle"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }} &nearr;</a></p>
+{% if ressorts %}
+{# Ressortleiste: springt zum Block. Kein Filter - der Filter oben sucht im
+   Text, diese Zeile ist die Gliederung der Seite. #}
+<nav class="ressort-nav" aria-label="Ressorts">
+  {% for r in ressorts %}<a href="#ressort-{{ r.key }}">{{ r.label }} <b>{{ r.n }}</b></a>{% endfor %}
+</nav>
+
+{% for r in ressorts %}
+<section class="mressort" id="ressort-{{ r.key }}">
+  <div class="rubrik">
+    <h2>{{ r.label }}</h2>
+    <span class="count-badge">{{ r.n }} Meldungen</span>
+  </div>
+
+  <div class="mressort-oben">
+    <article class="mlead{% if not r.lead.image %} ohne-bild{% endif %}" data-such="{{ ((r.lead.operator or '') ~ ' ' ~ (r.lead.schlagzeile or '') ~ ' ' ~ (r.lead.summary or '') ~ ' ' ~ (r.lead.region or '') ~ ' ' ~ (r.lead.category or '') ~ ' ' ~ (r.lead.source_label or '')) | lower }}">
+      <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
+        {% if r.lead.image %}<span class="mlead-bild"><img src="{{ prefix }}images/{{ r.lead.image }}" alt=""
+           {% if r.lead.image_w %}width="{{ r.lead.image_w }}" height="{{ r.lead.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
+        <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}{% if r.lead.date %} · {{ r.lead.date }}{% endif %}</span>
+        <span class="mlead-titel szl">{{ r.lead.schlagzeile }}</span>
+        {% if r.lead.summary %}<span class="mlead-anriss">{{ r.lead.summary }}</span>{% endif %}
+      </a>
+    </article>
+    {% if r.mittel %}
+    <div class="mmittel">
+      {% for h in r.mittel %}
+      <article class="mzwei{% if not h.image %} ohne-bild{% endif %}" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
+        <a href="{{ h.url }}" target="_blank" rel="noopener">
+          {% if h.image %}<span class="mzwei-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+             {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
+          <span class="mzwei-text">
+            <span class="mzwei-titel szl">{{ h.schlagzeile }}</span>
+            <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}</span>
+          </span>
+        </a>
+      </article>
+      {% endfor %}
     </div>
-  </article>
-  {% endfor %}
-</div>
+    {% endif %}
+  </div>
+
+  {% if r.zeilen %}
+  <div class="mzeilen">
+    {% for h in r.zeilen %}{{ zeile(h) }}{% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
 <p class="empty-note" id="meldung-leer" hidden>Keine Meldung passt zu diesem Filter.</p>
 {% else %}
 <p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>

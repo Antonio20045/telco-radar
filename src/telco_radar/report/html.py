@@ -216,6 +216,11 @@ def _load_latest_diff_report(reports_dir: Path) -> dict | None:
         return None
 
 
+_IST_PLATZHALTER = re.compile(
+    r"(kein[^,]*betreiber|keine?r?|branche|diverse?|mehrere|unbekannt|"
+    r"n/?a|-+|allgemein)", re.I)
+
+
 def _flatten(report: dict) -> list[dict]:
     out = []
     for region_name, region in (report.get("regions") or {}).items():
@@ -230,10 +235,21 @@ def _flatten(report: dict) -> list[dict]:
             dom = urlsplit(h.get("url") or "").netloc.removeprefix("www.")
             h["source_domain"] = dom
             h["source_label"] = h.get("source") or dom
+            # Der Analyst traegt bei branchenweiten Meldungen Platzhalter in
+            # das Betreiberfeld ("kein spezifischer Betreiber", "Branche").
+            # Als Rubrikzeile ueber einer Titelseiten-Schlagzeile gelesen ist
+            # das kein Absender, sondern eine Ausrede - dann steht dort die
+            # Quelle, die die Meldung wirklich verantwortet.
+            if _IST_PLATZHALTER.fullmatch((h.get("operator") or "").strip()):
+                h["operator"] = ""
             h["de_title"] = _first_sentence(h.get("summary") or "", 150) or h.get("title") or ""
             # Jede Meldung traegt ihre vollstaendige Ueberschrift - die
             # Meldungsseite zeigt alle, nicht nur die der Titelseite.
             h["schlagzeile"] = _schlagzeile(h)
+            # ... und ihr Ressort. Titelseite und Meldungsseite gruppieren
+            # beide danach; die Zuordnung darf nur an EINER Stelle stehen.
+            h["ressort"] = _ressort(h)
+            h["ressort_label"] = _RESSORT_LABEL[h["ressort"]]
             out.append(h)
     out.sort(key=lambda h: (h["relevance"], h.get("date") or ""), reverse=True)
     for i, h in enumerate(out):
@@ -277,6 +293,219 @@ def _tag_tech(text):
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
 
 
+# ------------------------------------------------------------------ Ressorts
+# Eine Zeitung hat Ressorts, und zwar VOR der Nachrichtenlage: der Leser
+# weiss, wo Netzthemen stehen, bevor er die Ausgabe aufschlaegt. Die
+# Zuordnung kommt aus der `category`, die der Analyst ohnehin je Meldung
+# vergibt - keine zweite Klassifizierung, kein zusaetzlicher LLM-Aufruf.
+#
+# Zwei Kategorien pro Ressort zusammenzufassen ist Absicht: "Produktlaunch"
+# und "Tarif/Pricing" sind fuer den Leser dasselbe Ressort ("was kann ich
+# kaufen und was kostet es"), und ein Ressort mit fuenf Meldungen ist keins.
+RESSORTS: list[tuple[str, str, set[str]]] = [
+    ("netz", "Netz & Technik", {"Netz/Technologie"}),
+    ("tarife", "Tarife & Angebote",
+     {"Tarif/Pricing", "Produktlaunch", "Kampagne"}),
+    ("regulierung", "Regulierung & Politik", {"Regulierung"}),
+    ("geld", "Geld & Übernahmen", {"Finanzen", "M&A"}),
+    ("partner", "Partnerschaften", {"Partnerschaft"}),
+    ("vermischt", "Vermischtes", {"Sonstiges"}),
+]
+# Die eine Ausnahme von "Ressort = Kategorie": Satellit/NTN. Sonst lieferte
+# "Netz/Technologie" ein Viertel der ganzen Ausgabe (46 von 193 am
+# 06.08.2026, plus 28 Satellitenmeldungen darin), und das ist kein Ressort,
+# das ist ein Sammelbecken. Der Themen-Tagger steht ohnehin schon da.
+_SATELLIT = ("satellit", "Satellit & Direct-to-Cell")
+_RESSORT_REIHENFOLGE = ["netz", "tarife", _SATELLIT[0], "regulierung",
+                        "geld", "partner", "vermischt"]
+_RESSORT_LABEL = dict([(k, l) for k, l, _ in RESSORTS] + [_SATELLIT])
+
+
+def _ressort(h: dict) -> str:
+    """Der Ressortschluessel einer Meldung. Jede bekommt genau einen."""
+    if "Satellit / NTN" in _tag_tech(f"{h.get('title', '')} {h.get('summary', '')}"):
+        return _SATELLIT[0]
+    kategorie = h.get("category") or "Sonstiges"
+    for key, _label, kategorien in RESSORTS:
+        if kategorie in kategorien:
+            return key
+    return "vermischt"
+
+
+def _bildbreite(h: dict) -> int:
+    """Breite des abgelegten Bildes in Pixeln, 0 wenn es keins gibt.
+
+    `image_w` schreibt report/bilder.py beim Ablegen. Berichte von vor dem
+    06.08.2026 haben das Feld nicht - fuer die gilt 0, sie landen also nie
+    in einer Position, die ein grosses Bild verlangt. Genau richtig: ihre
+    Bilder waren die 120x90-Vorschaubilder, um die es hier geht.
+    """
+    return int(h.get("image_w") or 0) if h.get("image") else 0
+
+
+# Woerter, die keinen Absender unterscheiden. Ohne diese Liste faende
+# "T-Mobile US" und "Mobile World Live" denselben Namen.
+_GENERISCHE_NAMENSWOERTER = {
+    "group", "telecom", "telecoms", "mobile", "communications", "holdings",
+    "international", "limited", "global", "media", "news", "corp", "world",
+    "corporation", "company", "networks", "network", "digital", "wireless",
+}
+
+
+def _kennwoerter(name: str) -> frozenset[str]:
+    """Die unterscheidenden Woerter eines Absendernamens.
+
+    Dient nur einem Zweck: erkennen, dass "Starlink (SpaceX)",
+    "SpaceX / Starlink" und "SpaceX" derselbe Absender sind. Am 06.08.2026
+    standen dadurch fuenf von sieben Zeilen der Spalte "Was wichtig ist"
+    unter demselben Namen - eine Zeitung bringt nicht fuenfmal dieselbe
+    Firma auf der Titelseite, auch wenn die Nachrichtenlage es hergibt.
+    """
+    woerter = re.findall(r"[a-zäöüß0-9]{4,}", (name or "").lower())
+    return frozenset(w for w in woerter
+                     if w not in _GENERISCHE_NAMENSWOERTER)
+
+
+# Wie oft ein Absender oberhalb der Falz vorkommen darf.
+_MAX_JE_ABSENDER = 2
+
+
+def _titelseite(highlights: list[dict]) -> dict:
+    """Verteilt die Meldungen auf die Gewichtsstufen der Titelseite.
+
+    Bis zum 06.08.2026 kannte die Titelseite ZWEI Stufen: einen Aufmacher
+    und drei gleich grosse Anreisser, dahinter eine flache Liste. Eine
+    Zeitungstitelseite braucht vier, und sie muss oberhalb der Falz mehr als
+    vier Geschichten zeigen.
+
+        aufmacher     1  gross, Bild >= 800 px
+        zwei          2  mittel, Bild >= 800 px  (die zweite Reihe)
+        vier          4  klein, Bild beliebig
+        wichtig       7  nur Text, nummeriert - die Spalte "Was wichtig ist"
+        ressorts      je Ressort ein Aufmacher + bis zu vier Zeilen
+
+    Die Reihenfolge der Vergabe ist der Punkt: die Bildpositionen greifen
+    zuerst zu, damit die grossen Bilder nicht in einer Textzeile verpuffen.
+    Eine Meldung wird ueber ihre URL genau einmal vergeben - ueber
+    Objektidentitaet ging das schon einmal schief (der Aufmacher stand
+    zweimal auf der Seite, weil er fuer die Anzeige kopiert wird).
+    """
+    benutzt: set[str] = set()
+    absender: list[set[str]] = []      # Kennwoerter je Absendergruppe
+    vergeben: list[int] = []           # wie viele Plaetze die Gruppe schon hat
+
+    def gruppe(h: dict) -> int | None:
+        kw = _kennwoerter(h.get("operator") or h.get("source_label") or "")
+        if not kw:
+            return None
+        for i, g in enumerate(absender):
+            if g & kw:
+                g |= kw                # Namensvarianten wachsen zusammen
+                return i
+        absender.append(set(kw))
+        vergeben.append(0)
+        return len(absender) - 1
+
+    def nimm(n: int, *, mind_breite: int = 0) -> list[dict]:
+        gewaehlt: list[dict] = []
+        # Drei Durchgaenge, in dieser Reihenfolge:
+        #   1. Bildanspruch UND Absenderdeckel
+        #   2. nur Absenderdeckel   - Vielfalt schlaegt Bebilderung
+        #   3. ohne beides          - eine Position bleibt nie leer
+        stufen = ([(mind_breite, True)] if mind_breite else []) \
+            + [(0, True), (0, False)]
+        for anspruch, deckel in stufen:
+            for h in highlights:
+                if len(gewaehlt) >= n:
+                    break
+                if h.get("url") in benutzt or _bildbreite(h) < anspruch:
+                    continue
+                i = gruppe(h)
+                if deckel and i is not None and vergeben[i] >= _MAX_JE_ABSENDER:
+                    continue
+                if i is not None:
+                    vergeben[i] += 1
+                benutzt.add(h.get("url"))
+                gewaehlt.append(h)
+            if len(gewaehlt) >= n:
+                break
+        return gewaehlt
+
+    from .bilder import MIND_BREITE_GROSS
+
+    aufmacher_roh = (nimm(1, mind_breite=MIND_BREITE_GROSS) or [None])[0]
+    aufmacher = None
+    if aufmacher_roh is not None:
+        aufmacher = dict(aufmacher_roh)
+        # Die volle Zusammenfassung des Analysten - sie ist bereits auf ein
+        # bis zwei Saetze angelegt. Ein Schnitt daran machte einen Halbsatz.
+        aufmacher["vorspann"] = " ".join((aufmacher_roh.get("summary") or "").split())
+
+    zwei = nimm(2, mind_breite=MIND_BREITE_GROSS)
+    for h in zwei:
+        h["anriss"] = _first_sentence(h.get("summary") or "", 150)
+    vier = nimm(4, mind_breite=1)
+    wichtig = nimm(7)
+
+    ressorts = []
+    # "Vermischtes" steht auf der Titelseite NICHT. Erstens fuehrt keine
+    # Zeitung ihre Titelseite mit einem Sammelressort, zweitens bleiben so
+    # genau sechs Bloecke - zwei volle Dreierreihen statt einer angebrochenen.
+    # Auf der Meldungsseite ist das Ressort weiterhin vollstaendig da.
+    for key in (k for k in _RESSORT_REIHENFOLGE if k != "vermischt"):
+        offen = [h for h in highlights
+                 if h.get("url") not in benutzt and h.get("ressort") == key]
+        if len(offen) < 2:            # ein Ressort mit einer Meldung ist keins
+            continue
+        lead = next((h for h in offen if _bildbreite(h) >= 500), offen[0])
+        zeilen = [h for h in offen if h is not lead][:4]
+        lead = dict(lead)
+        lead["anriss"] = _first_sentence(lead.get("summary") or "", 130)
+        ressorts.append({
+            "key": key, "label": _RESSORT_LABEL[key],
+            "lead": lead, "zeilen": zeilen,
+            # Die Zahl ist die des GANZEN Ressorts, nicht die der gezeigten
+            # Zeilen - deshalb steht neben ihr "insgesamt" und ein Link.
+            "n": sum(1 for h in highlights if h.get("ressort") == key),
+        })
+
+    return {"aufmacher": aufmacher, "zwei": zwei, "vier": vier,
+            "wichtig": wichtig, "ressorts": ressorts,
+            # Was oberhalb der Falz mit eigener Schlagzeile steht. Der Test
+            # in tests/test_seiten_zahlen.py haelt diese Zahl gegen die
+            # gerenderten Elemente.
+            "oben": 1 + len(zwei) + len(vier) + len(wichtig) if aufmacher else 0}
+
+
+def _nach_ressort(highlights: list[dict]) -> list[dict]:
+    """Alle Meldungen nach Ressort gruppiert, in fester Reihenfolge.
+
+    Fuer die Meldungsseite: dort steht jede Meldung, nicht nur eine Auswahl.
+    Innerhalb eines Ressorts bleibt die Sortierung nach Dringlichkeit, die
+    `_flatten()` gesetzt hat - der erste Eintrag ist also der Aufmacher des
+    Ressorts.
+    """
+    gruppen: dict[str, list[dict]] = {}
+    for h in highlights:
+        gruppen.setdefault(h.get("ressort") or "vermischt", []).append(h)
+    out = []
+    for key in _RESSORT_REIHENFOLGE:
+        eintraege = gruppen.get(key) or []
+        if not eintraege:
+            continue
+        # Der Ressortaufmacher steht mit grossem Bild - also muss er eins
+        # haben. Sonst gaehnt links eine Textwueste, waehrend die zwei
+        # kleineren daneben bebildert sind. Unter den ersten fuenf, damit
+        # die Dringlichkeit nicht der Bebilderung geopfert wird.
+        lead = next((h for h in eintraege[:5] if _bildbreite(h) >= 500),
+                    eintraege[0])
+        rest = [h for h in eintraege if h is not lead]
+        out.append({"key": key, "label": _RESSORT_LABEL[key],
+                    "lead": lead, "mittel": rest[:4],
+                    "zeilen": rest[4:], "n": len(eintraege)})
+    return out
+
+
 def _schlagzeile(h: dict, max_zeichen: int = 0) -> str:
     """Die Ueberschrift einer Meldung. **Nie abgeschnitten.**
 
@@ -317,6 +546,23 @@ def _text_aus_html(html: str) -> str:
     return " ".join(BeautifulSoup(html or "", "html.parser").get_text(" ").split())
 
 
+# Ein Punkt ist nur dann ein Satzende, wenn ein Buchstabe oder eine
+# schliessende Klammer davor steht und ein Grossbuchstabe dahinter. Ohne die
+# erste Bedingung ist "AST SpaceMobile hat am 5. August drei Satelliten
+# gestartet" nach vier Woertern zu Ende - genau so stand es am 06.08.2026 im
+# Anriss der zweiten Reihe ("AST SpaceMobile hat am 5."). Ordnungszahlen,
+# Datumsangaben und Geldbetraege sind im Deutschen voller solcher Punkte.
+#
+# Zwei Faelle, und der zweite ist nicht kosmetisch: ein freistehender Punkt
+# (" . ") ist immer ein Satzende und nie eine Ordnungszahl. Ohne diese
+# zweite Alternative verlor die Promo-Uebersicht ihren Schnitt - deren
+# Wochentext besteht aus aneinandergereihten Angebotstiteln, und der naechste
+# beginnt mit einer Ziffer ("1&1 Mobilfunk"), nicht mit einem Grossbuchstaben.
+_SATZENDE = re.compile(
+    r"(?:(?<=[a-z\u00e4\u00f6\u00fc\u00dfA-Z\u00c4\u00d6\u00dc\)\"'\u00bb])[.!?](?=\s+[A-Z\u00c4\u00d6\u00dc\u00ab\"\u201e])"
+    r"|(?<=\s)[.!?](?=\s))")
+
+
 def _first_sentence(text, limit=170):
     """Erster Satz, sonst gekuerzt - aber NIE mitten im Wort.
 
@@ -328,10 +574,12 @@ def _first_sentence(text, limit=170):
     t = " ".join((text or "").split())
     if not t:
         return ""
-    for sep in (". ", "! ", "? "):
-        k = t.find(sep)
-        if 0 < k < limit:
-            return t[:k + 1]
+    geschuetzt = t
+    for i, abk in enumerate(_ABK):
+        geschuetzt = geschuetzt.replace(abk, "\x00" * len(abk))
+    m = _SATZENDE.search(geschuetzt)
+    if m and 0 < m.end() < limit:
+        return t[:m.end()]
     if len(t) <= limit:
         return t
     schnitt = t[:limit].rstrip()
@@ -593,16 +841,41 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Meldungsbilder sind Pipeline-State (data/state/report_images/), nicht
     # Site-Quelltext - sie werden bei jedem Rendern kopiert, genau wie die
     # Promo-Screenshots. Nie von Hand unter site/ ablegen.
+    #
+    # site/images/ SPIEGELT den Ordner - es sammelt nicht. Bis zum
+    # 06.08.2026 wurde hier nur kopiert und nie geloescht: `raeume_auf()`
+    # beschnitt den Zwischenspeicher, site/images/ behielt jedes jemals
+    # geladene Bild. Solange es 9 Bilder je Lauf waren, fiel das nicht auf;
+    # seit es rund 130 sind, waere das Repo in einem Jahr um mehrere
+    # Gigabyte gewachsen - fuer Bilder, auf die keine Seite mehr zeigt.
     bild_quelle = report_bilder.bildordner(reports_dir.parent.parent)
     if bild_quelle.exists():
         bild_ziel = site_dir / "images"
         bild_ziel.mkdir(exist_ok=True)
+        vorhanden = set()
         for bild in bild_quelle.iterdir():
             if bild.is_file():
                 shutil.copyfile(bild, bild_ziel / bild.name)
+                vorhanden.add(bild.name)
+        for veraltet in bild_ziel.iterdir():
+            if veraltet.is_file() and veraltet.name not in vorhanden:
+                veraltet.unlink()
 
     num_operators = len(cfg.operators) if cfg is not None else None
     reports = _load_reports(reports_dir)
+    # Eine Berichtsdatei behaelt ihre `image`-Verweise fuer immer, der
+    # Bildordner nicht: `raeume_auf()` loescht die Bilder aelterer Ausgaben,
+    # damit das Repo nicht unbegrenzt waechst. Ohne diesen Abgleich zeigt
+    # jede Archivwoche jenseits der Aufbewahrungsfrist leere Bildkaesten -
+    # und der Satz kommt ohne Bild aus, das ist von Anfang an so gebaut.
+    vorhandene_bilder = {b.name for b in bild_quelle.iterdir() if b.is_file()} \
+        if bild_quelle.exists() else set()
+    for report in reports:
+        for region in (report.get("regions") or {}).values():
+            for h in region.get("highlights") or []:
+                if h.get("image") and h["image"] not in vorhandene_bilder:
+                    for feld in ("image", "image_w", "image_h"):
+                        h.pop(feld, None)
     # Die Datumszeile des Zeitungskopfs steht auf JEDER Seite und haengt an
     # der Ausgabe, nicht an der einzelnen Vorlage - deshalb als Global statt
     # als Kontextvariable, die man an sechs Aufrufstellen vergessen kann.
@@ -621,36 +894,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     latest_ctx: dict | None = None
     for i, report in enumerate(reports):
         highlights = _flatten(report)
-        spitze = [h for h in highlights if h["relevance"] >= 4]
-        # Der Aufmacher ist die dringendste Meldung MIT Bild - so fuehrt in
-        # jeder Zeitung die Bildgeschichte. Am 05.08.2026 haben die beiden
-        # dringendsten kein Bild (Mobile World Live und Telecoms.com weisen
-        # den Abruf mit 403 ab), die dritte schon.
-        aufmacher_roh = next((h for h in spitze if h.get("image")),
-                             spitze[0] if spitze else None)
-        # Ueber die URL ausschliessen, nicht ueber Objektidentitaet: der
-        # Aufmacher wird unten kopiert, und nach dem Kopieren traf `is not`
-        # nicht mehr zu - die Aufmachermeldung stand dadurch ein zweites Mal
-        # als erster Anreisser darunter, mit demselben Bild.
-        aufmacher_url = (aufmacher_roh or {}).get("url")
-        rest = [h for h in spitze if h.get("url") != aufmacher_url]
-        aufmacher = None
-        if aufmacher_roh is not None:
-            aufmacher = dict(aufmacher_roh)
-            aufmacher["schlagzeile"] = _schlagzeile(aufmacher_roh)
-            # Der Vorspann ist die Zusammenfassung DIESER Meldung, nicht die
-            # der Woche: briefing_lead ist derselbe Text, mit dem der Bericht
-            # darunter woertlich beginnt - das las sich wie ein Fehler.
-            # Die volle Zusammenfassung des Analysten - sie ist bereits auf
-            # ein bis zwei Saetze angelegt. Ein Schnitt bei 260 Zeichen
-            # machte daraus einen Halbsatz mit "…".
-            aufmacher["vorspann"] = " ".join(
-                (aufmacher_roh.get("summary") or "").split())
-        # Zweite Reihe: drei Anreisser, bevorzugt bebildert.
-        zweite_reihe = [dict(h, schlagzeile=_schlagzeile(h))
-                        for h in ([h for h in rest if h.get("image")]
-                                  + [h for h in rest if not h.get("image")])[:3]]
-        top = spitze[:6]
+        # Vier Gewichtsstufen plus Ressortbloecke statt "Aufmacher, drei
+        # gleich grosse Anreisser, flache Liste" - siehe _titelseite().
+        front = _titelseite(highlights)
         competitors = _prep_competitors(report)
         public_highlights = []
         for h in highlights:
@@ -664,13 +910,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "report": report, "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
             "explorer_json": _json_for_script(public_highlights),
-            "top_priorities": top,
-            "aufmacher": aufmacher,
-            "zweite_reihe": zweite_reihe,
-            # Was nach Aufmacher und zweiter Reihe uebrig bleibt - sonst
-            # stuende dieselbe Meldung dreimal auf der Titelseite.
-            "weitere_signale": [h for h in rest if h.get("url") not in
-                                {z.get("url") for z in zweite_reihe}][:6],
+            "front": front,
             "competitors": competitors,
             # _stats() ist teuer und wird nur von der aktuellen Woche
             # gebraucht. Bis zum 06.08.2026 lief es fuer JEDE Archivwoche mit
@@ -768,6 +1008,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             prefix="", archive=archive, num_operators=num_operators,
             date_de=(latest_ctx or {}).get("date_de", ""),
             highlights=(latest_ctx or {}).get("highlights", []),
+            # Nach Ressort gruppiert und innerhalb gewichtet - vorher waren
+            # es 193 identisch gebaute Zeilen untereinander.
+            ressorts=_nach_ressort((latest_ctx or {}).get("highlights", [])),
             explorer_json=(latest_ctx or {}).get("explorer_json", "[]"),
             regions=(latest_ctx or {}).get("regions", []),
             categories=(latest_ctx or {}).get("categories", [])),
@@ -893,7 +1136,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     if not reports:
         (site_dir / "index.html").write_text(
             woche_tpl.render(prefix="", report=None, date_de="", highlights=[],
-                             explorer_json="[]", top_priorities=[],
+                             explorer_json="[]", front=_titelseite([]),
                              competitors=[], dash=None, toc=[], lesezeit=0,
                              briefing_lead="", briefing_html="", regions=[],
                              categories=[], archive=[], is_latest=True,
