@@ -14,7 +14,7 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
-from .differentiation import build_differentiation, DIFF_THEMES
+from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
@@ -254,42 +254,6 @@ def _strip_suppressed_source_content(text: str) -> str:
     return re.sub(r"(?im)^.*(?:inside-digital\.de|inside digital).*$\n?", "", cleaned).strip()
 
 
-# --------------------------------------------------------------- SVG charts
-def _bar_chart_svg(rows, width=520, row_h=40, label_w=180) -> str:
-    if not rows:
-        return ""
-    maxv = max(v for _, v, _ in rows) or 1
-    value_w, pad = 40, 8
-    bar_max = width - label_w - value_w - pad * 2
-    height = row_h * len(rows)
-    parts = [f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" '
-             f'role="img" class="chart" preserveAspectRatio="xMinYMin meet">']
-    for i, (label, value, color) in enumerate(rows):
-        y = i * row_h
-        bw = max(4, round(bar_max * value / maxv))
-        lbl = html_lib.escape(label[:28])
-        parts.append(
-            f'<text x="{label_w - pad}" y="{y + row_h / 2 + 4}" text-anchor="end" '
-            f'class="c-label">{lbl}</text>'
-            f'<rect x="{label_w}" y="{y + 8}" width="{bar_max}" height="{row_h - 18}" '
-            f'rx="4" class="c-track"/>'
-            f'<rect x="{label_w}" y="{y + 8}" width="{bw}" height="{row_h - 18}" '
-            f'rx="4" fill="{color}"/>'
-            f'<text x="{label_w + bw + 8}" y="{y + row_h / 2 + 4}" class="c-value">'
-            f'{value}</text>')
-    parts.append("</svg>")
-    return "".join(parts)
-
-
-REL_COLORS = {5: "#e60000", 4: "#e07a00", 3: "#3860be", 2: "#9aa0aa"}
-
-
-def _delta(cur, prev):
-    d = int(cur or 0) - int(prev or 0)
-    return {"diff": d, "abs": abs(d),
-            "dir": "up" if d > 0 else ("down" if d < 0 else "flat")}
-
-
 TECH_THEMES = [
     ("5G Standalone", ["standalone", "5g sa", "5g-sa", "5g core", "sa network", "5g+"]),
     ("Satellit / NTN", ["satellite", "satellit", "ntn", "direct-to-cell", "direct to cell",
@@ -304,34 +268,9 @@ TECH_THEMES = [
     ("6G", ["6g"]),
     ("FWA", ["fwa", "fixed wireless", "fixed-wireless"]),
 ]
-_PRICE_RE = re.compile(
-    r"(\d+\s?(gb|tb)\b)|([\u20ac$\u00a3]\s?\d)|(\d+[.,]?\d*\s?(euro|eur|dollar))"
-    r"|\b(unlimited|allnet|flatrate|flat\b|prepaid|tarif|tariff|pricing|price cut"
-    r"|preissenkung|g\u00fcnstig|per month|/month|im monat)\b", re.I)
-_DEAL_RE = re.compile(
-    r"\b(partners? with|teams up|collaborat|acquir|acquisition|merger|merge[sd]?"
-    r"|joint venture|\bjv\b|stake|kooperation|\u00fcbernahme|to buy|invest|alliance"
-    r"|allianz|partnership)\b", re.I)
-_RISK_KW = ["druck", "risiko", "kontern", "verteidig", "angriff", "bedroh", "nachteil",
-            "verlieren", "abwander", "aufholen", "hinterher", "nachziehen", "reagieren",
-            "gefahr", "verdr\u00e4ng", "marktanteil verlier", "unter zugzwang"]
-_CHANCE_KW = ["chance", "potenzial", "potential", "nutzen", "adaptier", "adoptier",
-              "lernen", "vorbild", "m\u00f6glichkeit", "opportun", "vorreiter",
-              "vorsprung", "differenzier", "erschlie\u00df", "wachstum"]
-
-
 def _tag_tech(text):
     t = " " + (text or "").lower() + " "
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
-
-
-def _classify_angle(why):
-    w = (why or "").lower()
-    r = sum(w.count(k) for k in _RISK_KW)
-    c = sum(w.count(k) for k in _CHANCE_KW)
-    if r == 0 and c == 0:
-        return "neutral"
-    return "risk" if r >= c else "chance"
 
 
 def _first_sentence(text, limit=170):
@@ -343,15 +282,6 @@ def _first_sentence(text, limit=170):
         if 0 < k < limit:
             return t[:k + 1]
     return (t[:limit].rstrip() + "\u2026") if len(t) > limit else t
-
-
-def _op_counts(report):
-    c = {}
-    for h in _flatten(report):
-        op = (h.get("operator") or "").strip()
-        if op:
-            c[op] = c.get(op, 0) + 1
-    return c
 
 
 def _briefing_sections(md_text):
@@ -375,20 +305,56 @@ _ADVICE_SECTION_RE = re.compile(
 _ADVICE_LINE_RE = re.compile(r"(?mi)^\s*(?:Fuer|Für)\s+Vodafone\s*:.*(?:\n|$)")
 
 
+_ADVICE_PHRASES = (
+    "für vodafone", "fuer vodafone", "vodafone sollte", "vodafone könnte",
+    "vodafone koennte", "vodafone muss", "vodafone kann",
+)
+# Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
+# Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
+# Satz weg.
+_ABK = ("z. B.", "d. h.", "u. a.", "u. Ä.", "bzw.", "ca.", "ggf.", "inkl.",
+        "Mio.", "Mrd.", "Nr.", "Abb.", "evtl.", "sog.", "Prof.", "Dr.")
+_SATZ_GRENZE = re.compile(r"(?<=[.!?])\s+(?=[«\"„*\[(A-ZÄÖÜ])")
+
+
+def _ohne_ratschlagsaetze(block: str) -> str:
+    """Entfernt aus einem Absatz die SAETZE mit Vodafone-Ratschlag."""
+    geschuetzt = block
+    for i, abk in enumerate(_ABK):
+        geschuetzt = geschuetzt.replace(abk, f"\x00{i}\x00")
+    saetze = _SATZ_GRENZE.split(geschuetzt)
+    behalten = [s for s in saetze
+                if not any(p in s.lower() for p in _ADVICE_PHRASES)]
+    text = " ".join(behalten)
+    for i, abk in enumerate(_ABK):
+        text = text.replace(f"\x00{i}\x00", abk)
+    return text.strip()
+
+
 def _strip_vodafone_advice(md_text: str) -> str:
-    """Keep the public site observational, including for older reports."""
+    """Haelt die oeffentliche Seite beobachtend statt empfehlend.
+
+    Die Regel selbst ist eine Redaktionsentscheidung und bleibt: die Website
+    berichtet, sie berät nicht. Sie galt bis zum 06.08.2026 aber je ABSATZ -
+    und ein Absatz enthaelt in aller Regel zuerst den Befund und erst am Ende
+    die Folgerung. Gemessen am Bericht vom 05.08.2026 verschwanden dadurch
+    drei Absaetze mit 77 Woertern, darunter das Gewinnwachstum von MTN
+    Nigeria (70,6 %) - also berichtete Fakten, nur weil im selben Absatz
+    "Vodafone kann" stand.
+
+    Jetzt satzgenau: die Folgerung faellt, der Befund bleibt. Bleibt von
+    einem Absatz nichts uebrig, faellt er wie bisher ganz weg.
+    """
     cleaned = _ADVICE_SECTION_RE.sub("", md_text or "")
     cleaned = _ADVICE_LINE_RE.sub("", cleaned)
-    advice_phrases = (
-        "für vodafone", "fuer vodafone", "vodafone sollte", "vodafone könnte",
-        "vodafone koennte", "vodafone muss", "vodafone kann",
-    )
-    # Older reports sometimes put a factual sentence and an advice sentence
-    # in the same Markdown paragraph. Drop that whole block at render time so
-    # historical pages do not continue to sound like recommendation memos.
-    blocks = re.split(r"\n{2,}", cleaned)
-    blocks = [b for b in blocks
-              if not any(phrase in b.lower() for phrase in advice_phrases)]
+    blocks = []
+    for block in re.split(r"\n{2,}", cleaned):
+        if not any(p in block.lower() for p in _ADVICE_PHRASES):
+            blocks.append(block)
+            continue
+        rest = _ohne_ratschlagsaetze(block)
+        if rest:
+            blocks.append(rest)
     return "\n\n".join(blocks).strip()
 
 
@@ -421,21 +387,19 @@ def _promo_lead(md_text: str) -> str:
     return (txt[:280].rstrip() + "…") if len(txt) > 280 else txt
 
 
-def _stats(report, prev_report, trend_reports):
+def _stats(report):
+    """Kennzahlen der aktuellen Woche fuer den Kopf der Wochenseite.
+
+    Beim Redesign am 06.08.2026 auf das reduziert, was wirklich gerendert
+    wird. Entfernt, weil seit Monaten berechnet und in KEINER Vorlage
+    referenziert: sov (Share of Voice), pricing, deals, risks/chances und
+    n_competitors. Ebenso die Parameter prev_report/trend_reports - sie
+    dienten nur der Delta-Rechnung von sov.
+    """
     highlights = _flatten(report)
-    total = len(highlights) or 1
-    cur_ops = _op_counts(report)
-    prev_ops = _op_counts(prev_report) if prev_report else {}
 
-    sov = [{"op": k, "n": v, "pct": round(100 * v / total),
-            "delta": _delta(v, prev_ops.get(k, 0))}
-           for k, v in sorted(cur_ops.items(), key=lambda kv: -kv[1])[:6]]
-    sov_max = max((s["n"] for s in sov), default=1) or 1
-    for s in sov:
-        s["w"] = round(100 * s["n"] / sov_max)
-
-    # --- Tech radar (keyword themes over the news text) ---
-    tech = {}
+    # --- Themenradar (Schlagwortthemen ueber Titel und Zusammenfassung) ---
+    tech: dict[str, dict] = {}
     for h in highlights:
         for name in _tag_tech(f"{h.get('title','')} {h.get('summary','')}"):
             t = tech.setdefault(name, {"theme": name, "n": 0, "ops": {}, "ex": None})
@@ -449,78 +413,35 @@ def _stats(report, prev_report, trend_reports):
     tmax = max((t["n"] for t in tech_radar), default=1) or 1
     for t in tech_radar:
         t["w"] = round(100 * t["n"] / tmax)
-        t["ops_top"] = ", ".join(k for k, _ in sorted(t["ops"].items(), key=lambda kv: -kv[1])[:2])
+        t["ops_top"] = ", ".join(k for k, _ in sorted(t["ops"].items(),
+                                                      key=lambda kv: -kv[1])[:2])
 
-    # --- Pricing radar ---
-    pricing = [{"op": h.get("operator") or h.get("source_label"), "title": h.get("title"),
-                "url": h.get("url"), "region": h.get("region")}
-               for h in highlights
-               if h.get("category") == "Tarif/Pricing"
-               or _PRICE_RE.search(f"{h.get('title','')} {h.get('summary','')}")][:6]
+    profile = [{"name": c.get("name"), "n": int(c.get("n_items") or 0)}
+               for c in (report.get("competitors") or [])]
+    top_comp = max(profile, key=lambda c: c["n"], default=None)
 
-    # --- Deals & partnerships ---
-    deals = [{"op": h.get("operator") or h.get("source_label"), "title": h.get("title"),
-              "url": h.get("url"), "region": h.get("region"), "cat": h.get("category")}
-             for h in highlights
-             if h.get("category") in ("Partnerschaft", "M&A")
-             or _DEAL_RE.search(h.get("title", ""))][:6]
-
-    # --- Chances vs risks for Vodafone ---
-    risks, chances = [], []
-    for h in highlights:
-        if (h.get("relevance") or 0) < 3 or not h.get("why_it_matters"):
-            continue
-        rec = {"title": h.get("title"), "op": h.get("operator") or h.get("source_label"),
-               "url": h.get("url"), "why": h.get("why_it_matters"),
-               "cat": h.get("category"), "region": h.get("region"),
-               "rel": h.get("relevance") or 0,
-               "de": _first_sentence(h.get("summary") or "", 150) or h.get("title")}
-        angle = _classify_angle(h.get("why_it_matters"))
-        if angle == "risk":
-            risks.append(rec)
-        elif angle == "chance":
-            chances.append(rec)
-    risks.sort(key=lambda r: -r["rel"])
-    chances.sort(key=lambda r: -r["rel"])
-    risks, chances = risks[:5], chances[:5]
-
-    # --- Competitor move-type matrix ---
-    move_matrix = []
-    for c in (report.get("competitors") or []):
-        cats = {}
-        for m in (c.get("moves") or []):
-            cat = m.get("category") or "Sonstiges"
-            cats[cat] = cats.get(cat, 0) + 1
-        move_matrix.append({
-            "name": c.get("name"), "n": int(c.get("n_items") or 0),
-            "impl": _first_sentence(c.get("vodafone_implication")),
-            "cats": sorted(cats.items(), key=lambda kv: -kv[1])[:4]})
-
-    top_comp = max(move_matrix, key=lambda c: c["n"], default=None)
     lead = next((h for h in highlights if (h.get("relevance") or 0) >= 4), None)
     if lead:
         lead = {
             "title": lead.get("title"), "url": lead.get("url"),
             "de_title": _first_sentence(lead.get("summary") or "", 150) or lead.get("title"),
-            "why": _first_sentence(lead.get("why_it_matters"), limit=250),
             "op": lead.get("operator") or lead.get("source_label"),
             "region": lead.get("region"), "category": lead.get("category"),
             "rel": lead.get("relevance") or 0,
         }
     kpis = [
         {"num": (report.get("stats") or {}).get("new", len(highlights)),
-         "label": "neue Meldungen"},
+         "label": "neue Meldungen gelesen"},
+        {"num": len(highlights), "label": "davon relevant", "tint": True},
         {"num": sum(1 for h in highlights if h.get("relevance") == 5),
-         "label": "sofort relevant (5/5)", "accent": True},
-        {"num": (top_comp["name"] if top_comp and top_comp["n"] else "-"),
-         "label": "aktivster Wettbewerber", "text": True, "tint": True},
+         "label": "sofort ansehen (5/5)", "accent": True},
         {"num": (tech_radar[0]["theme"] if tech_radar else "-"),
          "label": "Top-Technologiethema", "text": True},
     ]
-    return {"kpis": kpis, "lead_signal": lead, "sov": sov, "tech_radar": tech_radar, "pricing": pricing,
-            "deals": deals, "risks": risks, "chances": chances,
-            "move_matrix": move_matrix, "n_competitors": len(cur_ops),
-            "diff": build_differentiation(highlights)}
+    if top_comp and top_comp["n"]:
+        kpis.insert(3, {"num": top_comp["name"], "label": "aktivster Wettbewerber",
+                        "text": True})
+    return {"kpis": kpis, "lead_signal": lead, "tech_radar": tech_radar}
 
 
 def _prep_competitors(report: dict) -> list[dict]:
@@ -648,8 +569,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # _stats() ist teuer und wird nur von der aktuellen Woche
             # gebraucht. Bis zum 06.08.2026 lief es fuer JEDE Archivwoche mit
             # und das Ergebnis wurde verworfen.
-            "dash": (_stats(report, reports[1] if len(reports) > 1 else None,
-                            reports[:8]) if (i == 0 and highlights) else None),
+            "dash": _stats(report) if (i == 0 and highlights) else None,
             "briefing_html": briefing_html,
             "toc": toc,
             "lesezeit": _lesezeit(briefing_md),

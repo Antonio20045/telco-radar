@@ -25,8 +25,8 @@ BOESER_TITEL = '<img src=x onerror="alert(1)">Betreiber senkt Preise deutlich'
 def test_vorlagen_escapen_wirklich():
     """Der eigentliche Fehler: die Endung heisst j2, nicht html."""
     env = _env()
-    assert env.autoescape("sources.html.j2") is True
-    assert env.autoescape("report.html.j2") is True
+    assert env.autoescape("transparenz.html.j2") is True
+    assert env.autoescape("woche.html.j2") is True
     assert env.from_string("{{ x }}").render(x="<b>&</b>") in (
         "&lt;b&gt;&amp;&lt;/b&gt;", "&lt;b&gt;&amp;&lt;/b&gt;")
 

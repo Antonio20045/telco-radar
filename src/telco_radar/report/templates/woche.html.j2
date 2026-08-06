@@ -58,6 +58,23 @@
 </div>
 {% endif %}
 
+{% if dash and dash.tech_radar %}
+{# Baustein der alten Uebersicht ("Top-Themen"). Er ueberlebt die
+   Zusammenlegung, weil er etwas zeigt, das sonst nirgends steht: worueber
+   diese Woche ueberhaupt geredet wurde, quer ueber alle Bereiche. #}
+<div class="card">
+  <div class="card-head"><h2>Worüber diese Woche geredet wurde</h2></div>
+  <p class="card-sub">Technologiethemen, gezählt über die Überschriften und Zusammenfassungen der {{ highlights|length }} relevanten Meldungen.</p>
+  {% for t in dash.tech_radar[:6] %}
+  <div class="bento-bar">
+    <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
+    <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
+    {% if t.ops_top %}<p class="muted-note" style="margin:4px 0 0;font-size:12.5px">u. a. {{ t.ops_top }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 {% if briefing_lead %}
 <div class="card tan" style="margin-top:20px">
   <div class="card-head"><h2>Kurzfazit</h2></div>

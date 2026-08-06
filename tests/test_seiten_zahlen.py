@@ -310,3 +310,58 @@ def test_gescheiterte_quellen_werden_gezaehlt(tmp_path):
     assert "<b>1 / 1 / 2</b><span>ok / leer / fehlgeschlagen</span>" in html
     assert "<b>4</b><span>Quellen abgefragt</span>" in html
     assert "nicht erreichbar (2)" in html
+
+
+# ------------------------------- Vodafone-Filter: Rat weg, Befund bleibt
+def test_ratschlag_faellt_der_befund_im_selben_absatz_bleibt():
+    """Der sechste falsche Wert - diesmal ein fehlender.
+
+    Die Regel "die Website berichtet, sie beraet nicht" galt je ABSATZ. Ein
+    Absatz enthaelt aber in aller Regel zuerst den Befund und erst am Ende
+    die Folgerung. Am Bericht vom 05.08.2026 gemessen verschwanden dadurch
+    drei Absaetze mit 77 Woertern, darunter das Gewinnwachstum von MTN
+    Nigeria - berichtete Fakten, geloescht wegen des Nachsatzes.
+    """
+    from telco_radar.report.html import _strip_vodafone_advice
+
+    text = ("MTN Nigeria meldet einen Nettogewinnsprung um 70,6 Prozent. "
+            "Vodafone kann diese Entwicklung als Vorbild nutzen.")
+    sauber = _strip_vodafone_advice(text)
+    assert "70,6 Prozent" in sauber
+    assert "Vodafone kann" not in sauber
+
+
+def test_reiner_ratschlagsabsatz_faellt_ganz_weg():
+    from telco_radar.report.html import _strip_vodafone_advice
+    assert _strip_vodafone_advice("Für Vodafone heißt das: schneller werden.") == ""
+
+
+def test_abkuerzungen_zerlegen_den_satz_nicht():
+    """"z. B." ist kein Satzende - sonst wuerde die halbe Aussage
+    mitgeloescht."""
+    from telco_radar.report.html import _strip_vodafone_advice
+    text = "Mehrere Betreiber, z. B. Orange, senken Preise. Vodafone sollte reagieren."
+    sauber = _strip_vodafone_advice(text)
+    assert sauber == "Mehrere Betreiber, z. B. Orange, senken Preise."
+
+
+def test_absatz_ohne_vodafone_bleibt_unveraendert():
+    from telco_radar.report.html import _strip_vodafone_advice
+    text = "Orange senkt die Preise.\n\nTelefónica zieht nach."
+    assert _strip_vodafone_advice(text) == text
+
+
+# ------------------------------------------------ Waechter gegen toten Code
+def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
+    """Bis zum Redesign berechnete _stats() sechs Werte, die in KEINER
+    Vorlage vorkamen (sov, pricing, deals, risks, chances, n_competitors) -
+    bei jedem Rendern, fuer jede Archivwoche. Dieser Test haelt den
+    Rueckbau fest."""
+    from telco_radar.report.html import _flatten, _stats
+
+    report = {"date": "2026-08-05", "stats": {"new": NEU_GESAMMELT},
+              "regions": {"Europa": {"highlights": HIGHLIGHTS}},
+              "competitors": GELUNGEN}
+    dash = _stats(report)
+    assert set(dash) == {"kpis", "lead_signal", "tech_radar"}
+    assert _flatten(report)  # Gegenprobe: die Fixture ist nicht leer
