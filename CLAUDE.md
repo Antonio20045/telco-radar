@@ -395,6 +395,17 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Website darf **nie einschlafen** (deshalb Static Site, kein Web Service).
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
+## 8a. Der nächste Auftrag
+
+> **`AUFTRAG_NACHRICHTENPORTAL.md` ist der Text, mit dem die nächste Session
+> anfängt.** Die Seite ist funktional in Ordnung und sieht immer noch nicht
+> aus wie ein Nachrichtenportal. Der Auftrag benennt mit gemessenen Zahlen,
+> warum: 31 von 193 Meldungen haben ein Bild (153 wurden nie versucht — ein
+> Deckel im Code, keine fehlenden Quellen), 18 der 31 Bilder sind zu klein
+> und deshalb unscharf, und die Titelseite kennt nur zwei Gewichtsstufen
+> statt vier. Der Quellenausbau (`AUFTRAG_1000_QUELLEN_WELLE3.md`) läuft
+> parallel weiter, hat aber Vorrang NACH dem Portal.
+
 ## 9. Stand der Skalierung — und was als Nächstes kommt
 
 > **Der nächste Auftrag steht in `AUFTRAG_1000_QUELLEN_WELLE3.md`.** Er
