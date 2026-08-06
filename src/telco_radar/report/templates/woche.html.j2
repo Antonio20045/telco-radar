@@ -170,6 +170,17 @@
     {% endif %}
     {% endfor %}
   </div>
+  {% set gescheitert = competitors|selectattr('error')|rejectattr('summary')|list %}
+  {% if gescheitert %}
+  {# Ein Teilausfall darf nicht aussehen wie ein kleineres Wettbewerbsfeld. #}
+  <p class="muted-note" style="margin-top:14px">
+    Für {{ gescheitert|map(attribute='name')|join(' und ') }}
+    hat die Auswertung dieses Laufs keine Antwort geliefert
+    ({{ gescheitert|length }} von {{ competitors|length }} Profilen).
+    Der Fehler steht im Laufprotokoll unter
+    <a href="{{ prefix }}transparenz.html">Quellen</a>.
+  </p>
+  {% endif %}
 </div>
 {% elif competitors and competitors|selectattr('error')|list %}
 {# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht. #}

@@ -453,3 +453,28 @@ def test_originalueberschrift_schlaegt_den_gekuerzten_satz():
     h = {"title": "UK ISP Hey! Broadband Launch New Bundles with 6 Months Half Price",
          "de_title": "Der britische Glasfaser-Anbieter Hey! Broadband bringt drei neue…"}
     assert _schlagzeile(h) == "UK ISP Hey! Broadband Launch New Bundles with 6 Months Half Price"
+
+
+def test_teilausfall_der_wettbewerber_wird_benannt(tmp_path):
+    """Ein Profil da, zwei gescheitert darf nicht aussehen wie ein
+    kleineres Wettbewerbsfeld - genau so sah es im Lauf vom 06.08.2026 aus,
+    als zwei von drei Profilen am Token-Budget scheiterten."""
+    gemischt = [
+        dict(GELUNGEN[0]),
+        {"name": "Telefónica / O2", "n_items": 12, "moves": [], "summary": "",
+         "themes": [], "vodafone_implication": "", "error": "JSONDecodeError"},
+        {"name": "1&1", "n_items": 8, "moves": [], "summary": "",
+         "themes": [], "vodafone_implication": "", "error": "JSONDecodeError"},
+    ]
+    html = _seite(_render(tmp_path, competitors=gemischt), "index.html")
+    assert "Profiltext." in html                      # das gelungene Profil
+    assert "Telefónica / O2 und 1&amp;1" in html      # die gescheiterten
+    assert "2 von 3 Profilen" in html
+
+
+def test_wettbewerber_bekommen_budget_fuer_ein_reasoning_modell():
+    """3500 Token reichten unter flash, unter pro nicht: das Nachdenken
+    zaehlt gegen max_tokens, und was uebrig bleibt, reicht nicht fuer das
+    JSON. Abgerechnet werden erzeugte Token, ein hohes Limit kostet nichts."""
+    from telco_radar.analyze.competitors import COMPETITOR_MAX_TOKENS
+    assert COMPETITOR_MAX_TOKENS >= 8000

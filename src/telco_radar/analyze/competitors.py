@@ -40,6 +40,23 @@ Rules:
 """
 
 
+# Bei Reasoning-Modellen (DeepSeek V4, Claude mit adaptive thinking) zaehlt
+# das Nachdenken gegen max_tokens. Reicht das Budget nur dafuer, kommt eine
+# LEERE Antwort zurueck oder eine mitten im String abgeschnittene - beides
+# ohne Fehlermeldung des Anbieters. Der Editor steht aus genau diesem Grund
+# auf 32000 (siehe editor.py).
+#
+# Der Wettbewerber-Zweig blieb bei 3500, weil er unter dem billigen
+# flash-Modell lief. Beim ersten Lauf mit deepseek-v4-pro (06.08.2026)
+# scheiterten dadurch zwei von drei Profilen:
+#   Telefónica/O2  JSONDecodeError: Unterminated string  -> abgeschnitten
+#   1&1            JSONDecodeError: Expecting value      -> voellig leer
+# Das erzeugte Ergebnis ist klein (ein Profil, 4-8 Moves); teuer ist nur das
+# Nachdenken davor. Abgerechnet werden erzeugte Token, nicht das Budget -
+# ein grosszuegiges Limit kostet also nichts.
+COMPETITOR_MAX_TOKENS = 12000
+
+
 def _matcher(terms):
     pats = []
     for t in terms:
@@ -81,7 +98,7 @@ def analyze_competitor(name, terms, items, model, language="Deutsch",
     try:
         parsed = extract_json(complete(
             COMPETITOR_SYSTEM.format(name=name, language=language), user,
-            model=model, max_tokens=3500))
+            model=model, max_tokens=COMPETITOR_MAX_TOKENS))
         result["summary"] = str(parsed.get("summary", ""))
         result["themes"] = [str(t) for t in (parsed.get("themes") or [])][:6]
         result["vodafone_implication"] = str(parsed.get("vodafone_implication", ""))
