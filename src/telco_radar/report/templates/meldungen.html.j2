@@ -14,17 +14,16 @@
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Marktrecherche</p>
-      <h1>Meldungen</h1>
+      <h1>Das Meldungsarchiv</h1>
     </div>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Jede einzelne Meldung zum Nachprüfen – mit Betreiber, Bereich, Datum
-  und Link zur Originalquelle. Oben die Suche über <b>alle</b> bisherigen Wochen und die
-  Differenzierungs-Bibliothek, darunter die Meldungen dieser Woche, ganz unten das Archiv.</p>
+  <p class="page-lead">Jede einzelne Meldung zum Nachprüfen – mit Betreiber, Bereich, Datum und
+  Link zur Originalquelle.</p>
 </section>
 
-<div class="card">
-  <div class="card-head"><h2>Suche über alle Wochen</h2></div>
+<div class="card" style="margin-top:26px">
+  <div class="card-head"><h2>Suche im Gesamtarchiv</h2></div>
   <p class="card-sub">Durchsucht die als relevant behaltenen Meldungen jeder archivierten Woche
   plus die Differenzierungs-Bibliothek. Diese Seite ist bookmarkbar:
   <code>meldungen.html?q=Begriff</code> zeigt die Treffer direkt.</p>
@@ -55,7 +54,7 @@
 {% endif %}
 
 <div class="card" id="archiv" style="scroll-margin-top:90px">
-  <div class="card-head"><h2>Archiv</h2></div>
+  <div class="card-head"><h2>Frühere Ausgaben</h2></div>
   <p class="card-sub">Jede bisherige Woche als eigener Bericht – jeder zeigt, was in seiner Woche neu war.</p>
   {% if archive %}
   <div class="list-card">

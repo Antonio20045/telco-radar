@@ -1,10 +1,13 @@
-{# Die Wochenseite - loest uebersicht.html.j2 und report.html.j2 ab.
+{# Die Titelseite der Ausgabe.
 
-   Beide kamen aus derselben Berichtsdatei und verlinkten sich gegenseitig:
-   die Uebersicht war die 30-Sekunden-Schicht, der Bericht der 15-Minuten-Text.
-   Das sind zwei Antworten auf DIESELBE Frage ("was ist diese Woche
-   passiert?"), also zwei Ladevorgaenge fuer einen Vorgang. Jetzt eine Seite:
-   oben die 30 Sekunden, darunter der volle Bericht mit Sprungnavigation.
+   Loest uebersicht.html.j2 und report.html.j2 ab - beide kamen aus derselben
+   Berichtsdatei und verlinkten sich gegenseitig, also zwei Ladevorgaenge fuer
+   eine Frage.
+
+   Aufbau wie eine Zeitungstitelseite: Schlagzeile, Aufmacher, danach zwei
+   Spalten - links der Fliesstext, rechts die Rail mit Zahlen, Themenradar
+   und den dringendsten Meldungen. Was ueber beide Spalten gehoert
+   (Deutschland-Fokus, Auswertung je Bereich), steht unter dem Raster.
 
    Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html.
    Unterschied: is_latest (Archivbanner) und show_explorer (die Archivseite
@@ -20,114 +23,122 @@
 <section class="page-hero wide">
   <div class="page-hero-row">
     <div>
-      <p class="page-kicker">Marktrecherche{% if not is_latest %} &middot; Archiv{% endif %}</p>
+      <p class="page-kicker">{% if is_latest %}Die Woche im Markt{% else %}Aus dem Archiv{% endif %}</p>
       <h1>{% if is_latest %}Was Vodafone jetzt wissen muss.{% else %}Bericht vom {{ date_de }}{% endif %}</h1>
     </div>
     <span class="page-date">Stand {{ date_de }}</span>
   </div>
   <p class="page-lead">
     {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
-    <b>{{ highlights|length }} davon relevant</b>{% if report.stats.get('sources_total') %}
-    &middot; aus {{ report.stats.get('sources_total') }} Quellen{% endif %}.{% endif %}
-    {% if lesezeit %}Der Bericht darunter ist in etwa {{ lesezeit }} Minuten gelesen.{% endif %}
+    <b>{{ highlights|length }} davon relevant</b>.{% endif %}
+    {% if lesezeit %}Lesezeit etwa {{ lesezeit }} Minuten.{% endif %}
+    {% if not is_latest %}<a href="{{ prefix }}index.html">Zur aktuellen Ausgabe &nearr;</a>{% endif %}
   </p>
   {% if not is_latest %}
-  <p class="muted-note" style="margin-top:12px">Archivierter Bericht.
-    <a href="{{ prefix }}index.html">Zur aktuellen Woche &nearr;</a></p>
+  <p class="muted-note" style="margin-top:10px">Archivierter Bericht – die Zahlen sind der Stand dieser Woche.</p>
   {% endif %}
 </section>
 
 {% if top_priorities %}
 <div class="hero-priority">
-  <span class="hero-priority-badge">Priorität {{ top_priorities[0].relevance }}/5</span>
-  <p><a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener" style="color:inherit">{{ top_priorities[0].de_title }}</a></p>
+  <span class="hero-priority-badge">Aufmacher · Priorität {{ top_priorities[0].relevance }}/5</span>
+  <p><a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">{{ top_priorities[0].de_title }}</a></p>
   <div class="hero-priority-meta">
     <b>{{ top_priorities[0].operator or top_priorities[0].source_label }}</b> &middot; {{ top_priorities[0].region }}
-    &middot; <a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">Quelle &nearr;</a>
+    &middot; <a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">Quelle öffnen &nearr;</a>
   </div>
 </div>
 {% endif %}
 
-{% if dash and dash.kpis %}
-<div class="tile-grid" style="margin-top:20px">
-  {% for k in dash.kpis %}
-  <div class="tile{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
-    <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span>
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
+<div class="frontpage">
+  {# ------------------------------------------------------- Hauptspalte #}
+  <div class="frontpage-main">
+    {% if briefing_lead %}
+    <div class="card" style="margin-top:26px">
+      <div class="card-head"><h2>Kurzfazit</h2></div>
+      <p class="page-lead" style="margin:0;max-width:none">{{ briefing_lead }}</p>
+    </div>
+    {% endif %}
 
-{% if dash and dash.tech_radar %}
-{# Baustein der alten Uebersicht ("Top-Themen"). Er ueberlebt die
-   Zusammenlegung, weil er etwas zeigt, das sonst nirgends steht: worueber
-   diese Woche ueberhaupt geredet wurde, quer ueber alle Bereiche. #}
-<div class="card">
-  <div class="card-head"><h2>Worüber diese Woche geredet wurde</h2></div>
-  <p class="card-sub">Technologiethemen, gezählt über die Überschriften und Zusammenfassungen der {{ highlights|length }} relevanten Meldungen.</p>
-  {% for t in dash.tech_radar[:6] %}
-  <div class="bento-bar">
-    <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
-    <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
-    {% if t.ops_top %}<p class="muted-note" style="margin:4px 0 0;font-size:12.5px">u. a. {{ t.ops_top }}</p>{% endif %}
+    {% if briefing_html %}
+    <div class="card">
+      <div class="card-head"><h2>Der Wochenbericht</h2>
+        <a href="{{ prefix }}transparenz.html">Methode &amp; Quellen</a></div>
+      {% if toc %}
+      {# "In dieser Ausgabe" - die Gliederung berechnete html.py schon immer
+         und warf sie weg. Bei 2863 Woertern in elf Abschnitten ist sie der
+         Unterschied zwischen lesbar und nicht. #}
+      <nav class="toc" aria-label="Abschnitte des Berichts">
+        {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
+      </nav>
+      {% endif %}
+      <article class="prose">{{ briefing_html | safe }}</article>
+    </div>
+    {% endif %}
   </div>
-  {% endfor %}
-</div>
-{% endif %}
 
-{% if briefing_lead %}
-<div class="card tan" style="margin-top:20px">
-  <div class="card-head"><h2>Kurzfazit</h2></div>
-  <p style="margin:0;font-size:16px;line-height:1.7;color:#4a463e;max-width:800px">{{ briefing_lead }}</p>
-</div>
-{% endif %}
+  {# -------------------------------------------------------------- Rail #}
+  <aside class="frontpage-rail">
+    {% if dash and dash.kpis %}
+    <div class="rubrik"><h2>Zahlen der Woche</h2></div>
+    <div class="tile-grid">
+      {% for k in dash.kpis %}
+      <div class="tile{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
+        <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
-{% if briefing_html %}
-<div class="card">
-  <div class="card-head"><h2>Der Wochenbericht</h2>
-    <a href="{{ prefix }}transparenz.html">Methode &amp; Quellenbasis &nearr;</a></div>
-  {% if toc %}
-  {# Sprungnavigation: die Gliederung berechnete html.py schon immer
-     (_briefing_sections) und warf sie weg. Bei 2863 Woertern in elf
-     Abschnitten ist sie der Unterschied zwischen lesbar und nicht. #}
-  <nav class="toc" aria-label="Abschnitte des Berichts">
-    {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
-  </nav>
-  {% endif %}
-  <article class="prose">{{ briefing_html | safe }}</article>
-</div>
-{% endif %}
+    {% if top_priorities %}
+    <div class="card">
+      <div class="card-head">
+        <h2>Die {{ top_priorities|length }} dringendsten Signale</h2>
+      </div>
+      <div class="signal-list">
+        {% for h in top_priorities %}
+        <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
+          <span class="signal-badge r{{ h.relevance }}">{{ h.relevance }}</span>
+          <span class="signal-body">
+            <span class="signal-company">{{ h.operator or h.source_label }} &middot; {{ h.region }}</span>
+            <span class="signal-title">{{ h.de_title }}</span>
+          </span>
+        </a>
+        {% endfor %}
+      </div>
+      <p class="ex-count" style="margin-top:12px">
+        {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
+        {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
+      </p>
+    </div>
+    {% endif %}
 
-{% if top_priorities %}
-<div class="card">
-  <div class="card-head">
-    <h2>Die {{ top_priorities|length }} dringendsten Signale</h2>
-    {% if show_explorer %}<a href="#alle-meldungen">alle {{ highlights|length }} Meldungen &darr;</a>
-    {% else %}<a href="{{ prefix }}meldungen.html">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
-  </div>
-  <div class="signal-list">
-    {% for h in top_priorities %}
-    <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
-      <span class="signal-badge">{{ h.relevance }}</span>
-      <span class="signal-body">
-        <span class="signal-company">{{ h.operator or h.source_label }} &middot; {{ h.region }}</span>
-        <span class="signal-title">{{ h.de_title }}</span>
-      </span>
-    </a>
-    {% endfor %}
-  </div>
+    {% if dash and dash.tech_radar %}
+    {# Baustein der alten Uebersicht ("Top-Themen"). Er ueberlebt die
+       Zusammenlegung, weil er etwas zeigt, das sonst nirgends steht:
+       worueber diese Woche ueberhaupt geredet wurde. #}
+    <div class="card">
+      <div class="card-head"><h2>Worüber diese Woche geredet wurde</h2></div>
+      {% for t in dash.tech_radar[:6] %}
+      <div class="bento-bar">
+        <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
+        <div class="bento-bar-track"><span class="bento-bar-fill" style="width:{{ t.w }}%"></span></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </aside>
 </div>
-{% endif %}
 
 {# Deutschland-Fokus: was frueher als eigene Seite "Wettbewerber im Detail"
    lief. Die Ueberschrift dort versprach eine Analyse aller beobachteten
    Betreiber; konfiguriert sind drei deutsche Anbieter (focus_competitors).
-   Als benannter Block auf der Wochenseite stimmt das Versprechen. #}
-<section id="deutschland-fokus" style="scroll-margin-top:90px">
+   Als benannter Block auf der Titelseite stimmt das Versprechen. #}
+<section id="deutschland-fokus" style="scroll-margin-top:24px">
 {% if competitors and competitors|selectattr('summary')|list %}
 <div class="card">
   <div class="card-head"><h2>Deutschland-Fokus</h2></div>
-  <p class="card-sub">Die drei Anbieter, gegen die Vodafone Deutschland direkt antritt – aus den Fachpresse-Meldungen dieser Woche.</p>
+  <p class="card-sub">Die drei Anbieter, gegen die Vodafone Deutschland direkt antritt</p>
   <div class="comp-list">
     {% for c in competitors %}
     {% if c.summary or c.moves %}
@@ -164,7 +175,7 @@
    beim naechsten Lauf". #}
 <div class="card">
   <div class="card-head"><h2>Deutschland-Fokus</h2></div>
-  <p class="empty-note" style="margin:0">
+  <p class="empty-note">
     <b>Die Auswertung des Laufs vom {{ date_de }} ist gescheitert.</b>
     Die Meldungen wurden gesammelt und zugeordnet
     ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
@@ -177,16 +188,16 @@
 </section>
 
 {% if report.run and report.run.analysts %}
-<div class="card tan">
+<div class="card">
   <div class="card-head"><h2>Was die Auswertung je Bereich ergab</h2></div>
-  <p class="card-sub">Gelesen wird jede neue Meldung. Behalten wird, was für Vodafone eine Nachricht ist.</p>
+  <p class="card-sub">Gelesen wird jede neue Meldung – behalten wird, was für Vodafone eine Nachricht ist</p>
   <div class="rowtable">
     <div class="rowtable-head">
       <span class="col-region">Bereich</span><span class="col-flex">gelesen</span>
       <span class="col-kept">relevant</span><span class="col-model">Modell</span>
     </div>
     {% for a in report.run.analysts %}
-    <div class="rowtable-row" style="border-bottom:1px solid var(--tan-line)">
+    <div class="rowtable-row">
       <span class="col-region">{{ a.region }}</span>
       <span class="col-flex">{{ a.items_in }}</span>
       <span class="col-kept">{{ a.highlights }}</span>
@@ -198,7 +209,7 @@
 {% endif %}
 
 {% if show_explorer and highlights %}
-<details class="evidence" id="alle-meldungen" style="margin-top:24px">
+<details class="evidence" id="alle-meldungen">
   <summary><span>Alle {{ highlights | length }} Meldungen dieser Woche</span><small>bei Bedarf öffnen</small></summary>
   <div class="evidence-body">
     {% include "_explorer.html.j2" %}
@@ -208,6 +219,6 @@
 
 {% else %}
 <section class="page-hero"><p class="page-kicker">Marktrecherche</p><h1>Noch kein Bericht</h1>
-<p class="page-lead">Sobald der erste Lauf durchgelaufen ist, steht hier der Wochenbericht.</p></section>
+<p class="page-lead">Sobald der erste Lauf durchgelaufen ist, steht hier die Ausgabe.</p></section>
 {% endif %}
 {% endblock %}

@@ -273,7 +273,25 @@ def _tag_tech(text):
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
 
 
+def _text_aus_html(html: str) -> str:
+    """Reintext aus gerendertem HTML - inklusive Aufloesung der Entitaeten.
+
+    Wichtig: die Vorspaenne (_briefing_lead/_promo_lead) ziehen Text aus
+    bereits gerendertem HTML. Wer dort nur die Tags per Regex entfernt,
+    behaelt "&amp;" als Zeichenfolge - und Jinja escaped die beim Einsetzen
+    ein zweites Mal. Auf der Titelseite stand deshalb "mit AT&amp;T".
+    """
+    return " ".join(BeautifulSoup(html or "", "html.parser").get_text(" ").split())
+
+
 def _first_sentence(text, limit=170):
+    """Erster Satz, sonst gekuerzt - aber NIE mitten im Wort.
+
+    Bis zum 06.08.2026 schnitt die letzte Zeile hart bei `limit`. In der
+    Aufmacher-Schlagzeile stand deshalb "... die drei US-Betreiber erzielen
+    z\u2026" - in 33px Serife ueber drei Zeilen. Jetzt bis zur letzten
+    Wortgrenze davor.
+    """
     t = " ".join((text or "").split())
     if not t:
         return ""
@@ -281,7 +299,13 @@ def _first_sentence(text, limit=170):
         k = t.find(sep)
         if 0 < k < limit:
             return t[:k + 1]
-    return (t[:limit].rstrip() + "\u2026") if len(t) > limit else t
+    if len(t) <= limit:
+        return t
+    schnitt = t[:limit].rstrip()
+    leer = schnitt.rfind(" ")
+    if leer > limit * 0.6:          # sonst waere die Zeile unbrauchbar kurz
+        schnitt = schnitt[:leer]
+    return schnitt.rstrip(" ,;:\u2013-") + "\u2026"
 
 
 def _briefing_sections(md_text):
@@ -370,8 +394,7 @@ def _briefing_lead(md_text: str) -> str:
         pick = secs[1] if len(secs) > 1 else (secs[0] if secs else None)
     if not pick:
         return ""
-    txt = " ".join(re.sub(r"<[^>]+>", " ", pick["html"]).split())
-    return (txt[:360].rstrip() + "\u2026") if len(txt) > 360 else txt
+    return _first_sentence(_text_aus_html(pick["html"]), 360)
 
 
 def _promo_lead(md_text: str) -> str:
@@ -383,8 +406,7 @@ def _promo_lead(md_text: str) -> str:
     secs = _briefing_sections(md_text)
     if not secs:
         return ""
-    txt = " ".join(re.sub(r"<[^>]+>", " ", secs[0]["html"]).split())
-    return (txt[:280].rstrip() + "…") if len(txt) > 280 else txt
+    return _first_sentence(_text_aus_html(secs[0]["html"]), 280)
 
 
 def _stats(report):
@@ -538,6 +560,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
 
     num_operators = len(cfg.operators) if cfg is not None else None
     reports = _load_reports(reports_dir)
+    # Die Datumszeile des Zeitungskopfs steht auf JEDER Seite und haengt an
+    # der Ausgabe, nicht an der einzelnen Vorlage - deshalb als Global statt
+    # als Kontextvariable, die man an sechs Aufrufstellen vergessen kann.
+    env.globals["ausgabe_datum"] = _fmt_date_de(reports[0]["date"]) if reports else ""
+    env.globals["ausgabe_quellen"] = (
+        (reports[0].get("stats") or {}).get("sources_total") if reports else None)
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),
                 "llm": r.get("generated_with_llm", False)} for r in reports]

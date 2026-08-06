@@ -12,7 +12,7 @@
 
 <section class="page-hero wide">
   <p class="page-kicker">Transparenz</p>
-  <h1>Was beobachtet wird – und was der letzte Lauf ergab</h1>
+  <h1>Wie diese Ausgabe entsteht.</h1>
   <p class="page-lead">Jede Zahl auf dieser Website lässt sich hier zurückverfolgen: welche Quelle
   abgefragt wurde, was sie geliefert hat, und was die Auswertung daraus gemacht hat.</p>
 </section>
@@ -40,7 +40,7 @@
 </p>
 {% endif %}
 
-<div class="card" style="margin-top:20px">
+<div class="card">
   <div class="card-head"><h2>Ablauf dieses Laufs</h2></div>
   <div class="step-grid">
     {% for p in run.phases %}
@@ -126,16 +126,14 @@
 
 {# ------------------------------------------------------- der Bestand #}
 <section id="bestand" style="scroll-margin-top:90px">
-<section class="page-hero wide" style="padding-bottom:20px">
-  <h1 style="font-size:clamp(26px,3.4vw,34px)">Der beobachtete Bestand</h1>
-  <p class="page-lead">Primärquelle jedes Betreibers ist <b>seine eigene offizielle Presseseite</b> –
+<div class="rubrik" style="margin-top:44px"><h2>Der beobachtete Bestand</h2></div>
+  <p class="page-lead" style="margin-top:0;margin-bottom:22px">Primärquelle jedes Betreibers ist <b>seine eigene offizielle Presseseite</b> –
   per Feed (RSS/JSON), statischem Newsroom oder Headless-Render direkt vom Unternehmen. Viele Betreiber haben
   zusätzlich einen eigenen Kanal für Zahlen und Zukäufe (Investor Relations), einen Technik-Blog oder eigene
   Landesgesellschaften; die stehen hier als weitere Zeile beim selben Betreiber. Kein Dritt-Medium wird
   als Quelle eines Betreibers ausgegeben. Die Telco-Fachpresse ist eine separate, klar gekennzeichnete
   <b>zweite Ebene</b>, die Themenfelder (Technologie, Geräte, Regulierung) eine <b>dritte</b>.
   Alles verlinkt und nachprüfbar.</p>
-</section>
 
 {% if by_region %}
 <div class="region-tiles">

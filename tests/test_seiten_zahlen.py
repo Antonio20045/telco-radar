@@ -261,7 +261,7 @@ def test_gleichnamige_abschnitte_bekommen_verschiedene_anker():
 
 def test_lesezeit_wird_genannt(tmp_path):
     html = _seite(_render(tmp_path), "index.html")
-    assert "Minuten gelesen" in html
+    assert "Lesezeit etwa" in html
 
 
 # ------------------------------------------- Quellenbilanz des Laufprotokolls
