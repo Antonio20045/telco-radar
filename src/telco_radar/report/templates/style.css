@@ -134,6 +134,12 @@ b,strong{font-weight:700}
 .aufmacher{padding:26px 0 30px;border-bottom:3px solid var(--rule-ink);
   display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
   grid-template-areas:"kicker kicker" "titel bild" "text bild";
+  /* Die dritte Zeile schluckt die Resthoehe. Ohne das verteilt der Browser
+     die Hoehe des ueber zwei Zeilen gespannten Bildes auf beide Textzeilen,
+     und zwischen einer kurzen Schlagzeile und dem Vorspann klafft eine
+     Luecke - sichtbar, sobald der Analyst wirklich kurze Schlagzeilen
+     schreibt ("o2 senkt Unlimited-Preis dauerhaft"). */
+  grid-template-rows:auto auto 1fr;
   gap:0 44px;align-items:start}
 .aufmacher > .page-kicker{grid-area:kicker;margin-bottom:14px}
 .aufmacher h1{grid-area:titel;margin:0 0 18px;font-family:var(--serif);
