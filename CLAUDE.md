@@ -332,9 +332,19 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 9. Stand der Skalierung — und was als Nächstes kommt
 
-> **Der nächste Auftrag steht in `AUFTRAG_1000_QUELLEN_WELLE3.md`.** Er
-> benennt die zwei Hebel, die bisher niemand gezogen hat, und ist der Text,
-> mit dem die nächste Session anfängt.
+> **ACHTUNG, Vorrang seit 06.08.2026:** Der nächste Auftrag ist
+> `PLAN_MARKTRECHERCHE_REDESIGN.md` — der Umbau der Marktrecherche-Seite zu
+> einem Nachrichtenportal plus temporäre Themenseiten. Der Quellenausbau
+> (`AUFTRAG_1000_QUELLEN_WELLE3.md`) ist damit nicht erledigt, steht aber
+> hinten an. Die Rechercheunterlagen zum Redesign liegen in
+> `outputs/recherche-*.md` und `outputs/befunde-eigenmessung.md`.
+>
+> Zwei Dinge in Abschnitt 5 dieses Dokuments sind veraltet: die Seite ist
+> seit Juli 2026 **hell** (Cream-Canvas, kein Dark-Theme mit Toggle), und der
+> Aufbau der Startseite ist ein Bento-Raster, kein Ticker/Hero/Chart-Stapel.
+
+> **`AUFTRAG_1000_QUELLEN_WELLE3.md`** benennt die zwei Hebel im
+> Quellenausbau, die bisher niemand gezogen hat.
 
 **Die aktuelle Zahl bekommst du mit `python scripts/quellen_zaehlen.py`.**
 Sie ist die einzige, die zählt: crawlbare Quellen, also was ein Lauf wirklich
