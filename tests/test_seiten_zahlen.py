@@ -365,3 +365,17 @@ def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
     dash = _stats(report)
     assert set(dash) == {"kpis", "lead_signal", "tech_radar"}
     assert _flatten(report)  # Gegenprobe: die Fixture ist nicht leer
+
+
+def test_archivkopie_gibt_sich_als_archiv_zu_erkennen(tmp_path):
+    """reports/<datum>.html ist immer eine Archiv-URL - auch fuer die
+    neueste Woche. Sonst stehen zwei Seiten mit derselben Ueberschrift
+    unter zwei Adressen und die datierte verschweigt, dass sie datiert ist."""
+    site = _render(tmp_path)
+    archiv = _seite(site, "reports/2026-08-05.html")
+    start = _seite(site, "index.html")
+
+    assert "Archivierter Bericht" in archiv
+    assert "Bericht vom 5. August 2026" in archiv
+    assert "Archivierter Bericht" not in start
+    assert "Was Vodafone jetzt wissen muss." in start

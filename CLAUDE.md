@@ -131,7 +131,7 @@ Wichtige Dateien:
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
 | `data/reports/YYYY-MM-DD.{md,json}` | Bericht als Prosa (md) + strukturiert (json: stats, regions→highlights) |
 | `site/` | Generierte Website — wird von Actions committed, Render published sie (Publish Dir `site`, Build Command nur `echo`) |
-| `src/telco_radar/report/templates/` | base/report/archive/sources.html.j2 + style.css + app.js |
+| `src/telco_radar/report/templates/` | base/woche/meldungen/transparenz/differenzierung + `_explorer` + style.css + app.js (siehe §5) |
 | `scripts/validate_sources.py` | Health-Check aller Quellen: Status, Item-Zahl, wie viele datiert, **neuestes Datum**, **wie viele im Frischefenster** + Liste „liefert Inhalte, aber nichts Frisches" |
 | `scripts/build_quellen_doc.py` | Erzeugt `TELCO_RADAR_QUELLEN.md` aus der Watchlist; mit `--validate` mit echten Abrufzahlen |
 | `scripts/pruefe_quellenvorschlag.py` | **Abnahme-Check für neue Quellen.** Schickt jeden Vorschlag durch `collect_source` und prüft neun Kriterien maschinell. Ohne PASS hier kommt keine Quelle in die Config |
@@ -147,17 +147,44 @@ Wichtige Dateien:
 der Workflow akzeptiert `ANTHROPIC_API_KEY` ODER `ANTHROPIC`) und
 `RENDER_DEPLOY_HOOK`.
 
-## 5. Website (v3, „Bloomberg-Terminal-Stil")
+## 5. Website (Stand 06.08.2026, nach dem Redesign)
 
-Dark-Theme (Light-Toggle), Inter + IBM Plex Mono, Vodafone-Rot `#e60000`.
-Aufbau der Berichtsseite: Headline-**Ticker** → Hero + KPI-Leiste →
-aufklappbare Erklär-Box („Wie funktioniert dieser Bericht?") →
-**01** Top-Prioritäten-Karten → **02** Wochenbericht (Prosa; Struktur: Für
-Eilige / Executive Summary / Top-Signale / Regionen / Trends & Muster /
-Handlungsempfehlungen) → **03** SVG-Charts (Region/Thema/Dringlichkeit) →
-**04** Split-View-Explorer (links Liste, rechts Detail; Suche, Filter,
-Sortierung; Daten als eingebettetes JSON `#explorer-data`). Dazu archive.html
-und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
+> Hier stand bis zum 06.08.2026 eine Beschreibung („v3,
+> Bloomberg-Terminal-Stil": Dark-Theme mit Light-Toggle, Headline-Ticker,
+> Erklär-Box, vier nummerierte Abschnitte, SVG-Charts), die **keiner
+> ausgelieferten Seite entsprach**. Die tatsächliche Designsprache stammt aus
+> der „Design-Modernisierung Juli 2026" und ist hell. Wer der alten
+> Beschreibung folgte, baute eine dritte Designsprache. Diese Fassung ist am
+> ausgelieferten `site/` nachgemessen.
+
+**Design:** heller Cream-Canvas (`--bg:#faf8f5`), roter Sticky-Topbar,
+Inter, Vodafone-Rot `#e60000`, große abgerundete Karten. **Kein Dark-Mode**
+(auch kein Toggle — 0 Vorkommen von `prefers-color-scheme` im CSS). Alles
+Vanilla JS (`app.js`), kein Framework, kein CDN-JS.
+
+**Vier Seiten**, geschnitten nach der Frage des Lesers (vorher sieben, siehe
+`PLAN_MARKTRECHERCHE_REDESIGN.md`):
+
+| Seite | Frage | Inhalt |
+|---|---|---|
+| `index.html` **Diese Woche** | „Was ist passiert?" | Hero, Leitmeldung, KPI-Kacheln, Themenradar, Kurzfazit, **der volle Prosabericht mit Sprungnavigation**, die 6 dringendsten Signale, Deutschland-Fokus, Auswertung je Bereich |
+| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | Volltextsuche über alle Wochen (`search_index.json`), Split-View-Explorer der aktuellen Woche, Wochenarchiv |
+| `differenzierung.html` | „Womit heben sich Telkos ab?" | persistente, kuratierte Bibliothek (eigene Frage, eigener State) |
+| `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
+
+Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
+Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
+
+**Die alten Dateinamen** (`bericht.html`, `archive.html`, `sources.html`,
+`protokoll.html`, `suche.html`, `wettbewerber.html`) existieren weiter als
+**Weiterleitungen** — sie stehen in Lesezeichen und Mails. Render ist eine
+Static Site, es gibt keine Serverregel für eine 301; die Weiterleitung ist
+Meta-Refresh plus sichtbarer Link (`_redirect_html()` in `report/html.py`).
+
+**Vorlagen:** `base` (Navigation, Topbar-Suche) · `woche` (Wochenseite und
+Archivwoche) · `meldungen` · `transparenz` · `differenzierung` ·
+`_explorer` (Teilvorlage, an zwei Orten eingebunden) · `promo_index` ·
+`promo_quellen`.
 
 ## 6. Bekannte Fallstricke (alle in Session 1 gelernt!)
 
@@ -282,6 +309,30 @@ und sources.html. Alles Vanilla JS (app.js), kein Framework, kein CDN-JS.
   Analysten. Wer den Editor-Themenabschnitt ändert, muss **Prompt und
   `validate_editorial_briefing` gemeinsam** anfassen — sie hängen am selben
   Schalter.
+- **Eine Zahl auf der Seite ist erst wahr, wenn ein Test sie gegen die Daten
+  hält.** Am 06.08.2026 wurden beim Aufmaß für den Redesign **sechs** falsche
+  Werte gefunden, alle desselben Typs — ein Label und ein Feld, die nicht
+  dasselbe meinen —, und alle waren an `pytest -q` vorbeigekommen, weil von
+  37 Testdateien nur zwei `render_site()` aufriefen und beide nur die FORM
+  prüfen: (1) „426 neue Meldungen bewertet" — 426 waren gelesen, 92 relevant;
+  (2) „Alle Signale dieser Woche" über 6 von 92 Zeilen; (3) die
+  Wettbewerber-Seite zwei Läufe lang leer und dabei behauptend, die Analyse
+  komme beim nächsten Lauf; (4) das Laufprotokoll schreibt `status: "fail"`,
+  die Zusammenfassung heißt `failed` — 6 gescheiterte Quellen wurden als 0
+  gemeldet; (5) `_stats()` berechnete sechs Werte, die keine Vorlage nutzte;
+  (6) `_strip_vodafone_advice` löschte ganze Absätze samt Fakten.
+  **`tests/test_seiten_zahlen.py` ist die Gegenmaßnahme — jede neue Zahl auf
+  einer Seite gehört dort hinein.**
+- **Anbieter und Modell-ID laufen still auseinander.** Der Wettbewerber-Zweig
+  holte sein Modell fest aus `openai_analyst_model`. Solange „openai" der
+  einzige OpenAI-kompatible Anbieter war, stimmte das; seit DeepSeek
+  (c9c30f1) ging eine unbekannte Modell-ID an den falschen Endpunkt, alle
+  drei Profile scheiterten in 0,6 s, und der Lauf galt als erfolgreich. Jede
+  Stufe holt ihr Modell jetzt aus `_modelle_fuer_anbieter()`. **Wer einen
+  Anbieter ergänzt, prüft alle Aufrufer.**
+- **Eine gescheiterte Stufe muss sich bis auf die Seite melden.** `log.error`
+  reicht nicht — das Actions-Log liest niemand. Profile tragen deshalb ein
+  `error`-Feld, und die Seite unterscheidet „gescheitert" von „gab es nicht".
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max

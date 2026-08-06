@@ -583,8 +583,13 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         # Die Archivwoche traegt ihre Meldungen selbst - sie hat keine
         # meldungen.html, auf die sie verweisen koennte, und die globale
         # Suche verlinkt mit ?q= genau hierher.
+        # is_latest=False auch fuer die neueste Woche: reports/<datum>.html
+        # ist immer die Archiv-URL. Ohne das truege die Archivkopie der
+        # aktuellen Woche dieselbe Ueberschrift wie die Startseite und
+        # verschwiege, dass man eine datierte Fassung ansieht.
+        ctx_archiv = dict(ctx, is_latest=False)
         (site_dir / "reports" / f"{report['date']}.html").write_text(
-            woche_tpl.render(prefix="../", show_explorer=True, **ctx),
+            woche_tpl.render(prefix="../", show_explorer=True, **ctx_archiv),
             encoding="utf-8")
         if i == 0:
             latest_ctx = ctx

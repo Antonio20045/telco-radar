@@ -144,6 +144,21 @@ main{padding-bottom:60px}
 .prose blockquote{margin:18px 0;padding:12px 18px;background:var(--line2);border-left:3px solid var(--red);
   border-radius:0 10px 10px 0;color:var(--ink-body)}
 
+/* ------------------------------------------- Sprungnavigation im Bericht
+   Der Wochenbericht hat regelmaessig ueber 2800 Woerter in elf Abschnitten
+   (05.08.2026). Bis zum Redesign stand er als ein Block ohne Einstieg da.
+   Die Anker setzt html.py (_anchor_headings) nach der Sanitisierung. */
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px;padding:16px 18px;
+  background:var(--line2);border-radius:var(--radius-sm)}
+.toc a{font-size:13px;font-weight:600;color:var(--ink-soft);background:#fff;
+  padding:6px 12px;border-radius:var(--radius-pill);border:1px solid var(--line);
+  transition:.15s var(--ease)}
+.toc a:hover{color:var(--red);border-color:rgba(230,0,0,.35)}
+/* Die Topbar klebt oben - ohne diesen Abstand landet ein Ankersprung
+   hinter ihr und die angesprungene Ueberschrift ist unsichtbar. */
+.prose h2[id]{scroll-margin-top:96px}
+@media (max-width:640px){.toc{gap:6px;padding:12px}.toc a{font-size:12.5px;padding:5px 10px}}
+
 /* ---------------------------------------------------- signal rows (shared) */
 .signal-list{display:flex;flex-direction:column}
 .signal-row{display:flex;gap:16px;padding:20px 0;border-top:1px solid var(--line)}
