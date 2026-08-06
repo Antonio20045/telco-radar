@@ -1,0 +1,207 @@
+{# Transparenz - loest sources.html und protokoll.html ab.
+
+   Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und wurden
+   ohnehin nacheinander gelesen: was wird beobachtet, und was hat der letzte
+   Lauf daraus gemacht. Reihenfolge deshalb: erst der Lauf (die frische
+   Zahl), dann der Bestand. #}
+{% extends "base.html.j2" %}
+{% set active = 'transparenz' %}
+{% block title %}Marktrecherche · Transparenz{% endblock %}
+{% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz','trade_press':'Fachpresse'} %}
+{% block content %}
+
+<section class="page-hero wide">
+  <p class="page-kicker">Transparenz</p>
+  <h1>Was beobachtet wird – und was der letzte Lauf ergab</h1>
+  <p class="page-lead">Jede Zahl auf dieser Website lässt sich hier zurückverfolgen: welche Quelle
+  abgefragt wurde, was sie geliefert hat, und was die Auswertung daraus gemacht hat.</p>
+</section>
+
+{# ------------------------------------------------------------ der Lauf #}
+{% if run %}
+<div class="tile-grid">
+  <div class="tile"><b>{{ run.source_summary.total }}</b><span>Quellen abgefragt</span></div>
+  {% if run.source_summary.get('quarantaene') %}<div class="tile"><b>{{ run.source_summary.quarantaene }}</b><span>stillgelegt (liefern seit Wochen nichts)</span></div>{% endif %}
+  <div class="tile accent"><b>{{ run.source_summary.ok }} / {{ run.source_summary.empty }} / {{ run.source_summary.failed }}</b><span>ok / leer / fehlgeschlagen</span></div>
+  <div class="tile"><b>{{ (run.duration_seconds / 60) | round(1) }} min</b><span>Laufzeit ({{ date_de }})</span></div>
+  <div class="tile"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen gelesen</span></div>
+  <div class="tile tint"><b>{{ n_bewertet }}</b><span>davon relevant</span></div>
+</div>
+{# Bis zum 06.08.2026 stand hier EINE Kachel: "426 neue Meldungen bewertet".
+   Das waren zwei verschiedene Zahlen unter einem Label - am 05.08. wurden
+   426 neue Meldungen gelesen und 92 davon als relevant behalten. Getrennt
+   ausweisen und den Abstand erklaeren, statt ihn zu verstecken. #}
+{% if report and report.stats and report.stats.get('new') and n_bewertet < report.stats.get('new') %}
+<p class="muted-note" style="margin:14px 0 0;max-width:760px">
+  Warum die zweite Zahl kleiner ist: <b>jede</b> neue Meldung wird einem
+  Analysten vorgelegt – gekappt wird nichts. Er behält nur, was für Vodafone
+  eine Nachricht ist, und verwirft Routine, Doppelmeldungen und Werbung. Die
+  Tabelle unten zeigt das je Bereich.
+</p>
+{% endif %}
+
+<div class="card" style="margin-top:20px">
+  <div class="card-head"><h2>Ablauf dieses Laufs</h2></div>
+  <div class="step-grid">
+    {% for p in run.phases %}
+    <div>
+      <div class="step-dur">{{ p.seconds }} s</div>
+      <div class="step-name">{{ p.name }}</div>
+      <div class="step-detail">{{ p.detail }}</div>
+    </div>
+    {% endfor %}
+    <div>
+      <div class="step-dur">{{ run.duration_seconds }} s</div>
+      <div class="step-name">KI-Modelle</div>
+      <div class="step-detail">
+        {% if run.models.analyst %}Bewertung: <b>{{ run.models.analyst }}</b>{% else %}ohne KI{% endif %}{% if run.models.editor %} &middot; Wochenbericht: <b>{{ run.models.editor }}</b>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if run.analysts %}
+<div class="card">
+  <div class="card-head"><h2>Auswertung je Bereich</h2></div>
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span class="col-region">Bereich</span><span class="col-flex">gelesen</span>
+      <span class="col-kept">relevant behalten</span><span class="col-model">Modell</span>
+    </div>
+    {% for a in run.analysts %}
+    <div class="rowtable-row">
+      <span class="col-region">{{ a.region }}</span>
+      <span class="col-flex">{{ a.items_in }}</span>
+      <span class="col-kept">{{ a.highlights }}</span>
+      <span class="col-model">{{ a.model }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-head"><h2>Meistliefernde Quellen</h2><a href="#bestand">ganzer Bestand &darr;</a></div>
+  <div class="rowtable">
+    {% for s in (run.sources | selectattr('count') | sort(attribute='count', reverse=True) | list)[:10] %}
+    <div class="rowtable-row">
+      <span class="col-src-name">{{ s.name }}</span>
+      <span class="col-src-type">{{ kmap.get(s.kind, s.kind) }}</span>
+      <span class="col-src-count">{{ s.count }} Meldungen</span>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="card-sub" style="margin-top:16px">Von {{ run.source_summary.total }} abgefragten Quellen: {{ run.source_summary.ok }} lieferten neue Meldungen, {{ run.source_summary.empty }} waren leer, {{ run.source_summary.failed }} nicht erreichbar (meist temporäre Fehler).{% if run.source_summary.get('quarantaene') %} Zusätzlich wurden {{ run.source_summary.quarantaene }} Quellen gar nicht erst abgefragt: sie haben in mehreren Läufen hintereinander nichts geliefert und sind automatisch stillgelegt. Sie werden regelmäßig erneut geprüft und kehren zurück, sobald sie wieder liefern.{% endif %}</p>
+</div>
+
+<details class="evidence" style="margin-top:24px">
+  <summary><span>Alle {{ run.source_summary.total }} abgefragten Quellen</span><small>mit Status und Meldungszahl</small></summary>
+  <div class="evidence-body">
+    <div class="log-legend">
+      <span class="s"><span class="sdot ok"></span>geliefert ({{ run.source_summary.ok }})</span>
+      <span class="s"><span class="sdot empty"></span>keine neuen Meldungen ({{ run.source_summary.empty }})</span>
+      <span class="s"><span class="sdot fail"></span>nicht erreichbar ({{ run.source_summary.failed }})</span>
+      {% if run.source_summary.get('quarantaene') %}<span class="s"><span class="sdot empty"></span>stillgelegt ({{ run.source_summary.quarantaene }})</span>{% endif %}
+    </div>
+    <table class="src-table">
+      <thead><tr><th></th><th>Quelle</th><th>Region</th><th>Art</th><th class="num">Meldungen</th><th>Link</th></tr></thead>
+      <tbody>
+        {% for s in run.sources %}
+        <tr>
+          <td><span class="sdot {{ s.status }}" title="{{ s.status }}"></span></td>
+          <td><b>{{ s.name }}</b>{% if s.error %}<br><span style="color:var(--mute2);font-size:12.5px">{{ s.error }}</span>{% endif %}</td>
+          <td>{{ s.region if s.region != 'global' else 'Fachpresse' }}</td>
+          <td><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span></td>
+          <td class="num">{{ s.count }}</td>
+          <td><a href="{{ s.url }}" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</details>
+{% else %}
+<p class="empty-note">Für diesen Bericht liegt noch kein Laufprotokoll vor. Es entsteht beim nächsten Lauf der Pipeline.</p>
+{% endif %}
+
+{# ------------------------------------------------------- der Bestand #}
+<section id="bestand" style="scroll-margin-top:90px">
+<section class="page-hero wide" style="padding-bottom:20px">
+  <h1 style="font-size:clamp(26px,3.4vw,34px)">Der beobachtete Bestand</h1>
+  <p class="page-lead">Primärquelle jedes Betreibers ist <b>seine eigene offizielle Presseseite</b> –
+  per Feed (RSS/JSON), statischem Newsroom oder Headless-Render direkt vom Unternehmen. Viele Betreiber haben
+  zusätzlich einen eigenen Kanal für Zahlen und Zukäufe (Investor Relations), einen Technik-Blog oder eigene
+  Landesgesellschaften; die stehen hier als weitere Zeile beim selben Betreiber. Kein Dritt-Medium wird
+  als Quelle eines Betreibers ausgegeben. Die Telco-Fachpresse ist eine separate, klar gekennzeichnete
+  <b>zweite Ebene</b>, die Themenfelder (Technologie, Geräte, Regulierung) eine <b>dritte</b>.
+  Alles verlinkt und nachprüfbar.</p>
+</section>
+
+{% if by_region %}
+<div class="region-tiles">
+  {% for region, ops in by_region.items() %}
+  <div class="region-tile"><b>{{ ops | length }}</b><span>{{ region }}</span></div>
+  {% endfor %}
+</div>
+
+<div class="region-card-list">
+  {% for region, ops in by_region.items() %}
+  <section class="region-card">
+    <h2>{{ region }} <span>{{ ops | length }} Betreiber</span></h2>
+    <div class="op-grid">
+      {% for op in ops %}
+      <div class="op-row">
+        {% for s in op.sources %}
+        <a class="op-row-line" href="{{ s.url }}" target="_blank" rel="noopener">
+          <span class="op-row-name">{{ op.name }}{% if op.sources|length > 1 %} <span style="color:var(--faint2);font-weight:500">· {{ kmap.get(s.kind, s.kind) }}</span>{% endif %}</span>
+          <span class="op-row-type">{{ kmap.get(s.kind, s.kind) if op.sources|length == 1 else s.url | domain }}</span>
+        </a>
+        {% if s.kind == 'official' %}<span class="op-row-note" title="{{ s.plan }}">offizielle Referenz – Auto-Signal vorerst über Fachpresse</span>{% endif %}
+        {% else %}
+        <div class="op-row-line"><span class="op-row-name">{{ op.name }}</span><span class="op-row-type">–</span></div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if tech_themes %}
+<div class="card" style="margin-top:20px">
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700">Technologie, Geräte &amp; Regulierung <span style="color:var(--faint2);font-weight:500">dritte Ebene · {{ n_tech_sources }} Quellen in {{ tech_themes | length }} Themenfeldern</span></h2>
+  <p style="margin:0 0 16px;font-size:13.5px;color:var(--faint2);max-width:760px">Was den Telco-Markt verändert, kommt nicht nur von anderen Netzbetreibern:
+  KI-Anbieter, Geräte- und Chiphersteller, Netzausrüster, Satellitenbetreiber und Regulierungsbehörden entscheiden mit, was ein Netz kann,
+  was ein Handy unterstützt und was erlaubt ist. Diese Quellen sind <b>keine Wettbewerber</b> – sie werden im Bericht in einem eigenen Abschnitt geführt.
+  Jeweils der offizielle eigene Kanal des Unternehmens bzw. der Behörde.</p>
+  {% for t in tech_themes %}
+  <div style="margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">{{ t.label }} <span style="color:var(--faint2);font-weight:500">· {{ t.sources | length }}</span></div>
+    <div class="pill-cloud">
+      {% for s in t.sources %}
+      <a href="{{ s.url }}" target="_blank" rel="noopener" title="{{ s.url | domain }}">{{ s.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if news_sources %}
+<div class="card tan" style="margin-top:20px">
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span style="color:#a89c8c;font-weight:500">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
+  <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>
+  <div class="pill-cloud">
+    {% for s in news_sources %}
+    <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if not by_region and not tech_themes and not news_sources %}
+<p class="empty-note">Der Quellenbestand wird beim nächsten Lauf aus der Konfiguration erzeugt.</p>
+{% endif %}
+</section>
+{% endblock %}

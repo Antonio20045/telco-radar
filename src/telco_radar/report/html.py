@@ -101,6 +101,57 @@ def _md_to_html(text: str) -> str:
     return str(soup)
 
 
+_SLUG_MAP = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
+                           "Ä": "ae", "Ö": "oe", "Ü": "ue"})
+
+
+def _slug(text: str) -> str:
+    """Stabiler Anker aus einer Ueberschrift ("Afrika & Naher Osten" ->
+    "afrika-naher-osten"). Muss ueber Laeufe hinweg gleich bleiben - die
+    Anker landen in Mails."""
+    s = (text or "").strip().lower().translate(_SLUG_MAP)
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "abschnitt"
+
+
+def _anchor_headings(html: str) -> tuple[str, list[dict]]:
+    """Gibt jeder h2-Ueberschrift des Berichts einen Anker und liefert die
+    Gliederung zurueck.
+
+    Muss NACH _md_to_html() laufen: die Sanitisierung dort loescht jedes
+    Attribut, ein vorher gesetztes id waere also wieder weg.
+
+    Der Bericht vom 05.08.2026 hat 2863 Woerter in elf Abschnitten und stand
+    als ein einziger Prosablock auf der Seite - ohne Inhaltsverzeichnis, ohne
+    Sprungmarken, fuer eine Zielgruppe ohne Technikhintergrund.
+    """
+    if not html:
+        return html, []
+    soup = BeautifulSoup(html, "html.parser")
+    toc: list[dict] = []
+    vergeben: set[str] = set()
+    for h in soup.find_all("h2"):
+        titel = h.get_text(" ", strip=True)
+        if not titel:
+            continue
+        anker = _slug(titel)
+        if anker in vergeben:          # zwei gleichnamige Abschnitte
+            n = 2
+            while f"{anker}-{n}" in vergeben:
+                n += 1
+            anker = f"{anker}-{n}"
+        vergeben.add(anker)
+        h["id"] = anker
+        toc.append({"id": anker, "title": titel})
+    return str(soup), toc
+
+
+def _lesezeit(md_text: str) -> int:
+    """Lesezeit in Minuten, konservativ mit 200 Woertern/Minute gerechnet."""
+    woerter = len((md_text or "").split())
+    return max(1, round(woerter / 200)) if woerter else 0
+
+
 def _json_for_script(value: object) -> str:
     """Serialize public source text safely inside an application/json script."""
     return (json.dumps(value, ensure_ascii=False)
@@ -109,6 +160,25 @@ def _json_for_script(value: object) -> str:
             .replace("&", "\\u0026")
             .replace("\u2028", "\\u2028")
             .replace("\u2029", "\\u2029"))
+
+
+def _redirect_html(ziel: str) -> str:
+    """Weiterleitungsseite fuer einen alten Dateinamen.
+
+    Render ist eine Static Site - es gibt keine Serverregel, in die man eine
+    301 schreiben koennte. Meta-Refresh plus sichtbarer Link ist deshalb die
+    ganze Mechanik; ein Skript waere unnoetig und wuerde ohne JS scheitern.
+    """
+    ziel_escaped = html_lib.escape(ziel, quote=True)
+    return (
+        "<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n"
+        f"<meta http-equiv=\"refresh\" content=\"0; url={ziel_escaped}\">\n"
+        f"<link rel=\"canonical\" href=\"{ziel_escaped}\">\n"
+        "<meta name=\"robots\" content=\"noindex\">\n"
+        "<title>Weitergeleitet – Vodafone Insights</title>\n</head>\n"
+        "<body style=\"font-family:Inter,Arial,sans-serif;padding:40px\">\n"
+        f"<p>Diese Seite ist umgezogen. <a href=\"{ziel_escaped}\">Weiter zu "
+        f"{ziel_escaped}</a></p>\n</body>\n</html>\n")
 
 
 def _load_reports(reports_dir: Path) -> list[dict]:
@@ -551,8 +621,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 "stats": r.get("stats", {}),
                 "llm": r.get("generated_with_llm", False)} for r in reports]
 
-    report_tpl = env.get_template("report.html.j2")
-    uebersicht_tpl = env.get_template("uebersicht.html.j2")
+    # Eine Vorlage fuer die aktuelle Woche UND jede Archivwoche. Bis zum
+    # 06.08.2026 waren es zwei (uebersicht.html.j2 + report.html.j2), die
+    # dieselbe Berichtsdatei aus zwei Blickwinkeln zeigten und sich
+    # gegenseitig verlinkten - zwei Ladevorgaenge fuer eine Frage.
+    woche_tpl = env.get_template("woche.html.j2")
+    latest_ctx: dict | None = None
     for i, report in enumerate(reports):
         highlights = _flatten(report)
         top = [h for h in highlights if h["relevance"] >= 4][:6]
@@ -562,49 +636,44 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             public_h = dict(h)
             public_h.pop("why_it_matters", None)
             public_highlights.append(public_h)
+        briefing_md = _strip_vodafone_advice(
+            _strip_suppressed_source_content(report.get("briefing_md", "")))
+        briefing_html, toc = _anchor_headings(_md_to_html(briefing_md))
         ctx = {
             "report": report, "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
             "explorer_json": _json_for_script(public_highlights),
             "top_priorities": top,
-            "dash": _stats(report, reports[i + 1] if i + 1 < len(reports) else None,
-                           reports[i:i + 8]) if highlights else None,
-            "briefing_sections": _briefing_sections(
-                _strip_vodafone_advice(_strip_suppressed_source_content(
-                    report.get("briefing_md", "")))),
-            "briefing_html": _md_to_html(
-                _strip_vodafone_advice(_strip_suppressed_source_content(
-                    report.get("briefing_md", "")))),
+            "competitors": competitors,
+            # _stats() ist teuer und wird nur von der aktuellen Woche
+            # gebraucht. Bis zum 06.08.2026 lief es fuer JEDE Archivwoche mit
+            # und das Ergebnis wurde verworfen.
+            "dash": (_stats(report, reports[1] if len(reports) > 1 else None,
+                            reports[:8]) if (i == 0 and highlights) else None),
+            "briefing_html": briefing_html,
+            "toc": toc,
+            "lesezeit": _lesezeit(briefing_md),
+            "briefing_lead": _briefing_lead(briefing_md),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,
             "num_operators": num_operators or report.get("stats", {}).get("operators"),
             "n_competitors": len(competitors),
         }
+        # Die Archivwoche traegt ihre Meldungen selbst - sie hat keine
+        # meldungen.html, auf die sie verweisen koennte, und die globale
+        # Suche verlinkt mit ?q= genau hierher.
         (site_dir / "reports" / f"{report['date']}.html").write_text(
-            report_tpl.render(prefix="../", **ctx), encoding="utf-8")
+            woche_tpl.render(prefix="../", show_explorer=True, **ctx),
+            encoding="utf-8")
         if i == 0:
-            (site_dir / "bericht.html").write_text(
-                report_tpl.render(prefix="", **ctx), encoding="utf-8")
+            latest_ctx = ctx
             (site_dir / "index.html").write_text(
-                uebersicht_tpl.render(
-                    prefix="", dash=ctx["dash"],
-                    top_priorities=ctx["top_priorities"], date_de=ctx["date_de"],
-                    briefing_lead=_briefing_lead(
-                        _strip_vodafone_advice(_strip_suppressed_source_content(
-                            report.get("briefing_md", "")))),
-                ), encoding="utf-8")
+                woche_tpl.render(prefix="", show_explorer=False, **ctx),
+                encoding="utf-8")
 
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
-
-    # ---- Wettbewerber (competitor deep-dive) for the latest run
-    (site_dir / "wettbewerber.html").write_text(
-        env.get_template("wettbewerber.html.j2").render(
-            prefix="", competitors=_prep_competitors(latest or {}),
-            date_de=_fmt_date_de(latest["date"]) if latest else "",
-            num_operators=num_operators),
-        encoding="utf-8")
 
     # ---- Differenzierung (persistente, kuratierte Bibliothek)
     # Primaerquelle: der git-versionierte Kurator-Speicher (data/state/
@@ -658,14 +727,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "search_index.json").write_text(
         json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
 
-    # ---- Suche: eigene Ergebnisseite statt Topbar-Dropdown (Ausbau, siehe
-    # claude/suche-ergebnisseite-konzept.md). Rein clientseitig: app.js laedt
-    # search_index.json per fetch() und rendert die volle Trefferliste, das
-    # Template selbst braucht daher ausser der Basisnavigation keinen Kontext.
-    # Kein eigener Navigationslink in base.html.j2 - nur ueber die Topbar-
-    # Suche (native Formular-Navigation zu suche.html?q=...) erreichbar.
-    (site_dir / "suche.html").write_text(
-        env.get_template("suche.html.j2").render(prefix="", num_operators=num_operators),
+    # ---- Meldungen: die Belegebene an EINEM Ort. Loest den zugeklappten
+    # Explorer der Berichtsseite, suche.html und archive.html ab - drei Orte
+    # fuer dasselbe Beduerfnis ("zeig mir die Einzelmeldung"). Die Suche
+    # selbst bleibt rein clientseitig: app.js laedt search_index.json per
+    # fetch() und filtert im Browser, kein Suchserver noetig.
+    (site_dir / "meldungen.html").write_text(
+        env.get_template("meldungen.html.j2").render(
+            prefix="", archive=archive, num_operators=num_operators,
+            date_de=(latest_ctx or {}).get("date_de", ""),
+            highlights=(latest_ctx or {}).get("highlights", []),
+            explorer_json=(latest_ctx or {}).get("explorer_json", "[]"),
+            regions=(latest_ctx or {}).get("regions", []),
+            categories=(latest_ctx or {}).get("categories", [])),
         encoding="utf-8")
 
     # ---- Promo Uebersicht: eigener zweiter Anwendungsfall neben Marktrecherche
@@ -728,7 +802,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 prefix="../", sources=promo_cfg.sources),
             encoding="utf-8")
 
-    # ---- Protokoll
+    # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
+    # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
+    # wurden ohnehin nacheinander gelesen.
     run = (latest or {}).get("run") if latest else None
     if run:
         run = dict(run)
@@ -736,59 +812,73 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                            if not _is_suppressed_source(s)]
         summary = dict(run.get("source_summary") or {})
         summary["total"] = len(run["sources"])
-        for status in ("ok", "empty", "failed"):
-            summary[status] = sum(1 for s in run["sources"]
-                                  if s.get("status") == status)
+        # Die Statuswerte des Laufprotokolls heissen "ok", "empty", "fail" und
+        # "quarantaene" (pipeline.py:249ff). Die Zusammenfassung der Seite
+        # nennt den dritten "failed" - bis zum 06.08.2026 zaehlte diese
+        # Schleife deshalb nach "failed" und fand nie einen: der Lauf vom
+        # 05.08. hatte 6 gescheiterte Quellen, die Seite meldete 0. Der
+        # Schluessel der Zusammenfassung und der Wert im Protokoll sind zwei
+        # verschiedene Namen fuer dieselbe Sache - hier die Zuordnung.
+        for schluessel, status in (("ok", "ok"), ("empty", "empty"),
+                                   ("failed", "fail")):
+            summary[schluessel] = sum(1 for s in run["sources"]
+                                      if s.get("status") == status)
         # Stillgelegte Quellen zaehlen nicht als "abgefragt" - sonst sieht die
         # Bilanz besser aus, je mehr Quellen aufgegeben wurden.
         summary["quarantaene"] = sum(1 for s in run["sources"]
                                      if s.get("status") == "quarantaene")
         summary["total"] -= summary["quarantaene"]
         run["source_summary"] = summary
-    (site_dir / "protokoll.html").write_text(
-        env.get_template("protokoll.html.j2").render(
+    by_region: dict[str, list] = {}
+    tech_themes: list[dict] = []
+    news_sources: list = []
+    if cfg is not None:
+        for op in cfg.operators:
+            by_region.setdefault(op.region_name, []).append(op)
+        # Themenfelder (config/tech_sources.yaml) bekommen einen eigenen Block
+        # auf der Quellenseite - sie sind weder Betreiber noch Fachpresse,
+        # und die Seite verspricht Nachpruefbarkeit ueber ALLE Quellen.
+        for key, label in cfg.themes:
+            quellen = [s for s in cfg.tech_sources if s.theme == key]
+            if quellen:
+                tech_themes.append({"key": key, "label": label,
+                                    "sources": quellen})
+        news_sources = cfg.news_sources
+
+    (site_dir / "transparenz.html").write_text(
+        env.get_template("transparenz.html.j2").render(
             prefix="", run=run, report=latest,
             # Die Zahl, die die Seite wirklich zeigen kann: bewertete
             # Meldungen nach dem Ausfiltern stillgelegter Quellen. NICHT
             # stats.new - das sind die neu GESAMMELTEN.
             n_bewertet=len(_flatten(latest)) if latest else 0,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
+            by_region=by_region, news_sources=news_sources,
+            tech_themes=tech_themes,
+            n_tech_sources=sum(len(t["sources"]) for t in tech_themes),
             num_operators=num_operators),
         encoding="utf-8")
 
     if not reports:
         (site_dir / "index.html").write_text(
-            report_tpl.render(prefix="", report=None, date_de="", highlights=[],
-                              explorer_json="[]", top_priorities=[], charts=None,
-                              briefing_html="", regions=[], categories=[],
-                              archive=[], is_latest=True,
-                              num_operators=num_operators, n_competitors=0),
+            woche_tpl.render(prefix="", report=None, date_de="", highlights=[],
+                             explorer_json="[]", top_priorities=[],
+                             competitors=[], dash=None, toc=[], lesezeit=0,
+                             briefing_lead="", briefing_html="", regions=[],
+                             categories=[], archive=[], is_latest=True,
+                             show_explorer=False,
+                             num_operators=num_operators, n_competitors=0),
             encoding="utf-8")
 
-    (site_dir / "archive.html").write_text(
-        env.get_template("archive.html.j2").render(
-            prefix="", archive=archive, num_operators=num_operators),
-        encoding="utf-8")
-
-    if cfg is not None:
-        by_region: dict[str, list] = {}
-        for op in cfg.operators:
-            by_region.setdefault(op.region_name, []).append(op)
-        # Themenfelder (config/tech_sources.yaml) bekommen einen eigenen Block
-        # auf der Quellenseite - sie sind weder Betreiber noch Fachpresse,
-        # und die Seite verspricht Nachpruefbarkeit ueber ALLE Quellen.
-        tech_themes = []
-        for key, label in cfg.themes:
-            quellen = [s for s in cfg.tech_sources if s.theme == key]
-            if quellen:
-                tech_themes.append({"key": key, "label": label,
-                                    "sources": quellen})
-        (site_dir / "sources.html").write_text(
-            env.get_template("sources.html.j2").render(
-                prefix="", by_region=by_region, news_sources=cfg.news_sources,
-                tech_themes=tech_themes,
-                n_tech_sources=sum(len(t["sources"]) for t in tech_themes),
-                num_operators=num_operators),
-            encoding="utf-8")
+    # ---- Weiterleitungen von den alten Dateinamen. Sie stehen in Lesezeichen
+    # und in Mails an die Fachabteilung; ein 404 waere die teuerste Art, eine
+    # Navigation aufzuraeumen.
+    for alt, ziel in (("bericht.html", "index.html"),
+                      ("suche.html", "meldungen.html"),
+                      ("archive.html", "meldungen.html#archiv"),
+                      ("protokoll.html", "transparenz.html"),
+                      ("sources.html", "transparenz.html#bestand"),
+                      ("wettbewerber.html", "index.html#deutschland-fokus")):
+        (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)

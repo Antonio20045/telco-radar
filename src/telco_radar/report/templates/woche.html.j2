@@ -1,0 +1,196 @@
+{# Die Wochenseite - loest uebersicht.html.j2 und report.html.j2 ab.
+
+   Beide kamen aus derselben Berichtsdatei und verlinkten sich gegenseitig:
+   die Uebersicht war die 30-Sekunden-Schicht, der Bericht der 15-Minuten-Text.
+   Das sind zwei Antworten auf DIESELBE Frage ("was ist diese Woche
+   passiert?"), also zwei Ladevorgaenge fuer einen Vorgang. Jetzt eine Seite:
+   oben die 30 Sekunden, darunter der volle Bericht mit Sprungnavigation.
+
+   Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html.
+   Unterschied: is_latest (Archivbanner) und show_explorer (die Archivseite
+   traegt ihre Meldungen selbst, die aktuelle Woche zeigt sie auf
+   meldungen.html). #}
+{% extends "base.html.j2" %}
+{% set active = 'woche' %}
+{% block title %}Marktrecherche · {% if is_latest %}Diese Woche{% else %}Bericht {{ report.date if report else '' }}{% endif %}{% endblock %}
+
+{% block content %}
+{% if report %}
+
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Marktrecherche{% if not is_latest %} &middot; Archiv{% endif %}</p>
+      <h1>{% if is_latest %}Was Vodafone jetzt wissen muss.{% else %}Bericht vom {{ date_de }}{% endif %}</h1>
+    </div>
+    <span class="page-date">Stand {{ date_de }}</span>
+  </div>
+  <p class="page-lead">
+    {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
+    <b>{{ highlights|length }} davon relevant</b>{% if report.stats.get('sources_total') %}
+    &middot; aus {{ report.stats.get('sources_total') }} Quellen{% endif %}.{% endif %}
+    {% if lesezeit %}Der Bericht darunter ist in etwa {{ lesezeit }} Minuten gelesen.{% endif %}
+  </p>
+  {% if not is_latest %}
+  <p class="muted-note" style="margin-top:12px">Archivierter Bericht.
+    <a href="{{ prefix }}index.html">Zur aktuellen Woche &nearr;</a></p>
+  {% endif %}
+</section>
+
+{% if top_priorities %}
+<div class="hero-priority">
+  <span class="hero-priority-badge">Priorität {{ top_priorities[0].relevance }}/5</span>
+  <p><a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener" style="color:inherit">{{ top_priorities[0].de_title }}</a></p>
+  <div class="hero-priority-meta">
+    <b>{{ top_priorities[0].operator or top_priorities[0].source_label }}</b> &middot; {{ top_priorities[0].region }}
+    &middot; <a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">Quelle &nearr;</a>
+  </div>
+</div>
+{% endif %}
+
+{% if dash and dash.kpis %}
+<div class="tile-grid" style="margin-top:20px">
+  {% for k in dash.kpis %}
+  <div class="tile{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
+    <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if briefing_lead %}
+<div class="card tan" style="margin-top:20px">
+  <div class="card-head"><h2>Kurzfazit</h2></div>
+  <p style="margin:0;font-size:16px;line-height:1.7;color:#4a463e;max-width:800px">{{ briefing_lead }}</p>
+</div>
+{% endif %}
+
+{% if briefing_html %}
+<div class="card">
+  <div class="card-head"><h2>Der Wochenbericht</h2>
+    <a href="{{ prefix }}transparenz.html">Methode &amp; Quellenbasis &nearr;</a></div>
+  {% if toc %}
+  {# Sprungnavigation: die Gliederung berechnete html.py schon immer
+     (_briefing_sections) und warf sie weg. Bei 2863 Woertern in elf
+     Abschnitten ist sie der Unterschied zwischen lesbar und nicht. #}
+  <nav class="toc" aria-label="Abschnitte des Berichts">
+    {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
+  </nav>
+  {% endif %}
+  <article class="prose">{{ briefing_html | safe }}</article>
+</div>
+{% endif %}
+
+{% if top_priorities %}
+<div class="card">
+  <div class="card-head">
+    <h2>Die {{ top_priorities|length }} dringendsten Signale</h2>
+    {% if show_explorer %}<a href="#alle-meldungen">alle {{ highlights|length }} Meldungen &darr;</a>
+    {% else %}<a href="{{ prefix }}meldungen.html">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
+  </div>
+  <div class="signal-list">
+    {% for h in top_priorities %}
+    <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
+      <span class="signal-badge">{{ h.relevance }}</span>
+      <span class="signal-body">
+        <span class="signal-company">{{ h.operator or h.source_label }} &middot; {{ h.region }}</span>
+        <span class="signal-title">{{ h.de_title }}</span>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# Deutschland-Fokus: was frueher als eigene Seite "Wettbewerber im Detail"
+   lief. Die Ueberschrift dort versprach eine Analyse aller beobachteten
+   Betreiber; konfiguriert sind drei deutsche Anbieter (focus_competitors).
+   Als benannter Block auf der Wochenseite stimmt das Versprechen. #}
+<section id="deutschland-fokus" style="scroll-margin-top:90px">
+{% if competitors and competitors|selectattr('summary')|list %}
+<div class="card">
+  <div class="card-head"><h2>Deutschland-Fokus</h2></div>
+  <p class="card-sub">Die drei Anbieter, gegen die Vodafone Deutschland direkt antritt – aus den Fachpresse-Meldungen dieser Woche.</p>
+  <div class="comp-list">
+    {% for c in competitors %}
+    {% if c.summary or c.moves %}
+    <article class="comp-card">
+      <div class="comp-card-head">
+        <h2>{{ c.name }}</h2>
+        <div class="comp-badges">
+          <span class="comp-badge">{{ c.n_items }} Meldungen</span>
+          <span class="comp-badge accent">{{ c.moves|length }} relevante Moves</span>
+        </div>
+      </div>
+      {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
+      {% if c.themes %}<div class="comp-tags">{% for t in c.themes %}<span class="comp-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+      {% if c.moves %}
+      <p class="comp-moves-title">Aktuelle Moves</p>
+      <div class="comp-items">
+        {% for m in c.moves %}
+        <div class="comp-item">
+          <div class="comp-item-cat">{{ m.category }}</div>
+          <a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% elif competitors and competitors|selectattr('error')|list %}
+{# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht.
+   Am 04. und 05.08.2026 scheiterten alle drei Profile in 0,6 s an einer
+   falschen Modell-ID - die Seite sagte beide Male, die Analyse "entstehe
+   beim naechsten Lauf". #}
+<div class="card">
+  <div class="card-head"><h2>Deutschland-Fokus</h2></div>
+  <p class="empty-note" style="margin:0">
+    <b>Die Auswertung des Laufs vom {{ date_de }} ist gescheitert.</b>
+    Die Meldungen wurden gesammelt und zugeordnet
+    ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
+    hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll unter
+    <a href="{{ prefix }}transparenz.html">Transparenz</a>; beim nächsten Lauf
+    wird es erneut versucht.
+  </p>
+</div>
+{% endif %}
+</section>
+
+{% if report.run and report.run.analysts %}
+<div class="card tan">
+  <div class="card-head"><h2>Was die Auswertung je Bereich ergab</h2></div>
+  <p class="card-sub">Gelesen wird jede neue Meldung. Behalten wird, was für Vodafone eine Nachricht ist.</p>
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span class="col-region">Bereich</span><span class="col-flex">gelesen</span>
+      <span class="col-kept">relevant</span><span class="col-model">Modell</span>
+    </div>
+    {% for a in report.run.analysts %}
+    <div class="rowtable-row" style="border-bottom:1px solid var(--tan-line)">
+      <span class="col-region">{{ a.region }}</span>
+      <span class="col-flex">{{ a.items_in }}</span>
+      <span class="col-kept">{{ a.highlights }}</span>
+      <span class="col-model">{{ a.model }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if show_explorer and highlights %}
+<details class="evidence" id="alle-meldungen" style="margin-top:24px">
+  <summary><span>Alle {{ highlights | length }} Meldungen dieser Woche</span><small>bei Bedarf öffnen</small></summary>
+  <div class="evidence-body">
+    {% include "_explorer.html.j2" %}
+  </div>
+</details>
+{% endif %}
+
+{% else %}
+<section class="page-hero"><p class="page-kicker">Marktrecherche</p><h1>Noch kein Bericht</h1>
+<p class="page-lead">Sobald der erste Lauf durchgelaufen ist, steht hier der Wochenbericht.</p></section>
+{% endif %}
+{% endblock %}

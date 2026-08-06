@@ -1,0 +1,19 @@
+{# Der Split-View-Explorer (links Liste, rechts Detail).
+
+   Als Teilvorlage herausgezogen, weil er an zwei Orten steht: auf
+   meldungen.html fuer die aktuelle Woche und - eingeklappt - auf jeder
+   Archivwoche unter reports/<datum>.html. Die Logik dazu liegt in app.js
+   und haengt an diesen IDs; sie duerfen sich nicht je Seite unterscheiden. #}
+<div class="filters">
+  <input type="search" id="f-search" placeholder="Suchen: Betreiber, Thema, Stichwort …" aria-label="Meldungen dieser Woche durchsuchen">
+  <select id="f-region" aria-label="Bereich"><option value="">Alle Bereiche</option>{% for r in regions %}<option value="{{ r }}">{{ r }}</option>{% endfor %}</select>
+  <select id="f-category" aria-label="Thema"><option value="">Alle Themen</option>{% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select>
+  <select id="f-relevance" aria-label="Dringlichkeit"><option value="">Jede Dringlichkeit</option><option value="5">5/5 sofort</option><option value="4">ab 4/5</option><option value="3">ab 3/5</option></select>
+  <select id="f-sort" aria-label="Sortierung"><option value="relevance">Dringlichste zuerst</option><option value="date">Neueste zuerst</option><option value="operator">Betreiber (A–Z)</option></select>
+</div>
+<div class="explorer" id="explorer-app">
+  <div class="ex-list" id="ex-list" role="listbox" aria-label="Meldungsliste"></div>
+  <div class="ex-detail" id="ex-detail"><p class="ex-detail-empty">Meldung links auswählen.</p></div>
+</div>
+<p class="ex-count" id="ex-count"></p>
+<script type="application/json" id="explorer-data">{{ explorer_json | safe }}</script>

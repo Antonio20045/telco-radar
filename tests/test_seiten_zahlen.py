@@ -76,7 +76,7 @@ def _seite(site, name: str) -> str:
 # --------------------------------------------------------------- Protokoll
 def test_protokoll_trennt_gesammelt_von_bewertet(tmp_path):
     """Die beiden Zahlen duerfen nicht unter EIN Label fallen."""
-    html = _seite(_render(tmp_path), "protokoll.html")
+    html = _seite(_render(tmp_path), "transparenz.html")
 
     assert f"<b>{NEU_GESAMMELT}</b><span>neue Meldungen gelesen</span>" in html
     assert f"<b>{len(HIGHLIGHTS)}</b><span>davon relevant</span>" in html
@@ -85,20 +85,20 @@ def test_protokoll_trennt_gesammelt_von_bewertet(tmp_path):
 
 
 def test_protokoll_erklaert_den_abstand_zwischen_den_zahlen(tmp_path):
-    html = _seite(_render(tmp_path), "protokoll.html")
+    html = _seite(_render(tmp_path), "transparenz.html")
     assert "Warum die zweite Zahl kleiner ist" in html
 
 
 def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
     """Gegenprobe: sind beide Zahlen gleich, faellt der Hinweis weg."""
-    html = _seite(_render(tmp_path, stats={"new": len(HIGHLIGHTS)}), "protokoll.html")
+    html = _seite(_render(tmp_path, stats={"new": len(HIGHLIGHTS)}), "transparenz.html")
     assert "Warum die zweite Zahl kleiner ist" not in html
 
 
 # ------------------------------------------------------------------ Bericht
 def test_signalliste_verspricht_nicht_mehr_als_sie_zeigt(tmp_path):
     """Die Ueberschrift muss der Zahl der gerenderten Zeilen entsprechen."""
-    html = _seite(_render(tmp_path), "bericht.html")
+    html = _seite(_render(tmp_path), "index.html")
 
     gezeigt = html.count('class="signal-row"')
     m = re.search(r"<h2>Die (\d+) dringendsten Signale</h2>", html)
@@ -113,28 +113,41 @@ def test_signalliste_verspricht_nicht_mehr_als_sie_zeigt(tmp_path):
 
 def test_bericht_verlinkt_die_vollstaendige_liste(tmp_path):
     """Wer gekappt anzeigt, muss den Weg zur vollen Liste zeigen."""
-    html = _seite(_render(tmp_path), "bericht.html")
+    html = _seite(_render(tmp_path), "index.html")
     assert f"alle {len(HIGHLIGHTS)} Meldungen" in html
-    assert 'id="alle-meldungen"' in html
+    assert "meldungen.html" in html
 
 
 def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
-    html = _seite(_render(tmp_path), "bericht.html")
-    assert f"{NEU_GESAMMELT} neue Meldungen gelesen, {len(HIGHLIGHTS)} relevant" in html
+    html = _seite(_render(tmp_path), "index.html")
+    assert re.search(rf"{NEU_GESAMMELT} neue Meldungen gelesen,\s*"
+                     rf"<b>{len(HIGHLIGHTS)} davon relevant</b>", html)
 
 
 def test_explorer_enthaelt_wirklich_alle_meldungen(tmp_path):
-    """Die Zahl im Aufklapper muss zu den eingebetteten Daten passen."""
-    html = _seite(_render(tmp_path), "bericht.html")
+    """Die Zahl in der Ueberschrift muss zu den eingebetteten Daten passen."""
+    html = _seite(_render(tmp_path), "meldungen.html")
     daten = json.loads(re.search(r'id="explorer-data">(.*?)</script>', html, re.S).group(1))
     assert len(daten) == len(HIGHLIGHTS)
-    assert f"Alle {len(HIGHLIGHTS)} Meldungen durchsuchen" in html
+    assert f"Diese Woche: {len(HIGHLIGHTS)} Meldungen" in html
+
+
+def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
+    """Der Explorer-JSON war 78,5 KB der 120 KB von bericht.html - fuer
+    Daten, die nur sichtbar wurden, wenn jemand ein <details> aufklappte.
+    Er gehoert auf meldungen.html, nicht auf die Landeseite."""
+    site = _render(tmp_path)
+    assert 'id="explorer-data"' not in _seite(site, "index.html")
+    assert 'id="explorer-data"' in _seite(site, "meldungen.html")
+    # Die Archivwoche hat keine meldungen.html, auf die sie verweisen
+    # koennte - sie traegt ihre Meldungen weiter selbst.
+    assert 'id="explorer-data"' in _seite(site, "reports/2026-08-05.html")
 
 
 def test_interne_einordnung_verlaesst_die_seite_nicht(tmp_path):
     """`why_it_matters` ist intern und darf in keiner Seite auftauchen."""
     site = _render(tmp_path)
-    for name in ("bericht.html", "index.html", "search_index.json"):
+    for name in ("index.html", "meldungen.html", "search_index.json"):
         assert "Interne Einordnung." not in _seite(site, name)
 
 
@@ -151,7 +164,7 @@ GELUNGEN = [{"name": "Deutsche Telekom", "n_items": 16,
 
 def test_gescheiterte_analyse_sagt_dass_sie_gescheitert_ist(tmp_path):
     """Kein "kommt beim naechsten Lauf", wenn der Lauf schon war."""
-    html = _seite(_render(tmp_path, competitors=GESCHEITERT), "wettbewerber.html")
+    html = _seite(_render(tmp_path, competitors=GESCHEITERT), "index.html")
     assert "ist gescheitert" in html
     assert "entsteht beim nächsten Lauf" not in html
     # Und die Seite gibt zu, dass die Zuordnung funktioniert hat.
@@ -160,16 +173,18 @@ def test_gescheiterte_analyse_sagt_dass_sie_gescheitert_ist(tmp_path):
 
 def test_vorhandene_profile_zeigen_keinen_leertext(tmp_path):
     """Der Fall, der am 04.08. still verloren ging."""
-    html = _seite(_render(tmp_path, competitors=GELUNGEN), "wettbewerber.html")
+    html = _seite(_render(tmp_path, competitors=GELUNGEN), "index.html")
     assert "Profiltext." in html
     assert "ist gescheitert" not in html
     assert "liegt noch keine Wettbewerber-Detailanalyse vor" not in html
 
 
-def test_ohne_profile_bleibt_der_alte_hinweis(tmp_path):
-    """Ein Lauf ohne KI hat wirklich nichts - das darf so dastehen."""
-    html = _seite(_render(tmp_path, competitors=[]), "wettbewerber.html")
-    assert "liegt noch keine Wettbewerber-Detailanalyse vor" in html
+def test_ohne_profile_kein_leerer_block(tmp_path):
+    """Ein Lauf ohne KI hat wirklich nichts - dann faellt der Block weg,
+    statt eine leere Ueberschrift zu zeigen."""
+    html = _seite(_render(tmp_path, competitors=[]), "index.html")
+    assert "Deutschland-Fokus</h2>" not in html
+    assert "ist gescheitert" not in html
 
 
 # ------------------------------------------------- Modellwahl je Anbieter
@@ -212,3 +227,86 @@ def test_kein_anbieter_erbt_die_modell_id_eines_anderen():
         analyst, editor = _modelle_fuer_anbieter(settings, anbieter, "fallback")
         assert analyst == settings[analyst_key]
         assert editor == settings[editor_key]
+
+
+# ------------------------------------------------- Sprungnavigation (Etappe 2)
+def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
+    """2863 Woerter in elf Abschnitten standen als ein Block ohne Einstieg
+    da. Jede Ueberschrift braucht einen Anker, damit man aus einer Mail in
+    einen Abschnitt verlinken kann."""
+    html = _seite(_render(tmp_path), "index.html")
+
+    assert '<nav class="toc"' in html
+    # Beide Abschnitte der Fixture ("Auf einen Blick", "Europa") tauchen als
+    # Anker UND als Sprungziel auf.
+    for titel, anker in (("Auf einen Blick", "auf-einen-blick"), ("Europa", "europa")):
+        assert f'href="#{anker}"' in html
+        assert f'<h2 id="{anker}">{titel}</h2>' in html
+
+
+def test_anker_ueberleben_umlaute_und_sonderzeichen(tmp_path):
+    from telco_radar.report.html import _slug
+    assert _slug("Afrika & Naher Osten") == "afrika-naher-osten"
+    assert _slug("Türme, Glasfaser & Rechenzentren") == "tuerme-glasfaser-rechenzentren"
+    assert _slug("Technologie, Geräte & Regulierung") == "technologie-geraete-regulierung"
+    assert _slug("") == "abschnitt"
+
+
+def test_gleichnamige_abschnitte_bekommen_verschiedene_anker():
+    from telco_radar.report.html import _anchor_headings
+    html, toc = _anchor_headings("<h2>Global</h2><p>a</p><h2>Global</h2><p>b</p>")
+    assert [s["id"] for s in toc] == ["global", "global-2"]
+    assert 'id="global"' in html and 'id="global-2"' in html
+
+
+def test_lesezeit_wird_genannt(tmp_path):
+    html = _seite(_render(tmp_path), "index.html")
+    assert "Minuten gelesen" in html
+
+
+# ------------------------------------------- Quellenbilanz des Laufprotokolls
+QUELLEN = [
+    {"name": "A", "url": "https://a.example/f", "kind": "rss", "region": "global",
+     "status": "ok", "count": 5, "error": ""},
+    {"name": "B", "url": "https://b.example/f", "kind": "rss", "region": "global",
+     "status": "empty", "count": 0, "error": ""},
+    {"name": "C", "url": "https://c.example/f", "kind": "rss", "region": "global",
+     "status": "fail", "count": 0, "error": "HTTPStatusError: 403"},
+    {"name": "D", "url": "https://d.example/f", "kind": "rss", "region": "global",
+     "status": "fail", "count": 0, "error": "ValueError: unparseable feed"},
+    {"name": "E", "url": "https://e.example/f", "kind": "rss", "region": "global",
+     "status": "quarantaene", "count": 0, "error": ""},
+]
+
+
+def test_gescheiterte_quellen_werden_gezaehlt(tmp_path):
+    """Der fuenfte falsche Wert, gefunden beim Nachrendern am 06.08.2026.
+
+    Das Laufprotokoll schreibt `status: "fail"`, die Zusammenfassung der
+    Seite heisst `failed`. Die Neuberechnung im Renderer zaehlte nach
+    "failed" und fand nie einen: der Lauf vom 05.08. hatte 6 gescheiterte
+    Quellen, die Seite meldete 0 - also ausgerechnet die Zahl, die den
+    Bestand gesund aussehen laesst.
+    """
+    reports = tmp_path / "reports"
+    reports.mkdir(parents=True)
+    (reports / "2026-08-05.json").write_text(json.dumps({
+        "date": "2026-08-05", "generated_with_llm": True,
+        "stats": {"new": NEU_GESAMMELT},
+        "briefing_md": "## Auf einen Blick\n\nText.",
+        "regions": {"Europa": {"region_summary": "", "highlights": HIGHLIGHTS}},
+        "competitors": [],
+        "run": {"duration_seconds": 60, "models": {"analyst": "m", "editor": "m"},
+                "phases": [], "analysts": [], "sources": QUELLEN,
+                "source_summary": {}},
+    }, ensure_ascii=False), encoding="utf-8")
+    site = tmp_path / "site"
+    render_site(site, reports)
+    html = (site / "transparenz.html").read_text(encoding="utf-8")
+
+    # 1 ok / 1 leer / 2 gescheitert - die Quarantaene zaehlt nicht als
+    # abgefragt, sonst sieht die Bilanz besser aus, je mehr Quellen
+    # aufgegeben wurden.
+    assert "<b>1 / 1 / 2</b><span>ok / leer / fehlgeschlagen</span>" in html
+    assert "<b>4</b><span>Quellen abgefragt</span>" in html
+    assert "nicht erreichbar (2)" in html

@@ -52,7 +52,7 @@ def _bericht(tmp_path, briefing_md: str = "## Auf einen Blick\n\nText.") -> str:
         }]}},
     }, ensure_ascii=False), encoding="utf-8")
     render_site(tmp_path / "site", reports)
-    return (tmp_path / "site" / "bericht.html").read_text(encoding="utf-8")
+    return (tmp_path / "site" / "index.html").read_text(encoding="utf-8")
 
 
 def test_fremde_ueberschrift_landet_escaped_in_der_seite(tmp_path):
@@ -79,8 +79,13 @@ def test_redaktionsprosa_bleibt_gerendertes_markdown(tmp_path):
 
 def test_explorer_json_bleibt_lesbar(tmp_path):
     """Die eingebetteten Explorer-Daten stehen in einem script-Tag und
-    duerfen vom Escaping nicht zerstoert werden."""
-    html = _bericht(tmp_path)
+    duerfen vom Escaping nicht zerstoert werden.
+
+    Seit dem Redesign (06.08.2026) stehen sie auf meldungen.html statt auf
+    der Berichtsseite - die Landeseite trug 78,5 KB JSON fuer einen
+    zugeklappten Aufklapper."""
+    _bericht(tmp_path)
+    html = (tmp_path / "site" / "meldungen.html").read_text(encoding="utf-8")
     m = re.search(r'id="explorer-data">(.*?)</script>', html, re.S)
     assert m, "Explorer-Daten fehlen"
     daten = json.loads(m.group(1))

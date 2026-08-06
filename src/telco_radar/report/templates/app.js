@@ -117,9 +117,15 @@
 
   // Ankunft ueber die globale Suche (Topbar) mit ?q=…: Suchfeld vorbelegen,
   // Explorer-Akkordeon oeffnen und sofort filtern - kein zweites Mal tippen.
+  //
+  // Nur auf Seiten OHNE eigenes Suchfeld (also den Archivwochen unter
+  // reports/). Auf meldungen.html uebernimmt die Volltextsuche das ?q=; wuerde
+  // der Explorer es zusaetzlich als Wochenfilter lesen, staende ueber einer
+  // Trefferliste mit zwoelf Ergebnissen ein leerer Wochen-Explorer - derselbe
+  // Begriff, zwei widersprechende Zahlen.
   try {
     var qs = new URLSearchParams(location.search);
-    var q = qs.get('q');
+    var q = document.getElementById('suche-input') ? null : qs.get('q');
     if (q) {
       fSearch.value = q;
       renderList();

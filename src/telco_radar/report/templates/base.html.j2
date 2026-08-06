@@ -24,7 +24,7 @@
           <a class="uc {% if uc=='markt' %}active{% endif %}" href="{{ prefix }}index.html">Marktrecherche</a>
           <a class="uc {% if uc=='promo' %}active{% endif %}" href="{{ prefix }}promo/index.html">Promo Übersicht</a>
         </nav>
-        <form class="gsearch" id="gsearch" role="search" action="{{ prefix }}suche.html" autocomplete="off">
+        <form class="gsearch" id="gsearch" role="search" action="{{ prefix }}meldungen.html" autocomplete="off">
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
                  placeholder="Alle Berichte &amp; Differenzierung durchsuchen …"
                  aria-label="Marktrecherche durchsuchen">
@@ -43,14 +43,15 @@
       <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
     </nav>
     {% else %}
+    {# Vier Eintraege statt sieben, geschnitten nach der Frage des Lesers
+       (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Die alten Dateinamen
+       leben als Weiterleitungen weiter - sie stehen in Lesezeichen und
+       Mails. #}
     <nav class="subbar subnav" aria-label="Marktrecherche">
-      <a href="{{ prefix }}index.html" {% if active=='uebersicht' %}class="on"{% endif %}>Übersicht</a>
-      <a href="{{ prefix }}bericht.html" {% if active=='bericht' %}class="on"{% endif %}>Bericht</a>
+      <a href="{{ prefix }}index.html" {% if active=='woche' %}class="on"{% endif %}>Diese Woche</a>
+      <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on"{% endif %}>Meldungen</a>
       <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
-      <a href="{{ prefix }}wettbewerber.html" {% if active=='wettbewerber' %}class="on"{% endif %}>Wettbewerber</a>
-      <a href="{{ prefix }}protokoll.html" {% if active=='protokoll' %}class="on"{% endif %}>Protokoll</a>
-      <a href="{{ prefix }}archive.html" {% if active=='archive' %}class="on"{% endif %}>Archiv</a>
-      <a href="{{ prefix }}sources.html" {% if active=='sources' %}class="on"{% endif %}>Quellen</a>
+      <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Transparenz</a>
     </nav>
     {% endif %}
   </header>
