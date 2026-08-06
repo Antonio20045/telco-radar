@@ -31,6 +31,7 @@ from .config import is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
 from .quellen_register import Quellenregister, quellen_der_config
+from .report import bilder as report_bilder
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -482,10 +483,30 @@ def run(root: Path, use_llm: bool | None = None,
                 # damit die Frage, welcher Zweitkanal sich lohnt - nicht
                 # berechenbar.
                 h.setdefault("source_url", item.source_url)
+                # Bild aus dem Feed-Eintrag, falls der Feed eins mitliefert.
+                # Kostet keinen Abruf; report/bilder.py versucht danach nur
+                # noch fuer die Meldungen ohne eins die Artikelseite.
+                if getattr(item, "image_url", ""):
+                    h.setdefault("image_url", item.image_url)
             else:
                 h.setdefault("date", None)
                 h.setdefault("source", "")
                 h.setdefault("source_url", "")
+
+    # ------------------------------------------------------------- Bilder
+    # Eine Zeitung ohne Bilder ist eine Textwueste. Nur die dringendsten
+    # Meldungen bekommen eins, und ein Fehlschlag ist folgenlos - der Layout
+    # kommt ohne Bild aus (viele Fachpresseseiten weisen den direkten Abruf
+    # mit 403 ab).
+    tbild = time.monotonic()
+    alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
+    try:
+        n_bilder = report_bilder.hole_bilder(alle_highlights, root)
+    except Exception as exc:  # noqa: BLE001 - Bilder duerfen nie den Lauf kippen
+        log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
+        n_bilder = 0
+    phase("Bilder", time.monotonic() - tbild,
+          f"{n_bilder} von {min(len(alle_highlights), 14)} Meldungen mit Bild")
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den
@@ -675,6 +696,12 @@ def run(root: Path, use_llm: bool | None = None,
                     len(covered))
 
     # ---------------------------------------------------------------- site
+    # Erst aufraeumen, dann rendern: render_site kopiert den Bildordner nach
+    # site/images/, und was hier faellt, soll dort gar nicht erst landen.
+    try:
+        report_bilder.raeume_auf(root, reports_dir)
+    except Exception as exc:  # noqa: BLE001
+        log.error("Bilder-Aufraeumen fehlgeschlagen: %s", exc)
     render_site(root / "site", reports_dir, cfg)
     return report_path
 

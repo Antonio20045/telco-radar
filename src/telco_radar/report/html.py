@@ -14,6 +14,7 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
+from . import bilder as report_bilder
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from ..analyze.diff_curator import DiffStore
@@ -271,6 +272,34 @@ TECH_THEMES = [
 def _tag_tech(text):
     t = " " + (text or "").lower() + " "
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
+
+
+def _schlagzeile(h: dict, max_zeichen: int = 110) -> str:
+    """Die Schlagzeile einer Meldung.
+
+    Erste Wahl ist `headline` - eine echte, vom Analysten geschriebene
+    Schlagzeile (max. neun Woerter, Aktiv). Die gibt es erst fuer Berichte ab
+    dem 06.08.2026; aeltere Berichte haben sie nicht.
+
+    Fallback ist der volle Zusammenfassungssatz. **Nicht mechanisch gekuerzt**:
+    ein erster Versuch, an Komma oder Semikolon zu trennen, machte aus
+    "SpaceX-Praesidentin Gwynne Shotwell sagt, Starlink Mobile werde direkt
+    mit AT&T konkurrieren" die Schlagzeile "SpaceX-Praesidentin Gwynne
+    Shotwell sagt" - grammatisch sauber und inhaltsleer. Eine Schlagzeile
+    laesst sich nicht aus einem Fliesstextsatz schneiden; wer es doch tut,
+    produziert Zeilen, die nichts mehr sagen. Lieber drei Zeilen, die stimmen.
+    """
+    kopf = " ".join((h.get("headline") or "").split()).strip(" .")
+    if kopf:
+        return kopf
+    satz = " ".join((h.get("de_title") or "").split())
+    if len(satz) <= max_zeichen:
+        return satz.rstrip(" .")
+    schnitt = satz[:max_zeichen].rstrip()
+    leer = schnitt.rfind(" ")
+    if leer > max_zeichen * 0.5:
+        schnitt = schnitt[:leer]
+    return schnitt.rstrip(" ,;:–-") + "…"
 
 
 def _text_aus_html(html: str) -> str:
@@ -557,6 +586,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         src = _TEMPLATES / binasset
         if src.exists():
             shutil.copy(src, site_dir / binasset)
+    # Meldungsbilder sind Pipeline-State (data/state/report_images/), nicht
+    # Site-Quelltext - sie werden bei jedem Rendern kopiert, genau wie die
+    # Promo-Screenshots. Nie von Hand unter site/ ablegen.
+    bild_quelle = report_bilder.bildordner(reports_dir.parent.parent)
+    if bild_quelle.exists():
+        bild_ziel = site_dir / "images"
+        bild_ziel.mkdir(exist_ok=True)
+        for bild in bild_quelle.iterdir():
+            if bild.is_file():
+                shutil.copyfile(bild, bild_ziel / bild.name)
 
     num_operators = len(cfg.operators) if cfg is not None else None
     reports = _load_reports(reports_dir)
@@ -578,7 +617,33 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     latest_ctx: dict | None = None
     for i, report in enumerate(reports):
         highlights = _flatten(report)
-        top = [h for h in highlights if h["relevance"] >= 4][:6]
+        spitze = [h for h in highlights if h["relevance"] >= 4]
+        # Der Aufmacher ist die dringendste Meldung MIT Bild - so fuehrt in
+        # jeder Zeitung die Bildgeschichte. Am 05.08.2026 haben die beiden
+        # dringendsten kein Bild (Mobile World Live und Telecoms.com weisen
+        # den Abruf mit 403 ab), die dritte schon.
+        aufmacher_roh = next((h for h in spitze if h.get("image")),
+                             spitze[0] if spitze else None)
+        # Ueber die URL ausschliessen, nicht ueber Objektidentitaet: der
+        # Aufmacher wird unten kopiert, und nach dem Kopieren traf `is not`
+        # nicht mehr zu - die Aufmachermeldung stand dadurch ein zweites Mal
+        # als erster Anreisser darunter, mit demselben Bild.
+        aufmacher_url = (aufmacher_roh or {}).get("url")
+        rest = [h for h in spitze if h.get("url") != aufmacher_url]
+        aufmacher = None
+        if aufmacher_roh is not None:
+            aufmacher = dict(aufmacher_roh)
+            aufmacher["schlagzeile"] = _schlagzeile(aufmacher_roh)
+            # Der Vorspann ist die Zusammenfassung DIESER Meldung, nicht die
+            # der Woche: briefing_lead ist derselbe Text, mit dem der Bericht
+            # darunter woertlich beginnt - das las sich wie ein Fehler.
+            aufmacher["vorspann"] = _first_sentence(
+                aufmacher_roh.get("summary") or "", 260)
+        # Zweite Reihe: drei Anreisser, bevorzugt bebildert.
+        zweite_reihe = [dict(h, schlagzeile=_schlagzeile(h, 96))
+                        for h in ([h for h in rest if h.get("image")]
+                                  + [h for h in rest if not h.get("image")])[:3]]
+        top = spitze[:6]
         competitors = _prep_competitors(report)
         public_highlights = []
         for h in highlights:
@@ -593,6 +658,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "highlights": highlights,
             "explorer_json": _json_for_script(public_highlights),
             "top_priorities": top,
+            "aufmacher": aufmacher,
+            "zweite_reihe": zweite_reihe,
+            # Was nach Aufmacher und zweiter Reihe uebrig bleibt - sonst
+            # stuende dieselbe Meldung dreimal auf der Titelseite.
+            "weitere_signale": [h for h in rest if h.get("url") not in
+                                {z.get("url") for z in zweite_reihe}][:6],
             "competitors": competitors,
             # _stats() ist teuer und wird nur von der aktuellen Woche
             # gebraucht. Bis zum 06.08.2026 lief es fuer JEDE Archivwoche mit

@@ -7,6 +7,7 @@ provenance and has been removed.
 from __future__ import annotations
 
 import logging
+import re
 import time
 from datetime import datetime, timezone
 
@@ -50,6 +51,34 @@ def _entry_date(entry) -> datetime | None:
     return None
 
 
+_IMG_IM_TEXT = re.compile(r'<img[^>]+src=["\']([^"\']+)', re.I)
+
+
+def _entry_image(entry) -> str:
+    """Bild-URL eines Feed-Eintrags, falls der Feed eine mitliefert.
+
+    Feeds transportieren Bilder auf vier verschiedene Arten, je nach
+    Redaktionssystem. Keine davon ist verlaesslich vorhanden - Mobile World
+    Live liefert gar keine, Light Reading ein media:content. Deshalb alle
+    vier probieren und leer zurueckgeben, wenn keine greift.
+    """
+    for feld in ("media_content", "media_thumbnail"):
+        for m in (entry.get(feld) or []):
+            url = (m.get("url") or "").strip()
+            if url:
+                return url
+    for link in (entry.get("links") or []):
+        if (link.get("rel") == "enclosure"
+                and str(link.get("type") or "").startswith("image")):
+            url = (link.get("href") or "").strip()
+            if url:
+                return url
+    blob = (entry.get("summary") or "") + "".join(
+        c.get("value") or "" for c in (entry.get("content") or []))
+    m = _IMG_IM_TEXT.search(blob)
+    return m.group(1).strip() if m else ""
+
+
 def parse_feed_bytes(raw: bytes, source: Source, region: str,
                      operator: str | None, origin: str) -> list[Item]:
     """Parse feed content into Items (separated from fetching for testability)."""
@@ -75,6 +104,7 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
                 published=_entry_date(entry),
                 summary=summary[:600],
                 origin=origin,
+                image_url=_entry_image(entry),
             )
         )
     return items

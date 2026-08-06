@@ -45,6 +45,12 @@ class Item:
     # berechenbar. Wird zentral in collect/_collect_source gestempelt, damit
     # kein Collector es vergessen kann.
     source_url: str = ""
+    # Bild-URL aus dem Feed-Eintrag (media:content, media:thumbnail,
+    # enclosure oder erstes <img> im Text). Kostet keinen zusaetzlichen
+    # Abruf und funktioniert auch bei Seiten, die einen direkten Aufruf mit
+    # 403 abweisen. Leer ist der Normalfall - report/bilder.py versucht dann
+    # og:image, und ein Layout ohne Bild muss trotzdem tragen.
+    image_url: str = ""
     id: str = field(default="")
 
     def __post_init__(self) -> None:

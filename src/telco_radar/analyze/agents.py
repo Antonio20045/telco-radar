@@ -42,6 +42,7 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
       "url": "<original url, verbatim>",
       "category": "<one of: Produktlaunch | Tarif/Pricing | Kampagne | Partnerschaft | Netz/Technologie | Regulierung | M&A | Finanzen | Sonstiges>",
       "relevance": <1-5, 5 = Vodafone should react now / copy / watch closely>,
+      "headline": "<HEADLINE in {language}, max 9 words, no trailing period: what happened, active voice, concrete. Like a newspaper front page, NOT a summary sentence>",
       "summary": "<1-2 sentences in {language}: what exactly happened - names, prices, numbers, dates when given>",
       "why_it_matters": "<1-2 sentences in {language}: the Vodafone angle. Frame it as what Vodafone could DO or learn, e.g. 'Vorlage fuer ein eigenes ...', 'Preisdruck, den Vodafone kontern muss ...', 'zeigt, dass ...'. Never generic.>"
     }}
@@ -104,6 +105,7 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
       "url": "<original url, verbatim>",
       "category": "<one of: Produktlaunch | Tarif/Pricing | Kampagne | Partnerschaft | Netz/Technologie | Regulierung | M&A | Finanzen | Sonstiges>",
       "relevance": <1-5, 5 = changes what Vodafone can offer or must plan for now>,
+      "headline": "<HEADLINE in {language}, max 9 words, no trailing period: what happened, active voice, concrete. Like a newspaper front page, NOT a summary sentence>",
       "summary": "<1-2 sentences in {language}: what exactly was announced - names, numbers, dates when given>",
       "why_it_matters": "<1-2 sentences in {language}: the concrete consequence for a network operator - e.g. 'ermoeglicht ...', 'verschiebt die Kosten fuer ...', 'Kunden werden ... erwarten', 'schraenkt ... ein'. Never generic.>"
     }}

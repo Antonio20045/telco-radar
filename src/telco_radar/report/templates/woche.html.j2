@@ -1,73 +1,81 @@
 {# Die Titelseite der Ausgabe.
 
-   Loest uebersicht.html.j2 und report.html.j2 ab - beide kamen aus derselben
-   Berichtsdatei und verlinkten sich gegenseitig, also zwei Ladevorgaenge fuer
-   eine Frage.
+   Aufbau wie eine Zeitungstitelseite, nicht wie ein Dashboard:
+     AUFMACHER   ein grosses Bild, eine grosse Schlagzeile, ein Vorspann.
+                 Er nimmt die obere Haelfte der Seite ein und ist der
+                 einzige Block, der gross sein darf.
+     ZWEITE REIHE drei bebilderte Anreisser unter dem Aufmacher.
+     HAUPTSPALTE der Wochenbericht mit Sprungnavigation und Initial.
+     RAIL        Zahlen, weitere Meldungen, Themenradar - schmal, ruhig.
 
-   Aufbau wie eine Zeitungstitelseite: Schlagzeile, Aufmacher, danach zwei
-   Spalten - links der Fliesstext, rechts die Rail mit Zahlen, Themenradar
-   und den dringendsten Meldungen. Was ueber beide Spalten gehoert
-   (Deutschland-Fokus, Auswertung je Bereich), steht unter dem Raster.
+   Das Datum steht EINMAL, in der Datumszeile des Zeitungskopfs. Es stand
+   am 06.08.2026 zehnmal auf der Seite, und die Ueberschriften waren so
+   zahlreich, dass die Seite unruhig wirkte. Wer hier eine Rubrik ergaenzt,
+   sollte vorher eine streichen.
 
-   Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html.
-   Unterschied: is_latest (Archivbanner) und show_explorer (die Archivseite
-   traegt ihre Meldungen selbst, die aktuelle Woche zeigt sie auf
-   meldungen.html). #}
+   Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html. #}
 {% extends "base.html.j2" %}
 {% set active = 'woche' %}
-{% block title %}Marktrecherche · {% if is_latest %}Diese Woche{% else %}Bericht {{ report.date if report else '' }}{% endif %}{% endblock %}
+{% block title %}{% if is_latest %}Vodafone Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
 
 {% block content %}
 {% if report %}
 
-<section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">{% if is_latest %}Die Woche im Markt{% else %}Aus dem Archiv{% endif %}</p>
-      <h1>{% if is_latest %}Was Vodafone jetzt wissen muss.{% else %}Bericht vom {{ date_de }}{% endif %}</h1>
-    </div>
-    <span class="page-date">Stand {{ date_de }}</span>
-  </div>
-  <p class="page-lead">
-    {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
-    <b>{{ highlights|length }} davon relevant</b>.{% endif %}
-    {% if lesezeit %}Lesezeit etwa {{ lesezeit }} Minuten.{% endif %}
-    {% if not is_latest %}<a href="{{ prefix }}index.html">Zur aktuellen Ausgabe &nearr;</a>{% endif %}
-  </p>
-  {% if not is_latest %}
-  <p class="muted-note" style="margin-top:10px">Archivierter Bericht – die Zahlen sind der Stand dieser Woche.</p>
-  {% endif %}
-</section>
+{% if not is_latest %}
+<p class="archivhinweis">Archivierter Bericht vom {{ date_de }} –
+  <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
+{% endif %}
 
-{% if top_priorities %}
-<div class="hero-priority">
-  <span class="hero-priority-badge">Aufmacher · Priorität {{ top_priorities[0].relevance }}/5</span>
-  <p><a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">{{ top_priorities[0].de_title }}</a></p>
-  <div class="hero-priority-meta">
-    <b>{{ top_priorities[0].operator or top_priorities[0].source_label }}</b> &middot; {{ top_priorities[0].region }}
-    &middot; <a href="{{ top_priorities[0].url }}" target="_blank" rel="noopener">Quelle öffnen &nearr;</a>
+{# ====================================================== AUFMACHER ==== #}
+{% if aufmacher %}
+<article class="aufmacher{% if not aufmacher.image %} ohne-bild{% endif %}{% if (aufmacher.schlagzeile or "")|length <= 70 %} kurz{% endif %}">
+  <p class="page-kicker">{{ aufmacher.category or 'Aufmacher' }}{% if aufmacher.region %} · {{ aufmacher.region }}{% endif %}</p>
+  <h1>{{ aufmacher.schlagzeile or aufmacher.de_title }}</h1>
+  {% if aufmacher.image %}
+  <figure class="aufmacher-bild">
+    <img src="{{ prefix }}images/{{ aufmacher.image }}" alt="" loading="eager">
+    <figcaption>{{ aufmacher.operator or aufmacher.source_label }} · Bild: {{ aufmacher.source_label }}</figcaption>
+  </figure>
+  {% endif %}
+  <div class="aufmacher-text">
+    {% if aufmacher.vorspann %}<p class="aufmacher-vorspann">{{ aufmacher.vorspann }}</p>{% endif %}
+    <p class="aufmacher-meta">
+      <b>{{ aufmacher.operator or aufmacher.source_label }}</b>
+      <span class="rel-badge r{{ aufmacher.relevance }}">Priorität {{ aufmacher.relevance }}/5</span>
+      <a href="{{ aufmacher.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
+    </p>
   </div>
+</article>
+{% else %}
+<section class="page-hero"><h1>Diese Woche keine priorisierte Meldung.</h1></section>
+{% endif %}
+
+{# =================================================== ZWEITE REIHE ==== #}
+{% if zweite_reihe %}
+<div class="zweite-reihe">
+  {% for h in zweite_reihe %}
+  <a class="anreisser{% if not h.image %} ohne-bild{% endif %}" href="{{ h.url }}" target="_blank" rel="noopener">
+    {% if h.image %}<span class="anreisser-bild"><img src="{{ prefix }}images/{{ h.image }}" alt="" loading="lazy"></span>{% endif %}
+    <span class="anreisser-kicker">{{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}</span>
+    <span class="anreisser-titel">{{ h.schlagzeile or h.de_title }}</span>
+  </a>
+  {% endfor %}
 </div>
 {% endif %}
 
+{# ======================================================== RASTER ===== #}
 <div class="frontpage">
-  {# ------------------------------------------------------- Hauptspalte #}
   <div class="frontpage-main">
-    {% if briefing_lead %}
-    <div class="card" style="margin-top:26px">
-      <div class="card-head"><h2>Kurzfazit</h2></div>
-      <p class="page-lead" style="margin:0;max-width:none">{{ briefing_lead }}</p>
-    </div>
-    {% endif %}
-
     {% if briefing_html %}
     <div class="card">
       <div class="card-head"><h2>Der Wochenbericht</h2>
         <a href="{{ prefix }}transparenz.html">Methode &amp; Quellen</a></div>
+      <p class="berichtszeile">
+        {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
+        <b>{{ highlights|length }} davon relevant</b>.{% endif %}
+        {% if lesezeit %}Lesezeit etwa {{ lesezeit }} Minuten.{% endif %}
+      </p>
       {% if toc %}
-      {# "In dieser Ausgabe" - die Gliederung berechnete html.py schon immer
-         und warf sie weg. Bei 2863 Woertern in elf Abschnitten ist sie der
-         Unterschied zwischen lesbar und nicht. #}
       <nav class="toc" aria-label="Abschnitte des Berichts">
         {% for s in toc %}<a href="#{{ s.id }}">{{ s.title }}</a>{% endfor %}
       </nav>
@@ -77,7 +85,6 @@
     {% endif %}
   </div>
 
-  {# -------------------------------------------------------------- Rail #}
   <aside class="frontpage-rail">
     {% if dash and dash.kpis %}
     <div class="rubrik"><h2>Zahlen der Woche</h2></div>
@@ -90,13 +97,13 @@
     </div>
     {% endif %}
 
-    {% if top_priorities %}
+    {% if weitere_signale %}
     <div class="card">
       <div class="card-head">
-        <h2>Die {{ top_priorities|length }} dringendsten Signale</h2>
+        <h2>Die {{ weitere_signale|length }} nächsten Signale</h2>
       </div>
       <div class="signal-list">
-        {% for h in top_priorities %}
+        {% for h in weitere_signale %}
         <a class="signal-row" href="{{ h.url }}" target="_blank" rel="noopener">
           <span class="signal-badge r{{ h.relevance }}">{{ h.relevance }}</span>
           <span class="signal-body">
@@ -114,11 +121,8 @@
     {% endif %}
 
     {% if dash and dash.tech_radar %}
-    {# Baustein der alten Uebersicht ("Top-Themen"). Er ueberlebt die
-       Zusammenlegung, weil er etwas zeigt, das sonst nirgends steht:
-       worueber diese Woche ueberhaupt geredet wurde. #}
     <div class="card">
-      <div class="card-head"><h2>Worüber diese Woche geredet wurde</h2></div>
+      <div class="card-head"><h2>Themen der Woche</h2></div>
       {% for t in dash.tech_radar[:6] %}
       <div class="bento-bar">
         <div class="bento-bar-top"><b>{{ t.theme }}</b><span>{{ t.n }}</span></div>
@@ -132,8 +136,7 @@
 
 {# Deutschland-Fokus: was frueher als eigene Seite "Wettbewerber im Detail"
    lief. Die Ueberschrift dort versprach eine Analyse aller beobachteten
-   Betreiber; konfiguriert sind drei deutsche Anbieter (focus_competitors).
-   Als benannter Block auf der Titelseite stimmt das Versprechen. #}
+   Betreiber; konfiguriert sind drei deutsche Anbieter (focus_competitors). #}
 <section id="deutschland-fokus" style="scroll-margin-top:24px">
 {% if competitors and competitors|selectattr('summary')|list %}
 <div class="card">
@@ -169,19 +172,15 @@
   </div>
 </div>
 {% elif competitors and competitors|selectattr('error')|list %}
-{# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht.
-   Am 04. und 05.08.2026 scheiterten alle drei Profile in 0,6 s an einer
-   falschen Modell-ID - die Seite sagte beide Male, die Analyse "entstehe
-   beim naechsten Lauf". #}
+{# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht. #}
 <div class="card">
   <div class="card-head"><h2>Deutschland-Fokus</h2></div>
   <p class="empty-note">
-    <b>Die Auswertung des Laufs vom {{ date_de }} ist gescheitert.</b>
+    <b>Die Auswertung dieses Laufs ist gescheitert.</b>
     Die Meldungen wurden gesammelt und zugeordnet
     ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
     hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll unter
-    <a href="{{ prefix }}transparenz.html">Transparenz</a>; beim nächsten Lauf
-    wird es erneut versucht.
+    <a href="{{ prefix }}transparenz.html">Transparenz</a>.
   </p>
 </div>
 {% endif %}
@@ -189,8 +188,8 @@
 
 {% if report.run and report.run.analysts %}
 <div class="card">
-  <div class="card-head"><h2>Was die Auswertung je Bereich ergab</h2></div>
-  <p class="card-sub">Gelesen wird jede neue Meldung – behalten wird, was für Vodafone eine Nachricht ist</p>
+  <div class="card-head"><h2>Auswertung je Bereich</h2>
+    <a href="{{ prefix }}transparenz.html">Laufprotokoll</a></div>
   <div class="rowtable">
     <div class="rowtable-head">
       <span class="col-region">Bereich</span><span class="col-flex">gelesen</span>

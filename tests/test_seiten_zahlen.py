@@ -101,9 +101,10 @@ def test_signalliste_verspricht_nicht_mehr_als_sie_zeigt(tmp_path):
     html = _seite(_render(tmp_path), "index.html")
 
     gezeigt = html.count('class="signal-row"')
-    m = re.search(r"<h2>Die (\d+) dringendsten Signale</h2>", html)
+    m = re.search(r"<h2>Die (\d+) [a-zä]+ Signale</h2>", html)
     assert m, "Ueberschrift der Signalliste fehlt"
-    assert int(m.group(1)) == gezeigt
+    assert int(m.group(1)) == gezeigt, (
+        f"Ueberschrift sagt {m.group(1)}, gerendert sind {gezeigt}")
 
     # Das eigentliche Verbot: keine Ueberschrift, die "alle" behauptet,
     # solange gekappt wird.
@@ -375,7 +376,57 @@ def test_archivkopie_gibt_sich_als_archiv_zu_erkennen(tmp_path):
     archiv = _seite(site, "reports/2026-08-05.html")
     start = _seite(site, "index.html")
 
-    assert "Archivierter Bericht" in archiv
-    assert "Bericht vom 5. August 2026" in archiv
+    assert "Archivierter Bericht vom 5. August 2026" in archiv
+    assert "zur aktuellen Ausgabe" in archiv
     assert "Archivierter Bericht" not in start
-    assert "Was Vodafone jetzt wissen muss." in start
+
+
+# ---------------------------------------------- Titelseite: keine Dubletten
+def test_aufmacher_steht_nicht_zweimal_auf_der_titelseite(tmp_path):
+    """Der Aufmacher wird fuer die Anzeige kopiert. Wurde er danach ueber
+    Objektidentitaet aus den Anreissern gefiltert, stand dieselbe Meldung
+    mit demselben Bild ein zweites Mal darunter - gefunden am 06.08.2026."""
+    html = _seite(_render(tmp_path), "index.html")
+
+    titel = re.findall(r'<h1>(.*?)</h1>', html, re.S)
+    anreisser = re.findall(r'class="anreisser-titel">(.*?)</span>', html, re.S)
+    weitere = re.findall(r'class="signal-title">(.*?)</span>', html, re.S)
+    alle = [t.strip() for t in titel + anreisser + weitere]
+    assert len(alle) == len(set(alle)), f"Doppelte Meldung auf der Titelseite: {alle}"
+
+
+def test_schlagzeile_bricht_nicht_mitten_im_wort(tmp_path):
+    from telco_radar.report.html import _schlagzeile
+    lang = {"de_title": "Amazon Leo hat bei der US-Behörde FCC eine Genehmigung "
+                        "für ein Direct-to-Device-Satellitennetz mit bis zu 5.105 "
+                        "Satelliten beantragt und will 2028 starten"}
+    kopf = _schlagzeile(lang)
+    assert not kopf.rstrip("…").endswith("5.10"), kopf
+    assert kopf.rstrip("…").split()[-1] in lang["de_title"].split()
+
+
+def test_analystenschlagzeile_gewinnt_gegen_den_fliesstextsatz():
+    from telco_radar.report.html import _schlagzeile
+    h = {"headline": "Amazon beantragt Satellitennetz mit 5.105 Satelliten",
+         "de_title": "Amazon Leo hat bei der US-Behörde FCC eine Genehmigung für ein …"}
+    assert _schlagzeile(h) == "Amazon beantragt Satellitennetz mit 5.105 Satelliten"
+
+
+def test_bilder_alter_wochen_werden_aufgeraeumt(tmp_path):
+    """Rund 9 Bilder je Lauf mal zwei Laeufe pro Woche waeren ueber ein Jahr
+    etwa 200 MB im Repo. Was kein junger Bericht mehr referenziert, faellt."""
+    from telco_radar.report import bilder
+
+    reports = tmp_path / "reports"; reports.mkdir(parents=True)
+    (reports / "2026-08-05.json").write_text(json.dumps({
+        "date": "2026-08-05", "stats": {}, "briefing_md": "",
+        "regions": {"Europa": {"highlights": [dict(_highlight(1, 5), image="behalten.jpg")]}},
+    }), encoding="utf-8")
+    ordner = bilder.bildordner(tmp_path)
+    ordner.mkdir(parents=True)
+    (ordner / "behalten.jpg").write_bytes(b"x" * 10)
+    (ordner / "verwaist.jpg").write_bytes(b"x" * 10)
+
+    assert bilder.raeume_auf(tmp_path, reports) == 1
+    assert (ordner / "behalten.jpg").exists()
+    assert not (ordner / "verwaist.jpg").exists()

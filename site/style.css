@@ -69,10 +69,14 @@ b,strong{font-weight:700}
 /* Der Zeitungskopf steht MITTIG - das ist das eine Element, an dem man eine
    Zeitung ohne Lesen erkennt. */
 .brand{grid-column:2;display:flex;align-items:center;gap:11px;justify-content:center}
-.brand-logo-wrap{width:26px;height:26px;background:var(--red);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-logo{display:block;width:15px;height:15px;object-fit:contain;
-  filter:brightness(0) invert(1)}
+/* Das Vodafone-Logo ist die rote Sprechmarke und wird NICHT eingefaerbt und
+   NICHT in eine Flaeche gesetzt. Am 06.08.2026 stand hier ein roter Kasten
+   mit `filter:brightness(0) invert(1)` - uebrig blieb ein roter Klotz mit
+   weissem Fleck. Das Logo steht frei auf dem Papier, wie in jedem
+   Zeitungskopf. */
+.brand-logo-wrap{display:flex;align-items:center;justify-content:center;
+  flex-shrink:0}
+.brand-logo{display:block;width:30px;height:30px;object-fit:contain}
 .brand-name{font-family:var(--serif);font-size:29px;font-weight:700;
   letter-spacing:-.4px;color:var(--ink);white-space:nowrap}
 .brand-name em{font-style:italic;font-weight:600}
@@ -121,6 +125,76 @@ b,strong{font-weight:700}
   .brand-name{font-size:24px}
   .dateline{justify-content:center;text-align:center}
 }
+
+
+/* ======================================================  AUFMACHER  ==== */
+/* Der eine Block, der gross sein darf. Bild, Schlagzeile, Vorspann - er
+   nimmt die obere Haelfte der Titelseite ein. Vorher standen hier sechs
+   gleich grosse Kaesten nebeneinander, und keiner davon war die Nachricht. */
+.aufmacher{padding:26px 0 30px;border-bottom:3px solid var(--rule-ink);
+  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  grid-template-areas:"kicker kicker" "titel bild" "text bild";
+  gap:0 44px;align-items:start}
+.aufmacher > .page-kicker{grid-area:kicker;margin-bottom:14px}
+.aufmacher h1{grid-area:titel;margin:0 0 18px;font-family:var(--serif);
+  font-weight:700;line-height:1.06;letter-spacing:-.02em;color:var(--ink);
+  /* Der Grad haengt an der Laenge: eine vom Analysten geschriebene
+     Schlagzeile ist kurz und darf gross stehen; ein Zusammenfassungssatz
+     als Rueckfall ist lang und wuerde in 52px acht Zeilen hoch. */
+  font-size:clamp(27px,2.9vw,38px);max-width:26ch}
+.aufmacher.kurz h1{font-size:clamp(34px,4.4vw,54px);max-width:17ch;line-height:1.03}
+.aufmacher-bild{grid-area:bild;margin:0}
+.aufmacher-bild img{display:block;width:100%;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+.aufmacher-bild figcaption{margin-top:7px;font-family:var(--sans);font-size:9.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.aufmacher-text{grid-area:text;min-width:0}
+.aufmacher-vorspann{margin:0 0 16px;font-size:19.5px;line-height:1.5;
+  color:var(--ink-2)}
+.aufmacher-meta{margin:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-family:var(--sans);font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--ink-4)}
+.aufmacher-meta b{color:var(--ink);font-weight:800}
+.aufmacher-meta a{color:var(--red);border-bottom:1px solid var(--red);padding-bottom:1px}
+/* Ohne Bild wird der Aufmacher einspaltig - kein Platzhalter, kein Loch. */
+.aufmacher.ohne-bild{grid-template-columns:1fr;
+  grid-template-areas:"kicker" "titel" "text"}
+.aufmacher.ohne-bild h1{max-width:22ch;font-size:clamp(34px,5vw,58px)}
+.aufmacher.ohne-bild .aufmacher-vorspann{max-width:62ch}
+@media (max-width:900px){
+  .aufmacher{grid-template-columns:1fr;
+    grid-template-areas:"kicker" "titel" "bild" "text";gap:0}
+  .aufmacher-bild{margin:0 0 18px}
+  .aufmacher h1{margin-bottom:14px}
+}
+
+/* ===================================================  ZWEITE REIHE  ==== */
+.zweite-reihe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0 30px;padding:22px 0 26px;border-bottom:1px solid var(--rule)}
+.anreisser{display:flex;flex-direction:column;padding-right:30px;
+  border-right:1px solid var(--rule)}
+.anreisser:last-child{border-right:none;padding-right:0}
+.anreisser-bild{display:block;margin-bottom:11px}
+.anreisser-bild img{display:block;width:100%;aspect-ratio:16/10;
+  object-fit:cover;background:var(--paper-3)}
+.anreisser-kicker{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:6px}
+.anreisser-titel{font-size:18px;line-height:1.32;font-weight:600;color:var(--ink)}
+.anreisser:hover .anreisser-titel{color:var(--red)}
+@media (max-width:860px){
+  .zweite-reihe{grid-template-columns:1fr;gap:0}
+  .anreisser{border-right:none;padding-right:0;padding-bottom:16px;
+    margin-bottom:16px;border-bottom:1px solid var(--rule-2)}
+  .anreisser:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+}
+
+/* Zeile mit den Kennzahlen ueber dem Bericht - ersetzt eine eigene Rubrik. */
+.berichtszeile{margin:-6px 0 18px;font-family:var(--sans);font-size:10.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.berichtszeile b{color:var(--ink);font-weight:800}
+.archivhinweis{margin:22px 0 -6px;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.archivhinweis a{color:var(--red);border-bottom:1px solid var(--red)}
 
 /* ==================================================  RUBRIKEN & TITEL  === */
 /* Rubrikleiste ueber einem Block: Linie + Etikett, wie im Zeitungssatz. */
