@@ -69,7 +69,7 @@
     {% if briefing_html %}
     <div class="card">
       <div class="card-head"><h2>Der Wochenbericht</h2>
-        <a href="{{ prefix }}transparenz.html">Methode &amp; Quellen</a></div>
+        <a href="{{ prefix }}transparenz.html">Quellen</a></div>
       <p class="berichtszeile">
         {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
         <b>{{ highlights|length }} davon relevant</b>.{% endif %}
@@ -108,7 +108,7 @@
           <span class="signal-badge r{{ h.relevance }}">{{ h.relevance }}</span>
           <span class="signal-body">
             <span class="signal-company">{{ h.operator or h.source_label }} &middot; {{ h.region }}</span>
-            <span class="signal-title">{{ h.de_title }}</span>
+            <span class="signal-title">{{ h.schlagzeile }}</span>
           </span>
         </a>
         {% endfor %}

@@ -68,6 +68,9 @@ def test_navigation_hat_vier_eintraege(tmp_path):
     for ziel in ("index.html", "meldungen.html", "differenzierung.html",
                  "transparenz.html"):
         assert f'href="{ziel}"' in nav
+    # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
+    assert ">Quellen</a>" in nav
+    assert ">Transparenz</a>" not in nav
     assert nav.count("<a ") == 4
     # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen.
     for weg in ("bericht.html", "archive.html", "sources.html",

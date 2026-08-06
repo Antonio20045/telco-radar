@@ -231,6 +231,9 @@ def _flatten(report: dict) -> list[dict]:
             h["source_domain"] = dom
             h["source_label"] = h.get("source") or dom
             h["de_title"] = _first_sentence(h.get("summary") or "", 150) or h.get("title") or ""
+            # Jede Meldung traegt ihre vollstaendige Ueberschrift - die
+            # Meldungsseite zeigt alle, nicht nur die der Titelseite.
+            h["schlagzeile"] = _schlagzeile(h)
             out.append(h)
     out.sort(key=lambda h: (h["relevance"], h.get("date") or ""), reverse=True)
     for i, h in enumerate(out):
@@ -274,32 +277,33 @@ def _tag_tech(text):
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
 
 
-def _schlagzeile(h: dict, max_zeichen: int = 110) -> str:
-    """Die Schlagzeile einer Meldung.
+def _schlagzeile(h: dict, max_zeichen: int = 0) -> str:
+    """Die Ueberschrift einer Meldung. **Nie abgeschnitten.**
 
-    Erste Wahl ist `headline` - eine echte, vom Analysten geschriebene
-    Schlagzeile (max. neun Woerter, Aktiv). Die gibt es erst fuer Berichte ab
-    dem 06.08.2026; aeltere Berichte haben sie nicht.
+    Reihenfolge, und sie ist der ganze Punkt:
 
-    Fallback ist der volle Zusammenfassungssatz. **Nicht mechanisch gekuerzt**:
-    ein erster Versuch, an Komma oder Semikolon zu trennen, machte aus
-    "SpaceX-Praesidentin Gwynne Shotwell sagt, Starlink Mobile werde direkt
-    mit AT&T konkurrieren" die Schlagzeile "SpaceX-Praesidentin Gwynne
-    Shotwell sagt" - grammatisch sauber und inhaltsleer. Eine Schlagzeile
-    laesst sich nicht aus einem Fliesstextsatz schneiden; wer es doch tut,
-    produziert Zeilen, die nichts mehr sagen. Lieber drei Zeilen, die stimmen.
+    1. `headline` - eine echte, vom Analysten geschriebene Schlagzeile
+       (max. neun Woerter, Aktiv). Gibt es fuer Berichte ab dem 06.08.2026.
+    2. `title` - die Originalueberschrift der Quelle. Vollstaendig, und sie
+       IST eine Ueberschrift, weil eine Redaktion sie als solche geschrieben
+       hat. Oft englisch - aber vollstaendig und aussagekraeftig schlaegt
+       deutsch und abgehackt.
+    3. `de_title` - der Zusammenfassungssatz, nur als letzter Ausweg.
+
+    Was hier ausdruecklich NICHT passiert: kuerzen. Bis zum 06.08.2026 stand
+    auf der Titelseite "Amazon Leo hat bei der US-Behoerde FCC eine
+    Genehmigung fuer ein Direct-to-Device-Satellitennetz mit bis zu…" - der
+    Leser erfuhr nicht, worum es geht. Eine Ueberschrift, die mitten im Satz
+    aufhoert, ist keine. Lieber vier Zeilen, die vollstaendig sind; der Grad
+    richtet sich im CSS nach der Laenge.
     """
-    kopf = " ".join((h.get("headline") or "").split()).strip(" .")
-    if kopf:
-        return kopf
-    satz = " ".join((h.get("de_title") or "").split())
-    if len(satz) <= max_zeichen:
-        return satz.rstrip(" .")
-    schnitt = satz[:max_zeichen].rstrip()
-    leer = schnitt.rfind(" ")
-    if leer > max_zeichen * 0.5:
-        schnitt = schnitt[:leer]
-    return schnitt.rstrip(" ,;:–-") + "…"
+    for feld in ("headline", "title", "de_title"):
+        wert = " ".join((h.get(feld) or "").split()).strip()
+        # Ein bereits gekuerzter Wert (endet auf …) taugt nicht als
+        # Ueberschrift - dann lieber das naechste Feld.
+        if wert and not wert.endswith("…"):
+            return wert.rstrip(" .")
+    return " ".join((h.get("de_title") or "").split()).rstrip("… ")
 
 
 def _text_aus_html(html: str) -> str:
@@ -637,10 +641,13 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # Der Vorspann ist die Zusammenfassung DIESER Meldung, nicht die
             # der Woche: briefing_lead ist derselbe Text, mit dem der Bericht
             # darunter woertlich beginnt - das las sich wie ein Fehler.
-            aufmacher["vorspann"] = _first_sentence(
-                aufmacher_roh.get("summary") or "", 260)
+            # Die volle Zusammenfassung des Analysten - sie ist bereits auf
+            # ein bis zwei Saetze angelegt. Ein Schnitt bei 260 Zeichen
+            # machte daraus einen Halbsatz mit "…".
+            aufmacher["vorspann"] = " ".join(
+                (aufmacher_roh.get("summary") or "").split())
         # Zweite Reihe: drei Anreisser, bevorzugt bebildert.
-        zweite_reihe = [dict(h, schlagzeile=_schlagzeile(h, 96))
+        zweite_reihe = [dict(h, schlagzeile=_schlagzeile(h))
                         for h in ([h for h in rest if h.get("image")]
                                   + [h for h in rest if not h.get("image")])[:3]]
         top = spitze[:6]

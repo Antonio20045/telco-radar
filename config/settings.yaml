@@ -73,10 +73,14 @@ bedrock_editor_model: ""
 # Preis je 1M Token (Stand 08/2026): flash 0,14 $ ein / 0,28 $ aus,
 # pro 0,435 $ ein / 0,87 $ aus. Zu Pekinger Stosszeiten (9-12 und 14-18 Uhr)
 # kuendigt DeepSeek doppelte Preise an.
-# Deshalb pro fuer die Redaktion (ein Aufruf je Lauf, traegt den Wochenbericht)
-# und flash fuer die Analysten (~25 Aufrufe je Lauf).
+# Beide Stufen laufen auf "pro" (Antonios Entscheidung vom 06.08.2026).
+# Vorher war der Analyst auf "flash", weil er ~25 Aufrufe je Lauf macht und
+# damit den Preis bestimmt. Das war am falschen Ende gespart: der Analyst
+# schreibt Ueberschrift, Zusammenfassung und Einordnung JEDER Meldung - also
+# genau den Text, der auf der Titelseite steht. Die Redaktion darunter kann
+# nur so gut sein wie das, was sie bekommt.
 deepseek_api_base: "https://api.deepseek.com"
-deepseek_analyst_model: "deepseek-v4-flash"
+deepseek_analyst_model: "deepseek-v4-pro"
 deepseek_editor_model: "deepseek-v4-pro"
 
 llm_api_base: "https://integrate.api.nvidia.com/v1"

@@ -85,7 +85,7 @@ def test_explorer_json_bleibt_lesbar(tmp_path):
     der Berichtsseite - die Landeseite trug 78,5 KB JSON fuer einen
     zugeklappten Aufklapper."""
     _bericht(tmp_path)
-    html = (tmp_path / "site" / "meldungen.html").read_text(encoding="utf-8")
+    html = (tmp_path / "site" / "reports" / "2026-08-04.html").read_text(encoding="utf-8")
     m = re.search(r'id="explorer-data">(.*?)</script>', html, re.S)
     assert m, "Explorer-Daten fehlen"
     daten = json.loads(m.group(1))

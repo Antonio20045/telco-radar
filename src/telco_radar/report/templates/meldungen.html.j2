@@ -1,34 +1,81 @@
-{# Meldungen - die Belegebene.
+{# Alle Meldungen der Woche - als Zeitungsseite, nicht als Werkzeug.
 
-   Loest drei Orte fuer dasselbe Beduerfnis ab ("zeig mir die Einzelmeldung"):
-   den zugeklappten Explorer auf der Berichtsseite, suche.html und
-   archive.html. Der Explorer stand bis zum 06.08.2026 hinter einem
-   <details> mit der Aufschrift "bei Bedarf oeffnen" - 92 Belege, die
-   niemand sieht, waehrend die Seite darueber sechs Zeilen zeigte. #}
+   Bis zum 06.08.2026 stand hier zuerst eine Ueberschrift, dann ein
+   Erklaerabsatz, dann ein Suchfeld, dann Filterknoepfe, dann noch eine
+   Ueberschrift mit Unterzeile - und ERST DANN die Meldungen. Wer die
+   Meldungen sehen wollte, musste an fuenf Abschnitten vorbeiscrollen.
+
+   Jetzt: eine Zeile Kopf, eine Zeile Suche, dann die Meldungen. Jede mit
+   Bild (wenn eins da ist), vollstaendiger Ueberschrift und einer kurzen
+   Beschreibung. Das Archiv frueherer Ausgaben steht am Ende, wo es
+   hingehoert. #}
 {% extends "base.html.j2" %}
 {% set active = 'meldungen' %}
-{% block title %}Marktrecherche · Meldungen{% endblock %}
+{% block title %}Vodafone Insights · Alle Meldungen{% endblock %}
 {% block content %}
 
 <section class="page-hero wide">
-  <div class="page-hero-row">
-    <div>
-      <p class="page-kicker">Marktrecherche</p>
-      <h1>Das Meldungsarchiv</h1>
-    </div>
-    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
-  </div>
-  <p class="page-lead">Jede einzelne Meldung zum Nachprüfen – mit Betreiber, Bereich, Datum und
-  Link zur Originalquelle.</p>
+  <h1>Alle Meldungen</h1>
+  <p class="page-lead">Jede Meldung, die die Auswertung dieser Woche als relevant behalten hat –
+  mit Betreiber, Bereich, Datum und Link zur Originalquelle.</p>
 </section>
 
-<div class="card" style="margin-top:26px">
-  <div class="card-head"><h2>Suche im Gesamtarchiv</h2></div>
-  <p class="card-sub">Durchsucht die als relevant behaltenen Meldungen jeder archivierten Woche
-  plus die Differenzierungs-Bibliothek. Diese Seite ist bookmarkbar:
-  <code>meldungen.html?q=Begriff</code> zeigt die Treffer direkt.</p>
-  <div class="filters">
-    <input type="search" id="suche-input" placeholder="Suchbegriff eingeben …"
+<div class="meldungen-suche">
+  <input type="search" id="meldung-filter" placeholder="Filtern: Betreiber, Thema, Stichwort …"
+         aria-label="Meldungen filtern" autocomplete="off">
+  <span class="meldungen-zahl" id="meldung-zahl">{{ highlights|length }} Meldungen</span>
+</div>
+
+{% if highlights %}
+<div class="meldungs-liste" id="meldungs-liste">
+  {% for h in highlights %}
+  <article class="meldung" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
+    {% if h.image %}
+    <a class="meldung-bild" href="{{ h.url }}" target="_blank" rel="noopener">
+      <img src="{{ prefix }}images/{{ h.image }}" alt="" loading="lazy">
+    </a>
+    {% endif %}
+    <div class="meldung-text">
+      <p class="meldung-kicker">
+        <span class="meldung-rel r{{ h.relevance }}">{{ h.relevance }}</span>
+        {{ h.operator or h.source_label }}{% if h.region %} · {{ h.region }}{% endif %}{% if h.date %} · {{ h.date }}{% endif %}
+      </p>
+      <h2><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a></h2>
+      {% if h.summary %}<p class="meldung-text-body">{{ h.summary }}</p>{% endif %}
+      <p class="meldung-quelle"><a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.source_label }} &nearr;</a></p>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+<p class="empty-note" id="meldung-leer" hidden>Keine Meldung passt zu diesem Filter.</p>
+{% else %}
+<p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>
+{% endif %}
+
+<div class="card" id="archiv" style="scroll-margin-top:24px">
+  <div class="card-head"><h2>Frühere Ausgaben</h2></div>
+  {% if archive %}
+  <div class="list-card">
+    {% for e in archive %}
+    <a class="list-row" href="{{ prefix }}reports/{{ e.date }}.html">
+      <span class="list-row-date">{{ e.date_de }}</span>
+      <span class="list-row-meta">{{ e.stats.get('collected','–') }} gesammelt</span>
+      <span class="list-row-new">{{ e.stats.get('new','–') }} neu</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-note" style="margin:0">Noch keine Berichte im Archiv.</p>
+  {% endif %}
+</div>
+
+{# Die wochenuebergreifende Suche steht ganz unten: sie ist der Sonderfall
+   ("wo war nochmal die Meldung von vor drei Wochen"), nicht der Normalfall.
+   Oben stand sie dem im Weg, der einfach lesen wollte. #}
+<div class="card">
+  <div class="card-head"><h2>Im Gesamtarchiv suchen</h2></div>
+  <div class="meldungen-suche">
+    <input type="search" id="suche-input" placeholder="Alle bisherigen Wochen durchsuchen …"
            aria-label="Alle Berichte und die Differenzierung durchsuchen" autocomplete="off">
   </div>
   <div class="suche-filters" role="group" aria-label="Nach Bereich filtern">
@@ -38,38 +85,5 @@
   </div>
   <p class="suche-count" id="suche-count"></p>
   <div class="suche-list" id="suche-results"></div>
-</div>
-
-{% if highlights %}
-<div class="card">
-  <div class="card-head">
-    <h2>Diese Woche: {{ highlights|length }} Meldungen</h2>
-    <a href="{{ prefix }}index.html">Zum Wochenbericht &nearr;</a>
-  </div>
-  <p class="card-sub">Alle Meldungen, die die Auswertung dieser Woche als relevant behalten hat.</p>
-  {% include "_explorer.html.j2" %}
-</div>
-{% else %}
-<p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>
-{% endif %}
-
-<div class="card" id="archiv" style="scroll-margin-top:90px">
-  <div class="card-head"><h2>Frühere Ausgaben</h2></div>
-  <p class="card-sub">Jede bisherige Woche als eigener Bericht – jeder zeigt, was in seiner Woche neu war.</p>
-  {% if archive %}
-  <div class="list-card">
-    {% for e in archive %}
-    <a class="list-row" href="{{ prefix }}reports/{{ e.date }}.html">
-      <span class="list-row-date">{{ e.date_de }}</span>
-      <span class="list-row-meta">{{ e.stats.get('operators','–') }} Betreiber</span>
-      <span class="list-row-meta">{{ e.stats.get('collected','–') }} gesammelt</span>
-      <span class="list-row-flag">{% if not e.llm %}<span class="kbadge">roh</span>{% endif %}</span>
-      <span class="list-row-new">{{ e.stats.get('new','–') }} neu</span>
-    </a>
-    {% endfor %}
-  </div>
-  {% else %}
-  <p class="empty-note" style="margin:0">Noch keine Berichte im Archiv.</p>
-  {% endif %}
 </div>
 {% endblock %}

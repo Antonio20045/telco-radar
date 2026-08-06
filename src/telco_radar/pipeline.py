@@ -506,7 +506,7 @@ def run(root: Path, use_llm: bool | None = None,
         log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
         n_bilder = 0
     phase("Bilder", time.monotonic() - tbild,
-          f"{n_bilder} von {min(len(alle_highlights), 14)} Meldungen mit Bild")
+          f"{n_bilder} von {min(len(alle_highlights), 40)} Meldungen mit Bild")
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den

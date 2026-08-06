@@ -319,3 +319,44 @@ var TelcoSearch = (function () {
   } catch (e) { /* URLSearchParams nicht verfuegbar - stiller Fallback */ }
   run();
 })();
+
+
+/* Meldungsliste (meldungen.html): filtert die serverseitig gerenderten
+   Meldungen. Bewusst KEIN Explorer mit Split-View - die Seite soll gelesen
+   werden koennen wie eine Zeitungsseite, nicht bedient wie ein Werkzeug. */
+(function () {
+  'use strict';
+  var input = document.getElementById('meldung-filter');
+  var liste = document.getElementById('meldungs-liste');
+  var zahl = document.getElementById('meldung-zahl');
+  var leer = document.getElementById('meldung-leer');
+  if (!input || !liste) return;
+
+  var zeilen = Array.prototype.slice.call(liste.querySelectorAll('.meldung'));
+  var t;
+
+  function filtern() {
+    var q = (input.value || '').trim().toLowerCase();
+    var sichtbar = 0;
+    zeilen.forEach(function (z) {
+      var treffer = !q || (z.dataset.such || '').indexOf(q) !== -1;
+      z.hidden = !treffer;
+      if (treffer) sichtbar++;
+    });
+    if (zahl) {
+      zahl.textContent = q ? sichtbar + ' von ' + zeilen.length + ' Meldungen'
+                           : zeilen.length + ' Meldungen';
+    }
+    if (leer) leer.hidden = sichtbar !== 0;
+  }
+
+  input.addEventListener('input', function () {
+    clearTimeout(t); t = setTimeout(filtern, 110);
+  });
+
+  // Ankunft ueber die Topbar-Suche mit ?q=: direkt vorfiltern.
+  try {
+    var q0 = new URLSearchParams(location.search).get('q');
+    if (q0) { input.value = q0; filtern(); }
+  } catch (e) { /* stiller Fallback */ }
+})();

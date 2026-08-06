@@ -196,6 +196,51 @@ b,strong{font-weight:700}
   font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 .archivhinweis a{color:var(--red);border-bottom:1px solid var(--red)}
 
+
+/* ==================================================  MELDUNGSLISTE  ==== */
+/* Alle Meldungen der Woche als Zeitungsseite: Bild links, Ueberschrift und
+   Beschreibung rechts, Haarlinie dazwischen. Kein Split-View, kein
+   Aufklapper - man soll lesen koennen, nicht bedienen muessen. */
+.meldungen-suche{display:flex;align-items:center;gap:20px;margin:8px 0 4px;
+  padding:10px 0;border-top:2px solid var(--rule-ink);
+  border-bottom:1px solid var(--rule)}
+.meldungen-suche input{flex:1;min-width:0;border:none;background:none;
+  font-family:var(--sans);font-size:13px;color:var(--ink);padding:4px 0}
+.meldungen-suche input:focus{outline:none;color:var(--red)}
+.meldungen-suche input::placeholder{color:var(--ink-4)}
+.meldungen-zahl{font-family:var(--sans);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);white-space:nowrap}
+
+.meldungs-liste{display:flex;flex-direction:column}
+.meldung{display:grid;grid-template-columns:210px minmax(0,1fr);gap:0 26px;
+  padding:22px 0;border-bottom:1px solid var(--rule)}
+.meldung[hidden]{display:none}
+.meldung:first-child{padding-top:18px}
+/* Ohne Bild rueckt der Text nach links durch - kein Platzhalter, kein Loch. */
+.meldung:not(:has(.meldung-bild)){grid-template-columns:1fr}
+.meldung-bild img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
+  background:var(--paper-3)}
+.meldung-text{min-width:0}
+.meldung-kicker{margin:0 0 7px;display:flex;align-items:center;gap:9px;
+  flex-wrap:wrap;font-family:var(--sans);font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.meldung-rel{display:inline-block;min-width:18px;text-align:center;padding:2px 5px;
+  color:#fff;background:var(--r2);font-weight:800;font-variant-numeric:lining-nums}
+.meldung-rel.r5{background:var(--r5)}.meldung-rel.r4{background:var(--r4)}
+.meldung-rel.r3{background:var(--r3)}
+.meldung h2{margin:0 0 8px;font-family:var(--serif);font-size:23px;font-weight:700;
+  line-height:1.22;letter-spacing:-.014em;text-transform:none}
+.meldung h2 a:hover{color:var(--red)}
+.meldung-text-body{margin:0 0 9px;font-size:16px;line-height:1.55;color:var(--ink-2);
+  max-width:68ch}
+.meldung-quelle{margin:0;font-family:var(--sans);font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em}
+.meldung-quelle a{color:var(--red)}
+@media (max-width:720px){
+  .meldung{grid-template-columns:1fr;gap:12px 0}
+  .meldung-bild img{aspect-ratio:16/9}
+}
+
 /* ==================================================  RUBRIKEN & TITEL  === */
 /* Rubrikleiste ueber einem Block: Linie + Etikett, wie im Zeitungssatz. */
 .rubrik{display:flex;align-items:center;gap:12px;margin:0 0 18px;

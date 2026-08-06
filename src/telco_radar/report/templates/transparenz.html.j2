@@ -6,15 +6,14 @@
    Zahl), dann der Bestand. #}
 {% extends "base.html.j2" %}
 {% set active = 'transparenz' %}
-{% block title %}Marktrecherche · Transparenz{% endblock %}
+{% block title %}Vodafone Insights · Quellen{% endblock %}
 {% set kmap = {'rss':'Feed','json_api':'Feed (API)','newsroom':'Newsroom','newsroom_js':'Newsroom','official':'Referenz','trade_press':'Fachpresse'} %}
 {% block content %}
 
 <section class="page-hero wide">
-  <p class="page-kicker">Transparenz</p>
-  <h1>Wie diese Ausgabe entsteht.</h1>
-  <p class="page-lead">Jede Zahl auf dieser Website lässt sich hier zurückverfolgen: welche Quelle
-  abgefragt wurde, was sie geliefert hat, und was die Auswertung daraus gemacht hat.</p>
+  <h1>Quellen</h1>
+  <p class="page-lead">Welche Quelle abgefragt wurde, was sie geliefert hat, und was die
+  Auswertung daraus gemacht hat.</p>
 </section>
 
 {# ------------------------------------------------------------ der Lauf #}

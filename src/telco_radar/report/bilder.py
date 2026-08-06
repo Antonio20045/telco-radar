@@ -109,16 +109,17 @@ def _lade(bild_url: str, ziel_ordner: Path, client: httpx.Client) -> str:
     return ""
 
 
-def hole_bilder(highlights: list[dict], root: Path, max_bilder: int = 14,
-                og_versuche: int = 10) -> int:
+def hole_bilder(highlights: list[dict], root: Path, max_bilder: int = 40,
+                og_versuche: int = 34) -> int:
     """Beschafft Bilder fuer die wichtigsten Meldungen und stempelt sie ein.
 
     Setzt `h["image"]` auf den Dateinamen im Bildordner. Meldungen ohne Bild
     behalten schlicht keins - der Layout faengt das ab.
 
-    Nur die dringendsten Meldungen bekommen ein Bild: die Titelseite zeigt
-    einen Aufmacher und ein paar Anreisser, mehr braucht sie nicht, und jeder
-    Abruf kostet Laufzeit.
+    Die dringendsten Meldungen zuerst. Der Deckel liegt bei 40, weil die
+    Meldungsseite ALLE Meldungen der Woche zeigt und nicht nur die der
+    Titelseite - gemessen am 05.08.2026 kommen dabei 20 Bilder fuer 92
+    Meldungen zusammen, der Rest bleibt Textsatz.
     """
     ordner = bildordner(root)
     kandidaten = sorted(highlights, key=lambda h: (h.get("relevance") or 0),

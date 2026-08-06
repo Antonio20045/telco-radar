@@ -125,12 +125,12 @@ def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
                      rf"<b>{len(HIGHLIGHTS)} davon relevant</b>", html)
 
 
-def test_explorer_enthaelt_wirklich_alle_meldungen(tmp_path):
-    """Die Zahl in der Ueberschrift muss zu den eingebetteten Daten passen."""
+def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
+    """Die Zahl im Kopf muss zu den gerenderten Meldungen passen - und die
+    Meldungen muessen ohne Klick dastehen, nicht hinter einem Werkzeug."""
     html = _seite(_render(tmp_path), "meldungen.html")
-    daten = json.loads(re.search(r'id="explorer-data">(.*?)</script>', html, re.S).group(1))
-    assert len(daten) == len(HIGHLIGHTS)
-    assert f"Diese Woche: {len(HIGHLIGHTS)} Meldungen" in html
+    assert html.count('class="meldung"') == len(HIGHLIGHTS)
+    assert f"{len(HIGHLIGHTS)} Meldungen" in html
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -139,9 +139,9 @@ def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
     Er gehoert auf meldungen.html, nicht auf die Landeseite."""
     site = _render(tmp_path)
     assert 'id="explorer-data"' not in _seite(site, "index.html")
-    assert 'id="explorer-data"' in _seite(site, "meldungen.html")
-    # Die Archivwoche hat keine meldungen.html, auf die sie verweisen
-    # koennte - sie traegt ihre Meldungen weiter selbst.
+    # Die Meldungsseite rendert die Meldungen serverseitig als Zeitungsseite,
+    # der Explorer lebt nur noch auf den Archivwochen.
+    assert 'id="explorer-data"' not in _seite(site, "meldungen.html")
     assert 'id="explorer-data"' in _seite(site, "reports/2026-08-05.html")
 
 
@@ -430,3 +430,26 @@ def test_bilder_alter_wochen_werden_aufgeraeumt(tmp_path):
     assert bilder.raeume_auf(tmp_path, reports) == 1
     assert (ordner / "behalten.jpg").exists()
     assert not (ordner / "verwaist.jpg").exists()
+
+
+def test_keine_ueberschrift_ist_abgeschnitten(tmp_path):
+    """Der Kern der Kritik vom 06.08.2026: auf der Titelseite standen
+    Ueberschriften, die mitten im Satz mit "…" aufhoerten - der Leser
+    erfuhr nicht, worum es geht. Keine Ueberschrift darf so enden."""
+    site = _render(tmp_path)
+    for seite in ("index.html", "meldungen.html"):
+        html = _seite(site, seite)
+        for muster in (r'<h1>(.*?)</h1>', r'<h2><a[^>]*>(.*?)</a></h2>',
+                       r'class="anreisser-titel">(.*?)</span>',
+                       r'class="signal-title">(.*?)</span>'):
+            for treffer in re.findall(muster, html, re.S):
+                assert not treffer.strip().endswith("…"), (
+                    f"Abgeschnittene Ueberschrift auf {seite}: {treffer[:70]}")
+
+
+def test_originalueberschrift_schlaegt_den_gekuerzten_satz():
+    """Vollstaendig und aussagekraeftig schlaegt deutsch und abgehackt."""
+    from telco_radar.report.html import _schlagzeile
+    h = {"title": "UK ISP Hey! Broadband Launch New Bundles with 6 Months Half Price",
+         "de_title": "Der britische Glasfaser-Anbieter Hey! Broadband bringt drei neue…"}
+    assert _schlagzeile(h) == "UK ISP Hey! Broadband Launch New Bundles with 6 Months Half Price"
