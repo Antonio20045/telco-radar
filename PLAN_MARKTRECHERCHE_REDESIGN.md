@@ -21,6 +21,36 @@ bleibt, nur besser dargestellt.
 
 ---
 
+## 0b. Getroffene Entscheidungen (06.08.2026, von Antonio)
+
+Zwei Fragen standen offen, beide sind beantwortet. Sie gelten als gesetzt und
+müssen in der nächsten Session nicht neu aufgemacht werden.
+
+**Bilder: Hybrid.** Das eigene Cover-System wird gebaut (Logo →
+typografisches Cover → generatives Muster, alles SVG, 100 % Abdeckung), und
+darüber kommt der externe Bildkanal: echte Artikelbilder werden **live von
+der Quelle geladen, nie heruntergeladen, nie ins Repo committet**. Jedes
+externe Bild trägt eine Bildunterschrift mit Quellenname und Link,
+`referrerpolicy="no-referrer"`, `loading="lazy"` und eine `onerror`-Kaskade
+auf das eigene Cover. Der Schalter `bilder_modus` in `settings.yaml` bleibt
+trotzdem verpflichtend — er ist die Rückfalloption, falls jemand im Haus
+später anders entscheidet. Kapitel 3 gilt damit unverändert, nur ist Stufe 3b
+nicht mehr optional.
+
+**Umfang: Stufen 1 bis 4 am Stück.** Titelei, Ressorts, Cover-System und das
+komplette neue Layout werden als ein Vorhaben umgesetzt, über mehrere
+Sessions verteilt, statt in kleinen sichtbaren Schritten. Rund 6–8 Tage.
+Konsequenz für die Arbeitsweise: Zwischenstände gehen trotzdem nach jedem
+abgeschlossenen Teilschritt auf den Branch, damit ein Sessionabbruch nichts
+kostet — nur die Live-Seite wechselt erst am Ende auf das neue Layout.
+
+Reihenfolge innerhalb des Blocks bleibt wie in Kapitel 13: erst 1 und 2
+(Textebene, ohne die alles andere wirkungslos ist), dann 3/3b (Bilder), dann
+4 (Layout). Stufe 7 (Berichts-Schliff) läuft mit Stufe 1 mit, weil sie
+denselben Prompt anfasst.
+
+---
+
 ## 1. Diagnose: drei Ursachen, und nur eine davon ist Layout
 
 Das Problem sitzt nicht dort, wo es weh tut. Gemessen im Code:
@@ -681,7 +711,7 @@ in dieses Redesign, aber in den nächsten Quellenlauf.
 | 1 | Titelei je Meldung (Prompts + Schema) | 1 Tag | — | Ein echter Lauf liefert für jede Meldung Dachzeile ≤30, Schlagzeile ≤70, Dek ≤160; `pruefe_schreibstil.py` meldet keine harten Verstöße |
 | 2 | Ressorts reparieren (`region:` je Fachpressequelle) | 0,5 Tag | — | Europa hat im nächsten Lauf mehr als null bewertete Meldungen |
 | 3 | Eigene Cover (Logo/Typo/Muster, SVG) | 2–4 Tage | — | Jede Meldung hat ein Cover, kein Rasterbild im Repo, `.git` wächst um <1 MB |
-| 3b | Externer Bildkanal (`bilder_modus: extern`) | 1–2 Tage | **Antonios Ja** | Bild kommt live von der Quelle, Bildunterschrift mit Link, Ausfall fällt sauber auf das Cover zurück |
+| 3b | Externer Bildkanal (`bilder_modus: extern`) | 1–2 Tage | 3 (entschieden, s. Kap. 0b) | Bild kommt live von der Quelle, Bildunterschrift mit Link, Ausfall fällt sauber auf das Cover zurück |
 | 4 | Neues Layout (Templates + CSS) | 2–3 Tage | 1, 2, 3 | Ein Fremder erkennt in unter 5 Sekunden die wichtigste Meldung der Woche |
 | 5 | Detailansicht mit Anker-URL | 1 Tag | 4 | Jede Meldung ist per Link direkt ansteuerbar |
 | 6a | Rollierender Meldungsspeicher + `miss_stories.py` | 1,5 Tage | — | Das Skript beziffert, wie viele Stories welche Schwelle im Archiv erzeugt hätte |
