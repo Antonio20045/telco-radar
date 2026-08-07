@@ -1,38 +1,32 @@
 {# Die Promo Uebersicht: wer wirbt gerade womit.
 
-   Zweiter Anlauf, 07.08.2026. Der erste (vom Vortag) hatte die Bilder
-   eingefuehrt, aber die falschen: je Marke einen Playwright-Screenshot
-   ihrer Aktionsseite. Antonio:
+   Dritter Anlauf, 08.08.2026. Der zweite (Vortag) hatte die Kampagnenmotive
+   eingefuehrt und die vier Bauformen auf eine Karte reduziert - aber er
+   stellte die Karten NACH DER AUSWAHL zusammen ("die staerkste Aktion je
+   Wettbewerber") und schob alles Weitere als dreispaltige Zeilenwand
+   darunter. Damit standen wieder zwei Darstellungen derselben Sache auf der
+   Seite. Antonio:
 
-     "Das muss eigentlich die ganze Uebersicht, es muss alles neu gemacht
-      werden. Das sieht ueberhaupt nicht gut aus. [...] Das Problem ist
-      aber, dass du halt irgendwelche Screenshots von den Seiten machst, die
-      total beschissen aussehen. Das ist nicht richtig zugeschnitten. Bei
-      vielen sieht man nur die Cookies."
+     "Mir gefaellt absolut nicht, wie das Layout aussieht. Total
+      unuebersichtlich, nicht zugaenglich, nicht schoen. Ich will wissen,
+      welche Promo-Aktionen bei meinen Wettbewerbern laufen."
 
-   Zwei Aenderungen, und beide sitzen unter dieser Vorlage:
+   Der Leser denkt in Wettbewerbern, nicht in Rangfolgen. Also gliedert die
+   Seite jetzt nach MARKEN, und je Marke steht ALLES in einem Raster:
 
-   1. DIE BILDER kommen jetzt aus der Aktion selbst - das Kampagnenmotiv,
-      das die Aktionsseite dafuer zeigt, dem einzelnen Angebot zugeordnet
-      (promo_bilder.py). Kein Screenshot mehr, kein Cookie-Banner.
-   2. DIE FORM ist eine einzige. Vorher standen hier vier verschiedene:
-      Aufmacher, Beistellspalte mit Zeilen, Markenraster, Ruhezone mit
-      grauen Kaesten - der Leser musste viermal umlernen, um dieselbe Frage
-      zu beantworten. Jetzt: je Wettbewerber EINE Karte, gleiche Felder in
-      gleicher Reihenfolge. Vergleichen heisst Gleiches nebeneinander legen.
-
-   Die Gliederung:
-
-     LAGE       Welche Mechanik faehrt der Markt gerade, als Balken.
-     KARTEN     Je Wettbewerber seine staerkste laufende Aktion.
-     EIGEN      Vodafone daneben, als Vergleichsanker markiert.
-     ANBIETER   Alles Weitere, je Marke ein Block - die Tiefe NACH der
-                Uebersicht.
+     LAGE       Welche Mechanik faehrt der Markt gerade, als schmale Leiste.
+     BLOECKE    Je Marke eine Rubrikleiste, darunter ihre staerkste Aktion
+                gross und die uebrigen kleiner - dieselbe Karte, zwei
+                Gewichte. Jede Aktion steht genau einmal.
+     EIGEN      Vodafone am Ende, als Vergleichsanker markiert.
      TIEFE      Methodik und Wochentext hinter einem Klick.
 
    Was auf einer Karte steht, beantwortet die Frage "worum geht es in dieser
-   Aktion" ohne Klick: Marke, Motiv, Schlagzeile, ein Satz Beschreibung,
-   Mechanik, Wichtigkeit, Frist, Quelle. Alles andere ist Tiefe.
+   Aktion" ohne Klick: Motiv, Schlagzeile, (bei der grossen) ein Satz,
+   Mechanik, Frist. Was NICHT mehr darauf steht: das Pruefdatum (es gilt fuer
+   die ganze Seite und steht einmal im Fuss), die Quelldomain (sie ist der
+   Absender des Blocks) und der nackte Score (die Methodik erklaert ihn; auf
+   der Karte steht nur, ob sie hervorgehoben ist).
 
    Jede Schlagzeile traegt `szl` (Wahrheitstests, siehe CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
@@ -40,171 +34,106 @@
 {% set active = 'promo_uebersicht' %}
 {% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
 
-{% macro meta_zeile(o) -%}
-{{ o.url | domain }}{% if o.valid_until %} · bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}
-{%- endmacro %}
-
-{# Das Motiv einer Karte. Ohne Bild KEIN grauer Kasten - der stand hier
-   vorher und sah aus wie ein Ladefehler. Stattdessen die Mechanik gross
-   gesetzt: sie sagt in zwei Woertern, worum es geht, und das ist genau die
-   Aufgabe des Motivs. #}
-{% macro motiv(k) %}
+{# Das Motiv einer Karte. Nur die grosse Karte bekommt ohne Bild eine
+   Schriftkachel - bei den kleinen waere ein Kasten je Zeile genau das
+   Rauschen, das diese Seite loswerden soll. Die Kachel traegt die konkrete
+   Zahl des Angebots ("20 GB · 6,99 €"), nicht die Mechanik: vier Marken
+   fahren dieselbe Mechanik, und vier identische Kacheln lesen sich als
+   Fehler. #}
+{% macro motiv(k, gross) %}
 {%- if k.bild %}
-<span class="pk-bild"><img src="{{ k.bild }}" alt=""
+<span class="pk-bild{% if k.bild_panorama %} pk-bild--banner{% endif %}"><img src="{{ k.bild }}" alt=""
   {% if k.bild_w %}width="{{ k.bild_w }}" height="{{ k.bild_h }}"{% endif %}
   loading="lazy">
-  {%- if k.bild_ist_motiv %}
+  {%- if k.bild_ist_motiv and gross %}
   {# Stufe 4 der Zuordnung: das Buehnenbild der Aktionsseite. Es belegt,
      WOMIT die Marke gerade wirbt - nicht, dass es genau dieses Angebot
-     zeigt. Otelos Seitenmotiv wirbt mit "mehr GB, gleicher Preis", waehrend
-     die staerkste Aktion die Freundschaftswerbung ist; ohne diese Zeile
-     behauptet die Kachel mehr, als belegt ist. #}
-  <span class="pk-bildquelle">Motiv der Aktionsseite {{ k.offer.url | domain }}</span>
+     zeigt. Ohne diese Zeile behauptet die Kachel mehr, als belegt ist. #}
+  <span class="pk-bildquelle">Motiv der Aktionsseite</span>
   {%- endif %}
 </span>
-{%- else %}
-<span class="pk-bild pk-bild--typo" style="--marke:{{ k.brand.color }}">
-  <span class="pk-typo-marke">{{ k.brand.name }}</span>
-  <span class="pk-typo-mechanik">{{ k.mechanic or 'Aktion' }}</span>
+{%- elif gross %}
+<span class="pk-bild pk-bild--typo">
+  <span class="pk-typo-zahl">{{ k.kachel }}</span>
+  {# Die Mechanik nur, wenn die Kachel nicht ohnehin schon sie ist - sonst
+     steht dasselbe Wort zweimal untereinander. #}
+  {% if k.mechanic and k.mechanic != k.kachel %}<span class="pk-typo-mechanik">{{ k.mechanic }}</span>{% endif %}
 </span>
 {%- endif %}
 {% endmacro %}
 
-{# Eine Aktion als Karte. Dieselbe Form fuer jede Marke - das ist der Punkt. #}
-{% macro karte(k, klasse='pkarte') %}
-<article class="{{ klasse }}{% if k.offer.fading %} pkarte--fading{% endif %}">
+{# Eine Aktion als Karte. Dieselbe Form und dieselbe Feldreihenfolge fuer
+   jede Marke und jedes Gewicht - das ist der Punkt der Seite. #}
+{% macro karte(k, gross=false) %}
+{# `pkarte--hoch` nur mit einem Motiv im Bildformat: eine Schriftkachel und
+   ein flaches Banner fuellen keine zwei Rasterzeilen, sie wuerden sich in
+   Weissraum aufloesen. #}
+<article class="pkarte{% if gross %} pkarte--gross{% if k.bild and not k.bild_panorama %} pkarte--hoch{% endif %}{% endif %}{% if k.offer.fading %} pkarte--fading{% endif %}">
   <a class="pk-flaeche" href="{{ k.offer.url }}" target="_blank" rel="noopener">
-    {{ motiv(k) }}
-    <span class="pk-marke">{{ k.brand.name }}</span>
+    {{ motiv(k, gross) }}
     <span class="pk-titel szl">{{ k.offer.headline }}</span>
-    {% if k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
+    {% if gross and k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
   </a>
   <p class="pk-fuss">
     {% if k.mechanic %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
-    {% if k.score %}<span class="pz-score{% if k.highlight %} pz-score--hoch{% endif %}"
-      title="Wichtigkeit {{ k.score }} von 100">{{ k.score }}</span>{% endif %}
-    <span class="pk-meta">
-      {%- if k.offer.fading %}vermutlich ausgelaufen · {% elif k.offer.neu %}neu · {% endif -%}
-      {{ meta_zeile(k.offer) }}</span>
+    {% if k.frist %}<span class="pk-frist">bis {{ k.frist | date_de }}</span>{% endif %}
+    {%- if k.offer.fading %}<span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
+    {%- elif k.offer.neu %}<span class="pk-flag pk-flag--neu">neu</span>{% endif %}
+    {% if k.highlight %}<span class="pk-wichtig">wichtig</span>{% endif %}
   </p>
 </article>
 {% endmacro %}
 
-{# Eine Aktion als Zeile - fuer die Markenbloecke unten. Hat sie ein eigenes
-   Motiv, steht es als Vorschau davor: dieselbe Form (eine Zeile), nur
-   bebildert. Ohne das laegen die Bilder der Angebote 2 bis 8 einer Marke
-   beschafft auf der Platte und ungenutzt daneben - genau der Zustand, den
-   die Seite am 07.08.2026 hatte (14 Screenshots vorhanden, einer benutzt). #}
-{% macro zeile(o) %}
-<li class="pzeile{% if o.fading %} pzeile--fading{% endif %}">
-  <a href="{{ o.url }}" target="_blank" rel="noopener">
-    {%- if o.image %}<span class="pzeile-bild"><img src="images/{{ o.image }}" alt=""
-      {% if o.image_w %}width="{{ o.image_w }}" height="{{ o.image_h }}"{% endif %}
-      loading="lazy"></span>{% endif %}
-    <span class="pzeile-text">
-    <span class="pzeile-titel szl">{{ o.headline }}</span>
-    <span class="pk-meta">
-      {%- if o.fading %}vermutlich ausgelaufen · {% elif o.neu %}neu · {% endif -%}
-      {{ meta_zeile(o) }}</span>
-    </span>
-  </a>
-  {% if o.score %}<span class="pz-score">{{ o.score }}</span>{% endif %}
-</li>
+{# Ein Markenblock: Rubrikleiste plus ihr Kartenraster. #}
+{% macro block(b, eigen=false) %}
+<section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" style="--c:{{ b.color }}">
+  <div class="rubrik pmarke-rubrik">
+    <h2><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h2>
+    <span class="rubrik-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% endif %}</span>
+  </div>
+  <div class="promo-karten">
+    {{ karte(b.lead, true) }}
+    {% for k in b.weitere %}{{ karte(k) }}{% endfor %}
+  </div>
+</section>
 {% endmacro %}
 
 {% block content %}
 
-<div class="promo-kopf">
-  <p class="page-kicker">Deutschland · Aktions- und Tarifseiten</p>
+<section class="page-hero wide">
+  <p class="page-kicker">Deutschland · Promo-Aktionen</p>
   <h1>Wer wirbt gerade womit</h1>
-  <p class="promo-kopf-zahlen">
-    <b>{{ promo_view.active_total }}</b> laufende Aktionen bei
-    <b>{{ promo_view.brands_active }}</b> von {{ promo_view.brands_tracked }} beobachteten Wettbewerbern.
-    Oben steht je Anbieter die stärkste – jede verlinkt auf seine eigene Aktionsseite.
-  </p>
-</div>
+  {% if promo_lead %}<p class="page-lead">{{ promo_lead }}</p>{% endif %}
+</section>
 
 {# ============================================================== DIE LAGE #}
 {% if promo_view.mechaniken %}
 <section class="promo-lage">
-  <div class="lage-balken">
-    <p class="lage-titel">Was der Markt gerade fährt</p>
-    {% for m in promo_view.mechaniken[:6] %}
-    <div class="lage-zeile">
-      <span class="lage-label">{{ m.label }}</span>
-      <span class="lage-track"><span class="lage-fill" style="width:{{ m.w }}%"></span></span>
-      <span class="lage-zahl">{{ m.marken }} {{ 'Marken' if m.marken != 1 else 'Marke' }}</span>
-    </div>
-    {% endfor %}
+  <p class="lage-titel">Was der Markt gerade fährt</p>
+  {% for m in promo_view.mechaniken[:5] %}
+  <div class="lage-zeile">
+    <span class="lage-label">{{ m.label }}</span>
+    <span class="lage-track"><span class="lage-fill" style="width:{{ m.w }}%"></span></span>
+    <span class="lage-zahl">{{ m.marken }} {{ 'Marken' if m.marken != 1 else 'Marke' }}</span>
   </div>
-  <div class="lage-text">
-    {% if promo_lead %}
-    <p class="lage-lead">{{ promo_lead }}</p>
-    {% else %}
-    {# Kein Redaktionstext: der Promo-Editor ist ausgefallen und die Pipeline
-       hat auf den Digest zurueckgegriffen. Das sagt die Seite, statt eine
-       Aufzaehlung von Angebotstiteln als Analyse auszugeben - genau das
-       stand hier am 06.08.2026 (derselbe Titel zweimal, mit freistehendem
-       Punkt am Ende). #}
-    <p class="lage-lead muted-note">Für diesen Lauf liegt kein Redaktionstext vor.
-      Die {{ promo_view.active_total }} bestätigten Aktionen stehen unten, jede mit
-      Quelle und Prüfdatum.</p>
-    {% endif %}
-    {% if promo_report_html %}
-    <p class="lage-mehr"><a href="#promo-wochentext">Der ganze Wochentext &darr;</a></p>
-    {% endif %}
-  </div>
+  {% endfor %}
 </section>
 {% endif %}
 
-{# ============================================================ DIE KARTEN #}
-{% if promo_view.karten %}
-<div class="rubrik promo-rubrik"><h2>Die stärkste Aktion je Wettbewerber</h2>
-  <span class="rubrik-zusatz">{{ promo_view.karten|length }} Anbieter</span></div>
-<div class="promo-karten">
-  {% for k in promo_view.karten %}{{ karte(k) }}{% endfor %}
-</div>
-{% else %}
-<div class="rubrik promo-rubrik"><h2>Die stärkste Aktion je Wettbewerber</h2></div>
+{# =========================================================== DIE MARKEN #}
+{% for b in promo_view.bloecke %}{{ block(b) }}{% else %}
 <p class="empty-note">Zurzeit ist bei keinem beobachteten Wettbewerber eine Aktion bestätigt.
   Welche Seiten geprüft werden, steht auf der <a href="{{ prefix }}promo/quellen.html">Quellenseite</a>.</p>
-{% endif %}
+{% endfor %}
 
-{# Vodafone selbst: bewusst NICHT in der Wettbewerbsreihe, sondern daneben -
-   sonst gestaltete die eigene Marke die Wettbewerbsbeobachtung mit. #}
-{% if promo_view.eigen %}
-<div class="rubrik promo-rubrik rubrik-eigen"><h2>Vodafone selbst</h2>
-  <span class="rubrik-zusatz">Vergleichsanker, nicht als Wettbewerber gezählt</span></div>
-<div class="promo-eigen">{{ karte(promo_view.eigen, 'pkarte pkarte--eigen') }}</div>
-{% endif %}
-
-{# ========================================================== NACH ANBIETER #}
-<div class="rubrik promo-rubrik"><h2>Alle {{ promo_view.active_total }} Aktionen nach Anbieter</h2></div>
-<div class="promo-anbieter">
-  {% for b in promo_view.marken %}
-  <section class="pmarke{% if b.internal_reference %} pmarke--eigen{% endif %}">
-    <div class="pmarke-kopf">
-      <h3><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h3>
-      <span class="pmarke-tier">{{ b.tier_label }}</span>
-      <span class="count-badge">{{ b.active_count }} aktiv</span>
-    </div>
-    {% if b.rest %}
-    <ul class="pmarke-liste">{% for o in b.rest %}{{ zeile(o) }}{% endfor %}</ul>
-    {% else %}
-    <p class="pmarke-note">Die einzige laufende Aktion steht oben.</p>
-    {% endif %}
-    {% if b.stale %}
-    <p class="pmarke-note">{{ b.stale|length }} frühere Aktion{{ 'en' if b.stale|length != 1 else '' }} ausgelaufen.</p>
-    {% endif %}
-  </section>
-  {% endfor %}
-</div>
+{# Vodafone selbst: bewusst am Ende und markiert - sonst gestaltete die
+   eigene Marke die Wettbewerbsbeobachtung mit. #}
+{% if promo_view.eigen %}{{ block(promo_view.eigen, true) }}{% endif %}
 
 {% if promo_view.ohne_aktion %}
-{# Beobachtet, aber ohne bestaetigte Aktion. Hier standen bis zum 07.08.2026
-   fuenf leere graue Kaesten in Kachelgroesse - "kein Bild" als Bild. Eine
-   Zeile sagt dasselbe und behauptet nicht, es gaebe etwas zu sehen. Die
-   Marken bleiben genannt: dass hingesehen wurde, ist die Aussage. #}
+{# Beobachtet, aber ohne bestaetigte Aktion. Eine Zeile sagt das und
+   behauptet nicht, es gaebe etwas zu sehen. Die Marken bleiben genannt:
+   dass hingesehen wurde, ist die Aussage. #}
 <p class="promo-ruhe">
   <b>Ohne bestätigte Aktion:</b>
   {% for b in promo_view.ohne_aktion %}<a href="{{ b.url }}" target="_blank"
@@ -218,9 +147,11 @@
   <details class="promo-method">
     <summary>Wie die Reihenfolge entsteht</summary>
     <div class="promo-method-body">
-      <p><b>Die Reihenfolge &bdquo;wichtig&ldquo;:</b> jedes Angebot bekommt einen Score von 0 bis 100 aus
+      <p><b>Die Reihenfolge:</b> jedes Angebot bekommt einen Score von 0 bis 100 aus
         fünf getrennt bewerteten Achsen auf einer festen Skala &ndash; kein Vergleich mit den Angeboten
-        dieser Woche. Nur so bedeutet ein Score von 80 nächsten Monat noch dasselbe.</p>
+        dieser Woche. Nur so bedeutet ein Score von 80 nächsten Monat noch dasselbe. Marken stehen nach
+        ihrer stärksten Aktion, innerhalb einer Marke stehen die Aktionen nach Score. Als
+        &bdquo;wichtig&ldquo; markiert ist, was die Schwelle über zwei Läufe hinweg hält.</p>
       <ul>
         <li><b>Wechselhebel (30 %)</b> &ndash; wie direkt greift das Angebot die Hürde an, die einen Kunden bisher hält?</li>
         <li><b>Angebotstiefe (25 %)</b> &ndash; wie groß ist der bezifferbare wirtschaftliche Vorteil?</li>
@@ -233,7 +164,7 @@
         Pipeline ohne Sprachmodell.</p>
       <p><b>Die Bilder</b> sind die Kampagnenmotive der Aktionsseiten selbst, dem einzelnen Angebot
         zugeordnet &ndash; über den Link, in dem sie stehen, sonst über seltene gemeinsame Wörter. Was
-        sich nicht belegen lässt, bekommt kein Bild, sondern die Mechanik als Schriftkachel.</p>
+        sich nicht belegen lässt, bekommt kein Bild, sondern die Kernzahl des Angebots als Schriftkachel.</p>
       <p class="promo-method-caveat">Ein hoher Score heißt <b>beobachten</b>, nicht reagieren.</p>
     </div>
   </details>
@@ -248,7 +179,8 @@
   {% endif %}
 </div>
 
-<p class="dz-foot">Diese Seite beobachtet die öffentlichen Aktionsseiten deutscher Telcos direkt
-  (Snapshot-Vergleich von Lauf zu Lauf, keine Presse-Feeds). Für den aktuellen Stand gilt immer die
-  verlinkte Seite des Anbieters. <a href="{{ prefix }}promo/quellen.html">Welche Seiten beobachtet werden &rsaquo;</a></p>
+<p class="dz-foot">Stand: {{ date_de }}, Snapshot-Vergleich der Aktionsseiten &ndash; diese Seite beobachtet
+  die öffentlichen Aktionsseiten deutscher Telcos direkt, keine Presse-Feeds. Für den aktuellen Stand gilt
+  immer die verlinkte Seite des Anbieters.
+  <a href="{{ prefix }}promo/quellen.html">Welche Seiten beobachtet werden &rsaquo;</a></p>
 {% endblock %}

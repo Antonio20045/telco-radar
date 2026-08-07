@@ -794,6 +794,16 @@ def _strip_vodafone_advice(md_text: str) -> str:
 # lang unbemerkt berechnet wurde.
 
 
+# Ein Satzende, dem eine KLEIN geschriebene Marke folgt. `_SATZENDE` verlangt
+# dahinter einen Grossbuchstaben - im Nachrichtentext die richtige Vorsicht
+# gegen Abkuerzungen, in der Promo-Welt die falsche: winSIM, congstar, otelo,
+# simplytel und mobilcom-debitel schreiben sich alle klein. Gemessen am
+# Promo-Bericht vom 07.08.2026 uebersah die Regel deshalb das erste Satzende
+# ("... Eskalationsstufe erreicht. winSIM senkt ...") und lieferte statt eines
+# Leitsatzes 280 Zeichen mit "…" am Ende - als einzigen Vorspann der Seite.
+_PROMO_SATZENDE = re.compile(r"(?<=[a-zäöüßA-ZÄÖÜ\)\"'»])[.!?](?=\s+\S)")
+
+
 def _promo_lead(md_text: str) -> str:
     """Kurzer Vorspann aus dem Promo-Wochenbericht fuer die Karte "Was diese
     Woche auffaellt". Der Bericht beginnt mit einem gleichnamigen Abschnitt,
@@ -818,6 +828,12 @@ def _promo_lead(md_text: str) -> str:
     text = _text_aus_html(secs[0]["html"])
     if text.startswith(DIGEST_MARKER):
         return ""
+    geschuetzt = text
+    for abk in _ABK:
+        geschuetzt = geschuetzt.replace(abk, "\x00" * len(abk))
+    m = _PROMO_SATZENDE.search(geschuetzt)
+    if m and m.end() <= 280:
+        return text[:m.end()]
     return _first_sentence(text, 280)
 
 

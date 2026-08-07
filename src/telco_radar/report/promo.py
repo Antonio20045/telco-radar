@@ -5,24 +5,27 @@ Differenzierungs-Seite).
 Die Frage der Seite ist eine einzige: **wer wirbt gerade womit?** Antonio am
 07.08.2026: "Sinn ist ja, dass ich einen Ueberblick habe von meinen
 Konkurrenten, welche Aktionen gerade laufen, was die machen, was sie fuer
-Promos haben. Und ich moechte, dass sie da gut dargestellt sind, dass es
-fuer mich kognitiv auch nicht so ein grosser Aufwand ist zu verstehen, worum
-es in dieser Aktion geht."
+Promos haben."
 
-Daraus folgt die Gliederung, und sie ist gegen die vorige getauscht:
+Dritter Anlauf, 08.08.2026. Der zweite hatte die Karten eingefuehrt - je
+Wettbewerber EINE, seine staerkste - und alles Weitere darunter als
+Zeilenwand nach Anbieter. Damit standen wieder ZWEI Darstellungen derselben
+Sache auf der Seite, und wer eine Marke verstehen wollte, musste zwischen
+ihnen springen. Antonio: "Total unuebersichtlich, nicht zugaenglich, nicht
+schoen. Ich will wissen, welche Promo-Aktionen bei meinen Wettbewerbern
+laufen."
 
-    KARTEN     Je Wettbewerber GENAU EINE Karte - seine staerkste laufende
-               Aktion, mit Kampagnenbild, Mechanik, Score und Frist. Gleiche
-               Form, gleiche Felder, gleiche Reihenfolge fuer jede Marke.
-               Vergleichen heisst Gleiches nebeneinander legen; eine Seite
-               aus Aufmacher plus Beistellspalte plus Markenraster plus
-               Ruhezone (so sah sie bis zum 07.08.2026 aus) zwingt den Leser,
-               dreimal umzulernen.
-    MECHANIKEN Was der Markt gerade FAEHRT, als Balken. Zwei Sekunden fuer
-               die Lage: fuenf Marken werben mit Datenbonus, zwei mit
-               Wechselpraemie.
-    MARKEN     Alle uebrigen Aktionen, je Marke ein Block. Die Tiefe, nach
-               der Uebersicht - nicht davor.
+Der Leser denkt in Wettbewerbern. Also gliedert die Seite nach Marken, und
+je Marke stehen ALLE ihre Aktionen in EINEM Raster:
+
+    LAGE      Welche Mechanik faehrt der Markt gerade, als Balken. Zwei
+              Sekunden fuer die Marktlage, mehr soll es nicht sein.
+    BLOECKE   Je Marke ein Block: Rubrikleiste mit Markenname, darunter die
+              staerkste Aktion als grosse Karte und die uebrigen als
+              kleinere Karten derselben Form. Kein "oben die Auswahl, unten
+              der Rest" mehr - jede Aktion steht genau einmal, bei ihrer
+              Marke.
+    EIGEN     Vodafone am Ende, als Vergleichsanker markiert.
 
 Sichtbarkeits-/Persistenzregel (siehe analyze/promo_store.py:mark_stale):
 ein Angebot im Status "evtl. ausgelaufen" (= EINMAL nicht erneut bestaetigt)
@@ -37,6 +40,7 @@ auf der Seite (Luecken zeigen statt verstecken).
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta
 
 from ..analyze.promo_ranker import MECHANICS
@@ -47,11 +51,68 @@ _OWN_COLOR = "#e60000"
 _RETIRED_STATUS = "ausgelaufen"
 _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 
+# Die harte Aussage eines Angebots: Preis, Datenmenge, Bandbreite, Rabatt.
+# Genau das gehoert auf eine Schriftkachel - "20 GB fuer 6,99 €" sagt in
+# zwei Zahlen, worum es geht. Bis zum 08.08.2026 stand dort die MECHANIK
+# ("Wechsel- oder Altgeraetpraemie"), und weil vier Marken dieselbe fahren,
+# standen vier identische Kacheln nebeneinander - das liest sich als Fehler,
+# nicht als Gestaltung.
+_ZAHL_RE = re.compile(
+    r"\d[\d.,]*\s?(?:€|EUR|%|GB|TB|MBit/s|Mbit/s|MB/s|MB|Cent)", re.I)
+# Wo eine Ueberschrift ihren ersten Sinnabschnitt beendet. Nur zum
+# ABTRENNEN, nie zum Abschneiden mitten im Wort - die Kachel traegt kein
+# "…" (CLAUDE.md §5: keine gekuerzten Ueberschriften).
+_KLAUSEL_RE = re.compile(r"\s*[:–—(]\s*|,\s+")
+# Wo der Kern einer Ueberschrift endet und ihre Naeherbestimmung beginnt:
+# "Junge-Leute-Rabatt AUF Magenta Mobil Young 5G Tarife". Erst hier, nach
+# der Zeichensetzung - eine Praeposition ist die schwaechere Grenze.
+_NAEHER_RE = re.compile(r"\s+(?:auf|für|fuer|mit|bei|ohne|zum|zur|im|in|von)\s+")
+# Laenger gesetzt wirkt eine Kachel nicht mehr wie ein Motiv, sondern wie
+# ein zweiter Absatz.
+_KACHEL_MAX = 34
+
 
 def _initials(name: str) -> str:
     words = [w for w in (name or "").replace("/", " ").split() if w[:1].isalnum()]
     letters = "".join(w[0] for w in words[:2]).upper()
     return letters or "?"
+
+
+def _kachel_text(offer: dict, mechanik: str) -> str:
+    """Was auf der Schriftkachel gross steht, wenn es kein Bild gibt.
+
+    Drei Stufen, konkret vor generisch: die Zahlen der Ueberschrift ("20 GB
+    · 6,99 €"), sonst ihr erster Sinnabschnitt, sonst die Mechanik. Die
+    Mechanik ist ausdruecklich die LETZTE Wahl - sie beschreibt eine
+    Angebotsart und unterscheidet zwei Marken nicht.
+    """
+    headline = " ".join((offer.get("headline") or "").split())
+    zahlen: list[str] = []
+    for m in _ZAHL_RE.finditer(headline):
+        wert = " ".join(m.group(0).split())
+        if wert not in zahlen:
+            zahlen.append(wert)
+        if len(zahlen) == 2:
+            break
+    if zahlen:
+        return " · ".join(zahlen)
+    erster = _KLAUSEL_RE.split(headline)[0].strip()
+    if len(erster) > _KACHEL_MAX:
+        erster = _NAEHER_RE.split(erster)[0].strip()
+    if erster and len(erster) <= _KACHEL_MAX:
+        return erster
+    return mechanik or "Aktion"
+
+
+# Ab diesem Seitenverhaeltnis ist ein Bild ein Banner und kein Motiv. 2,2
+# liegt bewusst ueber 16:9 (1,78) und unter dem flachsten echten Foto im
+# Bestand vom 08.08.2026 (800x419 = 1,91): beschnitten wuerden sonst auch
+# gewoehnliche Querformate.
+_PANORAMA_AB = 2.2
+
+
+def _ist_panorama(breite, hoehe) -> bool:
+    return bool(breite and hoehe and breite / hoehe > _PANORAMA_AB)
 
 
 def _sortierschluessel(offer: dict) -> tuple:
@@ -66,16 +127,25 @@ def _sortierschluessel(offer: dict) -> tuple:
 def _karte(brand: dict, offer: dict) -> dict:
     """Ein Angebot als Anzeigeeinheit - genau die Felder, die eine Karte
     zeigt. Die Vorlage rechnet nichts mehr aus."""
+    mechanik = MECHANICS.get(offer.get("mechanic") or "", "")
     return {
         "brand": brand,
         "offer": offer,
         "score": offer.get("score"),
         "highlight": bool(offer.get("highlight")),
         "reason": offer.get("score_reason") or "",
-        "mechanic": MECHANICS.get(offer.get("mechanic") or "", ""),
+        "mechanic": mechanik,
+        "kachel": _kachel_text(offer, mechanik),
+        "frist": offer.get("valid_until") or "",
         "bild": f"images/{offer['image']}" if offer.get("image") else "",
         "bild_w": offer.get("image_w"),
         "bild_h": offer.get("image_h"),
+        # Ein Werbebanner ist kein Bildausschnitt. Ein 1280x410-Motiv im
+        # 16:9-Kasten formatfuellend zu beschneiden schneidet genau die
+        # Haelfte weg, in der die Aussage steht - bei simplytel blieb blaue
+        # Flaeche uebrig und die FRITZ!Box stand am Rand. Solche Formate
+        # werden deshalb vollstaendig gezeigt, nicht beschnitten.
+        "bild_panorama": _ist_panorama(offer.get("image_w"), offer.get("image_h")),
         # "motiv" = das Buehnenbild der Aktionsseite, nicht das Bild GENAU
         # dieses Angebots (siehe promo_bilder.zuordnen). Die Karte schreibt
         # das dazu, statt eine Verbindung zu behaupten, die nicht belegt ist.
@@ -83,14 +153,13 @@ def _karte(brand: dict, offer: dict) -> dict:
     }
 
 
-def _mechanik_balken(karten: list[dict], marken: list[dict]) -> list[dict]:
+def _mechanik_balken(marken: list[dict]) -> list[dict]:
     """Welche Mechanik faehrt der Markt gerade - und bei wie vielen Marken?
 
-    Gezaehlt werden ALLE sichtbaren Wettbewerberangebote, nicht nur die
-    Karten oben: die Frage ist die Marktlage, nicht die Auswahl der Seite.
-    Die Marken-Zahl steht daneben, weil sie die eigentliche Aussage traegt -
-    sechs Angebote derselben Marke sind eine Kampagne, sechs Angebote
-    sechs verschiedener Marken sind ein Trend.
+    Gezaehlt werden ALLE sichtbaren Wettbewerberangebote. Die Marken-Zahl
+    steht daneben, weil sie die eigentliche Aussage traegt - sechs Angebote
+    derselben Marke sind eine Kampagne, sechs Angebote sechs verschiedener
+    Marken sind ein Trend.
     """
     zaehler: dict[str, dict] = {}
     for b in marken:
@@ -112,6 +181,45 @@ def _mechanik_balken(karten: list[dict], marken: list[dict]) -> list[dict]:
              "marken": len(z["marken"]),
              "w": round(100 * len(z["marken"]) / hoechste) if hoechste else 0}
             for z in balken]
+
+
+def _block(brand: dict) -> dict:
+    """Eine Marke mit allen ihren sichtbaren Aktionen als Kartenblock.
+
+    `lead` ist die staerkste (grosse Karte), `weitere` sind die uebrigen in
+    derselben Form. Getrennt gefuehrt, weil die Vorlage sie verschieden
+    GEWICHTET - nicht, weil sie an zwei Orten stehen. Genau diese Trennung
+    war bis zum 08.08.2026 eine Trennung im Seitenaufbau, und das war der
+    Fehler.
+    """
+    karten = [_karte(brand, o) for o in brand["active"]]
+    return dict(brand, lead=karten[0] if karten else None,
+                weitere=karten[1:], karten=karten,
+                top_score=karten[0]["score"] if karten else None)
+
+
+def _entdoppele_bilder(karten: list[dict]) -> None:
+    """Jedes Motiv steht hoechstens EINMAL auf der Seite.
+
+    promo_bilder.zuordnen() vergibt jeden Bildkandidaten schon nur einmal -
+    aber je Marke und je Lauf. Ein Eintrag, dessen Seite in diesem Lauf
+    unveraendert blieb, behaelt sein Bild aus einem frueheren; taucht
+    derselbe Kandidat jetzt bei einem anderen Angebot auf, steht dasselbe
+    Motiv zweimal. Genau so passiert am 08.08.2026 bei O2, zweimal derselbe
+    Router unter zwei verschiedenen Schlagzeilen - das liest sich als Fehler.
+    Die spaetere (also schwaechere) Karte verliert es und wird eine
+    Textkarte; ein Bild wegzulassen ist ehrlicher, als eins zu wiederholen.
+    """
+    gesehen: set[str] = set()
+    for k in karten:
+        if not k["bild"]:
+            continue
+        if k["bild"] in gesehen:
+            k["bild"] = ""
+            k["bild_w"] = k["bild_h"] = None
+            k["bild_ist_motiv"] = False
+            continue
+        gesehen.add(k["bild"])
 
 
 def prepare_promo_view(db_entries: list[dict], sources: list,
@@ -178,40 +286,26 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
                                b["tier"], b["name"]))
 
-    # ------------------------------------------------------------ Karten
-    # Eine Karte je Marke: ihre staerkste sichtbare Aktion. Diese Regel ist
-    # keine Kosmetik, sondern die Lehre aus den echten Daten: gemessen am
-    # Bestand vom 27.07.2026 lagen 36 Angebote ueber der Schwelle, aber
-    # allein neun der besten fuenfzehn kamen von der Telekom - praktisch
-    # dieselbe Geraeteaktion, einmal je Modell. Eine Uebersicht soll die
-    # Marktbreite zeigen, nicht den Anbieter mit dem groessten
-    # Geraetekatalog. Die uebrigen Aktionen verschwinden nicht, sie stehen
-    # unten bei ihrer Marke.
-    karten: list[dict] = []
-    for b in marken:
-        if b["internal_reference"] or not b["active"]:
-            continue
-        karten.append(_karte(b, b["active"][0]))
-    # Bewertete zuerst, darunter nach Score - und bei gleichem Score die
-    # Marke mit Bild vor der ohne. Nicht aus Kosmetik: eine Karte ohne Bild
-    # ist eine halbe Karte, und oben stehen die, die am meisten tragen.
-    karten.sort(key=lambda k: (k["highlight"], k["score"] is not None,
-                               k["score"] or 0, bool(k["bild"])), reverse=True)
+    # ----------------------------------------------------------- Bloecke
+    # Je Marke ein Block, staerkste Marke zuerst. Sortiert wird ueber den
+    # Score ihrer besten Aktion - eine Marke ohne bewertete Aktion faellt
+    # hinter jede bewertete, verschwindet aber nicht (vor dem ersten
+    # Bewertungslauf und bei LLM-Ausfall ist das der Normalfall).
+    bloecke = [_block(b) for b in marken
+               if b["has_offers"] and not b["internal_reference"]]
+    bloecke.sort(key=lambda b: (b["top_score"] is not None, b["top_score"] or 0),
+                 reverse=True)
 
-    eigen = None
-    eigene_marke = next((b for b in marken if b["internal_reference"]), None)
-    if eigene_marke and eigene_marke["active"]:
-        eigen = _karte(eigene_marke, eigene_marke["active"][0])
+    eigene_marke = next((b for b in marken
+                         if b["internal_reference"] and b["has_offers"]), None)
+    eigen = _block(eigene_marke) if eigene_marke else None
 
-    # Die Bloecke unten zeigen jede Marke mit ihren uebrigen Aktionen - was
-    # oben schon als Karte steht, steht dort nicht noch einmal.
-    oben = {k["offer"].get("id") for k in karten}
-    if eigen:
-        oben.add(eigen["offer"].get("id"))
-    for b in marken:
-        b["rest"] = [e for e in b["active"] if e.get("id") not in oben]
+    # Alle Wettbewerberkarten in Seitenreihenfolge - die Grundlage, gegen die
+    # die Wahrheitstests rechnen ("jede sichtbare Aktion genau einmal").
+    karten = [k for b in bloecke for k in b["karten"]]
+    alle_karten = karten + (eigen["karten"] if eigen else [])
+    _entdoppele_bilder(alle_karten)
 
-    mit_aktion = [b for b in marken if b["has_offers"]]
     ohne_aktion = [b for b in marken if not b["has_offers"]]
 
     return {
@@ -220,15 +314,15 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
         # Gruppen, weil "hier laeuft gerade nichts" eine Zeile ist und keine
         # Kachel; die Zaehlung darf davon nicht abhaengen.
         "brands": marken,
-        "marken": mit_aktion,
+        "bloecke": bloecke,
         "ohne_aktion": ohne_aktion,
         "karten": karten,
         "eigen": eigen,
-        "mechaniken": _mechanik_balken(karten, marken),
-        # Wie viele der Karten ein echtes Kampagnenbild tragen. Die Zahl
-        # haengt am Abnahmekriterium der Seite (scripts/pruefe_portal.py)
+        "mechaniken": _mechanik_balken(marken),
+        # Wie viele der gezeigten Karten ein echtes Kampagnenbild tragen. Die
+        # Zahl haengt am Abnahmekriterium der Seite (scripts/pruefe_portal.py)
         # und wird in tests/test_promo_seite.py gegen die Daten gehalten.
-        "mit_bild": sum(1 for k in karten if k["bild"]),
+        "mit_bild": sum(1 for k in alle_karten if k["bild"]),
         "bilder_gesamt": sum(1 for b in marken for e in b["active"] if e.get("image")),
         "highlight_count": sum(1 for k in karten if k["highlight"]),
         "scored_total": sum(1 for b in marken if not b["internal_reference"]

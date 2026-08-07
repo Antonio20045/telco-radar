@@ -991,140 +991,149 @@ b,strong{font-weight:700}
   text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 /* ======================================================  PROMO  ========= */
 /* Wer wirbt gerade womit. Dieselbe Designsprache wie die Marktrecherche -
-   Newsprint, Serife, Linien statt Kaesten, Rot als Akzent -, aber EINE Form
-   statt vier. Die Seite hatte bis zum 07.08.2026 einen Aufmacher, eine
-   Beistellspalte mit Zeilen, ein Markenraster und eine Zone grauer Kaesten;
-   wer zwei Anbieter vergleichen wollte, musste dafuer zwischen drei
-   Darstellungen uebersetzen. Jetzt: ein Kartenraster, je Wettbewerber eine
-   Karte, gleiche Felder an gleicher Stelle. */
-.promo-kopf{padding:18px 0 0}
-.promo-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
-  font-size:clamp(30px,4vw,46px);line-height:1.02;letter-spacing:-.02em}
-.promo-kopf-zahlen{margin:7px 0 0;font-size:15px;line-height:1.5;
-  color:var(--ink-3);max-width:74ch}
-.promo-kopf-zahlen b{color:var(--ink);font-weight:700;
-  font-variant-numeric:lining-nums}
+   Newsprint, Serife, Linien statt Kaesten, Rot als Akzent.
+
+   Der Umbau vom 08.08.2026 betrifft die GLIEDERUNG, nicht die Optik: die
+   Seite hatte oben ein Kartenraster ("die staerkste Aktion je Wettbewerber")
+   und unten dieselben Marken noch einmal als dreispaltige Zeilenwand mit
+   einer Meta-Zeile unter jeder Zeile. Zwei Darstellungen derselben Sache,
+   und die untere war reines Rauschen. Jetzt gibt es EINEN Ort je Marke: ihre
+   Rubrikleiste, darunter ihre Aktionen in einem Raster - die staerkste
+   gross, die uebrigen klein, sonst identisch. Das Gewicht kommt aus der
+   Flaeche, nicht aus einer zweiten Bauform. */
 
 /* ---- die Lage: was der Markt gerade faehrt */
 /* Die Balken zaehlen MARKEN, nicht Angebote: sechs Aktionen einer Marke sind
-   eine Kampagne, sechs Aktionen sechs verschiedener Marken sind ein Trend. */
-.promo-lage{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
-  gap:0 34px;margin-top:22px;padding-top:16px;
+   eine Kampagne, sechs Aktionen sechs verschiedener Marken sind ein Trend.
+   Schmale Leiste, hoechstens fuenf Zeilen - sie ordnet die Seite ein, sie
+   ist nicht ihr Inhalt. */
+.promo-lage{max-width:430px;margin:26px 0 0;padding-top:14px;
   border-top:3px solid var(--rule-ink)}
-.lage-titel{margin:0 0 10px;font-family:var(--sans);font-size:10px;
+.lage-titel{margin:0 0 9px;font-family:var(--sans);font-size:10px;
   font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
 .lage-zeile{display:grid;grid-template-columns:minmax(0,1fr) 62px auto;
-  align-items:center;gap:0 10px;padding:5px 0}
+  align-items:center;gap:0 12px;padding:4px 0}
 .lage-label{font-size:14px;color:var(--ink-2);overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.lage-track{display:block;height:5px;background:var(--paper-3)}
+.lage-track{display:block;height:4px;background:var(--paper-3)}
 .lage-fill{display:block;height:100%;background:var(--red)}
 .lage-zahl{font-family:var(--sans);font-size:9.5px;font-weight:700;
   color:var(--ink-4);white-space:nowrap}
-.lage-text{min-width:0;padding-left:34px;border-left:1px solid var(--rule)}
-.lage-lead{margin:0;font-family:var(--serif);font-size:19px;line-height:1.45;
-  color:var(--ink);max-width:60ch}
-.lage-mehr{margin:10px 0 0;font-family:var(--sans);font-size:9.5px;
-  font-weight:800;text-transform:uppercase;letter-spacing:.1em}
-.lage-mehr a{color:var(--red)}
-@media (max-width:900px){
-  .promo-lage{grid-template-columns:1fr;gap:20px 0}
-  .lage-text{padding-left:0;border-left:none}
-}
 
-/* ---- das Kartenraster: die eine Form */
-.promo-rubrik{margin-top:34px}
+/* ---- der Markenblock: eine Rubrik, ein Raster */
+.pmarke{margin-top:40px}
+.pmarke-rubrik{margin-bottom:16px;border-top-width:3px;
+  border-top-color:var(--c,var(--rule-ink))}
+.pmarke-rubrik h2 a:hover{color:var(--red)}
 .rubrik-zusatz{margin-left:auto;font-family:var(--sans);font-size:10px;
   font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
-.promo-karten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:26px 30px}
+
+/* Vier Spalten, die staerkste Aktion ueber zwei. Damit steht das Gewicht im
+   Raster und nicht in einer eigenen Bauform - eine Zeitungsseite entsteht
+   aus einem Raster mit Gewichtung (CLAUDE.md §5). */
+.promo-karten{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:24px 26px}
 .pkarte{display:flex;flex-direction:column;min-width:0;
-  padding-bottom:14px;border-bottom:1px solid var(--rule)}
+  border-top:1px solid var(--rule);padding-top:10px}
+/* Die staerkste Aktion nimmt zwei Spalten - und mit Motiv auch zwei Zeilen.
+   Nur ueber zwei Spalten stand rechts neben ihr eine halbe Seite Weissraum,
+   weil zwei kleine Karten nie so hoch werden wie eine grosse mit Bild und
+   Absatz. Ohne Motiv gilt das Gegenteil: zwei Zeilen fuellt eine
+   Schriftkachel nicht, sie stuende in einem leeren Feld. */
+.pkarte--gross{grid-column:span 2;
+  border-top:2px solid var(--c,var(--rule-ink));padding-top:12px}
+.pkarte--hoch{grid-row:span 2}
 .pk-flaeche{display:flex;flex-direction:column;flex:1}
-.pk-bild{display:block;margin-bottom:10px}
+.pk-bild{display:block;margin-bottom:9px}
+/* KEINE Platzhalterfarbe hinter dem Bild. Sie stand hier bis zum 08.08.2026
+   und war die Ursache des "leeren Bildkastens", den Antonio auf der
+   simplytel-Karte sah: `loading="lazy"` laesst ein Bild ausserhalb des
+   Sichtfensters ungeladen, und der Browser malt dann die CSS-Flaeche - ein
+   grauer 16:9-Kasten, der wie ein kaputtes Bild aussieht. Gemessen an der
+   fertigen Seite waren das 31 von 36 Bildern, solange nicht gescrollt wurde
+   (und in jedem Screenshot/Ausdruck dauerhaft). Ohne Fuellung bleibt an der
+   Stelle Zeitungspapier - nichts behauptet dort ein Bild. */
 .pk-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
-  object-fit:cover;object-position:center;background:var(--paper-3)}
+  object-fit:cover;object-position:center}
+/* Ein Werbebanner wird nicht beschnitten, sondern ganz gezeigt: es traegt
+   seine Aussage ueber die volle Breite, und der 16:9-Ausschnitt schneidet
+   genau sie weg (simplytel: 1280x410, uebrig blieb blaue Flaeche). Es
+   bekommt dafuer auch keinen 16:9-Rahmen - der stuende als Papierstreifen
+   ueber und unter dem Banner und saehe aus wie eine Luecke. */
+.pk-bild--banner img{aspect-ratio:auto}
 .pk-bildquelle{display:block;margin-top:4px;font-family:var(--sans);
   font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
   color:var(--ink-4)}
-/* Ohne Bild KEIN grauer Kasten - der sah aus wie ein Ladefehler. Die
-   Mechanik gross gesetzt sagt dasselbe, was ein Motiv sagen soll: worum es
-   geht. Der Farbstreifen traegt die Markenfarbe. */
-.pk-bild--typo{display:flex;flex-direction:column;justify-content:space-between;
-  aspect-ratio:16/9;padding:14px 16px;background:var(--paper-3);
-  border-top:3px solid var(--marke,var(--ink))}
-.pk-typo-marke{font-family:var(--sans);font-size:11px;font-weight:800;
-  letter-spacing:.14em;color:var(--marke,var(--ink-4))}
-.pk-typo-mechanik{font-family:var(--serif);font-size:26px;line-height:1.1;
-  font-weight:700;color:var(--ink-2);letter-spacing:-.015em}
-.pk-marke{font-family:var(--sans);font-size:9.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.11em;color:var(--red);
-  margin-bottom:5px}
-.pk-titel{font-family:var(--serif);font-size:21px;line-height:1.2;
-  font-weight:700;letter-spacing:-.015em;color:var(--ink)}
+/* Ohne belegtes Motiv KEIN grauer Kasten - der sah aus wie ein Ladefehler.
+   Stattdessen die Kernzahl des Angebots gross gesetzt ("20 GB · 6,99 €"):
+   sie sagt in zwei Zahlen, worum es geht, und unterscheidet zwei Marken.
+   Die Mechanik stand hier bis zum 08.08.2026 - vier Marken fahren dieselbe,
+   also standen vier identische Kacheln nebeneinander. */
+/* Ohne feste 16:9-Flaeche: die Kachel ist so hoch wie ihre Zeilen. Mit
+   Bildmass reservierte sie auf der grossen Karte 324 px fuer zwei Zeilen
+   Text - und genau das sah wieder aus wie ein leerer Kasten. */
+.pk-bild--typo{display:flex;flex-direction:column;gap:6px;
+  padding:2px 0 10px;border-bottom:1px solid var(--rule)}
+.pk-typo-zahl{font-family:var(--serif);font-size:clamp(30px,4vw,52px);
+  line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--ink);
+  font-variant-numeric:lining-nums}
+.pk-typo-mechanik{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
+.pk-titel{font-family:var(--serif);font-size:15.5px;line-height:1.3;
+  font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.pkarte--gross .pk-titel{font-size:24px;line-height:1.16;font-weight:700;
+  letter-spacing:-.02em}
 .pk-flaeche:hover .pk-titel{color:var(--red)}
-.pk-text{margin-top:7px;font-size:14.5px;line-height:1.46;color:var(--ink-3)}
-.pk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:8px;
-  margin:11px 0 0;padding-top:9px;border-top:1px solid var(--rule-2)}
-.pkarte .pk-text{margin-bottom:auto}
-.pk-meta{font-family:var(--sans);font-size:9px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4)}
-.pmech{background:var(--ink);color:var(--paper);padding:2px 7px;
-  font-family:var(--sans);font-size:9px;font-weight:800;text-transform:uppercase;
-  letter-spacing:.08em;white-space:nowrap}
-.pz-score{font-family:var(--sans);font-size:10px;font-weight:800;color:#fff;
-  background:var(--ink-3);padding:2px 6px;font-variant-numeric:lining-nums}
-.pz-score--hoch{background:var(--red)}
-.pkarte--fading{opacity:.66}
-.pkarte--eigen .pk-marke{color:var(--ink-3)}
-.promo-eigen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 30px}
-.rubrik-eigen{border-top-color:var(--ink-4)}
-@media (max-width:1000px){
-  .promo-karten,.promo-eigen{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pk-text{margin-top:8px;font-size:15px;line-height:1.48;color:var(--ink-3)}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+.pk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:7px 9px;
+  margin:12px 0 0;padding-top:8px;border-top:1px solid var(--rule-2)}
+/* Die Mechanik als Umriss-Chip: sie benennt die Angebotsart, sie ist keine
+   Dringlichkeit - eine gefuellte Flaeche waere hier lauter als die Sache. */
+.pmech{padding:2px 6px;border:1px solid var(--rule);font-family:var(--sans);
+  font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-3);white-space:nowrap}
+.pk-frist,.pk-flag{font-family:var(--sans);font-size:8.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  white-space:nowrap}
+.pk-flag--neu{color:var(--red)}
+/* "wichtig" ersetzt den nackten Score auf jeder Karte. Der Score ist eine
+   Rechnung mit fuenf Achsen; als Zahl neben einer Ueberschrift behauptet er
+   eine Genauigkeit, die niemand nachvollzieht. Die Methodik erklaert ihn. */
+.pk-wichtig{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);
+  font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--red)}
+.pk-wichtig::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--red)}
+.pkarte--fading{opacity:.64}
+/* Vodafone selbst - Vergleichsanker, nicht Wettbewerber. */
+.pmarke--eigen{margin-top:46px}
+
+@media (max-width:1100px){
+  .promo-karten{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
-@media (max-width:640px){
-  .promo-karten,.promo-eigen{grid-template-columns:1fr}
+@media (max-width:820px){
+  .promo-karten{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pkarte--gross{grid-column:span 2}
+  .pkarte--hoch{grid-row:span 1}
+}
+@media (max-width:560px){
+  .promo-karten{grid-template-columns:1fr}
+  .pkarte--gross{grid-column:span 1}
+  .pkarte--hoch{grid-row:span 1}
+  .pkarte--gross .pk-titel{font-size:21px}
 }
 
-/* ---- nach Anbieter: die Tiefe, in Zeilen */
-.promo-anbieter{columns:3;column-gap:38px;column-rule:1px solid var(--rule)}
-.pmarke{break-inside:avoid;display:inline-block;width:100%;
-  margin:0 0 26px;padding:0}
-.pmarke-kopf{display:flex;align-items:baseline;gap:10px;padding-bottom:6px;
-  border-bottom:2px solid var(--rule-ink)}
-.pmarke-kopf h3{margin:0;font-family:var(--sans);font-size:11.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--ink)}
-.pmarke-kopf h3 a:hover{color:var(--red)}
-.pmarke-tier{font-family:var(--sans);font-size:9px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.pmarke-kopf .count-badge{margin-left:auto}
-.pmarke-liste{list-style:none;margin:0;padding:0}
-.pzeile{display:flex;gap:10px;align-items:flex-start;padding:9px 0;
-  border-top:1px solid var(--rule-2)}
-.pzeile:first-child{border-top:none}
-.pzeile a{min-width:0;flex:1;display:flex;gap:10px;align-items:flex-start}
-.pzeile-text{min-width:0;flex:1;display:flex;flex-direction:column}
-.pzeile-bild{flex:0 0 76px}
-.pzeile-bild img{display:block;width:76px;height:auto;aspect-ratio:4/3;
-  object-fit:cover;background:var(--paper-3)}
-.pzeile-titel{font-size:15px;line-height:1.3;font-weight:600;color:var(--ink)}
-.pzeile a:hover .pzeile-titel{color:var(--red)}
-.pzeile .pk-meta{margin-top:4px}
-.pzeile--fading{opacity:.62}
-.pmarke--eigen .pmarke-kopf{border-bottom-color:var(--red)}
-.pmarke-note{margin:8px 0 0;font-family:var(--sans);font-size:9.5px;
-  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.promo-ruhe{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);
+.promo-ruhe{margin:34px 0 0;padding-top:12px;border-top:1px solid var(--rule);
   font-size:14px;line-height:1.6;color:var(--ink-3)}
 .promo-ruhe b{font-family:var(--sans);font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2)}
 .promo-ruhe a{color:var(--ink-3);border-bottom:1px solid var(--rule)}
 .promo-ruhe a:hover{color:var(--red)}
-@media (max-width:1000px){.promo-anbieter{columns:2}}
-@media (max-width:640px){.promo-anbieter{columns:1;column-rule:none}}
 
 /* ---- die Tiefe */
-.promo-tiefe{margin-top:34px}
+.promo-tiefe{margin-top:40px}
 .promo-method{border-top:2px solid var(--rule-ink)}
 .promo-method > summary{list-style:none;cursor:pointer;padding:12px 0;
   font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
