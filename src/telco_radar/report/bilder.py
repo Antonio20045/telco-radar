@@ -155,6 +155,33 @@ def masse(daten: bytes) -> tuple[int, int]:
         return (0, 0)
 
 
+# Ein Bild, dessen Pixel praktisch alle denselben Wert haben, zeigt nichts.
+# Gemessen an den 15 Promo-Screenshots vom 07.08.2026: der leere
+# telekom-deutschland.jpg hat eine Standardabweichung von exakt 0,00, der
+# naechstflaue (otelo.jpg, eine dunkle Seite) 38,67. Dazwischen liegt kein
+# Grenzfall, die Schwelle ist also unkritisch gewaehlt. Ueber die Dateigroesse
+# ginge es auch (6 KB gegen 58-114 KB), aber die haengt an der
+# JPEG-Qualitaet; der Bildinhalt tut das nicht.
+_MIND_STREUUNG = 6.0
+
+
+def ist_leer(daten: bytes) -> bool:
+    """True, wenn das Bild eine einfarbige Flaeche ist - also nichts zeigt.
+
+    Der Fall, fuer den das gebaut wurde: die Promo-Uebersicht band als
+    einziges Bild einen 1280x720-Screenshot ein, der eine weisse Seite war
+    (Aufnahme vor dem Seitenaufbau). Masse und Dateityp waren tadellos -
+    nur zu sehen war nichts. Wer nur `masse()` prueft, sieht das nie.
+    """
+    try:
+        from PIL import Image, ImageStat
+        with Image.open(io.BytesIO(daten)) as im:
+            grau = im.convert("L")
+            return ImageStat.Stat(grau).stddev[0] < _MIND_STREUUNG
+    except Exception:                # noqa: BLE001 - unlesbar zeigt auch nichts
+        return True
+
+
 def _schreibe(daten: bytes, ziel: Path, max_breite: int) -> tuple[int, int]:
     """Verkleinert auf `max_breite` und legt das Bild als JPEG ab.
 

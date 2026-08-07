@@ -41,14 +41,12 @@
         </form>
       </div>
     </div>
-    {# Die Datumszeile einer Zeitung: Ausgabe, Ressort, Umfang. Sie steht
-       zwischen Kopf und Rubrikleiste und traegt die Zahlen, die sonst als
-       Kacheln herumstuenden. #}
-    <div class="dateline">
-      <span>{% if ausgabe_datum %}Ausgabe vom {{ ausgabe_datum }}{% else %}Interne Ausgabe{% endif %}</span>
-      <span>{% if uc == 'promo' %}Promo Übersicht · Deutschland{% else %}Wettbewerbsbeobachtung · Vodafone intern{% endif %}</span>
-      <span>{% if ausgabe_quellen %}{{ ausgabe_quellen }} Quellen beobachtet{% else %}Nur zur internen Verwendung{% endif %}</span>
-    </div>
+    {# Hier stand bis zum 07.08.2026 eine Datumszeile ("Ausgabe vom ... ·
+       Wettbewerbsbeobachtung · 205 Quellen beobachtet") auf JEDER Seite.
+       Antonio: "Loesch diese Zeile, das ist unnoetig." Der Ausgabetag steht
+       weiterhin dort, wo er gebraucht wird - im Kopf der Meldungsseite und
+       im Titel der Wochenseite. Die Globals ausgabe_datum/ausgabe_quellen
+       sind mit dieser Zeile aus html.py entfernt worden. #}
     {% if uc == 'promo' %}
     <nav class="subbar subnav" aria-label="Promo Übersicht">
       <a href="{{ prefix }}promo/index.html" {% if active=='promo_uebersicht' %}class="on"{% endif %}>Übersicht</a>

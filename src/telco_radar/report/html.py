@@ -370,7 +370,111 @@ def _kennwoerter(name: str) -> frozenset[str]:
 _MAX_JE_ABSENDER = 2
 
 
-def _titelseite(highlights: list[dict]) -> dict:
+# ------------------------------------------------------------- roter Faden
+# Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall". Gemessen
+# war das keine Geschmacksfrage - die Titelseite fuehrte mit einer anderen
+# Geschichte als der Wochenbericht, weil beide unabhaengig voneinander
+# sortierten: die Seite nach Dringlichkeit und Bildbreite, der Bericht nach
+# dem Urteil der Chefredaktion.
+#
+# Der Bericht beginnt mit einer Aufzaehlung "Auf einen Blick" - drei Saetze,
+# die sagen, worum es in dieser Woche geht. Die uebernimmt jetzt die
+# Titelseite als Fuehrung: Aufmacher und zweite Reihe belegen diese drei
+# Saetze, in ihrer Reihenfolge. Das ist der Faden, und er ist nachpruefbar -
+# nicht "die Seite wirkt geordneter".
+_FADEN_MAX = 3
+_FADEN_MIND_TREFFER = 2
+# Wie viele Meldungen je Fuehrungssatz vorgemerkt werden. Mehr als eine,
+# weil der Aufmacher ein Bild von mindestens 800 px verlangt: hat die
+# bestbelegte Meldung eines Satzes keins, soll die Seite bei DIESEM Satz
+# weitersuchen, statt zum naechsten zu springen. Genau das war am 07.08.2026
+# der Fall - der Bericht fuehrte mit SpaceX, die beste SpaceX-Meldung hatte
+# 720 px, und die Titelseite fuehrte deshalb mit der Telekom.
+_FADEN_KANDIDATEN = 4
+_WORT_RE = re.compile(r"[\wÄÖÜäöüß][\wÄÖÜäöüß-]{3,}")
+
+
+def _wortmenge(text: str) -> set[str]:
+    """Die inhaltstragenden Woerter eines Textes, kleingeschrieben."""
+    return {w.lower() for w in _WORT_RE.findall(text or "")}
+
+
+def _fuehrende_saetze(md_text: str) -> list[str]:
+    """Die Punkte aus "Auf einen Blick" - womit der Bericht fuehrt."""
+    for sec in _briefing_sections(md_text):
+        if "blick" not in (sec.get("title") or "").lower():
+            continue
+        soup = BeautifulSoup(sec.get("html") or "", "html.parser")
+        punkte = [li.get_text(" ", strip=True) for li in soup.find_all("li")]
+        if punkte:
+            return punkte[:_FADEN_MAX]
+    return []
+
+
+def _faden(highlights: list[dict],
+           saetze: list[str]) -> list[list[dict]]:
+    """Zu jedem Fuehrungssatz die Meldungen, die ihn belegen - beste zuerst.
+
+    Zugeordnet wird ueber SELTENE gemeinsame Woerter. Ein Abgleich ueber
+    alle Woerter faende "Netz", "Kunden" und "Milliarden" in jeder zweiten
+    Meldung und damit ueberall eine Uebereinstimmung; gezaehlt werden
+    deshalb nur Woerter, die in hoechstens einem Achtel der Meldungen
+    vorkommen ("Starlink", "IHS", "Freenet").
+
+    Gezaehlt reicht nicht, GEWICHTET muss es sein. Am 07.08.2026 gemessen:
+    fuer den Satz "MTN erlangt vollstaendige Kontrolle ueber den
+    Turminfrastrukturbetreiber IHS Towers ... in Afrika" fanden sich zwei
+    Meldungen mit je drei gemeinsamen seltenen Woertern - die richtige
+    (MTN/IHS Towers) und "KI treibt Cyberkriminalitaet in Afrika massiv
+    voran", die ueber "Afrika" und "treibt" mitkam. Ein Wort, das genau
+    zweimal vorkommt, beweist mehr als eines, das siebzehnmal vorkommt;
+    jeder Treffer zaehlt deshalb mit 1/Haeufigkeit.
+
+    Bei gleichem Gewicht gewinnt das breitere Bild. Nicht aus Kosmetik:
+    unter gleich gut belegten Meldungen ist die brauchbar, die den
+    Aufmacher auch tragen kann - der verlangt 800 px (Abnahmekriterium 3
+    des Vorgaengerauftrags).
+
+    Wer weniger als `_FADEN_MIND_TREFFER` seltene Woerter teilt, gilt als
+    nicht belegt - dann fuehrt die Seite nach Dringlichkeit weiter, statt
+    eine falsche Verbindung zu behaupten.
+    """
+    if not highlights or not saetze:
+        return []
+    worte_je_meldung = [
+        _wortmenge(f"{h.get('schlagzeile') or ''} {h.get('operator') or ''} "
+                   f"{h.get('title') or ''} {h.get('summary') or ''}")
+        for h in highlights]
+    haeufigkeit: dict[str, int] = {}
+    for worte in worte_je_meldung:
+        for w in worte:
+            haeufigkeit[w] = haeufigkeit.get(w, 0) + 1
+    deckel = max(2, len(highlights) // 8)
+
+    gewaehlt: list[list[dict]] = []
+    vergeben: set[str] = set()
+    for satz in saetze:
+        sw = _wortmenge(satz)
+        kandidaten: list[tuple[float, int, int, dict]] = []
+        for rang, (h, worte) in enumerate(zip(highlights, worte_je_meldung)):
+            if h.get("url") in vergeben:
+                continue
+            selten = [t for t in sw & worte if haeufigkeit[t] <= deckel]
+            if len(selten) < _FADEN_MIND_TREFFER:
+                continue
+            gewicht = round(sum(1.0 / haeufigkeit[t] for t in selten), 6)
+            kandidaten.append((-gewicht, -_bildbreite(h), rang, h))
+        if not kandidaten:
+            continue
+        kandidaten.sort(key=lambda k: k[:3])
+        belegt = [k[3] for k in kandidaten[:_FADEN_KANDIDATEN]]
+        vergeben.update(h.get("url") for h in belegt)
+        gewaehlt.append(belegt)
+    return gewaehlt
+
+
+def _titelseite(highlights: list[dict],
+                faden: list[list[dict]] | None = None) -> dict:
     """Verteilt die Meldungen auf die Gewichtsstufen der Titelseite.
 
     Bis zum 06.08.2026 kannte die Titelseite ZWEI Stufen: einen Aufmacher
@@ -406,16 +510,21 @@ def _titelseite(highlights: list[dict]) -> dict:
         vergeben.append(0)
         return len(absender) - 1
 
-    def nimm(n: int, *, mind_breite: int = 0) -> list[dict]:
+    def nimm(n: int, *, mind_breite: int = 0, aus: list[dict] | None = None,
+             streng: bool = False) -> list[dict]:
         gewaehlt: list[dict] = []
         # Drei Durchgaenge, in dieser Reihenfolge:
         #   1. Bildanspruch UND Absenderdeckel
         #   2. nur Absenderdeckel   - Vielfalt schlaegt Bebilderung
         #   3. ohne beides          - eine Position bleibt nie leer
-        stufen = ([(mind_breite, True)] if mind_breite else []) \
-            + [(0, True), (0, False)]
+        # `streng` laesst nur den ersten zu: wer aus einer Kandidatenliste
+        # des Fadens waehlt, will lieber leer ausgehen als den Bildanspruch
+        # aufgeben - die naechste Stufe darueber faengt das ab.
+        stufen = [(mind_breite, True)] if streng else (
+            ([(mind_breite, True)] if mind_breite else [])
+            + [(0, True), (0, False)])
         for anspruch, deckel in stufen:
-            for h in highlights:
+            for h in (highlights if aus is None else aus):
                 if len(gewaehlt) >= n:
                     break
                 if h.get("url") in benutzt or _bildbreite(h) < anspruch:
@@ -433,7 +542,24 @@ def _titelseite(highlights: list[dict]) -> dict:
 
     from .bilder import MIND_BREITE_GROSS
 
-    aufmacher_roh = (nimm(1, mind_breite=MIND_BREITE_GROSS) or [None])[0]
+    # Der Faden zuerst: die Meldungen, die die Fuehrungssaetze des Berichts
+    # belegen, bekommen Aufmacher und zweite Reihe - in der Reihenfolge des
+    # Berichts. Der Aufmacher nimmt den ERSTEN Satz, fuer den sich eine
+    # Meldung mit grossem Bild findet; innerhalb eines Satzes wird dafuer
+    # bis zum vierten Kandidaten gesucht, bevor der naechste Satz drankommt.
+    # Bleibt der Faden leer (kein Bericht, keine belegbare Zuordnung),
+    # laeuft alles wie vorher nach Dringlichkeit.
+    offen = [list(k) for k in (faden or []) if k]
+    aufmacher_roh = None
+    for i, kandidaten in enumerate(offen):
+        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS, aus=kandidaten,
+                       streng=True)
+        if treffer:
+            aufmacher_roh = treffer[0]
+            offen.pop(i)          # dieser Satz ist erzaehlt
+            break
+    if aufmacher_roh is None:
+        aufmacher_roh = (nimm(1, mind_breite=MIND_BREITE_GROSS) or [None])[0]
     aufmacher = None
     if aufmacher_roh is not None:
         aufmacher = dict(aufmacher_roh)
@@ -441,7 +567,10 @@ def _titelseite(highlights: list[dict]) -> dict:
         # bis zwei Saetze angelegt. Ein Schnitt daran machte einen Halbsatz.
         aufmacher["vorspann"] = " ".join((aufmacher_roh.get("summary") or "").split())
 
-    zwei = nimm(2, mind_breite=MIND_BREITE_GROSS)
+    # Die zweite Reihe erzaehlt die uebrigen Fuehrungssaetze, je einen.
+    zwei = nimm(2, mind_breite=MIND_BREITE_GROSS,
+                aus=[k[0] for k in offen], streng=True)
+    zwei += nimm(2 - len(zwei), mind_breite=MIND_BREITE_GROSS)
     for h in zwei:
         h["anriss"] = _first_sentence(h.get("summary") or "", 150)
     vier = nimm(4, mind_breite=1)
@@ -471,6 +600,13 @@ def _titelseite(highlights: list[dict]) -> dict:
 
     return {"aufmacher": aufmacher, "zwei": zwei, "vier": vier,
             "wichtig": wichtig, "ressorts": ressorts,
+            # Wie viele der Fuehrungssaetze des Berichts oberhalb der Falz
+            # wirklich mit ihrer Meldung stehen. Die Zahl ist die Messgroesse
+            # fuer den roten Faden - tests/test_seiten_zahlen.py haelt sie
+            # dagegen, damit die Kopplung nicht still verloren geht.
+            "faden_oben": sum(1 for kandidaten in (faden or [])
+                              if any(h.get("url") in benutzt
+                                     for h in kandidaten)),
             # Was oberhalb der Falz mit eigener Schlagzeile steht. Der Test
             # in tests/test_seiten_zahlen.py haelt diese Zahl gegen die
             # gerenderten Elemente.
@@ -484,6 +620,11 @@ def _nach_ressort(highlights: list[dict]) -> list[dict]:
     Innerhalb eines Ressorts bleibt die Sortierung nach Dringlichkeit, die
     `_flatten()` gesetzt hat - der erste Eintrag ist also der Aufmacher des
     Ressorts.
+
+    `kachel` ist die Auswahl fuer die Ressortuebersicht am Seitenkopf: drei
+    Meldungen, moeglichst bebildert, den Ressortaufmacher immer voran. Sie
+    ist eine Teilmenge von `lead`/`mittel`/`zeilen`, keine zusaetzliche
+    Meldung - die Uebersicht zeigt an, was darunter vollstaendig steht.
     """
     gruppen: dict[str, list[dict]] = {}
     for h in highlights:
@@ -500,9 +641,15 @@ def _nach_ressort(highlights: list[dict]) -> list[dict]:
         lead = next((h for h in eintraege[:5] if _bildbreite(h) >= 500),
                     eintraege[0])
         rest = [h for h in eintraege if h is not lead]
+        # Zwei Begleiter zum Aufmacher: bebilderte zuerst, sonst waere die
+        # Kachel ein Inhaltsverzeichnis. Innerhalb beider Gruppen bleibt die
+        # Reihenfolge nach Dringlichkeit erhalten.
+        begleiter = ([h for h in rest if h.get("image")]
+                     + [h for h in rest if not h.get("image")])[:2]
         out.append({"key": key, "label": _RESSORT_LABEL[key],
                     "lead": lead, "mittel": rest[:4],
-                    "zeilen": rest[4:], "n": len(eintraege)})
+                    "zeilen": rest[4:], "n": len(eintraege),
+                    "kachel": [lead] + begleiter})
     return out
 
 
@@ -679,25 +826,49 @@ def _briefing_lead(md_text: str) -> str:
 
 
 def _promo_lead(md_text: str) -> str:
-    """Kurzer Vorspann aus dem Promo-Wochenbericht fuer die rote Stat-Karte
-    ("Was diese Woche auffaellt") auf der Promo-Uebersicht. Der Bericht
-    beginnt bereits mit einem gleichnamigen Abschnitt, es wird also nur
-    dessen erster Teil fuer die Karte gekuerzt - keine separate Zusammen-
-    fassung wird erfunden."""
+    """Kurzer Vorspann aus dem Promo-Wochenbericht fuer die Karte "Was diese
+    Woche auffaellt". Der Bericht beginnt mit einem gleichnamigen Abschnitt,
+    es wird also nur dessen erster Satz gekuerzt - keine separate
+    Zusammenfassung wird erfunden.
+
+    Nur, wenn es ueberhaupt Saetze sind. Scheitert der Promo-Editor, faellt
+    die Pipeline auf `build_digest()` zurueck, und der schreibt unter
+    derselben Ueberschrift eine Liste von Angebotstiteln. Am 06.08.2026 stand
+    daraus auf der Seite "ALDI TALK imoo Kinder-Smartwatch kaufen + 2
+    MovieChoice-Kinogutscheine ALDI TALK - imoo Kinder-Smartwatch kaufen + 2
+    MovieChoice-Kinogutscheine ." Der Digest sagt jetzt selbst, dass er
+    keiner ist (`DIGEST_MARKER`); hier wird darauf gehoert und lieber nichts
+    zurueckgegeben, als eine Aufzaehlung als Analyse auszugeben. Die Karte
+    zeigt in dem Fall die Datenlage statt eines Textes (siehe Vorlage).
+    """
+    from ..analyze.promo_editor import DIGEST_MARKER
+
     secs = _briefing_sections(md_text)
     if not secs:
         return ""
-    return _first_sentence(_text_aus_html(secs[0]["html"]), 280)
+    text = _text_aus_html(secs[0]["html"])
+    if text.startswith(DIGEST_MARKER):
+        return ""
+    return _first_sentence(text, 280)
 
 
 def _stats(report):
-    """Kennzahlen der aktuellen Woche fuer den Kopf der Wochenseite.
+    """Der Themenradar der aktuellen Woche - mehr braucht die Wochenseite nicht.
 
     Beim Redesign am 06.08.2026 auf das reduziert, was wirklich gerendert
     wird. Entfernt, weil seit Monaten berechnet und in KEINER Vorlage
     referenziert: sov (Share of Voice), pricing, deals, risks/chances und
     n_competitors. Ebenso die Parameter prev_report/trend_reports - sie
     dienten nur der Delta-Rechnung von sov.
+
+    Am 07.08.2026 ist die naechste Schicht gefallen. `kpis` fuetterte die
+    Kachelreihe "Zahlen der Woche"; von ihren fuenf Werten standen zwei
+    (gelesen/relevant) im selben Bildschirm noch einmal als Satz ueber dem
+    Bericht und ein dritter (Top-Technologiethema) als erste Zeile des
+    Themenradars daneben. Dieselbe Information in zwei Formen ist genau die
+    Unruhe, die Antonio benannt hat - die Kachelreihe ist weg, die
+    verbliebenen Zahlen stehen im Berichtskopf. `lead_signal` war noch
+    aelter: berechnet seit Monaten, von keiner Vorlage je gelesen.
     """
     highlights = _flatten(report)
 
@@ -719,32 +890,10 @@ def _stats(report):
         t["ops_top"] = ", ".join(k for k, _ in sorted(t["ops"].items(),
                                                       key=lambda kv: -kv[1])[:2])
 
-    profile = [{"name": c.get("name"), "n": int(c.get("n_items") or 0)}
-               for c in (report.get("competitors") or [])]
-    top_comp = max(profile, key=lambda c: c["n"], default=None)
-
-    lead = next((h for h in highlights if (h.get("relevance") or 0) >= 4), None)
-    if lead:
-        lead = {
-            "title": lead.get("title"), "url": lead.get("url"),
-            "de_title": _first_sentence(lead.get("summary") or "", 150) or lead.get("title"),
-            "op": lead.get("operator") or lead.get("source_label"),
-            "region": lead.get("region"), "category": lead.get("category"),
-            "rel": lead.get("relevance") or 0,
-        }
-    kpis = [
-        {"num": (report.get("stats") or {}).get("new", len(highlights)),
-         "label": "neue Meldungen gelesen"},
-        {"num": len(highlights), "label": "davon relevant", "tint": True},
-        {"num": sum(1 for h in highlights if h.get("relevance") == 5),
-         "label": "sofort ansehen (5/5)", "accent": True},
-        {"num": (tech_radar[0]["theme"] if tech_radar else "-"),
-         "label": "Top-Technologiethema", "text": True},
-    ]
-    if top_comp and top_comp["n"]:
-        kpis.insert(3, {"num": top_comp["name"], "label": "aktivster Wettbewerber",
-                        "text": True})
-    return {"kpis": kpis, "lead_signal": lead, "tech_radar": tech_radar}
+    return {"tech_radar": tech_radar,
+            # Die einzige Zahl der alten Kachelreihe, die sonst nirgends
+            # steht - sie zieht in den Berichtskopf um.
+            "sofort": sum(1 for h in highlights if h.get("relevance") == 5)}
 
 
 def _prep_competitors(report: dict) -> list[dict]:
@@ -876,12 +1025,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 if h.get("image") and h["image"] not in vorhandene_bilder:
                     for feld in ("image", "image_w", "image_h"):
                         h.pop(feld, None)
-    # Die Datumszeile des Zeitungskopfs steht auf JEDER Seite und haengt an
-    # der Ausgabe, nicht an der einzelnen Vorlage - deshalb als Global statt
-    # als Kontextvariable, die man an sechs Aufrufstellen vergessen kann.
-    env.globals["ausgabe_datum"] = _fmt_date_de(reports[0]["date"]) if reports else ""
-    env.globals["ausgabe_quellen"] = (
-        (reports[0].get("stats") or {}).get("sources_total") if reports else None)
+    # Hier standen bis zum 07.08.2026 die Globals `ausgabe_datum` und
+    # `ausgabe_quellen` fuer die Datumszeile des Zeitungskopfs. Die Zeile ist
+    # weg (Antonio: "das ist unnoetig"), also sind es die Werte auch - diese
+    # Codebasis hat schon einmal sechs berechnete Groessen mitgeschleppt, die
+    # keine Vorlage benutzte.
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),
                 "llm": r.get("generated_with_llm", False)} for r in reports]
@@ -894,18 +1042,23 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     latest_ctx: dict | None = None
     for i, report in enumerate(reports):
         highlights = _flatten(report)
+        briefing_md = _strip_vodafone_advice(
+            _strip_suppressed_source_content(report.get("briefing_md", "")))
+        briefing_html, toc = _anchor_headings(_md_to_html(briefing_md))
         # Vier Gewichtsstufen plus Ressortbloecke statt "Aufmacher, drei
-        # gleich grosse Anreisser, flache Liste" - siehe _titelseite().
-        front = _titelseite(highlights)
+        # gleich grosse Anreisser, flache Liste" - siehe _titelseite(). Der
+        # Faden aus dem Bericht bestimmt, WOMIT die Seite fuehrt; die
+        # Gewichtung bleibt davon unberuehrt. Gelesen wird der BEREINIGTE
+        # Bericht - die Seite darf nicht einem Satz folgen, den sie selbst
+        # nicht zeigt.
+        front = _titelseite(highlights,
+                            _faden(highlights, _fuehrende_saetze(briefing_md)))
         competitors = _prep_competitors(report)
         public_highlights = []
         for h in highlights:
             public_h = dict(h)
             public_h.pop("why_it_matters", None)
             public_highlights.append(public_h)
-        briefing_md = _strip_vodafone_advice(
-            _strip_suppressed_source_content(report.get("briefing_md", "")))
-        briefing_html, toc = _anchor_headings(_md_to_html(briefing_md))
         ctx = {
             "report": report, "date_de": _fmt_date_de(report["date"]),
             "highlights": highlights,
@@ -1037,15 +1190,33 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         # promo_pipeline.py) are pipeline STATE, not site output, so they are
         # copied into site/promo/images/ on every render, same as any other
         # generated site asset - never edit/add files under site/ by hand.
+        # Ein leerer Screenshot wird NICHT ausgeliefert. Am 07.08.2026 war das
+        # einzige Bild der ganzen Promo-Uebersicht genau so einer: eine weisse
+        # 1280x720-Flaeche, aufgenommen bevor die Seite stand. Ohne Bild ist
+        # besser als mit leerem Bild - und die Marke faellt damit nur eine
+        # Gewichtsstufe tiefer, sie verschwindet nicht.
         promo_dir_images = site_dir / "promo" / "images"
         promo_image_map: dict[str, str] = {}
         for src in promo_cfg.sources:
             cached = promo_image_path(cfg.root, src.name)
             if not cached.exists():
                 continue
+            if report_bilder.ist_leer(cached.read_bytes()):
+                log.warning("Promo-Screenshot ohne Inhalt, wird nicht "
+                            "ausgeliefert: %s", cached.name)
+                continue
             promo_dir_images.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(cached, promo_dir_images / cached.name)
             promo_image_map[src.name] = f"images/{cached.name}"
+        # Wie site/images/ SPIEGELT auch dieser Ordner, er sammelt nicht -
+        # sonst bliebe der leere Screenshot von oben genau dort liegen, wo er
+        # gerade ausgeschlossen wurde, und eine entfernte Marke behielte ihr
+        # Bild fuer immer.
+        if promo_dir_images.exists():
+            behalten = {Path(p).name for p in promo_image_map.values()}
+            for veraltet in promo_dir_images.iterdir():
+                if veraltet.is_file() and veraltet.name not in behalten:
+                    veraltet.unlink()
 
         promo_view = prepare_promo_view(promo_entries, promo_cfg.sources,
                                         promo_updated, images=promo_image_map)

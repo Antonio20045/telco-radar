@@ -44,6 +44,11 @@ def _initials(name: str) -> str:
 # Ueberblicks. Wird gekappt, sagt die Seite das offen (siehe Template).
 _MAX_HIGHLIGHTS = 9
 
+# Wie viele Aktionen unter der Schwelle die Beistellspalte auffuellen darf.
+# Sechs, weil die Spalte neben Aufmacher und zweiter Reihe steht und darunter
+# nicht laenger werden soll als das, was sie begleitet.
+_MAX_SONSTIGE = 6
+
 
 def _rank_highlights(competitor_brands: list[dict]) -> tuple[list[dict], int]:
     """Hoechstens EIN Highlight je Marke, absteigend nach Score, plus die
@@ -215,12 +220,72 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str,
     grid_brands = [b for b in brands
                    if not b["internal_reference"] and b["name"] != hero_name]
 
+    # ---------------------------------------------------- Gewichtung
+    # Dieselbe Logik wie auf der Titelseite der Marktrecherche
+    # (report/html.py::_titelseite): eine Aktion MIT Bild wird eine Kachel,
+    # eine ohne Bild wird eine Zeile. Die Promo-Uebersicht hatte bis zum
+    # 07.08.2026 gar keine Gewichtung - neun gleich hohe Textsaeulen zu je
+    # 1058 px nebeneinander, kein einziges Bild darin, obwohl 14 brauchbare
+    # Screenshots auf der Platte lagen. Antonio: "hier sind auch nirgendwo
+    # Bilder".
+    rest = highlights[1:]
+    zweite_reihe = [i for i in rest if i["brand"].get("image_url")][:2]
+    zweite_ids = {id(i) for i in zweite_reihe}
+    weitere = [i for i in rest if id(i) not in zweite_ids]
+
+    # Die Schwelle darf schwanken - die Seite nicht. Am 07.08.2026 lag genau
+    # EIN Angebot darueber; Aufmacher, zweite Reihe und Beistellspalte waeren
+    # damit leer geblieben, obwohl 22 Aktionen laufen. Was nicht ueber der
+    # Schwelle liegt, wird deshalb weiter unten aufgefuellt - klar getrennt
+    # und anders beschriftet, damit "wichtig" seine Bedeutung behaelt.
+    gezeigt = {i["offer"].get("id") for i in highlights}
+    if own_anchor:
+        gezeigt.add(own_anchor["offer"].get("id"))
+    sonstige: list[dict] = []
+    for b in sorted((b for b in brands if not b["internal_reference"]),
+                    key=lambda b: -max((e.get("score") or 0) for e in b["active"])
+                    if b["active"] else 0):
+        bestes = next((e for e in sorted(
+            b["active"], key=lambda e: (e.get("score") is not None,
+                                        e.get("score") or 0), reverse=True)
+            if e.get("id") not in gezeigt), None)
+        if bestes is None:
+            continue
+        gezeigt.add(bestes.get("id"))
+        sonstige.append({
+            "brand": b, "offer": bestes, "score": bestes.get("score"),
+            "reason": bestes.get("score_reason") or "",
+            "mechanic": MECHANICS.get(bestes.get("mechanic") or "", ""),
+        })
+    # Die zweite Reihe verlangt ein Bild - sie ist eine Bildposition.
+    if len(zweite_reihe) < 2:
+        for item in sonstige:
+            if len(zweite_reihe) >= 2:
+                break
+            if item["brand"].get("image_url"):
+                zweite_reihe.append(item)
+    zweite_ids = {id(i) for i in zweite_reihe}
+    sonstige = [i for i in sonstige if id(i) not in zweite_ids]
+
     return {
         "brands": brands,
         "grid_brands": grid_brands,
         "hero": hero,
         "highlights": highlights,
-        "highlight_rest": highlights[1:],
+        "highlight_rest": rest,
+        # Die zwei staerksten Aktionen NACH dem Aufmacher, die ein Bild
+        # tragen - sie stehen als Kacheln. Der Rest steht als Zeile.
+        "zweite_reihe": zweite_reihe,
+        "weitere": weitere,
+        # Laufende Aktionen UNTER der Schwelle, hoechstens eine je Marke.
+        # Sie tragen die Seite durch eine ruhige Woche, ohne sich als
+        # "wichtig" auszugeben - die Vorlage beschriftet sie getrennt.
+        "sonstige": sonstige[:_MAX_SONSTIGE],
+        # Wie viele Marken ein echtes Bild beisteuern koennen. Die Zahl
+        # haengt am Abnahmekriterium 4 des Auftrags (mindestens 10 der 15
+        # vorhandenen Screenshots werden gezeigt) und wird in
+        # tests/test_promo_seite.py dagegen gehalten.
+        "brands_mit_bild": sum(1 for b in brands if b.get("image_url")),
         "highlight_count": len(highlights),
         # Alle uebrigen Angebote ueber der Schwelle, die oben NICHT gezeigt
         # werden - weitere Treffer derselben Marke plus alles jenseits der

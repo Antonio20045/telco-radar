@@ -141,10 +141,22 @@ def synthesize(entries: list[dict], model: str, language: str = "Deutsch") -> st
     return markdown
 
 
-def _source_link(e: dict) -> str:
+def _source_link(e: dict, mit_marke: bool = True) -> str:
     brand = e.get("brand") or "Anbieter"
     label = e.get("headline") or "Angebot"
-    return f"[{brand} – {label}]({e.get('url') or ''})"
+    return f"[{brand + ' – ' if mit_marke else ''}{label}]({e.get('url') or ''})"
+
+
+# Der Digest ist KEIN Redaktionstext, und er darf auch nicht so aussehen.
+# Bis zum 07.08.2026 stand er unter derselben Ueberschrift und in derselben
+# Form wie die Prosa des Editors - die Promo-Uebersicht schnitt daraus ihren
+# Vorspann und zeigte am 06.08. "ALDI TALK imoo Kinder-Smartwatch kaufen + 2
+# MovieChoice-Kinogutscheine ALDI TALK - imoo Kinder-Smartwatch kaufen + 2
+# MovieChoice-Kinogutscheine ." - derselbe Titel zweimal, mit freistehendem
+# Punkt. Der Fehler lag nicht im Schnitt, sondern hier: der Titel stand
+# zweimal in der Zeile (einmal blank, einmal als Linktext), und nichts sagte
+# der Seite, dass sie keine Saetze vor sich hat.
+DIGEST_MARKER = "Für diesen Lauf liegt kein Redaktionstext vor."
 
 
 def build_digest(entries: list[dict]) -> str:
@@ -161,12 +173,15 @@ def build_digest(entries: list[dict]) -> str:
             "Im aktuellen Beobachtungszeitraum liegt keine belegte aktive "
             "Aktion vor.")
     else:
+        lines.extend([
+            DIGEST_MARKER + " Aufgelistet stehen die beobachteten Aktionen "
+            "je Anbieter, unredigiert und mit Quelle.", ""])
         by_brand: dict[str, list[dict]] = {}
         for e in ordered:
             by_brand.setdefault(e["brand"], []).append(e)
         for brand, items in by_brand.items():
-            bits = "; ".join(f"{i['headline']} {_source_link(i)}" for i in items[:4])
-            lines.extend([f"**{brand}** {bits}.", ""])
+            bits = "; ".join(_source_link(i, mit_marke=False) for i in items[:4])
+            lines.extend([f"**{brand}:** {bits}.", ""])
 
     lines += ["## Quellenbasis", ""]
     for e in ordered[:20]:

@@ -1,24 +1,37 @@
-{# Alle Meldungen der Woche - als Ressortseite, nicht als Datenbankausgabe.
+{# Alle Meldungen der Woche - erst die Ressorts als Uebersicht, dann auf
+   Klick die Tiefe.
 
    Bis zum 06.08.2026 standen hier 193 identisch gebaute Bloecke
-   untereinander: Bild links, Ueberschrift, Beschreibung, Quelle. Jeder rund
-   150 px hoch, keine Gruppierung, keine Gewichtung. Antonio: "extrem
-   beschissenes Layout" - und er hatte recht, das war eine Tabelle mit
-   Serifenschrift.
+   untereinander. Das wurde am 06.08. zu einer Zeitungsseite mit Ressorts und
+   Gewichtung - besser, aber immer noch 12 249 px hoch: wer wissen wollte, was
+   unter "Geld & Uebernahmen" steht, scrollte acht Bildschirmhoehen. Antonio:
+   "so muss man auch viel runterscrollen und viel entdecken bei den einzelnen
+   Kategorien."
 
-   Jetzt: nach Ressort gruppiert, innerhalb gewichtet. Je Ressort ein
-   Aufmacher mit grossem Bild, zwei mittlere daneben, der Rest als
-   zweispaltige Zeilen mit kleinem Bild. Die Rubrikleiste nennt das Ressort
-   und seine Meldungszahl; die Filterleiste oben springt zu den Ressorts und
-   filtert weiterhin ueber alle.
+   Jetzt zweistufig, und zwar per <details> statt ueber sieben eigene
+   Ressortseiten (Begruendung in outputs/portal-welle2-2026-08-07.md):
+   alle 193 Meldungen bleiben in EINER Datei und damit in einem Suchlauf des
+   Browsers, es gibt keinen zweiten Ladevorgang, und `render_site()` bleibt
+   bei einer Ausgabedatei je Woche.
 
-   Jede Schlagzeile traegt `szl` - daran haengen die Wahrheitstests. #}
+     RESSORTUEBERSICHT  sieben Kacheln, je Ressort drei Meldungen mit Bild
+                        und Schlagzeile. Alle sieben ohne Scrollen sichtbar.
+     RESSORTBLOCK       je Ressort ein <details> mit ALLEN Meldungen in drei
+                        Gewichtungen (Aufmacher, mittlere, Zeilen).
+
+   Der Filter neben "Alle Meldungen" ist am 07.08.2026 entfernt worden
+   (Antonio: "das ist unnoetig") - samt seiner data-such-Attribute und dem
+   zugehoerigen Block in app.js. Die wochenuebergreifende Volltextsuche unten
+   bleibt, sie beantwortet eine andere Frage.
+
+   Jede Schlagzeile traegt `szl` und jede vollstaendig gelistete Meldung die
+   Klasse `meldung` - daran haengen die Wahrheitstests. #}
 {% extends "base.html.j2" %}
 {% set active = 'meldungen' %}
 {% block title %}Vodafone Insights · Alle Meldungen{% endblock %}
 
 {% macro zeile(h) %}
-<article class="mz" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
+<article class="mz meldung">
   <a href="{{ h.url }}" target="_blank" rel="noopener">
     {% if h.image %}<span class="mz-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
        {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
@@ -33,67 +46,92 @@
 {% block content %}
 
 <div class="meldungen-kopf">
-  <div>
-    <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
-    <h1>Alle Meldungen</h1>
-  </div>
-  <div class="meldungen-suche">
-    <input type="search" id="meldung-filter" placeholder="Filtern: Betreiber, Thema, Stichwort …"
-           aria-label="Meldungen filtern" autocomplete="off">
-    <span class="meldungen-zahl" id="meldung-zahl">{{ highlights|length }} Meldungen</span>
-  </div>
+  <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
+  <h1>Alle Meldungen</h1>
+  {% if ressorts %}
+  <p class="meldungen-sub"><b>{{ highlights|length }} Meldungen</b> in {{ ressorts|length }} Ressorts.
+    Jede Kachel zeigt die wichtigsten ihres Ressorts &ndash; &bdquo;alle&ldquo; klappt das
+    vollständige Ressort darunter auf.</p>
+  {% endif %}
 </div>
 
 {% if ressorts %}
-{# Ressortleiste: springt zum Block. Kein Filter - der Filter oben sucht im
-   Text, diese Zeile ist die Gliederung der Seite. #}
-<nav class="ressort-nav" aria-label="Ressorts">
-  {% for r in ressorts %}<a href="#ressort-{{ r.key }}">{{ r.label }} <b>{{ r.n }}</b></a>{% endfor %}
-</nav>
-
-{% for r in ressorts %}
-<section class="mressort" id="ressort-{{ r.key }}">
-  <div class="rubrik">
-    <h2>{{ r.label }}</h2>
-    <span class="count-badge">{{ r.n }} Meldungen</span>
-  </div>
-
-  <div class="mressort-oben">
-    <article class="mlead{% if not r.lead.image %} ohne-bild{% endif %}" data-such="{{ ((r.lead.operator or '') ~ ' ' ~ (r.lead.schlagzeile or '') ~ ' ' ~ (r.lead.summary or '') ~ ' ' ~ (r.lead.region or '') ~ ' ' ~ (r.lead.category or '') ~ ' ' ~ (r.lead.source_label or '')) | lower }}">
-      <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
-        {% if r.lead.image %}<span class="mlead-bild"><img src="{{ prefix }}images/{{ r.lead.image }}" alt=""
-           {% if r.lead.image_w %}width="{{ r.lead.image_w }}" height="{{ r.lead.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
-        <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}{% if r.lead.date %} · {{ r.lead.date }}{% endif %}</span>
-        <span class="mlead-titel szl">{{ r.lead.schlagzeile }}</span>
-        {% if r.lead.summary %}<span class="mlead-anriss">{{ r.lead.summary }}</span>{% endif %}
+{# Die Uebersicht: sieben Kacheln, keine Sprungleiste. Eine Sprungleiste war
+   die Kruecke einer zu langen Seite - sie bewies das Problem, statt es zu
+   loesen. #}
+<div class="ressort-kacheln">
+  {% for r in ressorts %}
+  <section class="rkachel">
+    <div class="rubrik">
+      <h2>{{ r.label }}</h2>
+      <span class="count-badge">{{ r.n }}</span>
+    </div>
+    {% for h in r.kachel %}
+    <article class="rk-stueck{% if loop.first %} rk-lead{% endif %}{% if not h.image %} ohne-bild{% endif %}">
+      <a href="{{ h.url }}" target="_blank" rel="noopener">
+        {% if h.image %}<span class="rk-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+           {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
+           loading="{{ 'eager' if loop.first else 'lazy' }}"></span>{% endif %}
+        <span class="rk-text">
+          <span class="rk-titel szl">{{ h.schlagzeile }}</span>
+          <span class="rk-meta">{{ h.operator or h.source_label }}</span>
+        </span>
       </a>
     </article>
-    {% if r.mittel %}
-    <div class="mmittel">
-      {% for h in r.mittel %}
-      <article class="mzwei{% if not h.image %} ohne-bild{% endif %}" data-such="{{ ((h.operator or '') ~ ' ' ~ (h.schlagzeile or '') ~ ' ' ~ (h.summary or '') ~ ' ' ~ (h.region or '') ~ ' ' ~ (h.category or '') ~ ' ' ~ (h.source_label or '')) | lower }}">
-        <a href="{{ h.url }}" target="_blank" rel="noopener">
-          {% if h.image %}<span class="mzwei-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
-             {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
-          <span class="mzwei-text">
-            <span class="mzwei-titel szl">{{ h.schlagzeile }}</span>
-            <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}</span>
-          </span>
+    {% endfor %}
+    <a class="rkachel-alle" href="#ressort-{{ r.key }}" data-oeffnet="ressort-{{ r.key }}">alle {{ r.n }} &darr;</a>
+  </section>
+  {% endfor %}
+</div>
+
+{# Die Tiefe. Zugeklappt, aber vollstaendig im Quelltext: keine Meldung
+   verschwindet, die Browsersuche findet weiterhin alles, und der Suchindex
+   liest ohnehin die Berichtsdatei. #}
+<div class="ressort-tiefe">
+  {% for r in ressorts %}
+  <details class="mressort" id="ressort-{{ r.key }}">
+    <summary class="rubrik">
+      <h2>{{ r.label }}</h2>
+      <span class="count-badge">{{ r.n }} Meldungen</span>
+      <span class="mressort-hinweis">öffnen</span>
+    </summary>
+
+    <div class="mressort-oben">
+      <article class="mlead meldung{% if not r.lead.image %} ohne-bild{% endif %}">
+        <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
+          {% if r.lead.image %}<span class="mlead-bild"><img src="{{ prefix }}images/{{ r.lead.image }}" alt=""
+             {% if r.lead.image_w %}width="{{ r.lead.image_w }}" height="{{ r.lead.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
+          <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}{% if r.lead.date %} · {{ r.lead.date }}{% endif %}</span>
+          <span class="mlead-titel szl">{{ r.lead.schlagzeile }}</span>
+          {% if r.lead.summary %}<span class="mlead-anriss">{{ r.lead.summary }}</span>{% endif %}
         </a>
       </article>
-      {% endfor %}
+      {% if r.mittel %}
+      <div class="mmittel">
+        {% for h in r.mittel %}
+        <article class="mzwei meldung{% if not h.image %} ohne-bild{% endif %}">
+          <a href="{{ h.url }}" target="_blank" rel="noopener">
+            {% if h.image %}<span class="mzwei-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+               {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %} loading="lazy"></span>{% endif %}
+            <span class="mzwei-text">
+              <span class="mzwei-titel szl">{{ h.schlagzeile }}</span>
+              <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}</span>
+            </span>
+          </a>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {% if r.zeilen %}
+    <div class="mzeilen">
+      {% for h in r.zeilen %}{{ zeile(h) }}{% endfor %}
     </div>
     {% endif %}
-  </div>
-
-  {% if r.zeilen %}
-  <div class="mzeilen">
-    {% for h in r.zeilen %}{{ zeile(h) }}{% endfor %}
-  </div>
-  {% endif %}
-</section>
-{% endfor %}
-<p class="empty-note" id="meldung-leer" hidden>Keine Meldung passt zu diesem Filter.</p>
+  </details>
+  {% endfor %}
+</div>
 {% else %}
 <p class="empty-note">Für die aktuelle Woche liegen noch keine bewerteten Meldungen vor.</p>
 {% endif %}

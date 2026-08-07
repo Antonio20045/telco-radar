@@ -1,163 +1,192 @@
+{# Die Promo Uebersicht: wer wirbt gerade womit.
+
+   Antonio am 07.08.2026: "Promo-Uebersicht ist richtig beschissen. Ganz
+   neues Layout, hier sind auch nirgendwo Bilder. Es ist beschissenes
+   Layout, viel unnoetiger Text." Gemessen war das exakt richtig:
+
+     Seitenhoehe            5 794 px
+     sichtbarer Text        3 184 Woerter
+     <img> auf der Seite            2   (eines davon das Logo)
+     Screenshots vorhanden         15
+     davon gerendert                1   - und ausgerechnet der leer (6 KB)
+
+   Die Seite war beim Nachrichtenportal-Umbau absichtlich nicht angefasst
+   worden und trug deshalb noch die Struktur von davor: neun Textsaeulen zu
+   je 1058 px nebeneinander, ohne ein einziges Bild. Dieselbe Diagnose wie
+   bei der alten Meldungsseite - eine Datenbankausgabe.
+
+   Jetzt dieselbe Designsprache wie die Marktrecherche (Newsprint, Serife,
+   Linien statt Kaesten, Rot als Akzent) und dieselbe Gewichtungslogik: eine
+   Aktion MIT Bild wird eine Kachel, eine ohne Bild eine Zeile. Aber eine
+   andere Frage - nicht "was ist passiert", sondern "wer wirbt gerade womit".
+
+     AUFMACHER      die wichtigste Aktion, gross, mit Screenshot.
+     ZWEITE REIHE   die zwei naechsten mit Screenshot.
+     ZEILEN         alles Weitere ueber der Schwelle, ohne Bild.
+     MARKENRASTER   je Marke eine Kachel mit Screenshot, zwei Angeboten und
+                    dem Rest hinter einem Klick.
+
+   Was auf einen Blick beantwortet sein muss: welche Marke, welches
+   Angebot, wie wichtig, bis wann, Link. Alles andere ist Tiefe und steht
+   hinter einem <details>.
+
+   Jede Schlagzeile traegt `szl`. #}
 {% extends "base.html.j2" %}
 {% set usecase = 'promo' %}
 {% set active = 'promo_uebersicht' %}
-{% block title %}Promo Übersicht · Übersicht{% endblock %}
+{% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
 
-{% macro promo_offer(o) %}
-<li class="promo-offer{% if o.fading %} promo-offer--fading{% endif %}">
-  <div class="promo-offer-top">
-    <a class="promo-offer-title" href="{{ o.url }}" target="_blank" rel="noopener">{{ o.headline }}</a>
-    {% if o.highlight %}<span class="promo-score-dot" title="Wichtigkeits-Score {{ o.score }} von 100">{{ o.score }}</span>{% endif %}
-    {% if o.fading %}<span class="promo-offer-fading-tag">vermutlich ausgelaufen</span>{% elif o.neu %}<span class="dz-new">neu</span>{% endif %}
-  </div>
-  <p class="promo-offer-meta">{{ o.url | domain }}{% if o.valid_until %} · gültig laut Anbieter bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}</p>
-  {% if o.description %}
-  <details class="promo-offer-desc-toggle">
-    <summary>mehr erfahren</summary>
-    <p class="promo-offer-desc">{{ o.description }}</p>
-  </details>
-  {% endif %}
-</li>
-{% endmacro %}
+{% macro meta_zeile(o) -%}
+{{ o.url | domain }}{% if o.valid_until %} · bis {{ o.valid_until }}{% endif %} · geprüft {{ o.last_verified | date_de }}
+{%- endmacro %}
 
-{% macro highlight_card(item, kind='rival') %}
-<article class="promo-top-card{% if kind == 'anchor' %} promo-top-card--own{% endif %}" style="--c:{{ item.brand.color }}">
-  <div class="promo-top-card-head">
-    <span class="promo-top-brand">{{ item.brand.name }}</span>
-    {% if kind == 'anchor' %}
-    <span class="promo-top-anchor-tag">eigenes Angebot</span>
-    {% else %}
-    <span class="promo-top-score" title="Wichtigkeits-Score {{ item.score }} von 100">{{ item.score }}</span>
-    {% endif %}
-  </div>
-  <a class="promo-top-headline" href="{{ item.offer.url }}" target="_blank" rel="noopener">{{ item.offer.headline }}</a>
-  {% if item.reason %}<p class="promo-top-reason">{{ item.reason }}</p>{% endif %}
-  <p class="promo-top-meta">
-    {% if item.mechanic %}<span class="promo-top-mech">{{ item.mechanic }}</span>{% endif %}
-    <span class="promo-top-metatext">{{ item.offer.url | domain }}{% if item.offer.valid_until %} · bis {{ item.offer.valid_until }}{% endif %}{% if kind == 'anchor' and item.score %} · Wichtigkeit {{ item.score }}{% endif %}</span>
-  </p>
+{# Eine Aktion als Zeile: Marke, Schlagzeile, Score. Kein Bild, keine
+   Beschreibung - der Link fuehrt zur Aktionsseite des Anbieters, und die
+   ist immer aktueller als jede Abschrift. #}
+{% macro aktion_zeile(item, klasse='pz') %}
+<article class="{{ klasse }}">
+  <a href="{{ item.offer.url }}" target="_blank" rel="noopener">
+    <span class="pz-text">
+      <span class="pz-marke">{{ item.brand.name }}</span>
+      <span class="pz-titel szl">{{ item.offer.headline }}</span>
+      <span class="pz-meta">{{ meta_zeile(item.offer) }}</span>
+    </span>
+    {% if item.score %}<span class="pz-score" title="Wichtigkeit {{ item.score }} von 100">{{ item.score }}</span>{% endif %}
+  </a>
 </article>
 {% endmacro %}
 
 {% block content %}
+
+<div class="promo-kopf">
+  <p class="page-kicker">Deutschland · Aktions- und Tarifseiten</p>
+  <h1>Wer wirbt gerade womit</h1>
+  <p class="promo-kopf-zahlen">
+    <b>{{ promo_view.active_total }}</b> laufende Aktionen bei
+    <b>{{ promo_view.brands_active }}</b> von {{ promo_view.brands_tracked }} beobachteten Wettbewerbern,
+    <b>{{ promo_view.highlight_count }}</b> davon über der Wichtigkeitsschwelle.
+    Jede Kachel verlinkt direkt auf die Aktionsseite des Anbieters.
+  </p>
+</div>
+
+{# ==================================================== OBEN: DIE WICHTIGEN #}
+<div class="promo-oben">
+  <div class="promo-oben-haupt">
+    {% if promo_view.hero %}
+    {% set hb = promo_view.hero.brand %}
+    {% set ho = promo_view.hero.offer %}
+    <article class="paufmacher{% if not hb.image_url %} ohne-bild{% endif %}">
+      <p class="page-kicker">{% if promo_view.highlights %}Wichtigste Aktion{% else %}Aktuelle Aktion{% endif %} · {{ hb.name }}</p>
+      <h2 class="paufmacher-titel szl"><a href="{{ ho.url }}" target="_blank" rel="noopener">{{ ho.headline }}</a></h2>
+      {% if hb.image_url %}
+      <figure class="paufmacher-bild">
+        <img src="{{ hb.image_url }}" alt="" width="1280" height="720" loading="eager">
+        <figcaption>Aktionsseite {{ ho.url | domain }}, aufgenommen am {{ ho.last_verified | date_de }}</figcaption>
+      </figure>
+      {% endif %}
+      {% if promo_view.hero.reason %}<p class="paufmacher-grund">{{ promo_view.hero.reason }}</p>{% endif %}
+      <p class="paufmacher-meta">
+        {% if promo_view.hero.mechanic %}<span class="pmech">{{ promo_view.hero.mechanic }}</span>{% endif %}
+        {% if promo_view.hero.score %}<span class="pz-score">{{ promo_view.hero.score }}</span>{% endif %}
+        <span>{{ meta_zeile(ho) }}</span>
+        <a href="{{ ho.url }}" target="_blank" rel="noopener">Zum Angebot &nearr;</a>
+      </p>
+    </article>
+    {% else %}
+    <section class="page-hero"><h2 class="szl">Zurzeit ist keine Aktion bestätigt.</h2></section>
+    {% endif %}
+
+    {% if promo_view.zweite_reihe %}
+    <div class="promo-reihe">
+      {% for item in promo_view.zweite_reihe %}
+      <article class="pstueck">
+        <a href="{{ item.offer.url }}" target="_blank" rel="noopener">
+          <span class="pstueck-bild"><img src="{{ item.brand.image_url }}" alt=""
+            width="1280" height="720" loading="lazy"></span>
+          <span class="stueck-kicker">{{ item.brand.name }}</span>
+          <span class="pstueck-titel szl">{{ item.offer.headline }}</span>
+          <span class="pz-meta">{% if item.mechanic %}{{ item.mechanic }} · {% endif %}{{ meta_zeile(item.offer) }}</span>
+        </a>
+        {% if item.score %}<span class="pz-score pstueck-score">{{ item.score }}</span>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  {# Die Spalte daneben: alles Weitere ueber der Schwelle als Zeile, dazu
+     Vodafones eigenes Angebot als Vergleichsanker. #}
+  <aside class="promo-rail">
+    {% if promo_view.weitere %}
+    <div class="rubrik"><h2>Ebenfalls über der Schwelle</h2></div>
+    <div class="promo-zeilen">
+      {% for item in promo_view.weitere %}{{ aktion_zeile(item) }}{% endfor %}
+    </div>
+    {% endif %}
+    {% if promo_view.sonstige %}
+    <div class="rubrik{% if promo_view.weitere %} rubrik-weiter{% endif %}"><h2>Ebenfalls beobachtet</h2></div>
+    <div class="promo-zeilen">
+      {% for item in promo_view.sonstige %}{{ aktion_zeile(item) }}{% endfor %}
+    </div>
+    <p class="promo-eigen-note">Laufende Aktionen unterhalb der Wichtigkeitsschwelle &ndash; je Marke die stärkste.</p>
+    {% endif %}
+    {% if promo_view.highlight_dropped %}
+    <p class="promo-top-note">{{ promo_view.highlight_dropped }} weitere Aktion{{ 'en' if promo_view.highlight_dropped != 1 else '' }}
+      über der Schwelle {{ 'stehen' if promo_view.highlight_dropped != 1 else 'steht' }} unten bei der jeweiligen Marke.</p>
+    {% endif %}
+
+    {% if promo_view.own_anchor %}
+    <div class="rubrik rubrik-eigen"><h2>Vodafone selbst</h2></div>
+    <div class="promo-zeilen">{{ aktion_zeile(promo_view.own_anchor, 'pz pz-eigen') }}</div>
+    <p class="promo-eigen-note">Als Vergleichsanker geführt, nicht als Wettbewerber gezählt.</p>
+    {% endif %}
+  </aside>
+</div>
+
+{# ======================================================= DAS MARKENRASTER #}
+<div class="rubrik promo-rubrik-board">
+  <h2>Alle {{ promo_view.active_total }} Aktionen nach Anbieter</h2>
+  <div class="promo-tabs" role="group" aria-label="Nach Anbietertyp filtern">
+    <button type="button" class="promo-filter on" data-tier="all">Alle</button>
+    <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
+    <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
+  </div>
+</div>
+
 {% set active_brands = promo_view.grid_brands | selectattr('has_offers') | list %}
 {% set inactive_brands = promo_view.grid_brands | rejectattr('has_offers') | list %}
 
-<section class="page-hero wide">
-  <p class="page-kicker">Deutschland &middot; Promo-Markt</p>
-  <div class="page-hero-row">
-    <h1>Wer wirbt gerade womit.</h1>
-    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
-  </div>
-  <p class="page-lead">Auf einen Blick: welche Tarif-, Rabatt- und Kampagnenaktion gerade bei welchem Wettbewerber läuft &ndash; die wichtigsten zuerst. Jede Karte verlinkt <b>direkt auf die Original-Aktionsseite</b> des Anbieters.</p>
-  <div class="stat-inline-row">
-    <span class="stat-inline accent"><b>{{ promo_view.highlight_count }}</b><span>Angebote über der Wichtigkeitsschwelle</span></span>
-    <span class="stat-inline"><b>{{ promo_view.active_total }}</b><span>aktive Aktionen insgesamt</span></span>
-    <span class="stat-inline"><b>{{ promo_view.brands_tracked }}</b><span>beobachtete Wettbewerber</span></span>
-  </div>
-</section>
-
-<div class="promo-section-head">
-  <h2>Die wichtigsten Angebote gerade</h2>
-  <span>
-    {% if promo_view.highlights %}
-      je Marke das stärkste Angebot über der Wichtigkeitsschwelle
-    {% elif promo_view.scored_total %}
-      ruhige Woche &ndash; keine der {{ promo_view.scored_total }} bewerteten Aktionen über der Schwelle
-    {% else %}
-      Bewertung folgt mit dem nächsten Lauf
-    {% endif %}
-  </span>
-</div>
-
-<div class="promo-hero-row">
-  {% if promo_view.hero %}
-  {% set hb = promo_view.hero.brand %}
-  {% set ho = promo_view.hero.offer %}
-  <div class="promo-hero-card" style="--c:{{ hb.color }}">
-    {% if hb.image_url %}<img src="{{ hb.image_url }}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
-    {% else %}<span class="promo-hero-fallback"><span class="promo-avatar">{{ hb.initials }}</span></span>{% endif %}
-    <div class="promo-hero-overlay"></div>
-    <div class="promo-hero-content">
-      <div class="promo-hero-badges">
-        <span class="promo-hero-badge">{% if promo_view.highlights %}Wichtigstes Angebot{% else %}Top-Angebot{% endif %} &middot; {{ hb.name }}</span>
-        {% if promo_view.hero.score is defined and promo_view.hero.score %}
-        <span class="promo-hero-score" title="Wichtigkeits-Score {{ promo_view.hero.score }} von 100"><b>{{ promo_view.hero.score }}</b><span>Wichtigkeit</span></span>
-        {% endif %}
-      </div>
-      <div class="promo-hero-headline">{{ ho.headline }}</div>
-      {% if promo_view.hero.reason is defined and promo_view.hero.reason %}
-      <p class="promo-hero-reason">{{ promo_view.hero.reason }}</p>
-      {% endif %}
-      <p class="promo-hero-meta">{{ ho.url | domain }}{% if ho.valid_until %} · gültig laut Anbieter bis {{ ho.valid_until }}{% endif %} · geprüft {{ ho.last_verified | date_de }}</p>
-      <a class="promo-hero-link" href="{{ ho.url }}" target="_blank" rel="noopener">Zum Angebot &nearr;</a>
-    </div>
-  </div>
-  {% else %}
-  <div class="promo-hero-card" style="display:flex;align-items:center;justify-content:center;min-height:240px">
-    <p style="color:rgba(255,255,255,.75);font-size:14px;font-weight:600;margin:0">Noch keine bestätigte Aktion beobachtet.</p>
-  </div>
-  {% endif %}
-
-  <div class="promo-stat-card">
-    <div>
-      <p class="promo-stat-kicker">Was diese Woche auffällt</p>
-      <p>{{ promo_lead if promo_lead else 'Für diese Woche liegt noch keine Analyse vor.' }}</p>
-    </div>
-    {% if promo_report_html %}<a class="promo-stat-link" href="#promo-wochentext">Analyse lesen &nearr;</a>{% endif %}
-  </div>
-</div>
-
-{% if promo_view.highlight_rest or promo_view.own_anchor %}
-<div class="promo-top-grid">
-  {% for item in promo_view.highlight_rest %}{{ highlight_card(item) }}{% endfor %}
-  {% if promo_view.own_anchor %}{{ highlight_card(promo_view.own_anchor, 'anchor') }}{% endif %}
-</div>
-{% endif %}
-
-{% if promo_view.highlight_dropped %}
-<p class="promo-top-note">{{ promo_view.highlight_dropped }} weitere Aktion{{ 'en' if promo_view.highlight_dropped != 1 else '' }} {{ 'liegen' if promo_view.highlight_dropped != 1 else 'liegt' }} ebenfalls über der Schwelle und {{ 'sind' if promo_view.highlight_dropped != 1 else 'ist' }} unten bei der jeweiligen Marke mit ihrem Score zu finden.</p>
-{% endif %}
-
-<details class="promo-method">
-  <summary>Wie entsteht die Reihenfolge &bdquo;wichtig&ldquo;?</summary>
-  <div class="promo-method-body">
-    <p>Jedes Angebot bekommt einen Score von 0 bis 100. Er entsteht aus fünf getrennt bewerteten Achsen mit jeweils null bis drei Punkten und fest formulierten Stufen &ndash; kein Vergleich mit den Angeboten dieser Woche, sondern eine feste Skala. Nur so bedeutet ein Score von 80 nächsten Monat noch dasselbe, und nur so darf die Anzahl der Highlights ehrlich schwanken.</p>
-    <ul>
-      <li><b>Wechselhebel (30 %)</b> &ndash; wie direkt greift das Angebot die Hürde an, die einen Kunden bisher hält? Eine Wechsel- oder Altgerätprämie zählt hier höher als derselbe Betrag als reiner Rabatt.</li>
-      <li><b>Angebotstiefe (25 %)</b> &ndash; wie groß ist der bezifferbare wirtschaftliche Vorteil?</li>
-      <li><b>Marktreichweite (20 %)</b> &ndash; Netzbetreiber, breit distribuierte Handelsmarke oder reine Online-Zweitmarke.</li>
-      <li><b>Marktbewegung (15 %)</b> &ndash; wie viele andere Marken fahren gerade dieselbe Mechanik?</li>
-      <li><b>Kampagnencharakter (10 %)</b> &ndash; befristete Aktion mit Enddatum oder unbefristeter Dauerpreis.</li>
-    </ul>
-    <p>Die ersten beiden Achsen bewertet ein eigener Prüfagent, der dafür eine wörtliche Belegstelle aus dem Angebotstext nennen muss; ohne Beleg wird die Bewertung gedeckelt. Die übrigen drei rechnet die Pipeline selbst aus, ohne Sprachmodell. Einmal vergebene Bewertungen werden eingefroren und erst neu ermittelt, wenn sich der Angebotstext ändert &ndash; ein Angebot verschwindet also nicht aus den Highlights, nur weil ein Lauf anders ausfällt.</p>
-    <p class="promo-method-caveat">Ein hoher Score heißt <b>beobachten</b>, nicht reagieren. Die Wettbewerbsforschung zeigt, dass auf Preisaktionen der Konkurrenz in gut der Hälfte der Fälle gar keine Reaktion erfolgt &ndash; und dass Manager eher über- als unterreagieren.</p>
-  </div>
-</details>
-
-<div class="promo-tabs" role="group" aria-label="Nach Anbietertyp filtern">
-  <button type="button" class="promo-filter on" data-tier="all">Alle</button>
-  <button type="button" class="promo-filter" data-tier="1">Netzbetreiber</button>
-  <button type="button" class="promo-filter" data-tier="2">Discount &amp; Zweitmarken</button>
-</div>
-
-<div class="promo-section-head">
-  <h2>Alle {{ promo_view.active_total }} Aktionen nach Anbieter</h2>
-  <span>{{ promo_view.brands_active }} Wettbewerber mit laufender Aktion</span>
-</div>
-
 <div class="promo-board" id="promo-board">
   {% for b in active_brands %}
-  <article class="promo-card" data-tier="{{ b.tier }}">
-    <div class="promo-card-head">
+  <article class="pmarke{% if not b.image_url %} ohne-bild{% endif %}" data-tier="{{ b.tier }}">
+    {% if b.image_url %}
+    <span class="pmarke-bild"><img src="{{ b.image_url }}" alt="" width="1280" height="720" loading="lazy"></span>
+    {% endif %}
+    <div class="pmarke-kopf">
       <h3>{{ b.name }}</h3>
-      <span class="promo-count{% if b.active_count %} live{% endif %}">{{ b.active_count }} aktiv</span>
+      <span class="count-badge">{{ b.active_count }} aktiv</span>
     </div>
-    {% if b.group and b.group != b.name %}<p class="promo-card-sub">{{ b.group }}</p>{% endif %}
-
-    <ul class="promo-offers">
-      {% for o in b.active %}{{ promo_offer(o) }}{% endfor %}
+    <ul class="pmarke-liste">
+      {% for o in b.active[:2] %}
+      <li class="pmarke-zeile{% if o.fading %} pmarke-zeile--fading{% endif %}">
+        <a href="{{ o.url }}" target="_blank" rel="noopener" class="szl">{{ o.headline }}</a>
+        <span class="pz-meta">{% if o.fading %}vermutlich ausgelaufen · {% elif o.neu %}neu · {% endif %}{{ meta_zeile(o) }}</span>
+      </li>
+      {% endfor %}
     </ul>
+    {% if b.active|length > 2 %}
+    <details class="pmarke-mehr">
+      <summary>alle {{ b.active|length }} Aktionen von {{ b.name }}</summary>
+      <ul class="pmarke-liste">
+        {% for o in b.active[2:] %}
+        <li class="pmarke-zeile{% if o.fading %} pmarke-zeile--fading{% endif %}">
+          <a href="{{ o.url }}" target="_blank" rel="noopener" class="szl">{{ o.headline }}</a>
+          <span class="pz-meta">{% if o.fading %}vermutlich ausgelaufen · {% elif o.neu %}neu · {% endif %}{{ meta_zeile(o) }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
     {% if b.stale %}
     <p class="promo-stale-note">{{ b.stale|length }} frühere Aktion{{ 'en' if b.stale|length != 1 else '' }} ausgelaufen.</p>
     {% endif %}
@@ -166,20 +195,71 @@
 </div>
 
 {% if inactive_brands %}
-<div class="promo-inactive">
-  <span class="promo-inactive-label">Ohne aktuelle Aktion</span>
-  {% for b in inactive_brands %}<span class="promo-inactive-op">{{ b.name }}</span>{% endfor %}
+{# Beobachtet, aber ohne bestaetigte Aktion. Die Zeile stand hier vorher als
+   reine Namensliste. Sie traegt jetzt den Screenshot der Marke - klein, denn
+   "hier laeuft gerade nichts" ist keine Nachricht -, weil sie damit belegt,
+   dass wirklich hingesehen wurde. Genau dafuer steht die Marke ueberhaupt
+   auf der Seite (siehe report/promo.py, Modul-Docstring): Luecken zeigen
+   statt verstecken. #}
+<div class="rubrik promo-rubrik-ruhe"><h2>Beobachtet, ohne laufende Aktion</h2></div>
+<div class="promo-ruhe">
+  {% for b in inactive_brands %}
+  <article class="pruhe{% if not b.image_url %} ohne-bild{% endif %}">
+    {% if b.image_url %}
+    <span class="pruhe-bild"><img src="{{ b.image_url }}" alt="" width="1280" height="720" loading="lazy"></span>
+    {% endif %}
+    <span class="pruhe-name">{{ b.name }}</span>
+    <span class="pz-meta">keine bestätigte Aktion</span>
+  </article>
+  {% endfor %}
 </div>
 {% endif %}
 
-{% if promo_report_html %}
-<details class="evidence" id="promo-wochentext" style="margin-top:34px">
-  <summary><span>Wochentext lesen: wie sich das Preis- und Aktionsbild insgesamt entwickelt</span><small>{% if promo_report_date %}{{ promo_report_date }}{% endif %}</small></summary>
-  <div class="evidence-body">
-    <article class="prose">{{ promo_report_html | safe }}</article>
-  </div>
-</details>
-{% endif %}
+{# ============================================================= DIE TIEFE #}
+<div class="promo-tiefe">
+  <details class="promo-method">
+    <summary>Was diese Woche auffällt &ndash; und wie die Reihenfolge entsteht</summary>
+    <div class="promo-method-body">
+      {% if promo_lead %}
+      <p class="promo-lead-text">{{ promo_lead }}</p>
+      {% else %}
+      {# Kein Redaktionstext: der Promo-Editor ist ausgefallen und die
+         Pipeline hat auf den Digest zurueckgegriffen. Das sagt die Seite,
+         statt eine Aufzaehlung von Angebotstiteln als Analyse auszugeben -
+         genau das stand hier am 06.08.2026 (derselbe Titel zweimal, mit
+         freistehendem Punkt am Ende). #}
+      <p class="promo-lead-text muted-note">Für diesen Lauf liegt kein Redaktionstext vor.
+        Die {{ promo_view.active_total }} bestätigten Aktionen stehen oben, jede mit Quelle und Prüfdatum.</p>
+      {% endif %}
+      {% if promo_report_html %}<p class="promo-method-mehr"><a href="#promo-wochentext">Den ganzen Wochentext lesen &darr;</a></p>{% endif %}
+      <p><b>Die Reihenfolge &bdquo;wichtig&ldquo;:</b> jedes Angebot bekommt einen Score von 0 bis 100 aus
+        fünf getrennt bewerteten Achsen auf einer festen Skala &ndash; kein Vergleich mit den Angeboten
+        dieser Woche. Nur so bedeutet ein Score von 80 nächsten Monat noch dasselbe.</p>
+      <ul>
+        <li><b>Wechselhebel (30 %)</b> &ndash; wie direkt greift das Angebot die Hürde an, die einen Kunden bisher hält?</li>
+        <li><b>Angebotstiefe (25 %)</b> &ndash; wie groß ist der bezifferbare wirtschaftliche Vorteil?</li>
+        <li><b>Marktreichweite (20 %)</b> &ndash; Netzbetreiber, Handelsmarke oder Online-Zweitmarke.</li>
+        <li><b>Marktbewegung (15 %)</b> &ndash; wie viele andere Marken fahren dieselbe Mechanik?</li>
+        <li><b>Kampagnencharakter (10 %)</b> &ndash; befristete Aktion oder Dauerpreis.</li>
+      </ul>
+      <p>Die ersten beiden Achsen bewertet ein Prüfagent, der dafür eine wörtliche Belegstelle aus dem
+        Angebotstext nennen muss; ohne Beleg wird die Bewertung gedeckelt. Die übrigen drei rechnet die
+        Pipeline ohne Sprachmodell.</p>
+      <p class="promo-method-caveat">Ein hoher Score heißt <b>beobachten</b>, nicht reagieren.</p>
+    </div>
+  </details>
 
-<p class="dz-foot">Diese Seite beobachtet die öffentlichen Aktions- und Tarifseiten deutscher Telcos direkt (Snapshot-Vergleich von Lauf zu Lauf, keine Presse-Feeds). Jede Karte trägt eine Originalquelle und ein Prüfdatum; Preise werden bewusst nicht als dauerhaft gültig übernommen – für den aktuellen Stand gilt immer die verlinkte Seite des Anbieters. Vodafones eigene Aktionsseite wird separat als interne Referenz geführt, nicht als Wettbewerber gezählt.</p>
+  {% if promo_report_html %}
+  <details class="evidence" id="promo-wochentext">
+    <summary><span>Der ganze Wochentext</span><small>{% if promo_report_date %}{{ promo_report_date }}{% endif %}</small></summary>
+    <div class="evidence-body">
+      <article class="prose">{{ promo_report_html | safe }}</article>
+    </div>
+  </details>
+  {% endif %}
+</div>
+
+<p class="dz-foot">Diese Seite beobachtet die öffentlichen Aktionsseiten deutscher Telcos direkt
+  (Snapshot-Vergleich von Lauf zu Lauf, keine Presse-Feeds). Für den aktuellen Stand gilt immer die
+  verlinkte Seite des Anbieters. <a href="{{ prefix }}promo/quellen.html">Welche Seiten beobachtet werden &rsaquo;</a></p>
 {% endblock %}

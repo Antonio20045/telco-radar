@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Abnahme des Nachrichtenportals - misst, statt zu behaupten.
+"""Abnahme des Portals - misst, statt zu behaupten.
 
-Die Session, die diesem Auftrag vorausging, ist an einem Satz gescheitert:
-"Jetzt sind ueberall Bilder" - tatsaechlich hatten 31 von 193 Meldungen
-eins. Dieses Skript prueft die sechs Kriterien aus
-AUFTRAG_NACHRICHTENPORTAL.md §5, die sich maschinell pruefen lassen, gegen
-die WIRKLICH gerenderte Seite:
+Die Session, die dem Nachrichtenportal-Auftrag vorausging, ist an einem
+Satz gescheitert: "Jetzt sind ueberall Bilder" - tatsaechlich hatten 31 von
+193 Meldungen eins. Dieses Skript prueft gegen die WIRKLICH gerenderte
+Seite:
 
   1. Oberhalb der Falz stehen bei 1440 px Breite >= 6 Geschichten.
-  2. >= 110 von ~193 Meldungen haben ein Bild.
+  2. Mindestens 57 % der Meldungen haben ein Bild.
   3. Kein Bild im Aufmacher oder in der zweiten Reihe ist schmaler als 800 px.
-  4. Die Meldungsseite ist nach Ressorts gruppiert und gewichtet, und die
-     erste Meldung ist ohne Scrollen sichtbar.
+  4. Die Meldungsseite ist nach Ressorts gruppiert und gewichtet.
   5. Keine Schlagzeile endet auf "…".
   6. Kein Bild wird hochskaliert dargestellt (Anzeigebreite > Dateibreite).
 
-Kriterium 1 und 4 brauchen einen echten Browser - Chromium liegt unter
+Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
+
+  7. Alle Ressorts der Meldungsseite sind ohne Scrollen sichtbar, und alle
+     Meldungen sind weiterhin auf der Seite.
+  8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, und keines
+     davon ist ein leerer Screenshot.
+
+Kriterium 1, 6 und 7 brauchen einen echten Browser - Chromium liegt unter
 /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
 
     python scripts/pruefe_portal.py                 # rendert nach /tmp und prueft
@@ -34,14 +39,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from bs4 import BeautifulSoup                                    # noqa: E402
 
-from telco_radar.report.bilder import MIND_BREITE_GROSS          # noqa: E402
+from telco_radar.report.bilder import (                          # noqa: E402
+    MIND_BREITE_GROSS, ist_leer)
 
 # Die Falz: was ein Leser bei 1440x900 ohne Scrollen sieht. 900 ist die
 # konservative Annahme - ein 16:9-Notebook mit Browserleisten.
 _FALZ = 900
 _BREITE = 1440
 _MIND_OBEN = 6
-_MIND_MIT_BILD = 110
+# Der Anteil bebilderter Meldungen. Bis zum 07.08.2026 stand hier die
+# absolute Zahl 110, kalibriert an der Ausgabe vom 6.8. mit 193 Meldungen
+# (= 57 %). Eine kleinere Ausgabe fiel damit durch, obwohl sich nichts
+# verschlechtert hatte: die Ausgabe vom 7.8. hatte 107 von 138 mit Bild -
+# also 77 %, deutlich BESSER, und trotzdem "durchgefallen". Gemessen wird
+# jetzt die Quote, die das Kriterium immer gemeint hat.
+_MIND_BILDQUOTE = 57
+# Abnahmekriterium 4 des Auftrags vom 07.08.2026: von den 15 vorhandenen
+# Screenshots muessen mindestens 10 auf der Promo Uebersicht ankommen. Vorher
+# war es genau einer - und der war leer.
+_MIND_PROMO_BILDER = 10
 _CHROMIUM = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
 
 
@@ -128,13 +144,23 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
                  f"6. Groesste Hochskalierung: {schlimmster} px"
                  + (f" ({wo})" if schlimmster > 0 else ""))
 
+        # ---- Kriterium 7: alle Ressorts ohne Scrollen
+        # Bis zum 07.08.2026 stand hier "die erste Meldung beginnt vor der
+        # Falz" - das war zu wenig. Die Seite war 12 249 px hoch, und wer
+        # wissen wollte, was unter "Geld & Uebernahmen" steht, scrollte acht
+        # Bildschirmhoehen. Gemessen wird jetzt die Oberkante der LETZTEN
+        # Ressortkachel: liegt sie unter der Falz, sieht der Leser die ganze
+        # Gliederung, ohne zu scrollen.
         seite.goto((site / "meldungen.html").resolve().as_uri())
-        seite.wait_for_timeout(400)
-        oberkante = seite.evaluate(
-            """() => { const e = document.querySelector('.mlead');
-                       return e ? Math.round(e.getBoundingClientRect().top) : -1; }""")
-        b.prueft(0 <= oberkante < _FALZ,
-                 f"4b. Erste Meldung beginnt bei {oberkante} px (< {_FALZ})")
+        seite.wait_for_timeout(500)
+        kacheln = seite.evaluate(
+            """() => [...document.querySelectorAll('.rkachel')]
+                 .map(e => Math.round(
+                      e.getBoundingClientRect().top + window.scrollY))""")
+        letzte = max(kacheln) if kacheln else -1
+        b.prueft(bool(kacheln) and letzte < _FALZ,
+                 f"7. Letztes Ressort beginnt bei {letzte} px "
+                 f"({len(kacheln)} Ressorts, < {_FALZ})")
         browser.close()
 
 
@@ -161,9 +187,10 @@ def main() -> int:
     hs = [h for r in (bericht.get("regions") or {}).values()
           for h in r.get("highlights") or []]
     mit_bild = [h for h in hs if h.get("image")]
-    b.prueft(len(mit_bild) >= _MIND_MIT_BILD,
+    quote = 100 * len(mit_bild) // max(1, len(hs))
+    b.prueft(quote >= _MIND_BILDQUOTE,
              f"2. Meldungen mit Bild: {len(mit_bild)} von {len(hs)} "
-             f"({100 * len(mit_bild) // max(1, len(hs))} %, >= {_MIND_MIT_BILD})")
+             f"({quote} %, >= {_MIND_BILDQUOTE} %)")
     ohne_mass = [h for h in mit_bild if not h.get("image_w")]
     b.prueft(not ohne_mass,
              f"2b. Bilder ohne gemessene Breite: {len(ohne_mass)}")
@@ -180,14 +207,16 @@ def main() -> int:
              f"3. Bilder in Aufmacher/zweiter Reihe: {len(gross)}, "
              f"davon unter {MIND_BREITE_GROSS} px: {len(zu_klein)}")
 
-    # ---- Kriterium 4: Ressorts und Gewichtung
+    # ---- Kriterium 4: Ressorts, Gewichtung, und keine verlorene Meldung
     ressorts = meldungen.select(".mressort")
     stufen = all(sec.select(".mlead") for sec in ressorts)
     summe = sum(int(x.get_text(strip=True))
-                for x in meldungen.select(".ressort-nav a b"))
-    b.prueft(len(ressorts) >= 3 and stufen and summe == len(hs),
+                for x in meldungen.select(".rkachel .count-badge"))
+    gerendert = len(meldungen.select(".mressort .meldung"))
+    b.prueft(len(ressorts) >= 3 and stufen and summe == len(hs)
+             and gerendert == len(hs),
              f"4. Meldungsseite: {len(ressorts)} Ressorts, "
-             f"Summe der Ressortzahlen {summe} von {len(hs)}")
+             f"Ressortzahlen {summe}, gerendert {gerendert}, Daten {len(hs)}")
 
     # ---- Kriterium 5: keine abgeschnittene Schlagzeile
     abgeschnitten = [t for soup in (index, meldungen)
@@ -196,6 +225,28 @@ def main() -> int:
     b.prueft(not abgeschnitten,
              f"5. Schlagzeilen geprueft: {alle}, abgeschnitten: "
              f"{len(abgeschnitten)}")
+
+    # ---- Kriterium 8: die Promo Uebersicht zeigt echte Bilder
+    promo_datei = site / "promo" / "index.html"
+    if not promo_datei.exists():
+        b.prueft(None, "8. Promo Uebersicht (nicht gerendert)")
+    else:
+        promo = BeautifulSoup(promo_datei.read_text(encoding="utf-8"),
+                              "html.parser")
+        verweise = {img["src"] for img in promo.select("img[src]")
+                    if "images/" in img["src"] and "logo" not in img["src"]}
+        fehlend = [v for v in verweise
+                   if not (site / "promo" / v).exists()]
+        b.prueft(len(verweise) >= _MIND_PROMO_BILDER and not fehlend,
+                 f"8. Promo Uebersicht: {len(verweise)} verschiedene Bilder "
+                 f"(>= {_MIND_PROMO_BILDER}), {len(fehlend)} Verweise ins Leere")
+        ordner = site / "promo" / "images"
+        leer = [p.name for p in ordner.iterdir()
+                if p.is_file() and ist_leer(p.read_bytes())] \
+            if ordner.exists() else []
+        b.prueft(not leer,
+                 f"8b. Leere Screenshots ausgeliefert: {len(leer)}"
+                 + (f" ({', '.join(leer)})" if leer else ""))
 
     _browser_messungen(site, b)
 

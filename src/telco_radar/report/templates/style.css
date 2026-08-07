@@ -54,7 +54,7 @@ main{padding-bottom:64px}
 b,strong{font-weight:700}
 
 /* Etikettenschrift: alles, was benennt statt erzaehlt. */
-.kicker,.page-kicker,.subnav a,.usecases .uc,.dateline,.meta,.rubrik,
+.kicker,.page-kicker,.subnav a,.usecases .uc,.meta,.rubrik,
 .stat span,.tile span,.ex-op,.ex-reg,.comp-badge,.kbadge,.chip,
 .list-row-meta,.suche-filter,.promo-filter,.gs-kind,.gs-item-meta,
 .rowtable-head,.step-name,.col-model,.card-sub,.foot-inner{
@@ -100,11 +100,6 @@ b,strong{font-weight:700}
 .subnav a.on{color:var(--red)}
 .subbar::-webkit-scrollbar{display:none}
 
-/* Datumszeile unter dem Kopf - Ausgabe, Auflage, Ressort. */
-.dateline{max-width:var(--wrap);margin:0 auto;padding:7px 28px;
-  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  font-size:10.5px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.1em;color:var(--ink-4);border-top:1px solid var(--rule-2)}
 
 /* Suche: eine Linie, kein Feld. */
 .gsearch{position:relative;width:210px;max-width:100%}
@@ -123,9 +118,22 @@ b,strong{font-weight:700}
   .brand,.topbar-right{grid-column:1}
   .topbar-right{flex-wrap:wrap;justify-content:center}
   .brand-name{font-size:24px}
-  .dateline{justify-content:center;text-align:center}
 }
 
+
+/* ====================================================  ROTER FADEN  ===== */
+/* Der Fuehrungsabsatz des Wochenberichts, ueber der Ausgabe. Linien statt
+   Kasten, wie alles andere hier: zwei Haarlinien und Weissraum. */
+.front-faden{margin:26px 0 0;padding:14px 0 16px;
+  border-top:3px solid var(--rule-ink);border-bottom:1px solid var(--rule)}
+.front-faden-kicker{margin:0 0 6px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:var(--red)}
+.front-faden-text{margin:0;font-family:var(--serif);font-size:20px;
+  line-height:1.42;color:var(--ink);max-width:78ch;font-weight:400}
+.front-faden-mehr{margin:9px 0 0;font-family:var(--sans);font-size:9.5px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+.front-faden-mehr a:hover{color:var(--red)}
+@media (max-width:640px){.front-faden-text{font-size:17px}}
 
 /* =============================================  TITELSEITENRASTER  ===== */
 /* Vier Gewichtsstufen statt zwei. Die Struktur, nicht die Schriftart, macht
@@ -288,42 +296,82 @@ b,strong{font-weight:700}
    eine Datenbankausgabe. Jetzt je Ressort ein Aufmacher, zwei mittlere und
    der Rest als zweispaltige Zeilen mit Vorschaubild. Eine Zeile ist jetzt
    ~72 px hoch statt ~150. */
-.meldungen-kopf{display:flex;align-items:flex-end;justify-content:space-between;
-  gap:28px;flex-wrap:wrap;padding:24px 0 0}
+/* Der Seitenkopf ist einspaltig, seit der Filter daneben weg ist
+   (07.08.2026). Knapp gehalten: jedes Pixel hier schiebt die
+   Ressortuebersicht unter die Falz, und die soll ohne Scrollen vollstaendig
+   sichtbar sein. */
+.meldungen-kopf{padding:18px 0 0}
 .meldungen-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
-  font-size:clamp(30px,4vw,44px);line-height:1.04;letter-spacing:-.022em}
+  font-size:clamp(26px,3vw,34px);line-height:1.04;letter-spacing:-.022em}
+.meldungen-sub{margin:5px 0 0;font-size:14px;line-height:1.4;color:var(--ink-3);
+  max-width:70ch}
 .meldungen-suche{display:flex;align-items:center;gap:20px;
   padding:6px 0;border-bottom:1px solid var(--ink-4);min-width:280px;flex:1}
 .meldungen-suche input{flex:1;min-width:0;border:none;background:none;
   font-family:var(--sans);font-size:13px;color:var(--ink);padding:4px 0}
 .meldungen-suche input:focus{outline:none;color:var(--red)}
 .meldungen-suche input::placeholder{color:var(--ink-4)}
-.meldungen-zahl{font-family:var(--sans);font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);white-space:nowrap}
 
-/* Die Ressortleiste - die Gliederung der Seite auf einen Blick. */
-.ressort-nav{display:flex;flex-wrap:wrap;gap:0;margin:20px 0 0;
-  border-top:3px solid var(--rule-ink);border-bottom:1px solid var(--rule);
-  padding:9px 0}
-.ressort-nav a{font-family:var(--sans);font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2);
-  padding:3px 14px;border-right:1px solid var(--rule)}
-.ressort-nav a:first-child{padding-left:0}
-.ressort-nav a:last-child{border-right:none}
-.ressort-nav a:hover{color:var(--red)}
-.ressort-nav b{color:var(--ink-4);font-weight:700;
-  font-variant-numeric:lining-nums}
-.ressort-nav li[hidden],.ressort-nav a[hidden]{display:none}
+/* ---- Ressortuebersicht: sieben Kacheln, alle ueber der Falz.
+   Vier plus drei bei 1240 px Satzbreite. Die Hoehe der ersten Reihe ist die
+   Groesse, an der Abnahmekriterium 3 haengt (Oberkante der letzten Kachel
+   unter 900 px bei 1440x900) - wer hier Luft ergaenzt, misst nach. */
+.ressort-kacheln{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;margin:14px 0 0;border-top:3px solid var(--rule-ink)}
+.rkachel{display:flex;flex-direction:column;min-width:0;
+  padding:10px 18px 12px;border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+.rkachel:nth-child(4n){border-right:none;padding-right:0}
+.rkachel:nth-child(4n+1){padding-left:0}
+/* Sieben Kacheln in einem Viererraster lassen den achten Platz frei - die
+   letzte darf dort keine Linie ins Leere ziehen. */
+.rkachel:last-child{border-right:none}
+.rkachel .rubrik{margin-bottom:9px}
+.rkachel .count-badge{margin-left:auto}
+.rk-stueck{padding:7px 0;border-top:1px solid var(--rule-2)}
+.rk-stueck:first-of-type{border-top:none;padding-top:0}
+.rk-stueck a{display:flex;gap:10px;align-items:flex-start}
+.rk-text{min-width:0;flex:1;display:flex;flex-direction:column}
+.rk-titel{font-size:14px;line-height:1.25;font-weight:600;color:var(--ink)}
+.rk-stueck a:hover .rk-titel{color:var(--red)}
+.rk-meta{margin-top:4px;font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-bild{flex:0 0 66px;order:2}
+.rk-bild img{display:block;width:100%;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+/* Der Ressortaufmacher der Kachel: Bild ueber der Zeile, nicht daneben. */
+.rk-lead a{flex-direction:column;gap:7px}
+.rk-lead .rk-bild{flex:none;order:0;width:100%}
+.rk-lead .rk-bild img{aspect-ratio:16/9}
+.rk-lead .rk-titel{font-size:17px;line-height:1.2;font-weight:700;
+  letter-spacing:-.012em}
+.rkachel-alle{margin-top:auto;padding-top:9px;font-family:var(--sans);
+  font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--red)}
+.rkachel-alle:hover{border-bottom:1px solid var(--red)}
 
-.mressort{margin-top:30px}
-.mressort[hidden]{display:none}
-.mressort .rubrik{margin-bottom:16px}
-.mressort .count-badge{margin-left:auto}
+/* ---- Die Tiefe: je Ressort ein <details> mit ALLEN Meldungen. */
+.ressort-tiefe{margin-top:34px;border-top:3px solid var(--rule-ink)}
+.mressort{border-bottom:1px solid var(--rule)}
+.mressort>summary{display:flex;align-items:baseline;gap:12px;cursor:pointer;
+  padding:11px 0;list-style:none;margin:0}
+.mressort>summary::-webkit-details-marker{display:none}
+.mressort>summary::marker{content:""}
+.mressort>summary:hover h2{color:var(--red)}
+.mressort>summary .count-badge{margin-left:auto}
+.mressort-hinweis{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red);
+  flex:0 0 auto}
+.mressort[open]>summary .mressort-hinweis::after{content:" ▴"}
+.mressort:not([open])>summary .mressort-hinweis::after{content:" ▾"}
+.mressort[open]>summary .mressort-hinweis{color:var(--ink-4)}
+.mressort[open]{padding-bottom:22px}
+.mressort .rubrik{margin-bottom:0;border-top:none;padding-top:0}
 
 /* Aufmacher des Ressorts + zwei mittlere daneben. */
 .mressort-oben{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
-  gap:0 30px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
-.mlead[hidden],.mzwei[hidden],.mz[hidden]{display:none}
+  gap:0 30px;margin-top:8px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
 .mlead a,.mzwei a{display:flex;flex-direction:column}
 .mlead-bild{display:block;margin-bottom:10px}
 /* 2:1 statt 16:9 - der Ressortaufmacher steht neben einer Spalte mit vier
@@ -370,11 +418,25 @@ b,strong{font-weight:700}
   font-variant-numeric:lining-nums;flex-shrink:0}
 .mz-rel.r5{background:var(--r5)}.mz-rel.r4{background:var(--r4)}
 .mz-rel.r3{background:var(--r3)}
+@media (max-width:1100px){
+  .ressort-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rkachel:nth-child(4n){border-right:1px solid var(--rule);padding-right:18px}
+  .rkachel:nth-child(4n+1){padding-left:18px}
+  .rkachel:nth-child(2n){border-right:none;padding-right:0}
+  .rkachel:nth-child(2n+1){padding-left:0}
+}
 @media (max-width:900px){
   .mressort-oben{grid-template-columns:1fr;gap:20px 0}
   .mmittel{border-left:none;padding-left:0;border-top:1px solid var(--rule);
     padding-top:16px}
   .mzeilen{grid-template-columns:1fr;gap:0}
+}
+@media (max-width:620px){
+  .ressort-kacheln{grid-template-columns:1fr}
+  .rkachel{border-right:none;padding-left:0;padding-right:0}
+  .rkachel:nth-child(4n),.rkachel:nth-child(4n+1),
+  .rkachel:nth-child(2n),.rkachel:nth-child(2n+1){
+    border-right:none;padding-left:0;padding-right:0}
 }
 
 /* ==================================================  RUBRIKEN & TITEL  === */
@@ -412,14 +474,12 @@ b,strong{font-weight:700}
 
 /* =============================================  SEITENRASTER (Front)  === */
 /* Hauptspalte + Rail mit Spaltenlinie dazwischen - das Zeitungsraster. */
-.frontpage{display:grid;grid-template-columns:minmax(0,1fr) 316px;
-  gap:0 40px;margin-top:30px}
-.frontpage-main{min-width:0;padding-right:40px;border-right:1px solid var(--rule)}
-.frontpage-rail{min-width:0}
+/* Der Wochenbericht steht seit dem 07.08.2026 ueber die volle Satzbreite -
+   die Beistellspalte "Zahlen der Woche" ist weg, und eine leere Rail neben
+   zweispaltigem Fliesstext liest sich als Fehler. */
+.frontpage{margin-top:38px}
+.frontpage-main{min-width:0}
 @media (max-width:1000px){
-  .frontpage{grid-template-columns:1fr;gap:0}
-  .frontpage-main{padding-right:0;border-right:none}
-  .frontpage-rail{margin-top:34px;border-top:3px solid var(--rule-ink);padding-top:22px}
 }
 
 /* ======================================================  INFOKASTEN  ==== */
@@ -439,8 +499,6 @@ b,strong{font-weight:700}
 .tile.accent b{color:var(--r5)}
 .tile.tint{background:var(--paper-3)}
 /* Im Rail stehen die Zahlen untereinander, nicht nebeneinander. */
-.frontpage-rail .tile-grid{grid-template-columns:1fr}
-.frontpage-rail .tile{border-right:none}
 
 /* ==========================================================  FLIESSTEXT  = */
 .prose{font-size:17.5px;line-height:1.5;color:var(--ink-2);max-width:var(--wrap-text)}
@@ -786,100 +844,168 @@ b,strong{font-weight:700}
 .stat-inline b{font-size:26px;font-weight:700;font-variant-numeric:lining-nums}
 .stat-inline span{font-family:var(--sans);font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
-.promo-tabs{display:flex;gap:24px;border-bottom:2px solid var(--rule-ink);
-  margin:26px 0 22px}
-.promo-tabs a,.promo-filter{font-family:var(--sans);font-size:10.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);background:none;
-  border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:6px 0;
-  cursor:pointer}
+/* ======================================================  PROMO  ========= */
+/* Wer wirbt gerade womit. Dieselbe Designsprache wie die Marktrecherche -
+   Newsprint, Serife, Linien statt Kaesten - und dieselbe Gewichtungslogik:
+   was ein Bild hat, wird eine Kachel, was keins hat, eine Zeile. Bis zum
+   07.08.2026 standen hier neun gleich hohe Textsaeulen ohne ein einziges
+   Bild nebeneinander. */
+.promo-kopf{padding:18px 0 0}
+.promo-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
+  font-size:clamp(28px,3.4vw,40px);line-height:1.04;letter-spacing:-.022em}
+.promo-kopf-zahlen{margin:7px 0 0;font-size:15px;line-height:1.5;
+  color:var(--ink-3);max-width:76ch}
+.promo-kopf-zahlen b{color:var(--ink);font-weight:700;
+  font-variant-numeric:lining-nums}
+
+.promo-oben{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0 34px;
+  margin-top:18px;padding-top:16px;border-top:3px solid var(--rule-ink)}
+.promo-oben-haupt{min-width:0;padding-right:34px;
+  border-right:1px solid var(--rule)}
+.promo-rail{min-width:0}
+
+/* ---- Aufmacher */
+.paufmacher-titel{margin:4px 0 12px;font-family:var(--serif);font-weight:700;
+  font-size:clamp(26px,3vw,36px);line-height:1.08;letter-spacing:-.02em}
+.paufmacher-titel a:hover{color:var(--red)}
+.paufmacher-bild{margin:0 0 12px}
+.paufmacher-bild img{display:block;width:100%;height:auto;aspect-ratio:2/1;
+  object-fit:cover;object-position:top center;background:var(--paper-3);
+  border:1px solid var(--rule-2)}
+.paufmacher-bild figcaption{margin-top:5px;font-family:var(--sans);font-size:9px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.paufmacher-grund{margin:0 0 10px;font-size:17px;line-height:1.5;color:var(--ink-2)}
+.paufmacher-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0;
+  font-family:var(--sans);font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ink-4)}
+.paufmacher-meta a{color:var(--red);border-bottom:1px solid var(--red)}
+.pmech{background:var(--ink);color:var(--paper);padding:2px 7px}
+
+/* ---- zweite Reihe */
+.promo-reihe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px;
+  margin-top:20px;padding-top:18px;border-top:1px solid var(--rule)}
+.pstueck{position:relative;min-width:0}
+.pstueck a{display:flex;flex-direction:column}
+.pstueck-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:top center;background:var(--paper-3);
+  border:1px solid var(--rule-2);margin-bottom:9px}
+.pstueck-titel{font-size:19px;line-height:1.22;font-weight:700;
+  letter-spacing:-.014em;color:var(--ink)}
+.pstueck a:hover .pstueck-titel{color:var(--red)}
+.pstueck-score{position:absolute;top:8px;right:8px;background:var(--paper);
+  padding:2px 6px}
+
+/* ---- Zeilen (Aktionen ohne Bild) */
+.promo-zeilen{display:flex;flex-direction:column}
+.pz{border-top:1px solid var(--rule-2)}
+.pz:first-child{border-top:none}
+.pz a{display:flex;gap:12px;align-items:flex-start;padding:10px 0}
+.pz-text{min-width:0;flex:1;display:flex;flex-direction:column}
+.pz-marke{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4);
+  margin-bottom:3px}
+.pz-titel{font-size:15px;line-height:1.3;font-weight:600;color:var(--ink)}
+.pz a:hover .pz-titel{color:var(--red)}
+.pz-meta{margin-top:4px;font-family:var(--sans);font-size:9px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4)}
+.pz-score{font-family:var(--sans);font-size:10px;font-weight:800;color:#fff;
+  background:var(--red);padding:2px 6px;flex:0 0 auto;
+  font-variant-numeric:lining-nums;align-self:flex-start}
+.pz-eigen .pz-marke{color:var(--red)}
+.rubrik-eigen{margin-top:24px;border-top-color:var(--red)}
+.rubrik-weiter{margin-top:24px}
+.promo-eigen-note,.promo-top-note{margin:8px 0 0;font-family:var(--sans);
+  font-size:9.5px;font-weight:600;line-height:1.5;color:var(--ink-4)}
+
+/* ---- Markenraster */
+.promo-rubrik-board{margin-top:38px;justify-content:space-between}
+.promo-tabs{display:flex;gap:20px;margin-left:auto}
+.promo-tabs a,.promo-filter{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:2px 0;cursor:pointer}
 .promo-tabs a.on,.promo-filter.on{color:var(--ink);border-bottom-color:var(--red)}
-.promo-hero-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);
-  gap:0 30px;margin-bottom:30px}
-@media (max-width:900px){.promo-hero-row{grid-template-columns:1fr;gap:24px}}
-.promo-hero-card{position:relative;overflow:hidden;min-height:300px;
-  display:flex;align-items:flex-end;border:1px solid var(--rule);background:var(--ink)}
-.promo-hero-overlay{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;
-  opacity:.55}
-.promo-hero-content{position:relative;padding:24px;color:#fff;width:100%;
-  background:linear-gradient(to top,rgba(10,9,8,.92),rgba(10,9,8,0))}
-.promo-hero-fallback{position:absolute;inset:0;background:var(--ink-2)}
-.promo-hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.promo-hero-badge{font-family:var(--sans);font-size:9px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.11em;background:var(--red);color:#fff;
-  padding:2px 7px}
-.promo-hero-headline{margin:0 0 8px;font-size:26px;font-weight:700;line-height:1.2;
-  letter-spacing:-.015em}
-.promo-hero-reason{margin:0 0 10px;font-size:15px;line-height:1.5;opacity:.9}
-.promo-hero-meta{font-family:var(--sans);font-size:9.5px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.08em;opacity:.72}
-.promo-hero-link{color:#fff;border-bottom:1px solid rgba(255,255,255,.5)}
-.promo-hero-score{position:absolute;top:16px;right:16px;font-family:var(--sans);
-  font-size:9.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.5);padding:3px 8px}
-.promo-stat-card{background:var(--paper-3);padding:22px;border-top:3px solid var(--red)}
-.promo-stat-kicker{margin:0 0 10px;font-family:var(--sans);font-size:10px;
-  font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
-.promo-stat-link{font-family:var(--sans);font-size:10.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
-.promo-section-head{display:flex;align-items:center;gap:12px;margin:30px 0 16px;
-  border-top:2px solid var(--rule-ink);padding-top:8px}
-.promo-section-head h2{font-family:var(--sans);font-size:11.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.13em;margin:0}
-.promo-count{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--ink-4)}
-.promo-top-grid{display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
-.promo-top-card{padding:16px 22px 18px 0;border-top:1px solid var(--rule);
-  border-right:1px solid var(--rule);margin-right:22px;min-width:0}
-.promo-top-card--own{border-top:3px solid var(--red)}
-.promo-top-card-head{display:flex;justify-content:space-between;gap:10px;
-  align-items:baseline;margin-bottom:8px}
-.promo-top-brand{font-family:var(--sans);font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
-.promo-top-score{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--ink-4)}
-.promo-top-headline{margin:0 0 7px;font-size:18px;font-weight:700;line-height:1.28}
-.promo-top-mech,.promo-top-reason,.promo-top-note{margin:0 0 7px;font-size:14.5px;
-  line-height:1.5;color:var(--ink-2)}
-.promo-top-meta,.promo-top-metatext{font-family:var(--sans);font-size:9.5px;
-  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.promo-top-anchor-tag{font-family:var(--sans);font-size:9px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
-.promo-board{display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.promo-card{padding:16px 22px 18px 0;border-top:1px solid var(--rule);
-  border-right:1px solid var(--rule);margin-right:22px;min-width:0}
-.promo-card--empty{opacity:.6}
-.promo-card-head{display:flex;justify-content:space-between;align-items:baseline;
-  gap:10px;margin-bottom:4px}
-.promo-card-head h3{margin:0;font-size:18px;font-weight:700}
-.promo-card-sub{font-family:var(--sans);font-size:9.5px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);margin:0 0 10px}
-.promo-offers{display:flex;flex-direction:column}
-.promo-offer{padding:9px 0;border-top:1px solid var(--rule-2)}
-.promo-offer--fading{opacity:.62}
-.promo-offer-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.promo-offer-title{font-size:15px;font-weight:600;line-height:1.4}
-.promo-offer-desc{margin:4px 0 0;font-size:14px;line-height:1.5;color:var(--ink-3)}
-.promo-offer-desc-toggle{font-family:var(--sans);font-size:9.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--red);cursor:pointer}
-.promo-offer-meta,.promo-offer-fading-tag{font-family:var(--sans);font-size:9.5px;
-  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.promo-score-dot{width:7px;height:7px;background:var(--red);display:inline-block}
-.promo-inactive{display:flex;flex-wrap:wrap;gap:0;margin-top:10px}
-.promo-inactive-label{font-family:var(--sans);font-size:9.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);padding-right:12px}
-.promo-inactive-op{font-size:13.5px;color:var(--ink-3);padding:0 12px;
-  border-left:1px solid var(--rule)}
-.promo-method{margin-top:30px;border-top:2px solid var(--rule-ink)}
+.promo-board{display:grid;gap:0;grid-template-columns:repeat(4,minmax(0,1fr))}
+.pmarke{display:flex;flex-direction:column;min-width:0;padding:14px 18px 16px;
+  border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.pmarke:nth-child(4n){border-right:none;padding-right:0}
+.pmarke:nth-child(4n+1){padding-left:0}
+.pmarke:last-child{border-right:none}
+.pmarke-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:top center;background:var(--paper-3);
+  border:1px solid var(--rule-2);margin-bottom:9px}
+.pmarke-kopf{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;
+  border-bottom:1px solid var(--rule-ink);padding-bottom:5px}
+.pmarke-kopf h3{margin:0;font-family:var(--sans);font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink)}
+.pmarke-kopf .count-badge{margin-left:auto}
+.pmarke-liste{list-style:none;margin:0;padding:0;display:flex;
+  flex-direction:column}
+.pmarke-zeile{padding:7px 0;border-top:1px solid var(--rule-2)}
+.pmarke-zeile:first-child{border-top:none;padding-top:0}
+.pmarke-zeile a{display:block;font-size:14px;line-height:1.28;font-weight:600;
+  color:var(--ink)}
+.pmarke-zeile a:hover{color:var(--red)}
+.pmarke-zeile--fading{opacity:.62}
+.pmarke-mehr{margin-top:auto;padding-top:8px}
+.pmarke-mehr>summary{list-style:none;cursor:pointer;font-family:var(--sans);
+  font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--red)}
+.pmarke-mehr>summary::-webkit-details-marker{display:none}
+.pmarke-mehr[open]>summary{color:var(--ink-4);margin-bottom:6px}
+.promo-rubrik-ruhe{margin-top:30px}
+.promo-ruhe{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0 20px}
+.pruhe{display:flex;flex-direction:column;min-width:0;opacity:.72}
+.pruhe-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:top center;background:var(--paper-3);
+  border:1px solid var(--rule-2);margin-bottom:6px;filter:grayscale(1)}
+.pruhe-name{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+@media (max-width:1000px){.promo-ruhe{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
+@media (max-width:620px){.promo-ruhe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---- die Tiefe */
+.promo-tiefe{margin-top:34px}
+.promo-method{border-top:2px solid var(--rule-ink)}
 .promo-method > summary{list-style:none;cursor:pointer;padding:12px 0;
   font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
-  letter-spacing:.12em}
+  letter-spacing:.11em;color:var(--ink)}
+.promo-method > summary:hover{color:var(--red)}
 .promo-method > summary::-webkit-details-marker{display:none}
-.promo-method-body{padding:6px 0 20px;font-size:15px;line-height:1.6;color:var(--ink-2)}
+.promo-method-body{padding:6px 0 20px;font-size:15px;line-height:1.6;
+  color:var(--ink-2);max-width:var(--wrap-text)}
+.promo-lead-text{font-family:var(--serif);font-size:17px;line-height:1.5;
+  color:var(--ink)}
+.promo-method-mehr{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em}
+.promo-method-mehr a{color:var(--red)}
 .promo-method-caveat{font-style:italic;color:var(--ink-3)}
-.promo-stale-note{font-family:var(--sans);font-size:10px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--r4)}
+.promo-stale-note{margin:8px 0 0;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--r4)}
+
+@media (max-width:1100px){
+  .promo-board{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pmarke:nth-child(4n){border-right:1px solid var(--rule);padding-right:18px}
+  .pmarke:nth-child(4n+1){padding-left:18px}
+  .pmarke:nth-child(2n){border-right:none;padding-right:0}
+  .pmarke:nth-child(2n+1){padding-left:0}
+}
+@media (max-width:940px){
+  .promo-oben{grid-template-columns:1fr;gap:0}
+  .promo-oben-haupt{padding-right:0;border-right:none}
+  .promo-rail{margin-top:28px;border-top:3px solid var(--rule-ink);padding-top:18px}
+}
+@media (max-width:620px){
+  .promo-reihe{grid-template-columns:1fr;gap:20px 0}
+  .promo-board{grid-template-columns:1fr}
+  .pmarke,.pmarke:nth-child(2n),.pmarke:nth-child(2n+1),
+  .pmarke:nth-child(4n),.pmarke:nth-child(4n+1){
+    border-right:none;padding-left:0;padding-right:0}
+}
 
 /* ==========================================================  DRUCK  ===== */
 @media print{
-  .topbar,.subbar,.dateline,.foot,.evidence,.filters{display:none}
+  .topbar,.subbar,.foot,.evidence,.filters{display:none}
   body{background:#fff;font-size:11pt}
-  .frontpage{grid-template-columns:1fr}
   .prose{max-width:none;columns:2;column-gap:28px}
 }

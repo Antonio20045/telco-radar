@@ -315,76 +315,63 @@ var TelcoSearch = (function () {
   try {
     var qs = new URLSearchParams(location.search);
     var q0 = qs.get('q');
-    if (q0) input.value = q0;
+    if (q0) {
+      input.value = q0;
+      // Die Topbar-Suche landet mit ?q= auf dieser Seite. Seit der Filter im
+      // Seitenkopf weg ist (07.08.2026), stehen die Treffer nur noch hier
+      // unten - ohne diesen Sprung sieht der Suchende oben eine
+      // Ressortuebersicht und haelt seine Suche fuer verpufft.
+      requestAnimationFrame(function () {
+        var karte = input.closest ? input.closest('.card') : null;
+        if (karte) karte.scrollIntoView({ block: 'start' });
+      });
+    }
   } catch (e) { /* URLSearchParams nicht verfuegbar - stiller Fallback */ }
   run();
 })();
 
 
-/* Meldungsliste (meldungen.html): filtert die serverseitig gerenderten
-   Meldungen. Bewusst KEIN Explorer mit Split-View - die Seite soll gelesen
-   werden koennen wie eine Zeitungsseite, nicht bedient wie ein Werkzeug.
+/* Meldungsseite (meldungen.html): die Ressortbloecke sind <details>.
 
-   Seit die Seite nach Ressorts gegliedert ist, muss der Filter zwei Dinge
-   mehr tun: ein Ressort ohne Treffer ganz ausblenden (sonst steht eine
-   Rubrikleiste ueber Leere) und die Zahl in der Ressortleiste mitfuehren
-   (sonst verspricht sie 46 Meldungen und zeigt zwei). */
+   Der Filter, der hier bis zum 07.08.2026 stand, ist weg (Antonio: "macht
+   diesen Filter weg ... das ist unnoetig") - samt der data-such-Attribute,
+   die es nur fuer ihn gab. Was bleibt, ist der Weg von der Uebersichtskachel
+   in die Tiefe: EINE Geste, nicht drei.
+
+   Ohne dieses Skript funktioniert die Seite weiterhin - <details> klappt
+   auch per Klick auf die Rubrikzeile auf. Das Skript erspart nur den
+   zweiten Klick nach dem Sprung. */
 (function () {
   'use strict';
-  var input = document.getElementById('meldung-filter');
-  var zahl = document.getElementById('meldung-zahl');
-  var leer = document.getElementById('meldung-leer');
-  var ressorts = Array.prototype.slice.call(
-    document.querySelectorAll('.mressort'));
-  if (!input || !ressorts.length) return;
+  var tiefe = document.querySelector('.ressort-tiefe');
+  if (!tiefe) return;
 
-  var nav = {};
-  Array.prototype.slice.call(document.querySelectorAll('.ressort-nav a'))
-    .forEach(function (a) {
-      var id = (a.getAttribute('href') || '').slice(1);
-      if (id) nav[id] = a.querySelector('b');
-    });
-
-  var bloecke = ressorts.map(function (sec) {
-    return {
-      sec: sec,
-      zaehler: nav[sec.id] || null,
-      gesamt: sec.querySelectorAll('[data-such]').length,
-      zeilen: Array.prototype.slice.call(sec.querySelectorAll('[data-such]'))
-    };
-  });
-  var gesamt = bloecke.reduce(function (n, b) { return n + b.gesamt; }, 0);
-  var t;
-
-  function filtern() {
-    var q = (input.value || '').trim().toLowerCase();
-    var sichtbar = 0;
-    bloecke.forEach(function (b) {
-      var n = 0;
-      b.zeilen.forEach(function (z) {
-        var treffer = !q || (z.dataset.such || '').indexOf(q) !== -1;
-        z.hidden = !treffer;
-        if (treffer) n++;
+  function oeffne(id, scrollen) {
+    var el = document.getElementById(id);
+    if (!el || el.tagName.toLowerCase() !== 'details') return false;
+    el.open = true;
+    if (scrollen) {
+      // Erst nach dem Aufklappen scrollen, sonst zielt der Browser auf die
+      // Position von vorher.
+      requestAnimationFrame(function () {
+        el.scrollIntoView({ block: 'start', behavior: 'smooth' });
       });
-      b.sec.hidden = n === 0;
-      if (b.zaehler) b.zaehler.textContent = n;
-      if (nav[b.sec.id]) nav[b.sec.id].parentNode.hidden = n === 0;
-      sichtbar += n;
-    });
-    if (zahl) {
-      zahl.textContent = q ? sichtbar + ' von ' + gesamt + ' Meldungen'
-                           : gesamt + ' Meldungen';
     }
-    if (leer) leer.hidden = sichtbar !== 0;
+    return true;
   }
 
-  input.addEventListener('input', function () {
-    clearTimeout(t); t = setTimeout(filtern, 110);
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('[data-oeffnet]') : null;
+    if (!a) return;
+    if (oeffne(a.getAttribute('data-oeffnet'), true)) ev.preventDefault();
   });
 
-  // Ankunft ueber die Topbar-Suche mit ?q=: direkt vorfiltern.
-  try {
-    var q0 = new URLSearchParams(location.search).get('q');
-    if (q0) { input.value = q0; filtern(); }
-  } catch (e) { /* stiller Fallback */ }
+  // Ankunft ueber einen Link von aussen (die Titelseite verlinkt
+  // meldungen.html#ressort-netz) oder ueber die Adresszeile.
+  function ausHash() {
+    var id = (location.hash || '').replace(/^#/, '');
+    if (id) oeffne(id, true);
+  }
+  window.addEventListener('hashchange', ausHash);
+  ausHash();
 })();

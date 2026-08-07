@@ -71,8 +71,11 @@ PORTAL = [
 ]
 
 
+BRIEFING = "## Auf einen Blick\n\nText.\n\n## Europa\n\nMehr Text."
+
+
 def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
-            bilder_anlegen=True):
+            bilder_anlegen=True, briefing=None):
     from telco_radar.report.bilder import bildordner
 
     # data/reports/ wie im echten Projekt: render_site() leitet den
@@ -97,11 +100,14 @@ def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
         "date": "2026-08-05",
         "generated_with_llm": True,
         "stats": stats if stats is not None else {"new": NEU_GESAMMELT},
-        "briefing_md": "## Auf einen Blick\n\nText.\n\n## Europa\n\nMehr Text.",
+        "briefing_md": BRIEFING if briefing is None else briefing,
         "regions": {"Europa": {"region_summary": "", "highlights": hs}},
         "competitors": competitors if competitors is not None else [],
         "run": {"duration_seconds": 1487.8, "models": {"analyst": "m", "editor": "m"},
-                "phases": [], "analysts": [], "sources": [],
+                "phases": [],
+                "analysts": [{"region": "Europa", "items_in": 15,
+                              "highlights": 4, "model": "m"}],
+                "sources": [],
                 "source_summary": {"ok": 1, "empty": 0, "failed": 0}},
     }, ensure_ascii=False), encoding="utf-8")
     site = tmp_path / "site"
@@ -277,17 +283,69 @@ def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
 
 
 def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
-    """Die Zahl im Kopf muss zu den gerenderten Meldungen passen - und die
-    Meldungen muessen ohne Klick dastehen, nicht hinter einem Werkzeug.
+    """Keine Meldung darf beim Umbau verschwinden.
 
-    Seit dem Portal-Umbau steht jede Meldung in einer von drei Gewichtungen
-    (Ressortaufmacher, mittel, Zeile). Gezaehlt wird deshalb ueber das
-    Filterattribut, das alle drei tragen - sonst wuerde ein Umbau, der eine
-    Stufe verliert, hier nicht auffallen."""
+    Seit dem 07.08.2026 stehen die Ressortbloecke in einem <details>: oben
+    die Uebersicht, die Tiefe auf Klick. Zugeklappt heisst NICHT weg - die
+    Belegebene ist Antonios ausdrueckliche Anforderung (CLAUDE.md §8), und
+    alle Meldungen stehen vollstaendig im Quelltext, also auch im Suchlauf
+    des Browsers.
+
+    Gezaehlt wird ueber die Klasse `meldung`, die jede der drei
+    Gewichtungen traegt (Ressortaufmacher, mittel, Zeile). Vorher lief die
+    Zaehlung ueber `data-such` - ein Attribut, das es nur fuer den
+    inzwischen entfernten Filter gab."""
     site = _render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
-    assert len(soup.select("[data-such]")) == len(PORTAL)
+    assert len(soup.select(".mressort .meldung")) == len(PORTAL)
     assert f"{len(PORTAL)} Meldungen" in _seite(site, "meldungen.html")
+
+
+def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
+    """Abnahmekriterium 3: erst die Ressorts, dann auf Klick die Tiefe.
+
+    Die Seite war 12 249 px hoch; wer wissen wollte, was unter "Geld &
+    Uebernahmen" steht, scrollte acht Bildschirmhoehen. Jetzt hat jedes
+    Ressort eine Uebersichtskachel mit zwei bis drei Meldungen und EINEN
+    Weg in die Tiefe. Die Pixelmessung dazu macht scripts/pruefe_portal.py
+    im echten Browser; dieser Test haelt die Struktur fest, die sie
+    voraussetzt."""
+    from telco_radar.report.html import _flatten, _nach_ressort
+
+    site = _render(tmp_path, highlights=PORTAL)
+    soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
+    bericht = json.loads((tmp_path / "data" / "reports" / "2026-08-05.json")
+                         .read_text(encoding="utf-8"))
+    echt = _nach_ressort(_flatten(bericht))
+
+    kacheln = soup.select(".rkachel")
+    assert len(kacheln) == len(echt), "Nicht jedes Ressort hat eine Kachel"
+    for kachel, r in zip(kacheln, echt):
+        assert kachel.select_one(".rubrik h2").get_text(strip=True) == r["label"]
+        # Zwei bis drei Meldungen je Kachel - ein Etikett allein waere ein
+        # Inhaltsverzeichnis, keine Uebersicht.
+        stuecke = kachel.select(".rk-stueck")
+        assert 2 <= len(stuecke) <= 3 or len(stuecke) == r["n"], (
+            f"{r['label']}: {len(stuecke)} Meldungen in der Kachel")
+        # ... und genau EINE Geste in die Tiefe.
+        alle = kachel.select("a.rkachel-alle")
+        assert len(alle) == 1
+        assert alle[0]["href"] == f"#ressort-{r['key']}"
+        assert soup.select_one(f"details#ressort-{r['key']}") is not None
+
+
+def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
+    """Abnahmekriterium 2: der Filter neben "Alle Meldungen" ist weg - samt
+    allem, was nur ihm diente. Ein toter Filterrest ist genau die Sorte
+    Ballast, die diese Codebasis schon einmal jahrelang mitgeschleppt hat."""
+    site = _render(tmp_path, highlights=PORTAL)
+    html = _seite(site, "meldungen.html")
+    for rest in ("data-such", "meldung-filter", "meldung-leer", "meldung-zahl",
+                 "ressort-nav"):
+        assert rest not in html, f"Rest des Filters auf der Seite: {rest}"
+    assert rest not in _seite(site, "app.js")
+    # Die wochenuebergreifende Suche bleibt - sie ist ein anderer Fall.
+    assert "suche-input" in html
 
 
 def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
@@ -303,16 +361,20 @@ def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
 
     ressorts = soup.select(".mressort")
     assert len(ressorts) >= 3, "Die Seite ist nicht nach Ressorts gegliedert"
+    assert all(sec.name == "details" for sec in ressorts), (
+        "Die Ressortbloecke sind nicht aufklappbar")
     # Jedes Ressort fuehrt mit genau einem Aufmacher ...
     for sec in ressorts:
         assert len(sec.select(".mlead")) == 1
     # ... und mindestens eines nutzt alle drei Gewichtungen.
     assert any(sec.select(".mlead") and sec.select(".mzwei") and sec.select(".mz")
                for sec in ressorts)
-    # Die Ressortzahlen der Sprungleiste summieren sich auf die Gesamtzahl.
-    aus_leiste = [int(b.get_text(strip=True))
-                  for b in soup.select(".ressort-nav a b")]
-    assert sum(aus_leiste) == len(PORTAL)
+    # Die Ressortzahlen der Uebersicht summieren sich auf die Gesamtzahl.
+    # (Bis zum 07.08.2026 stand diese Zahl in einer Sprungleiste; die war
+    # die Kruecke einer zu langen Seite und ist mit ihr weggefallen.)
+    aus_kacheln = [int(b.get_text(strip=True))
+                   for b in soup.select(".rkachel .count-badge")]
+    assert sum(aus_kacheln) == len(PORTAL)
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -539,14 +601,19 @@ def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
     """Bis zum Redesign berechnete _stats() sechs Werte, die in KEINER
     Vorlage vorkamen (sov, pricing, deals, risks, chances, n_competitors) -
     bei jedem Rendern, fuer jede Archivwoche. Dieser Test haelt den
-    Rueckbau fest."""
+    Rueckbau fest.
+
+    Am 07.08.2026 ist die naechste Schicht gefallen: `kpis` (die Kachelreihe
+    "Zahlen der Woche", deren Werte im selben Bildschirm ein zweites Mal
+    standen) und `lead_signal` (seit Monaten berechnet, von keiner Vorlage
+    je gelesen)."""
     from telco_radar.report.html import _flatten, _stats
 
     report = {"date": "2026-08-05", "stats": {"new": NEU_GESAMMELT},
               "regions": {"Europa": {"highlights": HIGHLIGHTS}},
               "competitors": GELUNGEN}
     dash = _stats(report)
-    assert set(dash) == {"kpis", "lead_signal", "tech_radar"}
+    assert set(dash) == {"tech_radar", "sofort"}
     assert _flatten(report)  # Gegenprobe: die Fixture ist nicht leer
 
 
@@ -693,3 +760,136 @@ def test_wettbewerber_bekommen_budget_fuer_ein_reasoning_modell():
     JSON. Abgerechnet werden erzeugte Token, ein hohes Limit kostet nichts."""
     from telco_radar.analyze.competitors import COMPETITOR_MAX_TOKENS
     assert COMPETITOR_MAX_TOKENS >= 8000
+
+
+# ------------------------------------------------------- Der rote Faden
+# Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall." Die
+# Titelseite sortierte nach Dringlichkeit, der Bericht nach dem Urteil der
+# Chefredaktion - beide fuehrten mit einer anderen Geschichte. Die Kopplung
+# ist jetzt gebaut, also gehoert sie auch gehalten.
+FADEN_BRIEFING = """## Auf einen Blick
+- Quasarnetz kuendigt ein Kleinzellennetz an und greift damit die
+  etablierten Mobilfunker an.
+- Tarifwerk senkt den Einstiegspreis fuer unlimitierte Tarife deutlich.
+
+## Das Wichtigste
+
+Quasarnetz greift diese Woche das Kerngeschaeft der Mobilfunker an.
+
+## Europa
+
+Mehr Text.
+"""
+
+
+def _faden_highlights() -> list[dict]:
+    """Eine Ausgabe, in der die zwei Fuehrungssaetze belegbar sind - und in
+    der die Dringlichkeit auf etwas ANDERES zeigt. Ohne diesen Gegensatz
+    koennte der Test nicht unterscheiden, ob die Seite dem Faden folgt oder
+    nur zufaellig dasselbe waehlt."""
+    hs = list(PORTAL)
+    # Dringlichkeit 5 und ein grosses Bild, aber im Bericht kommt sie nicht
+    # vor: die Meldung, die OHNE Faden den Aufmacher bekaeme.
+    hs.insert(0, dict(_highlight(900, 5, "Netz/Technologie", image_w=1200),
+                      title="Blaulicht Telekommunikation meldet Quartalszahlen",
+                      operator="Blaulicht"))
+    hs.append(dict(_highlight(901, 3, "Netz/Technologie", image_w=1200),
+                   title="Quasarnetz kuendigt Kleinzellennetz gegen Mobilfunker an",
+                   operator="Quasarnetz"))
+    hs.append(dict(_highlight(902, 3, "Tarif/Pricing", image_w=1200),
+                   title="Tarifwerk senkt Einstiegspreis fuer unlimitierte Tarife",
+                   operator="Tarifwerk"))
+    return hs
+
+
+def test_die_titelseite_fuehrt_mit_dem_bericht(tmp_path):
+    """Der Aufmacher kommt aus dem, worueber der Bericht fuehrt."""
+    from telco_radar.report.html import _flatten, _titelseite, _faden, _fuehrende_saetze
+
+    hs = _flatten({"date": "2026-08-05", "stats": {},
+                   "regions": {"Europa": {"highlights": _faden_highlights()}}})
+    front = _titelseite(hs, _faden(hs, _fuehrende_saetze(FADEN_BRIEFING)))
+
+    assert "Quasarnetz" in front["aufmacher"]["schlagzeile"], (
+        f"Aufmacher folgt dem Bericht nicht: {front['aufmacher']['schlagzeile']}")
+    # Beide Fuehrungssaetze stehen oberhalb der Falz.
+    assert front["faden_oben"] == 2
+    # Gegenprobe: OHNE Faden fuehrt die Seite mit der Dringlichkeit.
+    assert "Quasarnetz" not in _titelseite(hs)["aufmacher"]["schlagzeile"]
+
+
+def test_ohne_belegbaren_faden_bleibt_die_alte_reihenfolge(tmp_path):
+    """Eine falsche Verbindung ist schlimmer als keine: teilt eine Meldung
+    zu wenige seltene Woerter mit dem Fuehrungssatz, gilt er als nicht
+    belegt und die Seite sortiert weiter nach Dringlichkeit."""
+    from telco_radar.report.html import _flatten, _titelseite, _faden, _fuehrende_saetze
+
+    hs = _flatten({"date": "2026-08-05", "stats": {},
+                   "regions": {"Europa": {"highlights": _faden_highlights()}}})
+    fremd = "## Auf einen Blick\n- Ein Thema, das in keiner Meldung vorkommt.\n"
+    assert _faden(hs, _fuehrende_saetze(fremd)) == []
+    front = _titelseite(hs, _faden(hs, _fuehrende_saetze(fremd)))
+    assert front["faden_oben"] == 0
+    assert front["aufmacher"] is not None
+
+
+def test_der_faden_steht_sichtbar_auf_der_seite(tmp_path):
+    """Der Fuehrungsabsatz des Berichts gehoert auf die Seite, nicht nur in
+    die Auswahllogik - sonst ist der Faden gespannt, aber unsichtbar.
+    `briefing_lead` wurde bis zum 07.08.2026 bei jedem Rendern berechnet und
+    von keiner Vorlage gelesen."""
+    html = _seite(_render(tmp_path, highlights=_faden_highlights(),
+                          briefing=FADEN_BRIEFING), "index.html")
+    soup = BeautifulSoup(html, "html.parser")
+    faden = soup.select_one(".front-faden")
+    assert faden is not None, "Die Seite zeigt den Faden nicht"
+    assert "Quasarnetz" in faden.get_text(" ", strip=True)
+    # Und er fuehrt zum Bericht, statt nur zu behaupten.
+    assert soup.select_one('.front-faden a[href="#der-wochenbericht"]')
+    assert soup.select_one("#der-wochenbericht")
+
+
+# ------------------------------------------------- Was die Seite NICHT mehr traegt
+def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path):
+    """Abnahmekriterium 1. Antonio: "Loesch diese Zeile, das ist unnoetig."
+
+    Geprueft wird auch, dass keine tote Variable zurueckgeblieben ist -
+    diese Codebasis hat schon einmal sechs berechnete Werte mitgeschleppt,
+    die keine Vorlage benutzte."""
+    from telco_radar.report import html as html_mod
+
+    site = _render(tmp_path, highlights=PORTAL)
+    for name in ("index.html", "meldungen.html", "transparenz.html",
+                 "differenzierung.html", "reports/2026-08-05.html"):
+        seite = _seite(site, name)
+        assert "dateline" not in seite, f"Datumszeile noch auf {name}"
+        assert "Quellen beobachtet" not in seite
+    assert "dateline" not in _seite(site, "style.css")
+    # Und keine Vorlage fragt die Werte noch ab - sie werden nicht mehr
+    # berechnet, ein Zugriff waere also still leer statt laut falsch.
+    from pathlib import Path
+    vorlagen = Path(html_mod.__file__).parent / "templates"
+    for tpl in vorlagen.glob("*.j2"):
+        # Ohne Jinja-Kommentare: dass in einem {# ... #} steht, WARUM die
+        # Werte weg sind, ist Dokumentation und kein Zugriff.
+        text = re.sub(r"(?s)\{#.*?#\}", "", tpl.read_text(encoding="utf-8"))
+        for tot in ("ausgabe_datum", "ausgabe_quellen"):
+            assert tot not in text, f"{tpl.name} liest die tote Variable {tot}"
+
+
+def test_die_wochenseite_traegt_die_doppelten_formen_nicht_mehr(tmp_path):
+    """Punkt 4 des Auftrags: "Wo dieselbe Information zweimal in zwei Formen
+    steht, faellt eine weg."
+
+    Die Kachelreihe "Zahlen der Woche" nannte gelesen/relevant ein zweites
+    Mal (sie stehen als Satz ueber dem Bericht) und das Top-Technologiethema
+    ein zweites Mal (es ist die erste Zeile des Themenradars). "Auswertung je
+    Bereich" stand wortgleich auf transparenz.html."""
+    site = _render(tmp_path, highlights=PORTAL)
+    index = _seite(site, "index.html")
+    assert "Zahlen der Woche" not in index
+    assert "Auswertung je Bereich" not in index
+    # ... aber die Frage, die sie beantworteten, hat weiterhin einen Ort.
+    assert "Auswertung je Bereich" in _seite(site, "transparenz.html")
+    # Und die eine Zahl, die nur in der Kachelreihe stand, ist umgezogen.
+    assert "zum sofortigen Ansehen" in index

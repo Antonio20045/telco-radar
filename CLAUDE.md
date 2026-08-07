@@ -208,10 +208,27 @@ vergisst, fällt aus allen dreien heraus.
 
 | Seite | Frage | Inhalt |
 |---|---|---|
-| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, dann 6 Ressortblöcke, dann **der volle Prosabericht zweispaltig mit Sprungnavigation**, Zahlen der Woche, Deutschland-Fokus, Auswertung je Bereich |
-| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | alle Meldungen **nach Ressort gruppiert und innerhalb gewichtet** (Aufmacher / 4 mittlere / zweispaltige Zeilen), Ressort-Sprungleiste, Filter, Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
+| `index.html` **Diese Woche** | „Was ist passiert?" | **Vorspann „Worum es diese Woche geht"**, Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, dann 6 Ressortblöcke, dann **der volle Prosabericht zweispaltig mit Sprungnavigation**, Deutschland-Fokus |
+| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | persistente, kuratierte Bibliothek (eigene Frage, eigener State) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
+
+**Der rote Faden** (Welle 2, 07.08.2026): die Titelseite folgt dem Bericht,
+statt parallel zu ihm zu sortieren. `_fuehrende_saetze()` liest die
+Aufzählung „Auf einen Blick" aus `briefing_md`, `_faden()` sucht zu jedem
+Satz die belegende Meldung (gewichtet nach Wortseltenheit, 1/Häufigkeit —
+gezählte Überschneidung allein ordnete „KI treibt Cyberkriminalität in
+Afrika" einem Satz über MTN/IHS Towers zu), und `_titelseite()` besetzt
+Aufmacher und zweite Reihe damit. Findet sich kein Beleg, bleibt es bei der
+Dringlichkeitssortierung — **eine falsche Verbindung ist schlimmer als
+keine.**
+
+**Die Promo Übersicht** ist am 07.08.2026 neu gebaut worden, in derselben
+Designsprache und mit derselben Gewichtungslogik (Bild → Kachel, kein Bild →
+Zeile). Ein leerer Screenshot wird nicht ausgeliefert: `bilder.ist_leer()`
+misst die Standardabweichung der Graustufen (der leere lag bei 0,00, der
+nächstflaue bei 38,67). Sie hat seitdem **14 eigene Wahrheitstests**
+(`tests/test_promo_seite.py`) — vorher hatte sie keinen.
 
 Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
 Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
@@ -240,11 +257,15 @@ schwerer. **`site/images/` spiegelt den Bildordner, es sammelt nicht**, und
 ist (sonst zeigen Archivwochen leere Kästen, nachdem `raeume_auf()` ihre
 Bilder gelöscht hat).
 
-**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst acht
+**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **zehn**
 Kriterien gegen die wirklich gerenderte Seite, drei davon mit echtem
 Chromium bei 1440 × 900 — unter anderem, ob **irgendein** Bild
-hochskaliert dargestellt wird. Nichts an der Optik gilt als erledigt, bevor
-dieses Skript grün ist.
+hochskaliert dargestellt wird, ob alle sieben Ressorts ohne Scrollen
+sichtbar sind und ob die Promo Übersicht mindestens zehn echte Bilder zeigt.
+Nichts an der Optik gilt als erledigt, bevor dieses Skript grün ist.
+Kriterium 2 rechnet die **Quote** bebilderter Meldungen, keine absolute
+Zahl — die alte Schwelle „≥ 110" war an einer Ausgabe mit 193 Meldungen
+kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
 
 ## 6. Bekannte Fallstricke (alle in Session 1 gelernt!)
 
@@ -454,13 +475,18 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Der nächste Auftrag ist `AUFTRAG_PORTAL_WELLE2.md`.** Er ist Antonios
-> Rückmeldung auf das ausgelieferte Portal, gemessen statt zusammengefasst:
-> Datumszeile raus, Filter neben „Alle Meldungen" raus, Meldungsseite so
-> umbauen dass man nicht 8 Bildschirmhöhen scrollt, „Diese Woche" ruhiger
-> und mit rotem Faden — und die **Promo Übersicht komplett neu**. Dort
-> liegen 15 Screenshots auf der Platte, gerendert wird genau einer, und
-> ausgerechnet der ist mit 6 KB leer.
+> **`AUFTRAG_PORTAL_WELLE2.md` ist abgearbeitet** (Schlussliste:
+> `outputs/portal-welle2-2026-08-07.md`). Alle zehn Prüfungen von
+> `scripts/pruefe_portal.py` sind grün, 479 Tests laufen. Datumszeile und
+> Filter sind weg, die Meldungsseite ist von 9 846 auf 2 676 px geschrumpft
+> (alle sieben Ressorts ohne Scrollen), „Diese Woche" hat einen belegten
+> roten Faden und zwei Formen weniger, und die Promo Übersicht ist neu
+> gebaut — 13 echte Screenshots statt einem leeren.
+>
+> Offen daraus: **zwei der 14 Promo-Screenshots zeigen ein Cookie-Banner**
+> statt der Aktionsseite (1&1, congstar). Das gehört in
+> `collect/promo_snapshot.py`, nicht ins Layout, und ist der nächste
+> sichtbare Gewinn auf dieser Seite.
 >
 > **`AUFTRAG_NACHRICHTENPORTAL.md` ist abgearbeitet**
 > (Schlussliste: `outputs/nachrichtenportal-2026-08-06.md`). Alle acht
@@ -473,7 +499,7 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > „Pipeline-State ≠ Site-Ausgabe" um und ist eine Architekturentscheidung,
 > keine Aufräumarbeit.
 >
-> Danach kommt `AUFTRAG_1000_QUELLEN_WELLE3.md` (Quellenausbau) —
+> **Als Nächstes** `AUFTRAG_1000_QUELLEN_WELLE3.md` (Quellenausbau) —
 > beziehungsweise die vier Schritte aus §9 unten, deren erster (Vorgabe-Region
 > für Fachpressequellen) unverändert offen ist.
 

@@ -42,6 +42,27 @@
   <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
 {% endif %}
 
+{# ==================================================== DER ROTE FADEN ==== #}
+{# Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall". Er hat
+   recht gehabt und es war messbar: die Titelseite sortierte nach
+   Dringlichkeit, der Bericht nach dem Urteil der Chefredaktion, und beide
+   fuehrten mit einer anderen Geschichte.
+
+   Jetzt steht der Fuehrungsabsatz des Berichts ueber der Ausgabe, und
+   `_faden()` sorgt dafuer, dass Aufmacher und zweite Reihe GENAU die
+   Meldungen sind, die dieser Absatz meint. Der Vorspann ist nicht
+   dekorativ - er ist die Ansage, der die Seite darunter folgt.
+
+   `briefing_lead` gab es vorher schon; es wurde bei jedem Rendern berechnet
+   und von keiner Vorlage gelesen. #}
+{% if briefing_lead %}
+<div class="front-faden">
+  <p class="front-faden-kicker">Worum es diese Woche geht</p>
+  <p class="front-faden-text">{{ briefing_lead }}</p>
+  <p class="front-faden-mehr"><a href="#der-wochenbericht">Der ganze Wochenbericht &darr;</a></p>
+</div>
+{% endif %}
+
 {# ================================================= OBERHALB DER FALZ ==== #}
 <div class="front-oben">
   <div class="front-haupt">
@@ -174,7 +195,7 @@
 {% endif %}
 
 {# ================================================== DER WOCHENBERICHT == #}
-<div class="frontpage">
+<div class="frontpage" id="der-wochenbericht" style="scroll-margin-top:20px">
   <div class="frontpage-main">
     {% if briefing_html %}
     <div class="card">
@@ -183,6 +204,7 @@
       <p class="berichtszeile">
         {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
         <b>{{ highlights|length }} davon relevant</b>.{% endif %}
+        {% if dash and dash.sofort %}Davon <b>{{ dash.sofort }} zum sofortigen Ansehen</b> (5/5).{% endif %}
         {% if lesezeit %}Lesezeit etwa {{ lesezeit }} Minuten.{% endif %}
       </p>
       {% if toc %}
@@ -194,19 +216,13 @@
     </div>
     {% endif %}
   </div>
-
-  <aside class="frontpage-rail">
-    {% if dash and dash.kpis %}
-    <div class="rubrik"><h2>Zahlen der Woche</h2></div>
-    <div class="tile-grid">
-      {% for k in dash.kpis %}
-      <div class="tile{% if k.accent %} accent{% elif k.tint %} tint{% endif %}">
-        <b{% if k.text %} class="txt"{% endif %}>{{ k.num }}</b><span>{{ k.label }}</span>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-  </aside>
+  {# Hier stand bis zum 07.08.2026 eine Beistellspalte "Zahlen der Woche" mit
+     fuenf Kacheln. Zwei ihrer Werte (gelesen / relevant) standen im selben
+     Bildschirm noch einmal als Satz ueber dem Bericht, ein dritter
+     (Top-Technologiethema) als erste Zeile des Themenradars oberhalb der
+     Falz. Dieselbe Zahl in zwei Formen ist genau die Unruhe, die Antonio
+     benannt hat. Die eine Zahl, die nur hier stand, ist in den Berichtskopf
+     gezogen. #}
 </div>
 
 {# Deutschland-Fokus: was frueher als eigene Seite "Wettbewerber im Detail"
@@ -272,26 +288,11 @@
 {% endif %}
 </section>
 
-{% if report.run and report.run.analysts %}
-<div class="card">
-  <div class="card-head"><h2>Auswertung je Bereich</h2>
-    <a href="{{ prefix }}transparenz.html">Laufprotokoll</a></div>
-  <div class="rowtable">
-    <div class="rowtable-head">
-      <span class="col-region">Bereich</span><span class="col-flex">gelesen</span>
-      <span class="col-kept">relevant</span><span class="col-model">Modell</span>
-    </div>
-    {% for a in report.run.analysts %}
-    <div class="rowtable-row">
-      <span class="col-region">{{ a.region }}</span>
-      <span class="col-flex">{{ a.items_in }}</span>
-      <span class="col-kept">{{ a.highlights }}</span>
-      <span class="col-model">{{ a.model }}</span>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
+{# "Auswertung je Bereich" stand hier UND wortgleich auf transparenz.html
+   (dort ab Zeile 62, dieselben vier Spalten aus derselben Quelle). Eine
+   Tabelle mit Modell-IDs beantwortet "kann ich dem Ding trauen" - das ist
+   die Frage der Quellenseite, nicht die der Titelseite. Der Bericht
+   verlinkt sie im Kopf. #}
 
 {% if show_explorer and highlights %}
 <details class="evidence" id="alle-meldungen">
