@@ -160,7 +160,7 @@ def _resolve_link_index(row: dict, links: list[dict]) -> str | None:
 
 def extract_promos(brand: str, snapshot_text: str, model: str,
                    links: list[dict] | None = None,
-                   max_tokens: int = 1800) -> list[dict]:
+                   max_tokens: int = 8000) -> list[dict]:
     """LLM-Extraktion.
 
     Rueckgabe: die gefundenen Angebote. Eine LEERE Liste heisst "auf dieser

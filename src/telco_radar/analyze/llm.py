@@ -351,11 +351,50 @@ def _complete_openai(system: str, user: str, model: str,
     }
     if "deepseek" in model.lower():
         # NVIDIA DeepSeek NIM: turn off the reasoning trace (clean output, cheaper)
+        #
+        # ACHTUNG: das wirkt NUR auf NVIDIAs NIM-Endpunkt. Laeuft der Lauf
+        # gegen DeepSeeks EIGENE API (api.deepseek.com, siehe
+        # config/settings.yaml llm_provider: deepseek), wird der Parameter
+        # ignoriert - das Modell denkt trotzdem, und die Denkspur kommt in
+        # einem eigenen Feld zurueck. Siehe parse() unten, warum das teuer
+        # werden kann.
         payload["chat_template_kwargs"] = {"thinking": False}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
     def parse(data):
-        return data["choices"][0]["message"].get("content", "") or ""
+        nachricht = data["choices"][0]["message"]
+        inhalt = nachricht.get("content", "") or ""
+        if inhalt.strip():
+            return inhalt
+        # Leere Antwort trotz HTTP 200. Bei einem Reasoning-Modell heisst das
+        # fast immer dasselbe: das Token-Budget ist in der Denkspur
+        # aufgebraucht worden, bevor die eigentliche Antwort anfing.
+        #
+        # Aufgefallen in Lauf #84: dort scheiterten GENAU die Stufen mit
+        # kleinem Budget - Promo-Extraktion (1800), Kategorie-Sweep (2000),
+        # Promo-Bewertung (2200), Promo-Redaktion (3200) -, waehrend Analyst
+        # (8000) und Redaktion (32000) sauber durchliefen. 15 von 19
+        # gelesenen Promo-Seiten fielen so aus. Der Aufrufer sah davon nur
+        # einen "JSONDecodeError: Expecting value: line 1 column 1" auf einem
+        # leeren String und musste raten, ob die Quelle nichts hergab oder
+        # der Aufruf scheiterte.
+        #
+        # Deshalb hier eine Fehlermeldung, die den Grund benennt. Bewusst ein
+        # ValueError: der Retry-Wrapper oben faengt ihn NICHT, und das ist
+        # richtig - ein zu kleines Budget wird beim vierten Versuch nicht
+        # groesser, die Wiederholung waere nur teurer.
+        denkspur = (nachricht.get("reasoning_content")
+                    or nachricht.get("reasoning") or "")
+        grund = data["choices"][0].get("finish_reason", "?")
+        if denkspur:
+            raise ValueError(
+                f"Modell {model} lieferte KEINE Antwort, nur {len(denkspur)} "
+                f"Zeichen Denkspur (finish_reason={grund}, max_tokens="
+                f"{max_tokens}). Das Token-Budget dieser Stufe reicht fuer "
+                f"dieses Modell nicht - erhoehen, nicht wiederholen.")
+        raise ValueError(
+            f"Modell {model} lieferte eine leere Antwort "
+            f"(finish_reason={grund}, max_tokens={max_tokens}).")
 
     return _post_with_retries(_openai_base() + "/chat/completions",
                               payload, headers, retries, parse)
