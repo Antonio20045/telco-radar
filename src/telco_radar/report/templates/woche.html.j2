@@ -43,25 +43,17 @@
 {% endif %}
 
 {# ==================================================== DER ROTE FADEN ==== #}
-{# Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall". Er hat
-   recht gehabt und es war messbar: die Titelseite sortierte nach
-   Dringlichkeit, der Bericht nach dem Urteil der Chefredaktion, und beide
-   fuehrten mit einer anderen Geschichte.
+{# Der Faden ist geblieben, seine Anzeige nicht. `_faden()` sorgt weiterhin
+   dafuer, dass Aufmacher und zweite Reihe GENAU die Meldungen sind, die der
+   Fuehrungsabsatz des Berichts meint - die Reihenfolge der Seite folgt also
+   dem Bericht.
 
-   Jetzt steht der Fuehrungsabsatz des Berichts ueber der Ausgabe, und
-   `_faden()` sorgt dafuer, dass Aufmacher und zweite Reihe GENAU die
-   Meldungen sind, die dieser Absatz meint. Der Vorspann ist nicht
-   dekorativ - er ist die Ansage, der die Seite darunter folgt.
-
-   `briefing_lead` gab es vorher schon; es wurde bei jedem Rendern berechnet
-   und von keiner Vorlage gelesen. #}
-{% if briefing_lead %}
-<div class="front-faden">
-  <p class="front-faden-kicker">Worum es diese Woche geht</p>
-  <p class="front-faden-text">{{ briefing_lead }}</p>
-  <p class="front-faden-mehr"><a href="#der-wochenbericht">Der ganze Wochenbericht &darr;</a></p>
-</div>
-{% endif %}
+   Was hier bis zum 07.08.2026 zusaetzlich stand, war eine Abschrift dieses
+   Absatzes ueber der Ausgabe ("Worum es diese Woche geht") samt Sprunglink.
+   Antonio hat sie kassiert: derselbe Text steht zwei Bildschirme weiter
+   unten noch einmal, vollstaendig. Ein Ausschnitt eines Textes, der auf
+   derselben Seite ohnehin komplett steht, ist keine Zusammenfassung,
+   sondern eine Wiederholung. #}
 
 {# ================================================= OBERHALB DER FALZ ==== #}
 <div class="front-oben">
@@ -162,39 +154,20 @@
   {% endif %}
 </div>
 
-{# ======================================================= RESSORTS ====== #}
-{% if front.ressorts %}
-<div class="ressort-raster">
-  {% for r in front.ressorts %}
-  <section class="ressort">
-    <div class="rubrik">
-      <h2>{{ r.label }}</h2>
-      <a href="{{ prefix }}meldungen.html#ressort-{{ r.key }}">alle {{ r.n }}</a>
-    </div>
-    <article class="ressort-lead{% if not r.lead.image %} ohne-bild{% endif %}">
-      <a href="{{ r.lead.url }}" target="_blank" rel="noopener">
-        {{ bild(r.lead, 'ressort-lead-bild') }}
-        <span class="stueck-kicker">{{ r.lead.operator or r.lead.source_label }}</span>
-        <span class="ressort-lead-titel szl">{{ r.lead.schlagzeile }}</span>
-        {% if r.lead.anriss %}<span class="stueck-anriss">{{ r.lead.anriss }}</span>{% endif %}
-      </a>
-    </article>
-    {% if r.zeilen %}
-    <ul class="ressort-zeilen">
-      {% for h in r.zeilen %}
-      <li><a href="{{ h.url }}" target="_blank" rel="noopener">
-        <span class="ressort-zeile-titel szl">{{ h.schlagzeile }}</span>
-        <span class="ressort-zeile-meta">{{ h.operator or h.source_label }}</span>
-      </a></li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </section>
-  {% endfor %}
-</div>
-{% endif %}
-
 {# ================================================== DER WOCHENBERICHT == #}
+{# Hier standen bis zum 07.08.2026 sechs Ressortbloecke - je Ressort ein
+   Aufmacher und vier Zeilen, zusammen rund 3 500 px zwischen dem Ueberblick
+   und dem Bericht. Antonio: "die haben genau das Gleiche, habe ich ja auf
+   der naechsten Unterseite bei Meldungen. Das ist unnoetig, das ist doppelt
+   gemoppelt."
+
+   Er hat recht: meldungen.html gliedert ALLE Meldungen nach denselben
+   Ressorts, mit denselben Ueberschriften aus derselben Quelle - die
+   Titelseite zeigte davon eine Teilmenge. Diese Seite beantwortet jetzt
+   genau zwei Fragen, in dieser Reihenfolge: der Ueberblick oben ("was ist
+   diese Woche passiert") und danach ohne Zwischenstueck der Bericht ("was
+   heisst das"). Wer die Einzelmeldung sucht, geht auf Meldungen - dafuer
+   ist die Seite da. #}
 <div class="frontpage" id="der-wochenbericht" style="scroll-margin-top:20px">
   <div class="frontpage-main">
     {% if briefing_html %}

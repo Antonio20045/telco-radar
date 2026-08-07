@@ -121,19 +121,6 @@ b,strong{font-weight:700}
 }
 
 
-/* ====================================================  ROTER FADEN  ===== */
-/* Der Fuehrungsabsatz des Wochenberichts, ueber der Ausgabe. Linien statt
-   Kasten, wie alles andere hier: zwei Haarlinien und Weissraum. */
-.front-faden{margin:26px 0 0;padding:14px 0 16px;
-  border-top:3px solid var(--rule-ink);border-bottom:1px solid var(--rule)}
-.front-faden-kicker{margin:0 0 6px;font-family:var(--sans);font-size:10px;
-  font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:var(--red)}
-.front-faden-text{margin:0;font-family:var(--serif);font-size:20px;
-  line-height:1.42;color:var(--ink);max-width:78ch;font-weight:400}
-.front-faden-mehr{margin:9px 0 0;font-family:var(--sans);font-size:9.5px;
-  font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
-.front-faden-mehr a:hover{color:var(--red)}
-@media (max-width:640px){.front-faden-text{font-size:17px}}
 
 /* =============================================  TITELSEITENRASTER  ===== */
 /* Vier Gewichtsstufen statt zwei. Die Struktur, nicht die Schriftart, macht
@@ -197,40 +184,6 @@ b,strong{font-weight:700}
 .wichtig-titel{font-size:15.5px;line-height:1.32;font-weight:600;color:var(--ink)}
 .wichtig-zeile a:hover .wichtig-titel{color:var(--red)}
 
-/* ======================================================  RESSORTS  ===== */
-/* Je Ressort ein eigener Block: Rubrikleiste, ein bebilderter Aufmacher,
-   darunter Zeilen. Drei nebeneinander, mit Spaltenlinien. */
-.ressort-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:0 30px;margin-top:26px;padding-top:22px;
-  border-top:3px solid var(--rule-ink)}
-.ressort{min-width:0;padding:0 30px 26px 0;border-right:1px solid var(--rule);
-  margin-bottom:22px}
-.ressort:nth-child(3n){border-right:none;padding-right:0}
-.ressort .rubrik{margin-bottom:12px}
-.ressort-lead a{display:flex;flex-direction:column}
-.ressort-lead-bild{display:block;margin-bottom:9px}
-.ressort-lead-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
-  object-fit:cover;background:var(--paper-3)}
-.ressort-lead-titel{font-size:19px;line-height:1.26;font-weight:600;
-  letter-spacing:-.012em;color:var(--ink)}
-.ressort-lead a:hover .ressort-lead-titel{color:var(--red)}
-.ressort-zeilen{list-style:none;margin:14px 0 0;padding:0}
-.ressort-zeilen li{padding:9px 0;border-top:1px solid var(--rule-2)}
-.ressort-zeile-titel{display:block;font-size:15px;line-height:1.32;
-  color:var(--ink)}
-.ressort-zeilen a:hover .ressort-zeile-titel{color:var(--red)}
-.ressort-zeile-meta{display:block;margin-top:3px;font-family:var(--sans);
-  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
-  color:var(--ink-4)}
-@media (max-width:1040px){
-  .ressort-raster{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ressort:nth-child(3n){border-right:1px solid var(--rule);padding-right:30px}
-  .ressort:nth-child(2n){border-right:none;padding-right:0}
-}
-@media (max-width:680px){
-  .ressort-raster{grid-template-columns:1fr}
-  .ressort,.ressort:nth-child(3n){border-right:none;padding-right:0}
-}
 
 /* ======================================================  AUFMACHER  ==== */
 /* Der eine Block, der gross sein darf. Bild, Schlagzeile, Vorspann - er

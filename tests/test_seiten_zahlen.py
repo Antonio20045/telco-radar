@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
@@ -158,35 +159,40 @@ def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
 
 
 # ------------------------------------------------------------------ Bericht
-def test_ressortleiste_verspricht_nicht_mehr_als_es_gibt(tmp_path):
-    """Jede Ressortzahl auf der Titelseite muss der Datenlage entsprechen.
+def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
+    """Antonio am 07.08.2026: "die haben genau das Gleiche, habe ich ja auf
+    der naechsten Unterseite bei Meldungen. Das ist unnoetig, das ist doppelt
+    gemoppelt."
 
-    Der Nachfolger von `test_signalliste_verspricht_nicht_mehr_als_sie_zeigt`:
-    die Signalliste ist beim Portal-Umbau durch Ressortbloecke ersetzt
-    worden, das Verbot bleibt dasselbe. Ein Block, der "alle 46" verspricht
-    und zu einer Seite mit 12 fuehrt, ist genau der Fehler von damals.
+    Bis dahin standen zwischen dem Ueberblick und dem Bericht sechs
+    Ressortbloecke - dieselben Ressorts, dieselben Ueberschriften, dieselbe
+    Quelle wie auf meldungen.html, nur als Teilmenge. Der Test haelt beides
+    fest: die Bloecke sind weg UND keine Meldung ist dabei verloren
+    gegangen, sie stehen weiterhin vollstaendig auf der Meldungsseite.
     """
-    from telco_radar.report.html import _flatten, _nach_ressort
+    from telco_radar.report.html import _flatten, _nach_ressort, _titelseite
 
     site = _render(tmp_path, highlights=PORTAL)
-    html = _seite(site, "index.html")
+    soup = BeautifulSoup(_seite(site, "index.html"), "html.parser")
+    assert not soup.select(".ressort-raster"), "Ressortraster noch auf der Titelseite"
+    assert not soup.select(".ressort"), "Ressortbloecke noch auf der Titelseite"
+    assert "Alle Signale dieser Woche" not in _seite(site, "index.html")
+
+    # Die Gliederung selbst ist nicht verschwunden - sie steht dort, wo die
+    # Frage nach der Einzelmeldung gestellt wird, und dort vollstaendig.
     bericht = json.loads((tmp_path / "data" / "reports" / "2026-08-05.json")
                          .read_text(encoding="utf-8"))
-    echt = {r["label"]: r["n"] for r in _nach_ressort(_flatten(bericht))}
+    echt = _nach_ressort(_flatten(bericht))
+    meldungen = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
+    assert len(meldungen.select(".mressort")) == len(echt)
+    assert len(meldungen.select(".mressort .meldung")) == len(PORTAL)
 
-    soup = BeautifulSoup(html, "html.parser")
-    rubriken = soup.select(".ressort .rubrik")
-    assert rubriken, "Die Titelseite zeigt keine Ressortbloecke"
-    for rubrik in rubriken:
-        label = rubrik.h2.get_text(strip=True)
-        m = re.fullmatch(r"alle (\d+)", rubrik.a.get_text(strip=True))
-        assert m, f"Ressort {label} verlinkt seine Meldungszahl nicht"
-        assert int(m.group(1)) == echt[label], (
-            f"{label}: Seite sagt {m.group(1)}, Daten sagen {echt[label]}")
-
-    # Und keine Ueberschrift, die "alle" behauptet, waehrend gekappt wird.
-    assert len(_schlagzeilen(html)) < len(PORTAL)
-    assert "Alle Signale dieser Woche" not in html
+    # Und keine tote Rechnung zurueckgelassen: was keine Vorlage mehr liest,
+    # wird auch nicht mehr berechnet (dieselbe Regel wie bei der
+    # Datumszeile - diese Codebasis hat schon einmal sechs solcher Werte
+    # mitgeschleppt).
+    assert "ressorts" not in _titelseite(_flatten(bericht))
+    assert ".ressort-raster" not in _seite(site, "style.css")
 
 
 def test_oberhalb_der_falz_stehen_mindestens_sechs_geschichten(tmp_path):
@@ -833,20 +839,35 @@ def test_ohne_belegbaren_faden_bleibt_die_alte_reihenfolge(tmp_path):
     assert front["aufmacher"] is not None
 
 
-def test_der_faden_steht_sichtbar_auf_der_seite(tmp_path):
-    """Der Fuehrungsabsatz des Berichts gehoert auf die Seite, nicht nur in
-    die Auswahllogik - sonst ist der Faden gespannt, aber unsichtbar.
-    `briefing_lead` wurde bis zum 07.08.2026 bei jedem Rendern berechnet und
-    von keiner Vorlage gelesen."""
-    html = _seite(_render(tmp_path, highlights=_faden_highlights(),
-                          briefing=FADEN_BRIEFING), "index.html")
-    soup = BeautifulSoup(html, "html.parser")
-    faden = soup.select_one(".front-faden")
-    assert faden is not None, "Die Seite zeigt den Faden nicht"
-    assert "Quasarnetz" in faden.get_text(" ", strip=True)
-    # Und er fuehrt zum Bericht, statt nur zu behaupten.
-    assert soup.select_one('.front-faden a[href="#der-wochenbericht"]')
+def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path):
+    """Der Faden ordnet die Seite weiter, er wird nur nicht mehr abgeschrieben.
+
+    Ueber der Ausgabe stand bis zum 07.08.2026 der erste Satz des Berichts
+    als Vorspann samt Sprunglink. Antonio: "dieser kleine Ausschnitt von dem
+    Bericht mit dem Link zum Bericht, das kann dann auch weg" - derselbe
+    Text steht auf derselben Seite ohnehin vollstaendig.
+
+    Was bleibt, ist die Wirkung: der Aufmacher ist weiterhin GENAU die
+    Meldung, mit der der Bericht fuehrt (siehe
+    test_die_titelseite_fuehrt_mit_dem_bericht). Und `briefing_lead` wird
+    nicht mehr berechnet - eine Zahl, die keine Vorlage liest, ist genau der
+    Zustand, aus dem dieser Wert einmal gekommen ist."""
+    from telco_radar.report import html as html_mod
+
+    site = _render(tmp_path, highlights=_faden_highlights(),
+                   briefing=FADEN_BRIEFING)
+    soup = BeautifulSoup(_seite(site, "index.html"), "html.parser")
+    assert soup.select_one(".front-faden") is None, "Der Vorspann steht noch da"
+    assert "Worum es diese Woche geht" not in _seite(site, "index.html")
+    # Der Bericht steht direkt darunter und traegt seine Sprungmarke weiter.
     assert soup.select_one("#der-wochenbericht")
+    assert "front-faden" not in _seite(site, "style.css")
+
+    assert not hasattr(html_mod, "_briefing_lead")
+    vorlagen = Path(html_mod.__file__).parent / "templates"
+    for tpl in vorlagen.glob("*.j2"):
+        text = re.sub(r"(?s)\{#.*?#\}", "", tpl.read_text(encoding="utf-8"))
+        assert "briefing_lead" not in text, f"{tpl.name} liest briefing_lead"
 
 
 # ------------------------------------------------- Was die Seite NICHT mehr traegt

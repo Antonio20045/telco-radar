@@ -486,7 +486,6 @@ def _titelseite(highlights: list[dict],
         zwei          2  mittel, Bild >= 800 px  (die zweite Reihe)
         vier          4  klein, Bild beliebig
         wichtig       7  nur Text, nummeriert - die Spalte "Was wichtig ist"
-        ressorts      je Ressort ein Aufmacher + bis zu vier Zeilen
 
     Die Reihenfolge der Vergabe ist der Punkt: die Bildpositionen greifen
     zuerst zu, damit die grossen Bilder nicht in einer Textzeile verpuffen.
@@ -576,30 +575,16 @@ def _titelseite(highlights: list[dict],
     vier = nimm(4, mind_breite=1)
     wichtig = nimm(7)
 
-    ressorts = []
-    # "Vermischtes" steht auf der Titelseite NICHT. Erstens fuehrt keine
-    # Zeitung ihre Titelseite mit einem Sammelressort, zweitens bleiben so
-    # genau sechs Bloecke - zwei volle Dreierreihen statt einer angebrochenen.
-    # Auf der Meldungsseite ist das Ressort weiterhin vollstaendig da.
-    for key in (k for k in _RESSORT_REIHENFOLGE if k != "vermischt"):
-        offen = [h for h in highlights
-                 if h.get("url") not in benutzt and h.get("ressort") == key]
-        if len(offen) < 2:            # ein Ressort mit einer Meldung ist keins
-            continue
-        lead = next((h for h in offen if _bildbreite(h) >= 500), offen[0])
-        zeilen = [h for h in offen if h is not lead][:4]
-        lead = dict(lead)
-        lead["anriss"] = _first_sentence(lead.get("summary") or "", 130)
-        ressorts.append({
-            "key": key, "label": _RESSORT_LABEL[key],
-            "lead": lead, "zeilen": zeilen,
-            # Die Zahl ist die des GANZEN Ressorts, nicht die der gezeigten
-            # Zeilen - deshalb steht neben ihr "insgesamt" und ein Link.
-            "n": sum(1 for h in highlights if h.get("ressort") == key),
-        })
+    # Hier wurden bis zum 07.08.2026 zusaetzlich sechs Ressortbloecke
+    # bestueckt (je ein Aufmacher und vier Zeilen). Sie sind weg: dieselbe
+    # Gliederung nach denselben Ressorts steht vollstaendig auf der
+    # Meldungsseite (_nach_ressort), die Titelseite zeigte davon nur eine
+    # Teilmehge - dieselbe Ueberschrift, dieselbe Quelle, ein Klick weiter.
+    # Die Meldungen, die dort standen, sind nicht verschwunden; sie stehen
+    # auf meldungen.html, wo sie ohnehin schon standen.
 
     return {"aufmacher": aufmacher, "zwei": zwei, "vier": vier,
-            "wichtig": wichtig, "ressorts": ressorts,
+            "wichtig": wichtig,
             # Wie viele der Fuehrungssaetze des Berichts oberhalb der Falz
             # wirklich mit ihrer Meldung stehen. Die Zahl ist die Messgroesse
             # fuer den roten Faden - tests/test_seiten_zahlen.py haelt sie
@@ -685,7 +670,7 @@ def _schlagzeile(h: dict, max_zeichen: int = 0) -> str:
 def _text_aus_html(html: str) -> str:
     """Reintext aus gerendertem HTML - inklusive Aufloesung der Entitaeten.
 
-    Wichtig: die Vorspaenne (_briefing_lead/_promo_lead) ziehen Text aus
+    Wichtig: der Vorspann der Promo-Uebersicht (_promo_lead) zieht Text aus
     bereits gerendertem HTML. Wer dort nur die Tags per Regex entfernt,
     behaelt "&amp;" als Zeichenfolge - und Jinja escaped die beim Einsetzen
     ein zweites Mal. Auf der Titelseite stand deshalb "mit AT&amp;T".
@@ -810,19 +795,12 @@ def _strip_vodafone_advice(md_text: str) -> str:
     return "\n\n".join(blocks).strip()
 
 
-def _briefing_lead(md_text: str) -> str:
-    """Kurzer, plakativer Vorspann fuer die Uebersicht (Klartext, gekuerzt)."""
-    secs = _briefing_sections(md_text)
-    pick = None
-    for sec in secs:
-        if "wichtig" in (sec.get("title") or "").lower():
-            pick = sec
-            break
-    if pick is None:
-        pick = secs[1] if len(secs) > 1 else (secs[0] if secs else None)
-    if not pick:
-        return ""
-    return _first_sentence(_text_aus_html(pick["html"]), 360)
+# `_briefing_lead()` stand hier bis zum 07.08.2026: der erste Satz des
+# Abschnitts "Was wichtig ist", gekuerzt auf 360 Zeichen, als Vorspann ueber
+# der Ausgabe. Er ist mit seiner Anzeige zusammen entfernt worden (siehe
+# woche.html.j2) - eine Funktion, deren Ergebnis keine Vorlage mehr liest,
+# ist genau der Zustand, in dem `briefing_lead` schon einmal ein halbes Jahr
+# lang unbemerkt berechnet wurde.
 
 
 def _promo_lead(md_text: str) -> str:
@@ -1072,7 +1050,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "briefing_html": briefing_html,
             "toc": toc,
             "lesezeit": _lesezeit(briefing_md),
-            "briefing_lead": _briefing_lead(briefing_md),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,
@@ -1309,7 +1286,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             woche_tpl.render(prefix="", report=None, date_de="", highlights=[],
                              explorer_json="[]", front=_titelseite([]),
                              competitors=[], dash=None, toc=[], lesezeit=0,
-                             briefing_lead="", briefing_html="", regions=[],
+                             briefing_html="", regions=[],
                              categories=[], archive=[], is_latest=True,
                              show_explorer=False,
                              num_operators=num_operators, n_competitors=0),
