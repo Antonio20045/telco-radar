@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from . import bilder as report_bilder
+from . import differenzierung_view
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
@@ -23,7 +24,8 @@ from ..analyze import highlight_topics
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..promo_config import load_promo_config
-from ..textwerkzeug import (gewicht as _gewicht, haeufigkeiten as _haeufigkeiten,
+from ..textwerkzeug import (ABKUERZUNGEN as _ABK, gewicht as _gewicht,
+                            haeufigkeiten as _haeufigkeiten, saetze as _saetze,
                             slug as _tw_slug, wortmenge as _wortmenge)
 from .. import promo_bilder
 
@@ -746,26 +748,15 @@ _ADVICE_PHRASES = (
     "für vodafone", "fuer vodafone", "vodafone sollte", "vodafone könnte",
     "vodafone koennte", "vodafone muss", "vodafone kann",
 )
-# Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
-# Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
-# Satz weg.
-_ABK = ("z. B.", "d. h.", "u. a.", "u. Ä.", "bzw.", "ca.", "ggf.", "inkl.",
-        "Mio.", "Mrd.", "Nr.", "Abb.", "evtl.", "sog.", "Prof.", "Dr.")
-_SATZ_GRENZE = re.compile(r"(?<=[.!?])\s+(?=[«\"„*\[(A-ZÄÖÜ])")
-
-
 def _ohne_ratschlagsaetze(block: str) -> str:
-    """Entfernt aus einem Absatz die SAETZE mit Vodafone-Ratschlag."""
-    geschuetzt = block
-    for i, abk in enumerate(_ABK):
-        geschuetzt = geschuetzt.replace(abk, f"\x00{i}\x00")
-    saetze = _SATZ_GRENZE.split(geschuetzt)
-    behalten = [s for s in saetze
+    """Entfernt aus einem Absatz die SAETZE mit Vodafone-Ratschlag.
+
+    Der Satztrenner (mit Abkuerzungsschutz) steht in textwerkzeug - er wird
+    von drei Stellen gebraucht, die dieselbe Redaktionsregel durchsetzen.
+    """
+    behalten = [s for s in _saetze(block)
                 if not any(p in s.lower() for p in _ADVICE_PHRASES)]
-    text = " ".join(behalten)
-    for i, abk in enumerate(_ABK):
-        text = text.replace(f"\x00{i}\x00", abk)
-    return text.strip()
+    return " ".join(behalten).strip()
 
 
 def _strip_vodafone_advice(md_text: str) -> str:
@@ -1109,39 +1100,23 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
 
-    # ---- Differenzierung (persistente, kuratierte Bibliothek)
-    # Primaerquelle: der git-versionierte Kurator-Speicher (data/state/
-    # differentiation.jsonl) - so bleiben relevante Moves ueber Wochen erhalten,
-    # unabhaengig davon, wie lange die Wochen-Report-JSONs aufgehoben werden.
-    # Fallback (Bootstrap / erste Runde): Aggregation aller Report-Highlights.
-    # ---- Differenzierung: aus der dynamischen, quellenbelegten DB
-    # (data/state/differentiation_db.json), gepflegt vom Kategorie-Sweep.
-    from datetime import date, datetime, timedelta
+    # ---- Differenzierung: BEIDE Speicher, zu einem Bestand gemischt.
+    #   differentiation_db.json  - der rotierende Web-Sweep (Kategorie-Sweep).
+    #   differentiation.jsonl    - der Kurator ueber den Presse-Crawl.
+    # Bis zum 08.08.2026 rendere die Seite nur den ersten; der Kurator lief
+    # jede Woche und landete nirgends. Die Zusammenfuehrung (und warum ein
+    # Presse-Eintrag seine Hauptzeile aus `summary` bezieht) steht in
+    # report/differenzierung_view.py.
+    from datetime import date
     db = DiffDB(state_dir / "differentiation_db.json")
-    by_theme = db.by_theme()
+    store = DiffStore(state_dir / "differentiation.jsonl")
     latest_date = latest["date"] if latest else date.today().isoformat()
-    try:
-        cutoff = (datetime.fromisoformat(latest_date) - timedelta(days=10)).date().isoformat()
-    except ValueError:
-        cutoff = ""
-    diff_themes = []
-    for key, label in SWEEP_THEMES:
-        entries = by_theme.get(key, [])
-        for e in entries:
-            e["neu"] = bool((e.get("first_seen") or "") > cutoff)
-            e["verified_de"] = _fmt_date_de(e.get("last_verified") or "")
-        diff_themes.append({"key": key, "label": label,
-                            "color": _DIFF_COLOR.get(key, "#e60000"),
-                            "entries": entries, "n": len(entries)})
-    diff_stats = {
-        "total": len(db), "updated_de": _fmt_date_de(db.updated or latest_date),
-        "themes_active": sum(1 for t in diff_themes if t["n"]),
-        "themes_total": len(diff_themes),
-        "new": sum(1 for t in diff_themes for e in t["entries"] if e["neu"]),
-    }
+    diff = differenzierung_view.aufbereiten(
+        list(db.entries.values()), store.entries(), SWEEP_THEMES,
+        latest_date, _DIFF_COLOR)
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
-            prefix="", diff_themes=diff_themes, diff_stats=diff_stats,
+            prefix="", diff=diff,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             diff_report=diff_report,
             diff_report_html=_md_to_html(diff_report["briefing_md"])
@@ -1155,8 +1130,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Differenzierungs-Bibliothek in einem Index, den app.js im Browser
     # durchsucht (reines Filtern eines JSON-Arrays, kein Suchserver noetig -
     # siehe claude/suche-marktrecherche-konzept.md).
+    # Der Suchindex speist sich aus dem GEMISCHTEN Bestand - was auf der Seite
+    # steht, muss auffindbar sein. Ein Eintrag aus dem Presse-Zweig war bis zum
+    # 08.08.2026 weder das eine noch das andere.
     theme_label_map = dict(SWEEP_THEMES)
-    search_index = _build_search_index(reports, list(db.entries.values()), theme_label_map)
+    search_index = _build_search_index(reports, diff["bestand"], theme_label_map)
     (site_dir / "search_index.json").write_text(
         json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
 

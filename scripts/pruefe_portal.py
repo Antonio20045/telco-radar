@@ -244,8 +244,12 @@ def main() -> int:
     # ihre Ueberschriften aus dem Themenspeicher, also aus Meldungen, die
     # mehrere Wochen alt sein koennen - genau dort verschwindet ein Feld
     # unbemerkt.
+    # Seit dem 08.08.2026 auch auf der Differenzierungs-Seite: ihre Karten
+    # ziehen die Hauptzeile aus zwei Speichern, und der Presse-Zweig liefert
+    # rohe Zusammenfassungen - genau dort entsteht ein halber Satz.
     seiten = [index, meldungen]
-    for weitere in [site / "wettbewerb.html", *sorted((site / "thema").glob("*.html"))]:
+    for weitere in [site / "wettbewerb.html", site / "differenzierung.html",
+                    *sorted((site / "thema").glob("*.html"))]:
         if weitere.exists():
             seiten.append(BeautifulSoup(weitere.read_text(encoding="utf-8"),
                                         "html.parser"))

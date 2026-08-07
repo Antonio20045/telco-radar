@@ -550,8 +550,12 @@ b,strong{font-weight:700}
 .sdot{width:8px;height:8px;display:inline-block;border-radius:50%}
 .sdot.ok{background:#1a7f4b}.sdot.empty{background:var(--r4)}
 .sdot.fail{background:var(--r5)}.sdot.quarantaene{background:var(--ink-4)}
+/* Die "neu"-Marke. Bis zum 08.08.2026 ein gefuellter Farbblock - Rot (und
+   erst recht zwoelf Hebelfarben) als Flaeche widerspricht der Designsprache
+   (CLAUDE.md §5). Jetzt eine Haarlinien-Kontur in Rot. */
 .dz-new{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.11em;
-  text-transform:uppercase;color:#fff;background:var(--c,var(--red));padding:2px 6px}
+  text-transform:uppercase;color:var(--red);border:1px solid currentColor;
+  padding:1px 5px}
 .count-badge{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--ink-4)}
 
 /* ==========================================================  AUFKLAPPER = */
@@ -923,44 +927,54 @@ b,strong{font-weight:700}
 .gs-item-snip mark{background:#fbe9a7;color:inherit}
 
 /* ===================================================  DIFFERENZIERUNG === */
-.dz-status{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:18px;
-  padding-top:12px;border-top:1px solid var(--rule);font-family:var(--sans);
-  font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;
-  color:var(--ink-4)}
-.dz-status b{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);
-  font-variant-numeric:lining-nums}
-.dz-sep{width:1px;height:14px;background:var(--rule)}
-.theme-grid{display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  border-top:2px solid var(--rule-ink)}
-.theme-card{padding:16px 20px 18px 0;border-bottom:1px solid var(--rule);
-  border-right:1px solid var(--rule);border-top:3px solid var(--c,var(--red));
-  margin-top:-1px}
-.theme-card h3{margin:0 0 5px;font-size:18px;font-weight:700;letter-spacing:-.01em}
-.theme-count{font-family:var(--sans);font-size:9.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
-.theme-examples{display:flex;flex-direction:column;margin-top:11px}
-.theme-example{font-size:14px;line-height:1.42;color:var(--ink-2);padding:7px 0;
-  border-top:1px solid var(--rule-2)}
-.theme-example b{font-weight:700}
-.theme-example:hover{color:var(--red)}
-.theme-empty{margin:10px 0 0;font-family:var(--sans);font-size:10px;font-weight:600;
+/* Das Inspirations-Radar. Bis zum 08.08.2026 standen hier drei Bauformen
+   nebeneinander - Prosa-Wandtext, Kachelraster mit je zwei Beispielen in
+   Winzschrift, zugeklapptes <details> mit denselben Beispielen noch einmal.
+   Jetzt gibt es EINE Form: die Karte. Sie steht oben groesser (die juengsten
+   Funde) und in der Bibliothek kleiner, sonst ist sie identisch.
+
+   Die Hebel-Farbe (--c) traegt genau zwei Linien: die 3px-Rubrikleiste und
+   die 2px-Oberkante der Karte. Keine Flaeche, kein Badge (CLAUDE.md §5). */
+.dz-nav{margin:22px 0 0}
+.dz-radar{margin-top:34px}
+.dz-hebel{margin-top:38px;scroll-margin-top:16px}
+.dz-rubrik{border-top-width:3px;border-top-color:var(--c,var(--rule-ink))}
+.dz-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 30px}
+
+.dzk{display:flex;flex-direction:column;min-width:0;
+  border-top:2px solid var(--c,var(--rule-ink));padding-top:11px}
+.dzk-kopf{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 7px}
+.dzk-op{font-family:var(--serif);font-size:15px;font-weight:700;
+  letter-spacing:-.01em;color:var(--ink)}
+.dzk-reg{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+/* Die Hauptzeile: der Satz, der sagt, WAS der Anbieter tut. Serife, weil er
+   gelesen und nicht ueberflogen wird. */
+.dzk-what{display:block;font-family:var(--serif);font-size:17px;line-height:1.34;
+  font-weight:600;letter-spacing:-.012em;color:var(--ink)}
+.dzk-what:hover{color:var(--red)}
+.dzk-why{margin:8px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+.dzk > :nth-last-child(2){margin-bottom:auto}
+.dzk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+  margin:14px 0 0;padding-top:8px;border-top:1px solid var(--rule-2)}
+.dzk-hebel{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--c,var(--red))}
+.dzk-quelle{font-family:var(--sans);font-size:9px;font-weight:600;
   text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.dz-card{padding:18px 0 6px;border-top:2px solid var(--c,var(--red))}
-.dz-card-head{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
-.dz-card-head h2{font-family:var(--sans);font-size:11px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.12em;margin:0}
-.dz-count{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--ink-4)}
-.dz-moves{list-style:none;margin:0;padding:0}
-.dz-move{padding:10px 0;border-top:1px solid var(--rule-2)}
-.dz-move-h{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.dz-move-title{font-size:15.5px;line-height:1.42;color:var(--ink)}
-.dz-move-title:hover{color:var(--red)}
-.dz-move-meta{margin:4px 0 0;font-family:var(--sans);font-size:9.5px;font-weight:600;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.dz-move-meta a{color:var(--red)}
+.dzk-quelle:hover{color:var(--red)}
+.dzk--gross{padding-top:13px}
+.dzk--gross .dzk-op{font-size:16px}
+.dzk--gross .dzk-what{font-size:21px;line-height:1.22;letter-spacing:-.018em;
+  font-weight:700}
+.dzk--gross .dzk-why{font-size:15px;margin-top:9px}
+@media (max-width:1000px){.dz-raster{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.dz-raster{grid-template-columns:1fr}}
+
+.dz-essay{margin-top:44px}
 .dz-foot{margin:30px 0 0;padding-top:14px;border-top:1px solid var(--rule);
   font-size:14px;font-style:italic;color:var(--ink-3);max-width:75ch}
-.dz-report-meta{font-family:var(--sans);font-size:10px;color:var(--ink-4)}
 
 /* ==========================================================  IMPRESSUM  = */
 .foot{margin-top:60px;border-top:3px solid var(--rule-ink);padding:18px 0 40px}

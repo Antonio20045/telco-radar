@@ -1,80 +1,100 @@
+{# Das Inspirations-Radar: womit heben sich Telkos ab, jenseits von Preis
+   und Datenvolumen?
+
+   Antonio am 08.08.2026: "Differenzierung gefaellt mir ueberhaupt nicht. Es
+   geht darum, was Telco-Unternehmen weltweit tun, um sich JENSEITS von Preis
+   und Gigabytes zu differenzieren - zusaetzliche externe Services usw.
+   Beispiele: Vodafone 5-Jahres-Garantie; Telekom bietet Kunden Perplexity an.
+   Genau sowas will ich als Radar auf dem Schirm haben."
+
+   Bis dahin stand hier dreimal dieselbe Information: der Prosa-Bericht mit
+   Dutzenden Inline-Links, darunter ein Kachelraster mit je zwei Beispielen
+   in Winzschrift, darunter ein zugeklapptes <details> mit allen Beispielen.
+   Jetzt steht jedes Beispiel GENAU EINMAL, als Karte, und der Essay klappt
+   unten auf.
+
+   Die Ordnung:
+     RADAR       die juengsten Funde, gross - der Nachrichtenwert der Seite.
+     BIBLIOTHEK  je Hebel eine Rubrik mit allen Beispielen. Hebel ohne
+                 Beispiel erscheinen nicht.
+     BERICHT     der Essay, aufklappbar.
+
+   Die Anker `dz-theme-<key>` sitzen an den Hebel-Rubriken und muessen bleiben
+   (der Suchindex verlinkt dorthin). Sie stehen jetzt IM Seitenfluss statt in
+   einem geschlossenen <details> - ein Sprungziel in einem zugeklappten
+   Aufklapper fuehrt ins Nichts.
+
+   Jede Schlagzeile traegt `szl` (CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
 {% set active = 'differenzierung' %}
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
+
+{% macro karte(e, gross=false) %}
+<article class="dzk{% if gross %} dzk--gross{% endif %}"{% if e.farbe %} style="--c:{{ e.farbe }}"{% endif %}>
+  <p class="dzk-kopf"><b class="dzk-op">{{ e.operator }}</b>{% if e.region %}<span class="dzk-reg">{{ e.region }}</span>{% endif %}</p>
+  <a class="dzk-what szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.what }}</a>
+  {% if e.why %}<p class="dzk-why">{{ e.why }}</p>{% endif %}
+  <p class="dzk-fuss">
+    {# Oben mischen alle Hebel - dort muss die Karte sagen, aus welchem Feld
+       sie kommt. In der Bibliothek steht das schon in der Rubrik darueber. #}
+    {% if gross and e.hebel_label %}<a class="dzk-hebel" href="#dz-theme-{{ e.theme }}">{{ e.hebel_label }}</a>{% endif %}
+    <a class="dzk-quelle" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>
+    {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
+  </p>
+</article>
+{% endmacro %}
+
 {% block content %}
 
 <section class="page-hero wide">
   <div class="page-hero-row">
     <div>
-      <p class="page-kicker">Ressort</p>
-      <h1>Womit sich Telkos abheben.</h1>
+      <p class="page-kicker">Differenzierung</p>
+      <h1>Womit sich Telkos weltweit abheben.</h1>
     </div>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Konkrete Angebote, Projekte und Partnerschaften von Telkos weltweit – <b>jenseits von Netz, Tarif und Preis</b>.</p>
-  {% if diff_stats %}
-  <div class="dz-status">
-    <span><b>{{ diff_stats.total }}</b> Beispiele in der Bibliothek</span>
-    <span class="dz-sep"></span>
-    <span><b>{{ diff_stats.themes_active }}</b> von {{ diff_stats.themes_total }} Hebeln aktiv</span>
-    {% if diff_stats.new %}<span class="dz-sep"></span><span><b>{{ diff_stats.new }}</b> neu seit dem letzten Blick</span>{% endif %}
-  </div>
+  <p class="page-lead">Konkrete Beispiele jenseits von Preis und Datenvolumen – als Inspiration, jede mit Originalquelle.</p>
+  {% if diff.hebel %}
+  <nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
+    {% for h in diff.hebel %}<a href="#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}
+  </nav>
   {% endif %}
 </section>
 
-{% if diff_report_html %}
-<div class="card">
-  <div class="card-head"><h2>Der Differenzierungsbericht</h2></div>
-  <p class="card-sub">Bericht vom {{ diff_report_date }} · Quellen und Detailbelege stehen direkt im Text</p>
-  <article class="prose">{{ diff_report_html | safe }}</article>
-</div>
+{% if diff.neu %}
+<section class="dz-radar">
+  <div class="rubrik">
+    <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
+  </div>
+  <div class="dz-raster dz-raster--gross">
+    {% for e in diff.neu %}{{ karte(e, true) }}{% endfor %}
+  </div>
+</section>
 {% endif %}
 
-<div class="theme-grid" style="margin-top:24px">
-  {% for t in diff_themes %}
-  <div class="theme-card" style="--c:{{ t.color }}">
-    <h3>{{ t.label }}</h3>
-    <span class="theme-count">{{ t.n }} Beispiel{{ 'e' if t.n != 1 else '' }}</span>
-    {% if t.entries %}
-    <div class="theme-examples">
-      {% for e in t.entries[:2] %}
-      <a class="theme-example" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> {{ e.what }}</a>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p class="theme-empty">Noch keine bestätigten Beispiele.</p>
-    {% endif %}
+{% for h in diff.hebel %}
+<section class="dz-hebel" id="dz-theme-{{ h.key }}"{% if h.farbe %} style="--c:{{ h.farbe }}"{% endif %}>
+  <div class="rubrik dz-rubrik">
+    <h2>{{ h.label }}</h2>
+    <span class="rubrik-zusatz">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
   </div>
-  {% endfor %}
-</div>
+  <div class="dz-raster">
+    {% for e in h.eintraege %}{{ karte(e) }}{% endfor %}
+  </div>
+</section>
+{% else %}
+<p class="empty-note">Für dieses Ressort liegt noch kein belegtes Beispiel vor.</p>
+{% endfor %}
 
-<details class="evidence" style="margin-top:24px">
-  <summary><span>Konkrete Beispiele und Quellen öffnen</span><small>{{ diff_stats.total if diff_stats else '' }} Belege</small></summary>
+{% if diff_report_html %}
+<details class="evidence dz-essay">
+  <summary><span>Der Differenzierungsbericht</span><small>Bericht vom {{ diff_report_date }}</small></summary>
   <div class="evidence-body">
-    <p class="card-sub" style="margin-top:0">Konkrete Angebote und Projekte zum Nachprüfen – mit Betreiber, Region, Originalquelle und Prüfdatum.</p>
-    {% for t in diff_themes %}
-    {% if t.entries %}
-    <article class="dz-card" id="dz-theme-{{ t.key }}" style="--c:{{ t.color }}">
-      <div class="dz-card-head">
-        <h2>{{ t.label }}</h2>
-        <span class="dz-count">{{ t.n }}</span>
-      </div>
-      <ul class="dz-moves">
-        {% for e in t.entries %}
-        <li class="dz-move">
-          <div class="dz-move-h">
-            <a class="dz-move-title" href="{{ e.url }}" target="_blank" rel="noopener"><b>{{ e.operator }}</b> — {{ e.what }}</a>
-            {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
-          </div>
-          <p class="dz-move-meta">{% if e.region %}{{ e.region }} · {% endif %}{% if e.date %}{{ e.date }} · {% endif %}<a href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>{% if e.verified_de %} · geprüft {{ e.verified_de }}{% endif %}</p>
-        </li>
-        {% endfor %}
-      </ul>
-    </article>
-    {% endif %}
-    {% endfor %}
+    <article class="prose">{{ diff_report_html | safe }}</article>
   </div>
 </details>
+{% endif %}
 
 <p class="dz-foot">Zwei Quellen speisen diese Seite: der wöchentliche Presse-Crawl der beobachteten Netzbetreiber
 und ein rotierender Web-Sweep (Brave Search + KI-Prüfung), der gezielt nach Differenzierung jenseits des Preises

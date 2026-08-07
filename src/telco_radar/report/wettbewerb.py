@@ -43,6 +43,7 @@ import unicodedata
 from urllib.parse import urlsplit
 
 from ..analyze.promo_ranker import MECHANICS
+from ..textwerkzeug import ohne_vodafone_teil
 
 # Wie viele Aktionen je Wettbewerber auf der Seite stehen. Der Rest steht
 # vollstaendig auf der Promo Uebersicht, dorthin verweist die Zeile darunter.
@@ -55,11 +56,6 @@ _MAX_THEMEN_JE_WOCHE = 6
 
 _TRACKING = ("utm_", "fbclid", "gclid", "mc_cid", "mc_eid")
 
-# Trennzeichen, an dem die Notiz des Analysten ihre zwei Haelften teilt.
-# Das Semikolon steht ohne Leerzeichen davor ("Basisstationen; fuer
-# Vodafone"), der Halbgeviertstrich mit ("an - Vodafone") - und ein Bindestrich
-# ohne Leerzeichen ist keiner ("Wi-Fi-7-Router").
-_TRENNER = re.compile(r"\s*[;–—]\s+|\s+-\s+")
 
 
 def anker(name: str) -> str:
@@ -98,29 +94,10 @@ def _klartext(text: str) -> str:
     return " ".join(html_lib.unescape(text or "").split())
 
 
-def _ohne_vodafone_teil(note: str) -> str:
-    """Die Notiz ohne den Vodafone-Ratschlag.
-
-    Die Website berichtet, sie beraet nicht (CLAUDE.md §8; im Wochenbericht
-    macht das `_strip_vodafone_advice`). Der Wettbewerber-Prompt verlangt
-    aber ausdruecklich "what it is and the angle for Vodafone" in EINEM
-    Satz, und 82 von 170 Notizen im Archiv nennen Vodafone. Satzweise
-    streichen wuerde die Notiz komplett verwerfen - mitsamt dem Befund.
-
-    Die zwei Haelften sind durch Gedankenstrich oder Semikolon getrennt
-    ("Telekom bietet Google One mit Rabatt an – Vodafone muss gegenhalten").
-    Steht Vodafone nur hinten, faellt das Hintere weg. Steht der Name auch
-    vorn oder gibt es keine Trennstelle, faellt die ganze Notiz - lieber
-    keine Einordnung als eine Empfehlung auf einer beobachtenden Seite.
-    """
-    text = " ".join((note or "").split())
-    if "vodafone" not in text.lower():
-        return text
-    teile = _TRENNER.split(text)
-    kopf = teile[0].strip(" ,;–—-")
-    if len(teile) > 1 and "vodafone" not in kopf.lower():
-        return kopf if kopf.endswith((".", "!", "?")) else kopf + "."
-    return ""
+# Die Notiz ohne den Vodafone-Ratschlag. Die Regel selbst und ihr
+# Handwerkszeug stehen in textwerkzeug - dieselbe Frage stellt sich auf der
+# Differenzierungs-Seite noch einmal, dort nur mit einer anderen Antwort.
+_ohne_vodafone_teil = ohne_vodafone_teil
 
 
 def _matcher(begriffe) -> list[re.Pattern]:

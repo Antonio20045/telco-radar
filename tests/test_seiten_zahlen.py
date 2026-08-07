@@ -1038,3 +1038,218 @@ def test_ohne_aktives_thema_steht_kein_band_und_keine_seite(tmp_path):
     render_site(site, tmp_path / "data" / "reports")
     assert not (site / "thema" / f"{THEMA['slug']}.html").exists()
     assert "fokusband" not in _seite(site, "index.html")
+
+
+# ------------------------------------------------- Die Differenzierungs-Seite
+# Sie zeigt seit dem 08.08.2026 nur noch EINE Zahl: je Hebel, wie viele
+# Beispiele darunter stehen. Die alte Statuszeile ("51 Beispiele in der
+# Bibliothek · 12 von 12 Hebeln aktiv · 5 neu") ist genau das Zahlenrauschen,
+# das Antonio moniert hat - sie ist ersatzlos weg.
+#
+# Der zweite, wichtigere Punkt hier ist kein Layout-, sondern ein
+# Inhaltsfehler: die Seite las bis dahin nur `differentiation_db.json` (den
+# Web-Sweep). `differentiation.jsonl` (der Kurator ueber den woechentlichen
+# Presse-Crawl) wurde jede Woche gefuellt und nie angezeigt.
+DIFF_DB = [
+    {"id": f"https://sweep{i}.example.com/x", "theme": t,
+     "operator": f"Betreiber {i}", "region": "Europa",
+     "what": f"Sweep-Beispiel {i} als Zusatzleistung.",
+     "url": f"https://sweep{i}.example.com/x", "source": f"sweep{i}.example.com",
+     "date": "2026", "why": "Bindet Kunden ohne Preisnachlass.",
+     "first_seen": "2026-06-15", "last_verified": "2026-07-31",
+     "status": "aktiv"}
+    for i, t in enumerate(["ki", "ki", "ki", "cloud", "gaming"])
+]
+DIFF_STORE = [
+    {"id": f"https://presse{i}.example.com/y", "first_seen": "2026-08-04",
+     "theme": t, "title": f"Original headline {i} 20 Jul 2026",
+     "summary": f"Presse-Beispiel {i} als Zusatzleistung. Nebensatz faellt weg.",
+     "url": f"https://presse{i}.example.com/y", "operator": f"Presse-Betreiber {i}",
+     "region": "Asien", "date": None, "category": "Partnerschaft", "relevance": 4,
+     "why_it_matters": f"Begruendung {i}. Vodafone sollte pruefen, ob das traegt.",
+     "source": f"Quelle {i}"}
+    for i, t in enumerate(["ki", "security"])
+]
+
+
+def _diffspeicher(tmp_path, db=None, store=None):
+    state = tmp_path / "data" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "differentiation_db.json").write_text(
+        json.dumps({"updated": "2026-08-05",
+                    "entries": DIFF_DB if db is None else db},
+                   ensure_ascii=False), encoding="utf-8")
+    (state / "differentiation.jsonl").write_text(
+        "".join(json.dumps(e, ensure_ascii=False) + "\n"
+                for e in (DIFF_STORE if store is None else store)),
+        encoding="utf-8")
+
+
+def _mit_differenzierung(tmp_path, db=None, store=None):
+    site = _render(tmp_path)
+    _diffspeicher(tmp_path, db, store)
+    render_site(site, tmp_path / "data" / "reports")
+    return site
+
+
+def test_die_differenzierung_zeigt_BEIDE_speicher(tmp_path):
+    """Der Kurator lief bis zum 08.08.2026 jede Woche umsonst."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    hauptzeilen = {e.get_text(" ", strip=True) for e in soup.select(".dzk-what")}
+    assert "Sweep-Beispiel 0 als Zusatzleistung." in hauptzeilen
+    assert "Presse-Beispiel 0 als Zusatzleistung." in hauptzeilen
+    # Die Hauptzeile ist der deutsche Satz, nicht der mehrsprachige Rohtitel.
+    assert not any("Original headline" in z for z in hauptzeilen)
+
+
+def test_jeder_hebel_zaehlt_was_unter_ihm_steht(tmp_path):
+    """Die einzige Zahl der Seite - gegen die Karten gehalten, die sie meint."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    erwartet = {"ki": 4, "security": 1, "cloud": 1, "gaming": 1}
+    gesehen = {}
+    for abschnitt in soup.select(".dz-hebel"):
+        key = abschnitt["id"].removeprefix("dz-theme-")
+        zahl = abschnitt.select_one(".rubrik-zusatz").get_text(" ", strip=True)
+        karten = abschnitt.select(".dzk")
+        assert zahl == f"{len(karten)} Beispiel{'e' if len(karten) != 1 else ''}", key
+        gesehen[key] = len(karten)
+    assert gesehen == erwartet
+    # Und jedes Beispiel steht in der Bibliothek genau EINMAL.
+    quellen = [a["href"] for abschnitt in soup.select(".dz-hebel")
+               for a in abschnitt.select(".dzk-what")]
+    assert len(quellen) == len(set(quellen)) == len(DIFF_DB) + len(DIFF_STORE)
+
+
+def test_hebel_ohne_beispiel_stehen_nicht_auf_der_seite(tmp_path):
+    """Zwoelfmal "Noch keine bestaetigten Beispiele" war zwoelfmal derselbe
+    leere Kasten - und die Sprungnavigation zeigt nur, was es gibt."""
+    seite = _seite(_mit_differenzierung(tmp_path), "differenzierung.html")
+    soup = BeautifulSoup(seite, "html.parser")
+    assert "Noch keine bestätigten Beispiele" not in seite
+
+    anker = {a["id"] for a in soup.select(".dz-hebel")}
+    sprungziele = {a["href"].lstrip("#") for a in soup.select(".dz-nav a")}
+    assert sprungziele == anker == {"dz-theme-ki", "dz-theme-security",
+                                    "dz-theme-cloud", "dz-theme-gaming"}
+
+
+def test_die_statuszeile_der_differenzierung_ist_weg(tmp_path):
+    """Antonio: die Seite wirkt unruhig durch die vielen Kommentare. Geprueft
+    wird auch, dass keine tote Vorlagen-Variable und kein toter CSS-Block
+    zurueckgeblieben ist."""
+    site = _mit_differenzierung(tmp_path)
+    seite = _seite(site, "differenzierung.html")
+    for tot in ("dz-status", "Beispiele in der Bibliothek", "Hebeln aktiv",
+                "seit dem letzten Blick", "theme-grid", "theme-card"):
+        assert tot not in seite, tot
+    stil = _seite(site, "style.css")
+    for tot in ("dz-status", "theme-grid", "theme-card", "dz-move", "dz-card"):
+        assert tot not in stil, f"toter CSS-Block {tot}"
+
+    from telco_radar.report import html as html_mod
+    vorlage = (Path(html_mod.__file__).parent / "templates"
+               / "differenzierung.html.j2").read_text(encoding="utf-8")
+    vorlage = re.sub(r"(?s)\{#.*?#\}", "", vorlage)
+    for tot in ("diff_stats", "diff_themes"):
+        assert tot not in vorlage, f"Vorlage liest die tote Variable {tot}"
+
+
+def test_neu_auf_dem_radar_zeigt_nur_junge_funde(tmp_path):
+    site = _mit_differenzierung(tmp_path)
+    soup = BeautifulSoup(_seite(site, "differenzierung.html"), "html.parser")
+    radar = soup.select(".dz-radar .dzk")
+    # Nur die zwei Presse-Eintraege sind juenger als zehn Tage (Ausgabe vom
+    # 5.8., first_seen 4.8.); die Sweep-Eintraege stammen vom 15.6.
+    assert len(radar) == len(DIFF_STORE)
+    assert soup.select_one(".dz-radar .rubrik h2").get_text(strip=True) \
+        == "Neu auf dem Radar"
+    assert all(k.select_one(".dz-new") for k in radar)
+
+
+def test_ohne_junge_funde_steht_oben_das_zuletzt_gepruefte(tmp_path):
+    """Gegenprobe: eine ruhige Woche darf die Seite nicht enthaupten."""
+    soup = BeautifulSoup(
+        _seite(_mit_differenzierung(tmp_path, store=[]), "differenzierung.html"),
+        "html.parser")
+    assert soup.select_one(".dz-radar .rubrik h2").get_text(strip=True) \
+        == "Zuletzt nachgeprüft"
+    assert soup.select(".dz-radar .dzk")
+    assert not soup.select(".dz-radar .dz-new")
+
+
+def test_der_suchindex_kennt_auch_die_presse_eintraege(tmp_path):
+    """Was auf der Seite steht, muss auffindbar sein - der Index speiste sich
+    bis dahin allein aus der DiffDB."""
+    site = _mit_differenzierung(tmp_path)
+    index = json.loads(_seite(site, "search_index.json"))
+    diff = [e for e in index if e["kind"] == "differenzierung"]
+    assert len(diff) == len(DIFF_DB) + len(DIFF_STORE)
+    presse = [e for e in diff if e["operator"] == "Presse-Betreiber 0"]
+    assert len(presse) == 1
+    assert presse[0]["deep_link"] == "differenzierung.html#dz-theme-ki"
+    assert presse[0]["title"] == "Presse-Beispiel 0 als Zusatzleistung."
+
+
+def test_der_differenzierungsbericht_bleibt_erhalten(tmp_path):
+    """Der Essay wandert nach unten in einen Aufklapper - er verschwindet
+    nicht. Loeschen von Funktionalitaet ist keine Vereinfachung."""
+    site = _render(tmp_path)
+    berichte = tmp_path / "data" / "reports" / "differenzierung"
+    berichte.mkdir(parents=True, exist_ok=True)
+    (berichte / "2026-08-05.md").write_text(
+        "## Garantien\n\nEin Absatz des Essays.\n", encoding="utf-8")
+    _diffspeicher(tmp_path)
+    render_site(site, tmp_path / "data" / "reports")
+
+    soup = BeautifulSoup(_seite(site, "differenzierung.html"), "html.parser")
+    essay = soup.select_one("details.dz-essay")
+    assert essay is not None and not essay.has_attr("open")
+    assert "Ein Absatz des Essays." in essay.get_text(" ", strip=True)
+
+
+def test_keine_karte_der_differenzierung_raet_vodafone_etwas(tmp_path):
+    """Die Seite berichtet, sie beraet nicht (CLAUDE.md §8).
+
+    Geprueft wird ueber den GESAMTEN gerenderten Bestand, mit einem Muster,
+    das eingeschobene Woerter zulaesst - "Vodafone prüfen könnte" stand nicht
+    woertlich in den alten `_ADVICE_PHRASES` und rutschte deshalb durch.
+    Der Gegenfall steht gleich mit drin: eine Beobachtung UEBER
+    Vodafone-Gesellschaften ist kein Rat AN Vodafone und muss bleiben.
+    """
+    beobachtung = ("Vodafone-Afrika-Gesellschaften könnten Marktanteile an "
+                   "Reisende verlieren, wenn MTN ein eSIM-Angebot platziert.")
+    db = [dict(DIFF_DB[0], id="https://a.example.com/", url="https://a.example.com/",
+               why="Ein Modell, das Vodafone prüfen könnte: KI-Bundles binden Kunden."),
+          dict(DIFF_DB[1], id="https://b.example.com/", url="https://b.example.com/",
+               why="Vodafone sollte prüfen, ob das trägt."),
+          dict(DIFF_DB[2], id="https://c.example.com/", url="https://c.example.com/",
+               why=beobachtung)]
+    store = [dict(DIFF_STORE[0], id="https://d.example.com/",
+                  url="https://d.example.com/",
+                  why_it_matters="Zeigt die Zugkraft von Sportrechten. "
+                                 "Wir sollten prüfen, ob wir nachziehen.")]
+    site = _mit_differenzierung(tmp_path, db=db, store=store)
+    soup = BeautifulSoup(_seite(site, "differenzierung.html"), "html.parser")
+
+    modal = (r"(?:soll(?:te|ten)?|m(?:ü|u)ss(?:te|ten|en)?|"
+             r"k(?:ö|oe)nn(?:te|ten|en)?|kann|pr(?:ü|ue)fen|bewerten)")
+    adressat = r"vodafone|wir|uns(?:er\w*)?"
+    rat = [re.compile(rf"(?<!\w)(?:{adressat})(?:\W+\w+){{0,4}}\W+{modal}(?!\w)", re.I),
+           re.compile(rf"(?<!\w){modal}(?:\W+\w+){{0,4}}\W+(?:{adressat})(?!\w)", re.I)]
+
+    karten = soup.select(".dzk")
+    assert karten
+    for karte in karten:
+        text = " ".join(karte.get_text(" ", strip=True).split())
+        if beobachtung[:40] in text:      # der Gegenfall - er DARF matchen
+            continue
+        for muster in rat:
+            assert not muster.search(text), text
+
+    # Der Gegenfall steht wirklich noch da, ungekuerzt.
+    assert beobachtung in _seite(site, "differenzierung.html")
+    # Und die reine Empfehlung hat ihre Karte nicht mitgenommen.
+    zweitzeilen = len(soup.select(".dz-hebel .dzk-why"))
+    assert len(soup.select(".dz-hebel .dzk")) == 4 and zweitzeilen == 3
