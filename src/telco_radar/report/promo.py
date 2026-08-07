@@ -99,7 +99,10 @@ def _kachel_text(offer: dict, mechanik: str) -> str:
     erster = _KLAUSEL_RE.split(headline)[0].strip()
     if len(erster) > _KACHEL_MAX:
         erster = _NAEHER_RE.split(erster)[0].strip()
-    if erster and len(erster) <= _KACHEL_MAX:
+    # Die ganze Ueberschrift taugt nicht als Kachel: sie steht zwei Zeilen
+    # tiefer noch einmal, und dieselbe Aussage zweimal untereinander liest
+    # sich als Panne. Ein AUSSCHNITT ist etwas anderes - er hebt hervor.
+    if erster and erster != headline and len(erster) <= _KACHEL_MAX:
         return erster
     return mechanik or "Aktion"
 

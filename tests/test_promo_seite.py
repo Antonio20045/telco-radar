@@ -20,11 +20,13 @@ promo_db.json und im Bildordner steht.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
 
+from telco_radar.analyze.promo_ranker import MECHANICS
 from telco_radar.report.html import render_site
 from telco_radar.report.promo import prepare_promo_view
 
@@ -78,9 +80,11 @@ def _view(eintraege=None):
 
 
 # ----------------------------------------------------------------- Zahlen
-def test_die_kopfzahlen_stimmen_mit_den_daten_ueberein():
-    """Die drei Zahlen im Kopf sind die einzigen, die ein Leser ungeprueft
-    uebernimmt - sie muessen zaehlbar sein."""
+def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
+    """Die Zahlen, mit denen die Seite rechnet - sie muessen zaehlbar sein.
+    Im Kopf steht seit dem 08.08.2026 keine davon mehr (Antonio: die vielen
+    Kommentare machen die Seite unruhig); sie tragen die Marktlage-Balken
+    und die Wahrheitstests."""
     view = _view()
     aktive = [e for e in EINTRAEGE if e["status"] == "aktiv"
               and e["brand"] != "Vodafone Deutschland"]
@@ -88,22 +92,26 @@ def test_die_kopfzahlen_stimmen_mit_den_daten_ueberein():
     assert view["brands_active"] == len({e["brand"] for e in aktive})
     # Vodafone zaehlt nicht als beobachteter Wettbewerber.
     assert view["brands_tracked"] == len(MARKEN)
-    # highlight_count zaehlt die hervorgehobenen KARTEN (je Marke eine),
-    # nicht die Eintraege - genau das steht auch auf der Seite.
+    # highlight_count zaehlt die hervorgehobenen KARTEN - seit dem
+    # Markenraster steht jede sichtbare Aktion als Karte da, nicht nur die
+    # staerkste je Marke.
     assert view["highlight_count"] == len(
-        {e["brand"] for e in EINTRAEGE if e.get("highlight")})
+        [e for e in EINTRAEGE if e.get("highlight")])
 
 
-def test_je_wettbewerber_genau_eine_karte_nach_score():
-    """Die eine Form der Seite: gleiche Felder, gleiche Reihenfolge, je
-    Marke einmal. Vorher standen hier vier Formen nebeneinander (Aufmacher,
-    Beistellspalte, Markenraster, Ruhezone), und dieselbe Marke konnte in
-    dreien davon auftauchen."""
+def test_je_marke_ein_block_die_bloecke_nach_score():
+    """Die eine Form der Seite: je Marke ein Block, darin ihre Aktionen in
+    gleichen Karten. Vorher standen die staerkste Aktion oben im
+    Auswahlraster und alle uebrigen unten in einer eigenen Zeilenwand -
+    zwei Darstellungen derselben Sache."""
     view = _view()
-    assert [k["offer"]["id"] for k in view["karten"]] == ["id1", "id4", "id5", "id6"]
-    marken = [k["brand"]["name"] for k in view["karten"]]
-    assert len(marken) == len(set(marken))
-    assert all(not k["brand"]["internal_reference"] for k in view["karten"])
+    assert [b["name"] for b in view["bloecke"]] == [
+        "Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
+    assert [b["lead"]["offer"]["id"] for b in view["bloecke"]] == [
+        "id1", "id4", "id5", "id6"]
+    alpha = view["bloecke"][0]
+    assert [k["offer"]["id"] for k in alpha["weitere"]] == ["id2", "id3"]
+    assert all(not b["internal_reference"] for b in view["bloecke"])
 
 
 def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
@@ -122,28 +130,29 @@ def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
 def test_eine_ruhige_woche_laesst_die_seite_nicht_leer():
     """Liegt KEIN Angebot ueber der Schwelle - am 07.08.2026 lag genau eines
     darueber, bei 22 laufenden Aktionen -, darf die Seite nicht leer
-    aussehen. Die Karten stehen weiterhin, nur ohne Hervorhebung."""
+    aussehen. Die Bloecke stehen weiterhin, nur ohne Hervorhebung."""
     ruhig = [dict(e, highlight=False) for e in EINTRAEGE]
     view = prepare_promo_view(ruhig, QUELLEN, "2026-08-06")
     assert view["highlight_count"] == 0
-    assert len(view["karten"]) == 4
-    assert [k["offer"]["id"] for k in view["karten"]] == ["id1", "id4", "id5", "id6"]
+    assert len(view["bloecke"]) == 4
+    assert [b["lead"]["offer"]["id"] for b in view["bloecke"]] == [
+        "id1", "id4", "id5", "id6"]
 
 
-def test_was_oben_als_karte_steht_wiederholt_sich_unten_nicht():
+def test_jede_sichtbare_aktion_steht_genau_einmal_auf_der_seite():
+    """Die Regel, an der der Umbau haengt. Vorher konnte dieselbe Marke in
+    zwei Darstellungen auftauchen; jetzt gibt es einen Ort je Aktion."""
     view = _view()
-    oben = {k["offer"]["id"] for k in view["karten"]} | {view["eigen"]["offer"]["id"]}
-    unten = {o["id"] for b in view["marken"] for o in b["rest"]}
-    assert not oben & unten
-    # Verschwunden ist trotzdem nichts: jede sichtbare Aktion steht genau
-    # einmal auf der Seite.
+    gezeigt = [k["offer"]["id"] for b in view["bloecke"] for k in b["karten"]]
+    gezeigt += [k["offer"]["id"] for k in view["eigen"]["karten"]]
+    assert len(gezeigt) == len(set(gezeigt))
     sichtbar = {e["id"] for e in EINTRAEGE if e["status"] != "ausgelaufen"}
-    assert oben | unten == sichtbar
+    assert set(gezeigt) == sichtbar
 
 
 def test_das_eigene_angebot_bleibt_ausserhalb_der_wertung():
     view = _view()
-    assert view["eigen"]["brand"]["internal_reference"] is True
+    assert view["eigen"]["internal_reference"] is True
     assert all(not k["brand"]["internal_reference"] for k in view["karten"])
 
 
@@ -222,6 +231,28 @@ def test_echte_prosa_wird_weiterhin_als_vorspann_genommen():
     assert _promo_lead(prosa) == "Mehrere Anbieter senken den Einstiegspreis."
 
 
+def test_eine_klein_geschriebene_marke_beendet_den_vorspann_trotzdem():
+    """Der Vorspann ist seit dem 08.08.2026 der EINZIGE Leitsatz der Seite -
+    er darf nicht auf 280 Zeichen abgeschnitten sein. Genau das passierte im
+    Bericht vom 07.08.2026: die allgemeine Satzende-Regel verlangt hinter dem
+    Punkt einen Grossbuchstaben, und der naechste Satz begann mit 'winSIM'.
+    Die halbe Promo-Landschaft heisst so (congstar, otelo, simplytel,
+    mobilcom-debitel)."""
+    from telco_radar.report.html import _promo_lead
+
+    prosa = ("## Was diese Woche auffaellt\n\nDie Rabattschlacht hat eine neue "
+             "Eskalationsstufe erreicht. winSIM senkt die monatlichen "
+             "Grundgebuehren seiner gesamten 5G-Allnet-Flat-Palette drastisch, "
+             "und auch simplytel zieht mit stark reduzierten Monatspreisen "
+             "sowie einem dauerhaften Speed-Upgrade nach.\n")
+    assert _promo_lead(prosa) == \
+        "Die Rabattschlacht hat eine neue Eskalationsstufe erreicht."
+    # Und die Abkuerzungsbremse haelt weiter: der Punkt in "z. B." ist keiner.
+    kurz = ("## Was diese Woche auffaellt\n\nMehrere Marken, z. B. congstar, "
+            "senken den Preis. Danach mehr Text.\n")
+    assert _promo_lead(kurz) == "Mehrere Marken, z. B. congstar, senken den Preis."
+
+
 # ------------------------------------------------- die gerenderte Seite
 @pytest.fixture
 def promo_site(tmp_path):
@@ -287,9 +318,14 @@ def test_keine_promo_ueberschrift_ist_abgeschnitten(promo_site):
         assert not t.endswith("…"), f"Abgeschnittene Ueberschrift: {t}"
 
 
-def test_die_kopfzahlen_der_seite_stimmen_mit_der_datenbank(promo_site):
-    """Die Zahlen im Kopf, gegen promo_db.json gerechnet - nicht gegen die
-    Zahlen, die dieselbe Funktion ausgerechnet hat."""
+def test_die_zahl_der_marktlage_stimmt_mit_der_datenbank(promo_site):
+    """Die einzigen Zahlen, die auf der Seite stehen: wie viele MARKEN eine
+    Mechanik fahren. Gerechnet gegen promo_db.json, nicht gegen die
+    Funktion, die sie ausgerechnet hat.
+
+    Die Zahlenzeile im Kopf ("50 laufende Aktionen bei 12 von 14 ...") ist
+    am 08.08.2026 gefallen - Antonio: die Seite wirkt unruhig durch die
+    vielen Kommentare. Der Test bleibt und wandert mit."""
     from telco_radar.config import load_config
     from telco_radar.promo_config import load_promo_config
 
@@ -301,14 +337,52 @@ def test_die_kopfzahlen_der_seite_stimmen_mit_der_datenbank(promo_site):
     intern = {s.name for s in promo_cfg.sources if s.internal_reference}
     crawlbar = {s.name for s in promo_cfg.sources
                 if getattr(s, "crawlable", True)}
-    aktiv = [e for e in db.get("entries", [])
-             if e.get("status") == "aktiv"
-             and e.get("brand") in crawlbar - intern]
+    sichtbar = [e for e in db.get("entries", [])
+                if e.get("status") in ("aktiv", "evtl. ausgelaufen")
+                and e.get("brand") in crawlbar - intern]
 
-    seite = (promo_site / "promo" / "index.html").read_text(encoding="utf-8")
-    assert f"<b>{len(aktiv)}</b> laufende Aktionen" in seite
-    assert f"<b>{len({e['brand'] for e in aktiv})}</b> von " in seite
-    assert f"von {len(crawlbar - intern)} beobachteten Wettbewerbern" in seite
+    soup = BeautifulSoup((promo_site / "promo" / "index.html")
+                         .read_text(encoding="utf-8"), "html.parser")
+    zeilen = soup.select(".promo-lage .lage-zeile")
+    assert zeilen, "Die Marktlage fehlt auf der Seite"
+    assert len(zeilen) <= 5, "Die Marktlage soll eine schmale Leiste bleiben"
+    for zeile in zeilen:
+        label = zeile.select_one(".lage-label").get_text(strip=True)
+        gezaehlt = int(zeile.select_one(".lage-zahl").get_text(strip=True).split()[0])
+        marken = {e["brand"] for e in sichtbar
+                  if MECHANICS.get(e.get("mechanic") or "") == label}
+        assert gezaehlt == len(marken), f"{label}: {gezaehlt} statt {len(marken)}"
+
+    # Und keine Zahlenzeile mehr im Kopf.
+    assert "laufende Aktionen bei" not in soup.get_text(" ")
+
+
+def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
+    """Zwei gleiche Kacheln nebeneinander lesen sich als Fehler - am
+    08.08.2026 stand bei O2 derselbe Router unter zwei Schlagzeilen."""
+    soup = BeautifulSoup((promo_site / "promo" / "index.html")
+                         .read_text(encoding="utf-8"), "html.parser")
+    quellen = [img["src"] for img in soup.select(".pk-bild img[src]")]
+    assert len(quellen) == len(set(quellen)), "Ein Motiv steht mehrfach auf der Seite"
+    # Dasselbe fuer die Schriftkacheln: identischer Text auf zwei Kacheln
+    # war der zweite Befund ("Wechsel- oder Altgeraetpraemie" x4).
+    kacheln = [k.get_text(" ", strip=True)
+               for k in soup.select(".pk-bild--typo .pk-typo-zahl")]
+    assert len(kacheln) == len(set(kacheln)), f"Doppelte Schriftkachel: {kacheln}"
+
+
+def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten():
+    """Der "leere Bildkasten", den Antonio auf der simplytel-Karte sah:
+    `loading="lazy"` laesst ein Bild ausserhalb des Sichtfensters ungeladen,
+    und eine Hintergrundfarbe auf dem <img> macht daraus einen grauen
+    16:9-Kasten. Gemessen an der fertigen Seite waren 31 von 36 Bildern in
+    diesem Zustand, solange nicht gescrollt wurde - und in jedem Screenshot
+    dauerhaft. Ohne Fuellung bleibt dort Zeitungspapier."""
+    css = (Path(__file__).resolve().parent.parent / "src" / "telco_radar"
+           / "report" / "templates" / "style.css").read_text(encoding="utf-8")
+    regel = re.search(r"\.pk-bild img\{([^}]*)\}", css)
+    assert regel, "Die Bildregel der Promo-Karte fehlt"
+    assert "background" not in regel.group(1)
 
 
 def test_die_promo_quellenseite_bleibt(promo_site):

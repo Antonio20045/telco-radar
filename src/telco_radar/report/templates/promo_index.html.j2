@@ -42,8 +42,13 @@
    Fehler. #}
 {% macro motiv(k, gross) %}
 {%- if k.bild %}
+{# `max-width` = die echte Dateibreite. Die grosse Karte ist bei 1440 px
+   Fensterbreite 579 px breit, und nicht jedes Kampagnenmotiv ist so gross
+   (560 px kommen oft vor) - ohne die Grenze wuerde es hochskaliert
+   dargestellt, was scripts/pruefe_portal.py Kriterium 6 zu Recht verbietet. #}
 <span class="pk-bild{% if k.bild_panorama %} pk-bild--banner{% endif %}"><img src="{{ k.bild }}" alt=""
-  {% if k.bild_w %}width="{{ k.bild_w }}" height="{{ k.bild_h }}"{% endif %}
+  {% if k.bild_w %}width="{{ k.bild_w }}" height="{{ k.bild_h }}"
+  style="max-width:{{ k.bild_w }}px"{% endif %}
   loading="lazy">
   {%- if k.bild_ist_motiv and gross %}
   {# Stufe 4 der Zuordnung: das Buehnenbild der Aktionsseite. Es belegt,
@@ -75,7 +80,9 @@
     {% if gross and k.offer.description %}<span class="pk-text">{{ k.offer.description }}</span>{% endif %}
   </a>
   <p class="pk-fuss">
-    {% if k.mechanic %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
+    {# Der Mechanik-Chip entfaellt, wenn die Schriftkachel derselben Karte
+       schon die Mechanik ist - sonst steht sie zweimal auf einer Karte. #}
+    {% if k.mechanic and not (gross and not k.bild and k.kachel == k.mechanic) %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
     {% if k.frist %}<span class="pk-frist">bis {{ k.frist | date_de }}</span>{% endif %}
     {%- if k.offer.fading %}<span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     {%- elif k.offer.neu %}<span class="pk-flag pk-flag--neu">neu</span>{% endif %}

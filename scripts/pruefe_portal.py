@@ -281,14 +281,23 @@ def main() -> int:
         b.prueft(not leer,
                  f"8b. Leere Bilder ausgeliefert: {len(leer)}"
                  + (f" ({', '.join(leer)})" if leer else ""))
-        # 8c: keine Karte oben ohne Motiv. Eine Kachel ohne Bild bekommt die
-        # Mechanik als Schriftkachel (.pk-bild--typo) - was hier fehlt, ist
-        # ein leerer Kasten, und genau so sahen die fuenf Marken ohne
-        # laufende Aktion am 07.08.2026 aus.
-        karten = promo.select(".promo-karten .pkarte")
-        ohne_motiv = [k for k in karten if not k.select_one(".pk-bild")]
-        b.prueft(bool(karten) and not ohne_motiv,
-                 f"8c. Karten ohne Motiv: {len(ohne_motiv)} von {len(karten)}")
+        # 8c: kein leerer Bildkasten. Bis zum 08.08.2026 hiess das "jede
+        # Karte traegt ein Motiv" - damals zeigte die Seite oben je Marke
+        # genau eine Karte, und die hatte immer eins. Seit dem Markenraster
+        # steht jede Aktion als Karte da, und eine kleine ohne belegtes Bild
+        # ist eine reine TEXTkarte: das ist die Absicht, kein Mangel (ein
+        # Kasten je Zeile waere genau das Rauschen, das der Umbau beseitigt).
+        # Geprueft wird deshalb die Sache selbst - (a) die staerkste Aktion
+        # jeder Marke traegt ein Motiv, (b) nirgends steht ein Bildkasten
+        # ohne Inhalt.
+        gross = promo.select(".promo-karten .pkarte--gross")
+        ohne_motiv = [k for k in gross if not k.select_one(".pk-bild")]
+        leere_kaesten = [kasten for kasten in promo.select(".pk-bild")
+                         if not kasten.select_one("img")
+                         and "pk-bild--typo" not in (kasten.get("class") or [])]
+        b.prueft(bool(gross) and not ohne_motiv and not leere_kaesten,
+                 f"8c. Grosse Karten ohne Motiv: {len(ohne_motiv)} von "
+                 f"{len(gross)}, leere Bildkaesten: {len(leere_kaesten)}")
 
     _browser_messungen(site, b)
 
