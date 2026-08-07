@@ -214,15 +214,43 @@ Wahrheitstests (keine Dublette, keine abgeschnittene Überschrift, Zahl der
 Geschichten oberhalb der Falz). Wer eine Schlagzeile ergänzt und die Klasse
 vergisst, fällt aus allen dreien heraus.
 
-**Vier Seiten**, geschnitten nach der Frage des Lesers (vorher sieben, siehe
-`PLAN_MARKTRECHERCHE_REDESIGN.md`):
+**Fünf feste Seiten plus temporäre Themenseiten**, geschnitten nach der
+Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
 
 | Seite | Frage | Inhalt |
 |---|---|---|
-| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation, Deutschland-Fokus |
+| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, ggf. Fokusband auf aktive Themenseiten, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation; Deutschland nur noch als Drei-Zeilen-Verweis auf die Wettbewerbsseite |
 | `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
-| `differenzierung.html` | „Womit heben sich Telkos ab?" | persistente, kuratierte Bibliothek (eigene Frage, eigener State) |
+| `differenzierung.html` | „Womit heben sich Telkos ab?" | Inspirations-Radar aus Beispiel-Karten: „Neu auf dem Radar" oben, Bibliothek je Hebel mit Sprungleiste, Essay zugeklappt am Ende. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py` — bis 07.08. las die Seite nur die Sweep-DB, 20 Kurator-Beispiele waren unsichtbar) |
+| `wettbewerb.html` **Wettbewerb** | „Was machen Telekom, O2 und 1&1 — und wie passt das zu den Wochen davor?" | je Fokus-Wettbewerber: aktuelle Lage, laufende Promo-Aktionen seiner Marken (`group` in promo_sources), **Monats-Chronik** aller Moves+Meldungen aus dem gesamten Berichtsarchiv, per URL dedupliziert (`report/wettbewerb.py`, KEIN neuer State, keine LLM-Stufe — alles entsteht beim Rendern) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
+| `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
+
+**Highlight-Themen** (07.08.2026): erkennt ein Ereignis, zu dem viele
+Meldungen auftreten (Samsung-Fold-Launch, Starlink-Mobilfunknetz), und baut
+dafür eine temporäre Seite im Titelseitensatz. Mechanik in
+`analyze/highlight_topics.py`: deterministische Kandidatensuche (Gruppen ≥5
+Meldungen aus ≥3 Quellen über gemeinsame seltene WORTPAARE — ein
+Verwandtschafts-Graph über einzelne Wörter verband 129 von 138 Meldungen zu
+einer Gruppe), dann ein eigener Themen-Agent, der benennt, beschreibt und
+Firmen-Cluster („Deutsche Telekom" ist kein Ereignis) verwirft. Store:
+`data/state/highlight_topics.json`; Zuordnung neuer Meldungen per
+Suchwort-Match läuft auch OHNE Modell weiter, Themen ohne ≥2 neue Meldungen
+altern über 4 Läufe und verschwinden (Seite wird gelöscht, `site/thema/`
+SPIEGELT den Store); beendete Themen bleiben als Gedächtnis. Auffindbar nur
+über das Fokusband der Startseite — bewusst kein Nav-Eintrag.
+
+**Beruhigungsregeln** (07.08.2026, nach Antonios „unruhig durch
+Kommentare"): kein Satz auf einer Seite erklärt ihre Bedienung („jede
+Kachel zeigt …", „öffnen"), eine Zahl steht je Ort genau EINMAL, alle
+Zählwerte tragen dieselbe Etikettklasse (`rubrik-zahl`/`rubrik-zusatz`
+statt `count-badge`-Chips). `tests/test_seiten_zahlen.py` erzwingt beides
+(`test_keine_seite_erklaert_ihre_eigene_bedienung`,
+`test_zaehlwerte_tragen_ueberall_dieselbe_klasse`). „Beobachtend statt
+empfehlend" gilt jetzt auf ALLEN Seiten satzteilgenau über
+`textwerkzeug.py` (`ohne_vodafone_rat`/`ohne_vodafone_teil`) — Ratschläge
+an Vodafone fallen (auch im Genitiv „Vorlage für Vodafones …"),
+Beobachtungen über Vodafone-Gesellschaften bleiben.
 
 **Der rote Faden** (Welle 2, 07.08.2026): die Titelseite folgt dem Bericht,
 statt parallel zu ihm zu sortieren. `_fuehrende_saetze()` liest die
@@ -268,6 +296,26 @@ Zwei Dinge sind anders, und beide sitzen unter der Vorlage:
    darunter je Marke ein Block mit allen weiteren Aktionen als Zeilen, die
    ein eigenes Motiv als 76-px-Vorschau tragen. Marken ohne bestätigte
    Aktion stehen als **eine Zeile**, nicht als fünf leere Kästen.
+
+**Dritter Umbau am 07.08.2026 (Session „Ausbau & Beruhigung"), und er
+ersetzt Punkt 2:** Antonio zur Karten-plus-Zeilenwand-Fassung: „total
+unübersichtlich, nicht zugänglich, nicht schön." Die Trennung „stärkste
+Aktion oben als Karte, alle 50 unten als dreispaltige Zeilenwand" war
+wieder eine doppelte Darstellung. Jetzt: **je Marke EIN Block** —
+Rubrikleiste (Markenname, Tier), stärkste Aktion groß, die übrigen als
+gleiche Karten daneben, jede Aktion genau EINMAL auf der Seite. Kartenmeta
+reduziert auf Mechanik-Chip, Frist, neu/ausgelaufen; der Score erscheint
+nur noch als „wichtig"-Punkt bei Highlights, das Prüfdatum einmal im
+Seitenfuß. Schriftkacheln tragen die konkrete Zahl des Angebots
+(„20 GB · 6,99 €") statt viermal derselben Mechanik. Vier Bildfehler an
+der Wurzel behoben, der wichtigste als Fallstrick: **ein
+`background` auf einem `loading="lazy"`-`img` malt vor dem Scrollen einen
+gefüllten Kasten** — 31 von 36 Bildern standen so als graue Fläche in
+jedem Screenshot. Dazu: Motiv-Entdopplung in Seitenreihenfolge
+(`_entdoppele_bilder()` in `report/promo.py` — `promo_bilder` kann das an
+der Quelle nicht, weil unveränderte Seiten ihre Bilder aus früheren
+Läufen behalten), Banner ab Seitenverhältnis 2,2 ungeschnitten
+(`.pk-bild--banner`), kein Motiv über seine Dateibreite skaliert.
 
 **Eine Marke, mehrere Aktionsseiten** (08.08.2026). Bis dahin hatte jede Marke
 genau EINE URL — und das war die eigentliche Lücke: kein Anbieter zeigt seine
@@ -643,6 +691,28 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > `site/images/` als einzigen Ort zu führen; das dreht aber die Grenze
 > „Pipeline-State ≠ Site-Ausgabe" um und ist eine Architekturentscheidung,
 > keine Aufräumarbeit.
+>
+> **Am 07.08.2026 (abends) der große Ausbau-und-Beruhigungs-Auftrag von
+> Antonio direkt** — fünf Pakete, alle erledigt (Schlussliste:
+> `outputs/marktrecherche-ausbau-2026-08-07.md`, 656 Tests, alle elf
+> Prüfungen von `pruefe_portal.py` grün, jedes Paket ein eigener Commit):
+>
+> 1. **Beruhigung**: kein Satz erklärt die Bedienung, eine Zahl je Ort,
+>    einheitliche Etiketten (§5 „Beruhigungsregeln").
+> 2. **Differenzierung neu** als Karten-Radar; dabei Merge der zwei
+>    Speicher — 20 Kurator-Beispiele waren nie sichtbar gewesen (§5).
+> 3. **Promo Übersicht dritter Umbau**: je Marke ein Block, vier
+>    Bildfehler an der Wurzel (§5).
+> 4. **Highlight-Themen**: Erkennungs-Agent + temporäre Seiten
+>    `thema/<slug>.html` (§5). **Offen: der Themen-Agent ist noch nie
+>    gegen ein echtes Modell gelaufen** — nach dem nächsten Actions-Lauf
+>    im Log prüfen (`Highlight-Themen:`-Zeile), ob er Firmen-Cluster
+>    („Deutsche Telekom") wirklich verwirft und die Titel taugen.
+> 5. **Wettbewerbsseite** `wettbewerb.html` mit Monats-Chronik (§5).
+>
+> Offen aus dem Auftrag außerdem: die Treffer-Karten der Archivsuche
+> kürzen Überschriften JS-seitig mit „…" (app.js, `TelcoSearch`) — Bestand,
+> widerspricht aber der Schlagzeilen-Regel; kleiner eigener Auftrag.
 >
 > **Als Nächstes** `AUFTRAG_1000_QUELLEN_WELLE3.md` (Quellenausbau) —
 > beziehungsweise die vier Schritte aus §9 unten, deren erster (Vorgabe-Region
