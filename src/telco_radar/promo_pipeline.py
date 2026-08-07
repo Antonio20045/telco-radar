@@ -19,7 +19,7 @@ from pathlib import Path
 
 from . import promo_bilder
 from .analyze import promo_editor, promo_ranker
-from .analyze.promo_analyst import extract_promos
+from .analyze.promo_analyst import PromoExtractionError, extract_promos
 from .analyze.promo_store import PromoDB, SnapshotStore, snapshot_key
 from .collect.promo_snapshot import content_hash, fetch_snapshot
 from .promo_config import load_promo_config
@@ -143,12 +143,22 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         # Schluessel einmal geschrieben wurde.
         legacy = src_name if rec.get("leitseite") else None
         changed = snap_store.changed(key, h, legacy_key=legacy)
+        # Den Stand IMMER unter dem SEITENschluessel festhalten, auch wenn er
+        # sich nicht geaendert hat. Das stand bis Lauf #83 hinter dem
+        # `continue` weiter unten - mit der Folge, dass genau die unveraenderte
+        # Leitseite ihren neuen Schluessel nie bekam: sie galt ueber den alten
+        # Markenschluessel als unveraendert, sprang aus der Schleife, und
+        # prune() raeumte den alten Schluessel danach weg. Ergebnis in #83:
+        # 10 der 15 Leitseiten standen anschliessend ohne Hash da und waeren
+        # in JEDEM weiteren Lauf erneut durch die LLM-Extraktion gegangen,
+        # ohne dass sich etwas geaendert hat. Ein Schreibvorgang mehr je
+        # Seite ist dagegen kostenlos.
+        snap_store.update(key, h, today)
         try:
             if not changed:
                 rec["status"] = "unveraendert"
                 results.append(rec)
                 continue
-            snap_store.update(key, h, today)
             if use_llm and text.strip():
                 items = extract_promos(src_name, text, model, links=links)
                 for it in items:
@@ -163,6 +173,16 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                 rec["extracted"] = len(items)
             else:
                 rec["status"] = "changed_no_llm"
+        except PromoExtractionError as exc:
+            # Der Aufruf ist gescheitert, nicht die Seite. Sie kommt bewusst
+            # NICHT in gepruefte_seiten - damit laesst mark_stale ihre
+            # bestehenden Angebote unangetastet, statt sie wegen eines
+            # API-Aussetzers Richtung "ausgelaufen" zu schieben.
+            rec["status"] = "extraktion_fehlgeschlagen"
+            rec["error"] = str(exc)
+            log.warning("Promo-Extraktion fehlgeschlagen (%s / %s): %s - "
+                        "Angebote dieser Seite bleiben unveraendert",
+                        src_name, page_url, rec["error"])
         except Exception as exc:  # noqa: BLE001
             rec["status"] = "fail"
             rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
@@ -255,12 +275,30 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
 
     (reports_dir / f"{today}.md").write_text(body, encoding="utf-8")
     active = sum(1 for e in entries if e.get("status") == "aktiv")
+    zaehler = Counter(r.get("status") for r in results)
     log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Marken / %d Seiten "
-             "abgefragt, davon %d veraendert, %d fehlgeschlagen)",
+             "abgefragt: %s)",
              mode, active, len(sources), len(auftraege),
-             sum(1 for r in results if r.get("status") in ("ok", "changed_no_llm")),
-             sum(1 for r in results if r.get("status") == "fail"))
+             ", ".join(f"{n}x {s}" for s, n in sorted(zaehler.items())))
+    # Gescheiterte Extraktionen einzeln benennen. Ein Sammelzaehler reicht
+    # hier nicht: nach Lauf #83 war unklar, ob Telekom nichts LIEFERTE oder
+    # ob die Extraktion scheiterte - und genau diese Frage entscheidet, ob
+    # eine Quelle taugt oder nur gerade Pech hatte.
+    gescheitert = [r for r in results if r.get("status") == "extraktion_fehlgeschlagen"]
+    if gescheitert:
+        log.warning("Promo: %d Seite(n) mit gescheiterter Extraktion - ihre "
+                    "Angebote wurden NICHT gealtert: %s", len(gescheitert),
+                    "; ".join(f"{r['brand']} {r['url']} ({r.get('error','')})"
+                              for r in gescheitert))
+    # Wie viele Seiten haben wirklich etwas beigetragen? Die Zahl beantwortet
+    # die Frage, um die es beim Ausbau geht - eine Seite, die ueber Wochen
+    # 0 Angebote liefert, ist Ballast.
+    ergiebig = sum(1 for r in results if r.get("extracted"))
+    log.info("Promo-Ergiebigkeit: %d von %d gelesenen Seiten lieferten "
+             "mindestens ein Angebot", ergiebig, zaehler.get("ok", 0))
     return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
             "images": dict(bilder_bilanz),
             "brands": len(sources), "pages": len(auftraege),
+            "status": dict(zaehler), "ergiebig": ergiebig,
+            "extraktion_fehlgeschlagen": len(gescheitert),
             "score": score_summary}

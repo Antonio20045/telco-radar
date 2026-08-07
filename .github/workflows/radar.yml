@@ -133,7 +133,14 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload pipeline log
-        if: failure() || cancelled()
+        # IMMER, nicht nur bei Fehlschlag. Nach Lauf #83 liess sich nicht
+        # beantworten, warum Telekoms fuenf Aktionsseiten kein einziges
+        # Angebot ergaben - geliefert hatten sie Text (jede Seite hatte einen
+        # eigenen, nicht-leeren Snapshot-Hash), aber ob die Extraktion nichts
+        # FAND oder ob sie SCHEITERTE, stand nur im Log eines erfolgreichen
+        # Laufs. Und das wurde nicht aufbewahrt. Ein erfolgreicher Lauf kann
+        # eine halb tote Quelle verdecken; genau dafuer ist das Log da.
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: telco-radar-pipeline-log-${{ github.run_id }}

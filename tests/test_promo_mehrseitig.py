@@ -235,6 +235,150 @@ def test_die_echte_konfiguration_hat_mehrere_seiten_je_marke():
         assert s.pages[0].url == s.url
 
 
+def test_leitseite_behaelt_ihren_hash_auch_wenn_sie_sich_nicht_aenderte(tmp_path,
+                                                                       monkeypatch):
+    """Der Fehler aus Lauf #83, und er kostete jeden Lauf Geld.
+
+    Die Leitseite galt ueber den alten Markenschluessel als unveraendert,
+    sprang aus der Schleife, BEVOR ihr neuer Seitenschluessel geschrieben
+    war - und prune() raeumte den alten danach weg. Anschliessend standen
+    10 der 15 Leitseiten ganz ohne Hash da: jeder weitere Lauf haette sie
+    erneut durch die LLM-Extraktion geschickt, obwohl sich nichts geaendert
+    hat. Das Tueckische daran ist, dass nichts kaputt aussieht - es wird
+    nur still doppelt bezahlt.
+
+    Laeuft ohne Netz und ohne LLM: der Fetcher ist ersetzt, use_llm=False.
+    """
+    from telco_radar import promo_pipeline
+    from telco_radar.collect.promo_snapshot import content_hash
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+brands:
+  - name: Marke
+    url: {LEIT}
+    kind: static
+    pages:
+      - url: {ZWEIT}
+        kind: static
+""", encoding="utf-8")
+
+    seiten = {LEIT: "Text der Leitseite", ZWEIT: "Text der zweiten Seite"}
+    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
+                        lambda url, kind, cfg: {"text": seiten[url], "links": [],
+                                                "images": [], "image_url": None})
+
+    # Ausgangslage wie vor der Umstellung: EIN Hash, unter dem reinen
+    # Markenschluessel, und er passt zum aktuellen Text der Leitseite.
+    zustand = tmp_path / "data" / "state"
+    zustand.mkdir(parents=True)
+    (zustand / "promo_snapshots.json").write_text(
+        json.dumps({"Marke": {"hash": content_hash(seiten[LEIT]),
+                              "fetched_at": "2026-08-01"}}), encoding="utf-8")
+
+    ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
+
+    # Die Leitseite wurde korrekt als unveraendert erkannt ...
+    status = {r["url"]: r["status"] for r in ergebnis["sources"]}
+    assert status[LEIT] == "unveraendert"
+    assert status[ZWEIT] == "changed_no_llm"
+
+    # ... und trotzdem steht ihr Hash jetzt unter dem SEITENschluessel.
+    gespeichert = json.loads((zustand / "promo_snapshots.json").read_text())
+    assert snapshot_key("Marke", LEIT) in gespeichert
+    assert gespeichert[snapshot_key("Marke", LEIT)]["hash"] == content_hash(seiten[LEIT])
+    # Der alte Markenschluessel ist weg (prune), und er fehlt niemandem mehr.
+    assert "Marke" not in gespeichert
+    assert len(gespeichert) == 2
+
+    # Gegenprobe: ein zweiter Lauf ohne Aenderung darf NICHTS mehr als
+    # veraendert melden - genau das war vorher kaputt.
+    zweiter = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
+    assert {r["status"] for r in zweiter["sources"]} == {"unveraendert"}
+
+
+def test_gescheiterte_extraktion_altert_die_angebote_nicht(tmp_path, monkeypatch):
+    """Ein API-Aussetzer darf keine laufende Aktion loeschen.
+
+    Bis Lauf #83 gab extract_promos bei einem gescheiterten Aufruf dasselbe
+    zurueck wie bei "nichts gefunden": eine leere Liste. Die Pipeline zaehlte
+    die Seite damit als geprueft und liess mark_stale ueber ihre Angebote
+    laufen - zwei Aussetzer in Folge, und ein noch laufendes Angebot war als
+    "ausgelaufen" aus der Uebersicht verschwunden. Dieselbe Luecke, die im
+    Presse-Zweig der Seen-Store-Stapelschutz schliesst.
+    """
+    from telco_radar import promo_pipeline
+    from telco_radar.analyze.promo_analyst import PromoExtractionError
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+brands:
+  - name: Marke
+    url: {LEIT}
+    kind: static
+""", encoding="utf-8")
+    zustand = tmp_path / "data" / "state"
+    zustand.mkdir(parents=True)
+
+    db = PromoDB(zustand / "promo_db.json")
+    db.upsert([{"brand": "Marke", "headline": "Laufende Aktion"}],
+              "2026-08-01", source_url=LEIT)
+    db.save("2026-08-01")
+
+    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
+                        lambda url, kind, cfg: {"text": "neuer Text", "links": [],
+                                                "images": [], "image_url": None})
+    monkeypatch.setattr(promo_pipeline, "extract_promos",
+                        lambda *a, **k: (_ for _ in ()).throw(
+                            PromoExtractionError("HTTPError: 529 overloaded")))
+    # Die Bewertung braucht hier kein Modell.
+    monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all",
+                        lambda *a, **k: {})
+
+    ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
+
+    assert ergebnis["extraktion_fehlgeschlagen"] == 1
+    assert ergebnis["sources"][0]["status"] == "extraktion_fehlgeschlagen"
+    # Und das Entscheidende: das Angebot steht unveraendert da.
+    danach = PromoDB(zustand / "promo_db.json")
+    eintrag = next(iter(danach.entries.values()))
+    assert eintrag["status"] == "aktiv"
+    assert eintrag["missed_checks"] == 0
+
+
+def test_leere_extraktion_altert_sehr_wohl(tmp_path, monkeypatch):
+    """Die Gegenprobe: "das Modell hat nichts gefunden" ist eine belastbare
+    Aussage und muss weiterhin zaehlen - sonst koennte nie ein Angebot
+    auslaufen."""
+    from telco_radar import promo_pipeline
+
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+brands:
+  - name: Marke
+    url: {LEIT}
+    kind: static
+""", encoding="utf-8")
+    zustand = tmp_path / "data" / "state"
+    zustand.mkdir(parents=True)
+    db = PromoDB(zustand / "promo_db.json")
+    db.upsert([{"brand": "Marke", "headline": "Laufende Aktion"}],
+              "2026-08-01", source_url=LEIT)
+    db.save("2026-08-01")
+
+    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
+                        lambda url, kind, cfg: {"text": "neuer Text", "links": [],
+                                                "images": [], "image_url": None})
+    monkeypatch.setattr(promo_pipeline, "extract_promos", lambda *a, **k: [])
+    monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
+
+    promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
+
+    danach = PromoDB(zustand / "promo_db.json")
+    eintrag = next(iter(danach.entries.values()))
+    assert eintrag["status"] == "evtl. ausgelaufen"
+
+
 def test_promo_source_pages_ist_kein_geteilter_zustand():
     """`pages` baut die Leitseite bei jedem Zugriff neu. Wer die Liste
     veraendert, darf die Quelle nicht veraendern."""
