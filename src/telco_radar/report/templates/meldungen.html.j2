@@ -48,11 +48,6 @@
 <div class="meldungen-kopf">
   <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
   <h1>Alle Meldungen</h1>
-  {% if ressorts %}
-  <p class="meldungen-sub"><b>{{ highlights|length }} Meldungen</b> in {{ ressorts|length }} Ressorts.
-    Jede Kachel zeigt die wichtigsten ihres Ressorts &ndash; &bdquo;alle&ldquo; klappt das
-    vollständige Ressort darunter auf.</p>
-  {% endif %}
 </div>
 
 {% if ressorts %}
@@ -64,7 +59,6 @@
   <section class="rkachel">
     <div class="rubrik">
       <h2>{{ r.label }}</h2>
-      <span class="count-badge">{{ r.n }}</span>
     </div>
     {% for h in r.kachel %}
     <article class="rk-stueck{% if loop.first %} rk-lead{% endif %}{% if not h.image %} ohne-bild{% endif %}">
@@ -79,7 +73,9 @@
       </a>
     </article>
     {% endfor %}
-    <a class="rkachel-alle" href="#ressort-{{ r.key }}" data-oeffnet="ressort-{{ r.key }}">alle {{ r.n }} &darr;</a>
+    {# Die EINZIGE Zahl der Kachel. Bis zum 08.08.2026 stand sie zweimal:
+       als Chip neben der Rubrik und noch einmal im Link darunter. #}
+    <a class="rkachel-alle" href="#ressort-{{ r.key }}" data-oeffnet="ressort-{{ r.key }}">alle {{ r.n }} Meldungen &darr;</a>
   </section>
   {% endfor %}
 </div>
@@ -92,8 +88,7 @@
   <details class="mressort" id="ressort-{{ r.key }}">
     <summary class="rubrik">
       <h2>{{ r.label }}</h2>
-      <span class="count-badge">{{ r.n }} Meldungen</span>
-      <span class="mressort-hinweis">öffnen</span>
+      <span class="rubrik-zahl">{{ r.n }} Meldungen</span>
     </summary>
 
     <div class="mressort-oben">
@@ -141,10 +136,12 @@
   {% if archive %}
   <div class="list-card">
     {% for e in archive %}
+    {# Nur die neuen Meldungen. Wie viele insgesamt gesammelt wurden, ist
+       eine Frage der Quellenseite - hier stand sie in jeder Zeile daneben
+       und liess die Liste wie eine Tabelle aussehen. #}
     <a class="list-row" href="{{ prefix }}reports/{{ e.date }}.html">
       <span class="list-row-date">{{ e.date_de }}</span>
-      <span class="list-row-meta">{{ e.stats.get('collected','–') }} gesammelt</span>
-      <span class="list-row-new">{{ e.stats.get('new','–') }} neu</span>
+      <span class="list-row-new">{{ e.stats.get('new','–') }} neue Meldungen</span>
     </a>
     {% endfor %}
   </div>
@@ -162,7 +159,7 @@
     <input type="search" id="suche-input" placeholder="Alle bisherigen Wochen durchsuchen …"
            aria-label="Alle Berichte und die Differenzierung durchsuchen" autocomplete="off">
   </div>
-  <div class="suche-filters" role="group" aria-label="Nach Bereich filtern">
+  <div class="suche-filters" role="group" aria-label="Nach Bereich filtern" hidden>
     <button type="button" class="suche-filter on" data-kind="all">Alle</button>
     <button type="button" class="suche-filter" data-kind="bericht">Bericht</button>
     <button type="button" class="suche-filter" data-kind="differenzierung">Differenzierung</button>

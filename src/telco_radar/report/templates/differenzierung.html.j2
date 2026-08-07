@@ -77,7 +77,7 @@
 <section class="dz-hebel" id="dz-theme-{{ h.key }}"{% if h.farbe %} style="--c:{{ h.farbe }}"{% endif %}>
   <div class="rubrik dz-rubrik">
     <h2>{{ h.label }}</h2>
-    <span class="rubrik-zusatz">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
+    <span class="rubrik-zahl">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
   </div>
   <div class="dz-raster">
     {% for e in h.eintraege %}{{ karte(e) }}{% endfor %}

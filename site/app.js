@@ -243,6 +243,7 @@ var TelcoSearch = (function () {
   var resultsEl = document.getElementById('suche-results');
   var countEl = document.getElementById('suche-count');
   var chips = document.querySelectorAll('.suche-filter');
+  var filterZeile = document.querySelector('.suche-filters');
   if (!input || !resultsEl) return;
 
   var kind = 'all';
@@ -258,11 +259,17 @@ var TelcoSearch = (function () {
 
   function renderHits(hits, q) {
     if (!q) {
-      resultsEl.innerHTML = '<p class="empty-note">Suchbegriff eingeben, um alle Berichte und die ' +
-        'Differenzierungs-Bibliothek zu durchsuchen.</p>';
+      // Ohne Suchbegriff steht hier nichts. Bis zum 08.08.2026 stand unter
+      // dem Feld ein roter Kasten, der zum Eintippen aufforderte - ein Satz,
+      // der die Bedienung eines Suchfelds erklaert, und der einzige rote
+      // Block der Seite. Auch die Bereichsfilter zeigen sich erst, wenn es
+      // etwas zu filtern gibt.
+      resultsEl.innerHTML = '';
       countEl.textContent = '';
+      if (filterZeile) filterZeile.hidden = true;
       return;
     }
+    if (filterZeile) filterZeile.hidden = false;
     if (!hits.length) {
       resultsEl.innerHTML = '<p class="empty-note">Keine Treffer für „' + TelcoSearch.esc(q) + '“.</p>';
       countEl.textContent = '0 Treffer';

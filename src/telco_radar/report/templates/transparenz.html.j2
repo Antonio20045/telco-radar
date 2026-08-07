@@ -11,6 +11,7 @@
 {% block content %}
 
 <section class="page-hero wide">
+  <p class="page-kicker">Nachprüfbarkeit</p>
   <h1>Quellen</h1>
   <p class="page-lead">Welche Quelle abgefragt wurde, was sie geliefert hat, und was die
   Auswertung daraus gemacht hat.</p>
@@ -32,10 +33,8 @@
    ausweisen und den Abstand erklaeren, statt ihn zu verstecken. #}
 {% if report and report.stats and report.stats.get('new') and n_bewertet < report.stats.get('new') %}
 <p class="muted-note" style="margin:14px 0 0;max-width:760px">
-  Warum die zweite Zahl kleiner ist: <b>jede</b> neue Meldung wird einem
-  Analysten vorgelegt – gekappt wird nichts. Er behält nur, was für Vodafone
-  eine Nachricht ist, und verwirft Routine, Doppelmeldungen und Werbung. Die
-  Tabelle unten zeigt das je Bereich.
+  <b>Jede</b> neue Meldung wird einem Analysten vorgelegt, gekappt wird nichts;
+  behalten wird, was für Vodafone eine Nachricht ist.
 </p>
 {% endif %}
 
@@ -90,7 +89,12 @@
     </div>
     {% endfor %}
   </div>
-  <p class="card-sub" style="margin-top:16px">Von {{ run.source_summary.total }} abgefragten Quellen: {{ run.source_summary.ok }} lieferten neue Meldungen, {{ run.source_summary.empty }} waren leer, {{ run.source_summary.failed }} nicht erreichbar (meist temporäre Fehler).{% if run.source_summary.get('quarantaene') %} Zusätzlich wurden {{ run.source_summary.quarantaene }} Quellen gar nicht erst abgefragt: sie haben in mehreren Läufen hintereinander nichts geliefert und sind automatisch stillgelegt. Sie werden regelmäßig erneut geprüft und kehren zurück, sobald sie wieder liefern.{% endif %}</p>
+  {# Die Bilanz ok/leer/fehlgeschlagen stand hier als Satz - dieselben drei
+     Zahlen stehen als Kachel ueber der Seite und als Legende im Aufklapper
+     darunter. Geblieben ist, was nur hier steht: was "stillgelegt" heisst. #}
+  {% if run.source_summary.get('quarantaene') %}
+  <p class="card-sub" style="margin-top:16px">Stillgelegte Quellen werden gar nicht erst abgefragt: sie haben in mehreren Läufen hintereinander nichts geliefert. Sie werden regelmäßig erneut geprüft und kehren zurück, sobald sie wieder liefern.</p>
+  {% endif %}
 </div>
 
 <details class="evidence" style="margin-top:24px">
@@ -167,14 +171,14 @@
 
 {% if tech_themes %}
 <div class="card" style="margin-top:20px">
-  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700">Technologie, Geräte &amp; Regulierung <span style="color:var(--faint2);font-weight:500">dritte Ebene · {{ n_tech_sources }} Quellen in {{ tech_themes | length }} Themenfeldern</span></h2>
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700">Technologie, Geräte &amp; Regulierung <span class="rubrik-zahl">dritte Ebene · {{ n_tech_sources }} Quellen in {{ tech_themes | length }} Themenfeldern</span></h2>
   <p style="margin:0 0 16px;font-size:13.5px;color:var(--faint2);max-width:760px">Was den Telco-Markt verändert, kommt nicht nur von anderen Netzbetreibern:
   KI-Anbieter, Geräte- und Chiphersteller, Netzausrüster, Satellitenbetreiber und Regulierungsbehörden entscheiden mit, was ein Netz kann,
   was ein Handy unterstützt und was erlaubt ist. Diese Quellen sind <b>keine Wettbewerber</b> – sie werden im Bericht in einem eigenen Abschnitt geführt.
   Jeweils der offizielle eigene Kanal des Unternehmens bzw. der Behörde.</p>
   {% for t in tech_themes %}
   <div style="margin-bottom:14px">
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px">{{ t.label }} <span style="color:var(--faint2);font-weight:500">· {{ t.sources | length }}</span></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:6px">{{ t.label }} <span class="rubrik-zahl">{{ t.sources | length }}</span></div>
     <div class="pill-cloud">
       {% for s in t.sources %}
       <a href="{{ s.url }}" target="_blank" rel="noopener" title="{{ s.url | domain }}">{{ s.name }}</a>
@@ -187,7 +191,7 @@
 
 {% if news_sources %}
 <div class="card tan" style="margin-top:20px">
-  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span style="color:#a89c8c;font-weight:500">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span class="rubrik-zahl">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
   <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>
   <div class="pill-cloud">
     {% for s in news_sources %}

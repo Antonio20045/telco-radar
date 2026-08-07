@@ -61,7 +61,7 @@
 {% for c in wettbewerb.wettbewerber %}
 <section class="wb{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:16px">
   <div class="rubrik wb-rubrik"><h2>{{ c.name }}</h2>
-    {% if c.n_chronik %}<span class="rubrik-zusatz">{{ c.n_chronik }}
+    {% if c.n_chronik %}<span class="rubrik-zahl">{{ c.n_chronik }}
       Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span>{% endif %}
   </div>
 

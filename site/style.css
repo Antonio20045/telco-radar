@@ -56,7 +56,7 @@ b,strong{font-weight:700}
 /* Etikettenschrift: alles, was benennt statt erzaehlt. */
 .kicker,.page-kicker,.subnav a,.usecases .uc,.meta,.rubrik,
 .stat span,.tile span,.ex-op,.ex-reg,.comp-badge,.kbadge,.chip,
-.list-row-meta,.suche-filter,.promo-filter,.gs-kind,.gs-item-meta,
+.suche-filter,.promo-filter,.gs-kind,.gs-item-meta,
 .rowtable-head,.step-name,.col-model,.card-sub,.foot-inner{
   font-family:var(--sans);
 }
@@ -256,8 +256,6 @@ b,strong{font-weight:700}
 .meldungen-kopf{padding:18px 0 0}
 .meldungen-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
   font-size:clamp(26px,3vw,34px);line-height:1.04;letter-spacing:-.022em}
-.meldungen-sub{margin:5px 0 0;font-size:14px;line-height:1.4;color:var(--ink-3);
-  max-width:70ch}
 .meldungen-suche{display:flex;align-items:center;gap:20px;
   padding:6px 0;border-bottom:1px solid var(--ink-4);min-width:280px;flex:1}
 .meldungen-suche input{flex:1;min-width:0;border:none;background:none;
@@ -280,7 +278,6 @@ b,strong{font-weight:700}
    letzte darf dort keine Linie ins Leere ziehen. */
 .rkachel:last-child{border-right:none}
 .rkachel .rubrik{margin-bottom:9px}
-.rkachel .count-badge{margin-left:auto}
 .rk-stueck{padding:7px 0;border-top:1px solid var(--rule-2)}
 .rk-stueck:first-of-type{border-top:none;padding-top:0}
 .rk-stueck a{display:flex;gap:10px;align-items:flex-start}
@@ -312,13 +309,13 @@ b,strong{font-weight:700}
 .mressort>summary::-webkit-details-marker{display:none}
 .mressort>summary::marker{content:""}
 .mressort>summary:hover h2{color:var(--red)}
-.mressort>summary .count-badge{margin-left:auto}
-.mressort-hinweis{font-family:var(--sans);font-size:9.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--red);
-  flex:0 0 auto}
-.mressort[open]>summary .mressort-hinweis::after{content:" ▴"}
-.mressort:not([open])>summary .mressort-hinweis::after{content:" ▾"}
-.mressort[open]>summary .mressort-hinweis{color:var(--ink-4)}
+/* Bis zum 08.08.2026 standen hier zwei Angaben nebeneinander: "29 Meldungen"
+   und das Wort "oeffnen". Das Wort erklaerte die Bedienung eines Elements,
+   das sich selbst erklaert - geblieben ist die Zahl, das Dreieck traegt die
+   Aufforderung. */
+.mressort>summary::after{content:"▾";font-size:11px;color:var(--red);
+  flex:0 0 auto;line-height:1}
+.mressort[open]>summary::after{content:"▴";color:var(--ink-4)}
 .mressort[open]{padding-bottom:22px}
 .mressort .rubrik{margin-bottom:0;border-top:none;padding-top:0}
 
@@ -556,7 +553,14 @@ b,strong{font-weight:700}
 .dz-new{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.11em;
   text-transform:uppercase;color:var(--red);border:1px solid currentColor;
   padding:1px 5px}
-.count-badge{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--ink-4)}
+/* Zaehlwert bzw. Zusatz am Ende einer Rubrikleiste - EINE Form fuer die
+   ganze Website. Bis zum 08.08.2026 gab es dafuer drei Klassen in drei
+   Groessen (count-badge 10px, rubrik-zusatz 10px in Versalien, dazu
+   Inline-Styles auf der Quellenseite); nebeneinander gelesen wirkte jede
+   Zahl wie eine eigene Auszeichnung. Zwei Namen, eine Form: `rubrik-zahl`
+   traegt eine Zahl, `rubrik-zusatz` eine Einordnung ohne Zahl. */
+.rubrik-zahl,.rubrik-zusatz{margin-left:auto;font-family:var(--sans);
+  font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink-4)}
 
 /* ==========================================================  AUFKLAPPER = */
 .evidence{margin-top:30px;border-top:2px solid var(--rule-ink)}
@@ -617,6 +621,12 @@ b,strong{font-weight:700}
   border-bottom:1px solid var(--red);padding-bottom:2px}
 .ex-count{margin:14px 0 0;font-family:var(--sans);font-size:10.5px;font-weight:600;
   text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+/* Der Weg zu allen Meldungen ist Navigation, keine Ankuendigung: rot ja,
+   aber ohne den Unterstrich, mit dem ein `source-link` sonst auf eine
+   Originalquelle zeigt. */
+.front-wichtig .ex-count .source-link{border-bottom:none;padding-bottom:0;
+  font-weight:700}
+.front-wichtig .ex-count .source-link:hover{border-bottom:1px solid var(--red)}
 @media (max-width:880px){
   .explorer{grid-template-columns:1fr}
   .ex-list{max-height:340px;border-right:none;padding-right:0;
@@ -647,10 +657,12 @@ b,strong{font-weight:700}
   border-bottom:1px solid var(--rule-2)}
 .list-row:hover .list-row-date{color:var(--red)}
 .list-row-date{flex:1 1 auto;font-size:17px;font-weight:600}
-.list-row-meta,.list-row-flag{font-size:10px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--ink-4);flex:0 0 auto}
-.list-row-new{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--ink);
-  flex:0 0 auto;font-variant-numeric:lining-nums}
+/* Eine Zahl je Archivzeile, in derselben leisen Form wie jeder andere
+   Zaehlwert der Website. Daneben stand bis zum 08.08.2026 noch "3447
+   gesammelt" - eine Transparenzzahl, die auf die Quellenseite gehoert. */
+.list-row-new{font-family:var(--sans);font-size:11px;font-weight:600;
+  letter-spacing:.02em;color:var(--ink-4);flex:0 0 auto;
+  font-variant-numeric:lining-nums}
 .src-table{width:100%;border-collapse:collapse;font-size:14px}
 .src-table th{font-family:var(--sans);font-size:9.5px;font-weight:800;
   text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);text-align:left;
@@ -902,11 +914,15 @@ b,strong{font-weight:700}
 
 /* ======================================================  SUCHTREFFER  === */
 .suche-filters{display:flex;gap:0;margin:0 0 8px}
+/* Die Filterzeile blendet sich aus, solange nichts gesucht wurde - display
+   des Flex-Containers wuerde `hidden` sonst ueberstimmen. */
+.suche-filters[hidden]{display:none}
 .suche-filter{font-family:var(--sans);font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);background:none;
   border:none;border-bottom:2px solid transparent;padding:7px 16px 6px;cursor:pointer}
 .suche-filter:first-child{padding-left:0}
 .suche-filter.on{color:var(--ink);border-bottom-color:var(--red)}
+.suche-count:empty{margin:0}
 .suche-count{margin:0 0 14px;font-family:var(--sans);font-size:10.5px;font-weight:700;
   text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 .suche-list{display:flex;flex-direction:column}
@@ -1025,8 +1041,6 @@ b,strong{font-weight:700}
 .pmarke-rubrik{margin-bottom:16px;border-top-width:3px;
   border-top-color:var(--c,var(--rule-ink))}
 .pmarke-rubrik h2 a:hover{color:var(--red)}
-.rubrik-zusatz{margin-left:auto;font-family:var(--sans);font-size:10px;
-  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 
 /* Vier Spalten, die staerkste Aktion ueber zwei. Damit steht das Gewicht im
    Raster und nicht in einer eigenen Bauform - eine Zeitungsseite entsteht

@@ -854,31 +854,26 @@ def _stats(report):
     Unruhe, die Antonio benannt hat - die Kachelreihe ist weg, die
     verbliebenen Zahlen stehen im Berichtskopf. `lead_signal` war noch
     aelter: berechnet seit Monaten, von keiner Vorlage je gelesen.
-    """
-    highlights = _flatten(report)
 
+    Am 08.08.2026 ist der Rest gefallen. `sofort` ("davon 13 zum sofortigen
+    Ansehen") war der dritte Satz einer Zeile, die jetzt ein Halbsatz ist -
+    und die Zahl steht ohnehin an jeder betroffenen Meldung als Prioritaet
+    5/5. Mit ihr die letzten zwei Radarfelder, die nie eine Vorlage gelesen
+    hat: `ops_top` (die zwei haeufigsten Betreiber je Thema) und `ex` (ein
+    Beispielartikel je Thema). Der Themenradar zeigt Name, Zahl und Balken.
+    """
     # --- Themenradar (Schlagwortthemen ueber Titel und Zusammenfassung) ---
     tech: dict[str, dict] = {}
-    for h in highlights:
+    for h in _flatten(report):
         for name in _tag_tech(f"{h.get('title','')} {h.get('summary','')}"):
-            t = tech.setdefault(name, {"theme": name, "n": 0, "ops": {}, "ex": None})
+            t = tech.setdefault(name, {"theme": name, "n": 0})
             t["n"] += 1
-            op = (h.get("operator") or "").strip()
-            if op:
-                t["ops"][op] = t["ops"].get(op, 0) + 1
-            if t["ex"] is None or (h.get("relevance") or 0) >= 4:
-                t["ex"] = {"title": h.get("title"), "url": h.get("url")}
     tech_radar = sorted(tech.values(), key=lambda x: -x["n"])
     tmax = max((t["n"] for t in tech_radar), default=1) or 1
     for t in tech_radar:
         t["w"] = round(100 * t["n"] / tmax)
-        t["ops_top"] = ", ".join(k for k, _ in sorted(t["ops"].items(),
-                                                      key=lambda kv: -kv[1])[:2])
 
-    return {"tech_radar": tech_radar,
-            # Die einzige Zahl der alten Kachelreihe, die sonst nirgends
-            # steht - sie zieht in den Berichtskopf um.
-            "sofort": sum(1 for h in highlights if h.get("relevance") == 5)}
+    return {"tech_radar": tech_radar}
 
 
 def _prep_competitors(report: dict) -> list[dict]:

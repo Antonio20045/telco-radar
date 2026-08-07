@@ -149,13 +149,13 @@ def test_protokoll_trennt_gesammelt_von_bewertet(tmp_path):
 
 def test_protokoll_erklaert_den_abstand_zwischen_den_zahlen(tmp_path):
     html = _seite(_render(tmp_path), "transparenz.html")
-    assert "Warum die zweite Zahl kleiner ist" in html
+    assert "gekappt wird nichts" in html
 
 
 def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
     """Gegenprobe: sind beide Zahlen gleich, faellt der Hinweis weg."""
     html = _seite(_render(tmp_path, stats={"new": len(HIGHLIGHTS)}), "transparenz.html")
-    assert "Warum die zweite Zahl kleiner ist" not in html
+    assert "gekappt wird nichts" not in html
 
 
 # ------------------------------------------------------------------ Bericht
@@ -283,9 +283,14 @@ def test_bericht_verlinkt_die_vollstaendige_liste(tmp_path):
 
 
 def test_kopfzeile_nennt_gelesen_und_relevant_getrennt(tmp_path):
+    """Ein Halbsatz mit zwei Zahlen - beide muessen stimmen.
+
+    Bis zum 08.08.2026 waren es drei Saetze mit vier Zahlen ("... Davon 13
+    zum sofortigen Ansehen (5/5). Lesezeit etwa 16 Minuten."); die dritte
+    Zahl stand an jeder betroffenen Meldung noch einmal als Prioritaet."""
     html = _seite(_render(tmp_path), "index.html")
-    assert re.search(rf"{NEU_GESAMMELT} neue Meldungen gelesen,\s*"
-                     rf"<b>{len(HIGHLIGHTS)} davon relevant</b>", html)
+    assert re.search(rf"<b>{len(HIGHLIGHTS)} relevante Meldungen</b>\s*"
+                     rf"aus {NEU_GESAMMELT} neuen", html)
 
 
 def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
@@ -304,7 +309,12 @@ def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
     site = _render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
     assert len(soup.select(".mressort .meldung")) == len(PORTAL)
-    assert f"{len(PORTAL)} Meldungen" in _seite(site, "meldungen.html")
+    # Die Gesamtzahl steht seit dem 08.08.2026 nicht mehr als Satz im Kopf
+    # ("138 Meldungen in 7 Ressorts ..."), sondern nur noch verteilt an den
+    # Ressorts. Auch verteilt muss sie aufgehen.
+    aus_ressorts = [int(re.search(r"\d+", z.get_text(" ", strip=True)).group())
+                    for z in soup.select(".mressort > summary .rubrik-zahl")]
+    assert sum(aus_ressorts) == len(PORTAL)
 
 
 def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
@@ -377,10 +387,16 @@ def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
                for sec in ressorts)
     # Die Ressortzahlen der Uebersicht summieren sich auf die Gesamtzahl.
     # (Bis zum 07.08.2026 stand diese Zahl in einer Sprungleiste; die war
-    # die Kruecke einer zu langen Seite und ist mit ihr weggefallen.)
-    aus_kacheln = [int(b.get_text(strip=True))
-                   for b in soup.select(".rkachel .count-badge")]
+    # die Kruecke einer zu langen Seite und ist mit ihr weggefallen. Seit
+    # dem 08.08.2026 steht sie EINMAL je Kachel, im Link darunter - vorher
+    # einmal als Chip neben der Rubrik und ein zweites Mal im Link.)
+    links = soup.select(".rkachel .rkachel-alle")
+    assert len(links) == len(soup.select(".rkachel"))
+    aus_kacheln = [int(re.search(r"\d+", a.get_text(" ", strip=True)).group())
+                   for a in links]
     assert sum(aus_kacheln) == len(PORTAL)
+    assert not soup.select(".rkachel .rubrik-zahl"), (
+        "Die Ressortzahl steht wieder zweimal in derselben Kachel")
 
 
 def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
@@ -512,7 +528,7 @@ def test_gleichnamige_abschnitte_bekommen_verschiedene_anker():
 
 def test_lesezeit_wird_genannt(tmp_path):
     html = _seite(_render(tmp_path), "index.html")
-    assert "Lesezeit etwa" in html
+    assert "Lesezeit ca." in html
 
 
 # ------------------------------------------- Quellenbilanz des Laufprotokolls
@@ -612,14 +628,19 @@ def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
     Am 07.08.2026 ist die naechste Schicht gefallen: `kpis` (die Kachelreihe
     "Zahlen der Woche", deren Werte im selben Bildschirm ein zweites Mal
     standen) und `lead_signal` (seit Monaten berechnet, von keiner Vorlage
-    je gelesen)."""
+    je gelesen).
+
+    Am 08.08.2026 der Rest: `sofort` (mit dem dritten Satz der Berichtszeile
+    weggefallen) sowie `ops_top` und `ex` je Radareintrag - beide seit jeher
+    berechnet, nie gerendert. Der Radar zeigt Name, Zahl und Balken."""
     from telco_radar.report.html import _flatten, _stats
 
     report = {"date": "2026-08-05", "stats": {"new": NEU_GESAMMELT},
               "regions": {"Europa": {"highlights": HIGHLIGHTS}},
               "competitors": GELUNGEN}
     dash = _stats(report)
-    assert set(dash) == {"tech_radar", "sofort"}
+    assert set(dash) == {"tech_radar"}
+    assert all(set(t) == {"theme", "n", "w"} for t in dash["tech_radar"])
     assert _flatten(report)  # Gegenprobe: die Fixture ist nicht leer
 
 
@@ -912,8 +933,9 @@ def test_die_wochenseite_traegt_die_doppelten_formen_nicht_mehr(tmp_path):
     assert "Auswertung je Bereich" not in index
     # ... aber die Frage, die sie beantworteten, hat weiterhin einen Ort.
     assert "Auswertung je Bereich" in _seite(site, "transparenz.html")
-    # Und die eine Zahl, die nur in der Kachelreihe stand, ist umgezogen.
-    assert "zum sofortigen Ansehen" in index
+    # Die Zahl "davon N zum sofortigen Ansehen" ist am 08.08.2026 gefallen:
+    # sie stand an jeder betroffenen Meldung ohnehin als Prioritaet 5/5.
+    assert "zum sofortigen Ansehen" not in index
 
 
 # ------------------------------------------------------ Die Wettbewerbsseite
@@ -927,7 +949,7 @@ def test_die_chronik_zaehlt_was_sie_zeigt(tmp_path):
     abschnitt = soup.select_one("section.wb")
 
     zeilen = abschnitt.select(".wb-zeile")
-    kopf = " ".join(abschnitt.select_one(".rubrik-zusatz").get_text().split())
+    kopf = " ".join(abschnitt.select_one(".rubrik-zahl").get_text().split())
     assert kopf.startswith(f"{len(zeilen)} Meldung"), kopf
     # Der Bericht ist der einzige im Archiv - also datiert die Chronik auf
     # seinen Tag, nicht auf den heutigen.
@@ -1111,7 +1133,7 @@ def test_jeder_hebel_zaehlt_was_unter_ihm_steht(tmp_path):
     gesehen = {}
     for abschnitt in soup.select(".dz-hebel"):
         key = abschnitt["id"].removeprefix("dz-theme-")
-        zahl = abschnitt.select_one(".rubrik-zusatz").get_text(" ", strip=True)
+        zahl = abschnitt.select_one(".rubrik-zahl").get_text(" ", strip=True)
         karten = abschnitt.select(".dzk")
         assert zahl == f"{len(karten)} Beispiel{'e' if len(karten) != 1 else ''}", key
         gesehen[key] = len(karten)
@@ -1253,3 +1275,66 @@ def test_keine_karte_der_differenzierung_raet_vodafone_etwas(tmp_path):
     # Und die reine Empfehlung hat ihre Karte nicht mitgenommen.
     zweitzeilen = len(soup.select(".dz-hebel .dzk-why"))
     assert len(soup.select(".dz-hebel .dzk")) == 4 and zweitzeilen == 3
+
+
+# ------------------------------------------- Der Beruhigungs-Durchgang (A)
+# Antonio am 08.08.2026: "Die Seite wirkt unruhig, weil ueberall so viele
+# Kommentare sind - zum Beispiel '138 Meldungen in sieben Ressorts, jede
+# Kachel zeigt ...'. Mehr roter Faden, einfacher zu lesen."
+#
+# Was daraufhin gestrichen wurde, hat je einen Test - sonst kommt es beim
+# naechsten Umbau unbemerkt zurueck.
+def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
+    """Saetze, die beschreiben, was ein Klick tut, statt etwas auszusagen."""
+    site = _render(tmp_path, highlights=PORTAL, competitors=GELUNGEN)
+    verboten = ("Jede Kachel zeigt", "klappt das", "Suchbegriff eingeben")
+    for name in ("index.html", "meldungen.html", "transparenz.html",
+                 "differenzierung.html", "wettbewerb.html"):
+        text = _seite(site, name)
+        for satz in verboten:
+            assert satz not in text, f"{name} erklaert seine Bedienung: {satz}"
+    # Auch nicht aus dem Skript nachgereicht.
+    assert "Suchbegriff eingeben" not in _seite(site, "app.js")
+
+
+def test_meldungskopf_ist_kicker_und_ueberschrift(tmp_path):
+    """Kein Erklaersatz unter der H1 - Antonios woertliches Beispiel."""
+    soup = BeautifulSoup(
+        _seite(_render(tmp_path, highlights=PORTAL), "meldungen.html"),
+        "html.parser")
+    kopf = soup.select_one(".meldungen-kopf")
+    kinder = [k.name for k in kopf.find_all(recursive=False)]
+    assert kinder == ["p", "h1"], kinder
+    assert kopf.select_one("p")["class"] == ["page-kicker"]
+
+
+def test_archivzeile_nennt_nur_die_neuen_meldungen(tmp_path):
+    """"3447 gesammelt · 381 neu" waren zwei Zahlen je Zeile, von denen eine
+    (die gesammelten) eine Transparenzfrage beantwortet und dort auch
+    steht."""
+    site = _render(tmp_path, highlights=PORTAL)
+    soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
+    zeilen = soup.select("#archiv .list-row")
+    assert zeilen
+    for z in zeilen:
+        felder = [s["class"][0] for s in z.select("span")]
+        assert felder == ["list-row-date", "list-row-new"], felder
+    assert "gesammelt" not in _seite(site, "meldungen.html")
+    # Die verbliebene Zahl stimmt mit dem Bericht ueberein.
+    assert f"{NEU_GESAMMELT} neue Meldungen" in zeilen[0].get_text(" ", strip=True)
+
+
+def test_zaehlwerte_tragen_ueberall_dieselbe_klasse(tmp_path):
+    """Ein Etikettensystem, nicht drei. `count-badge` (Chip) und der
+    Inline-Style auf der Quellenseite sind in `rubrik-zahl` aufgegangen."""
+    site = _render(tmp_path, highlights=PORTAL, competitors=GELUNGEN)
+    for name in ("index.html", "meldungen.html", "transparenz.html",
+                 "differenzierung.html", "wettbewerb.html"):
+        assert "count-badge" not in _seite(site, name), name
+    # Im Stylesheet ohne Kommentare - dass dort steht, WORAUS `rubrik-zahl`
+    # hervorging, ist Dokumentation und keine Regel.
+    css = re.sub(r"(?s)/\*.*?\*/", "", _seite(site, "style.css"))
+    assert "count-badge" not in css
+    # ... und die Klasse wird auch wirklich benutzt.
+    soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
+    assert soup.select(".rubrik-zahl")

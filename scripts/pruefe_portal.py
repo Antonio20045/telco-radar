@@ -228,8 +228,12 @@ def main() -> int:
     # ---- Kriterium 4: Ressorts, Gewichtung, und keine verlorene Meldung
     ressorts = meldungen.select(".mressort")
     stufen = all(sec.select(".mlead") for sec in ressorts)
-    summe = sum(int(x.get_text(strip=True))
-                for x in meldungen.select(".rkachel .count-badge"))
+    # Die Ressortzahl steht seit dem 08.08.2026 EINMAL je Kachel, im Link in
+    # die Tiefe ("alle 29 Meldungen"). Vorher stand sie zusaetzlich als Chip
+    # neben der Rubrik - dieselbe Zahl zweimal in einer Kachel.
+    summe = sum(int(m.group())
+                for x in meldungen.select(".rkachel .rkachel-alle")
+                if (m := re.search(r"\d+", x.get_text(" ", strip=True))))
     gerendert = len(meldungen.select(".mressort .meldung"))
     b.prueft(len(ressorts) >= 3 and stufen and summe == len(hs)
              and gerendert == len(hs),

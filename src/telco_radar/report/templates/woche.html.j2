@@ -189,11 +189,14 @@
     <div class="card">
       <div class="card-head"><h2>Der Wochenbericht</h2>
         <a href="{{ prefix }}transparenz.html">Quellen</a></div>
+      {# Ein Halbsatz, keine Bilanz. Hier standen bis zum 08.08.2026 drei
+         Saetze mit vier Zahlen; die Zahl "13 zum sofortigen Ansehen" stand
+         ausserdem an jeder betroffenen Meldung noch einmal als Prioritaet
+         5/5. #}
       <p class="berichtszeile">
-        {% if report.stats %}{{ report.stats.get('new', '–') }} neue Meldungen gelesen,
-        <b>{{ highlights|length }} davon relevant</b>.{% endif %}
-        {% if dash and dash.sofort %}Davon <b>{{ dash.sofort }} zum sofortigen Ansehen</b> (5/5).{% endif %}
-        {% if lesezeit %}Lesezeit etwa {{ lesezeit }} Minuten.{% endif %}
+        {% if report.stats %}<b>{{ highlights|length }} relevante Meldungen</b>
+        aus {{ report.stats.get('new', '–') }} neuen{% endif %}{% if lesezeit %}
+        &middot; Lesezeit ca. {{ lesezeit }} Minuten{% endif %}
       </p>
       {% if toc %}
       <nav class="toc" aria-label="Abschnitte des Berichts">
@@ -279,7 +282,9 @@
 
 {% if show_explorer and highlights %}
 <details class="evidence" id="alle-meldungen">
-  <summary><span>Alle {{ highlights | length }} Meldungen dieser Woche</span><small>bei Bedarf öffnen</small></summary>
+  {# Ohne Zusatz: "bei Bedarf oeffnen" erklaerte die Bedienung eines
+     Aufklappers - das Plus daneben sagt dasselbe ohne Worte. #}
+  <summary><span>Alle {{ highlights | length }} Meldungen dieser Woche</span></summary>
   <div class="evidence-body">
     {% include "_explorer.html.j2" %}
   </div>

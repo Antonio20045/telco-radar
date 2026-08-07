@@ -28,14 +28,14 @@
 </section>
 
 <section class="source-region">
-  <h2>Tier 1 · Große Netzbetreiber <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 1) | list | length }} Anbieter</span></h2>
+  <h2>Tier 1 · Große Netzbetreiber <span class="rubrik-zahl">{{ sources | selectattr('tier', 'equalto', 1) | list | length }} Anbieter</span></h2>
   <div class="source-grid">
     {% for s in sources if s.tier == 1 %}{{ marke(s) }}{% endfor %}
   </div>
 </section>
 
 <section class="source-region">
-  <h2>Tier 2 · Discount- und Zweitmarken <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 2) | list | length }} Anbieter</span></h2>
+  <h2>Tier 2 · Discount- und Zweitmarken <span class="rubrik-zahl">{{ sources | selectattr('tier', 'equalto', 2) | list | length }} Anbieter</span></h2>
   <div class="source-grid">
     {% for s in sources if s.tier == 2 %}{{ marke(s) }}{% endfor %}
   </div>
