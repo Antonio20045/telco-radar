@@ -957,3 +957,84 @@ def test_der_kurzverweis_zeigt_jeden_wettbewerber_mit_profil(tmp_path):
     assert "1 von 2 Profilen" in _seite(_render(tmp_path / "b",
                                                 competitors=gemischt),
                                         "index.html")
+
+
+# --------------------------------------------------- Die Themenseiten (temp.)
+# Sie zeigen drei Zahlen: die Zahl der Meldungen des Themas (zweimal - im
+# Seitenkopf und als Zaehler ueber der Zeilenliste), die Zahl der beteiligten
+# Quellen und das Datum, seit dem das Thema laeuft. Alle drei sind Aggregate
+# ueber den Themenspeicher, nicht ueber die Wochenausgabe - also genau die
+# Sorte Zahl, die still falsch wird, sobald jemand die Zuordnung anfasst.
+THEMA = {
+    "slug": "starlink-plant-eigenes-mobilfunknetz",
+    "title": "Starlink plant eigenes Mobilfunknetz",
+    "description": "SpaceX will neben den Satelliten auch Funkmasten am Boden "
+                   "betreiben und damit selbst Mobilfunk anbieten.",
+    "keywords": ["Starlink", "SpaceX", "Mobilfunknetz"],
+    "first_seen": "2026-08-04", "last_active": "2026-08-05",
+    "runs_ohne_zuwachs": 0, "status": "aktiv",
+    "items": [
+        {"url": f"https://example.com/thema/{i}",
+         "title": f"Starlink baut Netz {i}", "headline": f"Starlink baut Netz {i}",
+         "summary": f"SpaceX kuendigt Schritt {i} an.", "operator": "SpaceX",
+         "source": f"Quelle {i % 3}", "date": "2026-08-05", "week": "2026-08-05",
+         "relevance": 5 - (i % 3)}
+        for i in range(9)
+    ],
+}
+
+
+def _themenspeicher(tmp_path, thema):
+    state = tmp_path / "data" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "highlight_topics.json").write_text(
+        json.dumps({"updated": "2026-08-05", "topics": [thema]},
+                   ensure_ascii=False), encoding="utf-8")
+
+
+def _mit_thema(tmp_path, thema=None):
+    site = _render(tmp_path)
+    _themenspeicher(tmp_path, thema if thema is not None else THEMA)
+    render_site(site, tmp_path / "data" / "reports")
+    return site
+
+
+def test_die_themenseite_zaehlt_was_sie_zeigt(tmp_path):
+    site = _mit_thema(tmp_path)
+    soup = BeautifulSoup(_seite(site, f"thema/{THEMA['slug']}.html"), "html.parser")
+
+    lage = " ".join(soup.select_one(".tm-lage").get_text().split())
+    quellen = {i["source"] for i in THEMA["items"]}
+    assert lage == (f"Seit 4. August 2026 · {len(THEMA['items'])} Meldungen "
+                    f"aus {len(quellen)} Quellen"), lage
+
+    # Die Zahl im Kopf ist die einzige auf der Seite - und sie stimmt: jede
+    # Meldung des Themas steht genau einmal darunter, verteilt auf Aufmacher,
+    # zweite Reihe und Zeilenliste.
+    schlagzeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
+    assert len(schlagzeilen) == len(set(schlagzeilen)) == len(THEMA["items"])
+    assert len(soup.select(".tm-zeile")) == len(THEMA["items"]) - 3
+
+
+def test_das_fokusband_nennt_die_zahl_des_themas(tmp_path):
+    site = _mit_thema(tmp_path)
+    soup = BeautifulSoup(_seite(site, "index.html"), "html.parser")
+
+    band = soup.select(".fokusband a")
+    assert len(band) == 1
+    assert band[0].select_one(".fokusband-titel").get_text(strip=True) == THEMA["title"]
+    assert band[0].select_one(".fokusband-zahl").get_text(strip=True).startswith(
+        f"{len(THEMA['items'])} Meldungen")
+    assert band[0]["href"] == f"thema/{THEMA['slug']}.html"
+
+
+def test_ohne_aktives_thema_steht_kein_band_und_keine_seite(tmp_path):
+    """Gegenprobe: ein beendetes Thema verschwindet vollstaendig - Seite,
+    Band und Ordnerinhalt."""
+    site = _mit_thema(tmp_path)
+    assert (site / "thema" / f"{THEMA['slug']}.html").exists()
+
+    _themenspeicher(tmp_path, dict(THEMA, status="beendet"))
+    render_site(site, tmp_path / "data" / "reports")
+    assert not (site / "thema" / f"{THEMA['slug']}.html").exists()
+    assert "fokusband" not in _seite(site, "index.html")

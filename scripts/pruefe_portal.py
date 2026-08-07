@@ -129,7 +129,10 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         # der sichtbarste Teil des Befunds vom 06.08.2026.
         schlimmster = 0
         wo = ""
-        for name in ("index.html", "meldungen.html", "promo/index.html"):
+        themenseiten = [f"thema/{p.name}"
+                        for p in sorted((site / "thema").glob("*.html"))]
+        for name in ("index.html", "meldungen.html", "promo/index.html",
+                     *themenseiten):
             seite.goto((site / name).resolve().as_uri())
             seite.wait_for_timeout(600)
             # Erst durchscrollen: die Bilder tragen loading="lazy", und was
@@ -237,11 +240,15 @@ def main() -> int:
     # Seit dem 08.08.2026 auch auf der Wettbewerbsseite: ihre Chronik zieht
     # Ueberschriften aus zwei Quellen (Meldung und Analysten-Move), und die
     # zweite hat keinen Rueckfall, falls ein Feed gekuerzt liefert.
+    # Seit dem 08.08.2026 auch auf den temporaeren Themenseiten: sie ziehen
+    # ihre Ueberschriften aus dem Themenspeicher, also aus Meldungen, die
+    # mehrere Wochen alt sein koennen - genau dort verschwindet ein Feld
+    # unbemerkt.
     seiten = [index, meldungen]
-    wettbewerb = site / "wettbewerb.html"
-    if wettbewerb.exists():
-        seiten.append(BeautifulSoup(wettbewerb.read_text(encoding="utf-8"),
-                                    "html.parser"))
+    for weitere in [site / "wettbewerb.html", *sorted((site / "thema").glob("*.html"))]:
+        if weitere.exists():
+            seiten.append(BeautifulSoup(weitere.read_text(encoding="utf-8"),
+                                        "html.parser"))
     abgeschnitten = [t for soup in seiten
                      for t in _schlagzeilen(soup) if t.endswith("…")]
     alle = sum(len(_schlagzeilen(soup)) for soup in seiten)

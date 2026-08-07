@@ -24,6 +24,7 @@ from .analyze import diff_curator
 from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
+from .analyze import highlight_topics
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
@@ -509,6 +510,25 @@ def run(root: Path, use_llm: bool | None = None,
     n_bilder = bild_bilanz.get("geladen", 0)
     phase("Bilder", time.monotonic() - tbild,
           f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild")
+
+    # -------------------------------------------------- Highlight-Themen
+    # Erkennt, wenn viele Meldungen dasselbe Ereignis meinen (Samsungs
+    # Foldable-Launch, eine Uebernahme, ein Netzausfall), und pflegt dafuer
+    # eine temporaere Themenseite. NACH der Bilderphase, damit die Meldungen
+    # eines Themas ihre Bilder mitbringen. Failsafe wie Kurator und Sweep:
+    # bricht den Lauf nie ab.
+    try:
+        themen_bilanz = highlight_topics.pflege_highlight_themen(
+            alle_highlights, state_dir, today_iso,
+            model=analyst_model or editor_model,
+            use_llm=bool(use_llm and new_items))
+        log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
+                 "beendet: %s", themen_bilanz["aktiv"],
+                 themen_bilanz["kandidaten"],
+                 ", ".join(themen_bilanz["neu"]) or "keins",
+                 ", ".join(themen_bilanz["beendet"]) or "keins")
+    except Exception as exc:  # noqa: BLE001
+        log.error("Highlight-Themen uebersprungen: %s", exc)
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den

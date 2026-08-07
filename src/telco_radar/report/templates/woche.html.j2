@@ -113,6 +113,21 @@
       {% endfor %}
     </div>
     {% endif %}
+
+    {# Der Verweis auf die laufenden Themenseiten. Eine Linie, kein Kasten -
+       die Seiten sind temporaer und bekommen deshalb auch keinen
+       Navigationspunkt (analyze/highlight_topics.py). #}
+    {% if is_latest and themen %}
+    <nav class="fokusband" aria-label="Laufende Themen">
+      {% for t in themen %}
+      <a href="{{ prefix }}thema/{{ t.slug }}.html">
+        <span class="fokusband-kicker">Im Fokus</span>
+        <span class="fokusband-titel">{{ t.titel }}</span>
+        <span class="fokusband-zahl">{{ t.n }} Meldungen &nearr;</span>
+      </a>
+      {% endfor %}
+    </nav>
+    {% endif %}
   </div>
 
   {# Die Textspalte neben dem Aufmacher. Ohne sie stehen oberhalb der Falz

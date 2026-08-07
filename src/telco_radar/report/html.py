@@ -17,10 +17,14 @@ from bs4 import BeautifulSoup
 from . import bilder as report_bilder
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
+from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
+from ..analyze import highlight_topics
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..promo_config import load_promo_config
+from ..textwerkzeug import (gewicht as _gewicht, haeufigkeiten as _haeufigkeiten,
+                            slug as _tw_slug, wortmenge as _wortmenge)
 from .. import promo_bilder
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
@@ -114,17 +118,10 @@ def _md_to_html(text: str) -> str:
     return str(soup)
 
 
-_SLUG_MAP = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
-                           "Ä": "ae", "Ö": "oe", "Ü": "ue"})
-
-
-def _slug(text: str) -> str:
-    """Stabiler Anker aus einer Ueberschrift ("Afrika & Naher Osten" ->
-    "afrika-naher-osten"). Muss ueber Laeufe hinweg gleich bleiben - die
-    Anker landen in Mails."""
-    s = (text or "").strip().lower().translate(_SLUG_MAP)
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    return s or "abschnitt"
+# Der Anker der Berichtsabschnitte und der Dateiname einer Themenseite
+# muessen aus demselben Titel dasselbe ergeben - deshalb steht die Rechnung
+# in textwerkzeug.py und nicht hier (siehe dortiger Modulkopf).
+_slug = _tw_slug
 
 
 def _anchor_headings(html: str) -> tuple[str, list[dict]]:
@@ -403,12 +400,6 @@ _FADEN_MIND_TREFFER = 2
 # der Fall - der Bericht fuehrte mit SpaceX, die beste SpaceX-Meldung hatte
 # 720 px, und die Titelseite fuehrte deshalb mit der Telekom.
 _FADEN_KANDIDATEN = 4
-_WORT_RE = re.compile(r"[\wÄÖÜäöüß][\wÄÖÜäöüß-]{3,}")
-
-
-def _wortmenge(text: str) -> set[str]:
-    """Die inhaltstragenden Woerter eines Textes, kleingeschrieben."""
-    return {w.lower() for w in _WORT_RE.findall(text or "")}
 
 
 def _fuehrende_saetze(md_text: str) -> list[str]:
@@ -457,10 +448,7 @@ def _faden(highlights: list[dict],
         _wortmenge(f"{h.get('schlagzeile') or ''} {h.get('operator') or ''} "
                    f"{h.get('title') or ''} {h.get('summary') or ''}")
         for h in highlights]
-    haeufigkeit: dict[str, int] = {}
-    for worte in worte_je_meldung:
-        for w in worte:
-            haeufigkeit[w] = haeufigkeit.get(w, 0) + 1
+    haeufigkeit = _haeufigkeiten(worte_je_meldung)
     deckel = max(2, len(highlights) // 8)
 
     gewaehlt: list[list[dict]] = []
@@ -474,8 +462,8 @@ def _faden(highlights: list[dict],
             selten = [t for t in sw & worte if haeufigkeit[t] <= deckel]
             if len(selten) < _FADEN_MIND_TREFFER:
                 continue
-            gewicht = round(sum(1.0 / haeufigkeit[t] for t in selten), 6)
-            kandidaten.append((-gewicht, -_bildbreite(h), rang, h))
+            kandidaten.append((-_gewicht(selten, haeufigkeit),
+                               -_bildbreite(h), rang, h))
         if not kandidaten:
             continue
         kandidaten.sort(key=lambda k: k[:3])
@@ -1023,6 +1011,20 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 if h.get("image") and h["image"] not in vorhandene_bilder:
                     for feld in ("image", "image_w", "image_h"):
                         h.pop(feld, None)
+    # Die temporaeren Themen (data/state/highlight_topics.json). Sie werden
+    # hier geladen, weil die Titelseite unter ihrer dritten Reihe darauf
+    # verweist - gerendert werden ihre Seiten weiter unten, nach den Promos:
+    # ein Thema darf die dazu passenden Aktionen zeigen.
+    state_dir = reports_dir.parent / "state"
+    themen = highlight_topics.lade_themen(state_dir)
+    for thema in themen:
+        for item in thema.get("items") or []:
+            if item.get("image") and item["image"] not in vorhandene_bilder:
+                for feld in ("image", "image_w", "image_h"):
+                    item.pop(feld, None)
+    themen_band = [{"slug": t.get("slug"), "titel": t.get("title"),
+                    "n": len(t.get("items") or [])} for t in themen]
+
     # Hier standen bis zum 07.08.2026 die Globals `ausgabe_datum` und
     # `ausgabe_quellen` fuer die Datumszeile des Zeitungskopfs. Die Zeile ist
     # weg (Antonio: "das ist unnoetig"), also sind es die Werte auch - diese
@@ -1081,6 +1083,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "archive": archive, "is_latest": i == 0,
             "num_operators": num_operators or report.get("stats", {}).get("operators"),
             "n_competitors": len(competitors),
+            # Die laufenden Themenseiten. Nur die aktuelle Ausgabe verweist
+            # darauf - eine Archivwoche zeigt den Stand ihres Tages, und die
+            # Themen von heute gehoeren nicht dazu (die Vorlage prueft
+            # `is_latest`).
+            "themen": themen_band,
         }
         # Die Archivwoche traegt ihre Meldungen selbst - sie hat keine
         # meldungen.html, auf die sie verweisen koennte, und die globale
@@ -1109,7 +1116,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Fallback (Bootstrap / erste Runde): Aggregation aller Report-Highlights.
     # ---- Differenzierung: aus der dynamischen, quellenbelegten DB
     # (data/state/differentiation_db.json), gepflegt vom Kategorie-Sweep.
-    state_dir = reports_dir.parent / "state"
     from datetime import date, datetime, timedelta
     db = DiffDB(state_dir / "differentiation_db.json")
     by_theme = db.by_theme()
@@ -1257,6 +1263,28 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                 prefix="../", sources=promo_cfg.sources),
             encoding="utf-8")
 
+    # ---- Themenseiten: eine Seite je laufendem Ereignis, temporaer.
+    # Der Ordner SPIEGELT den Themenspeicher, er sammelt nicht - genau wie
+    # site/images/. Ein beendetes Thema verliert damit seine Seite von
+    # selbst, ohne dass irgendwo eine Loeschliste gefuehrt werden muss.
+    # Die Promos stehen hier schon bereit: ein Thema zeigt die Aktionen, die
+    # sich ueber seine Suchwoerter belegen lassen.
+    thema_dir = site_dir / "thema"
+    geschrieben: set[str] = set()
+    if themen:
+        thema_dir.mkdir(exist_ok=True)
+        thema_tpl = env.get_template("thema.html.j2")
+        for thema in themen:
+            view = build_thema_view(thema, promo_entries)
+            datei = f"{view['slug']}.html"
+            (thema_dir / datei).write_text(
+                thema_tpl.render(prefix="../", t=view), encoding="utf-8")
+            geschrieben.add(datei)
+    if thema_dir.exists():
+        for veraltet in thema_dir.iterdir():
+            if veraltet.is_file() and veraltet.name not in geschrieben:
+                veraltet.unlink()
+
     # ---- Wettbewerb: die Dauerseite zu Telekom, O2 und 1&1.
     # Antonio am 08.08.2026: "nicht nur die Meldung dieser Woche, sondern
     # ueber die Wochen und Monate - wie passt die Meldung dieser Woche zu
@@ -1337,7 +1365,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                              competitors=[], dash=None, toc=[], lesezeit=0,
                              briefing_html="", regions=[],
                              categories=[], archive=[], is_latest=True,
-                             show_explorer=False,
+                             show_explorer=False, themen=[],
                              num_operators=num_operators, n_competitors=0),
             encoding="utf-8")
 

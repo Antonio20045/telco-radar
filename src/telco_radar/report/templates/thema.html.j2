@@ -1,0 +1,117 @@
+{# Eine temporaere Themenseite - alles zu EINEM Ereignis, ueber die Wochen.
+
+   Antonio am 08.08.2026: "Wenn zu einem Thema/Event viele Meldungen
+   auftreten (Beispiel: Launch des Samsung Z Fold), will ich eine temporaere
+   Highlight-Seite zu diesem Thema ... Wenn das Thema nicht mehr relevant
+   ist, soll die Seite wieder verschwinden."
+
+   Dieselbe Gewichtung wie die Titelseite, nur auf ein Ereignis verengt:
+   ein Aufmacher, zwei mittlere, dann alle uebrigen als Zeilen. Die Seite
+   steht in keiner Navigation - sie ist temporaer, und ein Menuepunkt, der
+   naechste Woche wieder verschwindet, ist keine Navigation. Gefunden wird
+   sie ueber das Band unter der dritten Reihe der Titelseite.
+
+   Jede Schlagzeile traegt `szl` (CLAUDE.md §5). #}
+{% extends "base.html.j2" %}
+{% block title %}Im Fokus · {{ t.titel }}{% endblock %}
+
+{% block content %}
+
+<section class="page-hero wide tm-kopf">
+  <p class="page-kicker">Im Fokus</p>
+  <h1>{{ t.titel }}</h1>
+  {% if t.leitsatz %}<p class="page-lead">{{ t.leitsatz }}</p>{% endif %}
+  <p class="tm-lage">Seit {{ t.seit | date_de }} &middot;
+    <b>{{ t.n }}</b> Meldung{{ 'en' if t.n != 1 else '' }} aus
+    <b>{{ t.n_quellen }}</b> Quelle{{ 'n' if t.n_quellen != 1 else '' }}</p>
+</section>
+
+{% if t.aufmacher %}
+{% set a = t.aufmacher %}
+<article class="aufmacher tm-aufmacher{% if not a.image %} ohne-bild{% endif %}{% if (a.schlagzeile or '')|length <= 70 %} kurz{% endif %}">
+  <p class="page-kicker">{{ a.absender }}{% if a.date %} &middot; {{ a.date | date_de }}{% endif %}</p>
+  {# h2, nicht h1: die eine Ueberschrift dieser Seite ist der Thementitel
+     oben. Die Aufmacher-Gestalt haengt im CSS an `.aufmacher :is(h1,h2)`. #}
+  <h2 class="szl"><a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.schlagzeile }}</a></h2>
+  {% if a.image %}
+  <figure class="aufmacher-bild">
+    <img src="{{ prefix }}images/{{ a.image }}" alt=""
+         {% if a.image_w %}width="{{ a.image_w }}" height="{{ a.image_h }}"{% endif %}
+         loading="eager">
+    <figcaption>Bild: {{ a.quelle }}</figcaption>
+  </figure>
+  {% endif %}
+  {# Absender und Datum stehen im Kicker darueber - die Meta-Zeile
+     wiederholt sie nicht, sie nennt nur die Quelle und den Weg dorthin. #}
+  <div class="aufmacher-text">
+    {% if a.summary %}<p class="aufmacher-vorspann">{{ a.summary }}</p>{% endif %}
+    <p class="aufmacher-meta">
+      <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.quelle }} öffnen &nearr;</a>
+    </p>
+  </div>
+</article>
+{% endif %}
+
+{% if t.zwei %}
+<div class="reihe reihe-zwei">
+  {% for h in t.zwei %}
+  <article class="stueck stueck-mittel{% if not h.image %} ohne-bild{% endif %}">
+    <a href="{{ h.url }}" target="_blank" rel="noopener">
+      {% if h.image %}<span class="stueck-bild"><img src="{{ prefix }}images/{{ h.image }}" alt=""
+         {% if h.image_w %}width="{{ h.image_w }}" height="{{ h.image_h }}"{% endif %}
+         loading="lazy"></span>{% endif %}
+      <span class="stueck-kicker">{{ h.absender }}{% if h.date %} &middot; {{ h.date | date_de }}{% endif %}</span>
+      <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
+      {% if h.summary %}<span class="stueck-anriss">{{ h.summary }}</span>{% endif %}
+    </a>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if t.zeilen %}
+{# Ueberschrift und Zahl: "Alle Meldungen 5" stand hier bis zur ersten
+   Bildabnahme ueber einer Liste mit zwei Zeilen - die drei anderen stehen
+   darueber als Aufmacher und zweite Reihe. Die Gesamtzahl steht im
+   Seitenkopf; hier steht, was noch kommt. #}
+<section class="tm-alle">
+  <div class="rubrik"><h2>Weitere Meldungen</h2></div>
+  <ol class="tm-liste">
+    {% for h in t.zeilen %}
+    <li class="tm-zeile">
+      <span class="tm-datum">{{ h.date | date_de }}</span>
+      <span class="tm-text">
+        <a class="tm-titel szl" href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }}</a>
+        {% if h.summary %}<span class="tm-anriss">{{ h.summary }}</span>{% endif %}
+        <span class="tm-quelle">{{ h.absender }}{% if h.quelle and h.quelle != h.absender %} &middot; {{ h.quelle }}{% endif %}</span>
+      </span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if t.aktionen %}
+{# Nur Angebote, die sich ueber die Suchwoerter des Themas belegen lassen -
+   sonst stuende hier Werbung, die mit dem Ereignis nichts zu tun hat. #}
+<section class="tm-aktionen">
+  <div class="rubrik"><h2>Passende Aktionen</h2>
+    <a href="{{ prefix }}promo/index.html">Promo Übersicht</a></div>
+  <ul class="tm-aktionsliste">
+    {% for a in t.aktionen %}
+    <li class="tm-aktion">
+      <a href="{{ a.url }}" target="_blank" rel="noopener">
+        <span class="tm-aktion-marke">{{ a.marke }}</span>
+        <span class="tm-aktion-titel szl">{{ a.headline }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<p class="dz-foot">Diese Seite entsteht, solange zu diesem Ereignis neue Meldungen eingehen –
+  sie verschwindet wieder, wenn nichts mehr nachkommt. Jede Meldung verlinkt auf ihre
+  Originalquelle; die Übersicht der Woche steht unter
+  <a href="{{ prefix }}index.html">Diese Woche</a>.</p>
+{% endblock %}
