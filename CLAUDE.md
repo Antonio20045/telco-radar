@@ -258,6 +258,17 @@ dieses Skript grün ist.
   schon mal 24 min — normal sind 7–8 min.
 - **Push→Hook-Race:** Render klont sofort; der Workflow wartet 15s zwischen
   git push und Hook-Curl. Beim manuellen Nachdeployen dran denken.
+- **Ein Push auf `main` ist KEIN Deploy.** Am 06.08.2026 lief `deploy.yml` in
+  die Actions-Warteschlange, bekam **nie einen Runner** (`runner_id: 0`,
+  `started_at == created_at`) und wurde nach 15 Minuten abgebrochen. Der Code
+  lag korrekt auf `main`, aber Render erfuhr nie davon und lieferte weiter die
+  alte Fassung aus — aufgefallen erst, weil Antonio auf die Seite sah. **Nach
+  jedem Push den AUSGANG von `deploy.yml` prüfen, nicht nur die Live-Seite
+  pollen**; ein hängender Deploy und eine noch nicht fertige Auslieferung
+  sehen von aussen gleich aus. Nachholen: Actions → „Deploy Site" → „Run
+  workflow" auf `main`. Gegenprobe, dass live wirklich ankam, was geprüft
+  wurde: `curl -sS https://telco-radar.onrender.com/index.html | md5sum`
+  gegen `md5sum < site/index.html`.
 - **Newsrooms:** Der Fetcher (collect/http.py) probiert Browser-UA und
   Bot-UA. Harte Fälle stehen als `type: official` in der Watchlist und werden
   nicht gecrawlt (Stand 08/2026 noch fünf: TIM, Cosmote, UScellular, Ooredoo,
@@ -443,20 +454,28 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
+> **Der nächste Auftrag ist `AUFTRAG_PORTAL_WELLE2.md`.** Er ist Antonios
+> Rückmeldung auf das ausgelieferte Portal, gemessen statt zusammengefasst:
+> Datumszeile raus, Filter neben „Alle Meldungen" raus, Meldungsseite so
+> umbauen dass man nicht 8 Bildschirmhöhen scrollt, „Diese Woche" ruhiger
+> und mit rotem Faden — und die **Promo Übersicht komplett neu**. Dort
+> liegen 15 Screenshots auf der Platte, gerendert wird genau einer, und
+> ausgerechnet der ist mit 6 KB leer.
+>
 > **`AUFTRAG_NACHRICHTENPORTAL.md` ist abgearbeitet**
 > (Schlussliste: `outputs/nachrichtenportal-2026-08-06.md`). Alle acht
-> Prüfungen von `scripts/pruefe_portal.py` sind grün, 458 Tests laufen.
-> Offen aus diesem Auftrag bleiben zwei Punkte, beide dort begründet:
-> die Verifikation auf der Live-Site (der Branch war noch nicht in `main`)
-> und der **Platzbedarf im Repo** — rund 17 MB Bilder je Lauf in zwei
-> Kopien, hochgerechnet ~1,5 GB im Jahr in der git-Historie. Die Lösung
-> wäre, den Zwischenspeicher abzuschaffen und `site/images/` als einzigen
-> Ort zu führen; das dreht aber die Grenze „Pipeline-State ≠ Site-Ausgabe"
-> um und ist eine Architekturentscheidung, keine Aufräumarbeit.
+> Prüfungen von `scripts/pruefe_portal.py` sind grün, 458 Tests laufen, die
+> Fassung ist live verifiziert (byte-identisch mit dem geprüften Commit).
+> Offen bleibt daraus ein Punkt: der **Platzbedarf im Repo** — rund 17 MB
+> Bilder je Lauf in zwei Kopien, hochgerechnet ~1,5 GB im Jahr in der
+> git-Historie. Die Lösung wäre, den Zwischenspeicher abzuschaffen und
+> `site/images/` als einzigen Ort zu führen; das dreht aber die Grenze
+> „Pipeline-State ≠ Site-Ausgabe" um und ist eine Architekturentscheidung,
+> keine Aufräumarbeit.
 >
-> **Der nächste Auftrag ist damit `AUFTRAG_1000_QUELLEN_WELLE3.md`**
-> (Quellenausbau) — beziehungsweise die vier Schritte aus §9 unten, deren
-> erster (Vorgabe-Region für Fachpressequellen) unverändert offen ist.
+> Danach kommt `AUFTRAG_1000_QUELLEN_WELLE3.md` (Quellenausbau) —
+> beziehungsweise die vier Schritte aus §9 unten, deren erster (Vorgabe-Region
+> für Fachpressequellen) unverändert offen ist.
 
 ## 9. Stand der Skalierung — und was als Nächstes kommt
 
