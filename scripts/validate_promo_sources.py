@@ -23,11 +23,11 @@ from telco_radar.config import load_config  # noqa: E402
 from telco_radar.promo_config import load_promo_config  # noqa: E402
 
 
-def check(src, http_cfg):
-    if src.kind == "skip":
-        return ("SKIP", 0, src.note or "dokumentierter Sonderfall, nicht automatisiert")
+def check(page, http_cfg):
+    if page.kind == "skip":
+        return ("SKIP", 0, page.note or "dokumentierter Sonderfall, nicht automatisiert")
     try:
-        snap = fetch_snapshot(src.url, src.kind, http_cfg)
+        snap = fetch_snapshot(page.url, page.kind, http_cfg)
         text = snap["text"]
         return ("OK" if text.strip() else "EMPTY", len(text), "")
     except Exception as exc:  # noqa: BLE001
@@ -43,21 +43,33 @@ def main() -> int:
     promo_cfg = load_promo_config(root)
     http_cfg = load_config(root).settings.get("http", {})
 
+    # Geprueft wird je SEITE, nicht je Marke: seit dem 08.08.2026 hat eine
+    # Marke mehrere (siehe config/promo_sources.yaml). Eine Marke, deren
+    # Leitseite laeuft und deren drei weitere Seiten tot sind, saehe sonst
+    # gesund aus.
+    seiten = [(s, p) for s in promo_cfg.sources for p in s.pages]
     print(f"{'STATUS':7} {'CHARS':>6}  {'TIER':4} {'NAME':24} URL")
     print("-" * 110)
     counts = {"OK": 0, "EMPTY": 0, "FAIL": 0, "SKIP": 0}
+    je_marke: dict[str, list[str]] = {}
     with ThreadPoolExecutor(max_workers=6) as pool:
-        futures = {pool.submit(check, s, http_cfg): s for s in promo_cfg.sources}
+        futures = {pool.submit(check, p, http_cfg): (s, p) for s, p in seiten}
         for fut in as_completed(futures):
-            src = futures[fut]
+            src, page = futures[fut]
             status, n, err = fut.result()
             counts[status] += 1
-            print(f"{status:7} {n:>6}  {src.tier:<4} {src.name[:24]:24} {src.url}  {err}")
+            je_marke.setdefault(src.name, []).append(status)
+            print(f"{status:7} {n:>6}  {src.tier:<4} {src.name[:24]:24} "
+                  f"{page.url}  {err}")
 
     total = sum(counts.values())
     print("-" * 110)
-    print(f"Total: {total} | OK: {counts['OK']} | EMPTY: {counts['EMPTY']} "
-          f"| FAIL: {counts['FAIL']} | SKIP: {counts['SKIP']}")
+    print(f"Seiten: {total} bei {len(promo_cfg.sources)} Marken | OK: {counts['OK']} "
+          f"| EMPTY: {counts['EMPTY']} | FAIL: {counts['FAIL']} | SKIP: {counts['SKIP']}")
+    blind = [m for m, st in je_marke.items() if "OK" not in st]
+    if blind:
+        print(f"\nMarken OHNE eine einzige lieferfaehige Seite ({len(blind)}): "
+              + ", ".join(sorted(blind)))
     print("\nHinweis: EMPTY/FAIL bei 'js'-Quellen kann Bot-Schutz oder ein "
           "geaendertes Seitenlayout bedeuten - nicht automatisch die Quelle "
           "entfernen, siehe TELCO_RADAR_HANDOVER.md Abschnitt zu Quellen.")

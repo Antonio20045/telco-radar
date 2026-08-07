@@ -125,6 +125,9 @@ Wichtige Dateien:
 | `config/news_sources.yaml` | Fachpresse-RSS (Mobile World Live, Light Reading, …) |
 | `config/tech_sources.yaml` | **Themenfelder** (dritte Ebene): KI, Geräte, Chips, Netzausrüster, Satellit, Regulierung. Themen-Tag statt Region; Schlüssel tragen das Präfix `thema:` |
 | `config/settings.yaml` | Sprache (de), Modell, Lookback (8 Tage), HTTP, Sammel-Parallelität + Host-Drosselung, Redaktionsmodus, Quarantäne-Schwelle |
+| `config/promo_sources.yaml` | **Promo-Übersicht**: 15 Marken mit je einer Leitseite (`url`) und weiteren Seiten (`pages:`), zusammen 59 abgefragte Seiten. Endkunden-Aktionsseiten, KEINE Newsrooms — eigener Loader (`promo_config.py`), eigener Collector, eigener State |
+| `scripts/finde_promo_seiten.py` | Sucht weitere Aktionsseiten je Marke (Linkernte auf den Bestandsseiten, dann Kandidatenpfade). Sagt WO nachzusehen ist, nicht was taugt |
+| `scripts/pruefe_promo_seite.py` | **Abnahme-Check für Promo-Seiten.** Acht Kriterien im Code; Nr. 7 (Eigenständigkeit) vergleicht auch gegen die bereits angenommenen Kandidaten derselben Marke. Ohne PASS hier kommt keine Seite in die Config |
 | `config/kandidaten_firmen.yaml` | Suchaufträge (Name + Domain) für `finde_quellen.py --firmen`. Sagt WO gesucht wird, nicht was wertvoll ist |
 | `data/state/seen.jsonl` | Dedup-Gedächtnis. Seit 08/2026 **kompaktes v2-Format**: ein Hash je Zeile (17 statt ~300 Byte) |
 | `data/state/quellen_register.json` | Je Quelle: Herkunft, Abnahmedatum, Läufe, Erfolge, letzter Erfolg, Fehlserie, Quarantäne |
@@ -266,8 +269,55 @@ Zwei Dinge sind anders, und beide sitzen unter der Vorlage:
    ein eigenes Motiv als 76-px-Vorschau tragen. Marken ohne bestätigte
    Aktion stehen als **eine Zeile**, nicht als fünf leere Kästen.
 
+**Eine Marke, mehrere Aktionsseiten** (08.08.2026). Bis dahin hatte jede Marke
+genau EINE URL — und das war die eigentliche Lücke: kein Anbieter zeigt seine
+laufenden Aktionen auf einer Seite. Der Gerätedeal steht unter `/handys`, der
+Wechselbonus unter `/wechselbonus`, die Prepaid-Aktion unter `/prepaid`. ALDI
+TALKs `/wechselbonus` war nirgends erfasst; klarmobil war ausschließlich über
+seine **Presseseite** beobachtet. Antonio: *„dass man wirklich alle
+Promo-Aktionen von den einzelnen Unternehmen auf dem Schirm hat, dafür braucht
+es wahrscheinlich mehr als eine Quelle pro Unternehmen."*
+
+Jetzt: **15 Marken, 59 abgefragte Seiten** (vorher 15), davon 41 statisch
+(vorher 5) — also lokal nachprüfbar und ohne Chromium-Start je Lauf.
+`url`/`kind` bleiben die **Leitseite** (Markenlink auf der Übersicht, Rückfall
+für ein Angebot ohne Tiefenlink), `pages:` nennt die weiteren. Schlussliste:
+`outputs/promo-quellen-2026-08-08.md`.
+
+Drei Stellen, an denen ein Fehler hier nicht auffällt, sondern **still
+Angebote löscht** — alle drei in `tests/test_promo_mehrseitig.py` festgenagelt:
+
+| Stelle | Regel |
+|---|---|
+| Snapshot-Schlüssel | Marke **+ URL** (`promo_store.snapshot_key`). Als reiner Markenschlüssel überschriebe jede Seite den Stand der zuletzt abgerufenen. Der alte Markenschlüssel gilt für die Leitseite **einmalig** weiter, sonst löste der erste Lauf nach der Umstellung eine LLM-Neuextraktion über alles aus. |
+| `mark_stale()` | altert **nur Angebote der wirklich gelesenen Seiten** (`gepruefte_seiten`). Eine Marke mit fünf Seiten hat pro Lauf typischerweise EINE geänderte; ohne diese Einschränkung rückten die Angebote der vier unveränderten jedes Mal Richtung „ausgelaufen" — nach zwei Läufen wäre die halbe Marke weg, und das Protokoll sähe normal aus. Jeder Eintrag trägt dafür `source_url`; Bestandseinträge ohne eine hängen an der Leitseite. |
+| `_MAX_ENTRIES_PER_PAGE` | gilt je **Seite**, nicht je Marke, und ist deshalb von 8 auf **6** gesenkt. O2 hat sieben Seiten; 7 × 8 wären 56 Zeilen unter einem Absender. |
+
+**Neue Promo-Quellen NUR über `scripts/pruefe_promo_seite.py`** — dieselbe
+Disziplin wie im Presse-Zweig, andere Kriterien (eine Aktionsseite hat kein
+Datum, „wie viele Meldungen im Frischefenster" ist dort bedeutungslos). Acht
+Kriterien im Code. Das entscheidende ist **Nr. 7, Eigenständigkeit**: es
+vergleicht jeden Kandidaten auch gegen die bereits *angenommenen* Kandidaten
+derselben Marke. Genau das hat gegriffen — congstars
+`prepaid-allnet-s/m/l/xl/xs` sind fünf Seiten mit demselben Gerüst, vier
+fielen durch; ohne diesen Vergleich hätten alle fünf bestanden, weil jede
+einzelne sich vom *Bestand* unterscheidet. Gerechnet wird gegen die
+**kleinere** Wortmenge (dieselbe Lehre wie Session 5). Kandidaten liefert
+`scripts/finde_promo_seiten.py` (Linkernte auf den Bestandsseiten, dann
+Kandidatenpfade): 109 Kandidaten → 67 bestanden → 44 nach Sichtung.
+
+**telekom.de beantwortet jeden httpx-Abruf mit HTTP 202** und einer
+2-KB-Challenge — auch mit Browser-UA, auch beim zweiten Versuch derselben
+Session. `curl` bekommt dieselbe URL als 200 mit vollem Inhalt; es ist TLS-/
+Client-Erkennung, keine Sperre gegen das Projekt. Die vier Telekom-Seiten sind
+deshalb **nicht per Check abgenommen**, sondern per curl nachgemessen und als
+`js` eingetragen. **Nach dem nächsten Actions-Lauf im Protokoll nachsehen, ob
+sie Text geliefert haben** — dasselbe gilt für die drei
+mobilcom-debitel-Seiten, deren Katalog rein JS-getrieben ist.
+
 Wahrheitstests: `tests/test_promo_seite.py` (16) · `tests/test_promo_view.py`
-(22) · `tests/test_promo_bilder.py` (17).
+(22) · `tests/test_promo_bilder.py` (17) · `tests/test_promo_mehrseitig.py`
+(14) · `tests/test_pruefe_promo_seite.py` (23).
 
 Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
 Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
@@ -535,6 +585,18 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 >    (`capture_hero_image`/`_dismiss_cookie_banner`) ist ersatzlos entfernt —
 >    damit erledigt sich auch der offene Punkt „zwei Screenshots zeigen ein
 >    Cookie-Banner", er kann nicht wiederkommen.
+>
+> **Am 08.08.2026 der dritte Auftrag von Antonio direkt: die Promo-Quellen in
+> die Breite.** Nicht mehr Unternehmen ("das reicht an Unternehmen"), sondern
+> mehr Quellen JE Unternehmen, damit wirklich jede laufende Aktion erfasst
+> wird. Erledigt: 15 → 59 abgefragte Seiten, Schema/Pipeline/Store auf Seiten
+> statt Marken umgestellt, zwei neue Werkzeuge (Sucher + Abnahme-Check), 532
+> Tests, alle elf Prüfungen von `pruefe_portal.py` grün. Einzelheiten in §5
+> unter "Eine Marke, mehrere Aktionsseiten"; Schlussliste
+> `outputs/promo-quellen-2026-08-08.md`. **Offen daraus: nach dem nächsten
+> Actions-Lauf prüfen, ob die vier Telekom- und drei
+> mobilcom-debitel-Seiten dort Text liefern** — beide sind auf JS-Rendering
+> angewiesen und lokal nicht abnehmbar.
 >
 > Offen daraus: **die Bildausbeute hängt am JS-Rendering.** Lokal (reines
 > HTTP, Chromium kommt in der Sandbox nicht ins Netz) liefern Telekom,

@@ -6,9 +6,52 @@
 # Quellenart als config/watchlist.yaml, deshalb eigene Datei und eigener
 # Collector (siehe src/telco_radar/collect/promo_snapshot.py).
 #
-# Recherchestand: 25.07.2026 per Websuche, NICHT einzeln per
-# scripts/validate_promo_sources.py verifiziert. Vor produktivem Einsatz jede
-# URL pruefen - v.a. JS-Lastigkeit und ob die Seite wirklich noch existiert.
+# -----------------------------------------------------------------------------
+# EINE MARKE, MEHRERE SEITEN (Stand 08.08.2026)
+# -----------------------------------------------------------------------------
+# Bis dahin hatte jede Marke genau EINE URL. Das war die eigentliche Luecke der
+# Rubrik: kein Anbieter zeigt alle laufenden Aktionen auf einer Seite. Die
+# Geraeteaktion steht unter /handys, der Wechselbonus unter /wechselbonus, die
+# Prepaid-Aktion unter /prepaid, die Junge-Leute-Aktion noch einmal woanders -
+# die Uebersichtsseite, die hier als einzige konfiguriert war, verlinkt sie
+# hoechstens. Antonio: "dass man wirklich alle Promo-Aktionen von den einzelnen
+# Unternehmen auf dem Schirm hat, dafuer braucht es wahrscheinlich mehr als
+# eine Quelle pro Unternehmen."
+#
+# Deshalb: `url`/`kind` bleiben die LEITSEITE (sie wird auf der Uebersicht als
+# Markenlink gezeigt und ist der Rueckfall fuer ein Angebot ohne eigenen
+# Tiefenlink), `pages:` nennt die weiteren Seiten. Jede Seite hat ihren eigenen
+# Aenderungsstand (analyze/promo_store.snapshot_key) und wird nur dann neu
+# durch die LLM-Extraktion geschickt, wenn SIE sich geaendert hat.
+#
+# WIE DIESE LISTE ENTSTANDEN IST - und wie sie zu erweitern ist:
+#   1. python scripts/finde_promo_seiten.py --yaml kandidaten.yaml
+#      Linkernte auf den bereits konfigurierten Seiten, danach Kandidatenpfade.
+#      Am 08.08.2026: 109 Kandidaten ueber 15 Marken.
+#   2. python scripts/pruefe_promo_seite.py kandidaten.yaml --statisch --zweimal
+#      Neun Kriterien im Code. Von 109 Kandidaten bestanden 67; nach
+#      inhaltlicher Sichtung (SEO-Ratgeber, Festnetz, Einzel-SKU aussortiert)
+#      blieben 44. KEIN Eintrag hier ohne PASS - mit der einen dokumentierten
+#      Ausnahme Telekom, siehe dort.
+#   3. Erst danach von Hand eintragen. Der Check prueft FORM, nicht WERT.
+#
+# Was in Schritt 3 verworfen wurde, obwohl es den Check bestand (damit es nicht
+# beim naechsten Mal wieder vorgeschlagen wird):
+#   * winsim.de/info/... - fuenf SEO-Ratgeberartikel ("Test Handytarife: So
+#     vergleichen Sie richtig"). Traegt Angebotswoerter, aber kein Angebot.
+#   * o2online.de/internet-festnetz/homespot-tarife und
+#     alditalk.de/internet-zuhause/... - Festnetzersatz. Der Extraktor soll
+#     genau das verwerfen (siehe promo_analyst._EXTRACT_SYSTEM).
+#   * congstar.de/prepaid/tarife/prepaid-allnet-{s,m,l,xl,xs} - Einzeltarife.
+#     Die Prepaid-Uebersicht /prepaid deckt sie ab.
+#   * klarmobil.de/service/vertragsverlaengerung - duenne Serviceseite.
+#
+# Was mangels Substanz KEINE zusaetzliche Seite bekommen hat (Luecke zeigen,
+# nicht verstecken):
+#   * Lidl Connect - Single-Page-App: /tarife, /aktionen, /smart-tarife liefern
+#     alle byteweise dieselbe Huelle. Es GIBT dort nur eine Seite.
+#   * simplytel, Penny Mobil - ihre Startseite enthaelt bereits alles; jeder
+#     Kandidat fiel an Kriterium 7 (Eigenstaendigkeit) durch.
 #
 # Felder:
 #   tier      1 = grosse Netzbetreiber, 2 = Discount-/Zweitmarken
@@ -17,6 +60,8 @@
 #             umsetzung.md, dritte Session)
 #   kind      static (per HTTP) | js (Playwright, wie newsroom_js) |
 #             skip (dokumentierter Sonderfall, wird nicht gecrawlt)
+#             Gilt je SEITE: eine Marke darf eine statische Uebersicht und
+#             eine JS-gerenderte Kampagnenseite gleichzeitig haben.
 #   group     Mutterkonzern/Markenfamilie, wo bekannt (KEINE Netzbetreiber-
 #             Behauptung - manche Discounter senden ueber mehrere Netze)
 #   internal_reference  true fuer Vodafone selbst: erscheint separat markiert,
@@ -27,6 +72,8 @@
 #             Regal, grosser Vertriebspartner), 1 = reine Online-Zweitmarke.
 #             Bewusst getrennt vom Tier: ALDI TALK und simplytel sind beide
 #             Tier 2, erreichen aber voellig unterschiedlich viele Menschen.
+#   pages     Weitere Seiten dieser Marke. `label` ist reine Anzeige auf der
+#             Quellen-Unterseite.
 # =============================================================================
 brands:
   # ---------------------------------------------------------- Tier 1: MNOs
@@ -36,6 +83,35 @@ brands:
     group: Deutsche Telekom
     url: https://www.telekom.de/unterwegs/aktionen
     kind: js
+    # ACHTUNG, dokumentierte Ausnahme: telekom.de beantwortet jeden
+    # httpx-Abruf mit HTTP 202 und einer 2-KB-Challenge - auch mit
+    # Browser-User-Agent, auch beim zweiten Versuch in derselben Session.
+    # Mit curl kommt dieselbe URL als HTTP 200 mit vollem Inhalt zurueck; es
+    # ist also eine TLS-/Client-Erkennung, keine Sperre gegen dieses Projekt.
+    # scripts/pruefe_promo_seite.py kann diese vier Seiten deshalb LOKAL NICHT
+    # abnehmen (sie fallen dort an Kriterium 1 durch). Nachgemessen wurde
+    # stattdessen per curl, am 08.08.2026, gegen genau diese URLs:
+    #   /shop/tarife/handyvertrag            20 890 Zeichen,  9 Preise
+    #   /shop/tarife/prepaid-tarife           8 220 Zeichen,  6 Preise
+    #   /shop/tarife/zusatzkarten            10 741 Zeichen, 12 Preise
+    #   /shop/tarife/smartphone-tarife-young    595 Zeichen (nur JS-gerendert)
+    # In GitHub Actions laeuft der Abruf ueber Playwright und damit ueber einen
+    # echten Browser - derselbe Weg, ueber den die Leitseite oben seit Monaten
+    # funktioniert. NACH DEM NAECHSTEN LAUF im Protokoll nachsehen, ob diese
+    # vier Seiten Text geliefert haben; wenn nicht, gehoeren sie wieder raus.
+    pages:
+      - url: https://www.telekom.de/shop/tarife/handyvertrag
+        kind: js
+        label: Handyverträge
+      - url: https://www.telekom.de/shop/tarife/prepaid-tarife
+        kind: js
+        label: Prepaid
+      - url: https://www.telekom.de/shop/tarife/zusatzkarten
+        kind: js
+        label: Zusatzkarten
+      - url: https://www.telekom.de/shop/tarife/smartphone-tarife-young
+        kind: js
+        label: Junge Leute
   - name: Vodafone Deutschland
     reach: 3
     tier: 1
@@ -44,12 +120,44 @@ brands:
     kind: js
     internal_reference: true
     note: "Eigene Marke - interne Referenz, nicht Teil der Wettbewerbsauswertung."
+    pages:
+      - url: https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html
+        kind: static
+        label: Tarife mit Vertrag
+      - url: https://www.vodafone.de/privat/handys-tablets-tarife/prepaid-ohne-vertrag.html
+        kind: static
+        label: Prepaid
+      - url: https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html
+        kind: static
+        label: Smartphones
+      - url: https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html
+        kind: static
+        label: Zusatzkarten
   - name: O2 / Telefónica Deutschland
     reach: 3
     tier: 1
     group: Telefónica Deutschland
     url: https://www.o2online.de/deals/
     kind: js
+    pages:
+      - url: https://www.o2online.de/tarife
+        kind: static
+        label: Tarife
+      - url: https://www.o2online.de/tarife/junge-leute
+        kind: static
+        label: Junge Leute
+      - url: https://www.o2online.de/tarife/datentarife
+        kind: static
+        label: Datentarife
+      - url: https://www.o2online.de/tarife/fuer-kinder
+        kind: static
+        label: Kindertarife
+      - url: https://www.o2online.de/kombiangebote
+        kind: static
+        label: Kombiangebote
+      - url: https://www.o2online.de/e-shop
+        kind: static
+        label: Geräte-Shop
   - name: 1&1 Mobilfunk
     reach: 3
     tier: 1
@@ -57,6 +165,16 @@ brands:
     url: https://mobile.1und1.de/handyvertrag
     kind: js
     note: "Kein festes /aktionen-Muster, Tarifseite mit laufenden Aktionspreisen. Presse-RSS ist bereits in config/watchlist.yaml erfasst."
+    pages:
+      - url: https://mobile.1und1.de/5g-tarife
+        kind: static
+        label: 5G-Tarife
+      - url: https://mobile.1und1.de/prepaid-internet-flat
+        kind: static
+        label: Prepaid
+      - url: https://mobile.1und1.de/tarife-fuer-kinder-und-jugendliche
+        kind: static
+        label: Kinder & Jugendliche
 
   # ------------------------------------------------ Tier 2: Discount-Marken
   - name: congstar
@@ -65,6 +183,16 @@ brands:
     group: Deutsche Telekom
     url: https://www.congstar.de/handytarife/angebote/
     kind: static
+    pages:
+      - url: https://www.congstar.de/handys
+        kind: static
+        label: Handys mit Vertrag
+      - url: https://www.congstar.de/handys/handy-angebote
+        kind: static
+        label: Handy-Angebote
+      - url: https://www.congstar.de/prepaid
+        kind: static
+        label: Prepaid
   - name: Otelo
     reach: 2
     tier: 2
@@ -72,45 +200,108 @@ brands:
     url: https://www.otelo.de/
     kind: js
     note: "Keine dedizierte Aktions-Unterseite gefunden, Homepage fuehrt aktuelle Kampagnen."
+    pages:
+      - url: https://www.otelo.de/handy-mit-vertrag
+        kind: static
+        label: Handy mit Vertrag
+      - url: https://www.otelo.de/handytarife/young-tarife
+        kind: static
+        label: Young-Tarife
   - name: Blau
     reach: 2
     tier: 2
     group: Telefónica Deutschland
     url: https://www.blau.de/handy-angebote/
     kind: static
+    pages:
+      - url: https://www.blau.de/handy-angebote/iphone-deals
+        kind: static
+        label: iPhone-Deals
+      - url: https://www.blau.de/handy-angebote/samsung-galaxy-smartphones
+        kind: static
+        label: Samsung-Deals
+      - url: https://www.blau.de/prepaid-tarife
+        kind: static
+        label: Prepaid
+      - url: https://www.blau.de/tarife/sim-only-tarife
+        kind: static
+        label: SIM-Only
+      - url: https://www.blau.de/tarife/handyvertrag-fuer-studenten
+        kind: static
+        label: Studenten
   - name: ALDI TALK
     reach: 2
     tier: 2
     group: MEDION / Telefónica-Netz
     url: https://www.alditalk.de/angebote
     kind: static
+    pages:
+      - url: https://www.alditalk.de/wechselbonus
+        kind: static
+        label: Wechselbonus
+      - url: https://www.alditalk.de/smartphones
+        kind: static
+        label: Smartphones
+      - url: https://www.alditalk.de/handytarife
+        kind: static
+        label: Handytarife
+      - url: https://www.alditalk.de/handytarife-schueler
+        kind: static
+        label: Schüler
+      - url: https://www.alditalk.de/prepaid
+        kind: static
+        label: Prepaid
   - name: mobilcom-debitel
     reach: 2
     tier: 2
     group: freenet Group
     url: https://www.mobilcom-debitel.de/handytarife/
     kind: js
-    note: "Sonderfall: filterbarer Tarifkatalog statt fester Aktionsseite - Extraktion ggf. unzuverlaessig, beobachten."
+    note: "Sonderfall: filterbarer Tarifkatalog statt fester Aktionsseite - Extraktion ggf. unzuverlaessig, beobachten. Ueber reines HTTP liefern die Seiten nur Geruest, Filterleiste und SEO-Text; die Angebote selbst kommen erst aus dem JS-Rendering in Actions."
+    pages:
+      - url: https://www.mobilcom-debitel.de/handys-smartphones/handys-mit-vertrag
+        kind: js
+        label: Handys mit Vertrag
+      - url: https://www.mobilcom-debitel.de/handytarife/5g-tarife
+        kind: js
+        label: 5G-Tarife
+      - url: https://www.mobilcom-debitel.de/handytarife/junge-leute
+        kind: js
+        label: Junge Leute
   - name: klarmobil
     reach: 2
     tier: 2
     group: freenet Group
     url: https://www.klarmobil.de/unternehmen/presse/
     kind: static
-    note: "Presseseite als Primaerquelle gewaehlt (strukturierter als der Tarifkatalog unter klarmobil.de/handytarife/)."
+    note: "Presseseite als Primaerquelle gewaehlt (strukturierter als der Tarifkatalog). Seit 08.08.2026 stehen die Tarifseiten selbst als weitere Seiten daneben - die Presseseite meldet Kampagnen, die Tarifseiten zeigen die laufenden Preise."
+    pages:
+      - url: https://www.klarmobil.de/handytarife
+        kind: static
+        label: Handytarife
+      - url: https://www.klarmobil.de/tarife/d-netz-tarife
+        kind: static
+        label: D-Netz-Tarife
+      - url: https://www.klarmobil.de/tarife/handytarife-ohne-handy
+        kind: static
+        label: SIM-Only
+      - url: https://www.klarmobil.de/tarife/prepaid
+        kind: static
+        label: Prepaid
   - name: Lidl Connect
     reach: 2
     tier: 2
     group: Lidl / Drillisch
     url: https://www.lidl-connect.de/
     kind: js
+    note: "Single-Page-App: /tarife, /aktionen und /smart-tarife liefern byteweise dieselbe Huelle wie die Startseite - es gibt dort nur eine Seite, eine zweite Quelle ist nicht moeglich (geprueft 08.08.2026)."
   - name: Penny Mobil
     reach: 2
     tier: 2
     group: Telekom-Netz (D1)
     url: https://www.pennymobil.de/
     kind: js
-    note: "Keine dedizierte Aktionsseite gefunden, Homepage als bester Fallback. connect.de deckt einzelne Kampagnen redaktionell ab."
+    note: "Keine dedizierte Aktionsseite gefunden, Homepage als bester Fallback. connect.de deckt einzelne Kampagnen redaktionell ab. Die Unterseiten /tarife und /tarife/prepaid-* fielen am 08.08.2026 alle an der Eigenstaendigkeitspruefung durch - die Startseite enthaelt sie bereits."
   - name: winSIM
     reach: 1
     tier: 2
@@ -118,17 +309,33 @@ brands:
     url: https://www.winsim.de/
     kind: js
     note: "Rotierende Angebote auf der Startseite, kein fester Pfad."
+    pages:
+      - url: https://www.winsim.de/tarife
+        kind: static
+        label: Tarife
+      - url: https://www.winsim.de/handys
+        kind: static
+        label: Handys
+      - url: https://www.winsim.de/handytarife-mit-handy
+        kind: static
+        label: Mit Handy
+      - url: https://www.winsim.de/handytarife-ohne-handy
+        kind: static
+        label: Ohne Handy
   - name: PremiumSIM
     reach: 1
     tier: 2
     group: 1&1 / Drillisch
     url: https://www.premiumsim.de/
     kind: js
-    note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
+    pages:
+      - url: https://www.premiumsim.de/tarife
+        kind: static
+        label: Tarife
   - name: simplytel
     reach: 1
     tier: 2
     group: 1&1 / Drillisch
     url: https://www.simplytel.de/
     kind: js
-    note: "Nicht einzeln verifiziert, vermutlich gleiches Muster wie winSIM."
+    note: "Startseite fuehrt den vollstaendigen Tarifkatalog - /tarife und /handys fielen am 08.08.2026 an der Eigenstaendigkeitspruefung durch."

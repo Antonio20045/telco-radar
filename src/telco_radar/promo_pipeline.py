@@ -20,19 +20,27 @@ from pathlib import Path
 from . import promo_bilder
 from .analyze import promo_editor, promo_ranker
 from .analyze.promo_analyst import extract_promos
-from .analyze.promo_store import PromoDB, SnapshotStore
+from .analyze.promo_store import PromoDB, SnapshotStore, snapshot_key
 from .collect.promo_snapshot import content_hash, fetch_snapshot
 from .promo_config import load_promo_config
 
 log = logging.getLogger(__name__)
 
 
-def _fetch_one(src, http_cfg: dict) -> dict:
+def _fetch_one(src, page, http_cfg: dict) -> dict:
     """Runs in a worker thread: fetch + hash only, no shared state touched -
-    keeps this safe to parallelise like collect/__init__.py's collect_all."""
-    rec = {"brand": src.name, "url": src.url, "tier": src.tier, "kind": src.kind}
+    keeps this safe to parallelise like collect/__init__.py's collect_all.
+
+    Abgefragt wird eine SEITE, nicht eine Marke: seit dem 08.08.2026 hat
+    eine Marke mehrere (promo_config.PromoSource.pages). Deshalb steht im
+    Protokolleintrag beides - `brand` fuer die Zuordnung, `url`/`label` fuer
+    die Seite. `leitseite` markiert die Seite, die die Marke auf der
+    Uebersicht verlinkt."""
+    rec = {"brand": src.name, "url": page.url, "tier": src.tier,
+           "kind": page.kind, "label": page.label,
+           "leitseite": page.url == src.url}
     try:
-        snap = fetch_snapshot(src.url, src.kind, http_cfg)
+        snap = fetch_snapshot(page.url, page.kind, http_cfg)
         rec["text"] = snap["text"]
         rec["links"] = snap.get("links") or []
         rec["hash"] = content_hash(snap["text"], rec["links"])
@@ -74,12 +82,18 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     db = PromoDB(state_dir / "promo_db.json")
 
     sources = promo_cfg.crawled_sources
+    by_name = {s.name: s for s in sources}
+    # Ein Auftrag je SEITE, nicht je Marke. Die Nebenlaeufigkeit wirkt damit
+    # auch INNERHALB einer Marke - eine Marke mit fuenf Seiten haelt den Lauf
+    # nicht fuenfmal so lange auf wie eine mit einer.
+    auftraege = [(src, page) for src in sources for page in src.crawled_pages]
     fetched: list[dict] = []
     with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
-        futures = {pool.submit(_fetch_one, src, http_cfg): src for src in sources}
+        futures = [pool.submit(_fetch_one, src, page, http_cfg)
+                   for src, page in auftraege]
         for fut in as_completed(futures):
             fetched.append(fut.result())
-    fetched.sort(key=lambda r: r["brand"])  # deterministisches Protokoll
+    fetched.sort(key=lambda r: (r["brand"], not r["leitseite"], r["url"]))
 
     # Bildkandidaten je Marke, aus DIESEM Abruf (siehe promo_bilder.py). Sie
     # entstehen im selben Seitenaufruf wie Text und Links - anders als der
@@ -89,14 +103,23 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     # sehr wohl noch ohne Bild dastehen.
     bild_kandidaten: dict[str, list[dict]] = {}
 
+    # Je Marke sammeln, was in DIESEM Lauf wirklich neu gelesen wurde:
+    # welche Seiten (URLs) und welche Angebots-IDs dabei wiedergefunden
+    # wurden. mark_stale() laeuft erst, wenn alle Seiten der Marke durch
+    # sind - sonst wuerde die erste Seite die Angebote der zweiten altern
+    # lassen, bevor diese ueberhaupt gelesen ist.
+    gepruefte_seiten: dict[str, set[str]] = {}
+    gesehene_ids: dict[str, set[str]] = {}
+
     results: list[dict] = []
     for rec in fetched:
         if rec.get("status") == "fail":
-            log.warning("Promo-Snapshot fehlgeschlagen (%s): %s",
-                       rec["brand"], rec.get("error"))
+            log.warning("Promo-Snapshot fehlgeschlagen (%s / %s): %s",
+                       rec["brand"], rec["url"], rec.get("error"))
             results.append(rec)
             continue
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
+        page_url = rec["url"]
         links = rec.pop("links", [])
         image_url = rec.get("image_url")
         # Das og:image der Seite haengt hinten an: es ist der schwaechste
@@ -105,25 +128,36 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         # eine Seite, aus der sich kein einziges <img> lesen laesst. Als
         # LETZTER in der Liste kommt er nur zum Zug, wenn nichts davor
         # taugte - genau die Rolle, die ihm zusteht.
-        bild_kandidaten[src_name] = (rec.pop("images", []) +
-                                     ([{"src": image_url, "anchor": "",
-                                        "context": "", "hint_w": 0}]
-                                      if image_url else []))
-        changed = snap_store.changed(src_name, h)
+        # Bildkandidaten ALLER Seiten einer Marke landen in einem Topf: das
+        # Motiv eines Angebots steht nicht zwangslaeufig auf der Seite, auf
+        # der der Text gefunden wurde (eine Uebersicht zeigt die Kachel, die
+        # Detailseite den Text). promo_bilder.zuordnen() entscheidet ueber
+        # Anker und Textnaehe, nicht ueber die Herkunftsseite.
+        bild_kandidaten.setdefault(src_name, []).extend(
+            rec.pop("images", []) +
+            ([{"src": image_url, "anchor": "", "context": "", "hint_w": 0}]
+             if image_url else []))
+        key = snapshot_key(src_name, page_url)
+        # Der reine Markenschluessel ist der Stand VOR dem 08.08.2026. Er
+        # zaehlt nur fuer die Leitseite und nur so lange, bis der neue
+        # Schluessel einmal geschrieben wurde.
+        legacy = src_name if rec.get("leitseite") else None
+        changed = snap_store.changed(key, h, legacy_key=legacy)
         try:
             if not changed:
                 rec["status"] = "unveraendert"
                 results.append(rec)
                 continue
-            snap_store.update(src_name, h, today)
+            snap_store.update(key, h, today)
             if use_llm and text.strip():
                 items = extract_promos(src_name, text, model, links=links)
                 for it in items:
                     it["tier"] = rec["tier"]
-                    it["url"] = _resolve_item_url(it.get("url"), rec["url"])
+                    it["url"] = _resolve_item_url(it.get("url"), page_url)
                     it["image_url"] = image_url
-                n_new, matched_ids = db.upsert(items, today)
-                db.mark_stale(src_name, matched_ids, today)
+                n_new, matched_ids = db.upsert(items, today, source_url=page_url)
+                gepruefte_seiten.setdefault(src_name, set()).add(page_url)
+                gesehene_ids.setdefault(src_name, set()).update(matched_ids)
                 rec["status"] = "ok"
                 rec["new_items"] = n_new
                 rec["extracted"] = len(items)
@@ -132,10 +166,22 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         except Exception as exc:  # noqa: BLE001
             rec["status"] = "fail"
             rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
-            log.warning("Promo-Verarbeitung fehlgeschlagen (%s): %s",
-                       src_name, rec["error"])
+            log.warning("Promo-Verarbeitung fehlgeschlagen (%s / %s): %s",
+                       src_name, page_url, rec["error"])
         results.append(rec)
 
+    # Alterung erst NACH allen Seiten einer Marke, und nur fuer die Seiten,
+    # die diesmal wirklich neu gelesen wurden (siehe PromoDB.mark_stale).
+    for brand, seiten in gepruefte_seiten.items():
+        src = by_name.get(brand)
+        db.mark_stale(brand, gesehene_ids.get(brand, set()), today,
+                      gepruefte_seiten=seiten,
+                      leitseite=src.url if src else "")
+
+    entfernt = snap_store.prune(
+        snapshot_key(s.name, p.url) for s in sources for p in s.crawled_pages)
+    if entfernt:
+        log.info("Promo-Snapshots: %d veraltete Schluessel entfernt", entfernt)
     snap_store.save()
 
     # Wichtigkeits-Score: laeuft ueber ALLE nicht-ausgelaufenen Eintraege der
@@ -209,8 +255,12 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
 
     (reports_dir / f"{today}.md").write_text(body, encoding="utf-8")
     active = sum(1 for e in entries if e.get("status") == "aktiv")
-    log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Quellen konfiguriert)",
-             mode, active, len(promo_cfg.sources))
+    log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Marken / %d Seiten "
+             "abgefragt, davon %d veraendert, %d fehlgeschlagen)",
+             mode, active, len(sources), len(auftraege),
+             sum(1 for r in results if r.get("status") in ("ok", "changed_no_llm")),
+             sum(1 for r in results if r.get("status") == "fail"))
     return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
             "images": dict(bilder_bilanz),
+            "brands": len(sources), "pages": len(auftraege),
             "score": score_summary}

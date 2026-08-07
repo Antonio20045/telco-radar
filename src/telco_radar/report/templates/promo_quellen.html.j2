@@ -3,48 +3,41 @@
 {% set active = 'promo_quellen' %}
 {% block title %}Promo Übersicht · Quellen{% endblock %}
 {% set kmap = {'static': 'Aktionsseite', 'js': 'Aktionsseite (JS)', 'skip': 'Referenz (nicht automatisiert)'} %}
+{% macro marke(s) %}
+    <div class="source-card">
+      <div class="source-head">
+        <h3>{{ s.name }}{% if s.internal_reference %} <span class="chip">eigene Marke</span>{% endif %}</h3>
+        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
+        <span class="chip">{{ s.crawled_pages | length }} Seite{% if s.crawled_pages | length != 1 %}n{% endif %}</span>
+      </div>
+      <ul class="source-links">
+        {% for p in s.pages %}
+        <li><span class="kbadge">{{ kmap.get(p.kind, p.kind) }}</span>
+        <a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.label or (p.url | domain) }} &nearr;</a></li>
+        {% endfor %}
+      </ul>
+      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
+    </div>
+{% endmacro %}
 {% block content %}
 <section class="page-hero wide">
   <p class="page-kicker">Transparenz</p>
   <h1>Beobachtete Anbieter</h1>
   <p class="page-lead">Jede Zeile ist die <b>eigene Aktions-/Tarifseite</b> des Anbieters – keine Preisvergleichsseite gilt hier als Quelle eines Anbieters. Vergleichsportale und Fachpresse dienen höchstens als ergänzende, klar getrennte Diskoveryschicht (nicht automatisiert eingebunden).</p>
+  <p class="page-lead">Ein Anbieter zeigt seine laufenden Aktionen selten auf einer einzigen Seite: der Gerätedeal steht unter „Handys“, der Wechselbonus auf einer eigenen Landingpage, die Prepaid-Aktion wieder woanders. Deshalb werden je Marke <b>mehrere Seiten</b> abgefragt – zusammen <b>{{ sources | map(attribute='crawled_pages') | map('length') | sum }} Seiten</b> bei {{ sources | length }} Marken. Steht bei einer Marke nur eine Seite, hat die Prüfung dort keine zweite gefunden, die etwas anderes zeigt.</p>
 </section>
 
 <section class="source-region">
   <h2>Tier 1 · Große Netzbetreiber <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 1) | list | length }} Anbieter</span></h2>
   <div class="source-grid">
-    {% for s in sources if s.tier == 1 %}
-    <div class="source-card">
-      <div class="source-head">
-        <h3>{{ s.name }}{% if s.internal_reference %} <span class="chip">eigene Marke</span>{% endif %}</h3>
-        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
-      </div>
-      <ul class="source-links">
-        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
-        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
-      </ul>
-      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
-    </div>
-    {% endfor %}
+    {% for s in sources if s.tier == 1 %}{{ marke(s) }}{% endfor %}
   </div>
 </section>
 
 <section class="source-region">
   <h2>Tier 2 · Discount- und Zweitmarken <span class="count-badge">{{ sources | selectattr('tier', 'equalto', 2) | list | length }} Anbieter</span></h2>
   <div class="source-grid">
-    {% for s in sources if s.tier == 2 %}
-    <div class="source-card">
-      <div class="source-head">
-        <h3>{{ s.name }}</h3>
-        {% if s.group %}<span class="chip">{{ s.group }}</span>{% endif %}
-      </div>
-      <ul class="source-links">
-        <li><span class="kbadge">{{ kmap.get(s.kind, s.kind) }}</span>
-        <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.url | domain }} &nearr;</a></li>
-      </ul>
-      {% if s.note %}<p class="source-domain">{{ s.note }}</p>{% endif %}
-    </div>
-    {% endfor %}
+    {% for s in sources if s.tier == 2 %}{{ marke(s) }}{% endfor %}
   </div>
 </section>
 
