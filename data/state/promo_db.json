@@ -522,6 +522,28 @@
    "image_kind": "angebot"
   },
   {
+   "id": "fd3a022bdce7a8a1",
+   "brand": "1&1 Mobilfunk",
+   "tier": 1,
+   "headline": "1&1 Daten-Flat ohne Vertragslaufzeit",
+   "description": "Daten-Flatrate mit monatlich kündbarer Laufzeit und 5G-Highspeed (300 MBit/s). Vier Tarifstufen: 10 GB für 12,99 €/Monat, 30 GB für 14,99 €/Monat, 60 GB für 19,99 €/Monat und 120 GB für 24,99 €/Monat. Inklusive EU-Roaming, eSIM und 30 Tagen Rückgaberecht.",
+   "valid_until": null,
+   "url": "https://mobile.1und1.de/datenflat-ohne-vertragslaufzeit",
+   "image_url": null,
+   "source_url": "https://mobile.1und1.de/prepaid-internet-flat",
+   "first_seen": "2026-08-07",
+   "last_verified": "2026-08-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false
+  },
+  {
    "id": "3c350bb86ab7b622",
    "brand": "ALDI TALK",
    "tier": 2,
@@ -926,10 +948,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -1109,10 +1131,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Die Möglichkeit, unbegrenzt 1 GB nachzubuchen, bietet einen spürbaren Mehrwert ohne zusätzliche Kosten.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -1233,14 +1255,14 @@
    "id": "417301cd42941b61",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Bis zu 25 € Rabatt auf Zweittarif",
-   "description": "Bestandskunden erhalten dauerhaft bis zu 25 Euro monatlichen Rabatt auf jeden weiteren Mobilfunk-Tarif ab dem zweiten Vertrag.",
+   "headline": "O2 Kombi-Vorteil für Bestandskunden: bis zu 25 € monatlicher Rabatt auf zusätzliche Mobilfunktarife",
+   "description": "Bestehende O2 Mobilfunkkunden erhalten beim Abschluss eines weiteren Mobilfunkvertrags (Partnerkarte) einen dauerhaften monatlichen Rabatt von 5 € (Mobile Starter Flex) bis 25 € (Mobile Unlimited L). Beispiel: Mobile M (50 GB) für 14,99 € statt 29,99 €, Mobile Unlimited M (unbegrenzt, 100 Mbit/s) für 24,99 € statt 39,99 €. Maximal vier Mobilfunk- oder Datentarife und ein Internet-Zuhause-Tarif kombinierbar. Flex-Tarife als Haupttarif möglich, aber erhalten selbst keinen Rabatt.",
    "valid_until": null,
-   "url": "https://www.o2online.de/kombiangebote/#id-2271586",
+   "url": "https://www.o2online.de/kombiangebote/?activeSwitcherCardItem=1#id-1211358",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-31",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-08-07",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-08-04",
    "judged": {
     "lever": 1,
@@ -1263,9 +1285,10 @@
    },
    "score": 62,
    "score_reason": "Das Angebot senkt die monatliche Belastung für Bestandskunden, die einen zweiten Vertrag abschließen, dauerhaft um bis zu 25 Euro.",
-   "scored_at": "2026-08-04",
+   "scored_at": "2026-08-07",
    "highlight": false,
-   "stale_since": "2026-08-04"
+   "source_url": "https://www.o2online.de/kombiangebote",
+   "image_url": "https://static2.o9.de/resource/blob/1478214/650a7b105044399030bc67ab079e8458/kombiangebote-og-image-data.jpg"
   },
   {
    "id": "351c0d8b16d0277e",
@@ -2091,15 +2114,15 @@
    "id": "6ba844640de3a72a",
    "brand": "O2 / Telefónica Deutschland",
    "tier": 1,
-   "headline": "Mein-o2-App-Bonus: 10 GB + 500 MB monatlich",
-   "description": "Neukunden erhalten nach Download der Mein-o2-App einmalig 10 GB und dauerhaft jeden Monat 500 MB zusätzliches Datenvolumen gratis.",
+   "headline": "App-Bonus: 10 GB einmalig + monatlich 500 MB gratis",
+   "description": "Nach Installation der Mein O2 App erhalten Kunden einmalig 10 GB und dauerhaft 500 MB zusätzliches Datenvolumen pro Monat geschenkt.",
    "valid_until": null,
-   "url": "https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/",
-   "image_url": null,
+   "url": "https://www.o2online.de/vorteile/apps-zusatzdienste/mein-o2-app/mein-o2-app-browser-detection-page/meino2flyout-page/?referrer=meino2flyout",
+   "image_url": "https://static2.o9.de/resource/blob/1478214/650a7b105044399030bc67ab079e8458/kombiangebote-og-image-data.jpg",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-28",
-   "status": "ausgelaufen",
-   "missed_checks": 2,
+   "last_verified": "2026-08-07",
+   "status": "aktiv",
+   "missed_checks": 0,
    "ended_since": "2026-07-31",
    "highlight": false,
    "judged": {
@@ -2123,8 +2146,13 @@
    },
    "score": 53,
    "score_reason": "Der dauerhafte Datenbonus von 500 MB monatlich ist ein kleiner, aber kontinuierlicher Vorteil für Neukunden.",
-   "scored_at": "2026-07-28",
-   "stale_since": "2026-07-28"
+   "scored_at": "2026-08-07",
+   "source_url": "https://www.o2online.de/kombiangebote",
+   "image": "6a402fbe1b69e061-1280.jpg",
+   "image_w": 560,
+   "image_h": 420,
+   "image_src": "https://static2.o9.de/resource/image/1649420/OCCL_Ratio_4x3/560/420/44bda866b48b743f8dbd3916ce25146c/92EF2E67D0572E865972D381E0B873A7/jpg/unlimited-datenvolumen-sofort-online-sein-teaser-bild.webp",
+   "image_kind": "angebot"
   },
   {
    "id": "462ebb5e611f6ddc",
@@ -3026,6 +3054,33 @@
    "ended_since": "2026-07-28"
   },
   {
+   "id": "547251cd647ae78f",
+   "brand": "O2 / Telefónica Deutschland",
+   "tier": 1,
+   "headline": "50 % Rabatt auf Tablet-Datentarife im Kombi-Vorteil",
+   "description": "Bestandskunden können zu ihrem Mobilfunkvertrag eine Daten-SIM ohne Telefonie fürs Tablet dazubuchen und erhalten darauf 50 % Rabatt. Gilt im Rahmen der Kombi-Vorteile.",
+   "valid_until": null,
+   "url": "https://www.o2online.de/kombiangebote",
+   "image_url": "https://static2.o9.de/resource/blob/1478214/650a7b105044399030bc67ab079e8458/kombiangebote-og-image-data.jpg",
+   "source_url": "https://www.o2online.de/kombiangebote",
+   "first_seen": "2026-08-07",
+   "last_verified": "2026-08-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 3,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false,
+   "image": "7902912deb1f4083-1280.jpg",
+   "image_w": 560,
+   "image_h": 420,
+   "image_src": "https://static2.o9.de/resource/image/1809966/OCCL_Ratio_4x3/560/420/ca882f9f12ac4b4c814c838578e0445/EB94EBFA7E30D8B76A252A5208902A98/jpg/mobile-wlan-router-teaser-bild.webp",
+   "image_kind": "angebot"
+  },
+  {
    "id": "29fd6aed75f49a77",
    "brand": "Otelo",
    "tier": 2,
@@ -3054,10 +3109,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das Angebot verdoppelt die Surf-Geschwindigkeit für Neukunden, was einen spürbaren Leistungsvorteil darstellt.",
    "scored_at": "2026-08-07",
    "highlight": false,
@@ -3293,10 +3348,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das dauerhaft zusätzliche Datenvolumen ist ein klarer Leistungsvorteil ohne zeitliche Begrenzung.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -3372,10 +3427,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Der dauerhafte Datenbonus von 5 GB pro Monat über zwei Jahre bietet einen spürbaren Mehrwert für datenaffine Nutzer.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -3409,10 +3464,10 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 42,
+   "score": 47,
    "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -3488,13 +3543,18 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Die Verdopplung des Datenvolumens von 1 GB auf 2 GB ist eine deutliche Leistungssteigerung ohne Preisänderung.",
    "scored_at": "2026-08-07",
-   "highlight": false
+   "highlight": false,
+   "image": "728d12a19c6420a1-1280.jpg",
+   "image_w": 774,
+   "image_h": 635,
+   "image_src": "https://www.pennymobil.de/_nuxt/image-bubble-prepaid-basic.C_QpKMwB.webp",
+   "image_kind": "angebot"
   },
   {
    "id": "65d5b9ab0ca3c8d8",
@@ -3525,10 +3585,10 @@
     "lever": 1,
     "depth": 1,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 42,
+   "score": 47,
    "score_reason": "Ein einmaliger Datenpolster von 25 GB für ein Jahr ist ein netter Bonus, aber kein starkes Wechselargument.",
    "scored_at": "2026-08-07",
    "highlight": false
@@ -5468,10 +5528,10 @@
     "lever": 1,
     "depth": 2,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 50,
+   "score": 55,
    "score_reason": "Das Angebot bietet 25 Prozent mehr Datenvolumen zum gleichen Preis, was einen spürbaren Mehrwert darstellt.",
    "scored_at": "2026-08-07",
    "highlight": false,
@@ -5560,10 +5620,10 @@
     "lever": 1,
     "depth": 3,
     "reach": 2,
-    "momentum": 2,
+    "momentum": 3,
     "campaign": 0
    },
-   "score": 58,
+   "score": 63,
    "score_reason": "Junge Kunden erhalten die doppelte Datenmenge zum regulären Preis, was einen sehr großen Leistungsvorteil darstellt.",
    "scored_at": "2026-08-07",
    "highlight": false,
@@ -7708,8 +7768,8 @@
    "source_url": "https://www.winsim.de/handys",
    "first_seen": "2026-08-07",
    "last_verified": "2026-08-07",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "evtl. ausgelaufen",
+   "missed_checks": 1,
    "judged": {
     "lever": 2,
     "depth": 3,
@@ -7737,6 +7797,34 @@
    "image_w": 1280,
    "image_h": 512,
    "image_src": "https://imagepool.winsim.de/v2/page/confi/v93988-page-confi-header-apple/v93988-page-confi-header-apple-q85-3600px.webp",
+   "image_kind": "angebot",
+   "stale_since": "2026-08-07"
+  },
+  {
+   "id": "aec31c53a026764c",
+   "brand": "winSIM",
+   "tier": 2,
+   "headline": "Smartphone-Bundle: Top-Handys ab 1 € mit Allnet-Flat-Tarif",
+   "description": "Wählen Sie aus vielen aktuellen Smartphones (u. a. iPhone 17 Pro, Galaxy S26, Xiaomi 17T Pro) und kombinieren Sie es mit einem winSIM Allnet-Tarif. Monatliche Tarifpreise beginnen bei 14,99 € (z. B. mit Samsung Galaxy A57 5G), der einmalige Gerätepreis liegt bei allen Modellen ab 1 €. Je nach Gerät unterschiedliche monatliche Raten, Datenvolumen flexibel anpassbar.",
+   "valid_until": null,
+   "url": "https://www.winsim.de/handys",
+   "image_url": "https://imagepool.winsim.de/v2/base/facebook-og/facebook-og.png",
+   "source_url": "https://www.winsim.de/handys",
+   "first_seen": "2026-08-07",
+   "last_verified": "2026-08-07",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "score": null,
+   "score_axes": {
+    "reach": 1,
+    "momentum": 0,
+    "campaign": 0
+   },
+   "highlight": false,
+   "image": "9da3c1c8d49b6bb3-1280.jpg",
+   "image_w": 1280,
+   "image_h": 512,
+   "image_src": "https://imagepool.winsim.de/v2/page/confi/v97892-page-confi-header-samsung/v97892-page-confi-header-samsung-q85-3600px.webp",
    "image_kind": "angebot"
   }
  ]
