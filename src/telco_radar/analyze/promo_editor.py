@@ -135,7 +135,7 @@ def synthesize(entries: list[dict], model: str, language: str = "Deutsch") -> st
                                            e.get("score") or 0), reverse=True)
     raw = complete(
         PROMO_EDITOR_SYSTEM + f"\nBerichtssprache: {language}.",
-        _payload(active), model=model, max_tokens=3200)
+        _payload(active), model=model, max_tokens=16000)
     markdown = raw.strip()
     validate_briefing(markdown)
     return markdown

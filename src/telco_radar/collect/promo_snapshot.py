@@ -81,7 +81,7 @@ _IMG_META = (
 # Upper bound on link candidates handed to the LLM per brand: a page can have
 # hundreds of anchors, and every candidate costs prompt tokens. 30 is
 # generous for the handful of genuinely distinct offers a promo page shows
-# (see promo_analyst._MAX_ENTRIES_PER_BRAND=8) while keeping the prompt
+# (see promo_analyst._MAX_ENTRIES_PER_PAGE=6) while keeping the prompt
 # bounded even on a link-heavy page.
 _MAX_LINK_CANDIDATES = 30
 # Containers whose own text is a reasonable last-resort context for a link

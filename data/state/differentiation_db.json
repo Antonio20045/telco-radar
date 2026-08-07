@@ -520,6 +520,20 @@
    "status": "aktiv"
   },
   {
+   "id": "https://prepaid.t-mobile.com/benefits",
+   "theme": "loyalty",
+   "operator": "T-Mobile",
+   "region": "Nordamerika",
+   "what": "T-Mobile bietet Prepaid- und Postpaid-Kunden mit 'Magenta Status' ein kostenloses Treueprogramm, das u.a. die wöchentliche Aktion 'T-Mobile Tuesdays' mit Gratis-Zugaben und Partnerrabatten umfasst.",
+   "url": "https://prepaid.t-mobile.com/benefits",
+   "source": "prepaid.t-mobile.com",
+   "date": null,
+   "why": "Ein wöchentliches, spielerisches Belohnungsformat geht über klassische Punktesysteme hinaus und adressiert emotionale Bindung statt reiner Transaktionslogik.",
+   "first_seen": "2026-08-07",
+   "last_verified": "2026-08-07",
+   "status": "aktiv"
+  },
+  {
    "id": "https://t-mobile.com/benefits/scam-shield",
    "theme": "security",
    "operator": "T-Mobile US",

@@ -3,9 +3,16 @@
 Two separate stores, mirroring the split already used by the differentiation
 branch (raw signal vs. curated display):
 
-  SnapshotStore  data/state/promo_snapshots.json - one content hash per brand,
-                 used ONLY to detect "did this page change since last run".
-                 Never shown on the site, never fed to the LLM by itself.
+  SnapshotStore  data/state/promo_snapshots.json - one content hash per
+                 SEITE (Marke + URL), used ONLY to detect "did this page
+                 change since last run". Never shown on the site, never fed
+                 to the LLM by itself. Bis zum 08.08.2026 lag hier ein Hash
+                 je MARKE - das ging, solange eine Marke genau eine Seite
+                 hatte. Mit mehreren Seiten je Marke (siehe promo_config.py)
+                 wuerde ein Marken-Hash die Seiten gegeneinander ausspielen:
+                 jede Seite haette den Hash der zuletzt abgerufenen
+                 ueberschrieben und damit jede andere dauerhaft als
+                 "veraendert" gemeldet.
 
   PromoDB        data/state/promo_db.json - the curated, versioned list of
                  extracted promotions actually shown on the site, with
@@ -79,28 +86,57 @@ def _same_offer(headline_a: str, headline_b: str) -> bool:
     return True
 
 
+def snapshot_key(brand: str, url: str) -> str:
+    """Schluessel einer Seite im SnapshotStore. Marke UND URL, weil eine
+    Marke seit dem 08.08.2026 mehrere Seiten haben kann und jede ihren
+    eigenen Aenderungsstand braucht."""
+    return f"{(brand or '').strip()} | {(url or '').strip()}"
+
+
 class SnapshotStore:
-    """Last-known content hash per brand, for change detection only."""
+    """Last-known content hash per page, for change detection only."""
 
     def __init__(self, path: Path):
         self.path = Path(path)
-        self._by_brand: dict[str, dict] = {}
+        self._by_key: dict[str, dict] = {}
         if self.path.exists():
             try:
-                self._by_brand = json.loads(self.path.read_text(encoding="utf-8"))
+                self._by_key = json.loads(self.path.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError):
                 log.warning("promo_snapshots.json unlesbar - starte leer")
 
-    def changed(self, brand: str, text_hash: str) -> bool:
-        return self._by_brand.get(brand, {}).get("hash") != text_hash
+    def changed(self, key: str, text_hash: str, legacy_key: str | None = None) -> bool:
+        """Hat sich diese Seite seit dem letzten Lauf geaendert?
 
-    def update(self, brand: str, text_hash: str, fetched_at: str) -> None:
-        self._by_brand[brand] = {"hash": text_hash, "fetched_at": fetched_at}
+        *legacy_key* ist der alte, reine Markenschluessel. Er wird nur
+        gelesen, wenn der neue Seitenschluessel noch gar nicht existiert -
+        also genau einmal, beim ersten Lauf nach der Umstellung. Ohne diesen
+        Rueckfall wuerde jede Leitseite dort einmal grundlos als veraendert
+        gelten und eine komplette LLM-Neuextraktion ueber alle Marken
+        ausloesen."""
+        rec = self._by_key.get(key)
+        if rec is None and legacy_key:
+            rec = self._by_key.get(legacy_key)
+        return (rec or {}).get("hash") != text_hash
+
+    def update(self, key: str, text_hash: str, fetched_at: str) -> None:
+        self._by_key[key] = {"hash": text_hash, "fetched_at": fetched_at}
+
+    def prune(self, gueltige_keys) -> int:
+        """Schluessel entfernen, die keiner konfigurierten Seite mehr
+        entsprechen - die alten Marken-Schluessel nach der Umstellung, und
+        spaeter jede aus der YAML entfernte Seite. Gibt zurueck, wie viele
+        Eintraege gefallen sind."""
+        gueltig = set(gueltige_keys)
+        veraltet = [k for k in self._by_key if k not in gueltig]
+        for k in veraltet:
+            del self._by_key[k]
+        return len(veraltet)
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(
-            json.dumps(self._by_brand, ensure_ascii=False, indent=1),
+            json.dumps(self._by_key, ensure_ascii=False, indent=1),
             encoding="utf-8")
 
 
@@ -150,7 +186,8 @@ class PromoDB:
                 best_id, best_overlap = eid, overlap
         return best_id
 
-    def upsert(self, items: list[dict], today: str) -> tuple[int, set[str]]:
+    def upsert(self, items: list[dict], today: str,
+               source_url: str = "") -> tuple[int, set[str]]:
         """Neue Aktionen aufnehmen bzw. bekannte re-verifizieren (gleicher
         Brand + gleiche oder nur umformulierte Kernaussage taucht im neuen
         Snapshot wieder auf - siehe _find_existing_id()). Gibt (Anzahl NEU
@@ -159,7 +196,13 @@ class PromoDB:
         uebergeben werden, NICHT ein frisch aus den rohen Item-Headlines
         berechneter entry_id() - sonst wuerde ein per Umformulierung wieder-
         erkannter, hier bereits aktualisierter Eintrag im selben Atemzug
-        faelschlich als Fehltreffer gezaehlt."""
+        faelschlich als Fehltreffer gezaehlt.
+
+        *source_url*: die SEITE, auf der diese Angebote gerade gefunden
+        wurden. Sie wird am Eintrag festgehalten, weil mark_stale() sie
+        braucht: seit eine Marke mehrere Seiten hat, darf ein Angebot von
+        Seite A nicht in Richtung "beendet" ruecken, nur weil Seite B neu
+        gelesen wurde und es dort naturgemaess nicht steht."""
         new = 0
         matched_ids: set[str] = set()
         for it in items:
@@ -179,6 +222,8 @@ class PromoDB:
                 e["status"] = "aktiv"
                 e["missed_checks"] = 0
                 e.pop("stale_since", None)
+                if source_url:
+                    e["source_url"] = source_url
                 if it.get("description"):
                     e["description"] = it["description"]
                 if it.get("valid_until"):
@@ -195,6 +240,7 @@ class PromoDB:
                     "valid_until": it.get("valid_until"),
                     "url": it.get("url", ""),
                     "image_url": it.get("image_url"),
+                    "source_url": source_url,
                     "first_seen": today, "last_verified": today,
                     "status": "aktiv", "missed_checks": 0,
                 }
@@ -202,7 +248,9 @@ class PromoDB:
             matched_ids.add(eid)
         return new, matched_ids
 
-    def mark_stale(self, brand: str, checked_ids: set, today: str) -> None:
+    def mark_stale(self, brand: str, checked_ids: set, today: str,
+                   gepruefte_seiten: set | None = None,
+                   leitseite: str = "") -> None:
         """Nach einem Snapshot-Wechsel fuer *brand*: Eintraege dieses Brands,
         die NICHT unter *checked_ids* sind (im neuen Snapshot nicht mehr
         wiedergefunden), ruecken einen Schritt in Richtung "beendet" -
@@ -219,10 +267,29 @@ class PromoDB:
         desselben Angebots) durfte ein noch gueltiges Angebot nicht sofort
         aus der Ansicht werfen. Wird ein Eintrag zwischendurch wieder
         bestaetigt (upsert), springt der Status sofort zurueck auf "aktiv"
-        mit missed_checks=0."""
+        mit missed_checks=0.
+
+        *gepruefte_seiten*: die URLs der Seiten dieser Marke, die in DIESEM
+        Lauf wirklich neu extrahiert wurden. Nur Angebote von diesen Seiten
+        koennen hier fehlen und damit altern. Das ist die Bedingung dafuer,
+        dass mehrere Seiten je Marke ueberhaupt funktionieren: eine Marke mit
+        vier Seiten hat pro Lauf typischerweise EINE geaenderte, und ohne
+        diese Einschraenkung wuerden die Angebote der drei unveraenderten
+        jedes Mal einen Schritt Richtung "ausgelaufen" ruecken - nach zwei
+        Laeufen waere die halbe Marke verschwunden, obwohl sich nichts
+        geaendert hat. None = alte Bedeutung (alle Eintraege der Marke),
+        fuer Aufrufer, die noch keine Seiten kennen.
+
+        *leitseite*: Heimatseite fuer Bestandseintraege ohne `source_url`
+        (angelegt, bevor es mehrere Seiten gab). Sie hingen alle an der
+        einzigen damals konfigurierten Seite - also an der Leitseite."""
         for e in self.entries.values():
             if e.get("brand") != brand or e["id"] in checked_ids:
                 continue
+            if gepruefte_seiten is not None:
+                heimat = (e.get("source_url") or leitseite or "").strip()
+                if heimat not in gepruefte_seiten:
+                    continue
             status = e.get("status")
             if status not in ("aktiv", "evtl. ausgelaufen"):
                 continue

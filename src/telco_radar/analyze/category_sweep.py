@@ -112,7 +112,7 @@ def _llm_extract(theme_key: str, results: list[dict], model: str) -> list[dict]:
                 "snippet": (r.get("description") or "")[:280]} for r in results]
     try:
         raw = complete(_EXTRACT_SYSTEM.format(label=THEME_LABEL.get(theme_key, theme_key)),
-                       json.dumps(payload, ensure_ascii=False), model=model, max_tokens=2000)
+                       json.dumps(payload, ensure_ascii=False), model=model, max_tokens=8000)
         parsed = extract_json(raw)
     except Exception as exc:  # noqa: BLE001
         log.warning("LLM-Extraktion (%s) fehlgeschlagen: %s", theme_key, str(exc)[:120])

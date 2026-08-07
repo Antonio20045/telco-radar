@@ -25,13 +25,38 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-# Harte Obergrenze pro Brand und Lauf, unabhaengig davon, ob die
+
+class PromoExtractionError(RuntimeError):
+    """Der Extraktionsaufruf selbst ist gescheitert (API-Fehler, unlesbare
+    Antwort) - im Unterschied zu "das Modell hat auf dieser Seite kein
+    Angebot gefunden", was eine leere Liste bleibt.
+
+    Die Unterscheidung ist keine Kosmetik, sie entscheidet ueber Datenverlust.
+    Bis Lauf #83 gab beides `[]` zurueck, und die Pipeline konnte die Faelle
+    nicht auseinanderhalten: sie zaehlte die Seite als geprueft und liess
+    mark_stale ueber deren Angebote laufen. Ein einzelner API-Aussetzer
+    schob damit noch laufende Aktionen Richtung "ausgelaufen" - dieselbe
+    Luecke, die im Presse-Zweig der Seen-Store-Stapelschutz schliesst
+    (siehe CLAUDE.md: gescheiterte Stapel duerfen nicht als gelesen gelten).
+    """
+
+# Harte Obergrenze pro SEITE und Lauf, unabhaengig davon, ob die
 # Prompt-Anweisung (keine SKU-fuer-SKU-Liste) tatsaechlich befolgt wird - eine
 # Karte mit 20 Einzelgeraete-Eintraegen ist nicht "auf einen Blick" lesbar.
 # Nimmt bewusst die ERSTEN Eintraege (das Modell wird angewiesen, die
 # wichtigsten/unterschiedlichsten Aktionen zuerst zu nennen), nicht die
 # groessten - eine harte Kappung ohne Rangfolge waere willkuerlich.
-_MAX_ENTRIES_PER_BRAND = 8
+#
+# Von 8 auf 6 gesenkt am 08.08.2026, weil sich die BEZUGSGROESSE geaendert
+# hat: bis dahin hatte jede Marke genau eine Seite, die Zahl war also zugleich
+# die Obergrenze je Marke. Seit eine Marke mehrere Seiten hat (O2 hat sieben),
+# multipliziert sie sich - 7 x 8 waeren 56 Zeilen unter einem Absender, und
+# der Markenblock auf der Uebersicht listet sie alle. 6 je Seite ist reichlich
+# fuer eine einzelne Aktionsseite (die meisten fuehren zwei bis vier klar
+# unterscheidbare Aktionen) und haelt die Summe je Marke im Lesbaren. Der
+# eigentliche Schutz gegen Wiederholungen sitzt ohnehin eine Schicht tiefer:
+# PromoDB.upsert erkennt dasselbe Angebot auf zwei Seiten als einen Eintrag.
+_MAX_ENTRIES_PER_PAGE = 6
 
 _EXTRACT_SYSTEM = """\
 Du extrahierst fuer ein internes Vodafone-Wettbewerbsbriefing die aktuell
@@ -135,10 +160,14 @@ def _resolve_link_index(row: dict, links: list[dict]) -> str | None:
 
 def extract_promos(brand: str, snapshot_text: str, model: str,
                    links: list[dict] | None = None,
-                   max_tokens: int = 1800) -> list[dict]:
-    """LLM-Extraktion. Failsafe: bei jedem Fehler leere Liste - der
-    bestehende PromoDB-Stand fuer diesen Brand bleibt dann einfach
-    unveraendert (kein Absturz, kein stillschweigendes Loeschen).
+                   max_tokens: int = 8000) -> list[dict]:
+    """LLM-Extraktion.
+
+    Rueckgabe: die gefundenen Angebote. Eine LEERE Liste heisst "auf dieser
+    Seite steht gerade kein Angebot" - eine belastbare Aussage, die
+    mark_stale auswerten darf. Scheitert dagegen der Aufruf selbst, fliegt
+    ein `PromoExtractionError`; der Aufrufer muss die Seite dann als
+    ungelesen behandeln und ihre bestehenden Angebote in Ruhe lassen.
 
     *links* (optional): Kandidaten aus
     collect/promo_snapshot.extract_link_candidates. Wird eine passende
@@ -159,7 +188,7 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
         parsed = extract_json(raw)
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Extraktion (%s) fehlgeschlagen: %s", brand, str(exc)[:140])
-        return []
+        raise PromoExtractionError(f"{type(exc).__name__}: {str(exc)[:140]}") from exc
     out = []
     for row in parsed if isinstance(parsed, list) else []:
         if not isinstance(row, dict):
@@ -179,8 +208,8 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
             if href:
                 entry["url"] = href
         out.append(entry)
-    if len(out) > _MAX_ENTRIES_PER_BRAND:
+    if len(out) > _MAX_ENTRIES_PER_PAGE:
         log.info("Promo-Extraktion (%s): %d Eintraege auf %d gekappt",
-                 brand, len(out), _MAX_ENTRIES_PER_BRAND)
-        out = out[:_MAX_ENTRIES_PER_BRAND]
+                 brand, len(out), _MAX_ENTRIES_PER_PAGE)
+        out = out[:_MAX_ENTRIES_PER_PAGE]
     return out

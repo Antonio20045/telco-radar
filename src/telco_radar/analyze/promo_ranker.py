@@ -399,7 +399,7 @@ def _offer_payload(entries: list[dict]) -> str:
 
 
 def judge_offers(brand: str, entries: list[dict], model: str,
-                 max_tokens: int = 2200) -> dict[str, dict]:
+                 max_tokens: int = 8000) -> dict[str, dict]:
     """Bewertet die LLM-Achsen fuer die Angebote EINER Marke in einem Aufruf.
 
     Warum gebuendelt statt ein Aufruf je Angebot (was fuer die Urteilsqualitaet

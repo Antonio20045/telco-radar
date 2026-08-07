@@ -1,66 +1,238 @@
 {
- "1&1 Mobilfunk": {
-  "hash": "edbb3987535396d6a4b151ad39a710ec0af193f89a6bf619f7113c2ed3f0ec1e",
-  "fetched_at": "2026-07-31"
- },
- "Blau": {
-  "hash": "d1534c13aaf7f5e5e2307ccd1704781571216fb8f96c53db5389110f7c3a2e07",
-  "fetched_at": "2026-07-27"
- },
- "Lidl Connect": {
-  "hash": "209cdaec97dd5563a48c6a91e4114def36a1779d78bfa994383e82ef56d7393b",
-  "fetched_at": "2026-07-27"
- },
- "O2 / Telefónica Deutschland": {
-  "hash": "7a7bf81b57820f9d3a8c5e7ae24ac0dbcc0650c4faa2401e7ac0992444b01de5",
+ "1&1 Mobilfunk | https://mobile.1und1.de/5g-tarife": {
+  "hash": "edb88b2597ee3a7e4804b7414d78292713a56be07f951c9b98daafb071d71dfd",
   "fetched_at": "2026-08-07"
  },
- "Otelo": {
+ "1&1 Mobilfunk | https://mobile.1und1.de/prepaid-internet-flat": {
+  "hash": "21d0dc79d04deb8ebb311d527e9d2f8bc9e765eb905683875730a74f95726c54",
+  "fetched_at": "2026-08-07"
+ },
+ "1&1 Mobilfunk | https://mobile.1und1.de/tarife-fuer-kinder-und-jugendliche": {
+  "hash": "646b9240ec9ce55e7a3124560573a715fd4101a966d3050f91286b65bea706bf",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/angebote": {
+  "hash": "86f04999e431716589d42ce3ee15444dd7559718852344af77de0b8d758540ea",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/handytarife": {
+  "hash": "10a13adb9d15f191dd8c5e1319ba3b00727cfdd14732e9e3817fd391b03fe051",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/handytarife-schueler": {
+  "hash": "0727960a665d5fe1e4b1b7400bab574b402eac879268be457b64d7350d22aa12",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/prepaid": {
+  "hash": "1e7d23ca3d7cf4ef85bffb077f2c45f3de2069beba15d7bbe034c6e04296146b",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/smartphones": {
+  "hash": "2b5d54a6d802d660e7aee7459dee546ef2965a94a7b74d5d474aa82dc03a8e5c",
+  "fetched_at": "2026-08-07"
+ },
+ "ALDI TALK | https://www.alditalk.de/wechselbonus": {
+  "hash": "de9a483855d4dead4c4ce43ad44568fc730f23e0494deca73654ab6f5aa44bca",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/handy-angebote/iphone-deals": {
+  "hash": "35d9bdb1d1e4af6f89915b3a9cabb0e4aad38671785d83d1b6dd2aa7cef4ef02",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/handy-angebote/samsung-galaxy-smartphones": {
+  "hash": "c95b0f8eadb2b3fff284aa10af07d10c489b53073fa29d41846c6d765cfb52b0",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/prepaid-tarife": {
+  "hash": "631337a7f8d6b5f89e4a1ac404e357f8856d710e53bc461fbf82bcbb1ea8913c",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/tarife/handyvertrag-fuer-studenten": {
+  "hash": "5da62189e71debd458fe5f372321d47f8dd5db47493ff0d09953f53431785868",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/tarife/sim-only-tarife": {
+  "hash": "b29425d650fb98356640b26e2fe07741ba7359cde4786db3a54da8cf6b26e177",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/deals/": {
+  "hash": "d996f730f1b9c938b04bfdc7403bc09cd8307de4ddd60ff3aa66f3a90727fe01",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/e-shop": {
+  "hash": "2198dfd867f02f0ffba61e6d11238e3d77a8b21e1337921d303b3d2c1927b563",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/kombiangebote": {
+  "hash": "1c33c0d2217d30c7b1400dac4a335f4b9ecd93d234afba01a2a2fba09ddd292c",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/tarife": {
+  "hash": "d8ca749062333aabadc3f94524b912b8a7dd656f89b73f7a1f76180599d629d1",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/tarife/datentarife": {
+  "hash": "de87a548019b1c3041b4b6226a21c7fd4e8494e35c50b3a0512aceaad8e9ca72",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/tarife/fuer-kinder": {
+  "hash": "dc04d38e88a19800e144e339cb00881378abf883399e7487055dcc9740efea5b",
+  "fetched_at": "2026-08-07"
+ },
+ "O2 / Telefónica Deutschland | https://www.o2online.de/tarife/junge-leute": {
+  "hash": "acb23e86d63541e3eaad8bde436a3ed9b206ac69bf3776145d2d6a9c66c797ca",
+  "fetched_at": "2026-08-07"
+ },
+ "Otelo | https://www.otelo.de/handy-mit-vertrag": {
+  "hash": "dcbcfbbba61a7f9cce9fc4eeecbf5a9b5d478a6f63b5abfeb2cb61979b095570",
+  "fetched_at": "2026-08-07"
+ },
+ "Otelo | https://www.otelo.de/handytarife/young-tarife": {
+  "hash": "414fe82563494b294426b0b1dd1277ea5b113c7df6760e36387b3b1966e25ec1",
+  "fetched_at": "2026-08-07"
+ },
+ "PremiumSIM | https://www.premiumsim.de/tarife": {
+  "hash": "8a507e073874b691edf32feee689af99abfc22ba71d5b9e51181fb54dd285c97",
+  "fetched_at": "2026-08-07"
+ },
+ "Telekom Deutschland | https://www.telekom.de/unterwegs/aktionen": {
+  "hash": "b283f09e219ec35ad604817300b066816e273980e156ace3eaf4c92562830013",
+  "fetched_at": "2026-08-07"
+ },
+ "Telekom Deutschland | https://www.telekom.de/shop/tarife/handyvertrag": {
+  "hash": "9162cc12dcac2c259dd805ef0a765680373e4e2a9264a5c4bd6e636234449781",
+  "fetched_at": "2026-08-07"
+ },
+ "Telekom Deutschland | https://www.telekom.de/shop/tarife/prepaid-tarife": {
+  "hash": "923d99c5322d27d436f635639daa23b290dede21fcfce38dc5a22a339fb424a0",
+  "fetched_at": "2026-08-07"
+ },
+ "Telekom Deutschland | https://www.telekom.de/shop/tarife/smartphone-tarife-young": {
+  "hash": "f458addb1b08c0b5e8ebacd40bfc360ee6420aa7e103a2b0bb28958d48643cad",
+  "fetched_at": "2026-08-07"
+ },
+ "Telekom Deutschland | https://www.telekom.de/shop/tarife/zusatzkarten": {
+  "hash": "a48a3771f87e2e7ca1c3bd3643ddcb18eb8bac68955f0e719cfd067efee979d0",
+  "fetched_at": "2026-08-07"
+ },
+ "Vodafone Deutschland | https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html": {
+  "hash": "7d32dece058a16b883c90cc06ad5466f785e04787c3c6d939f121c10fd8342f6",
+  "fetched_at": "2026-08-07"
+ },
+ "Vodafone Deutschland | https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
+  "hash": "06736d110311159b34e44f2de925b484e60cc48e2af468f21de81f657c942fad",
+  "fetched_at": "2026-08-07"
+ },
+ "Vodafone Deutschland | https://www.vodafone.de/privat/handys-tablets-tarife/prepaid-ohne-vertrag.html": {
+  "hash": "12e323bdc005ea27c56d97568e39a89f2c338b72185f559e2fa9c28f543c013c",
+  "fetched_at": "2026-08-07"
+ },
+ "Vodafone Deutschland | https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html": {
+  "hash": "6531ce4fb7636b8823cb3cbe306473f03ef0888b1ce08224b41f25dfe8be063d",
+  "fetched_at": "2026-08-07"
+ },
+ "congstar | https://www.congstar.de/handys": {
+  "hash": "60f99835a95f9d88fbcb00184e5de80dc7aeba37b3c2d2ea8d06e21dbd25ce0a",
+  "fetched_at": "2026-08-07"
+ },
+ "congstar | https://www.congstar.de/handys/handy-angebote": {
+  "hash": "1643fced495a7dd81c47289f1cc9aacb915c446b938a327a3e446f07d755e774",
+  "fetched_at": "2026-08-07"
+ },
+ "congstar | https://www.congstar.de/prepaid": {
+  "hash": "85a209d94298337f52ed75971786f6b9b27cedce71e834cd096365c6343ee40d",
+  "fetched_at": "2026-08-07"
+ },
+ "klarmobil | https://www.klarmobil.de/handytarife": {
+  "hash": "85e8ef7c17ae8cda9957f4ee6ab976f4fc3c2b1ab5c658a8dc3cf4daadb6e1c5",
+  "fetched_at": "2026-08-07"
+ },
+ "klarmobil | https://www.klarmobil.de/tarife/d-netz-tarife": {
+  "hash": "23f5e5b3799d9701987c29051f1343a9593fd9d1aa6e3aff56d655fc0d2db570",
+  "fetched_at": "2026-08-07"
+ },
+ "klarmobil | https://www.klarmobil.de/tarife/handytarife-ohne-handy": {
+  "hash": "2183b7626be72ca10be502829d687e49305a923ca2012916801170bbc08939c7",
+  "fetched_at": "2026-08-07"
+ },
+ "klarmobil | https://www.klarmobil.de/tarife/prepaid": {
+  "hash": "830033ecbeb617d57ce73a1c6a39dd131695e37fa6ea56b93c1dae599abb166b",
+  "fetched_at": "2026-08-07"
+ },
+ "mobilcom-debitel | https://www.mobilcom-debitel.de/handys-smartphones/handys-mit-vertrag": {
+  "hash": "add688430c8291111f50cd487afb72a95e745bca5baa05cd850c2ade3cf51941",
+  "fetched_at": "2026-08-07"
+ },
+ "mobilcom-debitel | https://www.mobilcom-debitel.de/handytarife/5g-tarife": {
+  "hash": "62f8fee9b8b99f8612e5ddf6506f1a3441dbacabb8b20cd437b220299a32d9cb",
+  "fetched_at": "2026-08-07"
+ },
+ "mobilcom-debitel | https://www.mobilcom-debitel.de/handytarife/junge-leute": {
+  "hash": "41013e3d4ae5166735501b36f6c17e8de05e75b7cf22ff30a5c1da8dcf1e42ae",
+  "fetched_at": "2026-08-07"
+ },
+ "simplytel | https://www.simplytel.de/": {
+  "hash": "278d0aebdc0b448b2b150cba095f9be9ad9404c1cf0ce12ad176d5bdc73d84d7",
+  "fetched_at": "2026-08-07"
+ },
+ "winSIM | https://www.winsim.de/": {
+  "hash": "1f702d670071bc8deb43ea507df68da79f783954fe48db58b6fa30bc7c63b875",
+  "fetched_at": "2026-08-07"
+ },
+ "winSIM | https://www.winsim.de/handys": {
+  "hash": "97914d7c1bdd41a2d9cf55c1526339cdf556298e6a5dc7ab80f55827b595214a",
+  "fetched_at": "2026-08-07"
+ },
+ "winSIM | https://www.winsim.de/handytarife-mit-handy": {
+  "hash": "f71800696fa8896b6689bccd659aeccb59bdbc9a50108d4c64ea32d095d1cab1",
+  "fetched_at": "2026-08-07"
+ },
+ "winSIM | https://www.winsim.de/handytarife-ohne-handy": {
+  "hash": "05a2c5971db3e3fefede5798dc238c4e687b8cd2dd8d53e0445c265cc1f10836",
+  "fetched_at": "2026-08-07"
+ },
+ "winSIM | https://www.winsim.de/tarife": {
+  "hash": "137c6348616db080160cfb7ae4669f756182dbd629c6f583fe57053ac76350e4",
+  "fetched_at": "2026-08-07"
+ },
+ "1&1 Mobilfunk | https://mobile.1und1.de/handyvertrag": {
+  "hash": "edbb3987535396d6a4b151ad39a710ec0af193f89a6bf619f7113c2ed3f0ec1e",
+  "fetched_at": "2026-08-07"
+ },
+ "Blau | https://www.blau.de/handy-angebote/": {
+  "hash": "d1534c13aaf7f5e5e2307ccd1704781571216fb8f96c53db5389110f7c3a2e07",
+  "fetched_at": "2026-08-07"
+ },
+ "Lidl Connect | https://www.lidl-connect.de/": {
+  "hash": "209cdaec97dd5563a48c6a91e4114def36a1779d78bfa994383e82ef56d7393b",
+  "fetched_at": "2026-08-07"
+ },
+ "Otelo | https://www.otelo.de/": {
   "hash": "010c1c6180a9f31193d0f7136f04f72ae1011b61eb986cfcc7e9a2bc37013791",
-  "fetched_at": "2026-07-31"
+  "fetched_at": "2026-08-07"
  },
- "Penny Mobil": {
+ "Penny Mobil | https://www.pennymobil.de/": {
   "hash": "f6ff60d337a4cb8634e718b84eda7b16bceecffd17915de5efaa6670ffdd23b6",
-  "fetched_at": "2026-07-27"
+  "fetched_at": "2026-08-07"
  },
- "PremiumSIM": {
+ "PremiumSIM | https://www.premiumsim.de/": {
   "hash": "eb52c489f57b186f9508eb13c9c2bbcd50f6a76e89cdf58076a042381f9b9b2f",
   "fetched_at": "2026-08-07"
  },
- "PŸUR": {
-  "hash": "3d90bd7c2d17602a262ab2cd365dfba0a8bb43ef23b28a0f7ba65458e403d9da",
-  "fetched_at": "2026-07-25"
- },
- "Telekom Deutschland": {
-  "hash": "b3cf4a59b6bcaa989ac00c29b79615d552aa196cb530e69c2017233b5525dee8",
-  "fetched_at": "2026-08-07"
- },
- "Vodafone Deutschland": {
+ "Vodafone Deutschland | https://www.vodafone.de/handy/angebote.html": {
   "hash": "3a14d08d0d7b4705eaa959ef0b2b5cbff65b3df5ee1d070db070f80112710a78",
   "fetched_at": "2026-08-07"
  },
- "congstar": {
+ "congstar | https://www.congstar.de/handytarife/angebote/": {
   "hash": "81439eaa5588711d416c66830a0dd7de317b60b3ef362a744d9ab83877ee7d1a",
-  "fetched_at": "2026-08-04"
+  "fetched_at": "2026-08-07"
  },
- "klarmobil": {
+ "klarmobil | https://www.klarmobil.de/unternehmen/presse/": {
   "hash": "d5814afe158b314761163ea3573892757395e9dcb3d0e56859b8fb6e43c54094",
-  "fetched_at": "2026-07-27"
+  "fetched_at": "2026-08-07"
  },
- "mobilcom-debitel": {
+ "mobilcom-debitel | https://www.mobilcom-debitel.de/handytarife/": {
   "hash": "e249bc41bf5c2ed7fc6cc2bdff4182a8ff6d020191ea3a68e7620c5e6797f467",
-  "fetched_at": "2026-08-04"
- },
- "simplytel": {
-  "hash": "d46ca0c351c2579baf6b792c39a329a9f3da5cb0087888fb24115be164d73822",
   "fetched_at": "2026-08-07"
- },
- "winSIM": {
-  "hash": "713e736bafbd16200d33eb93513a378f45ac47c209b83ab60eb1438c36687ce9",
-  "fetched_at": "2026-08-07"
- },
- "ALDI TALK": {
-  "hash": "cb7dfcc124f3bda9c73289afa6087ef00d98cb1385e3e66d8922b6b30f3d50ee",
-  "fetched_at": "2026-08-06"
  }
 }
