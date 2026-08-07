@@ -20,7 +20,7 @@ from .promo import prepare_promo_view
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..promo_config import load_promo_config
-from ..promo_images import image_path as promo_image_path
+from .. import promo_bilder
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
 
@@ -1163,40 +1163,44 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         promo_entries = promo_db_raw.get("entries") or []
         promo_updated = promo_db_raw.get("updated") or (latest["date"] if latest else "")
 
-        # Hero screenshots (data/state/promo_images/<slug>.jpg, written by
-        # promo_pipeline.py) are pipeline STATE, not site output, so they are
-        # copied into site/promo/images/ on every render, same as any other
-        # generated site asset - never edit/add files under site/ by hand.
-        # Ein leerer Screenshot wird NICHT ausgeliefert. Am 07.08.2026 war das
-        # einzige Bild der ganzen Promo-Uebersicht genau so einer: eine weisse
-        # 1280x720-Flaeche, aufgenommen bevor die Seite stand. Ohne Bild ist
-        # besser als mit leerem Bild - und die Marke faellt damit nur eine
-        # Gewichtsstufe tiefer, sie verschwindet nicht.
+        # Kampagnenbilder (data/state/promo_images/<hash>-1280.jpg, von
+        # promo_bilder.py je ANGEBOT abgelegt) sind Pipeline-State, keine
+        # Site-Ausgabe - sie werden bei jedem Rendern nach site/promo/images/
+        # kopiert, wie site/images/ auch. Nie von Hand etwas unter site/
+        # ablegen.
+        #
+        # Bis zum 07.08.2026 lag hier je MARKE ein Screenshot, und die
+        # Pruefung `ist_leer` fing die weisse Aufnahme ab, die dabei
+        # entstand. Beides ist weg: promo_bilder.py prueft schon beim Ablegen
+        # (Mindestbreite UND `ist_leer`), ein leeres Bild kommt gar nicht
+        # mehr bis hierher. Was bleibt, ist die andere Richtung - ein
+        # Eintrag, dessen Bilddatei nicht mehr da ist, verliert seinen
+        # Verweis, sonst zeigt die Seite einen leeren Kasten.
         promo_dir_images = site_dir / "promo" / "images"
-        promo_image_map: dict[str, str] = {}
-        for src in promo_cfg.sources:
-            cached = promo_image_path(cfg.root, src.name)
-            if not cached.exists():
+        promo_bild_ordner = promo_bilder.bildordner(cfg.root)
+        ausgeliefert: set[str] = set()
+        for e in promo_entries:
+            name = e.get("image")
+            if not name:
                 continue
-            if report_bilder.ist_leer(cached.read_bytes()):
-                log.warning("Promo-Screenshot ohne Inhalt, wird nicht "
-                            "ausgeliefert: %s", cached.name)
+            quelle = promo_bild_ordner / name
+            if not quelle.exists():
+                for feld in ("image", "image_w", "image_h"):
+                    e.pop(feld, None)
                 continue
-            promo_dir_images.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(cached, promo_dir_images / cached.name)
-            promo_image_map[src.name] = f"images/{cached.name}"
-        # Wie site/images/ SPIEGELT auch dieser Ordner, er sammelt nicht -
-        # sonst bliebe der leere Screenshot von oben genau dort liegen, wo er
-        # gerade ausgeschlossen wurde, und eine entfernte Marke behielte ihr
-        # Bild fuer immer.
+            if name not in ausgeliefert:
+                promo_dir_images.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(quelle, promo_dir_images / name)
+                ausgeliefert.add(name)
+        # Der Ordner SPIEGELT, er sammelt nicht - sonst behielte eine
+        # ausgelaufene Aktion ihr Bild fuer immer.
         if promo_dir_images.exists():
-            behalten = {Path(p).name for p in promo_image_map.values()}
             for veraltet in promo_dir_images.iterdir():
-                if veraltet.is_file() and veraltet.name not in behalten:
+                if veraltet.is_file() and veraltet.name not in ausgeliefert:
                     veraltet.unlink()
 
         promo_view = prepare_promo_view(promo_entries, promo_cfg.sources,
-                                        promo_updated, images=promo_image_map)
+                                        promo_updated)
 
         promo_report_dir = reports_dir / "promo"
         promo_report = None

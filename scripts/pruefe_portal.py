@@ -17,8 +17,9 @@ Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
 
   7. Alle Ressorts der Meldungsseite sind ohne Scrollen sichtbar, und alle
      Meldungen sind weiterhin auf der Seite.
-  8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, und keines
-     davon ist ein leerer Screenshot.
+  8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, keines
+     davon leer, und jede Karte oben traegt entweder ein Bild oder eine
+     Schriftkachel - nie einen leeren Kasten.
 
 Kriterium 1, 6 und 7 brauchen einen echten Browser - Chromium liegt unter
 /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
@@ -54,9 +55,12 @@ _MIND_OBEN = 6
 # also 77 %, deutlich BESSER, und trotzdem "durchgefallen". Gemessen wird
 # jetzt die Quote, die das Kriterium immer gemeint hat.
 _MIND_BILDQUOTE = 57
-# Abnahmekriterium 4 des Auftrags vom 07.08.2026: von den 15 vorhandenen
-# Screenshots muessen mindestens 10 auf der Promo Uebersicht ankommen. Vorher
-# war es genau einer - und der war leer.
+# Abnahmekriterium der Promo Uebersicht: mindestens 10 verschiedene echte
+# Bilder. Die Zahl stammt vom 07.08.2026, als 15 Screenshots vorlagen und
+# genau EINER auf der Seite ankam - und der war leer. Seit dem Umbau sind es
+# keine Screenshots mehr, sondern die Kampagnenmotive der Aktionsseiten
+# (promo_bilder.py); die Schwelle bleibt, weil sie dasselbe misst: kommt das,
+# was beschafft wurde, auch auf der Seite an?
 _MIND_PROMO_BILDER = 10
 _CHROMIUM = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
 
@@ -125,9 +129,20 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         # der sichtbarste Teil des Befunds vom 06.08.2026.
         schlimmster = 0
         wo = ""
-        for name in ("index.html", "meldungen.html"):
+        for name in ("index.html", "meldungen.html", "promo/index.html"):
             seite.goto((site / name).resolve().as_uri())
             seite.wait_for_timeout(600)
+            # Erst durchscrollen: die Bilder tragen loading="lazy", und was
+            # nie geladen wurde, hat naturalWidth 0 und faellt aus der
+            # Messung. Ohne diese Schleife prueft Kriterium 6 genau die
+            # Bilder NICHT, die weit unten stehen - auf der Promo Uebersicht
+            # ist das die Mehrheit.
+            hoehe = seite.evaluate("document.body.scrollHeight")
+            for y in range(0, hoehe, _FALZ // 2):
+                seite.evaluate(f"window.scrollTo(0,{y})")
+                seite.wait_for_timeout(70)
+            seite.evaluate("window.scrollTo(0,0)")
+            seite.wait_for_timeout(300)
             for eintrag in seite.evaluate(
                 """() => [...document.images]
                      .filter(i => i.naturalWidth > 0)
@@ -245,8 +260,16 @@ def main() -> int:
                 if p.is_file() and ist_leer(p.read_bytes())] \
             if ordner.exists() else []
         b.prueft(not leer,
-                 f"8b. Leere Screenshots ausgeliefert: {len(leer)}"
+                 f"8b. Leere Bilder ausgeliefert: {len(leer)}"
                  + (f" ({', '.join(leer)})" if leer else ""))
+        # 8c: keine Karte oben ohne Motiv. Eine Kachel ohne Bild bekommt die
+        # Mechanik als Schriftkachel (.pk-bild--typo) - was hier fehlt, ist
+        # ein leerer Kasten, und genau so sahen die fuenf Marken ohne
+        # laufende Aktion am 07.08.2026 aus.
+        karten = promo.select(".promo-karten .pkarte")
+        ohne_motiv = [k for k in karten if not k.select_one(".pk-bild")]
+        b.prueft(bool(karten) and not ohne_motiv,
+                 f"8c. Karten ohne Motiv: {len(ohne_motiv)} von {len(karten)}")
 
     _browser_messungen(site, b)
 

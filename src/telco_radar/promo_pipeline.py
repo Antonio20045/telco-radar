@@ -12,24 +12,19 @@ in try/except steht).
 from __future__ import annotations
 
 import logging
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
 
+from . import promo_bilder
 from .analyze import promo_editor, promo_ranker
 from .analyze.promo_analyst import extract_promos
 from .analyze.promo_store import PromoDB, SnapshotStore
-from .collect.promo_snapshot import capture_hero_image, content_hash, fetch_snapshot
+from .collect.promo_snapshot import content_hash, fetch_snapshot
 from .promo_config import load_promo_config
-from .promo_images import image_path
 
 log = logging.getLogger(__name__)
-
-# Screenshot capture launches a full Chromium instance per brand and is
-# noticeably heavier than the text-only fetch above (real images/fonts/CSS
-# loaded) - a lower, separate concurrency cap keeps peak memory bounded on
-# the Actions runner regardless of what max_workers the text-fetch pass uses.
-_IMAGE_WORKERS = 3
 
 
 def _fetch_one(src, http_cfg: dict) -> dict:
@@ -42,6 +37,7 @@ def _fetch_one(src, http_cfg: dict) -> dict:
         rec["links"] = snap.get("links") or []
         rec["hash"] = content_hash(snap["text"], rec["links"])
         rec["image_url"] = snap.get("image_url")
+        rec["images"] = snap.get("images") or []
     except Exception as exc:  # noqa: BLE001
         rec["status"] = "fail"
         rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
@@ -85,14 +81,13 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             fetched.append(fut.result())
     fetched.sort(key=lambda r: r["brand"])  # deterministisches Protokoll
 
-    # Brands whose hero screenshot should be (re-)captured this run: either
-    # the page actually changed (the screenshot is likely stale too), or no
-    # cached screenshot exists yet at all (first rollout / a past capture
-    # failure). A page that failed to fetch is skipped here too - if plain
-    # HTTP/JS-render couldn't reach it, a fresh screenshot attempt this same
-    # run is unlikely to fare better and would just spend time other brands
-    # could use; it gets picked up automatically once the source recovers.
-    image_candidates: list[tuple[str, str]] = []
+    # Bildkandidaten je Marke, aus DIESEM Abruf (siehe promo_bilder.py). Sie
+    # entstehen im selben Seitenaufruf wie Text und Links - anders als der
+    # Screenshot-Pfad davor, der je Marke einen zweiten, eigenen Chromium
+    # startete. Gesammelt wird fuer jede erfolgreich abgerufene Marke, auch
+    # fuer eine unveraenderte: ein Angebot aus einem frueheren Lauf kann
+    # sehr wohl noch ohne Bild dastehen.
+    bild_kandidaten: dict[str, list[dict]] = {}
 
     results: list[dict] = []
     for rec in fetched:
@@ -104,9 +99,17 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
         links = rec.pop("links", [])
         image_url = rec.get("image_url")
+        # Das og:image der Seite haengt hinten an: es ist der schwaechste
+        # Kandidat (meist ein generisches Markenlogo, siehe
+        # collect/promo_snapshot.extract_hero_image), aber der einzige fuer
+        # eine Seite, aus der sich kein einziges <img> lesen laesst. Als
+        # LETZTER in der Liste kommt er nur zum Zug, wenn nichts davor
+        # taugte - genau die Rolle, die ihm zusteht.
+        bild_kandidaten[src_name] = (rec.pop("images", []) +
+                                     ([{"src": image_url, "anchor": "",
+                                        "context": "", "hint_w": 0}]
+                                      if image_url else []))
         changed = snap_store.changed(src_name, h)
-        if changed or not image_path(root, src_name).exists():
-            image_candidates.append((src_name, rec["url"]))
         try:
             if not changed:
                 rec["status"] = "unveraendert"
@@ -158,41 +161,37 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Bewertung uebersprungen: %s", str(exc)[:160])
 
+    # Kampagnenbilder: je Angebot das Motiv, das die Aktionsseite dafuer
+    # zeigt (siehe promo_bilder.py). Laeuft NACH der Bewertung, weil die
+    # Reihenfolge der Angebote entscheidet, wer ein doppelt belegtes Bild
+    # bekommt - das hoeher bewertete Angebot. Fehler je Marke werden
+    # einzeln gefangen: eine Karte ohne Bild wird eine Zeile, nie ein
+    # Abbruch.
+    bilder_bilanz: Counter = Counter()
+    for brand, kandidaten in bild_kandidaten.items():
+        if not kandidaten:
+            continue
+        sichtbar = sorted(
+            (e for e in db.entries.values()
+             if e.get("brand") == brand
+             and e.get("status") in ("aktiv", "evtl. ausgelaufen")),
+            key=lambda e: -(e.get("score") or 0))
+        if not sichtbar:
+            continue
+        try:
+            zuordnung = promo_bilder.zuordnen(sichtbar, kandidaten)
+            bilder_bilanz.update(
+                promo_bilder.hole_bilder(zuordnung, db.entries, root))
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Promo-Bilder (%s) uebersprungen: %s", brand, str(exc)[:160])
+    if bilder_bilanz:
+        log.info("Promo-Bilder: %d von %d Angeboten haben eins (%s)",
+                 bilder_bilanz["geladen"] + bilder_bilanz["unveraendert"],
+                 bilder_bilanz["geprueft"],
+                 ", ".join(f"{k}={v}" for k, v in sorted(bilder_bilanz.items())))
+    promo_bilder.raeume_auf(root, list(db.entries.values()))
+
     db.save(today)
-
-    # Hero screenshots: a second, independent pass after the text/LLM work
-    # above (own Chromium launches, own lower concurrency cap - see
-    # _IMAGE_WORKERS) so a slow or failing screenshot can never affect the
-    # text/diff/LLM path this run's core value depends on. Failure per brand
-    # is caught individually; the card simply keeps last run's image (or the
-    # colour+initials fallback if there never was one) - never fatal.
-    images_captured = images_failed = 0
-    if image_candidates:
-        image_dir = state_dir / "promo_images"
-        image_dir.mkdir(parents=True, exist_ok=True)
-
-        def _capture_one(brand: str, url: str) -> bool:
-            data = capture_hero_image(url, http_cfg)
-            if not data:
-                return False
-            try:
-                image_path(root, brand).write_bytes(data)
-                return True
-            except OSError as exc:
-                log.warning("Promo-Hero-Bild konnte nicht gespeichert werden (%s): %s",
-                           brand, exc)
-                return False
-
-        with ThreadPoolExecutor(max_workers=_IMAGE_WORKERS) as pool:
-            futures = {pool.submit(_capture_one, brand, url): brand
-                      for brand, url in image_candidates}
-            for fut in as_completed(futures):
-                if fut.result():
-                    images_captured += 1
-                else:
-                    images_failed += 1
-        log.info("Promo-Hero-Bilder: %d von %d Kandidaten erfasst (%d fehlgeschlagen)",
-                 images_captured, len(image_candidates), images_failed)
 
     entries = list(db.entries.values())
     try:
@@ -213,5 +212,5 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Quellen konfiguriert)",
              mode, active, len(promo_cfg.sources))
     return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
-            "images_captured": images_captured, "images_failed": images_failed,
+            "images": dict(bilder_bilanz),
             "score": score_summary}

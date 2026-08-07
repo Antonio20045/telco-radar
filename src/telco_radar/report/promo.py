@@ -2,23 +2,39 @@
 kein LLM - analog zu report/differentiation.py's Rolle fuer die
 Differenzierungs-Seite).
 
-Die Seite soll auf einen Blick zeigen, welche Aktion gerade bei welchem
-Wettbewerber laeuft (siehe claude/promo-uebersicht-konzept.md) - deshalb ist
-die Marke hier die primaere Gruppierung, nicht der Tier. prepare_promo_view()
-baut pro beobachteter Marke eine Karte mit ihren aktiven Angeboten; Marken
-ohne aktuell bestaetigtes Angebot erscheinen trotzdem (leer/gedaempft), damit
-die Seite die tatsaechliche Beobachtungsabdeckung zeigt, statt Luecken zu
-verstecken.
+Die Frage der Seite ist eine einzige: **wer wirbt gerade womit?** Antonio am
+07.08.2026: "Sinn ist ja, dass ich einen Ueberblick habe von meinen
+Konkurrenten, welche Aktionen gerade laufen, was die machen, was sie fuer
+Promos haben. Und ich moechte, dass sie da gut dargestellt sind, dass es
+fuer mich kognitiv auch nicht so ein grosser Aufwand ist zu verstehen, worum
+es in dieser Aktion geht."
+
+Daraus folgt die Gliederung, und sie ist gegen die vorige getauscht:
+
+    KARTEN     Je Wettbewerber GENAU EINE Karte - seine staerkste laufende
+               Aktion, mit Kampagnenbild, Mechanik, Score und Frist. Gleiche
+               Form, gleiche Felder, gleiche Reihenfolge fuer jede Marke.
+               Vergleichen heisst Gleiches nebeneinander legen; eine Seite
+               aus Aufmacher plus Beistellspalte plus Markenraster plus
+               Ruhezone (so sah sie bis zum 07.08.2026 aus) zwingt den Leser,
+               dreimal umzulernen.
+    MECHANIKEN Was der Markt gerade FAEHRT, als Balken. Zwei Sekunden fuer
+               die Lage: fuenf Marken werben mit Datenbonus, zwei mit
+               Wechselpraemie.
+    MARKEN     Alle uebrigen Aktionen, je Marke ein Block. Die Tiefe, nach
+               der Uebersicht - nicht davor.
 
 Sichtbarkeits-/Persistenzregel (siehe analyze/promo_store.py:mark_stale):
-ein Angebot, das im PromoDB-Status "evtl. ausgelaufen" ist (= EINMAL nicht
-erneut bestaetigt), bleibt hier trotzdem in der normalen Angebotsliste
-sichtbar - nur gedaempft und mit einem kleinen Hinweis-Tag markiert. Eine
-Karte soll nicht verschwinden, nur weil eine einzelne Aktualisierung das
-Angebot nicht erneut fand (unzuverlaessige LLM-Extraktion, leicht andere
-Formulierung o.ae.). Erst wer ZWEIMAL in Folge nicht erneut bestaetigt wurde
-(Status "ausgelaufen") gilt als wirklich beendet und faellt aus der
-Angebotsliste in die knappe Fussnote."""
+ein Angebot im Status "evtl. ausgelaufen" (= EINMAL nicht erneut bestaetigt)
+bleibt sichtbar, nur gedaempft und markiert. Eine Karte soll nicht
+verschwinden, weil eine einzelne Aktualisierung das Angebot nicht erneut
+fand. Erst wer ZWEIMAL in Folge fehlt, gilt als beendet und faellt in die
+Fussnote.
+
+Marken ohne bestaetigte Aktion erscheinen weiterhin - als Zeile, nicht als
+leerer Kasten. Sie belegen, dass hingesehen wurde; genau dafuer stehen sie
+auf der Seite (Luecken zeigen statt verstecken).
+"""
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -29,6 +45,7 @@ TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
 TIER_COLOR = {1: "#3860be", 2: "#e07a00"}
 _OWN_COLOR = "#e60000"
 _RETIRED_STATUS = "ausgelaufen"
+_SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 
 
 def _initials(name: str) -> str:
@@ -37,73 +54,81 @@ def _initials(name: str) -> str:
     return letters or "?"
 
 
-# Anzeigebremse, kein Auswahlkriterium: die Auswahl trifft allein die
-# Score-Schwelle in analyze/promo_ranker.py. Diese Kappung greift nur, falls
-# eine aussergewoehnlich bewegte Woche zweistellig viele Highlights
-# produziert - dann waere die Sektion wieder eine Liste statt eines
-# Ueberblicks. Wird gekappt, sagt die Seite das offen (siehe Template).
-_MAX_HIGHLIGHTS = 9
-
-# Wie viele Aktionen unter der Schwelle die Beistellspalte auffuellen darf.
-# Sechs, weil die Spalte neben Aufmacher und zweiter Reihe steht und darunter
-# nicht laenger werden soll als das, was sie begleitet.
-_MAX_SONSTIGE = 6
+def _sortierschluessel(offer: dict) -> tuple:
+    """Bestes Angebot zuerst: bestaetigt vor Kulanzfrist, dann Score, dann
+    zuletzt gesehen. Ein Angebot ohne Score sortiert hinter jedes mit."""
+    return (offer.get("status") == "aktiv",
+            offer.get("score") is not None,
+            offer.get("score") or 0,
+            offer.get("last_verified") or "")
 
 
-def _rank_highlights(competitor_brands: list[dict]) -> tuple[list[dict], int]:
-    """Hoechstens EIN Highlight je Marke, absteigend nach Score, plus die
-    Zahl der uebrigen Angebote ueber der Schwelle.
+def _karte(brand: dict, offer: dict) -> dict:
+    """Ein Angebot als Anzeigeeinheit - genau die Felder, die eine Karte
+    zeigt. Die Vorlage rechnet nichts mehr aus."""
+    return {
+        "brand": brand,
+        "offer": offer,
+        "score": offer.get("score"),
+        "highlight": bool(offer.get("highlight")),
+        "reason": offer.get("score_reason") or "",
+        "mechanic": MECHANICS.get(offer.get("mechanic") or "", ""),
+        "bild": f"images/{offer['image']}" if offer.get("image") else "",
+        "bild_w": offer.get("image_w"),
+        "bild_h": offer.get("image_h"),
+        # "motiv" = das Buehnenbild der Aktionsseite, nicht das Bild GENAU
+        # dieses Angebots (siehe promo_bilder.zuordnen). Die Karte schreibt
+        # das dazu, statt eine Verbindung zu behaupten, die nicht belegt ist.
+        "bild_ist_motiv": offer.get("image_kind") == "motiv",
+    }
 
-    Die Ein-je-Marke-Regel ist keine Kosmetik, sondern die Lehre aus den
-    echten Daten: gemessen am Bestand vom 27.07.2026 lagen 36 Angebote ueber
-    der Schwelle, aber allein neun der besten fuenfzehn kamen von der
-    Telekom - praktisch dieselbe Geraeteaktion, einmal je Modell. Eine
-    Highlight-Sektion soll die Marktbreite zeigen, nicht den Anbieter mit dem
-    groessten Geraetekatalog. Die uebrigen Treffer verschwinden nicht: sie
-    stehen unten bei ihrer Marke, dort mit demselben Score als kleiner Punkt
-    markiert.
 
-    Ein Angebot ohne Score kann hier nie auftauchen - promo_ranker setzt das
-    Flag ausschliesslich zusammen mit einer Zahl."""
-    best: dict[str, dict] = {}
-    total = 0
-    for b in competitor_brands:
+def _mechanik_balken(karten: list[dict], marken: list[dict]) -> list[dict]:
+    """Welche Mechanik faehrt der Markt gerade - und bei wie vielen Marken?
+
+    Gezaehlt werden ALLE sichtbaren Wettbewerberangebote, nicht nur die
+    Karten oben: die Frage ist die Marktlage, nicht die Auswahl der Seite.
+    Die Marken-Zahl steht daneben, weil sie die eigentliche Aussage traegt -
+    sechs Angebote derselben Marke sind eine Kampagne, sechs Angebote
+    sechs verschiedener Marken sind ein Trend.
+    """
+    zaehler: dict[str, dict] = {}
+    for b in marken:
+        if b["internal_reference"]:
+            continue
         for offer in b["active"]:
-            if not (offer.get("highlight") and offer.get("score") is not None):
+            key = offer.get("mechanic") or ""
+            label = MECHANICS.get(key, "")
+            if not label or key == "sonstiges":
                 continue
-            total += 1
-            item = {
-                "brand": b, "offer": offer, "score": int(offer["score"]),
-                "reason": offer.get("score_reason") or "",
-                "mechanic": MECHANICS.get(offer.get("mechanic") or "", ""),
-            }
-            current = best.get(b["name"])
-            if current is None or item["score"] > current["score"]:
-                best[b["name"]] = item
-    items = sorted(best.values(),
-                   key=lambda i: (i["score"], i["offer"].get("first_seen") or "",
-                                  i["brand"]["name"]), reverse=True)
-    return items, total
+            eintrag = zaehler.setdefault(key, {"key": key, "label": label,
+                                               "n": 0, "marken": set()})
+            eintrag["n"] += 1
+            eintrag["marken"].add(b["name"])
+    balken = sorted(zaehler.values(),
+                    key=lambda z: (len(z["marken"]), z["n"]), reverse=True)
+    hoechste = max((len(z["marken"]) for z in balken), default=0)
+    return [{"key": z["key"], "label": z["label"], "n": z["n"],
+             "marken": len(z["marken"]),
+             "w": round(100 * len(z["marken"]) / hoechste) if hoechste else 0}
+            for z in balken]
 
 
-def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str,
-                       images: dict[str, str] | None = None) -> dict:
-    """Gruppiert PromoDB-Eintraege nach Marke fuer die Wettbewerber-Board-
-    Ansicht. "neu" = seit weniger als 10 Tagen zum ersten Mal gesehen, gleiche
-    Regel wie bei Differenzierung. Vodafone selbst (internal_reference=True)
-    wird angezeigt, aber nicht in active_total/brands_active/brands_tracked
+def prepare_promo_view(db_entries: list[dict], sources: list,
+                       latest_date: str) -> dict:
+    """Baut die Anzeigedaten der Promo-Uebersicht aus den PromoDB-Eintraegen.
+
+    "neu" = seit weniger als 10 Tagen zum ersten Mal gesehen, gleiche Regel
+    wie bei Differenzierung. Vodafone selbst (internal_reference=True) wird
+    angezeigt, aber nicht in active_total/brands_active/brands_tracked
     mitgezaehlt - das sind Wettbewerbskennzahlen.
 
-    *images* ist eine optionale Zuordnung Markenname -> site-relativer
-    Bildpfad (z. B. "images/congstar.jpg"), von report/html.py aus dem
-    Playwright-Screenshot-Cache (data/state/promo_images/, siehe
-    promo_images.py) gebaut. Ein echter Screenshot hat Vorrang vor dem
-    per-Eintrag og:image/twitter:image-Fund (meist nur ein generisches
-    Marken-Logo, siehe collect/promo_snapshot.py) - dieser bleibt nur als
-    zweite Absicherung, falls fuer eine Marke (noch) kein Screenshot
-    vorliegt. Fehlt beides, faellt die Karte auf die Farbverlauf+Initialen-
-    Kachel zurueck (siehe promo_index.html.j2)."""
-    images = images or {}
+    Bilder kommen aus dem Eintrag selbst (`image`/`image_w`/`image_h`, von
+    promo_bilder.py je ANGEBOT beschafft). Bis zum 07.08.2026 kam hier ein
+    Bild je MARKE an - ein Screenshot ihrer Aktionsseite -, und die Karte
+    zeigte fuer jedes ihrer acht Angebote dasselbe Bild. Das Bild gehoert
+    zum Angebot, nicht zum Absender.
+    """
     try:
         cutoff = (datetime.fromisoformat(latest_date) - timedelta(days=10)).date().isoformat()
     except ValueError:
@@ -113,186 +138,100 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str,
     for raw in db_entries:
         e = dict(raw)
         e["neu"] = bool((e.get("first_seen") or "") > cutoff)
+        e["fading"] = e.get("status") == "evtl. ausgelaufen"
         by_brand_raw.setdefault(e.get("brand") or "", []).append(e)
 
-    # Nur tatsaechlich gecrawlte Quellen (kind: static/js) werden als Karte
-    # gezeigt - dokumentierte Sonderfaelle (kind: skip, z. B. Deutsche
-    # Glasfaser) haben keinen Snapshot-Versuch und wuerden faelschlich wie
-    # eine geprueft-leere Marke aussehen. Diese Faelle stehen bereits auf der
-    # Quellen-Unterseite.
+    # Nur tatsaechlich gecrawlte Quellen (kind: static/js) werden gezeigt -
+    # dokumentierte Sonderfaelle (kind: skip, z. B. Deutsche Glasfaser) haben
+    # keinen Snapshot-Versuch und saehen faelschlich wie eine geprueft-leere
+    # Marke aus. Sie stehen auf der Quellen-Unterseite.
     crawlable = [s for s in sources if getattr(s, "crawlable", True)]
 
-    brands = []
+    marken: list[dict] = []
     active_total = 0
     brands_active = 0
     for src in crawlable:
-        entries = by_brand_raw.get(src.name, [])
-        entries = sorted(
-            entries,
-            key=lambda e: (e.get("status") == "aktiv", e.get("last_verified") or ""),
-            reverse=True)
-        # "aktiv" (bestaetigt) und "evtl. ausgelaufen" (einmal nicht erneut
-        # bestaetigt, Kulanzfrist) bleiben BEIDE in der sichtbaren Liste -
-        # nur wirklich "ausgelaufen" (zweimal in Folge nicht bestaetigt)
-        # verschwindet in die Fussnote. Siehe Modul-Docstring.
-        confirmed = [e for e in entries if e.get("status") == "aktiv"]
-        grace = [e for e in entries if e.get("status") == "evtl. ausgelaufen"]
-        for e in grace:
-            e["fading"] = True
-        visible = confirmed + grace
-        retired = [e for e in entries if e.get("status") == _RETIRED_STATUS]
-        image_url = images.get(src.name) or next(
-            (e.get("image_url") for e in entries if e.get("image_url")), None)
+        eintraege = by_brand_raw.get(src.name, [])
+        sichtbar = sorted((e for e in eintraege if e.get("status") in _SICHTBAR),
+                          key=_sortierschluessel, reverse=True)
+        bestaetigt = [e for e in sichtbar if e.get("status") == "aktiv"]
+        beendet = [e for e in eintraege if e.get("status") == _RETIRED_STATUS]
 
-        if not src.internal_reference and confirmed:
-            active_total += len(confirmed)
+        if not src.internal_reference and bestaetigt:
+            active_total += len(bestaetigt)
             brands_active += 1
 
-        brands.append({
+        marken.append({
             "name": src.name, "tier": src.tier,
             "tier_label": TIER_LABEL.get(src.tier, ""),
             "color": _OWN_COLOR if src.internal_reference else TIER_COLOR.get(src.tier, "#3860be"),
-            "group": src.group, "internal_reference": src.internal_reference,
-            "initials": _initials(src.name), "image_url": image_url,
-            "active": visible, "stale": retired, "active_count": len(confirmed),
-            "has_offers": bool(visible),
+            "group": src.group, "url": src.url,
+            "internal_reference": src.internal_reference,
+            "initials": _initials(src.name),
+            "active": sichtbar, "stale": beendet,
+            "active_count": len(bestaetigt),
+            "has_offers": bool(sichtbar),
         })
 
-    # Wettbewerber mit sichtbarem Angebot zuerst (bestaetigt oder in der
-    # Kulanzfrist), dann nach Tier/Name; Vodafones eigene Referenzkarte immer
-    # als letzte (siehe internal_reference). Bewusst has_offers statt
-    # active_count==0, damit eine Marke mit nur einem Kulanzfrist-Angebot
-    # nicht faelschlich wie eine unbeobachtete Marke ans Ende rutscht.
-    brands.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
-                                b["tier"], b["name"]))
+    # Wettbewerber mit sichtbarem Angebot zuerst, dann nach Tier/Name;
+    # Vodafones eigene Referenzkarte immer als letzte.
+    marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
+                               b["tier"], b["name"]))
 
-    own_brand = next((b for b in brands if b["internal_reference"]), None)
-
-    # ---------------------------------------------------------- Highlights
-    # "Was ist gerade am wichtigsten?" - die Auswahl trifft NICHT diese
-    # Anzeigefunktion, sondern der Wichtigkeits-Score aus
-    # analyze/promo_ranker.py: dort wird pro Angebot ein Score 0-100 auf
-    # einer festen Skala gebildet und mit Hysterese ein "highlight"-Flag
-    # gesetzt (rein ab Schwelle, raus erst deutlich darunter). Hier wird nur
-    # noch gelesen und sortiert. Dadurch ist die ANZAHL der Highlights
-    # bewusst dynamisch: in einer ruhigen Woche stehen oben vielleicht zwei
-    # Angebote, in einer bewegten zehn - statt per Perzentil kuenstlich
-    # konstant gehalten zu werden.
-    ranked, flagged_total = _rank_highlights(
-        [b for b in brands if not b["internal_reference"]])
-    highlights = ranked[:_MAX_HIGHLIGHTS]
-
-    # Vodafone als Vergleichsanker: das eigene bestbewertete sichtbare
-    # Angebot, unabhaengig von der Highlight-Schwelle. Es steht bewusst
-    # NICHT in der Wettbewerbsrangfolge (sonst wuerde die eigene Marke die
-    # Wettbewerbsbeobachtung mitgestalten), sondern daneben - damit man
-    # Druck und eigene Antwort nebeneinander sieht.
-    own_anchor = None
-    if own_brand and own_brand["active"]:
-        best = sorted(own_brand["active"],
-                      key=lambda e: (e.get("score") is not None, e.get("score") or 0),
-                      reverse=True)[0]
-        own_anchor = {
-            "brand": own_brand, "offer": best, "score": best.get("score"),
-            "reason": best.get("score_reason") or "",
-            "mechanic": MECHANICS.get(best.get("mechanic") or "", ""),
-        }
-
-    # Featured/Hero-Karte: das wichtigste Wettbewerberangebot, sobald
-    # Bewertungen vorliegen. Ohne Scores (erster Lauf nach dem Deploy, oder
-    # LLM-Ausfall) faellt die Karte auf das bisherige Verhalten zurueck -
-    # Vodafones eigenes Top-Angebot, sonst der erste Wettbewerber mit einem
-    # sichtbaren Angebot. Nie leer, nie faelschlich beschriftet: das Label
-    # nutzt immer den echten Markennamen.
-    if highlights:
-        hero = highlights[0]
-    elif own_brand and own_brand["active"]:
-        hero = {"brand": own_brand, "offer": own_brand["active"][0]}
-    else:
-        fallback = next((b for b in brands if not b["internal_reference"] and b["active"]), None)
-        hero = {"brand": fallback, "offer": fallback["active"][0]} if fallback else None
-
-    # Die Wettbewerber-Kachel-Reihe zeigt nie die im Hero gezeigte Marke ein
-    # zweites Mal (i.d.R. ohnehin Vodafone selbst, siehe internal_reference-
-    # Filter unten - der Ausschluss per Namen greift nur im Ausnahmefall,
-    # in dem der Fallback-Wettbewerber oben als Hero einspringt).
-    hero_name = hero["brand"]["name"] if hero else None
-    grid_brands = [b for b in brands
-                   if not b["internal_reference"] and b["name"] != hero_name]
-
-    # ---------------------------------------------------- Gewichtung
-    # Dieselbe Logik wie auf der Titelseite der Marktrecherche
-    # (report/html.py::_titelseite): eine Aktion MIT Bild wird eine Kachel,
-    # eine ohne Bild wird eine Zeile. Die Promo-Uebersicht hatte bis zum
-    # 07.08.2026 gar keine Gewichtung - neun gleich hohe Textsaeulen zu je
-    # 1058 px nebeneinander, kein einziges Bild darin, obwohl 14 brauchbare
-    # Screenshots auf der Platte lagen. Antonio: "hier sind auch nirgendwo
-    # Bilder".
-    rest = highlights[1:]
-    zweite_reihe = [i for i in rest if i["brand"].get("image_url")][:2]
-    zweite_ids = {id(i) for i in zweite_reihe}
-    weitere = [i for i in rest if id(i) not in zweite_ids]
-
-    # Die Schwelle darf schwanken - die Seite nicht. Am 07.08.2026 lag genau
-    # EIN Angebot darueber; Aufmacher, zweite Reihe und Beistellspalte waeren
-    # damit leer geblieben, obwohl 22 Aktionen laufen. Was nicht ueber der
-    # Schwelle liegt, wird deshalb weiter unten aufgefuellt - klar getrennt
-    # und anders beschriftet, damit "wichtig" seine Bedeutung behaelt.
-    gezeigt = {i["offer"].get("id") for i in highlights}
-    if own_anchor:
-        gezeigt.add(own_anchor["offer"].get("id"))
-    sonstige: list[dict] = []
-    for b in sorted((b for b in brands if not b["internal_reference"]),
-                    key=lambda b: -max((e.get("score") or 0) for e in b["active"])
-                    if b["active"] else 0):
-        bestes = next((e for e in sorted(
-            b["active"], key=lambda e: (e.get("score") is not None,
-                                        e.get("score") or 0), reverse=True)
-            if e.get("id") not in gezeigt), None)
-        if bestes is None:
+    # ------------------------------------------------------------ Karten
+    # Eine Karte je Marke: ihre staerkste sichtbare Aktion. Diese Regel ist
+    # keine Kosmetik, sondern die Lehre aus den echten Daten: gemessen am
+    # Bestand vom 27.07.2026 lagen 36 Angebote ueber der Schwelle, aber
+    # allein neun der besten fuenfzehn kamen von der Telekom - praktisch
+    # dieselbe Geraeteaktion, einmal je Modell. Eine Uebersicht soll die
+    # Marktbreite zeigen, nicht den Anbieter mit dem groessten
+    # Geraetekatalog. Die uebrigen Aktionen verschwinden nicht, sie stehen
+    # unten bei ihrer Marke.
+    karten: list[dict] = []
+    for b in marken:
+        if b["internal_reference"] or not b["active"]:
             continue
-        gezeigt.add(bestes.get("id"))
-        sonstige.append({
-            "brand": b, "offer": bestes, "score": bestes.get("score"),
-            "reason": bestes.get("score_reason") or "",
-            "mechanic": MECHANICS.get(bestes.get("mechanic") or "", ""),
-        })
-    # Die zweite Reihe verlangt ein Bild - sie ist eine Bildposition.
-    if len(zweite_reihe) < 2:
-        for item in sonstige:
-            if len(zweite_reihe) >= 2:
-                break
-            if item["brand"].get("image_url"):
-                zweite_reihe.append(item)
-    zweite_ids = {id(i) for i in zweite_reihe}
-    sonstige = [i for i in sonstige if id(i) not in zweite_ids]
+        karten.append(_karte(b, b["active"][0]))
+    # Bewertete zuerst, darunter nach Score - und bei gleichem Score die
+    # Marke mit Bild vor der ohne. Nicht aus Kosmetik: eine Karte ohne Bild
+    # ist eine halbe Karte, und oben stehen die, die am meisten tragen.
+    karten.sort(key=lambda k: (k["highlight"], k["score"] is not None,
+                               k["score"] or 0, bool(k["bild"])), reverse=True)
+
+    eigen = None
+    eigene_marke = next((b for b in marken if b["internal_reference"]), None)
+    if eigene_marke and eigene_marke["active"]:
+        eigen = _karte(eigene_marke, eigene_marke["active"][0])
+
+    # Die Bloecke unten zeigen jede Marke mit ihren uebrigen Aktionen - was
+    # oben schon als Karte steht, steht dort nicht noch einmal.
+    oben = {k["offer"].get("id") for k in karten}
+    if eigen:
+        oben.add(eigen["offer"].get("id"))
+    for b in marken:
+        b["rest"] = [e for e in b["active"] if e.get("id") not in oben]
+
+    mit_aktion = [b for b in marken if b["has_offers"]]
+    ohne_aktion = [b for b in marken if not b["has_offers"]]
 
     return {
-        "brands": brands,
-        "grid_brands": grid_brands,
-        "hero": hero,
-        "highlights": highlights,
-        "highlight_rest": rest,
-        # Die zwei staerksten Aktionen NACH dem Aufmacher, die ein Bild
-        # tragen - sie stehen als Kacheln. Der Rest steht als Zeile.
-        "zweite_reihe": zweite_reihe,
-        "weitere": weitere,
-        # Laufende Aktionen UNTER der Schwelle, hoechstens eine je Marke.
-        # Sie tragen die Seite durch eine ruhige Woche, ohne sich als
-        # "wichtig" auszugeben - die Vorlage beschriftet sie getrennt.
-        "sonstige": sonstige[:_MAX_SONSTIGE],
-        # Wie viele Marken ein echtes Bild beisteuern koennen. Die Zahl
-        # haengt am Abnahmekriterium 4 des Auftrags (mindestens 10 der 15
-        # vorhandenen Screenshots werden gezeigt) und wird in
-        # tests/test_promo_seite.py dagegen gehalten.
-        "brands_mit_bild": sum(1 for b in brands if b.get("image_url")),
-        "highlight_count": len(highlights),
-        # Alle uebrigen Angebote ueber der Schwelle, die oben NICHT gezeigt
-        # werden - weitere Treffer derselben Marke plus alles jenseits der
-        # Kappung. Die Seite sagt das offen, statt still zu kuerzen.
-        "highlight_dropped": max(0, flagged_total - len(highlights)),
-        "own_anchor": own_anchor,
-        "scored_total": sum(1 for b in brands if not b["internal_reference"]
+        # Alle beobachteten Marken in Anzeigereihenfolge - die Grundlage,
+        # gegen die die Wahrheitstests rechnen. Die Seite zeigt sie in zwei
+        # Gruppen, weil "hier laeuft gerade nichts" eine Zeile ist und keine
+        # Kachel; die Zaehlung darf davon nicht abhaengen.
+        "brands": marken,
+        "marken": mit_aktion,
+        "ohne_aktion": ohne_aktion,
+        "karten": karten,
+        "eigen": eigen,
+        "mechaniken": _mechanik_balken(karten, marken),
+        # Wie viele der Karten ein echtes Kampagnenbild tragen. Die Zahl
+        # haengt am Abnahmekriterium der Seite (scripts/pruefe_portal.py)
+        # und wird in tests/test_promo_seite.py gegen die Daten gehalten.
+        "mit_bild": sum(1 for k in karten if k["bild"]),
+        "bilder_gesamt": sum(1 for b in marken for e in b["active"] if e.get("image")),
+        "highlight_count": sum(1 for k in karten if k["highlight"]),
+        "scored_total": sum(1 for b in marken if not b["internal_reference"]
                             for e in b["active"] if e.get("score") is not None),
         "active_total": active_total,
         "brands_active": brands_active,

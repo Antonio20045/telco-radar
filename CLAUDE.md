@@ -189,7 +189,15 @@ aus einem **Raster mit Gewichtung**. Jetzt:
 | zweite Reihe | `.reihe-zwei .stueck-mittel` | 2 Meldungen, Bild ≥ 800 px |
 | dritte Reihe | `.reihe-vier .stueck-klein` | 4 Meldungen, Bild beliebig |
 | „Was wichtig ist" | `.front-wichtig` | 7 nummerierte Zeilen, **ohne** Bild |
-| Ressortblöcke | `.ressort-raster` | 6 Ressorts, je Aufmacher + 4 Zeilen |
+
+Eine sechste Stufe gab es bis zum 07.08.2026: sechs Ressortblöcke zwischen
+Überblick und Bericht. Sie sind weg — dieselben Ressorts, dieselben
+Überschriften, dieselbe Quelle standen einen Klick weiter auf
+`meldungen.html`, dort vollständig. Antonio: „das ist doppelt gemoppelt."
+Mit ihnen ist der Vorspann „Worum es diese Woche geht" gefallen (ein
+Ausschnitt des Berichts, der zwei Bildschirme tiefer komplett steht) samt
+`_briefing_lead()`. **Der rote Faden bleibt** — er ordnet die Seite weiter,
+er wird nur nicht mehr abgeschrieben.
 
 Ressorts kommen aus der `category` der Meldung (`RESSORTS` in `html.py`),
 mit **einer** Ausnahme: Satellit/NTN wird über den Themen-Tagger
@@ -208,7 +216,7 @@ vergisst, fällt aus allen dreien heraus.
 
 | Seite | Frage | Inhalt |
 |---|---|---|
-| `index.html` **Diese Woche** | „Was ist passiert?" | **Vorspann „Worum es diese Woche geht"**, Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, dann 6 Ressortblöcke, dann **der volle Prosabericht zweispaltig mit Sprungnavigation**, Deutschland-Fokus |
+| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation, Deutschland-Fokus |
 | `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | persistente, kuratierte Bibliothek (eigene Frage, eigener State) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
@@ -223,12 +231,43 @@ Aufmacher und zweite Reihe damit. Findet sich kein Beleg, bleibt es bei der
 Dringlichkeitssortierung — **eine falsche Verbindung ist schlimmer als
 keine.**
 
-**Die Promo Übersicht** ist am 07.08.2026 neu gebaut worden, in derselben
-Designsprache und mit derselben Gewichtungslogik (Bild → Kachel, kein Bild →
-Zeile). Ein leerer Screenshot wird nicht ausgeliefert: `bilder.ist_leer()`
-misst die Standardabweichung der Graustufen (der leere lag bei 0,00, der
-nächstflaue bei 38,67). Sie hat seitdem **14 eigene Wahrheitstests**
-(`tests/test_promo_seite.py`) — vorher hatte sie keinen.
+**Die Promo Übersicht** (`promo/index.html`) ist am 07.08.2026 **zweimal**
+gebaut worden. Der erste Anlauf brachte Bilder auf die Seite, aber die
+falschen; der zweite ist der, der steht. Antonio dazwischen: *„Das muss
+eigentlich die ganze Übersicht, es muss alles neu gemacht werden."*
+
+Zwei Dinge sind anders, und beide sitzen unter der Vorlage:
+
+1. **Die Bilder kommen aus der Aktion, nicht von einem Screenshot.** Bis
+   dahin lief je Marke ein eigener Chromium, klickte ein Cookie-Banner weg
+   und schnitt 1280 × 720 aus dem Viewport. Zwei der 14 Aufnahmen zeigten
+   trotzdem das Banner, eine war weiß, und als Kachel war keine lesbar — eine
+   ganze Webseite auf Kachelbreite zeigt keine Aktion, sondern ein Muster.
+   Jetzt liefert `collect/promo_snapshot.extract_image_candidates()` die
+   Bilder, die die Aktionsseite selbst trägt, und **`promo_bilder.py` ordnet
+   sie den einzelnen ANGEBOTEN zu** — in vier Stufen: Anker (das Bild steht
+   im Tiefenlink des Angebots) → gleicher Pfad → seltene gemeinsame Wörter
+   (1/Häufigkeit, dieselbe Rechnung wie beim roten Faden) → Seitenmotiv.
+   Was sich nicht belegen lässt, bekommt **kein** Bild, sondern die Mechanik
+   als Schriftkachel. Jedes Bild wird höchstens einmal vergeben.
+   **Das Seitenmotiv (Stufe 4) geht nur an die stärkste Aktion einer Marke
+   und sagt auf der Karte, dass es eins ist** („Motiv der Aktionsseite
+   otelo.de") — es belegt, womit die Marke wirbt, nicht welches Angebot
+   gemeint ist. Gemessen lokal über reines HTTP: 16 Bilder für 20 zugeordnete
+   Angebote; in Actions kommt das JS-Rendering dazu.
+2. **Eine Form statt vier.** Vorher standen Aufmacher, Beistellspalte,
+   Markenraster und eine Zone grauer Kästen nebeneinander — wer zwei
+   Anbieter vergleichen wollte, musste zwischen drei Darstellungen
+   übersetzen. Jetzt: **je Wettbewerber genau eine Karte** (`.pkarte`) mit
+   Motiv, Marke, Schlagzeile, einem Satz Beschreibung, Mechanik, Score und
+   Frist — gleiche Felder an gleicher Stelle. Darüber die Marktlage als
+   Balken („Was der Markt gerade fährt", zählt **Marken**, nicht Angebote),
+   darunter je Marke ein Block mit allen weiteren Aktionen als Zeilen, die
+   ein eigenes Motiv als 76-px-Vorschau tragen. Marken ohne bestätigte
+   Aktion stehen als **eine Zeile**, nicht als fünf leere Kästen.
+
+Wahrheitstests: `tests/test_promo_seite.py` (16) · `tests/test_promo_view.py`
+(22) · `tests/test_promo_bilder.py` (17).
 
 Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
 Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
@@ -257,11 +296,14 @@ schwerer. **`site/images/` spiegelt den Bildordner, es sammelt nicht**, und
 ist (sonst zeigen Archivwochen leere Kästen, nachdem `raeume_auf()` ihre
 Bilder gelöscht hat).
 
-**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **zehn**
+**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **elf**
 Kriterien gegen die wirklich gerenderte Seite, drei davon mit echtem
 Chromium bei 1440 × 900 — unter anderem, ob **irgendein** Bild
-hochskaliert dargestellt wird, ob alle sieben Ressorts ohne Scrollen
-sichtbar sind und ob die Promo Übersicht mindestens zehn echte Bilder zeigt.
+hochskaliert dargestellt wird (auf allen drei Seiten, und die Prüfung
+scrollt dafür durch, sonst misst sie die Lazy-Bilder gar nicht), ob alle
+sieben Ressorts ohne Scrollen sichtbar sind, ob die Promo Übersicht
+mindestens zehn echte Bilder zeigt und ob dort **keine Karte ohne Motiv**
+steht.
 Nichts an der Optik gilt als erledigt, bevor dieses Skript grün ist.
 Kriterium 2 rechnet die **Quote** bebilderter Meldungen, keine absolute
 Zahl — die alte Schwelle „≥ 110" war an einer Ausgabe mit 193 Meldungen
@@ -476,17 +518,30 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 ## 8a. Der nächste Auftrag
 
 > **`AUFTRAG_PORTAL_WELLE2.md` ist abgearbeitet** (Schlussliste:
-> `outputs/portal-welle2-2026-08-07.md`). Alle zehn Prüfungen von
-> `scripts/pruefe_portal.py` sind grün, 479 Tests laufen. Datumszeile und
-> Filter sind weg, die Meldungsseite ist von 9 846 auf 2 676 px geschrumpft
-> (alle sieben Ressorts ohne Scrollen), „Diese Woche" hat einen belegten
-> roten Faden und zwei Formen weniger, und die Promo Übersicht ist neu
-> gebaut — 13 echte Screenshots statt einem leeren.
+> `outputs/portal-welle2-2026-08-07.md`).
 >
-> Offen daraus: **zwei der 14 Promo-Screenshots zeigen ein Cookie-Banner**
-> statt der Aktionsseite (1&1, congstar). Das gehört in
-> `collect/promo_snapshot.py`, nicht ins Layout, und ist der nächste
-> sichtbare Gewinn auf dieser Seite.
+> **Danach, am 07.08.2026, zwei Aufträge von Antonio direkt** — beide
+> erledigt, alle elf Prüfungen von `scripts/pruefe_portal.py` grün,
+> 495 Tests:
+>
+> 1. **„Diese Woche"**: die sechs Ressortblöcke zwischen Überblick und
+>    Bericht sind weg („doppelt gemoppelt" — dieselbe Gliederung steht
+>    vollständig auf `meldungen.html`), ebenso der Vorspann „Worum es diese
+>    Woche geht". Die Seite ist von 11 498 auf 9 782 px geschrumpft, keine
+>    Meldung ist dabei verloren gegangen.
+> 2. **Promo Übersicht neu gebaut** (siehe §5): Kampagnenmotive statt
+>    Screenshots, je Angebot zugeordnet, und eine Kartenform statt vier
+>    Darstellungen. Der Screenshot-Pfad
+>    (`capture_hero_image`/`_dismiss_cookie_banner`) ist ersatzlos entfernt —
+>    damit erledigt sich auch der offene Punkt „zwei Screenshots zeigen ein
+>    Cookie-Banner", er kann nicht wiederkommen.
+>
+> Offen daraus: **die Bildausbeute hängt am JS-Rendering.** Lokal (reines
+> HTTP, Chromium kommt in der Sandbox nicht ins Netz) liefern Telekom,
+> mobilcom-debitel und klarmobil null Bildkandidaten, Lidl Connects
+> Bild-URLs antworten mit HTML. In Actions rendert Playwright diese Seiten;
+> **nach dem nächsten Lauf gehört nachgesehen, wie viele Angebote dort ein
+> Motiv bekommen** (`promo_bilder`-Zeile im Actions-Log).
 >
 > **`AUFTRAG_NACHRICHTENPORTAL.md` ist abgearbeitet**
 > (Schlussliste: `outputs/nachrichtenportal-2026-08-06.md`). Alle acht

@@ -206,6 +206,44 @@ def _dateiname(bild_url: str, max_breite: int) -> str:
     return f"{hashlib.sha1(bild_url.encode('utf-8')).hexdigest()[:16]}-{max_breite}.jpg"
 
 
+def lade_und_lege_ab(bild_url: str, ordner: Path, max_breite: int,
+                     client: httpx.Client,
+                     mind_breite: int = _MIND_BREITE) -> tuple[str, int, int] | None:
+    """Holt EIN Bild, misst es, verkleinert es und legt es ab.
+
+    Gibt `(dateiname, breite, hoehe)` der abgelegten Datei zurueck - oder
+    None, wenn die URL nichts taugt, der Abruf scheitert, das Bild schmaler
+    als *mind_breite* ist, nichts zeigt (`ist_leer`) oder sich nicht
+    schreiben laesst. Wirft nie.
+
+    Herausgezogen fuer promo_bilder.py: die Promo-Uebersicht braucht genau
+    diesen Ablauf, nur ohne die Feed-gegen-og:image-Abwaegung von
+    `_eine_meldung()`. Zwei Kopien davon waeren zwei Orte, an denen die
+    Mindestbreite auseinanderlaufen kann - und genau daran ist die
+    Bebilderung schon einmal gescheitert (Feed-Thumbnails im Aufmacher).
+    Ein Bild, das ein frueherer Lauf schon abgelegt hat, wird nicht erneut
+    geholt: der Dateiname haengt an URL und Zielbreite."""
+    if not _taugt(bild_url):
+        return None
+    fertig = ordner / _dateiname(bild_url, max_breite)
+    if fertig.exists():
+        w, hh = masse(fertig.read_bytes())
+        if w >= mind_breite:
+            return fertig.name, w, hh
+    daten = _hol(bild_url, client)
+    if not daten:
+        return None
+    w, _ = masse(daten)
+    if w < mind_breite or ist_leer(daten):
+        return None
+    try:
+        breite, hoehe = _schreibe(daten, fertig, max_breite)
+    except Exception as exc:         # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
+        log.debug("Bild konnte nicht abgelegt werden (%s): %s", bild_url, exc)
+        return None
+    return fertig.name, breite, hoehe
+
+
 def _eine_meldung(h: dict, ordner: Path, client: httpx.Client,
                   max_breite: int) -> Counter:
     """Beschafft das beste verfuegbare Bild EINER Meldung.

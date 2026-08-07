@@ -799,123 +799,137 @@ b,strong{font-weight:700}
   text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 /* ======================================================  PROMO  ========= */
 /* Wer wirbt gerade womit. Dieselbe Designsprache wie die Marktrecherche -
-   Newsprint, Serife, Linien statt Kaesten - und dieselbe Gewichtungslogik:
-   was ein Bild hat, wird eine Kachel, was keins hat, eine Zeile. Bis zum
-   07.08.2026 standen hier neun gleich hohe Textsaeulen ohne ein einziges
-   Bild nebeneinander. */
+   Newsprint, Serife, Linien statt Kaesten, Rot als Akzent -, aber EINE Form
+   statt vier. Die Seite hatte bis zum 07.08.2026 einen Aufmacher, eine
+   Beistellspalte mit Zeilen, ein Markenraster und eine Zone grauer Kaesten;
+   wer zwei Anbieter vergleichen wollte, musste dafuer zwischen drei
+   Darstellungen uebersetzen. Jetzt: ein Kartenraster, je Wettbewerber eine
+   Karte, gleiche Felder an gleicher Stelle. */
 .promo-kopf{padding:18px 0 0}
 .promo-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
-  font-size:clamp(28px,3.4vw,40px);line-height:1.04;letter-spacing:-.022em}
+  font-size:clamp(30px,4vw,46px);line-height:1.02;letter-spacing:-.02em}
 .promo-kopf-zahlen{margin:7px 0 0;font-size:15px;line-height:1.5;
-  color:var(--ink-3);max-width:76ch}
+  color:var(--ink-3);max-width:74ch}
 .promo-kopf-zahlen b{color:var(--ink);font-weight:700;
   font-variant-numeric:lining-nums}
 
-.promo-oben{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0 34px;
-  margin-top:18px;padding-top:16px;border-top:3px solid var(--rule-ink)}
-.promo-oben-haupt{min-width:0;padding-right:34px;
-  border-right:1px solid var(--rule)}
-.promo-rail{min-width:0}
+/* ---- die Lage: was der Markt gerade faehrt */
+/* Die Balken zaehlen MARKEN, nicht Angebote: sechs Aktionen einer Marke sind
+   eine Kampagne, sechs Aktionen sechs verschiedener Marken sind ein Trend. */
+.promo-lage{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
+  gap:0 34px;margin-top:22px;padding-top:16px;
+  border-top:3px solid var(--rule-ink)}
+.lage-titel{margin:0 0 10px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.lage-zeile{display:grid;grid-template-columns:minmax(0,1fr) 62px auto;
+  align-items:center;gap:0 10px;padding:5px 0}
+.lage-label{font-size:14px;color:var(--ink-2);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.lage-track{display:block;height:5px;background:var(--paper-3)}
+.lage-fill{display:block;height:100%;background:var(--red)}
+.lage-zahl{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  color:var(--ink-4);white-space:nowrap}
+.lage-text{min-width:0;padding-left:34px;border-left:1px solid var(--rule)}
+.lage-lead{margin:0;font-family:var(--serif);font-size:19px;line-height:1.45;
+  color:var(--ink);max-width:60ch}
+.lage-mehr{margin:10px 0 0;font-family:var(--sans);font-size:9.5px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.lage-mehr a{color:var(--red)}
+@media (max-width:900px){
+  .promo-lage{grid-template-columns:1fr;gap:20px 0}
+  .lage-text{padding-left:0;border-left:none}
+}
 
-/* ---- Aufmacher */
-.paufmacher-titel{margin:4px 0 12px;font-family:var(--serif);font-weight:700;
-  font-size:clamp(26px,3vw,36px);line-height:1.08;letter-spacing:-.02em}
-.paufmacher-titel a:hover{color:var(--red)}
-.paufmacher-bild{margin:0 0 12px}
-.paufmacher-bild img{display:block;width:100%;height:auto;aspect-ratio:2/1;
-  object-fit:cover;object-position:top center;background:var(--paper-3);
-  border:1px solid var(--rule-2)}
-.paufmacher-bild figcaption{margin-top:5px;font-family:var(--sans);font-size:9px;
-  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
-.paufmacher-grund{margin:0 0 10px;font-size:17px;line-height:1.5;color:var(--ink-2)}
-.paufmacher-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0;
-  font-family:var(--sans);font-size:9.5px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--ink-4)}
-.paufmacher-meta a{color:var(--red);border-bottom:1px solid var(--red)}
-.pmech{background:var(--ink);color:var(--paper);padding:2px 7px}
-
-/* ---- zweite Reihe */
-.promo-reihe{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px;
-  margin-top:20px;padding-top:18px;border-top:1px solid var(--rule)}
-.pstueck{position:relative;min-width:0}
-.pstueck a{display:flex;flex-direction:column}
-.pstueck-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
-  object-fit:cover;object-position:top center;background:var(--paper-3);
-  border:1px solid var(--rule-2);margin-bottom:9px}
-.pstueck-titel{font-size:19px;line-height:1.22;font-weight:700;
-  letter-spacing:-.014em;color:var(--ink)}
-.pstueck a:hover .pstueck-titel{color:var(--red)}
-.pstueck-score{position:absolute;top:8px;right:8px;background:var(--paper);
-  padding:2px 6px}
-
-/* ---- Zeilen (Aktionen ohne Bild) */
-.promo-zeilen{display:flex;flex-direction:column}
-.pz{border-top:1px solid var(--rule-2)}
-.pz:first-child{border-top:none}
-.pz a{display:flex;gap:12px;align-items:flex-start;padding:10px 0}
-.pz-text{min-width:0;flex:1;display:flex;flex-direction:column}
-.pz-marke{font-family:var(--sans);font-size:9px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4);
-  margin-bottom:3px}
-.pz-titel{font-size:15px;line-height:1.3;font-weight:600;color:var(--ink)}
-.pz a:hover .pz-titel{color:var(--red)}
-.pz-meta{margin-top:4px;font-family:var(--sans);font-size:9px;font-weight:600;
+/* ---- das Kartenraster: die eine Form */
+.promo-rubrik{margin-top:34px}
+.rubrik-zusatz{margin-left:auto;font-family:var(--sans);font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.promo-karten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:26px 30px}
+.pkarte{display:flex;flex-direction:column;min-width:0;
+  padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.pk-flaeche{display:flex;flex-direction:column;flex:1}
+.pk-bild{display:block;margin-bottom:10px}
+.pk-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:center;background:var(--paper-3)}
+.pk-bildquelle{display:block;margin-top:4px;font-family:var(--sans);
+  font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--ink-4)}
+/* Ohne Bild KEIN grauer Kasten - der sah aus wie ein Ladefehler. Die
+   Mechanik gross gesetzt sagt dasselbe, was ein Motiv sagen soll: worum es
+   geht. Der Farbstreifen traegt die Markenfarbe. */
+.pk-bild--typo{display:flex;flex-direction:column;justify-content:space-between;
+  aspect-ratio:16/9;padding:14px 16px;background:var(--paper-3);
+  border-top:3px solid var(--marke,var(--ink))}
+.pk-typo-marke{font-family:var(--sans);font-size:11px;font-weight:800;
+  letter-spacing:.14em;color:var(--marke,var(--ink-4))}
+.pk-typo-mechanik{font-family:var(--serif);font-size:26px;line-height:1.1;
+  font-weight:700;color:var(--ink-2);letter-spacing:-.015em}
+.pk-marke{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--red);
+  margin-bottom:5px}
+.pk-titel{font-family:var(--serif);font-size:21px;line-height:1.2;
+  font-weight:700;letter-spacing:-.015em;color:var(--ink)}
+.pk-flaeche:hover .pk-titel{color:var(--red)}
+.pk-text{margin-top:7px;font-size:14.5px;line-height:1.46;color:var(--ink-3)}
+.pk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  margin:11px 0 0;padding-top:9px;border-top:1px solid var(--rule-2)}
+.pkarte .pk-text{margin-bottom:auto}
+.pk-meta{font-family:var(--sans);font-size:9px;font-weight:600;
   text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4)}
+.pmech{background:var(--ink);color:var(--paper);padding:2px 7px;
+  font-family:var(--sans);font-size:9px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.08em;white-space:nowrap}
 .pz-score{font-family:var(--sans);font-size:10px;font-weight:800;color:#fff;
-  background:var(--red);padding:2px 6px;flex:0 0 auto;
-  font-variant-numeric:lining-nums;align-self:flex-start}
-.pz-eigen .pz-marke{color:var(--red)}
-.rubrik-eigen{margin-top:24px;border-top-color:var(--red)}
-.rubrik-weiter{margin-top:24px}
-.promo-eigen-note,.promo-top-note{margin:8px 0 0;font-family:var(--sans);
-  font-size:9.5px;font-weight:600;line-height:1.5;color:var(--ink-4)}
+  background:var(--ink-3);padding:2px 6px;font-variant-numeric:lining-nums}
+.pz-score--hoch{background:var(--red)}
+.pkarte--fading{opacity:.66}
+.pkarte--eigen .pk-marke{color:var(--ink-3)}
+.promo-eigen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 30px}
+.rubrik-eigen{border-top-color:var(--ink-4)}
+@media (max-width:1000px){
+  .promo-karten,.promo-eigen{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .promo-karten,.promo-eigen{grid-template-columns:1fr}
+}
 
-/* ---- Markenraster */
-.promo-rubrik-board{margin-top:38px;justify-content:space-between}
-.promo-tabs{display:flex;gap:20px;margin-left:auto}
-.promo-tabs a,.promo-filter{font-family:var(--sans);font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
-  background:none;border:none;border-bottom:2px solid transparent;
-  padding:2px 0;cursor:pointer}
-.promo-tabs a.on,.promo-filter.on{color:var(--ink);border-bottom-color:var(--red)}
-.promo-board{display:grid;gap:0;grid-template-columns:repeat(4,minmax(0,1fr))}
-.pmarke{display:flex;flex-direction:column;min-width:0;padding:14px 18px 16px;
-  border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-.pmarke:nth-child(4n){border-right:none;padding-right:0}
-.pmarke:nth-child(4n+1){padding-left:0}
-.pmarke:last-child{border-right:none}
-.pmarke-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
-  object-fit:cover;object-position:top center;background:var(--paper-3);
-  border:1px solid var(--rule-2);margin-bottom:9px}
-.pmarke-kopf{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;
-  border-bottom:1px solid var(--rule-ink);padding-bottom:5px}
-.pmarke-kopf h3{margin:0;font-family:var(--sans);font-size:11px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink)}
+/* ---- nach Anbieter: die Tiefe, in Zeilen */
+.promo-anbieter{columns:3;column-gap:38px;column-rule:1px solid var(--rule)}
+.pmarke{break-inside:avoid;display:inline-block;width:100%;
+  margin:0 0 26px;padding:0}
+.pmarke-kopf{display:flex;align-items:baseline;gap:10px;padding-bottom:6px;
+  border-bottom:2px solid var(--rule-ink)}
+.pmarke-kopf h3{margin:0;font-family:var(--sans);font-size:11.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink)}
+.pmarke-kopf h3 a:hover{color:var(--red)}
+.pmarke-tier{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
 .pmarke-kopf .count-badge{margin-left:auto}
-.pmarke-liste{list-style:none;margin:0;padding:0;display:flex;
-  flex-direction:column}
-.pmarke-zeile{padding:7px 0;border-top:1px solid var(--rule-2)}
-.pmarke-zeile:first-child{border-top:none;padding-top:0}
-.pmarke-zeile a{display:block;font-size:14px;line-height:1.28;font-weight:600;
-  color:var(--ink)}
-.pmarke-zeile a:hover{color:var(--red)}
-.pmarke-zeile--fading{opacity:.62}
-.pmarke-mehr{margin-top:auto;padding-top:8px}
-.pmarke-mehr>summary{list-style:none;cursor:pointer;font-family:var(--sans);
-  font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--red)}
-.pmarke-mehr>summary::-webkit-details-marker{display:none}
-.pmarke-mehr[open]>summary{color:var(--ink-4);margin-bottom:6px}
-.promo-rubrik-ruhe{margin-top:30px}
-.promo-ruhe{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0 20px}
-.pruhe{display:flex;flex-direction:column;min-width:0;opacity:.72}
-.pruhe-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
-  object-fit:cover;object-position:top center;background:var(--paper-3);
-  border:1px solid var(--rule-2);margin-bottom:6px;filter:grayscale(1)}
-.pruhe-name{font-family:var(--sans);font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
-@media (max-width:1000px){.promo-ruhe{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
-@media (max-width:620px){.promo-ruhe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pmarke-liste{list-style:none;margin:0;padding:0}
+.pzeile{display:flex;gap:10px;align-items:flex-start;padding:9px 0;
+  border-top:1px solid var(--rule-2)}
+.pzeile:first-child{border-top:none}
+.pzeile a{min-width:0;flex:1;display:flex;gap:10px;align-items:flex-start}
+.pzeile-text{min-width:0;flex:1;display:flex;flex-direction:column}
+.pzeile-bild{flex:0 0 76px}
+.pzeile-bild img{display:block;width:76px;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+.pzeile-titel{font-size:15px;line-height:1.3;font-weight:600;color:var(--ink)}
+.pzeile a:hover .pzeile-titel{color:var(--red)}
+.pzeile .pk-meta{margin-top:4px}
+.pzeile--fading{opacity:.62}
+.pmarke--eigen .pmarke-kopf{border-bottom-color:var(--red)}
+.pmarke-note{margin:8px 0 0;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.promo-ruhe{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);
+  font-size:14px;line-height:1.6;color:var(--ink-3)}
+.promo-ruhe b{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2)}
+.promo-ruhe a{color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.promo-ruhe a:hover{color:var(--red)}
+@media (max-width:1000px){.promo-anbieter{columns:2}}
+@media (max-width:640px){.promo-anbieter{columns:1;column-rule:none}}
 
 /* ---- die Tiefe */
 .promo-tiefe{margin-top:34px}
@@ -927,34 +941,7 @@ b,strong{font-weight:700}
 .promo-method > summary::-webkit-details-marker{display:none}
 .promo-method-body{padding:6px 0 20px;font-size:15px;line-height:1.6;
   color:var(--ink-2);max-width:var(--wrap-text)}
-.promo-lead-text{font-family:var(--serif);font-size:17px;line-height:1.5;
-  color:var(--ink)}
-.promo-method-mehr{font-family:var(--sans);font-size:9.5px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em}
-.promo-method-mehr a{color:var(--red)}
 .promo-method-caveat{font-style:italic;color:var(--ink-3)}
-.promo-stale-note{margin:8px 0 0;font-family:var(--sans);font-size:9.5px;
-  font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--r4)}
-
-@media (max-width:1100px){
-  .promo-board{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pmarke:nth-child(4n){border-right:1px solid var(--rule);padding-right:18px}
-  .pmarke:nth-child(4n+1){padding-left:18px}
-  .pmarke:nth-child(2n){border-right:none;padding-right:0}
-  .pmarke:nth-child(2n+1){padding-left:0}
-}
-@media (max-width:940px){
-  .promo-oben{grid-template-columns:1fr;gap:0}
-  .promo-oben-haupt{padding-right:0;border-right:none}
-  .promo-rail{margin-top:28px;border-top:3px solid var(--rule-ink);padding-top:18px}
-}
-@media (max-width:620px){
-  .promo-reihe{grid-template-columns:1fr;gap:20px 0}
-  .promo-board{grid-template-columns:1fr}
-  .pmarke,.pmarke:nth-child(2n),.pmarke:nth-child(2n+1),
-  .pmarke:nth-child(4n),.pmarke:nth-child(4n+1){
-    border-right:none;padding-left:0;padding-right:0}
-}
 
 /* ==========================================================  DRUCK  ===== */
 @media print{

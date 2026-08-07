@@ -33,16 +33,16 @@ offer it is describing. A brand with no usable candidates (or where nothing
 was picked) falls back to the brand's overview URL exactly as before - this
 is a strictly additive signal, never a new failure mode.
 
-Separately, capture_hero_image() below takes an actual screenshot of the
-brand's promo page for use as the card image on the site (see
-promo_images.py + report/promo.py). It is deliberately a SECOND, independent
-page load rather than reusing the text-extraction fetch above: the text path
-blocks images/fonts/stylesheets for speed (see newsroom_js.render_html),
-which is exactly what a screenshot needs loaded to look like anything. The
-og:image/twitter:image meta-tag extraction (extract_hero_image) stays as a
-lightweight fallback signal - most promo pages simply have no such meta tag,
-or one pointing at a generic brand logo, which is the whole reason the
-screenshot capture exists.
+Bilder: extract_image_candidates() liefert die Bilder, die die Aktionsseite
+SELBST zeigt - mit dem umgebenden <a href> und einem kurzen Kontext, damit
+promo_bilder.py sie den einzelnen Angeboten zuordnen kann (Anker zuerst,
+Textnaehe als Notnagel). Bis zum 07.08.2026 stand hier stattdessen
+capture_hero_image(): ein Playwright-Screenshot der ganzen Seite je Marke,
+1280x720 aus dem Viewport geschnitten. Zwei der 14 zeigten das Cookie-
+Banner, einer war weiss, und als Kachel war keiner davon lesbar. Der
+Kommentarblock weiter unten (vor content_hash) haelt fest, warum.
+extract_hero_image() (og:image/twitter:image) bleibt als letzte Absicherung
+je Marke - meist ein generisches Markenlogo, deshalb nur die letzte.
 """
 from __future__ import annotations
 
@@ -59,27 +59,6 @@ from .http import fetch, BROWSER_UA
 from .newsroom_js import render_html
 
 log = logging.getLogger(__name__)
-
-# Best-effort cookie-consent dismissal before a screenshot: no CMP is known
-# in advance for a given brand site, so we try the selectors of the CMPs
-# most common on German/EU sites first (cheap, exact), then fall back to
-# text-matching common accept-button wording. A miss here is normal, not an
-# error - the screenshot is still useful with a consent banner covering the
-# top few hundred pixels of a large clip, just not ideal.
-_CONSENT_SELECTORS = (
-    "#onetrust-accept-btn-handler",           # OneTrust
-    "#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll",  # Cookiebot
-    '[data-testid="uc-accept-all-button"]',   # Usercentrics
-    "._brlbs-btn-accept-all",                 # Borlabs Cookie (viel auf DE-WordPress)
-    ".cmpboxbtnyes",                          # consentmanager.net
-    ".cm-btn-success",                        # Klaro
-)
-_CONSENT_TEXTS = (
-    "Alle akzeptieren", "Alle Cookies akzeptieren", "Akzeptieren",
-    "Zustimmen", "Einverstanden", "Accept all", "I agree",
-)
-_IMG_VIEWPORT = {"width": 1280, "height": 900}
-_IMG_CLIP = {"x": 0, "y": 60, "width": 1280, "height": 720}
 
 _STRIP_TAGS = ("script", "style", "noscript", "svg", "nav", "footer", "header",
                "form", "iframe")
@@ -108,6 +87,26 @@ _MAX_LINK_CANDIDATES = 30
 # Containers whose own text is a reasonable last-resort context for a link
 # that has neither useful anchor text nor a nearby heading.
 _LINK_CONTAINER_TAGS = ("article", "li", "div", "section")
+
+# Bildkandidaten (siehe extract_image_candidates). Eine Aktionsseite traegt
+# deutlich mehr Bilder als brauchbare Links - Geraetefotos, Testimonials,
+# Netzkarten -, und die Zuordnung unten waehlt daraus. 60 ist grosszuegig
+# genug fuer die groesste gemessene Seite (winSIM: 66 <img>, davon 25 ueber
+# 400 px) und deckelt trotzdem eine Seite mit tausend Produktkacheln.
+_MAX_IMAGE_CANDIDATES = 60
+# Tags, die fuer die BILDsuche stehen bleiben duerfen. Anders als bei Text
+# und Links bleibt <header> hier drin: das Kampagnenmotiv einer Aktionsseite
+# steht sehr oft genau dort (o2online.de, otelo.de, congstar.de - alle drei
+# fuehren mit einem Buehnenbild im Kopfbereich). Wer header mitentfernt,
+# wirft zuerst das beste Bild der Seite weg.
+_IMG_STRIP_TAGS = ("script", "style", "noscript", "svg", "iframe", "form",
+                   "nav", "footer")
+_IMG_SRC_ATTRS = ("src", "data-src", "data-lazy-src", "data-original",
+                  "data-image-src")
+_IMG_SRCSET_ATTRS = ("srcset", "data-srcset")
+# Dateiendungen, die als Bild taugen. Ein Pfad ohne Endung (CDN mit
+# Query-Parametern) faellt NICHT durch - der Download misst ohnehin nach.
+_IMG_BAD_SUFFIX = (".svg", ".gif")
 _SKIP_HREF_PREFIXES = ("#", "javascript:", "mailto:", "tel:")
 # Tracking/campaign query params seen on real deep links during the
 # promo-tiefenlinks-konzept.md research (ALDI TALK's FF_* funnel tracker,
@@ -224,6 +223,143 @@ def extract_link_candidates(html: str, base_url: str,
         return []
 
 
+def _bestes_aus_srcset(wert: str) -> tuple[str, int]:
+    """Die breiteste Variante aus einem srcset: ("url", breite).
+
+    Ein srcset nennt dieselbe Aufnahme in mehreren Groessen
+    ("...-768.jpg 768w, ...-1920.jpg 1920w"). Fuer eine Kachel auf einer
+    Zeitungsseite ist die groesste die richtige - genau der Fehler, den
+    report/bilder.py am 06.08.2026 behoben hat (Feed-Thumbnails statt
+    Artikelbilder). Ohne Breitenangabe ("2x"-Deskriptoren, nackte Liste)
+    gewinnt der letzte Eintrag; das ist die Konvention aufsteigender
+    srcset-Listen."""
+    bestes, breite = "", 0
+    for teil in (wert or "").split(","):
+        stuecke = teil.split()
+        if not stuecke:
+            continue
+        url = stuecke[0].strip()
+        if not url:
+            continue
+        w = 0
+        if len(stuecke) > 1 and stuecke[1].endswith("w"):
+            try:
+                w = int(stuecke[1][:-1])
+            except ValueError:
+                w = 0
+        if w >= breite:
+            bestes, breite = url, w
+    return bestes, breite
+
+
+def _bild_quelle(img) -> tuple[str, int]:
+    """Beste Quell-URL eines <img> samt angekuendigter Breite (0 = unbekannt).
+
+    Beruecksichtigt das umgebende <picture> mit: dort steht die grosse
+    Desktop-Fassung oft nur in einem <source srcset>, waehrend das <img>
+    selbst das Handybild traegt."""
+    kandidaten: list[tuple[str, int]] = []
+    for attr in _IMG_SRCSET_ATTRS:
+        if img.get(attr):
+            kandidaten.append(_bestes_aus_srcset(img.get(attr)))
+    eltern = getattr(img, "parent", None)
+    if eltern is not None and getattr(eltern, "name", "") == "picture":
+        for quelle in eltern.find_all("source"):
+            for attr in _IMG_SRCSET_ATTRS:
+                if quelle.get(attr):
+                    kandidaten.append(_bestes_aus_srcset(quelle.get(attr)))
+    for attr in _IMG_SRC_ATTRS:
+        wert = (img.get(attr) or "").strip()
+        if wert:
+            kandidaten.append((wert, 0))
+            break
+    kandidaten = [(u, w) for u, w in kandidaten if u]
+    if not kandidaten:
+        return "", 0
+    # Eine angekuendigte Breite schlaegt eine unbekannte; unter mehreren
+    # gewinnt die groesste. Gemessen wird spaeter trotzdem mit Pillow -
+    # das hier ist nur die Vorauswahl.
+    breiteste = max(kandidaten, key=lambda k: k[1])
+    if breiteste[1]:
+        return breiteste
+    return kandidaten[0]
+
+
+def _naechster_anker(img) -> str:
+    """href des <a>, in dem das Bild steht - "" wenn es in keinem steht.
+
+    Das ist das staerkste Zuordnungssignal, das eine Aktionsseite hergibt:
+    ein Angebot kennt seinen Tiefenlink (der Analyst hat ihn aus genau
+    diesen Ankern gewaehlt, siehe extract_link_candidates), und das Bild im
+    selben Anker gehoert zu genau diesem Angebot. Keine Heuristik, sondern
+    die Struktur der Seite."""
+    node = img
+    for _ in range(6):
+        node = getattr(node, "parent", None)
+        if node is None or getattr(node, "name", None) is None:
+            break
+        if node.name == "a" and node.get("href"):
+            return (node.get("href") or "").strip()
+    return ""
+
+
+def extract_image_candidates(html: str, base_url: str,
+                             max_candidates: int = _MAX_IMAGE_CANDIDATES) -> list[dict]:
+    """Bildkandidaten der Seite:
+    [{"src": <absolut>, "context": <alt + naechste Ueberschrift>,
+      "anchor": <absoluter href des umgebenden <a> oder "">,
+      "hint_w": <angekuendigte Breite, 0 = unbekannt>}, ...]
+
+    In Dokumentreihenfolge, nach URL entdoppelt. Das Gegenstueck zu
+    extract_link_candidates(): dort waehlt ein Modell den Link, hier ordnet
+    promo_bilder.py die Bilder den Angeboten mechanisch zu (Anker zuerst,
+    Textnaehe als Notnagel).
+
+    Warum ueberhaupt: bis zum 07.08.2026 bekam jede Marke EIN Bild, und das
+    war ein Playwright-Screenshot ihrer Aktionsseite - 1280x720 aus dem
+    Viewport geschnitten. Zwei der 14 zeigten das Cookie-Banner, einer war
+    weiss, und alle waren als Kachel unlesbar (eine ganze Webseite auf
+    Kachelbreite verkleinert). Die Aktionsseiten tragen ihr Kampagnenmotiv
+    aber selbst - dieselbe Beobachtung, die die Marktrecherche bebildert
+    (report/bilder.py). Fremde Bilder werden nicht mitgeholt, nur die der
+    beobachteten Seite selbst.
+
+    Gibt [] bei jedem Parse-Problem zurueck - ein rein additives Signal,
+    nie ein neuer Fehlerfall."""
+    try:
+        soup = BeautifulSoup(html or "", "html.parser")
+        for tag in soup.find_all(_IMG_STRIP_TAGS):
+            tag.decompose()
+        gesehen: dict[str, dict] = {}
+        for img in soup.find_all("img"):
+            roh, hint_w = _bild_quelle(img)
+            if not roh or roh.lower().startswith("data:"):
+                continue
+            absolut = urljoin(base_url, roh)
+            teile = urlsplit(absolut)
+            if teile.scheme not in ("http", "https"):
+                continue
+            if teile.path.lower().endswith(_IMG_BAD_SUFFIX):
+                continue
+            if absolut in gesehen:
+                continue
+            alt = _WS_RE.sub(" ", (img.get("alt") or "").strip())
+            kontext = " - ".join(t for t in (alt, _link_context(img)) if t)
+            anker = _naechster_anker(img)
+            gesehen[absolut] = {
+                "src": absolut,
+                "context": kontext[:200],
+                "anchor": urljoin(base_url, anker) if anker else "",
+                "hint_w": hint_w,
+            }
+            if len(gesehen) >= max_candidates:
+                break
+        return list(gesehen.values())
+    except Exception:  # noqa: BLE001 - additives Signal, darf den Abruf nie kippen
+        log.info("Bild-Kandidaten-Extraktion fehlgeschlagen fuer %s", base_url)
+        return []
+
+
 def _normalize_link_for_hash(href: str) -> str:
     """Strip known tracking/campaign params before folding *href* into
     content_hash()'s link signature, so a page swapping only a campaign
@@ -240,7 +376,8 @@ def _normalize_link_for_hash(href: str) -> str:
 
 def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> dict:
     """Fetch *url* and return {"text": <visible text>, "image_url": <hero
-    image or None>, "links": <link candidates, see extract_link_candidates>}.
+    image or None>, "links": <link candidates, see extract_link_candidates>,
+    "images": <image candidates, see extract_image_candidates>}.
     Raises on failure - the caller is responsible for catching and recording
     it as a source failure, exactly like the other collectors."""
     if kind == "js":
@@ -255,72 +392,27 @@ def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> dict:
         "text": extract_text(html),
         "image_url": extract_hero_image(html, url),
         "links": extract_link_candidates(html, url),
+        "images": extract_image_candidates(html, url),
     }
 
 
-def _dismiss_cookie_banner(page) -> None:
-    """Best-effort only: never let a missing/unrecognised banner raise. A
-    successful click gets a short settle so the reflow finishes before the
-    screenshot (accepted banners often collapse with a brief transition)."""
-    try:
-        for sel in _CONSENT_SELECTORS:
-            loc = page.locator(sel).first
-            if loc.count() and loc.is_visible():
-                loc.click(timeout=800)
-                page.wait_for_timeout(600)
-                return
-        for text in _CONSENT_TEXTS:
-            loc = page.get_by_role("button", name=re.compile(re.escape(text), re.I)).first
-            if loc.count() and loc.is_visible():
-                loc.click(timeout=800)
-                page.wait_for_timeout(600)
-                return
-    except Exception:  # noqa: BLE001 - purely cosmetic, must never fail capture
-        pass
-
-
-def capture_hero_image(url: str, http_cfg: dict) -> bytes | None:
-    """Best-effort JPEG screenshot of *url* for use as a promo card's hero
-    image. Returns None on any failure - callers must treat a missing image
-    as the normal case (falls back to the colour+initials card), not an
-    error, exactly like extract_hero_image() above.
-
-    A deliberately separate Chromium launch from fetch_snapshot()/
-    render_html(): those block images/fonts/stylesheets for fast text
-    extraction, which would make a screenshot pointless. locale is de-DE
-    (rather than render_html's en-US) so German cookie-consent banners show
-    their normal German button text, which _dismiss_cookie_banner() matches
-    against."""
-    timeout_s = float(http_cfg.get(
-        "image_timeout_seconds", http_cfg.get("render_timeout_seconds", 17)))
-    try:
-        from playwright.sync_api import sync_playwright
-
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True,
-                args=["--no-sandbox", "--disable-dev-shm-usage",
-                      "--disable-gpu", "--disable-blink-features=AutomationControlled"],
-            )
-            try:
-                page = browser.new_page(
-                    viewport=_IMG_VIEWPORT, device_scale_factor=1, locale="de-DE",
-                    user_agent=http_cfg.get("user_agent", BROWSER_UA),
-                )
-                page.goto(url, wait_until="load", timeout=int(timeout_s * 1000))
-                page.wait_for_timeout(1500)
-                _dismiss_cookie_banner(page)
-                # Nudge past a sticky top nav / any residual banner chrome so
-                # the clip below lands on actual page content, not furniture.
-                page.evaluate("window.scrollTo(0, 200)")
-                page.wait_for_timeout(400)
-                return page.screenshot(type="jpeg", quality=68, clip=_IMG_CLIP)
-            finally:
-                browser.close()
-    except Exception as exc:  # noqa: BLE001
-        log.info("Promo-Hero-Screenshot fehlgeschlagen (%s): %s",
-                 url, f"{type(exc).__name__}: {str(exc)[:140]}")
-        return None
+# Hier standen bis zum 07.08.2026 `_dismiss_cookie_banner()` und
+# `capture_hero_image()`: je Marke ein eigener Chromium-Start, der die
+# Aktionsseite mit echten Bildern und Schriften laed, ein Cookie-Banner
+# wegzuklicken versucht und dann 1280x720 aus dem Viewport schneidet.
+#
+# Das Ergebnis war messbar schlecht. Von den 15 aufgenommenen Screenshots
+# zeigten zwei das Cookie-Banner statt der Aktion (1&1, congstar - der
+# Klickversuch trifft laengst nicht jede Zustimmungsschicht), einer war
+# eine weisse Flaeche, und ALLE hatten dasselbe Grundproblem: eine ganze
+# Webseite, auf Kachelbreite verkleinert, zeigt keine Aktion, sondern ein
+# Muster. Antonio: "Bei vielen sieht man nur die Cookies. Und so ein
+# Screenshot hilft ueberhaupt nicht."
+#
+# Ersetzt durch extract_image_candidates() oben plus promo_bilder.py: das
+# Kampagnenmotiv, das die Aktionsseite selbst zeigt - dieselbe Loesung, mit
+# der die Marktrecherche seit dem 06.08.2026 bebildert wird. Nebenbei faellt
+# damit ein Chromium-Start je Marke weg.
 
 
 def content_hash(text: str, links: list[dict] | None = None) -> str:

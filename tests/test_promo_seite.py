@@ -34,13 +34,15 @@ class _Quelle:
 
     def __init__(self, name, tier=2, internal_reference=False, crawlable=True):
         self.name = name
+        self.url = f"https://{name.lower().replace(' ', '')}.test/"
         self.tier = tier
         self.group = ""
         self.internal_reference = internal_reference
         self.crawlable = crawlable
 
 
-def _angebot(i, brand, score=None, status="aktiv", highlight=False):
+def _angebot(i, brand, score=None, status="aktiv", highlight=False,
+             bild=None):
     e = {
         "id": f"id{i}", "brand": brand, "tier": 2,
         "headline": f"Aktion {i} von {brand}",
@@ -52,6 +54,9 @@ def _angebot(i, brand, score=None, status="aktiv", highlight=False):
     if score is not None:
         e |= {"score": score, "highlight": highlight,
               "score_reason": f"Grund {i}.", "mechanic": "preisnachlass"}
+    if bild:
+        e |= {"image": f"bild-{i}-1280.jpg", "image_w": 1280, "image_h": 720,
+              "image_kind": bild}
     return e
 
 
@@ -59,21 +64,17 @@ MARKEN = ["Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
 QUELLEN = [_Quelle(m) for m in MARKEN] + [
     _Quelle("Vodafone Deutschland", tier=1, internal_reference=True)]
 EINTRAEGE = [
-    _angebot(1, "Alpha Mobil", score=88, highlight=True),
+    _angebot(1, "Alpha Mobil", score=88, highlight=True, bild="angebot"),
     _angebot(2, "Alpha Mobil", score=70),
     _angebot(3, "Alpha Mobil", score=64),
-    _angebot(4, "Beta Funk", score=81, highlight=True),
+    _angebot(4, "Beta Funk", score=81, highlight=True, bild="motiv"),
     _angebot(5, "Gamma Tel", score=52),
     _angebot(6, "Delta Connect", score=40),
     _angebot(7, "Delta Connect", status="ausgelaufen"),
     _angebot(8, "Vodafone Deutschland", score=60),
 ]
-BILDER = {m: f"images/{m.lower().replace(' ', '-')}.jpg" for m in MARKEN}
-
-
-def _view(images=None):
-    return prepare_promo_view(EINTRAEGE, QUELLEN, "2026-08-06",
-                              images=BILDER if images is None else images)
+def _view(eintraege=None):
+    return prepare_promo_view(eintraege or EINTRAEGE, QUELLEN, "2026-08-06")
 
 
 # ----------------------------------------------------------------- Zahlen
@@ -87,46 +88,63 @@ def test_die_kopfzahlen_stimmen_mit_den_daten_ueberein():
     assert view["brands_active"] == len({e["brand"] for e in aktive})
     # Vodafone zaehlt nicht als beobachteter Wettbewerber.
     assert view["brands_tracked"] == len(MARKEN)
-    assert view["highlight_count"] == sum(
-        1 for e in EINTRAEGE if e.get("highlight"))
+    # highlight_count zaehlt die hervorgehobenen KARTEN (je Marke eine),
+    # nicht die Eintraege - genau das steht auch auf der Seite.
+    assert view["highlight_count"] == len(
+        {e["brand"] for e in EINTRAEGE if e.get("highlight")})
 
 
-def test_gewichtung_ordnet_bilder_nach_oben():
-    """Dieselbe Logik wie die Titelseite: was ein Bild hat, wird eine
-    Kachel. Ohne diese Zuordnung stand die Seite mit 14 brauchbaren
-    Screenshots auf der Platte und keinem einzigen auf der Seite da."""
+def test_je_wettbewerber_genau_eine_karte_nach_score():
+    """Die eine Form der Seite: gleiche Felder, gleiche Reihenfolge, je
+    Marke einmal. Vorher standen hier vier Formen nebeneinander (Aufmacher,
+    Beistellspalte, Markenraster, Ruhezone), und dieselbe Marke konnte in
+    dreien davon auftauchen."""
     view = _view()
-    assert view["hero"]["offer"]["id"] == "id1"          # hoechster Score
-    assert view["zweite_reihe"], "Die zweite Reihe ist leer"
-    for item in view["zweite_reihe"]:
-        assert item["brand"]["image_url"], (
-            "Eine Bildposition ohne Bild - dafuer ist sie nicht da")
+    assert [k["offer"]["id"] for k in view["karten"]] == ["id1", "id4", "id5", "id6"]
+    marken = [k["brand"]["name"] for k in view["karten"]]
+    assert len(marken) == len(set(marken))
+    assert all(not k["brand"]["internal_reference"] for k in view["karten"])
+
+
+def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
+    """Bis zum 07.08.2026 bekam jede MARKE ein Bild - denselben Screenshot
+    fuer alle ihre Angebote. Jetzt haengt es am Angebot, und ein blosses
+    Seitenmotiv sagt das auf der Karte."""
+    view = _view()
+    nach_id = {k["offer"]["id"]: k for k in view["karten"]}
+    assert nach_id["id1"]["bild"] == "images/bild-1-1280.jpg"
+    assert nach_id["id1"]["bild_ist_motiv"] is False
+    assert nach_id["id4"]["bild_ist_motiv"] is True
+    assert nach_id["id5"]["bild"] == ""       # kein Beleg, keine Behauptung
+    assert view["mit_bild"] == 2
 
 
 def test_eine_ruhige_woche_laesst_die_seite_nicht_leer():
-    """Liegt nur EIN Angebot ueber der Schwelle - am 07.08.2026 war das der
-    Fall bei 22 laufenden Aktionen -, waeren Aufmacher, zweite Reihe und
-    Beistellspalte sonst leer. Die Aktionen darunter fuellen auf, aber
-    getrennt beschriftet: "wichtig" behaelt seine Bedeutung."""
+    """Liegt KEIN Angebot ueber der Schwelle - am 07.08.2026 lag genau eines
+    darueber, bei 22 laufenden Aktionen -, darf die Seite nicht leer
+    aussehen. Die Karten stehen weiterhin, nur ohne Hervorhebung."""
     ruhig = [dict(e, highlight=False) for e in EINTRAEGE]
-    view = prepare_promo_view(ruhig, QUELLEN, "2026-08-06", images=BILDER)
+    view = prepare_promo_view(ruhig, QUELLEN, "2026-08-06")
     assert view["highlight_count"] == 0
-    assert view["hero"] is not None
-    assert view["sonstige"], "Die Seite haette nichts zu zeigen"
-    # Je Marke hoechstens eine - sonst waere die Spalte ein Markenkatalog.
-    marken = [i["brand"]["name"] for i in view["sonstige"]]
-    assert len(marken) == len(set(marken))
-    # Und nichts doppelt, was oben schon steht.
-    oben = {view["hero"]["offer"]["id"]} | {
-        i["offer"]["id"] for i in view["zweite_reihe"]}
-    assert not oben & {i["offer"]["id"] for i in view["sonstige"]}
+    assert len(view["karten"]) == 4
+    assert [k["offer"]["id"] for k in view["karten"]] == ["id1", "id4", "id5", "id6"]
+
+
+def test_was_oben_als_karte_steht_wiederholt_sich_unten_nicht():
+    view = _view()
+    oben = {k["offer"]["id"] for k in view["karten"]} | {view["eigen"]["offer"]["id"]}
+    unten = {o["id"] for b in view["marken"] for o in b["rest"]}
+    assert not oben & unten
+    # Verschwunden ist trotzdem nichts: jede sichtbare Aktion steht genau
+    # einmal auf der Seite.
+    sichtbar = {e["id"] for e in EINTRAEGE if e["status"] != "ausgelaufen"}
+    assert oben | unten == sichtbar
 
 
 def test_das_eigene_angebot_bleibt_ausserhalb_der_wertung():
     view = _view()
-    assert view["own_anchor"]["brand"]["internal_reference"] is True
-    assert all(not i["brand"]["internal_reference"] for i in view["highlights"])
-    assert all(not i["brand"]["internal_reference"] for i in view["sonstige"])
+    assert view["eigen"]["brand"]["internal_reference"] is True
+    assert all(not k["brand"]["internal_reference"] for k in view["karten"])
 
 
 # ------------------------------------------------------------ leeres Bild
