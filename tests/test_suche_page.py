@@ -13,7 +13,7 @@ from telco_radar.report.html import render_site
 
 # Die vier Seiten der Marktrecherche nach dem Redesign.
 SEITEN = ("index.html", "meldungen.html", "differenzierung.html",
-          "transparenz.html")
+          "wettbewerb.html", "transparenz.html")
 
 
 def test_meldungen_traegt_die_suche_und_referenziert_den_index(tmp_path):
@@ -54,9 +54,11 @@ def test_topbar_formular_zeigt_auf_meldungen(tmp_path):
         assert "gsearch-results" not in html
 
 
-def test_navigation_hat_vier_eintraege(tmp_path):
-    """Sieben Unterseiten fuer eine Frage waren der Befund; vier sind das
-    Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3)."""
+def test_navigation_hat_fuenf_eintraege(tmp_path):
+    """Sieben Unterseiten fuer eine Frage waren der Befund; vier waren das
+    Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Seit dem 08.08.2026
+    sind es fuenf: "Wettbewerb" beantwortet eine eigene Frage, die keine der
+    vier beantwortet - was Telekom, O2 und 1&1 ueber die Wochen tun."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -66,12 +68,12 @@ def test_navigation_hat_vier_eintraege(tmp_path):
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     nav = html.split('aria-label="Marktrecherche"')[1].split("</nav>")[0]
     for ziel in ("index.html", "meldungen.html", "differenzierung.html",
-                 "transparenz.html"):
+                 "wettbewerb.html", "transparenz.html"):
         assert f'href="{ziel}"' in nav
     # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
-    assert nav.count("<a ") == 4
+    assert nav.count("<a ") == 5
     # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen.
     for weg in ("bericht.html", "archive.html", "sources.html",
                 "protokoll.html", "wettbewerber.html", "suche.html"):
@@ -93,7 +95,10 @@ def test_alte_dateinamen_leiten_weiter(tmp_path):
         "archive.html": "meldungen.html#archiv",
         "protokoll.html": "transparenz.html",
         "sources.html": "transparenz.html#bestand",
-        "wettbewerber.html": "index.html#deutschland-fokus",
+        # Seit dem 08.08.2026 gibt es die Seite wieder, die dieser Name
+        # meint - die Weiterleitung zeigt wieder dorthin statt auf den
+        # Kurzverweis der Titelseite.
+        "wettbewerber.html": "wettbewerb.html",
     }
     for alt, ziel in erwartet.items():
         html = (site_dir / alt).read_text(encoding="utf-8")

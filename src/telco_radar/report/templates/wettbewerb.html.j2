@@ -1,0 +1,151 @@
+{# Die Dauerseite zum deutschen Wettbewerb - Telekom, O2 und 1&1.
+
+   Antonio am 08.08.2026: "Eine ganz genaue Wettbewerbsseite, wo ich fuer
+   Deutschland ueber Telekom, O2 und 1&1 sehe, was sie gerade machen ...
+   Interessant auch im historischen Kontext: nicht nur die Meldung dieser
+   Woche, sondern ueber die Wochen und Monate - wie passt die Meldung dieser
+   Woche zu dem, was davor kam? Eine ganz neue Unterseite, die fuer immer da
+   ist."
+
+   Jeder Wettbewerber bekommt denselben Aufbau, in dieser Reihenfolge:
+
+     LAGE      Das aktuelle Profil in einem Absatz, darunter die Themen der
+               letzten vier Ausgaben untereinander - daran liest man die
+               Verschiebung ab, ohne einen Satz darueber schreiben zu muessen.
+     AKTIONEN  Was gerade beworben wird, aus der Promo-Uebersicht.
+     CHRONIK   Jede Meldung seit Beobachtungsbeginn, nach Monaten. Der
+               laufende Monat steht offen, aeltere klappen auf - sonst waere
+               die Seite in einem halben Jahr unlesbar lang.
+
+   Die Chronik ist der Punkt der Seite, deshalb bekommt sie die volle
+   Satzbreite und die Lage nur den Kopf. Jede Schlagzeile traegt `szl`
+   (CLAUDE.md §5). #}
+{% extends "base.html.j2" %}
+{% set active = 'wettbewerb' %}
+{% block title %}Marktrecherche · Wettbewerb{% endblock %}
+
+{% macro chronik_liste(eintraege) %}
+<ol class="wb-liste">
+  {% for e in eintraege %}
+  <li class="wb-zeile{% if e.tag_zeigen and not loop.first %} wb-zeile--tag{% endif %}">
+    <span class="wb-tag">{% if e.tag_zeigen %}{{ e.tag }}.{% endif %}</span>
+    <span class="wb-ressort">{{ e.rubrik }}</span>
+    <span class="wb-text">
+      <a class="wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
+      {% if e.note %}<span class="wb-note">{{ e.note }}</span>{% endif %}
+      {% if e.quelle %}<span class="wb-quelle">{{ e.quelle }}</span>{% endif %}
+    </span>
+  </li>
+  {% endfor %}
+</ol>
+{% endmacro %}
+
+{% block content %}
+
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland</p>
+      <h1>Der deutsche Wettbewerb.</h1>
+    </div>
+    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
+  </div>
+  <p class="page-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu dem passt, was in den Wochen davor kam.</p>
+  {% if wettbewerb.wettbewerber %}
+  <nav class="toc" aria-label="Die drei Wettbewerber">
+    {% for c in wettbewerb.wettbewerber %}<a href="#{{ c.anker }}">{{ c.name }}</a>{% endfor %}
+  </nav>
+  {% endif %}
+</section>
+
+{% for c in wettbewerb.wettbewerber %}
+<section class="wb{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:16px">
+  <div class="rubrik wb-rubrik"><h2>{{ c.name }}</h2>
+    {% if c.n_chronik %}<span class="rubrik-zusatz">{{ c.n_chronik }}
+      Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span>{% endif %}
+  </div>
+
+  <div class="wb-lage{% if not wettbewerb.promo_bekannt %} wb-lage--einspaltig{% endif %}">
+    <div class="wb-profil">
+      {% if c.summary %}
+      <p class="wb-summary">{{ c.summary }}</p>
+      {% elif c.fehler %}
+      {# Ein Teilausfall darf nicht aussehen wie ein ruhiger Wettbewerber. #}
+      <p class="empty-note"><b>Für diesen Lauf liegt kein Profil vor.</b>
+        Die Auswertung vom {{ c.fehler_datum | date_de }} hat keine Antwort geliefert.
+        Die Chronik darunter steht trotzdem – sie kommt aus dem Archiv.
+        Der Fehler steht im <a href="{{ prefix }}transparenz.html">Laufprotokoll</a>.</p>
+      {% else %}
+      <p class="muted-note">Für diesen Wettbewerber liegt noch kein Profil vor.</p>
+      {% endif %}
+
+      {% if c.themen_verlauf %}
+      <div class="wb-themen">
+        {% for w in c.themen_verlauf %}
+        <div class="wb-themenzeile">
+          <span class="wb-themendatum">{{ w.datum | date_de }}</span>
+          <span class="wb-tags">{% for t in w.themen %}<span class="comp-tag">{{ t }}</span>{% endfor %}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {% if wettbewerb.promo_bekannt %}
+    <aside class="wb-aktionen">
+      <p class="wb-spaltentitel">Laufende Aktionen</p>
+      {% if c.aktionen %}
+      <ul class="wb-aktionsliste">
+        {% for a in c.aktionen %}
+        <li class="wb-aktion">
+          <a href="{{ a.url }}" target="_blank" rel="noopener">
+            <span class="wb-aktion-titel szl">{{ a.headline }}</span>
+            <span class="wb-aktion-meta">{{ a.marke }}{% if a.mechanik %} · {{ a.mechanik }}{% endif %}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="wb-mehr"><a href="{{ prefix }}promo/index.html">Alle {{ c.aktionen_n }}
+        Aktion{{ 'en' if c.aktionen_n != 1 else '' }} &nearr;</a></p>
+      {% else %}
+      <p class="wb-leer">Zurzeit ist keine Aktion bestätigt.
+        <a href="{{ prefix }}promo/index.html">Promo Übersicht &nearr;</a></p>
+      {% endif %}
+      {% if c.marken %}
+      {# Welche Marken hier mitgezaehlt werden, gehoert dazu: dass congstar
+         unter der Telekom steht, ist eine Zuordnung und keine Selbstverstaendlichkeit. #}
+      <p class="wb-marken">Marken: {{ c.marken | join(', ') }}</p>
+      {% endif %}
+    </aside>
+    {% endif %}
+  </div>
+
+  {% if c.monate %}
+  <div class="wb-chronik">
+    {% for m in c.monate %}
+    {% if loop.first %}
+    <p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
+    {{ chronik_liste(m.eintraege) }}
+    {% else %}
+    <details class="wb-aelter">
+      <summary>{{ m.monat | monat_de }}<span>{{ m.n }}
+        Meldung{{ 'en' if m.n != 1 else '' }}</span></summary>
+      {{ chronik_liste(m.eintraege) }}
+    </details>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted-note">Seit Beobachtungsbeginn ist zu {{ c.name }} keine Meldung eingegangen.</p>
+  {% endif %}
+</section>
+{% else %}
+<p class="empty-note">Für diese Seite liegt noch kein Bericht im Archiv.</p>
+{% endfor %}
+
+<p class="dz-foot">Diese Seite baut sich bei jedem Lauf neu aus dem Berichtsarchiv auf – aus den
+  Wettbewerber-Profilen und allen Meldungen, deren Absender zum jeweiligen Konzern gehört. Eine
+  Meldung trägt das Datum, an dem sie zum ersten Mal im Radar auftauchte; jede verlinkt auf die
+  Originalquelle. Die laufenden Aktionen stammen aus der
+  <a href="{{ prefix }}promo/index.html">Promo Übersicht</a>.</p>
+{% endblock %}

@@ -914,3 +914,46 @@ def test_die_wochenseite_traegt_die_doppelten_formen_nicht_mehr(tmp_path):
     assert "Auswertung je Bereich" in _seite(site, "transparenz.html")
     # Und die eine Zahl, die nur in der Kachelreihe stand, ist umgezogen.
     assert "zum sofortigen Ansehen" in index
+
+
+# ------------------------------------------------------ Die Wettbewerbsseite
+# Sie zeigt zwei Zahlen: den Umfang der Chronik ("56 Meldungen seit 16. Juli
+# 2026") und den Umfang je Monatsgruppe. Beide sind Aggregate ueber ALLE
+# Wochen des Archivs - genau die Sorte Zahl, die still falsch wird, wenn
+# jemand die Gruppierung anfasst.
+def test_die_chronik_zaehlt_was_sie_zeigt(tmp_path):
+    site = _render(tmp_path, competitors=GELUNGEN)
+    soup = BeautifulSoup(_seite(site, "wettbewerb.html"), "html.parser")
+    abschnitt = soup.select_one("section.wb")
+
+    zeilen = abschnitt.select(".wb-zeile")
+    kopf = " ".join(abschnitt.select_one(".rubrik-zusatz").get_text().split())
+    assert kopf.startswith(f"{len(zeilen)} Meldung"), kopf
+    # Der Bericht ist der einzige im Archiv - also datiert die Chronik auf
+    # seinen Tag, nicht auf den heutigen.
+    assert kopf.endswith("seit 5. August 2026"), kopf
+
+    # Die Monatszahlen summieren sich auf dieselbe Zahl (offener Monat plus
+    # jeder zugeklappte).
+    monate = [int(m.get_text(strip=True))
+              for m in abschnitt.select(".wb-monat span")]
+    assert sum(monate) == len(zeilen)
+
+
+def test_der_kurzverweis_zeigt_jeden_wettbewerber_mit_profil(tmp_path):
+    """Die Titelseite nennt je Wettbewerber eine Zeile - nicht mehr, nicht
+    weniger. Ein stiller Verlust hier saehe aus wie ein kleineres
+    Wettbewerbsfeld."""
+    gemischt = [dict(GELUNGEN[0]),
+                {"name": "1&1", "n_items": 8, "moves": [], "summary": "",
+                 "themes": [], "vodafone_implication": "",
+                 "error": "JSONDecodeError"}]
+    soup = BeautifulSoup(_seite(_render(tmp_path, competitors=gemischt),
+                                "index.html"), "html.parser")
+
+    mit_profil = [c for c in gemischt if c["summary"]]
+    assert len(soup.select(".wb-kurz-zeile")) == len(mit_profil)
+    # ... und der Ausfall des anderen wird weiterhin benannt.
+    assert "1 von 2 Profilen" in _seite(_render(tmp_path / "b",
+                                                competitors=gemischt),
+                                        "index.html")

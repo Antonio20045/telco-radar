@@ -234,9 +234,17 @@ def main() -> int:
              f"Ressortzahlen {summe}, gerendert {gerendert}, Daten {len(hs)}")
 
     # ---- Kriterium 5: keine abgeschnittene Schlagzeile
-    abgeschnitten = [t for soup in (index, meldungen)
+    # Seit dem 08.08.2026 auch auf der Wettbewerbsseite: ihre Chronik zieht
+    # Ueberschriften aus zwei Quellen (Meldung und Analysten-Move), und die
+    # zweite hat keinen Rueckfall, falls ein Feed gekuerzt liefert.
+    seiten = [index, meldungen]
+    wettbewerb = site / "wettbewerb.html"
+    if wettbewerb.exists():
+        seiten.append(BeautifulSoup(wettbewerb.read_text(encoding="utf-8"),
+                                    "html.parser"))
+    abgeschnitten = [t for soup in seiten
                      for t in _schlagzeilen(soup) if t.endswith("…")]
-    alle = len(_schlagzeilen(index)) + len(_schlagzeilen(meldungen))
+    alle = sum(len(_schlagzeilen(soup)) for soup in seiten)
     b.prueft(not abgeschnitten,
              f"5. Schlagzeilen geprueft: {alle}, abgeschnitten: "
              f"{len(abgeschnitten)}")

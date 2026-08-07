@@ -53,14 +53,17 @@
       <a href="{{ prefix }}promo/quellen.html" {% if active=='promo_quellen' %}class="on"{% endif %}>Quellen</a>
     </nav>
     {% else %}
-    {# Vier Eintraege statt sieben, geschnitten nach der Frage des Lesers
-       (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Die alten Dateinamen
-       leben als Weiterleitungen weiter - sie stehen in Lesezeichen und
-       Mails. #}
+    {# Geschnitten nach der Frage des Lesers (PLAN_MARKTRECHERCHE_REDESIGN.md,
+       Abschnitt 3): vier Eintraege statt der sieben alten Dateien, seit dem
+       08.08.2026 fuenf - "Wettbewerb" beantwortet eine eigene Frage ("was
+       machen Telekom, O2 und 1&1 ueber die Wochen") und ist die einzige
+       Seite, die nicht die aktuelle Woche zeigt. Die alten Dateinamen leben
+       als Weiterleitungen weiter - sie stehen in Lesezeichen und Mails. #}
     <nav class="subbar subnav" aria-label="Marktrecherche">
       <a href="{{ prefix }}index.html" {% if active=='woche' %}class="on"{% endif %}>Diese Woche</a>
       <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on"{% endif %}>Meldungen</a>
       <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
+      <a href="{{ prefix }}wettbewerb.html" {% if active=='wettbewerb' %}class="on"{% endif %}>Wettbewerb</a>
       <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Quellen</a>
     </nav>
     {% endif %}

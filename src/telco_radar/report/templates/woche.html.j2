@@ -198,42 +198,34 @@
      gezogen. #}
 </div>
 
-{# Deutschland-Fokus: was frueher als eigene Seite "Wettbewerber im Detail"
-   lief. Die Ueberschrift dort versprach eine Analyse aller beobachteten
-   Betreiber; konfiguriert sind drei deutsche Anbieter (focus_competitors). #}
+{# Deutschland-Fokus: ein Verweis, keine zweite Wettbewerbsseite.
+
+   Hier standen bis zum 08.08.2026 drei Detailkarten mit Profil, Themen und
+   je bis zu acht Moves - rund ein Drittel der Titelseite fuer etwas, das
+   ueber die Wochen erzaehlt werden muss und nicht in einer Ausgabe. Antonio
+   wollte "eine ganz neue Unterseite, die fuer immer da ist"; die Karten sind
+   dorthin umgezogen und stehen dort mit ihrer Chronik. Geblieben ist eine
+   Zeile je Wettbewerber - Name und Lage in einem Satz.
+
+   Der Anker #deutschland-fokus bleibt: er ist das Ziel der alten
+   Weiterleitung und steht in Mails. #}
 <section id="deutschland-fokus" style="scroll-margin-top:24px">
 {% if competitors and competitors|selectattr('summary')|list %}
 <div class="card">
-  <div class="card-head"><h2>Deutschland-Fokus</h2></div>
-  <p class="card-sub">Die drei Anbieter, gegen die Vodafone Deutschland direkt antritt</p>
-  <div class="comp-list">
+  <div class="rubrik"><h2>Deutschland</h2>
+    <a href="{{ prefix }}wettbewerb.html">Zur Wettbewerbsseite</a></div>
+  <ul class="wb-kurz">
     {% for c in competitors %}
-    {% if c.summary or c.moves %}
-    <article class="comp-card">
-      <div class="comp-card-head">
-        <h2>{{ c.name }}</h2>
-        <div class="comp-badges">
-          <span class="comp-badge">{{ c.n_items }} Meldungen</span>
-          <span class="comp-badge accent">{{ c.moves|length }} relevante Moves</span>
-        </div>
-      </div>
-      {% if c.summary %}<p class="comp-summary">{{ c.summary }}</p>{% endif %}
-      {% if c.themes %}<div class="comp-tags">{% for t in c.themes %}<span class="comp-tag">{{ t }}</span>{% endfor %}</div>{% endif %}
-      {% if c.moves %}
-      <p class="comp-moves-title">Aktuelle Moves</p>
-      <div class="comp-items">
-        {% for m in c.moves %}
-        <div class="comp-item">
-          <div class="comp-item-cat">{{ m.category }}</div>
-          <a href="{{ m.url }}" target="_blank" rel="noopener">{{ m.title }}</a>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </article>
+    {% if c.satz %}
+    <li class="wb-kurz-zeile">
+      <a href="{{ prefix }}wettbewerb.html#{{ c.anker }}">
+        <span class="wb-kurz-name">{{ c.name }}</span>
+        <span class="wb-kurz-satz">{{ c.satz }}</span>
+      </a>
+    </li>
     {% endif %}
     {% endfor %}
-  </div>
+  </ul>
   {% set gescheitert = competitors|selectattr('error')|rejectattr('summary')|list %}
   {% if gescheitert %}
   {# Ein Teilausfall darf nicht aussehen wie ein kleineres Wettbewerbsfeld. #}
@@ -249,13 +241,16 @@
 {% elif competitors and competitors|selectattr('error')|list %}
 {# Ein gescheiterter Lauf darf nicht aussehen wie ein Lauf, der noch aussteht. #}
 <div class="card">
-  <div class="card-head"><h2>Deutschland-Fokus</h2></div>
+  <div class="rubrik"><h2>Deutschland</h2>
+    <a href="{{ prefix }}wettbewerb.html">Zur Wettbewerbsseite</a></div>
   <p class="empty-note">
     <b>Die Auswertung dieses Laufs ist gescheitert.</b>
     Die Meldungen wurden gesammelt und zugeordnet
     ({{ competitors|sum(attribute='n_items') }} Treffer), aber die Analyse
     hat keine Antwort geliefert. Der Fehler steht im Laufprotokoll unter
     <a href="{{ prefix }}transparenz.html">Transparenz</a>.
+    Die Chronik der Wettbewerber steht davon unberührt auf der
+    <a href="{{ prefix }}wettbewerb.html">Wettbewerbsseite</a>.
   </p>
 </div>
 {% endif %}

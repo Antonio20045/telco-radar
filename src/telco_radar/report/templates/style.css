@@ -718,6 +718,119 @@ b,strong{font-weight:700}
 .comp-item a{font-size:14.5px;line-height:1.4}
 .comp-item a:hover{color:var(--red)}
 
+/* ================================  WETTBEWERB (Dauerseite mit Chronik) == */
+/* Telekom, O2 und 1&1 ueber die Wochen. Die Seite hat zwei Ebenen, und die
+   zweite traegt sie: oben die Lage in einem Absatz, darunter die CHRONIK -
+   jede Meldung seit Beobachtungsbeginn, nach Monaten. Deshalb ist die
+   Chronikzeile hier die am sorgfaeltigsten gesetzte Form: Tageszahl,
+   Ressort-Etikett, Schlagzeile, Einordnung, Quelle - vier Spalten Rhythmus
+   wie im Terminkalender einer Redaktion. */
+.wb{margin-top:40px}
+/* Der erste Abschnitt haengt direkt am Seitenkopf - dort ist der Abstand
+   schon durch dessen Sprungnavigation gesetzt. */
+.wb--erste{margin-top:6px}
+.wb-rubrik{border-top-width:3px;margin-bottom:16px}
+.wb-lage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
+  gap:0 34px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.wb-lage--einspaltig{grid-template-columns:1fr}
+.wb-profil{min-width:0}
+.wb-summary{margin:0;font-size:18px;line-height:1.55;color:var(--ink-2);
+  max-width:68ch}
+/* Der Themenverlauf: eine Zeile je Ausgabe, neueste oben. Er ersetzt den
+   Satz "das beschaeftigt sie seit Wochen" - man sieht die Verschiebung, statt
+   sie behauptet zu bekommen. */
+.wb-themen{margin-top:16px;border-top:1px solid var(--rule-2)}
+.wb-themenzeile{display:grid;grid-template-columns:118px minmax(0,1fr);
+  gap:0 14px;padding:8px 0;border-bottom:1px solid var(--rule-2);
+  align-items:baseline}
+.wb-themendatum{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  white-space:nowrap}
+.wb-tags{display:flex;flex-wrap:wrap;gap:5px}
+.wb-aktionen{min-width:0;padding-left:34px;border-left:1px solid var(--rule)}
+.wb-spaltentitel{margin:0 0 9px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.wb-aktionsliste{list-style:none;margin:0;padding:0}
+.wb-aktion{padding:8px 0;border-top:1px solid var(--rule-2)}
+.wb-aktion:first-child{border-top:none;padding-top:0}
+.wb-aktion a{display:flex;flex-direction:column}
+.wb-aktion-titel{font-size:14.5px;line-height:1.3;font-weight:600;color:var(--ink)}
+.wb-aktion a:hover .wb-aktion-titel{color:var(--red)}
+.wb-aktion-meta{margin-top:3px;font-family:var(--sans);font-size:9px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4)}
+.wb-mehr{margin:11px 0 0;font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em}
+.wb-mehr a{color:var(--red)}
+.wb-leer,.wb-marken{margin:0;font-family:var(--sans);font-size:9.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4);
+  line-height:1.6}
+.wb-marken{margin-top:12px;padding-top:9px;border-top:1px solid var(--rule-2)}
+.wb-leer a{color:var(--red)}
+
+/* ---- die Chronik */
+.wb-chronik{margin-top:20px}
+.wb-monat{display:flex;align-items:baseline;gap:12px;margin:0 0 4px;
+  font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink);border-bottom:1px solid var(--rule-ink);
+  padding-bottom:6px}
+.wb-monat span{margin-left:auto;font-weight:700;color:var(--ink-4);
+  font-variant-numeric:lining-nums}
+.wb-liste{list-style:none;margin:0;padding:0}
+.wb-zeile{display:grid;grid-template-columns:34px 132px minmax(0,1fr);
+  gap:0 16px;padding:10px 0;border-bottom:1px solid var(--rule-2)}
+/* Der Tageswechsel bekommt die staerkere Linie. Die Tageszahl steht nur
+   einmal je Tag; ohne diesen Absatz laesen sich zwoelf Meldungen eines
+   Lauftags und die des Vortags als eine einzige Kette. */
+.wb-zeile--tag{border-top:1px solid var(--rule);padding-top:16px}
+.wb-tag{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--ink-4);
+  font-variant-numeric:lining-nums;text-align:right;line-height:1.5}
+.wb-ressort{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--red);line-height:1.7;
+  overflow:hidden;text-overflow:ellipsis}
+.wb-text{min-width:0;display:flex;flex-direction:column}
+.wb-titel{font-size:16px;line-height:1.32;font-weight:600;color:var(--ink)}
+.wb-titel:hover{color:var(--red)}
+.wb-note{margin-top:4px;font-size:14.5px;line-height:1.45;color:var(--ink-3)}
+.wb-quelle{margin-top:5px;font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+/* Aeltere Monate klappen zu. Ohne das waechst die Seite mit jeder Ausgabe um
+   rund 30 Zeilen je Wettbewerber - nach einem Jahr waere sie unlesbar, und
+   der laufende Monat, um den es meistens geht, staende ganz oben in einem
+   Meer aus Archiv. */
+.wb-aelter{margin-top:18px;border-top:1px solid var(--rule)}
+.wb-aelter > summary{list-style:none;cursor:pointer;display:flex;
+  align-items:baseline;gap:12px;padding:10px 0;font-family:var(--sans);
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink-2)}
+.wb-aelter > summary::-webkit-details-marker{display:none}
+.wb-aelter > summary span{margin-left:auto;font-weight:600;color:var(--ink-4)}
+.wb-aelter > summary::after{content:"+";font-size:16px;color:var(--red);line-height:1}
+.wb-aelter[open] > summary::after{content:"–"}
+.wb-aelter > summary:hover{color:var(--red)}
+@media (max-width:900px){
+  .wb-lage{grid-template-columns:1fr;gap:22px 0}
+  .wb-aktionen{padding-left:0;border-left:none;padding-top:16px;
+    border-top:1px solid var(--rule)}
+  .wb-zeile{grid-template-columns:30px minmax(0,1fr);gap:0 12px}
+  .wb-ressort{grid-column:2;order:-1;line-height:1.5;margin-bottom:2px}
+  .wb-text{grid-column:2}
+}
+
+/* ---- der Kurzverweis auf der Titelseite */
+/* Drei Zeilen statt drei Karten: die Detailtiefe steht auf wettbewerb.html,
+   hier steht nur, wo jeder gerade steht. */
+.wb-kurz{list-style:none;margin:0;padding:0}
+.wb-kurz-zeile{border-bottom:1px solid var(--rule-2)}
+.wb-kurz-zeile a{display:grid;grid-template-columns:170px minmax(0,1fr);
+  gap:0 20px;padding:10px 0;align-items:baseline}
+.wb-kurz-name{font-family:var(--sans);font-size:10.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink)}
+.wb-kurz-satz{font-size:15.5px;line-height:1.5;color:var(--ink-2)}
+.wb-kurz-zeile a:hover .wb-kurz-name{color:var(--red)}
+@media (max-width:700px){
+  .wb-kurz-zeile a{grid-template-columns:1fr;gap:4px 0}
+}
+
 /* ======================================================  SUCHTREFFER  === */
 .suche-filters{display:flex;gap:0;margin:0 0 8px}
 .suche-filter{font-family:var(--sans);font-size:10px;font-weight:800;

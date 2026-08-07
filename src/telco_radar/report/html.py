@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 from . import bilder as report_bilder
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
+from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..promo_config import load_promo_config
@@ -55,6 +56,16 @@ def _fmt_date_de(iso: str) -> str:
         return iso
 
 
+def _fmt_monat_de(iso_monat: str) -> str:
+    """"2026-08" -> "August 2026" - die Ueberschrift einer Monatsgruppe in
+    der Chronik der Wettbewerbsseite."""
+    try:
+        jahr, monat = (iso_monat or "").split("-")[:2]
+        return f"{MONTHS_DE[int(monat) - 1]} {jahr}"
+    except (ValueError, IndexError):
+        return iso_monat
+
+
 def _env() -> Environment:
     # "j2" MUSS in der Liste stehen. select_autoescape() sieht nur die LETZTE
     # Dateiendung an, und jede Vorlage hier heisst "*.html.j2" - mit
@@ -73,6 +84,7 @@ def _env() -> Environment:
                       autoescape=select_autoescape(["html", "htm", "xml", "j2"]))
     env.filters["domain"] = lambda u: urlsplit(u or "").netloc.removeprefix("www.")
     env.filters["date_de"] = _fmt_date_de
+    env.filters["monat_de"] = _fmt_monat_de
     return env
 
 
@@ -875,7 +887,13 @@ def _stats(report):
 
 
 def _prep_competitors(report: dict) -> list[dict]:
-    """Enrich competitor profiles for rendering (domains, category colours)."""
+    """Enrich competitor profiles for rendering (domains, category colours).
+
+    Liefert ausserdem, was die Titelseite fuer ihren Kurzverweis braucht:
+    `anker` (Sprungziel auf wettbewerb.html) und `satz` (der erste Satz des
+    Profils). Die Detailkarten sind am 08.08.2026 auf die Wettbewerbsseite
+    umgezogen - die Titelseite nennt nur noch Name und Lage in einer Zeile.
+    """
     out = []
     for c in (report.get("competitors") or []):
         c = dict(c)
@@ -888,6 +906,8 @@ def _prep_competitors(report: dict) -> list[dict]:
             m["color"] = CATEGORY_COLORS.get(m.get("category"), "#7e7e7e")
             moves.append(m)
         c["moves"] = moves
+        c["anker"] = _wb_anker(c.get("name") or "")
+        c["satz"] = _first_sentence(c.get("summary") or "", 190)
         out.append(c)
     return out
 
@@ -1018,6 +1038,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # gegenseitig verlinkten - zwei Ladevorgaenge fuer eine Frage.
     woche_tpl = env.get_template("woche.html.j2")
     latest_ctx: dict | None = None
+    # Je Woche das, woraus die Wettbewerbsseite ihre Chronik baut. Es faellt
+    # in dieser Schleife ohnehin an - beides ein zweites Mal zu rechnen waere
+    # der teuerste Teil des Rendervorgangs (14 Wochen x _flatten()).
+    wochen: list[dict] = []
     for i, report in enumerate(reports):
         highlights = _flatten(report)
         briefing_md = _strip_vodafone_advice(
@@ -1032,6 +1056,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         front = _titelseite(highlights,
                             _faden(highlights, _fuehrende_saetze(briefing_md)))
         competitors = _prep_competitors(report)
+        wochen.append({"date": report["date"], "highlights": highlights,
+                       "competitors": competitors})
         public_highlights = []
         for h in highlights:
             public_h = dict(h)
@@ -1151,8 +1177,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # eigener State (data/state/promo_db.json) - komplett getrennt vom
     # Presse-Collect oben. Fehlt der State (z. B. render_site() ohne
     # vorherigen Promo-Lauf), wird einfach eine leere Uebersicht gerendert.
+    promo_entries: list[dict] = []
+    promo_sources: list = []
     if cfg is not None:
         promo_cfg = load_promo_config(cfg.root)
+        promo_sources = promo_cfg.sources
         promo_db_raw: dict = {}
         promo_db_path = state_dir / "promo_db.json"
         if promo_db_path.exists():
@@ -1227,6 +1256,22 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             env.get_template("promo_quellen.html.j2").render(
                 prefix="../", sources=promo_cfg.sources),
             encoding="utf-8")
+
+    # ---- Wettbewerb: die Dauerseite zu Telekom, O2 und 1&1.
+    # Antonio am 08.08.2026: "nicht nur die Meldung dieser Woche, sondern
+    # ueber die Wochen und Monate - wie passt die Meldung dieser Woche zu
+    # dem, was davor kam?" Sie entsteht komplett hier beim Rendern aus dem
+    # Berichtsarchiv: kein eigener State, kein zusaetzlicher LLM-Aufruf.
+    # Deshalb waechst sie mit jedem Lauf, ohne dass die Pipeline etwas davon
+    # wissen muss.
+    wettbewerb_view = build_wettbewerb_view(
+        wochen, getattr(cfg, "focus_competitors", None) or [],
+        promo_entries, promo_sources)
+    (site_dir / "wettbewerb.html").write_text(
+        env.get_template("wettbewerb.html.j2").render(
+            prefix="", wettbewerb=wettbewerb_view,
+            date_de=_fmt_date_de(wettbewerb_view["stand"])),
+        encoding="utf-8")
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
@@ -1304,7 +1349,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                       ("archive.html", "meldungen.html#archiv"),
                       ("protokoll.html", "transparenz.html"),
                       ("sources.html", "transparenz.html#bestand"),
-                      ("wettbewerber.html", "index.html#deutschland-fokus")):
+                      ("wettbewerber.html", "wettbewerb.html")):
         (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)
