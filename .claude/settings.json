@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PYTHONPATH=src pytest*)",
+      "Bash(python scripts/validate_sources.py*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(pdftotext*)",
+      "Read(src/**)",
+      "Read(config/**)",
+      "Read(tests/**)",
+      "Edit(src/**)",
+      "Edit(tests/**)",
+      "Edit(config/**)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Edit(site/**)",
+      "Write(site/**)",
+      "Edit(data/state/**)",
+      "Write(data/state/**)",
+      "Bash(git add -A*)",
+      "Bash(git add .*)",
+      "Bash(rm -rf*)",
+      "Bash(git push --force*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && PYTHONPATH=src python -m pytest -q 2>&1 | tail -15",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}
