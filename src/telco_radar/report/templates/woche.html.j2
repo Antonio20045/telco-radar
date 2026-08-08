@@ -42,6 +42,14 @@
   <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
 {% endif %}
 
+{# Der Foliensatz. Kein Navigationseintrag: er ist kein Ort zum Lesen,
+   sondern eine Datei zum Mitnehmen - vier Folien im Vodafone-Design, mit
+   der Quellenfolie, die sich nicht abschalten laesst. #}
+{% if report and report.date %}
+<p class="folienlink"><a href="{{ prefix }}folien/{{ report.date }}.html">
+  Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
+{% endif %}
+
 {# ==================================================== DER ROTE FADEN ==== #}
 {# Der Faden ist geblieben, seine Anzeige nicht. `_faden()` sorgt weiterhin
    dafuer, dass Aufmacher und zweite Reihe GENAU die Meldungen sind, die der

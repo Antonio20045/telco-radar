@@ -949,6 +949,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     env = _env()
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
+    # Ein Foliensatz je Ausgabe, neben dem Bericht. Nicht in der Navigation:
+    # er ist kein Ort zum Lesen, sondern eine Datei zum Mitnehmen.
+    folien_dir = site_dir / "folien"
+    folien_dir.mkdir(exist_ok=True)
     (site_dir / ".nojekyll").write_text("")
     for asset in ("style.css", "app.js"):
         (site_dir / asset).write_text(
@@ -1114,6 +1118,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         (site_dir / "reports" / f"{report['date']}.html").write_text(
             woche_tpl.render(prefix="../", show_explorer=True, **ctx_archiv),
             encoding="utf-8")
+        # Der Foliensatz je Ausgabe. Feste Vorlage, feste Platzhalter, harte
+        # Zeichengrenzen - der Nutzer braucht selten einen Text, er braucht
+        # drei Folien fuer den Montagstermin. Ein Ueberlauf wirft, statt eine
+        # Folie auszuliefern, die unten herauslaeuft; das darf keine Ausgabe
+        # kosten, deshalb wird der Fehler protokolliert und nicht geworfen.
+        try:
+            from . import folien as folien_mod
+            (folien_dir / f"{report['date']}.html").write_text(
+                folien_mod.baue(report), encoding="utf-8")
+        except Exception as exc:  # noqa: BLE001
+            log.error("Foliensatz fuer %s nicht erzeugt: %s",
+                      report["date"], exc)
         if i == 0:
             latest_ctx = ctx
             (site_dir / "index.html").write_text(

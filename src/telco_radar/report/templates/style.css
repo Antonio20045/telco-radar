@@ -1746,3 +1746,11 @@ b,strong{font-weight:700}
   .t-werte{gap:20px}
   .t-kennzahl b{font-size:24px}
 }
+
+/* --- Der Foliensatz-Verweis. Eine Zeile, kein Kasten. ------------------ */
+.folienlink{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
+  margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--rule-2)}
+.folienlink a{color:var(--red);text-decoration:none;font-weight:600;
+  text-transform:uppercase;letter-spacing:.09em}
+.folienlink a:hover{text-decoration:underline}
+.folienlink span{color:var(--ink-4);margin-left:8px}
