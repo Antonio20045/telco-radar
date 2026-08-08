@@ -431,3 +431,49 @@ def test_bevorzugte_slugs_kommen_zuerst():
     links = [f"{EINSTIEG}/call-start-2017", f"{EINSTIEG}/magentamobil-l-2024"]
     sortiert = tarif_crawler._sortiere(links, ["magentamobil-l-2"])
     assert sortiert[0].endswith("magentamobil-l-2024")
+
+
+def test_zwei_dokumente_mit_gleichem_titel_bleiben_getrennt(tmp_path):
+    """Live gemessen am 08.08.2026 gegen o2.
+
+    `o2-home-l-flex` und `o2-home-l-175-flex` sind zwei getrennte PDFs mit
+    derselben Ueberschrift. Ohne Unterscheidung waere das zweite eine neue
+    FASSUNG des ersten - und der Diff meldete bei jedem Lauf abwechselnd hin
+    und her, ohne dass sich irgendwo etwas geaendert haette.
+    """
+    a, b = f"{EINSTIEG}/doc-a", f"{EINSTIEG}/doc-b"
+    # Zwei Dokumente, gleicher Produktname, verschiedene Werte.
+    eins = _pib_text()
+    zwei = _pib_text().replace("Ab Verbrauch von 80 GB", "Ab Verbrauch von 30 GB")
+    netz = _Netz({
+        EINSTIEG: _Antwort(f'<a href="{a}">A</a><a href="{b}">B</a>'),
+        a: _Antwort(eins, typ="text/plain"),
+        b: _Antwort(zwei, typ="text/plain"),
+    })
+    root = _repo(tmp_path, CONFIG)
+    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+
+    # Beide sind Grundlinie, keines ist eine Aenderung des anderen.
+    assert bilanz["grundlinie"] == 2
+    assert items == []
+    ids = {json.loads(z)["tarif_id"] for z in
+           (root / "data" / "state" / "tarife.jsonl").read_text(
+               encoding="utf-8").strip().splitlines()}
+    assert len(ids) == 2
+
+
+def test_dieselbe_adresse_bleibt_eine_versionsfolge(tmp_path):
+    """Zwei Staende NACHEINANDER sind eine Versionsfolge - die Trennung oben
+    darf das nicht kaputtmachen."""
+    url = f"{EINSTIEG}/doc-a"
+    root = _repo(tmp_path, CONFIG)
+    sammle(root, {}, jetzt=JETZT, hole=_Netz({
+        EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
+        url: _Antwort(_pib_text(), typ="text/plain")}))
+    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz({
+        EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
+        url: _Antwort(_pib_text().replace("Ab Verbrauch von 80 GB",
+                                          "Ab Verbrauch von 30 GB"),
+                      typ="text/plain")}))
+    assert bilanz["geaendert"] == 1
+    assert len(items) == 1

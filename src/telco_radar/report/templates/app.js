@@ -642,3 +642,156 @@ var TelcoSearch = (function () {
   window.addEventListener('hashchange', ausHash);
   ausHash();
 })();
+
+/* ===================================================================== *
+ * Frag das Archiv (report/archiv_dossier.py als Browserfassung)
+ *
+ * Die Website ist eine Static Site OHNE Backend - das ist die Bedingung
+ * dafuer, dass sie nie einschlaeft. Ein RAG-Aufbau braeuchte einen Dienst
+ * zur Laufzeit, also gibt es hier BM25 im Browser und eine EXTRAKTIVE
+ * Antwort: jede Zeile IST ein Archiveintrag, keine Umformulierung. Damit
+ * kann eine Fussnote nicht auf etwas zeigen, das die Aussage nicht deckt.
+ *
+ * Die Konstanten unten muessen mit archiv_dossier.py uebereinstimmen -
+ * ein Test haelt sie zusammen (test_archiv_dossier_js_und_python).
+ * ===================================================================== */
+var TelcoFrage = (function () {
+  'use strict';
+
+  var K1 = 1.5, B = 0.75, MIND_SCORE = 1.0, MAX_BELEGE = 8;
+  var STOPP = ('der die das den dem des ein eine einen einem einer eines und '
+    + 'oder aber auch mit von vom für fuer auf aus bei nach über ueber unter '
+    + 'zwischen ist sind war waren wird werden wurde wurden hat haben hatte '
+    + 'sich nicht kein keine als wie was wer wo wann warum welche welcher '
+    + 'welches sein seine ihr ihre im in an am zu zum zur es sie er wir man '
+    + 'mehr sehr schon noch nur dass denn doch so the and for of').split(' ');
+  var STOPPSET = {};
+  STOPP.forEach(function (w) { STOPPSET[w] = true; });
+
+  function zerlege(text) {
+    var treffer = String(text || '').toLowerCase()
+      .match(/[a-zäöüßA-ZÄÖÜ0-9]{2,}/g) || [];
+    return treffer.filter(function (w) { return !STOPPSET[w]; });
+  }
+
+  function baueIndex(items) {
+    var docs = items.map(function (it) {
+      return zerlege([it.title, it.summary, it.operator, it.category,
+                      it.source_label].join(' '));
+    });
+    var df = {}, gesamt = 0;
+    docs.forEach(function (d) {
+      gesamt += d.length;
+      var gesehen = {};
+      d.forEach(function (w) {
+        if (!gesehen[w]) { gesehen[w] = true; df[w] = (df[w] || 0) + 1; }
+      });
+    });
+    var tf = docs.map(function (d) {
+      var c = {};
+      d.forEach(function (w) { c[w] = (c[w] || 0) + 1; });
+      return c;
+    });
+    return { docs: docs, tf: tf, df: df, n: docs.length,
+             avg: docs.length ? gesamt / docs.length : 0 };
+  }
+
+  function idf(idx, wort) {
+    var d = idx.df[wort] || 0;
+    return Math.log(1 + (idx.n - d + 0.5) / (d + 0.5));
+  }
+
+  function frage(items, text) {
+    var worte = zerlege(text);
+    if (!worte.length) {
+      return { gefunden: false, belege: [],
+               begruendung: 'Die Frage enthält keine durchsuchbaren Begriffe.' };
+    }
+    if (!items || !items.length) {
+      return { gefunden: false, belege: [], begruendung: 'Das Archiv ist leer.' };
+    }
+    var idx = baueIndex(items);
+    var einmalig = worte.filter(function (w, i) { return worte.indexOf(w) === i; });
+    var bewertet = [];
+    for (var i = 0; i < idx.n; i++) {
+      if (!idx.docs[i].length) continue;
+      var norm = K1 * (1 - B + B * idx.docs[i].length / (idx.avg || 1));
+      var score = 0, getroffen = [];
+      einmalig.forEach(function (w) {
+        var f = idx.tf[i][w] || 0;
+        if (!f) return;
+        getroffen.push(w);
+        score += idf(idx, w) * (f * (K1 + 1)) / (f + norm);
+      });
+      if (score >= MIND_SCORE) {
+        bewertet.push({ score: score, treffer: getroffen, item: items[i] });
+      }
+    }
+    if (!bewertet.length) {
+      return { gefunden: false, belege: [], begruendung:
+        'Dazu steht nichts im Archiv. Das heißt nicht, dass es nichts gibt — '
+        + 'es heißt, dass keine der bisher erfassten Meldungen die Frage berührt.' };
+    }
+    bewertet.sort(function (a, b) {
+      return b.score - a.score
+        || String(b.item.date || '').localeCompare(String(a.item.date || ''));
+    });
+    var gesehen = {}, belege = [];
+    for (var j = 0; j < bewertet.length && belege.length < MAX_BELEGE; j++) {
+      var key = bewertet[j].item.url || bewertet[j].item.title || '';
+      if (key && gesehen[key]) continue;
+      gesehen[key] = true;
+      belege.push(bewertet[j]);
+    }
+    return { gefunden: true, belege: belege, begruendung: '' };
+  }
+
+  function rendern(ziel, antwort) {
+    if (!ziel) return;
+    var esc = TelcoSearch.esc;
+    if (!antwort.gefunden) {
+      ziel.innerHTML = '<h2 class="rubrik">Was das Archiv dazu belegt</h2>'
+        + '<p class="fa-leer">' + esc(antwort.begruendung) + '</p>';
+      ziel.hidden = false;
+      return;
+    }
+    var zeilen = antwort.belege.map(function (b) {
+      var it = b.item;
+      return '<li class="fa-beleg">'
+        + '<b>' + esc(it.title || '') + '</b>'
+        + (it.summary ? '<span>' + esc(it.summary) + '</span>' : '')
+        + '<i>' + esc(it.source_label || it.operator || '')
+        + (it.date ? ' · ' + esc(it.date) : '') + '</i>'
+        + (it.url ? '<a href="' + esc(it.url) + '" rel="noopener">Quelle</a>' : '')
+        + '</li>';
+    }).join('');
+    ziel.innerHTML = '<h2 class="rubrik">Was das Archiv dazu belegt</h2>'
+      + '<p class="fa-hinweis">Jede Zeile ist eine erfasste Meldung im '
+      + 'Wortlaut, keine Zusammenfassung. Was hier nicht steht, belegt das '
+      + 'Archiv nicht.</p><ol class="fa-liste">' + zeilen + '</ol>';
+    ziel.hidden = false;
+  }
+
+  return { zerlege: zerlege, frage: frage, rendern: rendern,
+           K1: K1, B: B, MIND_SCORE: MIND_SCORE, MAX_BELEGE: MAX_BELEGE };
+})();
+
+/* Auf der Dossier-Seite: die Antwort steht ueber den Treffern. */
+(function () {
+  var ziel = document.getElementById('dossier-antwort');
+  if (!ziel || typeof TelcoSearch === 'undefined') return;
+  var eingabe = document.getElementById('dossier-input');
+  function lauf() {
+    var q = (eingabe && eingabe.value || '').trim();
+    if (!q) { ziel.hidden = true; return; }
+    TelcoSearch.loadIndex().then(function (items) {
+      TelcoFrage.rendern(ziel, TelcoFrage.frage(items, q));
+    });
+  }
+  lauf();
+  if (eingabe) {
+    eingabe.form && eingabe.form.addEventListener('submit', function () {
+      setTimeout(lauf, 0);
+    });
+  }
+})();

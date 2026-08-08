@@ -371,6 +371,8 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     besucht: list[str] = []
     erlaubt: set[str] = set()
     items: list[Item] = []
+    # Welche Tarif-ID in DIESEM Lauf schon von welcher Adresse kam.
+    im_lauf: dict[str, str] = {}
 
     for quelle in quellen:
         links: list[str] = []
@@ -425,6 +427,19 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             bilanz["gelesen"] += 1
 
             tid = tarif_id(tarif.anbieter, tarif.name)
+            if tid in im_lauf and im_lauf[tid] != url:
+                # ZWEI verschiedene Dokumente mit derselben Titelzeile im
+                # SELBEN Lauf. Live gemessen am 08.08.2026: o2 fuehrt
+                # `o2-home-l-flex` und `o2-home-l-175-flex` als getrennte
+                # PDFs, beide mit der Ueberschrift "O2 Home L 175/250/300
+                # Flex". Ohne Unterscheidung waere das zweite eine neue
+                # Fassung des ersten - und der Diff meldete bei jedem Lauf
+                # abwechselnd hin und her.
+                #
+                # Zwei Staende NACHEINANDER sind eine Versionsfolge, zwei
+                # im selben Lauf sind zwei Produkte.
+                tid = f"{tid}#{dokument_hash(url)[:8]}"
+            im_lauf[tid] = url
             satz = tarif.als_dict()
             satz["tarif_id"] = tid
             vorher = speicher.letzter(tid)
