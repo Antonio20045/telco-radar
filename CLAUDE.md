@@ -100,6 +100,14 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              (src/telco_radar/collect/: rss.py, newsroom.py, http.py)
              + AENDERUNGSRADAR auf 16 Tarifseiten (collect/aenderungen.py)
              + LIEFERZEIT-RADAR auf dem Warenkorb (collect/lieferzeit.py)
+             + TARIF-SAMMLER auf den Pflichtdokumenten nach § 1
+               TK-TransparenzV (collect/tarif_crawler.py + tarif_pdf.py;
+               State: data/state/tarife.jsonl). NUR verlinkte Adressen -
+               nie hochgezaehlte IDs
+             + CT-RADAR auf Zertifikatslogs (collect/ct_log.py; State:
+               data/state/ct_seen.jsonl). Die einzige Ebene, die VOR der
+               Veroeffentlichung liegt - und die Meldungen sagen ihren
+               Vorbehalt im eigenen Satz
 2. DELTA     Seen-Store + Freshness-Filter → nur NEUE Items
              (src/telco_radar/dedupe.py; State: data/state/seen.jsonl)
 2b. CLUSTER  Ereignis-Buendelung: dieselbe Sache aus drei Quellen ist EINE
@@ -124,6 +132,10 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              Beides mit Topic-Memory gegen Wiederholungen (analyze/editor.py)
 5. PUBLISH   Markdown + JSON nach data/reports/, statische Site nach site/
              (report/html.py + templates/), Commit + Render-Hook
+             + TARIFE: Effektivpreis und Positionskarte
+               (report/effektivpreis.py + tarife_view.py)
+             + FOLIEN: vier Folien je Ausgabe nach site/folien/
+               (report/folien.py) - feste Vorlage, harte Zeichengrenzen
 6. VERSAND   Montags der Zwei-Minuten-Pfad per Mail, Teams nur fuer die
              Ausnahme (versand.py; State: data/state/versand.json)
 ```
@@ -143,12 +155,16 @@ Wichtige Dateien:
 | `config/ctm_fokus.yaml` | **Der Zuschnitt des Teams**: Heimatmarkt-Marken, direkte Kategorien, Stichworte, Sicherheitsskala. Die eine Stelle, an der steht, was "fuer uns" heisst — wer sie aendert, aendert die Reihenfolge der Startseite |
 | `config/vodafone_hebel.yaml` | Was WIR selbst haben, je Differenzierungs-Hebel. Drei Zustaende, `offen` ist der Standard; ein Eintrag ohne `stand` verfaellt. **"Wir haben das nicht" kommt NUR von hier, nie aus einer Modellvermutung** |
 | `config/tarif_seiten.yaml` | 16 Dauertarif-Seiten fuer den Aenderungsradar. NICHT die Aktionsseiten — die stehen in `promo_sources.yaml` |
+| `config/tarif_quellen.yaml` | **Einstiegsseiten der Tarif-Datenbank.** Es wird NUR abgerufen, was dort verlinkt ist — keine hochgezaehlten Blob-IDs. Nicht zu verwechseln mit `tarif_seiten.yaml` (Aenderungsradar auf HTML) |
+| `config/ct_domains.yaml` | Domains des CT-Radars plus die Rauschmuster. Verglichen wird LABELWEISE, nie als Teilkette |
 | `config/lieferzeit_warenkorb.yaml` | Der feste Warenkorb des Lieferzeit-Radars: Produkte mit EINER Variante, eine Test-PLZ, je Anbieter das Ident-Verfahren |
 | `config/fruehwarnung.yaml` | Fuenf CTM-Kernfragen mit falsifizierbaren Indikatoren. Der Wert steckt darin, dass sie VORHER feststehen |
 | `data/state/clusters.jsonl` | Ereignis-Gedaechtnis. ID aus der kanonischen URL, nie aus dem Titel |
 | `data/state/tarif_snapshots.json` | Die zuletzt gesehene WERTMENGE je Tarifseite (nicht der Text) |
 | `data/state/lieferzeit.json` | Zeitreihe je Produkt und Anbieter, mit Methode und Belastbarkeit je Messpunkt |
 | `data/state/versand.json` | Zustellbuch — was schon hinaus ist. Ohne das schickt ein zweiter Lauf am selben Tag dieselbe Mail |
+| `data/state/tarife.jsonl` | Zeitreihe der Tarifdokumente. Ein Stand je Zeile; ein unveraendertes Dokument erzeugt KEINEN neuen Satz, nur ein neues `abgerufen_am` |
+| `data/state/ct_seen.jsonl` | Bekannte Subdomains je Domain. Klartext statt Hash — hier sind es Hunderte, nicht Millionen, und der Klartext ist die halbe Diagnose |
 | `data/state/seen.jsonl` | Dedup-Gedächtnis. Seit 08/2026 **kompaktes v2-Format**: ein Hash je Zeile (17 statt ~300 Byte) |
 | `data/state/quellen_register.json` | Je Quelle: Herkunft, Abnahmedatum, Läufe, Erfolge, letzter Erfolg, Fehlserie, Quarantäne |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
@@ -245,6 +261,8 @@ Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | Lage aus dem Bericht, **Marktbild** (Hebel-Balken, aktivste Anbieter, Regionen), „Neu auf dem Radar", dann je Hebel eine Rubrik mit Erklärsatz und GEWICHTETEN Karten mit Bild. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py`) |
 | `wettbewerb.html` **Wettbewerb** | „Was machen Telekom, O2 und 1&1 — und wie passt das zu den Wochen davor?" | je Fokus-Wettbewerber: aktuelle Lage, laufende Promo-Aktionen seiner Marken (`group` in promo_sources), **Monats-Chronik** aller Moves+Meldungen aus dem gesamten Berichtsarchiv, per URL dedupliziert (`report/wettbewerb.py`, KEIN neuer State, keine LLM-Stufe — alles entsteht beim Rendern) |
 | `lieferzeit.html` **Lieferzeiten** | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
+| `tarife.html` **Tarife** | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
+| `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt über der Titelseite |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
@@ -466,9 +484,16 @@ einem sonst leeren Drittel — dem besten Platz der Seite. Höchstens drei
 Zeilen, jede mit Sprungziel; gibt es nichts Neues, steht dort wieder nur der
 Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
 
-**Die Navigation hat jetzt SECHS Einträge** (Lieferzeiten ist dazugekommen).
-`tests/test_suche_page.py` nagelt die Zahl fest — eine Navigation wächst
-sonst zurück auf sieben, und genau davon kam dieses Projekt.
+**Die Navigation hat jetzt SIEBEN Einträge** (Lieferzeiten und, seit dem
+08.08.2026, Tarife). `tests/test_suche_page.py` nagelt die Zahl fest — eine
+Navigation wächst sonst zurück, und genau davon kam dieses Projekt.
+
+Die Erhöhung von sechs auf sieben ist eine **bewusste Ausnahme, keine
+Aufweichung**: „Tarife" ist die erste Seite dieses Portals, die nicht aus
+Meldungen entsteht, sondern aus Daten — und zwar aus den einzigen Daten
+dieses Marktes, die rechtlich wahrheitsbewehrt sind. Sie beantwortet die
+Frage, die keine der sechs anderen beantwortet. **Wer die achte Seite
+anlegen will, begründet sie im Test** — genau dafür steht die Zahl hart.
 
 **Die alten Dateinamen** (`bericht.html`, `archive.html`, `sources.html`,
 `protokoll.html`, `wettbewerber.html`) existieren weiter als
@@ -830,6 +855,68 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
   dessen Alleinstellungsmerkmal der Belegzwang ist. *Archiv-Dialog (RAG)* —
   braucht einen Dienst zur Laufzeit; die Website ist eine Static Site ohne
   Backend, und genau das ist die Bedingung dafür, dass sie nie einschläft.
+- **Der Tarif-Sammler enumeriert NICHT, und das ist keine Vorsicht.** Es wird
+  ausschliesslich abgerufen, was auf einer konfigurierten Seite als Link
+  stand. Die o2-Dokumente liegen unter fortlaufenden Blob-IDs im S3-Bucket;
+  sie durchzuzaehlen waere trivial und ist die Grenze, an der aus dem Abrufen
+  oeffentlicher Pflichtdokumente das Leerraeumen einer fremden Datenbank wird
+  (§ 87b UrhG). `sammle()` fuehrt darueber Buch, und
+  `test_crawler_ruft_nur_verlinkte_adressen_ab` stellt eine erreichbare, aber
+  nicht verlinkte Falle auf. Nebenbei ist es die einzige Methode, die
+  funktioniert: geratene Slugs sind 404 (`magentamobil-l-20250401` gibt es
+  nicht, nur `magentamobil-data-l-20250401`).
+- **Bei Tarifdokumenten entscheidet der Content-Type, nicht die Endung.** Die
+  Telekom liefert ihre Produktinformationsblaetter unter
+  `/produktinformationsblatt/<slug>` — ohne `.pdf`, mit
+  `Content-Type: application/pdf`. Wer auf die Endung filtert, findet dort
+  kein einziges Dokument.
+- **Die Spaltenzuordnung in einem PDF haengt am WORT, nicht an der Zeile und
+  nicht am Zeichenschnitt.** Die Geraetepreisstaffel steht spaltenweise ueber
+  drei Zeilen. Verkettet und per Regex gelesen ergibt sie „mit Premium- mit
+  Premium- Smartphone" (zwei Spalten verschmolzen); hart an der
+  Zeichenposition geschnitten zerreisst sie „Smartphone" zu „Smartphon"/„e".
+  Und die Spaltenbreite wird GEMESSEN: mit fester Toleranz stand „Hardware"
+  aus der Zeilenbeschriftung in einem Dokument 15 und im anderen 14 Zeichen
+  von der ersten Spalte entfernt.
+- **„Keine Mindestlaufzeit" ist 0, nicht None.** Eine Aussage, kein fehlender
+  Wert — als None faellt der Tarif in die Quarantaene, und der Effektivpreis
+  rechnet gegen 24 Monate, die es nicht gibt. Ebenso ist ein Feld, das der
+  Extraktor diesmal NICHT fand, ein Ausfall und keine Aenderung: „80 GB →
+  nicht angegeben" waere die haeufigste Falschmeldung dieses Radars.
+- **Zwei Dokumente mit derselben Titelzeile im SELBEN Lauf sind zwei
+  Produkte, nicht zwei Fassungen.** Live gemessen: o2 fuehrt
+  `o2-home-l-flex` und `o2-home-l-175-flex` als getrennte PDFs, beide mit der
+  Ueberschrift „O2 Home L 175/250/300 Flex". Ohne Unterscheidung meldete der
+  Diff bei jedem Lauf abwechselnd hin und her.
+- **Der CT-Rauschfilter vergleicht LABEL, nie Teilketten.** `news.congstar.de`
+  enthaelt „ns"; ein Teilkettenfilter haette genau die Meldung verworfen, die
+  dem Radar seinen Wert gibt (die Zweitmarken `jamobil` und `pennymobil`
+  waren ueber keine andere Ebene sichtbar). Und der Timeout grosser Domains
+  ist eine EIGENE Fehlerklasse: als leeres Ergebnis gespeichert waere die
+  Grundlinie danach leer und der naechste Lauf meldete alles.
+- **Der Effektivpreis rechnet phasengewichtet und gegen einen FESTEN
+  Horizont.** „6 Monate 9,99 €, danach 29,99 €" ist 24,99 €. 24 Monate auch
+  fuer Flex-Tarife — nicht weil die so lange laufen, sondern weil ein
+  Anschlusspreis sich auf 24 Monate anders verteilt als auf einen. Und immer
+  DREI Werte ausweisen: eine Rangliste nach Effektivpreis allein ist eine
+  Rangliste der Drosselung.
+- **Ein Archiv-Dialog bleibt extraktiv, solange es kein Backend gibt.** Die
+  Antwort besteht aus den Eintraegen selbst; damit kann eine Fussnote nicht
+  auf etwas zeigen, das die Aussage nicht deckt. Wer dort ein Modell
+  einsetzt, braucht denselben Prueflauf wie `faithfulness.py` — und einen
+  Dienst zur Laufzeit, den diese Static Site nicht hat. Die JS-Fassung in
+  `app.js` ist eine ZWEITE Umsetzung derselben Rechnung; zwei Tests halten
+  Konstanten und Stoppwoerter zusammen, sonst antwortet die Seite anders als
+  der Test und beide sind fuer sich gruen.
+- **`pdftotext` ist ein externes Binary.** Die Extraktionslogik arbeitet
+  deshalb auf TEXT, nicht auf PDF, und wird gegen gespeicherte Textfixtures
+  geprueft. Wer sie ans Binary bindet, verliert achtzig Tests, sobald jemand
+  die Suite ohne poppler laufen laesst.
+- **`pruefe_portal.py` Kriterium 4 faellt nach einem `--no-llm`-Lauf
+  durch.** Ohne Analyst gibt es keine Kategorien, also kollabieren die sieben
+  Ressorts auf zwei, und das Kriterium verlangt mindestens drei. Das ist kein
+  Fehler der Seite — vor dem Messen den ausgelieferten `site/`-Stand
+  wiederherstellen (`git checkout -- site data`).
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -880,7 +967,53 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (08.08.2026, Antonio direkt): das Review-Dokument.**
+> **Zuletzt erledigt (08.08.2026, Antonio direkt): der Umsetzungsplan,
+> Teil 1 und A1–A10.** Antonio hat den Plan übergeben („diggah erledige
+> alles, setze alle Phasen um"). Stand danach: **1080 Tests**, alle **14
+> Prüfungen von `pruefe_portal.py`** grün, **207 crawlbare Quellen**.
+> Vollständige Liste mit allen Messungen:
+> `outputs/umsetzungsplan-2026-08-08.md`.
+>
+> Neu gebaut: **CT-Radar** (A3), **Tarif-Extraktor** (A4), **Tarif-Sammler
+> mit Historie** (A5), **Effektivpreis und Positionskarte** (A6),
+> **Foliensatz-Export** (A8), **Kleingedruckt-Wächter** (A9), **Frag das
+> Archiv** (A10), dazu die Einrichtung aus Teil 1 (`.claude/settings.json`
+> mit Berechtigungen und Test-Hook, drei Subagenten, `commit-sicher`).
+>
+> **A1, A2 und A7 waren schon da** — der Plan und das Review datieren vom
+> selben Tag wie die Vorsession, die sie umgesetzt hat. Nachgemessen:
+> `analyze/clustering.py`, Browser-UA in `settings.yaml:395` plus `certifi`
+> in `http.py:66`, `analyze/ctm.py` mit `faithfulness.py`.
+>
+> **Die zwei Grundlagendokumente des Plans fehlen im Repo**
+> (`claude/site-review-und-feature-roadmap-2026-08-08.md` und
+> `claude/neue-features-ideenkatalog-2026-08-08.md`; es gibt kein
+> Verzeichnis `claude/`). Gebaut wurde deshalb gegen **echte Dokumente
+> statt gegen die Tabellen** — alle drei URL-Muster aus dem Plan sind tot.
+>
+> **Zwei bewusste Abweichungen:** die Navigation hat jetzt **sieben**
+> Einträge (Begründung steht im Test), und `commit-sicher` pusht auf den
+> aktuellen Branch statt auf `main`.
+>
+> **Offen daraus, alles erst nach dem nächsten Actions-Lauf prüfbar:**
+> 1. **`Tarif-Sammler:` im Protokoll.** Die Telekom-Einstiegsseite
+>    antwortet httpx mit HTTP 202 (§5) und lieferte lokal null Links — nur
+>    die drei o2-Dokumente kamen an. Steht dort weiterhin nur o2, braucht
+>    die Telekom-Quelle den JS-Collector.
+> 2. **`CT-Radar:` im Protokoll.** Die Grundlinie steht (15 Domains, 0
+>    Funde — beim ersten Lauf richtig so). Ab dem zweiten Lauf gilt: meldet
+>    er zweistellig viele Namen je Domain, ist der Rauschfilter zu grob;
+>    meldet er nie etwas, ist er zu scharf. Seine Modellstufe ist noch nie
+>    gegen ein echtes Modell gelaufen.
+> 3. **Die Positionskarte braucht drei Punkte** für eine Ausgleichsgerade.
+>    Mit den zwei o2-Tarifen aus dem Livelauf zeigt sie noch keine.
+> 4. **Vodafone fehlt in der Tarif-Datenbank.** `vodafone.de/infofaxe`
+>    liefert HTTP 200, die Linkernte dort ist nicht gemessen. Ohne den
+>    eigenen Punkt zeigt die Positionskarte den Markt ohne uns.
+> 5. **1&1 fehlt mit Grund**: das PIB-Verzeichnis ist eine Next.js-Seite
+>    ohne statische Links. Braucht den JS-Collector, keinen geratenen Pfad.
+
+> **Davor erledigt (08.08.2026, Antonio direkt): das Review-Dokument.**
 > Antonio hat ein von der Vorsession erstelltes Review der Seite übergeben
 > („Ich möchte, dass du an all den Punkten arbeitest … und zwar autonom")
 > und ist gegangen. Umgesetzt sind **alle sechs Befunde aus Teil A und
