@@ -18,9 +18,9 @@ news_sources:
   - {name: "Broadband TV News", type: rss, url: "https://www.broadbandtvnews.com/feed/"}
   - {name: "Telecoms Tech News", type: rss, url: "https://www.telecomstechnews.com/feed/"}
   - {name: "The Fast Mode", type: rss, url: "https://www.thefastmode.com/?format=feed&type=rss"}
-  - {name: "Telecompetitor", type: rss, url: "https://www.telecompetitor.com/feed/"}
-  - {name: "TelecomTalk", type: rss, url: "https://telecomtalk.info/feed/"}
-  - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed"}
+  - {name: "Telecompetitor", type: rss, url: "https://www.telecompetitor.com/feed/", region: north_america}
+  - {name: "TelecomTalk", type: rss, url: "https://telecomtalk.info/feed/", region: asia}
+  - {name: "ISPreview UK", type: rss, url: "https://www.ispreview.co.uk/index.php/feed", region: europe}
   - {name: "CommsRisk", type: rss, url: "https://commsrisk.com/feed/"}
   # -- German telco press (Telekom, O2, 1&1, Vodafone DE)
 
@@ -54,38 +54,38 @@ news_sources:
   # -- Deutsch
   # Rein telekommunikationsspezifisch, taeglich, mit Tarifdetails - genau die
   # Ebene, auf der die Kollegin arbeitet.
-  - {name: "teltarif", type: rss, url: "https://www.teltarif.de/feed/news/20.rss2", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "teltarif", type: rss, url: "https://www.teltarif.de/feed/news/20.rss2", region: europe, herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
   # Handelsblatt des Telekommunikationsvertriebs: Tarife, Endgeraete, Handel.
-  - {name: "Telecom Handel", type: rss, url: "https://www.telecom-handel.de/feed/rss", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Handel", type: rss, url: "https://www.telecom-handel.de/feed/rss", region: europe, herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
 
   # -- Franzoesisch
   # Deckt den franzoesischen Markt (Orange, SFR, Bouygues, Free) taeglich ab.
-  - {name: "Univers Freebox", type: rss, url: "https://www.universfreebox.com/feed", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Univers Freebox", type: rss, url: "https://www.universfreebox.com/feed", region: europe, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   # -- Spanisch (Spanien)
-  - {name: "Xataka Móvil", type: rss, url: "https://www.xatakamovil.com/feedburner.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
-  - {name: "ADSLZone", type: rss, url: "https://www.adslzone.net/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Xataka Móvil", type: rss, url: "https://www.xatakamovil.com/feedburner.xml", region: europe, herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
+  - {name: "ADSLZone", type: rss, url: "https://www.adslzone.net/feed/", region: europe, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   # -- Italienisch
-  - {name: "Corriere Comunicazioni", type: rss, url: "https://www.corrierecomunicazioni.it/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Corriere Comunicazioni", type: rss, url: "https://www.corrierecomunicazioni.it/feed/", region: europe, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   # -- Portugiesisch / Spanisch (Lateinamerika)
   # Der brasilianische Markt war bisher nur ueber die Betreiber selbst
   # sichtbar; TeleSintese lieferte im Abruf 40 von 40 Meldungen im
   # Frischefenster.
-  - {name: "TeleSíntese (BR)", type: rss, url: "https://telesintese.com.br/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "TeleSemana (LatAm)", type: rss, url: "https://www.telesemana.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TeleSíntese (BR)", type: rss, url: "https://telesintese.com.br/feed/", region: latin_america, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TeleSemana (LatAm)", type: rss, url: "https://www.telesemana.com/feed/", region: latin_america, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   # -- Regionale englischsprachige Fachpresse (Asien, Afrika, Indien)
   # Nicht "noch ein internationaler Feed": diese vier berichten ueber Maerkte,
   # die in der bestehenden Fachpresse praktisch nicht vorkommen.
-  - {name: "Communications Today (Indien)", type: rss, url: "https://www.communicationstoday.co.in/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Asia", type: rss, url: "https://www.telecomreviewasia.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review Africa", type: rss, url: "https://www.telecomreviewafrica.com/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Communications Today (Indien)", type: rss, url: "https://www.communicationstoday.co.in/feed/", region: asia, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Asia", type: rss, url: "https://www.telecomreviewasia.com/feed/", region: asia, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review Africa", type: rss, url: "https://www.telecomreviewafrica.com/feed/", region: africa_middle_east, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
   # Suedafrika ist der groesste Markt, in dem Vodacom und MTN aufeinander
   # treffen - und war bisher nur ueber die Betreiber selbst sichtbar.
-  - {name: "ITWeb (Südafrika)", type: rss, url: "https://www.itweb.co.za/rss", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
-  - {name: "TechCentral (Südafrika)", type: rss, url: "https://techcentral.co.za/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "ITWeb (Südafrika)", type: rss, url: "https://www.itweb.co.za/rss", region: africa_middle_east, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+  - {name: "TechCentral (Südafrika)", type: rss, url: "https://techcentral.co.za/feed/", region: africa_middle_east, herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
 
   # -- International, aber im Bestand bisher nicht vertreten
   - {name: "TelecomTV", type: rss, url: "https://www.telecomtv.com/content/news/rss.xml", herkunft: "Breitensuche (rel=alternate)", abgenommen: "2026-08-05"}
@@ -114,14 +114,14 @@ news_sources:
   # spezifischen Titel im Bestand.
   # Ebenfalls verworfen: die "comments/feed"-Varianten mehrerer Titel - das
   # sind Leserkommentare, keine Artikel.
-  - {name: "Telepolis (Polen)", type: rss, url: "https://www.telepolis.pl/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Lupa (Tschechien)", type: rss, url: "https://www.lupa.cz/rss/clanky/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Netzwoche (Schweiz)", type: rss, url: "https://www.netzwoche.ch/taxonomy/term/31/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "digi.no (Norwegen)", type: rss, url: "https://www.digi.no/rss", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "TelecomLead (Indien)", type: rss, url: "https://telecomlead.com/feed", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "MediaNama (Indien)", type: rss, url: "https://www.medianama.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Mobile Time (Brasilien)", type: rss, url: "https://www.mobiletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "TELETIME (Brasilien)", type: rss, url: "https://teletime.com.br/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
-  - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Telepolis (Polen)", type: rss, url: "https://www.telepolis.pl/rss", region: europe, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Lupa (Tschechien)", type: rss, url: "https://www.lupa.cz/rss/clanky/", region: europe, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Netzwoche (Schweiz)", type: rss, url: "https://www.netzwoche.ch/taxonomy/term/31/feed", region: europe, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "digi.no (Norwegen)", type: rss, url: "https://www.digi.no/rss", region: europe, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "TelecomLead (Indien)", type: rss, url: "https://telecomlead.com/feed", region: asia, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "MediaNama (Indien)", type: rss, url: "https://www.medianama.com/feed/", region: asia, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Mobile Time (Brasilien)", type: rss, url: "https://www.mobiletime.com.br/feed/", region: latin_america, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "TELETIME (Brasilien)", type: rss, url: "https://teletime.com.br/feed/", region: latin_america, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "DPL News (Lateinamerika)", type: rss, url: "https://dplnews.com/feed/", region: latin_america, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Connecting Africa", type: rss, url: "https://www.connectingafrica.com/rss.xml", region: africa_middle_east, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}
+  - {name: "Telecom Review (Naher Osten)", type: rss, url: "https://www.telecomreview.com/feed/", region: africa_middle_east, herkunft: "Firmenliste Welle 2", abgenommen: "2026-08-05"}

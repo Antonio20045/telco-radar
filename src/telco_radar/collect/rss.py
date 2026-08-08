@@ -20,7 +20,19 @@ from .newsroom import _date_from_text
 
 log = logging.getLogger(__name__)
 
-MAX_ENTRIES_PER_FEED = 40
+# Wie viele Eintraege eines Feeds gelesen werden. Der Wert ist ein DECKEL,
+# kein Ziel - und er ist am 08.08.2026 von 40 auf 60 gestiegen. Der Grund:
+# genau die zehn ergiebigsten Quellen lieferten exakt 40 Meldungen, also den
+# Deckel und nicht ihren Bestand (Light Reading, Telecoms.com, The Fast Mode).
+# Zwischen einem Freitags- und einem Dienstagslauf liegen vier Tage; eine
+# Fachpresse mit 12 Meldungen am Tag laeuft in dieser Zeit ueber 40 hinaus,
+# und was dabei aus dem Feed faellt, sieht dieses Projekt nie.
+#
+# Der Preis ist Laufzeit: mehr Meldungen heisst mehr Analysten-Stapel. Er ist
+# seit dem Ereignis-Clustering kleiner geworden (analyze/clustering.py bricht
+# die Mehrfachberichterstattung heraus, bevor bewertet wird), und das
+# Job-Timeout liegt bei 50 Minuten gegen zuletzt 27,4 gemessene.
+MAX_ENTRIES_PER_FEED = 60
 
 
 def _strip_html(text: str) -> str:
@@ -48,7 +60,36 @@ def _entry_date(entry) -> datetime | None:
             parsed_text = _date_from_text(raw[:60])
             if parsed_text:
                 return parsed_text
-    return None
+    # Letzter Ausweg: das Datum im LINK. Manche Behoerden- und
+    # Redaktionssysteme liefern ueberhaupt kein <pubDate> - der RSS-Feed der
+    # Bundesnetzagentur zum Beispiel hat weder pubDate noch dc:date, seine
+    # Pressemitteilungen tragen das Datum aber im Pfad
+    # (/Pressemitteilungen/DE/2026/20260806_Agnes.html).
+    #
+    # Ohne diesen Ausweg fiel eine solche Quelle durch Kriterium 3 des
+    # Abnahme-Checks (>= 80 % datiert) - zu Recht, denn eine undatierte
+    # Meldung sortiert ans Ende und ist damit faktisch unsichtbar. Der Weg
+    # ueber den Link macht aus "unsichtbar" ein normales Datum, ohne dass
+    # irgendwo eine Ausnahme eingetragen werden muesste.
+    return _datum_aus_url((entry.get("link") or "").strip())
+
+
+# /2026/08/06/, /2026-08-06-, /20260806_ - die drei Formen, in denen ein
+# Datum in einem Pfad vorkommt. Bewusst NICHT sechsstellig (260806): das
+# faende jede Artikelnummer.
+_URL_DATUM = re.compile(
+    r"/(20\d{2})[-/_]?(0[1-9]|1[0-2])[-/_]?(0[1-9]|[12]\d|3[01])(?![\d])")
+
+
+def _datum_aus_url(url: str) -> datetime | None:
+    m = _URL_DATUM.search(url or "")
+    if not m:
+        return None
+    try:
+        return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                        tzinfo=timezone.utc)
+    except ValueError:
+        return None
 
 
 _IMG_IM_TEXT = re.compile(r'<img[^>]+src=["\']([^"\']+)', re.I)
@@ -80,7 +121,8 @@ def _entry_image(entry) -> str:
 
 
 def parse_feed_bytes(raw: bytes, source: Source, region: str,
-                     operator: str | None, origin: str) -> list[Item]:
+                     operator: str | None, origin: str,
+                     max_entries: int | None = None) -> list[Item]:
     """Parse feed content into Items (separated from fetching for testability)."""
     feed = feedparser.parse(raw)
     if feed.bozo and not feed.entries:
@@ -88,7 +130,7 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 
     default_name = source.name or source.url
     items: list[Item] = []
-    for entry in feed.entries[:MAX_ENTRIES_PER_FEED]:
+    for entry in feed.entries[:(max_entries or MAX_ENTRIES_PER_FEED)]:
         title = _strip_html(entry.get("title") or "")
         link = (entry.get("link") or "").strip()
         if not title or not link:
@@ -128,7 +170,10 @@ def collect_rss(source: Source, region: str, operator: str | None,
     for attempt in range(_PARSE_RETRIES + 1):
         resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
         try:
-            return parse_feed_bytes(resp.content, source, region, operator, origin)
+            return parse_feed_bytes(
+                resp.content, source, region, operator, origin,
+                max_entries=int(http_cfg.get("max_entries_per_feed")
+                                or MAX_ENTRIES_PER_FEED))
         except ValueError as exc:
             last_exc = exc
             if attempt < _PARSE_RETRIES:

@@ -63,6 +63,22 @@ class Source:
     timeout_seconds: float | None = None  # per-source HTTP timeout override,
     # for hosts that are simply slow to reach from the CI runner (KT's Korean
     # API ran into the global 20s connect timeout in 3 of 9 runs).
+    # news_sources.yaml only: die Region, in der eine Fachpressequelle
+    # BERICHTET, wenn die Ueberschrift keinen Betreiber nennt.
+    #
+    # Warum es das braucht: `tag_news_regions()` ordnet eine Fachpressemeldung
+    # nur dann einer Region zu, wenn ein Betreibername in der Ueberschrift
+    # steht. Alles andere landet unter "Global". Solange alle 14 Feeds
+    # englischsprachig und weltweit waren, war das richtig. Seit Session 5
+    # stehen dort deutsche, franzoesische, spanische, italienische und
+    # portugiesische Feeds - und Lauf #75 schloss EUROPA MIT NULL bewerteten
+    # Meldungen ab, waehrend "Global" 62 von 92 bekam. Je mehr regionale
+    # Quellen dazukommen, desto leerer wird der Regionsteil.
+    #
+    # Ein Betreibername in der Ueberschrift schlaegt diese Vorgabe weiterhin:
+    # eine Meldung ueber Verizon in einem deutschen Feed gehoert nach
+    # Nordamerika, nicht nach Europa.
+    region: str = ""
     theme: str = ""  # tech_sources.yaml only: the theme key this source feeds
     # ("ki", "geraete", "chips", ...). Operators carry a region instead; a
     # theme source has no region, which is exactly why it lives in its own
@@ -223,8 +239,18 @@ def load_config(root: Path) -> Config:
             exclude_url_pattern=s.get("exclude_url_pattern"),
             timeout_seconds=s.get("timeout_seconds"),
             allow_short_titles=s.get("allow_short_titles", False),
+            region=str(s.get("region", "") or ""),
             herkunft=s.get("herkunft", ""),
             abgenommen=str(s.get("abgenommen", "") or "")))
+    # Eine Vorgabe-Region, die es gar nicht gibt, waere ein eigener
+    # Analysten-Bereich mit einem Tippfehler als Namen. Lieber laut hier als
+    # still im Bericht.
+    for s in news_sources:
+        if s.region and s.region not in region_names:
+            log.warning("news_sources.yaml: %s hat region: %r - diese Region "
+                        "steht nicht in der Watchlist, die Vorgabe wird "
+                        "ignoriert", s.name, s.region)
+            s.region = ""
 
     tech_sources, theme_names = _load_tech_sources(cfg_dir / "tech_sources.yaml")
 

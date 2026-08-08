@@ -229,6 +229,63 @@ themen:
       # Wettbewerber der Telekom. Naeher am deutschen Marktgeschehen als jede
       # internationale Quelle.
       - {name: "VATM", type: rss, url: "https://www.vatm.de/feed/", herkunft: "Breitensuche (Kandidatenpfad)", abgenommen: "2026-08-05"}
+      # Die deutsche Regulierungsbehoerde. Sie hat bis zum 08.08.2026 gefehlt -
+      # ausgerechnet fuer den Markt, in dem die Kollegin arbeitet. Der Grund
+      # war technisch: der Feed traegt WEDER pubDate NOCH dc:date, damit galten
+      # alle 50 Meldungen als undatiert, und undatiert heisst unsichtbar
+      # (Kriterium 3). Seit collect/rss.py das Datum notfalls aus dem LINK
+      # liest (/Pressemitteilungen/DE/2026/20260806_...), sind es 10 von 10.
+      #
+      # BEWUSST der Pressemitteilungs-Feed und NICHT "Aktuelles": letzterer
+      # mischt Pressemitteilungen mit Dauerseiten ("Elektromobilitaet",
+      # "Rufzeichenliste"), die kein Datum haben KOENNEN - 64 % datiert, damit
+      # zu Recht durchgefallen.
+      #
+      # Die BNetzA ist zustaendig fuer Strom, Gas, Post, Bahn UND
+      # Telekommunikation; ein Teil der Meldungen ist deshalb Energiepolitik.
+      # Das ist der Unterschied zum abgelehnten Bundeskartellamt: dort ist
+      # Telekommunikation ein Fall unter vielen, hier ist es eine der
+      # Zustaendigkeiten - und die amtlichen Marktzahlen zum deutschen Markt
+      # gibt es nirgends sonst.
+      - {name: "Bundesnetzagentur", type: rss, url: "https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Pressemitteilungen.xml", herkunft: "Deutschland-Paket", abgenommen: "2026-08-08"}
+      # BREKO vertritt die Glasfaser-Wettbewerber der Telekom. Wo der VATM die
+      # Mobilfunk- und Festnetzwettbewerber allgemein vertritt, geht es hier um
+      # Open Access und Leerrohrzugang - genau die Streitpunkte, die in
+      # Deutschland ueber Netzabdeckung und Vorleistungspreise entscheiden.
+      - {name: "BREKO", type: rss, url: "https://brekoverband.de/feed/", herkunft: "Deutschland-Paket", abgenommen: "2026-08-08"}
+      #
+      # BEWUSST NICHT AUFGENOMMEN, obwohl im Abnahme-Check bestanden - der
+      # prueft Form, nicht Wert (08.08.2026, Deutschland-Paket):
+      #   bundeskartellamt.de/.../rssnewsfeed.xml
+      #       allgemeine Wettbewerbsbehoerde, kein Telekommunikationsressort.
+      #       Im Abruf: Strassenreparatur-Kartell, Kraftstoffpreise,
+      #       Jahrespressekonferenz. Dieselbe Begruendung, aus der in
+      #       Session 4 die spanische CNMC gefallen ist.
+      #   deutsche-glasfaser.de/blog/feed/
+      #       KEIN Newsroom, sondern der Endkunden-Ratgeberblog ("Handy wird
+      #       heiss - so schuetzen Sie Ihr Smartphone").
+      #   rss.golem.de/rss.php
+      #       stand schon in news_sources.yaml als abgelehnt; der Abruf vom
+      #       08.08.2026 bestaetigt es (erste drei Meldungen: Cloudflare,
+      #       OpenAI, ein Rollenspiel-Remake).
+      #
+      # NICHT AUFGENOMMEN, weil im Abnahme-Check DURCHGEFALLEN - hier steht,
+      # woran, damit niemand sie ein zweites Mal vorschlaegt:
+      #   telefonica.de/o2/rss/news?category_id=18|22|33, ?group_id=18
+      #       vier weitere Rubriken der o2-Pressefeeds. Sauber datiert, aber
+      #       ohne eine einzige Meldung im Frischefenster (neueste 15.07.,
+      #       29.06., 24.02., 29.07.). Die drei ergiebigen o2-Rubriken stehen
+      #       laengst in der Watchlist.
+      #   1und1.ag/press/feed
+      #       Drillischs Pressefeed: 50 Meldungen, alle datiert, neueste vom
+      #       23.01.2026. Inhaltlich waere er ideal (sim.de-Tarifaktionen mit
+      #       Preisen), er wird nur nicht mehr gepflegt.
+      #   vatm.de/comments/feed/
+      #       der KOMMENTAR-Feed derselben WordPress-Installation, deren
+      #       Beitragsfeed oben schon steht. Null Meldungen.
+      #   bitkom.org/rss.xml
+      #       Sammelfeed neben dem oben konfigurierten Presse-Feed,
+      #       neueste Meldung 19.06.2026.
       # BEREC ist das Gremium ALLER europaeischen Regulierungsbehoerden - was
       # hier beschlossen wird, setzen die nationalen Behoerden anschliessend um.
       # Frische-Ausnahme belegt: publiziert zu den Plenarterminen, neueste

@@ -26,6 +26,55 @@ BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
               "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 BOT_UA = "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
 
+# Kopfzeilen, die ein echter Chrome mitschickt und ein Skript typischerweise
+# nicht. Manche Bot-Abwehr (Cloudflare "Bot Fight Mode", Akamai) prueft genau
+# das Fehlen der Client-Hints, nicht den User-Agent.
+#
+# GEMESSEN am 08.08.2026 gegen die drei Quellen, die im Lauf vom 07.08. mit
+# 403 ausgefallen waren: ISPreview UK und MediaNama antworten mit diesem
+# Satz - und uebrigens auch ohne ihn - mit 200; ihr Ausfall war also nicht
+# der User-Agent. **Telecompetitor antwortet auf JEDE Variante mit 403** -
+# voller Client-Hint-Satz, nackter Browser-UA, Googlebot-UA, HTTP/2, ohne
+# Referer. Das ist eine Sperre gegen den IP-Bereich, keine gegen den
+# Absender; kein Kopfzeilentrick loest sie. Die Quarantaene mit
+# Bewaehrungsabruf (quellen_register.py) ist dafuer die richtige Antwort und
+# steht schon.
+#
+# Der Satz bleibt trotzdem: er kostet nichts, er ist ehrlich (er behauptet
+# nichts, was der Abruf nicht waere - ein Programm, das eine oeffentliche
+# Seite liest), und er hilft bei der Sorte Abwehr, die nur auf fehlende
+# Client-Hints prueft.
+_CLIENT_HINTS = {
+    "sec-ch-ua": '"Chromium";v="126", "Not.A/Brand";v="24"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"macOS"',
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+# --------------------------------------------------------------------------- #
+# Wurzelzertifikate
+#
+# Der Lauf vom 07.08.2026 meldete fuer die NTIA (US-Fernmeldebehoerde)
+# CERTIFICATE_VERIFY_FAILED. Das ist kein Problem der Quelle - dieselbe URL
+# antwortet aus der Sandbox mit 200 und 126 KB. Es ist der Zertifikatsspeicher
+# des Containers: welche Wurzeln dort liegen, haengt am Basis-Image des
+# Runners und aendert sich, ohne dass jemand etwas an diesem Projekt tut.
+#
+# Deshalb explizit das Buendel von `certifi` statt "was das System gerade hat".
+# Faellt certifi aus (nicht installiert), bleibt es beim Systemspeicher - eine
+# fehlende Abhaengigkeit darf keine Sammelphase kippen.
+def _ca_bundle():
+    try:
+        import certifi
+        return certifi.where()
+    except ImportError:  # pragma: no cover - certifi steht in requirements.txt
+        log.warning("certifi fehlt - benutze den Zertifikatsspeicher des Systems")
+        return True
+
+
 _UA_SWAP_STATUSES = {403, 406}            # try the other UA
 _BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then give up
 _BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
@@ -188,10 +237,19 @@ def fetch(url: str, http_cfg: dict,
     for ua in uas:
         headers = {
             "User-Agent": ua,
-            "Accept": "text/html,application/xhtml+xml,application/xml,*/*",
-            "Accept-Language": "en;q=0.9,de;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                      "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
+            # Deutsch zuerst. Die Quellenliste ist seit Session 5 mehrsprachig,
+            # und eine Seite, die nach Accept-Language ausliefert, gab bisher
+            # ihre englische Fassung heraus - auch bei einer deutschen Quelle.
+            "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
             "Referer": site_root,
         }
+        # Nur mit dem Browser-UA. Client-Hints unter dem Bot-UA waeren ein
+        # Widerspruch in sich: der eine Kopf sagt "ich bin ein Programm", der
+        # andere "ich bin Chrome".
+        if ua != BOT_UA:
+            headers.update(_CLIENT_HINTS)
         if extra_headers:
             headers.update(extra_headers)
         # attempt 0 immediate, then one retry per backoff wait
@@ -205,7 +263,7 @@ def fetch(url: str, http_cfg: dict,
             try:
                 with _gate.slot(url):
                     resp = httpx.get(url, timeout=timeout, headers=headers,
-                                     follow_redirects=True)
+                                     follow_redirects=True, verify=_ca_bundle())
                 if resp.status_code in _UA_SWAP_STATUSES:
                     last_exc = httpx.HTTPStatusError(
                         f"{resp.status_code} with UA '{ua[:24]}...'",

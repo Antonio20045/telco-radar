@@ -344,3 +344,9 @@ http:
                                 # above - images/CSS load, unlike the text fetch)
   user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
   max_links_per_newsroom: 30
+  # Wie viele Eintraege eines RSS-Feeds gelesen werden. Am 07.08.2026 lieferten
+  # die zehn ergiebigsten Quellen exakt 40 Meldungen - also den damaligen
+  # Deckel und nicht ihren Bestand. Zwischen einem Freitags- und einem
+  # Dienstagslauf liegen vier Tage; was eine Fachpresse in dieser Zeit ueber
+  # den Deckel hinaus veroeffentlicht, sieht dieses Projekt nie.
+  max_entries_per_feed: 60

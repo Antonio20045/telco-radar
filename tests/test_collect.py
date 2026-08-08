@@ -320,3 +320,67 @@ def test_parent_site_never_widens_to_a_public_suffix():
     assert _parent_site("www.tim.com.br") == "tim.com.br"
     assert _parent_site("tim.com.br") == ""      # would be com.br
     assert _parent_site("att.com") == ""
+
+
+# ---------------------------------------------------- Datum aus dem Link
+# Ein Feed ohne pubDate ist kein Sonderfall: der RSS-Feed der
+# Bundesnetzagentur - der Regulierer des Marktes, in dem die Kollegin
+# arbeitet - traegt weder pubDate noch dc:date. Alle 50 Meldungen galten
+# damit als undatiert, und undatiert heisst faktisch unsichtbar: sie
+# sortieren ans Ende und der Abnahme-Check lehnt die Quelle zu Recht ab.
+
+def test_datum_kommt_notfalls_aus_dem_link():
+    from telco_radar.collect.rss import _datum_aus_url
+    assert _datum_aus_url(
+        "https://www.bundesnetzagentur.de/SharedDocs/Pressemitteilungen/DE/"
+        "2026/20260806_Agnes.html").date().isoformat() == "2026-08-06"
+    assert _datum_aus_url(
+        "https://example.com/2026/08/06/artikel").date().isoformat() == "2026-08-06"
+    assert _datum_aus_url(
+        "https://example.com/news/2026-08-06-artikel").date().isoformat() == "2026-08-06"
+
+
+def test_artikelnummer_ist_kein_datum():
+    """Sechsstellig gesucht faende das jede Artikelnummer - deshalb nur
+    vierstellige Jahre, und der Tag darf keine weitere Ziffer nach sich
+    ziehen."""
+    from telco_radar.collect.rss import _datum_aus_url
+    assert _datum_aus_url("https://example.com/artikel/260806") is None
+    assert _datum_aus_url("https://example.com/id/20260899.html") is None
+    assert _datum_aus_url("https://example.com/nr/202608061234") is None
+    assert _datum_aus_url("https://example.com/ohne-datum") is None
+
+
+def test_echtes_pubdate_schlaegt_den_link():
+    """Der Link ist der LETZTE Ausweg. Ein Feed mit Datum darf nicht
+    ploetzlich das Datum seiner URL-Struktur tragen."""
+    from telco_radar.collect.rss import parse_feed_bytes
+    from telco_radar.config import Source
+    feed = b"""<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>Mit Datum</title>
+        <link>https://example.com/2020/01/01/alt</link>
+        <pubDate>Thu, 06 Aug 2026 09:00:00 +0000</pubDate></item>
+      <item><title>Ohne Datum</title>
+        <link>https://example.com/2026/08/06/neu</link></item>
+    </channel></rss>"""
+    items = parse_feed_bytes(feed, Source(type="rss", url="https://example.com/feed"),
+                             "global", None, "industry_news")
+    assert items[0].published.date().isoformat() == "2026-08-06"
+    assert items[1].published.date().isoformat() == "2026-08-06"
+
+
+def test_deckel_je_feed_ist_einstellbar():
+    """Am 07.08.2026 lieferten die zehn ergiebigsten Quellen exakt 40
+    Meldungen - also den damaligen Deckel und nicht ihren Bestand."""
+    from telco_radar.collect.rss import parse_feed_bytes, MAX_ENTRIES_PER_FEED
+    from telco_radar.config import Source
+    eintraege = "".join(
+        f"<item><title>Meldung {i}</title>"
+        f"<link>https://example.com/{i}</link></item>" for i in range(80))
+    feed = ('<?xml version="1.0"?><rss version="2.0"><channel>'
+            + eintraege + "</channel></rss>").encode()
+    src = Source(type="rss", url="https://example.com/feed")
+    assert len(parse_feed_bytes(feed, src, "global", None, "industry_news")) \
+        == MAX_ENTRIES_PER_FEED
+    assert len(parse_feed_bytes(feed, src, "global", None, "industry_news",
+                                max_entries=10)) == 10

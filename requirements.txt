@@ -1,4 +1,9 @@
 httpx>=0.27
+# collect/http.py prueft TLS gegen DIESES Buendel statt gegen den
+# Zertifikatsspeicher des Containers. Der wechselt mit dem Basis-Image des
+# Runners, und am 07.08.2026 fiel die NTIA deshalb mit
+# CERTIFICATE_VERIFY_FAILED aus - obwohl dieselbe URL anderswo 200 lieferte.
+certifi>=2024.2
 feedparser>=6.0
 beautifulsoup4>=4.12
 PyYAML>=6.0
