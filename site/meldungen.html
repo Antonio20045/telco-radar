@@ -26,7 +26,9 @@
           <a class="uc active" href="index.html">Marktrecherche</a>
           <a class="uc " href="promo/index.html">Promo Übersicht</a>
         </nav>
-        <form class="gsearch" id="gsearch" role="search" action="meldungen.html" autocomplete="off">
+        
+        
+        <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
                  placeholder="Im Archiv suchen …"
                  aria-label="Marktrecherche durchsuchen">
@@ -37,6 +39,7 @@
             </svg>
           </button>
         </form>
+        
       </div>
     </div>
     
@@ -2101,20 +2104,6 @@
 </div>
 
 
-<div class="card">
-  <div class="card-head"><h2>Im Gesamtarchiv suchen</h2></div>
-  <div class="meldungen-suche">
-    <input type="search" id="suche-input" placeholder="Alle bisherigen Wochen durchsuchen …"
-           aria-label="Alle Berichte und die Differenzierung durchsuchen" autocomplete="off">
-  </div>
-  <div class="suche-filters" role="group" aria-label="Nach Bereich filtern" hidden>
-    <button type="button" class="suche-filter on" data-kind="all">Alle</button>
-    <button type="button" class="suche-filter" data-kind="bericht">Bericht</button>
-    <button type="button" class="suche-filter" data-kind="differenzierung">Differenzierung</button>
-  </div>
-  <p class="suche-count" id="suche-count"></p>
-  <div class="suche-list" id="suche-results"></div>
-</div>
 
     </div>
   </main>

@@ -4,6 +4,32 @@ Der Bericht beschreibt konkrete Angebote und Projekte von Telkos jenseits von
 Netzausbau, Tarifen und Preisen. Er ist keine Vodafone-Empfehlung und spricht
 nicht ueber interne Entscheidungen, sondern ordnet beobachtete Beispiele
 neutral und quellengebunden ein.
+
+**Die Gliederung ist am 08.08.2026 gewechselt, und der Grund ist nicht
+Geschmack.** Bis dahin verlangte der Prompt "einen direkten Bericht aus 4 bis 6
+zusammenhaengenden Absaetzen ... beginne sofort mit konkreten Betreibern,
+Angeboten und Projekten" plus eine Rubrik "Quellenbasis". Herausgekommen ist,
+was so ein Auftrag hergibt: Absaetze von 2000 Zeichen, in denen zwoelf Moves
+mit Semikolon aneinandergereiht sind - und damit exakt derselbe Inhalt, den die
+Differenzierungs-Seite darueber schon als Karten zeigt, nur ohne Bild und ohne
+Gliederung. Ein Bericht, der die Liste unter ihm nacherzaehlt, ist kein
+Bericht. Antonio: *"nicht einfach so reinpasten, dieser eine lange Bereich ...
+das muss intelligent sein."*
+
+Der Redakteur schreibt jetzt das, was die Karten NICHT zeigen koennen, und er
+schreibt es in drei Teilen, die die Seite an drei verschiedenen Stellen
+einsetzt (`report/differenzierung_bericht.zerlegen`):
+
+    ## Das Bild      die Lage in wenigen Saetzen - steht im Seitenkopf.
+    ## Muster        die wiederkehrenden Muster - steht neben dem gerechneten
+                     Marktbild.
+    ## Einordnung    je Hebel ein Absatz unter einer H3 mit dem Hebel-Namen -
+                     steht direkt ueber den Beispielen dieses Hebels.
+
+`validate_briefing`, `build_digest` und `report/differenzierung_bericht.py`
+haengen an derselben Gliederung. Wer eine Ueberschrift aendert, aendert alle
+drei - sonst faellt der Bericht still auf den Notfall-Digest zurueck (dieselbe
+Kopplung wie beim Wochen-Editor, CLAUDE.md §6).
 """
 from __future__ import annotations
 
@@ -44,42 +70,56 @@ noetig sind. Schreibe anschaulich: „bietet Kunden“, „buendelt“, „integ
 Verwende nicht den abstrakten Begriff „Sammlung“ und nenne keine Anzahl von
 Moves, Eintraegen, Kategorien oder Quellen als Selbstzweck.
 
+WICHTIG: Jedes gelieferte Beispiel steht auf der Seite bereits als eigene Karte
+mit Betreiber, Beschreibung, Quelle und Bild. Zaehle die Beispiele deshalb NICHT
+noch einmal auf. Dein Text beantwortet, was eine Kartenliste nicht beantworten
+kann: Was faellt ueber die Beispiele hinweg auf? Was tun mehrere Betreiber
+gleichzeitig? Wo unterscheiden sich Regionen? Was ist neu gegenueber dem, was
+schon laenger laeuft?
+
 Antworte ausschliesslich mit sauberem Markdown, ohne H1 und ohne Vorwort.
-Verwende exakt diese H2-Ueberschriften:
+Verwende exakt diese drei H2-Ueberschriften, in dieser Reihenfolge:
 
-## Konkrete Entwicklungen
-Schreibe einen direkten Bericht aus 4 bis 6 zusammenhaengenden Absaetzen.
-Beginne sofort mit konkreten Betreibern, Angeboten und Projekten aus den Daten.
-Erklaere nicht, was „Differenzierung“ bedeutet, und schreibe keine allgemeine
-Einleitung ueber Marktverschiebungen oder Kundenerlebnisse. Jeder Absatz soll
-mehrere Artikel aus einem Themenfeld zusammenfassen: Was bietet welcher
-Betreiber konkret an, in welcher Region und mit welchem Partner oder Dienst?
-Nenne die Betreiber beim Namen und verknuepfe jede konkrete Aussage direkt mit
-der passenden Quelle. Die Absaetze duerfen mit einem kurzen fettgedruckten
-Themenwort beginnen, sollen aber keine H3-Ueberschriften pro Betreiber und
-keine Bullet-Liste sein.
+## Das Bild
+Drei bis fuenf Saetze, ein einziger Absatz: Was zeigt der Bestand insgesamt?
+Nenne dabei zwei bis drei Betreiber als Beleg mit Quellenlink, aber schreibe
+keine Liste. Beginne nicht mit einer Definition von „Differenzierung“.
 
-## Quellenbasis
-Liste die wichtigsten verwendeten Beispiele als
-[Betreiber – Kurzbezeichnung](URL), mit Region und, falls vorhanden, Datum.
+## Muster
+Zwei bis vier Absaetze. Jeder beginnt mit einem kurzen fettgedruckten
+Musterwort und beschreibt dann in zwei bis drei Saetzen EIN wiederkehrendes
+Muster - etwas, das mehrere Betreiber unabhaengig voneinander tun. Belege jedes
+Muster mit mindestens zwei Betreibern und ihren Quellenlinks. Ein Muster, das
+nur ein einziger Betreiber zeigt, ist kein Muster - lass es weg.
+
+## Einordnung
+Je Hebel eine H3-Ueberschrift mit GENAU dem Hebel-Namen aus dem Feld „thema“,
+darunter zwei bis drei Saetze: Was ist an diesem Hebel gerade charakteristisch,
+und wer treibt ihn? Nimm nur Hebel auf, zu denen die Daten mehr hergeben als
+ein einzelnes Beispiel. Ein Hebel, zu dem du nichts Eigenstaendiges sagen
+kannst, wird ausgelassen - nicht mit einem Satz gefuellt.
 
 Regeln:
 - Jede konkrete Aussage ueber einen Betreiber muss einen Link auf eine
   exakte URL aus den gelieferten Daten tragen.
 - Keine Vodafone-Empfehlungen, keine Handlungsaufforderungen, kein
   „Fuer Vodafone“, kein „Vodafone sollte“ und kein „Vodafone koennte“.
-- Der Bericht soll die gelieferten Artikel konkret zusammenfassen, nicht das
-  Thema erklaeren und keine abstrakten Muster ableiten.
-- Keine H3-Ueberschriften und keine Aufzaehlung von Einzelartikeln im Bericht.
-- Bulletpoints sind nur in der Quellenbasis erlaubt.
-- Maximal etwa 1.200 Woerter.
+- Keine Aufzaehlung der Einzelbeispiele, keine Bulletpoints, keine
+  Quellenliste am Ende - die Seite zeigt die Quellen bereits.
+- H3 nur unter „## Einordnung“, und dort nur mit einem Hebel-Namen.
+- Maximal etwa 700 Woerter. Kuerzer ist besser.
 """
 
 
 _REQUIRED_HEADINGS = (
-    "## konkrete entwicklungen",
-    "## quellenbasis",
+    "## das bild",
+    "## muster",
+    "## einordnung",
 )
+# Ab hier ist ein Absatz keine Prosa mehr, sondern eine Aufzaehlung mit
+# Semikolons. Gemessen ohne die Markdown-Links, sonst schlaegt schon ein
+# normaler Absatz mit drei Belegen an.
+_MAX_ABSATZ_ZEICHEN = 1200
 _FORBIDDEN_EDITORIAL_PHRASES = (
     "fuer vodafone", "für vodafone", "vodafone sollte", "vodafone könnte",
     "vodafone koennte", "vodafone muss", "empfehlung", "handlungsaufforderung",
@@ -111,6 +151,18 @@ def validate_briefing(markdown: str) -> None:
     if any(phrase in plain for phrase in _FORBIDDEN_EDITORIAL_PHRASES):
         raise DifferentiationBriefingError(
             "Differenzierungsbericht enthaelt eine Vodafone-Empfehlung")
+    # Der Rueckfall in die Aufzaehlung ist der wahrscheinlichste Fehlgriff:
+    # das Modell bekommt 71 Beispiele geliefert und die alte Fassung hat sie
+    # brav alle in einen Absatz gehaengt (gemessen am Bericht vom 07.08.2026:
+    # 2 100 Zeichen in einem einzigen Absatz, zwoelf Moves mit Semikolon
+    # getrennt). Ein Absatz dieser Laenge ist auf der Seite kein Text mehr,
+    # sondern eine Wand - und genau der Zustand, den diese Gliederung ersetzt.
+    zu_lang = [a for a in re.split(r"\n\s*\n", _without_links(markdown))
+               if len(a.strip()) > _MAX_ABSATZ_ZEICHEN]
+    if zu_lang:
+        raise DifferentiationBriefingError(
+            f"Differenzierungsbericht hat {len(zu_lang)} Absatz/Absaetze ueber "
+            f"{_MAX_ABSATZ_ZEICHEN} Zeichen - vermutlich wieder eine Aufzaehlung")
 
 
 def _payload(entries: list[dict], theme_labels: dict[str, str]) -> str:
@@ -156,55 +208,130 @@ def _date_suffix(entry: dict) -> str:
     return " · " + " · ".join(bits) if bits else ""
 
 
+def _anbieter(entry: dict) -> list[str]:
+    """Die einzelnen Betreiber eines Beispiels - ein Joint Venture von fuenf
+    Konzernen steht als ein Feld mit Kommata da."""
+    return [t.strip() for t in str(entry.get("operator") or "").split(",")
+            if t.strip()]
+
+
+def _aufzaehlung(namen: list[str]) -> str:
+    if not namen:
+        return ""
+    if len(namen) == 1:
+        return namen[0]
+    return ", ".join(namen[:-1]) + " und " + namen[-1]
+
+
 def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
-    """Build a concrete article summary without an LLM."""
+    """Der Bericht ohne LLM - in derselben Gliederung wie die KI-Redaktion.
+
+    Er beschreibt, was sich aus dem Bestand RECHNEN laesst (wie viele
+    Beispiele, welcher Hebel wie stark, wer mehrere Hebel bespielt) und
+    belegt jede Aussage mit Quellen. Was er nicht kann, behauptet er nicht.
+
+    Er muss dieselbe Gliederung schreiben wie der Prompt, weil die Seite ihn
+    genauso zerlegt (report/differenzierung_bericht.py). Faellt der Redakteur
+    aus, aendert sich der Ton der Seite, nicht ihr Aufbau.
+    """
     entries = [e for e in entries if e.get("url") and e.get("what")]
     ordered = sorted(entries, key=lambda e: (e.get("last_verified") or "",
                                              e.get("first_seen") or ""),
                      reverse=True)
 
-    def move_sentence(entry: dict) -> str:
-        operator = entry.get("operator") or "Der Betreiber"
-        what = re.sub(r"^\s*" + re.escape(operator)
-                      + r"(?:\s*\([^)]*\))?\s*:?\s*", "",
-                      str(entry.get("what") or ""), flags=re.IGNORECASE)
-        if not what:
-            what = str(entry.get("what") or "")
-        if what[:1].islower():
-            text = f"{operator} {what}"
-        else:
-            text = f"{operator}: {what}"
-        return f"{text.rstrip('.')} {_source_link(entry)}"
-
-    def paragraph(lead: str, items: list[dict]) -> str:
-        if not items:
-            return ""
-        return f"**{lead}** " + "; ".join(move_sentence(e) for e in items) + "."
-
-    groups = (
-        ("KI und digitale Dienste", ("ki",)),
-        ("Streaming, Cloud und Gaming", ("entertainment", "cloud", "gaming")),
-        ("Garantien, Schutz und Gesundheit", ("garantie", "security", "health")),
-        ("Geräteprogramme, Vorteile und Smart Home", ("geraete", "loyalty", "smarthome")),
-        ("Fintech und Super-Apps", ("fintech", "superapp")),
-    )
-    lines = ["## Konkrete Entwicklungen", ""]
-    used = set()
-    for lead, themes in groups:
-        items = [e for e in ordered if e.get("theme") in themes]
-        used.update(id(e) for e in items)
-        text = paragraph(lead, items)
-        if text:
-            lines.extend([text, ""])
-    remaining = [e for e in ordered if id(e) not in used]
-    if remaining:
-        lines.extend([paragraph("Weitere konkrete Angebote", remaining), ""])
     if not ordered:
-        lines.append("Im aktuellen Beobachtungszeitraum liegt noch kein belegtes Beispiel vor.")
+        return ("## Das Bild\n\n"
+                "Im aktuellen Beobachtungszeitraum liegt noch kein belegtes "
+                "Beispiel vor.\n\n"
+                "## Muster\n\nNoch kein Muster belegbar.\n\n"
+                "## Einordnung\n\n")
 
-    lines += ["## Quellenbasis", ""]
-    for entry in ordered[:12]:
-        lines.append(f"- {_source_link(entry)}{_date_suffix(entry)}")
-    if not ordered:
-        lines.append("- Noch keine belegte Quelle vorhanden.")
-    return "\n".join(lines).strip() + "\n"
+    # Je Hebel: die Beispiele, die Anbieter, und ein Beleg je Anbieter.
+    je_hebel: dict[str, list[dict]] = {}
+    for e in ordered:
+        je_hebel.setdefault(e.get("theme") or "", []).append(e)
+    nach_groesse = sorted(je_hebel.items(),
+                          key=lambda p: (len(p[1]), p[0]), reverse=True)
+
+    alle_anbieter: dict[str, set] = {}
+    for e in ordered:
+        for name in _anbieter(e):
+            alle_anbieter.setdefault(name, set()).add(e.get("theme") or "")
+    breit = sorted(alle_anbieter.items(),
+                   key=lambda p: (len(p[1]), p[0]), reverse=True)
+
+    def label(key: str) -> str:
+        return theme_labels.get(key, key or "Sonstiges")
+
+    def belege(items: list[dict], anzahl: int = 2) -> str:
+        """Bis zu `anzahl` Quellenlinks verschiedener Anbieter."""
+        gesehen: set[str] = set()
+        links = []
+        for e in items:
+            name = (_anbieter(e) or ["?"])[0]
+            if name in gesehen:
+                continue
+            gesehen.add(name)
+            links.append(_source_link(e))
+            if len(links) >= anzahl:
+                break
+        return ", ".join(links)
+
+    zeilen: list[str] = ["## Das Bild", ""]
+    fuehrend = nach_groesse[0]
+    regionen = {str(e.get("region") or "").strip() for e in ordered}
+    regionen.discard("")
+    zeilen.append(
+        f"Der Bestand umfasst {len(ordered)} belegte Beispiele von "
+        f"{len(alle_anbieter)} Anbietern aus {len(regionen)} Regionen. Am "
+        f"stärksten bespielt ist {label(fuehrend[0])} mit "
+        f"{len(fuehrend[1])} Beispielen, gefolgt von "
+        f"{_aufzaehlung([label(k) for k, _ in nach_groesse[1:3]])}. "
+        f"Zuletzt hinzugekommen sind {belege(ordered, 3)}.")
+    zeilen.append("")
+
+    zeilen += ["## Muster", ""]
+    gefunden = False
+    for key, items in nach_groesse[:3]:
+        anbieter = {n for e in items for n in _anbieter(e)}
+        if len(anbieter) < 2:
+            # Ein Hebel, den nur ein Anbieter zieht, ist kein Muster.
+            continue
+        gefunden = True
+        zeilen.append(
+            f"**{label(key)}** {len(items)} Beispiele von {len(anbieter)} "
+            f"Anbietern, darunter {belege(items, 2)}.")
+        zeilen.append("")
+    if breit and len(breit[0][1]) > 1:
+        name, hebel = breit[0]
+        gefunden = True
+        zeilen.append(
+            f"**Mehrere Hebel gleichzeitig** {name} taucht in "
+            f"{len(hebel)} verschiedenen Hebeln auf: "
+            f"{_aufzaehlung([label(k) for k in sorted(hebel)])}.")
+        zeilen.append("")
+    if not gefunden:
+        zeilen += ["Noch zeigt kein Hebel mehr als einen Anbieter - ein "
+                   "Muster laesst sich daraus nicht belegen.", ""]
+
+    zeilen += ["## Einordnung", ""]
+    for key, items in nach_groesse:
+        if len(items) < 2:
+            # Ein einzelnes Beispiel steht als Karte, es braucht keinen
+            # Einordnungssatz, der es bloss wiederholt.
+            continue
+        anbieter = sorted({n for e in items for n in _anbieter(e)})
+        genannt = anbieter[:4]
+        if len(anbieter) > 4:
+            # Als eigenes Glied der Aufzaehlung, nicht angehaengt - sonst
+            # steht dort "A, B und C und 3 weiteren".
+            genannt = genannt + [f"{len(anbieter) - 4} weiteren"]
+        zeilen.append(f"### {label(key)}")
+        zeilen.append("")
+        zeilen.append(
+            f"{len(items)} belegte Beispiele, getragen von "
+            f"{_aufzaehlung(genannt)}. "
+            f"Zuletzt gesehen: {belege(items, 1)}.")
+        zeilen.append("")
+
+    return "\n".join(zeilen).strip() + "\n"

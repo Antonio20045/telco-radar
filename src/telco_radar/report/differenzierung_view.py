@@ -10,12 +10,31 @@ der Welt."
 
 Ein Radar zeigt Beispiele, keinen Essay. Daraus folgt die Gliederung:
 
+    MARKTBILD           die Auswertung ueber den ganzen Bestand: welcher Hebel
+                        wird wie oft gezogen, wer ist am breitesten
+                        aufgestellt, aus welchen Regionen kommen die
+                        Beispiele. Das ist die Antwort auf "was machen die
+                        anderen", bevor man 71 Einzelbeispiele liest.
     NEU AUF DEM RADAR   die juengsten Funde, prominent - das ist der
                         Nachrichtenwert der Seite. Gibt es keine, stehen
                         stattdessen die zuletzt nachgeprueften.
-    BIBLIOTHEK          je Hebel eine Rubrik, darunter die Beispiele als
-                        gleich gebaute Karten. Ein Hebel ohne Beispiele
-                        erscheint NICHT - ein leerer Kasten sagt nichts.
+    BIBLIOTHEK          je Hebel eine Rubrik, darunter die Beispiele
+                        GEWICHTET: ein Aufmacher, ein paar Karten, der Rest
+                        als Zeilen. Ein Hebel ohne Beispiele erscheint NICHT -
+                        ein leerer Kasten sagt nichts.
+
+**Warum es das Marktbild und die Gewichtung gibt.** Bis zum 08.08.2026 war die
+Seite eine 9060 px hohe Wand aus 77 gleich grossen Textkaertchen ohne ein
+einziges Bild. Antonio: *"Es ist total unuebersichtlich, sich das anzugucken.
+Keine Bilder, es ist schwer zu verstehen ... damit nicht so viel kognitive
+Arbeit darin besteht, erstmal zu verstehen, was die Differenzierung ist."*
+Gleich grosse Kaertchen sind eine Liste, keine Analyse: sie behaupten, dass
+alle 77 Beispiele gleich wichtig sind, und ueberlassen das Sortieren dem Leser.
+Deshalb steht die Auswertung jetzt VOR den Beispielen, jeder Hebel sagt in
+EINEM Satz, was er ueberhaupt bedeutet (`blurb` aus `report/differentiation.py`
+- dieselbe Quelle wie die Hebel-Farbe, damit die Erklaerung nicht an zwei
+Orten auseinanderlaufen kann), und innerhalb eines Hebels traegt das juengste
+belegte Beispiel den Abschnitt.
 
 **Der Grund, warum es dieses Modul gibt: die Seite las bis zum 08.08.2026 nur
 EINEN der zwei vorhandenen Speicher.**
@@ -52,15 +71,33 @@ from urllib.parse import urlsplit
 
 from ..models import normalize_url
 from ..textwerkzeug import ohne_vodafone_rat
+from .differentiation import DIFF_THEMES
 
 # Wie lange ein Eintrag als "neu" gilt, gerechnet ab dem Stand der Ausgabe.
 # Zehn Tage, weil die Pipeline zweimal die Woche laeuft: ein Fund bleibt so
 # ueber mindestens zwei Ausgaben sichtbar und verschwindet nicht, bevor ihn
 # jemand gesehen hat.
 NEU_TAGE = 10
-# Wie viele Karten oben stehen. Sechs fuellen bei 1440 px zwei Reihen zu
-# dritt - mehr waere wieder eine Kachelwand.
-MAX_NEU = 6
+# Wie viele Karten oben stehen. Drei, seit sie ein Bild tragen und in voller
+# Breite stehen - sechs Bildkarten waeren wieder eine Kachelwand, nur bunter.
+MAX_NEU = 3
+# Die Gewichtung innerhalb eines Hebels: ein Aufmacher, dann GENAU EINE Reihe
+# Karten, dann Zeilen. Drei Karten sind bei 1440 px diese eine Reihe. Mit
+# fuenf war die Seite 15 100 px hoch - Bilder machen eine Karte dreimal so
+# hoch wie das Textkaertchen von vorher, also muessen es weniger Karten
+# werden, nicht gleich viele mit Bild.
+KARTEN_JE_HEBEL = 3
+# Was am Stueck sichtbar bleibt, bevor der Rest in den Aufklapper geht. Der
+# groesste Hebel hatte am 08.08.2026 17 Beispiele - als 17 Kaertchen war er
+# allein zwei Bildschirme hoch.
+ZEILEN_OFFEN = 5
+
+# Was ein Hebel ueberhaupt bedeutet, in einem Satz. Quelle ist bewusst
+# `DIFF_THEMES` (report/differentiation.py) - dort steht schon die Farbe des
+# Hebels, und eine Erklaerung, die an einem zweiten Ort gepflegt wird, sagt
+# nach dem dritten Hebel etwas anderes als die Klassifikation.
+HEBEL_ERKLAERUNG = {t["key"]: " ".join(str(t.get("blurb") or "").split())
+                    for t in DIFF_THEMES}
 
 
 # Woerter, nach denen ein Punkt KEIN Satzende ist. Ohne diese Liste endete
@@ -176,41 +213,167 @@ def _juengste_zuerst(e: dict) -> tuple:
             e.get("operator") or "")
 
 
+def kachelwort(e: dict) -> str:
+    """Die Aufschrift der Schriftkachel, wenn ein Beispiel kein Bild hat.
+
+    Dieselbe Regel wie auf der Promo-Uebersicht (CLAUDE.md §5): jede Karte
+    traegt ein Motiv, und die Schriftkachel ist die zweite gueltige Form -
+    nicht der Notnagel fuer ein fehlendes Bild. Sie zeigt den Absender, denn
+    das ist die Information, nach der auf dieser Seite verglichen wird
+    ("machen das nur die Amerikaner?").
+    """
+    name = _text(e.get("operator"))
+    if not name:
+        return _text(e.get("source")) or "Beispiel"
+    # Mehrfach-Absender ("Deutsche Telekom, e&, Singtel Group, SK Telecom,
+    # SoftBank") sind auf einer Kachel nicht lesbar - dann steht dort der
+    # erste und die Zahl der uebrigen.
+    teile = [t.strip() for t in name.split(",") if t.strip()]
+    if len(teile) > 1:
+        return f"{teile[0]} +{len(teile) - 1}"
+    return name
+
+
+def _operatoren(e: dict) -> list[str]:
+    """Die einzelnen Absender eines Beispiels. Ein Joint Venture von fuenf
+    Konzernen ist fuenf Betreibern zuzurechnen, nicht einem Namen mit
+    Kommata - sonst zaehlt das Marktbild jede Allianz als eigenen Anbieter."""
+    return [t.strip() for t in _text(e.get("operator")).split(",") if t.strip()]
+
+
+def _balken(zaehler: dict[str, int]) -> list[dict]:
+    """Gezaehlte Werte als Balken, relativ zum groessten. Reine Anzeige-
+    Rechnung; die Breite steht als Prozentzahl in der Vorlage."""
+    hoechste = max(zaehler.values(), default=0)
+    return [{"name": name, "n": n,
+             "w": round(100 * n / hoechste) if hoechste else 0}
+            for name, n in sorted(zaehler.items(),
+                                  key=lambda p: (-p[1], p[0]))]
+
+
+def marktbild(bestand: list[dict], hebel: list[dict],
+              max_anbieter: int = 8) -> dict:
+    """Die Auswertung ueber den GANZEN Bestand - was die Beispiele zusammen
+    sagen, bevor man sie einzeln liest.
+
+    Drei Fragen, drei Zahlenreihen:
+
+      Welcher Hebel?   wie oft ein Feld ueberhaupt bespielt wird.
+      Wer?             welcher Anbieter am breitesten aufgestellt ist. Gezaehlt
+                       wird nach BEISPIELEN, gereiht nach der Zahl der
+                       verschiedenen Hebel - wer denselben Hebel achtmal zieht,
+                       hat eine Kampagne, wer vier verschiedene zieht, eine
+                       Strategie.
+      Wo?              aus welchen Regionen die Beispiele stammen.
+    """
+    hebel_zaehler = {h["label"]: h["n"] for h in hebel}
+    regionen: dict[str, int] = {}
+    je_anbieter: dict[str, dict] = {}
+    for e in bestand:
+        region = _text(e.get("region"))
+        if region:
+            regionen[region] = regionen.get(region, 0) + 1
+        label = _text(e.get("hebel_label"))
+        for name in _operatoren(e):
+            eintrag = je_anbieter.setdefault(name, {"name": name, "n": 0,
+                                                    "hebel": set()})
+            eintrag["n"] += 1
+            if label:
+                eintrag["hebel"].add(label)
+    aktivste = sorted(je_anbieter.values(),
+                      key=lambda a: (len(a["hebel"]), a["n"], a["name"]),
+                      reverse=True)[:max_anbieter]
+    return {
+        "gesamt": len(bestand),
+        "n_anbieter": len(je_anbieter),
+        "n_regionen": len(regionen),
+        "n_hebel": len(hebel),
+        "n_neu": sum(1 for e in bestand if e.get("neu")),
+        "n_bild": sum(1 for e in bestand if e.get("image")),
+        "hebel_balken": _balken(hebel_zaehler),
+        "regionen": _balken(regionen),
+        "aktivste": [{"name": a["name"], "n": a["n"],
+                      "hebel": sorted(a["hebel"]),
+                      "n_hebel": len(a["hebel"])} for a in aktivste],
+    }
+
+
+def _gewichten(eintraege: list[dict], schon_oben: set | None = None) -> dict:
+    """Ein Hebel-Abschnitt in drei Gewichtsstufen.
+
+    Der Aufmacher ist das juengste Beispiel MIT Bild - und **nur** ein
+    Beispiel mit Bild kann Aufmacher sein. Ohne Bild bekommt der Hebel
+    keinen: eine Schriftkachel ueber 46 % Breite fuellt die groesste Position
+    des Abschnitts nicht, sie laesst daneben eine halbe Spalte leer, und
+    genau dieser Eindruck ("da fehlen bei einigen die Bilder, das wirkt so
+    richtig scheisse", 08.08.2026 zur Promo Uebersicht) soll nicht
+    wiederkommen. Dann stehen alle Beispiele gleichrangig im Kartenraster -
+    eine Stufe weniger ist ehrlicher als eine leere Stufe.
+
+    `schon_oben` sind die URLs der Radar-Karten. Ein Beispiel, das oben schon
+    gross steht, fuehrt seinen Hebel nicht auch noch an - sonst steht dieselbe
+    Karte zweimal auf einem Bildschirm. Es faellt deshalb nicht weg (die
+    Rubrikzahl meint alle Beispiele des Hebels), es steht nur eine Stufe
+    tiefer.
+    """
+    if not eintraege:
+        return {"lead": None, "karten": [], "zeilen": [], "zeilen_offen": [],
+                "zeilen_rest": []}
+    schon_oben = schon_oben or set()
+    lead = next((e for e in eintraege
+                 if e.get("image") and e.get("url") not in schon_oben), None)
+    rest = [e for e in eintraege if e is not lead]
+    # Ohne Aufmacher ruecken die Karten eine Reihe hoch: der Abschnitt hat
+    # dann sechs statt fuenf Karten, nicht eine Luecke.
+    deckel = KARTEN_JE_HEBEL if lead else KARTEN_JE_HEBEL + 1
+    karten = rest[:deckel]
+    zeilen = rest[deckel:]
+    return {"lead": lead, "karten": karten, "zeilen": zeilen,
+            "zeilen_offen": zeilen[:ZEILEN_OFFEN],
+            "zeilen_rest": zeilen[ZEILEN_OFFEN:]}
+
+
 def aufbereiten(db_entries, store_entries, themes, stichtag: str,
-                farben: dict | None = None) -> dict:
-    """Der fertige Seitenzustand: Hebel-Rubriken plus die Karten oben.
+                farben: dict | None = None, einordnung: dict | None = None,
+                bilder: dict | None = None,
+                vorhandene_bilder: set | None = None) -> dict:
+    """Der fertige Seitenzustand: Marktbild, Radar-Karten und Hebel-Rubriken.
 
     `themes` ist die Hebel-Liste (key, label) aus analyze/category_sweep -
     sie gibt die Reihenfolge der Rubriken vor. `farben` bildet Hebel auf die
     Akzentfarbe ab; sie erscheint nur als schmale Linie, nie als Flaeche
-    (CLAUDE.md §5).
+    (CLAUDE.md §5). `einordnung` bildet Hebel auf den Absatz des
+    Differenzierungsberichts ab, der zu ihm gehoert - so steht der Bericht
+    dort, wo seine Beispiele stehen, statt als ein langer Block am Seitenende
+    (siehe report/differenzierung_bericht.py).
+
+    `bilder` ist der Bildindex aus `diff_bilder.lade_index()`. Er muss HIER
+    hinein und darf nicht nachtraeglich ueber den Bestand gestempelt werden:
+    `merge()` legt neue Dicts an, und die Gewichtung entscheidet anhand des
+    Bildes, welches Beispiel einen Hebel anfuehrt. Genau daran ist der erste
+    Anlauf gescheitert - die Bilder standen auf den Karten, aber KEIN
+    Abschnitt hatte einen Aufmacher, weil zum Zeitpunkt der Gewichtung noch
+    kein Eintrag ein Bild trug. Beschafft werden sie in der Pipeline; dieses
+    Modul fasst nie das Netz an.
     """
     farben = farben or {}
+    einordnung = einordnung or {}
     grenze = _neuheitsgrenze(stichtag)
     bestand = merge(db_entries, store_entries)
+    if bilder:
+        from . import diff_bilder
+        diff_bilder.verteile(bestand, bilder, vorhandene_bilder)
     for e in bestand:
         e["neu"] = bool(grenze and (e.get("first_seen") or "") > grenze)
+        e["kachelwort"] = kachelwort(e)
 
     label_map = dict(themes)
-    hebel = []
-    for key, label in themes:
-        eintraege = sorted((e for e in bestand if e.get("theme") == key),
-                           key=_juengste_zuerst, reverse=True)
-        if not eintraege:
-            # Ein Hebel ohne Beispiel steht nicht auf der Seite. "Noch keine
-            # bestaetigten Beispiele" war zwoelfmal derselbe leere Kasten.
-            continue
-        for e in eintraege:
-            e["hebel_label"] = label
-            e["farbe"] = farben.get(key, "")
-        hebel.append({"key": key, "label": label, "n": len(eintraege),
-                      "farbe": farben.get(key, ""), "eintraege": eintraege})
-
-    # Hebel, die es (noch) nicht in die Liste geschafft haben, tragen trotzdem
-    # ihr Etikett - die Karten oben mischen alle Hebel und nennen ihren.
+    # Erst die Etiketten, dann die Radar-Karten, dann die Gewichtung: die
+    # Gewichtung eines Hebels muss wissen, was oben schon gross steht.
     for e in bestand:
-        e.setdefault("hebel_label", label_map.get(e.get("theme"), ""))
-        e.setdefault("farbe", farben.get(e.get("theme"), ""))
+        key = e.get("theme")
+        e["hebel_label"] = label_map.get(key, "")
+        e["farbe"] = farben.get(key, "")
 
     neu = sorted((e for e in bestand if e["neu"]),
                  key=_juengste_zuerst, reverse=True)[:MAX_NEU]
@@ -221,7 +384,26 @@ def aufbereiten(db_entries, store_entries, themes, stichtag: str,
         neu = sorted(bestand, key=lambda e: (e.get("last_verified") or "",
                                              e.get("first_seen") or ""),
                      reverse=True)[:MAX_NEU]
+    oben = {e.get("url") for e in neu}
+
+    hebel = []
+    for key, label in themes:
+        eintraege = sorted((e for e in bestand if e.get("theme") == key),
+                           key=_juengste_zuerst, reverse=True)
+        if not eintraege:
+            # Ein Hebel ohne Beispiel steht nicht auf der Seite. "Noch keine
+            # bestaetigten Beispiele" war zwoelfmal derselbe leere Kasten.
+            continue
+        hebel.append({"key": key, "label": label, "n": len(eintraege),
+                      "farbe": farben.get(key, ""), "eintraege": eintraege,
+                      "erklaerung": ohne_vodafone_rat(
+                          HEBEL_ERKLAERUNG.get(key, "")),
+                      "einordnung": ohne_vodafone_rat(
+                          _text(einordnung.get(key))),
+                      "n_bild": sum(1 for e in eintraege if e.get("image")),
+                      **_gewichten(eintraege, oben)})
 
     return {"bestand": bestand, "hebel": hebel, "neu": neu,
             "neu_ist_rueckfall": rueckfall, "gesamt": len(bestand),
-            "n_hebel": len(hebel)}
+            "n_hebel": len(hebel),
+            "marktbild": marktbild(bestand, hebel)}

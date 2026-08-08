@@ -22,8 +22,22 @@ Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
      Schriftkachel - nie einen leeren Kasten (seit 08.08.2026 alle Karten,
      vorher nur die grossen; siehe Kriterium 8c im Code).
 
-Kriterium 1, 6 und 7 brauchen einen echten Browser - Chromium liegt unter
+Dazu die zwei Kriterien der Runde vom 08.08.2026 (Suche und Differenzierung):
+
+  9. Die Differenzierungs-Seite zeigt echte Bilder, und JEDE Karte traegt ein
+     Motiv (Bild oder Schriftkachel).
+ 10. Die Suchseite liefert zu einem echten Begriff Treffer, einen Verlauf und
+     bebilderte Karten - gemessen im Browser, weil die Seite ihren Index per
+     fetch() laedt.
+
+Kriterium 1, 6, 7 und 10 brauchen einen echten Browser - Chromium liegt unter
 /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
+
+**Gemessen wird ueber einen lokalen HTTP-Server, nicht ueber file://.** Der
+Grund ist Kriterium 10: `fetch('search_index.json')` ist unter file:// von der
+Same-Origin-Regel gesperrt, die Suchseite bliebe leer, und die Pruefung wuerde
+einen Fehler messen, den es in Wirklichkeit nicht gibt. Der Server bindet auf
+127.0.0.1 und braucht kein Netz.
 
     python scripts/pruefe_portal.py                 # rendert nach /tmp und prueft
     python scripts/pruefe_portal.py --site site     # prueft ein fertiges site/
@@ -34,7 +48,11 @@ import argparse
 import glob
 import json
 import re
+import socket
+import subprocess
 import sys
+import time
+from contextlib import contextmanager
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
@@ -63,6 +81,15 @@ _MIND_BILDQUOTE = 57
 # (promo_bilder.py); die Schwelle bleibt, weil sie dasselbe misst: kommt das,
 # was beschafft wurde, auch auf der Seite an?
 _MIND_PROMO_BILDER = 10
+# Abnahme der Differenzierungs-Seite. Gemessen am Bestand vom 08.08.2026
+# bekommen 35 von 71 Beispielen ein Bild (5 geerbt aus dem Wochenbericht, 30
+# per og:image) - die Schwelle liegt bewusst darunter, weil die Ausbeute an
+# fremden Seiten haengt und nicht am Code. Der harte Teil ist die zweite
+# Zahl: KEINE Karte ohne Motiv.
+_MIND_DIFF_BILDQUOTE = 25
+# Abnahme der Suchseite: so viele Treffer muss ein Begriff bringen, der im
+# Archiv nachweislich vorkommt (gewaehlt wird der haeufigste Absender).
+_MIND_DOSSIER_TREFFER = 5
 _CHROMIUM = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
 
 
@@ -95,8 +122,51 @@ def _schlagzeilen(soup: BeautifulSoup) -> list[str]:
     return [e.get_text(" ", strip=True) for e in soup.select(".szl")]
 
 
+@contextmanager
+def _server(site: Path):
+    """Ein lokaler HTTP-Server ueber dem gerenderten `site/`.
+
+    Ohne ihn misst Kriterium 10 einen Fehler, den es nicht gibt: die Suchseite
+    laedt ihren Index per `fetch()`, und unter file:// verbietet die
+    Same-Origin-Regel das. Bindet auf 127.0.0.1, braucht kein Netz.
+    """
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "http.server", str(port)], cwd=site,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        time.sleep(1.2)
+        yield f"http://127.0.0.1:{port}"
+    finally:
+        proc.terminate()
+        proc.wait(timeout=5)
+
+
+def _haeufigster_absender(site: Path) -> str:
+    """Ein Begriff, der im Archiv nachweislich vorkommt - aus dem Index, nicht
+    geraten. Ein fest verdrahteter Begriff waere ein Test, der eines Tages
+    nur noch belegt, dass diese Firma nicht mehr vorkommt."""
+    try:
+        index = json.loads((site / "search_index.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    from collections import Counter
+    zaehler = Counter(e.get("operator") or "" for e in index
+                      if e.get("kind") != "promo")
+    for name, _ in zaehler.most_common():
+        # Ein Wort reicht: die Suche verknuepft mehrere Woerter mit UND, und
+        # "O2 / Telefónica Deutschland" faende dann nur sich selbst.
+        erstes = name.split()[0] if name else ""
+        if len(erstes) >= 4:
+            return erstes
+    return ""
+
+
 def _browser_messungen(site: Path, b: Bilanz) -> None:
-    """Kriterium 1, 4 und 6 - alles, was eine echte Darstellung braucht."""
+    """Kriterium 1, 6, 7 und 10 - alles, was eine echte Darstellung braucht."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -111,11 +181,29 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
     else:
         pfad = _CHROMIUM
 
-    with sync_playwright() as p:
+    begriff = _haeufigster_absender(site)
+
+    with _server(site) as wurzel, sync_playwright() as p:
         browser = p.chromium.launch(executable_path=pfad)
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
 
-        seite.goto((site / "index.html").resolve().as_uri())
+        def oeffne(name: str, warte: int = 600) -> None:
+            """Seite laden und einmal durchscrollen.
+
+            Das Scrollen gehoert zum Laden: die Bilder tragen loading="lazy",
+            und was nie geladen wurde, hat naturalWidth 0 und faellt aus jeder
+            Messung. Ohne diese Schleife prueft Kriterium 6 genau die Bilder
+            NICHT, die weit unten stehen."""
+            seite.goto(f"{wurzel}/{name}")
+            seite.wait_for_timeout(warte)
+            hoehe = seite.evaluate("document.body.scrollHeight")
+            for y in range(0, hoehe, _FALZ // 2):
+                seite.evaluate(f"window.scrollTo(0,{y})")
+                seite.wait_for_timeout(70)
+            seite.evaluate("window.scrollTo(0,0)")
+            seite.wait_for_timeout(300)
+
+        seite.goto(f"{wurzel}/index.html")
         seite.wait_for_timeout(400)
         oben = seite.evaluate(
             """(falz) => [...document.querySelectorAll('.szl')]
@@ -132,21 +220,14 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         wo = ""
         themenseiten = [f"thema/{p.name}"
                         for p in sorted((site / "thema").glob("*.html"))]
+        # Seit dem 08.08.2026 auch die Differenzierungs- und die Suchseite:
+        # beide zeigen seither Bilder, und beide setzen sie in Positionen,
+        # die es vorher nicht gab (Hebel-Aufmacher, Dossier-Aufmacher).
         for name in ("index.html", "meldungen.html", "promo/index.html",
+                     "differenzierung.html",
+                     *([f"suche.html?q={begriff}"] if begriff else []),
                      *themenseiten):
-            seite.goto((site / name).resolve().as_uri())
-            seite.wait_for_timeout(600)
-            # Erst durchscrollen: die Bilder tragen loading="lazy", und was
-            # nie geladen wurde, hat naturalWidth 0 und faellt aus der
-            # Messung. Ohne diese Schleife prueft Kriterium 6 genau die
-            # Bilder NICHT, die weit unten stehen - auf der Promo Uebersicht
-            # ist das die Mehrheit.
-            hoehe = seite.evaluate("document.body.scrollHeight")
-            for y in range(0, hoehe, _FALZ // 2):
-                seite.evaluate(f"window.scrollTo(0,{y})")
-                seite.wait_for_timeout(70)
-            seite.evaluate("window.scrollTo(0,0)")
-            seite.wait_for_timeout(300)
+            oeffne(name)
             for eintrag in seite.evaluate(
                 """() => [...document.images]
                      .filter(i => i.naturalWidth > 0)
@@ -170,7 +251,7 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         # Bildschirmhoehen. Gemessen wird jetzt die Oberkante der LETZTEN
         # Ressortkachel: liegt sie unter der Falz, sieht der Leser die ganze
         # Gliederung, ohne zu scrollen.
-        seite.goto((site / "meldungen.html").resolve().as_uri())
+        seite.goto(f"{wurzel}/meldungen.html")
         seite.wait_for_timeout(500)
         kacheln = seite.evaluate(
             """() => [...document.querySelectorAll('.rkachel')]
@@ -180,6 +261,40 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         b.prueft(bool(kacheln) and letzte < _FALZ,
                  f"7. Letztes Ressort beginnt bei {letzte} px "
                  f"({len(kacheln)} Ressorts, < {_FALZ})")
+
+        # ---- Kriterium 10: die Suchseite liefert ein Dossier
+        #
+        # Sie muss im BROWSER gemessen werden: bis auf das Suchfeld entsteht
+        # alles in app.js, nachdem search_index.json geladen ist. Eine
+        # statische Pruefung des HTML saehe nur leere Behaelter - genau die
+        # Sorte Pruefung, die am 06.08.2026 sechs falsche Zahlen durchgelassen
+        # hat.
+        if not begriff:
+            b.prueft(None, "10. Suchseite (kein Begriff im Index)")
+        else:
+            oeffne(f"suche.html?q={begriff}", warte=1400)
+            gemessen = seite.evaluate(
+                """() => ({
+                     treffer: document.querySelectorAll('#dossier-treffer .dsk').length,
+                     verlauf: document.querySelectorAll('#dossier-verlauf li').length,
+                     bilder: document.querySelectorAll('#dossier-treffer .dsk-motiv img').length,
+                     ohne_motiv: [...document.querySelectorAll('#dossier-treffer .dsk')]
+                        .filter(k => !k.classList.contains('dsk--zeile') &&
+                                     !k.querySelector('.dsk-motiv')).length,
+                     bilanz: (document.getElementById('dossier-bilanz')||{}).textContent || '',
+                     abgeschnitten: [...document.querySelectorAll('#dossier-treffer .szl')]
+                        .filter(e => e.textContent.trim().endsWith('\u2026')).length,
+                   })""")
+            b.prueft(gemessen["treffer"] >= _MIND_DOSSIER_TREFFER
+                     and gemessen["verlauf"] > 0
+                     and gemessen["bilder"] > 0
+                     and not gemessen["ohne_motiv"]
+                     and not gemessen["abgeschnitten"],
+                     f"10. Dossier \u201e{begriff}\u201c: {gemessen['treffer']} Treffer "
+                     f"(>= {_MIND_DOSSIER_TREFFER}), {gemessen['verlauf']} Monate im "
+                     f"Verlauf, {gemessen['bilder']} Bilder, "
+                     f"{gemessen['ohne_motiv']} Karten ohne Motiv, "
+                     f"{gemessen['abgeschnitten']} abgeschnittene Schlagzeilen")
         browser.close()
 
 
@@ -304,6 +419,51 @@ def main() -> int:
         b.prueft(bool(karten) and not ohne_motiv and not leere_kaesten,
                  f"8c. Karten ohne Motiv: {len(ohne_motiv)} von "
                  f"{len(karten)}, leere Bildkaesten: {len(leere_kaesten)}")
+
+    # ---- Kriterium 9: die Differenzierungs-Seite zeigt Bilder, und JEDE
+    # Karte traegt ein Motiv.
+    #
+    # Der Befund vom 08.08.2026: 77 Karten, null Bilder, 9060 px Seitenhoehe.
+    # Antonio: "Es ist total unuebersichtlich, sich das anzugucken. Keine
+    # Bilder, es ist schwer zu verstehen." Gemessen werden beide Haelften der
+    # Antwort - die Ausbeute (haengt an fremden Seiten, deshalb eine Quote)
+    # und die Luecke (haengt am Code, deshalb hart auf null).
+    dz_datei = site / "differenzierung.html"
+    if not dz_datei.exists():
+        b.prueft(None, "9. Differenzierung (nicht gerendert)")
+    else:
+        dz = BeautifulSoup(dz_datei.read_text(encoding="utf-8"), "html.parser")
+        # Die Zeilen sind die dritte Gewichtsstufe und tragen bewusst kein
+        # Motiv - genau wie die Zeilen der Meldungsseite.
+        karten = [k for k in dz.select(".dzk")
+                  if "dzk--zeile" not in (k.get("class") or [])]
+        mit_bild = [k for k in karten if k.select_one(".dzk-motiv img")]
+        ohne_motiv = [k for k in karten if not k.select_one(".dzk-motiv")]
+        leere_kaesten = [m for m in dz.select(".dzk-motiv")
+                         if not m.select_one("img") and not m.get_text(strip=True)]
+        quote = 100 * len(mit_bild) // max(1, len(karten))
+        b.prueft(bool(karten) and quote >= _MIND_DIFF_BILDQUOTE
+                 and not ohne_motiv and not leere_kaesten,
+                 f"9. Differenzierung: {len(mit_bild)} von {len(karten)} Karten "
+                 f"mit Bild ({quote} %, >= {_MIND_DIFF_BILDQUOTE} %), "
+                 f"{len(ohne_motiv)} ohne Motiv, {len(leere_kaesten)} leere Kaesten")
+        # 9b: die Auswertung steht VOR den Beispielen und nennt dieselben
+        # Zahlen wie die Rubriken darunter - sonst hat die Seite zwei
+        # Wahrheiten (der Fehlertyp vom 06.08.2026).
+        marktbild = dz.select_one(".dz-marktbild")
+        balken = {li.select_one(".dz-balken-name").get_text(strip=True):
+                  int(li.select_one(".dz-balken-n").get_text(strip=True))
+                  for li in (marktbild.select(".dz-mb-block")[0].select("li")
+                             if marktbild else [])}
+        falsch = []
+        for abschnitt in dz.select(".dz-hebel"):
+            label = abschnitt.select_one("h2").get_text(strip=True)
+            if balken.get(label) != len(abschnitt.select(".dzk")):
+                falsch.append(label)
+        b.prueft(bool(balken) and not falsch,
+                 f"9b. Marktbild gegen die Rubriken: {len(balken)} Hebel, "
+                 f"{len(falsch)} widersprechen"
+                 + (f" ({', '.join(falsch)})" if falsch else ""))
 
     _browser_messungen(site, b)
 

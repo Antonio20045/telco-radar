@@ -150,21 +150,13 @@
   {% endif %}
 </div>
 
-{# Die wochenuebergreifende Suche steht ganz unten: sie ist der Sonderfall
-   ("wo war nochmal die Meldung von vor drei Wochen"), nicht der Normalfall.
-   Oben stand sie dem im Weg, der einfach lesen wollte. #}
-<div class="card">
-  <div class="card-head"><h2>Im Gesamtarchiv suchen</h2></div>
-  <div class="meldungen-suche">
-    <input type="search" id="suche-input" placeholder="Alle bisherigen Wochen durchsuchen …"
-           aria-label="Alle Berichte und die Differenzierung durchsuchen" autocomplete="off">
-  </div>
-  <div class="suche-filters" role="group" aria-label="Nach Bereich filtern" hidden>
-    <button type="button" class="suche-filter on" data-kind="all">Alle</button>
-    <button type="button" class="suche-filter" data-kind="bericht">Bericht</button>
-    <button type="button" class="suche-filter" data-kind="differenzierung">Differenzierung</button>
-  </div>
-  <p class="suche-count" id="suche-count"></p>
-  <div class="suche-list" id="suche-results"></div>
-</div>
+{# Hier stand bis zum 08.08.2026 die wochenuebergreifende Suche - ein
+   Eingabefeld, Bereichsfilter und eine Trefferliste, ganz am Fuss dieser
+   Seite. Das war der Ort, an dem das Suchfeld der Topbar landete, und damit
+   der Grund fuer Antonios Satz: "Wenn ich was suche, werde ich auf die
+   Unterseite Meldungen weitergeleitet ... ich verstehe nicht, warum."
+
+   Die Suche hat jetzt ihre eigene Seite (`suche.html`, als Dossier gebaut).
+   Was hier stand, ist dorthin gewandert - nicht geloescht, sondern an den
+   Ort gebracht, an dem es die einzige Frage der Seite ist. #}
 {% endblock %}

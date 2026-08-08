@@ -56,7 +56,7 @@ b,strong{font-weight:700}
 /* Etikettenschrift: alles, was benennt statt erzaehlt. */
 .kicker,.page-kicker,.subnav a,.usecases .uc,.meta,.rubrik,
 .stat span,.tile span,.ex-op,.ex-reg,.comp-badge,.kbadge,.chip,
-.suche-filter,.promo-filter,.gs-kind,.gs-item-meta,
+.suche-filter,.promo-filter,.dsk-art,.dsk-meta,
 .rowtable-head,.step-name,.col-model,.card-sub,.foot-inner{
   font-family:var(--sans);
 }
@@ -256,12 +256,6 @@ b,strong{font-weight:700}
 .meldungen-kopf{padding:18px 0 0}
 .meldungen-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
   font-size:clamp(26px,3vw,34px);line-height:1.04;letter-spacing:-.022em}
-.meldungen-suche{display:flex;align-items:center;gap:20px;
-  padding:6px 0;border-bottom:1px solid var(--ink-4);min-width:280px;flex:1}
-.meldungen-suche input{flex:1;min-width:0;border:none;background:none;
-  font-family:var(--sans);font-size:13px;color:var(--ink);padding:4px 0}
-.meldungen-suche input:focus{outline:none;color:var(--red)}
-.meldungen-suche input::placeholder{color:var(--ink-4)}
 
 /* ---- Ressortuebersicht: sieben Kacheln, alle ueber der Falz.
    Vier plus drei bei 1240 px Satzbreite. Die Hoehe der ersten Reihe ist die
@@ -949,53 +943,237 @@ b,strong{font-weight:700}
   .tm-aktionsliste{grid-template-columns:1fr}
 }
 
-/* ======================================================  SUCHTREFFER  === */
-.suche-filters{display:flex;gap:0;margin:0 0 8px}
-/* Die Filterzeile blendet sich aus, solange nichts gesucht wurde - display
-   des Flex-Containers wuerde `hidden` sonst ueberstimmen. */
-.suche-filters[hidden]{display:none}
-.suche-filter{font-family:var(--sans);font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);background:none;
-  border:none;border-bottom:2px solid transparent;padding:7px 16px 6px;cursor:pointer}
-.suche-filter:first-child{padding-left:0}
-.suche-filter.on{color:var(--ink);border-bottom-color:var(--red)}
-.suche-count:empty{margin:0}
-.suche-count{margin:0 0 14px;font-family:var(--sans);font-size:10.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
-.suche-list{display:flex;flex-direction:column}
-.suche-card{padding:14px 0;border-top:1px solid var(--rule-2)}
-.suche-card-links{display:flex;gap:20px;flex-wrap:wrap;margin-top:9px}
-.suche-context-link{font-family:var(--sans);font-size:10.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
-.suche-context-link:hover{color:var(--red)}
-.gs-item-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
-.gs-kind{font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
-  padding:2px 7px;color:#fff;background:var(--ink-4)}
-.gs-kind.bericht{background:var(--r3)}
-.gs-kind.differenzierung{background:var(--red)}
-.gs-item-meta{font-size:9.5px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--ink-4)}
-.gs-item-title{margin:0 0 5px;font-size:17px;font-weight:600;line-height:1.35}
-.gs-item-snip{margin:0;font-size:15px;line-height:1.55;color:var(--ink-3)}
-.gs-item-snip mark{background:#fbe9a7;color:inherit}
+/* =========================================================  DOSSIER  ==== */
+/* Die Suchseite (suche.html). Sie ist keine Trefferliste, sondern eine
+   Ausgabe zu EINEM Begriff: Kopf, Ueberblick, Aufmacher, Chronik. Deshalb
+   erbt sie die Bauformen der Zeitungsseiten (Rubrikleiste, Kartenraster,
+   Balken des Marktbilds) und bringt nur das mit, was es dort nicht gibt.
+
+   Bis zum 08.08.2026 fuehrte die Suche auf meldungen.html und zeigte ihre
+   Treffer als graue Textzeilen am Fuss dieser Seite - Antonio: "Das UI ist
+   total beschissen. Ich verstehe nicht, warum ich da weitergeleitet werde."
+   Die Klassen .suche-card/.gs-item-* dieser Fassung sind weg; was bleibt,
+   ist die Filterzeile (.suche-filter), weil sie unveraendert taugt. */
+.dossier-kopf{padding-bottom:12px}
+.dossier-kopf h1{font-size:clamp(34px,5vw,62px);letter-spacing:-.03em;
+  max-width:none;overflow-wrap:anywhere}
+.dossier-form{display:flex;align-items:center;gap:12px;margin:22px 0 0;
+  border-bottom:2px solid var(--rule-ink);padding-bottom:8px}
+.dossier-input{flex:1;min-width:0;border:none;background:none;
+  font-family:var(--serif);font-size:clamp(19px,2.2vw,26px);color:var(--ink)}
+.dossier-input:focus{outline:none}
+.dossier-input::placeholder{color:var(--ink-4)}
+.dossier-btn{border:none;background:none;color:var(--ink-3);cursor:pointer;
+  padding:0;display:flex;align-items:center}
+.dossier-btn:hover{color:var(--red)}
+/* Die drei Zahlen, die alles Weitere einordnen: Treffer, Zeitraum, Quellen. */
+.dossier-bilanz{margin:10px 0 0;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.dossier-bilanz:empty{margin:0}
+
+/* Die Ankunft ohne Begriff. Kein Satz, der zum Tippen auffordert - eine
+   Liste dessen, worueber das Archiv ueberhaupt etwas weiss. */
+.dossier-start[hidden]{display:none}
+.dossier-start{margin-top:34px}
+.dossier-chips{display:flex;flex-wrap:wrap;gap:10px 12px}
+.dossier-chip{font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.03em;color:var(--ink-2);border:1px solid var(--rule);
+  padding:7px 13px}
+.dossier-chip:hover{color:var(--red);border-color:var(--red)}
+
+.dossier-analyse[hidden]{display:none}
+.dossier-analyse{margin-top:34px}
+.dossier-analyse-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 40px}
+
+.dossier-lead{margin-top:30px}
+.dossier-monat{margin-top:40px}
+.dossier-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 30px;align-items:start}
+.dossier-zeilen{margin-top:22px;border-top:1px solid var(--rule)}
+
+/* Eine Trefferkarte. Gleiche Felder an gleicher Stelle, egal ob der Treffer
+   aus einer Ausgabe, aus der Differenzierung oder aus den Aktionen kommt -
+   Vergleichen heisst Gleiches nebeneinander legen. */
+.dsk{display:flex;flex-direction:column;min-width:0;
+  border-top:1px solid var(--rule);padding-top:10px}
+.dsk-text{display:flex;flex-direction:column;flex:1;min-width:0}
+/* JEDE Karte traegt ein Motiv - Bild oder Schriftkachel. Nie ein leerer
+   Kasten und nie eine Platzhalterfarbe: `loading="lazy"` laesst ein Bild
+   ausserhalb des Sichtfensters ungeladen, und eine CSS-Flaeche dahinter
+   sieht dann aus wie ein kaputtes Bild (der Befund vom 08.08.2026 auf der
+   Promo Uebersicht, 31 von 36 Bildern). */
+.dsk-motiv{display:block;margin-bottom:9px}
+.dsk-motiv img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:center}
+.dsk-kachel{display:block;padding:2px 0 10px;border-bottom:1px solid var(--rule);
+  font-family:var(--serif);font-size:clamp(19px,1.8vw,24px);line-height:1.1;
+  font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.dsk-kopf{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 6px}
+.dsk-art{font-family:var(--sans);font-size:8.5px;font-weight:800;
+  letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;color:#fff;
+  background:var(--ink-4)}
+.dsk-art.bericht{background:var(--r3)}
+.dsk-art.differenzierung{background:var(--red)}
+.dsk-art.promo{background:var(--r4)}
+.dsk-meta{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.dsk-status{font-family:var(--sans);font-size:8.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  border:1px solid var(--rule);padding:1px 5px}
+.dsk-titel{display:block;font-family:var(--serif);font-size:17px;line-height:1.32;
+  font-weight:600;letter-spacing:-.012em;color:var(--ink)}
+.dsk-titel:hover{color:var(--red)}
+.dsk-anriss{margin:7px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+.dsk mark{background:#fbe9a7;color:inherit}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+.dsk-text > :nth-last-child(2){margin-bottom:auto}
+.dsk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:14px;
+  margin:13px 0 0;padding-top:7px;border-top:1px solid var(--rule-2)}
+.dsk-quelle,.dsk-kontext{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.dsk-kontext{color:var(--ink-3)}
+.dsk-quelle:hover,.dsk-kontext:hover{color:var(--red)}
+
+/* Der Aufmacher des Dossiers: Bild und Text nebeneinander, damit die
+   staerkste Antwort auf die Suche oberhalb der Falz ganz zu sehen ist. */
+.dsk--lead{flex-direction:row;gap:30px;border-top-width:3px;
+  border-top-color:var(--rule-ink);padding-top:14px}
+.dsk--lead .dsk-motiv{flex:0 0 55%;margin-bottom:0}
+.dsk--lead .dsk-titel{font-size:clamp(24px,2.9vw,34px);line-height:1.14;
+  font-weight:700;letter-spacing:-.028em}
+.dsk--lead .dsk-anriss{font-size:16.5px;margin-top:11px}
+/* Ohne belegtes Bild kippt der Aufmacher in eine Spalte: eine Schriftkachel
+   ueber 55 % Breite ist keine halbe Seite Motiv, sondern eine halbe Seite
+   Leere. Die Kachel steht dann als breite Absenderzeile ueber der
+   Schlagzeile - ein Motiv bleibt es. */
+.dsk--lead.ohne-bild{flex-direction:column;gap:0}
+.dsk--lead.ohne-bild .dsk-motiv{flex:none;margin-bottom:10px}
+.dsk--lead.ohne-bild .dsk-kachel{font-size:clamp(22px,2.4vw,30px)}
+
+/* Die Zeile: derselbe Treffer, nur ohne Motiv und ohne Anriss. Ab dem
+   siebten Treffer eines Monats - eine dritte Kachelreihe traegt nichts mehr
+   bei, eine Zeile ist schneller gelesen. Drei Spalten, damit hundert Zeilen
+   untereinander eine Chronik ergeben und keine hundert Absaetze. */
+.dsk--zeile{border-top:none;border-bottom:1px solid var(--rule-2);padding:8px 0}
+.dsk--zeile .dsk-text{display:grid;grid-template-columns:270px 1fr auto;
+  align-items:baseline;gap:8px 20px}
+.dsk--zeile .dsk-kopf{margin:0}
+.dsk--zeile .dsk-titel{font-size:15.5px;line-height:1.35}
+.dsk--zeile .dsk-fuss{border:none;margin:0;padding:0;gap:12px;justify-content:flex-end}
+
+.suche-filter-n{font-variant-numeric:lining-nums;color:var(--ink-4)}
+.suche-filter.on .suche-filter-n{color:var(--red)}
+
+@media (max-width:1000px){
+  .dossier-analyse-raster,.dossier-raster{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dsk--lead{flex-direction:column;gap:0}
+  .dsk--lead .dsk-motiv{flex:none;margin-bottom:11px}
+}
+@media (max-width:640px){
+  .dossier-analyse-raster,.dossier-raster{grid-template-columns:1fr}
+  .dsk--zeile{flex-direction:column;gap:4px}
+  .dsk--zeile .dsk-kopf{flex:none}
+}
 
 /* ===================================================  DIFFERENZIERUNG === */
-/* Das Inspirations-Radar. Bis zum 08.08.2026 standen hier drei Bauformen
-   nebeneinander - Prosa-Wandtext, Kachelraster mit je zwei Beispielen in
-   Winzschrift, zugeklapptes <details> mit denselben Beispielen noch einmal.
-   Jetzt gibt es EINE Form: die Karte. Sie steht oben groesser (die juengsten
-   Funde) und in der Bibliothek kleiner, sonst ist sie identisch.
+/* Das Inspirations-Radar. Zweiter Umbau am 08.08.2026, und er behebt genau
+   das, was der erste offen liess: die Seite war eine 9060 px hohe Wand aus
+   77 gleich grossen Textkaertchen ohne ein einziges Bild. Antonio: "total
+   unuebersichtlich ... keine Bilder ... viel besser sein analytisch."
 
-   Die Hebel-Farbe (--c) traegt genau zwei Linien: die 3px-Rubrikleiste und
-   die 2px-Oberkante der Karte. Keine Flaeche, kein Badge (CLAUDE.md §5). */
-.dz-nav{margin:22px 0 0}
+   Vier Regeln tragen die neue Fassung:
+     1. JEDE KARTE HAT EIN MOTIV - Bild oder Schriftkachel, nie ein leerer
+        Kasten (dieselbe Regel wie auf der Promo Uebersicht).
+     2. GEWICHTUNG statt Gleichverteilung: je Hebel ein Aufmacher, dann
+        Karten, dann Zeilen. Gleich grosse Kaertchen behaupten, dass alle 77
+        Beispiele gleich wichtig sind.
+     3. DAS MARKTBILD STEHT VOR DEN BEISPIELEN - Balken, keine Kaesten.
+     4. Die Hebel-Farbe (--c) traegt genau zwei Linien: die 3px-Rubrikleiste
+        und die Oberkante des Aufmachers. Keine Flaeche (CLAUDE.md §5). */
+.dz-nav{margin:34px 0 0}
 .dz-radar{margin-top:34px}
-.dz-hebel{margin-top:38px;scroll-margin-top:16px}
+.dz-hebel{margin-top:44px;scroll-margin-top:16px}
 .dz-rubrik{border-top-width:3px;border-top-color:var(--c,var(--rule-ink))}
-.dz-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 30px}
+.dz-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:26px 30px;align-items:start}
+
+/* Die Lage aus dem Bericht: der Einstieg in die Seite, nicht ihr Anhang. */
+.dz-lage{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+.dz-lage .prose{max-width:80ch}
+.dz-lage .prose p{font-size:19px;line-height:1.55;color:var(--ink-2)}
+
+/* Das gerechnete Marktbild - drei Spalten, drei Fragen. */
+.dz-marktbild{margin-top:40px}
+.dz-mb-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 40px}
+.dz-mb-titel{margin:0 0 12px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
+/* Balken statt Diagramm: eine Zeile je Wert, die Fuellung relativ zum
+   groessten. Kein Chart-Skript, keine Achsen - es geht um die Rangfolge. */
+.dz-balken{list-style:none;margin:0;padding:0}
+.dz-balken li{display:grid;grid-template-columns:1fr 74px 26px;align-items:center;
+  gap:10px;padding:5px 0;border-bottom:1px solid var(--rule-2)}
+.dz-balken-name{font-size:14px;line-height:1.25;color:var(--ink-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-balken-spur{display:block;height:4px;background:var(--rule-2)}
+.dz-balken-fuell{display:block;height:100%;background:var(--c,var(--ink-3))}
+.dz-balken-n{font-family:var(--sans);font-size:11px;font-weight:700;
+  text-align:right;color:var(--ink-4);font-variant-numeric:lining-nums}
+
+.dz-anbieter{list-style:none;margin:0;padding:0;counter-reset:dzr}
+.dz-anbieter li{padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.dz-anbieter-name{display:block;font-family:var(--serif);font-size:15.5px;
+  font-weight:700;letter-spacing:-.012em;color:var(--ink)}
+/* Nicht die ZAHL der Hebel, sondern ihre Namen: "wer breit aufgestellt ist"
+   beantwortet sich durch die Aufzaehlung, nicht durch eine Ziffer. */
+.dz-anbieter-hebel{display:block;margin-top:2px;font-family:var(--sans);
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--ink-4)}
+
+/* Das Musterband unter den drei gerechneten Spalten: geschriebene Saetze
+   brauchen Satzbreite, keine 370-px-Spalte. Zwei Spalten bei 1240 px, damit
+   vier Muster nicht zu vier Bildschirmzeilen werden. */
+.dz-muster-band{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+.dz-muster{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}
+.dz-muster li{break-inside:avoid;padding:8px 0;
+  border-bottom:1px solid var(--rule-2);
+  font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+.dz-muster b{color:var(--ink)}
+.dz-muster a{color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.dz-muster a:hover{color:var(--red)}
+
+/* Was ein Hebel BEDEUTET (steht fest) und was an ihm gerade auffaellt
+   (kommt aus dem Bericht). Zwei Saetze, zwei Rollen, zwei Grade. */
+.dz-hebel-was{margin:0 0 4px;max-width:78ch;font-size:15.5px;line-height:1.5;
+  color:var(--ink-2)}
+.dz-hebel-einordnung{margin:0 0 6px;max-width:78ch;font-size:14.5px;
+  line-height:1.5;font-style:italic;color:var(--ink-3)}
+.dz-hebel-oben{margin:18px 0 26px}
+.dz-zeilen{margin-top:24px;border-top:1px solid var(--rule)}
+.dz-mehr{margin-top:6px}
+.dz-mehr > summary{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  cursor:pointer;padding:9px 0;list-style:none}
+.dz-mehr > summary::-webkit-details-marker{display:none}
+.dz-mehr > summary::after{content:' ▾'}
+.dz-mehr[open] > summary::after{content:' ▴'}
+.dz-mehr > summary:hover{color:var(--red)}
+.dz-mehr .dz-zeilen{margin-top:0;border-top:none}
 
 .dzk{display:flex;flex-direction:column;min-width:0;
-  border-top:2px solid var(--c,var(--rule-ink));padding-top:11px}
+  border-top:1px solid var(--rule);padding-top:10px}
+.dzk-text{display:flex;flex-direction:column;flex:1;min-width:0}
+/* Motiv: das Bild der Originalseite oder die Schriftkachel mit dem Absender.
+   Keine Platzhalterfarbe hinter dem Bild - mit `loading="lazy"` malt der
+   Browser sie, bevor das Bild da ist, und das sieht aus wie ein Ladefehler. */
+.dzk-motiv{display:block;margin-bottom:9px}
+.dzk-motiv img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:center}
+.dzk-kachel{display:block;padding:2px 0 10px;border-bottom:1px solid var(--rule);
+  font-family:var(--serif);font-size:clamp(18px,1.7vw,23px);line-height:1.1;
+  font-weight:700;letter-spacing:-.02em;color:var(--ink)}
 .dzk-kopf{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 7px}
 .dzk-op{font-family:var(--serif);font-size:15px;font-weight:700;
   letter-spacing:-.01em;color:var(--ink)}
@@ -1009,7 +1187,7 @@ b,strong{font-weight:700}
 .dzk-why{margin:8px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
 /* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
    in jeder Karte einer Reihe auf einer anderen Hoehe. */
-.dzk > :nth-last-child(2){margin-bottom:auto}
+.dzk-text > :nth-last-child(2){margin-bottom:auto}
 .dzk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:10px;
   margin:14px 0 0;padding-top:8px;border-top:1px solid var(--rule-2)}
 .dzk-hebel{font-family:var(--sans);font-size:9px;font-weight:800;
@@ -1017,13 +1195,45 @@ b,strong{font-weight:700}
 .dzk-quelle{font-family:var(--sans);font-size:9px;font-weight:600;
   text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
 .dzk-quelle:hover{color:var(--red)}
-.dzk--gross{padding-top:13px}
-.dzk--gross .dzk-op{font-size:16px}
+
+.dzk--gross{border-top-width:2px;border-top-color:var(--c,var(--rule-ink));
+  padding-top:13px}
 .dzk--gross .dzk-what{font-size:21px;line-height:1.22;letter-spacing:-.018em;
   font-weight:700}
 .dzk--gross .dzk-why{font-size:15px;margin-top:9px}
-@media (max-width:1000px){.dz-raster{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){.dz-raster{grid-template-columns:1fr}}
+
+/* Der Aufmacher eines Hebels: Motiv und Text nebeneinander. Er traegt den
+   Abschnitt, deshalb steht sein Motiv gross - und deshalb waehlt
+   `_gewichten()` dafuer das juengste Beispiel MIT Bild. */
+.dzk--lead{flex-direction:row;gap:30px;border-top-width:2px;
+  border-top-color:var(--c,var(--rule-ink));padding-top:13px}
+.dzk--lead .dzk-motiv{flex:0 0 46%;margin-bottom:0}
+.dzk--lead .dzk-what{font-size:clamp(21px,2.3vw,27px);line-height:1.16;
+  font-weight:700;letter-spacing:-.024em}
+.dzk--lead .dzk-why{font-size:15.5px;margin-top:10px}
+/* Siehe .dsk--lead.ohne-bild: eine Schriftkachel ueber 46 % Breite laesst
+   darunter eine leere halbe Spalte stehen. */
+.dzk--lead.ohne-bild{flex-direction:column;gap:0}
+.dzk--lead.ohne-bild .dzk-motiv{flex:none;margin-bottom:10px}
+.dzk--lead.ohne-bild .dzk-kachel{font-size:clamp(21px,2.2vw,28px)}
+
+.dzk--zeile{border-top:none;border-bottom:1px solid var(--rule-2);padding:8px 0}
+.dzk--zeile .dzk-text{display:grid;grid-template-columns:240px 1fr auto;
+  align-items:baseline;gap:8px 20px}
+.dzk--zeile .dzk-kopf{margin:0}
+.dzk--zeile .dzk-what{font-size:15px;line-height:1.35;font-weight:600}
+.dzk--zeile .dzk-fuss{border:none;margin:0;padding:0;justify-content:flex-end}
+
+@media (max-width:1000px){
+  .dz-raster,.dz-mb-raster{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dzk--lead{flex-direction:column;gap:0}
+  .dzk--lead .dzk-motiv{flex:none;margin-bottom:11px}
+}
+@media (max-width:640px){
+  .dz-raster,.dz-mb-raster{grid-template-columns:1fr}
+  .dzk--zeile{flex-direction:column;gap:4px}
+  .dzk--zeile .dzk-kopf{flex:none}
+}
 
 .dz-essay{margin-top:44px}
 .dz-foot{margin:30px 0 0;padding-top:14px;border-top:1px solid var(--rule);

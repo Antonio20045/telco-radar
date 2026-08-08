@@ -1,13 +1,131 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=meldungen.html">
-<link rel="canonical" href="meldungen.html">
-<meta name="robots" content="noindex">
-<title>Weitergeleitet – Vodafone Insights</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marktrecherche · Suche</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="logo.png">
 </head>
-<body style="font-family:Inter,Arial,sans-serif;padding:40px">
-<p>Diese Seite ist umgezogen. <a href="meldungen.html">Weiter zu meldungen.html</a></p>
+<body class="uc-markt">
+  
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Vodafone Insights">
+        <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
+      </a>
+      <div class="topbar-right">
+        <nav class="usecases" aria-label="Anwendungsfälle">
+          <a class="uc active" href="index.html">Marktrecherche</a>
+          <a class="uc " href="promo/index.html">Promo Übersicht</a>
+        </nav>
+        
+        
+      </div>
+    </div>
+    
+    
+    
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="index.html" >Diese Woche</a>
+      <a href="meldungen.html" >Meldungen</a>
+      <a href="differenzierung.html" >Differenzierung</a>
+      <a href="wettbewerb.html" >Wettbewerb</a>
+      <a href="transparenz.html" >Quellen</a>
+    </nav>
+    
+  </header>
+  <main>
+    <div class="wrap">
+      
+
+
+<section class="page-hero wide dossier-kopf">
+  <form class="dossier-form" id="dossier-form" role="search" action="suche.html" autocomplete="off">
+    <input type="search" id="dossier-input" name="q" class="dossier-input"
+           placeholder="Telekom, Perplexity, eSIM, Starlink …"
+           aria-label="Alle Ausgaben, die Differenzierung und die Aktionen durchsuchen"
+           autocomplete="off" autofocus>
+    <button type="submit" class="dossier-btn" aria-label="Suchen">
+      <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+        <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </form>
+  <p class="page-kicker">Dossier</p>
+  <h1 id="dossier-titel">Suche im Archiv</h1>
+  <p class="dossier-bilanz" id="dossier-bilanz"></p>
+</section>
+
+
+<section class="dossier-start" id="dossier-start">
+  <div class="rubrik"><h2>Meistgenannt im Archiv</h2></div>
+  <div class="dossier-chips">
+    
+    <a class="dossier-chip" href="suche.html?q=Deutsche%20Telekom">Deutsche Telekom</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Bharti%20Airtel">Bharti Airtel</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Vodafone%20Group">Vodafone Group</a>
+    
+    <a class="dossier-chip" href="suche.html?q=AT%26T">AT&amp;T</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Reliance%20Jio">Reliance Jio</a>
+    
+    <a class="dossier-chip" href="suche.html?q=SoftBank">SoftBank</a>
+    
+    <a class="dossier-chip" href="suche.html?q=2degrees">2degrees</a>
+    
+    <a class="dossier-chip" href="suche.html?q=SK%20Telecom">SK Telecom</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Samsung">Samsung</a>
+    
+    <a class="dossier-chip" href="suche.html?q=T-Mobile%20US">T-Mobile US</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Vodacom">Vodacom</a>
+    
+    <a class="dossier-chip" href="suche.html?q=Verizon">Verizon</a>
+    
+  </div>
+</section>
+
+<section class="dossier-analyse" id="dossier-analyse" hidden>
+  <div class="rubrik"><h2>Der Überblick</h2></div>
+  <div class="dossier-analyse-raster">
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Verlauf</h3>
+      <ul class="dz-balken" id="dossier-verlauf"></ul>
+    </div>
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Wer</h3>
+      <ul class="dz-balken" id="dossier-wer"></ul>
+    </div>
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Worum</h3>
+      <ul class="dz-balken" id="dossier-worum"></ul>
+    </div>
+  </div>
+</section>
+
+<div class="suche-filters" id="dossier-filter" role="group" aria-label="Nach Bereich filtern" hidden></div>
+
+<div id="dossier-treffer"></div>
+
+    </div>
+  </main>
+  <footer class="foot">
+    <div class="foot-inner">
+      Vodafone Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+    </div>
+  </footer>
+  <script src="app.js"></script>
 </body>
 </html>

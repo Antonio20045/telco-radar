@@ -1,0 +1,101 @@
+{# Das Dossier: alles, was das Portal ueber einen Begriff weiss, an einem Ort.
+
+   Antonio am 08.08.2026: "Die Suchfunktion ist total bescheuert. Wenn ich was
+   suche, werde ich auf die Unterseite Meldungen weitergeleitet ... Wenn ich
+   suche, zum Beispiel Telekom oder Perplexity, alle Meldungen super
+   dargestellt, dass ich einen Ueberblick habe ueber die Entwicklung, auch
+   ueber die Historie."
+
+   Bis dahin fuehrte das Suchfeld der Topbar auf `meldungen.html?q=` - eine
+   Seite, die zuerst sieben Ressortkacheln, dann sieben Ressortbloecke und
+   dann das Archiv zeigt; die Treffer standen als graue Textzeilen in einer
+   Karte am FUSS dieser Seite, nach rund 2400 px. Wer "Telekom" suchte, sah
+   also zuerst alles ausser dem, wonach er gesucht hatte.
+
+   Jetzt hat die Suche eine eigene Seite, und sie ist nicht als Trefferliste
+   gebaut, sondern als Dossier:
+
+     KOPF      der Begriff als Ueberschrift, darunter die Bilanz
+               (Treffer, Zeitraum, Quellen).
+     UEBERBLICK der Verlauf ueber die Monate, die haeufigsten Absender, die
+               Ressorts - die Frage "wie hat sich das entwickelt" wird
+               beantwortet, bevor die erste Meldung kommt.
+     AUFMACHER der staerkste Treffer, gross und mit Bild.
+     CHRONIK   alle uebrigen Treffer nach Monaten, mit Bildern.
+
+   Gesucht wird ueber `search_index.json`: die bewerteten Meldungen ALLER
+   Ausgaben, die Differenzierungs-Bibliothek und die Promo-Aktionen - nicht
+   nur die laufende Woche ("ich moechte auch die Meldungen nicht von diesem
+   Band, sondern alle sehen, die mit diesem Thema zu tun hatten").
+
+   Die Seite traegt das Suchfeld selbst, deshalb blendet `base.html.j2` hier
+   das Feld der Topbar aus: zwei Suchfelder auf einer Seite sind zwei
+   Bedienelemente fuer eine Handlung.
+
+   Fast alles unter dem Kopf entsteht in `app.js` - der Index wird im Browser
+   geladen und gefiltert, es gibt keinen Suchserver. Was hier steht, sind die
+   Behaelter und der Einstieg fuer die Ankunft ohne Suchbegriff. #}
+{% extends "base.html.j2" %}
+{% set active = 'suche' %}
+{% set ohne_topbar_suche = true %}
+{% block title %}Marktrecherche · Suche{% endblock %}
+
+{% block content %}
+
+{# Erst das Feld, dann die Ueberschrift. Umgekehrt stand der Begriff zweimal
+   direkt untereinander - einmal als H1, einmal als Feldinhalt -, und das
+   liest sich als Panne. Die Reihenfolge Suchleiste -> Ergebnisueberschrift
+   ist ausserdem die, in der die Handlung ablaeuft. #}
+<section class="page-hero wide dossier-kopf">
+  <form class="dossier-form" id="dossier-form" role="search" action="suche.html" autocomplete="off">
+    <input type="search" id="dossier-input" name="q" class="dossier-input"
+           placeholder="Telekom, Perplexity, eSIM, Starlink …"
+           aria-label="Alle Ausgaben, die Differenzierung und die Aktionen durchsuchen"
+           autocomplete="off" autofocus>
+    <button type="submit" class="dossier-btn" aria-label="Suchen">
+      <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+        <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+        <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </form>
+  <p class="page-kicker">Dossier</p>
+  <h1 id="dossier-titel">Suche im Archiv</h1>
+  <p class="dossier-bilanz" id="dossier-bilanz"></p>
+</section>
+
+{# Die Ankunft ohne Begriff. Ein leeres Feld mit blinkendem Cursor ist eine
+   Aufforderung, sich selbst etwas auszudenken; diese Liste sagt stattdessen,
+   worueber das Archiv ueberhaupt etwas weiss. Sie ist gerechnet, nicht
+   gepflegt (suchindex.haeufigste_absender). #}
+<section class="dossier-start" id="dossier-start">
+  <div class="rubrik"><h2>Meistgenannt im Archiv</h2></div>
+  <div class="dossier-chips">
+    {% for name in top_absender %}
+    <a class="dossier-chip" href="suche.html?q={{ name | urlencode }}">{{ name }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="dossier-analyse" id="dossier-analyse" hidden>
+  <div class="rubrik"><h2>Der Überblick</h2></div>
+  <div class="dossier-analyse-raster">
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Verlauf</h3>
+      <ul class="dz-balken" id="dossier-verlauf"></ul>
+    </div>
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Wer</h3>
+      <ul class="dz-balken" id="dossier-wer"></ul>
+    </div>
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Worum</h3>
+      <ul class="dz-balken" id="dossier-worum"></ul>
+    </div>
+  </div>
+</section>
+
+<div class="suche-filters" id="dossier-filter" role="group" aria-label="Nach Bereich filtern" hidden></div>
+
+<div id="dossier-treffer"></div>
+{% endblock %}

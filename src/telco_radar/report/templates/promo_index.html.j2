@@ -107,7 +107,7 @@
    Serife, gross, mit der Konzernzugehoerigkeit als Etikett daneben - denn
    dass congstar zur Telekom gehoert, ist die halbe Aussage. #}
 {% macro block(b, eigen=false) %}
-<section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" style="--c:{{ b.color }}">
+<section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" id="{{ b.anker }}" style="--c:{{ b.color }}">
   <div class="pmarke-kopf">
     <h2 class="pmarke-name"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h2>
     <span class="pmarke-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% if b.group and b.group != b.name %} · {{ b.group }}{% endif %}{% endif %}</span>

@@ -360,8 +360,14 @@ def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
                  "ressort-nav"):
         assert rest not in html, f"Rest des Filters auf der Seite: {rest}"
     assert rest not in _seite(site, "app.js")
-    # Die wochenuebergreifende Suche bleibt - sie ist ein anderer Fall.
-    assert "suche-input" in html
+    # Die wochenuebergreifende Suche stand hier bis zum 08.08.2026 ganz
+    # unten. Sie ist nicht geloescht, sondern eine eigene Seite geworden
+    # (suche.html, als Dossier gebaut - siehe tests/test_suche_page.py):
+    # das Topbar-Formular fuehrte auf diese Seite, und die Treffer standen
+    # nach rund 2400 px. Antonio: "Ich verstehe nicht, warum ich da
+    # weitergeleitet werde."
+    assert "suche-input" not in html
+    assert 'action="suche.html"' in html
 
 
 def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
@@ -1229,6 +1235,96 @@ def test_der_differenzierungsbericht_bleibt_erhalten(tmp_path):
     essay = soup.select_one("details.dz-essay")
     assert essay is not None and not essay.has_attr("open")
     assert "Ein Absatz des Essays." in essay.get_text(" ", strip=True)
+
+
+# ---- Der Umbau vom 08.08.2026 (Antonio: "total unuebersichtlich, keine
+# Bilder, es ist schwer zu verstehen ... viel besser sein analytisch").
+def test_jede_karte_der_differenzierung_traegt_ein_motiv(tmp_path):
+    """Bild ODER Schriftkachel - nie ein leerer Kasten. Dieselbe Regel wie
+    auf der Promo Uebersicht (Abnahmekriterium 8c). Die Zeilen sind bewusst
+    ausgenommen: sie sind die dritte Gewichtsstufe und tragen kein Motiv,
+    genau wie die Zeilen der Meldungsseite."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    karten = [k for k in soup.select(".dzk")
+              if "dzk--zeile" not in (k.get("class") or [])]
+    assert karten
+    for karte in karten:
+        motiv = karte.select_one(".dzk-motiv")
+        assert motiv is not None, karte.get_text(" ", strip=True)[:60]
+        assert motiv.select_one("img") or motiv.get_text(strip=True), \
+            "leerer Motivkasten"
+
+
+def test_die_schriftkachel_wiederholt_den_absender_nicht(tmp_path):
+    """Ohne Bild traegt die Kachel den Absender - dann steht er nicht noch
+    einmal in der Metazeile darunter. Zweimal derselbe Name untereinander
+    liest sich als Panne, nicht als Gestaltung."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    kacheln = soup.select(".dzk-kachel")
+    assert kacheln, "ohne Bildindex muessten alle Karten eine Kachel tragen"
+    for karte in soup.select(".dzk"):
+        if karte.select_one(".dzk-kachel") and "dzk--zeile" not in (karte.get("class") or []):
+            assert not karte.select_one(".dzk-op"), \
+                karte.get_text(" ", strip=True)[:80]
+
+
+def test_das_marktbild_zaehlt_was_die_bibliothek_zeigt(tmp_path):
+    """Die Auswertung steht vor den Beispielen und muss dieselben Zahlen
+    nennen wie die Rubriken darunter - sonst hat die Seite zwei Wahrheiten."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    marktbild = soup.select_one(".dz-marktbild")
+    gesamt = marktbild.select_one(".rubrik-zahl").get_text(" ", strip=True)
+    assert gesamt == f"{len(DIFF_DB) + len(DIFF_STORE)} Beispiele"
+
+    # Der Hebel-Balken je Hebel gegen die Rubrikzahl desselben Hebels.
+    balken = {li.select_one(".dz-balken-name").get_text(strip=True):
+              int(li.select_one(".dz-balken-n").get_text(strip=True))
+              for li in marktbild.select(".dz-mb-block")[0].select("li")}
+    for abschnitt in soup.select(".dz-hebel"):
+        label = abschnitt.select_one("h2").get_text(strip=True)
+        n = len(abschnitt.select(".dzk"))
+        assert balken[label] == n, label
+
+
+def test_jeder_hebel_sagt_in_einem_satz_was_er_bedeutet(tmp_path):
+    """Antonio: "damit nicht so viel kognitive Arbeit darin besteht, erstmal
+    zu verstehen, was die Differenzierung ist." Wer "Super-App & Oekosystem"
+    liest, soll nicht raten muessen."""
+    soup = BeautifulSoup(_seite(_mit_differenzierung(tmp_path), "differenzierung.html"),
+                         "html.parser")
+    abschnitte = soup.select(".dz-hebel")
+    assert abschnitte
+    for abschnitt in abschnitte:
+        satz = abschnitt.select_one(".dz-hebel-was")
+        assert satz is not None and len(satz.get_text(strip=True)) > 30, \
+            abschnitt.get("id")
+
+
+def test_der_bericht_steht_verteilt_statt_als_block(tmp_path):
+    """Die neue Gliederung landet im Seitenkopf, im Musterband und ueber den
+    Hebeln - und dann gibt es KEINEN Aufklapper mehr am Seitenende. Das war
+    der Block, den Antonio nicht "reingepastet" haben wollte."""
+    site = _render(tmp_path)
+    berichte = tmp_path / "data" / "reports" / "differenzierung"
+    berichte.mkdir(parents=True, exist_ok=True)
+    (berichte / "2026-08-05.md").write_text(
+        "## Das Bild\n\nDie Lage in einem Satz.\n\n"
+        "## Muster\n\n**Bündel** Zwei Anbieter tun dasselbe.\n\n"
+        "## Einordnung\n\n### KI & Assistenten\n\nIndien treibt das Feld.\n",
+        encoding="utf-8")
+    _diffspeicher(tmp_path)
+    render_site(site, tmp_path / "data" / "reports")
+
+    soup = BeautifulSoup(_seite(site, "differenzierung.html"), "html.parser")
+    assert "Die Lage in einem Satz." in soup.select_one(".dz-lage").get_text(" ", strip=True)
+    assert "Zwei Anbieter tun dasselbe." in \
+        soup.select_one(".dz-muster-band").get_text(" ", strip=True)
+    ki = soup.select_one("#dz-theme-ki .dz-hebel-einordnung").get_text(" ", strip=True)
+    assert ki == "Indien treibt das Feld."
+    assert soup.select_one("details.dz-essay") is None
 
 
 def test_keine_karte_der_differenzierung_raet_vodafone_etwas(tmp_path):

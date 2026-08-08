@@ -33,6 +33,8 @@ from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
 from .quellen_register import Quellenregister, quellen_der_config
 from .report import bilder as report_bilder
+from .report import diff_bilder
+from .report import differenzierung_view
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -616,6 +618,24 @@ def run(root: Path, use_llm: bool | None = None,
     diff_report_path = diff_report_dir / f"{today.isoformat()}.md"
     diff_report_path.write_text(diff_body, encoding="utf-8")
     log.info("Differenzierungsbericht: %s (%d Moves)", diff_mode, len(diff_entries))
+
+    # ----------------------------------------- Bilder der Differenzierung
+    # Die Seite zeigte bis zum 08.08.2026 77 Karten und null Bilder - Antonio:
+    # "Keine Bilder, es ist schwer zu verstehen." Hier werden sie beschafft
+    # (erst aus den Bildern des Wochenberichts, dann per og:image), damit
+    # `render_site()` offline bleiben kann. Failsafe: ein fehlendes Bild ist
+    # kein Grund, einen Lauf zu kippen - die Karte bekommt dann eine
+    # Schriftkachel.
+    try:
+        diff_store_fuer_bilder = DiffStore(state_dir / "differentiation.jsonl")
+        diff_bestand = differenzierung_view.merge(
+            diff_entries, diff_store_fuer_bilder.entries())
+        bilanz = diff_bilder.beschaffe(diff_bestand, root, reports_dir,
+                                       today.isoformat())
+        log.info("Differenzierungs-Bilder: %d von %d Beispielen",
+                 bilanz.get("mit_bild", 0), bilanz.get("bestand", 0))
+    except Exception as exc:  # noqa: BLE001
+        log.error("Differenzierungs-Bilder uebersprungen: %s", exc)
 
     # -------------------------------------------------------------- report
     total_sources = sum(len(op.crawled_sources) for op in cfg.operators) \

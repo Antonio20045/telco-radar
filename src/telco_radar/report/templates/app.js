@@ -115,17 +115,17 @@
 
   renderList();
 
-  // Ankunft ueber die globale Suche (Topbar) mit ?q=…: Suchfeld vorbelegen,
+  // Ankunft ueber die Dossier-Seite mit ?q=…: Suchfeld vorbelegen,
   // Explorer-Akkordeon oeffnen und sofort filtern - kein zweites Mal tippen.
   //
-  // Nur auf Seiten OHNE eigenes Suchfeld (also den Archivwochen unter
-  // reports/). Auf meldungen.html uebernimmt die Volltextsuche das ?q=; wuerde
-  // der Explorer es zusaetzlich als Wochenfilter lesen, staende ueber einer
-  // Trefferliste mit zwoelf Ergebnissen ein leerer Wochen-Explorer - derselbe
-  // Begriff, zwei widersprechende Zahlen.
+  // Der Explorer steht nur auf den Archivwochen unter reports/, und genau
+  // dorthin verlinkt ein Dossier-Treffer ("in dieser Ausgabe ansehen"). Bis
+  // zum 08.08.2026 stand hier eine Ausnahme fuer meldungen.html, weil dort
+  // ein zweites Suchfeld dasselbe ?q= las; das Feld ist weg, die Suche hat
+  // ihre eigene Seite.
   try {
     var qs = new URLSearchParams(location.search);
-    var q = document.getElementById('suche-input') ? null : qs.get('q');
+    var q = qs.get('q');
     if (q) {
       fSearch.value = q;
       renderList();
@@ -155,18 +155,28 @@
   });
 })();
 
-/* Gemeinsame Matching-/Snippet-Logik der globalen Suche: durchsucht
-   search_index.json - Bericht-Highlights ALLER Wochen PLUS die persistente
-   Differenzierungs-Bibliothek, nicht nur die aktuelle Seite. Reines
-   Substring-Matching (kein Fuzzy/Scoring), siehe
-   claude/suche-marktrecherche-konzept.md. Frueher lebte diese Logik in der
-   Topbar-Dropdown-IIFE; seit dem Ausbau (claude/suche-ergebnisseite-
-   konzept.md) navigiert die Topbar per nativem <form> direkt zu suche.html,
-   das dieselben Funktionen hier nutzt statt sie zu duplizieren. */
+/* Die Suchmaschine der Seite. Sie durchsucht `search_index.json` - die
+   bewerteten Meldungen ALLER Ausgaben, die Differenzierungs-Bibliothek und die
+   Promo-Aktionen (report/suchindex.py). Kein Suchserver: der Index ist ein
+   JSON-Array, das der Browser einmal laedt und dann filtert.
+
+   Am 08.08.2026 hat diese Schicht zwei Dinge dazubekommen, und beide gehen auf
+   denselben Satz zurueck ("wenn ich suche, alle Meldungen super dargestellt,
+   dass ich einen Ueberblick habe"):
+
+   1. WORTWEISES SUCHEN STATT EINER ZEICHENKETTE. Vorher musste die Eingabe
+      als Ganzes im Text vorkommen; "telekom perplexity" fand nichts, obwohl
+      genau diese Kombination der Anlass der Suche war. Jetzt muss JEDES Wort
+      vorkommen (UND-Verknuepfung), irgendwo im Eintrag.
+   2. EINE RANGFOLGE. Vorher war jeder Treffer gleich viel wert und die Liste
+      stand in Indexreihenfolge. Ein Treffer im Absender wiegt jetzt schwerer
+      als einer im Fliesstext, und die Dringlichkeit der Meldung geht mit ein -
+      sonst fuehrt eine Randnotiz das Dossier an. */
 var TelcoSearch = (function () {
   'use strict';
 
-  var KIND_LABEL = { bericht: 'Bericht', differenzierung: 'Differenzierung' };
+  var KIND_LABEL = { bericht: 'Meldung', differenzierung: 'Differenzierung',
+                     promo: 'Aktion' };
   var items = null;   // null = noch nicht geladen; [] = geladen, leer
   var loading = null;
 
@@ -195,31 +205,82 @@ var TelcoSearch = (function () {
     return loading;
   }
 
-  function haystack(it) {
-    return [it.title, it.summary, it.operator, it.region, it.category, it.source_label]
-      .filter(Boolean).join(' — ').toLowerCase();
+  function worte(q) {
+    return String(q || '').toLowerCase().split(/\s+/).filter(function (w) {
+      return w.length > 0;
+    });
   }
 
-  function snippet(it, q) {
-    var text = [it.title, it.summary].filter(Boolean).join(' — ');
-    var lower = text.toLowerCase();
-    var idx = lower.indexOf(q);
-    if (idx === -1) {
-      return esc(text.slice(0, 150)) + (text.length > 150 ? '…' : '');
+  function felder(it) {
+    return {
+      op: String(it.operator || '').toLowerCase(),
+      titel: String(it.title || '').toLowerCase(),
+      rest: [it.summary, it.region, it.category, it.source_label]
+        .filter(Boolean).join(' — ').toLowerCase()
+    };
+  }
+
+  /* 0 = kein Treffer. Sonst: je Wort das schwerste Feld, in dem es steht,
+     plus die Dringlichkeit der Meldung als Stichentscheid. */
+  function score(it, ws) {
+    if (!ws.length) return 0;
+    var f = felder(it);
+    var summe = 0;
+    for (var i = 0; i < ws.length; i++) {
+      var w = ws[i];
+      if (f.op.indexOf(w) !== -1) summe += 8;
+      else if (f.titel.indexOf(w) !== -1) summe += 5;
+      else if (f.rest.indexOf(w) !== -1) summe += 2;
+      else return 0;             // UND-Verknuepfung: ein fehlendes Wort kippt
     }
-    var start = Math.max(0, idx - 55);
-    var end = Math.min(text.length, idx + q.length + 85);
-    return (start > 0 ? '…' : '') +
-      esc(text.slice(start, idx)) +
-      '<mark>' + esc(text.slice(idx, idx + q.length)) + '</mark>' +
-      esc(text.slice(idx + q.length, end)) +
-      (end < text.length ? '…' : '');
+    return summe + (it.relevance || 0);
   }
 
-  // Deep-Link zum vollen Kontext: Bericht-Treffer haengen ?q= an, damit der
-  // Explorer der jeweiligen Woche sofort gefiltert oeffnet (siehe die
-  // Explorer-IIFE weiter oben in dieser Datei); Differenzierungs-Treffer
-  // springen direkt zum Thema - dort gibt es keinen Suchbegriff-Filter.
+  function suche(alle, q) {
+    var ws = worte(q);
+    if (!ws.length) return [];
+    var out = [];
+    for (var i = 0; i < alle.length; i++) {
+      var s = score(alle[i], ws);
+      if (s) out.push({ it: alle[i], score: s });
+    }
+    return out;
+  }
+
+  /* Der Suchbegriff im Text hervorgehoben. Der Text selbst wird NICHT
+     gekuerzt - eine Schlagzeile mit "…" am Ende ist ein abgeschnittener Satz,
+     und die verbietet diese Codebasis ueberall sonst (CLAUDE.md §5,
+     Abnahmekriterium 5). Gekuerzt wird nur der Fliesstext, und dort auch nur
+     am Ende. */
+  function markiere(text, ws) {
+    var roh = String(text || '');
+    if (!ws.length) return esc(roh);
+    var lower = roh.toLowerCase();
+    var stellen = [];
+    for (var i = 0; i < ws.length; i++) {
+      var von = lower.indexOf(ws[i]);
+      while (von !== -1) {
+        stellen.push([von, von + ws[i].length]);
+        von = lower.indexOf(ws[i], von + ws[i].length);
+      }
+    }
+    if (!stellen.length) return esc(roh);
+    stellen.sort(function (a, b) { return a[0] - b[0]; });
+    var out = '';
+    var pos = 0;
+    for (var j = 0; j < stellen.length; j++) {
+      if (stellen[j][0] < pos) continue;
+      out += esc(roh.slice(pos, stellen[j][0])) +
+        '<mark>' + esc(roh.slice(stellen[j][0], stellen[j][1])) + '</mark>';
+      pos = stellen[j][1];
+    }
+    return out + esc(roh.slice(pos));
+  }
+
+  // Deep-Link zum vollen Kontext: Meldungen haengen ?q= an, damit der
+  // Explorer der jeweiligen Ausgabe sofort gefiltert oeffnet (siehe die
+  // Explorer-IIFE weiter oben in dieser Datei); Differenzierung und Aktionen
+  // springen direkt zu ihrem Abschnitt - dort gibt es keinen Begriffsfilter.
   function deepLinkHref(it, q) {
     var p = prefix();
     if (it.kind === 'bericht' && q) {
@@ -230,113 +291,312 @@ var TelcoSearch = (function () {
 
   return {
     KIND_LABEL: KIND_LABEL, esc: esc, prefix: prefix, loadIndex: loadIndex,
-    haystack: haystack, snippet: snippet, deepLinkHref: deepLinkHref
+    worte: worte, score: score, suche: suche, markiere: markiere,
+    deepLinkHref: deepLinkHref
   };
 })();
 
-/* Suche-Ergebnisseite (suche.html): alle Treffer zu einem Begriff an einem
-   Ort statt im 8er-gedeckelten Topbar-Dropdown - bookmarkbar/teilbar ueber
-   ?q=<begriff>. Siehe claude/suche-ergebnisseite-konzept.md. */
+/* Die Dossier-Seite (suche.html).
+
+   Sie beantwortet nicht "welche Zeilen enthalten mein Wort", sondern "was
+   weiss dieses Portal ueber mein Thema, und wie hat es sich entwickelt".
+   Daraus folgt der Aufbau, und zwar in dieser Reihenfolge:
+
+     BILANZ     wie viele Treffer, ueber welchen Zeitraum, aus wie vielen
+                Quellen - drei Zahlen, die den Rest einordnen.
+     UEBERBLICK Verlauf ueber die Monate, haeufigste Absender, haeufigste
+                Ressorts. Das ist die "Entwicklung", nach der Antonio gefragt
+                hat, und sie steht VOR der ersten Meldung.
+     AUFMACHER  der staerkste Treffer, gross und mit Bild.
+     CHRONIK    alle uebrigen nach Monaten, neueste zuerst, mit Bildern -
+                die Historie in der Reihenfolge, in der sie passiert ist.
+
+   Alles ausser dem Suchfeld wird hier gebaut; die Vorlage liefert nur die
+   Behaelter (templates/suche.html.j2). */
 (function () {
   'use strict';
-  var input = document.getElementById('suche-input');
-  var resultsEl = document.getElementById('suche-results');
-  var countEl = document.getElementById('suche-count');
-  var chips = document.querySelectorAll('.suche-filter');
-  var filterZeile = document.querySelector('.suche-filters');
-  if (!input || !resultsEl) return;
+  var input = document.getElementById('dossier-input');
+  var trefferEl = document.getElementById('dossier-treffer');
+  if (!input || !trefferEl) return;
 
-  var kind = 'all';
+  var startEl = document.getElementById('dossier-start');
+  var titelEl = document.getElementById('dossier-titel');
+  var bilanzEl = document.getElementById('dossier-bilanz');
+  var analyseEl = document.getElementById('dossier-analyse');
+  var filterEl = document.getElementById('dossier-filter');
+  var verlaufEl = document.getElementById('dossier-verlauf');
+  var werEl = document.getElementById('dossier-wer');
+  var worumEl = document.getElementById('dossier-worum');
+  var form = document.getElementById('dossier-form');
+
+  var MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli',
+                'August', 'September', 'Oktober', 'November', 'Dezember'];
+  // Wie viele Treffer als Bildkarte stehen, bevor der Rest zur Zeile wird.
+  // Sechs fuellen zwei Reihen zu dritt; darueber hinaus waere die Chronik
+  // wieder eine Kachelwand, und lesbar ist eine Zeile ohnehin schneller.
+  var KARTEN_JE_MONAT = 6;
+  var bereich = 'all';
   var t;
 
-  function syncUrl(q) {
+  var esc = TelcoSearch.esc;
+
+  function datumDe(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
+    if (!m) return '';
+    return parseInt(m[3], 10) + '. ' + MONATE[parseInt(m[2], 10) - 1] + ' ' + m[1];
+  }
+
+  function monatDe(schluessel) {
+    var m = /^(\d{4})-(\d{2})/.exec(schluessel || '');
+    return m ? MONATE[parseInt(m[2], 10) - 1] + ' ' + m[1] : 'Ohne Datum';
+  }
+
+  function zaehle(liste, feld) {
+    var z = {};
+    liste.forEach(function (it) {
+      var wert = (it[feld] || '').trim();
+      if (wert) z[wert] = (z[wert] || 0) + 1;
+    });
+    return z;
+  }
+
+  /* Gezaehlte Werte als Balken. Dieselbe Bauform wie das Marktbild der
+     Differenzierungs-Seite - eine Zahlenreihe, ein Aussehen. */
+  function balken(el, zaehler, grenze, reihenfolge) {
+    var paare = Object.keys(zaehler).map(function (k) {
+      return { name: k, n: zaehler[k] };
+    });
+    if (reihenfolge === 'name') paare.sort(function (a, b) { return a.name < b.name ? -1 : 1; });
+    else paare.sort(function (a, b) { return b.n - a.n || (a.name < b.name ? -1 : 1); });
+    if (grenze) paare = paare.slice(0, grenze);
+    var hoechste = paare.reduce(function (m, p) { return Math.max(m, p.n); }, 0);
+    el.innerHTML = paare.map(function (p) {
+      var w = hoechste ? Math.round(100 * p.n / hoechste) : 0;
+      return '<li><span class="dz-balken-name">' + esc(p.name) + '</span>' +
+        '<span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:' + w + '%"></span></span>' +
+        '<span class="dz-balken-n">' + p.n + '</span></li>';
+    }).join('');
+  }
+
+  function motiv(it) {
+    if (it.image) {
+      return '<span class="dsk-motiv"><img src="' + esc(TelcoSearch.prefix() + it.image) +
+        '" alt=""' + (it.image_w ? ' width="' + it.image_w + '" height="' + it.image_h + '"' : '') +
+        ' loading="lazy"></span>';
+    }
+    // Kein belegtes Bild: die Schriftkachel mit dem Absender. Dieselbe Regel
+    // wie auf der Promo-Uebersicht und der Differenzierung - jede Karte
+    // traegt ein Motiv, nie einen leeren Kasten.
+    return '<span class="dsk-motiv"><span class="dsk-kachel">' +
+      esc(it.operator || it.source_label || 'Meldung') + '</span></span>';
+  }
+
+  function meta(it, ohneAbsender) {
+    var teile = [ohneAbsender ? '' : it.operator, it.region, datumDe(it.date)]
+      .filter(Boolean);
+    return teile.join(' · ');
+  }
+
+  function kontextLabel(it) {
+    if (it.kind === 'bericht') return 'In der Ausgabe ansehen';
+    if (it.kind === 'promo') return 'Auf der Promo Übersicht ansehen';
+    return 'Im Differenzierungs-Hebel ansehen';
+  }
+
+  function karte(it, ws, q, stufe) {
+    var zeile = stufe === 'zeile';
+    var klasse = 'dsk' + (stufe ? ' dsk--' + stufe : '') +
+      (it.image ? '' : ' ohne-bild');
+    // Traegt die Schriftkachel schon den Absender, faellt er aus der
+    // Metazeile - sonst steht derselbe Name zweimal untereinander.
+    var ohneAbsender = !it.image && !zeile;
+    return '<article class="' + klasse + '">' +
+      (zeile ? '' : motiv(it)) +
+      '<div class="dsk-text">' +
+        '<p class="dsk-kopf">' +
+          '<span class="dsk-art ' + esc(it.kind) + '">' +
+            esc(TelcoSearch.KIND_LABEL[it.kind] || it.kind) + '</span>' +
+          '<span class="dsk-meta">' + esc(meta(it, ohneAbsender)) + '</span>' +
+          (it.status ? '<span class="dsk-status">' + esc(it.status) + '</span>' : '') +
+        '</p>' +
+        '<a class="dsk-titel szl" href="' + esc(it.url) + '" target="_blank" rel="noopener">' +
+          TelcoSearch.markiere(it.title, ws) + '</a>' +
+        (!zeile && it.summary && it.summary !== it.title
+          ? '<p class="dsk-anriss">' + TelcoSearch.markiere(it.summary, ws) + '</p>' : '') +
+        '<p class="dsk-fuss">' +
+          '<a class="dsk-quelle" href="' + esc(it.url) + '" target="_blank" rel="noopener">' +
+            esc(it.source_label || 'Quelle') + ' &nearr;</a>' +
+          '<a class="dsk-kontext" href="' + esc(TelcoSearch.deepLinkHref(it, q)) + '">' +
+            kontextLabel(it) + ' &rsaquo;</a>' +
+        '</p>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function chronik(treffer, ws, q) {
+    // Nach Monat, neueste zuerst. Die Chronik IST die Historie - deshalb
+    // sortiert sie nach Datum und nicht nach Punktzahl; die Punktzahl
+    // entscheidet nur, wer den Aufmacher stellt.
+    var monate = [];
+    var nachMonat = {};
+    treffer.forEach(function (it) {
+      var key = (it.date || '').slice(0, 7) || '0000-00';
+      if (!nachMonat[key]) { nachMonat[key] = []; monate.push(key); }
+      nachMonat[key].push(it);
+    });
+    monate.sort().reverse();
+    return monate.map(function (key) {
+      var liste = nachMonat[key];
+      var karten = liste.slice(0, KARTEN_JE_MONAT);
+      var zeilen = liste.slice(KARTEN_JE_MONAT);
+      return '<section class="dossier-monat">' +
+        '<div class="rubrik"><h2>' + esc(monatDe(key)) + '</h2>' +
+        '<span class="rubrik-zahl">' + liste.length + ' Treffer</span></div>' +
+        '<div class="dossier-raster">' +
+          karten.map(function (it) { return karte(it, ws, q); }).join('') +
+        '</div>' +
+        (zeilen.length
+          ? '<div class="dossier-zeilen">' +
+              zeilen.map(function (it) { return karte(it, ws, q, 'zeile'); }).join('') +
+            '</div>'
+          : '') +
+      '</section>';
+    }).join('');
+  }
+
+  function bilanz(treffer, q) {
+    var mitDatum = treffer.map(function (it) { return it.date; })
+      .filter(Boolean).sort();
+    var quellen = {};
+    treffer.forEach(function (it) { if (it.source_label) quellen[it.source_label] = 1; });
+    var teile = [treffer.length + (treffer.length === 1 ? ' Treffer' : ' Treffer')];
+    if (mitDatum.length > 1 && mitDatum[0] !== mitDatum[mitDatum.length - 1]) {
+      teile.push('von ' + datumDe(mitDatum[0]) + ' bis ' +
+                 datumDe(mitDatum[mitDatum.length - 1]));
+    } else if (mitDatum.length) {
+      teile.push('vom ' + datumDe(mitDatum[0]));
+    }
+    var n = Object.keys(quellen).length;
+    if (n) teile.push(n + (n === 1 ? ' Quelle' : ' Quellen'));
+    return teile.join(' · ');
+  }
+
+  function filterZeile(alle, ws) {
+    // Die Zahl je Bereich steht am Filter, nicht daneben - sie ist der
+    // Grund, ihn zu druecken.
+    var arten = ['all', 'bericht', 'differenzierung', 'promo'];
+    var zaehler = {};
+    alle.forEach(function (h) { zaehler[h.it.kind] = (zaehler[h.it.kind] || 0) + 1; });
+    filterEl.innerHTML = arten.filter(function (a) {
+      return a === 'all' || zaehler[a];
+    }).map(function (a) {
+      var n = a === 'all' ? alle.length : zaehler[a];
+      var label = a === 'all' ? 'Alles' : (TelcoSearch.KIND_LABEL[a] || a);
+      return '<button type="button" class="suche-filter' + (a === bereich ? ' on' : '') +
+        '" data-kind="' + a + '">' + esc(label) + ' <span class="suche-filter-n">' +
+        n + '</span></button>';
+    }).join('');
+  }
+
+  function zeichne(q) {
+    var ws = TelcoSearch.worte(q);
+    if (!ws.length) {
+      titelEl.textContent = 'Suche im Archiv';
+      bilanzEl.textContent = '';
+      trefferEl.innerHTML = '';
+      analyseEl.hidden = true;
+      filterEl.hidden = true;
+      if (startEl) startEl.hidden = false;
+      document.title = 'Marktrecherche · Suche';
+      return;
+    }
+    if (startEl) startEl.hidden = true;
+    titelEl.textContent = q;
+    document.title = q + ' · Dossier';
+
+    TelcoSearch.loadIndex().then(function (alleEintraege) {
+      var alle = TelcoSearch.suche(alleEintraege, q);
+      filterZeile(alle, ws);
+      filterEl.hidden = !alle.length;
+
+      var gefiltert = bereich === 'all' ? alle
+        : alle.filter(function (h) { return h.it.kind === bereich; });
+      var treffer = gefiltert.map(function (h) { return h.it; });
+
+      if (!treffer.length) {
+        bilanzEl.textContent = '';
+        analyseEl.hidden = true;
+        trefferEl.innerHTML = '<p class="empty-note">Keine Treffer für „' +
+          esc(q) + '“.</p>';
+        return;
+      }
+
+      bilanzEl.textContent = bilanz(treffer, q);
+
+      analyseEl.hidden = false;
+      var proMonat = {};
+      treffer.forEach(function (it) {
+        var key = (it.date || '').slice(0, 7);
+        if (key) proMonat[monatDe(key)] = (proMonat[monatDe(key)] || 0) + 1;
+      });
+      balken(verlaufEl, proMonat, 12, 'name');
+      balken(werEl, zaehle(treffer, 'operator'), 8);
+      balken(worumEl, zaehle(treffer, 'category'), 8);
+
+      // Der Aufmacher: der staerkste Treffer, aber unter gleich starken der
+      // mit Bild - eine leere grosse Position ist genau der Zustand, den die
+      // Bebilderung gerade behebt.
+      var sortiert = gefiltert.slice().sort(function (a, b) {
+        return b.score - a.score ||
+          (b.it.date || '').localeCompare(a.it.date || '');
+      });
+      var spitze = sortiert[0].score;
+      var kopf = sortiert.filter(function (h) { return h.score === spitze; })
+        .sort(function (a, b) { return (b.it.image ? 1 : 0) - (a.it.image ? 1 : 0); })[0].it;
+
+      var rest = treffer.filter(function (it) { return it !== kopf; })
+        .sort(function (a, b) {
+          return (b.date || '').localeCompare(a.date || '') ||
+            (b.relevance || 0) - (a.relevance || 0);
+        });
+
+      trefferEl.innerHTML =
+        '<section class="dossier-lead">' + karte(kopf, ws, q, 'lead') + '</section>' +
+        chronik(rest, ws, q);
+    });
+  }
+
+  function lauf() {
+    var q = (input.value || '').trim();
     try {
       var url = new URL(location.href);
       if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
       history.replaceState(null, '', url.pathname + url.search + url.hash);
     } catch (e) { /* URL() nicht verfuegbar - stiller Fallback, Seite bleibt nutzbar */ }
+    zeichne(q);
   }
 
-  function renderHits(hits, q) {
-    if (!q) {
-      // Ohne Suchbegriff steht hier nichts. Bis zum 08.08.2026 stand unter
-      // dem Feld ein roter Kasten, der zum Eintippen aufforderte - ein Satz,
-      // der die Bedienung eines Suchfelds erklaert, und der einzige rote
-      // Block der Seite. Auch die Bereichsfilter zeigen sich erst, wenn es
-      // etwas zu filtern gibt.
-      resultsEl.innerHTML = '';
-      countEl.textContent = '';
-      if (filterZeile) filterZeile.hidden = true;
-      return;
-    }
-    if (filterZeile) filterZeile.hidden = false;
-    if (!hits.length) {
-      resultsEl.innerHTML = '<p class="empty-note">Keine Treffer für „' + TelcoSearch.esc(q) + '“.</p>';
-      countEl.textContent = '0 Treffer';
-      return;
-    }
-    resultsEl.innerHTML = hits.map(function (it) {
-      var meta = [it.operator, it.region, it.date].filter(Boolean).join(' · ');
-      var ctxLabel = it.kind === 'bericht' ? 'Im Wochenbericht ansehen' : 'Im Differenzierungs-Thema ansehen';
-      return '<article class="suche-card">' +
-        '<div class="gs-item-top">' +
-          '<span class="gs-kind ' + TelcoSearch.esc(it.kind) + '">' +
-            TelcoSearch.esc(TelcoSearch.KIND_LABEL[it.kind] || it.kind) + '</span>' +
-          '<span class="gs-item-meta">' + TelcoSearch.esc(meta) + '</span>' +
-        '</div>' +
-        '<p class="gs-item-title">' + TelcoSearch.esc(it.title) + '</p>' +
-        '<p class="gs-item-snip">' + TelcoSearch.snippet(it, q) + '</p>' +
-        '<div class="suche-card-links">' +
-          '<a class="source-link" href="' + TelcoSearch.esc(it.url) + '" target="_blank" rel="noopener">' +
-            'Originalquelle öffnen &nearr;</a>' +
-          '<a class="suche-context-link" href="' + TelcoSearch.esc(TelcoSearch.deepLinkHref(it, q)) + '">' +
-            ctxLabel + ' &rsaquo;</a>' +
-        '</div>' +
-      '</article>';
-    }).join('');
-    countEl.textContent = hits.length + ' Treffer für „' + TelcoSearch.esc(q) + '“';
+  input.addEventListener('input', function () {
+    clearTimeout(t); t = setTimeout(lauf, 150);
+  });
+  if (form) {
+    // Ohne das laedt das Formular die Seite neu und die Eingabe verliert den
+    // Fokus - der Unterschied zwischen einer Suche und einem Seitenwechsel.
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); lauf(); });
   }
-
-  function run() {
-    var q = (input.value || '').trim().toLowerCase();
-    syncUrl(q);
-    if (!q) { renderHits([], ''); return; }
-    TelcoSearch.loadIndex().then(function (all) {
-      var hits = all.filter(function (it) { return TelcoSearch.haystack(it).indexOf(q) !== -1; });
-      if (kind !== 'all') hits = hits.filter(function (it) { return it.kind === kind; });
-      renderHits(hits, q);
-      document.title = 'Suche: ' + q + ' – Vodafone Insights';
-    });
-  }
-
-  input.addEventListener('input', function () { clearTimeout(t); t = setTimeout(run, 150); });
-  chips.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      chips.forEach(function (b) { b.classList.remove('on'); });
-      btn.classList.add('on');
-      kind = btn.dataset.kind || 'all';
-      run();
-    });
+  filterEl.addEventListener('click', function (ev) {
+    var btn = ev.target.closest ? ev.target.closest('.suche-filter') : null;
+    if (!btn) return;
+    bereich = btn.dataset.kind || 'all';
+    zeichne((input.value || '').trim());
   });
 
   try {
-    var qs = new URLSearchParams(location.search);
-    var q0 = qs.get('q');
-    if (q0) {
-      input.value = q0;
-      // Die Topbar-Suche landet mit ?q= auf dieser Seite. Seit der Filter im
-      // Seitenkopf weg ist (07.08.2026), stehen die Treffer nur noch hier
-      // unten - ohne diesen Sprung sieht der Suchende oben eine
-      // Ressortuebersicht und haelt seine Suche fuer verpufft.
-      requestAnimationFrame(function () {
-        var karte = input.closest ? input.closest('.card') : null;
-        if (karte) karte.scrollIntoView({ block: 'start' });
-      });
-    }
+    var q0 = new URLSearchParams(location.search).get('q');
+    if (q0) input.value = q0;
   } catch (e) { /* URLSearchParams nicht verfuegbar - stiller Fallback */ }
-  run();
+  zeichne((input.value || '').trim());
 })();
-
 
 /* Meldungsseite (meldungen.html): die Ressortbloecke sind <details>.
 

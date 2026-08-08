@@ -44,6 +44,7 @@ import re
 from datetime import datetime, timedelta
 
 from ..analyze.promo_ranker import MECHANICS
+from .suchindex import marken_anker
 from ..analyze.promo_store import _same_offer
 
 TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
@@ -382,6 +383,11 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
 
         marken.append({
             "name": src.name, "tier": src.tier, "rang": _rang(src),
+            # Sprungziel fuer die Dossier-Suche: ein Treffer vom Typ "Aktion"
+            # verlinkt hierher. Die Rechnung steht in report/suchindex.py -
+            # dort wird der Link geschrieben, hier der Anker gesetzt, und wenn
+            # die zwei auseinanderlaufen, springt die Suche ins Leere.
+            "anker": marken_anker(src.name),
             "tier_label": TIER_LABEL.get(src.tier, ""),
             "color": _OWN_COLOR if src.internal_reference else TIER_COLOR.get(src.tier, "#3860be"),
             "group": src.group, "url": src.url,

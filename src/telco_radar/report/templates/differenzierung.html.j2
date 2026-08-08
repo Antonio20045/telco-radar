@@ -1,46 +1,79 @@
 {# Das Inspirations-Radar: womit heben sich Telkos ab, jenseits von Preis
    und Datenvolumen?
 
-   Antonio am 08.08.2026: "Differenzierung gefaellt mir ueberhaupt nicht. Es
-   geht darum, was Telco-Unternehmen weltweit tun, um sich JENSEITS von Preis
-   und Gigabytes zu differenzieren - zusaetzliche externe Services usw.
-   Beispiele: Vodafone 5-Jahres-Garantie; Telekom bietet Kunden Perplexity an.
-   Genau sowas will ich als Radar auf dem Schirm haben."
+   Antonio am 08.08.2026, nach dem ersten Umbau: "Es ist total
+   unuebersichtlich, sich das anzugucken. Keine Bilder, es ist schwer zu
+   verstehen. Der Sinn hinter der Differenzierung ist ja zu schauen, was
+   andere Wettbewerber machen, sich vom Markt abzuheben ... viel besser sein
+   analytisch. Eigentlich hat es noch einen Bericht, und Bericht finde ich
+   auch gut, aber nicht einfach so reinpasten, dieser eine lange Bereich ...
+   damit nicht so viel kognitive Arbeit darin besteht, erstmal zu verstehen,
+   was die Differenzierung ist."
 
-   Bis dahin stand hier dreimal dieselbe Information: der Prosa-Bericht mit
-   Dutzenden Inline-Links, darunter ein Kachelraster mit je zwei Beispielen
-   in Winzschrift, darunter ein zugeklapptes <details> mit allen Beispielen.
-   Jetzt steht jedes Beispiel GENAU EINMAL, als Karte, und der Essay klappt
-   unten auf.
+   Vier Dinge sind daraufhin anders, und jedes beantwortet einen der Saetze:
+
+   1. JEDE KARTE TRAEGT EIN MOTIV - ein Bild von der Originalseite oder eine
+      Schriftkachel mit dem Absender (report/diff_bilder.py). Vorher: 77
+      Karten, null Bilder.
+   2. DAS MARKTBILD STEHT VOR DEN BEISPIELEN. Welcher Hebel wird wie oft
+      gezogen, wer ist am breitesten aufgestellt, aus welchen Regionen kommen
+      die Beispiele - gerechnet aus dem Bestand, ohne Modell.
+   3. JEDER HEBEL SAGT IN EINEM SATZ, WAS ER BEDEUTET. Wer "Super-App &
+      Oekosystem" liest, soll nicht raten muessen.
+   4. DER BERICHT IST VERTEILT, nicht angehaengt: die Lage oben, die Muster
+      neben dem Marktbild, die Einordnung je Hebel ueber dessen Beispielen
+      (report/differenzierung_bericht.py). Ein alter Bericht ohne diese
+      Gliederung steht weiterhin zugeklappt am Ende.
 
    Die Ordnung:
-     RADAR       die juengsten Funde, gross - der Nachrichtenwert der Seite.
-     BIBLIOTHEK  je Hebel eine Rubrik mit allen Beispielen. Hebel ohne
-                 Beispiel erscheinen nicht.
-     BERICHT     der Essay, aufklappbar.
+     LAGE + MARKTBILD  was der Bestand zusammen sagt.
+     RADAR             die juengsten Funde, gross.
+     BIBLIOTHEK        je Hebel eine Rubrik, GEWICHTET: ein Aufmacher, ein
+                       paar Karten, der Rest als Zeilen.
 
    Die Anker `dz-theme-<key>` sitzen an den Hebel-Rubriken und muessen bleiben
-   (der Suchindex verlinkt dorthin). Sie stehen jetzt IM Seitenfluss statt in
-   einem geschlossenen <details> - ein Sprungziel in einem zugeklappten
-   Aufklapper fuehrt ins Nichts.
+   (der Suchindex verlinkt dorthin). Sie stehen IM Seitenfluss statt in einem
+   geschlossenen <details> - ein Sprungziel in einem zugeklappten Aufklapper
+   fuehrt ins Nichts.
 
-   Jede Schlagzeile traegt `szl` (CLAUDE.md §5). #}
+   Jede Schlagzeile traegt `szl`, und jedes Beispiel - auch die Zeilen -
+   traegt `dzk`: daran haengt der Wahrheitstest, der die Rubrikzahl gegen die
+   wirklich gerenderten Beispiele haelt. #}
 {% extends "base.html.j2" %}
 {% set active = 'differenzierung' %}
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 
-{% macro karte(e, gross=false) %}
-<article class="dzk{% if gross %} dzk--gross{% endif %}"{% if e.farbe %} style="--c:{{ e.farbe }}"{% endif %}>
-  <p class="dzk-kopf"><b class="dzk-op">{{ e.operator }}</b>{% if e.region %}<span class="dzk-reg">{{ e.region }}</span>{% endif %}</p>
-  <a class="dzk-what szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.what }}</a>
-  {% if e.why %}<p class="dzk-why">{{ e.why }}</p>{% endif %}
-  <p class="dzk-fuss">
-    {# Oben mischen alle Hebel - dort muss die Karte sagen, aus welchem Feld
-       sie kommt. In der Bibliothek steht das schon in der Rubrik darueber. #}
-    {% if gross and e.hebel_label %}<a class="dzk-hebel" href="#dz-theme-{{ e.theme }}">{{ e.hebel_label }}</a>{% endif %}
-    <a class="dzk-quelle" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>
-    {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
-  </p>
+{% macro motiv(e) %}
+{# Bild oder Schriftkachel - nie ein leerer Kasten. Dieselbe Regel wie auf
+   der Promo Uebersicht: die Kachel ist die zweite gueltige Form einer Karte,
+   nicht der Notnagel fuer ein fehlendes Bild. #}
+<span class="dzk-motiv">
+  {% if e.image %}<img src="{{ prefix }}images/{{ e.image }}" alt=""
+     {% if e.image_w %}width="{{ e.image_w }}" height="{{ e.image_h }}"{% endif %}
+     loading="lazy">
+  {% else %}<span class="dzk-kachel">{{ e.kachelwort }}</span>{% endif %}
+</span>
+{% endmacro %}
+
+{% macro karte(e, stufe='') %}
+<article class="dzk{% if stufe %} dzk--{{ stufe }}{% endif %}{% if not e.image %} ohne-bild{% endif %}"{% if e.farbe %} style="--c:{{ e.farbe }}"{% endif %}>
+  {% if stufe != 'zeile' %}{{ motiv(e) }}{% endif %}
+  <div class="dzk-text">
+    {# Traegt die Schriftkachel schon den Absender, steht er hier nicht noch
+       einmal - sonst liest man "T-Mobile" zweimal untereinander, und das
+       sieht nach Panne aus, nicht nach Gestaltung. Die Region bleibt: sie
+       ist die zweite Information dieser Zeile, nicht dieselbe. #}
+    <p class="dzk-kopf">{% if e.image or stufe == 'zeile' %}<b class="dzk-op">{{ e.operator }}</b>{% endif %}{% if e.region %}<span class="dzk-reg">{{ e.region }}</span>{% endif %}</p>
+    <a class="dzk-what szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.what }}</a>
+    {% if e.why and stufe != 'zeile' %}<p class="dzk-why">{{ e.why }}</p>{% endif %}
+    <p class="dzk-fuss">
+      {# Oben mischen alle Hebel - dort muss die Karte sagen, aus welchem Feld
+         sie kommt. In der Bibliothek steht das schon in der Rubrik darueber. #}
+      {% if stufe == 'gross' and e.hebel_label %}<a class="dzk-hebel" href="#dz-theme-{{ e.theme }}">{{ e.hebel_label }}</a>{% endif %}
+      <a class="dzk-quelle" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.source }} &nearr;</a>
+      {% if e.neu %}<span class="dz-new">neu</span>{% endif %}
+    </p>
+  </div>
 </article>
 {% endmacro %}
 
@@ -54,11 +87,82 @@
     </div>
     {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Konkrete Beispiele jenseits von Preis und Datenvolumen – als Inspiration, jede mit Originalquelle.</p>
-  {% if diff.hebel %}
-  <nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
-    {% for h in diff.hebel %}<a href="#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}
-  </nav>
+  {# Der Satz, der die kognitive Arbeit abnimmt: was auf dieser Seite
+     ueberhaupt gesammelt wird, an drei Beispielen statt an einer Definition. #}
+  <p class="page-lead">Alles, womit ein Netzbetreiber Kunden gewinnt und hält, das <em>nicht</em>
+  Preis oder Datenvolumen ist – eine Perplexity-Lizenz im Tarif, fünf Jahre Garantie
+  aufs Gerät, ein Streaming-Abo, Betrugsschutz im Netz. Gesammelt aus aller Welt,
+  jedes Beispiel mit Originalquelle.</p>
+</section>
+
+{% if diff_lage_html %}
+{# Die Lage aus dem Bericht - der Einstieg, nicht der Anhang. #}
+<section class="dz-lage">
+  <article class="prose">{{ diff_lage_html | safe }}</article>
+</section>
+{% endif %}
+
+{% set mb = diff.marktbild %}
+<section class="dz-marktbild">
+  <div class="rubrik">
+    <h2>Das Marktbild</h2>
+    <span class="rubrik-zahl">{{ mb.gesamt }} Beispiele</span>
+  </div>
+  <div class="dz-mb-raster">
+
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Welcher Hebel gezogen wird</h3>
+      <ul class="dz-balken">
+        {% for b in mb.hebel_balken %}
+        <li><span class="dz-balken-name">{{ b.name }}</span>
+          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:{{ b.w }}%"></span></span>
+          <span class="dz-balken-n">{{ b.n }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Wer am breitesten aufgestellt ist</h3>
+      {# Gereiht nach der Zahl VERSCHIEDENER Hebel: wer denselben Hebel
+         achtmal zieht, fährt eine Kampagne; wer vier verschiedene zieht,
+         eine Strategie. Genau das ist die Frage der Seite. #}
+      <ol class="dz-anbieter">
+        {% for a in mb.aktivste %}
+        <li>
+          <span class="dz-anbieter-name">{{ a.name }}</span>
+          <span class="dz-anbieter-hebel">{{ a.hebel | join(' · ') }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    <div class="dz-mb-block">
+      <h3 class="dz-mb-titel">Woher die Beispiele kommen</h3>
+      <ul class="dz-balken">
+        {% for b in mb.regionen %}
+        <li><span class="dz-balken-name">{{ b.name }}</span>
+          <span class="dz-balken-spur"><span class="dz-balken-fuell" style="width:{{ b.w }}%"></span></span>
+          <span class="dz-balken-n">{{ b.n }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+
+  {# Die Muster aus dem Bericht stehen unter den gerechneten Spalten und ueber
+     die volle Breite: sie sind Prosa, keine Zahlenreihe, und in einer 370 px
+     schmalen Spalte waeren zwei Saetze mit Quellenlinks unlesbar. Sie
+     ERSETZEN keine der drei Spalten - das Marktbild wird gerechnet, die
+     Muster werden geschrieben, und beide sagen etwas anderes. #}
+  {% if diff_muster %}
+  <div class="dz-muster-band">
+    <h3 class="dz-mb-titel">Was sich wiederholt</h3>
+    <ul class="dz-muster">
+      {% for m in diff_muster %}
+      <li>{% if m.titel %}<b>{{ m.titel }}</b> {% endif %}{{ m.text_html | safe }}</li>
+      {% endfor %}
+    </ul>
+  </div>
   {% endif %}
 </section>
 
@@ -68,9 +172,15 @@
     <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
   </div>
   <div class="dz-raster dz-raster--gross">
-    {% for e in diff.neu %}{{ karte(e, true) }}{% endfor %}
+    {% for e in diff.neu %}{{ karte(e, 'gross') }}{% endfor %}
   </div>
 </section>
+{% endif %}
+
+{% if diff.hebel %}
+<nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
+  {% for h in diff.hebel %}<a href="#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}
+</nav>
 {% endif %}
 
 {% for h in diff.hebel %}
@@ -79,15 +189,44 @@
     <h2>{{ h.label }}</h2>
     <span class="rubrik-zahl">{{ h.n }} Beispiel{{ 'e' if h.n != 1 else '' }}</span>
   </div>
+  {# Zwei Saetze, zwei Rollen: was der Hebel BEDEUTET (steht fest) und was
+     an ihm gerade auffaellt (kommt aus dem Bericht dieser Woche). Fehlt der
+     zweite, steht der erste allein - das ist kein Mangel. #}
+  {% if h.erklaerung %}<p class="dz-hebel-was">{{ h.erklaerung }}</p>{% endif %}
+  {% if h.einordnung %}<p class="dz-hebel-einordnung">{{ h.einordnung }}</p>{% endif %}
+
+  {% if h.lead %}
+  <div class="dz-hebel-oben">{{ karte(h.lead, 'lead') }}</div>
+  {% endif %}
+  {% if h.karten %}
   <div class="dz-raster">
-    {% for e in h.eintraege %}{{ karte(e) }}{% endfor %}
+    {% for e in h.karten %}{{ karte(e) }}{% endfor %}
   </div>
+  {% endif %}
+  {% if h.zeilen_offen %}
+  <div class="dz-zeilen">
+    {% for e in h.zeilen_offen %}{{ karte(e, 'zeile') }}{% endfor %}
+  </div>
+  {% endif %}
+  {% if h.zeilen_rest %}
+  {# Der Rest bleibt auf der Seite, nur nicht im Weg - dieselbe Bauform wie
+     die Chronik der Wettbewerbsseite. #}
+  <details class="dz-mehr">
+    <summary>{{ h.zeilen_rest | length }} weitere</summary>
+    <div class="dz-zeilen">
+      {% for e in h.zeilen_rest %}{{ karte(e, 'zeile') }}{% endfor %}
+    </div>
+  </details>
+  {% endif %}
 </section>
 {% else %}
 <p class="empty-note">Für dieses Ressort liegt noch kein belegtes Beispiel vor.</p>
 {% endfor %}
 
 {% if diff_report_html %}
+{# Nur noch der Rueckfall: ein Bericht in der alten Gliederung, den die Seite
+   nicht verteilen kann. Ein Bericht in der neuen steht oben, in den Mustern
+   und ueber den Hebeln - dann faellt dieser Block ersatzlos weg. #}
 <details class="evidence dz-essay">
   <summary><span>Der Differenzierungsbericht</span><small>Bericht vom {{ diff_report_date }}</small></summary>
   <div class="evidence-body">

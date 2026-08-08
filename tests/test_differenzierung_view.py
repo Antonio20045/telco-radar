@@ -150,10 +150,13 @@ def test_ohne_neue_eintraege_stehen_oben_die_zuletzt_geprueften():
     assert [e["url"] for e in d["neu"]][0] == "https://b2.example.com/"
 
 
-def test_hoechstens_sechs_karten_stehen_oben():
+def test_hoechstens_drei_karten_stehen_oben():
+    """Drei seit dem 08.08.2026: die Radar-Karten tragen jetzt ein Motiv und
+    stehen zu dritt in voller Breite. Sechs Bildkarten waeren wieder die
+    Kachelwand, nur bunter."""
     viele = [db_eintrag(id=str(i), url=f"https://x{i}.example.com/",
                         first_seen="2026-08-05") for i in range(12)]
-    assert len(auf(viele)["neu"]) == view.MAX_NEU == 6
+    assert len(auf(viele)["neu"]) == view.MAX_NEU == 3
 
 
 # ------------------------------------------------------------- die Hebel
@@ -199,8 +202,11 @@ def test_ein_unbekannter_hebel_faellt_aus_der_bibliothek_bleibt_aber_im_bestand(
 
 def test_leerer_bestand_bricht_nicht():
     d = auf([], [])
-    assert d == {"bestand": [], "hebel": [], "neu": [], "neu_ist_rueckfall": True,
-                 "gesamt": 0, "n_hebel": 0}
+    assert {k: v for k, v in d.items() if k != "marktbild"} == {
+        "bestand": [], "hebel": [], "neu": [], "neu_ist_rueckfall": True,
+        "gesamt": 0, "n_hebel": 0}
+    assert d["marktbild"]["gesamt"] == 0
+    assert d["marktbild"]["hebel_balken"] == []
 
 
 def test_kaputter_stichtag_macht_niemanden_neu():

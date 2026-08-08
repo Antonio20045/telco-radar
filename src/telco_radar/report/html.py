@@ -15,7 +15,10 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from . import bilder as report_bilder
+from . import diff_bilder
+from . import differenzierung_bericht
 from . import differenzierung_view
+from . import suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
@@ -23,6 +26,7 @@ from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
 from ..analyze import highlight_topics
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
+from ..analyze.promo_ranker import MECHANICS as PROMO_MECHANICS
 from ..promo_config import load_promo_config
 from ..textwerkzeug import (ABKUERZUNGEN as _ABK, gewicht as _gewicht,
                             haeufigkeiten as _haeufigkeiten, saetze as _saetze,
@@ -100,10 +104,19 @@ _MD_DANGEROUS_TAGS = {"base", "embed", "form", "iframe", "math", "object",
                       "script", "style", "svg"}
 
 
-def _md_to_html(text: str) -> str:
-    """Render the editor's Markdown while stripping raw HTML and unsafe URLs."""
+def _md_to_html(text: str, inline: bool = False) -> str:
+    """Render the editor's Markdown while stripping raw HTML and unsafe URLs.
+
+    `inline=True` liefert den Text OHNE das umschliessende <p> - fuer Stellen,
+    an denen das Ergebnis in ein vorhandenes Element gesetzt wird (ein
+    Listenpunkt der Muster-Liste zum Beispiel). Ein <p> in einem <li> reisst
+    dort den Zeilenfluss auf, in dem der fette Musterbegriff steht.
+    """
     rendered = md.markdown(text or "", extensions=["extra", "sane_lists"])
     soup = BeautifulSoup(rendered, "html.parser")
+    if inline:
+        for absatz in soup.find_all("p"):
+            absatz.unwrap()
     for tag in soup.find_all(True):
         if tag.name in _MD_DANGEROUS_TAGS:
             tag.decompose()
@@ -903,63 +916,12 @@ def _prep_competitors(report: dict) -> list[dict]:
 
 
 # ------------------------------------------------------------- search index
-def _search_entry_bericht(h: dict, report_date: str) -> dict:
-    """Ein Bericht-Highlight fuer den siteweiten Suchindex (search_index.json)."""
-    return {
-        "kind": "bericht",
-        "title": h.get("de_title") or h.get("title") or "",
-        "summary": h.get("summary") or "",
-        "operator": h.get("operator") or h.get("source_label") or "",
-        "region": h.get("region") or "",
-        "category": h.get("category") or "",
-        "date": report_date,
-        "source_label": h.get("source_label") or h.get("source") or "",
-        "url": h.get("url") or "",
-        "deep_link": f"reports/{report_date}.html",
-    }
-
-
-def _search_entry_diff(e: dict, theme_label: str) -> dict:
-    """Ein Differenzierungs-Eintrag (data/state/differentiation_db.json) fuer
-    den siteweiten Suchindex."""
-    theme_key = e.get("theme") or ""
-    return {
-        "kind": "differenzierung",
-        "title": e.get("what") or "",
-        "summary": e.get("why") or "",
-        "operator": e.get("operator") or "",
-        "region": e.get("region") or "",
-        "category": theme_label or theme_key,
-        "date": e.get("first_seen") or e.get("last_verified") or "",
-        "source_label": e.get("source") or "",
-        "url": e.get("url") or "",
-        "deep_link": f"differenzierung.html#dz-theme-{theme_key}",
-    }
-
-
-def _build_search_index(reports: list[dict], diff_entries: list[dict],
-                         theme_label_map: dict[str, str]) -> list[dict]:
-    """Aggregiert Bericht-Highlights ALLER Wochen (nicht nur der aktuellen) plus
-    die persistente Differenzierungs-Bibliothek zu einem einzigen, siteweiten
-    Suchindex.
-
-    v1 macht bewusst nur Substring-Matching (in app.js) auf diesen Feldern -
-    keine Tokenisierung/kein Scoring hier. Beide Quellen muessen zusammen rein:
-    ein Themenbegriff wie "Perplexity" taucht fast ausschliesslich in der
-    Differenzierungs-Bibliothek auf, nicht in den woechentlichen
-    Bericht-Highlights derselben Woche - eine Suche, die nur den aktuellen
-    Bericht abdeckt, wuerde beim ersten Ernstfall leer laufen (siehe
-    claude/suche-marktrecherche-konzept.md, Pre-Mortem Punkt 2)."""
-    out: list[dict] = []
-    for report in reports:
-        for h in _flatten(report):
-            public_h = dict(h)
-            public_h.pop("why_it_matters", None)
-            out.append(_search_entry_bericht(public_h, report["date"]))
-    for e in diff_entries:
-        theme_key = e.get("theme") or ""
-        out.append(_search_entry_diff(e, theme_label_map.get(theme_key, theme_key)))
-    return out
+# Der Index selbst wird in report/suchindex.py gebaut - er speist seit dem
+# 08.08.2026 nicht mehr nur die Bericht-Highlights und die Differenzierung,
+# sondern auch die Promo-Aktionen, und jeder Eintrag traegt sein Bild. Die
+# Aufbereitung dorthin auszulagern hat einen zweiten Grund: der Index ist die
+# einzige Datei, die eine SEITE nicht ist - sie wird vom Browser gelesen, und
+# eine 1400-Zeilen-Datei ist der falsche Ort fuer ein Datenformat.
 
 
 # ------------------------------------------------------------------- render
@@ -985,15 +947,27 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # geladene Bild. Solange es 9 Bilder je Lauf waren, fiel das nicht auf;
     # seit es rund 130 sind, waere das Repo in einem Jahr um mehrere
     # Gigabyte gewachsen - fuer Bilder, auf die keine Seite mehr zeigt.
+    #
+    # Gespiegelt werden ZWEI Ordner: die Bilder der Wochenberichte und die der
+    # Differenzierungs-Bibliothek (data/state/diff_images, seit 08.08.2026).
+    # Sie brauchen getrennte Speicher, weil `report_bilder.raeume_auf()` nur
+    # behaelt, was die letzten vier Ausgaben referenzieren - ein
+    # Differenzierungs-Beispiel lebt aber Monate. Ausgeliefert werden sie im
+    # selben Ordner: die Dateinamen sind Hashes ihrer Bild-URL, eine Kollision
+    # waere dieselbe Datei, und eine Seite muss nicht wissen, aus welchem
+    # Speicher ihr Bild stammt.
     bild_quelle = report_bilder.bildordner(reports_dir.parent.parent)
-    if bild_quelle.exists():
+    diff_bild_quelle = diff_bilder.bildordner(reports_dir.parent.parent)
+    bild_quellen = [q for q in (bild_quelle, diff_bild_quelle) if q.exists()]
+    if bild_quellen:
         bild_ziel = site_dir / "images"
         bild_ziel.mkdir(exist_ok=True)
         vorhanden = set()
-        for bild in bild_quelle.iterdir():
-            if bild.is_file():
-                shutil.copyfile(bild, bild_ziel / bild.name)
-                vorhanden.add(bild.name)
+        for quelle in bild_quellen:
+            for bild in quelle.iterdir():
+                if bild.is_file():
+                    shutil.copyfile(bild, bild_ziel / bild.name)
+                    vorhanden.add(bild.name)
         for veraltet in bild_ziel.iterdir():
             if veraltet.is_file() and veraltet.name not in vorhanden:
                 veraltet.unlink()
@@ -1005,8 +979,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # damit das Repo nicht unbegrenzt waechst. Ohne diesen Abgleich zeigt
     # jede Archivwoche jenseits der Aufbewahrungsfrist leere Bildkaesten -
     # und der Satz kommt ohne Bild aus, das ist von Anfang an so gebaut.
-    vorhandene_bilder = {b.name for b in bild_quelle.iterdir() if b.is_file()} \
-        if bild_quelle.exists() else set()
+    # Beide Speicher, weil beide nach site/images/ gespiegelt werden - ein
+    # Differenzierungs-Beispiel kann sein Bild aus dem Bericht geerbt haben
+    # oder ein eigenes og:image tragen.
+    vorhandene_bilder = {b.name for quelle in bild_quellen
+                         for b in quelle.iterdir() if b.is_file()}
     for report in reports:
         for region in (report.get("regions") or {}).values():
             for h in region.get("highlights") or []:
@@ -1042,9 +1019,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # gegenseitig verlinkten - zwei Ladevorgaenge fuer eine Frage.
     woche_tpl = env.get_template("woche.html.j2")
     latest_ctx: dict | None = None
-    # Je Woche das, woraus die Wettbewerbsseite ihre Chronik baut. Es faellt
-    # in dieser Schleife ohnehin an - beides ein zweites Mal zu rechnen waere
-    # der teuerste Teil des Rendervorgangs (14 Wochen x _flatten()).
+    # Je Woche das, woraus die Wettbewerbsseite ihre Chronik und der Suchindex
+    # seine Meldungen bauen. Es faellt in dieser Schleife ohnehin an - alles
+    # ein zweites Mal zu rechnen waere der teuerste Teil des Rendervorgangs
+    # (14 Wochen x _flatten()).
     wochen: list[dict] = []
     for i, report in enumerate(reports):
         highlights = _flatten(report)
@@ -1122,32 +1100,40 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     db = DiffDB(state_dir / "differentiation_db.json")
     store = DiffStore(state_dir / "differentiation.jsonl")
     latest_date = latest["date"] if latest else date.today().isoformat()
+    theme_label_map = dict(SWEEP_THEMES)
+
+    # Der Bericht wird ZERLEGT statt angehaengt: die Lage in den Seitenkopf,
+    # die Muster neben das Marktbild, die Einordnung je Hebel ueber dessen
+    # Beispiele. Nur ein Bericht in der alten Gliederung (bis 08.08.2026:
+    # "Konkrete Entwicklungen" + "Quellenbasis") landet noch als Block am
+    # Seitenende - siehe report/differenzierung_bericht.py.
+    diff_teile = differenzierung_bericht.zerlegen(
+        (diff_report or {}).get("briefing_md", ""), theme_label_map)
+
+    # Die Bilder kommen aus dem Index, den die Pipeline gefuellt hat
+    # (report/diff_bilder.py). `render_site()` fasst nie das Netz an - sonst
+    # koennte weder `scripts/pruefe_portal.py` noch ein Test die Seite bauen.
+    # Sie gehen IN `aufbereiten` hinein, nicht nachtraeglich darueber: die
+    # Gewichtung eines Hebels entscheidet anhand des Bildes, wer ihn anfuehrt.
     diff = differenzierung_view.aufbereiten(
         list(db.entries.values()), store.entries(), SWEEP_THEMES,
-        latest_date, _DIFF_COLOR)
+        latest_date, _DIFF_COLOR, diff_teile["einordnung"],
+        bilder=diff_bilder.lade_index(state_dir.parent.parent),
+        vorhandene_bilder=vorhandene_bilder)
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
             prefix="", diff=diff,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
-            diff_report=diff_report,
-            diff_report_html=_md_to_html(diff_report["briefing_md"])
-            if diff_report else "",
+            diff_lage_html=_md_to_html(diff_teile["lage"])
+            if diff_teile["lage"] else "",
+            diff_muster=[dict(m, text_html=_md_to_html(m["text"], inline=True))
+                         for m in diff_teile["muster"]],
+            # Nur noch der Rueckfall fuer die alte Gliederung.
+            diff_report_html=_md_to_html(diff_teile["alt_md"])
+            if diff_teile["alt_md"] else "",
             diff_report_date=_fmt_date_de(diff_report["date"])
-            if diff_report else "",
-            num_operators=num_operators),
+            if diff_report else ""),
         encoding="utf-8")
-
-    # ---- Suchindex (siteweit): Bericht-Highlights aller Wochen + persistente
-    # Differenzierungs-Bibliothek in einem Index, den app.js im Browser
-    # durchsucht (reines Filtern eines JSON-Arrays, kein Suchserver noetig -
-    # siehe claude/suche-marktrecherche-konzept.md).
-    # Der Suchindex speist sich aus dem GEMISCHTEN Bestand - was auf der Seite
-    # steht, muss auffindbar sein. Ein Eintrag aus dem Presse-Zweig war bis zum
-    # 08.08.2026 weder das eine noch das andere.
-    theme_label_map = dict(SWEEP_THEMES)
-    search_index = _build_search_index(reports, diff["bestand"], theme_label_map)
-    (site_dir / "search_index.json").write_text(
-        json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
 
     # ---- Meldungen: die Belegebene an EINEM Ort. Loest den zugeklappten
     # Explorer der Berichtsseite, suche.html und archive.html ab - drei Orte
@@ -1274,6 +1260,29 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             if veraltet.is_file() and veraltet.name not in geschrieben:
                 veraltet.unlink()
 
+    # ---- Suchindex und Dossier-Seite.
+    #
+    # Sie stehen hier unten und nicht weiter oben, weil der Index ALLE drei
+    # Bereiche traegt - und die Promo-Aktionen entstehen erst im Block
+    # darueber. Wer "Telekom" sucht, will die Meldungen, die Beispiele UND
+    # die laufenden Aktionen der Marke sehen; bis zum 08.08.2026 fehlte der
+    # dritte Bereich ganz, und die Suche fuehrte auf eine Seite, die vor den
+    # Treffern erst ihre eigenen Ressorts zeigte (Antonio: "Ich verstehe
+    # nicht, warum ich da weitergeleitet werde").
+    #
+    # Gesucht wird rein clientseitig: app.js laedt search_index.json per
+    # fetch() und filtert im Browser, kein Suchserver noetig.
+    search_index = suchindex.bauen(
+        wochen, diff["bestand"], theme_label_map,
+        promo_aktionen=promo_entries, mechanik_label=PROMO_MECHANICS)
+    (site_dir / "search_index.json").write_text(
+        json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
+    (site_dir / "suche.html").write_text(
+        env.get_template("suche.html.j2").render(
+            prefix="",
+            top_absender=suchindex.haeufigste_absender(search_index)),
+        encoding="utf-8")
+
     # ---- Wettbewerb: die Dauerseite zu Telekom, O2 und 1&1.
     # Antonio am 08.08.2026: "nicht nur die Meldung dieser Woche, sondern
     # ueber die Wochen und Monate - wie passt die Meldung dieser Woche zu
@@ -1361,8 +1370,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # ---- Weiterleitungen von den alten Dateinamen. Sie stehen in Lesezeichen
     # und in Mails an die Fachabteilung; ein 404 waere die teuerste Art, eine
     # Navigation aufzuraeumen.
+    # `suche.html` steht nicht mehr darunter: der Name ist seit dem 08.08.2026
+    # wieder eine echte Seite - die Dossier-Suche. Ein Lesezeichen darauf
+    # landet also dort, wo es immer hinwollte.
     for alt, ziel in (("bericht.html", "index.html"),
-                      ("suche.html", "meldungen.html"),
                       ("archive.html", "meldungen.html#archiv"),
                       ("protokoll.html", "transparenz.html"),
                       ("sources.html", "transparenz.html#bestand"),

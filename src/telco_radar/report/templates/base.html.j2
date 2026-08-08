@@ -28,7 +28,17 @@
           <a class="uc {% if uc=='markt' %}active{% endif %}" href="{{ prefix }}index.html">Marktrecherche</a>
           <a class="uc {% if uc=='promo' %}active{% endif %}" href="{{ prefix }}promo/index.html">Promo Übersicht</a>
         </nav>
-        <form class="gsearch" id="gsearch" role="search" action="{{ prefix }}meldungen.html" autocomplete="off">
+        {# Das Feld fuehrt auf `suche.html` - die Dossier-Seite. Bis zum
+           08.08.2026 zeigte es auf `meldungen.html`, und der Suchende landete
+           auf einer Seite voller Ressortkacheln, deren Treffer erst nach rund
+           2400 px kamen. Antonio: "Ich verstehe nicht, warum ich da
+           weitergeleitet werde."
+
+           Auf der Suchseite selbst faellt es weg (`ohne_topbar_suche`): dort
+           steht das grosse Feld im Seitenkopf, und zwei Suchfelder auf einer
+           Seite sind zwei Bedienelemente fuer eine Handlung. #}
+        {% if not ohne_topbar_suche %}
+        <form class="gsearch" id="gsearch" role="search" action="{{ prefix }}suche.html" autocomplete="off">
           <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
                  placeholder="Im Archiv suchen …"
                  aria-label="Marktrecherche durchsuchen">
@@ -39,6 +49,7 @@
             </svg>
           </button>
         </form>
+        {% endif %}
       </div>
     </div>
     {# Hier stand bis zum 07.08.2026 eine Datumszeile ("Ausgabe vom ... ·

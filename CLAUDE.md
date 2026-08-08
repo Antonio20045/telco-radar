@@ -214,14 +214,15 @@ Wahrheitstests (keine Dublette, keine abgeschnittene Überschrift, Zahl der
 Geschichten oberhalb der Falz). Wer eine Schlagzeile ergänzt und die Klasse
 vergisst, fällt aus allen dreien heraus.
 
-**Fünf feste Seiten plus temporäre Themenseiten**, geschnitten nach der
+**Sechs feste Seiten plus temporäre Themenseiten**, geschnitten nach der
 Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
 
 | Seite | Frage | Inhalt |
 |---|---|---|
 | `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, ggf. Fokusband auf aktive Themenseiten, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation; Deutschland nur noch als Drei-Zeilen-Verweis auf die Wettbewerbsseite |
-| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Volltextsuche über alle Wochen (`search_index.json`), Wochenarchiv |
-| `differenzierung.html` | „Womit heben sich Telkos ab?" | Inspirations-Radar aus Beispiel-Karten: „Neu auf dem Radar" oben, Bibliothek je Hebel mit Sprungleiste, Essay zugeklappt am Ende. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py` — bis 07.08. las die Seite nur die Sweep-DB, 20 Kurator-Beispiele waren unsichtbar) |
+| `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Wochenarchiv. Die Volltextsuche stand hier bis zum 08.08.2026 am Seitenfuß — sie hat jetzt eine eigene Seite |
+| `suche.html` **Dossier** | „Was weiß das Portal über mein Thema, und wie hat es sich entwickelt?" | Suchfeld, Bilanz (Treffer/Zeitraum/Quellen), Überblick (Verlauf je Monat, Absender, Ressorts), Aufmacher mit Bild, Chronik nach Monaten. Speist sich aus `search_index.json` — Meldungen ALLER Ausgaben **plus** Differenzierung **plus** Promo-Aktionen. Nicht in der Navigation: das Suchfeld der Topbar ist der Eingang |
+| `differenzierung.html` | „Womit heben sich Telkos ab?" | Lage aus dem Bericht, **Marktbild** (Hebel-Balken, aktivste Anbieter, Regionen), „Neu auf dem Radar", dann je Hebel eine Rubrik mit Erklärsatz und GEWICHTETEN Karten mit Bild. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py`) |
 | `wettbewerb.html` **Wettbewerb** | „Was machen Telekom, O2 und 1&1 — und wie passt das zu den Wochen davor?" | je Fokus-Wettbewerber: aktuelle Lage, laufende Promo-Aktionen seiner Marken (`group` in promo_sources), **Monats-Chronik** aller Moves+Meldungen aus dem gesamten Berichtsarchiv, per URL dedupliziert (`report/wettbewerb.py`, KEIN neuer State, keine LLM-Stufe — alles entsteht beim Rendern) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
@@ -426,15 +427,80 @@ Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
 Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
 
 **Die alten Dateinamen** (`bericht.html`, `archive.html`, `sources.html`,
-`protokoll.html`, `suche.html`, `wettbewerber.html`) existieren weiter als
+`protokoll.html`, `wettbewerber.html`) existieren weiter als
 **Weiterleitungen** — sie stehen in Lesezeichen und Mails. Render ist eine
 Static Site, es gibt keine Serverregel für eine 301; die Weiterleitung ist
 Meta-Refresh plus sichtbarer Link (`_redirect_html()` in `report/html.py`).
+`suche.html` steht seit dem 08.08.2026 **nicht** mehr darunter — der Name ist
+wieder eine echte Seite.
 
 **Vorlagen:** `base` (Navigation, Topbar-Suche) · `woche` (Wochenseite und
-Archivwoche) · `meldungen` · `transparenz` · `differenzierung` ·
+Archivwoche) · `meldungen` · `suche` · `transparenz` · `differenzierung` ·
 `_explorer` (Teilvorlage, an zwei Orten eingebunden) · `promo_index` ·
 `promo_quellen`.
+
+**Die Suche ist ein Dossier, keine Trefferliste** (08.08.2026). Bis dahin
+zeigte das Topbar-Formular auf `meldungen.html`, und die Treffer standen als
+graue Textzeilen am FUSS dieser Seite — nach rund 2400 px Ressortkacheln,
+Ressortblöcken und Archiv. Antonio: *„Die Suchfunktion ist total bescheuert …
+ich verstehe nicht, warum ich da weitergeleitet werde. Wenn ich suche, zum
+Beispiel Telekom oder Perplexity, alle Meldungen super dargestellt, dass ich
+einen Überblick habe über die Entwicklung, auch über die Historie."*
+
+| Was | Wo |
+|---|---|
+| Index | `report/suchindex.py` (aus `html.py` herausgelöst). Drei Bereiche: Meldungen ALLER Ausgaben mit `schlagzeile` (nicht `de_title` — der Rest des Portals zeigt diese Zeile), Differenzierungs-Bibliothek, **Promo-Aktionen**. Je Eintrag sein Bild mit fertigem Pfad (`images/…` bzw. `promo/images/…`) |
+| Maschine | `TelcoSearch` in `app.js`: **wortweise mit UND-Verknüpfung** (vorher musste die Eingabe als eine Zeichenkette vorkommen — „telekom perplexity" fand nichts) und mit Rangfolge (Absender 8, Schlagzeile 5, sonst 2, plus Dringlichkeit). Die Hervorhebung **kürzt nichts mehr mit „…"** |
+| Seite | `suche.html` — Kopf mit Bilanz, „Der Überblick" (Verlauf je Monat, Wer, Worum als Balken), Bereichsfilter mit Zahl, Aufmacher mit Bild, Chronik nach Monaten (6 Bildkarten, Rest als Zeilen) |
+| Leere Seite | „Meistgenannt im Archiv" — zwölf Absender als Chips, gerechnet. **Ohne die Promo-Aktionen**: sie sind 256 von 1060 Einträgen und alle deutsch, mitgezählt stünden winSIM und simplytel vor AT&T |
+
+Fallstricke: der Markenanker der Promo-Übersicht wird in `suchindex.marken_anker()`
+gerechnet und in `promo.py` gesetzt — laufen die zwei auseinander, springt die
+Suche ins Leere (ein Test hält sie zusammen). Und auf `suche.html` blendet
+`base.html.j2` das Topbar-Feld aus (`ohne_topbar_suche`): zwei Suchfelder auf
+einer Seite sind zwei Bedienelemente für eine Handlung.
+
+**Die Differenzierungs-Seite ist am 08.08.2026 zum zweiten Mal umgebaut worden.**
+Der erste Anlauf (07.08.) hatte die drei Darstellungen auf eine Kartenform
+reduziert; übrig blieb eine 9060 px hohe Wand aus 77 gleich großen Textkärtchen
+**ohne ein einziges Bild**. Antonio: *„total unübersichtlich … keine Bilder, es
+ist schwer zu verstehen … viel besser sein analytisch … Bericht finde ich auch
+gut, aber nicht einfach so reinpasten, dieser eine lange Bereich."* Fünf
+Änderungen:
+
+1. **Jede Karte trägt ein Motiv** — Bild oder Schriftkachel mit dem Absender
+   (`report/diff_bilder.py`: erst das Bild, das der Wochenbericht für dieselbe
+   URL schon geholt hat, dann `og:image`; gemessen 35 von 71). Trägt die Kachel
+   den Absender, steht er **nicht** noch einmal in der Metazeile darunter.
+   Eigener Speicher `data/state/diff_images/` mit eigenem Index und eigenem
+   Aufräumen: `report_bilder.raeume_auf()` behält nur, was die letzten vier
+   Ausgaben referenzieren — ein Differenzierungs-Beispiel lebt Monate.
+   `site/images/` spiegelt seitdem **beide** Ordner. Der Index merkt sich auch
+   den Fehlversuch (30 Tage), sonst fragt jeder Lauf dieselben 36 Seiten neu.
+2. **Das Marktbild steht vor den Beispielen** (gerechnet, kein Modell): welcher
+   Hebel wie oft gezogen wird, wer am breitesten aufgestellt ist (gereiht nach
+   der Zahl **verschiedener** Hebel — acht Beispiele in einem Hebel sind eine
+   Kampagne, vier in vier eine Strategie), woher die Beispiele kommen.
+3. **Jeder Hebel sagt in einem Satz, was er bedeutet** — `blurb` aus
+   `report/differentiation.py`, also dieselbe Stelle wie die Hebel-Farbe.
+4. **Gewichtung statt Kachelwand**: Aufmacher, eine Reihe Karten, Zeilen, Rest
+   im Aufklapper. **Nur ein Beispiel MIT Bild kann Aufmacher sein** — eine
+   Schriftkachel über 46 % Breite lässt daneben eine halbe Spalte leer. Gibt es
+   keins, hat der Hebel keinen Aufmacher; eine Stufe weniger ist ehrlicher als
+   eine leere Stufe. Ein Beispiel aus dem Radar führt seinen Hebel nicht auch
+   noch an.
+5. **Der Bericht wird VERTEILT**: `## Das Bild` in den Seitenkopf, `## Muster`
+   als Band unter das Marktbild, `## Einordnung` (H3 je Hebel) über dessen
+   Beispiele (`report/differenzierung_bericht.py`). `## Quellenbasis` fällt weg
+   — sie führte jede Karte ein drittes Mal auf. **Prompt,
+   `validate_briefing`, `build_digest` und die Zerlegung hängen an EINER
+   Gliederung**; wer eine Überschrift ändert, ändert alle vier. Ein Bericht in
+   der alten Gliederung steht weiterhin zugeklappt am Ende — kein Lauf muss
+   abgewartet werden, damit die Seite steht.
+
+Wahrheitstests: `tests/test_diff_bilder.py` (8) ·
+`tests/test_differenzierung_bericht.py` (8) · `tests/test_search_index.py` (13)
+· `tests/test_suche_page.py` (6) · fünf neue in `tests/test_seiten_zahlen.py`.
 
 **Bilder** (`report/bilder.py`, neu geschrieben am 06.08.2026): jede Meldung
 wird versucht — kein Deckel —, und die **Größe entscheidet, nicht die
@@ -449,14 +515,24 @@ schwerer. **`site/images/` spiegelt den Bildordner, es sammelt nicht**, und
 ist (sonst zeigen Archivwochen leere Kästen, nachdem `raeume_auf()` ihre
 Bilder gelöscht hat).
 
-**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **elf**
-Kriterien gegen die wirklich gerenderte Seite, drei davon mit echtem
+**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **vierzehn**
+Kriterien gegen die wirklich gerenderte Seite, vier davon mit echtem
 Chromium bei 1440 × 900 — unter anderem, ob **irgendein** Bild
 hochskaliert dargestellt wird (auf allen drei Seiten, und die Prüfung
 scrollt dafür durch, sonst misst sie die Lazy-Bilder gar nicht), ob alle
 sieben Ressorts ohne Scrollen sichtbar sind, ob die Promo Übersicht
 mindestens zehn echte Bilder zeigt und ob dort **keine Karte ohne Motiv**
 steht.
+Seit dem 08.08.2026 dazu Kriterium **9** (Differenzierung: Bildquote und
+KEINE Karte ohne Motiv), **9b** (das Marktbild nennt dieselben Zahlen wie die
+Rubriken darunter) und **10** (die Suchseite liefert zu einem echten Begriff
+Treffer, einen Verlauf und bebilderte Karten).
+**Gemessen wird seitdem über einen lokalen HTTP-Server, nicht über `file://`** —
+`fetch('search_index.json')` ist unter `file://` von der Same-Origin-Regel
+gesperrt, die Suchseite bliebe leer, und die Prüfung würde einen Fehler messen,
+den es nicht gibt. Der Server bindet auf 127.0.0.1 und braucht kein Netz.
+Kriterium 10 misst im BROWSER, nicht im HTML: bis auf das Suchfeld entsteht die
+Dossier-Seite in `app.js`, eine statische Prüfung sähe nur leere Behälter.
 Nichts an der Optik gilt als erledigt, bevor dieses Skript grün ist.
 Kriterium 2 rechnet die **Quote** bebilderter Meldungen, keine absolute
 Zahl — die alte Schwelle „≥ 110" war an einer Ausgabe mit 193 Meldungen
@@ -698,7 +774,30 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (08.08.2026, Antonio direkt): Promo-Seite und
+> **Zuletzt erledigt (08.08.2026, Antonio direkt): Suchfunktion und
+> Differenzierung.** Zwei Aufträge in einem: die Suche leitete auf
+> `meldungen.html` weiter und zeigte ihre Treffer als graue Textzeilen am
+> Seitenfuß („total bescheuert … ich verstehe nicht, warum ich da
+> weitergeleitet werde"); die Differenzierung war eine 9060-px-Wand aus 77
+> gleich großen Textkärtchen ohne ein einziges Bild („total unübersichtlich …
+> viel besser sein analytisch"). Erledigt: `suche.html` als Dossier (Bilanz,
+> Verlauf über die Monate, Aufmacher mit Bild, Chronik), Suchindex um die
+> Promo-Aktionen und um Bilder erweitert, wortweise Suche mit Rangfolge;
+> Differenzierung mit Bildern, Marktbild, Hebel-Erklärung, Gewichtung und
+> einem VERTEILTEN statt angehängten Bericht. **707 Tests, alle vierzehn
+> Prüfungen von `pruefe_portal.py` grün.** Einzelheiten in §5, Schlussliste
+> `outputs/suche-und-differenzierung-2026-08-08.md`.
+>
+> **Offen daraus, beides erst nach dem nächsten Actions-Lauf prüfbar:**
+> (1) die Zeile `Differenzierungs-Bilder:` im Protokoll — lokal bekommen 35
+> von 71 Beispielen ein Motiv; (2) der Differenzierungs-Redakteur schreibt
+> seit dieser Runde eine neue Gliederung (`## Das Bild` / `## Muster` /
+> `## Einordnung`) und ist noch nie gegen ein echtes Modell gelaufen. Kommt
+> sie an, verschwindet der zugeklappte Berichtsblock am Seitenende von selbst;
+> kommt sie nicht an, steht dort weiter der alte Bericht — dann im Log nach
+> `Differenzierungsbericht: Regelbericht` sehen.
+>
+> **Davor erledigt (08.08.2026): Promo-Seite und
 > Wettbewerbsseite.** Fünf Punkte in einem Auftrag — fehlende Bilder auf der
 > Promo Übersicht („das wirkt so richtig scheiße"), Reihenfolge nach
 > Wichtigkeit der Anbieter, Namen der Wettbewerber prominenter (beide
@@ -781,8 +880,9 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > 5. **Wettbewerbsseite** `wettbewerb.html` mit Monats-Chronik (§5).
 >
 > Offen aus dem Auftrag außerdem: die Treffer-Karten der Archivsuche
-> kürzen Überschriften JS-seitig mit „…" (app.js, `TelcoSearch`) — Bestand,
-> widerspricht aber der Schlagzeilen-Regel; kleiner eigener Auftrag.
+> kürzten Überschriften JS-seitig mit „…" (app.js, `TelcoSearch`) —
+> **erledigt am 08.08.2026** im Zuge des Suchseiten-Umbaus: die Hervorhebung
+> markiert jetzt jedes Suchwort und kürzt nichts mehr.
 >
 > **Als Nächstes** `AUFTRAG_1000_QUELLEN_WELLE3.md` (Quellenausbau) —
 > beziehungsweise die vier Schritte aus §9 unten, deren erster (Vorgabe-Region

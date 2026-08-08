@@ -1,13 +1,19 @@
-"""Tests fuer die Suche - seit dem Redesign Teil von meldungen.html.
+"""Tests fuer die Suche - seit dem 08.08.2026 wieder eine eigene Seite.
 
-Ausbau von claude/suche-ergebnisseite-konzept.md: statt eines Topbar-Dropdowns
-mit 8er-Deckel gibt es eine eigenstaendige, bookmarkbare Ergebnisliste.
+Sie lebte von 06.08. bis 08.08.2026 am FUSS von meldungen.html, und genau das
+war der Fehler: das Topbar-Formular fuehrte dorthin, und wer "Telekom" suchte,
+sah zuerst sieben Ressortkacheln, sieben Ressortbloecke und das Archiv - die
+Treffer standen nach rund 2400 px. Antonio: "Wenn ich was suche, werde ich auf
+die Unterseite Meldungen weitergeleitet ... ich verstehe nicht, warum."
 
-Seit dem Redesign (06.08.2026, PLAN_MARKTRECHERCHE_REDESIGN.md) lebt sie
-nicht mehr auf einer eigenen suche.html, sondern oben auf meldungen.html -
-zusammen mit dem Wochen-Explorer und dem Archiv. Der Grund: das waren drei
-Orte fuer dasselbe Beduerfnis ("zeig mir die Einzelmeldung"). Die
-Aggregationslogik ist unabhaengig davon in test_search_index.py abgesichert.
+Die Begruendung von damals ("drei Orte fuer dasselbe Beduerfnis") war richtig
+und wird hier nicht rueckgaengig gemacht: die Suche ist kein dritter Ort fuer
+"zeig mir die Einzelmeldung", sondern beantwortet eine eigene Frage - "was
+weiss dieses Portal ueber mein Thema, und wie hat es sich entwickelt". Deshalb
+ist suche.html ein Dossier und keine Trefferliste.
+
+Die Aggregationslogik ist unabhaengig davon in test_search_index.py
+abgesichert.
 """
 from telco_radar.report.html import render_site
 
@@ -16,7 +22,31 @@ SEITEN = ("index.html", "meldungen.html", "differenzierung.html",
           "wettbewerb.html", "transparenz.html")
 
 
-def test_meldungen_traegt_die_suche_und_referenziert_den_index(tmp_path):
+def test_die_suchseite_traegt_das_dossier_und_referenziert_den_index(tmp_path):
+    reports_dir = tmp_path / "data" / "reports"
+    reports_dir.mkdir(parents=True)
+    site_dir = tmp_path / "site"
+
+    render_site(site_dir, reports_dir, cfg=None)
+
+    suche = (site_dir / "suche.html").read_text(encoding="utf-8")
+    # Das Feld und die Behaelter, die app.js fuellt.
+    assert 'id="dossier-input"' in suche
+    assert 'id="dossier-bilanz"' in suche
+    assert 'id="dossier-treffer"' in suche
+    assert 'id="dossier-verlauf"' in suche      # die Entwicklung ueber Monate
+    assert 'id="dossier-filter"' in suche
+
+    # search_index.json entsteht daneben und ist das, was app.js laedt.
+    assert (site_dir / "search_index.json").exists()
+    app_js = (site_dir / "app.js").read_text(encoding="utf-8")
+    assert "search_index.json" in app_js
+    assert "TelcoSearch" in app_js
+
+
+def test_die_suche_steht_nicht_mehr_am_fuss_der_meldungsseite(tmp_path):
+    """Der Zustand, der Antonios Satz ausgeloest hat: das Topbar-Formular
+    fuehrte auf meldungen.html, und die Treffer standen dort ganz unten."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -24,24 +54,18 @@ def test_meldungen_traegt_die_suche_und_referenziert_den_index(tmp_path):
     render_site(site_dir, reports_dir, cfg=None)
 
     meldungen = (site_dir / "meldungen.html").read_text(encoding="utf-8")
-    # Die Suche selbst: Eingabefeld, Filterchips, Trefferbehaelter.
-    assert 'id="suche-input"' in meldungen
-    assert 'id="suche-count"' in meldungen
-    assert 'id="suche-results"' in meldungen
-    assert 'data-kind="bericht"' in meldungen
-    assert 'data-kind="differenzierung"' in meldungen
-
-    # search_index.json entsteht daneben und ist das, was app.js laedt -
-    # fuer das Topbar-Formular wie fuer die Ergebnisliste selbst.
-    assert (site_dir / "search_index.json").exists()
-    app_js = (site_dir / "app.js").read_text(encoding="utf-8")
-    assert "search_index.json" in app_js
-    assert "TelcoSearch" in app_js
+    for tot in ('id="suche-input"', 'id="suche-count"', 'id="suche-results"',
+                "Im Gesamtarchiv suchen"):
+        assert tot not in meldungen, tot
+    # Und kein toter CSS-Block zurueckgeblieben.
+    assert "meldungen-suche" not in (site_dir / "style.css").read_text(encoding="utf-8")
 
 
-def test_topbar_formular_zeigt_auf_meldungen(tmp_path):
+def test_topbar_formular_zeigt_auf_die_suchseite(tmp_path):
     """Jede Seite traegt das native Formular (funktioniert ohne JS) und
-    kein Live-Dropdown."""
+    kein Live-Dropdown. Auf der Suchseite selbst faellt es weg - dort steht
+    das grosse Feld im Seitenkopf, und zwei Suchfelder auf einer Seite sind
+    zwei Bedienelemente fuer eine Handlung."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -50,8 +74,10 @@ def test_topbar_formular_zeigt_auf_meldungen(tmp_path):
 
     for page in SEITEN:
         html = (site_dir / page).read_text(encoding="utf-8")
-        assert 'action="meldungen.html"' in html
+        assert 'action="suche.html"' in html
         assert "gsearch-results" not in html
+    suche = (site_dir / "suche.html").read_text(encoding="utf-8")
+    assert 'id="gsearch-input"' not in suche
 
 
 def test_navigation_hat_fuenf_eintraege(tmp_path):
@@ -89,9 +115,11 @@ def test_alte_dateinamen_leiten_weiter(tmp_path):
 
     render_site(site_dir, reports_dir, cfg=None)
 
+    # `suche.html` steht NICHT mehr darunter: der Name ist seit dem
+    # 08.08.2026 wieder eine echte Seite - ein Lesezeichen darauf landet also
+    # dort, wo es immer hinwollte.
     erwartet = {
         "bericht.html": "index.html",
-        "suche.html": "meldungen.html",
         "archive.html": "meldungen.html#archiv",
         "protokoll.html": "transparenz.html",
         "sources.html": "transparenz.html#bestand",
@@ -116,6 +144,6 @@ def test_render_site_ohne_berichte_erzeugt_trotzdem_alle_seiten(tmp_path):
 
     render_site(site_dir, reports_dir, cfg=None)
 
-    for seite in SEITEN:
+    for seite in (*SEITEN, "suche.html"):
         assert (site_dir / seite).exists(), seite
     assert (site_dir / "search_index.json").read_text(encoding="utf-8") == "[]"
