@@ -313,6 +313,26 @@ def run(root: Path, use_llm: bool | None = None,
             items.extend(tarif_items)
         except Exception as exc:  # noqa: BLE001
             log.error("Aenderungsradar uebersprungen: %s", exc)
+
+    # ----------------------------------------------------------- CT-Radar
+    # Die einzige Ebene, die VOR der Veroeffentlichung liegt: ein
+    # Zertifikat entsteht, waehrend die Seite gebaut wird. Die Meldungen
+    # tragen ihren Vorbehalt im Text - es sind Indizien, keine Meldungen.
+    # Failsafe wie alle Nebenstufen.
+    ct_bilanz: dict = {}
+    if cfg.settings.get("ct_radar_aktiv", True):
+        try:
+            from .collect import ct_log
+            # `use_llm` faellt erst weiter unten; hier zaehlt nur, ob ein
+            # Backend ueberhaupt erreichbar ist. Ohne Modell laeuft der Radar
+            # vollstaendig weiter, nur ohne die Aussortierstufe.
+            ct_items, ct_bilanz = ct_log.sammle(
+                root, cfg.settings.get("http", {}),
+                modell=(analyst_model if (use_llm is not False
+                                          and llm_available()) else ""))
+            items.extend(ct_items)
+        except Exception as exc:  # noqa: BLE001
+            log.error("CT-Radar uebersprungen: %s", exc)
     failed = [r["url"] for r in source_results if r["status"] == "fail"]
     n_ok = sum(1 for r in source_results if r["status"] == "ok")
     n_empty = sum(1 for r in source_results if r["status"] == "empty")
@@ -829,6 +849,12 @@ def run(root: Path, use_llm: bool | None = None,
         # Lieferzeit-Radar: gemessene Punkte des Warenkorbs.
         "lieferzeit_gemessen": lieferzeit_bilanz.get("gemessen", 0),
         "lieferzeit_engpaesse": len(lieferzeit_bilanz.get("engpaesse") or []),
+        # CT-Radar: neue Subdomains als Indiz. `ct_zeitueberschreitung` ist
+        # ausdruecklich eigen gefuehrt - eine Domain, die certspotter nicht
+        # beantwortet hat, ist NICHT eine Domain ohne neue Namen.
+        "ct_domains": ct_bilanz.get("gelesen", 0),
+        "ct_funde": ct_bilanz.get("meldungen", 0),
+        "ct_zeitueberschreitung": ct_bilanz.get("zeitueberschreitung", 0),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),

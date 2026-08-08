@@ -1,0 +1,165 @@
+# Certificate-Transparency-Radar: welche Domains beobachtet werden.
+#
+# Wer eine Kampagnenseite vorbereitet, braucht vorher ein TLS-Zertifikat, und
+# jedes ausgestellte Zertifikat landet nach RFC 6962 in oeffentlichen,
+# append-only Logs. Das ist kein Scraping und keine Luecke - es ist der Zweck
+# dieser Logs, und jeder Browser prueft sie. Wir lesen sie ueber die
+# certspotter-API von SSLMate.
+#
+# WAS DAS SIGNAL WERT IST - und was nicht
+# ---------------------------------------
+# Eine neue Subdomain ist ein INDIZ, keine Meldung. Sie sagt: hier wurde etwas
+# vorbereitet. Sie sagt NICHT, dass es startet, wann es startet oder was es
+# ist. Ein Zertifikat kann Wochen vor dem Start ausgestellt werden, fuer einen
+# Test, oder fuer eine Kampagne, die nie laeuft. Deshalb steht jede Zeile aus
+# diesem Radar im Bericht ausdruecklich als unbestaetigte Vermutung.
+#
+# Gemessen am 08.08.2026 gegen congstar.de: 79 Zertifikate, 48 verschiedene
+# DNS-Namen, darunter `jamobil-news.congstar.de` und
+# `pennymobil.congstarnews.de` - also die Zweitmarken, die congstar fuer Rewe
+# (ja!mobil) und Penny betreibt. Genau das ist der Fall, fuer den das hier
+# gebaut ist.
+#
+# GROSSE DOMAINS LAUFEN IN EINEN TIMEOUT
+# --------------------------------------
+# certspotter beantwortet `telekom.de` mit `include_subdomains=true` nicht
+# innerhalb der Frist - zu viele Eintraege. Das ist ein bekannter Fall und
+# wird als eigene Fehlerklasse gemeldet (`CTZeitueberschreitung`), NICHT als
+# leeres Ergebnis. Ein leeres Ergebnis hiesse "keine neuen Subdomains", und
+# das waere eine Falschaussage. Solche Domains tragen `gross: true` - dann
+# wird die Frist grosszuegiger gesetzt und ein Fehlschlag als erwartbar
+# protokolliert statt als Stoerung.
+
+domains:
+  # --- Deutsche Telekom
+  - marke: congstar
+    domain: congstar.de
+    konzern: Deutsche Telekom
+  - marke: fraenk
+    domain: fraenk.de
+    konzern: Deutsche Telekom
+  - marke: Telekom
+    domain: telekom.de
+    konzern: Deutsche Telekom
+    gross: true
+
+  # --- Telefonica / o2
+  - marke: o2
+    domain: o2online.de
+    konzern: Telefónica
+  - marke: Blau
+    domain: blau.de
+    konzern: Telefónica
+  - marke: ALDI TALK
+    domain: alditalk.de
+    konzern: Telefónica
+
+  # --- 1&1 / United Internet
+  - marke: 1&1
+    domain: 1und1.de
+    konzern: United Internet
+    gross: true
+  - marke: winSIM
+    domain: winsim.de
+    konzern: Drillisch
+  - marke: simplytel
+    domain: simplytel.de
+    konzern: Drillisch
+
+  # --- Freenet
+  - marke: mobilcom-debitel
+    domain: mobilcom-debitel.de
+    konzern: Freenet
+  - marke: klarmobil
+    domain: klarmobil.de
+    konzern: Freenet
+
+  # --- Vodafone selbst: nicht zur Beobachtung des Wettbewerbs, sondern damit
+  # sichtbar ist, was der eigene Konzern oeffentlich ankuendigt, bevor es
+  # intern ankommt. Beobachtend, nicht ratend.
+  - marke: Vodafone
+    domain: vodafone.de
+    konzern: Vodafone
+    gross: true
+
+  # --- Discounter / MVNO
+  - marke: Lidl Connect
+    domain: lidl-connect.de
+    konzern: Lidl
+  - marke: otelo
+    domain: otelo.de
+    konzern: Vodafone
+  - marke: PENNY Mobil
+    domain: pennymobil.de
+    konzern: Deutsche Telekom
+
+# Technische Namen, die NIE eine Kampagne sind.
+#
+# Verglichen wird gegen die einzelnen LABEL des Namens (die Teile zwischen
+# den Punkten), nicht gegen die Zeichenkette. `news.congstar.de` enthaelt
+# "ns" als Teilkette - als Teilketten-Filter waere die interessanteste
+# Meldung des Radars weggefallen.
+#
+# Die Liste steht hier und nicht im Code, weil sie sich mit jedem neuen
+# Anbieter aendert. Was hier nicht steht, faengt die Modellstufe ab.
+rauschen:
+  # Zugang und Identitaet
+  - sso
+  - adfs
+  - acc
+  - auth
+  - login
+  - idp
+  - oauth
+  - vpn
+  - remote
+  - citrix
+  # Umgebungen, die keine Kundenseite sind
+  - test
+  - tests
+  - stage
+  - staging
+  - dev
+  - devel
+  - qa
+  - uat
+  - preprod
+  - sandbox
+  - demo
+  # Betrieb und Zustellung
+  - mail
+  - smtp
+  - imap
+  - pop
+  - mx
+  - webmail
+  - exchange
+  - autodiscover
+  - ns1
+  - ns2
+  - dns
+  - cdn
+  - static
+  - assets
+  - images
+  - img
+  - media
+  - files
+  - download
+  - proxy
+  - gateway
+  - api
+  - monitoring
+  - grafana
+  - status
+  - metrics
+  - backup
+  - git
+  - jenkins
+  - intranet
+  - internal
+  - support
+  - helpdesk
+  - jira
+  - confluence
+  - wiki

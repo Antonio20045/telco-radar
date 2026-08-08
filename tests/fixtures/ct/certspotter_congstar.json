@@ -1,0 +1,472 @@
+[
+ {
+  "id": "11499457400",
+  "tbs_sha256": "6e24790152fbcf633cf7b0ec633a172b1483fd3b943df3909719843f4fa17054",
+  "cert_sha256": "126ed594e898b99acfe0aea3de601d21c1ec0eda0e0204d28a2d25cf6db882ed",
+  "dns_names": [
+   "b2b.congstar.de",
+   "b2b.nicolive.de"
+  ],
+  "pubkey_sha256": "8cf301134a5cf5da58280ed80853e7b684c166f062ad6a39732a260980300b31",
+  "not_before": "2025-08-15T07:02:13Z",
+  "not_after": "2026-08-20T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "11576195876",
+  "tbs_sha256": "7b9cffd5535fe3eb4c575ac02e4e9b8115b8458521f4f7f70ad435f417c75657",
+  "cert_sha256": "45dcb9233c4d1510cb918340f79baea4f5a33ba12d84dfe96c0c2ab757ed43bf",
+  "dns_names": [
+   "mail.congstar.de"
+  ],
+  "pubkey_sha256": "e73aa1ce2b64b35bda038f3465c4dc932f76ec182682735c1dad19f6d31a2ba6",
+  "not_before": "2025-08-21T07:01:42Z",
+  "not_after": "2026-08-26T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "11577247729",
+  "tbs_sha256": "4d8e218235903cedc86323cd92ab7c14423cbff41dd38c28aae89ba24da64a7b",
+  "cert_sha256": "32389919b51896b2603c47a5f7f0e82a50d8f8b81662179de18bc4490b9ef9de",
+  "dns_names": [
+   "cdn.congstar.de"
+  ],
+  "pubkey_sha256": "fca67643f2a4153941c659db12605db903fc66d5128132c4b81b49e8b6a23a6f",
+  "not_before": "2025-08-21T08:58:16Z",
+  "not_after": "2026-08-25T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "11882860502",
+  "tbs_sha256": "d1cc2295c5c96b1bed992a7f861b6ba9cca747bd401cd38ce58c0a8eb1a0b881",
+  "cert_sha256": "526b46d65628cb7893def92f04ad90af7789a55b5f64bfa6f7c04e6506e57258",
+  "dns_names": [
+   "bezahlen.congstar.de"
+  ],
+  "pubkey_sha256": "6429e320c910983110c11dbcb3911f7e51633956c39f5f1a50d1e2b15eb82eb7",
+  "not_before": "2025-09-15T09:54:16Z",
+  "not_after": "2026-09-19T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "12322528214",
+  "tbs_sha256": "870844ec4e1a6b6a7c5291073e567dbe3bbfe2ecd18439084f45c237486f672b",
+  "cert_sha256": "7c4ed2528a55154458363e13ffdb6636a15b5c81108561ad8c61116a6639e494",
+  "dns_names": [
+   "acs.congstar.de"
+  ],
+  "pubkey_sha256": "3cfa601d6b15ee895d29d2685fc890ea171462c6f2004fc030d57dcf017fdbe0",
+  "not_before": "2025-10-17T12:06:54Z",
+  "not_after": "2026-10-21T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "13363050122",
+  "tbs_sha256": "a831526e5038b91d4f5390294c0dd1642fd8c859fe58ce72596969d0919b3a47",
+  "cert_sha256": "165f4b66b0506a7531f0f695f9e0fe517c8a74b17b1611a7d6ab38513a4a80e5",
+  "dns_names": [
+   "reparatur.congstar.de"
+  ],
+  "pubkey_sha256": "db70e40f80e0dfed5a604afb09f4813dccad9f6c95b039788fc88bc1996fd492",
+  "not_before": "2026-01-08T00:00:00Z",
+  "not_after": "2027-01-07T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "14069213285",
+  "tbs_sha256": "a0fc86ed6265ba528013d44e7fc731d63ce7e5064cfd3351e295999c74f99fd0",
+  "cert_sha256": "9a2257d6093cf2c8d7604ea87b1e7ec2e0cedf5b9bc8aa2e8c540dcdcb6b93d8",
+  "dns_names": [
+   "sms.congstar.de"
+  ],
+  "pubkey_sha256": "4e378fbdfbf19998d1307459859dbdd0b7db93fe5c535994bf5c6dfc1e74ad62",
+  "not_before": "2026-03-09T09:17:22Z",
+  "not_after": "2026-09-22T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "14149906196",
+  "tbs_sha256": "ae093a6716398fd26a5f59724486b2fe5ee74455fb3287a67a485c2d2f9d09b6",
+  "cert_sha256": "fd60d69f3f4142a6f6dd97b80992de82a26c5fa14b422cdbfe48351e2d2c57ed",
+  "dns_names": [
+   "*.congstar.de",
+   "congstar.de"
+  ],
+  "pubkey_sha256": "a348b3248aaa0ac8f48c427c88781ae144e45b363ebca0512bcdb1379c815d2e",
+  "not_before": "2026-03-16T07:18:01Z",
+  "not_after": "2026-09-29T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "14856387411",
+  "tbs_sha256": "3bfa5aeef67baa14fcae623cae238324687586ca26e313df723a424bdd1491ee",
+  "cert_sha256": "e9c5703ec41a86f63dbc4fc75d229dd3d1d34b20314f27c3a4c4e460aa39eb83",
+  "dns_names": [
+   "created.congstar.de"
+  ],
+  "pubkey_sha256": "1215820bf40f15ecc2e082fe0ed840945bd05f7aa5dc80903abf98d7e5684fb2",
+  "not_before": "2026-05-11T04:37:24Z",
+  "not_after": "2026-08-09T04:37:23Z",
+  "revoked": false
+ },
+ {
+  "id": "14914638428",
+  "tbs_sha256": "a43437cc224c61bac1a2f41d283e2cd7569ddb8a83188d85c0bc78ec4729eabf",
+  "cert_sha256": "dd90fbb9eefb05678845b3a1c150b8e3742cbc5809d5b2da1eab3c84b3ecced3",
+  "dns_names": [
+   "notruf-info.jamobil.congstar.de"
+  ],
+  "pubkey_sha256": "c7b62dcdac5388850e873111ef713abeaa0d6f05bb8213267afa543697ff7691",
+  "not_before": "2026-05-15T04:10:54Z",
+  "not_after": "2026-08-13T04:10:53Z",
+  "revoked": false
+ },
+ {
+  "id": "14914641400",
+  "tbs_sha256": "76304006071965a080db1a9f1d408e3aa48ed126518b39a3d53e13ec17149e02",
+  "cert_sha256": "567189d2318ec0406d61a57e5a518d9e66a6754521cf86fa0cba7937cc1a3d29",
+  "dns_names": [
+   "notruf-info.pennymobil.congstar.de"
+  ],
+  "pubkey_sha256": "be09468003d68c9d07103e08f5977250940b3f24b68de0c0f479b2de02cb10a1",
+  "not_before": "2026-05-15T04:11:08Z",
+  "not_after": "2026-08-13T04:11:07Z",
+  "revoked": false
+ },
+ {
+  "id": "14987189120",
+  "tbs_sha256": "a0c2260a2f9b40852b321df47c1d3eaf052104770e90d63ccf17c44f1d097f89",
+  "cert_sha256": "ecc8fd190b1ef6eb2b23ed87c58929c56541df7bdb917e2933f455c03d798df4",
+  "dns_names": [
+   "newsroom.congstar.de"
+  ],
+  "pubkey_sha256": "6682155d327c090430fd4849d94bdc5783f60ee72cd2e03e41cb3e0f3cbd24c9",
+  "not_before": "2026-05-20T06:32:54Z",
+  "not_after": "2026-08-18T06:32:53Z",
+  "revoked": false
+ },
+ {
+  "id": "15002025834",
+  "tbs_sha256": "4e8052fbb8fc694c04cf1b63346e8314e9b8c89b4ce11d11c68d18f050e0e649",
+  "cert_sha256": "207533494f75d91ba5dd6de1a51d72253e5c25db4946744a841f7b39b13acb8e",
+  "dns_names": [
+   "adventskalender.congstar.de"
+  ],
+  "pubkey_sha256": "cfa3225da903c6b84cb4fee8d9dfd7d1cbe13d982b150237f8b5b317d9161871",
+  "not_before": "2026-05-21T07:40:40Z",
+  "not_after": "2026-08-19T07:40:39Z",
+  "revoked": false
+ },
+ {
+  "id": "15013668321",
+  "tbs_sha256": "3f029b11eb7ae1eaad34178206e359f8e10a377c95fd36e6c03874b08e8cedae",
+  "cert_sha256": "89c629a28710e9c6ef72f16bf2459a784fabffd00698c4dda387d7b0e721c177",
+  "dns_names": [
+   "email.congstarnews.de",
+   "freundewerben1.congstarnews.de",
+   "news.congstar.de",
+   "newsletter.congstar.de"
+  ],
+  "pubkey_sha256": "dc1e9bbcc2326a722688f8615add04d6c982bd83deb25412484c389df6b4f764",
+  "not_before": "2026-05-22T02:57:55Z",
+  "not_after": "2026-08-20T02:57:54Z",
+  "revoked": false
+ },
+ {
+  "id": "15029140795",
+  "tbs_sha256": "306fd4cae8c077fdb6f5cce8593506f87f507d17f673cfb523357861d4349a8f",
+  "cert_sha256": "834e791a78af2522dd48dd513990ebab5dbb44b9ee2fac24f091a600f2a12b00",
+  "dns_names": [
+   "salesforce-forms.congstar.de"
+  ],
+  "pubkey_sha256": "ca73aad8517ae7477e01a865ebe0e7ae8dd363cb293d2c53d569cbfdb57c466b",
+  "not_before": "2026-05-23T04:11:18Z",
+  "not_after": "2026-08-21T04:11:17Z",
+  "revoked": false
+ },
+ {
+  "id": "15044922915",
+  "tbs_sha256": "f2ceb699d6bc6e87aa9511f6642da8aa4a5e790a866d9ad30ce24c084f84898d",
+  "cert_sha256": "7cadc5fe21448dc3239040ba8927a3a1457d3bbf9ed668819b432dd82c993d6d",
+  "dns_names": [
+   "shop.congstar.de"
+  ],
+  "pubkey_sha256": "3f487f0c05574b8dc67b48277dfb952f0e6ed7ffe3d70226b00ad40f2840bf0c",
+  "not_before": "2026-05-24T07:40:45Z",
+  "not_after": "2026-08-22T07:40:44Z",
+  "revoked": false
+ },
+ {
+  "id": "15047424961",
+  "tbs_sha256": "c4c04a7f35a65fe7766f8d3f0dc08e36edfc36fef50257168a299b29ed1001c8",
+  "cert_sha256": "79ab63ca4057270082b2c5a9069b2bd53735e925fe40970dd923b7ca408e583c",
+  "dns_names": [
+   "freundewerben.congstar.de"
+  ],
+  "pubkey_sha256": "e14121557b5d466e5b69e9bd3e853d44a0d598c2a1bdcf4354abbaa5d96dda5b",
+  "not_before": "2026-05-24T12:24:27Z",
+  "not_after": "2026-08-22T12:24:26Z",
+  "revoked": false
+ },
+ {
+  "id": "15047429517",
+  "tbs_sha256": "a18ccc868d5935263d4a0eb9abc5073cf821ce0026da64759d1b92e28351f702",
+  "cert_sha256": "a926d163802ef941c820a7d989e8b9ad376d1a17535ab489e802701751c3fbaf",
+  "dns_names": [
+   "mgm.congstar.de"
+  ],
+  "pubkey_sha256": "d0ef4f82ad42bb0ac7981ca23dcedf86bac30dbe0957f995f73426199039bbd6",
+  "not_before": "2026-05-24T12:25:55Z",
+  "not_after": "2026-08-22T12:25:54Z",
+  "revoked": false
+ },
+ {
+  "id": "15047481342",
+  "tbs_sha256": "1b77867ee988741a2f8351aec68565e8c10edc3621400550731d09eb1d3cb6b3",
+  "cert_sha256": "f42a922cedbebc24088aaa9e348b1a9ab0e3e19364b6497e354ad3cbb1d7b8c8",
+  "dns_names": [
+   "www.freundewerben.congstar.de"
+  ],
+  "pubkey_sha256": "3a1db662d0e9b1a7bed673addef36f1d0d92f1a1fd471e50b0d1e7257752bec2",
+  "not_before": "2026-05-24T12:30:38Z",
+  "not_after": "2026-08-22T12:30:37Z",
+  "revoked": false
+ },
+ {
+  "id": "15073555784",
+  "tbs_sha256": "9a4baf4f83a71049ad5ccbe307a8995ab62a12b469bc20140fe87a31107b6a78",
+  "cert_sha256": "fe0b6fc26c5d0ed5d5106188dc9d70fa97e164dd8da2b2ac69d22acbc2bb834e",
+  "dns_names": [
+   "te.congstar.de",
+   "ts.congstar.de"
+  ],
+  "pubkey_sha256": "83845fec1df966d4f0733ea4fb10fc610271113a710c7b3ab64891121132147d",
+  "not_before": "2026-05-26T11:29:45Z",
+  "not_after": "2026-12-09T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15074737384",
+  "tbs_sha256": "f41eecabdaf784c5c4b51a2fdaeb6961945a7a9c37241b53fddea18267ac00d6",
+  "cert_sha256": "13927d2daa31b85650724f8a40e63cb8ac69a6c68bc270b1c5f6e24800c1f711",
+  "dns_names": [
+   "www.mgm.congstar.de"
+  ],
+  "pubkey_sha256": "28fecedb9f3fbaa74c54d68bfc133011034b72666cba92ef83eea57713d1fa40",
+  "not_before": "2026-05-26T12:25:19Z",
+  "not_after": "2026-08-24T12:25:18Z",
+  "revoked": false
+ },
+ {
+  "id": "15130677710",
+  "tbs_sha256": "980d23cc1fe8d7265d8a7f2441db0bcfa50af662de912b08d55b000acea872d2",
+  "cert_sha256": "277682a6dedfeb7e7527f2ffbd64ce0e24342bb73054bc45bddf27cb985476fc",
+  "dns_names": [
+   "sign-aax.congstar.de"
+  ],
+  "pubkey_sha256": "e5c1d4ec140753cfec9426adb7107dc763608ba30863d626af7efd791d85249b",
+  "not_before": "2026-05-30T07:01:32Z",
+  "not_after": "2026-08-28T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15255846474",
+  "tbs_sha256": "ac98f16954ed665a487d03396aa3afbdfec6c6a8aa43b4074ac29e35111d4763",
+  "cert_sha256": "3b14027e289704dfd56fbbaed6f166d76f5df94eeab5dbdc339632621bd31c18",
+  "dns_names": [
+   "info.congstarnews.de",
+   "news.fraenk.de",
+   "service.congstar.de"
+  ],
+  "pubkey_sha256": "ee3a1974eb22ddd6f6aeca20707bbed50f0ce4489f1b8cbec2468596e3620df2",
+  "not_before": "2026-06-07T03:40:09Z",
+  "not_after": "2026-09-05T03:40:08Z",
+  "revoked": false
+ },
+ {
+  "id": "15270138140",
+  "tbs_sha256": "9a9f5841445564c3e8877f5c318cd28b497b568e2e3f314a3de223060e6de2ce",
+  "cert_sha256": "b569d21139cca5f9cd128012b11d9b2f17b2c7751084a6e349608d0c21b99174",
+  "dns_names": [
+   "procurement.congstar.de"
+  ],
+  "pubkey_sha256": "54654bf5606dc4d84e2ff408b8c1364d3887dfd22259a6373b75da5522853156",
+  "not_before": "2026-06-08T00:21:02Z",
+  "not_after": "2026-09-06T00:21:01Z",
+  "revoked": false
+ },
+ {
+  "id": "15272835118",
+  "tbs_sha256": "ed31c9af6cf5dd91b4fbbe988dc80179b7d957578a003488998633eff5315954",
+  "cert_sha256": "f4cb64ce56eb819837b18b976493899705e58d54cddf587206cc97a2b6d7cf98",
+  "dns_names": [
+   "forms.congstar.de"
+  ],
+  "pubkey_sha256": "0d57cc20b5581d5140ed2d03a4fa56be2db09575918ae2d75e24902fd3ec4970",
+  "not_before": "2026-06-08T04:09:43Z",
+  "not_after": "2026-09-06T04:09:42Z",
+  "revoked": false
+ },
+ {
+  "id": "15283556616",
+  "tbs_sha256": "ef6807b6552d6cab9e3927c8e09bdc150f41b0abf321c44b6e8f90f69c14b6c2",
+  "cert_sha256": "bb764c546cdf0c1eed0139098693dae7c51267cec0e389d375be3461e795c24c",
+  "dns_names": [
+   "jamobil-news.congstar.de",
+   "jamobil.congstarnews.de"
+  ],
+  "pubkey_sha256": "c9554aba74c29942fe3c212047aad1eab838809e6887c6d71753131f8a6f9ed3",
+  "not_before": "2026-06-08T18:47:17Z",
+  "not_after": "2026-09-06T18:47:16Z",
+  "revoked": false
+ },
+ {
+  "id": "15291344047",
+  "tbs_sha256": "23d2be3c9cfa9650fad7f7830bafa5f1fafdb021eda1d17e54daf24aa1c02927",
+  "cert_sha256": "ee91d617c2ad387473741f89714614a91dfa2c9f690b5e4f1429bae6da8161b8",
+  "dns_names": [
+   "app.congstar.de"
+  ],
+  "pubkey_sha256": "aa44ad0593c3f4f48c3f0678beaa4e8b70c5f99f8d54592ef3615c17396ac332",
+  "not_before": "2026-06-09T07:02:06Z",
+  "not_after": "2026-09-07T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15326410036",
+  "tbs_sha256": "cb9d28b853780abf08b922b0a4187a028ed69605608e9a8a102a537eebbb40d1",
+  "cert_sha256": "27f9adce0b286c8ae7287e235b070699e977c0a491bafe10f375c676c5c831b8",
+  "dns_names": [
+   "pennymobil-news.congstar.de",
+   "pennymobil.congstarnews.de"
+  ],
+  "pubkey_sha256": "ec772a0da66f5e57590c499fdc6428ba1a25f785e35ce01c9cd43a137977ed29",
+  "not_before": "2026-06-11T01:12:50Z",
+  "not_after": "2026-09-09T01:12:49Z",
+  "revoked": false
+ },
+ {
+  "id": "15404431168",
+  "tbs_sha256": "c5a6cfadc79234f659f0a676bd6b145182f04529994e2f7f8a4468c129959df7",
+  "cert_sha256": "d32da70ad76b4f34d7085c371fd7b3e1884925ce9b66d32d1ee8aea571f40cd5",
+  "dns_names": [
+   "da.congstar.de"
+  ],
+  "pubkey_sha256": "9a4d913d379331867108837c8c35f6a2dccb5df880548f9c8949852005c3bb45",
+  "not_before": "2026-06-15T00:00:00Z",
+  "not_after": "2026-12-30T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15540814637",
+  "tbs_sha256": "a0e0b9f034233453e8d04709450dce5de32707a3de7146f09f6d5adb6356f38a",
+  "cert_sha256": "7c04efa063a85f761406e6f650ba6e6f880050c73a3a0078ef3b0ed6ac12f792",
+  "dns_names": [
+   "sso.congstar.de"
+  ],
+  "pubkey_sha256": "9c3446cd452431592597b633875bc560cde11719bc009facc4586ea00f886d17",
+  "not_before": "2026-06-24T05:22:58Z",
+  "not_after": "2027-01-08T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15541082372",
+  "tbs_sha256": "892a341ad951629df4eaa6f18b79d28df022f530821f696f954bed3c83395aa5",
+  "cert_sha256": "2b5bbfe76be665181b4a215a788a22e5f9d2c35f16295c2e73be60a59d127cb0",
+  "dns_names": [
+   "applinks.congstar.de"
+  ],
+  "pubkey_sha256": "5a988c79b8c3ae9503374928e13cc9743c8c14a9d90d3101adbdb22fa2816132",
+  "not_before": "2026-06-24T05:49:24Z",
+  "not_after": "2027-01-08T23:59:59Z",
+  "revoked": false
+ },
+ {
+  "id": "15555536096",
+  "tbs_sha256": "9b7524825b3b4fd29e9ae8ea419c87e2c7160db3b51c9ba0b964cf24d33ebeab",
+  "cert_sha256": "393122268d14a7c30187d4a481c4cf0278080e05880f9b92b60827560cf1c573",
+  "dns_names": [
+   "di.congstar.de"
+  ],
+  "pubkey_sha256": "77ee23fd874bd765e1b90a50b77f4589940c2b8a34430890de699e96c6de0616",
+  "not_before": "2026-06-25T03:16:36Z",
+  "not_after": "2026-08-09T03:16:35Z",
+  "revoked": false
+ },
+ {
+  "id": "15688600281",
+  "tbs_sha256": "5c079e267e2c79f050ee6230a446c22e7750063a2580e5c79c5a151a11235912",
+  "cert_sha256": "d9a57c75efa6fdae84da0c56ccebf4892e78aea9ea9986f533c1bf5531879c33",
+  "dns_names": [
+   "cxtools.congstar.de"
+  ],
+  "pubkey_sha256": "c8f0ff357f2dd45fc2c4b6e1c5e4842caa9d7ecb3ca89441d0c5a6e09507e4be",
+  "not_before": "2026-07-04T04:09:41Z",
+  "not_after": "2026-10-02T04:09:40Z",
+  "revoked": false
+ },
+ {
+  "id": "15688611982",
+  "tbs_sha256": "79b95ef7948ab40beb839d0b7f6ba0bc0133f99d6f48109727da88347d9887d8",
+  "cert_sha256": "f65c1cc4fbc9ce438baeb5f73fbf638bfaf624be4f4ea7e77664456e3e7caebe",
+  "dns_names": [
+   "handyankauf.congstar.de"
+  ],
+  "pubkey_sha256": "8b8d63d9abe9a05c7ec299a05d28f542e1c97338783371f69bcc93d71a6d704d",
+  "not_before": "2026-07-04T04:11:22Z",
+  "not_after": "2026-10-02T04:11:21Z",
+  "revoked": false
+ },
+ {
+  "id": "15688650119",
+  "tbs_sha256": "74db94d4ca33531725fed413c31e8ddcd277b7eac5d98cf3b586655ea859a31d",
+  "cert_sha256": "3d6d728f1b474f3c5e7dad99fec784ce765fc76377fdd2a3049b3aa5856efd2d",
+  "dns_names": [
+   "notruf-info.congstar.de"
+  ],
+  "pubkey_sha256": "c7a7ab5161926fa84ef39eb36c03b0b2587896b18d9a5f7d3b249ddce5981323",
+  "not_before": "2026-07-04T04:15:44Z",
+  "not_after": "2026-10-02T04:15:43Z",
+  "revoked": false
+ },
+ {
+  "id": "15746792404",
+  "tbs_sha256": "62a5d3691bef229ad065c1b47474c883648eab3fcb7c3be78b25b6b2c08fce60",
+  "cert_sha256": "766f1e309815b3f80296b03d0c4c0b6656618ecc0e39ec95f240fe41e899fe93",
+  "dns_names": [
+   "personalverkauf.congstar.de"
+  ],
+  "pubkey_sha256": "7c4c83df6091617c18b0288109f0d2675918ee8d112fce85e09f86ab2688b9ce",
+  "not_before": "2026-07-08T04:11:43Z",
+  "not_after": "2026-10-06T04:11:42Z",
+  "revoked": false
+ },
+ {
+  "id": "15850887985",
+  "tbs_sha256": "0db5824ed4a3673e8fa6fe2f786df261bd1190109633ab012936e13d159f3b8f",
+  "cert_sha256": "4c38f32dcaea5e970c15ad22f8b69385635dcc4d1a1843d3bba2f16d4c0b4a04",
+  "dns_names": [
+   "images.congstar.de"
+  ],
+  "pubkey_sha256": "374fbf07b131c2a40cbd237ca53a30f68fd965b2b0a69020209a4a2dc546360f",
+  "not_before": "2026-07-14T23:53:26Z",
+  "not_after": "2026-08-13T23:53:25Z",
+  "revoked": false
+ },
+ {
+  "id": "16182898713",
+  "tbs_sha256": "26aa2843b7487f6582b561407b1babb9c9ebf26c6e6e473283c050deb0d81a5d",
+  "cert_sha256": "ce8fe167b22b1a63d4c4cac83824207f40449bd0ab314f528c9d1d34dd5d96f9",
+  "dns_names": [
+   "email.congstarnews.de",
+   "freundewerben1.congstarnews.de",
+   "news.congstar.de",
+   "newsletter.congstar.de",
+   "vertriebspartner.congstar.de"
+  ],
+  "pubkey_sha256": "2b8e00f571d0b70bab4f8fdfee1dd5654860721685c75617901093b0cc4d544b",
+  "not_before": "2026-07-30T19:06:28Z",
+  "not_after": "2026-10-28T19:06:27Z",
+  "revoked": false
+ }
+]

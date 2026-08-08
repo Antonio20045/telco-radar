@@ -229,6 +229,19 @@ aenderungsradar_aktiv: true
 # mitliefert: Originaltext, Methode, Belastbarkeit, Messzeitpunkt.
 lieferzeit_radar_aktiv: true
 
+# ---------------------------------------------------------------------------
+# CT-Radar (src/telco_radar/collect/ct_log.py + config/ct_domains.yaml)
+#
+# Die einzige Ebene dieses Projekts, die VOR der Veroeffentlichung liegt: wer
+# eine Kampagnenseite vorbereitet, braucht vorher ein TLS-Zertifikat, und
+# jedes davon steht nach RFC 6962 in einem oeffentlichen Log. Gemessen gegen
+# congstar.de: 48 DNS-Namen, darunter die Zweitmarken fuer Rewe und Penny.
+#
+# Die Meldungen sind INDIZIEN und sagen das in ihrem eigenen Text. Wer den
+# Radar abschaltet, verliert Vorlauf - wer ihn fuer bare Muenze nimmt,
+# verliert Vertrauen.
+ct_radar_aktiv: true
+
 versand:
   mail_aktiv: true
   teams_aktiv: true
