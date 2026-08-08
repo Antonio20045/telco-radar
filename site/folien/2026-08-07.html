@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was diese Woche im Markt passiert ist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vf-red:#e60000; --vf-red-deep:#ac1811; --vf-ink:#25282b;
+    --vf-mute:#7e7e7e; --vf-canvas:#ffffff; --vf-neutral:#f2f2f2;
+    --font-display:'Inter','Helvetica Neue',Arial,sans-serif;
+    --slide-w:1920px; --slide-h:1080px;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
+  body{background:var(--vf-canvas);color:var(--vf-ink);
+    font-family:var(--font-display);font-size:22px}
+  .deck{position:fixed;inset:0;background:var(--vf-canvas);overflow:hidden}
+  .stage{position:absolute;width:var(--slide-w);height:var(--slide-h);
+    transform-origin:0 0;background:var(--vf-canvas);overflow:hidden}
+  .slide{position:absolute;inset:0;padding:120px;background:var(--vf-canvas);
+    opacity:0;visibility:hidden;transition:opacity 420ms var(--ease);
+    display:flex;flex-direction:column;justify-content:center}
+  .slide.active{opacity:1;visibility:visible}
+  .kicker{font-size:18px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--vf-mute);margin:0 0 28px}
+  .cover-title{font-size:104px;font-weight:800;letter-spacing:-.018em;
+    line-height:1.02;margin:0;max-width:1500px}
+  .cover-date{font-size:20px;color:var(--vf-mute);margin:38px 0 0;
+    letter-spacing:.06em}
+  .headline{font-size:60px;font-weight:800;letter-spacing:-.015em;
+    line-height:1.05;margin:0 0 56px;max-width:1500px}
+  .accent{color:var(--vf-red)}
+  .checklist{list-style:none;padding:0;margin:0;max-width:1500px}
+  .checklist li{font-size:30px;font-weight:500;line-height:1.4;
+    padding:0 0 26px 52px;position:relative}
+  .checklist li::before{content:"";position:absolute;left:0;top:16px;
+    width:26px;height:3px;background:var(--vf-red)}
+  .lede{font-size:30px;font-weight:500;line-height:1.4;margin:0 0 26px;
+    max-width:1400px}
+  .quellen{list-style:none;padding:0;margin:0;columns:2;column-gap:70px}
+  .quellen li{font-size:17px;line-height:1.45;color:var(--vf-ink);
+    margin:0 0 15px;break-inside:avoid}
+  .quellen a{color:var(--vf-mute);text-decoration:none;display:block;
+    font-size:14px;word-break:break-all}
+  .fussnote{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--vf-mute);margin:44px 0 0}
+  .footer{position:absolute;left:120px;right:120px;bottom:56px;
+    display:flex;justify-content:space-between;font-size:14px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--vf-mute)}
+  .progress{position:fixed;left:0;top:0;height:3px;background:var(--vf-red);
+    width:0;transition:width 300ms var(--ease);z-index:9}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck"><div class="stage" id="stage">
+<section class="slide" data-slide="1">
+  <p class="kicker">Telco Radar · Wochenbericht</p>
+  <h1 class="cover-title">Was diese Woche im Markt <span class="accent">passiert</span> ist</h1>
+  <p class="cover-date">Stand 2026-08-07</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-07</span><span>01 / 04</span></div>
+</section>
+<section class="slide" data-slide="2">
+  <h2 class="headline">Was diese Woche <span class="accent">passiert</span> ist</h2>
+  <ul class="checklist">
+    <li>Telekom-Flatrate mit Unlimited-Daten für 34,95 Euro bei Freenet</li>
+    <li>Jio bündelt OTT und unlimitiertes 5G für 200 Rupien</li>
+    <li>Samsung startet Verkauf neuer Galaxy Z und Watch Modelle</li>
+  </ul>
+
+  <div class="footer"><span>Telco Radar · 2026-08-07</span><span>02 / 04</span></div>
+</section>
+<section class="slide" data-slide="3">
+  <h2 class="headline">Was das für uns <span class="accent">bedeutet</span></h2>
+  <p class="lede">Das ist ein aggressiver Preispunkt für eine echte Telekom-Flatrate und erhöht den Druck auf Vodafone Deutschland. Vodafone muss prüfen, ob es mit eigenen Reseller-Angeboten kontern oder seine Unlimited-Tarife anpassen kann, um…</p>
+  <p class="lede">Diese aggressive Kombination aus Service-Bundling und Unlimited-5G erhöht den Preisdruck massiv. Vodafone könnte ähnliche Bündel in Afrika oder Europa testen, um Kunden zu binden und den ARPU zu schützen – sonst drohen Marktanteilsverluste.</p>
+  <p class="lede">Diese Premium-Smartphones müssen sofort in Tarifportfolios aufgenommen werden, Kunden werden sie nachfragen; die integrierten KI-Funktionen können Datenvolumen und Netzauslastung erhöhen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-07</span><span>03 / 04</span></div>
+</section>
+<section class="slide" data-slide="4">
+  <h2 class="headline">Quellen zum <span class="accent">Nachlesen</span></h2>
+  <ul class="quellen">
+    <li>teltarif: Telekom-Flatrate mit Unlimited-Daten für 34,95 Euro bei Freenet<a href="https://www.teltarif.de/nr0/flat-freenet-magentamobil-xl-telekom-unlimited-5g/news/105029.html">https://www.teltarif.de/nr0/flat-freenet-magentamobil-xl-telekom-unlimited-5g/news/105029.html</a></li>
+    <li>TelecomTalk: Jio bündelt OTT und unlimitiertes 5G für 200 Rupien<a href="https://telecomtalk.info/reliance-jio-rs-200-ott-pass-is/1010499/">https://telecomtalk.info/reliance-jio-rs-200-ott-pass-is/1010499/</a></li>
+    <li>Samsung: Samsung startet Verkauf neuer Galaxy Z und Watch Modelle<a href="https://news.samsung.com/global/samsung-officially-launches-galaxy-z-fold8-ultra-fold8-flip8-watch-ultra2-and-watch9">https://news.samsung.com/global/samsung-officially-launches-galaxy-z-fold8-ultra-fold8-flip8-watch-ultra2-and-watch9</a></li>
+    <li>The Fast Mode: MTN startet Reise-eSIM mit Telna in Afrika<a href="https://www.thefastmode.com/technology-solutions/50081-mtn-bayobab-telna-expand-travel-esim-services-across-african-markets-with-digital-connectivity-platform">https://www.thefastmode.com/technology-solutions/50081-mtn-bayobab-telna-expand-travel-esim-services-across-african-markets-with-digital-connectivity-platform</a></li>
+    <li>Developing Telecoms: MTN übernimmt IHS Towers vollständig nach Aktionärszustimmung<a href="https://developingtelecoms.com/telecom-business/operator-news/20645-mtn-gains-ihs-shareholder-approval-in-multi-billion-tower-acquisition.html">https://developingtelecoms.com/telecom-business/operator-news/20645-mtn-gains-ihs-shareholder-approval-in-multi-billion-tower-acquisition.html</a></li>
+    <li>Light Reading: SpaceX plant eigenes terrestrisches Mobilfunknetz via Starlink<a href="https://www.lightreading.com/satellite/spacex-small-cell-plan-serves-up-more-musk-madness">https://www.lightreading.com/satellite/spacex-small-cell-plan-serves-up-more-musk-madness</a></li>
+    <li>RCR Wireless: Analysten: Starlink Mobile könnte vierter US-Carrier werden<a href="https://www.rcrwireless.com/20260806/carriers/starlink-what-is-musk-building">https://www.rcrwireless.com/20260806/carriers/starlink-what-is-musk-building</a></li>
+    <li>SpaceX / Starlink: Starlink plant eigenes Small-Cell-Mobilfunknetz<a href="https://www.telecomtv.com/content/access-evolution/musk-s-starlink-plots-small-cell-rollout-to-rival-us-mobile-operators-56015">https://www.telecomtv.com/content/access-evolution/musk-s-starlink-plots-small-cell-rollout-to-rival-us-mobile-operators-56015</a></li>
+    <li>RCR Wireless: SpaceX plant terrestrisches Mobilnetz mit Satelliten-Backup<a href="https://www.rcrwireless.com/20260805/carriers/spacex-targets-us-carriers-small-cells-physical-ai">https://www.rcrwireless.com/20260805/carriers/spacex-targets-us-carriers-small-cells-physical-ai</a></li>
+    <li>Light Reading: Starlink will ländliche Breitband-Subventionen abschaffen<a href="https://www.lightreading.com/broadband/spacex-to-fcc-starlink-makes-rural-subsidies-obsolete">https://www.lightreading.com/broadband/spacex-to-fcc-starlink-makes-rural-subsidies-obsolete</a></li>
+    <li>ADSLZone: Digi startet kostenlosen Spam-Anrufwarndienst<a href="https://www.adslzone.net/noticias/operadores/digi-lanza-servicio-llamadas-fraudulentas/">https://www.adslzone.net/noticias/operadores/digi-lanza-servicio-llamadas-fraudulentas/</a></li>
+    <li>Telepolis (Polen): OpenAI macht ChatGPT für Gratisnutzer unlimitiert<a href="https://www.telepolis.pl/tech/oprogramowanie/openai-chatgpt-free-go-za-darmo-brak-limitow-2026">https://www.telepolis.pl/tech/oprogramowanie/openai-chatgpt-free-go-za-darmo-brak-limitow-2026</a></li>
+  </ul>
+  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in einer der oben verlinkten Quellen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-07</span><span>04 / 04</span></div>
+</section>
+</div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var current = 0, total = slides.length;
+  function fitStage() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var scale = Math.min(vw / 1920, vh / 1080);
+    stage.style.left = ((vw - 1920 * scale) / 2) + 'px';
+    stage.style.top = ((vh - 1080 * scale) / 2) + 'px';
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+    current = i;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1);
+  });
+  document.addEventListener('click', function (e) {
+    show(current + (e.clientX < window.innerWidth / 3 ? -1 : 1));
+  });
+  window.addEventListener('resize', fitStage);
+  fitStage(); show(0);
+})();
+</script>
+</body>
+</html>
