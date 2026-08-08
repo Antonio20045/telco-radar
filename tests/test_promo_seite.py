@@ -34,13 +34,18 @@ from telco_radar.report.promo import prepare_promo_view
 class _Quelle:
     """Minimalfassung einer promo_sources.yaml-Quelle."""
 
-    def __init__(self, name, tier=2, internal_reference=False, crawlable=True):
+    def __init__(self, name, tier=2, internal_reference=False, crawlable=True,
+                 rang=None):
         self.name = name
         self.url = f"https://{name.lower().replace(' ', '')}.test/"
         self.tier = tier
         self.group = ""
         self.internal_reference = internal_reference
         self.crawlable = crawlable
+        # Platz in der Anbieter-Rangfolge - er ordnet die Seite seit dem
+        # 08.08.2026 (siehe report/promo._rang).
+        self.rang = rang
+        self.reach = None
 
 
 def _angebot(i, brand, score=None, status="aktiv", highlight=False,
@@ -63,8 +68,8 @@ def _angebot(i, brand, score=None, status="aktiv", highlight=False,
 
 
 MARKEN = ["Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
-QUELLEN = [_Quelle(m) for m in MARKEN] + [
-    _Quelle("Vodafone Deutschland", tier=1, internal_reference=True)]
+QUELLEN = [_Quelle(m, rang=i) for i, m in enumerate(MARKEN, start=1)] + [
+    _Quelle("Vodafone Deutschland", tier=1, internal_reference=True, rang=5)]
 EINTRAEGE = [
     _angebot(1, "Alpha Mobil", score=88, highlight=True, bild="angebot"),
     _angebot(2, "Alpha Mobil", score=70),
@@ -99,11 +104,14 @@ def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
         [e for e in EINTRAEGE if e.get("highlight")])
 
 
-def test_je_marke_ein_block_die_bloecke_nach_score():
+def test_je_marke_ein_block_die_bloecke_nach_anbieterrang():
     """Die eine Form der Seite: je Marke ein Block, darin ihre Aktionen in
     gleichen Karten. Vorher standen die staerkste Aktion oben im
     Auswahlraster und alle uebrigen unten in einer eigenen Zeilenwand -
-    zwei Darstellungen derselben Sache."""
+    zwei Darstellungen derselben Sache.
+
+    Die Bloecke stehen nach dem RANG DES ANBIETERS (config/promo_sources.yaml,
+    Feld `rang`), nicht nach dem Score ihrer staerksten Aktion."""
     view = _view()
     assert [b["name"] for b in view["bloecke"]] == [
         "Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
@@ -112,6 +120,20 @@ def test_je_marke_ein_block_die_bloecke_nach_score():
     alpha = view["bloecke"][0]
     assert [k["offer"]["id"] for k in alpha["weitere"]] == ["id2", "id3"]
     assert all(not b["internal_reference"] for b in view["bloecke"])
+
+
+def test_eine_starke_aktion_hebt_eine_kleine_marke_nicht_nach_oben():
+    """Der Punkt der Rangfolge. Am 08.08.2026 stand Otelo auf Platz eins und
+    die Telekom auf Platz zehn, weil deren JS-Seiten in dem Lauf nur zwei
+    Angebote hergaben - Antonio: "die groessten Anbieter wie Telekom etc. an
+    erster Stelle". Ein Spitzenangebot des Kleinsten darf die Seite nicht
+    umsortieren; es steht innerhalb SEINES Blocks vorn."""
+    laut = [dict(e, score=100, highlight=True) if e["brand"] == "Delta Connect"
+            else e for e in EINTRAEGE]
+    view = prepare_promo_view(laut, QUELLEN, "2026-08-06")
+    assert [b["name"] for b in view["bloecke"]] == [
+        "Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
+    assert view["bloecke"][-1]["top_score"] == 100
 
 
 def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
@@ -365,10 +387,17 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     quellen = [img["src"] for img in soup.select(".pk-bild img[src]")]
     assert len(quellen) == len(set(quellen)), "Ein Motiv steht mehrfach auf der Seite"
     # Dasselbe fuer die Schriftkacheln: identischer Text auf zwei Kacheln
-    # war der zweite Befund ("Wechsel- oder Altgeraetpraemie" x4).
-    kacheln = [k.get_text(" ", strip=True)
-               for k in soup.select(".pk-bild--typo .pk-typo-zahl")]
-    assert len(kacheln) == len(set(kacheln)), f"Doppelte Schriftkachel: {kacheln}"
+    # war der zweite Befund ("Wechsel- oder Altgeraetpraemie" x4) - und zwar
+    # JE MARKENBLOCK. Seit dem 08.08.2026 traegt jede Karte ohne Motiv eine
+    # Kachel, und ueber 13 Bloecke hinweg kosten zwei verschiedene Angebote
+    # zweier verschiedener Anbieter nun einmal beide "10 €". Nebeneinander
+    # stehen sie nie; als Fehler liest sich nur die Wiederholung IM Block.
+    for block in soup.select(".pmarke"):
+        kacheln = [k.get_text(" ", strip=True)
+                   for k in block.select(".pk-bild--typo .pk-typo-zahl")]
+        marke = block.select_one(".pmarke-name").get_text(strip=True)
+        assert len(kacheln) == len(set(kacheln)), \
+            f"Doppelte Schriftkachel bei {marke}: {kacheln}"
 
 
 def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten():
@@ -390,3 +419,58 @@ def test_die_promo_quellenseite_bleibt(promo_site):
     assert (promo_site / "promo" / "quellen.html").exists()
     assert "Quellen" in (promo_site / "promo" / "index.html").read_text(
         encoding="utf-8")
+
+
+def test_jede_karte_traegt_ein_motiv(promo_site):
+    """Antonio am 08.08.2026: "da fehlen bei einigen Aktionen die Bilder, das
+    wirkt so richtig scheisse." Gemessen an der Ausgabe vom 8.8. hatten 37
+    von 77 Karten gar nichts an der Motivstelle - nur die grossen bekamen
+    ohne Bild eine Schriftkachel -, und weil eine Rasterzeile so hoch ist
+    wie ihre hoechste Karte, stand neben jedem Bild eine handbreite Luecke.
+    Ein Bild kann fehlen (es muss belegt sein), ein MOTIV nie."""
+    soup = BeautifulSoup((promo_site / "promo" / "index.html")
+                         .read_text(encoding="utf-8"), "html.parser")
+    karten = soup.select(".promo-karten .pkarte")
+    assert karten
+    ohne = [k.select_one(".szl").get_text(" ", strip=True)
+            for k in karten if not k.select_one(".pk-bild")]
+    assert not ohne, f"{len(ohne)} Karten ohne Motiv, z. B. {ohne[:3]}"
+    # ... und keine Kachel ist leer.
+    for kasten in soup.select(".pk-bild"):
+        assert kasten.select_one("img") or kasten.get_text(strip=True)
+
+
+def test_die_marken_stehen_in_der_reihenfolge_der_konfiguration(promo_site):
+    """Die Rangfolge der Anbieter ist gepflegt (config/promo_sources.yaml,
+    Feld `rang`) - die Seite muss ihr folgen und nicht dem Score des Tages.
+    Am 08.08.2026 stand Otelo auf Platz eins und die Telekom auf Platz
+    zehn."""
+    from telco_radar.promo_config import load_promo_config
+
+    soup = BeautifulSoup((promo_site / "promo" / "index.html")
+                         .read_text(encoding="utf-8"), "html.parser")
+    gezeigt = [b.select_one(".pmarke-name").get_text(strip=True)
+               for b in soup.select(".pmarke")]
+    cfg = load_promo_config(Path(__file__).resolve().parent.parent)
+    rang = {s.name: s.rang for s in cfg.sources}
+    wettbewerber = [n for n in gezeigt if not n.startswith("Vodafone")]
+    assert wettbewerber == sorted(wettbewerber, key=lambda n: rang[n])
+    # Die eigene Marke steht am Ende, nicht an ihrem Rang.
+    assert not gezeigt or gezeigt[-1].startswith("Vodafone") \
+        or "Vodafone Deutschland" not in gezeigt
+
+
+def test_jede_marke_der_konfiguration_hat_einen_eindeutigen_rang():
+    """Ein vergessener oder doppelter Rang faellt auf der Seite nicht auf -
+    zwei Marken mit demselben Rang stuenden nach Zufall, eine ohne Rang
+    rutschte ans Ende. Also wird die Konfiguration selbst geprueft."""
+    from telco_radar.promo_config import load_promo_config
+
+    cfg = load_promo_config(Path(__file__).resolve().parent.parent)
+    raenge = [s.rang for s in cfg.sources]
+    assert all(r for r in raenge), \
+        [s.name for s in cfg.sources if not s.rang]
+    assert len(set(raenge)) == len(raenge), sorted(raenge)
+    # Die Netzbetreiber stehen vorn - das ist die erste Regel der Rangfolge.
+    mno = [s.rang for s in cfg.sources if s.tier == 1]
+    assert max(mno) < min(s.rang for s in cfg.sources if s.tier != 1)

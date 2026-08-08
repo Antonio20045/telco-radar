@@ -34,12 +34,18 @@
 {% set active = 'promo_uebersicht' %}
 {% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
 
-{# Das Motiv einer Karte. Nur die grosse Karte bekommt ohne Bild eine
-   Schriftkachel - bei den kleinen waere ein Kasten je Zeile genau das
-   Rauschen, das diese Seite loswerden soll. Die Kachel traegt die konkrete
-   Zahl des Angebots ("20 GB · 6,99 €"), nicht die Mechanik: vier Marken
-   fahren dieselbe Mechanik, und vier identische Kacheln lesen sich als
-   Fehler. #}
+{# Das Motiv einer Karte. JEDE Karte hat eins - entweder das Kampagnenbild
+   oder die Kernzahl des Angebots als Schriftkachel ("20 GB · 6,99 €").
+
+   Bis zum 08.08.2026 bekam nur die grosse Karte ohne Bild eine Kachel, die
+   kleinen blieben leer. Auf der Ausgabe vom 8.8. traf das 37 von 77 Karten,
+   und weil die Reihen eines Rasters gleich hoch sind, stand neben jeder
+   bebilderten Karte eine handbreite Luecke mit einer Schlagzeile darin.
+   Antonio: "da fehlen bei einigen Aktionen die Bilder, das wirkt so richtig
+   scheisse." Die Kachel ist nicht der Notnagel fuer ein fehlendes Bild -
+   sie ist die zweite gueltige Form einer Karte, und sie sagt in zwei Zahlen,
+   worum es geht. Die Mechanik steht nur darunter, nie darin: vier Marken
+   fahren dieselbe, vier identische Kacheln lesen sich als Fehler. #}
 {% macro motiv(k, gross) %}
 {%- if k.bild %}
 {# `max-width` = die echte Dateibreite. Die grosse Karte ist bei 1440 px
@@ -57,8 +63,8 @@
   <span class="pk-bildquelle">Motiv der Aktionsseite</span>
   {%- endif %}
 </span>
-{%- elif gross %}
-<span class="pk-bild pk-bild--typo">
+{%- else %}
+<span class="pk-bild pk-bild--typo{% if not gross %} pk-bild--typo-klein{% endif %}">
   <span class="pk-typo-zahl">{{ k.kachel }}</span>
   {# Die Mechanik nur, wenn die Kachel nicht ohnehin schon sie ist - sonst
      steht dasselbe Wort zweimal untereinander. #}
@@ -82,7 +88,7 @@
   <p class="pk-fuss">
     {# Der Mechanik-Chip entfaellt, wenn die Schriftkachel derselben Karte
        schon die Mechanik ist - sonst steht sie zweimal auf einer Karte. #}
-    {% if k.mechanic and not (gross and not k.bild and k.kachel == k.mechanic) %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
+    {% if k.mechanic and not (not k.bild and k.kachel == k.mechanic) %}<span class="pmech">{{ k.mechanic }}</span>{% endif %}
     {% if k.frist %}<span class="pk-frist">bis {{ k.frist | date_de }}</span>{% endif %}
     {%- if k.offer.fading %}<span class="pk-flag pk-flag--weg">vermutlich ausgelaufen</span>
     {%- elif k.offer.neu %}<span class="pk-flag pk-flag--neu">neu</span>{% endif %}
@@ -91,12 +97,20 @@
 </article>
 {% endmacro %}
 
-{# Ein Markenblock: Rubrikleiste plus ihr Kartenraster. #}
+{# Ein Markenblock: Markenkopf plus Kartenraster.
+
+   Der Name traegt den Block. Bis zum 08.08.2026 stand er als 11,5-px-Etikett
+   in derselben Zeile wie "Discount- und Zweitmarke" und war damit kleiner
+   gesetzt als jede Schlagzeile darunter - Antonio: "die Namen der
+   Wettbewerber prominenter, zu dezent." Wer eine Seite nach Anbietern
+   ordnet, muss den Anbieter auch lesen koennen, ohne ihn zu suchen. Jetzt:
+   Serife, gross, mit der Konzernzugehoerigkeit als Etikett daneben - denn
+   dass congstar zur Telekom gehoert, ist die halbe Aussage. #}
 {% macro block(b, eigen=false) %}
 <section class="pmarke{% if eigen %} pmarke--eigen{% endif %}" style="--c:{{ b.color }}">
-  <div class="rubrik pmarke-rubrik">
-    <h2><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h2>
-    <span class="rubrik-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% endif %}</span>
+  <div class="pmarke-kopf">
+    <h2 class="pmarke-name"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.name }}</a></h2>
+    <span class="pmarke-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% if b.group and b.group != b.name %} · {{ b.group }}{% endif %}{% endif %}</span>
   </div>
   <div class="promo-karten">
     {{ karte(b.lead, true) }}

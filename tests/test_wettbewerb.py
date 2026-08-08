@@ -103,9 +103,13 @@ def test_die_chronik_gruppiert_nach_monaten_neueste_zuerst():
     assert [m["n"] for m in monate] == [1, 1, 1]
 
 
-def test_die_tageszahl_steht_nur_beim_ersten_eintrag_ihres_tages():
-    """Ein Lauftag bringt zehn bis dreissig Meldungen. Zwanzigmal dieselbe
-    Zahl untereinander ist keine Zeilenmarke mehr, sondern ein Muster."""
+def test_jede_chronikzeile_traegt_ihr_eigenes_datum():
+    """Bis zum 08.08.2026 stand die Tageszahl nur beim ersten Eintrag ihres
+    Tages - eine Zeilenmarke, die sich nicht wiederholt. Das ging, solange
+    die Chronik EINE Spalte war. Sie steht jetzt in zwei (die Seite war
+    6777 px hoch), und ein Spaltenumbruch mitten in einer Tagesgruppe liesse
+    oben in Spalte zwei Meldungen ohne Datum stehen. Jede Zeile traegt ihr
+    Datum deshalb selbst, dafuer kurz."""
     view = build_wettbewerb_view([
         _woche("2026-08-03", competitors=[_profil("Deutsche Telekom", [
             _move("Eins", "https://x.de/1"), _move("Zwei", "https://x.de/2")])]),
@@ -114,8 +118,7 @@ def test_die_tageszahl_steht_nur_beim_ersten_eintrag_ihres_tages():
     ], FOCUS)
 
     eintraege = _eintraege(_telekom(view))
-    assert [(e["tag"], e["tag_zeigen"]) for e in eintraege] == \
-        [("5", True), ("3", True), ("3", False)]
+    assert [e["tag"] for e in eintraege] == ["5.8.", "3.8.", "3.8."]
 
 
 # ------------------------------------------------------------- Alias-Match
@@ -426,3 +429,55 @@ def test_stillgelegte_quellen_erreichen_die_chronik_nicht(tmp_path):
     html = (site / "wettbewerb.html").read_text(encoding="utf-8")
     assert "inside-digital" not in html
     assert "Deal bei inside digital" not in html
+
+
+# ------------------------------------------------- Hoehe der Seite (Layout)
+# Antonio am 08.08.2026: "mach Wettbewerb das Layout besser, sodass man nicht
+# so viel runterscrollen muss." Die Seite war 6777 px hoch, allein der
+# laufende Monat der Telekom 2600 davon. Die Gegenmassnahmen sind messbar,
+# also werden sie gemessen - und keine davon darf eine Meldung verlieren.
+
+def _bericht_mit_moves(n: int) -> dict:
+    moves = [{"title": f"Meldung {i}", "url": f"https://telekom.com/m{i}",
+              "category": "M&A", "note": f"Notiz {i}."} for i in range(n)]
+    return dict(BERICHT, competitors=[
+        dict(BERICHT["competitors"][0], moves=moves)])
+
+
+def test_der_laufende_monat_zeigt_seinen_anfang_und_haelt_den_rest_bereit():
+    view = build_wettbewerb_view(
+        [_woche("2026-08-05", competitors=[_profil("Deutsche Telekom", [
+            _move(f"Meldung {i}", f"https://x.de/{i}") for i in range(30)])])],
+        FOCUS)
+    august = _telekom(view)["monate"][0]
+    assert august["n"] == 30
+    assert len(august["offen"]) == 12
+    assert len(august["rest"]) == 18
+    # Zusammen sind es wieder alle, in derselben Reihenfolge.
+    assert august["offen"] + august["rest"] == august["eintraege"]
+
+
+def test_keine_meldung_geht_beim_einklappen_verloren(tmp_path):
+    """Der Rest steht in einem <details>, nicht im Nichts - die Chronik
+    zaehlt weiterhin, was sie zeigt."""
+    site = _render(tmp_path, _bericht_mit_moves(20))
+    soup = BeautifulSoup((site / "wettbewerb.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    abschnitt = soup.select_one("section.wb")
+    assert len(abschnitt.select(".wb-zeile")) == 21   # 20 Moves + die Meldung
+    rest = abschnitt.select_one("details.wb-mehr-monat")
+    assert rest is not None
+    assert len(rest.select(".wb-zeile")) == 21 - 12
+
+
+def test_der_name_traegt_den_abschnitt(tmp_path):
+    """"Die Namen prominenter, zu dezent" - der Name stand als 11,5-px-
+    Etikett ueber einem Abschnitt voller 16-px-Schlagzeilen."""
+    site = _render(tmp_path)
+    soup = BeautifulSoup((site / "wettbewerb.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    name = soup.select_one("section.wb .wb-name")
+    assert name.name == "h2"
+    assert name.get_text(strip=True) == "Deutsche Telekom"
+    css = (site / "style.css").read_text(encoding="utf-8")
+    assert ".wb-name{" in css and "var(--serif)" in css.split(".wb-name{")[1][:200]

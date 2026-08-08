@@ -53,7 +53,31 @@
 #   * simplytel, Penny Mobil - ihre Startseite enthaelt bereits alles; jeder
 #     Kandidat fiel an Kriterium 7 (Eigenstaendigkeit) durch.
 #
+# -----------------------------------------------------------------------------
+# DIE REIHENFOLGE DER SEITE (Feld `rang`, Stand 08.08.2026)
+# -----------------------------------------------------------------------------
+# Die Promo Uebersicht steht in dieser Reihenfolge, und zwar unabhaengig davon,
+# wie stark die Aktionen einer Marke gerade bewertet sind. Bis zum 08.08.2026
+# sortierte sie nach dem Score der staerksten Aktion - damit stand Otelo oben
+# und die Telekom auf Platz zehn, weil ihre JS-Seiten in dem Lauf nur zwei
+# Angebote hergaben. Antonio: "die groessten Anbieter wie Telekom etc. an
+# erster Stelle, soll also nach Wichtigkeit der Anbieter geordnet werden."
+#
+# Die Rangfolge folgt zwei Regeln, in dieser Ordnung:
+#   1. Netzbetreiber vor Zweitmarken. Wer ein eigenes Netz betreibt, setzt den
+#      Preis, an dem sich alle anderen ausrichten.
+#   2. Danach die Konzerne in derselben Reihenfolge wie ihre Netzbetreiber
+#      (Telekom -> Vodafone -> Telefónica -> 1&1), dann Vertriebs- und
+#      Handelsmarken, zuletzt die reinen Online-Zweitmarken (reach 1).
+# Vodafone selbst traegt Rang 2 - die Marke gehoert an diese Stelle, die SEITE
+# stellt sie trotzdem ans Ende (internal_reference, siehe report/promo.py):
+# der eigene Absender soll die Wettbewerbsbeobachtung nicht anfuehren.
+#
 # Felder:
+#   rang      Platz in der Anbieter-Rangfolge, 1 = wichtigster. Gepflegt, nicht
+#             gerechnet: Marktgewicht steht in keiner Zahl dieses Projekts.
+#             Fehlt das Feld, faellt die Marke hinter jede gepflegte und wird
+#             dort nach tier/reach/Name einsortiert.
 #   tier      1 = grosse Netzbetreiber, 2 = Discount-/Zweitmarken
 #             (Festnetz/Kabel/Glasfaser bewusst nicht getrackt - kein
 #             Interesse an diesem Segment, siehe claude/promo-uebersicht-
@@ -78,6 +102,7 @@
 brands:
   # ---------------------------------------------------------- Tier 1: MNOs
   - name: Telekom Deutschland
+    rang: 1
     reach: 3
     tier: 1
     group: Deutsche Telekom
@@ -113,6 +138,7 @@ brands:
         kind: js
         label: Junge Leute
   - name: Vodafone Deutschland
+    rang: 2
     reach: 3
     tier: 1
     group: Vodafone
@@ -134,6 +160,7 @@ brands:
         kind: static
         label: Zusatzkarten
   - name: O2 / Telefónica Deutschland
+    rang: 3
     reach: 3
     tier: 1
     group: Telefónica Deutschland
@@ -159,6 +186,7 @@ brands:
         kind: static
         label: Geräte-Shop
   - name: 1&1 Mobilfunk
+    rang: 4
     reach: 3
     tier: 1
     group: 1&1 / United Internet
@@ -178,6 +206,7 @@ brands:
 
   # ------------------------------------------------ Tier 2: Discount-Marken
   - name: congstar
+    rang: 5
     reach: 2
     tier: 2
     group: Deutsche Telekom
@@ -194,6 +223,7 @@ brands:
         kind: static
         label: Prepaid
   - name: Otelo
+    rang: 6
     reach: 2
     tier: 2
     group: Vodafone
@@ -208,6 +238,7 @@ brands:
         kind: static
         label: Young-Tarife
   - name: Blau
+    rang: 7
     reach: 2
     tier: 2
     group: Telefónica Deutschland
@@ -230,6 +261,7 @@ brands:
         kind: static
         label: Studenten
   - name: ALDI TALK
+    rang: 8
     reach: 2
     tier: 2
     group: MEDION / Telefónica-Netz
@@ -252,6 +284,7 @@ brands:
         kind: static
         label: Prepaid
   - name: mobilcom-debitel
+    rang: 9
     reach: 2
     tier: 2
     group: freenet Group
@@ -269,6 +302,7 @@ brands:
         kind: js
         label: Junge Leute
   - name: klarmobil
+    rang: 10
     reach: 2
     tier: 2
     group: freenet Group
@@ -289,6 +323,7 @@ brands:
         kind: static
         label: Prepaid
   - name: Lidl Connect
+    rang: 11
     reach: 2
     tier: 2
     group: Lidl / Drillisch
@@ -296,6 +331,7 @@ brands:
     kind: js
     note: "Single-Page-App: /tarife, /aktionen und /smart-tarife liefern byteweise dieselbe Huelle wie die Startseite - es gibt dort nur eine Seite, eine zweite Quelle ist nicht moeglich (geprueft 08.08.2026)."
   - name: Penny Mobil
+    rang: 12
     reach: 2
     tier: 2
     group: Telekom-Netz (D1)
@@ -303,6 +339,7 @@ brands:
     kind: js
     note: "Keine dedizierte Aktionsseite gefunden, Homepage als bester Fallback. connect.de deckt einzelne Kampagnen redaktionell ab. Die Unterseiten /tarife und /tarife/prepaid-* fielen am 08.08.2026 alle an der Eigenstaendigkeitspruefung durch - die Startseite enthaelt sie bereits."
   - name: winSIM
+    rang: 13
     reach: 1
     tier: 2
     group: 1&1 / Drillisch
@@ -323,6 +360,7 @@ brands:
         kind: static
         label: Ohne Handy
   - name: PremiumSIM
+    rang: 14
     reach: 1
     tier: 2
     group: 1&1 / Drillisch
@@ -333,6 +371,7 @@ brands:
         kind: static
         label: Tarife
   - name: simplytel
+    rang: 15
     reach: 1
     tier: 2
     group: 1&1 / Drillisch

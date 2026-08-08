@@ -4,9 +4,11 @@ from telco_radar.promo_config import PromoSource
 from telco_radar.report.promo import prepare_promo_view
 
 
-def _src(name="congstar", tier=2, group="", internal_reference=False, kind="static"):
+def _src(name="congstar", tier=2, group="", internal_reference=False, kind="static",
+         rang=None):
     return PromoSource(name=name, url="https://example.test/", tier=tier,
-                       kind=kind, group=group, internal_reference=internal_reference)
+                       kind=kind, group=group, internal_reference=internal_reference,
+                       rang=rang)
 
 
 def _entry(brand="congstar", headline="10 GB Bonus", status="aktiv",
@@ -168,8 +170,12 @@ def _scored(brand="congstar", headline="A", score=80, highlight=True,
     return e
 
 
-def test_karten_stehen_nach_score():
-    sources = [_src("congstar"), _src("klarmobil"), _src("Blau")]
+def test_karten_folgen_der_anbieterrangfolge():
+    """Die Karten stehen in Seitenreihenfolge, und die ist seit dem
+    08.08.2026 die Rangfolge der ANBIETER - innerhalb einer Marke sortiert
+    weiterhin der Score (siehe test_die_karten_einer_marke_stehen_nach_score)."""
+    sources = [_src("congstar", rang=3), _src("klarmobil", rang=1),
+               _src("Blau", rang=2)]
     entries = [_scored(brand="congstar", score=71),
                _scored(brand="klarmobil", score=88),
                _scored(brand="Blau", score=79)]
@@ -186,7 +192,7 @@ def test_je_marke_ein_block_mit_allen_ihren_aktionen():
     08.08.2026 stand die staerkste oben im Auswahlraster und der Rest weit
     unten in einer Zeilenwand - wer eine Marke verstehen wollte, musste
     zwischen beiden springen."""
-    sources = [_src("Telekom"), _src("congstar")]
+    sources = [_src("Telekom", rang=1), _src("congstar", rang=2)]
     entries = [_scored(brand="Telekom", headline="Gerät A", score=90),
                _scored(brand="Telekom", headline="Gerät B", score=88),
                _scored(brand="Telekom", headline="Gerät C", score=86),
@@ -199,17 +205,38 @@ def test_je_marke_ein_block_mit_allen_ihren_aktionen():
     assert [b["name"] for b in view["bloecke"]] == ["Telekom", "congstar"]
 
 
-def test_die_bloecke_stehen_nach_der_staerksten_aktion_der_marke():
-    """Sortiert wird die MARKE, nicht die Einzelaktion - sonst zerfaellt die
-    Seite wieder in eine Rangliste quer ueber alle Anbieter."""
-    sources = [_src("congstar"), _src("Blau"), _src("klarmobil")]
+def test_die_bloecke_stehen_nach_dem_rang_des_anbieters():
+    """Sortiert wird die MARKE, und zwar nach ihrem Gewicht im Markt - nicht
+    nach dem Score ihrer staerksten Aktion. Der Score haengt an einem
+    einzelnen Lauf: am 08.08.2026 stand die Telekom auf Platz zehn, weil
+    ihre JS-Seiten an dem Tag nur zwei Angebote hergaben. Antonio: "die
+    groessten Anbieter wie Telekom etc. an erster Stelle."
+
+    Der Score ordnet weiterhin INNERHALB einer Marke."""
+    sources = [_src("congstar", rang=2), _src("Blau", rang=3),
+               _src("klarmobil", rang=1)]
     entries = [_scored(brand="congstar", headline="A", score=71),
                _scored(brand="congstar", headline="B", score=99),
                _scored(brand="Blau", headline="C", score=88),
                _scored(brand="klarmobil", headline="D", score=40)]
     view = prepare_promo_view(entries, sources, "2026-07-25")
-    assert [b["name"] for b in view["bloecke"]] == ["congstar", "Blau", "klarmobil"]
-    assert [b["top_score"] for b in view["bloecke"]] == [99, 88, 40]
+    assert [b["name"] for b in view["bloecke"]] == ["klarmobil", "congstar", "Blau"]
+    assert [b["top_score"] for b in view["bloecke"]] == [40, 99, 88]
+    # ... und innerhalb von congstar steht die staerkere Aktion vorn.
+    congstar = view["bloecke"][1]
+    assert [k["offer"]["headline"] for k in congstar["karten"]] == ["B", "A"]
+
+
+def test_ohne_gepflegten_rang_entscheiden_tier_und_reichweite():
+    """Eine frisch eingetragene Marke ohne `rang` faellt hinter jede
+    gepflegte - und steht dort nicht nach Zufall, sondern nach Tier,
+    Reichweite und Name."""
+    sources = [_src("Neuling Online", tier=2), _src("Neuling Netz", tier=1),
+               _src("Gepflegt", tier=2, rang=7)]
+    entries = [_entry(brand=n) for n in ("Neuling Online", "Neuling Netz", "Gepflegt")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [b["name"] for b in view["bloecke"]] == [
+        "Gepflegt", "Neuling Netz", "Neuling Online"]
 
 
 def test_jede_sichtbare_aktion_steht_genau_einmal():
@@ -224,9 +251,9 @@ def test_jede_sichtbare_aktion_steht_genau_einmal():
 def test_das_highlight_flag_wird_gelesen_nicht_nachgebaut():
     """Ein hoher Score allein macht kein Highlight - das Flag kommt aus der
     Hysterese im Ranker, die Anzeige darf die Schwelle nicht selbst
-    nachbilden. Es ordnet die Seite aber NICHT: sortiert wird nach Score,
-    sonst haette die Hysterese zwei Wirkungen statt einer."""
-    sources = [_src("congstar"), _src("Blau")]
+    nachbilden. Es ordnet die Seite aber NICHT: sortiert wird nach dem Rang
+    des Anbieters, sonst haette die Hysterese zwei Wirkungen statt einer."""
+    sources = [_src("congstar", rang=1), _src("Blau", rang=2)]
     entries = [_scored(brand="congstar", score=95, highlight=False),
                _scored(brand="Blau", score=70, highlight=True)]
     view = prepare_promo_view(entries, sources, "2026-07-25")
@@ -238,7 +265,7 @@ def test_das_highlight_flag_wird_gelesen_nicht_nachgebaut():
 def test_eine_unbewertete_marke_faellt_hinter_jede_bewertete():
     """Vor dem ersten Bewertungslauf (und bei LLM-Ausfall) darf die Seite
     nicht leer wirken - unbewertete Aktionen stehen weiter da, nur hinten."""
-    sources = [_src("congstar"), _src("Blau")]
+    sources = [_src("congstar", rang=2), _src("Blau", rang=1)]
     entries = [_entry(brand="congstar"), _scored(brand="Blau", score=40)]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [k["brand"]["name"] for k in view["karten"]] == ["Blau", "congstar"]
@@ -372,3 +399,81 @@ def test_mechanik_sonstiges_taucht_nicht_als_balken_auf():
     entries = [_scored(mechanic="sonstiges")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["mechaniken"] == []
+
+
+# --------------------------------------------------- Dubletten & Kacheln
+# Zwei Karten, die dieselbe Aktion zeigen, und zwei Kacheln mit demselben
+# Text nebeneinander - beides liest sich als Fehler, nicht als Angebot.
+
+def test_dasselbe_angebot_steht_nur_einmal_im_block():
+    """PromoDB.upsert erkennt eine Umformulierung und aktualisiert den
+    bestehenden Eintrag. Was vor dieser Erkennung entstand, liegt trotzdem
+    doppelt in der Datenbank - am 08.08.2026 bei Lidl Connect zweimal:
+    "SMART Tarife mit 5G und Flatrate" neben "SMART-Tarife mit 5G und
+    Flatrate". Auf der Seite standen sie als zwei Karten nebeneinander."""
+    sources = [_src("Lidl Connect")]
+    entries = [_scored(brand="Lidl Connect", headline="SMART Tarife mit 5G und Flatrate",
+                       score=60),
+               _scored(brand="Lidl Connect", headline="SMART-Tarife mit 5G und Flatrate",
+                       score=40),
+               _scored(brand="Lidl Connect", headline="10 € Startguthaben", score=30)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert [k["offer"]["headline"] for k in view["karten"]] == [
+        "SMART Tarife mit 5G und Flatrate", "10 € Startguthaben"]
+
+
+def test_zwei_verschiedene_angebote_bleiben_zwei_karten():
+    """Der Zahlenwaechter aus dem Store gilt auch hier: "10 GB Bonus" und
+    "20 GB Bonus" teilen sich fast jedes Wort und sind zwei Angebote."""
+    sources = [_src("congstar")]
+    entries = [_scored(headline="10 GB Bonus für Neukunden", score=60),
+               _scored(headline="20 GB Bonus für Neukunden", score=50)]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert len(view["karten"]) == 2
+
+
+def test_die_dublette_vererbt_ihr_motiv_an_die_bleibende_karte():
+    """Beide beschreiben dieselbe Aktion - also gehoert das Bild der einen
+    auch der anderen. Ohne das verliert die Seite ein Motiv, nur weil die
+    schwaechere Schreibweise es hielt."""
+    sources = [_src("Lidl Connect")]
+    entries = [_scored(brand="Lidl Connect", headline="Jahrestarife: einmal zahlen",
+                       score=60),
+               _scored(brand="Lidl Connect", headline="Jahrestarife – einmal zahlen",
+                       score=40, image="jahr-1280.jpg")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    assert len(view["karten"]) == 1
+    assert view["karten"][0]["bild"] == "images/jahr-1280.jpg"
+
+
+def test_keine_zwei_gleichen_schriftkacheln_in_einem_block():
+    """Seit dem 08.08.2026 traegt JEDE Karte ohne Motiv eine Kachel, und
+    damit stehen bis zu acht davon in einem Block. Zweimal "1 GB"
+    untereinander ist genau der Eindruck, den der Umbau beseitigen soll -
+    die zweite Karte nimmt die naechste Stufe ihrer eigenen Liste."""
+    sources = [_src("winSIM")]
+    entries = [_scored(brand="winSIM", headline="1 GB extra im Sommer", score=60),
+               _scored(brand="winSIM", headline="1 GB geschenkt für Bestandskunden",
+                       score=50, mechanic="datenbonus")]
+    view = prepare_promo_view(entries, sources, "2026-07-25")
+    kacheln = [k["kachel"] for k in view["karten"]]
+    assert kacheln[0] == "1 GB"
+    assert len(set(kacheln)) == 2, kacheln
+
+
+def test_die_kachel_sagt_nie_sonstiges():
+    """"sonstiges" ist der Sammelschluessel des Bewertungsagenten. Als
+    groesster Text einer Karte sagt er einem Leser nichts."""
+    from telco_radar.report.promo import _kachel_text
+
+    assert _kachel_text({"headline": "SMART Tarife mit 5G und Flatrate"},
+                        "sonstiges") == "Aktion"
+
+
+def test_der_rang_kommt_aus_der_konfiguration():
+    """Ein gepflegter Rang schlaegt Tier und Reichweite - sonst stuende die
+    Rangfolge des Marktes in einer Rechnung, die ihn nicht kennt."""
+    from telco_radar.report.promo import _rang
+
+    assert _rang(_src("Telekom", tier=1, rang=1)) < _rang(_src("Blau", tier=2, rang=5))
+    assert _rang(_src("Gepflegt", tier=2, rang=9)) < _rang(_src("Ohne Rang", tier=1))

@@ -44,9 +44,14 @@ import re
 from datetime import datetime, timedelta
 
 from ..analyze.promo_ranker import MECHANICS
+from ..analyze.promo_store import _same_offer
 
 TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
 TIER_COLOR = {1: "#3860be", 2: "#e07a00"}
+# Wo eine Marke ohne gepflegten `rang` einsortiert wird: hinter jede
+# gepflegte, dort nach Tier und Reichweite. Eine neu eingetragene Marke
+# verschwindet damit nicht, sie draengelt sich nur nicht nach vorn.
+RANG_UNGESETZT = 900
 _OWN_COLOR = "#e60000"
 _RETIRED_STATUS = "ausgelaufen"
 _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
@@ -57,8 +62,12 @@ _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 # ("Wechsel- oder Altgeraetpraemie"), und weil vier Marken dieselbe fahren,
 # standen vier identische Kacheln nebeneinander - das liest sich als Fehler,
 # nicht als Gestaltung.
+# Die abschliessende Grenze ist nicht kosmetisch: ohne sie schnitt "EUR"
+# mitten aus "1 Euro einmalig" ein "1 Eur" heraus, und genau so stand es am
+# 08.08.2026 als Schriftkachel auf der Otelo-Karte.
 _ZAHL_RE = re.compile(
-    r"\d[\d.,]*\s?(?:€|EUR|%|GB|TB|MBit/s|Mbit/s|MB/s|MB|Cent)", re.I)
+    r"\d[\d.,]*\s?(?:€|Euro|EUR|%|GB|TB|MBit/s|Mbit/s|MB/s|MB|Cent)"
+    r"(?![A-Za-zÄÖÜäöüß])", re.I)
 # Wo eine Ueberschrift ihren ersten Sinnabschnitt beendet. Nur zum
 # ABTRENNEN, nie zum Abschneiden mitten im Wort - die Kachel traegt kein
 # "…" (CLAUDE.md §5: keine gekuerzten Ueberschriften).
@@ -72,19 +81,43 @@ _NAEHER_RE = re.compile(r"\s+(?:auf|für|fuer|mit|bei|ohne|zum|zur|im|in|von)\s+
 _KACHEL_MAX = 34
 
 
+def _rang(src) -> tuple:
+    """Der Platz einer Marke in der Anbieter-Rangfolge.
+
+    Antonio am 08.08.2026: "die groessten Anbieter wie Telekom etc. an
+    erster Stelle, soll also nach Wichtigkeit der Anbieter geordnet werden."
+    Gepflegt wird das in config/promo_sources.yaml (`rang`, dort steht auch
+    die Begruendung der Reihenfolge). Ohne gepflegten Rang entscheiden Tier,
+    Reichweite und Name - damit eine frisch eingetragene Marke eine
+    definierte Stelle hat, statt nach Zufall irgendwo zu landen.
+    """
+    rang = getattr(src, "rang", None)
+    if rang:
+        return (rang, 0, 0, "")
+    return (RANG_UNGESETZT, getattr(src, "tier", 2) or 2,
+            -(getattr(src, "reach", None) or 0), (getattr(src, "name", "") or "").lower())
+
+
 def _initials(name: str) -> str:
     words = [w for w in (name or "").replace("/", " ").split() if w[:1].isalnum()]
     letters = "".join(w[0] for w in words[:2]).upper()
     return letters or "?"
 
 
-def _kachel_text(offer: dict, mechanik: str) -> str:
-    """Was auf der Schriftkachel gross steht, wenn es kein Bild gibt.
+def _kachel_kandidaten(offer: dict, mechanik: str) -> list[str]:
+    """Was auf der Schriftkachel stehen kann, konkret vor generisch.
 
-    Drei Stufen, konkret vor generisch: die Zahlen der Ueberschrift ("20 GB
-    · 6,99 €"), sonst ihr erster Sinnabschnitt, sonst die Mechanik. Die
+    Eine Liste statt eines Werts, weil die Kachel sich innerhalb einer Marke
+    nicht wiederholen darf (siehe _entdoppele_kacheln): steht in einem Block
+    zweimal "10 €" untereinander, liest sich das als Fehler, obwohl beide
+    Angebote wirklich 10 € kosten.
+
+    Die Stufen: die Zahlen der Ueberschrift ("20 GB · 6,99 €"), dann alle
+    ihre Zahlen, dann ihr erster Sinnabschnitt, dann die Mechanik. Die
     Mechanik ist ausdruecklich die LETZTE Wahl - sie beschreibt eine
-    Angebotsart und unterscheidet zwei Marken nicht.
+    Angebotsart und unterscheidet zwei Angebote nicht. "sonstiges" faellt
+    ganz heraus: es ist der Sammelschluessel des Bewertungsagenten und sagt
+    einem Leser nichts.
     """
     headline = " ".join((offer.get("headline") or "").split())
     zahlen: list[str] = []
@@ -92,10 +125,11 @@ def _kachel_text(offer: dict, mechanik: str) -> str:
         wert = " ".join(m.group(0).split())
         if wert not in zahlen:
             zahlen.append(wert)
-        if len(zahlen) == 2:
-            break
+    kandidaten = []
     if zahlen:
-        return " · ".join(zahlen)
+        kandidaten.append(" · ".join(zahlen[:2]))
+        if len(zahlen) > 2:
+            kandidaten.append(" · ".join(zahlen[2:4]))
     erster = _KLAUSEL_RE.split(headline)[0].strip()
     if len(erster) > _KACHEL_MAX:
         erster = _NAEHER_RE.split(erster)[0].strip()
@@ -103,8 +137,41 @@ def _kachel_text(offer: dict, mechanik: str) -> str:
     # tiefer noch einmal, und dieselbe Aussage zweimal untereinander liest
     # sich als Panne. Ein AUSSCHNITT ist etwas anderes - er hebt hervor.
     if erster and erster != headline and len(erster) <= _KACHEL_MAX:
-        return erster
-    return mechanik or "Aktion"
+        kandidaten.append(erster)
+    if mechanik and mechanik != "sonstiges":
+        kandidaten.append(mechanik)
+    kandidaten.append("Aktion")
+    return list(dict.fromkeys(k for k in kandidaten if k))
+
+
+def _kachel_text(offer: dict, mechanik: str) -> str:
+    """Die beste Schriftkachel eines Angebots ohne Ruecksicht auf seine
+    Nachbarn - der Normalfall und die Grundlage der Tests."""
+    return _kachel_kandidaten(offer, mechanik)[0]
+
+
+def _entdoppele_kacheln(karten: list[dict]) -> None:
+    """Innerhalb eines Markenblocks traegt jede Schriftkachel einen eigenen
+    Text.
+
+    Seit dem 08.08.2026 hat JEDE Karte ohne Motiv eine Kachel (vorher nur
+    die grosse), und damit stehen in einem Block bis zu acht davon
+    nebeneinander - bei winSIM zweimal "1 GB" und zweimal "Jahrestarife",
+    bei PremiumSIM zweimal "25 GB". Zwei gleiche Kacheln untereinander sind
+    genau der Eindruck, den diese Runde loswerden soll. Wer schon vergeben
+    ist, nimmt die naechste Stufe seiner eigenen Kandidatenliste; ist auch
+    die vergeben, bleibt es beim besten Text - eine falsche Zahl waere
+    schlimmer als eine wiederholte.
+    """
+    vergeben: set[str] = set()
+    for k in karten:
+        if k["bild"]:
+            continue
+        for kandidat in k["kachel_kandidaten"]:
+            if kandidat not in vergeben:
+                k["kachel"] = kandidat
+                break
+        vergeben.add(k["kachel"])
 
 
 # Ab diesem Seitenverhaeltnis ist ein Bild ein Banner und kein Motiv. 2,2
@@ -127,10 +194,47 @@ def _sortierschluessel(offer: dict) -> tuple:
             offer.get("last_verified") or "")
 
 
+def _ohne_dubletten(sichtbar: list[dict]) -> list[dict]:
+    """Dasselbe Angebot steht nur einmal im Block.
+
+    PromoDB.upsert erkennt eine Umformulierung derselben Aktion und
+    aktualisiert den bestehenden Eintrag, statt einen zweiten anzulegen
+    (_find_existing_id). Was vor dieser Erkennung entstanden ist, liegt
+    trotzdem doppelt in der Datenbank - am 08.08.2026 bei Lidl Connect
+    gleich zweimal: "SMART Tarife mit 5G und Flatrate" neben
+    "SMART-Tarife mit 5G und Flatrate", "Jahrestarife – einmal zahlen"
+    neben "Jahrestarife: Einmal zahlen". Auf der Seite standen sie als zwei
+    Karten nebeneinander, und das liest sich als Fehler, nicht als zwei
+    Angebote.
+
+    Gerechnet wird mit derselben Heuristik wie im Store (`_same_offer`:
+    Wortueberlappung plus Zahlenwaechter, damit "10 GB Bonus" und "20 GB
+    Bonus" getrennt bleiben). Die Liste kommt bereits sortiert - der
+    staerkere Eintrag steht vorn und bleibt. Die DATENBANK wird nicht
+    angefasst: das hier ist ein Anzeigefilter, kein stiller Loeschvorgang.
+    """
+    behalten: list[dict] = []
+    for eintrag in sichtbar:
+        kopf = eintrag.get("headline") or ""
+        zwilling = next((b for b in behalten
+                         if _same_offer(kopf, b.get("headline") or "")), None)
+        if zwilling is None:
+            behalten.append(eintrag)
+            continue
+        # Das Motiv der Dublette gehoert derselben Aktion - es faellt nicht
+        # weg, nur weil die andere Schreibweise gewinnt.
+        if eintrag.get("image") and not zwilling.get("image"):
+            for feld in ("image", "image_w", "image_h", "image_kind"):
+                if eintrag.get(feld) is not None:
+                    zwilling[feld] = eintrag[feld]
+    return behalten
+
+
 def _karte(brand: dict, offer: dict) -> dict:
     """Ein Angebot als Anzeigeeinheit - genau die Felder, die eine Karte
     zeigt. Die Vorlage rechnet nichts mehr aus."""
     mechanik = MECHANICS.get(offer.get("mechanic") or "", "")
+    kandidaten = _kachel_kandidaten(offer, mechanik)
     return {
         "brand": brand,
         "offer": offer,
@@ -138,7 +242,10 @@ def _karte(brand: dict, offer: dict) -> dict:
         "highlight": bool(offer.get("highlight")),
         "reason": offer.get("score_reason") or "",
         "mechanic": mechanik,
-        "kachel": _kachel_text(offer, mechanik),
+        # `kachel` ist die Vorauswahl; _entdoppele_kacheln() entscheidet
+        # innerhalb des Markenblocks endgueltig.
+        "kachel": kandidaten[0],
+        "kachel_kandidaten": kandidaten,
         "frist": offer.get("valid_until") or "",
         "bild": f"images/{offer['image']}" if offer.get("image") else "",
         "bild_w": offer.get("image_w"),
@@ -263,8 +370,9 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     brands_active = 0
     for src in crawlable:
         eintraege = by_brand_raw.get(src.name, [])
-        sichtbar = sorted((e for e in eintraege if e.get("status") in _SICHTBAR),
-                          key=_sortierschluessel, reverse=True)
+        sichtbar = _ohne_dubletten(
+            sorted((e for e in eintraege if e.get("status") in _SICHTBAR),
+                   key=_sortierschluessel, reverse=True))
         bestaetigt = [e for e in sichtbar if e.get("status") == "aktiv"]
         beendet = [e for e in eintraege if e.get("status") == _RETIRED_STATUS]
 
@@ -273,7 +381,7 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
             brands_active += 1
 
         marken.append({
-            "name": src.name, "tier": src.tier,
+            "name": src.name, "tier": src.tier, "rang": _rang(src),
             "tier_label": TIER_LABEL.get(src.tier, ""),
             "color": _OWN_COLOR if src.internal_reference else TIER_COLOR.get(src.tier, "#3860be"),
             "group": src.group, "url": src.url,
@@ -284,20 +392,27 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
             "has_offers": bool(sichtbar),
         })
 
-    # Wettbewerber mit sichtbarem Angebot zuerst, dann nach Tier/Name;
+    # Wettbewerber mit sichtbarem Angebot zuerst, dann nach Anbieterrang;
     # Vodafones eigene Referenzkarte immer als letzte.
     marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
-                               b["tier"], b["name"]))
+                               b["rang"]))
 
     # ----------------------------------------------------------- Bloecke
-    # Je Marke ein Block, staerkste Marke zuerst. Sortiert wird ueber den
-    # Score ihrer besten Aktion - eine Marke ohne bewertete Aktion faellt
-    # hinter jede bewertete, verschwindet aber nicht (vor dem ersten
-    # Bewertungslauf und bei LLM-Ausfall ist das der Normalfall).
+    # Je Marke ein Block, WICHTIGSTER ANBIETER ZUERST (siehe _rang).
+    #
+    # Bis zum 08.08.2026 sortierte hier der Score der staerksten Aktion. Das
+    # war eine Rangliste der Angebote, keine des Marktes, und sie hing an
+    # einem einzigen Lauf: die Telekom stand auf Platz zehn, weil ihre
+    # JS-Seiten an dem Tag nur zwei Angebote hergaben, waehrend Otelo mit
+    # einer starken Freundschaftswerbung die Seite anfuehrte. Wer wissen
+    # will, was die Telekom macht, soll nicht scrollen muessen - und die
+    # Reihenfolge soll nicht jede Woche eine andere sein.
+    #
+    # Der Score ordnet weiterhin INNERHALB einer Marke (siehe
+    # _sortierschluessel) und traegt die Hervorhebung "wichtig".
     bloecke = [_block(b) for b in marken
                if b["has_offers"] and not b["internal_reference"]]
-    bloecke.sort(key=lambda b: (b["top_score"] is not None, b["top_score"] or 0),
-                 reverse=True)
+    bloecke.sort(key=lambda b: b["rang"])
 
     eigene_marke = next((b for b in marken
                          if b["internal_reference"] and b["has_offers"]), None)
@@ -307,7 +422,11 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     # die Wahrheitstests rechnen ("jede sichtbare Aktion genau einmal").
     karten = [k for b in bloecke for k in b["karten"]]
     alle_karten = karten + (eigen["karten"] if eigen else [])
+    # Erst die Motive entdoppeln, dann die Kacheln: die erste Runde kann
+    # einer Karte ihr Bild nehmen, und die wird dadurch zur Schriftkachel.
     _entdoppele_bilder(alle_karten)
+    for block in bloecke + ([eigen] if eigen else []):
+        _entdoppele_kacheln(block["karten"])
 
     ohne_aktion = [b for b in marken if not b["has_offers"]]
 

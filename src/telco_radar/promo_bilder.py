@@ -38,10 +38,15 @@ Zugeordnet wird in drei Stufen, staerkstes Signal zuerst:
             Angebot zu, ein seltenes Wort wie "Kinder-Smartwatch" beweist
             etwas.
 
+Dazu kommt als vierte Stufe das SEITENMOTIV: das Buehnenbild einer
+Aktionsseite geht an deren staerkstes noch unbebildertes Angebot (siehe
+_seitenmotive). Es belegt, womit auf dieser Seite geworben wird, nicht
+welches ihrer Angebote gemeint ist - die Karte schreibt das dazu.
+
 Was sich nicht belegen laesst, bekommt KEIN Bild - eine falsche Zuordnung
 ist schlimmer als keine (dieselbe Regel wie beim roten Faden). Die Vorlage
-faengt das ab: eine Aktion mit Bild wird eine Kachel, eine ohne Bild eine
-Zeile.
+faengt das ab: eine Aktion ohne Motiv bekommt ihre Kernzahl als
+Schriftkachel, nie einen leeren Kasten.
 
 Jedes Kandidatenbild wird hoechstens EINMAL vergeben. Zwei Kacheln
 nebeneinander mit demselben Motiv lesen sich als Fehler, und im Zweifel ist
@@ -189,7 +194,72 @@ def _haeufigkeiten(kandidaten: list[dict]) -> dict[str, int]:
     return {w: (n if n <= deckel else 10_000) for w, n in zaehler.items()}
 
 
-def zuordnen(angebote: list[dict], kandidaten: list[dict]) -> dict[str, dict]:
+def _seitenmotive(angebote: list[dict], kandidaten: list[dict],
+                  vergeben: set[str], ergebnis: dict[str, dict],
+                  leitseite: str) -> None:
+    """Stufe 4: das Buehnenbild JE AKTIONSSEITE an das staerkste noch
+    unbebilderte Angebot DIESER Seite.
+
+    Viele Aktionsseiten binden ihr Kampagnenmotiv ohne Link und ohne
+    alt-Text ein (otelo.de: vier Kandidaten, kein einziger Anker, kein
+    einziger alt-Text) - dort greift keine der drei Stufen darueber, obwohl
+    das Motiv der laufenden Aktion offen daliegt.
+
+    Bis zum 08.08.2026 wurde hier genau EIN Motiv je MARKE vergeben, und das
+    war die Rechnung von vorgestern: damals hatte eine Marke eine einzige
+    Seite. Seit sie bis zu sieben hat (promo_config.PromoSource.pages), liegt
+    je Seite ein eigenes Buehnenbild bereit - congstar bringt ueber vier
+    Seiten 80 Bildkandidaten mit und bekam trotzdem hoechstens ein Motiv.
+    Gemessen ueber alle statisch abrufbaren Seiten am 08.08.2026: 41 von 77
+    sichtbaren Angeboten hatten ein Bild, mit dieser Stufe je Seite sind es
+    deutlich mehr.
+
+    Die Aussage bleibt dieselbe und bleibt belegt: ein Seitenmotiv zeigt,
+    WOMIT auf dieser Seite geworben wird - nicht, welches ihrer Angebote
+    gemeint ist. Genau deshalb bekommt es das staerkste Angebot der Seite und
+    keins darunter, und genau deshalb schreibt die Karte "Motiv der
+    Aktionsseite" dazu (siehe promo_index.html.j2).
+
+    Ein Angebot ohne `source_url` (Bestand aus der Zeit vor den Mehrfach-
+    seiten) haengt an der Leitseite - dieselbe Konvention wie in
+    PromoDB.mark_stale.
+    """
+    nach_seite: dict[str, list[dict]] = {}
+    for kand in kandidaten:
+        nach_seite.setdefault(kand.get("page") or "", []).append(kand)
+
+    def _taugt_als_motiv(k: dict) -> bool:
+        breite = k.get("hint_w") or 0
+        return ((k.get("src") or "") not in vergeben
+                and (breite == 0 or breite >= _MOTIV_MIND_BREITE)
+                and not _SIEGEL_RE.search(k.get("context") or ""))
+
+    for seite, seiten_kandidaten in nach_seite.items():
+        # Kein `page` an den Kandidaten (Bestand, Tests): dann ist "die
+        # Seite" die Marke, und es bleibt bei einem Motiv - genau das
+        # Verhalten von vor dem 08.08.2026.
+        if seite:
+            passend = [a for a in angebote
+                       if (a.get("source_url") or leitseite) == seite]
+        else:
+            passend = list(angebote)
+        ziel = next((a for a in passend
+                     if a.get("id") and not ergebnis.get(a["id"])), None)
+        if ziel is None:
+            continue
+        # Dokumentreihenfolge, nicht Groesse: das Buehnenbild steht oben auf
+        # der Seite, die 1920 px breiten Testsiegel stehen unten.
+        motive = [k["src"] for k in seiten_kandidaten if _taugt_als_motiv(k)]
+        if not motive:
+            continue
+        ergebnis[ziel["id"]] = {"quellen": motive[:3], "art": "motiv"}
+        # Vergeben ist vergeben: sonst steht dasselbe Motiv auf der naechsten
+        # Seite noch einmal, und zwei gleiche Kacheln lesen sich als Fehler.
+        vergeben.update(motive[:3])
+
+
+def zuordnen(angebote: list[dict], kandidaten: list[dict],
+             leitseite: str = "") -> dict[str, dict]:
     """Ordnet den Angeboten EINER Marke ihre Bildkandidaten zu.
 
     Gibt {angebots-id: {"quellen": [url, ...], "art": "angebot"|"motiv"}}
@@ -202,10 +272,15 @@ def zuordnen(angebote: list[dict], kandidaten: list[dict]) -> dict[str, dict]:
     "art" sagt, WAS das Bild belegt, und die Seite schreibt es dazu:
     "angebot" = das Bild steht im Kasten dieses Angebots oder nennt es
     (Stufen 1-3), "motiv" = es ist das Buehnenbild der Aktionsseite und
-    zeigt, womit die Marke gerade wirbt - nicht zwingend dieses eine Angebot
-    (Stufe 4). Ohne diese Unterscheidung behauptet eine Kachel mehr, als
-    belegt ist: Otelos Seitenmotiv wirbt mit "mehr GB, gleicher Preis",
-    waehrend die staerkste Aktion die Freundschaftswerbung ist.
+    zeigt, womit dort geworben wird - nicht zwingend dieses eine Angebot
+    (Stufe 4, siehe _seitenmotive). Ohne diese Unterscheidung behauptet eine
+    Kachel mehr, als belegt ist: Otelos Seitenmotiv wirbt mit "mehr GB,
+    gleicher Preis", waehrend die staerkste Aktion die Freundschaftswerbung
+    ist.
+
+    `leitseite` ist die URL der Marken-Leitseite. Angebote ohne `source_url`
+    (Bestand von vor den Mehrfachseiten) haengen an ihr - dieselbe
+    Konvention wie in PromoDB.mark_stale.
 
     Angebote ohne Beleg fehlen im Ergebnis. Das ist kein Fehlschlag, sondern
     die Aussage "hier gibt es kein passendes Bild" - die Vorlage macht
@@ -249,32 +324,8 @@ def zuordnen(angebote: list[dict], kandidaten: list[dict]) -> dict[str, dict]:
         eintrag["quellen"].append(src)
         vergeben.add(src)
 
-    # ---- Stufe 4: das SEITENMOTIV, und zwar nur fuer das staerkste Angebot
-    # der Marke. Viele Aktionsseiten binden ihr Buehnenbild ohne Link und
-    # ohne alt-Text ein (otelo.de: vier Kandidaten, kein einziger Anker,
-    # kein einziger alt-Text) - dort greift keine der drei Stufen oben,
-    # obwohl das Kampagnenmotiv der laufenden Aktion offen daliegt.
-    #
-    # Die Beschraenkung auf EIN Angebot je Marke ist der Punkt: das
-    # Seitenmotiv belegt nicht, welches der acht Angebote gemeint ist - es
-    # belegt nur, womit die Marke gerade wirbt. Genau das ist die Aussage
-    # der obersten Karte ("die staerkste Aktion dieser Marke"), und genau
-    # deshalb bekommt keine Zeile darunter dieses Bild. Dieselbe Rolle wie
-    # `og:image` bei einer Meldung: das Bild der Seite, nicht des Absatzes.
-    erstes = next((a for a in angebote if a.get("id")), None)
-    if erstes is not None and not ergebnis.get(erstes["id"]):
-        def _taugt_als_motiv(k: dict) -> bool:
-            breite = k.get("hint_w") or 0
-            return ((k.get("src") or "") not in vergeben
-                    and (breite == 0 or breite >= _MOTIV_MIND_BREITE)
-                    and not _SIEGEL_RE.search(k.get("context") or ""))
-
-        motive = [k for k in kandidaten if _taugt_als_motiv(k)]
-        if motive:
-            # Dokumentreihenfolge, nicht Groesse: das Buehnenbild steht oben
-            # auf der Seite, die 1920 px breiten Testsiegel stehen unten.
-            ergebnis[erstes["id"]] = {"quellen": [k["src"] for k in motive[:3]],
-                                      "art": "motiv"}
+    # ---- Stufe 4: das Buehnenbild JE AKTIONSSEITE, siehe _seitenmotive().
+    _seitenmotive(angebote, kandidaten, vergeben, ergebnis, leitseite)
     return ergebnis
 
 
