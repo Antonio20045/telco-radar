@@ -178,6 +178,65 @@
 </section>
 {% endif %}
 
+{# ======================================================= WER WAS HAT ==== #}
+{# Die Gegenfrage. Bis zum 08.08.2026 zeigte diese Seite 71 Beispiele und wer
+   am breitesten aufgestellt ist - und beantwortete nie die eine Frage, wegen
+   der ein Portfolio-Manager sie aufschlaegt: wer hat einen Hebel, den WIR
+   nicht haben?
+
+   Was hier NICHT passiert: raten. "Wir haben das nicht" steht nur da, wo es
+   in config/vodafone_hebel.yaml mit Datum gepflegt ist. Alles andere heisst
+   "noch nicht erfasst" - siehe report/luecken.py. #}
+{% if luecken and luecken.aktiv %}
+<section class="dz-luecken" id="luecken" style="scroll-margin-top:90px">
+  <div class="rubrik">
+    <h2>Wer was hat{% if luecken.markt %} – und was {{ luecken.markt }} dazu{% endif %}</h2>
+    <span class="rubrik-zahl">{{ luecken.n_erfasst }} von {{ luecken.n_hebel }} Hebeln erfasst</span>
+  </div>
+
+  {% if luecken.flecken %}
+  <p class="dz-luecken-lead">Hebel, die mehrere Wettbewerber ziehen und die auf
+  eigener Seite als <b>nicht vorhanden</b> erfasst sind – der stärkste zuerst.</p>
+  <ul class="dz-fleck-liste">
+    {% for z in luecken.flecken %}
+    <li><a href="#dz-theme-{{ z.key }}">
+      <span class="dz-fleck-label">{{ z.label }}</span>
+      <span class="dz-fleck-n">{{ z.n_wettbewerber }} Wettbewerber</span>
+      <span class="dz-fleck-wer">{{ z.wettbewerber | join(', ') }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="rowtable dz-vergleich">
+    <div class="rowtable-head">
+      <span class="col-region">Hebel</span>
+      <span class="col-flex">Wettbewerber</span>
+      <span class="col-kept">{{ luecken.markt or 'eigene Seite' }}</span>
+    </div>
+    {% for z in luecken.vergleich %}
+    <div class="rowtable-row">
+      <span class="col-region"><a href="#dz-theme-{{ z.key }}">{{ z.label }}</a></span>
+      <span class="col-flex">{{ z.n_wettbewerber }}{% if z.wettbewerber %} · {{ z.wettbewerber[:3] | join(', ') }}{% endif %}</span>
+      <span class="col-kept">
+        {%- if z.zustand == 'ja' %}{{ z.eigenes or 'vorhanden' }} <i>({{ z.stand }})</i>
+        {%- elif z.zustand == 'nein' %}nicht vorhanden <i>({{ z.stand }})</i>
+        {%- else %}noch nicht erfasst{% endif -%}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if luecken.unvollstaendig %}
+  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
+    Ein Hebel gilt erst dann als Lücke, wenn die eigene Seite mit Datum
+    gepflegt ist. Was hier „noch nicht erfasst“ heißt, ist ungeprüft – nicht
+    fehlend. Die Liste steht in <code>config/vodafone_hebel.yaml</code>.
+  </p>
+  {% endif %}
+</section>
+{% endif %}
+
 {% if diff.hebel %}
 <nav class="toc dz-nav" aria-label="Die Differenzierungs-Hebel">
   {% for h in diff.hebel %}<a href="#dz-theme-{{ h.key }}">{{ h.label }}</a>{% endfor %}

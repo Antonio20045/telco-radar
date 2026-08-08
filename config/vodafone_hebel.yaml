@@ -1,0 +1,105 @@
+# =============================================================================
+# WAS WIR SELBST HABEN - die Gegenseite der Differenzierungs-Bibliothek
+# =============================================================================
+#
+# Warum es diese Datei gibt
+# -------------------------
+# Die Differenzierungs-Seite zeigt 71 Beispiele und wer am breitesten
+# aufgestellt ist: Deutsche Telekom, Verizon, T-Mobile US, Reliance Jio,
+# AT&T, SK Telecom, Telkomsel. Vodafone kommt darin nicht vor. Die Seite
+# beantwortet damit die Frage, die ein Portfolio-Manager wirklich hat, nie:
+# *Wer hat einen Hebel, den wir nicht haben?*
+#
+# Die Promo-Uebersicht macht das mit ihrem Vodafone-Vergleichsanker laengst
+# richtig. Die Marktrecherche nicht - bis jetzt.
+#
+# Die eine Regel, an der alles haengt
+# -----------------------------------
+# **"Wir haben das nicht" kommt aus DIESER Datei, nie aus einer
+# Modellvermutung.** Ein falsches "Vodafone hat das nicht" bei etwas, das es
+# gibt, kostet mehr Vertrauen als zehn richtige Eintraege einbringen - und es
+# faellt genau der Person auf, die die Seite benutzt.
+#
+# Deshalb drei Zustaende statt zwei, und der dritte ist der Standard:
+#
+#   ja        wir haben es. `beispiel` nennt WAS, `stand` WANN geprueft.
+#   nein      wir haben es nachweislich nicht. Braucht ebenfalls `stand`.
+#   offen     noch niemand nachgesehen. **Die Seite zaehlt so einen Hebel
+#             NICHT als weissen Fleck** - sie schreibt "noch nicht erfasst".
+#
+# Ein Eintrag ohne `stand` gilt automatisch als `offen`, egal was in `wir_haben`
+# steht: eine undatierte Aussage ueber ein Portfolio ist nach drei Monaten
+# keine Aussage mehr.
+#
+# So wird die Datei gepflegt
+# --------------------------
+# Von Hand, und das ist Absicht. Es sind zwoelf Zeilen, sie aendern sich
+# selten, und sie sind der einzige Teil dieses Projekts, den kein Crawler
+# beantworten kann. Wer einen Hebel eintraegt, setzt `stand` auf das heutige
+# Datum - die Seite zeigt es an.
+#
+# STAND DER BEFUELLUNG: leer. Alle zwoelf Hebel stehen auf `offen`, weil zum
+# Zeitpunkt des Einbaus (08.08.2026) niemand hier das Vodafone-Portfolio
+# belastbar kannte. Das ist kein Versaeumnis der Mechanik, sondern die
+# Anwendung ihrer eigenen Regel: lieber "noch nicht erfasst" als eine
+# geratene Behauptung ueber das eigene Haus. Die Seite funktioniert in diesem
+# Zustand vollstaendig - sie zeigt das Marktbild und sagt bei jedem Hebel
+# ehrlich, dass die eigene Seite fehlt.
+
+markt: "Vodafone Deutschland"
+
+hebel:
+  - key: ki
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: entertainment
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: garantie
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: geraete
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: security
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: fintech
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: superapp
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: cloud
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: smarthome
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: gaming
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: loyalty
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+  - key: health
+    wir_haben: offen
+    beispiel: ""
+    stand: ""
+
+# Der Wettbewerber, gegen den Zeile fuer Zeile verglichen wird. Die Telekom
+# ist mit sechs besetzten Hebeln der breiteste Anbieter im Bestand - der
+# Vergleich mit ihr ist der einzige, der sich im deutschen Markt von selbst
+# aufdraengt.
+direktvergleich: "Deutsche Telekom"

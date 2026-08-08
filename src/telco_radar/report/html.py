@@ -18,6 +18,7 @@ from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
 from . import differenzierung_view
+from . import luecken as luecken_mod
 from . import seit as seit_mod
 from . import suchindex
 from .differentiation import DIFF_THEMES
@@ -1151,6 +1152,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # leeren Drittel nur "Stand 7. August 2026" - der beste Platz der
             # Seite mit einer Datumszeile belegt (report/seit.py).
             seit=seit_mod.fuer_differenzierung(diff),
+            # Die Gegenfrage: wer hat einen Hebel, den wir nicht haben?
+            # Gerechnet gegen eine GEPFLEGTE Liste - nie gegen eine
+            # Modellvermutung (report/luecken.py).
+            luecken=luecken_mod.bauen(
+                diff["bestand"], theme_label_map,
+                luecken_mod.lade_eigene_hebel(reports_dir.parent.parent)),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             diff_lage_html=_md_to_html(diff_teile["lage"])
             if diff_teile["lage"] else "",
