@@ -1434,3 +1434,114 @@ def test_zaehlwerte_tragen_ueberall_dieselbe_klasse(tmp_path):
     # ... und die Klasse wird auch wirklich benutzt.
     soup = BeautifulSoup(_seite(site, "meldungen.html"), "html.parser")
     assert soup.select(".rubrik-zahl")
+
+
+# =========================================================== CTM-Linse ====
+# Die zweite Bewertungsachse (analyze/ctm.py) und der Zwei-Minuten-Pfad.
+# Beides sind ZAHLEN und REIHENFOLGEN auf der Seite - also gehoert es hierhin
+# und nicht in einen Modultest: dass `veredle()` richtig rechnet, sagt noch
+# nicht, dass die Startseite das Ergebnis auch zeigt.
+
+def _ctm_highlight(i, *, ctm_bezug, relevance=3, satz=None, operator=None):
+    h = _highlight(i, relevance, "Tarif/Pricing", image_w=1200)
+    h["ctm_bezug"] = ctm_bezug
+    h["operator"] = operator or f"Betreiber {i}"
+    if satz:
+        h["ctm_satz"] = satz
+    return h
+
+
+def test_zwei_minuten_steht_vor_dem_aufmacher(tmp_path):
+    """Wer zwei Minuten hat, soll nicht erst eine Zeitungsseite durchqueren."""
+    hs = [_ctm_highlight(1, ctm_bezug=3, relevance=5,
+                         satz="Drückt unsere Preisuntergrenze deutlich.",
+                         operator="Deutsche Telekom")] + PORTAL
+    html = _seite(_render(tmp_path, highlights=hs), "index.html")
+    assert "In zwei Minuten" in html
+    assert html.index("kurzpfad") < html.index("front-oben")
+
+
+def test_zwei_minuten_zeigt_nur_saetze_mit_quelle(tmp_path):
+    hs = [_ctm_highlight(1, ctm_bezug=3, relevance=5,
+                         satz="Drückt unsere Preisuntergrenze deutlich.",
+                         operator="Deutsche Telekom")] + PORTAL
+    soup = BeautifulSoup(_seite(_render(tmp_path, highlights=hs),
+                                "index.html"), "html.parser")
+    zeilen = soup.select(".kurzpfad-zeile")
+    assert zeilen
+    for z in zeilen:
+        assert z.select_one(".kurzpfad-satz").get_text(strip=True)
+        assert z.select_one(".kurzpfad-beleg a")["href"].startswith("http")
+
+
+def test_ohne_direkten_bezug_faellt_der_kasten_weg(tmp_path):
+    """Eine Woche ohne Portfoliofrage ist ein Befund, kein Loch, das man mit
+    Fuellzeilen schliesst."""
+    html = _seite(_render(tmp_path, highlights=PORTAL), "index.html")
+    assert "In zwei Minuten" not in html
+
+
+def test_direkte_meldung_steht_vor_der_dringlicheren(tmp_path):
+    """Der eigentliche Eingriff: die Prioritaet misst branchenweite
+    Bedeutung. Danach sortiert stand am 07.08.2026 "OpenAI macht ChatGPT
+    gratis unbegrenzt" (Prioritaet 5) ueber der Telekom-Flat fuer 34,95 Euro
+    (Prioritaet 3)."""
+    welt = _ctm_highlight(90, ctm_bezug=1, relevance=5, operator="OpenAI")
+    welt["title"] = "OpenAI macht ChatGPT für Gratisnutzer unlimitiert"
+    heimat = _ctm_highlight(91, ctm_bezug=3, relevance=3,
+                            operator="Deutsche Telekom")
+    heimat["title"] = "Telekom-Flatrate mit Unlimited-Daten für 34,95 Euro"
+    soup = BeautifulSoup(_seite(_render(tmp_path, highlights=[welt, heimat]),
+                                "meldungen.html"), "html.parser")
+    zeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
+    assert any("34,95" in z for z in zeilen)
+    erste_heimat = next(i for i, z in enumerate(zeilen) if "34,95" in z)
+    erste_welt = next(i for i, z in enumerate(zeilen) if "ChatGPT" in z)
+    assert erste_heimat < erste_welt
+
+
+def test_alte_ausgaben_ohne_ctm_feld_behalten_ihre_reihenfolge(tmp_path):
+    """Berichte von vor dem 08.08.2026 tragen das Feld nicht. Sie duerfen
+    nicht alle auf Stufe 0 fallen - dann ordnete die Prioritaet nichts mehr,
+    und eine Archivwoche kaeme in willkuerlicher Reihenfolge."""
+    soup = BeautifulSoup(_seite(_render(tmp_path), "meldungen.html"),
+                         "html.parser")
+    zeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
+    nummern = [int(re.search(r"Meldung (\d+)", z).group(1))
+               for z in zeilen if re.search(r"Meldung (\d+)", z)]
+    # HIGHLIGHTS: 0-3 tragen Prioritaet 5, 4-7 die 4, 8-11 die 3.
+    stark = [n for n in nummern if n < 4]
+    schwach = [n for n in nummern if n >= 8]
+    assert stark and schwach
+    assert nummern.index(stark[0]) < nummern.index(schwach[0])
+
+
+def test_der_folgerungssatz_traegt_seine_marke(tmp_path):
+    """Ohne die Marke liest er sich als zweite Zusammenfassung."""
+    hs = [_ctm_highlight(1, ctm_bezug=3, relevance=5,
+                         satz="Drückt unsere Preisuntergrenze deutlich.")] + PORTAL
+    for seite in ("index.html", "meldungen.html"):
+        soup = BeautifulSoup(_seite(_render(tmp_path / seite, highlights=hs),
+                                    seite), "html.parser")
+        satz = soup.select_one(".ctm-satz")
+        assert satz is not None, seite
+        assert satz.select_one(".ctm-marke").get_text(strip=True) == \
+            "Was das für uns heißt"
+
+
+def test_belege_eines_ereignisses_stehen_unter_der_meldung(tmp_path):
+    """Die weiteren Quellen desselben Ereignisses (analyze/clustering.py) -
+    einzeln anklickbar und NICHT als eigene Meldungszeile."""
+    h = _highlight(1, 5, "Tarif/Pricing")
+    h["weitere_quellen"] = [
+        {"source": "Light Reading", "url": "https://lr.test/1", "title": "A"},
+        {"source": "Telecoms.com", "url": "https://tc.test/2", "title": "B"}]
+    h["quellenzahl"] = 3
+    soup = BeautifulSoup(_seite(_render(tmp_path, highlights=[h] + PORTAL),
+                                "meldungen.html"), "html.parser")
+    belege = soup.select_one(".mz-belege")
+    assert belege is not None
+    assert len(belege.select("a")) == 2
+    # Ein Link im Link waere ungueltiges HTML - die Belege muessen ausserhalb
+    # des Meldungslinks stehen.
+    assert belege.find_parent("a") is None

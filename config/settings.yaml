@@ -176,6 +176,17 @@ cluster_llm_pruefung: true
 # Eine Zahl hier setzt eine feste Obergrenze.
 cluster_max_llm_pruefungen: null
 
+# ---------------------------------------------------------------------------
+# CTM-Linse (src/telco_radar/analyze/ctm.py + config/ctm_fokus.yaml)
+#
+# Der Prueflauf gegen den Originaltext (analyze/faithfulness.py). Er ist KEIN
+# optionales Extra, sondern die Bedingung dafuer, dass das System ueberhaupt
+# folgern darf: solange es zusammenfasst, ist ein Fehler eine ungenaue Zeile;
+# sobald es "drueckt die Preisuntergrenze fuer unsere Unlimited-Stufe"
+# schreibt, klingt ein Fehler plausibel und steht unter einem Quellenlink.
+# Ausschalten heisst: es erscheint gar kein Folgerungssatz (fail closed).
+ctm_belegpruefung: true
+
 # Parallelitaet der Sammelphase (collect/__init__.py::collect_all).
 # Mit dem Quellen-Ausbau vom 04.08.2026 hat sich die Zahl der Quellen mehr als
 # verdoppelt. Die Sammelphase ist fast reine Wartezeit auf fremde Server, also

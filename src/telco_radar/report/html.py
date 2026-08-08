@@ -23,6 +23,7 @@ from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
 from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
+from ..analyze import ctm
 from ..analyze import highlight_topics
 from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
@@ -274,8 +275,22 @@ def _flatten(report: dict) -> list[dict]:
             # beide danach; die Zuordnung darf nur an EINER Stelle stehen.
             h["ressort"] = _ressort(h)
             h["ressort_label"] = _RESSORT_LABEL[h["ressort"]]
+            # Die CTM-Linse. Berichte von vor dem 08.08.2026 tragen das Feld
+            # nicht; fuer sie gilt 1 ("Kontext"), damit eine Archivwoche ihre
+            # Reihenfolge behaelt, statt komplett auf 0 zu fallen.
+            try:
+                h["ctm_bezug"] = int(h.get("ctm_bezug"))
+            except (TypeError, ValueError):
+                h["ctm_bezug"] = 1
+            h.setdefault("ctm_label", ctm.STUFEN_LABEL.get(h["ctm_bezug"], ""))
             out.append(h)
-    out.sort(key=lambda h: (h["relevance"], h.get("date") or ""), reverse=True)
+    # Sortiert wird nach der CTM-Achse VOR der Prioritaet. Das ist der
+    # eigentliche Eingriff des Auftrags vom 08.08.2026: die Prioritaet misst
+    # branchenweite Bedeutung, und danach sortiert stand "OpenAI macht ChatGPT
+    # gratis unbegrenzt" ueber der Telekom-Flat fuer 34,95 Euro - also das
+    # Weltereignis ueber der Preisfrage des eigenen Marktes.
+    out.sort(key=lambda h: (h["ctm_bezug"], h["relevance"], h.get("date") or ""),
+             reverse=True)
     for i, h in enumerate(out):
         h["id"] = i
     return out
@@ -1058,6 +1073,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "briefing_html": briefing_html,
             "toc": toc,
             "lesezeit": _lesezeit(briefing_md),
+            # Der Zwei-Minuten-Pfad. "Lesezeit ca. 16 Minuten" ist ehrlich und
+            # trotzdem das Ende der Nutzung - 16 Minuten liest kein
+            # Bereichsleiter. Hoechstens fuenf Zeilen, jede mit Konsequenz und
+            # Quellenlink, ausschliesslich aus geprueften Folgerungssaetzen.
+            # Bleibt die Liste leer, steht der Kasten nicht da: eine Woche
+            # ohne direkte Portfoliofrage ist ein Befund, keine Luecke, die
+            # man mit Fuellzeilen schliesst.
+            "zwei_minuten": ctm.zwei_minuten(highlights),
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,
@@ -1350,6 +1373,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # stats.new - das sind die neu GESAMMELTEN.
             n_bewertet=len(_flatten(latest)) if latest else 0,
             date_de=_fmt_date_de(latest["date"]) if latest else "",
+            # Die CTM-Linse erklaert sich hier und nur hier: die Startseite
+            # zeigt die Etiketten, die Transparenzseite sagt, was sie
+            # bedeuten. Die Sicherheitsskala kommt aus derselben Datei, aus
+            # der auch der Prompt sie bezieht - zwei Fassungen davon waeren
+            # zwei Bedeutungen desselben Wortes.
+            ctm_stufen=[{"stufe": s, "label": ctm.STUFEN_LABEL[s],
+                         "text": ctm.STUFEN_ERKLAERUNG[s]}
+                        for s in (3, 2, 1, 0)],
+            sicherheitsskala=ctm.lade_fokus(
+                reports_dir.parent.parent).sicherheitsskala,
             by_region=by_region, news_sources=news_sources,
             tech_themes=tech_themes,
             n_tech_sources=sum(len(t["sources"]) for t in tech_themes),

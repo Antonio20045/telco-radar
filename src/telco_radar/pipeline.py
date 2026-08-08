@@ -19,6 +19,8 @@ from pathlib import Path
 
 from .analyze import editor
 from .analyze import clustering
+from .analyze import ctm as ctm_mod
+from .analyze import faithfulness
 from .analyze.agents import analyze_region
 from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
@@ -523,6 +525,41 @@ def run(root: Path, use_llm: bool | None = None,
           f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
           f"bewertete Meldungen" if use_llm else "ohne KI (Roh-Digest)")
 
+    # ------------------------------------------------------------ CTM-Linse
+    # Die zweite Bewertungsachse: nicht "ist das wichtig?", sondern "ist das
+    # fuer UNS wichtig?". Sie laeuft NACH den Analysten und VOR allem, was
+    # sortiert - Stufe 3 rechnet der Code aus config/ctm_fokus.yaml, die
+    # Stufen 0-2 kommen vom Modell. Danach der Prueflauf gegen den
+    # Originaltext: sobald das System folgert statt zusammenzufasst, ist ein
+    # plausibel klingender Fehler das eigentliche Risiko, und ein
+    # ungeprueft veroeffentlichter Folgerungssatz waere genau das.
+    tctm = time.monotonic()
+    ctm_bilanz: dict = {}
+    beleg_bilanz: dict = {}
+    try:
+        fokus = ctm_mod.lade_fokus(root)
+        for region_name, r in regional.items():
+            for h in r.get("highlights", []):
+                h.setdefault("region", region_name)
+        alle = [h for r in regional.values() for h in r.get("highlights", [])]
+        ctm_bilanz = ctm_mod.veredle(alle, fokus)
+        beleg_bilanz = faithfulness.pruefe(
+            alle, model=analyst_model,
+            use_llm=bool(use_llm and new_items
+                         and cfg.settings.get("ctm_belegpruefung", True)))
+        log.info("CTM-Linse: %d direkt / %d uebertragbar / %d Kontext / "
+                 "%d Hintergrund | Saetze: %d belegt, %d verworfen",
+                 ctm_bilanz.get("direkt", 0), ctm_bilanz.get("uebertragbar", 0),
+                 ctm_bilanz.get("kontext", 0), ctm_bilanz.get("hintergrund", 0),
+                 beleg_bilanz.get("belegt", 0),
+                 ctm_bilanz.get("saetze_verworfen", 0)
+                 + beleg_bilanz.get("verworfen", 0))
+    except Exception as exc:  # noqa: BLE001 - die Linse kippt keinen Lauf
+        log.error("CTM-Linse uebersprungen: %s", exc)
+    phase("Einordnen für uns", time.monotonic() - tctm,
+          f"{ctm_bilanz.get('direkt', 0)} direkt handlungsrelevant, "
+          f"{beleg_bilanz.get('belegt', 0)} belegte Folgerungssätze")
+
     # strip internal telemetry from the regional dict before it is stored
     for r in regional.values():
         r.pop("_telemetry", None)
@@ -743,6 +780,14 @@ def run(root: Path, use_llm: bool | None = None,
         "events": len(vertreter_items),
         "bundled": zusammengefasst,
         "followups": len(nachklapp),
+        # Die CTM-Linse. `ctm_direkt` ist die Zahl, an der sich ablesen
+        # laesst, ob eine Woche ueberhaupt etwas fuer das eigene Portfolio
+        # hergab - eine Null ist ein Befund, kein Fehler.
+        "ctm_direkt": ctm_bilanz.get("direkt", 0),
+        "ctm_uebertragbar": ctm_bilanz.get("uebertragbar", 0),
+        "ctm_saetze": beleg_bilanz.get("belegt", 0),
+        "ctm_saetze_verworfen": (ctm_bilanz.get("saetze_verworfen", 0)
+                                 + beleg_bilanz.get("verworfen", 0)),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),

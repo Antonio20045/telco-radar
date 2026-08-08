@@ -45,6 +45,9 @@
      Belege sollen einzeln anklickbar sein. Bis zum 08.08.2026 waren diese
      Meldungen eigene Zeilen; dass drei Fachmedien dieselbe Sache melden, ist
      aber keine dreifache Nachricht, sondern eine dreifach belegte. #}
+  {% if h.ctm_satz %}
+  <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ h.ctm_satz }}</p>
+  {% endif %}
   {% if h.weitere_quellen %}
   <p class="mz-belege">Auch berichtet von {% for q in h.weitere_quellen %}<a
      href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
@@ -109,6 +112,15 @@
           <span class="mlead-titel szl">{{ r.lead.schlagzeile }}</span>
           {% if r.lead.summary %}<span class="mlead-anriss">{{ r.lead.summary }}</span>{% endif %}
         </a>
+        {# Ausserhalb des Links wie die Belege unten: der Satz gehoert zur
+           Meldung, ist aber kein Teil ihrer Ueberschrift. #}
+        {% if r.lead.ctm_satz %}
+        <p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ r.lead.ctm_satz }}</p>
+        {% endif %}
+        {% if r.lead.weitere_quellen %}
+        <p class="mz-belege">Auch berichtet von {% for q in r.lead.weitere_quellen %}<a
+           href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
+        {% endif %}
       </article>
       {% if r.mittel %}
       <div class="mmittel">

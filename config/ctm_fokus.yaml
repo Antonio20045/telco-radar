@@ -1,0 +1,144 @@
+# =============================================================================
+# CTM-FOKUS - der Zuschnitt des Teams, fuer das dieses Portal geschrieben wird
+# =============================================================================
+#
+# Warum es diese Datei gibt
+# -------------------------
+# Bis zum 08.08.2026 kannte die Bewertung nur "Prioritaet 1-5", und ihr Massstab
+# war branchenweite Bedeutung. Fuer ein Team, das Portfolio, Tarifoptionen und
+# Logistik im deutschen ENDKUNDENGESCHAEFT verantwortet, ist das der falsche
+# Massstab. Gemessen an der Ausgabe vom 07.08.2026: von den sieben Eintraegen
+# der Spalte "Was wichtig ist" war KEIN EINZIGER fuer ein deutsches
+# Consumer-Portfolio handlungsrelevant (Turminfrastruktur in Afrika, zweimal
+# ein rumaenischer Spamfilter, OpenAI, ein oesterreichischer Discounter,
+# US-Spektrum, indisches FWA) - waehrend "Telekom-Flatrate mit Unlimited-Daten
+# fuer 34,95 Euro bei Freenet" in einer kleinen Kachel der dritten Reihe stand.
+#
+# Diese Datei ist die eine Stelle, an der steht, was "fuer uns" heisst. Sie
+# speist `src/telco_radar/analyze/ctm.py`; die Stufen selbst stehen dort.
+#
+# Wer sie aendert, aendert die Reihenfolge der Startseite. Das ist gewollt -
+# aber es ist eine Redaktionsentscheidung, keine Konfigurationsfrage.
+
+# ---------------------------------------------------------------------------
+# Stufe 3 (DIREKT): deutscher Markt, Endkunde, Preis/Portfolio/Option/Logistik.
+# Diese Stufe wird DETERMINISTISCH vergeben, nicht vom Modell - dieselbe
+# Bauweise wie beim Promo-Score, wo 45 % im Code gerechnet werden und genau das
+# ihn stabil macht. Ein Modell, das seinen eigenen Massstab jeden Lauf neu
+# auslegt, ist als Sortierkriterium wertlos.
+# ---------------------------------------------------------------------------
+
+# Die Marken des Heimatmarktes. Genannt wird, was auf einer Rechnung stehen
+# kann - Konzern UND Endkundenmarke, denn die Meldung nennt mal das eine, mal
+# das andere ("Telekom-Flat bei Freenet" ist beides).
+heimatmarkt_marken:
+  - Deutsche Telekom
+  - Telekom
+  - T-Mobile Deutschland
+  - congstar
+  - Penny Mobil
+  - Vodafone Deutschland
+  - Vodafone
+  - otelo
+  - Telefónica Deutschland
+  - Telefonica Deutschland
+  - O2
+  - o2
+  - Blau
+  - Blau.de
+  - 1&1
+  - 1und1
+  - United Internet
+  - Drillisch
+  - winSIM
+  - PremiumSIM
+  - sim.de
+  - handyvertrag.de
+  - freenet
+  - mobilcom-debitel
+  - klarmobil
+  - ALDI TALK
+  - Lidl Connect
+  - Tchibo mobil
+  - fraenk
+  - Ja! mobil
+  - NORMA Connect
+  - EDEKA smart
+  - Deutsche Glasfaser
+  - Tele Columbus
+  - PYUR
+  - M-net
+  - NetCologne
+  - EWE Tel
+  - wilhelm.tel
+  # Oesterreich und Schweiz gehoeren zum betrachteten Sprach- und Geraetemarkt,
+  # aber nicht zum Portfolio - sie stehen deshalb unter `nachbarmarkt_marken`.
+
+nachbarmarkt_marken:
+  - A1 Telekom Austria
+  - Magenta Telekom
+  - Drei Austria
+  - spusu
+  - HoT
+  - Swisscom
+  - Sunrise
+  - Salt
+
+# Kategorien, in denen eine Meldung ueberhaupt direkt handlungsrelevant sein
+# KANN. Sie stammen aus derselben Liste, die der Analyst vergibt (agents.py) -
+# eine zweite Klassifizierung waere eine zweite Wahrheit.
+direkte_kategorien:
+  - Tarif/Pricing
+  - Produktlaunch
+  - Kampagne
+
+# Zusaetzlich: Woerter, die eine Meldung auch ohne passende Kategorie zur
+# Portfolio- oder Logistikfrage machen. Bewusst kurz gehalten - jede Zeile
+# hier verschiebt die Startseite.
+direkte_stichworte:
+  - lieferzeit
+  - lieferbar
+  - verfügbarkeit
+  - versand
+  - vorbestell
+  - anschlusspreis
+  - bereitstellungspreis
+  - wechselbonus
+  - rufnummernmitnahme
+  - portierung
+  - esim
+  - roaming
+  - datenvolumen
+  - allnet
+  - flat
+  - prepaid
+  - tarifwechsel
+  - preiserhöhung
+  - preissenkung
+
+# ---------------------------------------------------------------------------
+# Stufe 2 (UEBERTRAGBAR): Consumer-Mechanik in einem vergleichbaren Markt.
+# Hier entscheidet das Modell - aber nur innerhalb dieser Maerkte. Ein
+# Endkundenangebot in einem westeuropaeischen Markt ist uebertragbar, dasselbe
+# Angebot in einem Markt mit anderem Preisniveau und anderer Geraetelogistik
+# ist Kontext.
+# ---------------------------------------------------------------------------
+vergleichbare_maerkte:
+  - Europa
+  - Nordamerika
+
+# ---------------------------------------------------------------------------
+# Die Sicherheitsskala. Sie steht hier und NICHT im Prompt-Text, damit die
+# Erklaerung auf der Transparenzseite und die Vorgabe an das Modell dieselbe
+# Quelle haben. Getrennt gehalten wird bewusst zweierlei, was gern vermischt
+# wird: wie wahrscheinlich das Ereignis ist, und wie belastbar die Quellenlage
+# ist. "Wir sind sicher, dass es wahrscheinlich passiert" verschleiert genau
+# das.
+# ---------------------------------------------------------------------------
+sicherheitsskala:
+  - wort: möglich
+    bedeutung: "Es gibt Anzeichen, aber die Quelle laesst offen, ob es kommt."
+  - wort: wahrscheinlich
+    bedeutung: "Die Quelle nennt einen Plan oder eine Absicht, aber kein Datum und keine Zusage."
+  - wort: sehr wahrscheinlich
+    bedeutung: "Die Quelle nennt eine Entscheidung, ein Datum oder einen Preis."

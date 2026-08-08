@@ -55,6 +55,40 @@
    derselben Seite ohnehin komplett steht, ist keine Zusammenfassung,
    sondern eine Wiederholung. #}
 
+{# ==================================================== IN ZWEI MINUTEN ==== #}
+{# Der kurze Weg durch die Ausgabe. Er steht VOR dem Aufmacher, nicht als
+   Fazit darunter: wer zwei Minuten hat, soll nicht erst eine Zeitungsseite
+   durchqueren muessen.
+
+   Was hier steht, ist nicht die Zusammenfassung des Berichts (die stuende
+   zwei Bildschirme weiter noch einmal - genau der Fehler, den Antonio am
+   07.08.2026 kassiert hat), sondern eine ANDERE Auswahl nach einem anderen
+   Massstab: Meldungen, die das eigene Portfolio unmittelbar beruehren, je
+   mit dem einen Satz, was sie dafuer bedeuten. Jeder dieser Saetze ist
+   gegen seinen Originaltext geprueft (analyze/faithfulness.py); was nicht
+   belegt war, steht hier nicht.
+
+   Ist die Liste leer, faellt der Kasten weg. Eine Woche ohne direkte
+   Portfoliofrage ist ein Befund, kein Loch, das man fuellt. #}
+{% if zwei_minuten %}
+<section class="kurzpfad">
+  <div class="rubrik"><h2>In zwei Minuten</h2>
+    <span class="rubrik-zusatz">was diese Woche das eigene Portfolio berührt</span></div>
+  <ol class="kurzpfad-liste">
+    {% for h in zwei_minuten %}
+    <li class="kurzpfad-zeile">
+      <p class="kurzpfad-satz">{{ h.ctm_satz }}</p>
+      <p class="kurzpfad-beleg">
+        <span class="kurzpfad-stufe s{{ h.ctm_bezug }}">{{ h.ctm_label }}</span>
+        <b>{{ h.operator or h.source_label }}</b>
+        <a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }} &nearr;</a>
+      </p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
 {# ================================================= OBERHALB DER FALZ ==== #}
 <div class="front-oben">
   <div class="front-haupt">
@@ -74,6 +108,10 @@
       {% endif %}
       <div class="aufmacher-text">
         {% if a.vorspann %}<p class="aufmacher-vorspann">{{ a.vorspann }}</p>{% endif %}
+        {# Der eine Satz, der aus einer Meldung eine Konsequenz macht. Er
+           steht nur da, wenn er die Pruefung gegen den Originaltext
+           bestanden hat. #}
+        {% if a.ctm_satz %}<p class="ctm-satz"><span class="ctm-marke">Was das für uns heißt</span>{{ a.ctm_satz }}</p>{% endif %}
         <p class="aufmacher-meta">
           <b>{{ a.operator or a.source_label }}</b>
           <span class="rel-badge r{{ a.relevance }}">Priorität {{ a.relevance }}/5</span>

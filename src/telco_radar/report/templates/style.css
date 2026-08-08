@@ -559,6 +559,45 @@ b,strong{font-weight:700}
    rechten Rand - `margin-left:auto` schoebe dort alles Folgende weg. */
 .aufmacher-meta .rubrik-zahl{margin-left:0}
 
+/* ================================================  IN ZWEI MINUTEN ====== */
+/* Der kurze Weg durch die Ausgabe, ganz oben. Bewusst KEIN Kasten mit
+   Hintergrund: die Designsprache dieser Seite kennt keine Flaechen, die
+   Hierarchie kommt aus der Linienstaerke. Eine 3px-Rubrikleiste oben und
+   eine Haarlinie je Zeile - dieselbe Bauform wie die Ressorts. */
+.kurzpfad{margin:0 0 38px;border-top:3px solid var(--rule-ink);padding-top:0}
+.kurzpfad .rubrik{margin-bottom:6px}
+.kurzpfad-liste{list-style:none;margin:0;padding:0;
+  counter-reset:kurzpfad}
+.kurzpfad-zeile{counter-increment:kurzpfad;padding:12px 0 12px 34px;
+  border-bottom:1px solid var(--rule-2);position:relative}
+.kurzpfad-zeile:last-child{border-bottom:none}
+.kurzpfad-zeile::before{content:counter(kurzpfad);position:absolute;left:0;
+  top:13px;font-family:var(--sans);font-size:12px;font-weight:700;
+  color:var(--red)}
+.kurzpfad-satz{margin:0;font-family:var(--serif);font-size:18px;
+  line-height:1.42;color:var(--ink)}
+.kurzpfad-beleg{margin:5px 0 0;display:flex;flex-wrap:wrap;
+  align-items:baseline;gap:8px;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink-4)}
+.kurzpfad-beleg a{color:var(--ink-3)}
+.kurzpfad-beleg a:hover{color:var(--red)}
+.kurzpfad-stufe{font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  font-size:10px;color:var(--ink-4)}
+.kurzpfad-stufe.s3{color:var(--red)}
+@media (max-width:640px){.kurzpfad-satz{font-size:16px}}
+
+/* Der Satz, der aus einer Meldung eine Konsequenz macht (analyze/ctm.py).
+   Er traegt eine eigene Marke, damit er nicht als weitere Zusammenfassung
+   gelesen wird - und er steht nur da, wenn er die Pruefung gegen den
+   Originaltext bestanden hat (analyze/faithfulness.py). */
+.ctm-satz{margin:8px 0 0;font-family:var(--serif);font-size:15px;
+  line-height:1.45;color:var(--ink-2);border-left:2px solid var(--red);
+  padding-left:12px}
+.ctm-marke{display:block;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--red);margin-bottom:2px}
+.mz .ctm-satz{font-size:13.5px;margin:0 0 10px}
+
 /* Die weiteren Belege eines Ereignisses (analyze/clustering.py). Bewusst
    klein und unter der Meldung: sie sind der Nachweis, dass mehrere
    Redaktionen dieselbe Sache melden, nicht eine zweite Meldung. */
@@ -566,7 +605,7 @@ b,strong{font-weight:700}
   font-size:11.5px;color:var(--ink-4)}
 .mz-belege a{color:var(--ink-3);text-decoration:underline;
   text-decoration-color:var(--rule-2)}
-.mz-belege a:hover{color:var(--akzent)}
+.mz-belege a:hover{color:var(--red)}
 
 /* ==========================================================  AUFKLAPPER = */
 .evidence{margin-top:30px;border-top:2px solid var(--rule-ink)}

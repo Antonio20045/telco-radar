@@ -44,7 +44,8 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
       "relevance": <1-5, 5 = Vodafone should react now / copy / watch closely>,
       "headline": "<HEADLINE in {language}, max 9 words, no trailing period: what happened, active voice, concrete. Like a newspaper front page, NOT a summary sentence>",
       "summary": "<1-2 sentences in {language}: what exactly happened - names, prices, numbers, dates when given>",
-      "why_it_matters": "<1-2 sentences in {language}: the Vodafone angle. Frame it as what Vodafone could DO or learn, e.g. 'Vorlage fuer ein eigenes ...', 'Preisdruck, den Vodafone kontern muss ...', 'zeigt, dass ...'. Never generic.>"
+      "why_it_matters": "<1-2 sentences in {language}: the Vodafone angle. Frame it as what Vodafone could DO or learn, e.g. 'Vorlage fuer ein eigenes ...', 'Preisdruck, den Vodafone kontern muss ...', 'zeigt, dass ...'. Never generic.>",
+      {CTM_FELDER}
     }}
   ]
 }}
@@ -107,7 +108,8 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
       "relevance": <1-5, 5 = changes what Vodafone can offer or must plan for now>,
       "headline": "<HEADLINE in {language}, max 9 words, no trailing period: what happened, active voice, concrete. Like a newspaper front page, NOT a summary sentence>",
       "summary": "<1-2 sentences in {language}: what exactly was announced - names, numbers, dates when given>",
-      "why_it_matters": "<1-2 sentences in {language}: the concrete consequence for a network operator - e.g. 'ermoeglicht ...', 'verschiebt die Kosten fuer ...', 'Kunden werden ... erwarten', 'schraenkt ... ein'. Never generic.>"
+      "why_it_matters": "<1-2 sentences in {language}: the concrete consequence for a network operator - e.g. 'ermoeglicht ...', 'verschiebt die Kosten fuer ...', 'Kunden werden ... erwarten', 'schraenkt ... ein'. Never generic.>",
+      {CTM_FELDER}
     }}
   ]
 }}
@@ -130,6 +132,37 @@ Rules:
 - Keep it factual and specific. Prefer a concrete number over an adjective.
 """
 
+
+# --------------------------------------------------------------- CTM-Linse
+# Die zweite Bewertungsachse. Sie steht als EIN Textbaustein in beiden
+# Prompts, weil sie in beiden dasselbe bedeuten muss: eine Chipmeldung und
+# eine Tarifmeldung werden nach demselben Massstab gefragt, "ist das fuer ein
+# deutsches Endkunden-Portfolio handlungsrelevant?".
+#
+# Stufe 3 steht bewusst NICHT zur Wahl: sie wird in analyze/ctm.py
+# deterministisch vergeben (Heimatmarkt-Marke plus Endkundenthema). Ein
+# Modell, das seinen eigenen Massstab jeden Lauf neu auslegt, taugt nicht als
+# Sortierkriterium - und die Erfahrung mit dem Promo-Score sagt, dass genau
+# der gerechnete Anteil ihn stabil macht.
+CTM_FELDER = """\
+"ctm_bezug": <0, 1 oder 2 - wie unmittelbar diese Meldung ein deutsches
+        Endkunden-Portfolio (Tarife, Optionen, Geraete, Logistik) beruehrt:
+        2 = uebertragbare Endkundenmechanik aus einem vergleichbaren Markt
+            (Westeuropa, Nordamerika): ein Tarif, ein Bundle, eine Aktion,
+            eine Option, die man hier nachbauen koennte
+        1 = Kontext: Branche, Technik, Regulierung mit mittelbarer Wirkung
+        0 = Hintergrund: Infrastruktur, Geschaeftskunden, Kapitalmarkt,
+            Personalien - ohne Endkundenbezug>,
+      "ctm_satz": "<NUR wenn ctm_bezug 2 ist: EIN Satz in {language}, hoechstens
+        25 Woerter, der sagt, was das FUER DAS EIGENE PORTFOLIO heisst.
+        Er muss eine Konsequenz oder eine offene Frage enthalten, niemals
+        die Meldung wiederholen.
+        FALSCH: 'Das zeigt den Trend zu Bundles.'
+        RICHTIG: 'Erste 5G-Flat unter 35 Euro in einem Nachbarmarkt - drueckt
+        die Preisuntergrenze fuer unsere Unlimited-Stufe.'
+        Keine Zahl, die nicht in der Quelle steht. Bei Unsicherheit genau
+        eines dieser Woerter benutzen: moeglich / wahrscheinlich / sehr
+        wahrscheinlich. Sonst leer lassen.>\""""
 
 BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
 
@@ -173,7 +206,8 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     erledigt, egal ob ein Analyst sie gelesen hat.
     """
     vorlage = TECH_ANALYST_SYSTEM if is_theme else ANALYST_SYSTEM
-    system = vorlage.format(region=region_name, language=language)
+    system = vorlage.format(region=region_name, language=language,
+                            CTM_FELDER=CTM_FELDER.format(language=language))
     capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 

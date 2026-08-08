@@ -64,6 +64,51 @@
   </div>
 </div>
 
+{# ------------------------------------------------- Wie eingeordnet wird #}
+{# Die Startseite zeigt Etiketten ("Direkt für uns") und einen Satz, was eine
+   Meldung fürs eigene Portfolio bedeutet. Wer dem trauen soll, muss wissen,
+   woher beides kommt - und dass der Satz gegen den Originaltext geprüft wird,
+   bevor er erscheint. Deshalb steht die Erklärung hier, auf der Seite, die
+   genau diese Frage beantwortet, und nicht als Beipackzettel auf der
+   Titelseite. #}
+{% if ctm_stufen %}
+<div class="card">
+  <div class="card-head"><h2>Wie „für uns wichtig“ gemessen wird</h2></div>
+  <div class="rowtable">
+    {% for s in ctm_stufen %}
+    <div class="rowtable-row">
+      <span class="col-region">{{ s.label }}</span>
+      <span class="col-flex">{{ s.text }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
+    Die oberste Stufe vergibt kein Sprachmodell, sondern eine Regel: eine
+    Marke des deutschen Marktes <b>und</b> ein Thema, das ein Endkunde kauft.
+    {% if report and report.stats and report.stats.get('ctm_saetze') is not none %}
+    In dieser Ausgabe haben {{ report.stats.get('ctm_saetze') }} Folgerungssätze
+    die Prüfung gegen ihren Originaltext bestanden,
+    {{ report.stats.get('ctm_saetze_verworfen', 0) }} sind dabei gefallen und
+    erscheinen nicht.
+    {% endif %}
+  </p>
+  {% if sicherheitsskala %}
+  <div class="rowtable" style="margin-top:18px">
+    <div class="rowtable-head">
+      <span class="col-region">Unsicherheit</span>
+      <span class="col-flex">heißt in diesen Texten</span>
+    </div>
+    {% for s in sicherheitsskala %}
+    <div class="rowtable-row">
+      <span class="col-region">{{ s.wort }}</span>
+      <span class="col-flex">{{ s.bedeutung }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
 {% if run.analysts %}
 <div class="card">
   <div class="card-head"><h2>Auswertung je Bereich</h2></div>
