@@ -1334,7 +1334,11 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # wissen muss.
     wettbewerb_view = build_wettbewerb_view(
         wochen, getattr(cfg, "focus_competitors", None) or [],
-        promo_entries, promo_sources)
+        promo_entries, promo_sources,
+        # Die Differenzierungs-Hebel je Wettbewerber. Sie lagen bis zum
+        # 08.08.2026 eine Seite weiter und dort nach THEMA sortiert - also
+        # genau nicht nach der Frage "was macht dieser eine Anbieter".
+        diff_bestand=diff["bestand"], theme_label=theme_label_map)
     (site_dir / "wettbewerb.html").write_text(
         env.get_template("wettbewerb.html.j2").render(
             prefix="", wettbewerb=wettbewerb_view,

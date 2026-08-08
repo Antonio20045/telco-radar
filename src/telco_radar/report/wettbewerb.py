@@ -230,8 +230,46 @@ def _nach_monaten(eintraege: list[dict]) -> list[dict]:
     return monate
 
 
+def _hebel_je_wettbewerber(bestand, muster, theme_label: dict) -> list[dict]:
+    """Die Differenzierungs-Hebel, die DIESER Wettbewerber zieht.
+
+    Damit wird die Wettbewerbsseite zu dem, was Klue als Battlecard verkauft -
+    nur aus vorhandenen Daten abgeleitet: Positionierung (Lage), laufende
+    Aktionen, letzte Moves, Differenzierungs-Hebel. Bis zum 08.08.2026 lagen
+    die Hebel eine Seite weiter und waren dort nach THEMA sortiert, also
+    genau nicht nach der Frage "was macht dieser eine Anbieter".
+    """
+    je_hebel: dict[str, dict] = {}
+    for e in (bestand or []):
+        absender = " ".join(str(e.get("operator") or e.get("company")
+                                or e.get("source") or "").split()).lower()
+        # Der Name muss am ANFANG des Absenders stehen - dieselbe Regel wie
+        # in `_gehoert_dazu`. Ohne sie zog der Alias "Telekom" auch
+        # "A1 Telekom Austria" und "Turk Telekom" in dieses Profil.
+        if not (absender and any(p.match(absender) for p in muster)):
+            continue
+        key = str(e.get("theme") or "")
+        if not key:
+            continue
+        h = je_hebel.setdefault(key, {"key": key,
+                                      "label": theme_label.get(key, key),
+                                      "n": 0, "beispiel": "", "url": ""})
+        h["n"] += 1
+        if not h["beispiel"]:
+            # `what` ist das Feld der Differenzierungs-Bibliothek ("was
+            # dieser Anbieter tut"); `headline`/`summary` gibt es dort NICHT -
+            # ohne diese Zuordnung blieb die Beispielzeile leer, und der
+            # Hebel stand als nackte Zahl da.
+            h["beispiel"] = " ".join(str(
+                e.get("what") or e.get("headline") or e.get("title")
+                or e.get("summary") or "").split())[:120]
+            h["url"] = e.get("url") or ""
+    return sorted(je_hebel.values(), key=lambda h: (-h["n"], h["label"]))
+
+
 def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
-                          promo_entries=(), promo_sources=()) -> dict:
+                          promo_entries=(), promo_sources=(),
+                          diff_bestand=(), theme_label=None) -> dict:
     """Baut die Anzeigedaten der Wettbewerbsseite aus dem Berichtsarchiv.
 
     `wochen` ist je Berichtswoche ein Wörterbuch mit `date`, den bereits
@@ -339,7 +377,26 @@ def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
             "aktionen": [_aktion(e) for e in angebote[:_MAX_AKTIONEN]],
             "aktionen_n": len(angebote),
             "marken": sorted(marken),
+            "hebel": _hebel_je_wettbewerber(diff_bestand, muster,
+                                            theme_label or {}),
         })
+
+    # Offene Flanken: Hebel, die ein ANDERER Fokus-Wettbewerber zieht und
+    # dieser nicht. Erst im Nachgang berechenbar - vorher steht nicht fest,
+    # was die anderen ziehen. Bewusst nur gegen die Fokus-Wettbewerber und
+    # nicht gegen den Weltbestand: "Telkomsel hat das auch" ist im deutschen
+    # Markt keine Flanke.
+    alle_hebel = {h["key"]: h["label"] for c in wettbewerber
+                  for h in c.get("hebel") or []}
+    for c in wettbewerber:
+        eigene = {h["key"] for h in c.get("hebel") or []}
+        c["flanken"] = [{"key": k, "label": alle_hebel[k],
+                         "wer": sorted(
+                             a["name"] for a in wettbewerber
+                             if any(h["key"] == k
+                                    for h in a.get("hebel") or []))}
+                        for k in alle_hebel if k not in eigene]
+        c["flanken"].sort(key=lambda f: (-len(f["wer"]), f["label"]))
 
     return {
         "wettbewerber": wettbewerber,

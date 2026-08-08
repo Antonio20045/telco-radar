@@ -110,6 +110,33 @@
         {% endfor %}
       </div>
       {% endif %}
+
+      {# Womit sich dieser Anbieter abhebt - und wo eine Flanke offen ist.
+         Die Hebel standen bis zum 08.08.2026 eine Seite weiter und dort nach
+         THEMA sortiert, also genau nicht nach der Frage "was macht dieser
+         eine Anbieter". Zusammen mit Lage, Aktionen und Chronik darüber ist
+         das der Steckbrief - abgeleitet, nicht gepflegt. #}
+      {% if c.hebel %}
+      <div class="wb-hebel">
+        <p class="wb-spaltentitel">Womit er sich abhebt</p>
+        <ul class="wb-hebelliste">
+          {% for h in c.hebel %}
+          <li>
+            <a href="{{ prefix }}differenzierung.html#dz-theme-{{ h.key }}">{{ h.label }}</a>
+            <span class="wb-hebel-n">{{ h.n }}</span>
+            {% if h.beispiel %}<span class="wb-hebel-beispiel">{% if h.url %}<a
+              href="{{ h.url }}" target="_blank" rel="noopener">{{ h.beispiel }}</a>{% else %}{{ h.beispiel }}{% endif %}</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% if c.flanken %}
+        {# Nur gegen die anderen FOKUS-Wettbewerber. "Telkomsel hat das auch"
+           ist im deutschen Markt keine Flanke. #}
+        <p class="wb-flanken">Ohne Beispiel bei diesem Anbieter, aber bei
+          {% for f in c.flanken[:3] %}<b>{{ f.label }}</b> ({{ f.wer | join(', ') }}){{ ", " if not loop.last }}{% endfor %}.</p>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
 
     {% if wettbewerb.promo_bekannt %}
