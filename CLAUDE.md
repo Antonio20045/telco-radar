@@ -1,6 +1,6 @@
 # Telco Radar — Handover für die nächste Claude-Session
 
-Stand: 2026-08-05, Ende Session 5 (Skalierung). Dieses Dokument enthält
+Stand: 2026-08-08, Ende der Session „Review-Umsetzung“. Dieses Dokument enthält
 alles, was eine neue Session braucht, um das Projekt zu verstehen, darauf
 zuzugreifen und weiterzuarbeiten.
 
@@ -27,7 +27,8 @@ Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
    Wettbewerber**, sondern die Unternehmen und Behörden, die den Rahmen
    setzen — eigener Analyst mit eigenem Prompt, eigener Abschnitt im Bericht.
 
-Gesamt: **167 crawlbare Quellen** (Stand 05.08.2026).
+Gesamt: **207 crawlbare Quellen** (Stand 08.08.2026). Die Zahl bekommst du mit
+`python scripts/quellen_zaehlen.py` — nie mit `grep -c "url:"` über die YAMLs.
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
 nicht in den Agents. LLM-Calls sehen nur neue Items → günstig, keine
@@ -97,13 +98,21 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
 ```
 1. COLLECT   RSS- & Newsroom-Collector, parallel, fehlertolerant
              (src/telco_radar/collect/: rss.py, newsroom.py, http.py)
+             + AENDERUNGSRADAR auf 16 Tarifseiten (collect/aenderungen.py)
+             + LIEFERZEIT-RADAR auf dem Warenkorb (collect/lieferzeit.py)
 2. DELTA     Seen-Store + Freshness-Filter → nur NEUE Items
              (src/telco_radar/dedupe.py; State: data/state/seen.jsonl)
+2b. CLUSTER  Ereignis-Buendelung: dieselbe Sache aus drei Quellen ist EINE
+             Meldung (analyze/clustering.py; State: data/state/clusters.jsonl)
 3. ANALYZE   1 Analyst-Agent pro Region UND pro Themenfeld, Batches à 15
              Items (parallel, analyst_batch_workers), 8k Tokens.
              Themenfelder bekommen TECH_ANALYST_SYSTEM statt ANALYST_SYSTEM -
              ein Chiphersteller ist kein Wettbewerber.
              (src/telco_radar/analyze/agents.py; API direkt via httpx: llm.py)
+3b. CTM      Zweite Bewertungsachse "ist das fuer UNS wichtig?" plus der
+             Satz, was es fuers eigene Portfolio heisst - und der Prueflauf
+             dieses Satzes gegen den Originaltext
+             (analyze/ctm.py + analyze/faithfulness.py)
 4. EDIT      EIN- oder ZWEISTUFIG, je nach Menge (editor_modus, Schwelle
              editor_zweistufig_ab_meldungen = 120 bewertete Meldungen):
              einstufig  = ein Editor-Aufruf ueber alles (wie bisher)
@@ -115,6 +124,8 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              Beides mit Topic-Memory gegen Wiederholungen (analyze/editor.py)
 5. PUBLISH   Markdown + JSON nach data/reports/, statische Site nach site/
              (report/html.py + templates/), Commit + Render-Hook
+6. VERSAND   Montags der Zwei-Minuten-Pfad per Mail, Teams nur fuer die
+             Ausnahme (versand.py; State: data/state/versand.json)
 ```
 
 Wichtige Dateien:
@@ -129,6 +140,15 @@ Wichtige Dateien:
 | `scripts/finde_promo_seiten.py` | Sucht weitere Aktionsseiten je Marke (Linkernte auf den Bestandsseiten, dann Kandidatenpfade). Sagt WO nachzusehen ist, nicht was taugt |
 | `scripts/pruefe_promo_seite.py` | **Abnahme-Check für Promo-Seiten.** Acht Kriterien im Code; Nr. 7 (Eigenständigkeit) vergleicht auch gegen die bereits angenommenen Kandidaten derselben Marke. Ohne PASS hier kommt keine Seite in die Config |
 | `config/kandidaten_firmen.yaml` | Suchaufträge (Name + Domain) für `finde_quellen.py --firmen`. Sagt WO gesucht wird, nicht was wertvoll ist |
+| `config/ctm_fokus.yaml` | **Der Zuschnitt des Teams**: Heimatmarkt-Marken, direkte Kategorien, Stichworte, Sicherheitsskala. Die eine Stelle, an der steht, was "fuer uns" heisst — wer sie aendert, aendert die Reihenfolge der Startseite |
+| `config/vodafone_hebel.yaml` | Was WIR selbst haben, je Differenzierungs-Hebel. Drei Zustaende, `offen` ist der Standard; ein Eintrag ohne `stand` verfaellt. **"Wir haben das nicht" kommt NUR von hier, nie aus einer Modellvermutung** |
+| `config/tarif_seiten.yaml` | 16 Dauertarif-Seiten fuer den Aenderungsradar. NICHT die Aktionsseiten — die stehen in `promo_sources.yaml` |
+| `config/lieferzeit_warenkorb.yaml` | Der feste Warenkorb des Lieferzeit-Radars: Produkte mit EINER Variante, eine Test-PLZ, je Anbieter das Ident-Verfahren |
+| `config/fruehwarnung.yaml` | Fuenf CTM-Kernfragen mit falsifizierbaren Indikatoren. Der Wert steckt darin, dass sie VORHER feststehen |
+| `data/state/clusters.jsonl` | Ereignis-Gedaechtnis. ID aus der kanonischen URL, nie aus dem Titel |
+| `data/state/tarif_snapshots.json` | Die zuletzt gesehene WERTMENGE je Tarifseite (nicht der Text) |
+| `data/state/lieferzeit.json` | Zeitreihe je Produkt und Anbieter, mit Methode und Belastbarkeit je Messpunkt |
+| `data/state/versand.json` | Zustellbuch — was schon hinaus ist. Ohne das schickt ein zweiter Lauf am selben Tag dieselbe Mail |
 | `data/state/seen.jsonl` | Dedup-Gedächtnis. Seit 08/2026 **kompaktes v2-Format**: ein Hash je Zeile (17 statt ~300 Byte) |
 | `data/state/quellen_register.json` | Je Quelle: Herkunft, Abnahmedatum, Läufe, Erfolge, letzter Erfolg, Fehlserie, Quarantäne |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
@@ -224,7 +244,8 @@ Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
 | `suche.html` **Dossier** | „Was weiß das Portal über mein Thema, und wie hat es sich entwickelt?" | Suchfeld, Bilanz (Treffer/Zeitraum/Quellen), Überblick (Verlauf je Monat, Absender, Ressorts), Aufmacher mit Bild, Chronik nach Monaten. Speist sich aus `search_index.json` — Meldungen ALLER Ausgaben **plus** Differenzierung **plus** Promo-Aktionen. Nicht in der Navigation: das Suchfeld der Topbar ist der Eingang |
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | Lage aus dem Bericht, **Marktbild** (Hebel-Balken, aktivste Anbieter, Regionen), „Neu auf dem Radar", dann je Hebel eine Rubrik mit Erklärsatz und GEWICHTETEN Karten mit Bild. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py`) |
 | `wettbewerb.html` **Wettbewerb** | „Was machen Telekom, O2 und 1&1 — und wie passt das zu den Wochen davor?" | je Fokus-Wettbewerber: aktuelle Lage, laufende Promo-Aktionen seiner Marken (`group` in promo_sources), **Monats-Chronik** aller Moves+Meldungen aus dem gesamten Berichtsarchiv, per URL dedupliziert (`report/wettbewerb.py`, KEIN neuer State, keine LLM-Stufe — alles entsteht beim Rendern) |
-| `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
+| `lieferzeit.html` **Lieferzeiten** | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
+| `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
 **Die Wettbewerbsseite ist am 08.08.2026 auf die halbe Höhe gebracht worden**
@@ -425,6 +446,29 @@ Wahrheitstests: `tests/test_promo_seite.py` (16) · `tests/test_promo_view.py`
 
 Dazu `reports/<datum>.html` je Archivwoche (dieselbe Vorlage wie die
 Wochenseite, `show_explorer=True`) und die Promo Übersicht unter `promo/`.
+
+**Was am 08.08.2026 dazugekommen ist (Umsetzung des Review-Dokuments).**
+Sechs Bausteine, alle gerechnet und nicht geraten; Einzelheiten und die
+Messungen dazu in `outputs/review-umsetzung-2026-08-08.md`:
+
+| Baustein | Wo | Die eine Regel, die ihn trägt |
+|---|---|---|
+| **Ereignis-Bündelung** | `analyze/clustering.py` | Stern statt Kette: verglichen wird mit dem VERTRETER, nie transitiv. Das Betreiberfeld schlägt die Großschreibung (im Deutschen ist jedes Substantiv groß, „Tarif" sähe sonst wie ein Eigenname aus). Ein Beleg fällt mit seinem Vertreter aus dem Seen-Store |
+| **CTM-Linse** | `analyze/ctm.py`, `config/ctm_fokus.yaml` | Stufe 3 rechnet der CODE (Heimatmarkt-Marke UND Endkundenthema). Das Modell darf sie weder wegnehmen noch sich selbst geben — sonst wäre die Achse wieder das, was sie ersetzt |
+| **Prüflauf gegen den Originaltext** | `analyze/faithfulness.py` | **Fail closed.** Zahlen und Sicherheitswort prüft der Code, die Aussage das Modell; was nicht geprüft werden konnte, erscheint NICHT |
+| **Zwei-Minuten-Pfad** | `woche.html.j2`, ganz oben | Höchstens fünf Zeilen, ein Absender nur einmal, leer wenn es nichts gibt |
+| **Frühwarn-Board** | `report/fruehwarnung.py` | Die Indikatoren stehen VORHER fest. „Ruhend" bleibt stehen — eine Frage, zu der seit Wochen nichts kommt, ist beantwortet. Es steht UNTER der Titelseite: mit dem Board davor fiel Kriterium 1 von `pruefe_portal.py` auf drei Geschichten oberhalb der Falz |
+| **Verlauf, Lücken, Steckbrief** | `report/verlauf.py`, `report/luecken.py`, `report/wettbewerb.py` | Anteile statt Zahlen (eine wachsende Sammlung zeigt sonst immer „alles wächst"); ein weißer Fleck entsteht nur aus einem gepflegten „nein" MIT Datum |
+
+Dazu die Spalte **„Neu seit der letzten Ausgabe"** (`report/seit.py`) neben der
+Überschrift der drei Dauerseiten. Sie ersetzt eine einzelne Datumszeile in
+einem sonst leeren Drittel — dem besten Platz der Seite. Höchstens drei
+Zeilen, jede mit Sprungziel; gibt es nichts Neues, steht dort wieder nur der
+Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
+
+**Die Navigation hat jetzt SECHS Einträge** (Lieferzeiten ist dazugekommen).
+`tests/test_suche_page.py` nagelt die Zahl fest — eine Navigation wächst
+sonst zurück auf sieben, und genau davon kam dieses Projekt.
 
 **Die alten Dateinamen** (`bericht.html`, `archive.html`, `sources.html`,
 `protokoll.html`, `wettbewerber.html`) existieren weiter als
@@ -724,6 +768,68 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
 - **Eine gescheiterte Stufe muss sich bis auf die Seite melden.** `log.error`
   reicht nicht — das Actions-Log liest niemand. Profile tragen deshalb ein
   `error`-Feld, und die Seite unterscheidet „gescheitert" von „gab es nicht".
+- **Ein 403 ist nicht automatisch ein User-Agent-Filter.** Am 08.08.2026
+  gegen die drei ausgefallenen Quellen gemessen: ISPreview UK und MediaNama
+  antworten mit 200 — ihr Ausfall lag nicht am Absender. **Telecompetitor
+  antwortet auf JEDE Variante mit 403**: voller Client-Hint-Satz, nackter
+  Browser-UA, Googlebot-UA, HTTP/2, ohne Referer. Das ist eine Sperre gegen
+  den IP-Bereich, und kein Kopfzeilentrick löst sie. Wer das nächste Mal
+  „realistischere Header" als Lösung vorschlägt: erst messen, dann bauen.
+- **Ein Feed ohne `pubDate` ist kein Sonderfall.** Der RSS-Feed der
+  Bundesnetzagentur — der Regulierer des Marktes, um den es hier geht —
+  trägt weder `pubDate` noch `dc:date`. Alle 50 Meldungen galten als
+  undatiert, und undatiert heißt unsichtbar. `collect/rss.py` liest das
+  Datum deshalb notfalls aus dem LINK (`/…/2026/20260806_…`); damit sind es
+  10 von 10. Bewusst nur vierstellige Jahre und kein sechsstelliges Muster —
+  das fände jede Artikelnummer.
+- **JSON-LD trägt die Lieferzeit NICHT.** Der naheliegende und im Review
+  empfohlene Weg (`schema.org/OfferShippingDetails`) ist im deutschen
+  Telko-Handel nicht belegt: winSIM liefert ein sauberes `Product` samt
+  `Offer`, aber ohne `shippingDetails` und ohne `deliveryTime`; otelo trägt
+  seine Zustände in einem JavaScript-Wörterbuch mit Platzhaltern
+  (`Lieferzeit ca. {DELIVERY_TIME} Tage`). Die Stufe steht trotzdem im Code —
+  sie kostet nichts und greift ohne Änderung, sobald ein Shop sie nachrüstet.
+- **Ein Diff auf einer Tarifseite braucht drei Sicherungen, sonst ist er
+  Rauschen.** (1) Das Etikett eines Preises darf nur aus DERSELBEN Textzeile
+  stammen — ohne die Blockgrenze las das Etikett von „19,99 €" die
+  Nachbarkachel mit, und bloßes Umsortieren war eine Preisänderung. (2)
+  Uhrzeiten, Datumsangaben, Sitzungsnummern und Zählerstände müssen raus,
+  sonst meldet JEDER Abruf. (3) Unter zehn erkannten Werten gilt die Seite
+  als JavaScript-gebaut: eine echte Preistabelle bringt 16 bis 54 Werte, eine
+  JS-Seite drei aus dem Fließtext.
+- **Eine neue Seite oberhalb der Falz kostet Titelseite.** Das Frühwarn-Board
+  stand zuerst über dem Aufmacher; Kriterium 1 von `pruefe_portal.py` fiel
+  damit von zehn auf **drei** Geschichten oberhalb der Falz. Wer oben etwas
+  einfügt, prüft dieses Kriterium — es ist der einzige, der Platz misst.
+- **Der Abnahme-Check prüft Form, nicht Wert — auch beim Deutschland-Paket.**
+  Am 08.08.2026 bestanden Bundeskartellamt (allgemeine Wettbewerbsbehörde,
+  im Abruf: Straßenreparatur-Kartell), der Ratgeberblog der Deutschen
+  Glasfaser („Handy wird heiß"), Holafly (Reiseblog mit SEO-Inhalten) und
+  Thales (Sammelfeed eines Rüstungskonzerns, „uncrewed vessels for ASW
+  frigates") — alle vier wurden verworfen. **Vor jedem Eintrag die
+  bestehenden YAML-Kommentare lesen**; dort steht, was schon abgelehnt wurde,
+  jetzt einschließlich der Gründe dieser Runde.
+- **„0 relevant" heißt nicht „Quellen fehlen".** Das Themenfeld „MVNO, eSIM &
+  Plattformen" liest 8 Meldungen und behält 0. Nachgeprüft mit zwölf
+  Firmensuchen und neun Kandidaten: es liegt nicht an fehlenden Quellen. Die
+  konfigurierten sind ZULIEFERER-Feeds, und der Analyst bewertet ihre
+  Produktmeldungen zu Recht unter Relevanz 2; die Endkundenbewegung findet in
+  der Fachpresse statt, die schon im Bestand ist. Wer das Feld beleben will,
+  braucht eine ANDERE Art Quelle, nicht mehr von dieser.
+- **Was bewusst NICHT gebaut wird, und warum** (aus dem Review vom
+  08.08.2026, damit die Ideen nicht in sechs Wochen wiederkommen):
+  *Meta Ad Library* — der `ads_archive`-Endpunkt deckt programmatisch nur
+  politische und die regulierten Sonderkategorien ab; normale Tarifwerbung
+  ist über die API **nicht** abrufbar. *Google Ads Transparency Center* —
+  keine öffentliche API, der BigQuery-Datensatz enthält ebenfalls nur
+  politische Werbung. *Trustpilot* — Scraping in den Nutzungsbedingungen
+  ausdrücklich untersagt, die API gilt nur fürs eigene Profil.
+  *App-Store-Bewertungen fremder Apps* — dieselbe Grenze. *X-API* —
+  vierstellig im Monat bei sinkender Relevanz. *Similarweb-artige
+  Schätzungen* — geschätzt statt gemessen, ein Fremdkörper in einem Bericht,
+  dessen Alleinstellungsmerkmal der Belegzwang ist. *Archiv-Dialog (RAG)* —
+  braucht einen Dienst zur Laufzeit; die Website ist eine Static Site ohne
+  Backend, und genau das ist die Bedingung dafür, dass sie nie einschläft.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -774,6 +880,58 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (08.08.2026, Antonio direkt): das Review-Dokument.**
+> Antonio hat ein von der Vorsession erstelltes Review der Seite übergeben
+> („Ich möchte, dass du an all den Punkten arbeitest … und zwar autonom")
+> und ist gegangen. Umgesetzt sind **alle sechs Befunde aus Teil A und
+> elf der dreizehn Roadmap-Punkte**; die vollständige Liste mit den Messungen
+> steht in `outputs/review-umsetzung-2026-08-08.md`. Stand danach: **870
+> Tests**, alle **14 Prüfungen von `pruefe_portal.py`** grün, **207 crawlbare
+> Quellen**.
+>
+> Gebaut: Ereignis-Bündelung, CTM-Linse mit Konsequenzsatz und Prüflauf,
+> Zwei-Minuten-Pfad, Quellen-Reparatur samt Deutschland-Paket,
+> Änderungsradar auf 16 Tarifseiten, Lieferzeit-Radar mit eigener Seite,
+> Lücken-Analyse, Push-Versand, Verlauf („was wächst, was kippt"),
+> Frühwarn-Board, vollständiger Wettbewerber-Steckbrief, Mobil-Navigation
+> und die Spalte „Neu seit der letzten Ausgabe".
+>
+> **Vier Punkte des Reviews haben sich beim Nachmessen als falsch erwiesen** —
+> wer sie erneut liest, liest sie mit diesen Korrekturen:
+> (1) Telecompetitor ist eine IP-Sperre, kein User-Agent-Filter;
+> (2) `schema.org/OfferShippingDetails` liefert im deutschen Telko-Handel
+> niemand, die Lieferzeit-Kaskade hängt am Text und am gerenderten DOM;
+> (3) die Nullausbeute des MVNO-Themenfelds liegt nicht an fehlenden Quellen;
+> (4) das Job-Timeout liegt längst bei 50 Minuten, nicht bei 35.
+>
+> **Nicht gebaut, mit Grund:** der Archiv-Dialog (RAG braucht einen Dienst
+> zur Laufzeit — die Website ist eine Static Site ohne Backend, und genau das
+> hält sie wach) und das Kundenstimme-Radar (für fremde Apps gibt es keinen
+> zulässigen Zugang, dieselbe Grenze wie bei Trustpilot). Beides steht mit
+> Begründung in §6.
+>
+> **Offen daraus, alles erst nach dem nächsten Actions-Lauf prüfbar:**
+> 1. Der **Prüflauf gegen den Originaltext** ist noch nie gegen ein echtes
+>    Modell gelaufen. Im Protokoll die Zeile `CTM-Linse:` ansehen: fallen
+>    fast alle Sätze, stimmt der Prompt nicht; fällt keiner, ist die Prüfung
+>    zu milde.
+> 2. Die **Ereignis-Prüfung im Graubereich** (`Ereignis-Pruefung:`): legt das
+>    Modell fast alles zusammen, ist die Schwelle zu tief.
+> 3. Der **Versand** verschickt ohne die Secrets nichts und schreibt den
+>    Grund ins Protokoll — das ist Absicht. Nötig sind `SMTP_HOST`,
+>    `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM`, `MAIL_TO` und
+>    `TEAMS_WEBHOOK`. Trockenlauf:
+>    `python -m telco_radar.versand --trocken --erzwinge --zeige`.
+> 4. Die **JS-Seiten** von Änderungs- und Lieferzeit-Radar: in Actions
+>    rendert Playwright, lokal nicht.
+> 5. Die **Vorgabe-Region** (`region:` in `news_sources.yaml`): ob Europa,
+>    Lateinamerika, Asien und Afrika jetzt eigene bewertete Meldungen haben.
+> 6. **`config/vodafone_hebel.yaml` ist leer ausgeliefert** — zwölf Hebel auf
+>    `offen`. Das ist Absicht (§5), aber es ist der eine Punkt, den nur ein
+>    Mensch schließen kann: zwölf Zeilen darüber, was Vodafone selbst hat.
+>    Solange sie leer ist, sagt die Seite ehrlich „noch nicht erfasst" und
+>    behauptet keine Lücke.
+>
 > **Zuletzt erledigt (08.08.2026, Antonio direkt): Suchfunktion und
 > Differenzierung.** Zwei Aufträge in einem: die Suche leitete auf
 > `meldungen.html` weiter und zeigte ihre Treffer als graue Textzeilen am
@@ -933,11 +1091,15 @@ gerechnet misst die Kennzahl die Abrufhäufigkeit statt den Wert (1,9 % gegen
 
 **Die nächsten vier Schritte, in dieser Reihenfolge:**
 
-1. **Vorgabe-Region für Fachpressequellen.** Lauf #75 schloss Europa mit null
-   bewerteten Meldungen ab, während „Global" 62 von 92 bekam — die neuen
-   deutschen, französischen, spanischen und italienischen Feeds landen dort,
-   weil `tag_news_regions` nur nach Betreibernamen in der Überschrift tagt.
-   Je mehr regionale Quellen dazukommen, desto leerer wird der Regionsteil.
+1. ~~**Vorgabe-Region für Fachpressequellen.**~~ **ERLEDIGT am 08.08.2026.**
+   Lauf #75 schloss Europa mit null bewerteten Meldungen ab, während „Global"
+   62 von 92 bekam. `Source` trägt jetzt ein Feld `region`, 27 regionale
+   Feeds sind zugeordnet (Europa 11, Asien 5, Lateinamerika 5, Afrika &
+   Naher Osten 5, Nordamerika 1), und ein Betreibername in der Überschrift
+   schlägt die Vorgabe weiterhin — eine Verizon-Meldung in einem deutschen
+   Feed gehört nach Nordamerika. Eine Region, die es nicht gibt, wird beim
+   Laden verworfen und gemeldet. **Nach dem nächsten Lauf nachsehen, ob die
+   Regionsteile jetzt gefüllt sind.**
 2. Zwei bis drei normale Läufe abwarten, dann die Trefferquote neu auswerten —
    ab jetzt je KANAL, weil das Laufprotokoll `new` und `source_url` mitführt.
    Erst dann steht fest, was die 35 neuen Quellen und die zwei neuen
@@ -957,10 +1119,10 @@ entscheidet die Trefferquote nach den Läufen.
 
 ## 10. Offene Ideen / Roadmap
 
-- E-Mail-/Teams-Versand des Briefings nach jedem Lauf
+- ~~E-Mail-/Teams-Versand~~ **gebaut am 08.08.2026** (`versand.py`) — Mail montags mit dem Zwei-Minuten-Pfad, Teams nur für die Ausnahme. Es fehlen nur noch die Secrets.
 - Firecrawl/Crawl4AI als Fetcher für JS-Newsrooms (AT&T, Singtel, Telia, …)
 - Semantisches Dedup (Embeddings), um dieselbe Story aus mehreren Quellen zu mergen
 - Tarif-/Preisseiten-Diffing als dritte Signalebene
-- Trend-Charts über mehrere Wochen (Daten liegen ja als JSON-Archiv vor)
+- ~~Trend-Charts über mehrere Wochen~~ **gebaut am 08.08.2026** (`report/verlauf.py`, Abschnitt „Was wächst, was kippt" auf der Differenzierungs-Seite)
 - Feedback der Vodafone-Kollegin einarbeiten (steht noch aus)
 - Migration auf Vodafone-Infra, falls gewünscht (Runner braucht nur Python + HTTPS)

@@ -99,6 +99,30 @@ b,strong{font-weight:700}
 .subnav a:hover{color:var(--red)}
 .subnav a.on{color:var(--red)}
 .subbar::-webkit-scrollbar{display:none}
+/* Bei 390 px endet die Navigation mitten im Wort ("DIFFERENZIER…"), ohne
+   dass irgendetwas verraet, dass sie seitlich weitergeht - gemessen am
+   08.08.2026 im Mobilaufmass. Ein weicher Rand rechts sagt es, ohne einen
+   Satz dafuer zu brauchen: er ist genau dann da, wenn noch etwas kommt.
+   `background-attachment:local` macht das - die zweite Flaeche haengt am
+   Inhalt, die aeussere am Rahmen, und beide loeschen sich am Ende der
+   Scrollstrecke gegenseitig aus.
+
+   Der Umbruch in zwei Zeilen waere die Alternative gewesen; er kostet aber
+   auf jedem Geraet eine Zeile Hoehe, damit auf einem die Andeutung stimmt. */
+@media (max-width:760px){
+  .subbar{
+    background-image:
+      linear-gradient(to right, var(--paper), var(--paper)),
+      linear-gradient(to left, var(--paper), var(--paper)),
+      linear-gradient(to right, rgba(20,18,15,.16), rgba(20,18,15,0)),
+      linear-gradient(to left, rgba(20,18,15,.16), rgba(20,18,15,0));
+    background-position:left center,right center,left center,right center;
+    background-repeat:no-repeat;
+    background-size:22px 100%,22px 100%,14px 100%,14px 100%;
+    background-attachment:local,local,scroll,scroll;
+  }
+  .subnav a{padding:11px 14px}
+}
 
 
 /* Suche: eine Linie, kein Feld. */
@@ -406,6 +430,24 @@ b,strong{font-weight:700}
   font-size:clamp(34px,5.2vw,58px);line-height:1.03;letter-spacing:-.022em;
   color:var(--ink);max-width:16ch}
 .page-hero.wide h1{max-width:20ch}
+
+/* "Neu seit der letzten Ausgabe" - die Spalte neben der Ueberschrift der
+   Dauerseiten. Sie ersetzt eine einzelne Datumszeile in einem sonst leeren
+   Drittel (report/seit.py). Rechtsbuendig und schmal: sie soll die
+   Ueberschrift nicht bedraengen, sondern die Zeile darunter fuellen. */
+.seit{text-align:right;max-width:260px;font-family:var(--sans)}
+.seit-kopf{margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-4)}
+.seit-liste{list-style:none;margin:0;padding:0;
+  border-top:1px solid var(--rule-2)}
+.seit-liste li{border-bottom:1px solid var(--rule-2)}
+.seit-liste a{display:block;padding:5px 0;font-size:12.5px;color:var(--ink-2)}
+.seit-liste a:hover{color:var(--red)}
+.seit-liste b{font-family:var(--serif);font-size:16px;color:var(--ink)}
+.seit-stand{margin:7px 0 0;font-size:10.5px;color:var(--ink-4)}
+@media (max-width:760px){
+  .seit{text-align:left;max-width:none;margin-top:14px}
+}
 .page-date{font-family:var(--sans);font-size:10.5px;font-weight:700;
   text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
   white-space:nowrap;padding-bottom:6px}
@@ -555,6 +597,79 @@ b,strong{font-weight:700}
    traegt eine Zahl, `rubrik-zusatz` eine Einordnung ohne Zahl. */
 .rubrik-zahl,.rubrik-zusatz{margin-left:auto;font-family:var(--sans);
   font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink-4)}
+/* In einer laufenden Metazeile steht der Wert MITTEN im Satz, nicht am
+   rechten Rand - `margin-left:auto` schoebe dort alles Folgende weg. */
+.aufmacher-meta .rubrik-zahl{margin-left:0}
+
+/* ============================================  WER WAS HAT (Luecken) ==== */
+/* Die Gegenfrage der Differenzierungs-Seite. Eine Tabelle, kein Kartenraster:
+   hier geht es um Vollstaendigkeit ueber zwoelf Zeilen, nicht um Gewichtung -
+   und eine Zeile, die "noch nicht erfasst" sagt, darf genauso viel Platz
+   bekommen wie eine mit Inhalt. */
+.dz-luecken{margin:44px 0}
+.dz-luecken-lead{margin:10px 0 14px;max-width:70ch;font-size:16px;
+  color:var(--ink-2)}
+.dz-fleck-liste{list-style:none;margin:0 0 22px;padding:0;
+  border-top:1px solid var(--rule-2)}
+.dz-fleck-liste li{border-bottom:1px solid var(--rule-2)}
+.dz-fleck-liste a{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;
+  padding:9px 0}
+.dz-fleck-label{font-family:var(--serif);font-size:18px;font-weight:700;
+  color:var(--ink)}
+.dz-fleck-n{font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.05em;color:var(--red)}
+.dz-fleck-wer{font-family:var(--sans);font-size:11.5px;color:var(--ink-4);
+  margin-left:auto}
+.dz-vergleich .col-kept i{font-style:normal;color:var(--ink-4);font-size:11px}
+@media (max-width:640px){.dz-fleck-wer{margin-left:0;flex-basis:100%}}
+
+/* ================================================  IN ZWEI MINUTEN ====== */
+/* Der kurze Weg durch die Ausgabe, ganz oben. Bewusst KEIN Kasten mit
+   Hintergrund: die Designsprache dieser Seite kennt keine Flaechen, die
+   Hierarchie kommt aus der Linienstaerke. Eine 3px-Rubrikleiste oben und
+   eine Haarlinie je Zeile - dieselbe Bauform wie die Ressorts. */
+.kurzpfad{margin:0 0 38px;border-top:3px solid var(--rule-ink);padding-top:0}
+.kurzpfad .rubrik{margin-bottom:6px}
+.kurzpfad-liste{list-style:none;margin:0;padding:0;
+  counter-reset:kurzpfad}
+.kurzpfad-zeile{counter-increment:kurzpfad;padding:12px 0 12px 34px;
+  border-bottom:1px solid var(--rule-2);position:relative}
+.kurzpfad-zeile:last-child{border-bottom:none}
+.kurzpfad-zeile::before{content:counter(kurzpfad);position:absolute;left:0;
+  top:13px;font-family:var(--sans);font-size:12px;font-weight:700;
+  color:var(--red)}
+.kurzpfad-satz{margin:0;font-family:var(--serif);font-size:18px;
+  line-height:1.42;color:var(--ink)}
+.kurzpfad-beleg{margin:5px 0 0;display:flex;flex-wrap:wrap;
+  align-items:baseline;gap:8px;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink-4)}
+.kurzpfad-beleg a{color:var(--ink-3)}
+.kurzpfad-beleg a:hover{color:var(--red)}
+.kurzpfad-stufe{font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  font-size:10px;color:var(--ink-4)}
+.kurzpfad-stufe.s3{color:var(--red)}
+@media (max-width:640px){.kurzpfad-satz{font-size:16px}}
+
+/* Der Satz, der aus einer Meldung eine Konsequenz macht (analyze/ctm.py).
+   Er traegt eine eigene Marke, damit er nicht als weitere Zusammenfassung
+   gelesen wird - und er steht nur da, wenn er die Pruefung gegen den
+   Originaltext bestanden hat (analyze/faithfulness.py). */
+.ctm-satz{margin:8px 0 0;font-family:var(--serif);font-size:15px;
+  line-height:1.45;color:var(--ink-2);border-left:2px solid var(--red);
+  padding-left:12px}
+.ctm-marke{display:block;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--red);margin-bottom:2px}
+.mz .ctm-satz{font-size:13.5px;margin:0 0 10px}
+
+/* Die weiteren Belege eines Ereignisses (analyze/clustering.py). Bewusst
+   klein und unter der Meldung: sie sind der Nachweis, dass mehrere
+   Redaktionen dieselbe Sache melden, nicht eine zweite Meldung. */
+.mz-belege{margin:2px 0 10px;padding-left:0;font-family:var(--sans);
+  font-size:11.5px;color:var(--ink-4)}
+.mz-belege a{color:var(--ink-3);text-decoration:underline;
+  text-decoration-color:var(--rule-2)}
+.mz-belege a:hover{color:var(--red)}
 
 /* ==========================================================  AUFKLAPPER = */
 .evidence{margin-top:30px;border-top:2px solid var(--rule-ink)}
@@ -1437,3 +1552,136 @@ b,strong{font-weight:700}
   body{background:#fff;font-size:11pt}
   .prose{max-width:none;columns:2;column-gap:28px}
 }
+
+/* ==============================================  LIEFERZEIT-RADAR ======= */
+/* Eine Tabelle, weil es um Vergleichbarkeit ueber Zeilen und Spalten geht -
+   nicht um Gewichtung. Jede Zelle traegt ihre eigene Gegenprobe mit:
+   Originaltext, Messzeitpunkt, Belegstufe. Es gibt keine oeffentliche
+   Quelle, gegen die jemand diese Zahlen pruefen koennte; also liefert die
+   Seite den Beleg gleich mit. */
+.lz-tabelle{margin:26px 0 34px;border-top:3px solid var(--rule-ink)}
+.lz-kopf,.lz-zeile{display:grid;
+  grid-template-columns:minmax(160px,1.1fr) repeat(auto-fit,minmax(150px,1fr));
+  gap:0 18px;align-items:start}
+.lz-kopf{padding:9px 0;border-bottom:1px solid var(--rule);
+  font-family:var(--sans);font-size:10.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4)}
+.lz-zeile{padding:14px 0;border-bottom:1px solid var(--rule-2)}
+.lz-produkt b{font-family:var(--serif);font-size:17px;display:block}
+.lz-produkt i{font-family:var(--sans);font-size:11px;font-style:normal;
+  color:var(--ink-4)}
+.lz-feld{display:block}
+.lz-wert{font-family:var(--serif);font-size:19px;font-weight:700;
+  display:block;color:var(--ink)}
+.lz-wert.lz-sofort{color:#2f6b3a}
+.lz-wert.lz-verzoegert{color:var(--r4)}
+.lz-wert.lz-nein{color:var(--red)}
+.lz-roh{display:block;font-family:var(--sans);font-size:11px;
+  color:var(--ink-3);margin-top:2px}
+.lz-quelle{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4);margin-top:3px}
+.lz-quelle a{color:var(--ink-3)}
+.lz-leer{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.lz-engpass{border-left:2px solid var(--red);padding-left:10px}
+.lz-verlauf{display:flex;gap:3px;margin-top:6px}
+.lz-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
+  display:inline-block}
+.lz-punkt.lz-sofort{background:#2f6b3a}
+.lz-punkt.lz-verzoegert{background:var(--r4)}
+.lz-punkt.lz-nein{background:var(--red)}
+.lz-grenzen{margin:34px 0}
+@media (max-width:760px){
+  .lz-kopf{display:none}
+  .lz-zeile{grid-template-columns:1fr;gap:10px}
+  .lz-feld::before{content:attr(data-anbieter)}
+}
+
+/* ==================================================  VERLAUF (Trend) ==== */
+/* Was waechst, was kippt. Balken statt Linien: es geht um den Vergleich
+   zwischen Monaten, nicht um eine stetige Kurve - und ein Balkengitter
+   traegt zwoelf Hebel nebeneinander, ohne dass eine Legende noetig wird. */
+.dz-verlauf{margin:44px 0}
+.vl-bewegung{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 22px}
+.vl-move{display:block;padding:9px 14px 9px 12px;border-left:3px solid var(--rule);
+  min-width:180px}
+.vl-move.vl-auf{border-left-color:#2f6b3a}
+.vl-move.vl-ab{border-left-color:var(--red)}
+.vl-move-label{display:block;font-family:var(--serif);font-size:17px;
+  font-weight:700;color:var(--ink)}
+.vl-move-delta{display:block;font-family:var(--sans);font-size:11.5px;
+  font-weight:700;margin-top:2px}
+.vl-auf .vl-move-delta{color:#2f6b3a}
+.vl-ab .vl-move-delta{color:var(--red)}
+.vl-move-detail{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4)}
+.vl-gitter{border-top:1px solid var(--rule)}
+.vl-kopf,.vl-zeile{display:grid;
+  grid-template-columns:minmax(140px,1.2fr) repeat(auto-fit,minmax(38px,1fr));
+  gap:0 6px;align-items:end}
+.vl-kopf{padding:6px 0;font-family:var(--sans);font-size:10px;
+  font-weight:700;letter-spacing:.05em;color:var(--ink-4);
+  border-bottom:1px solid var(--rule-2)}
+.vl-monat{text-align:center}
+.vl-monat.vl-duenn{color:var(--rule)}
+.vl-zeile{padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.vl-name{font-family:var(--sans);font-size:12px;color:var(--ink-2);
+  align-self:center}
+.vl-zelle{display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;height:42px;position:relative}
+.vl-balken{display:block;width:14px;background:var(--ink-3);min-height:1px}
+.vl-zahl{font-family:var(--sans);font-size:9.5px;color:var(--ink-4);
+  margin-top:2px}
+@media (max-width:640px){
+  .vl-kopf,.vl-zeile{grid-template-columns:minmax(90px,1fr) repeat(auto-fit,minmax(26px,1fr))}
+  .vl-balken{width:9px}
+}
+
+/* Die Differenzierungs-Hebel je Wettbewerber (report/wettbewerb.py).
+   Zusammen mit Lage, Aktionen und Chronik ergibt das den Steckbrief - der
+   Teil, den kommerzielle Werkzeuge als "Battlecard" verkaufen, hier aber aus
+   vorhandenen Daten abgeleitet statt gepflegt. */
+.wb-hebel{margin-top:18px;border-top:1px solid var(--rule-2);padding-top:12px}
+.wb-hebelliste{list-style:none;margin:6px 0 0;padding:0}
+.wb-hebelliste li{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
+  padding:5px 0;border-bottom:1px solid var(--rule-2)}
+.wb-hebelliste > li > a{font-family:var(--sans);font-size:12px;font-weight:700;
+  color:var(--ink-2)}
+.wb-hebelliste > li > a:hover{color:var(--red)}
+.wb-hebel-n{font-family:var(--sans);font-size:10px;font-weight:700;
+  color:var(--ink-4)}
+.wb-hebel-beispiel{flex-basis:100%;font-family:var(--serif);font-size:14px;
+  color:var(--ink-3)}
+.wb-hebel-beispiel a{color:var(--ink-3)}
+.wb-hebel-beispiel a:hover{color:var(--red)}
+.wb-flanken{margin:10px 0 0;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink-4)}
+
+/* =============================================  FRUEHWARN-BOARD ========= */
+/* Die Fragen, die dauerhaft offen sind. Bewusst eine ruhige Form: das Board
+   steht ueber der Titelseite und darf sie nicht ueberstrahlen - es ordnet,
+   es meldet nicht. Farbe traegt nur der Zustandspunkt. */
+.fwb{margin:0 0 34px;border-top:3px solid var(--rule-ink)}
+.fwb-gitter{display:grid;gap:0 30px;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.fwb-frage{padding:12px 0 14px;border-bottom:1px solid var(--rule-2)}
+.fwb-titel{margin:0;font-family:var(--serif);font-size:17px;font-weight:700;
+  line-height:1.3;color:var(--ink)}
+.fwb-warum{margin:4px 0 8px;font-family:var(--sans);font-size:11.5px;
+  line-height:1.45;color:var(--ink-4)}
+.fwb-liste{list-style:none;margin:0;padding:0}
+.fwb-ind{display:grid;grid-template-columns:10px 1fr auto;gap:0 8px;
+  align-items:baseline;padding:3px 0}
+.fwb-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
+  display:inline-block;align-self:center}
+.fwb-ind.fwb-aktiv .fwb-punkt{background:var(--red)}
+.fwb-ind.fwb-beobachtet .fwb-punkt{background:var(--r4)}
+.fwb-name{font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.fwb-zustand{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
+.fwb-ind.fwb-aktiv .fwb-zustand{color:var(--red)}
+.fwb-beleg{grid-column:2 / -1;font-family:var(--serif);font-size:13px;
+  line-height:1.35;color:var(--ink-3);margin:1px 0 4px}
+.fwb-beleg a{color:var(--ink-3)}
+.fwb-beleg a:hover{color:var(--red)}
+.fwb-beleg i{display:block;font-style:normal;font-family:var(--sans);
+  font-size:10px;color:var(--ink-4)}
