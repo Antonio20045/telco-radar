@@ -385,6 +385,31 @@ themen:
       # Zwischenhaendler, ueber den Roaming-Erloese laufen.
       # Frische-Ausnahme belegt: neueste Meldung im Abruf 16.07.2026.
       - {name: "BICS", type: rss, url: "https://www.bics.com/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}
+      # NACHGEPRUEFT am 08.08.2026, weil dieses Themenfeld im Lauf vom 07.08.
+      # 8 Meldungen gelesen und 0 als relevant behalten hat - was angesichts
+      # der Marktbewegung (Travel-eSIM erodiert Roaming-Erloese) unplausibel
+      # aussah. Zwoelf Firmen mechanisch gesucht, neun Kandidaten geprueft,
+      # zwei bestanden den Check - und BEIDE fielen an der Wertfrage:
+      #   esim.holafly.com/news/feed/
+      #       18 Meldungen, sauber datiert - aber ein Reiseblog mit
+      #       SEO-Inhalten ("Border checks in Italy due to the Ceuta crisis",
+      #       "The iPhone 17e is here"), keine Marktmeldungen.
+      #   thalesgroup.com/en/rss.xml
+      #       der Sammelfeed eines Ruestungs- und Luftfahrtkonzerns. Im
+      #       Abruf: "Design of uncrewed vessels for new ASW frigates".
+      # Durchgefallen: MVNO Europe (neueste Meldung 21.01.2026), Trustonic
+      # (01.06.2026), Ubigi (0 Meldungen), Mobile Europes wp-json (dieselben
+      # Meldungen wie der schon konfigurierte Feed - Kriterium 7 hat es
+      # gefangen).
+      #
+      # BEFUND: die Nullausbeute liegt nicht an fehlenden Quellen. Die hier
+      # konfigurierten sind ZULIEFERER-Feeds (IDEMIA, Infobip, BICS,
+      # Transatel), und der Themen-Analyst bewertet deren Produktmeldungen zu
+      # Recht unter Relevanz 2. Die Endkundenbewegung (Airalo, Holafly)
+      # findet in der FACHPRESSE statt, nicht in Anbieterblogs - und die
+      # steht bereits in news_sources.yaml. Wer dieses Feld beleben will,
+      # braucht eine andere Art Quelle, nicht mehr von dieser.
+      #
       # Zweite grosse CPaaS-Plattform neben Infobip. Frische-Ausnahme belegt:
       # neueste Meldung im Abruf 20.07.2026.
       - {name: "Sinch", type: rss, url: "https://sinch.com/blog/feed/", herkunft: "Firmenliste (Breitensuche)", abgenommen: "2026-08-05"}

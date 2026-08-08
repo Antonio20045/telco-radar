@@ -89,6 +89,48 @@
 </section>
 {% endif %}
 
+{# ====================================================== FRÜHWARN-BOARD == #}
+{# Die Fragen, die dauerhaft offen sind - und wie es diese Woche um sie
+   steht. Der Bericht darunter beantwortet "was ist passiert?"; er kann nicht
+   beantworten "wie steht es um die Fragen, die uns seit Monaten
+   beschäftigen?".
+
+   Der Wert steckt darin, dass die Indikatoren VORHER feststehen
+   (config/fruehwarnung.yaml) - einer, der nach dem Ereignis formuliert wird,
+   ist keine Warnung, sondern eine Erklärung. Deshalb rechnet das hier ein
+   Wortabgleich und kein Modell: sonst gäbe es jede Woche eine andere
+   Auslegung derselben Frage.
+
+   „Ruhend" bleibt stehen. Eine Frage, zu der seit Wochen nichts kommt, ist
+   beantwortet - es passiert gerade nichts. #}
+{% if is_latest and fruehwarnung and fruehwarnung.aktiv %}
+<section class="fwb">
+  <div class="rubrik"><h2>Worauf wir warten</h2>
+    <span class="rubrik-zahl">{{ fruehwarnung.n_aktiv }} von {{ fruehwarnung.fragen | length }} in Bewegung</span></div>
+  <div class="fwb-gitter">
+    {% for f in fruehwarnung.fragen %}
+    <article class="fwb-frage fwb-{{ f.zustand }}">
+      <h3 class="fwb-titel">{{ f.frage }}</h3>
+      {% if f.warum %}<p class="fwb-warum">{{ f.warum }}</p>{% endif %}
+      <ul class="fwb-liste">
+        {% for i in f.indikatoren %}
+        <li class="fwb-ind fwb-{{ i.zustand }}">
+          <span class="fwb-punkt" aria-hidden="true"></span>
+          <span class="fwb-name">{{ i.name }}</span>
+          <span class="fwb-zustand">{{ i.zustand }}</span>
+          {% for b in i.belege %}
+          <span class="fwb-beleg"><a href="{{ b.url }}" target="_blank" rel="noopener">{{ b.titel }}</a>
+            <i>{{ b.absender }}{% if b.datum %} · {{ b.datum }}{% endif %}</i></span>
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {# ================================================= OBERHALB DER FALZ ==== #}
 <div class="front-oben">
   <div class="front-haupt">

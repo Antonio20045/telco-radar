@@ -18,6 +18,7 @@ from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
 from . import differenzierung_view
+from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
 from . import seit as seit_mod
@@ -1095,6 +1096,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # Themen von heute gehoeren nicht dazu (die Vorlage prueft
             # `is_latest`).
             "themen": themen_band,
+            # Das Fruehwarn-Board braucht das ARCHIV, nicht nur diese Woche -
+            # "beobachtet" heisst "in einer der letzten Ausgaben belegt".
+            # Deshalb wird es unten nach der Schleife nachgereicht und die
+            # Startseite ein zweites Mal geschrieben; nur sie zeigt es
+            # ohnehin (`is_latest`).
+            "fruehwarnung": None,
         }
         # Die Archivwoche traegt ihre Meldungen selbst - sie hat keine
         # meldungen.html, auf die sie verweisen koennte, und die globale
@@ -1112,6 +1119,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             (site_dir / "index.html").write_text(
                 woche_tpl.render(prefix="", show_explorer=False, **ctx),
                 encoding="utf-8")
+
+    # Das Fruehwarn-Board steht auf der Startseite, braucht aber alle
+    # Ausgaben - erst nach der Schleife oben liegen sie vor. Die Startseite
+    # wird deshalb mit dem fertigen Board noch einmal geschrieben. Ein zweiter
+    # Rendervorgang derselben Vorlage kostet Millisekunden; die Alternative
+    # waere, `wochen` vor der Schleife ein zweites Mal zu berechnen (14 x
+    # _flatten(), der teuerste Teil des Rendervorgangs).
+    if latest_ctx is not None:
+        latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(
+            wochen, reports_dir.parent.parent)
+        (site_dir / "index.html").write_text(
+            woche_tpl.render(prefix="", show_explorer=False, **latest_ctx),
+            encoding="utf-8")
 
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")

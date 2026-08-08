@@ -1,0 +1,109 @@
+# =============================================================================
+# FRUEHWARN-BOARD - die Fragen, die dauerhaft offen sind
+# =============================================================================
+#
+# Warum das etwas anderes ist als der Wochenbericht
+# -------------------------------------------------
+# Der Bericht beantwortet "was ist passiert?". Er kann nicht beantworten "wie
+# steht es um die Fragen, die uns seit Monaten beschaeftigen?" - dafuer
+# muesste jemand jede Woche dieselben fuenf Dinge nachschlagen und sich
+# merken, was beim letzten Mal dastand.
+#
+# Genau das ist die Methode "Indicators & Warnings" aus der
+# Nachrichtendienst-Analyse: nicht alle Neuigkeiten quer lesen, sondern
+# vorher festlegen, WORAUF man wartet, und dann nur noch pruefen, ob es
+# eingetreten ist. Der Wert steckt im "vorher": ein Indikator, der nach dem
+# Ereignis formuliert wird, ist keine Warnung, sondern eine Erklaerung.
+#
+# Wie ein Indikator gebaut sein muss
+# ----------------------------------
+# Er muss FALSIFIZIERBAR sein, also aus Woertern bestehen, die in einer
+# Meldung stehen oder nicht stehen. "Der Markt konsolidiert sich" ist kein
+# Indikator. "Ein deutscher Anbieter kuendigt eine Preiserhoehung an" ist
+# einer.
+#
+# `stichworte` sind ODER-verknuepft; `marken` schraenkt zusaetzlich ein
+# (UND). Ein Indikator ohne `marken` feuert bei jedem Absender - das ist fuer
+# technische und regulatorische Fragen richtig und fuer Preisfragen falsch.
+#
+# Die Zustaende
+# ------------
+#   aktiv       in der aktuellen Ausgabe belegt
+#   beobachtet  in einer der letzten Ausgaben belegt, jetzt nicht
+#   ruhend      seit dem Beobachtungsfenster nichts
+#
+# "ruhend" ist ausdruecklich ein Ergebnis und kein Fehler. Eine Frage, zu der
+# seit sechs Wochen nichts kommt, ist beantwortet: es passiert gerade nichts.
+
+fragen:
+  - frage: "Kippt die Preisuntergrenze im deutschen Markt?"
+    warum: >-
+      Eine Unlimited-Flat unter 35 Euro oder ein Anschlusspreis von null
+      verschiebt die Untergrenze fuer das ganze Portfolio - und beides wird
+      selten als Pressemitteilung angekuendigt.
+    indikatoren:
+      - name: "Unlimited-Tarif unter 35 Euro"
+        stichworte: ["unlimited", "unbegrenzt", "flatrate", "allnet-flat"]
+        marken: ["Telekom", "O2", "1&1", "Vodafone", "congstar", "otelo",
+                 "freenet", "mobilcom-debitel", "ALDI TALK", "Lidl Connect"]
+      - name: "Anschlusspreis faellt weg"
+        stichworte: ["anschlusspreis", "bereitstellungspreis",
+                     "anschlussgebühr"]
+      - name: "Preiserhöhung angekündigt"
+        stichworte: ["preiserhöhung", "preisanpassung", "teurer",
+                     "preise steigen"]
+
+  - frage: "Wird Satellit zum Endkundenprodukt?"
+    warum: >-
+      Solange Direct-to-Cell ein Notrufdienst ist, ist es Technik. Sobald es
+      ein buchbarer Tarifbestandteil mit Preis wird, ist es Portfolio.
+    indikatoren:
+      - name: "Direct-to-Cell wird buchbar"
+        stichworte: ["direct-to-cell", "direct to cell", "d2d",
+                     "satellitentarif", "starlink direct"]
+      - name: "Satellit im Tarif eines europäischen Anbieters"
+        stichworte: ["satellit", "satellite", "ntn", "starlink"]
+        marken: ["Telekom", "O2", "Vodafone", "1&1", "Orange", "Telefónica",
+                 "Swisscom", "A1"]
+
+  - frage: "Erodiert eSIM das Roaming-Geschäft?"
+    warum: >-
+      Reise-eSIMs nehmen Roaming-Erloese ab, ohne dass ein Betreiber den
+      Vertrag sieht. Die Bewegung ist gut belegt, der Zeitpunkt nicht.
+    indikatoren:
+      - name: "Travel-eSIM-Anbieter wächst oder wird gekauft"
+        stichworte: ["airalo", "holafly", "saily", "travel esim",
+                     "reise-esim", "esim-anbieter"]
+      - name: "Roaming-Preise oder -Erlöse verändern sich"
+        stichworte: ["roaming"]
+
+  - frage: "Wird KI zum bezahlten Tarifbestandteil?"
+    warum: >-
+      Eine KI-Lizenz im Tarif ist der erste Differenzierungs-Hebel seit
+      Jahren, den Kunden auf der Rechnung sehen - und der erste, bei dem
+      Vodafones Wettbewerber im deutschen Markt vorgelegt haben.
+    indikatoren:
+      - name: "KI-Assistent im Tarif enthalten"
+        stichworte: ["perplexity", "chatgpt", "gemini", "copilot",
+                     "ki-assistent", "ai assistant"]
+      - name: "KI-Gerät eines Netzbetreibers"
+        stichworte: ["ai phone", "ki-phone", "ai-handy"]
+
+  - frage: "Zwingt die Regulierung zu einer Portfolio-Änderung?"
+    warum: >-
+      Vorgaben zu Preisklauseln, Vertragslaufzeiten oder Kuendigungsfristen
+      wirken unmittelbar auf jeden Tarif - und sie kommen mit Vorlauf, wenn
+      man den Vorlauf beobachtet.
+    indikatoren:
+      - name: "Vorgabe zu Preisklauseln oder Laufzeiten"
+        stichworte: ["preisklausel", "inflationsklausel", "vertragslaufzeit",
+                     "kündigungsfrist", "mindestlaufzeit"]
+      - name: "Digital Networks Act / TKG-Novelle"
+        stichworte: ["digital networks act", "tkg-novelle",
+                     "telekommunikationsgesetz", "dna-entwurf"]
+
+# Wie viele Ausgaben zurueck ein Indikator als "beobachtet" gilt. Vier
+# Ausgaben sind bei taeglichem Lauf knapp eine Woche, bei zwei Laeufen die
+# Woche zwei Wochen - lang genug, dass ein Thema nicht zwischen zwei Laeufen
+# verschwindet, kurz genug, dass "beobachtet" etwas heisst.
+fenster_ausgaben: 4
