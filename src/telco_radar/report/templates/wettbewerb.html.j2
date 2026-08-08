@@ -24,20 +24,36 @@
 {% set active = 'wettbewerb' %}
 {% block title %}Marktrecherche · Wettbewerb{% endblock %}
 
+{# Die Chronik in ZWEI Spalten (CSS-Spalten, siehe .wb-liste). Dieselben
+   Meldungen, halbe Hoehe: eine Chronikzeile ist schmal gesetzt und braucht
+   keine 1180 px Satzbreite. Datum und Ressort stehen deshalb als eine
+   leise Kopfzeile ueber der Schlagzeile statt als zwei Spalten davor -
+   nebeneinander blieben in einer 570-px-Spalte 400 px fuer den Text. #}
 {% macro chronik_liste(eintraege) %}
 <ol class="wb-liste">
   {% for e in eintraege %}
-  <li class="wb-zeile{% if e.tag_zeigen and not loop.first %} wb-zeile--tag{% endif %}">
-    <span class="wb-tag">{% if e.tag_zeigen %}{{ e.tag }}.{% endif %}</span>
-    <span class="wb-ressort">{{ e.rubrik }}</span>
-    <span class="wb-text">
-      <a class="wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
-      {% if e.note %}<span class="wb-note">{{ e.note }}</span>{% endif %}
-      {% if e.quelle %}<span class="wb-quelle">{{ e.quelle }}</span>{% endif %}
-    </span>
+  <li class="wb-zeile">
+    <span class="wb-zeile-kopf"><span class="wb-tag">{{ e.tag }}</span>
+      <span class="wb-ressort">{{ e.rubrik }}</span>
+      {% if e.quelle %}<span class="wb-quelle">{{ e.quelle }}</span>{% endif %}</span>
+    <a class="wb-titel szl" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.titel }}</a>
+    {% if e.note %}<span class="wb-note">{{ e.note }}</span>{% endif %}
   </li>
   {% endfor %}
 </ol>
+{% endmacro %}
+
+{# Ein Monat der Chronik. Der laufende steht offen, aber nur mit seinem
+   Anfang - der Rest liegt einen Klick tiefer (siehe _OFFEN_JE_MONAT). #}
+{% macro chronik_monat(m) %}
+<p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
+{{ chronik_liste(m.offen) }}
+{% if m.rest %}
+<details class="wb-mehr-monat">
+  <summary>{{ m.rest | length }} weitere</summary>
+  {{ chronik_liste(m.rest) }}
+</details>
+{% endif %}
 {% endmacro %}
 
 {% block content %}
@@ -60,7 +76,10 @@
 
 {% for c in wettbewerb.wettbewerber %}
 <section class="wb{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:16px">
-  <div class="rubrik wb-rubrik"><h2>{{ c.name }}</h2>
+  {# Der Name traegt den Abschnitt. Als 11,5-px-Etikett stand er kleiner
+     auf der Seite als jede Schlagzeile darunter, und die Seite heisst nach
+     ihm - Antonio: "die Namen prominenter." #}
+  <div class="wb-kopf"><h2 class="wb-name">{{ c.name }}</h2>
     {% if c.n_chronik %}<span class="rubrik-zahl">{{ c.n_chronik }}
       Meldung{{ 'en' if c.n_chronik != 1 else '' }} seit {{ c.seit | date_de }}</span>{% endif %}
   </div>
@@ -124,8 +143,7 @@
   <div class="wb-chronik">
     {% for m in c.monate %}
     {% if loop.first %}
-    <p class="wb-monat">{{ m.monat | monat_de }}<span>{{ m.n }}</span></p>
-    {{ chronik_liste(m.eintraege) }}
+    {{ chronik_monat(m) }}
     {% else %}
     <details class="wb-aelter">
       <summary>{{ m.monat | monat_de }}<span>{{ m.n }}

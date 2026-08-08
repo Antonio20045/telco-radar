@@ -51,8 +51,17 @@ _MAX_AKTIONEN = 3
 # Wie viele Wochen der Themenverlauf zurueckreicht. Vier Profile zeigen die
 # Verschiebung ("Ende Juli Router und Streaming, jetzt Glasfaser und Joyn"),
 # ohne dass unter jedem Wettbewerber eine halbe Seite Etiketten steht.
-_MAX_THEMENWOCHEN = 4
+_MAX_THEMENWOCHEN = 3
 _MAX_THEMEN_JE_WOCHE = 6
+# Wie viele Meldungen des laufenden Monats gleich offen stehen. Antonio am
+# 08.08.2026: "mach Wettbewerb das Layout besser, sodass man nicht so viel
+# runterscrollen muss." Der Monat mit 30 Meldungen war 2600 px hoch, drei
+# Wettbewerber darunter machten eine Seite von 6777 px - man scrollte sieben
+# Bildschirmhoehen, um den zweiten Wettbewerber ueberhaupt zu sehen. Zwoelf
+# Meldungen sind in zwei Spalten sechs Zeilen: genug, um den Monat zu
+# erfassen, wenig genug, dass der naechste Wettbewerber in Sichtweite bleibt.
+# Der Rest steht vollstaendig einen Klick weiter - nichts faellt weg.
+_OFFEN_JE_MONAT = 12
 
 _TRACKING = ("utm_", "fbclid", "gclid", "mc_cid", "mc_eid")
 
@@ -179,9 +188,14 @@ def _aktion(eintrag: dict) -> dict:
 
 def _chronik_eintrag(datum: str, rubrik: str, titel: str, url: str,
                      note: str, quelle: str, herkunft: str) -> dict:
-    # `tag` steht als Zeilenmarke links in der Chronik - der Monat steht
-    # ueber der Gruppe, das Jahr in ihrer Ueberschrift.
-    return {"datum": datum, "monat": datum[:7], "tag": datum[8:10].lstrip("0"),
+    # `tag` steht als Zeilenmarke ueber der Schlagzeile ("7.8."). Bis zum
+    # 08.08.2026 stand dort nur die Tageszahl, und sie wurde bei
+    # Wiederholung ausgeblendet - das ging, solange die Chronik EINE Spalte
+    # war. In zwei Spalten (siehe die Vorlage) zerreisst ein Spaltenumbruch
+    # jede solche Gruppe: oben in Spalte zwei stuenden Meldungen ohne Datum.
+    # Jede Zeile traegt ihr Datum deshalb selbst, dafuer kurz und leise.
+    return {"datum": datum, "monat": datum[:7],
+            "tag": f"{int(datum[8:10])}.{int(datum[5:7])}.",
             "rubrik": rubrik or "Sonstiges", "titel": _klartext(titel),
             "url": url, "note": _ohne_vodafone_teil(note), "quelle": quelle,
             "herkunft": herkunft}
@@ -206,16 +220,13 @@ def _nach_monaten(eintraege: list[dict]) -> list[dict]:
         gruppen.setdefault(e["monat"], []).append(e)
     monate = []
     for monat in sorted(gruppen, reverse=True):
-        # Die Tageszahl steht nur beim ERSTEN Eintrag ihres Tages. Ein
-        # Lauftag bringt zehn bis dreissig Meldungen mit; zwanzigmal
-        # untereinander dieselbe "7." zu setzen macht aus einer Zeilenmarke
-        # ein Muster, das man wegsieht.
-        letzter = ""
-        for e in gruppen[monat]:
-            e["tag_zeigen"] = e["datum"] != letzter
-            letzter = e["datum"]
-        monate.append({"monat": monat, "eintraege": gruppen[monat],
-                       "n": len(gruppen[monat])})
+        eintraege_monat = gruppen[monat]
+        monate.append({"monat": monat, "eintraege": eintraege_monat,
+                       "n": len(eintraege_monat),
+                       # Der offene Monat zeigt seinen Anfang und haelt den
+                       # Rest bereit, siehe _OFFEN_JE_MONAT.
+                       "offen": eintraege_monat[:_OFFEN_JE_MONAT],
+                       "rest": eintraege_monat[_OFFEN_JE_MONAT:]})
     return monate
 
 
