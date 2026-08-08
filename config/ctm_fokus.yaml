@@ -115,6 +115,16 @@ direkte_stichworte:
   - tarifwechsel
   - preiserhöhung
   - preissenkung
+  # Das Kleingedruckte (collect/tarif_crawler.py). Eine Drosselgrenze, die
+  # bei gleichem Preis von 80 auf 50 GB faellt, IST eine Preiserhoehung -
+  # sie taucht nur nirgends als solche auf. Ohne diese Zeilen stuende der
+  # stille Konditionswechsel unter "ferner liefen", also genau dort, wo ihn
+  # auch heute schon niemand sieht.
+  - drossel
+  - mindestlaufzeit
+  - kündigungsfrist
+  - produktinformationsblatt
+  - vertragszusammenfassung
 
 # ---------------------------------------------------------------------------
 # Stufe 2 (UEBERTRAGBAR): Consumer-Mechanik in einem vergleichbaren Markt.

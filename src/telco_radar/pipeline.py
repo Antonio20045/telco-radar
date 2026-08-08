@@ -314,6 +314,21 @@ def run(root: Path, use_llm: bool | None = None,
         except Exception as exc:  # noqa: BLE001
             log.error("Aenderungsradar uebersprungen: %s", exc)
 
+    # ------------------------------------------------------- Tarif-Sammler
+    # Die Produktinformationsblaetter nach § 1 TK-TransparenzV sind die
+    # einzige Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist.
+    # Woechentlich, weil sie sich selten aendern - und genau deshalb ist
+    # jede Aenderung ein Signal. Failsafe wie alle Nebenstufen.
+    tarif_bilanz: dict = {}
+    if cfg.settings.get("tarif_radar_aktiv", True):
+        try:
+            from .collect import tarif_crawler
+            dokument_items, tarif_bilanz = tarif_crawler.sammle(
+                root, cfg.settings.get("http", {}))
+            items.extend(dokument_items)
+        except Exception as exc:  # noqa: BLE001
+            log.error("Tarif-Sammler uebersprungen: %s", exc)
+
     # ----------------------------------------------------------- CT-Radar
     # Die einzige Ebene, die VOR der Veroeffentlichung liegt: ein
     # Zertifikat entsteht, waehrend die Seite gebaut wird. Die Meldungen
@@ -852,6 +867,12 @@ def run(root: Path, use_llm: bool | None = None,
         # CT-Radar: neue Subdomains als Indiz. `ct_zeitueberschreitung` ist
         # ausdruecklich eigen gefuehrt - eine Domain, die certspotter nicht
         # beantwortet hat, ist NICHT eine Domain ohne neue Namen.
+        # Tarif-Datenbank. `tarif_kleingedruckt` ist eigen gefuehrt: eine
+        # Aenderung ohne Preisbewegung ist die Meldung, die es sonst nirgends
+        # gibt, und sie darf in der Summe nicht untergehen.
+        "tarif_dokumente": tarif_bilanz.get("gelesen", 0),
+        "tarif_dokument_aenderungen": tarif_bilanz.get("geaendert", 0),
+        "tarif_kleingedruckt": tarif_bilanz.get("kleingedruckt", 0),
         "ct_domains": ct_bilanz.get("gelesen", 0),
         "ct_funde": ct_bilanz.get("meldungen", 0),
         "ct_zeitueberschreitung": ct_bilanz.get("zeitueberschreitung", 0),

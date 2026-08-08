@@ -1,0 +1,65 @@
+# Woher die Tarifdokumente kommen.
+#
+# DIE REGEL, DIE NICHT VERHANDELBAR IST
+# --------------------------------------
+# Es wird ausschliesslich abgerufen, was auf einer der `einstieg`-Seiten als
+# LINK steht. Keine geratenen Pfade, keine hochgezaehlten IDs.
+#
+# Das ist keine Vorsicht, sondern die Grenze zwischen zwei verschiedenen
+# Dingen: dem Abrufen oeffentlicher Pflichtdokumente (das ist der Zweck
+# dieser Dokumente) und dem systematischen Leerraeumen einer fremden
+# Datenbank. An dieser Grenze haengt das Datenbankherstellerrecht nach
+# § 87b UrhG. Die o2-Dokumente liegen unter fortlaufenden Blob-IDs im
+# S3-Bucket - sie durchzuzaehlen waere trivial und ist zu unterlassen.
+# `tests/test_tarif_crawler.py` nagelt das fest: ein Test prueft, dass jede
+# abgerufene Adresse vorher als Link auf einer konfigurierten Seite stand.
+#
+# Nebenbei ist das auch die einzige Methode, die funktioniert: geratene
+# Slugs sind 404. Beim Bau dieses Moduls wurde `magentamobil-l-20250401`
+# geraten - es gibt nur `magentamobil-data-l-20250401`.
+#
+# FREQUENZ
+# --------
+# Einmal woechentlich. Diese Dokumente aendern sich selten, und genau
+# deshalb ist jede Aenderung ein Signal.
+
+quellen:
+  - anbieter: Telekom
+    # 1177 verlinkte Produktinformationsblaetter, als echte <a>-Tags.
+    # Die Telekom liefert das PDF unter dem Slug OHNE .pdf-Endung und mit
+    # Content-Type application/pdf - deshalb entscheidet der Content-Type,
+    # nicht die Dateiendung.
+    einstieg:
+      - https://www.telekom.de/produktinformationsblatt
+    pfadmuster:
+      - /produktinformationsblatt/
+    # Aus 1177 Dokumenten die aktuellen herausgreifen. Alphabetisch die
+    # ersten drei zu nehmen liefert Tarife von 2017.
+    bevorzugt:
+      - "magentamobil-basic-2"
+      - "magentamobil-l-2"
+      - "magentamobil-m-2"
+      - "magentamobil-s-2"
+      - "magentamobil-xl-2"
+    max_dokumente: 5
+
+  - anbieter: o2
+    # Die PDFs liegen auf static2.o9.de unter Blob-IDs. Verlinkt sind sie
+    # von der Rechtsseite - und NUR von dort werden sie geholt.
+    einstieg:
+      - https://www.o2online.de/recht/produktinformationsblatt/
+    pfadmuster:
+      - ".pdf"
+    max_dokumente: 5
+
+# --- Warum 1&1 (noch) fehlt
+# hilfe-center.1und1.de/produktinformationsblaetter ist eine Next.js-Seite
+# ohne statische Links; im HTML stehen nur die Chunk-Dateien. Der Katalog
+# entsteht erst im Browser. Das ist derselbe Fall wie bei den JS-Promo-Seiten
+# und braucht den JS-Collector - kein Grund, hier einen geratenen Pfad
+# einzutragen.
+#
+# --- Warum Vodafone hier steht, aber nicht als Wettbewerber
+# vodafone.de/infofaxe liefert HTTP 200. Aufgenommen wird es, sobald die
+# Linkernte dort gemessen ist - der eigene Konzern gehoert in die
+# Positionskarte, sonst zeigt sie den Markt ohne den eigenen Punkt.

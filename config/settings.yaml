@@ -242,6 +242,19 @@ lieferzeit_radar_aktiv: true
 # verliert Vertrauen.
 ct_radar_aktiv: true
 
+# ---------------------------------------------------------------------------
+# Tarif-Datenbank (src/telco_radar/collect/tarif_crawler.py +
+# config/tarif_quellen.yaml)
+#
+# Ab hier ist Telco Radar kein Nachrichtenprodukt mehr, sondern ein
+# Analysewerkzeug: nicht "Anbieter X hat etwas angekuendigt", sondern
+# "Anbieter X verlangt 59,95 € bei 80 GB, und vor vier Wochen waren es 100".
+#
+# Es wird ausschliesslich abgerufen, was auf einer konfigurierten Seite
+# VERLINKT ist. Keine hochgezaehlten Blob-IDs - die Grenze zu § 87b UrhG
+# ist genau dort, und ein Test haelt sie.
+tarif_radar_aktiv: true
+
 versand:
   mail_aktiv: true
   teams_aktiv: true
