@@ -18,6 +18,7 @@ from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
 from . import differenzierung_view
+from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
 from . import seit as seit_mod
 from . import suchindex
@@ -1335,6 +1336,28 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             seit=seit_mod.fuer_wettbewerb(wettbewerb_view,
                                           wettbewerb_view["stand"]),
             date_de=_fmt_date_de(wettbewerb_view["stand"])),
+        encoding="utf-8")
+
+    # ---- Lieferzeiten: die einzige Frage dieses Portals, zu der es sonst
+    # NIRGENDS eine Antwort gibt - es existiert keine oeffentliche Studie, die
+    # Lieferzeiten der deutschen Anbieter systematisch vergleicht. Die Seite
+    # entsteht wie die Wettbewerbsseite beim Rendern, aus dem Speicher, den
+    # die Sammelstufe gefuellt hat (collect/lieferzeit.py).
+    from ..collect.lieferzeit import lade_warenkorb
+    lieferzeit_daten: dict = {}
+    lieferzeit_pfad = state_dir / "lieferzeit.json"
+    if lieferzeit_pfad.exists():
+        try:
+            lieferzeit_daten = json.loads(
+                lieferzeit_pfad.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            log.warning("lieferzeit.json unlesbar - rendere leere Seite")
+    lieferzeit_view = lieferzeit_view_mod.aufbereiten(
+        lieferzeit_daten, lade_warenkorb(reports_dir.parent.parent),
+        heute=latest["date"] if latest else "")
+    (site_dir / "lieferzeit.html").write_text(
+        env.get_template("lieferzeit.html.j2").render(
+            prefix="", lieferzeit=lieferzeit_view),
         encoding="utf-8")
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.

@@ -1552,3 +1552,46 @@ b,strong{font-weight:700}
   body{background:#fff;font-size:11pt}
   .prose{max-width:none;columns:2;column-gap:28px}
 }
+
+/* ==============================================  LIEFERZEIT-RADAR ======= */
+/* Eine Tabelle, weil es um Vergleichbarkeit ueber Zeilen und Spalten geht -
+   nicht um Gewichtung. Jede Zelle traegt ihre eigene Gegenprobe mit:
+   Originaltext, Messzeitpunkt, Belegstufe. Es gibt keine oeffentliche
+   Quelle, gegen die jemand diese Zahlen pruefen koennte; also liefert die
+   Seite den Beleg gleich mit. */
+.lz-tabelle{margin:26px 0 34px;border-top:3px solid var(--rule-ink)}
+.lz-kopf,.lz-zeile{display:grid;
+  grid-template-columns:minmax(160px,1.1fr) repeat(auto-fit,minmax(150px,1fr));
+  gap:0 18px;align-items:start}
+.lz-kopf{padding:9px 0;border-bottom:1px solid var(--rule);
+  font-family:var(--sans);font-size:10.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4)}
+.lz-zeile{padding:14px 0;border-bottom:1px solid var(--rule-2)}
+.lz-produkt b{font-family:var(--serif);font-size:17px;display:block}
+.lz-produkt i{font-family:var(--sans);font-size:11px;font-style:normal;
+  color:var(--ink-4)}
+.lz-feld{display:block}
+.lz-wert{font-family:var(--serif);font-size:19px;font-weight:700;
+  display:block;color:var(--ink)}
+.lz-wert.lz-sofort{color:#2f6b3a}
+.lz-wert.lz-verzoegert{color:var(--r4)}
+.lz-wert.lz-nein{color:var(--red)}
+.lz-roh{display:block;font-family:var(--sans);font-size:11px;
+  color:var(--ink-3);margin-top:2px}
+.lz-quelle{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4);margin-top:3px}
+.lz-quelle a{color:var(--ink-3)}
+.lz-leer{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.lz-engpass{border-left:2px solid var(--red);padding-left:10px}
+.lz-verlauf{display:flex;gap:3px;margin-top:6px}
+.lz-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
+  display:inline-block}
+.lz-punkt.lz-sofort{background:#2f6b3a}
+.lz-punkt.lz-verzoegert{background:var(--r4)}
+.lz-punkt.lz-nein{background:var(--red)}
+.lz-grenzen{margin:34px 0}
+@media (max-width:760px){
+  .lz-kopf{display:none}
+  .lz-zeile{grid-template-columns:1fr;gap:10px}
+  .lz-feld::before{content:attr(data-anbieter)}
+}

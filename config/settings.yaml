@@ -219,6 +219,16 @@ ctm_belegpruefung: true
 # Pipeline.
 aenderungsradar_aktiv: true
 
+# ---------------------------------------------------------------------------
+# Lieferzeit-Radar (src/telco_radar/collect/lieferzeit.py +
+# config/lieferzeit_warenkorb.yaml)
+#
+# Es existiert KEINE oeffentliche Studie, die Lieferzeiten der deutschen
+# Telko-Anbieter systematisch vergleicht. Was hier entsteht, ist deshalb
+# Eigenwissen - und der Grund, warum die Seite ihre eigene Gegenprobe
+# mitliefert: Originaltext, Methode, Belastbarkeit, Messzeitpunkt.
+lieferzeit_radar_aktiv: true
+
 versand:
   mail_aktiv: true
   teams_aktiv: true

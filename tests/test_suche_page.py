@@ -80,11 +80,17 @@ def test_topbar_formular_zeigt_auf_die_suchseite(tmp_path):
     assert 'id="gsearch-input"' not in suche
 
 
-def test_navigation_hat_fuenf_eintraege(tmp_path):
+def test_navigation_hat_sechs_eintraege(tmp_path):
     """Sieben Unterseiten fuer eine Frage waren der Befund; vier waren das
     Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Seit dem 08.08.2026
-    sind es fuenf: "Wettbewerb" beantwortet eine eigene Frage, die keine der
-    vier beantwortet - was Telekom, O2 und 1&1 ueber die Wochen tun."""
+    sind es sechs: "Wettbewerb" beantwortet eine eigene Frage, die keine der
+    vier beantwortet (was Telekom, O2 und 1&1 ueber die Wochen tun), und
+    "Lieferzeiten" die einzige, zu der es sonst NIRGENDS eine Antwort gibt -
+    es existiert keine oeffentliche Studie, die Lieferzeiten der deutschen
+    Anbieter systematisch vergleicht.
+
+    Die Zahl steht hier absichtlich hart: eine Navigation waechst sonst
+    zurueck auf sieben Eintraege, und genau davon kam dieses Projekt."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -94,12 +100,12 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     nav = html.split('aria-label="Marktrecherche"')[1].split("</nav>")[0]
     for ziel in ("index.html", "meldungen.html", "differenzierung.html",
-                 "wettbewerb.html", "transparenz.html"):
+                 "wettbewerb.html", "lieferzeit.html", "transparenz.html"):
         assert f'href="{ziel}"' in nav
     # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
-    assert nav.count("<a ") == 5
+    assert nav.count("<a ") == 6
     # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen.
     for weg in ("bericht.html", "archive.html", "sources.html",
                 "protokoll.html", "wettbewerber.html", "suche.html"):

@@ -1,0 +1,106 @@
+{# Lieferzeit-Radar.
+
+   Es gibt keine oeffentliche Studie, gegen die jemand diese Zahlen
+   gegenpruefen koennte. Genau deshalb liefert die Seite ihre eigene
+   Gegenprobe mit: den Originaltext der Quelle, die Methode, mit der er
+   gelesen wurde, den Messzeitpunkt und die Grenzen der Messung.
+
+   Was in Quarantaene steht (unplausibler Wert, Platzhalter statt Zahl, keine
+   Angabe gefunden), erscheint hier NICHT. Eine Zahl ohne Beleg ist auf dieser
+   Seite schlimmer als eine Luecke. #}
+{% extends "base.html.j2" %}
+{% set active = 'lieferzeit' %}
+{% block title %}Vodafone Insights · Lieferzeiten{% endblock %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Logistik</p>
+      <h1>Wie lange die anderen liefern.</h1>
+    </div>
+    {% if lieferzeit.stand %}<span class="page-date">Stand {{ lieferzeit.stand }}</span>{% endif %}
+  </div>
+  <p class="page-lead">Ein fester Warenkorb, immer dieselben Varianten, immer
+  dieselbe Postleitzahl – zweimal die Woche gemessen. Was ein Anbieter auf
+  seiner eigenen Produktseite über Verfügbarkeit und Lieferzeit sagt, mit
+  Originaltext und Zeitpunkt.</p>
+</section>
+
+{% if lieferzeit.aktiv %}
+<div class="lz-tabelle">
+  <div class="lz-kopf">
+    <span class="lz-produkt">Produkt</span>
+    {% for a in lieferzeit.anbieter %}<span class="lz-feld">{{ a }}</span>{% endfor %}
+  </div>
+  {% for z in lieferzeit.zeilen %}
+  <div class="lz-zeile">
+    <span class="lz-produkt">
+      <b>{{ z.produkt }}</b>
+      {% if z.variante %}<i>{{ z.variante }}</i>{% endif %}
+    </span>
+    {% for f in z.felder %}
+    <span class="lz-feld{% if f.engpass %} lz-engpass{% endif %}">
+      {% if f.hat_wert %}
+      <span class="lz-wert lz-{{ f.lage }}">{{ f.text }}</span>
+      {% if f.roh %}<span class="lz-roh">„{{ f.roh }}“</span>{% endif %}
+      <span class="lz-quelle">{{ f.gemessen }} · Beleg: {{ f.belastbarkeit }}{% if f.url %} ·
+        <a href="{{ f.url }}" target="_blank" rel="noopener">Seite</a>{% endif %}</span>
+      {% if f.verlauf | length > 1 %}
+      <span class="lz-verlauf">
+        {% for p in f.verlauf %}<i class="lz-punkt lz-{{ p.lage }}" title="{{ p.datum }}: {{ p.tage }} Tage"></i>{% endfor %}
+      </span>
+      {% endif %}
+      {% else %}
+      <span class="lz-leer">nicht erfasst</span>
+      {% endif %}
+    </span>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+{# Die Grenzen der Messung. Sie stehen NICHT im Kleingedruckten, sondern
+   direkt unter der Tabelle: eine Lieferzeit ohne ihre Randbedingungen ist
+   keine Zahl, sondern eine Behauptung. #}
+<section class="lz-grenzen">
+  <div class="rubrik"><h2>Was diese Zahlen sind – und was nicht</h2></div>
+  <div class="rowtable">
+    <div class="rowtable-row">
+      <span class="col-region">Gemessen wird</span>
+      <span class="col-flex">die Angabe auf der öffentlichen Produktseite,
+        Postleitzahl {{ lieferzeit.test_plz }}, ohne Anmeldung – also der
+        Listenpreis-Fall, nicht der Bestandskundenfall.</span>
+    </div>
+    <div class="rowtable-row">
+      <span class="col-region">Nicht gemessen wird</span>
+      <span class="col-flex">die tatsächlich eingetroffene Sendung. Zwischen
+        Bestellung und Aktivierung liegt bei den meisten Anbietern ein
+        Ident-Verfahren, und wo Gerät und SIM getrennt verschickt werden,
+        bestimmt der spätere der beiden den Start.</span>
+    </div>
+    {% for m in lieferzeit.meta %}
+    <div class="rowtable-row">
+      <span class="col-region">{{ m.anbieter }}</span>
+      <span class="col-flex">{% if m.ident %}Ident: {{ m.ident }}{% endif %}{%
+        if m.getrennte_sendung %} · Gerät und SIM getrennt{% endif %}</span>
+    </div>
+    {% endfor %}
+    <div class="rowtable-row">
+      <span class="col-region">Belegstufe</span>
+      <span class="col-flex">„hoch“ = strukturierte Angabe der Seite
+        (schema.org), „mittel“ = benannter Seitenbereich, „niedrig“ = aus dem
+        Fließtext gelesen. Was sich nicht belegen ließ, steht hier gar
+        nicht{% if lieferzeit.n_quarantaene %} – aktuell
+        {{ lieferzeit.n_quarantaene }} Messungen in Quarantäne{% endif %}.</span>
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="lz-grenzen">
+  <p class="page-lead">Noch keine Messung. Der Warenkorb steht in
+  <code>config/lieferzeit_warenkorb.yaml</code>; die erste Messung legt die
+  Grundlinie, ab der zweiten entsteht ein Verlauf.</p>
+</section>
+{% endif %}
+{% endblock %}

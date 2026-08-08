@@ -290,6 +290,20 @@ def run(root: Path, use_llm: bool | None = None,
     # eine eigene `id` (aus URL plus Inhalt der Aenderung), sonst haette der
     # Seen-Store die zweite Preisaenderung derselben Seite fuer eine schon
     # berichtete gehalten. Failsafe: bricht den Lauf nie ab.
+    # ---------------------------------------------------- Lieferzeit-Radar
+    # Es existiert keine oeffentliche Studie, die Lieferzeiten der deutschen
+    # Anbieter systematisch vergleicht. Was hier entsteht, ist Eigenwissen -
+    # und deshalb eine eigene Stufe mit eigenem Speicher, nicht eine weitere
+    # Quelle. Failsafe wie alle Nebenstufen.
+    lieferzeit_bilanz: dict = {}
+    if cfg.settings.get("lieferzeit_radar_aktiv", True):
+        try:
+            from .collect import lieferzeit as lieferzeit_radar
+            lieferzeit_bilanz = lieferzeit_radar.sammle(
+                root, cfg.settings.get("http", {}))
+        except Exception as exc:  # noqa: BLE001
+            log.error("Lieferzeit-Radar uebersprungen: %s", exc)
+
     aenderungs_bilanz: dict = {}
     if cfg.settings.get("aenderungsradar_aktiv", True):
         try:
@@ -812,6 +826,9 @@ def run(root: Path, use_llm: bool | None = None,
         # Aenderungsradar: was still auf einer Tarifseite anders wurde.
         "tarif_seiten": aenderungs_bilanz.get("gelesen", 0),
         "tarif_aenderungen": aenderungs_bilanz.get("geaendert", 0),
+        # Lieferzeit-Radar: gemessene Punkte des Warenkorbs.
+        "lieferzeit_gemessen": lieferzeit_bilanz.get("gemessen", 0),
+        "lieferzeit_engpaesse": len(lieferzeit_bilanz.get("engpaesse") or []),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),

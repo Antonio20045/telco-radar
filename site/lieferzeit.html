@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vodafone Insights · Lieferzeiten</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="logo.png">
+</head>
+<body class="uc-markt">
+  
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Vodafone Insights">
+        <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
+      </a>
+      <div class="topbar-right">
+        <nav class="usecases" aria-label="Anwendungsfälle">
+          <a class="uc active" href="index.html">Marktrecherche</a>
+          <a class="uc " href="promo/index.html">Promo Übersicht</a>
+        </nav>
+        
+        
+        <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
+                 placeholder="Im Archiv suchen …"
+                 aria-label="Marktrecherche durchsuchen">
+          <button type="submit" class="gsearch-btn" aria-label="Suchen">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
+              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </form>
+        
+      </div>
+    </div>
+    
+    
+    
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="index.html" >Diese Woche</a>
+      <a href="meldungen.html" >Meldungen</a>
+      <a href="differenzierung.html" >Differenzierung</a>
+      <a href="wettbewerb.html" >Wettbewerb</a>
+      
+      <a href="lieferzeit.html" class="on">Lieferzeiten</a>
+      <a href="transparenz.html" >Quellen</a>
+    </nav>
+    
+  </header>
+  <main>
+    <div class="wrap">
+      
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Logistik</p>
+      <h1>Wie lange die anderen liefern.</h1>
+    </div>
+    <span class="page-date">Stand 2026-08-07</span>
+  </div>
+  <p class="page-lead">Ein fester Warenkorb, immer dieselben Varianten, immer
+  dieselbe Postleitzahl – zweimal die Woche gemessen. Was ein Anbieter auf
+  seiner eigenen Produktseite über Verfügbarkeit und Lieferzeit sagt, mit
+  Originaltext und Zeitpunkt.</p>
+</section>
+
+
+<section class="lz-grenzen">
+  <p class="page-lead">Noch keine Messung. Der Warenkorb steht in
+  <code>config/lieferzeit_warenkorb.yaml</code>; die erste Messung legt die
+  Grundlinie, ab der zweiten entsteht ein Verlauf.</p>
+</section>
+
+
+    </div>
+  </main>
+  <footer class="foot">
+    <div class="foot-inner">
+      Vodafone Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+    </div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
