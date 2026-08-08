@@ -1,0 +1,32 @@
+{# "Was sich seit der letzten Ausgabe geändert hat" - die Spalte neben dem
+   Seitenkopf.
+
+   Sie schliesst eine gemessene Lücke: auf `wettbewerb`, `differenzierung` und
+   `promo` stand im Desktop-Aufmass vom 08.08.2026 in einem sonst leeren
+   Drittel nur "Stand 7. August 2026". Das ist der beste Platz der Seite -
+   direkt neben der Überschrift, oberhalb jeder Falz - und er trug eine
+   Datumszeile.
+
+   Was dort hingehört, beantwortet die Frage, mit der jemand eine Dauerseite
+   zum zweiten Mal aufschlägt: nicht "was steht hier?", sondern "was ist neu,
+   seit ich zuletzt hier war?". Deshalb Zahlen und höchstens drei Zeilen, jede
+   mit Sprungziel auf der Seite selbst.
+
+   Bleibt `seit` leer, rendert der Block gar nichts - dann steht dort wie
+   bisher nur der Stand, und das ist ehrlicher als eine Zeile "keine
+   Änderungen", die jede Woche gleich aussieht. #}
+{% macro seit_block(seit, date_de) %}
+{% if seit and seit.zeilen %}
+<aside class="seit">
+  <p class="seit-kopf">Neu seit der letzten Ausgabe</p>
+  <ul class="seit-liste">
+    {% for z in seit.zeilen %}
+    <li><a href="{{ z.anker }}"><b>{{ z.n }}</b> {{ z.text }}</a></li>
+    {% endfor %}
+  </ul>
+  {% if date_de %}<p class="seit-stand">Stand {{ date_de }}</p>{% endif %}
+</aside>
+{% elif date_de %}
+<span class="page-date">Stand {{ date_de }}</span>
+{% endif %}
+{% endmacro %}

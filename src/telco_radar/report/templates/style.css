@@ -99,6 +99,30 @@ b,strong{font-weight:700}
 .subnav a:hover{color:var(--red)}
 .subnav a.on{color:var(--red)}
 .subbar::-webkit-scrollbar{display:none}
+/* Bei 390 px endet die Navigation mitten im Wort ("DIFFERENZIER…"), ohne
+   dass irgendetwas verraet, dass sie seitlich weitergeht - gemessen am
+   08.08.2026 im Mobilaufmass. Ein weicher Rand rechts sagt es, ohne einen
+   Satz dafuer zu brauchen: er ist genau dann da, wenn noch etwas kommt.
+   `background-attachment:local` macht das - die zweite Flaeche haengt am
+   Inhalt, die aeussere am Rahmen, und beide loeschen sich am Ende der
+   Scrollstrecke gegenseitig aus.
+
+   Der Umbruch in zwei Zeilen waere die Alternative gewesen; er kostet aber
+   auf jedem Geraet eine Zeile Hoehe, damit auf einem die Andeutung stimmt. */
+@media (max-width:760px){
+  .subbar{
+    background-image:
+      linear-gradient(to right, var(--paper), var(--paper)),
+      linear-gradient(to left, var(--paper), var(--paper)),
+      linear-gradient(to right, rgba(20,18,15,.16), rgba(20,18,15,0)),
+      linear-gradient(to left, rgba(20,18,15,.16), rgba(20,18,15,0));
+    background-position:left center,right center,left center,right center;
+    background-repeat:no-repeat;
+    background-size:22px 100%,22px 100%,14px 100%,14px 100%;
+    background-attachment:local,local,scroll,scroll;
+  }
+  .subnav a{padding:11px 14px}
+}
 
 
 /* Suche: eine Linie, kein Feld. */
@@ -406,6 +430,24 @@ b,strong{font-weight:700}
   font-size:clamp(34px,5.2vw,58px);line-height:1.03;letter-spacing:-.022em;
   color:var(--ink);max-width:16ch}
 .page-hero.wide h1{max-width:20ch}
+
+/* "Neu seit der letzten Ausgabe" - die Spalte neben der Ueberschrift der
+   Dauerseiten. Sie ersetzt eine einzelne Datumszeile in einem sonst leeren
+   Drittel (report/seit.py). Rechtsbuendig und schmal: sie soll die
+   Ueberschrift nicht bedraengen, sondern die Zeile darunter fuellen. */
+.seit{text-align:right;max-width:260px;font-family:var(--sans)}
+.seit-kopf{margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-4)}
+.seit-liste{list-style:none;margin:0;padding:0;
+  border-top:1px solid var(--rule-2)}
+.seit-liste li{border-bottom:1px solid var(--rule-2)}
+.seit-liste a{display:block;padding:5px 0;font-size:12.5px;color:var(--ink-2)}
+.seit-liste a:hover{color:var(--red)}
+.seit-liste b{font-family:var(--serif);font-size:16px;color:var(--ink)}
+.seit-stand{margin:7px 0 0;font-size:10.5px;color:var(--ink-4)}
+@media (max-width:760px){
+  .seit{text-align:left;max-width:none;margin-top:14px}
+}
 .page-date{font-family:var(--sans);font-size:10.5px;font-weight:700;
   text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
   white-space:nowrap;padding-bottom:6px}

@@ -111,6 +111,18 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || secrets.ANTHROPIC }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          # Push statt Pull (src/telco_radar/versand.py). Fehlen diese
+          # Secrets, verschickt der Lauf nichts und schreibt den Grund ins
+          # Laufprotokoll - er scheitert deswegen nicht. Genau deshalb stehen
+          # sie hier ohne Bedingung: ein leeres Secret ist ein leerer String,
+          # und den erkennt versand.py.
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
           PYTHONPATH: src
         run: |
           set -o pipefail

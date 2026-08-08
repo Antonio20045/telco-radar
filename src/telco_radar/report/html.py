@@ -18,6 +18,7 @@ from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
 from . import differenzierung_view
+from . import seit as seit_mod
 from . import suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
@@ -1146,6 +1147,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
             prefix="", diff=diff,
+            # Neben der Ueberschrift stand bis zum 08.08.2026 in einem sonst
+            # leeren Drittel nur "Stand 7. August 2026" - der beste Platz der
+            # Seite mit einer Datumszeile belegt (report/seit.py).
+            seit=seit_mod.fuer_differenzierung(diff),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             diff_lage_html=_md_to_html(diff_teile["lage"])
             if diff_teile["lage"] else "",
@@ -1249,6 +1254,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             env.get_template("promo_index.html.j2").render(
                 prefix="../", date_de=_fmt_date_de(promo_updated),
                 promo_view=promo_view,
+                seit=seit_mod.fuer_promo(promo_view),
                 promo_report_html=_md_to_html(promo_report["briefing_md"])
                 if promo_report else "",
                 promo_report_date=_fmt_date_de(promo_report["date"])
@@ -1319,6 +1325,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "wettbewerb.html").write_text(
         env.get_template("wettbewerb.html.j2").render(
             prefix="", wettbewerb=wettbewerb_view,
+            seit=seit_mod.fuer_wettbewerb(wettbewerb_view,
+                                          wettbewerb_view["stand"]),
             date_de=_fmt_date_de(wettbewerb_view["stand"])),
         encoding="utf-8")
 

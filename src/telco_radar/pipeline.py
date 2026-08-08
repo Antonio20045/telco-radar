@@ -895,6 +895,22 @@ def run(root: Path, use_llm: bool | None = None,
     except Exception as exc:  # noqa: BLE001
         log.error("Bilder-Aufraeumen fehlgeschlagen: %s", exc)
     render_site(root / "site", reports_dir, cfg)
+
+    # ------------------------------------------------------------- Versand
+    # Ganz zuletzt und failsafe: eine Mail, die nicht hinausgeht, ist
+    # aergerlich - ein Lauf, der deshalb keinen Bericht veroeffentlicht,
+    # waere schlimmer. Die Bilanz landet im Laufprotokoll, damit ein stiller
+    # Dauerausfall auffaellt (versand.py verschickt nie stillschweigend
+    # nichts).
+    try:
+        from .versand import versende
+        run_log["versand"] = versende(root, report_json, cfg.settings)
+        json_path.write_text(
+            json.dumps(report_json, ensure_ascii=False, indent=1),
+            encoding="utf-8")
+    except Exception as exc:  # noqa: BLE001
+        log.error("Versand uebersprungen: %s", exc)
+
     return report_path
 
 

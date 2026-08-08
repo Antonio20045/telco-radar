@@ -21,6 +21,7 @@
    Satzbreite und die Lage nur den Kopf. Jede Schlagzeile traegt `szl`
    (CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
+{% from "_seit.html.j2" import seit_block %}
 {% set active = 'wettbewerb' %}
 {% block title %}Marktrecherche · Wettbewerb{% endblock %}
 
@@ -64,7 +65,7 @@
       <p class="page-kicker">Deutschland</p>
       <h1>Der deutsche Wettbewerb.</h1>
     </div>
-    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
+    {{ seit_block(seit, date_de) }}
   </div>
   <p class="page-lead">Was Telekom, O2 und 1&amp;1 gerade tun – und wie es zu dem passt, was in den Wochen davor kam.</p>
   {% if wettbewerb.wettbewerber %}
@@ -74,6 +75,7 @@
   {% endif %}
 </section>
 
+<div id="chronik" style="scroll-margin-top:90px"></div>
 {% for c in wettbewerb.wettbewerber %}
 <section class="wb{% if loop.first %} wb--erste{% endif %}" id="{{ c.anker }}" style="scroll-margin-top:16px">
   {# Der Name traegt den Abschnitt. Als 11,5-px-Etikett stand er kleiner

@@ -40,6 +40,7 @@
    traegt `dzk`: daran haengt der Wahrheitstest, der die Rubrikzahl gegen die
    wirklich gerenderten Beispiele haelt. #}
 {% extends "base.html.j2" %}
+{% from "_seit.html.j2" import seit_block %}
 {% set active = 'differenzierung' %}
 {% block title %}Marktrecherche · Differenzierung{% endblock %}
 
@@ -85,7 +86,7 @@
       <p class="page-kicker">Differenzierung</p>
       <h1>Womit sich Telkos weltweit abheben.</h1>
     </div>
-    {% if date_de %}<span class="page-date">Stand {{ date_de }}</span>{% endif %}
+    {{ seit_block(seit, date_de) }}
   </div>
   {# Der Satz, der die kognitive Arbeit abnimmt: was auf dieser Seite
      ueberhaupt gesammelt wird, an drei Beispielen statt an einer Definition. #}
@@ -103,7 +104,7 @@
 {% endif %}
 
 {% set mb = diff.marktbild %}
-<section class="dz-marktbild">
+<section class="dz-marktbild" id="marktbild" style="scroll-margin-top:90px">
   <div class="rubrik">
     <h2>Das Marktbild</h2>
     <span class="rubrik-zahl">{{ mb.gesamt }} Beispiele</span>
@@ -167,7 +168,7 @@
 </section>
 
 {% if diff.neu %}
-<section class="dz-radar">
+<section class="dz-radar" id="neu" style="scroll-margin-top:90px">
   <div class="rubrik">
     <h2>{% if diff.neu_ist_rueckfall %}Zuletzt nachgeprüft{% else %}Neu auf dem Radar{% endif %}</h2>
   </div>

@@ -30,6 +30,7 @@
 
    Jede Schlagzeile traegt `szl` (Wahrheitstests, siehe CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
+{% from "_seit.html.j2" import seit_block %}
 {% set usecase = 'promo' %}
 {% set active = 'promo_uebersicht' %}
 {% block title %}Promo Übersicht · Wer wirbt gerade womit{% endblock %}
@@ -122,8 +123,13 @@
 {% block content %}
 
 <section class="page-hero wide">
-  <p class="page-kicker">Deutschland · Promo-Aktionen</p>
-  <h1>Wer wirbt gerade womit</h1>
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Promo-Aktionen</p>
+      <h1>Wer wirbt gerade womit</h1>
+    </div>
+    {{ seit_block(seit, date_de) }}
+  </div>
   {% if promo_lead %}<p class="page-lead">{{ promo_lead }}</p>{% endif %}
 </section>
 
@@ -142,6 +148,7 @@
 {% endif %}
 
 {# =========================================================== DIE MARKEN #}
+<div id="marken" style="scroll-margin-top:90px"></div>
 {% for b in promo_view.bloecke %}{{ block(b) }}{% else %}
 <p class="empty-note">Zurzeit ist bei keinem beobachteten Wettbewerber eine Aktion bestätigt.
   Welche Seiten geprüft werden, steht auf der <a href="{{ prefix }}promo/quellen.html">Quellenseite</a>.</p>

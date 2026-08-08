@@ -187,6 +187,34 @@ cluster_max_llm_pruefungen: null
 # Ausschalten heisst: es erscheint gar kein Folgerungssatz (fail closed).
 ctm_belegpruefung: true
 
+# ---------------------------------------------------------------------------
+# Versand (src/telco_radar/versand.py)
+#
+# Bis zum 08.08.2026 war alles an diesem Portal Pull: wer nicht von selbst auf
+# die Seite ging, erfuhr nichts. Das ist die haeufigste Todesursache interner
+# Intelligence-Programme.
+#
+# Zwei Kanaele, zwei Aufgaben:
+#   Mail   feste Kadenz, fester Wochentag, nur der Zwei-Minuten-Pfad plus
+#          Link. Planbar, weiterleitbar, verschwindet nicht im Chatverlauf.
+#   Teams  NUR die Ausnahme (CTM-Stufe 3 UND Prioritaet 5). Die Schwelle ist
+#          bewusst so hoch, dass hoechstens ein bis zwei Meldungen im Monat
+#          durchkommen - bei taeglichem Lauf ist jeder niedrigere Wert
+#          innerhalb von zwei Wochen stummgeschaltet.
+#
+# Zugangsdaten kommen aus der Umgebung, nicht aus dieser Datei:
+#   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, MAIL_FROM, MAIL_TO
+#   TEAMS_WEBHOOK
+# Fehlt eine davon, wird nicht verschickt UND nicht so getan - der Grund
+# steht im Laufprotokoll.
+versand:
+  mail_aktiv: true
+  teams_aktiv: true
+  # Montag=0 ... Sonntag=6. Montag ist der Tag, an dem jemand die Woche
+  # plant; eine Freitagsmail liest niemand mehr.
+  wochentag: 0
+  site_url: "https://telco-radar.onrender.com"
+
 # Parallelitaet der Sammelphase (collect/__init__.py::collect_all).
 # Mit dem Quellen-Ausbau vom 04.08.2026 hat sich die Zahl der Quellen mehr als
 # verdoppelt. Die Sammelphase ist fast reine Wartezeit auf fremde Server, also
