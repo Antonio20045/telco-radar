@@ -54,6 +54,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # pdftotext (poppler-utils) ist die einzige externe Binaerabhaengigkeit
+      # dieses Projekts. Der Tarif-Extraktor braucht sie, und ihr Fehlen sieht
+      # von aussen aus wie "keine Tarifdokumente gefunden": collect/tarif_pdf.py
+      # wirft PDFNichtLesbar, der Sammler zaehlt das als Fehler und laeuft
+      # weiter. Also lieber hier installieren als spaeter im Protokoll suchen.
+      - name: Install poppler-utils (pdftotext)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
       - name: Install Playwright Chromium
         run: python -m playwright install --with-deps chromium
 
