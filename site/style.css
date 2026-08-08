@@ -737,15 +737,32 @@ b,strong{font-weight:700}
 /* ================================  WETTBEWERB (Dauerseite mit Chronik) == */
 /* Telekom, O2 und 1&1 ueber die Wochen. Die Seite hat zwei Ebenen, und die
    zweite traegt sie: oben die Lage in einem Absatz, darunter die CHRONIK -
-   jede Meldung seit Beobachtungsbeginn, nach Monaten. Deshalb ist die
-   Chronikzeile hier die am sorgfaeltigsten gesetzte Form: Tageszahl,
-   Ressort-Etikett, Schlagzeile, Einordnung, Quelle - vier Spalten Rhythmus
-   wie im Terminkalender einer Redaktion. */
+   jede Meldung seit Beobachtungsbeginn, nach Monaten.
+
+   Umbau am 08.08.2026. Die Seite war 6777 px hoch - sieben Bildschirme, und
+   der zweite Wettbewerber begann erst nach dreien. Antonio: "mach Wettbewerb
+   das Layout besser, sodass man nicht so viel runterscrollen muss." Drei
+   Stellschrauben, keine davon streicht Inhalt:
+     1. Die Chronik steht in ZWEI Spalten. Eine Chronikzeile ist schmal
+        gesetzt und braucht keine 1180 px Satzbreite.
+     2. Der laufende Monat zeigt zwoelf Meldungen, der Rest liegt einen
+        Klick tiefer (report/wettbewerb._OFFEN_JE_MONAT).
+     3. Der Themenverlauf reicht drei statt vier Ausgaben zurueck.
+   Dazu traegt der NAME jetzt den Abschnitt, statt als Etikett darueber zu
+   stehen. */
 .wb{margin-top:40px}
 /* Der erste Abschnitt haengt direkt am Seitenkopf - dort ist der Abstand
    schon durch dessen Sprungnavigation gesetzt. */
 .wb--erste{margin-top:6px}
-.wb-rubrik{border-top-width:3px;margin-bottom:16px}
+/* Der Kopf eines Wettbewerbers: Name gross in Serife, die Zahl der Chronik
+   als leises Etikett am rechten Rand. Dieselbe Bauform wie der Markenkopf
+   der Promo Uebersicht (.pmarke-kopf) - beide Seiten beantworten dieselbe
+   Frage "wer", und beide sollen den Namen zuerst zeigen. */
+.wb-kopf{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  margin:0 0 18px;padding-top:9px;border-top:3px solid var(--rule-ink)}
+.wb-name{margin:0;font-family:var(--serif);font-size:clamp(28px,3vw,38px);
+  line-height:1.03;font-weight:700;letter-spacing:-.024em;color:var(--ink)}
+.wb-kopf .rubrik-zahl{margin-left:auto}
 .wb-lage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
   gap:0 34px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
 .wb-lage--einspaltig{grid-template-columns:1fr}
@@ -791,24 +808,44 @@ b,strong{font-weight:700}
   padding-bottom:6px}
 .wb-monat span{margin-left:auto;font-weight:700;color:var(--ink-4);
   font-variant-numeric:lining-nums}
-.wb-liste{list-style:none;margin:0;padding:0}
-.wb-zeile{display:grid;grid-template-columns:34px 132px minmax(0,1fr);
-  gap:0 16px;padding:10px 0;border-bottom:1px solid var(--rule-2)}
-/* Der Tageswechsel bekommt die staerkere Linie. Die Tageszahl steht nur
-   einmal je Tag; ohne diesen Absatz laesen sich zwoelf Meldungen eines
-   Lauftags und die des Vortags als eine einzige Kette. */
-.wb-zeile--tag{border-top:1px solid var(--rule);padding-top:16px}
-.wb-tag{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--ink-4);
-  font-variant-numeric:lining-nums;text-align:right;line-height:1.5}
+/* Zwei Spalten. Eine Chronikzeile traegt eine Schlagzeile und einen Satz -
+   ueber die volle Satzbreite gesetzt verbrauchte sie 86 px Hoehe fuer zwei
+   halbleere Zeilen, und dreissig davon waren 2600 px. */
+.wb-liste{list-style:none;margin:0;padding:0;columns:2;column-gap:40px}
+.wb-zeile{break-inside:avoid;-webkit-column-break-inside:avoid;
+  padding:9px 0 10px;border-bottom:1px solid var(--rule-2)}
+/* Datum, Ressort und Quelle als eine leise Kopfzeile ueber der Schlagzeile.
+   Jede Zeile traegt ihr Datum selbst - in zwei Spalten kann eine
+   Tagesgruppe am Spaltenrand zerreissen (siehe _chronik_eintrag). */
+.wb-zeile-kopf{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  margin-bottom:3px}
+.wb-tag{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  color:var(--ink-4);font-variant-numeric:lining-nums;white-space:nowrap}
 .wb-ressort{font-family:var(--sans);font-size:9px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.09em;color:var(--red);line-height:1.7;
-  overflow:hidden;text-overflow:ellipsis}
-.wb-text{min-width:0;display:flex;flex-direction:column}
-.wb-titel{font-size:16px;line-height:1.32;font-weight:600;color:var(--ink)}
+  text-transform:uppercase;letter-spacing:.09em;color:var(--red);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wb-titel{display:block;font-size:15.5px;line-height:1.3;font-weight:600;
+  color:var(--ink)}
 .wb-titel:hover{color:var(--red)}
-.wb-note{margin-top:4px;font-size:14.5px;line-height:1.45;color:var(--ink-3)}
-.wb-quelle{margin-top:5px;font-family:var(--sans);font-size:9px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+/* Die Einordnung auf zwei Zeilen begrenzt: sie ergaenzt die Schlagzeile, sie
+   ersetzt den Artikel nicht - und drei Zeilen Fliesstext je Chronikeintrag
+   waeren wieder die Hoehe, die diesen Umbau ausgeloest hat. */
+.wb-note{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin-top:3px;font-size:14px;line-height:1.42;
+  color:var(--ink-3)}
+.wb-quelle{margin-left:auto;font-family:var(--sans);font-size:8.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-4);white-space:nowrap}
+/* Der Rest des laufenden Monats. Kein eigener Zaehler in Worten - die Zahl
+   ueber der Liste nennt den ganzen Monat, hier steht nur, wie viele davon
+   noch nicht zu sehen sind. */
+.wb-mehr-monat{margin-top:2px}
+.wb-mehr-monat > summary{list-style:none;cursor:pointer;padding:9px 0;
+  font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+.wb-mehr-monat > summary::-webkit-details-marker{display:none}
+.wb-mehr-monat > summary::after{content:" +"}
+.wb-mehr-monat[open] > summary::after{content:" –"}
 /* Aeltere Monate klappen zu. Ohne das waechst die Seite mit jeder Ausgabe um
    rund 30 Zeilen je Wettbewerber - nach einem Jahr waere sie unlesbar, und
    der laufende Monat, um den es meistens geht, staende ganz oben in einem
@@ -827,9 +864,9 @@ b,strong{font-weight:700}
   .wb-lage{grid-template-columns:1fr;gap:22px 0}
   .wb-aktionen{padding-left:0;border-left:none;padding-top:16px;
     border-top:1px solid var(--rule)}
-  .wb-zeile{grid-template-columns:30px minmax(0,1fr);gap:0 12px}
-  .wb-ressort{grid-column:2;order:-1;line-height:1.5;margin-bottom:2px}
-  .wb-text{grid-column:2}
+  /* Unter 900 px ist eine Spalte 400 px breit - dort trennt die zweite
+     Spalte nicht mehr, sie zerhackt. */
+  .wb-liste{columns:1}
 }
 
 /* ---- der Kurzverweis auf der Titelseite */
@@ -1036,17 +1073,33 @@ b,strong{font-weight:700}
 .lage-zahl{font-family:var(--sans);font-size:9.5px;font-weight:700;
   color:var(--ink-4);white-space:nowrap}
 
-/* ---- der Markenblock: eine Rubrik, ein Raster */
-.pmarke{margin-top:40px}
-.pmarke-rubrik{margin-bottom:16px;border-top-width:3px;
-  border-top-color:var(--c,var(--rule-ink))}
-.pmarke-rubrik h2 a:hover{color:var(--red)}
+/* ---- der Markenblock: ein Markenkopf, ein Raster */
+/* Der Markenname ist die Ueberschrift dieses Blocks und wird auch so
+   gesetzt: Serife, gross, schwarz. Als 11,5-px-Grotesketikett (Stand bis
+   08.08.2026) war er kleiner als jede Schlagzeile unter ihm - auf einer
+   Seite, die nach Anbietern gegliedert ist, das falsche Gewicht. Die Linie
+   darueber traegt weiterhin die Tier-Farbe, sie ordnet ohne zu schreien. */
+.pmarke{margin-top:46px}
+.pmarke-kopf{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  margin:0 0 16px;padding-top:9px;border-top:3px solid var(--c,var(--rule-ink))}
+.pmarke-name{margin:0;font-family:var(--serif);font-size:clamp(26px,2.6vw,34px);
+  line-height:1.05;font-weight:700;letter-spacing:-.022em;color:var(--ink)}
+.pmarke-name a:hover{color:var(--red)}
+.pmarke-zusatz{margin-left:auto;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-4);white-space:nowrap}
 
 /* Vier Spalten, die staerkste Aktion ueber zwei. Damit steht das Gewicht im
    Raster und nicht in einer eigenen Bauform - eine Zeitungsseite entsteht
    aus einem Raster mit Gewichtung (CLAUDE.md §5). */
+/* `align-items:start`: eine Karte ist so hoch wie ihr Inhalt und wird nicht
+   auf die Hoehe der hoechsten ihrer Reihe gedehnt. Gedehnt sass der Fuss
+   einer kurzen Karte am unteren Rand einer fremden Hoehe - zwischen
+   Schlagzeile und Mechanik-Chip klaffte dann eine Handbreit Papier INNERHALB
+   der Karte, und das liest sich als fehlender Inhalt. Jetzt liegt der
+   Zwischenraum zwischen den Karten, wo er hingehoert. */
 .promo-karten{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:24px 26px}
+  gap:24px 26px;align-items:start}
 .pkarte{display:flex;flex-direction:column;min-width:0;
   border-top:1px solid var(--rule);padding-top:10px}
 /* Die staerkste Aktion nimmt zwei Spalten - und mit Motiv auch zwei Zeilen.
@@ -1093,6 +1146,16 @@ b,strong{font-weight:700}
   font-variant-numeric:lining-nums}
 .pk-typo-mechanik{font-family:var(--sans);font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
+/* Dieselbe Kachel im Kartenformat der kleinen Spalten. Sie ist seit dem
+   08.08.2026 der Regelfall und nicht die Ausnahme: von 77 Karten der
+   Ausgabe vom 8.8. hatten 37 kein belegbares Motiv, und leer gelassen
+   rissen sie in jede Rasterzeile eine Luecke. Kleiner gesetzt (die Spalte
+   ist 296 px breit) und mit einer Haarlinie statt der 1px-Linie - sonst
+   traegt eine Reihe aus vier Kacheln mehr Striche als Text. */
+.pk-bild--typo-klein{padding:0 0 8px;border-bottom-color:var(--rule-2)}
+.pk-bild--typo-klein .pk-typo-zahl{font-size:clamp(20px,1.8vw,25px);
+  letter-spacing:-.02em}
+.pk-bild--typo-klein .pk-typo-mechanik{font-size:8.5px;letter-spacing:.09em}
 .pk-titel{font-family:var(--serif);font-size:15.5px;line-height:1.3;
   font-weight:600;letter-spacing:-.01em;color:var(--ink)}
 .pkarte--gross .pk-titel{font-size:24px;line-height:1.16;font-weight:700;
