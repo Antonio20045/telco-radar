@@ -25,6 +25,12 @@
   <div class="tile accent"><b>{{ run.source_summary.ok }} / {{ run.source_summary.empty }} / {{ run.source_summary.failed }}</b><span>ok / leer / fehlgeschlagen</span></div>
   <div class="tile"><b>{{ (run.duration_seconds / 60) | round(1) }} min</b><span>Laufzeit ({{ date_de }})</span></div>
   <div class="tile"><b>{{ report.stats.get('new', '–') }}</b><span>neue Meldungen gelesen</span></div>
+  {# Meldungen und Ereignisse sind zwei Zahlen. Ihr Abstand ist die
+     Mehrfachberichterstattung: drei Fachmedien ueber dieselbe Sache waren bis
+     zum 08.08.2026 drei Meldungen im Bericht (analyze/clustering.py). #}
+  {% if report.stats.get('bundled') %}
+  <div class="tile"><b>{{ report.stats.get('events') }}</b><span>Ereignisse daraus ({{ report.stats.get('bundled') }} Mehrfachmeldungen gebündelt)</span></div>
+  {% endif %}
   <div class="tile tint"><b>{{ n_bewertet }}</b><span>davon relevant</span></div>
 </div>
 {# Bis zum 06.08.2026 stand hier EINE Kachel: "426 neue Meldungen bewertet".

@@ -159,6 +159,23 @@ editor_zweistufig_ab_meldungen: 120
 # How many previously reported topics the editor gets as "do not repeat" memory
 reported_topics_memory: 300
 
+# ---------------------------------------------------------------------------
+# Ereignis-Clustering (src/telco_radar/analyze/clustering.py)
+#
+# Der Seen-Store dedupliziert die URL, nicht das Ereignis. Ohne diese Stufe
+# stand dieselbe Sache aus drei Quellen dreimal auf der Seite - am 07.08.2026
+# belegten zwei Varianten einer rumaenischen Spamfilter-Ankuendigung Platz 2
+# und Platz 5 der Spalte "Was wichtig ist".
+#
+# Die erste Stufe ist deterministisch (Zeitfenster, gemeinsamer Akteur,
+# Wortaehnlichkeit, gemeinsame Zahl) und laeuft immer. Die zweite fragt bei
+# Zweifelsfaellen das Modell - dort landen die Faelle, die in verschiedenen
+# Sprachen berichtet werden und deshalb kaum Woerter teilen.
+cluster_llm_pruefung: true
+# Leer = mit der Meldungsmenge mitwachsend (max(40, Meldungen/4), Deckel 120).
+# Eine Zahl hier setzt eine feste Obergrenze.
+cluster_max_llm_pruefungen: null
+
 # Parallelitaet der Sammelphase (collect/__init__.py::collect_all).
 # Mit dem Quellen-Ausbau vom 04.08.2026 hat sich die Zahl der Quellen mehr als
 # verdoppelt. Die Sammelphase ist fast reine Wartezeit auf fremde Server, also

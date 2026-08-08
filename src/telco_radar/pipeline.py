@@ -18,6 +18,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from .analyze import editor
+from .analyze import clustering
 from .analyze.agents import analyze_region
 from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
@@ -174,6 +175,31 @@ def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
     return bewertete >= schwelle
 
 
+def zu_merkende_meldungen(new_items: list[Item],
+                          vertreter_item_von: dict[str, Item],
+                          ungelesene_meldungen: set[str],
+                          unanalysierte_regionen: set[str]) -> list[Item]:
+    """Welche Meldungen als "gesehen" abgelegt werden duerfen.
+
+    Der Seen-Store ist ein Einbahnschild: was hineingeht, gilt als erledigt
+    und wird nie wieder gesammelt. Zwei Schutzstufen gab es dafuer schon (die
+    komplett ausgefallene Region aus Lauf #64, der einzelne gescheiterte
+    Stapel aus Lauf #67); mit dem Ereignis-Clustering kommt eine dritte dazu.
+
+    Ein BELEG wird nie einzeln bewertet - er haengt an seinem Vertreter. Ohne
+    diese Umleitung waeren gebuendelte Meldungen der teuerste Fall ueberhaupt:
+    der Vertreter kaeme beim naechsten Lauf wieder, seine drei Belege nie, und
+    das Protokoll saehe normal aus. Als eigene Funktion herausgezogen, damit
+    genau das ein Test halten kann.
+    """
+    def gelesen(item: Item) -> bool:
+        chef = vertreter_item_von.get(item.id, item)
+        return (chef.id not in ungelesene_meldungen
+                and chef.region not in unanalysierte_regionen)
+
+    return [i for i in new_items if gelesen(i)]
+
+
 def _sort_key(item: Item):
     """Freshest first; undated items last."""
     pub = item.published
@@ -291,16 +317,69 @@ def run(root: Path, use_llm: bool | None = None,
     log.info("Novelty filter: %d new items (seen store: %d known ids)",
              len(new_items), len(seen))
 
+    # ------------------------------------------------------ Ereignis-Cluster
+    # Der Seen-Store dedupliziert die URL, nicht das EREIGNIS. Drei Fachmedien
+    # ueber dieselbe Sache waren bis zum 08.08.2026 drei Meldungen, drei
+    # Bewertungen und im schlimmsten Fall drei Plaetze auf der Titelseite - in
+    # der Ausgabe vom 07.08. standen zwei Varianten derselben rumaenischen
+    # Spamfilter-Ankuendigung auf Platz 2 und Platz 5 der Spalte "Was wichtig
+    # ist". Hier wird daraus EINE Meldung mit mehreren Belegen.
+    #
+    # Die Reihenfolge ist wichtig: sortiert wird VOR dem Gruppieren nach
+    # Datum absteigend, damit die frischeste Meldung eines Ereignisses es
+    # anfuehrt und die aelteren als Belege darunterstehen.
+    llm_was_explicitly_disabled = use_llm is False
+    if use_llm is None:
+        use_llm = llm_available()
+
+    tk = time.monotonic()
+    cluster_store = clustering.ClusterStore(state_dir / "clusters.jsonl")
+    gruppen = clustering.gruppiere(
+        sorted(new_items, key=_sort_key, reverse=True),
+        model=analyst_model,
+        use_llm=bool(use_llm and cfg.settings.get("cluster_llm_pruefung", True)),
+        max_llm_pruefungen=cfg.settings.get("cluster_max_llm_pruefungen"))
+
+    # Gruppen, deren Ereignis ein frueherer Lauf schon berichtet hat. Das
+    # greift NUR bei praktisch gleicher Ueberschrift innerhalb von 72 Stunden
+    # (clustering.SCHWELLE_SICHER) - also beim Nachdruck derselben Meldung,
+    # nicht bei einer Entwicklung des Themas. Alles darunter bleibt eine
+    # eigene Meldung: eine falsche Verbindung ist schlimmer als keine.
+    jetzt = datetime.now(timezone.utc)
+    nachklapp: list[clustering.Gruppe] = []
+    aktuelle: list[clustering.Gruppe] = []
+    for g in gruppen:
+        if cluster_store.zuordnen(g.vertreter, jetzt) is not None:
+            nachklapp.append(g)
+        else:
+            aktuelle.append(g)
+
+    # Nur der Vertreter geht in die Bewertung; seine Belege haengen an ihm.
+    vertreter_items = [g.vertreter for g in aktuelle]
+    belege_je_url = {g.vertreter.url: g for g in aktuelle}
+    # Wer haengt an wem - fuer den Seen-Store weiter unten. Ein Beleg darf nur
+    # dann als erledigt gelten, wenn SEIN Vertreter wirklich gelesen wurde.
+    vertreter_item_von: dict[str, Item] = {}
+    for g in gruppen:
+        vertreter_item_von[g.vertreter.id] = g.vertreter
+        for m in g.mitglieder:
+            vertreter_item_von[m.id] = g.vertreter
+    zusammengefasst = len(new_items) - len(vertreter_items)
+    phase("Ereignisse buendeln", time.monotonic() - tk,
+          f"{len(vertreter_items)} Ereignisse aus {len(new_items)} Meldungen"
+          + (f", {len(nachklapp)} Nachklapp" if nachklapp else ""))
+    log.info("Ereignis-Cluster: %d Meldungen -> %d Ereignisse (%d gebuendelt, "
+             "%d Nachklapp zu frueher berichteten Ereignissen)",
+             len(new_items), len(vertreter_items), zusammengefasst,
+             len(nachklapp))
+
     items_by_region: dict[str, list[Item]] = defaultdict(list)
-    for item in sorted(new_items, key=_sort_key, reverse=True):
+    for item in sorted(vertreter_items, key=_sort_key, reverse=True):
         items_by_region[item.region].append(item)
     for region_key, region_items in items_by_region.items():
         items_by_region[region_key] = _interleave_by_source(region_items)
 
     # ------------------------------------------------------------- analyze
-    llm_was_explicitly_disabled = use_llm is False
-    if use_llm is None:
-        use_llm = llm_available()
     topics_store = ReportedTopics(
         state_dir / "reported_topics.jsonl",
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
@@ -491,6 +570,16 @@ def run(root: Path, use_llm: bool | None = None,
                 # noch fuer die Meldungen ohne eins die Artikelseite.
                 if getattr(item, "image_url", ""):
                     h.setdefault("image_url", item.image_url)
+                # Die weiteren Quellen desselben Ereignisses. Dass drei
+                # unabhaengige Fachmedien dieselbe Sache melden, ist in der
+                # Regel der bessere Wichtigkeitsindikator als jede
+                # LLM-Einschaetzung - deshalb steht die Zahl an der Meldung
+                # und nicht nur im Protokoll.
+                gruppe = belege_je_url.get(h.get("url", ""))
+                if gruppe is not None and gruppe.mitglieder:
+                    h.setdefault("weitere_quellen", gruppe.belege())
+                    h.setdefault("quellenzahl", gruppe.quellen)
+                    h.setdefault("cluster_id", gruppe.id)
             else:
                 h.setdefault("date", None)
                 h.setdefault("source", "")
@@ -648,6 +737,12 @@ def run(root: Path, use_llm: bool | None = None,
         "sources_failed": n_fail,
         "collected": len(items),
         "new": len(new_items),
+        # Was nach dem Buendeln uebrig bleibt. "new" zaehlt Meldungen,
+        # "events" zaehlt Ereignisse - der Unterschied ist genau die
+        # Mehrfachberichterstattung, die vorher als eigene Meldung durchging.
+        "events": len(vertreter_items),
+        "bundled": zusammengefasst,
+        "followups": len(nachklapp),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
@@ -716,9 +811,14 @@ def run(root: Path, use_llm: bool | None = None,
     # das Anthropic-Guthaben war leer, jeder Analysten-Stapel scheiterte mit
     # HTTP 400, und trotzdem wanderten 223 ungelesene Meldungen in den Store.
     # Beim naechsten Lauf mit Guthaben waeren sie nicht mehr aufgetaucht.
-    zu_merken = [i for i in new_items
-                 if i.region not in unanalysierte_regionen
-                 and i.id not in ungelesene_meldungen]
+    # Ein Beleg haengt am Schicksal SEINES Vertreters: gilt der als ungelesen,
+    # ist es der Beleg auch. Ohne diese Umleitung waeren die zusammengefassten
+    # Meldungen der teuerste Fall ueberhaupt - der Vertreter kaeme im naechsten
+    # Lauf wieder, seine drei Belege nie.
+    zu_merken = zu_merkende_meldungen(
+        new_items, vertreter_item_von, ungelesene_meldungen,
+        unanalysierte_regionen)
+    gemerkt = {i.id for i in zu_merken}
     uebersprungen = len(new_items) - len(zu_merken)
     if uebersprungen:
         log.warning("%d Meldungen NICHT als gesehen markiert (%d Region(en) "
@@ -727,6 +827,11 @@ def run(root: Path, use_llm: bool | None = None,
                     uebersprungen, len(unanalysierte_regionen),
                     len(ungelesene_meldungen))
     seen.add(zu_merken)
+    # Der Ereignis-Speicher merkt sich nur, was auch gelesen wurde - sonst
+    # gaelte ein Ereignis als berichtet, das nie im Bericht stand, und der
+    # naechste Lauf wuerde seine Nachzuegler als Nachklapp verwerfen.
+    cluster_store.merke([g for g in aktuelle if g.vertreter.id in gemerkt],
+                        today_iso)
     # Dieselbe Logik fuer das Themengedaechtnis: Themen aus einem Notfall-
     # Digest als "schon berichtet" abzulegen wuerde die Redaktion daran
     # hindern, sie spaeter richtig zu behandeln.

@@ -77,6 +77,11 @@
         <p class="aufmacher-meta">
           <b>{{ a.operator or a.source_label }}</b>
           <span class="rel-badge r{{ a.relevance }}">Priorität {{ a.relevance }}/5</span>
+          {# Dass mehrere unabhaengige Redaktionen dieselbe Sache melden, ist
+             in der Regel der bessere Wichtigkeitsbeleg als jede
+             Modelleinschaetzung - deshalb steht die Zahl neben der
+             Prioritaet, nicht in einer Fussnote. #}
+          {% if a.quellenzahl and a.quellenzahl > 1 %}<span class="rubrik-zahl">{{ a.quellenzahl }} Quellen</span>{% endif %}
           <a href="{{ a.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
         </p>
       </div>
@@ -91,7 +96,7 @@
       <article class="stueck stueck-mittel{% if not h.image %} ohne-bild{% endif %}">
         <a href="{{ h.url }}" target="_blank" rel="noopener">
           {{ bild(h, 'stueck-bild') }}
-          <span class="stueck-kicker">{{ h.ressort_label }} · {{ h.operator or h.source_label }}</span>
+          <span class="stueck-kicker">{{ h.ressort_label }} · {{ h.operator or h.source_label }}{% if h.quellenzahl and h.quellenzahl > 1 %} · {{ h.quellenzahl }} Quellen{% endif %}</span>
           <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
           {% if h.anriss %}<span class="stueck-anriss">{{ h.anriss }}</span>{% endif %}
         </a>

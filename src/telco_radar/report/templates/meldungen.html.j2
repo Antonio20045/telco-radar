@@ -40,6 +40,15 @@
       <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}{% if h.date %} · {{ h.date }}{% endif %}</span>
     </span>
   </a>
+  {# Die weiteren Quellen desselben Ereignisses. Sie stehen AUSSERHALB des
+     Links darueber - ein Link in einem Link ist kein gueltiges HTML, und die
+     Belege sollen einzeln anklickbar sein. Bis zum 08.08.2026 waren diese
+     Meldungen eigene Zeilen; dass drei Fachmedien dieselbe Sache melden, ist
+     aber keine dreifache Nachricht, sondern eine dreifach belegte. #}
+  {% if h.weitere_quellen %}
+  <p class="mz-belege">Auch berichtet von {% for q in h.weitere_quellen %}<a
+     href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
+  {% endif %}
 </article>
 {% endmacro %}
 
