@@ -451,7 +451,16 @@ def gruppiere(items: list[Item], *, model: str | None = None,
     """
     gruppen: list[Gruppe] = []
     profile: list[_Profil] = []
-    grau: list[tuple[float, int, _Profil]] = []   # (aehnlichkeit, index, profil)
+    # (Rang, ZIELGRUPPE, Profil) - die Gruppe als OBJEKT, nicht als Index.
+    #
+    # Der Index war ein Fehler, und zwar einer, der nur mit Modell auftritt:
+    # die Schleife unten loest zusammengelegte Gruppen mit `gruppen.pop(i)`
+    # auf, und das verschiebt jeden gespeicherten Index oberhalb von i um
+    # eins. Ein spaeterer Zweifelsfall zeigte danach auf die falsche Gruppe -
+    # und wenn genug gepoppt war, ins Leere: Lauf #86 ist mit
+    # "IndexError: list index out of range" gestorben, nachdem die Stufe
+    # lokal nur mit `--no-llm` gelaufen war.
+    grau: list[tuple[float, Gruppe, _Profil]] = []
 
     akteure = _seltene_akteure([akteur_kandidaten(i) for i in items])
 
@@ -474,7 +483,7 @@ def gruppiere(items: list[Item], *, model: str | None = None,
             continue
         if graubester is not None:
             grau.append((_grau_rang(profile[graubester[1]], p, graubester[0]),
-                         graubester[1], p))
+                         gruppen[graubester[1]], p))
         gruppen.append(Gruppe(vertreter=item, akteure=namen))
         profile.append(p)
 
@@ -484,8 +493,13 @@ def gruppiere(items: list[Item], *, model: str | None = None,
         grau.sort(key=lambda t: -t[0])
         zusammengelegt = 0
         gefragt = 0
-        for wert, idx, p in grau[:_deckel(len(items), max_llm_pruefungen)]:
-            ziel = gruppen[idx]
+        for wert, ziel, p in grau[:_deckel(len(items), max_llm_pruefungen)]:
+            # Die Zielgruppe kann in einer frueheren Runde selbst aufgeloest
+            # und in eine andere gehaengt worden sein. Dann ist sie kein
+            # gueltiges Ziel mehr - ihr etwas anzuhaengen hiesse, es in eine
+            # Gruppe zu legen, die niemand mehr zurueckgibt.
+            if not any(g is ziel for g in gruppen):
+                continue
             if len(ziel.mitglieder) + 1 >= MAX_MITGLIEDER:
                 continue
             try:

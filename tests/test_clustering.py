@@ -326,3 +326,74 @@ def test_beleg_faellt_mit_der_region_seines_vertreters():
 def test_belegte_dubletten_der_ausgabe_vom_7_august(fall):
     a, b = fall
     assert len(C.gruppiere([_item(a), _item(b, stunden=5)])) == 1
+
+
+# --------------------------------------------------------------------------- #
+# Der Absturz aus Lauf #86
+# --------------------------------------------------------------------------- #
+
+def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
+    """Lauf #86 starb mit "IndexError: list index out of range".
+
+    Die Zweifelsfaelle merkten sich ihre Zielgruppe als INDEX in `gruppen`.
+    Legt die Modellstufe zwei Gruppen zusammen, entfernt sie eine mit
+    `gruppen.pop(i)` - und das verschiebt jeden gespeicherten Index oberhalb
+    von i um eins. Der naechste Zweifelsfall zeigte dann auf die falsche
+    Gruppe, und wenn genug gepoppt war, ins Leere.
+
+    Lokal war das unsichtbar: die Stufe laeuft nur mit Modell, und alle
+    lokalen Laeufe waren `--no-llm`.
+    """
+    # Zwoelf Themen zu je zwei Meldungen: die Paare liegen im Graubereich,
+    # die Themen untereinander sind verschieden. So bleiben die Gruppen klein
+    # genug, dass MAX_MITGLIEDER die Schleife nicht vorher abwuergt.
+    worte = ["alpha beta gamma delta", "epsilon zeta eta theta",
+             "iota kappa lambda my", "ny xi omikron pi"]
+    items = []
+    for t in range(12):
+        marke = f"Marke{t}"
+        for k in range(2):
+            items.append(Item(
+                title=f"{marke} {worte[k % len(worte)]} thema{t}",
+                url=f"https://x.test/{t}-{k}", source_name="q", operator=marke,
+                published=JETZT - timedelta(hours=t),
+                summary=f"{marke} {worte[(k + 1) % len(worte)]} thema{t}"))
+
+    # Die Reihenfolge der Zweifelsfaelle entscheidet, ob der Fehler auftritt:
+    # es muss zuerst ein FRUEHER Index aufgeloest werden, damit die spaeteren
+    # danebenzeigen. Der echte Rang haengt an den Profilen, hier wird er
+    # deshalb erzwungen.
+    monkeypatch.setattr(C, "_grau_rang",
+                        lambda a, b, w: 1000.0 - abs(hash(a.item.url)) % 1000)
+    monkeypatch.setattr(C, "_frage_modell", lambda a, b, m: True)
+
+    gruppen = C.gruppiere(items, model="m", use_llm=True,
+                                   max_llm_pruefungen=500)
+
+    # Kein Absturz - und jede Meldung ist genau einmal vertreten.
+    gesehen = [g.vertreter.id for g in gruppen] + \
+              [m.id for g in gruppen for m in g.mitglieder]
+    assert len(gesehen) == len(set(gesehen)) == len(items)
+
+
+def test_aufgeloeste_zielgruppe_nimmt_nichts_mehr_auf(monkeypatch):
+    """Eine Gruppe, die selbst schon in eine andere gehaengt wurde, ist kein
+    gueltiges Ziel mehr - sonst landet eine Meldung in einer Gruppe, die
+    niemand zurueckgibt, und ist damit still verschwunden."""
+    worte = ["alpha beta gamma delta", "epsilon zeta eta theta",
+             "iota kappa lambda my"]
+    items = [Item(title=f"Marke{t} {worte[k % len(worte)]} thema{t}",
+                  url=f"https://x.test/{t}-{k}", source_name="q",
+                  operator=f"Marke{t}",
+                  published=JETZT - timedelta(hours=t),
+                  summary=f"Marke{t} {worte[(k + 1) % len(worte)]} thema{t}")
+             for t in range(8) for k in range(3)]
+    monkeypatch.setattr(C, "_frage_modell", lambda a, b, m: True)
+
+    gruppen = C.gruppiere(items, model="m", use_llm=True,
+                                   max_llm_pruefungen=500)
+
+    alle = [g.vertreter.id for g in gruppen] + \
+           [m.id for g in gruppen for m in g.mitglieder]
+    assert len(alle) == len(set(alle)) == len(items), \
+        "eine Meldung ist beim Zusammenlegen verloren gegangen oder doppelt"
