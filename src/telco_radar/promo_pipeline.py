@@ -133,10 +133,16 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         # der der Text gefunden wurde (eine Uebersicht zeigt die Kachel, die
         # Detailseite den Text). promo_bilder.zuordnen() entscheidet ueber
         # Anker und Textnaehe, nicht ueber die Herkunftsseite.
-        bild_kandidaten.setdefault(src_name, []).extend(
-            rec.pop("images", []) +
-            ([{"src": image_url, "anchor": "", "context": "", "hint_w": 0}]
-             if image_url else []))
+        # `page` haelt fest, VON WELCHER Seite ein Kandidat stammt. Stufe 4
+        # der Zuordnung (promo_bilder._seitenmotive) vergibt das Buehnenbild
+        # je Seite; ohne diese Marke bekaeme eine Marke mit sieben Seiten
+        # weiterhin genau ein Motiv.
+        seiten_bilder = rec.pop("images", []) + (
+            [{"src": image_url, "anchor": "", "context": "", "hint_w": 0}]
+            if image_url else [])
+        for kandidat in seiten_bilder:
+            kandidat["page"] = page_url
+        bild_kandidaten.setdefault(src_name, []).extend(seiten_bilder)
         key = snapshot_key(src_name, page_url)
         # Der reine Markenschluessel ist der Stand VOR dem 08.08.2026. Er
         # zaehlt nur fuer die Leitseite und nur so lange, bis der neue
@@ -245,7 +251,9 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         if not sichtbar:
             continue
         try:
-            zuordnung = promo_bilder.zuordnen(sichtbar, kandidaten)
+            zuordnung = promo_bilder.zuordnen(
+                sichtbar, kandidaten,
+                leitseite=by_name[brand].url if brand in by_name else "")
             bilder_bilanz.update(
                 promo_bilder.hole_bilder(zuordnung, db.entries, root))
         except Exception as exc:  # noqa: BLE001

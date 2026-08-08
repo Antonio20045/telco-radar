@@ -111,10 +111,66 @@ def test_logos_verbrauchen_keinen_kandidatenplatz():
     assert zuordnung["a1"]["quellen"] == ["https://marke.test/b/kampagne.jpg"]
 
 
+def test_jede_aktionsseite_vergibt_ihr_eigenes_motiv():
+    """Stufe 4 rechnet je SEITE, nicht je Marke. Bis zum 08.08.2026 bekam
+    eine Marke genau ein Seitenmotiv - die Rechnung von vorgestern, als
+    eine Marke eine einzige Seite hatte. Sie hat jetzt bis zu sieben, und
+    jede bringt ihr eigenes Buehnenbild mit (congstar: 80 Kandidaten ueber
+    vier Seiten, hoechstens ein Motiv)."""
+    handys, prepaid = "https://marke.test/handys", "https://marke.test/prepaid"
+    angebote = [
+        dict(_angebot("a1", url=""), source_url=handys),
+        dict(_angebot("a2", url=""), source_url=handys),
+        dict(_angebot("a3", url=""), source_url=prepaid),
+    ]
+    kandidaten = [
+        dict(_kand("https://marke.test/b/handy.jpg", hint_w=1600), page=handys),
+        dict(_kand("https://marke.test/b/prepaid.jpg", hint_w=1600), page=prepaid),
+    ]
+    zuordnung = promo_bilder.zuordnen(angebote, kandidaten)
+    # Das staerkste Angebot JE SEITE - a2 geht leer aus, sein Seitenmotiv
+    # ist an a1 vergeben.
+    assert sorted(zuordnung) == ["a1", "a3"]
+    assert zuordnung["a1"]["quellen"] == ["https://marke.test/b/handy.jpg"]
+    assert zuordnung["a3"]["quellen"] == ["https://marke.test/b/prepaid.jpg"]
+    assert {z["art"] for z in zuordnung.values()} == {"motiv"}
+
+
+def test_ein_bestandsangebot_ohne_seite_haengt_an_der_leitseite():
+    """Eintraege aus der Zeit vor den Mehrfachseiten tragen kein
+    `source_url`. Sie gehoeren zu der einen Seite, die es damals gab -
+    dieselbe Konvention wie in PromoDB.mark_stale."""
+    leit, extra = "https://marke.test/", "https://marke.test/prepaid"
+    angebote = [_angebot("alt", url=""),
+                dict(_angebot("neu", url=""), source_url=extra)]
+    kandidaten = [
+        dict(_kand("https://marke.test/b/leit.jpg", hint_w=1600), page=leit),
+        dict(_kand("https://marke.test/b/prepaid.jpg", hint_w=1600), page=extra),
+    ]
+    zuordnung = promo_bilder.zuordnen(angebote, kandidaten, leitseite=leit)
+    assert zuordnung["alt"]["quellen"] == ["https://marke.test/b/leit.jpg"]
+    assert zuordnung["neu"]["quellen"] == ["https://marke.test/b/prepaid.jpg"]
+
+
+def test_ein_motiv_wird_nicht_zweimal_vergeben():
+    """Zwei Seiten, die dasselbe Buehnenbild einbinden (eine Uebersicht und
+    ihre Detailseite), duerfen nicht zwei Karten mit demselben Motiv
+    ergeben."""
+    a, b = "https://marke.test/a", "https://marke.test/b"
+    angebote = [dict(_angebot("a1", url=""), source_url=a),
+                dict(_angebot("a2", url=""), source_url=b)]
+    gleich = "https://marke.test/b/buehne.jpg"
+    kandidaten = [dict(_kand(gleich, hint_w=1600), page=a),
+                  dict(_kand(gleich, hint_w=1600), page=b)]
+    zuordnung = promo_bilder.zuordnen(angebote, kandidaten)
+    assert list(zuordnung) == ["a1"]
+
+
 def test_das_seitenmotiv_geht_nur_an_das_staerkste_angebot():
-    """Stufe 4 belegt nur, WOMIT die Marke wirbt - nicht, welches ihrer
-    acht Angebote gemeint ist. Deshalb bekommt es genau eine Karte, und die
-    Karte schreibt es dazu (art="motiv")."""
+    """Ohne Seitenmarke an den Kandidaten (Bestand, Tests) bleibt es bei
+    EINEM Motiv je Marke - es belegt nur, WOMIT die Marke wirbt, nicht
+    welches ihrer acht Angebote gemeint ist. Deshalb bekommt es genau eine
+    Karte, und die Karte schreibt es dazu (art="motiv")."""
     angebote = [_angebot("a1", url=""), _angebot("a2", url=""),
                 _angebot("a3", url="")]
     kandidaten = [_kand("https://marke.test/b/buehne.jpg", hint_w=1600),

@@ -71,6 +71,19 @@ class PromoSource:
     # Menschen als eine reine Online-Zweitmarke, obwohl beide Tier 2 sind.
     # Fehlt das Feld, faellt promo_ranker.reach_axis() auf das Tier zurueck.
     reach: int | None = None
+    # Platz in der Anbieter-Rangfolge (1 = wichtigster). Antonio am
+    # 08.08.2026: "die groessten Anbieter wie Telekom etc. an erster Stelle,
+    # soll also nach Wichtigkeit der Anbieter geordnet werden." Bis dahin
+    # sortierte die Uebersicht die Marken nach dem Score ihrer staerksten
+    # Aktion - eine Rangliste der ANGEBOTE, keine des Marktes: Otelo stand
+    # oben und die Telekom auf Platz zehn, weil ihre JS-Seiten in dem Lauf
+    # nur zwei Angebote hergaben.
+    #
+    # Bewusst ein gepflegtes Feld und keine Rechnung: Marktgewicht steht in
+    # keiner Zahl dieses Projekts. Fehlt es, wird aus tier und reach ein
+    # Rang abgeleitet (siehe report/promo.RANG_UNGESETZT), die Marke faellt
+    # dann hinter jede gepflegte.
+    rang: int | None = None
     # Die WEITEREN Seiten dieser Marke (YAML: `pages:`). Die Leitseite steht
     # NICHT hier drin - sie kommt aus url/kind und wird von `pages` unten
     # vorangestellt. Getrennt gehalten, damit ein Bestandseintrag ohne
@@ -174,6 +187,7 @@ def load_promo_config(root: Path) -> PromoConfig:
             internal_reference=bool(b.get("internal_reference", False)),
             note=b.get("note", ""),
             reach=int(b["reach"]) if str(b.get("reach", "")).strip().isdigit() else None,
+            rang=int(b["rang"]) if str(b.get("rang", "")).strip().isdigit() else None,
             extra_pages=_parse_pages(b.get("pages"), b["url"]),
         )
         for b in (raw.get("brands") or []) if b.get("name") and b.get("url")

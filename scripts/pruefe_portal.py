@@ -18,8 +18,9 @@ Dazu die zwei Kriterien aus AUFTRAG_PORTAL_WELLE2.md §7 (07.08.2026):
   7. Alle Ressorts der Meldungsseite sind ohne Scrollen sichtbar, und alle
      Meldungen sind weiterhin auf der Seite.
   8. Die Promo Uebersicht zeigt >= 10 verschiedene echte Bilder, keines
-     davon leer, und jede Karte oben traegt entweder ein Bild oder eine
-     Schriftkachel - nie einen leeren Kasten.
+     davon leer, und JEDE Karte traegt entweder ein Bild oder eine
+     Schriftkachel - nie einen leeren Kasten (seit 08.08.2026 alle Karten,
+     vorher nur die grossen; siehe Kriterium 8c im Code).
 
 Kriterium 1, 6 und 7 brauchen einen echten Browser - Chromium liegt unter
 /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
@@ -285,23 +286,24 @@ def main() -> int:
         b.prueft(not leer,
                  f"8b. Leere Bilder ausgeliefert: {len(leer)}"
                  + (f" ({', '.join(leer)})" if leer else ""))
-        # 8c: kein leerer Bildkasten. Bis zum 08.08.2026 hiess das "jede
-        # Karte traegt ein Motiv" - damals zeigte die Seite oben je Marke
-        # genau eine Karte, und die hatte immer eins. Seit dem Markenraster
-        # steht jede Aktion als Karte da, und eine kleine ohne belegtes Bild
-        # ist eine reine TEXTkarte: das ist die Absicht, kein Mangel (ein
-        # Kasten je Zeile waere genau das Rauschen, das der Umbau beseitigt).
-        # Geprueft wird deshalb die Sache selbst - (a) die staerkste Aktion
-        # jeder Marke traegt ein Motiv, (b) nirgends steht ein Bildkasten
-        # ohne Inhalt.
-        gross = promo.select(".promo-karten .pkarte--gross")
-        ohne_motiv = [k for k in gross if not k.select_one(".pk-bild")]
+        # 8c: JEDE Karte traegt ein Motiv - ein Kampagnenbild oder eine
+        # Schriftkachel -, und nirgends steht ein leerer Bildkasten.
+        #
+        # Bis zum 08.08.2026 galt das nur fuer die grossen Karten; die
+        # kleinen ohne belegtes Bild waren "reine Textkarten, das ist die
+        # Absicht". Gemessen an der Ausgabe vom 8.8. traf das 37 von 77
+        # Karten, und weil eine Rasterzeile so hoch ist wie ihre hoechste
+        # Karte, stand neben jedem Bild eine handbreite Luecke. Antonio:
+        # "da fehlen bei einigen Aktionen die Bilder, das wirkt so richtig
+        # scheisse." Die Absicht war falsch, das Kriterium hat sie gedeckt.
+        karten = promo.select(".promo-karten .pkarte")
+        ohne_motiv = [k for k in karten if not k.select_one(".pk-bild")]
         leere_kaesten = [kasten for kasten in promo.select(".pk-bild")
                          if not kasten.select_one("img")
-                         and "pk-bild--typo" not in (kasten.get("class") or [])]
-        b.prueft(bool(gross) and not ohne_motiv and not leere_kaesten,
-                 f"8c. Grosse Karten ohne Motiv: {len(ohne_motiv)} von "
-                 f"{len(gross)}, leere Bildkaesten: {len(leere_kaesten)}")
+                         and not kasten.get_text(strip=True)]
+        b.prueft(bool(karten) and not ohne_motiv and not leere_kaesten,
+                 f"8c. Karten ohne Motiv: {len(ohne_motiv)} von "
+                 f"{len(karten)}, leere Bildkaesten: {len(leere_kaesten)}")
 
     _browser_messungen(site, b)
 
