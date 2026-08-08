@@ -278,6 +278,27 @@ def run(root: Path, use_llm: bool | None = None,
     register = Quellenregister(state_dir / "quellen_register.json")
     items, source_results = collect_all(cfg, register=register)
     tag_news_regions(items, cfg.operators)
+
+    # ---------------------------------------------------- Aenderungsradar
+    # Die wichtigsten Preisbewegungen im Endkundengeschaeft werden NIE per
+    # Pressemitteilung kommuniziert: eine geaenderte Option, ein neuer
+    # Anschlusspreis, ein still verschwundener Aktionstarif stehen nur auf der
+    # Tarifseite. Newsmonitoring erwischt das strukturell nicht.
+    #
+    # Die gefundenen Aenderungen gehen als normale Meldungen weiter - durch
+    # Delta-Schicht, Clustering, Analyst, CTM-Linse und Bericht. Sie tragen
+    # eine eigene `id` (aus URL plus Inhalt der Aenderung), sonst haette der
+    # Seen-Store die zweite Preisaenderung derselben Seite fuer eine schon
+    # berichtete gehalten. Failsafe: bricht den Lauf nie ab.
+    aenderungs_bilanz: dict = {}
+    if cfg.settings.get("aenderungsradar_aktiv", True):
+        try:
+            from .collect import aenderungen as aenderungsradar
+            tarif_items, aenderungs_bilanz = aenderungsradar.sammle(
+                root, cfg.settings.get("http", {}))
+            items.extend(tarif_items)
+        except Exception as exc:  # noqa: BLE001
+            log.error("Aenderungsradar uebersprungen: %s", exc)
     failed = [r["url"] for r in source_results if r["status"] == "fail"]
     n_ok = sum(1 for r in source_results if r["status"] == "ok")
     n_empty = sum(1 for r in source_results if r["status"] == "empty")
@@ -788,6 +809,9 @@ def run(root: Path, use_llm: bool | None = None,
         "ctm_saetze": beleg_bilanz.get("belegt", 0),
         "ctm_saetze_verworfen": (ctm_bilanz.get("saetze_verworfen", 0)
                                  + beleg_bilanz.get("verworfen", 0)),
+        # Aenderungsradar: was still auf einer Tarifseite anders wurde.
+        "tarif_seiten": aenderungs_bilanz.get("gelesen", 0),
+        "tarif_aenderungen": aenderungs_bilanz.get("geaendert", 0),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),

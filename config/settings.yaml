@@ -207,6 +207,18 @@ ctm_belegpruefung: true
 #   TEAMS_WEBHOOK
 # Fehlt eine davon, wird nicht verschickt UND nicht so getan - der Grund
 # steht im Laufprotokoll.
+# ---------------------------------------------------------------------------
+# Aenderungsradar (src/telco_radar/collect/aenderungen.py + config/tarif_seiten.yaml)
+#
+# Beobachtet die DAUERTARIFE der Wettbewerber und meldet, wenn sich ein WERT
+# aendert - nicht, wenn sich die Darstellung aendert. Die wichtigsten
+# Preisbewegungen im Endkundengeschaeft kommen ohne Pressemitteilung.
+#
+# Aktionsseiten stehen NICHT hier, sondern in config/promo_sources.yaml: das
+# ist die andere Frage ("womit wirbt jemand gerade?") und hat eine eigene
+# Pipeline.
+aenderungsradar_aktiv: true
+
 versand:
   mail_aktiv: true
   teams_aktiv: true
