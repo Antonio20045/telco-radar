@@ -178,6 +178,67 @@
 </section>
 {% endif %}
 
+{# ========================================================= DER VERLAUF == #}
+{# Bis zum 08.08.2026 zeigte jede Ansicht dieser Seite einen ZUSTAND: "71
+   Beispiele, Entertainment 17, KI 12". Ob KI im Juni noch 4 war, stand
+   nirgends - und genau diese Ableitung ist der Wert einer Datenbank, die
+   seit Juli laeuft.
+
+   Verglichen werden ANTEILE, nicht Zahlen: die Bibliothek waechst, absolute
+   Zahlen zeigten deshalb immer "alles waechst" - eine Aussage ueber die
+   Sammelmenge, nicht ueber den Markt. #}
+{% if verlauf and verlauf.aktiv %}
+<section class="dz-verlauf" id="verlauf" style="scroll-margin-top:90px">
+  <div class="rubrik"><h2>Was wächst, was kippt</h2>
+    <span class="rubrik-zusatz">Anteil an den Aufnahmen des Monats</span></div>
+
+  {% if verlauf.waechst or verlauf.kippt %}
+  <div class="vl-bewegung">
+    {% for e in verlauf.waechst %}
+    <a class="vl-move vl-auf" href="#dz-theme-{{ e.key }}">
+      <span class="vl-move-label">{{ e.label }}</span>
+      <span class="vl-move-delta">+{{ e.delta }} Punkte</span>
+      <span class="vl-move-detail">{{ e.vorher }} % → {{ e.jetzt }} %</span>
+    </a>
+    {% endfor %}
+    {% for e in verlauf.kippt %}
+    <a class="vl-move vl-ab" href="#dz-theme-{{ e.key }}">
+      <span class="vl-move-label">{{ e.label }}</span>
+      <span class="vl-move-delta">{{ e.delta }} Punkte</span>
+      <span class="vl-move-detail">{{ e.vorher }} % → {{ e.jetzt }} %</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="vl-gitter">
+    <div class="vl-kopf">
+      <span class="vl-name"></span>
+      {% for m in verlauf.monate %}<span class="vl-monat{% if not m.belastbar %} vl-duenn{% endif %}">{{ m.label }}</span>{% endfor %}
+    </div>
+    {% for r in verlauf.reihen %}
+    <div class="vl-zeile">
+      <span class="vl-name"><a href="#dz-theme-{{ r.key }}">{{ r.label }}</a></span>
+      {% for p in r.punkte %}
+      <span class="vl-zelle" title="{{ p.label }}: {{ p.n }} Aufnahmen ({{ p.anteil }} %)">
+        <span class="vl-balken" style="height:{{ [p.anteil * 2, 100] | min | round }}%"></span>
+        <span class="vl-zahl">{{ p.n or '' }}</span>
+      </span>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if verlauf.duenne_monate %}
+  <p class="muted-note" style="margin:12px 0 0;max-width:760px">
+    Monate mit weniger als {{ verlauf.mind_je_monat }} Aufnahmen zählen für die
+    Bewegung oben nicht mit ({{ verlauf.duenne_monate | join(', ') }}) – ein
+    Anteil aus zwei Beispielen ist eine Rundung, keine Beobachtung.
+  </p>
+  {% endif %}
+</section>
+{% endif %}
+
 {# ======================================================= WER WAS HAT ==== #}
 {# Die Gegenfrage. Bis zum 08.08.2026 zeigte diese Seite 71 Beispiele und wer
    am breitesten aufgestellt ist - und beantwortete nie die eine Frage, wegen

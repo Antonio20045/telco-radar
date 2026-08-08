@@ -21,6 +21,7 @@ from . import differenzierung_view
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
 from . import seit as seit_mod
+from . import verlauf as verlauf_mod
 from . import suchindex
 from .differentiation import DIFF_THEMES
 from .promo import prepare_promo_view
@@ -1153,6 +1154,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # leeren Drittel nur "Stand 7. August 2026" - der beste Platz der
             # Seite mit einer Datumszeile belegt (report/seit.py).
             seit=seit_mod.fuer_differenzierung(diff),
+            # Was waechst, was kippt - die Zeitachse aus `first_seen`. Kein
+            # neuer Speicher, kein Modellaufruf: das Rohmaterial liegt seit
+            # Juli vor, es hat es nur nie jemand gerechnet.
+            verlauf=verlauf_mod.aufbereiten(diff["bestand"], theme_label_map),
             # Die Gegenfrage: wer hat einen Hebel, den wir nicht haben?
             # Gerechnet gegen eine GEPFLEGTE Liste - nie gegen eine
             # Modellvermutung (report/luecken.py).
