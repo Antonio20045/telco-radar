@@ -1389,6 +1389,24 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             prefix="", lieferzeit=lieferzeit_view),
         encoding="utf-8")
 
+    # ---- Tarife: Effektivpreis und Positionskarte.
+    # Die erste Seite, die nicht aus Meldungen entsteht, sondern aus den
+    # Pflichtdokumenten nach § 1 TK-TransparenzV. Die Punktkoordinaten des
+    # Streudiagramms werden hier gerechnet, nicht im Browser - kein CDN-JS
+    # ist Hausregel, und so ist die Darstellung ohne Browser testbar.
+    from . import tarife_view as tarife_view_mod
+    try:
+        from ..collect.tarif_crawler import lade_quellen as _lade_tarifquellen
+        tarif_quellen = _lade_tarifquellen(reports_dir.parent.parent)
+    except Exception:  # noqa: BLE001 - eine fehlende Config kippt keine Seite
+        tarif_quellen = []
+    tarife = tarife_view_mod.aufbereiten(
+        state_dir / "tarife.jsonl", tarif_quellen,
+        heute=latest["date"] if latest else "")
+    (site_dir / "tarife.html").write_text(
+        env.get_template("tarife.html.j2").render(prefix="", tarife=tarife),
+        encoding="utf-8")
+
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
     # wurden ohnehin nacheinander gelesen.

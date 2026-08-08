@@ -80,6 +80,13 @@
          es existiert keine oeffentliche Studie, die Lieferzeiten der
          deutschen Anbieter systematisch vergleicht. #}
       <a href="{{ prefix }}lieferzeit.html" {% if active=='lieferzeit' %}class="on"{% endif %}>Lieferzeiten</a>
+      {# Seit dem 08.08.2026 sieben, und das ist eine bewusste Ausnahme von
+         der Regel "die Navigation waechst nicht". "Tarife" ist die erste
+         Seite dieses Portals, die nicht aus Meldungen entsteht, sondern aus
+         Daten - und zwar aus den einzigen dieses Marktes, die rechtlich
+         wahrheitsbewehrt sind. Sie beantwortet die Frage, die keine der
+         sechs anderen beantwortet: was kostet was wirklich. #}
+      <a href="{{ prefix }}tarife.html" {% if active=='tarife' %}class="on"{% endif %}>Tarife</a>
       <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Quellen</a>
     </nav>
     {% endif %}

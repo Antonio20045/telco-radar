@@ -1,0 +1,192 @@
+{# Tarife: Effektivpreis und Positionskarte.
+
+   Die erste Seite dieses Portals, die nicht aus Meldungen entsteht, sondern
+   aus Daten - und zwar aus den einzigen Daten dieses Marktes, die rechtlich
+   wahrheitsbewehrt sind (Produktinformationsblatt nach § 1 TK-TransparenzV).
+
+   Das Streudiagramm ist ein gerechnetes SVG, keine Bibliothek. Kein CDN-JS
+   ist Hausregel, und die Koordinaten stehen fertig im Datensatz - damit ist
+   die Darstellung ohne Browser testbar.
+
+   Die Vollstaendigkeitsangabe steht OBEN, nicht als Fussnote: eine
+   Positionskarte mit zwei von sechs Anbietern ist keine Marktuebersicht,
+   und sie darf nicht so aussehen. #}
+{% extends "base.html.j2" %}
+{% set active = 'tarife' %}
+{% block title %}Vodafone Insights · Tarife{% endblock %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Preise</p>
+      <h1>Was ein Tarif wirklich kostet.</h1>
+    </div>
+    {% if tarife.stand %}<span class="page-date">Stand {{ tarife.stand }}</span>{% endif %}
+  </div>
+  <p class="page-lead">„6 Monate 9,99 €, danach 29,99 €“ ist weder 9,99 € noch
+  29,99 €, sondern 24,99 €. Diese Seite rechnet jeden Tarif auf
+  {{ tarife.horizont }} Monate um – Monatsentgelte aller Preisphasen,
+  Anschlusspreis, Gerätezuzahlung, abzüglich Boni – und stellt daneben, was
+  der Preis allein nicht zeigt. Grundlage ist das gesetzlich vorgeschriebene
+  Produktinformationsblatt, nicht die Werbeseite.</p>
+</section>
+
+{% if tarife.hat_daten %}
+{# --- Vollstaendigkeit zuerst. Wer die Karte liest, muss wissen, wie viel
+       Markt darin steckt. #}
+<section class="t-bilanz">
+  <h2 class="rubrik">Wie vollständig ist das</h2>
+  <div class="t-bilanz-reihe">
+    <div class="t-kennzahl">
+      <b>{{ tarife.bilanz.tarife }}</b>
+      <span>Tarife in der Datenbank</span>
+    </div>
+    <div class="t-kennzahl">
+      <b>{{ tarife.bilanz.anbieter }}</b>
+      <span>Anbieter erfasst</span>
+    </div>
+    <div class="t-kennzahl">
+      <b>{{ tarife.bilanz.in_der_karte }}</b>
+      <span>davon in der Karte</span>
+    </div>
+    <div class="t-kennzahl">
+      <b>{{ tarife.bilanz.mit_luecken }}</b>
+      <span>mit bekannten Lücken</span>
+    </div>
+  </div>
+  <p class="t-hinweis">Erfasst: {{ tarife.vorhanden | join(', ') }}.
+  {% if tarife.fehlend %}Konfiguriert, aber ohne Daten:
+  {{ tarife.fehlend | join(', ') }}.{% endif %}
+  Nicht erfasst sind Anbieter, deren Dokumentenverzeichnis erst im Browser
+  entsteht – dort steht im Quelltext kein Link, dem man folgen könnte.
+  Ein fehlender Anbieter heißt nicht, dass er teurer oder billiger ist; er
+  fehlt schlicht.</p>
+</section>
+
+{# --- Die Positionskarte #}
+{% if tarife.karte.hat_daten %}
+<section class="t-karte">
+  <h2 class="rubrik">Wer liegt über dem Üblichen</h2>
+  <p class="t-erklaer">Jeder Punkt ist ein Tarif: nach rechts mehr
+  Datenvolumen, nach oben höherer Effektivpreis.
+  {% if tarife.karte.gerade %}Die Linie ist der Marktdurchschnitt – was ein
+  Tarif bei diesem Volumen üblicherweise kostet. Punkte darüber sind relativ
+  teuer, Punkte darunter relativ günstig.{% endif %}</p>
+
+  <svg class="t-svg" viewBox="0 0 {{ tarife.karte.breite }} {{ tarife.karte.hoehe }}"
+       role="img" aria-label="Streudiagramm: Datenvolumen gegen Effektivpreis">
+    {# Achsen #}
+    <line x1="{{ tarife.karte.rand_l }}" y1="{{ tarife.karte.rand_o }}"
+          x2="{{ tarife.karte.rand_l }}" y2="{{ tarife.karte.hoehe - tarife.karte.rand_u }}"
+          class="t-achse"/>
+    <line x1="{{ tarife.karte.rand_l }}" y1="{{ tarife.karte.hoehe - tarife.karte.rand_u }}"
+          x2="{{ tarife.karte.breite }}" y2="{{ tarife.karte.hoehe - tarife.karte.rand_u }}"
+          class="t-achse"/>
+    {% for t in tarife.karte.y_ticks %}
+    <line x1="{{ tarife.karte.rand_l }}" y1="{{ t.y }}"
+          x2="{{ tarife.karte.breite }}" y2="{{ t.y }}" class="t-raster"/>
+    <text x="{{ tarife.karte.rand_l - 8 }}" y="{{ t.y + 4 }}"
+          class="t-tick" text-anchor="end">{{ t.wert }} €</text>
+    {% endfor %}
+    {% for t in tarife.karte.x_ticks %}
+    <text x="{{ t.x }}" y="{{ tarife.karte.hoehe - tarife.karte.rand_u + 18 }}"
+          class="t-tick" text-anchor="middle">{{ t.wert }}</text>
+    {% endfor %}
+    <text x="{{ tarife.karte.breite }}" y="{{ tarife.karte.hoehe - 6 }}"
+          class="t-achsname" text-anchor="end">Datenvolumen in GB</text>
+
+    {% if tarife.karte.gerade %}
+    <line x1="{{ tarife.karte.gerade.x1 }}" y1="{{ tarife.karte.gerade.y1 }}"
+          x2="{{ tarife.karte.gerade.x2 }}" y2="{{ tarife.karte.gerade.y2 }}"
+          class="t-fair"/>
+    {% endif %}
+
+    {% for p in tarife.karte.punkte %}
+    <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ 7 if p.eigen else 5 }}"
+            class="t-punkt{% if p.eigen %} t-punkt--eigen{% endif %}">
+      <title>{{ p.anbieter }} {{ p.name }} · {{ '%.2f'|format(p.effektiv) }} € effektiv{% if p.ueber_linie is not none %} · {{ '%+.2f'|format(p.ueber_linie) }} € gegenüber dem Üblichen{% endif %}</title>
+    </circle>
+    {% endfor %}
+  </svg>
+
+  <ul class="t-legende">
+    {% for a in tarife.vorhanden %}<li>{{ a }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{# --- Die Tabelle. Immer drei Werte, nie nur der Preis. #}
+<section class="t-liste">
+  <h2 class="rubrik">Jeder Tarif im Einzelnen</h2>
+  <p class="t-erklaer">Der Effektivpreis allein belohnt aggressive Drosselung:
+  ein Tarif mit 5 GB und danach 64 KBit/s ist pro Monat billig und ab dem
+  sechsten Gigabyte unbenutzbar. Deshalb steht hier neben dem Preis immer der
+  Preis je Gigabyte und das, was der Preis nicht zeigt.</p>
+
+  {% for z in tarife.zeilen %}
+  <article class="t-zeile{% if z.eigen %} t-zeile--eigen{% endif %}">
+    <div class="t-kopf">
+      <span class="t-anbieter">{{ z.anbieter }}</span>
+      <h3 class="t-name">
+        {% if z.url %}<a href="{{ z.url }}" rel="noopener">{{ z.name }}</a>
+        {% else %}{{ z.name }}{% endif %}
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>{% if z.effektiv is not none %}{{ '%.2f'|format(z.effektiv) }} €{% else %}—{% endif %}</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>{% if z.unbegrenzt %}unbegrenzt{% elif z.je_gb is not none %}{{ '%.2f'|format(z.je_gb) }} €{% else %}—{% endif %}</b>
+        <i>{% if z.unbegrenzt %}Datenvolumen{% else %}je Gigabyte{% endif %}</i>
+      </span>
+      <span class="t-wert">
+        <b>{% if z.grundgebuehr is not none %}{{ '%.2f'|format(z.grundgebuehr) }} €{% else %}—{% endif %}</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    {% if z.flags %}
+    <ul class="t-flags">
+      {% for f in z.flags %}
+      <li class="t-flag{% if f.gut is true %} t-flag--gut{% elif f.gut is false %} t-flag--schlecht{% endif %}">{{ f.text }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if z.luecken %}
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    {{ z.luecken | join(', ') }}. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+
+<section class="t-grenzen">
+  <h2 class="rubrik">Was diese Zahlen nicht können</h2>
+  <ul>
+    <li>Gerechnet wird auf {{ tarife.horizont }} Monate, auch bei Tarifen ohne
+    Mindestlaufzeit. Nicht weil sie so lange laufen, sondern weil ein
+    Vergleich einen gemeinsamen Nenner braucht – ein Anschlusspreis verteilt
+    sich auf 24 Monate anders als auf einen.</li>
+    <li>Cashback, Wechselboni und Gerätezuzahlungen stehen nicht im
+    Produktinformationsblatt. Wo sie fehlen, steht das an der Zeile – sie
+    werden nicht als null angenommen.</li>
+    <li>Ein Produktinformationsblatt nennt den Listenpreis. Aktionspreise
+    stehen auf der <a href="{{ prefix }}promo/index.html">Promo&nbsp;Übersicht</a>,
+    und die beiden sind absichtlich getrennt.</li>
+    <li>Die Ausgleichsgerade ist eine Beschreibung dieser Punkte, keine
+    Bewertung. Sie sagt, was üblich ist, nicht was richtig ist.</li>
+  </ul>
+</section>
+
+{% else %}
+<section class="t-leer">
+  <h2 class="rubrik">Noch keine Tarife erfasst</h2>
+  <p>Die Tarif-Datenbank füllt sich mit dem ersten vollständigen Lauf. Bis
+  dahin steht hier nichts – eine leere Tabelle ist ehrlicher als eine
+  gefüllte, die nichts belegt.</p>
+</section>
+{% endif %}
+{% endblock %}

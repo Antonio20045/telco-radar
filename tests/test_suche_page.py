@@ -80,7 +80,7 @@ def test_topbar_formular_zeigt_auf_die_suchseite(tmp_path):
     assert 'id="gsearch-input"' not in suche
 
 
-def test_navigation_hat_sechs_eintraege(tmp_path):
+def test_navigation_hat_sieben_eintraege(tmp_path):
     """Sieben Unterseiten fuer eine Frage waren der Befund; vier waren das
     Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Seit dem 08.08.2026
     sind es sechs: "Wettbewerb" beantwortet eine eigene Frage, die keine der
@@ -90,7 +90,19 @@ def test_navigation_hat_sechs_eintraege(tmp_path):
     Anbieter systematisch vergleicht.
 
     Die Zahl steht hier absichtlich hart: eine Navigation waechst sonst
-    zurueck auf sieben Eintraege, und genau davon kam dieses Projekt."""
+    zurueck auf sieben Eintraege, und genau davon kam dieses Projekt.
+
+    Am 08.08.2026 ist sie trotzdem auf SIEBEN erhoeht worden, und das ist
+    eine bewusste Entscheidung, keine Aufweichung. "Tarife" ist die erste
+    Seite dieses Portals, die nicht aus Meldungen entsteht, sondern aus
+    Daten - und zwar aus den einzigen Daten dieses Marktes, die rechtlich
+    wahrheitsbewehrt sind (Produktinformationsblatt nach § 1
+    TK-TransparenzV). Sie beantwortet die Frage, die keine der sechs
+    anderen beantwortet: was kostet was wirklich, und wer liegt ueber dem,
+    was am Markt ueblich ist.
+
+    Wer die achte Seite anlegen will, begruendet sie hier - genau dafuer
+    steht die Zahl hart."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -100,12 +112,13 @@ def test_navigation_hat_sechs_eintraege(tmp_path):
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     nav = html.split('aria-label="Marktrecherche"')[1].split("</nav>")[0]
     for ziel in ("index.html", "meldungen.html", "differenzierung.html",
-                 "wettbewerb.html", "lieferzeit.html", "transparenz.html"):
+                 "wettbewerb.html", "lieferzeit.html", "tarife.html",
+                 "transparenz.html"):
         assert f'href="{ziel}"' in nav
     # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
-    assert nav.count("<a ") == 6
+    assert nav.count("<a ") == 7
     # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen.
     for weg in ("bericht.html", "archive.html", "sources.html",
                 "protokoll.html", "wettbewerber.html", "suche.html"):
