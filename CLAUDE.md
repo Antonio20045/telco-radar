@@ -226,6 +226,19 @@ Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
+**Die Wettbewerbsseite ist am 08.08.2026 auf die halbe Höhe gebracht worden**
+(6777 → 4169 px), weil Antonio drei Bildschirme scrollen musste, bevor der
+zweite Wettbewerber begann. Vier Stellschrauben, keine streicht Inhalt: die
+**Chronik steht zweispaltig** (eine Chronikzeile braucht keine 1180 px
+Satzbreite), der **laufende Monat zeigt zwölf Meldungen** und hält den Rest
+in einem `<details>` bereit (`_OFFEN_JE_MONAT`), die Einordnung unter der
+Schlagzeile ist auf zwei Zeilen begrenzt, der Themenverlauf reicht drei statt
+vier Ausgaben zurück. Der **Name trägt den Abschnitt** (`.wb-kopf`/`.wb-name`,
+Serife 28–38 px, dieselbe Bauform wie `.pmarke-kopf`). Fallstrick der zwei
+Spalten: die alte Regel „Tageszahl nur beim ersten Eintrag ihres Tages"
+**zerreißt am Spaltenumbruch** — oben in Spalte zwei stünden Meldungen ohne
+Datum. Jede Zeile trägt ihr Datum deshalb selbst („7.8.").
+
 **Highlight-Themen** (07.08.2026): erkennt ein Ereignis, zu dem viele
 Meldungen auftreten (Samsung-Fold-Launch, Starlink-Mobilfunknetz), und baut
 dafür eine temporäre Seite im Titelseitensatz. Mechanik in
@@ -316,6 +329,48 @@ jedem Screenshot. Dazu: Motiv-Entdopplung in Seitenreihenfolge
 der Quelle nicht, weil unveränderte Seiten ihre Bilder aus früheren
 Läufen behalten), Banner ab Seitenverhältnis 2,2 ungeschnitten
 (`.pk-bild--banner`), kein Motiv über seine Dateibreite skaliert.
+
+**Vierter Umbau am 08.08.2026, und er korrigiert eine ABSICHT des dritten.**
+Antonio: *„da fehlen bei einigen Aktionen die Bilder, das wirkt so richtig
+scheiße, außerdem will ich die größten Anbieter wie Telekom etc. an erster
+Stelle haben … die Namen der Wettbewerber prominenter, zu dezent."* Gemessen:
+**37 von 77 Karten hatten an der Motivstelle gar nichts.** Der dritte Umbau
+hatte das ausdrücklich so gewollt („eine kleine Karte ohne belegtes Bild ist
+eine reine TEXTkarte: das ist die Absicht, kein Mangel"), und
+`pruefe_portal.py` Kriterium 8c hat die Absicht gedeckt, indem es nur die
+großen Karten prüfte. Weil eine Rasterzeile so hoch ist wie ihre höchste
+Karte, stand neben jedem Bild eine handbreite Lücke. Vier Änderungen
+(Schlussliste `outputs/promo-und-wettbewerb-2026-08-08.md`):
+
+1. **Jede Karte trägt ein Motiv** — Bild oder Schriftkachel. Die Kachel ist
+   nicht der Notnagel für ein fehlendes Bild, sondern die zweite gültige Form
+   einer Karte. Dazu `align-items:start` auf dem Raster: eine kurze Karte wird
+   nicht auf fremde Höhe gedehnt, der Zwischenraum liegt ZWISCHEN den Karten.
+   Kriterium 8c prüft jetzt **alle** Karten.
+2. **Das Seitenmotiv (Stufe 4) rechnet je AKTIONSSEITE, nicht je Marke**
+   (`promo_bilder._seitenmotive`). Das war die Rechnung von vorgestern: seit
+   dem Mehrseiten-Umbau bringt jede der bis zu sieben Seiten ihr eigenes
+   Bühnenbild mit — congstar liefert über vier Seiten 80 Kandidaten und bekam
+   höchstens ein Motiv. Kandidaten tragen dafür `page`, Angebote ohne
+   `source_url` hängen an der Leitseite (Konvention wie `mark_stale`). Über
+   alle statisch abrufbaren Seiten gemessen: **41 → 49 von 77**.
+3. **Die Blöcke stehen nach dem Rang des ANBIETERS** (`rang` in
+   `config/promo_sources.yaml`, gepflegt statt gerechnet). Vorher sortierte
+   der Score der stärksten Aktion — eine Rangliste der Angebote, keine des
+   Marktes, und sie hing an einem Lauf: Otelo auf Platz eins, die Telekom auf
+   Platz zehn, weil deren JS-Seiten an dem Tag zwei Angebote hergaben. Der
+   Score ordnet weiterhin INNERHALB einer Marke.
+4. **Der Markenname trägt den Block**: Serife, 26–34 px, Konzern als Etikett
+   daneben (`.pmarke-kopf`). Als 11,5-px-Etikett war er kleiner gesetzt als
+   jede Schlagzeile unter ihm.
+
+Zwei Befunde nebenbei: `EUR` ohne Wortgrenze schnitt aus „1 Euro einmalig"
+die Kachel „1 Eur", und **Lidl Connect zeigte dieselbe Aktion zweimal**
+(„SMART Tarife" / „SMART-Tarife"). Die Dublettenerkennung des Stores greift
+erst beim nächsten Upsert; was davor entstand, liegt doppelt in der Datenbank.
+`_ohne_dubletten()` fasst solche Zwillinge **beim Rendern** zusammen — gleiche
+Heuristik wie im Store, ohne die Datenbank anzufassen, und das Motiv der
+Dublette erbt die bleibende Karte.
 
 **Eine Marke, mehrere Aktionsseiten** (08.08.2026). Bis dahin hatte jede Marke
 genau EINE URL — und das war die eigentliche Lücke: kein Anbieter zeigt seine
@@ -643,6 +698,21 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (08.08.2026, Antonio direkt): Promo-Seite und
+> Wettbewerbsseite.** Fünf Punkte in einem Auftrag — fehlende Bilder auf der
+> Promo Übersicht („das wirkt so richtig scheiße"), Reihenfolge nach
+> Wichtigkeit der Anbieter, Namen der Wettbewerber prominenter (beide
+> Seiten), Wettbewerbsseite kürzer. Alle erledigt, 673 Tests, alle elf
+> Prüfungen von `pruefe_portal.py` grün. Einzelheiten in §5, Schlussliste
+> `outputs/promo-und-wettbewerb-2026-08-08.md`.
+>
+> **Offen daraus:** nach dem nächsten Actions-Lauf die Zeile
+> `Promo-Bilder:` im Protokoll ansehen — lokal (reines HTTP) bekommen 49 von
+> 77 Angeboten ein Motiv, mit den JS-gerenderten Seiten sollten es mehr
+> sein. Und: die Dubletten in `promo_db.json` werden nur beim Rendern
+> zusammengefasst; sie an der Wurzel zu entfernen wäre eine Datenmigration
+> über den Store, keine Anzeigefrage.
+>
 > **`AUFTRAG_PORTAL_WELLE2.md` ist abgearbeitet** (Schlussliste:
 > `outputs/portal-welle2-2026-08-07.md`).
 >
