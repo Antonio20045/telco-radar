@@ -16,4 +16,10 @@ jobs:
           if [ -z "$HOOK" ]; then echo "RENDER_DEPLOY_HOOK not set"; exit 1; fi
           code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
           echo "Render deploy hook -> HTTP $code"
-          [ "$code" = "200" ] || [ "$code" = "201" ]
+          # 202 gehoert dazu, und das ist keine Grosszuegigkeit: Render
+          # antwortet auf den Deploy-Hook mit "202 Accepted" - der Deploy IST
+          # angenommen, er laeuft nur asynchron. Deploy #78 am 09.08.2026 hat
+          # deshalb "failure" gemeldet, waehrend Render korrekt deployte. Ein
+          # rot gemeldeter Deploy, der in Wahrheit funktioniert, ist teurer
+          # als gar keine Meldung: beim naechsten Mal glaubt sie niemand.
+          [ "$code" = "200" ] || [ "$code" = "201" ] || [ "$code" = "202" ]

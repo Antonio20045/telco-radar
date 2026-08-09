@@ -207,7 +207,11 @@ jobs:
           sleep 15  # let the git push propagate before Render clones
           for attempt in 1 2 3 4 5; do
             code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
-            if [ "$code" = "200" ] || [ "$code" = "201" ]; then
+            # 202 = "Accepted": Render hat den Deploy angenommen und faehrt
+            # ihn asynchron. Ohne diesen Fall lief die Schleife fuenfmal
+            # durch und stiess dabei fuenf Deploys an - fuer einen Hook, der
+            # beim ersten Mal richtig geantwortet hatte.
+            if [ "$code" = "200" ] || [ "$code" = "201" ] || [ "$code" = "202" ]; then
               echo "Render deploy triggered (HTTP $code)"; exit 0
             fi
             echo "Render hook returned HTTP $code (attempt $attempt/5) - retrying in 30s"
