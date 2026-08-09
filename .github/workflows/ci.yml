@@ -16,6 +16,14 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt
+      # Ohne diesen Schritt ueberspringt sich tests/test_falz_browser.py, und
+      # zwar lautlos - ein Skip sieht im Protokoll aus wie ein Erfolg. Genau
+      # dieser Test misst, ob die Schlagzeile der Ausgabe ohne Scrollen
+      # dasteht (1440x900 und 390x844); er gehoert auf die Maschine, die
+      # Merges absichert. Nur Chromium, ohne --with-deps: die Messung laeuft
+      # headless gegen 127.0.0.1 und braucht weder Netz noch Systempakete.
+      - name: Install Chromium for the browser tests
+        run: playwright install chromium
       - name: Run tests
         env:
           PYTHONPATH: src

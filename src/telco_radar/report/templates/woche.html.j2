@@ -42,13 +42,16 @@
   <a href="{{ prefix }}index.html">zur aktuellen Ausgabe</a></p>
 {% endif %}
 
-{# Der Foliensatz. Kein Navigationseintrag: er ist kein Ort zum Lesen,
-   sondern eine Datei zum Mitnehmen - vier Folien im Vodafone-Design, mit
-   der Quellenfolie, die sich nicht abschalten laesst. #}
-{% if report and report.date %}
-<p class="folienlink"><a href="{{ prefix }}folien/{{ report.date }}.html">
-  Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
-{% endif %}
+{# Der Foliensatz stand hier bis zum 09.08.2026, zwischen Subnav und
+   Titelseite. Er steht jetzt am FUSS des Berichts (weiter unten in dieser
+   Datei), und das ist nicht nur eine Abstandsfrage: als erste Zeile der
+   Seite las er sich wie ein achter Navigationspunkt, und er kostete den
+   Platz, um den es beim Rueckbau des Kurzpfads ging - gemessen 1440x900
+   standen mit ihm fuenf Geschichten oberhalb der Falz, ohne ihn acht
+   (scripts/pruefe_portal.py, Kriterium 1).
+
+   Am Berichtsfuss steht er ausserdem an der richtigen Stelle: wer den
+   Bericht gelesen hat, ist der, der ihn am Montag vortraegt. #}
 
 {# ==================================================== DER ROTE FADEN ==== #}
 {# Der Faden ist geblieben, seine Anzeige nicht. `_faden()` sorgt weiterhin
@@ -63,39 +66,12 @@
    derselben Seite ohnehin komplett steht, ist keine Zusammenfassung,
    sondern eine Wiederholung. #}
 
-{# ==================================================== IN ZWEI MINUTEN ==== #}
-{# Der kurze Weg durch die Ausgabe. Er steht VOR dem Aufmacher, nicht als
-   Fazit darunter: wer zwei Minuten hat, soll nicht erst eine Zeitungsseite
-   durchqueren muessen.
-
-   Was hier steht, ist nicht die Zusammenfassung des Berichts (die stuende
-   zwei Bildschirme weiter noch einmal - genau der Fehler, den Antonio am
-   07.08.2026 kassiert hat), sondern eine ANDERE Auswahl nach einem anderen
-   Massstab: Meldungen, die das eigene Portfolio unmittelbar beruehren, je
-   mit dem einen Satz, was sie dafuer bedeuten. Jeder dieser Saetze ist
-   gegen seinen Originaltext geprueft (analyze/faithfulness.py); was nicht
-   belegt war, steht hier nicht.
-
-   Ist die Liste leer, faellt der Kasten weg. Eine Woche ohne direkte
-   Portfoliofrage ist ein Befund, kein Loch, das man fuellt. #}
-{% if zwei_minuten %}
-<section class="kurzpfad">
-  <div class="rubrik"><h2>In zwei Minuten</h2>
-    <span class="rubrik-zusatz">was diese Woche das eigene Portfolio berührt</span></div>
-  <ol class="kurzpfad-liste">
-    {% for h in zwei_minuten %}
-    <li class="kurzpfad-zeile">
-      <p class="kurzpfad-satz">{{ h.ctm_satz }}</p>
-      <p class="kurzpfad-beleg">
-        <span class="kurzpfad-stufe s{{ h.ctm_bezug }}">{{ h.ctm_label }}</span>
-        <b>{{ h.operator or h.source_label }}</b>
-        <a href="{{ h.url }}" target="_blank" rel="noopener">{{ h.schlagzeile }} &nearr;</a>
-      </p>
-    </li>
-    {% endfor %}
-  </ol>
-</section>
-{% endif %}
+{# Der Zwei-Minuten-Pfad stand hier bis zum 09.08.2026, ueber dem Aufmacher.
+   Er hat genau das getan, was ein Kasten an dieser Stelle tut: die
+   Titelseite aus dem ersten Bildschirm gedraengt. Fuenf Eintraege, jeder ein
+   Absatz plus Belegzeile - die Schlagzeile des Aufmachers begann erst
+   darunter. Er steht jetzt in der rechten Spalte ueber "Was wichtig ist"
+   (weiter unten in dieser Datei), kompakt und auf drei Zeilen begrenzt. #}
 
 {# ================================================= OBERHALB DER FALZ ==== #}
 <div class="front-oben">
@@ -184,8 +160,41 @@
   {# Die Textspalte neben dem Aufmacher. Ohne sie stehen oberhalb der Falz
      vier Geschichten; mit ihr elf. Bewusst OHNE Bilder - die gehoeren in
      die Bildpositionen links, nicht in eine Digest-Spalte. #}
-  {% if front.wichtig %}
+  {% if front.wichtig or zwei_minuten %}
   <aside class="front-wichtig">
+
+    {# ================================================ IN ZWEI MINUTEN ==== #}
+    {# Der kurze Weg durch die Ausgabe - in der Spalte, nicht ueber der
+       Seite. Was hier steht, ist nicht die Zusammenfassung des Berichts
+       (die stuende zwei Bildschirme weiter noch einmal - genau der Fehler,
+       den Antonio am 07.08.2026 kassiert hat), sondern eine ANDERE Auswahl
+       nach einem anderen Massstab: Meldungen, die das eigene Portfolio
+       unmittelbar beruehren, je mit dem einen Satz, was sie dafuer
+       bedeuten. Jeder dieser Saetze ist gegen seinen Originaltext geprueft
+       (analyze/faithfulness.py); was nicht belegt war, steht hier nicht.
+
+       EINE Zeile je Eintrag, hoechstens 20 Woerter, hoechstens drei
+       Eintraege - und kein Auffuellen. Gibt es nur einen, steht einer da;
+       gibt es keinen, faellt der Kasten weg. Eine Woche ohne direkte
+       Portfoliofrage ist ein Befund, kein Loch, das man fuellt. #}
+    {% if zwei_minuten %}
+    <section class="kurzpfad">
+      <div class="rubrik"><h2>In zwei Minuten</h2></div>
+      <ol class="kurzpfad-liste">
+        {% for h in zwei_minuten %}
+        <li class="kurzpfad-zeile">
+          {# Ein Absatz, eine Zeile. Der Beleg haengt am Satz statt darunter
+             zu stehen - eine zweite Zeile je Eintrag waere wieder ein
+             Block, und drei Bloecke sind derselbe Kasten wie vorher. #}
+          <p class="kurzpfad-satz">{{ h.ctm_satz }}<span class="kurzpfad-beleg"><a
+            href="{{ h.url }}" target="_blank" rel="noopener">{{ h.operator or h.source_label }} &nearr;</a></span></p>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if front.wichtig %}
     <div class="rubrik"><h2>Was wichtig ist</h2></div>
     <ol class="wichtig-liste">
       {% for h in front.wichtig %}
@@ -201,6 +210,7 @@
       {% if show_explorer %}<a href="#alle-meldungen" class="source-link">alle {{ highlights|length }} Meldungen &darr;</a>
       {% else %}<a href="{{ prefix }}meldungen.html" class="source-link">alle {{ highlights|length }} Meldungen &nearr;</a>{% endif %}
     </p>
+    {% endif %}
 
     {# Der Themenradar steht hier oben, nicht unten neben dem Bericht: die
        Rail neben Aufmacher und den beiden Reihen waere sonst ab der Haelfte
@@ -304,6 +314,18 @@
       {% endif %}
       <article class="prose prose-zwei">{{ briefing_html | safe }}</article>
     </div>
+    {% endif %}
+    {# Der Foliensatz. Kein Navigationseintrag: er ist kein Ort zum Lesen,
+       sondern eine Datei zum Mitnehmen - vier Folien im Vodafone-Design,
+       mit der Quellenfolie, die sich nicht abschalten laesst.
+
+       Bewusst AUSSERHALB von `briefing_html`: die Foliendatei entsteht je
+       Ausgabe unbedingt (html.py), der Bericht nicht. Faellt der Editor
+       aus, waere der Foliensatz sonst von der Seite aus unerreichbar,
+       obwohl die Datei daliegt - und es gibt keinen zweiten Weg dorthin. #}
+    {% if report.date %}
+    <p class="folienlink"><a href="{{ prefix }}folien/{{ report.date }}.html">
+      Diese Ausgabe als Foliensatz</a> <span>4 Folien, für den Montagstermin</span></p>
     {% endif %}
   </div>
   {# Hier stand bis zum 07.08.2026 eine Beistellspalte "Zahlen der Woche" mit

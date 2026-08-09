@@ -250,19 +250,21 @@ Wahrheitstests (keine Dublette, keine abgeschnittene Überschrift, Zahl der
 Geschichten oberhalb der Falz). Wer eine Schlagzeile ergänzt und die Klasse
 vergisst, fällt aus allen dreien heraus.
 
-**Sechs feste Seiten plus temporäre Themenseiten**, geschnitten nach der
-Frage des Lesers (Stand 07.08.2026, Session „Ausbau & Beruhigung"):
+**Acht feste Seiten plus temporäre Themenseiten**, geschnitten nach der
+Frage des Lesers — davon **fünf in der Navigation**; `suche.html`,
+`lieferzeit.html` und `tarife.html` sind gebaut und über ihren direkten
+Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 
 | Seite | Frage | Inhalt |
 |---|---|---|
-| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + „Was wichtig ist" + Themenradar, ggf. Fokusband auf aktive Themenseiten, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation; Deutschland nur noch als Drei-Zeilen-Verweis auf die Wettbewerbsseite |
+| `index.html` **Diese Woche** | „Was ist passiert?" | Aufmacher + zweite/dritte Reihe + rechte Spalte („In zwei Minuten", dann „Was wichtig ist" — beide nach `ctm_bezug` vor Priorität) + Themenradar, ggf. Fokusband auf aktive Themenseiten, **dann ohne Zwischenstück der volle Prosabericht** zweispaltig mit Sprungnavigation; Deutschland nur noch als Drei-Zeilen-Verweis auf die Wettbewerbsseite |
 | `meldungen.html` **Meldungen** | „Zeig mir die Einzelmeldung" | **sieben Ressort-Übersichtskacheln ohne Scrollen**, darunter je Ressort ein `<details>` mit ALLEN Meldungen in drei Gewichtungen; Wochenarchiv. Die Volltextsuche stand hier bis zum 08.08.2026 am Seitenfuß — sie hat jetzt eine eigene Seite |
 | `suche.html` **Dossier** | „Was weiß das Portal über mein Thema, und wie hat es sich entwickelt?" | Suchfeld, Bilanz (Treffer/Zeitraum/Quellen), Überblick (Verlauf je Monat, Absender, Ressorts), Aufmacher mit Bild, Chronik nach Monaten. Speist sich aus `search_index.json` — Meldungen ALLER Ausgaben **plus** Differenzierung **plus** Promo-Aktionen. Nicht in der Navigation: das Suchfeld der Topbar ist der Eingang |
 | `differenzierung.html` | „Womit heben sich Telkos ab?" | Lage aus dem Bericht, **Marktbild** (Hebel-Balken, aktivste Anbieter, Regionen), „Neu auf dem Radar", dann je Hebel eine Rubrik mit Erklärsatz und GEWICHTETEN Karten mit Bild. Speist sich aus BEIDEN Speichern (Sweep-DB **und** Presse-Kurator, gemerged in `report/differenzierung_view.py`) |
 | `wettbewerb.html` **Wettbewerb** | „Was machen Telekom, O2 und 1&1 — und wie passt das zu den Wochen davor?" | je Fokus-Wettbewerber: aktuelle Lage, laufende Promo-Aktionen seiner Marken (`group` in promo_sources), **Monats-Chronik** aller Moves+Meldungen aus dem gesamten Berichtsarchiv, per URL dedupliziert (`report/wettbewerb.py`, KEIN neuer State, keine LLM-Stufe — alles entsteht beim Rendern) |
-| `lieferzeit.html` **Lieferzeiten** | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
-| `tarife.html` **Tarife** | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
-| `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt über der Titelseite |
+| `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
+| `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
+| `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
@@ -474,7 +476,7 @@ Messungen dazu in `outputs/review-umsetzung-2026-08-08.md`:
 | **Ereignis-Bündelung** | `analyze/clustering.py` | Stern statt Kette: verglichen wird mit dem VERTRETER, nie transitiv. Das Betreiberfeld schlägt die Großschreibung (im Deutschen ist jedes Substantiv groß, „Tarif" sähe sonst wie ein Eigenname aus). Ein Beleg fällt mit seinem Vertreter aus dem Seen-Store |
 | **CTM-Linse** | `analyze/ctm.py`, `config/ctm_fokus.yaml` | Stufe 3 rechnet der CODE (Heimatmarkt-Marke UND Endkundenthema). Das Modell darf sie weder wegnehmen noch sich selbst geben — sonst wäre die Achse wieder das, was sie ersetzt |
 | **Prüflauf gegen den Originaltext** | `analyze/faithfulness.py` | **Fail closed.** Zahlen und Sicherheitswort prüft der Code, die Aussage das Modell; was nicht geprüft werden konnte, erscheint NICHT |
-| **Zwei-Minuten-Pfad** | `woche.html.j2`, ganz oben | Höchstens fünf Zeilen, ein Absender nur einmal, leer wenn es nichts gibt |
+| **Zwei-Minuten-Pfad** | `woche.html.j2`, rechte Spalte über „Was wichtig ist" | Höchstens DREI Zeilen (seit 09.08.2026, vorher fünf über dem Aufmacher), je eine Zeile mit höchstens 20 Wörtern, ein Absender nur einmal, leer wenn es nichts gibt |
 | **Frühwarn-Board** | `report/fruehwarnung.py` | Die Indikatoren stehen VORHER fest. „Ruhend" bleibt stehen — eine Frage, zu der seit Wochen nichts kommt, ist beantwortet. Es steht UNTER der Titelseite: mit dem Board davor fiel Kriterium 1 von `pruefe_portal.py` auf drei Geschichten oberhalb der Falz |
 | **Verlauf, Lücken, Steckbrief** | `report/verlauf.py`, `report/luecken.py`, `report/wettbewerb.py` | Anteile statt Zahlen (eine wachsende Sammlung zeigt sonst immer „alles wächst"); ein weißer Fleck entsteht nur aus einem gepflegten „nein" MIT Datum |
 
@@ -484,16 +486,33 @@ einem sonst leeren Drittel — dem besten Platz der Seite. Höchstens drei
 Zeilen, jede mit Sprungziel; gibt es nichts Neues, steht dort wieder nur der
 Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
 
-**Die Navigation hat jetzt SIEBEN Einträge** (Lieferzeiten und, seit dem
-08.08.2026, Tarife). `tests/test_suche_page.py` nagelt die Zahl fest — eine
-Navigation wächst sonst zurück, und genau davon kam dieses Projekt.
+**Die Navigation hat FÜNF Einträge** (Diese Woche, Meldungen,
+Differenzierung, Wettbewerb, Quellen). `tests/test_suche_page.py` nagelt die
+Zahl fest — eine Navigation wächst sonst zurück, und genau davon kam dieses
+Projekt.
 
-Die Erhöhung von sechs auf sieben ist eine **bewusste Ausnahme, keine
-Aufweichung**: „Tarife" ist die erste Seite dieses Portals, die nicht aus
-Meldungen entsteht, sondern aus Daten — und zwar aus den einzigen Daten
-dieses Marktes, die rechtlich wahrheitsbewehrt sind. Sie beantwortet die
-Frage, die keine der sechs anderen beantwortet. **Wer die achte Seite
-anlegen will, begründet sie im Test** — genau dafür steht die Zahl hart.
+Sieben waren es vom 08. bis zum 09.08.2026. „Lieferzeiten" und „Tarife"
+kamen mit der Begründung dazu, sie beantworteten eine Frage, die sonst
+niemand beantwortet — und sind wieder heraus, weil sie **die Frage selbst
+nicht beantworten konnten**: die Tarifseite kennt zwei o2-Tarife und keinen
+von Telekom, Vodafone oder 1&1, die Lieferzeitseite keinen der drei großen
+Anbieter. Beide Seiten werden weiter gebaut und getestet und sind über
+ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
+
+> **Die Veröffentlichungsschwelle.** Eine Seite, die eine Frage beantworten
+> soll, geht erst in die Navigation, wenn sie die Frage beantworten kann.
+> Bis dahin wird sie gebaut, getestet und ist über einen direkten Link
+> erreichbar, aber nicht verlinkt.
+> **Tarifseite:** mindestens drei Anbieter, zwölf Mobilfunktarife, ein
+> Tarif mit echter Rabattphase.
+> **Lieferzeitseite:** Telekom, o2 und 1&1 erfasst.
+
+Die Regel ist der Preis für die Ausnahme, die am 08.08. zweimal gemacht
+wurde. „Diese Seite beantwortet eine Frage, die keine andere beantwortet"
+ist eine Aussage über den Zuschnitt, nicht über den Inhalt — und sie stimmt
+auch dann, wenn die Seite leer ist. **Wer die sechste Seite anlegen will,
+misst vorher die Schwelle nach und begründet sie im Test** — genau dafür
+steht die Zahl hart.
 
 **Die alten Dateinamen** (`bericht.html`, `archive.html`, `sources.html`,
 `protokoll.html`, `wettbewerber.html`) existieren weiter als
@@ -755,6 +774,19 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
   (6) `_strip_vodafone_advice` löschte ganze Absätze samt Fakten.
   **`tests/test_seiten_zahlen.py` ist die Gegenmaßnahme — jede neue Zahl auf
   einer Seite gehört dort hinein.**
+- **Ein Test, dessen Lookup ins Leere geht, ist grün und prüft nichts.** Am
+  09.08.2026 verglich ein neuer Test die Reihenfolge der Startseite gegen die
+  Berichtsdatei — geschlüsselt auf `schlagzeile`. Das Feld gibt es dort nicht:
+  die Datei kennt `headline` und `title`, die **Schlagzeile rechnet erst
+  `_flatten()`**. Der Lookup traf 0 von 7 Zeilen, die Liste blieb leer, und
+  `[] == sorted([])` ist wahr. Aufgefallen ist es erst, als jemand die
+  geänderte Vergabereihenfolge zurückdrehte und der Test grün blieb.
+  **Jeder Test, der zwei Datenquellen über einen Schlüssel verbindet, braucht
+  eine Zeile `assert len(zugeordnet) == len(erwartet)`** — sonst meldet er den
+  nächsten Feldumbau nicht, sondern verschweigt ihn. Dasselbe gilt für
+  konstruierte Fälle: prüfe im selben Test, dass der Fall OHNE die Zusicherung
+  wirklich eintritt. Ein Fixture, das die Dublette gar nicht auslöst, beweist
+  nicht, dass die Sperre greift.
 - **Ein zu kleines `max_tokens` sieht aus wie eine tote Quelle.** Läufe #83–85
   (07.08.2026): 15 von 19 gelesenen Promo-Seiten scheiterten mit
   `JSONDecodeError: Expecting value: line 1 column 1 (char 0)` — also an einem
@@ -967,7 +999,97 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (08.08.2026, Antonio direkt): der Umsetzungsplan,
+> **Zuletzt erledigt (09.08.2026, Antonio direkt): Startseite und
+> Navigation, K1–K3.** Grundlage war eine Prüfung der Live-Seite vom
+> 8. August. Stand danach: **1104 Tests**, alle **14 Prüfungen von
+> `pruefe_portal.py`** grün.
+>
+> | | Was | Messung |
+> |---|---|---|
+> | K1 | Kurzpfad zurückgebaut: höchstens drei Einträge, je eine Zeile mit ≤ 20 Wörtern, in der rechten Spalte statt über dem Aufmacher; Aufnahme nur mit `ctm_bezug` 3 oder Stufe 2 **mit einer konkreten Zahl aus der Quelle** | Unterkante der Aufmacher-Schlagzeile auf dem Telefon (390×844) von **1364 px auf 325 px** — vorher 520 px unterhalb der Falz; auf 1440×900 von 863 auf 298 px |
+> | K2 | „Was wichtig ist" folgt derselben Achse wie der Kurzpfad | die zwei BREKO-Stellungnahmen von Platz 1+2 auf **4+5**, davor drei Meldungen mit direktem Portfoliobezug |
+> | K3 | `tarife.html` und `lieferzeit.html` aus der Subnav (nicht gelöscht), Veröffentlichungsschwelle in §5 | Navigation **7 → 5** |
+>
+> **Der eigentliche Fund saß nicht in der Sortierung.** `_flatten` sortiert
+> längst nach `ctm_bezug` vor Priorität — die Digest-Spalte widersprach dem
+> Kurzpfad trotzdem, weil die **vier kleinen Bildkacheln vor ihr zugriffen**
+> und dabei jede Stufe-3-Meldung abräumten. Der Eingriff steht deshalb in
+> der Reihenfolge der Vergabe in `_titelseite`, nicht in einem `sorted()`.
+>
+> **Die Foliensatz-Zeile ist an den Fuß des Berichts gewandert** (die zweite
+> der beiden Möglichkeiten aus K1). Als Abstand über der Titelseite hätte
+> sie 18 px gekostet, und genau daran hing das Kriterium: **oberhalb der
+> Falz 3 → 5 → 8 Geschichten** (vorher / Kurzpfad umgebaut / Zeile
+> verschoben). Kriterium 1 von `pruefe_portal.py` war vor dieser Session
+> **rot** — der Kurzpfad vom 08.08. hatte es von 10 auf 3 gedrückt, und der
+> Handover-Eintrag „alle 14 grün" stimmte nicht mehr.
+>
+> **Zwei bestehende Tests sind geändert worden**, beide weil sie genau das
+> Verhalten festhielten, das der Auftrag umkehrt:
+> `test_zwei_minuten_steht_vor_dem_aufmacher` (Kasten über dem Aufmacher →
+> jetzt `…_steht_in_der_spalte_ueber_was_wichtig_ist`) und
+> `test_navigation_hat_sieben_eintraege` (→ `…_fuenf_…`). Sonst wurde kein
+> Test angefasst.
+>
+> **Neu:** `tests/test_startseite_kurzpfad.py` (18) und
+> `tests/test_falz_browser.py` (4, echtes Chromium auf 1440×900 und
+> 390×844). Gegen den alten Stand gemessen fallen **19 der 22** durch. Die
+> drei, die auch dort bestehen, sind erklärbar: einer ruft `zwei_minuten()`
+> mit explizitem Deckel auf (die Seite deckt
+> `test_hoechstens_drei_eintraege_mit_quellenlink` ab), einer prüft eine
+> Invariante, die auf dieser Ausgabe auch vorher galt, und die
+> Schreibtisch-Messung war vorher knapp bestanden (863 von 900 px) — gekippt
+> ist nur das Telefon.
+>
+> **Der Kurzpfad-Zuschnitt liegt in `ctm.kurzpfad()`, nicht beim Aufrufer.**
+> Erster Anlauf war, die Verschärfungen als abwählbare Parameter zu bauen,
+> damit `versand.py` unverändert bleibt. Das hat eine dokumentierte
+> Zusicherung gebrochen: die Mail verspricht „dieselbe Auswahl wie auf der
+> Startseite", zeigte aber weiter fünf ungefilterte Zeilen — an der Ausgabe
+> vom 8. August gemessen stand **genau eine der drei Seitenzeilen auch in
+> der Mail**, und die Mail führte mit einem 22-Wort-Konjunktiv, den die
+> Seite ausdrücklich nicht mehr zeigt. Jetzt holen beide denselben
+> Zuschnitt aus einer Funktion. Die Parameter von `zwei_minuten()` bleiben
+> abwählbar, aber **niemand wählt sie mehr einzeln**.
+>
+> **Kurzpfad und Digest-Spalte sperren sich gegenseitig.** Beide ziehen seit
+> K2 aus derselben Sortierung und stehen untereinander in derselben Spalte;
+> ohne Sperre steht die stärkste Meldung zweimal. `_titelseite(…,
+> belegt=…)` hält sie aus „Was wichtig ist" heraus — **nur dort**, nicht von
+> der ganzen Seite: der Aufmacher zeigt seinen Folgerungssatz absichtlich
+> mit (`.ctm-satz`), und eine Vollsperre hätte der Meldung mit dem besten
+> Satz den Aufmacher für immer verwehrt.
+>
+> **Was `zwei_minuten()` abweist, steht jetzt im Protokoll** (`Kurzpfad:`,
+> mit Zahl je Grund). Ein leerer Kasten sagte sonst nur „nichts gefunden",
+> und ob nichts kam oder zwanzig Sätze an der Wortgrenze hingen, wäre
+> hinterher nicht mehr zu beantworten.
+>
+> **`ci.yml` installiert jetzt Chromium.** Ohne den Schritt übersprang sich
+> der Browser-Test auf genau der Maschine, die Merges absichert — und ein
+> Skip sieht im Protokoll aus wie ein Erfolg. Der Test sucht den Browser an
+> beiden Orten (Sandbox `/opt/pw-browsers`, Runner `~/.cache/ms-playwright`).
+>
+> **Offen daraus, erst nach dem nächsten Actions-Lauf prüfbar:**
+> 1. Die Aufnahmeregel ist gegen **eine** Ausgabe gemessen (8. August: 5 → 3
+>    Einträge). Steht der Kasten mehrere Läufe leer, ist sie zu scharf —
+>    dann im Protokoll nachsehen, wie viele Sätze überhaupt Stufe 3 tragen.
+> 2. **Eine freistehende Ziffer neben einem Produktnamen zählt weiter als
+>    Zahl.** „Redmi 17C 5G" fällt (am Buchstaben erkannt), „Redmi 17 5G"
+>    nicht. Eine strengere Regel bräuchte eine Einheit neben der Zahl — das
+>    wirft „249 Rupien" nicht, aber „500 Zloty Bonus" könnte kippen. Erst
+>    messen, dann verschärfen.
+> 3. Die zwei Seiten unter der Schwelle: sobald der Tarif-Sammler drei
+>    Anbieter und zwölf Mobilfunktarife hat, gehören sie zurück in die
+>    Navigation — die Zahlen stehen in §5.
+>
+> **Die Auftragsgrundlage fehlt im Repo.**
+> `claude/nachbesserung-nach-erstem-durchgang-2026-08-08.md` gibt es nicht,
+> und ein Verzeichnis `claude/` auch nicht — dasselbe wie beim
+> Umsetzungsplan (siehe unten). Gearbeitet wurde gegen die Punkte, die
+> Antonio in der Nachricht selbst ausgeschrieben hat.
+
+> **Davor erledigt (08.08.2026, Antonio direkt): der Umsetzungsplan,
 > Teil 1 und A1–A10.** Antonio hat den Plan übergeben („diggah erledige
 > alles, setze alle Phasen um"). Stand danach: **1080 Tests**, alle **14
 > Prüfungen von `pruefe_portal.py`** grün, **207 crawlbare Quellen**.

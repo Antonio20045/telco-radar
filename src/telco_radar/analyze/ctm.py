@@ -56,6 +56,12 @@ from pathlib import Path
 
 import yaml
 
+# Die Zahlenrechnung des Prueflaufs, nicht eine zweite daneben. Ob eine Zahl
+# "aus der Quelle" stammt, muss hier dasselbe heissen wie dort - sonst laesst
+# der Kasten eine Zeile zu, die die Belegpruefung verworfen haette.
+# faithfulness importiert nur `.llm`, also entsteht kein Ringschluss.
+from .faithfulness import _zahlen_gedeckt
+
 log = logging.getLogger(__name__)
 
 DIREKT, UEBERTRAGBAR, KONTEXT, HINTERGRUND = 3, 2, 1, 0
@@ -81,6 +87,12 @@ STUFEN_ERKLAERUNG = {
 # Satz wird VERWORFEN, nicht gekuerzt. Ein Halbsatz mit "…" ist in dieser
 # Codebasis schon zweimal als Fehler benannt worden.
 MAX_WOERTER = 28
+
+# Eine Zahl, die als eigenes Wort steht - fuer die Aufnahmeregel des
+# Kurzpfads (siehe `hat_zahl_aus_der_quelle`). Die Rechnung des Prueflaufs
+# selbst bleibt bewusst weiter gefasst: dort geht es darum, ob eine Ziffer
+# erfunden ist, und da zaehlt auch die im Modellnamen.
+_ECHTE_ZAHL = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)*(?![\w])")
 
 # Woerter, an denen ein Satz als Wiederholung statt als Konsequenz erkennbar
 # ist. Sie sind nicht verboten, sie reichen nur nicht: ein Satz, der KEINES
@@ -271,11 +283,63 @@ def veredle(highlights: list[dict], fokus: CtmFokus) -> dict:
     return bilanz
 
 
-def zwei_minuten(highlights: list[dict], max_zeilen: int = 5) -> list[dict]:
+def hat_zahl_aus_der_quelle(h: dict) -> bool:
+    """Nennt der Folgerungssatz eine konkrete Zahl, die in der Quelle steht?
+
+    Die Trennlinie zwischen einer Beobachtung und einer Ableitung. "Ein
+    gestaffelter Trade-in-Bonus koennte den Geraetewechsel beschleunigen" ist
+    ein Konjunktiv ueber nichts - er laesst sich weder pruefen noch
+    widerlegen. "Bis zu 500 Zloty Bonus" ist eine Zahl, die im Originaltext
+    steht und die morgen jemand nachschlagen kann.
+
+    Verlangt wird BEIDES: mindestens eine mehrstellige Zahl im Satz, die als
+    eigenes Wort steht, und keine einzige Zahl darin, die in Titel oder
+    Zusammenfassung fehlt.
+
+    "Als eigenes Wort" ist der Teil, der beim ersten Anlauf gefehlt hat.
+    Gegen die Ausgabe vom 08.08.2026 gemessen kam "Das Redmi 17C 5G koennte
+    das Einsteigersegment dominieren" durch - "17" ist zweistellig und steht
+    im Titel. Es ist nur keine Zahl, sondern ein Modellname. Eine Ziffer, an
+    der ein Buchstabe klebt, behauptet nichts, was sich nachschlagen liesse;
+    "900 TV-Kanaele" und "300 Dollar" tun es.
+    """
+    satz = h.get("ctm_satz") or ""
+    zahlen = [z for z in _ECHTE_ZAHL.findall(satz)
+              if len(z.replace(".", "").replace(",", "")) > 1]
+    if not zahlen:
+        return False
+    quelle = f"{h.get('title') or ''} {h.get('summary') or ''}"
+    return _zahlen_gedeckt(satz, quelle) is None
+
+
+# Der Zuschnitt des Kurzpfads. Er steht HIER und nicht bei seinem Aufrufer,
+# weil ihn zwei Aufrufer haben: die Startseite und die Montagsmail. Zwei
+# Zahlenpaare an zwei Orten waren am 09.08.2026 kurz davor, aus einer
+# Auswahl zwei zu machen - und eine Mail, die etwas anderes hervorhebt als
+# die Seite, auf die sie verlinkt, ist schlimmer als keine Mail.
+KURZPFAD_ZEILEN = 3
+KURZPFAD_WOERTER = 20
+
+
+def kurzpfad(highlights: list[dict]) -> list[dict]:
+    """Die Zeilen, die Startseite UND Mail zeigen - eine Auswahl, ein Ort.
+
+    Bis zum 09.08.2026 waren es fuenf Zeilen ohne Wortgrenze und ohne
+    Aufnahmeregel. Sie standen ueber dem Aufmacher und haben die Titelseite
+    aus dem ersten Bildschirm gedraengt; vier der fuenf waren reine
+    Konjunktiv-Ableitungen.
+    """
+    return zwei_minuten(highlights, KURZPFAD_ZEILEN, nur_belegt=True,
+                        max_woerter=KURZPFAD_WOERTER)
+
+
+def zwei_minuten(highlights: list[dict], max_zeilen: int = 5, *,
+                 nur_belegt: bool = False,
+                 max_woerter: int = 0) -> list[dict]:
     """Die Zeilen des Zwei-Minuten-Pfads.
 
     "Lesezeit ca. 16 Minuten" ist ehrlich und trotzdem das Ende der Nutzung:
-    16 Minuten liest kein Bereichsleiter. Fuenf Zeilen mit Konsequenz und
+    16 Minuten liest kein Bereichsleiter. Ein paar Zeilen mit Konsequenz und
     Quellenlink liest er.
 
     Genommen wird nur, was Stufe >= 2 UND einen geprueften Satz hat. Lieber
@@ -286,12 +350,46 @@ def zwei_minuten(highlights: list[dict], max_zeilen: int = 5) -> list[dict]:
     Ein Absender kommt hoechstens einmal vor. Ohne diese Regel stuenden in
     einer Telekom-Woche fuenf Telekom-Zeilen, und der Pfad waere kein
     Ueberblick mehr.
+
+    Die zwei Verschaerfungen sind ABWAEHLBAR und aus gutem Grund nicht der
+    Standard: der Kasten auf der Titelseite hat wenig Platz und viel
+    Gewicht, die Mail (versand.py) hat viel Platz und wenig Gewicht.
+
+    ``nur_belegt`` ist die Aufnahmeregel vom 09.08.2026. Stufe 3 kommt
+    immer hinein; Stufe 2 nur mit einer konkreten Zahl aus der Quelle.
+    Anlass war die Ausgabe vom 08.08.: fuenf Zeilen, vier davon reine
+    Konjunktiv-Ableitungen ("koennte pruefen", "muesste nachschaerfen"),
+    keine einzige mit einer Zahl. Ein Satz, der nichts behauptet, das man
+    nachschlagen kann, kostet die wertvollste Zeile der Seite.
+
+    ``max_woerter`` wirft Saetze hinaus, die als EINE Zeile nicht mehr
+    lesbar sind. Gekuerzt wird NICHT: ein auf 20 Woerter geschnittener
+    Folgerungssatz ist ein Halbsatz, und ein Halbsatz unter einem
+    Quellenlink behauptet etwas, das die Quelle nicht sagt.
     """
     out: list[dict] = []
     gesehen: set[str] = set()
+    # Warum eine Zeile NICHT dasteht. Ohne diese Zaehler sagt ein leerer
+    # Kasten nur "nichts gefunden" - und ob nichts kam oder ob zwanzig
+    # Saetze an der Wortgrenze hingen, liesse sich hinterher nicht mehr
+    # beantworten. Dieselbe Ueberlegung wie bei `veredle()`, die ihre
+    # verworfenen Saetze samt Grund ins Laufprotokoll gibt.
+    gefallen = {"zu lang": 0, "ohne Zahl aus der Quelle": 0}
+
+    def zugelassen(h: dict) -> bool:
+        stufe = int(h.get("ctm_bezug") or 0)
+        if stufe < UEBERTRAGBAR or not h.get("ctm_satz"):
+            return False
+        if max_woerter and len(str(h["ctm_satz"]).split()) > max_woerter:
+            gefallen["zu lang"] += 1
+            return False
+        if nur_belegt and stufe < DIREKT and not hat_zahl_aus_der_quelle(h):
+            gefallen["ohne Zahl aus der Quelle"] += 1
+            return False
+        return True
+
     kandidaten = sorted(
-        (h for h in highlights
-         if int(h.get("ctm_bezug") or 0) >= UEBERTRAGBAR and h.get("ctm_satz")),
+        (h for h in highlights if zugelassen(h)),
         key=lambda h: (-int(h.get("ctm_bezug") or 0),
                        -int(h.get("relevance") or 0),
                        -int(h.get("quellenzahl") or 1)))
@@ -303,4 +401,8 @@ def zwei_minuten(highlights: list[dict], max_zeilen: int = 5) -> list[dict]:
         out.append(h)
         if len(out) >= max_zeilen:
             break
+    if any(gefallen.values()):
+        log.info("Kurzpfad: %d Zeilen aus %d Kandidaten; abgewiesen %s",
+                 len(out), len(kandidaten),
+                 ", ".join(f"{n}x {grund}" for grund, n in gefallen.items() if n))
     return out

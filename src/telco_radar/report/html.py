@@ -508,8 +508,33 @@ def _faden(highlights: list[dict],
     return gewaehlt
 
 
+def _ctm_achse(highlights: list[dict]) -> list[dict]:
+    """Genau die Reihenfolge, nach der auch der Kurzpfad auswaehlt.
+
+    Die ersten zwei Schluessel teilt sie mit `_flatten`, der dritte nicht:
+    dort entscheidet bei Gleichstand das Datum, hier die Zahl der Quellen -
+    weil `ctm.zwei_minuten()` es so haelt, und weil "dieselbe Achse wie der
+    Kurzpfad" der ganze Zweck dieser Funktion ist. Dass mehrere unabhaengige
+    Redaktionen dieselbe Sache melden, ist in der Regel der bessere
+    Wichtigkeitsbeleg als das juengere Datum.
+
+    Der Aufruf ist deshalb auch keine Verdopplung von `_flatten`:
+    `_titelseite` bekommt seine Liste nicht nur von dort, und eine
+    Zusicherung, die an der Sortierung einer anderen Funktion haengt, faellt
+    still aus, sobald jemand die andere Funktion anfasst.
+
+    `sorted` ist stabil - bei gleichem Bezug bleibt die Dringlichkeitsfolge,
+    in der die Meldungen ankommen, unangetastet.
+    """
+    return sorted(highlights,
+                  key=lambda h: (-int(h.get("ctm_bezug") or 0),
+                                 -int(h.get("relevance") or 0),
+                                 -int(h.get("quellenzahl") or 1)))
+
+
 def _titelseite(highlights: list[dict],
-                faden: list[list[dict]] | None = None) -> dict:
+                faden: list[list[dict]] | None = None,
+                belegt: list[str] | None = None) -> dict:
     """Verteilt die Meldungen auf die Gewichtsstufen der Titelseite.
 
     Bis zum 06.08.2026 kannte die Titelseite ZWEI Stufen: einen Aufmacher
@@ -527,7 +552,23 @@ def _titelseite(highlights: list[dict],
     Eine Meldung wird ueber ihre URL genau einmal vergeben - ueber
     Objektidentitaet ging das schon einmal schief (der Aufmacher stand
     zweimal auf der Seite, weil er fuer die Anzeige kopiert wird).
+
+    `belegt` sind die Meldungen, die der Kurzpfad schon zeigt. Sie werden
+    NUR aus "Was wichtig ist" herausgehalten, nicht von der ganzen Seite -
+    und das ist der Unterschied, auf den es ankommt:
+
+    * Kurzpfad-Zeile und Digest-Zeile stehen in DERSELBEN Spalte
+      untereinander und zeigen beide Text. Dieselbe Meldung dort zweimal
+      ist genau das "doppelt gemoppelt", das am 07.08.2026 die
+      Ressortbloecke gekostet hat.
+    * Aufmacher und Kurzpfad sind zweierlei: der eine zeigt Schlagzeile und
+      Bild, der andere den Folgerungssatz - und der Aufmacher zeigt ihn
+      absichtlich mit ("Was das fuer uns heisst", `.ctm-satz`). Sperrte man
+      belegte Meldungen auch dort, koennte die Meldung mit dem besten
+      Folgerungssatz nie mehr Aufmacher werden, und die Marke verschwaende
+      von der Seite.
     """
+    gesperrt: set[str] = {u for u in (belegt or []) if u}
     benutzt: set[str] = set()
     absender: list[set[str]] = []      # Kennwoerter je Absendergruppe
     vergeben: list[int] = []           # wie viele Plaetze die Gruppe schon hat
@@ -607,8 +648,24 @@ def _titelseite(highlights: list[dict],
     zwei += nimm(2 - len(zwei), mind_breite=MIND_BREITE_GROSS)
     for h in zwei:
         h["anriss"] = _first_sentence(h.get("summary") or "", 150)
+    # Die Digest-Spalte VOR der dritten Reihe, seit dem 09.08.2026. Das ist
+    # der eigentliche Eingriff, und er sitzt in der Reihenfolge der Vergabe,
+    # nicht in einer Sortierung: sortiert wurde schon vorher nach der
+    # CTM-Achse (`_flatten`), aber die vier kleinen Bildkacheln griffen
+    # davor zu und raeumten damit jede Meldung mit direktem Portfoliobezug
+    # ab. Am 08.08.2026 fuehrte "Was wichtig ist" deshalb zwei
+    # BREKO-Stellungnahmen zur TKG-Novelle (Stufe 2), waehrend alle vier
+    # Meldungen der Stufe 3 in Bildpositionen ohne Rubriknamen standen -
+    # zwei Module, die beide "das Wichtigste" behaupten und sich
+    # widersprechen.
+    #
+    # Die dritte Reihe ist eine Bildposition, keine Rangliste; sie darf mit
+    # dem nehmen, was uebrig ist. Die zwei Stufen darueber bleiben beim
+    # roten Faden - sie erzaehlen den Bericht, und der ordnet nach
+    # Nachrichtenwert.
+    wichtig = nimm(7, aus=[h for h in _ctm_achse(highlights)
+                           if h.get("url") not in gesperrt])
     vier = nimm(4, mind_breite=1)
-    wichtig = nimm(7)
 
     # Hier wurden bis zum 07.08.2026 zusaetzlich sechs Ressortbloecke
     # bestueckt (je ein Aufmacher und vier Zeilen). Sie sind weg: dieselbe
@@ -1059,8 +1116,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         # Gewichtung bleibt davon unberuehrt. Gelesen wird der BEREINIGTE
         # Bericht - die Seite darf nicht einem Satz folgen, den sie selbst
         # nicht zeigt.
+        # Der Kurzpfad wird VOR der Titelseite gewaehlt, damit sie ihn
+        # aussparen kann. Seit dem 09.08.2026 stehen beide in derselben
+        # Spalte und ziehen aus derselben Sortierung - ohne diese Reihenfolge
+        # steht dieselbe Meldung als Kurzpfad-Zeile 1 und als erste Zeile von
+        # "Was wichtig ist" direkt untereinander. Genau das "doppelt
+        # gemoppelt" hat Antonio am 07.08.2026 an den Ressortbloecken
+        # kassiert; die Regel "eine Meldung genau einmal" galt auf dieser
+        # Seite bisher nur innerhalb von `_titelseite`.
+        kurzpfad = ctm.kurzpfad(highlights)
         front = _titelseite(highlights,
-                            _faden(highlights, _fuehrende_saetze(briefing_md)))
+                            _faden(highlights, _fuehrende_saetze(briefing_md)),
+                            belegt=[h.get("url") for h in kurzpfad])
         competitors = _prep_competitors(report)
         wochen.append({"date": report["date"], "highlights": highlights,
                        "competitors": competitors})
@@ -1084,12 +1151,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "lesezeit": _lesezeit(briefing_md),
             # Der Zwei-Minuten-Pfad. "Lesezeit ca. 16 Minuten" ist ehrlich und
             # trotzdem das Ende der Nutzung - 16 Minuten liest kein
-            # Bereichsleiter. Hoechstens fuenf Zeilen, jede mit Konsequenz und
-            # Quellenlink, ausschliesslich aus geprueften Folgerungssaetzen.
+            # Bereichsleiter. Jede Zeile mit Konsequenz und Quellenlink,
+            # ausschliesslich aus geprueften Folgerungssaetzen.
             # Bleibt die Liste leer, steht der Kasten nicht da: eine Woche
             # ohne direkte Portfoliofrage ist ein Befund, keine Luecke, die
             # man mit Fuellzeilen schliesst.
-            "zwei_minuten": ctm.zwei_minuten(highlights),
+            "zwei_minuten": kurzpfad,
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
             "archive": archive, "is_latest": i == 0,

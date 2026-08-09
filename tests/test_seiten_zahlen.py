@@ -1451,14 +1451,32 @@ def _ctm_highlight(i, *, ctm_bezug, relevance=3, satz=None, operator=None):
     return h
 
 
-def test_zwei_minuten_steht_vor_dem_aufmacher(tmp_path):
-    """Wer zwei Minuten hat, soll nicht erst eine Zeitungsseite durchqueren."""
+def test_zwei_minuten_steht_in_der_spalte_ueber_was_wichtig_ist(tmp_path):
+    """Bis zum 09.08.2026 stand der Kasten UEBER dem Aufmacher, und dieser
+    Test hat genau das festgehalten ("wer zwei Minuten hat, soll nicht erst
+    eine Zeitungsseite durchqueren").
+
+    Die Rechnung ging nicht auf: fuenf Eintraege zu je einem Absatz plus
+    Belegzeile haben die Schlagzeile des Aufmachers aus dem ersten
+    Bildschirm gedraengt - der Kurzpfad hat nicht den Weg zur Titelseite
+    abgekuerzt, sondern sie ersetzt. Er steht jetzt in der rechten Spalte
+    ueber "Was wichtig ist": derselbe erste Bildschirm, aber neben der
+    Nachricht statt vor ihr.
+
+    Geprueft wird die Reihenfolge INNERHALB der Spalte mit - die beiden
+    Module sortieren nach derselben Achse, und der kuerzere fuehrt."""
     hs = [_ctm_highlight(1, ctm_bezug=3, relevance=5,
                          satz="Drückt unsere Preisuntergrenze deutlich.",
                          operator="Deutsche Telekom")] + PORTAL
     html = _seite(_render(tmp_path, highlights=hs), "index.html")
     assert "In zwei Minuten" in html
-    assert html.index("kurzpfad") < html.index("front-oben")
+    assert html.index("front-oben") < html.index("kurzpfad")
+    soup = BeautifulSoup(html, "html.parser")
+    spalte = soup.select_one(".front-wichtig")
+    assert spalte.select_one(".kurzpfad") is not None
+    # Der Kurzpfad zuerst, die Digest-Spalte darunter.
+    rubriken = [h2.get_text(strip=True) for h2 in spalte.select("h2")]
+    assert rubriken[:2] == ["In zwei Minuten", "Was wichtig ist"]
 
 
 def test_zwei_minuten_zeigt_nur_saetze_mit_quelle(tmp_path):

@@ -98,14 +98,21 @@ def _highlights(report: dict) -> list[dict]:
             for h in (r.get("highlights") or [])]
 
 
-def zwei_minuten_zeilen(report: dict, max_zeilen: int = 5) -> list[dict]:
+def zwei_minuten_zeilen(report: dict) -> list[dict]:
     """Dieselbe Auswahl wie auf der Startseite - aus derselben Funktion.
 
     Bewusst kein zweiter Auswahlweg: eine Mail, die etwas anderes hervorhebt
     als die Seite, auf die sie verlinkt, ist schlimmer als keine Mail.
+
+    Die Zusicherung war am 09.08.2026 kurz gebrochen: die Seite bekam drei
+    Zeilen mit Aufnahmeregel, die Mail behielt fuenf ohne. An der Ausgabe
+    vom 8. August gemessen stand danach genau EINE der drei Seitenzeilen
+    auch in der Mail, und die Mail fuehrte mit einem Satz, den die Seite
+    ausdruecklich nicht mehr zeigt. Der Zuschnitt liegt seitdem in
+    `ctm.kurzpfad()` - eine Auswahl, ein Ort.
     """
-    from .analyze.ctm import zwei_minuten
-    return zwei_minuten(_highlights(report), max_zeilen=max_zeilen)
+    from .analyze.ctm import kurzpfad
+    return kurzpfad(_highlights(report))
 
 
 def ausnahmen(report: dict) -> list[dict]:

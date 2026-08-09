@@ -75,18 +75,20 @@
       <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on"{% endif %}>Meldungen</a>
       <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
       <a href="{{ prefix }}wettbewerb.html" {% if active=='wettbewerb' %}class="on"{% endif %}>Wettbewerb</a>
-      {# Seit dem 08.08.2026 sechs. "Lieferzeiten" beantwortet die einzige
-         Frage dieses Portals, zu der es sonst NIRGENDS eine Antwort gibt:
-         es existiert keine oeffentliche Studie, die Lieferzeiten der
-         deutschen Anbieter systematisch vergleicht. #}
-      <a href="{{ prefix }}lieferzeit.html" {% if active=='lieferzeit' %}class="on"{% endif %}>Lieferzeiten</a>
-      {# Seit dem 08.08.2026 sieben, und das ist eine bewusste Ausnahme von
-         der Regel "die Navigation waechst nicht". "Tarife" ist die erste
-         Seite dieses Portals, die nicht aus Meldungen entsteht, sondern aus
-         Daten - und zwar aus den einzigen dieses Marktes, die rechtlich
-         wahrheitsbewehrt sind. Sie beantwortet die Frage, die keine der
-         sechs anderen beantwortet: was kostet was wirklich. #}
-      <a href="{{ prefix }}tarife.html" {% if active=='tarife' %}class="on"{% endif %}>Tarife</a>
+      {# "Lieferzeiten" und "Tarife" standen hier vom 08.08. bis zum
+         09.08.2026 und sind wieder heraus. Nicht geloescht - beide Seiten
+         werden weiter gebaut, getestet und sind ueber ihren direkten Link
+         erreichbar. Sie sind nur nicht verlinkt, weil sie ihre Frage
+         derzeit nicht beantworten koennen: die Tarifseite kennt zwei
+         o2-Tarife und keinen einzigen von Telekom, Vodafone oder 1&1, die
+         Lieferzeitseite keinen der drei grossen Anbieter. Eine verlinkte
+         Seite verspricht eine Antwort; eine Seite mit einem Viertel des
+         Marktes gibt eine falsche.
+
+         Die Schwelle steht in CLAUDE.md §5 und ist zahlenmaessig: Tarife
+         drei Anbieter, zwoelf Mobilfunktarife, ein Tarif mit echter
+         Rabattphase - Lieferzeiten Telekom, o2 und 1&1 erfasst. Wer sie
+         wieder eintraegt, misst vorher nach. #}
       <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Quellen</a>
     </nav>
     {% endif %}

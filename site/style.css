@@ -624,31 +624,34 @@ b,strong{font-weight:700}
 @media (max-width:640px){.dz-fleck-wer{margin-left:0;flex-basis:100%}}
 
 /* ================================================  IN ZWEI MINUTEN ====== */
-/* Der kurze Weg durch die Ausgabe, ganz oben. Bewusst KEIN Kasten mit
-   Hintergrund: die Designsprache dieser Seite kennt keine Flaechen, die
-   Hierarchie kommt aus der Linienstaerke. Eine 3px-Rubrikleiste oben und
-   eine Haarlinie je Zeile - dieselbe Bauform wie die Ressorts. */
-.kurzpfad{margin:0 0 38px;border-top:3px solid var(--rule-ink);padding-top:0}
-.kurzpfad .rubrik{margin-bottom:6px}
+/* Der kurze Weg durch die Ausgabe - in der rechten Spalte ueber "Was
+   wichtig ist", seit dem 09.08.2026. Bewusst KEIN Kasten mit Hintergrund:
+   die Designsprache dieser Seite kennt keine Flaechen, die Hierarchie kommt
+   aus der Linienstaerke. Eine 3px-Rubrikleiste oben und eine Haarlinie je
+   Zeile - dieselbe Bauform wie die Ressorts.
+
+   Die Masse sind die der Spalte, nicht die der Seite: 18px Serife ueber die
+   volle Satzbreite waren an dieser Stelle der Grund, warum der Kasten die
+   Titelseite verdraengt hat. */
+.kurzpfad{margin:0 0 22px;border-top:3px solid var(--rule-ink);padding-top:0}
+.kurzpfad .rubrik{margin-bottom:2px}
 .kurzpfad-liste{list-style:none;margin:0;padding:0;
   counter-reset:kurzpfad}
-.kurzpfad-zeile{counter-increment:kurzpfad;padding:12px 0 12px 34px;
+.kurzpfad-zeile{counter-increment:kurzpfad;padding:9px 0 9px 20px;
   border-bottom:1px solid var(--rule-2);position:relative}
-.kurzpfad-zeile:last-child{border-bottom:none}
+.kurzpfad-zeile:last-child{border-bottom:none;padding-bottom:2px}
 .kurzpfad-zeile::before{content:counter(kurzpfad);position:absolute;left:0;
-  top:13px;font-family:var(--sans);font-size:12px;font-weight:700;
-  color:var(--red)}
-.kurzpfad-satz{margin:0;font-family:var(--serif);font-size:18px;
-  line-height:1.42;color:var(--ink)}
-.kurzpfad-beleg{margin:5px 0 0;display:flex;flex-wrap:wrap;
-  align-items:baseline;gap:8px;font-family:var(--sans);font-size:11.5px;
-  color:var(--ink-4)}
-.kurzpfad-beleg a{color:var(--ink-3)}
+  top:10px;font-family:var(--sans);font-size:11px;font-weight:800;
+  color:var(--red);font-variant-numeric:lining-nums}
+.kurzpfad-satz{margin:0;font-family:var(--serif);font-size:14.5px;
+  line-height:1.38;color:var(--ink)}
+/* Der Beleg haengt im Satz, nicht darunter: eine eigene Zeile je Eintrag
+   machte aus drei Zeilen wieder drei Bloecke. */
+.kurzpfad-beleg{margin-left:6px;font-family:var(--sans);font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  white-space:nowrap}
+.kurzpfad-beleg a{color:var(--ink-4)}
 .kurzpfad-beleg a:hover{color:var(--red)}
-.kurzpfad-stufe{font-weight:700;letter-spacing:.04em;text-transform:uppercase;
-  font-size:10px;color:var(--ink-4)}
-.kurzpfad-stufe.s3{color:var(--red)}
-@media (max-width:640px){.kurzpfad-satz{font-size:16px}}
 
 /* Der Satz, der aus einer Meldung eine Konsequenz macht (analyze/ctm.py).
    Er traegt eine eigene Marke, damit er nicht als weitere Zusammenfassung
@@ -1748,8 +1751,11 @@ b,strong{font-weight:700}
 }
 
 /* --- Der Foliensatz-Verweis. Eine Zeile, kein Kasten. ------------------ */
+/* Seit dem 09.08.2026 am FUSS des Berichts statt ueber der Titelseite -
+   deshalb liegt die Linie jetzt oben statt unten: sie trennt den Verweis
+   vom letzten Absatz des Berichts, nicht von der Ausgabe darunter. */
 .folienlink{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
-  margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--rule-2)}
+  margin:26px 0 0;padding-top:12px;border-top:1px solid var(--rule-2)}
 .folienlink a{color:var(--red);text-decoration:none;font-weight:600;
   text-transform:uppercase;letter-spacing:.09em}
 .folienlink a:hover{text-decoration:underline}

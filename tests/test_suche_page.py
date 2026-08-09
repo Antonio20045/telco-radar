@@ -80,29 +80,29 @@ def test_topbar_formular_zeigt_auf_die_suchseite(tmp_path):
     assert 'id="gsearch-input"' not in suche
 
 
-def test_navigation_hat_sieben_eintraege(tmp_path):
+def test_navigation_hat_fuenf_eintraege(tmp_path):
     """Sieben Unterseiten fuer eine Frage waren der Befund; vier waren das
-    Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Seit dem 08.08.2026
-    sind es sechs: "Wettbewerb" beantwortet eine eigene Frage, die keine der
-    vier beantwortet (was Telekom, O2 und 1&1 ueber die Wochen tun), und
-    "Lieferzeiten" die einzige, zu der es sonst NIRGENDS eine Antwort gibt -
-    es existiert keine oeffentliche Studie, die Lieferzeiten der deutschen
-    Anbieter systematisch vergleicht.
+    Ziel (PLAN_MARKTRECHERCHE_REDESIGN.md, Abschnitt 3). Am 08.08.2026 waren
+    es sieben, seit dem 09.08.2026 sind es FUENF.
 
-    Die Zahl steht hier absichtlich hart: eine Navigation waechst sonst
-    zurueck auf sieben Eintraege, und genau davon kam dieses Projekt.
+    Die drei Zahlen sind die ganze Geschichte dieser Navigation. "Wettbewerb"
+    (Nr. 5) beantwortet eine eigene Frage, die keine der vier beantwortet:
+    was Telekom, O2 und 1&1 ueber die Wochen tun. "Lieferzeiten" und
+    "Tarife" kamen am 08.08. dazu, mit derselben Begruendung - eine Frage,
+    die sonst niemand beantwortet - und sind am 09.08. wieder heraus. Sie
+    sind nicht geloescht: beide Seiten werden weiter gebaut, getestet und
+    sind ueber ihren direkten Link erreichbar (der Test unten haelt das
+    fest). Sie stehen nur nicht in der Navigation, weil sie ihre Frage
+    derzeit nicht beantworten koennen - die Tarifseite kennt zwei
+    o2-Tarife und keinen der drei grossen Anbieter, die Lieferzeitseite
+    keinen einzigen.
 
-    Am 08.08.2026 ist sie trotzdem auf SIEBEN erhoeht worden, und das ist
-    eine bewusste Entscheidung, keine Aufweichung. "Tarife" ist die erste
-    Seite dieses Portals, die nicht aus Meldungen entsteht, sondern aus
-    Daten - und zwar aus den einzigen Daten dieses Marktes, die rechtlich
-    wahrheitsbewehrt sind (Produktinformationsblatt nach § 1
-    TK-TransparenzV). Sie beantwortet die Frage, die keine der sechs
-    anderen beantwortet: was kostet was wirklich, und wer liegt ueber dem,
-    was am Markt ueblich ist.
-
-    Wer die achte Seite anlegen will, begruendet sie hier - genau dafuer
-    steht die Zahl hart."""
+    Das ist die Veroeffentlichungsschwelle aus CLAUDE.md §5, und sie ist der
+    Grund, warum die Zahl hier hart steht: die Begruendung "diese Seite
+    beantwortet eine Frage, die sonst niemand beantwortet" hat 2026 zweimal
+    eine Seite in die Navigation gebracht, die die Frage selbst nicht
+    beantworten konnte. Wer die sechste Seite eintraegt, misst vorher die
+    Schwelle nach und begruendet sie hier."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -112,17 +112,38 @@ def test_navigation_hat_sieben_eintraege(tmp_path):
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     nav = html.split('aria-label="Marktrecherche"')[1].split("</nav>")[0]
     for ziel in ("index.html", "meldungen.html", "differenzierung.html",
-                 "wettbewerb.html", "lieferzeit.html", "tarife.html",
-                 "transparenz.html"):
+                 "wettbewerb.html", "transparenz.html"):
         assert f'href="{ziel}"' in nav
     # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
-    assert nav.count("<a ") == 7
-    # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen.
+    assert nav.count("<a ") == 5
+    # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen -
+    # und die zwei unter der Schwelle ebenfalls nicht.
     for weg in ("bericht.html", "archive.html", "sources.html",
-                "protokoll.html", "wettbewerber.html", "suche.html"):
+                "protokoll.html", "wettbewerber.html", "suche.html",
+                "tarife.html", "lieferzeit.html"):
         assert f'href="{weg}"' not in nav
+
+
+def test_seiten_unter_der_schwelle_werden_gebaut_aber_nicht_verlinkt(tmp_path):
+    """"Nicht verlinkt" heisst nicht "weg".
+
+    Eine Seite unter der Veroeffentlichungsschwelle wird weiter gebaut und
+    ist ueber ihren direkten Link erreichbar - sonst waere die Schwelle eine
+    Loeschung mit Zwischenschritt, und niemand koennte nachsehen, ob sie
+    inzwischen genug Daten hat. Genau das ist die Bedingung dafuer, dass die
+    zwei Seiten zurueckkommen koennen."""
+    reports_dir = tmp_path / "data" / "reports"
+    reports_dir.mkdir(parents=True)
+    site_dir = tmp_path / "site"
+
+    render_site(site_dir, reports_dir, cfg=None)
+
+    for name in ("tarife.html", "lieferzeit.html"):
+        seite = site_dir / name
+        assert seite.exists(), f"{name} darf nicht verschwinden"
+        assert seite.read_text(encoding="utf-8").strip()
 
 
 def test_alte_dateinamen_leiten_weiter(tmp_path):
