@@ -1,0 +1,494 @@
+# =============================================================================
+# TELCO RADAR - Geräte- und Preisradar: die beobachteten Anbieter
+# =============================================================================
+# Drei Ebenen, alle in dieser Datei, unterschieden durch `typ`:
+#   handel        Elektronikfachhandel, nach Marktgröße in Deutschland
+#   netzbetreiber Telekom, Vodafone, o2, 1&1
+#   discount      Discount- und Zweitmarken, mit `netz` als Zuordnung
+#
+# -----------------------------------------------------------------------------
+# JEDE ZEILE HIER IST GEMESSEN, NICHT GERATEN
+# -----------------------------------------------------------------------------
+# Am 10.08.2026 wurde jeder dieser Anbieter einzeln abgerufen: robots.txt zuerst,
+# dann eine Kategorie-/Sitemap-Seite, dann eine Produktseite, und der Preis
+# wurde mit `json.loads` aus dem strukturierten Datensatz gezogen - nicht per
+# Augenmaß aus dem sichtbaren Text. `methode` und `grund` geben genau dieses
+# Messergebnis wieder. Eine URL, die nicht abgerufen wurde, steht hier nicht.
+#
+# -----------------------------------------------------------------------------
+# DIE FELDER
+# -----------------------------------------------------------------------------
+#   name          Pflicht. Geht als `anbieter` in jede listung_id ein.
+#   typ           handel | netzbetreiber | discount
+#   netz          bei typ=discount: in wessen Netz die Marke funkt
+#   gruppe        Konzern
+#   rang          gepflegt, nicht gerechnet - die Reihenfolge auf der Seite.
+#                 Dieselbe Regel wie `rang` in promo_sources.yaml: Marktgewicht
+#                 steht in keiner Zahl dieses Projekts.
+#   eigen         true nur für Vodafone: eigene Referenz, kein Wettbewerber
+#   methode       ldjson | shopify | json_endpunkt | html | js | api |
+#                 kein_hardware | deaktiviert
+#                 IMPLEMENTIERT sind derzeit `ldjson` (inklusive der
+#                 schema.org-Microdata-Stufe) und `shopify`. Alles andere ist
+#                 gemessen, dokumentiert und wartet auf einen eigenen Adapter -
+#                 drei stabile Adapter sind mehr wert als zwanzig, die zur
+#                 Hälfte leere Ergebnisse liefern (Teil F des Auftrags).
+#   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
+#                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
+#                 verschwindet stillschweigend.
+#   einstiege     die Seiten, von denen aus Produktlinks GEERNTET werden.
+#                 kind: static (HTML) | sitemap (XML) | shopify (products.json) | js
+#                 pfadmuster: nur Links, deren Adresse das enthält.
+#                 Es wird ausschließlich abgerufen, was hier steht oder von
+#                 hier aus verlinkt ist. Keine hochgezählten IDs - dieselbe
+#                 Regel und derselbe Grund wie beim Tarif-Sammler
+#                 (§ 87b UrhG, Datenbankherstellerrecht).
+#   rate_limit_sekunden  Mindestabstand zweier Abrufe derselben Domain. Eine
+#                 `Crawl-delay` aus der robots.txt gewinnt, wenn sie größer ist.
+#   max_produkte  Deckel je Lauf.
+#
+# -----------------------------------------------------------------------------
+# DAS BESUCHSFENSTER - der Befund, der den Zeitplan bestimmt
+# -----------------------------------------------------------------------------
+# medimax.de und ep.de (derselbe Shop-Betreiber, dieselbe robots.txt) schreiben
+# wörtlich:
+#
+#     Request-rate: 1/10
+#     Crawl-delay: 10
+#     Visit-time: 0200-0800          # only visit between 02:00 and 08:00 UTC
+#
+# Der Wochenlauf startet dienstags und freitags um 08:30 UTC - also AUSSERHALB
+# dieses Fensters. `collect/geraete/robots.py` erzwingt das: außerhalb der
+# Besuchszeit wird der Anbieter nicht abgerufen, er erscheint auf der
+# Quellenseite mit genau diesem Grund, und - das ist der wichtigere Teil -
+# seine Geräte werden NICHT gealtert. Sonst hätte jeder Tageslauf die halbe
+# Palette dieser zwei Händler Richtung "ausgelistet" geschoben.
+#
+# Deshalb hat der Gerätezweig einen eigenen nächtlichen Lauf
+# (.github/workflows/geraete.yml, 03:10 UTC). Im Tageslauf kommen die Anbieter
+# ohne Fenster dran, nachts alle.
+# =============================================================================
+
+anbieter:
+
+  # =========================================================== ELEKTRONIKHANDEL
+
+  - name: Amazon
+    typ: handel
+    gruppe: Amazon
+    rang: 1
+    methode: deaktiviert
+    aktiv: false
+    # Teil C3 des Auftrags, wörtlich umgesetzt: Adapter mit klarer
+    # Schnittstelle, in der Konfiguration deaktiviert ausgeliefert. Kein
+    # Scraping-Versuch, keine Proxy-Konstruktion, kein Workaround.
+    grund: >-
+      Nicht angebunden - erfordert Zugang zur Product Advertising API 5.0
+      (PartnerNet-Konto mit qualifizierenden Verkäufen). Scraping von
+      amazon.de verstößt gegen die Nutzungsbedingungen und wird zuverlässig
+      gesperrt. Sobald Zugangsdaten vorliegen, ist das ein
+      Konfigurationsschalter und kein Umbau.
+    hinweis: "Größter Händler Deutschlands - die wichtigste bekannte Lücke dieser Seite."
+
+  - name: MediaMarkt
+    typ: handel
+    gruppe: Ceconomy
+    rang: 2
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Produktdetailseiten antworten mit HTTP 403 und einer Cloudflare-Captcha-
+      Wand - auf Chrome-, Edge- und den ehrlichen ClaudeBot-Absender gleich,
+      obwohl robots.txt ClaudeBot ausdrücklich erlaubt. Lesbar ist nur die
+      Kampagnenseite /de/campaign/angebote-smartphones; ihre 26 Gerätepreise
+      stehen in window.__PRELOADED_STATE__, das kein gültiges JSON am Stück
+      ist und einen eigenen Adapter braucht.
+    basis_url: https://www.mediamarkt.de
+    einstiege:
+      - url: https://www.mediamarkt.de/de/campaign/angebote-smartphones
+        label: Angebote Smartphones
+        kind: static
+        pfadmuster: /de/product/
+
+  - name: Saturn
+    typ: handel
+    gruppe: Ceconomy
+    rang: 2
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Gleiche Plattform und gleiche Sperre wie MediaMarkt (HTTP 403 auf
+      Produktseiten, Preise nur im __PRELOADED_STATE__ der Kampagnenseite).
+      Beide gehören zu Ceconomy - wer sie als zwei Wettbewerber führt, zählt
+      einen doppelt.
+    basis_url: https://www.saturn.de
+    einstiege:
+      - url: https://www.saturn.de/de/campaign/angebote-smartphones
+        label: Angebote Smartphones
+        kind: static
+        pfadmuster: /de/product/
+
+  - name: expert
+    typ: handel
+    gruppe: expert
+    rang: 3
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Erreichbar, aber ohne ld+json: der Preis liegt im Nuxt-3-Payload
+      <script id="__NUXT_DATA__"> - einem flachen Referenz-Array, das ein
+      eigener Auflöser braucht. Kategorieseite und Produkt-Sitemap
+      (1835 Smartphone-URLs) liefern sauber.
+    basis_url: https://www.expert.de
+    einstiege:
+      - url: https://www.expert.de/sitemap/urls/produkte/telekom-navigation.xml
+        label: Produkt-Sitemap Telekommunikation
+        kind: sitemap
+        pfadmuster: /handys-smartphones/smartphones/
+
+  - name: Medimax
+    typ: handel
+    gruppe: ElectronicPartner
+    rang: 3
+    methode: ldjson
+    aktiv: true
+    basis_url: https://www.medimax.de
+    rate_limit_sekunden: 10
+    max_produkte: 20
+    hinweis: >-
+      Besuchszeit 02:00-08:00 UTC laut eigener robots.txt - im Tageslauf wird
+      dieser Anbieter deshalb übersprungen, nicht gealtert.
+    einstiege:
+      - url: https://www.medimax.de/c/116/telefon-navi/handy-smartphone/smartphones
+        label: Smartphones
+        kind: static
+        pfadmuster: /p/
+
+  - name: ElectronicPartner
+    typ: handel
+    gruppe: ElectronicPartner
+    rang: 3
+    methode: ldjson
+    aktiv: true
+    basis_url: https://www.ep.de
+    rate_limit_sekunden: 10
+    max_produkte: 20
+    hinweis: >-
+      Derselbe Shop-Betreiber wie Medimax - gleiche Sitemap-Struktur, gleiche
+      Kategorie-IDs, gleiches ld+json-Schema, gleiche Besuchszeit. Ihre Preise
+      sind kein unabhängiger zweiter Marktpunkt.
+    einstiege:
+      - url: https://www.ep.de/c/116/telefon-navi/handy-smartphone/smartphones
+        label: Smartphones
+        kind: static
+        pfadmuster: /p/
+
+  - name: Euronics
+    typ: handel
+    gruppe: Euronics
+    rang: 3
+    methode: deaktiviert
+    aktiv: false
+    grund: >-
+      Antwortet auf JEDEN Abruf mit HTTP 403, auch auf die robots.txt selbst -
+      mit nacktem Browser-Absender wie mit vollem Kopfzeilensatz, mit und ohne
+      www, über HTTP/2 wie HTTP/1.1. Das ist eine Sperre gegen den IP-Bereich
+      beziehungsweise den TLS-Fingerabdruck, kein Absenderfilter; dieselbe Lage
+      wie bei Telecompetitor. Kein Kopfzeilentrick löst das, und Bot-Schutz
+      umgehen ist ausgeschlossen.
+
+  - name: mobilcom-debitel
+    typ: handel
+    gruppe: freenet
+    rang: 4
+    methode: ldjson
+    aktiv: true
+    basis_url: https://www.freenet.de
+    rate_limit_sekunden: 2
+    max_produkte: 120
+    hinweis: >-
+      mobilcom-debitel.de leitet vollständig auf freenet.de - es ist derselbe
+      Shop. Die Produktseite trägt neben dem Hauptangebot bis zu sieben
+      Varianten mit eigenem Preis und eigener Farbe unter isSimilarTo, also
+      genau die Granularität, die ein SKU-Radar braucht.
+    einstiege:
+      # Die Listenstrecke */b/smartphones* ist in der robots.txt gesperrt und
+      # wird deshalb NICHT abgerufen. Als Einstieg dient die Sitemap, die die
+      # Seite selbst in ihrer robots.txt ausweist: 227 Geräteadressen, davon
+      # die "-ohne-vertrag"-Fassung mit dem Preis OHNE Vertrag.
+      - url: https://www.freenet.de/sitemap.xml
+        label: Sitemap (Geräte ohne Vertrag)
+        kind: sitemap
+        pfadmuster: -ohne-vertrag/p/P-M-
+
+  # ============================================================ NETZBETREIBER
+
+  - name: Telekom
+    typ: netzbetreiber
+    gruppe: Deutsche Telekom
+    rang: 1
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Erreichbar (Übersicht /mobilfunk/geraete/smartphone und 432 Geräteseiten
+      in der eigenen Sitemap), aber der Preis steht nur im eingebetteten
+      Zustandsobjekt productDetailed.productDetailsData - kein ld+json, kein
+      Microdata. Braucht einen eigenen Adapter.
+    basis_url: https://www.telekom.de
+    einstiege:
+      - url: https://www.telekom.de/mobilfunk/geraete/smartphone
+        label: Smartphones
+        kind: static
+        pfadmuster: /shop/geraet/
+
+  - name: Vodafone
+    typ: netzbetreiber
+    gruppe: Vodafone
+    rang: 2
+    eigen: true
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Im Roh-HTML steht kein Preis - er entsteht erst im Browser aus
+      /glados/v2/hardware beziehungsweise der TMF-Produktkatalog-Schnittstelle.
+      Braucht entweder den JS-Collector oder einen Adapter gegen diese
+      Schnittstelle.
+    basis_url: https://www.vodafone.de
+    hinweis: "Eigene Referenz, nicht Teil der Wettbewerbsauswertung."
+    einstiege:
+      - url: https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html
+        label: Alle Smartphones
+        kind: static
+        pfadmuster: /privat/handys/
+
+  - name: o2
+    typ: netzbetreiber
+    gruppe: Telefónica Deutschland
+    rang: 3
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Das ld+json der Produktseite trägt "price":"1.00" - den Lockpreis im
+      Tarifbündel, nicht den Gerätepreis. Der belastbare Katalog liegt hinter
+      /e-shop/rest/catalog/... (77 Geräte, robots erlaubt) und braucht einen
+      eigenen Adapter. Ein Bündelpreis ohne seinen Tarif ist bedeutungslos
+      (Teil C4).
+    basis_url: https://www.o2online.de
+    einstiege:
+      - url: https://www.o2online.de/handys/
+        label: Handys
+        kind: static
+        pfadmuster: /e-shop/
+
+  - name: 1&1
+    typ: netzbetreiber
+    gruppe: United Internet
+    rang: 4
+    methode: ldjson
+    aktiv: false
+    grund: >-
+      Es GIBT ld+json, aber sein offers.price ist der MONATSPREIS des Tarifs
+      (37,99 EUR), nicht der Gerätepreis. Diese Zahl in der Preisspalte wäre
+      falsch - und zwar plausibel falsch. Erst anbinden, wenn der Gerätepreis
+      belegbar getrennt vorliegt.
+    basis_url: https://mobile.1und1.de
+    einstiege:
+      - url: https://mobile.1und1.de/smartphones
+        label: Smartphones
+        kind: static
+        pfadmuster: mobile.1und1.de/
+
+  # ===================================================== DISCOUNT & ZWEITMARKEN
+
+  # ---------------------------------------------------------- im Telekom-Netz
+  - name: congstar
+    typ: discount
+    netz: Telekom
+    gruppe: Deutsche Telekom
+    rang: 10
+    methode: ldjson
+    aktiv: false
+    grund: >-
+      ld+json vorhanden und sauber (price 577 EUR), aber es ist der Einmalpreis
+      im Tarifbündel - der zugehörige Tarif steht nicht im strukturierten
+      Datensatz. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht
+      gespeichert (Teil C4, erzwungen in geraete_model.Listung).
+    basis_url: https://www.congstar.de
+    einstiege:
+      - url: https://www.congstar.de/sitemap/devices.xml
+        label: Geräte-Sitemap
+        kind: sitemap
+        pfadmuster: /geraete/
+
+  - name: fraenk
+    typ: discount
+    netz: Telekom
+    gruppe: Deutsche Telekom
+    rang: 11
+    methode: kein_hardware
+    aktiv: false
+    grund: >-
+      Vermarktet keine Hardware. Gemessen am 10.08.2026: die gesamte Sitemap
+      führt 24 Adressen, keine davon eine Gerätestrecke; die einzigen Preise
+      im ld+json gehören zu den zwei Tarifen.
+
+  - name: klarmobil
+    typ: discount
+    netz: Telekom
+    gruppe: freenet
+    rang: 12
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Preis liegt im Angular-Zustand (ng-state), nicht in ld+json; der
+      naheliegende Weg /shop/rest/ ist per robots.txt gesperrt. Braucht einen
+      eigenen Adapter auf den ng-state.
+    basis_url: https://www.klarmobil.de
+    einstiege:
+      - url: https://www.klarmobil.de/sitemap.xml
+        label: Sitemap
+        kind: sitemap
+        pfadmuster: /handy-kaufen/
+
+  - name: Edeka smart
+    typ: discount
+    netz: Telekom
+    gruppe: EDEKA
+    rang: 13
+    methode: shopify
+    aktiv: false
+    grund: >-
+      Technisch die einfachste Anbindung von allen (Shopify, products.json),
+      inhaltlich fast leer: der Shop führt 16 Positionen, davon 15 SIM- und
+      eSIM-Tarife und genau EIN Hardware-Bündel. Und dieses eine ist ein
+      Bündelpreis aus Gerät, Jahrespaket und Zubehör - keine Zahl, die neben
+      einem Gerätepreis ohne Vertrag stehen darf.
+    basis_url: https://bestellung.edeka-smart.de
+    einstiege:
+      - url: https://bestellung.edeka-smart.de/products.json?limit=250
+        label: Shopify-Katalog
+        kind: shopify
+
+  - name: Norma Connect
+    typ: discount
+    netz: Telekom
+    gruppe: NORMA
+    rang: 14
+    methode: shopify
+    aktiv: false
+    grund: >-
+      Wie Edeka smart: sauber abrufbar (products.json, 15 Positionen), aber
+      genau EIN Gerät, und das als Bündel mit Startpaket. Nebenbefund der
+      Messung: die Werbeseite nennt 99,00 EUR, der Shop-Datensatz 99,99 EUR -
+      wer nur eine der beiden liest, meldet einen Preis, den die andere
+      widerlegt.
+    basis_url: https://bestellung.norma-connect.de
+    einstiege:
+      - url: https://bestellung.norma-connect.de/products.json?limit=250
+        label: Shopify-Katalog
+        kind: shopify
+
+  # --------------------------------------------------------- im Vodafone-Netz
+  - name: otelo
+    typ: discount
+    netz: Vodafone
+    gruppe: Vodafone
+    rang: 20
+    methode: json_endpunkt
+    aktiv: false
+    grund: >-
+      Preis liegt in window.INITIAL_STATE unter hardwareEntity[].tariffMap[]
+      als singlePaymentFee je Tarif - also ausschließlich als Bündelzahl, und
+      zwar eine je Tarif. Braucht einen eigenen Adapter und die Tarifreferenz.
+    basis_url: https://www.otelo.de
+    einstiege:
+      - url: https://www.otelo.de/handy-mit-vertrag
+        label: Handy mit Vertrag
+        kind: static
+        pfadmuster: /handy-mit-vertrag/
+
+  - name: SIMon mobile
+    typ: discount
+    netz: Vodafone
+    gruppe: Vodafone
+    rang: 21
+    methode: kein_hardware
+    aktiv: false
+    grund: >-
+      Vermarktet keine Hardware. Gemessen am 10.08.2026: die Sitemap kennt
+      keinen einzigen Geräte- oder Shop-Pfad, die Startseite verlinkt keinen.
+
+  # --------------------------------------------------------------- im o2-Netz
+  - name: Blau
+    typ: discount
+    netz: o2
+    gruppe: Telefónica Deutschland
+    rang: 30
+    methode: html
+    aktiv: false
+    grund: >-
+      Wie o2: das ld+json trägt "price":"1.00", also die Zuzahlung im Bündel.
+      Der echte Gerätepreis steht nur im eingebetteten Zustandsobjekt.
+    basis_url: https://www.blau.de
+    einstiege:
+      - url: https://www.blau.de/e-shop/neue-handys
+        label: Neue Handys
+        kind: static
+        pfadmuster: /e-shop/
+
+  - name: smartmobil
+    typ: discount
+    netz: o2
+    gruppe: United Internet
+    rang: 31
+    methode: html
+    aktiv: false
+    grund: >-
+      Der Gerätepreis steht im Fließtext der Produktseite, und zwar VIERMAL -
+      einmal je Tarif der Staffel. Das sind vier Bündelpreise, kein
+      Gerätepreis; ohne Tarifreferenz wird keiner davon gespeichert.
+    basis_url: https://www.smartmobil.de
+    einstiege:
+      - url: https://www.smartmobil.de/sitemap-confi_handys.xml
+        label: Geräte-Sitemap
+        kind: sitemap
+        pfadmuster: /handys/
+
+  - name: WinSIM
+    typ: discount
+    netz: o2
+    gruppe: United Internet
+    rang: 32
+    methode: ldjson
+    aktiv: false
+    grund: >-
+      ld+json vorhanden, aber sein offers.price ist 1 EUR - der Lockpreis im
+      Bündel. Auf der Produktseite steht dazu wörtlich "Einmaliger Gerätepreis
+      ab: 1,- EUR"; ein belastbarer Gerätepreis ist dort nicht vorhanden.
+    basis_url: https://www.winsim.de
+    einstiege:
+      - url: https://www.winsim.de/sitemap-confi_handys.xml
+        label: Geräte-Sitemap
+        kind: sitemap
+        pfadmuster: /handys/
+
+  - name: ALDI TALK
+    typ: discount
+    netz: o2
+    gruppe: MEDION / Telefónica
+    rang: 33
+    methode: ldjson
+    aktiv: true
+    basis_url: https://www.alditalk.de
+    rate_limit_sekunden: 2
+    max_produkte: 30
+    hinweis: >-
+      Kein ld+json, aber vollständige schema.org-Microdata im Roh-HTML
+      (itemprop="price" / "priceCurrency" / "availability") - dieselbe
+      Extraktionsstufe, andere Schreibweise. Die Kategorieseite trägt KEINE
+      Gerätepreise; der Preis kommt zwingend von der Detailseite.
+    einstiege:
+      - url: https://www.alditalk.de/smartphones
+        label: Smartphones
+        kind: static
+        pfadmuster: /p/

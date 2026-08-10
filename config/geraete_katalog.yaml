@@ -1,0 +1,394 @@
+# =============================================================================
+# TELCO RADAR - Geraete- und Preisradar: der verfolgte Gerätekatalog
+# =============================================================================
+# Hand-gepflegt. Das hier ist NICHT der Markt, sondern die Liste der Modelle,
+# deren Preise verfolgt werden - Flaggschiffe und Volumenmodelle. Ein Gerät,
+# das hier nicht steht, wird von `geraete_model.erkenne_geraet()` nicht
+# erkannt und landet nicht in der Datenbank. Das ist Absicht: ein Katalog,
+# der alles aufnimmt, was in einer Shop-Kategorie steht, füllt die
+# Positionskarte mit Zubehör und Auslaufware.
+#
+# -----------------------------------------------------------------------------
+# DIE FELDER
+# -----------------------------------------------------------------------------
+#   hersteller   Pflicht. Geht in die device_id ein.
+#   modell       Pflicht. Geht in die device_id ein. So schreiben, wie der
+#                Hersteller es schreibt - Händlerschreibweisen kommen unter
+#                `aliase`.
+#   generation   Zahl, für die Sortierung "aktuelle Generation / mit Vorgängern".
+#   vorgaenger   MODELLNAME des Vorgängers desselben Herstellers. Das Feld, an
+#                dem die ganze Lifecycle-Auswertung hängt. Ohne gepflegte Kette
+#                gibt es keine Nachfolger-Analyse - und zwar still, denn eine
+#                fehlende Kette sieht aus wie "kein Effekt gemessen".
+#   marktstart   YYYY-MM-DD. SIEHE UNTEN.
+#   aliase       weitere Schreibweisen, unter denen Händler das Gerät führen.
+#                Groß-/Kleinschreibung und Sonderzeichen sind egal (alles läuft
+#                durch `wortmarken()`); nötig sind Aliase nur, wenn sich die
+#                WORTFOLGE unterscheidet ("iPhone 17 ProMax" ist KEIN Alias -
+#                "ProMax" zerfällt ohnehin nicht -, "Galaxy Fold 7" ohne das
+#                "Z" dagegen schon).
+#   speicher     die angebotenen Stufen in GB. Wird als Filter benutzt: eine
+#                Zahl im Titel, die hier nicht steht, gilt nicht als Speicher.
+#   segment      flagship | premium | mid | entry. Ordnet die Positionskarte.
+#
+# -----------------------------------------------------------------------------
+# WARUM VIELE `marktstart`-FELDER LEER SIND - und was das kostet
+# -----------------------------------------------------------------------------
+# Ein Marktstartdatum wird hier NUR eingetragen, wenn es belegt ist. Ein
+# geratenes Datum ist schlimmer als ein fehlendes: der Nachfolger-Effekt
+# rechnet Preisbewegungen in den 30/60/90 Tagen NACH dem Start des Nachfolgers,
+# und ein um zwei Monate verschobenes Datum erzeugt genau die Art Zahl, die
+# plausibel aussieht und falsch ist.
+#
+# Ein leeres Feld schaltet für dieses Gerät die Nachfolger-Analyse ab
+# (`geraete_lifecycle.nachfolger_effekt` gibt dann None statt einer Kurve).
+# Listungsdauer, Preisverfall und Portfolio-Tiefe laufen weiter - die brauchen
+# nur die eigene Zeitreihe. Wie viele Modelle betroffen sind, steht auf
+# /geraete.html unter "Datenbasis und Lücken"; die Zeile ist der Auftrag an
+# den Menschen, der diese Datei pflegt.
+#
+# Eintragen kann man ein Datum aus der Pressemitteilung des Herstellers
+# (Verkaufsstart, nicht Ankündigung) - eine Zeile pro Recherche, keine
+# Massenpflege.
+# =============================================================================
+
+geraete:
+
+  # ------------------------------------------------------------------ Apple
+  - hersteller: Apple
+    modell: iPhone 15
+    generation: 15
+    marktstart: 2023-09-22
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 15 Pro Max
+    generation: 15
+    marktstart: 2023-09-22
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16
+    generation: 16
+    vorgaenger: iPhone 15
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 16 Plus
+    generation: 16
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 16 Pro
+    generation: 16
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16 Pro Max
+    generation: 16
+    vorgaenger: iPhone 15 Pro Max
+    marktstart: 2024-09-20
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16e
+    generation: 16
+    marktstart: 2025-02-28
+    speicher: [128, 256, 512]
+    segment: mid
+
+  # Die 17er-Reihe: Marktstart bewusst leer, siehe Kopf. Die Modelle stehen
+  # trotzdem im Katalog, weil sie im Handel liegen - ohne Eintrag würde jede
+  # ihrer Listungen verworfen.
+  - hersteller: Apple
+    modell: iPhone 17
+    generation: 17
+    vorgaenger: iPhone 16
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 17 Pro
+    generation: 17
+    vorgaenger: iPhone 16 Pro
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 17 Pro Max
+    generation: 17
+    vorgaenger: iPhone 16 Pro Max
+    speicher: [256, 512, 1024, 2048]
+    segment: flagship
+
+  # ---------------------------------------------------------------- Samsung
+  - hersteller: Samsung
+    modell: Galaxy S24
+    generation: 24
+    marktstart: 2024-01-31
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S24 Ultra
+    generation: 24
+    marktstart: 2024-01-31
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S25
+    generation: 25
+    vorgaenger: Galaxy S24
+    marktstart: 2025-02-07
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 Plus
+    generation: 25
+    marktstart: 2025-02-07
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 Ultra
+    generation: 25
+    vorgaenger: Galaxy S24 Ultra
+    marktstart: 2025-02-07
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S26
+    generation: 26
+    vorgaenger: Galaxy S25
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S26 Ultra
+    generation: 26
+    vorgaenger: Galaxy S25 Ultra
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold 6
+    generation: 6
+    marktstart: 2024-07-24
+    aliase: ["Galaxy Fold 6"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold 7
+    generation: 7
+    vorgaenger: Galaxy Z Fold 6
+    aliase: ["Galaxy Fold 7"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip 6
+    generation: 6
+    marktstart: 2024-07-24
+    aliase: ["Galaxy Flip 6"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip 7
+    generation: 7
+    vorgaenger: Galaxy Z Flip 6
+    aliase: ["Galaxy Flip 7"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy A56
+    generation: 56
+    speicher: [128, 256]
+    segment: mid
+
+  # ----------------------------------------------------------------- Google
+  - hersteller: Google
+    modell: Pixel 9
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256]
+    segment: premium
+
+  - hersteller: Google
+    modell: Pixel 9 Pro
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 9 Pro XL
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10
+    generation: 10
+    vorgaenger: Pixel 9
+    speicher: [128, 256]
+    segment: premium
+
+  - hersteller: Google
+    modell: Pixel 10 Pro
+    generation: 10
+    vorgaenger: Pixel 9 Pro
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10 Pro XL
+    generation: 10
+    vorgaenger: Pixel 9 Pro XL
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  # ----------------------------------------------------------------- Xiaomi
+  - hersteller: Xiaomi
+    modell: Xiaomi 14
+    generation: 14
+    marktstart: 2024-02-25
+    aliase: ["Mi 14"]
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 15
+    generation: 15
+    vorgaenger: Xiaomi 14
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 15 Ultra
+    generation: 15
+    speicher: [512, 1024]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 14 Pro
+    generation: 14
+    speicher: [128, 256, 512]
+    segment: mid
+
+  # --------------------------------------------------------------- Motorola
+  - hersteller: Motorola
+    modell: Motorola edge 50 pro
+    generation: 50
+    marktstart: 2024-04-16
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola edge 60 pro
+    generation: 60
+    vorgaenger: Motorola edge 50 pro
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola moto g85
+    generation: 85
+    speicher: [128, 256]
+    segment: mid
+
+  # ------------------------------------------------------------------ HONOR
+  - hersteller: HONOR
+    modell: HONOR Magic6 Pro
+    generation: 6
+    marktstart: 2024-03-18
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: HONOR
+    modell: HONOR Magic7 Pro
+    generation: 7
+    vorgaenger: HONOR Magic6 Pro
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: HONOR
+    modell: HONOR 200 Pro
+    generation: 200
+    speicher: [256, 512]
+    segment: premium
+
+  # ----------------------------------------------------------------- realme
+  - hersteller: realme
+    modell: realme GT 6
+    generation: 6
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: realme
+    modell: realme GT 7 Pro
+    generation: 7
+    vorgaenger: realme GT 6
+    speicher: [256, 512]
+    segment: flagship
+
+  # ---------------------------------------------------------------- OnePlus
+  - hersteller: OnePlus
+    modell: OnePlus 12
+    generation: 12
+    marktstart: 2024-01-23
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: OnePlus
+    modell: OnePlus 13
+    generation: 13
+    vorgaenger: OnePlus 12
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: OnePlus
+    modell: OnePlus 13R
+    generation: 13
+    speicher: [256, 512]
+    segment: premium
+
+  # ---------------------------------------------------------------- Nothing
+  # Achtung: "Phone (3a)" und "Phone (3)" sind zwei Geräte. Die Klammern
+  # fallen bei der Normalisierung weg, die Ziffer-Buchstabe-Folge "3a" bleibt
+  # aber zusammen (`wortmarken`) - genau deshalb verwechselt der Erkenner die
+  # beiden nicht.
+  - hersteller: Nothing
+    modell: Nothing Phone (2a)
+    generation: 2
+    marktstart: 2024-03-12
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (3a)
+    generation: 3
+    vorgaenger: Nothing Phone (2a)
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (3)
+    generation: 3
+    speicher: [256, 512]
+    segment: premium

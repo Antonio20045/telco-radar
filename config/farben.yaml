@@ -1,0 +1,120 @@
+# =============================================================================
+# TELCO RADAR - Geräteradar: Farbschreibweisen
+# =============================================================================
+# Händler schreiben dieselbe Farbe unterschiedlich. Ohne diese Tabelle wären
+# "Titannatur" (MediaMarkt), "Titan Natur" (o2) und "Natural Titanium"
+# (Importtitel) drei verschiedene SKUs desselben Geräts - die SKU-Matrix
+# zeigte dreimal so viele Varianten, wie es gibt, und der Preisvergleich
+# zwischen zwei Händlern fände keinen gemeinsamen Artikel.
+#
+# AUFBAU: kanonische Farbe -> Liste der Schreibweisen. Der kanonische Name
+# gilt immer auch als eigene Schreibweise. Groß-/Kleinschreibung, Bindestriche
+# und Umlaute sind egal - alles läuft durch `geraete_model.normalisiere()`.
+#
+# WAS PASSIERT, WENN EINE FARBE FEHLT: sie wird NICHT geraten. Die
+# Rohschreibweise bleibt erhalten, `farbe_normalisiert` ist null, und die SKU
+# trägt die Rohschreibweise in der ID. Zwei unbekannte Schreibweisen derselben
+# Farbe sind dann zwei SKUs - das ist der Preis, und er ist ehrlicher als eine
+# geratene Zusammenlegung. Am Fuß von /geraete.html steht deshalb der
+# Farbbericht: jede unbekannte Schreibweise mit der Zahl ihrer Listungen. Das
+# ist die Arbeitsliste für diese Datei.
+#
+# Aufnehmen also nur, was wirklich aufgetaucht ist. Eine vorsorglich gepflegte
+# Farbtabelle ist eine Liste von Vermutungen.
+# =============================================================================
+
+farben:
+
+  # ------------------------------------------------------- Titan (Apple Pro)
+  titan-natur:
+    - Titannatur
+    - Titan Natur
+    - Natural Titanium
+    - Naturtitan
+  titan-blau:
+    - Titanblau
+    - Titan Blau
+    - Blue Titanium
+    - Titanium Blue
+    - Titanium Silverblue
+  titan-schwarz:
+    - Titanschwarz
+    - Titan Schwarz
+    - Black Titanium
+    - Titanium Black
+  titan-weiss:
+    - Titanweiß
+    - Titan Weiß
+    - White Titanium
+    - Titanium White
+  titan-wueste:
+    - Wüstentitan
+    - Desert Titanium
+
+  # -------------------------------------------------------------- Grundfarben
+  schwarz:
+    - Black
+    - Phantom Black
+    - Midnight
+    - Mitternacht
+    - Obsidian
+    - Space Black
+  weiss:
+    - White
+    - Starlight
+    - Polarstern
+    - Porcelain
+    - Cloud White
+  titan-grau:
+    - Titanium Gray
+    - Titanium Grey
+  blau:
+    - Blue
+    - Ultramarine
+    - Icyblue
+    - Icy Blue
+    - Ultramarin
+    - Icy Blue
+    - Navy
+    - Marineblau
+  gruen:
+    - Green
+    - Mint
+    - Minze
+    - Sage
+    - Salbei
+    - Jade Green
+  rot:
+    - Red
+    - PRODUCT RED
+  rosa:
+    - Pink
+    - Rosé
+    - Rose
+    - Peony
+    - Pfingstrose
+  gelb:
+    - Yellow
+  violett:
+    - Purple
+    - Lila
+    - Lavendel
+    - Lavender
+  grau:
+    - Grey
+    - Gray
+    - Graphit
+    - Graphite
+    - Space Grey
+  silber:
+    - Silver
+    - Silver Shadow
+  gold:
+    - Golden
+    - Champagne
+    - Champagner
+  beige:
+    - Sand
+    - Sandstein
+  koralle:
+    - Coral
