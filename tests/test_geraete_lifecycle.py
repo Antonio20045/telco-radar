@@ -1,0 +1,247 @@
+"""Die Lifecycle-Auswertung - deterministisch, ohne Modell.
+
+Das eigentliche Wertversprechen der Seite und zugleich die Stelle, an der
+sich am leichtesten luegen laesst: aus zwei Messpunkten eine Kurve zu
+zeichnen ist trivial, und sie sieht gut aus. Deshalb steht in jedem
+Ergebnis, worauf es beruht, und unter `_MIND_PUNKTE` Messpunkten heisst es
+"Datenbasis noch duenn" - nicht "Trend".
+"""
+import pytest
+
+from telco_radar.analyze.geraete_lifecycle import (
+    MIND_PUNKTE,
+    MIND_WOCHEN,
+    auswertung,
+    listungsdauer,
+    nachfolger_effekt,
+    portfolio_tiefe,
+    preisverfall,
+)
+from telco_radar.analyze.geraete_store import (
+    STATUS_AKTIV,
+    STATUS_AUSGELISTET,
+)
+from telco_radar.geraete_model import Geraet, Katalog
+
+_KATALOG = Katalog(geraete=[
+    Geraet(hersteller="Apple", modell="iPhone 16 Pro Max", generation=16,
+           marktstart="2024-09-20", segment="flagship"),
+    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
+           vorgaenger="iPhone 16 Pro Max", marktstart="2025-09-19",
+           segment="flagship"),
+    Geraet(hersteller="Apple", modell="iPhone 15 Pro Max", generation=15,
+           segment="flagship"),          # ohne Marktstart
+])
+
+
+def _eintrag(device="apple-iphone-16-pro-max", anbieter="expert",
+             first="2025-06-01", last="2026-08-10", status=STATUS_AKTIV,
+             preis=899.0, erstpreis=1449.0, sku=None, **kw):
+    e = {
+        "id": f"{anbieter}--{sku or device}",
+        "sku_id": sku or f"{device}-256gb-schwarz",
+        "device_id": device, "anbieter": anbieter, "anbieter_typ": "handel",
+        "first_seen": first, "last_verified": last, "status": status,
+        "preis_ohne_vertrag": preis, "erstpreis": erstpreis,
+        "erstpreis_art": "ohne_vertrag", "erstpreis_am": first,
+    }
+    e.update(kw)
+    return e
+
+
+def _punkte(*paare, listung_id="expert--apple-iphone-16-pro-max"):
+    return [{"listung_id": listung_id, "datum": d, "preis_ohne_vertrag": p,
+             "device_id": "apple-iphone-16-pro-max", "anbieter": "expert"}
+            for d, p in paare]
+
+
+# --------------------------------------------------------------------------
+# Listungsdauer
+# --------------------------------------------------------------------------
+
+def test_listungsdauer_zaehlt_von_der_ersten_bis_zur_letzten_sichtung():
+    d = listungsdauer(_eintrag(first="2026-01-01", last="2026-08-10"))
+    assert d == 221
+
+
+def test_ein_ausgelistetes_geraet_endet_am_auslistungstag():
+    d = listungsdauer(_eintrag(first="2026-01-01", last="2026-06-01",
+                               status=STATUS_AUSGELISTET, ended_since="2026-06-15"))
+    # Gezaehlt wird bis zur letzten BESTAETIGUNG, nicht bis zum Tag, an dem
+    # der Store aufgegeben hat - sonst zaehlten die zwei Fehltreffer der
+    # Auslistungslogik als Portfoliozeit mit.
+    assert d == 151
+
+
+def test_listungsdauer_am_ersten_tag_ist_null():
+    assert listungsdauer(_eintrag(first="2026-08-10", last="2026-08-10")) == 0
+
+
+def test_kaputte_daten_ergeben_keine_dauer():
+    assert listungsdauer(_eintrag(first="", last="2026-08-10")) is None
+    assert listungsdauer(_eintrag(first="gestern", last="2026-08-10")) is None
+
+
+# --------------------------------------------------------------------------
+# Preisverfall
+# --------------------------------------------------------------------------
+
+def test_preisverfall_absolut_und_prozentual():
+    """Der Testfall aus Teil D3 des Auftrags."""
+    v = preisverfall(_eintrag(erstpreis=899.0, preis=649.0))
+    assert v["absolut"] == -250.0
+    assert v["prozent"] == pytest.approx(-27.8, abs=0.05)
+
+
+def test_preisanstieg_wird_genauso_gerechnet():
+    v = preisverfall(_eintrag(erstpreis=649.0, preis=699.0))
+    assert v["absolut"] == 50.0 and v["prozent"] > 0
+
+
+def test_ohne_einfuehrungspreis_kein_verfall():
+    assert preisverfall(_eintrag(erstpreis=None)) is None
+    assert preisverfall(_eintrag(preis=None)) is None
+
+
+def test_zwei_preisarten_werden_nicht_verrechnet():
+    """Teil C4: 1449 Euro ohne Vertrag gegen 49,95 Euro Zuzahlung waeren
+    96,6 Prozent "Preisverfall" - die zwei Preisarten in einer Rechnung."""
+    e = _eintrag(erstpreis=1449.0, preis=None)
+    e["erstpreis_art"] = "ohne_vertrag"
+    e["zuzahlung"] = 49.95
+    e["tarif_referenz"] = "MagentaMobil M"
+    assert preisverfall(e) is None
+
+
+# --------------------------------------------------------------------------
+# Nachfolger-Effekt
+# --------------------------------------------------------------------------
+
+def test_nachfolger_effekt_ueber_30_60_90_tage():
+    punkte = _punkte(("2025-08-01", 1449.0), ("2025-09-25", 1299.0),
+                     ("2025-10-30", 1149.0), ("2025-12-15", 999.0))
+    e = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte)
+    assert e is not None
+    assert e["nachfolger"] == "apple-iphone-17-pro-max"
+    assert e["marktstart"] == "2025-09-19"
+    assert e["basis"] == 1449.0            # letzter Preis VOR dem Start
+    assert e["nach"][30] == 1299.0
+    assert e["nach"][60] == 1149.0
+    assert e["nach"][90] == 999.0
+    assert e["prozent"][90] == pytest.approx(-31.1, abs=0.1)
+
+
+def test_ohne_marktstart_des_nachfolgers_kein_effekt():
+    """Ein geratenes Datum ist schlimmer als ein fehlendes - der Katalog
+    laesst `marktstart` deshalb leer, und dann gibt es keine Kurve."""
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="iPhone 16 Pro Max", generation=16),
+        Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
+               vorgaenger="iPhone 16 Pro Max"),      # ohne marktstart
+    ])
+    assert nachfolger_effekt("apple-iphone-16-pro-max", katalog,
+                             _punkte(("2026-01-01", 1449.0))) is None
+
+
+def test_ohne_nachfolger_kein_effekt():
+    assert nachfolger_effekt("apple-iphone-17-pro-max", _KATALOG,
+                             _punkte(("2026-01-01", 1449.0))) is None
+
+
+def test_ohne_preis_vor_dem_start_kein_effekt():
+    # Wir haben erst nach dem Nachfolger angefangen zu messen - dann gibt es
+    # keine Basis, gegen die zu rechnen waere.
+    punkte = _punkte(("2025-10-01", 1299.0), ("2025-12-01", 1099.0))
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte) is None
+
+
+def test_noch_nicht_erreichte_fenster_bleiben_leer():
+    punkte = _punkte(("2025-08-01", 1449.0), ("2025-09-25", 1299.0))
+    # 30 Tage nach dem 19.09. ist der 19.10. - erreicht; 60 und 90 nicht.
+    e = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte,
+                          heute="2025-10-25")
+    assert e["nach"][30] == 1299.0
+    assert e["nach"][60] is None and e["nach"][90] is None
+
+
+# --------------------------------------------------------------------------
+# Portfolio-Tiefe
+# --------------------------------------------------------------------------
+
+def test_portfolio_tiefe_zaehlt_gleichzeitige_generationen():
+    """Antonios Beobachtung: Wettbewerber halten das Vorgaengermodell als
+    Preiseinstieg im Regal, bei Vodafone wird es meist direkt ersetzt."""
+    eintraege = [
+        _eintrag(device="apple-iphone-17-pro-max", anbieter="expert"),
+        _eintrag(device="apple-iphone-16-pro-max", anbieter="expert"),
+        _eintrag(device="apple-iphone-15-pro-max", anbieter="expert"),
+        _eintrag(device="apple-iphone-17-pro-max", anbieter="Vodafone"),
+    ]
+    tiefe = portfolio_tiefe(eintraege, _KATALOG)
+    nach_anbieter = {t["anbieter"]: t for t in tiefe}
+    assert len(nach_anbieter) == 2
+    assert nach_anbieter["expert"]["generationen"] == 3
+    assert nach_anbieter["Vodafone"]["generationen"] == 1
+
+
+def test_ausgelistete_geraete_zaehlen_nicht_zur_tiefe():
+    eintraege = [
+        _eintrag(device="apple-iphone-17-pro-max", anbieter="expert"),
+        _eintrag(device="apple-iphone-16-pro-max", anbieter="expert",
+                 status=STATUS_AUSGELISTET),
+    ]
+    assert portfolio_tiefe(eintraege, _KATALOG)[0]["generationen"] == 1
+
+
+def test_mehrere_varianten_eines_geraets_sind_eine_generation():
+    eintraege = [
+        _eintrag(device="apple-iphone-17-pro-max", anbieter="expert",
+                 sku="apple-iphone-17-pro-max-256gb-schwarz"),
+        _eintrag(device="apple-iphone-17-pro-max", anbieter="expert",
+                 sku="apple-iphone-17-pro-max-512gb-schwarz"),
+    ]
+    t = portfolio_tiefe(eintraege, _KATALOG)[0]
+    assert t["generationen"] == 1 and t["skus"] == 2
+
+
+# --------------------------------------------------------------------------
+# Die Ehrlichkeit ueber die Datenbasis
+# --------------------------------------------------------------------------
+
+def test_zwei_messpunkte_sind_kein_trend():
+    """Akzeptanzkriterium aus Teil E. In den ersten Wochen gibt es schlicht
+    keine Historie - dann sagt die Auswertung das, statt aus zwei Punkten
+    eine Kurve zu zeichnen."""
+    a = auswertung([_eintrag()], _punkte(("2026-08-03", 1449.0),
+                                         ("2026-08-10", 1399.0)),
+                   _KATALOG, heute="2026-08-10")
+    assert a["duenn"] is True
+    assert a["punkte"] == 2
+    assert "duenn" in a["hinweis"].lower() or "dünn" in a["hinweis"].lower()
+    assert a["trends"] == []
+
+
+def test_genug_messpunkte_ergeben_einen_trend():
+    punkte = _punkte(*[(f"2026-{1 + m // 3:02d}-{1 + (m % 3) * 10:02d}",
+                        1449.0 - m * 25) for m in range(15)])
+    a = auswertung([_eintrag(first="2026-01-01")], punkte, _KATALOG,
+                   heute="2026-08-10")
+    assert a["punkte"] >= MIND_PUNKTE
+    assert a["duenn"] is False
+    assert a["trends"], "genug Punkte, aber kein Trend ausgewiesen"
+
+
+def test_der_hinweis_nennt_beide_zahlen():
+    a = auswertung([_eintrag(first="2026-07-20")],
+                   _punkte(("2026-07-20", 1449.0), ("2026-08-10", 1399.0)),
+                   _KATALOG, heute="2026-08-10")
+    # "seit N Wochen beobachtet, belastbar ab etwa M" - beide Zahlen muessen
+    # dastehen, sonst ist der Satz eine Ausrede statt einer Auskunft.
+    assert str(MIND_WOCHEN) in a["hinweis"]
+    assert a["wochen"] == 3 and "3" in a["hinweis"]
+
+
+def test_leere_datenbasis_kippt_nicht():
+    a = auswertung([], [], _KATALOG, heute="2026-08-10")
+    assert a["duenn"] is True and a["punkte"] == 0 and a["trends"] == []
+    assert a["portfolio"] == []

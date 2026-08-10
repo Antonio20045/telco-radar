@@ -1,0 +1,107 @@
+name: Geraete- und Preisradar
+
+# WARUM DIESER LAUF EIGEN IST
+# ---------------------------
+# medimax.de und ep.de erlauben Abrufe laut ihrer eigenen robots.txt nur
+# zwischen 02:00 und 08:00 UTC:
+#
+#     Request-rate: 1/10
+#     Crawl-delay: 10
+#     Visit-time: 0200-0800
+#
+# Der Wochenlauf ("Telco Radar Run") startet um 08:30 UTC - also ausserhalb.
+# Dort werden diese Anbieter uebersprungen (und dabei ausdruecklich NICHT
+# gealtert, sonst schoebe jeder Tageslauf ihre Geraete Richtung
+# "ausgelistet"). Dieser Lauf holt sie nach.
+#
+# Er ist bewusst UNABHAENGIG vom Wochenlauf: er fasst weder den Seen-Store
+# noch die Berichte an, er rendert die Website nicht und er ruft kein Modell.
+# Er schreibt genau zwei Dateien - data/state/geraete_db.json und
+# data/state/geraete_preise.jsonl. Die Seite entsteht beim naechsten
+# regulaeren Lauf aus diesem Stand.
+
+on:
+  schedule:
+    # 03:10 UTC, taeglich. Mitten im Besuchsfenster und weit weg von der
+    # vollen Stunde, zu der halb GitHub seine Cronjobs startet.
+    - cron: "10 3 * * *"
+  workflow_dispatch:
+    inputs:
+      frist:
+        description: "Zeitbudget der Sammelphase in Sekunden"
+        required: false
+        default: "1500"
+
+permissions:
+  contents: write
+
+concurrency:
+  # Nicht dieselbe Gruppe wie `radar`: die zwei Laeufe schreiben verschiedene
+  # Dateien und duerfen sich nicht gegenseitig abwuergen. Aber zwei
+  # Geraetelaeufe gleichzeitig waeren zwei Collector gegen dieselbe Domain -
+  # effektiv der halbe Abstand und damit ein Bruch der Crawl-delay.
+  group: geraete
+  cancel-in-progress: false
+
+jobs:
+  geraete:
+    runs-on: ubuntu-latest
+    # Grosszuegig, weil die Bremse hier nicht die Rechenzeit ist, sondern die
+    # Crawl-delay: zehn Sekunden je Abruf mal zwanzig Produktseiten sind
+    # allein fuer einen Haendler mehr als drei Minuten.
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Wie im Hauptlauf: ohne volle Historie haelt der Rebase unten jede
+          # Datei fuer neu und bricht mit "CONFLICT (add/add)" ab.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run geraete stage
+        env:
+          PYTHONPATH: src
+        run: |
+          set -o pipefail
+          python -m telco_radar.geraete_pipeline --root . \
+            --frist "${{ github.event.inputs.frist || 1500 }}" \
+            2>&1 | tee geraete.log
+
+      - name: Upload log
+        # IMMER, nicht nur bei Fehlschlag - dieselbe Lehre wie beim
+        # Pipeline-Log: ein gruener Lauf kann eine halb tote Quelle verdecken,
+        # und ohne das Log ist hinterher nicht zu beantworten, ob eine Quelle
+        # nichts FAND oder ob sie SCHEITERTE.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geraeteradar-log-${{ github.run_id }}
+          path: geraete.log
+          if-no-files-found: warn
+
+      - name: Commit state
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          # Gezielt nur die zwei Dateien dieser Stufe. Kein `git add data/`:
+          # dieser Lauf hat mit dem Seen-Store und den Berichten nichts zu
+          # tun, und ein weiter Pfad wuerde fremde Aenderungen mitnehmen.
+          git add data/state/geraete_db.json data/state/geraete_preise.jsonl
+          if git diff --cached --quiet; then
+            echo "Keine Aenderung am Geraetebestand."
+            exit 0
+          fi
+          git commit -m "geraeteradar: Stand $(date -u +%Y-%m-%d)"
+          BRANCH="${GITHUB_REF_NAME}"
+          for i in 1 2 3 4; do
+            git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH" && exit 0
+            echo "Push fehlgeschlagen, Versuch $i"
+            sleep $((2 ** i))
+          done
+          exit 1

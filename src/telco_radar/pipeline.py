@@ -788,6 +788,26 @@ def run(root: Path, use_llm: bool | None = None,
         except Exception as exc:  # noqa: BLE001
             log.error("Promo-Uebersicht uebersprungen: %s", exc)
 
+    # ------------------------------------------- Geraete- und Preisradar (DE)
+    # Dritter Beobachtungsraum neben Presse und Aktionsseiten: was die
+    # Wettbewerber an GERAETEN fuehren und was sie kosten. Wie der Promo-Zweig
+    # eine Nebenstufe mit eigenem try/except - aber mit einem echten
+    # Zeitbudget, denn der Kernlauf liegt bereits bei rund 27 Minuten.
+    #
+    # Der Tageslauf startet um 08:30 UTC. Zwei Haendler erlauben Abrufe laut
+    # eigener robots.txt nur zwischen 02:00 und 08:00; sie werden hier
+    # uebersprungen (und dabei ausdruecklich NICHT gealtert) und vom
+    # naechtlichen Lauf .github/workflows/geraete.yml nachgeholt.
+    geraete_bilanz: dict = {}
+    if cfg.settings.get("geraete_enabled", True):
+        try:
+            from .geraete_pipeline import run_geraete_stage
+            geraete_bilanz = run_geraete_stage(
+                root, cfg.settings.get("http", {}), today_iso,
+                frist_sekunden=float(cfg.settings.get("geraete_frist_sekunden", 600)))
+        except Exception as exc:  # noqa: BLE001
+            log.error("Geraeteradar uebersprungen: %s", exc)
+
     # ----------------------------------------- Differenzierungsbericht-Agent
     # Der Bericht arbeitet auf der aktualisierten, versionierten DB. Er ist
     # deshalb ein eigener Editorial-Schritt und nicht nur eine Umformatierung
@@ -876,6 +896,17 @@ def run(root: Path, use_llm: bool | None = None,
         "ct_domains": ct_bilanz.get("gelesen", 0),
         "ct_funde": ct_bilanz.get("meldungen", 0),
         "ct_zeitueberschreitung": ct_bilanz.get("zeitueberschreitung", 0),
+        # Geraeteradar. Bewusst in `stats` und nicht nur im Log: der
+        # Promo-Zweig ist auf der Website unsichtbar, weil sein Ergebnis
+        # nirgends eingetragen wird - dieser hier soll es nicht sein.
+        # `geraete_gealtert` steht eigen: ein Geraet, das Richtung
+        # "ausgelistet" rueckt, ist die Meldung, nicht die Fussnote.
+        "geraete_anbieter": geraete_bilanz.get("abgefragt", 0),
+        "geraete_listungen": geraete_bilanz.get("listungen", 0),
+        "geraete_neu": geraete_bilanz.get("neu", 0),
+        "geraete_gealtert": geraete_bilanz.get("gealtert", 0),
+        "geraete_preispunkte": geraete_bilanz.get("preispunkte", 0),
+        "geraete_bestand": geraete_bilanz.get("bestand", 0),
         "operators": len(cfg.operators),
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
