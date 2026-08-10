@@ -133,7 +133,10 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "gealtert": gealtert_gesamt,
         "preispunkte": punkte,
         "bestand": len(db.eintraege()),
+        # Die Liste ist gedeckelt, die ZAHL ist es nicht - sonst meldet ein
+        # Lauf mit 300 unerkannten Titeln genau 40 davon und sieht harmlos aus.
         "unbekannte_titel": ergebnis["unbekannte_titel"][:40],
+        "unbekannte_titel_gesamt": len(ergebnis["unbekannte_titel"]),
         "unbekannte_farben": sorted({f for b in ergebnis["anbieter"]
                                      for f in b.unbekannte_farben})[:40],
         "kollisionen": len(kollisionen),
@@ -145,8 +148,21 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
              punkte, gealtert_gesamt, bilanz["bestand"], bilanz["sekunden"])
     for satz in bilanzen:
         if satz["status"] != "ok":
-            log.info("Geraeteradar: %s -> %s (%s)", satz["anbieter"],
-                     satz["status"], satz["grund"][:160])
+            # Die Zahlen gehoeren in DIESE Zeile. Ein Anbieter, der 84
+            # Listungen liefert und trotzdem "fehler" heisst, ist erklaerbar
+            # (der Einstieg galt als unvollstaendig gelesen) - aber nur, wenn
+            # das Protokoll die 84 auch nennt.
+            log.info("Geraeteradar: %s -> %s, %d Listungen aus %d Produktseiten "
+                     "(%s)", satz["anbieter"], satz["status"], satz["listungen"],
+                     satz["produkte_abgerufen"], satz["grund"][:160])
+    if bilanz["unbekannte_titel"]:
+        # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher
+        # nur in der Rueckgabe - und der naechtliche Lauf gibt an niemanden
+        # zurueck, sein einziger Kanal ist dieses Protokoll.
+        log.info("Geraeteradar: %d Titel ohne Katalogtreffer (Arbeitsliste "
+                 "fuer config/geraete_katalog.yaml): %s",
+                 bilanz["unbekannte_titel_gesamt"],
+                 " | ".join(bilanz["unbekannte_titel"][:25]))
     if bilanz["unbekannte_farben"]:
         log.info("Geraeteradar: unbekannte Farbschreibweisen (Arbeitsliste "
                  "fuer config/farben.yaml): %s",

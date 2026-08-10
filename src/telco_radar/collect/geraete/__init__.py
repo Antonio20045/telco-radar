@@ -293,8 +293,20 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     else:
         # Keine einzige Einstiegsseite vollstaendig gelesen. Der Anbieter
         # gilt als ungelesen - `vollstaendig` ist False, also altert nichts.
+        #
+        # "Nicht vollstaendig gelesen" ist aber NICHT dasselbe wie "nicht
+        # lesbar", und der erste echte Lauf hat genau daran gezeigt, wie
+        # irrefuehrend die alte Meldung war: mobilcom-debitel stand mit
+        # "kein Einstieg lesbar" im Protokoll und hatte dabei 84 Listungen
+        # geliefert - die Einstiegsseite war lesbar, nur ihr Deckel war
+        # erreicht. Wer das Protokoll liest, muss den Unterschied sehen.
         bilanz.status = "fehler"
-        bilanz.grund = "; ".join(gruende)[:300] or "kein Einstieg lesbar"
+        teile = gruende + bilanz.gedeckelt
+        if not teile and (bilanz.produkte_abgerufen or bilanz.listungen):
+            teile = [f"Einstieg gelesen, aber unvollstaendig ausgewertet: "
+                     f"{bilanz.produkte_abgerufen} Produktseiten abgerufen, "
+                     f"{len(bilanz.listungen)} Listungen"]
+        bilanz.grund = "; ".join(teile)[:300] or "kein Einstieg lesbar"
     bilanz.nicht_verlinkt = sorted(set(bilanz.besucht) - erlaubt)
     return bilanz
 

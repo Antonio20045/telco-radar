@@ -1089,23 +1089,69 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > diese Woche auffällt" hatte kein Zeitfenster, eine Änderung vom 9. März
 > stand in der Augustausgabe.
 >
-> **Offen, alles erst nach dem ersten echten Lauf prüfbar:**
-> 1. Der **nächtliche Lauf** (`geraete.yml`, 03:10 UTC) ist noch nie
->    gelaufen. Im Artefakt `geraeteradar-log-<run_id>` die Zeile
->    `Geraeteradar:` ansehen.
-> 2. Der **Tageslauf muss Medimax und ep.de überspringen** („ausserhalb der
->    Besuchszeit"). Steht dort etwas anderes, greift der Wächter nicht.
-> 3. **`bilanz.unbekannte_titel` durchsehen**: stehen dort echte Geräte, ist
->    der Katalog zu schmal; stehen dort Hüllen, ist der Zubehörfilter zu eng.
->    Er ist bisher nur an konstruierten Titeln gemessen.
-> 4. **24 von 46 Katalogmodellen haben kein belegtes Marktstartdatum.** Für
+> **Der erste echte Lauf ist am 10.08.2026 gelaufen** (Lauf 31419244686,
+> `main`, 19 min, Commit `dbdcf14`). Er hat vier der sechs offenen Punkte
+> beantwortet — und drei Mängel gezeigt, die nur mit echten Daten sichtbar
+> werden. Alle drei sind behoben, jeder mit einem Test, der gegen den alten
+> Stand durchfällt. Stand danach: **1390 Tests**, `pruefe_portal.py`
+> **15 bestanden / 0 durchgefallen / 0 übersprungen**.
+>
+> ```
+> Geraeteradar: 1 Anbieter abgefragt, 87 Listungen (85 neu), 85 Preispunkte,
+>               0 gealtert, Bestand 85, 1154.9s
+> ```
+>
+> | Punkt | Ergebnis |
+> |---|---|
+> | Besuchszeit-Wächter | **greift.** Medimax und ep.de: „ausserhalb der Besuchszeit laut robots.txt (02:00-08:00 UTC, Lauf um 18:29 UTC)", und **nicht gealtert** |
+> | Kriterium 11 | **BESTANDEN** — aber erst nach der Reparatur unten. Mit echten Daten fiel es durch: 76 Etiketten unter der Nulllinie |
+> | Bestand | 85 Listungen: mobilcom-debitel 84, ALDI TALK 1. Drei Hersteller (Apple 38, Google 22, Samsung 25), 11 Modelle, **alle Preise `ohne_vertrag`** — keine Bündelzahl ist durchgerutscht |
+> | Veröffentlichungsschwelle | **nicht erreicht**: 2 Anbieter mit Daten (nötig 3). Hersteller (3) und SKUs (85) stehen. Die Seite bleibt deshalb aus der Navigation, der Test hält beides gegeneinander |
+>
+> **Die drei Mängel des ersten Laufs, alle behoben:**
+>
+> 1. **Der Deckel der Positionskarte deckelte die falsche Größe.** Die
+>    Vorlage setzte `y="{{ p.ly + 3 }}"` — ein SVG-Text sitzt auf seiner
+>    Grundlinie —, der Deckel rechnete aber gegen `ly`. Jedes gedeckelte
+>    Etikett lag drei Pixel unter der Achse. Dazu zeichnete die Vorlage für
+>    jeden gedeckelten Punkt ein **leeres** `<text class="gr-etikett">`, und
+>    genau die zählte Kriterium 11: 76 Stück. Der Versatz liegt jetzt als
+>    `label_y` im Modul (die Vorlage rechnet nichts nach), und ein Punkt
+>    ohne Etikett zeichnet keinen Text mehr. Die Legende nennt jetzt **beide**
+>    Ansichten — in der Anbieteransicht stehen 84 der 85 Listungen in einer
+>    Spalte, dort bleiben die meisten Etiketten weg.
+> 2. **„kein Einstieg lesbar" für einen Anbieter mit 84 Listungen.**
+>    mobilcom-debitel stand so im Protokoll, und das Gegenteil war wahr: die
+>    Einstiegsseite war lesbar, nur ihr Deckel (`max_produkte`) war erreicht.
+>    Der Status „fehler" ist richtig (nichts darf altern) — der GRUND war es
+>    nicht. Er nennt jetzt den Deckel bzw. „Einstieg gelesen, aber
+>    unvollständig ausgewertet", und die Protokollzeile trägt die Zahlen
+>    (`… -> fehler, 84 Listungen aus N Produktseiten`).
+> 3. **`unbekannte_titel` stand nur in der Rückgabe.** Der nächtliche Lauf
+>    gibt an niemanden zurück, sein einziger Kanal ist das Protokoll — die
+>    Arbeitsliste war also genau da nicht auffindbar, wo diese Übergabe sie
+>    zu lesen verlangt. Sie wird jetzt geloggt, mit der **echten Gesamtzahl**
+>    neben der auf 25 gekürzten Liste.
+>
+> **Offen:**
+> 1. **Der Katalog ist für die Discount-Ebene zu schmal.** ALDI TALK lieferte
+>    27 abgerufene Produktseiten und genau EINE Listung (ein refurbished
+>    iPhone 15). Der Rest sind Motorola moto g06/g17/g37/g67/g77/g86, Nubia,
+>    OnePlus Nord, Crosscall, Sonim, Samsung A17 — Mittelklasse, die im
+>    Katalog nicht steht. Nach dem nächsten Lauf die neue Zeile
+>    „**N Titel ohne Katalogtreffer**" lesen und entscheiden: Katalog
+>    verbreitern oder die Ebene bewusst schmal lassen.
+> 2. **Die dritte Datenquelle fehlt für die Schwelle.** Medimax und ep.de
+>    liefern nur im nächtlichen Lauf (03:10 UTC); der ist noch nie zur
+>    geplanten Zeit gelaufen, sondern nur von Hand um 18:29 UTC. Nach dem
+>    ersten echten Nachtlauf steht die Schwelle mit vier Anbietern.
+> 3. **24 von 46 Katalogmodellen haben kein belegtes Marktstartdatum.** Für
 >    sie gibt es keine Nachfolger-Analyse. Der eine Punkt, den nur ein Mensch
 >    schließen kann — eine Zeile je Recherche.
-> 5. **Kriterium 11 von `pruefe_portal.py`** muss nach dem ersten Lauf auf
->    BESTANDEN springen. Tut es das nicht, stimmt die Verdrahtung nicht.
-> 6. Die **Veröffentlichungsschwelle** (3 Anbieter, 2 Hersteller, 20 SKUs):
->    sobald sie erreicht ist, gehört die Seite in die Navigation — der Test
->    misst beides gegeneinander und wird rot, wenn sie auseinanderlaufen.
+> 4. **Die zwölf unbekannten Farbschreibweisen** aus dem Lauf sind die
+>    Arbeitsliste für `config/farben.yaml`: Blueblack, Cobalt Violet, Cosmic
+>    Orange, Frost, Indigo, Jade, Lemongrass, Moonstone, Nebelblau, Silver
+>    Shadow (Enterprise Edition), Sky Blue, Tiefblau.
 
 > **Davor erledigt (09.08.2026, Antonio direkt): Startseite und
 > Navigation, K1–K3.** Grundlage war eine Prüfung der Live-Seite vom

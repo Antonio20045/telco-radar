@@ -53,7 +53,9 @@
             class="gr-versatz"/>
       {% endif %}
       <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ 6 if p.eigen else 4 }}"/>
-      <text x="{{ p.cx + 10 }}" y="{{ p.ly + 3 }}" class="gr-etikett">{{ p.label_kurz }}</text>
+      {% if p.beschriftet %}
+      <text x="{{ p.cx + 10 }}" y="{{ p.label_y }}" class="gr-etikett">{{ p.label_kurz }}</text>
+      {% endif %}
       <title>{{ p.modell }}{% if p.speicher %} · {{ p.speicher }} GB{% endif %}{% if p.farbe %} · {{ p.farbe }}{% endif %} · {{ '%.2f'|format(p.preis) }} € bei {{ p.anbieter }} (abgerufen {{ p.abgerufen_am }})</title>
     </g>
     {% endfor %}
@@ -146,10 +148,11 @@
   von {{ geraete.bilanz.geraete }} Geräten bei
   {{ geraete.karte_anbieter.spaltenzahl }} Anbietern, zuletzt abgerufen am
   {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen Angebote.{%
-  if geraete.karte_hersteller.etiketten_verborgen %} In der Herstelleransicht
-  tragen {{ geraete.karte_hersteller.etiketten_verborgen }} Punkte kein
-  Etikett – die Spalte ist voll; der Punkt selbst steht auf seinem Preis.{%
-  endif %}</p>
+  if geraete.karte_hersteller.etiketten_verborgen
+     or geraete.karte_anbieter.etiketten_verborgen %} Ohne Etikett bleiben {{
+  geraete.karte_hersteller.etiketten_verborgen }} Punkte nach Hersteller und {{
+  geraete.karte_anbieter.etiketten_verborgen }} nach Anbieter – die Spalte ist
+  voll; der Punkt selbst steht auf seinem Preis.{% endif %}</p>
 </section>
 {% endif %}
 

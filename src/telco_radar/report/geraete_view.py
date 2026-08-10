@@ -69,6 +69,14 @@ _ENTZERR_ABSTAND = 14
 # Abstand des Etiketts vom Punkt (muss zum `x`-Versatz in der Vorlage passen).
 _ETIKETT_ABSTAND = 10
 
+# Ein SVG-Text sitzt auf seiner GRUNDLINIE, nicht auf seiner Mitte: das
+# Etikett steht deshalb um diesen Betrag tiefer als die Zeile, der es
+# zugeordnet ist. Der Betrag gehoert hierher und nicht in die Vorlage - im
+# ersten Lauf mit echten Daten stand er dort (`y="{{ p.ly + 3 }}"`), waehrend
+# der Deckel hier gegen `ly` rechnete. Ergebnis: jedes gedeckelte Etikett lag
+# drei Pixel unter der Nulllinie, und Kriterium 11 zaehlte 76 davon.
+_ETIKETT_BASISLINIE = 3
+
 # Ungefaehre Zeichenbreite bei 10px - reicht, um ein Etikett auf die
 # Spaltenbreite zu kuerzen, statt es in die Nachbarspalte laufen zu lassen.
 _ZEICHENBREITE = 5.1
@@ -137,7 +145,11 @@ def _karte(punkte: list, spaltenfeld: str, achsname: str) -> dict:
     # Verfuegung. Die Formel des Spaltenkopfes (ganze Breite) gilt hier
     # nicht: der traegt text-anchor="middle", das Etikett nicht.
     etikettbreite = breite_spalte / 2 - _ETIKETT_ABSTAND - 4
-    unterkante = HOEHE - RAND_U
+    # Die Nulllinie ist die Grenze fuer die GRUNDLINIE des Etiketts, also
+    # fuer `ly + _ETIKETT_BASISLINIE`. Deshalb liegt der Deckel fuer `ly`
+    # genau um diesen Betrag hoeher.
+    achse = HOEHE - RAND_U
+    unterkante = achse - _ETIKETT_BASISLINIE
 
     gezeichnet = []
     verborgen = 0
@@ -164,11 +176,14 @@ def _karte(punkte: list, spaltenfeld: str, achsname: str) -> dict:
                 letzte = ly
             else:
                 verborgen += 1
+            zeile = round(min(ly, unterkante), 1)
             gezeichnet.append({
                 **p,
                 "cx": spalte["x"],
                 "cy": round(cy, 1),
-                "ly": round(min(ly, unterkante), 1),
+                "ly": zeile,
+                # Die Vorlage rechnet nichts nach: sie setzt `label_y`.
+                "label_y": round(zeile + _ETIKETT_BASISLINIE, 1),
                 "verschoben": beschriftet and abs(ly - cy) > 0.5,
                 "beschriftet": beschriftet,
                 "label_kurz": _kurz(p["label"], etikettbreite) if beschriftet else "",

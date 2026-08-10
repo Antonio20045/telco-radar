@@ -128,8 +128,11 @@ _PUNKTE = [
 ]
 
 
-def _baue(tmp_path: Path):
-    """Eine vollstaendige Site rendern - mit echtem Bericht, echtem Zustand."""
+def _baue(tmp_path: Path, db=None):
+    """Eine vollstaendige Site rendern - mit echtem Bericht, echtem Zustand.
+
+    `db` ersetzt den Bestand, wenn ein Fall mehr Listungen braucht als die
+    fuenf des Normalfalls (etwa: eine volle Spalte der Positionskarte)."""
     root = tmp_path
     (root / "config").mkdir(parents=True, exist_ok=True)
     for name, daten in (("geraete_katalog.yaml", _KATALOG),
@@ -140,7 +143,7 @@ def _baue(tmp_path: Path):
             encoding="utf-8")
     state = root / "data" / "state"
     state.mkdir(parents=True, exist_ok=True)
-    (state / "geraete_db.json").write_text(json.dumps(_DB), encoding="utf-8")
+    (state / "geraete_db.json").write_text(json.dumps(db or _DB), encoding="utf-8")
     (state / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(p) for p in _PUNKTE) + "\n", encoding="utf-8")
 
@@ -682,6 +685,57 @@ def test_kein_etikett_rutscht_unter_die_nulllinie():
     beschriftet = [p for p in k["punkte"] if p["beschriftet"]]
     assert len(beschriftet) + k["etiketten_verborgen"] == len(k["punkte"])
     assert all(p["label_kurz"] == "" for p in k["punkte"] if not p["beschriftet"])
+
+
+def test_die_grundlinie_des_etiketts_bleibt_ueber_der_nulllinie():
+    """Der erste echte Lauf (10.08.2026) hat gezeigt, dass der Deckel die
+    falsche Groesse deckelte: die Vorlage setzte `y="{{ p.ly + 3 }}"`, weil
+    ein SVG-Text auf seiner Grundlinie sitzt - der Deckel rechnete aber gegen
+    `ly`. Jedes gedeckelte Etikett lag damit drei Pixel unter der Achse;
+    Kriterium 11 von `pruefe_portal.py` zaehlte 76 davon und fiel durch.
+
+    Geprueft wird die Zahl, die die Vorlage wirklich schreibt."""
+    viele = [_punkt(199.0 + i * 20, f"Modell {i} · 256 GB") for i in range(60)]
+    k = _karte(viele, "hersteller", "Hersteller")
+    achse = k["hoehe"] - k["rand_u"]
+    assert k["etiketten_verborgen"] > 0, "sonst prueft der Fall nichts"
+    assert all(p["label_y"] <= achse for p in k["punkte"]), \
+        max(p["label_y"] for p in k["punkte"])
+    # Und die Grundlinie liegt wirklich UNTER der Zeile - sonst waere der
+    # Test auch dann gruen, wenn jemand den Versatz stillschweigend streicht.
+    assert all(p["label_y"] > p["ly"] for p in k["punkte"])
+
+
+def test_ein_punkt_ohne_etikett_zeichnet_keinen_leeren_text(tmp_path):
+    """Ein leeres `<text>` ist kein leeres Element: es traegt seine Klasse und
+    sein `y`, und genau daran haengen die Wahrheitstests der Positionskarte.
+    Vor dem 10.08.2026 stand fuer jeden gedeckelten Punkt eines im HTML - im
+    ersten echten Lauf waren das 76 Stueck, und Kriterium 11 von
+    `pruefe_portal.py` fiel daran durch.
+
+    Der Bestand des Normalfalls hat fuenf Listungen; damit deckelt nichts,
+    und der Test waere gruen, ohne etwas zu pruefen. Deshalb eine volle
+    Spalte: 60 Varianten desselben Geraets bei EINEM Anbieter."""
+    voll = {"updated": "2026-08-11", "anbieter": {"Medimax": {"laeufe": 4}},
+            "listungen": [
+                _listung("Medimax", "apple-iphone-17-pro-max",
+                         f"apple-iphone-17-pro-max-256gb-farbe-{i}",
+                         199.0 + i * 20)
+                for i in range(60)]}
+    site = _baue(tmp_path, db=voll)
+    s = _suppe(site, "geraete.html")
+    punkte = s.select("#gr-ansicht-hersteller .gr-punkt")
+    etiketten = s.select("#gr-ansicht-hersteller .gr-etikett")
+    assert len(punkte) == 60
+    assert etiketten and len(etiketten) < len(punkte), \
+        "ohne gedeckelte Etiketten prueft der Test nichts"
+    assert all(e.get_text(strip=True) for e in etiketten)
+    achse = 540 - 70
+    assert all(float(e.get("y")) <= achse for e in etiketten)
+    # Und die Legende sagt, wie viele kein Etikett tragen - eine stille
+    # Kappung waere schlimmer als eine sichtbare Luecke.
+    legende = s.select_one("#gr-legende").get_text(" ", strip=True)
+    assert "ohne Etikett" in legende.lower() or "Ohne Etikett" in legende
 
 
 def test_etikett_bleibt_in_seiner_spaltenhaelfte():

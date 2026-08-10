@@ -446,6 +446,28 @@ def test_abgeschnittene_seite_gilt_nicht_als_gelesen():
     assert bilanz.gedeckelt and "3 Adressen" in bilanz.gedeckelt[0]
 
 
+def test_ein_gedeckelter_anbieter_heisst_nicht_kein_einstieg_lesbar():
+    """Befund des ersten echten Laufs (10.08.2026): mobilcom-debitel stand
+    mit "fehler (kein Einstieg lesbar)" im Protokoll und hatte dabei 84
+    Listungen geliefert. Die Einstiegsseite WAR lesbar - nur ihr Deckel war
+    erreicht. Wer das Protokoll liest, muss den Unterschied sehen; sonst
+    sucht die naechste Session einen Ausfall, den es nicht gibt."""
+    bilanz = _lauf(_anbieter(max_produkte=2))
+    assert bilanz.status == "fehler"          # richtig: nichts darf altern
+    assert "kein Einstieg lesbar" not in bilanz.grund
+    assert "3 Adressen" in bilanz.grund       # der Deckel steht drin
+
+
+def test_kein_einstieg_lesbar_bleibt_fuer_den_echten_ausfall():
+    """Gegenprobe: wenn die Einstiegsseite wirklich nicht kommt, soll genau
+    das dastehen - und nicht ploetzlich eine Deckelmeldung."""
+    bilanz = _lauf(seiten={})          # die Einstiegsseite antwortet 404
+    assert bilanz.status == "fehler"
+    assert bilanz.produkte_abgerufen == 0
+    assert "HTTP 404" in bilanz.grund
+    assert "unvollstaendig ausgewertet" not in bilanz.grund
+
+
 def test_unter_dem_deckel_gilt_die_seite_weiterhin_als_gelesen():
     # Gegenprobe: die Sperre darf den Normalfall nicht lahmlegen.
     bilanz = _lauf(_anbieter(max_produkte=50))

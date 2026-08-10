@@ -205,6 +205,51 @@ def test_drei_leere_aber_gelesene_laeufe_ergeben_sim_only(tmp_path):
     assert db.hardware_vermarktung("Medimax") == "nein"
 
 
+def _seite_mit_titel(titel: str, preis: str = "299.00") -> str:
+    return ('<html><head><script type="application/ld+json">'
+            '{"@type":"Product","name":"%s","offers":{"@type":"Offer",'
+            '"price":"%s","priceCurrency":"EUR",'
+            '"availability":"https://schema.org/InStock"}}'
+            '</script></head><body></body></html>' % (titel, preis))
+
+
+def test_unerkannte_titel_stehen_im_protokoll(tmp_path, caplog):
+    """Der naechtliche Lauf gibt an niemanden zurueck - sein einziger Kanal
+    ist das Protokoll. `unbekannte_titel` ist die Arbeitsliste fuer
+    `config/geraete_katalog.yaml` (ist der Katalog zu schmal oder der
+    Zubehoerfilter zu eng?) und stand bis zum 10.08.2026 nur in der
+    Rueckgabe. Im ersten echten Lauf war sie deshalb nicht auffindbar,
+    obwohl von 27 abgerufenen ALDI-TALK-Seiten genau EINE eine Listung
+    ergab."""
+    seiten = dict(_SEITEN)
+    seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = \
+        _seite_mit_titel("Nothing Phone (3a) 128GB")
+    with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
+        bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
+                                   jetzt=_jetzt(), hole=_hole(seiten))
+    assert "Nothing Phone (3a) 128GB" in bilanz["unbekannte_titel"]
+    assert bilanz["unbekannte_titel_gesamt"] == len(bilanz["unbekannte_titel"])
+    text = caplog.text
+    assert "ohne Katalogtreffer" in text
+    assert "Nothing Phone (3a) 128GB" in text
+
+
+def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path,
+                                                                    caplog):
+    """Ein Anbieter, der 84 Listungen liefert und trotzdem "fehler" heisst,
+    ist erklaerbar - aber nur, wenn die Zeile die 84 nennt. Im ersten echten
+    Lauf stand dort bloss "mobilcom-debitel -> fehler (kein Einstieg
+    lesbar)", und das Gegenteil war wahr."""
+    seiten = dict(_SEITEN)
+    del seiten["https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb"]
+    with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
+        bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
+                                   jetzt=_jetzt(), hole=_hole(seiten))
+    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    assert medimax["status"] == "fehler" and medimax["listungen"] == 1
+    assert "Medimax -> fehler, 1 Listungen aus 2 Produktseiten" in caplog.text
+
+
 def test_nichts_wird_ausserhalb_von_data_state_geschrieben(tmp_path):
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
