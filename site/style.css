@@ -57,7 +57,8 @@ b,strong{font-weight:700}
 .kicker,.page-kicker,.subnav a,.usecases .uc,.meta,.rubrik,
 .stat span,.tile span,.ex-op,.ex-reg,.comp-badge,.kbadge,.chip,
 .suche-filter,.promo-filter,.dsk-art,.dsk-meta,
-.rowtable-head,.step-name,.col-model,.card-sub,.foot-inner{
+.rowtable-head,.step-name,.col-model,.card-sub,.foot-inner,
+.gr-knopf,.gr-filter label,.gr-unter,.gr-hersteller,.gr-legende{
   font-family:var(--sans);
 }
 
@@ -1781,3 +1782,115 @@ b,strong{font-weight:700}
   text-transform:uppercase;color:var(--red);text-decoration:none;
   margin-left:10px}
 .fa-beleg a:hover{text-decoration:underline}
+
+/* --- Geraete- und Preisradar ------------------------------------------- */
+/* Die Positionskarte ist ein gerechnetes SVG (report/geraete_view._karte),
+   keine Bibliothek - dieselbe Bauform wie die Tarifkarte. Hier steht nur,
+   wie sie aussieht; WO die Punkte sitzen, entscheidet Python. */
+.gr-bilanz,.gr-karte,.gr-auffaellig,.gr-matrix,.gr-lifecycle,.gr-luecken,
+.gr-quellen,.gr-methode,.gr-leer{margin:26px 0 34px}
+.gr-erklaer,.gr-legende,.gr-basis,.gr-ruhe{font-size:13.5px;line-height:1.6;
+  color:var(--ink-2);max-width:74ch;margin:8px 0 14px}
+.gr-legende{font-family:var(--sans);font-size:11.5px;letter-spacing:.03em;
+  color:var(--ink-4)}
+.gr-unter{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);margin:22px 0 6px;
+  padding-top:10px;border-top:1px solid var(--rule-2)}
+.gr-klein{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+  display:block}
+
+/* Umschalter und Filter */
+.gr-steuer{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;
+  justify-content:space-between;margin:0 0 10px;padding-bottom:10px;
+  border-bottom:1px solid var(--rule-2)}
+.gr-schalter{display:flex;gap:0}
+.gr-knopf{font-family:var(--sans);font-size:11.5px;letter-spacing:.06em;
+  text-transform:uppercase;background:none;color:var(--ink-3);cursor:pointer;
+  border:1px solid var(--rule);padding:7px 13px;margin:0 -1px 0 0}
+.gr-knopf.on{color:var(--paper-2);background:var(--ink);border-color:var(--ink)}
+.gr-filter{display:flex;flex-wrap:wrap;gap:12px}
+.gr-filter label{font-family:var(--sans);font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-4);display:flex;gap:6px;
+  align-items:center}
+.gr-filter select{font-family:var(--sans);font-size:12px;color:var(--ink);
+  background:var(--paper-2);border:1px solid var(--rule);padding:5px 7px;
+  text-transform:none;letter-spacing:0}
+
+/* Die Karte */
+.gr-ansicht--aus{display:none}
+.gr-svg{width:100%;height:auto;max-width:980px;display:block}
+.gr-achse{stroke:var(--ink-3);stroke-width:1}
+.gr-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-spaltenlinie{stroke:var(--rule-2);stroke-width:1;stroke-dasharray:2 4}
+.gr-tick,.gr-achsname{font-family:var(--sans);font-size:10px;fill:var(--ink-4)}
+.gr-spaltenname{font-family:var(--sans);font-size:11px;fill:var(--ink-2);
+  letter-spacing:.04em}
+.gr-etikett{font-family:var(--sans);font-size:9.5px;fill:var(--ink-3)}
+.gr-versatz{stroke:var(--rule);stroke-width:1}
+.gr-punkt circle{fill:var(--ink-2);cursor:pointer}
+.gr-punkt:hover circle,.gr-punkt:focus circle{fill:var(--red)}
+.gr-punkt:hover .gr-etikett,.gr-punkt:focus .gr-etikett{fill:var(--ink)}
+.gr-punkt--eigen circle{fill:var(--red)}
+.gr-punkt--eigen .gr-etikett{fill:var(--red-deep);font-weight:600}
+.gr-punkt--aus{display:none}
+.gr-detail{font-family:var(--sans);font-size:12px;color:var(--ink-2);
+  min-height:1.4em;margin:6px 0 0}
+.gr-detail a{color:var(--red)}
+
+/* Was auffaellt */
+.gr-auffaellig-karte{border-top:3px solid var(--rule-ink);padding-top:12px}
+.gr-saetze{list-style:none;padding:0;margin:0}
+.gr-saetze li{font-family:var(--serif);font-size:17px;line-height:1.4;
+  padding:9px 0;border-bottom:1px solid var(--rule-2)}
+.gr-delta--runter{color:var(--r3)}
+.gr-delta--rauf{color:var(--r5)}
+.gr-tabelle{margin-top:14px}
+
+/* SKU-Matrix */
+.gr-matrix-scroll,.gr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Eine breite Tabelle rollt IN SICH, nie die ganze Seite. Ohne diese zwei
+   Behaelter schob die Bewegungstabelle auf 390 px die komplette Seite nach
+   rechts - und eine Seite, die waagerecht rollt, ist auf dem Telefon
+   unbenutzbar. */
+.gr-scroll .src-table{min-width:520px}
+/* Lange Bezeichner ("application/ld+json") brechen, statt die Seite zu
+   verbreitern - auf 390 px war das der zweite Grund fuer waagerechtes
+   Rollen, und er sass nicht in einer Tabelle, sondern in einem <code>. */
+.gr-methode code,.gr-quellen code,.gr-grund code{overflow-wrap:break-word}
+/* `.list-row` ist ein FLEX-Container: jedes Inline-Kind wird ein eigenes
+   Flex-Element. Drei <code>-Bausteine im Fliesstext sind dort als drei
+   Spalten gelandet und mitten im Wort umgebrochen ("application/ld+ json").
+   Der Beschreibungstext steht deshalb in EINEM span - und weil
+   `.list-row-date` sonst waechst (flex:1 1 auto) und den Text nach rechts
+   drueckt, bekommt das Etikett hier eine feste Breite. */
+.gr-methodenliste .list-row-date{flex:0 0 130px;font-family:var(--mono);
+  font-size:13px}
+.gr-methodenliste .list-row>span:not(.list-row-date){flex:1 1 auto;
+  text-align:left;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.gr-matrix-tabelle{min-width:640px}
+.gr-modell{text-align:left;font-family:var(--serif);font-size:15px;
+  font-weight:600;white-space:nowrap}
+.gr-hersteller{display:block;font-family:var(--sans);font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
+.gr-zelle b{font-family:var(--serif);font-size:16px}
+.gr-spanne{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4)}
+.gr-zelle--leer{color:var(--ink-4)}
+.gr-strich{color:var(--rule)}
+.gr-varianten summary{font-family:var(--sans);font-size:12px}
+.gr-variantenzeile{font-size:13px;line-height:1.6;margin:6px 0}
+.gr-variante{display:block;color:var(--ink-2);padding-left:12px}
+
+/* Quellenseite */
+.gr-grund{font-size:12.5px;line-height:1.5;color:var(--ink-2);max-width:52ch}
+.gr-einstiege{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4);margin-top:4px}
+.gr-einstiege a{color:var(--ink-3);text-decoration:none}
+.gr-einstiege a:hover{text-decoration:underline}
+.gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
+.gr-basis--duenn{color:var(--r4)}
+
+@media (max-width:720px){
+  .gr-steuer{flex-direction:column;align-items:stretch}
+  .gr-etikett{font-size:8px}
+}

@@ -656,6 +656,28 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
   schon mal 24 min — normal sind 7–8 min.
 - **Push→Hook-Race:** Render klont sofort; der Workflow wartet 15s zwischen
   git push und Hook-Curl. Beim manuellen Nachdeployen dran denken.
+- **Eine Nebenstufe VOR dem Rendern kann den ganzen Lauf kosten — ihr
+  eigenes Zeitbudget schützt nicht.** Lauf 31422689829 (10.08.2026): der
+  Kernlauf war nach 44:39 fertig, die Geräte-Nebenstufe startete mit zehn
+  Minuten eigenem Budget in einen Job, der noch fünf hatte, und das
+  50-Minuten-Timeout kam mitten in ihr. Weil sie vor `render_site()` und dem
+  Commit steht, wurde von 45 erfolgreichen Minuten **nichts** veröffentlicht:
+  kein Bericht, keine Website, kein Deploy — und ein Timeout ist in GitHub ein
+  „cancelled", kein „failed", der Lauf sieht also nicht einmal rot aus. Ein
+  Budget muss gegen die **Restzeit des Jobs** rechnen, nicht gegen sich
+  selbst: `pipeline.geraete_budget()` tut das, zieht eine Reserve fürs
+  Veröffentlichen ab und lässt die Stufe unter vier Minuten Rest gar nicht
+  erst anlaufen. Die Geräteststufe ist im Wochenlauf seitdem **aus**
+  (`geraete_enabled: false`) — sie hat mit `geraete.yml` einen eigenen
+  täglichen Job, der zusätzlich im Besuchsfenster von medimax.de und ep.de
+  liegt. **Wer `timeout-minutes` in `radar.yml` ändert, ändert
+  `job_frist_sekunden` mit** (ein Test hält beides gegeneinander).
+- **`render_site()` ohne `cfg` rendert eine stillschweigend halbe Seite.**
+  Die Signatur ist `render_site(site_dir, reports_dir, cfg=None)`, und ohne
+  den dritten Parameter verliert `transparenz.html` seinen kompletten
+  Quellenbestand (109 Operator-Zeilen) und `wettbewerb.html` den halben
+  Inhalt — ohne Fehler, ohne Warnung. Wer die Seite von Hand neu rendert,
+  macht es wie `pipeline.py:1063`: mit `load_config(root)`.
 - **Ein Push auf `main` ist KEIN Deploy.** Am 06.08.2026 lief `deploy.yml` in
   die Actions-Warteschlange, bekam **nie einen Runner** (`runner_id: 0`,
   `started_at == created_at`) und wurde nach 15 Minuten abgebrochen. Der Code

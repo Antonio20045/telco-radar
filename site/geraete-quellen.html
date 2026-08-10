@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vodafone Insights · Geräte-Quellen</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="logo.png">
+</head>
+<body class="uc-markt">
+  
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html" aria-label="Vodafone Insights">
+        <span class="brand-logo-wrap"><img class="brand-logo" src="logo.png" alt="" width="15" height="15"></span>
+        <span class="brand-name">Vodafone <em>Insights</em></span>
+      </a>
+      <div class="topbar-right">
+        <nav class="usecases" aria-label="Anwendungsfälle">
+          <a class="uc active" href="index.html">Marktrecherche</a>
+          <a class="uc " href="promo/index.html">Promo Übersicht</a>
+        </nav>
+        
+        
+        <form class="gsearch" id="gsearch" role="search" action="suche.html" autocomplete="off">
+          <input type="search" id="gsearch-input" name="q" class="gsearch-input" autocomplete="off"
+                 placeholder="Im Archiv suchen …"
+                 aria-label="Marktrecherche durchsuchen">
+          <button type="submit" class="gsearch-btn" aria-label="Suchen">
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" aria-hidden="true">
+              <circle cx="9" cy="9" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+              <line x1="13.6" y1="13.6" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </form>
+        
+      </div>
+    </div>
+    
+    
+    
+    <nav class="subbar subnav" aria-label="Marktrecherche">
+      <a href="index.html" >Diese Woche</a>
+      <a href="meldungen.html" >Meldungen</a>
+      <a href="differenzierung.html" >Differenzierung</a>
+      <a href="wettbewerb.html" >Wettbewerb</a>
+      
+      <a href="transparenz.html" >Quellen</a>
+    </nav>
+    
+  </header>
+  <main>
+    <div class="wrap">
+      
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Geräteradar · Quellen</p>
+      <h1>Wer geliefert hat – und wer nicht.</h1>
+    </div>
+    <span class="page-date">Stand 2026-08-08</span>
+  </div>
+  <p class="page-lead">Jeder dieser Anbieter wurde einzeln gemessen: erst
+  robots.txt, dann eine Kategorie- oder Sitemap-Seite, dann eine Produktseite,
+  und der Preis aus dem strukturierten Datensatz gelesen – nicht aus dem
+  sichtbaren Text. Was in der Spalte „Warum“ steht, ist das Ergebnis dieser
+  Messung, keine Vermutung.</p>
+</section>
+
+<section class="gr-quellen">
+  <h2 class="rubrik">Alle beobachteten Anbieter
+    <span class="rubrik-zahl">21</span></h2>
+  <div class="t-bilanz-reihe">
+    <div class="t-kennzahl"><b>2</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>4</b><span>abgefragte Einstiegsseiten</span></div>
+    <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
+  </div>
+
+  <div class="gr-scroll">
+  <table class="src-table">
+    <thead>
+      <tr><th>Anbieter</th><th>Ebene</th><th>Beschaffung</th><th>Stand</th>
+        <th class="num">Geräte</th><th>Warum</th></tr>
+    </thead>
+    <tbody>
+      
+<tr>
+  <td>
+    <b>Amazon</b>
+    
+    <span class="gr-hersteller">Amazon</span>
+  </td>
+  <td>handel</td>
+  <td><code>deaktiviert</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Nicht angebunden - erfordert Zugang zur Product Advertising API 5.0 (PartnerNet-Konto mit qualifizierenden Verkäufen). Scraping von amazon.de verstößt gegen die Nutzungsbedingungen und wird zuverlässig gesperrt. Sobald Zugangsdaten vorliegen, ist das ein Konfigurationsschalter und kein Umbau.
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Telekom</b>
+    
+    <span class="gr-hersteller">Deutsche Telekom</span>
+  </td>
+  <td>netzbetreiber</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Erreichbar (Übersicht /mobilfunk/geraete/smartphone und 432 Geräteseiten in der eigenen Sitemap), aber der Preis steht nur im eingebetteten Zustandsobjekt productDetailed.productDetailsData - kein ld+json, kein Microdata. Braucht einen eigenen Adapter.
+    
+    <span class="gr-einstiege"><a href="https://www.telekom.de/mobilfunk/geraete/smartphone" rel="noopener">Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>MediaMarkt</b>
+    
+    <span class="gr-hersteller">Ceconomy</span>
+  </td>
+  <td>handel</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Produktdetailseiten antworten mit HTTP 403 und einer Cloudflare-Captcha- Wand - auf Chrome-, Edge- und den ehrlichen ClaudeBot-Absender gleich, obwohl robots.txt ClaudeBot ausdrücklich erlaubt. Lesbar ist nur die Kampagnenseite /de/campaign/angebote-smartphones; ihre 26 Gerätepreise stehen in window.__PRELOADED_STATE__, das kein gültiges JSON am Stück ist und einen eigenen Adapter braucht.
+    
+    <span class="gr-einstiege"><a href="https://www.mediamarkt.de/de/campaign/angebote-smartphones" rel="noopener">Angebote Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Saturn</b>
+    
+    <span class="gr-hersteller">Ceconomy</span>
+  </td>
+  <td>handel</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Gleiche Plattform und gleiche Sperre wie MediaMarkt (HTTP 403 auf Produktseiten, Preise nur im __PRELOADED_STATE__ der Kampagnenseite). Beide gehören zu Ceconomy - wer sie als zwei Wettbewerber führt, zählt einen doppelt.
+    
+    <span class="gr-einstiege"><a href="https://www.saturn.de/de/campaign/angebote-smartphones" rel="noopener">Angebote Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Vodafone</b>
+    <span class="chip">eigene Referenz</span>
+    <span class="gr-hersteller">Vodafone</span>
+  </td>
+  <td>netzbetreiber</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Im Roh-HTML steht kein Preis - er entsteht erst im Browser aus /glados/v2/hardware beziehungsweise der TMF-Produktkatalog-Schnittstelle. Braucht entweder den JS-Collector oder einen Adapter gegen diese Schnittstelle.
+    
+    <span class="gr-einstiege"><a href="https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html" rel="noopener">Alle Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>ElectronicPartner</b>
+    
+    <span class="gr-hersteller">ElectronicPartner</span>
+  </td>
+  <td>handel</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot empty"></span>
+    angebunden, ohne Fund
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Derselbe Shop-Betreiber wie Medimax - gleiche Sitemap-Struktur, gleiche Kategorie-IDs, gleiches ld+json-Schema, gleiche Besuchszeit. Ihre Preise sind kein unabhängiger zweiter Marktpunkt.
+    
+    <span class="gr-einstiege"><a href="https://www.ep.de/c/116/telefon-navi/handy-smartphone/smartphones" rel="noopener">Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Euronics</b>
+    
+    <span class="gr-hersteller">Euronics</span>
+  </td>
+  <td>handel</td>
+  <td><code>deaktiviert</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Antwortet auf JEDEN Abruf mit HTTP 403, auch auf die robots.txt selbst - mit nacktem Browser-Absender wie mit vollem Kopfzeilensatz, mit und ohne www, über HTTP/2 wie HTTP/1.1. Das ist eine Sperre gegen den IP-Bereich beziehungsweise den TLS-Fingerabdruck, kein Absenderfilter; dieselbe Lage wie bei Telecompetitor. Kein Kopfzeilentrick löst das, und Bot-Schutz umgehen ist ausgeschlossen.
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Medimax</b>
+    
+    <span class="gr-hersteller">ElectronicPartner</span>
+  </td>
+  <td>handel</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot empty"></span>
+    angebunden, ohne Fund
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Besuchszeit 02:00-08:00 UTC laut eigener robots.txt - im Tageslauf wird dieser Anbieter deshalb übersprungen, nicht gealtert.
+    
+    <span class="gr-einstiege"><a href="https://www.medimax.de/c/116/telefon-navi/handy-smartphone/smartphones" rel="noopener">Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>expert</b>
+    
+    <span class="gr-hersteller">expert</span>
+  </td>
+  <td>handel</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Erreichbar, aber ohne ld+json: der Preis liegt im Nuxt-3-Payload &lt;script id=&#34;__NUXT_DATA__&#34;&gt; - einem flachen Referenz-Array, das ein eigener Auflöser braucht. Kategorieseite und Produkt-Sitemap (1835 Smartphone-URLs) liefern sauber.
+    
+    <span class="gr-einstiege"><a href="https://www.expert.de/sitemap/urls/produkte/telekom-navigation.xml" rel="noopener">Produkt-Sitemap Telekommunikation</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>o2</b>
+    
+    <span class="gr-hersteller">Telefónica Deutschland</span>
+  </td>
+  <td>netzbetreiber</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Das ld+json der Produktseite trägt &#34;price&#34;:&#34;1.00&#34; - den Lockpreis im Tarifbündel, nicht den Gerätepreis. Der belastbare Katalog liegt hinter /e-shop/rest/catalog/... (77 Geräte, robots erlaubt) und braucht einen eigenen Adapter. Ein Bündelpreis ohne seinen Tarif ist bedeutungslos (Teil C4).
+    
+    <span class="gr-einstiege"><a href="https://www.o2online.de/handys/" rel="noopener">Handys</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>1&amp;1</b>
+    
+    <span class="gr-hersteller">United Internet</span>
+  </td>
+  <td>netzbetreiber</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Es GIBT ld+json, aber sein offers.price ist der MONATSPREIS des Tarifs (37,99 EUR), nicht der Gerätepreis. Diese Zahl in der Preisspalte wäre falsch - und zwar plausibel falsch. Erst anbinden, wenn der Gerätepreis belegbar getrennt vorliegt.
+    
+    <span class="gr-einstiege"><a href="https://mobile.1und1.de/smartphones" rel="noopener">Smartphones</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>mobilcom-debitel</b>
+    
+    <span class="gr-hersteller">freenet</span>
+  </td>
+  <td>handel</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot ok"></span>
+    liefert
+  </td>
+  <td class="num">84</td>
+  <td class="gr-grund">
+    mobilcom-debitel.de leitet vollständig auf freenet.de - es ist derselbe Shop. Die Produktseite trägt neben dem Hauptangebot bis zu sieben Varianten mit eigenem Preis und eigener Farbe unter isSimilarTo, also genau die Granularität, die ein SKU-Radar braucht.
+    
+    <span class="gr-einstiege"><a href="https://www.freenet.de/sitemap.xml" rel="noopener">Sitemap (Geräte ohne Vertrag)</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>congstar</b>
+    
+    <span class="gr-hersteller">Deutsche Telekom</span>
+  </td>
+  <td>discount · Telekom-Netz</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    ld+json vorhanden und sauber (price 577 EUR), aber es ist der Einmalpreis im Tarifbündel - der zugehörige Tarif steht nicht im strukturierten Datensatz. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht gespeichert (Teil C4, erzwungen in geraete_model.Listung).
+    
+    <span class="gr-einstiege"><a href="https://www.congstar.de/sitemap/devices.xml" rel="noopener">Geräte-Sitemap</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>klarmobil</b>
+    
+    <span class="gr-hersteller">freenet</span>
+  </td>
+  <td>discount · Telekom-Netz</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Preis liegt im Angular-Zustand (ng-state), nicht in ld+json; der naheliegende Weg /shop/rest/ ist per robots.txt gesperrt. Braucht einen eigenen Adapter auf den ng-state.
+    
+    <span class="gr-einstiege"><a href="https://www.klarmobil.de/sitemap.xml" rel="noopener">Sitemap</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Edeka smart</b>
+    
+    <span class="gr-hersteller">EDEKA</span>
+  </td>
+  <td>discount · Telekom-Netz</td>
+  <td><code>shopify</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Technisch die einfachste Anbindung von allen (Shopify, products.json), inhaltlich fast leer: der Shop führt 16 Positionen, davon 15 SIM- und eSIM-Tarife und genau EIN Hardware-Bündel. Und dieses eine ist ein Bündelpreis aus Gerät, Jahrespaket und Zubehör - keine Zahl, die neben einem Gerätepreis ohne Vertrag stehen darf.
+    
+    <span class="gr-einstiege"><a href="https://bestellung.edeka-smart.de/products.json?limit=250" rel="noopener">Shopify-Katalog</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Norma Connect</b>
+    
+    <span class="gr-hersteller">NORMA</span>
+  </td>
+  <td>discount · Telekom-Netz</td>
+  <td><code>shopify</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Wie Edeka smart: sauber abrufbar (products.json, 15 Positionen), aber genau EIN Gerät, und das als Bündel mit Startpaket. Nebenbefund der Messung: die Werbeseite nennt 99,00 EUR, der Shop-Datensatz 99,99 EUR - wer nur eine der beiden liest, meldet einen Preis, den die andere widerlegt.
+    
+    <span class="gr-einstiege"><a href="https://bestellung.norma-connect.de/products.json?limit=250" rel="noopener">Shopify-Katalog</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>otelo</b>
+    
+    <span class="gr-hersteller">Vodafone</span>
+  </td>
+  <td>discount · Vodafone-Netz</td>
+  <td><code>json_endpunkt</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Preis liegt in window.INITIAL_STATE unter hardwareEntity[].tariffMap[] als singlePaymentFee je Tarif - also ausschließlich als Bündelzahl, und zwar eine je Tarif. Braucht einen eigenen Adapter und die Tarifreferenz.
+    
+    <span class="gr-einstiege"><a href="https://www.otelo.de/handy-mit-vertrag" rel="noopener">Handy mit Vertrag</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>Blau</b>
+    
+    <span class="gr-hersteller">Telefónica Deutschland</span>
+  </td>
+  <td>discount · o2-Netz</td>
+  <td><code>html</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Wie o2: das ld+json trägt &#34;price&#34;:&#34;1.00&#34;, also die Zuzahlung im Bündel. Der echte Gerätepreis steht nur im eingebetteten Zustandsobjekt.
+    
+    <span class="gr-einstiege"><a href="https://www.blau.de/e-shop/neue-handys" rel="noopener">Neue Handys</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>smartmobil</b>
+    
+    <span class="gr-hersteller">United Internet</span>
+  </td>
+  <td>discount · o2-Netz</td>
+  <td><code>html</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    Der Gerätepreis steht im Fließtext der Produktseite, und zwar VIERMAL - einmal je Tarif der Staffel. Das sind vier Bündelpreise, kein Gerätepreis; ohne Tarifreferenz wird keiner davon gespeichert.
+    
+    <span class="gr-einstiege"><a href="https://www.smartmobil.de/sitemap-confi_handys.xml" rel="noopener">Geräte-Sitemap</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>WinSIM</b>
+    
+    <span class="gr-hersteller">United Internet</span>
+  </td>
+  <td>discount · o2-Netz</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot quarantaene"></span>
+    nicht angebunden
+  </td>
+  <td class="num">0</td>
+  <td class="gr-grund">
+    ld+json vorhanden, aber sein offers.price ist 1 EUR - der Lockpreis im Bündel. Auf der Produktseite steht dazu wörtlich &#34;Einmaliger Gerätepreis ab: 1,- EUR&#34;; ein belastbarer Gerätepreis ist dort nicht vorhanden.
+    
+    <span class="gr-einstiege"><a href="https://www.winsim.de/sitemap-confi_handys.xml" rel="noopener">Geräte-Sitemap</a></span>
+    
+  </td>
+</tr>
+
+<tr>
+  <td>
+    <b>ALDI TALK</b>
+    
+    <span class="gr-hersteller">MEDION / Telefónica</span>
+  </td>
+  <td>discount · o2-Netz</td>
+  <td><code>ldjson</code></td>
+  <td>
+    <span class="sdot ok"></span>
+    liefert
+  </td>
+  <td class="num">1</td>
+  <td class="gr-grund">
+    Kein ld+json, aber vollständige schema.org-Microdata im Roh-HTML (itemprop=&#34;price&#34; / &#34;priceCurrency&#34; / &#34;availability&#34;) - dieselbe Extraktionsstufe, andere Schreibweise. Die Kategorieseite trägt KEINE Gerätepreise; der Preis kommt zwingend von der Detailseite.
+    
+    <span class="gr-einstiege"><a href="https://www.alditalk.de/smartphones" rel="noopener">Smartphones</a></span>
+    
+  </td>
+</tr>
+
+    </tbody>
+  </table>
+  </div>
+
+  
+  <p class="gr-ruhe">Ohne Hardware-Vermarktung beobachtet:
+  <b>fraenk</b>, <b>SIMon mobile</b>.
+  Diese Marken vermarkten ausschließlich SIM-only. Das ist selbst ein Befund
+  und steht deshalb hier – als eine Zeile, nicht als leere Kachel.</p>
+  
+</section>
+
+<section class="gr-methode">
+  <h2 class="rubrik">Wie beschafft wird</h2>
+  <ul class="list-card gr-methodenliste">
+    <li class="list-row"><span class="list-row-date">ldjson</span>
+      <span><code>application/ld+json</code> mit <code>schema.org/Product</code>
+      und <code>offers</code>, ersatzweise dieselben Angaben als Microdata.
+      Der Weg, den die Shops selbst für Maschinen anbieten.</span></li>
+    <li class="list-row"><span class="list-row-date">shopify</span>
+      <span>der offene Katalog <code>/products.json</code> eines
+      Shopify-Shops.</span></li>
+    <li class="list-row"><span class="list-row-date">json_endpunkt</span>
+      <span>gemessen und dokumentiert, aber noch ohne Adapter: der Preis liegt
+      in einem seitenspezifischen Zustandsobjekt und braucht eigenen
+      Code.</span></li>
+    <li class="list-row"><span class="list-row-date">deaktiviert</span>
+      <span>bewusst nicht angebunden – siehe Grund in der Tabelle.</span></li>
+  </ul>
+  <p class="gr-erklaer">Drei Regeln gelten für jeden Abruf: robots.txt wird
+  gelesen und befolgt, samt Crawl-delay und Besuchszeitfenster; abgerufen wird
+  nur, was auf einer konfigurierten Seite oder in einer vom Anbieter selbst
+  ausgewiesenen Sitemap verlinkt ist – keine hochgezählten Kennungen; und ein
+  Bot-Schutz wird nicht umgangen. Wer sperrt, steht als gesperrt in der
+  Tabelle. Eine ehrliche Lücke ist besser als eine Zahl, der niemand trauen
+  kann.</p>
+  <p class="dz-foot">Zurück zum <a href="geraete.html">Geräteradar</a>.</p>
+</section>
+
+    </div>
+  </main>
+  <footer class="foot">
+    <div class="foot-inner">
+      Vodafone Insights &middot; Marktrecherche &middot; automatisch erstellt, jede Aussage mit Quelle
+    </div>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

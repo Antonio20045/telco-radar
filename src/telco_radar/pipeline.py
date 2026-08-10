@@ -44,6 +44,29 @@ log = logging.getLogger("telco_radar")
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
+# Unter dieser Restzeit lohnt die Geraetestufe nicht: ein einzelner Anbieter
+# mit zehn Sekunden Abstand je Abruf braucht Minuten, und ein halber Abruf
+# ist ohnehin kein gelesener Anbieter (`bilanz.vollstaendig`). Lieber gar
+# nicht anfangen als die Veroeffentlichung riskieren.
+_GERAETE_MINDESTBUDGET = 240.0
+
+
+def geraete_budget(settings: dict, verstrichen: float):
+    """Wie viel Zeit die Geraetestufe im Wochenlauf noch bekommt.
+
+    `None` heisst "nicht anfangen". Gerechnet wird gegen die RESTZEIT DES
+    JOBS, nicht gegen das eigene Budget - genau daran ist Lauf 31422689829
+    gescheitert. Die Reserve gehoert dem Rendern, Committen und Deployen;
+    sie ist der Teil, den ein Nutzer zu sehen bekommt.
+    """
+    if not settings.get("geraete_enabled", False):
+        return None
+    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
+            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    if rest < _GERAETE_MINDESTBUDGET:
+        return None
+    return min(float(settings.get("geraete_frist_sekunden", 600)), rest)
+
 # Anbieter, die das OpenAI-Chat-Protokoll sprechen, mit ihren
 # Konfigurationsschluesseln: (Basis-URL, Analyst-Modell, Editor-Modell).
 # Sie teilen sich EINEN Schluessel (LLM_API_KEY) - es kann also immer nur
@@ -798,13 +821,37 @@ def run(root: Path, use_llm: bool | None = None,
     # eigener robots.txt nur zwischen 02:00 und 08:00; sie werden hier
     # uebersprungen (und dabei ausdruecklich NICHT gealtert) und vom
     # naechtlichen Lauf .github/workflows/geraete.yml nachgeholt.
+    #
+    # DIE HARTE LEHRE AUS LAUF 31422689829 (10.08.2026)
+    # ------------------------------------------------
+    # Die Stufe hatte ihr eigenes Budget - und trotzdem hat sie den ganzen
+    # Lauf gekostet. Der Kernlauf war um 19:54:48 fertig, also 44:39 nach
+    # Jobbeginn; die Stufe startete mit zehn Minuten Budget in einen Job, der
+    # noch fuenf Minuten hatte. Um 19:59:46 kam das Job-Timeout, und weil
+    # diese Stufe VOR dem Rendern und Committen steht, ist nichts von den 45
+    # erfolgreichen Minuten veroeffentlicht worden: kein Bericht, keine
+    # Website, kein Deploy. Ein eigenes Zeitbudget schuetzt nur, wenn es
+    # gegen die verbleibende Jobzeit gerechnet wird - nicht gegen sich selbst.
+    #
+    # Deshalb zwei Sicherungen. Erstens ist die Stufe im Wochenlauf AUS
+    # (`geraete_enabled: false`): sie hat mit `.github/workflows/geraete.yml`
+    # einen eigenen naechtlichen Job, der sie taeglich und im Besuchsfenster
+    # der zwei Haendler faehrt. Zweitens - falls sie jemand wieder anschaltet -
+    # bekommt sie nur, was der Job noch uebrig hat, und laeuft gar nicht
+    # erst an, wenn das Rendern dadurch in Gefahr geraet.
     geraete_bilanz: dict = {}
-    if cfg.settings.get("geraete_enabled", True):
+    _budget = geraete_budget(cfg.settings, time.monotonic() - t0)
+    if _budget is None:
+        if cfg.settings.get("geraete_enabled", False):
+            log.warning("Geraeteradar uebersprungen: zu wenig Jobzeit uebrig. "
+                        "Der naechtliche Lauf holt es nach - die "
+                        "Veroeffentlichung geht vor.")
+    else:
         try:
             from .geraete_pipeline import run_geraete_stage
             geraete_bilanz = run_geraete_stage(
                 root, cfg.settings.get("http", {}), today_iso,
-                frist_sekunden=float(cfg.settings.get("geraete_frist_sekunden", 600)))
+                frist_sekunden=_budget)
         except Exception as exc:  # noqa: BLE001
             log.error("Geraeteradar uebersprungen: %s", exc)
 

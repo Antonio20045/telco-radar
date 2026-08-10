@@ -371,6 +371,30 @@ editor_model_fallback: true
 # ohne den Hauptlauf/die Hauptseite zu beruehren.
 promo_enabled: true
 
+# Geraete- und Preisradar: im WOCHENLAUF AUS. Nicht, weil die Stufe etwas
+# taugt oder nicht - sie hat einen eigenen taeglichen Job
+# (.github/workflows/geraete.yml, 03:10 UTC), und der ist der bessere Ort:
+# er faellt in das Besuchsfenster von medimax.de und ep.de (02:00-08:00 UTC
+# laut deren robots.txt), er hat sein eigenes Zeitbudget, und er kann den
+# Wochenbericht nicht aufhalten.
+#
+# Lauf 31422689829 (10.08.2026) hat gezeigt, warum das keine Geschmacksfrage
+# ist: der Kernlauf war nach 44:39 fertig, die Stufe startete mit zehn
+# Minuten Budget, das Job-Timeout kam nach 50 Minuten - und weil die Stufe
+# VOR dem Rendern steht, wurde von 45 erfolgreichen Minuten NICHTS
+# veroeffentlicht. Wer sie hier wieder anschaltet, bekommt die zweite
+# Sicherung aus pipeline.py: sie laeuft nur mit der Restzeit des Jobs und
+# gar nicht, wenn dadurch das Rendern in Gefahr geriete.
+geraete_enabled: false
+geraete_frist_sekunden: 600
+
+# Wie lange der Job insgesamt darf (radar.yml: timeout-minutes: 50) und wie
+# viel davon fuer Rendern, Committen und Deploy reserviert bleibt. Beide
+# Zahlen sind die Rechengrundlage der Sicherung oben - wer `timeout-minutes`
+# im Workflow aendert, aendert `job_frist_sekunden` mit.
+job_frist_sekunden: 3000
+veroeffentlichung_reserve_sekunden: 420
+
 # Wichtigkeits-Score der Promo-Uebersicht (src/telco_radar/analyze/promo_ranker.py).
 # Methodisch ein composite indicator nach OECD/JRC-Handbuch: fuenf Achsen mit
 # je 0-3 Punkten und FESTEN Ankertexten, gewichtete Summe, skaliert auf 0-100.
