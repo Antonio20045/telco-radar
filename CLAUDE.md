@@ -108,6 +108,11 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
                data/state/ct_seen.jsonl). Die einzige Ebene, die VOR der
                Veroeffentlichung liegt - und die Meldungen sagen ihren
                Vorbehalt im eigenen Satz
+             + GERAETE- UND PREISRADAR auf den Produktseiten von Handel,
+               Netzbetreibern und Discountmarken (collect/geraete/;
+               geraete_pipeline.py; State: data/state/geraete_db.json +
+               geraete_preise.jsonl). Die einzige Stufe mit einer echten
+               robots.txt-Pruefung - samt Crawl-delay UND Besuchszeit
 2. DELTA     Seen-Store + Freshness-Filter → nur NEUE Items
              (src/telco_radar/dedupe.py; State: data/state/seen.jsonl)
 2b. CLUSTER  Ereignis-Buendelung: dieselbe Sache aus drei Quellen ist EINE
@@ -157,6 +162,11 @@ Wichtige Dateien:
 | `config/tarif_seiten.yaml` | 16 Dauertarif-Seiten fuer den Aenderungsradar. NICHT die Aktionsseiten — die stehen in `promo_sources.yaml` |
 | `config/tarif_quellen.yaml` | **Einstiegsseiten der Tarif-Datenbank.** Es wird NUR abgerufen, was dort verlinkt ist — keine hochgezaehlten Blob-IDs. Nicht zu verwechseln mit `tarif_seiten.yaml` (Aenderungsradar auf HTML) |
 | `config/ct_domains.yaml` | Domains des CT-Radars plus die Rauschmuster. Verglichen wird LABELWEISE, nie als Teilkette |
+| `config/geraete_quellen.yaml` | **23 beobachtete Anbieter** des Geraeteradars in drei Ebenen (Handel / Netzbetreiber / Discount). Jede Zeile ist gemessen, nicht geraten: `methode` und `grund` geben das Messergebnis vom 10.08.2026 wieder. Ein Anbieter ohne Adapter steht mit seinem Grund da und verschwindet NICHT |
+| `config/geraete_katalog.yaml` | Die **verfolgten Modelle** - nicht der Markt. `vorgaenger` ist das Feld, an dem die ganze Lifecycle-Auswertung haengt; ein leeres `marktstart` schaltet die Nachfolger-Analyse fuer dieses Geraet ab (ein geratenes Datum waere schlimmer) |
+| `config/farben.yaml` | Farbschreibweise -> kanonische Farbe. Eine unbekannte Farbe wird BEHALTEN und nicht geraten; der Farbbericht am Fuss von `/geraete.html` ist die Arbeitsliste fuer diese Datei |
+| `data/state/geraete_db.json` | Aktueller Stand je Listung, mit Zwei-Stufen-Auslistung wie `promo_db.json`. Nichts wird geloescht - genau daraus entsteht die Listungsdauer |
+| `data/state/geraete_preise.jsonl` | NUR die Aenderungspunkte des Preises. Ein unveraenderter Preis schreibt keine Zeile; die rechte Kante jeder Kurve ist `last_verified` in der DB |
 | `config/lieferzeit_warenkorb.yaml` | Der feste Warenkorb des Lieferzeit-Radars: Produkte mit EINER Variante, eine Test-PLZ, je Anbieter das Ident-Verfahren |
 | `config/fruehwarnung.yaml` | Fuenf CTM-Kernfragen mit falsifizierbaren Indikatoren. Der Wert steckt darin, dass sie VORHER feststehen |
 | `data/state/clusters.jsonl` | Ereignis-Gedaechtnis. ID aus der kanonischen URL, nie aus dem Titel |
@@ -265,6 +275,8 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
+| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit Umschalter (Spalten = Hersteller / = Anbieter, beide vorgerechnet, kein Reload), SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
@@ -489,7 +501,9 @@ Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
 **Die Navigation hat FÜNF Einträge** (Diese Woche, Meldungen,
 Differenzierung, Wettbewerb, Quellen). `tests/test_suche_page.py` nagelt die
 Zahl fest — eine Navigation wächst sonst zurück, und genau davon kam dieses
-Projekt.
+Projekt. `geraete.html` und `geraete-quellen.html` sind seit dem 10.08.2026
+gebaut und getestet, stehen aber aus demselben Grund nicht darin: die
+Veröffentlichungsschwelle unten.
 
 Sieben waren es vom 08. bis zum 09.08.2026. „Lieferzeiten" und „Tarife"
 kamen mit der Begründung dazu, sie beantworteten eine Frage, die sonst
@@ -506,6 +520,10 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > **Tarifseite:** mindestens drei Anbieter, zwölf Mobilfunktarife, ein
 > Tarif mit echter Rabattphase.
 > **Lieferzeitseite:** Telekom, o2 und 1&1 erfasst.
+> **Geräteseite:** drei Anbieter mit Daten, zwei Hersteller in der
+> Positionskarte, zwanzig SKUs. Die Zahlen stehen hart in
+> `tests/test_geraete_seite.py`, und ein Test misst Navigation und Schwelle
+> GEGENEINANDER — laufen sie auseinander, wird er rot.
 
 Die Regel ist der Preis für die Ausnahme, die am 08.08. zweimal gemacht
 wurde. „Diese Seite beantwortet eine Frage, die keine andere beantwortet"
@@ -887,6 +905,43 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
   dessen Alleinstellungsmerkmal der Belegzwang ist. *Archiv-Dialog (RAG)* —
   braucht einen Dienst zur Laufzeit; die Website ist eine Static Site ohne
   Backend, und genau das ist die Bedingung dafür, dass sie nie einschläft.
+- **Die ID eines Geräts kommt aus dem KATALOG, nie aus dem Titel.** Händler
+  benennen denselben Artikel ständig um („iPhone 17 Pro Max 256GB Titan" →
+  „Apple iPhone 17 Pro Max 5G 256 GB Titannatur"). Aus einem Titel-Hash
+  würden jede Woche neue Geräte, die Listungsdauer wäre immer eine Woche und
+  der Preisverfall immer null. `geraete_model.py` benutzt den Titel
+  ausschließlich, um den Katalogeintrag zu finden. Genau diese Falle steckt
+  in `promo_store.entry_id()`, wo eine Fuzzy-Suche sie nachträglich abfängt.
+- **Ein Modellzusatz hinter dem Katalogtreffer verwirft die Zuordnung.**
+  „Google Pixel 10 Pro **Fold**" traf im ersten Anlauf den Eintrag „Pixel 10
+  Pro". Beide stehen beim selben Händler und liegen 800 € auseinander — die
+  Preishistorie schrieb in JEDEM Lauf zwei Änderungspunkte hin und zurück,
+  eine dauerhafte Sägezahnkurve, die wie ein Preiskampf aussah. Dasselbe galt
+  für „Galaxy S25 FE" und „Galaxy S25 Edge". Wer `_MODELLZUSATZ` anfasst,
+  fasst diese Kurve an.
+- **Ein Deckel, der eine Seite abschneidet, macht sie nicht „gelesen".**
+  `max_produkte` kappte die Linkliste, die Einstiegsseite galt trotzdem als
+  vollständig, und `mark_stale` alterte alles jenseits des Deckels. Live:
+  freenets Sitemap liefert 83 Adressen zum konfigurierten Muster. Dieselbe
+  Falle wie bei `promo_store.mark_stale/gepruefte_seiten`, nur an einer neuen
+  Stelle — und das Protokoll sah dabei normal aus.
+- **`verfuegbarkeit` ist nie None, also griff die Ausfallregel dort nie.** Ein
+  Lauf, der die Verfügbarkeit nicht parsen konnte, schrieb für JEDE Listung
+  eine Historienzeile: aus „lieferbar → unbekannt → lieferbar" wurde ein
+  Lieferereignis, das es nie gab. Wer ein Feld mit Vorgabewert in die
+  Änderungsprüfung aufnimmt, braucht `_ist_ausfall()` dafür.
+- **Der Zubehörfilter braucht ZWEI Listen.** Eine einzige, breite verwarf
+  echte Geräte: „iPhone 16 Pro Max 256GB, ohne Netzteil" (im deutschen Handel
+  eine Pflichtangabe), „moto g85, 5000 mAh Akku", „Xiaomi 15 Ultra, 6,73 Zoll
+  AMOLED Display". Wörter, die ein Gerät begleiten können, zählen nur VOR dem
+  Modellnamen — so heißt ein Zubehörtitel („Ladekabel für iPhone 17"), während
+  die Beigabe hinten steht.
+- **`Visit-time` in einer robots.txt ist keine Feinheit.** medimax.de und
+  ep.de erlauben Abrufe nur zwischen 02:00 und 08:00 UTC; der Wochenlauf
+  startet 08:30. Wer nur `Disallow` prüft, hält sich für regelkonform und
+  läuft trotzdem jedes Mal außerhalb des Fensters. Die zweite Hälfte der Regel
+  steht nicht im Wächter, sondern beim Aufrufer: ein übersprungener Anbieter
+  darf NICHT gealtert werden.
 - **Der Tarif-Sammler enumeriert NICHT, und das ist keine Vorsicht.** Es wird
   ausschliesslich abgerufen, was auf einer konfigurierten Seite als Link
   stand. Die o2-Dokumente liegen unter fortlaufenden Blob-IDs im S3-Bucket;
@@ -999,7 +1054,60 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (09.08.2026, Antonio direkt): Startseite und
+> **Zuletzt erledigt (10.08.2026, Antonio direkt): das Geräte- und
+> Preisradar.** Vier Bauabschnitte, alle umgesetzt. Stand danach:
+> **1384 Tests** (vorher 1104), `pruefe_portal.py` 14 bestanden / 0
+> durchgefallen / 1 übersprungen (das neue Kriterium 11 braucht Daten, die
+> erst der erste Lauf bringt). Vollständige
+> Schlussliste mit allen Messungen:
+> `outputs/geraete-preisradar-2026-08-10.md`.
+>
+> Neu: `geraete_model.py` (Datenmodell und Geräteerkennung),
+> `geraete_config.py`, `analyze/geraete_store.py` (Zwei-Stufen-Auslistung +
+> Preishistorie), `collect/geraete/` (robots.txt, ld+json/Microdata, Shopify,
+> Linkernte), `analyze/geraete_lifecycle.py`, `geraete_pipeline.py`,
+> `report/geraete_view.py`, zwei Vorlagen, `.github/workflows/geraete.yml`.
+>
+> **Die Quellen sind gemessen, nicht geraten.** 22 Anbieter einzeln (plus
+> Amazon, das aus Rechtsgründen gar nicht erst abgerufen wurde — 23 in der
+> Konfiguration)
+> abgerufen — robots.txt, Kategorie-/Sitemap-Seite, Produktseite, Preis per
+> `json.loads`. Vier tragen einen Adapter (Medimax, ElectronicPartner,
+> mobilcom-debitel/freenet, ALDI TALK); alle anderen stehen mit ihrem
+> Messergebnis und ihrem Grund in der Konfiguration. Amazon ist wie im
+> Auftrag verlangt als Adapter gebaut und **deaktiviert ausgeliefert**;
+> Euronics antwortet auf jede Variante mit 403, auch auf die robots.txt
+> selbst — dieselbe Lage wie bei Telecompetitor.
+>
+> **`diff-reviewer` lief zweimal und hat 17 + 19 Befunde gemeldet**, neun
+> davon kritisch oder schwer — alle behoben, jeder mit einem Test, der gegen
+> den alten Stand durchfällt. Die teuersten stehen als Fallstricke in §6; die
+> vollständige Liste in der Schlussliste. Drei Beispiele, weil sie den Typ
+> zeigen: „Pixel 10 Pro **Fold**" traf den Katalogeintrag „Pixel 10 Pro" und
+> erzeugte eine dauerhafte 800-Euro-Sägezahnkurve; die Etiketten der
+> Positionskarte wanderten bei voller Spalte unter die Nulllinie; und „Was
+> diese Woche auffällt" hatte kein Zeitfenster, eine Änderung vom 9. März
+> stand in der Augustausgabe.
+>
+> **Offen, alles erst nach dem ersten echten Lauf prüfbar:**
+> 1. Der **nächtliche Lauf** (`geraete.yml`, 03:10 UTC) ist noch nie
+>    gelaufen. Im Artefakt `geraeteradar-log-<run_id>` die Zeile
+>    `Geraeteradar:` ansehen.
+> 2. Der **Tageslauf muss Medimax und ep.de überspringen** („ausserhalb der
+>    Besuchszeit"). Steht dort etwas anderes, greift der Wächter nicht.
+> 3. **`bilanz.unbekannte_titel` durchsehen**: stehen dort echte Geräte, ist
+>    der Katalog zu schmal; stehen dort Hüllen, ist der Zubehörfilter zu eng.
+>    Er ist bisher nur an konstruierten Titeln gemessen.
+> 4. **24 von 46 Katalogmodellen haben kein belegtes Marktstartdatum.** Für
+>    sie gibt es keine Nachfolger-Analyse. Der eine Punkt, den nur ein Mensch
+>    schließen kann — eine Zeile je Recherche.
+> 5. **Kriterium 11 von `pruefe_portal.py`** muss nach dem ersten Lauf auf
+>    BESTANDEN springen. Tut es das nicht, stimmt die Verdrahtung nicht.
+> 6. Die **Veröffentlichungsschwelle** (3 Anbieter, 2 Hersteller, 20 SKUs):
+>    sobald sie erreicht ist, gehört die Seite in die Navigation — der Test
+>    misst beides gegeneinander und wird rot, wenn sie auseinanderlaufen.
+
+> **Davor erledigt (09.08.2026, Antonio direkt): Startseite und
 > Navigation, K1–K3.** Grundlage war eine Prüfung der Live-Seite vom
 > 8. August. Stand danach: **1104 Tests**, alle **14 Prüfungen von
 > `pruefe_portal.py`** grün.

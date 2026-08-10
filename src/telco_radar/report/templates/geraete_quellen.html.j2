@@ -1,0 +1,105 @@
+{# Geraete-Quellen: wer beobachtet wird, wie - und wer warum nicht.
+
+   Die Zusicherung dieser Seite steht in Teil E des Auftrags: kein Anbieter
+   fehlt stillschweigend. Ein Anbieter, der nicht abgefragt wird, steht hier
+   mit seinem GRUND, und der Grund ist gemessen - robots.txt, Statuscode,
+   Fundstelle des Preises. #}
+{% extends "base.html.j2" %}
+{% set active = 'geraete' %}
+{% block title %}Vodafone Insights · Geräte-Quellen{% endblock %}
+
+{% macro zeile(z) %}
+<tr>
+  <td>
+    <b>{{ z.name }}</b>
+    {% if z.eigen %}<span class="chip">eigene Referenz</span>{% endif %}
+    {% if z.gruppe %}<span class="gr-hersteller">{{ z.gruppe }}</span>{% endif %}
+  </td>
+  <td>{{ z.typ }}{% if z.netz %} · {{ z.netz }}-Netz{% endif %}</td>
+  <td><code>{{ z.methode }}</code></td>
+  <td>
+    <span class="sdot {{ 'ok' if z.liefert else ('empty' if z.crawlbar else 'quarantaene') }}"></span>
+    {% if z.liefert %}liefert{% elif z.crawlbar %}angebunden, ohne Fund{% else %}nicht angebunden{% endif %}
+  </td>
+  <td class="num">{{ z.geraete }}</td>
+  <td class="gr-grund">
+    {% if z.liefert %}{{ z.hinweis }}{% else %}{{ z.grund or z.hinweis }}{% endif %}
+    {% if z.einstiege %}
+    <span class="gr-einstiege">{% for e in z.einstiege %}<a href="{{ e.url }}" rel="noopener">{{ e.label or e.url | domain }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>
+    {% endif %}
+  </td>
+</tr>
+{% endmacro %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Geräteradar · Quellen</p>
+      <h1>Wer geliefert hat – und wer nicht.</h1>
+    </div>
+    {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand }}</span>{% endif %}
+  </div>
+  <p class="page-lead">Jeder dieser Anbieter wurde einzeln gemessen: erst
+  robots.txt, dann eine Kategorie- oder Sitemap-Seite, dann eine Produktseite,
+  und der Preis aus dem strukturierten Datensatz gelesen – nicht aus dem
+  sichtbaren Text. Was in der Spalte „Warum“ steht, ist das Ergebnis dieser
+  Messung, keine Vermutung.</p>
+</section>
+
+<section class="gr-quellen">
+  <h2 class="rubrik">Alle beobachteten Anbieter
+    <span class="rubrik-zahl">{{ geraete.quellenlage.aufgefuehrt }}</span></h2>
+  <div class="t-bilanz-reihe">
+    <div class="t-kennzahl"><b>{{ geraete.quellenlage.liefernd }}</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.quellenlage.seiten }}</b><span>abgefragte Einstiegsseiten</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.quellenlage.ohne_hardware | length }}</b><span>ohne Hardware-Vermarktung</span></div>
+  </div>
+
+  <div class="gr-scroll">
+  <table class="src-table">
+    <thead>
+      <tr><th>Anbieter</th><th>Ebene</th><th>Beschaffung</th><th>Stand</th>
+        <th class="num">Geräte</th><th>Warum</th></tr>
+    </thead>
+    <tbody>
+      {% for z in geraete.quellenlage.zeilen %}{{ zeile(z) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {% if geraete.quellenlage.ohne_hardware %}
+  <p class="gr-ruhe">Ohne Hardware-Vermarktung beobachtet:
+  {% for z in geraete.quellenlage.ohne_hardware %}<b>{{ z.name }}</b>{% if not loop.last %}, {% endif %}{% endfor %}.
+  Diese Marken vermarkten ausschließlich SIM-only. Das ist selbst ein Befund
+  und steht deshalb hier – als eine Zeile, nicht als leere Kachel.</p>
+  {% endif %}
+</section>
+
+<section class="gr-methode">
+  <h2 class="rubrik">Wie beschafft wird</h2>
+  <ul class="list-card gr-methodenliste">
+    <li class="list-row"><span class="list-row-date">ldjson</span>
+      <span><code>application/ld+json</code> mit <code>schema.org/Product</code>
+      und <code>offers</code>, ersatzweise dieselben Angaben als Microdata.
+      Der Weg, den die Shops selbst für Maschinen anbieten.</span></li>
+    <li class="list-row"><span class="list-row-date">shopify</span>
+      <span>der offene Katalog <code>/products.json</code> eines
+      Shopify-Shops.</span></li>
+    <li class="list-row"><span class="list-row-date">json_endpunkt</span>
+      <span>gemessen und dokumentiert, aber noch ohne Adapter: der Preis liegt
+      in einem seitenspezifischen Zustandsobjekt und braucht eigenen
+      Code.</span></li>
+    <li class="list-row"><span class="list-row-date">deaktiviert</span>
+      <span>bewusst nicht angebunden – siehe Grund in der Tabelle.</span></li>
+  </ul>
+  <p class="gr-erklaer">Drei Regeln gelten für jeden Abruf: robots.txt wird
+  gelesen und befolgt, samt Crawl-delay und Besuchszeitfenster; abgerufen wird
+  nur, was auf einer konfigurierten Seite oder in einer vom Anbieter selbst
+  ausgewiesenen Sitemap verlinkt ist – keine hochgezählten Kennungen; und ein
+  Bot-Schutz wird nicht umgangen. Wer sperrt, steht als gesperrt in der
+  Tabelle. Eine ehrliche Lücke ist besser als eine Zahl, der niemand trauen
+  kann.</p>
+  <p class="dz-foot">Zurück zum <a href="{{ prefix }}geraete.html">Geräteradar</a>.</p>
+</section>
+{% endblock %}

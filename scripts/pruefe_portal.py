@@ -30,6 +30,13 @@ Dazu die zwei Kriterien der Runde vom 08.08.2026 (Suche und Differenzierung):
      bebilderte Karten - gemessen im Browser, weil die Seite ihren Index per
      fetch() laedt.
 
+Dazu das Kriterium des Geraeteradars (10.08.2026):
+
+ 11. Die Preis-Positionskarte fuehrt in BEIDEN Ansichten gleich viele Punkte,
+     und jeder traegt seinen Quelllink, sein Abrufdatum und einen Titel. Sind
+     noch keine Listungen erfasst, gilt das Kriterium als uebersprungen - die
+     Seite steht dann unter ihrer Veroeffentlichungsschwelle.
+
 Kriterium 1, 6, 7 und 10 brauchen einen echten Browser - Chromium liegt unter
 /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
 
@@ -367,8 +374,16 @@ def main() -> int:
     # Seit dem 08.08.2026 auch auf der Differenzierungs-Seite: ihre Karten
     # ziehen die Hauptzeile aus zwei Speichern, und der Presse-Zweig liefert
     # rohe Zusammenfassungen - genau dort entsteht ein halber Satz.
+    # Und seit dem 10.08.2026 die Geraeteseite. Geprueft wird dort genau
+    # eine Stelle: die Saetze der Karte "Was diese Woche auffaellt" tragen
+    # `szl`. Die Etiketten der Positionskarte kuerzt `_kurz()` bewusst mit
+    # "…" - sie liegen in `.gr-etikett`, tragen kein `szl` und sind hier
+    # richtigerweise nicht gemeint. Wer eine Seite mit Schlagzeilen
+    # ergaenzt und sie hier vergisst, prueft sie nie: genau dieser Zuschnitt
+    # hat am 08.08.2026 37 Karten ohne Motiv gedeckt.
     seiten = [index, meldungen]
     for weitere in [site / "wettbewerb.html", site / "differenzierung.html",
+                    site / "geraete.html",
                     *sorted((site / "thema").glob("*.html"))]:
         if weitere.exists():
             seiten.append(BeautifulSoup(weitere.read_text(encoding="utf-8"),
@@ -464,6 +479,47 @@ def main() -> int:
                  f"9b. Marktbild gegen die Rubriken: {len(balken)} Hebel, "
                  f"{len(falsch)} widersprechen"
                  + (f" ({', '.join(falsch)})" if falsch else ""))
+
+    # ---- Kriterium 11: die Preis-Positionskarte des Geraeteradars
+    #
+    # Sie ist ein gerechnetes SVG ohne Bibliothek, und beide Ansichten stehen
+    # fertig im HTML - der Umschalter blendet nur um. Geprueft wird genau
+    # das: gleich viele Punkte in beiden Ansichten (sonst zeigt eine davon
+    # weniger, als es gibt), jeder Punkt mit Beleg und Abrufdatum, und kein
+    # Punkt ohne Titel. Fehlen die Daten noch, ist das kein Fehlschlag -
+    # dann steht die Seite unter der Veroeffentlichungsschwelle.
+    gr_datei = site / "geraete.html"
+    if not gr_datei.exists():
+        # KEIN "uebersprungen": render_site() erzeugt diese Seite immer,
+        # notfalls mit ihrem Fehlerzustand. Fehlt sie ganz, ist etwas
+        # kaputt - und ein Totalausfall, der als "nicht pruefbar" durchgeht,
+        # ist genau die Sorte gruener Lauf, vor der CLAUDE.md §6 warnt.
+        b.prueft(False, "11. Geraeteradar: geraete.html fehlt ganz")
+    else:
+        gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
+        hersteller = gr.select("#gr-ansicht-hersteller .gr-punkt")
+        anbieter = gr.select("#gr-ansicht-anbieter .gr-punkt")
+        if not hersteller and not anbieter:
+            b.prueft(None, "11. Geraeteradar: noch keine Listungen erfasst")
+        else:
+            # BEIDE Ansichten pruefen. Nur die erste zu messen hiesse, die
+            # zweite nie zu pruefen - und sie ist die, wegen der die Seite
+            # existiert.
+            alle = hersteller + anbieter
+            ohne_beleg = [p for p in alle
+                          if not (p.get("data-url") or "").startswith("http")
+                          or not p.get("data-stand")]
+            ohne_titel = [p for p in alle if p.find("title") is None]
+            # Ein Etikett darf nicht unter die Nulllinie rutschen.
+            unterkante = 540 - 70
+            zu_tief = [e for e in gr.select(".gr-etikett")
+                       if float(e.get("y") or 0) > unterkante + 1]
+            b.prueft(len(hersteller) == len(anbieter) and not ohne_beleg
+                     and not ohne_titel and not zu_tief,
+                     f"11. Positionskarte: {len(hersteller)} Punkte je Ansicht "
+                     f"(Anbieteransicht {len(anbieter)}), {len(ohne_beleg)} ohne "
+                     f"Beleg, {len(ohne_titel)} ohne Titel, {len(zu_tief)} "
+                     f"Etiketten unter der Nulllinie")
 
     _browser_messungen(site, b)
 

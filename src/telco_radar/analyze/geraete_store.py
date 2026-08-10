@@ -107,11 +107,17 @@ class GeraeteDB:
         self._eintraege: dict[str, dict] = {}
         self._anbieter: dict[str, dict] = {}
         self.updated = ""
+        # Eine unlesbare Datei ist NICHT dasselbe wie "noch nichts gefunden".
+        # Ohne dieses Feld schriebe die Seite "Der Geraetezweig laeuft, hat
+        # aber noch keine Listung aufgenommen" - der Fallstrick aus
+        # CLAUDE.md §6, nur eine Ebene hoeher.
+        self.lesbar = True
         if self.path.exists():
             try:
                 roh = json.loads(self.path.read_text(encoding="utf-8"))
             except (json.JSONDecodeError, OSError) as exc:
                 log.warning("geraete_db.json unlesbar (%s) - starte leer", exc)
+                self.lesbar = False
                 roh = {}
             self.updated = roh.get("updated", "")
             for e in (roh.get("listungen") or []):
@@ -486,3 +492,8 @@ class Preishistorie:
     @property
     def punkte_gesamt(self) -> int:
         return sum(len(r) for r in self._reihen.values())
+
+    def alle_punkte(self) -> list:
+        """Alle Aenderungspunkte, aeltester zuerst - fuer die Auswertung."""
+        return sorted((p for reihe in self._reihen.values() for p in reihe),
+                      key=lambda s: (s.get("datum", ""), s.get("listung_id", "")))

@@ -1490,6 +1490,46 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         env.get_template("tarife.html.j2").render(prefix="", tarife=tarife),
         encoding="utf-8")
 
+    # ---- Geraete- und Preisradar: Positionskarte, SKU-Matrix, Lifecycle.
+    # Zwei Seiten aus einem Datensatz, wie Promo-Uebersicht und Promo-Quellen.
+    # Beide entstehen ohne Netz und ohne Modell - der Zustand liegt fertig in
+    # data/state/geraete_db.json und geraete_preise.jsonl.
+    #
+    # Die Seite steht bewusst NICHT in der Navigation: die
+    # Veroeffentlichungsschwelle (CLAUDE.md §5) verlangt, dass eine Seite ihre
+    # Frage beantworten kann, bevor sie verlinkt wird. Erreichbar ist sie
+    # ueber ihren direkten Link; die Schwelle steht beziffert im Test
+    # (tests/test_geraete_seite.py).
+    #
+    # Das try/except umschliesst NUR die Datenaufbereitung, nicht das
+    # Rendern. Beides zusammen abzufangen hiess: ein einziger kaputter
+    # Eintrag laesst beide Seiten verschwinden, `site/` behaelt beim naechsten
+    # Commit die alte Fassung, und die Seite friert still auf dem Stand der
+    # Vorwoche ein - waehrend `pruefe_portal.py` "nicht gerendert" meldet und
+    # trotzdem mit 0 endet. CLAUDE.md §6: "Eine gescheiterte Stufe muss sich
+    # bis auf die Seite melden. log.error reicht nicht."
+    #
+    # Deshalb: gescheiterte Aufbereitung -> die Seite entsteht trotzdem und
+    # SAGT, dass sie nichts zeigen kann.
+    from ..geraete_config import lade_katalog, lade_quellen as _lade_geraetequellen
+    from . import geraete_view as geraete_view_mod
+    wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
+    try:
+        geraete = geraete_view_mod.aufbereiten(
+            state_dir, _lade_geraetequellen(wurzel), lade_katalog(wurzel),
+            heute=latest["date"] if latest else "")
+    except Exception as exc:  # noqa: BLE001
+        log.error("Geraetedaten nicht aufbereitbar: %s: %s",
+                  type(exc).__name__, exc)
+        geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
+    (site_dir / "geraete.html").write_text(
+        env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
+        encoding="utf-8")
+    (site_dir / "geraete-quellen.html").write_text(
+        env.get_template("geraete_quellen.html.j2").render(
+            prefix="", geraete=geraete),
+        encoding="utf-8")
+
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
     # wurden ohnehin nacheinander gelesen.

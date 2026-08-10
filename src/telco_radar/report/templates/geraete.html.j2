@@ -1,0 +1,387 @@
+{# Geraete- und Preisradar.
+
+   Drei Fragen, die heute niemand automatisiert beantwortet: was die
+   Wettbewerber ueberhaupt fuehren, wo ein Geraet im Preis steht, und wie
+   lange es im Markt lebt.
+
+   Die Positionskarte ist ein gerechnetes SVG, keine Bibliothek - dieselbe
+   Bauform wie die Tarif-Positionskarte. Beide Ansichten (Spalten =
+   Hersteller / Spalten = Anbieter) stehen fertig im Datensatz; der
+   Umschalter blendet um, er laedt nicht neu.
+
+   Die Vollstaendigkeitsangabe steht OBEN. Eine Preiskarte mit vier von
+   dreiundzwanzig Anbietern ist keine Marktuebersicht und darf nicht so
+   aussehen. #}
+{% extends "base.html.j2" %}
+{% set active = 'geraete' %}
+{% block title %}Vodafone Insights · Geräte und Preise{% endblock %}
+
+{% macro karte(k, ansicht, aktiv) %}
+<div class="gr-ansicht{% if not aktiv %} gr-ansicht--aus{% endif %}"
+     id="gr-ansicht-{{ ansicht }}" data-ansicht="{{ ansicht }}">
+  <svg class="gr-svg" viewBox="0 0 {{ k.breite }} {{ k.hoehe }}"
+       role="img" aria-label="Preis-Positionskarte, Spalten nach {{ k.achsname }}">
+    {% for t in k.y_ticks %}
+    <line x1="{{ k.rand_l }}" y1="{{ t.y }}" x2="{{ k.breite - k.rand_r }}"
+          y2="{{ t.y }}" class="gr-raster"/>
+    <text x="{{ k.rand_l - 8 }}" y="{{ t.y + 4 }}" class="gr-tick"
+          text-anchor="end">{{ t.wert }} €</text>
+    {% endfor %}
+    {% for s in k.spalten %}
+    {% if not loop.first %}
+    <line x1="{{ s.x0 }}" y1="{{ k.rand_o }}" x2="{{ s.x0 }}"
+          y2="{{ k.hoehe - k.rand_u }}" class="gr-spaltenlinie"/>
+    {% endif %}
+    <text x="{{ s.x }}" y="{{ k.hoehe - k.rand_u + 22 }}" class="gr-spaltenname"
+          text-anchor="middle">{{ s.label }}</text>
+    {% endfor %}
+    <line x1="{{ k.rand_l }}" y1="{{ k.hoehe - k.rand_u }}"
+          x2="{{ k.breite - k.rand_r }}" y2="{{ k.hoehe - k.rand_u }}" class="gr-achse"/>
+    <line x1="{{ k.rand_l }}" y1="{{ k.rand_o }}" x2="{{ k.rand_l }}"
+          y2="{{ k.hoehe - k.rand_u }}" class="gr-achse"/>
+
+    {% for p in k.punkte %}
+    <g class="gr-punkt{% if p.eigen %} gr-punkt--eigen{% endif %}"
+       data-segment="{{ p.segment }}" data-speicher="{{ p.speicher or '' }}"
+       data-aktuell="{{ '1' if p.aktuelle_generation else '0' }}"
+       data-modell="{{ p.modell }}" data-anbieter="{{ p.anbieter }}"
+       data-preis="{{ '%.2f'|format(p.preis) }}" data-farbe="{{ p.farbe }}"
+       data-url="{{ p.url }}" data-stand="{{ p.abgerufen_am }}"
+       data-speicher-text="{{ p.speicher or '' }}" tabindex="0" role="button">
+      {% if p.verschoben %}
+      <line x1="{{ p.cx }}" y1="{{ p.cy }}" x2="{{ p.cx + 7 }}" y2="{{ p.ly }}"
+            class="gr-versatz"/>
+      {% endif %}
+      <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ 6 if p.eigen else 4 }}"/>
+      <text x="{{ p.cx + 10 }}" y="{{ p.ly + 3 }}" class="gr-etikett">{{ p.label_kurz }}</text>
+      <title>{{ p.modell }}{% if p.speicher %} · {{ p.speicher }} GB{% endif %}{% if p.farbe %} · {{ p.farbe }}{% endif %} · {{ '%.2f'|format(p.preis) }} € bei {{ p.anbieter }} (abgerufen {{ p.abgerufen_am }})</title>
+    </g>
+    {% endfor %}
+    <text x="{{ k.breite - k.rand_r }}" y="{{ k.hoehe - 8 }}" class="gr-achsname"
+          text-anchor="end">{{ k.achsname }}</text>
+  </svg>
+</div>
+{% endmacro %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Geräte</p>
+      <h1>Was die anderen im Regal haben.</h1>
+    </div>
+    {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand }}</span>{% endif %}
+  </div>
+  <p class="page-lead">Diese Seite beantwortet drei Fragen: welche Geräte ein
+  Wettbewerber überhaupt führt, wo ein Gerät im Preis steht – und wie lange es
+  im Markt lebt. Jeder Preis stammt aus den strukturierten Produktdaten des
+  Anbieters, trägt seinen Quelllink und sein Abrufdatum. Geschätzte oder
+  hochgerechnete Preise gibt es hier nicht.</p>
+</section>
+
+{% if geraete.hat_daten %}
+{# --- Vollstaendigkeit zuerst. --------------------------------------- #}
+<section class="gr-bilanz">
+  <h2 class="rubrik">Wie vollständig ist das</h2>
+  <div class="t-bilanz-reihe">
+    <div class="t-kennzahl"><b>{{ geraete.bilanz.geraete }}</b><span>Geräte beobachtet</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.bilanz.skus }}</b><span>Varianten (SKUs)</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.bilanz.anbieter }}</b><span>Anbieter mit Daten</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.bilanz.preispunkte }}</b><span>Preispunkte in der Historie</span></div>
+    <div class="t-kennzahl"><b>{{ geraete.bilanz.ausgelistet }}</b><span>ausgelistet</span></div>
+  </div>
+  <p class="t-hinweis">{{ geraete.quellenlage.liefernd }} von
+  {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern
+  Daten. Welcher warum nicht, steht auf
+  <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a> – kein
+  Anbieter fehlt dort stillschweigend.</p>
+</section>
+
+{# --- Die Positionskarte --------------------------------------------- #}
+{% if geraete.karte_hersteller.hat_daten %}
+<section class="gr-karte" id="positionskarte">
+  <h2 class="rubrik">Wo steht welches Gerät im Preis
+    <span class="rubrik-zahl">{{ geraete.bilanz.in_der_karte }}</span></h2>
+  <p class="gr-erklaer">Jeder Punkt ist eine Gerätevariante, die Höhe ist ihr
+  Preis ohne Vertrag. Zwei Ansichten: nach Hersteller zeigt, wie ein
+  Portfolio über die Preisachse verteilt ist; nach Anbieter zeigt, was
+  dasselbe Gerät bei wem kostet. Zuzahlungen aus Tarifbündeln stehen bewusst
+  nicht in dieser Grafik – „1 €“ mit Vertrag und „1.199 €“ ohne sind nicht
+  dieselbe Zahl.</p>
+
+  <div class="gr-steuer">
+    <div class="gr-schalter" role="group" aria-label="Ansicht">
+      <button type="button" class="gr-knopf on" data-zeige="hersteller">Spalten: Hersteller</button>
+      <button type="button" class="gr-knopf" data-zeige="anbieter">Spalten: Anbieter</button>
+    </div>
+    <div class="gr-filter">
+      <label>Segment
+        <select id="gr-segment">
+          <option value="">alle</option>
+          {% for s in geraete.segmente %}
+          <option value="{{ s }}">{{ geraete.segment_label.get(s, s) }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Speicher
+        <select id="gr-speicher">
+          <option value="">alle</option>
+          {% for s in geraete.speicherstufen %}<option value="{{ s }}">{{ s }} GB</option>{% endfor %}
+        </select>
+      </label>
+      <label>Generation
+        <select id="gr-generation">
+          <option value="">mit Vorgängern</option>
+          <option value="1">nur aktuelle Generation</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  {{ karte(geraete.karte_hersteller, 'hersteller', true) }}
+  {{ karte(geraete.karte_anbieter, 'anbieter', false) }}
+
+  <p class="gr-detail" id="gr-detail" role="status"></p>
+  <p class="gr-legende" id="gr-legende">{{ geraete.bilanz.in_der_karte }} Listungen
+  von {{ geraete.bilanz.geraete }} Geräten bei
+  {{ geraete.karte_anbieter.spaltenzahl }} Anbietern, zuletzt abgerufen am
+  {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen Angebote.{%
+  if geraete.karte_hersteller.etiketten_verborgen %} In der Herstelleransicht
+  tragen {{ geraete.karte_hersteller.etiketten_verborgen }} Punkte kein
+  Etikett – die Spalte ist voll; der Punkt selbst steht auf seinem Preis.{%
+  endif %}</p>
+</section>
+{% endif %}
+
+{# --- Was auffaellt --------------------------------------------------- #}
+{% if geraete.auffaellig.hat_daten %}
+<section class="gr-auffaellig">
+  <h2 class="rubrik">Was diese Woche auffällt
+    <span class="rubrik-zusatz">letzte {{ geraete.fenster_tage }} Tage</span></h2>
+  <div class="gr-auffaellig-karte">
+    <ul class="gr-saetze">
+      {% for s in geraete.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% if geraete.auffaellig.bewegungen %}
+  <div class="gr-scroll">
+  <table class="src-table gr-tabelle">
+    <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
+      <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
+      <th>Beleg</th></tr></thead>
+    <tbody>
+      {% for b in geraete.auffaellig.bewegungen %}
+      <tr>
+        <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
+        <td class="num">{{ '%.2f'|format(b.von) }} €</td>
+        <td class="num">{{ '%.2f'|format(b.auf) }} €</td>
+        <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
+          {{ '%+.2f'|format(b.delta) }} €</td>
+        <td>{{ b.datum | date_de }}</td>
+        <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{# --- SKU-Matrix ------------------------------------------------------ #}
+<section class="gr-matrix" id="matrix">
+  <h2 class="rubrik">Welches Gerät gibt es bei wem
+    <span class="rubrik-zahl">{{ geraete.matrix.zeilen | length }}</span></h2>
+  <p class="gr-erklaer">Eine Zelle nennt die Zahl der Varianten und die
+  Preisspanne. Die Einzelheiten – Speichergrößen, Farben, Verfügbarkeit,
+  Quelle und Abrufdatum – stehen im Aufklapper darunter.</p>
+  <div class="gr-matrix-scroll">
+    <table class="src-table gr-matrix-tabelle">
+      <thead>
+        <tr><th>Gerät</th>
+          {% for a in geraete.matrix.anbieter %}<th>{{ a }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for z in geraete.matrix.zeilen %}
+        <tr>
+          <th scope="row" class="gr-modell">{{ z.modell }}
+            <span class="gr-hersteller">{{ z.hersteller }}</span></th>
+          {% for c in z.zellen %}
+          <td class="gr-zelle{{ ' gr-zelle--leer' if c.leer }}">
+            {% if c.leer %}<span class="gr-strich">–</span>
+            {% else %}
+            <b>{{ c.anzahl }}</b>
+            {% if c.min is not none %}
+            <span class="gr-spanne">{% if c.min == c.max %}{{ '%.0f'|format(c.min) }} €{% else %}{{ '%.0f'|format(c.min) }}–{{ '%.0f'|format(c.max) }} €{% endif %}</span>
+            {% elif c.nur_buendel %}<span class="gr-spanne">nur im Bündel</span>
+            {% else %}<span class="gr-spanne">ohne Preis</span>{% endif %}
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% for z in geraete.matrix.zeilen %}
+  <details class="evidence gr-varianten">
+    <summary>{{ z.modell }} – {{ z.anbieter_mit_geraet }} Anbieter</summary>
+    <div class="evidence-body">
+      {% for c in z.zellen if not c.leer %}
+      <p class="gr-variantenzeile"><b>{{ c.anbieter }}</b>
+        {% for v in c.varianten %}
+        <span class="gr-variante">
+          {% if v.speicher %}{{ v.speicher }} GB{% else %}Speicher unbekannt{% endif %}{% if v.farbe %} · {{ v.farbe }}{% endif %}{% if v.zustand != 'neu' %} · {{ v.zustand }}{% endif %} ·
+          {% if v.preis is not none %}{{ '%.2f'|format(v.preis) }} €{% elif v.zuzahlung is not none %}{{ '%.2f'|format(v.zuzahlung) }} € mit {{ v.tarif }}{% else %}ohne Preis{% endif %} ·
+          {{ v.verfuegbarkeit }}{% if v.url %} · <a href="{{ v.url }}" rel="noopener">Quelle</a>{% endif %}{% if v.abgerufen_am %}, {{ v.abgerufen_am | date_de }}{% endif %}
+        </span>
+        {% endfor %}
+      </p>
+      {% endfor %}
+    </div>
+  </details>
+  {% endfor %}
+</section>
+
+{# --- Lifecycle ------------------------------------------------------- #}
+<section class="gr-lifecycle" id="lifecycle">
+  <h2 class="rubrik">Wie lange ein Gerät im Markt lebt</h2>
+  <p class="gr-basis{{ ' gr-basis--duenn' if geraete.lifecycle.duenn }}">{{ geraete.lifecycle.hinweis }}</p>
+
+  {% if geraete.lifecycle.portfolio %}
+  <h3 class="gr-unter">Wie viele Generationen ein Anbieter gleichzeitig führt</h3>
+  <p class="gr-erklaer">Ein Wettbewerber, der das Vorjahresmodell im Regal
+  lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
+  Gezählt werden Gerätegenerationen, nicht Varianten: acht Farben eines
+  Modells sind ein Regalplatz.</p>
+  <ul class="dz-balken gr-tiefe">
+    {% set tiefstes = geraete.lifecycle.portfolio[0].generationen %}
+    {% for t in geraete.lifecycle.portfolio %}
+    <li{% if t.anbieter|lower == 'vodafone' %} class="gr-eigen"{% endif %}>
+      <span class="dz-balken-name">{{ t.anbieter }}</span>
+      <span class="dz-balken-spur"><span class="dz-balken-fuell"
+        style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
+      <span class="dz-balken-n">{{ t.generationen }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if geraete.lifecycle.dauern %}
+  <h3 class="gr-unter">Verweildauer im Regal</h3>
+  <ul class="list-card gr-dauern">
+    {% for d in geraete.lifecycle.dauern[:12] %}
+    <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
+      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if geraete.lifecycle.trends %}
+  <h3 class="gr-unter">Preisverfall gegenüber dem Einführungspreis</h3>
+  <ul class="list-card gr-verfall">
+    {% for v in geraete.lifecycle.trends %}
+    <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
+      {{ v.modell }} bei {{ v.anbieter }}: {{ '%.2f'|format(v.erstpreis) }} €
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ '%.2f'|format(v.aktuell) }} €
+      <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if geraete.lifecycle.nachfolger %}
+  <h3 class="gr-unter">Was der Nachfolger mit dem Preis macht</h3>
+  <div class="gr-scroll">
+  <table class="src-table gr-nachfolger">
+    <thead><tr><th>Gerät</th><th>Nachfolger ab</th><th class="num">vorher</th>
+      <th class="num">+30 Tage</th><th class="num">+60</th><th class="num">+90</th></tr></thead>
+    <tbody>
+      {% for n in geraete.lifecycle.nachfolger %}
+      <tr><td>{{ n.modell }}</td><td>{{ n.nachfolger_modell }}, {{ n.marktstart | date_de }}</td>
+        <td class="num">{{ '%.0f'|format(n.basis) }} €</td>
+        {% for tage in [30, 60, 90] %}
+        <td class="num">{% if n.nach[tage] %}{{ '%.0f'|format(n.nach[tage]) }} €
+          <span class="gr-klein">{{ '%+.1f'|format(n.prozent[tage]) }} %</span>{% else %}–{% endif %}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+</section>
+{% else %}
+<section class="gr-leer">
+  {% if geraete.fehler %}
+  <h2 class="rubrik">Diese Seite konnte nicht gebaut werden</h2>
+  <p class="empty-note">Die Aufbereitung der Gerätedaten ist gescheitert:
+  <code>{{ geraete.fehler }}</code>. Das heißt <em>nicht</em>, dass keine
+  Geräte gefunden wurden – es heißt, dass diese Seite gerade nichts über sie
+  aussagen kann.</p>
+  {% elif not geraete.db_lesbar %}
+  {# Eine unlesbare Datei ist NICHT "noch nichts gefunden". Sie sieht nur so
+     aus - und genau das ist der Fallstrick aus CLAUDE.md §6. #}
+  <h2 class="rubrik">Der Gerätebestand ist nicht lesbar</h2>
+  <p class="empty-note"><code>data/state/geraete_db.json</code> ließ sich nicht
+  einlesen. Diese Seite zeigt deshalb nichts – das heißt <em>nicht</em>, dass
+  keine Geräte gefunden wurden. Der Grund steht im Protokoll des letzten
+  Laufs.</p>
+  {% else %}
+  <h2 class="rubrik">Noch keine Geräte erfasst</h2>
+  <p class="empty-note">Der Gerätezweig läuft, hat aber noch keine Listung
+  aufgenommen. Welche Anbieter angebunden sind und welche warum nicht, steht
+  auf <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a>.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{# --- Datenbasis und Luecken ------------------------------------------ #}
+<section class="gr-luecken" id="luecken">
+  <h2 class="rubrik">Datenbasis und Lücken</h2>
+  <p class="gr-erklaer">Was fehlt, ist so wichtig wie was da ist. Eine
+  Preiskarte ohne den größten Händler des Landes ist keine Marktübersicht –
+  sie sagt es hier, statt es aussehen zu lassen wie Vollständigkeit.</p>
+
+  <ul class="list-card gr-quellenkurz">
+    {% for z in geraete.quellenlage.zeilen if not z.liefert %}
+    <li class="list-row"><b>{{ z.name }}</b> – {{ z.grund or 'liefert derzeit keine Geräte' }}</li>
+    {% endfor %}
+  </ul>
+
+  {% if geraete.quellenlage.ohne_hardware %}
+  <p class="gr-ruhe">Ohne Hardware-Vermarktung beobachtet:
+  {% for z in geraete.quellenlage.ohne_hardware %}{{ z.name }}{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+  {% endif %}
+
+  {% if geraete.ohne_katalog %}
+  <p class="muted-note">{{ geraete.ohne_katalog | length }} Listungen tragen ein
+  Gerät, das <code>config/geraete_katalog.yaml</code> nicht (mehr) kennt. Sie
+  stehen unter ihrer Kennung statt unter ihrem Modellnamen:
+  {{ geraete.ohne_katalog | join(', ') }}.</p>
+  {% endif %}
+
+  {% if geraete.katalog.ohne_marktstart %}
+  <p class="muted-note">{{ geraete.katalog.ohne_marktstart | length }} von
+  {{ geraete.katalog.modelle }} Modellen im Katalog haben kein belegtes
+  Marktstartdatum. Für sie gibt es keine Nachfolger-Analyse – ein geratenes
+  Datum wäre schlimmer als ein fehlendes.</p>
+  {% endif %}
+
+  {% if geraete.farbbericht %}
+  <details class="evidence">
+    <summary>{{ geraete.farbbericht | length }} unbekannte Farbschreibweisen</summary>
+    <div class="evidence-body">
+      <p>Diese Schreibweisen kennt <code>config/farben.yaml</code> nicht. Sie
+      bleiben erhalten und werden nicht geraten – bis die Tabelle sie kennt,
+      zählen zwei Schreibweisen derselben Farbe als zwei Varianten.</p>
+      <ul class="pill-cloud">
+        {% for f in geraete.farbbericht %}<li>{{ f.schreibweise }} ({{ f.listungen }})</li>{% endfor %}
+      </ul>
+    </div>
+  </details>
+  {% endif %}
+  <p class="dz-foot">Vollständige Quellenlage:
+  <a href="{{ prefix }}geraete-quellen.html">Geräte-Quellen</a>.</p>
+</section>
+{% endblock %}

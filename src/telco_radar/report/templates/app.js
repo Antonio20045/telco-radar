@@ -795,3 +795,116 @@ var TelcoFrage = (function () {
     });
   }
 })();
+
+/* ---------------------------------------------------------------------- *
+ * Geraeteradar: Ansichtsumschalter, Filter, Detailzeile.
+ *
+ * Beide Ansichten der Positionskarte stehen fertig im HTML - hier wird nur
+ * umgeblendet, nichts nachgeladen und nichts neu gerechnet. Genauso die
+ * Filter: sie BLENDEN Punkte aus, sie verschieben keine. Das ist Absicht,
+ * denn eine Achse, die sich beim Filtern verschiebt, macht zwei Ansichten
+ * unvergleichbar - und die Entzerrung der Etiketten kommt aus Python.
+ *
+ * Auf dem Telefon gibt es kein Hover. Deshalb reagiert jeder Punkt auf Tap
+ * und auf Tastatur, und die Einzelheiten stehen in einer Zeile unter der
+ * Grafik statt in einer Sprechblase.
+ * ---------------------------------------------------------------------- */
+(function () {
+  var karte = document.getElementById('positionskarte');
+  if (!karte) return;
+
+  var knoepfe = karte.querySelectorAll('.gr-knopf');
+  var ansichten = karte.querySelectorAll('.gr-ansicht');
+  var detail = document.getElementById('gr-detail');
+  var legende = document.getElementById('gr-legende');
+  var legendeRoh = legende ? legende.textContent : '';
+  var felder = {
+    segment: document.getElementById('gr-segment'),
+    speicher: document.getElementById('gr-speicher'),
+    generation: document.getElementById('gr-generation')
+  };
+
+  function aktiveAnsicht() {
+    for (var i = 0; i < ansichten.length; i++) {
+      if (ansichten[i].className.indexOf('gr-ansicht--aus') < 0) return ansichten[i];
+    }
+    return ansichten[0];
+  }
+
+  function leereDetail() {
+    // Sonst nennt die Zeile weiter Preis und Anbieter eines Geraets, das
+    // gerade ausgeblendet wurde oder in der anderen Ansicht steht.
+    if (detail) detail.textContent = '';
+  }
+
+  function filtern() {
+    leereDetail();
+    var seg = felder.segment ? felder.segment.value : '';
+    var sp = felder.speicher ? felder.speicher.value : '';
+    var gen = felder.generation ? felder.generation.value : '';
+    var sichtbar = 0;
+    var alle = karte.querySelectorAll('.gr-punkt');
+    for (var i = 0; i < alle.length; i++) {
+      var p = alle[i];
+      var passt = (!seg || p.getAttribute('data-segment') === seg)
+        && (!sp || p.getAttribute('data-speicher') === sp)
+        && (!gen || p.getAttribute('data-aktuell') === '1');
+      p.classList.toggle('gr-punkt--aus', !passt);
+      if (passt && p.closest('.gr-ansicht') === aktiveAnsicht()) sichtbar++;
+    }
+    if (legende) {
+      var zusatz = (seg || sp || gen)
+        ? ' Gefiltert: ' + sichtbar + ' von ' + (alle.length / ansichten.length) + ' sichtbar.'
+        : '';
+      legende.textContent = legendeRoh + zusatz;
+    }
+  }
+
+  for (var i = 0; i < knoepfe.length; i++) {
+    knoepfe[i].addEventListener('click', function (ev) {
+      var wunsch = ev.currentTarget.getAttribute('data-zeige');
+      for (var j = 0; j < knoepfe.length; j++) {
+        knoepfe[j].classList.toggle('on',
+          knoepfe[j].getAttribute('data-zeige') === wunsch);
+      }
+      for (var k = 0; k < ansichten.length; k++) {
+        ansichten[k].classList.toggle('gr-ansicht--aus',
+          ansichten[k].getAttribute('data-ansicht') !== wunsch);
+      }
+      filtern();
+    });
+  }
+
+  Object.keys(felder).forEach(function (name) {
+    if (felder[name]) felder[name].addEventListener('change', filtern);
+  });
+
+  function zeige(el) {
+    if (!detail) return;
+    var teile = [el.getAttribute('data-modell')];
+    if (el.getAttribute('data-speicher-text')) teile.push(el.getAttribute('data-speicher-text') + ' GB');
+    if (el.getAttribute('data-farbe')) teile.push(el.getAttribute('data-farbe'));
+    teile.push(el.getAttribute('data-preis') + ' €');
+    teile.push('bei ' + el.getAttribute('data-anbieter'));
+    if (el.getAttribute('data-stand')) teile.push('abgerufen ' + el.getAttribute('data-stand'));
+    detail.textContent = teile.join(' · ') + ' ';
+    var url = el.getAttribute('data-url');
+    if (url) {
+      var a = document.createElement('a');
+      a.href = url;
+      a.rel = 'noopener';
+      a.textContent = 'Quelle';
+      detail.appendChild(a);
+    }
+  }
+
+  karte.addEventListener('click', function (ev) {
+    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
+    if (punkt) zeige(punkt);
+  });
+  karte.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
+    if (punkt) { ev.preventDefault(); zeige(punkt); }
+  });
+})();
