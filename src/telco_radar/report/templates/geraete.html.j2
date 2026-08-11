@@ -16,9 +16,22 @@
 {% set active = 'geraete' %}
 {% block title %}Vodafone Insights · Geräte und Preise{% endblock %}
 
-{% macro karte(k, ansicht, aktiv) %}
-<div class="gr-ansicht{% if not aktiv %} gr-ansicht--aus{% endif %}"
-     id="gr-ansicht-{{ ansicht }}" data-ansicht="{{ ansicht }}">
+{# Eine Zeichenflaeche. Die Geometrie steht als data-Attribut am Container,
+   damit Abnahme und Tests sie LESEN statt sie nachzurechnen: `pruefe_portal`
+   hatte die Nulllinie als `540 - 70` hartcodiert, und sobald die Hoehe mit
+   der Zahl der Eintraege waechst, misst so eine Zahl am falschen Ort.
+
+   Der Formschalter benutzt bewusst eine ANDERE Klasse als der
+   Ansichtsschalter (`gr-flaeche--aus` statt `gr-ansicht--aus`) - sonst
+   zaehlte `test_beide_ansichten_stehen_fertig_im_html` vier ausgeblendete
+   Ansichten statt einer und fiele aus dem falschen Grund. #}
+{% macro flaeche(k, aktiv) %}
+<div class="gr-flaeche{% if not aktiv %} gr-flaeche--aus{% endif %}"
+     data-form="{{ k.form }}" data-vertrag="{{ k.preisart }}"
+     data-hoehe="{{ k.hoehe }}" data-achse="{{ k.achse_y }}"
+     data-plot-h="{{ k.plot_h }}" data-ymax="{{ k.y_max }}"
+     data-punkte="{{ k.punkte | length }}"
+     data-etiketten-verborgen="{{ k.etiketten_verborgen }}">
   <svg class="gr-svg" viewBox="0 0 {{ k.breite }} {{ k.hoehe }}"
        role="img" aria-label="Preis-Positionskarte, Spalten nach {{ k.achsname }}">
     {% for t in k.y_ticks %}
@@ -30,38 +43,88 @@
     {% for s in k.spalten %}
     {% if not loop.first %}
     <line x1="{{ s.x0 }}" y1="{{ k.rand_o }}" x2="{{ s.x0 }}"
-          y2="{{ k.hoehe - k.rand_u }}" class="gr-spaltenlinie"/>
+          y2="{{ k.achse_y }}" class="gr-spaltenlinie"/>
     {% endif %}
-    <text x="{{ s.x }}" y="{{ k.hoehe - k.rand_u + 22 }}" class="gr-spaltenname"
-          text-anchor="middle">{{ s.label }}</text>
+    {# Direkt unter die Achse. Tiefer gesetzt lief der Spaltenname in den
+       Achsenhinweis am unteren Rand - bei der Bandform steht dort ausserdem
+       der gedrehte Modellname. #}
+    <text x="{{ s.x }}" y="{{ k.achse_y + 16 }}"
+          class="gr-spaltenname" text-anchor="middle">{{ s.label }}</text>
     {% endfor %}
-    <line x1="{{ k.rand_l }}" y1="{{ k.hoehe - k.rand_u }}"
-          x2="{{ k.breite - k.rand_r }}" y2="{{ k.hoehe - k.rand_u }}" class="gr-achse"/>
+    <line x1="{{ k.rand_l }}" y1="{{ k.achse_y }}"
+          x2="{{ k.breite - k.rand_r }}" y2="{{ k.achse_y }}" class="gr-achse"/>
     <line x1="{{ k.rand_l }}" y1="{{ k.rand_o }}" x2="{{ k.rand_l }}"
-          y2="{{ k.hoehe - k.rand_u }}" class="gr-achse"/>
+          y2="{{ k.achse_y }}" class="gr-achse"/>
+
+    {# Die Baender der Variante A. Sie liegen VOR den Punkten, damit die
+       Querstriche darauf sichtbar bleiben.
+
+       Die PREISZAHLEN stehen bewusst NICHT hier, sondern im jeweiligen
+       `.gr-punkt`. Als eigene Knoten neben dem Band waeren sie weder vom
+       Filter noch von Kriterium 11 erfasst: ein Filter auf "256 GB" haette
+       die Kreise der anderen Groessen ausgeblendet und ihre Preiszahlen
+       stehen lassen. #}
+    {% for b in k.baender %}
+    <g class="gr-band{% if b.eigen %} gr-band--eigen{% endif %}"
+       data-band="{{ b.schluessel }}">
+      {% if not b.entartet %}
+      <line x1="{{ b.x }}" y1="{{ b.y_oben }}" x2="{{ b.x }}" y2="{{ b.y_unten }}"
+            class="gr-bandlinie"/>
+      {% endif %}
+      {# Der Modellname steht UNTER der Achse und traegt deshalb keine
+         Preisaussage - deswegen `gr-bandname` und nicht `gr-etikett`. #}
+      <text x="{{ b.name_x }}" y="{{ b.name_y }}" class="gr-bandname"
+            text-anchor="end"
+            transform="rotate(-90 {{ b.name_x }} {{ b.name_y }})">{{ b.name_kurz }}</text>
+    </g>
+    {% endfor %}
 
     {% for p in k.punkte %}
     <g class="gr-punkt{% if p.eigen %} gr-punkt--eigen{% endif %}"
        data-segment="{{ p.segment }}" data-speicher="{{ p.speicher or '' }}"
        data-aktuell="{{ '1' if p.aktuelle_generation else '0' }}"
-       data-modell="{{ p.modell }}" data-anbieter="{{ p.anbieter }}"
-       data-preis="{{ '%.2f'|format(p.preis) }}" data-farbe="{{ p.farbe }}"
+       data-modell="{{ p.modell }}" data-anbieter="{{ p.anbieter_anzeige }}"
+       data-anbieter-key="{{ p.anbieter }}"
+       data-preis="{{ '%.2f'|format(p.preis) }}" data-preisart="{{ p.preisart }}"
+       data-farben="{{ p.farben }}" data-farben-liste="{{ p.farben_liste | join(', ') }}"
+       data-varianten="{{ p.varianten }}"
        data-url="{{ p.url }}" data-stand="{{ p.abgerufen_am }}"
-       data-speicher-text="{{ p.speicher or '' }}" tabindex="0" role="button">
-      {% if p.verschoben %}
-      <line x1="{{ p.cx }}" y1="{{ p.cy }}" x2="{{ p.cx + 7 }}" y2="{{ p.ly }}"
-            class="gr-versatz"/>
+       data-speicher-text="{{ p.speicher or '' }}"
+       {% if p.band %}data-band="{{ p.band }}"{% endif %}
+       tabindex="0" role="button">
+      {% if p.chip %}
+      <rect x="{{ p.chip.x }}" y="{{ p.chip.y }}" width="{{ p.chip.w }}"
+            height="{{ p.chip.h }}" rx="2" class="gr-chip"/>
       {% endif %}
-      <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ 6 if p.eigen else 4 }}"/>
+      {% if p.strich_x1 is defined %}
+      <line x1="{{ p.strich_x1 }}" y1="{{ p.cy }}" x2="{{ p.strich_x2 }}"
+            y2="{{ p.cy }}" class="gr-stufe"/>
+      {% endif %}
+      <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ p.r }}"/>
       {% if p.beschriftet %}
-      <text x="{{ p.cx + 10 }}" y="{{ p.label_y }}" class="gr-etikett">{{ p.label_kurz }}</text>
+      <text x="{{ p.label_x }}" y="{{ p.label_y }}" class="gr-etikett"
+            text-anchor="{{ p.label_anker }}">{{ p.label_kurz }}</text>
       {% endif %}
-      <title>{{ p.modell }}{% if p.speicher %} · {{ p.speicher }} GB{% endif %}{% if p.farbe %} · {{ p.farbe }}{% endif %} · {{ '%.2f'|format(p.preis) }} € bei {{ p.anbieter }} (abgerufen {{ p.abgerufen_am }})</title>
+      <title>{{ p.titel }}</title>
     </g>
     {% endfor %}
-    <text x="{{ k.breite - k.rand_r }}" y="{{ k.hoehe - 8 }}" class="gr-achsname"
-          text-anchor="end">{{ k.achsname }}</text>
+    {# Der Achsenhinweis steht OBEN rechts. Unten stand er bis zum
+       11.08.2026 und lief dort in die Spaltenbeschriftung; bei der Bandform
+       haette er ausserdem im gedrehten Modellnamen gelegen. Oben ist er
+       ausserdem da, wo man ihn liest, bevor man die Grafik deutet - und
+       genau das ist der Zweck des Zusatzes "Preise von N Händlern". #}
+    <text x="{{ k.breite - k.rand_r }}" y="{{ k.rand_o - 6 }}" class="gr-achsname"
+          text-anchor="end">{{ k.achsname }}{% if k.achszusatz %} – {{ k.achszusatz }}{% endif %}</text>
   </svg>
+</div>
+{% endmacro %}
+
+{% macro ansicht(g, name, aktiv) %}
+<div class="gr-ansicht{% if not aktiv %} gr-ansicht--aus{% endif %}"
+     id="gr-ansicht-{{ name }}" data-ansicht="{{ name }}">
+  {% for form in g.formen %}
+  {{ flaeche(g.flaechen[name ~ '_' ~ form], loop.first) }}
+  {% endfor %}
 </div>
 {% endmacro %}
 
@@ -104,17 +167,30 @@
 <section class="gr-karte" id="positionskarte">
   <h2 class="rubrik">Wo steht welches Gerät im Preis
     <span class="rubrik-zahl">{{ geraete.bilanz.in_der_karte }}</span></h2>
-  <p class="gr-erklaer">Jeder Punkt ist eine Gerätevariante, die Höhe ist ihr
-  Preis ohne Vertrag. Zwei Ansichten: nach Hersteller zeigt, wie ein
-  Portfolio über die Preisachse verteilt ist; nach Anbieter zeigt, was
-  dasselbe Gerät bei wem kostet. Zuzahlungen aus Tarifbündeln stehen bewusst
-  nicht in dieser Grafik – „1 €“ mit Vertrag und „1.199 €“ ohne sind nicht
-  dieselbe Zahl.</p>
+  <p class="gr-erklaer">Ein Punkt ist ein Gerät in einer Speichergröße bei
+  einem Anbieter, die Höhe ist sein Preis ohne Vertrag. Farbvarianten stehen
+  nicht einzeln in der Grafik – dieselbe Speichergröße kostet in jeder Farbe
+  dasselbe. Zwei
+  Ansichten: nach Hersteller zeigt, wie ein Portfolio über die Preisachse
+  verteilt ist; nach Anbieter zeigt, was dasselbe Gerät bei wem kostet.
+  Zuzahlungen aus Tarifbündeln stehen bewusst nicht in dieser Grafik –
+  „1 €“ mit Vertrag und „1.199 €“ ohne sind nicht dieselbe Zahl.</p>
 
   <div class="gr-steuer">
     <div class="gr-schalter" role="group" aria-label="Ansicht">
-      <button type="button" class="gr-knopf on" data-zeige="hersteller">Spalten: Hersteller</button>
-      <button type="button" class="gr-knopf" data-zeige="anbieter">Spalten: Anbieter</button>
+      <button type="button" class="gr-knopf{% if geraete.standard_ansicht == 'hersteller' %} on{% endif %}"
+              data-schalter="ansicht" data-wert="hersteller">Spalten: Hersteller</button>
+      <button type="button" class="gr-knopf{% if geraete.standard_ansicht == 'anbieter' %} on{% endif %}"
+              data-schalter="ansicht" data-wert="anbieter">Spalten: Anbieter</button>
+    </div>
+    {# Der Knopfzustand folgt der Reihenfolge in `geraete_karte.FORMEN` -
+       fest verdrahtet zeigte er "Punkte" als aktiv, waehrend die Bandform
+       gerendert wurde. #}
+    <div class="gr-schalter" role="group" aria-label="Darstellung">
+      {% for form in geraete.formen %}
+      <button type="button" class="gr-knopf{% if loop.first %} on{% endif %}"
+              data-schalter="form" data-wert="{{ form }}">{{ 'Preisbänder' if form == 'band' else 'Punkte' }}</button>
+      {% endfor %}
     </div>
     <div class="gr-filter">
       <label>Segment
@@ -140,19 +216,49 @@
     </div>
   </div>
 
-  {{ karte(geraete.karte_hersteller, 'hersteller', true) }}
-  {{ karte(geraete.karte_anbieter, 'anbieter', false) }}
+  <div class="gr-karte-scroll">
+    {{ ansicht(geraete, 'hersteller', geraete.standard_ansicht == 'hersteller') }}
+    {{ ansicht(geraete, 'anbieter', geraete.standard_ansicht == 'anbieter') }}
+  </div>
 
   <p class="gr-detail" id="gr-detail" role="status"></p>
-  <p class="gr-legende" id="gr-legende">{{ geraete.bilanz.in_der_karte }} Listungen
-  von {{ geraete.bilanz.geraete }} Geräten bei
+  {# Die Zahl der Punkte OHNE Etikett gilt je Flaeche und wird von `app.js`
+     beim Umschalten nachgezogen. Hier steht der Stand der Startflaeche -
+     eine feste Zahl fuer alle vier waere eine, die fuer keine gilt. #}
+  {% set start = geraete.flaechen[geraete.standard_ansicht ~ '_' ~ geraete.formen[0]] %}
+  <p class="gr-legende" id="gr-legende">{{ geraete.bilanz.in_der_karte }} Preispunkte
+  aus {{ geraete.bilanz.aggregiert_aus }} Listungen von
+  {{ geraete.bilanz.geraete }} Geräten bei
   {{ geraete.karte_anbieter.spaltenzahl }} Anbietern, zuletzt abgerufen am
   {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen Angebote.{%
-  if geraete.karte_hersteller.etiketten_verborgen
-     or geraete.karte_anbieter.etiketten_verborgen %} Ohne Etikett bleiben {{
-  geraete.karte_hersteller.etiketten_verborgen }} Punkte nach Hersteller und {{
-  geraete.karte_anbieter.etiketten_verborgen }} nach Anbieter – die Spalte ist
-  voll; der Punkt selbst steht auf seinem Preis.{% endif %}</p>
+  if start.etiketten_verborgen %} Ohne Etikett bleiben
+  {{ start.etiketten_verborgen }} Punkte – dort ist die Spalte voll; der Punkt
+  steht auf seinem Preis.{% endif %}</p>
+
+  {# Wer die Grafik auf dem Telefon nicht lesen kann, hat trotzdem Zugriff.
+     Aus DERSELBEN Punktliste - eine zweite Aufbereitung wuerde driften. #}
+  <details class="evidence gr-tabelle-auf">
+    <summary>Dieselben Zahlen als Tabelle</summary>
+    <div class="gr-scroll">
+      <table class="src-table">
+        <thead><tr><th>Gerät</th><th>Speicher</th><th>Anbieter</th>
+          <th class="num">Preis</th><th class="num">Farben</th>
+          <th>Stand</th><th>Beleg</th></tr></thead>
+        <tbody>
+          {% for p in geraete.flaechen['hersteller_chip'].punkte %}
+          <tr>
+            <td>{{ p.modell }}</td><td>{{ p.speicher or '–' }}{% if p.speicher %} GB{% endif %}</td>
+            <td>{{ p.anbieter_anzeige }}</td>
+            <td class="num">{{ '%.2f'|format(p.preis) }} €</td>
+            <td class="num">{{ p.farben }}</td>
+            <td>{{ p.abgerufen_am | date_de }}</td>
+            <td>{% if p.url %}<a href="{{ p.url }}" rel="noopener">{{ p.url | domain }}</a>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
 </section>
 {% endif %}
 

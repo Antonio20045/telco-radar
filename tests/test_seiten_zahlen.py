@@ -1383,9 +1383,13 @@ def test_keine_karte_der_differenzierung_raet_vodafone_etwas(tmp_path):
 def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
     """Saetze, die beschreiben, was ein Klick tut, statt etwas auszusagen."""
     site = _render(tmp_path, highlights=PORTAL, competitors=GELUNGEN)
-    verboten = ("Jede Kachel zeigt", "klappt das", "Suchbegriff eingeben")
+    # "beim Anklicken" kam am 11.08.2026 auf der Geraeteseite dazu und ist
+    # dieselbe Sorte Satz: er beschreibt eine Handlung, statt etwas
+    # auszusagen. Die Seite fehlte in dieser Liste, also fing sie ihn nicht.
+    verboten = ("Jede Kachel zeigt", "klappt das", "Suchbegriff eingeben",
+                "beim Anklicken", "nennt ihn beim")
     for name in ("index.html", "meldungen.html", "transparenz.html",
-                 "differenzierung.html", "wettbewerb.html"):
+                 "differenzierung.html", "wettbewerb.html", "geraete.html"):
         text = _seite(site, name)
         for satz in verboten:
             assert satz not in text, f"{name} erklaert seine Bedienung: {satz}"

@@ -39,6 +39,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from . import geraete_karte
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -50,36 +51,21 @@ from ..analyze.geraete_store import (
 
 log = logging.getLogger(__name__)
 
-BREITE, HOEHE = 980, 540
-RAND_L, RAND_R, RAND_O, RAND_U = 66, 18, 20, 70
-
-# Preisachse: feste Schrittweite wie in der Vorlage. Sie beginnt bei NULL -
-# eine abgeschnittene Preisachse laesst kleine Unterschiede riesig aussehen,
-# und bei einem Preisvergleich ist das keine Gestaltungsfrage.
-Y_SCHRITT = 200
-# Untergrenze der Achse. Die Kehrseite der Nullpunkt-Regel: ein Portfolio aus
-# reinen Einstiegsgeraeten (alles unter 300 EUR) draengt sich sonst im
-# untersten Zehntel. 800 ist der Kompromiss - hoch genug, dass die Achse eine
-# Aussage behaelt, niedrig genug, dass ein Guenstig-Sortiment noch Luft hat.
-Y_MINDEST = 800
-
-# Mindestabstand zweier Etiketten in einer Spalte. Darunter wird entzerrt.
-_ENTZERR_ABSTAND = 14
-
-# Abstand des Etiketts vom Punkt (muss zum `x`-Versatz in der Vorlage passen).
-_ETIKETT_ABSTAND = 10
-
-# Ein SVG-Text sitzt auf seiner GRUNDLINIE, nicht auf seiner Mitte: das
-# Etikett steht deshalb um diesen Betrag tiefer als die Zeile, der es
-# zugeordnet ist. Der Betrag gehoert hierher und nicht in die Vorlage - im
-# ersten Lauf mit echten Daten stand er dort (`y="{{ p.ly + 3 }}"`), waehrend
-# der Deckel hier gegen `ly` rechnete. Ergebnis: jedes gedeckelte Etikett lag
-# drei Pixel unter der Nulllinie, und Kriterium 11 zaehlte 76 davon.
-_ETIKETT_BASISLINIE = 3
-
-# Ungefaehre Zeichenbreite bei 10px - reicht, um ein Etikett auf die
-# Spaltenbreite zu kuerzen, statt es in die Nachbarspalte laufen zu lassen.
-_ZEICHENBREITE = 5.1
+# Die Geometrie der Positionskarte steht seit dem 11.08.2026 in
+# `geraete_karte.py`. Sie ist dorthin gewandert, weil sie einen Fehler trug,
+# den kein Test fand: Etiketten wurden gestapelt, waehrend die Punkte auf
+# ihrem Preis blieben - bis zu 235 px Versatz, 87 von 94 Etiketten weiter als
+# drei Prozent daneben. Die Namen hier bleiben als Weiterleitung stehen, weil
+# `pruefe_portal.py` und mehrere Tests sie lesen.
+BREITE = geraete_karte.BREITE
+HOEHE = geraete_karte.HOEHE_MIN
+RAND_L, RAND_R, RAND_O = (geraete_karte.RAND_L, geraete_karte.RAND_R,
+                          geraete_karte.RAND_O)
+RAND_U = geraete_karte.RAND_U_CHIP
+Y_SCHRITT = geraete_karte.Y_SCHRITT
+Y_MINDEST = geraete_karte.Y_MINDEST
+_ETIKETT_BASISLINIE = geraete_karte.BASISLINIE
+_ZEICHENBREITE = geraete_karte.ZEICHENBREITE
 
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
@@ -137,106 +123,42 @@ def _kurz(text: str, breite_px: float) -> str:
     return text if len(text) <= grenze else text[:grenze - 1].rstrip() + "…"
 
 
+# Ab diesem Anteil traegt ein einzelner Laden die Karte so weit, dass sein
+# Name in den Spaltentitel gehoert. Ohne diesen Satz zeigt die Spalte "Apple"
+# nicht Apples Portfolio, sondern das, was EIN Haendler von Apple fuehrt -
+# und behauptet dabei das Erste.
+_TRAEGT_DIE_KARTE = 0.8
+
+
+def _grundlage(aggregate: list, anzeige: dict) -> str:
+    """Der Satz unter dem Achsnamen: woher die Preise kommen."""
+    if not aggregate:
+        return ""
+    laeden: dict[str, int] = {}
+    for p in aggregate:
+        schluessel = p.get("shop") or p.get("anbieter") or ""
+        laeden[schluessel] = laeden.get(schluessel, 0) + 1
+    zahl = len(laeden)
+    satz = f"Preise von {zahl} {'Händler' if zahl == 1 else 'Händlern'}"
+    fuehrend, treffer = max(laeden.items(), key=lambda kv: kv[1])
+    if zahl > 1 and treffer >= _TRAEGT_DIE_KARTE * len(aggregate):
+        satz += (f", {treffer} von {len(aggregate)} Punkten "
+                 f"{anzeige.get(fuehrend, fuehrend)}")
+    return satz
+
+
 # --------------------------------------------------------------------------
 # Die Positionskarte
 # --------------------------------------------------------------------------
+# Sie steht seit dem 11.08.2026 in `geraete_karte.py`. `_karte()` bleibt als
+# Weiterleitung, weil mehrere Tests und Aufrufer sie kennen - sie reicht
+# jetzt aggregierte Preispunkte durch, nicht mehr rohe Listungen.
 
-def _karte(punkte: list, spaltenfeld: str, achsname: str) -> dict:
-    """Eine Ansicht der Positionskarte.
 
-    `punkte` sind Dicts mit mindestens `preis`, `label`, `eigen` und dem
-    Spaltenfeld. Gibt Koordinaten, Achsen und Spalten fertig zurueck.
-    """
-    brauchbar = [p for p in punkte if p.get("preis") is not None]
-    if not brauchbar:
-        return {"hat_daten": False, "punkte": [], "spalten": [], "y_ticks": [],
-                "breite": BREITE, "hoehe": HOEHE, "rand_l": RAND_L,
-                "rand_u": RAND_U, "rand_o": RAND_O, "achsname": achsname}
-
-    hoechster = max(p["preis"] for p in brauchbar)
-    y_max = max(Y_MINDEST, int((hoechster // Y_SCHRITT + 1) * Y_SCHRITT))
-    spaltennamen = sorted({p[spaltenfeld] for p in brauchbar})
-    innen = BREITE - RAND_L - RAND_R
-    breite_spalte = innen / max(1, len(spaltennamen))
-
-    def py(preis: float) -> float:
-        return HOEHE - RAND_U - (preis / y_max) * (HOEHE - RAND_O - RAND_U)
-
-    spalten = []
-    for i, name in enumerate(spaltennamen):
-        spalten.append({
-            "name": name,
-            "x": round(RAND_L + (i + 0.5) * breite_spalte, 1),
-            "x0": round(RAND_L + i * breite_spalte, 1),
-            "breite": round(breite_spalte, 1),
-            "label": _kurz(name, breite_spalte - 6),
-        })
-    index = {s["name"]: s for s in spalten}
-
-    # Der Text beginnt RECHTS vom Punkt, und der Punkt sitzt in der
-    # Spaltenmitte - dem Etikett steht also nur die halbe Spalte zur
-    # Verfuegung. Die Formel des Spaltenkopfes (ganze Breite) gilt hier
-    # nicht: der traegt text-anchor="middle", das Etikett nicht.
-    etikettbreite = breite_spalte / 2 - _ETIKETT_ABSTAND - 4
-    # Die Nulllinie ist die Grenze fuer die GRUNDLINIE des Etiketts, also
-    # fuer `ly + _ETIKETT_BASISLINIE`. Deshalb liegt der Deckel fuer `ly`
-    # genau um diesen Betrag hoeher.
-    achse = HOEHE - RAND_U
-    unterkante = achse - _ETIKETT_BASISLINIE
-
-    gezeichnet = []
-    verborgen = 0
-    for name in spaltennamen:
-        in_spalte = sorted([p for p in brauchbar if p[spaltenfeld] == name],
-                           key=lambda p: -p["preis"])
-        spalte = index[name]
-        letzte = None
-        for p in in_spalte:
-            cy = py(p["preis"])
-            # Entzerren: das Etikett rueckt nach unten, der PUNKT bleibt auf
-            # seinem Preis. Die Verbindungslinie macht den Versatz sichtbar -
-            # sonst waere es eine stille Verschiebung der Aussage.
-            ly = cy if letzte is None else max(cy, letzte + _ENTZERR_ABSTAND)
-            # ... aber nur bis zur Nulllinie. Ohne diesen Deckel waendern die
-            # Etiketten einer vollen Spalte unter die Achse und aus dem Bild:
-            # bei 450 px Zeichenhoehe und 14 px Mindestabstand passen 32
-            # Etiketten, mehr nicht. Was nicht mehr passt, bekommt KEIN
-            # Etikett - der Punkt bleibt, sein Titel bleibt, und die Legende
-            # sagt, wie viele es waren. Eine stille Kappung waere schlimmer
-            # als eine sichtbare Luecke.
-            beschriftet = ly <= unterkante
-            if beschriftet:
-                letzte = ly
-            else:
-                verborgen += 1
-            zeile = round(min(ly, unterkante), 1)
-            gezeichnet.append({
-                **p,
-                "cx": spalte["x"],
-                "cy": round(cy, 1),
-                "ly": zeile,
-                # Die Vorlage rechnet nichts nach: sie setzt `label_y`.
-                "label_y": round(zeile + _ETIKETT_BASISLINIE, 1),
-                "verschoben": beschriftet and abs(ly - cy) > 0.5,
-                "beschriftet": beschriftet,
-                "label_kurz": _kurz(p["label"], etikettbreite) if beschriftet else "",
-                "spalte": name,
-            })
-
-    return {
-        "hat_daten": True,
-        "punkte": gezeichnet,
-        "spalten": spalten,
-        "y_max": y_max,
-        "y_ticks": [{"wert": w, "y": round(py(w), 1)}
-                    for w in range(0, y_max + 1, Y_SCHRITT)],
-        "breite": BREITE, "hoehe": HOEHE, "rand_l": RAND_L,
-        "rand_r": RAND_R, "rand_u": RAND_U, "rand_o": RAND_O,
-        "achsname": achsname,
-        "anzahl": len(gezeichnet),
-        "spaltenzahl": len(spalten),
-        "etiketten_verborgen": verborgen,
-    }
+def _karte(punkte: list, spaltenfeld: str, achsname: str,
+           form: str = geraete_karte.FORM_CHIP, **kw) -> dict:
+    """Weiterleitung auf `geraete_karte.karte` - siehe dort."""
+    return geraete_karte.karte(punkte, spaltenfeld, achsname, form=form, **kw)
 
 
 # --------------------------------------------------------------------------
@@ -442,6 +364,10 @@ def _matrix(eintraege: list, katalog) -> dict:
             "sku_id": e.get("sku_id"),
             "speicher": e.get("speicher_gb"),
             "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+            # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
+            # - es gehoert in den Aggregationsschluessel, sonst schluckt der
+            # niedrigere Preis den hoeheren.
+            "zustand": e.get("zustand") or "neu",
             "farbe_roh": e.get("farbe_roh", ""),
             "preis": e.get("preis_ohne_vertrag"),
             "zuzahlung": e.get("zuzahlung"),
@@ -599,7 +525,18 @@ def leer(fehler: str = "") -> dict:
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
                    "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0,
-                   "schwelle_erreicht": False},
+                   "aggregiert_aus": 0, "schwelle_erreicht": False},
+        # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
+        # genau dafuer gibt es ihn. Die vier Flaechen kommen aus derselben
+        # Funktion wie im Normalfall, damit sie nicht auseinanderlaufen
+        # koennen (ein Test haelt beide Schluesselmengen gegeneinander).
+        "flaechen": {f"{ansicht}_{form}": geraete_karte.karte(
+                         [], "hersteller" if ansicht == "hersteller" else "shop",
+                         ansicht.capitalize(), form=form)
+                     for ansicht in ("hersteller", "anbieter")
+                     for form in geraete_karte.FORMEN},
+        "standard_ansicht": "hersteller",
+        "formen": list(geraete_karte.FORMEN),
         "karte_hersteller": {"hat_daten": False, "punkte": [], "spalten": [],
                              "etiketten_verborgen": 0, "spaltenzahl": 0},
         "karte_anbieter": {"hat_daten": False, "punkte": [], "spalten": [],
@@ -627,6 +564,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
+    # Laden und Anzeigename je Anbieter. Zwei Marken desselben Shops
+    # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
+    # die Karte einen Laden mit sich selbst.
+    laden = {a.name: (a.shop or a.name) for a in getattr(quellen, "anbieter", [])}
+    anzeige = {a.name: (a.anzeige or a.name)
+               for a in getattr(quellen, "anbieter", [])}
+    # Der Anzeigename haengt am LADEN, nicht am Markennamen: die Spalte heisst
+    # nach dem Shop, und der Shop traegt den Namen, unter dem seine Quelle
+    # erreichbar ist.
+    anzeige.update({(a.shop or a.name): (a.anzeige or a.name)
+                    for a in getattr(quellen, "anbieter", [])})
+
     punkte_ohne_vertrag = []
     for e in sichtbar:
         preis = e.get("preis_ohne_vertrag")
@@ -634,7 +583,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             continue
         g = katalog.nach_id(e.get("device_id"))
         speicher = e.get("speicher_gb")
+        name = e.get("anbieter")
         punkte_ohne_vertrag.append({
+            "shop": laden.get(name, name),
+            "anbieter_anzeige": anzeige.get(name, name),
             "sku_id": e.get("sku_id"),
             "device_id": e.get("device_id"),
             "hersteller": g.hersteller if g else "ohne Katalogeintrag",
@@ -646,6 +598,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "preis": float(preis),
             "speicher": speicher,
             "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+            # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
+            # - es gehoert in den Aggregationsschluessel, sonst schluckt der
+            # niedrigere Preis den hoeheren.
+            "zustand": e.get("zustand") or "neu",
             "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
             "url": e.get("quelle_url", ""),
             "abgerufen_am": e.get("abgerufen_am", ""),
@@ -678,11 +634,50 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     ohne_katalog = sorted({e.get("device_id") for e in sichtbar
                            if katalog.nach_id(e.get("device_id")) is None})
 
-    karte_hersteller = _karte(punkte_ohne_vertrag, "hersteller", "Hersteller")
+    # Aus Listungen werden Preispunkte. Fuenf Farben desselben iPhone 17 mit
+    # 512 GB kosten alle 1199 EUR - als fuenf Punkte lagen sie deckungsgleich
+    # aufeinander und trugen fuenf Etiketten, die sich gegenseitig nach unten
+    # schoben. 60 der 85 Kreise waren so entstanden.
+    aggregate = geraete_karte.aggregiere(punkte_ohne_vertrag)
+
+    # Beide Ansichten bekommen dieselbe Hoehe, sonst springt die Seite beim
+    # Umschalten. Zwei Durchgaenge: erst messen, dann mit dem Maximum bauen.
+    def _flaechen(hoehe_mindestens: int = 0) -> dict:
+        raus = {}
+        # Die Anbieteransicht sortiert nach LADEN, nicht nach Markenname -
+        # sonst stuenden mobilcom-debitel und freenet als zwei Spalten
+        # nebeneinander und zeigten dasselbe Sortiment zweimal.
+        for name, feld, achsname in (("hersteller", "hersteller", "Hersteller"),
+                                     ("anbieter", "shop", "Anbieter")):
+            for form in geraete_karte.FORMEN:
+                raus[f"{name}_{form}"] = geraete_karte.karte(
+                    aggregate, feld, achsname, form=form, anzeige=anzeige,
+                    hoehe_mindestens=hoehe_mindestens,
+                    achszusatz=_grundlage(aggregate, anzeige))
+        return raus
+
+    erst = _flaechen()
+    flaechen = _flaechen(max((k["hoehe"] for k in erst.values()), default=0))
+
+    karte_hersteller = flaechen["hersteller_chip"]
+    # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
+    # "was kostet dasselbe Geraet bei wem" - und zwei Marken desselben Shops
+    # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
+    # schaltete sich der Navigationseintrag mit "2 Anbietern" frei, waehrend
+    # die Karte EINE Spalte zeigt und "Preise von 1 Haendler" darunter steht.
+    laeden_mit_daten = {laden.get(e.get("anbieter"), e.get("anbieter"))
+                        for e in sichtbar}
     erreicht = schwelle_erreicht(
-        anbieter=len({e.get("anbieter") for e in sichtbar}),
+        anbieter=len(laeden_mit_daten),
         skus=len({e.get("sku_id") for e in sichtbar}),
         hersteller=len(karte_hersteller.get("spalten") or []))
+
+    # Liefert nur EIN Laden, zeigt die Herstelleransicht nicht das Portfolio
+    # von Apple, sondern das, was dieser eine Haendler von Apple fuehrt. Dann
+    # ist die Anbieteransicht die ehrlichere Startansicht - und die
+    # Herstelleransicht traegt ihren Vorbehalt im Spaltentitel.
+    laeden = {p.get("shop") for p in aggregate if p.get("shop")}
+    standard = "anbieter" if len(laeden) <= 1 else "hersteller"
 
     return {
         "hat_daten": bool(sichtbar),
@@ -696,15 +691,24 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "geraete": len({e.get("device_id") for e in sichtbar}),
             "listungen": len(sichtbar),
             "skus": len({e.get("sku_id") for e in sichtbar}),
-            "anbieter": len({e.get("anbieter") for e in sichtbar}),
+            "anbieter": len(laeden_mit_daten),
             "ausgelistet": sum(1 for e in alle
                                if e.get("status") == STATUS_AUSGELISTET),
             "preispunkte": historie.punkte_gesamt,
-            "in_der_karte": len(punkte_ohne_vertrag),
+            # ZWEI Zahlen, seit die Karte aggregiert: `in_der_karte` sind die
+            # gezeichneten Preispunkte, `aggregiert_aus` die Listungen
+            # dahinter. Eine einzige Zahl fuer beides waere genau der
+            # Fehlertyp aus CLAUDE.md §6 - ein Etikett und ein Feld, die
+            # nicht dasselbe meinen.
+            "in_der_karte": len(aggregate),
+            "aggregiert_aus": len(punkte_ohne_vertrag),
             "schwelle_erreicht": erreicht,
         },
+        "flaechen": flaechen,
+        "standard_ansicht": standard,
+        "formen": list(geraete_karte.FORMEN),
         "karte_hersteller": karte_hersteller,
-        "karte_anbieter": _karte(punkte_ohne_vertrag, "anbieter", "Anbieter"),
+        "karte_anbieter": flaechen["anbieter_chip"],
         "segmente": sorted({p["segment"] for p in punkte_ohne_vertrag if p["segment"]}),
         "segment_label": SEGMENT_LABEL,
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag

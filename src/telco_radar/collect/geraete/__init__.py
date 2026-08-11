@@ -45,10 +45,60 @@ log = logging.getLogger(__name__)
 
 _LOC_RE = re.compile(r"<loc>\s*([^<\s]+)\s*</loc>", re.IGNORECASE)
 
-# Methoden, fuer die es in diesem Abschnitt einen Adapter gibt. Alles andere
-# ist gemessen und dokumentiert (config/geraete_quellen.yaml), wartet aber auf
-# eigenen Code - drei stabile Adapter sind mehr wert als zwanzig halbe.
-UMGESETZTE_METHODEN = ("ldjson", "shopify")
+# --------------------------------------------------------------------------
+# Die Adapter-Registry
+# --------------------------------------------------------------------------
+# Bis zum 11.08.2026 war das ein Tupel von zwei Methodennamen plus ein
+# hartcodiertes `if einstieg.kind == "shopify" or anbieter.methode ==
+# "shopify"` mitten in `sammle_anbieter`. Damit war der Ausbau von zwei auf
+# acht Anbieter kein Adapterproblem, sondern ein Umbau derselben Funktion -
+# und `json_endpunkt` war ein SAMMELBEGRIFF fuer fuenf voellig verschiedene
+# Nutzlasten (Nuxt-Referenzarray, __PRELOADED_STATE__, productDetailsData,
+# ng-state, INITIAL_STATE). Wer ihn implementiert haette, haette alle fuenf
+# gleichzeitig scharf geschaltet.
+#
+# ZWEI TEILE JE ADAPTER, und der zweite wird gern vergessen: Telekom und o2
+# fuehren ihre Produktadressen NICHT als `<a href>`, sondern in derselben
+# JSON-Nutzlast wie die Preise. Ein Adapter, der nur `lies` mitbringt, findet
+# dort null Seiten. Die Regel "nur verlinkte Adressen, nie hochgezaehlte IDs"
+# gilt dabei unveraendert: was in der Nutzlast der Einstiegsseite steht, hat
+# der Anbieter selbst genannt.
+
+
+@dataclass
+class Adapter:
+    """Wie eine Quelle gelesen wird.
+
+    `lies(text, url) -> list[rohsatz]` mit den neun Schluesseln
+    (titel, preis, waehrung, verfuegbarkeit, sku, ean, farbe, url, quelle)
+    und wahlweise `zuzahlung` + `tarif` fuer Buendelpreise.
+
+    `ernte(text, basis_url, pfadmuster, kind) -> list[str]` nur, wenn die
+    Adressen nicht als `<a href>` oder `<loc>` dastehen.
+
+    `direkt=True` heisst: die Einstiegsseite IST die Nutzlast, es werden
+    keine Produktseiten nachgeladen (so arbeitet Shopify).
+    """
+    name: str
+    lies: Callable
+    ernte: Optional[Callable] = None
+    direkt: bool = False
+    # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
+    # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
+    # als "mittel" ausweist, obwohl sie aus ld+json stammt.
+    confidence: str = "hoch"
+
+
+ADAPTER: dict = {}
+
+
+def registriere(methode: str, adapter: Adapter) -> None:
+    ADAPTER[methode] = adapter
+
+
+def umgesetzte_methoden() -> tuple:
+    return tuple(sorted(ADAPTER))
+
 
 
 class GeraeteAbrufFehler(RuntimeError):
@@ -158,18 +208,54 @@ def produkte_aus_shopify(nutzlast: str) -> list[dict]:
 
 
 # --------------------------------------------------------------------------
+# Die zwei Adapter, mit denen der Zweig gestartet ist
+# --------------------------------------------------------------------------
+# `ldjson` ist in Wahrheit eine KASKADE (ld+json, dann Microdata) - so haengt
+# ALDI TALK daran, das gar kein ld+json ausliefert. Der Methodenname ist
+# deshalb bewusst nicht "der Extraktor", sondern "die uebliche Lesart einer
+# gewoehnlichen Produktseite".
+registriere("ldjson", Adapter(name="ldjson",
+                              lies=lambda text, url="": produkte_aus_html(text)))
+registriere("shopify", Adapter(name="shopify",
+                               lies=lambda text, url="": produkte_aus_shopify(text),
+                               direkt=True))
+
+
+# --------------------------------------------------------------------------
 # Ein Anbieter
 # --------------------------------------------------------------------------
 
-def _preisfelder(anbieter, preis: Optional[float]) -> dict:
+def _preisfelder(anbieter, satz: dict) -> dict:
     """Welche der zwei Preisarten traegt diese Zahl? (Teil C4)
 
-    Die umgesetzten Adapter bedienen ausschliesslich Geraetepreise OHNE
-    Vertrag - jede Quelle, deren strukturierter Preis in Wahrheit eine
-    Zuzahlung ist, steht in der Konfiguration mit `aktiv: false` und dem
-    Grund dabei. Der Lockpreis-Waechter ist die zweite Sicherung: taucht
-    trotzdem eine Buendelzahl auf, wird sie NICHT als Ladenpreis gefuehrt.
+    DIE DISZIPLIN BLEIBT, SIE WIRD NUR PRAEZISER. Bis zum 11.08.2026 kannte
+    diese Funktion ausschliesslich `preis_ohne_vertrag`, und der
+    Lockpreis-Waechter warf jede Zahl unter 30 EUR weg. Das war richtig - es
+    hat 1-Euro-iPhones aus der Preiskarte gehalten - und hatte einen Preis:
+    KEIN einziger Netzbetreiber erschien, also fehlte die Haelfte des
+    Marktes. Gemessen an Blau steht der Geraetepreis dort als `"price":
+    "1.00"` in einem escapten ld+json-Block; ohne Tarifbezug ist diese Zahl
+    tatsaechlich bedeutungslos, MIT ihm ist sie die eigentliche Auskunft.
+
+    Neue Regel:
+    - Ein Buendelpreis wird gespeichert, wenn seine Tarifreferenz mitgelesen
+      werden konnte. Ohne sie wird er weiterhin verworfen.
+    - Er landet in EIGENEN Feldern und nie in `preis_ohne_vertrag`. Die
+      Positionskarte mischt die zwei Achsen nicht.
+    - Der Lockpreis-Waechter greift unveraendert fuer Zahlen, die als
+      Ladenpreis ausgegeben werden.
+
+    `Listung.__post_init__` ist die dritte Sicherung: eine Zuzahlung ohne
+    `tarif_referenz` wirft dort.
     """
+    preis = satz.get("preis")
+    zuzahlung = satz.get("zuzahlung")
+    tarif = (satz.get("tarif") or "").strip()
+
+    if zuzahlung is not None and tarif:
+        return {"preis_ohne_vertrag": None, "zuzahlung": float(zuzahlung),
+                "tarif_referenz": tarif,
+                "preis_mit_vertrag_ab": satz.get("monatspreis")}
     if preis is None or ist_lockpreis(preis):
         return {"preis_ohne_vertrag": None}
     return {"preis_ohne_vertrag": preis}
@@ -193,7 +279,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         bilanz.status = "uebersprungen"
         bilanz.grund = anbieter.grund or "nicht crawlbar"
         return bilanz
-    if anbieter.methode not in UMGESETZTE_METHODEN:
+    adapter = ADAPTER.get(anbieter.methode)
+    if adapter is None:
         bilanz.status = "nicht_umgesetzt"
         bilanz.grund = anbieter.grund or (
             f"Beschaffungsmethode {anbieter.methode!r} ist gemessen, aber noch "
@@ -235,9 +322,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             gruende.append(f"{einstieg.url}: {type(exc).__name__}: {str(exc)[:120]}")
             continue
 
-        if einstieg.kind == "shopify" or anbieter.methode == "shopify":
+        # `direkt` heisst: die Einstiegsseite IST die Nutzlast. Der
+        # Einstiegstyp gewinnt ueber die Methode - eine Marke kann eine
+        # Shopify-Liste UND eine gewoehnliche Kategorieseite fuehren.
+        direkt = ADAPTER["shopify"] if einstieg.kind == "shopify" else adapter
+        if direkt.direkt:
             try:
-                roh = produkte_aus_shopify(inhalt)
+                roh = direkt.lies(inhalt, einstieg.url)
             except GeraeteAbrufFehler as exc:
                 gruende.append(f"{einstieg.url}: {exc}")
                 continue
@@ -246,7 +337,15 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             bilanz.gelesene_einstiege.add(einstieg.url)
             continue
 
-        links = ernte_links(inhalt, einstieg.url, einstieg.pfadmuster, einstieg.kind)
+        # Die Linkernte gehoert zum Adapter. Telekom und o2 fuehren ihre
+        # Produktadressen in derselben JSON-Nutzlast wie die Preise, nicht als
+        # `<a href>` - der beste Extraktor faende dort sonst null Seiten.
+        if adapter.ernte is not None:
+            links = adapter.ernte(inhalt, einstieg.url, einstieg.pfadmuster,
+                                  einstieg.kind)
+        else:
+            links = ernte_links(inhalt, einstieg.url, einstieg.pfadmuster,
+                                einstieg.kind)
         erlaubt.update(links)
         vollstaendig = True
         if len(links) > anbieter.max_produkte:
@@ -279,8 +378,16 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 vollstaendig = False
                 continue
             bilanz.produkte_abgerufen += 1
-            _uebernimm(produkte_aus_html(seite), anbieter, einstieg, url,
-                       katalog, farben, heute, bilanz)
+            try:
+                roh = adapter.lies(seite, url)
+            except GeraeteAbrufFehler as exc:
+                # Eine unlesbare Nutzlast ist NICHT "keine Geraete auf der
+                # Seite" - dieselbe Lehre wie bei `PromoExtractionError`.
+                log.info("%s: %s unlesbar (%s)", anbieter.name, url, exc)
+                vollstaendig = False
+                continue
+            _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute,
+                       bilanz)
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
 
@@ -345,6 +452,16 @@ def _ohne_sammelknoten(listungen: list) -> list:
             if l.speicher_gb is not None or l.device_id not in mit_speicher]
 
 
+def _belegstufe(quelle: str) -> str:
+    """Wie gut ein Satz belegt ist - nachgeschlagen, nicht aufgezaehlt."""
+    for adapter in ADAPTER.values():
+        if adapter.name == quelle:
+            return adapter.confidence
+    # "microdata" ist keine eigene Methode, sondern die zweite Stufe der
+    # Kaskade in `produkte_aus_html` - so haengt ALDI TALK am ldjson-Adapter.
+    return "hoch" if quelle in ("ldjson", "shopify", "microdata") else "mittel"
+
+
 def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
                       heute, bilanz):
     listung = lies_listung(
@@ -353,10 +470,14 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         quelle_url=urljoin(quelle_url, satz.get("url") or "") or quelle_url,
         abgerufen_am=heute, katalog=katalog, farben=farben,
         verfuegbarkeit=satz.get("verfuegbarkeit") or "unbekannt",
-        confidence="hoch" if satz.get("quelle") in ("ldjson", "shopify") else "mittel",
+        # Die Belegstufe kommt aus der REGISTRY, nicht aus einer Liste von
+        # Namen an dieser Stelle: eine Liste hier haette jeder neue Adapter
+        # stillschweigend verfehlt, und seine Listungen stuenden als
+        # "mittel" da, obwohl sie aus strukturierten Daten stammen.
+        confidence=_belegstufe(satz.get("quelle")),
         farbe_roh=satz.get("farbe") or "", ean=satz.get("ean") or "",
         einstieg_url=einstieg.url,
-        **_preisfelder(anbieter, satz.get("preis")))
+        **_preisfelder(anbieter, satz))
     if listung is None:
         titel = (satz.get("titel") or "").strip()
         if titel:

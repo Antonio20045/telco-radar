@@ -200,6 +200,13 @@ anbieter:
   - name: mobilcom-debitel
     typ: handel
     gruppe: freenet
+    # Derselbe LADEN, nicht nur derselbe Konzern: mobilcom-debitel.de leitet
+    # vollstaendig auf freenet.de. Die Positionskarte fuehrt ihn deshalb
+    # einmal - und unter dem Namen, unter dem seine Quelle erreichbar ist.
+    # Nicht aus `gruppe` ableitbar: klarmobil traegt dieselbe Gruppe, ist
+    # aber ein eigener Shop mit eigenem Sortiment.
+    shop: freenet
+    anzeige: freenet (mobilcom-debitel)
     rang: 4
     methode: ldjson
     aktiv: true

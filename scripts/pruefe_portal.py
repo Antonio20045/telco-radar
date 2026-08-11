@@ -66,6 +66,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from bs4 import BeautifulSoup                                    # noqa: E402
 
+from telco_radar.report import geraete_karte                     # noqa: E402
 from telco_radar.report.bilder import (                          # noqa: E402
     MIND_BREITE_GROSS, ist_leer)
 
@@ -510,16 +511,74 @@ def main() -> int:
                           if not (p.get("data-url") or "").startswith("http")
                           or not p.get("data-stand")]
             ohne_titel = [p for p in alle if p.find("title") is None]
-            # Ein Etikett darf nicht unter die Nulllinie rutschen.
-            unterkante = 540 - 70
-            zu_tief = [e for e in gr.select(".gr-etikett")
-                       if float(e.get("y") or 0) > unterkante + 1]
-            b.prueft(len(hersteller) == len(anbieter) and not ohne_beleg
-                     and not ohne_titel and not zu_tief,
+
+            # DER EIGENTLICHE TEST, seit dem 11.08.2026. Bis dahin stand hier
+            # nur "kein Etikett unter der Nulllinie" - und genau daran ist die
+            # Pruefung vorbeigelaufen: der Fehler der ausgelieferten Fassung
+            # war nicht, dass Etiketten unter die Achse rutschten, sondern
+            # dass sie bis zu 235 px ueber ihr am falschen Preis standen.
+            # Deshalb wird jetzt aus jeder Etikettenhoehe der PREIS
+            # zurueckgerechnet und gegen `data-preis` gehalten.
+            #
+            # Die Geometrie kommt dabei aus den data-Attributen der Flaeche,
+            # nicht aus `540 - 70`: die Hoehe waechst mit der Zahl der
+            # Eintraege, und eine feste Zahl misst dann am falschen Ort.
+            luegner, deckungsgleich, ohne_geometrie = [], 0, 0
+            for f in gr.select(".gr-flaeche"):
+                try:
+                    achse = float(f.get("data-achse"))
+                    plot_h = float(f.get("data-plot-h"))
+                    y_max = float(f.get("data-ymax"))
+                except (TypeError, ValueError):
+                    ohne_geometrie += 1
+                    continue
+                koordinaten = set()
+                for g in f.select(".gr-punkt"):
+                    kreis = g.find("circle")
+                    if kreis is not None:
+                        koordinaten.add((kreis.get("cx"), kreis.get("cy")))
+                    text = g.select_one(".gr-etikett")
+                    if text is None or not g.get("data-preis"):
+                        continue
+                    echt = float(g["data-preis"])
+                    gelesen = geraete_karte.preis_aus_hoehe(
+                        float(text.get("y") or 0), y_max, achse, plot_h)
+                    if abs(gelesen - echt) > geraete_karte.toleranz(
+                            echt, y_max, plot_h):
+                        luegner.append(f"{text.get_text(strip=True)} "
+                                       f"({gelesen:.0f} statt {echt:.0f} EUR)")
+                deckungsgleich += len(f.select(".gr-punkt")) - len(koordinaten)
+                # Und die Trennung, an der das haengt: ein `gr-etikett` steht
+                # im Zeichenbereich, ein `gr-bandname` unter der Achse.
+                luegner += [f"Bandname ueber der Achse: {t.get_text(strip=True)}"
+                            for t in f.select(".gr-bandname")
+                            if float(t.get("y") or 0) <= achse]
+                luegner += [f"Etikett unter der Achse: {t.get_text(strip=True)}"
+                            for t in f.select(".gr-etikett")
+                            if float(t.get("y") or 0) > achse + 4]
+
+            # Die Gegenprobe (CLAUDE.md §6): ein Lauf, der ueber die
+            # Flaechen NICHTS findet, ist gruen und prueft nichts. Genau das
+            # passiert bei einem Vorlagenumbau, der den Wrapper umbenennt -
+            # dann sieht die Schleife oben null Punkte, meldet null Luegner
+            # und bestaetigt eine Seite, die sie nie angesehen hat.
+            besucht = sum(len(f.select(".gr-punkt")) for f in gr.select(".gr-flaeche"))
+            vollstaendig = besucht == len(alle)
+            if not vollstaendig:
+                luegner.insert(0, f"nur {besucht} von {len(alle)} Punkten liegen "
+                                  f"in einer .gr-flaeche - die Pruefung sieht "
+                                  f"den Rest nicht")
+            ok = (len(hersteller) == len(anbieter) and not ohne_beleg
+                  and not ohne_titel and not luegner and not deckungsgleich
+                  and not ohne_geometrie and vollstaendig)
+            b.prueft(ok,
                      f"11. Positionskarte: {len(hersteller)} Punkte je Ansicht "
                      f"(Anbieteransicht {len(anbieter)}), {len(ohne_beleg)} ohne "
-                     f"Beleg, {len(ohne_titel)} ohne Titel, {len(zu_tief)} "
-                     f"Etiketten unter der Nulllinie")
+                     f"Beleg, {len(ohne_titel)} ohne Titel, {len(luegner)} "
+                     f"Etiketten am falschen Preis, {deckungsgleich} "
+                     f"deckungsgleiche Punkte")
+            for zeile in luegner[:5]:
+                print(f"      ! {zeile}")
 
     _browser_messungen(site, b)
 

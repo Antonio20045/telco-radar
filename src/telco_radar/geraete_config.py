@@ -73,6 +73,18 @@ class Anbieter:
     aktiv: bool = True
     grund: str = ""               # WARUM nicht aktiv - steht auf der Quellenseite
     eigen: bool = False           # Vodafone: eigene Referenz, kein Wettbewerber
+    # Der LADEN hinter dem Namen. mobilcom-debitel und freenet sind derselbe
+    # Shop unter zwei Marken - die Positionskarte darf sie nicht als zwei
+    # Wettbewerber fuehren, sonst steht dasselbe Sortiment zweimal
+    # nebeneinander und der Preisvergleich vergleicht einen Laden mit sich
+    # selbst. Dasselbe gilt fuer MediaMarkt und Saturn (Ceconomy).
+    #
+    # `gruppe` taugt dafuer NICHT: klarmobil traegt ebenfalls `gruppe:
+    # freenet`, ist aber ein anderer Laden mit eigenem Sortiment. Aus der
+    # Gruppe abgeleitet stuende dort "freenet (klarmobil)". Deshalb wird der
+    # Laden ausdruecklich gesetzt, nicht erraten.
+    shop: str = ""                # leer = der Anbieter ist sein eigener Laden
+    anzeige: str = ""             # leer = der Name steht fuer sich
     basis_url: str = ""
     max_produkte: int = _MAX_PRODUKTE_STANDARD
     rate_limit_sekunden: float = _RATE_LIMIT_STANDARD
@@ -285,7 +297,10 @@ def lade_quellen(root: Path) -> QuellenConfig:
             netz=str(a.get("netz") or "").strip(),
             rang=int(a["rang"]) if str(a.get("rang", "")).strip().isdigit() else 99,
             methode=methode, aktiv=aktiv, grund=grund,
-            eigen=bool(a.get("eigen", False)), basis_url=basis_url,
+            eigen=bool(a.get("eigen", False)),
+            shop=str(a.get("shop") or "").strip() or name,
+            anzeige=str(a.get("anzeige") or "").strip() or name,
+            basis_url=basis_url,
             max_produkte=int(a["max_produkte"]) if str(a.get("max_produkte", "")).strip().isdigit()
             else _MAX_PRODUKTE_STANDARD,
             rate_limit_sekunden=_als_zahl(a.get("rate_limit_sekunden"),
