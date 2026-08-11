@@ -498,12 +498,24 @@ einem sonst leeren Drittel — dem besten Platz der Seite. Höchstens drei
 Zeilen, jede mit Sprungziel; gibt es nichts Neues, steht dort wieder nur der
 Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
 
-**Die Navigation hat FÜNF Einträge** (Diese Woche, Meldungen,
-Differenzierung, Wettbewerb, Quellen). `tests/test_suche_page.py` nagelt die
-Zahl fest — eine Navigation wächst sonst zurück, und genau davon kam dieses
-Projekt. `geraete.html` und `geraete-quellen.html` sind seit dem 10.08.2026
-gebaut und getestet, stehen aber aus demselben Grund nicht darin: die
-Veröffentlichungsschwelle unten.
+**Die Navigation hat FÜNF feste Einträge** (Diese Woche, Meldungen,
+Differenzierung, Wettbewerb, Quellen) **plus „Geräte", sobald die Daten die
+Schwelle nehmen**. `tests/test_suche_page.py` nagelt die fünf fest — eine
+Navigation wächst sonst zurück, und genau davon kam dieses Projekt.
+
+**Der sechste Eintrag schaltet sich selbst** (11.08.2026). Bis dahin stand
+die Veröffentlichungsschwelle **nur in einem Test**, und das war der Fehler
+daran: ein Test kann keine Navigation schalten. Die Geräteseite stand am
+10.08. fertig, geprüft und live — und war für jeden Leser unauffindbar,
+weil das Eintragen Handarbeit blieb. Antonio: *„Ich sehe auf der normalen
+Hauptseite gar nichts, keine Unterseite gar nichts."* Jetzt rechnet
+`geraete_view.schwelle_erreicht()` die Schwelle, `render_site()` setzt
+daraus das Jinja-Global `geraete_verlinkt`, und `base.html.j2` fragt es ab.
+**Die Aufbereitung der Gerätedaten steht deshalb GANZ OBEN in
+`render_site()`, vor der ersten gerenderten Seite** — sie entscheidet über
+einen Navigationseintrag, und die Navigation steht auf jeder Seite. Wer sie
+zurück zu ihrer eigenen Seite schiebt, bekommt eine Startseite ohne den
+Eintrag und eine Geräteseite mit ihm.
 
 Sieben waren es vom 08. bis zum 09.08.2026. „Lieferzeiten" und „Tarife"
 kamen mit der Begründung dazu, sie beantworteten eine Frage, die sonst
@@ -520,10 +532,23 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > **Tarifseite:** mindestens drei Anbieter, zwölf Mobilfunktarife, ein
 > Tarif mit echter Rabattphase.
 > **Lieferzeitseite:** Telekom, o2 und 1&1 erfasst.
-> **Geräteseite:** drei Anbieter mit Daten, zwei Hersteller in der
-> Positionskarte, zwanzig SKUs. Die Zahlen stehen hart in
-> `tests/test_geraete_seite.py`, und ein Test misst Navigation und Schwelle
-> GEGENEINANDER — laufen sie auseinander, wird er rot.
+> **Geräteseite:** **zwei** Anbieter mit Daten, zwei Hersteller in der
+> Positionskarte, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
+> CODE rechnet (`geraete_view.SCHWELLE_*` und `schwelle_erreicht()`), nicht
+> nur ein Test. Zwei Tests messen beide Zweige: unterhalb nicht verlinkt,
+> oberhalb auf JEDER Seite verlinkt.
+>
+> Drei Anbieter waren die Vorgabe des Bauauftrags und sind an der
+> Wirklichkeit gemessen zu hoch. Mit 85 Varianten von 11 Modellen aus drei
+> Herstellerhäusern beantwortet die Seite ihre erste und zweite Frage
+> vollständig („was führt der Wettbewerb", „wo steht ein Gerät im Preis").
+> Was sie mit zwei Anbietern noch nicht beantwortet, ist die dritte („was
+> kostet dasselbe Gerät bei wem") — und genau das sagt sie oben selbst, in
+> ihrer eigenen Zeile „N von M konfigurierten Anbietern liefern Daten".
+> **Eine Seite, die ihre Lücke beziffert, lügt nicht; eine Seite, die
+> niemand findet, nützt nichts.** Tarif- und Lieferzeitseite bleiben bei
+> ihren Zahlen: dort fehlen nicht Anbieter am Rand, sondern die drei
+> größten des Marktes.
 
 Die Regel ist der Preis für die Ausnahme, die am 08.08. zweimal gemacht
 wurde. „Diese Seite beantwortet eine Frage, die keine andere beantwortet"
