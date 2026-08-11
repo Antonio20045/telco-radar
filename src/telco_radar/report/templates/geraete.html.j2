@@ -153,7 +153,9 @@
     <div class="t-kennzahl"><b>{{ geraete.bilanz.skus }}</b><span>Varianten (SKUs)</span></div>
     <div class="t-kennzahl"><b>{{ geraete.bilanz.anbieter }}</b><span>Anbieter mit Daten</span></div>
     <div class="t-kennzahl"><b>{{ geraete.bilanz.preispunkte }}</b><span>Preispunkte in der Historie</span></div>
+    {% if not geraete.bilanz.ohne_vorlauf %}
     <div class="t-kennzahl"><b>{{ geraete.bilanz.ausgelistet }}</b><span>ausgelistet</span></div>
+    {% endif %}
   </div>
   <p class="t-hinweis">{{ geraete.quellenlage.liefernd }} von
   {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern

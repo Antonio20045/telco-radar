@@ -263,7 +263,20 @@ def _tag(wert):
 
 def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                 heute: str) -> dict:
-    """Die groessten Bewegungen DIESES Zeitraums - aus den Deltas gerechnet."""
+    """Die groessten Bewegungen DIESES Zeitraums - aus den Deltas gerechnet.
+
+    DER BEZUG IST DIE MESSUNG, NICHT DER BERICHTSTAG. Der Geraetezweig laeuft
+    naechtlich und committet seinen Stand; der Bericht erscheint zweimal die
+    Woche. Die Geraetedaten sind damit REGELMAESSIG neuer als `heute` - am
+    11.08.2026 gemessen: Bestand vom 11., letzter Bericht vom 8. Weil das
+    Fenster nur zurueckschaut, fiel jede Aenderung heraus, und die Sektion
+    stand leer da, obwohl frische Daten vorlagen. Als Bezug gilt deshalb der
+    spaetere der beiden Tage.
+    """
+    juengste = sorted(p.get("datum") for p in historie.alle_punkte()
+                      if p.get("datum"))
+    if juengste and juengste[-1] > (heute or ""):
+        heute = juengste[-1]
     bewegungen = []
     for e in eintraege:
         reihe = historie.reihe(e["id"])
@@ -301,13 +314,26 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         erlaubt |= zahlen_der_namen(b["modell"], b["anbieter"])
     erlaubt.update({len(neu_gelistet), len(verschwunden), len(bewegungen)})
 
+    # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Solange nur an EINEM
+    # Tag gemessen wurde, kann keine Bewegung entstanden sein - dann zeigt
+    # die Karte, was neu ERFASST wurde, und sagt das auch so. Der erste Lauf
+    # hatte hier eine leere Sektion, und "keine Auffaelligkeiten" ist etwas
+    # anderes als "noch nichts zu vergleichen".
+    messtage = {p.get("datum") for p in historie.alle_punkte() if p.get("datum")}
+    ohne_vorlauf = len(messtage) < 2
+
     saetze = []
     for b in bewegungen[:5]:
         richtung = "günstiger" if b["delta"] < 0 else "teurer"
         saetze.append(f"{b['modell']} bei {b['anbieter']}: "
                       f"{abs(b['delta']):.2f} € {richtung} "
                       f"({b['von']:.2f} € auf {b['auf']:.2f} €).")
-    if neu_gelistet:
+    if neu_gelistet and ohne_vorlauf:
+        saetze.append(f"{len(neu_gelistet)} Gerät"
+                      f"{'e' if len(neu_gelistet) != 1 else ''} erstmals "
+                      f"erfasst – es gibt noch keinen früheren Stand, gegen "
+                      f"den sich vergleichen ließe.")
+    elif neu_gelistet:
         saetze.append(f"{len(neu_gelistet)} Gerät{'e' if len(neu_gelistet) != 1 else ''} "
                       f"neu im Regal.")
     if verschwunden:
@@ -336,6 +362,7 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                  "anbieter": e.get("anbieter"), "seit": e.get("ended_since", "")}
                 for e in verschwunden[:12]],
         "hat_daten": bool(geprueft or bewegungen),
+        "ohne_vorlauf": ohne_vorlauf,
     }
 
 
@@ -364,10 +391,6 @@ def _matrix(eintraege: list, katalog) -> dict:
             "sku_id": e.get("sku_id"),
             "speicher": e.get("speicher_gb"),
             "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
-            # - es gehoert in den Aggregationsschluessel, sonst schluckt der
-            # niedrigere Preis den hoeheren.
-            "zustand": e.get("zustand") or "neu",
             "farbe_roh": e.get("farbe_roh", ""),
             "preis": e.get("preis_ohne_vertrag"),
             "zuzahlung": e.get("zuzahlung"),
@@ -694,6 +717,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "anbieter": len(laeden_mit_daten),
             "ausgelistet": sum(1 for e in alle
                                if e.get("status") == STATUS_AUSGELISTET),
+            # Ohne einen frueheren Stand ist "0 ausgelistet" keine Aussage,
+            # sondern eine Selbstverstaendlichkeit - die Kachel bleibt weg,
+            # bis es etwas zu vergleichen gibt.
+            "ohne_vorlauf": len({p.get("datum") for p in historie.alle_punkte()
+                                 if p.get("datum")}) < 2,
             "preispunkte": historie.punkte_gesamt,
             # ZWEI Zahlen, seit die Karte aggregiert: `in_der_karte` sind die
             # gezeichneten Preispunkte, `aggregiert_aus` die Listungen

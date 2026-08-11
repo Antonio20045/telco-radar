@@ -245,3 +245,63 @@ def test_leere_datenbasis_kippt_nicht():
     a = auswertung([], [], _KATALOG, heute="2026-08-10")
     assert a["duenn"] is True and a["punkte"] == 0 and a["trends"] == []
     assert a["portfolio"] == []
+
+
+# --------------------------------------------------------------------------
+# Die Schwelle der Lifecycle-Sektion (Evaluation vom 11.08.2026)
+# --------------------------------------------------------------------------
+
+def test_ein_messtag_ergibt_keine_einzige_lifecycle_zeile():
+    """Der Befund: die ausgelieferte Seite zeigte zwoelf Zeilen "0 Tage" und
+    zwoelf Zeilen "+0.0 %".
+
+    Ursache war, dass `duenn` PREISPUNKTE zaehlte statt MESSTERMINE: 85
+    Listungen an EINEM Tag ergaben 85 Punkte, die Basis galt als dick. Gegen
+    den alten Stand gemessen faellt dieser Test durch - er ist der
+    Reproduktionsfall."""
+    eintraege = [
+        {"id": f"l{i}", "device_id": "apple-iphone-17-pro-max",
+         "anbieter": "Medimax", "status": "aktiv",
+         "first_seen": "2026-08-10", "last_verified": "2026-08-10",
+         "preis_ohne_vertrag": 1449.0, "erstpreis": 1449.0,
+         "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-10"}
+        for i in range(12)]
+    punkte = [{"listung_id": f"l{i}", "device_id": "apple-iphone-17-pro-max",
+               "anbieter": "Medimax", "datum": "2026-08-10",
+               "preis_ohne_vertrag": 1449.0} for i in range(12)]
+
+    a = auswertung(eintraege, punkte, _KATALOG, heute="2026-08-10")
+    assert a["duenn"] is True, "zwoelf Punkte an EINEM Tag sind keine Basis"
+    assert a["dauern"] == [], "keine Verweildauer aus einem einzigen Messtag"
+    assert a["verfaelle"] == [] and a["trends"] == []
+    assert a["termine"] == 1
+
+
+def test_die_schwelle_greift_je_geraet():
+    """Vier Messtermine ueber 21 Tage - darunter keine Zeile.
+
+    Ein Portfolio, in dem EIN Geraet lange beobachtet wird und ein anderes
+    seit gestern, darf nicht fuer beide eine Zahl behaupten."""
+    lange = [{"listung_id": "alt", "device_id": "apple-iphone-17-pro-max",
+              "anbieter": "Medimax", "datum": d, "preis_ohne_vertrag": p}
+             for d, p in (("2026-07-01", 1499.0), ("2026-07-10", 1479.0),
+                          ("2026-07-20", 1459.0), ("2026-08-10", 1449.0))]
+    kurz = [{"listung_id": "neu", "device_id": "samsung-galaxy-s25-ultra",
+             "anbieter": "Medimax", "datum": d, "preis_ohne_vertrag": 1249.0}
+            for d in ("2026-08-09", "2026-08-10")]
+    eintraege = [
+        {"id": "alt", "device_id": "apple-iphone-17-pro-max", "anbieter": "Medimax",
+         "status": "aktiv", "first_seen": "2026-07-01",
+         "last_verified": "2026-08-10", "preis_ohne_vertrag": 1449.0,
+         "erstpreis": 1499.0, "erstpreis_art": "ohne_vertrag",
+         "erstpreis_am": "2026-07-01"},
+        {"id": "neu", "device_id": "samsung-galaxy-s25-ultra", "anbieter": "Medimax",
+         "status": "aktiv", "first_seen": "2026-08-09",
+         "last_verified": "2026-08-10", "preis_ohne_vertrag": 1249.0,
+         "erstpreis": 1249.0, "erstpreis_art": "ohne_vertrag",
+         "erstpreis_am": "2026-08-09"},
+    ]
+    a = auswertung(eintraege, lange + kurz, _KATALOG, heute="2026-08-10")
+    assert a["duenn"] is False, "ein Geraet nimmt die Schwelle"
+    assert [d["device_id"] for d in a["dauern"]] == ["apple-iphone-17-pro-max"]
+    assert all(v["device_id"] == "apple-iphone-17-pro-max" for v in a["verfaelle"])

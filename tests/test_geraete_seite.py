@@ -130,11 +130,14 @@ _PUNKTE = [
 ]
 
 
-def _baue(tmp_path: Path, db=None):
+def _baue(tmp_path: Path, db=None, punkte=None):
     """Eine vollstaendige Site rendern - mit echtem Bericht, echtem Zustand.
 
     `db` ersetzt den Bestand, wenn ein Fall mehr Listungen braucht als die
-    fuenf des Normalfalls (etwa: eine volle Spalte der Positionskarte)."""
+    fuenf des Normalfalls (etwa: eine volle Spalte der Positionskarte).
+    `punkte` ersetzt die Preishistorie - noetig fuer jeden Fall, der vom
+    ERSTLAUF handelt: der Normalfall hat zwei Messtage, und damit tritt
+    "es gibt noch nichts zu vergleichen" nie ein."""
     root = tmp_path
     (root / "config").mkdir(parents=True, exist_ok=True)
     for name, daten in (("geraete_katalog.yaml", _KATALOG),
@@ -147,7 +150,8 @@ def _baue(tmp_path: Path, db=None):
     state.mkdir(parents=True, exist_ok=True)
     (state / "geraete_db.json").write_text(json.dumps(db or _DB), encoding="utf-8")
     (state / "geraete_preise.jsonl").write_text(
-        "\n".join(json.dumps(p) for p in _PUNKTE) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(p) for p in (_PUNKTE if punkte is None else punkte))
+        + "\n", encoding="utf-8")
 
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
@@ -1198,3 +1202,72 @@ def test_der_notzustand_traegt_dieselben_flaechen_wie_der_normalfall(tmp_path):
     for schluessel, k in notzustand["flaechen"].items():
         assert set(k) >= set(voll["flaechen"][schluessel]) - {"y_schritt"}, schluessel
     assert notzustand["formen"] == voll["formen"]
+
+
+def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
+    """Die Sektion, die zwei Bildschirmseiten lang nichts aussagte.
+
+    Der Testbestand hat genau zwei Messpunkte an zwei Tagen - unter der
+    Schwelle. Gegen den alten Stand gemessen stuenden hier Zeilen mit
+    "0 Tage" und "+0.0 %"."""
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    basis = s.select_one(".gr-basis")
+    assert basis is not None
+    # Die Klasse war im CSS angelegt und kam im HTML NULL Mal vor.
+    assert "gr-basis--duenn" in (basis.get("class") or [])
+    assert not s.select(".gr-dauern li"), "Verweildauer ohne Datenbasis"
+    assert not s.select(".gr-verfall li"), "Preisverfall ohne Datenbasis"
+    text = s.select_one(".gr-lifecycle").get_text(" ", strip=True)
+    assert "0 Tage" not in text
+    assert "+0.0 %" not in text
+    # Und die zwei Textfehler von damals kommen nicht zurueck.
+    assert "1 Wochen" not in text
+    assert "ueber" not in text
+
+
+def test_ohne_vorlauf_sagt_die_wochenkarte_was_sie_zeigt(tmp_path):
+    """Teil B7 Punkt 3: solange es keinen frueheren Stand gibt, zeigt die
+    Karte, was NEU ERFASST wurde - und sagt das auch so.
+
+    Vorher stand die Sektion leer da, und "keine Auffaelligkeiten" ist etwas
+    anderes als "noch nichts zu vergleichen"."""
+    # EIN Messtag, und die Listungen sind an diesem Tag erstmals gesehen
+    # worden - sonst gibt es einen Vorlauf und der Fall tritt nie ein.
+    frisch = {"updated": "2026-08-11",
+              "anbieter": {"Medimax": {"laeufe": 1, "funde_gesamt": 2}},
+              "listungen": [
+                  _listung("Medimax", "apple-iphone-17-pro-max",
+                           "apple-iphone-17-pro-max-256gb-titan-natur", 1449.0,
+                           first_seen="2026-08-11"),
+                  _listung("Medimax", "samsung-galaxy-s25-ultra",
+                           "samsung-galaxy-s25-ultra-256gb-schwarz", 1249.0,
+                           farbe="schwarz", first_seen="2026-08-11"),
+              ]}
+    erstlauf = [{"listung_id": "medimax--apple-iphone-17-pro-max-256gb-titan-natur",
+                 "device_id": "apple-iphone-17-pro-max", "anbieter": "Medimax",
+                 "datum": "2026-08-11", "preis_ohne_vertrag": 1449.0,
+                 "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"}]
+    site = _baue(tmp_path, db=frisch, punkte=erstlauf)
+    s = _suppe(site, "geraete.html")
+    abschnitt = s.select_one(".gr-auffaellig")
+    assert abschnitt is not None, "die Sektion fehlt ganz"
+    saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
+    assert saetze, "kein einziger Satz"
+    assert any("erfasst" in x and "vergleichen" in x for x in saetze), saetze
+    # Die Kachel "0 ausgelistet" ist ohne Vorlauf keine Aussage.
+    kacheln = {k.find("span").get_text(strip=True)
+               for k in s.select(".gr-bilanz .t-kennzahl")}
+    assert "ausgelistet" not in kacheln
+
+
+def test_jede_zahl_der_wochenkarte_stammt_aus_dem_datensatz(tmp_path):
+    """Der Zahlenwaechter, mit Gegenprobe: eine erfundene Zahl muss fallen.
+
+    Ohne die Gegenprobe belegt der Test nur, dass die echten Saetze
+    durchkommen - nicht, dass der Waechter ueberhaupt greift."""
+    from telco_radar.report.geraete_view import pruefe_zahlen
+    erlaubt = {85.0, 1449.0}
+    assert pruefe_zahlen("85 Geräte erstmals erfasst.", erlaubt)
+    assert not pruefe_zahlen("86 Geräte erstmals erfasst.", erlaubt)
+    assert not pruefe_zahlen("Der Preis fiel um 12,5 %.", erlaubt)

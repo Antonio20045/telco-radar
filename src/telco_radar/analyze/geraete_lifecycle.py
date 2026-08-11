@@ -45,6 +45,26 @@ MIND_PUNKTE = 12
 # seine erste Preisstufe nimmt.
 MIND_WOCHEN = 12
 
+# --------------------------------------------------------------------------
+# DIE SCHWELLE, ohne die diese Sektion luegt
+# --------------------------------------------------------------------------
+# Am 11.08.2026 zeigte die ausgelieferte Seite zwoelf Zeilen "0 Tage" und
+# zwoelf Zeilen "+0.0 %". Der Grund stand eine Zeile hoeher: `duenn` rechnete
+#
+#     duenn = len(punkte) < MIND_PUNKTE
+#
+# und zaehlte damit PREISPUNKTE statt MESSTERMINE. 85 Listungen an EINEM Tag
+# ergeben 85 Punkte, die Datenbasis galt als dick, der Nicht-duenn-Zweig lief,
+# und die Klasse `gr-basis--duenn` - die im CSS seit dem ersten Tag angelegt
+# ist - kam im HTML kein einziges Mal vor. Zwei Bildschirmseiten, die exakt
+# nichts aussagen und dabei wie ein Ergebnis aussehen.
+#
+# Gezaehlt werden jetzt VERSCHIEDENE Messtage und die Spanne dazwischen, und
+# zwar JE GERAET: ein Portfolio, in dem ein Geraet lange beobachtet wird und
+# elf andere seit gestern, hat keine zwoelf belastbaren Zeilen.
+MIND_TERMINE_JE_GERAET = 4
+MIND_TAGE_JE_GERAET = 21
+
 _FENSTER = (30, 60, 90)
 
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
@@ -225,13 +245,35 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     """Alles zusammen, mitsamt der Aussage ueber die eigene Datenbasis."""
     stand = _datum(heute) or date.today()
     daten = [d for d in (_datum(p.get("datum")) for p in punkte) if d]
+    termine = sorted({d for d in daten})
     wochen = max(1, (stand - min(daten)).days // 7) if daten else 0
-    duenn = len(punkte) < MIND_PUNKTE
+
+    # Wie viele Messtermine und wie viele Tage liegen JE LISTUNG vor? Nur
+    # daran entscheidet sich, ob ueber dieses Geraet etwas gesagt werden darf.
+    je_listung: dict = {}
+    for p in punkte:
+        d = _datum(p.get("datum"))
+        if d is None:
+            continue
+        je_listung.setdefault(p.get("listung_id"), set()).add(d)
+
+    def _traegt(listung_id) -> bool:
+        tage = je_listung.get(listung_id) or set()
+        if len(tage) < MIND_TERMINE_JE_GERAET:
+            return False
+        return (max(tage) - min(tage)).days >= MIND_TAGE_JE_GERAET
+
+    # Duenn ist die Basis, solange KEIN Geraet die Schwelle nimmt. Gezaehlt
+    # werden Termine, nicht Punkte - siehe Kommentar am Modulkopf.
+    belastbar = [e for e in eintraege if _traegt(e.get("id"))]
+    duenn = not belastbar
 
     dauern = []
     for e in eintraege:
         tage = listungsdauer(e)
-        if tage is None:
+        if tage is None or not _traegt(e.get("id")):
+            # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis,
+            # dass noch nicht gemessen wurde.
             continue
         g = katalog.nach_id(e.get("device_id"))
         dauern.append({
@@ -245,7 +287,7 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     verfaelle = []
     for e in eintraege:
         v = preisverfall(e)
-        if v is None:
+        if v is None or not _traegt(e.get("id")):
             continue
         g = katalog.nach_id(e.get("device_id"))
         verfaelle.append({**v, "device_id": e.get("device_id"),
@@ -261,20 +303,32 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
             effekte.append({**ergebnis,
                             "modell": g.modell if g else gid})
 
+    # Zahlwoerter beugen, Umlaute benutzen. Die alte Fassung schrieb an
+    # prominenter Stelle "seit 1 Wochen" und "Messpunkte ueber 85 Listungen".
+    def _n(zahl: int, eins: str, viele: str) -> str:
+        return f"{zahl} {eins if zahl == 1 else viele}"
+
+    seit = min(daten).strftime("%d.%m.%Y") if daten else ""
     if duenn:
-        hinweis = (f"Datenbasis noch dünn: Preisverlauf seit {wochen} "
-                   f"{'Woche' if wochen == 1 else 'Wochen'} beobachtet, "
-                   f"{len(punkte)} Messpunkte. Belastbare Aussagen über "
-                   f"Preisverfall und Nachfolger-Effekt gibt es ab etwa "
-                   f"{MIND_WOCHEN} Wochen - bis dahin steht hier, was gemessen "
-                   f"wurde, und keine Kurve.")
+        hinweis = (f"Datenbasis noch dünn: Preisverlauf wird seit dem {seit} "
+                   f"erfasst" if seit
+                   else "Datenbasis noch dünn: Preisverlauf wird noch nicht erfasst")
+        # BEIDE Zahlen: wie lange schon, und wie lange noch. Ein Hinweis, der
+        # nur "noch zu duenn" sagt, ist eine Ausrede statt einer Auskunft.
+        hinweis += (f" – {_n(wochen, 'Woche', 'Wochen')}, bisher "
+                    f"{_n(len(termine), 'Messtermin', 'Messtermine')}. "
+                    f"Belastbare Aussagen zu Verweildauer und Preisverfall gibt "
+                    f"es ab etwa {MIND_WOCHEN} Wochen; bis dahin steht hier "
+                    f"keine Zahl, die noch keine ist.")
     else:
-        hinweis = (f"Preisverlauf seit {wochen} Wochen beobachtet, "
-                   f"{len(punkte)} Messpunkte ueber {len(dauern)} Listungen.")
+        hinweis = (f"Preisverlauf seit {_n(wochen, 'Woche', 'Wochen')} "
+                   f"beobachtet, {_n(len(termine), 'Messtermin', 'Messtermine')} "
+                   f"über {_n(len(dauern), 'Listung', 'Listungen')}.")
 
     return {
         "duenn": duenn,
         "punkte": len(punkte),
+        "termine": len(termine),
         "wochen": wochen,
         "hinweis": hinweis,
         "dauern": sorted(dauern, key=lambda d: -d["tage"]),
