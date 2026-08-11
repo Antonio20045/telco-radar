@@ -1,0 +1,129 @@
+# Die drei Abo-Ereignisse: Bestaetigungsmail, Bestaetigung, Abmeldung.
+#
+# EIN Workflow fuer alle drei, und das ist Absicht: sie fassen denselben
+# Store an, brauchen also dieselbe concurrency-Gruppe. Als drei Workflows
+# mit drei Gruppen waere die Gruppe kein Schutz mehr, sondern Dekoration.
+#
+# DIE STELLE, AN DER ES STILL SCHIEFGEHT: `cancel-in-progress: false`. Mit
+# `true` wuerde eine zweite Anmeldung die gerade laufende Bestaetigung
+# abbrechen - der Nutzer hat auf der Seite "Angemeldet" gelesen, im Store
+# steht nichts, und niemandem faellt es auf.
+name: Abo-Ereignis
+
+on:
+  repository_dispatch:
+    types: [send_doi, confirm, unsubscribe]
+
+concurrency:
+  group: telco-radar-store
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  ereignis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Store-Repo auschecken
+        uses: actions/checkout@v4
+
+      - name: Logik-Repo auschecken (oeffentlich)
+        # Die Skripte liegen dort, die Daten hier. Eine Kopie der
+        # Filter-Engine in diesem Repo wuerde driften - und dann schickt die
+        # Mail etwas anderes, als die Website zeigt.
+        uses: actions/checkout@v4
+        with:
+          repository: Antonio20045/telco-radar
+          path: logik
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r logik/requirements.txt
+
+      - name: age installieren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Token in eine Datei schreiben
+        # NICHT als Kommandozeilenargument: eine Kommandozeile steht in der
+        # Prozessliste und im Actions-Log, und im Token steckt die Adresse.
+        env:
+          TOKEN: ${{ github.event.client_payload.token }}
+        run: |
+          umask 077
+          printf '%s' "$TOKEN" > /tmp/token.txt
+
+      - name: Store entschluesseln
+        env:
+          AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+        run: |
+          umask 077
+          mkdir -p store
+          printf '%s' "$AGE_SECRET_KEY" > /tmp/age.key
+          if [ -f store/subscribers.jsonl.age ]; then
+            age -d -i /tmp/age.key store/subscribers.jsonl.age > store/subscribers.jsonl
+          else
+            : > store/subscribers.jsonl
+          fi
+          echo "Verteiler: $(wc -l < store/subscribers.jsonl) Zeilen"
+
+      - name: Ereignis verarbeiten
+        env:
+          SIGNUP_TOKEN_KEY: ${{ secrets.SIGNUP_TOKEN_KEY }}
+          SIGNUP_PEPPER: ${{ secrets.SIGNUP_PEPPER }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          ERLAUBTE_DOMAINS: ${{ vars.ERLAUBTE_DOMAINS }}
+          PYTHONPATH: logik/src:logik
+        run: |
+          befehl="${{ github.event.action }}"
+          case "$befehl" in
+            send_doi) befehl=doi ;;
+            confirm|unsubscribe) ;;
+            *) echo "::error::Unbekanntes Ereignis"; exit 1 ;;
+          esac
+          python logik/scripts/newsletter/abo.py "$befehl" \
+            --token-datei /tmp/token.txt \
+            --token-id "${{ github.event.client_payload.token_id }}" \
+            --store store/subscribers.jsonl \
+            ${{ github.event.action == 'send_doi' && format('--doi-log store/doi_log.jsonl --confirm-url {0}', github.event.client_payload.confirm_url) || '' }}
+
+      - name: Store verschluesseln und committen
+        env:
+          AGE_PUBLIC_KEY: ${{ vars.AGE_PUBLIC_KEY }}
+        run: |
+          age -r "$AGE_PUBLIC_KEY" -o store/subscribers.jsonl.age store/subscribers.jsonl
+          # Der Klartext verlaesst den Runner NIE. `.gitignore` allein waere
+          # zu wenig - ein `git add -f` gibt es auch versehentlich.
+          shred -u store/subscribers.jsonl /tmp/token.txt /tmp/age.key 2>/dev/null || \
+            rm -f store/subscribers.jsonl /tmp/token.txt /tmp/age.key
+          git config user.name "telco-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add store/
+          if git diff --cached --quiet; then
+            echo "Nichts geaendert."
+            exit 0
+          fi
+          # Die Commit-Nachricht nennt das EREIGNIS, nie den Betroffenen.
+          git commit -m "Abo-Ereignis: ${{ github.event.action }}"
+          # Zwischen Auschecken und Push kann ein anderer Lauf gepusht haben
+          # - trotz concurrency-Gruppe, etwa nach einem Neustart. Ein Rebase
+          # auf einem age-Ciphertext ist ein Binaerkonflikt; deshalb: neu
+          # laden, das Skript noch einmal laufen lassen. Der Store fuehrt
+          # dabei auf Zeilenebene zusammen.
+          for versuch in 1 2 3 4; do
+            if git push; then exit 0; fi
+            echo "Push abgewiesen - Versuch $versuch"
+            sleep $((2 ** versuch))
+            git fetch origin main && git reset --hard origin/main
+            echo "::warning::Der Store hat sich geaendert. Das Ereignis muss "\
+                 "wiederholt werden - siehe README, Abschnitt Konflikte."
+            exit 1
+          done
+
+      - name: Klartext darf nicht liegenbleiben
+        if: always()
+        run: rm -f store/subscribers.jsonl /tmp/token.txt /tmp/age.key

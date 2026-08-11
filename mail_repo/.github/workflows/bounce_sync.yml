@@ -1,0 +1,89 @@
+# Taeglicher Abgleich der Rueckläufer gegen die Brevo-Events-API.
+#
+# Warum taeglich und nicht als Teil des Versands: Ereignisse brauchen Zeit,
+# und die Frage "ist diese Adresse noch erreichbar" ist nicht an einen
+# Versandtag gebunden.
+#
+# Warum ueberhaupt: Transaktionsanbieter reagieren auf schlechte Bounce- und
+# Beschwerdequoten empfindlich und deaktivieren Free-Konten SCHNELL UND OHNE
+# VORWARNUNG. Der Vorteil gegenueber einem privaten Postfach als Absender
+# ist, dass es dann nur den Newsletter trifft - aber es trifft ihn eben.
+#
+# Kein IMAP, kein Postfach. Die API ist die Quelle.
+name: Rueckläufer abgleichen
+
+on:
+  schedule:
+    # 05:20 UTC - vor dem Radar-Lauf (08:30), damit eine tote Adresse nicht
+    # noch eine Ausgabe bekommt.
+    - cron: "20 5 * * *"
+  workflow_dispatch:
+    inputs:
+      trocken:
+        description: "nur zaehlen, nichts schreiben"
+        type: boolean
+        default: false
+
+concurrency:
+  group: telco-radar-store
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  abgleichen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Antonio20045/telco-radar
+          path: logik
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r logik/requirements.txt
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Store entschluesseln
+        env:
+          AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+        run: |
+          umask 077
+          mkdir -p store
+          printf '%s' "$AGE_SECRET_KEY" > /tmp/age.key
+          if [ -f store/subscribers.jsonl.age ]; then
+            age -d -i /tmp/age.key store/subscribers.jsonl.age > store/subscribers.jsonl
+          else
+            : > store/subscribers.jsonl
+          fi
+
+      - name: Ereignisse holen und auswerten
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          PYTHONPATH: logik/src:logik
+        run: |
+          python logik/scripts/newsletter/bounce_sync.py \
+            ${{ inputs.trocken && '--trocken' || '' }} \
+            --store store/subscribers.jsonl \
+            --send-log store/send_log.jsonl \
+            --stand store/bounce_stand.json
+
+      - name: Store verschluesseln und committen
+        env:
+          AGE_PUBLIC_KEY: ${{ vars.AGE_PUBLIC_KEY }}
+        run: |
+          age -r "$AGE_PUBLIC_KEY" -o store/subscribers.jsonl.age store/subscribers.jsonl
+          rm -f store/subscribers.jsonl /tmp/age.key
+          git config user.name "telco-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add store/
+          git diff --cached --quiet && { echo "Nichts geaendert."; exit 0; }
+          git commit -m "Rueckläufer abgeglichen"
+          git push
+
+      - name: Klartext darf nicht liegenbleiben
+        if: always()
+        run: rm -f store/subscribers.jsonl /tmp/age.key

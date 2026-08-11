@@ -1,0 +1,155 @@
+# Der Versandlauf. Ausgeloest per repository_dispatch NACH dem Deploy.
+#
+# Bewusst ein eigener Workflow in einem eigenen Repo:
+#   * Der Radar-Lauf lag am 6. August bei 27,4 von 35 Minuten. Ein
+#     gedrosselter Versand an 200 Empfaenger dauert allein rund sieben
+#     Minuten - im selben Job kippt das den Lauf ins Timeout, und dann
+#     faellt nicht nur der Newsletter aus, sondern der BERICHT.
+#   * Ein fehlgeschlagener Versand darf den Radar-Lauf nie rot faerben.
+#
+# DIE IDEMPOTENZ IST DREISTUFIG, und die zwei Jobs unten sind Stufe 1 und 2:
+#   1. `plan` schreibt den Sendeplan und PUSHT ihn, bevor die erste Mail
+#      rausgeht. Ohne ihn weiss ein Wiederanlauf nach einem Runner-Absturz
+#      nicht, was er eigentlich vorhatte.
+#   2. `versand` haengt jede Zustellung einzeln ans Log an.
+#   3. Beim Wiederanlauf gilt: alles mit Bestaetigung wird uebersprungen,
+#      und "gesendet, Log-Schreiben fehlgeschlagen" gilt als GESENDET - im
+#      Zweifel lieber eine Mail zu wenig als eine zu viel.
+name: Newsletter versenden
+
+on:
+  repository_dispatch:
+    types: [report_ready]
+  workflow_dispatch:
+    inputs:
+      datum:
+        description: "Ausgabedatum (YYYY-MM-DD)"
+        required: true
+      dry_run:
+        description: "alles rendern, nichts verschicken"
+        type: boolean
+        default: true
+
+concurrency:
+  group: telco-radar-store
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  versenden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DATUM: ${{ github.event.client_payload.date || inputs.datum }}
+      SHA: ${{ github.event.client_payload.sha || 'main' }}
+      TROCKEN: ${{ inputs.dry_run && '--dry-run' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Logik und Bericht auschecken
+        # Beim COMMIT-SHA der Ausgabe, nicht bei main: zwischen Deploy und
+        # Versand kann ein weiterer Lauf gelaufen sein, und dann verschickt
+        # die Mail eine andere Ausgabe, als der Link zeigt.
+        uses: actions/checkout@v4
+        with:
+          repository: Antonio20045/telco-radar
+          ref: ${{ env.SHA }}
+          path: logik
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r logik/requirements.txt
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Bericht vorhanden?
+        run: |
+          test -f "logik/data/reports/$DATUM.json" || {
+            echo "::error::Kein Bericht für $DATUM im Commit $SHA."
+            exit 1
+          }
+
+      - name: Store entschluesseln
+        env:
+          AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+        run: |
+          umask 077
+          mkdir -p store
+          printf '%s' "$AGE_SECRET_KEY" > /tmp/age.key
+          if [ -f store/subscribers.jsonl.age ]; then
+            age -d -i /tmp/age.key store/subscribers.jsonl.age > store/subscribers.jsonl
+          else
+            : > store/subscribers.jsonl
+          fi
+
+      # ---------------------------------------------------- Stufe 1 -------
+      - name: Sendeplan schreiben und pushen
+        env:
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+          PYTHONPATH: logik/src:logik
+        run: |
+          python logik/scripts/newsletter/send_digest.py --stufe plan \
+            --bericht "logik/data/reports/$DATUM.json" \
+            --promo logik/data/state/promo_db.json \
+            --store store/subscribers.jsonl \
+            --send-log store/send_log.jsonl \
+            --plan store/sendeplan.json
+          git config user.name "telco-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add store/sendeplan.json
+          git diff --cached --quiet || {
+            git commit -m "Sendeplan $DATUM"
+            git push
+          }
+
+      # ---------------------------------------------------- Stufe 2 -------
+      - name: Versenden
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          SIGNUP_TOKEN_KEY: ${{ secrets.SIGNUP_TOKEN_KEY }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          PYTHONPATH: logik/src:logik
+        run: |
+          python logik/scripts/newsletter/send_digest.py $TROCKEN \
+            --bericht "logik/data/reports/$DATUM.json" \
+            --promo logik/data/state/promo_db.json \
+            --store store/subscribers.jsonl \
+            --send-log store/send_log.jsonl \
+            --plan store/sendeplan.json
+
+      - name: Sendeprotokoll sichern
+        if: always()
+        run: |
+          rm -f store/subscribers.jsonl /tmp/age.key
+          git config user.name "telco-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add store/send_log.jsonl newsletter_lauf.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Sendeprotokoll $DATUM"
+          git push || {
+            echo "::warning::Push des Sendeprotokolls abgewiesen."
+            git fetch origin main && git rebase origin/main && git push
+          }
+
+      - name: Zahlen ans oeffentliche Repo zurueckmelden
+        # NUR ZAHLEN. Sie landen in data/state/newsletter_stats.jsonl und von
+        # dort auf transparenz.html - dort, wo ohnehin hingesehen wird.
+        if: always()
+        env:
+          TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+        run: |
+          test -f newsletter_lauf.json || exit 0
+          test -n "$TOKEN" || { echo "Kein PUBLIC_REPO_TOKEN - Zahlen bleiben hier."; exit 0; }
+          koerper=$(jq -nc --argjson p "$(cat newsletter_lauf.json)" \
+            '{event_type:"newsletter_stats", client_payload:$p}')
+          curl -sS -X POST -o /dev/null -w 'Zahlen gemeldet -> HTTP %{http_code}\n' \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Antonio20045/telco-radar/dispatches \
+            -d "$koerper"
+
+      - name: Klartext darf nicht liegenbleiben
+        if: always()
+        run: rm -f store/subscribers.jsonl /tmp/age.key
