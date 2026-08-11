@@ -1,0 +1,129 @@
+# =============================================================================
+# TELCO RADAR - Newsletter: was auswaehlbar ist und was die Grenzen sind
+# =============================================================================
+# Diese Datei ist der KATALOG der Anmeldeseite. Was hier steht, kann ein
+# Abonnent waehlen; was nicht hier steht, kann er nicht waehlen. Sie ist damit
+# das Gegenstueck zu config/ctm_fokus.yaml: dort steht, was "fuer uns wichtig"
+# heisst, hier steht, was "meine Themen" heissen kann.
+#
+# DIE VERKNUEPFUNGSREGEL - die Stelle, an der solche Filter ueblicherweise
+# scheitern:
+#
+#   * ZWISCHEN den Dimensionen gilt UND. Wer Europa und Buendelangebote
+#     waehlt, bekommt europaeische Buendelmeldungen - nicht alles aus Europa
+#     PLUS alles zu Buendeln.
+#   * INNERHALB einer Dimension gilt ODER. Europa oder Nordamerika.
+#   * LEER heisst ALLES, nicht nichts. Wer keine Region waehlt, schliesst
+#     keine aus. Das ist die Erwartung fast aller Nutzer - und es muss
+#     trotzdem auf dem Formular danebenstehen, weil es die Erwartung der
+#     ANDEREN nicht ist.
+#   * STICHWOERTER sind additiv, nicht einschraenkend. Ein Treffer kommt in
+#     die Ausgabe, auch wenn die uebrigen Filter ihn ausgeschlossen haetten,
+#     und wird als solcher markiert. Ohne diese eine Regel versteht niemand,
+#     warum ein Eintrag in seiner Mail steht - und Stichwort-Abos gelten als
+#     kaputt statt als nuetzlich.
+#
+# WER HIER EINE ZEILE AENDERT, aendert den Zuschnitt bestehender Abos. Die
+# Schluessel (`key`) landen im Abo-Datensatz; ein umbenannter Schluessel ist
+# ein stillschweigend geloeschter Filter. Label aendern: jederzeit. Schluessel
+# aendern: nur mit einer Wanderung ueber den Store.
+# -----------------------------------------------------------------------------
+
+# ---------------------------------------------------------------- Grenzen --
+grenzen:
+  # Acht Eintraege je Ausgabe. Nach oben gedeckelt, weil die Mail ein
+  # Anreisser ist und kein Bericht - Ziel jeder Ausgabe ist der Klick auf die
+  # Seite, und eine Mail mit vierzig Zeilen erzieht zum Ignorieren.
+  max_eintraege: 8
+  # Zehn Stichwoerter je Abo. Mehr sind keine Themenauswahl mehr, sondern
+  # eine zweite Volltextsuche - und die steht auf suche.html.
+  max_stichwoerter: 10
+  # Vier Zeichen Mindestlaenge - dieselbe Grenze wie textwerkzeug.WORT_RE.
+  # Darunter sind es im Deutschen fast nur Fuellwoerter, und im Englischen
+  # genau die mehrdeutigen Firmennamen, an denen sich das Fachpresse-Tagging
+  # schon einmal verschluckt hat ("tim", "vi", "au").
+  min_stichwort_laenge: 4
+  # Ab so vielen Treffern in 30 Tagen warnt die Vorschau. Der Wert ist
+  # gegriffen und gehoert nach vier Wochen Pilotbetrieb nachgezogen (N9,
+  # Schritt 5) - er steht hier, damit das eine Zeile ist und kein Umbau.
+  vorschau_warnung_ab: 25
+  # Das Fenster der Trefferzahl-Vorschau.
+  vorschau_tage: 30
+
+# ------------------------------------------------------------- Dimension 1 -
+# Die zwei Anwendungsfaelle des Portals. Ein drittes Feld kaeme nur mit einer
+# dritten Rubrik auf der Website dazu - der Newsletter ist ein Ausspielkanal
+# fuer das, was ohnehin entsteht, und kein eigener Apparat.
+bereiche:
+  - key: marktrecherche
+    label: Marktrecherche
+    beschreibung: Meldungen aus dem Wochenbericht - Netzbetreiber, Fachpresse, Themenfelder.
+  - key: promo
+    label: Promo Übersicht
+    beschreibung: Laufende Endkunden-Aktionen der deutschen Anbieter.
+
+# ------------------------------------------------------------- Dimension 2 -
+# Die sechs Regionen der Watchlist plus "Global". Die Schluessel sind die
+# Slugs der Regionsnamen aus config/watchlist.yaml (textwerkzeug.slug) -
+# gerechnet, nicht getippt, sonst laufen sie beim naechsten Umbenennen
+# auseinander.
+regionen:
+  - {key: europa,               label: Europa}
+  - {key: nordamerika,          label: Nordamerika}
+  - {key: lateinamerika,        label: Lateinamerika}
+  - {key: afrika-naher-osten,   label: Afrika & Naher Osten}
+  - {key: asien,                label: Asien}
+  - {key: ozeanien,             label: Ozeanien}
+  - {key: global,               label: Global und Themenfelder}
+
+# ------------------------------------------------------------- Dimension 3 -
+# Die Wettbewerber, nach denen sich filtern laesst. `treffer` sind die
+# Schreibweisen, unter denen sie in Meldungen auftauchen - dieselbe Mechanik
+# wie die Aliase der Watchlist, und aus demselben Grund noetig: kein Analyst
+# schreibt konsequent "Deutsche Telekom".
+#
+# Getroffen wird ueber das Betreiberfeld ODER ueber die Ueberschrift; eine
+# Meldung ohne Betreiberfeld ("Branche") ist sonst fuer jeden
+# Wettbewerbsfilter unsichtbar.
+wettbewerber:
+  - key: telekom
+    label: Deutsche Telekom
+    treffer: ["Deutsche Telekom", "Telekom Deutschland", "Telekom", "T-Mobile",
+              "T-Systems", "MagentaMobil", "congstar"]
+  - key: o2
+    label: O2 Telefónica
+    treffer: ["O2", "o2", "Telefónica", "Telefonica", "Blau", "Ay Yildiz",
+              "Ortel Mobile"]
+  - key: 1und1
+    label: 1&1
+    treffer: ["1&1", "1und1", "1 & 1", "United Internet"]
+  - key: vodafone
+    label: Vodafone
+    treffer: ["Vodafone", "otelo", "Vodafone Idea", "VodafoneZiggo"]
+  - key: freenet
+    label: freenet / mobilcom-debitel
+    treffer: ["freenet", "mobilcom-debitel", "mobilcom debitel", "klarmobil"]
+  - key: discounter
+    label: Discountmarken
+    treffer: ["ALDI TALK", "Lidl Connect", "Penny Mobil", "Norma Connect",
+              "winSIM", "simplytel", "PremiumSIM", "sim.de", "smartmobil",
+              "Drillisch"]
+
+# ------------------------------------------------------------- Dimension 4 -
+# Die Ressorts der Meldungsseite (RESSORTS in report/html.py). Absichtlich
+# DIESE Liste und nicht die Kategorien des Analysten: der Leser sieht auf der
+# Website Ressorts, und zwei Ordnungssysteme fuer dieselbe Menge sind eines
+# zu viel. "Vermischtes" fehlt - es ist die Restklasse, und niemand
+# abonniert eine Restklasse.
+#
+# Die `ressorts` sind die Schluessel aus RESSORTS in report/html.py. Ein Test
+# haelt sie dagegen: ein umbenanntes Ressort wuerde hier sonst still ins
+# Leere zeigen, und die Kategorie waere fuer immer leer, ohne dass irgendwo
+# ein Fehler entsteht.
+kategorien:
+  - {key: tarife,       label: "Tarife & Angebote",      ressorts: [tarife]}
+  - {key: netz,         label: "Netz & Technik",         ressorts: [netz]}
+  - {key: satellit,     label: "Satellit & Direct-to-Cell", ressorts: [satellit]}
+  - {key: regulierung,  label: "Regulierung & Politik",  ressorts: [regulierung]}
+  - {key: geld,         label: "Geld & Übernahmen",      ressorts: [geld]}
+  - {key: partner,      label: "Partnerschaften",        ressorts: [partner]}

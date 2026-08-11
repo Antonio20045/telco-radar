@@ -1471,6 +1471,31 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         promo_aktionen=promo_entries, mechanik_label=PROMO_MECHANICS)
     (site_dir / "search_index.json").write_text(
         json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
+
+    # ---- Der Stichwort-Index der Newsletter-Anmeldung.
+    # Die Trefferzahl-Vorschau ("Ihr Stichwort hätte in den letzten 30 Tagen
+    # 47 Meldungen getroffen") ist die wirksamste Einzelmassnahme gegen
+    # Abo-Muedigkeit - sie loest das Problem, bevor es Mails erzeugt. Aber
+    # die Anmeldeseite ist statisch und kann kein Python aufrufen, und der
+    # Signup-Dienst hat die Berichtsarchive nicht. Also zaehlt der Browser
+    # gegen diese Datei, und die Pipeline schreibt sie bei jedem Lauf mit.
+    #
+    # `newsletter/filters.baue_stichwort_index()` ist ihr Erzeuger UND die
+    # Testgrundlage: ein Test haelt jedes Wort des Index gegen `vorschau()`.
+    # Ohne den wuerde die Seite eine Zahl voraussagen, die der Versand nie
+    # einloest, und beide waeren fuer sich gruen.
+    from ..newsletter.filters import baue_stichwort_index
+    from ..newsletter.config import lade_katalog as _lade_nl_katalog
+    try:
+        _nl_tage = _lade_nl_katalog(_wurzel).grenzen.vorschau_tage
+    except (FileNotFoundError, ValueError) as exc:
+        log.warning("newsletter.yaml nicht lesbar (%s) - Stichwort-Index mit "
+                    "30 Tagen", exc)
+        _nl_tage = 30
+    (site_dir / "data").mkdir(exist_ok=True)
+    (site_dir / "data" / "keyword-index.json").write_text(
+        json.dumps(baue_stichwort_index(reports_dir, tage=_nl_tage),
+                   ensure_ascii=False), encoding="utf-8")
     (site_dir / "suche.html").write_text(
         env.get_template("suche.html.j2").render(
             prefix="",

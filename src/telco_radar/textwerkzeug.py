@@ -77,6 +77,43 @@ def gewicht(woerter, haeufigkeit: dict[str, int]) -> float:
     return round(sum(1.0 / haeufigkeit[w] for w in woerter if haeufigkeit.get(w)), 6)
 
 
+# ============================================  Begriffe an Wortgrenzen  ====
+# Vier Stellen im Projekt suchen einen Begriff im Fliesstext - die CTM-Linse
+# (Heimatmarkt-Marken), das Fruehwarn-Board (Indikatoren), die
+# Wettbewerbsseite (Aliase) und seit dem 11.08.2026 die Newsletter-Filter
+# (Stichwoerter der Abonnenten). Alle vier brauchen dieselbe Antwort auf
+# dieselbe Frage, und die Frage ist im Deutschen nicht trivial:
+#
+#   * "Netzausbau" MUSS in "Glasfaser-Netzausbau" treffen. Ein Bindestrich
+#     ist kein Wortzeichen, `(?<!\w)` laesst ihn also von selbst durch.
+#   * "Netz" darf NICHT in "Netzwerkkarte" untergehen. Rechts steht ein
+#     Wortzeichen, `(?!\w)` verhindert den Treffer.
+#   * "spark" darf nicht in "Sparkasse", "globe" nicht in "Globetrotter",
+#     "orange" nicht in "Orangensaft" treffen - dieselbe rechte Grenze.
+#
+# Was diese Regel BEWUSST nicht kann: die deutsche Beugung. "Netzausbaus"
+# (Genitiv) trifft nicht. Eine optionale Endung `s|es|n|en` waere schnell
+# geschrieben und faengt sich sofort einen neuen Falschtreffer ein -
+# "Orange" + "n" ist "Orangen". Erst messen, dann verschaerfen.
+#
+# `kein_punkt_davor` blendet zusaetzlich Domainnamen aus: ohne das trifft
+# "o2" auch in "example.o2" und die Marke steht in jeder Fussnote.
+
+def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
+    """Ein Muster, das JEDEN der Begriffe an Wortgrenzen findet - oder None.
+
+    Der laengste Begriff steht vorn: bei alternativen Zweigen nimmt die
+    Regex-Maschine den ERSTEN passenden, und "Telekom" vor "Deutsche Telekom"
+    wuerde die Gruppe auf das kuerzere Ergebnis festlegen.
+    """
+    teile = [re.escape(b.strip()) for b in (begriffe or []) if (b or "").strip()]
+    if not teile:
+        return None
+    teile.sort(key=len, reverse=True)
+    davor = r"(?<![\w.])" if kein_punkt_davor else r"(?<!\w)"
+    return re.compile(davor + "(" + "|".join(teile) + r")(?!\w)", re.I)
+
+
 # ======================================  beobachtend statt empfehlend  ====
 # Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
 # Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
