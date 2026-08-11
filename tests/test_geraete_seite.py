@@ -33,18 +33,16 @@ _ROOT = Path(__file__).resolve().parents[1]
 # DIE VEROEFFENTLICHUNGSSCHWELLE
 # ---------------------------------------------------------------------------
 # Ab hier beantwortet die Seite ihre Frage ("was bieten die Wettbewerber an,
-# und was kostet es?") und gehoert in die Navigation. Die Zahlen sind
-# bewusst niedrig und trotzdem hart: drei Anbieter, weil ein Preisvergleich
-# mit zwei Spalten kein Vergleich ist; zwei Hersteller, weil eine
-# Positionskarte mit einem Hersteller keine Marktverteilung zeigt; zwanzig
-# SKUs, weil darunter jede Aussage an einem einzelnen Geraet haengt.
+# und was kostet es?") und gehoert in die Navigation.
 #
-# Wer die Seite verlinken will, misst gegen diese Zahlen und aendert diesen
-# Test - dieselbe Disziplin wie bei tarife.html und lieferzeit.html
-# (CLAUDE.md §5).
-SCHWELLE_ANBIETER = 3
-SCHWELLE_HERSTELLER = 2
-SCHWELLE_SKUS = 20
+# Die Zahlen stehen seit dem 11.08.2026 im MODUL, nicht mehr hier - eine
+# Schwelle, die nur ein Test kennt, kann keine Navigation schalten, und
+# genau daran ist die Seite gescheitert: sie war live, vollstaendig und fuer
+# jeden Leser unauffindbar, weil das Eintragen Handarbeit blieb.
+# Der Test importiert sie und prueft BEIDE Zweige.
+SCHWELLE_ANBIETER = geraete_view.SCHWELLE_ANBIETER
+SCHWELLE_HERSTELLER = geraete_view.SCHWELLE_HERSTELLER
+SCHWELLE_SKUS = geraete_view.SCHWELLE_SKUS
 
 
 _KATALOG = {"geraete": [
@@ -435,37 +433,66 @@ def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
 # Die Veroeffentlichungsschwelle
 # --------------------------------------------------------------------------
 
-def test_seite_steht_nicht_in_der_navigation(tmp_path):
-    """Solange die Schwelle nicht erreicht ist, wird die Seite gebaut,
-    getestet und ist ueber ihren direkten Link erreichbar - aber nicht
-    verlinkt. Dieselbe Regel wie bei tarife.html und lieferzeit.html."""
-    site = _baue(tmp_path)
+def _db_mit(anzahl_skus: int, anbieter: tuple = ("Medimax",)) -> dict:
+    """Ein Bestand, der die Schwelle gezielt reisst oder nimmt."""
+    modelle = ("apple-iphone-17-pro-max", "samsung-galaxy-s25-ultra")
+    listungen = []
+    for i in range(anzahl_skus):
+        name = anbieter[i % len(anbieter)]
+        device = modelle[i % len(modelle)]
+        listungen.append(_listung(name, device, f"{device}-256gb-farbe-{i}",
+                                  399.0 + i * 15))
+    return {"updated": "2026-08-11",
+            "anbieter": {n: {"laeufe": 4} for n in anbieter},
+            "listungen": listungen}
+
+
+def test_unter_der_schwelle_steht_die_seite_nicht_in_der_navigation(tmp_path):
+    """Eine verlinkte Seite verspricht eine Antwort; eine Seite mit drei
+    Geraeten gibt eine falsche. Dieselbe Regel wie bei tarife.html und
+    lieferzeit.html - die Seite wird gebaut, getestet und ist ueber ihren
+    direkten Link erreichbar, aber nicht verlinkt."""
+    site = _baue(tmp_path, db=_db_mit(3))
     s = _suppe(site, "geraete.html")
-    nav = s.select(".subnav a") or s.select("nav a")
-    ziele = {a.get("href") for a in nav}
-    assert "geraete.html" not in ziele
+    assert "geraete.html" not in {a.get("href") for a in s.select(".subnav a")}
+    # Gegenprobe, dass der Fall wirklich UNTER der Schwelle liegt - sonst
+    # prueft der Test bloss, dass drei kleiner als zwanzig ist.
+    assert 3 < SCHWELLE_SKUS
 
 
-def test_die_schwelle_ist_beziffert_und_wird_gemessen(tmp_path):
-    """Wer die Seite verlinken will, misst hier nach und aendert DIESEN Test.
+def test_ueber_der_schwelle_erscheint_sie_auf_JEDER_seite(tmp_path):
+    """Der Fehler vom 11.08.2026: die Schwelle stand nur im Test, also
+    musste ein Mensch die Seite von Hand eintragen - und solange er das
+    nicht tat, war sie unauffindbar. Jetzt schaltet der Code sie, und zwar
+    in `base.html.j2`, also auf allen Seiten. Die Startseite ist die, auf
+    der es zaehlt: dort hat Antonio gesucht."""
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=("Medimax", "ElectronicPartner")))
+    for name in ("index.html", "meldungen.html", "wettbewerb.html",
+                 "differenzierung.html", "transparenz.html", "geraete.html"):
+        ziele = {a.get("href") for a in _suppe(site, name).select(".subnav a")}
+        assert "geraete.html" in ziele, name
 
-    Der Zweck der Zeile ist, dass die Zahlen nicht in einer Prosaregel
-    stehen, sondern gerechnet werden - eine Schwelle, die niemand misst, ist
-    eine Meinung.
-    """
-    site = _baue(tmp_path)
-    root = tmp_path
-    geraete = geraete_view.aufbereiten(
-        root / "data" / "state", lade_quellen(root), lade_katalog(root),
-        heute="2026-08-11")
-    erreicht = (geraete["bilanz"]["anbieter"] >= SCHWELLE_ANBIETER
-                and geraete["bilanz"]["skus"] >= SCHWELLE_SKUS
-                and len(geraete["karte_hersteller"]["spalten"]) >= SCHWELLE_HERSTELLER)
-    s = _suppe(site, "geraete.html")
-    verlinkt = "geraete.html" in {a.get("href") for a in s.select(".subnav a")}
-    assert verlinkt == erreicht, (
-        "Navigation und Veroeffentlichungsschwelle sind auseinandergelaufen: "
-        f"erreicht={erreicht}, verlinkt={verlinkt}")
+
+def test_die_schwelle_wird_gerechnet_und_nicht_behauptet(tmp_path):
+    """Die Navigation und die gerechnete Schwelle duerfen nicht
+    auseinanderlaufen - an beiden Zweigen gemessen, nicht nur an dem, der
+    heute gilt."""
+    for db, erwartet in ((_db_mit(3), False),
+                         (_db_mit(24, anbieter=("Medimax", "ElectronicPartner")), True)):
+        site = _baue(tmp_path / f"fall{erwartet}", db=db)
+        root = tmp_path / f"fall{erwartet}"
+        geraete = geraete_view.aufbereiten(
+            root / "data" / "state", lade_quellen(root), lade_katalog(root),
+            heute="2026-08-11")
+        erreicht = geraete_view.schwelle_erreicht(
+            anbieter=geraete["bilanz"]["anbieter"],
+            skus=geraete["bilanz"]["skus"],
+            hersteller=len(geraete["karte_hersteller"]["spalten"]))
+        assert erreicht is erwartet, geraete["bilanz"]
+        assert geraete["bilanz"]["schwelle_erreicht"] is erwartet
+        verlinkt = "geraete.html" in {
+            a.get("href") for a in _suppe(site, "geraete.html").select(".subnav a")}
+        assert verlinkt == erreicht
 
 
 def test_die_seite_erklaert_ihre_eigene_bedienung_nicht(tmp_path):

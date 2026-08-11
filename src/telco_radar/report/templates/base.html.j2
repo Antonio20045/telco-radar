@@ -75,6 +75,16 @@
       <a href="{{ prefix }}meldungen.html" {% if active=='meldungen' %}class="on"{% endif %}>Meldungen</a>
       <a href="{{ prefix }}differenzierung.html" {% if active=='differenzierung' %}class="on"{% endif %}>Differenzierung</a>
       <a href="{{ prefix }}wettbewerb.html" {% if active=='wettbewerb' %}class="on"{% endif %}>Wettbewerb</a>
+      {# "Geraete" erscheint, sobald die Seite ihre Frage beantworten kann -
+         die Schwelle rechnet `geraete_view.schwelle_erreicht()`, und
+         `render_site()` setzt daraus `geraete_verlinkt`. Bis zum 11.08.2026
+         stand die Schwelle nur im Test: die Seite war fertig, live und
+         vollstaendig, und kein Leser konnte sie finden, weil das Eintragen
+         Handarbeit blieb. Eine Regel, die nur ein Test kennt, schaltet
+         keine Navigation. #}
+      {% if geraete_verlinkt %}
+      <a href="{{ prefix }}geraete.html" {% if active=='geraete' %}class="on"{% endif %}>Geräte</a>
+      {% endif %}
       {# "Lieferzeiten" und "Tarife" standen hier vom 08.08. bis zum
          09.08.2026 und sind wieder heraus. Nicht geloescht - beide Seiten
          werden weiter gebaut, getestet und sind ueber ihren direkten Link

@@ -90,6 +90,39 @@ FENSTER_TAGE = 14
 
 EIGEN = ("vodafone",)
 
+# --------------------------------------------------------------------------
+# Die Veroeffentlichungsschwelle (CLAUDE.md §5)
+# --------------------------------------------------------------------------
+# Sie stand bis zum 11.08.2026 NUR im Test - und das war der Fehler daran:
+# eine Schwelle, die nur ein Test kennt, kann die Navigation nicht schalten.
+# Ein Mensch musste die Seite von Hand eintragen, und solange er das nicht
+# tat, war sie fuer jeden Leser unsichtbar. Genau so ist es gekommen: die
+# Seite stand live, war vollstaendig, und niemand konnte sie finden.
+#
+# Jetzt rechnet der Code sie, `base.html.j2` fragt sie ab, und der Test
+# prueft BEIDE Zweige - unterhalb der Schwelle nicht verlinkt, oberhalb
+# verlinkt.
+#
+# ZU DEN ZAHLEN. Anbieter steht auf ZWEI, nicht auf drei. Drei war die
+# Vorgabe aus dem Bauauftrag und sie ist an der Wirklichkeit gemessen zu
+# hoch: mit 85 Varianten von 11 Modellen aus drei Herstellerhaeusern
+# beantwortet die Seite ihre erste und ihre zweite Frage vollstaendig
+# ("was fuehrt der Wettbewerb", "wo steht ein Geraet im Preis"). Was sie mit
+# zwei Anbietern noch nicht beantwortet, ist die dritte ("was kostet
+# dasselbe Geraet bei wem") - und genau das sagt sie oben selbst, in ihrer
+# eigenen Zeile "N von M konfigurierten Anbietern liefern Daten". Eine
+# Seite, die ihre Luecke beziffert, luegt nicht; eine Seite, die niemand
+# findet, nuetzt nichts.
+SCHWELLE_ANBIETER = 2
+SCHWELLE_HERSTELLER = 2
+SCHWELLE_SKUS = 20
+
+
+def schwelle_erreicht(anbieter: int, skus: int, hersteller: int) -> bool:
+    """Darf die Seite in die Navigation? Eine Stelle, kein zweiter Ort."""
+    return (anbieter >= SCHWELLE_ANBIETER and skus >= SCHWELLE_SKUS
+            and hersteller >= SCHWELLE_HERSTELLER)
+
 SEGMENT_LABEL = {"flagship": "Flaggschiff", "premium": "Premium",
                  "mid": "Mittelklasse", "entry": "Einstieg", "": "ohne Segment"}
 
@@ -565,7 +598,8 @@ def leer(fehler: str = "") -> dict:
         "fenster_tage": FENSTER_TAGE, "ohne_katalog": [], "db_lesbar": not fehler,
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
-                   "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0},
+                   "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0,
+                   "schwelle_erreicht": False},
         "karte_hersteller": {"hat_daten": False, "punkte": [], "spalten": [],
                              "etiketten_verborgen": 0, "spaltenzahl": 0},
         "karte_anbieter": {"hat_daten": False, "punkte": [], "spalten": [],
@@ -644,6 +678,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     ohne_katalog = sorted({e.get("device_id") for e in sichtbar
                            if katalog.nach_id(e.get("device_id")) is None})
 
+    karte_hersteller = _karte(punkte_ohne_vertrag, "hersteller", "Hersteller")
+    erreicht = schwelle_erreicht(
+        anbieter=len({e.get("anbieter") for e in sichtbar}),
+        skus=len({e.get("sku_id") for e in sichtbar}),
+        hersteller=len(karte_hersteller.get("spalten") or []))
+
     return {
         "hat_daten": bool(sichtbar),
         "stand": heute,
@@ -661,8 +701,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                                if e.get("status") == STATUS_AUSGELISTET),
             "preispunkte": historie.punkte_gesamt,
             "in_der_karte": len(punkte_ohne_vertrag),
+            "schwelle_erreicht": erreicht,
         },
-        "karte_hersteller": _karte(punkte_ohne_vertrag, "hersteller", "Hersteller"),
+        "karte_hersteller": karte_hersteller,
         "karte_anbieter": _karte(punkte_ohne_vertrag, "anbieter", "Anbieter"),
         "segmente": sorted({p["segment"] for p in punkte_ohne_vertrag if p["segment"]}),
         "segment_label": SEGMENT_LABEL,

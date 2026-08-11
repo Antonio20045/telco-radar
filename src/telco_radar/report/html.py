@@ -1090,6 +1090,29 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # weg (Antonio: "das ist unnoetig"), also sind es die Werte auch - diese
     # Codebasis hat schon einmal sechs berechnete Groessen mitgeschleppt, die
     # keine Vorlage benutzte.
+    # ---- Geraetedaten: HIER, nicht erst bei ihrer eigenen Seite.
+    # Sie entscheiden ueber einen Navigationseintrag, und die Navigation
+    # steht in `base.html.j2` - also auf JEDER Seite, auch auf denen, die
+    # weiter unten schon gerendert sind. Wer das Aufbereiten unten laesst,
+    # bekommt eine Startseite ohne den Eintrag und eine Geraeteseite mit ihm.
+    #
+    # Die Aufbereitung faellt aus, wenn ein Eintrag kaputt ist; dann steht
+    # die Seite in ihrem Notzustand und der Eintrag bleibt weg. Der try/except
+    # deckt ausdruecklich NUR das Aufbereiten ab, nie das Rendern.
+    from ..geraete_config import lade_katalog, lade_quellen as _lade_geraetequellen
+    from . import geraete_view as geraete_view_mod
+    _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
+    try:
+        geraete = geraete_view_mod.aufbereiten(
+            state_dir, _lade_geraetequellen(_wurzel), lade_katalog(_wurzel),
+            heute=reports[0]["date"] if reports else "")
+    except Exception as exc:  # noqa: BLE001
+        log.error("Geraetedaten nicht aufbereitbar: %s: %s",
+                  type(exc).__name__, exc)
+        geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
+    env.globals["geraete_verlinkt"] = bool(
+        geraete["bilanz"].get("schwelle_erreicht"))
+
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),
                 "llm": r.get("generated_with_llm", False)} for r in reports]
@@ -1510,18 +1533,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # bis auf die Seite melden. log.error reicht nicht."
     #
     # Deshalb: gescheiterte Aufbereitung -> die Seite entsteht trotzdem und
-    # SAGT, dass sie nichts zeigen kann.
-    from ..geraete_config import lade_katalog, lade_quellen as _lade_geraetequellen
-    from . import geraete_view as geraete_view_mod
-    wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
-    try:
-        geraete = geraete_view_mod.aufbereiten(
-            state_dir, _lade_geraetequellen(wurzel), lade_katalog(wurzel),
-            heute=latest["date"] if latest else "")
-    except Exception as exc:  # noqa: BLE001
-        log.error("Geraetedaten nicht aufbereitbar: %s: %s",
-                  type(exc).__name__, exc)
-        geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
+    # SAGT, dass sie nichts zeigen kann. Aufbereitet wird `geraete` weiter
+    # OBEN, vor der ersten gerenderten Seite - es entscheidet ueber einen
+    # Navigationseintrag, und die Navigation steht auf jeder Seite.
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
         encoding="utf-8")
