@@ -206,7 +206,7 @@ def _redirect_html(ziel: str) -> str:
         f"<meta http-equiv=\"refresh\" content=\"0; url={ziel_escaped}\">\n"
         f"<link rel=\"canonical\" href=\"{ziel_escaped}\">\n"
         "<meta name=\"robots\" content=\"noindex\">\n"
-        "<title>Weitergeleitet – Vodafone Insights</title>\n</head>\n"
+        "<title>Weitergeleitet – Vodafone Product and Services Insights</title>\n</head>\n"
         "<body style=\"font-family:Inter,Arial,sans-serif;padding:40px\">\n"
         f"<p>Diese Seite ist umgezogen. <a href=\"{ziel_escaped}\">Weiter zu "
         f"{ziel_escaped}</a></p>\n</body>\n</html>\n")

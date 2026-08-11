@@ -37,8 +37,16 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
      noch keine Listungen erfasst, gilt das Kriterium als uebersprungen - die
      Seite steht dann unter ihrer Veroeffentlichungsschwelle.
 
-Kriterium 1, 6, 7 und 10 brauchen einen echten Browser - Chromium liegt unter
-/opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
+Dazu das Kriterium der Umbenennung (11.08.2026):
+
+ 12. Der Zeitungskopf traegt auf 1440 UND auf 390 px den vollen Namen
+     "Vodafone Product and Services Insights", steht vollstaendig im Bild,
+     erzeugt keinen Seitwaertslauf und sitzt nicht weiter als 90 px aus der
+     Mitte. Der laengere Name hat in seiner ersten Fassung alle drei Zahlen
+     gerissen: 169 px aus der Mitte und 61 px aus dem Bild heraus.
+
+Kriterium 1, 6, 7, 10 und 12 brauchen einen echten Browser - Chromium liegt
+unter /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
 
 **Gemessen wird ueber einen lokalen HTTP-Server, nicht ueber file://.** Der
 Grund ist Kriterium 10: `fetch('search_index.json')` ist unter file:// von der
@@ -75,6 +83,16 @@ from telco_radar.report.bilder import (                          # noqa: E402
 _FALZ = 900
 _BREITE = 1440
 _MIND_OBEN = 6
+# Der Zeitungskopf (Kriterium 12). Die Marke steht hier als EIN String, damit
+# eine halb durchgezogene Umbenennung auffaellt - am 11.08.2026 stand sie an
+# elf Stellen in den Vorlagen. Der zulaessige Versatz aus der Mitte ist
+# gemessen: der Kopf sass schon vor der Umbenennung 38 px links (bei 1440) und
+# 68 px bei 1180, weil die rechte Spalte breiter ist als die leere linke. 90
+# px lassen dem laengeren Namen Luft, ohne den zweiten Fehlerfall (169 px)
+# durchzulassen.
+_MOBIL_BREITE = 390
+_MARKE = "Vodafone Product and Services Insights"
+_MAX_KOPF_VERSATZ = 90
 # Der Anteil bebilderter Meldungen. Bis zum 07.08.2026 stand hier die
 # absolute Zahl 110, kalibriert an der Ausgabe vom 6.8. mit 193 Meldungen
 # (= 57 %). Eine kleinere Ausgabe fiel damit durch, obwohl sich nichts
@@ -174,7 +192,7 @@ def _haeufigster_absender(site: Path) -> str:
 
 
 def _browser_messungen(site: Path, b: Bilanz) -> None:
-    """Kriterium 1, 6, 7 und 10 - alles, was eine echte Darstellung braucht."""
+    """Kriterium 1, 6, 7, 10 und 12 - alles, was eine Darstellung braucht."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -303,6 +321,61 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
                      f"Verlauf, {gemessen['bilder']} Bilder, "
                      f"{gemessen['ohne_motiv']} Karten ohne Motiv, "
                      f"{gemessen['abgeschnitten']} abgeschnittene Schlagzeilen")
+
+        # ---- Kriterium 12: der Zeitungskopf traegt den ganzen Namen
+        #
+        # Gemessen wird auf BEIDEN Breiten, und das ist der Punkt: der Name
+        # "Vodafone Product and Services Insights" ist 373 statt 214 px breit,
+        # und auf dem Telefon lief er in der ersten Fassung 61 px aus dem
+        # Bild - die ganze Seite liess sich seitwaerts schieben. Geprueft
+        # wird deshalb dreierlei: der Kopf steht vollstaendig im Bild, die
+        # Seite hat keinen Seitwaertslauf, und der Kopf sitzt nicht weiter
+        # aus der Mitte als _MAX_KOPF_VERSATZ. Die dritte Zahl ist die, an
+        # der eine Schriftvergroesserung zuerst auffaellt.
+        kopf: dict = {}
+        for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, 844)):
+            klein = browser.new_page(viewport={"width": breite, "height": hoehe})
+            klein.goto(f"{wurzel}/index.html")
+            klein.wait_for_timeout(400)
+            kopf[breite] = klein.evaluate(
+                """() => {
+                     const n = document.querySelector('.brand-name');
+                     const bar = document.querySelector('.topbar-inner');
+                     if (!n || !bar) return null;
+                     const nb = n.getBoundingClientRect();
+                     const bb = bar.getBoundingClientRect();
+                     const br = document.querySelector('.brand').getBoundingClientRect();
+                     return {name: n.textContent.replace(/\\s+/g, ' ').trim(),
+                             links: Math.round(nb.left),
+                             rechts: Math.round(nb.right),
+                             versatz: Math.round((br.left + br.width / 2) -
+                                                 (bb.left + bb.width / 2)),
+                             docW: document.documentElement.scrollWidth,
+                             winW: window.innerWidth};
+                   }""")
+            klein.close()
+        fehler = []
+        for breite, m in kopf.items():
+            if not m:
+                fehler.append(f"{breite}px: kein Zeitungskopf gefunden")
+                continue
+            if m["name"] != _MARKE:
+                fehler.append(f"{breite}px: Kopf liest „{m['name']}“")
+            if m["docW"] > m["winW"]:
+                fehler.append(f"{breite}px: Seitwaertslauf "
+                              f"{m['docW'] - m['winW']} px")
+            if m["links"] < 0 or m["rechts"] > m["winW"]:
+                fehler.append(f"{breite}px: Kopf ragt aus dem Bild "
+                              f"({m['links']}..{m['rechts']} in {m['winW']})")
+            if abs(m["versatz"]) > _MAX_KOPF_VERSATZ:
+                fehler.append(f"{breite}px: Kopf {abs(m['versatz'])} px aus der "
+                              f"Mitte (max {_MAX_KOPF_VERSATZ})")
+        b.prueft(not fehler,
+                 "12. Zeitungskopf: "
+                 + ("; ".join(fehler) if fehler else
+                    ", ".join(f"{breite}px Versatz {int(abs(m['versatz']))} px, "
+                              f"Breite {m['rechts'] - m['links']} px"
+                              for breite, m in kopf.items() if m)))
         browser.close()
 
 

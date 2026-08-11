@@ -682,8 +682,9 @@ schwerer. **`site/images/` spiegelt den Bildordner, es sammelt nicht**, und
 ist (sonst zeigen Archivwochen leere Kästen, nachdem `raeume_auf()` ihre
 Bilder gelöscht hat).
 
-**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **vierzehn**
-Kriterien gegen die wirklich gerenderte Seite, vier davon mit echtem
+**Abnahme der Seite:** `python scripts/pruefe_portal.py` misst **fünfzehn**
+Kriterien gegen die wirklich gerenderte Seite (16 Zeilen mit den
+Unterkriterien), fünf davon mit echtem
 Chromium bei 1440 × 900 — unter anderem, ob **irgendein** Bild
 hochskaliert dargestellt wird (auf allen drei Seiten, und die Prüfung
 scrollt dafür durch, sonst misst sie die Lazy-Bilder gar nicht), ob alle
@@ -704,6 +705,31 @@ Nichts an der Optik gilt als erledigt, bevor dieses Skript grün ist.
 Kriterium 2 rechnet die **Quote** bebilderter Meldungen, keine absolute
 Zahl — die alte Schwelle „≥ 110" war an einer Ausgabe mit 193 Meldungen
 kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
+Seit dem 11.08.2026 dazu Kriterium **12** (der Zeitungskopf, siehe unten).
+
+**Der Name ist „Vodafone Product and Services Insights"** (11.08.2026, vorher
+„Vodafone Insights"). Er steht an elf Stellen — Seitentitel je Unterseite,
+Zeitungskopf, `aria-label`, Fußzeile, die Weiterleitungsseiten in `html.py` —
+und `tests/test_marke.py` hält sie zusammen; ein halber Rename sieht auf der
+Startseite fertig aus und fällt sonst erst auf der Tarifseite auf.
+
+**Der längere Name ist ein Geometrieproblem, kein Textproblem.** In EINER
+Schriftgröße ist er **475 statt 214 px** breit. Die rechte Spalte der
+Kopfleiste (Anwendungsfälle plus Suchzeile) belegt 483 der 1184 px, und weil
+die linke leer ist, schiebt jedes zusätzliche Wort den Kopf nach links: er saß
+**169 px** aus der Mitte (vorher 38) und lief auf 390 px Breite **61 px aus
+dem Bild** — die ganze Seite ließ sich seitwärts schieben. Zwei Stellschrauben,
+beide gemessen: der Mittelteil des Namens steht kleiner (`.brand-zusatz`,
+`.58em` — eine Zeile, dieselbe Serife, derselbe kursive Akzent am Ende), und
+die Suchzeile ist **oberhalb von 900 px** von 210 auf 160 px verschmälert (ihr
+Platzhalter misst 108 px und braucht mit dem Knopf 134). Ergebnis: 373 px
+breit, Versatz 67 px, mobil 307 px und kein Seitwärtslauf. **Wer die Größe des
+Kopfes anhebt, misst beides nach** — Kriterium 12 prüft auf 1440 UND auf
+390 px.
+
+Der interne Projektname **„Telco Radar" bleibt** — er steht im Foliensatz
+(`report/folien.py`) und im Mailversand (`versand.py`), also dort, wo nicht die
+Website spricht.
 
 ## 6. Bekannte Fallstricke (alle in Session 1 gelernt!)
 

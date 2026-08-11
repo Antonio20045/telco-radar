@@ -26,7 +26,7 @@
    Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html. #}
 {% extends "base.html.j2" %}
 {% set active = 'woche' %}
-{% block title %}{% if is_latest %}Vodafone Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
+{% block title %}{% if is_latest %}Vodafone Product and Services Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Product and Services Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
 
 {% macro bild(h, klasse, eager=false) %}
 {%- if h.image %}<span class="{{ klasse }}"><img src="{{ prefix }}images/{{ h.image }}" alt=""
