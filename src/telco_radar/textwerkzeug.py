@@ -159,16 +159,35 @@ _RAT_SCHLUSS = re.compile(_RAT_VERBEN.pattern + r"\s*[.!?]?$", re.I)
 _NOTIZ_TRENNER = re.compile(r"\s*[;–—]\s+|\s+-\s+")
 
 
+# Das deutsche Ordinaldatum ist der zweite Fall, an dem der Satztrenner
+# zerbricht - und er ist haeufiger als jede Abkuerzung. "Gueltig bis 12.
+# September 2026" hat nach dem Punkt ein Leerzeichen und danach einen
+# Grossbuchstaben, also genau das Muster eines Satzendes; der Trenner machte
+# daraus "Gueltig bis 12." und "September 2026". Gemessen am 11.08.2026 in
+# der Ausgabe vom 8.: die Mail zeigte "Aktion gueltig bis 12." als ganzen
+# Satz, und derselbe Schnitt trifft `_strip_vodafone_advice` im Wochenbericht
+# - dort faellt dann eine Satzhaelfte als vermeintlicher Rat weg.
+#
+# Geschuetzt wird BEWUSST nur vor einem Monatsnamen und nicht vor jedem
+# Grossbuchstaben: "Die Zahl stieg auf 12. Vodafone reagierte." ist ein
+# echtes Satzende, und eine Regel, die es verschluckt, waere die teurere.
+_MONATE = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+           "August", "September", "Oktober", "November", "Dezember")
+_ORDINALDATUM = re.compile(
+    r"(?<=\d)\.(?=\s+(?:" + "|".join(_MONATE) + r")\b)")
+_ORDINAL_MARKE = "\x00o\x00"
+
+
 def _geschuetzt(text: str) -> str:
     for i, abk in enumerate(ABKUERZUNGEN):
         text = text.replace(abk, f"\x00{i}\x00")
-    return text
+    return _ORDINALDATUM.sub(_ORDINAL_MARKE, text)
 
 
 def _entschuetzt(text: str) -> str:
     for i, abk in enumerate(ABKUERZUNGEN):
         text = text.replace(f"\x00{i}\x00", abk)
-    return text
+    return text.replace(_ORDINAL_MARKE, ".")
 
 
 def saetze(text: str) -> list[str]:

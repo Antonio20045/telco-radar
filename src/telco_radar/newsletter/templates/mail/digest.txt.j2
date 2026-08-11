@@ -1,0 +1,36 @@
+{#- =========================================================================
+     DIE TEXTFASSUNG - eigenstaendig geschrieben, kein gestripptes HTML
+
+     Der Unterschied faellt genau dort auf, wo es weh tut: ein aus dem HTML
+     gestripptes Fragment liefert Links als nackte Zeichenketten mitten im
+     Satz, Ueberschriften ohne Abstand und Aufzaehlungen ohne Nummer. Diese
+     Fassung ist fuer jemanden geschrieben, der Mails als Text liest - und
+     das ist in Konzernpostfaechern keine Seltenheit, sondern oft die
+     Voreinstellung des Gateways.
+
+     Jede Zeile mit `{{- ... -}}` waere hier ein Fehler: in einer Textmail
+     IST der Zeilenumbruch das Layout.
+     ==================================================================== -#}
+{{ chrome.kopf.titel | upper }}
+{{ chrome.kopf.untertitel }} - {{ chrome.kopf.ausgabe | replace('{datum}', datum_de) }}
+==============================================================
+
+{{ chrome.anrede }} {{ einleitung }}
+{% for it in items %}
+{% if it.stichwort %}{{ chrome.stichwort_marker | replace('{stichwort}', it.stichwort) }}
+{% endif %}{{ loop.index }}. {{ it.titel }}{% if it.absender %}  [{{ it.absender }}]{% endif %}
+{% if it.text %}   {{ it.text }}
+{% endif %}   {{ chrome.link_quelle }}: {{ it.url }}
+{% if it.anker %}   {{ chrome.link_bericht }}: {{ it.anker }}
+{% endif %}{% endfor %}
+--------------------------------------------------------------
+{{ chrome.schluss }}
+{{ bericht_url }}
+
+{{ chrome.fuss.warum | replace('{seit_datum}', seit_datum) }}
+{{ chrome.fuss.abmelden_satz }}
+{{ abmelde_url }}
+
+{{ chrome.fuss.impressum }}: {{ impressum_url }}
+{{ chrome.fuss.datenschutz }}: {{ datenschutz_url }}
+{{ chrome.fuss.automatisch }}
