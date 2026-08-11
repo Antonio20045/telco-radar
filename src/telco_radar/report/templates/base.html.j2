@@ -100,6 +100,19 @@
          Rabattphase - Lieferzeiten Telekom, o2 und 1&1 erfasst. Wer sie
          wieder eintraegt, misst vorher nach. #}
       <a href="{{ prefix }}transparenz.html" {% if active=='transparenz' %}class="on"{% endif %}>Quellen</a>
+      {# "Newsletter" erscheint erst, wenn die Seite Adressen entgegennehmen
+         DARF - also wenn Impressum und Datenschutzerklaerung vollstaendig
+         sind (`rechtstexte.vollstaendig()`). Bis dahin wird die Seite
+         gebaut, sagt sichtbar warum sie gesperrt ist, und ist nur ueber
+         ihren direkten Link erreichbar.
+
+         Dieselbe Mechanik wie bei "Geraete" und aus demselben Grund im CODE
+         statt in einem Test: eine Regel, die nur ein Test kennt, schaltet
+         keine Navigation. Der Unterschied ist der Grund - bei den Geraeten
+         geht es um Aussagekraft, hier um Art. 13 DSGVO. #}
+      {% if newsletter_verlinkt %}
+      <a href="{{ prefix }}newsletter.html" {% if active=='newsletter' %}class="on"{% endif %}>Newsletter</a>
+      {% endif %}
     </nav>
     {% endif %}
   </header>

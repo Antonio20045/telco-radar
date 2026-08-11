@@ -40,7 +40,7 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
 
-from ..textwerkzeug import begriffs_muster, slug, wortmenge
+from ..textwerkzeug import begriffs_muster
 from .config import DIMENSIONEN, NewsletterKatalog
 
 # ============================================================  Eintraege  ===
@@ -347,19 +347,43 @@ def vorschau(term: str, reports_dir: Path, *, tage: int = 30,
 preview_keyword = vorschau
 
 
+# Der Tokenizer des Index - und warum es NICHT `textwerkzeug.wortmenge()` ist.
+#
+# `wortmenge()` laesst den Bindestrich INNERHALB eines Wortes zu
+# (`WORT_RE = [\w][\w-]{3,}`): "Tarif-Rabatt" ist dort EIN Wort. Das ist fuer
+# den roten Faden richtig - zusammengesetzte Begriffe sind dort das
+# aussagekraeftigere Signal.
+#
+# Der Stichwort-Matcher sieht denselben Text anders: er behandelt den
+# Bindestrich als WORTGRENZE, damit "Netzausbau" in "Glasfaser-Netzausbau"
+# trifft. Gemessen am 11.08.2026: fuer "tarif" zaehlte der Index 6 Meldungen,
+# `vorschau()` fand 13 - die sieben Differenz waren "Tarif-Rabatt",
+# "Tarif-Aktion" und Geschwister. Die Vorschau haette also die Haelfte
+# unterschlagen, und der Test dagegen waere gruen geblieben, wenn er
+# dieselbe Rechnung zweimal gemacht haette.
+#
+# `\w{4,}` liefert genau die maximalen Wortzeichen-Laeufe - und ein solcher
+# Lauf IST ein Wort nach der Grenzdefinition des Matchers. Damit stimmen
+# beide Rechnungen ueberein, und ein Test misst das im echten Browser.
+_INDEX_WORT = re.compile(r"\w{4,}", re.UNICODE)
+
+
+def _index_woerter(text: str) -> set[str]:
+    return {w.lower() for w in _INDEX_WORT.findall(text or "")}
+
+
 def baue_stichwort_index(reports_dir: Path, *, tage: int = 30,
                          heute: date | None = None) -> dict:
     """Der Index fuer die clientseitige Vorschau (`site/data/keyword-index.json`).
 
     Enthaelt nur Woerter ab vier Zeichen - dieselbe Grenze wie
-    `textwerkzeug.WORT_RE` und wie `min_stichwort_laenge`. Kuerzere kann
-    niemand als Stichwort eintragen, sie muessten also gar nicht erst
-    ausgeliefert werden.
+    `min_stichwort_laenge`. Kuerzere kann niemand als Stichwort eintragen,
+    sie muessten also gar nicht erst ausgeliefert werden.
     """
     texte = _texte_aus_berichten(reports_dir, tage, heute)
     zaehler: dict[str, int] = {}
     for text in texte:
-        for wort in wortmenge(text):          # Menge: EINE Meldung zaehlt 1
+        for wort in _index_woerter(text):     # Menge: EINE Meldung zaehlt 1
             zaehler[wort] = zaehler.get(wort, 0) + 1
     return {
         "stand": (heute or date.today()).isoformat(),

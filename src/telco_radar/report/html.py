@@ -21,6 +21,7 @@ from . import differenzierung_view
 from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
+from . import newsletter_protokoll
 from . import rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
 from . import verlauf as verlauf_mod
@@ -1496,6 +1497,40 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "data" / "keyword-index.json").write_text(
         json.dumps(baue_stichwort_index(reports_dir, tage=_nl_tage),
                    ensure_ascii=False), encoding="utf-8")
+
+    # ---- Die Anmeldeseite und ihre zwei Abschlussseiten.
+    # Die beiden kleinen sind die wichtigeren: sie sind STATISCH und kommen
+    # ohne den Signup-Dienst aus. Wer auf den Abmeldelink klickt, waehrend
+    # Render die Instanz schlafen laesst, wartet sonst eine Minute vor einem
+    # Spinner - und der Abmeldelink ist der einzige Abmeldeweg.
+    from . import newsletter_seite as nl_seite
+    try:
+        nl_katalog = _lade_nl_katalog(_wurzel)
+    except (FileNotFoundError, ValueError) as exc:
+        log.error("newsletter.yaml nicht lesbar (%s) - keine Anmeldeseite", exc)
+        nl_katalog = None
+    if nl_katalog is not None:
+        fassung = rechtstexte_mod.aktuelle_einwilligung(_wurzel)
+        (site_dir / "newsletter.html").write_text(
+            env.get_template("newsletter.html.j2").render(
+                prefix="", active="newsletter",
+                dimensionen=nl_seite.dimensionen(nl_katalog),
+                grenzen=nl_katalog.grenzen,
+                einwilligung_absaetze=nl_seite.einwilligung_absaetze(
+                    fassung.text if fassung else ""),
+                einwilligung_version=fassung.version if fassung else "—",
+                nl_config=nl_seite.konfiguration(
+                    nl_katalog,
+                    dienst_url=(cfg.settings.get("newsletter_dienst_url", "")
+                                if cfg is not None else ""),
+                    frei=env.globals["newsletter_verlinkt"])),
+            encoding="utf-8")
+        for name, (titel, text, weiter) in nl_seite.abschlussseiten().items():
+            (site_dir / f"newsletter-{name}.html").write_text(
+                env.get_template("newsletter_abschluss.html.j2").render(
+                    prefix="", active="newsletter", titel=titel, text=text,
+                    weiter=weiter),
+                encoding="utf-8")
     (site_dir / "suche.html").write_text(
         env.get_template("suche.html.j2").render(
             prefix="",
@@ -1656,6 +1691,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                         for s in (3, 2, 1, 0)],
             sicherheitsskala=ctm.lade_fokus(
                 reports_dir.parent.parent).sicherheitsskala,
+            # Der Newsletter-Abschnitt: NUR Zahlen, nie Adressen. Ein
+            # CI-Test prueft die Statistikdatei gegen ein Adressmuster.
+            newsletter=newsletter_protokoll.aufbereiten(
+                state_dir / "newsletter_stats.jsonl"),
             by_region=by_region, news_sources=news_sources,
             tech_themes=tech_themes,
             n_tech_sources=sum(len(t["sources"]) for t in tech_themes),

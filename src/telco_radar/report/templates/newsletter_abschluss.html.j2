@@ -1,0 +1,22 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ titel }} – Vodafone Product and Services Insights{% endblock %}
+{% block content %}
+{# STATISCH, und das ist der ganze Punkt.
+
+   Render Free faehrt den Signup-Dienst nach 15 Minuten ohne Verkehr herunter;
+   das Aufwachen dauert rund eine Minute. Wer auf den Abmeldelink klickt,
+   waehrend der Dienst schlaeft, wartet sonst vor einem Spinner oder sieht
+   einen Fehler - und haelt sich trotzdem fuer abgemeldet. Der Abmeldelink ist
+   der EINZIGE Abmeldeweg (Festlegung 5, kein List-Unsubscribe-Post), also
+   muss er im kalten Zustand tragen.
+
+   Diese Seite liegt deshalb auf der Static Site: sie steht sofort, unabhaengig
+   davon, ob der Dienst gerade laeuft. Die Verarbeitung laeuft asynchron
+   dahinter. #}
+<div class="nl nl--abschluss">
+  <p class="page-kicker">Newsletter</p>
+  <h1>{{ titel }}</h1>
+  <p class="nl-lead">{{ text }}</p>
+  <p class="nl-weiter"><a href="{{ prefix }}index.html">{{ weiter }} &rsaquo;</a></p>
+</div>
+{% endblock %}

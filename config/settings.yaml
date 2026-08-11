@@ -450,3 +450,21 @@ http:
   # Dienstagslauf liegen vier Tage; was eine Fachpresse in dieser Zeit ueber
   # den Deckel hinaus veroeffentlicht, sieht dieses Projekt nie.
   max_entries_per_feed: 60
+
+# =============================================================================
+# NEWSLETTER
+# =============================================================================
+# Die Adresse des Signup-Dienstes auf Render. Sie steht HIER und nicht im
+# JavaScript, weil sie sich aendern kann, ohne dass sich der Code aendert -
+# und weil eine Adresse in einer Vorlage genau so lange richtig ist, bis
+# jemand den Dienst umzieht.
+#
+# LEER heisst: das Anmeldeformular wird gebaut, aber es kann nichts
+# absenden. Zusammen mit der Veroeffentlichungsschwelle aus
+# `report/rechtstexte.py` (Impressum und Datenschutzerklaerung vollstaendig)
+# sind das ZWEI unabhaengige Bedingungen - und beide muessen erfuellt sein,
+# bevor diese Seite eine E-Mail-Adresse entgegennimmt.
+#
+# Eintragen, sobald der Dienst laeuft, zum Beispiel:
+#   newsletter_dienst_url: "https://telco-radar-signup.onrender.com"
+newsletter_dienst_url: ""

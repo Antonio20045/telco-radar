@@ -1,0 +1,123 @@
+{% extends "base.html.j2" %}
+{% block title %}Newsletter – Vodafone Product and Services Insights{% endblock %}
+{% block content %}
+{# Die Anmeldeseite. Drei Dinge sind hier anders als auf jeder anderen Seite
+   des Portals, und alle drei aus einem Grund:
+
+   1. Sie ist die EINZIGE Seite, die etwas entgegennimmt. Deshalb muessen
+      Impressum und Datenschutz von hier aus erreichbar sein - Art. 13 DSGVO
+      verlangt die Information zum ZEITPUNKT der Erhebung, nicht irgendwo.
+   2. Sie braucht JavaScript. Ohne es ist sichtbar, DASS es den Newsletter
+      gibt, und warum die Anmeldung gerade nicht geht.
+   3. Sie erklaert ihre eigene Bedienung an genau einer Stelle - bei der
+      leeren Auswahl. Die Hausregel "kein Satz erklaert die Bedienung"
+      (CLAUDE.md §5) gilt fuer Seiten, die etwas ZEIGEN. Hier trifft jemand
+      eine Entscheidung, und "leer heisst alles" ist keine Bedienhilfe,
+      sondern die Regel selbst - wer sie nicht kennt, waehlt falsch. #}
+<div class="nl">
+  <p class="page-kicker">Per E-Mail</p>
+  <h1>Der Radar in Ihrem Postfach</h1>
+  <p class="nl-lead">
+    Zweimal pro Woche eine kurze Zusammenfassung der neuen Meldungen — zu den
+    Themen, die Sie hier auswählen. <strong>Nur dann, wenn es zu Ihren Themen
+    wirklich etwas Neues gibt.</strong> Jede Meldung mit Link auf die
+    Originalquelle, wie im Bericht.
+  </p>
+
+  {% if not newsletter_verlinkt %}
+  {# Die Veroeffentlichungsschwelle, sichtbar gemacht. Solange Impressum oder
+     Datenschutzerklaerung eine offene Stelle haben, nimmt diese Seite nichts
+     entgegen - und sagt, warum. Das Formular steht darunter trotzdem, aber
+     abgeschaltet: eine Seite, die ihre Luecke beziffert, luegt nicht. #}
+  <div class="nl-gesperrt">
+    <strong>Die Anmeldung ist noch nicht freigeschaltet.</strong>
+    Impressum und Datenschutzerklärung sind noch nicht vollständig, und ohne
+    sie darf hier keine E-Mail-Adresse entgegengenommen werden. Was fehlt,
+    steht auf der <a href="{{ prefix }}impressum.html">Impressumsseite</a>.
+  </div>
+  {% endif %}
+
+  <form id="nl-form" class="nl-form" novalidate
+        {% if not newsletter_verlinkt %}data-gesperrt="1"{% endif %}>
+
+    {# ------------------------------------------------- die vier Achsen -#}
+    {% for dim in dimensionen %}
+    <fieldset class="nl-block">
+      <legend class="rubrik">{{ dim.label }}</legend>
+      <p class="nl-hinweis">{{ dim.hinweis }}</p>
+      <div class="nl-optionen">
+        {% for opt in dim.optionen %}
+        <label class="nl-opt">
+          <input type="checkbox" name="{{ dim.feld }}" value="{{ opt.key }}">
+          <span>{{ opt.label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% endfor %}
+
+    {# ------------------------------------------------------ Stichwoerter -#}
+    <fieldset class="nl-block">
+      <legend class="rubrik">Eigene Stichwörter</legend>
+      <p class="nl-hinweis">
+        Ein Treffer auf ein eigenes Stichwort kommt in die Ausgabe, auch wenn
+        er durch die Auswahl oben herausgefallen wäre — er ist dann als solcher
+        markiert. Höchstens {{ grenzen.max_stichwoerter }} Stichwörter, jedes
+        mit mindestens {{ grenzen.min_stichwort_laenge }} Zeichen.
+      </p>
+      <div class="nl-stichwort-zeile">
+        <input type="text" id="nl-stichwort" class="nl-feld"
+               placeholder="z. B. Netzausbau" maxlength="60"
+               aria-label="Stichwort hinzufügen">
+        <button type="button" id="nl-stichwort-add" class="nl-btn-klein">Hinzufügen</button>
+      </div>
+      <p id="nl-stichwort-vorschau" class="nl-vorschau" role="status" aria-live="polite"></p>
+      <ul id="nl-stichwort-liste" class="nl-chips"></ul>
+    </fieldset>
+
+    {# ----------------------------------------------- Adresse und Zustimmung -#}
+    <fieldset class="nl-block nl-abschluss">
+      <legend class="rubrik">Ihre E-Mail-Adresse</legend>
+      <input type="email" id="nl-email" name="email" class="nl-feld nl-feld--breit"
+             autocomplete="email" required placeholder="name@firma.de"
+             aria-label="E-Mail-Adresse">
+
+      {# Der Honeypot. Kein `type=hidden` - Skripte fuellen versteckte Felder
+         gezielt NICHT aus. Ein sichtbares Feld, das aus dem Bild geschoben
+         ist, wird von ihnen ausgefuellt und von Menschen nie gesehen. #}
+      <div class="nl-hp" aria-hidden="true">
+        <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      </div>
+
+      <label class="nl-consent">
+        {# NICHT vorausgewaehlt. Eine vorangekreuzte Einwilligung ist keine. #}
+        <input type="checkbox" id="nl-consent" required>
+        <span class="nl-consent-text">
+          {% for absatz in einwilligung_absaetze %}<span class="nl-consent-p">{{ absatz }}</span>{% endfor %}
+        </span>
+      </label>
+      <p class="nl-fein">
+        Fassung {{ einwilligung_version }}. Einzelheiten in der
+        <a href="{{ prefix }}datenschutz.html">Datenschutzerklärung</a>,
+        Anbieterangaben im <a href="{{ prefix }}impressum.html">Impressum</a>.
+      </p>
+
+      <button type="submit" id="nl-submit" class="nl-btn"
+              {% if not newsletter_verlinkt %}disabled{% endif %}>
+        Anmelden
+      </button>
+      <p id="nl-status" class="nl-status" role="status" aria-live="polite"></p>
+    </fieldset>
+  </form>
+
+  <noscript>
+    <p class="nl-gesperrt">
+      Für die Anmeldung braucht diese Seite JavaScript — sie holt vorher eine
+      signierte Kennung beim Anmeldedienst ab. Ohne JavaScript schreiben Sie
+      bitte an die Adresse im <a href="{{ prefix }}impressum.html">Impressum</a>.
+    </p>
+  </noscript>
+</div>
+
+<script id="nl-config" type="application/json">{{ nl_config | safe }}</script>
+{% endblock %}

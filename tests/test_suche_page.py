@@ -102,7 +102,15 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     beantwortet eine Frage, die sonst niemand beantwortet" hat 2026 zweimal
     eine Seite in die Navigation gebracht, die die Frage selbst nicht
     beantworten konnte. Wer die sechste Seite eintraegt, misst vorher die
-    Schwelle nach und begruendet sie hier."""
+    Schwelle nach und begruendet sie hier.
+
+    Zwei Eintraege schalten sich seitdem SELBST: "Geraete" (Datenlage,
+    `geraete_view.schwelle_erreicht()`) und seit dem 11.08.2026
+    "Newsletter" (`rechtstexte.vollstaendig()` - ohne vollstaendiges
+    Impressum darf keine Adresse entgegengenommen werden, Art. 13 DSGVO).
+    Dieser Test rendert OHNE cfg und mit leerem Projekt; beide Schwellen
+    sind dabei nicht erreicht, also bleiben es fuenf. Den anderen Zweig
+    misst `tests/test_newsletter_seite.py`."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -122,7 +130,7 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     # und die zwei unter der Schwelle ebenfalls nicht.
     for weg in ("bericht.html", "archive.html", "sources.html",
                 "protokoll.html", "wettbewerber.html", "suche.html",
-                "tarife.html", "lieferzeit.html"):
+                "tarife.html", "lieferzeit.html", "newsletter.html"):
         assert f'href="{weg}"' not in nav
 
 
