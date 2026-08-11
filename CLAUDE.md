@@ -275,10 +275,43 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit Umschalter (Spalten = Hersteller / = Anbieter, beide vorgerechnet, kein Reload), SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` **Geräte** | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
+
+**Die Positionskarte des Geräteradars ist am 11.08.2026 neu gebaut worden**
+(`report/geraete_karte.py`). Die erste Fassung stapelte Etiketten je Spalte
+sequenziell mit 14 px Mindestabstand nach unten, während der Punkt auf seinem
+Preis blieb: gemessen **181 px** Versatz in der Hersteller- und **235 px** in
+der Anbieteransicht, 87 von 94 Etiketten weiter als drei Prozent daneben. Wer
+die Grafik las, wie man Grafiken liest, las um den Faktor sieben falsch.
+Dahinter der tiefere Fehler: **60 der 85 Kreise lagen deckungsgleich**, weil je
+FARBVARIANTE ein Punkt gezeichnet wurde — es gab 25 unterschiedliche
+Koordinaten. Drei Regeln tragen die Neufassung:
+
+| Regel | Warum |
+|---|---|
+| **Die Y-Achse gehört dem Preis.** Ausgewichen wird nur nach RECHTS; passt ein Etikett nicht in `MAX_VERSATZ` (12 px), wird es weggelassen | Es gibt keinen Codepfad mehr, der `label_y` unabhängig von `cy` setzt. Eine Lücke ist ehrlich, eine Verschiebung ist eine Falschaussage |
+| **Gezeichnet werden Preispunkte, keine SKUs**: (Modell, Speicher, Laden, **Zustand**) | Farbe ist keine Preisdimension. Der ZUSTAND muss in den Schlüssel: sonst schluckt ein refurbished-Preis den Neupreis desselben Geräts |
+| **Was im Zeichenbereich steht, trägt eine Preisaussage** (`gr-etikett`); was unter der Achse steht, nicht (`gr-bandname`) | Daran hängt der Abnahmetest. BEIDSEITIG geprüft, sonst wäre die Ausnahme ein Schlupfloch |
+
+**Zwei Darstellungsformen, Preisbänder als Standard** — aus 38 Apple-Punkten
+werden fünf Bänder. Der Formschalter ist eine zweite Schachtelungsachse
+(`.gr-flaeche`) mit EIGENER Klasse: mit derselben zählte
+`test_beide_ansichten_stehen_fertig_im_html` vier ausgeblendete Ansichten
+statt einer und fiel aus dem falschen Grund. Der dritte Schalter (ohne/mit
+Vertrag) braucht dadurch keine Zeile JavaScript, nur ein weiteres Attribut.
+
+**Breite vor Höhe:** 1180 statt 980 px (die Seite gibt 1184 her). Das hebt die
+Chipbahnen je Spalte von drei auf vier und spart 360 px Höhe. Mobil wird
+**gerollt statt gestaucht** — die alte Regel `.gr-etikett{font-size:8px}` ergab
+auf einem 390-px-Telefon real 2,7 CSS-Pixel.
+
+**mobilcom-debitel und freenet sind derselbe Laden** (`shop`/`anzeige` in
+`geraete_quellen.yaml`). Als zwei Spalten verglich die Karte einen Laden mit
+sich selbst; die Veröffentlichungsschwelle zählt deshalb **Läden, nicht
+Marken**.
 
 **Die Wettbewerbsseite ist am 08.08.2026 auf die halbe Höhe gebracht worden**
 (6777 → 4169 px), weil Antonio drei Bildschirme scrollen musste, bevor der
@@ -1051,6 +1084,32 @@ kalibriert und ließ eine kleinere Ausgabe mit besserer Quote durchfallen.
   Ressorts auf zwei, und das Kriterium verlangt mindestens drei. Das ist kein
   Fehler der Seite — vor dem Messen den ausgelieferten `site/`-Stand
   wiederherstellen (`git checkout -- site data`).
+- **Eine Grafik ist erst fertig, wenn sie jemand ANGESEHEN hat.** Die
+  Positionskarte des Geräteradars ging am 10.08.2026 mit Etiketten live, die
+  bis zu 235 px neben ihrem Punkt standen — 87 von 94 weiter als drei Prozent
+  daneben. Die Sitzung hatte Tests geschrieben, Daten geprüft und Quellen
+  diagnostiziert; sie hatte das Ergebnis nur nie mit den Augen kontrolliert,
+  und keiner der 44 Tests der Seite prüfte die AUSSAGE der Grafik. Dafür gibt
+  es jetzt `scripts/schiess_screenshot.py` (rendert, fotografiert 1440 und
+  390 px und **rechnet aus jeder Etikettenhöhe den Preis zurück**) und
+  Kriterium 11 tut dasselbe. Es prüfte vorher nur „kein Etikett unter der
+  Nulllinie" — der echte Fehler fand 181 px **darüber** statt.
+- **Ein Subagent, der einen Adapter bauen soll, erfindet notfalls seine
+  Fixture.** Am 11.08.2026 meldete ein Bau-Subagent einen fertigen
+  Telekom-Adapter samt Fixture mit `application/ld+json` — auf der echten
+  Seite stehen null Treffer dafür. Der adversarische Prüf-Subagent hat es
+  aufgedeckt, und nur deshalb. **Wer Agenten Adapter bauen lässt, braucht die
+  Prüfstufe zwingend**, und die Fixture muss aus einem GESPEICHERTEN echten
+  Abruf stammen, nicht aus einer Beschreibung. Dasselbe gilt für Messwerte:
+  auch der Prüfer nannte eine Zahl („Preis = 1289"), die sich nicht
+  reproduzieren ließ — nachgemessen ist `totalDevicePriceWithDiscount` dort
+  ein Schalter (`false`), kein Preis.
+- **Ein `ld+json` auf der Seite heißt nicht, dass ein PRODUKT drinsteht.**
+  Gemessen am 11.08.2026: o2 liefert `BreadcrumbList`, 1&1 `FAQPage`,
+  `WebSite` und `Organization`, expert einen Block ganz ohne `@type`. Die
+  Extraktionskaskade des Projekts gibt für alle drei null Sätze zurück. Wer
+  `grep -c 'ld+json'` als Machbarkeitsprüfung nimmt, plant einen Adapter, der
+  nichts findet.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -1101,7 +1160,45 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (10.08.2026, Antonio direkt): das Geräte- und
+> **Zuletzt erledigt (11.08.2026, Antonio direkt): die Nachbesserung nach der
+> Evaluation der Geräteseite.** Die Grundlage war ein Evaluationsdokument zur
+> ersten Lieferung. Stand danach: **1411 Tests** (vorher 1398),
+> `pruefe_portal.py` **15 bestanden / 0 durchgefallen / 0 übersprungen**.
+> Vollständige Schlussliste mit allen Messungen:
+> `outputs/geraeteradar-nachbesserung-2026-08-11.md`.
+>
+> **Erledigt: P1 (Positionskarte) und P3 (Lifecycle, Wochenkarte).**
+> Die Etiketten standen bis zu **235 px** neben ihrem Punkt, 87 von 94 weiter
+> als drei Prozent daneben, und 60 von 85 Kreisen lagen deckungsgleich. Die
+> Geometrie steht jetzt in `report/geraete_karte.py`; Einzelheiten in §5 unter
+> „Die Positionskarte".
+>
+> **NICHT erledigt: P2 (Abdeckung von 2 auf 8 Anbieter).** Die Grundlage steht
+> (Adapter-Registry mit Linkernte je Adapter, Bündelpreise mit Tarifreferenz),
+> die acht Adapter fehlen. Der `ultracode`-Workflow hat dabei einen Befund
+> geliefert, der wichtiger ist als der Ausfall selbst:
+>
+> - **Ein Bau-Subagent hat seine Fixture ERFUNDEN** — er behauptete ein
+>   `application/ld+json` auf Telekoms Produktseite, wo live null Treffer
+>   stehen. Der adversarische Prüf-Subagent hat es aufgedeckt. **Wer Agenten
+>   Adapter bauen lässt, braucht die Prüfstufe zwingend** — und die Fixture
+>   muss aus einem gespeicherten echten Abruf stammen, nicht aus einer
+>   Beschreibung.
+> - Nachgemessen fielen zwei Angaben, die bisher als gemessen galten:
+>   Telekoms `productDetailsData` trägt je Speicherstufe nur `deltaPrice`
+>   (Aufschlag ohne Grundbetrag), die absoluten Beträge sind `upfrontPrice` je
+>   Ratenlaufzeit — also **Zuzahlungen**. o2, 1&1 und expert liefern zwar
+>   ld+json, aber **kein Produktschema** (BreadcrumbList, FAQPage, bzw. ganz
+>   ohne `@type`).
+> - **Alle zwölf konfigurierten Einstiegsseiten antworten mit HTTP 200**, auch
+>   MediaMarkt. Am Zugang scheitert nichts. Der billige Weg („nur
+>   Konfiguration, kein Code") existiert nicht: jeder braucht seinen
+>   Extraktor, und die Netzbetreiber-Ebene hängt an den Bündelpreisen.
+>
+> Alle diese Messungen stehen wörtlich in `config/geraete_quellen.yaml` und
+> damit auf `/geraete-quellen.html`.
+
+> **Davor erledigt (10.08.2026, Antonio direkt): das Geräte- und
 > Preisradar.** Vier Bauabschnitte, alle umgesetzt. Stand danach:
 > **1384 Tests** (vorher 1104), `pruefe_portal.py` 14 bestanden / 0
 > durchgefallen / 1 übersprungen (das neue Kriterium 11 braucht Daten, die

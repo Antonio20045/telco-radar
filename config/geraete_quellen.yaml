@@ -135,10 +135,16 @@ anbieter:
     methode: json_endpunkt
     aktiv: false
     grund: >-
-      Erreichbar, aber ohne ld+json: der Preis liegt im Nuxt-3-Payload
-      <script id="__NUXT_DATA__"> - einem flachen Referenz-Array, das ein
-      eigener Auflöser braucht. Kategorieseite und Produkt-Sitemap
-      (1835 Smartphone-URLs) liefern sauber.
+      Erreichbar, aber ohne verwertbares ld+json: nachgemessen am 11.08.2026
+      trägt die Produktseite genau einen ld+json-Block, und der hat gar kein
+      @type — die Extraktionskaskade des Projekts liefert dafür null
+      Produktsätze. Der Preis liegt im Nuxt-3-Payload
+      <script id="__NUXT_DATA__">, einem flachen Referenz-Array, das ein
+      eigener Auflöser braucht. Die Sitemap liefert sauber: 1837
+      Smartphone-Adressen. ACHTUNG beim Anbinden — max_produkte steht
+      standardmäßig auf 60; ein erreichter Deckel macht die Einstiegsseite
+      ungelesen, dann altert nichts und der Anbieter steht trotz Funden als
+      "fehler" im Protokoll.
     basis_url: https://www.expert.de
     einstiege:
       - url: https://www.expert.de/sitemap/urls/produkte/telekom-navigation.xml
@@ -287,10 +293,13 @@ anbieter:
     aktiv: false
     grund: >-
       Das ld+json der Produktseite trägt "price":"1.00" - den Lockpreis im
-      Tarifbündel, nicht den Gerätepreis. Der belastbare Katalog liegt hinter
-      /e-shop/rest/catalog/... (77 Geräte, robots erlaubt) und braucht einen
-      eigenen Adapter. Ein Bündelpreis ohne seinen Tarif ist bedeutungslos
-      (Teil C4).
+      Tarifbündel, nicht den Gerätepreis. Nachgemessen am 11.08.2026 trägt die
+      Einstiegsseite /handys/ nur einen ld+json-Block vom Typ BreadcrumbList,
+      also überhaupt kein Produktschema; die Kaskade des Projekts liefert dort
+      null Sätze. Der belastbare Katalog liegt hinter /e-shop/rest/catalog/...
+      und braucht einen eigenen Adapter. Seit dem 11.08.2026 KANN die
+      Sammelschicht einen Bündelpreis speichern - aber nur mit seiner
+      Tarifreferenz (Tarifname, Monatspreis); ohne sie bleibt er verworfen.
     basis_url: https://www.o2online.de
     einstiege:
       - url: https://www.o2online.de/handys/
