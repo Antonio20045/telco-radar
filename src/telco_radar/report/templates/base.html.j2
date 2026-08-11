@@ -111,6 +111,22 @@
   <footer class="foot">
     <div class="foot-inner">
       Vodafone Product and Services Insights &middot; {% if uc == 'promo' %}Promo Übersicht{% else %}Marktrecherche{% endif %} &middot; automatisch erstellt, jede Aussage mit Quelle
+      {# Impressum und Datenschutz stehen seit dem 11.08.2026 hier - auf JEDER
+         Seite, nicht nur auf der Startseite. Sobald das Portal eine einzige
+         E-Mail-Adresse entgegennimmt, sind die Informationspflichten nach
+         Art. 13 DSGVO faellig, und sie sind zum Zeitpunkt der Erhebung
+         faellig: der Link muss dort stehen, wo das Formular steht.
+
+         Verlinkt wird nur, was auch gerendert wurde (`rechtstexte_verlinkt`
+         kommt aus `render_site()`). Eine Fusszeile, die auf eine 404 zeigt,
+         ist schlechter als eine ohne Link. #}
+      {% set rv = rechtstexte_verlinkt | default([]) %}
+      {% if rv %}
+      <span class="foot-recht">
+        {% if 'impressum' in rv %}<a href="{{ prefix }}impressum.html">Impressum</a>{% endif %}
+        {% if 'datenschutz' in rv %}<a href="{{ prefix }}datenschutz.html">Datenschutz</a>{% endif %}
+      </span>
+      {% endif %}
     </div>
   </footer>
   <script src="{{ prefix }}app.js"></script>

@@ -21,6 +21,7 @@ from . import differenzierung_view
 from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
+from . import rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
 from . import verlauf as verlauf_mod
 from . import suchindex
@@ -1112,6 +1113,31 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
     env.globals["geraete_verlinkt"] = bool(
         geraete["bilanz"].get("schwelle_erreicht"))
+
+    # ---- Rechtstexte: aus demselben Grund HIER und nicht bei ihrer Seite.
+    # Die Fusszeile steht in `base.html.j2`, also auf JEDER Seite - und die
+    # Schwelle "Impressum vollstaendig" entscheidet zusaetzlich darueber, ob
+    # das Anmeldeformular ueberhaupt verlinkt wird. Beides muss feststehen,
+    # bevor die erste Seite gerendert wird; sonst hat die Startseite eine
+    # andere Fusszeile als die Quellenseite.
+    rechtstexte = rechtstexte_mod.alle(_wurzel)
+    env.globals["rechtstexte_verlinkt"] = {t.schluessel for t in rechtstexte}
+    # Der Newsletter braucht BEIDE Pflichtseiten vollstaendig. Ohne sie wird
+    # das Formular gebaut, aber nicht verlinkt - dieselbe
+    # Veroeffentlichungsschwelle wie bei der Geraeteseite, und aus demselben
+    # Grund im Code statt in einem Test.
+    env.globals["newsletter_verlinkt"] = rechtstexte_mod.vollstaendig(_wurzel)
+    if not env.globals["newsletter_verlinkt"]:
+        for seite, was in rechtstexte_mod.offene_stellen(_wurzel):
+            log.warning("Rechtstext unvollstaendig: %s -> %s", seite, was)
+    rechtstext_tpl = env.get_template("rechtstext.html.j2")
+    for text in rechtstexte:
+        (site_dir / f"{text.schluessel}.html").write_text(
+            rechtstext_tpl.render(
+                prefix="", active=text.schluessel,
+                text={"titel": text.titel, "luecken": text.luecken,
+                      "html": _md_to_html(text.markdown)}),
+            encoding="utf-8")
 
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),

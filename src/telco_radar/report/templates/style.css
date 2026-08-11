@@ -1383,6 +1383,30 @@ b,strong{font-weight:700}
 .foot{margin-top:60px;border-top:3px solid var(--rule-ink);padding:18px 0 40px}
 .foot-inner{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.13em;color:var(--ink-4)}
+/* Die Pflichtlinks stehen in derselben Etikettenzeile, nicht als zweite
+   Zeile darunter: sie sind Teil des Absenders, nicht ein eigener Abschnitt.
+   Auf schmalen Geraeten bricht der Flex-Umbruch sie von selbst um. */
+.foot-recht{display:inline-flex;gap:14px;margin-left:14px}
+.foot-recht a{color:var(--ink-4);text-decoration:none;border-bottom:1px solid var(--rule-2)}
+.foot-recht a:hover{color:var(--red);border-bottom-color:var(--red)}
+
+/* ---------------------------------------------- Impressum / Datenschutz -
+   Zwei Seiten, ein Satzspiegel. Fliesstext in der Serife, eine Spalte,
+   Zeilenlaenge gedeckelt - hier wird gelesen, nicht ueberflogen. */
+.rechtstext{max-width:70ch;margin:0 auto;padding-top:8px}
+.rechtstext h1{font-size:40px;line-height:1.1;margin:0 0 24px}
+.rechtstext-body{font-size:16.5px;line-height:1.62;color:var(--ink-2)}
+.rechtstext-body h2{font-size:22px;margin:34px 0 10px;line-height:1.2}
+.rechtstext-body h3{font-size:17px;margin:24px 0 8px}
+.rechtstext-body p{margin:0 0 14px}
+.rechtstext-body ul,.rechtstext-body ol{margin:0 0 16px;padding-left:22px}
+.rechtstext-body li{margin-bottom:7px}
+.rechtstext-body a{color:var(--red)}
+/* Die offene Stelle: rote Haarlinie links, kein Kasten. Linien statt
+   Kaesten ist die Regel der ganzen Seite, und eine Warnung ist kein Grund,
+   sie zu brechen. */
+.rechtstext-luecke{border-left:3px solid var(--red);padding:10px 0 10px 14px;
+  margin:0 0 26px;font-size:15px;line-height:1.5;color:var(--ink-2)}
 
 /* =========================================================================
    Promo Übersicht (eigener Farbraum: promo-* Namen bleiben eigenständig)
