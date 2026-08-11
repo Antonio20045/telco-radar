@@ -815,20 +815,60 @@ var TelcoFrage = (function () {
 
   var knoepfe = karte.querySelectorAll('.gr-knopf');
   var ansichten = karte.querySelectorAll('.gr-ansicht');
+  var flaechen = karte.querySelectorAll('.gr-flaeche');
   var detail = document.getElementById('gr-detail');
   var legende = document.getElementById('gr-legende');
-  var legendeRoh = legende ? legende.textContent : '';
+  // Der feste Teil der Legende. Der Satz "Ohne Etikett bleiben N Punkte"
+  // gilt je FLAECHE und wird unten nachgezogen - stuende er hier mit drin,
+  // haenge er beim ersten Umschalten ein zweites Mal daran.
+  var legendeRoh = legende
+    ? legende.textContent.split('Ohne Etikett bleiben')[0].replace(/\s+$/, '')
+    : '';
   var felder = {
     segment: document.getElementById('gr-segment'),
     speicher: document.getElementById('gr-speicher'),
     generation: document.getElementById('gr-generation')
   };
 
+  // Der Zustand ist ein Woerterbuch, kein Sonderfall je Knopf. Ein Knopf
+  // sagt ueber `data-schalter`, WELCHE Achse er stellt, und ueber
+  // `data-wert`, worauf. Der dritte Schalter ("ohne Vertrag / mit Vertrag")
+  // braucht damit keine Zeile JavaScript mehr, nur ein weiteres Attribut.
+  var zustand = {ansicht: '', form: ''};
+  for (var a = 0; a < ansichten.length; a++) {
+    if (ansichten[a].className.indexOf('gr-ansicht--aus') < 0) {
+      zustand.ansicht = ansichten[a].getAttribute('data-ansicht');
+      break;
+    }
+  }
+  for (var f = 0; f < flaechen.length; f++) {
+    if (flaechen[f].className.indexOf('gr-flaeche--aus') < 0) {
+      zustand.form = flaechen[f].getAttribute('data-form');
+      break;
+    }
+  }
+
   function aktiveAnsicht() {
     for (var i = 0; i < ansichten.length; i++) {
-      if (ansichten[i].className.indexOf('gr-ansicht--aus') < 0) return ansichten[i];
+      if (ansichten[i].getAttribute('data-ansicht') === zustand.ansicht) return ansichten[i];
     }
     return ansichten[0];
+  }
+
+  function blenden() {
+    for (var i = 0; i < ansichten.length; i++) {
+      ansichten[i].classList.toggle('gr-ansicht--aus',
+        ansichten[i].getAttribute('data-ansicht') !== zustand.ansicht);
+    }
+    for (var j = 0; j < flaechen.length; j++) {
+      flaechen[j].classList.toggle('gr-flaeche--aus',
+        flaechen[j].getAttribute('data-form') !== zustand.form);
+    }
+    for (var k = 0; k < knoepfe.length; k++) {
+      var achse = knoepfe[k].getAttribute('data-schalter');
+      knoepfe[k].classList.toggle('on',
+        zustand[achse] === knoepfe[k].getAttribute('data-wert'));
+    }
   }
 
   function leereDetail() {
@@ -837,12 +877,19 @@ var TelcoFrage = (function () {
     if (detail) detail.textContent = '';
   }
 
+  function aktiveFlaeche() {
+    return aktiveAnsicht()
+      ? aktiveAnsicht().querySelector('.gr-flaeche[data-form="' + zustand.form + '"]')
+      : null;
+  }
+
   function filtern() {
     leereDetail();
     var seg = felder.segment ? felder.segment.value : '';
     var sp = felder.speicher ? felder.speicher.value : '';
     var gen = felder.generation ? felder.generation.value : '';
     var sichtbar = 0;
+    var flaeche = aktiveFlaeche();
     var alle = karte.querySelectorAll('.gr-punkt');
     for (var i = 0; i < alle.length; i++) {
       var p = alle[i];
@@ -850,27 +897,45 @@ var TelcoFrage = (function () {
         && (!sp || p.getAttribute('data-speicher') === sp)
         && (!gen || p.getAttribute('data-aktuell') === '1');
       p.classList.toggle('gr-punkt--aus', !passt);
-      if (passt && p.closest('.gr-ansicht') === aktiveAnsicht()) sichtbar++;
+      if (passt && flaeche && p.closest('.gr-flaeche') === flaeche) sichtbar++;
     }
-    if (legende) {
-      var zusatz = (seg || sp || gen)
-        ? ' Gefiltert: ' + sichtbar + ' von ' + (alle.length / ansichten.length) + ' sichtbar.'
+    // Ein Preisband ohne sichtbaren Punkt zeigt eine Spanne, die es gerade
+    // nicht mehr gibt. Es verschwindet mit seinen Punkten.
+    var baender = karte.querySelectorAll('.gr-band');
+    for (var b = 0; b < baender.length; b++) {
+      var schluessel = baender[b].getAttribute('data-band');
+      var eigene = baender[b].closest('.gr-flaeche')
+        .querySelectorAll('.gr-punkt[data-band="' + schluessel + '"]');
+      var offen = false;
+      for (var e = 0; e < eigene.length; e++) {
+        if (eigene[e].className.baseVal.indexOf('gr-punkt--aus') < 0) offen = true;
+      }
+      baender[b].classList.toggle('gr-band--aus', !offen);
+    }
+    if (legende && flaeche) {
+      // ALLE Zahlen kommen aus der SICHTBAREN Flaeche. Vorher standen hier
+      // drei verschiedene Gesamtzahlen: eine aus der Vorlage (alle Punkte),
+      // eine gerechnete (Punkte durch Flaechen) und die der jeweils anderen
+      // Darstellungsform - keine davon galt fuer das Bild, das man ansah.
+      var gesamt = flaeche.getAttribute('data-punkte');
+      var ohne = parseInt(flaeche.getAttribute('data-etiketten-verborgen') || '0', 10);
+      var zusatz = ohne
+        ? ' Ohne Etikett bleiben ' + ohne + ' Punkte – dort ist die Spalte voll;'
+          + ' der Punkt steht auf seinem Preis.'
         : '';
+      if (seg || sp || gen) {
+        zusatz += ' Gefiltert: ' + sichtbar + ' von ' + gesamt + ' sichtbar.';
+      }
       legende.textContent = legendeRoh + zusatz;
     }
   }
 
   for (var i = 0; i < knoepfe.length; i++) {
     knoepfe[i].addEventListener('click', function (ev) {
-      var wunsch = ev.currentTarget.getAttribute('data-zeige');
-      for (var j = 0; j < knoepfe.length; j++) {
-        knoepfe[j].classList.toggle('on',
-          knoepfe[j].getAttribute('data-zeige') === wunsch);
-      }
-      for (var k = 0; k < ansichten.length; k++) {
-        ansichten[k].classList.toggle('gr-ansicht--aus',
-          ansichten[k].getAttribute('data-ansicht') !== wunsch);
-      }
+      var achse = ev.currentTarget.getAttribute('data-schalter');
+      if (!achse) return;
+      zustand[achse] = ev.currentTarget.getAttribute('data-wert');
+      blenden();
       filtern();
     });
   }
@@ -879,12 +944,23 @@ var TelcoFrage = (function () {
     if (felder[name]) felder[name].addEventListener('change', filtern);
   });
 
+  // Einmal beim Laden: die Baender der Startflaeche brauchen ihren Zustand,
+  // und die Legende ihre Zahl.
+  filtern();
+
   function zeige(el) {
     if (!detail) return;
     var teile = [el.getAttribute('data-modell')];
     if (el.getAttribute('data-speicher-text')) teile.push(el.getAttribute('data-speicher-text') + ' GB');
-    if (el.getAttribute('data-farbe')) teile.push(el.getAttribute('data-farbe'));
-    teile.push(el.getAttribute('data-preis') + ' €');
+    // Die Farben stehen jetzt als ZAHL plus Liste da, weil ein Punkt seit
+    // der Verdichtung alle Farben einer Speichergroesse vertritt. Genau
+    // deshalb liegen keine fuenf Kreise mehr aufeinander.
+    var farben = parseInt(el.getAttribute('data-farben') || '0', 10);
+    var liste = el.getAttribute('data-farben-liste') || '';
+    if (farben === 1 && liste) teile.push(liste);
+    else if (farben > 1) teile.push(farben + ' Farben' + (liste ? ' (' + liste + ')' : ''));
+    teile.push((el.getAttribute('data-preisart') === 'mit_vertrag' ? 'Zuzahlung ' : '')
+      + el.getAttribute('data-preis') + ' €');
     teile.push('bei ' + el.getAttribute('data-anbieter'));
     if (el.getAttribute('data-stand')) teile.push('abgerufen ' + el.getAttribute('data-stand'));
     detail.textContent = teile.join(' · ') + ' ';
@@ -894,6 +970,7 @@ var TelcoFrage = (function () {
       a.href = url;
       a.rel = 'noopener';
       a.textContent = 'Quelle';
+      try { a.title = new URL(url).hostname.replace(/^www\./, ''); } catch (e) {}
       detail.appendChild(a);
     }
   }

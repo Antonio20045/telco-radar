@@ -127,7 +127,7 @@
   </td>
   <td class="num">0</td>
   <td class="gr-grund">
-    Erreichbar (Übersicht /mobilfunk/geraete/smartphone und 432 Geräteseiten in der eigenen Sitemap), aber der Preis steht nur im eingebetteten Zustandsobjekt productDetailed.productDetailsData - kein ld+json, kein Microdata. Braucht einen eigenen Adapter.
+    Erreichbar, aber es gibt dort keinen Gerätepreis ohne Vertrag zu lesen. Nachgemessen am 11.08.2026 an /shop/geraet/apple/apple-iphone-17-pro-max/silber-256-gb (HTTP 200, 2,8 MB, HTTP/1.1 — über HTTP/2 antwortet eine WAF-Challenge): kein ld+json, kein Microdata, und im Zustandsobjekt window.__INITIAL_STATE__ trägt productDetailed.productDetailsData zwar Modellname, Farben und Speicherstufen, aber als Preis nur einen deltaPrice je Stufe — also einen Aufschlag ohne Grundbetrag. Die einzigen absoluten Beträge stehen unter productDetailed.installmentConfiguratorItems als upfrontPrice je Ratenlaufzeit (12/24/36 Monate) und sind damit Zuzahlungen im Bündel, keine Ladenpreise. Ein Adapter kann Telekom deshalb erst liefern, wenn er die Zuzahlung MIT ihrer Tarifreferenz schreibt — die Sammelschicht kann das seit dem 11.08.2026, der Extraktor fehlt. Die Linkernte steht: die Übersichtsseite führt zehn Produktadressen als echte a-href mit dem Pfadmuster /shop/geraet/.
     
     <span class="gr-einstiege"><a href="https://www.telekom.de/mobilfunk/geraete/smartphone" rel="noopener">Smartphones</a></span>
     
@@ -272,7 +272,7 @@
   </td>
   <td class="num">0</td>
   <td class="gr-grund">
-    Erreichbar, aber ohne ld+json: der Preis liegt im Nuxt-3-Payload &lt;script id=&#34;__NUXT_DATA__&#34;&gt; - einem flachen Referenz-Array, das ein eigener Auflöser braucht. Kategorieseite und Produkt-Sitemap (1835 Smartphone-URLs) liefern sauber.
+    Erreichbar, aber ohne verwertbares ld+json: nachgemessen am 11.08.2026 trägt die Produktseite genau einen ld+json-Block, und der hat gar kein @type — die Extraktionskaskade des Projekts liefert dafür null Produktsätze. Der Preis liegt im Nuxt-3-Payload &lt;script id=&#34;__NUXT_DATA__&#34;&gt;, einem flachen Referenz-Array, das ein eigener Auflöser braucht. Die Sitemap liefert sauber: 1837 Smartphone-Adressen. ACHTUNG beim Anbinden — max_produkte steht standardmäßig auf 60; ein erreichter Deckel macht die Einstiegsseite ungelesen, dann altert nichts und der Anbieter steht trotz Funden als &#34;fehler&#34; im Protokoll.
     
     <span class="gr-einstiege"><a href="https://www.expert.de/sitemap/urls/produkte/telekom-navigation.xml" rel="noopener">Produkt-Sitemap Telekommunikation</a></span>
     
@@ -293,7 +293,7 @@
   </td>
   <td class="num">0</td>
   <td class="gr-grund">
-    Das ld+json der Produktseite trägt &#34;price&#34;:&#34;1.00&#34; - den Lockpreis im Tarifbündel, nicht den Gerätepreis. Der belastbare Katalog liegt hinter /e-shop/rest/catalog/... (77 Geräte, robots erlaubt) und braucht einen eigenen Adapter. Ein Bündelpreis ohne seinen Tarif ist bedeutungslos (Teil C4).
+    Das ld+json der Produktseite trägt &#34;price&#34;:&#34;1.00&#34; - den Lockpreis im Tarifbündel, nicht den Gerätepreis. Nachgemessen am 11.08.2026 trägt die Einstiegsseite /handys/ nur einen ld+json-Block vom Typ BreadcrumbList, also überhaupt kein Produktschema; die Kaskade des Projekts liefert dort null Sätze. Der belastbare Katalog liegt hinter /e-shop/rest/catalog/... und braucht einen eigenen Adapter. Seit dem 11.08.2026 KANN die Sammelschicht einen Bündelpreis speichern - aber nur mit seiner Tarifreferenz (Tarifname, Monatspreis); ohne sie bleibt er verworfen.
     
     <span class="gr-einstiege"><a href="https://www.o2online.de/handys/" rel="noopener">Handys</a></span>
     
