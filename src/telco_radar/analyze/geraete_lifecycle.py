@@ -241,39 +241,60 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
 # --------------------------------------------------------------------------
 
 def auswertung(eintraege: list, punkte: list, katalog: Katalog,
-               heute: Optional[str] = None) -> dict:
+               heute: Optional[str] = None,
+               laeufe_je_anbieter: Optional[dict] = None) -> dict:
     """Alles zusammen, mitsamt der Aussage ueber die eigene Datenbasis."""
-    stand = _datum(heute) or date.today()
     daten = [d for d in (_datum(p.get("datum")) for p in punkte) if d]
     termine = sorted({d for d in daten})
-    wochen = max(1, (stand - min(daten)).days // 7) if daten else 0
+    # Der Bezugstag ist der SPAETERE von Berichtstag und juengster Messung -
+    # dieselbe Rechnung wie in `geraete_view._auffaellig`. Der Geraetezweig
+    # laeuft naechtlich, der Bericht zweimal die Woche; ohne die Korrektur
+    # rechnete `(stand - min(daten)).days` negativ und `max(1, …)` machte
+    # daraus "1 Woche", obwohl seit einem Tag gemessen wird.
+    stand = _datum(heute) or date.today()
+    if daten and max(daten) > stand:
+        stand = max(daten)
+    beobachtungstage = (stand - min(daten)).days if daten else 0
+    wochen = max(1, beobachtungstage // 7) if beobachtungstage >= 7 else 0
 
-    # Wie viele Messtermine und wie viele Tage liegen JE LISTUNG vor? Nur
-    # daran entscheidet sich, ob ueber dieses Geraet etwas gesagt werden darf.
-    je_listung: dict = {}
-    for p in punkte:
-        d = _datum(p.get("datum"))
-        if d is None:
-            continue
-        je_listung.setdefault(p.get("listung_id"), set()).add(d)
+    # JEDE KENNZAHL AN IHRER EIGENEN BEOBACHTUNGSDAUER, und keine an der
+    # Preishistorie.
+    #
+    # Der erste Anlauf verlangte vier verschiedene Daten aus
+    # `geraete_preise.jsonl`. Das ist die falsche Quelle: die Datei traegt nur
+    # AENDERUNGSpunkte (geraete_store.py, Modulkopf) - ein unveraenderter
+    # Preis schreibt keine Zeile. Ein Geraet, das ein halbes Jahr stabil im
+    # Regal steht, haette damit einen einzigen Punkt und faellt fuer immer
+    # durch; eines mit vier Verfuegbarkeits-Ausschlaegen in 22 Tagen kaeme
+    # rein. Genau verkehrt herum: die Sektion zeigte bevorzugt das Rauschen.
+    #
+    # `first_seen` und `last_verified` wachsen dagegen bei JEDEM Lauf, auch
+    # wenn sich nichts aendert - sie sind das ehrliche Mass dafuer, wie lange
+    # beobachtet wurde. Der Preisverfall misst gegen `erstpreis_am`, also
+    # gegen seinen eigenen Ausgangspunkt.
+    def _spanne(von, bis) -> Optional[int]:
+        a, b = _datum(von), _datum(bis)
+        return None if a is None or b is None or b < a else (b - a).days
 
-    def _traegt(listung_id) -> bool:
-        tage = je_listung.get(listung_id) or set()
-        if len(tage) < MIND_TERMINE_JE_GERAET:
-            return False
-        return (max(tage) - min(tage)).days >= MIND_TAGE_JE_GERAET
+    # Ein MESSTERMIN ist ein Lauf, kein Preiswechsel. Wie oft eine Listung
+    # angesehen wurde, weiss die Laufbilanz ihres Anbieters; die
+    # Preishistorie weiss es nicht, sie schweigt bei unveraendertem Preis.
+    # Ohne Bilanz (aeltere Bestaende, Tests) wird die Zahl nicht erfunden,
+    # sondern die Termine-Bedingung entfaellt - die Spanne gilt weiter.
+    laeufe_je_anbieter = laeufe_je_anbieter or {}
 
-    # Duenn ist die Basis, solange KEIN Geraet die Schwelle nimmt. Gezaehlt
-    # werden Termine, nicht Punkte - siehe Kommentar am Modulkopf.
-    belastbar = [e for e in eintraege if _traegt(e.get("id"))]
-    duenn = not belastbar
+    def _oft_genug(eintrag) -> bool:
+        if not laeufe_je_anbieter:
+            return True
+        return (laeufe_je_anbieter.get(eintrag.get("anbieter"), 0)
+                >= MIND_TERMINE_JE_GERAET)
 
     dauern = []
     for e in eintraege:
         tage = listungsdauer(e)
-        if tage is None or not _traegt(e.get("id")):
-            # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis,
-            # dass noch nicht gemessen wurde.
+        # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis, dass
+        # noch nicht lange genug gemessen wurde.
+        if tage is None or tage < MIND_TAGE_JE_GERAET or not _oft_genug(e):
             continue
         g = katalog.nach_id(e.get("device_id"))
         dauern.append({
@@ -287,13 +308,21 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     verfaelle = []
     for e in eintraege:
         v = preisverfall(e)
-        if v is None or not _traegt(e.get("id")):
+        if v is None:
+            continue
+        beobachtet = _spanne(e.get("erstpreis_am"), e.get("last_verified"))
+        if (beobachtet is None or beobachtet < MIND_TAGE_JE_GERAET
+                or not _oft_genug(e)):
+            # "+0.0 % seit gestern" ist keine Preisentwicklung.
             continue
         g = katalog.nach_id(e.get("device_id"))
         verfaelle.append({**v, "device_id": e.get("device_id"),
                           "modell": g.modell if g else e.get("device_id"),
                           "anbieter": e.get("anbieter")})
     verfaelle.sort(key=lambda v: v["prozent"])
+
+    # Duenn ist die Basis, solange KEINE Kennzahl etwas hergibt.
+    duenn = not dauern and not verfaelle
 
     effekte = []
     for gid in sorted({e.get("device_id") for e in eintraege if e.get("device_id")}):
@@ -315,7 +344,12 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
                    else "Datenbasis noch dünn: Preisverlauf wird noch nicht erfasst")
         # BEIDE Zahlen: wie lange schon, und wie lange noch. Ein Hinweis, der
         # nur "noch zu duenn" sagt, ist eine Ausrede statt einer Auskunft.
-        hinweis += (f" – {_n(wochen, 'Woche', 'Wochen')}, bisher "
+        # Bei einem einzigen Messtermin ist die Spanne null - und "0 Tage"
+        # liest sich wie die Nullzeilen, die diese Schwelle gerade
+        # abgeschafft hat.
+        spanne = (f" – {_n(beobachtungstage, 'Tag', 'Tage')}"
+                  if beobachtungstage else "")
+        hinweis += (f"{spanne}, bisher "
                     f"{_n(len(termine), 'Messtermin', 'Messtermine')}. "
                     f"Belastbare Aussagen zu Verweildauer und Preisverfall gibt "
                     f"es ab etwa {MIND_WOCHEN} Wochen; bis dahin steht hier "

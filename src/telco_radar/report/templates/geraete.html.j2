@@ -153,7 +153,10 @@
     <div class="t-kennzahl"><b>{{ geraete.bilanz.skus }}</b><span>Varianten (SKUs)</span></div>
     <div class="t-kennzahl"><b>{{ geraete.bilanz.anbieter }}</b><span>Anbieter mit Daten</span></div>
     <div class="t-kennzahl"><b>{{ geraete.bilanz.preispunkte }}</b><span>Preispunkte in der Historie</span></div>
-    {% if not geraete.bilanz.ohne_vorlauf %}
+    {# Eine Zahl groesser null ist IMMER eine Aussage. Weg bleibt die Kachel
+       nur, wenn sie null zeigt UND es noch keinen frueheren Lauf gibt -
+       "0 ausgelistet" ist dann eine Selbstverstaendlichkeit. #}
+    {% if geraete.bilanz.ausgelistet or not geraete.bilanz.ohne_vorlauf %}
     <div class="t-kennzahl"><b>{{ geraete.bilanz.ausgelistet }}</b><span>ausgelistet</span></div>
     {% endif %}
   </div>

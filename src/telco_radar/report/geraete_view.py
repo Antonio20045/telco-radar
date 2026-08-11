@@ -262,7 +262,7 @@ def _tag(wert):
 
 
 def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
-                heute: str) -> dict:
+                heute: str, laeufe: int = 0) -> dict:
     """Die groessten Bewegungen DIESES Zeitraums - aus den Deltas gerechnet.
 
     DER BEZUG IST DIE MESSUNG, NICHT DER BERICHTSTAG. Der Geraetezweig laeuft
@@ -273,10 +273,15 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     stand leer da, obwohl frische Daten vorlagen. Als Bezug gilt deshalb der
     spaetere der beiden Tage.
     """
-    juengste = sorted(p.get("datum") for p in historie.alle_punkte()
-                      if p.get("datum"))
-    if juengste and juengste[-1] > (heute or ""):
-        heute = juengste[-1]
+    # Ueber `_tag()`, nicht ueber rohe Zeichenketten: ein kaputtes `datum`
+    # ("unbekannt") sortiert lexikalisch hinter jedes ISO-Datum, wuerde
+    # Bezugstag und liesse `_im_fenster` fuer ALLES falsch werden - die
+    # ganze Sektion verschwaende lautlos.
+    juengste = sorted(d for d in (_tag(p.get("datum"))
+                                  for p in historie.alle_punkte()) if d)
+    bezug = _tag(heute)
+    if juengste and (bezug is None or juengste[-1] > bezug):
+        heute = juengste[-1].isoformat()
     bewegungen = []
     for e in eintraege:
         reihe = historie.reihe(e["id"])
@@ -314,13 +319,16 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         erlaubt |= zahlen_der_namen(b["modell"], b["anbieter"])
     erlaubt.update({len(neu_gelistet), len(verschwunden), len(bewegungen)})
 
-    # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Solange nur an EINEM
-    # Tag gemessen wurde, kann keine Bewegung entstanden sein - dann zeigt
-    # die Karte, was neu ERFASST wurde, und sagt das auch so. Der erste Lauf
-    # hatte hier eine leere Sektion, und "keine Auffaelligkeiten" ist etwas
-    # anderes als "noch nichts zu vergleichen".
-    messtage = {p.get("datum") for p in historie.alle_punkte() if p.get("datum")}
-    ohne_vorlauf = len(messtage) < 2
+    # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Dann zeigt die Karte,
+    # was neu ERFASST wurde, und sagt das auch so - "keine Auffaelligkeiten"
+    # ist etwas anderes als "noch nichts zu vergleichen".
+    #
+    # Gefragt wird die LAUFBILANZ, nicht die Preishistorie. Die erste Fassung
+    # zaehlte Messtage in `geraete_preise.jsonl` - und die Datei traegt nur
+    # Aenderungspunkte: ein Anbieter, der wegbricht, schreibt gar keine mehr,
+    # waehrend `mark_stale` seine Listungen altert. Genau dann haette die
+    # Kachel "ausgelistet" den Einbruch gezeigt und war ausgeblendet.
+    ohne_vorlauf = laeufe < 2
 
     saetze = []
     for b in bewegungen[:5]:
@@ -336,7 +344,7 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     elif neu_gelistet:
         saetze.append(f"{len(neu_gelistet)} Gerät{'e' if len(neu_gelistet) != 1 else ''} "
                       f"neu im Regal.")
-    if verschwunden:
+    if verschwunden and not ohne_vorlauf:
         saetze.append(f"{len(verschwunden)} Gerät{'e' if len(verschwunden) != 1 else ''} "
                       f"aus dem Portfolio gefallen.")
 
@@ -397,7 +405,7 @@ def _matrix(eintraege: list, katalog) -> dict:
             "tarif": e.get("tarif_referenz", ""),
             "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
             "status": e.get("status"),
-            "zustand": e.get("zustand", "neu"),
+            "zustand": e.get("zustand") or "neu",
             "url": e.get("quelle_url", ""),
             "abgerufen_am": e.get("abgerufen_am", ""),
         })
@@ -645,8 +653,19 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         p["aktuelle_generation"] = (p["generation"] is not None
                                     and p["generation"] == hoechste.get(p["hersteller"]))
 
+    # Wie oft ist der Geraetezweig ueberhaupt schon gelaufen? Das ist die
+    # Frage hinter "gibt es einen frueheren Stand" - und sie wird an der
+    # Laufbilanz beantwortet, nicht an der Preishistorie (die traegt nur
+    # Aenderungspunkte und schweigt, wenn sich nichts aendert).
+    laeufe = max((int(db.laufbilanz(name).get("laeufe") or 0)
+                  for name in {e.get("anbieter") for e in alle if e.get("anbieter")}),
+                 default=0)
+    auffaellig = _auffaellig(alle, historie, katalog, heute, laeufe=laeufe)
     lifecycle = geraete_lifecycle.auswertung(
-        alle, historie.alle_punkte(), katalog, heute)
+        alle, historie.alle_punkte(), katalog, heute,
+        laeufe_je_anbieter={name: int(db.laufbilanz(name).get("laeufe") or 0)
+                            for name in {e.get("anbieter") for e in alle
+                                         if e.get("anbieter")}})
 
     # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
@@ -719,9 +738,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                                if e.get("status") == STATUS_AUSGELISTET),
             # Ohne einen frueheren Stand ist "0 ausgelistet" keine Aussage,
             # sondern eine Selbstverstaendlichkeit - die Kachel bleibt weg,
-            # bis es etwas zu vergleichen gibt.
-            "ohne_vorlauf": len({p.get("datum") for p in historie.alle_punkte()
-                                 if p.get("datum")}) < 2,
+            # bis es etwas zu vergleichen gibt. Steht dort eine Zahl groesser
+            # null, ist sie IMMER eine Aussage und wird gezeigt.
+            # Die Regel steht an EINER Stelle: `_auffaellig` rechnet sie,
+            # hier wird sie gelesen. Zweimal gerechnet liefen Satz und Kachel
+            # beim naechsten Umbau auseinander, ohne dass etwas rot wird.
+            "ohne_vorlauf": auffaellig["ohne_vorlauf"],
             "preispunkte": historie.punkte_gesamt,
             # ZWEI Zahlen, seit die Karte aggregiert: `in_der_karte` sind die
             # gezeichneten Preispunkte, `aggregiert_aus` die Listungen
@@ -741,7 +763,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "segment_label": SEGMENT_LABEL,
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
                                   if p["speicher"]}),
-        "auffaellig": _auffaellig(alle, historie, katalog, heute),
+        "auffaellig": auffaellig,
         "matrix": _matrix(sichtbar, katalog),
         "lifecycle": lifecycle,
         "quellenlage": _quellenlage(quellen, db, sichtbar),

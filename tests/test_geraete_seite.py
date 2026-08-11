@@ -130,6 +130,26 @@ _PUNKTE = [
 ]
 
 
+# Ein ausdruecklich duenner Bestand: seit gestern gelistet, EIN Lauf. Der
+# Normalfall `_DB` ist seit dem 11.08.2026 KEIN duenner Fall mehr - er laeuft
+# seit dem 01.07. und hat vier Laeufe, also eine belastbare Verweildauer.
+_DB_DUENN = {"updated": "2026-08-11",
+             "anbieter": {"Medimax": {"laeufe": 1, "funde_gesamt": 2}},
+             "listungen": [
+                 _listung("Medimax", "apple-iphone-17-pro-max",
+                          "apple-iphone-17-pro-max-256gb-titan-natur", 1449.0,
+                          first_seen="2026-08-10", erstpreis_am="2026-08-10"),
+                 _listung("Medimax", "samsung-galaxy-s25-ultra",
+                          "samsung-galaxy-s25-ultra-256gb-schwarz", 1249.0,
+                          farbe="schwarz", first_seen="2026-08-10",
+                          erstpreis_am="2026-08-10"),
+             ]}
+_PUNKTE_DUENN = [{"listung_id": "medimax--apple-iphone-17-pro-max-256gb-titan-natur",
+                  "device_id": "apple-iphone-17-pro-max", "anbieter": "Medimax",
+                  "datum": "2026-08-11", "preis_ohne_vertrag": 1449.0,
+                  "verfuegbarkeit": "lieferbar",
+                  "quelle_url": "https://example.de/p"}]
+
 def _baue(tmp_path: Path, db=None, punkte=None):
     """Eine vollstaendige Site rendern - mit echtem Bericht, echtem Zustand.
 
@@ -304,9 +324,9 @@ def test_matrix_zeigt_variantenzahl_und_preisspanne(tmp_path):
 
 
 def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
-    """Akzeptanzkriterium: unter N Messpunkten kein Trend, sondern ein Satz,
+    """Akzeptanzkriterium: unter der Schwelle kein Trend, sondern ein Satz,
     der das sagt."""
-    site = _baue(tmp_path)
+    site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
     s = _suppe(site, "geraete.html")
     basis = s.select_one(".gr-basis")
     assert basis is not None
@@ -1210,7 +1230,7 @@ def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
     Der Testbestand hat genau zwei Messpunkte an zwei Tagen - unter der
     Schwelle. Gegen den alten Stand gemessen stuenden hier Zeilen mit
     "0 Tage" und "+0.0 %"."""
-    site = _baue(tmp_path)
+    site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
     s = _suppe(site, "geraete.html")
     basis = s.select_one(".gr-basis")
     assert basis is not None
@@ -1271,3 +1291,18 @@ def test_jede_zahl_der_wochenkarte_stammt_aus_dem_datensatz(tmp_path):
     assert pruefe_zahlen("85 Geräte erstmals erfasst.", erlaubt)
     assert not pruefe_zahlen("86 Geräte erstmals erfasst.", erlaubt)
     assert not pruefe_zahlen("Der Preis fiel um 12,5 %.", erlaubt)
+
+
+def test_eine_lange_beobachtung_erscheint_sehr_wohl_auf_der_seite(tmp_path):
+    """Die Gegenprobe zur Schwelle: ohne sie belegt der Test oben nur, dass
+    die Sektion IMMER leer ist.
+
+    Der Normalfall-Bestand laeuft seit dem 01.07.2026 bei vier Laeufen - das
+    ist eine belastbare Verweildauer, und sie gehoert auf die Seite."""
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    basis = s.select_one(".gr-basis")
+    assert "gr-basis--duenn" not in (basis.get("class") or []), basis.get_text()
+    zeilen = s.select(".gr-dauern li")
+    assert zeilen, "eine 41 Tage alte Listung ergibt sehr wohl eine Zeile"
+    assert not any("0 Tage" in z.get_text() for z in zeilen)

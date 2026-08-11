@@ -211,12 +211,19 @@ def test_mehrere_varianten_eines_geraets_sind_eine_generation():
 def test_zwei_messpunkte_sind_kein_trend():
     """Akzeptanzkriterium aus Teil E. In den ersten Wochen gibt es schlicht
     keine Historie - dann sagt die Auswertung das, statt aus zwei Punkten
-    eine Kurve zu zeichnen."""
-    a = auswertung([_eintrag()], _punkte(("2026-08-03", 1449.0),
-                                         ("2026-08-10", 1399.0)),
+    eine Kurve zu zeichnen.
+
+    Die Listung ist seit dem 11.08.2026 ebenfalls jung. Vorher entschied die
+    Zahl der PREISPUNKTE ueber alles; jetzt entscheidet je Kennzahl ihre
+    eigene Beobachtungsdauer, und eine seit einem Jahr gelistete Ware mit
+    zwei Preispunkten hat sehr wohl eine belastbare Verweildauer."""
+    a = auswertung([_eintrag(first="2026-08-03",
+                             erstpreis_am="2026-08-03")],
+                   _punkte(("2026-08-03", 1449.0), ("2026-08-10", 1399.0)),
                    _KATALOG, heute="2026-08-10")
     assert a["duenn"] is True
     assert a["punkte"] == 2
+    assert a["dauern"] == [] and a["verfaelle"] == []
     assert "duenn" in a["hinweis"].lower() or "dünn" in a["hinweis"].lower()
     assert a["trends"] == []
 
@@ -232,13 +239,16 @@ def test_genug_messpunkte_ergeben_einen_trend():
 
 
 def test_der_hinweis_nennt_beide_zahlen():
-    a = auswertung([_eintrag(first="2026-07-20")],
+    # Die Listung ist jung (der Hinweis der duennen Basis wird geprueft), die
+    # Messreihe reicht aber 21 Tage zurueck.
+    a = auswertung([_eintrag(first="2026-08-04", erstpreis_am="2026-08-04")],
                    _punkte(("2026-07-20", 1449.0), ("2026-08-10", 1399.0)),
                    _KATALOG, heute="2026-08-10")
-    # "seit N Wochen beobachtet, belastbar ab etwa M" - beide Zahlen muessen
-    # dastehen, sonst ist der Satz eine Ausrede statt einer Auskunft.
+    # "seit N Tagen beobachtet, belastbar ab etwa M Wochen" - beide Zahlen
+    # muessen dastehen, sonst ist der Satz eine Ausrede statt einer Auskunft.
+    assert a["duenn"] is True, a["hinweis"]
     assert str(MIND_WOCHEN) in a["hinweis"]
-    assert a["wochen"] == 3 and "3" in a["hinweis"]
+    assert "21 Tage" in a["hinweis"], a["hinweis"]
 
 
 def test_leere_datenbasis_kippt_nicht():
@@ -305,3 +315,36 @@ def test_die_schwelle_greift_je_geraet():
     assert a["duenn"] is False, "ein Geraet nimmt die Schwelle"
     assert [d["device_id"] for d in a["dauern"]] == ["apple-iphone-17-pro-max"]
     assert all(v["device_id"] == "apple-iphone-17-pro-max" for v in a["verfaelle"])
+
+
+def test_eine_lange_beobachtung_ergibt_sehr_wohl_eine_zeile():
+    """Die Gegenprobe zur Schwelle - und der Fall, den die erste Fassung
+    STILL abgeschaltet haette.
+
+    `geraete_preise.jsonl` traegt nur AENDERUNGSpunkte. Eine Ware, die ein
+    halbes Jahr stabil im Regal steht, hat dort genau einen Punkt. Wer
+    Aenderungspunkte zaehlt, sperrt genau diese Ware aus - und laesst
+    stattdessen die zu, deren Verfuegbarkeit flattert."""
+    a = auswertung(
+        [_eintrag(first="2026-02-01", last="2026-08-10",
+                  erstpreis_am="2026-02-01", erstpreis=1449.0, preis=899.0)],
+        _punkte(("2026-02-01", 1449.0)),          # EIN einziger Punkt
+        _KATALOG, heute="2026-08-10",
+        laeufe_je_anbieter={"expert": 40})
+    assert a["duenn"] is False, a["hinweis"]
+    assert [d["tage"] for d in a["dauern"]] == [190]
+    assert a["verfaelle"] and a["verfaelle"][0]["prozent"] < 0
+
+
+def test_wenige_laeufe_sperren_die_zeile_trotz_langer_spanne():
+    """Vier Messtermine ueber 21 Tage - ein Messtermin ist ein LAUF.
+
+    Ohne die Laufzahl genuegte eine einzige Messung mit weit
+    auseinanderliegendem first_seen/last_verified."""
+    a = auswertung(
+        [_eintrag(first="2026-02-01", last="2026-08-10",
+                  erstpreis_am="2026-02-01")],
+        _punkte(("2026-02-01", 1449.0)), _KATALOG, heute="2026-08-10",
+        laeufe_je_anbieter={"expert": 3})
+    assert a["duenn"] is True
+    assert a["dauern"] == [] and a["verfaelle"] == []
