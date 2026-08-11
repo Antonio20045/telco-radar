@@ -1,0 +1,45 @@
+# Render-Blueprint fuer den Signup-Dienst.
+#
+# FREE-PLAN, und das ist eine Entscheidung, keine Sparsamkeit: der Dienst ist
+# so gebaut, dass die drei Einschraenkungen des Free-Plans ihn nicht treffen.
+#   * Ports 25/465/587 ausgehend gesperrt -> er verschickt ohnehin nichts.
+#   * ephemeres Dateisystem                -> er speichert ohnehin nichts.
+#   * Spin-down nach 15 Minuten            -> `GET /form-token` beim
+#     Seitenaufbau weckt ihn, waehrend der Nutzer noch ausfuellt.
+#
+# KEIN Keep-alive-Ping. Ein Monat hat rund 730 Stunden, das Kontingent 750
+# Instanzstunden - ein Dauerping wuerde es allein aufbrauchen und den Dienst
+# genau dann abschalten, wenn jemand ihn braucht.
+services:
+  - type: web
+    name: telco-radar-signup
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: .
+    buildCommand: pip install -r service/signup/requirements.txt
+    startCommand: uvicorn service.signup.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /gesund
+    envVars:
+      # Alle vier sind Geheimnisse und werden im Render-Dashboard gesetzt,
+      # NICHT hier. `sync: false` heisst genau das: Render fragt beim
+      # Anlegen danach und schreibt sie nie in die Blueprint-Datei.
+      - key: SIGNUP_TOKEN_KEY      # HMAC-Schluessel der Token
+        sync: false
+      - key: SIGNUP_PEPPER         # Pepper der Kennwerte - MUSS derselbe
+        sync: false                # sein wie im privaten Repo, sonst passt
+                                   # kein einziger Adress-Kennwert zusammen
+      - key: GITHUB_DISPATCH_TOKEN # fein granular, NUR auf telco-radar-inbox
+        sync: false
+      - key: GITHUB_DISPATCH_REPO
+        value: Antonio20045/telco-radar-inbox
+      - key: SITE_BASE_URL
+        value: https://telco-radar.onrender.com
+      # Die Domain-Allowlist. LEER = offen fuer alle (Festlegung 3 des
+      # Konzepts). Umschalten ist damit diese eine Zeile.
+      - key: ERLAUBTE_DOMANIEN_HINWEIS
+        value: "ERLAUBTE_DOMAINS leer lassen = Anmeldung offen fuer alle"
+      - key: ERLAUBTE_DOMAINS
+        value: ""
+      - key: PYTHONUNBUFFERED
+        value: "1"

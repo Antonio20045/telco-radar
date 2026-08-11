@@ -1,0 +1,5 @@
+# Bewusst kurz. Der Dienst hat einen Zweck und laeuft auf dem Free-Plan;
+# jede Abhaengigkeit mehr ist Kaltstartzeit, die der Nutzer wartet.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pyyaml>=6.0
