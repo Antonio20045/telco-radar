@@ -275,7 +275,7 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
@@ -536,7 +536,11 @@ Differenzierung, Wettbewerb, Quellen) **plus „Geräte", sobald die Daten die
 Schwelle nehmen**. `tests/test_suche_page.py` nagelt die fünf fest — eine
 Navigation wächst sonst zurück, und genau davon kam dieses Projekt.
 
-**Der sechste Eintrag schaltet sich selbst** (11.08.2026). Bis dahin stand
+**Der sechste Eintrag schaltet sich selbst** (11.08.2026) — und ist im
+Moment AUS, weil nur zwei Läden liefern. Genau das ist der Punkt der
+Mechanik: die Entscheidung steht als Zahl im Code, nicht als Handgriff in der
+Vorlage, und sobald ein dritter Laden liefert, trägt sich die Seite selbst
+wieder ein. Bis dahin stand
 die Veröffentlichungsschwelle **nur in einem Test**, und das war der Fehler
 daran: ein Test kann keine Navigation schalten. Die Geräteseite stand am
 10.08. fertig, geprüft und live — und war für jeden Leser unauffindbar,
@@ -565,23 +569,22 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > **Tarifseite:** mindestens drei Anbieter, zwölf Mobilfunktarife, ein
 > Tarif mit echter Rabattphase.
 > **Lieferzeitseite:** Telekom, o2 und 1&1 erfasst.
-> **Geräteseite:** **zwei** Anbieter mit Daten, zwei Hersteller in der
+> **Geräteseite:** **drei** Anbieter mit Daten, zwei Hersteller in der
 > Positionskarte, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
 > CODE rechnet (`geraete_view.SCHWELLE_*` und `schwelle_erreicht()`), nicht
 > nur ein Test. Zwei Tests messen beide Zweige: unterhalb nicht verlinkt,
 > oberhalb auf JEDER Seite verlinkt.
 >
-> Drei Anbieter waren die Vorgabe des Bauauftrags und sind an der
-> Wirklichkeit gemessen zu hoch. Mit 85 Varianten von 11 Modellen aus drei
-> Herstellerhäusern beantwortet die Seite ihre erste und zweite Frage
-> vollständig („was führt der Wettbewerb", „wo steht ein Gerät im Preis").
-> Was sie mit zwei Anbietern noch nicht beantwortet, ist die dritte („was
-> kostet dasselbe Gerät bei wem") — und genau das sagt sie oben selbst, in
-> ihrer eigenen Zeile „N von M konfigurierten Anbietern liefern Daten".
-> **Eine Seite, die ihre Lücke beziffert, lügt nicht; eine Seite, die
-> niemand findet, nützt nichts.** Tarif- und Lieferzeitseite bleiben bei
-> ihren Zahlen: dort fehlen nicht Anbieter am Rand, sondern die drei
-> größten des Marktes.
+> Die Anbieterschwelle stand am 11.08.2026 kurzzeitig auf **zwei**, mit der
+> Begründung, die Seite beantworte ihre erste und zweite Frage („was führt
+> der Wettbewerb", „wo steht ein Gerät im Preis") auch so vollständig.
+> **Antonio hat das kassiert, nachdem er die Seite live gesehen hatte** —
+> und die Zahl gibt ihm recht: von den zwei „Anbietern" trägt einer 84 von
+> 85 Listungen. Die dritte Frage („was kostet dasselbe Gerät bei wem") ist
+> die, wegen der die Seite existiert, und mit einem echten Laden kann sie
+> niemand beantworten. Eine Seite, die ihre Lücke beziffert, lügt zwar
+> nicht — aber eine Marktübersicht, die den Markt nicht zeigt, gehört
+> deshalb noch lange nicht in die Navigation.
 
 Die Regel ist der Preis für die Ausnahme, die am 08.08. zweimal gemacht
 wurde. „Diese Seite beantwortet eine Frage, die keine andere beantwortet"

@@ -89,17 +89,26 @@ EIGEN = ("vodafone",)
 # prueft BEIDE Zweige - unterhalb der Schwelle nicht verlinkt, oberhalb
 # verlinkt.
 #
-# ZU DEN ZAHLEN. Anbieter steht auf ZWEI, nicht auf drei. Drei war die
-# Vorgabe aus dem Bauauftrag und sie ist an der Wirklichkeit gemessen zu
-# hoch: mit 85 Varianten von 11 Modellen aus drei Herstellerhaeusern
-# beantwortet die Seite ihre erste und ihre zweite Frage vollstaendig
-# ("was fuehrt der Wettbewerb", "wo steht ein Geraet im Preis"). Was sie mit
-# zwei Anbietern noch nicht beantwortet, ist die dritte ("was kostet
-# dasselbe Geraet bei wem") - und genau das sagt sie oben selbst, in ihrer
-# eigenen Zeile "N von M konfigurierten Anbietern liefern Daten". Eine
-# Seite, die ihre Luecke beziffert, luegt nicht; eine Seite, die niemand
-# findet, nuetzt nichts.
-SCHWELLE_ANBIETER = 2
+# ZU DEN ZAHLEN. Anbieter steht auf DREI - dem Wert des Bauauftrags.
+#
+# Am 11.08.2026 stand er kurzzeitig auf zwei, mit der Begruendung, die Seite
+# beantworte ihre erste und zweite Frage ("was fuehrt der Wettbewerb", "wo
+# steht ein Geraet im Preis") auch mit zwei Laeden vollstaendig. Antonio hat
+# das kassiert, nachdem er die Seite live gesehen hatte: sie soll nicht
+# angezeigt werden, solange sie so aussieht.
+#
+# Er hat recht, und die Zahl macht es deutlicher als jede Erklaerung: von den
+# zwei "Anbietern" traegt einer 84 von 85 Listungen. Die dritte Frage - "was
+# kostet dasselbe Geraet bei wem" - ist die, wegen der diese Seite existiert,
+# und mit einem echten Laden kann sie niemand beantworten. Eine Seite, die
+# ihre Luecke beziffert, luegt zwar nicht; aber eine Marktuebersicht, die den
+# Markt nicht zeigt, gehoert deshalb noch lange nicht in die Navigation.
+#
+# Die Seite wird weiter gebaut, getestet und ist ueber ihren direkten Link
+# erreichbar - dieselbe Regel wie bei tarife.html und lieferzeit.html
+# (CLAUDE.md §5). Sobald ein dritter Laden liefert, traegt sie sich selbst
+# wieder ein; es braucht dafuer keine Handarbeit und keinen zweiten Ort.
+SCHWELLE_ANBIETER = 3
 SCHWELLE_HERSTELLER = 2
 SCHWELLE_SKUS = 20
 

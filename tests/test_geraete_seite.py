@@ -468,6 +468,14 @@ def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
 # Die Veroeffentlichungsschwelle
 # --------------------------------------------------------------------------
 
+# Genau so viele verschiedene LAEDEN, wie die Schwelle verlangt. Aus der
+# Konstante abgeleitet und nicht abgeschrieben: wer die Schwelle aendert,
+# soll nicht auch noch die Fixtures nachziehen muessen - und der Test soll
+# nicht stillschweigend den falschen Zweig messen.
+_UEBER_DER_SCHWELLE = ("Medimax", "ElectronicPartner", "Vodafone",
+                       "fraenk")[:geraete_view.SCHWELLE_ANBIETER]
+
+
 def _db_mit(anzahl_skus: int, anbieter: tuple = ("Medimax",)) -> dict:
     """Ein Bestand, der die Schwelle gezielt reisst oder nimmt."""
     modelle = ("apple-iphone-17-pro-max", "samsung-galaxy-s25-ultra")
@@ -501,7 +509,7 @@ def test_ueber_der_schwelle_erscheint_sie_auf_JEDER_seite(tmp_path):
     nicht tat, war sie unauffindbar. Jetzt schaltet der Code sie, und zwar
     in `base.html.j2`, also auf allen Seiten. Die Startseite ist die, auf
     der es zaehlt: dort hat Antonio gesucht."""
-    site = _baue(tmp_path, db=_db_mit(24, anbieter=("Medimax", "ElectronicPartner")))
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     for name in ("index.html", "meldungen.html", "wettbewerb.html",
                  "differenzierung.html", "transparenz.html", "geraete.html"):
         ziele = {a.get("href") for a in _suppe(site, name).select(".subnav a")}
@@ -513,7 +521,7 @@ def test_die_schwelle_wird_gerechnet_und_nicht_behauptet(tmp_path):
     auseinanderlaufen - an beiden Zweigen gemessen, nicht nur an dem, der
     heute gilt."""
     for db, erwartet in ((_db_mit(3), False),
-                         (_db_mit(24, anbieter=("Medimax", "ElectronicPartner")), True)):
+                         (_db_mit(24, anbieter=_UEBER_DER_SCHWELLE), True)):
         site = _baue(tmp_path / f"fall{erwartet}", db=db)
         root = tmp_path / f"fall{erwartet}"
         geraete = geraete_view.aufbereiten(
