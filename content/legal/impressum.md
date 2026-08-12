@@ -4,8 +4,10 @@ Angaben nach § 5 Digitale-Dienste-Gesetz (DDG).
 
 ## Anbieter
 
-Antonio Fotiadis Francisco
-{{ANSCHRIFT}}
+Antonio Fotiadis Francisco  
+c/o Vodafone GmbH  
+Ferdinand-Braun-Platz 1  
+D-40549 Düsseldorf
 
 ## Kontakt
 

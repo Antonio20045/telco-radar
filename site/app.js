@@ -985,3 +985,226 @@ var TelcoFrage = (function () {
     if (punkt) { ev.preventDefault(); zeige(punkt); }
   });
 })();
+
+/* =========================================================================
+   NEWSLETTER-ANMELDUNG
+   =========================================================================
+   Drei Dinge passieren hier, und das erste ist das, das man leicht vergisst.
+
+   1. `GET /form-token` wird beim SEITENAUFBAU geholt, nicht beim Absenden.
+      Render Free faehrt den Signup-Dienst nach 15 Minuten ohne Verkehr
+      herunter, das Aufwachen dauert rund eine Minute. Wer die Kennung erst
+      beim Klick holt, laesst den Nutzer diese Minute vor einem Spinner
+      warten. Geholt beim Aufbau, weckt sie die Instanz, waehrend er noch
+      ausfuellt.
+   2. Die Stichwort-Vorschau zaehlt CLIENTSEITIG gegen
+      `data/keyword-index.json`. Sie kann `preview_keyword` nicht aufrufen -
+      die Seite ist statisch, und der Signup-Dienst kennt die Berichtsarchive
+      nicht. Die Datei schreibt die Pipeline bei jedem Lauf mit, und ein Test
+      haelt jedes ihrer Woerter gegen `vorschau()`.
+   3. Der Kaltstart wird trotzdem abgefangen: sofort "Wird verarbeitet ...",
+      Timeout 90 Sekunden, danach eine verstaendliche Meldung mit
+      Wiederholmoeglichkeit. Kein haengender Spinner.
+   ====================================================================== */
+(function () {
+  var form = document.getElementById('nl-form');
+  if (!form) return;
+  var konfigEl = document.getElementById('nl-config');
+  var K = {};
+  try { K = JSON.parse(konfigEl ? konfigEl.textContent : '{}'); } catch (e) {}
+
+  var status = document.getElementById('nl-status');
+  var submit = document.getElementById('nl-submit');
+  var gesperrt = form.getAttribute('data-gesperrt') === '1' || !K.frei || !K.dienst;
+  var nonce = '';
+  var stichwoerter = [];
+  var index = null;
+
+  function sagen(text, art) {
+    status.textContent = text || '';
+    status.className = 'nl-status' + (art ? ' nl-status--' + art : '');
+  }
+
+  /* ---- 1. Die Kennung beim Seitenaufbau holen. Weckt die Instanz. ---- */
+  if (!gesperrt) {
+    fetch(K.dienst + '/form-token', { method: 'GET' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.nonce) nonce = d.nonce; })
+      .catch(function () { /* still: der Absendeweg faengt es ab */ });
+  } else if (K.frei && !K.dienst) {
+    sagen('Der Anmeldedienst ist noch nicht eingerichtet.', 'warn');
+  }
+
+  /* ---- 2. Stichwoerter: Vorschau gegen den Index ---------------------- */
+  function indexLaden() {
+    if (index) return Promise.resolve(index);
+    return fetch('data/keyword-index.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { index = d || { woerter: {}, meldungen: 0 }; return index; })
+      .catch(function () { index = { woerter: {}, meldungen: 0 }; return index; });
+  }
+
+  /* Dieselbe Rechnung wie `filters.vorschau()`: gezaehlt werden MELDUNGEN,
+     die das Wort enthalten, nicht Vorkommen. Fuer eine Phrase laesst sich
+     das aus einem Wortindex nur nach oben abschaetzen - dann sagt die
+     Vorschau "höchstens N" und behauptet keine Zahl, die sie nicht hat. */
+  function schaetzen(term) {
+    var teile = term.toLowerCase().split(/\s+/).filter(function (w) {
+      return w.length >= (K.min_laenge || 4);
+    });
+    if (!teile.length) return null;
+    var werte = teile.map(function (w) { return index.woerter[w] || 0; });
+    var n = Math.min.apply(null, werte);
+    return { n: n, genau: teile.length === 1 };
+  }
+
+  var feld = document.getElementById('nl-stichwort');
+  var vorschau = document.getElementById('nl-stichwort-vorschau');
+  var liste = document.getElementById('nl-stichwort-liste');
+
+  function vorschauZeigen() {
+    var term = (feld.value || '').trim();
+    if (term.length < (K.min_laenge || 4)) { vorschau.textContent = ''; return; }
+    indexLaden().then(function () {
+      var s = schaetzen(term);
+      if (!s) { vorschau.textContent = ''; return; }
+      var tage = K.vorschau_tage || 30;
+      vorschau.textContent = (s.genau ? '' : 'höchstens ') + s.n +
+        ' Meldung' + (s.n === 1 ? '' : 'en') + ' in den letzten ' + tage + ' Tagen';
+      vorschau.className = 'nl-vorschau' +
+        (s.n >= (K.warnung_ab || 25) ? ' nl-vorschau--warn' : '') +
+        (s.n === 0 ? ' nl-vorschau--null' : '');
+      if (s.n >= (K.warnung_ab || 25)) {
+        vorschau.textContent += ' — das ist viel. Enger fassen?';
+      } else if (s.n === 0) {
+        vorschau.textContent += ' — dazu kam bisher nichts.';
+      }
+    });
+  }
+
+  feld.addEventListener('input', vorschauZeigen);
+
+  function chipsZeichnen() {
+    liste.textContent = '';
+    stichwoerter.forEach(function (term, i) {
+      var li = document.createElement('li');
+      li.className = 'nl-chip';
+      li.appendChild(document.createTextNode(term));
+      var weg = document.createElement('button');
+      weg.type = 'button';
+      weg.className = 'nl-chip-weg';
+      weg.textContent = '×';
+      weg.setAttribute('aria-label', 'Stichwort ' + term + ' entfernen');
+      weg.addEventListener('click', function () {
+        stichwoerter.splice(i, 1);
+        chipsZeichnen();
+      });
+      li.appendChild(weg);
+      liste.appendChild(li);
+    });
+  }
+
+  document.getElementById('nl-stichwort-add').addEventListener('click', function () {
+    var term = (feld.value || '').trim();
+    var min = K.min_laenge || 4;
+    var laengstes = term.split(/\s+/).reduce(function (a, w) {
+      return Math.max(a, w.length);
+    }, 0);
+    if (laengstes < min) {
+      sagen('Stichwörter brauchen mindestens ein Wort mit ' + min +
+            ' Zeichen — kurze Begriffe treffen zu viel.', 'warn');
+      return;
+    }
+    if (stichwoerter.length >= (K.max_stichwoerter || 10)) {
+      sagen('Höchstens ' + (K.max_stichwoerter || 10) + ' Stichwörter.', 'warn');
+      return;
+    }
+    if (stichwoerter.indexOf(term) < 0) stichwoerter.push(term);
+    feld.value = '';
+    vorschau.textContent = '';
+    sagen('');
+    chipsZeichnen();
+  });
+
+  feld.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      document.getElementById('nl-stichwort-add').click();
+    }
+  });
+
+  /* ---- 3. Absenden, mit Kaltstart-Behandlung -------------------------- */
+  function gewaehlt(feldName) {
+    return Array.prototype.slice.call(
+      form.querySelectorAll('input[name="' + feldName + '"]:checked')
+    ).map(function (el) { return el.value; });
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (gesperrt) {
+      sagen('Die Anmeldung ist noch nicht freigeschaltet.', 'warn');
+      return;
+    }
+    var email = (document.getElementById('nl-email').value || '').trim();
+    if (!email || email.indexOf('@') < 1) {
+      sagen('Bitte eine gültige E-Mail-Adresse eintragen.', 'warn');
+      return;
+    }
+    if (!document.getElementById('nl-consent').checked) {
+      sagen('Ohne Ihre Einwilligung dürfen wir Ihnen nichts schicken.', 'warn');
+      return;
+    }
+
+    var koerper = {
+      email: email,
+      nonce: nonce,
+      consent: true,
+      website: (form.querySelector('input[name="website"]') || {}).value || '',
+      filters: {
+        branches: gewaehlt('branches'),
+        regions: gewaehlt('regions'),
+        competitors: gewaehlt('competitors'),
+        categories: gewaehlt('categories'),
+        keywords: stichwoerter.map(function (t) { return { term: t }; })
+      }
+    };
+
+    submit.disabled = true;
+    sagen('Wird verarbeitet …');
+
+    /* 90 Sekunden. Der Kaltstart dauert rund eine Minute, und der Nutzer
+       soll danach eine Antwort bekommen - keinen ewigen Spinner. */
+    var abbruch = new AbortController();
+    var uhr = setTimeout(function () { abbruch.abort(); }, 90000);
+
+    fetch(K.dienst + '/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(koerper),
+      signal: abbruch.signal
+    }).then(function (r) {
+      return r.json().then(function (d) { return { ok: r.ok, daten: d }; });
+    }).then(function (a) {
+      clearTimeout(uhr);
+      submit.disabled = false;
+      if (a.ok) {
+        sagen(a.daten.message || 'Bitte sehen Sie in Ihr Postfach.', 'ok');
+        form.querySelector('#nl-email').value = '';
+        document.getElementById('nl-consent').checked = false;
+      } else {
+        sagen((a.daten.fehler || ['Das hat nicht geklappt.']).join(' '), 'warn');
+      }
+    }).catch(function (err) {
+      clearTimeout(uhr);
+      submit.disabled = false;
+      /* Der Dienst schlaeft nach 15 Minuten ohne Verkehr ein. Das ist der
+         haeufigste Fall hier - und er ist beim zweiten Versuch weg. */
+      sagen(err && err.name === 'AbortError'
+        ? 'Der Anmeldedienst antwortet gerade nicht (er wacht nach einer '
+          + 'Pause erst auf). Bitte noch einmal auf „Anmelden“ klicken.'
+        : 'Verbindung zum Anmeldedienst fehlgeschlagen. Bitte später noch '
+          + 'einmal versuchen.', 'warn');
+    });
+  });
+})();

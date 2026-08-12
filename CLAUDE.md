@@ -177,7 +177,7 @@ Wichtige Dateien:
 | `config/geraete_quellen.yaml` | **23 beobachtete Anbieter** des Geraeteradars in drei Ebenen (Handel / Netzbetreiber / Discount). Jede Zeile ist gemessen, nicht geraten: `methode` und `grund` geben das Messergebnis vom 10.08.2026 wieder. Ein Anbieter ohne Adapter steht mit seinem Grund da und verschwindet NICHT |
 | `config/geraete_katalog.yaml` | Die **verfolgten Modelle** - nicht der Markt. `vorgaenger` ist das Feld, an dem die ganze Lifecycle-Auswertung haengt; ein leeres `marktstart` schaltet die Nachfolger-Analyse fuer dieses Geraet ab (ein geratenes Datum waere schlimmer) |
 | `config/newsletter.yaml` | **Der Katalog der Anmeldeseite**: die vier Filterachsen und die Grenzen. Sein Kopf trägt die Verknüpfungsregel ausgeschrieben — UND zwischen den Dimensionen, ODER innerhalb, **leer heißt ALLES**, Stichwörter additiv. Ein umbenannter `key` ist ein stillschweigend gelöschter Filter in bestehenden Abos |
-| `content/legal/*.md` | Impressum und Datenschutzerklärung als Text, getrennt vom Code. `{{ANSCHRIFT}}` ist eine **offene Stelle**, die auf der Seite sichtbar wird und die Newsletter-Schwelle geschlossen hält |
+| `content/legal/*.md` | Impressum und Datenschutzerklärung als Text, getrennt vom Code. Ein Platzhalter `{{...}}` ist eine **offene Stelle**, die auf der Seite sichtbar wird und die Newsletter-Schwelle geschlossen hält. Seit 12.08.2026 ist keiner mehr offen — `tests/test_newsletter_seite.py` hält das gegen die echten Dateien |
 | `content/consent_texts/<datum>.md` | Die Fassungen des Einwilligungstextes. Der Hash landet im Abo-Datensatz — eine Aufsichtsbehörde fragt nach dem Wortlaut von DAMALS, nicht dem von heute |
 | `mail_repo/` | **Kein laufender Code**, sondern der Inhalt der zwei privaten Repos (`telco-radar-mail`, `telco-radar-inbox`) samt Einrichtungsanleitung. Die Workflows dort enthalten keine Logik; sie checken dieses Repo aus |
 | `config/farben.yaml` | Farbschreibweise -> kanonische Farbe. Eine unbekannte Farbe wird BEHALTEN und nicht geraten; der Farbbericht am Fuss von `/geraete.html` ist die Arbeitsliste fuer diese Datei |
@@ -594,9 +594,22 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > Aussagekraft geht, sondern um Art. 13 DSGVO: die Information ist zum
 > ZEITPUNKT der Erhebung fällig, nicht irgendwann. Unterhalb der Schwelle
 > wird die Seite gebaut, nennt ihre Lücke, hat einen abgeschalteten
-> Absendeknopf und keinen Navigationseintrag. **Im Moment ist sie AUS** — es
-> fehlt die ladungsfähige Anschrift, und die kann diese Codebasis nicht
-> wissen.
+> Absendeknopf und keinen Navigationseintrag. **Seit dem 12.08.2026 ist sie
+> AN**: Antonio hat die ladungsfähige Anschrift geliefert (`c/o Vodafone
+> GmbH, Ferdinand-Braun-Platz 1, D-40549 Düsseldorf`, unter seinem Namen —
+> er bleibt Anbieter, das Portal bleibt privat betrieben). Die Navigation
+> hat damit **sechs** Einträge.
+>
+> **Die Schwelle rechnet aber nur die Rechtstexte, nicht den Dienst** — und
+> das ist Absicht (Art. 13 DSGVO, nicht Aussagekraft). Solange
+> `newsletter_dienst_url` leer ist, steht die Seite also in der Navigation
+> und kann trotzdem nichts entgegennehmen. Damit das niemanden Arbeit
+> kostet, sagt sie es **oben** (`{% elif not dienst_da %}` in
+> `newsletter.html.j2`): der Hinweis aus `app.js` sitzt am Absendeknopf und
+> stand damit bei 1918 px auf einer 2145 px hohen Seite — nach vier
+> Filtern, der E-Mail-Adresse und der abgehakten Einwilligung. Solange die
+> Seite unverlinkt war, fand sie ohnehin niemand; mit dem
+> Navigationseintrag wird der Weg begangen.
 > **Geräteseite:** **drei** Anbieter mit Daten, zwei Hersteller in der
 > Positionskarte, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
 > CODE rechnet (`geraete_view.SCHWELLE_*` und `schwelle_erreicht()`), nicht
@@ -1326,11 +1339,12 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > 4. Der Protokollabschnitt lag versehentlich in `{% if run %}` und wäre in
 >    Produktion nie aufgefallen.
 >
-> **OFFEN, und Punkt 1 blockiert alles andere:**
-> 1. **Die ladungsfähige Anschrift.** Zwei Zeilen in `content/legal/`; sie
->    steht als `{{ANSCHRIFT}}` im Text und erscheint auf der Seite als
->    sichtbare Lücke. Der eine Punkt, den nur ein Mensch schließen kann —
->    wie `config/vodafone_hebel.yaml`.
+> **OFFEN:**
+> 1. ~~**Die ladungsfähige Anschrift.**~~ **ERLEDIGT am 12.08.2026.**
+>    `c/o Vodafone GmbH, Ferdinand-Braun-Platz 1, D-40549 Düsseldorf`, unter
+>    Antonios Namen in beiden Rechtstexten. Die Schwelle steht auf `True`,
+>    die Anmeldeseite ist verlinkt. **Sie kann trotzdem noch nichts
+>    entgegennehmen** — dafür fehlt Punkt 3.
 > 2. **Der Testversand.** `.github/workflows/mail_test.yml` von Hand starten,
 >    dann `docs/mail-setup.md` §4 ausfüllen, **auch wenn es schlecht
 >    ausfällt**. Die eine Zeile, auf die es ankommt: landet die Mail im
@@ -1858,7 +1872,7 @@ entscheidet die Trefferquote nach den Läufen.
 ## 10. Offene Ideen / Roadmap
 
 - ~~E-Mail-/Teams-Versand~~ **gebaut am 08.08.2026** (`versand.py`) — Mail montags mit dem Zwei-Minuten-Pfad, Teams nur für die Ausnahme. Es fehlen nur noch die Secrets. **Nicht zu verwechseln mit dem Newsletter** (`src/telco_radar/newsletter/`, 11.08.2026): `versand.py` schickt EINE Mail an Antonio und seine Kollegin, der Newsletter einen gefilterten Anreißer an einen offenen Verteiler über Brevo.
-- ~~Newsletter mit Themenauswahl~~ **gebaut am 11.08.2026**, N1–N8 (`outputs/newsletter-2026-08-11.md`). Offen ist die Abnahme (N9) und die ladungsfähige Anschrift im Impressum — solange sie fehlt, ist die Anmeldeseite nicht verlinkt.
+- ~~Newsletter mit Themenauswahl~~ **gebaut am 11.08.2026**, N1–N8 (`outputs/newsletter-2026-08-11.md`). Offen ist die Abnahme (N9) und die Einrichtung des Signup-Dienstes. Die Anschrift steht seit 12.08.2026, die Anmeldeseite ist verlinkt.
 - Firecrawl/Crawl4AI als Fetcher für JS-Newsrooms (AT&T, Singtel, Telia, …)
 - Semantisches Dedup (Embeddings), um dieselbe Story aus mehreren Quellen zu mergen
 - Tarif-/Preisseiten-Diffing als dritte Signalebene

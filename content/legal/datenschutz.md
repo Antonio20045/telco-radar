@@ -4,8 +4,10 @@ Stand: 11. August 2026.
 
 ## 1. Verantwortlicher
 
-Antonio Fotiadis Francisco
-{{ANSCHRIFT}}
+Antonio Fotiadis Francisco  
+c/o Vodafone GmbH  
+Ferdinand-Braun-Platz 1  
+D-40549 Düsseldorf  
 E-Mail: antonio.fotiadis.francisco@gmail.com
 
 Ein Datenschutzbeauftragter ist nicht bestellt; die Voraussetzungen des

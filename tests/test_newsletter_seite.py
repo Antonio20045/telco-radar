@@ -19,21 +19,42 @@ from bs4 import BeautifulSoup
 from telco_radar.config import load_config
 from telco_radar.newsletter.config import lade_katalog
 from telco_radar.report import newsletter_seite as ns
+from telco_radar.report import rechtstexte
 from telco_radar.report.html import render_site
 
 WURZEL = Path(__file__).resolve().parents[1]
+
+
+_MUSTERANSCHRIFT = "Musterweg 1, 12345 Musterstadt"
+_PLATZHALTER = re.compile(r"\{\{[A-ZÄÖÜ_]+\}\}")
+
+
+def _rechtstexte_zustand(wurzel: Path, *, vollstaendig: bool) -> None:
+    """BEIDE Zustaende der Schwelle aktiv herstellen, keinen erben.
+
+    Frueher stellte dieses Fixture nur den vollstaendigen Fall her und liess
+    den unvollstaendigen aus den echten Dateien unter `content/legal/`
+    durchfallen - er hing daran, dass dort noch ein `{{ANSCHRIFT}}` stand.
+    Am Tag, an dem die Anschrift eingetragen wurde, kippten dadurch zwei
+    Tests, die mit der Anschrift nichts zu tun haben: der unvollstaendige
+    Zweig war gar nicht mehr herstellbar. Dieselbe Klasse wie die
+    datumsabhaengigen Tests in CLAUDE.md §6 - ein Fixture, das seinen Fall
+    nicht selbst herstellt, prueft den Zustand des Repos.
+    """
+    for datei in ("impressum.md", "datenschutz.md"):
+        pfad = wurzel / "content" / "legal" / datei
+        text = _PLATZHALTER.sub(_MUSTERANSCHRIFT,
+                                pfad.read_text(encoding="utf-8"))
+        if not vollstaendig:
+            text += "\n\nZustellanschrift: {{ANSCHRIFT}}\n"
+        pfad.write_text(text, encoding="utf-8")
 
 
 def _projekt(tmp_path, *, vollstaendig: bool, dienst: str = ""):
     """Eine Projektwurzel mit echten Configs und echten Berichten."""
     for name in ("content", "config", "data"):
         shutil.copytree(WURZEL / name, tmp_path / name)
-    if vollstaendig:
-        for datei in ("impressum.md", "datenschutz.md"):
-            pfad = tmp_path / "content" / "legal" / datei
-            pfad.write_text(pfad.read_text(encoding="utf-8").replace(
-                "{{ANSCHRIFT}}", "Musterweg 1, 12345 Musterstadt"),
-                encoding="utf-8")
+    _rechtstexte_zustand(tmp_path, vollstaendig=vollstaendig)
     cfg = load_config(tmp_path)
     cfg.settings["newsletter_dienst_url"] = dienst
     site = tmp_path / "site"
@@ -47,6 +68,40 @@ def katalog():
 
 
 # =====================================  Veroeffentlichungsschwelle  ========
+
+def test_das_fixture_stellt_beide_zustaende_wirklich_her(tmp_path):
+    """Die Zusicherung unter der Zusicherung.
+
+    Jeder Schwellentest dieser Datei glaubt dem Fixture, dass sein Fall
+    eingetreten ist. Genau das war am 12.08.2026 nicht mehr wahr: der
+    unvollstaendige Zweig erbte seine Luecke aus `content/legal/`, und mit
+    der eingetragenen Anschrift rendert das Fixture beide Male dieselbe
+    vollstaendige Seite. Ohne diesen Test faellt so etwas erst auf, wenn
+    jemand das Gegenteil behauptet und der Test trotzdem gruen bleibt.
+    """
+    for name in ("content", "config", "data"):
+        shutil.copytree(WURZEL / name, tmp_path / name)
+
+    _rechtstexte_zustand(tmp_path, vollstaendig=True)
+    assert rechtstexte.vollstaendig(tmp_path) is True
+    assert rechtstexte.offene_stellen(tmp_path) == []
+
+    _rechtstexte_zustand(tmp_path, vollstaendig=False)
+    assert rechtstexte.vollstaendig(tmp_path) is False
+    assert ("impressum", "ANSCHRIFT") in rechtstexte.offene_stellen(tmp_path)
+    assert ("datenschutz", "ANSCHRIFT") in rechtstexte.offene_stellen(tmp_path)
+
+
+def test_die_echten_rechtstexte_trage_keine_offene_stelle():
+    """Die ausgelieferten Texte, nicht eine Fixture-Kopie.
+
+    Diese Zeile ist der Schalter fuer den Navigationseintrag: steht hier
+    wieder ein Platzhalter, nimmt die Seite still keine Adressen mehr
+    entgegen. Ein Test, der nur tmp_path prueft, saehe das nie.
+    """
+    assert rechtstexte.offene_stellen(WURZEL) == []
+    assert rechtstexte.vollstaendig(WURZEL) is True
+
 
 def test_ohne_vollstaendiges_impressum_kein_nav_eintrag(tmp_path):
     """Art. 13 DSGVO verlangt die Information ZUM ZEITPUNKT der Erhebung.
@@ -100,6 +155,42 @@ def test_ohne_dienst_url_kann_die_seite_nichts_absenden(tmp_path):
                         .select_one("#nl-config").text)
     assert konfig["dienst"] == ""
     assert konfig["frei"] is True
+
+
+def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path):
+    """Nicht nur DASS es dasteht, sondern WO.
+
+    Bis zum 12.08.2026 kam dieser Hinweis allein aus `app.js` und stand
+    damit unter dem Absendeknopf - gemessen bei 1918 px auf einer 2145 px
+    hohen Seite. Wer der Navigation folgte, hatte vier Filter gewaehlt,
+    seine Adresse getippt und die Einwilligung abgehakt, bevor er las, dass
+    nichts davon ankommt. Solange die Rechtstexte unvollstaendig waren, fand
+    die Seite ohnehin niemand; mit der eingetragenen Anschrift steht sie in
+    der Navigation, und der Weg wird begangen.
+    """
+    site = _projekt(tmp_path, vollstaendig=True, dienst="")
+    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    kasten = soup.select_one(".nl-gesperrt")
+    assert kasten is not None, "kein Hinweis auf den fehlenden Dienst"
+    assert "noch nicht möglich" in kasten.get_text()
+    # Der Kasten steht VOR dem Formular - im Dokument und damit auf der Seite.
+    reihenfolge = [t.name for t in soup.select(".nl-gesperrt, form#nl-form")]
+    assert reihenfolge and reihenfolge[0] == "div", reihenfolge
+    # Und er beschreibt den richtigen Grund: die Rechtstexte sind vollstaendig.
+    assert "Impressum" not in kasten.get_text()
+
+
+def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path):
+    """Die Gegenprobe - ohne sie belegt der Test oben nur, dass der Kasten
+    IMMER dasteht."""
+    site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
+    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    # Der Kasten im <noscript> beschreibt einen anderen Fall und bleibt.
+    ausserhalb = [k for k in soup.select(".nl-gesperrt")
+                  if not k.find_parent("noscript")]
+    assert ausserhalb == []
 
 
 # ================================================  Inhalt des Formulars  ===

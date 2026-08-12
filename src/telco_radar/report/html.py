@@ -1511,18 +1511,28 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         nl_katalog = None
     if nl_katalog is not None:
         fassung = rechtstexte_mod.aktuelle_einwilligung(_wurzel)
+        # Zwei UNABHAENGIGE Bedingungen sperren diese Seite, und der Leser
+        # muss beide OBEN erfahren. Der Hinweis auf den fehlenden Dienst kam
+        # bis zum 12.08.2026 nur aus app.js - und landete damit unter dem
+        # Absendeknopf, am Fuss einer 2145 px hohen Seite. Wer der Navigation
+        # folgte, waehlte vier Filter, tippte seine Adresse ein und hakte die
+        # Einwilligung ab, bevor er las, dass nichts davon ankommt. Solange
+        # die Rechtstexte unvollstaendig waren, fiel das niemandem auf: ohne
+        # Navigationseintrag fand die Seite ohnehin niemand.
+        nl_dienst_url = (cfg.settings.get("newsletter_dienst_url", "")
+                         if cfg is not None else "")
         (site_dir / "newsletter.html").write_text(
             env.get_template("newsletter.html.j2").render(
                 prefix="", active="newsletter",
                 dimensionen=nl_seite.dimensionen(nl_katalog),
                 grenzen=nl_katalog.grenzen,
+                dienst_da=bool(nl_dienst_url),
                 einwilligung_absaetze=nl_seite.einwilligung_absaetze(
                     fassung.text if fassung else ""),
                 einwilligung_version=fassung.version if fassung else "—",
                 nl_config=nl_seite.konfiguration(
                     nl_katalog,
-                    dienst_url=(cfg.settings.get("newsletter_dienst_url", "")
-                                if cfg is not None else ""),
+                    dienst_url=nl_dienst_url,
                     frei=env.globals["newsletter_verlinkt"])),
             encoding="utf-8")
         for name, (titel, text, weiter) in nl_seite.abschlussseiten().items():

@@ -35,6 +35,17 @@
     sie darf hier keine E-Mail-Adresse entgegengenommen werden. Was fehlt,
     steht auf der <a href="{{ prefix }}impressum.html">Impressumsseite</a>.
   </div>
+  {% elif not dienst_da %}
+  {# Die zweite Sperre, und sie hat einen ANDEREN Grund: die Rechtstexte
+     stehen, aber der Anmeldedienst ist nicht eingerichtet. app.js sagt das
+     ohnehin - nur unten am Absendeknopf, also erst nach dem ausgefuellten
+     Formular. Hier oben kostet es den Leser nichts. #}
+  <div class="nl-gesperrt">
+    <strong>Die Anmeldung ist noch nicht möglich.</strong>
+    Der Dienst, der die Anmeldungen entgegennimmt, ist noch nicht
+    eingerichtet. Das Formular unten zeigt, was einstellbar sein wird, nimmt
+    aber noch keine Adresse entgegen.
+  </div>
   {% endif %}
 
   <form id="nl-form" class="nl-form" novalidate
