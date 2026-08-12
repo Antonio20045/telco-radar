@@ -222,10 +222,33 @@ def _browser():
     return None
 
 
+def _index_zum_stichtag(tmp_path, site):
+    """Den Index auf den TAG DER JUENGSTEN AUSGABE stellen.
+
+    `render_site()` rechnet mit `date.today()`, und die Berichte im Repo
+    altern: dreissig Tage nach dem letzten Lauf faende die Vorschau in einem
+    frischen Checkout null Meldungen, und dieser Test fiele durch, ohne dass
+    sich eine Zeile Code geaendert haette. Ein Test, dessen Ergebnis von der
+    Wanduhr abhaengt, meldet nicht den naechsten Umbau, sondern die naechste
+    Mitternacht - am 12.08.2026 ist genau das in
+    `test_newsletter_versand.py` passiert.
+    """
+    from datetime import date
+    from telco_radar.newsletter.filters import baue_stichwort_index
+    reports = tmp_path / "data" / "reports"
+    daten = sorted(f.stem for f in reports.glob("*.json")
+                   if re.fullmatch(r"\d{4}-\d{2}-\d{2}", f.stem))
+    assert daten, "keine Berichte - der Test prueft sonst nichts"
+    stand = date.fromisoformat(daten[-1])
+    index = baue_stichwort_index(reports, tage=30, heute=stand)
+    (site / "data" / "keyword-index.json").write_text(
+        json.dumps(index, ensure_ascii=False), encoding="utf-8")
+    return index, reports, stand
+
+
 def test_der_index_liegt_neben_der_seite(tmp_path):
     site = _projekt(tmp_path, vollstaendig=True)
-    index = json.loads(
-        (site / "data" / "keyword-index.json").read_text(encoding="utf-8"))
+    index, _reports, _stand = _index_zum_stichtag(tmp_path, site)
     assert index["woerter"] and index["meldungen"] > 0
     # Das Formular zeigt auf genau diesen relativen Pfad.
     assert "data/keyword-index.json" in (site / "app.js").read_text(encoding="utf-8")
@@ -247,9 +270,7 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
     from telco_radar.newsletter.filters import vorschau
 
     site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
-    reports = tmp_path / "data" / "reports"
-    index = json.loads(
-        (site / "data" / "keyword-index.json").read_text(encoding="utf-8"))
+    index, reports, stand = _index_zum_stichtag(tmp_path, site)
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=pfad)
@@ -265,8 +286,6 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
                }""", [index, begriff, 4])
         browser.close()
 
-    from datetime import date
-    stand = date.fromisoformat(index["stand"])
     in_python = vorschau(begriff, reports, tage=index["tage"], heute=stand)
     assert im_browser == in_python, (
         f"{begriff}: Browser {im_browser}, Python {in_python}")
@@ -275,11 +294,8 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
 def test_wenigstens_ein_begriff_trifft_ueberhaupt(tmp_path):
     """Ohne diese Gegenprobe bestuende der Test oben auch dann, wenn beide
     Seiten konsequent null zaehlen."""
-    from datetime import date
     from telco_radar.newsletter.filters import vorschau
     site = _projekt(tmp_path, vollstaendig=True)
-    index = json.loads(
-        (site / "data" / "keyword-index.json").read_text(encoding="utf-8"))
-    treffer = vorschau("telekom", tmp_path / "data" / "reports",
-                       tage=index["tage"], heute=date.fromisoformat(index["stand"]))
+    index, reports, stand = _index_zum_stichtag(tmp_path, site)
+    treffer = vorschau("telekom", reports, tage=index["tage"], heute=stand)
     assert treffer > 0, "der Vergleichstest prueft sonst nur Nullen"

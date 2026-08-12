@@ -368,7 +368,14 @@ def test_der_abstand_zum_limit_wird_zurueckgegeben(tmp_path):
 
 
 def test_der_waechter_laeuft_vor_der_ersten_zustellung(tmp_path):
-    """Sonst waere der Abbruch selbst ein Teilversand."""
+    """Sonst waere der Abbruch selbst ein Teilversand.
+
+    `heute` wird ausdruecklich mitgegeben. Ohne das haengt der Test an der
+    Wanduhr: `heute_versendet()` zaehlt den ZUSTELLTAG, und am 12.08.2026
+    zaehlten die 279 Eintraege vom 11. nicht mehr mit - der Test fiel durch,
+    ohne dass sich eine Zeile Code geaendert hatte. Ein Test, dessen Ergebnis
+    vom Datum abhaengt, meldet nicht den naechsten Umbau, sondern das
+    naechste Mitternacht."""
     log_pfad = tmp_path / "send_log.jsonl"
     st.schreibe_jsonl(log_pfad, [
         {"key": f"k{i}", "status": "gesendet", "at": "2026-08-11T09:00:00Z"}
@@ -378,7 +385,8 @@ def test_der_waechter_laeuft_vor_der_ersten_zustellung(tmp_path):
     with pytest.raises(v.LimitGerissen):
         v.versende(plan, {"h": _nachricht()},
                    {i: f"{i}@t.test" for i in "abc"}, transport,
-                   log_pfad=log_pfad, datum="2026-08-11", rate_je_minute=0)
+                   log_pfad=log_pfad, datum="2026-08-11",
+                   heute="2026-08-11", rate_je_minute=0)
     assert transport.versendet == []
 
 

@@ -143,6 +143,18 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
                (report/folien.py) - feste Vorlage, harte Zeichengrenzen
 6. VERSAND   Montags der Zwei-Minuten-Pfad per Mail, Teams nur fuer die
              Ausnahme (versand.py; State: data/state/versand.json)
+7. NEWSLETTER Ein AUSSPIELKANAL, kein vierter Anwendungsfall - und er laeuft
+             NICHT in diesem Job. radar.yml schickt am Ende nur ein
+             repository_dispatch (Datum + Commit-SHA, continue-on-error) an
+             ein leeres Inbox-Repo; Versand und Abonnentenliste liegen im
+             privaten Repo telco-radar-mail (Buendel in mail_repo/). Der
+             Radar-Lauf lag am 6.8. bei 27,4 von 35 Minuten - ein
+             gedrosselter Versand an 200 Empfaenger dauert allein sieben,
+             und dann faellt nicht der Newsletter aus, sondern der BERICHT.
+             Die LOGIK steht trotzdem hier (src/telco_radar/newsletter/,
+             scripts/newsletter/): eine Kopie der Filter-Engine im privaten
+             Repo wuerde driften, und dann schickt die Mail etwas anderes,
+             als die Website zeigt.
 ```
 
 Wichtige Dateien:
@@ -164,6 +176,10 @@ Wichtige Dateien:
 | `config/ct_domains.yaml` | Domains des CT-Radars plus die Rauschmuster. Verglichen wird LABELWEISE, nie als Teilkette |
 | `config/geraete_quellen.yaml` | **23 beobachtete Anbieter** des Geraeteradars in drei Ebenen (Handel / Netzbetreiber / Discount). Jede Zeile ist gemessen, nicht geraten: `methode` und `grund` geben das Messergebnis vom 10.08.2026 wieder. Ein Anbieter ohne Adapter steht mit seinem Grund da und verschwindet NICHT |
 | `config/geraete_katalog.yaml` | Die **verfolgten Modelle** - nicht der Markt. `vorgaenger` ist das Feld, an dem die ganze Lifecycle-Auswertung haengt; ein leeres `marktstart` schaltet die Nachfolger-Analyse fuer dieses Geraet ab (ein geratenes Datum waere schlimmer) |
+| `config/newsletter.yaml` | **Der Katalog der Anmeldeseite**: die vier Filterachsen und die Grenzen. Sein Kopf trägt die Verknüpfungsregel ausgeschrieben — UND zwischen den Dimensionen, ODER innerhalb, **leer heißt ALLES**, Stichwörter additiv. Ein umbenannter `key` ist ein stillschweigend gelöschter Filter in bestehenden Abos |
+| `content/legal/*.md` | Impressum und Datenschutzerklärung als Text, getrennt vom Code. `{{ANSCHRIFT}}` ist eine **offene Stelle**, die auf der Seite sichtbar wird und die Newsletter-Schwelle geschlossen hält |
+| `content/consent_texts/<datum>.md` | Die Fassungen des Einwilligungstextes. Der Hash landet im Abo-Datensatz — eine Aufsichtsbehörde fragt nach dem Wortlaut von DAMALS, nicht dem von heute |
+| `mail_repo/` | **Kein laufender Code**, sondern der Inhalt der zwei privaten Repos (`telco-radar-mail`, `telco-radar-inbox`) samt Einrichtungsanleitung. Die Workflows dort enthalten keine Logik; sie checken dieses Repo aus |
 | `config/farben.yaml` | Farbschreibweise -> kanonische Farbe. Eine unbekannte Farbe wird BEHALTEN und nicht geraten; der Farbbericht am Fuss von `/geraete.html` ist die Arbeitsliste fuer diese Datei |
 | `data/state/geraete_db.json` | Aktueller Stand je Listung, mit Zwei-Stufen-Auslistung wie `promo_db.json`. Nichts wird geloescht - genau daraus entsteht die Listungsdauer |
 | `data/state/geraete_preise.jsonl` | NUR die Aenderungspunkte des Preises. Ein unveraenderter Preis schreibt keine Zeile; die rechte Kante jeder Kurve ist `last_verified` in der DB |
@@ -277,7 +293,10 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
 | `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
-| `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala |
+| `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala; seit 11.08.2026 der **Newsletter-Abschnitt** (nur Zahlen, Warnung ab 80 % des Tageskontingents) |
+| `newsletter.html` **Newsletter** (nicht verlinkt) | „Schick mir das per Mail" | Vier Filterachsen plus eigene Stichwörter mit Trefferzahl-Vorschau, Einwilligungstext im Wortlaut. **Verlinkt erst, wenn Impressum und Datenschutzerklärung vollständig sind** — siehe Veröffentlichungsschwelle |
+| `newsletter-bestaetigt.html` / `-abgemeldet.html` (nicht verlinkt) | „Hat es geklappt?" | Zwei **statische** Seiten ohne den Signup-Dienst. Render Free schläft nach 15 Minuten; wer im kalten Zustand auf den Abmeldelink klickt, darf nicht vor einem Spinner stehen — und es ist der EINZIGE Abmeldeweg |
+| `impressum.html` / `datenschutz.html` | „Wer ist das, und was passiert mit meiner Adresse?" | Aus `content/legal/*.md` über `report/rechtstexte.py`. Eine offene Stelle im Text (`{{ANSCHRIFT}}`) steht sichtbar OBEN auf der Seite und hält die Newsletter-Schwelle geschlossen |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
 **Die Positionskarte des Geräteradars ist am 11.08.2026 neu gebaut worden**
@@ -569,6 +588,15 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > **Tarifseite:** mindestens drei Anbieter, zwölf Mobilfunktarife, ein
 > Tarif mit echter Rabattphase.
 > **Lieferzeitseite:** Telekom, o2 und 1&1 erfasst.
+> **Newsletter-Seite:** Impressum **und** Datenschutzerklärung vollständig,
+> also ohne offenen Platzhalter (`rechtstexte.vollstaendig()`). Die zweite
+> Schwelle, die der CODE rechnet, und die einzige, bei der es nicht um
+> Aussagekraft geht, sondern um Art. 13 DSGVO: die Information ist zum
+> ZEITPUNKT der Erhebung fällig, nicht irgendwann. Unterhalb der Schwelle
+> wird die Seite gebaut, nennt ihre Lücke, hat einen abgeschalteten
+> Absendeknopf und keinen Navigationseintrag. **Im Moment ist sie AUS** — es
+> fehlt die ladungsfähige Anschrift, und die kann diese Codebasis nicht
+> wissen.
 > **Geräteseite:** **drei** Anbieter mit Daten, zwei Hersteller in der
 > Positionskarte, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
 > CODE rechnet (`geraete_view.SCHWELLE_*` und `schwelle_erreicht()`), nicht
@@ -901,6 +929,16 @@ Website spricht.
   (6) `_strip_vodafone_advice` löschte ganze Absätze samt Fakten.
   **`tests/test_seiten_zahlen.py` ist die Gegenmaßnahme — jede neue Zahl auf
   einer Seite gehört dort hinein.**
+- **Ein Test, dessen Ergebnis vom Datum abhängt, meldet die nächste
+  Mitternacht statt den nächsten Umbau.** Am 12.08.2026 fiel
+  `test_der_waechter_laeuft_vor_der_ersten_zustellung` durch, ohne dass sich
+  eine Zeile geändert hatte: die 279 Sendeprotokoll-Einträge trugen den 11.,
+  und `heute_versendet()` zählt zu Recht den ZUSTELLTAG. Zwei
+  Vorschau-Tests hatten dieselbe Zeitbombe — sie messen die letzten 30 Tage
+  gegen die Berichte im Repo, und dreißig Tage nach dem letzten Lauf fände
+  ein frischer Checkout dort nichts. **Jede Funktion dieses Projekts, die
+  `date.today()` kennt, nimmt deshalb ein `heute=` entgegen; ein Test, der
+  es nicht mitgibt, prüft die Uhr.**
 - **Ein Test, dessen Lookup ins Leere geht, ist grün und prüft nichts.** Am
   09.08.2026 verglich ein neuer Test die Reihenfolge der Startseite gegen die
   Berichtsdatei — geschlüsselt auf `schlagzeile`. Das Feld gibt es dort nicht:
@@ -1139,6 +1177,42 @@ Website spricht.
   Extraktionskaskade des Projekts gibt für alle drei null Sätze zurück. Wer
   `grep -c 'ld+json'` als Machbarkeitsprüfung nimmt, plant einen Adapter, der
   nichts findet.
+- **Der Satztrenner zerbricht an deutschen Datumsangaben.** „Aktion gültig bis
+  12. September" wurde zu „Aktion gültig bis 12." — Punkt, Leerzeichen,
+  Großbuchstabe sieht wie ein Satzende aus. Behoben in
+  `textwerkzeug._geschuetzt()`, aber der Fall zeigt die Klasse: `saetze()`
+  trägt auch `_strip_vodafone_advice` im Wochenbericht, dort fällt dann eine
+  Satzhälfte als vermeintlicher Rat weg. Geschützt wird **nur vor einem
+  Monatsnamen** — „Die Zahl stieg auf 12. Vodafone reagierte." ist ein echtes
+  Satzende, und eine Regel, die es verschluckt, wäre die teurere.
+- **Zwei Rechnungen für dieselbe Zahl sind zwei Zahlen.** Die
+  Stichwort-Vorschau zählt im BROWSER gegen `site/data/keyword-index.json`,
+  `filters.vorschau()` zählt in Python. Am 11.08.2026 sagte der Browser für
+  „tarif" 6 und Python 13: der Index tokenisierte mit
+  `textwerkzeug.wortmenge()`, das den Bindestrich INNERHALB eines Wortes
+  zulässt („Tarif-Rabatt" = ein Wort), während der Stichwort-Matcher ihn als
+  Wortgrenze behandelt (damit „Netzausbau" in „Glasfaser-Netzausbau" trifft).
+  Der Index hat deshalb einen eigenen Tokenizer. **Und der Test dagegen läuft
+  im echten Chromium** — hätte er die Browser-Rechnung in Python nachgebaut,
+  wäre er grün geblieben.
+- **Die 24-Stunden-Sperre des Newsletters liegt im Workflow, nicht im
+  Signup-Dienst.** Dessen IP-Zähler liegt im Arbeitsspeicher, und Render Free
+  fährt die Instanz nach 15 Minuten herunter: nach jedem Spin-down und jedem
+  Deploy ist er leer. Wer den Mailbomben-Schutz dort einbaut, baut ihn an der
+  einzigen Stelle ein, an der er sicher nicht wirkt — man wartet sechzehn
+  Minuten.
+- **`git pull --rebase` kann eine `age`-verschlüsselte Datei nicht
+  zusammenführen.** Jeder Ciphertext unterscheidet sich bei jedem
+  Schreibvorgang vollständig; jeder Konflikt ist ein Binärkonflikt, und
+  „ours" oder „theirs" wirft die halbe Abonnentenliste weg. Der Weg ist:
+  entschlüsseln → auf JSONL-Zeilenebene zusammenführen → neu verschlüsseln.
+  Bei gleichem Zeitstempel gewinnt der weiter fortgeschrittene Zustand, sonst
+  hängt ein Widerruf davon ab, welcher Workflow zufällig zuerst gepusht hat.
+- **Ein `<legend>` sitzt per Voreinstellung IN der Rahmenlinie seines
+  Fieldsets.** Ein `border-top` auf dem Fieldset läuft deshalb durch die
+  Überschrift hindurch — im ersten Screenshot der Anmeldeseite war jede
+  Rubrik durchgestrichen. Die Rubrikleiste gehört an die Legende. Die einzige
+  Stelle im ganzen Stylesheet, an der das vorkommt.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -1189,7 +1263,76 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (11.08.2026, Antonio direkt): die Nachbesserung nach der
+> **Zuletzt erledigt (11.08.2026, Antonio direkt): der Newsletter, N1–N8.**
+> Grundlage ist `claude/newsletter-konzept-2026-08-11.md` (liegt jetzt im
+> Repo — zweimal war die Auftragsgrundlage vorher nicht auffindbar).
+> Stand danach: **1647 Tests** (vorher 1416), `pruefe_portal.py`
+> **16 bestanden / 0 durchgefallen / 0 übersprungen**. Vollständige
+> Schlussliste mit allen Messungen: `outputs/newsletter-2026-08-11.md`.
+>
+> **Der Newsletter ist ein AUSSPIELKANAL, kein vierter Anwendungsfall.** Drei
+> Regeln tragen ihn, alle drei im Test: keine neuen Inhalte (jeder
+> inhaltstragende Block der Mail muss als Teilstring im Bericht-JSON stehen),
+> kein Modellaufruf im Versandpfad, und die Mail ist ein Anreißer mit
+> höchstens acht Einträgen — Ziel jeder Ausgabe ist der Klick auf die Seite.
+>
+> **Er schaltet sich selbst frei, und im Moment ist er AUS.**
+> `rechtstexte.vollstaendig()` rechnet die Schwelle, `render_site()` setzt
+> daraus `newsletter_verlinkt`. Ohne vollständiges Impressum steht die Seite
+> da, sagt sichtbar warum sie gesperrt ist, hat einen abgeschalteten
+> Absendeknopf und keinen Navigationseintrag — Art. 13 DSGVO verlangt die
+> Information zum ZEITPUNKT der Erhebung. Dieselbe Mechanik wie bei
+> „Geräte" und aus demselben Grund im CODE statt in einem Test.
+>
+> | Baustein | Wo | Die eine Regel, die ihn trägt |
+> |---|---|---|
+> | **Filter-Engine** | `newsletter/filters.py`, `config/newsletter.yaml` | UND zwischen den Dimensionen, ODER innerhalb, **leer heißt ALLES**, Stichwörter additiv und im Ergebnis begründet |
+> | **Stichwörter** | dieselbe Datei | Im Fachpresse-Tagging hält eine gepflegte Blockliste gegen `spark`/`tim`/`globe` — hier tippt der Abonnent. Vier Zeichen Mindestlänge, Wortgrenzen, nur Titel und Zusammenfassung, Trefferzahl-Vorschau VOR dem Absenden |
+> | **Segmente** | `newsletter/segments.py` | Der `segment_hash` ist die Hälfte des Idempotenzschlüssels. Ändert er sich ohne Änderung der Auswahl, hält ein Wiederanlauf seinen eigenen Sendeplan für einen fremden |
+> | **Mail-Renderer** | `newsletter/render.py`, `templates/mail/` | Inhaltstragende Blöcke müssen im Bericht stehen, Rahmentexte kommen aus `chrome.yaml` — die Allowlist des Treue-Tests. Ohne diese Trennung ist der Test nicht erfüllbar |
+> | **Signup-Dienst** | `service/signup/` | **Speichert nichts, verschickt nichts.** Alle Angaben reisen signiert im Bestätigungslink; wer nie bestätigt, hinterlässt keine Daten |
+> | **Abo-Store** | `newsletter/store.py`, `mail_repo/` | Die Logik hier, die DATEN im privaten Repo. Eine Kopie der Filter-Engine dort würde driften |
+> | **Versand** | `newsletter/versand.py` | Idempotenz dreistufig; „gesendet, Log-Schreiben fehlgeschlagen" gilt als GESENDET — im Zweifel eine Mail zu wenig |
+> | **Limit-Wächter** | dieselbe Datei | 300/Tag ist die **Verteilerobergrenze**, nicht eine ferne Grenze. Gezählt wird geplant PLUS heute schon versendet |
+> | **Protokoll** | `report/newsletter_protokoll.py` | Auf `transparenz.html`, nicht in einem eigenen Dashboard — nach acht Wochen geht dorthin niemand mehr. Nur Zahlen |
+>
+> **Vier Befunde, die erst beim Messen kamen** (Einzelheiten in der
+> Schlussliste):
+> 1. **Der Satztrenner zerreißt deutsche Datumsangaben.** „gültig bis
+>    12. September" wurde zu „gültig bis 12." — ein VORBESTEHENDER Fehler in
+>    `textwerkzeug.saetze()`, der damit auch `_strip_vodafone_advice` im
+>    Wochenbericht trifft. An der Wurzel behoben, geschützt bewusst nur vor
+>    einem Monatsnamen.
+> 2. **Browser und Python zählten die Stichwort-Vorschau verschieden**
+>    (`tarif`: 6 gegen 13). Der Index tokenisierte mit `wortmenge()`, das den
+>    Bindestrich im Wort zulässt; der Matcher behandelt ihn als Grenze. Der
+>    Index hat jetzt einen eigenen Tokenizer, und vier Begriffe werden im
+>    echten Chromium gegen Python gehalten.
+> 3. **„Ihr Stichwort: Starlink" stand viermal untereinander** — jetzt nennt
+>    nur der erste einer Folge sein Stichwort.
+> 4. Der Protokollabschnitt lag versehentlich in `{% if run %}` und wäre in
+>    Produktion nie aufgefallen.
+>
+> **OFFEN, und Punkt 1 blockiert alles andere:**
+> 1. **Die ladungsfähige Anschrift.** Zwei Zeilen in `content/legal/`; sie
+>    steht als `{{ANSCHRIFT}}` im Text und erscheint auf der Seite als
+>    sichtbare Lücke. Der eine Punkt, den nur ein Mensch schließen kann —
+>    wie `config/vodafone_hebel.yaml`.
+> 2. **Der Testversand.** `.github/workflows/mail_test.yml` von Hand starten,
+>    dann `docs/mail-setup.md` §4 ausfüllen, **auch wenn es schlecht
+>    ausfällt**. Die eine Zeile, auf die es ankommt: landet die Mail im
+>    FIRMENpostfach im Posteingang oder im Spam? Ohne eigene Domain fehlt das
+>    DMARC-Alignment; das ist der dauerhafte Zustand, kein Bug.
+> 3. **Die drei Repositories und der Render-Dienst** nach
+>    `mail_repo/README.md`. `SIGNUP_TOKEN_KEY` und `SIGNUP_PEPPER` müssen im
+>    Dienst und im privaten Repo IDENTISCH sein.
+> 4. **Der Versand ist noch nie gegen die echte Brevo-API gelaufen**, und die
+>    Events-API hat noch nie ein echtes Ereignis geliefert.
+> 5. **Die Mail ist in keinem echten Client gesehen worden.** Gemessen sind
+>    Chromium auf 700 und 390 px; N9 verlangt Outlook, Gmail-Web und ein
+>    Telefon. `outputs/mail-preview/` liegt bereit.
+
+> **Davor erledigt (11.08.2026, Antonio direkt): die Nachbesserung nach der
 > Evaluation der Geräteseite.** Die Grundlage war ein Evaluationsdokument zur
 > ersten Lieferung. Stand danach: **1411 Tests** (vorher 1398),
 > `pruefe_portal.py` **15 bestanden / 0 durchgefallen / 0 übersprungen**.
@@ -1701,7 +1844,8 @@ entscheidet die Trefferquote nach den Läufen.
 
 ## 10. Offene Ideen / Roadmap
 
-- ~~E-Mail-/Teams-Versand~~ **gebaut am 08.08.2026** (`versand.py`) — Mail montags mit dem Zwei-Minuten-Pfad, Teams nur für die Ausnahme. Es fehlen nur noch die Secrets.
+- ~~E-Mail-/Teams-Versand~~ **gebaut am 08.08.2026** (`versand.py`) — Mail montags mit dem Zwei-Minuten-Pfad, Teams nur für die Ausnahme. Es fehlen nur noch die Secrets. **Nicht zu verwechseln mit dem Newsletter** (`src/telco_radar/newsletter/`, 11.08.2026): `versand.py` schickt EINE Mail an Antonio und seine Kollegin, der Newsletter einen gefilterten Anreißer an einen offenen Verteiler über Brevo.
+- ~~Newsletter mit Themenauswahl~~ **gebaut am 11.08.2026**, N1–N8 (`outputs/newsletter-2026-08-11.md`). Offen ist die Abnahme (N9) und die ladungsfähige Anschrift im Impressum — solange sie fehlt, ist die Anmeldeseite nicht verlinkt.
 - Firecrawl/Crawl4AI als Fetcher für JS-Newsrooms (AT&T, Singtel, Telia, …)
 - Semantisches Dedup (Embeddings), um dieselbe Story aus mehreren Quellen zu mergen
 - Tarif-/Preisseiten-Diffing als dritte Signalebene
