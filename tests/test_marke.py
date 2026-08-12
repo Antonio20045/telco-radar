@@ -21,6 +21,8 @@ Test kann sie nicht sehen.
 """
 import re
 
+import pytest
+
 from telco_radar.report.html import render_site
 
 MARKE = "Vodafone Product and Services Insights"
@@ -142,3 +144,100 @@ def test_kein_alter_name_mehr_in_den_vorlagen():
         for treffer in re.finditer(r"Vodafone Insights", text):
             reste.append(f"{datei.name}:{text[:treffer.start()].count(chr(10)) + 1}")
     assert not reste, f"alter Name uebrig: {reste}"
+
+
+# ==========================================  Der Kopf und die Schriftbreite ==
+# Der teuerste Fehler dieser Kopfleiste ist nicht, dass sie zu breit ist -
+# sondern dass ihre Breite gegen EINE Schrift kalibriert war.
+
+def _chromium():
+    import os
+    for kandidat in ("/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+                     os.path.expanduser(
+                         "~/.cache/ms-playwright/chromium-1194/chrome-linux/chrome"),
+                     os.environ.get("CHROMIUM_PFAD", "")):
+        if kandidat and os.path.exists(kandidat):
+            return kandidat
+    return None
+
+
+def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path):
+    """Die Regressionsprobe zu CI-Lauf #159.
+
+    Bis zum 12.08.2026 trug `.brand-name` auch auf dem Telefon
+    `white-space:nowrap`, und die Passgenauigkeit haengte an einer gemessenen
+    Zahl: 307 px bei 390 px Bildbreite. Gemessen war sie allerdings in einer
+    Sandbox, in der Google Fonts nicht laden - es war die Breite der
+    RUECKFALLSCHRIFT. In GitHub Actions laedt die echte Source Serif 4, sie
+    ist breiter, und die Geraeteseiten liefen waagerecht aus dem Bild.
+
+    Dieser Test misst deshalb nicht eine Breite, sondern eine EIGENSCHAFT:
+    der Kopf darf auch dann nicht ueberlaufen, wenn der Name deutlich
+    breiter rendert als heute. Simuliert wird das mit `letter-spacing` -
+    unabhaengig davon, welche Schrift die Testmaschine wirklich bekommt.
+    Ein Test, der die echte Schrift braeuchte, waere in der Sandbox gruen und
+    in CI rot, also genau so viel wert wie keiner.
+    """
+    import contextlib
+    import functools
+    import http.server
+    import socket
+    import threading
+
+    pytest.importorskip("playwright.sync_api")
+    from playwright.sync_api import sync_playwright
+
+    exe = _chromium()
+    if exe is None:
+        pytest.skip("kein Chromium gefunden")
+
+    site_dir = _site(tmp_path)
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
+                                directory=str(site_dir))
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    gemessen = {}
+    try:
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(
+                executable_path=exe,
+                args=["--no-sandbox", "--disable-dev-shm-usage"])
+            for aufschlag in (0, 1.2, 3.0):
+                page = browser.new_page(viewport={"width": 390, "height": 844})
+                page.goto(f"http://127.0.0.1:{port}/index.html")
+                # Der Aufschlag macht den Namen breiter, ohne eine bestimmte
+                # Schrift vorauszusetzen. 3 px je Zeichen sind rund 40 % mehr
+                # Breite - deutlich mehr, als eine Serife gegenueber ihrer
+                # Rueckfallschrift ausmacht.
+                page.add_style_tag(content=(
+                    f".brand-name{{letter-spacing:{aufschlag}px}}"))
+                page.wait_for_timeout(120)
+                gemessen[aufschlag] = page.evaluate(
+                    """() => ({
+                         doc: document.documentElement.scrollWidth,
+                         fenster: window.innerWidth,
+                         kopf: Math.ceil(
+                           document.querySelector('.brand-name')
+                                   .getBoundingClientRect().right),
+                       })""")
+                page.close()
+            browser.close()
+    finally:
+        httpd.shutdown()
+
+    schuldig = [f"+{a} px Sperrung: Seite {m['doc']} px breit bei "
+                f"{m['fenster']} px Fenster"
+                for a, m in gemessen.items() if m["doc"] > m["fenster"] + 1]
+    assert not schuldig, schuldig
+    # ... und der Kopf selbst bleibt im Bild.
+    ragt = [f"+{a} px: Kopf endet bei {m['kopf']} px"
+            for a, m in gemessen.items() if m["kopf"] > m["fenster"] + 1]
+    assert not ragt, ragt
+    # Gegenprobe: der Aufschlag hat wirklich etwas veraendert - sonst misst
+    # der Test dreimal dasselbe.
+    breiten = {m["kopf"] for m in gemessen.values()}
+    assert len(breiten) > 1, f"Aufschlag ohne Wirkung: {gemessen}"

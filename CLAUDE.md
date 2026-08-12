@@ -929,6 +929,19 @@ Website spricht.
   (6) `_strip_vodafone_advice` löschte ganze Absätze samt Fakten.
   **`tests/test_seiten_zahlen.py` ist die Gegenmaßnahme — jede neue Zahl auf
   einer Seite gehört dort hinein.**
+- **Eine Breite, die in der Sandbox gemessen wurde, ist die Breite der
+  RÜCKFALLSCHRIFT.** Google Fonts laden hier nicht, in GitHub Actions schon.
+  Der Zeitungskopf war auf 307 px bei 390 px Bildbreite kalibriert — mit
+  echter Source Serif 4 lief er waagerecht aus dem Bild, und CI-Lauf #159 auf
+  `main` fiel deshalb durch (`test_keine_seite_rollt_waagerecht`, Schuldige:
+  `.brand`, `.brand-name`, `em`, `.topbar-right`). **Eine Kalibrierung auf
+  eine Schrift ist keine Lösung, sondern eine Wette.** Der Kopf bricht auf
+  dem Telefon jetzt um (`white-space:normal`), damit seine Mindestbreite nur
+  noch am längsten Wort hängt; `min-width:0` nimmt Grid- und Flex-Kindern das
+  voreingestellte `min-width:auto`. Der Regressionstest misst deshalb keine
+  Breite, sondern eine Eigenschaft: er verbreitert den Namen per
+  `letter-spacing` und prüft, dass nichts überläuft — ein Test, der die echte
+  Schrift bräuchte, wäre hier grün und in CI rot.
 - **Ein Test, dessen Ergebnis vom Datum abhängt, meldet die nächste
   Mitternacht statt den nächsten Umbau.** Am 12.08.2026 fiel
   `test_der_waechter_laeuft_vor_der_ersten_zustellung` durch, ohne dass sich

@@ -163,7 +163,29 @@ b,strong{font-weight:700}
   .topbar-inner{grid-template-columns:1fr;justify-items:center;gap:10px;padding:14px 20px}
   .brand,.topbar-right{grid-column:1}
   .topbar-right{flex-wrap:wrap;justify-content:center}
-  .brand-name{font-size:24px}
+  /* Der Name DARF hier umbrechen - und das ist der eigentliche Fix, nicht die
+     Schriftgroesse.
+
+     Bis zum 12.08.2026 stand hier nur `font-size:24px`, und `white-space:
+     nowrap` aus der Grundregel blieb stehen. Die Breite war damit gegen eine
+     GEMESSENE Zahl kalibriert (307 px) - gemessen allerdings in einer
+     Sandbox, in der Google Fonts nicht laden. In GitHub Actions laedt die
+     echte Source Serif 4, sie ist breiter als die Rueckfallschrift, und die
+     Seite lief waagerecht aus dem Bild: CI-Lauf #159 auf `main` fiel mit
+     genau diesen vier Schuldigen durch (.brand, .brand-name, em,
+     .topbar-right).
+
+     Eine Kalibrierung auf eine Schrift ist keine Loesung, sondern eine
+     Wette. Mit `white-space:normal` haengt die Mindestbreite des Kopfes nur
+     noch am LAENGSTEN WORT ("Insights", rund 100 px) statt am ganzen Namen -
+     und damit passt er auf jedes Telefon, egal welche Serife wirklich
+     ankommt. `min-width:0` nimmt Grid- und Flex-Kindern zusaetzlich das
+     voreingestellte `min-width:auto`, mit dem sie sich weigern, unter ihre
+     Inhaltsbreite zu schrumpfen. */
+  .brand-name{font-size:24px;white-space:normal;text-align:center;
+    text-wrap:balance}
+  .brand{flex-wrap:wrap;justify-content:center;max-width:100%;min-width:0}
+  .topbar-inner > *{min-width:0;max-width:100%}
 }
 
 
