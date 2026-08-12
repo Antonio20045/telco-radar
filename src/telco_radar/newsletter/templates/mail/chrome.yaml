@@ -1,0 +1,80 @@
+# =============================================================================
+# RAHMENTEXTE DER MAIL - und der Grund, warum sie eine eigene Datei haben
+# =============================================================================
+# Die haerteste Anforderung des Newsletters lautet: kein inhaltstragender Satz
+# in der Mail darf von dem abweichen, was im Bericht-JSON steht. Ein Test
+# prueft jeden aus `items[]` stammenden Textblock als Teilstring gegen das
+# Quell-JSON.
+#
+# Dieser Test ist ohne eine Unterscheidung nicht erfuellbar. Es gibt zwei
+# Arten Text in einer Mail:
+#
+#   * INHALTSTRAGENDE Bloecke - Titel, Zusammenfassung, Absender. Sie kommen
+#     aus dem Bericht und muessen dort wortgleich wiederzufinden sein.
+#   * RAHMENTEXTE - Anrede, Kopfzeile, Abmeldehinweis, Impressumszeile, die
+#     Stichwort-Markierung, die Leermeldung. Sie stehen naturgemaess nirgends
+#     im Bericht.
+#
+# Diese Datei ist die Allowlist der zweiten Art. Sie ist versioniert, damit
+# eine Aenderung am Rahmen im Diff sichtbar ist und nicht in einer Vorlage
+# untergeht - und damit niemand auf die Idee kommt, den Treue-Test durch eine
+# grosszuegigere Regel zu "reparieren".
+#
+# WER HIER EINEN SATZ ERGAENZT, ergaenzt ihn im Test mit. Genau das ist die
+# Absicht: ein neuer Rahmensatz soll eine bewusste Entscheidung sein.
+# -----------------------------------------------------------------------------
+
+version: "2026-08-11"
+
+# Der Absender. Anzeigename bewusst neutral: ein Markenname vor einer nicht
+# zur Marke gehoerenden Adresse ist genau das Muster, auf das
+# Konzern-Gateways als Display-Name-Spoofing anschlagen.
+absender_name: "Telco Radar"
+
+kopf:
+  titel: "Telco Radar"
+  untertitel: "Marktbeobachtung Telekommunikation"
+  # {datum} wird ersetzt. Kein anderer Platzhalter.
+  ausgabe: "Ausgabe vom {datum}"
+
+anrede: "Guten Tag,"
+
+# Der eine Satz, der die Auswahl erklaert. Er steht bewusst VOR den
+# Meldungen: wer nicht weiss, warum diese acht Zeilen und keine anderen,
+# liest die erste als Zufall.
+einleitung_filter: "diese Meldungen passen zu Ihren Themen:"
+einleitung_alles: "das ist neu in der Marktbeobachtung:"
+
+# Die Markierung eines additiven Stichworttreffers. Ohne sie versteht
+# niemand, warum ein Eintrag in der Mail steht, den die uebrigen Filter
+# ausgeschlossen haetten.
+stichwort_marker: "Ihr Stichwort: {stichwort}"
+
+# Die zwei Links je Eintrag. "Quelle" fuehrt zum Original, "im Bericht" auf
+# die Website - der Klick auf die Seite ist das Ziel jeder Ausgabe.
+link_quelle: "Zur Quelle"
+link_bericht: "Im Wochenbericht"
+
+# Der Abschluss.
+schluss: "Den vollständigen Wochenbericht mit allen Meldungen finden Sie hier:"
+schluss_link: "Wochenbericht öffnen"
+
+# Die Ausgabe, die es nicht gibt. Sie wird NICHT verschickt (ein leerer
+# Newsletter erzieht zum Ignorieren) - dieser Text steht in der einen
+# monatlichen Nachricht an jemanden, bei dem seit Wochen nichts passt.
+leer_titel: "Zu Ihren Themen gab es nichts Neues"
+leer_text: >-
+  seit {seit} ist zu den von Ihnen gewählten Themen keine Meldung
+  aufgelaufen. Das ist ein Befund und keine Panne — Sie bekommen von uns
+  keine Ausgabe, in der nichts steht. Falls Ihre Auswahl zu eng ist, können
+  Sie sie hier ändern:
+leer_link: "Themen anpassen"
+
+# Der Fuss. Jede Zeile hier ist rechtlich noetig oder eine Zusicherung.
+fuss:
+  warum: "Sie erhalten diese E-Mail, weil Sie sich am {seit_datum} für den Telco Radar angemeldet und die Anmeldung per Klick bestätigt haben."
+  abmelden: "Abmelden"
+  abmelden_satz: "Sie können sich jederzeit mit einem Klick abmelden:"
+  datenschutz: "Datenschutzerklärung"
+  impressum: "Impressum"
+  automatisch: "Automatisch erstellt aus öffentlichen Quellen. Jede Aussage ist mit ihrer Originalquelle verlinkt."

@@ -1,0 +1,28 @@
+{% extends "base.html.j2" %}
+{% block title %}{{ text.titel }} – Vodafone Product and Services Insights{% endblock %}
+{% block content %}
+{# Eine Vorlage fuer beide Pflichtseiten. Sie haben denselben Bau (Titel,
+   Fliesstext, keine Zahlen, keine Bilder) - zwei Vorlagen waeren zwei Orte
+   fuer denselben Satzspiegel. #}
+<div class="rechtstext">
+  <p class="page-kicker">Rechtliches</p>
+  <h1>{{ text.titel }}</h1>
+
+  {% if text.luecken %}
+  {# Die offene Stelle steht OBEN, nicht als Fussnote. Wer die Seite
+     aufschlaegt, um zu pruefen, ob hier jemand greifbar ist, soll es im
+     ersten Bildschirm erfahren - und nicht, nachdem er den ganzen Text
+     gelesen hat. Solange dieser Kasten steht, ist das Anmeldeformular nicht
+     verlinkt (rechtstexte.vollstaendig()). #}
+  <div class="rechtstext-luecke">
+    <strong>Diese Seite ist noch nicht vollständig.</strong>
+    Es fehlt: {{ text.luecken | join(', ') }}. Solange das so ist, wird auf
+    dieser Website kein Anmeldeformular für den E-Mail-Versand angeboten.
+  </div>
+  {% endif %}
+
+  <div class="rechtstext-body">
+    {{ text.html | safe }}
+  </div>
+</div>
+{% endblock %}

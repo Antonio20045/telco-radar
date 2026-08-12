@@ -77,6 +77,43 @@ def gewicht(woerter, haeufigkeit: dict[str, int]) -> float:
     return round(sum(1.0 / haeufigkeit[w] for w in woerter if haeufigkeit.get(w)), 6)
 
 
+# ============================================  Begriffe an Wortgrenzen  ====
+# Vier Stellen im Projekt suchen einen Begriff im Fliesstext - die CTM-Linse
+# (Heimatmarkt-Marken), das Fruehwarn-Board (Indikatoren), die
+# Wettbewerbsseite (Aliase) und seit dem 11.08.2026 die Newsletter-Filter
+# (Stichwoerter der Abonnenten). Alle vier brauchen dieselbe Antwort auf
+# dieselbe Frage, und die Frage ist im Deutschen nicht trivial:
+#
+#   * "Netzausbau" MUSS in "Glasfaser-Netzausbau" treffen. Ein Bindestrich
+#     ist kein Wortzeichen, `(?<!\w)` laesst ihn also von selbst durch.
+#   * "Netz" darf NICHT in "Netzwerkkarte" untergehen. Rechts steht ein
+#     Wortzeichen, `(?!\w)` verhindert den Treffer.
+#   * "spark" darf nicht in "Sparkasse", "globe" nicht in "Globetrotter",
+#     "orange" nicht in "Orangensaft" treffen - dieselbe rechte Grenze.
+#
+# Was diese Regel BEWUSST nicht kann: die deutsche Beugung. "Netzausbaus"
+# (Genitiv) trifft nicht. Eine optionale Endung `s|es|n|en` waere schnell
+# geschrieben und faengt sich sofort einen neuen Falschtreffer ein -
+# "Orange" + "n" ist "Orangen". Erst messen, dann verschaerfen.
+#
+# `kein_punkt_davor` blendet zusaetzlich Domainnamen aus: ohne das trifft
+# "o2" auch in "example.o2" und die Marke steht in jeder Fussnote.
+
+def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
+    """Ein Muster, das JEDEN der Begriffe an Wortgrenzen findet - oder None.
+
+    Der laengste Begriff steht vorn: bei alternativen Zweigen nimmt die
+    Regex-Maschine den ERSTEN passenden, und "Telekom" vor "Deutsche Telekom"
+    wuerde die Gruppe auf das kuerzere Ergebnis festlegen.
+    """
+    teile = [re.escape(b.strip()) for b in (begriffe or []) if (b or "").strip()]
+    if not teile:
+        return None
+    teile.sort(key=len, reverse=True)
+    davor = r"(?<![\w.])" if kein_punkt_davor else r"(?<!\w)"
+    return re.compile(davor + "(" + "|".join(teile) + r")(?!\w)", re.I)
+
+
 # ======================================  beobachtend statt empfehlend  ====
 # Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
 # Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
@@ -122,16 +159,35 @@ _RAT_SCHLUSS = re.compile(_RAT_VERBEN.pattern + r"\s*[.!?]?$", re.I)
 _NOTIZ_TRENNER = re.compile(r"\s*[;–—]\s+|\s+-\s+")
 
 
+# Das deutsche Ordinaldatum ist der zweite Fall, an dem der Satztrenner
+# zerbricht - und er ist haeufiger als jede Abkuerzung. "Gueltig bis 12.
+# September 2026" hat nach dem Punkt ein Leerzeichen und danach einen
+# Grossbuchstaben, also genau das Muster eines Satzendes; der Trenner machte
+# daraus "Gueltig bis 12." und "September 2026". Gemessen am 11.08.2026 in
+# der Ausgabe vom 8.: die Mail zeigte "Aktion gueltig bis 12." als ganzen
+# Satz, und derselbe Schnitt trifft `_strip_vodafone_advice` im Wochenbericht
+# - dort faellt dann eine Satzhaelfte als vermeintlicher Rat weg.
+#
+# Geschuetzt wird BEWUSST nur vor einem Monatsnamen und nicht vor jedem
+# Grossbuchstaben: "Die Zahl stieg auf 12. Vodafone reagierte." ist ein
+# echtes Satzende, und eine Regel, die es verschluckt, waere die teurere.
+_MONATE = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+           "August", "September", "Oktober", "November", "Dezember")
+_ORDINALDATUM = re.compile(
+    r"(?<=\d)\.(?=\s+(?:" + "|".join(_MONATE) + r")\b)")
+_ORDINAL_MARKE = "\x00o\x00"
+
+
 def _geschuetzt(text: str) -> str:
     for i, abk in enumerate(ABKUERZUNGEN):
         text = text.replace(abk, f"\x00{i}\x00")
-    return text
+    return _ORDINALDATUM.sub(_ORDINAL_MARKE, text)
 
 
 def _entschuetzt(text: str) -> str:
     for i, abk in enumerate(ABKUERZUNGEN):
         text = text.replace(f"\x00{i}\x00", abk)
-    return text
+    return text.replace(_ORDINAL_MARKE, ".")
 
 
 def saetze(text: str) -> list[str]:

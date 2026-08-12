@@ -1,0 +1,114 @@
+{#- =========================================================================
+     DIE MAIL ALS HTML - und warum sie aussieht wie aus dem Jahr 2005
+
+     Fuer E-Mail gilt E-Mail-Recht, nicht Web-Recht. Outlook rendert auf
+     Windows mit der WORD-Engine: kein Flexbox, kein Grid, keine externen
+     Stylesheets, keine Web Fonts, kein `background-image`, `<div>`-Abstaende
+     unzuverlaessig. Deshalb Tabellenlayout und Inline-CSS - beides waere auf
+     der Website ein Fehler und ist hier die einzige Fassung, die ueberall
+     ankommt.
+
+     Die zweite Regel: hoechstens 600 px. Outlooks Leseansicht schneidet
+     darueber ab, ohne zu scrollen.
+
+     Die dritte: JEDER inhaltstragende Text kommt aus `items` und wurde
+     nirgends umformuliert. Alles, was hier als Satz steht, kommt aus
+     `chrome` (templates/mail/chrome.yaml) - der Allowlist des Treue-Tests.
+     Wer hier einen Satz direkt hineinschreibt, bricht diesen Test, und das
+     ist die Absicht.
+     ==================================================================== -#}
+<!DOCTYPE html>
+<html lang="de" style="color-scheme:light dark;supported-color-schemes:light dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+{#- Dark-Mode: `color-scheme` sagt dem Client, dass die Mail beide Modi
+    kennt. Ohne die Angabe invertieren Apple Mail und Outlook die Flaechen
+    selbst - und invertiertes Rot auf invertiertem Papier ist unlesbar. -#}
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>{{ betreff }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f4ee;color:#141414">
+{#- Die Vorschauzeile: was die Liste unter dem Betreff anreisst. Ohne sie
+    steht dort der Anfang des Kopfbereichs, also die Marke ein zweites
+    Mal. -#}
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">
+{{ items[0].titel if items else chrome.kopf.untertitel }}
+</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#f6f4ee;border-collapse:collapse">
+<tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="{{ breite }}" cellpadding="0" cellspacing="0" border="0"
+       style="width:100%;max-width:{{ breite }}px;background:#fffdf8;border-collapse:collapse">
+<tr><td style="padding:26px 24px 0 24px">
+
+  {#- ---------------------------------------------------------- Kopf -#}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border-collapse:collapse">
+    <tr><td align="center" style="padding:0 0 16px 0;border-bottom:3px solid #141414">
+      <div style="font:700 26px/1.1 Georgia,'Times New Roman',Times,serif;color:#141414">{{ chrome.kopf.titel }}</div>
+      <div style="font:700 10px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b6b6b;padding-top:7px">{{ chrome.kopf.untertitel }} &middot; {{ chrome.kopf.ausgabe | replace('{datum}', datum_de) }}</div>
+    </td></tr>
+    <tr><td style="padding:20px 0 2px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#141414">{{ chrome.anrede }} {{ einleitung }}</td></tr>
+  </table>
+
+  {#- ------------------------------------------------------ Meldungen -#}
+  {% if items %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border-collapse:collapse">
+    {% for it in items %}
+    <tr><td style="padding:18px 0 16px 0;{% if not loop.first %}border-top:1px solid #ddd8cc{% endif %}">
+      {#- Der additive Stichworttreffer sagt, warum er hier steht. Ohne
+          diese Zeile ist er fuer den Leser unerklaerlich - und genau daran
+          entscheidet sich, ob Stichwort-Abos als nuetzlich oder als kaputt
+          empfunden werden. -#}
+      {% if it.stichwort %}
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#e60000;padding-bottom:5px">{{ chrome.stichwort_marker | replace('{stichwort}', it.stichwort) }}</div>
+      {% endif %}
+      {% if it.absender %}
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b;padding-bottom:5px">{{ it.absender }}</div>
+      {% endif %}
+      <div style="font:700 18px/1.3 Georgia,'Times New Roman',Times,serif;color:#141414;padding-bottom:6px">{{ it.titel }}</div>
+      {% if it.text %}
+      <div style="font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a;padding-bottom:9px">{{ it.text }}</div>
+      {% endif %}
+      <div style="font:700 12px/1.4 Arial,Helvetica,sans-serif">
+        <a href="{{ it.url }}" style="color:#e60000;text-decoration:none">{{ chrome.link_quelle }} &rsaquo;</a>
+        {%- if it.anker %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ it.anker }}" style="color:#6b6b6b;text-decoration:none">{{ chrome.link_bericht }} &rsaquo;</a>{% endif %}
+      </div>
+    </td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  {#- ----------------------------------------------------- Schlussweg -#}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border-collapse:collapse">
+    <tr><td style="padding:14px 0 0 0;border-top:1px solid #ddd8cc">
+      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ chrome.schluss }}</div>
+      <div style="font:700 13px/1.4 Arial,Helvetica,sans-serif;padding-top:6px"><a href="{{ bericht_url }}" style="color:#e60000;text-decoration:none">{{ chrome.schluss_link }} &rsaquo;</a></div>
+    </td></tr>
+  </table>
+
+  {#- ---------------------------------------------------------- Fuss -#}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border-collapse:collapse">
+    <tr><td style="padding:26px 0 26px 0;font:400 11px/1.6 Arial,Helvetica,sans-serif;color:#6b6b6b">
+      <div style="border-top:3px solid #141414;padding-top:14px">{{ chrome.fuss.warum | replace('{seit_datum}', seit_datum) }}</div>
+      <div style="padding-top:8px">{{ chrome.fuss.abmelden_satz }} <a href="{{ abmelde_url }}" style="color:#e60000">{{ chrome.fuss.abmelden }}</a></div>
+      <div style="padding-top:8px">
+        <a href="{{ impressum_url }}" style="color:#6b6b6b">{{ chrome.fuss.impressum }}</a>
+        &nbsp;&middot;&nbsp;
+        <a href="{{ datenschutz_url }}" style="color:#6b6b6b">{{ chrome.fuss.datenschutz }}</a>
+      </div>
+      <div style="padding-top:8px">{{ chrome.fuss.automatisch }}</div>
+    </td></tr>
+  </table>
+
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,102 @@
+# Die Zahlen des Versandlaufs zurueck ins oeffentliche Repo.
+#
+# Der Versand laeuft im PRIVATEN Repo (dort liegen die Adressen). Damit
+# jemand ohne Zugriff darauf sehen kann, ob er funktioniert, meldet er
+# SUMMEN zurueck - und die landen auf transparenz.html, also dort, wo in
+# diesem Projekt ohnehin nachgesehen wird, wenn etwas komisch aussieht.
+#
+# DIE EINE REGEL: nur Zahlen. Der Payload kommt aus einem anderen Repo und
+# ist damit nicht vertrauenswuerdiger als jede andere Fremddaten-Quelle -
+# `newsletter_protokoll.vermerken()` uebernimmt deshalb die BEKANNTEN Felder
+# als int und laesst alles andere fallen. Ein Feld mehr im Payload darf nicht
+# bedeuten, dass eine Adresse ins oeffentliche Repo wandert. Ein CI-Test
+# prueft die Datei zusaetzlich gegen ein Adressmuster.
+name: Newsletter-Zahlen eintragen
+
+on:
+  repository_dispatch:
+    types: [newsletter_stats]
+
+concurrency:
+  # Nicht dieselbe Gruppe wie der Radar-Lauf, aber eine eigene: zwei
+  # gleichzeitige Zahlenmeldungen wuerden sich beim Push ins Gehege kommen.
+  group: telco-radar-newsletter-stats
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  eintragen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+
+      - name: Zahlen anhaengen
+        env:
+          PYTHONPATH: src
+          LAUF: ${{ toJSON(github.event.client_payload) }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "src")
+          from telco_radar.report import newsletter_protokoll as np
+          lauf = json.loads(os.environ["LAUF"])
+          pfad = Path("data/state/newsletter_stats.jsonl")
+          np.vermerken(pfad, lauf)
+          # Ausgegeben wird die GEFILTERTE Zeile, nicht der Payload - sonst
+          # stuende ein unerwartetes Feld im Log.
+          print("Eingetragen:", pfad.read_text(encoding="utf-8").splitlines()[-1])
+          PY
+
+      - name: Gegenprobe - keine Adresse in der Datei
+        # Die zweite Sicherung nach der Filterung. Sie kostet nichts und
+        # faengt den Fall, in dem jemand `vermerken()` erweitert.
+        run: |
+          if grep -Eq '[[:alnum:]._%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}' \
+              data/state/newsletter_stats.jsonl; then
+            echo "::error::Adressmuster in newsletter_stats.jsonl - nicht committet."
+            exit 1
+          fi
+          echo "Sauber."
+
+      - name: Seite neu rendern und committen
+        run: |
+          PYTHONPATH=src python - <<'PY'
+          from pathlib import Path
+          from telco_radar.config import load_config
+          from telco_radar.report.html import render_site
+          # MIT cfg: ohne den dritten Parameter verliert transparenz.html
+          # seinen kompletten Quellenbestand und wettbewerb.html den halben
+          # Inhalt - ohne Fehler und ohne Warnung (CLAUDE.md §6).
+          render_site(Path("site"), Path("data/reports"),
+                      cfg=load_config(Path(".")))
+          PY
+          git config user.name "telco-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/state/newsletter_stats.jsonl site/
+          git diff --cached --quiet && { echo "Nichts geaendert."; exit 0; }
+          git commit -m "newsletter: Zahlen der Ausgabe ${{ github.event.client_payload.date }}"
+          for versuch in 1 2 3; do
+            git pull --rebase --autostash origin "$GITHUB_REF_NAME" \
+              && git push origin "HEAD:$GITHUB_REF_NAME" && exit 0
+            git rebase --abort || true
+            sleep 5
+          done
+          echo "::warning::Push abgewiesen - die Zahlen erscheinen mit dem naechsten Lauf."
+
+      - name: Render-Deploy anstossen
+        continue-on-error: true
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          [ -n "$HOOK" ] || { echo "Kein Hook gesetzt."; exit 0; }
+          sleep 15   # den Push propagieren lassen, bevor Render klont
+          curl -sS -o /dev/null -w 'Deploy angestossen -> HTTP %{http_code}\n' \
+            -X POST "$HOOK"

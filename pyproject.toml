@@ -6,4 +6,10 @@ requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+# "." steht seit dem 11.08.2026 daneben: der Signup-Dienst liegt unter
+# `service/` und nicht unter `src/`, weil er ein eigener Prozess ist (auf
+# Render, nicht in der Pipeline). Ohne diesen Eintrag laeuft
+# tests/test_signup_service.py nur mit gesetztem PYTHONPATH - und ein Test,
+# der sich mangels Import ueberspringt, sieht im Protokoll aus wie ein
+# Erfolg. Genau derselbe Grund, aus dem ci.yml Chromium installiert.
+pythonpath = ["src", "."]

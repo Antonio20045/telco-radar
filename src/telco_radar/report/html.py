@@ -21,6 +21,8 @@ from . import differenzierung_view
 from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
+from . import newsletter_protokoll
+from . import rechtstexte as rechtstexte_mod
 from . import seit as seit_mod
 from . import verlauf as verlauf_mod
 from . import suchindex
@@ -1113,6 +1115,31 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     env.globals["geraete_verlinkt"] = bool(
         geraete["bilanz"].get("schwelle_erreicht"))
 
+    # ---- Rechtstexte: aus demselben Grund HIER und nicht bei ihrer Seite.
+    # Die Fusszeile steht in `base.html.j2`, also auf JEDER Seite - und die
+    # Schwelle "Impressum vollstaendig" entscheidet zusaetzlich darueber, ob
+    # das Anmeldeformular ueberhaupt verlinkt wird. Beides muss feststehen,
+    # bevor die erste Seite gerendert wird; sonst hat die Startseite eine
+    # andere Fusszeile als die Quellenseite.
+    rechtstexte = rechtstexte_mod.alle(_wurzel)
+    env.globals["rechtstexte_verlinkt"] = {t.schluessel for t in rechtstexte}
+    # Der Newsletter braucht BEIDE Pflichtseiten vollstaendig. Ohne sie wird
+    # das Formular gebaut, aber nicht verlinkt - dieselbe
+    # Veroeffentlichungsschwelle wie bei der Geraeteseite, und aus demselben
+    # Grund im Code statt in einem Test.
+    env.globals["newsletter_verlinkt"] = rechtstexte_mod.vollstaendig(_wurzel)
+    if not env.globals["newsletter_verlinkt"]:
+        for seite, was in rechtstexte_mod.offene_stellen(_wurzel):
+            log.warning("Rechtstext unvollstaendig: %s -> %s", seite, was)
+    rechtstext_tpl = env.get_template("rechtstext.html.j2")
+    for text in rechtstexte:
+        (site_dir / f"{text.schluessel}.html").write_text(
+            rechtstext_tpl.render(
+                prefix="", active=text.schluessel,
+                text={"titel": text.titel, "luecken": text.luecken,
+                      "html": _md_to_html(text.markdown)}),
+            encoding="utf-8")
+
     archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
                 "stats": r.get("stats", {}),
                 "llm": r.get("generated_with_llm", False)} for r in reports]
@@ -1445,6 +1472,65 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         promo_aktionen=promo_entries, mechanik_label=PROMO_MECHANICS)
     (site_dir / "search_index.json").write_text(
         json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
+
+    # ---- Der Stichwort-Index der Newsletter-Anmeldung.
+    # Die Trefferzahl-Vorschau ("Ihr Stichwort hätte in den letzten 30 Tagen
+    # 47 Meldungen getroffen") ist die wirksamste Einzelmassnahme gegen
+    # Abo-Muedigkeit - sie loest das Problem, bevor es Mails erzeugt. Aber
+    # die Anmeldeseite ist statisch und kann kein Python aufrufen, und der
+    # Signup-Dienst hat die Berichtsarchive nicht. Also zaehlt der Browser
+    # gegen diese Datei, und die Pipeline schreibt sie bei jedem Lauf mit.
+    #
+    # `newsletter/filters.baue_stichwort_index()` ist ihr Erzeuger UND die
+    # Testgrundlage: ein Test haelt jedes Wort des Index gegen `vorschau()`.
+    # Ohne den wuerde die Seite eine Zahl voraussagen, die der Versand nie
+    # einloest, und beide waeren fuer sich gruen.
+    from ..newsletter.filters import baue_stichwort_index
+    from ..newsletter.config import lade_katalog as _lade_nl_katalog
+    try:
+        _nl_tage = _lade_nl_katalog(_wurzel).grenzen.vorschau_tage
+    except (FileNotFoundError, ValueError) as exc:
+        log.warning("newsletter.yaml nicht lesbar (%s) - Stichwort-Index mit "
+                    "30 Tagen", exc)
+        _nl_tage = 30
+    (site_dir / "data").mkdir(exist_ok=True)
+    (site_dir / "data" / "keyword-index.json").write_text(
+        json.dumps(baue_stichwort_index(reports_dir, tage=_nl_tage),
+                   ensure_ascii=False), encoding="utf-8")
+
+    # ---- Die Anmeldeseite und ihre zwei Abschlussseiten.
+    # Die beiden kleinen sind die wichtigeren: sie sind STATISCH und kommen
+    # ohne den Signup-Dienst aus. Wer auf den Abmeldelink klickt, waehrend
+    # Render die Instanz schlafen laesst, wartet sonst eine Minute vor einem
+    # Spinner - und der Abmeldelink ist der einzige Abmeldeweg.
+    from . import newsletter_seite as nl_seite
+    try:
+        nl_katalog = _lade_nl_katalog(_wurzel)
+    except (FileNotFoundError, ValueError) as exc:
+        log.error("newsletter.yaml nicht lesbar (%s) - keine Anmeldeseite", exc)
+        nl_katalog = None
+    if nl_katalog is not None:
+        fassung = rechtstexte_mod.aktuelle_einwilligung(_wurzel)
+        (site_dir / "newsletter.html").write_text(
+            env.get_template("newsletter.html.j2").render(
+                prefix="", active="newsletter",
+                dimensionen=nl_seite.dimensionen(nl_katalog),
+                grenzen=nl_katalog.grenzen,
+                einwilligung_absaetze=nl_seite.einwilligung_absaetze(
+                    fassung.text if fassung else ""),
+                einwilligung_version=fassung.version if fassung else "—",
+                nl_config=nl_seite.konfiguration(
+                    nl_katalog,
+                    dienst_url=(cfg.settings.get("newsletter_dienst_url", "")
+                                if cfg is not None else ""),
+                    frei=env.globals["newsletter_verlinkt"])),
+            encoding="utf-8")
+        for name, (titel, text, weiter) in nl_seite.abschlussseiten().items():
+            (site_dir / f"newsletter-{name}.html").write_text(
+                env.get_template("newsletter_abschluss.html.j2").render(
+                    prefix="", active="newsletter", titel=titel, text=text,
+                    weiter=weiter),
+                encoding="utf-8")
     (site_dir / "suche.html").write_text(
         env.get_template("suche.html.j2").render(
             prefix="",
@@ -1605,6 +1691,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                         for s in (3, 2, 1, 0)],
             sicherheitsskala=ctm.lade_fokus(
                 reports_dir.parent.parent).sicherheitsskala,
+            # Der Newsletter-Abschnitt: NUR Zahlen, nie Adressen. Ein
+            # CI-Test prueft die Statistikdatei gegen ein Adressmuster.
+            newsletter=newsletter_protokoll.aufbereiten(
+                state_dir / "newsletter_stats.jsonl"),
             by_region=by_region, news_sources=news_sources,
             tech_themes=tech_themes,
             n_tech_sources=sum(len(t["sources"]) for t in tech_themes),

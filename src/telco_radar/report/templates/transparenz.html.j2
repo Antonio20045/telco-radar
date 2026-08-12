@@ -64,6 +64,7 @@
   </div>
 </div>
 
+
 {# ------------------------------------------------- Wie eingeordnet wird #}
 {# Die Startseite zeigt Etiketten ("Direkt für uns") und einen Satz, was eine
    Meldung fürs eigene Portfolio bedeutet. Wer dem trauen soll, muss wissen,
@@ -176,6 +177,56 @@
 </details>
 {% else %}
 <p class="empty-note">Für diesen Bericht liegt noch kein Laufprotokoll vor. Es entsteht beim nächsten Lauf der Pipeline.</p>
+{% endif %}
+
+{# --------------------------------------------------------- Newsletter --
+   Der Versand meldet sich HIER und nicht in einem eigenen Dashboard. Nach
+   acht Wochen prueft niemand mehr Zustellquote, Rueckläufer und
+   Abmeldungen - das ist der Normalfall. Ein zweiter Ort waere ein Ort, an
+   den niemand geht; diese Seite ist die, auf die in diesem Projekt ohnehin
+   gesehen wird, wenn etwas komisch aussieht.
+
+   AUSSCHLIESSLICH ZAHLEN. Kein Name, keine Adresse, kein Segment-Inhalt. #}
+{% if newsletter.vorhanden %}
+<div class="card">
+  <div class="card-head"><h2>Newsletter-Versand</h2>
+    <span class="rubrik-zahl">{{ newsletter.summe_zugestellt }} Zustellungen in
+      {{ newsletter.ausgaben | length }} Ausgaben</span></div>
+
+  {% if newsletter.warnungen %}
+  <div class="nl-prot-warn">
+    {% for satz in newsletter.warnungen %}<p>{{ satz }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span>Ausgabe</span><span>Segmente</span><span>Zugestellt</span>
+      <span>Fehler</span><span>Rückläufer</span><span>Abmeldungen</span>
+      <span>Quote</span><span>Tageslimit</span>
+    </div>
+    {% for a in newsletter.ausgaben %}
+    <div class="rowtable-row">
+      <span>{{ a.datum | date_de }}</span>
+      <span>{{ a.segmente }}</span>
+      <span>{{ a.zugestellt }}</span>
+      <span>{{ a.fehler }}</span>
+      <span>{{ a.bounces }}</span>
+      <span>{{ a.abmeldungen }}</span>
+      <span{% if a.quote_prozent < 95 %} class="nl-prot-rot"{% endif %}>{{ a.quote_prozent }} %</span>
+      {# Der Abstand zum Limit steht in JEDER Zeile - damit sichtbar wird,
+         wann der Verteiler an die Grenze waechst, und nicht erst, wenn er
+         sie gerissen hat. #}
+      <span{% if a.auslastung >= 80 %} class="nl-prot-rot"{% endif %}>noch {{ a.abstand_zum_limit }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="nl-prot-fuss">
+    Der Versand läuft über Brevo im Free-Plan: höchstens
+    {{ newsletter.tageslimit }} E-Mails pro Tag. Die Spalte „Tageslimit“ nennt,
+    wie viele an diesem Tag noch möglich gewesen wären.
+  </p>
+</div>
 {% endif %}
 
 {# ------------------------------------------------------- der Bestand #}

@@ -61,6 +61,7 @@ import yaml
 # der Kasten eine Zeile zu, die die Belegpruefung verworfen haette.
 # faithfulness importiert nur `.llm`, also entsteht kein Ringschluss.
 from .faithfulness import _zahlen_gedeckt
+from ..textwerkzeug import begriffs_muster
 
 log = logging.getLogger(__name__)
 
@@ -141,11 +142,11 @@ class CtmFokus:
 
 
 def _marken_muster(marken: list[str]) -> re.Pattern | None:
-    teile = [re.escape(m.strip()) for m in marken if (m or "").strip()]
-    if not teile:
-        return None
-    teile.sort(key=len, reverse=True)   # laengster Name zuerst
-    return re.compile(r"(?<![\w.])(" + "|".join(teile) + r")(?![\w])", re.I)
+    """Seit dem 11.08.2026 nur noch ein Aufruf: die Rechnung steht in
+    `textwerkzeug.begriffs_muster()`. Sie war hier, in `fruehwarnung.py` und
+    in `wettbewerb.py` dreimal getippt - und die Newsletter-Stichwoerter
+    waeren die vierte Fassung gewesen."""
+    return begriffs_muster(marken, kein_punkt_davor=True)
 
 
 def lade_fokus(root: Path) -> CtmFokus:
