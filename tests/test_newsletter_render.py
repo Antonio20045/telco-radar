@@ -303,19 +303,34 @@ def test_impressum_und_datenschutz_stehen_im_fuss():
 
 # ================================================  Stichwort-Markierung  ===
 
+def _marker(stichwort: str) -> str:
+    """Die Markierung aus chrome.yaml, nicht abgeschrieben.
+
+    Am 13.08.2026 wurde die Mail von "Sie" auf "du" umgestellt; drei Tests
+    hier fielen durch, weil sie "Ihr Stichwort" woertlich trugen - obwohl
+    der Treue-Test seine Allowlist laengst AUS der Datei liest. Ein Test,
+    der einen Rahmentext abschreibt, prueft die Rechtschreibung von
+    vorgestern und meldet beim naechsten Umformulieren einen Fehler, den es
+    nicht gibt.
+    """
+    return r.lade_chrome()["stichwort_marker"].format(stichwort=stichwort)
+
+
 def test_ein_stichworttreffer_sagt_warum_er_dasteht():
     nachricht = _nachricht(treffer=_treffer(stichwort="Starlink"))
-    assert "Ihr Stichwort: Starlink" in nachricht.html
-    assert "Ihr Stichwort: Starlink" in nachricht.text
+    assert _marker("Starlink") in nachricht.html
+    assert _marker("Starlink") in nachricht.text
 
 
 def test_ein_filtertreffer_traegt_keine_markierung():
     nachricht = _nachricht()
-    assert "Ihr Stichwort" not in nachricht.html
+    # Der Rumpf der Markierung, ohne das Stichwort selbst.
+    rumpf = r.lade_chrome()["stichwort_marker"].split("{")[0].rstrip(": ")
+    assert rumpf not in nachricht.html
 
 
 def test_dasselbe_stichwort_wird_nur_beim_ersten_der_folge_genannt():
-    """In der Vorschau vom 11.08.2026 stand "Ihr Stichwort: Starlink"
+    """In der Vorschau vom 11.08.2026 stand die Markierung
     viermal untereinander - Stichworttreffer stehen hinter den
     Filtertreffern, gleiche Marken folgen also zwangslaeufig aufeinander.
     Viermal dieselbe Zeile erklaert nichts mehr, sie trommelt."""
@@ -324,8 +339,8 @@ def test_dasselbe_stichwort_wird_nur_beim_ersten_der_folge_genannt():
                for e in eintraege]
     assert len(treffer) >= 2, "der Fall tritt sonst gar nicht ein"
     nachricht = _nachricht(treffer=treffer)
-    assert nachricht.html.count("Ihr Stichwort: Starlink") == 1
-    assert nachricht.text.count("Ihr Stichwort: Starlink") == 1
+    assert nachricht.html.count(_marker("Starlink")) == 1
+    assert nachricht.text.count(_marker("Starlink")) == 1
 
 
 def test_ein_wechsel_des_stichworts_wird_wieder_genannt():
@@ -334,8 +349,8 @@ def test_ein_wechsel_des_stichworts_wird_wieder_genannt():
     treffer = [Treffer(eintrag=eintraege[0], grund="stichwort", stichwort="Tarif"),
                Treffer(eintrag=eintraege[1], grund="stichwort", stichwort="Satellit")]
     html = _nachricht(treffer=treffer).html
-    assert "Ihr Stichwort: Tarif" in html
-    assert "Ihr Stichwort: Satellit" in html
+    assert _marker("Tarif") in html
+    assert _marker("Satellit") in html
 
 
 # ==========================================================  Betreff  ======

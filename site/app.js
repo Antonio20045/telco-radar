@@ -1152,7 +1152,7 @@ var TelcoFrage = (function () {
       return;
     }
     if (!document.getElementById('nl-consent').checked) {
-      sagen('Ohne Ihre Einwilligung dürfen wir Ihnen nichts schicken.', 'warn');
+      sagen('Ohne dein Häkchen bei der Einwilligung geht es nicht.', 'warn');
       return;
     }
 
@@ -1189,7 +1189,7 @@ var TelcoFrage = (function () {
       clearTimeout(uhr);
       submit.disabled = false;
       if (a.ok) {
-        sagen(a.daten.message || 'Bitte sehen Sie in Ihr Postfach.', 'ok');
+        sagen(a.daten.message || 'Sieh bitte in dein Postfach.', 'ok');
         form.querySelector('#nl-email').value = '';
         document.getElementById('nl-consent').checked = false;
       } else {

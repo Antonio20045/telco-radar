@@ -27,7 +27,7 @@ from . import rechtstexte
 # Der Satz, der neben jeder Dimension steht. "Leer heisst alles" ist die
 # Erwartung fast aller Nutzer - und es ist NICHT die Erwartung der anderen,
 # deshalb steht es da. Das ist keine Bedienhilfe, sondern die Regel selbst.
-_LEER = "Nichts angekreuzt bedeutet: alles aus diesem Bereich."
+_LEER = "Nichts angekreuzt = alles."
 
 HINWEISE = {
     "bereiche": f"Welche Rubrik des Portals. {_LEER}",
@@ -79,15 +79,14 @@ def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str,
 _ABSCHLUSS = {
     "bestaetigt": (
         "Anmeldung bestätigt",
-        "Sie bekommen den Telco Radar ab der nächsten Ausgabe — dienstags "
-        "oder freitags, und nur dann, wenn es zu Ihren Themen wirklich etwas "
-        "Neues gibt.",
+        "Du bekommst den Telco Radar ab der nächsten Ausgabe — dienstags "
+        "oder freitags, und nur dann, wenn es zu deinen Themen wirklich "
+        "etwas Neues gibt.",
         "Zur aktuellen Ausgabe"),
     "abgemeldet": (
         "Abgemeldet",
-        "Sie bekommen keine weiteren Ausgaben. Ihre E-Mail-Adresse wird "
-        "gelöscht. Falls Sie es sich anders überlegen, können Sie sich "
-        "jederzeit wieder anmelden.",
+        "Du bekommst keine weiteren Ausgaben, deine E-Mail-Adresse wird "
+        "gelöscht. Du kannst dich jederzeit wieder anmelden.",
         "Zur aktuellen Ausgabe"),
 }
 

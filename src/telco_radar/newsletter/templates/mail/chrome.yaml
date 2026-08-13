@@ -24,7 +24,7 @@
 # Absicht: ein neuer Rahmensatz soll eine bewusste Entscheidung sein.
 # -----------------------------------------------------------------------------
 
-version: "2026-08-11"
+version: "2026-08-13"
 
 # Der Absender. Anzeigename bewusst neutral: ein Markenname vor einer nicht
 # zur Marke gehoerenden Adresse ist genau das Muster, auf das
@@ -37,18 +37,18 @@ kopf:
   # {datum} wird ersetzt. Kein anderer Platzhalter.
   ausgabe: "Ausgabe vom {datum}"
 
-anrede: "Guten Tag,"
+anrede: "Hallo,"
 
 # Der eine Satz, der die Auswahl erklaert. Er steht bewusst VOR den
 # Meldungen: wer nicht weiss, warum diese acht Zeilen und keine anderen,
 # liest die erste als Zufall.
-einleitung_filter: "diese Meldungen passen zu Ihren Themen:"
+einleitung_filter: "diese Meldungen passen zu deinen Themen:"
 einleitung_alles: "das ist neu in der Marktbeobachtung:"
 
 # Die Markierung eines additiven Stichworttreffers. Ohne sie versteht
 # niemand, warum ein Eintrag in der Mail steht, den die uebrigen Filter
 # ausgeschlossen haetten.
-stichwort_marker: "Ihr Stichwort: {stichwort}"
+stichwort_marker: "Dein Stichwort: {stichwort}"
 
 # Die zwei Links je Eintrag. "Quelle" fuehrt zum Original, "im Bericht" auf
 # die Website - der Klick auf die Seite ist das Ziel jeder Ausgabe.
@@ -56,25 +56,24 @@ link_quelle: "Zur Quelle"
 link_bericht: "Im Wochenbericht"
 
 # Der Abschluss.
-schluss: "Den vollständigen Wochenbericht mit allen Meldungen finden Sie hier:"
+schluss: "Den vollständigen Wochenbericht mit allen Meldungen findest du hier:"
 schluss_link: "Wochenbericht öffnen"
 
 # Die Ausgabe, die es nicht gibt. Sie wird NICHT verschickt (ein leerer
 # Newsletter erzieht zum Ignorieren) - dieser Text steht in der einen
 # monatlichen Nachricht an jemanden, bei dem seit Wochen nichts passt.
-leer_titel: "Zu Ihren Themen gab es nichts Neues"
+leer_titel: "Zu deinen Themen gab es nichts Neues"
 leer_text: >-
-  seit {seit} ist zu den von Ihnen gewählten Themen keine Meldung
-  aufgelaufen. Das ist ein Befund und keine Panne — Sie bekommen von uns
-  keine Ausgabe, in der nichts steht. Falls Ihre Auswahl zu eng ist, können
-  Sie sie hier ändern:
+  seit {seit} ist zu deinen Themen keine Meldung aufgelaufen. Das ist ein
+  Befund und keine Panne — du bekommst keine Ausgabe, in der nichts steht.
+  Falls deine Auswahl zu eng ist, kannst du sie hier ändern:
 leer_link: "Themen anpassen"
 
 # Der Fuss. Jede Zeile hier ist rechtlich noetig oder eine Zusicherung.
 fuss:
-  warum: "Sie erhalten diese E-Mail, weil Sie sich am {seit_datum} für den Telco Radar angemeldet und die Anmeldung per Klick bestätigt haben."
+  warum: "Du bekommst diese E-Mail, weil du dich am {seit_datum} für den Telco Radar angemeldet und die Anmeldung per Klick bestätigt hast."
   abmelden: "Abmelden"
-  abmelden_satz: "Sie können sich jederzeit mit einem Klick abmelden:"
+  abmelden_satz: "Du kannst dich jederzeit mit einem Klick abmelden:"
   datenschutz: "Datenschutzerklärung"
   impressum: "Impressum"
   automatisch: "Automatisch erstellt aus öffentlichen Quellen. Jede Aussage ist mit ihrer Originalquelle verlinkt."

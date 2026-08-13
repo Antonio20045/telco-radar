@@ -16,12 +16,10 @@
       sondern die Regel selbst - wer sie nicht kennt, waehlt falsch. #}
 <div class="nl">
   <p class="page-kicker">Per E-Mail</p>
-  <h1>Der Radar in Ihrem Postfach</h1>
+  <h1>Der Radar in deinem Postfach</h1>
   <p class="nl-lead">
-    Zweimal pro Woche eine kurze Zusammenfassung der neuen Meldungen — zu den
-    Themen, die Sie hier auswählen. <strong>Nur dann, wenn es zu Ihren Themen
-    wirklich etwas Neues gibt.</strong> Jede Meldung mit Link auf die
-    Originalquelle, wie im Bericht.
+    Zweimal pro Woche, zu deinen Themen — und <strong>nur, wenn es dazu
+    wirklich etwas Neues gibt.</strong>
   </p>
 
   {% if not newsletter_verlinkt %}
@@ -88,7 +86,7 @@
 
     {# ----------------------------------------------- Adresse und Zustimmung -#}
     <fieldset class="nl-block nl-abschluss">
-      <legend class="rubrik">Ihre E-Mail-Adresse</legend>
+      <legend class="rubrik">Deine E-Mail-Adresse</legend>
       <input type="email" id="nl-email" name="email" class="nl-feld nl-feld--breit"
              autocomplete="email" required placeholder="name@firma.de"
              aria-label="E-Mail-Adresse">
@@ -124,8 +122,8 @@
   <noscript>
     <p class="nl-gesperrt">
       Für die Anmeldung braucht diese Seite JavaScript — sie holt vorher eine
-      signierte Kennung beim Anmeldedienst ab. Ohne JavaScript schreiben Sie
-      bitte an die Adresse im <a href="{{ prefix }}impressum.html">Impressum</a>.
+      signierte Kennung beim Anmeldedienst ab. Ohne JavaScript schreib bitte
+      an die Adresse im <a href="{{ prefix }}impressum.html">Impressum</a>.
     </p>
   </noscript>
 </div>

@@ -69,8 +69,15 @@ WURZEL = Path(__file__).resolve().parents[2]
 # Die neutrale Antwort. Ein Satz, der nichts darueber verraet, ob die Adresse
 # bekannt ist, ob sie sich schon einmal abgemeldet hat oder ob heute schon
 # eine Bestaetigungsmail an sie ging.
-NEUTRAL = ("Wenn alles stimmt, ist eine Bestätigungsmail unterwegs. "
-           "Bitte klicken Sie den Link darin — erst dann sind Sie angemeldet.")
+#
+# Die schuetzende Eigenschaft ist die GLEICHHEIT ueber alle Zweige - Honeypot,
+# IP-Bremse, abgelehnte Nonce, Domainliste, Erfolg -, nicht der Konjunktiv.
+# Bis zum 13.08.2026 stand hier "Wenn alles stimmt, ist eine Bestaetigungsmail
+# unterwegs"; der Vorbehalt las sich fuer den Angemeldeten wie ein Zweifel an
+# seiner eigenen Eingabe und half niemandem. Wer hier umformuliert, darf nur
+# eines nicht tun: die Antwort vom Ausgang abhaengig machen.
+NEUTRAL = ("Gleich kommt eine E-Mail. Klick den Link darin — "
+           "erst dann bist du angemeldet.")
 
 
 def _env(name: str, vorgabe: str = "") -> str:
