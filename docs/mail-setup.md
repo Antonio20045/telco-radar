@@ -33,7 +33,7 @@ Antonio hat das am 11. August 2026 erledigt. **Nichts davon neu anlegen.**
 | Brevo-Konto | Free-Plan, Organisation `insights`, keine Kreditkarte |
 | Kontingent | **300 von 300 E-Mails pro Tag**, Zähler setzt täglich zurück |
 | Absender | `Telco Radar <antonio.fotiadis.francisco@gmail.com>`, **verifiziert** |
-| API-Key | `telco-radar-newsletter`, gültig bis 11.08.2027, liegt als GitHub-Secret `BREVO_API_KEY` |
+| API-Key | `telco-radar-newsletter`, gültig bis 11.08.2027, liegt als GitHub-Secret `BREVO_API_KEY` in **beiden** Repositories: `telco-radar` (Testversand) und `telco-radar-mail` (Versand). Am 13.08.2026 nachgetragen — vorher stand er in keinem. |
 | SMTP | im Konto freigeschaltet — wird trotzdem nicht benutzt (siehe oben) |
 
 **Der API-Key steht nirgends im Code, in keiner Datei und in keinem Log.**
