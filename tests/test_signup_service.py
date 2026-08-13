@@ -488,3 +488,24 @@ def test_eine_fremde_seite_bekommt_keine_freigabe(dienst):
     freigabe = antwort.headers.get("access-control-allow-origin")
     assert freigabe != "https://boese.example"
     assert freigabe != "*"
+
+
+def test_gesund_nennt_version_und_erlaubte_herkuenfte(dienst):
+    """Von aussen sieht ein Dienst mit altem Commit genauso aus wie einer,
+    dessen Deploy noch laeuft - und eine falsch gesetzte SITE_BASE_URL ist
+    ueberhaupt nicht sichtbar. Am 13.08.2026 hat genau das eine halbe Stunde
+    Raterei gekostet. Beides sind keine Geheimnisse."""
+    daten = dienst.get("/gesund").json()
+    assert daten["ok"] is True
+    assert "version" in daten
+    assert EIGENE_SEITE in daten["cors_fuer"]
+
+
+def test_die_produktionsadresse_steht_immer_in_der_freigabe():
+    """Die Liste traegt die bekannte Adresse NEBEN SITE_BASE_URL.
+
+    Ohne diesen Rueckfall macht ein Tippfehler in der Render-Variablen das
+    Formular tot, ohne dass irgendetwas danach aussieht: der Preflight
+    antwortet 200, nur eben ohne Kopf."""
+    assert EIGENE_SEITE in app_mod.ERLAUBTE_HERKUENFTE
+    assert "*" not in app_mod.ERLAUBTE_HERKUENFTE

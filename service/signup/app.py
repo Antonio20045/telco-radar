@@ -126,9 +126,19 @@ katalog = lade_katalog(WURZEL)
 # fremde Seite soll das Formular nicht in ihrem Namen abschicken koennen.
 # Erlaubt ist die eigene Seite - dieselbe Adresse, die auch die
 # Bestaetigungslinks traegt, also genau eine Stelle zum Pflegen.
+#
+# Die Liste traegt NEBEN `SITE_BASE_URL` die bekannte Produktionsadresse.
+# Das ist keine Verdopplung, sondern der Schutz gegen den einen Fehler, den
+# man von aussen nicht sieht: steht `SITE_BASE_URL` im Render-Dienst falsch
+# oder gar nicht, dann greift die Freigabe stillschweigend nicht - der
+# Preflight antwortet brav 200, nur eben ohne Kopf, und das Formular ist
+# wieder tot. `/gesund` gibt die Liste deshalb aus.
+ERLAUBTE_HERKUENFTE = sorted({einstellungen.basis_url,
+                              "https://telco-radar.onrender.com"})
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[einstellungen.basis_url],
+    allow_origins=ERLAUBTE_HERKUENFTE,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type"],
     # Es gibt weder Cookie noch Auth-Header; alles reist signiert im Token.
@@ -211,8 +221,20 @@ def _seite(titel: str, text: str, *, ziel: str = "") -> HTMLResponse:
 
 @app.get("/gesund")
 def gesund() -> dict:
-    """Ob der Dienst sich fuer einsatzbereit haelt - ohne Geheimnisse."""
-    return {"ok": True, "einsatzbereit": einstellungen.einsatzbereit}
+    """Ob der Dienst sich fuer einsatzbereit haelt - ohne Geheimnisse.
+
+    `version` und `cors_fuer` stehen hier, weil am 13.08.2026 eine halbe
+    Stunde daran verging, zu raten, WELCHER Stand auf Render laeuft. Von
+    aussen sieht ein Dienst, der einen alten Commit ausliefert, genauso aus
+    wie einer, dessen Deploy noch laeuft - und ein Fehler in der
+    Origin-Einstellung ist ueberhaupt nicht sichtbar, er zeigt sich nur als
+    fehlender Kopf. Render setzt `RENDER_GIT_COMMIT` von selbst; beides sind
+    keine Geheimnisse, sondern genau die zwei Angaben, die eine
+    Fehlersuche am Formular zuerst braucht.
+    """
+    return {"ok": True, "einsatzbereit": einstellungen.einsatzbereit,
+            "version": _env("RENDER_GIT_COMMIT", "unbekannt")[:8],
+            "cors_fuer": ERLAUBTE_HERKUENFTE}
 
 
 @app.get("/form-token")
