@@ -26,17 +26,29 @@ jobs:
         env:
           TOKEN: ${{ secrets.MAIL_REPO_TOKEN }}
           TYP: ${{ github.event.action }}
-          # Die Nutzlast reist unveraendert weiter. Sie enthaelt KEINE
-          # Klaradresse - die steckt signiert im Token, und das Token geht
-          # an einen privaten Workflow.
-          NUTZLAST: ${{ toJSON(github.event.client_payload) }}
+          # Die Nutzlast steht BEWUSST NICHT hier. Actions druckt den
+          # `env:`-Block eines `run`-Schrittes vollstaendig ins Protokoll,
+          # und zwar BEVOR die erste Zeile laeuft - ein `::add-mask::` im
+          # Skript kommt also zu spaet.
+          #
+          # Und die Nutzlast ist sehr wohl personenbezogen: `token` und
+          # `confirm_url` sind base64, nicht verschluesselt. Wer sie
+          # dekodiert, liest die Adresse im Klartext. Genau das stand am
+          # 13.08.2026 im Protokoll von Lauf 31705957050 - entgegen der
+          # Hausregel "in keinem Log steht je eine Adresse" und entgegen
+          # dem Kommentar, der frueher an dieser Stelle das Gegenteil
+          # behauptete.
+          #
+          # Gelesen wird sie deshalb aus der Ereignisdatei auf der Platte.
+          # Die steht ohnehin im Runner, wird aber nirgends ausgegeben.
         run: |
           if [ -z "$TOKEN" ]; then
             echo "::error::Secret MAIL_REPO_TOKEN fehlt."
             exit 1
           fi
-          koerper=$(jq -nc --arg t "$TYP" --argjson p "$NUTZLAST" \
-            '{event_type:$t, client_payload:$p}')
+          koerper=$(jq -c --arg t "$TYP" \
+            '{event_type:$t, client_payload:.client_payload}' \
+            "$GITHUB_EVENT_PATH")
           code=$(curl -sS -o /tmp/antwort.txt -w '%{http_code}' -X POST \
             -H "Authorization: Bearer $TOKEN" \
             -H "Accept: application/vnd.github+json" \

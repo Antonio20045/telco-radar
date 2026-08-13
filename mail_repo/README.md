@@ -55,8 +55,21 @@ Adresse; ein Test misst das (`test_keine_jsonl_im_repo_enthaelt_ein_adressmuster
 
 Nur `inbox/.github/workflows/weiterreichen.yml` hineinkopieren.
 
-Secret: `MAIL_REPO_TOKEN` — ein fein granulares PAT mit `contents: read` und
-**`repository_dispatch: write` auf `telco-radar-mail`**, sonst nichts.
+Secret: `MAIL_REPO_TOKEN` — ein fein granulares PAT, dessen **Resource owner
+`Antonio20045`** ist und das als **einziges** Repository `telco-radar-mail`
+ausgewählt hat, mit **Repository permissions → Contents: Read and write**.
+
+> **Es gibt keine Berechtigung namens `repository_dispatch`.** Bis zum
+> 13.08.2026 stand genau das hier, und ein Token, das man danach baut, gibt
+> es nicht — `POST /repos/{owner}/{repo}/dispatches` verlangt bei fein
+> granularen Token **Contents: write**. Das ist kontraintuitiv (es wird
+> nichts geschrieben), aber es ist die Regel.
+>
+> Die zwei Fehlerbilder auseinanderhalten:
+> **`401 Bad credentials`** = der Wert des Secrets stimmt nicht (abgelaufen,
+> beim Einfügen abgeschnitten, oder ein klassisches Token, das widerrufen
+> wurde). **`403`** = der Wert stimmt, die Berechtigung fehlt. Nur beim
+> zweiten hilft es, an den Häkchen zu drehen.
 
 ### 2. `telco-radar-mail` (privat)
 
