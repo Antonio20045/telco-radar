@@ -34,7 +34,13 @@ Antonio hat das am 11. August 2026 erledigt. **Nichts davon neu anlegen.**
 | Kontingent | **300 von 300 E-Mails pro Tag**, Zähler setzt täglich zurück |
 | Absender | `Telco Radar <antonio.fotiadis.francisco@gmail.com>`, **verifiziert** |
 | API-Key | `telco-radar-newsletter`, gültig bis 11.08.2027, liegt als GitHub-Secret `BREVO_API_KEY` in **beiden** Repositories: `telco-radar` (Testversand) und `telco-radar-mail` (Versand). Am 13.08.2026 nachgetragen — vorher stand er in keinem. |
-| SMTP | im Konto freigeschaltet — wird trotzdem nicht benutzt (siehe oben) |
+| Versand | **NOCH GESPERRT.** Der Testversand am 13.08.2026 bekam von
+`POST /v3/smtp/email` zweimal `HTTP 403 permission_denied`: *"Your SMTP
+account is not yet activated. Please contact us at contact@brevo.com to
+request activation."* Das ist eine Freischaltung auf Brevo-Seite, kein
+Fehler in dieser Einrichtung — der Key selbst ist gueltig
+(`GET /v3/account` -> HTTP 200). Ohne diese Freischaltung geht **keine**
+Mail raus: kein Testversand, keine Bestaetigungsmail, keine Ausgabe. |
 
 **Der API-Key steht nirgends im Code, in keiner Datei und in keinem Log.**
 Ausschließlich als Secret. Wer ihn braucht, holt ihn über
