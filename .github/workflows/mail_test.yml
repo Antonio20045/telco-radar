@@ -54,9 +54,9 @@ jobs:
             exit 1
           fi
           [ "$code" = "200" ] || { cat /tmp/konto.json; exit 1; }
-          python3 - <<'PY' < /tmp/konto.json
+          python3 - <<'PY'
           import json, sys
-          konto = json.load(sys.stdin)
+          konto = json.load(open("/tmp/konto.json"))
           plan = konto.get("plan") or []
           for p in plan:
               print("Plan:", p.get("type"), "Kontingent:", p.get("credits"))
@@ -82,10 +82,10 @@ jobs:
             -H "api-key: $BREVO_API_KEY" \
             "https://api.brevo.com/v3/smtp/statistics/events?limit=20")
           echo "GET /v3/smtp/statistics/events -> HTTP $code"
-          python3 - <<'PY' < /tmp/events.json
+          python3 - <<'PY'
           import json, sys
           try:
-              daten = json.load(sys.stdin)
+              daten = json.load(open("/tmp/events.json"))
           except Exception as exc:
               print("nicht lesbar:", exc); raise SystemExit(1)
           events = daten.get("events") or []
