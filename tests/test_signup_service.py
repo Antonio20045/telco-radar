@@ -437,3 +437,54 @@ def test_die_bremse_waechst_nicht_unbegrenzt():
     for i in range(500):
         b.erlaubt_jetzt(f"ip-{i}", jetzt=i)
     assert len(b._spuren) <= 50
+
+
+# ================================================================  CORS  ====
+# Die Seite und dieser Dienst liegen auf VERSCHIEDENEN Hosts
+# (telco-radar.onrender.com gegen telco-radar-signup.onrender.com). Jeder
+# Formularaufruf ist damit cross-origin, und ohne die Middleware ist das
+# Formular im Browser tot, waehrend der Dienst per curl korrekt antwortet -
+# gemessen am 13.08.2026 auf der Live-Instanz:
+#
+#   GET  /form-token   -> 200, aber ohne `Access-Control-Allow-Origin`
+#   OPTIONS /subscribe -> 405, der Preflight faellt durch
+#
+# Die drei Tests hier schicken deshalb einen `Origin`-Header und pruefen die
+# ANTWORTKOPFZEILEN. Ein Test, der einfach POSTet, ist gruen, egal wie die
+# Middleware steht: TestClient spricht denselben Origin und erzwingt CORS
+# ueberhaupt nicht. Genau daran ist der Fehler vorbeigekommen.
+
+EIGENE_SEITE = "https://telco-radar.onrender.com"
+
+
+def test_form_token_traegt_die_cors_freigabe_der_eigenen_seite(dienst):
+    """Ohne diesen Kopf verwirft der Browser die Antwort, und das Formular
+    kommt nie ueber den ersten Schritt hinaus."""
+    antwort = dienst.get("/form-token", headers={"Origin": EIGENE_SEITE})
+    assert antwort.status_code == 200
+    assert antwort.headers.get("access-control-allow-origin") == EIGENE_SEITE
+
+
+def test_der_preflight_auf_subscribe_wird_beantwortet(dienst):
+    """Ein POST mit `content-type: application/json` loest einen Preflight
+    aus. Ohne Middleware antwortet FastAPI darauf mit 405 - der eigentliche
+    POST wird dann nie abgeschickt."""
+    antwort = dienst.options("/subscribe", headers={
+        "Origin": EIGENE_SEITE,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+    })
+    assert antwort.status_code == 200, "Preflight abgelehnt"
+    assert antwort.headers.get("access-control-allow-origin") == EIGENE_SEITE
+    assert "POST" in antwort.headers.get("access-control-allow-methods", "")
+
+
+def test_eine_fremde_seite_bekommt_keine_freigabe(dienst):
+    """Die Gegenprobe - ohne sie belegen die zwei Tests oben nur, dass
+    IRGENDEIN Kopf gesetzt wird. Ein '*' wuerde jeder fremden Seite
+    erlauben, das Anmeldeformular in ihrem Namen abzuschicken."""
+    antwort = dienst.get("/form-token",
+                         headers={"Origin": "https://boese.example"})
+    freigabe = antwort.headers.get("access-control-allow-origin")
+    assert freigabe != "https://boese.example"
+    assert freigabe != "*"

@@ -46,6 +46,7 @@ import urllib.request
 from pathlib import Path
 
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 
 # Der Dienst lebt im selben Repo wie die Pipeline, laeuft aber als eigener
@@ -100,6 +101,42 @@ app = FastAPI(title="Telco Radar - Anmeldung", docs_url=None, redoc_url=None)
 einstellungen = Einstellungen()
 bremse = IPBremse()
 katalog = lade_katalog(WURZEL)
+
+# ------------------------------------------------------------------ CORS ----
+# Die Seite liegt auf telco-radar.onrender.com, dieser Dienst auf
+# telco-radar-signup.onrender.com. JEDER Aufruf des Formulars ist damit
+# cross-origin - und ohne diese Middleware ist das Formular im Browser tot,
+# waehrend der Dienst per curl tadellos antwortet:
+#
+#   GET  /form-token  -> 200, aber ohne `Access-Control-Allow-Origin`;
+#                        der Browser verwirft die Antwort.
+#   OPTIONS /subscribe -> 405, der Preflight faellt durch, der POST wird
+#                        nie abgeschickt.
+#
+# Nichts davon steht in einem Protokoll: der Dienst hat ja korrekt
+# geantwortet. Gefunden am 13.08.2026, nachdem Antonio auf der fertigen
+# Seite keine Anmeldemoeglichkeit fand.
+#
+# Warum kein Test das gesehen hat: FastAPIs TestClient spricht denselben
+# Origin und erzwingt CORS ueberhaupt nicht. Ein Test, der einfach POSTet,
+# ist deshalb gruen, egal wie die Middleware steht. Der Test dazu schickt
+# einen `Origin`-Header und prueft die ANTWORTKOPFZEILEN.
+#
+# Bewusst kein "*": dieser Dienst nimmt Anmeldungen entgegen, und eine
+# fremde Seite soll das Formular nicht in ihrem Namen abschicken koennen.
+# Erlaubt ist die eigene Seite - dieselbe Adresse, die auch die
+# Bestaetigungslinks traegt, also genau eine Stelle zum Pflegen.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[einstellungen.basis_url],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["content-type"],
+    # Es gibt weder Cookie noch Auth-Header; alles reist signiert im Token.
+    # `allow_credentials=True` waere hier nicht nur unnoetig, sondern wuerde
+    # die Herkunftspruefung des Browsers aufweichen.
+    allow_credentials=False,
+    max_age=3600,
+)
 
 
 # ------------------------------------------------------------- Handwerk ----
