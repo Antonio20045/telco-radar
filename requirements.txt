@@ -21,3 +21,14 @@ Pillow>=10.0
 # Hier stehen sie, damit sich der Test in CI nicht mangels Import
 # ueberspringt: ein Skip sieht im Protokoll aus wie ein Erfolg.
 fastapi>=0.115
+# Volltext-Uebersetzung (src/telco_radar/uebersetzung/). py3langid erkennt die
+# Sprache - IMMER auf dem Fliesstext, nie auf der Ueberschrift: auf Titeln
+# gemessen galt "AT&T, Ericsson demonstrate drone-sensing 5G capabilities" als
+# franzoesisch. trafilatura zieht den Artikeltext aus der Seite; ein Eigenbau
+# darueber liefert frueher oder spaeter Navigation und Cookie-Banner statt des
+# Artikels, und das steht dann uebersetzt auf der eigenen Domain.
+#
+# Beide fallen GESCHLOSSEN aus: fehlt die Bibliothek, wird nichts uebersetzt -
+# nicht alles.
+py3langid>=0.2
+trafilatura>=1.8

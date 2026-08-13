@@ -11,7 +11,7 @@ import logging
 import os
 import sys
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import zip_longest
 from datetime import date, datetime, timezone
@@ -28,6 +28,7 @@ from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
 from .analyze import highlight_topics
+from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .collect import collect_all, tag_news_regions
@@ -1052,6 +1053,41 @@ def run(root: Path, use_llm: bool | None = None,
         log.warning("%d Themen stammen aus dem Notfall-Digest, nicht aus der "
                     "Redaktion - sie werden NICHT als berichtet gemerkt",
                     len(covered))
+
+    # ------------------------------------------------------- Uebersetzung
+    # Fremdsprachige Meldungen bekommen eine vollstaendige deutsche Fassung
+    # als eigene Seite. Die Stufe steht VOR dem Rendern, weil der rote Link
+    # auf der gerenderten Karte stehen muss - und genau deshalb bekommt sie
+    # dieselbe Sicherung wie das Geraeteradar: ihr Budget rechnet gegen die
+    # RESTZEIT DES JOBS abzueglich der Reserve fuers Veroeffentlichen, nicht
+    # gegen sich selbst. Lauf 31422689829 hat gezeigt, was die andere
+    # Rechnung kostet: 45 erfolgreiche Minuten, von denen nichts
+    # veroeffentlicht wurde.
+    #
+    # Failsafe daneben: ein Fehler dieser Stufe darf den Bericht nie kosten.
+    # Sie laeuft auf `new_items`, also auf dem, was den Seen- und
+    # Freshness-Filter ueberlebt hat - eine laengst bekannte Meldung wird
+    # nicht ein zweites Mal abgerufen.
+    uebersetzung_bilanz: dict = {}
+    _ueb_budget = uebersetzung_stufe.budget(cfg.settings, time.monotonic() - t0)
+    if _ueb_budget is None:
+        if cfg.settings.get("uebersetzung_enabled", True):
+            log.warning("Uebersetzung uebersprungen: zu wenig Jobzeit uebrig. "
+                        "Die Veroeffentlichung geht vor.")
+    elif not llm.llm_available():
+        log.info("Uebersetzung uebersprungen: kein Modellzugang.")
+    else:
+        try:
+            uebersetzung_bilanz = uebersetzung_stufe.lauf(
+                new_items, root, cfg.settings, editor_model,
+                frist_sekunden=_ueb_budget, heute=today)
+            log.info("%s", uebersetzung_stufe.protokollzeile(uebersetzung_bilanz))
+            run_log["uebersetzung"] = {
+                k: (dict(v) if isinstance(v, Counter) else v)
+                for k, v in uebersetzung_bilanz.items()}
+        except Exception as exc:  # noqa: BLE001
+            log.error("Uebersetzung uebersprungen: %s: %s",
+                      type(exc).__name__, exc)
 
     # ---------------------------------------------------------------- site
     # Erst aufraeumen, dann rendern: render_site kopiert den Bildordner nach

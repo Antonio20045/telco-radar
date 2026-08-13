@@ -468,3 +468,41 @@ http:
 # Eintragen, sobald der Dienst laeuft, zum Beispiel:
 #   newsletter_dienst_url: "https://telco-radar-signup.onrender.com"
 newsletter_dienst_url: "https://telco-radar-signup.onrender.com"
+
+# =============================================================================
+# VOLLTEXT-UEBERSETZUNG
+# =============================================================================
+# Artikel, deren Original weder deutsch noch englisch ist, bekommen eine
+# vollstaendige deutsche Uebersetzung als eigene statische Seite. Auf der
+# Meldungskarte steht dann ein roter Link darauf - der Link zur
+# ORIGINALQUELLE bleibt unveraendert daneben.
+#
+# Der Hauptschalter. Auf `false` laeuft die Pipeline exakt wie vorher: keine
+# Abrufe, keine Modellaufrufe, keine Links. Bereits erzeugte
+# Uebersetzungsseiten bleiben erreichbar und verlinkt - sie sind fertig,
+# und ein abgeschalteter Schalter ist kein Grund, Vorhandenes zu verstecken.
+uebersetzung_enabled: true
+
+# Wie viele Artikel je Lauf hoechstens uebersetzt werden.
+#
+# Gemessen am 13.08.2026 ueber 1329 Feed-Eintraege: 15,2 % sind
+# fremdsprachig, bei 130-190 neuen Meldungen je Lauf also rund 20-30. Der
+# Deckel liegt bewusst darueber und ist trotzdem hart: eine Quelle, die
+# ploetzlich hundert Meldungen liefert, darf nicht den Lauf kosten.
+uebersetzung_max_je_lauf: 40
+
+# Das Zeitbudget der Stufe in Sekunden. Es ist eine OBERGRENZE, keine
+# Zuteilung: gerechnet wird gegen die Restzeit des Jobs abzueglich
+# `veroeffentlichung_reserve_sekunden`, und unterhalb einer Minute Rest
+# faengt die Stufe gar nicht erst an. Genau daran ist Lauf 31422689829
+# gescheitert - eine Nebenstufe mit eigenem Budget in einem Job, der weniger
+# Zeit hatte als sie.
+uebersetzung_frist_sekunden: 600
+
+# Ob die ARTIKELSEITE abgerufen werden darf, wenn der Feed keinen Volltext
+# mitliefert. Auf `false` bleibt nur der kostenlose Weg (content:encoded).
+#
+# Das kostet mehr, als es klingt: gemessen tragen nur 43 % der
+# fremdsprachigen Eintraege ihren Volltext im Feed. Ohne den Artikelabruf
+# faellt also die Mehrheit aus.
+uebersetzung_artikelabruf: true

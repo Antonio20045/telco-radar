@@ -1,0 +1,23 @@
+{# Der rote Link zur vollstaendigen deutschen Uebersetzung.
+
+   EINE Stelle, an zwei Vorlagen eingebunden (meldungen, woche). Als
+   kopierter Schnipsel liefe er beim ersten Umbau auseinander, und dann
+   traegt die Meldungsseite einen anderen Link als die Titelseite.
+
+   Zwei Regeln stecken in diesen sechs Zeilen:
+
+     - Der Link zur ORIGINALQUELLE bleibt unberuehrt. Er steht in der
+       Karte darueber und wird hier weder ersetzt noch verdeckt: die
+       Uebersetzung tritt NEBEN das Original.
+     - Er steht AUSSERHALB des umschliessenden <a> der Karte. Ein Link in
+       einem Link ist kein gueltiges HTML - dieselbe Regel, die schon fuer
+       die Belegquellen gilt.
+
+   `h.uebersetzung` setzt `render_site()` aus dem Uebersetzungsspeicher.
+   Fehlt es, erscheint gar nichts - eine deutsche oder englische Meldung
+   traegt keinen Hinweis darauf, dass es keine Uebersetzung gibt. #}
+{% macro uebersetzung_link(h, prefix='') %}
+{% if h.uebersetzung %}
+<p class="ueb-link"><a href="{{ prefix }}{{ h.uebersetzung }}">Vollständige Übersetzung lesen</a></p>
+{% endif %}
+{% endmacro %}

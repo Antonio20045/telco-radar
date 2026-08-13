@@ -25,6 +25,7 @@
    Das Datum steht EINMAL, in der Datumszeile des Zeitungskopfs.
    Dieselbe Vorlage rendert die Archivwochen unter reports/<datum>.html. #}
 {% extends "base.html.j2" %}
+{% import "_uebersetzung.html.j2" as ueb %}
 {% set active = 'woche' %}
 {% block title %}{% if is_latest %}Vodafone Product and Services Insights · Ausgabe vom {{ date_de }}{% else %}Vodafone Product and Services Insights · Archiv {{ report.date if report else '' }}{% endif %}{% endblock %}
 
@@ -106,6 +107,7 @@
           {% if a.quellenzahl and a.quellenzahl > 1 %}<span class="rubrik-zahl">{{ a.quellenzahl }} Quellen</span>{% endif %}
           <a href="{{ a.url }}" target="_blank" rel="noopener">Originalquelle öffnen &nearr;</a>
         </p>
+        {{ ueb.uebersetzung_link(a, prefix) }}
       </div>
     </article>
     {% else %}

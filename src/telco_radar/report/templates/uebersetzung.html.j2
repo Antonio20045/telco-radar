@@ -1,0 +1,57 @@
+{# Eine vollstaendige deutsche Uebersetzung eines fremdsprachigen Artikels.
+
+   Drei Dinge stehen OBEN, nicht als Fussnote:
+     1. dass es eine maschinelle Uebersetzung ist,
+     2. aus welcher Sprache,
+     3. der Link zum Original.
+
+   Das ist keine Hoeflichkeit, sondern der Kern: die Uebersetzung tritt
+   NEBEN das Original, nicht an seine Stelle. Wer hier landet, muss ohne
+   Scrollen wissen, was er liest und wo es herkommt.
+
+   Kein Nav-Eintrag - die Seite ist ueber den roten Link der Meldungskarte
+   erreichbar und ueber sonst nichts. #}
+{% extends "base.html.j2" %}
+{% set ohne_topbar_suche = false %}
+{% block title %}{{ u.titel_de }} · Übersetzung · Vodafone Product and Services Insights{% endblock %}
+
+{% block content %}
+<article class="ueb">
+
+  <p class="ueb-rubrik">Vollständige Übersetzung</p>
+
+  <h1 class="ueb-titel szl">{{ u.titel_de }}</h1>
+
+  <p class="ueb-meta">
+    {{ u.quelle }}{% if u.datum %} · {{ u.datum }}{% endif %} ·
+    aus dem {{ sprachname_dativ }}
+  </p>
+
+  {# Der Hinweis und der Originallink stehen ZUSAMMEN und ganz oben. Getrennt
+     gesetzt liest man das eine und uebersieht das andere. #}
+  <div class="ueb-hinweis">
+    <p><b>Maschinelle Übersetzung.</b> Dieser Text wurde automatisch aus dem
+    {{ sprachname_dativ }} übersetzt und nicht redaktionell geprüft.
+    Verbindlich ist allein das Original.</p>
+    <p class="ueb-original">
+      <a href="{{ u.url }}" target="_blank" rel="noopener">Original bei {{ u.quelle }} lesen</a>
+      {% if u.titel_original and u.titel_original != u.titel_de %}
+      <span class="ueb-otitel">{{ u.titel_original }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="ueb-text">
+    {% for absatz in u.absaetze %}<p>{{ absatz }}</p>
+    {% endfor %}
+  </div>
+
+  <p class="ueb-fuss">
+    Übersetzt am {{ u.erstellt_am }} ·
+    {{ u.absaetze|length }} Absätze ·
+    Original {{ u.zeichen_original }} Zeichen ·
+    <a href="{{ u.url }}" target="_blank" rel="noopener">zum Original</a>
+  </p>
+
+</article>
+{% endblock %}
