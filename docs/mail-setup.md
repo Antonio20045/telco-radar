@@ -34,13 +34,17 @@ Antonio hat das am 11. August 2026 erledigt. **Nichts davon neu anlegen.**
 | Kontingent | **300 von 300 E-Mails pro Tag**, Zähler setzt täglich zurück |
 | Absender | `Telco Radar <antonio.fotiadis.francisco@gmail.com>`, **verifiziert** |
 | API-Key | `telco-radar-newsletter`, gültig bis 11.08.2027, liegt als GitHub-Secret `BREVO_API_KEY` in **beiden** Repositories: `telco-radar` (Testversand) und `telco-radar-mail` (Versand). Am 13.08.2026 nachgetragen — vorher stand er in keinem. |
-| Versand | **NOCH GESPERRT.** Der Testversand am 13.08.2026 bekam von
-`POST /v3/smtp/email` zweimal `HTTP 403 permission_denied`: *"Your SMTP
-account is not yet activated. Please contact us at contact@brevo.com to
-request activation."* Das ist eine Freischaltung auf Brevo-Seite, kein
-Fehler in dieser Einrichtung — der Key selbst ist gueltig
-(`GET /v3/account` -> HTTP 200). Ohne diese Freischaltung geht **keine**
-Mail raus: kein Testversand, keine Bestaetigungsmail, keine Ausgabe. |
+| Versand | **Freigeschaltet am 13.08.2026.** Der erste Versuch bekam
+`HTTP 403 permission_denied` ("SMTP account is not yet activated"), auch in
+Brevos eigener Oberflaeche. Ursache: die Kontoregistrierung war bei Schritt
+2 von 5 stehengeblieben, die Unternehmensanschrift fehlte. Nach dem
+Nachtragen ging der Versand sofort. |
+| **Absenderdomaene** | **Wird von Brevo ersetzt.** Im `From:` steht nicht
+`@gmail.com`, sondern `antonio.fotiadis.francisco@11874756.brevosend.com`.
+Brevo tut das bei nicht authentifizierten Domaenen automatisch. Folge fuer
+3.3: SPF, DKIM und DMARC richten sich damit auf *Brevos* Domaene aus, sind
+also technisch sauber — der Preis ist ein Absender, der nach Maschine
+aussieht. Eine eigene Domain waere die einzige Abhilfe. |
 
 **Der API-Key steht nirgends im Code, in keiner Datei und in keinem Log.**
 Ausschließlich als Secret. Wer ihn braucht, holt ihn über
@@ -107,46 +111,38 @@ Markenname vor einer nicht zur Marke gehörenden Adresse ist genau das Muster,
 auf das Konzern-Gateways als Display-Name-Spoofing anschlagen — und
 markenrechtlich gilt dasselbe wie bei der Domain.
 
-## 4. Der Testversand — Ergebnis noch offen
+## 4. Der Testversand — Lauf vom 13.08.2026
 
-`.github/workflows/mail_test.yml` ist der Wegwerf-Workflow dafür. Er läuft
-**nur von Hand** (`workflow_dispatch`), nimmt die beiden Zieladressen als
-Eingabe und gibt zurück, was Brevo antwortet. Verschickt wird eine neutrale
-Testmail ohne Inhalt aus dem Bericht.
+`.github/workflows/mail_test.yml` (Wegwerf, nur `workflow_dispatch`).
+Lauf `31701576584`, 13.08.2026 14:45 MESZ.
 
-```
-Actions → "Mail-Testversand (Wegwerf)" → Run workflow
-   freemail_to      = eine Adresse bei einem Freemail-Anbieter
-   unternehmen_to   = eine Adresse in einem Firmenpostfach
-```
+| Was | Ergebnis |
+|---|---|
+| `POST /v3/smtp/email`, Freemail | **HTTP 201**, `202608131245.50237314179@smtp-relay.mailin.fr` |
+| `POST /v3/smtp/email`, Firma | **HTTP 201**, `202608131245.37351269242@smtp-relay.mailin.fr` |
+| Brevo-Log, Freemail | **Zugestellt** |
+| Brevo-Log, Firma (`@vodafone.com`) | **Zugestellt** — das Konzern-Gateway hat *angenommen* |
+| tatsaechlicher Absender | `antonio.fotiadis.francisco@11874756.brevosend.com` |
+| `GET /v3/smtp/statistics/events` nach 30 s | HTTP 200, **0 Ereignisse** |
 
-**Was danach hier einzutragen ist** — und zwar auch dann, wenn es schlecht
-ausfällt:
+**Zugestellt heisst angenommen, nicht gelesen.** Ob die Mail im Firmenpostfach
+im Posteingang oder im Spam liegt, sagt kein Log — das muss ein Mensch
+nachsehen. Diese zwei Zeilen sind noch offen:
 
 | Frage | Antwort |
 |---|---|
 | Freemail-Postfach: Posteingang oder Spam? | *offen* |
 | **Firmenpostfach: Posteingang oder Spam?** | *offen* |
-| `Authentication-Results`: SPF | *offen* |
-| `Authentication-Results`: DKIM | *offen* |
-| `Authentication-Results`: DMARC | *offen* — erwartet wird `fail` oder `none`, siehe 3.3 |
-| Events-API liefert Ereignisse zum Testversand? | *offen* |
+| `Authentication-Results`-Zeile | *offen* |
 
-> **Diese Zeilen sind noch nicht gemessen.** Der Workflow ist gebaut und
-> lauffähig, aber in dieser Session konnte er nicht ausgeführt werden: Ein
-> echter Versand braucht den Secret-Zugriff eines Actions-Laufs und zwei
-> reale Postfächer. Solange die Tabelle offen ist, ist der Newsletter **nicht
-> abgenommen** — Schritt 1 von N9.
+Zu den 0 Ereignissen: die Events-API antwortete korrekt mit HTTP 200, die
+Ereignisse standen wenige Minuten spaeter im Log. Die 30 Sekunden Wartezeit im
+Workflow sind schlicht zu knapp. Fuer `bounce_sync.yml` ist das ohne Belang —
+der laeuft taeglich, nicht sekundenaktuell.
 
-**Die zweite Zeile entscheidet über das Vorhaben.** Landet die Mail im
-Firmenpostfach im Spam, ist das kein Bug, sondern die dokumentierte Folge der
-Absenderentscheidung. Dann steht die Frage an, ob der Newsletter für diese
-Zielgruppe trägt, ob die Empfänger einmalig gebeten werden, den Absender als
-vertrauenswürdig zu markieren, oder ob Ausbaustufe A (eigene Domain, ~10–20 €
-im Jahr, ein halber Nachmittag) doch fällig wird.
-
-Nach dem Eintragen: **Workflow löschen.** Er hat keinen Zweck im Dauerbetrieb
-und ist ein Versandwerkzeug mit freier Empfängerangabe.
+**Wenn die zwei offenen Zeilen ausgefuellt sind: `mail_test.yml` und
+`.github/scripts/mail_test.py` loeschen.** Der Workflow nimmt beliebige
+Empfaengeradressen entgegen und hat im Dauerbetrieb nichts zu suchen.
 
 ## 5. Fehlerbilder und ihre erste Ursache
 
