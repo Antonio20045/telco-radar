@@ -125,24 +125,36 @@ Lauf `31701576584`, 13.08.2026 14:45 MESZ.
 | tatsaechlicher Absender | `antonio.fotiadis.francisco@11874756.brevosend.com` |
 | `GET /v3/smtp/statistics/events` nach 30 s | HTTP 200, **0 Ereignisse** |
 
-**Zugestellt heisst angenommen, nicht gelesen.** Ob die Mail im Firmenpostfach
-im Posteingang oder im Spam liegt, sagt kein Log — das muss ein Mensch
-nachsehen. Diese zwei Zeilen sind noch offen:
+**Der Sichtbefund, den kein Log liefert** (Antonio, 13.08.2026):
 
 | Frage | Antwort |
 |---|---|
-| Freemail-Postfach: Posteingang oder Spam? | *offen* |
-| **Firmenpostfach: Posteingang oder Spam?** | *offen* |
-| `Authentication-Results`-Zeile | *offen* |
+| Freemail-Postfach | **Posteingang** |
+| **Firmenpostfach (`@vodafone.com`)** | **Posteingang** — nicht Spam |
+| `Authentication-Results`-Zeile | nicht erfasst |
+
+Damit ist die Frage beantwortet, die ueber das Vorhaben entschieden hat: das
+Konzern-Gateway laesst diesen Versandweg in den Posteingang. Der Grund ist
+mit hoher Wahrscheinlichkeit die Absenderersetzung aus Abschnitt 2 — weil
+Brevo die Domaene durch `11874756.brevosend.com` austauscht, sind SPF, DKIM
+und DMARC ausgerichtet. Die Befuerchtung aus 3.3 (nicht ausgerichteter
+Freemail-Absender) trifft in dieser Konstellation nicht zu.
+
+**Das ist eine Momentaufnahme, keine Garantie.** Sie gilt fuer eine einzelne
+Mail ohne Verteiler-Historie. Reputation entsteht erst ueber Wochen, und ein
+Konzern-Gateway bewertet Massenversandmuster spaeter strenger als einen
+Einzelversand. Wenn Ausgaben spaeter im Spam landen, ist das kein Widerspruch
+zu dieser Zeile.
 
 Zu den 0 Ereignissen: die Events-API antwortete korrekt mit HTTP 200, die
 Ereignisse standen wenige Minuten spaeter im Log. Die 30 Sekunden Wartezeit im
 Workflow sind schlicht zu knapp. Fuer `bounce_sync.yml` ist das ohne Belang —
 der laeuft taeglich, nicht sekundenaktuell.
 
-**Wenn die zwei offenen Zeilen ausgefuellt sind: `mail_test.yml` und
-`.github/scripts/mail_test.py` loeschen.** Der Workflow nimmt beliebige
-Empfaengeradressen entgegen und hat im Dauerbetrieb nichts zu suchen.
+`mail_test.yml` und `.github/scripts/mail_test.py` sind mit diesem Commit
+**geloescht** — der Workflow nahm beliebige Empfaengeradressen entgegen und
+hatte im Dauerbetrieb nichts zu suchen. Wer ihn wiederbraucht (etwa nach dem
+Umzug auf eine eigene Domain), holt ihn aus der Git-Historie zurueck.
 
 ## 5. Fehlerbilder und ihre erste Ursache
 
