@@ -173,7 +173,14 @@ def _abmeldelinks(abos, basis: str) -> dict:
     for abo in abos:
         token = tokens.schreibe(key, tokens.ZWECK_ABMELDUNG,
                                 {"sub_id": abo.id, "addr_hmac": abo.email_hmac})
-        aus[abo.id] = f"{basis}/unsubscribe/{token}"
+        # Nicht `basis`: das ist die Website. `/unsubscribe/...` ist eine
+        # Route des Signup-Dienstes. Derselbe Fehler wie beim
+        # Bestaetigungslink, nur faellt er spaeter auf - erst wenn sich
+        # jemand abmelden will und ein 404 bekommt.
+        dienst = os.environ.get(
+            "DIENST_BASE_URL", "https://telco-radar-signup.onrender.com"
+        ).rstrip("/")
+        aus[abo.id] = f"{dienst}/unsubscribe/{token}"
     return aus
 
 

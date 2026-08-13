@@ -89,6 +89,15 @@ class Einstellungen:
                                   "Antonio20045/telco-radar-inbox")
         self.basis_url = _env("SITE_BASE_URL",
                               "https://telco-radar.onrender.com").rstrip("/")
+        # Die Adresse DIESES Dienstes - nicht die der Website. Der
+        # Unterschied ist keine Feinheit: `/confirm/...` und
+        # `/unsubscribe/...` sind Routen hier, die Website ist eine Static
+        # Site und kennt sie nicht. Bis zum 13.08.2026 baute der
+        # Bestaetigungslink auf `SITE_BASE_URL` - jede Bestaetigungsmail
+        # fuehrte damit auf ein 404, und die Anmeldung konnte niemand
+        # abschliessen.
+        self.dienst_url = _env("DIENST_BASE_URL",
+                               "https://telco-radar-signup.onrender.com").rstrip("/")
         self.erlaubte_domains = [d for d in _env("ERLAUBTE_DOMAINS", "").split(",")
                                  if d.strip()]
 
@@ -343,7 +352,7 @@ async def subscribe(anfrage: Request) -> JSONResponse:
         # Der Kennwert reist AUCH ausserhalb des Tokens mit: `doi.yml` prueft
         # damit die 24-Stunden-Sperre, ohne das Token entpacken zu muessen.
         "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
-        "confirm_url": f"{einstellungen.basis_url}/confirm/{bestaetigung}",
+        "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
     })
     if not ok:
         # Ehrlich bleiben: wenn der Weiterreichweg klemmt, kommt keine Mail,
