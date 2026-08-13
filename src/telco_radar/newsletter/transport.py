@@ -25,6 +25,7 @@ DIE ZWEI DINGE, DIE HIER RICHTIG SEIN MUESSEN:
 from __future__ import annotations
 
 import json
+import re
 import logging
 import time
 import urllib.error
@@ -94,15 +95,24 @@ class BrevoTransport(Transport):
     versuche: int = 3
 
     def _nutzlast(self, nachricht: Nachricht, an: str) -> dict:
-        return {
+        nutzlast = {
             "sender": {"name": self.absender_name,
                        "email": self.absender_adresse},
             "to": [{"email": an}],
             "subject": nachricht.betreff,
             "htmlContent": nachricht.html,
             "textContent": nachricht.text,
-            "headers": dict(nachricht.headers),
         }
+        # `headers` nur mitschicken, wenn wirklich einer drinsteht. Ein leeres
+        # Objekt beantwortet Brevo mit HTTP 400 - und genau daran scheiterte
+        # am 13.08.2026 jede Bestaetigungsmail: die DOI-Mail setzt bewusst
+        # keinen List-Unsubscribe (es gibt noch kein Abo), schickte das leere
+        # Feld aber trotzdem mit. Der Testversand hatte einen Header und kam
+        # deshalb durch - der Unterschied war unsichtbar, bis man beide
+        # Nutzlasten nebeneinanderlegte.
+        if nachricht.headers:
+            nutzlast["headers"] = dict(nachricht.headers)
+        return nutzlast
 
     def send(self, nachricht: Nachricht, an: str) -> Ergebnis:
         letzte = Ergebnis(ok=False, fehler="kein Versuch")
@@ -140,8 +150,19 @@ class BrevoTransport(Transport):
                 text += (" | Erste Ursache: Brevo-Keys verfallen nach 90 "
                          "Tagen ohne Nutzung (docs/mail-setup.md 3.2).")
             # Im Log steht der Code und der Text der API - NIE die Adresse.
-            log.warning("Brevo antwortet HTTP %s (%s)", fehler.code,
-                        "dauerhaft" if dauerhaft else "wiederholbar")
+            # Der Grund gehoert ins Protokoll, die Adresse nicht. Brevo
+            # nennt in `code`/`message` die verletzte Regel; Adressen darin
+            # werden vor der Ausgabe unkenntlich gemacht. Ohne diese Zeile
+            # stand am 13.08.2026 nur "HTTP 400 (dauerhaft)" im Log, und die
+            # Ursache war eine Stunde Suche wert.
+            try:
+                d = json.loads(text or "{}")
+                grund = f'{d.get("code", "?")}: {d.get("message", "")}'
+            except json.JSONDecodeError:
+                grund = text
+            grund = re.sub(r"[\w.+-]+@[\w.-]+", "<adresse>", grund)[:200]
+            log.warning("Brevo antwortet HTTP %s (%s) - %s", fehler.code,
+                        "dauerhaft" if dauerhaft else "wiederholbar", grund)
             return Ergebnis(ok=False, status=fehler.code, fehler=text,
                             dauerhaft=dauerhaft)
         except (OSError, json.JSONDecodeError) as fehler:
