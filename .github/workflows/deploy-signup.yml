@@ -1,0 +1,69 @@
+# Deploy des Signup-Dienstes auf Render.
+#
+# Warum es diesen Workflow ueberhaupt gibt: der Dienst haengt ueber "Public
+# Git Repository" an diesem Repo, nicht ueber Renders GitHub-App. Render
+# zeigt dafuer zwar "Auto-Deploy: On Commit" an, bekommt aber keine Webhooks
+# und deployt nie. Am 13.08.2026 lief die Instanz deshalb sechs Stunden lang
+# auf dem Stand des ersten Deploys, waehrend der Fix fuer den CORS-Preflight
+# laengst auf `main` lag. Der Fehler war von aussen nicht zu sehen: die Seite
+# meldete nur "Verbindung zum Anmeldedienst fehlgeschlagen".
+#
+# Der Deploy-Hook ist der Weg, der ohne GitHub-App funktioniert - derselbe,
+# den `deploy.yml` fuer die Static Site schon benutzt.
+name: Deploy Signup-Dienst
+
+on:
+  push:
+    branches: [main]
+    # Nur wenn der Dienst selbst sich aendert. Die Berichtscommits des Bots
+    # kommen zweimal die Woche und haetten sonst jedes Mal einen Build
+    # ausgeloest - auf dem Free-Plan sind Buildminuten endlich.
+    paths:
+      - "service/signup/**"
+      - ".github/workflows/deploy-signup.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-signup
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Render-Deploy anstossen
+        env:
+          HOOK: ${{ secrets.SIGNUP_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Secret SIGNUP_DEPLOY_HOOK fehlt. Render -> telco-radar-signup -> Settings -> Deploy Hook."
+            exit 1
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$HOOK")
+          echo "Deploy-Hook -> HTTP $code"
+          # 202 gehoert dazu: Render nimmt an und deployt asynchron. Siehe
+          # denselben Hinweis in deploy.yml.
+          [ "$code" = "200" ] || [ "$code" = "201" ] || [ "$code" = "202" ]
+
+      - name: Warten, bis der neue Stand antwortet
+        # Ohne diesen Schritt meldet der Workflow Erfolg, sobald Render den
+        # Hook angenommen hat - also bevor irgendetwas ausgeliefert ist.
+        # Genau diese Luecke hat den Fehler vom 13.08. verdeckt.
+        run: |
+          soll="${GITHUB_SHA:0:8}"
+          echo "Erwartet: ${soll:-<unbekannt>}"
+          for i in $(seq 1 20); do
+            antwort=$(curl -sS --max-time 25 https://telco-radar-signup.onrender.com/gesund || echo "")
+            echo "  Versuch $i: $antwort"
+            case "$antwort" in
+              *"$soll"*) echo "Neuer Stand ist live."; exit 0 ;;
+            esac
+            sleep 20
+          done
+          echo "::warning::Nach ~7 Minuten antwortet noch nicht der erwartete Commit."
+          echo "Kein Abbruch - der Free-Plan faehrt die Instanz bei Inaktivitaet herunter,"
+          echo "der erste Aufruf danach dauert. Im Render-Dashboard unter Events nachsehen."
