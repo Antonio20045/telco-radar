@@ -56,7 +56,7 @@
    "|5gb",
    "|63.49€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -96,7 +96,7 @@
    "|365tage",
    "|50gb"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -129,7 +129,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -163,14 +163,13 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
    "in|1gb",
    "jeden monat bis zu|30gb",
    "|10.99€",
-   "|100mb",
    "|10gb",
    "|14.99€",
    "|19.99€",
@@ -183,18 +182,19 @@
    "|360€",
    "|40gb",
    "|50gb",
+   "|50mb",
    "|6.99€",
    "|60gb",
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.premiumsim.de/": {
   "werte": [
    "ab|19.99€",
    "dsl ab|19.99€",
-   "sichern ab|59.99€",
+   "sichern ab|54.99€",
    "|0€",
    "|10.99€",
    "|10gb",
@@ -214,7 +214,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -229,7 +229,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -250,7 +250,7 @@
    "|55%",
    "|99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -275,7 +275,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -287,6 +287,7 @@
    "beim tarifpreis.|24monate",
    "bekommst du monate lang|10%",
    "bis zu|12monate",
+   "bis zu|500€",
    "buchst bekommst du zusätzlich|50%",
    "da ist hast du|15tage",
    "das geht bis zu|6monate",
@@ -325,6 +326,7 @@
    "gigamobil young m|100gb",
    "gigamobil young s|50gb",
    "gigamobil young xs|6gb",
+   "google ai pro|6monate",
    "hardware-bonus|200€",
    "im gigamobil l mit|280gb",
    "im gigamobil l mit|77gb",
@@ -335,12 +337,14 @@
    "im red l mit|72gb",
    "im red m mit|52gb",
    "im tarif familycard xl|15€",
+   "im wert von insgesamt|131.94€",
    "innerhalb von|14tage",
    "kostenpflichtig. du zahlst dafür|5.99€",
    "lang. das sind insgesamt|200€",
    "m gb zusätzlich insgesamt|100gb",
    "m gb zusätzlich insgesamt|200gb",
-   "mindestens|500€",
+   "mit dem tauschbonus von|120€",
+   "mit dem tauschbonus von|240€",
    "mit einem datenvolumen von|107gb",
    "mit einem datenvolumen von|135gb",
    "mit einem mindestwert von|1€",
@@ -358,7 +362,9 @@
    "monate lang jeden monat|20€",
    "monate lang jeden monat|5€",
    "monate lang|20€",
+   "monatliche abogebühr von derzeit|21.99€",
    "neu abschließt bekommst du|200€",
+   "pro fold bis zu|500€",
    "rabatt entfällt automatisch nach|24monate",
    "reisen dafür bekommst du|2gb",
    "s gb zusätzlich insgesamt|100gb",
@@ -368,6 +374,7 @@
    "selbständig dann bekommst du|24monate",
    "sich dein tarifpreis um|2€",
    "sich der tarifpreis um|15€",
+   "sich der zusatzbonus auf|260€",
    "smartphone dazubuchen und|200€",
    "smartphone-akkus ist weniger als|80%",
    "sparst du|25%",
@@ -381,6 +388,10 @@
    "surfst langsamer sobald du|100%",
    "tarif gigamobil young xs|25%",
    "tarifpreis du zahlst statt|39.99€",
+   "tauschbonus von sind das|200€",
+   "tauschbonus von sind das|300€",
+   "tauschbonus von sind das|400€",
+   "tauschbonus von sind das|500€",
    "und im mobil m|40gb",
    "und keine kaufpreis-erhöhung auf|260€",
    "und zwar nachdem du|4monate",
@@ -415,6 +426,7 @@
    "|15.99€",
    "|15gb",
    "|15€",
+   "|160€",
    "|18gb",
    "|19.99€",
    "|1monat",
@@ -436,11 +448,13 @@
    "|50gb",
    "|5€",
    "|60gb",
+   "|60€",
    "|8.34€",
+   "|80€",
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -458,6 +472,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-08-08"
+  "stand": "2026-08-14"
  }
 }

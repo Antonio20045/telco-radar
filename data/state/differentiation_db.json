@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-08",
+ "updated": "2026-08-14",
  "entries": [
   {
    "id": "https://thefastmode.com/technology-solutions/49163-o2-expands-cloud-storage-service-with-10-tb-free-space-for-mobile-fiber-customers",
@@ -170,6 +170,34 @@
    "status": "aktiv"
   },
   {
+   "id": "https://yahoo.com/entertainment/articles/t-mobile-plans-now-free-222402279.html",
+   "theme": "entertainment",
+   "operator": "T-Mobile",
+   "region": "Nordamerika",
+   "what": "T-Mobile nimmt in ausgewählte Tarife kostenlosen Zugang zu Netflix, Hulu und Apple TV auf; zusätzlich gibt es vier Monate Pandora Premium und sechs Monate SiriusXM kostenlos.",
+   "url": "https://www.yahoo.com/entertainment/articles/t-mobile-plans-now-free-222402279.html",
+   "source": "yahoo.com",
+   "date": null,
+   "why": "Der Move zeigt, wie ein Mobilfunkanbieter durch die gleichzeitige Bündelung mehrerer Streaming- und Audio-Dienste den Unterhaltungswert seiner Tarife erhöht.",
+   "first_seen": "2026-08-14",
+   "last_verified": "2026-08-14",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://cnet.com/tech/services-and-software/verizon-streaming-perk-free-disney-plus-netflix-discount-hbo-max",
+   "theme": "entertainment",
+   "operator": "Verizon",
+   "region": "Nordamerika",
+   "what": "Verizon bündelt für Kunden mit Fios-Home-Internet, 5G-Home-Internet oder einem berechtigten Mobilfunktarif Netflix und HBO Max (Basic mit Werbung) für 13 US-Dollar pro Monat, was eine monatliche Ersparnis von 7 US-Dollar bedeutet.",
+   "url": "https://www.cnet.com/tech/services-and-software/verizon-streaming-perk-free-disney-plus-netflix-discount-hbo-max/",
+   "source": "cnet.com",
+   "date": null,
+   "why": "Der Move zeigt, wie ein Anbieter über Festnetz- und Mobilfunkanschlüsse hinweg ein vergünstigtes Streaming-Bündel als Kundenbindungsinstrument einsetzt.",
+   "first_seen": "2026-08-14",
+   "last_verified": "2026-08-14",
+   "status": "aktiv"
+  },
+  {
    "id": "https://dignited.com/119603/tanzania-gets-paypal-m-pesa-super-app-integration-skipping-the-web-portal-era",
    "theme": "fintech",
    "operator": "Vodacom / M-Pesa",
@@ -292,7 +320,7 @@
    "date": null,
    "why": "Dieser Move ist interessant, weil er das Konzept der Preisgarantie aufgreift, aber mit einem Service-Versprechen kombiniert, was eine Differenzierung jenseits des reinen Preises darstellt.",
    "first_seen": "2026-07-25",
-   "last_verified": "2026-07-26",
+   "last_verified": "2026-08-14",
    "status": "aktiv"
   },
   {
@@ -320,7 +348,7 @@
    "date": "2026",
    "why": "Ein Immer-das-neueste-Gerät-Versprechen bindet ohne Preisnachlass.",
    "first_seen": "2026-06-15",
-   "last_verified": "2026-07-21",
+   "last_verified": "2026-08-14",
    "status": "aktiv"
   },
   {
@@ -475,6 +503,34 @@
    "why": "Dieser Move ist interessant, weil er einen Premium-KI-Dienst als Massen-Benefit für die gesamte Kundenbasis einführt, ohne eine Preiserhöhung vorzunehmen.",
    "first_seen": "2026-07-25",
    "last_verified": "2026-07-26",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://index.dev/blog/perplexity-ai-features-statistics",
+   "theme": "ki",
+   "operator": "Telkomsel",
+   "region": "Asien",
+   "what": "Telkomsel bündelt Perplexity Pro mit Datentarifen; Prepaid-Kunden zahlen 35.000 Rupiah (ca. 2,30 USD) für 3 Monate Perplexity Pro plus Internetkontingent.",
+   "url": "https://www.index.dev/blog/perplexity-ai-features-statistics",
+   "source": "index.dev",
+   "date": null,
+   "why": "Der Move zeigt, wie ein Mobilfunker ein KI-Abo als konkreten Zusatznutzen in Prepaid-Datentarife integriert und sich damit abseits reiner Netztarife positioniert.",
+   "first_seen": "2026-08-14",
+   "last_verified": "2026-08-14",
+   "status": "aktiv"
+  },
+  {
+   "id": "https://tecknexus.com/ai-in-india-why-airtel-perplexity-and-jio-gemini-offer-free-premium-access",
+   "theme": "ki",
+   "operator": "Reliance Jio",
+   "region": "Asien",
+   "what": "Reliance Jio integriert Google-Gemini-Funktionen in Endkundentarife und positioniert den Assistenten für Suche, Produktivität und multimodale Aufgaben.",
+   "url": "https://tecknexus.com/ai-in-india-why-airtel-perplexity-and-jio-gemini-offer-free-premium-access/",
+   "source": "tecknexus.com",
+   "date": null,
+   "why": "Der Schritt illustriert, wie ein Netzbetreiber einen generativen KI-Assistenten als Tarifbestandteil einsetzt, um sich im Endkundengeschäft über den Preis hinaus zu differenzieren.",
+   "first_seen": "2026-08-14",
+   "last_verified": "2026-08-14",
    "status": "aktiv"
   },
   {
