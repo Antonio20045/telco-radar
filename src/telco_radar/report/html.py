@@ -1128,6 +1128,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Veroeffentlichungsschwelle wie bei der Geraeteseite, und aus demselben
     # Grund im Code statt in einem Test.
     env.globals["newsletter_verlinkt"] = rechtstexte_mod.vollstaendig(_wurzel)
+
+    # ---- Uebersetzungen: die Zuordnung muss stehen, BEVOR die erste Woche
+    # gerendert wird. Der rote Link haengt an der einzelnen Meldung, und
+    # dieselbe Meldung steht auf der Titelseite, auf der Meldungsseite und in
+    # jeder Archivwoche - alle drei lesen `h["uebersetzung"]`.
+    #
+    # Es wird NICHT gefiltert, welche Ausgabe eine Uebersetzung bekommt: der
+    # Speicher wird nie beschnitten, also traegt auch eine Archivwoche von
+    # vor drei Monaten ihren Link weiter. Das ist die Gegenmassnahme zu den
+    # toten Archivlinks (Premortem 6).
+    from . import uebersetzung_view as uebersetzung_view_mod
+    uebersetzungen = uebersetzung_view_mod.lade(state_dir)
+    uebersetzung_je_url = uebersetzung_view_mod.zuordnung(uebersetzungen)
     if not env.globals["newsletter_verlinkt"]:
         for seite, was in rechtstexte_mod.offene_stellen(_wurzel):
             log.warning("Rechtstext unvollstaendig: %s -> %s", seite, was)
@@ -1157,6 +1170,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     wochen: list[dict] = []
     for i, report in enumerate(reports):
         highlights = _flatten(report)
+        # Der rote Link. Er entsteht beim Rendern und steht nicht in der
+        # Berichtsdatei: eine Uebersetzung kann nach der Ausgabe entstehen
+        # (die Stufe hat eine Frist und arbeitet ihre Kandidaten der Reihe
+        # nach ab), und ein Bericht wird nicht rueckwirkend umgeschrieben.
+        for h in highlights:
+            pfad = uebersetzung_je_url.get(h.get("url") or "")
+            if pfad:
+                h["uebersetzung"] = pfad
         briefing_md = _strip_vodafone_advice(
             _strip_suppressed_source_content(report.get("briefing_md", "")))
         briefing_html, toc = _anchor_headings(_md_to_html(briefing_md))
@@ -1454,6 +1475,31 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         for veraltet in thema_dir.iterdir():
             if veraltet.is_file() and veraltet.name not in geschrieben:
                 veraltet.unlink()
+
+    # ---- Uebersetzungsseiten, eine je Eintrag im Speicher.
+    #
+    # Anders als `thema/` wird hier NICHT gespiegelt: kein Aufraeumen, kein
+    # Loeschen veralteter Dateien. Eine Uebersetzung gehoert zu einer
+    # Meldung, und die steht noch in Jahren im Archiv - eine Seite, die
+    # verschwindet, sobald ihre Ausgabe aus dem Frischefenster rotiert,
+    # waere ein toter Link im eigenen Bestand.
+    #
+    # Die HTML-Dateien entstehen bei JEDEM Rendern neu aus dem JSONL. Das
+    # ist der Grund, warum der Speicher das JSONL ist und nicht der Ordner:
+    # eine Aenderung an der Vorlage schreibt sonst dreitausend
+    # Einzeldateien in die git-Historie (Premortem 7).
+    ueb_seiten = uebersetzung_view_mod.seiten(uebersetzungen)
+    if ueb_seiten:
+        ueb_dir = site_dir / uebersetzung_view_mod.ORDNER
+        ueb_dir.mkdir(exist_ok=True)
+        ueb_tpl = env.get_template("uebersetzung.html.j2")
+        for seite in ueb_seiten:
+            (ueb_dir / seite["dateiname"]).write_text(
+                ueb_tpl.render(prefix="../", u=seite["u"],
+                               sprachname=seite["sprachname"],
+                               sprachname_dativ=seite["sprachname_dativ"]),
+                encoding="utf-8")
+        log.info("Uebersetzungsseiten gerendert: %d", len(ueb_seiten))
 
     # ---- Suchindex und Dossier-Seite.
     #

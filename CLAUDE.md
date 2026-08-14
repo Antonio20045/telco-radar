@@ -141,6 +141,13 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
                (report/effektivpreis.py + tarife_view.py)
              + FOLIEN: vier Folien je Ausgabe nach site/folien/
                (report/folien.py) - feste Vorlage, harte Zeichengrenzen
+5b. UEBERSETZUNG  Fremdsprachige Meldungen bekommen eine VOLLSTAENDIGE
+             deutsche Fassung als eigene statische Seite
+             (src/telco_radar/uebersetzung/; State:
+             data/state/uebersetzungen.jsonl). Sie steht VOR dem Rendern
+             (der rote Link muss auf die Karte) und rechnet ihr Budget
+             deshalb gegen die RESTZEIT DES JOBS. Sprache IMMER auf dem
+             Fliesstext, nie auf der Ueberschrift
 6. VERSAND   Montags der Zwei-Minuten-Pfad per Mail, Teams nur fuer die
              Ausnahme (versand.py; State: data/state/versand.json)
 7. NEWSLETTER Ein AUSSPIELKANAL, kein vierter Anwendungsfall - und er laeuft
@@ -191,6 +198,7 @@ Wichtige Dateien:
 | `data/state/versand.json` | Zustellbuch — was schon hinaus ist. Ohne das schickt ein zweiter Lauf am selben Tag dieselbe Mail |
 | `data/state/tarife.jsonl` | Zeitreihe der Tarifdokumente. Ein Stand je Zeile; ein unveraendertes Dokument erzeugt KEINEN neuen Satz, nur ein neues `abgerufen_am` |
 | `data/state/ct_seen.jsonl` | Bekannte Subdomains je Domain. Klartext statt Hash — hier sind es Hunderte, nicht Millionen, und der Klartext ist die halbe Diagnose |
+| `data/state/uebersetzungen.jsonl` | Die fertigen Uebersetzungen, eine je Zeile. Schluessel ist `Item.id` **plus** ein Hash des Quelltexts. **Es wird nie etwas geloescht** — ein Archivbericht verlinkt seine Uebersetzung noch in einem Jahr. Die HTML-Seiten entstehen bei jedem Rendern daraus und werden NICHT einzeln versioniert |
 | `data/state/seen.jsonl` | Dedup-Gedächtnis. Seit 08/2026 **kompaktes v2-Format**: ein Hash je Zeile (17 statt ~300 Byte) |
 | `data/state/quellen_register.json` | Je Quelle: Herkunft, Abnahmedatum, Läufe, Erfolge, letzter Erfolg, Fehlserie, Quarantäne |
 | `data/state/reported_topics.jsonl` | Bereits berichtete Themen (Editor-Memory) |
@@ -293,6 +301,7 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
 | `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
+| `uebersetzung/<id>.html` (nicht verlinkt) | „Was steht da eigentlich?" | Die **vollständige** deutsche Fassung eines fremdsprachigen Artikels. Kein Nav-Eintrag: erreichbar über den roten Link der Meldungskarte. Oben und ohne Scrollen: „Maschinelle Übersetzung", die Ausgangssprache und der Link zum Original — die Übersetzung tritt NEBEN das Original, nicht an seine Stelle. Dateiname ist die `Item.id` (SHA-256 über die normalisierte URL), damit ein Archivbericht in einem Jahr noch trifft |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala; seit 11.08.2026 der **Newsletter-Abschnitt** (nur Zahlen, Warnung ab 80 % des Tageskontingents) |
 | `newsletter.html` **Newsletter** (nicht verlinkt) | „Schick mir das per Mail" | Vier Filterachsen plus eigene Stichwörter mit Trefferzahl-Vorschau, Einwilligungstext im Wortlaut. **Verlinkt erst, wenn Impressum und Datenschutzerklärung vollständig sind** — siehe Veröffentlichungsschwelle |
 | `newsletter-bestaetigt.html` / `-abgemeldet.html` (nicht verlinkt) | „Hat es geklappt?" | Zwei **statische** Seiten ohne den Signup-Dienst. Render Free schläft nach 15 Minuten; wer im kalten Zustand auf den Abmeldelink klickt, darf nicht vor einem Spinner stehen — und es ist der EINZIGE Abmeldeweg |
@@ -1239,6 +1248,46 @@ Website spricht.
   Überschrift hindurch — im ersten Screenshot der Anmeldeseite war jede
   Rubrik durchgestrichen. Die Rubrikleiste gehört an die Legende. Die einzige
   Stelle im ganzen Stylesheet, an der das vorkommt.
+- **Eine Sprache raet man nicht auf der Ueberschrift.** Am 13.08.2026 ueber
+  810 archivierte Meldungen gemessen ergab die Titelmessung 23,2 %
+  fremdsprachig — und war Ausschuss: „AT&T, Ericsson demonstrate
+  drone-sensing 5G capabilities" galt als franzoesisch, „CMA clears
+  Paramount-WBD deal" als spanisch. Eine Ueberschrift ist kurz und besteht
+  groesstenteils aus Eigennamen. Auf Titel PLUS echtem Teaser gemessen fiel
+  derselbe Bestand auf 15,2 %, und ueber zwoelf per Artikelabruf gepruefte
+  Faelle stimmte die Teasersprache in ALLEN zwoelf mit der des Volltexts
+  ueberein. `uebersetzung/sprache.py` misst deshalb nur auf Text ab 200
+  Zeichen und **enthaelt sich im Grenzfall**.
+- **`py3langid.classify()` gibt eine LOG-Wahrscheinlichkeit zurueck**, keinen
+  Anteil zwischen 0 und 1 (Werte wie -53 oder +5). Eine Schwelle `< 0.90`
+  darauf ist sinnlos — sie laesst fast alles durch und verwirft gelegentlich
+  alles, je nach Textlaenge. Nur `LanguageIdentifier.from_pickled_model(...,
+  norm_probs=True)` liefert das Mass, das eine solche Schwelle meint.
+- **Die Kappung `summary[:600]` war nie der Engpass.** Ueber 1329
+  Feed-Eintraege gemessen sind nur 14,1 % der Teaser ueberhaupt laenger als
+  600 Zeichen. Der Hebel, den bis zum 13.08.2026 niemand gezogen hatte, ist
+  das nie gelesene Feld **`content:encoded`**: 45,2 % haben eins, 33,2 %
+  tragen dort Volltext. Beide Feed-Wege zusammen decken 40,6 % — die
+  restlichen **59,4 % gehen nur ueber den Abruf der Artikelseite**. Wer den
+  Artikelabruf als „Rueckfall fuer die Minderheit" plant, plant den
+  Hauptweg als Nebensache.
+- **Eine Mindestlaenge fuer extrahierten Text gehoert in ZEICHEN, nicht in
+  einen Faktor.** digi.no lieferte 141 Zeichen hinter einer Paywall gegen 45
+  Zeichen Teaser — als Faktor gerechnet „3,1x laenger" und damit ein
+  Treffer, absolut sind es zwei Saetze. Der Leser klickt einmal und nie
+  wieder.
+- **Der Analyst sieht `summary[:300]`, nicht 600.** `_items_payload` in
+  `analyze/agents.py` baut die Nutzlast Feld fuer Feld — eine Positivliste.
+  Ein neues Feld am `Item` landet dort NICHT automatisch, und das ist der
+  Grund, warum `volltext` gefahrlos danebenstehen kann. Wer den Analysten
+  mehr zeigen will, traegt es dort ein; das ist eine eigene Entscheidung
+  mit eigener Laufzeit- und Token-Rechnung.
+- **52 der 164 crawlbaren Quellen liefern Meldungen ganz ohne `summary`**
+  (41 `newsroom` + 11 `newsroom_js`; `parse_newsroom_html` setzt das Feld
+  nicht, nur der Sonderpfad `_extract_datamodel_articles` tut es). Knapp
+  ein Drittel wird also allein aus der Ueberschrift bewertet, eingeordnet
+  und im Wochenbericht beschrieben. Offener Qualitaetsbefund, unabhaengig
+  von der Uebersetzung.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -1289,7 +1338,68 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (11.08.2026, Antonio direkt): der Newsletter, N1–N8.**
+> **Zuletzt erledigt (13.08.2026, Antonio direkt): die Volltext-Übersetzung
+> fremdsprachiger Artikel.** Grundlage ist das Konzept „Volltext-Übersetzung
+> fremdsprachiger Artikel" (13.08.2026). Stand danach: **1716 Tests** (vorher
+> 1657), `pruefe_portal.py` **16 bestanden / 0 durchgefallen**. Der
+> Phase-0-Befundbericht mit allen Messungen:
+> `outputs/volltext-uebersetzung-phase0-2026-08-13.md`.
+>
+> **Phase 0 hat den Zuschnitt umgedreht.** Das Konzept plante den
+> Artikelabruf als „Rückfallweg für die Minderheit". Gemessen über 1329
+> Feed-Einträge aus 140 RSS-Quellen: die Kappung `[:600]` aufzuheben bringt
+> **14,1 %**, das nie gelesene `content:encoded` bringt **33,2 %**, beide
+> zusammen **40,6 %** — die restlichen **59,4 % gehen nur über den
+> Artikelabruf**. Er ist der Hauptweg, nicht das Anhängsel.
+>
+> | Baustein | Wo | Die eine Regel, die ihn trägt |
+> |---|---|---|
+> | **Feed-Volltext** | `collect/rss.py` | `content:encoded` lesen, ungekappt, in ein EIGENES Feld. `summary` bleibt bei 600 — was der Analyst sieht, ist eine eigene Entscheidung |
+> | **Spracherkennung** | `uebersetzung/sprache.py` | **Nie auf der Überschrift**, erst ab 200 Zeichen, und im Grenzfall wird verworfen statt geraten |
+> | **Volltext holen** | `uebersetzung/volltext.py` | Mindestlänge in ZEICHEN, nicht als Faktor (digi.no: 141 Zeichen = „3,1× länger") |
+> | **Übersetzen** | `uebersetzung/uebersetzer.py` | Vollständig, nicht zusammengefasst: unter 55 % der Originallänge fällt die Antwort durch. Absatzweise gebündelt, ein Absatz wird nie zerrissen |
+> | **Speicher** | `uebersetzung/store.py` | Schlüssel = `Item.id` **plus** Texthash. **Es wird nie etwas gelöscht** — sonst tote Links im eigenen Archiv |
+> | **Stufe** | `uebersetzung/stufe.py` | Budget gegen die **Restzeit des Jobs**, nicht gegen sich selbst — die Lehre aus Lauf 31422689829. Ein kaputter Artikel kostet nie den Bericht |
+> | **Seite und Link** | `report/uebersetzung_view.py`, `_uebersetzung.html.j2` | Der Link zum Original bleibt **unverändert daneben stehen**. Der rote Link steht außerhalb des umschließenden `<a>` — ein Link im Link ist kein gültiges HTML |
+>
+> **Drei Fehler sind erst beim ANSEHEN der gerenderten Seite aufgefallen**,
+> nicht in einem der Tests: „aus dem Spanisch" statt „aus dem Spanischen"
+> (der Satz steht zweimal je Seite), sichtbarer Text in
+> ASCII-Umschrift („Maschinelle Uebersetzung", „Absaetze") während der Rest
+> des Portals Umlaute schreibt, und ein Pfeil, der mit dem `letter-spacing`
+> der Zeile sichtbar vom Wort abstand. Alle drei behoben, die ersten zwei
+> mit einem Test.
+>
+> **Der Link erscheint an allen drei Gewichtungen von `meldungen.html`**, am
+> Aufmacher der Wochenseite und im Explorer der Archivwochen (dort über
+> `app.js`, weil die Seite ihre Meldungen im Browser baut). Im ersten Anlauf
+> hing er nur an der Zeilen-Gewichtung — dann wäre er je nach Dringlichkeit
+> der Woche erschienen oder verschwunden.
+>
+> **OFFEN:**
+> 1. **Die Stufe ist noch nie gegen ein echtes Modell gelaufen.** Nach dem
+>    nächsten Actions-Lauf die Zeile `Uebersetzung:` im Protokoll lesen. Sie
+>    nennt übersetzt / übersprungen / ohne Abruf vorgefiltert / gescheitert
+>    **mit Gründen**. Fällt fast alles unter „zusammengefasst statt
+>    übersetzt", ist `MINDESTANTEIL` zu scharf oder der Prompt zu schwach.
+> 2. **Keine Übersetzung ist bisher von einem Menschen gelesen worden.** Die
+>    Textprobe der Phase-0-Messung war sauberer Artikelanfang über fünf
+>    Sprachen, aber das ist der EXTRAKT, nicht die Übersetzung. Premortem 2
+>    verlangt eine Stichprobe von Hand, bevor es dauerhaft läuft.
+> 3. **Soll der rote Link in den Newsletter?** Offene Frage aus dem Konzept,
+>    bewusst nicht entschieden: die Mail hat die Regel „keine neuen Inhalte",
+>    und ein Link auf eine Seite, die es zur Sendezeit noch nicht gab, wäre
+>    ein Sonderfall, den der Treue-Test heute nicht kennt.
+> 4. **Sollen die Analysten mehr sehen als die Überschrift?** 52 der 164
+>    crawlbaren Quellen liefern ihnen heute nichts als den Titel (§6). Der
+>    Volltextabruf stellt den Stoff bereit — ihn in die Prompts zu geben ist
+>    eine eigene Entscheidung mit eigener Laufzeit- und Token-Rechnung.
+> 5. **Der Platzbedarf ist gerechnet, nicht gemessen.** Rund 20–30
+>    Übersetzungen je Ausgabe als JSONL-Zeilen; die HTML-Seiten entstehen
+>    beim Rendern und werden nicht einzeln versioniert. Nach vier Wochen die
+>    Dateigröße von `uebersetzungen.jsonl` nachsehen.
+
+> **Davor erledigt (11.08.2026, Antonio direkt): der Newsletter, N1–N8.**
 > Grundlage ist `claude/newsletter-konzept-2026-08-11.md` (liegt jetzt im
 > Repo — zweimal war die Auftragsgrundlage vorher nicht auffindbar).
 > Stand danach: **1647 Tests** (vorher 1416), `pruefe_portal.py`

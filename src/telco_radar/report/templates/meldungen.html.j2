@@ -30,6 +30,8 @@
 {% set active = 'meldungen' %}
 {% block title %}Vodafone Product and Services Insights · Alle Meldungen{% endblock %}
 
+{% import "_uebersetzung.html.j2" as ueb %}
+
 {% macro zeile(h) %}
 <article class="mz meldung">
   <a href="{{ h.url }}" target="_blank" rel="noopener">
@@ -52,6 +54,7 @@
   <p class="mz-belege">Auch berichtet von {% for q in h.weitere_quellen %}<a
      href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
   {% endif %}
+  {{ ueb.uebersetzung_link(h, prefix) }}
 </article>
 {% endmacro %}
 
@@ -121,6 +124,7 @@
         <p class="mz-belege">Auch berichtet von {% for q in r.lead.weitere_quellen %}<a
            href="{{ q.url }}" target="_blank" rel="noopener">{{ q.source }}</a>{{ ", " if not loop.last }}{% endfor %}</p>
         {% endif %}
+        {{ ueb.uebersetzung_link(r.lead, prefix) }}
       </article>
       {% if r.mittel %}
       <div class="mmittel">
@@ -134,6 +138,7 @@
               <span class="mz-meta"><span class="mz-rel r{{ h.relevance }}">{{ h.relevance }}</span>{{ h.operator or h.source_label }}</span>
             </span>
           </a>
+          {{ ueb.uebersetzung_link(h, prefix) }}
         </article>
         {% endfor %}
       </div>

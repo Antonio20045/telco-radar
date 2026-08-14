@@ -9,6 +9,11 @@
 
   const listEl = document.getElementById('ex-list');
   const detailEl = document.getElementById('ex-detail');
+  // Wie tief die aktuelle Seite unter site/ liegt. Die Archivwochen stehen
+  // in reports/, alles andere direkt darunter.
+  function uebPrefix() {
+    return location.pathname.indexOf('/reports/') !== -1 ? '../' : '';
+  }
   const countEl = document.getElementById('ex-count');
   const fSearch = document.getElementById('f-search');
   const fRegion = document.getElementById('f-region');
@@ -94,7 +99,17 @@
         (h.date ? ' · ' + esc(h.date) : '') +
         (h.source_label ? ' · Quelle: ' + esc(h.source_label) : '') + '</p>' +
       (h.summary ? '<p class="ex-d-sum">' + esc(h.summary) + '</p>' : '') +
-      '<a class="source-link" href="' + esc(h.url) + '" target="_blank" rel="noopener">Originalquelle öffnen (' + esc(h.source_label || 'Link') + ') &nearr;</a>';
+      '<a class="source-link" href="' + esc(h.url) + '" target="_blank" rel="noopener">Originalquelle öffnen (' + esc(h.source_label || 'Link') + ') &nearr;</a>' +
+      // Der rote Link zur vollstaendigen Uebersetzung, wenn es eine gibt.
+      // Er steht NACH der Originalquelle, nicht an ihrer Stelle: das
+      // Original bleibt der Beleg, die Uebersetzung ist das Angebot.
+      // `prefix` traegt die Seite als data-Attribut - der Explorer steht
+      // auf meldungen.html (prefix "") und unter reports/<datum>.html
+      // (prefix "../"), und ein fester Pfad waere an einem der beiden Orte
+      // falsch.
+      (h.uebersetzung
+        ? '<p class="ueb-link"><a href="' + esc(uebPrefix()) + esc(h.uebersetzung) + '">Vollständige Übersetzung lesen</a></p>'
+        : '');
     if (scroll && window.innerWidth <= 880) detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 

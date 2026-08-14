@@ -51,6 +51,26 @@ class Item:
     # 403 abweisen. Leer ist der Normalfall - report/bilder.py versucht dann
     # og:image, und ein Layout ohne Bild muss trotzdem tragen.
     image_url: str = ""
+    # Der ARTIKELTEXT, wenn er beschafft werden konnte - ungekappt.
+    #
+    # Bewusst ein eigenes Feld neben `summary`, nicht dessen Verlaengerung:
+    # `summary` ist das Feld, aus dem `analyze/agents.py` den Analysten-
+    # Schnipsel schneidet, und was der Analyst sieht, ist eine eigene
+    # Entscheidung mit eigener Laufzeit- und Token-Rechnung. Ein Volltext,
+    # der still in die Stapel-Prompts rutscht, waere genau der Nebeneffekt,
+    # den niemand bestellt hat.
+    #
+    # Gemessen am 13.08.2026 ueber 1329 Feed-Eintraege: 40,6 % tragen ihren
+    # Volltext schon im Feed (meist in content:encoded, das bis dahin
+    # niemand gelesen hat), die anderen 59,4 % brauchen den Abruf der
+    # Artikelseite.
+    volltext: str = ""
+    # Die erkannte Sprache des Originals als ISO-639-1-Kuerzel, oder "" wenn
+    # sie sich nicht sicher bestimmen liess. NIE auf dem Titel gemessen -
+    # eine Ueberschrift besteht groesstenteils aus Eigennamen, und darauf
+    # raet jede Erkennung: "AT&T, Ericsson demonstrate drone-sensing 5G
+    # capabilities" gilt titelweise als franzoesisch.
+    sprache: str = ""
     id: str = field(default="")
 
     def __post_init__(self) -> None:
@@ -79,6 +99,13 @@ class Item:
             summary=d.get("summary", ""),
             origin=d.get("origin", "operator"),
             source_url=d.get("source_url", ""),
+            # `image_url` fehlte hier bis zum 13.08.2026: ein aus einem Dict
+            # wiederhergestelltes Item verlor sein Feed-Bild lautlos, und
+            # `to_dict` hatte es korrekt geschrieben. Kein Test hat das
+            # gemeldet, weil beide Richtungen nur einzeln geprueft wurden.
+            image_url=d.get("image_url", ""),
+            volltext=d.get("volltext", ""),
+            sprache=d.get("sprache", ""),
             id=d.get("id", ""),
         )
 

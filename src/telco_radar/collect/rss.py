@@ -120,6 +120,40 @@ def _entry_image(entry) -> str:
     return m.group(1).strip() if m else ""
 
 
+# Ab wie vielen Zeichen ein Text als Artikel gilt und nicht als Anreisser.
+#
+# Absolut und nicht als Vielfaches des Teasers - das ist die Lehre aus
+# digi.no in der Messung vom 13.08.2026: 45 Zeichen Teaser, 141 Zeichen
+# Extrakt hinter einer Paywall. Als Faktor gerechnet waeren das "3,1x
+# laenger" und damit ein Treffer; absolut gemessen sind es zwei Saetze.
+VOLLTEXT_MINDESTLAENGE = 1200
+
+
+def _entry_volltext(entry, summary: str) -> str:
+    """Der Artikeltext, wenn der Feed ihn schon mitliefert.
+
+    feedparser legt <content:encoded> unter `entry.content` ab - das Feld,
+    in dem WordPress und viele andere Redaktionssysteme den ganzen Artikel
+    transportieren und das dieses Projekt bis zum 13.08.2026 nicht gelesen
+    hat. Gemessen ueber 1329 Eintraege: 45,2 % haben eins, in 33,2 % steht
+    Volltext. Das ist der mit Abstand billigste Zugewinn im ganzen Vorhaben
+    - er kostet keinen einzigen zusaetzlichen Abruf.
+
+    Der Teaser zaehlt hier mit: bei 9,7 % der Eintraege steht der ganze
+    Artikel in `description` (TeleSemana: 15 289 Zeichen). Das laengere von
+    beiden gewinnt, ohne Kappung - die 600 Zeichen gelten fuer `summary`
+    und damit fuer den Analysten, nicht fuer dieses Feld.
+    """
+    bester = ""
+    for c in (entry.get("content") or []):
+        wert = _strip_html(c.get("value") or "")
+        if len(wert) > len(bester):
+            bester = wert
+    if len(summary) > len(bester):
+        bester = summary
+    return bester if len(bester) >= VOLLTEXT_MINDESTLAENGE else ""
+
+
 def parse_feed_bytes(raw: bytes, source: Source, region: str,
                      operator: str | None, origin: str,
                      max_entries: int | None = None) -> list[Item]:
@@ -147,6 +181,7 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
                 summary=summary[:600],
                 origin=origin,
                 image_url=_entry_image(entry),
+                volltext=_entry_volltext(entry, summary),
             )
         )
     return items
