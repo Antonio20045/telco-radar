@@ -388,11 +388,15 @@ promo_enabled: true
 geraete_enabled: false
 geraete_frist_sekunden: 600
 
-# Wie lange der Job insgesamt darf (radar.yml: timeout-minutes: 50) und wie
+# Wie lange der Job insgesamt darf (radar.yml: timeout-minutes: 90) und wie
 # viel davon fuer Rendern, Committen und Deploy reserviert bleibt. Beide
 # Zahlen sind die Rechengrundlage der Sicherung oben - wer `timeout-minutes`
 # im Workflow aendert, aendert `job_frist_sekunden` mit.
-job_frist_sekunden: 3000
+# 3000 -> 5400 am 14.08.2026, zusammen mit timeout-minutes 50 -> 90: die
+# Laeufe #88, #89 und #90 sind alle drei genau an der 50-Minuten-Marke
+# gestorben, jedes Mal VOR dem Commit - also ohne irgendetwas zu
+# veroeffentlichen.
+job_frist_sekunden: 5400
 veroeffentlichung_reserve_sekunden: 420
 
 # Wichtigkeits-Score der Promo-Uebersicht (src/telco_radar/analyze/promo_ranker.py).
