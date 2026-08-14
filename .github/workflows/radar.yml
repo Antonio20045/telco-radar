@@ -35,35 +35,39 @@ jobs:
     # and up to four LLM stages that each exhaust their 300s call budget before
     # giving up. Was 35, which killed runs #30 and #33 mid-pipeline.
     #
-    # Raised 50 -> 90 on 14.08.2026. Three runs in a row died at exactly the
-    # 50 minute mark -- #88 (10.08.), #89 (11.08., the scheduled Tuesday run)
-    # and #90 (14.08.) -- and each time the pipeline was still working when
-    # the axe fell. Because committing and deploying are the LAST steps, a
-    # timeout publishes NOTHING: no report, no website, no deploy. And a job
-    # killed by timeout-minutes is "cancelled" in GitHub, not "failed", so the
-    # run does not even look red. The site stood at the 08.08. edition for six
-    # days that way.
+    # Raised 50 -> 180 on 14.08.2026 (Antonios Entscheidung: "dann haben wir
+    # erstmal unsere Ruhe"). Three runs in a row died at exactly the 50 minute
+    # mark -- #88 (10.08.), #89 (11.08., the scheduled Tuesday run) and #90
+    # (14.08., cancelled at 50:21) -- and each time the pipeline was still
+    # working when the axe fell. Because committing and deploying are the LAST
+    # steps, a timeout publishes NOTHING: no report, no website, no deploy.
+    # And a job killed by timeout-minutes is "cancelled" in GitHub, not
+    # "failed", so the run does not even look red. The site stood at the
+    # 08.08. edition for six days that way.
     #
-    # 90 is not a guess at how long the pipeline needs; it is headroom over
-    # what we measured. Run #89 had done all the essential work after 35:03
-    # and was inside the promo stage at the 50 minute mark. The point is to
-    # stop losing complete runs over the last few minutes.
+    # 180 is deliberately far above the measured need rather than a tight fit.
+    # Run #89 had all the essential work done after 35:03 and was inside the
+    # promo stage at minute 50; a realistic run wants something like 55-70
+    # minutes. The ceiling is not a duration - the job ends when the pipeline
+    # ends. Buying three hours costs nothing until something actually hangs,
+    # and it removes "the run was two minutes short" as a failure mode.
     #
-    # Why not more: the schedule is 08:30 UTC and GitHub has been starting it
-    # about an hour late, so 90 minutes still lands the report before midday
-    # in Germany -- which is the reason the cron sits that early (see above).
     # Why this is free: the repository is public, so GitHub-hosted runner
-    # minutes are not billed. The platform ceiling for a single job is 6 h.
-    #
-    # A longer fuse does not make a hung stage safe -- it only makes the loss
-    # more expensive. The pipeline should still learn to skip its optional
-    # stages when the clock runs down; `geraete_budget()` in pipeline.py does
-    # this for one stage, the others do not have it yet.
+    # minutes are not billed at all.
+    # Why not "unlimited": there is no such setting. GitHub kills any job on a
+    # hosted runner at 6 h (360 min) regardless of what stands here, so 360 is
+    # the real ceiling and 180 sits comfortably below it.
+    # What it costs: a hung stage now burns up to three hours before anyone
+    # finds out, and still publishes nothing - the report is written after the
+    # optional stages, not before them. The pipeline should learn to skip
+    # those when the clock runs down; `geraete_budget()` in pipeline.py does
+    # it for one stage, the others do not have it yet. Until then, a long
+    # timeout is headroom, not a safety net.
     #
     # WER DIESE ZAHL AENDERT, AENDERT `job_frist_sekunden` IN
     # config/settings.yaml MIT (= minuten * 60). Ein Test haelt beide
     # gegeneinander: tests/test_geraete_jobbudget.py.
-    timeout-minutes: 90
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
         with:
