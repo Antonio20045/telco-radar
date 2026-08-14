@@ -50,6 +50,78 @@ LANGUAGES = {"de": "Deutsch", "en": "English"}
 # nicht anfangen als die Veroeffentlichung riskieren.
 _GERAETE_MINDESTBUDGET = 240.0
 
+# WARUM JEDE NEBENSTUFE EINEN WAECHTER BRAUCHT
+# --------------------------------------------
+# Zwischen "Kernlauf fertig" (Sammeln, Analysten, Redaktion, CTM, Bilder) und
+# `render_site()` stehen sechs Anreicherungsstufen. Sie sind alle einzeln
+# per try/except abgesichert - und genau das hat zweimal nicht gereicht:
+#
+#   Lauf 31422689829 (10.08.2026): Kernlauf nach 44:39 fertig, die
+#       Geraetestufe startete mit zehn Minuten EIGENEM Budget in einen Job,
+#       der noch fuenf hatte.
+#   Lauf 31477750661 (11.08.2026, planmaessiger Dienstagslauf): Kernlauf nach
+#       35:03 fertig, danach Kategorie-Sweep (3:13) und Promo-Stufe. Die
+#       Promo-Stufe lief noch, als um 10:17:19 das Job-Timeout kam.
+#
+# Beide Male stand die Stufe VOR dem Rendern und Committen, beide Male ist
+# deshalb von einem erfolgreichen Lauf NICHTS veroeffentlicht worden: kein
+# Bericht, keine Website, kein Deploy. Und ein Job-Timeout ist in GitHub ein
+# "cancelled", kein "failed" - der Lauf sieht nicht einmal rot aus.
+#
+# Ein try/except faengt Fehler ab, keine Uhr. Deshalb fragt ab jetzt JEDE
+# Stufe zwischen Kernlauf und Bericht vorher, ob die Zeit noch reicht. Der
+# Bericht ist das Produkt; eine fehlende Anreicherung ist eine Luecke, ein
+# fehlender Bericht ist ein Ausfall.
+_MINDESTBUDGET = {
+    "Highlight-Themen": 120.0,
+    "Differenzierungs-Kurator": 120.0,
+    # Gemessen in Lauf 31477750661: 193s.
+    "Kategorie-Sweep": 240.0,
+    # Die teuerste Nebenstufe: bis zu 59 Seiten, jede geaenderte mit einem
+    # eigenen LLM-Aufruf. Sie bekommt zusaetzlich eine INNERE Frist (siehe
+    # promo_pipeline.run_promo_stage) und hoert mitten in der Seitenliste auf.
+    "Promo-Uebersicht": 300.0,
+    "Differenzierungsbericht": 180.0,
+    "Differenzierungs-Bilder": 120.0,
+}
+
+
+def restzeit(settings: dict, verstrichen: float) -> float:
+    """Sekunden, die der Job noch fuer Nebenstufen uebrig hat.
+
+    Gerechnet wird gegen die Frist des JOBS (`job_frist_sekunden`, haengt an
+    `timeout-minutes` in radar.yml) abzueglich der Reserve fuers
+    Veroeffentlichen - der Teil, den ein Nutzer zu sehen bekommt.
+    """
+    return (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
+            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+
+
+def zeit_fuer(settings: dict, verstrichen: float, stufe: str) -> float | None:
+    """Restzeit fuer `stufe`, oder `None` wenn sie nicht mehr anfangen soll.
+
+    Reine Rechnung ohne Seiteneffekt, damit ein Test sie ohne Pipeline
+    pruefen kann. Das Protokollieren macht `_budget()`.
+    """
+    rest = restzeit(settings, verstrichen)
+    return None if rest < _MINDESTBUDGET.get(stufe, 120.0) else rest
+
+
+def _budget(settings: dict, t0: float, stufe: str) -> float | None:
+    """`zeit_fuer()` plus die Zeile im Protokoll.
+
+    Ohne die Zeile waere eine uebersprungene Stufe von einer Stufe, die
+    nichts gefunden hat, nicht zu unterscheiden - und genau diese Frage
+    stellt sich nach jedem knappen Lauf.
+    """
+    verstrichen = time.monotonic() - t0
+    rest = zeit_fuer(settings, verstrichen, stufe)
+    if rest is None:
+        log.warning("%s uebersprungen: nur noch %.0fs Jobzeit bis zur "
+                    "Veroeffentlichungsreserve - der Bericht geht vor.",
+                    stufe, restzeit(settings, verstrichen))
+    return rest
+
 
 def geraete_budget(settings: dict, verstrichen: float):
     """Wie viel Zeit die Geraetestufe im Wochenlauf noch bekommt.
@@ -61,8 +133,7 @@ def geraete_budget(settings: dict, verstrichen: float):
     """
     if not settings.get("geraete_enabled", False):
         return None
-    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
-            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    rest = restzeit(settings, verstrichen)
     if rest < _GERAETE_MINDESTBUDGET:
         return None
     return min(float(settings.get("geraete_frist_sekunden", 600)), rest)
@@ -738,59 +809,62 @@ def run(root: Path, use_llm: bool | None = None,
     # eine temporaere Themenseite. NACH der Bilderphase, damit die Meldungen
     # eines Themas ihre Bilder mitbringen. Failsafe wie Kurator und Sweep:
     # bricht den Lauf nie ab.
-    try:
-        themen_bilanz = highlight_topics.pflege_highlight_themen(
-            alle_highlights, state_dir, today_iso,
-            model=analyst_model or editor_model,
-            use_llm=bool(use_llm and new_items))
-        log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
-                 "beendet: %s", themen_bilanz["aktiv"],
-                 themen_bilanz["kandidaten"],
-                 ", ".join(themen_bilanz["neu"]) or "keins",
-                 ", ".join(themen_bilanz["beendet"]) or "keins")
-    except Exception as exc:  # noqa: BLE001
-        log.error("Highlight-Themen uebersprungen: %s", exc)
+    if _budget(cfg.settings, t0, "Highlight-Themen") is not None:
+        try:
+            themen_bilanz = highlight_topics.pflege_highlight_themen(
+                alle_highlights, state_dir, today_iso,
+                model=analyst_model or editor_model,
+                use_llm=bool(use_llm and new_items))
+            log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
+                     "beendet: %s", themen_bilanz["aktiv"],
+                     themen_bilanz["kandidaten"],
+                     ", ".join(themen_bilanz["neu"]) or "keins",
+                     ", ".join(themen_bilanz["beendet"]) or "keins")
+        except Exception as exc:  # noqa: BLE001
+            log.error("Highlight-Themen uebersprungen: %s", exc)
 
     # -------------------------------------------- Differenzierungs-Kurator
     # Nimmt aufnahmewuerdige Differenzierungs-Moves dieser Woche in den
     # persistenten Speicher auf (data/state/differentiation.jsonl), damit sie
     # auch spaeter noch als Inspiration sichtbar bleiben. Failsafe: Fehler
     # brechen den Lauf nicht ab.
-    try:
-        # Die Themenfelder bleiben hier bewusst aussen vor: die
-        # Differenzierungs-Bibliothek sammelt Moves, mit denen sich ein
-        # BETREIBER von anderen Betreibern abhebt. Eine Chip- oder
-        # Regulierungsmeldung ist kein solcher Move - sie wuerde den Speicher
-        # fuellen, ohne je als Vorbild taugen zu koennen.
-        themen_namen = set(cfg.theme_names.values())
-        flat_new = []
-        for region_name, r in regional.items():
-            if region_name in themen_namen:
-                continue
-            for h in r.get("highlights", []):
-                hh = dict(h)
-                hh["region"] = region_name
-                flat_new.append(hh)
-        diff_store = DiffStore(state_dir / "differentiation.jsonl")
-        added = diff_curator.curate(
-            flat_new, diff_store, date.today().isoformat(),
-            model=editor_model, use_llm=bool(use_llm and new_items))
-        log.info("Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
-                 len(added), len(diff_store))
-    except Exception as exc:  # noqa: BLE001
-        log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
+    if _budget(cfg.settings, t0, "Differenzierungs-Kurator") is not None:
+        try:
+            # Die Themenfelder bleiben hier bewusst aussen vor: die
+            # Differenzierungs-Bibliothek sammelt Moves, mit denen sich ein
+            # BETREIBER von anderen Betreibern abhebt. Eine Chip- oder
+            # Regulierungsmeldung ist kein solcher Move - sie wuerde den
+            # Speicher fuellen, ohne je als Vorbild taugen zu koennen.
+            themen_namen = set(cfg.theme_names.values())
+            flat_new = []
+            for region_name, r in regional.items():
+                if region_name in themen_namen:
+                    continue
+                for h in r.get("highlights", []):
+                    hh = dict(h)
+                    hh["region"] = region_name
+                    flat_new.append(hh)
+            diff_store = DiffStore(state_dir / "differentiation.jsonl")
+            added = diff_curator.curate(
+                flat_new, diff_store, date.today().isoformat(),
+                model=editor_model, use_llm=bool(use_llm and new_items))
+            log.info("Differenzierung: %d neue Move(s) aufgenommen "
+                     "(Speicher: %d)", len(added), len(diff_store))
+        except Exception as exc:  # noqa: BLE001
+            log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
 
     # ------------------------------------- Dynamischer Kategorie-Sweep (Web)
     # Zweite Datenquelle fuer die Differenzierungs-Seite: durchsucht je Lauf
     # rotierend aktiv das Web (Brave Search) nach echten Differenzierungs-Moves
     # der Wettbewerber und pflegt sie mit Quelle + Datum in die versionierte DB
     # (data/state/differentiation_db.json). Failsafe: bricht nie ab.
-    try:
-        category_sweep.run_sweep(
-            state_dir, os.environ.get("BRAVE_API_KEY", ""),
-            editor_model, bool(use_llm), date.today().isocalendar()[1])
-    except Exception as exc:  # noqa: BLE001
-        log.error("Kategorie-Sweep uebersprungen: %s", exc)
+    if _budget(cfg.settings, t0, "Kategorie-Sweep") is not None:
+        try:
+            category_sweep.run_sweep(
+                state_dir, os.environ.get("BRAVE_API_KEY", ""),
+                editor_model, bool(use_llm), date.today().isocalendar()[1])
+        except Exception as exc:  # noqa: BLE001
+            log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
     # ---------------------------------------------- Promo-Uebersicht (DE)
     # Eigener zweiter Anwendungsfall neben Marktrecherche: Tarif-/Kampagnen-
@@ -798,18 +872,30 @@ def run(root: Path, use_llm: bool | None = None,
     # eigenen Aktionsseite gesammelt statt per Presse-RSS (siehe
     # promo_pipeline.py + config/promo_sources.yaml). Failsafe: bricht den
     # Gesamtlauf nie ab; per settings.yaml (promo_enabled) abschaltbar.
+    #
+    # ZEITBUDGET (Lehre aus Lauf 31477750661, dem Dienstagslauf vom
+    # 11.08.2026): sie ist die teuerste Nebenstufe des Laufs - bis zu 59
+    # Seiten, jede geaenderte mit einem eigenen LLM-Aufruf. Sie hat um
+    # 10:06:50 angefangen und lief noch, als um 10:17:19 das Job-Timeout kam.
+    # Deshalb bekommt sie zwei Grenzen: sie faengt gar nicht erst an, wenn zu
+    # wenig Jobzeit uebrig ist, und sie hoert MITTEN IN DER SEITENLISTE auf,
+    # wenn ihre Frist ablaeuft. Eine halb gelesene Markenliste ist dank
+    # `gepruefte_seiten` unschaedlich - was nicht gelesen wurde, altert nicht.
     promo_result: dict = {}
     if cfg.settings.get("promo_enabled", True):
-        try:
-            from .promo_pipeline import run_promo_stage
-            promo_result = run_promo_stage(
-                root, cfg.settings.get("http", {}), bool(use_llm),
-                editor_model, language=language, settings=cfg.settings,
-                score_model=analyst_model or editor_model)
-            log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
-                     promo_result.get("mode"), promo_result.get("active", 0))
-        except Exception as exc:  # noqa: BLE001
-            log.error("Promo-Uebersicht uebersprungen: %s", exc)
+        _promo_frist = _budget(cfg.settings, t0, "Promo-Uebersicht")
+        if _promo_frist is not None:
+            try:
+                from .promo_pipeline import run_promo_stage
+                promo_result = run_promo_stage(
+                    root, cfg.settings.get("http", {}), bool(use_llm),
+                    editor_model, language=language, settings=cfg.settings,
+                    score_model=analyst_model or editor_model,
+                    frist_sekunden=_promo_frist)
+                log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
+                         promo_result.get("mode"), promo_result.get("active", 0))
+            except Exception as exc:  # noqa: BLE001
+                log.error("Promo-Uebersicht uebersprungen: %s", exc)
 
     # ------------------------------------------- Geraete- und Preisradar (DE)
     # Dritter Beobachtungsraum neben Presse und Aktionsseiten: was die
@@ -865,8 +951,12 @@ def run(root: Path, use_llm: bool | None = None,
     diff_db = category_sweep.DiffDB(state_dir / "differentiation_db.json")
     diff_entries = list(diff_db.entries.values())
     theme_labels = category_sweep.THEME_LABEL
+    # Diese Stufe wird nie ganz uebersprungen: die Seite braucht die Datei.
+    # Bei knapper Zeit faellt nur der LLM-Aufruf weg, der Regelbericht bleibt
+    # (er ist quellengebunden und kostet nichts).
+    _diff_zeit = _budget(cfg.settings, t0, "Differenzierungsbericht") is not None
     try:
-        if use_llm and diff_entries:
+        if use_llm and diff_entries and _diff_zeit:
             diff_body = differentiation_editor.synthesize(
                 diff_entries, theme_labels, model=editor_model, language=language)
             diff_mode = "KI-Redaktion"
