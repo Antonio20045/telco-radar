@@ -796,7 +796,12 @@ Website spricht.
 - **Anthropic 529 (overloaded):** kommt vor; llm.py hat 5 Retries mit bis zu
   45s Backoff, Analysten-Batches werden übersprungen statt zu crashen, der
   Editor fällt notfalls auf einen Digest zurück. Ein Lauf dauerte deshalb
-  schon mal 24 min — normal sind 7–8 min.
+  schon mal 24 min. **„Normal sind 7–8 min" stand hier bis zum 15.08.2026 und
+  ist um eine Größenordnung falsch** — mit 199 Quellen und ~900 neuen
+  Meldungen braucht ein vollständiger Lauf rund **80 Minuten** (14.08.2026:
+  80,2 min). Die Zahl stammt aus der Zeit mit 85 Quellen und ist nie
+  mitgewachsen; wer Laufzeit beurteilt, liest `run.phases` aus dem
+  Berichts-JSON.
 - **Push→Hook-Race:** Render klont sofort; der Workflow wartet 15s zwischen
   git push und Hook-Curl. Beim manuellen Nachdeployen dran denken.
 - **Eine Nebenstufe VOR dem Rendern kann den ganzen Lauf kosten — ihr
@@ -993,6 +998,28 @@ Website spricht.
   konstruierte Fälle: prüfe im selben Test, dass der Fall OHNE die Zusicherung
   wirklich eintritt. Ein Fixture, das die Dublette gar nicht auslöst, beweist
   nicht, dass die Sperre greift.
+- **HTTP 402 ist so endgültig wie ein falscher Schlüssel — und war es im Code
+  nicht.** Am 15.08.2026 war DeepSeeks Guthaben **26 Minuten nach dem Start**
+  aufgebraucht. Weil 402 nicht in `_FATAL_STATUSES` stand, lief es durch den
+  Wiederholungspfad wie ein vorübergehender Kapazitätsengpass:
+  **1245 Wiederholungen** über die restlichen zwei Stunden, 45 gescheiterte
+  Analysten-Stapel, **20 von 810 Meldungen bewertet**, Editor im
+  Notfall-Digest, 0 Übersetzungen (allein dort 32 Versuche je Artikel und
+  889 s). Der Lauf dauerte **151,7 statt 80 Minuten** — und sah dabei aus wie
+  eine dünne Nachrichtenwoche. Ein leeres Konto wird beim 32. Versuch nicht
+  voller; dieselbe Lehre wie bei `_is_daily_quota`. 402 wird jetzt als
+  `LLMModelUnavailable` geworfen, **nicht** als `LLMFatalError`: ein leeres
+  Guthaben ist eine Ablehnung des ANBIETERS, kein defekter Request, also darf
+  die Kette den nächsten Anbieter fragen und `dead_models()` bringt den Befund
+  auf `transparenz.html`. Drei Tests in `tests/test_llm_retry_policy.py`.
+- **Die Laufzeit eines Laufs sagt nichts, solange die Phasen nicht
+  danebenstehen.** Am 15.08. lag der Verdacht auf dem längeren
+  Analysten-Text; gemessen kostete er **2,5 Minuten** („Bewerten &
+  Schreiben" 16,6 gegen 14,1 min bei mehr Text und weniger Meldungen). Die
+  70 Minuten Aufschlag waren die 402-Wiederholungen. Und die in dieser Datei
+  jahrelang wiederholte Zahl „normal sind 7–8 min" ist **falsch**: der
+  Referenzlauf vom 14.08.2026 brauchte **80,2 Minuten**. Wer Laufzeit
+  beurteilt, liest `run.phases` aus dem Berichts-JSON, nicht diese Datei.
 - **Ein zu kleines `max_tokens` sieht aus wie eine tote Quelle.** Läufe #83–85
   (07.08.2026): 15 von 19 gelesenen Promo-Seiten scheiterten mit
   `JSONDecodeError: Expecting value: line 1 column 1 (char 0)` — also an einem
@@ -1441,11 +1468,35 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > alten Stand gemessen fallen **13 der 17** bzw. **3 der 6** durch; die
 > übrigen prüfen Invarianten, die auch vorher galten.
 >
+> **Der Lauf danach (31884827147, `main`, 151,7 min) hat die Auswahl
+> bestätigt und an einer ganz anderen Stelle etwas aufgedeckt.** Die
+> Protokollzeile:
+>
+> ```
+> Uebersetzung: 20 berichtete Meldungen -> 13 Kandidaten (erkannt
+>   fremdsprachig insgesamt: 7, ueber dem Deckel 40: 0), Bestand 4
+> Uebersetzung: 0 uebersetzt aus 20 berichteten Meldungen, 3 gescheitert,
+>   7 ohne Abruf vorgefiltert, 889.8s [FRIST ERREICHT]
+> ```
+>
+> **`angeboten: 20` statt 810, `ueber_deckel: 0`** — die zwei Fehler sind in
+> Produktion behoben. Übersetzt wurde trotzdem nichts, und zwar aus einem
+> Grund, der nichts mit dieser Stufe zu tun hat: **HTTP 402, DeepSeeks
+> Guthaben war 26 Minuten nach dem Start aufgebraucht.** Derselbe Lauf hat
+> deshalb auch nur 20 von 810 Meldungen bewertet und den Editor in den
+> Notfall-Digest fallen lassen. Siehe §6 — 402 galt nicht als endgültig und
+> wurde 1245-mal wiederholt.
+>
 > **OFFEN daraus:**
-> 1. **Noch nie gegen ein echtes Modell gelaufen.** Nach dem nächsten
->    Actions-Lauf die Zeile `Uebersetzung:` lesen — sie nennt jetzt auch die
->    ANGEBOTENE Menge („aus N berichteten Meldungen"). Steht dort eine Zahl
->    in der Größe von `new`, läuft die Stufe wieder auf der falschen Menge.
+> 1. **Das DeepSeek-Guthaben ist leer.** Das ist der einzige Grund, warum
+>    noch keine Übersetzung live steht, und nur Antonio kann es auffüllen.
+>    Danach genügt ein `workflow_dispatch` auf `radar.yml`; die Auswahl ist
+>    gemessen und funktioniert. Erwartung bei einer normalen Ausgabe:
+>    10–25 Kandidaten, davon der größere Teil übersetzt.
+> 2. **Die Stufe ist noch nie gegen ein antwortendes Modell gelaufen.** Alles
+>    bisher Gemessene lief mit gestubbtem Übersetzer. Fällt beim nächsten Lauf
+>    fast alles unter „zusammengefasst statt übersetzt", ist `MINDESTANTEIL`
+>    zu scharf oder der Prompt zu schwach.
 > 2. **Der Deckel (40) ist für eine große Ausgabe knapp.** Bei 58 berichteten
 >    Meldungen greift er nach der Vorauswahl nicht; die Ausgabe vom 06.08.
 >    hatte 193. Dann entscheidet die Berichtsreihenfolge, also die Relevanz —

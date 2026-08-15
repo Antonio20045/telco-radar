@@ -93,7 +93,22 @@ def active_backend() -> str:
 
 
 # Client errors that will never succeed on retry (bad key, bad request, bad model)
-_FATAL_STATUSES = {400, 401, 403, 404, 405, 422}
+# Endgueltige Antworten: hier wird NICHT wiederholt.
+#
+# 402 steht als Netz mit drin, abgefangen wird es aber schon eine Zeile
+# vorher (als LLMModelUnavailable, damit die Anbieterkette weiterlaeuft).
+# Sein Fehlen hat am 15.08.2026 einen ganzen Lauf gekostet: DeepSeeks
+# Guthaben war 26 Minuten nach dem Start aufgebraucht, und weil 402 nicht als
+# endgueltig galt, lief es durch den Wiederholungspfad wie ein
+# voruebergehender Kapazitaetsengpass - **1245 Wiederholungen** ueber die
+# restlichen zwei Stunden, 45 gescheiterte Analysten-Stapel, 20 von 810
+# Meldungen bewertet, Editor im Notfall-Digest, 0 Uebersetzungen (allein dort
+# 32 Versuche je Artikel und 889s). Der Lauf dauerte 151,7 statt 80 Minuten
+# und sah dabei aus wie eine duenne Nachrichtenwoche.
+#
+# Dieselbe Begruendung wie bei `_is_daily_quota`: ein leeres Konto wird beim
+# 32. Versuch nicht voller.
+_FATAL_STATUSES = {400, 401, 402, 403, 404, 405, 422}
 
 # Read timeout for a single request. Measured on 2026-07-25 against
 # integrate.api.nvidia.com with the real editor prompt: a served request answers
@@ -282,6 +297,18 @@ def _post_with_retries(url, payload, headers, retries, parse):
         try:
             resp = httpx.post(url, json=payload, headers=headers,
                               timeout=http_timeout())
+            if resp.status_code == 402:
+                # Leeres Guthaben ist eine Ablehnung des ANBIETERS, kein
+                # defekter Request: ein anderes Modell desselben Kontos
+                # scheitert gleich, ein Modell bei einem anderen Anbieter
+                # nicht. Deshalb dieselbe Klasse wie eine Zugriffsablehnung -
+                # das Modell gilt fuer den Rest des Laufs als tot, die Kette
+                # geht weiter, und `dead_models()` bringt den Befund auf
+                # transparenz.html. Als LLMFatalError waere der Lauf hier zu
+                # Ende, ohne den zweiten Anbieter auch nur zu fragen.
+                raise LLMModelUnavailable(
+                    f"HTTP 402 Payment Required (Guthaben aufgebraucht): "
+                    f"{resp.text[:200]}")
             if resp.status_code in _FATAL_STATUSES:
                 raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
             if _is_daily_quota(resp):
