@@ -396,6 +396,47 @@ Aufmacher und zweite Reihe damit. Findet sich kein Beleg, bleibt es bei der
 Dringlichkeitssortierung — **eine falsche Verbindung ist schlimmer als
 keine.**
 
+**Der Rang schlägt den Faden** (15.08.2026). Bis dahin wählte `_faden()`
+allein nach Wortüberschneidung, ohne jede Untergrenze — und konnte damit
+eine beliebig schwach bewertete Meldung auf den Aufmacher ziehen. An der
+Ausgabe vom 14.08. gemessen: Aufmacher war „T-Mobile wirbt mit
+Studienstart-Ratgeber" (Kontext, Priorität 2), während „T-Mobile verschenkt
+Pixel 11 Pro XL" (Übertragbar, Priorität 5) als Textzeile daneben stand.
+Antonio: *„die ordnung stimmt überhaupt nicht, die wichtigsten artikel
+sollen auch an erster reihe stehen."* Jetzt wählt der Faden nur unter
+Meldungen, die den **besten noch freien Rangschlüssel** dieser Bildstufe
+erreichen (`_rangschluessel` = CTM-Bezug vor Priorität): er entscheidet,
+WELCHE der gleichrangigen Geschichten führt, und kann keine schwächere
+hochziehen. Die Latte wird **vor jedem Platz neu gemessen** — einmal vorab
+gerechnet wäre sie nach dem ersten Zugriff veralteter Rang, und die zweite
+Reihe bliebe halb leer.
+
+**Die dritte Reihe zieht wieder vor der Digest-Spalte** (15.08.2026) — und
+das dreht die Vergabereihenfolge von K2 (09.08.2026) zurück. Damals zog die
+Spalte „Was wichtig ist" zuerst, weil die vier Bildkacheln jede Meldung mit
+direktem Portfoliobezug abräumten. Der Preis war, dass die HAUPTSPALTE
+systematisch die schwächeren Meldungen bekam: in der Ausgabe vom 15.08.
+standen in den vier Kacheln vier Meldungen mit Priorität 2, während fünf
+mit Priorität 3 als Textzeilen danebenlagen — und **jede Karte trägt ihre
+Priorität als sichtbares Etikett**, das war also kein Feinheitsproblem sondern
+ein Widerspruch, den man auf der Seite lesen konnte. Der Grund von damals
+trägt nicht mehr: die Meldungen mit direktem Bezug holt inzwischen der
+Kurzpfad an die Spitze DERSELBEN Spalte, und `gesperrt` hält sie aus dem
+Digest heraus. Zwei Regeln tragen die Neufassung:
+
+| Regel | Warum |
+|---|---|
+| Die Titelseite vergibt in **einer** Rangfolge: Aufmacher → zweite Reihe → dritte Reihe → „Was wichtig ist" | Die drei Bildstufen stehen untereinander in derselben Spalte. Was untereinander steht, muss in einer Rangfolge stehen |
+| Die dritte Reihe greift **`streng`** zu (Bild zwingend), erst nach der Spalte füllt sie notfalls auf | Ohne das holt sie sich die hoch bewerteten BILDLOSEN Meldungen in eine Kachel, die dann leer bleibt — und nimmt sie der Spalte weg. Ein fehlendes Bild ist keine Abwertung: solche Meldungen gehören in die Textspalte, und dort nach oben |
+
+Wahrheitstests: `test_der_faden_zieht_keine_schwaechere_meldung_nach_vorn`,
+`test_die_bildstufen_stehen_in_der_rangfolge`,
+`test_die_spalte_nimmt_den_bildstufen_keine_bessere_meldung_weg`. Fallstrick
+beim Bauen solcher Fälle: **„Anbieter 701" und „Anbieter 702" sind für
+`_kennwoerter` DERSELBE Absender** (die Ziffern sind zu kurz für das
+Wortmuster) — dann greift der Absenderdeckel statt der Rangfolge, und der
+Test misst etwas anderes, als er behauptet.
+
 **Die Promo Übersicht** (`promo/index.html`) ist am 07.08.2026 **zweimal**
 gebaut worden. Der erste Anlauf brachte Bilder auf die Seite, aber die
 falschen; der zweite ist der, der steht. Antonio dazwischen: *„Das muss
@@ -1423,7 +1464,43 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (15.08.2026, Antonio direkt): die Übersetzung sichtbar
+> **Zuletzt erledigt (15.08.2026, Antonio direkt): die Reihenfolge der
+> Titelseite.** Antonio: *„mir gefällt überhaupt nicht die ordnung der
+> artikel … wie kann es sein dass artikel mit priorität von 3 auf der
+> titelseite landen, bei diese woche … die wichtigsten artikel sollen auch
+> an erster reihe stehen. fixe das, stoße aber keinen neuen Lauf an, sorge
+> nur dass alles live gemerged ist."* Stand danach: **1747 Tests** (vorher
+> 1741), `pruefe_portal.py` **15 bestanden / 1 durchgefallen** — der eine
+> Durchfaller (Kriterium 6, 14 px Hochskalierung auf `meldungen.html`) ist
+> **vorbestehend** und gegen den unveränderten `site/`-Stand nachgemessen,
+> er hat mit dieser Änderung nichts zu tun.
+>
+> Zwei unabhängige Fehler, beide in `_titelseite` (`report/html.py`),
+> Einzelheiten in §5 unter „Der Rang schlägt den Faden":
+>
+> | # | Befund | Messung an der echten Ausgabe |
+> |---|---|---|
+> | 1 | **Der rote Faden hatte keine Untergrenze.** Er wählte allein nach Wortüberschneidung und konnte eine beliebig schwache Meldung auf den Aufmacher ziehen | Ausgabe 14.08.: Aufmacher „T-Mobile wirbt mit Studienstart-Ratgeber" (Kontext, Priorität 2) statt „1GLOBAL Reise-eSIM" (Übertragbar, Priorität 4) |
+> | 2 | **Die Digest-Spalte zog vor der dritten Reihe** (K2, 09.08.) und ließ der Hauptspalte systematisch die schwächeren Meldungen | Ausgabe 15.08.: vier Bildkacheln mit Priorität 2, daneben fünf Priorität-3-Meldungen als Textzeilen. Nach der Änderung tragen die Kacheln die Dreier |
+>
+> **Der Lauf wurde wie verlangt nicht angestoßen** — `site/` ist aus den
+> vorhandenen Berichten neu gerendert (`render_site` MIT `cfg`, siehe §6).
+>
+> **OFFEN daraus:**
+> 1. **Die live sichtbare Ausgabe (15.08.) ist degeneriert.** Sie hat nur
+>    20 bewertete Meldungen und keine über Priorität 3 — nicht wegen der
+>    Reihenfolge, sondern weil in diesem Lauf DeepSeeks Guthaben nach
+>    26 Minuten leer war (HTTP 402, siehe §6) und nur 20 von 810 Meldungen
+>    bewertet wurden. Solange das Guthaben leer ist, führt die Titelseite
+>    mit Priorität 3, egal wie gut sie sortiert. Das ist der eine Punkt,
+>    den nur Antonio schließen kann.
+> 2. **Die Regel ist an drei Ausgaben gemessen** (08.08., 14.08., 15.08.),
+>    nicht an einem Lauf. Nach dem nächsten echten Lauf die Titelseite
+>    ansehen: führt der Aufmacher weiterhin den besten Rang mit Bild?
+> 3. **Kriterium 6** (`pruefe_portal.py`, 14 px Hochskalierung eines Bildes
+>    auf `meldungen.html`) steht offen und ist nicht Teil dieses Auftrags.
+
+> **Davor erledigt (15.08.2026, Antonio direkt): die Übersetzung sichtbar
 > gemacht — sie war gebaut, getestet, live und vollständig unsichtbar.**
 > Antonio: *„Ich sehe hier nirgendwo bei keiner einzigen Meldung … keinen
 > Link, der mir dann zeigt, die übersetzte Quelle. Also es hat anscheinend

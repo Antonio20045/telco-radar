@@ -344,8 +344,19 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
     Ausgabe standen.
 
     Geprueft wird die Bedingung, nicht der Name: BREKO darf sehr wohl weit
-    oben stehen, sobald die Meldungen mit hoeherem Bezug ihren Platz haben.
-    Nur nicht DAVOR - und nicht zu zweit an der Spitze.
+    oben stehen, sobald die Meldungen mit hoeherem Bezug ihren Platz haben -
+    nur nicht DAVOR.
+
+    Seit dem 15.08.2026 haben sie ihn eine Stufe hoeher: die Bildstufen
+    ziehen wieder vor der Spalte, und die vier Stufe-3-Meldungen dieser
+    Ausgabe stehen damit als Aufmacher, zweite und dritte Reihe oberhalb
+    davon - nicht als Textzeile daneben. Was hier bis dahin zusaetzlich
+    stand ("nicht zu zweit an der Spitze"), war eine Namenspruefung fuer
+    genau diesen Fall und ist entfallen: die zwei Stellungnahmen sind mit
+    Prioritaet 5 und 4 die bestbewerteten Meldungen, die uebrig bleiben,
+    und der Absenderdeckel (`_MAX_JE_ABSENDER` = 2) laesst zwei zu. Die
+    Zusicherung, die den Befund abdeckt, steht darunter und ist strenger
+    geworden.
 
     Gemessen wird an `_titelseite()`, nicht an der gerenderten Datei, und das
     ist kein Bequemlichkeitsschnitt: `render_site()` streicht jeden
@@ -363,23 +374,32 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
         html._faden(highlights,
                     html._fuehrende_saetze(daten.get("briefing_md") or "")))
 
-    assert [h for h in highlights if int(h.get("ctm_bezug") or 0) > 2], \
-        "ohne Stufe-3-Meldungen prueft dieser Test nichts"
+    stufe3 = [h for h in highlights if int(h.get("ctm_bezug") or 0) > 2]
+    assert stufe3, "ohne Stufe-3-Meldungen prueft dieser Test nichts"
 
     spalte = front["wichtig"]
     absender = [(h.get("operator") or h.get("source_label") or "")
                 for h in spalte]
     titel = [h.get("schlagzeile") or h.get("title") for h in spalte]
-    # Der Befund vom 8. August: beide Stellungnahmen an der Spitze.
-    assert absender[:2] != ["BREKO", "BREKO"], titel
 
-    # Und die Bedingung dahinter: keine BREKO-Zeile steht vor einer Meldung
-    # mit hoeherem CTM-Bezug. Die Stufe-3-Meldungen, die es nicht in diese
-    # Spalte schaffen, stehen oberhalb davon in den Bildpositionen - eine
-    # zweite Ausspielung waere eine Dublette, keine Verbesserung.
+    # Der Befund vom 8. August, in seiner strengeren Fassung: keine
+    # BREKO-Zeile steht vor einer Meldung mit hoeherem CTM-Bezug.
     stufen = [int(h.get("ctm_bezug") or 0) for h in spalte]
     for platz, ab in enumerate(absender):
         if ab != "BREKO":
             continue
         assert all(s <= stufen[platz] for s in stufen[platz + 1:]), \
             f"BREKO auf Platz {platz + 1} vor {titel[platz + 1:]}"
+
+    # Und der Grund, warum BREKO diese Spalte anfuehren DARF: die Meldungen
+    # mit direktem Portfoliobezug stehen nicht daneben, sondern darueber -
+    # in den Bildstufen der Hauptspalte. Ohne diese Zeile liesse sich der
+    # Test auch dadurch erfuellen, dass die Stufe-3-Meldungen gar nicht
+    # mehr auf der Titelseite vorkommen.
+    oberhalb = {h.get("url") for h in
+                ([front["aufmacher"]] if front["aufmacher"] else [])
+                + list(front["zwei"]) + list(front["vier"])}
+    fehlt = [h.get("schlagzeile") for h in stufe3
+             if h.get("url") not in oberhalb
+             and h.get("url") not in {s.get("url") for s in spalte}]
+    assert not fehlt, f"Stufe-3-Meldung ohne Platz auf der Titelseite: {fehlt}"

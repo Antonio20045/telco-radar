@@ -416,6 +416,17 @@ def _kennwoerter(name: str) -> frozenset[str]:
 _MAX_JE_ABSENDER = 2
 
 
+def _rangschluessel(h: dict) -> tuple[int, int]:
+    """Der Rang einer Meldung: CTM-Bezug vor Prioritaet.
+
+    Dieselben zwei Schluessel, nach denen `_flatten` und `_ctm_achse`
+    sortieren - hier als eigene Funktion, weil die Titelseite sie nicht nur
+    zum Sortieren braucht, sondern zum VERGLEICHEN: der rote Faden darf nur
+    unter Gleichrangigen waehlen (siehe `_titelseite`).
+    """
+    return (int(h.get("ctm_bezug") or 0), int(h.get("relevance") or 0))
+
+
 # ------------------------------------------------------------- roter Faden
 # Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall". Gemessen
 # war das keine Geschmacksfrage - die Titelseite fuehrte mit einer anderen
@@ -555,6 +566,16 @@ def _titelseite(highlights: list[dict],
     Objektidentitaet ging das schon einmal schief (der Aufmacher stand
     zweimal auf der Seite, weil er fuer die Anzeige kopiert wird).
 
+    Vergeben wird in EINER Rangfolge (CTM-Bezug vor Prioritaet,
+    `_rangschluessel`), von oben nach unten. Zwei Regeln halten sie:
+
+    * **Der Rang schlaegt den Faden.** Der rote Faden waehlt nur unter
+      gleichrangigen Meldungen, welche die Geschichte erzaehlt; er kann
+      keine schwaechere hochziehen.
+    * **Ein fehlendes Bild ist keine Abwertung.** Wer die Bildstufe nicht
+      erfuellt, faellt in die Spalte "Was wichtig ist" - und steht dort
+      ganz oben, statt hinter den bebilderten Kacheln zu verschwinden.
+
     `belegt` sind die Meldungen, die der Kurzpfad schon zeigt. Sie werden
     NUR aus "Was wichtig ist" herausgehalten, nicht von der ganzen Seite -
     und das ist der Unterschied, auf den es ankommt:
@@ -619,6 +640,21 @@ def _titelseite(highlights: list[dict],
 
     from .bilder import MIND_BREITE_GROSS
 
+    def spitze(mind_breite: int) -> tuple[int, int] | None:
+        """Der beste Rang, den eine noch freie Meldung dieser Bildstufe hat.
+
+        Die Messlatte fuer den roten Faden: was darunter liegt, darf den
+        Platz nicht bekommen, egal wie gut es den Fuehrungssatz belegt.
+        """
+        return max((_rangschluessel(h) for h in highlights
+                    if h.get("url") not in benutzt
+                    and _bildbreite(h) >= mind_breite), default=None)
+
+    def gleichrangig(kandidaten: list[dict],
+                     latte: tuple[int, int] | None) -> list[dict]:
+        return [h for h in kandidaten
+                if latte is None or _rangschluessel(h) >= latte]
+
     # Der Faden zuerst: die Meldungen, die die Fuehrungssaetze des Berichts
     # belegen, bekommen Aufmacher und zweite Reihe - in der Reihenfolge des
     # Berichts. Der Aufmacher nimmt den ERSTEN Satz, fuer den sich eine
@@ -626,11 +662,24 @@ def _titelseite(highlights: list[dict],
     # bis zum vierten Kandidaten gesucht, bevor der naechste Satz drankommt.
     # Bleibt der Faden leer (kein Bericht, keine belegbare Zuordnung),
     # laeuft alles wie vorher nach Dringlichkeit.
+    #
+    # Seit dem 15.08.2026 schlaegt der RANG den Faden: gewaehlt wird nur
+    # unter Meldungen, die den besten noch freien Rangschluessel dieser
+    # Bildstufe erreichen. Der Faden entscheidet also, WELCHE der
+    # gleichrangigen Geschichten fuehrt - er kann keine schwaechere
+    # hochziehen. Bis dahin ordnete er die zwei obersten Stufen allein nach
+    # Wortueberschneidung, und das war an der Ausgabe vom 14.08.2026
+    # messbar falsch: Aufmacher war "T-Mobile wirbt mit Studienstart-
+    # Ratgeber" (Kontext, Prioritaet 2), waehrend "T-Mobile verschenkt
+    # Pixel 11 Pro XL" (Uebertragbar, Prioritaet 5) als Textzeile in der
+    # Spalte stand. Antonio: "die wichtigsten artikel sollen auch an erster
+    # reihe stehen."
     offen = [list(k) for k in (faden or []) if k]
     aufmacher_roh = None
+    latte = spitze(MIND_BREITE_GROSS)
     for i, kandidaten in enumerate(offen):
-        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS, aus=kandidaten,
-                       streng=True)
+        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS,
+                       aus=gleichrangig(kandidaten, latte), streng=True)
         if treffer:
             aufmacher_roh = treffer[0]
             offen.pop(i)          # dieser Satz ist erzaehlt
@@ -644,30 +693,58 @@ def _titelseite(highlights: list[dict],
         # bis zwei Saetze angelegt. Ein Schnitt daran machte einen Halbsatz.
         aufmacher["vorspann"] = " ".join((aufmacher_roh.get("summary") or "").split())
 
-    # Die zweite Reihe erzaehlt die uebrigen Fuehrungssaetze, je einen.
-    zwei = nimm(2, mind_breite=MIND_BREITE_GROSS,
-                aus=[k[0] for k in offen], streng=True)
-    zwei += nimm(2 - len(zwei), mind_breite=MIND_BREITE_GROSS)
+    # Die zweite Reihe erzaehlt die uebrigen Fuehrungssaetze, je einen -
+    # und misst die Latte VOR JEDEM Platz neu. Einmal vorab gerechnet waere
+    # sie nach dem ersten Zugriff veraltet: dann duerfte der zweite Platz
+    # nur noch von einem Rang genommen werden, den es gar nicht mehr gibt,
+    # und die Reihe bliebe halb leer.
+    zwei: list[dict] = []
+    while len(zwei) < 2:
+        latte = spitze(MIND_BREITE_GROSS)
+        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS,
+                       aus=gleichrangig([k[0] for k in offen], latte),
+                       streng=True) \
+            or nimm(1, mind_breite=MIND_BREITE_GROSS)
+        if not treffer:
+            break
+        zwei += treffer
     for h in zwei:
         h["anriss"] = _first_sentence(h.get("summary") or "", 150)
-    # Die Digest-Spalte VOR der dritten Reihe, seit dem 09.08.2026. Das ist
-    # der eigentliche Eingriff, und er sitzt in der Reihenfolge der Vergabe,
-    # nicht in einer Sortierung: sortiert wurde schon vorher nach der
-    # CTM-Achse (`_flatten`), aber die vier kleinen Bildkacheln griffen
-    # davor zu und raeumten damit jede Meldung mit direktem Portfoliobezug
-    # ab. Am 08.08.2026 fuehrte "Was wichtig ist" deshalb zwei
-    # BREKO-Stellungnahmen zur TKG-Novelle (Stufe 2), waehrend alle vier
-    # Meldungen der Stufe 3 in Bildpositionen ohne Rubriknamen standen -
-    # zwei Module, die beide "das Wichtigste" behaupten und sich
-    # widersprechen.
+    # Die dritte Reihe VOR der Digest-Spalte, seit dem 15.08.2026 - und das
+    # dreht die Vergabereihenfolge vom 09.08.2026 zurueck.
     #
-    # Die dritte Reihe ist eine Bildposition, keine Rangliste; sie darf mit
-    # dem nehmen, was uebrig ist. Die zwei Stufen darueber bleiben beim
-    # roten Faden - sie erzaehlen den Bericht, und der ordnet nach
-    # Nachrichtenwert.
+    # Damals zog die Spalte zuerst, weil die vier Bildkacheln jede Meldung
+    # mit direktem Portfoliobezug abraeumten und "Was wichtig ist" dadurch
+    # mit zwei BREKO-Stellungnahmen (Stufe 2) fuehrte. Der Preis dafuer war
+    # aber, dass die HAUPTSPALTE systematisch die schwaecheren Meldungen
+    # bekam: an der Ausgabe vom 15.08.2026 standen in den vier Kacheln vier
+    # Meldungen mit Prioritaet 2, waehrend fuenf mit Prioritaet 3 als
+    # Textzeilen daneben lagen. Jede Karte traegt ihre Prioritaet sichtbar
+    # als Etikett - eine 2 in der grossen Kachel neben einer 3 in der Zeile
+    # ist damit kein Feinheitsproblem, sondern ein sichtbarer Widerspruch.
+    #
+    # Der Grund von damals traegt heute nicht mehr: die Meldungen mit
+    # direktem Bezug holt inzwischen der Kurzpfad ("In zwei Minuten") an die
+    # Spitze DERSELBEN Spalte, und `gesperrt` haelt sie aus dem Digest
+    # heraus. Die Spalte fuehrt also weiterhin mit dem, was fuer uns zaehlt.
+    #
+    # Damit liest sich die Titelseite jetzt in EINER Rangfolge: Aufmacher,
+    # zweite Reihe, dritte Reihe - und "Was wichtig ist" ist die
+    # Fortsetzung, nicht die Konkurrenz. Sie bleibt in sich nach der
+    # CTM-Achse sortiert (siehe test_die_spalte_folgt_der_ctm_achse) und
+    # sammelt dabei genau die hoch bewerteten Meldungen ein, die ohne
+    # grosses Bild in keine Bildstufe passen.
+    # `streng` ist hier die halbe Regel: die dritte Reihe ist eine
+    # BILDposition. Ohne sie greift ihr Rueckfall auf Meldungen OHNE Bild
+    # zu - und weil sie jetzt vor der Spalte zieht, holte sie sich die
+    # hoch bewerteten bildlosen Meldungen in eine Kachel, die dann leer
+    # bleibt, und nahm sie damit der Spalte weg. Eine bildlose Meldung ist
+    # in einer Textzeile besser aufgehoben als in einer Bildkachel ohne
+    # Bild; erst wenn die Spalte voll ist, fuellt der Rest die Reihe auf.
+    vier = nimm(4, mind_breite=1, streng=True)
     wichtig = nimm(7, aus=[h for h in _ctm_achse(highlights)
                            if h.get("url") not in gesperrt])
-    vier = nimm(4, mind_breite=1)
+    vier += nimm(4 - len(vier), mind_breite=1)
 
     # Hier wurden bis zum 07.08.2026 zusaetzlich sechs Ressortbloecke
     # bestueckt (je ein Aufmacher und vier Zeilen). Sie sind weg: dieselbe
