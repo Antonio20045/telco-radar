@@ -912,21 +912,66 @@ def test_der_faden_zieht_keine_schwaechere_meldung_nach_vorn(tmp_path):
     assert _rangschluessel(aufmacher) == bester
 
 
-def test_die_bildstufen_stehen_in_der_rangfolge(tmp_path):
+def test_die_bildstufen_stehen_in_der_rangfolge():
     """Aufmacher, zweite und dritte Reihe stehen untereinander in EINER
-    Spalte - dann muessen sie auch in einer Rangfolge stehen."""
-    from telco_radar.report.html import (_flatten, _titelseite,
-                                         _rangschluessel)
+    Spalte - dann muessen sie auch in einer Rangfolge stehen.
 
-    hs = _flatten({"date": "2026-08-05", "stats": {},
-                   "regions": {"Europa": {"highlights": _faden_highlights()}}})
-    front = _titelseite(hs)
-    stufen = ([front["aufmacher"]] if front["aufmacher"] else []) \
-        + list(front["zwei"]) + list(front["vier"])
-    assert len(stufen) == 7, stufen
-    raenge = [_rangschluessel(h) for h in stufen]
-    assert raenge == sorted(raenge, reverse=True), \
-        list(zip(raenge, [h["schlagzeile"] for h in stufen]))
+    Gemessen wird an ALLEN archivierten Ausgaben, nicht an einer Fixture:
+    die erste Fassung dieses Tests gab jeder Meldung `image_w=1200` und
+    behauptete danach eine Zusicherung, die der Code gar nicht hat. Auf den
+    echten Daten brach sie in 2 von 17 Ausgaben.
+
+    Die Ausnahme, die dabei sichtbar wurde, ist keine Schlamperei sondern
+    die Bildregel: Aufmacher und zweite Reihe verlangen 800 px, die dritte
+    Reihe nur ueberhaupt ein Bild. Eine Meldung mit 776 px kann also in der
+    dritten Reihe stehen und die zweite ueberragen (14.08.2026: "Free
+    buendelt Disney+ Sportrechte", Uebertragbar/Prioritaet 4, 776 px). Sie
+    ist deshalb ausgenommen - und nur sie. Wer die dritte Reihe fuer
+    schwaechere Meldungen mit grossem Bild oeffnet, faellt hier durch.
+
+    Ausgenommen ist ausserdem, was der Absenderdeckel verschoben hat: mehr
+    als zwei Meldungen desselben Absenders duerfen oberhalb der Falz nicht
+    stehen, und die dritte rutscht dadurch nach hinten."""
+    from telco_radar.report.bilder import MIND_BREITE_GROSS
+    from telco_radar.report.html import (_flatten, _titelseite, _bildbreite,
+                                         _rangschluessel, _kennwoerter)
+
+    repo = Path(__file__).resolve().parents[1]
+    geprueft = 0
+    for datei in sorted((repo / "data" / "reports").glob("*.json")):
+        hs = _flatten(json.loads(datei.read_text(encoding="utf-8")))
+        if len(hs) < 14:
+            continue                      # zu klein fuer alle Stufen
+        front = _titelseite(hs)
+        oben = ([front["aufmacher"]] if front["aufmacher"] else []) \
+            + list(front["zwei"])
+        gross = [h for h in oben if _bildbreite(h) >= MIND_BREITE_GROSS]
+        if not gross:
+            continue
+        schwaechste = min(_rangschluessel(h) for h in gross)
+        # Wer den Absenderdeckel schon ausgeschoepft hat, darf hinten stehen.
+        voll = set()
+        for h in oben:
+            kw = _kennwoerter(h.get("operator") or h.get("source_label") or "")
+            if sum(1 for g in oben
+                   if _kennwoerter(g.get("operator")
+                                   or g.get("source_label") or "") & kw) >= 2:
+                voll |= kw
+        ueber = [h["schlagzeile"] for h in front["vier"]
+                 if _rangschluessel(h) > schwaechste
+                 and _bildbreite(h) >= MIND_BREITE_GROSS
+                 and not (_kennwoerter(h.get("operator")
+                                       or h.get("source_label") or "") & voll)]
+        assert not ueber, f"{datei.name}: dritte Reihe ueberragt die zweite: {ueber}"
+        geprueft += 1
+    # Die Anti-Leerlauf-Zeile. Gemessen werden nur Ausgaben AB dem
+    # 06.08.2026 - davor trugen die Berichte keine Bildbreiten (bilder.py
+    # ist an dem Tag neu geschrieben worden), und ohne Bild gibt es keine
+    # Bildstufe zu pruefen. Es sind aktuell fuenf, und die Zahl waechst mit
+    # jeder Ausgabe; sie kann nicht schrumpfen, weil `_flatten` die Breite
+    # aus dem BERICHT liest und nicht aus dem Bildordner, den ein
+    # Aufraeumlauf beschneiden darf.
+    assert geprueft >= 4, f"nur {geprueft} Ausgaben gemessen"
 
 
 def test_die_spalte_nimmt_den_bildstufen_keine_bessere_meldung_weg(tmp_path):

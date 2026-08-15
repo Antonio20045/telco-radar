@@ -411,23 +411,45 @@ hochziehen. Die Latte wird **vor jedem Platz neu gemessen** — einmal vorab
 gerechnet wäre sie nach dem ersten Zugriff veralteter Rang, und die zweite
 Reihe bliebe halb leer.
 
-**Die dritte Reihe zieht wieder vor der Digest-Spalte** (15.08.2026) — und
-das dreht die Vergabereihenfolge von K2 (09.08.2026) zurück. Damals zog die
-Spalte „Was wichtig ist" zuerst, weil die vier Bildkacheln jede Meldung mit
-direktem Portfoliobezug abräumten. Der Preis war, dass die HAUPTSPALTE
-systematisch die schwächeren Meldungen bekam: in der Ausgabe vom 15.08.
-standen in den vier Kacheln vier Meldungen mit Priorität 2, während fünf
-mit Priorität 3 als Textzeilen danebenlagen — und **jede Karte trägt ihre
-Priorität als sichtbares Etikett**, das war also kein Feinheitsproblem sondern
-ein Widerspruch, den man auf der Seite lesen konnte. Der Grund von damals
-trägt nicht mehr: die Meldungen mit direktem Bezug holt inzwischen der
-Kurzpfad an die Spitze DERSELBEN Spalte, und `gesperrt` hält sie aus dem
-Digest heraus. Zwei Regeln tragen die Neufassung:
+**Die dritte Reihe zieht wieder vor der Digest-Spalte** (15.08.2026) — aber
+erst, nachdem sich die Spalte genommen hat, was ihr K2 (09.08.2026) zugesagt
+hat. **Drei Stufen in dieser Reihenfolge:** `wichtig` nimmt die Meldungen
+der Stufe „Direkt für uns" → `vier` füllt seine Bildkacheln aus der
+Rangfolge → `wichtig` füllt auf, `vier` notfalls ohne Bild.
+
+Warum überhaupt zurückgedreht: die Spalte zuerst hieß, dass die HAUPTSPALTE
+systematisch die schwächeren Meldungen bekam — in der Ausgabe vom 15.08.
+vier Kacheln mit Priorität 2, daneben fünf Priorität-3-Meldungen als
+Textzeilen. Aufmacher, zweite und dritte Reihe stehen untereinander in
+derselben Spalte und werden in dieser Folge gelesen.
+
+> Die erste Fassung dieser Änderung begründete sich damit, dass **jede
+> Karte ihre Priorität als sichtbares Etikett trägt**. Das ist falsch, und
+> es ist nachgezählt: `site/index.html` enthält **genau ein** `rel-badge`,
+> im Aufmacher. Die Karten der zweiten und dritten Reihe zeigen Ressort,
+> Absender, Schlagzeile und Anriss; die Zeilen der Spalte Absender und
+> Schlagzeile. Die Reihenfolge ist trotzdem falsch gewesen — aber aus dem
+> Grund darüber, nicht aus diesem. Wer eine Begründung aus dem Aussehen der
+> Seite zieht, zählt vorher nach.
+
+Ebenso wenig trägt die zweite naheliegende Begründung, die Reservierung sei
+entbehrlich, weil der Kurzpfad die Stufe-3-Meldungen ohnehin an die Spitze
+derselben Spalte hole: **der Kurzpfad nimmt nur Meldungen mit einem
+geprüften Folgerungssatz, und über die 17 archivierten Ausgaben gemessen ist
+er in 16 leer** (am 14.08. verwarf der Prüflauf gegen den Originaltext alle
+neun Sätze). Eine Zusicherung, die an einer anderen Stufe hängt, ist keine —
+deshalb rechnet `_titelseite` die Reservierung selbst.
 
 | Regel | Warum |
 |---|---|
-| Die Titelseite vergibt in **einer** Rangfolge: Aufmacher → zweite Reihe → dritte Reihe → „Was wichtig ist" | Die drei Bildstufen stehen untereinander in derselben Spalte. Was untereinander steht, muss in einer Rangfolge stehen |
-| Die dritte Reihe greift **`streng`** zu (Bild zwingend), erst nach der Spalte füllt sie notfalls auf | Ohne das holt sie sich die hoch bewerteten BILDLOSEN Meldungen in eine Kachel, die dann leer bleibt — und nimmt sie der Spalte weg. Ein fehlendes Bild ist keine Abwertung: solche Meldungen gehören in die Textspalte, und dort nach oben |
+| „Was wichtig ist" greift **zuerst** auf die Stufe „Direkt für uns" zu — aber erst NACH Aufmacher und zweiter Reihe | Das ist der Befund vom 08.08.2026: die Bildkacheln räumten jede Meldung mit direktem Portfoliobezug ab. In den zwei obersten Stufen steht eine solche Meldung aber besser als in einer Textzeile |
+| Die dritte Reihe greift **`streng`** zu (Bild zwingend), erst danach füllt sie notfalls auf | Ohne das holt sie sich die hoch bewerteten BILDLOSEN Meldungen in eine Kachel, die dann leer bleibt — und nimmt sie der Spalte weg. Ein fehlendes Bild ist keine Abwertung: solche Meldungen gehören in die Textspalte, und dort nach oben |
+| `spitze()` rechnet die Latte **mit** dem Absenderdeckel | Eine deckelblockierte Meldung KANN den Platz nicht bekommen, darf ihn also nicht für alle anderen sperren — sonst wirft `gleichrangig()` die Faden-Kandidaten gegen einen Rang weg, den niemand mehr erreichen darf, und der rote Faden ist stumm abgeschaltet. Über die 17 Ausgaben ändert die Zeile keine Belegung; sie hält den Fall auf, wenn er eintritt |
+
+**Der Preis, gemessen:** auf der Ausgabe vom 08.08. fällt `faden_oben` von
+3 auf 2, und über alle Ausgaben stammt der Aufmacher in 11 statt 12 Fällen
+aus dem Faden. Das ist der Zweck der Änderung, nicht ihr Nebenwirkung — der
+Faden ordnet jetzt unter Gleichrangigen, statt zu bestimmen.
 
 Wahrheitstests: `test_der_faden_zieht_keine_schwaechere_meldung_nach_vorn`,
 `test_die_bildstufen_stehen_in_der_rangfolge`,
@@ -1486,6 +1508,16 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > **Der Lauf wurde wie verlangt nicht angestoßen** — `site/` ist aus den
 > vorhandenen Berichten neu gerendert (`render_site` MIT `cfg`, siehe §6).
 >
+> **`diff-reviewer` hat die erste Fassung zerlegt, und zwei Befunde haben
+> sie geändert:** die Begründung „jede Karte trägt ihre Priorität als
+> sichtbares Etikett" war falsch (nachgezählt: genau ein `rel-badge` auf
+> der ganzen Seite), und die K2-Zusicherung hing an einem Kurzpfad, der in
+> 16 von 17 Ausgaben leer ist. Beides steht in §5; die Reservierung rechnet
+> `_titelseite` seitdem selbst. Ein dritter Befund kostete einen Test: die
+> erste Fassung von `test_die_bildstufen_stehen_in_der_rangfolge` gab jeder
+> Meldung dieselbe Bildbreite und maß damit nur ihre eigene Fixture — auf
+> den echten Ausgaben brach die behauptete Zusicherung in 2 von 17 Fällen.
+>
 > **OFFEN daraus:**
 > 1. **Die live sichtbare Ausgabe (15.08.) ist degeneriert.** Sie hat nur
 >    20 bewertete Meldungen und keine über Priorität 3 — nicht wegen der
@@ -1499,6 +1531,24 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 >    ansehen: führt der Aufmacher weiterhin den besten Rang mit Bild?
 > 3. **Kriterium 6** (`pruefe_portal.py`, 14 px Hochskalierung eines Bildes
 >    auf `meldungen.html`) steht offen und ist nicht Teil dieses Auftrags.
+> 4. **Die zwei obersten Reihen der Ausgabe vom 15.08. ändern sich NICHT.**
+>    Der Aufmacher bleibt „Rogers schenkt Waldbrand-Opfern…" mit dem
+>    sichtbaren Etikett „Priorität 3/5", und die zweite Reihe trägt eine
+>    Meldung mit Priorität 2 über vier Karten mit Priorität 3. Ursache ist
+>    nicht der behobene Fehler, sondern `_rangschluessel`: **der CTM-Bezug
+>    schlägt die Priorität ohne Deckel**, und beide Meldungen sind
+>    „Übertragbar" (Stufe 2), die vier darunter nur „Kontext". Das ist die
+>    Entscheidung vom 08.08.2026 (`test_direkte_meldung_steht_vor_der_
+>    dringlicheren`) und wurde hier bewusst NICHT angefasst — sie umzukehren
+>    ist ein eigener Auftrag, kein Nebeneffekt. Wenn Antonio erneut auf die
+>    Priorität der obersten Karten zeigt, ist DAS die Stelle: entweder eine
+>    CTM-Stufe wiegt höchstens einen Prioritätsschritt (`relevance +
+>    ctm_bezug`, gerechnet und verworfen, weil der Gleichstand dann wieder
+>    zugunsten des CTM bricht), oder die Priorität führt und der CTM-Bezug
+>    ist nur noch Gleichstandsregel.
+> 5. **`front["oben"]` ist eine tote Rechnung**, und ihr Kommentar behauptet
+>    einen Test, den es nicht gibt (`html.py`, am Ende von `_titelseite`).
+>    Vorbestehend, beim Review gefunden, hier nicht angefasst.
 
 > **Davor erledigt (15.08.2026, Antonio direkt): die Übersetzung sichtbar
 > gemacht — sie war gebaut, getestet, live und vollständig unsichtbar.**

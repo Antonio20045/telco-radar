@@ -392,14 +392,34 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
             f"BREKO auf Platz {platz + 1} vor {titel[platz + 1:]}"
 
     # Und der Grund, warum BREKO diese Spalte anfuehren DARF: die Meldungen
-    # mit direktem Portfoliobezug stehen nicht daneben, sondern darueber -
-    # in den Bildstufen der Hauptspalte. Ohne diese Zeile liesse sich der
-    # Test auch dadurch erfuellen, dass die Stufe-3-Meldungen gar nicht
-    # mehr auf der Titelseite vorkommen.
-    oberhalb = {h.get("url") for h in
-                ([front["aufmacher"]] if front["aufmacher"] else [])
-                + list(front["zwei"]) + list(front["vier"])}
-    fehlt = [h.get("schlagzeile") for h in stufe3
-             if h.get("url") not in oberhalb
-             and h.get("url") not in {s.get("url") for s in spalte}]
-    assert not fehlt, f"Stufe-3-Meldung ohne Platz auf der Titelseite: {fehlt}"
+    # mit direktem Portfoliobezug stehen nicht dahinter, sondern in den zwei
+    # obersten Bildstufen oder VOR ihr in derselben Spalte.
+    #
+    # Gemessen wird OHNE `belegt` - und das ist der Kern dieser Fassung.
+    # Der naheliegende Weg waere, die Zusicherung dem Kurzpfad zu
+    # ueberlassen: er steht ueber derselben Spalte und `gesperrt` haelt
+    # seine Meldungen aus dem Digest heraus. Der Kurzpfad nimmt aber nur
+    # Meldungen mit einem GEPRUEFTEN Folgerungssatz, und ueber die 17
+    # archivierten Ausgaben gemessen ist er in 16 leer. Ein Test, der ihn
+    # mitgibt, prueft den Normalfall also gerade nicht.
+    ohne_kurzpfad = html._titelseite(highlights, None)
+    zwei_stufen = {h.get("url") for h in
+                   ([ohne_kurzpfad["aufmacher"]] if ohne_kurzpfad["aufmacher"]
+                    else []) + list(ohne_kurzpfad["zwei"])}
+    kacheln = {h.get("url") for h in ohne_kurzpfad["vier"]}
+    zeilen = [h.get("url") for h in ohne_kurzpfad["wichtig"]]
+    for h in stufe3:
+        if h.get("url") in zwei_stufen:
+            continue
+        assert h.get("url") not in kacheln, (
+            "Stufe-3-Meldung in einer Bildkachel der dritten Reihe, "
+            f"waehrend die Spalte mit Stufe {stufen[0]} fuehrt: "
+            f"{h.get('schlagzeile')}")
+        assert h.get("url") in zeilen, \
+            f"Stufe-3-Meldung ohne Platz: {h.get('schlagzeile')}"
+        # Vor jeder Meldung mit geringerem Bezug.
+        platz = zeilen.index(h.get("url"))
+        davor = [int(z.get("ctm_bezug") or 0)
+                 for z in ohne_kurzpfad["wichtig"][:platz]]
+        assert all(s >= ctm.DIREKT for s in davor), \
+            f"{h.get('schlagzeile')} steht hinter Stufe {davor}"
