@@ -815,40 +815,215 @@ Mehr Text.
 """
 
 
-def _faden_highlights() -> list[dict]:
+def _faden_highlights(quasar_relevance: int = 5) -> list[dict]:
     """Eine Ausgabe, in der die zwei Fuehrungssaetze belegbar sind - und in
-    der die Dringlichkeit auf etwas ANDERES zeigt. Ohne diesen Gegensatz
-    koennte der Test nicht unterscheiden, ob die Seite dem Faden folgt oder
-    nur zufaellig dasselbe waehlt."""
+    der eine gleich stark bewertete Meldung im Bericht NICHT vorkommt. Ohne
+    diesen Gegensatz koennte der Test nicht unterscheiden, ob die Seite dem
+    Faden folgt oder nur zufaellig dasselbe waehlt.
+
+    `quasar_relevance` senkt die Bewertung der Meldung, die der Bericht
+    meint. Damit misst derselbe Aufbau beide Seiten der Regel: bei
+    Gleichstand ordnet der Faden, darunter schlaegt ihn der Rang."""
     hs = list(PORTAL)
-    # Dringlichkeit 5 und ein grosses Bild, aber im Bericht kommt sie nicht
-    # vor: die Meldung, die OHNE Faden den Aufmacher bekaeme.
+    # Dieselbe Bewertung wie Quasarnetz, aber im Bericht kommt sie nicht
+    # vor: die Meldung, die OHNE Faden den Aufmacher bekaeme (sie steht
+    # vorn in der Liste, und `nimm` geht die Liste der Reihe nach durch).
     hs.insert(0, dict(_highlight(900, 5, "Netz/Technologie", image_w=1200),
                       title="Blaulicht Telekommunikation meldet Quartalszahlen",
                       operator="Blaulicht"))
-    hs.append(dict(_highlight(901, 3, "Netz/Technologie", image_w=1200),
+    hs.append(dict(_highlight(901, quasar_relevance, "Netz/Technologie",
+                              image_w=1200),
                    title="Quasarnetz kuendigt Kleinzellennetz gegen Mobilfunker an",
                    operator="Quasarnetz"))
-    hs.append(dict(_highlight(902, 3, "Tarif/Pricing", image_w=1200),
+    hs.append(dict(_highlight(902, quasar_relevance, "Tarif/Pricing",
+                              image_w=1200),
                    title="Tarifwerk senkt Einstiegspreis fuer unlimitierte Tarife",
                    operator="Tarifwerk"))
     return hs
 
 
 def test_die_titelseite_fuehrt_mit_dem_bericht(tmp_path):
-    """Der Aufmacher kommt aus dem, worueber der Bericht fuehrt."""
-    from telco_radar.report.html import _flatten, _titelseite, _faden, _fuehrende_saetze
+    """Der Aufmacher kommt aus dem, worueber der Bericht fuehrt - unter den
+    Meldungen, die den Platz nach ihrer Bewertung auch verdienen.
+
+    Bis zum 15.08.2026 stand hier der Gegensatz "Faden schlaegt
+    Dringlichkeit": die Fixture gab Blaulicht Prioritaet 5 und Quasarnetz
+    die 3, und der Test verlangte trotzdem Quasarnetz als Aufmacher. Genau
+    das hat die Titelseite kaputt gemacht - an der Ausgabe vom 14.08.2026
+    fuehrte die Seite mit "T-Mobile wirbt mit Studienstart-Ratgeber"
+    (Kontext, Prioritaet 2), waehrend "T-Mobile verschenkt Pixel 11 Pro XL"
+    (Uebertragbar, Prioritaet 5) als Textzeile daneben stand.
+
+    Die Regel ist jetzt: der Faden waehlt unter GLEICHRANGIGEN, welche
+    Geschichte fuehrt. Hier haben Blaulicht und Quasarnetz denselben Rang -
+    und dann muss der Bericht entscheiden."""
+    from telco_radar.report.html import (_flatten, _titelseite, _faden,
+                                         _fuehrende_saetze, _rangschluessel)
 
     hs = _flatten({"date": "2026-08-05", "stats": {},
                    "regions": {"Europa": {"highlights": _faden_highlights()}}})
+    # Die Voraussetzung des Falls, ausgeschrieben: gleicher Rang, damit der
+    # Test nicht heimlich nur die Sortierung misst.
+    rang = {h["operator"]: _rangschluessel(h) for h in hs}
+    assert rang["Quasarnetz"] == rang["Blaulicht"] == rang["Tarifwerk"]
+
     front = _titelseite(hs, _faden(hs, _fuehrende_saetze(FADEN_BRIEFING)))
 
     assert "Quasarnetz" in front["aufmacher"]["schlagzeile"], (
         f"Aufmacher folgt dem Bericht nicht: {front['aufmacher']['schlagzeile']}")
     # Beide Fuehrungssaetze stehen oberhalb der Falz.
     assert front["faden_oben"] == 2
-    # Gegenprobe: OHNE Faden fuehrt die Seite mit der Dringlichkeit.
+    # Gegenprobe: OHNE Faden fuehrt die Seite mit der Dringlichkeit, und die
+    # zeigt bei Gleichstand auf die erste Meldung der Liste.
     assert "Quasarnetz" not in _titelseite(hs)["aufmacher"]["schlagzeile"]
+
+
+def test_der_faden_zieht_keine_schwaechere_meldung_nach_vorn(tmp_path):
+    """Der Regressionstest zum Befund vom 15.08.2026. Antonio: "wie kann es
+    sein dass artikel mit prioriät von 3 auf der titelseite landen ... die
+    wichtigsten artikel sollen auch an erster reihe stehen."
+
+    Derselbe Aufbau wie oben, nur ist die Meldung, die der Bericht meint,
+    zwei Stufen schwaecher bewertet. Dann bekommt sie den Aufmacher NICHT -
+    der Rang schlaegt den Faden. Gegen den Stand vom 14.08.2026 gemessen
+    faellt dieser Test durch: dort stand Quasarnetz als Aufmacher."""
+    from telco_radar.report.html import (_flatten, _titelseite, _faden,
+                                         _fuehrende_saetze, _rangschluessel)
+
+    hs = _flatten({"date": "2026-08-05", "stats": {},
+                   "regions": {"Europa": {
+                       "highlights": _faden_highlights(quasar_relevance=3)}}})
+    rang = {h["operator"]: _rangschluessel(h) for h in hs}
+    assert rang["Quasarnetz"] < rang["Blaulicht"], \
+        "ohne Rangunterschied prueft dieser Test nichts"
+
+    front = _titelseite(hs, _faden(hs, _fuehrende_saetze(FADEN_BRIEFING)))
+
+    aufmacher = front["aufmacher"]
+    assert "Quasarnetz" not in aufmacher["schlagzeile"], (
+        "der Faden hat eine schwaecher bewertete Meldung nach vorn gezogen: "
+        f"{aufmacher['schlagzeile']}")
+    # Und positiv: der Aufmacher traegt den besten Rang, den eine Meldung
+    # mit grossem Bild ueberhaupt hat.
+    from telco_radar.report.bilder import MIND_BREITE_GROSS
+    from telco_radar.report.html import _bildbreite
+    bester = max(_rangschluessel(h) for h in hs
+                 if _bildbreite(h) >= MIND_BREITE_GROSS)
+    assert _rangschluessel(aufmacher) == bester
+
+
+def test_die_bildstufen_stehen_in_der_rangfolge():
+    """Aufmacher, zweite und dritte Reihe stehen untereinander in EINER
+    Spalte - dann muessen sie auch in einer Rangfolge stehen.
+
+    Gemessen wird an ALLEN archivierten Ausgaben, nicht an einer Fixture:
+    die erste Fassung dieses Tests gab jeder Meldung `image_w=1200` und
+    behauptete danach eine Zusicherung, die der Code gar nicht hat. Auf den
+    echten Daten brach sie in 2 von 17 Ausgaben.
+
+    Die Ausnahme, die dabei sichtbar wurde, ist keine Schlamperei sondern
+    die Bildregel: Aufmacher und zweite Reihe verlangen 800 px, die dritte
+    Reihe nur ueberhaupt ein Bild. Eine Meldung mit 776 px kann also in der
+    dritten Reihe stehen und die zweite ueberragen (14.08.2026: "Free
+    buendelt Disney+ Sportrechte", Uebertragbar/Prioritaet 4, 776 px). Sie
+    ist deshalb ausgenommen - und nur sie. Wer die dritte Reihe fuer
+    schwaechere Meldungen mit grossem Bild oeffnet, faellt hier durch.
+
+    Ausgenommen ist ausserdem, was der Absenderdeckel verschoben hat: mehr
+    als zwei Meldungen desselben Absenders duerfen oberhalb der Falz nicht
+    stehen, und die dritte rutscht dadurch nach hinten."""
+    from telco_radar.report.bilder import MIND_BREITE_GROSS
+    from telco_radar.report.html import (_flatten, _titelseite, _bildbreite,
+                                         _rangschluessel, _kennwoerter)
+
+    repo = Path(__file__).resolve().parents[1]
+    geprueft = 0
+    for datei in sorted((repo / "data" / "reports").glob("*.json")):
+        hs = _flatten(json.loads(datei.read_text(encoding="utf-8")))
+        if len(hs) < 14:
+            continue                      # zu klein fuer alle Stufen
+        front = _titelseite(hs)
+        oben = ([front["aufmacher"]] if front["aufmacher"] else []) \
+            + list(front["zwei"])
+        gross = [h for h in oben if _bildbreite(h) >= MIND_BREITE_GROSS]
+        if not gross:
+            continue
+        schwaechste = min(_rangschluessel(h) for h in gross)
+        # Wer den Absenderdeckel schon ausgeschoepft hat, darf hinten stehen.
+        voll = set()
+        for h in oben:
+            kw = _kennwoerter(h.get("operator") or h.get("source_label") or "")
+            if sum(1 for g in oben
+                   if _kennwoerter(g.get("operator")
+                                   or g.get("source_label") or "") & kw) >= 2:
+                voll |= kw
+        ueber = [h["schlagzeile"] for h in front["vier"]
+                 if _rangschluessel(h) > schwaechste
+                 and _bildbreite(h) >= MIND_BREITE_GROSS
+                 and not (_kennwoerter(h.get("operator")
+                                       or h.get("source_label") or "") & voll)]
+        assert not ueber, f"{datei.name}: dritte Reihe ueberragt die zweite: {ueber}"
+        geprueft += 1
+    # Die Anti-Leerlauf-Zeile. Gemessen werden nur Ausgaben AB dem
+    # 06.08.2026 - davor trugen die Berichte keine Bildbreiten (bilder.py
+    # ist an dem Tag neu geschrieben worden), und ohne Bild gibt es keine
+    # Bildstufe zu pruefen. Es sind aktuell fuenf, und die Zahl waechst mit
+    # jeder Ausgabe; sie kann nicht schrumpfen, weil `_flatten` die Breite
+    # aus dem BERICHT liest und nicht aus dem Bildordner, den ein
+    # Aufraeumlauf beschneiden darf.
+    assert geprueft >= 4, f"nur {geprueft} Ausgaben gemessen"
+
+
+def test_die_spalte_nimmt_den_bildstufen_keine_bessere_meldung_weg(tmp_path):
+    """Der Regressionstest zum zweiten Teil des Befunds vom 15.08.2026.
+
+    Bis dahin zog die Digest-Spalte "Was wichtig ist" (sieben Textzeilen)
+    VOR der dritten Reihe. Die Hauptspalte bekam dadurch systematisch die
+    schwaecheren Meldungen: in der Ausgabe, die Antonio vorlag, standen in
+    den vier Kacheln vier Meldungen mit Prioritaet 2, waehrend fuenf mit
+    Prioritaet 3 als Textzeilen danebenlagen. Jede Karte traegt ihre
+    Prioritaet als sichtbares Etikett - das war also kein Feinheitsproblem,
+    sondern ein Widerspruch, den man auf der Seite lesen konnte.
+
+    Geprueft wird nur, was die Regel wirklich zusichert: eine Meldung MIT
+    Bild darf nicht in der Spalte stehen, waehrend eine schwaechere in der
+    dritten Reihe steht. Meldungen OHNE Bild duerfen die Spalte sehr wohl
+    anfuehren - sie passen in keine Bildstufe, und ein fehlendes Bild ist
+    keine Abwertung."""
+    from telco_radar.report.html import (_flatten, _titelseite, _bildbreite,
+                                         _rangschluessel)
+
+    # Der Zuschnitt der Ausgabe vom 15.08.2026, nachgebaut: drei Meldungen
+    # fuer Aufmacher und zweite Reihe, danach fuenf mit Prioritaet 3 und
+    # sieben mit Prioritaet 2 - alle mit grossem Bild. Die Spalte hat sieben
+    # Plaetze; zieht sie zuerst, raeumt sie damit jede Prioritaet 3 ab, und
+    # in die vier Kacheln fallen die Zweier. Jede Meldung braucht einen
+    # eigenen Absender - und zwar einen, der kein gemeinsames Wort mit den
+    # anderen teilt: "Anbieter 701" und "Anbieter 702" sind fuer
+    # `_kennwoerter` DERSELBE Absender (die Ziffern sind zu kurz fuer das
+    # Wortmuster), dann greift der Deckel statt der Rangfolge, und der Test
+    # misst etwas anderes als er behauptet.
+    namen = ["Quasarnetz", "Tarifwerk", "Blaulicht", "Nordfunk", "Sylttel",
+             "Ostmobil", "Wattline", "Duenenfunk", "Kliffnetz", "Moorcom",
+             "Heidefon", "Foehrmobil", "Bodencom", "Ryktel", "Aalfunk"]
+    roh = []
+    for i, (ctm, rel) in enumerate([(2, 3)] * 3 + [(1, 3)] * 5
+                                   + [(1, 2)] * 7):
+        h = _highlight(700 + i, rel, "Tarif/Pricing", image_w=1200)
+        h |= {"ctm_bezug": ctm, "operator": namen[i]}
+        roh.append(h)
+    hs = _flatten({"date": "2026-08-15", "stats": {},
+                   "regions": {"Europa": {"highlights": roh}}})
+    front = _titelseite(hs)
+    assert front["vier"], "ohne dritte Reihe prueft dieser Test nichts"
+    assert len(front["wichtig"]) == 7, front["wichtig"]
+
+    schwaechste = min(_rangschluessel(h) for h in front["vier"])
+    ueberholt = [h["schlagzeile"] for h in front["wichtig"]
+                 if _bildbreite(h) >= 1 and _rangschluessel(h) > schwaechste]
+    assert not ueberholt, (
+        f"steht als Textzeile, obwohl schwaechere Meldungen eine Bildkachel "
+        f"bekamen: {ueberholt}")
 
 
 def test_ohne_belegbaren_faden_bleibt_die_alte_reihenfolge(tmp_path):
