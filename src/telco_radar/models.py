@@ -54,16 +54,25 @@ class Item:
     # Der ARTIKELTEXT, wenn er beschafft werden konnte - ungekappt.
     #
     # Bewusst ein eigenes Feld neben `summary`, nicht dessen Verlaengerung:
-    # `summary` ist das Feld, aus dem `analyze/agents.py` den Analysten-
-    # Schnipsel schneidet, und was der Analyst sieht, ist eine eigene
-    # Entscheidung mit eigener Laufzeit- und Token-Rechnung. Ein Volltext,
-    # der still in die Stapel-Prompts rutscht, waere genau der Nebeneffekt,
-    # den niemand bestellt hat.
+    # `summary` bleibt bei 600 Zeichen und ist das, was der Bericht und die
+    # Karten zeigen.
+    #
+    # **Seit dem 15.08.2026 liest der Analyst dieses Feld mit** -
+    # `agents.analyst_text()` nimmt den laengeren von `volltext` und
+    # `summary` und kappt bei 2500 Zeichen. Bis dahin stand hier, ein
+    # Volltext in den Stapel-Prompts waere "der Nebeneffekt, den niemand
+    # bestellt hat"; er ist jetzt ausdruecklich bestellt, weil 52 der 164
+    # crawlbaren Quellen kein `summary` liefern und der Analyst dort allein
+    # aus der Ueberschrift bewertet hat. Die Entscheidung hat ihre eigene
+    # Token-Rechnung, und sie steht in `ANALYST_TEXT_ZEICHEN`.
     #
     # Gemessen am 13.08.2026 ueber 1329 Feed-Eintraege: 40,6 % tragen ihren
     # Volltext schon im Feed (meist in content:encoded, das bis dahin
     # niemand gelesen hat), die anderen 59,4 % brauchen den Abruf der
-    # Artikelseite.
+    # Artikelseite. **Nur der Feed-Weg fuellt dieses Feld** -
+    # `collect/newsroom.py` setzt es nicht, der Abruf der Artikelseite
+    # geschieht erst in der Uebersetzungsstufe und damit NACH der Analyse.
+    # Fuer die textlosen Newsroom-Quellen bleibt es deshalb beim Titel.
     volltext: str = ""
     # Die erkannte Sprache des Originals als ISO-639-1-Kuerzel, oder "" wenn
     # sie sich nicht sicher bestimmen liess. NIE auf dem Titel gemessen -

@@ -730,8 +730,23 @@ b,strong{font-weight:700}
    der einzige sichtbare Hinweis darauf, dass eins nach draussen fuehrt. */
 .ueb-link{margin:2px 0 10px;font-family:var(--sans);font-size:11.5px;
   font-weight:600;letter-spacing:.02em}
-.ueb-link a{color:var(--red);text-decoration:none;
-  border-bottom:1px solid var(--red-wash);padding-bottom:1px}
+/* `display:inline` ist hier kein Feinschliff, sondern eine Reparatur.
+   Die Kartenvorlagen wickeln ihre ganze Karte in einen Link und formen ihn
+   als Flexbox: `.mlead a,.mzwei a{display:flex;flex-direction:column}`
+   (Z. 387), `.mz a{display:flex;gap:13px;padding:11px 0}` (Z. 418) und
+   `.stueck a{display:flex;flex-direction:column}` (Z. 217). Das sind
+   Nachfahren-Selektoren, und der rote Link steht INNERHALB dieser Karten -
+   er hat ihre Regeln also mitgeerbt. Gemessen am 15.08.2026 auf
+   meldungen.html: der Link der Aufmacher-Karte war 38 px hoch statt 20, weil
+   Text und Pfeil als zwei Flex-Kinder UNTEREINANDER standen; auf den
+   mittleren Karten trieb `gap:14px` den Pfeil weit vom Wort, auf den Zeilen
+   kam `padding:11px 0` dazu. Der Pfeil, der laut Fussnote "an das Wort"
+   gehoert, stand seit der Auslieferung des Feature auf einer eigenen Zeile.
+   Deshalb wird `display` hier ausdruecklich gesetzt und `gap`/`padding`
+   zurueckgeholt - gleiche Spezifitaet, aber weiter unten im Stylesheet. */
+.ueb-link a{display:inline;gap:0;padding:0 0 1px;
+  color:var(--red);text-decoration:none;
+  border-bottom:1px solid var(--red-wash)}
 .ueb-link a:hover{border-bottom-color:var(--red)}
 /* Der Pfeil gehoert an das Wort, nicht daneben: als Leerzeichen im
    content stand er mit dem letter-spacing der Zeile sichtbar ab. */

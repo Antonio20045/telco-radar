@@ -33,8 +33,20 @@ PREISE = {
 ZEICHEN_JE_TOKEN = 4
 
 # Aus dem Analysten-Prompt (analyze/agents.py) und einem echten Lauf gemessen.
-ANALYST_SYSTEM_TOKEN = 900     # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM
-ANALYST_JE_MELDUNG_TOKEN = 120  # Titel + Betreiber + Quelle + Datum + Anriss
+ANALYST_SYSTEM_TOKEN = 1200    # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM (mit TEXTFELD)
+# Titel + Betreiber + Quelle + Datum + `text`.
+#
+# Seit dem 15.08.2026 traegt `text` bis zu ANALYST_TEXT_ZEICHEN (2500)
+# Zeichen Artikeltext statt 300 - der Wert stand vorher bei 120 und war damit
+# rund fuenffach zu niedrig. Gerechnet aus der Messung vom 15.08.2026 ueber
+# 267 Feed-Eintraege: 30 % tragen Feed-Volltext (Median 2000 Zeichen, auf
+# 2500 gekappt), die uebrigen ihren Teaser (Median 206). Im Mittel also rund
+# 800 Zeichen je Meldung, bei 4 Zeichen je Token gut 200 plus die Metafelder.
+#
+# Es bleibt eine EINGABE-Rechnung, und Eingabe ist die billige Haelfte: der
+# Aufschlag sind bei 1000 Meldungen je Lauf einige Cent im Monat. Wer die
+# Grenze in agents.py anhebt, zieht diesen Wert mit.
+ANALYST_JE_MELDUNG_TOKEN = 260
 ANALYST_AUSGABE_JE_HIGHLIGHT = 190
 BATCH_SIZE = 15
 

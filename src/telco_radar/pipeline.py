@@ -1065,10 +1065,32 @@ def run(root: Path, use_llm: bool | None = None,
     # veroeffentlicht wurde.
     #
     # Failsafe daneben: ein Fehler dieser Stufe darf den Bericht nie kosten.
-    # Sie laeuft auf `new_items`, also auf dem, was den Seen- und
-    # Freshness-Filter ueberlebt hat - eine laengst bekannte Meldung wird
-    # nicht ein zweites Mal abgerufen.
+    #
+    # Sie laeuft auf den BERICHTETEN Meldungen, nicht auf `new_items`. Das
+    # war der Fehler, an dem das ganze Vorhaben still gescheitert ist: der
+    # rote Link haengt an der Karte einer Meldung, und eine Karte bekommt nur,
+    # was der Analyst behalten hat. Am 14.08.2026 liefen 944 neue Meldungen
+    # durch die Stufe, 58 kamen in den Bericht - und alle vier
+    # Uebersetzungen, die entstanden, gehoerten zu Meldungen, die in KEINEM
+    # Bericht stehen. Vier fertige Seiten, vier Modellaufrufe, 415 Sekunden,
+    # und auf der Website nicht ein einziger Link. Die Stufe hat funktioniert
+    # und war trotzdem vollstaendig unsichtbar.
     uebersetzung_bilanz: dict = {}
+    # In Berichtsreihenfolge, also nach Relevanz. Die Stufe ordnet INNERHALB
+    # dieser Reihenfolge noch einmal um - erkannt Fremdsprachige vor
+    # Unbestimmten (`stufe._kandidaten`) -, damit ein sicherer Treffer nicht
+    # hinter einem "vielleicht" verhungert. Die Zusicherung ist deshalb die
+    # kleinere: es schneidet nicht die zufaellig letzte Meldung weg, sondern
+    # innerhalb jeder der beiden Gruppen die unwichtigste. Ueber die URL
+    # zurueck auf das Item, weil nur das den
+    # Feed-Volltext und den Original-Teaser traegt - das Highlight traegt die
+    # DEUTSCHE Zusammenfassung des Analysten, auf der jede Spracherkennung
+    # "deutsch" messen wuerde.
+    _ueb_items = uebersetzung_stufe.berichtete_items(alle_highlights, by_url)
+    if len(_ueb_items) < len(alle_highlights):
+        log.info("Uebersetzung: %d von %d berichteten Meldungen ohne "
+                 "zugehoeriges Item (Dubletten oder umgeschriebene Adresse)",
+                 len(alle_highlights) - len(_ueb_items), len(alle_highlights))
     _ueb_budget = uebersetzung_stufe.budget(cfg.settings, time.monotonic() - t0)
     if _ueb_budget is None:
         if cfg.settings.get("uebersetzung_enabled", True):
@@ -1079,7 +1101,7 @@ def run(root: Path, use_llm: bool | None = None,
     else:
         try:
             uebersetzung_bilanz = uebersetzung_stufe.lauf(
-                new_items, root, cfg.settings, editor_model,
+                _ueb_items, root, cfg.settings, editor_model,
                 frist_sekunden=_ueb_budget, heute=today)
             log.info("%s", uebersetzung_stufe.protokollzeile(uebersetzung_bilanz))
             run_log["uebersetzung"] = {

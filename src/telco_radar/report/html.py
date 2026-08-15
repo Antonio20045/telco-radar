@@ -1467,6 +1467,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         thema_tpl = env.get_template("thema.html.j2")
         for thema in themen:
             view = build_thema_view(thema, promo_entries)
+            # Der rote Link auch hier. Eine Themenseite zeigt dieselben
+            # Meldungen wie die Titelseite, nur auf ein Ereignis verengt -
+            # und die Historie eines Ereignisses ist genau der Ort, an dem
+            # jemand nach dem vollen Text sucht. Sie baut ihre Karten aber
+            # aus dem Themenspeicher und nicht aus `_flatten()`, bekommt die
+            # Zuordnung oben also nicht mit; dieselbe Positivlisten-Falle
+            # wie in `_items_payload`.
+            for schluessel in ("aufmacher", "zwei", "rest"):
+                wert = view.get(schluessel)
+                for h in ([wert] if isinstance(wert, dict) else (wert or [])):
+                    pfad = uebersetzung_je_url.get(h.get("url") or "")
+                    if pfad:
+                        h["uebersetzung"] = pfad
             datei = f"{view['slug']}.html"
             (thema_dir / datei).write_text(
                 thema_tpl.render(prefix="../", t=view), encoding="utf-8")

@@ -490,10 +490,15 @@ uebersetzung_enabled: true
 
 # Wie viele Artikel je Lauf hoechstens uebersetzt werden.
 #
-# Gemessen am 13.08.2026 ueber 1329 Feed-Eintraege: 15,2 % sind
-# fremdsprachig, bei 130-190 neuen Meldungen je Lauf also rund 20-30. Der
-# Deckel liegt bewusst darueber und ist trotzdem hart: eine Quelle, die
-# ploetzlich hundert Meldungen liefert, darf nicht den Lauf kosten.
+# Gezaehlt wird auf den BERICHTETEN Meldungen, nicht auf den neuen - seit dem
+# 15.08.2026 bekommt die Stufe nur, was auch eine Karte hat (§6). Das sind je
+# Ausgabe 58 bis 193; nach der Vorauswahl bleiben davon typischerweise 10-25
+# fremdsprachige uebrig. An der Ausgabe vom 14.08.2026 nachgerechnet: 58
+# berichtete Meldungen, 40 Kandidaten, 11 Uebersetzungen.
+#
+# Der Deckel liegt bewusst darueber und ist trotzdem hart: eine Ausgabe mit
+# 193 Meldungen darf nicht den Lauf kosten. Wenn er greift, schneidet er die
+# unwichtigste Meldung weg - die Stufe arbeitet in Berichtsreihenfolge.
 uebersetzung_max_je_lauf: 40
 
 # Das Zeitbudget der Stufe in Sekunden. Es ist eine OBERGRENZE, keine

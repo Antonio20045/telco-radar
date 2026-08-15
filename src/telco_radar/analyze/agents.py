@@ -32,6 +32,8 @@ angle. For each real signal decide: what happened, and what Vodafone could
 actually DO with this insight (copy it, defend against it, watch it, learn
 from it).
 
+{TEXTFELD}
+
 Respond with ONLY valid JSON, no markdown, matching this schema:
 {{
   "region_summary": "<2-3 sentences in {language}: what is happening in this region this week and the direction it points>",
@@ -95,6 +97,8 @@ the network, a new device/chip feature customers will ask for, a cost or
 supply shift, a new distribution or partnership channel, a rule that
 constrains or enables an offer. Never frame these companies as Vodafone's
 competitors.
+
+{TEXTFELD}
 
 Respond with ONLY valid JSON, no markdown, matching this schema:
 {{
@@ -164,7 +168,63 @@ CTM_FELDER = """\
         eines dieser Woerter benutzen: moeglich / wahrscheinlich / sehr
         wahrscheinlich. Sonst leer lassen.>\""""
 
+# Was im Feld "text" steht - als EIN Textbaustein in beiden Prompts, aus
+# demselben Grund wie CTM_FELDER: die acht Themenfelder bekommen dieselbe
+# Nutzlast, und ein Hinweis, der nur im Regionalprompt steht, gilt fuer die
+# Haelfte der Analysten nicht. Ein guter Teil der textlosen Newsroom-Quellen
+# sitzt gerade dort.
+TEXTFELD = """\
+The "text" field carries the article text as far as it was available - often
+the full body, sometimes only a teaser, and for some sources it is EMPTY
+because the source publishes headlines only. It may end mid-sentence; that is
+a length limit, not the end of the article. Judge from it, and take your
+names, prices, numbers and dates from it - but never invent what is not
+there. If "text" is empty, work from the headline alone, say only what the
+headline actually says, and score conservatively.
+
+Your own "summary" stays 1-2 sentences no matter how long "text" is. If you
+put a number in "summary" or in any other field, it must be a number you
+actually read - a later automatic check compares your fields against each
+other and silently drops what it cannot verify."""
+
 BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
+
+# Wie viel Text der Analyst je Meldung zu sehen bekommt.
+#
+# Bis zum 15.08.2026 waren es `summary[:300]` - und bei 52 der 164 crawlbaren
+# Quellen ist `summary` leer (`parse_newsroom_html` setzt das Feld nicht).
+# Knapp ein Drittel des Bestands wurde also allein aus der UEBERSCHRIFT
+# bewertet, eingeordnet, kategorisiert und im Wochenbericht beschrieben.
+# Dabei lag der Artikeltext bei jeder dritten Meldung schon ungenutzt am
+# Item: `content:encoded` wird seit dem 13.08.2026 nach `Item.volltext`
+# gelesen, aber diese Nutzlast hier hat ihn nie weitergegeben.
+#
+# Gemessen am 15.08.2026 ueber 267 Eintraege aus 12 Fachpressequellen:
+# 30,0 % tragen Feed-Volltext (Median 2000 Zeichen, p90 5302), und der
+# Teaser selbst ist im Median 206 Zeichen lang - `[:300]` schnitt also auch
+# dort, wo Text da war, jede zweite laengere Zusammenfassung mitten im Satz
+# ab.
+#
+# Die Grenze ist eine EINGABE-Rechnung, keine Ausgabe-Rechnung: ein Stapel
+# sind 15 Meldungen, also hoechstens 15 x 2500 = 37 500 Zeichen ~ 10k
+# Tokens Eingabe. Das Ausgabebudget (8000) bleibt unberuehrt, weil der
+# Analyst weiterhin nur seine Bewertung schreibt.
+ANALYST_TEXT_ZEICHEN = 2500
+
+
+def analyst_text(item: Item) -> str:
+    """Der laengste Text, der ohne einen zusaetzlichen Abruf zu haben ist.
+
+    Bewusst KEIN Artikelabruf: diese Funktion laeuft ueber jede neue Meldung
+    eines Laufs (am 14.08.2026 waren das 944), und 944 zusaetzliche HTTP-
+    Abrufe vor der Analyse waeren eine zweite Sammelphase. Der Abruf hat
+    seinen Ort in der Uebersetzungsstufe, die ihn fuer eine Handvoll
+    Meldungen mit Frist und Deckel macht.
+    """
+    volltext = (item.volltext or "").strip()
+    teaser = (item.summary or "").strip()
+    text = volltext if len(volltext) > len(teaser) else teaser
+    return text[:ANALYST_TEXT_ZEICHEN]
 
 
 def _items_payload(items: list[Item]) -> str:
@@ -176,7 +236,10 @@ def _items_payload(items: list[Item]) -> str:
             "source": item.source_name,
             "date": item.published.date().isoformat() if item.published else None,
             "url": item.url,
-            "snippet": item.summary[:300],
+            # "text", nicht "snippet": das Feld traegt seit dem 15.08.2026
+            # bis zu ANALYST_TEXT_ZEICHEN Zeichen Artikeltext. Unter dem
+            # alten Namen wuerde es der naechste Leser wieder kappen.
+            "text": analyst_text(item),
         })
     return json.dumps(rows, ensure_ascii=False)
 
@@ -207,7 +270,8 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     """
     vorlage = TECH_ANALYST_SYSTEM if is_theme else ANALYST_SYSTEM
     system = vorlage.format(region=region_name, language=language,
-                            CTM_FELDER=CTM_FELDER.format(language=language))
+                            CTM_FELDER=CTM_FELDER.format(language=language),
+                            TEXTFELD=TEXTFELD)
     capped = items if not max_items else items[:max_items]
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 

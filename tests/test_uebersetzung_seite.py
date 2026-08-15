@@ -304,3 +304,78 @@ def test_sprachen_ohne_isch_bleiben_unveraendert():
     assert sprachname_dativ("hi") == "Hindi"
     assert sprachname_dativ("th") == "Thai"
     assert sprachname_dativ("tr") == "Türkischen"
+
+
+# --------------------------------------------- Die Titelseite, alle Gewichte
+@pytest.fixture(scope="module")
+def titelseite_voll(tmp_path_factory):
+    """Jede berichtete Meldung bekommt eine Uebersetzung.
+
+    So laesst sich zaehlen, an WELCHEN Gewichtungen der Link ueberhaupt
+    erscheinen kann - unabhaengig davon, welche Meldung dieser Woche gerade
+    fremdsprachig ist.
+    """
+    reports = sorted((WURZEL / "data" / "reports").glob("*.json"))
+    if not reports:
+        pytest.skip("keine Berichte im Repo")
+    daten = json.loads(reports[-1].read_text(encoding="utf-8"))
+    urls = [h["url"] for region in (daten.get("regions") or {}).values()
+            for h in (region.get("highlights") or []) if h.get("url")]
+    if len(urls) < 8:
+        pytest.skip("zu wenige Meldungen fuer die Zaehlung")
+
+    basis = tmp_path_factory.mktemp("titelseite")
+    shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
+    (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
+    store = UebersetzungsStore(
+        basis / "data" / "state" / "uebersetzungen.jsonl")
+    for u in urls:
+        store.add(Uebersetzung(
+            item_id=uv.id_fuer_url(u), quell_hash=text_hash(u),
+            titel_de="Deutsche Fassung", absaetze=["Ein Absatz."],
+            sprache="pl", url=u, quelle="Quelle", erstellt_am="2026-08-15",
+            herkunft="artikel"))
+    store.speichern()
+
+    from telco_radar.config import load_config
+    render_site(basis / "site", basis / "data" / "reports",
+                load_config(WURZEL))
+    return (basis / "site" / "index.html").read_text(encoding="utf-8")
+
+
+def test_die_titelseite_verlinkt_an_allen_bildgewichtungen(titelseite_voll):
+    """Bis zum 15.08.2026 trug nur der Aufmacher den roten Link.
+
+    Damit erschien er auf der Startseite genau dann, wenn die staerkste
+    Meldung der Woche zufaellig fremdsprachig war - an der Ausgabe vom
+    14.08.2026 gemessen: elf Uebersetzungen, davon null auf der Startseite,
+    obwohl acht polnische und zwei franzoesische Meldungen im Bericht
+    standen. Aufmacher (1) + zweite Reihe (2) + dritte Reihe (4) = 7.
+    """
+    assert titelseite_voll.count('class="ueb-link"') >= 7
+
+
+def test_der_rote_link_verschachtelt_keine_links(titelseite_voll):
+    """Ein Link in einem Link ist kein gueltiges HTML - und die Karten der
+    zweiten und dritten Reihe sind vollstaendig in einen `<a>` gewickelt."""
+    from html.parser import HTMLParser
+
+    class Zaehler(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.tief = 0
+            self.verschachtelt = 0
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "a":
+                self.tief += 1
+                if self.tief > 1:
+                    self.verschachtelt += 1
+
+        def handle_endtag(self, tag):
+            if tag == "a" and self.tief:
+                self.tief -= 1
+
+    z = Zaehler()
+    z.feed(titelseite_voll)
+    assert z.verschachtelt == 0

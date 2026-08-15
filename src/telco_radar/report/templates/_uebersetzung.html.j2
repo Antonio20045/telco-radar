@@ -16,8 +16,17 @@
    `h.uebersetzung` setzt `render_site()` aus dem Uebersetzungsspeicher.
    Fehlt es, erscheint gar nichts - eine deutsche oder englische Meldung
    traegt keinen Hinweis darauf, dass es keine Uebersetzung gibt. #}
+{# Die Beschriftung ist auf die SCHMALSTE Karte gemessen, nicht auf die
+   breiteste. "Vollständige Übersetzung lesen" braucht 195 px; die vier
+   kleinen Karten der dritten Reihe sind 170 px breit, dort stand der Satz
+   am 15.08.2026 zweizeilig in einer Karte, die sonst nur Rubrik und
+   Schlagzeile traegt. Das Versprechen der VOLLSTAENDIGKEIT steht deshalb
+   dort, wo es hingehoert - auf der Zielseite selbst, in ihrer Rubrikzeile
+   und im Hinweiskasten -, und nicht in einem Link, der dafuer umbricht.
+   Eine zweite, kuerzere Fassung nur fuer die kleinen Karten waere zwei
+   Beschriftungen fuer eine Handlung. #}
 {% macro uebersetzung_link(h, prefix='') %}
 {% if h.uebersetzung %}
-<p class="ueb-link"><a href="{{ prefix }}{{ h.uebersetzung }}">Vollständige Übersetzung lesen</a></p>
+<p class="ueb-link"><a href="{{ prefix }}{{ h.uebersetzung }}">Übersetzung lesen</a></p>
 {% endif %}
 {% endmacro %}

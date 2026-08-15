@@ -13,6 +13,7 @@
 
    Jede Schlagzeile traegt `szl` (CLAUDE.md §5). #}
 {% extends "base.html.j2" %}
+{% import "_uebersetzung.html.j2" as ueb %}
 {% block title %}Im Fokus · {{ t.titel }}{% endblock %}
 
 {% block content %}
@@ -48,6 +49,7 @@
     <p class="aufmacher-meta">
       <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.quelle }} öffnen &nearr;</a>
     </p>
+    {{ ueb.uebersetzung_link(a, prefix) }}
   </div>
 </article>
 {% endif %}
@@ -64,6 +66,8 @@
       <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
       {% if h.summary %}<span class="stueck-anriss">{{ h.summary }}</span>{% endif %}
     </a>
+    {# Ausserhalb des Links darueber - ein Link im Link ist kein gueltiges HTML. #}
+    {{ ueb.uebersetzung_link(h, prefix) }}
   </article>
   {% endfor %}
 </div>

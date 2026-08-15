@@ -124,6 +124,15 @@
           <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
           {% if h.anriss %}<span class="stueck-anriss">{{ h.anriss }}</span>{% endif %}
         </a>
+        {# AUSSERHALB des Links darueber - ein Link in einem Link ist kein
+           gueltiges HTML. Bis zum 15.08.2026 trug auf dieser Seite nur der
+           Aufmacher den roten Link, und damit erschien er auf der
+           Titelseite genau dann, wenn die staerkste Meldung der Woche
+           zufaellig fremdsprachig war. An der Ausgabe vom 14.08. gemessen:
+           elf Uebersetzungen, davon null auf der Startseite sichtbar -
+           acht polnische und zwei franzoesische Meldungen standen in diesen
+           beiden Reihen. #}
+        {{ ueb.uebersetzung_link(h, prefix) }}
       </article>
       {% endfor %}
     </div>
@@ -138,6 +147,7 @@
           <span class="stueck-kicker">{{ h.ressort_label }}</span>
           <span class="stueck-titel szl">{{ h.schlagzeile }}</span>
         </a>
+        {{ ueb.uebersetzung_link(h, prefix) }}
       </article>
       {% endfor %}
     </div>

@@ -121,6 +121,9 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              Items (parallel, analyst_batch_workers), 8k Tokens.
              Themenfelder bekommen TECH_ANALYST_SYSTEM statt ANALYST_SYSTEM -
              ein Chiphersteller ist kein Wettbewerber.
+             Der Analyst sieht seit dem 15.08.2026 den ARTIKELTEXT
+             (analyst_text(), 2500 Zeichen), nicht summary[:300] - bei 52
+             der 164 Quellen war das vorher die Ueberschrift allein
              (src/telco_radar/analyze/agents.py; API direkt via httpx: llm.py)
 3b. CTM      Zweite Bewertungsachse "ist das fuer UNS wichtig?" plus der
              Satz, was es fuers eigene Portfolio heisst - und der Prueflauf
@@ -147,7 +150,10 @@ Pipeline (läuft in GitHub Actions, `python -m telco_radar.pipeline`):
              data/state/uebersetzungen.jsonl). Sie steht VOR dem Rendern
              (der rote Link muss auf die Karte) und rechnet ihr Budget
              deshalb gegen die RESTZEIT DES JOBS. Sprache IMMER auf dem
-             Fliesstext, nie auf der Ueberschrift
+             Fliesstext, nie auf der Ueberschrift.
+             Sie laeuft auf den BERICHTETEN Meldungen (berichtete_items()
+             aus alle_highlights), nicht auf new_items - eine Uebersetzung
+             zu einer Meldung ohne Karte hat keinen Ort fuer ihren Link
 6. VERSAND   Montags der Zwei-Minuten-Pfad per Mail, Teams nur fuer die
              Ausnahme (versand.py; State: data/state/versand.json)
 7. NEWSLETTER Ein AUSSPIELKANAL, kein vierter Anwendungsfall - und er laeuft
@@ -1276,18 +1282,70 @@ Website spricht.
   Zeichen Teaser — als Faktor gerechnet „3,1x laenger" und damit ein
   Treffer, absolut sind es zwei Saetze. Der Leser klickt einmal und nie
   wieder.
-- **Der Analyst sieht `summary[:300]`, nicht 600.** `_items_payload` in
-  `analyze/agents.py` baut die Nutzlast Feld fuer Feld — eine Positivliste.
-  Ein neues Feld am `Item` landet dort NICHT automatisch, und das ist der
-  Grund, warum `volltext` gefahrlos danebenstehen kann. Wer den Analysten
-  mehr zeigen will, traegt es dort ein; das ist eine eigene Entscheidung
-  mit eigener Laufzeit- und Token-Rechnung.
-- **52 der 164 crawlbaren Quellen liefern Meldungen ganz ohne `summary`**
-  (41 `newsroom` + 11 `newsroom_js`; `parse_newsroom_html` setzt das Feld
-  nicht, nur der Sonderpfad `_extract_datamodel_articles` tut es). Knapp
-  ein Drittel wird also allein aus der Ueberschrift bewertet, eingeordnet
-  und im Wochenbericht beschrieben. Offener Qualitaetsbefund, unabhaengig
-  von der Uebersetzung.
+- **Eine Nebenstufe, die auf `new_items` läuft, arbeitet für den Papierkorb.**
+  Der teuerste Fehler dieses Features, und er sah im Protokoll wie ein
+  Erfolg aus. Die Übersetzungsstufe bekam alle neuen Meldungen (am
+  14.08.2026: 944), in den Bericht kamen 58 — und **alle vier
+  Übersetzungen des Laufs gehörten zu Meldungen, die in KEINEM Bericht
+  stehen.** Vier fertige Seiten, vier Modellaufrufe, 415 Sekunden, und auf
+  der Website nicht ein Link: der rote Link hängt an der KARTE einer
+  Meldung, und eine Karte bekommt nur, was der Analyst behalten hat. Wer
+  eine Stufe baut, deren Ergebnis auf einer Karte erscheint, füttert sie
+  aus `alle_highlights` — `uebersetzung/stufe.berichtete_items()` tut das,
+  in Berichtsreihenfolge und zurück auf das ITEM (das Highlight trägt die
+  DEUTSCHE Zusammenfassung des Analysten; auf ihr messen Vorauswahl und
+  Spracherkennung „deutsch", und es würde nie wieder etwas übersetzt).
+- **Ein Deckel, der den SCAN abbricht, ist keine Begrenzung, sondern eine
+  Auswahl nach Listenposition.** `_kandidaten` brach ab, sobald 40
+  Kandidaten standen: `ueber_deckel: 887`. Weil eine Meldung ohne Text
+  (52 der 164 Quellen liefern keinen Teaser) unbesehen als Kandidat gilt,
+  gingen die 40 Plätze an textlose englische Newsroom-Meldungen — 40
+  Abrufe, 35 Absagen, 4 Treffer. Jetzt wird ALLES vorgeprüft, dann
+  geschnitten, und die erkannt fremdsprachigen stehen vor den
+  unbestimmten. Dieselbe Fehlerklasse wie bei `max_produkte` im
+  Geräteradar, nur eine Stufe weiter.
+- **Eine Kartenvorlage, die ihre ganze Karte in einen Link wickelt, formt
+  jeden Link DARIN mit.** `.mlead a,.mzwei a{display:flex;flex-direction:
+  column}`, `.mz a{display:flex;gap:13px;padding:11px 0}` und
+  `.stueck a{display:flex;flex-direction:column}` sind
+  Nachfahren-Selektoren. Der rote Übersetzungslink steht innerhalb dieser
+  Karten und hat sie mitgeerbt: Text und Pfeil wurden zwei Flex-Kinder und
+  standen UNTEREINANDER — auf der Aufmacher-Karte 38 px hoch statt 14,
+  Breite 663 statt 195, die Unterstreichung quer durch die Karte. Seit der
+  Auslieferung des Features so live, und **in keinem HTML zu sehen**;
+  gefunden erst durch eine Messung im Browser
+  (`tests/test_uebersetzung_link_browser.py`). Wer einen Link in eine Karte
+  setzt, setzt `display` ausdrücklich und holt `gap`/`padding` zurück.
+- **Die Beschriftung eines Kartenlinks wird auf die SCHMALSTE Karte
+  gemessen.** „Vollständige Übersetzung lesen" braucht 195 px; die vier
+  kleinen Karten der dritten Reihe sind 170 px breit, dort stand der Satz
+  zweizeilig. Deshalb heißt er „Übersetzung lesen" — das Versprechen der
+  Vollständigkeit steht auf der Zielseite, nicht in einem Link, der dafür
+  umbricht. Eine zweite, kürzere Fassung nur für die kleinen Karten wären
+  zwei Beschriftungen für eine Handlung. Und der Text steht ZWEIMAL im
+  Code (Jinja-Makro + `app.js` für den Explorer der Archivwochen) — ein
+  Test hält beide zusammen.
+- **`_items_payload` in `analyze/agents.py` ist eine POSITIVLISTE.** Sie baut
+  die Nutzlast des Analysten Feld für Feld; ein neues Feld am `Item` landet
+  dort NICHT automatisch. Genau daran hing der Befund unten: `volltext` lag
+  seit dem 13.08.2026 am Item und wurde bis zum 15.08.2026 nie
+  weitergegeben. Wer dem Analysten etwas zeigen will, trägt es dort ein.
+- **Der Analyst sieht seit dem 15.08.2026 `analyst_text(item)`** — den
+  längeren von Feed-Volltext und Teaser, gekappt bei
+  `ANALYST_TEXT_ZEICHEN` (2500). Das Feld heißt `text`, nicht mehr
+  `snippet`: unter dem alten Namen kappt es der nächste Leser wieder.
+  Davor waren es `summary[:300]`, und **52 der 164 crawlbaren Quellen
+  liefern gar kein `summary`** (41 `newsroom` + 11 `newsroom_js`;
+  `parse_newsroom_html` setzt das Feld nicht, nur der Sonderpfad
+  `_extract_datamodel_articles` tut es) — knapp ein Drittel des Bestands
+  wurde also allein aus der ÜBERSCHRIFT bewertet, kategorisiert und im
+  Wochenbericht beschrieben. Die Grenze ist eine **Eingabe**-Rechnung:
+  15 Meldungen je Stapel × 2500 ≈ 10k Tokens, das Ausgabebudget (8000)
+  bleibt unberührt. **Ein Artikelabruf gehört hier NICHT hinein** — die
+  Nutzlast läuft über jede neue Meldung (am 14.08. waren das 944), das wäre
+  eine zweite Sammelphase. Für die textlosen Newsroom-Quellen bleibt es
+  deshalb beim Titel; der Prompt sagt dem Analysten ausdrücklich, dass
+  `text` leer sein kann und er dann konservativ bewerten soll.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -1338,7 +1396,78 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (13.08.2026, Antonio direkt): die Volltext-Übersetzung
+> **Zuletzt erledigt (15.08.2026, Antonio direkt): die Übersetzung sichtbar
+> gemacht — sie war gebaut, getestet, live und vollständig unsichtbar.**
+> Antonio: *„Ich sehe hier nirgendwo bei keiner einzigen Meldung … keinen
+> Link, der mir dann zeigt, die übersetzte Quelle. Also es hat anscheinend
+> überhaupt nicht funktioniert."* Er hatte recht, und zwar aus drei
+> unabhängigen Gründen. Stand danach: **1741 Tests** (vorher 1716),
+> `pruefe_portal.py` **16 bestanden / 0 durchgefallen**.
+>
+> | # | Befund | Messung |
+> |---|---|---|
+> | 1 | **Die Stufe lief auf `new_items` statt auf den berichteten Meldungen.** Der rote Link hängt an der KARTE einer Meldung; eine Karte bekommt nur, was der Analyst behalten hat | Lauf 14.08.: 944 neue Meldungen, 58 im Bericht, 4 Übersetzungen — **davon 0 zu einer berichteten Meldung**. 415 s Arbeit, 0 Links |
+> | 2 | **Der Deckel brach den SCAN ab, nicht die Arbeit.** Textlose Meldungen gelten unbesehen als Kandidat und verbrannten die 40 Plätze | `ueber_deckel: 887` — 887 von 944 nie angesehen. 40 Abrufe → 35 Absagen → 4 Treffer |
+> | 3 | **Der Analyst sah wirklich nur die Überschrift** — bei 52 der 164 Quellen. `volltext` lag seit dem 13.08. am Item, die Nutzlast gab ihn nie weiter | `summary[:300]`, und der Teaser ist im Median 206 Zeichen. 30 % der Feed-Einträge tragen Volltext (Median 2000 Zeichen, p90 5302) |
+>
+> **Gegen die echte Ausgabe vom 14.08. gemessen** (ohne Modell, nur Auswahl
+> und Abruf): von 22 geprüften berichteten Meldungen bekommen **9** eine
+> deutsche Fassung — 8× Polnisch (Telepolis), 2× Französisch (Univers
+> Freebox), Italienisch (Corriere), Spanisch (Xataka). Vorher: keine davon.
+> Mit gestubbtem Modell durchgerechnet: **11 Übersetzungen aus 58
+> berichteten Meldungen, 11 rote Links auf `meldungen.html`.**
+>
+> **Zwei Anzeigefehler dazu, beide nur im BROWSER sichtbar** — kein
+> statischer Test hätte sie gemeldet, und beide waren seit der Auslieferung
+> live:
+> 1. **Der Pfeil stand auf einer eigenen Zeile.** Die Kartenvorlagen wickeln
+>    ihre Karte in einen Link und formen ihn als Flexbox; der rote Link steht
+>    darin und erbte das. Aufmacher-Karte: 38 px hoch statt 14, 663 px breit
+>    statt 195. Siehe §6.
+> 2. **Auf der Startseite trug nur der Aufmacher den Link.** Er erschien dort
+>    also genau dann, wenn die stärkste Meldung der Woche zufällig
+>    fremdsprachig war — an der Ausgabe vom 14.08.: elf Übersetzungen, null
+>    auf der Startseite, obwohl die polnischen und französischen Meldungen in
+>    der zweiten und dritten Reihe standen. Jetzt an allen drei
+>    Bildgewichtungen.
+>
+> Dabei ist die Beschriftung von „Vollständige Übersetzung lesen" auf
+> **„Übersetzung lesen"** gekürzt — gemessen auf die schmalste Karte (170 px),
+> nicht auf die breiteste. Der Text steht ZWEIMAL im Code (Makro + `app.js`);
+> ein Test hält beide zusammen.
+>
+> Neu: `tests/test_uebersetzung_auswahl.py` (17) und
+> `tests/test_uebersetzung_link_browser.py` (6, echtes Chromium). Gegen den
+> alten Stand gemessen fallen **13 der 17** bzw. **3 der 6** durch; die
+> übrigen prüfen Invarianten, die auch vorher galten.
+>
+> **OFFEN daraus:**
+> 1. **Noch nie gegen ein echtes Modell gelaufen.** Nach dem nächsten
+>    Actions-Lauf die Zeile `Uebersetzung:` lesen — sie nennt jetzt auch die
+>    ANGEBOTENE Menge („aus N berichteten Meldungen"). Steht dort eine Zahl
+>    in der Größe von `new`, läuft die Stufe wieder auf der falschen Menge.
+> 2. **Der Deckel (40) ist für eine große Ausgabe knapp.** Bei 58 berichteten
+>    Meldungen greift er nach der Vorauswahl nicht; die Ausgabe vom 06.08.
+>    hatte 193. Dann entscheidet die Berichtsreihenfolge, also die Relevanz —
+>    das ist gewollt, aber nach einem großen Lauf gehört
+>    `[DECKEL: n nicht angesehen]` im Protokoll nachgesehen.
+> 3. **Der Zeitbedarf ist jetzt echt.** 11 Übersetzungen brauchten mit
+>    gestubbtem Modell 49 s, die Abrufe also. Mit echten Modellaufrufen
+>    kommen 3–5 Aufrufe je Artikel dazu; `uebersetzung_frist_sekunden` steht
+>    auf 600. Fällt die Zeile mit `[FRIST ERREICHT]` auf, ist der Deckel oder
+>    die Frist zu hoch angesetzt — nicht der Bericht darf leiden.
+> 4. **Ob der längere Analysten-Text die Bewertungen verändert, ist nicht
+>    gemessen.** Er kann nur besser werden (mehr Stoff statt Titel allein),
+>    aber die Verteilung der Relevanzstufen und die Länge der Bericht-Sätze
+>    gehören nach dem nächsten Lauf verglichen.
+> 5. **`ctm_saetze: 0` bei `ctm_saetze_verworfen: 9`** — nebenbei aufgefallen,
+>    NICHT Teil dieses Auftrags: der Prüflauf gegen den Originaltext hat am
+>    14.08. jeden einzelnen Satz verworfen. Der Handover verlangt genau dafür
+>    „fallen fast alle Sätze, stimmt der Prompt nicht". Der Prüftext ist
+>    `title + summary` des Highlights; mit dem längeren Analysten-Text
+>    könnten mehr Zahlen gedeckt sein. Erst nach dem nächsten Lauf beurteilen.
+
+> **Davor erledigt (13.08.2026, Antonio direkt): die Volltext-Übersetzung
 > fremdsprachiger Artikel.** Grundlage ist das Konzept „Volltext-Übersetzung
 > fremdsprachiger Artikel" (13.08.2026). Stand danach: **1716 Tests** (vorher
 > 1657), `pruefe_portal.py` **16 bestanden / 0 durchgefallen**. Der
@@ -1354,7 +1483,7 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 >
 > | Baustein | Wo | Die eine Regel, die ihn trägt |
 > |---|---|---|
-> | **Feed-Volltext** | `collect/rss.py` | `content:encoded` lesen, ungekappt, in ein EIGENES Feld. `summary` bleibt bei 600 — was der Analyst sieht, ist eine eigene Entscheidung |
+> | **Feed-Volltext** | `collect/rss.py` | `content:encoded` lesen, ungekappt, in ein EIGENES Feld. `summary` bleibt bei 600 — was der Analyst sieht, ist eine eigene Entscheidung (und **seit dem 15.08.2026 anders entschieden**: er bekommt den Volltext, siehe oben) |
 > | **Spracherkennung** | `uebersetzung/sprache.py` | **Nie auf der Überschrift**, erst ab 200 Zeichen, und im Grenzfall wird verworfen statt geraten |
 > | **Volltext holen** | `uebersetzung/volltext.py` | Mindestlänge in ZEICHEN, nicht als Faktor (digi.no: 141 Zeichen = „3,1× länger") |
 > | **Übersetzen** | `uebersetzung/uebersetzer.py` | Vollständig, nicht zusammengefasst: unter 55 % der Originallänge fällt die Antwort durch. Absatzweise gebündelt, ein Absatz wird nie zerrissen |
@@ -1375,6 +1504,10 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > `app.js`, weil die Seite ihre Meldungen im Browser baut). Im ersten Anlauf
 > hing er nur an der Zeilen-Gewichtung — dann wäre er je nach Dringlichkeit
 > der Woche erschienen oder verschwunden.
+>
+> **Der Satz „am Aufmacher der Wochenseite" war die Lücke.** Nur dort hiess
+> auf der Titelseite: fast nie. Seit dem 15.08.2026 tragen auch die zweite
+> und die dritte Reihe den Link — siehe den Eintrag darüber.
 >
 > **OFFEN:**
 > 1. **Die Stufe ist noch nie gegen ein echtes Modell gelaufen.** Nach dem

@@ -53,6 +53,31 @@ def budget(settings: dict, verstrichen: float) -> float | None:
     return min(float(settings.get("uebersetzung_frist_sekunden", 600)), rest)
 
 
+def berichtete_items(alle_highlights, by_url: dict) -> list:
+    """Die Items hinter den berichteten Meldungen, in Berichtsreihenfolge.
+
+    Der Zuschnitt der ganzen Stufe, und die Stelle, an der sie bis zum
+    15.08.2026 ins Leere gelaufen ist: sie bekam `new_items`. Am 14.08.2026
+    waren das 944 Meldungen, von denen 58 in den Bericht kamen - und alle
+    vier Uebersetzungen des Laufs gehoerten zu Meldungen, die in KEINEM
+    Bericht stehen. Der rote Link haengt an der Karte einer Meldung; ohne
+    Karte gibt es keinen Ort, an dem er erscheinen koennte.
+
+    Zurueck auf das ITEM und nicht auf das Highlight, weil nur das Item den
+    Feed-Volltext und den Teaser in der ORIGINALSPRACHE traegt. Das
+    Highlight traegt die deutsche Zusammenfassung des Analysten - auf ihr
+    messen Vorauswahl und Spracherkennung "deutsch", und es waere nie wieder
+    etwas uebersetzt worden.
+    """
+    raus, gesehen = [], set()
+    for h in alle_highlights:
+        item = by_url.get((h.get("url") or ""))
+        if item is not None and item.id not in gesehen:
+            gesehen.add(item.id)
+            raus.append(item)
+    return raus
+
+
 def _kandidaten(items, store: UebersetzungsStore, deckel: int,
                 bilanz: dict | None = None):
     """Was ueberhaupt in Frage kommt - vor jedem Abruf und jedem Modellaufruf.
@@ -61,13 +86,19 @@ def _kandidaten(items, store: UebersetzungsStore, deckel: int,
     Teaser. Ein Item, das hier schon als deutsch oder englisch erkannt
     wird, kostet keinen Abruf. Sicher ist die Erkennung erst auf dem
     Volltext - deshalb wird sie spaeter wiederholt.
+
+    **Der Deckel schneidet erst NACH dem Scan, und die erkannt
+    fremdsprachigen kommen zuerst.** Bis zum 15.08.2026 brach die Schleife
+    ab, sobald der Deckel voll war - im Lauf vom 14.08. wurden damit 887 von
+    944 Meldungen nie angesehen, und die 40 Plaetze gingen an die ersten
+    Meldungen der Liste. Weil ein Item ohne Text (52 der 164 crawlbaren
+    Quellen liefern keinen Teaser) unbesehen als Kandidat gilt, waren das
+    ueberwiegend textlose englische Newsroom-Meldungen: 40 Abrufe, 35
+    Absagen, 4 Uebersetzungen in 415 Sekunden. Wer sicher fremdsprachig ist,
+    darf nicht hinter einem "vielleicht" warten.
     """
-    raus = []
+    sicher, unbestimmt = [], []
     for item in items:
-        if len(raus) >= deckel:
-            if bilanz is not None:
-                bilanz["ueber_deckel"] += 1
-            continue
         if item.id in store:
             if bilanz is not None:
                 bilanz["vorgefiltert"] += 1
@@ -87,7 +118,14 @@ def _kandidaten(items, store: UebersetzungsStore, deckel: int,
                     bilanz["gruende"][
                         f"nicht fremdsprachig ({kuerzel or 'unbestimmt'})"] += 1
                 continue
-        raus.append(item)
+            sicher.append(item)
+            continue
+        unbestimmt.append(item)
+
+    raus = (sicher + unbestimmt)[:deckel]
+    if bilanz is not None:
+        bilanz["ueber_deckel"] = len(sicher) + len(unbestimmt) - len(raus)
+        bilanz["sicher_fremd"] = len(sicher)
     return raus
 
 
@@ -97,6 +135,13 @@ def lauf(items, root: Path, settings: dict, modell: str,
     t0 = time.monotonic()
     heute = heute or date.today()
     root = Path(root)
+    # Erst materialisieren, dann zaehlen. `len()` auf einem Generator wirft
+    # einen TypeError, und weil die Bilanz ganz oben gebaut wird, faellt die
+    # Stufe dann VOR dem ersten Artikel - die Pipeline fangt das und
+    # protokolliert "Uebersetzung uebersprungen: TypeError". Die Stufe
+    # verschwindet also lautlos, und die Zusicherung "wirft nichts" waere von
+    # der Aufrufseite her gebrochen.
+    items = list(items)
     store = UebersetzungsStore(root / "data" / "state" / "uebersetzungen.jsonl")
     http_cfg = dict(settings.get("http", {}) or {})
     artikelabruf = bool(settings.get("uebersetzung_artikelabruf", True))
@@ -104,16 +149,24 @@ def lauf(items, root: Path, settings: dict, modell: str,
 
     bilanz = {
         "geprueft": 0, "uebersetzt": 0, "uebersprungen": 0, "gescheitert": 0,
-        "vorgefiltert": 0, "ueber_deckel": 0,
+        "vorgefiltert": 0, "ueber_deckel": 0, "sicher_fremd": 0,
         "aus_feed": 0, "aus_artikel": 0, "bestand": len(store),
+        "angeboten": len(items),
         "gruende": Counter(), "sprachen": Counter(), "sekunden": 0.0,
         "frist_erreicht": False,
     }
 
     kandidaten = _kandidaten(items, store, deckel, bilanz)
-    log.info("Uebersetzung: %d Kandidaten von %d neuen Meldungen "
-             "(Bestand: %d, Deckel: %d)",
-             len(kandidaten), len(items), len(store), deckel)
+    # `sicher_fremd` zaehlt ALLE erkannt fremdsprachigen, auch die, die der
+    # Deckel wegschneidet - ein "davon" waere hier falsch, weil die Zahl
+    # groesser sein kann als die der Kandidaten. Bei 193 berichteten
+    # Meldungen und Deckel 40 ist genau das die Zeile, an der sonst niemand
+    # mehr ablesen kann, wie viele sichere Treffer wirklich bearbeitet werden.
+    log.info("Uebersetzung: %d berichtete Meldungen -> %d Kandidaten "
+             "(erkannt fremdsprachig insgesamt: %d, ueber dem Deckel %d: %d), "
+             "Bestand %d",
+             len(items), len(kandidaten), bilanz["sicher_fremd"], deckel,
+             bilanz["ueber_deckel"], len(store))
 
     for item in kandidaten:
         if time.monotonic() - t0 > frist_sekunden:
@@ -198,14 +251,20 @@ def protokollzeile(bilanz: dict) -> str:
     teile = [
         f"Uebersetzung: {bilanz['uebersetzt']} uebersetzt "
         f"({bilanz['aus_feed']} aus dem Feed, "
-        f"{bilanz['aus_artikel']} aus der Artikelseite), "
+        f"{bilanz['aus_artikel']} aus der Artikelseite) "
+        f"aus {bilanz.get('angeboten', 0)} berichteten Meldungen, "
         f"{bilanz['uebersprungen']} uebersprungen, "
         f"{bilanz['vorgefiltert']} ohne Abruf vorgefiltert, "
         f"{bilanz['gescheitert']} gescheitert, "
         f"Bestand {bilanz['bestand']}, {bilanz['sekunden']}s"
     ]
     if bilanz.get("ueber_deckel"):
-        teile.append(f" [DECKEL: {bilanz['ueber_deckel']} nicht angesehen]")
+        # "nicht bearbeitet", nicht "nicht angesehen": angesehen wird seit dem
+        # 15.08.2026 ALLES, der Deckel schneidet erst danach. Die alte
+        # Formulierung war die Zahl, an der der Fehler zu erkennen war
+        # (`ueber_deckel: 887` bei 40 bearbeiteten) - sie darf jetzt nicht
+        # dasselbe Wort fuer etwas anderes benutzen.
+        teile.append(f" [DECKEL: {bilanz['ueber_deckel']} nicht bearbeitet]")
     if bilanz.get("frist_erreicht"):
         teile.append(" [FRIST ERREICHT]")
     if sprachen:
