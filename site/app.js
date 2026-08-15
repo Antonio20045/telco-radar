@@ -107,8 +107,11 @@
       // auf meldungen.html (prefix "") und unter reports/<datum>.html
       // (prefix "../"), und ein fester Pfad waere an einem der beiden Orte
       // falsch.
+      // Die Beschriftung steht WOERTLICH so auch in _uebersetzung.html.j2.
+      // Zwei Umsetzungen derselben Sache laufen auseinander - deshalb haelt
+      // test_die_beschriftung_ist_an_beiden_orten_dieselbe sie zusammen.
       (h.uebersetzung
-        ? '<p class="ueb-link"><a href="' + esc(uebPrefix()) + esc(h.uebersetzung) + '">Vollständige Übersetzung lesen</a></p>'
+        ? '<p class="ueb-link"><a href="' + esc(uebPrefix()) + esc(h.uebersetzung) + '">Übersetzung lesen</a></p>'
         : '');
     if (scroll && window.innerWidth <= 880) detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

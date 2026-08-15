@@ -56,7 +56,7 @@
    "|5gb",
    "|63.49€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -96,7 +96,7 @@
    "|365tage",
    "|50gb"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -129,7 +129,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -163,13 +163,14 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
    "in|1gb",
    "jeden monat bis zu|30gb",
    "|10.99€",
+   "|100mb",
    "|10gb",
    "|14.99€",
    "|19.99€",
@@ -182,13 +183,12 @@
    "|360€",
    "|40gb",
    "|50gb",
-   "|50mb",
    "|6.99€",
    "|60gb",
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -214,7 +214,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -229,7 +229,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -250,7 +250,7 @@
    "|55%",
    "|99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -275,7 +275,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -454,7 +454,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -472,6 +472,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-08-14"
+  "stand": "2026-08-15"
  }
 }
