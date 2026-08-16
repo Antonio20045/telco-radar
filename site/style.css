@@ -1555,14 +1555,20 @@ b,strong{font-weight:700}
 /* Vier Spalten, die staerkste Aktion ueber zwei. Damit steht das Gewicht im
    Raster und nicht in einer eigenen Bauform - eine Zeitungsseite entsteht
    aus einem Raster mit Gewichtung (CLAUDE.md §5). */
-/* `align-items:start`: eine Karte ist so hoch wie ihr Inhalt und wird nicht
-   auf die Hoehe der hoechsten ihrer Reihe gedehnt. Gedehnt sass der Fuss
-   einer kurzen Karte am unteren Rand einer fremden Hoehe - zwischen
-   Schlagzeile und Mechanik-Chip klaffte dann eine Handbreit Papier INNERHALB
-   der Karte, und das liest sich als fehlender Inhalt. Jetzt liegt der
-   Zwischenraum zwischen den Karten, wo er hingehoert. */
+/* Die Karten einer Reihe sind gleich hoch (Rastervoreinstellung `stretch`),
+   und ihr Fuss steht unten (`.pk-fuss{margin-top:auto}`). Damit liegen die
+   Trennlinien einer Reihe auf einer Hoehe.
+
+   Bis zum 16.08.2026 stand hier `align-items:start` - jede Karte so hoch
+   wie ihr Inhalt. Der Gedanke dahinter war richtig (kein Loch INNERHALB
+   einer Karte), die Rechnung ging nur nicht auf: mit unterschiedlich hohen
+   Motiven fing jede Schlagzeile einer Reihe auf einer anderen Hoehe an, und
+   die naechste Reihe stand versetzt darunter. Die Ursache war nicht die
+   Ausrichtung, sondern die Motivhoehe - die ist jetzt fest, und damit
+   bleibt zwischen Schlagzeile und Fuss auch bei gedehnter Karte nur noch
+   der Unterschied zwischen ein- und zweizeiligem Fuss. */
 .promo-karten{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:24px 26px;align-items:start}
+  gap:24px 26px}
 .pkarte{display:flex;flex-direction:column;min-width:0;
   border-top:1px solid var(--rule);padding-top:10px}
 /* Die staerkste Aktion nimmt zwei Spalten - und mit Motiv auch zwei Zeilen.
@@ -1574,7 +1580,10 @@ b,strong{font-weight:700}
   border-top:2px solid var(--c,var(--rule-ink));padding-top:12px}
 .pkarte--hoch{grid-row:span 2}
 .pk-flaeche{display:flex;flex-direction:column;flex:1}
-.pk-bild{display:block;margin-bottom:9px}
+/* Die feste Motivflaeche: 16:9, volle Kartenbreite, fuer JEDE Form eines
+   Motivs - Bild, Banner, Schriftkachel. Sie ist der Grund, warum die Reihen
+   dieses Rasters ueberhaupt buendig stehen. */
+.pk-bild{display:block;margin-bottom:9px;aspect-ratio:16/9;overflow:hidden}
 /* KEINE Platzhalterfarbe hinter dem Bild. Sie stand hier bis zum 08.08.2026
    und war die Ursache des "leeren Bildkastens", den Antonio auf der
    simplytel-Karte sah: `loading="lazy"` laesst ein Bild ausserhalb des
@@ -1583,14 +1592,15 @@ b,strong{font-weight:700}
    fertigen Seite waren das 31 von 36 Bildern, solange nicht gescrollt wurde
    (und in jedem Screenshot/Ausdruck dauerhaft). Ohne Fuellung bleibt an der
    Stelle Zeitungspapier - nichts behauptet dort ein Bild. */
-.pk-bild img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+.pk-bild img{display:block;width:100%;height:100%;
   object-fit:cover;object-position:center}
 /* Ein Werbebanner wird nicht beschnitten, sondern ganz gezeigt: es traegt
    seine Aussage ueber die volle Breite, und der 16:9-Ausschnitt schneidet
-   genau sie weg (simplytel: 1280x410, uebrig blieb blaue Flaeche). Es
-   bekommt dafuer auch keinen 16:9-Rahmen - der stuende als Papierstreifen
-   ueber und unter dem Banner und saehe aus wie eine Luecke. */
-.pk-bild--banner img{aspect-ratio:auto}
+   genau sie weg (simplytel: 1280x410, uebrig blieb blaue Flaeche). Es steht
+   dafuer VOLLSTAENDIG in derselben Flaeche wie jedes andere Motiv - bis zum
+   16.08.2026 bekam es gar keine und war dadurch 46 statt 156 px hoch, also
+   die Haelfte des Grundes, warum die Reihen versetzt standen. */
+.pk-bild--banner img{object-fit:contain}
 .pk-bildquelle{display:block;margin-top:4px;font-family:var(--sans);
   font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
   color:var(--ink-4)}
@@ -1599,14 +1609,21 @@ b,strong{font-weight:700}
    sie sagt in zwei Zahlen, worum es geht, und unterscheidet zwei Marken.
    Die Mechanik stand hier bis zum 08.08.2026 - vier Marken fahren dieselbe,
    also standen vier identische Kacheln nebeneinander. */
-/* Ohne feste 16:9-Flaeche: die Kachel ist so hoch wie ihre Zeilen. Mit
-   Bildmass reservierte sie auf der grossen Karte 324 px fuer zwei Zeilen
-   Text - und genau das sah wieder aus wie ein leerer Kasten. */
-.pk-bild--typo{display:flex;flex-direction:column;gap:6px;
-  padding:2px 0 10px;border-bottom:1px solid var(--rule)}
+/* Die Kachel steht in DERSELBEN 16:9-Flaeche wie ein Bild - anders stehen
+   die Reihen nicht buendig, und genau daran ist die Fassung vom 08.08.2026
+   gescheitert. Der Einwand von damals ("mit Bildmass reserviert sie 324 px
+   fuer zwei Zeilen Text und sieht aus wie ein leerer Kasten") bleibt
+   richtig und wird hier anders beantwortet: die Zeilen sitzen UNTEN an der
+   Trennlinie, nicht oben in der Mitte des Feldes, und die Zahl fuellt die
+   Flaeche. */
+.pk-bild--typo{display:flex;flex-direction:column;justify-content:center;
+  gap:6px;padding:12px 14px;border:1px solid var(--rule-2);
+  background:rgba(20,18,14,.028)}
 .pk-typo-zahl{font-family:var(--serif);font-size:clamp(30px,4vw,52px);
-  line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--ink);
-  font-variant-numeric:lining-nums}
+  line-height:1.02;font-weight:700;letter-spacing:-.03em;color:var(--ink);
+  font-variant-numeric:lining-nums;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden}
 .pk-typo-mechanik{font-family:var(--sans);font-size:10px;font-weight:800;
   text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
 /* Dieselbe Kachel im Kartenformat der kleinen Spalten. Sie ist seit dem
@@ -1615,20 +1632,31 @@ b,strong{font-weight:700}
    rissen sie in jede Rasterzeile eine Luecke. Kleiner gesetzt (die Spalte
    ist 296 px breit) und mit einer Haarlinie statt der 1px-Linie - sonst
    traegt eine Reihe aus vier Kacheln mehr Striche als Text. */
-.pk-bild--typo-klein{padding:0 0 8px;border-bottom-color:var(--rule-2)}
+.pk-bild--typo-klein{padding:10px 12px}
 .pk-bild--typo-klein .pk-typo-zahl{font-size:clamp(20px,1.8vw,25px);
   letter-spacing:-.02em}
 .pk-bild--typo-klein .pk-typo-mechanik{font-size:8.5px;letter-spacing:.09em}
+/* Zwei Zeilen, und die zweite ist reserviert (`min-height`): eine einzeilige
+   Schlagzeile neben einer zweizeiligen verschoebe sonst den ganzen Rest der
+   Karte um 20 px nach oben. Drei Zeilen sind auf 277 px Breite selten und
+   werden gekappt - die vollstaendige Schlagzeile steht hinter dem Link. */
 .pk-titel{font-family:var(--serif);font-size:15.5px;line-height:1.3;
-  font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+  font-weight:600;letter-spacing:-.01em;color:var(--ink);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;min-height:calc(2 * 1.3em)}
 .pkarte--gross .pk-titel{font-size:24px;line-height:1.16;font-weight:700;
-  letter-spacing:-.02em}
+  letter-spacing:-.02em;-webkit-line-clamp:3;min-height:0}
 .pk-flaeche:hover .pk-titel{color:var(--red)}
-.pk-text{margin-top:8px;font-size:15px;line-height:1.48;color:var(--ink-3)}
+.pk-text{margin-top:8px;font-size:15px;line-height:1.48;color:var(--ink-3);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden}
 /* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
-   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+   in jeder Karte einer Reihe auf einer anderen Hoehe. `margin-top:auto`
+   schiebt ihn dorthin, und weil die Karten einer Rasterreihe gleich hoch
+   sind, liegen die Linien einer Reihe damit auf EINER Hoehe. */
 .pk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:7px 9px;
-  margin:12px 0 0;padding-top:8px;border-top:1px solid var(--rule-2)}
+  margin:12px 0 0;padding-top:8px;border-top:1px solid var(--rule-2);
+  margin-top:auto}
 /* Die Mechanik als Umriss-Chip: sie benennt die Angebotsart, sie ist keine
    Dringlichkeit - eine gefuellte Flaeche waere hier lauter als die Sache. */
 .pmech{padding:2px 6px;border:1px solid var(--rule);font-family:var(--sans);

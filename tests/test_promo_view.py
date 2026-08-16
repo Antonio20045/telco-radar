@@ -477,3 +477,82 @@ def test_der_rang_kommt_aus_der_konfiguration():
 
     assert _rang(_src("Telekom", tier=1, rang=1)) < _rang(_src("Blau", tier=2, rang=5))
     assert _rang(_src("Gepflegt", tier=2, rang=9)) < _rang(_src("Ohne Rang", tier=1))
+
+
+# --------------------------------------------------------------------------
+# Die Gewichtung der Aufmacherkarte (16.08.2026). Sie haengt an zwei Zahlen -
+# der Motivbreite und der Zahl der uebrigen Karten -, und beide werden HIER
+# gerechnet, nicht in der Vorlage.
+# --------------------------------------------------------------------------
+
+def _mit_bild(brand, headline, breite, score):
+    e = _entry(brand=brand, headline=headline)
+    e.update({"image": f"{headline}.jpg", "image_w": breite,
+              "image_h": int(breite * 0.56), "image_kind": "angebot",
+              "score": score})
+    return e
+
+
+def _block_von(entries, name="congstar"):
+    view = prepare_promo_view(entries, [_src(name)], "2026-07-25")
+    return view["bloecke"][0]
+
+
+def test_ein_zu_schmales_motiv_traegt_die_grosse_flaeche_nicht():
+    """Die grosse Flaeche ist 579 px breit, auf einem Schirm mit zwei
+    Geraetepixeln je CSS-Pixel also 1158 echte. Ein 620-px-Motiv dort ist
+    nicht hochskaliert - es ist trotzdem unscharf, und genau so stand es am
+    16.08.2026 bei Blau und Penny Mobil auf der Seite. Die Aktion fuehrt
+    ihren Block weiterhin an, nur eben in der kleinen Flaeche."""
+    block = _block_von([_mit_bild("congstar", "Schmal", 620, 90),
+                        _mit_bild("congstar", "Zweite", 1280, 40)])
+    assert block["lead"]["offer"]["headline"] == "Schmal"   # Reihenfolge bleibt
+    assert block["lead_gross"] is False
+    assert block["lead_hoch"] is False
+
+
+def test_ein_breites_motiv_und_eine_schriftkachel_tragen_sie():
+    """Eine Schriftkachel ist Text und in jeder Groesse scharf - die
+    Breitenfrage stellt sich nur einem Rasterbild."""
+    breit = _block_von([_mit_bild("congstar", "Breit", 1280, 90)])
+    assert breit["lead_gross"] is True
+    ohne = _block_von([_entry(brand="congstar", headline="Ohne Motiv")])
+    assert ohne["lead_gross"] is True
+
+
+def test_zwei_zeilen_hoch_erst_ab_drei_weiteren_karten():
+    """Steht die Aufmacherkarte ueber zwei Rasterzeilen, ohne dass die
+    Zellen daneben gefuellt sind, bleibt MITTEN im Raster eine Luecke - genau
+    das "kreuz und quer", das diese Fassung abstellt."""
+    zwei = _block_von([_mit_bild("congstar", "Erste", 1280, 90),
+                       _mit_bild("congstar", "Zweite", 1280, 80)])
+    assert zwei["lead_gross"] is True and zwei["lead_hoch"] is False
+    vier = _block_von([_mit_bild("congstar", "Erste", 1280, 90)]
+                      + [_mit_bild("congstar", f"Nr{i}", 1280, 80 - i)
+                         for i in range(3)])
+    assert vier["lead_hoch"] is True
+
+
+def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():
+    """`_entdoppele_bilder()` kann der Aufmacherkarte ihr Motiv noch nehmen -
+    und eine Karte ohne Motiv beantwortet die Breitenfrage anders als eine
+    mit einem zu schmalen. Wer nur in `_block()` rechnet, bekommt eine
+    Aufmacherkarte, die aus einem Grund klein bleibt, den es auf der Seite
+    nicht mehr gibt.
+
+    Der Fall wird hier auch als Fall belegt: dasselbe Motiv steht bei zwei
+    Marken, die staerkere behaelt es.
+    """
+    doppelt = [_mit_bild("congstar", "Stark", 1280, 90)]
+    schmal = _mit_bild("klarmobil", "Dieselbe Datei", 620, 95)
+    schmal["image"] = "Stark.jpg"                  # dasselbe Motiv
+    doppelt.append(schmal)
+    view = prepare_promo_view(doppelt, [_src("congstar", rang=1),
+                                        _src("klarmobil", rang=2)],
+                              "2026-07-25")
+    bloecke = {b["name"]: b for b in view["bloecke"]}
+    # Der Fall tritt wirklich ein: die zweite Karte hat ihr Bild verloren.
+    assert bloecke["klarmobil"]["lead"]["bild"] == ""
+    # ... und traegt die grosse Flaeche deshalb wieder.
+    assert bloecke["klarmobil"]["lead_gross"] is True
+    assert bloecke["congstar"]["lead"]["bild"] and bloecke["congstar"]["lead_gross"]
