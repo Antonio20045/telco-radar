@@ -164,3 +164,47 @@ def test_es_gibt_keinen_deckel_mehr(tmp_path, monkeypatch):
 
     assert bilanz["geprueft"] == 193
     assert len(set(versuche)) == 193
+
+
+def _png_mit_transparenz(breite=600, hoehe=400) -> bytes:
+    """Ein Freisteller, wie ihn jede Tarifseite traegt: farbiges Motiv auf
+    DURCHSICHTIGEM Grund."""
+    import io as _io
+    from PIL import Image
+    im = Image.new("RGBA", (breite, hoehe), (0, 0, 0, 0))
+    for x in range(breite // 3, 2 * breite // 3):
+        for y in range(hoehe // 3, 2 * hoehe // 3):
+            im.putpixel((x, y), (230, 0, 0, 255))
+    puffer = _io.BytesIO()
+    im.save(puffer, "PNG")
+    return puffer.getvalue()
+
+
+def test_transparenz_wird_auf_weiss_gelegt_nicht_auf_schwarz(tmp_path):
+    """Der Fehler, den Antonio am 16.08.2026 als "komplett verpixelt" sah.
+
+    `Image.convert("RGB")` wirft den Alphakanal weg, ohne ihn zu verrechnen -
+    was durchsichtig war, wird SCHWARZ. Auf der Promo Uebersicht trugen so 13
+    von 51 Motiven schwarze Bloecke. Gegen den Stand von vorher faellt dieser
+    Test: dort ist die Ecke (0, 0) rein schwarz.
+    """
+    from PIL import Image
+    ziel = tmp_path / "motiv.jpg"
+    bilder._schreibe(_png_mit_transparenz(), ziel, 1280)
+    with Image.open(ziel) as fertig:
+        ecke = fertig.convert("RGB").getpixel((2, 2))
+        mitte = fertig.convert("RGB").getpixel((fertig.width // 2,
+                                                fertig.height // 2))
+    assert min(ecke) > 230, f"durchsichtiger Grund wurde {ecke}, nicht weiss"
+    assert mitte[0] > 150 and mitte[1] < 90, f"Motiv verfaelscht: {mitte}"
+
+
+def test_ist_leer_misst_die_abgelegte_fassung():
+    """Gemessen wird, was auf der Seite landet - also mit Transparenz auf
+    Weiss. Ein leerer durchsichtiger Rahmen ist leer, ein Freisteller nicht."""
+    import io as _io
+    from PIL import Image
+    puffer = _io.BytesIO()
+    Image.new("RGBA", (600, 400), (0, 0, 0, 0)).save(puffer, "PNG")
+    assert bilder.ist_leer(puffer.getvalue())
+    assert not bilder.ist_leer(_png_mit_transparenz())

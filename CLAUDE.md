@@ -556,6 +556,76 @@ erst beim nächsten Upsert; was davor entstand, liegt doppelt in der Datenbank.
 Heuristik wie im Store, ohne die Datenbank anzufassen, und das Motiv der
 Dublette erbt die bleibende Karte.
 
+**Fünfter Umbau am 16.08.2026: das Raster steht jetzt wirklich.** Antonio:
+*„die ganzen Artikel bei der Promo-Übersicht, die sind kreuz und quer. Das
+sieht total bescheuert aus. Es ist nicht geordnet und kein konsistent
+einheitliches Layout … bei einigen Bildern sind die komplett verpixelt."*
+Beides war im HTML nicht zu sehen — jede Karte trug dieselben Felder in
+derselben Reihenfolge. Die Ursachen entstanden erst im Browser bzw. im
+Bildholer:
+
+| # | Befund | Messung an der Ausgabe vom 15.08. |
+|---|---|---|
+| 1 | **Die Motivhöhe war frei.** Bild im 16:9-Rahmen 156 px, Banner (ab 2,2:1) 46 px, Schriftkachel je nach Textlänge 95–179 px. Mit `align-items:start` fing damit jede Schlagzeile einer Reihe woanders an, und die nächste Reihe stand versetzt darunter | in **14 von 15** Markenblöcken standen die Schlagzeilen einer Reihe versetzt, bis zu 110 px |
+| 2 | **Transparenz wurde SCHWARZ.** `Image.convert("RGB")` wirft den Alphakanal weg, ohne ihn zu verrechnen — jeder Freisteller bekam schwarze Flächen | **13 von 51** gezeigten Motiven trugen schwarze Blöcke |
+| 3 | Ein **EU-Energielabel** (1200×2401) stand als Motiv einer winSIM-Aktion | im 16:9-Ausschnitt eine bunte Balkenleiter |
+
+Vier Regeln tragen die Neufassung:
+
+1. **Jedes Motiv steht in derselben Fläche** — 16:9, volle Kartenbreite, für
+   Bild, Banner und Schriftkachel gleichermaßen (`.pk-bild{aspect-ratio:16/9}`).
+   Ein Banner wird darin nicht beschnitten, sondern eingepasst
+   (`object-fit:contain`) — die Regel von 08/2026 („ein Banner trägt seine
+   Aussage über die volle Breite") bleibt, sie bekommt nur eine feste Höhe.
+2. **Die Karten einer Reihe sind gleich hoch** (Raster-Voreinstellung
+   `stretch`), der Fuß steht unten, die Schlagzeile ist auf zwei Zeilen
+   geklammert **mit reservierter zweiter Zeile**. Der Einwand von 08/2026
+   gegen `stretch` (ein Loch INNERHALB der Karte) bleibt richtig und wird
+   anders beantwortet: mit fester Motivhöhe und geklammerter Zeile bleibt
+   nur noch der Unterschied zwischen ein- und zweizeiligem Fuß.
+3. **Die große Fläche bekommt nur, wer sie füllen kann.** Sie ist 579 px
+   breit, auf dem Schirm, auf dem diese Seite gelesen wird, also 1158 echte
+   Pixel; `promo.LEAD_MIND_BREITE` (900) hält das. Ein schmaleres Motiv ist
+   nach Kriterium 6 nicht hochskaliert und trotzdem unscharf — die Aktion
+   führt ihren Block weiterhin an, nur in der kleinen Fläche (Blau 620 px,
+   Penny Mobil 698 px). **`gross`/`hoch` rechnet `promo.gewichte()`, nicht
+   die Vorlage** — und zwar ZWEIMAL, weil `_entdoppele_bilder()` der
+   Aufmacherkarte ihr Motiv noch nehmen kann.
+4. **Zwei Rasterzeilen hoch erst ab drei weiteren Karten**
+   (`_HOCH_AB_WEITEREN`). Darunter bleibt neben der Aufmacherkarte eine Zelle
+   leer — und eine Lücke MITTEN im Raster ist genau das „kreuz und quer".
+
+Die Schriftkachel trägt dafür jetzt einen Rahmen und 3 % Grauton: in einer
+festen Fläche stand sie sonst als Handbreit Papier über ihrem Text, und das
+liest sich wieder als fehlendes Bild. Sie ist kein Notnagel, sondern die
+zweite gültige Form einer Karte — vier Marken haben gar kein abrufbares
+Motiv (siehe unten).
+
+Wahrheitstests: `tests/test_promo_raster_browser.py` (4, echtes Chromium —
+gegen den alten Stand fallen 2 davon über 14 Blöcke durch), vier neue in
+`tests/test_promo_view.py`, zwei in `tests/test_bilder.py`.
+
+**Der Alpha-Fehler saß in `report/bilder.py` und betrifft die ganze Seite.**
+`auf_weiss()` legt Transparenz jetzt auf Weiß, statt sie wegzuwerfen — für
+Promo-, Meldungs- und Differenzierungsbilder gleichermaßen. Die 57
+Promo-Motive sind mit der Korrektur **neu geholt** und liegen korrigiert im
+Repo. Die 257 Bilder unter `site/images/` sind es NICHT: `lade_und_lege_ab()`
+lädt eine Datei nicht erneut, deren Name schon existiert, und der Name hängt
+an URL plus Zielbreite, nicht am Inhalt. 26 von ihnen sind zu über 30 %
+fast schwarz — darunter sind echte Nachtaufnahmen, der Anteil mit
+Alpha-Schaden ist nicht ausgezählt. Wer sie richten will, löscht sie aus
+`data/state/report_images/` und lässt sie der nächste Lauf neu holen.
+
+**Warum Lidl Connect keine Bilder hat** (gemessen am 16.08.2026, live):
+seine Bild-Adressen (`/static/assets/…jpg`) antworten mit `text/html` — die
+Single-Page-App liefert ihre eigene Hülle, auch mit `Referer` und
+`Accept: image/*`. mobilcom-debitel liefert **null** Bildkandidaten,
+klarmobil einen, ALDI TALKs Teaser sind 318 px breit und fallen an
+`MIND_BREITE` (500). Das ist kein Fehler der Zuordnung, und es ist mit
+einem Kopfzeilentrick nicht zu lösen — dieselbe Lehre wie bei
+Telecompetitor. Für diese vier Marken ist die Schriftkachel der ehrliche
+Regelfall.
+
 **Eine Marke, mehrere Aktionsseiten** (08.08.2026). Bis dahin hatte jede Marke
 genau EINE URL — und das war die eigentliche Lücke: kein Anbieter zeigt seine
 laufenden Aktionen auf einer Seite. Der Gerätedeal steht unter `/handys`, der
@@ -1486,7 +1556,51 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (15.08.2026, Antonio direkt): die Reihenfolge der
+> **Zuletzt erledigt (16.08.2026, Antonio direkt): das Layout und die Bilder
+> der Promo Übersicht.** Antonio: *„die ganzen Artikel bei der
+> Promo-Übersicht, die sind kreuz und quer … nicht geordnet und kein
+> konsistent einheitliches Layout … bei einigen Bildern sind die komplett
+> verpixelt … bei einigen Artikeln gibt es gar keine Bilder, zum Beispiel bei
+> Lidl Connect."* Stand danach: **1757 Tests** (vorher 1747),
+> `pruefe_portal.py` **15 bestanden / 1 durchgefallen** — der eine Durchfaller
+> ist Kriterium 6 (14 px Hochskalierung auf `meldungen.html`) und steht seit
+> dem 15.08. unverändert offen; er hat mit dieser Änderung nichts zu tun.
+> Einzelheiten in §5 unter „Fünfter Umbau am 16.08.2026".
+>
+> Drei unabhängige Ursachen, alle erst im Browser bzw. beim Nachmessen
+> sichtbar:
+>
+> | # | Befund | Messung |
+> |---|---|---|
+> | 1 | **Die Motivhöhe war frei** — Bild 156 px, Banner 46 px, Schriftkachel 95–179 px. Damit begann jede Schlagzeile einer Reihe woanders | in **14 von 15** Markenblöcken versetzte Schlagzeilen, bis zu 110 px |
+> | 2 | **Transparenz wurde schwarz** (`convert("RGB")` verrechnet den Alphakanal nicht) | **13 von 51** Motiven mit schwarzen Blöcken; nach der Korrektur **0** |
+> | 3 | **Lidl Connect hat keine abrufbaren Bilder** — seine Bild-Adressen antworten mit `text/html`, auch mit `Referer` und `Accept: image/*` | ebenso mobilcom-debitel (0 Kandidaten), klarmobil (1), ALDI TALK (Teaser 318 px, unter der Mindestbreite 500) |
+>
+> **Der Lauf wurde nicht angestoßen** — `site/` ist aus den vorhandenen
+> Berichten neu gerendert (`render_site` MIT `cfg`), die 57 Promo-Motive sind
+> mit der Alpha-Korrektur neu geholt und liegen korrigiert im Repo.
+>
+> **OFFEN daraus:**
+> 1. **Die vier Marken ohne Motiv bleiben ohne Motiv**, bis eine andere
+>    Bildquelle da ist. Lidls Bilder sind über die statische Hülle nicht zu
+>    erreichen; ob der Playwright-Lauf in Actions andere Adressen sieht, ist
+>    **nicht gemessen** (Chromium kommt in der Sandbox nicht ins Netz). Nach
+>    dem nächsten Lauf die Zeile `Promo-Bilder:` im Protokoll lesen.
+> 2. **ALDI TALKs Teaser sind 318 px breit.** `MIND_BREITE` (500) hält sie
+>    draußen, und das ist die richtige Seite des Kompromisses, solange die
+>    kleine Karte 277 px breit ist. Wer sie hereinlassen will, misst vorher
+>    auf einem Retina-Schirm nach.
+> 3. **Die 257 Bilder unter `site/images/` tragen den Alpha-Fehler
+>    weiter** — sie werden nicht neu geholt, weil der Dateiname schon
+>    existiert (§5). 26 von ihnen sind zu über 30 % fast schwarz, darunter
+>    echte Nachtaufnahmen; der Anteil mit Schaden ist nicht ausgezählt.
+> 4. **Die Regel „große Fläche ab 900 px" ist an einer Ausgabe gemessen**
+>    (15.08., 15 Blöcke, zwei Aufmacher fielen darunter). Steht nach dem
+>    nächsten Lauf die halbe Seite ohne große Karte da, ist die Schwelle zu
+>    hoch — dann die Motivbreiten aus `promo_db.json` auszählen, nicht die
+>    Schwelle nach Gefühl senken.
+
+> **Davor erledigt (15.08.2026, Antonio direkt): die Reihenfolge der
 > Titelseite.** Antonio: *„mir gefällt überhaupt nicht die ordnung der
 > artikel … wie kann es sein dass artikel mit priorität von 3 auf der
 > titelseite landen, bei diese woche … die wichtigsten artikel sollen auch

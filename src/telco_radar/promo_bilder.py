@@ -118,6 +118,15 @@ _MOTIV_MIND_BREITE = 700
 _SIEGEL_RE = re.compile(
     r"(siegel|testsieg|auszeichnung|ausgezeichnet|bewertung|tüv|tuev|"
     r"note\s+sehr\s+gut|leserwahl|award)", re.I)
+# Pflichtgrafiken. Sie sind gross, scharf, hochformatig und stehen bei jedem
+# Geraeteangebot - der Bildholer nimmt sie deshalb bereitwillig, und auf der
+# Uebersicht stand am 16.08.2026 das EU-Energielabel eines Galaxy S26 als
+# Motiv einer winSIM-Aktion (1200x2401, im 16:9-Ausschnitt eine bunte
+# Balkenleiter). Anders als ein Testsiegel steht es nicht im alt-Text,
+# sondern im Pfad: kein Haendler nennt diese Datei anders.
+_KEIN_MOTIV_RE = re.compile(
+    r"(energielabel|energy[-_]?label|energieeffizienz|eprel|"
+    r"produktdatenblatt|datenblatt)", re.I)
 
 
 def bildordner(root: Path) -> Path:
@@ -293,7 +302,9 @@ def zuordnen(angebote: list[dict], kandidaten: list[dict],
     # Markenlogo, das auf jeder Seite ganz oben steht, den Kandidatenplatz
     # des Buehnenbilds (gemessen bei ALDI TALK - `aldilogo.png` stand vor
     # dem Back2School-Motiv und gewann Stufe 4).
-    kandidaten = [k for k in kandidaten if _taugt(k.get("src") or "")]
+    kandidaten = [k for k in kandidaten
+                  if _taugt(k.get("src") or "")
+                  and not _KEIN_MOTIV_RE.search(k.get("src") or "")]
     if not kandidaten:
         return {}
     haeufigkeit = _haeufigkeiten(kandidaten)

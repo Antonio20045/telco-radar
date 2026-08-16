@@ -294,6 +294,20 @@ def _mechanik_balken(marken: list[dict]) -> list[dict]:
             for z in balken]
 
 
+# Was die grosse Flaeche verlangt. Sie ist bei 1440 px Fensterbreite 579 px
+# breit; auf dem Schirm, auf dem diese Seite gelesen wird (MacBook, zwei
+# Geraetepixel je CSS-Pixel), sind das 1158 echte Pixel. Ein 620-px-Motiv
+# dort ist nicht hochskaliert im Sinne von Kriterium 6 - es ist trotzdem
+# unscharf, und genau so sah Antonio es am 16.08.2026. Unterhalb dieser
+# Breite fuehrt die Aktion ihren Block weiterhin an, aber in der kleinen
+# Flaeche: das Motiv bleibt, die Unschaerfe geht.
+LEAD_MIND_BREITE = 900
+# Ab wie vielen weiteren Karten die Aufmacherkarte zwei Rasterzeilen hoch
+# steht. Darunter bleibt neben ihr eine Zelle leer - und eine Luecke MITTEN
+# im Raster ist genau das "kreuz und quer", das diese Fassung abstellt.
+_HOCH_AB_WEITEREN = 3
+
+
 def _block(brand: dict) -> dict:
     """Eine Marke mit allen ihren sichtbaren Aktionen als Kartenblock.
 
@@ -302,11 +316,36 @@ def _block(brand: dict) -> dict:
     GEWICHTET - nicht, weil sie an zwei Orten stehen. Genau diese Trennung
     war bis zum 08.08.2026 eine Trennung im Seitenaufbau, und das war der
     Fehler.
+
+    `lead_gross` und `lead_hoch` rechnet DIESE Stelle, nicht die Vorlage:
+    beide haengen an Zahlen (Motivbreite, Zahl der uebrigen Karten), und
+    eine Vorlage, die Zahlen vergleicht, ist eine Vorlage, die niemand
+    testet.
     """
     karten = [_karte(brand, o) for o in brand["active"]]
-    return dict(brand, lead=karten[0] if karten else None,
-                weitere=karten[1:], karten=karten,
-                top_score=karten[0]["score"] if karten else None)
+    block = dict(brand, lead=karten[0] if karten else None,
+                 weitere=karten[1:], karten=karten,
+                 top_score=karten[0]["score"] if karten else None)
+    gewichte(block)
+    return block
+
+
+def gewichte(block: dict) -> None:
+    """Setzt `lead_gross` und `lead_hoch` eines Blocks.
+
+    Eigene Funktion, weil sie ZWEIMAL laufen muss: `_entdoppele_bilder()`
+    kann der Aufmacherkarte ihr Motiv noch nehmen, und eine Karte ohne
+    Motiv beantwortet die Breitenfrage anders als eine mit einem zu
+    schmalen. Wer sie nur in `_block()` rechnet, bekommt eine Aufmacherkarte,
+    die aus einem Grund klein bleibt, den es auf der Seite nicht mehr gibt.
+    """
+    lead = block.get("lead")
+    # Eine Schriftkachel ist Text und in jeder Groesse scharf - nur ein
+    # Rasterbild muss die Flaeche fuellen koennen.
+    gross = bool(lead) and (not lead["bild"]
+                            or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE)
+    block["lead_gross"] = gross
+    block["lead_hoch"] = gross and len(block["karten"]) - 1 >= _HOCH_AB_WEITEREN
 
 
 def _entdoppele_bilder(karten: list[dict]) -> None:
@@ -433,6 +472,10 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     _entdoppele_bilder(alle_karten)
     for block in bloecke + ([eigen] if eigen else []):
         _entdoppele_kacheln(block["karten"])
+        # Nach dem Entdoppeln, nicht davor: eine Aufmacherkarte, die hier ihr
+        # Motiv verloren hat, ist eine Schriftkachel und darf die grosse
+        # Flaeche wieder tragen.
+        gewichte(block)
 
     ohne_aktion = [b for b in marken if not b["has_offers"]]
 

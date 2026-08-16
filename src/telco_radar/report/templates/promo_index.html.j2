@@ -47,23 +47,32 @@
    sie ist die zweite gueltige Form einer Karte, und sie sagt in zwei Zahlen,
    worum es geht. Die Mechanik steht nur darunter, nie darin: vier Marken
    fahren dieselbe, vier identische Kacheln lesen sich als Fehler. #}
+{# 16.08.2026: JEDES Motiv steht in DERSELBEN Flaeche - 16:9, so breit wie
+   seine Karte. Bis dahin bestimmte der Inhalt die Hoehe: ein 16:9-Bild
+   156 px, ein Banner 46 px, eine Schriftkachel je nach Textlaenge 95 bis
+   179 px. In einem Raster, dessen Karten oben buendig beginnen, faengt
+   damit jede Schlagzeile einer Reihe auf einer anderen Hoehe an, und die
+   naechste Reihe steht versetzt darunter. Antonio: "die ganzen Artikel sind
+   kreuz und quer, das sieht total bescheuert aus." Eine Zeitungsseite
+   entsteht aus einem Raster - und ein Raster hat gleiche Zellen. #}
 {% macro motiv(k, gross) %}
 {%- if k.bild %}
-{# `max-width` = die echte Dateibreite. Die grosse Karte ist bei 1440 px
-   Fensterbreite 579 px breit, und nicht jedes Kampagnenmotiv ist so gross
-   (560 px kommen oft vor) - ohne die Grenze wuerde es hochskaliert
-   dargestellt, was scripts/pruefe_portal.py Kriterium 6 zu Recht verbietet. #}
+{# Kein `max-width` mehr: die Flaeche ist gesetzt, und in sie darf nur, was
+   sie fuellen kann. Der Aufmacher (579 px) verlangt dafuer
+   promo.LEAD_MIND_BREITE, jede kleine Karte (277 px) die Mindestbreite des
+   Bildholers - beides mit Reserve ueber dem, was Kriterium 6 verbietet. #}
 <span class="pk-bild{% if k.bild_panorama %} pk-bild--banner{% endif %}"><img src="{{ k.bild }}" alt=""
-  {% if k.bild_w %}width="{{ k.bild_w }}" height="{{ k.bild_h }}"
-  style="max-width:{{ k.bild_w }}px"{% endif %}
+  {% if k.bild_w %}width="{{ k.bild_w }}" height="{{ k.bild_h }}"{% endif %}
   loading="lazy">
-  {%- if k.bild_ist_motiv and gross %}
-  {# Stufe 4 der Zuordnung: das Buehnenbild der Aktionsseite. Es belegt,
-     WOMIT die Marke gerade wirbt - nicht, dass es genau dieses Angebot
-     zeigt. Ohne diese Zeile behauptet die Kachel mehr, als belegt ist. #}
-  <span class="pk-bildquelle">Motiv der Aktionsseite</span>
-  {%- endif %}
 </span>
+{%- if k.bild_ist_motiv and gross %}
+{# Stufe 4 der Zuordnung: das Buehnenbild der Aktionsseite. Es belegt,
+   WOMIT die Marke gerade wirbt - nicht, dass es genau dieses Angebot
+   zeigt. Ohne diese Zeile behauptet die Kachel mehr, als belegt ist.
+   Steht ausserhalb der Bildflaeche: in ihr wuerde sie das Motiv
+   beschneiden, seit die Flaeche fest ist. #}
+<span class="pk-bildquelle">Motiv der Aktionsseite</span>
+{%- endif %}
 {%- else %}
 <span class="pk-bild pk-bild--typo{% if not gross %} pk-bild--typo-klein{% endif %}">
   <span class="pk-typo-zahl">{{ k.kachel }}</span>
@@ -76,11 +85,11 @@
 
 {# Eine Aktion als Karte. Dieselbe Form und dieselbe Feldreihenfolge fuer
    jede Marke und jedes Gewicht - das ist der Punkt der Seite. #}
-{% macro karte(k, gross=false) %}
-{# `pkarte--hoch` nur mit einem Motiv im Bildformat: eine Schriftkachel und
-   ein flaches Banner fuellen keine zwei Rasterzeilen, sie wuerden sich in
-   Weissraum aufloesen. #}
-<article class="pkarte{% if gross %} pkarte--gross{% if k.bild and not k.bild_panorama %} pkarte--hoch{% endif %}{% endif %}{% if k.offer.fading %} pkarte--fading{% endif %}">
+{% macro karte(k, gross=false, hoch=false) %}
+{# `gross` und `hoch` rechnet report/promo.gewichte() - sie haengen an der
+   Motivbreite und an der Zahl der uebrigen Karten. Eine Vorlage, die Zahlen
+   vergleicht, ist eine Vorlage, die niemand testet. #}
+<article class="pkarte{% if gross %} pkarte--gross{% if hoch %} pkarte--hoch{% endif %}{% endif %}{% if k.offer.fading %} pkarte--fading{% endif %}">
   <a class="pk-flaeche" href="{{ k.offer.url }}" target="_blank" rel="noopener">
     {{ motiv(k, gross) }}
     <span class="pk-titel szl">{{ k.offer.headline }}</span>
@@ -114,7 +123,7 @@
     <span class="pmarke-zusatz">{% if eigen %}Vergleichsanker, nicht als Wettbewerber gezählt{% else %}{{ b.tier_label }}{% if b.group and b.group != b.name %} · {{ b.group }}{% endif %}{% endif %}</span>
   </div>
   <div class="promo-karten">
-    {{ karte(b.lead, true) }}
+    {{ karte(b.lead, b.lead_gross, b.lead_hoch) }}
     {% for k in b.weitere %}{{ karte(k) }}{% endfor %}
   </div>
 </section>

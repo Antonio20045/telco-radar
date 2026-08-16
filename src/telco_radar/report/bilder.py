@@ -165,6 +165,31 @@ def masse(daten: bytes) -> tuple[int, int]:
 _MIND_STREUUNG = 6.0
 
 
+def auf_weiss(im):
+    """Legt ein Bild mit Transparenz auf WEISS und gibt RGB zurueck.
+
+    `Image.convert("RGB")` wirft den Alphakanal weg, ohne ihn zu verrechnen -
+    und was durchsichtig war, wird dabei SCHWARZ. Genau das stand am
+    16.08.2026 auf der Promo Uebersicht: von 51 gezeigten Motiven trugen 13
+    schwarze Bloecke, wo der Werbebanner durchsichtig war (o2s
+    Freisteller-Grafiken, congstars Geraetebilder, winSIMs schwarze Kachel).
+    Antonio: "bei einigen Bildern sind die komplett verpixelt." Es war kein
+    Skalierungsfehler - es war der Alphakanal.
+
+    Weiss und nicht `--paper`: ein Werbemotiv wird auf weissem Grund
+    gestaltet, und ein Freisteller auf 246/244/238 traegt einen sichtbaren
+    Rahmen, sobald er neben einem weissen Motiv steht.
+    """
+    from PIL import Image
+    if im.mode in ("RGBA", "LA") or (im.mode == "P"
+                                     and "transparency" in im.info):
+        rgba = im.convert("RGBA")
+        grund = Image.new("RGB", rgba.size, (255, 255, 255))
+        grund.paste(rgba, mask=rgba.split()[-1])
+        return grund
+    return im.convert("RGB")          # Palette, Graustufe, CMYK
+
+
 def ist_leer(daten: bytes) -> bool:
     """True, wenn das Bild eine einfarbige Flaeche ist - also nichts zeigt.
 
@@ -172,11 +197,17 @@ def ist_leer(daten: bytes) -> bool:
     einziges Bild einen 1280x720-Screenshot ein, der eine weisse Seite war
     (Aufnahme vor dem Seitenaufbau). Masse und Dateityp waren tadellos -
     nur zu sehen war nichts. Wer nur `masse()` prueft, sieht das nie.
+
+    Gemessen wird auf der Fassung, die spaeter auch abgelegt wird - also mit
+    Transparenz auf Weiss. Ohne das misst die Pruefung ein anderes Bild als
+    das, das auf der Seite landet: ein Freisteller auf durchsichtigem Grund
+    hat als RGBA eine hohe Streuung (der Alphakanal traegt sie) und als
+    fertiges JPEG fast keine.
     """
     try:
         from PIL import Image, ImageStat
         with Image.open(io.BytesIO(daten)) as im:
-            grau = im.convert("L")
+            grau = auf_weiss(im).convert("L")
             return ImageStat.Stat(grau).stddev[0] < _MIND_STREUUNG
     except Exception:                # noqa: BLE001 - unlesbar zeigt auch nichts
         return True
@@ -190,7 +221,7 @@ def _schreibe(daten: bytes, ziel: Path, max_breite: int) -> tuple[int, int]:
     """
     from PIL import Image
     with Image.open(io.BytesIO(daten)) as im:
-        im = im.convert("RGB")       # PNG mit Alpha, Palette, CMYK
+        im = auf_weiss(im)           # PNG mit Alpha, Palette, CMYK
         if im.width > max_breite:
             hoehe = max(1, round(im.height * max_breite / im.width))
             im = im.resize((max_breite, hoehe), Image.LANCZOS)
