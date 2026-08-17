@@ -360,14 +360,25 @@ Spalten: die alte Regel „Tageszahl nur beim ersten Eintrag ihres Tages"
 **zerreißt am Spaltenumbruch** — oben in Spalte zwei stünden Meldungen ohne
 Datum. Jede Zeile trägt ihr Datum deshalb selbst („7.8.").
 
-**Highlight-Themen** (07.08.2026): erkennt ein Ereignis, zu dem viele
-Meldungen auftreten (Samsung-Fold-Launch, Starlink-Mobilfunknetz), und baut
-dafür eine temporäre Seite im Titelseitensatz. Mechanik in
-`analyze/highlight_topics.py`: deterministische Kandidatensuche (Gruppen ≥5
-Meldungen aus ≥3 Quellen über gemeinsame seltene WORTPAARE — ein
-Verwandtschafts-Graph über einzelne Wörter verband 129 von 138 Meldungen zu
-einer Gruppe), dann ein eigener Themen-Agent, der benennt, beschreibt und
-Firmen-Cluster („Deutsche Telekom" ist kein Ereignis) verwirft. Store:
+**Highlight-Themen** (07.08.2026, Kandidatensuche neu am 17.08.2026):
+erkennt ein Ereignis, zu dem viele Meldungen auftreten (Samsung-Fold-Launch,
+Starlink-Mobilfunknetz), und baut dafür eine temporäre Seite im
+Titelseitensatz. Mechanik in `analyze/highlight_topics.py`: deterministische
+Kandidatensuche (Gruppen ≥4 Meldungen aus ≥3 Quellen über gemeinsame seltene
+WORTPAARE — ein Verwandtschafts-Graph über einzelne Wörter verband 129 von
+138 Meldungen zu einer Gruppe), dann ein eigener Themen-Agent, der benennt,
+beschreibt und Firmen-Cluster („Deutsche Telekom" ist kein Ereignis)
+verwirft. **Die Suche rechnet seit dem 17.08.2026 über den aktuellen Lauf
+PLUS die Highlights der letzten 14 Tage aus `data/reports/`** — mit der
+alten Fassung (≥5, nur der eigene Lauf) hat die Mechanik in zehn Tagen KEIN
+einziges Thema gebaut, weil sich ein Launch über Läufe verteilt (Pixel 11:
+eine Meldung am 06.08., vier am 14.08.). Drei Regeln halten den größeren
+Korpus sauber: der Seltenheitsdeckel rechnet JE AUSGABE (über 610 Meldungen
+gerechnet ließe `n // 5` sogar „eine" als Bindewort durch), eine Gruppe
+braucht ≥2 Meldungen des LAUFENDEN Laufs (`MIND_AKTUELL` — das Archiv
+verstärkt Momentum, es erzeugt keins), und ein Ereignis, das ein aktives
+Thema schon trägt, wird dem Agenten nicht erneut vorgelegt
+(`_schon_erfasst`, per URL-Überlappung). Store:
 `data/state/highlight_topics.json`; Zuordnung neuer Meldungen per
 Suchwort-Match läuft auch OHNE Modell weiter, Themen ohne ≥2 neue Meldungen
 altern über 4 Läufe und verschwinden (Seite wird gelöscht, `site/thema/`
@@ -1556,7 +1567,43 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (16.08.2026, Antonio direkt): das Layout und die Bilder
+> **Zuletzt erledigt (17.08.2026, Antonio direkt): der unsichtbare
+> Pixel-Launch und die tote Highlight-Themen-Mechanik.** Antonio: *„das
+> Google-Pixel ist launcht und ich sehe dazu absolut gar nichts auf der
+> Seite … nicht nur, dass ich nicht die Highlightseite sehe, ich sehe halt
+> auch nichts von Google Pixel."* Zwei getrennte Ursachen, beide gemessen:
+>
+> | # | Befund | Messung |
+> |---|---|---|
+> | 1 | **Die live sichtbare Ausgabe ist der degenerierte 402-Lauf vom 15.08.** (20 von 810 Meldungen bewertet, 0 Pixel). Der Launch STAND am 14.08. im Bericht — 5 Highlights, darunter T-Mobiles „Pixel 11 Pro XL on Us" mit Priorität 5. Auf der Live-Seite existiert Pixel nur als Linkliste im „Roh-Digest" des Notfall-Editors | Seit #93 (15.08.) kein Lauf mehr; der Stapelschutz hat gehalten: nur **55 von 810** Hashes im Seen-Store, 755 Meldungen kommen im nächsten Lauf wieder (Frischefenster 8 Tage reicht) |
+> | 2 | **Die Highlight-Themen-Mechanik hat seit ihrem Bau (07.08.) kein einziges Thema angelegt.** `MIND_MELDUNGEN = 5` gegen eine zustandslose Suche je Lauf: Pixel 11 hatte am 06.08. eine und am 14.08. vier Highlight-Meldungen (aus 4 Quellen) — nie 5 in EINEM Lauf. Der Agent wurde nie auch nur gefragt | Reproduziert: 0 Kandidatengruppen über alle Ausgaben. Nach dem Fix (Schwelle 4 + 14-Tage-Archiv + Deckel je Ausgabe + `MIND_AKTUELL`): 5 Kandidaten am 14.08.-Korpus, Pixel-Gruppe dabei, Thema entsteht mit gestubbtem Agenten Ende-zu-Ende |
+>
+> Einzelheiten in §5 unter „Highlight-Themen"; Stand: **1764 Tests** (vorher
+> 1759), alle grün, Browser-Tests eingeschlossen. Zwei bestehende Tests
+> angepasst, beide weil sie das umgekehrte Verhalten festhielten
+> (`test_kandidatensuche_verlangt_genug_meldungen`: 4 reichen jetzt;
+> `test_gescheiterter_agent_…`: der Kandidat wird neuerdings von
+> `_schon_erfasst` gefiltert, der Test braucht ein zweites Ereignis).
+>
+> **OFFEN daraus:**
+> 1. **Der Themen-Agent ist weiterhin nie gegen ein echtes Modell
+>    gelaufen.** Nach dem nächsten Lauf die Zeile `Highlight-Themen:` im
+>    Protokoll lesen: verwirft er die Quartalszahlen-Gruppe („Umsatz",
+>    „Revenue") und benennt er die echten Ereignisse (Pixel 11,
+>    Fold8/Flip8, Starlink-Mobilfunknetz)?
+> 2. **`MIND_AKTUELL = 2` ist an einem Korpus gemessen** (15.08., in dem
+>    der 402-Lauf die aktuellen Meldungen fast leer ließ). Bleibt das
+>    Fokusband über mehrere gesunde Läufe leer, obwohl Ereignisse da sind,
+>    steht die Schwelle zu hoch — erst im Protokoll nachsehen, wie viele
+>    Gruppen an ihr fallen.
+> 3. **Ein abgelehnter Kandidat wird nicht gemerkt** — die
+>    Quartalszahlen-Gruppe wird dem Agenten jeden Lauf erneut vorgelegt,
+>    solange sie sich aus dem Archivfenster neu bildet. Das kostet je Lauf
+>    einen Bruchteil eines Aufrufs (alle Kandidaten gehen in EINEN Call)
+>    und ist bewusst nicht als neuer State gebaut. Wird es lästig, gehört
+>    die Ablehnung als dritter Status in den Store, nicht als Sonderliste.
+
+> **Davor erledigt (16.08.2026, Antonio direkt): das Layout und die Bilder
 > der Promo Übersicht.** Antonio: *„die ganzen Artikel bei der
 > Promo-Übersicht, die sind kreuz und quer … nicht geordnet und kein
 > konsistent einheitliches Layout … bei einigen Bildern sind die komplett

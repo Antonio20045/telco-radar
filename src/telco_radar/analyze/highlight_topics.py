@@ -46,12 +46,27 @@ log = logging.getLogger(__name__)
 STORE_NAME = "highlight_topics.json"
 
 # --- Kandidatensuche ------------------------------------------------------
-# Was eine Gruppe sein muss, um ueberhaupt gefragt zu werden. Die drei Werte
-# haengen zusammen: fuenf Meldungen aus drei verschiedenen Quellen ueber zwei
-# gemeinsame seltene Woerter ist die kleinste Konstellation, die nicht schon
-# durch eine einzelne Redaktion entstehen kann, die dreimal nachlegt.
-MIND_MELDUNGEN = 5
+# Was eine Gruppe sein muss, um ueberhaupt gefragt zu werden. Der Schutz vor
+# der einzelnen Redaktion, die nachlegt, liegt bei MIND_QUELLEN - nicht bei
+# der Gruppengroesse. MIND_MELDUNGEN stand bis zum 17.08.2026 auf 5, und mit
+# dieser Schwelle hat die Mechanik seit ihrem Bau am 07.08. KEIN einziges
+# Thema angelegt: der Google-Pixel-11-Launch brachte am 14.08. vier
+# Highlights aus vier Quellen (darunter die Prioritaet-5-Meldung der Woche)
+# und fiel an 4 < 5. Ein Geraetelaunch erreicht in EINEM Lauf fast nie
+# fuenf bewertete Meldungen - er verteilt sich ueber Carrier-Meldungen an
+# verschiedenen Tagen. Deshalb 4, und deshalb rechnet die Kandidatensuche
+# seitdem ueber das Berichtsarchiv mit (ARCHIV_TAGE unten).
+MIND_MELDUNGEN = 4
 MIND_QUELLEN = 3
+# Wie viele Meldungen einer Gruppe aus dem AKTUELLEN Lauf stammen muessen.
+# Das Archiv (unten) verstaerkt nur, was gerade Momentum hat - es soll kein
+# Thema aus einer zwei Wochen alten Welle entstehen, zu der diese Woche
+# nichts mehr kommt. Zwei, nicht eins: dieselbe Schwelle wie MIND_ZUWACHS,
+# denn ein Thema, das nicht einmal den Zuwachs eines BESTEHENDEN Themas
+# erreichte, wuerde als frisches sofort zu altern beginnen. Ohne diese
+# Bedingung standen am Korpus vom 15.08.2026 gemessen 40 Gruppen an, die
+# meisten ohne eine einzige Meldung der laufenden Woche.
+MIND_AKTUELL = 2
 MIND_GEMEINSAM = 2
 # Ein Wort taugt nur als Bindeglied, wenn es in mindestens drei Meldungen
 # steht - zwei sind ein Zufall.
@@ -75,6 +90,17 @@ MAX_RUNS_OHNE_ZUWACHS = 4
 # Obergrenze je Thema, damit ein monatelang laufendes Thema die Speicherdatei
 # nicht sprengt. Die dringendsten bleiben.
 MAX_ITEMS_JE_THEMA = 80
+
+# --- Archivfenster --------------------------------------------------------
+# Die Kandidatensuche sieht nicht nur den aktuellen Lauf, sondern auch die
+# Highlights der letzten Ausgaben aus data/reports/. Der Grund ist gemessen,
+# nicht vermutet: der Pixel-11-Launch stand am 06.08. mit EINER und am
+# 14.08. mit VIER Meldungen im Bericht - in keinem einzelnen Lauf genug fuer
+# eine Gruppe, ueber beide zusammen locker. Ein Ereignis, das sich ueber
+# Laeufe verteilt, ist der Normalfall, nicht die Ausnahme. 14 Tage decken
+# bei zwei Laeufen je Woche vier Ausgaben ab - derselbe Horizont wie
+# MAX_RUNS_OHNE_ZUWACHS.
+ARCHIV_TAGE = 14
 
 _TOKENS = 8000
 
@@ -121,6 +147,48 @@ def lade_themen(state_dir: Path) -> list[dict]:
     return aktive_themen(lade_store(state_dir))
 
 
+# ----------------------------------------------------------- Archivzugriff
+def _archiv_highlights(reports_dir: Path, heute: str,
+                       bekannt: set[str]) -> list[dict]:
+    """Highlights der letzten Ausgaben, per URL entdoppelt gegen `bekannt`.
+
+    Jede Meldung traegt ihr Ausgabedatum als `_woche` mit - im Themenspeicher
+    soll die Woche stehen, in der sie BERICHTET wurde, nicht die, in der das
+    Thema entstand. Ein unlesbares Berichts-JSON wird uebersprungen, nie
+    geworfen: das Archiv ist Zugabe, nicht Voraussetzung.
+    """
+    from datetime import date, timedelta
+
+    try:
+        grenze = (date.fromisoformat(heute) - timedelta(days=ARCHIV_TAGE)).isoformat()
+    except ValueError:
+        return []
+    out: list[dict] = []
+    urls = set(bekannt)
+    for pfad in sorted(Path(reports_dir).glob("*.json"), reverse=True):
+        datum = pfad.stem
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", datum):
+            continue
+        if datum > heute or datum < grenze:
+            continue
+        try:
+            daten = json.loads(pfad.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        regionen = daten.get("regions") or {}
+        bereiche = regionen.values() if isinstance(regionen, dict) else regionen
+        for bereich in bereiche:
+            if not isinstance(bereich, dict):
+                continue
+            for h in bereich.get("highlights") or []:
+                url = (h or {}).get("url") or ""
+                if not url or url in urls:
+                    continue
+                urls.add(url)
+                out.append(dict(h, _woche=datum))
+    return out
+
+
 # -------------------------------------------------------- Kandidatensuche
 def _text(h: dict) -> str:
     return (f"{h.get('headline') or ''} {h.get('operator') or ''} "
@@ -131,23 +199,32 @@ def _rang(h: dict) -> tuple:
     return (int(h.get("relevance") or 0), h.get("date") or "")
 
 
-def _seltenheitsdeckel(n: int) -> int:
+def _seltenheitsdeckel(n: int, ausgaben: int = 1) -> int:
     """Ab welcher Haeufigkeit ein Wort nichts mehr bindet.
 
-    Ein Wort, das ein Fuenftel der Ausgabe durchzieht ("mobile", "network",
+    Ein Wort, das ein Fuenftel der AUSGABE durchzieht ("mobile", "network",
     "2026"), verbindet nichts - es beschreibt die Branche. Die Untergrenze
     ist doppelt so hoch wie die Mindestgruppe und darf nicht kleiner sein:
-    ein Wort, das fuenf Meldungen bindet, kommt zwangslaeufig fuenfmal vor.
+    ein Wort, das vier Meldungen bindet, kommt zwangslaeufig viermal vor.
     Mit einem Deckel unterhalb von MIND_MELDUNGEN schloesse die Suche genau
     die Woerter aus, die sie sucht, und faende in einer kleinen Ausgabe
     grundsaetzlich nichts.
+
+    Seit die Kandidatensuche das Berichtsarchiv mitliest, muss der Deckel
+    JE AUSGABE rechnen, nicht ueber den zusammengelegten Korpus: an 610
+    Meldungen aus vier Ausgaben gemessen (15.08.2026) liesse n // 5 = 122
+    sogar "eine" (119x), "2026" (87x) und "ueber" (76x) als Bindewoerter
+    durch, und die groessten sechs "Gruppen" waren 57 Meldungen Fuellwort-
+    Rauschen, waehrend die echte Pixel-11-Gruppe hinter MAX_KANDIDATEN
+    verschwand.
 
     Am Bericht vom 07.08.2026 (138 Meldungen) gemessen ist der genaue Wert
     unkritisch: zwischen 13 und 34 aendern sich die gefundenen Gruppen von
     vier auf sechs, und keine davon wird groesser als sieben Meldungen. Die
     Arbeit macht die Paarbedingung, nicht der Deckel.
     """
-    return max(2 * MIND_MELDUNGEN, n // 5)
+    je_ausgabe = n // max(1, ausgaben)
+    return max(2 * MIND_MELDUNGEN, je_ausgabe // 5)
 
 
 def finde_kandidaten(highlights: list[dict]) -> list[dict]:
@@ -172,7 +249,8 @@ def finde_kandidaten(highlights: list[dict]) -> list[dict]:
 
     mengen = [wortmenge(_text(h)) for h in kandidaten_items]
     haeufigkeit = haeufigkeiten(mengen)
-    deckel = _seltenheitsdeckel(len(kandidaten_items))
+    ausgaben = len({h.get("_woche") or "" for h in kandidaten_items})
+    deckel = _seltenheitsdeckel(len(kandidaten_items), ausgaben)
     selten = [sorted(w for w in m
                      if MIND_WORTHAEUFIGKEIT <= haeufigkeit[w] <= deckel)
               for m in mengen]
@@ -209,6 +287,11 @@ def finde_kandidaten(highlights: list[dict]) -> list[dict]:
         items = sorted((kandidaten_items[i] for i in idx), key=_rang, reverse=True)
         quellen = {(h.get("source") or "").strip() for h in items} - {""}
         if len(items) < MIND_MELDUNGEN or len(quellen) < MIND_QUELLEN:
+            continue
+        # Meldungen ohne _woche sind die des aktuellen Laufs - Archiv-Items
+        # tragen ihr Ausgabedatum (siehe _archiv_highlights).
+        aktuell = sum(1 for h in items if not h.get("_woche"))
+        if aktuell < MIND_AKTUELL:
             continue
         # Die tragenden Woerter der Gruppe: was mindestens ein Drittel ihrer
         # Meldungen teilt, seltenste zuerst. Sie sind der Vorschlag an den
@@ -370,6 +453,28 @@ def _freier_slug(titel: str, vergeben: set[str]) -> str:
     return f"{basis}-{n}"
 
 
+def _schon_erfasst(kandidat: dict, laufende: list[dict]) -> bool:
+    """Ob ein Kandidat im Wesentlichen aus Meldungen besteht, die ein
+    aktives Thema schon traegt.
+
+    Seit die Kandidatensuche das Berichtsarchiv mitliest, findet sie ein
+    einmal erkanntes Ereignis in jedem folgenden Lauf erneut. Ohne diesen
+    Filter wuerde derselbe Kandidat dem Agenten jedes Mal wieder vorgelegt -
+    ein Modellaufruf je Lauf fuer eine laengst beantwortete Frage. Neue
+    Meldungen erreichen das Thema weiter ueber die Suchwort-Zuordnung
+    (_einsortieren), die kein Modell braucht. Gerechnet mit derselben
+    UEBERLAPPUNG wie beim Zusammenlegen zweier Gruppen.
+    """
+    urls = {h.get("url") for h in kandidat.get("items") or [] if h.get("url")}
+    if not urls:
+        return True
+    for t in laufende:
+        bekannt = {i.get("url") for i in t.get("items") or []}
+        if len(urls & bekannt) / len(urls) >= UEBERLAPPUNG:
+            return True
+    return False
+
+
 def _passendes_thema(suchwoerter, themen: list[dict]) -> dict | None:
     """Ein bestehendes Thema, das dieselben Suchwoerter traegt.
 
@@ -388,7 +493,8 @@ def _passendes_thema(suchwoerter, themen: list[dict]) -> dict | None:
 
 def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
                             heute: str, model: str | None = None,
-                            use_llm: bool = False) -> dict:
+                            use_llm: bool = False,
+                            reports_dir: Path | None = None) -> dict:
     """Ein Lauf Themenpflege. Gibt eine Bilanz fuer das Protokoll zurueck.
 
     Failsafe an genau einer Stelle: scheitert der Agent, entstehen KEINE
@@ -406,11 +512,24 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
     for thema in laufende:
         zuwachs[thema["slug"]] = _einsortieren(thema, highlights, heute)
 
-    kandidaten = finde_kandidaten(highlights)
+    # Die Kandidatensuche rechnet ueber diesen Lauf PLUS die Highlights der
+    # letzten Ausgaben (ARCHIV_TAGE): ein Ereignis verteilt sich ueber
+    # Laeufe, und eine zustandslose Suche je Lauf hat deshalb vom 07. bis
+    # zum 17.08.2026 kein einziges Thema gefunden. Der Zuwachs bestehender
+    # Themen (oben) rechnet weiterhin NUR mit dem aktuellen Lauf - sonst
+    # zaehlte jedes Archiv-Item als neue Aktivitaet und kein Thema altert.
+    basis = [h for h in (highlights or []) if h.get("url")]
+    if reports_dir is not None:
+        basis = basis + _archiv_highlights(
+            Path(reports_dir), heute, bekannt={h["url"] for h in basis})
+    kandidaten = finde_kandidaten(basis)
     # Was ein beendetes Thema schon einmal war, wird nicht noch einmal neu
-    # entdeckt - genau dafuer bleiben beendete Themen im Speicher.
+    # entdeckt - genau dafuer bleiben beendete Themen im Speicher. Und was
+    # ein AKTIVES Thema schon traegt, wird dem Agenten nicht erneut
+    # vorgelegt.
     kandidaten = [k for k in kandidaten
-                  if _passendes_thema(k["worte"], beendete) is None]
+                  if _passendes_thema(k["worte"], beendete) is None
+                  and not _schon_erfasst(k, laufende)]
 
     neu_angelegt: list[str] = []
     agent_fehler = ""
@@ -450,7 +569,7 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
                 fuer_ziel = [h for h in kandidat["items"]
                              if h.get("url") and h["url"] not in bekannt]
                 ziel.setdefault("items", []).extend(
-                    _item(h, heute) for h in fuer_ziel)
+                    _item(h, h.get("_woche") or heute) for h in fuer_ziel)
                 ziel["items"] = sorted(ziel["items"], key=_rang,
                                        reverse=True)[:MAX_ITEMS_JE_THEMA]
                 zuwachs[ziel["slug"]] = zuwachs.get(ziel["slug"], 0) + len(fuer_ziel)
@@ -464,7 +583,8 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
                 "keywords": suchwoerter[:8],
                 "first_seen": heute, "last_active": heute,
                 "runs_ohne_zuwachs": 0, "status": "aktiv",
-                "items": [_item(h, heute) for h in kandidat["items"]],
+                "items": [_item(h, h.get("_woche") or heute)
+                          for h in kandidat["items"]],
             }
             themen.append(thema)
             laufende.append(thema)
