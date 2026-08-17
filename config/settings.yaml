@@ -17,7 +17,7 @@ report_language: "de"
 # ein Anbieterwechsel soll eine Zeile hier sein, kein Loeschen von Secrets.
 # ACHTUNG: deepseek und openai teilen sich das Secret LLM_API_KEY - dort muss
 # der Schluessel des Anbieters liegen, der hier eingetragen ist.
-llm_provider: "deepseek"
+llm_provider: "anthropic"
 
 # ---------------------------------------------------------------------------
 # Models (fallback Anthropic; OpenAI-compatible provider used when LLM_API_KEY
