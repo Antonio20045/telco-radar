@@ -56,7 +56,7 @@
    "|5gb",
    "|63.49€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -96,7 +96,7 @@
    "|365tage",
    "|50gb"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -129,7 +129,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -170,7 +170,6 @@
    "in|1gb",
    "jeden monat bis zu|30gb",
    "|10.99€",
-   "|100mb",
    "|10gb",
    "|14.99€",
    "|19.99€",
@@ -183,12 +182,13 @@
    "|360€",
    "|40gb",
    "|50gb",
+   "|50mb",
    "|6.99€",
    "|60gb",
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -203,6 +203,7 @@
    "|19.99€",
    "|240€",
    "|48€",
+   "|49.99€",
    "|4gb",
    "|50gb",
    "|50mb",
@@ -214,7 +215,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -229,28 +230,30 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
-   "ab dem monat|12.99€",
-   "ab dem monat|14.99€",
-   "ab dem monat|9.99€",
    "du innerhalb der ersten|19monate",
+   "max.|100mb",
    "max.|50mb",
-   "monat laufzeit anschlusspreis|9.99€",
+   "monat laufzeit anschlusspreis|19.99€",
    "monate laufzeit anschlusspreis|0€",
    "normal surfer|40gb",
    "viel surfer|280gb",
    "wenig surfer|10gb",
+   "|19.99€",
    "|1monat",
+   "|24.99€",
    "|24monate",
+   "|29.99€",
+   "|33%",
    "|50%",
    "|52%",
-   "|55%",
+   "|60%",
    "|99€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -275,7 +278,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -454,7 +457,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -472,6 +475,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-08-15"
+  "stand": "2026-08-17"
  }
 }
