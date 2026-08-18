@@ -63,7 +63,8 @@ def _resolve_item_url(item_url: str | None, brand_url: str) -> str:
 def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                     language: str = "Deutsch", max_workers: int = 4,
                     settings: dict | None = None,
-                    score_model: str | None = None) -> dict:
+                    score_model: str | None = None,
+                    extract_model: str | None = None) -> dict:
     """Fuehrt den Promo-Uebersicht-Zweig aus. Gibt einen Status-Dict fuer das
     Protokoll zurueck. Wirft nur bei fatalen Konfigurationsfehlern - einzelne
     Quellenfehler werden pro Quelle abgefangen und geloggt.
@@ -166,7 +167,12 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                 results.append(rec)
                 continue
             if use_llm and text.strip():
-                items = extract_promos(src_name, text, model, links=links)
+                # Extraktion ist Mechanik (Angebote aus HTML lesen), die
+                # Promo-Redaktion unten (promo_editor.synthesize) bleibt auf
+                # dem Redaktionsmodell - dieselbe Trennung wie in der
+                # Hauptpipeline (_mechanik_modell).
+                items = extract_promos(src_name, text,
+                                       extract_model or model, links=links)
                 for it in items:
                     it["tier"] = rec["tier"]
                     it["url"] = _resolve_item_url(it.get("url"), page_url)

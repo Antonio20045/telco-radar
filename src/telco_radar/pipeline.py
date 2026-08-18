@@ -176,6 +176,22 @@ def _modelle_fuer_anbieter(settings: dict, anbieter: str,
             settings.get("editor_model", fallback_model))
 
 
+def _mechanik_modell(settings: dict, anbieter: str, fallback: str) -> str:
+    """Das Modell der MECHANIK-Stufen (Uebersetzung, Clustering-Pruefung,
+    Beleg-Pruefung, Promo-Extraktion/-Score, Kategorie-Sweep, CT-Radar,
+    Diff-Kurator).
+
+    Diese Stufen brauchen kein Urteil, nur Fleiss - und ein Denkspur-Modell
+    wie deepseek-v4-pro bezahlt je Aufruf ~8-9k Token Nachdenken, egal wie
+    klein die Aufgabe ist (18.08.2026, der groesste Kostenposten des Laufs).
+    Der Schluessel folgt demselben Muster wie _modelle_fuer_anbieter
+    (`<anbieter>_mechanik_model`); fehlt er, laeuft alles wie bisher auf dem
+    uebergebenen Modell - ein Anbieter ohne den Eintrag verhaelt sich exakt
+    wie vor dieser Aenderung.
+    """
+    return str(settings.get(f"{anbieter}_mechanik_model") or "").strip() or fallback
+
+
 def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
     """Entscheidet, ob die zweistufige Redaktion laeuft.
 
@@ -277,10 +293,12 @@ def run(root: Path, use_llm: bool | None = None,
     # burns 4x the retry budget and the job timeout kills the run before it can
     # publish anything. Register the (smaller, still-served) analyst model as
     # the stand-in - used only after the editor model has failed hard once.
+    mechanik_model = _mechanik_modell(cfg.settings, anbieter, analyst_model)
     if cfg.settings.get("editor_model_fallback", True) and analyst_model:
         llm.set_fallback(editor_model, analyst_model)
-    log.info("LLM backend: %s | analyst=%s editor=%s (Ausweichmodell: %s)",
-             active_backend(), analyst_model, editor_model,
+    log.info("LLM backend: %s | analyst=%s editor=%s mechanik=%s "
+             "(Ausweichmodell: %s)",
+             active_backend(), analyst_model, editor_model, mechanik_model,
              analyst_model if analyst_model != editor_model else "keins")
     # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
     max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
@@ -367,8 +385,8 @@ def run(root: Path, use_llm: bool | None = None,
             # vollstaendig weiter, nur ohne die Aussortierstufe.
             ct_items, ct_bilanz = ct_log.sammle(
                 root, cfg.settings.get("http", {}),
-                modell=(analyst_model if (use_llm is not False
-                                          and llm_available()) else ""))
+                modell=(mechanik_model if (use_llm is not False
+                                           and llm_available()) else ""))
             items.extend(ct_items)
         except Exception as exc:  # noqa: BLE001
             log.error("CT-Radar uebersprungen: %s", exc)
@@ -432,7 +450,7 @@ def run(root: Path, use_llm: bool | None = None,
     cluster_store = clustering.ClusterStore(state_dir / "clusters.jsonl")
     gruppen = clustering.gruppiere(
         sorted(new_items, key=_sort_key, reverse=True),
-        model=analyst_model,
+        model=mechanik_model,
         use_llm=bool(use_llm and cfg.settings.get("cluster_llm_pruefung", True)),
         max_llm_pruefungen=cfg.settings.get("cluster_max_llm_pruefungen"))
 
@@ -638,7 +656,7 @@ def run(root: Path, use_llm: bool | None = None,
         alle = [h for r in regional.values() for h in r.get("highlights", [])]
         ctm_bilanz = ctm_mod.veredle(alle, fokus)
         beleg_bilanz = faithfulness.pruefe(
-            alle, model=analyst_model,
+            alle, model=mechanik_model,
             use_llm=bool(use_llm and new_items
                          and cfg.settings.get("ctm_belegpruefung", True)))
         log.info("CTM-Linse: %d direkt / %d uebertragbar / %d Kontext / "
@@ -776,7 +794,7 @@ def run(root: Path, use_llm: bool | None = None,
         diff_store = DiffStore(state_dir / "differentiation.jsonl")
         added = diff_curator.curate(
             flat_new, diff_store, date.today().isoformat(),
-            model=editor_model, use_llm=bool(use_llm and new_items))
+            model=mechanik_model, use_llm=bool(use_llm and new_items))
         log.info("Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
                  len(added), len(diff_store))
     except Exception as exc:  # noqa: BLE001
@@ -790,7 +808,7 @@ def run(root: Path, use_llm: bool | None = None,
     try:
         category_sweep.run_sweep(
             state_dir, os.environ.get("BRAVE_API_KEY", ""),
-            editor_model, bool(use_llm), date.today().isocalendar()[1])
+            mechanik_model, bool(use_llm), date.today().isocalendar()[1])
     except Exception as exc:  # noqa: BLE001
         log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
@@ -807,7 +825,8 @@ def run(root: Path, use_llm: bool | None = None,
             promo_result = run_promo_stage(
                 root, cfg.settings.get("http", {}), bool(use_llm),
                 editor_model, language=language, settings=cfg.settings,
-                score_model=analyst_model or editor_model)
+                score_model=mechanik_model,
+                extract_model=mechanik_model)
             log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
                      promo_result.get("mode"), promo_result.get("active", 0))
         except Exception as exc:  # noqa: BLE001
@@ -975,6 +994,7 @@ def run(root: Path, use_llm: bool | None = None,
         "models": {
             "analyst": analyst_model if (use_llm and new_items) else None,
             "editor": editor_model if editor_used else None,
+            "mechanik": mechanik_model if (use_llm and new_items) else None,
             # Models the provider stopped serving mid-run. Visible in
             # protokoll.html so a degraded run is recognisable as such instead
             # of looking like a thin news week.
@@ -1102,7 +1122,7 @@ def run(root: Path, use_llm: bool | None = None,
     else:
         try:
             uebersetzung_bilanz = uebersetzung_stufe.lauf(
-                _ueb_items, root, cfg.settings, editor_model,
+                _ueb_items, root, cfg.settings, mechanik_model,
                 frist_sekunden=_ueb_budget, heute=today)
             log.info("%s", uebersetzung_stufe.protokollzeile(uebersetzung_bilanz))
             run_log["uebersetzung"] = {

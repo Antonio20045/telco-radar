@@ -45,7 +45,7 @@ zur Originalquelle.
 |---|---|
 | Live-Website | https://telco-radar.onrender.com (Render **Static Site** → CDN, schläft nie, kostenlos) |
 | GitHub-Repo | https://github.com/Antonio20045/telco-radar (public, Account **Antonio20045**) |
-| GitHub Actions | Repo → Actions → Workflow „Telco Radar Run" |
+| GitHub Actions | Repo → Actions → Workflow „Telco Radar Run" (Cron **Mi + Fr 11:00 UTC** seit 18.08.2026 — 08:30 UTC lag mitten in DeepSeeks Pekinger Stoßzeit mit doppelten Tokenpreisen) |
 | Render-Service | dashboard.render.com → Static Site **telco-radar** (Service-ID `srv-d9cil1vaqgkc73f7ugd0`) |
 
 Antonio ist in Chrome bei **GitHub (Antonio20045)** und **Render** eingeloggt.
@@ -1567,7 +1567,44 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (17.08.2026, Antonio direkt): der unsichtbare
+> **Zuletzt erledigt (18.08.2026, Antonio direkt): die Kostenkrise der
+> Läufe.** Vier Befunde in einem Tag, alle gemessen: (1) **v4-pro schreibt
+> je Aufruf ~8–9k Token Denkspur** und war mit `max_tokens=8000` fertig,
+> bevor die Antwort begann — 41 von ~60 Analysten-Stapeln in Lauf #97
+> bezahlt, aber ohne Ergebnis; alle Budgets ≤8000 stehen jetzt auf 16000
+> (`test_die_stufen_mit_kleinem_budget_sind_hochgezogen` hält die neue
+> Untergrenze). (2) Die Denkspur wird als AUSGABE abgerechnet und ist der
+> größte Kostenposten: **Mechanik-Stufen laufen deshalb auf
+> `deepseek_mechanik_model` (v4-flash, ⅓ des Preises)** — Übersetzung,
+> Clustering-/Beleg-Prüfung, Promo-Extraktion/-Score, Kategorie-Sweep,
+> CT-Radar, Diff-Kurator (`_mechanik_modell()` in pipeline.py; fehlt der
+> Eintrag, verhält sich ein Anbieter exakt wie vorher). Analyst, Redaktion,
+> Themen-Agent, Wettbewerber bleiben auf pro. (3) **Der Cron lief mitten in
+> DeepSeeks Pekinger Stoßzeit** (08:30 UTC = 16:30 CST, alle Preise ×2) —
+> jetzt Mi + Fr 11:00 UTC. (4) Der 402-Schnellabbruch und der
+> Seen-Store-Stapelschutz haben in vier degenerierten Läufen (#94–#97)
+> gehalten: kein Datenverlust, aber auch keine vollständige Ausgabe — live
+> steht die manuell wiederhergestellte vom 17.08. (380 Meldungen, 13×
+> Pixel; Prosabericht und Highlight-Themenseite fehlen weiter, weil bisher
+> JEDES Guthaben vor der Redaktionsstufe leer war).
+>
+> **OFFEN daraus:**
+> 1. **Ein gesunder Lauf mit Guthaben** ist weiter der eine fehlende
+>    Schritt für Prosabericht + Pixel-Themenseite. Erwartete Kosten je Lauf
+>    nach den Änderungen: ~0,30–0,60 $ (vorher 2–4 $ zur Stoßzeit).
+> 2. **v4-flash ist auf der DIREKTEN DeepSeek-API nie gemessen** — die
+>    Messwerte in settings.yaml stammen vom NVIDIA-Endpunkt. Nach dem
+>    ersten Lauf prüfen: liefert die Übersetzungsstufe echte Übersetzungen
+>    (nicht „zusammengefasst statt übersetzt"), und hält die
+>    Beleg-Prüfung ihr Niveau?
+> 3. **Kostenzähler je Stufe** (Konzept-Punkt 4) und **Not-Aus je Lauf**
+>    (Punkt 5) sind besprochen, aber nicht gebaut.
+> 4. **Wo Antonios Aufladungen geblieben sind, ist ungeklärt** — zwischen
+>    07:53 UTC (letzter 402) und der Meldung „wieder leer" hat der Radar
+>    keinen bezahlten Call gemacht. Usage-Seite bei DeepSeek prüfen;
+>    teilt sich jemand den Key?
+
+> **Davor erledigt (17.08.2026, Antonio direkt): der unsichtbare
 > Pixel-Launch und die tote Highlight-Themen-Mechanik.** Antonio: *„das
 > Google-Pixel ist launcht und ich sehe dazu absolut gar nichts auf der
 > Seite … nicht nur, dass ich nicht die Highlightseite sehe, ich sehe halt

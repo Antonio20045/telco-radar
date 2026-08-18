@@ -502,6 +502,28 @@ def test_kein_anbieter_erbt_die_modell_id_eines_anderen():
         assert editor == settings[editor_key]
 
 
+def test_mechanik_stufen_haben_ein_eigenes_guenstiges_modell():
+    """Kostensenkung vom 18.08.2026: v4-pro schreibt je Aufruf ~8-9k Token
+    Denkspur - bei 150+ Aufrufen je Lauf der groesste Kostenposten. Die
+    Mechanik-Stufen (Uebersetzung, Clustering-/Beleg-Pruefung, Promo-
+    Extraktion, Sweep, CT-Radar, Diff-Kurator) laufen deshalb auf einem
+    eigenen Modell; fehlt der Eintrag, verhaelt sich der Anbieter exakt wie
+    vorher (Rueckfall auf das uebergebene Modell - der Anthropic-Pfad ist
+    unveraendert)."""
+    from telco_radar.pipeline import _mechanik_modell
+
+    settings = {"deepseek_mechanik_model": "deepseek-v4-flash"}
+    assert _mechanik_modell(settings, "deepseek", "deepseek-v4-pro") == "deepseek-v4-flash"
+    assert _mechanik_modell(settings, "anthropic", "claude-sonnet-5") == "claude-sonnet-5"
+    assert _mechanik_modell({}, "deepseek", "deepseek-v4-pro") == "deepseek-v4-pro"
+    # Und die echte Konfiguration traegt den Eintrag wirklich - eine Zahl
+    # in der Doku ist erst wahr, wenn ein Test sie gegen die Daten haelt.
+    import yaml
+    from pathlib import Path
+    echte = yaml.safe_load(Path("config/settings.yaml").read_text(encoding="utf-8"))
+    assert echte.get("deepseek_mechanik_model") == "deepseek-v4-flash"
+
+
 # ------------------------------------------------- Sprungnavigation (Etappe 2)
 def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
     """2863 Woerter in elf Abschnitten standen als ein Block ohne Einstieg

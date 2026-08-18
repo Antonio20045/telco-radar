@@ -6,8 +6,11 @@ on:
     # Germany, even when GitHub delays a scheduled run or NVIDIA is busy.
     # Mi + Fr seit 18.08.2026 (vorher Di + Fr): Antonio wollte nach den
     # manuellen Laeufen vom 18.08. keinen zweiten Lauf am selben Tag mehr.
-    # Zurueck auf Di + Fr ist wieder eine Zeile: "30 8 * * 2,5".
-    - cron: "30 8 * * 3,5" # every Wednesday and Friday 08:30 UTC (~10:30 DE summer / 09:30 winter)
+    # 11:00 statt 08:30 UTC seit 18.08.2026: 08:30 UTC ist 16:30 Uhr in
+    # Peking - mitten in DeepSeeks Stosszeit (9-12 und 14-18 Uhr CST), in
+    # der ALLE Tokenpreise verdoppelt sind. 11:00 UTC = 19:00 CST liegt
+    # dahinter und halbiert die Laufkosten mit einer Zeile.
+    - cron: "0 11 * * 3,5" # every Wednesday and Friday 11:00 UTC (~13:00 DE summer / 12:00 winter), off-peak fuer DeepSeek
   workflow_dispatch:
     inputs:
       lookback_days:

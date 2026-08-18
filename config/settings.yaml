@@ -82,6 +82,16 @@ bedrock_editor_model: ""
 deepseek_api_base: "https://api.deepseek.com"
 deepseek_analyst_model: "deepseek-v4-pro"
 deepseek_editor_model: "deepseek-v4-pro"
+# Das Modell der MECHANIK-Stufen (Uebersetzung, Clustering-Pruefung,
+# Beleg-Pruefung, Promo-Extraktion und -Score, Kategorie-Sweep, CT-Radar,
+# Diff-Kurator). Diese Stufen brauchen kein Urteil, nur Fleiss - und
+# v4-pro schreibt seit 08/2026 je Aufruf ~8-9k Token Denkspur, die als
+# Ausgabe abgerechnet wird, egal wie klein die Aufgabe ist. flash kostet
+# ein Drittel (0,14/0,28 $/M) und denkt kurz. Analyst, Redaktion,
+# Themen-Agent und Wettbewerber-Analyse bleiben auf pro - dort entsteht
+# die Qualitaet (Antonios Entscheidung vom 06.08.2026 bleibt unberuehrt).
+# Leer lassen = alles laeuft wie vorher auf dem Analystenmodell.
+deepseek_mechanik_model: "deepseek-v4-flash"
 
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"
