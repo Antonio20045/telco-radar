@@ -25,7 +25,7 @@ from .sprache import sprachname
 
 log = logging.getLogger(__name__)
 
-MAX_TOKENS = 8000
+MAX_TOKENS = 16000
 
 # Wie viele Zeichen Original in EINEN Modellaufruf gehen. Konservativ
 # gerechnet: deutscher Text ist rund 15 % laenger als englischer oder
@@ -138,7 +138,7 @@ def uebersetze_titel(titel: str, sprache: str, modell: str) -> str:
         antwort = _saeubern(llm.complete(
             TITEL_SYSTEM,
             f"Ueberschrift ({sprachname(sprache)}):\n{titel}",
-            modell, max_tokens=1000))
+            modell, max_tokens=16000))
     except Exception as exc:  # noqa: BLE001
         log.debug("Titeluebersetzung fehlgeschlagen: %s", exc)
         return ""

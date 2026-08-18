@@ -188,7 +188,7 @@ def synthesize(entries: list[dict], theme_labels: dict[str, str], model: str,
         return build_digest(entries, theme_labels)
     raw = complete(
         DIFFERENTIATION_EDITOR_SYSTEM + f"\nBerichtssprache: {language}.",
-        _payload(entries, theme_labels), model=model, max_tokens=4200)
+        _payload(entries, theme_labels), model=model, max_tokens=16000)
     markdown = raw.strip()
     validate_briefing(markdown)
     return markdown

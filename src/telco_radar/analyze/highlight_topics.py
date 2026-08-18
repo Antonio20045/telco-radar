@@ -102,7 +102,7 @@ MAX_ITEMS_JE_THEMA = 80
 # MAX_RUNS_OHNE_ZUWACHS.
 ARCHIV_TAGE = 14
 
-_TOKENS = 8000
+_TOKENS = 16000
 
 
 # ---------------------------------------------------------------- Speicher
