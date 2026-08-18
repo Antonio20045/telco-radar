@@ -4,7 +4,10 @@ on:
   schedule:
     # Start early enough that the report is normally live before midday in
     # Germany, even when GitHub delays a scheduled run or NVIDIA is busy.
-    - cron: "30 8 * * 2,5" # every Tuesday and Friday 08:30 UTC (~10:30 DE summer / 09:30 winter)
+    # Mi + Fr seit 18.08.2026 (vorher Di + Fr): Antonio wollte nach den
+    # manuellen Laeufen vom 18.08. keinen zweiten Lauf am selben Tag mehr.
+    # Zurueck auf Di + Fr ist wieder eine Zeile: "30 8 * * 2,5".
+    - cron: "30 8 * * 3,5" # every Wednesday and Friday 08:30 UTC (~10:30 DE summer / 09:30 winter)
   workflow_dispatch:
     inputs:
       lookback_days:
