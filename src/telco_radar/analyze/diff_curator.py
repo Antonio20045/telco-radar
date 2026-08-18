@@ -155,7 +155,7 @@ def _llm_judge(candidates: list[dict], model: str) -> list[dict]:
     try:
         raw = complete(_CURATOR_SYSTEM,
                        json.dumps(payload, ensure_ascii=False),
-                       model=model, max_tokens=1500)
+                       model=model, max_tokens=16000)
         verdicts = extract_json(raw)
         keep_idx = {int(v["i"]) for v in verdicts
                     if isinstance(v, dict) and v.get("keep")}

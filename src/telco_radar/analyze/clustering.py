@@ -419,7 +419,7 @@ def _frage_modell(a: Item, b: Item, model: str) -> bool:
     # 8000 ist die Untergrenze, die sich bewaehrt hat: ein kleineres Budget
     # sieht wie eine tote Quelle aus, weil ein denkendes Modell damit fertig
     # ist, bevor die Antwort anfaengt (Laeufe #83-85).
-    roh = complete(_PRUEF_SYSTEM, user, model=model, max_tokens=8000)
+    roh = complete(_PRUEF_SYSTEM, user, model=model, max_tokens=16000)
     return bool(extract_json(roh).get("gleich"))
 
 

@@ -468,7 +468,7 @@ THEMEN_H2 = "## Technologie, Geräte & Regulierung"
 # Ein Bereichsabschnitt ist kurz; die Chefredaktion laeuft ueber _ein_versuch()
 # und teilt sich das grosse Budget (EDITOR_MAX_TOKENS) mit dem einstufigen
 # Editor - dieselbe Aufgabe, dieselbe Denk- und Themenlistenlast.
-BEREICH_MAX_TOKENS = 8000
+BEREICH_MAX_TOKENS = 16000
 
 # Wie viele Meldungen eines Bereichs die Chefredaktion zu sehen bekommt. Der
 # ganze Sinn der zweiten Stufe ist, dass ihre Eingabe an der Zahl der BEREICHE

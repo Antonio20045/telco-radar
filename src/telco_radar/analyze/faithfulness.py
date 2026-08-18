@@ -172,7 +172,7 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
             # 8000 ist die Untergrenze, die sich bewaehrt hat (Laeufe #83-85):
             # ein denkendes Modell ist mit einem kleineren Budget fertig,
             # bevor die Antwort anfaengt, und liefert einen leeren String.
-            roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=8000)
+            roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=16000)
             urteile = {int(u.get("id", -1)): u
                        for u in (extract_json(roh).get("urteile") or [])}
         except (ValueError, RuntimeError, KeyError, TypeError) as exc:

@@ -282,7 +282,14 @@ def analyze_region(region_name: str, items: list[Item], model: str,
             + _items_payload(batch)
         )
         try:
-            raw = complete(system, user, model=model, max_tokens=8000)
+            # 16000, nicht 8000: am 18.08.2026 dachte deepseek-v4-pro je
+            # Stapel ~31.000 Zeichen Denkspur und war mit 8000 fertig, BEVOR
+            # die Antwort begann (finish_reason=length) - 41 von ~60 Stapeln
+            # fielen so aus, und der Lauf sah aus wie eine duenne Woche.
+            # Dieselbe Fehlerklasse wie CLAUDE.md §6 (Laeufe #83-85), nur
+            # eine Budgetstufe hoeher. Die Denkspur wird als Ausgabe
+            # abgerechnet, das Budget muss Denken PLUS Antwort tragen.
+            raw = complete(system, user, model=model, max_tokens=16000)
             return extract_json(raw)
         except (ValueError, RuntimeError, KeyError) as exc:
             log.error("Analyst %s batch %d/%d failed: %s - skipping batch",

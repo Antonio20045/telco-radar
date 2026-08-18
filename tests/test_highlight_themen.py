@@ -132,7 +132,15 @@ def test_kandidatensuche_verlangt_mehrere_quellen():
 
 
 def test_kandidatensuche_verlangt_genug_meldungen():
-    assert ht.finde_kandidaten(LAUNCH[:4] + RAUSCHEN) == []
+    """Drei Meldungen sind keine Welle. Vier reichen seit dem 17.08.2026:
+    der Pixel-11-Launch stand am 14.08. mit vier Highlights aus vier Quellen
+    im Bericht (darunter die Prioritaet-5-Meldung der Woche) und fiel an der
+    alten Schwelle 5 - der Schutz vor der einzelnen Redaktion, die nachlegt,
+    liegt bei MIND_QUELLEN, nicht bei der Gruppengroesse."""
+    assert ht.finde_kandidaten(LAUNCH[:3] + RAUSCHEN) == []
+    vier = ht.finde_kandidaten(LAUNCH[:4] + RAUSCHEN)
+    assert len(vier) == 1
+    assert {h["url"] for h in vier[0]["items"]} == {h["url"] for h in LAUNCH[:4]}
 
 
 # ------------------------------------------------------- Suchwortzuordnung
@@ -178,6 +186,94 @@ def test_dieselbe_meldung_kommt_nicht_zweimal_ins_thema(tmp_path, agent):
     thema = ht.lade_themen(tmp_path)[0]
     urls = [i["url"] for i in thema["items"]]
     assert len(urls) == len(set(urls)) == len(LAUNCH)
+
+
+# ------------------------------------------------- Archiv ueber die Laeufe
+def _bericht(reports_dir, datum: str, highlights: list[dict]) -> None:
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    (reports_dir / f"{datum}.json").write_text(json.dumps(
+        {"date": datum, "regions": {"Europa": {"highlights": highlights}}},
+        ensure_ascii=False), encoding="utf-8")
+
+
+def test_ereignis_ueber_zwei_laeufe_wird_gefunden(tmp_path, agent):
+    """Der Pixel-Befund vom 17.08.2026: ein Launch stand am 06.08. mit EINER
+    und am 14.08. mit VIER Meldungen im Bericht - in keinem Lauf allein
+    genug. Die Kandidatensuche liest deshalb das Berichtsarchiv mit; die
+    Meldungen behalten dabei die Woche, in der sie BERICHTET wurden."""
+    reports = tmp_path / "reports"
+    _bericht(reports, "2026-08-07", [LAUNCH[3]])
+
+    aufrufe = agent(_urteil())
+    # Ohne Archiv: drei Meldungen des laufenden Laufs sind zu wenig.
+    bilanz = ht.pflege_highlight_themen(LAUNCH[:3] + RAUSCHEN, tmp_path,
+                                        "2026-08-14", model="m", use_llm=True)
+    assert bilanz["kandidaten"] == 0 and not aufrufe
+
+    aufrufe = agent(_urteil())
+    bilanz = ht.pflege_highlight_themen(LAUNCH[:3] + RAUSCHEN, tmp_path,
+                                        "2026-08-14", model="m", use_llm=True,
+                                        reports_dir=reports)
+    assert bilanz["kandidaten"] == 1 and len(aufrufe) == 1
+    thema = ht.lade_themen(tmp_path)[0]
+    zuordnung = {i["url"]: i["week"] for i in thema["items"]}
+    assert len(zuordnung) == 4
+    assert zuordnung[LAUNCH[3]["url"]] == "2026-08-07"
+    assert all(zuordnung[h["url"]] == "2026-08-14" for h in LAUNCH[:3])
+
+
+def test_archiv_aelter_als_das_fenster_zaehlt_nicht(tmp_path, agent):
+    reports = tmp_path / "reports"
+    _bericht(reports, "2026-07-20", [LAUNCH[3]])  # 25 Tage vor "heute"
+    aufrufe = agent(_urteil())
+    bilanz = ht.pflege_highlight_themen(LAUNCH[:3] + RAUSCHEN, tmp_path,
+                                        "2026-08-14", model="m", use_llm=True,
+                                        reports_dir=reports)
+    assert bilanz["kandidaten"] == 0 and not aufrufe
+
+
+def test_ein_reines_archiv_ereignis_wird_kein_thema(tmp_path, agent):
+    """Das Archiv verstaerkt nur, was gerade Momentum hat: eine Gruppe
+    braucht MIND_AKTUELL Meldungen aus dem laufenden Lauf. Eine zwei Wochen
+    alte Welle, zu der diese Woche eine einzelne Meldung kommt, bekommt
+    keine Seite - sie wuerde als frisches Thema sofort zu altern beginnen."""
+    reports = tmp_path / "reports"
+    _bericht(reports, "2026-08-07", LAUNCH[1:])
+    aufrufe = agent(_urteil())
+    bilanz = ht.pflege_highlight_themen([LAUNCH[0]] + RAUSCHEN, tmp_path,
+                                        "2026-08-14", model="m", use_llm=True,
+                                        reports_dir=reports)
+    assert bilanz["kandidaten"] == 0 and not aufrufe
+
+
+def test_erfasstes_ereignis_wird_dem_agenten_nicht_erneut_vorgelegt(tmp_path, agent):
+    """Seit die Suche das Archiv mitliest, findet sie ein erkanntes Ereignis
+    in jedem Folgelauf erneut. Der Agent wird dafuer nicht noch einmal
+    gefragt - neue Meldungen erreichen das Thema ueber die Suchwoerter."""
+    reports = tmp_path / "reports"
+    aufrufe = agent(_urteil())
+    ht.pflege_highlight_themen(LAUNCH + RAUSCHEN, tmp_path, "2026-08-14",
+                               model="m", use_llm=True, reports_dir=reports)
+    assert len(ht.lade_themen(tmp_path)) == 1 and len(aufrufe) == 1
+
+    _bericht(reports, "2026-08-14", LAUNCH)
+    aufrufe = agent(_urteil())
+    bilanz = ht.pflege_highlight_themen(LAUNCH + RAUSCHEN, tmp_path,
+                                        "2026-08-15", model="m", use_llm=True,
+                                        reports_dir=reports)
+    assert bilanz["kandidaten"] == 0 and not aufrufe
+    assert len(ht.lade_themen(tmp_path)) == 1
+
+
+def test_der_seltenheitsdeckel_rechnet_je_ausgabe():
+    """Am zusammengelegten Korpus vom 15.08.2026 gemessen (610 Meldungen aus
+    sieben Ausgaben): n // 5 = 122 liesse "eine" (119x) als Bindewort durch,
+    und Fuellwort-Gruppen verdraengten die echten. Je Ausgabe gerechnet
+    bleibt der Deckel im kalibrierten Band."""
+    assert ht._seltenheitsdeckel(610, 1) == 122
+    assert ht._seltenheitsdeckel(610, 7) == 17
+    # Untergrenze: doppelte Mindestgruppe, auch bei winzigen Ausgaben.
+    assert ht._seltenheitsdeckel(10, 1) == 2 * ht.MIND_MELDUNGEN
 
 
 # ------------------------------------------------------------- Alterung
@@ -237,12 +333,20 @@ def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", model="m", use_llm=True)
 
     agent(RuntimeError("Anbieter antwortet nicht"))
+    # Der Nachschlag traegt ZWEI Dinge: neue Fold8-Meldungen (die per
+    # Suchwort ins bestehende Thema wandern und deshalb KEINEN neuen
+    # Kandidaten mehr bilden - _schon_erfasst) und ein zweites, fremdes
+    # Ereignis, das dem gescheiterten Agenten als Kandidat vorliegt.
     nachschlag = [
         _meldung("https://e.example/9", "Galaxy Fold8 nun auch in Indien", "Quelle E"),
         _meldung("https://f.example/10", "Samsung senkt Preis des Galaxy Fold8", "Quelle F"),
         _meldung("https://g.example/12", "Galaxy Fold8 ab Freitag im Handel", "Quelle G"),
         _meldung("https://e.example/13", "Galaxy Fold8 in Japan ausverkauft", "Quelle E"),
         _meldung("https://h.example/14", "Netzbetreiber buendeln Galaxy Fold8", "Quelle H"),
+        _meldung("https://p.example/1", "Ausfall im Kernnetz von Beta Telecom", "Quelle P"),
+        _meldung("https://q.example/2", "Beta Telecom entschuldigt sich fuer Kernnetz-Ausfall", "Quelle Q"),
+        _meldung("https://r.example/3", "Regulierer prueft Kernnetz-Ausfall bei Beta Telecom", "Quelle R"),
+        _meldung("https://s.example/4", "Beta Telecom nennt Ursache des Kernnetz-Ausfall", "Quelle S"),
     ] + RAUSCHEN
     bilanz = ht.pflege_highlight_themen(nachschlag, tmp_path, "2026-08-11",
                                         model="m", use_llm=True)

@@ -743,7 +743,8 @@ def run(root: Path, use_llm: bool | None = None,
         themen_bilanz = highlight_topics.pflege_highlight_themen(
             alle_highlights, state_dir, today_iso,
             model=analyst_model or editor_model,
-            use_llm=bool(use_llm and new_items))
+            use_llm=bool(use_llm and new_items),
+            reports_dir=reports_dir)
         log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
                  "beendet: %s", themen_bilanz["aktiv"],
                  themen_bilanz["kandidaten"],
