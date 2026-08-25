@@ -120,6 +120,21 @@
     "belastbarkeit": "niedrig",
     "plz": "40213",
     "quarantaene": ""
+   },
+   {
+    "produkt_ref": "iphone-topmodell",
+    "produkt_name": "Apple iPhone 17 Pro",
+    "anbieter": "winSIM",
+    "url": "https://www.winsim.de/handys/apple/iphone-17-pro",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
+    "verfuegbarkeit": "sofort",
+    "lieferzeit_roh": "Sofort lieferbar",
+    "tage_min": 0,
+    "tage_max": 0,
+    "methode": "text",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": ""
    }
   ],
   "samsung-flaggschiff|winSIM": [
@@ -234,6 +249,21 @@
     "anbieter": "winSIM",
     "url": "https://www.winsim.de/handys/samsung/galaxy-s26-ultra",
     "zeitstempel": "2026-08-21T11:20:51+00:00",
+    "verfuegbarkeit": "sofort",
+    "lieferzeit_roh": "Sofort lieferbar",
+    "tage_min": 0,
+    "tage_max": 0,
+    "methode": "text",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": ""
+   },
+   {
+    "produkt_ref": "samsung-flaggschiff",
+    "produkt_name": "Samsung Galaxy S26 Ultra",
+    "anbieter": "winSIM",
+    "url": "https://www.winsim.de/handys/samsung/galaxy-s26-ultra",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
     "verfuegbarkeit": "sofort",
     "lieferzeit_roh": "Sofort lieferbar",
     "tage_min": 0,
@@ -364,6 +394,21 @@
     "belastbarkeit": "niedrig",
     "plz": "40213",
     "quarantaene": "keine Lieferzeitangabe gefunden"
+   },
+   {
+    "produkt_ref": "sim-only",
+    "produkt_name": "SIM-Only-Tarif",
+    "anbieter": "winSIM",
+    "url": "https://www.winsim.de/5g-tarife",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
+    "verfuegbarkeit": "",
+    "lieferzeit_roh": "",
+    "tage_min": null,
+    "tage_max": null,
+    "methode": "",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": "keine Lieferzeitangabe gefunden"
    }
   ],
   "iphone-topmodell|PremiumSIM": [
@@ -478,6 +523,21 @@
     "anbieter": "PremiumSIM",
     "url": "https://www.premiumsim.de/handys/apple/iphone-17-pro",
     "zeitstempel": "2026-08-21T11:20:51+00:00",
+    "verfuegbarkeit": "sofort",
+    "lieferzeit_roh": "Sofort lieferbar",
+    "tage_min": 0,
+    "tage_max": 0,
+    "methode": "text",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": ""
+   },
+   {
+    "produkt_ref": "iphone-topmodell",
+    "produkt_name": "Apple iPhone 17 Pro",
+    "anbieter": "PremiumSIM",
+    "url": "https://www.premiumsim.de/handys/apple/iphone-17-pro",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
     "verfuegbarkeit": "sofort",
     "lieferzeit_roh": "Sofort lieferbar",
     "tage_min": 0,
@@ -608,6 +668,21 @@
     "belastbarkeit": "niedrig",
     "plz": "40213",
     "quarantaene": "keine Lieferzeitangabe gefunden"
+   },
+   {
+    "produkt_ref": "sim-only",
+    "produkt_name": "SIM-Only-Tarif",
+    "anbieter": "PremiumSIM",
+    "url": "https://www.premiumsim.de/",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
+    "verfuegbarkeit": "",
+    "lieferzeit_roh": "",
+    "tage_min": null,
+    "tage_max": null,
+    "methode": "",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": "keine Lieferzeitangabe gefunden"
    }
   ],
   "iphone-topmodell|otelo": [
@@ -730,8 +805,23 @@
     "belastbarkeit": "niedrig",
     "plz": "40213",
     "quarantaene": "keine Lieferzeitangabe gefunden"
+   },
+   {
+    "produkt_ref": "iphone-topmodell",
+    "produkt_name": "Apple iPhone 17 Pro",
+    "anbieter": "otelo",
+    "url": "https://www.otelo.de/handy-mit-vertrag/apple",
+    "zeitstempel": "2026-08-25T09:19:25+00:00",
+    "verfuegbarkeit": "",
+    "lieferzeit_roh": "",
+    "tage_min": null,
+    "tage_max": null,
+    "methode": "",
+    "belastbarkeit": "niedrig",
+    "plz": "40213",
+    "quarantaene": "keine Lieferzeitangabe gefunden"
    }
   ]
  },
- "stand": "2026-08-21"
+ "stand": "2026-08-25"
 }

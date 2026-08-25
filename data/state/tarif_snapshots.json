@@ -57,7 +57,7 @@
    "|5gb",
    "|63.49€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -83,7 +83,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -117,7 +117,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -151,7 +151,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -160,11 +160,11 @@
    "|10.99€",
    "|10gb",
    "|14.99€",
+   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
    "|216€",
-   "|264€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -175,7 +175,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -202,7 +202,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -217,7 +217,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -240,32 +240,26 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
-   "fußnote zu|10€",
-   "fußnote zu|25gb",
-   "jedes jahr|25gb",
-   "statt|15gb",
-   "statt|30gb",
-   "statt|60gb",
+   "fußnote zu|40€",
+   "statt|995€",
    "|0€",
-   "|100gb",
-   "|10€",
    "|12monate",
    "|1399€",
    "|1899€",
-   "|25gb",
    "|2999€",
+   "|299€",
+   "|40€",
    "|499€",
-   "|50gb",
    "|6999€",
    "|6monate",
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -391,7 +385,7 @@
    "vodafone mobil l|120gb",
    "von uns bis zu|12monate",
    "wenn du|80%",
-   "xs bis s mit|24monate",
+   "xs bis m mit|24monate",
    "xs gb zusätzlich insgesamt|20gb",
    "xs gb zusätzlich insgesamt|25gb",
    "xs gb zusätzlich insgesamt|26gb",
@@ -444,7 +438,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -452,7 +446,6 @@
    "ab|129€",
    "ab|179€",
    "ab|189€",
-   "ab|1€",
    "ab|49€",
    "ab|99€",
    "ab|9€",
@@ -462,6 +455,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-08-21"
+  "stand": "2026-08-25"
  }
 }
