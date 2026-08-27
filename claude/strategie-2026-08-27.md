@@ -170,3 +170,27 @@ für CTM-Stufen jenseits E6.
 Fünf Arbeitspakete (P0=E1–E3, P1=E4, P2=E6–E8, P3=E5, P4=E9–E10), jeweils
 mit Tests, die gegen den alten Stand durchfallen; volle Suite + Portal-Check
 am Ende; Branch `claude/highlight-pages-system-43s1d3`.
+
+## 6. Stand der Umsetzung & offene Entscheidungen (Stand 27.08., wird nachgeführt)
+
+**Läuft gerade in der Session vom 27.08.:** Workflow über P0–P4 →
+Integration (volle Testsuite) → adversarisches Review, danach ein
+Revisionspaket (E1: Vorsortierung + Batch 24 statt Modellwechsel; E3:
+Zähler warnt nur, kappt nie), dann geprüfter Push auf den Branch. **Wer
+diese Strategie in einer neuen Session aufnimmt: zuerst den Branch-Stand
+und dieses Kapitel lesen — NICHT bei null anfangen.** Ist der Branch noch
+ohne Code-Commits, ist die Umsetzung abgebrochen worden und dieses Dokument
+ist die Startgrundlage.
+
+**Nur diese zwei Entscheidungen stehen aus, beide bei Antonio:**
+1. **DeepSeek-Guthaben auffüllen** und auf der DeepSeek-Usage-Seite klären,
+   wohin die Aufladungen seit dem 15.08. geflossen sind (teilt sich jemand
+   den Key?). Ohne Guthaben trägt der Anthropic-Anker den ganzen Lauf —
+   funktional in Ordnung, aber auf Antonios Anthropic-Key.
+2. **Kostenrahmen bestätigen:** ~1,3–1,6 $ je Lauf (~11–13 $/Monat) mit pro
+   überall. Alternativen auf Ansage: Bereichsredakteure auf flash
+   (−0,3–0,4 $) oder Umfangsdeckel je Lauf.
+
+**Bewusst offen für einen SPÄTEREN Auftrag:** Quellenausbau
+Consumer-Fachpresse (B7 nennt die Richtung; braucht Netz-Massenläufe über
+`scripts/pruefe_quellenvorschlag.py`).
