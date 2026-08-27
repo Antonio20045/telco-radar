@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was diese Woche im Markt passiert ist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vf-red:#e60000; --vf-red-deep:#ac1811; --vf-ink:#25282b;
+    --vf-mute:#7e7e7e; --vf-canvas:#ffffff; --vf-neutral:#f2f2f2;
+    --font-display:'Inter','Helvetica Neue',Arial,sans-serif;
+    --slide-w:1920px; --slide-h:1080px;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
+  body{background:var(--vf-canvas);color:var(--vf-ink);
+    font-family:var(--font-display);font-size:22px}
+  .deck{position:fixed;inset:0;background:var(--vf-canvas);overflow:hidden}
+  .stage{position:absolute;width:var(--slide-w);height:var(--slide-h);
+    transform-origin:0 0;background:var(--vf-canvas);overflow:hidden}
+  .slide{position:absolute;inset:0;padding:120px;background:var(--vf-canvas);
+    opacity:0;visibility:hidden;transition:opacity 420ms var(--ease);
+    display:flex;flex-direction:column;justify-content:center}
+  .slide.active{opacity:1;visibility:visible}
+  .kicker{font-size:18px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--vf-mute);margin:0 0 28px}
+  .cover-title{font-size:104px;font-weight:800;letter-spacing:-.018em;
+    line-height:1.02;margin:0;max-width:1500px}
+  .cover-date{font-size:20px;color:var(--vf-mute);margin:38px 0 0;
+    letter-spacing:.06em}
+  .headline{font-size:60px;font-weight:800;letter-spacing:-.015em;
+    line-height:1.05;margin:0 0 56px;max-width:1500px}
+  .accent{color:var(--vf-red)}
+  .checklist{list-style:none;padding:0;margin:0;max-width:1500px}
+  .checklist li{font-size:30px;font-weight:500;line-height:1.4;
+    padding:0 0 26px 52px;position:relative}
+  .checklist li::before{content:"";position:absolute;left:0;top:16px;
+    width:26px;height:3px;background:var(--vf-red)}
+  .lede{font-size:30px;font-weight:500;line-height:1.4;margin:0 0 26px;
+    max-width:1400px}
+  .quellen{list-style:none;padding:0;margin:0;columns:2;column-gap:70px}
+  .quellen li{font-size:17px;line-height:1.45;color:var(--vf-ink);
+    margin:0 0 15px;break-inside:avoid}
+  .quellen a{color:var(--vf-mute);text-decoration:none;display:block;
+    font-size:14px;word-break:break-all}
+  .fussnote{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--vf-mute);margin:44px 0 0}
+  .footer{position:absolute;left:120px;right:120px;bottom:56px;
+    display:flex;justify-content:space-between;font-size:14px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--vf-mute)}
+  .progress{position:fixed;left:0;top:0;height:3px;background:var(--vf-red);
+    width:0;transition:width 300ms var(--ease);z-index:9}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck"><div class="stage" id="stage">
+<section class="slide" data-slide="1">
+  <p class="kicker">Telco Radar · Wochenbericht</p>
+  <h1 class="cover-title">Was diese Woche im Markt <span class="accent">passiert</span> ist</h1>
+  <p class="cover-date">Stand 2026-08-27</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-27</span><span>01 / 04</span></div>
+</section>
+<section class="slide" data-slide="2">
+  <h2 class="headline">Was diese Woche <span class="accent">passiert</span> ist</h2>
+  <ul class="checklist">
+    <li>Nufibre startet eSIM-Unlimited für 15 Pfund</li>
+    <li>O2: TV-Option für 6 Euro, Geräte ab 0</li>
+    <li>Vodafone Idea und BSNL teilen Netzinfrastruktur enger</li>
+  </ul>
+
+  <div class="footer"><span>Telco Radar · 2026-08-27</span><span>02 / 04</span></div>
+</section>
+<section class="slide" data-slide="3">
+  <h2 class="headline">Was das für uns <span class="accent">bedeutet</span></h2>
+  <p class="lede">Setzt im britischen Markt eine aggressive Preisuntergrenze für Unlimited-Tarife und zeigt das Muster einer eSIM-only-Zweitmarke. Vodafone sollte prüfen, ob eine eigene digitale Marke darauf schnell antworten muss.</p>
+  <p class="lede">Das ist eine direkte Vorlage für Vodafone: Eine günstige TV-Streaming-Option und eine niedrige 0-Euro-Geräteschwelle können genutzt werden, um Bestand zu binden und preissensible Wechsler abzufangen.</p>
+  <p class="lede">Stützt Vodafones indische Beteiligung gegen Reliance Jio und Bharti Airtel und sichert Zusatzumsatz. Die Mechanik ist eine mögliche Blaupause für Netzkostenteilung in Märkten, in denen Vodafone nicht allein ausbauen kann.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-27</span><span>03 / 04</span></div>
+</section>
+<section class="slide" data-slide="4">
+  <h2 class="headline">Quellen zum <span class="accent">Nachlesen</span></h2>
+  <ul class="quellen">
+    <li>ISPreview UK: Nufibre startet eSIM-Unlimited für 15 Pfund<a href="https://www.ispreview.co.uk/index.php/2026/08/broadband-isp-nufibre-launch-esim-based-unlimited-uk-mobile-plan.html">https://www.ispreview.co.uk/index.php/2026/08/broadband-isp-nufibre-launch-esim-based-unlimited-uk-mobile-plan.html</a></li>
+    <li>Telefónica: O2: TV-Option für 6 Euro, Geräte ab 0<a href="https://www.telefonica.com/en/communication-room/press-room/o2-offering-customers-benefits-movistar-e6-month-access-handsets-e0-tariffs/">https://www.telefonica.com/en/communication-room/press-room/o2-offering-customers-benefits-movistar-e6-month-access-handsets-e0-tariffs/</a></li>
+    <li>TelecomTalk: Vodafone Idea und BSNL teilen Netzinfrastruktur enger<a href="https://telecomtalk.info/vodafone-idea-bsnl-formalise-infrastructure-sharing/1011222/">https://telecomtalk.info/vodafone-idea-bsnl-formalise-infrastructure-sharing/1011222/</a></li>
+    <li>Vodafone Deutschland: Vodafone startet Danke-Deal: Mobilfunk zum halben Preis<a href="https://newsroom.vodafone.de/danke-deal-fuer-internet-kunden">https://newsroom.vodafone.de/danke-deal-fuer-internet-kunden</a></li>
+    <li>A1 Telekom Austria: A1 bündelt Streaming, Fitness und Lernen als Abo<a href="https://newsroom.a1.net/news-a1-startet-a1-select-die-einzigartige-abo-plattform-fuer-digitale-services-fuer-streaming-fitness-und-lernen-in-oesterreich?id=246701&amp;menueid=12657&amp;l=deutsch">https://newsroom.a1.net/news-a1-startet-a1-select-die-einzigartige-abo-plattform-fuer-digitale-services-fuer-streaming-fitness-und-lernen-in-oesterreich?id=246701&amp;menueid=12657&amp;l=deutsch</a></li>
+    <li>T-Mobile Polen (Deutsche Telekom): T-Mobile Polen bietet MagentaTV mit 75 Kanälen…<a href="https://www.telepolis.pl/artykuly/sponsorowane/tmobile-magenta-tv-telewizja-gratis">https://www.telepolis.pl/artykuly/sponsorowane/tmobile-magenta-tv-telewizja-gratis</a></li>
+    <li>Vodafone UK: Vodafone UK startet Pixel-11-Tarife ab 19,16 Pfund<a href="https://www.vodafone.co.uk/newscentre/press-release/google-pixel-11-series-available/">https://www.vodafone.co.uk/newscentre/press-release/google-pixel-11-series-available/</a></li>
+    <li>Vodafone Deutschland: Vodafone startet FRITZ!Box 6690 Pro für 9,99 Euro<a href="https://newsroom.vodafone.de/dieser-router-bringt-schnelles-internet-jetzt-noch-stabiler-in-die-wohnzimmer">https://newsroom.vodafone.de/dieser-router-bringt-schnelles-internet-jetzt-noch-stabiler-in-die-wohnzimmer</a></li>
+    <li>Telecom Handel: Vodafone startet Premium-Kabelrouter mit Wi-Fi 7<a href="https://www.telecom-handel.de/themen/consumer-communications/vodafone-nimmt-neuen-premium-router-fuer-kabelanschluesse-ins-portfolio">https://www.telecom-handel.de/themen/consumer-communications/vodafone-nimmt-neuen-premium-router-fuer-kabelanschluesse-ins-portfolio</a></li>
+    <li>TelecomTalk: Vodafone Idea verkauft 50-GB-Datenvoucher mit Jahreslaufzeit<a href="https://telecomtalk.info/vodafone-idea-rs-1189-plan-has-365-days-of-validity/1011208/">https://telecomtalk.info/vodafone-idea-rs-1189-plan-has-365-days-of-validity/1011208/</a></li>
+    <li>Virgin Media O2: O2 lockt Gamer mit Fortnite-Code in Priority App<a href="https://news.virginmediao2.co.uk/o2-celebrates-fortnites-newest-season-override-with-unique-code-thats-discoverable-at-the-o2-arena-and-in-the-priority-app/">https://news.virginmediao2.co.uk/o2-celebrates-fortnites-newest-season-override-with-unique-code-thats-discoverable-at-the-o2-arena-and-in-the-priority-app/</a></li>
+    <li>Deutsche Telekom: Telekom wirbt mit Ratgeber für erstes Kinder-Smartphone<a href="https://www.telekom.com/de/medien/medieninformationen/detail/sicher-ins-digitale-leben-1106778">https://www.telekom.com/de/medien/medieninformationen/detail/sicher-ins-digitale-leben-1106778</a></li>
+  </ul>
+  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in einer der oben verlinkten Quellen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-27</span><span>04 / 04</span></div>
+</section>
+</div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var current = 0, total = slides.length;
+  function fitStage() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var scale = Math.min(vw / 1920, vh / 1080);
+    stage.style.left = ((vw - 1920 * scale) / 2) + 'px';
+    stage.style.top = ((vh - 1080 * scale) / 2) + 'px';
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+    current = i;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1);
+  });
+  document.addEventListener('click', function (e) {
+    show(current + (e.clientX < window.innerWidth / 3 ? -1 : 1));
+  });
+  window.addEventListener('resize', fitStage);
+  fitStage(); show(0);
+})();
+</script>
+</body>
+</html>
