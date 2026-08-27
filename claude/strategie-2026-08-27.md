@@ -182,15 +182,60 @@ und dieses Kapitel lesen — NICHT bei null anfangen.** Ist der Branch noch
 ohne Code-Commits, ist die Umsetzung abgebrochen worden und dieses Dokument
 ist die Startgrundlage.
 
-**Nur diese zwei Entscheidungen stehen aus, beide bei Antonio:**
-1. **DeepSeek-Guthaben auffüllen** und auf der DeepSeek-Usage-Seite klären,
-   wohin die Aufladungen seit dem 15.08. geflossen sind (teilt sich jemand
-   den Key?). Ohne Guthaben trägt der Anthropic-Anker den ganzen Lauf —
-   funktional in Ordnung, aber auf Antonios Anthropic-Key.
-2. **Kostenrahmen bestätigen:** ~1,3–1,6 $ je Lauf (~11–13 $/Monat) mit pro
-   überall. Alternativen auf Ansage: Bereichsredakteure auf flash
-   (−0,3–0,4 $) oder Umfangsdeckel je Lauf.
+**Antonios Entscheidungen (27.08., beide gefallen):**
+1. **Kein DeepSeek-Auffüllen vorerst.** Konsequenz, ehrlich: Solange das
+   Konto leer ist, trägt der Anthropic-Anker den GANZEN Lauf (Analyst →
+   haiku, Redaktion → sonnet). Das funktioniert — kein Roh-Digest mehr —
+   läuft aber auf dem Anthropic-Key und ist voraussichtlich TEURER als der
+   DeepSeek-Pfad (grobe Schätzung 2,5–3,5 $ je Lauf; unsicher, der Zähler
+   misst es beim ersten Lauf). Wer das liest und der erste gemessene
+   Anker-Lauf liegt deutlich darüber: Antonio die Zahl zeigen, bevor
+   weitere Läufe laufen. Die Klärung auf der DeepSeek-Usage-Seite (wohin
+   gingen die Aufladungen seit 15.08.? teilt sich jemand den Key?) bleibt
+   offen und kann nur Antonio erledigen.
+2. **Kostenrahmen: 1,3–1,6 $ je Lauf ist akzeptiert — als OBERGRENZE.**
+   Antonio ist skeptisch, ob die Schätzung hält; genau dafür misst der
+   Zähler. Liegt der gemessene DeepSeek-Pfad über 1,6 $, ist die nächste
+   Stellschraube Bereichsredaktion auf flash (−0,3–0,4 $) oder ein
+   Umfangsdeckel — Entscheidung dann bei Antonio anhand der Zählerdaten,
+   nicht vorab.
 
 **Bewusst offen für einen SPÄTEREN Auftrag:** Quellenausbau
 Consumer-Fachpresse (B7 nennt die Richtung; braucht Netz-Massenläufe über
 `scripts/pruefe_quellenvorschlag.py`).
+
+## 7. Prompt für die nächste Session
+
+> Lies zuerst `claude/strategie-2026-08-27.md` VOLLSTÄNDIG — sie ist die
+> Auftragsgrundlage. Die Diagnose ist abgeschlossen und dort dokumentiert
+> (§1): wiederhole sie nicht, starte keine neuen Diagnose-Agenten, hole
+> keine Live-Seiten-Analysen nach. Prüfe dann den Stand des Branches
+> `claude/highlight-pages-system-43s1d3` gegen §6:
+>
+> 1. **Liegen die Code-Pakete P0–P4 + Vorsortierung committet auf dem
+>    Branch** (erkennbar an Commits jenseits der Strategie-Doku, u.a.
+>    `analyze/llm.py`, `analyze/vorsortierung.py`, `highlight_topics.py`)?
+>    Dann: volle Testsuite (`PYTHONPATH=src python -m pytest -q`) und
+>    `python scripts/pruefe_portal.py` laufen lassen, Befunde beheben, den
+>    Stand nach `main` mergen (Merge, kein Rebase), damit der nächste
+>    Cron-Lauf (Mi/Fr 11:00 UTC) mit dem neuen Code läuft. Danach §4
+>    (Messplan) gegen den nächsten Actions-Lauf abarbeiten und die
+>    Ergebnisse in §6 nachtragen.
+> 2. **Fehlen Pakete**, setze NUR die fehlenden um — §2 nennt je
+>    Entscheidung die Regel, §5/§6 den Zuschnitt. Jede Verhaltensänderung
+>    braucht einen Test, der gegen den alten Stand durchfällt.
+>
+> **Arbeitsweise (Token-Disziplin, bitte einhalten):** Kein erneutes
+> Einlesen des ganzen Repos — gezielt die Dateien lesen, die das jeweilige
+> Paket nennt; CLAUDE.md §5/§6 nur die Abschnitte, die dein Paket berührt.
+> Subagents nur für parallelisierbare mechanische Arbeit und dann auf
+> Sonnet oder Haiku, nie auf Opus/Fable für Routinearbeit. Erst gezielte
+> Tests je Änderung, die volle Suite genau EINMAL am Ende. Keine
+> Screenshots/Browser-Läufe, außer eine sichtbare Layout-Änderung wird
+> verifiziert. Kurze Statusmeldungen statt Zwischenberichte.
+>
+> **Was du NICHT tust:** DeepSeek-Guthaben voraussetzen (Antonio füllt
+> vorerst nicht auf — der Anthropic-Anker trägt den Lauf, siehe §6.1),
+> keinen Modellwechsel des Analysten (revidierte E1), keinen
+> Kosten-Not-Aus (revidierte E3: der Zähler warnt nur), keinen
+> Quellenausbau (eigener späterer Auftrag).
