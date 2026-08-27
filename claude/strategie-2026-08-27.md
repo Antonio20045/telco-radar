@@ -104,7 +104,7 @@ wertvollsten Quellen sind durchweg Fachpresse (Light Reading 55, Telecoms
 
 | # | Entscheidung | Begründung / Rückweg |
 |---|---|---|
-| E1 | **Analyst wechselt auf `deepseek-v4-flash`.** | Der Analyst ist ~90 % der 1,95 $. Antonios Vorgabe „inakzeptabel" schlägt die Entscheidung vom 06.08. („Analyst bleibt auf pro"). Flash hat die Ereignis-Prüfung nachweislich sauber bedient; die Relevanz-Kalibrierung von pro war ohnehin schief (B4). Rückweg: eine Zeile in settings.yaml. Zielkosten ≤0,50 $/Lauf. Chefredaktion, Bereichsredakteure, Themen-Agent, Wettbewerber bleiben auf pro (wenige Aufrufe, dort entsteht der Text). |
+| E1 | **Analyst bleibt auf v4-pro — die Token werden reduziert, nicht das Urteil.** (Revidiert 27.08. nach Antonios Einspruch gegen den Modellwechsel.) Vier Hebel: (a) **Vorsortierung auf flash** — heute bezahlt pro das Wegwerfen selbst (890 rein, 362 behalten); flash sortiert die offensichtlich Irrelevanten aus, pro bewertet nur die Kandidaten. Im Zweifel zu pro; Heimatmarkt-/CTM-Treffer umgehen die Vorsortierung. Von der Vorsortierung Aussortiertes gilt als gelesen; scheitert der flash-Aufruf, gehen die Meldungen ungefiltert zu pro (bzw. über den Stapelschutz in den nächsten Lauf). (b) **Batchgröße 15 → 24** — die ~8–9k Token Denkspur fallen je AUFRUF an, fast unabhängig von der Batchgröße; weniger Aufrufe = weniger Denkspur. max_tokens wächst mit (Lehre vom 18.08.). Die Denkspur selbst ist auf der direkten DeepSeek-API NICHT abschaltbar (der Parameter wirkt nur auf NVIDIAs Endpunkt, gemessen 07.08.). (c) E7 senkt die Ereigniszahl (Dubletten). (d) E9 Ballast. Erwartung: ~0,6–0,8 $ je Lauf bei vollem pro-Urteil. |
 | E2 | **Anthropic wird Rettungsanker, nicht Ersatz.** | `_dispatch` routet künftig pro Modell (`claude-*` → Anthropic-API), der Key wird nicht mehr gelöscht, und die Modellketten enden in Claude-Modellen: Redaktion/Themen/Wettbewerber → `claude-sonnet-5`, Mechanik/Übersetzung/Analyst → `claude-haiku-4-5-20251001`. Der Anker greift NUR, wenn DeepSeek tot ist — im Normalfall kostet er 0 $. Nie wieder ein Lauf ohne Bericht. |
 | E3 | **Echter Kostenzähler + Not-Aus.** | `llm.py` summiert `usage` je Aufruf (inkl. Reasoning-Token) je Stufe; Summe und €-Schätzung landen im run-JSON und auf transparenz.html. Ein Budget-Not-Aus (`llm_budget_usd`, Vorgabe 1,00 $) stoppt weitere **Analyst**-Batches, wenn die Schwelle erreicht ist — ungelesene Meldungen bleiben dank Stapelschutz aus dem Seen-Store und kommen im nächsten Lauf wieder. Redaktion/Übersetzung laufen weiter (sie sind billig und das sichtbare Produkt). |
 | E4 | **Highlight-Kandidaten: Spezifität schlägt Größe; Antizipation als zweiter Pfad.** | Rausch-Bindewörter (Quartals-/Finanzvokabular, bloße Firmennamen) werden nachrangig sortiert; Gruppen mit Produktname+Ereignissprache steigen. Zweiter Erkennungspfad für **bevorstehende Ereignisse** (keynote/event/launch + Datumsbezug) mit niedrigerer Schwelle (≥3 Meldungen, ≥2 Quellen). Der Agent bekommt den Fall „bevorstehendes Ereignis" mit Zieldatum; das Thema altert erst ab Event-Datum + 7 Tage statt über den Zuwachs-Zähler. |
@@ -125,10 +125,12 @@ für CTM-Stufen jenseits E6.
 
 ## 3. Premortem — woran das scheitern könnte
 
-1. **Flash-Analyst bewertet schlechter als pro.** Deshalb E8 (schärferer
-   Prompt) im selben Paket, und der Messauftrag unten: nach dem ersten
-   gesunden Lauf Relevanzverteilung und Stichprobe der Top-20 gegen den
-   14.08.-Bericht vergleichen. Rückweg ist eine Zeile.
+1. **Die Vorsortierung wirft eine wichtige Meldung weg.** Deshalb: flash
+   verwirft nur eindeutige Fälle, im Zweifel geht die Meldung zu pro,
+   CTM-/Heimatmarkt-Treffer umgehen die Stufe ganz, und die Protokollzeile
+   nennt die Zahl der Aussortierten. Messauftrag: nach dem ersten gesunden
+   Lauf stichprobenartig 20 Aussortierte lesen — ist eine dabei, die in den
+   Bericht gehört hätte, wird die Schwelle konservativer.
 2. **Der Anthropic-Anker wird teuer, wenn DeepSeek dauerhaft tot ist.** Der
    Anker deckt bewusst nur die Nach-Analyse-Stufen (wenige Dutzend Aufrufe);
    der Analyst fällt auf haiku (billigstes Claude-Modell). Der Kostenzähler
