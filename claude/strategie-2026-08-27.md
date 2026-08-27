@@ -106,7 +106,7 @@ wertvollsten Quellen sind durchweg Fachpresse (Light Reading 55, Telecoms
 |---|---|---|
 | E1 | **Analyst bleibt auf v4-pro — die Token werden reduziert, nicht das Urteil.** (Revidiert 27.08. nach Antonios Einspruch gegen den Modellwechsel.) Vier Hebel: (a) **Vorsortierung auf flash** — heute bezahlt pro das Wegwerfen selbst (890 rein, 362 behalten); flash sortiert die offensichtlich Irrelevanten aus, pro bewertet nur die Kandidaten. Im Zweifel zu pro; Heimatmarkt-/CTM-Treffer umgehen die Vorsortierung. Von der Vorsortierung Aussortiertes gilt als gelesen; scheitert der flash-Aufruf, gehen die Meldungen ungefiltert zu pro (bzw. über den Stapelschutz in den nächsten Lauf). (b) **Batchgröße 15 → 24** — die ~8–9k Token Denkspur fallen je AUFRUF an, fast unabhängig von der Batchgröße; weniger Aufrufe = weniger Denkspur. max_tokens wächst mit (Lehre vom 18.08.). Die Denkspur selbst ist auf der direkten DeepSeek-API NICHT abschaltbar (der Parameter wirkt nur auf NVIDIAs Endpunkt, gemessen 07.08.). (c) E7 senkt die Ereigniszahl (Dubletten). (d) E9 Ballast. **Erwartung ehrlich gerechnet: ~1,3–1,6 $ je GESUNDEM Lauf** — die 1,95 $ vom 27.08. waren ein unvollständiger Lauf (ohne Chefredaktion, Beleg-Prüfung, Promo, Übersetzungen, Themen-Agent; vollständig wären es ~2,2–2,5 $ gewesen). Die 18.08.-Schätzung „0,30–0,60 $" ist an genau dieser Stelle gescheitert: geschätzt ohne Zähler, gemessen nie. Deshalb ist E3 (echter Zähler je Stufe) Voraussetzung — nach dem ersten gemessenen Lauf wird nachkalibriert. Tiefer als ~1,3 $ geht nur über Antonios Stellschrauben: Bereichsredakteure auf flash (−0,3–0,4 $) und/oder Umfangsdeckel. |
 | E2 | **Anthropic wird Rettungsanker, nicht Ersatz.** | `_dispatch` routet künftig pro Modell (`claude-*` → Anthropic-API), der Key wird nicht mehr gelöscht, und die Modellketten enden in Claude-Modellen: Redaktion/Themen/Wettbewerber → `claude-sonnet-5`, Mechanik/Übersetzung/Analyst → `claude-haiku-4-5-20251001`. Der Anker greift NUR, wenn DeepSeek tot ist — im Normalfall kostet er 0 $. Nie wieder ein Lauf ohne Bericht. |
-| E3 | **Echter Kostenzähler + Not-Aus.** | `llm.py` summiert `usage` je Aufruf (inkl. Reasoning-Token) je Stufe; Summe und $-Schätzung landen im run-JSON und auf transparenz.html. Ein Budget-Not-Aus (`llm_budget_usd`, Vorgabe 1,50 $ — passend zur ehrlichen E1-Erwartung, damit nicht jeder gesunde Lauf hineinläuft) stoppt weitere **Analyst**-Batches, wenn die Schwelle erreicht ist — ungelesene Meldungen bleiben dank Stapelschutz aus dem Seen-Store und kommen im nächsten Lauf wieder. Redaktion/Übersetzung laufen weiter (sie sind das sichtbare Produkt). **Kein Lauf kann mehr ausgeben, als hier steht** — die Zahl gehört Antonio. |
+| E3 | **Echter Kostenzähler — er zählt NUR.** (Revidiert 27.08.: Antonio will keinen Lauf-Abbruch durch den Zähler.) `llm.py` summiert `usage` je Aufruf (inkl. Reasoning-Token) je Stufe; Summe und $-Schätzung landen im run-JSON und auf transparenz.html. `llm_budget_usd` (Vorgabe 1,50 $) ist eine reine **Warnschwelle**: Überschreitung erzeugt eine deutliche Protokoll- und Transparenz-Zeile, greift aber NIE in den Lauf ein — kein Batch wird gestoppt, nichts wird gekappt. Die harte Grenze bleibt das DeepSeek-Guthaben selbst; stirbt es, fängt der Anthropic-Anker (E2) die sichtbaren Stufen. |
 | E4 | **Highlight-Kandidaten: Spezifität schlägt Größe; Antizipation als zweiter Pfad.** | Rausch-Bindewörter (Quartals-/Finanzvokabular, bloße Firmennamen) werden nachrangig sortiert; Gruppen mit Produktname+Ereignissprache steigen. Zweiter Erkennungspfad für **bevorstehende Ereignisse** (keynote/event/launch + Datumsbezug) mit niedrigerer Schwelle (≥3 Meldungen, ≥2 Quellen). Der Agent bekommt den Fall „bevorstehendes Ereignis" mit Zieldatum; das Thema altert erst ab Event-Datum + 7 Tage statt über den Zuwachs-Zähler. |
 | E5 | **Englisch wird übersetzt.** | `MUTTERSPRACHEN = {"de"}`, Deckel 40 → 60 (settings), Priorisierung bleibt Berichtsreihenfolge, Zeitbudget bleibt gegen die Restzeit des Jobs. Übersetzungsmodell bleibt flash (Anker: haiku). Nicht jede Meldung wird eine Übersetzung bekommen — der Deckel schneidet nach Rang, das ist gewollt. |
 | E6 | **Rangschlüssel: Priorität führt, CTM bricht Gleichstand.** | Die am 15.08. dokumentierte Stelle. Alleine hätte sie heute nichts geändert (B4) — zusammen mit E7/E8 stellt sie sicher, dass „wichtig" wieder „Priorität" heißt. Der Test `test_direkte_meldung_steht_vor_der_dringlicheren` wird mit Begründung umgekehrt. |
@@ -143,17 +143,19 @@ für CTM-Stufen jenseits E6.
 4. **402 mitten im Anker-Betrieb** (auch Anthropic kann 429/529 werfen).
    Fail-Verhalten bleibt wie heute: gefangene Exception, Fallback-Digest,
    Stapelschutz — nur eben zwei Anbieter tief statt einem.
-5. **Budget-Not-Aus misst falsch** (Preistabelle veraltet). Die Tabelle
-   steht in settings.yaml neben dem Budget, beide an EINER Stelle; der
-   Zähler schreibt Token UND €-Schätzung, sodass eine falsche Tabelle am
-   Token-Ist auffällt.
+5. **Der Zähler misst falsch** (Preistabelle veraltet). Die Tabelle steht
+   in settings.yaml neben der Warnschwelle, beide an EINER Stelle; der
+   Zähler schreibt Token UND $-Schätzung, sodass eine falsche Tabelle am
+   Token-Ist auffällt. Da der Zähler nie eingreift, kostet ein Messfehler
+   nur eine falsche Warnzeile, nie einen Lauf.
 6. **Übersetzungsdeckel 60 sprengt die Laufzeit.** Das Zeitbudget rechnet
    weiter gegen die Restzeit des Jobs und bricht sauber ab; der Deckel
    schneidet nach Berichtsrang, die wichtigsten zuerst.
 
 ## 4. Messplan nach dem nächsten Actions-Lauf
 
-1. `run.kosten` im Report-JSON: Gesamt ≤0,50 $? Größter Posten?
+1. `run.kosten` im Report-JSON: Gesamt im Rahmen 1,3–1,6 $? Größter
+   Posten? Warnschwelle ausgelöst?
 2. `editor_used=true`? Wenn DeepSeek wieder leer: kam der Anker (Anker-Feld
    im Kostenblock)?
 3. `Highlight-Themen:`-Zeile: steht die Apple-Gruppe unter den Kandidaten,
