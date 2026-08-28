@@ -73,12 +73,18 @@ bedrock_editor_model: ""
 # Preis je 1M Token (Stand 08/2026): flash 0,14 $ ein / 0,28 $ aus,
 # pro 0,435 $ ein / 0,87 $ aus. Zu Pekinger Stosszeiten (9-12 und 14-18 Uhr)
 # kuendigt DeepSeek doppelte Preise an.
-# Beide Stufen laufen auf "pro" (Antonios Entscheidung vom 06.08.2026).
-# Vorher war der Analyst auf "flash", weil er ~25 Aufrufe je Lauf macht und
-# damit den Preis bestimmt. Das war am falschen Ende gespart: der Analyst
-# schreibt Ueberschrift, Zusammenfassung und Einordnung JEDER Meldung - also
-# genau den Text, der auf der Titelseite steht. Die Redaktion darunter kann
-# nur so gut sein wie das, was sie bekommt.
+# Beide Stufen laufen auf "pro" (Antonios Entscheidung vom 06.08.2026,
+# bestaetigt am 27.08.2026). Vorher war der Analyst auf "flash", weil er
+# ~25 Aufrufe je Lauf macht und damit den Preis bestimmt. Das war am falschen
+# Ende gespart: der Analyst schreibt Ueberschrift, Zusammenfassung und
+# Einordnung JEDER Meldung - also genau den Text, der auf der Titelseite
+# steht. Die Redaktion darunter kann nur so gut sein wie das, was sie bekommt.
+#
+# Am 27.08.2026 stand der Wechsel auf flash erneut zur Debatte (der Lauf
+# kostete 1,95 $, davon rund 90 % der Analyst). Antonio hat ihn erneut
+# abgelehnt: gespart wird an den TOKEN, nicht am Urteil - groessere Stapel
+# (weniger Denkspur je Meldung, siehe BATCH_SIZE in analyze/agents.py),
+# weniger Dubletten (E7) und weniger Ballastquellen (E9).
 deepseek_api_base: "https://api.deepseek.com"
 deepseek_analyst_model: "deepseek-v4-pro"
 deepseek_editor_model: "deepseek-v4-pro"
@@ -92,6 +98,89 @@ deepseek_editor_model: "deepseek-v4-pro"
 # die Qualitaet (Antonios Entscheidung vom 06.08.2026 bleibt unberuehrt).
 # Leer lassen = alles laeuft wie vorher auf dem Analystenmodell.
 deepseek_mechanik_model: "deepseek-v4-flash"
+
+# --------------------------------------------------------- Vorsortierung
+# Laeuft VOR dem Analysten auf dem Mechanik-Modell und sortiert die
+# offensichtlich Irrelevanten aus (Boilerplate, Kapitalmarkt-Formalia,
+# Zulieferer-PR ohne Marktfolge, Ratgebertexte). Anlass: am 27.08.2026 gingen
+# 890 Ereignisse in den Analysten und 362 kamen heraus - das WEGWERFEN
+# bezahlte damit das teuerste Modell der Kette.
+#
+# Was hier faellt, gilt als gelesen und kommt nicht wieder. Deshalb der
+# Schalter: zeigt die Stichprobe im Bericht-JSON (run.vorsortierung) nach dem
+# ersten Lauf eine Meldung, die in den Bericht gehoert haette, schaltet diese
+# eine Zeile die Stufe ab, und der Lauf verhaelt sich wie vor dem 27.08.2026.
+vorsortierung_enabled: true
+
+# Das Zeitbudget der Stufe in Sekunden - eine OBERGRENZE, keine Zuteilung.
+# Gerechnet wird gegen die Restzeit des Jobs abzueglich
+# `veroeffentlichung_reserve_sekunden` (pipeline.vorsortierung_budget), und
+# unterhalb einer Minute Rest faengt die Stufe gar nicht erst an.
+#
+# Der Unterschied zu `uebersetzung_frist_sekunden` und
+# `geraete_frist_sekunden` ist die POSITION: die Vorsortierung steht VOR dem
+# Analysten, also vor der laengsten Stufe des Laufs. Ueberzieht sie, kostet
+# das nicht ein paar Meldungen, sondern den Bericht. Was nach Ablauf der
+# Frist noch offen ist, geht UNGEFILTERT zum Analysten - teurer, aber
+# vollstaendig.
+vorsortierung_frist_sekunden: 480
+
+# ---------------------------------------------------------------- Anker
+# Der RETTUNGSANKER: an welchem Claude-Modell jede Kette endet, wenn der
+# gewaehlte Anbieter aussteigt. Er greift NUR nach einem harten Ausfall des
+# Primaermodells - im Normalfall kostet er nichts.
+#
+# Anlass (E2 der Strategie vom 27.08.2026): vom 15. bis zum 27.08. lief JEDER
+# Lauf ohne Redaktion, weil DeepSeeks Guthaben leer war (HTTP 402) und es
+# strukturell keinen Ausweg gab - llm.py waehlte sein Backend einmal je
+# Prozess, und die Pipeline loeschte den vorhandenen Anthropic-Schluessel
+# aktiv aus der Umgebung. Beides ist behoben: eine `claude-*`-Modell-ID geht
+# jetzt immer an die Anthropic-API.
+#
+# Ein leerer Wert (oder llm_anker: false) schaltet den Anker ab - dann
+# verhaelt sich der Lauf wie vor dem 27.08.2026.
+# "claude-haiku-4-5" ist derselbe Stand ohne Datumskennung.
+anker_redaktion_model: "claude-sonnet-5"
+anker_mechanik_model: "claude-haiku-4-5-20251001"
+
+# --------------------------------------------------------------- Kosten
+# WARNSCHWELLE je Lauf in USD - kein Not-Aus. Wird sie ueberschritten,
+# entsteht eine deutliche Zeile im Protokoll und eine auf transparenz.html;
+# in den Lauf greift der Zaehler NIE ein.
+#
+# Die erste Fassung stoppte bei Erreichen weitere Analysten-Stapel. Antonio
+# hat das am 27.08.2026 verworfen, und die Begruendung stand schon da: ein
+# Lauf, der auf halber Strecke aufhoert zu lesen, ist von einer duennen
+# Nachrichtenwoche nicht zu unterscheiden - genau das Bild der degenerierten
+# 402-Laeufe vom 15. bis 27.08. Die harte Grenze bleibt das Guthaben beim
+# Anbieter; stirbt es, faengt der Anker oben die sichtbaren Stufen.
+#
+# 1,50 $ ist an der ehrlichen Erwartung eines GESUNDEN Laufs kalibriert
+# (1,3-1,6 $, gerechnet am 27.08.2026 aus dem unvollstaendigen 1,95-$-Lauf).
+# Sie ist nicht gemessen - nach dem ersten Lauf mit echtem Zaehler
+# nachkalibrieren. 0 oder leer = keine Schwelle.
+llm_budget_usd: 1.50
+
+# Preise je 1 Mio Token, Stand 08/2026 - BEI PREISAENDERUNG NACHPFLEGEN.
+# Ein Modell ohne Zeile wird in Token gezaehlt, aber nicht beziffert; es
+# geht dann mit 0 $ in die Summe ein. Geraten wird nie - die Luecke steht
+# als `ohne_preis` im Kostenblock des Berichts.
+#
+# DeepSeek: api-docs.deepseek.com, dieselben Werte wie in
+# scripts/kostenrechnung.py. Zu Pekinger Stosszeiten (9-12 und 14-18 Uhr,
+# also 01-04 und 06-10 UTC) kuendigt DeepSeek doppelte Preise an; der Cron
+# liegt seit dem 18.08.2026 deshalb auf 11:00 UTC.
+# Anthropic: Listenpreise der Messages-API. Die Anker-Modelle sind mit
+# aufgenommen, damit ein Ankerlauf nicht als "unbeziffert" durchgeht.
+# Die `deepseek-ai/...`-IDs des NVIDIA-Endpunkts stehen bewusst NICHT hier:
+# was der dort kostet, ist nicht gemessen, und eine geratene Zahl waere
+# schlimmer als die Zeile "ohne Preis" im Kostenblock.
+llm_preise:
+  deepseek-v4-flash: {ein: 0.14, aus: 0.28}
+  deepseek-v4-pro: {ein: 0.435, aus: 0.87}
+  claude-sonnet-5: {ein: 2.00, aus: 10.00}
+  claude-haiku-4-5: {ein: 1.00, aus: 5.00}
+  claude-haiku-4-5-20251001: {ein: 1.00, aus: 5.00}
 
 llm_api_base: "https://integrate.api.nvidia.com/v1"
 openai_analyst_model: "deepseek-ai/deepseek-v4-flash"
@@ -506,10 +595,15 @@ uebersetzung_enabled: true
 # fremdsprachige uebrig. An der Ausgabe vom 14.08.2026 nachgerechnet: 58
 # berichtete Meldungen, 40 Kandidaten, 11 Uebersetzungen.
 #
+# Seit dem 27.08.2026 gilt Englisch nicht mehr als Muttersprache
+# (uebersetzung/sprache.py MUTTERSPRACHEN) - am Lauf vom 27.08. waren 143 von
+# 163 vorgefilterten Meldungen englisch. Der Kandidatenstrom waechst damit von
+# ~83 auf ~226 je Lauf, der Deckel deshalb von 40 auf 60.
+#
 # Der Deckel liegt bewusst darueber und ist trotzdem hart: eine Ausgabe mit
 # 193 Meldungen darf nicht den Lauf kosten. Wenn er greift, schneidet er die
 # unwichtigste Meldung weg - die Stufe arbeitet in Berichtsreihenfolge.
-uebersetzung_max_je_lauf: 40
+uebersetzung_max_je_lauf: 60
 
 # Das Zeitbudget der Stufe in Sekunden. Es ist eine OBERGRENZE, keine
 # Zuteilung: gerechnet wird gegen die Restzeit des Jobs abzueglich

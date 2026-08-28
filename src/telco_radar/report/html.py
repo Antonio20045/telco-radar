@@ -291,12 +291,14 @@ def _flatten(report: dict) -> list[dict]:
                 h["ctm_bezug"] = 1
             h.setdefault("ctm_label", ctm.STUFEN_LABEL.get(h["ctm_bezug"], ""))
             out.append(h)
-    # Sortiert wird nach der CTM-Achse VOR der Prioritaet. Das ist der
-    # eigentliche Eingriff des Auftrags vom 08.08.2026: die Prioritaet misst
-    # branchenweite Bedeutung, und danach sortiert stand "OpenAI macht ChatGPT
-    # gratis unbegrenzt" ueber der Telekom-Flat fuer 34,95 Euro - also das
-    # Weltereignis ueber der Preisfrage des eigenen Marktes.
-    out.sort(key=lambda h: (h["ctm_bezug"], h["relevance"], h.get("date") or ""),
+    # Sortiert wird mit demselben Schluessel wie die Titelseite
+    # (`_rangschluessel`, Strategie E6, 27.08.2026): die Prioritaet fuehrt,
+    # der CTM-Bezug bricht nur noch den Gleichstand. Bis zum 27.08.2026 fuehrte
+    # der CTM-Bezug - das war der Eingriff vom 08.08.2026, der "OpenAI macht
+    # ChatGPT gratis unbegrenzt" ueber die Telekom-Flat fuer 34,95 Euro stellen
+    # sollte. Am 27.08.2026 hat sich das gegen den Leser gewendet, siehe
+    # `_rangschluessel` fuer die Begruendung.
+    out.sort(key=lambda h: (*_rangschluessel(h), h.get("date") or ""),
              reverse=True)
     for i, h in enumerate(out):
         h["id"] = i
@@ -423,14 +425,29 @@ _WICHTIG_ZEILEN = 7
 
 
 def _rangschluessel(h: dict) -> tuple[int, int]:
-    """Der Rang einer Meldung: CTM-Bezug vor Prioritaet.
+    """Der Rang einer Meldung: Prioritaet vor CTM-Bezug.
 
-    Dieselben zwei Schluessel, nach denen `_flatten` und `_ctm_achse`
-    sortieren - hier als eigene Funktion, weil die Titelseite sie nicht nur
-    zum Sortieren braucht, sondern zum VERGLEICHEN: der rote Faden darf nur
-    unter Gleichrangigen waehlen (siehe `_titelseite`).
+    Antonio, 27.08.2026 (Strategie E6): "wie kann es sein dass artikel mit
+    prioriät von 3 auf der titelseite landen ... die wichtigsten artikel
+    sollen auch an erster reihe stehen." Bis dahin fuehrte der CTM-Bezug -
+    das war der Eingriff vom 08.08.2026, der "OpenAI macht ChatGPT gratis
+    unbegrenzt" (branchenweit) ueber die Telekom-Flat fuer 34,95 Euro
+    (Heimatmarkt, aber schwaecher bewertet) stellen sollte. Am 27.08.2026 hat
+    sich das gegen den Leser gewendet: acht relevance=5-Meldungen ohne jeden
+    CTM-Bezug saettigten alle Bildplaetze, waehrend eine hoch bewertete
+    Heimatmarkt-Meldung dahinter verschwand. Die Prioritaet fuehrt jetzt, der
+    CTM-Bezug bricht nur noch den Gleichstand - er bleibt also weiterhin der
+    Grund, warum zwei gleich dringliche Meldungen unterschiedlich stehen,
+    kann aber keine schwaecher bewertete mehr nach vorne ziehen.
+
+    Dieselben zwei Schluessel, nach denen `_flatten` sortiert - hier als
+    eigene Funktion, weil die Titelseite sie nicht nur zum Sortieren braucht,
+    sondern zum VERGLEICHEN: der rote Faden darf nur unter Gleichrangigen
+    waehlen (siehe `_titelseite`). `_ctm_achse` (Kurzpfad) rechnet bewusst
+    weiter in der ALTEN Reihenfolge - das ist eine andere Frage ("was betrifft
+    unser Portfolio unmittelbar?"), keine Kopie dieser Funktion.
     """
-    return (int(h.get("ctm_bezug") or 0), int(h.get("relevance") or 0))
+    return (int(h.get("relevance") or 0), int(h.get("ctm_bezug") or 0))
 
 
 # ------------------------------------------------------------- roter Faden
@@ -572,8 +589,9 @@ def _titelseite(highlights: list[dict],
     Objektidentitaet ging das schon einmal schief (der Aufmacher stand
     zweimal auf der Seite, weil er fuer die Anzeige kopiert wird).
 
-    Vergeben wird in EINER Rangfolge (CTM-Bezug vor Prioritaet,
-    `_rangschluessel`), von oben nach unten. Zwei Regeln halten sie:
+    Vergeben wird in EINER Rangfolge (Prioritaet vor CTM-Bezug, seit
+    27.08.2026, Strategie E6 - siehe `_rangschluessel`), von oben nach
+    unten. Zwei Regeln halten sie:
 
     * **Der Rang schlaegt den Faden.** Der rote Faden waehlt nur unter
       gleichrangigen Meldungen, welche die Geschichte erzaehlt; er kann

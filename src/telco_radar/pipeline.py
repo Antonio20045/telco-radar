@@ -28,6 +28,7 @@ from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
 from .analyze import highlight_topics
+from .analyze import vorsortierung as vorsortierung_mod
 from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
@@ -135,13 +136,20 @@ def _waehle_anbieter(settings: dict) -> str:
         # Wechsel von NVIDIA auf DeepSeek stuende sonst eine von aussen
         # gesetzte alte URL gegen den konfigurierten Anbieter.
         os.environ["LLM_API_BASE"] = base_url
-    if wanted != "anthropic":
-        # Auch den Anthropic-Schluessel entfernen. llm.py behandelt ihn sonst
-        # als letzte Rueckfallebene: bei einem Tippfehler in der DeepSeek-URL
-        # liefe der ganze Lauf still ueber Anthropic - also genau ueber den
-        # teuren Anbieter, von dem hier gerade weggeschaltet wurde. Die
-        # Warnung oben verspricht den Notfall-Digest; das hier haelt sie ein.
-        os.environ.pop("ANTHROPIC_API_KEY", None)
+    # Der Anthropic-Schluessel bleibt stehen, auch wenn ein anderer Anbieter
+    # gewaehlt ist: er ist der RETTUNGSANKER der Modellketten (E2 der
+    # Strategie vom 27.08.2026), nicht ein zweiter Anbieter.
+    #
+    # Bis dahin wurde er hier geloescht, mit der Begruendung, sonst bestimme
+    # der eine Anbieter die Modell-IDs, waehrend der andere aufgerufen wird.
+    # Dieser Grund ist weg: llm._dispatch routet seit dem 27.08.2026 je
+    # MODELL - eine `claude-*`-ID geht an die Anthropic-API, alles andere an
+    # den gewaehlten Anbieter. Ein Tippfehler in der DeepSeek-URL schickt den
+    # Lauf damit nicht heimlich zum teuren Anbieter, sondern laesst eine
+    # unbekannte Modell-ID auflaufen; bezahlt wird eine abgelehnte Anfrage
+    # nicht. Der Preis fuers Loeschen war dagegen hoch: sieben Laeufe in
+    # Folge (15.-27.08.2026) ohne Wochenbericht, weil DeepSeeks Guthaben leer
+    # war und es strukturell keinen Ausweg gab.
     return wanted
 
 
@@ -190,6 +198,132 @@ def _mechanik_modell(settings: dict, anbieter: str, fallback: str) -> str:
     wie vor dieser Aenderung.
     """
     return str(settings.get(f"{anbieter}_mechanik_model") or "").strip() or fallback
+
+
+# Vorgabewerte des Ankers. Beide sind Claude-Modell-IDs und werden deshalb von
+# llm._dispatch an die Anthropic-API geroutet, egal welcher Anbieter den Lauf
+# bedient.
+ANKER_REDAKTION = "claude-sonnet-5"
+ANKER_MECHANIK = "claude-haiku-4-5-20251001"
+
+
+def anker_modelle(settings: dict) -> tuple[str, str]:
+    """(Redaktionsanker, Mechanikanker) - oder ("", ""), wenn abgeschaltet.
+
+    Eine Stelle, an der die zwei Namen herkommen: `_registriere_anker` haengt
+    sie an die Ketten, und der Analyst bekommt seinen ueber `ausweich=` je
+    Aufruf mitgegeben (siehe dort). Zwei Ableseorte waeren zwei Wahrheiten.
+    """
+    if not settings.get("llm_anker", True):
+        return "", ""
+    return (str(settings.get("anker_redaktion_model", ANKER_REDAKTION) or "").strip(),
+            str(settings.get("anker_mechanik_model", ANKER_MECHANIK) or "").strip())
+
+
+def _registriere_ausweichmodell(settings: dict, analyst_model: str,
+                                editor_model: str) -> bool:
+    """Das anbietereigene Ausweichmodell `editor -> analyst`, wenn es taugt.
+
+    Es taugt genau dann NICHT, wenn der Claude-Anker aktiv ist: Analyst und
+    Redaktion haengen am selben Anbieterkonto, ein HTTP 402 toetet beide
+    zugleich, und ein Ausweichmodell auf demselben leeren Konto ist keins.
+    Frueher hat `_registriere_anker` diese Zusicherung nachtraeglich
+    ueberschrieben - das war die Stelle, an der eine ECHTE Praeferenzkette
+    (`bedrock_model_chain`) mit ueberschrieben wurde. Die Entscheidung
+    gehoert hierher, wo bekannt ist, dass beide Modelle demselben Anbieter
+    gehoeren; `_registriere_anker` sieht nur Namen.
+    """
+    if not (settings.get("editor_model_fallback", True) and analyst_model):
+        return False
+    if any(anker_modelle(settings)):
+        return False
+    llm.set_fallback(editor_model, analyst_model)
+    return True
+
+
+def _registriere_anker(settings: dict, analyst_model: str, editor_model: str,
+                       mechanik_model: str) -> dict[str, str]:
+    """Haengt an das ENDE jeder Modellkette einen Claude-Anker.
+
+    Der Anker greift NUR, wenn das Primaermodell hart gescheitert ist - im
+    Normalfall kostet er nichts. Er existiert, weil eine Kette innerhalb
+    EINES Anbieters keine leere Kasse ueberlebt: Analyst, Redaktion und
+    Mechanik haengen am selben DeepSeek-Konto, und ein HTTP 402 toetet sie
+    zugleich.
+
+    **Ans Ende, nicht an den Kopf.** `set_fallback(modell, anker)` ersetzt den
+    Nachfolger, den `modell` schon hatte - und das ist bei einer echten
+    Praeferenzkette ein stiller Verlust: `bedrock_model_chain` registriert
+    "das beste Modell, das dieses Konto wirklich bedient" als
+    a -> b -> c, und ein Anker am Kopf wirft b und c weg, ohne dass es
+    irgendwo auffiele. Ein Bedrock-403 ("not available for this account") ist
+    gerade KEINE leere Kasse, sondern eine Aussage ueber genau ein Modell -
+    die Kette ist die Antwort darauf und muss stehen bleiben. Der Anker ist
+    das, was NACH ihr kommt.
+
+    Text entsteht in der Redaktion, deshalb endet sie in einem grossen
+    Modell; die Mechanik im kleinsten - sie macht die allermeisten Aufrufe.
+
+    In JEDER heutigen Provider-Konfiguration ist `analyst_model ==
+    editor_model` ("deepseek-v4-pro", ebenso die beiden openai_*_model), und
+    `llm._FALLBACKS` haengt am MODELLNAMEN, nicht an der Rolle des Aufrufers:
+    fuer denselben Namen kann es nur EINEN Nachfolger geben, und der gehoert
+    der Redaktion (ein ausgefallener Bericht wiegt schwerer). Der Analyst
+    bekommt seinen kleineren Anker deshalb NICHT hier, sondern je Aufruf
+    ueber `agents.analyze_region(..., ausweich=...)` - siehe `llm._kette`.
+    Genau daran hing der Fehler bis zum 27.08.2026: der Analyst, die mit
+    Abstand aufrufstaerkste Stufe, waere im Ernstfall auf Sonnet gelandet.
+    """
+    redaktion, mechanik = anker_modelle(settings)
+    if not (redaktion or mechanik):
+        return {}
+    gesetzt: dict[str, str] = {}
+    anker_namen = {redaktion, mechanik} - {""}
+    for modell, anker in ((editor_model, redaktion),
+                          (mechanik_model, mechanik),
+                          (analyst_model, mechanik)):
+        if not modell or not anker:
+            continue
+        kette = llm._chain_from(modell)
+        if anker in kette:
+            continue                    # diese Kette ist schon verankert
+        ende = kette[-1]
+        # Nie einen Anker hinter einen Anker haengen: dann fuehrte der
+        # Ausfall des Anbieters ueber Sonnet nach Haiku statt direkt ins
+        # richtige Modell - und die Redaktion wuerde am Ende doch klein.
+        if ende in gesetzt or ende in anker_namen:
+            continue
+        llm.set_fallback(ende, anker)
+        gesetzt[ende] = anker
+    return gesetzt
+
+
+def _protokolliere_kosten(kosten: dict) -> None:
+    """Was der Lauf verbraucht hat - je Modell, im Actions-Log.
+
+    Die Summe allein sagt nichts: teuer wird ein Lauf an EINER Stufe (am
+    27.08.2026 waren ~90 % der 1,95 $ der Analyst auf v4-pro), und ohne die
+    Zeile je Modell ist nicht zu sehen, an welcher.
+    """
+    modelle = kosten.get("modelle") or {}
+    log.info("Kosten: %.4f $ ueber %d Aufruf(e) in %d Modell(en)%s",
+             kosten.get("summe_usd", 0.0),
+             sum(m["aufrufe"] for m in modelle.values()), len(modelle),
+             f" - ohne Preiszeile: {', '.join(kosten['ohne_preis'])}"
+             if kosten.get("ohne_preis") else "")
+    for name, m in modelle.items():
+        log.info("Kosten %-32s %5d Aufrufe, %9d ein / %9d aus -> %s",
+                 name, m["aufrufe"], m["prompt_tokens"], m["completion_tokens"],
+                 "?" if m.get("usd") is None else f"{m['usd']:.4f} $")
+    if kosten.get("budget_ueberschritten"):
+        # Eine Warnung, kein Eingriff: der Lauf ist an dieser Stelle laengst
+        # fertig. Sie steht hier, damit die Zahl nicht erst auffaellt, wenn
+        # die Abrechnung kommt.
+        log.warning("Kosten: WARNSCHWELLE UEBERSCHRITTEN - %.4f $ gegen "
+                    "%.2f $ (llm_budget_usd). Der Lauf wurde nicht "
+                    "beschnitten; die Schwelle gehoert nachkalibriert oder "
+                    "der Umfang gesenkt.",
+                    kosten.get("summe_usd", 0.0), kosten["budget_usd"])
 
 
 def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
@@ -242,6 +376,110 @@ def zu_merkende_meldungen(new_items: list[Item],
     return [i for i in new_items if gelesen(i)]
 
 
+# Unter dieser Restzeit faengt die Vorsortierung gar nicht erst an. Sie
+# spart Geld, keine Zeit - und ein halber Durchlauf spart nur einen halben
+# Anteil, waehrend der Analyst dahinter auf seine Minuten wartet.
+_VORSORTIERUNG_MINDESTBUDGET = 60.0
+
+
+def vorsortierung_budget(settings: dict, verstrichen: float) -> float | None:
+    """Wie viel Zeit die Vorsortierung bekommt, oder None fuer "nicht
+    anfangen".
+
+    Dieselbe Rechnung wie `geraete_budget()` und `uebersetzung.stufe.budget()`
+    und aus demselben Grund: gerechnet wird gegen die RESTZEIT DES JOBS, nicht
+    gegen das eigene Budget. Der Unterschied zu jenen beiden ist die
+    POSITION - die Vorsortierung steht VOR dem Analysten, also vor der
+    laengsten Stufe des Laufs. Ein festes `vorsortierung_frist_sekunden` ist
+    deshalb die eigentliche Sicherung; die Restzeit-Rechnung faengt nur den
+    Fall ab, dass der Job ohnehin schon knapp ist.
+    """
+    if not vorsortierung_mod.ist_eingeschaltet(settings):
+        return None
+    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
+            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    if rest < _VORSORTIERUNG_MINDESTBUDGET:
+        return None
+    return min(float(settings.get("vorsortierung_frist_sekunden", 480)), rest)
+
+
+def vorsortieren(items_by_region: dict[str, list[Item]], *, settings: dict,
+                 root: Path, model: str, use_llm: bool,
+                 verstrichen: float = 0.0
+                 ) -> tuple[dict[str, list[Item]], dict]:
+    """Die Vorsortierung so, wie der Lauf sie aufruft - und nur deshalb eine
+    eigene Funktion: der Aufrufer sitzt mitten in `run()`, und was dort steht,
+    haelt kein Test. Dieselbe Ueberlegung wie bei `zu_merkende_meldungen`.
+
+    Ohne Modell, ohne Meldungen oder mit abgeschaltetem Schalter bleibt die
+    Abbildung unveraendert und die Bilanz leer - dann verhaelt sich der Lauf
+    exakt wie vor dem 27.08.2026.
+
+    Zwei Sicherungen liegen hier und nicht im Modul, weil nur der Lauf sie
+    kennt:
+
+    * **Das Zeitbudget** (`vorsortierung_budget`) - die Stufe steht vor dem
+      Analysten, und eine Stufe, die ihre Zeit ueberzieht, kostet nicht ein
+      paar Meldungen, sondern den Bericht (Lauf 31422689829).
+    * **Das try/except** - eine Stufe, die MELDUNGEN ENTFERNT, darf nie der
+      Grund sein, dass der Lauf ausfaellt. Faellt sie aus, gehen alle
+      Meldungen unveraendert zum Analysten; das ist teurer, aber vollstaendig.
+    """
+    if not (use_llm and items_by_region
+            and vorsortierung_mod.ist_eingeschaltet(settings)):
+        return dict(items_by_region), {}
+    frist = vorsortierung_budget(settings, verstrichen)
+    if frist is None:
+        log.warning("Vorsortierung uebersprungen: unter %.0fs Restzeit im Job "
+                    "- alle Meldungen gehen ungefiltert zum Analysten",
+                    _VORSORTIERUNG_MINDESTBUDGET)
+        return dict(items_by_region), {}
+    try:
+        behalten, bilanz = vorsortierung_mod.sortiere_regionen_vor(
+            dict(items_by_region), model=model, fokus=ctm_mod.lade_fokus(root),
+            workers=int(settings.get("llm_max_workers", 4) or 1),
+            deadline=time.monotonic() + frist)
+    except Exception as exc:  # noqa: BLE001
+        log.error("Vorsortierung fehlgeschlagen (%s) - alle Meldungen gehen "
+                  "ungefiltert zum Analysten", str(exc)[:200])
+        return dict(items_by_region), {}
+    return behalten, bilanz.als_dict()
+
+
+def promo_stats(promo_result: dict) -> dict:
+    """Die Promo-Zahlen fuers Laufprotokoll - leer, wenn die Stufe nicht lief.
+
+    Bewusst in `stats`, nicht nur im Log: der Promo-Ausfall seit dem
+    14.08.2026 (43 gescheiterte Extraktionen an einem Tag) stand in KEINER
+    Statistik, weil `stats` kein `promo_*`-Feld kannte. Dieselbe Lehre wie
+    beim Geraeteradar.
+
+    Zwei Regeln, und beide unterscheiden Faelle, die sonst gleich aussehen:
+
+    1. **Kein Ergebnis, keine Felder.** Ein abgeschalteter
+       (`promo_enabled: false`) oder uebersprungener Zweig liefert `{}`, und
+       daraus wuerde ohne diese Regel "0 Aktionsseiten gelesen, 0 Angebote"
+       auf transparenz.html - die Aussage eines Totalausfalls fuer eine
+       Stufe, die es in diesem Lauf gar nicht gab. Die Seite, die Vertrauen
+       herstellen soll, darf "gab es nicht" und "hat nichts gefunden" nicht
+       verwechseln.
+    2. **Neu UND bestaetigt.** Eine ruhige Woche (nichts neu, siebzig
+       Aktionen bestaetigt) meldete als einzelne Zahl dasselbe wie ein
+       stiller Ausfall der Extraktion.
+
+    Als eigene Funktion herausgezogen, damit ein Test das halten kann -
+    dieselbe Ueberlegung wie bei `zu_merkende_meldungen` und `vorsortieren`.
+    """
+    if not promo_result:
+        return {}
+    return {
+        "promo_seiten_gelesen": promo_result.get("seiten_gelesen", 0),
+        "promo_angebote_neu": promo_result.get("angebote_neu", 0),
+        "promo_angebote_bestaetigt": promo_result.get("angebote_bestaetigt", 0),
+        "promo_extraktion_fehler": promo_result.get("extraktion_fehlgeschlagen", 0),
+    }
+
+
 def _sort_key(item: Item):
     """Freshest first; undated items last."""
     pub = item.published
@@ -284,7 +522,6 @@ def run(root: Path, use_llm: bool | None = None,
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
     anbieter = _waehle_anbieter(cfg.settings)
-    use_openai = anbieter in OPENAI_KOMPATIBEL
     analyst_model, editor_model = _modelle_fuer_anbieter(
         cfg.settings, anbieter, fallback_model)
     # The editor model is the big one and the first to lose its slot when the
@@ -294,12 +531,24 @@ def run(root: Path, use_llm: bool | None = None,
     # publish anything. Register the (smaller, still-served) analyst model as
     # the stand-in - used only after the editor model has failed hard once.
     mechanik_model = _mechanik_modell(cfg.settings, anbieter, analyst_model)
-    if cfg.settings.get("editor_model_fallback", True) and analyst_model:
-        llm.set_fallback(editor_model, analyst_model)
+    ausweich_aktiv = _registriere_ausweichmodell(
+        cfg.settings, analyst_model, editor_model)
+    # Danach, nicht davor: der Anker haengt sich ans ENDE derselben Kette
+    # (siehe _registriere_anker).
+    anker_redaktion, anker_mechanik = anker_modelle(cfg.settings)
+    anker = _registriere_anker(cfg.settings, analyst_model, editor_model,
+                               mechanik_model)
+    llm.kosten_reset()
+    llm.budget_setzen(cfg.settings.get("llm_budget_usd", 1.5),
+                      cfg.settings.get("llm_preise") or {})
     log.info("LLM backend: %s | analyst=%s editor=%s mechanik=%s "
-             "(Ausweichmodell: %s)",
+             "(Ausweichmodell: %s, Anker: %s, Analystenanker: %s, "
+             "Warnschwelle: %s $)",
              active_backend(), analyst_model, editor_model, mechanik_model,
-             analyst_model if analyst_model != editor_model else "keins")
+             analyst_model if ausweich_aktiv else "keins",
+             ", ".join(sorted(set(anker.values()))) or "keiner",
+             anker_mechanik or "keiner",
+             cfg.settings.get("llm_budget_usd", 1.5) or "keine")
     # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
     max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
 
@@ -493,6 +742,25 @@ def run(root: Path, use_llm: bool | None = None,
     for region_key, region_items in items_by_region.items():
         items_by_region[region_key] = _interleave_by_source(region_items)
 
+    # -------------------------------------------------------- Vorsortierung
+    # Das billige Modell wirft weg, bevor das teure liest. Am 27.08.2026 gingen
+    # 890 Ereignisse in den Analysten und 362 kamen heraus - bezahlt wurde das
+    # Wegwerfen also mit dem Modell, das je Aufruf ~8-9k Token Denkspur
+    # schreibt. Was hier faellt, gilt als GELESEN und wandert normal in den
+    # Seen-Store: es wurde bewusst verworfen, nicht verpasst (der Unterschied
+    # zu `ungelesene_meldungen` weiter unten). Alle Sicherungen stehen im
+    # Modulkopf von analyze/vorsortierung.py.
+    tvs = time.monotonic()
+    items_by_region, vorsortierung_bilanz = vorsortieren(
+        items_by_region, settings=cfg.settings, root=root,
+        model=mechanik_model, use_llm=bool(use_llm and new_items),
+        verstrichen=time.monotonic() - t0)
+    if vorsortierung_bilanz:
+        phase("Vorsortieren", time.monotonic() - tvs,
+              f"{vorsortierung_bilanz['verworfen']} von "
+              f"{vorsortierung_bilanz['angeboten']} aussortiert, "
+              f"{vorsortierung_bilanz['durchlass']} direkt durchgelassen")
+
     # ------------------------------------------------------------- analyze
     topics_store = ReportedTopics(
         state_dir / "reported_topics.jsonl",
@@ -529,7 +797,11 @@ def run(root: Path, use_llm: bool | None = None,
                     region_name, region_items, model=analyst_model,
                     language=language, max_items=max_items,
                     is_theme=is_theme_key(region_key),
-                    batch_workers=batch_workers)
+                    batch_workers=batch_workers,
+                    # Der Analyst teilt sich seinen Modellnamen mit der
+                    # Redaktion; sein Anker muss deshalb je AUFRUF mitgehen,
+                    # sonst erbt er den Redaktionsanker (siehe llm._kette).
+                    ausweich=anker_mechanik)
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
                 if tel.get("batches") and not tel.get("batches_ok"):
@@ -689,7 +961,13 @@ def run(root: Path, use_llm: bool | None = None,
             # DeepSeek-Endpunkt, der nur "deepseek-v4-flash" kennt, und alle
             # drei Profile scheiterten in 0,6 s. Zwei Laeufe lang stand die
             # Seite deshalb leer da (Lauf #74 und #75).
-            comp_model = analyst_model if use_openai else editor_model
+            # Seit dem 27.08.2026 das REDAKTIONSmodell, auch bei einem
+            # OpenAI-kompatiblen Anbieter: ein Wettbewerber-Steckbrief ist
+            # geschriebener Text, keine Mechanik, und er gehoert damit auf
+            # dieselbe Stufe wie der Wochenbericht. Solange beide
+            # Konfigurationsschluessel dasselbe Modell nannten, war der
+            # Unterschied keiner - er wird es, sobald sie auseinandergehen.
+            comp_model = editor_model or analyst_model
             competitor_profiles = competitor_mod.analyze_all(
                 cfg.focus_competitors, items, comp_model, language,
                 max_workers=int(cfg.settings.get('llm_max_workers', 4)))
@@ -760,7 +1038,11 @@ def run(root: Path, use_llm: bool | None = None,
     try:
         themen_bilanz = highlight_topics.pflege_highlight_themen(
             alle_highlights, state_dir, today_iso,
-            model=analyst_model or editor_model,
+            # Das Redaktionsmodell: der Themen-Agent BENENNT ein Ereignis
+            # und verwirft Firmen-Cluster - ein Urteil, keine Mechanik. Er
+            # macht wenige Aufrufe je Lauf, und sein Ergebnis ist eine ganze
+            # Seite.
+            model=editor_model or analyst_model,
             use_llm=bool(use_llm and new_items),
             reports_dir=reports_dir)
         log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
@@ -979,9 +1261,15 @@ def run(root: Path, use_llm: bool | None = None,
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
     }
+    stats |= promo_stats(promo_result)
 
     # ------------------------------------------------------- run log (transparency)
     duration = time.monotonic() - t0
+    # Zwischenstand: die Uebersetzungsstufe laeuft nach diesem Schreibvorgang
+    # und wird unten nachgetragen. Das Feld steht trotzdem schon hier, damit
+    # es auch dann im Bericht steht, wenn eine spaetere Stufe abbricht.
+    kosten = llm.kosten_stand()
+
     kind_counts: dict[str, int] = defaultdict(int)
     for r in source_results:
         kind_counts[r["kind"]] += 1
@@ -999,7 +1287,17 @@ def run(root: Path, use_llm: bool | None = None,
             # protokoll.html so a degraded run is recognisable as such instead
             # of looking like a thin news week.
             "unavailable": sorted(llm.dead_models()) or None,
+            # Welches Claude-Modell fuer welches Primaermodell bereitstand.
+            # Ohne diese Zeile laesst sich hinterher nicht sagen, ob ein
+            # Bericht vom Anker kam oder vom Anbieter.
+            "anker": anker or None,
         },
+        "kosten": kosten,
+        # Was die Vorsortierung aussortiert hat, samt Stichprobe mit Gruenden.
+        # Die Stichprobe ist der Messauftrag aus dem Premortem: ohne sie laesst
+        # sich nach dem Lauf nicht mehr pruefen, ob eine Meldung gefallen ist,
+        # die in den Bericht gehoert haette.
+        "vorsortierung": vorsortierung_bilanz or None,
         "phases": phases,
         "source_summary": {
             "total": len(source_results),
@@ -1131,6 +1429,16 @@ def run(root: Path, use_llm: bool | None = None,
         except Exception as exc:  # noqa: BLE001
             log.error("Uebersetzung uebersprungen: %s: %s",
                       type(exc).__name__, exc)
+
+    # ---------------------------------------------------------------- Kosten
+    # Erst hier, nach der letzten Modellstufe - und VOR dem Rendern: die Seite
+    # entsteht aus der Berichtsdatei, ein spaeter nachgetragener Kostenblock
+    # stuende dort nirgends.
+    run_log["kosten"] = llm.kosten_stand()
+    report_json["run"] = run_log
+    _protokolliere_kosten(run_log["kosten"])
+    json_path.write_text(
+        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # ---------------------------------------------------------------- site
     # Erst aufraeumen, dann rendern: render_site kopiert den Bildordner nach

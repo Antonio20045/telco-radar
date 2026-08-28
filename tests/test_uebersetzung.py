@@ -63,13 +63,19 @@ def test_spanischer_fliesstext_wird_erkannt():
     assert kuerzel == "es"
 
 
-def test_englischer_fliesstext_bekommt_keine_uebersetzung():
+def test_englischer_fliesstext_gilt_als_fremdsprachig():
+    """Entscheidung vom 27.08.2026: die Zielgruppe (deutsche Manager ohne
+    sicheres Englisch, CLAUDE.md §1) liest Englisch nicht ohnehin. Bis dahin
+    stand "en" neben "de" in MUTTERSPRACHEN und 143 von 163 vorgefilterten
+    Meldungen des Laufs vom 27.08. waren englisch - keine davon wurde je
+    uebersetzt. Gegen den alten Stand faellt dieser Test."""
     fremd, kuerzel, _ = sprache_mod.ist_fremdsprachig(ENGLISCH)
-    assert fremd is False
+    assert fremd is True
     assert kuerzel == "en"
 
 
 def test_deutscher_text_bekommt_keine_uebersetzung():
+    """Die einzige echte Muttersprache, die uebrig bleibt (E5, 27.08.2026)."""
     text = ("Die Bundesnetzagentur hat am Mittwoch mitgeteilt, dass die "
             "Vergabe der Frequenzen im kommenden Jahr stattfinden soll. Die "
             "Behoerde nannte dabei weder einen genauen Termin noch die "
@@ -306,19 +312,20 @@ def test_ein_kaputter_artikel_kostet_nie_den_lauf(tmp_path, monkeypatch):
     assert bilanz["uebersetzt"] == 0
 
 
-def test_englischer_artikel_wird_nicht_uebersetzt(tmp_path, monkeypatch):
-    def _nie(*a, **k):
-        raise AssertionError("ein englischer Artikel darf kein Modell kosten")
-
-    monkeypatch.setattr(stufe_mod, "uebersetze", _nie)
+def test_englischer_artikel_wird_uebersetzt(tmp_path, monkeypatch):
+    """Entscheidung vom 27.08.2026 (E5): Englisch ist keine Muttersprache
+    mehr. Gegen den alten Stand faellt dieser Test - dort verwarf die
+    Vorauswahl den Artikel vor jedem Abruf."""
+    monkeypatch.setattr(stufe_mod, "uebersetze",
+                        lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."]))
+    monkeypatch.setattr(stufe_mod, "hole_volltext",
+                        lambda *a, **k: volltext_mod.VolltextErgebnis(
+                            text=ENGLISCH, herkunft="feed"))
     item = _item(volltext=ENGLISCH)
     bilanz = stufe_mod.lauf([item], tmp_path, {}, "modell",
                             frist_sekunden=30, heute=date(2026, 8, 13))
-    assert bilanz["uebersetzt"] == 0
-    # Vorgefiltert, also OHNE Abruf - und trotzdem gezaehlt. Ein Protokoll,
-    # das diesen Fall verschweigt, meldet "0 uebersetzt, 0 uebersprungen".
-    assert bilanz["vorgefiltert"] == 1
-    assert "nicht fremdsprachig (en)" in bilanz["gruende"]
+    assert bilanz["uebersetzt"] == 1
+    assert bilanz["sprachen"]["en"] == 1
 
 
 def test_spanischer_artikel_landet_im_speicher(tmp_path, monkeypatch):

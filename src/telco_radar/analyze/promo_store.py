@@ -38,8 +38,26 @@ import json
 import logging
 import re
 from pathlib import Path
+from typing import NamedTuple
 
 log = logging.getLogger(__name__)
+
+
+class UpsertBilanz(NamedTuple):
+    """Was EIN `PromoDB.upsert()`-Aufruf getan hat.
+
+    Bewusst mit Namen statt als nacktes Tupel: die zwei Zahlen bedeuten
+    Verschiedenes und wurden genau deshalb verwechselt. `neu` sind die
+    Aktionen, die es vorher nicht gab; `bestaetigt` sind die bekannten, deren
+    `last_verified` aufgefrischt wurde. Das Laufprotokoll wies bis zum
+    27.08.2026 allein `neu` aus und nannte es "aktualisiert" - in einer
+    ruhigen Woche stand dort "0 Angebote aktualisiert", obwohl siebzig
+    Aktionen bestaetigt worden waren.
+    """
+
+    neu: int
+    gesehene_ids: set[str]
+    bestaetigt: int = 0
 
 # Ab diesem Wort-Ueberlappungswert gilt eine neu extrahierte Ueberschrift als
 # dieselbe Aktion wie ein bestehender Eintrag, nur umformuliert - siehe
@@ -187,16 +205,26 @@ class PromoDB:
         return best_id
 
     def upsert(self, items: list[dict], today: str,
-               source_url: str = "") -> tuple[int, set[str]]:
+               source_url: str = "") -> "UpsertBilanz":
         """Neue Aktionen aufnehmen bzw. bekannte re-verifizieren (gleicher
         Brand + gleiche oder nur umformulierte Kernaussage taucht im neuen
-        Snapshot wieder auf - siehe _find_existing_id()). Gibt (Anzahl NEU
-        aufgenommener Eintraege, IDs aller in diesem Aufruf gesehenen
-        Eintraege) zurueck; letzteres muss mark_stale() als checked_ids
-        uebergeben werden, NICHT ein frisch aus den rohen Item-Headlines
-        berechneter entry_id() - sonst wuerde ein per Umformulierung wieder-
-        erkannter, hier bereits aktualisierter Eintrag im selben Atemzug
-        faelschlich als Fehltreffer gezaehlt.
+        Snapshot wieder auf - siehe _find_existing_id()).
+
+        Gibt eine `UpsertBilanz` zurueck: NEU aufgenommene Eintraege, IDs
+        aller in diesem Aufruf gesehenen Eintraege, und die Zahl der
+        BESTAETIGTEN (bekannt, `last_verified` auf heute gesetzt). Die letzte
+        Zahl ist nicht Beiwerk: das Laufprotokoll sprach von "aktualisierten"
+        Angeboten und meinte die NEUEN - in einer ruhigen Woche steht dort
+        also "0 Angebote aktualisiert", waehrend in Wahrheit siebzig
+        Aktionen bestaetigt wurden. Genau umgekehrt sieht ein stiller
+        Totalausfall der Extraktion (alles bestaetigt nichts, nichts neu)
+        exakt wie eine ruhige Woche aus.
+
+        Die IDs muessen mark_stale() als checked_ids uebergeben werden,
+        NICHT ein frisch aus den rohen Item-Headlines berechneter
+        entry_id() - sonst wuerde ein per Umformulierung wiedererkannter,
+        hier bereits aktualisierter Eintrag im selben Atemzug faelschlich als
+        Fehltreffer gezaehlt.
 
         *source_url*: die SEITE, auf der diese Angebote gerade gefunden
         wurden. Sie wird am Eintrag festgehalten, weil mark_stale() sie
@@ -204,6 +232,7 @@ class PromoDB:
         Seite A nicht in Richtung "beendet" ruecken, nur weil Seite B neu
         gelesen wurde und es dort naturgemaess nicht steht."""
         new = 0
+        bestaetigt = 0
         matched_ids: set[str] = set()
         for it in items:
             brand = (it.get("brand") or "").strip()
@@ -216,6 +245,7 @@ class PromoDB:
                 if fuzzy_id is not None:
                     eid = fuzzy_id
             if eid in self.entries:
+                bestaetigt += 1
                 e = self.entries[eid]
                 e["headline"] = headline
                 e["last_verified"] = today
@@ -246,7 +276,7 @@ class PromoDB:
                 }
                 new += 1
             matched_ids.add(eid)
-        return new, matched_ids
+        return UpsertBilanz(new, matched_ids, bestaetigt)
 
     def mark_stale(self, brand: str, checked_ids: set, today: str,
                    gepruefte_seiten: set | None = None,

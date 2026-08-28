@@ -65,6 +65,75 @@
 </div>
 
 
+{# ------------------------------------------------------------- Kosten #}
+{# Nur Zahlen. Antonio zahlt die API privat, und bis zum 27.08.2026 stand
+   nirgends, was ein Lauf verbraucht - der Lauf vom 27.08. kostete 1,95 $ und
+   es war hinterher nicht zu sagen, an welcher Stufe. Ein Modell ohne
+   Preiszeile steht mit seinen Token da und ohne Betrag: geraten wird nichts. #}
+{% if run.get('kosten') and run.kosten.get('modelle') %}
+<div class="card">
+  <div class="card-head"><h2>Was dieser Lauf verbraucht hat</h2></div>
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span class="col-region">Modell</span>
+      <span class="col-flex">Aufrufe</span>
+      <span class="col-kept">Token ein / aus</span>
+      <span class="col-model">Kosten</span>
+    </div>
+    {% for name, m in run.kosten.modelle.items() %}
+    <div class="rowtable-row">
+      <span class="col-region">{{ name }}</span>
+      <span class="col-flex">{{ m.aufrufe }}</span>
+      <span class="col-kept">{{ "{:,}".format(m.prompt_tokens) | replace(",", ".") }}
+        / {{ "{:,}".format(m.completion_tokens) | replace(",", ".") }}</span>
+      <span class="col-model">{% if m.usd is none %}nicht beziffert{% else %}{{ "%.2f"|format(m.usd) }} ${% endif %}</span>
+    </div>
+    {% endfor %}
+    <div class="rowtable-row">
+      <span class="col-region"><b>Summe</b></span>
+      <span class="col-flex"></span>
+      <span class="col-kept"></span>
+      <span class="col-model"><b>{{ "%.2f"|format(run.kosten.summe_usd) }} $</b></span>
+    </div>
+  </div>
+  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
+    {% if run.kosten.budget_usd %}Erwartet werden je Lauf bis zu
+    {{ "%.2f"|format(run.kosten.budget_usd) }} $.{% if run.kosten.budget_ueberschritten %}
+    Dieser Lauf lag darüber. Gekürzt wurde deswegen nichts.{% endif %}{% endif %}
+    {% if run.kosten.ohne_preis %}
+    Ohne hinterlegten Preis und deshalb ohne Betrag:
+    {{ run.kosten.ohne_preis | join(", ") }}.{% endif %}
+  </p>
+</div>
+{% endif %}
+
+
+{# --------------------------------------------------- Promo-Uebersicht #}
+{# Eigener zweiter Anwendungsfall (promo/index.html) neben der
+   Marktrecherche - sein Ergebnis stand bis zum 27.08.2026 in KEINER
+   Statistik, nur im Actions-Log. Der Ausfall seit dem 14.08.2026 (die
+   LLM-Extraktion scheiterte an leerem API-Guthaben) war deshalb erst beim
+   Lesen des Logs sichtbar, nicht auf der Seite, die genau diese Frage
+   beantwortet. #}
+{# Der Block erscheint NUR, wenn die Stufe wirklich gelaufen ist. Ein
+   abgeschalteter oder übersprungener Promo-Zweig setzt das Feld gar nicht
+   (pipeline.py), und ohne diese Bedingung stünde hier „0 Aktionsseiten
+   gelesen" - die Aussage eines Totalausfalls für einen Zweig, den es in
+   diesem Lauf nicht gab. #}
+{% if report and report.stats and report.stats.get('promo_seiten_gelesen') is not none %}
+<div class="card">
+  <div class="card-head"><h2>Promo-Übersicht</h2></div>
+  <p class="muted-note" style="max-width:760px">
+    {{ report.stats.get('promo_seiten_gelesen', 0) }} Aktionsseiten gelesen,
+    {{ report.stats.get('promo_angebote_neu', 0) }} Angebote neu aufgenommen,
+    {{ report.stats.get('promo_angebote_bestaetigt', 0) }} bestätigt{% if report.stats.get('promo_extraktion_fehler') %},
+    {{ report.stats.get('promo_extraktion_fehler') }} Seiten mit gescheiterter Extraktion
+    (ihre Angebote blieben unverändert){% endif %}.
+  </p>
+</div>
+{% endif %}
+
+
 {# ------------------------------------------------- Wie eingeordnet wird #}
 {# Die Startseite zeigt Etiketten ("Direkt für uns") und einen Satz, was eine
    Meldung fürs eigene Portfolio bedeutet. Wer dem trauen soll, muss wissen,

@@ -30,7 +30,7 @@ def _antwort(titel: list[str]) -> str:
 
 
 def test_parallele_stapel_liefern_dieselbe_reihenfolge(monkeypatch):
-    def fake_complete(system, user, model, max_tokens):
+    def fake_complete(system, user, model, max_tokens, ausweich=""):
         rows = json.loads(user.split("\n", 1)[1])
         return _antwort([r["title"] for r in rows])
 
@@ -52,7 +52,7 @@ def test_parallele_stapel_laufen_wirklich_gleichzeitig(monkeypatch):
     sperre = threading.Lock()
     tor = threading.Barrier(3, timeout=5)
 
-    def fake_complete(system, user, model, max_tokens):
+    def fake_complete(system, user, model, max_tokens, ausweich=""):
         nonlocal gleichzeitig, hoechststand
         with sperre:
             gleichzeitig += 1
@@ -74,9 +74,9 @@ def test_parallele_stapel_laufen_wirklich_gleichzeitig(monkeypatch):
 
 def test_ein_gescheiterter_stapel_kostet_nur_seine_meldungen(monkeypatch):
     """Genau wie im seriellen Fall: der Stapel faellt aus, der Lauf nicht."""
-    def fake_complete(system, user, model, max_tokens):
+    def fake_complete(system, user, model, max_tokens, ausweich=""):
         rows = json.loads(user.split("\n", 1)[1])
-        if rows[0]["title"] == "Meldung 15":
+        if rows[0]["title"] == f"Meldung {agents.BATCH_SIZE}":
             raise RuntimeError("provider overloaded")
         return _antwort([r["title"] for r in rows])
 
@@ -87,5 +87,6 @@ def test_ein_gescheiterter_stapel_kostet_nur_seine_meldungen(monkeypatch):
     assert res["_telemetry"]["batches"] == 3
     assert res["_telemetry"]["batches_ok"] == 2
     titel = {h["title"] for h in res["highlights"]}
-    assert "Meldung 0" in titel and "Meldung 30" in titel
-    assert "Meldung 15" not in titel
+    assert "Meldung 0" in titel
+    assert f"Meldung {2 * agents.BATCH_SIZE}" in titel
+    assert f"Meldung {agents.BATCH_SIZE}" not in titel

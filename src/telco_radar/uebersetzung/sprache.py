@@ -26,9 +26,13 @@ import re
 
 log = logging.getLogger(__name__)
 
-# Sprachen, fuer die es KEINE Uebersetzung gibt: die Zielsprache selbst und
-# die Sprache, die im Zielpublikum als gelesen vorausgesetzt wird.
-MUTTERSPRACHEN = frozenset({"de", "en"})
+# Sprachen, fuer die es KEINE Uebersetzung gibt: nur noch die Zielsprache
+# selbst. Bis zum 27.08.2026 stand hier auch "en" - mit der Annahme, das
+# Zielpublikum lese Englisch ohnehin. Gemessen am Lauf vom 27.08.2026 waren
+# 143 von 163 vorgefilterten Meldungen englisch; die Zielgruppe (deutsche
+# Manager ohne sicheres Englisch, siehe CLAUDE.md §1) ist damit falsch
+# geschnitten. Englisch ist jetzt eine Fremdsprache wie jede andere.
+MUTTERSPRACHEN = frozenset({"de"})
 
 # Unter so vielen Zeichen wird gar nicht erst gemessen. py3langid liefert
 # auch fuer drei Woerter ein Ergebnis - nur eben ein geratenes.
@@ -42,9 +46,21 @@ MINDESTSICHERHEIT = 0.90
 # vorkamen, plus die naheliegenden Nachbarn. Eine unbekannte Sprache
 # bekommt ihr Kuerzel als Namen - das ist haesslich, aber ehrlich, und es
 # faellt beim Lesen der Seite sofort auf.
+# Die Liste traegt zwei Saetze auf jeder Uebersetzungsseite ("Maschinelle
+# Uebersetzung aus dem ...") UND die Sprachangabe an der Meldungskarte. Ein
+# fehlender Code faellt deshalb nicht aus, sondern erscheint als Kuerzel in
+# Grossbuchstaben - "aus dem EN".
+#
+# Genau das war bis zum 27.08.2026 der Regelfall: "en" und "de" fehlten,
+# obwohl Englisch die mit Abstand haeufigste Ausgangssprache des Bestands ist
+# (die Sprachpruefung laesst eine englische Meldung nur dann bis hierher
+# durch, wenn der Leser eine deutsche Fassung bekommt). Ein Code, der nie
+# uebersetzt wird, gehoert trotzdem hier hinein: die Namen werden auch fuer
+# die reine ANZEIGE der erkannten Sprache gebraucht.
 SPRACHNAMEN = {
     "ar": "Arabisch", "bg": "Bulgarisch", "cs": "Tschechisch",
-    "da": "Dänisch", "el": "Griechisch", "es": "Spanisch",
+    "da": "Dänisch", "de": "Deutsch", "el": "Griechisch", "en": "Englisch",
+    "es": "Spanisch",
     "et": "Estnisch", "fa": "Persisch", "fi": "Finnisch",
     "fr": "Französisch", "he": "Hebräisch", "hi": "Hindi",
     "hr": "Kroatisch", "hu": "Ungarisch", "id": "Indonesisch",

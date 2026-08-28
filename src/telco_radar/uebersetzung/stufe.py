@@ -145,7 +145,12 @@ def lauf(items, root: Path, settings: dict, modell: str,
     store = UebersetzungsStore(root / "data" / "state" / "uebersetzungen.jsonl")
     http_cfg = dict(settings.get("http", {}) or {})
     artikelabruf = bool(settings.get("uebersetzung_artikelabruf", True))
-    deckel = int(settings.get("uebersetzung_max_je_lauf", 40))
+    # Vorgabe 60 (bis 27.08.2026: 40) - seit Englisch mituebersetzt wird
+    # (sprache.MUTTERSPRACHEN), wuchs der Kandidatenstrom von ~83 auf ~226
+    # je Lauf. Der Deckel schneidet weiterhin nach Berichtsrang, die
+    # wichtigsten zuerst - er wird nicht mitgezogen, weil "mehr Kandidaten"
+    # nicht "jeder bekommt eine Uebersetzung" heissen muss.
+    deckel = int(settings.get("uebersetzung_max_je_lauf", 60))
 
     bilanz = {
         "geprueft": 0, "uebersetzt": 0, "uebersprungen": 0, "gescheitert": 0,

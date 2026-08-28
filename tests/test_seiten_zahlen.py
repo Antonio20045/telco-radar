@@ -76,7 +76,7 @@ BRIEFING = "## Auf einen Blick\n\nText.\n\n## Europa\n\nMehr Text."
 
 
 def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
-            bilder_anlegen=True, briefing=None):
+            bilder_anlegen=True, briefing=None, kosten=None):
     from telco_radar.report.bilder import bildordner
 
     # data/reports/ wie im echten Projekt: render_site() leitet den
@@ -86,6 +86,14 @@ def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     hs = HIGHLIGHTS if highlights is None else highlights
+    run = {"duration_seconds": 1487.8, "models": {"analyst": "m", "editor": "m"},
+           "phases": [],
+           "analysts": [{"region": "Europa", "items_in": 15,
+                         "highlights": 4, "model": "m"}],
+           "sources": [],
+           "source_summary": {"ok": 1, "empty": 0, "failed": 0}}
+    if kosten is not None:
+        run["kosten"] = kosten
     # Die Bilddateien muessen wirklich existieren: render_site() streicht
     # jeden `image`-Verweis, zu dem keine Datei mehr im Bildordner liegt
     # (sonst zeigen Archivwochen leere Kaesten, nachdem raeume_auf() ihre
@@ -104,12 +112,7 @@ def _render(tmp_path, *, competitors=None, stats=None, highlights=None,
         "briefing_md": BRIEFING if briefing is None else briefing,
         "regions": {"Europa": {"region_summary": "", "highlights": hs}},
         "competitors": competitors if competitors is not None else [],
-        "run": {"duration_seconds": 1487.8, "models": {"analyst": "m", "editor": "m"},
-                "phases": [],
-                "analysts": [{"region": "Europa", "items_in": 15,
-                              "highlights": 4, "model": "m"}],
-                "sources": [],
-                "source_summary": {"ok": 1, "empty": 0, "failed": 0}},
+        "run": run,
     }, ensure_ascii=False), encoding="utf-8")
     site = tmp_path / "site"
     render_site(site, reports)
@@ -156,6 +159,109 @@ def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
     """Gegenprobe: sind beide Zahlen gleich, faellt der Hinweis weg."""
     html = _seite(_render(tmp_path, stats={"new": len(HIGHLIGHTS)}), "transparenz.html")
     assert "gekappt wird nichts" not in html
+
+
+# ------------------------------------------------------------------ Kosten
+# Antonio zahlt die API privat. Bis zum 27.08.2026 stand nirgends, was ein
+# Lauf verbraucht - der Lauf vom 27.08. kostete 1,95 $, und es war hinterher
+# nicht zu sagen, an welcher Stufe.
+KOSTEN = {
+    "modelle": {
+        "deepseek-v4-flash": {"aufrufe": 66, "prompt_tokens": 1_200_000,
+                              "completion_tokens": 300_000, "usd": 0.252},
+        "unbekanntes-modell": {"aufrufe": 3, "prompt_tokens": 900,
+                               "completion_tokens": 400, "usd": None},
+    },
+    "summe_usd": 0.252,
+    "ohne_preis": ["unbekanntes-modell"],
+    "budget_usd": 1.5,
+    "budget_ueberschritten": False,
+}
+
+
+def test_transparenz_nennt_kosten_und_token_je_modell(tmp_path):
+    html = _seite(_render(tmp_path, kosten=KOSTEN), "transparenz.html")
+
+    assert "deepseek-v4-flash" in html
+    assert "66" in html
+    assert "1.200.000" in html and "300.000" in html
+    assert "0.25 $" in html
+    assert "1.50 $" in html          # die Erwartung je Lauf
+
+
+def test_transparenz_beziffert_ein_modell_ohne_preis_nicht(tmp_path):
+    """Geraten wird nichts - die Luecke wird benannt."""
+    html = _seite(_render(tmp_path, kosten=KOSTEN), "transparenz.html")
+    assert "nicht beziffert" in html
+    assert "unbekanntes-modell" in html
+
+
+def test_transparenz_sagt_wenn_der_lauf_teurer_war_als_erwartet(tmp_path):
+    """Und im selben Atemzug, dass deshalb nichts gekuerzt wurde - der
+    Zaehler warnt, er greift nicht ein (Antonio, 27.08.2026)."""
+    teuer = {**KOSTEN, "summe_usd": 1.93, "budget_ueberschritten": True}
+    html = _seite(_render(tmp_path, kosten=teuer), "transparenz.html")
+    assert "Dieser Lauf lag darüber" in html
+    assert "Gekürzt wurde deswegen nichts" in html
+
+
+def test_ein_lauf_im_rahmen_meldet_keine_ueberschreitung(tmp_path):
+    """Gegenprobe zum Test darueber - sonst prueft er nur, dass irgendein
+    Satz auf der Seite steht."""
+    html = _seite(_render(tmp_path, kosten=KOSTEN), "transparenz.html")
+    assert "Dieser Lauf lag darüber" not in html
+
+
+def test_ohne_kostenblock_bleibt_die_seite_wie_vorher(tmp_path):
+    """Archivberichte von vor dem 27.08.2026 tragen kein `run.kosten`."""
+    html = _seite(_render(tmp_path), "transparenz.html")
+    assert "Was dieser Lauf verbraucht hat" not in html
+
+
+# ------------------------------------------------------------------- Promo
+# E10b (27.08.2026, Strategie 2026-08-27 B6): der Promo-Ausfall seit dem
+# 14.08.2026 (LLM-Extraktion scheiterte an leerem API-Guthaben) stand bis
+# dahin in KEINER Statistik - `stats` kannte kein `promo_*`-Feld, nur das
+# Actions-Log, das niemand liest.
+PROMO_STATS = {"new": NEU_GESAMMELT, "promo_seiten_gelesen": 41,
+              "promo_angebote_neu": 7, "promo_angebote_bestaetigt": 62,
+              "promo_extraktion_fehler": 3}
+
+
+def test_transparenz_nennt_die_promo_zahlen(tmp_path):
+    html = _seite(_render(tmp_path, stats=PROMO_STATS), "transparenz.html")
+    assert "41 Aktionsseiten gelesen" in html
+    assert "7 Angebote neu aufgenommen" in html
+    assert "62 bestätigt" in html
+    assert "3 Seiten mit gescheiterter Extraktion" in html
+
+
+def test_transparenz_trennt_neue_und_bestaetigte_angebote(tmp_path):
+    """Der Befund vom 27.08.2026: gezaehlt wurden nur die NEUEN Angebote, das
+    Etikett sagte "aktualisiert". Eine ruhige Woche (nichts neu, siebzig
+    bestaetigt) las sich damit wie ein stiller Totalausfall der Extraktion.
+    Gegen den alten Stand faellt dieser Test."""
+    ruhig = {**PROMO_STATS, "promo_angebote_neu": 0,
+             "promo_angebote_bestaetigt": 70, "promo_extraktion_fehler": 0}
+    html = _seite(_render(tmp_path, stats=ruhig), "transparenz.html")
+    assert "0 Angebote neu aufgenommen" in html
+    assert "70 bestätigt" in html
+
+
+def test_transparenz_verschweigt_null_extraktionsfehler(tmp_path):
+    """Gegenprobe: ohne Fehler faellt der Halbsatz weg, statt eine "0" zu
+    zeigen, die niemand einordnen kann."""
+    ohne_fehler = {**PROMO_STATS, "promo_extraktion_fehler": 0}
+    html = _seite(_render(tmp_path, stats=ohne_fehler), "transparenz.html")
+    assert "gescheiterter Extraktion" not in html
+    assert "41 Aktionsseiten gelesen" in html   # der Rest der Zeile bleibt
+
+
+def test_ohne_promo_stats_bleibt_die_seite_wie_vorher(tmp_path):
+    """Archivberichte von vor dem 27.08.2026 tragen kein `promo_*`-Feld -
+    dieselbe Zusicherung wie beim Kostenblock direkt darueber."""
+    html = _seite(_render(tmp_path), "transparenz.html")
+    assert "Aktionsseiten gelesen" not in html
 
 
 # ------------------------------------------------------------------ Bericht
@@ -1700,11 +1806,24 @@ def test_ohne_direkten_bezug_faellt_der_kasten_weg(tmp_path):
     assert "In zwei Minuten" not in html
 
 
-def test_direkte_meldung_steht_vor_der_dringlicheren(tmp_path):
-    """Der eigentliche Eingriff: die Prioritaet misst branchenweite
-    Bedeutung. Danach sortiert stand am 07.08.2026 "OpenAI macht ChatGPT
-    gratis unbegrenzt" (Prioritaet 5) ueber der Telekom-Flat fuer 34,95 Euro
-    (Prioritaet 3)."""
+def test_die_dringlichere_meldung_steht_vor_der_direkten(tmp_path):
+    """Der Name stand bis zum 28.08.2026 andersherum und beschrieb damit die
+    Regel VOR dem 27.08.2026 - das Verhalten war laengst umgekehrt, nur der
+    Name log. Ein Testname ist die kuerzeste Fassung der Zusicherung; wer die
+    Liste der Testnamen liest, liest sonst das Gegenteil dessen, was der Code
+    tut.
+
+    Antonio, 27.08.2026 (Strategie E6): "wie kann es sein dass artikel
+    mit prioriät von 3 auf der titelseite landen ... die wichtigsten
+    artikel sollen auch an erster reihe stehen." Bis dahin fuehrte der
+    CTM-Bezug (Eingriff vom 07.08.2026: "OpenAI macht ChatGPT gratis
+    unbegrenzt", Prioritaet 5, stand HINTER der Telekom-Flat fuer 34,95
+    Euro, Prioritaet 3, weil deren CTM-Bezug hoeher war). Seit dem
+    27.08.2026 fuehrt die Prioritaet, der CTM-Bezug bricht nur noch den
+    Gleichstand (`html._rangschluessel`) - dieser Test ist deshalb
+    UMGEKEHRT: die branchenweite Meldung mit der hoeheren Prioritaet
+    steht jetzt VOR der Heimatmarkt-Meldung mit der niedrigeren, obwohl
+    deren CTM-Bezug staerker ist."""
     welt = _ctm_highlight(90, ctm_bezug=1, relevance=5, operator="OpenAI")
     welt["title"] = "OpenAI macht ChatGPT für Gratisnutzer unlimitiert"
     heimat = _ctm_highlight(91, ctm_bezug=3, relevance=3,
@@ -1716,7 +1835,7 @@ def test_direkte_meldung_steht_vor_der_dringlicheren(tmp_path):
     assert any("34,95" in z for z in zeilen)
     erste_heimat = next(i for i, z in enumerate(zeilen) if "34,95" in z)
     erste_welt = next(i for i, z in enumerate(zeilen) if "ChatGPT" in z)
-    assert erste_heimat < erste_welt
+    assert erste_welt < erste_heimat
 
 
 def test_alte_ausgaben_ohne_ctm_feld_behalten_ihre_reihenfolge(tmp_path):

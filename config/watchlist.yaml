@@ -142,9 +142,8 @@ regions:
     - name: Swisscom
       country: CH
       website: swisscom.ch
-      sources:
-      - type: newsroom_js
-        url: https://www.swisscom.ch/en/about/news.html
+      # sources entfernt 27.08.2026: 5 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     - name: Telia
       country: SE
       website: teliacompany.com
@@ -564,9 +563,8 @@ regions:
       website: mtn.com
       aliases:
       - MTN
-      sources:
-      - type: rss
-        url: https://www.mtn.com/feed/
+      # sources entfernt 27.08.2026: 9 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     - name: Vodacom
       country: ZA
       website: vodacom.com
@@ -586,22 +584,10 @@ regions:
     - name: Airtel Africa
       country: NG
       website: airtel.africa
-      sources:
-      - type: newsroom
-        url: https://www.investegate.co.uk/company/AAF
-        item_selector: tbody tr
-        allow_short_titles: true
-        label: 'RNS (Regulatory News Service) via Investegate - Airtel Africa ist an der London
-          Stock Exchange notiert und muss kursrelevante Meldungen ueber RNS veroeffentlichen.
-          airtel.africa/press-release selbst bleibt unloesbar (PDF-Links auf Fremddomain +
-          Titel in Nachbar-div ohne Klasse/Heading).'
-      # Zweiter Kanal, 05.08.2026: der Konzern-Feed neben der
-      # Boersenmeldungsseite. Frische-Ausnahme belegt - Konzernmeldungen
-      # erscheinen etwa monatlich, neueste im Abruf 23.07.2026.
-      - type: rss
-        url: https://www.airtel.africa/rss.xml
-        herkunft: Firmenliste (Breitensuche)
-        abgenommen: '2026-08-05'
+      # sources entfernt 27.08.2026: 7 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
+      # (Beide Kanaele betroffen: die RNS-Boersenmeldungen via Investegate
+      # und der Konzern-Feed airtel.africa/rss.xml.)
     - name: stc
       country: SA
       website: stc.com.sa
@@ -678,33 +664,17 @@ regions:
       aliases:
       - Orange Egypt
       - Orange Jordan
-      sources:
-      # orange.eg blockt den Presse-Pfad per F5-WAF ("Request Rejected", 246 B),
-      # die Startseite verlinkt keinen Newsroom. Orange Jordanien ist im
-      # selben Eintrag bereits als Alias gefuehrt und liefert datierte
-      # Meldungen - stellvertretend fuer die MEA-Praesenz.
-      - type: newsroom
-        url: https://orange.jo/en/corporate/media-center
-        item_selector: div.card
-        plan: 'Echte WAF-Ablehnung, kein Render-/Consent-Problem: sowohl curl als auch Playwright
-          bekommen HTTP 200 mit dem Body "The requested URL was rejected. Please consult with
-          your administrator... Your support ID is: ..." (246 Byte, F5/BIG-IP-Stil, mit 3
-          verschiedenen User-Agents reproduziert). Kein Consent-Banner, kein JS - die WAF
-          lehnt die URL selbst ab, bevor irgendetwas laedt. Nur mit Residential-Proxy oder
-          expliziter WAF-Allowlist loesbar; bis dahin Referenz.'
+      # sources entfernt 27.08.2026: 9 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
+      # (orange.eg selbst blockt den Presse-Pfad per F5-WAF, das war die
+      # Ersatzquelle Orange Jordanien.)
     - name: du
       country: AE
       website: du.ae
       aliases:
       - EITC
-      sources:
-      # /about-us/media-centre leitet auf eine Seite um, deren Liste per AJAX
-      # nachgeladen wird - der Render zog nur Mega-Menue und Support-Seiten
-      # ("Useful short codes for my prepaid mobile"). Dies ist der Endpunkt
-      # dahinter; ohne den Selektor kippt die Extraktion zurueck in Navigation.
-      - type: newsroom
-        url: https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&Category=0&lang=en&Year=0&Month=0
-        item_selector: '#pMediaCentreNews .news'
+      # sources entfernt 27.08.2026: 9 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     - name: Maroc Telecom
       country: MA
       website: iam.ma
@@ -715,10 +685,8 @@ regions:
     - name: Turk Telekom
       country: TR
       website: turktelekom.com.tr
-      sources:
-      - type: newsroom
-        url: https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller
-        item_selector: a.relases-card
+      # sources entfernt 27.08.2026: 10 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     # Marktfuehrer im Senegal und Ankerbeteiligung von Orange in Westafrika -
     # eine Region, die im Bestand bisher nur ueber MTN und Airtel sichtbar war.
     - name: Sonatel
@@ -745,11 +713,8 @@ regions:
       aliases:
       - Liquid Telecom
       - Liquid Intelligent Technologies
-      sources:
-      - type: rss
-        url: https://liquid.tech/feed/
-        herkunft: Firmenliste Welle 2
-        abgenommen: '2026-08-05'
+      # sources entfernt 27.08.2026: 6 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
   asia:
     name: Asien
     operators:
@@ -910,10 +875,8 @@ regions:
       website: cht.com.tw
       aliases:
       - Chunghwa
-      sources:
-      - type: newsroom
-        url: https://www.cht.com.tw/en/home/cht/messages
-        item_selector: a.list-item-head-link
+      # sources entfernt 27.08.2026: 6 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     - name: Telkomsel
       country: ID
       website: telkomsel.com
@@ -925,17 +888,10 @@ regions:
       website: ais.co.th
       aliases:
       - Advanced Info Service
-      sources:
-      # Vorher die SET-Boersenmeldungen: datiert, aber inhaltlich AGM-Protokolle
-      # und F24-1-Formulare. Der echte Newsroom liefert 30 Pressemeldungen -
-      # allerdings zeigt AIS dort NIRGENDS ein Datum (weder Karte noch URL noch
-      # ein JSON dahinter), die Items kommen also undatiert an. Seit die
-      # Auswahl reihum ueber die Betreiber laeuft, bekommt AIS trotzdem einen
-      # Platz beim Analysten; vorher waeren undatierte Items unsichtbar
-      # gewesen. Inhalt schlaegt hier Formalie.
-      - type: newsroom
-        url: https://www.ais.th/en/about-us/pr-news
-        item_selector: .content-list-div
+      # sources entfernt 27.08.2026: 13 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
+      # (Der Newsroom lieferte ohnehin nur undatierte Items - Inhalt schlug
+      # Formalie, aber keine davon war je relevant.)
     - name: Viettel
       country: VN
       website: viettel.com.vn
@@ -956,10 +912,8 @@ regions:
       website: pldt.com
       aliases:
       - Smart Communications
-      sources:
-      - type: json_api
-        url: https://cms.pldt.com/drupal/api/v1/newsroom-article-list
-        link_template: 'https://cms.pldt.com{view_node}'
+      # sources entfernt 27.08.2026: 31 neue Meldungen, 0 bewertet ueber 23
+      # Laeufe (scripts/quellen_trefferquote.py); Wiederaufnahme moeglich.
     - name: Indosat Ooredoo Hutchison
       country: ID
       website: ioh.co.id
