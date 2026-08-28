@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Was diese Woche im Markt passiert ist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --vf-red:#e60000; --vf-red-deep:#ac1811; --vf-ink:#25282b;
+    --vf-mute:#7e7e7e; --vf-canvas:#ffffff; --vf-neutral:#f2f2f2;
+    --font-display:'Inter','Helvetica Neue',Arial,sans-serif;
+    --slide-w:1920px; --slide-h:1080px;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
+  body{background:var(--vf-canvas);color:var(--vf-ink);
+    font-family:var(--font-display);font-size:22px}
+  .deck{position:fixed;inset:0;background:var(--vf-canvas);overflow:hidden}
+  .stage{position:absolute;width:var(--slide-w);height:var(--slide-h);
+    transform-origin:0 0;background:var(--vf-canvas);overflow:hidden}
+  .slide{position:absolute;inset:0;padding:120px;background:var(--vf-canvas);
+    opacity:0;visibility:hidden;transition:opacity 420ms var(--ease);
+    display:flex;flex-direction:column;justify-content:center}
+  .slide.active{opacity:1;visibility:visible}
+  .kicker{font-size:18px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--vf-mute);margin:0 0 28px}
+  .cover-title{font-size:104px;font-weight:800;letter-spacing:-.018em;
+    line-height:1.02;margin:0;max-width:1500px}
+  .cover-date{font-size:20px;color:var(--vf-mute);margin:38px 0 0;
+    letter-spacing:.06em}
+  .headline{font-size:60px;font-weight:800;letter-spacing:-.015em;
+    line-height:1.05;margin:0 0 56px;max-width:1500px}
+  .accent{color:var(--vf-red)}
+  .checklist{list-style:none;padding:0;margin:0;max-width:1500px}
+  .checklist li{font-size:30px;font-weight:500;line-height:1.4;
+    padding:0 0 26px 52px;position:relative}
+  .checklist li::before{content:"";position:absolute;left:0;top:16px;
+    width:26px;height:3px;background:var(--vf-red)}
+  .lede{font-size:30px;font-weight:500;line-height:1.4;margin:0 0 26px;
+    max-width:1400px}
+  .quellen{list-style:none;padding:0;margin:0;columns:2;column-gap:70px}
+  .quellen li{font-size:17px;line-height:1.45;color:var(--vf-ink);
+    margin:0 0 15px;break-inside:avoid}
+  .quellen a{color:var(--vf-mute);text-decoration:none;display:block;
+    font-size:14px;word-break:break-all}
+  .fussnote{font-size:13px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--vf-mute);margin:44px 0 0}
+  .footer{position:absolute;left:120px;right:120px;bottom:56px;
+    display:flex;justify-content:space-between;font-size:14px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--vf-mute)}
+  .progress{position:fixed;left:0;top:0;height:3px;background:var(--vf-red);
+    width:0;transition:width 300ms var(--ease);z-index:9}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck"><div class="stage" id="stage">
+<section class="slide" data-slide="1">
+  <p class="kicker">Telco Radar · Wochenbericht</p>
+  <h1 class="cover-title">Was diese Woche im Markt <span class="accent">passiert</span> ist</h1>
+  <p class="cover-date">Stand 2026-08-28</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-28</span><span>01 / 04</span></div>
+</section>
+<section class="slide" data-slide="2">
+  <h2 class="headline">Was diese Woche <span class="accent">passiert</span> ist</h2>
+  <ul class="checklist">
+    <li>Telefónica-Tochter O2 startet 5-Euro-Tarif und mehr</li>
+    <li>Telekom-Tarife mit bis zu 820 Euro Cashback</li>
+    <li>T-Mobile weitet Handy-Rückkauf auf alle Filialen aus</li>
+  </ul>
+
+  <div class="footer"><span>Telco Radar · 2026-08-28</span><span>02 / 04</span></div>
+</section>
+<section class="slide" data-slide="3">
+  <h2 class="headline">Was das für uns <span class="accent">bedeutet</span></h2>
+  <p class="lede">5-Euro-Tarif mit 15 GB im spanischen Markt drückt die Einstiegsschwelle, an der wir unsere Zweitmarken-Tarife messen müssen.</p>
+  <p class="lede">Telekom senkt mit LogiTel-Wechselrabatten die Effektivpreise von MagentaMobil S und M - eigene Wechselgutschriften für vergleichbare Tarife prüfen.</p>
+  <p class="lede">Vorlage für Vodafone: Altgeräte-Rückkauf mit Sofort-Rabatt auf Neugeräte kann Vertragsverlängerungen und Lager-Umschlag im eigenen Handel stützen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-28</span><span>03 / 04</span></div>
+</section>
+<section class="slide" data-slide="4">
+  <h2 class="headline">Quellen zum <span class="accent">Nachlesen</span></h2>
+  <ul class="quellen">
+    <li>ADSLZone: Telefónica-Tochter O2 startet 5-Euro-Tarif und mehr<a href="https://www.adslzone.net/noticias/operadores/cambios-o2-2026/">https://www.adslzone.net/noticias/operadores/cambios-o2-2026/</a></li>
+    <li>teltarif: Telekom-Tarife mit bis zu 820 Euro Cashback<a href="https://www.teltarif.de/nr0/logitel-telekom-magenta-mobil-cashback-bonus/news/105486.html">https://www.teltarif.de/nr0/logitel-telekom-magenta-mobil-cashback-bonus/news/105486.html</a></li>
+    <li>Lupa (Tschechien): T-Mobile weitet Handy-Rückkauf auf alle Filialen aus<a href="https://www.lupa.cz/aktuality/t-mobile-rozsiruje-vykup-telefonu-do-vsech-prodejen-v-cr-na-nove-samsungy-a-pixely-nabizi-slevy/?utm_source=rss&amp;utm_medium=text&amp;utm_campaign=rss">https://www.lupa.cz/aktuality/t-mobile-rozsiruje-vykup-telefonu-do-vsech-prodejen-v-cr-na-nove-samsungy-a-pixely-nabizi-slevy/?utm_source=rss&amp;utm_medium=text&amp;utm_campaign=rss</a></li>
+    <li>winSIM (Tarifseite): winSIM ändert Tarifwerte ohne Ankündigung<a href="https://www.winsim.de/5g-tarife">https://www.winsim.de/5g-tarife</a></li>
+    <li>O2 Telefónica Deutschland: Fußball-WM treibt Roaming-Datenverkehr stark an<a href="https://www.telefonica.de/fixed/news/10923/roaming-auswertung-2026-fussball-wm-und-reisesommer-sorgen-fuer-starkes-roaming-wachstum.html">https://www.telefonica.de/fixed/news/10923/roaming-auswertung-2026-fussball-wm-und-reisesommer-sorgen-fuer-starkes-roaming-wachstum.html</a></li>
+    <li>Turkcell: Turkcell bewirbt BiP als datenfreies Messaging für alle Netze<a href="https://medya.turkcell.com.tr/bulletins/internet-kotalarindan-harcamadan-mesajlasmak-isteyenler-grup-sohbetlerini-bipe-tasiyor/">https://medya.turkcell.com.tr/bulletins/internet-kotalarindan-harcamadan-mesajlasmak-isteyenler-grup-sohbetlerini-bipe-tasiyor/</a></li>
+    <li>Verizon: Visible startet Mobile-plus-Glasfaser-Bündel ohne Vertragsbindung<a href="https://www.verizon.com/about/news/visible-launches-visible-one-fiber-bundle">https://www.verizon.com/about/news/visible-launches-visible-one-fiber-bundle</a></li>
+    <li>Telepolis (Polen): Apple kündigt iPhone-Event am 9. September an<a href="https://www.telepolis.pl/tech/sprzet/apple-iphone-18-pro-iphone-ultra-premiera-data">https://www.telepolis.pl/tech/sprzet/apple-iphone-18-pro-iphone-ultra-premiera-data</a></li>
+    <li>ISPreview UK: Starlink testet Maritim-Tarif für kleine Boote<a href="https://www.ispreview.co.uk/index.php/2026/08/starlink-trials-personal-maritime-broadband-plan-for-small-boat-owners.html">https://www.ispreview.co.uk/index.php/2026/08/starlink-trials-personal-maritime-broadband-plan-for-small-boat-owners.html</a></li>
+    <li>A1 Telekom Austria: HBO Max startet bei A1 Select<a href="https://newsroom.a1.net/news-top-serien-filme-und-originals-hbo-max-startet-bei-a1-select?id=246840&amp;menueid=12657&amp;l=deutsch">https://newsroom.a1.net/news-top-serien-filme-und-originals-hbo-max-startet-bei-a1-select?id=246840&amp;menueid=12657&amp;l=deutsch</a></li>
+    <li>Univers Freebox: Free Mobile lockt mit Smartphones für 1 Euro<a href="https://www.universfreebox.com/article/596929/free-mobile-lance-une-nouvelle-operation-promos-speciale-rentree">https://www.universfreebox.com/article/596929/free-mobile-lance-une-nouvelle-operation-promos-speciale-rentree</a></li>
+    <li>ADSLZone: Disney+ startet Gratis-Plan ohne 4K und Downloads<a href="https://www.adslzone.net/noticias/streaming-tv/disney-plus-plan-gratuito-condiciones/">https://www.adslzone.net/noticias/streaming-tv/disney-plus-plan-gratuito-condiciones/</a></li>
+  </ul>
+  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in einer der oben verlinkten Quellen.</p>
+
+  <div class="footer"><span>Telco Radar · 2026-08-28</span><span>04 / 04</span></div>
+</section>
+</div></div>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var current = 0, total = slides.length;
+  function fitStage() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var scale = Math.min(vw / 1920, vh / 1080);
+    stage.style.left = ((vw - 1920 * scale) / 2) + 'px';
+    stage.style.top = ((vh - 1080 * scale) / 2) + 'px';
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i > total - 1) i = total - 1;
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+    current = i;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1);
+  });
+  document.addEventListener('click', function (e) {
+    show(current + (e.clientX < window.innerWidth / 3 ? -1 : 1));
+  });
+  window.addEventListener('resize', fitStage);
+  fitStage(); show(0);
+})();
+</script>
+</body>
+</html>

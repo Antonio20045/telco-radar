@@ -75,16 +75,16 @@
 
 
 <div class="tile-grid">
-  <div class="tile"><b>194</b><span>Quellen abgefragt</span></div>
+  <div class="tile"><b>183</b><span>Quellen abgefragt</span></div>
   <div class="tile"><b>13</b><span>stillgelegt (liefern seit Wochen nichts)</span></div>
-  <div class="tile accent"><b>191 / 1 / 2</b><span>ok / leer / fehlgeschlagen</span></div>
-  <div class="tile"><b>43.6 min</b><span>Laufzeit (27. August 2026)</span></div>
-  <div class="tile"><b>1046</b><span>neue Meldungen gelesen</span></div>
+  <div class="tile accent"><b>180 / 0 / 3</b><span>ok / leer / fehlgeschlagen</span></div>
+  <div class="tile"><b>71.3 min</b><span>Laufzeit (28. August 2026)</span></div>
+  <div class="tile"><b>439</b><span>neue Meldungen gelesen</span></div>
   
   
-  <div class="tile"><b>890</b><span>Ereignisse daraus (156 Mehrfachmeldungen gebündelt)</span></div>
+  <div class="tile"><b>344</b><span>Ereignisse daraus (95 Mehrfachmeldungen gebündelt)</span></div>
   
-  <div class="tile tint"><b>362</b><span>davon relevant</span></div>
+  <div class="tile tint"><b>104</b><span>davon relevant</span></div>
 </div>
 
 
@@ -99,56 +99,124 @@
   <div class="step-grid">
     
     <div>
-      <div class="step-dur">145.5 s</div>
+      <div class="step-dur">149.7 s</div>
       <div class="step-name">Sammeln</div>
-      <div class="step-detail">194 Quellen abgefragt, 3629 Meldungen gefunden, 13 stillgelegt</div>
+      <div class="step-detail">183 Quellen abgefragt, 3451 Meldungen gefunden, 13 stillgelegt</div>
     </div>
     
     <div>
       <div class="step-dur">0.0 s</div>
       <div class="step-name">Nur Neues</div>
-      <div class="step-detail">1046 neue Meldungen (Gedaechtnis: 4477 bekannt)</div>
+      <div class="step-detail">439 neue Meldungen (Gedaechtnis: 5412 bekannt)</div>
     </div>
     
     <div>
-      <div class="step-dur">262.2 s</div>
+      <div class="step-dur">245.3 s</div>
       <div class="step-name">Ereignisse buendeln</div>
-      <div class="step-detail">890 Ereignisse aus 1046 Meldungen</div>
+      <div class="step-detail">344 Ereignisse aus 439 Meldungen, 34 Nachklapp</div>
     </div>
     
     <div>
-      <div class="step-dur">2010.2 s</div>
+      <div class="step-dur">321.9 s</div>
+      <div class="step-name">Vorsortieren</div>
+      <div class="step-detail">62 von 344 aussortiert, 20 direkt durchgelassen</div>
+    </div>
+    
+    <div>
+      <div class="step-dur">898.4 s</div>
       <div class="step-name">Bewerten &amp; Schreiben</div>
-      <div class="step-detail">362 bewertete Meldungen</div>
+      <div class="step-detail">104 bewertete Meldungen</div>
     </div>
     
     <div>
-      <div class="step-dur">2.7 s</div>
+      <div class="step-dur">184.9 s</div>
       <div class="step-name">Einordnen für uns</div>
-      <div class="step-detail">12 direkt handlungsrelevant, 0 belegte Folgerungssätze</div>
+      <div class="step-detail">6 direkt handlungsrelevant, 14 belegte Folgerungssätze</div>
     </div>
     
     <div>
-      <div class="step-dur">1.1 s</div>
+      <div class="step-dur">134.7 s</div>
       <div class="step-name">Wettbewerber-Analyse</div>
-      <div class="step-detail">3 Profile (0 Moves)</div>
+      <div class="step-detail">3 Profile (22 Moves)</div>
     </div>
     
     <div>
-      <div class="step-dur">40.2 s</div>
+      <div class="step-dur">6.5 s</div>
       <div class="step-name">Bilder</div>
-      <div class="step-detail">293 von 362 Meldungen mit Bild</div>
+      <div class="step-detail">86 von 104 Meldungen mit Bild</div>
     </div>
     
     <div>
-      <div class="step-dur">2614.9 s</div>
+      <div class="step-dur">4278.5 s</div>
       <div class="step-name">KI-Modelle</div>
       <div class="step-detail">
-        Bewertung: <b>deepseek-v4-pro</b>
+        Bewertung: <b>deepseek-v4-pro</b> &middot; Wochenbericht: <b>deepseek-v4-pro</b>
       </div>
     </div>
   </div>
 </div>
+
+
+
+
+
+<div class="card">
+  <div class="card-head"><h2>Was dieser Lauf verbraucht hat</h2></div>
+  <div class="rowtable">
+    <div class="rowtable-head">
+      <span class="col-region">Modell</span>
+      <span class="col-flex">Aufrufe</span>
+      <span class="col-kept">Token ein / aus</span>
+      <span class="col-model">Kosten</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">deepseek-v4-flash</span>
+      <span class="col-flex">185</span>
+      <span class="col-kept">237.595
+        / 543.110</span>
+      <span class="col-model">0.19 $</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">deepseek-v4-pro</span>
+      <span class="col-flex">26</span>
+      <span class="col-kept">197.286
+        / 272.989</span>
+      <span class="col-model">0.32 $</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region"><b>Summe</b></span>
+      <span class="col-flex"></span>
+      <span class="col-kept"></span>
+      <span class="col-model"><b>0.51 $</b></span>
+    </div>
+  </div>
+  <p class="muted-note" style="margin:14px 0 0;max-width:760px">
+    Erwartet werden je Lauf bis zu
+    1.50 $.
+    
+  </p>
+</div>
+
+
+
+
+
+
+
+<div class="card">
+  <div class="card-head"><h2>Promo-Übersicht</h2></div>
+  <p class="muted-note" style="max-width:760px">
+    59 Aktionsseiten gelesen,
+    23 Angebote neu aufgenommen,
+    11 bestätigt,
+    2 Seiten mit gescheiterter Extraktion
+    (ihre Angebote blieben unverändert).
+  </p>
+</div>
+
 
 
 
@@ -183,9 +251,9 @@
     Die oberste Stufe vergibt kein Sprachmodell, sondern eine Regel: eine
     Marke des deutschen Marktes <b>und</b> ein Thema, das ein Endkunde kauft.
     
-    In dieser Ausgabe haben 0 Folgerungssätze
+    In dieser Ausgabe haben 14 Folgerungssätze
     die Prüfung gegen ihren Originaltext bestanden,
-    50 sind dabei gefallen und
+    6 sind dabei gefallen und
     erscheinen nicht.
     
   </p>
@@ -226,106 +294,78 @@
     </div>
     
     <div class="rowtable-row">
-      <span class="col-region">Geräte</span>
-      <span class="col-flex">19</span>
-      <span class="col-kept">8</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
       <span class="col-region">Afrika &amp; Naher Osten</span>
-      <span class="col-flex">90</span>
-      <span class="col-kept">34</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region">Regulierung &amp; Verbände</span>
-      <span class="col-flex">34</span>
-      <span class="col-kept">18</span>
+      <span class="col-flex">15</span>
+      <span class="col-kept">4</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
       <span class="col-region">Global</span>
-      <span class="col-flex">181</span>
-      <span class="col-kept">83</span>
+      <span class="col-flex">46</span>
+      <span class="col-kept">14</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
-      <span class="col-region">Ozeanien</span>
-      <span class="col-flex">6</span>
+      <span class="col-region">Regulierung &amp; Verbände</span>
+      <span class="col-flex">4</span>
+      <span class="col-kept">3</span>
+      <span class="col-model">deepseek-v4-pro</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">Lateinamerika</span>
+      <span class="col-flex">36</span>
+      <span class="col-kept">20</span>
+      <span class="col-model">deepseek-v4-pro</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-region">Nordamerika</span>
+      <span class="col-flex">4</span>
       <span class="col-kept">4</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
       <span class="col-region">Asien</span>
-      <span class="col-flex">87</span>
-      <span class="col-kept">50</span>
+      <span class="col-flex">6</span>
+      <span class="col-kept">4</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
-      <span class="col-region">KI-Anbieter</span>
-      <span class="col-flex">29</span>
-      <span class="col-kept">15</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region">Lateinamerika</span>
-      <span class="col-flex">105</span>
-      <span class="col-kept">37</span>
+      <span class="col-region">Geräte</span>
+      <span class="col-flex">1</span>
+      <span class="col-kept">0</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
       <span class="col-region">Europa</span>
-      <span class="col-flex">285</span>
-      <span class="col-kept">92</span>
+      <span class="col-flex">162</span>
+      <span class="col-kept">51</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
-      <span class="col-region">Nordamerika</span>
-      <span class="col-flex">28</span>
-      <span class="col-kept">10</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region">Netzausrüster</span>
-      <span class="col-flex">6</span>
-      <span class="col-kept">1</span>
+      <span class="col-region">Chips &amp; Modems</span>
+      <span class="col-flex">1</span>
+      <span class="col-kept">0</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
       <span class="col-region">MVNO, eSIM &amp; Plattformen</span>
-      <span class="col-flex">10</span>
-      <span class="col-kept">5</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region">Satellit &amp; NTN</span>
-      <span class="col-flex">2</span>
-      <span class="col-kept">1</span>
-      <span class="col-model">deepseek-v4-pro</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-region">Türme, Glasfaser &amp; Rechenzentren</span>
       <span class="col-flex">1</span>
       <span class="col-kept">1</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
     
     <div class="rowtable-row">
-      <span class="col-region">Chips &amp; Modems</span>
-      <span class="col-flex">7</span>
+      <span class="col-region">KI-Anbieter</span>
+      <span class="col-flex">6</span>
       <span class="col-kept">3</span>
       <span class="col-model">deepseek-v4-pro</span>
     </div>
@@ -345,19 +385,7 @@
     </div>
     
     <div class="rowtable-row">
-      <span class="col-src-name">Mistral AI</span>
-      <span class="col-src-type">Feed</span>
-      <span class="col-src-count">60 Meldungen</span>
-    </div>
-    
-    <div class="rowtable-row">
       <span class="col-src-name">Google DeepMind</span>
-      <span class="col-src-type">Feed</span>
-      <span class="col-src-count">60 Meldungen</span>
-    </div>
-    
-    <div class="rowtable-row">
-      <span class="col-src-name">1GLOBAL (Truphone)</span>
       <span class="col-src-type">Feed</span>
       <span class="col-src-count">60 Meldungen</span>
     </div>
@@ -369,15 +397,21 @@
     </div>
     
     <div class="rowtable-row">
+      <span class="col-src-name">Mistral AI</span>
+      <span class="col-src-type">Feed</span>
+      <span class="col-src-count">60 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
       <span class="col-src-name">TeleSíntese (BR)</span>
       <span class="col-src-type">Fachpresse</span>
       <span class="col-src-count">60 Meldungen</span>
     </div>
     
     <div class="rowtable-row">
-      <span class="col-src-name">Light Reading</span>
-      <span class="col-src-type">Fachpresse</span>
-      <span class="col-src-count">50 Meldungen</span>
+      <span class="col-src-name">1GLOBAL (Truphone)</span>
+      <span class="col-src-type">Feed</span>
+      <span class="col-src-count">60 Meldungen</span>
     </div>
     
     <div class="rowtable-row">
@@ -393,7 +427,13 @@
     </div>
     
     <div class="rowtable-row">
-      <span class="col-src-name">Telecom Handel</span>
+      <span class="col-src-name">Telecoms.com</span>
+      <span class="col-src-type">Fachpresse</span>
+      <span class="col-src-count">50 Meldungen</span>
+    </div>
+    
+    <div class="rowtable-row">
+      <span class="col-src-name">Light Reading</span>
       <span class="col-src-type">Fachpresse</span>
       <span class="col-src-count">50 Meldungen</span>
     </div>
@@ -406,12 +446,12 @@
 </div>
 
 <details class="evidence" style="margin-top:24px">
-  <summary><span>Alle 194 abgefragten Quellen</span><small>mit Status und Meldungszahl</small></summary>
+  <summary><span>Alle 183 abgefragten Quellen</span><small>mit Status und Meldungszahl</small></summary>
   <div class="evidence-body">
     <div class="log-legend">
-      <span class="s"><span class="sdot ok"></span>geliefert (191)</span>
-      <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (1)</span>
-      <span class="s"><span class="sdot fail"></span>nicht erreichbar (2)</span>
+      <span class="s"><span class="sdot ok"></span>geliefert (180)</span>
+      <span class="s"><span class="sdot empty"></span>keine neuen Meldungen (0)</span>
+      <span class="s"><span class="sdot fail"></span>nicht erreichbar (3)</span>
       <span class="s"><span class="sdot empty"></span>stillgelegt (13)</span>
     </div>
     <table class="src-table">
@@ -425,6 +465,15 @@
           <td><span class="kbadge">Feed</span></td>
           <td class="num">0</td>
           <td><a href="https://crtc.gc.ca/eng/rss/news.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot fail" title="fail"></span></td>
+          <td><b>Telecoms Tech News</b><br><span style="color:var(--mute2);font-size:12.5px">ValueError: unparseable feed: &lt;unknown&gt;:2:119: not well-formed (invalid token)</span></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">0</td>
+          <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -447,29 +496,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Mistral AI</b></td>
-          <td>thema:ki</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">60</td>
-          <td><a href="https://mistral.ai/news/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Google DeepMind</b></td>
           <td>thema:ki</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">60</td>
           <td><a href="https://deepmind.google/blog/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>1GLOBAL (Truphone)</b></td>
-          <td>thema:mvno</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">60</td>
-          <td><a href="https://www.1global.com/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -483,6 +514,15 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Mistral AI</b></td>
+          <td>thema:ki</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">60</td>
+          <td><a href="https://mistral.ai/news/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>TeleSíntese (BR)</b></td>
           <td>latin_america</td>
           <td><span class="kbadge">Fachpresse</span></td>
@@ -492,11 +532,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Light Reading</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">50</td>
-          <td><a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><b>1GLOBAL (Truphone)</b></td>
+          <td>thema:mvno</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">60</td>
+          <td><a href="https://www.1global.com/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -519,20 +559,29 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telecom Handel</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">50</td>
-          <td><a href="https://www.telecom-handel.de/feed/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Telecoms.com</b></td>
           <td>Fachpresse</td>
           <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">50</td>
           <td><a href="https://www.telecoms.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Light Reading</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">50</td>
+          <td><a href="https://www.lightreading.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telepolis (Polen)</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">50</td>
+          <td><a href="https://www.telepolis.pl/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -546,20 +595,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telecom Handel</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">50</td>
+          <td><a href="https://www.telecom-handel.de/feed/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Samsung</b></td>
           <td>thema:geraete</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">50</td>
           <td><a href="https://news.samsung.com/global/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telepolis (Polen)</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">50</td>
-          <td><a href="https://www.telepolis.pl/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -578,15 +627,6 @@
           <td><span class="kbadge">Feed</span></td>
           <td class="num">48</td>
           <td><a href="https://mfn.se/all/a/millicom.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>ITWeb (Südafrika)</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">42</td>
-          <td><a href="https://www.itweb.co.za/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -618,20 +658,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Iliad</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed (API)</span></td>
-          <td class="num">40</td>
-          <td><a href="https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&amp;year=all&amp;tag=all" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Charter Communications</b></td>
           <td>north_america</td>
           <td><span class="kbadge">Feed (API)</span></td>
           <td class="num">40</td>
           <td><a href="https://corporate.charter.com/page-data/sq/d/2336972469.json" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Iliad</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed (API)</span></td>
+          <td class="num">40</td>
+          <td><a href="https://api.scw.iliad.fr/iliad-cms/news-items/deep-find?language=en&amp;year=all&amp;tag=all" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -663,24 +703,6 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Airtel Africa</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">30</td>
-          <td><a href="https://www.investegate.co.uk/company/AAF" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Singtel</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">30</td>
-          <td><a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Rakuten Mobile</b></td>
           <td>asia</td>
           <td><span class="kbadge">Newsroom</span></td>
@@ -690,20 +712,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Mobile World Live</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">30</td>
-          <td><a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Bharti Airtel</b></td>
           <td>asia</td>
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">30</td>
           <td><a href="https://www.airtel.in/press-release" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Singtel</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">30</td>
+          <td><a href="https://www.singtel.com/about-us/media-centre" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -735,11 +757,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Safaricom</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Newsroom</span></td>
+          <td><b>Mobile World Live</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">30</td>
-          <td><a href="https://www.safaricom.co.ke/media-center-landing/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.mobileworldlive.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -753,11 +775,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>TELETIME (Brasilien)</b></td>
-          <td>latin_america</td>
-          <td><span class="kbadge">Fachpresse</span></td>
+          <td><b>Safaricom</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
           <td class="num">30</td>
-          <td><a href="https://teletime.com.br/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.safaricom.co.ke/media-center-landing/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -771,20 +793,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>AIS</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Newsroom</span></td>
+          <td><b>TELETIME (Brasilien)</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">30</td>
-          <td><a href="https://www.ais.th/en/about-us/pr-news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>du</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">30</td>
-          <td><a href="https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&amp;Category=0&amp;lang=en&amp;Year=0&amp;Month=0" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://teletime.com.br/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -816,11 +829,29 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>ITWeb (Südafrika)</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">27</td>
+          <td><a href="https://www.itweb.co.za/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>AT&amp;T</b></td>
           <td>north_america</td>
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">25</td>
           <td><a href="https://investors.att.com/news-and-events/news-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>KPN</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">25</td>
+          <td><a href="https://www.overons.kpn/nieuws/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -843,11 +874,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>KPN</b></td>
+          <td><b>Univers Freebox</b></td>
           <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">25</td>
-          <td><a href="https://www.overons.kpn/nieuws/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.universfreebox.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -857,15 +888,6 @@
           <td><span class="kbadge">Feed</span></td>
           <td class="num">25</td>
           <td><a href="https://newsroom.bt.com/feed/en" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Univers Freebox</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">25</td>
-          <td><a href="https://www.universfreebox.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -924,6 +946,15 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>O2 Telefónica Deutschland</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">20</td>
+          <td><a href="https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Entel</b></td>
           <td>latin_america</td>
           <td><span class="kbadge">Newsroom</span></td>
@@ -942,38 +973,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>O2 Telefónica Deutschland</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">20</td>
-          <td><a href="https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>WOM</b></td>
           <td>latin_america</td>
           <td><span class="kbadge">Feed (API)</span></td>
           <td class="num">20</td>
           <td><a href="https://sobrenosotros.wom.cl/wp-json/wp/v2/posts?categories=1&amp;per_page=20" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>O2 Telefónica Deutschland</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">20</td>
-          <td><a href="https://www.telefonica.de/o2/rss/news?group_id=62;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telia Sverige</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">20</td>
-          <td><a href="https://press.telia.se/rss/current_news/55401" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -987,11 +991,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telia Sverige</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">20</td>
+          <td><a href="https://press.telia.se/rss/current_news/55401" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>O2 Telefónica Deutschland</b></td>
           <td>europe</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">20</td>
-          <td><a href="https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telefonica.de/o2/rss/news?group_id=62;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1005,11 +1018,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>teltarif</b></td>
+          <td><b>O2 Telefónica Deutschland</b></td>
           <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
+          <td><span class="kbadge">Feed</span></td>
           <td class="num">20</td>
-          <td><a href="https://www.teltarif.de/feed/news/20.rss2" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1019,6 +1032,15 @@
           <td><span class="kbadge">Feed</span></td>
           <td class="num">20</td>
           <td><a href="https://www.irasia.com/cgi-local/news/rss.cgi?id=chinatelecom&amp;loc=hk&amp;t=p&amp;title_for_section=yes" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>teltarif</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">20</td>
+          <td><a href="https://www.teltarif.de/feed/news/20.rss2" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1050,15 +1072,6 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>TechCentral (Südafrika)</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">20</td>
-          <td><a href="https://techcentral.co.za/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Netzwoche (Schweiz)</b></td>
           <td>europe</td>
           <td><span class="kbadge">Fachpresse</span></td>
@@ -1068,11 +1081,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Google AI</b></td>
-          <td>thema:ki</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><b>TechCentral (Südafrika)</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">20</td>
-          <td><a href="https://blog.google/technology/ai/rss/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://techcentral.co.za/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1086,20 +1099,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Google AI</b></td>
+          <td>thema:ki</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">20</td>
+          <td><a href="https://blog.google/technology/ai/rss/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Mobile Time (Brasilien)</b></td>
           <td>latin_america</td>
           <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">20</td>
           <td><a href="https://www.mobiletime.com.br/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Android</b></td>
-          <td>thema:geraete</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">20</td>
-          <td><a href="https://blog.google/products/android/rss/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1131,6 +1144,15 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Android</b></td>
+          <td>thema:geraete</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">20</td>
+          <td><a href="https://blog.google/products/android/rss/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Nvidia Newsroom</b></td>
           <td>thema:ki</td>
           <td><span class="kbadge">Feed</span></td>
@@ -1145,6 +1167,15 @@
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">18</td>
           <td><a href="https://www.threemediacentre.co.uk/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>NTT Group</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">18</td>
+          <td><a href="https://www.group.ntt/en/newsrelease/rss/release.rdf" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1185,29 +1216,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>NTT Group</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">17</td>
-          <td><a href="https://www.group.ntt/en/newsrelease/rss/release.rdf" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Vodafone Group</b></td>
           <td>europe</td>
           <td><span class="kbadge">Feed (API)</span></td>
           <td class="num">16</td>
           <td><a href="https://www.vodafone.com/tools/urlproxy/advurlproxy.aspx?settingname=news-feed&amp;categories=*&amp;tags=*" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Xataka Móvil</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">16</td>
-          <td><a href="https://www.xatakamovil.com/feedburner.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1226,6 +1239,15 @@
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">15</td>
           <td><a href="https://www.telekom.com/de/medien/medieninformationen" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Xataka Móvil</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">15</td>
+          <td><a href="https://www.xatakamovil.com/feedburner.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1302,69 +1324,6 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>MTN Group</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.mtn.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Liberty Latin America</b></td>
-          <td>latin_america</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.lla.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Comcast</b></td>
-          <td>north_america</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.cmcsa.com/rss/news-releases.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telefónica</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Airtel Africa</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.airtel.africa/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>T-Mobile US</b></td>
-          <td>north_america</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://investor.t-mobile.com/rss/pressrelease.aspx?T=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Beyon</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.beyon.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Charter Communications</b></td>
           <td>north_america</td>
           <td><span class="kbadge">Feed</span></td>
@@ -1383,15 +1342,6 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telenor</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telenor.com/media/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>DISH Wireless</b></td>
           <td>north_america</td>
           <td><span class="kbadge">Feed</span></td>
@@ -1401,74 +1351,29 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Turk Telekom</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">10</td>
-          <td><a href="https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>1&amp;1</b></td>
-          <td>europe</td>
+          <td><b>Liberty Latin America</b></td>
+          <td>latin_america</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://unternehmen.1und1.de/presse/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.lla.com/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Vodafone Deutschland</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://newsroom.vodafone.de/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Optus</b></td>
-          <td>oceania</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.optus.com.au/about/media-centre/media-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Virgin Media O2</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://news.o2.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Rogers</b></td>
+          <td><b>T-Mobile US</b></td>
           <td>north_america</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://about.rogers.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://investor.t-mobile.com/rss/pressrelease.aspx?T=1" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Liquid Intelligent Technologies</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><b>Telenor</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
           <td class="num">10</td>
-          <td><a href="https://liquid.tech/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>SK Telecom</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://news.sktelecom.com/en/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telenor.com/media/newsroom/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1482,11 +1387,29 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Turkcell</b></td>
+          <td><b>Telefónica</b></td>
           <td>europe</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://medya.turkcell.com.tr/bulletins/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telefonica.com/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Beyon</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.beyon.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Optus</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.optus.com.au/about/media-centre/media-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1500,101 +1423,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Sonatel</b></td>
-          <td>africa_middle_east</td>
+          <td><b>SK Telecom</b></td>
+          <td>asia</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://sonatel.sn/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://news.sktelecom.com/en/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Corriere Comunicazioni</b></td>
+          <td><b>Vodafone Deutschland</b></td>
           <td>europe</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.corrierecomunicazioni.it/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Mobile Europe</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>CommsRisk</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://commsrisk.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Broadband TV News</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Chunghwa Telecom</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Total Telecom</b></td>
-          <td>Fachpresse</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://totaltele.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>KDDI</b></td>
-          <td>asia</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://newsroom.kddi.com/english/ir-news/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Tata Communications</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.tatacommunications.com/press-release/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telecom Review Africa</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telecomreviewafrica.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Ooredoo</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.ooredoo.qa/web/en/press-release/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://newsroom.vodafone.de/rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1608,20 +1450,47 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>One NZ</b></td>
-          <td>oceania</td>
+          <td><b>Sonatel</b></td>
+          <td>africa_middle_east</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://media.one.nz/index.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://sonatel.sn/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telecoms Tech News</b></td>
+          <td><b>Ooredoo</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.ooredoo.qa/web/en/press-release/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>KDDI</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://newsroom.kddi.com/english/ir-news/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Total Telecom</b></td>
           <td>Fachpresse</td>
           <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.telecomstechnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://totaltele.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Broadband TV News</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.broadbandtvnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1635,200 +1504,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Broadcom</b></td>
-          <td>thema:chips</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://investors.broadcom.com/rss/news-releases.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>PLDT</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Feed (API)</span></td>
-          <td class="num">10</td>
-          <td><a href="https://cms.pldt.com/drupal/api/v1/newsroom-article-list" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>TeleSemana (LatAm)</b></td>
-          <td>latin_america</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telesemana.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>PolicyTracker</b></td>
+          <td><b>Broadband Communities</b></td>
           <td>Fachpresse</td>
           <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.policytracker.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://bbcmag.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>DPL News (Lateinamerika)</b></td>
-          <td>latin_america</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://dplnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Communications Today (Indien)</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.communicationstoday.co.in/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Intel</b></td>
-          <td>thema:chips</td>
+          <td><b>Virgin Media O2</b></td>
+          <td>europe</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://newsroom.intel.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>MediaTek</b></td>
-          <td>thema:chips</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.mediatek.com/press-room/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>AST SpaceMobile</b></td>
-          <td>thema:satellit</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://ast-science.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>True Corporation</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.true.th/blog/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Microsoft Azure</b></td>
-          <td>thema:ki</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://azure.microsoft.com/en-us/blog/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Meta</b></td>
-          <td>thema:ki</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://about.fb.com/news/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Bundesnetzagentur</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Pressemitteilungen.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>TelecomLead (Indien)</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://telecomlead.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>ČTÚ (Tschechien)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://ctu.gov.cz/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>JMA Wireless</b></td>
-          <td>thema:netzausruester</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://jmawireless.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>EU-Kommission (DG CNECT)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://digital-strategy.ec.europa.eu/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telecom Review Asia</b></td>
-          <td>asia</td>
-          <td><span class="kbadge">Fachpresse</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telecomreviewasia.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>GSMA</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.gsma.com/newsroom/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Hughes Network Systems</b></td>
-          <td>thema:satellit</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.hughes.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>CA (Kenia)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.ca.go.ke/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>BREKO</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://brekoverband.de/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://news.o2.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1842,83 +1531,146 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Subtel (Chile)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><b>Telecom Review Asia</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.subtel.gob.cl/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telecomreviewasia.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>NCA (Ghana)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><b>Corriere Comunicazioni</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://nca.org.gh/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.corrierecomunicazioni.it/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Broadband Communities</b></td>
+          <td><b>Tata Communications</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.tatacommunications.com/press-release/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Mobile Europe</b></td>
           <td>Fachpresse</td>
           <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://bbcmag.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.mobileeurope.co.uk/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>IDEMIA</b></td>
-          <td>thema:mvno</td>
+          <td><b>Telecom Review Africa</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telecomreviewafrica.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Turkcell</b></td>
+          <td>europe</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.idemia.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://medya.turkcell.com.tr/bulletins/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Sequans</b></td>
+          <td><b>Microsoft Azure</b></td>
+          <td>thema:ki</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://azure.microsoft.com/en-us/blog/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>1&amp;1</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://unternehmen.1und1.de/presse/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Communications Today (Indien)</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.communicationstoday.co.in/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Hughes Network Systems</b></td>
+          <td>thema:satellit</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.hughes.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>PolicyTracker</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.policytracker.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>EU-Kommission (DG CNECT)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://digital-strategy.ec.europa.eu/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>DPL News (Lateinamerika)</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://dplnews.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>True Corporation</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.true.th/blog/en/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Broadcom</b></td>
           <td>thema:chips</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://sequans.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://investors.broadcom.com/rss/news-releases.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>TRAI (Indien)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
+          <td><b>TeleSemana (LatAm)</b></td>
+          <td>latin_america</td>
+          <td><span class="kbadge">Fachpresse</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.trai.gov.in/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>NCC (Nigeria)</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.ncc.gov.ng/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Connect Europe</b></td>
-          <td>thema:regulierung</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.connecteurope.org/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telna</b></td>
-          <td>thema:mvno</td>
-          <td><span class="kbadge">Feed</span></td>
-          <td class="num">10</td>
-          <td><a href="https://www.telna.com/blog/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.telesemana.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1932,6 +1684,96 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Intel</b></td>
+          <td>thema:chips</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://newsroom.intel.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Sequans</b></td>
+          <td>thema:chips</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://sequans.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Comcast</b></td>
+          <td>north_america</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.cmcsa.com/rss/news-releases.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telna</b></td>
+          <td>thema:mvno</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telna.com/blog/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>GSMA</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.gsma.com/newsroom/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>AST SpaceMobile</b></td>
+          <td>thema:satellit</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://ast-science.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>MediaTek</b></td>
+          <td>thema:chips</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.mediatek.com/press-room/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>IDEMIA</b></td>
+          <td>thema:mvno</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.idemia.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>TelecomLead (Indien)</b></td>
+          <td>asia</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://telecomlead.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Subtel (Chile)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.subtel.gob.cl/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Zayo</b></td>
           <td>thema:infrastruktur</td>
           <td><span class="kbadge">Feed</span></td>
@@ -1941,11 +1783,47 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Telecom Review (Naher Osten)</b></td>
-          <td>africa_middle_east</td>
-          <td><span class="kbadge">Fachpresse</span></td>
+          <td><b>JMA Wireless</b></td>
+          <td>thema:netzausruester</td>
+          <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.telecomreview.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://jmawireless.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>One NZ</b></td>
+          <td>oceania</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://media.one.nz/index.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>BREKO</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://brekoverband.de/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>NCA (Ghana)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://nca.org.gh/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>BEREC</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.berec.europa.eu/index%2ephp/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1959,11 +1837,47 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Infobip</b></td>
-          <td>thema:mvno</td>
+          <td><b>Rogers</b></td>
+          <td>north_america</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.infobip.com/news/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://about.rogers.com/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>ČTÚ (Tschechien)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://ctu.gov.cz/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Bundesnetzagentur</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Pressemitteilungen.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Telecom Review (Naher Osten)</b></td>
+          <td>africa_middle_east</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.telecomreview.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>NCC (Nigeria)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.ncc.gov.ng/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -1977,6 +1891,15 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>TRAI (Indien)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.trai.gov.in/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>ANCOM (Rumänien)</b></td>
           <td>thema:regulierung</td>
           <td><span class="kbadge">Feed</span></td>
@@ -1986,11 +1909,47 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>BEREC</b></td>
+          <td><b>Meta</b></td>
+          <td>thema:ki</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://about.fb.com/news/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Connect Europe</b></td>
           <td>thema:regulierung</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">10</td>
-          <td><a href="https://www.berec.europa.eu/index%2ephp/en/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.connecteurope.org/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>CommsRisk</b></td>
+          <td>Fachpresse</td>
+          <td><span class="kbadge">Fachpresse</span></td>
+          <td class="num">10</td>
+          <td><a href="https://commsrisk.com/feed/" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>CA (Kenia)</b></td>
+          <td>thema:regulierung</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.ca.go.ke/rss.xml" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Infobip</b></td>
+          <td>thema:mvno</td>
+          <td><span class="kbadge">Feed</span></td>
+          <td class="num">10</td>
+          <td><a href="https://www.infobip.com/news/feed" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -2067,11 +2026,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Orange MEA</b></td>
-          <td>africa_middle_east</td>
+          <td><b>Orange</b></td>
+          <td>europe</td>
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">6</td>
-          <td><a href="https://orange.jo/en/corporate/media-center" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+          <td><a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -2094,20 +2053,20 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Tele2</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">5</td>
-          <td><a href="https://www.tele2.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Deutsche Telekom</b></td>
           <td>europe</td>
           <td><span class="kbadge">Feed</span></td>
           <td class="num">5</td>
           <td><a href="https://www.telekom.com/service/rss/427676/feed.rss" target="_blank" rel="noopener">öffnen &nearr;</a></td>
+        </tr>
+        
+        <tr>
+          <td><span class="sdot ok" title="ok"></span></td>
+          <td><b>Tele2</b></td>
+          <td>europe</td>
+          <td><span class="kbadge">Newsroom</span></td>
+          <td class="num">5</td>
+          <td><a href="https://www.tele2.com/media/press-releases" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -2139,29 +2098,11 @@
         
         <tr>
           <td><span class="sdot ok" title="ok"></span></td>
-          <td><b>Swisscom</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">3</td>
-          <td><a href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot ok" title="ok"></span></td>
           <td><b>Viettel</b></td>
           <td>asia</td>
           <td><span class="kbadge">Newsroom</span></td>
           <td class="num">1</td>
           <td><a href="https://viettel.com.vn/en/news" target="_blank" rel="noopener">öffnen &nearr;</a></td>
-        </tr>
-        
-        <tr>
-          <td><span class="sdot empty" title="empty"></span></td>
-          <td><b>Orange</b></td>
-          <td>europe</td>
-          <td><span class="kbadge">Newsroom</span></td>
-          <td class="num">0</td>
-          <td><a href="https://www.orange.com/en/newsroom" target="_blank" rel="noopener">öffnen &nearr;</a></td>
         </tr>
         
         <tr>
@@ -2434,11 +2375,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.swisscom.ch/en/about/news.html" target="_blank" rel="noopener">
-          <span class="op-row-name">Swisscom</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Swisscom</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -2843,11 +2780,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.mtn.com/feed/" target="_blank" rel="noopener">
-          <span class="op-row-name">MTN Group</span>
-          <span class="op-row-type">Feed</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">MTN Group</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -2873,17 +2806,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.investegate.co.uk/company/AAF" target="_blank" rel="noopener">
-          <span class="op-row-name">Airtel Africa <span style="color:var(--faint2);font-weight:500">· Newsroom</span></span>
-          <span class="op-row-type">investegate.co.uk</span>
-        </a>
-        
-        
-        <a class="op-row-line" href="https://www.airtel.africa/rss.xml" target="_blank" rel="noopener">
-          <span class="op-row-name">Airtel Africa <span style="color:var(--faint2);font-weight:500">· Feed</span></span>
-          <span class="op-row-type">airtel.africa</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Airtel Africa</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -2951,21 +2874,13 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://orange.jo/en/corporate/media-center" target="_blank" rel="noopener">
-          <span class="op-row-name">Orange MEA</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Orange MEA</span><span class="op-row-type">–</span></div>
         
       </div>
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.du.ae/sites/Satellite?pagename=DisplayPressRelease&amp;Category=0&amp;lang=en&amp;Year=0&amp;Month=0" target="_blank" rel="noopener">
-          <span class="op-row-name">du</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">du</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -2981,11 +2896,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://medya.turktelekom.com.tr/basin-bultenleri/basin-bultenleri-ve-gorseller" target="_blank" rel="noopener">
-          <span class="op-row-name">Turk Telekom</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Turk Telekom</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -3001,11 +2912,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://liquid.tech/feed/" target="_blank" rel="noopener">
-          <span class="op-row-name">Liquid Intelligent Technologies</span>
-          <span class="op-row-type">Feed</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Liquid Intelligent Technologies</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -3182,11 +3089,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.cht.com.tw/en/home/cht/messages" target="_blank" rel="noopener">
-          <span class="op-row-name">Chunghwa Telecom</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">Chunghwa Telecom</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -3202,11 +3105,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://www.ais.th/en/about-us/pr-news" target="_blank" rel="noopener">
-          <span class="op-row-name">AIS</span>
-          <span class="op-row-type">Newsroom</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">AIS</span><span class="op-row-type">–</span></div>
         
       </div>
       
@@ -3232,11 +3131,7 @@
       
       <div class="op-row">
         
-        <a class="op-row-line" href="https://cms.pldt.com/drupal/api/v1/newsroom-article-list" target="_blank" rel="noopener">
-          <span class="op-row-name">PLDT</span>
-          <span class="op-row-type">Feed (API)</span>
-        </a>
-        
+        <div class="op-row-line"><span class="op-row-name">PLDT</span><span class="op-row-type">–</span></div>
         
       </div>
       
