@@ -520,17 +520,57 @@ def test_ein_breites_motiv_und_eine_schriftkachel_tragen_sie():
     assert ohne["lead_gross"] is True
 
 
-def test_zwei_zeilen_hoch_erst_ab_drei_weiteren_karten():
-    """Steht die Aufmacherkarte ueber zwei Rasterzeilen, ohne dass die
-    Zellen daneben gefuellt sind, bleibt MITTEN im Raster eine Luecke - genau
-    das "kreuz und quer", das diese Fassung abstellt."""
-    zwei = _block_von([_mit_bild("congstar", "Erste", 1280, 90),
-                       _mit_bild("congstar", "Zweite", 1280, 80)])
-    assert zwei["lead_gross"] is True and zwei["lead_hoch"] is False
-    vier = _block_von([_mit_bild("congstar", "Erste", 1280, 90)]
+def _block_mit_weiteren(n: int):
+    """Ein Block mit einer breiten Aufmacherkarte und `n` weiteren Karten."""
+    return _block_von([_mit_bild("congstar", "Erste", 1280, 90)]
                       + [_mit_bild("congstar", f"Nr{i}", 1280, 80 - i)
-                         for i in range(3)])
-    assert vier["lead_hoch"] is True
+                         for i in range(n)])
+
+
+def test_zwei_zeilen_hoch_erst_ab_vier_weiteren_karten():
+    """Steht die Aufmacherkarte ueber zwei Rasterzeilen, ohne dass die VIER
+    Zellen daneben (2 Spalten x 2 Zeilen) vollstaendig gefuellt sind, bleibt
+    MITTEN im Raster eine Luecke - genau das "kreuz und quer", das diese
+    Fassung abstellt. Bis zum 27.08.2026 reichten drei weitere Karten, und
+    ALDI TALK zeigte live genau die leere Zelle unten rechts."""
+    # Zwei weitere Karten fuellen die einzeilige Aufmacherkarte VOLLSTAENDIG
+    # (Spalte 3+4) - anders als bei genau einer (siehe Test daneben).
+    zwei = _block_mit_weiteren(2)
+    assert zwei["lead_gross"] is True and zwei["lead_hoch"] is False
+    drei = _block_mit_weiteren(3)
+    assert drei["lead_gross"] is True and drei["lead_hoch"] is False, (
+        "drei weitere Karten fuellen die 2x2-Flaeche nicht vollstaendig "
+        "(ALDI TALK, 27.08.2026)")
+    vier = _block_mit_weiteren(4)
+    assert vier["lead_gross"] is True and vier["lead_hoch"] is True
+
+
+def test_eine_weitere_karte_laesst_die_aufmacherkarte_normal_breit():
+    """Genau EINE weitere Karte neben einer zweispaltigen Aufmacherkarte
+    liesse eine Zelle leer (PremiumSIM, simplytel - live gemessen am
+    27.08.2026, "je 1 leere Spalte"). Die Aufmacherkarte faellt dafuer auf
+    die normale Breite zurueck: zwei gleich grosse Karten mit Rest-Weissraum
+    rechts sind eine normale kurze Reihe, keine Luecke neben einer
+    groesseren Karte."""
+    eine = _block_mit_weiteren(1)
+    assert eine["lead_gross"] is False and eine["lead_hoch"] is False
+
+
+def test_null_weitere_karten_bleiben_gross():
+    """Ohne jede weitere Karte bleibt die Aufmacherkarte breit - dort ist
+    keine dritte Spalte, die eine Luecke aufreissen koennte."""
+    null = _block_mit_weiteren(0)
+    assert null["lead_gross"] is True and null["lead_hoch"] is False
+
+
+def test_fuenf_bis_sieben_weitere_karten_bleiben_ohne_luecke():
+    """Ueberschuss ueber die volle 2x2-Flaeche hinaus faengt eine neue,
+    eigene Rasterzeile an - die ist gegebenenfalls kurz, aber KEINE Luecke
+    NEBEN der Aufmacherkarte: die Karten dieser Zeile stehen fuer sich, ohne
+    Beruehrung mit dem zweizeiligen Feld."""
+    for n in (5, 6, 7):
+        block = _block_mit_weiteren(n)
+        assert block["lead_gross"] is True and block["lead_hoch"] is True, n
 
 
 def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():

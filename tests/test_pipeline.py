@@ -152,24 +152,29 @@ def test_analyst_reads_every_item_when_uncapped():
 
     from telco_radar.analyze import agents
 
-    items = [_mk_item(n) for n in range(37)]
+    # Zwei volle Stapel plus ein Rest - die Zahl wird aus BATCH_SIZE
+    # gerechnet, nicht festgeschrieben: als Literal (37 bei Stapelgroesse 15)
+    # zerbrach der Test an der Erhoehung auf 24 am 27.08.2026, obwohl die
+    # gepruefte Zusicherung "es wird nichts weggeworfen" unberuehrt blieb.
+    anzahl = agents.BATCH_SIZE * 2 + 7
+    items = [_mk_item(n) for n in range(anzahl)]
     seen_batches = []
 
-    def fake_complete(system, user, model=None, max_tokens=None):
+    def fake_complete(system, user, model=None, max_tokens=None, **kw):
         seen_batches.append(user)
         return '{"region_summary": "s", "highlights": []}'
 
     with patch.object(agents, "complete", fake_complete):
         agents.analyze_region("Europa", items, model="m", max_items=None)
-    # 37 items in batches of 15 -> 3 calls, nothing dropped
     assert len(seen_batches) == 3
-    for n in range(37):
+    for n in range(anzahl):
         assert any(f"item-{n}\n" in b or f"item-{n} " in b or f"item-{n}" in b
                    for b in seen_batches), n
 
     seen_batches.clear()
     with patch.object(agents, "complete", fake_complete):
-        agents.analyze_region("Europa", items, model="m", max_items=15)
+        agents.analyze_region("Europa", items, model="m",
+                              max_items=agents.BATCH_SIZE)
     assert len(seen_batches) == 1  # old behaviour still available
 
 

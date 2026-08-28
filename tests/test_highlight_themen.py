@@ -13,6 +13,7 @@ Positivtest auf.
 from __future__ import annotations
 
 import json
+from datetime import date
 
 import pytest
 from bs4 import BeautifulSoup
@@ -276,6 +277,219 @@ def test_der_seltenheitsdeckel_rechnet_je_ausgabe():
     assert ht._seltenheitsdeckel(10, 1) == 2 * ht.MIND_MELDUNGEN
 
 
+# --------------------------------------------------------------- Spezifitaet
+def test_spezifitaet_gewichtet_ereignis_vor_rauschen():
+    """Der Befund vom 27.08.2026: worte=['quartal','zweiten',...] (reines
+    Finanzrauschen) hatte keinen Punktabzug gegenueber worte=['apple',
+    'iphone','september','ultra'] (Produktname plus Datumssprache) - beide
+    zaehlten nur nach roher Groesse. Rein rauschige Bindewoerter zaehlen
+    nichts, eine blosse Wortpaarung ohne jede Ereignissprache ("deutsche"/
+    "telekom" - eine Firma, kein Vorgang) fast nichts, Ereignissprache zaehlt
+    doppelt."""
+    assert ht._spezifitaet(["quartal", "zweiten"]) == 0.0
+    assert ht._spezifitaet(["halbjahr", "ergebnis", "prozent"]) == 0.0
+    # Zwei Woerter ohne jede Ereignis-/Datumssprache: eine Firma, kein
+    # Vorgang - ohne dass das Modul eine Firmenliste braucht.
+    assert ht._spezifitaet(["deutsche", "telekom"]) == 0.1
+    apple = ht._spezifitaet(["apple", "iphone", "september", "ultra"])
+    samsung = ht._spezifitaet(["samsung", "fold8", "galaxy"])
+    assert apple > samsung > ht._spezifitaet(["quartal", "zweiten"])
+
+
+def test_spezifitaet_belohnt_nicht_die_blosse_wortzahl():
+    """Die Summe `eigen + 2*ereignis` war unbeschraenkt, also gewann, wer
+    mehr Bindewoerter hatte. Am echten Korpus vom 27.08.2026 trugen fuenf der
+    sechs Top-Kandidaten den Wert 10,0 - mit tragenden Woertern wie "keine",
+    "text", "your" und "weiteren". `_kandidat_aus_gruppe` liefert bis zu acht
+    Woerter; eine praezise Gruppe kommt oft mit vier aus und verlor damit
+    gegen das Rauschen. Gegen den alten Stand faellt dieser Test (dort 8,0
+    gegen 6,0)."""
+    allerwelts = ht._spezifitaet(["keine", "text", "your", "weiteren",
+                                  "konkreten", "gelten", "sollen", "dazu"])
+    apple = ht._spezifitaet(["apple", "iphone", "september", "ultra"])
+    assert apple > allerwelts
+
+
+def test_spezifitaet_zaehlt_produktbezeichnungen_mit():
+    """Ein Bindewort mit einer Ziffer ist praktisch immer eine Modell- oder
+    Generationsbezeichnung, also ein Eigenname - und Eigennamen benennen
+    Vorgaenge. Grossschreibung steht nicht zur Verfuegung, `wortmenge` hat
+    sie entfernt."""
+    mit = ht._spezifitaet(["google", "pixel-11-serie", "kamera"])
+    ohne = ht._spezifitaet(["google", "geraete", "kamera"])
+    assert mit > ohne
+
+
+def test_grosse_finanzgruppen_verdraengen_die_produktgruppe_nicht():
+    """Wahrheitstest aus dem Korpus vom 27.08.2026: die Apple-Keynote-Gruppe
+    (10 Meldungen, 5 Quellen, alle Schwellen erfuellt) stand auf Rang 17 von
+    116 Rohgruppen, weil MAX_KANDIDATEN=6 nach roher Groesse schnitt und
+    sechs groessere Finanzrauschen-Gruppen (Quartalszahlen, Halbjahres-
+    ergebnis, ...) die Plaetze belegten. Sechs solche Gruppen sind hier
+    bewusst GROESSER (6 Meldungen) als die Produktgruppe (4) - nach der alten
+    Regel (Groesse zuerst) waeren das die Top 6, die Produktgruppe faellt
+    komplett heraus. Nach der Spezifitaets-Regel steht sie trotzdem drin."""
+    rausch_paare = [
+        ("quartal", "zweiten"), ("halbjahr", "ergebnis"), ("umsatz", "milliarden"),
+        ("gewinn", "prozent"), ("bilanz", "revenue"), ("quartalszahlen", "millionen"),
+    ]
+    finanzgruppen = []
+    for gi, (rw1, rw2) in enumerate(rausch_paare):
+        for i in range(6):
+            finanzgruppen.append(_meldung(
+                f"https://finanz{gi}.example/{i}",
+                f"Firmenkuerzel{gi}{i} meldet {rw1} und {rw2} fuer den Berichtszeitraum",
+                f"Quelle{gi}-{i % 3}"))
+    produktgruppe = [_meldung(f"https://produkt.example/{i}",
+                              "Apple stellt neues iPhone Ultra im September vor",
+                              f"QuelleP{i}") for i in range(4)]
+
+    gruppen = ht.finde_kandidaten(finanzgruppen + produktgruppe)
+    assert len(gruppen) <= ht.MAX_KANDIDATEN
+    produkt_urls = {h["url"] for h in produktgruppe}
+    treffer = [g for g in gruppen if produkt_urls <= {h["url"] for h in g["items"]}]
+    assert len(treffer) == 1, "die Produktgruppe muss unter den Top-6 stehen"
+    # Und die reinste Rauschgruppe (nur die zwei Finanzwoerter als Bindeglied)
+    # steht NICHT vor ihr - hier faellt sie sogar ganz heraus.
+    quartal_dabei = [g for g in gruppen if set(g["worte"]) == {"quartal", "zweiten"}]
+    assert quartal_dabei == [] or quartal_dabei[0]["spezifitaet"] < treffer[0]["spezifitaet"]
+
+
+# ------------------------------------------------------------- Antizipation
+_ANKUENDIGUNG = [
+    _meldung("https://k.example/1", "Apple laedt zur Keynote am 9. September",
+             "Quelle K1", summary="Apple laedt zur Keynote am 9. September ein "
+             "- Vorstellung neuer Geraete erwartet."),
+    _meldung("https://k.example/2", "Apple Keynote Termin steht: September 9",
+             "Quelle K2", summary="Der Konzern bestaetigt die Keynote fuer "
+             "September 9 - neue Produkte erwartet."),
+    _meldung("https://k.example/3", "Analysten erwarten neue Geraete zur Keynote",
+             "Quelle K3", summary="Zur bevorstehenden Keynote am 9. September "
+             "werden mehrere neue Geraete erwartet."),
+]
+_OHNE_ANKUENDIGUNG = [
+    _meldung("https://o.example/1", "Firma Zeta bringt neues Ladekabel",
+             "Quelle O1", summary="Firma Zeta bringt ein neues Ladekabel fuer "
+             "Reisende auf den Markt."),
+    _meldung("https://o.example/2", "Zubehoer von Firma Zeta jetzt erhaeltlich",
+             "Quelle O2", summary="Das Ladekabel von Firma Zeta ist jetzt im "
+             "Handel erhaeltlich."),
+    _meldung("https://o.example/3", "Test des neuen Ladekabels von Firma Zeta",
+             "Quelle O3", summary="Wir haben das neue Ladekabel von Firma Zeta "
+             "getestet."),
+]
+
+
+def test_ankuendigungssprache_ergibt_einen_bevorstehenden_kandidaten():
+    """Drei Meldungen aus drei Quellen sind fuer finde_kandidaten() zu wenig
+    (MIND_MELDUNGEN=4) - der Antizipations-Pfad verlangt nur drei, dafuer
+    Ankuendigungssprache (Keynote-Datumsangaben in mindestens der Haelfte
+    der Meldungen)."""
+    assert ht.finde_kandidaten(_ANKUENDIGUNG) == []
+    gruppen = ht.finde_antizipation(_ANKUENDIGUNG)
+    assert len(gruppen) == 1
+    gruppe = gruppen[0]
+    assert gruppe["bevorstehend"] is True
+    assert {h["url"] for h in gruppe["items"]} == {h["url"] for h in _ANKUENDIGUNG}
+    assert gruppe["quellen"] == 3
+
+
+def test_ohne_ankuendigungssprache_kein_antizipationskandidat():
+    """Dieselbe Gruppengroesse und Quellenzahl, aber ohne Ankuendigungs-
+    oder Datumssprache: kein bevorstehendes Ereignis, kein Kandidat."""
+    assert ht.finde_antizipation(_OHNE_ANKUENDIGUNG) == []
+
+
+def _ankuendigungsgruppe(nr: int, marke: str, tag: int) -> list[dict]:
+    """Drei Meldungen aus drei Quellen ueber EINEN angekuendigten Termin."""
+    return [
+        _meldung(f"https://v{nr}.example/{k}",
+                 f"{marke} laedt zur Keynote am {tag}. Oktober",
+                 f"Quelle V{nr}{k}",
+                 summary=f"{marke} laedt zur Keynote am {tag}. Oktober ein - "
+                         f"die Vorstellung neuer {marke}-Geraete wird erwartet.")
+        for k in range(3)]
+
+
+def test_hoechstens_drei_antizipationsgruppen_werden_vorgelegt():
+    """Der Antizipations-Pfad war ungedeckelt. Am echten Korpus vom
+    27.08.2026 (1023 Meldungen aus vier Ausgaben) lieferte er 28 Gruppen und
+    trieb die Nutzlast an den Agenten auf ueber 64 000 Zeichen - mit einem
+    Denkspur-Modell reisst das `_TOKENS`, die Antwort bricht mitten im JSON
+    ab, und das Ergebnis sind NULL Themen. Gegen den alten Stand faellt
+    dieser Test (dort: acht Gruppen)."""
+    marken = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta",
+              "Theta"]
+    roh = [m for nr, marke in enumerate(marken)
+           for m in _ankuendigungsgruppe(nr, marke, 5 + nr)]
+    # Die Voraussetzung ausgeschrieben: OHNE Deckel waeren es wirklich mehr
+    # als drei - sonst pruefte der Test seine eigene Fixture.
+    gefunden = [g for g in ht.finde_antizipation(roh, "2026-09-20")]
+    assert len(ht._gruppen(roh, mind_meldungen=ht.MIND_MELDUNGEN_ANTIZIPATION,
+                           mind_quellen=ht.MIND_QUELLEN_ANTIZIPATION)[0]) > 3
+    assert len(gefunden) == ht.MAX_ANTIZIPATION == 3
+
+
+def test_eine_vergangene_datumsangabe_ist_kein_bevorstehendes_ereignis():
+    """"12. August" in einem Lauf vom 27.08. ist ein Rueckblick. Am Korpus
+    vom 27.08.2026 lagen 30 von 40 Datumstreffern in der Vergangenheit.
+    Gegen den alten Stand faellt dieser Test - dort zaehlte jede Tag-und-
+    Monat-Angabe."""
+    rueckblick = [
+        _meldung(f"https://r.example/{k}",
+                 f"Rueckblick auf den Netzausfall am 12. August", f"Quelle R{k}",
+                 summary="Was am 12. August im Netz von Firma Iota geschah - "
+                         "eine Rekonstruktion des Ausfalls am 12. August.")
+        for k in range(3)]
+    assert ht.finde_antizipation(rueckblick, "2026-08-27") == []
+    # Gegenprobe: derselbe Text mit einem noch bevorstehenden Termin.
+    assert ht._kuenftiger_termin("Termin am 12. September", date(2026, 8, 27))
+    assert not ht._kuenftiger_termin("Termin am 12. August", date(2026, 8, 27))
+
+
+def test_ein_bereits_stattgefundenes_ereignis_traegt_keine_ankuendigung():
+    """"vorgestellt" berichtet ueber etwas, das gerade stattgefunden hat -
+    das Gegenteil dessen, was dieser Pfad sucht. Am Korpus vom 27.08.2026
+    kam es fuer 31 der Treffer auf, mehr als jedes andere Wort und mehr als
+    alle Datumsangaben zusammen. Fuer den Spezifitaets-Bonus zaehlt es
+    weiter mit."""
+    vergangen = [
+        _meldung(f"https://p.example/{k}",
+                 "Firma Kappa hat ihr neues Modell vorgestellt", f"Quelle P{k}",
+                 summary="Firma Kappa hat auf einer Veranstaltung ihr neues "
+                         "Modell vorgestellt und praesentiert die Preise.")
+        for k in range(3)]
+    assert ht.finde_antizipation(vergangen, "2026-08-27") == []
+    assert "vorgestellt" in ht.EREIGNIS_WOERTER
+
+
+def test_antizipation_konkurriert_nicht_um_max_kandidaten(tmp_path, agent):
+    """Die Ankuendigungsgruppe (3 Meldungen) wird ZUSAETZLICH zu den sechs
+    Top-Kandidaten der normalen Suche vorgelegt, nicht anstelle einer davon -
+    LAUNCH bildet dafuer einen ganz normalen (ausreichend grossen)
+    Kandidaten."""
+    aufrufe = agent(json.dumps([
+        {"i": 0, "thema": True, "gehoert_zu": None,
+         "titel": "Samsung Galaxy Fold8 kommt", "leitsatz": "Samsung.",
+         "suchwoerter": ["Samsung", "Fold8", "Galaxy"],
+         "bevorstehend": False, "event_datum": None},
+        {"i": 1, "thema": True, "gehoert_zu": None,
+         "titel": "Apple kuendigt Keynote an", "leitsatz": "Apple laedt ein.",
+         "suchwoerter": ["Apple", "Keynote", "September"],
+         "bevorstehend": True, "event_datum": "2026-09-09"},
+    ]))
+    bilanz = ht.pflege_highlight_themen(LAUNCH + RAUSCHEN + _ANKUENDIGUNG, tmp_path,
+                                        "2026-08-27", model="m", use_llm=True)
+    # Beide Kandidaten wurden vorgelegt - der Agent sah zwei, nicht einen.
+    payload = json.loads(aufrufe[0])
+    assert len(payload["kandidaten"]) == 2
+    assert payload["kandidaten"][1]["bevorstehendes_ereignis"] is True
+    assert bilanz["neu"] == ["samsung-galaxy-fold8-kommt", "apple-kuendigt-keynote-an"]
+    themen = {t["slug"]: t for t in ht.lade_store(tmp_path)["topics"]}
+    assert themen["apple-kuendigt-keynote-an"]["event_datum"] == "2026-09-09"
+    assert "event_datum" not in themen["samsung-galaxy-fold8-kommt"]
+
+
 # ------------------------------------------------------------- Alterung
 def _lauf_ohne_zuwachs(tmp_path, agent, datum):
     agent(json.dumps([]))
@@ -318,6 +532,112 @@ def test_beendetes_thema_wird_nicht_neu_entdeckt(tmp_path, agent):
     assert ht.lade_themen(tmp_path) == []
     # Der Agent wurde gar nicht erst gefragt - der Kandidat war schon weg.
     assert aufrufe == []
+
+
+def _urteil_bevorstehend(event_datum: str) -> str:
+    return json.dumps([{
+        "i": 0, "thema": True, "gehoert_zu": None,
+        "titel": "Samsung Galaxy Fold8 kommt", "leitsatz": "Samsung.",
+        "suchwoerter": ["Samsung", "Fold8", "Galaxy"],
+        "bevorstehend": True, "event_datum": event_datum,
+    }])
+
+
+def test_thema_mit_bevorstehendem_ereignis_altert_nicht_vor_der_frist(tmp_path, agent):
+    """Ein Ereignis in zehn Tagen: vier Laeufe ganz ohne Zuwachs duerfen das
+    Thema NICHT beenden - vor dem Termin ist ein duennes Echo der Normalfall,
+    nicht ein Zeichen, dass das Thema erledigt ist (CLAUDE.md, Auftrag P1).
+    Gegen den alten Stand faellt das rot: dort gibt es kein event_datum, und
+    das Thema waere nach dem vierten Lauf beendet - genau wie in
+    test_thema_endet_nach_vier_laeufen_ohne_zuwachs oben."""
+    agent(_urteil_bevorstehend("2026-09-06"))
+    ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
+    assert ht.lade_store(tmp_path)["topics"][0]["event_datum"] == "2026-09-06"
+
+    for n, datum in enumerate(
+            ("2026-08-31", "2026-09-03", "2026-09-07", "2026-09-10"), start=1):
+        bilanz = _lauf_ohne_zuwachs(tmp_path, agent, datum)
+        assert bilanz["beendet"] == []
+        assert len(ht.lade_themen(tmp_path)) == 1, f"nach {n} stillen Laeufen"
+
+
+def test_thema_mit_bevorstehendem_ereignis_altert_nach_der_frist(tmp_path, agent):
+    """Dieselbe Ausgangslage, aber die Laeufe liegen alle NACH event_datum +
+    EREIGNIS_SCHUTZ_TAGE (2026-09-13): die normale Vier-Laeufe-Alterung greift
+    wieder, unveraendert."""
+    agent(_urteil_bevorstehend("2026-09-06"))
+    ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
+
+    for n, datum in enumerate(("2026-09-14", "2026-09-17", "2026-09-20"), start=1):
+        bilanz = _lauf_ohne_zuwachs(tmp_path, agent, datum)
+        assert bilanz["beendet"] == []
+        assert len(ht.lade_themen(tmp_path)) == 1, f"nach {n} Laeufen nach der Frist"
+
+    bilanz = _lauf_ohne_zuwachs(tmp_path, agent, "2026-09-23")
+    assert bilanz["beendet"] == ["samsung-galaxy-fold8-kommt"]
+    assert ht.lade_themen(tmp_path) == []
+
+
+def test_ein_halluziniertes_event_datum_macht_kein_thema_unsterblich(tmp_path, agent):
+    """`event_datum` kommt aus einem Modell und setzt die Alterung aus.
+    "2028-09-09" ist ein formal gueltiger Kalendertag und haette das Thema
+    damit ZWEI JAHRE aktiv gehalten - eine Seite im Fokusband, zu der nie
+    wieder eine Meldung kommt und die keine Alterung mehr erreicht. Gegen den
+    alten Stand faellt dieser Test.
+
+    Gerechnet wird gegen das durchgereichte `heute`, nie gegen die Uhr -
+    sonst meldete der Test die naechste Mitternacht statt den naechsten
+    Umbau (CLAUDE.md §6)."""
+    agent(_urteil_bevorstehend("2028-09-09"))
+    ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27",
+                               model="m", use_llm=True)
+    thema = ht.lade_store(tmp_path)["topics"][0]
+    # Gar nicht erst uebernommen: ein Termin jenseits des Horizonts ist
+    # Roadmap, kein Termin.
+    assert "event_datum" not in thema
+
+    # Und selbst als BESTANDSdatum - etwa aus einem Lauf vor dieser Regel -
+    # schuetzt es nicht mehr.
+    thema["event_datum"] = "2028-09-09"
+    assert ht._durch_event_geschuetzt(thema, "2026-08-27") is False
+    # Die normale Alterung greift damit wieder.
+    for datum in ("2026-08-31", "2026-09-03", "2026-09-07"):
+        assert _lauf_ohne_zuwachs(tmp_path, agent, datum)["beendet"] == []
+    assert _lauf_ohne_zuwachs(tmp_path, agent, "2026-09-10")["beendet"] == \
+        ["samsung-galaxy-fold8-kommt"]
+
+
+def test_ein_event_datum_in_der_vergangenheit_wird_nicht_uebernommen(tmp_path, agent):
+    """Ein Datum, das schon vorbei ist, kann kein bevorstehendes Ereignis
+    schuetzen - der Prompt verlangt ohnehin `null` dafuer, hier zaehlt es
+    doppelt."""
+    agent(_urteil_bevorstehend("2026-07-01"))
+    ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27",
+                               model="m", use_llm=True)
+    assert "event_datum" not in ht.lade_store(tmp_path)["topics"][0]
+
+
+def test_die_datumspruefung_liest_niemals_die_uhr():
+    """Ohne `heute` wird nur das FORMAT geprueft. Ein Test, dessen Ergebnis
+    vom Tag abhaengt, meldet die naechste Mitternacht statt den naechsten
+    Umbau."""
+    assert ht._valid_iso_datum("2028-09-09") == "2028-09-09"
+    assert ht._valid_iso_datum("2028-09-09", "2026-08-27") == ""
+    assert ht._valid_iso_datum("2026-09-09", "2026-08-27") == "2026-09-09"
+    assert ht._valid_iso_datum("2026-02-30", "2026-01-01") == ""
+    assert ht._valid_iso_datum("nicht datum", "2026-08-27") == ""
+
+
+def test_thema_ohne_event_datum_altert_wie_bisher(tmp_path, agent):
+    """Bestandsschutz: ein Thema ohne event_datum (jedes Thema vor diesem
+    Auftrag) ist von der Sperre unberuehrt - _durch_event_geschuetzt() greift
+    fuer ein solches Thema NIE, unabhaengig vom Datum des Laufs."""
+    agent(_urteil())
+    ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", model="m", use_llm=True)
+    thema = ht.lade_store(tmp_path)["topics"][0]
+    assert "event_datum" not in thema
+    assert ht._durch_event_geschuetzt(thema, "2026-08-07") is False
+    assert ht._durch_event_geschuetzt(thema, "2099-01-01") is False
 
 
 # ------------------------------------------------------------- Failsafe

@@ -27,7 +27,9 @@ Agents bewerten („Warum ist das für Vodafone interessant?", Dringlichkeit
    Wettbewerber**, sondern die Unternehmen und Behörden, die den Rahmen
    setzen — eigener Analyst mit eigenem Prompt, eigener Abschnitt im Bericht.
 
-Gesamt: **207 crawlbare Quellen** (Stand 08.08.2026). Die Zahl bekommst du mit
+Gesamt: **196 crawlbare Quellen** (Stand 27.08.2026 — E9 hat die sources
+von 10 Ballast-Betreibern entkoppelt, die Betreiber stehen als Referenz
+weiter in der Watchlist). Die Zahl bekommst du mit
 `python scripts/quellen_zaehlen.py` — nie mit `grep -c "url:"` über die YAMLs.
 
 **Kernprinzip:** Die Intelligenz sitzt in der Delta-Schicht (Seen-Store),
@@ -1567,7 +1569,57 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (18.08.2026, Antonio direkt): die Kostenkrise der
+> **Zuletzt erledigt (27.08.2026, Antonio direkt): die Sanierung — Diagnose,
+> Strategie und die Pakete E1–E10.** Auftragsgrundlage und ALLE Befunde:
+> **`claude/strategie-2026-08-27.md`** (mit §6 Stand/Entscheidungen und §7
+> dem Prompt für die nächste Session — dort weiterlesen, nicht hier).
+> Kernbefund: seit dem 15.08. lief JEDER Lauf (7 in Folge) ohne Redaktion,
+> weil DeepSeeks Guthaben mitten im Lauf leer war (402) und `pipeline.py`
+> den Anthropic-Key aktiv löschte; die 1,95 $ des 27.08.-Laufs steckten zu
+> ~90 % in 66 v4-pro-Analystenaufrufen (Denkspur wird als Ausgabe
+> abgerechnet und ist auf der direkten API nicht abschaltbar).
+>
+> Gebaut (alle auf Branch `claude/highlight-pages-system-43s1d3`, Stand
+> **1876 Tests / 2 skipped**, Quellen 207 → **196**):
+> **Anthropic-Anker** (`_dispatch` routet je Modell, claude-* → Anthropic;
+> Ketten enden in sonnet-5/haiku; Analyst bekommt seinen Anker als
+> per-Aufruf-`ausweich` — sonst erbte er über den gleichen Modellnamen den
+> teuren Redaktionsanker) · **Kostenzähler** (`llm.kosten_stand()`, je
+> Modell inkl. Denkspur, `run.kosten` + transparenz.html;
+> `llm_budget_usd: 1.50` ist auf Antonios Ansage eine reine WARNSCHWELLE —
+> nichts wird gekappt) · **flash-Vorsortierung** vor dem pro-Analysten
+> (`analyze/vorsortierung.py`; CTM-Bypass, Fehler-Durchlass, Verworfenes
+> gilt als gesehen, Frist gegen die Restzeit; Analyst BLEIBT auf v4-pro —
+> Antonios Einspruch gegen den Modellwechsel, Batch 15→24 statt dessen) ·
+> **Highlight-Themen**: Spezifität schlägt Gruppengröße (die
+> Apple-Keynote-Gruppe lag auf Rang 17 hinter Quartalszahlen-Rauschen),
+> Antizipations-Pfad für bevorstehende Ereignisse (≥3 Meldungen/≥2
+> Quellen, gedeckelt auf 3, nur künftige Termine), `event_datum` mit
+> 90-Tage-Horizont hält Themen bis Event+7 Tage am Leben ·
+> **Rangschlüssel umgekehrt** (Priorität führt, CTM bricht Gleichstand) ·
+> **Clustering** bündelt Fachpresse-Dubletten quellenübergreifend (die 4
+> EE-Slicing-Artikel), aber zwei disjunkte Akteursmengen bleiben getrennt
+> (Zain/Batelco-Falle) · **Analysten-Prompt** mit Marktgewicht-Deckel
+> (Nischenanbieter ohne Marktfolge ≤3) und Endkunden-Gewichtung ·
+> **Englisch wird übersetzt** (`MUTTERSPRACHEN={"de"}`, Deckel 60,
+> `SPRACHNAMEN` kennt jetzt en/de) · **Promo**: Grid-Lücken behoben,
+> `stats.promo_*` (neu/bestätigt getrennt — `UpsertBilanz`), Block
+> erscheint nur wenn die Stufe lief · **10 Ballastquellen entkoppelt**
+> (105 neue Meldungen, 0 bewertet über 23 Läufe; je ein datierter
+> YAML-Kommentar).
+>
+> **OFFEN daraus** (Einzelheiten in Strategie §4/§6): (1) Branch nach
+> `main` mergen, damit der nächste Cron-Lauf den Code fährt; (2) erster
+> gemessener Lauf gegen den Messplan §4 (Kosten je Stufe, Anker-Einsatz,
+> Apple-Themenseite, Übersetzungen >0, promo-Stats, Titelseite); (3)
+> Antonio füllt DeepSeek vorerst NICHT auf — der Anker trägt dann den
+> ganzen Lauf auf dem Anthropic-Key (Analyst→haiku), der Zähler weist es
+> aus; (4) Vorsortierungs-Stichprobe (20 Verworfene in
+> `run.vorsortierung`) von Hand gegenlesen; (5) DeepSeek-Usage-Klärung
+> weiter offen; (6) Quellenausbau Consumer-Fachpresse ist ein EIGENER
+> späterer Auftrag (74 % der bewerteten Meldungen sind B2B/Infra).
+
+> **Davor erledigt (18.08.2026, Antonio direkt): die Kostenkrise der
 > Läufe.** Vier Befunde in einem Tag, alle gemessen: (1) **v4-pro schreibt
 > je Aufruf ~8–9k Token Denkspur** und war mit `max_tokens=8000` fertig,
 > bevor die Antwort begann — 41 von ~60 Analysten-Stapeln in Lauf #97

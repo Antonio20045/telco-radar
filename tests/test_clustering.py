@@ -328,6 +328,114 @@ def test_belegte_dubletten_der_ausgabe_vom_7_august(fall):
     assert len(C.gruppiere([_item(a), _item(b, stunden=5)])) == 1
 
 
+def test_zwei_wettbewerber_mit_derselben_satzschablone_sind_zwei_ereignisse():
+    """Der dritte Vergleichspfad (`_urteil`) war zu weit: er griff, sobald
+    KEIN GEMEINSAMER Akteur gefunden wurde - auch dann, wenn beide Seiten
+    einen eigenen, klar verschiedenen tragen. Damit buendelte er jedes Paar
+    mit gleicher Satzschablone aus zwei Quellen, also zwei Wettbewerber zu
+    einem. Gegen den alten Stand faellt dieser Test (dort: 'gleich', 0.60).
+
+    Die Testvoraussetzung ausgeschrieben: beide Seiten MUESSEN je einen
+    eigenen Akteur tragen und ein gemeinsames seltenes Titelwort haben, sonst
+    prueft der Test eine andere Regel."""
+    a = _item("Zain launches eSIM roaming bundle for travellers",
+              url="https://a.test/zain", quelle="Quelle A")
+    b = _item("Batelco launches eSIM roaming bundle for tourists",
+              url="https://b.test/batelco", quelle="Quelle B", stunden=3)
+
+    akteure = C._seltene_akteure([C.akteur_kandidaten(i) for i in (a, b)])
+    selten = C._seltene_titelworte([C.wortmenge(i.title) for i in (a, b)])
+    pa, pb = (C._Profil.von(i, akteure=k, selten=s)
+              for i, k, s in zip((a, b), akteure, selten))
+    assert pa.akteure and pb.akteure and not (pa.akteure & pb.akteure), \
+        "der Fall ohne Fix liegt nicht vor - beide brauchen EIGENE Akteure"
+    assert pa.selten & pb.selten, \
+        "ohne gemeinsames seltenes Titelwort prueft der Test den falschen Pfad"
+
+    assert C._urteil(pa, pb) == ("verschieden", 0.0)
+    assert len(C.gruppiere([a, b])) == 2
+
+
+def test_haeufige_branchenwoerter_gelten_in_grossen_stapeln_nicht_als_selten():
+    """`len // 8` allein waechst mit dem Stapel: bei den ~890 Meldungen eines
+    echten Laufs laege der Deckel bei 111, und "network" (ueber 1941
+    archivierte Ueberschriften 154x) waere ein seltenes Bindewort. Gegen den
+    alten Stand faellt dieser Test."""
+    mengen = [frozenset({"network", f"eigen{i}"}) for i in range(400)]
+    mengen += [frozenset({"pixel", f"anders{i}"}) for i in range(30)]
+    selten = C._seltene_titelworte(mengen)
+    assert not any("network" in s for s in selten)
+    assert sum(1 for s in selten if "pixel" in s) == 30
+
+
+def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
+    """Befund vom 27.08.2026 (Strategie E7): vier Fachpressequellen berichten
+    EEs 5G-Network-Slicing-Start als vier getrennte Meldungen - acht davon
+    sitzen mit relevance=5 auf allen sieben Bildplaetzen der Titelseite.
+    Titel und URLs stammen wortgleich aus data/reports/2026-08-27.json.
+
+    Ursache: "EE" hat zwei Buchstaben und faellt sowohl durch
+    `tag_news_regions` (verlangt drei, collect/__init__.py) als auch durch
+    die Laengenpruefung in `akteur_kandidaten` - das Betreiberfeld bleibt
+    leer, kein Titelwort gilt als Akteur, und `_urteil` gab bisher sofort
+    "verschieden" zurueck, OHNE die Titel je zu vergleichen."""
+    slicing = [
+        _item("EE unveils UK’s first commercial 5G network slicing service",
+              url="https://www.mobileeurope.co.uk/ee-5g-network-slicing/",
+              quelle="Mobile Europe"),
+        _item("EE introduces premium ‘Fast Lane’ 5G network "
+              "slicing service",
+              url="https://totaltele.com/ee-introduces-premium-fast-lane-"
+                  "5g-network-slicing-service/",
+              quelle="Total Telecom", stunden=2),
+        _item("EE launches 5G+ network slice for consumers and small "
+              "businesses",
+              url="https://www.telecoms.com/5g-6g/ee-launches-5g-network-"
+                  "slice-for-consumers-and-small-businesses",
+              quelle="Telecoms.com", stunden=4),
+        _item("EE joins Europe's growing 5G slicing cohort with consumer "
+              "offer",
+              url="https://www.lightreading.com/5g/ee-joins-europe-s-"
+                  "growing-5g-slicing-cohort-with-consumer-offer",
+              quelle="Light Reading", stunden=6),
+    ]
+    # Gegenprobe: eine fuenfte, ebenfalls echte EE-Meldung aus demselben
+    # Zeitfenster - aber ueber ein anderes Thema (kein Slicing). Sie darf
+    # NICHT mit hineinrutschen, sonst waere die neue Regel zu grob.
+    ryanair = _item("EE has flown the Ryanair model into 5G",
+                     url="https://www.lightreading.com/5g/ee-has-flown-"
+                         "the-ryanair-model-into-5g",
+                     quelle="Light Reading", stunden=8)
+
+    # Die Testvoraussetzung, ausgeschrieben: ohne diese Zeile pruefte der
+    # Test nicht die Luecke, die er beheben soll, sondern etwas anderes -
+    # der "Fall ohne Fix" muss hier wirklich vorliegen (kein Betreiber, kein
+    # erkannter Akteur), sonst haette schon der bestehende Akteursabgleich
+    # gegriffen.
+    p0, p1 = C._Profil.von(slicing[0]), C._Profil.von(slicing[1])
+    assert not p0.betreiber and not p1.betreiber
+    assert not (p0.akteure & p1.akteure), \
+        "EE ist hier als Akteur erkannt - der Test prueft die falsche Luecke"
+
+    def _ja(system, user, model=None, max_tokens=None):
+        return '{"gleich": true}'
+    import telco_radar.analyze.clustering as mod
+    alt = mod.complete
+    mod.complete = _ja
+    try:
+        gruppen = C.gruppiere([*slicing, ryanair], model="m", use_llm=True)
+    finally:
+        mod.complete = alt
+
+    gebuendelt = [g for g in gruppen if g.quellen > 1]
+    assert len(gebuendelt) == 1, gruppen
+    assert gebuendelt[0].quellen == 4
+
+    andere = next(g for g in gruppen if g.vertreter.url == ryanair.url)
+    assert andere.quellen == 1, \
+        "die inhaltlich andere EE-Meldung ist faelschlich hineingerutscht"
+
+
 # --------------------------------------------------------------------------- #
 # Der Absturz aus Lauf #86
 # --------------------------------------------------------------------------- #

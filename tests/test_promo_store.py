@@ -23,7 +23,7 @@ def test_snapshot_store_change_detection(tmp_path):
 
 def test_promo_db_upsert_and_dedup(tmp_path):
     db = PromoDB(tmp_path / "db.json")
-    n, ids = db.upsert([_item(), _item()], "2026-07-25")
+    n, ids, _ = db.upsert([_item(), _item()], "2026-07-25")
     assert n == 1 and len(db) == 1
     assert ids == {entry_id("congstar", "10 GB Bonus")}
 
@@ -49,7 +49,7 @@ def test_upsert_recognises_reworded_headline_as_same_offer(tmp_path):
     sie ununterbrochen lief. Beispiel 1:1 aus den echten Produktivdaten."""
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="iPhone 17 Pro mit unbegrenztem Datenvolumen")], "2026-07-27")
-    n, ids = db.upsert(
+    n, ids, _ = db.upsert(
         [_item(headline="iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt")],
         "2026-07-28")
     assert n == 0  # kein zweiter Eintrag
@@ -69,7 +69,7 @@ def test_upsert_does_not_merge_similar_but_distinct_offers(tmp_path):
     grosszuegig waere."""
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="10 GB Bonus")], "2026-07-27")
-    n, ids = db.upsert([_item(headline="20 GB Bonus")], "2026-07-28")
+    n, ids, _ = db.upsert([_item(headline="20 GB Bonus")], "2026-07-28")
     assert n == 1
     assert len(db) == 2
     assert len(ids) == 1

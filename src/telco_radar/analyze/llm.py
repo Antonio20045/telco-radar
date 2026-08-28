@@ -137,6 +137,21 @@ CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
 
 # model -> stand-in, consulted only after the preferred model failed hard.
 _FALLBACKS: dict[str, str] = {}
+
+# Was dieser Lauf verbraucht hat, je Modell-ID.
+#
+# Der Zaehler sitzt hier und nirgends sonst, weil `usage` nur an dieser einen
+# Stelle vorbeikommt. Bis zum 27.08.2026 wurde es ausschliesslich im
+# Fehlerfall gelesen; die einzige Kostenaussage des Projekts war
+# scripts/kostenrechnung.py, eine Hochrechnung aus Zeichenzahlen, die die
+# Denkspur gar nicht kennt. Der Lauf vom 27.08. kostete 1,95 $, und niemand
+# konnte sagen wofuer.
+_VERBRAUCH: dict[str, dict[str, int]] = {}
+# Modell-ID -> {"ein": USD je 1M Eingabetoken, "aus": USD je 1M Ausgabetoken}.
+# Kommt aus der Konfiguration (settings llm_preise); ein Modell ohne Zeile
+# wird gezaehlt, aber nicht beziffert - geraten wird nie.
+_PREISE: dict[str, dict[str, float]] = {}
+_BUDGET_USD: float | None = None
 # Models that already failed hard in this process. Later stages skip them
 # instead of retrying, so a dead model costs the run ONE timeout budget
 # rather than one per stage.
@@ -241,6 +256,37 @@ def _chain_from(model: str) -> list[str]:
     return chain
 
 
+def _kette(model: str, ausweich: str = "") -> list[str]:
+    """Die Modellkette DIESES Aufrufs - registrierte Kette oder Sonderweg.
+
+    `_FALLBACKS` haengt am MODELLNAMEN, nicht an der Rolle des Aufrufers, und
+    das ist genau dann zu grob, wenn zwei Rollen dasselbe Modell fahren. In
+    jeder heutigen Anbieter-Konfiguration ist `analyst_model ==
+    editor_model` ("deepseek-v4-pro"), also kann es fuer diesen Namen nur
+    EINEN registrierten Nachfolger geben - und der gehoert der Redaktion, weil
+    ein ausgefallener Wochenbericht schwerer wiegt als ein Analyst auf dem
+    teureren Claude-Modell. Der Analyst erbte damit den REDAKTIONSanker
+    (Sonnet), obwohl er die allermeisten Aufrufe macht und in den kleinsten
+    gehoert.
+
+    `ausweich` loest genau das auf: der Aufrufer nennt seinen eigenen
+    Ausweichweg, und er schlaegt fuer diesen einen Aufruf die registrierte
+    Kette. Registriert wird dabei nichts - der naechste Aufrufer desselben
+    Modells bekommt wieder die Kette, die ihm gehoert.
+
+    Die Kette des Ausweichmodells laeuft weiter mit: ein Anker, der selbst
+    einen Nachfolger hat, behaelt ihn.
+    """
+    if not ausweich or ausweich == model:
+        return _chain_from(model)
+    kette, gesehen = [model], {model}
+    for weiter in _chain_from(ausweich):
+        if weiter not in gesehen:
+            kette.append(weiter)
+            gesehen.add(weiter)
+    return kette
+
+
 def reset_model_health() -> None:
     """Forget which models failed. Only needed by tests."""
     _DEAD_MODELS.clear()
@@ -249,6 +295,121 @@ def reset_model_health() -> None:
 def dead_models() -> set[str]:
     """Models that stopped answering during this run (for the run protocol)."""
     return set(_DEAD_MODELS)
+
+
+# --------------------------------------------------------------- Kosten
+def _zaehle_usage(model: str, data: dict) -> None:
+    """Den Verbrauch EINER Antwort mitschreiben.
+
+    Gezaehlt wird, bevor der Aufrufer den Inhalt beurteilt: eine Antwort, die
+    nur aus Denkspur besteht (Laeufe #83-85, #97), ist bezahlt und muss im
+    Zaehler stehen - sonst waere ausgerechnet der teuerste Fehlerfall
+    kostenlos.
+
+    DeepSeek weist die Denkspur nicht getrennt aus, sie steckt in
+    `completion_tokens` und wird als Ausgabe abgerechnet. Genau das ist der
+    Posten, den dieser Zaehler sichtbar machen soll.
+    """
+    usage = data.get("usage") if isinstance(data, dict) else None
+    if not isinstance(usage, dict):
+        return
+    ein = usage.get("prompt_tokens")
+    if ein is None:
+        ein = usage.get("input_tokens") or 0
+    aus = usage.get("completion_tokens")
+    if aus is None:
+        aus = usage.get("output_tokens") or 0
+    # Anthropic weist Cache-Treffer getrennt aus; sie sind Eingabe und
+    # wuerden sonst gar nicht auftauchen.
+    ein = int(ein) + int(usage.get("cache_read_input_tokens") or 0) \
+        + int(usage.get("cache_creation_input_tokens") or 0)
+    eintrag = _VERBRAUCH.setdefault(
+        model, {"aufrufe": 0, "prompt_tokens": 0, "completion_tokens": 0})
+    eintrag["aufrufe"] += 1
+    eintrag["prompt_tokens"] += ein
+    eintrag["completion_tokens"] += int(aus)
+
+
+def _usd(model: str, prompt_tokens: int, completion_tokens: int) -> float | None:
+    """USD-Schaetzung, oder None fuer ein Modell ohne Preiszeile."""
+    preis = _PREISE.get(model)
+    if not preis:
+        return None
+    return (prompt_tokens * preis.get("ein", 0.0)
+            + completion_tokens * preis.get("aus", 0.0)) / 1_000_000
+
+
+def _summe_usd() -> float:
+    return sum(_usd(name, v["prompt_tokens"], v["completion_tokens"]) or 0.0
+               for name, v in _VERBRAUCH.items())
+
+
+def kosten_reset() -> None:
+    """Zaehler leeren. Ein Lauf zaehlt seinen eigenen Verbrauch."""
+    _VERBRAUCH.clear()
+
+
+def budget_setzen(usd_limit: float | None,
+                  preistabelle: dict | None = None) -> None:
+    """Warnschwelle und Preistabelle setzen. 0/leer heisst: keine Schwelle.
+
+    Warnschwelle, nicht Not-Aus: der Zaehler greift NIE in den Lauf ein
+    (Antonios Entscheidung vom 27.08.2026). Siehe budget_ueberschritten().
+    """
+    global _BUDGET_USD
+    try:
+        limit = float(usd_limit or 0)
+    except (TypeError, ValueError):
+        limit = 0.0
+    _BUDGET_USD = limit if limit > 0 else None
+    _PREISE.clear()
+    for name, preis in (preistabelle or {}).items():
+        if not isinstance(preis, dict):
+            continue
+        try:
+            _PREISE[str(name)] = {
+                "ein": float(preis.get("ein", preis.get("input", 0)) or 0),
+                "aus": float(preis.get("aus", preis.get("output", 0)) or 0),
+            }
+        except (TypeError, ValueError):
+            log.warning("Unbrauchbare Preiszeile fuer %s - Modell bleibt "
+                        "unbeziffert", name)
+
+
+def budget_ueberschritten() -> bool:
+    """True, sobald die BEZIFFERBAREN Kosten die Warnschwelle erreichen.
+
+    Es passiert dann NICHTS ausser einer Zeile im Protokoll und einer auf
+    transparenz.html. Die erste Fassung dieses Zaehlers stoppte weitere
+    Analysten-Stapel; Antonio hat das am 27.08.2026 verworfen, und die
+    Begruendung steht in den degenerierten Laeufen vom 15.-27.08.: ein Lauf,
+    der auf halber Strecke aufhoert zu lesen, ist von einer duennen
+    Nachrichtenwoche nicht zu unterscheiden. Die harte Grenze ist das
+    Guthaben des Anbieters; stirbt es, faengt der Anker die sichtbaren
+    Stufen.
+
+    Ein Modell ohne Preiszeile geht mit 0 $ ein - geraten wird nichts. Die
+    Luecke steht als `ohne_preis` im Kostenblock und faellt am Token-Ist auf.
+    """
+    return bool(_BUDGET_USD) and _summe_usd() >= _BUDGET_USD
+
+
+def kosten_stand() -> dict:
+    """Was der Lauf bisher verbraucht hat - je Modell, in Token und USD."""
+    modelle: dict[str, dict] = {}
+    ohne_preis: list[str] = []
+    for name, v in sorted(_VERBRAUCH.items()):
+        usd = _usd(name, v["prompt_tokens"], v["completion_tokens"])
+        modelle[name] = {**v, "usd": None if usd is None else round(usd, 4)}
+        if usd is None:
+            ohne_preis.append(name)
+    return {
+        "modelle": modelle,
+        "summe_usd": round(_summe_usd(), 4),
+        "ohne_preis": ohne_preis,
+        "budget_usd": _BUDGET_USD,
+        "budget_ueberschritten": budget_ueberschritten(),
+    }
 
 
 def _anthropic_text(data: dict) -> str:
@@ -389,6 +550,7 @@ def _complete_openai(system: str, user: str, model: str,
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
     def parse(data):
+        _zaehle_usage(model, data)
         nachricht = data["choices"][0]["message"]
         inhalt = nachricht.get("content", "") or ""
         if inhalt.strip():
@@ -445,6 +607,7 @@ def _complete_anthropic(system: str, user: str, model: str,
     }
 
     def parse(data):
+        _zaehle_usage(model, data)
         return _anthropic_text(data)
 
     return _post_with_retries(ANTHROPIC_URL, payload, headers, retries, parse)
@@ -469,6 +632,7 @@ def _complete_bedrock(system: str, user: str, model: str,
     }
 
     def parse(data):
+        _zaehle_usage(model, data)
         return _anthropic_text(data)
 
     return _post_with_retries(_bedrock_url(model), payload, headers,
@@ -477,6 +641,21 @@ def _complete_bedrock(system: str, user: str, model: str,
 
 def _dispatch(system: str, user: str, model: str,
               max_tokens: int, retries: int) -> str:
+    # Der Anthropic-Anker wird je MODELL geroutet, nicht je Prozess.
+    #
+    # Bis zum 27.08.2026 waehlte diese Funktion das Backend EINMAL aus der
+    # Umgebung, und pipeline.py loeschte dafuer den Anthropic-Schluessel.
+    # Ein DeepSeek-Lauf mit leerem Guthaben hatte damit strukturell keinen
+    # Ausweg: sieben Laeufe in Folge (15.-27.08.2026) endeten ohne
+    # Redaktion, ohne Uebersetzung und ohne Promo-Extraktion, obwohl das
+    # Anthropic-Secret im Workflow ankam.
+    #
+    # Eine Claude-Modell-ID gehoert zur Anthropic-API, egal welcher Anbieter
+    # den Rest des Laufs bedient - und nur so kann eine Fallback-Kette bei
+    # einem anderen Anbieter enden. Bedrock-IDs tragen das Praefix
+    # "anthropic." und werden von der Regel nicht getroffen.
+    if model.startswith("claude") and os.environ.get("ANTHROPIC_API_KEY"):
+        return _complete_anthropic(system, user, model, max_tokens, retries)
     if _use_bedrock():
         return _complete_bedrock(system, user, model, max_tokens, retries)
     if _use_openai():
@@ -485,7 +664,8 @@ def _dispatch(system: str, user: str, model: str,
 
 
 def complete(system: str, user: str, model: str,
-             max_tokens: int = 4096, retries: int = 3) -> str:
+             max_tokens: int = 4096, retries: int = 3,
+             ausweich: str = "") -> str:
     """Single-turn completion via the active backend.
 
     Survives a provider that stops serving one model. If `model` has a
@@ -502,8 +682,12 @@ def complete(system: str, user: str, model: str,
     A fatal error (bad key, malformed request) is NOT retried on the fallback -
     another model would fail the same way. A per-MODEL access rejection
     (LLMModelUnavailable) is the exception and does move to the next link.
+
+    `ausweich` setzt fuer DIESEN Aufruf einen eigenen Ausweichweg, statt der
+    registrierten Kette zu folgen - siehe `_kette`. Der Analyst braucht das,
+    weil er sich seinen Modellnamen mit der Redaktion teilt.
     """
-    chain = [m for m in _chain_from(model) if m not in _DEAD_MODELS]
+    chain = [m for m in _kette(model, ausweich) if m not in _DEAD_MODELS]
     if not chain:
         # every link died earlier in this run - try the preferred one anyway so
         # the caller gets a real error rather than an IndexError

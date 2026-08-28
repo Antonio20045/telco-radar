@@ -55,7 +55,10 @@ Respond with ONLY valid JSON, no markdown, matching this schema:
 Scoring guide (be strict - most PR is noise):
 - 5: a competitor move Vodafone should react to or copy quickly (aggressive new
      tariff, disruptive consumer product, FMC/eSIM/roaming/AI-in-tariff launch,
-     major partnership that shifts the market).
+     major partnership that shifts the market). Requires EITHER a major
+     operator/market-mover as sender OR direct relevance for the German/
+     European consumer market - a niche or regional player with no market
+     followership is capped at 3, even if its own move sounds aggressive.
 - 4: clearly relevant strategic development worth a manager's attention.
 - 3: worth monitoring, not urgent.
 - 2: minor / contextual.
@@ -65,6 +68,11 @@ Scoring guide (be strict - most PR is noise):
 Rules:
 - Only include items with relevance >= 2 in "highlights".
 - Judge relevance from a Vodafone Group perspective (consumer + B2B).
+- A global device or market-share story (e.g. "best-selling phone worldwide")
+  is "Produktlaunch", never "Sonstiges" - it is about a specific product.
+- When two items are otherwise comparable in scope, consumer-facing relevance
+  (tariff, device, network quality a customer feels) outweighs vendor PR,
+  AGM notices and infrastructure-financing announcements.
 - Never invent items or URLs. Use only what is in the input list.
 - Keep it factual and specific. Prefer a concrete number over an adjective.
 """
@@ -122,7 +130,9 @@ Scoring guide (be strict - most of this is product marketing):
 - 5: changes what an operator can sell or must plan for right now (a device
      feature every carrier will have to support, a binding regulatory
      decision, a network-capability launch, direct-to-cell satellite going
-     commercial).
+     commercial). Requires EITHER a major supplier/standard-setter as sender
+     OR direct relevance for the German/European consumer market - a niche
+     vendor with no market followership is capped at 3.
 - 4: clearly relevant technology or policy development for operator planning.
 - 3: worth monitoring, not urgent.
 - 2: minor / contextual.
@@ -132,6 +142,11 @@ Scoring guide (be strict - most of this is product marketing):
 
 Rules:
 - Only include items with relevance >= 2 in "highlights".
+- A global device or market-share story (e.g. "best-selling phone worldwide")
+  is "Produktlaunch", never "Sonstiges" - it is about a specific product.
+- When two items are otherwise comparable in scope, consumer-facing relevance
+  (device, network quality a customer feels) outweighs vendor PR, AGM notices
+  and infrastructure-financing announcements.
 - Never invent items or URLs. Use only what is in the input list.
 - Keep it factual and specific. Prefer a concrete number over an adjective.
 """
@@ -187,7 +202,27 @@ put a number in "summary" or in any other field, it must be a number you
 actually read - a later automatic check compares your fields against each
 other and silently drops what it cannot verify."""
 
-BATCH_SIZE = 15  # items per LLM call - keeps JSON output well below token limit
+# Meldungen je LLM-Aufruf.
+#
+# 24 statt 15 seit dem 27.08.2026, und der Grund ist ein Kostengrund: die
+# Denkspur von deepseek-v4-pro faellt je AUFRUF an (~8-9k Token, als Ausgabe
+# abgerechnet) und haengt kaum an der Stapelgroesse. Ein Drittel weniger
+# Aufrufe ist damit rund ein Drittel weniger Denkspur - ohne dass eine
+# einzige Meldung schlechter gelesen wuerde. Das ist Antonios Antwort auf die
+# 1,95 $ vom 27.08.2026: gespart wird an den Token, nicht am Urteil (der
+# Wechsel des Analysten auf flash wurde am selben Tag erneut abgelehnt).
+#
+# Das AUSGABE-Budget waechst mit (ANALYST_MAX_TOKENS): die Antwort traegt je
+# behaltener Meldung ~190 Token, und ein Budget, das vor der Antwort
+# aufgebraucht ist, kostet den ganzen Stapel (Laeufe #83-85, #97).
+BATCH_SIZE = 24
+
+# Ausgabebudget eines Analysten-Stapels.
+#
+# 16000 war die Untergrenze fuer 15 Meldungen: ~8-9k Denkspur plus Antwort.
+# Mit 24 Meldungen waechst nur der Antwortteil, die Denkspur nicht - deshalb
+# 26000 und nicht 16000 * 24/15.
+ANALYST_MAX_TOKENS = 26000
 
 # Wie viel Text der Analyst je Meldung zu sehen bekommt.
 #
@@ -246,7 +281,8 @@ def _items_payload(items: list[Item]) -> str:
 
 def analyze_region(region_name: str, items: list[Item], model: str,
                    language: str = "Deutsch", max_items: int | None = None,
-                   is_theme: bool = False, batch_workers: int = 1) -> dict:
+                   is_theme: bool = False, batch_workers: int = 1,
+                   ausweich: str = "") -> dict:
     """Run one regional analyst (in batches). Returns the merged assessment.
 
     Items are processed in batches of BATCH_SIZE so the JSON response never
@@ -259,6 +295,17 @@ def analyze_region(region_name: str, items: list[Item], model: str,
 
     is_theme=True schaltet auf TECH_ANALYST_SYSTEM um - fuer die Themenfelder
     aus config/tech_sources.yaml, deren Absender keine Wettbewerber sind.
+
+    `ausweich` ist der Anker DIESER Stufe - das Modell, das einspringt, wenn
+    das Primaermodell hart gescheitert ist (leeres Guthaben, toter Endpunkt).
+    Er wird je AUFRUF mitgegeben statt in `llm._FALLBACKS` registriert, weil
+    Analyst und Redaktion sich in jeder heutigen Anbieter-Konfiguration
+    denselben Modellnamen teilen ("deepseek-v4-pro") und eine Registrierung
+    am Namen deshalb nur EINEN Anker fuer beide kennt. Der Analyst macht die
+    allermeisten Aufrufe und gehoert ins kleinste Modell; die Redaktion
+    schreibt den Bericht und gehoert ins grosse. Ohne diesen Parameter erbt
+    der Analyst den Redaktionsanker (siehe pipeline._registriere_anker).
+    Leer heisst: die registrierte Kette gilt unveraendert.
 
     batch_workers > 1 laesst die Stapel EINER Region ueberlappen. Das ist der
     Hebel gegen die Laufzeit, seit der Quellen-Ausbau die Zahl der Meldungen
@@ -276,20 +323,28 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
     def _ein_stapel(n: int, batch: list[Item]) -> dict | None:
+        # Hier steht bewusst KEINE Kostenpruefung. Der Zaehler aus llm.py
+        # zaehlt und warnt, er greift nicht ein (Antonios Entscheidung vom
+        # 27.08.2026): ein Lauf, der auf halber Strecke aufhoert zu lesen,
+        # sieht aus wie eine duenne Nachrichtenwoche - genau das Bild, das
+        # die degenerierten 402-Laeufe vom 15.-27.08. abgegeben haben. Die
+        # harte Grenze ist das Guthaben des Anbieters selbst; stirbt es,
+        # faengt der Anker die sichtbaren Stufen.
         user = (
             f"NEW items for region {region_name} "
             f"(batch {n}/{len(batches)}, {len(batch)} items):\n"
             + _items_payload(batch)
         )
         try:
-            # 16000, nicht 8000: am 18.08.2026 dachte deepseek-v4-pro je
-            # Stapel ~31.000 Zeichen Denkspur und war mit 8000 fertig, BEVOR
-            # die Antwort begann (finish_reason=length) - 41 von ~60 Stapeln
-            # fielen so aus, und der Lauf sah aus wie eine duenne Woche.
-            # Dieselbe Fehlerklasse wie CLAUDE.md §6 (Laeufe #83-85), nur
-            # eine Budgetstufe hoeher. Die Denkspur wird als Ausgabe
-            # abgerechnet, das Budget muss Denken PLUS Antwort tragen.
-            raw = complete(system, user, model=model, max_tokens=16000)
+            # Grosszuegig, nicht knapp: am 18.08.2026 dachte deepseek-v4-pro
+            # je Stapel ~31.000 Zeichen Denkspur und war mit 8000 fertig,
+            # BEVOR die Antwort begann (finish_reason=length) - 41 von ~60
+            # Stapeln fielen so aus, und der Lauf sah aus wie eine duenne
+            # Woche. Dieselbe Fehlerklasse wie CLAUDE.md §6 (Laeufe #83-85).
+            # Die Denkspur wird als Ausgabe abgerechnet, das Budget muss
+            # Denken PLUS Antwort tragen.
+            raw = complete(system, user, model=model,
+                           max_tokens=ANALYST_MAX_TOKENS, ausweich=ausweich)
             return extract_json(raw)
         except (ValueError, RuntimeError, KeyError) as exc:
             log.error("Analyst %s batch %d/%d failed: %s - skipping batch",

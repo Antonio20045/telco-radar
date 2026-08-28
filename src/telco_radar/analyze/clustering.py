@@ -48,6 +48,19 @@ kein Feintuning, sondern die Sicherung.
 aus dem Titel gehashter Schluessel ist beim naechsten Lauf ein anderer, sobald
 eine Quelle ihre Ueberschrift nachtraeglich aendert - denselben Fehler hat der
 Promo-Zweig schon einmal bezahlt.
+
+**Die Cluster-Luecke vom 27.08.2026.** Vier Fachpressequellen berichteten
+EEs 5G-Network-Slicing-Start als vier getrennte Meldungen. Ursache: "EE" hat
+zwei Buchstaben und faellt sowohl durch `tag_news_regions` (verlangt drei,
+collect/__init__.py) als auch durch die Laengenpruefung in
+`akteur_kandidaten` - das Betreiberfeld blieb leer UND kein Titelwort wurde
+als Akteur erkannt, und `_urteil` gab darauf hin "verschieden" zurueck, OHNE
+die Titel ueberhaupt zu vergleichen. Fuer genau diesen Fall gibt es den
+dritten Pfad in `_urteil`: quellenuebergreifend UND ein gemeinsames seltenes
+Titelwort genuegen, um die Titelaehnlichkeit ueberhaupt erst zu pruefen -
+dieselbe 1-je-Haeufigkeit-Rechnung wie beim roten Faden der Titelseite
+(report/html.py:_faden). Er ersetzt die Akteurspruefung nicht, er tritt nur
+ein, wenn sie mangels erkennbaren Akteurs gar nicht greifen konnte.
 """
 from __future__ import annotations
 
@@ -83,6 +96,12 @@ SCHWELLE_GRAU = 0.12
 # Wie viele Zweifelsfaelle je Lauf ans Modell gehen duerfen. Die Stufe soll
 # Geld SPAREN; ein Lauf, der 300 Ja/Nein-Fragen stellt, tut das Gegenteil.
 MAX_LLM_PRUEFUNGEN = 40
+
+# Obergrenze der Seltenheitsrechnung auf den TITELWOERTERN. Ein Anteil allein
+# (`len // 8`) waechst mit dem Stapel und laesst bei einem normalen Lauf
+# (~890 Meldungen) Woerter wie "network" oder "mobile" als "selten" gelten -
+# die Messung steht in `_seltene_titelworte`.
+SELTENHEITS_OBERGRENZE = 40
 
 # Ab wie vielen Mitgliedern eine Gruppe keine weiteren mehr aufnimmt. Eine
 # echte Ereignis-Gruppe hat drei bis fuenf Quellen; alles darueber ist der
@@ -225,19 +244,25 @@ class _Profil:
     # Der Betreiber aus dem gleichnamigen Feld - der EINE Name, den die
     # Konfiguration verantwortet und nicht der Grossschreibung entnommen ist.
     betreiber: frozenset[str] = frozenset()
+    # Titelwoerter, die im Stapel selten sind (`_seltene_titelworte`). Traegt
+    # die quellenuebergreifende Pruefung, wenn kein Akteur erkannt wurde.
+    selten: frozenset[str] = frozenset()
 
     @classmethod
-    def von(cls, item: Item, akteure: frozenset[str] | None = None) -> "_Profil":
+    def von(cls, item: Item, akteure: frozenset[str] | None = None,
+             selten: frozenset[str] | None = None) -> "_Profil":
         # Der Titel traegt das Ereignis, die Zusammenfassung traegt die Zahlen.
         # Beide zusammen fuer die Woerter waere falsch: ein langer Teaser
         # verduennt jede Aehnlichkeit.
         text = item.title
+        worte = wortmenge(text)
         return cls(
             item=item,
-            worte=wortmenge(text),
+            worte=worte,
             zahlen=zahlenmenge(f"{text} {item.summary[:400]}"),
             akteure=akteure if akteure is not None else akteur_kandidaten(item),
             betreiber=_betreiber(item),
+            selten=selten if selten is not None else worte,
         )
 
 
@@ -301,6 +326,37 @@ def _seltene_akteure(kandidaten: list[frozenset[str]]) -> list[frozenset[str]]:
             for menge in kandidaten]
 
 
+def _seltene_titelworte(mengen: list[frozenset[str]]) -> list[frozenset[str]]:
+    """Behaelt je Meldung nur die Titelwoerter, die im Stapel selten sind.
+
+    Dieselbe Rechnung wie `_seltene_akteure` und der rote Faden der
+    Titelseite (report/html.py:_faden) - nur auf dem GANZEN Titelwortschatz
+    statt nur auf grossgeschriebenen Namen. Sie traegt den quellenuebergreifenden
+    Vergleich fuer den Fall, dass keine Seite einen erkennbaren Akteur hat -
+    ein Betreibername wie "EE" ist fuer die Akteurserkennung zu kurz (siehe
+    Modulkopf), das Ereignis bleibt ueber seltene Inhaltswoerter trotzdem
+    auffindbar.
+
+    **Der Deckel hat eine feste Obergrenze, und die ist nachgemessen.** Hier
+    stand bis zum 27.08.2026 allein `len(mengen) // 8` mit der Begruendung,
+    bei grossen Stapeln filterten sich allgemeine Telko-Woerter von selbst
+    heraus. Das tun sie nicht: ein Lauf bringt rund 890 Meldungen, der Deckel
+    liegt damit bei 111, und ueber 1941 archivierte Ueberschriften gezaehlt
+    gelten dann "network" (154x), "mobile" (134x), "2026" (102x), "data"
+    (82x) und "telecom" (61x) als SELTEN - also genau das Branchenvokabular,
+    das nichts unterscheidet. Bei 40 fallen sie alle heraus, waehrend
+    "airtel" (38x), "pixel" (36x) und "samsung" (35x) bleiben; eine echte
+    Ereignisgruppe hat drei bis acht Mitglieder und liegt weit darunter.
+    """
+    haeufigkeit: dict[str, int] = {}
+    for menge in mengen:
+        for w in menge:
+            haeufigkeit[w] = haeufigkeit.get(w, 0) + 1
+    deckel = max(3, min(SELTENHEITS_OBERGRENZE, len(mengen) // 8))
+    return [frozenset(w for w in menge if haeufigkeit[w] <= deckel)
+            for menge in mengen]
+
+
 def _zeitlich_nah(a: Item, b: Item, stunden: int) -> bool:
     """Liegen zwei Meldungen im selben Zeitfenster?
 
@@ -336,7 +392,29 @@ def _urteil(a: _Profil, b: _Profil) -> tuple[str, float]:
         if not (a.betreiber & b.betreiber):
             return "verschieden", 0.0
     elif not (a.akteure & b.akteure):
-        return "verschieden", 0.0
+        # Kein GEMEINSAMER Akteur. Drei Bedingungen muessen zusammenkommen,
+        # damit die Titelaehnlichkeit ueberhaupt geprueft wird - und die
+        # erste ist die wichtigste:
+        #
+        # 1. Mindestens eine Seite hat GAR KEINEN erkannten Akteur. Genau das
+        #    ist der Fall, fuer den dieser Pfad gebaut wurde: "EE" hat zwei
+        #    Buchstaben und faellt durch die Laengenpruefung in
+        #    `akteur_kandidaten` (siehe Modulkopf, "Cluster-Luecke vom
+        #    27.08.2026"). Tragen BEIDE Seiten Akteure und teilen sie keinen,
+        #    ist das keine Erkennungsluecke, sondern eine Aussage: es sind
+        #    zwei verschiedene Handelnde. Ohne diese Bedingung buendelte der
+        #    Pfad jedes Paar mit gleicher Satzschablone - nachgemessen am
+        #    27.08.2026 galten "Zain launches eSIM roaming bundle for
+        #    travellers" und "Batelco launches eSIM roaming bundle for
+        #    tourists" als DASSELBE Ereignis (Aehnlichkeit 0,60 ueber
+        #    "esim"/"roaming"/"bundle"), also zwei Wettbewerber als einer.
+        # 2. Verschiedene Quellen - eine Redaktion, die zweimal dasselbe
+        #    Schema fuellt, ist kein Beleg.
+        # 3. Ein gemeinsames SELTENES Titelwort (`_seltene_titelworte`).
+        if ((a.akteure and b.akteure)
+                or a.item.source_name == b.item.source_name
+                or not (a.selten & b.selten)):
+            return "verschieden", 0.0
     aehnlich = _jaccard(a.worte, b.worte)
     gemeinsame_zahl = bool(a.zahlen & b.zahlen)
     if aehnlich >= SCHWELLE_SICHER:
@@ -463,9 +541,10 @@ def gruppiere(items: list[Item], *, model: str | None = None,
     grau: list[tuple[float, Gruppe, _Profil]] = []
 
     akteure = _seltene_akteure([akteur_kandidaten(i) for i in items])
+    selten = _seltene_titelworte([wortmenge(i.title) for i in items])
 
-    for item, namen in zip(items, akteure):
-        p = _Profil.von(item, akteure=namen)
+    for item, namen, sw in zip(items, akteure, selten):
+        p = _Profil.von(item, akteure=namen, selten=sw)
         bestes: tuple[float, int] | None = None
         graubester: tuple[float, int] | None = None
         for idx, g in enumerate(gruppen):
