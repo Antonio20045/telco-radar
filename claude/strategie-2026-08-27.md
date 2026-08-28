@@ -173,14 +173,14 @@ am Ende; Branch `claude/highlight-pages-system-43s1d3`.
 
 ## 6. Stand der Umsetzung & offene Entscheidungen (Stand 27.08., wird nachgeführt)
 
-**Läuft gerade in der Session vom 27.08.:** Workflow über P0–P4 →
-Integration (volle Testsuite) → adversarisches Review, danach ein
-Revisionspaket (E1: Vorsortierung + Batch 24 statt Modellwechsel; E3:
-Zähler warnt nur, kappt nie), dann geprüfter Push auf den Branch. **Wer
-diese Strategie in einer neuen Session aufnimmt: zuerst den Branch-Stand
-und dieses Kapitel lesen — NICHT bei null anfangen.** Ist der Branch noch
-ohne Code-Commits, ist die Umsetzung abgebrochen worden und dieses Dokument
-ist die Startgrundlage.
+**UMSETZUNG ABGESCHLOSSEN (28.08., Commit `59029d4` auf dem Branch):**
+Alle Pakete P0–P4 + Vorsortierung sind gebaut, die 11 Befunde des
+adversarischen Reviews behoben, **1876 Tests / 2 skipped / 0 failed**,
+Quellen 207 → 196. Schlussliste: `outputs/sanierung-2026-08-27.md`;
+CLAUDE.md §8a trägt den Eintrag. **Für die nächste Session gilt damit
+Pfad 1 des §7-Prompts:** Testsuite + `pruefe_portal.py` bestätigen, nach
+`main` mergen (Merge, kein Rebase), dann Messplan §4 gegen den nächsten
+Actions-Lauf.
 
 **Antonios Entscheidungen (27.08., beide gefallen):**
 1. **Kein DeepSeek-Auffüllen vorerst.** Konsequenz, ehrlich: Solange das
