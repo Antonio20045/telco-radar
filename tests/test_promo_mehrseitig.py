@@ -168,7 +168,7 @@ def test_unveraenderte_seite_laesst_ihre_angebote_in_ruhe(tmp_path):
     wiedergefundenen IDs - altern darf es trotzdem nicht."""
     db = _db_mit_zwei_seiten(tmp_path)
     neu = db.upsert([{"brand": "Marke", "headline": "Rabatt auf Geraete"}],
-                    "2026-08-08", source_url=ZWEIT)[1]
+                    "2026-08-08", source_url=ZWEIT).gesehene_ids
     db.mark_stale("Marke", neu, "2026-08-08",
                   gepruefte_seiten={ZWEIT}, leitseite=LEIT)
     status = {e["headline"]: e["status"] for e in db.entries.values()}

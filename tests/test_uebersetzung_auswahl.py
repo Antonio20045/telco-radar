@@ -34,6 +34,15 @@ from telco_radar.uebersetzung.store import UebersetzungsStore
 
 from test_uebersetzung import ENGLISCH, SPANISCH, _item
 
+# Deutscher Fliesstext ab 200 Zeichen - vorgefiltert, kein Kandidat, egal ob
+# vor oder nach dem 27.08.2026.
+DEUTSCH = (
+    "Die Bundesnetzagentur hat mitgeteilt, dass die Vergabe der Frequenzen "
+    "im kommenden Jahr stattfinden soll. Die Behoerde nannte dabei weder "
+    "einen genauen Termin noch die Bedingungen, unter denen die Anbieter "
+    "mitbieten duerfen. "
+) * 2
+
 
 def _highlight(item: Item, **kw) -> dict:
     """Ein Highlight so, wie der Analyst es zurueckgibt.
@@ -192,6 +201,60 @@ def test_sicher_fremdsprachige_stehen_vor_den_unbestimmten(tmp_path,
     assert abgerufen[0] == spanisch.url
 
 
+def test_englische_kandidaten_stehen_vor_den_unbestimmten(tmp_path,
+                                                           monkeypatch):
+    """Dieselbe Zusicherung wie oben, jetzt fuer Englisch (E5, 27.08.2026).
+
+    Vor der Entscheidung war ein englischer Artikel gar kein Kandidat -
+    dieser Test haette also gegen den alten Stand keinen englischen Abruf
+    gesehen und waere trivial gruen gewesen. Er prueft deshalb zusaetzlich,
+    dass der englische Artikel ueberhaupt abgerufen UND uebersetzt wird."""
+    monkeypatch.setattr(stufe_mod, "uebersetze",
+                        lambda *a, **k: ("T", ["A"]))
+    abgerufen = []
+
+    def _merke(item, *a, **k):
+        abgerufen.append(item.url)
+        return _feed_ergebnis(item)
+
+    monkeypatch.setattr(stufe_mod, "hole_volltext", _merke)
+    textlos = [_item(url=f"https://beispiel.test/leer/{i}") for i in range(3)]
+    englisch = _item(url="https://beispiel.test/en/1", volltext=ENGLISCH)
+
+    bilanz = stufe_mod.lauf(textlos + [englisch], tmp_path, {}, "modell",
+                            frist_sekunden=30, heute=date(2026, 8, 15))
+
+    assert abgerufen[0] == englisch.url
+    assert bilanz["uebersetzt"] == 1
+
+
+def test_deckel_kommt_aus_settings_und_faellt_auf_sechzig_zurueck(tmp_path,
+                                                                   monkeypatch):
+    """Der Deckel wuchs am 27.08.2026 mit dem Kandidatenstrom von 40 auf 60
+    (settings-Schluessel `uebersetzung_max_je_lauf`). Gegen den alten Stand
+    (Vorgabe 40) faellt dieser Test: die 45. bis 60. Meldung waeren dort
+    ueber dem Deckel geblieben."""
+    monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
+    monkeypatch.setattr(stufe_mod, "hole_volltext",
+                        lambda item, *a, **k: _feed_ergebnis(item))
+    items = [_item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH)
+             for i in range(50)]
+
+    bilanz = stufe_mod.lauf(items, tmp_path / "vorgabe", {}, "modell",
+                            frist_sekunden=30, heute=date(2026, 8, 15))
+
+    assert bilanz["ueber_deckel"] == 0
+    assert bilanz["uebersetzt"] == 50
+
+    # Ein expliziter Wert aus settings gewinnt weiterhin gegen die Vorgabe.
+    # Eigener Store-Pfad, sonst gelten die 50 Meldungen von oben schon als
+    # "schon uebersetzt" und die Vorauswahl sieht sie nie wieder an.
+    bilanz_explizit = stufe_mod.lauf(
+        items, tmp_path / "explizit", {"uebersetzung_max_je_lauf": 3},
+        "modell", frist_sekunden=30, heute=date(2026, 8, 15))
+    assert bilanz_explizit["ueber_deckel"] == 47
+
+
 def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path,
                                                         monkeypatch):
     """`ueber_deckel: 887` bei 40 bearbeiteten Meldungen war die Zahl, an der
@@ -199,11 +262,13 @@ def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path,
     monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
     monkeypatch.setattr(stufe_mod, "hole_volltext",
                         lambda item, *a, **k: _feed_ergebnis(item))
-    # Fuenf spanische, zwei englische. Die englischen werden vorgefiltert und
-    # stehen deshalb NICHT ueber dem Deckel.
+    # Fuenf spanische, zwei deutsche. Die deutschen werden vorgefiltert und
+    # stehen deshalb NICHT ueber dem Deckel. (Bis zum 27.08.2026 stand hier
+    # Englisch - seit MUTTERSPRACHEN nur noch "de" enthaelt, waere ein
+    # englisches Beispiel selbst sicher fremdsprachig, siehe der Test unten.)
     items = [_item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH)
              for i in range(5)]
-    items += [_item(url=f"https://beispiel.test/en/{i}", volltext=ENGLISCH)
+    items += [_item(url=f"https://beispiel.test/de/{i}", volltext=DEUTSCH)
               for i in range(2)]
 
     bilanz = stufe_mod.lauf(items, tmp_path, {"uebersetzung_max_je_lauf": 2},
@@ -284,9 +349,20 @@ def test_ohne_jeden_text_bleibt_die_nutzlast_gueltig():
 
 
 def test_ein_stapel_bleibt_im_eingabebudget():
-    """15 Meldungen mal die Grenze - die Rechnung, an der die Grenze haengt."""
+    """BATCH_SIZE Meldungen mal die Textgrenze - die Rechnung dahinter.
+
+    Die Obergrenze wird GERECHNET. Als feste Zahl (45000) hing sie an
+    BATCH_SIZE=15 und schlug am 27.08.2026 bei der Erhoehung auf 24 an,
+    obwohl das Eingabefenster derselbe geblieben war - der Test haette eine
+    Kostenmassnahme als Ueberlauf gemeldet.
+    """
     items = [_item(url=f"https://beispiel.test/a/{i}", volltext="Z" * 40000)
              for i in range(agents.BATCH_SIZE)]
     nutzlast = agents._items_payload(items)
-    assert len(nutzlast) < 45000, (
+    # Je Meldung der gekappte Text plus die Metafelder.
+    obergrenze = agents.BATCH_SIZE * (agents.ANALYST_TEXT_ZEICHEN + 500)
+    assert len(nutzlast) < obergrenze, (
         "ein Stapel darf das Eingabefenster nicht sprengen")
+    # Und absolut: ~4 Zeichen je Token, die konfigurierten Modelle tragen
+    # 1M Kontext - ein Stapel muss weit darunter bleiben.
+    assert len(nutzlast) < 200_000

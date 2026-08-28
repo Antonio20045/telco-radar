@@ -72,13 +72,25 @@ def test_wechsel_ueberschreibt_eine_alte_basis_url(umgebung, monkeypatch):
                                                    "llm_provider": "deepseek"})
 
 
-def test_deepseek_ohne_basis_url_laeuft_nirgendwo_sonst(umgebung):
-    """Ein Tippfehler in der DeepSeek-URL darf den Lauf weder an NVIDIA noch
-    an Anthropic geben - sonst zahlt man still beim teuren Anbieter weiter,
-    von dem man gerade weggeschaltet hat."""
-    backend = _aktives_backend({"llm_api_base": "https://nvidia.invalid/v1",
-                                "llm_provider": "deepseek"})
-    assert backend == "none", f"still auf {backend} ausgewichen"
+def test_deepseek_ohne_basis_url_weicht_nicht_auf_nvidia_aus(umgebung):
+    """Ein Tippfehler in der DeepSeek-URL darf den Lauf nicht an NVIDIA geben -
+    dort liegt derselbe Schluessel und ein anderer Endpunkt.
+
+    Bis zum 27.08.2026 verlangte dieser Test zusaetzlich, dass auch Anthropic
+    ausfaellt (`backend == "none"`), mit der Begruendung, man zahle sonst
+    still beim teuren Anbieter weiter. Diese Haelfte ist mit E2 bewusst
+    aufgegeben: der Anthropic-Schluessel ist jetzt der Rettungsanker der
+    Modellketten, und llm._dispatch routet je MODELL - nur eine `claude-*`-ID
+    geht an die Anthropic-API. Eine DeepSeek-Modell-ID dort ist eine
+    abgelehnte Anfrage, keine Rechnung. Der Preis der alten Fassung war
+    dagegen bezifferbar: sieben Laeufe in Folge ohne Wochenbericht.
+    """
+    from telco_radar.pipeline import _waehle_anbieter
+
+    _waehle_anbieter({"llm_api_base": "https://nvidia.invalid/v1",
+                      "llm_provider": "deepseek"})
+    assert not llm._use_openai(), "still auf den NVIDIA-Endpunkt ausgewichen"
+    assert not llm._use_bedrock()
 
 
 def test_deepseek_weicht_nicht_auf_anthropic_aus(umgebung):

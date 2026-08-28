@@ -303,9 +303,12 @@ def _mechanik_balken(marken: list[dict]) -> list[dict]:
 # Flaeche: das Motiv bleibt, die Unschaerfe geht.
 LEAD_MIND_BREITE = 900
 # Ab wie vielen weiteren Karten die Aufmacherkarte zwei Rasterzeilen hoch
-# steht. Darunter bleibt neben ihr eine Zelle leer - und eine Luecke MITTEN
-# im Raster ist genau das "kreuz und quer", das diese Fassung abstellt.
-_HOCH_AB_WEITEREN = 3
+# steht. Zwei Zeilen brauchen VIER volle Zellen daneben (2 Spalten x 2
+# Zeilen) - mit drei blieb am 27.08.2026 die Zelle unten rechts leer (ALDI
+# TALK, live gemessen). Darunter bleibt neben ihr eine Zelle leer - und eine
+# Luecke MITTEN im Raster ist genau das "kreuz und quer", das diese Fassung
+# abstellt.
+_HOCH_AB_WEITEREN = 4
 
 
 def _block(brand: dict) -> dict:
@@ -338,14 +341,26 @@ def gewichte(block: dict) -> None:
     Motiv beantwortet die Breitenfrage anders als eine mit einem zu
     schmalen. Wer sie nur in `_block()` rechnet, bekommt eine Aufmacherkarte,
     die aus einem Grund klein bleibt, den es auf der Seite nicht mehr gibt.
+
+    Beide Gewichte werden gegen die TATSAECHLICHE Kartenzahl gerechnet, nicht
+    nur gegen die Motivbreite - live gemessen am 27.08.2026: PremiumSIM und
+    simplytel hatten genau EINE weitere Karte neben der zweispaltigen
+    Aufmacherkarte, und die vierte Spalte blieb leer. Eine zweispaltige
+    Aufmacherkarte braucht deshalb entweder GAR keine oder MINDESTENS zwei
+    weitere Karten daneben, sonst faellt sie auf die normale Breite zurueck -
+    zwei kleine Karten mit Rest-Weissraum rechts sind eine normale kurze
+    Reihe, keine Luecke neben einer groesseren Karte.
     """
     lead = block.get("lead")
+    weitere = len(block["karten"]) - 1
     # Eine Schriftkachel ist Text und in jeder Groesse scharf - nur ein
     # Rasterbild muss die Flaeche fuellen koennen.
-    gross = bool(lead) and (not lead["bild"]
-                            or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE)
+    bildtauglich = bool(lead) and (not lead["bild"]
+                                  or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE)
+    hoch = bildtauglich and weitere >= _HOCH_AB_WEITEREN
+    gross = bildtauglich and not (not hoch and weitere == 1)
     block["lead_gross"] = gross
-    block["lead_hoch"] = gross and len(block["karten"]) - 1 >= _HOCH_AB_WEITEREN
+    block["lead_hoch"] = gross and hoch
 
 
 def _entdoppele_bilder(karten: list[dict]) -> None:

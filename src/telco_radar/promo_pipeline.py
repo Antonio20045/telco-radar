@@ -60,6 +60,34 @@ def _resolve_item_url(item_url: str | None, brand_url: str) -> str:
     return (item_url or "").strip() or brand_url
 
 
+def _seiten_gelesen(zaehler: dict, gesamt: int) -> int:
+    """Wie viele der abgefragten Seiten wirklich ABGERUFEN wurden.
+
+    "gelesen" ist der Abruf, nicht die Extraktion danach - eine Seite mit
+    gescheiterter Extraktion (`extraktion_fehlgeschlagen`) wurde trotzdem
+    gelesen, nur ihr Ergebnis kam nicht an. Nur ein fehlgeschlagener
+    Seitenabruf selbst (`fail`) zaehlt nicht als gelesen.
+    """
+    return gesamt - zaehler.get("fail", 0)
+
+
+def _angebote_neu(results: list[dict]) -> int:
+    """Angebote, die es in der Datenbank vorher NICHT gab (`upsert.neu`)."""
+    return sum(r.get("new_items") or 0 for r in results)
+
+
+def _angebote_bestaetigt(results: list[dict]) -> int:
+    """Bekannte Angebote, die in diesem Lauf wiedergefunden wurden.
+
+    Die zweite Zahl, und sie beantwortet eine andere Frage als die erste.
+    Bis zum 27.08.2026 wies das Protokoll nur die NEUEN aus und nannte sie
+    "aktualisiert": eine ruhige Woche meldete damit "0 Angebote
+    aktualisiert" - dasselbe Bild wie ein stiller Totalausfall der
+    Extraktion. Erst beide Zahlen nebeneinander unterscheiden die Faelle.
+    """
+    return sum(r.get("confirmed_items") or 0 for r in results)
+
+
 def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                     language: str = "Deutsch", max_workers: int = 4,
                     settings: dict | None = None,
@@ -177,11 +205,12 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                     it["tier"] = rec["tier"]
                     it["url"] = _resolve_item_url(it.get("url"), page_url)
                     it["image_url"] = image_url
-                n_new, matched_ids = db.upsert(items, today, source_url=page_url)
+                bilanz = db.upsert(items, today, source_url=page_url)
                 gepruefte_seiten.setdefault(src_name, set()).add(page_url)
-                gesehene_ids.setdefault(src_name, set()).update(matched_ids)
+                gesehene_ids.setdefault(src_name, set()).update(bilanz.gesehene_ids)
                 rec["status"] = "ok"
-                rec["new_items"] = n_new
+                rec["new_items"] = bilanz.neu
+                rec["confirmed_items"] = bilanz.bestaetigt
                 rec["extracted"] = len(items)
             else:
                 rec["status"] = "changed_no_llm"
@@ -310,9 +339,15 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     ergiebig = sum(1 for r in results if r.get("extracted"))
     log.info("Promo-Ergiebigkeit: %d von %d gelesenen Seiten lieferten "
              "mindestens ein Angebot", ergiebig, zaehler.get("ok", 0))
+    # Drei Zahlen fuers Laufprotokoll (pipeline.py::stats, siehe dort): der
+    # Ausfall seit dem 14.08.2026 (Strategie 2026-08-27, B6) stand sonst in
+    # KEINER Statistik, nur im Actions-Log, das niemand liest.
     return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
             "images": dict(bilder_bilanz),
             "brands": len(sources), "pages": len(auftraege),
             "status": dict(zaehler), "ergiebig": ergiebig,
             "extraktion_fehlgeschlagen": len(gescheitert),
+            "seiten_gelesen": _seiten_gelesen(zaehler, len(auftraege)),
+            "angebote_neu": _angebote_neu(results),
+            "angebote_bestaetigt": _angebote_bestaetigt(results),
             "score": score_summary}

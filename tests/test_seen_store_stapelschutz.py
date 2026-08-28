@@ -33,10 +33,14 @@ def _antwort(titel: list[str]) -> str:
 
 
 def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
-    def fake_complete(system, user, model, max_tokens):
+    def fake_complete(system, user, model, max_tokens, ausweich=""):
         rows = json.loads(user.split("\n", 1)[1])
         # Der mittlere Stapel scheitert - genau der Fall aus Lauf #67.
-        if rows[0]["title"] == "Meldung 15":
+        # Die Nummer wird aus BATCH_SIZE GERECHNET: als Literal "15" zeigte
+        # sie nach der Erhoehung auf 24 (27.08.2026) auf die Mitte des
+        # ERSTEN Stapels, und der Test prueft dann etwas anderes, als er
+        # behauptet.
+        if rows[0]["title"] == f"Meldung {agents.BATCH_SIZE}":
             raise RuntimeError("provider overloaded")
         return _antwort([r["title"] for r in rows])
 
@@ -45,16 +49,16 @@ def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
     res = agents.analyze_region("KI-Anbieter", items, model="m", is_theme=True)
 
     ungelesen = set(res["_ungelesen"])
-    # Genau die 15 Meldungen des gescheiterten Stapels, keine anderen.
+    # Genau die Meldungen des gescheiterten Stapels, keine anderen.
     assert len(ungelesen) == agents.BATCH_SIZE
-    mittlere = {i.id for i in items[15:30]}
+    mittlere = {i.id for i in items[agents.BATCH_SIZE:2 * agents.BATCH_SIZE]}
     assert ungelesen == mittlere
     assert res["_telemetry"]["unread_items"] == agents.BATCH_SIZE
     assert res["_telemetry"]["batches_ok"] == 2
 
 
 def test_ohne_ausfall_ist_nichts_ungelesen(monkeypatch):
-    def fake_complete(system, user, model, max_tokens):
+    def fake_complete(system, user, model, max_tokens, ausweich=""):
         rows = json.loads(user.split("\n", 1)[1])
         return _antwort([r["title"] for r in rows])
 
