@@ -1117,6 +1117,10 @@ b,strong{font-weight:700}
 /* Das Band unter der dritten Reihe. Eine Linie, kein Kasten - es soll die
    Titelseite nicht unterbrechen, sondern sie fortsetzen. */
 .fokusband{border-top:3px solid var(--rule-ink);margin-top:2px}
+/* Ueber dem Aufmacher zaehlt jede Zeile: das Band traegt die Linie der
+   Rubrikleisten, aber keinen zusaetzlichen Abstand nach oben. */
+.fokusband--oben{margin:0 0 14px}
+.fokusband--oben a{padding:9px 0}
 .fokusband a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;
   gap:0 16px;align-items:baseline;padding:11px 0;
   border-bottom:1px solid var(--rule-2)}

@@ -78,6 +78,36 @@
 <div class="front-oben">
   <div class="front-haupt">
 
+    {# Der Verweis auf die laufenden Themenseiten. Eine Linie, kein Kasten -
+       die Seiten sind temporaer und bekommen deshalb auch keinen
+       Navigationspunkt (analyze/highlight_topics.py).
+
+       Er stand bis zum 29.08.2026 am ENDE dieser Spalte, hinter Aufmacher,
+       zweiter und dritter Reihe. Gemessen an der Ausgabe vom 28.08.: auf
+       dem Schreibtisch y=1316 px bei 900 px Falz, auf dem Telefon
+       y=3031 px bei 844 px. Wer die Domain aufrief, sah die Themenseite
+       also nie - und im HTML war das nicht zu sehen, der Link war da.
+       Die rechte Spalte waere billiger gewesen (sie beginnt bei y=132 px),
+       faellt auf dem Telefon aber unter das ganze Raster.
+
+       Ueber dem Aufmacher steht sonst nichts, und das hat einen Grund:
+       der Zwei-Minuten-Kasten hat hier am 09.08.2026 die Titelseite von
+       zehn auf drei Geschichten oberhalb der Falz gedrueckt. Der
+       Unterschied ist die Bauform - fuenf Absaetze mit Belegzeile gegen
+       EINE Zeile je Thema. Wer hier etwas ergaenzt, misst
+       `pruefe_portal.py` Kriterium 1 nach. #}
+    {% if is_latest and themen %}
+    <nav class="fokusband fokusband--oben" aria-label="Laufende Themen">
+      {% for t in themen %}
+      <a href="{{ prefix }}thema/{{ t.slug }}.html">
+        <span class="fokusband-kicker">Im Fokus</span>
+        <span class="fokusband-titel">{{ t.titel }}</span>
+        <span class="fokusband-zahl">{{ t.n }} Meldungen &nearr;</span>
+      </a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+
     {% if front.aufmacher %}
     {% set a = front.aufmacher %}
     <article class="aufmacher{% if not a.image %} ohne-bild{% endif %}{% if (a.schlagzeile or '')|length <= 70 %} kurz{% endif %}">
@@ -153,20 +183,6 @@
     </div>
     {% endif %}
 
-    {# Der Verweis auf die laufenden Themenseiten. Eine Linie, kein Kasten -
-       die Seiten sind temporaer und bekommen deshalb auch keinen
-       Navigationspunkt (analyze/highlight_topics.py). #}
-    {% if is_latest and themen %}
-    <nav class="fokusband" aria-label="Laufende Themen">
-      {% for t in themen %}
-      <a href="{{ prefix }}thema/{{ t.slug }}.html">
-        <span class="fokusband-kicker">Im Fokus</span>
-        <span class="fokusband-titel">{{ t.titel }}</span>
-        <span class="fokusband-zahl">{{ t.n }} Meldungen &nearr;</span>
-      </a>
-      {% endfor %}
-    </nav>
-    {% endif %}
   </div>
 
   {# Die Textspalte neben dem Aufmacher. Ohne sie stehen oberhalb der Falz
