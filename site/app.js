@@ -1005,6 +1005,58 @@ var TelcoFrage = (function () {
 })();
 
 /* =========================================================================
+   PREISVERGLEICH GEGEN VODAFONE: der Anbieterfilter
+   =========================================================================
+   Drei Knoepfe, eine Regel: gezeigt wird eine Zeile, wenn MINDESTENS EIN
+   guenstigerer Wettbewerber zum gewaehlten Typ gehoert. Zeilen ohne
+   guenstigeren Wettbewerber stehen nur unter "alle" - unter "nur
+   Netzbetreiber" waere "niemand guenstiger" eine Aussage ueber alle
+   Anbieter, nicht ueber die gefilterten, und damit falsch.
+
+   Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
+   Detailliste unter einer Zeile, die nicht mehr da ist.
+   ====================================================================== */
+(function () {
+  var leisten = document.querySelectorAll('[data-vergleich-filter]');
+  if (!leisten.length) return;
+
+  Array.prototype.forEach.call(leisten, function (leiste) {
+    var sektion = leiste.closest('.gr-vergleich');
+    if (!sektion) return;
+    var knoepfe = leiste.querySelectorAll('.gr-filter-knopf');
+
+    function anwenden(typ) {
+      var zeilen = sektion.querySelectorAll('.gr-v-zeile');
+      var sichtbar = 0;
+      for (var i = 0; i < zeilen.length; i++) {
+        var typen = (zeilen[i].getAttribute('data-typen') || '').split(' ');
+        var passt = typ === 'alle' || typen.indexOf(typ) >= 0;
+        zeilen[i].hidden = !passt;
+        if (passt) sichtbar++;
+        var naechste = zeilen[i].nextElementSibling;
+        if (naechste && naechste.classList.contains('gr-v-alle')) {
+          naechste.hidden = !passt;
+        }
+      }
+      // Eine leere Tabelle ohne Satz sieht aus wie ein Fehler.
+      var leer = sektion.querySelector('.gr-v-leer');
+      var scroll = sektion.querySelector('.gr-vergleich-scroll');
+      if (leer) leer.hidden = sichtbar > 0;
+      if (scroll) scroll.hidden = sichtbar === 0;
+    }
+
+    Array.prototype.forEach.call(knoepfe, function (knopf) {
+      knopf.addEventListener('click', function () {
+        Array.prototype.forEach.call(knoepfe, function (k) {
+          k.classList.toggle('is-aktiv', k === knopf);
+        });
+        anwenden(knopf.getAttribute('data-typ') || 'alle');
+      });
+    });
+  });
+})();
+
+/* =========================================================================
    NEWSLETTER-ANMELDUNG
    =========================================================================
    Drei Dinge passieren hier, und das erste ist das, das man leicht vergisst.

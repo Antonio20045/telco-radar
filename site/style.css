@@ -2066,6 +2066,87 @@ b,strong{font-weight:700}
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
 .gr-basis--duenn{color:var(--r4)}
 
+/* --- Wer ist guenstiger als Vodafone? (G2, 28.08.2026) ------------------
+   ZUR FARBE, nachgesehen am gerenderten Bild statt behauptet: in diesem
+   Portal sind LINKS rot (Designsprache "Zeitungsausgabe": Rot markiert
+   Rubriken, Dringlichkeit und Links). Beide Preise dieser Tabelle sind
+   Links, also stehen beide rot da - das ist die Hausregel und kein
+   Sonderweg. Was Vodafone auszeichnet, ist deshalb nicht die Schriftfarbe,
+   sondern die 3px-Linie links an seiner Spalte.
+   Kein Wert wird eingefaerbt, um ihn zu bewerten: ein guenstigerer
+   Wettbewerber bekommt kein Gruen und kein Warnzeichen. Die Seite
+   beobachtet, sie empfiehlt nicht. */
+.gr-vergleich{margin:34px 0 0}
+.gr-vergleich-lage{font-size:13.5px;line-height:1.65;color:var(--ink-2);
+  max-width:64ch;margin:10px 0 14px}
+.gr-vergleich-filter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.gr-filter-knopf{font-family:var(--sans);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;background:none;border:1px solid var(--rule);
+  color:var(--ink-3);padding:5px 11px;cursor:pointer;border-radius:0}
+.gr-filter-knopf.is-aktiv{border-color:var(--rule-ink);color:var(--ink);
+  background:var(--paper-3)}
+.gr-vergleich-scroll{overflow-x:auto}
+.gr-vergleich-tabelle{width:100%;font-size:13.5px}
+.gr-vergleich-tabelle th[scope=col]{font-family:var(--sans);font-size:10.5px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+/* Die eigene Spalte traegt die Vodafone-Linie - der einzige Ort, an dem in
+   dieser Sektion Rot vorkommt. */
+.gr-vergleich-tabelle .gr-eigen-spalte{border-left:3px solid var(--red);
+  padding-left:10px}
+.gr-v-geraet{text-align:left;font-weight:400}
+.gr-v-geraet .szl{display:block;font-size:14.5px;line-height:1.35}
+.gr-v-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+  letter-spacing:.03em}
+.gr-v-name{display:block;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink-2);letter-spacing:.02em}
+.gr-v-datum{display:block;font-family:var(--sans);font-size:10px;
+  color:var(--ink-4)}
+.gr-v-tarif{display:block;font-family:var(--sans);font-size:10px;
+  color:var(--ink-3);font-style:italic}
+.gr-v-prozent{font-family:var(--sans);font-size:10.5px;color:var(--ink-3)}
+.gr-v-keiner{color:var(--ink-4);font-size:12.5px}
+.gr-v-zeile--ohne .gr-v-geraet .szl{color:var(--ink-3)}
+.gr-v-alle td{padding-top:0;border-top:0}
+.gr-v-alle summary{font-family:var(--sans);font-size:11px;color:var(--ink-3);
+  cursor:pointer}
+.gr-v-liste{list-style:none;margin:6px 0 0;padding:0}
+.gr-v-liste li{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
+  padding:5px 0;border-top:1px solid var(--rule-2);font-size:13px}
+.gr-v-liste li .gr-v-name{display:inline;min-width:12ch}
+.gr-v-liste li .gr-v-datum{display:inline}
+.gr-vergleich-luecke{margin-top:20px;border-top:1px solid var(--rule);
+  padding-top:12px}
+.gr-v-luecke-titel{font-family:var(--sans);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.gr-v-zeile[hidden]{display:none}
+.gr-v-leer{font-size:13px;line-height:1.6;color:var(--ink-3);max-width:56ch;
+  margin:10px 0 0}
+
+/* --- Gesamtexport ------------------------------------------------------ */
+/* Die Geraetespalte der SKU-Matrix bleibt beim Waagerechtscrollen stehen.
+   Mit zwei Anbietern war das entbehrlich; ab vier - und erst recht ab acht -
+   scrollt man sonst eine Zeile nach rechts und weiss nicht mehr, zu welchem
+   Geraet sie gehoert. `--paper` als Hintergrund ist Pflicht: ohne ihn
+   scheinen die Zellen darunter durch die klebende Spalte hindurch. */
+.gr-matrix-tabelle th[scope=row]{position:sticky;left:0;z-index:1;
+  background:var(--paper)}
+
+.gr-export{margin:34px 0 0}
+.gr-export-liste{list-style:none;margin:10px 0 0;padding:0}
+.gr-export-liste li{border-top:1px solid var(--rule);padding:11px 0}
+.gr-export-liste a{font-size:15px}
+.gr-export-meta{display:block;font-family:var(--sans);font-size:10.5px;
+  letter-spacing:.03em;color:var(--ink-4);margin-top:2px}
+.gr-export-was{display:block;font-size:12.5px;line-height:1.55;
+  color:var(--ink-3);max-width:62ch;margin-top:4px}
+.gr-export-hinweis{font-size:12px;line-height:1.55;color:var(--ink-4);
+  max-width:62ch;margin:12px 0 0}
+
+@media (max-width:720px){
+  .gr-vergleich-tabelle{font-size:12.5px}
+  .gr-v-geraet .szl{font-size:13.5px}
+}
+
 @media (max-width:720px){
   .gr-steuer{flex-direction:column;align-items:stretch}
   /* Die Regel `.gr-etikett{font-size:8px}` stand hier bis zum 11.08.2026
