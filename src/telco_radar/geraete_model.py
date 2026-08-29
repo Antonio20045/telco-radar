@@ -389,6 +389,44 @@ VERGLEICHBARE_ZUSTAENDE = ("", "neu")
 ZUSTAENDE = ("neu", "refurbished", "b-ware", "unbekannt")
 
 
+def serie_aus_modell(modell: str) -> str:
+    """Die Baureihe eines Modellnamens.
+
+    `Geraet.generation` ist die Nummer INNERHALB einer Baureihe, kein
+    vergleichbarer Jahrgang: Samsungs Galaxy A57 traegt 57, die Galaxy S26
+    traegt 26, das Galaxy Z Fold8 traegt 8. Je HERSTELLER verglichen gewinnt
+    damit die A-Reihe - "nur aktuelle Generation" zeigte am 29.08.2026 drei
+    Galaxy A57 und keine einzige S26, also das aktuelle Flaggschiff nicht.
+    Aus demselben Grund waeren "Redmi 17", "Redmi Note 17" und "Xiaomi 17T"
+    je Hersteller EINE Generation, obwohl es drei Produktlinien sind.
+
+    Eine Generationszahl ist nur innerhalb ihrer Baureihe eine Zahl. Die
+    Baureihe endet vor der ersten Zahl; der Buchstabenteil des Zahltokens
+    gehoert noch dazu, weil er die Reihe benennt ("Galaxy S26" -> "Galaxy S",
+    "Galaxy A57" -> "Galaxy A"). Traegt der Name gar keine Zahl, ist er
+    selbst die Reihe ("iPhone Air").
+    """
+    teile = []
+    # Der Bindestrich trennt wie ein Leerzeichen: "Pixel-11 Pro" ergab sonst
+    # die Baureihe "Pixel-11 Pro", also eine eigene Reihe je Variante - dann
+    # ist jede Variante ihre eigene "aktuelle Generation", der Filter wird
+    # zum No-Op und `portfolio_tiefe` zaehlt Varianten als Jahrgaenge.
+    for wort in re.split(r"[\s\-]+", (modell or "").strip()):
+        if not wort:
+            continue
+        treffer = re.match(r"^\(?([A-Za-z]*)(\d)", wort)
+        if treffer:
+            if treffer.group(1):
+                teile.append(treffer.group(1))
+            break
+        teile.append(wort.strip("()"))
+    # Faellt nichts ab - ein Name, der mit einer Ziffer beginnt, oder einer
+    # ganz ohne Ziffer -, ist der Name SELBST die Reihe. Das ist der ehrliche
+    # Rueckfall: eine geratene Reihe wuerde zwei Produktlinien zusammenwerfen,
+    # und das ist teurer als eine Reihe je Modell.
+    return " ".join(teile).strip() or (modell or "").strip()
+
+
 def ohne_zustandswort(farbe: str) -> str:
     """Die Farbe ohne das Zustandskennzeichen.
 

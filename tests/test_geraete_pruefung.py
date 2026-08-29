@@ -326,3 +326,47 @@ def test_ein_stimmiger_zustand_wird_nicht_angefasst():
     erg = pruefe([gut], _KATALOG)
     assert len(erg["sauber"]) == 1
     assert erg["zahlen"]["zustand_veraltet"] == 0
+
+
+def test_zwei_baureihen_mit_derselben_nummer_sind_zwei_generationen():
+    """"Redmi 17", "Redmi Note 17" und "Xiaomi 17T" tragen alle die 17 und
+    sind drei Produktlinien. Als (Hersteller, Nummer) gezählt wären sie EINE
+    Generation - die Kennzahl schrumpfte mit jeder zusätzlichen Baureihe."""
+    from telco_radar.analyze.geraete_lifecycle import portfolio_tiefe
+
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Xiaomi", modell="Redmi 17", generation=17,
+               speicher=[256], segment="einstieg"),
+        Geraet(hersteller="Xiaomi", modell="Redmi Note 17", generation=17,
+               speicher=[256], segment="mittelklasse"),
+        Geraet(hersteller="Xiaomi", modell="Xiaomi 17T", generation=17,
+               speicher=[256], segment="premium"),
+    ])
+    eintraege = [{**_e(gid=gid), "status": "aktiv"}
+                 for gid in ("xiaomi-redmi-17", "xiaomi-redmi-note-17",
+                             "xiaomi-17t")]
+    tiefe = portfolio_tiefe(eintraege, katalog)[0]
+    assert tiefe["generationen"] == 3
+    assert tiefe["modelle_anzahl"] == 3
+
+
+def test_eine_baureihe_mit_varianten_bleibt_eine_generation():
+    """Gegenprobe: Galaxy S26, S26 Plus und S26 Ultra sind ein Jahrgang."""
+    from telco_radar.analyze.geraete_lifecycle import portfolio_tiefe
+
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Samsung", modell="Galaxy S26", generation=26,
+               speicher=[256], segment="premium"),
+        Geraet(hersteller="Samsung", modell="Galaxy S26 Plus", generation=26,
+               speicher=[256], segment="premium"),
+        Geraet(hersteller="Samsung", modell="Galaxy S26 Ultra", generation=26,
+               speicher=[256], segment="flagship"),
+        Geraet(hersteller="Samsung", modell="Galaxy A57", generation=57,
+               speicher=[128], segment="mittelklasse"),
+    ])
+    eintraege = [{**_e(gid=gid), "status": "aktiv"}
+                 for gid in ("samsung-galaxy-s26", "samsung-galaxy-s26-plus",
+                             "samsung-galaxy-s26-ultra", "samsung-galaxy-a57")]
+    tiefe = portfolio_tiefe(eintraege, katalog)[0]
+    assert tiefe["generationen"] == 2, "Galaxy S26 (3 Varianten) plus A57"
+    assert tiefe["modelle_anzahl"] == 4

@@ -31,7 +31,8 @@
      data-hoehe="{{ k.hoehe }}" data-achse="{{ k.achse_y }}"
      data-plot-h="{{ k.plot_h }}" data-ymax="{{ k.y_max }}"
      data-punkte="{{ k.punkte | length }}"
-     data-etiketten-verborgen="{{ k.etiketten_verborgen }}">
+     data-etiketten-verborgen="{{ k.etiketten_verborgen }}"
+     data-baender-uebersprungen="{{ geraete.bilanz.nicht_gezeigt }}">
   <svg class="gr-svg" viewBox="0 0 {{ k.breite }} {{ k.hoehe }}"
        role="img" aria-label="Preis-Positionskarte, Spalten nach {{ k.achsname }}">
     {% for t in k.y_ticks %}
@@ -173,13 +174,10 @@
   <h2 class="rubrik">Wo steht welches Gerät im Preis
     <span class="rubrik-zahl">{{ geraete.bilanz.in_der_karte }}</span></h2>
   <p class="gr-erklaer">Ein Punkt ist ein Gerät in einer Speichergröße bei
-  einem Anbieter, die Höhe ist sein Preis ohne Vertrag. Farbvarianten stehen
-  nicht einzeln in der Grafik – dieselbe Speichergröße kostet in jeder Farbe
-  dasselbe. Zwei
-  Ansichten: nach Hersteller zeigt, wie ein Portfolio über die Preisachse
-  verteilt ist; nach Anbieter zeigt, was dasselbe Gerät bei wem kostet.
-  Zuzahlungen aus Tarifbündeln stehen bewusst nicht in dieser Grafik –
-  „1 €“ mit Vertrag und „1.199 €“ ohne sind nicht dieselbe Zahl.</p>
+  einem Anbieter, die Höhe ist sein Preis ohne Vertrag; Farbvarianten stehen
+  nicht einzeln, dieselbe Speichergröße kostet in jeder Farbe dasselbe.
+  Zuzahlungen aus Tarifbündeln stehen bewusst nicht hier – „1 €“ mit Vertrag
+  und „1.199 €“ ohne sind nicht dieselbe Zahl.</p>
 
   <div class="gr-steuer">
     <div class="gr-schalter" role="group" aria-label="Ansicht">
@@ -213,6 +211,21 @@
         </select>
       </label>
       <label>Generation
+        {# Der Filter steht bewusst NICHT auf "nur aktuelle Generation".
+           Kurz war er es, und zwei Messungen haben es kassiert:
+
+           1. Er blendete ALDI TALKs einzige Listung (Galaxy A17) aus. Die
+              Kappung rettet jeden Laden ausdruecklich davor, ganz aus der
+              Grafik zu fallen - der Standardfilter machte die Rettung
+              wirkungslos und stellte eine beschriftete, LEERE Ladenspalte
+              unter eine Legende, die vier Anbieter nennt.
+           2. Gefiltert wird in `app.js`, ausgewaehlt im HTML. Ohne
+              JavaScript las man "nur aktuelle Generation" ueber einer
+              Grafik mit allen Punkten - eine Beschriftung, die dem Bild
+              widerspricht.
+
+           Das Aufraeumen leistet die Kappung (112 -> 54 Baender), und die
+           faellt serverseitig. #}
         <select id="gr-generation">
           <option value="">mit Vorgängern</option>
           <option value="1">nur aktuelle Generation</option>
@@ -233,12 +246,24 @@
   {% set start = geraete.flaechen[geraete.standard_ansicht ~ '_' ~ geraete.formen[0]] %}
   <p class="gr-legende" id="gr-legende">{{ geraete.bilanz.in_der_karte }} Preispunkte
   aus {{ geraete.bilanz.aggregiert_aus }} Listungen von
-  {{ geraete.bilanz.geraete }} Geräten bei
+  {{ geraete.bilanz.geraete_in_der_karte }} Geräten bei
   {{ geraete.karte_anbieter.spaltenzahl }} Anbietern, zuletzt abgerufen am
-  {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen Angebote.{%
-  if start.etiketten_verborgen %} Ohne Etikett bleiben
+  {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen
+  Angebote.{# Der veraenderliche Teil steht in EINEM eigenen Element. Vorher
+     schnitt `app.js` den Satz an der Zeichenkette "Ohne Etikett bleiben" ab -
+     sobald der Satz je Darstellungsform anders anfaengt, trifft ein solcher
+     Schnitt nicht mehr, und die Legende stand doppelt auf der Seite. #}
+  <span id="gr-legende-zusatz">{%
+  if start.etiketten_verborgen %}{% if start.form == 'band' %} Die Preiszahl
+  steht nur dort, wo sie neben das Band passt
+  ({{ start.punkte|length - start.etiketten_verborgen }} von
+  {{ start.punkte|length }}); die Höhe des Bandes ist die Spanne, den genauen
+  Wert zeigt ein Klick.{% else %} Ohne Etikett bleiben
   {{ start.etiketten_verborgen }} Punkte – dort ist die Spalte voll; der Punkt
-  steht auf seinem Preis.{% endif %}</p>
+  steht auf seinem Preis.{% endif %}{% endif %}{%
+  if geraete.bilanz.nicht_gezeigt %} {{ geraete.bilanz.nicht_gezeigt }} weitere
+  Angebote passen nicht in die Spalten; sie stehen vollständig in der
+  CSV-Tabelle.{% endif %}</span></p>
 
   {# Wer die Grafik auf dem Telefon nicht lesen kann, hat trotzdem Zugriff.
      Aus DERSELBEN Punktliste - eine zweite Aufbereitung wuerde driften. #}
@@ -281,22 +306,19 @@
       <span class="gr-export-meta">{{ geraete.export.aktuell.zeilen }} Zeilen ·
         {{ (geraete.export.aktuell.bytes / 1024) | round | int }} KB{%
         if geraete.export.stand %} · Stand {{ geraete.export.stand | date_de }}{% endif %}</span>
-      <span class="gr-export-was">Eine Zeile je Listung: Anbieter, Modell,
-        Speicher, Farbe, Preis, Preisart, Tarifreferenz, Verfügbarkeit,
-        Quelle, Abrufdatum.</span>
     </li>
     <li>
       <a href="{{ geraete.export.historie.datei }}" download>Preishistorie (CSV)</a>
       <span class="gr-export-meta">{{ geraete.export.historie.zeilen }} Zeilen ·
         {{ (geraete.export.historie.bytes / 1024) | round | int }} KB</span>
-      <span class="gr-export-was">Eine Zeile je Listung und Messtag. Ein
-        unveränderter Preis erzeugt keine neue Zeile – die Kurve ist eine
-        Treppe, keine Messreihe.</span>
     </li>
   </ul>
-  <p class="gr-export-hinweis">UTF-8 mit BOM, Semikolon als Trenner,
-  Dezimalkomma – so öffnet Excel im deutschen Gebietsschema die Datei per
-  Doppelklick, ohne Importassistent.</p>
+  <p class="gr-export-hinweis">Der Bestand trägt eine Zeile je Listung
+  (Anbieter, Modell, Speicher, Farbe, Zustand, Preis, Preisart,
+  Tarifreferenz, Verfügbarkeit, Quelle, Abrufdatum), die Historie eine je
+  Listung und Messtag – ein unveränderter Preis schreibt keine Zeile. UTF-8
+  mit BOM, Semikolon, Dezimalkomma: Excel öffnet beide im deutschen
+  Gebietsschema per Doppelklick.</p>
 </section>
 {% endif %}
 
@@ -307,38 +329,7 @@
 {% for achse in ['ohne_vertrag', 'mit_vertrag'] %}
 {% set v = geraete.vergleich[achse] %}
 {% if v.hat_daten %}
-<section class="gr-vergleich" id="vergleich-{{ achse|replace('_','-') }}">
-  <h2 class="rubrik">Wer ist günstiger als Vodafone?
-    <span class="rubrik-zusatz">{{ 'ohne Vertrag' if achse == 'ohne_vertrag'
-      else 'Zuzahlung im Tarifbündel' }}</span></h2>
-
-  {% if v.hat_vodafone %}
-  <p class="gr-vergleich-lage">
-    {{ v.zeilen|length }} {{ 'Gerät' if v.zeilen|length == 1 else 'Geräte' }} im
-    Vergleich · bei {{ v.mit_vorteil }} ist ein Wettbewerber günstiger, bei
-    {{ v.ohne_vorteil }} nicht{% if v.groesste_differenz %} · größter Abstand
-    {{ '%.2f'|format(v.groesste_differenz)|replace('.', ',') }} €{% endif %}.
-  </p>
-
-  <div class="gr-vergleich-filter" data-vergleich-filter="{{ achse }}">
-    <button type="button" class="gr-filter-knopf is-aktiv" data-typ="alle">alle</button>
-    <button type="button" class="gr-filter-knopf" data-typ="netzbetreiber">nur Netzbetreiber</button>
-    <button type="button" class="gr-filter-knopf" data-typ="handel">nur Fachhandel</button>
-  </div>
-
-  <div class="gr-vergleich-scroll">
-  <table class="src-table gr-vergleich-tabelle">
-    <thead>
-      <tr>
-        <th scope="col">Gerät</th>
-        <th scope="col" class="gr-eigen-spalte">Vodafone</th>
-        <th scope="col">günstigster Wettbewerber</th>
-        <th scope="col" class="num">Differenz</th>
-        <th scope="col" class="num">darunter</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for z in v.zeilen %}
+{% macro vergleichszeile(z) %}
       <tr class="gr-v-zeile{{ ' gr-v-zeile--ohne' if not z.bester }}"
           data-typen="{{ z.guenstiger|map(attribute='typ')|join(' ') }}">
         <th scope="row" class="gr-v-geraet">
@@ -391,7 +382,46 @@
         </td>
       </tr>
       {% endif %}
-      {% endfor %}
+{% endmacro %}
+
+<section class="gr-vergleich" id="vergleich-{{ achse|replace('_','-') }}">
+  <h2 class="rubrik">Wer ist günstiger als Vodafone?
+    <span class="rubrik-zusatz">{{ 'ohne Vertrag' if achse == 'ohne_vertrag'
+      else 'Zuzahlung im Tarifbündel' }}</span></h2>
+
+  {% if v.hat_vodafone %}
+  <p class="gr-vergleich-lage">
+    {{ v.geraete }} {{ 'Gerät' if v.geraete == 1 else 'Geräte' }} im Vergleich,
+    {{ v.zeilen|length }} mit ihren Speichergrößen · bei {{ v.mit_vorteil }}
+    ist ein Wettbewerber günstiger, bei {{ v.ohne_vorteil }} nicht{%
+    if v.groesste_differenz %} · größter Abstand
+    {{ '%.2f'|format(v.groesste_differenz)|replace('.', ',') }} €{% endif %}.
+    Die Übersicht zeigt {{ v.wesentlich|length }} davon – die mit dem
+    größten Abstand, mindestens 3 % oder 15 €.
+  </p>
+
+  <div class="gr-vergleich-filter" data-vergleich-filter="{{ achse }}">
+    <button type="button" class="gr-filter-knopf is-aktiv" data-typ="alle">alle</button>
+    <button type="button" class="gr-filter-knopf" data-typ="netzbetreiber">nur Netzbetreiber</button>
+    <button type="button" class="gr-filter-knopf" data-typ="handel">nur Fachhandel</button>
+  </div>
+
+  <div class="gr-vergleich-scroll">
+  <table class="src-table gr-vergleich-tabelle">
+    <thead>
+      <tr>
+        <th scope="col">Gerät</th>
+        <th scope="col" class="gr-eigen-spalte">Vodafone</th>
+        <th scope="col">günstigster Wettbewerber</th>
+        <th scope="col" class="num">Differenz</th>
+        <th scope="col" class="num">darunter</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for z in v.wesentlich %}{{ vergleichszeile(z) }}{% endfor %}
+      {% if not v.wesentlich %}
+      <tr><td colspan="5" class="gr-v-keiner">Kein Wettbewerber liegt mehr als 3 % oder 15 € unter Vodafone.</td></tr>
+      {% endif %}
     </tbody>
   </table>
   </div>
@@ -402,11 +432,42 @@
   <p class="gr-v-leer" hidden>Zu dieser Auswahl liegt keine Vergleichszeile
     vor – kein Anbieter dieser Art ist bei einem der verglichenen Geräte
     günstiger als Vodafone.</p>
+
+  {% if v.rest %}
+  <details class="evidence gr-vergleich-rest">
+    <summary>Alle {{ v.zeilen|length }} Zeilen zeigen – auch die
+      {{ v.rest|length }} weiteren</summary>
+    <div class="evidence-body">
+      <p class="gr-erklaer">Hier steht der vollständige Vergleich: die
+      Geräte, bei denen niemand günstiger ist, die mit einem Abstand unter
+      3 % und unter 15 €, und alles jenseits der zwanzig Zeilen der
+      Übersicht. Ein Cent Unterschied auf einen Tausender ist kein
+      Wettbewerbsbefund – die Zeile verschwindet deshalb aus der Übersicht,
+      nicht aus der Seite.</p>
+      <div class="gr-vergleich-scroll">
+      <table class="src-table gr-vergleich-tabelle">
+        <thead>
+          <tr><th scope="col">Gerät</th>
+            <th scope="col" class="gr-eigen-spalte">Vodafone</th>
+            <th scope="col">günstigster Wettbewerber</th>
+            <th scope="col" class="num">Differenz</th>
+            <th scope="col" class="num">darunter</th></tr>
+        </thead>
+        <tbody>
+          {% for z in v.rest %}{{ vergleichszeile(z) }}{% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+  {% endif %}
   {% endif %}
 
   {% if v.ohne_vodafone %}
-  <div class="gr-vergleich-luecke">
-    <h3 class="gr-v-luecke-titel">Bei Wettbewerbern gelistet, bei Vodafone nicht</h3>
+  <details class="evidence gr-vergleich-luecke">
+    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+      ({{ v.ohne_vodafone_gesamt }})</summary>
+    <div class="evidence-body">
     <ul class="gr-v-liste">
       {% for l in v.ohne_vodafone %}
       <li><span class="szl">{{ l.modell }}</span>
@@ -422,7 +483,8 @@
     {% if v.ohne_vodafone_gesamt > v.ohne_vodafone|length %}
     <p class="gr-v-meta">{{ v.ohne_vodafone_gesamt }} insgesamt.</p>
     {% endif %}
-  </div>
+    </div>
+  </details>
   {% endif %}
 </section>
 {% endif %}
@@ -469,8 +531,12 @@
   <h2 class="rubrik">Welches Gerät gibt es bei wem
     <span class="rubrik-zahl">{{ geraete.matrix.zeilen | length }}</span></h2>
   <p class="gr-erklaer">Eine Zelle nennt die Zahl der Varianten und die
-  Preisspanne. Die Einzelheiten – Speichergrößen, Farben, Verfügbarkeit,
-  Quelle und Abrufdatum – stehen im Aufklapper darunter.</p>
+  Preisspanne über alle Neugeräte. Die Einzelheiten – Speichergrößen,
+  Farben, Zustand, Verfügbarkeit, Quelle und Abrufdatum – stehen in den
+  Aufklappern darunter, vollständig auch in der CSV-Tabelle.</p>
+  <details class="evidence gr-matrixblock">
+    <summary>Tabelle Gerät × Anbieter
+      ({{ geraete.matrix.zeilen | length }} Geräte)</summary>
   <div class="gr-matrix-scroll">
     <table class="src-table gr-matrix-tabelle">
       <thead>
@@ -499,7 +565,11 @@
       </tbody>
     </table>
   </div>
+  </details>
 
+  <details class="evidence gr-variantenblock">
+    <summary>Alle Varianten je Gerät – Speicher, Farbe, Zustand, Quelle</summary>
+    <div class="evidence-body">
   {% for z in geraete.matrix.zeilen %}
   <details class="evidence gr-varianten">
     <summary>{{ z.modell }} – {{ z.anbieter_mit_geraet }} Anbieter</summary>
@@ -518,6 +588,8 @@
     </div>
   </details>
   {% endfor %}
+    </div>
+  </details>
 </section>
 
 {# --- Lifecycle ------------------------------------------------------- #}
@@ -621,11 +693,23 @@
   Preiskarte ohne den größten Händler des Landes ist keine Marktübersicht –
   sie sagt es hier, statt es aussehen zu lassen wie Vollständigkeit.</p>
 
-  <ul class="list-card gr-quellenkurz">
-    {% for z in geraete.quellenlage.zeilen if not z.liefert %}
-    <li class="list-row"><b>{{ z.name }}</b> – {{ z.grund or 'liefert derzeit keine Geräte' }}</li>
-    {% endfor %}
-  </ul>
+  {% set stumm = geraete.quellenlage.zeilen | rejectattr('liefert') | list %}
+  {% if stumm %}
+  <p class="gr-erklaer">Ohne Daten sind derzeit
+    <b>{{ stumm | map(attribute='name') | join(', ') }}</b>. Der Grund steht
+    je Anbieter im Aufklapper und ausführlich auf
+    <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a>.</p>
+  <details class="evidence gr-quellenkurz">
+    <summary>Warum diese {{ stumm | length }} nichts liefern</summary>
+    <div class="evidence-body">
+      <ul class="list-card">
+        {% for z in stumm %}
+        <li class="list-row"><b>{{ z.name }}</b> – {{ z.grund or 'liefert derzeit keine Geräte' }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </details>
+  {% endif %}
 
   {% if geraete.quellenlage.ohne_hardware %}
   <p class="gr-ruhe">Ohne Hardware-Vermarktung beobachtet:

@@ -290,3 +290,92 @@ def test_ein_neugeraet_gewinnt_weiterhin_ganz_normal():
     zeile = next(z for z in erg["zeilen"] if z["modell"] == "iPhone 17 Pro Max")
     assert [a["anbieter"] for a in zeile["guenstiger"]] == ["o2"]
     assert zeile["guenstiger"][0]["preis"] == 799.0
+
+
+# --------------------------------------------------------------------------
+# W2: die Tabelle zeigt Befunde, nicht Rundungsrauschen
+# --------------------------------------------------------------------------
+
+def test_rundungsrauschen_steht_nicht_in_der_hauptansicht():
+    """62 Zeilen, davon 36 "niemand günstiger" und Dutzende mit -0,90 EUR:
+    ein Manager scrollte durch 20 Bildschirme, um sechs relevante Zeilen zu
+    finden. freenet listet dasselbe Gerät fuer 1199,00 statt 1199,90 EUR -
+    das ist kein Wettbewerbsbefund.
+
+    Die Zeilen verschwinden nicht, sie stehen in `rest`."""
+    eintraege = [
+        _e("Vodafone", preis=1199.9),
+        _e("freenet", preis=1199.0, typ="handel"),
+    ]
+    erg = vergleich(eintraege, _KATALOG)
+    assert erg["wesentlich"] == []
+    assert len(erg["rest"]) == 1
+    assert erg["rest"][0]["differenz"] == 0.9
+    # Die Gesamtliste bleibt vollstaendig - `zeilen` ist die Vollansicht.
+    assert len(erg["zeilen"]) == 1
+
+
+@pytest.mark.parametrize("preis,wesentlich", [
+    (1199.0, False),   # 0,90 EUR / 0,1 % - Rauschen
+    (1184.0, True),    # 15,90 EUR ueber der absoluten Grenze
+    (1160.0, True),    # 39,90 EUR / 3,3 % - beides
+])
+def test_die_schwelle_greift_absolut_oder_relativ(preis, wesentlich):
+    """Mindestens 3 Prozent ODER 15 Euro: bei einem 200-Euro-Geraet sind
+    15 Euro viel und 3 Prozent wenig, bei einem 2000-Euro-Geraet umgekehrt.
+    Eine Grenze allein liesse je nach Preisklasse das Falsche durch."""
+    erg = vergleich([_e("Vodafone", preis=1199.9),
+                     _e("freenet", preis=preis, typ="handel")], _KATALOG)
+    assert bool(erg["wesentlich"]) is wesentlich
+
+
+def test_ein_billiges_geraet_kommt_ueber_die_prozentgrenze():
+    """Gegenprobe zur absoluten Grenze: 9,90 EUR sind bei einem 219,90-EUR-
+    Geraet 4,5 Prozent und damit ein Befund, obwohl sie unter 15 EUR
+    liegen."""
+    erg = vergleich([_e("Vodafone", gid="google-pixel-11", preis=219.9),
+                     _e("ALDI TALK", gid="google-pixel-11", preis=210.0,
+                        typ="discount")], _KATALOG)
+    assert len(erg["wesentlich"]) == 1
+
+
+def test_eine_zeile_ist_keine_geraetezahl():
+    """"62 Geräte im Vergleich" stand über einer Seite, die daneben 59
+    beobachtete Geräte auswies. Eine Zeile ist eine (Modell, Speicher)-
+    Kombination: das iPhone 17 Pro Max mit 256 und mit 512 GB sind zwei
+    Zeilen und EIN Gerät. Dieselbe Fehlerklasse wie "267 Geräte neu im
+    Regal", nur eine Sektion weiter."""
+    eintraege = [_e("Vodafone", speicher=s) for s in (256, 512)]
+    eintraege += [_e("o2", speicher=s, preis=1249.9) for s in (256, 512)]
+    erg = vergleich(eintraege, _KATALOG)
+    assert len(erg["zeilen"]) == 2, "die Fixture spannt zwei Zeilen auf"
+    assert erg["geraete"] == 1
+
+
+def test_die_uebersicht_ist_nach_oben_gedeckelt():
+    """Ohne Deckel hängt die Seitenhöhe am Datenbestand: eine Zeile ist
+    71 px hoch, und die Seite hat 146 px Luft unter der
+    Sechs-Bildschirm-Grenze. Zwei zusätzliche wesentliche Zeilen kippten den
+    Abnahmetest, ohne dass sich eine Zeile Code ändert.
+
+    Gekappt wird am unteren Ende – die gestrichenen Zeilen sind die mit dem
+    kleinsten Vorteil, und sie stehen vollständig in der Vollansicht."""
+    from telco_radar.report.geraete_vergleich import UEBERSICHT_MAX_ZEILEN
+
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell=f"iPhone {n}", generation=n,
+               speicher=[256], segment="premium")
+        for n in range(1, UEBERSICHT_MAX_ZEILEN + 11)])
+    eintraege = []
+    for n in range(1, UEBERSICHT_MAX_ZEILEN + 11):
+        gid = f"apple-iphone-{n}"
+        eintraege.append(_e("Vodafone", gid=gid, preis=1000.0))
+        eintraege.append(_e("o2", gid=gid, preis=1000.0 - n * 10))
+    erg = vergleich(eintraege, _KATALOG_GROSS := katalog)
+
+    assert len(erg["zeilen"]) == UEBERSICHT_MAX_ZEILEN + 10, "Fixture greift nicht"
+    assert len(erg["wesentlich"]) == UEBERSICHT_MAX_ZEILEN
+    # Nichts geht verloren: was nicht oben steht, steht in der Vollansicht.
+    assert len(erg["wesentlich"]) + len(erg["rest"]) == len(erg["zeilen"])
+    # Und gekappt wird unten, nicht oben.
+    assert erg["wesentlich"][0]["differenz"] >= erg["rest"][0]["differenz"]

@@ -39,7 +39,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, serie_aus_modell
 from . import geraete_karte, geraete_pruefung, geraete_vergleich
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
@@ -589,7 +589,8 @@ def leer(fehler: str = "") -> dict:
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
                    "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0,
-                   "aggregiert_aus": 0, "hersteller": 0,
+                   "aggregiert_aus": 0, "hersteller": 0, "nicht_gezeigt": 0,
+                   "geraete_in_der_karte": 0,
                    "schwelle_erreicht": False},
         # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
         # genau dafuer gibt es ihn. Die vier Flaechen kommen aus derselben
@@ -700,17 +701,24 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                      + (f" · {speicher} GB" if speicher else ""),
         })
 
-    # Nur die aktuelle Generation je Hersteller-Familie kennzeichnen - der
-    # Filter blendet, er rechnet nicht neu.
-    hoechste: dict[str, int] = {}
+    # Die aktuelle Generation JE BAUREIHE, nicht je Hersteller. `generation`
+    # ist die Nummer innerhalb einer Reihe: Samsungs Galaxy A57 traegt 57,
+    # die Galaxy S26 traegt 26, das Galaxy Z Fold8 traegt 8. Je Hersteller
+    # verglichen gewinnt die A-Reihe - die Standardansicht zeigte am
+    # 29.08.2026 drei Galaxy A57 und keine einzige S26, also das aktuelle
+    # Flaggschiff nicht. Der Filter blendet weiterhin, er rechnet nicht neu.
+    for p in punkte_ohne_vertrag:
+        p["serie"] = serie_aus_modell(p.get("modell") or "")
+    hoechste: dict[tuple, int] = {}
     for p in punkte_ohne_vertrag:
         if p["generation"] is None:
             continue
-        hoechste[p["hersteller"]] = max(hoechste.get(p["hersteller"], 0),
-                                        p["generation"])
+        schluessel = (p["hersteller"], p["serie"])
+        hoechste[schluessel] = max(hoechste.get(schluessel, 0), p["generation"])
     for p in punkte_ohne_vertrag:
-        p["aktuelle_generation"] = (p["generation"] is not None
-                                    and p["generation"] == hoechste.get(p["hersteller"]))
+        p["aktuelle_generation"] = (
+            p["generation"] is not None
+            and p["generation"] == hoechste.get((p["hersteller"], p["serie"])))
 
     # Wie oft ist der Geraetezweig ueberhaupt schon gelaufen? Das ist die
     # Frage hinter "gibt es einen frueheren Stand" - und sie wird an den
@@ -749,7 +757,14 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # 512 GB kosten alle 1199 EUR - als fuenf Punkte lagen sie deckungsgleich
     # aufeinander und trugen fuenf Etiketten, die sich gegenseitig nach unten
     # schoben. 60 der 85 Kreise waren so entstanden.
-    aggregate = geraete_karte.aggregiere(punkte_ohne_vertrag)
+    # Die Kappung faellt HIER, nicht erst in `karte()`: `_grundlage` und
+    # `bilanz.in_der_karte` lesen `aggregate`, und ungekappt meldete die
+    # Legende "153 Preispunkte", waehrend die Grafik 82 zeichnete - genau
+    # der Fehlertyp aus CLAUDE.md §6, ein Etikett und ein Feld, die nicht
+    # dasselbe meinen. `karte()` kappt weiterhin selbst (die Rechnung ist
+    # idempotent), damit ein direkter Aufruf dieselbe Auswahl bekommt.
+    aggregate = geraete_karte.gekappt(
+        geraete_karte.aggregiere(punkte_ohne_vertrag))
 
     # Beide Ansichten bekommen dieselbe Hoehe, sonst springt die Seite beim
     # Umschalten. Zwei Durchgaenge: erst messen, dann mit dem Maximum bauen.
@@ -767,8 +782,21 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                     achszusatz=_grundlage(aggregate, anzeige))
         return raus
 
+    # Synchronisiert wird JE FORM, nicht ueber beide. Der Grund der
+    # Synchronisierung ist, dass die Seite beim Umschalten nicht springt -
+    # und der haeufige Schalter ist Hersteller/Anbieter, nicht Baender/Punkte.
+    # Ueber beide Formen gerechnet erbte die Bandform die 900 px der
+    # Punktform, obwohl sie 540 braucht: 360 px leere Flaeche in der
+    # Ansicht, die als Standard gezeigt wird.
     erst = _flaechen()
-    flaechen = _flaechen(max((k["hoehe"] for k in erst.values()), default=0))
+    je_form = {}
+    for schluessel, k in erst.items():
+        form = schluessel.rsplit("_", 1)[1]
+        je_form[form] = max(je_form.get(form, 0), k["hoehe"])
+    flaechen = {}
+    for form, hoehe in je_form.items():
+        flaechen.update({s: k for s, k in _flaechen(hoehe).items()
+                         if s.rsplit("_", 1)[1] == form})
 
     karte_hersteller = flaechen["hersteller_chip"]
     # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
@@ -778,9 +806,25 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # die Karte EINE Spalte zeigt und "Preise von 1 Haendler" darunter steht.
     laeden_mit_daten = {laden.get(e.get("anbieter"), e.get("anbieter"))
                         for e in sichtbar}
-    gezeichnete_listungen = [p for p in punkte_ohne_vertrag
-                             if (p.get("zustand") or "neu")
-                             in VERGLEICHBARE_ZUSTAENDE]
+    # Die Listungen HINTER den gezeichneten Punkten - nicht alle
+    # vergleichbaren. Seit die Karte kappt, sind das zwei verschiedene
+    # Zahlen, und "83 Preispunkte aus 339 Listungen" waere wieder ein
+    # Etikett, das nicht zu seinem Feld passt.
+    gezeigte_schluessel = {(p.get("device_id"), p.get("speicher"),
+                            p.get("shop"), p.get("zustand") or "neu")
+                           for p in aggregate}
+    gezeichnete_listungen = [
+        p for p in punkte_ohne_vertrag
+        if (p.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+        and (p.get("device_id"), p.get("speicher"), p.get("shop"),
+             p.get("zustand") or "neu") in gezeigte_schluessel]
+    # Was die Kappung weggelassen hat, wird gezaehlt und auf der Seite
+    # genannt - eine still gekappte Grafik behauptet Vollstaendigkeit.
+    alle_punkte = geraete_karte.aggregiere(punkte_ohne_vertrag)
+    nicht_gezeigt = len({(p.get("modell"), p.get("device_id"), p.get("shop"))
+                         for p in alle_punkte}) - len(
+        {(p.get("modell"), p.get("device_id"), p.get("shop"))
+         for p in aggregate})
     # Die Veroeffentlichungsschwelle rechnet gegen den BESTAND, nicht gegen
     # die Karte. Bis zum 29.08.2026 nahm sie die Spaltenzahl der
     # Herstelleransicht - und die haengt seit W1.2 an der
@@ -844,6 +888,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             # waren. Auf einer Seite, deren Verkaufsargument der Belegzwang
             # ist, ist das die teuerste Sorte falscher Zahl.
             "aggregiert_aus": len(gezeichnete_listungen),
+            "nicht_gezeigt": nicht_gezeigt,
+            # Die Geraete IN DER KARTE, nicht die beobachteten. Seit die
+            # Karte kappt, sind das zwei Zahlen; die Legende meint ihre.
+            "geraete_in_der_karte": len({p.get("device_id") for p in aggregate}),
             "hersteller": len(hersteller_mit_daten),
             "schwelle_erreicht": erreicht,
         },

@@ -30,7 +30,7 @@ import logging
 from datetime import date, datetime
 from typing import Optional
 
-from ..geraete_model import Katalog
+from ..geraete_model import Katalog, serie_aus_modell
 from .geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
 
 log = logging.getLogger(__name__)
@@ -200,8 +200,14 @@ def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
 def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
     """Wie viele GERAETE-Generationen fuehrt ein Anbieter gleichzeitig?
 
-    Gezaehlt werden verschiedene device_ids, nicht SKUs: acht Farben eines
-    Modells sind ein Regalplatz, drei Generationen sind eine Strategie.
+    Gezaehlt werden verschiedene (Hersteller, Baureihe, Jahrgang) - nicht
+    device_ids und nicht SKUs. Acht Farben eines Modells sind ein Regalplatz,
+    iPhone 17 / 17 Pro / 17 Pro Max sind EIN Jahrgang, und drei Jahrgaenge
+    sind eine Strategie.
+
+    Die Zahl der Modelle steht daneben als `modelle_anzahl`. Bis zum
+    29.08.2026 stand sie unter der Ueberschrift "Generationen": die Seite
+    meldete "o2 fuehrt 54 Generationen" bei 59 beobachteten Geraeten.
     """
     je_anbieter: dict[str, dict] = {}
     for e in eintraege:
@@ -239,8 +245,14 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
         # Ein Katalogeintrag OHNE Jahrgang zaehlt nicht mit: sonst waeren
         # drei Geraete ohne Angabe drei Generationen, und die Kennzahl
         # wuchse mit der Luecke im Katalog statt mit dem Portfolio.
-        jahrgaenge = {(m["hersteller"], m["generation"]) for m in modelle
-                      if m["generation"] is not None}
+        # Je BAUREIHE, nicht je Hersteller: "Redmi 17", "Redmi Note 17" und
+        # "Xiaomi 17T" sind drei Produktlinien mit derselben Nummer und
+        # waeren als (Hersteller, Nummer) EINE Generation. Umgekehrt sind
+        # Galaxy A57 und Galaxy S26 zwei Jahrgaenge zweier Reihen und keine
+        # 31 Generationen Abstand.
+        jahrgaenge = {(m["hersteller"], serie_aus_modell(m["modell"]),
+                       m["generation"])
+                      for m in modelle if m["generation"] is not None}
         out.append({
             "anbieter": name,
             "anbieter_typ": roh["anbieter_typ"],

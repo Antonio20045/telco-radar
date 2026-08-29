@@ -30,6 +30,7 @@ from telco_radar.geraete_model import (
     listung_id,
     normalisiere,
     normalisiere_farbe,
+    serie_aus_modell,
     ohne_zustandswort,
     sku_id,
     speicher_aus_titel,
@@ -756,3 +757,54 @@ def test_ein_unbekannter_zustand_wird_abgewiesen():
         Listung(sku_id="x", device_id="x", anbieter="o2",
                 anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p",
                 abgerufen_am="2026-08-29", zustand="Neu")
+
+
+@pytest.mark.parametrize("modell,serie", [
+    ("Galaxy S26 Ultra", "Galaxy S"),
+    ("Galaxy S26", "Galaxy S"),
+    ("Galaxy A57", "Galaxy A"),
+    ("Galaxy Z Fold8 Ultra", "Galaxy Z Fold"),
+    ("Galaxy Z Flip 7", "Galaxy Z Flip"),
+    ("iPhone 17 Pro Max", "iPhone"),
+    ("iPhone Air", "iPhone Air"),
+    ("Redmi Note 17 Pro", "Redmi Note"),
+    ("Redmi 17", "Redmi"),
+    ("Xiaomi 17T Pro", "Xiaomi"),
+    ("Pixel 11 Pro XL", "Pixel"),
+    ("Nothing Phone (4a)", "Nothing Phone"),
+    ("Fairphone 6", "Fairphone"),
+])
+def test_die_baureihe_wird_aus_dem_modellnamen_gelesen(modell, serie):
+    """`generation` ist die Nummer INNERHALB einer Baureihe, kein
+    vergleichbarer Jahrgang: Samsungs Galaxy A57 traegt 57, die Galaxy S26
+    traegt 26. Je Hersteller verglichen gewinnt damit die A-Reihe, und "nur
+    aktuelle Generation" zeigte am 29.08.2026 drei Galaxy A57 und keine
+    einzige S26 - das aktuelle Flaggschiff fehlte in der Standardansicht.
+
+    Ein Jahrgang ist nur INNERHALB seiner Baureihe eine Zahl. Die Baureihe
+    endet vor der ersten Zahl; der Buchstabenteil der Zahl gehoert noch dazu
+    ("Galaxy S26" -> "Galaxy S")."""
+    assert serie_aus_modell(modell) == serie
+
+
+@pytest.mark.parametrize("modell,serie", [
+    # Der Bindestrich trennt wie ein Leerzeichen. Ohne das wäre
+    # "Pixel-11 Pro" seine eigene Baureihe, jede Variante wäre "aktuelle
+    # Generation", der Filter ein No-Op und `portfolio_tiefe` zählte
+    # Varianten als Jahrgänge.
+    ("Pixel-11 Pro", "Pixel"),
+    ("Galaxy-S26-Ultra", "Galaxy S"),
+    # Rückfall: ein Name, der mit einer Ziffer beginnt, und einer ganz ohne
+    # Ziffer sind selbst die Reihe. Eine geratene Reihe würfe zwei
+    # Produktlinien zusammen, und das ist teurer.
+    ("5G Phone X", "5G Phone X"),
+    ("Rugged Phone", "Rugged Phone"),
+    ("17", "17"),
+    ("", ""),
+])
+def test_die_baureihe_haelt_auch_bei_ungewoehnlichen_namen(modell, serie):
+    assert serie_aus_modell(modell) == serie
+
+
+def test_die_baureihe_vertraegt_none():
+    assert serie_aus_modell(None) == ""
