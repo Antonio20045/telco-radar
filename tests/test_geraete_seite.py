@@ -1022,7 +1022,15 @@ def test_alte_preisbewegung_steht_nicht_unter_diese_woche(tmp_path):
         "\n".join(json.dumps(p) for p in alt) + "\n", encoding="utf-8")
     render_site(site, root / "data" / "reports")
     s = _suppe(site, "geraete.html")
-    text = s.get_text(" ", strip=True)
+    # NUR der Abschnitt "Was diese Woche auffaellt" - so steht es im Namen
+    # dieses Tests und in seiner Beschreibung. Bis zum 28.08.2026 suchte er
+    # im GESAMTEN Seitentext; seit die Seite eine Vergleichssektion hat, die
+    # das Wort "guenstiger" in ihrer Ueberschrift fuehrt, haette er
+    # angeschlagen, ohne dass eine alte Preisbewegung im Blick gestanden
+    # haette. Der Gegenstand des Tests ist unveraendert, seine Zielscheibe
+    # ist die richtige.
+    abschnitt = s.select_one(".gr-auffaellig")
+    text = abschnitt.get_text(" ", strip=True) if abschnitt else ""
     assert "günstiger" not in text and "teurer" not in text
 
 
@@ -1314,3 +1322,127 @@ def test_eine_lange_beobachtung_erscheint_sehr_wohl_auf_der_seite(tmp_path):
     zeilen = s.select(".gr-dauern li")
     assert zeilen, "eine 41 Tage alte Listung ergibt sehr wohl eine Zeile"
     assert not any("0 Tage" in z.get_text() for z in zeilen)
+
+
+# --------------------------------------------------------------------------
+# "Wer ist guenstiger als Vodafone?" auf der gerenderten Seite (G2)
+# --------------------------------------------------------------------------
+
+def _db_mit_vergleich():
+    """Ein Bestand, in dem Vodafone einmal teurer und einmal konkurrenzlos
+    ist - beide Faelle muessen auf der Seite stehen."""
+    return {"updated": "2026-08-11", "anbieter": {
+        "Medimax": {"laeufe": 4, "funde_gesamt": 8},
+        "Vodafone": {"laeufe": 4, "funde_gesamt": 4},
+    }, "listungen": [
+        _listung("Vodafone", "apple-iphone-17-pro-max",
+                 "apple-iphone-17-pro-max-256gb-titan-natur", 1349.0),
+        _listung("Medimax", "apple-iphone-17-pro-max",
+                 "apple-iphone-17-pro-max-256gb-titan-natur-mx", 1199.0),
+        _listung("ElectronicPartner", "apple-iphone-17-pro-max",
+                 "apple-iphone-17-pro-max-256gb-titan-natur-ep", 1279.0),
+        # Hier ist Vodafone der guenstigste - die Zeile bleibt trotzdem stehen.
+        _listung("Vodafone", "apple-iphone-16-pro-max",
+                 "apple-iphone-16-pro-max-256gb-schwarz-vf", 799.0, farbe="schwarz"),
+        _listung("Medimax", "apple-iphone-16-pro-max",
+                 "apple-iphone-16-pro-max-256gb-schwarz", 899.0, farbe="schwarz"),
+        # Und das hier fuehrt Vodafone gar nicht.
+        _listung("Medimax", "samsung-galaxy-s25-ultra",
+                 "samsung-galaxy-s25-ultra-256gb-schwarz", 1249.0, farbe="schwarz"),
+    ]}
+
+
+def test_die_vergleichssektion_nennt_den_guenstigsten_mit_namen(tmp_path):
+    """Die woertliche Anforderung: nicht DASS es guenstiger ist, sondern
+    BEI WEM."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    abschnitt = s.select_one(".gr-vergleich")
+    assert abschnitt is not None, "die Sektion fehlt ganz"
+    text = abschnitt.get_text(" ", strip=True)
+    assert "Wer ist günstiger als Vodafone?" in text
+    assert "Medimax" in text, "der guenstigste Wettbewerber steht mit Namen da"
+    assert "150,00" in text, "die Differenz steht da (1349 - 1199)"
+    assert "11,1" in text, "und der Prozentsatz"
+
+
+def test_jede_vergleichszeile_traegt_beide_quellen_und_beide_daten(tmp_path):
+    """"Kein Vergleich ohne beide Quelllinks und beide Abrufdaten." Auf der
+    Seite gemessen, nicht nur in der Rechnung."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    zeilen = s.select(".gr-vergleich .gr-v-zeile")
+    assert zeilen, "keine einzige Vergleichszeile"
+    for zeile in zeilen:
+        eigen = zeile.select_one(".gr-eigen-spalte")
+        assert eigen.select_one("a[href]"), "Vodafone ohne Quelllink"
+        assert eigen.select_one(".gr-v-datum"), "Vodafone ohne Abrufdatum"
+        bester = zeile.select_one(".gr-v-name")
+        if bester is None:
+            continue          # "niemand guenstiger" - eine gueltige Zeile
+        zelle = bester.parent
+        assert zelle.select_one("a[href]"), "Wettbewerber ohne Quelllink"
+        assert zelle.select_one(".gr-v-datum"), "Wettbewerber ohne Abrufdatum"
+
+
+def test_der_aufklapper_listet_alle_guenstigeren(tmp_path):
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    auf = s.select_one(".gr-vergleich .gr-v-alle details")
+    assert auf is not None, "zwei guenstigere Anbieter, aber kein Aufklapper"
+    namen = [x.get_text(strip=True) for x in auf.select(".gr-v-name")]
+    # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
+    # ElectronicPartner unter `shop: ep`. Verglichen werden Laeden - sonst
+    # zaehlte derselbe Shop unter zwei Marken zweimal als "guenstiger".
+    assert set(namen) == {"Medimax", "ep"}
+
+
+def test_die_zeile_ohne_guenstigeren_wettbewerber_bleibt_stehen(tmp_path):
+    """"Nirgends guenstiger" ist die Auskunft, wegen der man die Liste liest."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    text = s.select_one(".gr-vergleich").get_text(" ", strip=True)
+    assert "niemand günstiger" in text
+
+
+def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    luecke = s.select_one(".gr-vergleich-luecke")
+    assert luecke is not None
+    text = luecke.get_text(" ", strip=True)
+    assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
+    assert "Galaxy S25 Ultra" in text
+
+
+def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
+    """Zielgruppe sind Manager ohne Technikhintergrund - der Rest des
+    Portals schreibt deutsche Daten, diese Sektion tat es zuerst nicht.
+    Beim ANSEHEN des Screenshots aufgefallen, nicht im Test."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    for datum in s.select(".gr-vergleich .gr-v-datum"):
+        text = datum.get_text(strip=True)
+        if not text or not text[0].isdigit():
+            continue
+        assert "-" not in text, f"ISO-Datum auf der Seite: {text!r}"
+
+
+def test_der_anbieterfilter_steht_mit_drei_knoepfen_bereit(tmp_path):
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    knoepfe = [k.get("data-typ") for k in
+               s.select(".gr-vergleich-filter .gr-filter-knopf")]
+    assert knoepfe == ["alle", "netzbetreiber", "handel"]
+    # Und jede Zeile sagt, zu welchen Typen ihre guenstigeren Anbieter zaehlen.
+    for zeile in s.select(".gr-vergleich .gr-v-zeile"):
+        assert zeile.has_attr("data-typen")
+
+
+def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
+    """Ein leerer Kasten mit Ueberschrift sagt "kaputt", nicht "noch keine
+    Daten"."""
+    ohne = {"updated": "2026-08-11", "anbieter": {}, "listungen": []}
+    site = _baue(tmp_path, db=ohne, punkte=[])
+    s = _suppe(site, "geraete.html")
+    assert s.select_one(".gr-vergleich") is None

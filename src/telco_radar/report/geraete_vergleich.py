@@ -1,0 +1,235 @@
+"""Wer ist guenstiger als Vodafone - und um wie viel?
+
+DIE FRAGE, WEGEN DER DIESE SEKTION EXISTIERT
+--------------------------------------------
+Die interne Loesung der Fachkollegen zeigt, DASS ein Geraet irgendwo
+guenstiger ist. Sie zeigt nicht, BEI WEM. Fuer eine Wettbewerbsanalyse ist
+genau das die Auskunft: ein Preisabstand ohne Namen ist eine Zahl, mit Namen
+ist er eine Handlungsoption. Deshalb nennt jede Zeile hier den guenstigsten
+Wettbewerber beim Namen, und der Aufklapper nennt ALLE, die unter Vodafone
+liegen - nicht nur den ersten.
+
+VIER REGELN, DIE DIESE DATEI TRAGEN
+-----------------------------------
+1. **Kein Vergleich ohne beide Belege.** Eine Zeile entsteht nur, wenn BEIDE
+   Seiten eine Quelladresse UND ein Abrufdatum tragen. Das ist keine
+   Formalie: die ganze Seite verspricht, dass jede Zahl nachpruefbar ist,
+   und ein Preisvergleich ist die Zahl, die am ehesten jemand bestreitet.
+   `_belegt()` erzwingt es, ein Test stellt den Fall.
+
+2. **Die zwei Preisarten werden nie gegeneinander gerechnet.** Eine
+   Zuzahlung von 49,95 EUR im Tarifbuendel ist nicht "1300 EUR guenstiger"
+   als ein Ladenpreis von 1349,90 EUR - sie ist eine andere Groesse. Die
+   Preisart steht im Schluessel, nicht in einer Fussnote.
+
+3. **Der ZUSTAND steht im Schluessel.** Dieselbe Lehre wie bei der
+   Positionskarte (11.08.2026): ohne ihn schluckt ein refurbished-Preis den
+   Neupreis desselben Geraets, und die Seite meldete einen Preisvorteil, den
+   es nicht gibt.
+
+4. **Verglichen werden LAEDEN, nicht Marken.** mobilcom-debitel und freenet
+   sind derselbe Shop; als zwei Wettbewerber gezaehlt stuende dasselbe
+   Angebot zweimal in der Liste "N Anbieter guenstiger als Vodafone".
+
+Die Gegenrichtung ist selbst ein Befund: was Wettbewerber fuehren und
+Vodafone nicht, steht in einer eigenen kurzen Zeile. Eine Luecke im eigenen
+Regal ist eine Auskunft, kein fehlender Datensatz.
+"""
+from __future__ import annotations
+
+from typing import Optional
+
+# Wie in `geraete_view`: Vodafone ist die eigene Referenz, kein Wettbewerber.
+EIGEN = ("vodafone",)
+
+# Ohne Vertrag und mit Vertrag - die zwei Achsen, die nie zusammenfliessen.
+OHNE_VERTRAG = "ohne_vertrag"
+MIT_VERTRAG = "mit_vertrag"
+
+# Ein sichtbarer Bestand ist einer, der noch im Regal steht. Ein
+# ausgelistetes Geraet gehoert nicht in einen Preisvergleich von heute.
+_SICHTBAR = ("aktiv", "vermutlich ausgelistet")
+
+
+def _ist_eigen(anbieter: str) -> bool:
+    return (anbieter or "").strip().lower() in EIGEN
+
+
+def _laden(eintrag: dict, laeden: Optional[dict] = None) -> str:
+    """Der LADEN hinter dem Anbieternamen.
+
+    `laeden` bildet Anbietername -> Ladenname ab (aus `shop` in
+    geraete_quellen.yaml). Ohne die Abbildung ist jeder Anbieter sein
+    eigener Laden - dann verhaelt sich diese Datei wie vorher.
+    """
+    name = eintrag.get("anbieter") or ""
+    return (laeden or {}).get(name, name)
+
+
+def _preis(eintrag: dict) -> tuple[Optional[float], str]:
+    """Den einen Preis dieser Listung samt seiner Art.
+
+    Reihenfolge ist keine Vorliebe, sondern Definition: eine Listung mit
+    Ladenpreis IST eine Listung ohne Vertrag, auch wenn derselbe Haendler
+    daneben ein Buendel fuehrt.
+    """
+    ohne = eintrag.get("preis_ohne_vertrag")
+    if ohne is not None:
+        return float(ohne), OHNE_VERTRAG
+    zuzahlung = eintrag.get("zuzahlung")
+    # Eine Zuzahlung OHNE Tarifreferenz ist nach der Disziplin dieses
+    # Projekts kein Preis. `Listung.__post_init__` faengt das schon ab -
+    # hier steht es noch einmal, weil diese Funktion auch rohe dicts aus
+    # der Zustandsdatei sieht.
+    if zuzahlung is not None and (eintrag.get("tarif_referenz") or "").strip():
+        return float(zuzahlung), MIT_VERTRAG
+    return None, ""
+
+
+def _belegt(eintrag: dict) -> bool:
+    """Traegt diese Listung Quelle UND Abrufdatum?"""
+    return bool((eintrag.get("quelle_url") or "").strip()
+                and (eintrag.get("abgerufen_am") or "").strip())
+
+
+def _angebot(eintrag: dict, laeden: Optional[dict] = None) -> dict:
+    preis, _ = _preis(eintrag)
+    return {
+        "anbieter": eintrag.get("anbieter") or "",
+        "laden": _laden(eintrag, laeden),
+        "typ": eintrag.get("anbieter_typ") or "",
+        "preis": preis,
+        "url": eintrag.get("quelle_url") or "",
+        "abgerufen_am": eintrag.get("abgerufen_am") or "",
+        "farbe": eintrag.get("farbe_normalisiert") or eintrag.get("farbe_roh") or "",
+        "tarif": (eintrag.get("tarif_referenz") or "").strip(),
+    }
+
+
+def _guenstigstes_je_laden(eintraege: list, laeden: Optional[dict]) -> list:
+    """Je Laden das guenstigste belegte Angebot.
+
+    Ein Haendler fuehrt dasselbe Geraet in fuenf Farben; fuer die Frage
+    "wer ist guenstiger" zaehlt sein bester Preis, nicht fuenfmal derselbe
+    Laden.
+    """
+    beste: dict[str, dict] = {}
+    for e in eintraege:
+        preis, _ = _preis(e)
+        if preis is None or not _belegt(e):
+            continue
+        schluessel = _laden(e, laeden)
+        vorher = beste.get(schluessel)
+        if vorher is None or preis < vorher["preis"]:
+            beste[schluessel] = _angebot(e, laeden)
+    return sorted(beste.values(), key=lambda a: a["preis"])
+
+
+def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
+              preisart: str = OHNE_VERTRAG) -> dict:
+    """Je (Modell, Speicher, Zustand) eine Zeile - fuer alles, was Vodafone hat.
+
+    Gibt zusaetzlich `ohne_vodafone`: was Wettbewerber fuehren und Vodafone
+    nicht. Diese Liste ist absichtlich kurz gehalten und nach der Zahl der
+    Wettbewerber sortiert - eine Luecke, die drei Haendler fuellen, ist eine
+    andere Aussage als eine, die einer fuellt.
+    """
+    gruppen: dict[tuple, list] = {}
+    for e in eintraege:
+        if e.get("status") not in _SICHTBAR:
+            continue
+        preis, art = _preis(e)
+        if preis is None or art != preisart:
+            continue
+        schluessel = (e.get("device_id"), e.get("speicher_gb"),
+                      e.get("zustand") or "neu")
+        gruppen.setdefault(schluessel, []).append(e)
+
+    zeilen = []
+    ohne_vodafone = []
+    for (gid, speicher, zustand), gruppe in gruppen.items():
+        geraet = katalog.nach_id(gid) if katalog else None
+        modell = geraet.modell if geraet else gid
+        hersteller = geraet.hersteller if geraet else ""
+
+        eigene = [e for e in gruppe if _ist_eigen(e.get("anbieter", ""))]
+        fremde = [e for e in gruppe if not _ist_eigen(e.get("anbieter", ""))]
+        wettbewerb = _guenstigstes_je_laden(fremde, laeden)
+
+        kopf = {
+            "device_id": gid, "modell": modell, "hersteller": hersteller,
+            "speicher": speicher, "zustand": zustand,
+            "segment": geraet.segment if geraet else "",
+        }
+
+        vodafone = _guenstigstes_je_laden(eigene, laeden)
+        if not vodafone:
+            # Vodafone hat hier nichts - das ist selbst ein Befund, aber kein
+            # Preisvergleich. Er steht in einer eigenen, kurzen Liste.
+            if wettbewerb:
+                ohne_vodafone.append({**kopf, "anbieter": wettbewerb,
+                                      "anzahl": len(wettbewerb),
+                                      "ab_preis": wettbewerb[0]["preis"]})
+            continue
+
+        eigen = vodafone[0]
+        # STRIKT guenstiger: Preisgleichheit ist kein Preisvorteil.
+        guenstiger = [a for a in wettbewerb if a["preis"] < eigen["preis"]]
+        teurer = [a for a in wettbewerb if a["preis"] >= eigen["preis"]]
+
+        zeile = {
+            **kopf,
+            "vodafone": eigen,
+            "guenstiger": guenstiger,
+            "teurer": teurer,
+            "anzahl_guenstiger": len(guenstiger),
+            "anzahl_verglichen": len(wettbewerb),
+            "bester": guenstiger[0] if guenstiger else None,
+            "differenz": None,
+            "prozent": None,
+        }
+        if guenstiger:
+            bester = guenstiger[0]
+            zeile["differenz"] = round(eigen["preis"] - bester["preis"], 2)
+            zeile["prozent"] = round(
+                (eigen["preis"] - bester["preis"]) / eigen["preis"] * 100.0, 1)
+        zeilen.append(zeile)
+
+    # Groesster Abstand zuerst; Zeilen ohne guenstigeren Wettbewerber danach,
+    # nach Modell sortiert. Sie verschwinden NICHT - "nirgends guenstiger"
+    # ist die Auskunft, wegen der man eine Vergleichsliste liest.
+    zeilen.sort(key=lambda z: (-(z["differenz"] or 0), z["modell"],
+                               z["speicher"] or 0))
+    ohne_vodafone.sort(key=lambda z: (-z["anzahl"], z["modell"]))
+
+    mit_vorteil = [z for z in zeilen if z["anzahl_guenstiger"]]
+    return {
+        "preisart": preisart,
+        "zeilen": zeilen,
+        "mit_vorteil": len(mit_vorteil),
+        "ohne_vorteil": len(zeilen) - len(mit_vorteil),
+        "ohne_vodafone": ohne_vodafone[:15],
+        "ohne_vodafone_gesamt": len(ohne_vodafone),
+        "groesste_differenz": mit_vorteil[0]["differenz"] if mit_vorteil else None,
+        # Die Seite blendet die Sektion aus, solange es nichts zu vergleichen
+        # gibt. Ein leerer Kasten mit Ueberschrift sagt "kaputt", nicht
+        # "noch keine Daten".
+        "hat_daten": bool(zeilen or ohne_vodafone),
+        "hat_vodafone": bool(zeilen),
+    }
+
+
+def beide_preisarten(eintraege: list, katalog,
+                     laeden: Optional[dict] = None) -> dict:
+    """Beide Achsen getrennt gerechnet - nie in einer Tabelle gemischt."""
+    ohne = vergleich(eintraege, katalog, laeden, OHNE_VERTRAG)
+    mit = vergleich(eintraege, katalog, laeden, MIT_VERTRAG)
+    return {
+        "ohne_vertrag": ohne,
+        "mit_vertrag": mit,
+        "hat_daten": ohne["hat_daten"] or mit["hat_daten"],
+        # Welche Achse die Seite zuerst zeigt: die mit Daten. Ohne diese
+        # Zeile stuende bei einem reinen Buendel-Bestand die leere Achse
+        # oben und die volle im zugeklappten Umschalter.
+        "standard": OHNE_VERTRAG if ohne["hat_daten"] else MIT_VERTRAG,
+    }

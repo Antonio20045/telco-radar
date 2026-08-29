@@ -39,7 +39,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from . import geraete_karte
+from . import geraete_karte, geraete_vergleich
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -584,6 +584,19 @@ def leer(fehler: str = "") -> dict:
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": []},
+        "vergleich": {"hat_daten": False, "standard": "ohne_vertrag",
+                      "ohne_vertrag": {"zeilen": [], "ohne_vodafone": [],
+                                       "hat_daten": False, "hat_vodafone": False,
+                                       "mit_vorteil": 0, "ohne_vorteil": 0,
+                                       "ohne_vodafone_gesamt": 0,
+                                       "groesste_differenz": None,
+                                       "preisart": "ohne_vertrag"},
+                      "mit_vertrag": {"zeilen": [], "ohne_vodafone": [],
+                                      "hat_daten": False, "hat_vodafone": False,
+                                      "mit_vorteil": 0, "ohne_vorteil": 0,
+                                      "ohne_vodafone_gesamt": 0,
+                                      "groesste_differenz": None,
+                                      "preisart": "mit_vertrag"}},
         "matrix": {"anbieter": [], "zeilen": []},
         "lifecycle": {"duenn": True, "punkte": 0, "wochen": 0, "hinweis": "",
                       "dauern": [], "verfaelle": [], "trends": [],
@@ -783,6 +796,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
                                   if p["speicher"]}),
         "auffaellig": auffaellig,
+        # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die
+        # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
+        # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
+        "vergleich": geraete_vergleich.beide_preisarten(sichtbar, katalog,
+                                                        laeden=laden),
         "matrix": _matrix(sichtbar, katalog),
         "lifecycle": lifecycle,
         "quellenlage": _quellenlage(quellen, db, sichtbar),
