@@ -464,8 +464,21 @@ anbieter:
     methode: json_endpunkt
     aktiv: false
     grund: >-
-      Preis liegt in window.INITIAL_STATE unter hardwareEntity[].tariffMap[]
-      als singlePaymentFee je Tarif - also ausschließlich als Bündelzahl, und
+      NACHGEMESSEN AM 29.08.2026 an /handy-mit-vertrag/apple: die Struktur
+      ist da und wäre baubar - was fehlt, ist die Tarifreferenz. In
+      window.INITIAL_STATE stehen unter entities.hardwareEntity 6 Geräte mit
+      Hersteller, Name, Speicher und Farbe, jedes mit einer tariffMap aus
+      fünf Stufen; jede Stufe trägt singlePaymentFee (die Zuzahlung, in
+      Cent) und paymentFee (den Monatspreis). Der TARIFNAME steht dort
+      nicht: entities.tariffEntity und entities.tariffVO sind auf dieser
+      Seite LEER, es bleibt die Kennung ("N43"). Eine Zuzahlung, deren
+      Tarif nur als "N43" dasteht, ist für einen Leser nicht nachprüfbar -
+      und genau das verbietet die Bündelpreis-Regel seit dem 11.08.2026.
+      Wer otelo anbindet, löst zuerst die Kennungen gegen
+      /handytarife/smartphone-tarife auf; das ist ein zweiter Abruf und eine
+      Zuordnung, die veralten kann. Der ursprüngliche Befund bleibt richtig:
+      der Preis liegt unter hardwareEntity[].tariffMap[] als
+      singlePaymentFee je Tarif - also ausschließlich als Bündelzahl, und
       zwar eine je Tarif. Braucht einen eigenen Adapter und die Tarifreferenz.
     basis_url: https://www.otelo.de
     einstiege:
