@@ -134,6 +134,8 @@ def _gemessen(tmp_path_factory):
                     "text": " ".join(szl.inner_text().split())[:80],
                     "kurzpfad": (seite.locator(".kurzpfad").first.bounding_box()
                                  if seite.locator(".kurzpfad").count() else None),
+                    "fokusband": (seite.locator(".fokusband").first.bounding_box()
+                                  if seite.locator(".fokusband").count() else None),
                 }
                 seite.close()
         finally:
@@ -181,3 +183,50 @@ def test_der_kurzpfad_steht_nicht_ueber_der_schlagzeile(_gemessen, format_name):
         f"{format_name}: der Kurzpfad endet bei {unterkante:.0f} px, bevor "
         f"die Schlagzeile bei {messung['kasten']['y']:.0f} px beginnt - er "
         f"steht ueber ihr statt neben ihr")
+
+
+@pytest.mark.parametrize("format_name", [f[0] for f in FORMATE])
+def test_das_fokusband_steht_ohne_scrollen_da(_gemessen, format_name):
+    """Die Themenseite ist nur ueber dieses Band auffindbar - also muss es
+    im ersten Bildschirm stehen.
+
+    Am 29.08.2026 gemessen, an der live ausgelieferten Ausgabe vom 28.08.:
+    das Band stand am ENDE der linken Spalte, hinter Aufmacher, zweiter und
+    dritter Reihe - auf dem Schreibtisch bei y=1316 px (Falz 900), auf dem
+    Telefon bei y=3031 px (Falz 844). Antonio: "es ist keine highlightseite
+    zu sehen live im browser wenn ich die domain aufrufe." Er hatte recht,
+    und es war im HTML nicht zu sehen: der Link war da, nur nie im Bild.
+
+    Die rechte Spalte waere der billigere Platz gewesen (sie beginnt auf
+    dem Schreibtisch bei y=132 px und kostet die Hauptspalte nichts) - aber
+    auf dem Telefon faellt sie unter das ganze Raster, und dort waere das
+    Band wieder drei Bildschirme tief. Deshalb steht es ueber dem
+    Aufmacher, als EINE Zeile: der Zwei-Minuten-Kasten hat an derselben
+    Stelle die Titelseite gekostet (09.08.2026), aber das war ein Block aus
+    fuenf Absaetzen, kein Strich. Was es wirklich kostet, misst
+    `pruefe_portal.py` Kriterium 1."""
+    messung = _gemessen[format_name]
+    kasten = messung["fokusband"]
+    if kasten is None:
+        pytest.skip("diese Ausgabe hat kein laufendes Thema")
+    unterkante = kasten["y"] + kasten["height"]
+    assert unterkante <= messung["hoehe"], (
+        f"{format_name}: das Fokusband endet bei {unterkante:.0f} px und "
+        f"damit unterhalb der Falz ({messung['hoehe']} px) - die "
+        f"Themenseite ist beim Aufruf der Domain unsichtbar")
+
+
+@pytest.mark.parametrize("format_name", [f[0] for f in FORMATE])
+def test_das_fokusband_verdraengt_die_schlagzeile_nicht(_gemessen, format_name):
+    """Die Gegenprobe zum Test darueber - sonst waere er mit einem Band
+    erfuellbar, das die Ausgabe aus dem Bild schiebt. Genau der Tausch war
+    der Fehler vom 09.08.2026."""
+    messung = _gemessen[format_name]
+    if messung["fokusband"] is None:
+        pytest.skip("diese Ausgabe hat kein laufendes Thema")
+    kasten = messung["kasten"]
+    assert kasten is not None, "die Titelseite hat keinen Aufmacher"
+    unterkante = kasten["y"] + kasten["height"]
+    assert unterkante <= messung["hoehe"], (
+        f"{format_name}: mit dem Fokusband endet die Schlagzeile erst bei "
+        f"{unterkante:.0f} px, Falz {messung['hoehe']} px")
