@@ -204,6 +204,73 @@ Actions-Lauf.
 Consumer-Fachpresse (B7 nennt die Richtung; braucht Netz-Massenläufe über
 `scripts/pruefe_quellenvorschlag.py`).
 
+## 6a. Der erste gemessene Lauf (28.08.2026, Lauf #104)
+
+Der Branch `claude/highlight-pages-system-43s1d3` lag vollstaendig committet vor
+(Pfad 1). Validiert und gemergt: **1876 Tests / 2 skipped / 0 failed**,
+`pruefe_portal.py` **16 bestanden / 0 durchgefallen** — dabei faellt nebenbei
+Kriterium 6 (die 14 px Hochskalierung auf `meldungen.html`, seit dem 15.08.
+offen) erstmals auf **0 px**. Merge nach `main` als `727b70c` (Merge, kein
+Rebase), "Deploy Site" erfolgreich.
+
+Der Freitags-Cron (11:00 UTC) ist am 28.08. **nicht gefeuert** — GitHub hat den
+Lauf nicht angelegt; die Messung laeuft deshalb auf einem
+`workflow_dispatch`-Lauf **#104** (`33179084841`, 83,5 min, success).
+
+### Der Messplan §4, Punkt fuer Punkt
+
+| # | Frage | Befund |
+|---|---|---|
+| 1 | `run.kosten` | **0,2448 $** gesamt. Groesster Posten v4-pro 0,1397 $ (16 Aufrufe, 87k ein / 117k aus), flash 0,1051 $ (62 Aufrufe). `budget_ueberschritten: false`, `ohne_preis: []` — die Preistabelle deckt jedes benutzte Modell ab. Der Zaehler funktioniert. |
+| 2 | `editor_used` / Anker | **`editor_used: true`** — zum ersten Mal seit dem 15.08. ein Lauf MIT Redaktion, `briefing_md` 10 924 Zeichen. Der Prosabericht steht wieder, die "Auflistung" ist weg. **Der Anker kam nicht zum Zug**: im Kostenblock steht kein einziges `claude-*`-Modell, DeepSeek hat den ganzen Lauf getragen. |
+| 3 | `Highlight-Themen` | **Die Apple-Gruppe ist Thema geworden.** `data/state/highlight_topics.json`: ein aktives Thema, `apples-iphone-event-am-9-september`, mit `event_datum` 9. September und sieben Suchwoertern; `site/thema/apples-iphone-event-am-9-september.html` ist gebaut. Keine Quartalszahlen-Gruppe daneben — E4 wirkt in beide Richtungen. |
+| 4 | `Uebersetzung` | **23 Uebersetzungen**, 23 Seiten unter `site/uebersetzung/`. Sprachen: es 10, **en 9**, pt 2, fr 1, tr 1 — E5 (Englisch wird uebersetzt) ist im Feld bestaetigt. |
+| 5 | `stats.promo_*` | **Die Extraktion laeuft wieder**: 59 Seiten gelesen, 6 Angebote neu, 15 bestaetigt, 1 Extraktionsfehler. `promo_db.json` traegt **46 Eintraege mit `last_verified: 2026-08-28`** — der Stand war seit dem 14.08. eingefroren. |
+| 6 | Titelseite | **Der Aufmacher fuehrt mit der hoechsten Prioritaet** (P5/CTM 1, "Vodafone Spanien bei 1-Gbps-Glasfaser deutlich hinter Movistar"), obwohl eine P4-Meldung mit CTM 1 daneben steht — E6 greift. Buendelung: **67 Ereignisse aus 77 Meldungen, 7 Nachklapp**. |
+
+Dazu die Vorsortierung (E1a): 67 angeboten, 6 per CTM-Bypass direkt
+durchgelassen, 61 geprueft, **9 verworfen**, 0 Fehler-Batches, 0
+Fristueberschreitungen, 55,2 s. Die Stichprobe der Verworfenen liest sich
+sauber ("Termin ohne Marktfolge", "Marken-PR ohne Marktfolge",
+"Konferenztermin ohne Marktfolge", "Trendartikel ohne Marktbezug") — keiner
+der gelesenen Faelle gehoert in den Bericht.
+
+`pruefe_portal.py` gegen die **frisch veroeffentlichte** Ausgabe: erneut
+**16 bestanden / 0 durchgefallen**.
+
+### Was diese Messung NICHT beweist
+
+1. **Die 0,2448 $ sind keine Antwort auf die Kostenfrage.** Der Lauf hatte
+   **77 neue Meldungen** und 21 bewertete — der 27.08.-Lauf hatte 890 bzw.
+   362, weil er den Seen-Store gefuellt hat. Ein Lauf mit voller Menge
+   kostet ein Vielfaches; ob er die 1,3–1,6 $ haelt, ist weiterhin
+   **ungemessen**. Die naechste belastbare Zahl liefert der erste Lauf nach
+   einer normalen Woche Abstand (Mi 02.09.). Was diese Messung zeigt: der
+   Zaehler misst, die Preistabelle ist vollstaendig, und die Warnschwelle
+   greift nicht in den Lauf ein.
+2. **Der Anthropic-Anker ist im Feld unerprobt.** Antonios Annahme aus §6.1
+   ("das Konto bleibt leer, der Anker traegt den ganzen Lauf") ist von der
+   Wirklichkeit ueberholt: **auf dem DeepSeek-Konto lag wieder Guthaben**,
+   kein einziger 402 im Lauf. Der Anker ist damit weiter nur durch Tests
+   gedeckt — und die offene Frage aus §6.1, wohin die Aufladungen seit dem
+   15.08. gingen, ist damit nicht beantwortet, sondern nur vertagt.
+3. **Die Ausgabe ist klein.** 21 bewertete Meldungen sind kein Beleg fuer
+   die Relevanz-Kalibrierung aus E8; dafuer braucht es eine volle Ausgabe.
+
+### Offen fuer die naechste Session
+
+1. **Den Lauf vom Mi 02.09. messen** — er hat wieder normale Menge. Dann
+   `run.kosten` gegen die 1,3–1,6 $ halten und, wenn er darueber liegt,
+   Antonio die Zahl zeigen, bevor weitere Laeufe laufen (§6.2).
+2. **Vorsortierungs-Stichprobe von Hand gegenlesen** (Premortem 1): dieser
+   Lauf lieferte nur 9 Verworfene, die Stichprobe in `run.vorsortierung`
+   ist vollstaendig und unauffaellig. Die 20 Faelle des Messauftrags
+   braucht es aus einem vollen Lauf.
+3. **CLAUDE.md §6 nennt das Job-Timeout mit 50 Minuten — es steht seit dem
+   14.08. auf 180** (`radar.yml: timeout-minutes: 180`,
+   `job_frist_sekunden: 10800`). Beim Warten auf Lauf #104 aufgefallen,
+   hier nur notiert.
+
 ## 7. Prompt für die nächste Session
 
 > Lies zuerst `claude/strategie-2026-08-27.md` VOLLSTÄNDIG — sie ist die

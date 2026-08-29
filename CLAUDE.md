@@ -965,7 +965,10 @@ Website spricht.
   (`geraete_enabled: false`) — sie hat mit `geraete.yml` einen eigenen
   täglichen Job, der zusätzlich im Besuchsfenster von medimax.de und ep.de
   liegt. **Wer `timeout-minutes` in `radar.yml` ändert, ändert
-  `job_frist_sekunden` mit** (ein Test hält beides gegeneinander).
+  `job_frist_sekunden` mit** (ein Test hält beides gegeneinander). **Die
+  Zahl steht seit dem 14.08.2026 auf 180 Minuten** (`job_frist_sekunden:
+  10800`) — die „50 Minuten" in den Absätzen darüber und darunter sind der
+  Stand von damals und beschreiben den Vorfall, nicht die heutige Grenze.
 - **`render_site()` ohne `cfg` rendert eine stillschweigend halbe Seite.**
   Die Signatur ist `render_site(site_dir, reports_dir, cfg=None)`, und ohne
   den dritten Parameter verliert `transparenz.html` seinen kompletten
@@ -1569,7 +1572,43 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (27.08.2026, Antonio direkt): die Sanierung — Diagnose,
+> **Zuletzt erledigt (28.08.2026): der Branch der Sanierung ist gemergt und
+> zum ersten Mal gemessen.** Der Branch `claude/highlight-pages-system-43s1d3`
+> lag vollständig committet vor (Pfad 1 des §7-Prompts): **1876 Tests / 2
+> skipped / 0 failed**, `pruefe_portal.py` **16 bestanden / 0 durchgefallen**
+> — dabei fällt Kriterium 6 (die 14 px Hochskalierung auf `meldungen.html`,
+> seit dem 15.08. offen) erstmals auf **0 px**. Merge nach `main` als
+> `727b70c`, Deploy erfolgreich. Alle Messungen und ihre Grenzen stehen in
+> **`claude/strategie-2026-08-27.md` §6a** — dort weiterlesen, nicht hier.
+>
+> Der Freitags-Cron ist am 28.08. nicht gefeuert; gemessen wurde deshalb an
+> Lauf **#104** (`workflow_dispatch`, 83,5 min, success). Kurz:
+> **`editor_used: true`** — der erste Lauf mit Redaktion seit dem 15.08., der
+> Prosabericht steht wieder (10 924 Zeichen); **die Apple-Themenseite ist
+> gebaut** (`thema/apples-iphone-event-am-9-september.html`, mit Event-Datum
+> 9. September); **23 Übersetzungen, davon 9 englische**; die
+> **Promo-Extraktion läuft wieder** (59 Seiten, 46 Einträge mit
+> `last_verified: 2026-08-28` nach zwei Wochen Stillstand); der **Aufmacher
+> führt mit der höchsten Priorität**; die Vorsortierung verwarf 9 von 61
+> ohne einen Fehler-Batch. Kosten laut dem neuen Zähler: **0,2448 $**.
+>
+> **Diese 0,2448 $ beantworten die Kostenfrage NICHT.** Der Lauf hatte 77
+> neue Meldungen und 21 bewertete, weil der 27.08.-Lauf den Seen-Store
+> gefüllt hatte (dort: 890 bzw. 362). Ein Lauf mit voller Menge kostet ein
+> Vielfaches; ob er die 1,3–1,6 $ hält, ist weiterhin ungemessen. Ebenso
+> unerprobt ist der **Anthropic-Anker**: auf dem DeepSeek-Konto lag wieder
+> Guthaben, kein einziger 402 — die Annahme aus §6.1 („der Anker trägt den
+> ganzen Lauf") hat sich nicht bewahrheitet, und wohin die Aufladungen seit
+> dem 15.08. gingen, ist damit vertagt, nicht geklärt.
+>
+> **OFFEN:** (1) den Lauf vom **Mi 02.09.** messen — er hat wieder normale
+> Menge, und erst er beantwortet die Kostenfrage; liegt er über 1,6 $,
+> Antonio die Zahl zeigen, bevor weitere Läufe laufen; (2) die
+> Vorsortierungs-Stichprobe aus einem vollen Lauf von Hand gegenlesen
+> (dieser lieferte nur 9 Verworfene, alle unauffällig); (3) Quellenausbau
+> Consumer-Fachpresse bleibt ein eigener späterer Auftrag.
+
+> **Davor erledigt (27.08.2026, Antonio direkt): die Sanierung — Diagnose,
 > Strategie und die Pakete E1–E10.** Auftragsgrundlage und ALLE Befunde:
 > **`claude/strategie-2026-08-27.md`** (mit §6 Stand/Entscheidungen und §7
 > dem Prompt für die nächste Session — dort weiterlesen, nicht hier).
