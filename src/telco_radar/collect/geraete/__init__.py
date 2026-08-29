@@ -580,10 +580,22 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
         eigene_frist = frist_bis
         if frist_bis is not None and anbieter.name in crawlt:
             nach_mir = len(crawlt) - crawlt.index(anbieter.name) - 1
+            rest = frist_bis - time.monotonic()
+            # Die Untergrenze ist `_MINDEST_JE_ANBIETER`, nicht null - und
+            # das ist der ganze Unterschied. Mit `max(0, …)` bekaeme bei
+            # KNAPPEM Budget jeder ausser dem letzten null Sekunden: die
+            # Reserve fuer die Nachfolgenden frisst dann den eigenen Anteil
+            # vollstaendig auf. Das waere dasselbe Verhungern, das diese
+            # Rechnung verhindern soll, nur am anderen Ende der Liste.
+            # Rechenbeispiel: 240 s Budget, 6 crawlende Anbieter -> der
+            # erste haette 240 - 5*120 = -360, also 0.
+            #
+            # `frist_bis` bleibt die harte Grenze: die Summe der Anteile
+            # darf sie ueberschreiten, der einzelne Abruf nicht.
             eigene_frist = min(frist_bis,
                                time.monotonic()
-                               + max(0.0, (frist_bis - time.monotonic())
-                                     - nach_mir * _MINDEST_JE_ANBIETER))
+                               + max(_MINDEST_JE_ANBIETER,
+                                     rest - nach_mir * _MINDEST_JE_ANBIETER))
         bilanzen.append(sammle_anbieter(
             anbieter, katalog, farben, hole, heute, waechter, jetzt,
             eigene_frist))

@@ -135,16 +135,23 @@ anbieter:
     methode: json_endpunkt
     aktiv: false
     grund: >-
-      Erreichbar, aber ohne verwertbares ld+json: nachgemessen am 11.08.2026
-      trägt die Produktseite genau einen ld+json-Block, und der hat gar kein
-      @type — die Extraktionskaskade des Projekts liefert dafür null
-      Produktsätze. Der Preis liegt im Nuxt-3-Payload
-      <script id="__NUXT_DATA__">, einem flachen Referenz-Array, das ein
-      eigener Auflöser braucht. Die Sitemap liefert sauber: 1837
-      Smartphone-Adressen. ACHTUNG beim Anbinden — max_produkte steht
-      standardmäßig auf 60; ein erreichter Deckel macht die Einstiegsseite
-      ungelesen, dann altert nichts und der Anbieter steht trotz Funden als
-      "fehler" im Protokoll.
+      GESPERRT, nicht "wartet auf einen Adapter" — nachgemessen am
+      29.08.2026 am Nuxt-3-Payload selbst. Der Befund vom 11.08.2026 (kein
+      verwertbares ld+json, Preis im <script id="__NUXT_DATA__">) stimmt,
+      war aber unvollständig: der Payload einer Produktseite trägt den
+      Preis DIESES Artikels gar nicht. Der Schlüssel
+      "pricePds/webcode=<nummer>;storeId=<markt>" löst im flachen
+      Referenz-Array auf -1 auf, also auf undefined; der Preis wird erst im
+      Browser nachgeladen. Der zugehörige Endpunkt liegt unter /api/, und
+      genau das sperrt expert in seiner robots.txt ("Disallow: /api/").
+      Im Payload stehen ausschließlich SCHWESTERartikel mit eigenem
+      Webcode, Speicher und Preis (28 Objekte auf der geprüften Seite).
+      Ihre Preise ihrem jeweiligen Artikel zuzuordnen ist nicht belegbar —
+      der Webcode der aufgerufenen Seite steht nicht darunter. Eine Zahl,
+      deren Zugehörigkeit man raten muss, gehört nicht in diese Datenbank.
+      Die Sitemap bleibt sauber (16 293 Adressen, davon die
+      Smartphone-Strecke); sobald expert einen Preis serverseitig
+      ausliefert oder /api/ freigibt, ist das ein Adapter und kein Umbau.
     basis_url: https://www.expert.de
     einstiege:
       - url: https://www.expert.de/sitemap/urls/produkte/telekom-navigation.xml

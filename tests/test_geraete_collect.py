@@ -582,3 +582,48 @@ def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch)
     assert gross.produkte_abgerufen > 0, "das Teilergebnis bleibt"
     assert klein.vollstaendig is True, \
         "der Kleine bekommt seine Reserve und liest zu Ende"
+
+
+def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatch):
+    """Der Fehler in der ERSTEN Fassung dieser Aufteilung, beim Selbstreview
+    gefunden: mit `max(0, rest - nach_mir * MINDEST)` frisst die Reserve fuer
+    die Nachfolgenden bei knappem Budget den eigenen Anteil vollstaendig auf.
+
+    Rechenbeispiel: 240 s Budget, 6 crawlende Anbieter -> der erste haette
+    240 - 5*120 = -360, also null Sekunden. Und der zweite auch, und der
+    dritte - nur der letzte bekaeme etwas. Das ist dasselbe Verhungern, das
+    die Aufteilung verhindern soll, nur am anderen Ende der Liste."""
+    import telco_radar.collect.geraete as g
+
+    uhr = {"t": 0.0}
+    monkeypatch.setattr(g.time, "monotonic", lambda: uhr["t"])
+    monkeypatch.setattr(g.time, "sleep",
+                        lambda s: uhr.__setitem__("t", uhr["t"] + s))
+
+    produkt = ('<script type="application/ld+json">{"@type":"Product",'
+               '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
+               '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
+    seiten, anbieter = {}, []
+    for i in range(4):
+        host = f"https://www.a{i}.de"
+        seiten[f"{host}/kat"] = f'<a href="/p/1">P</a>'
+        seiten[f"{host}/p/1"] = produkt
+        anbieter.append(_anbieter(
+            name=f"A{i}", rang=i, basis_url=host,
+            einstiege=[Einstieg(url=f"{host}/kat", kind="static",
+                                pfadmuster="/p/")]))
+
+    def hole(url):
+        uhr["t"] += 20.0
+        if url.endswith("/robots.txt"):
+            return _ROBOTS_FREI
+        return (200, seiten[url]) if url in seiten else (404, "")
+
+    # 240 s fuer vier Anbieter: nicht genug fuer alle, aber die ersten
+    # muessen etwas bekommen - nicht null.
+    ergebnis = sammle(QuellenConfig(anbieter=anbieter), _KATALOG, _FARBEN,
+                      hole, "2026-08-29", _jetzt(), frist_sekunden=240.0)
+    mit_funden = [b for b in ergebnis["anbieter"] if b.listungen]
+    assert mit_funden, "bei knappem Budget liefert KEIN Anbieter etwas"
+    assert mit_funden[0].name == "A0", \
+        "der erste Anbieter kommt zuerst dran, nicht der letzte"

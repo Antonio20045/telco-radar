@@ -164,9 +164,25 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
 
         vodafone = _guenstigstes_je_laden(eigene, laeden)
         if not vodafone:
-            # Vodafone hat hier nichts - das ist selbst ein Befund, aber kein
-            # Preisvergleich. Er steht in einer eigenen, kurzen Liste.
-            if wettbewerb:
+            # ZWEI verschiedene Faelle, und sie duerfen nicht denselben Satz
+            # bekommen:
+            #
+            #   `eigene` leer          Vodafone fuehrt das Geraet nicht. Das
+            #                          ist selbst ein Befund und gehoert in
+            #                          die Luecken-Liste.
+            #   `eigene` da, unbelegt  Vodafone fuehrt es sehr wohl, nur ohne
+            #                          Quelle oder Abrufdatum. "Bei Vodafone
+            #                          nicht gelistet" waere dann eine
+            #                          FALSCHE Aussage ueber das eigene
+            #                          Portfolio - die Zeile entfaellt
+            #                          stillschweigend, der Vergleich auch.
+            #
+            # Der zweite Fall kann aus der Pipeline nicht entstehen
+            # (`Listung.__post_init__` erzwingt Quelle und Abrufdatum zu
+            # jedem Preis). Er steht hier trotzdem, weil diese Funktion auch
+            # rohe dicts aus der Zustandsdatei sieht - und weil ein falscher
+            # Satz ueber das eigene Regal teurer ist als eine fehlende Zeile.
+            if wettbewerb and not eigene:
                 ohne_vodafone.append({**kopf, "anbieter": wettbewerb,
                                       "anzahl": len(wettbewerb),
                                       "ab_preis": wettbewerb[0]["preis"]})

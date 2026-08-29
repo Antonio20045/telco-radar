@@ -104,9 +104,11 @@ def test_ohne_vodafone_quelle_entsteht_gar_keine_vergleichszeile():
     v = vergleich([_e("Vodafone", preis=1349.9, quelle_url=""),
                    _e("o2", preis=1279.0)], _KATALOG)
     assert v["zeilen"] == [], "ohne Beleg keine Zeile"
-    # Und die Meldung faellt nicht unter den Tisch: ohne belegte
-    # Vodafone-Listung gilt das Geraet als "bei Vodafone nicht gelistet".
-    assert [x["modell"] for x in v["ohne_vodafone"]] == ["iPhone 17 Pro Max"]
+    # Und die Meldung wird NICHT zu "bei Vodafone nicht gelistet"
+    # umgedeutet: Vodafone fuehrt das Geraet sehr wohl, nur ohne Beleg. Ein
+    # falscher Satz ueber das eigene Regal ist teurer als eine fehlende
+    # Zeile. (Beim Selbstreview am 29.08.2026 gefunden.)
+    assert v["ohne_vodafone"] == []
 
 
 def test_ohne_vodafone_abrufdatum_entsteht_gar_keine_vergleichszeile():
@@ -214,6 +216,15 @@ def test_mehrere_farben_eines_anbieters_sind_ein_angebot():
                   _KATALOG)
     z = v["zeilen"][0]
     assert z["anzahl_guenstiger"] == 1 and z["bester"]["preis"] == 1279.0
+
+
+def test_ein_geraet_ganz_ohne_vodafone_listung_steht_sehr_wohl_in_der_luecke():
+    """Die Gegenprobe zum Test darueber: fehlt die Vodafone-Listung WIRKLICH,
+    ist das der Befund, den die Luecken-Liste zeigen soll."""
+    v = vergleich([_e("o2", preis=1279.0),
+                   _e("Medimax", preis=1199.0, typ="handel")], _KATALOG)
+    assert [x["modell"] for x in v["ohne_vodafone"]] == ["iPhone 17 Pro Max"]
+    assert v["ohne_vodafone"][0]["anzahl"] == 2
 
 
 def test_was_der_wettbewerb_fuehrt_und_vodafone_nicht():

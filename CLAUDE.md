@@ -308,6 +308,7 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
 | `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `uebersetzung/<id>.html` (nicht verlinkt) | „Was steht da eigentlich?" | Die **vollständige** deutsche Fassung eines fremdsprachigen Artikels. Kein Nav-Eintrag: erreichbar über den roten Link der Meldungskarte. Oben und ohne Scrollen: „Maschinelle Übersetzung", die Ausgangssprache und der Link zum Original — die Übersetzung tritt NEBEN das Original, nicht an seine Stelle. Dateiname ist die `Item.id` (SHA-256 über die normalisierte URL), damit ein Archivbericht in einem Jahr noch trifft |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala; seit 11.08.2026 der **Newsletter-Abschnitt** (nur Zahlen, Warnung ab 80 % des Tageskontingents) |
@@ -1522,6 +1523,57 @@ Website spricht.
   eine zweite Sammelphase. Für die textlosen Newsroom-Quellen bleibt es
   deshalb beim Titel; der Prompt sagt dem Analysten ausdrücklich, dass
   `text` leer sein kann und er dann konservativ bewerten soll.
+- **Eine Zusicherung in einer Docstring ist keine Zusicherung.**
+  `geraete_pipeline._hole_fabrik` versprach wörtlich, 404 („keine
+  robots.txt, also keine Regeln") von 403 („nicht anfassen") zu
+  unterscheiden — „`collect.http.fetch` wirft bei beidem nicht". Das
+  Gegenteil war der Fall: `fetch` ruft `raise_for_status()`. Der
+  Robots-Wächter bekam statt eines Status eine Ausnahme, landete in seinem
+  Zweig „kein Ergebnis heißt nicht erlaubt" und führte den ganzen Anbieter
+  als nicht abrufbar. **Aufgefallen ist es 18 Tage lang nicht, weil jeder
+  bisher konfigurierte Host eine robots.txt mit HTTP 200 ausliefert** —
+  `api.vodafone.de` ist der erste ohne, und ein Host ohne robots.txt ist im
+  Web der Normalfall, nicht der Sonderfall.
+- **Eine Buchführung, die nur den Erfolgsfall zählt, macht den
+  Dauerbetrieb unsichtbar.** `protokolliere_lauf` lief nur für Anbieter mit
+  `bilanz.vollstaendig`. mobilcom-debitel bestätigt jede Nacht 68–84
+  Listungen, wird am Zeitbudget aber nie fertig — und fehlte deshalb
+  KOMPLETT in `geraete_db.json['anbieter']`. Die Lifecycle-Auswertung
+  sperrte darauf 84 von 85 Listungen aus, und die Seite meldete nach 17
+  Tagen „bisher 1 Messtermin". **Zwei verschiedene Zahlen:** `laeufe`
+  (nur vollständige — drei Abbrüche dürfen keine Marke zum
+  SIM-only-Anbieter erklären) und `termine` (jeder Tag, an dem Listungen
+  wirklich gesehen wurden, auch im Teillauf).
+- **Ein Zeitbudget ohne Aufteilung ist eine gemeinsame Weide.** freenet
+  (Rang 4, über 70 Produktseiten mal Crawl-Abstand) verbrauchte die vollen
+  1500 s des nächtlichen Laufs, und ALDI TALK stand ab dem 15.08.2026 jede
+  Nacht mit „frist, 0 Listungen" da. `collect.geraete.sammle` hält jedem
+  noch ausstehenden crawlenden Anbieter jetzt `_MINDEST_JE_ANBIETER` (120 s)
+  frei.
+- **Der Preis eines Netzbetreibers steht selten dort, wo der Preis steht.**
+  Vodafones Geräteliste trägt unter `prices.composition` ausschließlich
+  Bündelzahlen mit 1 € Anzahlung; der Preis ohne Vertrag steht eine Ebene
+  tiefer je Variante. o2s Katalog trägt `oneTimePrice` (die Anzahlung) und
+  `totalPrice` (den Gerätepreis) nebeneinander — wer den ersten nimmt,
+  schreibt 1 € in die Preisspalte. **Und 18 der 93 o2-Einträge sind Gerät
+  PLUS Zubehör** („iPhone 17 Pro Max mit Watch Ultra 3", 2323 €); als
+  Gerätepreis gespeichert wäre das ein Telefon plus einer Smartwatch.
+- **Eine relative Adresse in einer JSON-Nutzlast wird gegen die QUELLE
+  aufgelöst, nicht gegen die Website.** Vodafones Detailnutzlast nennt die
+  Produktseite als `/privat/handys/iphone-15.html`; der Collector löst sie
+  gegen die Schnittstelle auf, und so standen 150 Quelllinks auf
+  `https://api.vodafone.de/privat/handys/…` — Adressen, die es nicht gibt.
+  31 Adapter-Tests waren dabei grün. Gefunden erst beim **Lesen der
+  exportierten CSV-Tabelle**. Ein Adapter gegen eine API liefert seine
+  Quelllinks absolut.
+- **`*` ist nicht immer die strengere robots-Gruppe.** Der Modulkopf von
+  `collect/geraete/robots.py` sagt das, und bei o2 stimmt es nicht:
+  `Disallow: /e-shop/rest/` steht ausschließlich in der Gruppe
+  `User-agent: googlebot`, zusammen mit `/chat-ui/` und `/ebooking/` — das
+  Muster einer Suchmaschinen-Hygiene. Für uns (`TelcoRadar/1.0`) gilt die
+  `*`-Gruppe, die den Pfad nicht sperrt. Wer die Regel verschärfen will,
+  entscheidet damit über diesen Anbieter; der Befund steht deshalb wörtlich
+  in `geraete_quellen.yaml` und auf `/geraete-quellen.html`.
 - **GitHub Pages ist AUS** (war Free-Plan-Problem bei privat, dann auf Render
   umgestellt). Nicht wieder aktivieren.
 - **Sandbox:** aarch64; pip braucht `--break-system-packages`; Bash-Calls max
@@ -1572,7 +1624,105 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (28.08.2026): der Branch der Sanierung ist gemergt und
+> **Zuletzt erledigt (29.08.2026): Geräteradar, Ausbaustufe 2 (G0–G4).**
+> Auftragsgrundlage: „Geräteradar, Ausbaustufe 2" (28.08.2026). Alle
+> Messungen und die offenen Punkte:
+> **`outputs/geraeteradar-ausbaustufe-2-2026-08-29.md`** — dort weiterlesen.
+> Stand danach: **1988 Tests**, alle grün. Anbieter mit Daten **2 → 4**,
+> Katalog **46 → 83 Modelle**.
+>
+> **G0 war der Grund für fast alles andere.** Die Seite meldete nach 17
+> Tagen „bisher 1 Messtermin", obwohl der nächtliche Zweig 16 Läufe in Folge
+> erfolgreich lief. Drei Ursachen, alle gemessen: (1) die Messtermin-Zählung
+> hing an `geraete_preise.jsonl`, die nur ÄNDERUNGSpunkte trägt — alle 85
+> Zeilen vom 10.08.; (2) `protokolliere_lauf` lief nur für VOLLSTÄNDIGE
+> Läufe, und mobilcom-debitel wird am Zeitbudget nie fertig, fehlte also
+> komplett in der Bilanz, worauf `_oft_genug` 84 von 85 Listungen aus der
+> Lifecycle-Auswertung sperrte; (3) das Zeitbudget war eine gemeinsame
+> Weide — freenet fraß es, ALDI TALK stand seit dem 15.08. jede Nacht auf
+> „frist, 0 Listungen".
+>
+> **Ein vierter, vorbestehender Fehler kam beim Anbinden dazu:**
+> `_hole_fabrik` versprach in der eigenen Docstring, 404 von 403 zu
+> unterscheiden — `collect.http.fetch` ruft aber `raise_for_status()` und
+> wirft bei beidem. Der Robots-Wächter landete im Ausnahmezweig und führte
+> den Anbieter als nicht abrufbar. Aufgefallen ist es nie, weil **jeder
+> bisher konfigurierte Host eine robots.txt mit 200 hat**; `api.vodafone.de`
+> ist der erste ohne. Ein Host ohne robots.txt ist im Web der Normalfall.
+>
+> **Neu angebunden, beide live gemessen:** **Vodafone** (150 Listungen,
+> `api.vodafone.de/glados/v2/hardware` — Liste plus Detailnutzlast je Gerät;
+> der Preis OHNE Vertrag steht NUR in der Detailnutzlast, die Liste trägt
+> 1-Euro-Bündelzahlen) und **o2** (68, der Katalog hinter `/e-shop/` mit
+> `hwOnly=true`, eine Antwort für 93 Geräte; `totalPrice` ist der Preis,
+> `oneTimePrice` die Anzahlung, und 18 Einträge sind Gerät PLUS Zubehör und
+> werden verworfen). Beide brauchen eine **Pflichtkopfzeile** (`kopfzeilen:`
+> in `geraete_quellen.yaml`, neu).
+>
+> **o2s robots.txt ist der Fall, an dem die Hausannahme nicht gilt:**
+> `Disallow: /e-shop/rest/` steht ausschließlich in der **googlebot**-Gruppe,
+> nicht in `User-agent: *`. Der Modulkopf von `robots.py` nennt `*` „die
+> strengere und immer gültige Lesart" — hier ist die Googlebot-Gruppe die
+> strengere. Unser Absender ist `TelcoRadar/1.0`, es gilt die `*`-Gruppe.
+> Der Befund steht wörtlich in der Quellenkonfiguration und damit auf
+> `/geraete-quellen.html`.
+>
+> **Der Katalog stand eine Gerätegeneration hinter dem Markt:** von 126 live
+> geführten Modellnamen trafen 67 keinen Eintrag. 37 nachgelegt, alle aus
+> den zwei Live-Katalogen abgelesen; Trefferquote 84 %. Google und Xiaomi —
+> die zwei von den Fachkollegen benannten Lücken — sind erfasst.
+>
+> **Neu auf der Seite:** die Sektion **„Wer ist günstiger als Vodafone?"**
+> (`report/geraete_vergleich.py`, je Modell+Speicher der günstigste
+> Wettbewerber MIT NAMEN, Aufklapper mit allen darunter, Filter nach
+> Anbietertyp, beide Preisarten strikt getrennt) und der **CSV-Gesamtexport**
+> (`report/geraete_export.py` → `site/exporte/`, UTF-8 mit BOM, Semikolon,
+> Dezimalkomma — damit Excel im deutschen Gebietsschema die Datei per
+> Doppelklick öffnet).
+>
+> **Die Lifecycle-Schwelle und die Karte „Was diese Woche auffällt" waren
+> NICHT fehlend** (der Auftrag nahm das an) — sie stehen seit dem 11.08. im
+> Code und waren live unsichtbar, weil G0 sie abschaltete.
+>
+> **Drei Fehler hat NUR das Ansehen des Ergebnisses gezeigt, bei grünen
+> Tests:** alle 150 Vodafone-Quelllinks zeigten auf `api.vodafone.de/privat/…`
+> (Adressen, die es nicht gibt — gefunden beim Lesen der exportierten
+> CSV-Tabelle), die Abrufdaten standen im ISO-Format, und „nur Fachhandel"
+> leerte die Vergleichstabelle kommentarlos.
+>
+> **OFFEN daraus:**
+> 1. **Das Kriterium „mindestens 8 Anbieter" ist NICHT erreicht** — es sind
+>    vier. Die **Telekom fehlt**: sie antwortet httpx mit einer
+>    202-Challenge (TLS-/Client-Erkennung), und ihre strukturierten Daten
+>    tragen den Gerätepreis nur als Zuzahlung ohne Tarifreferenz.
+> 2. **Die nächsten Adapter sind die Bündelpreis-Anbieter**, und sie sind
+>    baubar, seit die Sammelschicht eine Zuzahlung MIT Tarifreferenz
+>    speichert: otelos `hardwareEntity[].tariffMap[].singlePaymentFee` ist
+>    der naheliegendste Einstieg, dann klarmobil (`ng-state`), congstar,
+>    smartmobil, WinSIM, Blau. Sie stehen weiter auf „gemessen, aber ohne
+>    Adapter", und das ist ehrlich — sie sind nicht gesperrt, nur nicht
+>    gebaut. **expert** ist dagegen auf „gesperrt mit Begründung"
+>    umgestellt: sein Preis steht als `undefined` im Nuxt-Payload und wird
+>    aus `/api/` nachgeladen, das seine robots.txt sperrt.
+> 3. **Medimax/ElectronicPartner: 20 abgerufene Produktseiten, 0 Listungen,
+>    seit 16 Nächten.** Es liegt NICHT an der Besuchszeit (Lauf #17 lief um
+>    03:59 UTC im Fenster). Der neue **Rohsatz-Zähler** je Anbieter
+>    beantwortet beim nächsten Nachtlauf, an welcher Stufe es liegt: die
+>    Protokollzeile nennt jetzt „N Preissaetze gelesen" neben den Listungen.
+>    Messen geht nur im Fenster 02:00–08:00 UTC.
+> 4. **Die Veröffentlichungsschwelle kippt beim nächsten Nachtlauf auf
+>    `True`** (4 Anbieter ≥ 3). Die Geräteseite trägt sich dann selbst in
+>    die Navigation ein — dann hat sie **sieben** Einträge, und
+>    `tests/test_suche_page.py` nagelt fünf fest. **Danach ansehen.**
+> 5. **Die unbekannten Farbschreibweisen sind gewachsen** und bewusst NICHT
+>    nachgetragen: eine neue Farbzuordnung ändert die `sku_id`, der
+>    Altbestand gälte als ausgelistet und entstünde neu. Das ist eine
+>    Datenwanderung, keine Konfigurationszeile.
+> 6. **G3.1 (Preisverlauf-Chart) und G3.2 (Wochenvergleich als eigener
+>    State) sind nicht gebaut** — die Historie hat je Listung genau einen
+>    Messtag, das Chart würde sich nach seiner eigenen Schwelle ausblenden.
+
+> **Davor erledigt (28.08.2026): der Branch der Sanierung ist gemergt und
 > zum ersten Mal gemessen.** Der Branch `claude/highlight-pages-system-43s1d3`
 > lag vollständig committet vor (Pfad 1 des §7-Prompts): **1876 Tests / 2
 > skipped / 0 failed**, `pruefe_portal.py` **16 bestanden / 0 durchgefallen**
