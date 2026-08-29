@@ -195,6 +195,26 @@ def _sortierschluessel(offer: dict) -> tuple:
             offer.get("last_verified") or "")
 
 
+def _andere_mechanik(a: str, b: str) -> bool:
+    """Zwei ERKANNTE, verschiedene Mechaniken - also zwei Angebote.
+
+    Der Wortvergleich allein reicht nicht. Gemessen am 29.08.2026 hielt er
+    congstars "Geraeterabatt mit Allnet Flat M" (datenbonus) und
+    "Partnerkarte: 11 EUR Rabatt auf Allnet Flat M" (preisnachlass) fuer
+    dieselbe Aktion: beide teilen "Allnet Flat M" und "Rabatt", und der
+    Zahlenwaechter greift nicht, weil nur EINE der beiden eine Zahl traegt.
+    Die Folge stand auf der Seite - der Preisnachlass verschwand, und die
+    Marktlage zaehlte neun statt zehn Marken.
+
+    Die Mechanik gehoert zur Identitaet eines Angebots: ein Geraeterabatt
+    ist keine Umformulierung eines Tarifrabatts. Verglichen werden nur
+    ERKANNTE Mechaniken - ein leeres Feld oder "sonstiges" sagt nichts und
+    darf eine Dublette nicht auseinanderhalten.
+    """
+    unklar = ("", "sonstiges")
+    return a not in unklar and b not in unklar and a != b
+
+
 def _ohne_dubletten(sichtbar: list[dict]) -> list[dict]:
     """Dasselbe Angebot steht nur einmal im Block.
 
@@ -217,8 +237,11 @@ def _ohne_dubletten(sichtbar: list[dict]) -> list[dict]:
     behalten: list[dict] = []
     for eintrag in sichtbar:
         kopf = eintrag.get("headline") or ""
+        mech = eintrag.get("mechanic") or ""
         zwilling = next((b for b in behalten
-                         if _same_offer(kopf, b.get("headline") or "")), None)
+                         if _same_offer(kopf, b.get("headline") or "")
+                         and not _andere_mechanik(mech, b.get("mechanic") or "")),
+                        None)
         if zwilling is None:
             behalten.append(eintrag)
             continue

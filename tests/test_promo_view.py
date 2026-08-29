@@ -596,3 +596,58 @@ def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():
     # ... und traegt die grosse Flaeche deshalb wieder.
     assert bloecke["klarmobil"]["lead_gross"] is True
     assert bloecke["congstar"]["lead"]["bild"] and bloecke["congstar"]["lead_gross"]
+
+
+# --------------------------------------------------------------------------
+# Die Entdopplung darf keine ZWEI Angebote zusammenwerfen (29.08.2026)
+# --------------------------------------------------------------------------
+
+def test_zwei_mechaniken_sind_zwei_angebote_auch_bei_aehnlicher_ueberschrift():
+    """Der Befund, den `test_die_zahl_der_marktlage_stimmt_mit_der_datenbank`
+    gemeldet hat: die Marktlage zaehlte neun Marken, die Datenbank zehn.
+
+    Ursache war ein Fehltreffer der Entdopplung. congstars "Geraeterabatt
+    mit Allnet Flat M" (datenbonus) und "Partnerkarte: 11 EUR Rabatt auf
+    Allnet Flat M" (preisnachlass) teilen "Allnet Flat M" und "Rabatt", und
+    der Zahlenwaechter greift nicht, weil nur EINE der beiden eine Zahl
+    traegt. Auf der Seite verschwand damit ein echtes Angebot.
+
+    Gegen den alten Stand faellt dieser Test durch."""
+    from telco_radar.analyze.promo_store import _same_offer
+    from telco_radar.report.promo import _ohne_dubletten
+
+    geraet = {"headline": "Geräterabatt mit Allnet Flat M",
+              "mechanic": "datenbonus"}
+    partner = {"headline": "Partnerkarte: 11 € Rabatt auf Allnet Flat M",
+               "mechanic": "preisnachlass"}
+    # Die Voraussetzung des Falls: der Wortvergleich haelt sie fuer gleich.
+    assert _same_offer(geraet["headline"], partner["headline"]) is True, \
+        "ohne diesen Fehltreffer prueft der Test nichts"
+
+    behalten = _ohne_dubletten([geraet, partner])
+    assert len(behalten) == 2, "zwei Mechaniken sind zwei Angebote"
+
+
+def test_die_echte_dublette_faellt_weiterhin_weg():
+    """Die Gegenprobe: gleiche Mechanik, nur andere Schreibweise - genau der
+    Fall, fuer den die Entdopplung am 08.08.2026 gebaut wurde."""
+    from telco_radar.report.promo import _ohne_dubletten
+
+    a = {"headline": "SMART Tarife mit 5G und Flatrate",
+         "mechanic": "preisnachlass"}
+    b = {"headline": "SMART-Tarife mit 5G und Flatrate",
+         "mechanic": "preisnachlass"}
+    assert len(_ohne_dubletten([a, b])) == 1
+
+
+def test_eine_unbekannte_mechanik_haelt_keine_dublette_auseinander():
+    """Ein leeres Feld sagt nichts. Wer es als Unterscheidung gelten liesse,
+    haette die Entdopplung fuer jeden Eintrag ohne erkannte Mechanik
+    abgeschaltet - und davon gibt es viele."""
+    from telco_radar.report.promo import _ohne_dubletten
+
+    a = {"headline": "SMART Tarife mit 5G und Flatrate", "mechanic": "preisnachlass"}
+    b = {"headline": "SMART-Tarife mit 5G und Flatrate", "mechanic": ""}
+    c = {"headline": "SMART Tarife mit 5G und Flatrate", "mechanic": "sonstiges"}
+    assert len(_ohne_dubletten([a, b])) == 1
+    assert len(_ohne_dubletten([a, c])) == 1
