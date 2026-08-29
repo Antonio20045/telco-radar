@@ -477,14 +477,25 @@ _UEBER_DER_SCHWELLE = ("Medimax", "ElectronicPartner", "Vodafone",
 
 
 def _db_mit(anzahl_skus: int, anbieter: tuple = ("Medimax",)) -> dict:
-    """Ein Bestand, der die Schwelle gezielt reisst oder nimmt."""
+    """Ein Bestand, der die Schwelle gezielt reisst oder nimmt.
+
+    Die Preise liegen dicht beieinander (399 bis 468 EUR). Das ist kein
+    Schoenheitsfehler: die Listungen unterscheiden sich nur in der FARBE,
+    und seit W1.2 (29.08.2026) sortiert die Plausibilitaetspruefung eine
+    Gruppe aus, deren Preisspanne bei gleichem Anbieter, Modell, Speicher
+    und Zustand ueber SPANNE_GRENZE liegt. Mit dem alten Abstand von 15 EUR
+    je Schritt spannten acht Farben eines Geraets 399 bis 744 EUR auf - 86
+    Prozent, und die Pruefung raeumte den Bestand voellig zu Recht ab. Dieser
+    Test misst die SCHWELLE, nicht die Preislogik; er braucht deshalb Daten,
+    die die Preislogik passieren.
+    """
     modelle = ("apple-iphone-17-pro-max", "samsung-galaxy-s25-ultra")
     listungen = []
     for i in range(anzahl_skus):
         name = anbieter[i % len(anbieter)]
         device = modelle[i % len(modelle)]
         listungen.append(_listung(name, device, f"{device}-256gb-farbe-{i}",
-                                  399.0 + i * 15))
+                                  399.0 + i * 3))
     return {"updated": "2026-08-11",
             "anbieter": {n: {"laeufe": 4} for n in anbieter},
             "listungen": listungen}
@@ -1552,3 +1563,155 @@ def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
         text = knoten.get_text(" ", strip=True)
         assert not re.search(r"\d{4}-\d{2}-\d{2}", text), \
             f"ISO-Datum sichtbar: {text!r}"
+
+
+# --------------------------------------------------------------------------
+# W1.1: die Preisgrafik zeigt nur Neugeraete
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("zustand", ["refurbished", "b-ware", "unbekannt"])
+def test_die_preisgrafik_zeigt_nur_neugeraete(zustand):
+    """Dieselbe Regel wie im Vergleich, aus demselben Grund: die Karte
+    ordnet Punkte nach Preis auf einer Achse. Ein Gebrauchtpreis darunter
+    liest sich wie ein guenstiger Neupreis - die Y-Achse traegt keine
+    Zustandsangabe."""
+    from telco_radar.report.geraete_karte import aggregiere
+    punkte = [
+        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
+         "preis": 899.0, "zustand": "neu", "modell": "iPhone 17",
+         "hersteller": "Apple"},
+        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
+         "preis": 499.0, "zustand": zustand, "modell": "iPhone 17",
+         "hersteller": "Apple"},
+    ]
+    erg = aggregiere(punkte)
+    assert [p["preis"] for p in erg] == [899.0], (
+        f"{zustand} darf keinen Preispunkt bilden")
+
+
+def test_die_preisgrafik_behaelt_neugeraete():
+    """Gegenprobe: ohne sie waere eine Karte, die ALLES verwirft, gruen."""
+    from telco_radar.report.geraete_karte import aggregiere
+    punkte = [
+        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
+         "preis": 899.0, "zustand": "neu", "modell": "iPhone 17",
+         "hersteller": "Apple"},
+        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "freenet",
+         "preis": 879.0, "zustand": "neu", "modell": "iPhone 17",
+         "hersteller": "Apple"},
+    ]
+    assert len(aggregiere(punkte)) == 2
+
+
+def test_die_pruefung_schaltet_die_navigation_nicht(tmp_path):
+    """Befund des Reviews vom 29.08.2026: `schwelle_erreicht` nahm die
+    Spaltenzahl der Herstelleransicht, und die hängt seit W1.2 an der
+    Plausibilitätsprüfung. Damit hätte ein Anbieter, der an einem Tag seine
+    Farbvarianten mit großem Abstand bepreist, den Navigationseintrag
+    „Geräte" auf JEDER Seite verschwinden lassen – ohne Fehler, ohne
+    Warnung. Eine Datenqualitätsheuristik darf keine Navigation schalten.
+
+    Die Fixture spannt genau diesen Fall auf: Preise von 399 bis 744 EUR für
+    dieselbe (Anbieter, Modell, Speicher, Zustand)-Gruppe. Die Prüfung räumt
+    sie ab – die Schwelle muss trotzdem stehen."""
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    for i, listung in enumerate(db["listungen"]):
+        listung["preis_ohne_vertrag"] = 399.0 + i * 15
+
+    site = _baue(tmp_path, db=db)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+
+    # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts.
+    assert geraete["pruefung"]["aussortiert"] > 0, "Prüfung greift gar nicht"
+    assert geraete["bilanz"]["schwelle_erreicht"] is True
+    ziele = {a.get("href") for a in _suppe(site, "index.html").select(".subnav a")}
+    assert "geraete.html" in ziele
+
+
+def test_die_legende_zaehlt_die_listungen_die_wirklich_gezeichnet_werden(tmp_path):
+    """"153 Preispunkte aus 348 Listungen" war falsch, sobald die Karte nur
+    noch Neugeräte zeichnet: 9 refurbished Listungen standen im Nenner und
+    nicht in der Grafik. Auf einer Seite, deren Verkaufsargument der
+    Belegzwang ist, ist das die teuerste Sorte falscher Zahl."""
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    for listung in db["listungen"][:6]:
+        listung["zustand"] = "refurbished"
+        listung["sku_id"] = listung["sku_id"] + "-refurbished"
+        listung["id"] = listung["id"] + "-refurbished"
+
+    _baue(tmp_path, db=db)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+
+    assert geraete["bilanz"]["listungen"] == 24
+    assert geraete["bilanz"]["aggregiert_aus"] == 18, (
+        "die 6 refurbished Listungen gehören nicht in den Nenner der Grafik")
+    assert geraete["bilanz"]["in_der_karte"] <= geraete["bilanz"]["aggregiert_aus"]
+
+
+def test_der_pruefbericht_nennt_dieselben_zahlen_wie_die_pruefung(tmp_path):
+    """Die neue Sektion auf /geraete-quellen.html wurde von keinem Test
+    gerendert – und zeigte deshalb zweimal die Zahl der BEFUNDE, wo die Zahl
+    der aussortierten LISTUNGEN gemeint war. Genau der Fehlertyp aus
+    CLAUDE.md §6: ein Etikett und ein Feld, die nicht dasselbe meinen."""
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    for i, listung in enumerate(db["listungen"]):
+        listung["preis_ohne_vertrag"] = 399.0 + i * 15
+    # Eine zweite Befundart, damit die Vorlage nicht nur ihren ersten Zweig
+    # zeigt: der `zustand_veraltet`-Fall hat weder `preise` noch `median`
+    # und lief bis zum Review in den Ausreisser-Zweig - mit einem
+    # Jinja-Fehler, der die ganze Seite riss.
+    db["listungen"][0]["titel_roh"] = "Apple iPhone 17 Pro Max (erneuert) 256 GB"
+
+    site = _baue(tmp_path, db=db)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    zahlen = geraete["pruefung"]
+    assert zahlen["zustand_veraltet"] >= 1 and zahlen["doppelpreise"] >= 1, (
+        "die Fixture spannt nicht beide Befundarten auf")
+    assert zahlen["aussortiert"] != zahlen["entfernt"], (
+        "die Fixture trennt die zwei Zahlen nicht - dann misst der Test nichts")
+
+    s = _suppe(site, "geraete-quellen.html")
+    abschnitt = s.select_one(".gr-pruefung")
+    assert abschnitt is not None, "der Prüfbericht fehlt auf der Seite"
+    text = abschnitt.get_text(" ", strip=True)
+    assert f"{zahlen['geprueft']} Preiszeilen geprüft" in text
+    assert f"{zahlen['aussortiert']} aus dem Vergleich genommen" in text
+    assert f"{zahlen['befunde']} Auffälligkeiten" in text
+    assert abschnitt.select_one(".rubrik-zahl").get_text(strip=True) == str(
+        zahlen["aussortiert"])
+    assert len(abschnitt.select("tbody tr")) == zahlen["befunde"]
+
+
+def test_die_preisspanne_der_sku_matrix_zeigt_keinen_gebrauchtpreis(tmp_path):
+    """Die Zelle sagt „ab N €" – das ist eine Preisaussage und folgt
+    derselben Regel wie Vergleich und Grafik. Vorher stand dort der
+    Gebrauchtpreis ohne jede Kennzeichnung; nur die aufgeklappte
+    Variantenzeile trug „· refurbished"."""
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    billig = db["listungen"][0]
+    billig["zustand"] = "refurbished"
+    billig["preis_ohne_vertrag"] = 99.0
+    billig["sku_id"] += "-refurbished"
+    billig["id"] += "-refurbished"
+
+    _baue(tmp_path, db=db)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+
+    spannen = [z for zeile in geraete["matrix"]["zeilen"]
+               for z in zeile["zellen"] if not z.get("leer")]
+    assert spannen, "keine Zellen - dann prüft der Test nichts"
+    assert all(z.get("ab") is None or z["ab"] >= 399.0 for z in spannen), (
+        "ein Gebrauchtpreis steht in der Preisspanne einer Zelle")
+    # Gegenprobe: die Variante selbst bleibt sichtbar, nur gekennzeichnet.
+    varianten = [v for zeile in geraete["matrix"]["zeilen"]
+                 for z in zeile["zellen"] if not z.get("leer")
+                 for v in z.get("varianten", [])]
+    assert any(v["zustand"] == "refurbished" for v in varianten)

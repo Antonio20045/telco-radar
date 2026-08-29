@@ -53,6 +53,8 @@ PROPORTIONALE (dort zaehlen Schlitze, nicht Punktdichte).
 """
 from __future__ import annotations
 
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+
 # Die Zeichenflaeche. 1180 = 1240 (--wrap) - 2x28 (Polster), also auf dem
 # Schreibtisch 1:1 ohne Herunterskalieren.
 BREITE = 1180
@@ -159,6 +161,14 @@ def aggregiere(punkte: list, preisart: str = "ohne_vertrag") -> list:
     gruppen: dict[tuple, list] = {}
     for p in punkte:
         if p.get("preis") is None:
+            continue
+        # Dieselbe Regel wie in der Vergleichstabelle (W1.1, 29.08.2026): die
+        # Karte zeigt NUR Neugeraete. Sie ordnet Punkte nach Preis auf einer
+        # Achse, und die Y-Achse traegt keine Zustandsangabe - ein
+        # Gebrauchtpreis liest sich dort wie ein guenstiger Neupreis. Der
+        # Zustand bleibt trotzdem im Schluessel unten: er ist die zweite
+        # Sicherung, falls diese Zeile jemand lockert.
+        if (p.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
         laden = p.get("shop") or p.get("anbieter") or ""
         # `zustand` MUSS in den Schluessel. Ohne ihn faellt "iPhone 15 256 GB

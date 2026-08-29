@@ -39,6 +39,8 @@ from __future__ import annotations
 
 from typing import Optional
 
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+
 # Wie in `geraete_view`: Vodafone ist die eigene Referenz, kein Wettbewerber.
 EIGEN = ("vodafone",)
 
@@ -140,6 +142,16 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
             continue
         preis, art = _preis(e)
         if preis is None or art != preisart:
+            continue
+        # W1.1, Evaluation vom 29.08.2026: der Vergleich zeigt NUR
+        # Neugeraete. Bis dahin bildete jeder Zustand seine eigene Zeile -
+        # arithmetisch richtig, auf der Seite aber nicht zu unterscheiden,
+        # und ein falsch erkannter Zustand schlug voll durch: ein o2-Geraet
+        # fuer 577 EUR ("grau erneuert") stand als Sieger gegen Vodafones
+        # Neupreis von 849,90 EUR. "unbekannt" faellt aus demselben Grund
+        # heraus - ein nicht bestimmter Zustand wird nicht als neu
+        # angenommen. Beides bleibt im CSV-Export und in der SKU-Ansicht.
+        if (e.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
         schluessel = (e.get("device_id"), e.get("speicher_gb"),
                       e.get("zustand") or "neu")

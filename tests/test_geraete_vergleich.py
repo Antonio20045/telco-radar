@@ -251,3 +251,42 @@ def test_ausgelistete_geraete_stehen_in_keinem_preisvergleich():
     v = vergleich([_e("Vodafone", preis=1349.9),
                    _e("o2", preis=999.0, status="ausgelistet")], _KATALOG)
     assert v["zeilen"][0]["anzahl_guenstiger"] == 0
+
+
+# --------------------------------------------------------------------------
+# W1.1: Gebrauchtware gehoert nicht in einen Neupreis-Vergleich
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("zustand", ["refurbished", "b-ware", "unbekannt"])
+def test_nur_neugeraete_stehen_im_preisvergleich(zustand):
+    """Der Befund der Evaluation vom 29.08.2026: ein o2-Gebrauchtgeraet fuer
+    577 EUR stand als Sieger gegen Vodafones Neupreis von 849,90 EUR. Bis
+    dahin bildete jeder Zustand seine EIGENE Vergleichszeile - richtig
+    gerechnet, aber auf der Seite las es sich wie ein Neupreis, und ein
+    falsch erkannter Zustand schlug voll durch.
+
+    Jetzt zeigt der Vergleich ausschliesslich `neu`. Refurbished bleibt im
+    Export und in der SKU-Ansicht sichtbar - nur eben gekennzeichnet und
+    nicht gegen einen Neupreis gerechnet."""
+    eintraege = [
+        _e("Vodafone", preis=849.9),
+        _e("o2", preis=577.0, zustand=zustand),
+    ]
+    erg = vergleich(eintraege, _KATALOG)
+    zustaende = {z["zustand"] for z in erg["zeilen"]}
+    assert zustaende <= {"neu"}, f"{zustand} darf keine Vergleichszeile bilden"
+    zeile = next(z for z in erg["zeilen"] if z["modell"] == "iPhone 17 Pro Max")
+    assert not zeile["guenstiger"], (
+        "ein Gebrauchtpreis darf den Neupreis nicht unterbieten")
+    assert zeile["anzahl_verglichen"] == 0
+
+
+def test_ein_neugeraet_gewinnt_weiterhin_ganz_normal():
+    """Gegenprobe: die Sperre darf den Vergleich nicht leerraeumen. Ohne
+    diesen Test koennte `vergleich()` alles verwerfen und der Test darueber
+    waere trotzdem gruen."""
+    erg = vergleich([_e("Vodafone", preis=849.9), _e("o2", preis=799.0)],
+                    _KATALOG)
+    zeile = next(z for z in erg["zeilen"] if z["modell"] == "iPhone 17 Pro Max")
+    assert [a["anbieter"] for a in zeile["guenstiger"]] == ["o2"]
+    assert zeile["guenstiger"][0]["preis"] == 799.0

@@ -529,16 +529,18 @@
   <h3 class="gr-unter">Wie viele Generationen ein Anbieter gleichzeitig führt</h3>
   <p class="gr-erklaer">Ein Wettbewerber, der das Vorjahresmodell im Regal
   lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
-  Gezählt werden Gerätegenerationen, nicht Varianten: acht Farben eines
-  Modells sind ein Regalplatz.</p>
+  Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17 Pro Max
+  sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz. Die
+  zweite Zahl nennt die Modelle dahinter.</p>
   <ul class="dz-balken gr-tiefe">
-    {% set tiefstes = geraete.lifecycle.portfolio[0].generationen %}
+    {% set tiefstes = geraete.lifecycle.portfolio[0].generationen or 1 %}
     {% for t in geraete.lifecycle.portfolio %}
     <li{% if t.anbieter|lower == 'vodafone' %} class="gr-eigen"{% endif %}>
       <span class="dz-balken-name">{{ t.anbieter }}</span>
       <span class="dz-balken-spur"><span class="dz-balken-fuell"
         style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
-      <span class="dz-balken-n">{{ t.generationen }}</span>
+      <span class="dz-balken-n">{{ t.generationen }}<span
+        class="rubrik-zusatz">{{ t.modelle_anzahl }} Modelle</span></span>
     </li>
     {% endfor %}
   </ul>

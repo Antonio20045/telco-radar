@@ -102,4 +102,54 @@
   kann.</p>
   <p class="dz-foot">Zurück zum <a href="{{ prefix }}geraete.html">Geräteradar</a>.</p>
 </section>
+
+{% if geraete.pruefung and geraete.pruefung.geprueft %}
+<section class="gr-pruefung">
+  <h2 class="rubrik">Was der Preisvergleich nicht zeigt
+    <span class="rubrik-zahl">{{ geraete.pruefung.aussortiert }}</span></h2>
+  <p class="gr-erklaer">Vor dem Rendern läuft jeder Preis ohne Vertrag durch
+  drei Prüfungen: derselbe Artikel mit zwei Preisen, mehr Speicher für weniger
+  Geld, ein Preis weit abseits aller anderen. Was dabei auffällt, steht hier
+  und fehlt in Vergleichstabelle und Preisgrafik – es bleibt aber in der
+  CSV-Tabelle und in der Geräteansicht. Ein Preis, der sich nicht belegen
+  lässt, verschwindet nicht; er wird nur nicht gegen einen anderen
+  gerechnet.</p>
+  <p class="gr-erklaer">{{ geraete.pruefung.geprueft }} Preiszeilen geprüft,
+  {{ geraete.pruefung.aussortiert }} aus dem Vergleich genommen,
+  {{ geraete.pruefung.befunde }} Auffälligkeiten notiert.</p>
+  {% if geraete.pruefbefunde %}
+  <table class="gr-tabelle">
+    <thead><tr><th scope="col">Anbieter</th><th scope="col">Gerät</th>
+      <th scope="col">Befund</th><th scope="col">im Vergleich</th></tr></thead>
+    <tbody>
+    {% for b in geraete.pruefbefunde %}
+      <tr>
+        <td>{{ b.anbieter }}</td>
+        <td>{{ b.geraet }}</td>
+        <td>{% if b.art == "doppelpreis" %}zwei Preise ({% for pr in b.preise
+              %}{{ '%.2f'|format(pr)|replace('.', ',') }} €{% if not loop.last
+              %} und {% endif %}{% endfor %}, {{ b.spanne|replace('.', ',') }} %
+              Abstand){% if b.farben %} – {{ b.farben | join(" / ") }}{% endif %}
+            {% elif b.art == "speicherinversion" %}{{ b.gross_gb }} GB
+              ({{ '%.2f'|format(b.gross_preis)|replace('.', ',') }} €) billiger
+              als {{ b.klein_gb }} GB
+              ({{ '%.2f'|format(b.klein_preis)|replace('.', ',') }} €)
+            {% elif b.art == "ausreisser" %}{{
+              '%.2f'|format(b.preis)|replace('.', ',') }} € gegen einen
+              Mittelwert von
+              {{ '%.2f'|format(b.median)|replace('.', ',') }} €
+              ({{ b.abweichung|replace('.', ',') }} % daneben)
+            {% elif b.art == "zustand_veraltet" %}als „{{ b.gespeichert }}"
+              gespeichert, nach heutiger Lesart „{{ b.erkannt }}“ – der
+              Bestand wird beim nächsten Abruf dieses Anbieters berichtigt
+            {% else %}{{ b.art }}
+            {% endif %}</td>
+        <td>{% if b.entfernt %}nicht gezeigt{% else %}gezeigt{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+{% endif %}
 {% endblock %}

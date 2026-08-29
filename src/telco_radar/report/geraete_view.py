@@ -39,7 +39,8 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from . import geraete_karte, geraete_vergleich
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+from . import geraete_karte, geraete_pruefung, geraete_vergleich
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -322,11 +323,23 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                     if e.get("status") == STATUS_AUSGELISTET
                     and _im_fenster(e.get("ended_since", ""), heute)]
 
+    # W3 (29.08.2026): die Karte sagte "267 Geraete neu im Regal", waehrend
+    # die Seite daneben 59 beobachtete Geraete auswies. Gezaehlt wurden
+    # LISTUNGEN - dasselbe Geraet bei vier Anbietern in acht Farben sind 32
+    # Listungen und EIN Geraet. Eine Kennzahl, die groesser ist als ihre
+    # eigene Grundgesamtheit, macht jede andere Zahl der Seite unglaubwuerdig.
+    #
+    # Beide Zahlen bleiben stehen, sie heissen nur richtig: `*_geraete`
+    # traegt den Satz, die Listungszahl bleibt fuer die Tabelle darunter.
+    neu_geraete = {e.get("device_id") for e in neu_gelistet if e.get("device_id")}
+    weg_geraete = {e.get("device_id") for e in verschwunden if e.get("device_id")}
+
     erlaubt = set()
     for b in bewegungen:
         erlaubt.update({abs(b["delta"]), b["von"], b["auf"], abs(b["prozent"])})
         erlaubt |= zahlen_der_namen(b["modell"], b["anbieter"])
-    erlaubt.update({len(neu_gelistet), len(verschwunden), len(bewegungen)})
+    erlaubt.update({len(neu_gelistet), len(verschwunden), len(bewegungen),
+                    len(neu_geraete), len(weg_geraete)})
 
     # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Dann zeigt die Karte,
     # was neu ERFASST wurde, und sagt das auch so - "keine Auffaelligkeiten"
@@ -345,16 +358,16 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         saetze.append(f"{b['modell']} bei {b['anbieter']}: "
                       f"{abs(b['delta']):.2f} € {richtung} "
                       f"({b['von']:.2f} € auf {b['auf']:.2f} €).")
-    if neu_gelistet and ohne_vorlauf:
-        saetze.append(f"{len(neu_gelistet)} Gerät"
-                      f"{'e' if len(neu_gelistet) != 1 else ''} erstmals "
+    if neu_geraete and ohne_vorlauf:
+        saetze.append(f"{len(neu_geraete)} Gerät"
+                      f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
                       f"erfasst – es gibt noch keinen früheren Stand, gegen "
                       f"den sich vergleichen ließe.")
-    elif neu_gelistet:
-        saetze.append(f"{len(neu_gelistet)} Gerät{'e' if len(neu_gelistet) != 1 else ''} "
+    elif neu_geraete:
+        saetze.append(f"{len(neu_geraete)} Gerät{'e' if len(neu_geraete) != 1 else ''} "
                       f"neu im Regal.")
-    if verschwunden and not ohne_vorlauf:
-        saetze.append(f"{len(verschwunden)} Gerät{'e' if len(verschwunden) != 1 else ''} "
+    if weg_geraete and not ohne_vorlauf:
+        saetze.append(f"{len(weg_geraete)} Gerät{'e' if len(weg_geraete) != 1 else ''} "
                       f"aus dem Portfolio gefallen.")
 
     # Fail closed: ein Satz, dessen Zahlen nicht im Datensatz stehen,
@@ -367,6 +380,10 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 
     return {
         "saetze": geprueft,
+        "neu_gelistet": len(neu_gelistet),
+        "neu_gelistet_geraete": len(neu_geraete),
+        "verschwunden": len(verschwunden),
+        "verschwunden_geraete": len(weg_geraete),
         "bewegungen": bewegungen[:12],
         "neu": [{"modell": (katalog.nach_id(e.get("device_id")).modell
                             if katalog.nach_id(e.get("device_id"))
@@ -418,7 +435,14 @@ def _matrix(eintraege: list, katalog) -> dict:
             "url": e.get("quelle_url", ""),
             "abgerufen_am": e.get("abgerufen_am", ""),
         })
-        if e.get("preis_ohne_vertrag") is not None:
+        # Die Preisspanne der Zelle ("ab 577 EUR") ist eine PREISAUSSAGE und
+        # folgt derselben Regel wie Vergleich und Grafik: nur Neugeraete.
+        # Vorher stand fuer das iPhone 14 Pro bei o2 der Gebrauchtpreis in
+        # der Spanne, ohne jede Kennzeichnung - nur die aufgeklappte
+        # Variantenzeile trug "· refurbished". Die Varianten selbst bleiben
+        # vollstaendig: dort steht der Zustand daneben.
+        if (e.get("preis_ohne_vertrag") is not None
+                and (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE):
             zelle["preise"].append(e["preis_ohne_vertrag"])
         if e.get("zuzahlung") is not None:
             zelle["buendel"].append(e["zuzahlung"])
@@ -565,7 +589,8 @@ def leer(fehler: str = "") -> dict:
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
                    "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0,
-                   "aggregiert_aus": 0, "schwelle_erreicht": False},
+                   "aggregiert_aus": 0, "hersteller": 0,
+                   "schwelle_erreicht": False},
         # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
         # genau dafuer gibt es ihn. Die vier Flaechen kommen aus derselben
         # Funktion wie im Normalfall, damit sie nicht auseinanderlaufen
@@ -620,6 +645,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
+    # W1.2 (29.08.2026): bevor irgendetwas gerendert wird, laeuft die
+    # Plausibilitaetspruefung ueber den Datensatz. Was sie aussortiert, faellt
+    # aus Vergleich UND Preisgrafik - beides sind Preisaussagen, und eine
+    # Preisaussage aus zwei widerspruechlichen Zahlen ist keine. Der
+    # CSV-Export und die SKU-Ansicht sehen weiterhin ALLES: eine Zeile, die
+    # sich nicht vergleichen laesst, ist deshalb nicht verschwunden.
+    pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
+    belastbar = pruefung["sauber"]
+
     # Laden und Anzeigename je Anbieter. Zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
     # die Karte einen Laden mit sich selbst.
@@ -633,7 +667,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                     for a in getattr(quellen, "anbieter", [])})
 
     punkte_ohne_vertrag = []
-    for e in sichtbar:
+    for e in belastbar:
         preis = e.get("preis_ohne_vertrag")
         if preis is None:
             continue
@@ -744,10 +778,25 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # die Karte EINE Spalte zeigt und "Preise von 1 Haendler" darunter steht.
     laeden_mit_daten = {laden.get(e.get("anbieter"), e.get("anbieter"))
                         for e in sichtbar}
+    gezeichnete_listungen = [p for p in punkte_ohne_vertrag
+                             if (p.get("zustand") or "neu")
+                             in VERGLEICHBARE_ZUSTAENDE]
+    # Die Veroeffentlichungsschwelle rechnet gegen den BESTAND, nicht gegen
+    # die Karte. Bis zum 29.08.2026 nahm sie die Spaltenzahl der
+    # Herstelleransicht - und die haengt seit W1.2 an der
+    # Plausibilitaetspruefung. Damit haette ein Anbieter, der an einem Tag
+    # seine Farbvarianten mit mehr als SPANNE_GRENZE Abstand bepreist, den
+    # Navigationseintrag "Geraete" auf JEDER Seite verschwinden lassen -
+    # ohne Fehler, ohne Warnung, und niemand faende die Seite mehr. Eine
+    # Datenqualitaetsheuristik darf keine Navigation schalten.
+    hersteller_mit_daten = {
+        g.hersteller for g in (katalog.nach_id(e.get("device_id"))
+                               for e in sichtbar)
+        if g and g.hersteller}
     erreicht = schwelle_erreicht(
         anbieter=len(laeden_mit_daten),
         skus=len({e.get("sku_id") for e in sichtbar}),
-        hersteller=len(karte_hersteller.get("spalten") or []))
+        hersteller=len(hersteller_mit_daten))
 
     # Liefert nur EIN Laden, zeigt die Herstelleransicht nicht das Portfolio
     # von Apple, sondern das, was dieser eine Haendler von Apple fuehrt. Dann
@@ -757,6 +806,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     standard = "anbieter" if len(laeden) <= 1 else "hersteller"
 
     return {
+        "pruefung": pruefung["zahlen"],
+        "pruefbefunde": pruefung["befunde"],
         "hat_daten": bool(sichtbar),
         "stand": heute,
         "abgerufen_bis": abrufdaten[-1] if abrufdaten else "",
@@ -786,7 +837,14 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             # Fehlertyp aus CLAUDE.md §6 - ein Etikett und ein Feld, die
             # nicht dasselbe meinen.
             "in_der_karte": len(aggregate),
-            "aggregiert_aus": len(punkte_ohne_vertrag),
+            # Gezaehlt wird, was die Karte WIRKLICH aggregiert hat. Seit
+            # `aggregiere` nur Neugeraete zeichnet (W1.1), ist
+            # `len(punkte_ohne_vertrag)` eine andere Zahl - die Legende sagte
+            # damit "153 Preispunkte aus 348 Listungen", waehrend es 339
+            # waren. Auf einer Seite, deren Verkaufsargument der Belegzwang
+            # ist, ist das die teuerste Sorte falscher Zahl.
+            "aggregiert_aus": len(gezeichnete_listungen),
+            "hersteller": len(hersteller_mit_daten),
             "schwelle_erreicht": erreicht,
         },
         "flaechen": flaechen,
@@ -808,7 +866,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die
         # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
         # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
-        "vergleich": geraete_vergleich.beide_preisarten(sichtbar, katalog,
+        "vergleich": geraete_vergleich.beide_preisarten(belastbar, katalog,
                                                         laeden=laden),
         "matrix": _matrix(sichtbar, katalog),
         "lifecycle": lifecycle,

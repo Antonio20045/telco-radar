@@ -30,9 +30,11 @@ from telco_radar.geraete_model import (
     listung_id,
     normalisiere,
     normalisiere_farbe,
+    ohne_zustandswort,
     sku_id,
     speicher_aus_titel,
     wortmarken,
+    zustand_aus_titel,
 )
 
 # --------------------------------------------------------------------------
@@ -573,3 +575,184 @@ def test_vertragspreis_ohne_tarifbezug_wird_abgewiesen():
         Listung(sku_id="x", device_id="x", anbieter="o2",
                 anbieter_typ="netzbetreiber", quelle_url="https://e.de/p",
                 abgerufen_am="2026-08-10", preis_mit_vertrag_ab=1.00)
+
+
+# --------------------------------------------------------------------------
+# Zustand: die Preisdimension, die am 29.08.2026 den Vergleich verdreht hat
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("titel,erwartet", [
+    # o2 kennzeichnet seine Gebrauchtstrecke in ZWEI Schreibweisen. Die
+    # Stichwortliste kannte am 29.08.2026 nur die erste - und genau die zwei
+    # Geraete, die o2 "(erneuert)" nennt, liefen als Neugeraet mit und
+    # gewannen damit den Preisvergleich gegen Vodafone.
+    ("Apple iPhone 14 (gebraucht) 128 GB mitternacht erneuert", "refurbished"),
+    ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert", "refurbished"),
+    ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "refurbished"),
+    ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "refurbished"),
+    # "wie neu" stand in der Liste und konnte nie treffen: ein Zwei-Wort-
+    # String wurde gegen eine Menge einzelner Wortmarken geprueft.
+    ("Apple iPhone 13 wie neu 128 GB", "refurbished"),
+    ("Apple iPhone 15 renewed 128 GB", "refurbished"),
+    ("Apple iPhone 15 generalueberholt 128 GB", "refurbished"),
+    ("Samsung Galaxy S24 B-Ware 128 GB", "b-ware"),
+    # Gegenprobe: ein Neugeraet bleibt neu. "Neuheit" und "erneuerbar"
+    # duerfen nicht anschlagen - deshalb Wortmarken statt Teilketten.
+    ("Apple iPhone 17 256 GB Titannatur", "neu"),
+    ("Samsung Galaxy S25 Neuheit 128 GB", "neu"),
+])
+def test_zustand_kennt_alle_schreibweisen_des_handels(titel, erwartet):
+    assert zustand_aus_titel(titel) == erwartet
+
+
+def test_zustand_liest_auch_das_farbfeld():
+    """Der Zustand steht nicht immer im Titel. Bei einer Quelle, die Farbe
+    strukturiert liefert ("grau erneuert"), ist das Farbfeld das einzige
+    Signal - und wurde bis zum 29.08.2026 gar nicht befragt."""
+    listung = lies_listung(
+        titel="Samsung Galaxy S25 128 GB", anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://www.o2online.de/e-shop/samsung/s25-128gb-details",
+        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
+        farbe_roh="grau erneuert", speicher_gb=128, preis_ohne_vertrag=577.0)
+    assert listung.zustand == "refurbished"
+    assert listung.sku_id.endswith("-refurbished")
+
+
+@pytest.mark.parametrize("titel,farbe,url,preis", [
+    ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert",
+     "space schwarz erneuert",
+     "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-space-schwarz-erneuert-details",
+     577.0),
+    ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "grau erneuert",
+     "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-grau-erneuert-details",
+     577.0),
+    ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "blau erneuert",
+     "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-blau-erneuert-details",
+     697.0),
+])
+def test_die_drei_faelle_der_evaluation_vom_29_august(titel, farbe, url, preis):
+    """Regressionsfaelle aus `claude/geraeteradar-evaluation-2026-08-29.md`,
+    Abschnitt 1. Alle drei standen live im Export; zwei davon (die
+    "(erneuert)"-Schreibweise) liefen als Neugeraet und schlugen damit den
+    Vodafone-Preis. Der dritte war korrekt erkannt und belegt, dass der
+    Filter im Vergleich greift, sobald der Zustand stimmt."""
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="iPhone 14 Pro", generation=14,
+               speicher=[128, 256], segment="flagship"),
+        Geraet(hersteller="Apple", modell="iPhone 16", generation=16,
+               speicher=[128, 256], segment="premium"),
+        Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25,
+               speicher=[128, 256], segment="premium"),
+    ])
+    listung = lies_listung(
+        titel=titel, anbieter="o2", anbieter_typ="netzbetreiber",
+        quelle_url=url, abgerufen_am="2026-08-29", katalog=katalog,
+        farben=_FARBEN, farbe_roh=farbe, speicher_gb=128,
+        preis_ohne_vertrag=preis)
+    assert listung is not None
+    assert listung.zustand == "refurbished", (
+        f"{titel!r} ist Gebrauchtware und darf den Neupreis-Vergleich "
+        f"nicht gewinnen")
+
+
+def test_der_zustand_wird_aus_der_farbe_herausgeloest():
+    """W1.3: "space schwarz erneuert" ist kein Farbname, sondern Farbe plus
+    Zustand. Bleibt das Wort in der Farbe stehen, fuehrt der Farbbericht am
+    Seitenende eine Schreibweise, die keine Farbe ist, und dieselbe Farbe
+    steht als zwei Eintraege da."""
+    listung = lies_listung(
+        titel="Apple iPhone 17 (erneuert) 256 GB", anbieter="o2",
+        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/x",
+        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
+        farbe_roh="schwarz erneuert", speicher_gb=256,
+        preis_ohne_vertrag=899.0)
+    assert listung.zustand == "refurbished"
+    assert "erneuert" not in (listung.farbe_roh or "")
+    assert listung.farbe_roh == "schwarz"
+
+
+def test_eine_farbe_die_nur_aus_dem_zustand_besteht_bleibt_stehen():
+    """Gegenprobe: die Zerlegung darf das Feld nicht leeren. Bliebe von
+    "gebraucht" nichts uebrig, verloere die SKU ihre Farbdimension und zwei
+    verschiedene Geraete teilten sich eine ID."""
+    listung = lies_listung(
+        titel="Apple iPhone 17 256 GB", anbieter="o2",
+        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/y",
+        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
+        farbe_roh="gebraucht", speicher_gb=256, preis_ohne_vertrag=899.0)
+    assert listung.zustand == "refurbished"
+    assert listung.farbe_roh == "gebraucht"
+
+
+@pytest.mark.parametrize("titel", [
+    "Apple iPhone 17 256 GB neuwertig",
+    "Apple iPhone 17 256 GB Retoure",
+    "Apple iPhone 17 256 GB Open Box",
+    "Apple iPhone 17 256 GB zweite Wahl",
+])
+def test_ein_unklares_kennzeichen_wird_nicht_als_neu_durchgewunken(titel):
+    """W1.1: "Ein Geraet, dessen Zustand nicht sicher bestimmbar ist,
+    bekommt `zustand: unbekannt` und faellt aus dem Preisvergleich heraus -
+    es wird nicht als "neu" angenommen."
+
+    "neuwertig", "Retoure" und "Open Box" heissen im deutschen Handel je
+    nach Haendler Verschiedenes. Sie auf "refurbished" zu raten waere
+    genauso falsch wie sie als neu zu fuehren; beides ist eine Aussage, die
+    die Quelle nicht deckt."""
+    assert zustand_aus_titel(titel) == "unbekannt"
+
+
+def test_ein_eindeutiges_kennzeichen_schlaegt_das_unklare():
+    """"Apple iPhone 17 neuwertig refurbished" ist refurbished, nicht
+    unbekannt: eine eindeutige Angabe wird durch eine unklare daneben nicht
+    wieder unklar."""
+    assert zustand_aus_titel("Apple iPhone 17 neuwertig refurbished") == "refurbished"
+
+
+@pytest.mark.parametrize("farbe", ["   ", "", "gebraucht", "- -"])
+def test_eine_leere_farbe_reisst_den_nachtlauf_nicht(farbe):
+    """`lies_listung` ist der Einstieg fuer JEDEN Adapter, und weder
+    `_uebernimm` noch `sammle_anbieter` noch `geraete_pipeline` fangen einen
+    UnboundLocalError. Ein einziger Satz mit leerem Farbfeld beendete damit
+    den kompletten Geraete-Nachtlauf - ohne Upsert, ohne Historie, ohne
+    Protokoll, und in Actions sieht so ein Abbruch aus wie ein Lauf, der nie
+    lief.
+
+    Heute loesen ihn die vier ausgelieferten Adapter nicht aus, weil sie die
+    Farbe selbst strippen. Die naechsten (otelo, klarmobil, congstar) sind
+    noch nicht geschrieben."""
+    listung = lies_listung(
+        titel="Apple iPhone 17 256 GB", anbieter="o2",
+        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/x",
+        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
+        farbe_roh=farbe, speicher_gb=256, preis_ohne_vertrag=899.0)
+    assert listung is not None
+    assert listung.sku_id
+
+
+@pytest.mark.parametrize("roh,erwartet", [
+    ("Schwarz (gebraucht)", "Schwarz"),
+    ("schwarz, refurbished", "schwarz"),
+    ("space schwarz erneuert", "space schwarz"),
+    # Ein unklares Kennzeichen gehoert genauso wenig in die Farbe wie ein
+    # eindeutiges - sonst traegt die sku_id "neuwertig" als Farbe.
+    ("schwarz neuwertig", "schwarz"),
+    # Gegenprobe: eine echte Farbe wird nicht angetastet.
+    ("Erneuerbar-Gruen", "Erneuerbar-Gruen"),
+    ("gebrauchtgrau", "gebrauchtgrau"),
+    ("sunset-gold", "sunset-gold"),
+])
+def test_ohne_zustandswort_raeumt_auch_die_interpunktion_ab(roh, erwartet):
+    assert ohne_zustandswort(roh) == erwartet
+
+
+def test_ein_unbekannter_zustand_wird_abgewiesen():
+    """Seit der Zustand ueber die Sichtbarkeit in Vergleich und Preisgrafik
+    entscheidet, laesst ein Adapter mit "Neu" statt "neu" seine Listungen
+    fail closed und stillschweigend aus beiden Preisaussagen fallen. Ein
+    Tippfehler darf laut sein, nicht unsichtbar."""
+    with pytest.raises(ValueError, match="zustand"):
+        Listung(sku_id="x", device_id="x", anbieter="o2",
+                anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p",
+                abgerufen_am="2026-08-29", zustand="Neu")

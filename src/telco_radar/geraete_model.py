@@ -344,24 +344,112 @@ def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
 # der Modellname derselbe ist - freenet fuehrt bereits eine eigene
 # "-refurbished"-Strecke. Ohne diese Dimension teilten sich beide dieselbe
 # listung_id, und der Preisverlauf sprang zwischen Neu- und Gebrauchtpreis.
+#
+# Mehrwortmuster stehen BINDESTRICHVERBUNDEN ("wie-neu"), weil sie ueber
+# `normalisiere` laufen - dort wird jede Folge von Nicht-Alphanumerik zu
+# einem Bindestrich. Als "wie neu" geschrieben landete das Muster im
+# Einzelwort-Zweig und wurde gegen eine Menge einzelner Wortmarken geprueft,
+# in der ein Zwei-Wort-String nie vorkommen kann: die Zeile stand da und
+# konnte nicht treffen.
+#
+# "erneuert" ist am 29.08.2026 dazugekommen und war der teuerste Eintrag der
+# Liste. o2 kennzeichnet dieselbe Gebrauchtstrecke in ZWEI Schreibweisen -
+# "Apple iPhone 14 (gebraucht) ..." und "Apple iPhone 14 Pro (erneuert) ...".
+# Acht von zehn Geraeten trugen "(gebraucht)" und waren richtig erkannt; die
+# zwei mit "(erneuert)" liefen als NEUgeraet mit, unterboten mit ihrem
+# Gebrauchtpreis den Vodafone-Neupreis und standen als Sieger in der
+# Vergleichstabelle. Ein Gebrauchtpreis, der einen Neupreis schlaegt, ist
+# dieselbe Fehlerklasse wie die Buendelzahl, die einen Geraetepreis schlaegt.
 _ZUSTAENDE = (
-    ("refurbished", ("refurbished", "generalueberholt", "gebraucht", "wie neu")),
-    ("b-ware", ("b-ware", "bware", "vorfuehrgeraet", "ausstellungsstueck")),
+    ("refurbished", ("refurbished", "refurb", "generalueberholt", "erneuert",
+                     "renewed", "gebraucht", "wie-neu", "second-hand")),
+    ("b-ware", ("b-ware", "bware", "vorfuehrgeraet", "vorfuehrer",
+                "ausstellungsstueck")),
 )
+
+
+# Kennzeichen, die im deutschen Handel je nach Haendler Verschiedenes heissen.
+# Sie auf "refurbished" zu raten waere genauso falsch wie sie als neu zu
+# fuehren - beides ist eine Aussage, die die Quelle nicht deckt. Sie ergeben
+# deshalb "unbekannt", und "unbekannt" faellt aus Preisvergleich und
+# Preisgrafik heraus (siehe VERGLEICHBARE_ZUSTAENDE).
+_UNSICHER = ("neuwertig", "retoure", "open-box", "openbox", "zweite-wahl",
+             "2-wahl", "geprueft-und-zertifiziert")
+
+# Welche Zustaende in einer Preisaussage GEGENEINANDER stehen duerfen. Neu-,
+# Gebraucht- und B-Warenpreis sind drei verschiedene Preise; die Vergleichs-
+# tabelle und die Positionskarte zeigen nur den ersten.
+VERGLEICHBARE_ZUSTAENDE = ("", "neu")
+
+# Alle gueltigen Werte von `Listung.zustand`. Seit der Zustand ueber die
+# SICHTBARKEIT in Vergleich und Preisgrafik entscheidet (fail closed), laesst
+# ein Adapter, der "Neu" oder "new" liefert, seine Listungen stillschweigend
+# aus beiden Preisaussagen fallen - ohne Log, ohne Befund im Pruefbericht.
+# Deshalb wird der Wert geprueft wie `verfuegbarkeit` und `anbieter_typ`.
+ZUSTAENDE = ("neu", "refurbished", "b-ware", "unbekannt")
+
+
+def ohne_zustandswort(farbe: str) -> str:
+    """Die Farbe ohne das Zustandskennzeichen.
+
+    o2 schreibt den Zustand in die Farbe ("space schwarz erneuert",
+    "titanium black gebraucht"). Bleibt das Wort stehen, fuehrt der
+    Farbbericht am Fuss von `/geraete.html` Schreibweisen, die keine Farben
+    sind, und dieselbe Farbe steht zweimal in der Arbeitsliste.
+
+    Die Zerlegung gehoert hierher und NICHT in die sku_id: der Zustand ist
+    dort bereits eine eigene Dimension (`sku_id(..., zustand)`), das Neu-
+    und das Gebrauchtgeraet bleiben also weiterhin zwei SKUs.
+
+    Bleibt nach dem Streichen nichts uebrig, wird die Farbe UNVERAENDERT
+    zurueckgegeben: eine geleerte Farbe verloere die Dimension, und zwei
+    verschiedene Geraete teilten sich eine ID.
+    """
+    roh = (farbe or "").strip()
+    if not roh:
+        return roh
+    # Auch die UNKLAREN Kennzeichen: "schwarz neuwertig" ergibt zwar
+    # `zustand="unbekannt"`, aber "neuwertig" ist trotzdem keine Farbe und
+    # hat in der sku_id nichts verloren.
+    woerter = [w for _, gruppe in _ZUSTAENDE for w in gruppe] + list(_UNSICHER)
+    rest = roh
+    for wort in sorted(woerter, key=len, reverse=True):
+        # Ein Bindestrich im Muster steht fuer "Bindestrich ODER Leerzeichen"
+        # ("wie-neu" trifft auch "wie neu"). `re.escape` maskiert den
+        # Bindestrich, deshalb wird die maskierte Form ersetzt; faellt diese
+        # Maskierung in einer kuenftigen Python-Fassung weg, greift der
+        # zweite Zweig.
+        muster = re.escape(wort).replace(r"\-", r"[\s\-]").replace("-", r"[\s\-]")
+        rest = re.sub(rf"(?<![a-z0-9]){muster}(?![a-z0-9])", " ", rest,
+                      flags=re.IGNORECASE)
+    # Was ein gestrichenes Wort an Klammern und Kommas zuruecklaesst, ist
+    # keine Farbe: "Schwarz (gebraucht)" wurde sonst zu "Schwarz ( )" - und
+    # landete genau so im Farbbericht, den diese Funktion sauber halten soll.
+    rest = re.sub(r"\(\s*\)|\[\s*\]", " ", rest)
+    rest = re.sub(r"\s+", " ", rest).strip(" -,;/()[]")
+    return rest or roh
 
 
 def zustand_aus_titel(titel: str) -> str:
     """"neu" | "refurbished" | "b-ware"."""
     marken = set(wortmarken(titel))
     text = normalisiere(titel)
+
+    def trifft(wort: str) -> bool:
+        if "-" in wort:
+            return f"-{wort}-" in f"-{text}-"
+        return wort in marken
+
     for name, woerter in _ZUSTAENDE:
         for wort in woerter:
-            teile = wort.split("-")
-            if len(teile) == 1:
-                if wort in marken:
-                    return name
-            elif f"-{wort}-" in f"-{text}-":
+            if trifft(wort):
                 return name
+    # Erst NACH den eindeutigen Kennzeichen: "iPhone 17 neuwertig
+    # refurbished" ist refurbished, nicht unbekannt. Eine eindeutige Angabe
+    # wird durch eine unklare daneben nicht wieder unklar.
+    for wort in _UNSICHER:
+        if trifft(wort):
+            return "unbekannt"
     return "neu"
 
 
@@ -560,7 +648,7 @@ class Listung:
     farbe_roh: str = ""
     farbe_normalisiert: Optional[str] = None
     ean: str = ""
-    zustand: str = "neu"          # neu | refurbished | b-ware
+    zustand: str = "neu"          # neu | refurbished | b-ware | unbekannt
     titel_roh: str = ""
     # Die Einstiegsseite, auf der dieses Geraet gefunden wurde. Sie ist der
     # Schluessel der Auslistungslogik: gealtert wird nur, was auf einer
@@ -580,6 +668,8 @@ class Listung:
             raise ValueError(f"unbekannte verfuegbarkeit: {self.verfuegbarkeit!r}")
         if self.anbieter_typ not in ANBIETER_TYPEN:
             raise ValueError(f"unbekannter anbieter_typ: {self.anbieter_typ!r}")
+        if self.zustand not in ZUSTAENDE:
+            raise ValueError(f"unbekannter zustand: {self.zustand!r}")
         if self.confidence not in CONFIDENCE:
             raise ValueError(f"unbekannte confidence: {self.confidence!r}")
         for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung"):
@@ -666,12 +756,22 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
     else:
         speicher_gb = int(speicher_gb)
 
-    kanonisch = normalisiere_farbe(farbe_roh, farben) if farbe_roh else None
+    kanonisch = None
     if not farbe_roh:
         farbe_roh, kanonisch = farbe_aus_titel(titel, farben)
 
     gid = geraet.device_id
-    zustand = zustand_aus_titel(f"{titel} {quelle_url}")
+    # Der Zustand wird aus ALLEN verfuegbaren Signalen abgeleitet, nicht nur
+    # aus dem Titel: eine Quelle, die Farbe strukturiert liefert, traegt das
+    # Kennzeichen unter Umstaenden NUR dort ("grau erneuert"). Das Farbfeld
+    # gehoert deshalb in die Pruefung - ein Zustand, den nur eine Spalte
+    # kennt, ist trotzdem ein Zustand.
+    zustand = zustand_aus_titel(f"{titel} {farbe_roh or ''} {quelle_url}")
+    # ERST lesen, DANN streichen: die Farbe ist bei manchen Quellen der
+    # einzige Traeger des Kennzeichens. Umgekehrt haette die Zerlegung das
+    # Signal geloescht, bevor es jemand gelesen hat.
+    farbe_roh = ohne_zustandswort(farbe_roh) if farbe_roh else farbe_roh
+    kanonisch = normalisiere_farbe(farbe_roh, farben) if farbe_roh else None
     # Unbekannte Farbe: die Rohschreibweise traegt die ID. Der Preis dafuer
     # ist, dass zwei unbekannte Schreibweisen derselben Farbe zwei SKUs
     # ergeben - das ist ehrlicher als sie zusammenzuwerfen, und der

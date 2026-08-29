@@ -225,15 +225,33 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
                 "hersteller": g.hersteller if g else "",
                 "generation": g.generation if g else None,
             })
+        # W3 (29.08.2026): bis dahin stand hier `len(roh["geraete"])` - also
+        # die Zahl verschiedener MODELLE unter der Ueberschrift
+        # "Generationen". Die Seite meldete damit "o2 fuehrt 54
+        # Generationen" bei 59 beobachteten Geraeten insgesamt.
+        #
+        # Eine Generation ist der Jahrgang eines Herstellers: iPhone 17,
+        # 17 Pro und 17 Pro Max sind EINE. Genau daran haengt die Aussage
+        # dieser Kennzahl - wer das Vorjahresmodell im Regal laesst, hat
+        # einen Preiseinstieg, ohne den Preis des neuen Geraets anzufassen.
+        # Drei Varianten desselben Jahrgangs sind kein Preiseinstieg.
+        #
+        # Ein Katalogeintrag OHNE Jahrgang zaehlt nicht mit: sonst waeren
+        # drei Geraete ohne Angabe drei Generationen, und die Kennzahl
+        # wuchse mit der Luecke im Katalog statt mit dem Portfolio.
+        jahrgaenge = {(m["hersteller"], m["generation"]) for m in modelle
+                      if m["generation"] is not None}
         out.append({
             "anbieter": name,
             "anbieter_typ": roh["anbieter_typ"],
-            "generationen": len(roh["geraete"]),
+            "generationen": len(jahrgaenge),
+            "modelle_anzahl": len(roh["geraete"]),
             "skus": len(roh["skus"]),
             "modelle": sorted(modelle, key=lambda m: (m["hersteller"],
                                                       -(m["generation"] or 0))),
         })
-    return sorted(out, key=lambda t: (-t["generationen"], t["anbieter"]))
+    return sorted(out, key=lambda t: (-t["generationen"],
+                                      -t["modelle_anzahl"], t["anbieter"]))
 
 
 # --------------------------------------------------------------------------
