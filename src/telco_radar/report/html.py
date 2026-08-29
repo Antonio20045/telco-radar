@@ -1828,6 +1828,23 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # SAGT, dass sie nichts zeigen kann. Aufbereitet wird `geraete` weiter
     # OBEN, vor der ersten gerenderten Seite - es entscheidet ueber einen
     # Navigationseintrag, und die Navigation steht auf jeder Seite.
+    # Der Gesamtexport entsteht VOR der Seite: sie nennt Zeilenzahl und
+    # Groesse neben dem Link, und diese Zahlen kommen aus den wirklich
+    # geschriebenen Dateien. Ein Link mit gerechneter statt gemessener Zahl
+    # waere genau die Sorte Angabe, die dieses Portal nicht macht.
+    try:
+        from . import geraete_export as _geraete_export
+        geraete["export"] = _geraete_export.schreibe_exporte(
+            site_dir, geraete.get("alle_eintraege") or [],
+            geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
+            stand=geraete.get("stand", ""))
+    except Exception as exc:                      # noqa: BLE001
+        # Wie beim Rest dieser Stufe: ein gescheiterter Export darf die
+        # Seite nicht kosten - aber er verschwindet auch nicht still.
+        log.error("Geraete-Export gescheitert: %s: %s", type(exc).__name__, exc)
+        from . import geraete_export as _geraete_export
+        geraete["export"] = _geraete_export.leer()
+
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
         encoding="utf-8")

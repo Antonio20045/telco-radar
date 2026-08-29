@@ -2122,6 +2122,26 @@ b,strong{font-weight:700}
 .gr-v-leer{font-size:13px;line-height:1.6;color:var(--ink-3);max-width:56ch;
   margin:10px 0 0}
 
+/* --- Gesamtexport ------------------------------------------------------ */
+/* Die Geraetespalte der SKU-Matrix bleibt beim Waagerechtscrollen stehen.
+   Mit zwei Anbietern war das entbehrlich; ab vier - und erst recht ab acht -
+   scrollt man sonst eine Zeile nach rechts und weiss nicht mehr, zu welchem
+   Geraet sie gehoert. `--paper` als Hintergrund ist Pflicht: ohne ihn
+   scheinen die Zellen darunter durch die klebende Spalte hindurch. */
+.gr-matrix-tabelle th[scope=row]{position:sticky;left:0;z-index:1;
+  background:var(--paper)}
+
+.gr-export{margin:34px 0 0}
+.gr-export-liste{list-style:none;margin:10px 0 0;padding:0}
+.gr-export-liste li{border-top:1px solid var(--rule);padding:11px 0}
+.gr-export-liste a{font-size:15px}
+.gr-export-meta{display:block;font-family:var(--sans);font-size:10.5px;
+  letter-spacing:.03em;color:var(--ink-4);margin-top:2px}
+.gr-export-was{display:block;font-size:12.5px;line-height:1.55;
+  color:var(--ink-3);max-width:62ch;margin-top:4px}
+.gr-export-hinweis{font-size:12px;line-height:1.55;color:var(--ink-4);
+  max-width:62ch;margin:12px 0 0}
+
 @media (max-width:720px){
   .gr-vergleich-tabelle{font-size:12.5px}
   .gr-v-geraet .szl{font-size:13.5px}

@@ -1446,3 +1446,109 @@ def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
     site = _baue(tmp_path, db=ohne, punkte=[])
     s = _suppe(site, "geraete.html")
     assert s.select_one(".gr-vergleich") is None
+
+
+# --------------------------------------------------------------------------
+# G4: die Wochenkarte rechnet, sie erzaehlt nicht (29.08.2026)
+# --------------------------------------------------------------------------
+
+def test_jede_zahl_der_wochenkarte_steht_so_im_datensatz(tmp_path):
+    """Der Auftrag verlangt: "Vollstaendig deterministisch, ohne LLM-Aufruf.
+    Jede Zahl im Text stammt aus dem Datensatz."
+
+    Bei einer gerechneten Sektion gibt es kein Modell, das etwas erfinden
+    koennte - die Zusicherung ist trotzdem pruefbar, und zwar so: jede Zahl,
+    die in den Saetzen steht, muss sich aus der Datenbank oder der
+    Preishistorie herleiten lassen. Erfundene Zahlen fielen hier auf."""
+    import re
+
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    abschnitt = s.select_one(".gr-auffaellig")
+    assert abschnitt is not None, "die Wochenkarte fehlt"
+    saetze = [li.get_text(" ", strip=True)
+              for li in abschnitt.select(".gr-saetze li")]
+    assert saetze, "kein einziger Satz"
+
+    # Alles, was aus den Daten belegbar ist: Preise, Deltas, Anzahlen.
+    erlaubt = set()
+    for e in _DB["listungen"]:
+        for feld in ("preis_ohne_vertrag", "erstpreis", "speicher_gb"):
+            if e.get(feld) is not None:
+                erlaubt.add(f"{float(e[feld]):.0f}")
+    for p in _PUNKTE:
+        if p.get("preis_ohne_vertrag") is not None:
+            erlaubt.add(f"{float(p['preis_ohne_vertrag']):.0f}")
+    # Zaehlwerte: hoechstens so viele wie Listungen bzw. Punkte.
+    erlaubt |= {str(n) for n in range(0, len(_DB["listungen"]) + 1)}
+    erlaubt |= {str(n) for n in range(0, len(_PUNKTE) + 1)}
+    # Differenzen zwischen zwei belegten Preisen.
+    preise = [float(p["preis_ohne_vertrag"]) for p in _PUNKTE
+              if p.get("preis_ohne_vertrag") is not None]
+    for a in preise:
+        for b in preise:
+            erlaubt.add(f"{abs(a - b):.0f}")
+
+    # Geprueft werden die MESSWERTE, nicht jede Ziffer: in "iPhone 16 Pro
+    # Max" steckt eine 16, die zum Namen gehoert und zu keiner Rechnung.
+    # Ein Messwert ist in diesen Saetzen daran erkennbar, dass er eine
+    # Einheit traegt (Euro) oder als Zaehlwert vor einem Substantiv steht.
+    gemessen = re.findall(r"(\d[\d.]*),\d\d\s*€|(\d[\d.]*)\.\d\d\s*€", " ".join(saetze))
+    werte = [a or b for a, b in gemessen]
+    assert werte, f"kein einziger Messwert in {saetze!r}"
+    for roh in werte:
+        zahl = roh.replace(".", "")
+        assert zahl in erlaubt, (
+            f"Wert {roh!r} in {saetze!r} laesst sich nicht aus dem "
+            f"Datensatz herleiten")
+
+
+def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
+                                                                     monkeypatch):
+    """Der Provider war beim Lauf vom 25.08. ohne Guthaben (HTTP 402). Die
+    ganze Geraeteseite - Wochenkarte, Vergleich, Export - muss trotzdem
+    stehen: sie ist gerechnet, nicht geschrieben.
+
+    Geprueft wird an der Wurzel: jeder ausgehende HTTP-Aufruf fliegt. Ein
+    Modellaufruf ginge durch dieselbe Tuer."""
+    import httpx
+
+    def _verboten(*a, **kw):
+        raise AssertionError("die Geraeteseite darf nichts abrufen")
+
+    monkeypatch.setattr(httpx, "get", _verboten, raising=False)
+    monkeypatch.setattr(httpx, "post", _verboten, raising=False)
+    monkeypatch.setattr(httpx.Client, "request", _verboten, raising=False)
+
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    assert s.select_one(".gr-auffaellig .gr-saetze li") is not None
+    assert s.select_one(".gr-vergleich") is not None
+
+
+def test_die_geraetespalte_der_matrix_bleibt_beim_scrollen_stehen(tmp_path):
+    """Ab vier Anbietern - und erst recht ab acht - scrollt man sonst eine
+    Zeile nach rechts und weiss nicht mehr, zu welchem Geraet sie gehoert."""
+    site = _baue(tmp_path)
+    css = (site / "style.css").read_text(encoding="utf-8")
+    assert ".gr-matrix-tabelle th[scope=row]" in css
+    block = css.split(".gr-matrix-tabelle th[scope=row]", 1)[1].split("}", 1)[0]
+    assert "position:sticky" in block and "left:0" in block
+    # Ohne eigenen Hintergrund scheinen die Zellen darunter durch.
+    assert "background:" in block
+
+
+def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
+    """Zielgruppe sind Manager ohne Technikhintergrund, und das Portal
+    schreibt sonst deutsche Daten. "2026-08-27" ist eine Maschinenschreibung.
+
+    Beim Ansehen der gerenderten Seite gefunden - zweimal: im Seitenkopf
+    ("Stand") und in der Export-Zeile."""
+    import re
+
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    for knoten in s.select(".page-date, .gr-export-meta, .gr-v-datum"):
+        text = knoten.get_text(" ", strip=True)
+        assert not re.search(r"\d{4}-\d{2}-\d{2}", text), \
+            f"ISO-Datum sichtbar: {text!r}"

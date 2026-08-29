@@ -584,6 +584,9 @@ def leer(fehler: str = "") -> dict:
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": []},
+        "alle_eintraege": [], "alle_punkte": [], "katalog_obj": None,
+        "export": {"stand": "", "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
+                   "historie": {"datei": "", "zeilen": 0, "bytes": 0}},
         "vergleich": {"hat_daten": False, "standard": "ohne_vertrag",
                       "ohne_vertrag": {"zeilen": [], "ohne_vodafone": [],
                                        "hat_daten": False, "hat_vodafone": False,
@@ -796,6 +799,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
                                   if p["speicher"]}),
         "auffaellig": auffaellig,
+        # Roh fuer den CSV-Gesamtexport (report/geraete_export.py). Er
+        # entsteht in `render_site`, weil er in `site/` schreibt und diese
+        # Funktion bewusst KEINEN Schreibzugriff hat.
+        "alle_eintraege": sichtbar,
+        "alle_punkte": punkte_alle,
+        "katalog_obj": katalog,
         # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die
         # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
         # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.

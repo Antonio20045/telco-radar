@@ -124,9 +124,25 @@ def test_vodafone_zwei_schreibweisen_ergeben_dieselbe_id(katalog, farben):
 
 def test_vodafone_quelle_zeigt_auf_die_menschenseite(katalog, farben):
     """Die Seite verspricht zu jeder Zahl einen nachpruefbaren Beleg -
-    niemand prueft eine JSON-Antwort mit Schluessel nach."""
+    niemand prueft eine JSON-Antwort mit Schluessel nach.
+
+    Und die Adresse muss ABSOLUT auf www.vodafone.de zeigen: die Nutzlast
+    nennt den Pfad relativ, der Collector loest ihn gegen die QUELLE auf -
+    also gegen api.vodafone.de. Im ersten Lauf standen deshalb 150
+    Quelllinks auf "https://api.vodafone.de/privat/handys/..." in der
+    Datenbank; Adressen, die es nicht gibt. Aufgefallen beim Lesen der
+    exportierten Tabelle, nicht in einem Test - deshalb steht er jetzt hier.
+    """
     saetze = vodafone.lies(_fixture("vodafone_virtualitem.json"))
-    assert all(s["url"].startswith("/privat/handys/") for s in saetze)
+    assert saetze
+    for s in saetze:
+        assert s["url"].startswith("https://www.vodafone.de/privat/handys/"), \
+            s["url"]
+    # Und er ueberlebt den urljoin des Collectors gegen die API-Adresse.
+    from urllib.parse import urljoin
+    api = ("https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/287"
+           "?businessTransaction=newContract")
+    assert urljoin(api, saetze[0]["url"]).startswith("https://www.vodafone.de/")
 
 
 def test_vodafone_kaputte_nutzlast_wirft_statt_leer_zurueckzugeben():

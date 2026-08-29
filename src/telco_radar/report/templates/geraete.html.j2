@@ -135,7 +135,7 @@
       <p class="page-kicker">Deutschland · Geräte</p>
       <h1>Was die anderen im Regal haben.</h1>
     </div>
-    {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand }}</span>{% endif %}
+    {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
   </div>
   <p class="page-lead">Diese Seite beantwortet drei Fragen: welche Geräte ein
   Wettbewerber überhaupt führt, wo ein Gerät im Preis steht – und wie lange es
@@ -264,6 +264,39 @@
       </table>
     </div>
   </details>
+</section>
+{% endif %}
+
+{# --- Gesamtexport ----------------------------------------------------- #}
+{# Die vierte Luecke der internen Loesung: dort gibt es Daten nur je
+   Einzelprodukt oder je Marke. Hier steht der ganze Bestand in EINER Datei.
+   Zeilenzahl und Groesse stehen NEBEN dem Link - ein leerer Download ist
+   der teuerste Weg herauszufinden, dass sich einer nicht lohnt. #}
+{% if geraete.export and geraete.export.aktuell.zeilen %}
+<section class="gr-export" id="export">
+  <h2 class="rubrik">Alles als Tabelle</h2>
+  <ul class="gr-export-liste">
+    <li>
+      <a href="{{ geraete.export.aktuell.datei }}" download>Aktueller Bestand (CSV)</a>
+      <span class="gr-export-meta">{{ geraete.export.aktuell.zeilen }} Zeilen ·
+        {{ (geraete.export.aktuell.bytes / 1024) | round | int }} KB{%
+        if geraete.export.stand %} · Stand {{ geraete.export.stand | date_de }}{% endif %}</span>
+      <span class="gr-export-was">Eine Zeile je Listung: Anbieter, Modell,
+        Speicher, Farbe, Preis, Preisart, Tarifreferenz, Verfügbarkeit,
+        Quelle, Abrufdatum.</span>
+    </li>
+    <li>
+      <a href="{{ geraete.export.historie.datei }}" download>Preishistorie (CSV)</a>
+      <span class="gr-export-meta">{{ geraete.export.historie.zeilen }} Zeilen ·
+        {{ (geraete.export.historie.bytes / 1024) | round | int }} KB</span>
+      <span class="gr-export-was">Eine Zeile je Listung und Messtag. Ein
+        unveränderter Preis erzeugt keine neue Zeile – die Kurve ist eine
+        Treppe, keine Messreihe.</span>
+    </li>
+  </ul>
+  <p class="gr-export-hinweis">UTF-8 mit BOM, Semikolon als Trenner,
+  Dezimalkomma – so öffnet Excel im deutschen Gebietsschema die Datei per
+  Doppelklick, ohne Importassistent.</p>
 </section>
 {% endif %}
 

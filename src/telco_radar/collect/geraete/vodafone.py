@@ -134,7 +134,17 @@ def lies(text: str, url: str = "") -> list[dict]:
     # Schnittstellenaufruf waere als Quellenlink wertlos: die Seite
     # verspricht zu jeder Zahl einen nachpruefbaren Beleg, und niemand
     # prueft eine JSON-Antwort mit Schluessel nach.
+    #
+    # ABSOLUT, und zwar auf www.vodafone.de. Die Nutzlast nennt den Pfad
+    # relativ ("/privat/handys/iphone-15.html"), und der Collector loest ihn
+    # gegen die QUELLE auf - das ist hier api.vodafone.de. Im ersten Lauf
+    # standen deshalb 150 Quelllinks auf "https://api.vodafone.de/privat/
+    # handys/..." in der Datenbank und im CSV-Export: Adressen, die es nicht
+    # gibt. Kein Test hat das gemeldet; aufgefallen ist es beim Lesen der
+    # exportierten Tabelle.
     hubpage = str(_pfad(knoten, "hubpage", "href") or "").strip()
+    if hubpage.startswith("/"):
+        hubpage = "https://www.vodafone.de" + hubpage
 
     out: list[dict] = []
     for atom in (knoten.get("atomics") or []):
