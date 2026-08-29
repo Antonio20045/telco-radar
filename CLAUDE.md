@@ -308,6 +308,7 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
 | `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` — **Preiswahrheit und Kuerzung** (29.08.2026, abends) | „Kann ich der Zahl trauen, und finde ich sie?" | Die Seite ist **5254 statt 18299 px** lang. Der Vergleich zeigt nur Zeilen mit ≥ 3 % **oder** ≥ 15 € Abstand (ODER, nicht UND: bei 200 € sind 15 € viel und 3 % wenig, bei 2000 € umgekehrt), alles Uebrige steht hinter Aufklappern — SKU-Matrix, 65 Varianten, Ausfallgruende, Vollansicht. Die Grafik zeigt hoechstens **12 Baender je Spalte** und als Standard nur die aktuelle Generation JE BAUREIHE. Nichts ist geloescht |
 | `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `uebersetzung/<id>.html` (nicht verlinkt) | „Was steht da eigentlich?" | Die **vollständige** deutsche Fassung eines fremdsprachigen Artikels. Kein Nav-Eintrag: erreichbar über den roten Link der Meldungskarte. Oben und ohne Scrollen: „Maschinelle Übersetzung", die Ausgangssprache und der Link zum Original — die Übersetzung tritt NEBEN das Original, nicht an seine Stelle. Dateiname ist die `Item.id` (SHA-256 über die normalisierte URL), damit ein Archivbericht in einem Jahr noch trifft |
@@ -1270,6 +1271,68 @@ Website spricht.
   dessen Alleinstellungsmerkmal der Belegzwang ist. *Archiv-Dialog (RAG)* —
   braucht einen Dienst zur Laufzeit; die Website ist eine Static Site ohne
   Backend, und genau das ist die Bedingung dafür, dass sie nie einschläft.
+- **Ein Zustand ist eine PREISDIMENSION, kein Etikett.** Neu, refurbished
+  und B-Ware sind drei verschiedene Preise. Sie stehen in `sku_id` als eigene
+  Dimension, und Vergleich, Preisgrafik und die Preisspanne der SKU-Matrix
+  zeigen ausschliesslich `neu` (`VERGLEICHBARE_ZUSTAENDE`); Export und
+  Variantenzeile zeigen alles, gekennzeichnet. Ein Zustand, der sich nicht
+  bestimmen laesst, ist `unbekannt` und faellt heraus — er wird NICHT als neu
+  angenommen. Und die Erkennung liest ALLE Signale: o2 schreibt sie in den
+  Titel („(gebraucht)" ODER „(erneuert)"), manche Quellen nur in die Farbe
+  („grau erneuert").
+- **`generation` ist die Nummer INNERHALB einer Baureihe, kein Jahrgang.**
+  Samsungs Galaxy A57 traegt 57, die Galaxy S26 traegt 26, das Z Fold8 traegt
+  8. Je HERSTELLER verglichen gewinnt die A-Reihe: „nur aktuelle Generation"
+  zeigte am 29.08.2026 drei Galaxy A57 und keine einzige S26. Umgekehrt waeren
+  „Redmi 17", „Redmi Note 17" und „Xiaomi 17T" EINE Generation. Gerechnet wird
+  deshalb je (Hersteller, **Baureihe**) — `serie_aus_modell()`.
+- **Der niedrigste Preis ist der wahrscheinlichste Fehler.** Jede
+  `min`-Auswahl braucht einen Filter davor. `report/geraete_pruefung.py`
+  laeuft vor dem Rendern und sortiert aus, was sich SELBST widerspricht
+  (Doppelpreis, Speicherinversion, veralteter Zustand im Store). Ein
+  **Ausreisser** widerspricht dem MARKT und wird gemeldet, nicht geloescht —
+  ein Discounter 60 % unter dem Median ist das Signal dieser Seite, nicht ihr
+  Fehler.
+- **Ein Farbaufschlag ist kein Doppelpreis.** Am 29.08.2026 gemessen: die
+  echten Fehler lagen bei 53 und 112 Prozent Spanne, echte Farbpreise bei
+  5,7 bis 21,6. Eine Regel, die alle verwirft, loescht wahre Preise —
+  deshalb `SPANNE_GRENZE = 0.30`, und jeder Fall wird berichtet, auch der
+  behaltene.
+- **Eine Datenqualitaetsheuristik darf keine Navigation schalten.** Die
+  Veroeffentlichungsschwelle hing kurzzeitig an der Plausibilitaetspruefung;
+  ein Anbieter mit weiten Farbpreisen haette den Eintrag „Geraete" auf JEDER
+  Seite verschwinden lassen, ohne Fehler und ohne Warnung. Sie rechnet gegen
+  den BESTAND (`sichtbar`), nie gegen die gefilterte Menge.
+- **Die Positionskarte kappt je HERSTELLER *und* je LADEN, einmal fuer beide
+  Ansichten.** Jede der drei Bedingungen war einzeln schon die falsche: nur je
+  Hersteller gekappt trug o2s Spalte in der ANBIETERansicht 23 Baender (sechs
+  Hersteller in einer Spalte); nur je Spalte gekappt zeigten die zwei
+  Ansichten verschiedene Geraete und `pruefe_portal.py` Kriterium 11 fiel
+  durch; und faellt eine Spalte GANZ heraus, wird die Legende falsch (ALDI
+  TALK verlor seine zwei Listungen, Nothing fiel aus der Herstelleransicht).
+  Die Rettung **verdraengt** deshalb den schwaechsten Eintrag, statt
+  anzuhaengen — angehaengt stand Samsung mit 13 statt 12 Baendern da.
+- **Der Generationen-Filter ist NICHT der Standard, und das ist gemessen.**
+  Kurz war er es: er blendete ALDI TALKs einzige Listung aus und stellte eine
+  beschriftete, LEERE Ladenspalte unter eine Legende, die vier Anbieter nennt;
+  und weil in `app.js` gefiltert und im HTML ausgewaehlt wird, las man ohne
+  JavaScript „nur aktuelle Generation" ueber einer Grafik mit allen Punkten.
+  Das Aufraeumen leistet die Kappung, und die faellt serverseitig.
+- **Die Seitenhoehe muss STRUKTURELL begrenzt sein, nicht nur heute knapp
+  unter der Grenze.** `geraete_vergleich.UEBERSICHT_MAX_ZEILEN` ist gerechnet:
+  eine Zeile misst 71 px, die Seite steht bei 5211, die Grenze bei 5400. Ohne
+  den Deckel haengt die Hoehe am Datenbestand, und zwei zusaetzliche Zeilen
+  kippen den Abnahmetest, ohne dass sich eine Zeile Code aendert — dieselbe
+  Fehlerklasse wie die Datums-Zeitbomben, nur ueber den Bestand statt ueber
+  die Uhr.
+- **Jede Zahl der Kartenlegende meint die GEZEICHNETE Menge.** Seit die
+  Karte kappt, sind „Preispunkte", „Listungen" und „Geraete" andere Zahlen
+  als die der Bilanz. Ungekappt gerechnet stand dort „153 Preispunkte aus
+  348 Listungen", gezeichnet wurden 83 aus 207.
+- **Die Kuerze der Geraeteseite haengt an zugeklappten `<details>`.** Ein
+  versehentliches `open` macht sie von 5254 wieder auf 18299 px lang, ohne
+  dass sich eine Zeile Inhalt aendert — `tests/test_geraete_hoehe_browser.py`
+  misst beides im echten Chromium.
 - **Die ID eines Geräts kommt aus dem KATALOG, nie aus dem Titel.** Händler
   benennen denselben Artikel ständig um („iPhone 17 Pro Max 256GB Titan" →
   „Apple iPhone 17 Pro Max 5G 256 GB Titannatur"). Aus einem Titel-Hash
@@ -1623,6 +1686,67 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
 ## 8a. Der nächste Auftrag
+
+> **Zuletzt erledigt (29.08.2026, abends): Preiswahrheit der Geräteseite
+> (W1–W3).** Auftragsgrundlage: „Geräteradar — Evaluation vom 29. August
+> 2026". Alle Messungen und die offenen Punkte:
+> **`outputs/geraeteradar-wahrheit-2026-08-29.md`** — dort weiterlesen.
+> Stand danach: **2078 Tests** (vorher 1972), `pruefe_portal.py`
+> **16 bestanden / 0 durchgefallen**. Seitenhöhe **18299 → 5211 px**.
+>
+> **Die Ursache war ein Wort.** o2 kennzeichnet dieselbe Gebrauchtstrecke in
+> ZWEI Schreibweisen — „(gebraucht)" und „(erneuert)". `_ZUSTAENDE` kannte
+> nur die erste; acht von zehn Geräten waren richtig erkannt, die zwei mit
+> „(erneuert)" liefen als Neugerät mit und unterboten mit ihrem
+> Gebrauchtpreis den Vodafone-Neupreis. „wie neu" stand tot in derselben
+> Liste (Zwei-Wort-String gegen eine Wortmenge geprüft), „renewed" fehlte.
+>
+> **Drei Zahlen der Evaluation reproduzieren NICHT** und sind korrigiert: der
+> iPhone-16-Fall war richtig erkannt (der Refurbished-Filter griff), es sind
+> 5 Doppelpreise statt 12, und die Speicherinversion beim S24 Ultra ist
+> keine — die 512-GB-Zeile ist refurbished. Über den ganzen Bestand: **0
+> Inversionen**, sobald der Zustand im Schlüssel steht.
+>
+> **Neu: `report/geraete_pruefung.py`** läuft vor jedem Rendern. Aussortiert
+> wird nur, was sich SELBST widerspricht (Doppelpreis, Speicherinversion,
+> veralteter Zustand im Store); ein Ausreißer widerspricht dem MARKT und wird
+> gemeldet statt gelöscht — ein Discounter 60 % unter dem Median ist das
+> Signal dieser Seite. Die 30-%-Spanne ist an echten Daten kalibriert:
+> Fehler lagen bei 53 und 112 Prozent, echte Farbpreise bei 5,7 bis 21,6.
+>
+> **`generation` ist die Nummer INNERHALB einer Baureihe, kein Jahrgang.**
+> Samsungs Galaxy A57 trägt 57, die S26 trägt 26, das Z Fold8 trägt 8. Je
+> Hersteller verglichen gewinnt die A-Reihe — der neue Standard „nur aktuelle
+> Generation" zeigte drei Galaxy A57 und keine einzige S26. `serie_aus_modell()`
+> liest die Reihe aus dem Modellnamen; gezählt und gefiltert wird seitdem je
+> (Hersteller, Baureihe). **Das hat nur das ANSEHEN der Grafik gezeigt, alle
+> Tests waren grün.**
+>
+> **Zwanzig Befunde des `diff-reviewer` über drei Durchgänge, die teuersten:** (1) diese
+> Sitzung baute einen `UnboundLocalError` in `lies_listung` ein — niemand
+> fängt ihn, ein Satz mit leerer Farbe hätte den ganzen Nachtlauf beendet;
+> (2) die Veröffentlichungsschwelle hing plötzlich an der
+> Plausibilitätsprüfung und hätte den Navigationseintrag stumm abschalten
+> können; (3) die Legende sagte „153 Preispunkte aus 348 Listungen",
+> gezeichnet wurden 339; (4) der Prüfbericht zeigte die Zahl der Befunde, wo
+> die der Listungen stand.
+>
+> **OFFEN daraus:**
+> 1. **Die rotierten Achsenlabels bleiben** (54 statt 114). Ein waagerechter
+>    Modellname braucht ~90 px, die Fläche gibt 1080 her — es passen ZWÖLF
+>    Bänder insgesamt, nicht zwölf je Spalte. Die Vorgabe wörtlich zu nehmen
+>    heißt, die Grafik auf zwei Geräte je Hersteller zu kürzen: eine
+>    Produktentscheidung, keine Codezeile. Die PUNKTform erfüllt das
+>    Kriterium inzwischen (68 % bzw. 79 % beschriftet).
+> 2. **Die zwei falsch gespeicherten o2-Zustände stehen bis zum nächsten
+>    Nachtlauf so in `geraete_db.json`** — draußen aus Vergleich und Grafik,
+>    aber im Store. Danach nachsehen, ob `zustand_veraltet` im Prüfbericht
+>    auf 0 fällt.
+> 3. **„pistachio" gegen „pistachio bk"** ist ungeklärt: zwei o2-URLs, 144 €
+>    Abstand, beide `hw-only`. Der Prüfer meldet es, statt dass der Vergleich
+>    blind das Minimum nimmt.
+> 4. **W4 (Telekom, Ceconomy, expert, 1&1) ist nicht angefasst** — der
+>    Auftrag stellt ihn hinter W1–W3.
 
 > **Zuletzt erledigt (29.08.2026): Geräteradar, Ausbaustufe 2 (G0–G4).**
 > Auftragsgrundlage: „Geräteradar, Ausbaustufe 2" (28.08.2026). Alle

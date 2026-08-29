@@ -839,9 +839,11 @@ var TelcoFrage = (function () {
   // Der feste Teil der Legende. Der Satz "Ohne Etikett bleiben N Punkte"
   // gilt je FLAECHE und wird unten nachgezogen - stuende er hier mit drin,
   // haenge er beim ersten Umschalten ein zweites Mal daran.
-  var legendeRoh = legende
-    ? legende.textContent.split('Ohne Etikett bleiben')[0].replace(/\s+$/, '')
-    : '';
+  // Der veraenderliche Teil hat ein eigenes Element. An einer Zeichenkette
+  // geschnitten ("Ohne Etikett bleiben") verfehlte der Schnitt den Satz,
+  // sobald er je Darstellungsform anders anfaengt - dann stand die Legende
+  // doppelt auf der Seite.
+  var legendeZusatz = document.getElementById('gr-legende-zusatz');
   var felder = {
     segment: document.getElementById('gr-segment'),
     speicher: document.getElementById('gr-speicher'),
@@ -930,21 +932,45 @@ var TelcoFrage = (function () {
       }
       baender[b].classList.toggle('gr-band--aus', !offen);
     }
-    if (legende && flaeche) {
+    if (legendeZusatz && flaeche) {
       // ALLE Zahlen kommen aus der SICHTBAREN Flaeche. Vorher standen hier
       // drei verschiedene Gesamtzahlen: eine aus der Vorlage (alle Punkte),
       // eine gerechnete (Punkte durch Flaechen) und die der jeweils anderen
       // Darstellungsform - keine davon galt fuer das Bild, das man ansah.
       var gesamt = flaeche.getAttribute('data-punkte');
       var ohne = parseInt(flaeche.getAttribute('data-etiketten-verborgen') || '0', 10);
-      var zusatz = ohne
-        ? ' Ohne Etikett bleiben ' + ohne + ' Punkte – dort ist die Spalte voll;'
-          + ' der Punkt steht auf seinem Preis.'
-        : '';
+      // Der Satz haengt an der FORM. In der Punktform ist ein Punkt ohne
+      // Chip wirklich ein Punkt ohne Beschriftung. In der Bandform ist die
+      // Zahl am Bandende gemeint - das Band traegt seinen Modellnamen unter
+      // der Achse, und seine Hoehe IST die Preisspanne auf einer
+      // beschrifteten Achse. "Ohne Etikett" waere dort eine Falschaussage
+      // ueber eine Beschriftung, die es gar nicht geben soll.
+      var zusatz = '';
+      if (ohne && zustand.form === 'band') {
+        zusatz = ' Die Preiszahl steht nur dort, wo sie neben das Band passt'
+          + ' (' + (parseInt(gesamt, 10) - ohne) + ' von ' + gesamt + ');'
+          + ' die Höhe des Bandes ist die Spanne, den genauen Wert zeigt ein'
+          + ' Klick.';
+      } else if (ohne) {
+        zusatz = ' Ohne Etikett bleiben ' + ohne + ' Punkte – dort ist die'
+          + ' Spalte voll; der Punkt steht auf seinem Preis.';
+      }
+      // Eine gekappte Spalte muss sagen, dass sie gekappt ist. Eine Grafik,
+      // die stillschweigend zwoelf von dreissig Modellen zeigt, behauptet
+      // eine Vollstaendigkeit, die sie nicht hat.
+      // ANGEBOTE, nicht Modelle: gezaehlt werden (Modell, Geraet, Laden) -
+      // dasselbe Geraet bei drei Laeden sind drei. Und sie stehen NICHT in
+      // der Tabelle unter der Grafik: die entsteht aus denselben
+      // gezeichneten Punkten. Vollstaendig sind sie nur im CSV-Export.
+      var weg = parseInt(flaeche.getAttribute('data-baender-uebersprungen') || '0', 10);
+      if (weg) {
+        zusatz += ' ' + weg + ' weitere Angebote passen nicht in die Spalten;'
+          + ' sie stehen vollständig in der CSV-Tabelle.';
+      }
       if (seg || sp || gen) {
         zusatz += ' Gefiltert: ' + sichtbar + ' von ' + gesamt + ' sichtbar.';
       }
-      legende.textContent = legendeRoh + zusatz;
+      if (legendeZusatz) legendeZusatz.textContent = zusatz;
     }
   }
 
@@ -1025,6 +1051,14 @@ var TelcoFrage = (function () {
     if (!sektion) return;
     var knoepfe = leiste.querySelectorAll('.gr-filter-knopf');
 
+    // Die Sektion enthaelt seit dem 29.08.2026 ZWEI Tabellen: die Uebersicht
+    // und die Vollansicht im Aufklapper. Gefiltert wird in beiden, GEZAEHLT
+    // wird nur die Uebersicht - sonst meldet der Filter "es gibt Treffer",
+    // waehrend alle davon zugeklappt im Aufklapper stehen, und der Leser
+    // steht vor einer leeren Tabelle mit Kopfzeile ohne Erklaerung. Genau
+    // den Fall soll `.gr-v-leer` abfangen.
+    var uebersicht = sektion.querySelector('.gr-vergleich-scroll');
+
     function anwenden(typ) {
       var zeilen = sektion.querySelectorAll('.gr-v-zeile');
       var sichtbar = 0;
@@ -1032,7 +1066,7 @@ var TelcoFrage = (function () {
         var typen = (zeilen[i].getAttribute('data-typen') || '').split(' ');
         var passt = typ === 'alle' || typen.indexOf(typ) >= 0;
         zeilen[i].hidden = !passt;
-        if (passt) sichtbar++;
+        if (passt && uebersicht && uebersicht.contains(zeilen[i])) sichtbar++;
         var naechste = zeilen[i].nextElementSibling;
         if (naechste && naechste.classList.contains('gr-v-alle')) {
           naechste.hidden = !passt;
@@ -1040,9 +1074,8 @@ var TelcoFrage = (function () {
       }
       // Eine leere Tabelle ohne Satz sieht aus wie ein Fehler.
       var leer = sektion.querySelector('.gr-v-leer');
-      var scroll = sektion.querySelector('.gr-vergleich-scroll');
       if (leer) leer.hidden = sichtbar > 0;
-      if (scroll) scroll.hidden = sichtbar === 0;
+      if (uebersicht) uebersicht.hidden = sichtbar === 0;
     }
 
     Array.prototype.forEach.call(knoepfe, function (knopf) {

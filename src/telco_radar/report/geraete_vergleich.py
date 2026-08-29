@@ -39,6 +39,49 @@ from __future__ import annotations
 
 from typing import Optional
 
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+
+# Ab wann ein Preisunterschied ein BEFUND ist und kein Rundungsrauschen.
+# Am 29.08.2026 standen 62 Zeilen auf der Seite, davon 36 "niemand
+# guenstiger" und Dutzende mit -0,90 EUR (freenet fuehrt dasselbe Geraet fuer
+# 1199,00 statt 1199,90). Wer wissen will, wo wir teurer sind, scrollte durch
+# zwanzig Bildschirme, um sechs Zeilen zu finden.
+#
+# ODER, nicht UND: bei einem 200-Euro-Geraet sind 15 Euro viel und 3 Prozent
+# wenig, bei einem 2000-Euro-Geraet umgekehrt. Eine Grenze allein liesse je
+# nach Preisklasse das Falsche durch.
+#
+# Nichts wird geloescht - `zeilen` bleibt die Vollansicht, `rest` steht auf
+# der Seite hinter einem Aufklapper.
+WESENTLICH_PROZENT = 3.0
+WESENTLICH_EURO = 15.0
+
+# Wie viele Zeilen die Uebersicht hoechstens zeigt. Ohne diesen Deckel haengt
+# die Seitenhoehe am Datenbestand: eine Zeile ist 71 px hoch, die Seite hat
+# 146 px Luft unter der Sechs-Bildschirm-Grenze - zwei zusaetzliche
+# wesentliche Zeilen kippten den Abnahmetest, ohne dass sich eine Zeile Code
+# aendert. Dieselbe Fehlerklasse wie die Datums-Zeitbomben in CLAUDE.md §6,
+# nur ueber den Datenbestand statt ueber die Uhr.
+#
+# Gekappt wird am UNTEREN Ende: sortiert ist nach Abstand, die gestrichenen
+# Zeilen sind also die mit dem kleinsten Vorteil. Sie stehen vollstaendig in
+# der Vollansicht.
+#
+# Die Zahl ist gerechnet, nicht gegriffen: eine Zeile misst 71 px, die Seite
+# steht bei 5211 px und die Grenze bei sechs Bildschirmen zu 900 px.
+# Vierzehn Zeilen sind damit die Obergrenze, die `test_die_seite_ist_kuerzer_
+# als_sechs_bildschirme` auch dann haelt, wenn der Bestand waechst: heute
+# stehen zwoelf Zeilen, zwei weitere kosten 142 px, und 5211 + 142 < 5400.
+UEBERSICHT_MAX_ZEILEN = 14
+
+
+def ist_wesentlich(zeile: dict) -> bool:
+    """Traegt diese Zeile eine Aussage, oder ist sie Rauschen?"""
+    if not zeile.get("bester"):
+        return False
+    return ((zeile.get("prozent") or 0) >= WESENTLICH_PROZENT
+            or (zeile.get("differenz") or 0) >= WESENTLICH_EURO)
+
 # Wie in `geraete_view`: Vodafone ist die eigene Referenz, kein Wettbewerber.
 EIGEN = ("vodafone",)
 
@@ -141,6 +184,16 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
         preis, art = _preis(e)
         if preis is None or art != preisart:
             continue
+        # W1.1, Evaluation vom 29.08.2026: der Vergleich zeigt NUR
+        # Neugeraete. Bis dahin bildete jeder Zustand seine eigene Zeile -
+        # arithmetisch richtig, auf der Seite aber nicht zu unterscheiden,
+        # und ein falsch erkannter Zustand schlug voll durch: ein o2-Geraet
+        # fuer 577 EUR ("grau erneuert") stand als Sieger gegen Vodafones
+        # Neupreis von 849,90 EUR. "unbekannt" faellt aus demselben Grund
+        # heraus - ein nicht bestimmter Zustand wird nicht als neu
+        # angenommen. Beides bleibt im CSV-Export und in der SKU-Ansicht.
+        if (e.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
+            continue
         schluessel = (e.get("device_id"), e.get("speicher_gb"),
                       e.get("zustand") or "neu")
         gruppen.setdefault(schluessel, []).append(e)
@@ -219,9 +272,22 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
     ohne_vodafone.sort(key=lambda z: (-z["anzahl"], z["modell"]))
 
     mit_vorteil = [z for z in zeilen if z["anzahl_guenstiger"]]
+    # Eine Zeile ist eine (Modell, Speicher)-Kombination, KEIN Geraet: das
+    # iPhone 17 mit 256 und mit 512 GB sind zwei Zeilen und ein Geraet. Als
+    # "62 Geraete im Vergleich" stand darueber eine Zahl, die groesser war
+    # als die 59 beobachteten Geraete daneben - dieselbe Fehlerklasse wie
+    # "267 Geraete neu im Regal" (W3), nur eine Sektion weiter.
+    geraete = len({z["device_id"] for z in zeilen})
+    alle_wesentlich = [z for z in zeilen if ist_wesentlich(z)]
+    wesentlich = alle_wesentlich[:UEBERSICHT_MAX_ZEILEN]
+    gezeigt = {id(z) for z in wesentlich}
+    rest = [z for z in zeilen if id(z) not in gezeigt]
     return {
         "preisart": preisart,
         "zeilen": zeilen,
+        "geraete": geraete,
+        "wesentlich": wesentlich,
+        "rest": rest,
         "mit_vorteil": len(mit_vorteil),
         "ohne_vorteil": len(zeilen) - len(mit_vorteil),
         "ohne_vodafone": ohne_vodafone[:15],

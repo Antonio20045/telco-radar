@@ -53,6 +53,8 @@ PROPORTIONALE (dort zaehlen Schlitze, nicht Punktdichte).
 """
 from __future__ import annotations
 
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+
 # Die Zeichenflaeche. 1180 = 1240 (--wrap) - 2x28 (Polster), also auf dem
 # Schreibtisch 1:1 ohne Herunterskalieren.
 BREITE = 1180
@@ -100,6 +102,15 @@ BAND_STUFE_MIN = 6.0
 # Der gedrehte Modellname beginnt UNTER der Spaltenbeschriftung, die bei
 # achse_y + 16 sitzt. Wer ihn hoeher setzt, laesst beide uebereinanderliegen.
 BAND_NAME_DY = 32.0
+
+# Hoechstens so viele Baender je Spalte. Am 29.08.2026 trug die Samsung-Spalte
+# 38 Baender und die Apple-Spalte 30; ein Schlitz war damit acht Pixel breit,
+# und darin steht kein Modellname mehr - 114 gedrehte, abgeschnittene
+# Beschriftungen in einem 200 px hohen Buchstabenstreifen, den niemand liest.
+#
+# Die Bandform war die richtige Wahl, ihr fehlte nur eine Obergrenze. Sechs
+# Hersteller mal alle Generationen mal vier Anbieter passen in keine Grafik.
+BAND_MAX_JE_SPALTE = 12
 
 FORM_CHIP, FORM_BAND = "chip", "band"
 FORMEN = (FORM_BAND, FORM_CHIP)
@@ -159,6 +170,14 @@ def aggregiere(punkte: list, preisart: str = "ohne_vertrag") -> list:
     gruppen: dict[tuple, list] = {}
     for p in punkte:
         if p.get("preis") is None:
+            continue
+        # Dieselbe Regel wie in der Vergleichstabelle (W1.1, 29.08.2026): die
+        # Karte zeigt NUR Neugeraete. Sie ordnet Punkte nach Preis auf einer
+        # Achse, und die Y-Achse traegt keine Zustandsangabe - ein
+        # Gebrauchtpreis liest sich dort wie ein guenstiger Neupreis. Der
+        # Zustand bleibt trotzdem im Schluessel unten: er ist die zweite
+        # Sicherung, falls diese Zeile jemand lockert.
+        if (p.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
         laden = p.get("shop") or p.get("anbieter") or ""
         # `zustand` MUSS in den Schluessel. Ohne ihn faellt "iPhone 15 256 GB
@@ -365,9 +384,150 @@ def _punkt(p: dict, cx: float, cy: float, beschriftet: bool, spalte: str,
 # Variante A - Preisbaender
 # --------------------------------------------------------------------------
 
+def _kappe(punkte: list) -> set:
+    """Welche (Modell, Geraet, Laden) duerfen ein Band bekommen?
+
+    Gedeckelt wird JE HERSTELLER **und** JE LADEN, und die Auswahl faellt
+    EINMAL fuer beide Ansichten. Alle drei Bedingungen zusammen sind noetig,
+    und jede einzelne war schon einmal die falsche:
+
+    * Nur je Hersteller gedeckelt hielt die Herstelleransicht ihre zwoelf,
+      waehrend in der Anbieteransicht sechs Hersteller in DERSELBEN
+      Ladenspalte landeten - gemessen am 29.08.2026: o2 23 Baender,
+      Vodafone 21. Eine Spalte mit 23 Schlitzen gibt jedem 20 px, und darin
+      steht kein Modellname mehr. Das ist genau der Befund, der die
+      Obergrenze ausgeloest hat, nur eine Ansicht weiter.
+    * Nur je Spalte gedeckelt behielten die zwei Ansichten VERSCHIEDENE
+      Geraete - `pruefe_portal.py` Kriterium 11 verlangt gleich viele Punkte
+      je Ansicht, und zwei Ansichten derselben Daten sollten ohnehin dieselben
+      Daten zeigen.
+    * Ein Laden, der durch die Kappung ganz herausfaellt, macht die Legende
+      falsch: ALDI TALK mit zwei Listungen verlor sonst beide an einen
+      Hersteller mit zwoelf besser gereihten, und die Legende meldete drei
+      Anbieter, waehrend die Seite daneben vier auswies.
+
+    Deshalb ein GREEDY-Durchgang: alle Kandidaten nach Rang, jeder wird
+    genommen, solange weder seine Herstellerspalte noch seine Ladenspalte
+    voll ist. Danach bekommt jeder noch unvertretene Laden seinen besten
+    Kandidaten - und dieser eine Platz zaehlt gegen beide Deckel, damit die
+    Rettung die Grenze nicht wieder reisst (sie tat es: Samsung stand mit 13
+    Baendern da).
+
+    Der Rang: zuerst die aktuelle Generation der Baureihe, dann der juengere
+    Jahrgang, dann der hoehere Preis. Alphabetisch gekappt fiele "Galaxy S26
+    Ultra" heraus, weil "Galaxy A17" vorne steht.
+    """
+    beste: dict[tuple, tuple] = {}
+    for p in punkte:
+        if p.get("preis") is None:
+            continue
+        schluessel = (p.get("modell") or "", p.get("device_id") or "",
+                      p.get("shop") or "")
+        rang = (0 if p.get("aktuelle_generation") else 1,
+                -(p.get("generation") or 0), -p["preis"])
+        if schluessel not in beste or rang < beste[schluessel][0]:
+            beste[schluessel] = (rang, p.get("hersteller") or "")
+
+    erlaubt: set = set()
+    voll_hersteller: dict[str, int] = {}
+    voll_laden: dict[str, int] = {}
+
+    def nimm(schluessel: tuple, hersteller: str) -> None:
+        erlaubt.add(schluessel)
+        voll_hersteller[hersteller] = voll_hersteller.get(hersteller, 0) + 1
+        voll_laden[schluessel[2]] = voll_laden.get(schluessel[2], 0) + 1
+
+    # Deterministisch: der Schluessel bricht den Gleichstand, sonst ergaebe
+    # jeder Lauf ein anderes SVG und damit einen Diff, der nichts bedeutet.
+    for schluessel, (rang, hersteller) in sorted(beste.items(),
+                                                 key=lambda kv: (kv[1][0], kv[0])):
+        if voll_hersteller.get(hersteller, 0) >= BAND_MAX_JE_SPALTE:
+            continue
+        if voll_laden.get(schluessel[2], 0) >= BAND_MAX_JE_SPALTE:
+            continue
+        nimm(schluessel, hersteller)
+
+    # Die Rettung VERDRAENGT, sie haengt nicht an. Angehaengt riss sie beide
+    # Deckel wieder auf - gemessen: Samsung stand mit 13 Baendern da, weil
+    # ALDI TALKs einzige Listung ein Samsung ist.
+    #
+    # Gerettet wird auf BEIDEN Achsen. Nur Laeden zu retten liess "Nothing"
+    # ganz aus der Herstelleransicht fallen, sobald der Ladendeckel band -
+    # dieselbe Luecke, nur eine Achse weiter. Eine Spalte, die es im Bestand
+    # gibt und in der Grafik nicht, ist eine stille Falschaussage ueber den
+    # Markt.
+    for achse in (2, None):
+        gruppe_von = ((lambda k: k[achse]) if achse is not None
+                      else (lambda k: beste[k][1]))
+        vertreten = {gruppe_von(k) for k in erlaubt}
+        voll = voll_laden if achse is not None else voll_hersteller
+        for schluessel in sorted(beste, key=lambda k: (beste[k][0], k)):
+            gruppe = gruppe_von(schluessel)
+            if gruppe in vertreten:
+                continue
+            hersteller = beste[schluessel][1]
+            laden = schluessel[2]
+            # Beide Deckel muessen Platz machen, nicht nur der eigene.
+            for topf, name in ((voll_hersteller, hersteller),
+                               (voll_laden, laden)):
+                if topf.get(name, 0) < BAND_MAX_JE_SPALTE:
+                    continue
+                opfer = [k for k in erlaubt
+                         if (beste[k][1] if topf is voll_hersteller else k[2]) == name
+                         and sum(1 for a in erlaubt if a[2] == k[2]) > 1
+                         and sum(1 for a in erlaubt
+                                 if beste[a][1] == beste[k][1]) > 1]
+                if not opfer:
+                    break
+                weg = max(opfer, key=lambda k: (beste[k][0], k))
+                erlaubt.discard(weg)
+                voll_hersteller[beste[weg][1]] -= 1
+                voll_laden[weg[2]] -= 1
+            if (voll_hersteller.get(hersteller, 0) >= BAND_MAX_JE_SPALTE
+                    or voll_laden.get(laden, 0) >= BAND_MAX_JE_SPALTE):
+                continue
+            nimm(schluessel, hersteller)
+            vertreten.add(gruppe)
+    return erlaubt
+
+
+def gekappt(punkte: list) -> list:
+    """Die Punkte, die wirklich gezeichnet werden - fuer beide Formen gleich.
+
+    Oeffentlich, weil `report/geraete_view.py` dieselbe Menge fuer Legende
+    und Bilanz braucht: ungekappt gerechnet meldete die Legende 153
+    Preispunkte, waehrend die Grafik 82 zeichnete.
+    """
+    # Dieselbe Vorfilterung wie in `karte()`. Ohne sie liefe ein Punkt ohne
+    # Preis in `-p["preis"]` und riss `aufbereiten` - `html.py` faengt das
+    # ab, und die Geraeteseite fiele stumm auf `leer()`, samt
+    # Navigationseintrag. Zwei Eingaenge in dieselbe Regel muessen dieselbe
+    # Vorbedingung pruefen.
+    brauchbar = [p for p in punkte if p.get("preis") is not None]
+    if not brauchbar:
+        return brauchbar
+    erlaubt = _kappe(brauchbar)
+    return [p for p in brauchbar
+            if (p.get("modell") or "", p.get("device_id") or "",
+                p.get("shop") or "") in erlaubt]
+
+
 def _form_band(punkte: list, spalten: list, py, spaltenfeld: str,
                achse_y: float) -> tuple:
     gezeichnet, baender, verborgen = [], [], 0
+    # Gekappt wird je HERSTELLER und EINMAL fuer beide Ansichten - nicht je
+    # Spalte. Je Spalte gerechnet behielte die Herstelleransicht (Spalte =
+    # Hersteller) andere Geraete als die Anbieteransicht (Spalte = Laden),
+    # und zwei Ansichten derselben Daten zeigten verschiedene Punkte. Genau
+    # das prueft `scripts/pruefe_portal.py` Kriterium 11 seit dem 10.08.2026:
+    # "gleich viele Punkte je Ansicht".
+    #
+    # Gekappt wird nach RANG, nicht nach Listenposition: zuerst die aktuelle
+    # Generation der Baureihe, dann der juengere Jahrgang, dann der hoehere
+    # Preis. Alphabetisch gekappt fiele "Galaxy S26 Ultra" heraus, weil
+    # "Galaxy A17" vorne steht - und die aktuelle Generation ist die, wegen
+    # der jemand die Grafik ansieht.
+    uebersprungen = 0
     for spalte in spalten:
         in_spalte = [p for p in punkte if p[spaltenfeld] == spalte["name"]]
         modelle = sorted({(p.get("modell") or "", p.get("device_id") or "",
@@ -465,7 +625,8 @@ def _leer(ansicht: str, achsname: str, form: str, preisart: str) -> dict:
             "rand_u": RAND_U_BAND if form == FORM_BAND else RAND_U_CHIP,
             "achse_y": 0.0, "plot_h": 0.0, "achsname": achsname,
             "achszusatz": "", "anzahl": 0, "spaltenzahl": 0,
-            "aggregiert_aus": 0, "etiketten_verborgen": 0, "y_max": 0,
+            "aggregiert_aus": 0, "etiketten_verborgen": 0,
+            "baender_uebersprungen": 0, "y_max": 0,
             "schrift": SCHRIFT}
 
 
@@ -486,6 +647,30 @@ def karte(punkte: list, spaltenfeld: str, achsname: str,
     """
     ansicht = "hersteller" if spaltenfeld == "hersteller" else "anbieter"
     brauchbar = [p for p in punkte if p.get("preis") is not None]
+    # Die Auswahl faellt fuer BEIDE Formen gleich und je Hersteller. Zwei
+    # Gruende:
+    #
+    # 1. Punkt- und Bandform sind zwei DARSTELLUNGEN derselben Daten, keine
+    #    zwei Umfaenge. Nur die Bandform zu kappen hiesse, dass ein Umschalten
+    #    den Bestand aendert.
+    # 2. `_form_chip` laesst einen Punkt WEG, wenn selbst fuer den nackten
+    #    Marker kein Platz mehr ist (lieber eine Luecke als ein
+    #    deckungsgleicher Punkt - siehe dort). Das traf am 29.08.2026 zwei
+    #    Apple-Punkte in der Herstelleransicht und keinen in der
+    #    Anbieteransicht, weil die Apple-Spalte dichter ist als jede
+    #    Ladenspalte: 160 gegen 164 Punkte, und `pruefe_portal.py`
+    #    Kriterium 11 ("gleich viele Punkte je Ansicht") fiel darauf durch.
+    #    Mehr Hoehe half nicht - die Punkte kollidieren bei GLEICHEM Preis,
+    #    das ist ein Breiten- und kein Hoehenproblem.
+    uebersprungen = 0
+    if brauchbar:
+        vorher = {(p.get("modell") or "", p.get("device_id") or "",
+                   p.get("shop") or "") for p in brauchbar}
+        erlaubt = _kappe(brauchbar)
+        uebersprungen = len(vorher) - len(erlaubt)
+        brauchbar = [p for p in brauchbar
+                     if (p.get("modell") or "", p.get("device_id") or "",
+                         p.get("shop") or "") in erlaubt]
     if not brauchbar:
         return _leer(ansicht, achsname, form, preisart)
     anzeige = anzeige or {}
@@ -574,6 +759,7 @@ def karte(punkte: list, spaltenfeld: str, achsname: str,
         "anzahl": len(gezeichnet), "spaltenzahl": len(spalten),
         "aggregiert_aus": sum(p.get("varianten", 1) for p in brauchbar),
         "etiketten_verborgen": verborgen,
+        "baender_uebersprungen": uebersprungen,
         "schrift": SCHRIFT,
     }
 
