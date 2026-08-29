@@ -348,3 +348,67 @@ def test_wenige_laeufe_sperren_die_zeile_trotz_langer_spanne():
         laeufe_je_anbieter={"expert": 3})
     assert a["duenn"] is True
     assert a["dauern"] == [] and a["verfaelle"] == []
+
+
+# --------------------------------------------------------------------------
+# Messtermine kommen aus den Pruefterminen, nicht aus der Preishistorie
+# (Diagnose G0 vom 28.08.2026)
+# --------------------------------------------------------------------------
+
+def test_der_hinweis_zaehlt_prueftermine_statt_aenderungspunkte():
+    """Der Reproduktionsfall der Live-Seite vom 28.08.2026: 85 Listungen,
+    alle Historienzeilen vom 10.08. (kein Preis hat sich geaendert), aber
+    vier echte Prueftermine. Die Seite sagte "bisher 1 Messtermin" - gegen
+    den alten Stand faellt dieser Test durch."""
+    eintraege = [
+        {"id": "l1", "device_id": "apple-iphone-17-pro-max",
+         "anbieter": "mobilcom-debitel", "status": "aktiv",
+         "first_seen": "2026-08-10", "last_verified": "2026-08-27",
+         "preis_ohne_vertrag": 1449.0, "erstpreis": 1449.0,
+         "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-10"}]
+    punkte = [{"listung_id": "l1", "device_id": "apple-iphone-17-pro-max",
+               "anbieter": "mobilcom-debitel", "datum": "2026-08-10",
+               "preis_ohne_vertrag": 1449.0}]
+    termine = {"mobilcom-debitel": ["2026-08-10", "2026-08-14",
+                                    "2026-08-21", "2026-08-27"]}
+    a = auswertung(eintraege, punkte, _KATALOG, heute="2026-08-28",
+                   termine_je_anbieter=termine)
+    assert a["termine"] == 4, a["hinweis"]
+    assert "4 Messtermine" in a["hinweis"], a["hinweis"]
+
+
+def test_vier_prueftermine_ueber_21_tage_schalten_die_sektion_frei():
+    """Dieselben Daten wie oben: vier Termine, 17+ Tage Spanne, stabiler
+    Preis. Ein stabiler Preis ist ein Messergebnis - die Listungsdauer darf
+    daran nicht scheitern."""
+    eintraege = [
+        {"id": "l1", "device_id": "apple-iphone-17-pro-max",
+         "anbieter": "mobilcom-debitel", "status": "aktiv",
+         "first_seen": "2026-08-01", "last_verified": "2026-08-27",
+         "preis_ohne_vertrag": 1449.0, "erstpreis": 1449.0,
+         "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-01"}]
+    punkte = [{"listung_id": "l1", "device_id": "apple-iphone-17-pro-max",
+               "anbieter": "mobilcom-debitel", "datum": "2026-08-01",
+               "preis_ohne_vertrag": 1449.0}]
+    termine = {"mobilcom-debitel": ["2026-08-01", "2026-08-10",
+                                    "2026-08-21", "2026-08-27"]}
+    a = auswertung(eintraege, punkte, _KATALOG, heute="2026-08-28",
+                   termine_je_anbieter=termine)
+    assert a["duenn"] is False, a["hinweis"]
+    assert [d["tage"] for d in a["dauern"]] == [26]
+
+
+def test_drei_prueftermine_reichen_nicht():
+    """Die Schwelle (4 Termine) gilt auch fuer die Termine-Quelle - drei
+    Prueftage sind keine Messreihe, egal wie weit sie auseinanderliegen."""
+    eintraege = [
+        {"id": "l1", "device_id": "apple-iphone-17-pro-max",
+         "anbieter": "mobilcom-debitel", "status": "aktiv",
+         "first_seen": "2026-08-01", "last_verified": "2026-08-27",
+         "preis_ohne_vertrag": 1449.0, "erstpreis": 1449.0,
+         "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-01"}]
+    a = auswertung(eintraege, [], _KATALOG, heute="2026-08-28",
+                   termine_je_anbieter={"mobilcom-debitel":
+                                        ["2026-08-01", "2026-08-10",
+                                         "2026-08-27"]})
+    assert a["dauern"] == [] and a["duenn"] is True

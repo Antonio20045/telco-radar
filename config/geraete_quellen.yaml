@@ -229,10 +229,19 @@ anbieter:
       # wird deshalb NICHT abgerufen. Als Einstieg dient die Sitemap, die die
       # Seite selbst in ihrer robots.txt ausweist: 227 Geräteadressen, davon
       # die "-ohne-vertrag"-Fassung mit dem Preis OHNE Vertrag.
+      #
+      # Beide Muster müssen treffen (UND). Gemessen am 28.08.2026: das
+      # Gerätemuster allein trifft 83 Adressen, davon 6 unter /tablets/ —
+      # Seiten, die nie den Katalog treffen und trotzdem je einen
+      # Crawl-Abstand des Zeitbudgets kosten. Genau diese Streuung (Tablets,
+      # Watches, Router) hat den Nachtlauf so lange gemacht, dass ALDI TALK
+      # ab dem 15.08. verhungerte.
       - url: https://www.freenet.de/sitemap.xml
-        label: Sitemap (Geräte ohne Vertrag)
+        label: Sitemap (Smartphones ohne Vertrag)
         kind: sitemap
-        pfadmuster: -ohne-vertrag/p/P-M-
+        pfadmuster:
+          - /handys-smartphones/
+          - -ohne-vertrag/p/P-M-
 
   # ============================================================ NETZBETREIBER
 
@@ -270,42 +279,66 @@ anbieter:
     gruppe: Vodafone
     rang: 2
     eigen: true
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Im Roh-HTML steht kein Preis - er entsteht erst im Browser aus
-      /glados/v2/hardware beziehungsweise der TMF-Produktkatalog-Schnittstelle.
-      Braucht entweder den JS-Collector oder einen Adapter gegen diese
-      Schnittstelle.
+    methode: vodafone_api
+    aktiv: true
     basis_url: https://www.vodafone.de
-    hinweis: "Eigene Referenz, nicht Teil der Wettbewerbsauswertung."
+    rate_limit_sekunden: 2
+    max_produkte: 60
+    # Der oeffentliche Browser-Schluessel der Geraeteuebersicht. Er steht
+    # woertlich in Vodafones eigenem Skriptbuendel
+    # /simplicity/device-overview/device-overview.bundle.js (Feld `apiKeys`,
+    # Umgebung Prod) und wird von jedem Besucher der Seite mitgeschickt - er
+    # ist eine oeffentliche Client-Kennung, kein Geheimnis. Wenn Vodafone ihn
+    # dreht, faellt der Adapter mit HTTP 401/403 auf und diese eine Zeile
+    # wird aus demselben Buendel neu abgelesen.
+    kopfzeilen:
+      x-api-key: DSWoP7V0jh0a3LFDdq3XhiBD5Uh5GuzR
+      Accept: application/json
+    hinweis: >-
+      Eigene Referenz, nicht Teil der Wettbewerbsauswertung. Gemessen am
+      28.08.2026: die Liste nennt 51 Geraete, die Detailnutzlast je Geraet
+      den Preis OHNE Vertrag je Variante (Speicher x Farbe). Der Befund vom
+      11.08.2026 - "im Roh-HTML steht kein Preis" - bleibt richtig; er gilt
+      fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite
+      selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404).
     einstiege:
-      - url: https://www.vodafone.de/privat/handys-tablets-tarife/alle-smartphones.html
-        label: Alle Smartphones
+      - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
+        label: Geraeteliste (Schnittstelle der Uebersichtsseite)
         kind: static
-        pfadmuster: /privat/handys/
 
   - name: o2
     typ: netzbetreiber
     gruppe: Telefónica Deutschland
     rang: 3
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Das ld+json der Produktseite trägt "price":"1.00" - den Lockpreis im
-      Tarifbündel, nicht den Gerätepreis. Nachgemessen am 11.08.2026 trägt die
-      Einstiegsseite /handys/ nur einen ld+json-Block vom Typ BreadcrumbList,
-      also überhaupt kein Produktschema; die Kaskade des Projekts liefert dort
-      null Sätze. Der belastbare Katalog liegt hinter /e-shop/rest/catalog/...
-      und braucht einen eigenen Adapter. Seit dem 11.08.2026 KANN die
-      Sammelschicht einen Bündelpreis speichern - aber nur mit seiner
-      Tarifreferenz (Tarifname, Monatspreis); ohne sie bleibt er verworfen.
+    methode: o2_katalog
+    aktiv: true
     basis_url: https://www.o2online.de
+    rate_limit_sekunden: 2
+    kopfzeilen:
+      # Der Endpunkt weist diesen Medientyp in der Nutzlast von /e-shop/
+      # selbst aus. Mit `Accept: application/json` antwortet er mit einer
+      # Weiterleitung in die 404-Seite - gemessen am 28.08.2026.
+      Accept: application/vnd.commerce.message+json
+    hinweis: >-
+      Der Befund vom 11.08.2026 bleibt richtig und gilt für die HTML-Seite:
+      deren ld+json trägt "price":"1.00", den Lockpreis im Tarifbündel.
+      Gelesen wird stattdessen der Katalog, den die Einstiegsseite /e-shop/
+      selbst aufruft - eine Antwort, 93 Geräte (28.08.2026), Preis als
+      `totalPrice` der Ratenzahlung OHNE Tarif (`hwOnly=true`; die
+      Detailadresse jedes Geräts trägt `ohne-tarif=ja`). Nachgerechnet:
+      Anzahlung plus 24 Monatsraten ergibt bei 92 der 93 Einträge exakt den
+      totalPrice. 18 Einträge sind Gerät PLUS Zubehör ("mit Watch Ultra 3")
+      und werden verworfen - ihr Preis gilt für beides zusammen.
+      ROBOTS: `Disallow: /e-shop/rest/` steht ausschließlich in der Gruppe
+      `User-agent: googlebot`, zusammen mit /chat-ui/ und /ebooking/. Die für
+      uns gültige Gruppe `User-agent: *` sperrt den Pfad nicht; unser
+      Absender ist TelcoRadar/1.0.
     einstiege:
-      - url: https://www.o2online.de/handys/
-        label: Handys
+      # Die Einstiegsseite IST die Nutzlast (direkt=True): eine Antwort mit
+      # allen Geraeten und Preisen, keine Produktseite wird nachgeladen.
+      - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true
+        label: Geraetekatalog ohne Tarif
         kind: static
-        pfadmuster: /e-shop/
 
   - name: 1&1
     typ: netzbetreiber

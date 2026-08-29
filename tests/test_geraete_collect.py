@@ -189,9 +189,28 @@ def test_fremde_domain_faellt_raus():
 
 
 def test_linkernte_aus_sitemap():
+    # Das Geraetemuster allein trifft auch das Tablet - genau die Streuung,
+    # fuer die es die Musterliste (Test darunter) braucht.
     links = ernte_links(_fixture("freenet_sitemap.xml"),
                         "https://www.freenet.de/sitemap.xml",
                         "-ohne-vertrag/p/P-M-", kind="sitemap")
+    assert links == [
+        "https://www.freenet.de/handys-smartphones/google/"
+        "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120",
+        "https://www.freenet.de/tablets/samsung/"
+        "samsung-galaxy-tab-a11-5g-ohne-vertrag/p/P-M-4538346",
+    ]
+
+
+def test_musterliste_verlangt_alle_teile():
+    """Eine Liste von Pfadmustern ist ein UND. freenets Sitemap fuehrt unter
+    dem Geraetemuster auch Tablets; jede dieser Seiten kostet Crawl-delay-
+    Sekunden des Zeitbudgets, ohne je den Katalog treffen zu koennen -
+    das war die halbe Ursache des verhungerten Nachtlaufs (G0, 28.08.2026)."""
+    links = ernte_links(_fixture("freenet_sitemap.xml"),
+                        "https://www.freenet.de/sitemap.xml",
+                        ["/handys-smartphones/", "-ohne-vertrag/p/P-M-"],
+                        kind="sitemap")
     assert links == ["https://www.freenet.de/handys-smartphones/google/"
                      "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120"]
 
@@ -199,7 +218,7 @@ def test_linkernte_aus_sitemap():
 def test_sitemap_ohne_muster_nimmt_alles_der_domain():
     links = ernte_links(_fixture("freenet_sitemap.xml"),
                         "https://www.freenet.de/sitemap.xml", "", kind="sitemap")
-    assert len(links) == 4
+    assert len(links) == 5
 
 
 # --------------------------------------------------------------------------
@@ -513,3 +532,53 @@ def test_unbekannte_farbe_der_quelle_landet_in_der_arbeitsliste():
         '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
     bilanz = _lauf(seiten=seiten)
     assert "Desert Mocha" in bilanz.unbekannte_farben
+
+
+# --------------------------------------------------------------------------
+# Das Zeitbudget ist keine gemeinsame Weide (Diagnose G0 vom 28.08.2026)
+# --------------------------------------------------------------------------
+
+def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch):
+    """Der Befund: freenet (Rang 4, ueber 70 Produktseiten mal Crawl-Abstand)
+    verbrauchte das gesamte 1500-s-Budget, und ALDI TALK stand ab dem
+    15.08.2026 jede Nacht mit "frist, 0 Listungen" da. Jeder noch
+    ausstehende crawlende Anbieter muss eine Mindestreserve behalten -
+    gegen den alten Stand (ein gemeinsames frist_bis fuer alle) faellt
+    dieser Test durch."""
+    import telco_radar.collect.geraete as g
+
+    uhr = {"t": 0.0}
+    monkeypatch.setattr(g.time, "monotonic", lambda: uhr["t"])
+    monkeypatch.setattr(g.time, "sleep",
+                        lambda s: uhr.__setitem__("t", uhr["t"] + s))
+
+    produkt = ('<script type="application/ld+json">{"@type":"Product",'
+               '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
+               '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
+    seiten = {"https://www.gross.de/kat":
+              "".join(f'<a href="/p/{i}">P{i}</a>' for i in range(20)),
+              "https://www.klein.de/kat": '<a href="/p/1">P1</a>',
+              "https://www.klein.de/p/1": produkt}
+    seiten.update({f"https://www.gross.de/p/{i}": produkt for i in range(20)})
+
+    def hole(url):
+        uhr["t"] += 30.0                      # jeder Abruf kostet 30 Sekunden
+        if url.endswith("/robots.txt"):
+            return _ROBOTS_FREI
+        return (200, seiten[url]) if url in seiten else (404, "")
+
+    quellen = QuellenConfig(anbieter=[
+        _anbieter(name="Gross", rang=1, basis_url="https://www.gross.de",
+                  einstiege=[Einstieg(url="https://www.gross.de/kat",
+                                      kind="static", pfadmuster="/p/")]),
+        _anbieter(name="Klein", rang=2, basis_url="https://www.klein.de",
+                  einstiege=[Einstieg(url="https://www.klein.de/kat",
+                                      kind="static", pfadmuster="/p/")]),
+    ])
+    ergebnis = sammle(quellen, _KATALOG, _FARBEN, hole, "2026-08-28",
+                      _jetzt(), frist_sekunden=600.0)
+    gross, klein = ergebnis["anbieter"]
+    assert gross.status == "frist", "der Grosse laeuft in seinen Anteil"
+    assert gross.produkte_abgerufen > 0, "das Teilergebnis bleibt"
+    assert klein.vollstaendig is True, \
+        "der Kleine bekommt seine Reserve und liest zu Ende"

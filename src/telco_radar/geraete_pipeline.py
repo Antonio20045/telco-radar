@@ -49,14 +49,35 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
     """`(status, text)` statt Response oder Ausnahme.
 
     Der Waechter muss 404 ("keine robots.txt, also keine Regeln") von 403
-    ("nicht anfassen") unterscheiden koennen. `collect.http.fetch` wirft bei
-    beidem nicht, aber ein Verbindungsfehler schon - der bleibt eine
-    Ausnahme und wird oben als Fehler gewertet, nicht als Freibrief.
+    ("nicht anfassen") unterscheiden koennen. Ein Verbindungsfehler bleibt
+    dagegen eine Ausnahme und wird oben als Fehler gewertet, nicht als
+    Freibrief.
+
+    DIESE FUNKTION HAT DAS BIS ZUM 28.08.2026 NICHT GEHALTEN, und ihre
+    eigene Docstring behauptete das Gegenteil ("`fetch` wirft bei beidem
+    nicht"). `collect.http.fetch` ruft `raise_for_status()` - es wirft bei
+    JEDEM 4xx. Der Waechter bekam damit statt eines Status eine Ausnahme,
+    und sein Ausnahmezweig sagt zu Recht "kein Ergebnis heisst nicht
+    erlaubt": der Anbieter wurde als nicht abrufbar gefuehrt.
+
+    Aufgefallen ist es nie, weil jeder bisher konfigurierte Host eine
+    robots.txt mit HTTP 200 ausliefert. `api.vodafone.de` ist der erste
+    ohne - dort antwortet 404, also "keine Regeln", und der ganze Anbieter
+    fiel mit "404 Not Found" aus, obwohl die Schnittstelle einwandfrei
+    antwortet. Ein Host ohne robots.txt ist der Normalfall im Web, nicht
+    der Sonderfall.
     """
+    import httpx
+
     from .collect.http import fetch
 
-    def hole(url: str):
-        antwort = fetch(url, http_cfg)
+    def hole(url: str, kopfzeilen: Optional[dict] = None):
+        try:
+            antwort = fetch(url, http_cfg, extra_headers=kopfzeilen or None)
+        except httpx.HTTPStatusError as exc:
+            # Der Statuscode IST hier die Auskunft - 404 heisst etwas
+            # anderes als 403, und beide etwas anderes als "kein Netz".
+            return (exc.response.status_code, exc.response.text)
         return (antwort.status_code, antwort.text)
 
     return hole
@@ -102,10 +123,17 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                 bilanz.name, gesehen, heute,
                 gelesene_einstiege=bilanz.gelesene_einstiege,
                 leitseite=leitseite)
-            # Nur ein wirklich gelesener Anbieter geht in die Buchfuehrung
-            # ueber die Hardware-Vermarktung ein. Ein ausgefallener Abruf
-            # darf keine Marke zum SIM-only-Anbieter erklaeren.
-            db.protokolliere_lauf(bilanz.name, heute, funde=len(bilanz.listungen))
+        # Die Buchfuehrung unterscheidet zwei Dinge, die vorher in einem
+        # Handgriff steckten: `laeufe` (zaehlt nur VOLLSTAENDIGE Laeufe -
+        # ein ausgefallener Abruf darf keine Marke zum SIM-only-Anbieter
+        # erklaeren) und die MESSTERMINE (jeder Tag, an dem Listungen
+        # wirklich gesehen wurden, auch in einem Teillauf). mobilcom-debitel
+        # bestaetigte jede Nacht seine Listungen, wurde am Zeitbudget aber
+        # nie fertig - und fehlte deshalb komplett in der Bilanz.
+        if bilanz.vollstaendig or bilanz.listungen:
+            db.protokolliere_lauf(bilanz.name, heute,
+                                  funde=len(bilanz.listungen),
+                                  vollstaendig=bilanz.vollstaendig)
         bilanzen.append({
             "anbieter": bilanz.name,
             "status": bilanz.status,
@@ -115,6 +143,7 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             "seiten": bilanz.seiten_versucht,
             "gelesen": len(bilanz.gelesene_einstiege),
             "produkte_abgerufen": bilanz.produkte_abgerufen,
+            "rohsaetze": bilanz.rohsaetze,
             "gedeckelt": bilanz.gedeckelt,
             "vollstaendig": bilanz.vollstaendig,
             "nicht_verlinkt": bilanz.nicht_verlinkt,
@@ -153,8 +182,10 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             # (der Einstieg galt als unvollstaendig gelesen) - aber nur, wenn
             # das Protokoll die 84 auch nennt.
             log.info("Geraeteradar: %s -> %s, %d Listungen aus %d Produktseiten "
-                     "(%s)", satz["anbieter"], satz["status"], satz["listungen"],
-                     satz["produkte_abgerufen"], satz["grund"][:160])
+                     "(%d Preissaetze gelesen) (%s)",
+                     satz["anbieter"], satz["status"], satz["listungen"],
+                     satz["produkte_abgerufen"], satz["rohsaetze"],
+                     satz["grund"][:160])
     if bilanz["unbekannte_titel"]:
         # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher
         # nur in der Rueckgabe - und der naechtliche Lauf gibt an niemanden

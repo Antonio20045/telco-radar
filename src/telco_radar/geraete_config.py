@@ -27,7 +27,14 @@ log = logging.getLogger(__name__)
 # Wie eine Quelle beschafft wird - die Rangfolge aus Teil C1 des Auftrags,
 # beste zuerst. `deaktiviert` ist ein vollwertiges Ergebnis, kein Mangel:
 # eine ehrliche Luecke ist besser als eine Zahl, der niemand trauen kann.
+# `json_endpunkt` ist bewusst KEIN Adaptername, sondern eine Diagnose: fuenf
+# Anbieter tragen ihn und meinen fuenf voellig verschiedene Nutzlasten
+# (Nuxt-Referenzarray, __PRELOADED_STATE__, productDetailsData, ng-state,
+# INITIAL_STATE). Wer ihn als eine Methode implementiert haette, haette alle
+# fuenf gleichzeitig scharf geschaltet. Ein gebauter Adapter bekommt deshalb
+# einen EIGENEN Namen - dann sagt die Konfiguration, was wirklich gelesen wird.
 METHODEN = ("api", "ldjson", "shopify", "json_endpunkt", "html", "js",
+            "vodafone_api", "o2_katalog",
             "kein_hardware", "deaktiviert")
 
 # Diese zwei sind gueltige Messergebnisse und keine Fehlkonfiguration, aber
@@ -55,7 +62,12 @@ class Einstieg:
     url: str
     label: str = ""
     kind: str = "static"          # static | sitemap | shopify | js
-    pfadmuster: str = ""          # nur Links, deren Pfad das enthaelt
+    # Nur Links, deren Adresse das enthaelt. Ein String ODER eine Liste von
+    # Strings, die ALLE enthalten sein muessen (UND) - die Liste braucht es,
+    # weil freenets Sitemap unter dem Geraetemuster auch Tablets fuehrt und
+    # jede dieser Seiten Crawl-delay-Sekunden kostet, ohne den Katalog
+    # treffen zu koennen.
+    pfadmuster: object = ""
 
     @property
     def crawlable(self) -> bool:
@@ -89,6 +101,14 @@ class Anbieter:
     max_produkte: int = _MAX_PRODUKTE_STANDARD
     rate_limit_sekunden: float = _RATE_LIMIT_STANDARD
     hinweis: str = ""
+    # Zusaetzliche HTTP-Kopfzeilen fuer die Abrufe DIESES Anbieters. Zwei
+    # Schnittstellen brauchen sie und beide sagen es selbst: o2 antwortet auf
+    # `Accept: application/json` mit einer Weiterleitung ins 404 und verlangt
+    # `application/vnd.commerce.message+json`, Vodafones Schnittstelle
+    # verlangt den oeffentlichen Browser-Schluessel als `x-api-key`. Beides
+    # steht in der jeweils eigenen oeffentlichen Seite, es ist kein Geheimnis
+    # und keine Umgehung.
+    kopfzeilen: dict = field(default_factory=dict)
     einstiege: list = field(default_factory=list)
 
     @property
@@ -231,9 +251,14 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
             log.warning("geraete_quellen: %s hat Einstieg %s mit unbekannter "
                         "Art %r - als static gefuehrt", anbieter, url, kind)
             kind = "static"
+        roh_muster = e.get("pfadmuster")
+        if isinstance(roh_muster, (list, tuple)):
+            pfadmuster = [str(m).strip() for m in roh_muster if str(m).strip()]
+        else:
+            pfadmuster = str(roh_muster or "").strip()
         out.append(Einstieg(
             url=url, label=str(e.get("label") or "").strip(), kind=kind,
-            pfadmuster=str(e.get("pfadmuster") or "").strip()))
+            pfadmuster=pfadmuster))
     return out
 
 
@@ -307,6 +332,8 @@ def lade_quellen(root: Path) -> QuellenConfig:
                                           _RATE_LIMIT_STANDARD, name,
                                           "rate_limit_sekunden"),
             hinweis=str(a.get("hinweis") or "").strip(),
+            kopfzeilen={str(k): str(v) for k, v in
+                        (a.get("kopfzeilen") or {}).items()},
             einstiege=einstiege,
         ))
     return QuellenConfig(anbieter=out)

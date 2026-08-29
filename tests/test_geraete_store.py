@@ -464,3 +464,68 @@ def test_erster_messpunkt_auch_bei_reinem_vertragspreis(tmp_path):
                 tarif_referenz="o2 Mobile M")
     assert h.schreibe(l, "2026-08-10") is True
     assert h.reihe(l.listung_id)[0]["preis_mit_vertrag_ab"] == 1.0
+
+
+# --------------------------------------------------------------------------
+# Messtermine: die Diagnose G0 vom 28.08.2026
+# --------------------------------------------------------------------------
+# Die Seite meldete nach 17 Tagen und vier echten Pruefterminen "bisher
+# 1 Messtermin", und die Lifecycle-Auswertung sperrte 84 von 85 Listungen aus.
+# Zwei Ursachen, beide hier festgenagelt: die Laufbilanz verbuchte nur
+# VOLLSTAENDIGE Laeufe (mobilcom-debitel wurde am Zeitbudget nie fertig und
+# fehlte komplett), und die Messtermin-Zaehlung hing an der Preishistorie,
+# die bei unveraendertem Preis schweigt.
+
+
+def test_teillauf_mit_funden_zaehlt_als_messtermin_aber_nicht_als_lauf(tmp_path):
+    db = GeraeteDB(tmp_path / "geraete_db.json")
+    db.protokolliere_lauf("mobilcom-debitel", "2026-08-21", funde=68,
+                          vollstaendig=False)
+    b = db.laufbilanz("mobilcom-debitel")
+    assert b.get("laeufe", 0) == 0, "ein Teillauf ist kein vollstaendiger Lauf"
+    assert "2026-08-21" in db.messtermine("mobilcom-debitel")
+    # Funde aus einem Teillauf sind echte Funde - die Marke vermarktet Hardware.
+    assert db.hardware_vermarktung("mobilcom-debitel") == "ja"
+
+
+def test_teillauf_ohne_funde_schiebt_nicht_richtung_sim_only(tmp_path):
+    """Drei abgebrochene Laeufe ohne Fund duerfen keine Marke zum
+    SIM-only-Anbieter erklaeren - ein Abbruch ist kein Messergebnis."""
+    db = GeraeteDB(tmp_path / "geraete_db.json")
+    for tag in ("2026-08-20", "2026-08-21", "2026-08-22"):
+        db.protokolliere_lauf("ALDI TALK", tag, funde=0, vollstaendig=False)
+    assert db.hardware_vermarktung("ALDI TALK") == "unbekannt"
+    assert db.messtermine("ALDI TALK") == []
+
+
+def test_messtermine_lesen_den_altbestand_aus_den_listungsdaten(tmp_path):
+    """Die Termine-Buchfuehrung gibt es erst seit dem 28.08.2026. Der
+    Altbestand traegt seine Beobachtungszeitpunkte aber in den Listungen
+    selbst (first_seen, last_verified, letzter_check) - genau daraus muss
+    die Zaehlung die vier echten Prueftermine des Bestands rekonstruieren."""
+    db = GeraeteDB(tmp_path / "geraete_db.json")
+    db.upsert([_listung(anbieter="mobilcom-debitel")], "2026-08-10")
+    db.upsert([_listung(anbieter="mobilcom-debitel", tag="2026-08-14")],
+              "2026-08-14")
+    # Die Bilanz absichtlich loeschen - so sieht der Altbestand aus, dessen
+    # Laeufe vor der Termine-Buchfuehrung lagen.
+    db._anbieter.clear()
+    assert db.messtermine("mobilcom-debitel") == ["2026-08-10", "2026-08-14"]
+
+
+def test_messtermine_mischen_keine_anbieter(tmp_path):
+    db = GeraeteDB(tmp_path / "geraete_db.json")
+    db.upsert([_listung(anbieter="mobilcom-debitel")], "2026-08-10")
+    db.protokolliere_lauf("ALDI TALK", "2026-08-14", funde=1)
+    assert "2026-08-14" not in db.messtermine("mobilcom-debitel")
+    assert "2026-08-10" not in db.messtermine("ALDI TALK")
+
+
+def test_termine_ueberleben_das_speichern_und_doppeln_nicht(tmp_path):
+    pfad = tmp_path / "geraete_db.json"
+    db = GeraeteDB(pfad)
+    db.protokolliere_lauf("congstar", "2026-08-10", funde=2)
+    db.protokolliere_lauf("congstar", "2026-08-10", funde=2)
+    db.save("2026-08-10")
+    wieder = GeraeteDB(pfad)
+    assert wieder.laufbilanz("congstar").get("termine") == ["2026-08-10"]

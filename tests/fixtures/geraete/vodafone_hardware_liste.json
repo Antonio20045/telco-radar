@@ -1,0 +1,266 @@
+{
+ "data": {
+  "numberOfDevices": 1,
+  "devices": [
+   {
+    "modelName": "Google Pixel 11",
+    "virtualItemId": "287",
+    "legacyGroupId": "58054",
+    "promotionAttribute": {
+     "cellular": "5GPlus"
+    },
+    "hubpage": {
+     "href": "/privat/handys/google-pixel-11.html"
+    },
+    "galleryImage": {
+     "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+     "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+    },
+    "url": {
+     "galleryImage": {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+     },
+     "hubpage": {
+      "href": "/privat/handys/google-pixel-11.html"
+     }
+    },
+    "defaultHardwareId": "58060",
+    "colors": [
+     {
+      "displayLabel": "Frost",
+      "primaryColorRgb": "181,183,206"
+     },
+     {
+      "displayLabel": "Hibiscus",
+      "primaryColorRgb": "198,14,100"
+     },
+     {
+      "displayLabel": "Obsidian",
+      "primaryColorRgb": "57,61,59"
+     },
+     {
+      "displayLabel": "Pistachio",
+      "primaryColorRgb": "161,159,111"
+     }
+    ],
+    "energyLabel": {
+     "thumbnail": {
+      "href": "https://www.vodafone.de/media/img/energylabelsmall/energylabel-b.svg",
+      "altText": "Energieeffizienzklasse A, auf einer Skala von A bis G"
+     },
+     "preview": {
+      "href": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-energylabel-b.pdf"
+     }
+    },
+    "productDataSheet": {
+     "href": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-produktdatenblatt.pdf"
+    },
+    "prices": {
+     "composition": [
+      {
+       "financingType": "sub",
+       "offerCoreHash": "05CFDB77B68E33D50A854615C1AE94C471BDBF9988C4DFFAE4B8757E091903C3",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 69.99,
+          "net": 58.82
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 54.99,
+          "net": 46.21
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 69.99,
+             "net": 58.82
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 54.99,
+              "net": 46.21
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 30
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 36,
+       "offerCoreHash": "7DFBDF12EACD0129A5FEF651C1B23527B95E102BC483F2FF2A366DDF6020D399",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 103.45,
+          "net": 90.37
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 71.61,
+          "net": 63.61
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 81.95,
+             "net": 68.87
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 50.11,
+              "net": 42.11
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 36,
+             "gross": 21.5,
+             "net": 21.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    "hardwareType": "Smartphone",
+    "sortOrder": 0
+   }
+  ]
+ }
+}

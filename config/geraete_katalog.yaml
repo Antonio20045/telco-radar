@@ -392,3 +392,278 @@ geraete:
     generation: 3
     speicher: [256, 512]
     segment: premium
+
+  # ===========================================================================
+  # NACHGELEGT AM 28.08.2026 - aus den LIVE-Katalogen von Vodafone und o2
+  # ===========================================================================
+  # Anlass: die Fachkollegen haben "Google fehlt" als erste von vier Lücken
+  # benannt. Nachgemessen an den 126 Modellnamen, die Vodafones
+  # Geräteschnittstelle (51) und o2s Katalog (93, ohne Zubehörbündel) am
+  # 28.08.2026 wirklich führten: 67 davon trafen keinen Katalogeintrag. Der
+  # Katalog stand eine ganze Gerätegeneration hinter dem Markt - Pixel 11,
+  # Galaxy S26 FE, Z Fold8, Xiaomi 17 und iPhone Air waren live und hier
+  # unbekannt, also unsichtbar.
+  #
+  # Jede Zeile unten steht so, wie mindestens eine der zwei Quellen sie
+  # führt. Was NICHT nachgelegt wurde: Tablets (iPad, Galaxy Tab), Router
+  # (GigaCube, MiFi) und Wearables - dieser Katalog verfolgt Smartphones.
+  # `marktstart` bleibt leer, wo er nicht belegt ist; die Regel oben gilt
+  # unverändert, ein geratenes Datum wäre schlimmer als keines.
+
+  # ------------------------------------------------------------------ Apple
+  - hersteller: Apple
+    modell: iPhone Air
+    generation: 17
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 17e
+    generation: 17
+    vorgaenger: iPhone 16e
+    speicher: [128, 256, 512]
+    segment: mid
+
+  - hersteller: Apple
+    modell: iPhone 15 Plus
+    generation: 15
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 15 Pro
+    generation: 15
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 14
+    generation: 14
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 14 Pro
+    generation: 14
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 14 Pro Max
+    generation: 14
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  # ----------------------------------------------------------------- Google
+  # Die Marke, die in den Price Alerts der internen Lösung ganz fehlt.
+  - hersteller: Google
+    modell: Pixel 11
+    generation: 11
+    vorgaenger: Pixel 10
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 11 Pro
+    generation: 11
+    vorgaenger: Pixel 10 Pro
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 11 Pro XL
+    generation: 11
+    vorgaenger: Pixel 10 Pro XL
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  # "Pro Fold" ist ein EIGENER Eintrag und kein Alias von "Pro": beide stehen
+  # beim selben Händler und liegen mehrere hundert Euro auseinander. Genau
+  # diese Verwechslung hat am 10.08.2026 die 800-Euro-Sägezahnkurve erzeugt.
+  - hersteller: Google
+    modell: Pixel 11 Pro Fold
+    generation: 11
+    vorgaenger: Pixel 10 Pro Fold
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10 Pro Fold
+    generation: 10
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10a
+    generation: 10
+    speicher: [128, 256]
+    segment: mid
+
+  # ---------------------------------------------------------------- Samsung
+  - hersteller: Samsung
+    modell: Galaxy S26 Plus
+    generation: 26
+    vorgaenger: Galaxy S25 Plus
+    aliase: ["Galaxy S26+"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S26 FE
+    generation: 26
+    vorgaenger: Galaxy S25 FE
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 FE
+    generation: 25
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold8
+    generation: 8
+    vorgaenger: Galaxy Z Fold 7
+    aliase: ["Galaxy Z Fold 8"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold8 Ultra
+    generation: 8
+    aliase: ["Galaxy Z Fold 8 Ultra"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip8
+    generation: 8
+    vorgaenger: Galaxy Z Flip 7
+    aliase: ["Galaxy Z Flip 8"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy A57
+    generation: 57
+    vorgaenger: Galaxy A56
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Samsung
+    modell: Galaxy A37
+    generation: 37
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Samsung
+    modell: Galaxy A27
+    generation: 27
+    speicher: [128, 256]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy A17
+    generation: 17
+    speicher: [128, 256]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy S23
+    generation: 23
+    speicher: [128, 256, 512]
+    segment: premium
+
+  # ----------------------------------------------------------------- Xiaomi
+  # Die zweite von den Kollegen genannte Marke. Der Bestand kannte bis hier
+  # genau vier Xiaomi-Modelle, alle aus der 14er/15er-Reihe.
+  - hersteller: Xiaomi
+    modell: Xiaomi 17
+    generation: 17
+    vorgaenger: Xiaomi 15
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17 Ultra
+    generation: 17
+    vorgaenger: Xiaomi 15 Ultra
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17T
+    generation: 17
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17T Pro
+    generation: 17
+    speicher: [256, 512, 1024]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 17
+    generation: 17
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 17 Pro
+    generation: 17
+    vorgaenger: Redmi Note 14 Pro
+    speicher: [256, 512]
+    segment: mid
+
+  # Eigener Eintrag, kein Alias: "Pro Max" wird vom Modellzusatz-Wächter
+  # sonst gegen "Redmi Note 17 Pro" gesperrt und fiele ganz heraus.
+  - hersteller: Xiaomi
+    modell: Redmi Note 17 Pro Max
+    generation: 17
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 15
+    generation: 15
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 15 Pro
+    generation: 15
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi 17
+    generation: 17
+    speicher: [128, 256]
+    segment: entry
+
+  # ---------------------------------------------------------------- Nothing
+  - hersteller: Nothing
+    modell: Nothing Phone (4a)
+    generation: 4
+    vorgaenger: Nothing Phone (3a)
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (4a) Pro
+    generation: 4
+    speicher: [256]
+    segment: mid
+
+  # -------------------------------------------------------------- Fairphone
+  # Neuer Hersteller im Bestand: beide Netzbetreiber führen ihn, und er ist
+  # das einzige Nachhaltigkeitsgerät im Sortiment - für eine Seite über
+  # Differenzierung kein Randfall.
+  - hersteller: Fairphone
+    modell: Fairphone 6
+    generation: 6
+    aliase: ["Fairphone (Gen.6)"]
+    speicher: [256]
+    segment: mid

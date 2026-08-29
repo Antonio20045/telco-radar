@@ -242,9 +242,21 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
 
 def auswertung(eintraege: list, punkte: list, katalog: Katalog,
                heute: Optional[str] = None,
-               laeufe_je_anbieter: Optional[dict] = None) -> dict:
-    """Alles zusammen, mitsamt der Aussage ueber die eigene Datenbasis."""
+               laeufe_je_anbieter: Optional[dict] = None,
+               termine_je_anbieter: Optional[dict] = None) -> dict:
+    """Alles zusammen, mitsamt der Aussage ueber die eigene Datenbasis.
+
+    `termine_je_anbieter` ({anbieter: [ISO-Tage]}) ist die Quelle fuer die
+    Messtermin-Zaehlung. Die Preishistorie taugt dafuer NICHT: sie traegt
+    nur AENDERUNGSpunkte, und ein Bestand mit stabilen Preisen hat dort
+    genau einen Tag - die Seite meldete deshalb am 28.08.2026 nach 17 Tagen
+    und vier echten Pruefterminen "bisher 1 Messtermin". Ohne das Argument
+    (aeltere Aufrufer, Tests) bleibt die alte Rechnung ueber die Historie.
+    """
     daten = [d for d in (_datum(p.get("datum")) for p in punkte) if d]
+    if termine_je_anbieter:
+        for tage in termine_je_anbieter.values():
+            daten.extend(d for d in (_datum(t) for t in (tage or [])) if d)
     termine = sorted({d for d in daten})
     # Der Bezugstag ist der SPAETERE von Berichtstag und juengster Messung -
     # dieselbe Rechnung wie in `geraete_view._auffaellig`. Der Geraetezweig
@@ -282,12 +294,19 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     # Ohne Bilanz (aeltere Bestaende, Tests) wird die Zahl nicht erfunden,
     # sondern die Termine-Bedingung entfaellt - die Spanne gilt weiter.
     laeufe_je_anbieter = laeufe_je_anbieter or {}
+    termine_je_anbieter = termine_je_anbieter or {}
 
     def _oft_genug(eintrag) -> bool:
-        if not laeufe_je_anbieter:
+        if not termine_je_anbieter and not laeufe_je_anbieter:
             return True
-        return (laeufe_je_anbieter.get(eintrag.get("anbieter"), 0)
-                >= MIND_TERMINE_JE_GERAET)
+        name = eintrag.get("anbieter")
+        # Das MAXIMUM beider Quellen: `laeufe` zaehlt vollstaendige Laeufe,
+        # deren Einzeldaten ein Altbestand nicht mehr kennt (last_verified
+        # behaelt nur den juengsten); die Termine-Liste kennt auch
+        # Teillaeufe. Beide sind echte Messungen, keine erfindet etwas.
+        n = max(len(termine_je_anbieter.get(name) or []),
+                int(laeufe_je_anbieter.get(name, 0)))
+        return n >= MIND_TERMINE_JE_GERAET
 
     dauern = []
     for e in eintraege:

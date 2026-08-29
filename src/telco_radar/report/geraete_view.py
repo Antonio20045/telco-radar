@@ -663,18 +663,28 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                                     and p["generation"] == hoechste.get(p["hersteller"]))
 
     # Wie oft ist der Geraetezweig ueberhaupt schon gelaufen? Das ist die
-    # Frage hinter "gibt es einen frueheren Stand" - und sie wird an der
-    # Laufbilanz beantwortet, nicht an der Preishistorie (die traegt nur
-    # Aenderungspunkte und schweigt, wenn sich nichts aendert).
-    laeufe = max((int(db.laufbilanz(name).get("laeufe") or 0)
-                  for name in {e.get("anbieter") for e in alle if e.get("anbieter")}),
-                 default=0)
+    # Frage hinter "gibt es einen frueheren Stand" - und sie wird an den
+    # MESSTERMINEN beantwortet, nicht an der Preishistorie (die traegt nur
+    # Aenderungspunkte und schweigt, wenn sich nichts aendert) und nicht an
+    # `laeufe` (das zaehlt nur VOLLSTAENDIGE Laeufe - mobilcom-debitel wird
+    # jede Nacht bestaetigt und war dort trotzdem nie verbucht, weil sein
+    # Lauf am Zeitbudget nie fertig wurde).
+    punkte_alle = historie.alle_punkte()
+    termine_je_anbieter: dict[str, list] = {}
+    laeufe_je_anbieter: dict[str, int] = {}
+    for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
+        termine = set(db.messtermine(name))
+        termine.update(p.get("datum") for p in punkte_alle
+                       if p.get("anbieter") == name and p.get("datum"))
+        termine_je_anbieter[name] = sorted(termine)
+        laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
+    laeufe = max((max(len(t), laeufe_je_anbieter.get(n, 0))
+                  for n, t in termine_je_anbieter.items()), default=0)
     auffaellig = _auffaellig(alle, historie, katalog, heute, laeufe=laeufe)
     lifecycle = geraete_lifecycle.auswertung(
-        alle, historie.alle_punkte(), katalog, heute,
-        laeufe_je_anbieter={name: int(db.laufbilanz(name).get("laeufe") or 0)
-                            for name in {e.get("anbieter") for e in alle
-                                         if e.get("anbieter")}})
+        alle, punkte_alle, katalog, heute,
+        laeufe_je_anbieter=laeufe_je_anbieter,
+        termine_je_anbieter=termine_je_anbieter)
 
     # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem

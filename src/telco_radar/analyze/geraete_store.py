@@ -339,16 +339,62 @@ class GeraeteDB:
 
     # ------------------------------------------------- Hardware-Vermarktung
 
-    def protokolliere_lauf(self, anbieter: str, today: str, funde: int) -> None:
+    def protokolliere_lauf(self, anbieter: str, today: str, funde: int,
+                           vollstaendig: bool = True) -> None:
         """Buch darueber, wie oft ein Anbieter abgefragt wurde und was dabei
-        herauskam. Grundlage von `hardware_vermarktung()`."""
+        herauskam. Grundlage von `hardware_vermarktung()` und `messtermine()`.
+
+        `vollstaendig=False` ist ein Teillauf: der Anbieter wurde gelesen,
+        aber nicht zu Ende (Zeitbudget, Deckel, einzelne tote Produktseiten).
+        Ein solcher Lauf zaehlt NICHT auf `laeufe` - drei Teillaeufe ohne
+        Fund duerfen keine Marke zum SIM-only-Anbieter erklaeren. Aber seine
+        FUNDE sind echte Beobachtungen: der Tag gehoert in die Messtermine,
+        sonst zaehlt die Lifecycle-Auswertung einen Anbieter, der jede Nacht
+        84 Listungen bestaetigt und nur nie fertig wird, als nie gemessen.
+        Genau das war der Befund vom 28.08.2026: mobilcom-debitel fehlte
+        komplett in dieser Bilanz, und `_oft_genug` sperrte 84 von 85
+        Listungen aus der Auswertung."""
         b = self._anbieter.setdefault(anbieter, {"laeufe": 0, "funde_gesamt": 0})
-        b["laeufe"] = int(b.get("laeufe", 0)) + 1
+        if vollstaendig:
+            b["laeufe"] = int(b.get("laeufe", 0)) + 1
+            b["letzter_lauf"] = today
         b["funde_gesamt"] = int(b.get("funde_gesamt", 0)) + int(funde)
-        b["letzter_lauf"] = today
-        b["letzte_funde"] = int(funde)
+        if vollstaendig or funde:
+            b["letzte_funde"] = int(funde)
+            termine = b.setdefault("termine", [])
+            if today not in termine:
+                termine.append(today)
         if funde:
             b["letzter_fund"] = today
+
+    def messtermine(self, anbieter: str) -> list:
+        """Alle Tage, an denen Listungen dieses Anbieters wirklich geprueft
+        wurden - sortiert, je Tag einmal.
+
+        Quelle sind die `termine` der Laufbilanz PLUS die Datumsfelder der
+        Listungen selbst. Der zweite Teil ist keine Redundanz, sondern der
+        Altbestand: die Termine-Buchfuehrung gibt es erst seit dem
+        28.08.2026, aber `first_seen`, `erstpreis_am`, `last_verified` und
+        `letzter_check` sind echte Beobachtungszeitpunkte frueherer Laeufe.
+        Abgeleitet wird nur, was wirklich gespeichert wurde - ein Lauf,
+        dessen Bestaetigung von einem spaeteren ueberschrieben wurde, ist
+        verloren und wird NICHT erfunden."""
+        termine = {str(t) for t in (self._anbieter.get(anbieter, {}).get("termine") or [])}
+        for feld in ("letzter_lauf", "letzter_fund"):
+            wert = self._anbieter.get(anbieter, {}).get(feld)
+            if wert:
+                termine.add(str(wert))
+        for e in self._eintraege.values():
+            if e.get("anbieter") != anbieter:
+                continue
+            # Bewusst NUR die reinen Beobachtungsfelder. `erstpreis_am` und
+            # `abgerufen_am` duplizieren first_seen/last_verified und wuerden
+            # in einem inkonsistenten Bestand Termine erfinden.
+            for feld in ("first_seen", "last_verified", "letzter_check"):
+                wert = e.get(feld)
+                if wert:
+                    termine.add(str(wert))
+        return sorted(termine)
 
     def hardware_vermarktung(self, anbieter: str) -> str:
         """ja | nein | unbekannt - ABGELEITET, nicht von Hand gesetzt.

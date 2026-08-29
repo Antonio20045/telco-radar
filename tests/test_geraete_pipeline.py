@@ -258,3 +258,94 @@ def test_nichts_wird_ausserhalb_von_data_state_geschrieben(tmp_path):
     ausserhalb = {p for p in geschrieben
                   if not p.startswith(("config/", "data/state/"))}
     assert ausserhalb == set()
+
+
+def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
+    """G0-Befund vom 28.08.2026: mobilcom-debitel bestaetigte jede Nacht
+    seine Listungen, wurde am Zeitbudget aber nie fertig - und fehlte
+    deshalb KOMPLETT in der Laufbilanz. `_oft_genug` sperrte damit 84 von
+    85 Listungen aus der Lifecycle-Auswertung. Ein Teillauf mit Funden
+    muss als Messtermin verbucht werden, ohne als vollstaendiger Lauf zu
+    zaehlen."""
+    root = _root(tmp_path)
+    # Eine der Produktseiten faellt aus - der Einstieg gilt damit als
+    # unvollstaendig gelesen (status fehler), genau die mobilcom-Lage.
+    seiten = dict(_SEITEN)
+    del seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"]
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten))
+
+    from telco_radar.analyze.geraete_store import GeraeteDB
+    db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
+    assert db.messtermine("Medimax") == ["2026-08-11"]
+    assert db.laufbilanz("Medimax").get("laeufe", 0) == 0, \
+        "ein Teillauf zaehlt nicht als vollstaendiger Lauf"
+    assert db.hardware_vermarktung("Medimax") == "ja"
+
+
+def test_die_hole_fabrik_gibt_den_statuscode_zurueck_statt_zu_werfen():
+    """Der Befund vom 28.08.2026, und er kostete einen ganzen Anbieter.
+
+    `collect.http.fetch` ruft `raise_for_status()`. Die Fabrik reichte die
+    Ausnahme durch, der Robots-Waechter landete in seinem Ausnahmezweig
+    ("kein Ergebnis heisst nicht erlaubt") und fuehrte den Anbieter als
+    nicht abrufbar - obwohl 404 auf einer robots.txt genau das Gegenteil
+    bedeutet: keine Regeln. Aufgefallen ist es erst bei `api.vodafone.de`,
+    dem ersten konfigurierten Host ohne robots.txt.
+
+    Gegen den alten Stand faellt dieser Test durch."""
+    import httpx
+
+    from telco_radar.geraete_pipeline import _hole_fabrik
+
+    class _Antwort:
+        status_code = 404
+        text = '{"message": "The requested API was not found."}'
+
+    def _werfen(url, cfg, **kw):
+        raise httpx.HTTPStatusError("404", request=None, response=_Antwort())
+
+    import telco_radar.collect.http as http_modul
+    echt = http_modul.fetch
+    http_modul.fetch = _werfen
+    try:
+        # Die Fabrik bindet `fetch` beim ERZEUGEN, nicht beim Aufruf - sie
+        # muss also nach dem Austausch gebaut werden.
+        status, text = _hole_fabrik({"timeout_seconds": 5})(
+            "https://api.example.de/robots.txt")
+    finally:
+        http_modul.fetch = echt
+    assert status == 404 and "not found" in text.lower()
+
+
+def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
+    """Die Gegenprobe auf Anbieterebene: 404 auf der robots.txt heisst
+    "keine Einschraenkung", nicht "Finger weg"."""
+    import httpx
+
+    root = _root(tmp_path)
+    seiten = dict(_SEITEN)
+
+    class _Antwort404:
+        status_code = 404
+        text = ""
+
+    def _fetch(url, cfg, **kw):
+        if url.endswith("/robots.txt"):
+            raise httpx.HTTPStatusError("404", request=None,
+                                        response=_Antwort404())
+        class _Ok:
+            status_code = 200
+            text = seiten.get(url, "")
+        if url not in seiten:
+            raise httpx.HTTPStatusError("404", request=None,
+                                        response=_Antwort404())
+        return _Ok()
+
+    import telco_radar.collect.http as http_modul
+    echt = http_modul.fetch
+    http_modul.fetch = _fetch
+    try:
+        bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt())
+    finally:
+        http_modul.fetch = echt
+    assert bilanz["listungen"] == 2, bilanz["anbieter"]

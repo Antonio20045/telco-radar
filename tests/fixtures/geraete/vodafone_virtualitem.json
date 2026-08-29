@@ -1,0 +1,3310 @@
+{
+ "data": {
+  "modelName": "Google Pixel 11",
+  "virtualItemId": "287",
+  "legacyGroupId": "58054",
+  "promotionAttribute": {
+   "cellular": "5GPlus"
+  },
+  "hubpage": {
+   "href": "/privat/handys/google-pixel-11.html"
+  },
+  "galleryImage": {
+   "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+   "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+  },
+  "url": {
+   "galleryImage": {
+    "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+   },
+   "hubpage": {
+    "href": "/privat/handys/google-pixel-11.html"
+   }
+  },
+  "capacities": [
+   {
+    "displayLabel": "256 GB",
+    "sortValue": 262144
+   },
+   {
+    "displayLabel": "512 GB",
+    "sortValue": 524288
+   }
+  ],
+  "colors": [
+   {
+    "displayLabel": "Frost",
+    "primaryColorRgb": "181,183,206"
+   },
+   {
+    "displayLabel": "Hibiscus",
+    "primaryColorRgb": "198,14,100"
+   },
+   {
+    "displayLabel": "Obsidian",
+    "primaryColorRgb": "57,61,59"
+   },
+   {
+    "displayLabel": "Pistachio",
+    "primaryColorRgb": "161,159,111"
+   }
+  ],
+  "atomics": [
+   {
+    "hardwareId": "58060",
+    "backendId": "303546",
+    "label": "Google Pixel 11 Frost (256 GB)",
+    "prices": {
+     "hardware": {
+      "offerCoreHash": "F4AC0F7C4843939C0B7903A5F7028784351149D92334881CAA9BFA921959B1A6",
+      "priceByType": {
+       "rate": {
+        "onetime": {
+         "withoutDiscounts": {
+          "gross": 999.9,
+          "net": 840.25,
+          "recurrenceUnit": "onetime"
+         }
+        }
+       }
+      }
+     },
+     "composition": [
+      {
+       "financingType": "sub",
+       "offerCoreHash": "05CFDB77B68E33D50A854615C1AE94C471BDBF9988C4DFFAE4B8757E091903C3",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 69.99,
+          "net": 58.82
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 54.99,
+          "net": 46.21
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 69.99,
+             "net": 58.82
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 54.99,
+              "net": 46.21
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 30
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 12,
+       "offerCoreHash": "046C1DBAAB9D954498427AC5A9E609D949BFE9E682114BB64813A0BD5890E3AD",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 106.45,
+          "net": 99.75
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 41.95,
+          "net": 35.25
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 95.95,
+          "net": 90.93
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 31.45,
+          "net": 26.43
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 41.95,
+             "net": 35.25
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 31.45,
+              "net": 26.43
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 12,
+             "gross": 64.5,
+             "net": 64.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 36,
+       "offerCoreHash": "AFC74ADAE1BC4C496886CC4B085D7F3BA822C281CEB6A7EA818901675B460FE8",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 53.45,
+          "net": 48.35
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 45.45,
+          "net": 41.63
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 31.95,
+             "net": 26.85
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 23.95,
+              "net": 20.13
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 36,
+             "gross": 21.5,
+             "net": 21.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 24,
+       "offerCoreHash": "8185E00DA9A03779278563702E06E3A5037825C6830CED3157CC0110BA556A8F",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 84.2,
+          "net": 75.91
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 61.36,
+          "net": 56.72
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 51.95,
+             "net": 43.66
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 29.11,
+              "net": 24.47
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 32.25,
+             "net": 32.25
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    "images": [
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System."
+     }
+    ],
+    "imageList": {
+     "imageGroup": "NSF-Image 288x320",
+     "href": [
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png"
+     ]
+    },
+    "shippingInfo": {
+     "label": "Liefertermin ca. 02.09.2026",
+     "date": "2026-09-02"
+    },
+    "capacity": {
+     "displayLabel": "256 GB",
+     "sortValue": 262144
+    },
+    "color": {
+     "displayLabel": "Frost",
+     "primaryColorRgb": "181,183,206"
+    },
+    "defaultAtomicDevice": true,
+    "galleryImage": {
+     "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+     "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+    },
+    "url": {
+     "galleryImage": {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+     }
+    },
+    "attributeGroups": [
+     {
+      "id": "12",
+      "displayLabel": "Images",
+      "attributes": [
+       {
+        "uniqueIdentifier": "image170x230",
+        "displayLabel": "Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/170x230/pixel-11-frost-s.png",
+          "sortOrder": 64
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage170x230",
+        "displayLabel": "NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-frost-170x230-01.png",
+          "sortOrder": 60
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image1200x1200",
+        "displayLabel": "Image 1200x1200",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-frost-1200.png",
+          "sortOrder": 68
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage90x120",
+        "displayLabel": "NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-frost-90x120-01.png",
+          "sortOrder": 62
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image228x309",
+        "displayLabel": "Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/228x309/pixel-11-frost-l.png",
+          "sortOrder": 66
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage288x320",
+        "displayLabel": "MultiValue NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+          },
+          "sortOrder": 55
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png"
+          },
+          "sortOrder": 57
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png"
+          },
+          "sortOrder": 59
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage170x230",
+        "displayLabel": "MultiValue Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "multiValue": {
+           "image170x230": "https://www.vodafone.de/media/img/products/170x230/pixel-11-frost-s.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 65
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage1200x1200",
+        "displayLabel": "MultiValue Image 1200x1200",
+        "sortOrder": 101,
+        "values": [
+         {
+          "multiValue": {
+           "image1200x1200": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-frost-1200.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 69
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage170x230",
+        "displayLabel": "MultiValue NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "multiValue": {
+           "NsfImage170x230": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-frost-170x230-01.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 61
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage288x320",
+        "displayLabel": "NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+          "sortOrder": 54
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+          "sortOrder": 56
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png",
+          "sortOrder": 58
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage90x120",
+        "displayLabel": "MultiValue NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage90x120": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-frost-90x120-01.png"
+          },
+          "sortOrder": 63
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage228x309",
+        "displayLabel": "MultiValue Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "image228x309": "https://www.vodafone.de/media/img/products/228x309/pixel-11-frost-l.png"
+          },
+          "sortOrder": 67
+         }
+        ]
+       }
+      ],
+      "sortOrder": 65
+     },
+     {
+      "id": "1",
+      "displayLabel": "Merkmale",
+      "attributes": [
+       {
+        "uniqueIdentifier": "deliveryTime",
+        "displayLabel": "Lieferzeit",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Liefertermin ca. 02.09.2026",
+          "sortOrder": 6
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "top",
+        "displayLabel": "Top-Features",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "256 GB interner Speicher",
+          "sortOrder": 2
+         },
+         {
+          "value": "6,3 Zoll Display (16 cm)",
+          "sortOrder": 3
+         },
+         {
+          "value": "48 Megapixel-Kamera",
+          "sortOrder": 4
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "primaryColor",
+        "displayLabel": "Primärfarbe",
+        "sortOrder": 45,
+        "values": [
+         {
+          "value": "181,183,206",
+          "sortOrder": 12
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "scopeOfDelivery",
+        "displayLabel": "Lieferumfang",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "Google Pixel 11 Frost (256 GB)",
+          "sortOrder": 7
+         },
+         {
+          "value": "Akku 4985 mAh (nicht austauschbar)",
+          "sortOrder": 8
+         },
+         {
+          "value": "USB-C Kabel (1m)",
+          "sortOrder": 9
+         },
+         {
+          "value": "SIM-Tool",
+          "sortOrder": 10
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deliveryDate",
+        "displayLabel": "Liefertermin",
+        "sortOrder": 18,
+        "values": [
+         {
+          "value": "20260902",
+          "sortOrder": 5
+         }
+        ]
+       }
+      ],
+      "sortOrder": 5
+     },
+     {
+      "id": "2",
+      "displayLabel": "Infos zum Gerät",
+      "attributes": [
+       {
+        "uniqueIdentifier": "color",
+        "displayLabel": "Farbe",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Frost",
+          "sortOrder": 17
+         }
+        ]
+       }
+      ],
+      "sortOrder": 10
+     },
+     {
+      "id": "15",
+      "displayLabel": "Speicher",
+      "attributes": [
+       {
+        "uniqueIdentifier": "internalStorage",
+        "displayLabel": "Interner Speicher bis zu",
+        "sortOrder": 10,
+        "values": [
+         {
+          "value": "256 GB",
+          "sortOrder": 35
+         }
+        ]
+       }
+      ],
+      "sortOrder": 22
+     },
+     {
+      "id": "16",
+      "displayLabel": "Internal Flags",
+      "attributes": [
+       {
+        "uniqueIdentifier": "insuranceTier",
+        "displayLabel": "Insurance Tier",
+        "sortOrder": 150,
+        "values": [
+         {
+          "value": "4",
+          "sortOrder": 84
+         }
+        ]
+       }
+      ],
+      "sortOrder": 9999
+     },
+     {
+      "id": "20",
+      "displayLabel": "Technische IDs",
+      "attributes": [
+       {
+        "uniqueIdentifier": "gtin",
+        "displayLabel": "GTIN",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "840353959620",
+          "sortOrder": 76
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelId",
+        "displayLabel": "Modell-ID",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "58054",
+          "sortOrder": 78
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deviceClass",
+        "displayLabel": "Device Class",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "2",
+          "sortOrder": 77
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelLabel",
+        "displayLabel": "Modellbezeichnung",
+        "sortOrder": 101,
+        "values": [
+         {
+          "value": "Google Pixel 11",
+          "sortOrder": 79
+         }
+        ]
+       }
+      ],
+      "sortOrder": 68
+     }
+    ]
+   },
+   {
+    "hardwareId": "58061",
+    "backendId": "303550",
+    "label": "Google Pixel 11 Frost (512 GB)",
+    "prices": {
+     "hardware": {
+      "offerCoreHash": "E56A49AC94312E28810408BB4FBE003CFF4B4170A534EEB412D309DA06874728",
+      "priceByType": {
+       "rate": {
+        "onetime": {
+         "withoutDiscounts": {
+          "gross": 1129.9,
+          "net": 949.5,
+          "recurrenceUnit": "onetime"
+         }
+        }
+       }
+      }
+     },
+     "composition": [
+      {
+       "financingType": "sub",
+       "offerCoreHash": "8C1657624D227310534A73B7774CD7F3DFB49911C77BF8A498103C01F8E8CBE5",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 69.99,
+          "net": 58.82
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 54.99,
+          "net": 46.21
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 69.99,
+             "net": 58.82
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 54.99,
+              "net": 46.21
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 30
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 12,
+       "offerCoreHash": "6562B971CC771F1C944B58D0438CDC68577D0D2F86D2E0D8130825A26D937872",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 116.95,
+          "net": 110.25
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 41.95,
+          "net": 35.25
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 106.45,
+          "net": 101.43
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 31.45,
+          "net": 26.43
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 41.95,
+             "net": 35.25
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 31.45,
+              "net": 26.43
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 12,
+             "gross": 75.0,
+             "net": 75.0
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1129.9,
+             "net": 949.5,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 901.0,
+             "net": 757.14,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 900.0,
+             "net": 756.3,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 36,
+       "offerCoreHash": "3F714701A569E8EFD99168B88F8306E56D67CA7998E04565EF6AE536E4064FAE",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 56.95,
+          "net": 51.85
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 25.0,
+          "net": 25.0
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 48.95,
+          "net": 45.13
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 25.0,
+          "net": 25.0
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 31.95,
+             "net": 26.85
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 23.95,
+              "net": 20.13
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 36,
+             "gross": 25.0,
+             "net": 25.0
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1129.9,
+             "net": 949.5,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 901.0,
+             "net": 757.14,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 900.0,
+             "net": 756.3,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 24,
+       "offerCoreHash": "1F18E408D9303045C92DA2AA38E48FE6198050F78D7B1BFB790D84EBEE51199A",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 89.45,
+          "net": 81.16
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 66.61,
+          "net": 61.97
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 51.95,
+             "net": 43.66
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 29.11,
+              "net": 24.47
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 37.5,
+             "net": 37.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1129.9,
+             "net": 949.5,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 901.0,
+             "net": 757.14,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 900.0,
+             "net": 756.3,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    "images": [
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System."
+     }
+    ],
+    "imageList": {
+     "imageGroup": "NSF-Image 288x320",
+     "href": [
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png"
+     ]
+    },
+    "shippingInfo": {
+     "label": "Liefertermin ca. 02.09.2026",
+     "date": "2026-09-02"
+    },
+    "capacity": {
+     "displayLabel": "512 GB",
+     "sortValue": 524288
+    },
+    "color": {
+     "displayLabel": "Frost",
+     "primaryColorRgb": "181,183,206"
+    },
+    "defaultAtomicDevice": false,
+    "galleryImage": {
+     "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+     "altText": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+    },
+    "url": {
+     "galleryImage": {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+     }
+    },
+    "attributeGroups": [
+     {
+      "id": "12",
+      "displayLabel": "Images",
+      "attributes": [
+       {
+        "uniqueIdentifier": "image170x230",
+        "displayLabel": "Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/170x230/pixel-11-frost-s.png",
+          "sortOrder": 64
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage170x230",
+        "displayLabel": "NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-frost-170x230-01.png",
+          "sortOrder": 60
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image1200x1200",
+        "displayLabel": "Image 1200x1200",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-frost-1200.png",
+          "sortOrder": 68
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage90x120",
+        "displayLabel": "NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-frost-90x120-01.png",
+          "sortOrder": 62
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image228x309",
+        "displayLabel": "Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/228x309/pixel-11-frost-l.png",
+          "sortOrder": 66
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage288x320",
+        "displayLabel": "MultiValue NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png"
+          },
+          "sortOrder": 55
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png"
+          },
+          "sortOrder": 57
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png"
+          },
+          "sortOrder": 59
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage170x230",
+        "displayLabel": "MultiValue Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "multiValue": {
+           "image170x230": "https://www.vodafone.de/media/img/products/170x230/pixel-11-frost-s.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 65
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage1200x1200",
+        "displayLabel": "MultiValue Image 1200x1200",
+        "sortOrder": 101,
+        "values": [
+         {
+          "multiValue": {
+           "image1200x1200": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-frost-1200.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 69
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage170x230",
+        "displayLabel": "MultiValue NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "multiValue": {
+           "NsfImage170x230": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-frost-170x230-01.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 61
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage288x320",
+        "displayLabel": "NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-01.png",
+          "sortOrder": 54
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-02.png",
+          "sortOrder": 56
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-frost-288x320-03.png",
+          "sortOrder": 58
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage90x120",
+        "displayLabel": "MultiValue NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage90x120": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-frost-90x120-01.png"
+          },
+          "sortOrder": 63
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage228x309",
+        "displayLabel": "MultiValue Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Frost. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "image228x309": "https://www.vodafone.de/media/img/products/228x309/pixel-11-frost-l.png"
+          },
+          "sortOrder": 67
+         }
+        ]
+       }
+      ],
+      "sortOrder": 65
+     },
+     {
+      "id": "1",
+      "displayLabel": "Merkmale",
+      "attributes": [
+       {
+        "uniqueIdentifier": "deliveryTime",
+        "displayLabel": "Lieferzeit",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Liefertermin ca. 02.09.2026",
+          "sortOrder": 6
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "top",
+        "displayLabel": "Top-Features",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "512 GB interner Speicher",
+          "sortOrder": 2
+         },
+         {
+          "value": "6,3 Zoll Display (16 cm)",
+          "sortOrder": 3
+         },
+         {
+          "value": "48 Megapixel-Kamera",
+          "sortOrder": 4
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "primaryColor",
+        "displayLabel": "Primärfarbe",
+        "sortOrder": 45,
+        "values": [
+         {
+          "value": "181,183,206",
+          "sortOrder": 12
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "scopeOfDelivery",
+        "displayLabel": "Lieferumfang",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "Google Pixel 11 Frost (512 GB)",
+          "sortOrder": 7
+         },
+         {
+          "value": "Akku 4985 mAh (nicht austauschbar)",
+          "sortOrder": 8
+         },
+         {
+          "value": "USB-C Kabel (1m)",
+          "sortOrder": 9
+         },
+         {
+          "value": "SIM-Tool",
+          "sortOrder": 10
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deliveryDate",
+        "displayLabel": "Liefertermin",
+        "sortOrder": 18,
+        "values": [
+         {
+          "value": "20260902",
+          "sortOrder": 5
+         }
+        ]
+       }
+      ],
+      "sortOrder": 5
+     },
+     {
+      "id": "2",
+      "displayLabel": "Infos zum Gerät",
+      "attributes": [
+       {
+        "uniqueIdentifier": "color",
+        "displayLabel": "Farbe",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Frost",
+          "sortOrder": 17
+         }
+        ]
+       }
+      ],
+      "sortOrder": 10
+     },
+     {
+      "id": "15",
+      "displayLabel": "Speicher",
+      "attributes": [
+       {
+        "uniqueIdentifier": "internalStorage",
+        "displayLabel": "Interner Speicher bis zu",
+        "sortOrder": 10,
+        "values": [
+         {
+          "value": "512 GB",
+          "sortOrder": 35
+         }
+        ]
+       }
+      ],
+      "sortOrder": 22
+     },
+     {
+      "id": "16",
+      "displayLabel": "Internal Flags",
+      "attributes": [
+       {
+        "uniqueIdentifier": "insuranceTier",
+        "displayLabel": "Insurance Tier",
+        "sortOrder": 150,
+        "values": [
+         {
+          "value": "4",
+          "sortOrder": 84
+         }
+        ]
+       }
+      ],
+      "sortOrder": 9999
+     },
+     {
+      "id": "20",
+      "displayLabel": "Technische IDs",
+      "attributes": [
+       {
+        "uniqueIdentifier": "gtin",
+        "displayLabel": "GTIN",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "840353959477",
+          "sortOrder": 76
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelId",
+        "displayLabel": "Modell-ID",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "58054",
+          "sortOrder": 78
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deviceClass",
+        "displayLabel": "Device Class",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "2",
+          "sortOrder": 77
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelLabel",
+        "displayLabel": "Modellbezeichnung",
+        "sortOrder": 101,
+        "values": [
+         {
+          "value": "Google Pixel 11",
+          "sortOrder": 79
+         }
+        ]
+       }
+      ],
+      "sortOrder": 68
+     }
+    ]
+   },
+   {
+    "hardwareId": "58063",
+    "backendId": "303549",
+    "label": "Google Pixel Hibiscus (256 GB)",
+    "prices": {
+     "hardware": {
+      "offerCoreHash": "05F32D88AF67A6F236E110530D685A7F328D2F6170AAB51EABB78B5568323B6E",
+      "priceByType": {
+       "rate": {
+        "onetime": {
+         "withoutDiscounts": {
+          "gross": 999.9,
+          "net": 840.25,
+          "recurrenceUnit": "onetime"
+         }
+        }
+       }
+      }
+     },
+     "composition": [
+      {
+       "financingType": "sub",
+       "offerCoreHash": "9DCB892187186C326C9A82CDF8A8D47C8881E194247D538442982814A29D7A56",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 69.99,
+          "net": 58.82
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 54.99,
+          "net": 46.21
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 69.99,
+             "net": 58.82
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 54.99,
+              "net": 46.21
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 30
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 12,
+       "offerCoreHash": "B6F457810807DB1AB81514DC6D7AC2F39792ACAD5441D7A653D1A425B8427E7A",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 106.45,
+          "net": 99.75
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 41.95,
+          "net": 35.25
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 12,
+          "gross": 95.95,
+          "net": 90.93
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 13,
+          "recurrenceEnd": 24,
+          "gross": 31.45,
+          "net": 26.43
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 41.95,
+             "net": 35.25
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 31.45,
+              "net": 26.43
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 12,
+             "gross": 64.5,
+             "net": 64.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 36,
+       "offerCoreHash": "1B94926DF7FB1E02054EC8C6E2AD22A5655FA53C79F963C4B06D7CD55BFA8E26",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 53.45,
+          "net": 48.35
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 45.45,
+          "net": 41.63
+         },
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 25,
+          "recurrenceEnd": 36,
+          "gross": 21.5,
+          "net": 21.5
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 31.95,
+             "net": 26.85
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 23.95,
+              "net": 20.13
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 36,
+             "gross": 21.5,
+             "net": 21.5
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      {
+       "financingType": "rate",
+       "financingDuration": 24,
+       "offerCoreHash": "93A1632E89AC2369222F23254B17167E256BD61AA59B1AE1ABA6FD78FFF87EDA",
+       "totalMonthlyRatePrice": {
+        "withoutDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 84.2,
+          "net": 75.91
+         }
+        ],
+        "withDiscounts": [
+         {
+          "recurrenceUnit": "month",
+          "recurrenceStart": 1,
+          "recurrenceEnd": 24,
+          "gross": 61.36,
+          "net": 56.72
+         }
+        ]
+       },
+       "priceByComponent": {
+        "tariff": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 0.0,
+             "net": 0.0,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 51.95,
+             "net": 43.66
+            },
+            "withDiscounts": [
+             {
+              "recurrenceUnit": "month",
+              "recurrenceStart": 1,
+              "recurrenceEnd": 24,
+              "gross": 29.11,
+              "net": 24.47
+             }
+            ]
+           }
+          }
+         }
+        },
+        "hardware": {
+         "priceByType": {
+          "rate": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 1.0,
+             "net": 0.84,
+             "recurrenceUnit": "onetime"
+            }
+           },
+           "month": {
+            "withoutDiscounts": {
+             "recurrenceUnit": "month",
+             "recurrenceStart": 1,
+             "recurrenceEnd": 24,
+             "gross": 32.25,
+             "net": 32.25
+            }
+           }
+          },
+          "uvp": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 999.9,
+             "net": 840.25,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "total": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 775.0,
+             "net": 651.26,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          },
+          "financingAmount": {
+           "onetime": {
+            "withoutDiscounts": {
+             "gross": 774.0,
+             "net": 650.42,
+             "recurrenceUnit": "onetime"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     ]
+    },
+    "images": [
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-02.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte."
+     },
+     {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-03.png",
+      "altText": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System."
+     }
+    ],
+    "imageList": {
+     "imageGroup": "NSF-Image 288x320",
+     "href": [
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-02.png",
+      "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-03.png"
+     ]
+    },
+    "shippingInfo": {
+     "label": "Liefertermin ca. 02.09.2026",
+     "date": "2026-09-02"
+    },
+    "capacity": {
+     "displayLabel": "256 GB",
+     "sortValue": 262144
+    },
+    "color": {
+     "displayLabel": "Hibiscus",
+     "primaryColorRgb": "198,14,100"
+    },
+    "defaultAtomicDevice": false,
+    "galleryImage": {
+     "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png",
+     "altText": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+    },
+    "url": {
+     "galleryImage": {
+      "href": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png"
+     }
+    },
+    "attributeGroups": [
+     {
+      "id": "12",
+      "displayLabel": "Images",
+      "attributes": [
+       {
+        "uniqueIdentifier": "image170x230",
+        "displayLabel": "Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/170x230/pixel-11-hibiscus-s.png",
+          "sortOrder": 64
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage170x230",
+        "displayLabel": "NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-hibiscus-170x230-01.png",
+          "sortOrder": 60
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image1200x1200",
+        "displayLabel": "Image 1200x1200",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-hibiscus-1200.png",
+          "sortOrder": 68
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage90x120",
+        "displayLabel": "NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-hibiscus-90x120-01.png",
+          "sortOrder": 62
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "image228x309",
+        "displayLabel": "Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/228x309/pixel-11-hibiscus-l.png",
+          "sortOrder": 66
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage288x320",
+        "displayLabel": "MultiValue NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png"
+          },
+          "sortOrder": 55
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-02.png"
+          },
+          "sortOrder": 57
+         },
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rechte Produktseite mit zwei Tasten. Rückseite mit erhöhtem Kamera-System.",
+           "NsfImage288x320": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-03.png"
+          },
+          "sortOrder": 59
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage170x230",
+        "displayLabel": "MultiValue Image 170x230",
+        "sortOrder": 5,
+        "values": [
+         {
+          "multiValue": {
+           "image170x230": "https://www.vodafone.de/media/img/products/170x230/pixel-11-hibiscus-s.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 65
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage1200x1200",
+        "displayLabel": "MultiValue Image 1200x1200",
+        "sortOrder": 101,
+        "values": [
+         {
+          "multiValue": {
+           "image1200x1200": "https://www.vodafone.de/media/img/products/1200x1200/pixel-11-hibiscus-1200.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Rückseite mit Google-Logo und Dreifach-Kamera-System oben in der Mitte. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 69
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage170x230",
+        "displayLabel": "MultiValue NSF-Image 170x230",
+        "sortOrder": 3,
+        "values": [
+         {
+          "multiValue": {
+           "NsfImage170x230": "https://www.vodafone.de/media/img/products/NSF-170x230/pixel-11-hibiscus-170x230-01.png",
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand."
+          },
+          "sortOrder": 61
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "NsfImage288x320",
+        "displayLabel": "NSF-Image 288x320",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-01.png",
+          "sortOrder": 54
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-02.png",
+          "sortOrder": 56
+         },
+         {
+          "value": "https://www.vodafone.de/media/img/products/NSF-288x320/pixel-11-hibiscus-288x320-03.png",
+          "sortOrder": 58
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvNsfImage90x120",
+        "displayLabel": "MultiValue NSF-Image 90x120",
+        "sortOrder": 4,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "NsfImage90x120": "https://www.vodafone.de/media/img/products/NSF-90x120/pixel-11-hibiscus-90x120-01.png"
+          },
+          "sortOrder": 63
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "mvImage228x309",
+        "displayLabel": "MultiValue Image 228x309",
+        "sortOrder": 6,
+        "values": [
+         {
+          "multiValue": {
+           "imageDescription": "Produktfoto: Google Pixel 11, Farbe Hibiscus. Vorderseite im All-Screen-Design und dünnem, schwarzem Rand.",
+           "image228x309": "https://www.vodafone.de/media/img/products/228x309/pixel-11-hibiscus-l.png"
+          },
+          "sortOrder": 67
+         }
+        ]
+       }
+      ],
+      "sortOrder": 65
+     },
+     {
+      "id": "1",
+      "displayLabel": "Merkmale",
+      "attributes": [
+       {
+        "uniqueIdentifier": "deliveryTime",
+        "displayLabel": "Lieferzeit",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Liefertermin ca. 02.09.2026",
+          "sortOrder": 6
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "top",
+        "displayLabel": "Top-Features",
+        "sortOrder": 5,
+        "values": [
+         {
+          "value": "256 GB interner Speicher",
+          "sortOrder": 2
+         },
+         {
+          "value": "6,3 Zoll Display (16 cm)",
+          "sortOrder": 3
+         },
+         {
+          "value": "48 Megapixel-Kamera",
+          "sortOrder": 4
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "primaryColor",
+        "displayLabel": "Primärfarbe",
+        "sortOrder": 45,
+        "values": [
+         {
+          "value": "198,14,100",
+          "sortOrder": 12
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "scopeOfDelivery",
+        "displayLabel": "Lieferumfang",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "Google Pixel 11 Hibiscus (256 GB)",
+          "sortOrder": 7
+         },
+         {
+          "value": "Akku 4985 mAh (nicht austauschbar)",
+          "sortOrder": 8
+         },
+         {
+          "value": "USB-C Kabel (1m)",
+          "sortOrder": 9
+         },
+         {
+          "value": "SIM-Tool",
+          "sortOrder": 10
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deliveryDate",
+        "displayLabel": "Liefertermin",
+        "sortOrder": 18,
+        "values": [
+         {
+          "value": "20260902",
+          "sortOrder": 5
+         }
+        ]
+       }
+      ],
+      "sortOrder": 5
+     },
+     {
+      "id": "2",
+      "displayLabel": "Infos zum Gerät",
+      "attributes": [
+       {
+        "uniqueIdentifier": "color",
+        "displayLabel": "Farbe",
+        "sortOrder": 20,
+        "values": [
+         {
+          "value": "Hibiscus",
+          "sortOrder": 17
+         }
+        ]
+       }
+      ],
+      "sortOrder": 10
+     },
+     {
+      "id": "15",
+      "displayLabel": "Speicher",
+      "attributes": [
+       {
+        "uniqueIdentifier": "internalStorage",
+        "displayLabel": "Interner Speicher bis zu",
+        "sortOrder": 10,
+        "values": [
+         {
+          "value": "256 GB",
+          "sortOrder": 35
+         }
+        ]
+       }
+      ],
+      "sortOrder": 22
+     },
+     {
+      "id": "16",
+      "displayLabel": "Internal Flags",
+      "attributes": [
+       {
+        "uniqueIdentifier": "insuranceTier",
+        "displayLabel": "Insurance Tier",
+        "sortOrder": 150,
+        "values": [
+         {
+          "value": "4",
+          "sortOrder": 84
+         }
+        ]
+       }
+      ],
+      "sortOrder": 9999
+     },
+     {
+      "id": "20",
+      "displayLabel": "Technische IDs",
+      "attributes": [
+       {
+        "uniqueIdentifier": "gtin",
+        "displayLabel": "GTIN",
+        "sortOrder": 1,
+        "values": [
+         {
+          "value": "840353959521",
+          "sortOrder": 76
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelId",
+        "displayLabel": "Modell-ID",
+        "sortOrder": 100,
+        "values": [
+         {
+          "value": "58054",
+          "sortOrder": 78
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "deviceClass",
+        "displayLabel": "Device Class",
+        "sortOrder": 30,
+        "values": [
+         {
+          "value": "2",
+          "sortOrder": 77
+         }
+        ]
+       },
+       {
+        "uniqueIdentifier": "modelLabel",
+        "displayLabel": "Modellbezeichnung",
+        "sortOrder": 101,
+        "values": [
+         {
+          "value": "Google Pixel 11",
+          "sortOrder": 79
+         }
+        ]
+       }
+      ],
+      "sortOrder": 68
+     }
+    ]
+   }
+  ],
+  "energyLabel": {
+   "thumbnail": {
+    "href": "https://www.vodafone.de/media/img/energylabelsmall/energylabel-b.svg",
+    "altText": "Energieeffizienzklasse A, auf einer Skala von A bis G"
+   },
+   "preview": {
+    "href": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-energylabel-b.pdf"
+   }
+  },
+  "productDataSheet": {
+   "href": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-produktdatenblatt.pdf"
+  },
+  "attributeGroups": [
+   {
+    "id": "36",
+    "displayLabel": "Energy Label",
+    "attributes": [
+     {
+      "uniqueIdentifier": "eprelId",
+      "displayLabel": "EPREL-Eintragungsnummer",
+      "sortOrder": 1,
+      "values": [
+       {
+        "value": "2647668",
+        "sortOrder": 71
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "energyLabelLarge",
+      "displayLabel": "Energy Label large",
+      "sortOrder": 2,
+      "values": [
+       {
+        "value": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-energylabel-b.pdf",
+        "sortOrder": 73
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "productDataSheet",
+      "displayLabel": "Produktdatenblatt",
+      "sortOrder": 3,
+      "values": [
+       {
+        "value": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-produktdatenblatt.pdf",
+        "sortOrder": 74
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "energyLabelSmall",
+      "displayLabel": "Energy Label small",
+      "sortOrder": 1,
+      "values": [
+       {
+        "value": "https://www.vodafone.de/media/img/energylabelsmall/energylabel-b.svg",
+        "sortOrder": 70
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "energyClass",
+      "displayLabel": "EnergyClass",
+      "sortOrder": 1,
+      "values": [
+       {
+        "value": "B",
+        "sortOrder": 72
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "mvEnergyLabel",
+      "displayLabel": "MultiValue Energy Label",
+      "sortOrder": 4,
+      "values": [
+       {
+        "multiValue": {
+         "energyLabelLarge": "https://www.vodafone.de/media/downloads/pdf/energylabel/pixel-11-energylabel-b.pdf",
+         "imageDescription": "Energieeffizienzklasse A, auf einer Skala von A bis G",
+         "energyLabelSmall": "https://www.vodafone.de/media/img/energylabelsmall/energylabel-b.svg"
+        },
+        "sortOrder": 75
+       }
+      ]
+     }
+    ],
+    "sortOrder": 66
+   },
+   {
+    "id": "25",
+    "displayLabel": "SIM-Karte",
+    "attributes": [
+     {
+      "uniqueIdentifier": "simCardCount",
+      "displayLabel": "Anzahl SIM-Karten",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "2 (Dual-SIM)",
+        "sortOrder": 37
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "supportedSimCardTypes",
+      "displayLabel": "SIM-Kartentyp",
+      "sortOrder": 10,
+      "values": [
+       {
+        "value": "Nano-SIM (SUCI)",
+        "sortOrder": 38
+       },
+       {
+        "value": "eSIM (SUCI)",
+        "sortOrder": 39
+       }
+      ]
+     }
+    ],
+    "sortOrder": 25
+   },
+   {
+    "id": "15",
+    "displayLabel": "Speicher",
+    "attributes": [
+     {
+      "uniqueIdentifier": "mainMemory",
+      "displayLabel": "Arbeitsspeicher",
+      "unit": "GB",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "12",
+        "sortOrder": 34
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "internalStorageExpandable",
+      "displayLabel": "Speicher erweiterbar",
+      "sortOrder": 20,
+      "values": [
+       {
+        "value": "false",
+        "sortOrder": 36
+       }
+      ]
+     }
+    ],
+    "sortOrder": 22
+   },
+   {
+    "id": "37",
+    "displayLabel": "Infos zum Netzteil",
+    "attributes": [
+     {
+      "uniqueIdentifier": "mvChargerIncluded",
+      "displayLabel": "Multi Value charger included",
+      "sortOrder": 1,
+      "values": [
+       {
+        "multiValue": {
+         "imageDescription": "Netzteil nicht im Lieferumfang enthalten",
+         "chargerIncluded": "https://www.vodafone.de/media/img/chargerIncluded/charger-not-included.svg"
+        },
+        "sortOrder": 13
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "mvCompatibleCharger",
+      "displayLabel": "Multi Value compatible charger",
+      "sortOrder": 2,
+      "values": [
+       {
+        "multiValue": {
+         "compatibleCharger": "https://www.vodafone.de/media/img/products/compatibleCharger/pixel-11-charger.svg",
+         "imageDescription": "Kompatibles Netzteil: 7,5 - 30 Watt USB PD"
+        },
+        "sortOrder": 14
+       }
+      ]
+     }
+    ],
+    "sortOrder": 9
+   },
+   {
+    "id": "16",
+    "displayLabel": "Internal Flags",
+    "attributes": [
+     {
+      "uniqueIdentifier": "searchId",
+      "displayLabel": "SearchId",
+      "sortOrder": 4,
+      "values": [
+       {
+        "value": "HMAA87202627",
+        "sortOrder": 82
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "isPremiumDevice",
+      "displayLabel": "Premium Device",
+      "sortOrder": 100,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 83
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "OlsLaunchDate",
+      "displayLabel": "OLS Launch Date (yyyymmdd)",
+      "sortOrder": 2,
+      "values": [
+       {
+        "value": "20260813",
+        "sortOrder": 81
+       }
+      ]
+     }
+    ],
+    "sortOrder": 9999
+   },
+   {
+    "id": "38",
+    "displayLabel": "Icons",
+    "attributes": [
+     {
+      "uniqueIdentifier": "brixInlineIconLibraryKey",
+      "displayLabel": "Brix Inline Icon Library Key",
+      "sortOrder": 1,
+      "values": [
+       {
+        "value": "_5G",
+        "sortOrder": 1
+       }
+      ]
+     }
+    ],
+    "sortOrder": 1
+   },
+   {
+    "id": "1",
+    "displayLabel": "Merkmale",
+    "attributes": [
+     {
+      "uniqueIdentifier": "manufacturer",
+      "displayLabel": "Hersteller",
+      "sortOrder": 40,
+      "values": [
+       {
+        "value": "Google",
+        "sortOrder": 11
+       }
+      ]
+     }
+    ],
+    "sortOrder": 5
+   },
+   {
+    "id": "2",
+    "displayLabel": "Infos zum Gerät",
+    "attributes": [
+     {
+      "uniqueIdentifier": "fingerprintsensor",
+      "displayLabel": "Fingerabdrucksensor",
+      "sortOrder": 65,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 20
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "weight",
+      "displayLabel": "Gewicht",
+      "unit": "g",
+      "sortOrder": 15,
+      "values": [
+       {
+        "value": "197",
+        "sortOrder": 16
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "waterRepellent",
+      "displayLabel": "Wasserabweisend",
+      "sortOrder": 70,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 21
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "faceRecognition",
+      "displayLabel": "Gesichtserkennung",
+      "sortOrder": 60,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 19
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "operatingSystem",
+      "displayLabel": "Betriebssystem",
+      "sortOrder": 25,
+      "values": [
+       {
+        "value": "Android",
+        "sortOrder": 18
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "processor",
+      "displayLabel": "Prozessor",
+      "sortOrder": 80,
+      "values": [
+       {
+        "value": "Google Tensor G6",
+        "sortOrder": 23
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "measurement",
+      "displayLabel": "Abmessungen",
+      "unit": "mm",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "152,8 x 72 x 8,6",
+        "sortOrder": 15
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "stereoSpeakers",
+      "displayLabel": "Stereolautsprecher",
+      "sortOrder": 75,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 22
+       }
+      ]
+     }
+    ],
+    "sortOrder": 10
+   },
+   {
+    "id": "3",
+    "displayLabel": "Bedienung",
+    "attributes": [
+     {
+      "uniqueIdentifier": "dictation",
+      "displayLabel": "Diktierfunktion",
+      "sortOrder": 32,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 52
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "voiceCommands",
+      "displayLabel": "Sprachbefehle",
+      "sortOrder": 25,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 50
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "voiceDialing",
+      "displayLabel": "Sprachwahl",
+      "sortOrder": 30,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 51
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "handsFree",
+      "displayLabel": "Freisprechfunktion",
+      "sortOrder": 35,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 53
+       }
+      ]
+     }
+    ],
+    "sortOrder": 50
+   },
+   {
+    "id": "4",
+    "displayLabel": "Besonderheiten",
+    "attributes": [
+     {
+      "uniqueIdentifier": "hardwareType",
+      "displayLabel": "Produkttyp",
+      "sortOrder": 10,
+      "values": [
+       {
+        "value": "Smartphone",
+        "sortOrder": 80
+       }
+      ]
+     }
+    ],
+    "sortOrder": 70
+   },
+   {
+    "id": "5",
+    "displayLabel": "Kamera",
+    "attributes": [
+     {
+      "uniqueIdentifier": "videoResolutionFrontalCamera",
+      "displayLabel": "Videoauflösung Frontkamera",
+      "unit": "Pixel",
+      "sortOrder": 40,
+      "values": [
+       {
+        "value": "(4K) 3840 x 2160",
+        "sortOrder": 33
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "mainCamera",
+      "displayLabel": "Hauptkamera",
+      "unit": "Megapixel",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "48",
+        "sortOrder": 29
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "frontalCamera",
+      "displayLabel": "Frontkamera",
+      "unit": "Megapixel",
+      "sortOrder": 30,
+      "values": [
+       {
+        "value": "10,5",
+        "sortOrder": 32
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "multipleLenses",
+      "displayLabel": "Mehrfach-Objektive",
+      "unit": "Megapixel",
+      "sortOrder": 10,
+      "values": [
+       {
+        "value": "48 + 13 + 10,8",
+        "sortOrder": 30
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "videoResolution",
+      "displayLabel": "Videoauflösung",
+      "unit": "Pixel",
+      "sortOrder": 20,
+      "values": [
+       {
+        "value": "(4K) 3840 x 2160",
+        "sortOrder": 31
+       }
+      ]
+     }
+    ],
+    "sortOrder": 20
+   },
+   {
+    "id": "6",
+    "displayLabel": "Display",
+    "attributes": [
+     {
+      "uniqueIdentifier": "displayDiagonalCm",
+      "displayLabel": "Display-Diagonale",
+      "unit": "cm",
+      "sortOrder": 15,
+      "values": [
+       {
+        "value": "16",
+        "sortOrder": 25
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "colourDepthUserFriendly",
+      "displayLabel": "Farbtiefe",
+      "sortOrder": 35,
+      "values": [
+       {
+        "value": "16 Millionen Farben",
+        "sortOrder": 28
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "displayDiagonal",
+      "displayLabel": "Display-Diagonale in Zoll (Inch)",
+      "unit": "Zoll",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "6,3",
+        "sortOrder": 24
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "resolution",
+      "displayLabel": "Auflösung",
+      "unit": "Pixel",
+      "sortOrder": 25,
+      "values": [
+       {
+        "value": "1080 x 2424",
+        "sortOrder": 26
+       }
+      ]
+     }
+    ],
+    "sortOrder": 15
+   },
+   {
+    "id": "8",
+    "displayLabel": "Konnektivität",
+    "attributes": [
+     {
+      "uniqueIdentifier": "voiceOverLTE",
+      "displayLabel": "VoLTE",
+      "sortOrder": 15,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 43
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "wirelessLan",
+      "displayLabel": "WLAN",
+      "sortOrder": 35,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 44
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "USBc",
+      "displayLabel": "USB-Anschluss (Typ C)",
+      "sortOrder": 90,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 49
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "fiveGPlus",
+      "displayLabel": "Giga 5G+",
+      "sortOrder": 4,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 40
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "qiCharging",
+      "displayLabel": "Qi-Standard (kabelloses Laden)",
+      "sortOrder": 60,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 48
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "nfc",
+      "displayLabel": "NFC",
+      "sortOrder": 55,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 47
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "fiveG",
+      "displayLabel": "5G",
+      "sortOrder": 5,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 41
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "gps",
+      "displayLabel": "GPS-Empfänger",
+      "sortOrder": 40,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 45
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "bluetoothVersion",
+      "displayLabel": "Bluetooth-Version",
+      "sortOrder": 50,
+      "values": [
+       {
+        "value": "6",
+        "sortOrder": 46
+       }
+      ]
+     },
+     {
+      "uniqueIdentifier": "lte",
+      "displayLabel": "4G/LTE",
+      "sortOrder": 10,
+      "values": [
+       {
+        "value": "true",
+        "sortOrder": 42
+       }
+      ]
+     }
+    ],
+    "sortOrder": 30
+   }
+  ]
+ }
+}

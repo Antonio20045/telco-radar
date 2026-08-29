@@ -122,6 +122,15 @@ class Anbieterbilanz:
     gedeckelt: list = field(default_factory=list)
     besucht: list = field(default_factory=list)
     nicht_verlinkt: list = field(default_factory=list)
+    # Wie viele PREISSAETZE der Extraktor auf den gelesenen Seiten ueberhaupt
+    # gefunden hat - vor dem Katalogabgleich. Ohne diese Zahl sind zwei ganz
+    # verschiedene Ausfaelle im Protokoll nicht zu unterscheiden: "die Seite
+    # gibt nichts her" (rohsaetze 0) und "die Seite gibt etwas her, aber
+    # nichts davon steht im Katalog" (rohsaetze > 0, listungen 0). Genau
+    # diese Frage stand am 28.08.2026 fuer Medimax und ElectronicPartner
+    # offen - 20 abgerufene Produktseiten, 0 Listungen, und das Protokoll
+    # sagte nicht, an welcher der beiden Stufen es lag.
+    rohsaetze: int = 0
 
     @property
     def vollstaendig(self) -> bool:
@@ -133,14 +142,24 @@ class Anbieterbilanz:
 # Linkernte
 # --------------------------------------------------------------------------
 
-def ernte_links(inhalt: str, basis_url: str, pfadmuster: str = "",
+def ernte_links(inhalt: str, basis_url: str, pfadmuster="",
                 kind: str = "static") -> list[str]:
     """Produktadressen aus einer Einstiegsseite.
 
     `static` liest echte `<a href>`, `sitemap` die `<loc>`-Eintraege. Beides
     sind Adressen, die der Anbieter SELBST nennt; geraten wird nichts.
     Reihenfolge = Seitenreihenfolge, entdoppelt.
+
+    `pfadmuster` ist ein Teilstring ODER eine Liste von Teilstrings, die ALLE
+    enthalten sein muessen. Die Liste braucht es, weil ein einzelner
+    Teilstring kein UND ausdruecken kann: freenets Sitemap traegt unter
+    `-ohne-vertrag/p/P-M-` auch Tablets - und jede dieser Seiten kostet bei
+    Crawl-delay einen zweistelligen Sekundenbetrag des Zeitbudgets, ohne je
+    den Katalog treffen zu koennen.
     """
+    muster = ([pfadmuster] if isinstance(pfadmuster, str) else
+              [str(m) for m in (pfadmuster or [])])
+    muster = [m for m in muster if m]
     roh: list[str] = []
     if kind == "sitemap":
         roh = [t.strip() for t in _LOC_RE.findall(inhalt or "")]
@@ -162,7 +181,7 @@ def ernte_links(inhalt: str, basis_url: str, pfadmuster: str = "",
             continue
         if basis_host and teile.netloc.lower() != basis_host:
             continue          # Fremde Domain: nicht unser Beobachtungsraum
-        if pfadmuster and pfadmuster not in url:
+        if muster and not all(m in url for m in muster):
             continue
         url = url.split("#", 1)[0]
         if url.rstrip("/") == (basis_url or "").rstrip("/"):
@@ -219,6 +238,26 @@ registriere("ldjson", Adapter(name="ldjson",
 registriere("shopify", Adapter(name="shopify",
                                lies=lambda text, url="": produkte_aus_shopify(text),
                                direkt=True))
+
+
+def _registriere_anbieter_adapter() -> None:
+    """Die anbietereigenen Adapter, jeder mit EIGENEM Methodennamen.
+
+    Der Import steht in einer Funktion, weil die Module aus diesem Paket
+    `GeraeteAbrufFehler` importieren - auf Modulebene waere das ein Zirkel.
+    """
+    from . import o2 as o2_modul
+    from . import vodafone as vodafone_modul
+
+    registriere("vodafone_api", Adapter(name="vodafone_api",
+                                        lies=vodafone_modul.lies,
+                                        ernte=vodafone_modul.ernte))
+    registriere("o2_katalog", Adapter(name="o2_katalog",
+                                      lies=o2_modul.lies,
+                                      direkt=True))
+
+
+_registriere_anbieter_adapter()
 
 
 # --------------------------------------------------------------------------
@@ -294,6 +333,14 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     gruende: list[str] = []
     frist_erreicht = False
 
+    # Zusaetzliche Kopfzeilen werden NUR uebergeben, wenn der Anbieter welche
+    # deklariert. Damit bleibt der Vertrag `hole(url)` fuer alle bestehenden
+    # Aufrufer und jede vorhandene Testattrappe unveraendert gueltig - nur
+    # die zwei Anbieter, die eine Schnittstelle mit Pflichtkopfzeile lesen
+    # (o2s Medientyp, Vodafones oeffentlicher Browser-Schluessel), brauchen
+    # eine Attrappe mit zweitem Parameter.
+    kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
+
     def _hole(url: str) -> str:
         darf, grund = waechter.darf(url, jetzt)
         if not darf:
@@ -303,7 +350,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             time.sleep(warte)
         letzter_abruf[0] = time.monotonic()
         bilanz.besucht.append(url)
-        status, text = hole(url)
+        status, text = hole(url, kopfzeilen) if kopfzeilen else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}")
         return text
@@ -420,6 +467,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
 
 def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
                farben: dict, heute: str, bilanz: Anbieterbilanz) -> None:
+    bilanz.rohsaetze += len(rohsaetze or [])
     gelesen = []
     for satz in rohsaetze:
         if satz.get("waehrung") and satz["waehrung"] not in ("EUR", ""):
@@ -476,6 +524,12 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         # "mittel" da, obwohl sie aus strukturierten Daten stammen.
         confidence=_belegstufe(satz.get("quelle")),
         farbe_roh=satz.get("farbe") or "", ean=satz.get("ean") or "",
+        # Strukturierte Daten schlagen Textextraktion - die Rangfolge aus
+        # Teil C1. Vodafone und o2 nennen den Speicher als eigenes Feld
+        # (`capacity.displayLabel`, der Angebotsslug); ohne diese Zeile
+        # haette `lies_listung` ihn erneut aus dem Titel geraten, den dieser
+        # Adapter selbst zusammengesetzt hat.
+        speicher_gb=satz.get("speicher_gb"),
         einstieg_url=einstieg.url,
         **_preisfelder(anbieter, satz))
     if listung is None:
@@ -489,6 +543,14 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
 # Alle Anbieter
 # --------------------------------------------------------------------------
 
+# Was jedem noch ausstehenden Anbieter vom Zeitbudget mindestens bleiben
+# muss, bevor ein grosser Anbieter weiterlaufen darf. Ohne diese Reserve
+# frass freenet (Crawl-delay mal ueber 70 Produktseiten) das gesamte Budget,
+# und ALDI TALK stand ab dem 15.08.2026 jede Nacht mit "frist, 0 Listungen
+# aus 5 Produktseiten" da - seine letzte Bestaetigung blieb der 14.08.
+_MINDEST_JE_ANBIETER = 120.0
+
+
 def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
            jetzt: Optional[datetime] = None,
            frist_sekunden: Optional[float] = None) -> dict:
@@ -498,15 +560,33 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
     Domain (bei Medimax und ep.de zehn Sekunden aus ihrer eigenen
     robots.txt), und zwei parallele Collector gegen denselben Betreiber
     waeren effektiv der halbe Abstand - also ein Bruch der Vorgabe.
+
+    Das Zeitbudget ist keine gemeinsame Weide: jeder Anbieter darf hoechstens
+    so viel verbrauchen, dass jedem NACH ihm noch `_MINDEST_JE_ANBIETER`
+    Sekunden bleiben. Gezaehlt werden dabei nur Anbieter, die wirklich
+    crawlen werden (aktiv, crawlbar, Adapter vorhanden) - ein uebersprungener
+    kostet nichts und reserviert nichts.
     """
     jetzt = jetzt or datetime.now(timezone.utc)
     waechter = RobotsWaechter(hole=hole)
     frist_bis = (time.monotonic() + frist_sekunden) if frist_sekunden else None
 
+    sortiert = sorted(quellen.anbieter, key=lambda a: (a.rang, a.name))
+    crawlt = [a.name for a in sortiert
+              if a.crawlbar and ADAPTER.get(a.methode) is not None]
+
     bilanzen = []
-    for anbieter in sorted(quellen.anbieter, key=lambda a: (a.rang, a.name)):
+    for anbieter in sortiert:
+        eigene_frist = frist_bis
+        if frist_bis is not None and anbieter.name in crawlt:
+            nach_mir = len(crawlt) - crawlt.index(anbieter.name) - 1
+            eigene_frist = min(frist_bis,
+                               time.monotonic()
+                               + max(0.0, (frist_bis - time.monotonic())
+                                     - nach_mir * _MINDEST_JE_ANBIETER))
         bilanzen.append(sammle_anbieter(
-            anbieter, katalog, farben, hole, heute, waechter, jetzt, frist_bis))
+            anbieter, katalog, farben, hole, heute, waechter, jetzt,
+            eigene_frist))
     return {
         "anbieter": bilanzen,
         "listungen": [l for b in bilanzen for l in b.listungen],

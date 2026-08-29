@@ -1,0 +1,644 @@
+{
+ "@type": "hwCatalog:HwCatalogValue",
+ "hardware": [
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 301298 00",
+   "description": "Apple iPhone 17 Pro Max",
+   "urlName": "apple-iphone-17-pro-max",
+   "offerName": "privatkunden-apple-iphone-17-pro-max-256gb-tiefblau-24xhigh",
+   "marketingClassification": {
+    "@type": "hwCatalog:MarketingClassificationType",
+    "name": "ORDINARY_DEVICE"
+   },
+   "colors": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2099074/8bfa21c6607147c8c9fdd1cb43a9d136/png/png-cosmic-orange-image-data.webp\" width=\"21\" height=\"21\" alt=\"Cosmic Orange\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2099096/378e4f5866cc404c7ca930be40bb96fc/png/png-tiefblau-image-data.webp\" width=\"21\" height=\"21\" alt=\"Tiefblau\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/130922/9743ab8853de20bec75304a65de6e05f/png/png-silber-image-data.webp\" width=\"21\" height=\"21\" alt=\"Silber\" />"
+   ],
+   "colorImageUrl": [
+    "https://www.o2online.de/resource/crblob/2099074/8bfa21c6607147c8c9fdd1cb43a9d136/png/png-cosmic-orange-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2099096/378e4f5866cc404c7ca930be40bb96fc/png/png-tiefblau-image-data.webp",
+    "https://www.o2online.de/resource/crblob/130922/9743ab8853de20bec75304a65de6e05f/png/png-silber-image-data.webp"
+   ],
+   "imageColorWithAltUrl": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2099074/8bfa21c6607147c8c9fdd1cb43a9d136/png/png-cosmic-orange-image-data.webp\" alt=\"Cosmic Orange\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2099096/378e4f5866cc404c7ca930be40bb96fc/png/png-tiefblau-image-data.webp\" alt=\"Tiefblau\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/130922/9743ab8853de20bec75304a65de6e05f/png/png-silber-image-data.webp\" alt=\"Silber\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />"
+   ],
+   "criteriaValues": [
+    "Merkmale/NFC",
+    "Merkmale/Outdoorgeeignet",
+    "Betriebssystem/iOS",
+    "Hersteller/Hersteller/Apple"
+   ],
+   "tags": [],
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 7.0,
+    "monthlyPrice": 60.5,
+    "totalPrice": 1459.0,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "promotionActive": false
+   },
+   "imageUrl": "https://static2.o9.de/resource/blob/2099180/2614356f79045b2dccf48d84fa25cd78/png/article-item-4510-301298-00-imagemed-picture-data.webp",
+   "highlights": "Das iPhone 17 Pro Max ist Apples bestes Modell. Das Edel-Flaggschiff bietet dir eine fantastische Kamera, enorm viel Leistung, sehr viel Akkulaufzeit und einen frischen Look. Sichere es dir jetzt günstig bei o2.",
+   "marketingHint": "",
+   "bundle": null,
+   "fox36Active": true,
+   "indexBySortingName": {
+    "BY_POPULARITY": 0,
+    "BY_PRICE": 76,
+    "BY_TOP_DEALS": 0
+   },
+   "imageUrlSmall": "https://static2.o9.de/resource/blob/2099178/f01fa08160cc45ba673ca6f6f15e561e/png/article-item-4510-301298-00-imagesmall-picture-data.webp",
+   "stockHint": null,
+   "contractDurationHint": "für 24 Monate",
+   "priceTemplateType": {
+    "@type": "hwCatalog:PriceTemplateType",
+    "name": "DEVICE_RECURRING"
+   },
+   "rateDurationText": "Ratenzahlung:",
+   "rateDurationValue": "24 Monate",
+   "monthlyText": "monatlich:",
+   "oneTimeHwoText": "Anzahlung:",
+   "oneTimeBundleText": "einmalig:",
+   "fullPriceText": "Gesamtpreis:",
+   "ratingStars": "",
+   "topDeal": false,
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-apple-iphone-17-pro-max-256gb-tiefblau-24xhigh",
+    "quantity": 1,
+    "attributes": {
+     "position": "1",
+     "dimension41": "smartphone",
+     "dimension46": "",
+     "dimension43": "inStock",
+     "dimension42": "privatkunden-apple-iphone-17-pro-max-256gb-tiefblau-24xhigh",
+     "brand": "o2shop",
+     "dimension167": "neukunde",
+     "metric17": "24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "1735844334",
+     "dimension164": "iPhone 17 Pro Max",
+     "metric7": "1459.0",
+     "dimension165": "Apple",
+     "metric3": "60.5",
+     "metric5": "7.0",
+     "dimension168": "privatkunden-apple-iphone-17-pro-max-256gb-tiefblau-24xhigh",
+     "dimension154": "4510 301298 00",
+     "dimension166": "no-paid-packs",
+     "aep_product_name": "Apple iPhone 17 Pro Max",
+     "aep_monthly_price_base": "60.5",
+     "aep_monthly_price_final": "60.5",
+     "dimension78": "24|0",
+     "aep_one_time_price_base": "7.0",
+     "aep_one_time_price_final": "7.0",
+     "category": "hw-only_smartphone",
+     "price": "1459.0",
+     "id": "4510 301298 00"
+    }
+   },
+   "promotionActive": false,
+   "energyEfficiency": {
+    "@type": "EnergyEfficiency",
+    "productDataSheet": "",
+    "energyEfficiencyLabel": "<a rel=\"nofollow\" href=\"#id-2119668\" class=\"modal-link occl-modal-link \" data-tracking-action=\"textlink\" data-tracking-description=\"cms___\" occl-modal-fetch=\"https://www.o2online.de/id/2119668?view=occlModal&amp;p=\" data-js=\"modals\" data-cms-target=\"2119668\">\n<picture>\n<source type=\"image/webp\" srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\"></source>\n<source srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/class-a-bild-data.png\"></source>\n<img src=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\" title=\"\" alt=\"\" loading=\"lazy\" width=\"88\" height=\"48\" />\n</picture></a>"
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 320291 00",
+   "description": "Google Pixel 11 Pro XL",
+   "urlName": "google-pixel-11-pro-xl",
+   "offerName": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh",
+   "marketingClassification": {
+    "@type": "hwCatalog:MarketingClassificationType",
+    "name": "ORDINARY_DEVICE"
+   },
+   "colors": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2317860/02032991dea61904e1451382b45fc2cf/png/png-canyon-image-data.webp\" width=\"21\" height=\"21\" alt=\"Awesome Pink\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2187840/3c4b29609ded46050d61f3c4dff68fb0/png/png-fog-image-data.webp\" width=\"21\" height=\"21\" alt=\"Fog\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2092486/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-obsidian-image-data.webp\" width=\"21\" height=\"21\" alt=\"Obsidian\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2317888/be21aa3bf67f12a059dadb0f9b9570e6/png/png-olive-image-data.webp\" width=\"21\" height=\"21\" alt=\"Gruen\" />"
+   ],
+   "colorImageUrl": [
+    "https://www.o2online.de/resource/crblob/2317860/02032991dea61904e1451382b45fc2cf/png/png-canyon-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2187840/3c4b29609ded46050d61f3c4dff68fb0/png/png-fog-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2092486/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-obsidian-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2317888/be21aa3bf67f12a059dadb0f9b9570e6/png/png-olive-image-data.webp"
+   ],
+   "imageColorWithAltUrl": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2317860/02032991dea61904e1451382b45fc2cf/png/png-canyon-image-data.webp\" alt=\"Awesome Pink\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2187840/3c4b29609ded46050d61f3c4dff68fb0/png/png-fog-image-data.webp\" alt=\"Fog\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2092486/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-obsidian-image-data.webp\" alt=\"Obsidian\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2317888/be21aa3bf67f12a059dadb0f9b9570e6/png/png-olive-image-data.webp\" alt=\"Gruen\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />"
+   ],
+   "criteriaValues": [
+    "Hersteller/Hersteller/Google",
+    "Merkmale/NFC",
+    "Betriebssystem/Android",
+    "Merkmale/Outdoorgeeignet"
+   ],
+   "tags": [],
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 1,
+    "monthlyPrice": 58.5,
+    "totalPrice": 1405.0,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "promotionActive": false
+   },
+   "imageUrl": "https://static2.o9.de/resource/blob/2311666/d3fc5c6e290b452c0a6a7bb36e2b3b61/png/article-item-canyon-imagemed-picture-data.webp",
+   "highlights": "Premium-Design trifft auf eine Weiterentwicklung der preisgekrönten Pixel-Kamera. Bei deinem Google Pixel 11 Pro XL kümmert sich Gemini Intelligence um die Alltagsaufgaben, damit du den Moment leben kannst.1",
+   "marketingHint": "",
+   "bundle": null,
+   "fox36Active": true,
+   "indexBySortingName": {
+    "BY_POPULARITY": 19,
+    "BY_PRICE": 73,
+    "BY_TOP_DEALS": 19
+   },
+   "imageUrlSmall": "https://static2.o9.de/resource/blob/2311664/7d008f63efa32eefb40fde60de56cf17/png/article-item-canyon-imagesmall-picture-data.webp",
+   "stockHint": null,
+   "contractDurationHint": "für 24 Monate",
+   "priceTemplateType": {
+    "@type": "hwCatalog:PriceTemplateType",
+    "name": "DEVICE_RECURRING"
+   },
+   "rateDurationText": "Ratenzahlung:",
+   "rateDurationValue": "24 Monate",
+   "monthlyText": "monatlich:",
+   "oneTimeHwoText": "Anzahlung:",
+   "oneTimeBundleText": "einmalig:",
+   "fullPriceText": "Gesamtpreis:",
+   "ratingStars": "",
+   "topDeal": false,
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh",
+    "quantity": 1,
+    "attributes": {
+     "position": "1",
+     "dimension41": "smartphone",
+     "dimension46": "",
+     "dimension43": "inStock",
+     "dimension42": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh",
+     "brand": "o2shop",
+     "dimension167": "neukunde",
+     "metric17": "24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "221068358",
+     "dimension164": "Pixel 11 Pro XL",
+     "metric7": "1405.0",
+     "dimension165": "Google",
+     "metric3": "58.5",
+     "metric5": "1",
+     "dimension168": "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh",
+     "dimension154": "4510 320291 00",
+     "dimension166": "no-paid-packs",
+     "aep_product_name": "Google Pixel 11 Pro XL",
+     "aep_monthly_price_base": "58.5",
+     "aep_monthly_price_final": "58.5",
+     "dimension78": "24|0",
+     "aep_one_time_price_base": "1",
+     "aep_one_time_price_final": "1",
+     "category": "hw-only_smartphone",
+     "price": "1405.0",
+     "id": "4510 320291 00"
+    }
+   },
+   "promotionActive": false,
+   "energyEfficiency": {
+    "@type": "EnergyEfficiency",
+    "productDataSheet": "",
+    "energyEfficiencyLabel": "<a aria-label=\"Mehr Informationen zur Energieklasse B - PDF\" class=\"modal-link occl-modal-link\" rel=\"nofollow\" href=\"#id-2312850\" data-tracking-action=\"textlink\" data-tracking-description=\"cms___\" occl-modal-fetch=\"https://www.o2online.de/id/2312850?view=occlModal&amp;p=\" data-js=\"modals\" data-cms-target=\"2312850\">\n<picture>\n<source type=\"image/webp\" srcset=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/png/class-b-bild-data.webp\"></source>\n<source srcset=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/class-b-bild-data.png\"></source>\n<img src=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/png/class-b-bild-data.webp\" title=\"\" alt=\"\" loading=\"lazy\" width=\"88\" height=\"48\" />\n</picture></a>"
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 091317 00",
+   "description": "Samsung Galaxy S26 FE",
+   "urlName": "samsung-galaxy-s26-fe",
+   "offerName": "privatkunden-samsung-galaxy-s26-fe-128gb-pistachio-24xhigh",
+   "marketingClassification": {
+    "@type": "hwCatalog:MarketingClassificationType",
+    "name": "ORDINARY_DEVICE"
+   },
+   "colors": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2334076/649919c48ca20ec4b84d615b2aafc4b3/png/png-blueberry-image-data.webp\" width=\"21\" height=\"21\" alt=\"Blueberry\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2299706/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-graphite-image-data.webp\" width=\"21\" height=\"21\" alt=\"Awesome Graphite\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2317622/be21aa3bf67f12a059dadb0f9b9570e6/png/png-pistachio-image-data.webp\" width=\"21\" height=\"21\" alt=\"Gruen\" />"
+   ],
+   "colorImageUrl": [
+    "https://www.o2online.de/resource/crblob/2334076/649919c48ca20ec4b84d615b2aafc4b3/png/png-blueberry-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2299706/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-graphite-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2317622/be21aa3bf67f12a059dadb0f9b9570e6/png/png-pistachio-image-data.webp"
+   ],
+   "imageColorWithAltUrl": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2334076/649919c48ca20ec4b84d615b2aafc4b3/png/png-blueberry-image-data.webp\" alt=\"Blueberry\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2299706/e9bb8d25fd924cbb53bdbc725c1bf034/png/png-graphite-image-data.webp\" alt=\"Awesome Graphite\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2317622/be21aa3bf67f12a059dadb0f9b9570e6/png/png-pistachio-image-data.webp\" alt=\"Gruen\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />"
+   ],
+   "criteriaValues": [
+    "Merkmale/NFC",
+    "Betriebssystem/Android",
+    "Hersteller/Hersteller/Samsung",
+    "Merkmale/Outdoorgeeignet"
+   ],
+   "tags": [],
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 7.0,
+    "monthlyPrice": 33.5,
+    "totalPrice": 811.0,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "promotionActive": false
+   },
+   "imageUrl": "https://static2.o9.de/resource/blob/2333804/6aa581e6207d3ee37dfda7e36772ddf0/png/article-item-samsung-galaxy-s26-fe-pistachio-imagemed-picture-data.webp",
+   "highlights": "Das Samsung Galaxy S26 FE bietet dir ein 6,7-Zoll-AMOLED-Display mit bis zu 120 Hz, eine 50-MP-Triple-Kamera und einen 4.900-mAh-Akku. Dazu kommen 5G, kabelloses Laden und bis zu 256 GB Speicher.",
+   "marketingHint": "",
+   "bundle": null,
+   "fox36Active": true,
+   "indexBySortingName": {
+    "BY_POPULARITY": 8,
+    "BY_PRICE": 40,
+    "BY_TOP_DEALS": 8
+   },
+   "imageUrlSmall": "https://static2.o9.de/resource/blob/2333802/da8d6bf42976405b5069149a0cb5b216/png/article-item-samsung-galaxy-s26-fe-pistachio-imagesmall-picture-data.webp",
+   "stockHint": null,
+   "contractDurationHint": "für 24 Monate",
+   "priceTemplateType": {
+    "@type": "hwCatalog:PriceTemplateType",
+    "name": "DEVICE_RECURRING"
+   },
+   "rateDurationText": "Ratenzahlung:",
+   "rateDurationValue": "24 Monate",
+   "monthlyText": "monatlich:",
+   "oneTimeHwoText": "Anzahlung:",
+   "oneTimeBundleText": "einmalig:",
+   "fullPriceText": "Gesamtpreis:",
+   "ratingStars": "",
+   "topDeal": false,
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-samsung-galaxy-s26-fe-128gb-pistachio-24xhigh",
+    "quantity": 1,
+    "attributes": {
+     "position": "1",
+     "dimension41": "smartphone",
+     "dimension46": "",
+     "dimension43": "virtualStock",
+     "dimension42": "privatkunden-samsung-galaxy-s26-fe-128gb-pistachio-24xhigh",
+     "brand": "o2shop",
+     "metric17": "24",
+     "dimension45": "",
+     "dimension167": "neukunde",
+     "dimension163": "privatkunden",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "535228129",
+     "dimension164": "Galaxy S26 FE",
+     "metric7": "811.0",
+     "dimension165": "Samsung",
+     "metric3": "33.5",
+     "metric5": "7.0",
+     "dimension168": "privatkunden-samsung-galaxy-s26-fe-128gb-pistachio-24xhigh",
+     "dimension154": "4510 091317 00",
+     "dimension166": "no-paid-packs",
+     "aep_product_name": "Samsung Galaxy S26 FE",
+     "aep_monthly_price_base": "33.5",
+     "aep_monthly_price_final": "33.5",
+     "dimension78": "24|0",
+     "aep_one_time_price_base": "7.0",
+     "aep_one_time_price_final": "7.0",
+     "category": "hw-only_smartphone",
+     "price": "811.0",
+     "id": "4510 091317 00"
+    }
+   },
+   "promotionActive": false,
+   "energyEfficiency": {
+    "@type": "EnergyEfficiency",
+    "productDataSheet": "",
+    "energyEfficiencyLabel": "<a rel=\"nofollow\" href=\"#id-2334030\" class=\"modal-link occl-modal-link \" data-tracking-action=\"textlink\" data-tracking-description=\"cms___\" occl-modal-fetch=\"https://www.o2online.de/id/2334030?view=occlModal&amp;p=\" data-js=\"modals\" data-cms-target=\"2334030\">\n<picture>\n<source type=\"image/webp\" srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\"></source>\n<source srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/class-a-bild-data.png\"></source>\n<img src=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\" title=\"\" alt=\"\" loading=\"lazy\" width=\"88\" height=\"48\" />\n</picture></a>"
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4510 310276 00",
+   "description": "Xiaomi Redmi Note 17 Pro Max 5G",
+   "urlName": "xiaomi-redmi-note-17-pro-max-5g",
+   "offerName": "privatkunden-xiaomi-redmi-note-17-pro-max-256gb-black-5g-24xhigh",
+   "marketingClassification": {
+    "@type": "hwCatalog:MarketingClassificationType",
+    "name": "ORDINARY_DEVICE"
+   },
+   "colors": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2331390/ea78c0b0a87faf368a40ef6a3efc5127/png/png-cloud-image-data.webp\" width=\"21\" height=\"21\" alt=\"Weiss\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2094994/be21aa3bf67f12a059dadb0f9b9570e6/png/png-gruen-image-data.webp\" width=\"21\" height=\"21\" alt=\"Gruen\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2094314/225b9a5148818490fc360c7da711028d/png/png-schwarz-image-data.webp\" width=\"21\" height=\"21\" alt=\"Schwarz\" />"
+   ],
+   "colorImageUrl": [
+    "https://www.o2online.de/resource/crblob/2331390/ea78c0b0a87faf368a40ef6a3efc5127/png/png-cloud-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2094994/be21aa3bf67f12a059dadb0f9b9570e6/png/png-gruen-image-data.webp",
+    "https://www.o2online.de/resource/crblob/2094314/225b9a5148818490fc360c7da711028d/png/png-schwarz-image-data.webp"
+   ],
+   "imageColorWithAltUrl": [
+    "<img src=\"https://static2.o9.de/resource/crblob/2331390/ea78c0b0a87faf368a40ef6a3efc5127/png/png-cloud-image-data.webp\" alt=\"Weiss\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2094994/be21aa3bf67f12a059dadb0f9b9570e6/png/png-gruen-image-data.webp\" alt=\"Gruen\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />",
+    "<img src=\"https://static2.o9.de/resource/crblob/2094314/225b9a5148818490fc360c7da711028d/png/png-schwarz-image-data.webp\" alt=\"Schwarz\" class=\"option-style\" loading=\"eager\" fetchpriority=\"high\" />"
+   ],
+   "criteriaValues": [
+    "Betriebssystem/Android",
+    "Merkmale/NFC",
+    "Hersteller/Hersteller/Xiaomi",
+    "Merkmale/Outdoorgeeignet"
+   ],
+   "tags": [],
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-black-5g-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 7.0,
+    "monthlyPrice": 24.5,
+    "totalPrice": 595.0,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "promotionActive": false
+   },
+   "imageUrl": "https://static2.o9.de/resource/blob/2326524/5a85719e7bac5a7bfc6d977264f12f33/png/article-item-xiaomi-redmi-note-17-pro-max-5g-schwarz-imagemed-picture-data.webp",
+   "highlights": "Das Xiaomi Redmi Note 17 Pro Max 5G kombiniert einen 9.210-mAh-Akku mit 100 W HyperCharge, ein helles 6,83-Zoll-AMOLED-Display und eine 50-MP-Kamera mit OIS. 5G, Dolby Atmos und praktische KI-Funktionen runden das Paket ab.",
+   "marketingHint": "",
+   "bundle": null,
+   "fox36Active": true,
+   "indexBySortingName": {
+    "BY_POPULARITY": 50,
+    "BY_PRICE": 20,
+    "BY_TOP_DEALS": 50
+   },
+   "imageUrlSmall": "https://static2.o9.de/resource/blob/2326522/c6bcbe76a08180ec243f460213693a16/png/article-item-xiaomi-redmi-note-17-pro-max-5g-schwarz-imagesmall-picture-data.webp",
+   "stockHint": null,
+   "contractDurationHint": "für 24 Monate",
+   "priceTemplateType": {
+    "@type": "hwCatalog:PriceTemplateType",
+    "name": "DEVICE_RECURRING"
+   },
+   "rateDurationText": "Ratenzahlung:",
+   "rateDurationValue": "24 Monate",
+   "monthlyText": "monatlich:",
+   "oneTimeHwoText": "Anzahlung:",
+   "oneTimeBundleText": "einmalig:",
+   "fullPriceText": "Gesamtpreis:",
+   "ratingStars": "",
+   "topDeal": false,
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-xiaomi-redmi-note-17-pro-max-256gb-black-5g-24xhigh",
+    "quantity": 1,
+    "attributes": {
+     "position": "1",
+     "dimension41": "smartphone",
+     "dimension46": "",
+     "dimension43": "inStock",
+     "dimension42": "privatkunden-xiaomi-redmi-note-17-pro-max-256gb-black-5g-24xhigh",
+     "brand": "o2shop",
+     "metric17": "24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension167": "neukunde",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "1638144793",
+     "dimension164": "Redmi Note 17 Pro Max",
+     "metric7": "595.0",
+     "dimension165": "Xiaomi",
+     "metric3": "24.5",
+     "metric5": "7.0",
+     "dimension168": "privatkunden-xiaomi-redmi-note-17-pro-max-256gb-black-5g-24xhigh",
+     "dimension154": "4510 310276 00",
+     "dimension166": "no-paid-packs",
+     "aep_product_name": "Xiaomi Redmi Note 17 Pro Max 5G",
+     "aep_monthly_price_base": "24.5",
+     "aep_monthly_price_final": "24.5",
+     "dimension78": "24|0",
+     "aep_one_time_price_base": "7.0",
+     "aep_one_time_price_final": "7.0",
+     "category": "hw-only_smartphone",
+     "price": "595.0",
+     "id": "4510 310276 00"
+    }
+   },
+   "promotionActive": false,
+   "energyEfficiency": {
+    "@type": "EnergyEfficiency",
+    "productDataSheet": "",
+    "energyEfficiencyLabel": "<a aria-label=\"Mehr Informationen zur Energieklasse B - PDF\" class=\"modal-link occl-modal-link\" rel=\"nofollow\" href=\"#id-2326500\" data-tracking-action=\"textlink\" data-tracking-description=\"cms___\" occl-modal-fetch=\"https://www.o2online.de/id/2326500?view=occlModal&amp;p=\" data-js=\"modals\" data-cms-target=\"2326500\">\n<picture>\n<source type=\"image/webp\" srcset=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/png/class-b-bild-data.webp\"></source>\n<source srcset=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/class-b-bild-data.png\"></source>\n<img src=\"/resource/blob/2037870/4bbfcca365141a486382ac288db03b96/png/class-b-bild-data.webp\" title=\"\" alt=\"\" loading=\"lazy\" width=\"88\" height=\"48\" />\n</picture></a>"
+   }
+  },
+  {
+   "@type": "hwCatalog:HardwareValue",
+   "externalId": "4530 001047 00",
+   "description": "Nothing Phone (3) mit Headphone (1)",
+   "urlName": "nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1",
+   "offerName": "privatkunden-nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1-24xhigh",
+   "marketingClassification": {
+    "@type": "hwCatalog:MarketingClassificationType",
+    "name": "ORDINARY_DEVICE"
+   },
+   "colors": [],
+   "colorImageUrl": [],
+   "imageColorWithAltUrl": [],
+   "criteriaValues": [
+    "Hersteller/Hersteller/Nothing",
+    "Merkmale/Outdoorgeeignet",
+    "Betriebssystem/Android",
+    "Merkmale/NFC"
+   ],
+   "tags": [],
+   "detailWwwAbsoluteCall": {
+    "@type": "infrastructure:ConstantCall",
+    "constantPayload": {
+     "@type": "infrastructure:NavigationEvent",
+     "link": {
+      "@type": "infrastructure:Link",
+      "uri": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+      "mediaType": null
+     }
+    }
+   },
+   "price": {
+    "@type": "hwCatalog:PriceValue",
+    "oneTimePrice": 7.0,
+    "monthlyPrice": 33.5,
+    "totalPrice": 811.0,
+    "activationFee": 0,
+    "nextMonthlyPrices": [],
+    "promotionOneTimePrice": null,
+    "promotionMonthlyPrice": null,
+    "promotionTotalPrice": null,
+    "promotionActivationFee": null,
+    "promotionNextMonthlyPrices": [],
+    "promotionActive": false
+   },
+   "imageUrl": "https://static2.o9.de/resource/blob/2063396/4b3974fdbba473253b51a14b6bd56069/png/article-item-4530-001047-00-imagemed-picture-data.webp",
+   "highlights": "Licht trifft Technik: Das Nothing Phone (3) begeistert mit seinem einzigartigen Glyph-Design, starker Performance und kreativen Kamera-Features. Ideal für alle, die ein stylisches, leistungsfähiges Smartphone suchen.",
+   "marketingHint": "",
+   "bundle": null,
+   "fox36Active": true,
+   "indexBySortingName": {
+    "BY_POPULARITY": 65,
+    "BY_PRICE": 39,
+    "BY_TOP_DEALS": 65
+   },
+   "imageUrlSmall": "https://static2.o9.de/resource/blob/2063394/f88bcb902a41df9bb1ace1b173b5e601/png/article-item-4530-001047-00-imagesmall-picture-data.webp",
+   "stockHint": null,
+   "contractDurationHint": "für 24 Monate",
+   "priceTemplateType": {
+    "@type": "hwCatalog:PriceTemplateType",
+    "name": "DEVICE_RECURRING"
+   },
+   "rateDurationText": "Ratenzahlung:",
+   "rateDurationValue": "24 Monate",
+   "monthlyText": "monatlich:",
+   "oneTimeHwoText": "Anzahlung:",
+   "oneTimeBundleText": "einmalig:",
+   "fullPriceText": "Gesamtpreis:",
+   "ratingStars": "",
+   "topDeal": false,
+   "ecommerceProductValue": {
+    "@type": "hwCatalog:EcommerceProductValue",
+    "name": "privatkunden-nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1-24xhigh",
+    "quantity": 1,
+    "attributes": {
+     "position": "1",
+     "dimension41": "smartphone",
+     "dimension46": "",
+     "dimension43": "inStock",
+     "dimension42": "privatkunden-nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1-24xhigh",
+     "brand": "o2shop",
+     "metric17": "24",
+     "dimension45": "",
+     "dimension163": "privatkunden",
+     "dimension167": "neukunde",
+     "dimension62": "CURRENTLY_NOT_AVAILABLE",
+     "dimension58": "1850355138",
+     "dimension164": "Phone (3) mit Headphone (1)",
+     "metric7": "811.0",
+     "dimension165": "Nothing",
+     "metric3": "33.5",
+     "metric5": "7.0",
+     "dimension168": "privatkunden-nothing-phone-3-256gb-schwarz-mit-nothing-headphone-1-24xhigh",
+     "dimension154": "4530 001047 00",
+     "dimension166": "no-paid-packs",
+     "aep_product_name": "Nothing Phone (3) mit Headphone (1)",
+     "aep_monthly_price_base": "33.5",
+     "aep_monthly_price_final": "33.5",
+     "dimension78": "24|0",
+     "aep_one_time_price_base": "7.0",
+     "aep_one_time_price_final": "7.0",
+     "category": "hw-only_smartphone",
+     "price": "811.0",
+     "id": "4530 001047 00"
+    }
+   },
+   "promotionActive": false,
+   "energyEfficiency": {
+    "@type": "EnergyEfficiency",
+    "productDataSheet": "",
+    "energyEfficiencyLabel": "<a rel=\"nofollow\" href=\"#id-2120132\" class=\"modal-link occl-modal-link \" data-tracking-action=\"textlink\" data-tracking-description=\"cms___\" occl-modal-fetch=\"https://www.o2online.de/id/2120132?view=occlModal&amp;p=\" data-js=\"modals\" data-cms-target=\"2120132\">\n<picture>\n<source type=\"image/webp\" srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\"></source>\n<source srcset=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/class-a-bild-data.png\"></source>\n<img src=\"/resource/blob/2037868/86fb42a950785d0cfaa3c9ef5e892057/png/class-a-bild-data.webp\" title=\"\" alt=\"\" loading=\"lazy\" width=\"88\" height=\"48\" />\n</picture></a>"
+   }
+  }
+ ],
+ "beginIndex": 0,
+ "resultCount": 0,
+ "maxValue": 93,
+ "loadNextRestLink": null,
+ "trackingInfoCall": {
+  "@type": "infrastructure:ConstantCall",
+  "constantPayload": {
+   "@type": "infrastructure:TrackingInfoValue",
+   "rawContent": ""
+  }
+ },
+ "hwCatalogSwitcherStateValue": {
+  "@type": "hwCatalog:HwCatalogSwitcherStateValue",
+  "selectedTargetGroupSwitcher": "privatkunden",
+  "hwOnlyOrBundleSwitcherValue": {
+   "@type": "hwCatalog:HwOnlyOrBundleSwitcherValue",
+   "hwOnlyOrBundleState": {
+    "@type": "hwCatalog:HwOnlyOrBundleState",
+    "name": "HW_ONLY"
+   },
+   "showSwitcher": true
+  }
+ }
+}
