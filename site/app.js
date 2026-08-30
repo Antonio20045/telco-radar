@@ -815,279 +815,142 @@ var TelcoFrage = (function () {
 })();
 
 /* ---------------------------------------------------------------------- *
- * Geraeteradar: Ansichtsumschalter, Filter, Detailzeile.
+ * Geraeteradar: Reiter, Filter, Zeilenaufklapper.
  *
- * Beide Ansichten der Positionskarte stehen fertig im HTML - hier wird nur
- * umgeblendet, nichts nachgeladen und nichts neu gerechnet. Genauso die
- * Filter: sie BLENDEN Punkte aus, sie verschieben keine. Das ist Absicht,
- * denn eine Achse, die sich beim Filtern verschiebt, macht zwei Ansichten
- * unvergleichbar - und die Entzerrung der Etiketten kommt aus Python.
+ * Alle Tafeln stehen fertig im HTML - hier wird nur umgeblendet, nichts
+ * nachgeladen und nichts neu gerechnet. Genauso die Filter: sie BLENDEN
+ * Zeilen aus, sie sortieren nicht um. Wer ohne JavaScript liest, sieht die
+ * erste Tafel vollstaendig; das ist die Tafel, die die Frage der Seite
+ * beantwortet.
  *
- * Auf dem Telefon gibt es kein Hover. Deshalb reagiert jeder Punkt auf Tap
- * und auf Tastatur, und die Einzelheiten stehen in einer Zeile unter der
- * Grafik statt in einer Sprechblase.
+ * Bis zum 30.08.2026 stand hier der Umschalter der Positionskarte samt
+ * Punktfilter. Die Grafik ist geloescht - 114 gedrehte Achsenbeschriftungen,
+ * 155 von 164 Punkten ohne Beschriftung -, und mit ihr dieser Code.
  * ---------------------------------------------------------------------- */
 (function () {
-  var karte = document.getElementById('positionskarte');
-  if (!karte) return;
+  var leiste = document.querySelector('.gr-reiter');
+  if (!leiste) return;
+  var knoepfe = leiste.querySelectorAll('button[data-tafel]');
 
-  var knoepfe = karte.querySelectorAll('.gr-knopf');
-  var ansichten = karte.querySelectorAll('.gr-ansicht');
-  var flaechen = karte.querySelectorAll('.gr-flaeche');
-  var detail = document.getElementById('gr-detail');
-  var legende = document.getElementById('gr-legende');
-  // Der feste Teil der Legende. Der Satz "Ohne Etikett bleiben N Punkte"
-  // gilt je FLAECHE und wird unten nachgezogen - stuende er hier mit drin,
-  // haenge er beim ersten Umschalten ein zweites Mal daran.
-  // Der veraenderliche Teil hat ein eigenes Element. An einer Zeichenkette
-  // geschnitten ("Ohne Etikett bleiben") verfehlte der Schnitt den Satz,
-  // sobald er je Darstellungsform anders anfaengt - dann stand die Legende
-  // doppelt auf der Seite.
-  var legendeZusatz = document.getElementById('gr-legende-zusatz');
-  var felder = {
-    segment: document.getElementById('gr-segment'),
-    speicher: document.getElementById('gr-speicher'),
-    generation: document.getElementById('gr-generation')
-  };
-
-  // Der Zustand ist ein Woerterbuch, kein Sonderfall je Knopf. Ein Knopf
-  // sagt ueber `data-schalter`, WELCHE Achse er stellt, und ueber
-  // `data-wert`, worauf. Der dritte Schalter ("ohne Vertrag / mit Vertrag")
-  // braucht damit keine Zeile JavaScript mehr, nur ein weiteres Attribut.
-  var zustand = {ansicht: '', form: ''};
-  for (var a = 0; a < ansichten.length; a++) {
-    if (ansichten[a].className.indexOf('gr-ansicht--aus') < 0) {
-      zustand.ansicht = ansichten[a].getAttribute('data-ansicht');
-      break;
-    }
-  }
-  for (var f = 0; f < flaechen.length; f++) {
-    if (flaechen[f].className.indexOf('gr-flaeche--aus') < 0) {
-      zustand.form = flaechen[f].getAttribute('data-form');
-      break;
-    }
-  }
-
-  function aktiveAnsicht() {
-    for (var i = 0; i < ansichten.length; i++) {
-      if (ansichten[i].getAttribute('data-ansicht') === zustand.ansicht) return ansichten[i];
-    }
-    return ansichten[0];
-  }
-
-  function blenden() {
-    for (var i = 0; i < ansichten.length; i++) {
-      ansichten[i].classList.toggle('gr-ansicht--aus',
-        ansichten[i].getAttribute('data-ansicht') !== zustand.ansicht);
-    }
-    for (var j = 0; j < flaechen.length; j++) {
-      flaechen[j].classList.toggle('gr-flaeche--aus',
-        flaechen[j].getAttribute('data-form') !== zustand.form);
-    }
-    for (var k = 0; k < knoepfe.length; k++) {
-      var achse = knoepfe[k].getAttribute('data-schalter');
-      knoepfe[k].classList.toggle('on',
-        zustand[achse] === knoepfe[k].getAttribute('data-wert'));
-    }
-  }
-
-  function leereDetail() {
-    // Sonst nennt die Zeile weiter Preis und Anbieter eines Geraets, das
-    // gerade ausgeblendet wurde oder in der anderen Ansicht steht.
-    if (detail) detail.textContent = '';
-  }
-
-  function aktiveFlaeche() {
-    return aktiveAnsicht()
-      ? aktiveAnsicht().querySelector('.gr-flaeche[data-form="' + zustand.form + '"]')
-      : null;
-  }
-
-  function filtern() {
-    leereDetail();
-    var seg = felder.segment ? felder.segment.value : '';
-    var sp = felder.speicher ? felder.speicher.value : '';
-    var gen = felder.generation ? felder.generation.value : '';
-    var sichtbar = 0;
-    var flaeche = aktiveFlaeche();
-    var alle = karte.querySelectorAll('.gr-punkt');
-    for (var i = 0; i < alle.length; i++) {
-      var p = alle[i];
-      var passt = (!seg || p.getAttribute('data-segment') === seg)
-        && (!sp || p.getAttribute('data-speicher') === sp)
-        && (!gen || p.getAttribute('data-aktuell') === '1');
-      p.classList.toggle('gr-punkt--aus', !passt);
-      if (passt && flaeche && p.closest('.gr-flaeche') === flaeche) sichtbar++;
-    }
-    // Ein Preisband ohne sichtbaren Punkt zeigt eine Spanne, die es gerade
-    // nicht mehr gibt. Es verschwindet mit seinen Punkten.
-    var baender = karte.querySelectorAll('.gr-band');
-    for (var b = 0; b < baender.length; b++) {
-      var schluessel = baender[b].getAttribute('data-band');
-      var eigene = baender[b].closest('.gr-flaeche')
-        .querySelectorAll('.gr-punkt[data-band="' + schluessel + '"]');
-      var offen = false;
-      for (var e = 0; e < eigene.length; e++) {
-        if (eigene[e].className.baseVal.indexOf('gr-punkt--aus') < 0) offen = true;
-      }
-      baender[b].classList.toggle('gr-band--aus', !offen);
-    }
-    if (legendeZusatz && flaeche) {
-      // ALLE Zahlen kommen aus der SICHTBAREN Flaeche. Vorher standen hier
-      // drei verschiedene Gesamtzahlen: eine aus der Vorlage (alle Punkte),
-      // eine gerechnete (Punkte durch Flaechen) und die der jeweils anderen
-      // Darstellungsform - keine davon galt fuer das Bild, das man ansah.
-      var gesamt = flaeche.getAttribute('data-punkte');
-      var ohne = parseInt(flaeche.getAttribute('data-etiketten-verborgen') || '0', 10);
-      // Der Satz haengt an der FORM. In der Punktform ist ein Punkt ohne
-      // Chip wirklich ein Punkt ohne Beschriftung. In der Bandform ist die
-      // Zahl am Bandende gemeint - das Band traegt seinen Modellnamen unter
-      // der Achse, und seine Hoehe IST die Preisspanne auf einer
-      // beschrifteten Achse. "Ohne Etikett" waere dort eine Falschaussage
-      // ueber eine Beschriftung, die es gar nicht geben soll.
-      var zusatz = '';
-      if (ohne && zustand.form === 'band') {
-        zusatz = ' Die Preiszahl steht nur dort, wo sie neben das Band passt'
-          + ' (' + (parseInt(gesamt, 10) - ohne) + ' von ' + gesamt + ');'
-          + ' die Höhe des Bandes ist die Spanne, den genauen Wert zeigt ein'
-          + ' Klick.';
-      } else if (ohne) {
-        zusatz = ' Ohne Etikett bleiben ' + ohne + ' Punkte – dort ist die'
-          + ' Spalte voll; der Punkt steht auf seinem Preis.';
-      }
-      // Eine gekappte Spalte muss sagen, dass sie gekappt ist. Eine Grafik,
-      // die stillschweigend zwoelf von dreissig Modellen zeigt, behauptet
-      // eine Vollstaendigkeit, die sie nicht hat.
-      // ANGEBOTE, nicht Modelle: gezaehlt werden (Modell, Geraet, Laden) -
-      // dasselbe Geraet bei drei Laeden sind drei. Und sie stehen NICHT in
-      // der Tabelle unter der Grafik: die entsteht aus denselben
-      // gezeichneten Punkten. Vollstaendig sind sie nur im CSV-Export.
-      var weg = parseInt(flaeche.getAttribute('data-baender-uebersprungen') || '0', 10);
-      if (weg) {
-        zusatz += ' ' + weg + ' weitere Angebote passen nicht in die Spalten;'
-          + ' sie stehen vollständig in der CSV-Tabelle.';
-      }
-      if (seg || sp || gen) {
-        zusatz += ' Gefiltert: ' + sichtbar + ' von ' + gesamt + ' sichtbar.';
-      }
-      if (legendeZusatz) legendeZusatz.textContent = zusatz;
-    }
-  }
-
-  for (var i = 0; i < knoepfe.length; i++) {
-    knoepfe[i].addEventListener('click', function (ev) {
-      var achse = ev.currentTarget.getAttribute('data-schalter');
-      if (!achse) return;
-      zustand[achse] = ev.currentTarget.getAttribute('data-wert');
-      blenden();
-      filtern();
-    });
-  }
-
-  Object.keys(felder).forEach(function (name) {
-    if (felder[name]) felder[name].addEventListener('change', filtern);
-  });
-
-  // Einmal beim Laden: die Baender der Startflaeche brauchen ihren Zustand,
-  // und die Legende ihre Zahl.
-  filtern();
-
-  function zeige(el) {
-    if (!detail) return;
-    var teile = [el.getAttribute('data-modell')];
-    if (el.getAttribute('data-speicher-text')) teile.push(el.getAttribute('data-speicher-text') + ' GB');
-    // Die Farben stehen jetzt als ZAHL plus Liste da, weil ein Punkt seit
-    // der Verdichtung alle Farben einer Speichergroesse vertritt. Genau
-    // deshalb liegen keine fuenf Kreise mehr aufeinander.
-    var farben = parseInt(el.getAttribute('data-farben') || '0', 10);
-    var liste = el.getAttribute('data-farben-liste') || '';
-    if (farben === 1 && liste) teile.push(liste);
-    else if (farben > 1) teile.push(farben + ' Farben' + (liste ? ' (' + liste + ')' : ''));
-    teile.push((el.getAttribute('data-preisart') === 'mit_vertrag' ? 'Zuzahlung ' : '')
-      + el.getAttribute('data-preis') + ' €');
-    teile.push('bei ' + el.getAttribute('data-anbieter'));
-    if (el.getAttribute('data-stand')) teile.push('abgerufen ' + el.getAttribute('data-stand'));
-    detail.textContent = teile.join(' · ') + ' ';
-    var url = el.getAttribute('data-url');
-    if (url) {
-      var a = document.createElement('a');
-      a.href = url;
-      a.rel = 'noopener';
-      a.textContent = 'Quelle';
-      try { a.title = new URL(url).hostname.replace(/^www\./, ''); } catch (e) {}
-      detail.appendChild(a);
-    }
-  }
-
-  karte.addEventListener('click', function (ev) {
-    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
-    if (punkt) zeige(punkt);
-  });
-  karte.addEventListener('keydown', function (ev) {
-    if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
-    if (punkt) { ev.preventDefault(); zeige(punkt); }
-  });
-})();
-
-/* =========================================================================
-   PREISVERGLEICH GEGEN VODAFONE: der Anbieterfilter
-   =========================================================================
-   Drei Knoepfe, eine Regel: gezeigt wird eine Zeile, wenn MINDESTENS EIN
-   guenstigerer Wettbewerber zum gewaehlten Typ gehoert. Zeilen ohne
-   guenstigeren Wettbewerber stehen nur unter "alle" - unter "nur
-   Netzbetreiber" waere "niemand guenstiger" eine Aussage ueber alle
-   Anbieter, nicht ueber die gefilterten, und damit falsch.
-
-   Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
-   Detailliste unter einer Zeile, die nicht mehr da ist.
-   ====================================================================== */
-(function () {
-  var leisten = document.querySelectorAll('[data-vergleich-filter]');
-  if (!leisten.length) return;
-
-  Array.prototype.forEach.call(leisten, function (leiste) {
-    var sektion = leiste.closest('.gr-vergleich');
-    if (!sektion) return;
-    var knoepfe = leiste.querySelectorAll('.gr-filter-knopf');
-
-    // Die Sektion enthaelt seit dem 29.08.2026 ZWEI Tabellen: die Uebersicht
-    // und die Vollansicht im Aufklapper. Gefiltert wird in beiden, GEZAEHLT
-    // wird nur die Uebersicht - sonst meldet der Filter "es gibt Treffer",
-    // waehrend alle davon zugeklappt im Aufklapper stehen, und der Leser
-    // steht vor einer leeren Tabelle mit Kopfzeile ohne Erklaerung. Genau
-    // den Fall soll `.gr-v-leer` abfangen.
-    var uebersicht = sektion.querySelector('.gr-vergleich-scroll');
-
-    function anwenden(typ) {
-      var zeilen = sektion.querySelectorAll('.gr-v-zeile');
-      var sichtbar = 0;
-      for (var i = 0; i < zeilen.length; i++) {
-        var typen = (zeilen[i].getAttribute('data-typen') || '').split(' ');
-        var passt = typ === 'alle' || typen.indexOf(typ) >= 0;
-        zeilen[i].hidden = !passt;
-        if (passt && uebersicht && uebersicht.contains(zeilen[i])) sichtbar++;
-        var naechste = zeilen[i].nextElementSibling;
-        if (naechste && naechste.classList.contains('gr-v-alle')) {
-          naechste.hidden = !passt;
-        }
-      }
-      // Eine leere Tabelle ohne Satz sieht aus wie ein Fehler.
-      var leer = sektion.querySelector('.gr-v-leer');
-      if (leer) leer.hidden = sichtbar > 0;
-      if (uebersicht) uebersicht.hidden = sichtbar === 0;
-    }
-
-    Array.prototype.forEach.call(knoepfe, function (knopf) {
-      knopf.addEventListener('click', function () {
-        Array.prototype.forEach.call(knoepfe, function (k) {
-          k.classList.toggle('is-aktiv', k === knopf);
-        });
-        anwenden(knopf.getAttribute('data-typ') || 'alle');
+  Array.prototype.forEach.call(knoepfe, function (knopf) {
+    knopf.addEventListener('click', function () {
+      Array.prototype.forEach.call(knoepfe, function (k) {
+        var ziel = document.getElementById(k.getAttribute('data-tafel'));
+        var aktiv = k === knopf;
+        k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
+        if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
       });
     });
   });
 })();
+
+/* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
+ *
+ * Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
+ * Anbieterliste unter einer Zeile, die nicht mehr da ist. Dieselbe Falle
+ * wie beim alten Vergleichsfilter, nur an einer neuen Stelle.
+ */
+/* Seit dem 30.08.2026 traegt diese Mechanik ZWEI Tabellen: die Alarme in
+ * Reiter 1 und den flachen Katalog in Reiter 2. Beide haben dieselbe
+ * Filterleiste und denselben "alle zeigen"-Knopf; sie unterscheiden sich nur
+ * in den Spalten. Eine zweite Kopie dieser Funktion waere eine zweite Stelle,
+ * an der die Kaskadenfalle mit `hidden` repariert werden muesste. */
+function grFilterleiste(tafelId, mehrId) {
+  var tafel = document.getElementById(tafelId);
+  if (!tafel) return;
+  var tabelle = tafel.querySelector('.gr-alarm');
+  if (!tabelle) return;
+
+  var felder = tafel.querySelectorAll('[data-filter]');
+  var mehr = document.getElementById(mehrId);
+
+  function anwenden() {
+    var alleZeigen = tabelle.classList.contains('gr-alarm--alle');
+    var wahl = {};
+    var suche = '';
+    Array.prototype.forEach.call(felder, function (f) {
+      var name = f.getAttribute('data-filter');
+      if (name === 'suche') suche = (f.value || '').trim().toLowerCase();
+      else wahl[name] = f.value || '';
+      // Ein aktiver Filter ist rot hinterlegt. Er veraendert, was darunter
+      // steht, und das muss man sehen, ohne die Auswahl zu lesen.
+      var etikett = f.closest('label');
+      if (etikett && name !== 'suche') {
+        etikett.classList.toggle('gr-filter--an', !!f.value);
+      }
+    });
+
+    var zeilen = tabelle.querySelectorAll('.gr-a-zeile');
+    var sichtbar = 0;
+    for (var i = 0; i < zeilen.length; i++) {
+      var z = zeilen[i];
+      var passt = true;
+      for (var name in wahl) {
+        if (wahl[name] && z.getAttribute('data-' + name) !== wahl[name]) {
+          passt = false;
+        }
+      }
+      if (passt && suche) {
+        passt = z.textContent.toLowerCase().indexOf(suche) >= 0;
+      }
+      z.hidden = !passt;
+      // Gezaehlt wird, was der Leser WIRKLICH sieht. Eine Rest-Zeile passt
+      // vielleicht zum Filter, steht aber bis zum Klick auf "alle anzeigen"
+      // per CSS nicht da - mitgezaehlt blendete sie den Erklaersatz aus, und
+      // vor dem Leser stand eine Tabellenkopfzeile mit nichts darunter.
+      // Denselben Waechter hatte der alte Vergleichsfilter, mit Begruendung;
+      // beim Umbau ist er verlorengegangen.
+      if (passt && (!z.classList.contains('gr-a-rest') || alleZeigen)) {
+        sichtbar++;
+      }
+      var auf = document.getElementById(z.getAttribute('data-auf'));
+      if (auf) auf.hidden = !passt;
+    }
+    var leer = tafel.querySelector('.gr-a-leer');
+    if (leer) leer.hidden = sichtbar > 0;
+  }
+
+  Array.prototype.forEach.call(felder, function (f) {
+    f.addEventListener('input', anwenden);
+    f.addEventListener('change', anwenden);
+  });
+
+  // Klick auf eine Zeile klappt alle Anbieter dieses Geraets auf.
+  tabelle.addEventListener('click', function (ev) {
+    if (ev.target.closest('a')) return;   // der Quelllink fuehrt hinaus
+    var zeile = ev.target.closest ? ev.target.closest('.gr-a-zeile') : null;
+    if (!zeile) return;
+    var auf = document.getElementById(zeile.getAttribute('data-auf'));
+    if (auf) auf.classList.toggle('gr-a-auf--an');
+  });
+  tabelle.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var zeile = ev.target.closest ? ev.target.closest('.gr-a-zeile') : null;
+    if (!zeile) return;
+    ev.preventDefault();
+    var auf = document.getElementById(zeile.getAttribute('data-auf'));
+    if (auf) auf.classList.toggle('gr-a-auf--an');
+  });
+
+  // Einmal beim Laden. Manche Browser stellen Formularwerte beim Reload
+  // wieder her; ohne diesen Aufruf zeigt die Tabelle dann ungefiltert an,
+  // was das Auswahlfeld daneben nicht sagt.
+  anwenden();
+
+  if (mehr) {
+    mehr.addEventListener('click', function () {
+      tabelle.classList.add('gr-alarm--alle');
+      // Der ganze Absatz, nicht nur der Knopf: ein leeres <p> mit Rand bleibt
+      // sonst als Luecke stehen.
+      var absatz = mehr.closest('p') || mehr;
+      absatz.parentNode.removeChild(absatz);
+      anwenden();
+    });
+  }
+}
+
+grFilterleiste('tafel-alarme', 'gr-mehr');
+grFilterleiste('tafel-katalog', 'gr-kmehr');
 
 /* =========================================================================
    NEWSLETTER-ANMELDUNG
@@ -1308,6 +1171,274 @@ var TelcoFrage = (function () {
           + 'Pause erst auf). Bitte noch einmal auf „Anmelden“ klicken.'
         : 'Verbindung zum Anmeldedienst fehlgeschlagen. Bitte später noch '
           + 'einmal versuchen.', 'warn');
+    });
+  });
+})();
+
+/* ===================================================================
+   Geraeteradar, Reiter 3: der Preisverlauf EINES Geraets.
+
+   Das einzige Diagramm der Seite. Es entsteht erst nach einer Auswahl -
+   ohne Auswahl steht dort ein Satz und KEIN leeres SVG, weil ein leerer
+   Rahmen so aussieht, als seien die Daten weg.
+
+   Gezeichnet wird von Hand: reines SVG, keine Bibliothek, kein CDN. Die
+   Reihen kommen fertig gerechnet aus `report/geraete_verlauf.py`; hier
+   passiert nur Geometrie.
+
+   DIE ZWEI HARTEN GRENZEN, beide aus dem Auftrag und beide der Grund,
+   warum diese Achse lesbar ist, wo die geloeschte Grafik es nicht war:
+   hoechstens acht Linien (das rechnet das Python-Modul) und hoechstens
+   acht WAAGERECHTE Datumsbeschriftungen (das rechnet `beschriftung()`).
+   Weitere Messpunkte werden gezeichnet, nur nicht beschriftet. Kein
+   gedrehter Text, keine Schrift unter 12 px, nichts mit "..." gekuerzt.
+   =================================================================== */
+(function () {
+  var daten = document.getElementById('gr-verlaufdaten');
+  var feld = document.getElementById('gr-vsuche');
+  if (!daten || !feld) return;
+
+  var GERAETE = [];
+  try { GERAETE = JSON.parse(daten.textContent) || []; } catch (e) { return; }
+  if (!GERAETE.length) return;
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var BREITE = 1080, HOEHE = 340;
+  var RAND = { oben: 18, rechts: 20, unten: 46, links: 74 };
+  var MAX_MARKEN = 8;
+
+  var treffer = document.getElementById('gr-vtreffer');
+  var steuer = document.getElementById('gr-vsteuer');
+  var kacheln = document.getElementById('gr-vkacheln');
+  var leer = document.getElementById('gr-vleer');
+  var bild = document.getElementById('gr-vbild');
+  var legende = document.getElementById('gr-vlegende');
+  var tabelle = document.getElementById('gr-vtabelle');
+  var von = document.getElementById('gr-vvon');
+  var bis = document.getElementById('gr-vbis');
+  var gewaehlt = null, raster = 'woche';
+
+  function euro(n) {
+    return n.toLocaleString('de-DE', { minimumFractionDigits: 2,
+                                       maximumFractionDigits: 2 }) + ' €';
+  }
+  function tagDE(iso) {
+    var t = iso.split('-');
+    return t[2].replace(/^0/, '') + '.' + t[1].replace(/^0/, '') + '.';
+  }
+
+  /* Welche Tage eine Beschriftung bekommen.
+
+     Nie mehr als MAX_MARKEN, und immer der erste und der letzte - eine
+     Achse, deren Enden unbeschriftet sind, sagt nicht, welchen Zeitraum
+     sie zeigt. Dazwischen wird gleichmaessig ausgeduennt. */
+  function beschriftung(tage) {
+    if (tage.length <= MAX_MARKEN) return tage.slice();
+    var schritt = (tage.length - 1) / (MAX_MARKEN - 1), raus = [];
+    for (var i = 0; i < MAX_MARKEN; i++) raus.push(tage[Math.round(i * schritt)]);
+    return raus.filter(function (t, i, a) { return a.indexOf(t) === i; });
+  }
+
+  /* Die Reihe auf das gewaehlte Raster zusammenfassen.
+
+     Je Zeitfenster bleibt der LETZTE Messpunkt stehen, nicht der
+     Mittelwert: ein Mittelwert aus zwei Preisen ist ein Preis, den nie
+     jemand verlangt hat. */
+  function fassen(punkte, wie) {
+    if (wie === 'woche') return punkte;
+    var je = {};
+    punkte.forEach(function (p) {
+      var t = p.datum.split('-');
+      var k = wie === 'monat' ? t[0] + '-' + t[1]
+                              : t[0] + '-Q' + Math.ceil(parseInt(t[1], 10) / 3);
+      if (!je[k] || p.datum > je[k].datum) je[k] = p;
+    });
+    return Object.keys(je).sort().map(function (k) { return je[k]; });
+  }
+
+  function el(name, attrs, text) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) if (attrs[k] !== null) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function zeichne(g) {
+    var vonT = von.value, bisT = bis.value;
+    var reihen = g.reihen.map(function (r) {
+      var ps = fassen(r.punkte.filter(function (p) {
+        return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
+      }), raster);
+      return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen, punkte: ps };
+    }).filter(function (r) { return r.punkte.length; });
+
+    bild.innerHTML = '';
+    legende.innerHTML = '';
+    tabelle.innerHTML = '';
+    if (!reihen.length) {
+      leer.hidden = false;
+      leer.textContent = 'Für diesen Zeitraum liegen keine Messpunkte vor.';
+      bild.hidden = true; legende.hidden = true; tabelle.hidden = true;
+      kacheln.hidden = true;
+      return;
+    }
+    leer.hidden = true;
+    bild.hidden = false; legende.hidden = false; tabelle.hidden = false;
+    kacheln.hidden = false;
+
+    var alle = [], tage = {};
+    reihen.forEach(function (r) {
+      r.punkte.forEach(function (p) { alle.push(p.preis); tage[p.datum] = 1; });
+    });
+    var tageSort = Object.keys(tage).sort();
+    var lo = Math.min.apply(null, alle), hi = Math.max.apply(null, alle);
+    // Eine Spanne von null (ein einziger Preis) wuerde durch null teilen.
+    if (hi === lo) { hi = lo + 1; }
+    var innenB = BREITE - RAND.links - RAND.rechts;
+    var innenH = HOEHE - RAND.oben - RAND.unten;
+
+    function x(datum) {
+      var i = tageSort.indexOf(datum);
+      return tageSort.length === 1 ? RAND.links + innenB / 2
+        : RAND.links + (i / (tageSort.length - 1)) * innenB;
+    }
+    function y(preis) {
+      return RAND.oben + innenH - ((preis - lo) / (hi - lo)) * innenH;
+    }
+
+    var svg = el('svg', {
+      viewBox: '0 0 ' + BREITE + ' ' + HOEHE, class: 'gr-vsvg',
+      role: 'img', 'aria-label': 'Preisverlauf ' + g.label
+    });
+
+    // Waagerechte Hilfslinien und die Preisachse: vier Stufen reichen, um
+    // eine Hoehe abzulesen, und halten die Flaeche ruhig.
+    for (var i = 0; i <= 4; i++) {
+      var preis = lo + (hi - lo) * (i / 4), yy = y(preis);
+      svg.appendChild(el('line', { x1: RAND.links, x2: BREITE - RAND.rechts,
+                                   y1: yy, y2: yy, class: 'gr-vraster' }));
+      svg.appendChild(el('text', { x: RAND.links - 10, y: yy + 4,
+                                   class: 'gr-vachse', 'text-anchor': 'end' },
+                         Math.round(preis) + ' €'));
+    }
+
+    // Datumsachse - waagerecht, hoechstens acht Marken.
+    var marken = beschriftung(tageSort);
+    marken.forEach(function (t) {
+      svg.appendChild(el('text', { x: x(t), y: HOEHE - RAND.unten + 22,
+                                   class: 'gr-vachse', 'text-anchor': 'middle' },
+                         tagDE(t)));
+    });
+
+    reihen.forEach(function (r) {
+      var d = r.punkte.map(function (p, i) {
+        return (i ? 'L' : 'M') + x(p.datum).toFixed(1) + ' ' + y(p.preis).toFixed(1);
+      }).join(' ');
+      if (r.punkte.length > 1) {
+        svg.appendChild(el('path', { d: d, fill: 'none', stroke: r.farbe,
+                                     'stroke-width': r.eigen ? 3 : 2,
+                                     class: 'gr-vlinie' }));
+      }
+      r.punkte.forEach(function (p) {
+        var k = el('circle', { cx: x(p.datum), cy: y(p.preis),
+                               r: r.eigen ? 5 : 4, fill: r.farbe,
+                               class: 'gr-vpunkt' });
+        k.appendChild(el('title', {}, r.anbieter + ': ' + euro(p.preis) +
+                                      ' am ' + tagDE(p.datum)));
+        svg.appendChild(k);
+      });
+    });
+    bild.appendChild(svg);
+
+    reihen.forEach(function (r) {
+      var s = document.createElement('span');
+      s.className = 'gr-vlegende-teil';
+      var punkt = document.createElement('span');
+      punkt.className = 'gr-vlegende-punkt';
+      punkt.style.background = r.farbe;
+      s.appendChild(punkt);
+      s.appendChild(document.createTextNode(r.anbieter));
+      legende.appendChild(s);
+    });
+
+    document.getElementById('gr-vmin').textContent = euro(lo);
+    document.getElementById('gr-vmax').textContent = euro(hi === lo + 1 ? lo : hi);
+    document.getElementById('gr-vanb').textContent = reihen.length;
+    document.getElementById('gr-vpkt').textContent = alle.length;
+
+    var t = document.createElement('table');
+    t.className = 'src-table gr-tabelle';
+    t.innerHTML = '<thead><tr><th scope="col">Anbieter</th>' +
+      '<th scope="col" class="num">aktueller Preis</th>' +
+      '<th scope="col" class="num">Veränderung</th>' +
+      '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
+    var tb = document.createElement('tbody');
+    g.aktuell.forEach(function (z) {
+      var tr = document.createElement('tr');
+      // "-0,00 EUR" und "0 Tage" sind keine Auskunft. Wer nur einen
+      // Messpunkt hat, bekommt einen Strich, keine gerechnete Null.
+      var d = z.veraenderung === null ? '–'
+            : (z.veraenderung > 0 ? '+' : '') + euro(z.veraenderung);
+      tr.innerHTML = '<td>' + z.anbieter + '</td><td class="num">' +
+        euro(z.preis) + '</td><td class="num">' + d + '</td><td>' +
+        tagDE(z.stand) + '</td>';
+      if (z.eigen) tr.className = 'gr-veigen';
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    tabelle.appendChild(t);
+  }
+
+  function waehle(g) {
+    gewaehlt = g;
+    feld.value = g.label;
+    treffer.hidden = true;
+    feld.setAttribute('aria-expanded', 'false');
+    steuer.hidden = false;
+    zeichne(g);
+  }
+
+  feld.addEventListener('input', function () {
+    var q = feld.value.trim().toLowerCase();
+    treffer.innerHTML = '';
+    if (q.length < 2) {
+      treffer.hidden = true;
+      feld.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    var gefunden = GERAETE.filter(function (g) {
+      return g.suchtext.indexOf(q) !== -1;
+    }).slice(0, 8);
+    gefunden.forEach(function (g) {
+      var li = document.createElement('li');
+      li.className = 'gr-vtreffer-zeile';
+      li.setAttribute('role', 'option');
+      li.tabIndex = 0;
+      li.textContent = g.label + ' · ' + g.anbieter +
+        (g.anbieter === 1 ? ' Anbieter' : ' Anbieter');
+      li.addEventListener('click', function () { waehle(g); });
+      li.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); waehle(g); }
+      });
+      treffer.appendChild(li);
+    });
+    treffer.hidden = !gefunden.length;
+    feld.setAttribute('aria-expanded', gefunden.length ? 'true' : 'false');
+  });
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.gr-vknopf'), function (k) {
+      k.addEventListener('click', function () {
+        Array.prototype.forEach.call(document.querySelectorAll('.gr-vknopf'),
+          function (a) { a.classList.remove('is-aktiv'); });
+        k.classList.add('is-aktiv');
+        raster = k.getAttribute('data-raster');
+        if (gewaehlt) zeichne(gewaehlt);
+      });
+    });
+  [von, bis].forEach(function (d) {
+    if (d) d.addEventListener('change', function () {
+      if (gewaehlt) zeichne(gewaehlt);
     });
   });
 })();
