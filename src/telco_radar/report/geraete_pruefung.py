@@ -67,6 +67,7 @@ from __future__ import annotations
 
 from statistics import median
 
+from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
                              zustand_aus_titel)
 
@@ -98,7 +99,22 @@ FARBSPANNE_UNMOEGLICH = 1.00
 # Abweichung vom Median, ab der ein Preis als Ausreisser gilt.
 AUSREISSER_ANTEIL = 0.60
 
-_SICHTBAR = ("aktiv", "beobachtet")
+# DIESELBE Sichtbarkeitsmenge wie Vergleich, Katalog und Preisgrafik. Sie
+# stand hier bis zum 30.08.2026 auf ("aktiv", "beobachtet") - und
+# "beobachtet" ist gar kein Status dieses Stores, den gibt es nur als
+# "aktiv", "vermutlich ausgelistet" und "ausgelistet".
+#
+# Die Folge war nicht kosmetisch: eine Listung auf "vermutlich ausgelistet"
+# wurde von dieser Pruefung NIE angesehen, stand aber sehr wohl im Vergleich
+# (`geraete_vergleich._SICHTBAR`). Genau so kam am 30.08.2026 der
+# o2-Gebrauchtpreis fuer das Galaxy S25 (577 EUR, falsch als "neu"
+# gespeichert) auf die LIVE-Seite zurueck und stand dort als "KRITISCH,
+# 32,1 % guenstiger" - derselbe Fehler, den B1 beseitigt hatte, durch eine
+# Hintertuer, die niemand gemessen hatte.
+#
+# Eine Pruefung kann nicht schuetzen, was sie nicht sieht. Ihre Menge muss
+# deshalb mindestens so weit sein wie die der Verbraucher.
+_SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
 
 def _schluessel(e: dict):

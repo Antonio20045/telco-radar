@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
 # Ab wann ein Preisunterschied ein BEFUND ist und kein Rundungsrauschen.
@@ -85,7 +86,11 @@ MIT_VERTRAG = "mit_vertrag"
 
 # Ein sichtbarer Bestand ist einer, der noch im Regal steht. Ein
 # ausgelistetes Geraet gehoert nicht in einen Preisvergleich von heute.
-_SICHTBAR = ("aktiv", "vermutlich ausgelistet")
+# Aus EINER Quelle, nicht abgeschrieben. Am 30.08.2026 standen hier und in
+# `geraete_pruefung` zwei verschiedene Tupel, und eine Listung auf
+# "vermutlich ausgelistet" fiel genau durch die Luecke dazwischen: geprueft
+# wurde sie nie, gezeigt schon.
+_SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
 
 def _ist_eigen(anbieter: str) -> bool:

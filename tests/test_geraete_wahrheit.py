@@ -418,3 +418,32 @@ def test_eine_ziffer_am_ende_ist_kein_kuerzel(eine, andere):
     Haelfte der Regel fielen 24 verschiedene Farben einer Fixture auf denselben
     Schluessel - und der ganze Bestand wurde als Doppelpreis aussortiert."""
     assert farbschluessel(None, eine) != farbschluessel(None, andere)
+
+
+def test_die_pruefung_sieht_dieselben_zeilen_wie_der_vergleich():
+    """Eine Prüfung kann nicht schützen, was sie nicht sieht.
+
+    Am 30.08.2026 stand `geraete_pruefung._SICHTBAR` auf
+    ("aktiv", "beobachtet") - und "beobachtet" ist gar kein Status dieses
+    Stores. Eine Listung auf "vermutlich ausgelistet" wurde deshalb NIE
+    geprüft, stand aber sehr wohl im Vergleich. So kam o2s Gebrauchtpreis für
+    das Galaxy S25 (577 EUR, falsch als "neu" gespeichert) auf die LIVE-Seite
+    zurück und stand dort als "KRITISCH, 32,1 % günstiger" - derselbe Fehler,
+    den diese Datei beschreibt, durch eine Hintertür.
+    """
+    from telco_radar.report import geraete_pruefung
+    assert set(geraete_vergleich._SICHTBAR) <= set(geraete_pruefung._SICHTBAR), (
+        "der Vergleich zeigt Zeilen, die die Prüfung nie ansieht")
+
+
+def test_ein_gebrauchtpreis_auf_dem_weg_zur_auslistung_faellt_auch():
+    """Der Live-Fall vom 30.08.2026: der Nachtlauf legte die Listung neu an
+    (richtig als refurbished) und setzte die alte auf "vermutlich
+    ausgelistet" - mit ihrem falschen "neu". Nur diese eine stand danach im
+    Vergleich."""
+    alt = _e("samsung-galaxy-s25", 577.0, "grau erneuert", kennung="alt")
+    alt["status"] = "vermutlich ausgelistet"
+    eintraege = [_e("samsung-galaxy-s25", 883.0, "navy", kennung="neu"), alt]
+    erg = pruefe(eintraege, _KATALOG)
+    assert "alt" not in {e["id"] for e in erg["sauber"]}
+    assert erg["zahlen"]["zustand_veraltet"] == 1, erg["zahlen"]
