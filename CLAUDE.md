@@ -1687,6 +1687,71 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (30.08.2026): `/geraete.html` komplett neu gebaut.**
+> Auftragsgrundlage: `outputs/geraeteradar-wahrheit-2026-08-29.md` (die im
+> Auftrag genannten `claude/…`-Pfade liegen im Claude-Projekt, nicht im Repo
+> — **künftig unter `outputs/` suchen und im Plan sagen, welches Dokument
+> genommen wurde**). Schlussliste mit allen Messungen:
+> **`outputs/geraete-html-neubau-2026-08-30.md`**. Stand: **2147 Tests**,
+> `pruefe_portal.py` **17 bestanden / 0 durchgefallen**, live (Deploy #122).
+>
+> **Vier Reiter statt einer Grafik**: Preis-Alarme (Startansicht, Tabelle,
+> KEIN Diagramm) · Gerätekatalog (flache Tabelle statt SKU-Matrix und 65
+> Aufklappern) · Preisverlauf (das EINZIGE Diagramm der Seite, und es zeigt
+> genau EIN Gerät) · Portfolio. Höhen an der echten Seite gemessen:
+> 2949 / 2893 / 2184 / 2575 px. `report/geraete_karte.py` ist gelöscht, nicht
+> umgebaut; live standen vorher 72 gedrehte Etiketten und 248 Punkte.
+>
+> **Fünf Fehler, die kein Test gesehen hat** — alle durch Ansehen oder
+> Nachrechnen an echten Daten gefunden:
+>
+> | # | Befund |
+> |---|---|
+> | 1 | **Die Prüfungen liefen unabhängig.** Eine als gebraucht verurteilte Zeile riss ihren gesunden Nachbarn mit aus dem Vergleich — o2s echte Neupreise (883 € / 1225 €) fehlten ganz. `pruefe()` verkettet jetzt sequenziell. |
+> | 2 | **Eine Autorenregel schlägt `[hidden]`** (Ursprung vor Spezifität). Nach „alle anzeigen" zeigte die gefilterte Tabelle fremde Zeilen — und der Testhelfer zählte `:not([hidden])`, war also für genau diesen Fehler blind. |
+> | 3 | **Die Preisachse erfand Preise**: bei Spanne null (41 von 89 Geräten) stand dreimal „1000 €" für einen Preis von 999,00 €. |
+> | 4 | **Die X-Achse war ordinal** — Abstände von 11 und 8 Tagen standen gleich weit auseinander, die Steigung war frei erfunden. |
+> | 5 | **Prüfung und Vergleich hatten verschiedene Sichtbarkeitsmengen** (siehe unten). |
+>
+> **Der fünfte ist der lehrreichste und stand nach dem ersten Deploy LIVE auf
+> der Seite.** `geraete_pruefung._SICHTBAR` war `("aktiv", "beobachtet")`,
+> `geraete_vergleich._SICHTBAR` dagegen `("aktiv", "vermutlich
+> ausgelistet")` — und **„beobachtet" ist gar kein Status dieses Stores.**
+> Eine Listung in diesem Zustand wurde nie geprüft, aber sehr wohl gezeigt.
+> Der Nachtlauf legte die o2-Listung neu an (richtig als refurbished) und
+> setzte die alte auf „vermutlich ausgelistet" — mit ihrem falschen „neu".
+> Genau die stand danach als „KRITISCH, 32,1 % günstiger" auf der Live-Seite,
+> während der Prüfbericht `zustand_veraltet: 0` meldete. **Eine Prüfung kann
+> nicht schützen, was sie nicht sieht; ihre Sichtbarkeitsmenge muss aus
+> derselben Quelle kommen wie die der Verbraucher.**
+>
+> **Adapter: ein gemessener Negativbefund.** Keiner der sechs ohne
+> Botumgehung erreichbaren Anbieter liefert einen vergleichbaren Preis ohne
+> Vertrag — otelo hat `singlePaymentFee`, aber `tariffEntity` ist auf
+> Übersicht UND Detailseite leer; congstars ld+json-`price` ist die Anzahlung
+> im Bündel (iPhone 16: 520 € gegen 849,90 €) und trägt keinen Speicher im
+> Namen; klarmobils `ng-state` enthält 248 CMS-Einträge und null Geräte.
+> Telekom (AWS-WAF) und Ceconomy (Cloudflare) werden **nicht versucht**.
+> Die Kategorie „gemessen, aber ohne Adapter" ist abgeschafft: `quellenlage`
+> rechnet drei Zustände, deren Summe die Zahl der konfigurierten Anbieter
+> treffen muss.
+>
+> **Ein Deckel in ZEILEN ist nur ein Stellvertreter für eine Grenze in
+> PIXELN.** `KATALOG_SICHTBAR` stand auf 18 und riss nach dem Nachtlauf die
+> 3000 px — acht Listungen mehr, vor allem längere Modellnamen, dieselbe
+> Zeilenzahl wurde höher. Gefunden hat es kein Test (der misst eine Fixture
+> mit 20 Geräten); `pruefe_portal.py` hat dafür jetzt **Kriterium 11b**, das
+> die vier Reiter an der wirklich ausgelieferten Seite misst.
+>
+> **OFFEN:** (1) Reiter 2 wird beim Aufklappen sehr lang (352 Zeilen) — eine
+> Nutzerhandlung, kein Vorgabestand, aber wenn es stört, gehört dort eine
+> Seitenweise hin; (2) Medimax/ElectronicPartner: der Rohsatz-Zähler
+> beantwortet beim nächsten Nachtlauf, an welcher Stufe es scheitert
+> (messbar nur 02:00–08:00 UTC); (3) der Preisverlauf ist erst ab etwa
+> 12 Wochen belastbar — heute vier Messtermine über 20 Tage; (4)
+> Zuzahlungspreise sind nirgends erprobt, alle 360 Listungen tragen einen
+> Barpreis.
+
 > **Zuletzt erledigt (29.08.2026, abends): Preiswahrheit der Geräteseite
 > (W1–W3).** Auftragsgrundlage: „Geräteradar — Evaluation vom 29. August
 > 2026". Alle Messungen und die offenen Punkte:
