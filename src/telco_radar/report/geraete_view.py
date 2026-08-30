@@ -356,14 +356,21 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 # --------------------------------------------------------------------------
 
 # Wie viele Katalogzeilen ohne Aufklappen stehen. GERECHNET wie
-# `geraete_alarme.SICHTBAR_MAX`, am 30.08.2026 im echten Chromium: mit 25
-# Zeilen mass der Reiter 3353 px und riss das 3000-px-Budget des Auftrags.
-# Eine Zeile misst rund 68 px, also sind 18 die Grenze mit etwas Reserve.
+# `geraete_alarme.SICHTBAR_MAX`, am 30.08.2026 im echten Chromium gegen den
+# ECHTEN Bestand: mit 25 Zeilen mass der Reiter 3353 px, mit 18 noch 3304,
+# mit 12 dann 2- statt 3-tausender.
+#
+# Warum 18 nicht reichte, obwohl die Rechnung "68 px je Zeile" es hergab:
+# eine Zeilenhoehe ist keine Konstante. Der naechtliche Lauf brachte 360
+# statt 352 Listungen, und mit ihnen laengere Modellnamen - dieselbe
+# Zeilenzahl wurde hoeher. Ein Deckel in ZEILEN ist immer nur ein Stellver-
+# treter fuer eine Grenze in PIXELN; er braucht deshalb Reserve, nicht die
+# knappste Zahl, die heute gerade passt. Dieselbe Fehlerklasse wie die
+# Datums-Zeitbomben, nur ueber den Bestand statt ueber die Uhr.
 #
 # Die Zahl steht hier und nicht in der Vorlage, damit ein Test sie gegen die
-# gemessene Hoehe halten kann - eine Hoehe, die am Datenbestand haengt,
-# kippt beim naechsten Lauf ohne eine Zeile Codeaenderung.
-KATALOG_SICHTBAR = 18
+# gemessene Hoehe halten kann.
+KATALOG_SICHTBAR = 12
 
 
 def katalogzeilen(eintraege: list, katalog) -> list[dict]:

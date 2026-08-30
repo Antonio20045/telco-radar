@@ -198,6 +198,41 @@ def _haeufigster_absender(site: Path) -> str:
     return ""
 
 
+# Hoechste zulaessige Seitenhoehe je Reiter, auf _BREITE gemessen. Der
+# Auftrag: "Jeder Reiter bleibt unter 3 Bildschirmen." Die alte Seite war
+# 18.412 px hoch.
+_MAX_REITERHOEHE = 3000
+
+
+def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
+    """Jeder Reiter unter drei Bildschirmen - an der ECHTEN Seite gemessen.
+
+    Es gibt dafuer auch einen Browser-Test, aber der laeuft auf einer
+    Fixture mit zwanzig Geraeten. Der echte Bestand ist ein Vielfaches davon
+    und waechst; genau daran ist der Katalog-Reiter am 30.08.2026 gerissen,
+    nachdem der naechtliche Lauf acht Listungen und mit ihnen laengere
+    Modellnamen brachte - dieselbe Zeilenzahl wurde hoeher. Ein Deckel in
+    ZEILEN ist nur ein Stellvertreter fuer eine Grenze in PIXELN, und dieser
+    Punkt hier ist der einzige, der die Pixel wirklich misst.
+    """
+    seite.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+    if not seite.query_selector(".gr-reiter [data-tafel]"):
+        b.prueft(None, "11b. Reiterhoehen (Geraeteseite ohne Reiter)")
+        return
+    zu_hoch, gemessen = [], []
+    for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
+        tid = knopf.get_attribute("data-tafel")
+        knopf.click()
+        seite.wait_for_timeout(80)
+        hoehe = seite.evaluate("document.documentElement.scrollHeight")
+        gemessen.append(f"{tid.replace('tafel-', '')} {hoehe}")
+        if hoehe >= _MAX_REITERHOEHE:
+            zu_hoch.append(f"{tid} {hoehe} px")
+    b.prueft(not zu_hoch,
+             "11b. Reiterhoehen: " + ", ".join(gemessen) + " px"
+             + (f" - ZU HOCH: {'; '.join(zu_hoch)}" if zu_hoch else ""))
+
+
 def _browser_messungen(site: Path, b: Bilanz) -> None:
     """Kriterium 1, 6, 7, 10 und 12 - alles, was eine Darstellung braucht."""
     try:
@@ -219,6 +254,7 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
     with _server(site) as wurzel, sync_playwright() as p:
         browser = p.chromium.launch(executable_path=pfad)
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
+        _reiterhoehen(seite, wurzel, b)
 
         def oeffne(name: str, warte: int = 600) -> None:
             """Seite laden und einmal durchscrollen.
