@@ -300,15 +300,54 @@ def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
         assert verboten not in roh.lower(), verboten
 
 
-def test_matrix_zeigt_variantenzahl_und_preisspanne(tmp_path):
+def test_der_katalog_ist_eine_flache_tabelle(tmp_path):
+    """Reiter 2 zeigt seit dem 30.08.2026 EINE Zeile je (Gerät, Speicher,
+    Farbe, Anbieter) statt einer Matrix mit 65 Aufklappern.
+
+    Der Unterschied ist nicht kosmetisch: eine Matrixzelle sagte "3
+    Varianten, 799-899 EUR", und wer wissen wollte WELCHE, klappte zweimal
+    auf. Jede Zeile trägt jetzt alles, was sie behauptet - Preis, Zustand,
+    Verfügbarkeit, Quelle und Abrufdatum.
+    """
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     kopf = [th.get_text(strip=True)
-            for th in s.select(".gr-matrix-tabelle thead th")]
-    assert kopf[0] == "Gerät"
-    assert set(kopf[1:]) == {"Medimax", "ElectronicPartner", "Vodafone"}
-    zeilen = s.select(".gr-matrix-tabelle tbody tr")
-    assert len(zeilen) == 3
+            for th in s.select("#gr-katalogtabelle thead th")]
+    assert kopf == ["Gerät", "Farbe", "Anbieter", "Preis", "Zustand",
+                    "Verfügbar", "Abgerufen"], kopf
+
+    zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
+    # Eine Zeile je SICHTBARER Listung, nicht je Gerät - das ist der ganze
+    # Punkt der flachen Form. Ausgelistete Bestände bleiben in der Datenbank
+    # (sie wird per Design nie geleert), gehören aber nicht ins Regal.
+    sichtbar = [l for l in _DB["listungen"]
+                if l.get("status") in ("aktiv", "beobachtet")]
+    assert len(sichtbar) < len(_DB["listungen"]), (
+        "die Fixture hat keine ausgelistete Zeile - dann misst dieser "
+        "Vergleich nicht, dass der Status wirklich filtert")
+    assert len(zeilen) == len(sichtbar), len(zeilen)
+    for z in zeilen:
+        assert z.select_one(".gr-a-modell"), "Zeile ohne Modellnamen"
+        assert z.select_one(".gr-a-datum"), "Zeile ohne Abrufdatum"
+    # Die alte Matrix steht nicht mehr auf der Seite.
+    assert s.select_one(".gr-matrix-tabelle") is None
+
+
+def test_eine_unbekannte_verfuegbarkeit_ist_kein_alarm(tmp_path):
+    """"unbekannt" heißt, dass die Quelle nichts gesagt hat - nicht, dass das
+    Gerät fehlt. In Alarmrot gesetzt wäre bei o2 jede der 68 Zeilen rot,
+    ohne dass irgendetwas fehlt."""
+    db = json.loads(json.dumps(_DB))
+    db["listungen"][0]["verfuegbarkeit"] = "unbekannt"
+    site = _baue(tmp_path, db=db)
+    s = _suppe(site, "geraete.html")
+    pillen = [p for p in s.select("#gr-katalogtabelle .gr-pille")
+              if "keine Angabe" in p.get_text()]
+    assert pillen, "die Fixture spannt den Fall nicht auf"
+    for p in pillen:
+        klassen = p.get("class") or []
+        assert "gr-pille--kritisch" not in klassen, klassen
+        assert "gr-pille--unbekannt" in klassen, klassen
 
 
 def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
@@ -905,7 +944,7 @@ def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
     Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one(".gr-alarm .gr-a-zeile")
+    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
     assert zeile is not None, "keine einzige Alarmzeile"
     assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
     assert "€" in zeile.select_one(".gr-a-euro").get_text(strip=True)
@@ -916,7 +955,7 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeilen = s.select(".gr-alarm .gr-a-zeile")
+    zeilen = s.select("#tafel-alarme .gr-a-zeile")
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
@@ -934,7 +973,7 @@ def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
     unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one(".gr-alarm .gr-a-zeile")
+    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
     auf = s.select_one("#" + zeile["data-auf"])
     namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
     # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
@@ -1003,7 +1042,7 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
 
     # Jede Zeile traegt die Werte, nach denen gefiltert wird.
-    for zeile in s.select(".gr-alarm .gr-a-zeile"):
+    for zeile in s.select("#tafel-alarme .gr-a-zeile"):
         assert zeile.has_attr("data-marke")
         assert zeile.has_attr("data-modell")
         assert zeile.has_attr("data-speicher")
@@ -1270,7 +1309,7 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # lief dieser Test an genau der Sektion vorbei, in der der zweite Fall
     # stand („62 Geräte im Vergleich") - ein Test, dessen Lookup ins Leere
     # geht, ist grün und prüft nichts (CLAUDE.md §6).
-    for auswahl in ("#tafel-alarme", ".gr-matrix", "#tafel-katalog"):
+    for auswahl in ("#tafel-alarme", ".gr-katalog", "#tafel-katalog"):
         assert suppe.select_one(auswahl), f"{auswahl} fehlt in der Fixture"
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
@@ -1284,3 +1323,43 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     assert not zu_gross, (
         f"{zu_gross} übersteigen die {bestand} beobachteten Geräte")
 
+
+
+def test_jeder_anbieter_steht_in_genau_einem_von_drei_zustaenden(tmp_path):
+    """Der Auftrag, Abschnitt 4.1: "Die Kategorie 'gemessen, aber ohne
+    Adapter' wird abgebaut, nicht gepflegt. Am Ende steht jeder Anbieter in
+    genau einem von drei Zuständen."
+
+    Die vierte Kategorie sagte nichts aus - sie stand für "könnte man bauen"
+    und blieb stehen, ohne dass jemand entschied. Die drei Zahlen müssen sich
+    auf die Zahl der konfigurierten Anbieter summieren; damit kann eine
+    vierte nicht unbemerkt zurückwachsen.
+    """
+    _baue(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    q = geraete["quellenlage"]
+
+    zustaende = {z["zustand"] for z in q["zeilen"] + q["ohne_hardware"]}
+    assert zustaende <= {"liefert", "gesperrt", "ohne_hardware"}, zustaende
+    assert q["liefernd"] + q["gesperrt"] + q["ohne_hardware_zahl"] == \
+        q["konfiguriert"], q
+
+    # Gegenprobe: die Fixture besetzt wirklich mehr als einen Zustand, sonst
+    # misst der Test nur, dass eine Summe mit sich selbst uebereinstimmt.
+    assert len(zustaende) >= 2, zustaende
+
+
+def test_ein_gesperrter_anbieter_nennt_seinen_grund(tmp_path):
+    """"technisch gesperrt, BEGRUENDET". Ein Anbieter ohne Grund waere
+    wieder die abgeschaffte Kategorie, nur unter anderem Namen."""
+    _baue(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    gesperrt = [z for z in geraete["quellenlage"]["zeilen"]
+                if z["zustand"] == "gesperrt"]
+    assert gesperrt, "die Fixture hat keinen gesperrten Anbieter"
+    ohne_grund = [z["name"] for z in gesperrt if not (z.get("grund") or "").strip()]
+    assert not ohne_grund, ohne_grund

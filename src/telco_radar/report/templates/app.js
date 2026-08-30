@@ -850,14 +850,19 @@ var TelcoFrage = (function () {
  * Anbieterliste unter einer Zeile, die nicht mehr da ist. Dieselbe Falle
  * wie beim alten Vergleichsfilter, nur an einer neuen Stelle.
  */
-(function () {
-  var tafel = document.getElementById('tafel-alarme');
+/* Seit dem 30.08.2026 traegt diese Mechanik ZWEI Tabellen: die Alarme in
+ * Reiter 1 und den flachen Katalog in Reiter 2. Beide haben dieselbe
+ * Filterleiste und denselben "alle zeigen"-Knopf; sie unterscheiden sich nur
+ * in den Spalten. Eine zweite Kopie dieser Funktion waere eine zweite Stelle,
+ * an der die Kaskadenfalle mit `hidden` repariert werden muesste. */
+function grFilterleiste(tafelId, mehrId) {
+  var tafel = document.getElementById(tafelId);
   if (!tafel) return;
   var tabelle = tafel.querySelector('.gr-alarm');
   if (!tabelle) return;
 
   var felder = tafel.querySelectorAll('[data-filter]');
-  var mehr = document.getElementById('gr-mehr');
+  var mehr = document.getElementById(mehrId);
 
   function anwenden() {
     var alleZeigen = tabelle.classList.contains('gr-alarm--alle');
@@ -942,7 +947,10 @@ var TelcoFrage = (function () {
       anwenden();
     });
   }
-})();
+}
+
+grFilterleiste('tafel-alarme', 'gr-mehr');
+grFilterleiste('tafel-katalog', 'gr-kmehr');
 
 /* =========================================================================
    NEWSLETTER-ANMELDUNG
@@ -1163,6 +1171,274 @@ var TelcoFrage = (function () {
           + 'Pause erst auf). Bitte noch einmal auf „Anmelden“ klicken.'
         : 'Verbindung zum Anmeldedienst fehlgeschlagen. Bitte später noch '
           + 'einmal versuchen.', 'warn');
+    });
+  });
+})();
+
+/* ===================================================================
+   Geraeteradar, Reiter 3: der Preisverlauf EINES Geraets.
+
+   Das einzige Diagramm der Seite. Es entsteht erst nach einer Auswahl -
+   ohne Auswahl steht dort ein Satz und KEIN leeres SVG, weil ein leerer
+   Rahmen so aussieht, als seien die Daten weg.
+
+   Gezeichnet wird von Hand: reines SVG, keine Bibliothek, kein CDN. Die
+   Reihen kommen fertig gerechnet aus `report/geraete_verlauf.py`; hier
+   passiert nur Geometrie.
+
+   DIE ZWEI HARTEN GRENZEN, beide aus dem Auftrag und beide der Grund,
+   warum diese Achse lesbar ist, wo die geloeschte Grafik es nicht war:
+   hoechstens acht Linien (das rechnet das Python-Modul) und hoechstens
+   acht WAAGERECHTE Datumsbeschriftungen (das rechnet `beschriftung()`).
+   Weitere Messpunkte werden gezeichnet, nur nicht beschriftet. Kein
+   gedrehter Text, keine Schrift unter 12 px, nichts mit "..." gekuerzt.
+   =================================================================== */
+(function () {
+  var daten = document.getElementById('gr-verlaufdaten');
+  var feld = document.getElementById('gr-vsuche');
+  if (!daten || !feld) return;
+
+  var GERAETE = [];
+  try { GERAETE = JSON.parse(daten.textContent) || []; } catch (e) { return; }
+  if (!GERAETE.length) return;
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var BREITE = 1080, HOEHE = 340;
+  var RAND = { oben: 18, rechts: 20, unten: 46, links: 74 };
+  var MAX_MARKEN = 8;
+
+  var treffer = document.getElementById('gr-vtreffer');
+  var steuer = document.getElementById('gr-vsteuer');
+  var kacheln = document.getElementById('gr-vkacheln');
+  var leer = document.getElementById('gr-vleer');
+  var bild = document.getElementById('gr-vbild');
+  var legende = document.getElementById('gr-vlegende');
+  var tabelle = document.getElementById('gr-vtabelle');
+  var von = document.getElementById('gr-vvon');
+  var bis = document.getElementById('gr-vbis');
+  var gewaehlt = null, raster = 'woche';
+
+  function euro(n) {
+    return n.toLocaleString('de-DE', { minimumFractionDigits: 2,
+                                       maximumFractionDigits: 2 }) + ' €';
+  }
+  function tagDE(iso) {
+    var t = iso.split('-');
+    return t[2].replace(/^0/, '') + '.' + t[1].replace(/^0/, '') + '.';
+  }
+
+  /* Welche Tage eine Beschriftung bekommen.
+
+     Nie mehr als MAX_MARKEN, und immer der erste und der letzte - eine
+     Achse, deren Enden unbeschriftet sind, sagt nicht, welchen Zeitraum
+     sie zeigt. Dazwischen wird gleichmaessig ausgeduennt. */
+  function beschriftung(tage) {
+    if (tage.length <= MAX_MARKEN) return tage.slice();
+    var schritt = (tage.length - 1) / (MAX_MARKEN - 1), raus = [];
+    for (var i = 0; i < MAX_MARKEN; i++) raus.push(tage[Math.round(i * schritt)]);
+    return raus.filter(function (t, i, a) { return a.indexOf(t) === i; });
+  }
+
+  /* Die Reihe auf das gewaehlte Raster zusammenfassen.
+
+     Je Zeitfenster bleibt der LETZTE Messpunkt stehen, nicht der
+     Mittelwert: ein Mittelwert aus zwei Preisen ist ein Preis, den nie
+     jemand verlangt hat. */
+  function fassen(punkte, wie) {
+    if (wie === 'woche') return punkte;
+    var je = {};
+    punkte.forEach(function (p) {
+      var t = p.datum.split('-');
+      var k = wie === 'monat' ? t[0] + '-' + t[1]
+                              : t[0] + '-Q' + Math.ceil(parseInt(t[1], 10) / 3);
+      if (!je[k] || p.datum > je[k].datum) je[k] = p;
+    });
+    return Object.keys(je).sort().map(function (k) { return je[k]; });
+  }
+
+  function el(name, attrs, text) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) if (attrs[k] !== null) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function zeichne(g) {
+    var vonT = von.value, bisT = bis.value;
+    var reihen = g.reihen.map(function (r) {
+      var ps = fassen(r.punkte.filter(function (p) {
+        return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
+      }), raster);
+      return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen, punkte: ps };
+    }).filter(function (r) { return r.punkte.length; });
+
+    bild.innerHTML = '';
+    legende.innerHTML = '';
+    tabelle.innerHTML = '';
+    if (!reihen.length) {
+      leer.hidden = false;
+      leer.textContent = 'Für diesen Zeitraum liegen keine Messpunkte vor.';
+      bild.hidden = true; legende.hidden = true; tabelle.hidden = true;
+      kacheln.hidden = true;
+      return;
+    }
+    leer.hidden = true;
+    bild.hidden = false; legende.hidden = false; tabelle.hidden = false;
+    kacheln.hidden = false;
+
+    var alle = [], tage = {};
+    reihen.forEach(function (r) {
+      r.punkte.forEach(function (p) { alle.push(p.preis); tage[p.datum] = 1; });
+    });
+    var tageSort = Object.keys(tage).sort();
+    var lo = Math.min.apply(null, alle), hi = Math.max.apply(null, alle);
+    // Eine Spanne von null (ein einziger Preis) wuerde durch null teilen.
+    if (hi === lo) { hi = lo + 1; }
+    var innenB = BREITE - RAND.links - RAND.rechts;
+    var innenH = HOEHE - RAND.oben - RAND.unten;
+
+    function x(datum) {
+      var i = tageSort.indexOf(datum);
+      return tageSort.length === 1 ? RAND.links + innenB / 2
+        : RAND.links + (i / (tageSort.length - 1)) * innenB;
+    }
+    function y(preis) {
+      return RAND.oben + innenH - ((preis - lo) / (hi - lo)) * innenH;
+    }
+
+    var svg = el('svg', {
+      viewBox: '0 0 ' + BREITE + ' ' + HOEHE, class: 'gr-vsvg',
+      role: 'img', 'aria-label': 'Preisverlauf ' + g.label
+    });
+
+    // Waagerechte Hilfslinien und die Preisachse: vier Stufen reichen, um
+    // eine Hoehe abzulesen, und halten die Flaeche ruhig.
+    for (var i = 0; i <= 4; i++) {
+      var preis = lo + (hi - lo) * (i / 4), yy = y(preis);
+      svg.appendChild(el('line', { x1: RAND.links, x2: BREITE - RAND.rechts,
+                                   y1: yy, y2: yy, class: 'gr-vraster' }));
+      svg.appendChild(el('text', { x: RAND.links - 10, y: yy + 4,
+                                   class: 'gr-vachse', 'text-anchor': 'end' },
+                         Math.round(preis) + ' €'));
+    }
+
+    // Datumsachse - waagerecht, hoechstens acht Marken.
+    var marken = beschriftung(tageSort);
+    marken.forEach(function (t) {
+      svg.appendChild(el('text', { x: x(t), y: HOEHE - RAND.unten + 22,
+                                   class: 'gr-vachse', 'text-anchor': 'middle' },
+                         tagDE(t)));
+    });
+
+    reihen.forEach(function (r) {
+      var d = r.punkte.map(function (p, i) {
+        return (i ? 'L' : 'M') + x(p.datum).toFixed(1) + ' ' + y(p.preis).toFixed(1);
+      }).join(' ');
+      if (r.punkte.length > 1) {
+        svg.appendChild(el('path', { d: d, fill: 'none', stroke: r.farbe,
+                                     'stroke-width': r.eigen ? 3 : 2,
+                                     class: 'gr-vlinie' }));
+      }
+      r.punkte.forEach(function (p) {
+        var k = el('circle', { cx: x(p.datum), cy: y(p.preis),
+                               r: r.eigen ? 5 : 4, fill: r.farbe,
+                               class: 'gr-vpunkt' });
+        k.appendChild(el('title', {}, r.anbieter + ': ' + euro(p.preis) +
+                                      ' am ' + tagDE(p.datum)));
+        svg.appendChild(k);
+      });
+    });
+    bild.appendChild(svg);
+
+    reihen.forEach(function (r) {
+      var s = document.createElement('span');
+      s.className = 'gr-vlegende-teil';
+      var punkt = document.createElement('span');
+      punkt.className = 'gr-vlegende-punkt';
+      punkt.style.background = r.farbe;
+      s.appendChild(punkt);
+      s.appendChild(document.createTextNode(r.anbieter));
+      legende.appendChild(s);
+    });
+
+    document.getElementById('gr-vmin').textContent = euro(lo);
+    document.getElementById('gr-vmax').textContent = euro(hi === lo + 1 ? lo : hi);
+    document.getElementById('gr-vanb').textContent = reihen.length;
+    document.getElementById('gr-vpkt').textContent = alle.length;
+
+    var t = document.createElement('table');
+    t.className = 'src-table gr-tabelle';
+    t.innerHTML = '<thead><tr><th scope="col">Anbieter</th>' +
+      '<th scope="col" class="num">aktueller Preis</th>' +
+      '<th scope="col" class="num">Veränderung</th>' +
+      '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
+    var tb = document.createElement('tbody');
+    g.aktuell.forEach(function (z) {
+      var tr = document.createElement('tr');
+      // "-0,00 EUR" und "0 Tage" sind keine Auskunft. Wer nur einen
+      // Messpunkt hat, bekommt einen Strich, keine gerechnete Null.
+      var d = z.veraenderung === null ? '–'
+            : (z.veraenderung > 0 ? '+' : '') + euro(z.veraenderung);
+      tr.innerHTML = '<td>' + z.anbieter + '</td><td class="num">' +
+        euro(z.preis) + '</td><td class="num">' + d + '</td><td>' +
+        tagDE(z.stand) + '</td>';
+      if (z.eigen) tr.className = 'gr-veigen';
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    tabelle.appendChild(t);
+  }
+
+  function waehle(g) {
+    gewaehlt = g;
+    feld.value = g.label;
+    treffer.hidden = true;
+    feld.setAttribute('aria-expanded', 'false');
+    steuer.hidden = false;
+    zeichne(g);
+  }
+
+  feld.addEventListener('input', function () {
+    var q = feld.value.trim().toLowerCase();
+    treffer.innerHTML = '';
+    if (q.length < 2) {
+      treffer.hidden = true;
+      feld.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    var gefunden = GERAETE.filter(function (g) {
+      return g.suchtext.indexOf(q) !== -1;
+    }).slice(0, 8);
+    gefunden.forEach(function (g) {
+      var li = document.createElement('li');
+      li.className = 'gr-vtreffer-zeile';
+      li.setAttribute('role', 'option');
+      li.tabIndex = 0;
+      li.textContent = g.label + ' · ' + g.anbieter +
+        (g.anbieter === 1 ? ' Anbieter' : ' Anbieter');
+      li.addEventListener('click', function () { waehle(g); });
+      li.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); waehle(g); }
+      });
+      treffer.appendChild(li);
+    });
+    treffer.hidden = !gefunden.length;
+    feld.setAttribute('aria-expanded', gefunden.length ? 'true' : 'false');
+  });
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.gr-vknopf'), function (k) {
+      k.addEventListener('click', function () {
+        Array.prototype.forEach.call(document.querySelectorAll('.gr-vknopf'),
+          function (a) { a.classList.remove('is-aktiv'); });
+        k.classList.add('is-aktiv');
+        raster = k.getAttribute('data-raster');
+        if (gewaehlt) zeichne(gewaehlt);
+      });
+    });
+  [von, bis].forEach(function (d) {
+    if (d) d.addEventListener('change', function () {
+      if (gewaehlt) zeichne(gewaehlt);
     });
   });
 })();

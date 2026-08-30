@@ -376,9 +376,20 @@ anbieter:
     methode: ldjson
     aktiv: false
     grund: >-
-      ld+json vorhanden und sauber (price 577 EUR), aber es ist der Einmalpreis
-      im Tarifbündel - der zugehörige Tarif steht nicht im strukturierten
-      Datensatz. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht
+      ld+json vorhanden und sauber, aber es ist der Einmalpreis im
+      Tarifbündel - der zugehörige Tarif steht nicht im strukturierten
+      Datensatz. AM 30.08.2026 an zwei echten Produktseiten nachgemessen:
+      /geraete/apple/apple-iphone-16/ trägt ein vollständiges Product-Schema
+      (name, brand, color, gtin, sku, itemCondition NewCondition) mit
+      "price": 520, /geraete/apple/apple-iphone-17/ mit 592. Vodafone führt
+      dasselbe iPhone 16 zu 849,90 EUR - die 520 sind die Anzahlung, nicht der
+      Gerätepreis, und der Seitentext bestätigt es ("mit Vertrag" achtmal,
+      "24 Monate", "Allnet Flat" siebzehnmal). Als Preis ohne Vertrag
+      gespeichert stünde congstar mit 39 Prozent Vorsprung als Sieger in der
+      Vergleichstabelle - genau die Fehlerklasse, die am 30.08.2026 beseitigt
+      worden ist. Zweiter Ausschlussgrund: der Produktname trägt KEINE
+      Speichergröße, ein Vergleich je (Modell, Speicher) ist damit gar nicht
+      möglich. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht
       gespeichert (Teil C4, erzwungen in geraete_model.Listung).
     basis_url: https://www.congstar.de
     einstiege:
@@ -407,9 +418,18 @@ anbieter:
     methode: json_endpunkt
     aktiv: false
     grund: >-
-      Preis liegt im Angular-Zustand (ng-state), nicht in ld+json; der
-      naheliegende Weg /shop/rest/ ist per robots.txt gesperrt. Braucht einen
-      eigenen Adapter auf den ng-state.
+      Preis liegt NICHT im Angular-Zustand, und der naheliegende Weg
+      /shop/rest/ ist per robots.txt gesperrt. AM 30.08.2026 an
+      /handys-mit-vertrag/samsung/samsung-galaxy-s26/ nachgemessen: die
+      Sitemap führt sehr wohl Smartphones - aber unter /handys-mit-vertrag/,
+      nicht unter dem hier konfigurierten /handy-kaufen/, das keinen einzigen
+      Treffer hat. Die Produktseite trägt einen ng-state von 129 kB, dessen
+      apollo.state 248 Einträge enthält: Page, MdlLink, StaticContent,
+      Teaser - kein einziges Geräte- oder Preisobjekt. Die beiden einzigen
+      Preisfelder heißen priceElementAllowedCombinations und
+      priceElementPrefixes, sind also Darstellungsregeln. Ein Adapter auf den
+      ng-state hätte nichts zu lesen; die Zahlen holt die Seite aus der
+      gesperrten Schnittstelle nach.
     basis_url: https://www.klarmobil.de
     einstiege:
       - url: https://www.klarmobil.de/sitemap.xml
@@ -471,7 +491,11 @@ anbieter:
       fünf Stufen; jede Stufe trägt singlePaymentFee (die Zuzahlung, in
       Cent) und paymentFee (den Monatspreis). Der TARIFNAME steht dort
       nicht: entities.tariffEntity und entities.tariffVO sind auf dieser
-      Seite LEER, es bleibt die Kennung ("N43"). Eine Zuzahlung, deren
+      Seite LEER, es bleibt die Kennung ("N43"). AM 30.08.2026 NACHGEMESSEN,
+      und das schließt die naheliegende Hoffnung: auf der DETAILSEITE
+      (/handy-mit-vertrag/apple/iphone-17) sind beide Sammlungen ebenfalls
+      leer. Die Tarifnamen kommen per JavaScript nach - es gibt keine
+      statisch lesbare Stelle, an der die Kennung aufgelöst wird. Eine Zuzahlung, deren
       Tarif nur als "N43" dasteht, ist für einen Leser nicht nachprüfbar -
       und genau das verbietet die Bündelpreis-Regel seit dem 11.08.2026.
       Wer otelo anbindet, löst zuerst die Kennungen gegen

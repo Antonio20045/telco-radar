@@ -194,13 +194,13 @@ def _sichtbare_zeilen(seite):
     Browser zeigte 13.
     """
     return seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-zeile",
+        "#tafel-alarme .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
 
 
 def _sichtbare_marken(seite):
     return seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-zeile",
+        "#tafel-alarme .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
         "      .map(x => x.dataset.marke)")
 
@@ -215,7 +215,12 @@ def test_die_startansicht_traegt_kein_diagramm(_seite):
     tafel = _seite.eval_on_selector(
         "#tafel-alarme", "e => e.querySelectorAll('svg').length")
     assert tafel == 0
-    assert _seite.eval_on_selector_all(".gr-alarm", "e => e.length") == 1
+    # ZWEI Tabellen tragen diese Klasse: die Alarme in Reiter 1 und der
+    # flache Katalog in Reiter 2. Sie teilen sich Aussehen und Filterlogik
+    # bewusst - eine zweite Kopie waere eine zweite Stelle, an der die
+    # Kaskadenfalle mit `hidden` repariert werden muesste.
+    assert _seite.eval_on_selector_all("#tafel-alarme .gr-alarm",
+                                       "e => e.length") == 1
 
 
 def test_kein_gedrehter_text_auf_der_ganzen_seite(_seite):
@@ -310,14 +315,21 @@ def _frisch(seite):
     seite.wait_for_timeout(60)
 
 
-def test_ohne_filter_stehen_hoechstens_fuenfzehn_zeilen(_seite):
+def test_ohne_filter_greift_der_zeilendeckel(_seite):
     """`SICHTBAR_MAX` deckelt die Seitenhoehe STRUKTURELL. Ohne den Deckel
     haengt sie am Datenbestand, und zwei zusaetzliche Zeilen kippen den
-    Abnahmetest, ohne dass sich eine Zeile Code aendert."""
+    Abnahmetest, ohne dass sich eine Zeile Code aendert.
+
+    Die Zahl wird aus dem Modul gelesen, nicht abgeschrieben: sie ist am
+    30.08.2026 von 15 auf 12 gefallen, weil der Reiter mit 15 Zeilen 3154 px
+    mass und damit die andere Vorgabe desselben Auftrags riss. Ein Test, der
+    die 15 festhaelt, haette die Korrektur als Fehler gemeldet.
+    """
+    from telco_radar.report.geraete_alarme import SICHTBAR_MAX
     _frisch(_seite)
-    gesamt = _seite.eval_on_selector_all(".gr-alarm .gr-a-zeile", "e => e.length")
-    assert gesamt > 15, "die Fixture reisst den Deckel nicht - der Test misst nichts"
-    assert _sichtbare_zeilen(_seite) == 15
+    gesamt = _seite.eval_on_selector_all("#tafel-alarme .gr-a-zeile", "e => e.length")
+    assert gesamt > SICHTBAR_MAX, "die Fixture reisst den Deckel nicht"
+    assert _sichtbare_zeilen(_seite) == SICHTBAR_MAX
     assert _seite.query_selector("#gr-mehr") is not None
 
 
@@ -367,7 +379,7 @@ def test_die_suche_grenzt_ein(_seite):
     nachher = _sichtbare_zeilen(_seite)
     assert 0 < nachher < vorher, (vorher, nachher)
     treffer = _seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-zeile",
+        "#tafel-alarme .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
         "      .map(x => x.textContent.toLowerCase().includes('medimax'))")
     assert all(treffer), "eine Zeile ohne den Suchbegriff ist sichtbar"
@@ -379,7 +391,7 @@ def test_eine_leere_auswahl_zeigt_einen_satz_statt_einer_leeren_flaeche(_seite):
     _seite.fill("[data-filter='suche']", "gibtesnicht")
     _seite.wait_for_timeout(60)
     assert _sichtbare_zeilen(_seite) == 0
-    assert _seite.eval_on_selector(".gr-a-leer", "e => !e.hidden") is True
+    assert _seite.eval_on_selector("#tafel-alarme .gr-a-leer", "e => !e.hidden") is True
     _seite.fill("[data-filter='suche']", "")
 
 
@@ -390,7 +402,7 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     # auf dem Aufraeumen eines anderen sitzt, faellt aus, sobald der andere
     # ausfaellt - und meldet dann etwas, das mit ihm nichts zu tun hat.
     _frisch(_seite)
-    zeile = ".gr-alarm .gr-a-zeile:not([hidden])"
+    zeile = "#tafel-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
     assert _seite.eval_on_selector(aufklapper, "e => e.offsetParent") is None
     _seite.click(f"{zeile} .gr-a-modell")
@@ -435,7 +447,7 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     _seite.select_option("[data-filter='marke']", "")
     _seite.fill("[data-filter='suche']", "")
     _frisch(_seite)
-    zeile = ".gr-alarm .gr-a-zeile:not([hidden])"
+    zeile = "#tafel-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
     # Der Klick TOGGELT. Die Fixture hat Modulgueltigkeit, ein Test davor kann
     # denselben Aufklapper schon geoeffnet haben - dann klappt ein blinder
@@ -461,16 +473,16 @@ def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
     werden muss, was wirklich dasteht - nicht, was zum Filter passt."""
     _frisch(_seite)
     rest = _seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-rest.gr-a-zeile", "e => e.length")
+        "#tafel-alarme .gr-a-rest.gr-a-zeile", "e => e.length")
     assert rest, "die Fixture hat keine Zeilen hinter 'alle anzeigen'"
     suchwort = _seite.eval_on_selector(
-        ".gr-alarm .gr-a-rest.gr-a-zeile .gr-a-modell",
+        "#tafel-alarme .gr-a-rest.gr-a-zeile .gr-a-modell",
         "e => e.textContent.trim()")
     _seite.fill("[data-filter='suche']", suchwort)
     _seite.wait_for_timeout(60)
     assert _sichtbare_zeilen(_seite) == 0
     assert _seite.eval_on_selector(
-        ".gr-a-leer", "e => getComputedStyle(e).display") != "none"
+        "#tafel-alarme .gr-a-leer", "e => getComputedStyle(e).display") != "none"
     _seite.fill("[data-filter='suche']", "")
 
 

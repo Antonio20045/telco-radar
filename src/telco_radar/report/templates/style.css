@@ -2317,3 +2317,68 @@ b,strong{font-weight:700}
 .nl-prot-warn p:last-child{margin-bottom:0}
 .nl-prot-rot{color:var(--red);font-weight:700}
 .nl-prot-fuss{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-4)}
+
+/* Reiter 3: Preisverlauf.
+   KEINE SCHRIFT UNTER 12 PX, und das gilt hier auch fuer die SVG-Texte -
+   die geloeschte Grafik setzte ihre Achsen mit 10,5 px und war deshalb
+   unlesbar. Kein `transform:rotate` in diesem ganzen Block: passt eine
+   Datumsmarke nicht hin, laesst `beschriftung()` in app.js sie weg. */
+.gr-verlauf{margin:34px 0 0}
+.gr-vsuche{position:relative;max-width:520px;margin:0 0 14px}
+.gr-vlabel{display:block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 4px}
+.gr-vfeld{width:100%;font-family:var(--serif);font-size:16px;padding:9px 11px;
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
+.gr-vfeld:focus{outline:2px solid var(--red);outline-offset:1px}
+.gr-vtreffer{position:absolute;z-index:5;left:0;right:0;margin:2px 0 0;
+  padding:0;list-style:none;background:var(--paper-2);
+  border:1px solid var(--rule);max-height:300px;overflow-y:auto}
+.gr-vtreffer-zeile{padding:8px 11px;font-size:15px;cursor:pointer;
+  border-bottom:1px solid var(--rule-2)}
+.gr-vtreffer-zeile:last-child{border-bottom:0}
+.gr-vtreffer-zeile:hover,.gr-vtreffer-zeile:focus{background:var(--paper-3);
+  outline:none}
+
+.gr-vsteuer{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
+  margin:0 0 16px}
+.gr-vgruppe{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.gr-vknopf{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
+  padding:7px 12px;border:1px solid var(--rule);background:var(--paper-2);
+  color:var(--ink-2);cursor:pointer}
+.gr-vknopf.is-aktiv{background:var(--red);border-color:var(--red);color:#fff}
+.gr-vdatum{font-family:var(--sans);font-size:12px;padding:6px 8px;
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
+
+.gr-vkacheln{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--rule-2);border-top:1px solid var(--rule-ink);
+  border-bottom:1px solid var(--rule);margin:0 0 18px}
+.gr-vkachel{background:var(--paper);padding:12px 14px}
+.gr-vkachel b{display:block;font-family:var(--serif);font-size:24px;
+  line-height:1.1;font-variant-numeric:lining-nums}
+.gr-vkachel span{display:block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.05em;color:var(--ink-3);margin:3px 0 0}
+
+.gr-vbild{margin:0 0 10px;overflow-x:auto}
+.gr-vsvg{width:100%;min-width:640px;height:auto;display:block}
+.gr-vraster{stroke:var(--rule-2);stroke-width:1}
+.gr-vachse{font-family:var(--sans);font-size:12px;fill:var(--ink-3)}
+.gr-vlinie{stroke-linejoin:round;stroke-linecap:round}
+.gr-vpunkt{stroke:var(--paper);stroke-width:1.5}
+.gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
+  font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
+.gr-vlegende-punkt{width:11px;height:11px;border-radius:50%;display:inline-block}
+.gr-vtabelle table{width:100%}
+.gr-veigen{background:var(--red-wash)}
+
+@media (max-width:760px){
+  .gr-vkacheln{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Der dritte Verfuegbarkeitszustand. "unbekannt" heisst, dass die Quelle
+   nichts gesagt hat - das ist keine schlechte Nachricht und darf nicht wie
+   eine aussehen. Bei o2 traegt jede der 68 Zeilen diesen Wert; in Alarmrot
+   waere die halbe Katalogtabelle rot, ohne dass irgendetwas fehlt. */
+.gr-pille--unbekannt{background:var(--paper-3);color:var(--ink-3);
+  border:1px solid var(--rule)}

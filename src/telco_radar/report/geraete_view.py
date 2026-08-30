@@ -39,8 +39,9 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, serie_aus_modell
-from . import geraete_alarme, geraete_pruefung, geraete_vergleich
+from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, serie_aus_modell,
+                             zustand_aus_feldern)
+from . import geraete_alarme, geraete_pruefung, geraete_vergleich, geraete_verlauf
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -354,6 +355,69 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 # SKU-Matrix
 # --------------------------------------------------------------------------
 
+# Wie viele Katalogzeilen ohne Aufklappen stehen. GERECHNET wie
+# `geraete_alarme.SICHTBAR_MAX`, am 30.08.2026 im echten Chromium: mit 25
+# Zeilen mass der Reiter 3353 px und riss das 3000-px-Budget des Auftrags.
+# Eine Zeile misst rund 68 px, also sind 18 die Grenze mit etwas Reserve.
+#
+# Die Zahl steht hier und nicht in der Vorlage, damit ein Test sie gegen die
+# gemessene Hoehe halten kann - eine Hoehe, die am Datenbestand haengt,
+# kippt beim naechsten Lauf ohne eine Zeile Codeaenderung.
+KATALOG_SICHTBAR = 18
+
+
+def katalogzeilen(eintraege: list, katalog) -> list[dict]:
+    """Reiter 2 als FLACHE Tabelle: eine Zeile je (Geraet, Speicher, Farbe,
+    Anbieter).
+
+    Bis zum 30.08.2026 stand hier eine Matrix Modell x Anbieter plus 65
+    Aufklapper - eine Zelle sagte "3 Varianten, 799-899 EUR", und wer wissen
+    wollte, WELCHE, klappte zweimal auf. Der Auftrag verlangt stattdessen die
+    flache Form: jede Zeile traegt alles, was sie behauptet, und die
+    Filterleiste von Reiter 1 arbeitet darauf.
+
+    Gezeigt wird ALLES, auch refurbished und Zuzahlungen - anders als in
+    Vergleich und Diagramm. Dieser Reiter ist der Bestand, nicht die Aussage:
+    was aus dem Vergleich faellt, verschwindet nicht, es wird nur nicht gegen
+    etwas gerechnet, das es nicht ist.
+    """
+    zeilen = []
+    for e in eintraege:
+        g = katalog.nach_id(e.get("device_id")) if katalog else None
+        preis = e.get("preis_ohne_vertrag")
+        # Der Zustand wird NEU ABGELEITET, nicht aus dem Store uebernommen.
+        # Sonst steht in dieser Tabelle "space schwarz erneuert - Zustand
+        # neu", waehrend der Pruefbericht zwei Reiter weiter "refurbished"
+        # sagt: die Seite widerspraeche sich selbst, und der Store ist die
+        # schwaechere Quelle - er traegt seinen alten Wert bis zum naechsten
+        # erfolgreichen Crawl.
+        zustand = zustand_aus_feldern(
+            e.get("titel_roh"), e.get("farbe_roh"), e.get("quelle_url"))
+        if zustand in VERGLEICHBARE_ZUSTAENDE:
+            zustand = e.get("zustand") or "neu"
+        zeilen.append({
+            "modell": g.modell if g else (e.get("device_id") or "?"),
+            "hersteller": g.hersteller if g else "",
+            "speicher": e.get("speicher_gb"),
+            "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+            "anbieter": e.get("anbieter"),
+            "anbieter_typ": e.get("anbieter_typ") or "",
+            "netz": e.get("netz") or "",
+            "zustand": zustand,
+            "preis": preis,
+            "zuzahlung": e.get("zuzahlung"),
+            "tarif": e.get("tarif_referenz") or "",
+            "verfuegbarkeit": e.get("verfuegbarkeit") or "unbekannt",
+            "url": e.get("quelle_url") or "",
+            "abgerufen_am": e.get("abgerufen_am") or "",
+        })
+    # Nach Modell, dann Speicher, dann Preis: wer ein Geraet sucht, findet
+    # seine Zeilen beieinander, und innerhalb steht der guenstigste oben.
+    return sorted(zeilen, key=lambda z: (
+        z["hersteller"], z["modell"], z["speicher"] or 0,
+        z["preis"] if z["preis"] is not None else float("inf"), z["anbieter"] or ""))
+
+
 def _matrix(eintraege: list, katalog) -> dict:
     """Modell x Anbieter. Zelle: Zahl der Varianten und Preisspanne."""
     anbieter = sorted({e.get("anbieter") for e in eintraege if e.get("anbieter")})
@@ -457,6 +521,15 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             "hardware_vermarktung": vermarktung,
             "bilanz": db.laufbilanz(a.name),
         }
+        # GENAU DREI ZUSTAENDE, und keiner davon heisst "gemessen, aber ohne
+        # Adapter". Diese vierte Kategorie ist am 30.08.2026 abgeschafft
+        # worden, weil sie nichts aussagte: sie stand fuer "koennte man
+        # bauen" und blieb jahrelang stehen, ohne dass jemand entschied. Wer
+        # nicht liefert, ist entweder ohne Hardware im Sortiment oder aus
+        # einem NACHGEMESSENEN Grund gesperrt - und der Grund steht daneben.
+        satz["zustand"] = ("liefert" if satz["liefert"]
+                           else "ohne_hardware" if vermarktung == "nein"
+                           else "gesperrt")
         if vermarktung == "nein":
             ohne_hardware.append(satz)
         else:
@@ -478,6 +551,7 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             "hinweis": "", "einstiege": [],
             "geraete": sum(1 for e in eintraege if e.get("anbieter") == name),
             "liefert": True, "hardware_vermarktung": "ja",
+            "zustand": "liefert",
             "bilanz": db.laufbilanz(name),
         })
 
@@ -489,6 +563,11 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         # passen, die darunter stehen - sonst steht ueber 21 Zeilen die Zahl
         # 23 (der Fehlertyp aus CLAUDE.md §6).
         "aufgefuehrt": len(zeilen),
+        # Die drei Zustaende als Zahlen. Sie muessen sich auf `konfiguriert`
+        # summieren - eine vierte Kategorie kann damit nicht unbemerkt
+        # zurueckwachsen, und genau davon kam dieser Abschnitt.
+        "gesperrt": sum(1 for z in zeilen if z["zustand"] == "gesperrt"),
+        "ohne_hardware_zahl": len(ohne_hardware),
         "konfiguriert": len(quellen.anbieter),
         "unbekannt": [n for n in sorted(mit_daten) if n and n not in bekannt],
         "seiten": quellen.seiten_zahl,
@@ -546,6 +625,9 @@ def leer(fehler: str = "") -> dict:
         # auseinanderlaufen koennen (ein Test haelt sie gegeneinander).
         "alarme": geraete_alarme.leer(),
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
+        "verlauf": geraete_verlauf.leer(),
+        "katalogtabelle": [],
+        "katalog_sichtbar": KATALOG_SICHTBAR,
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": []},
         "alle_eintraege": [], "alle_punkte": [], "katalog_obj": None,
@@ -726,6 +808,17 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                                    pruefung.get("auffaellig"))
 
     return {
+        # Der Verlauf rechnet auf `belastbar`, nicht auf `sichtbar`: ein
+        # falsch gespeicherter Gebrauchtpreis in derselben Kurve ist ein
+        # zweites Produkt in einer Linie, und der Sprung dazwischen saehe aus
+        # wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das den
+        # Unterschied zwischen "577-899 EUR" und "850-899 EUR".
+        "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
+        # Reiter 2 zeigt den BESTAND, also `sichtbar` und nicht `belastbar`:
+        # eine refurbished Zeile gehoert nicht in den Vergleich, aber sehr
+        # wohl in den Katalog.
+        "katalogtabelle": katalogzeilen(sichtbar, katalog),
+        "katalog_sichtbar": KATALOG_SICHTBAR,
         "pruefung": pruefung["zahlen"],
         "pruefbefunde": pruefung["befunde"],
         "hat_daten": bool(sichtbar),

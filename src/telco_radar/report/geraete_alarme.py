@@ -49,10 +49,21 @@ KRITISCH_AB = 10.0
 MITTEL_AB = 3.0
 
 # Wie viele Zeilen ohne Aufklappen sichtbar sind. Die Zahl deckelt die
-# Seitenhoehe STRUKTURELL: eine Zeile misst rund 71 px, und ohne Deckel
-# haengt die Hoehe am Datenbestand - zwei zusaetzliche Zeilen kippten den
-# Abnahmetest, ohne dass sich eine Zeile Code aendert.
-SICHTBAR_MAX = 15
+# Seitenhoehe STRUKTURELL: ohne Deckel haengt sie am Datenbestand, und zwei
+# zusaetzliche Zeilen kippten den Abnahmetest, ohne dass sich eine Zeile Code
+# aendert.
+#
+# Die 12 sind GERECHNET, nicht gegriffen, und zwar am 30.08.2026 im echten
+# Chromium: eine Zeile misst 68 px, der Reiter ohne Tabelle 2102 px, das
+# Budget des Auftrags liegt bei 3000 px auf 1440 px Breite. Damit bleiben
+# 898 px fuer die Tabelle, also 13 Zeilen - eine weniger als Reserve, weil
+# ein laengerer Modellname eine Zeile zweizeilig macht.
+#
+# Der Auftrag nennt "hoechstens 15 Zeilen sichtbar". Mit 15 mass der Reiter
+# 3154 px und riss damit die andere Vorgabe desselben Auftrags. Von zwei
+# Zahlen desselben Absatzes gewinnt die, die der Leser merkt: drei
+# Bildschirme.
+SICHTBAR_MAX = 12
 
 # Reihenfolge, Beschriftung und Farbe der vier Stufen. Die Farben stehen als
 # CSS-Variablen im Stylesheet; hier steht nur ihr Name, damit Kachel und

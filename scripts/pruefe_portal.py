@@ -596,6 +596,30 @@ def main() -> int:
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
+        # Die VIER Reiter, in der Reihenfolge des Auftrags. Ein fehlender
+        # Reiter faellt sonst nur dadurch auf, dass niemand ihn vermisst.
+        reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
+        erwartet = ["tafel-alarme", "tafel-katalog", "tafel-verlauf",
+                    "tafel-portfolio"]
+        if reiter != erwartet:
+            maengel.append(f"Reiter {reiter} statt {erwartet}")
+
+        # Reiter 3 ist der EINZIGE Ort mit einem Diagramm, und auch dort
+        # steht ohne Auswahl keins - auch kein leeres. Das SVG entsteht in
+        # `app.js`; im ausgelieferten Dokument darf es nirgends stehen.
+        # In den REITERFLAECHEN, nicht im ganzen Dokument: die Kopfleiste
+        # traegt ein Lupen-Icon als SVG, und das ist kein Diagramm. Die erste
+        # Fassung dieser Regel fiel genau darueber - sie meldete "ein
+        # Diagramm steht fertig im Dokument" und meinte den Suchknopf.
+        vorgerendert = [t.get("id") for t in gr.select(".gr-tafel")
+                        if t.find("svg") is not None]
+        if vorgerendert:
+            maengel.append(f"Diagramm steht fertig im Dokument ({vorgerendert}), "
+                           "obwohl es erst nach einer Geraeteauswahl entstehen darf")
+        verlauf = gr.select_one("#tafel-verlauf")
+        if verlauf is not None and not verlauf.select_one("#gr-verlaufdaten"):
+            maengel.append("Reiter 'Preisverlauf' ohne Datensatz")
+
         # Kein gedrehter Text - hier als Attribut, im Browser als gerechnete
         # Transformation.
         for el in gr.find_all(attrs={"transform": True}):
@@ -603,7 +627,7 @@ def main() -> int:
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        zeilen = gr.select(".gr-alarm .gr-a-zeile")
+        zeilen = gr.select("#tafel-alarme .gr-a-zeile")
         if not zeilen:
             # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
             # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
@@ -652,12 +676,16 @@ def main() -> int:
                 maengel.append(f"die Kacheln zaehlen {summe}, der Satz "
                                f"darunter etwas anderes")
 
+            # Der Grund gehoert IN die Zeile. Als eigener `print` danach
+            # ging er in der gepufferten Ausgabe verloren, und das Kriterium
+            # meldete "DURCHGEFALLEN" neben seinem Erfolgstext - unbrauchbar
+            # fuer den, der es liest.
             b.prueft(not maengel,
                      f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
                      f"{len(kacheln)} Kacheln ueber {summe} Vergleichen, "
-                     f"kein Diagramm auf der Startansicht")
-            for zeile in maengel[:5]:
-                print(f"      ! {zeile}")
+                     f"kein Diagramm auf der Startansicht"
+                     if not maengel else
+                     "11. Geraeteradar: " + "; ".join(maengel[:5]))
 
     _browser_messungen(site, b)
 

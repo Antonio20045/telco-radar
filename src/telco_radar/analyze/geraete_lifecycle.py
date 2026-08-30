@@ -256,6 +256,12 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
         out.append({
             "anbieter": name,
             "anbieter_typ": roh["anbieter_typ"],
+            # Der eigene Anbieter steht in dieser Liste MIT, und rot. Das ist
+            # der Punkt der Sektion: Wettbewerber lassen das Vorjahresmodell
+            # als guenstigen Einstieg im Regal, bei uns wird das alte Geraet
+            # meist direkt ersetzt. Eine Portfolio-Tiefe ohne uns beantwortet
+            # die Frage nicht, wegen der sie dasteht.
+            "eigen": (name or "").strip().lower() == "vodafone",
             "generationen": len(jahrgaenge),
             "modelle_anzahl": len(roh["geraete"]),
             "skus": len(roh["skus"]),
