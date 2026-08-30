@@ -276,7 +276,7 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
 # --------------------------------------------------------------------------
 
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
-    for tid in ("tafel-katalog", "tafel-portfolio", "tafel-alarme"):
+    for tid in ("tafel-katalog", "tafel-verlauf", "tafel-portfolio", "tafel-alarme"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
@@ -289,7 +289,7 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
 
 
 @pytest.mark.parametrize("tid", ["tafel-alarme", "tafel-katalog",
-                                 "tafel-portfolio"])
+                                 "tafel-verlauf", "tafel-portfolio"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch."""
@@ -338,14 +338,14 @@ def test_der_markenfilter_laesst_nur_die_passende_zeile(_seite):
     Fixture, in dem beide Marken ueberall vorkommen, koennte gruen sein,
     ohne dass der Filter etwas tut."""
     _frisch(_seite)
-    _seite.select_option("[data-filter='marke']", "Samsung")
+    _seite.select_option("#tafel-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
     marken = _sichtbare_marken(_seite)
     assert marken, "keine Zeile sichtbar - der Test misst nichts"
     assert set(marken) == {"Samsung"}, marken
     # Gegenprobe: ohne Filter sind BEIDE Marken da, sonst traefe der Filter
     # eine Fixture, die ohnehin nur Samsung kennt.
-    _seite.select_option("[data-filter='marke']", "")
+    _seite.select_option("#tafel-alarme [data-filter='marke']", "")
     _seite.wait_for_timeout(60)
     assert set(_sichtbare_marken(_seite)) == {"Apple", "Samsung"}
 
@@ -359,14 +359,14 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
     # sie durch, und zwei Tests weiter unten steht der Kommentar, warum man
     # das nicht tut.
     _frisch(_seite)
-    _seite.select_option("[data-filter='marke']", "Samsung")
+    _seite.select_option("#tafel-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
     an = _seite.eval_on_selector(
-        "[data-filter='marke']",
+        "#tafel-alarme [data-filter='marke']",
         "e => e.closest('label').classList.contains('gr-filter--an')")
     assert an is True
     farbe = _seite.eval_on_selector(
-        "[data-filter='marke']",
+        "#tafel-alarme [data-filter='marke']",
         "e => getComputedStyle(e.closest('label')).backgroundColor")
     assert farbe == "rgb(230, 0, 0)", farbe
 
@@ -374,7 +374,7 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
 def test_die_suche_grenzt_ein(_seite):
     _frisch(_seite)
     vorher = _sichtbare_zeilen(_seite)
-    _seite.fill("[data-filter='suche']", "medimax")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "medimax")
     _seite.wait_for_timeout(60)
     nachher = _sichtbare_zeilen(_seite)
     assert 0 < nachher < vorher, (vorher, nachher)
@@ -388,11 +388,11 @@ def test_die_suche_grenzt_ein(_seite):
 def test_eine_leere_auswahl_zeigt_einen_satz_statt_einer_leeren_flaeche(_seite):
     """Der Befund vom 29.08.2026, im Browser gesehen und nicht im HTML: eine
     leere Tabelle ohne Erklaerung liest sich als kaputte Seite."""
-    _seite.fill("[data-filter='suche']", "gibtesnicht")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "gibtesnicht")
     _seite.wait_for_timeout(60)
     assert _sichtbare_zeilen(_seite) == 0
     assert _seite.eval_on_selector("#tafel-alarme .gr-a-leer", "e => !e.hidden") is True
-    _seite.fill("[data-filter='suche']", "")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "")
 
 
 def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
@@ -433,7 +433,7 @@ def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
         mehr.click()
         _seite.wait_for_timeout(60)
 
-    _seite.select_option("[data-filter='marke']", "Samsung")
+    _seite.select_option("#tafel-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
     marken = _sichtbare_marken(_seite)
     assert marken, "keine Zeile sichtbar - der Test misst nichts"
@@ -444,8 +444,8 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     """Sonst haengt eine Anbieterliste unter einer Zeile, die nicht mehr da
     ist - dieselbe Kaskadenfalle wie eine Ebene darueber."""
     _seite.click(".gr-reiter button[data-tafel='tafel-alarme']")
-    _seite.select_option("[data-filter='marke']", "")
-    _seite.fill("[data-filter='suche']", "")
+    _seite.select_option("#tafel-alarme [data-filter='marke']", "")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "")
     _frisch(_seite)
     zeile = "#tafel-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
@@ -460,11 +460,11 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     assert _seite.eval_on_selector(
         aufklapper, "e => getComputedStyle(e).display") != "none"
 
-    _seite.fill("[data-filter='suche']", "gibtesnichtwirklich")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "gibtesnichtwirklich")
     _seite.wait_for_timeout(60)
     assert _seite.eval_on_selector(
         aufklapper, "e => getComputedStyle(e).display") == "none"
-    _seite.fill("[data-filter='suche']", "")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "")
 
 
 def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
@@ -478,12 +478,12 @@ def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
     suchwort = _seite.eval_on_selector(
         "#tafel-alarme .gr-a-rest.gr-a-zeile .gr-a-modell",
         "e => e.textContent.trim()")
-    _seite.fill("[data-filter='suche']", suchwort)
+    _seite.fill("#tafel-alarme [data-filter='suche']", suchwort)
     _seite.wait_for_timeout(60)
     assert _sichtbare_zeilen(_seite) == 0
     assert _seite.eval_on_selector(
         "#tafel-alarme .gr-a-leer", "e => getComputedStyle(e).display") != "none"
-    _seite.fill("[data-filter='suche']", "")
+    _seite.fill("#tafel-alarme [data-filter='suche']", "")
 
 
 def test_kein_aufklapper_steht_offen(_seite):
@@ -498,7 +498,7 @@ def test_kein_aufklapper_steht_offen(_seite):
     Fixture, in der ein offenes `<details>` fast nichts kostet.
     """
     _frisch(_seite)
-    for tid in ("tafel-alarme", "tafel-katalog", "tafel-portfolio"):
+    for tid in ("tafel-alarme", "tafel-katalog", "tafel-verlauf", "tafel-portfolio"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         offen = _seite.eval_on_selector_all(
@@ -519,3 +519,124 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     _frisch(_seite)
     text = _seite.eval_on_selector("body", "e => e.innerText")
     assert "11. August 2026" in text, "das Abrufdatum der Listungen fehlt"
+
+
+# --------------------------------------------------------------------------
+# Reiter 3: das einzige Diagramm der Seite
+#
+# Diese Tests sind am 30.08.2026 nachgetragen worden, nachdem der Review
+# festgestellt hat, dass KEIN Test je in `#gr-vsuche` tippt: der ganze
+# Reiter war ungeprueft, waehrend seine Modul-Docstring das Gegenteil
+# behauptete. Die drei harten Regeln des Auftrags leben in `app.js` und sind
+# nur im Browser sichtbar - CLAUDE.md §6: "Eine Grafik ist erst fertig, wenn
+# sie jemand ANGESEHEN hat."
+# --------------------------------------------------------------------------
+
+def _waehle_geraet(seite, begriff="galaxy"):
+    """Ein Geraet im Suchfeld auswaehlen. Gibt False, wenn die Fixture keins
+    hergibt - dann darf der Aufrufer nicht schweigend durchlaufen."""
+    seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    seite.wait_for_timeout(80)
+    if seite.query_selector("#gr-vsuche") is None:
+        return False
+    seite.fill("#gr-vsuche", begriff)
+    seite.wait_for_timeout(150)
+    if not seite.eval_on_selector_all(".gr-vtreffer-zeile", "e => e.length"):
+        return False
+    seite.click(".gr-vtreffer-zeile")
+    seite.wait_for_timeout(250)
+    return True
+
+
+def test_ohne_auswahl_steht_kein_diagramm_da(_seite):
+    """"Solange kein Gerät gewählt ist, steht hier KEIN Diagramm. Auch kein
+    leeres." Ein leerer Rahmen sieht aus, als seien die Daten weg."""
+    _frisch(_seite)
+    _seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    _seite.wait_for_timeout(80)
+    assert _seite.eval_on_selector_all("#tafel-verlauf svg", "e => e.length") == 0
+    assert _seite.eval_on_selector(
+        "#gr-vleer", "e => getComputedStyle(e).display") != "none"
+
+
+def test_nach_der_auswahl_steht_genau_ein_diagramm_fuer_ein_geraet(_seite):
+    _frisch(_seite)
+    assert _waehle_geraet(_seite), "die Fixture liefert kein waehlbares Geraet"
+    assert _seite.eval_on_selector_all("#tafel-verlauf svg", "e => e.length") == 1
+    # Eine Linie JE ANBIETER, und die Legende nennt genau diese.
+    legende = _seite.eval_on_selector_all(".gr-vlegende-teil", "e => e.length")
+    assert legende > 0
+    assert legende <= 8, "hoechstens acht Linien"
+
+
+def test_hoechstens_acht_waagerechte_datumsmarken(_seite):
+    """Diese Grenze ist der Ersatz fuer die 114 gedrehten Etiketten der
+    geloeschten Grafik. Sie ist nicht verhandelbar."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+    marken = _seite.eval_on_selector_all(
+        ".gr-vsvg text",
+        "e => e.filter(t => !t.textContent.includes('\u20ac') "
+        "&& /[0-9]/.test(t.textContent)).length")
+    assert 0 < marken <= 8, marken
+    gedreht = _seite.eval_on_selector_all(
+        ".gr-vsvg text",
+        "e => e.filter(t => /rotate|matrix/.test("
+        "(t.getAttribute('transform')||'') + getComputedStyle(t).transform)).length")
+    assert gedreht == 0
+    klein = _seite.eval_on_selector_all(
+        ".gr-vsvg text",
+        "e => e.filter(t => parseFloat(getComputedStyle(t).fontSize) < 12).length")
+    assert klein == 0
+
+
+def test_die_achse_erfindet_keinen_preis(_seite):
+    """41 der 89 waehlbaren Geraete haben genau EINEN Preis. Die erste
+    Fassung schob dafuer die Obergrenze auf `lo + 1` und beschriftete die
+    Hilfslinien daraus: bei 999,00 EUR stand dreimal "1000 €" an der Achse -
+    ein Preis, den es im Datensatz nicht gibt."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+    achse = _seite.eval_on_selector_all(
+        ".gr-vsvg text",
+        "e => e.filter(t => t.textContent.includes('€'))"
+        "      .map(t => parseFloat(t.textContent))")
+    punkte = _seite.eval_on_selector_all(
+        ".gr-vpunkt title",
+        "e => e.map(t => parseFloat(t.textContent.replace(/[^0-9,]/g,'')"
+        "                                        .replace(',', '.')))")
+    assert achse, "keine Preisachse"
+    lo, hi = min(punkte), max(punkte)
+    for wert in achse:
+        assert lo - 1 <= wert <= hi + 1, (wert, lo, hi)
+
+
+def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
+    """Zwei Zahlen fuer dieselbe Sache auf einem Bildschirm. Die Tabelle
+    rechnete ueber den vollen Zeitraum, waehrend Diagramm, Legende und
+    Kacheln dem Zeitraumfilter folgten - sie nannte einen Anbieter, der im
+    Bild nicht vorkam, mit einem Datum ausserhalb des Fensters."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+    von = _seite.eval_on_selector("#gr-vbis", "e => e.value")
+    _seite.fill("#gr-vvon", von)          # Fenster auf den letzten Tag
+    _seite.wait_for_timeout(200)
+    legende = set(_seite.eval_on_selector_all(
+        ".gr-vlegende-teil", "e => e.map(x => x.textContent.trim())"))
+    tabelle = set(_seite.eval_on_selector_all(
+        "#gr-vtabelle tbody tr td:first-child", "e => e.map(x => x.textContent.trim())"))
+    assert tabelle == legende, (tabelle, legende)
+    kachel = _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()")
+    assert kachel == str(len(legende))
+
+
+def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
+    """Sonst steht unter dem Suchwort "zzzz" unveraendert der Verlauf des
+    zuletzt gewaehlten Geraets."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+    _seite.fill("#gr-vsuche", "zzzzgibtesnicht")
+    _seite.wait_for_timeout(200)
+    assert _seite.eval_on_selector_all("#tafel-verlauf svg", "e => e.length") == 0
+    assert _seite.eval_on_selector(
+        "#gr-vleer", "e => getComputedStyle(e).display") != "none"

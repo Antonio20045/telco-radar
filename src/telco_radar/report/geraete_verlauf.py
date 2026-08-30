@@ -39,6 +39,8 @@ Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 """
 from __future__ import annotations
 
+import hashlib
+
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
 # Hoechstens acht Linien. Mehr Anbieter als das kann ein Mensch in einem
@@ -68,6 +70,33 @@ FARBEN = ("#2b5bd7", "#217a3c", "#8a5a00", "#6b3fa0",
 
 def _eigen(anbieter: str) -> bool:
     return (anbieter or "").strip().lower() == "vodafone"
+
+
+def farbe_fuer(anbieter: str) -> str:
+    """Die Farbe eines Anbieters - stabil ueber alle Geraete.
+
+    Die erste Fassung vergab sie nach der SORTIERPOSITION innerhalb eines
+    Geraets. Ueber die 89 waehlbaren Geraete gemessen hatte o2 damit drei
+    verschiedene Farben, und `#2b5bd7` hiess beim einen Geraet "o2" und beim
+    naechsten "mobilcom-debitel". Wer zwei Geraete hintereinander ansieht,
+    liest die Farbe falsch - und der Kommentar darueber versprach genau das
+    Gegenteil.
+
+    Der Name traegt die Farbe jetzt selbst. Zwei Anbieter koennen dieselbe
+    bekommen; das ist der Preis einer festen Zuordnung ohne Namensliste und
+    faellt nur auf, wenn beide im selben Diagramm stehen - dort sind es
+    hoechstens acht von sieben Farben plus Rot.
+    """
+    if _eigen(anbieter):
+        return EIGEN_FARBE
+    # md5 und nicht die Quersumme der Zeichen: die verteilt schlecht, und
+    # zwar genau dort, wo es wehtut - "o2" und "mobilcom-debitel" fielen auf
+    # denselben Wert, und die zwei stehen bei fast jedem Geraet nebeneinander.
+    # Ueber die vier liefernden Anbieter gemessen: Quersumme 3 von 4
+    # verschieden, md5 4 von 4. Der Hash muss nicht kryptografisch sein, nur
+    # gleichmaessig und ueber Laeufe hinweg stabil - `hash()` waere es nicht.
+    stelle = int(hashlib.md5((anbieter or "").encode("utf-8")).hexdigest()[:8], 16)
+    return FARBEN[stelle % len(FARBEN)]
 
 
 def _label(geraet, speicher) -> str:
@@ -100,12 +129,36 @@ def _punkte(listungen: list, historie) -> list[dict]:
             punkte.append({"datum": letzt, "anbieter": e.get("anbieter"),
                            "preis": float(preis), "art": "bestaetigt"})
     # Je (Anbieter, Tag) genau ein Punkt: zwei Farben desselben Geraets sind
-    # zwei Listungen, aber EIN Preis auf der Kurve. Der niedrigste gewinnt -
-    # das ist der Preis, zu dem der Anbieter das Geraet an dem Tag abgab.
+    # zwei Listungen, aber EIN Preis auf der Kurve.
+    #
+    # DER BESTAETIGTE PREIS SCHLAEGT DEN HISTORIENEINTRAG, und erst danach
+    # entscheidet der niedrigere. "Der niedrigste Preis ist der
+    # wahrscheinlichste Fehler; jede min-Auswahl braucht einen Filter davor"
+    # (CLAUDE.md §6) - hier stand ein nacktes Minimum ueber alles.
+    #
+    # Der Fall ist nicht hypothetisch: `aldi-talk--samsung-galaxy-a17-128gb-
+    # schwarz` traegt am 29.08.2026 ZWEI Historienzeilen, 129,00 und 155,00
+    # EUR, weil zwei Produkte (LTE und 5G) unter derselben listung_id
+    # laufen. `geraete_pruefung` meldet das als Doppelpreis - aber sie
+    # filtert EINTRAEGE, und die Historie zu einem ueberlebenden Eintrag
+    # wird roh gelesen. Der Befund erreicht die Kurve also nie. Mit dem
+    # bestaetigten Preis als Vorfahrt zeichnet die Linie wenigstens den Wert,
+    # den die Datenbank fuer dieses Geraet kennt.
+    # Zwischen zwei Punkten DERSELBEN Art entscheidet weiterhin der Preis:
+    # zwei bestaetigte Punkte sind zwei Farben desselben Anbieters, und der
+    # niedrigere ist der Preis, zu dem er das Geraet an dem Tag abgab. Nur
+    # zwischen den ARTEN gibt es einen Vorrang.
+    rang = {"bestaetigt": 1, "gemessen": 0}
     je_tag: dict[tuple, dict] = {}
     for p in punkte:
         k = (p["anbieter"], p["datum"])
-        if k not in je_tag or p["preis"] < je_tag[k]["preis"]:
+        bisher = je_tag.get(k)
+        if bisher is None:
+            je_tag[k] = p
+            continue
+        besser = (rang[p["art"]], -p["preis"]) > (rang[bisher["art"]],
+                                                  -bisher["preis"])
+        if besser:
             je_tag[k] = p
     return sorted(je_tag.values(), key=lambda p: (p["datum"], p["anbieter"]))
 
@@ -124,13 +177,22 @@ def _reihen(punkte: list) -> list[dict]:
 
     geordnet = sorted(je_anbieter.items(),
                       key=lambda kv: (not _eigen(kv[0]), -len(kv[1]), kv[0]))
-    reihen, farbe = [], 0
+    # Erst die stabile Farbe am Namen, dann die Kollisionsaufloesung IN
+    # diesem Diagramm. Beides zusammen ist noetig: der Name allein gab o2 und
+    # mobilcom-debitel dieselbe Farbe, und die zwei stehen bei fast jedem
+    # Geraet nebeneinander. Die Sortierposition allein gab o2 drei
+    # verschiedene Farben ueber die 89 Geraete.
+    #
+    # Verschoben wird der SPAETERE (die Reihenfolge ist deterministisch), und
+    # der eigene Anbieter nie - Rot bleibt Rot.
+    reihen, vergeben = [], set()
     for name, ps in geordnet[:MAX_LINIEN]:
-        if _eigen(name):
-            f = EIGEN_FARBE
-        else:
-            f = FARBEN[farbe % len(FARBEN)]
-            farbe += 1
+        f = farbe_fuer(name)
+        if not _eigen(name) and f in vergeben:
+            frei = [c for c in FARBEN if c not in vergeben]
+            if frei:
+                f = frei[0]
+        vergeben.add(f)
         reihen.append({
             "anbieter": name, "farbe": f, "eigen": _eigen(name),
             "punkte": [{"datum": p["datum"], "preis": p["preis"]} for p in ps],

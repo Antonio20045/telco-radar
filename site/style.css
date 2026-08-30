@@ -2382,3 +2382,9 @@ b,strong{font-weight:700}
    waere die halbe Katalogtabelle rot, ohne dass irgendetwas fehlt. */
 .gr-pille--unbekannt{background:var(--paper-3);color:var(--ink-3);
   border:1px solid var(--rule)}
+
+/* Der eigene Anbieter in der Portfolio-Tiefe. Die Farbe steht HIER und nicht
+   als `style="background:#e60000"` in der Vorlage: `#e60000` war damit an
+   einer vierten Stelle hartkodiert, waehrend `var(--red)` genau dafuer da
+   ist. */
+.gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}

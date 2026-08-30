@@ -411,89 +411,34 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
             "url": e.get("quelle_url") or "",
             "abgerufen_am": e.get("abgerufen_am") or "",
         })
-    # Nach Modell, dann Speicher, dann Preis: wer ein Geraet sucht, findet
-    # seine Zeilen beieinander, und innerhalb steht der guenstigste oben.
+    # Nach Modell, dann Speicher, dann dem GEZEIGTEN Betrag: wer ein Geraet
+    # sucht, findet seine Zeilen beieinander, und innerhalb steht der
+    # guenstigste oben.
+    #
+    # "Der gezeigte Betrag" und nicht `preis`: die Spalte zeigt bei einer
+    # Zeile ohne Barpreis die Zuzahlung. Mit `float("inf")` fuer fehlende
+    # Preise landete eine 1-Euro-Zuzahlung hinter einem 1199-Euro-Barpreis,
+    # und der Kommentar darueber behauptete das Gegenteil. Heute folgenlos
+    # (alle 352 Zeilen tragen einen Barpreis), aber der naechste
+    # Buendelpreis-Adapter loest es aus.
+    def betrag(z):
+        for feld in ("preis", "zuzahlung"):
+            if z[feld] is not None:
+                return z[feld]
+        return float("inf")
+
     return sorted(zeilen, key=lambda z: (
         z["hersteller"], z["modell"], z["speicher"] or 0,
-        z["preis"] if z["preis"] is not None else float("inf"), z["anbieter"] or ""))
+        betrag(z), z["anbieter"] or ""))
 
 
-def _matrix(eintraege: list, katalog) -> dict:
-    """Modell x Anbieter. Zelle: Zahl der Varianten und Preisspanne."""
-    anbieter = sorted({e.get("anbieter") for e in eintraege if e.get("anbieter")})
-    zeilen: dict[str, dict] = {}
-    for e in eintraege:
-        gid = e.get("device_id")
-        g = katalog.nach_id(gid)
-        zeile = zeilen.setdefault(gid, {
-            "device_id": gid,
-            "modell": g.modell if g else gid,
-            "hersteller": g.hersteller if g else "ohne Katalogeintrag",
-            "generation": g.generation if g else None,
-            "segment": g.segment if g else "",
-            "zellen": {},
-        })
-        zelle = zeile["zellen"].setdefault(e.get("anbieter"), {
-            "varianten": [], "preise": [], "buendel": []})
-        zelle["varianten"].append({
-            "sku_id": e.get("sku_id"),
-            "speicher": e.get("speicher_gb"),
-            "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            "farbe_roh": e.get("farbe_roh", ""),
-            "preis": e.get("preis_ohne_vertrag"),
-            "zuzahlung": e.get("zuzahlung"),
-            "tarif": e.get("tarif_referenz", ""),
-            "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
-            "status": e.get("status"),
-            "zustand": e.get("zustand") or "neu",
-            "url": e.get("quelle_url", ""),
-            "abgerufen_am": e.get("abgerufen_am", ""),
-        })
-        # Die Preisspanne der Zelle ("ab 577 EUR") ist eine PREISAUSSAGE und
-        # folgt derselben Regel wie Vergleich und Grafik: nur Neugeraete.
-        # Vorher stand fuer das iPhone 14 Pro bei o2 der Gebrauchtpreis in
-        # der Spanne, ohne jede Kennzeichnung - nur die aufgeklappte
-        # Variantenzeile trug "· refurbished". Die Varianten selbst bleiben
-        # vollstaendig: dort steht der Zustand daneben.
-        if (e.get("preis_ohne_vertrag") is not None
-                and (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE):
-            zelle["preise"].append(e["preis_ohne_vertrag"])
-        if e.get("zuzahlung") is not None:
-            zelle["buendel"].append(e["zuzahlung"])
-
-    out = []
-    for zeile in zeilen.values():
-        zellen = []
-        for name in anbieter:
-            z = zeile["zellen"].get(name)
-            if not z:
-                zellen.append({"anbieter": name, "leer": True})
-                continue
-            preise = sorted(z["preise"])
-            zellen.append({
-                "anbieter": name,
-                "leer": False,
-                "varianten": sorted(z["varianten"],
-                                    key=lambda v: (v["speicher"] or 0, v["farbe"])),
-                "anzahl": len(z["varianten"]),
-                "speicher": sorted({v["speicher"] for v in z["varianten"]
-                                    if v["speicher"]}),
-                "farben": sorted({v["farbe"] for v in z["varianten"] if v["farbe"]}),
-                "min": preise[0] if preise else None,
-                "max": preise[-1] if preise else None,
-                "nur_buendel": not preise and bool(z["buendel"]),
-            })
-        zeile["zellen"] = zellen
-        zeile["anbieter_mit_geraet"] = sum(1 for z in zellen if not z["leer"])
-        out.append(zeile)
-
-    out.sort(key=lambda z: (z["hersteller"], -(z["generation"] or 0), z["modell"]))
-    return {"anbieter": anbieter, "zeilen": out}
-
-
-# --------------------------------------------------------------------------
-# Datenbasis und Luecken
-# --------------------------------------------------------------------------
+# `_matrix()` ist am 30.08.2026 geloescht worden, mit der Sektion, die es
+# fuellte. Es rechnete Modell x Anbieter mit Variantenzahl und Preisspanne je
+# Zelle; Reiter 2 zeigt seitdem eine flache Tabelle, in der jede Zeile
+# traegt, was sie behauptet (`katalogzeilen`). Die Rechnung weiter laufen zu
+# lassen und von keiner Vorlage lesen zu lassen waere derselbe Befund wie
+# `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende Begruendung,
+# keine Wirkung.
 
 def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """Wer liefert, wer nicht - und warum nicht.
@@ -524,12 +469,19 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         # GENAU DREI ZUSTAENDE, und keiner davon heisst "gemessen, aber ohne
         # Adapter". Diese vierte Kategorie ist am 30.08.2026 abgeschafft
         # worden, weil sie nichts aussagte: sie stand fuer "koennte man
-        # bauen" und blieb jahrelang stehen, ohne dass jemand entschied. Wer
-        # nicht liefert, ist entweder ohne Hardware im Sortiment oder aus
-        # einem NACHGEMESSENEN Grund gesperrt - und der Grund steht daneben.
+        # bauen" und blieb stehen, ohne dass jemand entschied.
+        #
+        # Der mittlere Zustand heisst "ohne_daten" und nicht "gesperrt", und
+        # das ist keine Wortklauberei: Medimax und ElectronicPartner sind
+        # AKTIV, tragen einen Adapter und werden jede Nacht abgerufen - sie
+        # finden nur seit sechzehn Naechten nichts. Als "gesperrt" gefuehrt
+        # behauptete die Seite eine Sperre, die es nicht gibt, und der
+        # eigentliche Befund (ein kaputter Extraktor) verschwand hinter dem
+        # falschen Etikett. Der Auftrag nennt beide Faelle nebeneinander:
+        # "technisch gesperrt, begruendet" und "ohne Fund, Ursache X".
         satz["zustand"] = ("liefert" if satz["liefert"]
                            else "ohne_hardware" if vermarktung == "nein"
-                           else "gesperrt")
+                           else "ohne_daten")
         if vermarktung == "nein":
             ohne_hardware.append(satz)
         else:
@@ -566,8 +518,19 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         # Die drei Zustaende als Zahlen. Sie muessen sich auf `konfiguriert`
         # summieren - eine vierte Kategorie kann damit nicht unbemerkt
         # zurueckwachsen, und genau davon kam dieser Abschnitt.
-        "gesperrt": sum(1 for z in zeilen if z["zustand"] == "gesperrt"),
+        #
+        # Gezaehlt wird nur, was KONFIGURIERT ist. `zeilen` traegt zusaetzlich
+        # die Anbieter, die in der Datenbank stehen und nicht (mehr) in der
+        # Konfiguration - umbenannt oder entfernt. Sie mitzuzaehlen liesse die
+        # Summe ueber `konfiguriert` steigen, und die Seite meldete "5 von 4
+        # konfigurierten Anbietern liefern". Der Zweig existiert genau fuer
+        # diesen Fall; ihn in die Invariante zu ziehen hiesse, sie beim
+        # ersten Umbenennen zu brechen.
+        "liefernd_konfiguriert": sum(1 for z in zeilen
+                                     if z["liefert"] and z["name"] in bekannt),
+        "ohne_daten": sum(1 for z in zeilen if z["zustand"] == "ohne_daten"),
         "ohne_hardware_zahl": len(ohne_hardware),
+        "nicht_konfiguriert": sum(1 for z in zeilen if z["name"] not in bekannt),
         "konfiguriert": len(quellen.anbieter),
         "unbekannt": [n for n in sorted(mit_daten) if n and n not in bekannt],
         "seiten": quellen.seiten_zahl,
@@ -646,7 +609,6 @@ def leer(fehler: str = "") -> dict:
                                       "ohne_vodafone_gesamt": 0,
                                       "groesste_differenz": None,
                                       "preisart": "mit_vertrag"}},
-        "matrix": {"anbieter": [], "zeilen": []},
         "lifecycle": {"duenn": True, "punkte": 0, "wochen": 0, "hinweis": "",
                       "dauern": [], "verfaelle": [], "trends": [],
                       "nachfolger": [], "portfolio": []},
@@ -863,7 +825,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
         # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
         "vergleich": vergleich,
-        "matrix": _matrix(sichtbar, katalog),
         "lifecycle": lifecycle,
         "quellenlage": _quellenlage(quellen, db, sichtbar),
         "farbbericht": _farbbericht(sichtbar),

@@ -224,6 +224,12 @@
   Hier steht der ganze Bestand, auch gebrauchte Geräte und Zuzahlungen:
   was aus dem Preisvergleich fällt, verschwindet nicht, es wird nur nicht
   gegen etwas gerechnet, das es nicht ist.</p>
+  {# KEINE Zustandsvorbelegung. Reiter 1 filtert auf "neu", weil er
+     vergleicht; dieser Reiter zeigt den Bestand und sagt das im Satz
+     darueber. Mit der Vorbelegung liefen drei Zahlen auseinander: die
+     Ueberschrift zaehlte 352, sichtbar waren 12 statt 18 (die Sortierung
+     nach Preis zieht gebrauchte Geraete nach oben, der Filter versteckte
+     sie), und der Knopf versprach 352, lieferte aber 341. #}
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
     <label class="gr-fbox"><span>Marke</span>
@@ -252,7 +258,7 @@
         <option value="">alle</option>
         {% for z in geraete.katalogtabelle | map(attribute='zustand')
               | unique | sort %}
-        <option value="{{ z }}"{{ ' selected' if z == 'neu' }}>{{ z }}</option>{% endfor %}
+        <option value="{{ z }}">{{ z }}</option>{% endfor %}
       </select></label>
     <label class="gr-fbox gr-fbox--weit"><span>Suche</span>
       <input type="search" data-filter="suche" placeholder="Modell, Farbe, Anbieter …"></label>
@@ -436,10 +442,14 @@
   <ul class="dz-balken gr-tiefe">
     {% set tiefstes = geraete.lifecycle.portfolio[0].generationen or 1 %}
     {% for t in geraete.lifecycle.portfolio %}{# eigen = rot, siehe geraete_lifecycle #}
-    <li{% if t.anbieter|lower == 'vodafone' %} class="gr-eigen"{% endif %}>
+    {# `t.eigen` kommt aus `geraete_lifecycle` und wird hier NICHT noch
+       einmal gerechnet. Die Vorlage prüfte bis zum 30.08.2026 selbst auf
+       `anbieter|lower == 'vodafone'` - ohne `.strip()`. Ein Name mit
+       führendem Leerzeichen bekam dann die Klasse, aber nicht die Farbe. #}
+    <li{% if t.eigen %} class="gr-eigen"{% endif %}>
       <span class="dz-balken-name">{{ t.anbieter }}</span>
       <span class="dz-balken-spur"><span class="dz-balken-fuell"
-        style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%{% if t.eigen %};background:#e60000{% endif %}"></span></span>
+        style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
       <span class="dz-balken-n">{{ t.generationen }}<span
         class="rubrik-zusatz">{{ t.modelle_anzahl }} Modelle</span></span>
     </li>

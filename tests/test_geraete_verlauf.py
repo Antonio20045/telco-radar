@@ -215,3 +215,54 @@ def test_der_suchtext_findet_das_geraet(begriff):
     g = _eins(v.geraete_mit_verlauf([_l("a", "o2", 899.0)], _Historie(),
                                     _KATALOG))
     assert begriff in g["suchtext"], g["suchtext"]
+
+
+def test_ein_anbieter_behaelt_seine_farbe_ueber_geraete_hinweg():
+    """Die erste Fassung vergab die Farbe nach der SORTIERPOSITION innerhalb
+    eines Geraets. Ueber die 89 waehlbaren Geraete gemessen hatte o2 damit
+    drei Farben, und `#2b5bd7` hiess beim einen Geraet "o2" und beim
+    naechsten "mobilcom-debitel"."""
+    hist = _Historie()
+    # Geraet A: o2 hat mehr Punkte, steht also zuerst.
+    a = v.geraete_mit_verlauf(
+        [_l("x", "o2", 800.0), _l("y", "freenet", 810.0)], hist, _KATALOG)[0]
+    # Geraet B: die Reihenfolge dreht sich um.
+    b = v.geraete_mit_verlauf(
+        [_l("x", "freenet", 700.0), _l("y", "o2", 710.0),
+         _l("z", "ALDI TALK", 690.0)], hist, _KATALOG)[0]
+    von = lambda g, n: next(r["farbe"] for r in g["reihen"] if r["anbieter"] == n)
+    assert von(a, "o2") == von(b, "o2")
+    assert von(a, "freenet") == von(b, "freenet")
+
+
+def test_zwei_anbieter_eines_diagramms_teilen_nie_eine_farbe():
+    """Der Hash kann kollidieren - im selben Bild darf er es nicht. Genau
+    dieser Fall trat mit der Zeichenquersumme bei o2 und mobilcom-debitel
+    ein, und die zwei stehen bei fast jedem Geraet nebeneinander."""
+    namen = ["o2", "mobilcom-debitel", "ALDI TALK", "freenet", "Medimax",
+             "expert", "congstar", "Vodafone"]
+    g = _eins(v.geraete_mit_verlauf(
+        [_l(f"l{i}", n, 800.0 + i) for i, n in enumerate(namen)],
+        _Historie(), _KATALOG))
+    farben = [r["farbe"] for r in g["reihen"]]
+    assert len(set(farben)) == len(farben), list(zip(
+        [r["anbieter"] for r in g["reihen"]], farben))
+
+
+def test_der_bestaetigte_preis_schlaegt_den_historieneintrag():
+    """"Der niedrigste Preis ist der wahrscheinlichste Fehler; jede
+    min-Auswahl braucht einen Filter davor." Hier stand ein nacktes Minimum.
+
+    Der Fall ist echt: eine ALDI-TALK-Listung traegt am 29.08.2026 zwei
+    Historienzeilen (129 und 155 EUR), weil zwei Produkte unter derselben
+    listung_id laufen. Die Pruefung meldet das, filtert aber EINTRAEGE - die
+    Historie zu einem ueberlebenden Eintrag wird roh gelesen.
+    """
+    hist = _Historie({"a": [{"datum": "2026-08-29", "preis_ohne_vertrag": 129.0},
+                            {"datum": "2026-08-29", "preis_ohne_vertrag": 155.0}]})
+    g = _eins(v.geraete_mit_verlauf(
+        [_l("a", "ALDI TALK", 155.0, last_verified="2026-08-29")], hist,
+        _KATALOG))
+    assert g["reihen"][0]["punkte"] == [{"datum": "2026-08-29", "preis": 155.0}], (
+        "die Kurve zeigt einen Preis, den die Datenbank fuer dieses Geraet "
+        "nicht kennt")

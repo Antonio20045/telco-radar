@@ -587,11 +587,12 @@ def main() -> int:
 
         # Regel 1 und 2 des Auftrags: die Startansicht traegt kein Diagramm,
         # und es gibt keine Ansicht mit mehreren Geraeten in einem Bild.
+        # Ein SVG in `#tafel-alarme` meldete bis zum 30.08.2026 ZWEI Maengel
+        # (hier und in der Reiterflaechen-Pruefung unten) - dieselbe Sache,
+        # zweimal gezaehlt.
         start = gr.select_one("#tafel-alarme")
         if start is None:
             maengel.append("der Reiter 'Preis-Alarme' fehlt")
-        elif start.find("svg") is not None:
-            maengel.append("die Startansicht traegt ein Diagramm")
         for tot in (".gr-flaeche", ".gr-punkt", ".gr-etikett", ".gr-band"):
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
@@ -616,9 +617,15 @@ def main() -> int:
         if vorgerendert:
             maengel.append(f"Diagramm steht fertig im Dokument ({vorgerendert}), "
                            "obwohl es erst nach einer Geraeteauswahl entstehen darf")
+        # KEIN Mangel, wenn der Datensatz fehlt: die Vorlage rendert ihn nur
+        # bei `verlauf.hat_daten`, und das rechnet auf den GEPRUEFTEN
+        # Eintraegen. Ein Bestand, der nur gebrauchte Geraete oder nur
+        # Buendelpreise traegt, erzeugt einen ehrlichen Leerzustand - ihn als
+        # Durchfaller zu melden ist derselbe Fehler wie Kriterium 4 nach
+        # einem --no-llm-Lauf.
         verlauf = gr.select_one("#tafel-verlauf")
-        if verlauf is not None and not verlauf.select_one("#gr-verlaufdaten"):
-            maengel.append("Reiter 'Preisverlauf' ohne Datensatz")
+        verlauf_leer = (verlauf is not None
+                        and verlauf.select_one("#gr-verlaufdaten") is None)
 
         # Kein gedrehter Text - hier als Attribut, im Browser als gerechnete
         # Transformation.
@@ -638,7 +645,9 @@ def main() -> int:
                 b.prueft(False, "11. Geraeteradar: " + "; ".join(maengel))
             else:
                 b.prueft(None, "11. Geraeteradar: noch keine Alarmzeile "
-                               "erfasst (Grafik ist weg, Struktur in Ordnung)")
+                               "erfasst (Grafik ist weg, Struktur in Ordnung"
+                               + (", Preisverlauf noch ohne Messreihen"
+                                  if verlauf_leer else "") + ")")
         else:
             # Jede Zeile traegt Quelle UND Abrufdatum - der Belegzwang ist das
             # Verkaufsargument dieser Seite.

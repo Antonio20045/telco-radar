@@ -1135,18 +1135,6 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     assert s.select_one("#tafel-alarme") is not None
 
 
-def test_die_geraetespalte_der_matrix_bleibt_beim_scrollen_stehen(tmp_path):
-    """Ab vier Anbietern - und erst recht ab acht - scrollt man sonst eine
-    Zeile nach rechts und weiss nicht mehr, zu welchem Geraet sie gehoert."""
-    site = _baue(tmp_path)
-    css = (site / "style.css").read_text(encoding="utf-8")
-    assert ".gr-matrix-tabelle th[scope=row]" in css
-    block = css.split(".gr-matrix-tabelle th[scope=row]", 1)[1].split("}", 1)[0]
-    assert "position:sticky" in block and "left:0" in block
-    # Ohne eigenen Hintergrund scheinen die Zellen darunter durch.
-    assert "background:" in block
-
-
 def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
     """Zielgruppe sind Manager ohne Technikhintergrund, und das Portal
     schreibt sonst deutsche Daten. "2026-08-27" ist eine Maschinenschreibung.
@@ -1236,38 +1224,47 @@ def test_der_pruefbericht_nennt_dieselben_zahlen_wie_die_pruefung(tmp_path):
     assert len(abschnitt.select("tbody tr")) == zahlen["befunde"]
 
 
-def test_die_preisspanne_der_sku_matrix_zeigt_keinen_gebrauchtpreis(tmp_path):
-    """Die Zelle sagt „ab N €" – das ist eine Preisaussage und folgt
-    derselben Regel wie Vergleich und Grafik. Vorher stand dort der
-    Gebrauchtpreis ohne jede Kennzeichnung; nur die aufgeklappte
-    Variantenzeile trug „· refurbished"."""
-    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
-    billig = db["listungen"][0]
-    billig["zustand"] = "refurbished"
-    billig["preis_ohne_vertrag"] = 99.0
-    billig["sku_id"] += "-refurbished"
-    billig["id"] += "-refurbished"
+def test_die_katalogzeile_nennt_den_ABGELEITETEN_zustand(tmp_path):
+    """Der Katalog zeigt gebrauchte Geräte bewusst mit - dann muss die Zeile
+    auch „refurbished" sagen und nicht den Store-Wert.
 
-    _baue(tmp_path, db=db)
-    geraete = geraete_view.aufbereiten(
-        tmp_path / "data" / "state", lade_quellen(tmp_path),
-        lade_katalog(tmp_path), heute="2026-08-11")
+    Der Vorgänger dieses Tests hing an der gelöschten SKU-Matrix und prüfte,
+    dass deren Preisspanne keinen Gebrauchtpreis enthält. Die flache Tabelle
+    trifft eine andere, schärfere Zusicherung: sie zeigt die Zeile, sagt aber
+    dazu, was sie ist. Ohne die Ableitung stünde dort „space schwarz
+    erneuert · Zustand neu", während der Prüfbericht zwei Reiter weiter
+    „refurbished" meldet - die Seite widerspräche sich selbst.
+    """
+    db = json.loads(json.dumps(_DB))
+    # Der echte o2-Fall: das Kennzeichen steht NUR in der Farbe, der Store
+    # trägt weiter "neu".
+    db["listungen"][0]["farbe_roh"] = "Space Schwarz erneuert"
+    db["listungen"][0]["farbe_normalisiert"] = None
+    db["listungen"][0]["zustand"] = "neu"
+    site = _baue(tmp_path, db=db)
+    s = _suppe(site, "geraete.html")
 
-    spannen = [z for zeile in geraete["matrix"]["zeilen"]
-               for z in zeile["zellen"] if not z.get("leer")]
-    assert spannen, "keine Zellen - dann prüft der Test nichts"
-    assert all(z.get("ab") is None or z["ab"] >= 399.0 for z in spannen), (
-        "ein Gebrauchtpreis steht in der Preisspanne einer Zelle")
-    # Gegenprobe: die Variante selbst bleibt sichtbar, nur gekennzeichnet.
-    varianten = [v for zeile in geraete["matrix"]["zeilen"]
-                 for z in zeile["zellen"] if not z.get("leer")
-                 for v in z.get("varianten", [])]
-    assert any(v["zustand"] == "refurbished" for v in varianten)
+    zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
+    treffer = [z for z in zeilen if "erneuert" in z.get_text()]
+    assert treffer, "die Fixture spannt den Fall nicht auf"
+    for z in treffer:
+        assert z.get("data-zustand") == "refurbished", z.get("data-zustand")
+        assert "refurbished" in z.get_text()
 
 
-# --------------------------------------------------------------------------
-# W2: die Grafik zeigt eine Aussage, keine Tapete
-# --------------------------------------------------------------------------
+def test_die_geraetespalte_des_katalogs_bleibt_beim_scrollen_stehen(tmp_path):
+    """Die Tabelle rollt waagerecht; ohne festgestellte erste Spalte weiss
+    niemand mehr, zu welchem Geraet eine Zeile gehoert."""
+    site = _baue(tmp_path)
+    css = (site / "style.css").read_text(encoding="utf-8")
+    assert ".gr-alarm-scroll" in css
+    assert s_hat_scroll(_suppe(site, "geraete.html"))
+
+
+def s_hat_scroll(suppe):
+    behaelter = suppe.select_one("#gr-katalogtabelle")
+    return behaelter is not None and behaelter.find_parent(
+        class_="gr-alarm-scroll") is not None
 
 def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     """Das Akzeptanzkriterium, gemessen an der WIRKLICH gerenderten Seite.
@@ -1342,9 +1339,13 @@ def test_jeder_anbieter_steht_in_genau_einem_von_drei_zustaenden(tmp_path):
     q = geraete["quellenlage"]
 
     zustaende = {z["zustand"] for z in q["zeilen"] + q["ohne_hardware"]}
-    assert zustaende <= {"liefert", "gesperrt", "ohne_hardware"}, zustaende
-    assert q["liefernd"] + q["gesperrt"] + q["ohne_hardware_zahl"] == \
-        q["konfiguriert"], q
+    assert zustaende <= {"liefert", "ohne_daten", "ohne_hardware"}, zustaende
+    # Gezaehlt wird ueber die KONFIGURIERTEN. Ein Anbieter, der nur noch in
+    # der Datenbank steht (umbenannt, entfernt), steht in `zeilen`, gehoert
+    # aber nicht in diese Summe - sonst braeche die Invariante beim ersten
+    # Umbenennen, ohne dass ein Fehler vorlaege.
+    assert q["liefernd_konfiguriert"] + q["ohne_daten"] + \
+        q["ohne_hardware_zahl"] == q["konfiguriert"], q
 
     # Gegenprobe: die Fixture besetzt wirklich mehr als einen Zustand, sonst
     # misst der Test nur, dass eine Summe mit sich selbst uebereinstimmt.
@@ -1358,8 +1359,29 @@ def test_ein_gesperrter_anbieter_nennt_seinen_grund(tmp_path):
     geraete = geraete_view.aufbereiten(
         tmp_path / "data" / "state", lade_quellen(tmp_path),
         lade_katalog(tmp_path), heute="2026-08-11")
-    gesperrt = [z for z in geraete["quellenlage"]["zeilen"]
-                if z["zustand"] == "gesperrt"]
-    assert gesperrt, "die Fixture hat keinen gesperrten Anbieter"
-    ohne_grund = [z["name"] for z in gesperrt if not (z.get("grund") or "").strip()]
+    ohne_daten = [z for z in geraete["quellenlage"]["zeilen"]
+                  if z["zustand"] == "ohne_daten"]
+    assert ohne_daten, "die Fixture hat keinen Anbieter ohne Daten"
+    ohne_grund = [z["name"] for z in ohne_daten
+                  if not (z.get("grund") or "").strip()]
+    assert not ohne_grund, ohne_grund
+
+
+def test_kein_anbieter_der_ECHTEN_konfiguration_steht_ohne_grund():
+    """Derselbe Test, aber gegen `config/geraete_quellen.yaml` statt gegen
+    die Fixture.
+
+    Die Fixture-Fassung war grün, während die echte Konfiguration zwei
+    Anbieter ohne Grund führte (Medimax und ElectronicPartner: angebunden,
+    aktiv, seit sechzehn Nächten null Funde). Ein Test, der nur seine eigene
+    Fixture misst, meldet den nächsten solchen Fall wieder nicht - CLAUDE.md
+    §6, "ein Test, dessen Lookup ins Leere geht".
+    """
+    from pathlib import Path
+
+    from telco_radar.geraete_config import lade_quellen as _lade
+
+    wurzel = Path(__file__).resolve().parents[1]
+    ohne_grund = [a.name for a in _lade(wurzel).anbieter
+                  if not a.aktiv and not (a.grund or "").strip()]
     assert not ohne_grund, ohne_grund

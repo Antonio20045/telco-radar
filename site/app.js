@@ -1226,6 +1226,26 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     var t = iso.split('-');
     return t[2].replace(/^0/, '') + '.' + t[1].replace(/^0/, '') + '.';
   }
+  var MONATE = ['Jan','Feb','Mär','Apr','Mai','Jun',
+                'Jul','Aug','Sep','Okt','Nov','Dez'];
+  /* Die Beschriftung nennt, was das Raster ZUSAMMENFASST. Eine
+     "Quartal"-Ansicht mit zwei Tagesmarken behauptet eine Genauigkeit, die
+     sie gerade weggerechnet hat. */
+  function markeDE(iso, wie) {
+    var t = iso.split('-');
+    if (wie === 'monat') return MONATE[parseInt(t[1], 10) - 1] + ' ' + t[0];
+    if (wie === 'quartal') {
+      return 'Q' + Math.ceil(parseInt(t[1], 10) / 3) + ' ' + t[0];
+    }
+    return tagDE(iso);
+  }
+  /* Tage seit einem festen Nullpunkt - ohne `new Date()`, damit die Rechnung
+     nicht an der Zeitzone des Lesers haengt. */
+  function tagNr(iso) {
+    var t = iso.split('-').map(Number);
+    var a = (t[0] * 12 + (t[1] - 1)) / 12;
+    return Math.floor(a * 365.2425) + t[2];
+  }
 
   /* Welche Tage eine Beschriftung bekommen.
 
@@ -1245,15 +1265,24 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
      Mittelwert: ein Mittelwert aus zwei Preisen ist ein Preis, den nie
      jemand verlangt hat. */
   function fassen(punkte, wie) {
-    if (wie === 'woche') return punkte;
     var je = {};
     punkte.forEach(function (p) {
       var t = p.datum.split('-');
-      var k = wie === 'monat' ? t[0] + '-' + t[1]
-                              : t[0] + '-Q' + Math.ceil(parseInt(t[1], 10) / 3);
+      var k;
+      if (wie === 'monat') { k = t[0] + '-' + t[1]; }
+      else if (wie === 'quartal') {
+        k = t[0] + '-Q' + Math.ceil(parseInt(t[1], 10) / 3);
+      } else {
+        // Woechentlich hiess bis zum 30.08.2026 "gar nicht" - der Knopf gab
+        // die Punkte unveraendert zurueck und zeigte damit Rohtage. Jetzt
+        // fasst er wirklich je Kalenderwoche zusammen (Montag als Anker,
+        // ohne `new Date()`).
+        k = String(Math.floor(tagNr(p.datum) / 7));
+      }
       if (!je[k] || p.datum > je[k].datum) je[k] = p;
     });
-    return Object.keys(je).sort().map(function (k) { return je[k]; });
+    return Object.keys(je).map(function (k) { return je[k]; })
+      .sort(function (a, b) { return a.datum < b.datum ? -1 : 1; });
   }
 
   function el(name, attrs, text) {
@@ -1292,17 +1321,36 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     });
     var tageSort = Object.keys(tage).sort();
     var lo = Math.min.apply(null, alle), hi = Math.max.apply(null, alle);
-    // Eine Spanne von null (ein einziger Preis) wuerde durch null teilen.
-    if (hi === lo) { hi = lo + 1; }
+    // EINE SPANNE VON NULL ist der Normalfall, nicht der Sonderfall: 41 der
+    // 89 waehlbaren Geraete haben genau einen Preis. Die erste Fassung schob
+    // dafuer `hi` auf `lo + 1` - und beschriftete die vier Hilfslinien aus
+    // dem verschobenen Wert. Bei einem einzigen Preis von 999,00 EUR stand
+    // dann dreimal "1000 EUR" an der Achse, ein Preis, den es im Datensatz
+    // nicht gibt. Auf einer Seite, deren Leitsatz "geschaetzte Preise gibt
+    // es hier nicht" lautet, ist das die teuerste Sorte falscher Zahl.
+    //
+    // Jetzt traegt die Achse in diesem Fall EINE Linie mit dem echten Preis,
+    // und die Kurve laeuft auf halber Hoehe. `flach` ist ein eigenes Flag -
+    // `hi === lo + 1` als Erkennungsmerkmal traf jede echte Spanne von genau
+    // einem Euro.
+    var flach = (hi === lo);
     var innenB = BREITE - RAND.links - RAND.rechts;
     var innenH = HOEHE - RAND.oben - RAND.unten;
 
+    // ZEITPROPORTIONAL, nicht ordinal. Die erste Fassung bildete auf
+    // `tageSort.indexOf(datum)` ab: bei Messungen am 10.8., 21.8. und 29.8.
+    // (Abstaende 11 und 8 Tage) standen die drei Marken gleich weit
+    // auseinander, und die Steigung der Kurve war frei erfunden. Dieselbe
+    // Fehlerklasse wie die 235-px-Etiketten der geloeschten Grafik, nur auf
+    // der anderen Achse.
+    var t0 = tagNr(tageSort[0]);
+    var t1 = tagNr(tageSort[tageSort.length - 1]);
     function x(datum) {
-      var i = tageSort.indexOf(datum);
-      return tageSort.length === 1 ? RAND.links + innenB / 2
-        : RAND.links + (i / (tageSort.length - 1)) * innenB;
+      if (t1 === t0) return RAND.links + innenB / 2;
+      return RAND.links + ((tagNr(datum) - t0) / (t1 - t0)) * innenB;
     }
     function y(preis) {
+      if (flach) return RAND.oben + innenH / 2;
       return RAND.oben + innenH - ((preis - lo) / (hi - lo)) * innenH;
     }
 
@@ -1313,21 +1361,31 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
 
     // Waagerechte Hilfslinien und die Preisachse: vier Stufen reichen, um
     // eine Hoehe abzulesen, und halten die Flaeche ruhig.
-    for (var i = 0; i <= 4; i++) {
-      var preis = lo + (hi - lo) * (i / 4), yy = y(preis);
+    var stufen = flach ? [lo]
+                       : [0, 1, 2, 3, 4].map(function (i) {
+                           return lo + (hi - lo) * (i / 4);
+                         });
+    stufen.forEach(function (preis) {
+      var yy = y(preis);
       svg.appendChild(el('line', { x1: RAND.links, x2: BREITE - RAND.rechts,
                                    y1: yy, y2: yy, class: 'gr-vraster' }));
       svg.appendChild(el('text', { x: RAND.links - 10, y: yy + 4,
                                    class: 'gr-vachse', 'text-anchor': 'end' },
                          Math.round(preis) + ' €'));
-    }
+    });
 
     // Datumsachse - waagerecht, hoechstens acht Marken.
     var marken = beschriftung(tageSort);
+    var gesehen = {};
     marken.forEach(function (t) {
+      var text = markeDE(t, raster);
+      // Im Monats- und Quartalsraster koennen zwei Tage dieselbe Marke
+      // ergeben. Zweimal "Q3 2026" nebeneinander ist keine Achse.
+      if (gesehen[text]) return;
+      gesehen[text] = 1;
       svg.appendChild(el('text', { x: x(t), y: HOEHE - RAND.unten + 22,
                                    class: 'gr-vachse', 'text-anchor': 'middle' },
-                         tagDE(t)));
+                         text));
     });
 
     reihen.forEach(function (r) {
@@ -1362,7 +1420,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     });
 
     document.getElementById('gr-vmin').textContent = euro(lo);
-    document.getElementById('gr-vmax').textContent = euro(hi === lo + 1 ? lo : hi);
+    document.getElementById('gr-vmax').textContent = euro(flach ? lo : hi);
     document.getElementById('gr-vanb').textContent = reihen.length;
     document.getElementById('gr-vpkt').textContent = alle.length;
 
@@ -1373,15 +1431,38 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       '<th scope="col" class="num">Veränderung</th>' +
       '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
     var tb = document.createElement('tbody');
-    g.aktuell.forEach(function (z) {
+    // AUS DEN GEFILTERTEN REIHEN, nicht aus der vorgerechneten Liste.
+    // `g.aktuell` rechnet ueber den vollen Zeitraum; mit einem Von-Datum vom
+    // 29.08. nannte die Tabelle einen Anbieter, der im Diagramm daneben gar
+    // nicht vorkam, mit einem Datum ausserhalb des gewaehlten Fensters.
+    // Zwei Zahlen fuer dieselbe Sache auf einem Bildschirm.
+    var zeilen = reihen.map(function (r) {
+      var ps = r.punkte;
+      var letzt = ps[ps.length - 1];
+      var aend = null;
+      if (ps.length > 1 && ps[0].preis !== letzt.preis) {
+        aend = Math.round((letzt.preis - ps[0].preis) * 100) / 100;
+      }
+      return { anbieter: r.anbieter, eigen: r.eigen, preis: letzt.preis,
+               stand: letzt.datum, veraenderung: aend };
+    }).sort(function (a, b) { return a.preis - b.preis; });
+
+    zeilen.forEach(function (z) {
       var tr = document.createElement('tr');
       // "-0,00 EUR" und "0 Tage" sind keine Auskunft. Wer nur einen
       // Messpunkt hat, bekommt einen Strich, keine gerechnete Null.
       var d = z.veraenderung === null ? '–'
             : (z.veraenderung > 0 ? '+' : '') + euro(z.veraenderung);
-      tr.innerHTML = '<td>' + z.anbieter + '</td><td class="num">' +
-        euro(z.preis) + '</td><td class="num">' + d + '</td><td>' +
-        tagDE(z.stand) + '</td>';
+      // `textContent` statt `innerHTML`: der Anbietername ist ein DATENWERT.
+      // `_quellenlage` kennt ausdruecklich Anbieter, die nur in der
+      // Datenbank stehen und nicht in der Konfiguration - Legende und
+      // Trefferliste setzen ihn laengst als Text.
+      [z.anbieter, euro(z.preis), d, markeDE(z.stand, raster)]
+        .forEach(function (wert, i) {
+          var td = tr.insertCell(-1);
+          if (i === 1 || i === 2) td.className = 'num';
+          td.textContent = wert;
+        });
       if (z.eigen) tr.className = 'gr-veigen';
       tb.appendChild(tr);
     });
@@ -1401,6 +1482,18 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
   feld.addEventListener('input', function () {
     var q = feld.value.trim().toLowerCase();
     treffer.innerHTML = '';
+    // Sobald der Leser weitertippt, gilt die alte Auswahl nicht mehr. Ohne
+    // diesen Rueckbau stand unter dem Suchwort "zzzz" unveraendert der
+    // Verlauf des zuletzt gewaehlten Geraets.
+    if (gewaehlt && feld.value !== gewaehlt.label) {
+      gewaehlt = null;
+      steuer.hidden = true; kacheln.hidden = true;
+      bild.hidden = true; legende.hidden = true; tabelle.hidden = true;
+      bild.innerHTML = ''; legende.innerHTML = ''; tabelle.innerHTML = '';
+      leer.hidden = false;
+      leer.textContent = 'Wählen Sie oben ein Gerät – dann steht hier sein '
+        + 'Preisverlauf, mit einer Linie je Anbieter.';
+    }
     if (q.length < 2) {
       treffer.hidden = true;
       feld.setAttribute('aria-expanded', 'false');

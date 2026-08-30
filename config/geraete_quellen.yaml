@@ -165,6 +165,15 @@ anbieter:
     rang: 3
     methode: ldjson
     aktiv: true
+    grund: >-
+      ANGEBUNDEN UND AKTIV, findet aber seit dem 15.08.2026 nichts: 20
+      abgerufene Produktseiten, 0 Listungen, sechzehn Nächte in Folge. Es
+      liegt NICHT an der Besuchszeit - Lauf #17 lief um 03:59 UTC im Fenster
+      02:00-08:00. Ein Adapter mit null Funden ist kein funktionierender
+      Adapter; welche Stufe versagt, beantwortet der Rohsatz-Zähler beim
+      nächsten Nachtlauf (die Protokollzeile nennt "N Preissaetze gelesen"
+      neben den Listungen). Messen geht nur im Fenster, deshalb steht der
+      Befund hier und nicht als Vermutung.
     basis_url: https://www.medimax.de
     rate_limit_sekunden: 10
     max_produkte: 20
@@ -183,6 +192,15 @@ anbieter:
     rang: 3
     methode: ldjson
     aktiv: true
+    grund: >-
+      ANGEBUNDEN UND AKTIV, findet aber seit dem 15.08.2026 nichts: 20
+      abgerufene Produktseiten, 0 Listungen, sechzehn Nächte in Folge. Es
+      liegt NICHT an der Besuchszeit - Lauf #17 lief um 03:59 UTC im Fenster
+      02:00-08:00. Ein Adapter mit null Funden ist kein funktionierender
+      Adapter; welche Stufe versagt, beantwortet der Rohsatz-Zähler beim
+      nächsten Nachtlauf (die Protokollzeile nennt "N Preissaetze gelesen"
+      neben den Listungen). Messen geht nur im Fenster, deshalb steht der
+      Befund hier und nicht als Vermutung.
     basis_url: https://www.ep.de
     rate_limit_sekunden: 10
     max_produkte: 20
