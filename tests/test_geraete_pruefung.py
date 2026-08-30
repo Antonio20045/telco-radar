@@ -8,7 +8,7 @@ import pytest
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report.geraete_pruefung import (
     AUSREISSER_ANTEIL,
-    SPANNE_GRENZE,
+    FARBSPANNE_GRENZE,
     pruefe,
 )
 
@@ -37,37 +37,63 @@ def _e(anbieter="o2", gid="samsung-galaxy-s25", preis=849.0, speicher=128,
 # Doppelpreis
 # --------------------------------------------------------------------------
 
-def test_ein_grosser_doppelpreis_fliegt_aus_dem_vergleich():
-    """Der Fall aus der Evaluation: o2 fuehrte dasselbe Geraet fuer 577 und
-    883 EUR (53 % Spanne). Welcher der beiden stimmt, sagt der Datensatz
-    nicht - also darf keiner von beiden verglichen werden."""
-    eintraege = [_e(preis=883.0, farbe="blau"), _e(preis=577.0, farbe="grau")]
+def test_zwei_preise_fuer_dieselbe_farbe_fliegen_aus_dem_vergleich():
+    """Dieselbe Farbe kann nicht zwei Preise haben. Welcher der beiden
+    stimmt, sagt der Datensatz nicht - also darf keiner verglichen werden.
+
+    Bis zum 30.08.2026 entschied darueber eine Spannengrenze von 30 %. Die
+    Farbe im Schluessel beantwortet die Frage, statt sie zu schaetzen.
+    """
+    eintraege = [_e(preis=883.0, farbe="blau"), _e(preis=849.0, farbe="blau")]
     erg = pruefe(eintraege, _KATALOG)
     assert erg["sauber"] == []
     assert erg["zahlen"]["doppelpreise"] == 1
     assert erg["zahlen"]["entfernt"] == 1
-    assert erg["befunde"][0]["spanne"] == pytest.approx(53.0, abs=0.5)
 
 
-def test_ein_farbaufschlag_wird_berichtet_aber_nicht_geloescht():
+def test_ein_kleiner_abstand_bei_gleicher_farbe_fliegt_auch():
+    """Die neue Regel kennt keine Spannengrenze mehr. 849 gegen 859 EUR fuer
+    DIESELBE Farbe sind kein Farbaufschlag, sondern ein Widerspruch - unter
+    der alten 30-Prozent-Regel waren sie beide stehen geblieben."""
+    eintraege = [_e(preis=859.0, farbe="blau"), _e(preis=849.0, farbe="blau")]
+    erg = pruefe(eintraege, _KATALOG)
+    assert erg["sauber"] == []
+
+
+def test_ein_farbaufschlag_bleibt_unangetastet_und_unerwaehnt():
     """Samsung bepreist Aktionsfarben wirklich verschieden: 955 gegen 1009 EUR
-    sind 5,7 % und der Markt, kein Widerspruch. Eine Regel, die auch die
-    verwirft, loescht wahre Preise."""
+    sind 5,7 % und der Markt. Verschiedene Farben sind nie ein Widerspruch -
+    es gibt hier nichts zu melden und nichts zu loeschen."""
     eintraege = [_e(gid="samsung-galaxy-s26", preis=1009.0, speicher=256,
                     farbe="schwarz"),
                  _e(gid="samsung-galaxy-s26", preis=955.0, speicher=256,
                     farbe="cobalt violet")]
     erg = pruefe(eintraege, _KATALOG)
     assert len(erg["sauber"]) == 2, "ein Farbaufschlag ist kein Fehler"
-    assert erg["zahlen"]["doppelpreise"] == 1, "berichtet wird er trotzdem"
+    assert erg["zahlen"]["doppelpreise"] == 0
+    assert erg["zahlen"]["farbspannen"] == 0
     assert erg["zahlen"]["entfernt"] == 0
-    assert erg["befunde"][0]["entfernt"] is False
 
 
-def test_die_schwelle_trennt_die_gemessenen_faelle():
-    """Die Grenze ist an echten Daten kalibriert (Modulkopf): Fehler lagen
-    bei 53 und 112 Prozent, echte Farbpreise bei 5,7 bis 21,6."""
-    assert 0.216 < SPANNE_GRENZE < 0.53
+def test_eine_auffaellig_weite_farbspanne_wird_gemeldet_nicht_geloescht():
+    """Kein Farbaufschlag ist ein Viertel des Geraetepreises. Wenn doch, soll
+    ihn jemand ansehen - loeschen wuerde einen echten Preis vernichten."""
+    eintraege = [_e(gid="samsung-galaxy-s26", preis=1200.0, speicher=256,
+                    farbe="schwarz"),
+                 _e(gid="samsung-galaxy-s26", preis=800.0, speicher=256,
+                    farbe="cobalt violet")]
+    erg = pruefe(eintraege, _KATALOG)
+    assert len(erg["sauber"]) == 2
+    assert erg["zahlen"]["farbspannen"] == 1
+    assert erg["zahlen"]["entfernt"] == 0
+    befund = next(b for b in erg["befunde"] if b["art"] == "farbspanne")
+    assert befund["spanne"] == pytest.approx(50.0, abs=0.5)
+
+
+def test_die_farbspannenschwelle_liegt_ueber_den_gemessenen_farbpreisen():
+    """Die Grenze ist an echten Daten kalibriert (Modulkopf): echte
+    Farbpreise lagen bei 5,7 bis 21,6 Prozent."""
+    assert FARBSPANNE_GRENZE > 0.216
 
 
 def test_neu_und_refurbished_sind_kein_doppelpreis():

@@ -1,6 +1,7 @@
-"""Plausibilitaetspruefung des Geraetedatensatzes (W1.2, 29.08.2026).
+"""Plausibilitaetspruefung des Geraetedatensatzes (W1.2, 29.08.2026;
+sequenziell verkettet und um die Farbe im Schluessel erweitert am 30.08.2026).
 
-Der Anlass steht in `claude/geraeteradar-evaluation-2026-08-29.md`: die
+Der Anlass steht in `outputs/geraeteradar-wahrheit-2026-08-29.md`: die
 Vergleichstabelle meldete einen Wettbewerbsnachteil, wo in Wahrheit ein
 Vorteil stand. Ein o2-Gebrauchtgeraet lief als Neugeraet mit, unterbot mit
 seinem Gebrauchtpreis den Vodafone-Neupreis und stand als Sieger auf der
@@ -11,17 +12,23 @@ NETZ darunter: es faengt denselben Fehlertyp beim naechsten Adapter, bei der
 naechsten Schreibweise und bei der naechsten Quelle, ohne dass ihn wieder
 jemand im Export von Hand finden muss.
 
-Drei Pruefungen, alle gegen den fertigen Datensatz und alle vor dem Rendern:
+Fuenf Pruefungen, alle gegen den fertigen Datensatz, alle vor dem Rendern
+und alle NACHEINANDER (siehe `pruefe`):
 
-    Doppelpreis        Dieselbe (Anbieter, Modell, Speicher, Zustand,
-                       Preisart) mit zwei verschiedenen Preisen.
+    Zustand veraltet   Der gespeicherte Zustand widerspricht der heutigen
+                       Regel. Der Store wird nicht angefasst.
+    Doppelpreis        Dieselbe (Anbieter, Modell, Speicher, Zustand, FARBE)
+                       mit zwei verschiedenen Preisen.
     Speicherinversion  Mehr Speicher kostet weniger als weniger Speicher.
+    Farbspanne         Die Farben eines Geraets liegen weiter auseinander
+                       als FARBSPANNE_GRENZE. Nur berichtet.
     Ausreisser         Ein Preis weicht um mehr als AUSREISSER_ANTEIL vom
                        Median aller Preise fuer dasselbe (Modell, Speicher,
-                       Zustand) ab.
+                       Zustand) ab. Nur berichtet, mit Markierung an der
+                       Vergleichszeile.
 
-Was ein Doppelpreis IST - und was nicht
----------------------------------------
+Die Farbe gehoert in den Doppelpreis-Schluessel
+-----------------------------------------------
 Ein Farbaufschlag ist kein Widerspruch. Am 29.08.2026 ueber den echten
 Bestand gemessen trennen sich die zwei Faelle sauber:
 
@@ -31,11 +38,14 @@ Bestand gemessen trennen sich die zwei Faelle sauber:
       9,6 %  o2  Galaxy S26 U.  256 GB  1315 -> 1441   cobalt violet / schwarz
       5,7 %  o2  Galaxy S26     256 GB   955 -> 1009   cobalt violet / schwarz
 
-Die beiden oberen sind Fehler, die drei unteren sind der Markt: Samsung
-bepreist Aktionsfarben wirklich verschieden. Eine Regel, die alle fuenf
-verwirft, loescht drei wahre Preise - und "mehr Daten sind nicht mehr Wert"
-gilt in beide Richtungen. Deshalb wird JEDER Doppelpreis BERICHTET, aber nur
-oberhalb von SPANNE_GRENZE auch AUSSORTIERT.
+Bis zum 30.08.2026 entschied darueber eine Spannengrenze von 30 %. Jede
+solche Grenze verwirft an ihrer einen Seite wahre Preise und laesst an der
+anderen falsche durch - sie schaetzt, was der Schluessel wissen kann. Mit
+der Farbe im Schluessel ist die Frage entschieden statt geschaetzt:
+verschiedene Farben sind nie ein Widerspruch, dieselbe Farbe ist immer
+einer. Die drei unteren Faelle bleiben damit als Markt stehen; der
+S26-FE-Fall ist keiner mehr, seit `farbschluessel()` "pistachio bk" und
+"pistachio" als eine Farbe liest.
 
 Fail closed in eine Richtung: eine aussortierte Zeile faellt aus Vergleich
 UND Grafik, bleibt aber im CSV-Export und in der SKU-Ansicht. Was nicht
@@ -46,13 +56,14 @@ from __future__ import annotations
 
 from statistics import median
 
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, zustand_aus_titel
+from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
+                             zustand_aus_titel)
 
-# Oberhalb dieser Spanne innerhalb einer Gruppe ist ein Doppelpreis kein
-# Farbaufschlag mehr, sondern ein Hinweis auf zwei verschiedene Produkte.
-# Gemessen am Bestand vom 29.08.2026 (siehe Modulkopf): die echten Fehler
-# lagen bei 53 % und 112 %, die echten Farbpreise bei 5,7 bis 21,6 %.
-SPANNE_GRENZE = 0.30
+# Ab dieser Spanne ueber die FARBEN eines Geraets wird der Fall berichtet -
+# nicht aussortiert. Kein Farbaufschlag ist ein Viertel des Geraetepreises;
+# wenn doch, soll ihn jemand ansehen statt ihn zu verlieren. Gemessen am
+# Bestand vom 29.08.2026 lagen die echten Farbpreise bei 5,7 bis 21,6 %.
+FARBSPANNE_GRENZE = 0.25
 
 # Abweichung vom Median, ab der ein Preis als Ausreisser gilt.
 AUSREISSER_ANTEIL = 0.60
@@ -143,38 +154,87 @@ def _zustand_veraltet(eintraege: list, katalog) -> tuple[set, list]:
     return raus, befunde
 
 
+def _farbe(e: dict) -> str:
+    return farbschluessel(e.get("farbe_normalisiert"), e.get("farbe_roh") or "")
+
+
 def _doppelpreise(eintraege: list, katalog) -> tuple[set, list]:
+    """Zwei Preise fuer DIESELBE Farbe - das kann nicht sein.
+
+    Die Farbe gehoert in den Schluessel, weil ein Farbaufschlag ein echter
+    Preis ist: Samsung bepreist Aktionsfarben wirklich verschieden. Ohne
+    Farbe im Schluessel entschied eine Spannengrenze darueber, ob ein
+    Doppelpreis Fehler oder Markt war - und jede Grenze verwirft an ihrer
+    einen Seite wahre Preise. Mit Farbe im Schluessel braucht es die Grenze
+    nicht mehr: verschiedene Farben sind nie ein Widerspruch, gleiche Farbe
+    ist immer einer.
+
+    Aussortiert wird die GANZE Gruppe, nicht nur der niedrigere Preis:
+    welcher der beiden stimmt, sagt der Datensatz nicht, und den teureren
+    stehen zu lassen waere dieselbe Raterei mit umgekehrtem Vorzeichen.
+    """
     gruppen: dict[tuple, list] = {}
     for e in eintraege:
         gruppen.setdefault(
             (e.get("anbieter"), e.get("device_id"), e.get("speicher_gb"),
-             e.get("zustand") or "neu"), []).append(e)
+             e.get("zustand") or "neu", _farbe(e)), []).append(e)
 
     raus, befunde = set(), []
-    for (anbieter, _gid, _sp, _zu), gruppe in gruppen.items():
+    for (anbieter, _gid, _sp, _zu, farbe), gruppe in gruppen.items():
         preise = {_preis(e) for e in gruppe}
         if len(preise) < 2:
             continue
         lo, hi = min(preise), max(preise)
-        spanne = (hi - lo) / lo if lo else 0.0
-        entfernt = spanne > SPANNE_GRENZE
-        if entfernt:
-            # Aussortiert wird die GANZE Gruppe, nicht nur der niedrigere
-            # Preis: welcher der beiden stimmt, sagt der Datensatz nicht,
-            # und den teureren stehen zu lassen waere dieselbe Raterei wie
-            # den billigeren zu nehmen, nur mit umgekehrtem Vorzeichen.
-            raus.update(_schluessel(e) for e in gruppe)
+        raus.update(_schluessel(e) for e in gruppe)
         befunde.append({
             "art": "doppelpreis",
             "anbieter": anbieter,
             "geraet": _label(gruppe[0], katalog),
-            "spanne": round(spanne * 100, 1),
+            "spanne": round((hi - lo) / lo * 100, 1) if lo else 0.0,
             "preise": sorted(preise),
-            "farben": sorted({(e.get("farbe_normalisiert")
-                               or e.get("farbe_roh") or "?") for e in gruppe}),
-            "entfernt": entfernt,
+            "farben": sorted({(e.get("farbe_roh") or farbe or "?")
+                              for e in gruppe}),
+            "entfernt": True,
         })
     return raus, befunde
+
+
+def _farbspannen(eintraege: list, katalog) -> tuple[set, list]:
+    """Ein auffaellig weiter Abstand zwischen den Farben eines Geraets.
+
+    Wird BERICHTET, nicht entfernt - anders als der Doppelpreis ist das kein
+    Selbstwiderspruch, sondern eine Preisentscheidung des Anbieters. Sie
+    kann trotzdem ein falsch gelesenes Feld sein, und dann will man sie
+    sehen.
+    """
+    gruppen: dict[tuple, dict] = {}
+    for e in eintraege:
+        schluessel = (e.get("anbieter"), e.get("device_id"),
+                      e.get("speicher_gb"), e.get("zustand") or "neu")
+        gruppen.setdefault(schluessel, {})[_farbe(e)] = min(
+            gruppen.get(schluessel, {}).get(_farbe(e), float("inf")), _preis(e))
+
+    befunde = []
+    for (anbieter, _gid, _sp, _zu), je_farbe in gruppen.items():
+        if len(je_farbe) < 2:
+            continue
+        lo, hi = min(je_farbe.values()), max(je_farbe.values())
+        spanne = (hi - lo) / lo if lo else 0.0
+        if spanne <= FARBSPANNE_GRENZE:
+            continue
+        beispiel = next(e for e in eintraege
+                        if e.get("anbieter") == anbieter
+                        and e.get("device_id") == _gid)
+        befunde.append({
+            "art": "farbspanne",
+            "anbieter": anbieter,
+            "geraet": _label(beispiel, katalog),
+            "spanne": round(spanne * 100, 1),
+            "preise": sorted(je_farbe.values()),
+            "farben": sorted(je_farbe),
+            "entfernt": False,
+        })
+    return set(), befunde
 
 
 def _speicherinversionen(eintraege: list, katalog) -> tuple[set, list]:
@@ -240,6 +300,7 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
             # Befund gegen die Erwartung zu verwerfen.
             befunde.append({
                 "art": "ausreisser",
+                "listung_id": _schluessel(e),
                 "anbieter": e.get("anbieter"),
                 "geraet": _label(e, katalog),
                 "preis": _preis(e),
@@ -253,25 +314,54 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
 def pruefe(eintraege: list, katalog=None) -> dict:
     """Prueft den Datensatz und sagt, was nicht verglichen werden darf.
 
+    Die Pruefungen laufen NACHEINANDER, und jede sieht nur, was die vorige
+    uebrig gelassen hat. Das ist keine Aufraeumarbeit, sondern der Kern:
+    liefen sie unabhaengig und wuerden ihre Streichungen am Ende vereinigt,
+    zieht eine schon verurteilte Zeile ihre gesunden Nachbarn mit.
+
+    Am Bestand vom 30.08.2026 gemessen, mit unabhaengigen Pruefungen: o2
+    fuehrt das Galaxy S25 128 GB als Neugeraet fuer 883 Euro und daneben
+    eine falsch gespeicherte Gebrauchtzeile fuer 577 Euro. `_zustand_veraltet`
+    erkennt die Gebrauchtzeile - `_doppelpreise` sah sie aber trotzdem, fand
+    zwei Preise in einer Gruppe und warf BEIDE hinaus. Der echte o2-Neupreis
+    verschwand aus dem Vergleich, und die Seite konnte die Aussage "o2 ist
+    33 Euro teurer als wir" gar nicht mehr treffen. Dasselbe beim iPhone 14
+    Pro (1225 Euro). Sequenziell geprueft bleibt in beiden Gruppen nach der
+    Zustandspruefung genau ein Preis stehen, und es gibt keinen Doppelpreis
+    mehr zu finden.
+
     Gibt `sauber` (die Eintraege, die in Vergleich und Grafik duerfen),
-    `befunde` (jeder Treffer einzeln, fuer /geraete-quellen.html) und
-    `zahlen` (die Kurzbilanz) zurueck. Der EINGABEDATENSATZ wird nicht
-    veraendert - Export und SKU-Ansicht sehen weiterhin alles.
+    `befunde` (jeder Treffer einzeln, fuer /geraete-quellen.html), `zahlen`
+    (die Kurzbilanz) und `auffaellig` (die Kennungen der Zeilen, die zwar
+    verglichen werden duerfen, aber einen Hinweis an der Vergleichszeile
+    tragen) zurueck. Der EINGABEDATENSATZ wird nicht veraendert - Export und
+    SKU-Ansicht sehen weiterhin alles.
     """
     kandidaten = [e for e in eintraege if _vergleichbar(e)]
 
     raus: set = set()
     befunde: list = []
-    for pruefung in (_zustand_veraltet, _doppelpreise,
-                     _speicherinversionen, _ausreisser):
-        weg, gefunden = pruefung(kandidaten, katalog)
+    uebrig = kandidaten
+    for pruefung in (_zustand_veraltet, _doppelpreise, _speicherinversionen,
+                     _farbspannen, _ausreisser):
+        weg, gefunden = pruefung(uebrig, katalog)
         raus |= weg
         befunde.extend(gefunden)
+        if weg:
+            uebrig = [e for e in uebrig if _schluessel(e) not in weg]
 
     sauber = [e for e in eintraege if _schluessel(e) not in raus]
     entfernt = [b for b in befunde if b["entfernt"]]
+    # Die Zeilen, die stehen bleiben und trotzdem einen Blick verdienen. Ein
+    # Ausreisser ist der Befund, wegen dem diese Seite existiert - ein
+    # Discounter 60 % unter dem Median ist das Signal, nicht der Fehler. Er
+    # wird deshalb nicht geloescht, sondern an seiner Vergleichszeile
+    # markiert, damit ein Mensch die Quelle aufruft und entscheidet.
+    auffaellig = {b["listung_id"]: b for b in befunde
+                  if b["art"] == "ausreisser" and b.get("listung_id")}
     return {
         "sauber": sauber,
+        "auffaellig": auffaellig,
         "befunde": sorted(befunde, key=lambda b: (b["art"], b["anbieter"] or "",
                                                   b["geraet"])),
         "zahlen": {
@@ -282,6 +372,7 @@ def pruefe(eintraege: list, katalog=None) -> dict:
             "doppelpreise": sum(1 for b in befunde if b["art"] == "doppelpreis"),
             "speicherinversionen": sum(1 for b in befunde
                                        if b["art"] == "speicherinversion"),
+            "farbspannen": sum(1 for b in befunde if b["art"] == "farbspanne"),
             "ausreisser": sum(1 for b in befunde if b["art"] == "ausreisser"),
             "befunde": len(befunde),
             # ZWEI verschiedene Zahlen, und sie duerfen nicht denselben Namen

@@ -524,6 +524,7 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         # "mittel" da, obwohl sie aus strukturierten Daten stammen.
         confidence=_belegstufe(satz.get("quelle")),
         farbe_roh=satz.get("farbe") or "", ean=satz.get("ean") or "",
+        zustand_hinweis=satz.get("zustand_hinweis") or "",
         # Strukturierte Daten schlagen Textextraktion - die Rangfolge aus
         # Teil C1. Vodafone und o2 nennen den Speicher als eigenes Feld
         # (`capacity.displayLabel`, der Angebotsslug); ohne diese Zeile

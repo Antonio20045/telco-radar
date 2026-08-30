@@ -108,10 +108,14 @@
   <h2 class="rubrik">Was der Preisvergleich nicht zeigt
     <span class="rubrik-zahl">{{ geraete.pruefung.aussortiert }}</span></h2>
   <p class="gr-erklaer">Vor dem Rendern läuft jeder Preis ohne Vertrag durch
-  drei Prüfungen: derselbe Artikel mit zwei Preisen, mehr Speicher für weniger
-  Geld, ein Preis weit abseits aller anderen. Was dabei auffällt, steht hier
-  und fehlt in Vergleichstabelle und Preisgrafik – es bleibt aber in der
-  CSV-Tabelle und in der Geräteansicht. Ein Preis, der sich nicht belegen
+  fünf Prüfungen, eine nach der anderen: ein gespeicherter Zustand, der der
+  heutigen Lesart widerspricht; derselbe Artikel <em>in derselben Farbe</em>
+  mit zwei Preisen; mehr Speicher für weniger Geld; Farben eines Geräts, die
+  ungewöhnlich weit auseinanderliegen; ein Preis weit abseits aller anderen.
+  Die ersten drei nehmen eine Zeile aus Vergleichstabelle und Preisgrafik,
+  die letzten beiden melden sie nur – ein Discounter weit unter dem Markt ist
+  der Befund, wegen dem es diese Seite gibt, kein Datenfehler. Alles bleibt in
+  der CSV-Tabelle und in der Geräteansicht. Ein Preis, der sich nicht belegen
   lässt, verschwindet nicht; er wird nur nicht gegen einen anderen
   gerechnet.</p>
   <p class="gr-erklaer">{{ geraete.pruefung.geprueft }} Preiszeilen geprüft,
@@ -126,10 +130,16 @@
       <tr>
         <td>{{ b.anbieter }}</td>
         <td>{{ b.geraet }}</td>
-        <td>{% if b.art == "doppelpreis" %}zwei Preise ({% for pr in b.preise
+        <td>{% if b.art == "doppelpreis" %}zwei Preise für dieselbe Farbe
+              ({% for pr in b.preise
               %}{{ '%.2f'|format(pr)|replace('.', ',') }} €{% if not loop.last
               %} und {% endif %}{% endfor %}, {{ b.spanne|replace('.', ',') }} %
               Abstand){% if b.farben %} – {{ b.farben | join(" / ") }}{% endif %}
+            {% elif b.art == "farbspanne" %}die Farben liegen
+              {{ b.spanne|replace('.', ',') }} % auseinander ({% for pr in b.preise
+              %}{{ '%.2f'|format(pr)|replace('.', ',') }} €{% if not loop.last
+              %} bis {% endif %}{% endfor %}){% if b.farben %} –
+              {{ b.farben | join(" / ") }}{% endif %}
             {% elif b.art == "speicherinversion" %}{{ b.gross_gb }} GB
               ({{ '%.2f'|format(b.gross_preis)|replace('.', ',') }} €) billiger
               als {{ b.klein_gb }} GB

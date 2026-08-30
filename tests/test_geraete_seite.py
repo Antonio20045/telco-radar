@@ -479,15 +479,16 @@ _UEBER_DER_SCHWELLE = ("Medimax", "ElectronicPartner", "Vodafone",
 def _db_mit(anzahl_skus: int, anbieter: tuple = ("Medimax",)) -> dict:
     """Ein Bestand, der die Schwelle gezielt reisst oder nimmt.
 
-    Die Preise liegen dicht beieinander (399 bis 468 EUR). Das ist kein
-    Schoenheitsfehler: die Listungen unterscheiden sich nur in der FARBE,
-    und seit W1.2 (29.08.2026) sortiert die Plausibilitaetspruefung eine
-    Gruppe aus, deren Preisspanne bei gleichem Anbieter, Modell, Speicher
-    und Zustand ueber SPANNE_GRENZE liegt. Mit dem alten Abstand von 15 EUR
-    je Schritt spannten acht Farben eines Geraets 399 bis 744 EUR auf - 86
-    Prozent, und die Pruefung raeumte den Bestand voellig zu Recht ab. Dieser
-    Test misst die SCHWELLE, nicht die Preislogik; er braucht deshalb Daten,
-    die die Preislogik passieren.
+    Jede Listung traegt eine EIGENE Farbe. Bis zum 30.08.2026 stand hier nur
+    eine eigene `sku_id` (`farbe-{i}`), waehrend `farbe_normalisiert` bei
+    allen auf dem Vorgabewert "titan-natur" blieb - der Fixture-Kommentar
+    behauptete also eine Variation, die es nicht gab. Solange die
+    Doppelpreisregel die Farbe nicht kannte, fiel das nicht auf; seit sie im
+    Schluessel steht, ist ein Bestand aus 24 Preisen fuer EINE Farbe genau
+    das, was sie aussortieren soll.
+
+    Dieser Test misst die SCHWELLE, nicht die Preislogik; er braucht deshalb
+    Daten, die die Preislogik passieren.
     """
     modelle = ("apple-iphone-17-pro-max", "samsung-galaxy-s25-ultra")
     listungen = []
@@ -495,7 +496,7 @@ def _db_mit(anzahl_skus: int, anbieter: tuple = ("Medimax",)) -> dict:
         name = anbieter[i % len(anbieter)]
         device = modelle[i % len(modelle)]
         listungen.append(_listung(name, device, f"{device}-256gb-farbe-{i}",
-                                  399.0 + i * 3))
+                                  399.0 + i * 3, farbe=f"farbe-{i}"))
     return {"updated": "2026-08-11",
             "anbieter": {n: {"laeufe": 4} for n in anbieter},
             "listungen": listungen}
@@ -1611,12 +1612,16 @@ def test_die_pruefung_schaltet_die_navigation_nicht(tmp_path):
     „Geräte" auf JEDER Seite verschwinden lassen – ohne Fehler, ohne
     Warnung. Eine Datenqualitätsheuristik darf keine Navigation schalten.
 
-    Die Fixture spannt genau diesen Fall auf: Preise von 399 bis 744 EUR für
-    dieselbe (Anbieter, Modell, Speicher, Zustand)-Gruppe. Die Prüfung räumt
-    sie ab – die Schwelle muss trotzdem stehen."""
+    Die Fixture spannt genau diesen Fall auf: verschiedene Preise für
+    dieselbe (Anbieter, Modell, Speicher, Zustand, FARBE)-Gruppe. Die Prüfung
+    räumt sie ab – die Schwelle muss trotzdem stehen."""
     db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
     for i, listung in enumerate(db["listungen"]):
         listung["preis_ohne_vertrag"] = 399.0 + i * 15
+        # DIESELBE Farbe: seit dem 30.08.2026 ist nur das ein Doppelpreis.
+        # Eine weite Spanne über verschiedene Farben ist der Markt.
+        listung["farbe_roh"] = "Titan Natur"
+        listung["farbe_normalisiert"] = "titan-natur"
 
     site = _baue(tmp_path, db=db)
     geraete = geraete_view.aufbereiten(
@@ -1660,6 +1665,8 @@ def test_der_pruefbericht_nennt_dieselben_zahlen_wie_die_pruefung(tmp_path):
     db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
     for i, listung in enumerate(db["listungen"]):
         listung["preis_ohne_vertrag"] = 399.0 + i * 15
+        listung["farbe_roh"] = "Titan Natur"
+        listung["farbe_normalisiert"] = "titan-natur"
     # Eine zweite Befundart, damit die Vorlage nicht nur ihren ersten Zweig
     # zeigt: der `zustand_veraltet`-Fall hat weder `preise` noch `median`
     # und lief bis zum Review in den Ausreisser-Zweig - mit einem

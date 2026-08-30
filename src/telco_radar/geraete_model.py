@@ -302,6 +302,43 @@ def normalisiere_farbe(roh: str, tabelle: dict) -> Optional[str]:
     return tabelle.get(normalisiere(roh))
 
 
+# Ein Kuerzel am Ende einer Farbschreibweise ist keine eigene Farbe. o2
+# fuehrt dasselbe Galaxy S26 FE als "pistachio" und "pistachio bk" - zwei
+# Adressen, 144 Euro Abstand, beide ohne Vertrag. Als zwei Farben gelesen ist
+# das ein legitimer Farbaufschlag und der Vergleich nimmt kommentarlos die
+# 667 Euro; als EINE Farbe gelesen ist es ein Widerspruch, den die
+# Doppelpreisregel faengt.
+#
+# Warum das hier steht und nicht in `config/farben.yaml`: eine neue
+# Farbzuordnung aendert die `sku_id`. Der Altbestand gaelte als ausgelistet
+# und entstuende als neue Listung - eine Datenwanderung, die Listungsdauer
+# und Preisverlauf jedes betroffenen Geraets auf null zuruecksetzt. Der
+# Schluessel wird deshalb beim LESEN gerechnet und beruehrt den Store nicht.
+_KUERZEL_MAX = 3
+
+
+def farbschluessel(farbe_normalisiert: Optional[str], farbe_roh: str) -> str:
+    """Die Farbe als Vergleichsschluessel - kanonisch, wenn sie bekannt ist.
+
+    Kennt `config/farben.yaml` die Schreibweise, gewinnt die kanonische
+    Farbe: "Navy" und "navy blue" sind dann derselbe Schluessel. Kennt sie
+    sie nicht, traegt die normalisierte Rohschreibweise den Schluessel, und
+    ein angehaengtes Kuerzel von hoechstens `_KUERZEL_MAX` Zeichen faellt
+    weg.
+
+    Die Laengengrenze ist der ganze Schutz dieser Regel: sie trennt "bk" von
+    "gold". Ohne sie wuerde aus "titan natur" und "titan schwarz" derselbe
+    Schluessel, und zwei echte Farben eines Geraets sahen wie ein
+    Doppelpreis aus.
+    """
+    if farbe_normalisiert:
+        return normalisiere(farbe_normalisiert)
+    teile = [t for t in normalisiere(farbe_roh).split("-") if t]
+    if len(teile) > 1 and len(teile[-1]) <= _KUERZEL_MAX:
+        teile = teile[:-1]
+    return "-".join(teile)
+
+
 def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
     """Rueckfall, wenn die Quelle kein eigenes Farbfeld hat.
 
@@ -375,6 +412,11 @@ _ZUSTAENDE = (
 # Preisgrafik heraus (siehe VERGLEICHBARE_ZUSTAENDE).
 _UNSICHER = ("neuwertig", "retoure", "open-box", "openbox", "zweite-wahl",
              "2-wahl", "geprueft-und-zertifiziert")
+
+# Ab welcher Laenge ein Zustandsmarker auch gebeugt treffen darf. Acht
+# Zeichen halten "erneuert" (8) und "gebraucht" (9) drin und "refurb" (6)
+# draussen.
+_BEUGBAR_AB = 8
 
 # Welche Zustaende in einer Preisaussage GEGENEINANDER stehen duerfen. Neu-,
 # Gebraucht- und B-Warenpreis sind drei verschiedene Preise; die Vergleichs-
@@ -468,15 +510,43 @@ def ohne_zustandswort(farbe: str) -> str:
     return rest or roh
 
 
+def zustand_aus_feldern(*felder) -> str:
+    """Der Zustand aus ALLEN Signalen, die eine Quelle traegt.
+
+    Titel, Farbfeld, Kategoriepfad, `itemCondition` - ein Kennzeichen zaehlt,
+    egal in welcher Spalte es steht. Das ist die Lehre aus dem Fall vom
+    29.08.2026: o2 schrieb "erneuert" AUSSCHLIESSLICH in die Farbe, und ein
+    Zustand, den nur eine Spalte kennt, ist trotzdem ein Zustand.
+
+    Die Felder werden verbunden statt einzeln geprueft, weil die
+    Mehrwortmuster ("wie neu") sonst an einer Feldgrenze zerrissen wuerden.
+    """
+    return zustand_aus_titel(" ".join(str(f or "") for f in felder))
+
+
 def zustand_aus_titel(titel: str) -> str:
-    """"neu" | "refurbished" | "b-ware"."""
+    """"neu" | "refurbished" | "b-ware" | "unbekannt"."""
     marken = set(wortmarken(titel))
     text = normalisiere(titel)
 
     def trifft(wort: str) -> bool:
         if "-" in wort:
             return f"-{wort}-" in f"-{text}-"
-        return wort in marken
+        if wort in marken:
+            return True
+        # Gebeugte Formen. Ein Kategoriepfad heisst "Gebrauchte Handys",
+        # nicht "gebraucht", und eine Rubrik "Erneuerte Geraete" - seit der
+        # Zustand auch aus dem Pfad gelesen wird, gehen sonst genau die
+        # Felder leer aus, wegen derer er dort gelesen wird.
+        #
+        # Angehaengt werden nur die deutschen Endungen, und nur an Marker ab
+        # `_BEUGBAR_AB` Zeichen. Ohne die Laengengrenze faenge "refurb" das
+        # Wort "refurbe" - und vor allem waere die Regel eine Praefixsuche,
+        # die frueher oder spaeter ein harmloses laengeres Wort trifft.
+        if len(wort) < _BEUGBAR_AB:
+            return False
+        return any(f"{wort}{endung}" in marken
+                   for endung in ("e", "es", "er", "en", "em"))
 
     for name, woerter in _ZUSTAENDE:
         for wort in woerter:
@@ -774,6 +844,7 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
                  confidence: str = "mittel",
                  speicher_gb: Optional[int] = None,
                  farbe_roh: str = "", ean: str = "",
+                 zustand_hinweis: str = "",
                  einstieg_url: str = "") -> Optional[Listung]:
     """Die ganze Kette in einem Aufruf - der Einstieg fuer jeden Adapter.
 
@@ -803,8 +874,10 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
     # aus dem Titel: eine Quelle, die Farbe strukturiert liefert, traegt das
     # Kennzeichen unter Umstaenden NUR dort ("grau erneuert"). Das Farbfeld
     # gehoert deshalb in die Pruefung - ein Zustand, den nur eine Spalte
-    # kennt, ist trotzdem ein Zustand.
-    zustand = zustand_aus_titel(f"{titel} {farbe_roh or ''} {quelle_url}")
+    # kennt, ist trotzdem ein Zustand. `zustand_hinweis` traegt, was die
+    # Quelle sonst noch weiss: `itemCondition` aus dem ld+json, den
+    # Kategoriepfad, die Rubrik einer Gebrauchtstrecke.
+    zustand = zustand_aus_feldern(titel, farbe_roh, zustand_hinweis, quelle_url)
     # ERST lesen, DANN streichen: die Farbe ist bei manchen Quellen der
     # einzige Traeger des Kennzeichens. Umgekehrt haette die Zerlegung das
     # Signal geloescht, bevor es jemand gelesen hat.

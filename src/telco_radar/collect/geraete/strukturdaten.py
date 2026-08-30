@@ -165,6 +165,11 @@ def _aus_produktknoten(knoten: dict) -> Optional[dict]:
         "preis": preis,
         "waehrung": str(angebot.get("priceCurrency") or "").upper(),
         "verfuegbarkeit": verfuegbarkeit_aus_schema(angebot.get("availability")),
+        # schema.org kennt den Zustand als `itemCondition`
+        # (".../RefurbishedCondition"). Er steht am Produkt ODER am Angebot,
+        # je nachdem, wie der Shop sein Schema baut.
+        "zustand_hinweis": str(knoten.get("itemCondition")
+                               or angebot.get("itemCondition") or ""),
         "sku": str(knoten.get("sku") or "").strip(),
         "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
         "farbe": str(farbe).strip() if isinstance(farbe, str) else "",
@@ -236,6 +241,7 @@ def produkte_aus_microdata(html: str) -> list[dict]:
             "preis": preis,
             "waehrung": (_itemprop(quelle, "priceCurrency") or "").upper(),
             "verfuegbarkeit": verfuegbarkeit_aus_schema(_itemprop(quelle, "availability")),
+            "zustand_hinweis": _itemprop(quelle, "itemCondition"),
             "sku": _itemprop(produkt, "sku"),
             "ean": _itemprop(produkt, "gtin13"),
             "farbe": _itemprop(produkt, "color"),
