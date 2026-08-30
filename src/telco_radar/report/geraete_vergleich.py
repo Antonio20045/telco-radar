@@ -56,22 +56,16 @@ from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 WESENTLICH_PROZENT = 3.0
 WESENTLICH_EURO = 15.0
 
-# Wie viele Zeilen die Uebersicht hoechstens zeigt. Ohne diesen Deckel haengt
-# die Seitenhoehe am Datenbestand: eine Zeile ist 71 px hoch, die Seite hat
-# 146 px Luft unter der Sechs-Bildschirm-Grenze - zwei zusaetzliche
-# wesentliche Zeilen kippten den Abnahmetest, ohne dass sich eine Zeile Code
-# aendert. Dieselbe Fehlerklasse wie die Datums-Zeitbomben in CLAUDE.md §6,
-# nur ueber den Datenbestand statt ueber die Uhr.
+# Wie viele Zeilen die alte Vergleichsuebersicht ohne Aufklappen zeigte.
 #
-# Gekappt wird am UNTEREN Ende: sortiert ist nach Abstand, die gestrichenen
-# Zeilen sind also die mit dem kleinsten Vorteil. Sie stehen vollstaendig in
-# der Vollansicht.
-#
-# Die Zahl ist gerechnet, nicht gegriffen: eine Zeile misst 71 px, die Seite
-# steht bei 5211 px und die Grenze bei sechs Bildschirmen zu 900 px.
-# Vierzehn Zeilen sind damit die Obergrenze, die `test_die_seite_ist_kuerzer_
-# als_sechs_bildschirme` auch dann haelt, wenn der Bestand waechst: heute
-# stehen zwoelf Zeilen, zwei weitere kosten 142 px, und 5211 + 142 < 5400.
+# ACHTUNG, wer die Seitenhoehe deckeln will: das ist seit dem 30.08.2026
+# NICHT mehr diese Zahl. Die Vergleichssektion ist durch die Alarmtabelle
+# ersetzt, und deren Deckel heisst `report/geraete_alarme.SICHTBAR_MAX`.
+# Hier standen bis dahin siebzehn Zeilen Begruendung, dass diese Konstante
+# die Seite kurz haelt, samt Verweis auf einen Test, den es nicht mehr gibt -
+# eine lebendig klingende Erklaerung an einer Schraube, die nichts mehr
+# bewegt. `vergleich()` rechnet `wesentlich`/`rest` weiter aus (und Tests
+# halten die Rechnung fest), aber KEINE Vorlage liest sie.
 UEBERSICHT_MAX_ZEILEN = 14
 
 

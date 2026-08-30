@@ -12,20 +12,22 @@ Im ganzen Repo gab es bis dahin keinen Abnahme-Screenshot: `pruefe_portal.py`
 misst im Browser, aber es fotografiert nicht. Dieses Skript schliesst die
 Luecke und macht aus "ansehen" einen Befehl.
 
-ZWEI AUSGABEN, und die zweite ist die wichtigere:
+EINE AUSGABE: PNGs je Format (1440x900 und 390x844), einmal die ganze Seite
+und einmal der genannte Ausschnitt. Die sieht ein MENSCH an - dafuer gibt es
+dieses Skript, und CLAUDE.md nennt den Grund: "Eine Grafik ist erst fertig,
+wenn sie jemand ANGESEHEN hat."
 
-1. PNGs je Format (1440x900 und 390x844), einmal die ganze Seite und einmal
-   der genannte Ausschnitt. Die sieht ein Mensch an.
-2. `--pruefe-etiketten`: die Gegenprobe, die kein Mensch zuverlaessig macht.
-   Aus der gerenderten Etikettenhoehe wird der Preis ZURUECKGERECHNET und
-   gegen `data-preis` gehalten. Das ist genau die Messung, an der die alte
-   Grafik gescheitert waere - und sie kostet keine Sekunde Aufmerksamkeit.
+Bis zum 30.08.2026 gab es hier zweitens `--pruefe-etiketten`, die
+Gegenprobe zur Positionskarte: aus der gerenderten Etikettenhoehe wurde der
+Preis zurueckgerechnet und gegen `data-preis` gehalten. Die Karte ist
+geloescht, also auch die Messung. Was an ihre Stelle tritt, steht in
+`tests/test_geraete_reiter_browser.py`.
 
 Ohne `--site` wird frisch nach einem temporaeren Ordner gerendert; `site/` im
 Repo wird nie angefasst.
 
     python scripts/schiess_screenshot.py --seite geraete.html \\
-        --ausschnitt '#positionskarte' --pruefe-etiketten
+        --ausschnitt '#tafel-alarme'
 """
 from __future__ import annotations
 
@@ -45,10 +47,6 @@ sys.path.insert(0, str(REPO / "src"))
 
 # Dieselben zwei Formate wie in tests/test_falz_browser.py und im Auftrag.
 FORMATE = [("schreibtisch", 1440, 900), ("telefon", 390, 844)]
-
-# Toleranz der Rueckrechnung. Der Auftrag nennt drei Prozent; mehr ist keine
-# Rundung mehr, sondern eine andere Aussage.
-TOLERANZ_PROZENT = 3.0
 
 
 def _chromium() -> str | None:
@@ -111,63 +109,18 @@ def _rendern(ziel: Path) -> Path:
 # ~20 % Abweichung gemeldet, die es nicht gibt, sobald ein Bandpunkt ein
 # Etikett traegt. Dieselbe Lehre wie bei `pruefe_portal.py`: die Zahl gehoert
 # dorthin, wo sie entsteht.
-_MESSUNG_JS = """
-() => {
-  const raus = [];
-  for (const f of document.querySelectorAll('.gr-flaeche')) {
-    const geo = {
-      achse: parseFloat(f.dataset.achse),
-      plot_h: parseFloat(f.dataset.plotH),
-      y_max: parseFloat(f.dataset.ymax),
-      form: f.dataset.form || '',
-      ansicht: (f.closest('.gr-ansicht') || {dataset: {}}).dataset.ansicht || '',
-    };
-    for (const g of f.querySelectorAll('.gr-punkt')) {
-      const text = g.querySelector('.gr-etikett');
-      raus.push({
-        ...geo,
-        modell: g.dataset.modell || '',
-        preis: parseFloat(g.dataset.preis || 'NaN'),
-        label_y: text ? parseFloat(text.getAttribute('y')) : null,
-        label: text ? text.textContent.trim() : '',
-      });
-    }
-  }
-  return raus;
-}
-"""
-
-
-def _pruefe_etiketten(punkte: list) -> list[str]:
-    """Aus der Etikettenhoehe den Preis zurueckrechnen.
-
-    Gerechnet wird mit `geraete_karte.preis_aus_hoehe` und
-    `geraete_karte.toleranz` - denselben Funktionen, die auch
-    `scripts/pruefe_portal.py` und die Tests benutzen. Eine eigene Fassung
-    hier waere eine zweite Meinung darueber, wo die Nulllinie liegt, und
-    beide waeren fuer sich gruen.
-
-    Ein Punkt OHNE Etikett wird uebersprungen - das ist der erlaubte Ausweg
-    der Regel (passt es nicht in 12 px, wird es weggelassen), und ihn als
-    Fehler zu zaehlen hiesse, genau die Loesung zu bestrafen.
-    """
-    from telco_radar.report import geraete_karte
-
-    fehler = []
-    for p in punkte:
-        if p.get("label_y") is None or not p.get("preis"):
-            continue
-        if not p.get("plot_h") or not p.get("y_max"):
-            continue
-        gelesen = geraete_karte.preis_aus_hoehe(
-            p["label_y"], p["y_max"], p["achse"], p["plot_h"])
-        echt = p["preis"]
-        if abs(gelesen - echt) > geraete_karte.toleranz(
-                echt, p["y_max"], p["plot_h"]):
-            fehler.append(
-                f"{p['ansicht']}/{p['form']}: {p['label'] or p['modell']} steht "
-                f"auf Hoehe {gelesen:.0f} EUR, kostet aber {echt:.2f} EUR")
-    return fehler
+# Die Etikettengegenprobe ist am 30.08.2026 entfallen, mit der Grafik, die
+# sie vermass: sie rechnete aus jeder Etikettenhoehe den Preis zurueck und
+# hielt ihn gegen `data-preis`. Die Positionskarte ist geloescht - es gibt
+# keine `.gr-punkt` mehr, aus deren Geometrie sich etwas zurueckrechnen
+# liesse, und der Import von `geraete_karte` warf hier zuletzt einen
+# ImportError, den nur niemand sah, weil die Messung vorher leer zurueckkam.
+#
+# Was an ihre Stelle tritt, misst dieselbe Sorte Fehler an der neuen Seite:
+# `tests/test_geraete_reiter_browser.py` prueft im echten Chromium, dass kein
+# gedrehter Text, keine Schrift unter 12 px und keine mit "..." gekuerzte
+# Beschriftung dasteht. Dieses Skript bleibt, wofuer es sonst da ist -
+# fotografieren, damit ein Mensch hinsieht.
 
 
 def main() -> int:
@@ -182,8 +135,6 @@ def main() -> int:
                     default=Path("/tmp/telco-screenshots"))
     ap.add_argument("--marke", default="",
                     help="Namenszusatz, um zwei Staende zu vergleichen")
-    ap.add_argument("--pruefe-etiketten", action="store_true",
-                    help="Preis aus der Etikettenhoehe zurueckrechnen")
     args = ap.parse_args()
 
     try:
@@ -238,22 +189,6 @@ def main() -> int:
                     else:
                         fehler.append(f"{name}: '{args.ausschnitt}' gibt es nicht")
 
-                if args.pruefe_etiketten and name == "schreibtisch":
-                    punkte = seite.evaluate(_MESSUNG_JS)
-                    if not punkte:
-                        print("  keine Punkte gefunden - Grafik leer?")
-                    else:
-                        mit = [p for p in punkte if p.get("label_y") is not None]
-                        schlecht = _pruefe_etiketten(punkte)
-                        formen = sorted({p["form"] for p in punkte})
-                        print(f"  Etikettenprobe: {len(punkte)} Punkte in "
-                              f"{len(formen)} Formen ({', '.join(formen)}), "
-                              f"{len(mit)} mit Etikett, "
-                              f"{len(schlecht)} weiter als "
-                              f"{TOLERANZ_PROZENT:.0f} % daneben")
-                        for zeile in schlecht[:8]:
-                            print(f"    ! {zeile}")
-                        fehler.extend(schlecht)
                 seite.close()
         finally:
             browser.close()

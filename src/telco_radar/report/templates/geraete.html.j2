@@ -10,8 +10,10 @@
    jetzt eine Tabelle: die Startansicht traegt KEIN Diagramm.
 
    Drei Regeln, die diese Vorlage tragen:
-     1. Ein Diagramm zeigt genau EIN Geraet. Es steht in "Preisverlauf" und
-        erscheint erst nach einer Auswahl - auch kein leeres davor.
+     1. Ein Diagramm zeigt genau EIN Geraet. Es wird in "Preisverlauf"
+        stehen (B4) und erst nach einer Auswahl erscheinen - auch kein
+        leeres davor. Bis dahin traegt diese Seite GAR KEIN Diagramm, und
+        das ist der Zustand, den Kriterium 11 misst.
      2. Kein gedrehter Text, keine Schrift unter 12 px, keine mit "..."
         abgeschnittene Beschriftung. Passt ein Name nicht hin, ist die
         Ansicht zu voll: dann fallen Eintraege, nicht Buchstaben.
@@ -21,9 +23,12 @@
    Alle Tafeln stehen fertig im HTML - der Reiter blendet um, er laedt nicht
    neu und braucht kein Netz.
 
-   Die Vollstaendigkeitsangabe steht OBEN. Eine Preisuebersicht mit vier von
-   dreiundzwanzig Anbietern ist keine Marktuebersicht und darf nicht so
-   aussehen. #}
+   Die Vollstaendigkeitsangabe steht seit dem 30.08.2026 UNTEN, nicht mehr
+   oben. Der Grund ist nicht, dass sie unwichtig waere, sondern dass sie den
+   besten Platz der Seite belegte, ohne zu einer Handlung zu fuehren
+   ("250 Varianten"). Sie nennt weiterhin, wie viele der 23 Anbieter wirklich
+   liefern - eine Preisuebersicht mit vier von dreiundzwanzig ist keine
+   Marktuebersicht und darf nicht so aussehen. #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
 {% block title %}Vodafone Product and Services Insights · Geräte und Preise{% endblock %}
@@ -35,9 +40,10 @@
 {% macro alarmzeile(z, nr, rest=False) %}
   <tr class="gr-a-zeile{% if rest %} gr-a-rest{% endif %}" data-auf="auf-{{ nr }}"
       data-marke="{{ z.hersteller }}" data-modell="{{ z.modell }}"
-      data-speicher="{{ z.speicher }}" tabindex="0">
+      data-speicher="{{ z.speicher or '' }}" tabindex="0">
     <td><span class="gr-a-modell">{{ z.modell }}</span>
-      <span class="gr-a-klein">{{ z.speicher }} GB</span></td>
+      <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
+        %}Speicher unbekannt{% endif %}</span></td>
     <td>{{ z.bester.laden }}<a class="gr-a-quelle" href="{{ z.bester.url }}"
         rel="noopener" title="Quelle beim Anbieter öffnen"
         aria-label="Quelle bei {{ z.bester.laden }} öffnen">↗</a>
@@ -56,7 +62,7 @@
       {% elif z.bester.verfuegbarkeit == 'ausverkauft' %}<span
         class="gr-pille gr-pille--nein">Nicht lieferbar</span>
       {% else %}<span class="gr-pille gr-pille--unklar">unbekannt</span>{% endif %}</td>
-    <td><span class="gr-a-klein">{{ z.bester.abgerufen_am | date_de }}</span></td>
+    <td><span class="gr-a-klein gr-a-datum">{{ z.bester.abgerufen_am | date_de }}</span></td>
   </tr>
   <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="8">
     <ul class="gr-a-liste">
@@ -194,8 +200,8 @@
   <p class="gr-erklaer">{{ al.verglichen }} Modelle mit ihren Speichergrößen
   stehen einem Wettbewerber gegenüber{% if al.ohne_wettbewerber %}; bei
   weiteren {{ al.ohne_wettbewerber }} führt kein beobachteter Anbieter
-  dasselbe Modell, sie sind deshalb in keiner der vier Kacheln gezählt{%
-  endif %}. Verglichen werden ausschließlich Neugeräte ohne Vertrag, jeweils
+  dieselbe Kombination aus Modell und Speichergröße, sie sind deshalb in
+  keiner der vier Kacheln gezählt{% endif %}. Verglichen werden ausschließlich Neugeräte ohne Vertrag, jeweils
   der günstigste Preis je Laden.</p>
 </div>
 
@@ -394,6 +400,9 @@
   {{ geraete.bilanz.preispunkte }} Änderungspunkte{%
   if geraete.bilanz.ausgelistet %}, {{ geraete.bilanz.ausgelistet }} Listungen
   sind ausgelistet{% endif %}.
+  Die Preise sind zuletzt am
+  <b>{{ geraete.abgerufen_bis | date_de }}</b> abgerufen worden – das ist der
+  Tag, an dem sie gemessen wurden, nicht der Tag dieser Ausgabe.
   {{ geraete.quellenlage.liefernd }} von
   {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern
   Daten. Welcher warum nicht, steht auf

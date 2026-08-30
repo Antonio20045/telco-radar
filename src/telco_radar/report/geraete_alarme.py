@@ -31,8 +31,14 @@ Keine Zeile, die nichts sagt
 ----------------------------
 "niemand guenstiger" stand 36-mal in der alten Tabelle. Das ist keine
 Aussage, das ist eine leere Zeile mit Text darin - die Kachel "Bestpreis"
-sagt dasselbe einmal. Ebenso fallen die Zeilen unter der Wesentlichkeits-
-grenze aus der Tabelle: sie sind die Kachel "Gering".
+sagt dasselbe einmal, und nur solche Zeilen fallen aus der Tabelle.
+
+Zeilen mit KLEINEM Rueckstand bleiben dagegen stehen. Der Auftrag wollte sie
+zuerst auch heraushaben ("Rundungsrauschen"), aber der Unterschied ist
+keiner der Aussage, sondern des Grades: "1,6 % guenstiger" ist eine wahre
+Auskunft, "niemand guenstiger" ist keine. Die Kachel "Gering" zaehlt sie,
+die Tabelle zeigt sie, und die Sortierung stellt sie ans Ende - dort kostet
+ihre Anwesenheit nichts.
 """
 from __future__ import annotations
 

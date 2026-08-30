@@ -29,6 +29,7 @@ import functools
 import glob
 import http.server
 import json
+import re
 import socket
 import threading
 from pathlib import Path
@@ -40,11 +41,21 @@ from telco_radar.report.html import render_site
 
 REPO = Path(__file__).resolve().parents[1]
 
+# Zwanzig Geraete, nicht zwei. Die erste Fassung hatte zwei - damit greift
+# `SICHTBAR_MAX` (15) nie, "alle anzeigen" steht nicht auf der Seite, und der
+# Test dafuer uebersprang sich selbst. Ein Skip sieht im Protokoll aus wie ein
+# Erfolg (CLAUDE.md 6).
+#
+# Zwei Hersteller im Wechsel, damit der Markenfilter wirklich trennt, und je
+# Geraet ein guenstigerer Wettbewerber, damit jede Zeile in die Alarmtabelle
+# kommt.
+_MODELLE = [(f"iPhone 1{n}" if n % 2 else f"Galaxy S2{n}",
+             "Apple" if n % 2 else "Samsung") for n in range(20)]
+
 _KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro Max", "generation": 17,
-     "speicher": [256, 512], "segment": "flagship"},
-    {"hersteller": "Samsung", "modell": "Galaxy S25 Ultra", "generation": 25,
-     "speicher": [256], "segment": "flagship"},
+    {"hersteller": marke, "modell": modell, "generation": 20 + i,
+     "speicher": [256], "segment": "flagship"}
+    for i, (modell, marke) in enumerate(_MODELLE)
 ]}
 _FARBEN = {"farben": {"titan-natur": ["Titannatur"], "schwarz": ["Schwarz"]}}
 _QUELLEN = {"anbieter": [
@@ -60,8 +71,11 @@ _QUELLEN = {"anbieter": [
 ]}
 
 
-def _listung(anbieter, typ, sku, preis, gid="apple-iphone-17-pro-max",
-             speicher=256):
+def _kennung(modell: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", modell.lower()).strip("-")
+
+
+def _listung(anbieter, typ, sku, preis, gid, speicher=256):
     return {
         "id": f"{anbieter.lower()}--{sku}", "sku_id": sku, "device_id": gid,
         "anbieter": anbieter, "anbieter_typ": typ, "netz": "",
@@ -77,25 +91,30 @@ def _listung(anbieter, typ, sku, preis, gid="apple-iphone-17-pro-max",
     }
 
 
-# Zwei Geraete: beim ersten ist NUR ein Fachhaendler guenstiger, beim
-# zweiten NUR ein Netzbetreiber. Damit trennt jeder Filterknopf wirklich -
-# ein Fixture, in dem beide Typen ueberall vorkommen, koennte gruen sein,
-# ohne dass der Filter etwas tut.
+def _bestand():
+    """Je Geraet unser Preis und ein guenstigerer Wettbewerber.
+
+    Der Abstand waechst mit dem Index, damit die vier Alarmstufen alle
+    besetzt sind - eine Fixture, in der nur "kritisch" vorkommt, laesst drei
+    Kacheln ungeprueft.
+    """
+    zeilen = []
+    for i, (modell, _marke) in enumerate(_MODELLE):
+        gid = f"{'apple' if i % 2 else 'samsung'}-{_kennung(modell)}"
+        eigen = 1000.0 + i
+        # 0,5 % bis 20 % Abstand, im Wechsel Netzbetreiber und Fachhandel.
+        fremd = round(eigen * (1 - (0.005 + i * 0.011)), 2)
+        zeilen.append(_listung("Vodafone", "netzbetreiber", f"vf-{i}", eigen, gid))
+        wer, typ = ("o2", "netzbetreiber") if i % 2 else ("Medimax", "handel")
+        zeilen.append(_listung(wer, typ, f"{wer.lower()}-{i}", fremd, gid))
+    return zeilen
+
+
 _DB = {"updated": "2026-08-11", "anbieter": {
-    "Vodafone": {"laeufe": 4, "funde_gesamt": 4},
-    "o2": {"laeufe": 4, "funde_gesamt": 4},
-    "Medimax": {"laeufe": 4, "funde_gesamt": 4},
-}, "listungen": [
-    _listung("Vodafone", "netzbetreiber", "vf-17pm", 1349.0),
-    _listung("Medimax", "handel", "mx-17pm", 1199.0),
-    _listung("o2", "netzbetreiber", "o2-17pm", 1399.0),
-    _listung("Vodafone", "netzbetreiber", "vf-s25u", 1249.0,
-             gid="samsung-galaxy-s25-ultra"),
-    _listung("o2", "netzbetreiber", "o2-s25u", 1149.0,
-             gid="samsung-galaxy-s25-ultra"),
-    _listung("Medimax", "handel", "mx-s25u", 1299.0,
-             gid="samsung-galaxy-s25-ultra"),
-]}
+    "Vodafone": {"laeufe": 4, "funde_gesamt": 20},
+    "o2": {"laeufe": 4, "funde_gesamt": 10},
+    "Medimax": {"laeufe": 4, "funde_gesamt": 10},
+}, "listungen": _bestand()}
 
 
 def _chromium():
@@ -166,8 +185,24 @@ def _seite(tmp_path_factory):
 
 
 def _sichtbare_zeilen(seite):
+    """Was der Leser WIRKLICH sieht, nicht was das Attribut sagt.
+
+    Die erste Fassung zaehlte `:not([hidden])`. Damit war sie blind fuer den
+    Fehler, den sie haette finden sollen: eine Autorenregel schlaegt das
+    `[hidden]{display:none}` des Browsers, und nach "alle anzeigen" standen
+    weggefilterte Zeilen weiter in der Tabelle - Helfer sagte 10, der
+    Browser zeigte 13.
+    """
     return seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-zeile:not([hidden])", "e => e.length")
+        ".gr-alarm .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
+
+
+def _sichtbare_marken(seite):
+    return seite.eval_on_selector_all(
+        ".gr-alarm .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+        "      .map(x => x.dataset.marke)")
 
 
 # --------------------------------------------------------------------------
@@ -263,31 +298,57 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
 # Filter, Suche, Aufklapper
 # --------------------------------------------------------------------------
 
-def test_ohne_filter_stehen_alle_zeilen(_seite):
-    _seite.click(".gr-reiter button[data-tafel='tafel-alarme']")
-    _seite.select_option("[data-filter='marke']", "")
-    _seite.fill("[data-filter='suche']", "")
-    _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 2
+def _frisch(seite):
+    """Ein unberuehrter Ausgangszustand.
+
+    Die Fixture hat Modulgueltigkeit, und "alle anzeigen" ist eine Klasse an
+    der Tabelle, die kein Filter zuruecknimmt. Ein Test, der danach laeuft,
+    misst sonst eine Seite, die ein anderer aufgeklappt hat.
+    """
+    seite.reload(wait_until="load")
+    seite.click(".gr-reiter button[data-tafel='tafel-alarme']")
+    seite.wait_for_timeout(60)
+
+
+def test_ohne_filter_stehen_hoechstens_fuenfzehn_zeilen(_seite):
+    """`SICHTBAR_MAX` deckelt die Seitenhoehe STRUKTURELL. Ohne den Deckel
+    haengt sie am Datenbestand, und zwei zusaetzliche Zeilen kippen den
+    Abnahmetest, ohne dass sich eine Zeile Code aendert."""
+    _frisch(_seite)
+    gesamt = _seite.eval_on_selector_all(".gr-alarm .gr-a-zeile", "e => e.length")
+    assert gesamt > 15, "die Fixture reisst den Deckel nicht - der Test misst nichts"
+    assert _sichtbare_zeilen(_seite) == 15
+    assert _seite.query_selector("#gr-mehr") is not None
 
 
 def test_der_markenfilter_laesst_nur_die_passende_zeile(_seite):
     """Zwei Geraete, zwei Hersteller - so trennt der Filter wirklich. Ein
     Fixture, in dem beide Marken ueberall vorkommen, koennte gruen sein,
     ohne dass der Filter etwas tut."""
+    _frisch(_seite)
     _seite.select_option("[data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 1
-    modelle = _seite.eval_on_selector_all(
-        ".gr-alarm .gr-a-zeile:not([hidden]) .gr-a-modell",
-        "e => e.map(x => x.textContent.trim())")
-    assert modelle == ["Galaxy S25 Ultra"]
+    marken = _sichtbare_marken(_seite)
+    assert marken, "keine Zeile sichtbar - der Test misst nichts"
+    assert set(marken) == {"Samsung"}, marken
+    # Gegenprobe: ohne Filter sind BEIDE Marken da, sonst traefe der Filter
+    # eine Fixture, die ohnehin nur Samsung kennt.
+    _seite.select_option("[data-filter='marke']", "")
+    _seite.wait_for_timeout(60)
+    assert set(_sichtbare_marken(_seite)) == {"Apple", "Samsung"}
 
 
 def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
     """"Aktive Filter werden rot hinterlegt mit weisser Schrift." Sie
     veraendern, was darunter steht, und das muss man sehen, ohne die Auswahl
     zu lesen."""
+    # Der eigene Ausgangszustand. Die erste Fassung verliess sich darauf,
+    # dass der Test davor "Samsung" gewaehlt hatte - einzeln ausgefuehrt fiel
+    # sie durch, und zwei Tests weiter unten steht der Kommentar, warum man
+    # das nicht tut.
+    _frisch(_seite)
+    _seite.select_option("[data-filter='marke']", "Samsung")
+    _seite.wait_for_timeout(60)
     an = _seite.eval_on_selector(
         "[data-filter='marke']",
         "e => e.closest('label').classList.contains('gr-filter--an')")
@@ -299,10 +360,17 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
 
 
 def test_die_suche_grenzt_ein(_seite):
-    _seite.select_option("[data-filter='marke']", "")
+    _frisch(_seite)
+    vorher = _sichtbare_zeilen(_seite)
     _seite.fill("[data-filter='suche']", "medimax")
     _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 1
+    nachher = _sichtbare_zeilen(_seite)
+    assert 0 < nachher < vorher, (vorher, nachher)
+    treffer = _seite.eval_on_selector_all(
+        ".gr-alarm .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+        "      .map(x => x.textContent.toLowerCase().includes('medimax'))")
+    assert all(treffer), "eine Zeile ohne den Suchbegriff ist sichtbar"
 
 
 def test_eine_leere_auswahl_zeigt_einen_satz_statt_einer_leeren_flaeche(_seite):
@@ -321,10 +389,7 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     # Der eigene Ausgangszustand, nicht der des vorigen Tests: ein Test, der
     # auf dem Aufraeumen eines anderen sitzt, faellt aus, sobald der andere
     # ausfaellt - und meldet dann etwas, das mit ihm nichts zu tun hat.
-    _seite.click(".gr-reiter button[data-tafel='tafel-alarme']")
-    _seite.select_option("[data-filter='marke']", "")
-    _seite.fill("[data-filter='suche']", "")
-    _seite.wait_for_timeout(60)
+    _frisch(_seite)
     zeile = ".gr-alarm .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
     assert _seite.eval_on_selector(aufklapper, "e => e.offsetParent") is None
@@ -334,3 +399,111 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     eintraege = _seite.eval_on_selector_all(
         f"{aufklapper} .gr-a-liste li", "e => e.length")
     assert eintraege >= 2, "der Aufklapper zeigt unseren Preis und den fremden"
+
+
+# --------------------------------------------------------------------------
+# "Alle anzeigen" - und was danach passiert
+# --------------------------------------------------------------------------
+
+def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
+    """Der teuerste Befund des B2-Reviews, und kein statischer Test konnte ihn
+    sehen.
+
+    `.gr-alarm--alle .gr-a-rest` ist eine AUTORENregel und schlaegt das
+    `[hidden]{display:none}` des Browsers - Ursprung geht vor Spezifitaet.
+    Aufgeklappt auf 20 Zeilen und auf Samsung gefiltert standen drei
+    Apple-Zeilen mitten in der Tabelle, waehrend das `hidden`-Attribut
+    korrekt sass.
+    """
+    _frisch(_seite)
+    mehr = _seite.query_selector("#gr-mehr")
+    if mehr is not None:
+        mehr.click()
+        _seite.wait_for_timeout(60)
+
+    _seite.select_option("[data-filter='marke']", "Samsung")
+    _seite.wait_for_timeout(60)
+    marken = _sichtbare_marken(_seite)
+    assert marken, "keine Zeile sichtbar - der Test misst nichts"
+    assert set(marken) == {"Samsung"}, marken
+
+
+def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
+    """Sonst haengt eine Anbieterliste unter einer Zeile, die nicht mehr da
+    ist - dieselbe Kaskadenfalle wie eine Ebene darueber."""
+    _seite.click(".gr-reiter button[data-tafel='tafel-alarme']")
+    _seite.select_option("[data-filter='marke']", "")
+    _seite.fill("[data-filter='suche']", "")
+    _frisch(_seite)
+    zeile = ".gr-alarm .gr-a-zeile:not([hidden])"
+    aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
+    # Der Klick TOGGELT. Die Fixture hat Modulgueltigkeit, ein Test davor kann
+    # denselben Aufklapper schon geoeffnet haben - dann klappt ein blinder
+    # Klick ihn zu, und der Test misst das Gegenteil dessen, was er behauptet.
+    if _seite.eval_on_selector(aufklapper,
+                               "e => getComputedStyle(e).display") == "none":
+        _seite.click(f"{zeile} .gr-a-modell")
+        _seite.wait_for_timeout(60)
+    # Gegenprobe: er ist wirklich offen, sonst misst der Test nichts.
+    assert _seite.eval_on_selector(
+        aufklapper, "e => getComputedStyle(e).display") != "none"
+
+    _seite.fill("[data-filter='suche']", "gibtesnichtwirklich")
+    _seite.wait_for_timeout(60)
+    assert _seite.eval_on_selector(
+        aufklapper, "e => getComputedStyle(e).display") == "none"
+    _seite.fill("[data-filter='suche']", "")
+
+
+def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
+    """Trifft die Suche NUR eine Zeile, die hinter "alle anzeigen" steckt,
+    sieht der Leser eine Tabellenkopfzeile mit nichts darunter. Gezaehlt
+    werden muss, was wirklich dasteht - nicht, was zum Filter passt."""
+    _frisch(_seite)
+    rest = _seite.eval_on_selector_all(
+        ".gr-alarm .gr-a-rest.gr-a-zeile", "e => e.length")
+    assert rest, "die Fixture hat keine Zeilen hinter 'alle anzeigen'"
+    suchwort = _seite.eval_on_selector(
+        ".gr-alarm .gr-a-rest.gr-a-zeile .gr-a-modell",
+        "e => e.textContent.trim()")
+    _seite.fill("[data-filter='suche']", suchwort)
+    _seite.wait_for_timeout(60)
+    assert _sichtbare_zeilen(_seite) == 0
+    assert _seite.eval_on_selector(
+        ".gr-a-leer", "e => getComputedStyle(e).display") != "none"
+    _seite.fill("[data-filter='suche']", "")
+
+
+def test_kein_aufklapper_steht_offen(_seite):
+    """Die Kuerze der Seite haengt daran, dass die `<details>` ZU sind. Ein
+    versehentliches `open` macht sie wieder zwanzig Bildschirme lang, ohne
+    dass sich eine Zeile Inhalt aendert - CLAUDE.md nennt diesen Waechter
+    namentlich.
+
+    Er ist beim Umbau am 30.08.2026 mit `test_geraete_hoehe_browser.py`
+    verlorengegangen, weil diese Datei ausserdem die geloeschte Grafik
+    vermass. Die Hoehenmessung allein ersetzt ihn nicht: sie laeuft auf einer
+    Fixture, in der ein offenes `<details>` fast nichts kostet.
+    """
+    _frisch(_seite)
+    for tid in ("tafel-alarme", "tafel-katalog", "tafel-portfolio"):
+        _seite.click(f".gr-reiter button[data-tafel='{tid}']")
+        _seite.wait_for_timeout(60)
+        offen = _seite.eval_on_selector_all(
+            f"#{tid} details[open]", "e => e.length")
+        assert offen == 0, tid
+
+
+def test_die_seite_traegt_das_echte_abrufdatum(_seite):
+    """Faellt der naechtliche Lauf zwei Wochen aus, sind die Preise zwei
+    Wochen alt - die Seite darf trotzdem nicht den Berichtstag behaupten.
+    Auf einer Seite, deren Verkaufsargument der Belegzwang ist, ist das die
+    teuerste Sorte falscher Zahl.
+
+    Die Zusicherung stand als Kommentar in `geraete_view`, ihr Test hing an
+    der Legende der geloeschten Grafik - und war damit vom 30.08.2026 an
+    unbelegt.
+    """
+    _frisch(_seite)
+    text = _seite.eval_on_selector("body", "e => e.innerText")
+    assert "11. August 2026" in text, "das Abrufdatum der Listungen fehlt"

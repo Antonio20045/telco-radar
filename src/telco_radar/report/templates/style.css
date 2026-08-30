@@ -195,7 +195,6 @@ b,strong{font-weight:700}
 }
 
 
-
 /* =============================================  TITELSEITENRASTER  ===== */
 /* Vier Gewichtsstufen statt zwei. Die Struktur, nicht die Schriftart, macht
    eine Zeitungsseite: eine Geschichte dominiert, zwei sind mittel, vier sind
@@ -1962,21 +1961,26 @@ b,strong{font-weight:700}
 .gr-bilanz,.gr-karte,.gr-auffaellig,.gr-matrix,.gr-lifecycle,.gr-luecken,
 .gr-quellen,.gr-methode,.gr-leer{margin:26px 0 34px}
 .gr-erklaer,.gr-legende,.gr-basis,.gr-ruhe{font-size:13.5px;line-height:1.6;
-  color:var(--ink-2);max-width:74ch;margin:8px 0 14px}
-.gr-legende{font-family:var(--sans);font-size:11.5px;letter-spacing:.03em;
-  color:var(--ink-4)}
-.gr-unter{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  color:var(--ink-2);max-width:74ch;margin:8px 0 14px}.gr-unter{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink-3);margin:22px 0 6px;
   padding-top:10px;border-top:1px solid var(--rule-2)}
 .gr-klein{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
   display:block}
 
 /* Reiter.
-   KEINE SCHRIFT UNTER 12 PX in diesem ganzen Block. Der Auftrag sagt das als
-   hartes Verbot, und `test_keine_beschriftung_unter_zwoelf_pixeln` misst es
-   im gerenderten Dokument. Die erste Fassung dieser Regeln hatte 10,5 px
-   Etiketten - dieselbe Groesse, mit der die geloeschte Grafik ihre 236
-   unlesbaren Texte gesetzt hat.
+   KEINE SCHRIFT UNTER 12 PX in den Regeln von REITER 1 (bis einschliesslich
+   `.gr-a-liste`). Der Auftrag sagt das als hartes Verbot, und
+   `test_keine_beschriftung_unter_zwoelf_pixeln` misst es im gerenderten
+   Dokument. Die erste Fassung dieser Regeln hatte 10,5 px Etiketten -
+   dieselbe Groesse, mit der die geloeschte Grafik ihre 236 unlesbaren Texte
+   gesetzt hat.
+
+   Weiter unten NICHT: `.gr-hersteller` und `.gr-spanne` gehoeren der
+   SKU-Matrix und der Quellenseite. Ein Regex-Durchlauf hat sie am
+   30.08.2026 versehentlich mit hochgezogen, und das ist die falsche
+   Richtung - derselbe Auftrag verlangt die Typografie der bestehenden Site
+   unveraendert. Wer Reiter 2 und 3 baut (B5/B6), entscheidet ueber ihre
+   Schriftgroessen im Zuge dieses Umbaus, nicht per Suchen-und-Ersetzen.
    Alle Tafeln stehen fertig im HTML; der Reiter blendet um, er laedt nicht
    neu. Die Leiste ist eine Linie mit einem dicken Strich unter dem aktiven
    Reiter - kein Kasten, kein Radius, kein Schatten (Regel 2 des Redesigns). */
@@ -2087,13 +2091,24 @@ b,strong{font-weight:700}
 .gr-pille--unklar{background:var(--paper-3);color:var(--ink-3)}
 
 /* Die Zeilen jenseits von SICHTBAR_MAX stehen fertig im HTML und sind
-   ausgeblendet - "alle anzeigen" braucht kein Netz und keinen Reload. */
+   ausgeblendet - "alle anzeigen" braucht kein Netz und keinen Reload.
+   
+   `:not([hidden])` ist hier KEINE Feinheit, sondern der ganze Punkt. Eine
+   Autorenregel schlaegt das `[hidden]{display:none}` des Browsers - Ursprung
+   geht vor Spezifitaet -, und ohne diesen Zusatz zeigte die Tabelle nach
+   "alle anzeigen" die weggefilterten Zeilen weiter an: aufgeklappt auf 20
+   Zeilen, gefiltert auf Samsung, standen drei Apple-Zeilen mitten drin. Das
+   `hidden`-Attribut sass richtig, nur sah man es nicht. */
 .gr-a-rest{display:none}
-.gr-alarm--alle .gr-a-rest.gr-a-zeile{display:table-row}
+.gr-alarm--alle .gr-a-rest.gr-a-zeile:not([hidden]){display:table-row}
 
 /* Der Aufklapper unter einer Zeile: alle Anbieter dieses Geraets. */
 .gr-a-auf{display:none}
-.gr-a-auf--an,.gr-alarm--alle .gr-a-auf--an{display:table-row}
+/* Dieselbe Falle: ein geoeffneter Aufklapper blieb stehen, wenn seine Zeile
+   weggefiltert wurde - eine Anbieterliste unter einer Zeile, die nicht mehr
+   da ist. */
+.gr-a-auf--an:not([hidden]),
+.gr-alarm--alle .gr-a-auf--an:not([hidden]){display:table-row}
 .gr-a-auf td{background:var(--paper-3);padding:12px 14px}
 .gr-a-liste{list-style:none;margin:0;padding:0;font-size:13.5px}
 .gr-a-liste li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
@@ -2144,10 +2159,10 @@ b,strong{font-weight:700}
 .gr-matrix-tabelle{min-width:640px}
 .gr-modell{text-align:left;font-family:var(--serif);font-size:15px;
   font-weight:600;white-space:nowrap}
-.gr-hersteller{display:block;font-family:var(--sans);font-size:12px;
+.gr-hersteller{display:block;font-family:var(--sans);font-size:10px;
   letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
 .gr-zelle b{font-family:var(--serif);font-size:16px}
-.gr-spanne{display:block;font-family:var(--sans);font-size:12px;
+.gr-spanne{display:block;font-family:var(--sans);font-size:10.5px;
   color:var(--ink-4)}
 .gr-zelle--leer{color:var(--ink-4)}
 .gr-strich{color:var(--rule)}
@@ -2174,53 +2189,15 @@ b,strong{font-weight:700}
    Kein Wert wird eingefaerbt, um ihn zu bewerten: ein guenstigerer
    Wettbewerber bekommt kein Gruen und kein Warnzeichen. Die Seite
    beobachtet, sie empfiehlt nicht. */
-.gr-vergleich{margin:34px 0 0}
-.gr-vergleich-lage{font-size:13.5px;line-height:1.65;color:var(--ink-2);
-  max-width:64ch;margin:10px 0 14px}
-.gr-vergleich-filter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
-.gr-filter-knopf{font-family:var(--sans);font-size:11px;letter-spacing:.04em;
-  text-transform:uppercase;background:none;border:1px solid var(--rule);
-  color:var(--ink-3);padding:5px 11px;cursor:pointer;border-radius:0}
-.gr-filter-knopf.is-aktiv{border-color:var(--rule-ink);color:var(--ink);
-  background:var(--paper-3)}
-.gr-vergleich-scroll{overflow-x:auto}
-.gr-vergleich-tabelle{width:100%;font-size:13.5px}
-.gr-vergleich-tabelle th[scope=col]{font-family:var(--sans);font-size:10.5px;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-/* Die eigene Spalte traegt die Vodafone-Linie - der einzige Ort, an dem in
-   dieser Sektion Rot vorkommt. */
-.gr-vergleich-tabelle .gr-eigen-spalte{border-left:3px solid var(--red);
-  padding-left:10px}
-.gr-v-geraet{text-align:left;font-weight:400}
-.gr-v-geraet .szl{display:block;font-size:14.5px;line-height:1.35}
-.gr-v-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
-  letter-spacing:.03em}
-.gr-v-name{display:block;font-family:var(--sans);font-size:11.5px;
-  color:var(--ink-2);letter-spacing:.02em}
-.gr-v-datum{display:block;font-family:var(--sans);font-size:10px;
-  color:var(--ink-4)}
-.gr-v-tarif{display:block;font-family:var(--sans);font-size:10px;
-  color:var(--ink-3);font-style:italic}
-.gr-v-prozent{font-family:var(--sans);font-size:10.5px;color:var(--ink-3)}
-.gr-v-keiner{color:var(--ink-4);font-size:12.5px}
-.gr-v-zeile--ohne .gr-v-geraet .szl{color:var(--ink-3)}
-.gr-v-alle td{padding-top:0;border-top:0}
-.gr-v-alle summary{font-family:var(--sans);font-size:11px;color:var(--ink-3);
-  cursor:pointer}
-.gr-v-liste{list-style:none;margin:6px 0 0;padding:0}
+.gr-vergleich{margin:34px 0 0}.gr-v-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+  letter-spacing:.03em}.gr-v-datum{display:block;font-family:var(--sans);font-size:10px;
+  color:var(--ink-4)}.gr-v-prozent{font-family:var(--sans);font-size:10.5px;color:var(--ink-3)}.gr-v-liste{list-style:none;margin:6px 0 0;padding:0}
 .gr-v-liste li{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
   padding:5px 0;border-top:1px solid var(--rule-2);font-size:13px}
 .gr-v-liste li .gr-v-name{display:inline;min-width:12ch}
 .gr-v-liste li .gr-v-datum{display:inline}
 .gr-vergleich-luecke{margin-top:20px;border-top:1px solid var(--rule);
-  padding-top:12px}
-.gr-v-luecke-titel{font-family:var(--sans);font-size:11px;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
-.gr-v-zeile[hidden]{display:none}
-.gr-v-leer{font-size:13px;line-height:1.6;color:var(--ink-3);max-width:56ch;
-  margin:10px 0 0}
-
-/* --- Gesamtexport ------------------------------------------------------ */
+  padding-top:12px}/* --- Gesamtexport ------------------------------------------------------ */
 /* Die Geraetespalte der SKU-Matrix bleibt beim Waagerechtscrollen stehen.
    Mit zwei Anbietern war das entbehrlich; ab vier - und erst recht ab acht -
    scrollt man sonst eine Zeile nach rechts und weiss nicht mehr, zu welchem
@@ -2229,25 +2206,9 @@ b,strong{font-weight:700}
 .gr-matrix-tabelle th[scope=row]{position:sticky;left:0;z-index:1;
   background:var(--paper)}
 
-.gr-export{margin:34px 0 0}
-.gr-export-liste{list-style:none;margin:10px 0 0;padding:0}
-.gr-export-liste li{border-top:1px solid var(--rule);padding:11px 0}
-.gr-export-liste a{font-size:15px}
-.gr-export-meta{display:block;font-family:var(--sans);font-size:10.5px;
-  letter-spacing:.03em;color:var(--ink-4);margin-top:2px}
-.gr-export-was{display:block;font-size:12.5px;line-height:1.55;
-  color:var(--ink-3);max-width:62ch;margin-top:4px}
-.gr-export-hinweis{font-size:12px;line-height:1.55;color:var(--ink-4);
-  max-width:62ch;margin:12px 0 0}
+.gr-export{margin:34px 0 0}@media (max-width:720px){}
 
-@media (max-width:720px){
-  .gr-vergleich-tabelle{font-size:12.5px}
-  .gr-v-geraet .szl{font-size:13.5px}
-}
-
-@media (max-width:720px){
-  .gr-steuer{flex-direction:column;align-items:stretch}
-  /* Die Regel `.gr-etikett{font-size:8px}` stand hier bis zum 11.08.2026
+@media (max-width:720px){` stand hier bis zum 11.08.2026
      und war die schaerfste Fassung des Grundfehlers: die SVG wurde auf
      Containerbreite gestaucht, 8 px wurden real 2,7. Jetzt wird gerollt
      statt gestaucht, also bleibt die Schrift bei 10 px. */

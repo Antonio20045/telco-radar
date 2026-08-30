@@ -860,6 +860,7 @@ var TelcoFrage = (function () {
   var mehr = document.getElementById('gr-mehr');
 
   function anwenden() {
+    var alleZeigen = tabelle.classList.contains('gr-alarm--alle');
     var wahl = {};
     var suche = '';
     Array.prototype.forEach.call(felder, function (f) {
@@ -888,7 +889,15 @@ var TelcoFrage = (function () {
         passt = z.textContent.toLowerCase().indexOf(suche) >= 0;
       }
       z.hidden = !passt;
-      if (passt) sichtbar++;
+      // Gezaehlt wird, was der Leser WIRKLICH sieht. Eine Rest-Zeile passt
+      // vielleicht zum Filter, steht aber bis zum Klick auf "alle anzeigen"
+      // per CSS nicht da - mitgezaehlt blendete sie den Erklaersatz aus, und
+      // vor dem Leser stand eine Tabellenkopfzeile mit nichts darunter.
+      // Denselben Waechter hatte der alte Vergleichsfilter, mit Begruendung;
+      // beim Umbau ist er verlorengegangen.
+      if (passt && (!z.classList.contains('gr-a-rest') || alleZeigen)) {
+        sichtbar++;
+      }
       var auf = document.getElementById(z.getAttribute('data-auf'));
       if (auf) auf.hidden = !passt;
     }
@@ -918,10 +927,18 @@ var TelcoFrage = (function () {
     if (auf) auf.classList.toggle('gr-a-auf--an');
   });
 
+  // Einmal beim Laden. Manche Browser stellen Formularwerte beim Reload
+  // wieder her; ohne diesen Aufruf zeigt die Tabelle dann ungefiltert an,
+  // was das Auswahlfeld daneben nicht sagt.
+  anwenden();
+
   if (mehr) {
     mehr.addEventListener('click', function () {
       tabelle.classList.add('gr-alarm--alle');
-      mehr.parentNode.removeChild(mehr);
+      // Der ganze Absatz, nicht nur der Knopf: ein leeres <p> mit Rand bleibt
+      // sonst als Luecke stehen.
+      var absatz = mehr.closest('p') || mehr;
+      absatz.parentNode.removeChild(absatz);
       anwenden();
     });
   }

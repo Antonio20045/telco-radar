@@ -702,7 +702,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # die Karte. Bis zum 29.08.2026 nahm sie die Spaltenzahl der
     # Herstelleransicht - und die haengt seit W1.2 an der
     # Plausibilitaetspruefung. Damit haette ein Anbieter, der an einem Tag
-    # seine Farbvarianten mit mit weiten Farbabstaenden bepreist, den
+    # seine Farbvarianten mit weiten Farbabstaenden bepreist, den
     # Navigationseintrag "Geraete" auf JEDER Seite verschwinden lassen -
     # ohne Fehler, ohne Warnung, und niemand faende die Seite mehr. Eine
     # Datenqualitaetsheuristik darf keine Navigation schalten.
@@ -715,10 +715,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         skus=len({e.get("sku_id") for e in sichtbar}),
         hersteller=len(hersteller_mit_daten))
 
-    # Liefert nur EIN Laden, zeigt die Herstelleransicht nicht das Portfolio
-    # von Apple, sondern das, was dieser eine Haendler von Apple fuehrt. Dann
-    # ist die Anbieteransicht die ehrlichere Startansicht - und die
-    # Herstelleransicht traegt ihren Vorbehalt im Spaltentitel.
     # Reiter 1. Die Alarmtabelle liest den fertigen Vergleich - sie rechnet
     # keine Zahl zweimal (CLAUDE.md 6: zwei Rechnungen fuer dieselbe Zahl
     # sind zwei Zahlen). Die Ausreisser-Markierung kommt aus der Pruefung:

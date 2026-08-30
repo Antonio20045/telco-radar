@@ -395,14 +395,25 @@ def pruefe(eintraege: list, katalog=None) -> dict:
         if weg:
             uebrig = [e for e in uebrig if _schluessel(e) not in weg]
 
-    # Die MELDENDE Pruefung sieht dagegen den ganzen Kandidatensatz, nicht den
-    # Rest. Verkettet gemessen: bei "A 900 | B 200 | C 880 | C 850" nimmt der
-    # Doppelpreis beide C-Zeilen heraus, die Gruppe faellt unter drei Angebote,
-    # und der Median wird gar nicht mehr gerechnet - die 200-EUR-Zeile stuende
-    # unmarkiert im Vergleich. Eine Pruefung, die nichts entfernt, darf ihr
-    # Sichtfeld nicht von einer verlieren, die entfernt.
-    _, ausreisser = _ausreisser(kandidaten, katalog)
-    befunde.extend(b for b in ausreisser if b["listung_id"] not in raus)
+    # Die MELDENDE Pruefung rechnet ueber das, was UEBRIG ist - nicht ueber
+    # alle Kandidaten.
+    #
+    # Beide Richtungen sind einmal gebaut und wieder verworfen worden, und
+    # die Abwaegung ist die: ueber alle Kandidaten gerechnet ziehen genau
+    # die Zeilen den Median, die die Pruefungen gerade als kaputt entfernt
+    # haben - ein 1-Euro-Lockpreis oder ein falsch gespeicherter
+    # Gebrauchtpreis. Dann steht neben einer gesunden Zeile "ungewoehnlich
+    # grosser Abstand - Quelle pruefen", und der Leser soll eine Zahl
+    # anzweifeln, die stimmt.
+    #
+    # Der Preis dafuer: faellt eine Gruppe durch die Streichungen unter drei
+    # Angebote, wird ihr Median gar nicht mehr gerechnet und eine auffaellige
+    # Zeile bleibt unmarkiert. Das ist hinnehmbar, weil es dieselbe Aussage
+    # ist, die `_ausreisser` ohnehin trifft: unter drei Angeboten ist der
+    # Median kein Median, sondern einer der beiden Werte. Ein Fehlalarm auf
+    # einer richtigen Zahl waere teurer als eine ausgebliebene Markierung.
+    _, ausreisser = _ausreisser(uebrig, katalog)
+    befunde.extend(ausreisser)
 
     sauber = [e for e in eintraege if _schluessel(e) not in raus]
     entfernt = [b for b in befunde if b["entfernt"]]

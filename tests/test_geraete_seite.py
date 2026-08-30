@@ -195,6 +195,61 @@ def _suppe(site: Path, name: str) -> BeautifulSoup:
 # Die Seite entsteht
 # --------------------------------------------------------------------------
 
+def test_der_notzustand_traegt_dieselben_schluessel_wie_der_normalfall(tmp_path):
+    """Ein fehlender Schluessel ist in Jinja kein Fehler, sondern eine stumm
+    leere Seite. `leer()` und `aufbereiten()` duerfen deshalb nicht
+    auseinanderlaufen - und genau dafuer gibt es den Notzustand.
+
+    Der Test dazu ist beim Umbau am 30.08.2026 geloescht worden, weil er die
+    vier Flaechen der Positionskarte verglich; die Zusicherung stand danach
+    unbelegt in zwei Docstrings. Er vergleicht jetzt die Schluesselmengen
+    selbst.
+    """
+    site = _baue(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    leer = geraete_view.leer()
+
+    # Drei erlaubte Abweichungen, und alle drei sind aelter als dieser Umbau:
+    # `export` setzt erst `render_site` nach (der Notzustand traegt es leer
+    # vor), `fehler` gibt es nur im Notzustand, `pruefung`/`pruefbefunde` nur
+    # im Normalfall. Alles andere muss beidseitig da sein.
+    nur_notzustand = set(leer) - set(geraete)
+    nur_normal = set(geraete) - set(leer)
+    assert nur_notzustand <= {"export", "fehler"}, nur_notzustand
+    assert nur_normal <= {"pruefung", "pruefbefunde"}, nur_normal
+    assert set(leer["bilanz"]) <= set(geraete["bilanz"])
+    assert set(leer["alarme"]) == set(geraete["alarme"])
+    assert site.exists()
+
+
+def test_die_schwelle_wird_gerechnet_und_nicht_behauptet(tmp_path):
+    """Die Navigation und die gerechnete Schwelle duerfen nicht
+    auseinanderlaufen - an BEIDEN Zweigen gemessen, nicht nur an dem, der
+    heute gilt.
+
+    Die alte Fassung las die Herstellerzahl aus den Spalten der
+    Positionskarte; seit die geloescht ist, steht sie in `bilanz.hersteller`.
+    """
+    for db, erwartet in ((_db_mit(3), False),
+                         (_db_mit(24, anbieter=_UEBER_DER_SCHWELLE), True)):
+        wurzel = tmp_path / f"fall{erwartet}"
+        site = _baue(wurzel, db=db)
+        geraete = geraete_view.aufbereiten(
+            wurzel / "data" / "state", lade_quellen(wurzel),
+            lade_katalog(wurzel), heute="2026-08-11")
+        erreicht = geraete_view.schwelle_erreicht(
+            anbieter=geraete["bilanz"]["anbieter"],
+            skus=geraete["bilanz"]["skus"],
+            hersteller=geraete["bilanz"]["hersteller"])
+        assert erreicht is erwartet, geraete["bilanz"]
+        assert geraete["bilanz"]["schwelle_erreicht"] is erwartet
+        verlinkt = "geraete.html" in {
+            a.get("href") for a in _suppe(site, "geraete.html").select(".subnav a")}
+        assert verlinkt is erreicht
+
+
 def test_beide_seiten_werden_gerendert(tmp_path):
     site = _baue(tmp_path)
     assert (site / "geraete.html").exists()
@@ -865,7 +920,9 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
-        assert zeile.select(".gr-a-klein"), "Zeile ohne Abrufdatum"
+        # `.gr-a-datum`, nicht `.gr-a-klein`: die zweite Klasse traegt auch
+        # die Speichergroesse, und damit war diese Zusicherung wirkungslos.
+        assert zeile.select_one(".gr-a-datum"), "Zeile ohne Abrufdatum"
         auf = s.select_one("#" + zeile["data-auf"])
         assert auf is not None, "Zeile ohne Aufklapper"
         # Der Aufklapper traegt BEIDE Seiten - unsere Listung und die fremde.

@@ -359,24 +359,28 @@ def test_ein_unmoeglicher_farbabstand_fliegt_doch():
     assert befund["entfernt"] is True
 
 
-def test_ein_ausreisser_bleibt_markiert_wenn_nebenan_etwas_entfernt_wird():
-    """Eine Pruefung, die nichts entfernt, darf ihr Sichtfeld nicht von einer
-    verlieren, die entfernt.
+def test_ein_entfernter_muellpreis_zieht_den_median_nicht():
+    """Der Ausreisser-Median rechnet ueber das, was UEBRIG ist.
 
-    Verkettet gemessen: der Doppelpreis nimmt beide C-Zeilen heraus, die
-    Gruppe faellt unter drei Angebote, der Median wird gar nicht mehr
-    gerechnet - und die 200-EUR-Zeile stuende unmarkiert im Vergleich.
+    Ueber alle Kandidaten gerechnet ziehen genau die Zeilen den Median, die
+    die Pruefungen gerade als kaputt entfernt haben - hier ein
+    1-Euro-Lockpreis. Neben der gesunden 899-Euro-Zeile stuende dann
+    "ungewoehnlich grosser Abstand - Quelle pruefen", und der Leser soll eine
+    Zahl anzweifeln, die stimmt.
     """
     eintraege = [
-        _e("samsung-galaxy-s25", 900.0, "navy", kennung="a", anbieter="A"),
-        _e("samsung-galaxy-s25", 200.0, "navy", kennung="b", anbieter="B"),
-        _e("samsung-galaxy-s25", 880.0, "schwarz", kennung="c1", anbieter="C"),
-        _e("samsung-galaxy-s25", 850.0, "schwarz", kennung="c2", anbieter="C"),
+        _e("samsung-galaxy-s25", 899.0, "navy", kennung="a", anbieter="A"),
+        _e("samsung-galaxy-s25", 879.0, "navy", kennung="b", anbieter="B"),
+        _e("samsung-galaxy-s25", 909.0, "navy", kennung="c", anbieter="C"),
+        # Lockpreis in anderer Farbe: fliegt an der Unmoeglichkeitsgrenze.
+        _e("samsung-galaxy-s25", 1.0, "schwarz", kennung="lock", anbieter="A"),
     ]
     erg = pruefe(eintraege, _KATALOG)
-    # Gegenprobe: die C-Zeilen fliegen wirklich, sonst misst der Test nichts.
-    assert {e["id"] for e in erg["sauber"]} == {"a", "b"}
-    assert "b" in erg["auffaellig"], "der Ausreisser ist unmarkiert geblieben"
+    # Gegenprobe: der Lockpreis fliegt wirklich, sonst misst der Test nichts.
+    assert "lock" not in {e["id"] for e in erg["sauber"]}
+    assert erg["auffaellig"] == {}, (
+        "eine gesunde Zeile ist als Ausreisser markiert - der Median hat den "
+        "entfernten Muellpreis mitgerechnet")
 
 
 def test_zwei_marketingfarben_derselben_grundfarbe_sind_zwei_farben():

@@ -605,13 +605,26 @@ def main() -> int:
 
         zeilen = gr.select(".gr-alarm .gr-a-zeile")
         if not zeilen:
-            b.prueft(None, "11. Geraeteradar: noch keine Alarmzeile erfasst")
+            # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
+            # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
+            # im Skip-Zweig zu verwerfen hiesse, dass ein
+            # wiederauferstandenes `.gr-punkt` nach einem --no-llm-Lauf als
+            # "uebersprungen" durchginge.
+            if maengel:
+                b.prueft(False, "11. Geraeteradar: " + "; ".join(maengel))
+            else:
+                b.prueft(None, "11. Geraeteradar: noch keine Alarmzeile "
+                               "erfasst (Grafik ist weg, Struktur in Ordnung)")
         else:
             # Jede Zeile traegt Quelle UND Abrufdatum - der Belegzwang ist das
             # Verkaufsargument dieser Seite.
+            # `.gr-a-datum` und nicht `.gr-a-klein`: die zweite Klasse
+            # steht ZWEIMAL in der Zeile (Speichergroesse und Abrufdatum).
+            # Damit war die Datumshaelfte des Belegzwangs wirkungslos - mit
+            # geleerter Datumsspalte meldete die Pruefung null Verstoesse.
             ohne_beleg = [z for z in zeilen
                           if not (z.select_one("a.gr-a-quelle[href^='http']")
-                                  and z.select(".gr-a-klein"))]
+                                  and z.select_one(".gr-a-datum"))]
             # Jede Zeile hat ihren Aufklapper, und der zeigt mehr als einen
             # Anbieter - sonst waere der Klick eine Handlung ohne Ergebnis.
             ohne_aufklapper = [z for z in zeilen
@@ -627,7 +640,12 @@ def main() -> int:
             kacheln = gr.select(".gr-kacheln .gr-kachel b")
             summe = sum(int(k.get_text(strip=True)) for k in kacheln
                         if k.get_text(strip=True).isdigit())
-            satz = " ".join(start.get_text(" ", strip=True).split())
+            # `start` kann None sein - dann ist die Tafel umbenannt worden,
+            # und das ist ein Durchfaller, kein Absturz. Die erste Fassung
+            # rief hier `.get_text()` darauf auf und riss das ganze Skript
+            # mit einem AttributeError ab.
+            satz = (" ".join(start.get_text(" ", strip=True).split())
+                    if start is not None else "")
             if len(kacheln) != 4:
                 maengel.append(f"{len(kacheln)} statt 4 Kennzahl-Kacheln")
             elif f"{summe} Modelle mit ihren Speichergrößen" not in satz:
