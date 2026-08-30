@@ -192,3 +192,136 @@ günstiger" aus der Alarmtabelle geflogen ist.
    dieselbe Mechanik wie in der Alarmtabelle** — er wird neu vergeben. Weil
    die Katalogzeilen keinen Aufklapper haben, war das billig; wenn dort einer
    dazukommt, muss er mitwandern (`sortiere()` in `app.js` kann das bereits).
+
+---
+
+# Nachlauf: was der `diff-reviewer` nach dem Merge fand
+
+Der Review lief gegen `424fca0` — den Stand, der bereits live war. Er hat
+**zwei schwere Fehler** gefunden, beide in dieser Sitzung eingebaut, beide
+scharf. Sie sind hier aufgeführt, weil sie zeigen, was der Abnahmelauf aus
+2166 grünen Tests nicht sah.
+
+## B1 — die Wochenkarte konnte stumm leer werden (SCHWER)
+
+`geraete_view._auffaellig`. Der `kurzer_vorlauf`-Zweig hängt an EINEM Satz,
+und im selben Zweig ist die Tabelle abgeschaltet. Ab vier Bewegungen endet
+der Satz auf „… und **N weitere**." mit `N = len(bewegungen) - 3` — diese
+Zahl stand **nicht** in `erlaubt`. `pruefe_zahlen` verwirft fail-closed, und
+danach war nichts mehr da:
+
+```
+6 Bewegungen, kurzer Vorlauf, Modellnamen ohne Ziffern:
+  WARNING Geraeteradar: 1 Satz/Saetze mit ungedeckten Zahlen verworfen
+  saetze: []  bewegungen: 0  hat_daten: True
+  → <h2>Was diese Woche auffällt</h2> + leeres <ul>, sonst nichts
+```
+
+`hat_daten` rechnete mit der **lokalen**, ungefilterten Bewegungsliste, nicht
+mit dem, was zurückgegeben wird — deshalb rendert der Abschnitt überhaupt.
+
+**Vor dieser Sitzung hatte der Fail-closed-Pfad einen Auffangboden:** fiel der
+Satz, trug die Tabelle die Daten. Den habe ich entfernt, ohne den Ersatz zu
+prüfen. Ausgelöst hätte es die zweite Preisbewegung einer Nacht.
+
+*Behoben:* `erlaubt.add(len(bewegungen) - 3)` und `hat_daten` an das
+**geprüfte** Ergebnis gebunden.
+
+## B2 — der Rasterschalter hob das Gatter aus (SCHWER)
+
+Das Gatter zählte `rohTage` (Messtage), gezeichnet werden aber die
+**zusammengefassten** Punkte. Im echten Chromium gemessen:
+
+| Raster | `#gr-vbild` | `<path>` | Kachel |
+|---|---|---|---|
+| Woche | sichtbar | 2 | 4 Messtermine |
+| **Monat** | **sichtbar** | **0** | 4 Messtermine |
+| **Quartal** | **sichtbar** | **0** | 4 Messtermine |
+
+Ein „Preisverlauf" ganz ohne Linie — genau das, wogegen das Gatter gebaut
+ist, nur eine Stufe später.
+
+*Behoben:* das Gatter zählt **beides** (`rohTage` UND `tageSort`). Die ZAHL
+im Satz bleibt die der Messtage — das Raster formt die Linie, nicht die
+Datenlage —, nur ob überhaupt gezeichnet wird, hängt auch daran, ob nach der
+Rasterung eine Linie übrig ist. Fällt das Raster zu grob aus, sagt der Satz
+das: „In diesem Raster fallen sie auf 1 Punkt zusammen — ein feineres Raster
+zeigt mehr."
+
+## Vier mittlere
+
+| # | Befund | Behoben |
+|---|---|---|
+| B3 | Nach dem Löschen der Auswahl blieb „Für dieses Gerät liegen 2 Messtermine vor …" stehen, während daneben „Wählen Sie oben ein Gerät" stand — und die globale Zahl war weg | beide Rückbaupfade rufen jetzt `satzFuer(null, …)` |
+| B4 | Auslistungen fielen im kurzen Vorlauf unter den Tisch: 10 aus dem Regal gefallene Geräte standen nirgends, während der Satz „eine Preisänderung ist dabei nicht aufgefallen" meldete | eigener Satz, und der Zweig feuert auch bei `weg_geraete` |
+| B5 | `LINIEN_ABSTAND` war eine **tote Konstante**: sie reiste in den View-Dict und wurde von niemandem gelesen, `app.js` hatte `0.02` hartkodiert — zwei Zahlen für eine Regel | kommt als `data-abstand` aus der Vorlage, wie `AB_TERMINEN` |
+| B6 | **Die Achse wurde einem schwachen Test angepasst.** Sie schrieb „1099 €", während Tooltip, Legende, Kacheln und Tabelle desselben Diagramms „1.099,00 €" schreiben — weil `test_die_achse_erfindet_keinen_preis` mit `parseFloat` liest und an „1.099" scheitert | der **Test** liest jetzt deutsche Schreibweise; die Achse schreibt, was das Portal schreibt |
+
+B6 ist der lehrreichste: ein schwacher Testparser hatte bestimmt, wie die
+Seite aussieht. Die Richtung war falsch herum.
+
+## Zwei Tests, die nichts prüften
+
+1. **`test_das_raster_veraendert_die_zahl_der_messtermine_nicht`** klickte
+   durch genau die drei Raster aus B2 und prüfte **nur die Kachel**, nie das
+   Bild. Deshalb ist B2 an ihm vorbeigelaufen. Er prüft jetzt: entweder steht
+   ein Diagramm da und trägt wenigstens eine Linie, oder es steht keins da.
+   Gegengeprüft — mit dem alten Gatter meldet er
+   `monat: Diagramm ohne eine einzige Linie - {'svg': True, 'linien': 0}`.
+2. **`test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm`** war der
+   verlorene Regressionsmelder. Zwei Gründe, und beide musste ich nacheinander
+   finden:
+   - die Fixture hatte **genau** `DIAGRAMM_AB_TERMINEN` Messtage, also fiel
+     jede Verengung unters Gatter → jetzt **sechs**;
+   - **jede Listung hatte dieselben Messtage**, also fiel beim Verengen nie
+     jemand heraus, und die Gleichheit war trivial erfüllt. Der eingebaute
+     alte Fehler blieb unentdeckt. Jetzt wird **Medimax nur an den ersten
+     zwei Tagen gesehen** (`_NUR_FRUEH`), samt passendem `last_verified` —
+     ohne das hängt `_punkte` den Bestätigungstag an und verlängert die Kurve
+     doch wieder ins verengte Fenster.
+
+   Die Gegenprobe hängt jetzt an der **Legende**, nicht an der Tabelle: die
+   Legende kommt aus dem Bild, die Tabelle ist der Verdächtige. Mit dem
+   eingebauten alten Fehler meldet der Test: *„die Tabelle nennt {Vodafone,
+   Medimax}, das Bild zeigt {Vodafone} — rechnet sie wieder über den vollen
+   Zeitraum?"*
+
+Neu dazu: **`test_die_preiskacheln_stehen_so_im_datensatz`** — `#gr-vmin`
+und `#gr-vmax` wurden von keinem Test gegen die Daten gehalten, und sie
+stehen seit dieser Sitzung auch im Zustand ohne Diagramm da (86 von 89
+Geräten). Und der Sortierschlüssel-Test akzeptierte `data-s-preis=""`:
+`parseFloat("")` ist NaN, und NaN schiebt eine Zeile absteigend ans Ende,
+**aufsteigend aber an den Anfang**.
+
+## Ein Fund, den erst die erweiterte Fixture zeigte
+
+Mit sechs Messtagen schalten sich „Verweildauer im Regal" und „Preisverfall"
+ein — zusammen **1234 px**, und der Portfolio-Reiter misst **3328 statt
+2384 px**. Die Grenze des Auftrags liegt bei 3000.
+
+Das ist keine Fixture-Eigenheit, sondern die Datenlage in etwa zwei Wochen.
+`dauern` war in der VORLAGE auf `[:12]` gedeckelt (eine Zahl, die kein Test
+kennt), `trends` **überhaupt nicht**. Jetzt `geraete_view.LIFECYCLE_SICHTBAR`
+(6), Rest zugeklappt, gemessen **2798 px** — 202 px Reserve.
+
+## Was der Review NICHT beanstandet hat
+
+Die Y-Achse: Etikett und Ring sitzen auf `y(preis)`, ausgewichen wird nur
+nach rechts, der Browsertest misst den Abstand zum Punkt (≤ 6 px). Alle elf
+neuen Python-Tests fallen gegen `da7e410` durch, `site/` ist md5-identisch
+mit einem frischen `render_site(..., load_config(root))`, kein State und kein
+Secret im Commit.
+
+## Offen daraus
+
+1. **B7 (niedrig, latent):** die Wochenkarte nennt zwei Zeiträume in einem
+   Kasten — „letzte 14 Tage" am Rubriktitel gegen „Seit dem 10.08." im Satz
+   (20 Tage). Heute deckungsgleich, weil alle 59 Geräte eine Listung ab dem
+   29.08. haben; ein Gerät, das am 12.08. erstmals gesehen wurde und seither
+   ruht, fehlte in der Zahl. Nicht angefasst.
+2. **B8 (niedrig, latent):** `data-s-preis` mischt Barpreis und Zuzahlung in
+   EINE Ordnung — die Hausregel lautet „die zwei Preisarten nie
+   gegeneinander". Scharf, sobald der erste Zuzahlungs-Adapter kommt.
+3. **`geraete_verlauf.messtermine` je Gerät wird von niemandem gelesen** —
+   `app.js` rechnet `rohTage.length`. Das Feld reist im JSON-Block mit. Es
+   ist die richtige Zahl, nur hängt die Seite nicht daran.

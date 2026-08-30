@@ -1584,10 +1584,15 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
             schluessel = k.get("data-sort")
             assert schluessel, f"{tafel}: Knopf ohne data-sort"
             assert k.get("data-art") in ("zahl", "text"), schluessel
-            fehlend = [z for z in zeilen if z.get(f"data-s-{schluessel}") is None]
+            # LEER ist so schlecht wie fehlend: `parseFloat("")` ist NaN,
+            # und die Sortierung schiebt NaN absteigend ans Ende, aber
+            # aufsteigend an den ANFANG - eine Zeile ohne Wert stünde dann
+            # ganz oben. Deshalb wird auf einen echten Wert geprüft.
+            fehlend = [z for z in zeilen
+                       if not (z.get(f"data-s-{schluessel}") or "").strip()]
             assert not fehlend, (
-                f"{tafel}: {len(fehlend)} Zeilen ohne data-s-{schluessel} - "
-                f"sie sortierten stumm ans Ende")
+                f"{tafel}: {len(fehlend)} Zeilen ohne Wert in "
+                f"data-s-{schluessel} - sie sortieren aufsteigend nach oben")
 
 
 def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path):
@@ -1634,11 +1639,19 @@ def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path)
     abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
-    assert len(saetze) == 1, f"ein Satz, keine Aufzählung: {saetze}"
-    assert "erstmals erfasst" in saetze[0], saetze
-    assert "neu im Regal" not in saetze[0], (
+    assert saetze, "kein Satz in der Karte"
+    # Der Bewegungsteil steht in EINEM Satz, nicht als Aufzählung je
+    # Bewegung - das ist der Punkt dieses Zweiges. Eine Auslistung darf
+    # daneben stehen: sie ist das stärkste Signal dieser Seite und hängt
+    # nicht daran, wie lange wir schon messen.
+    erfasst = [x for x in saetze if "erstmals erfasst" in x]
+    assert len(erfasst) == 1, f"ein Satz zur Erfassung erwartet: {saetze}"
+    assert all("neu im Regal" not in x for x in saetze), (
         "'neu im Regal' ist bei 20 Tagen Messdauer eine Aussage ueber uns, "
         "nicht ueber den Markt")
+    uebrig = [x for x in saetze if x not in erfasst]
+    assert all("Portfolio gefallen" in x for x in uebrig), (
+        f"unerwarteter Satz in der Karte: {uebrig}")
     assert abschnitt.select_one("table") is None, (
         "unter kurzem Vorlauf gehört in die Wochenkarte keine Tabelle")
 

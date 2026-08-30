@@ -87,6 +87,23 @@ FENSTER_TAGE = 14
 # mehr dasselbe sind.
 VORLAUF_TAGE = 28
 
+# Wie viele Zeilen die zwei Lifecycle-Listen ohne Aufklappen zeigen
+# (30.08.2026).
+#
+# GERECHNET, nicht gegriffen, und zwar an einer Fixture, die die Datenlage
+# in etwa zwei Wochen vorwegnimmt: "Verweildauer im Regal" und
+# "Preisverfall" stehen heute leer, weil die Historie zu duenn ist. Sobald
+# sie sich einschalten, traegt jede Liste rund 51 px je Zeile - mit zwoelf
+# bzw. ungedeckelt zusammen 1234 px, und der Portfolio-Reiter misst dann
+# 3328 statt 2384 px. Die Grenze des Auftrags liegt bei 3000.
+#
+# Das ist dieselbe Fehlerklasse wie bei `KATALOG_SICHTBAR`: ein Deckel in
+# ZEILEN ist immer nur ein Stellvertreter fuer eine Grenze in PIXELN, und
+# eine Liste ohne Deckel haengt am Datenbestand. Sechs Zeilen kosten je
+# Liste rund 310 px; der Rest steht zugeklappt darunter und ist nicht
+# geloescht.
+LIFECYCLE_SICHTBAR = 6
+
 EIGEN = ("vodafone",)
 
 # --------------------------------------------------------------------------
@@ -374,7 +391,7 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                           f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
                           f"erfasst – es gibt noch keinen früheren Stand, gegen "
                           f"den sich vergleichen ließe.")
-    elif kurzer_vorlauf and (neu_geraete or bewegungen):
+    elif kurzer_vorlauf and (neu_geraete or bewegungen or weg_geraete):
         # EIN SATZ STATT EINER TABELLE.
         #
         # Die Bedingung `neu_geraete or bewegungen` ist nicht kosmetisch:
@@ -388,14 +405,14 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         # nicht ueber den Markt - sie steht deshalb im Nebensatz, und die
         # Preisaenderungen, die es wirklich gab, stehen ausgeschrieben
         # daneben statt als Tabelle mit Kopfzeile und einer Datenzeile.
-        kopf = ""
-        if seit:
-            kopf = f"Seit dem {seit.day}.{seit.month:02d}. wurden "
-        else:
-            kopf = "Bisher wurden "
-        satz = (f"{kopf}{len(neu_geraete)} "
-                f"Gerät{'e' if len(neu_geraete) != 1 else ''} erstmals "
-                f"erfasst; ")
+        # Numerus: "wurden 1 Gerät erstmals erfasst" ist falsch, und der
+        # Fall tritt in einer ruhigen Woche als erster ein.
+        wieviel = len(neu_geraete)
+        # "4.8.", nicht "4.08." - dieselbe Schreibweise wie `tagDE` in
+        # app.js und wie die Chronik der Wettbewerbsseite ("7.8.").
+        kopf = (f"Seit dem {seit.day}.{seit.month}. " if seit else "Bisher ")
+        satz = (f"{kopf}{'wurde' if wieviel == 1 else 'wurden'} {wieviel} "
+                f"Gerät{'' if wieviel == 1 else 'e'} erstmals erfasst; ")
         if not bewegungen:
             satz += "eine Preisänderung ist dabei nicht aufgefallen."
         else:
@@ -408,9 +425,30 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                              f"aufgefallen")
             satz += wieviele + ": " + "; ".join(teile)
             if len(bewegungen) > 3:
+                # DIE RESTZAHL MUSS ANGEMELDET SEIN. Sie ist gerechnet
+                # (`len - 3`) und stand nicht in `erlaubt`; der Waechter
+                # verwarf den Satz fail closed, und weil dieser Zweig KEINE
+                # Tabelle mehr zeigt, blieb die Rubrik danach vollstaendig
+                # leer - Ueberschrift ohne Inhalt. Ausgeloest ab der vierten
+                # Preisbewegung einer Nacht, sobald kein Eigenname die Zahl
+                # zufaellig deckt.
+                erlaubt.add(len(bewegungen) - 3)
                 satz += f" und {len(bewegungen) - 3} weitere"
             satz += "."
         saetze.append(satz)
+        # EINE AUSLISTUNG IST DAS STAERKSTE SIGNAL DIESER SEITE und darf
+        # nicht daran haengen, wie lange wir schon messen. Der erste Anlauf
+        # dieses Zweiges kannte nur `neu_geraete` und `bewegungen`: zehn aus
+        # dem Regal gefallene Geraete standen nirgends, waehrend der Satz
+        # daneben "eine Preisaenderung ist dabei nicht aufgefallen" meldete.
+        # Genau der Einbruch, den der Kommentar bei `ohne_vorlauf` als Grund
+        # fuer die Laufbilanz nennt.
+        if weg_geraete:
+            saetze.append(
+                f"{len(weg_geraete)} "
+                f"Gerät{'' if len(weg_geraete) == 1 else 'e'} "
+                f"{'ist' if len(weg_geraete) == 1 else 'sind'} aus dem "
+                f"Portfolio gefallen.")
     else:
         for b in bewegungen[:5]:
             richtung = "günstiger" if b["delta"] < 0 else "teurer"
@@ -430,7 +468,7 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     # Dieselbe Mechanik wie `zahlen_der_namen`, und aus demselben Grund
     # ausdruecklich statt stillschweigend.
     if kurzer_vorlauf and not ohne_vorlauf and seit:
-        erlaubt |= zahlen_im_text(f"{seit.day}.{seit.month:02d}.")
+        erlaubt |= zahlen_im_text(f"{seit.day}.{seit.month}.")
 
     # Fail closed: ein Satz, dessen Zahlen nicht im Datensatz stehen,
     # erscheint nicht. Heute kann das nicht passieren - morgen, mit einem
@@ -462,7 +500,11 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                             else e.get("device_id")),
                  "anbieter": e.get("anbieter"), "seit": e.get("ended_since", "")}
                 for e in verschwunden[:12]],
-        "hat_daten": bool(geprueft or bewegungen),
+        # AN DAS, WAS WIRKLICH AUF DIE SEITE KOMMT. `bewegungen` ist die
+        # lokale, ungefilterte Liste; im kurzen Vorlauf wird sie oben auf
+        # [] gesetzt, und `geprueft` kann der Zahlenwaechter leeren. Beides
+        # zusammen ergab eine Rubrik, die rendert und nichts enthaelt.
+        "hat_daten": bool(geprueft or (bewegungen and not kurzer_vorlauf)),
         "ohne_vorlauf": ohne_vorlauf,
         "kurzer_vorlauf": kurzer_vorlauf,
         "vorlauf_tage": vorlauf_tage,
@@ -716,6 +758,7 @@ def leer(fehler: str = "") -> dict:
         "verlauf": geraete_verlauf.leer(),
         "katalogtabelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
+        "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": [], "kurzer_vorlauf": True,
                        "vorlauf_tage": 0},
@@ -907,6 +950,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # wohl in den Katalog.
         "katalogtabelle": katalogzeilen(sichtbar, katalog),
         "katalog_sichtbar": KATALOG_SICHTBAR,
+        "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "pruefung": pruefung["zahlen"],
         "pruefbefunde": pruefung["befunde"],
         "hat_daten": bool(sichtbar),

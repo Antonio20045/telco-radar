@@ -486,7 +486,8 @@
      data-alle="{{ geraete.verlauf.messtermine }}"
      data-seit="{{ geraete.verlauf.seit | date_de }}"
      data-wochen="{{ geraete.verlauf.belastbar_ab_wochen }}"
-     data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}">Preisverlauf
+     data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}"
+     data-abstand="{{ geraete.verlauf.linien_abstand }}">Preisverlauf
   wird seit dem {{ geraete.verlauf.seit | date_de }} erfasst –
   {{ geraete.verlauf.messtermine }}
   {{ 'Messtermin' if geraete.verlauf.messtermine == 1 else 'Messtermine' }}.
@@ -600,25 +601,56 @@
   {% endif %}
 
   {% if geraete.lifecycle.dauern %}
+  {# DER DECKEL STEHT IM MODUL (`geraete_view.LIFECYCLE_SICHTBAR`), nicht
+     hier. Bis zum 30.08.2026 stand `[:12]` in der Vorlage - eine Zahl, die
+     kein Test kennt und die niemand gegen die Seitenhoehe rechnen kann. Der
+     Rest ist zugeklappt, nicht geloescht: an genau solchen `<details>`
+     haengt die Kuerze dieser Seite. #}
+  {% set sichtbar = geraete.lifecycle_sichtbar %}
   <h3 class="gr-unter">Verweildauer im Regal</h3>
   <ul class="list-card gr-dauern">
-    {% for d in geraete.lifecycle.dauern[:12] %}
+    {% for d in geraete.lifecycle.dauern[:sichtbar] %}
     <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
       {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
     {% endfor %}
   </ul>
+  {% if geraete.lifecycle.dauern | length > sichtbar %}
+  <details class="gr-mehrliste"><summary>{{ geraete.lifecycle.dauern | length - sichtbar }} weitere</summary>
+  <ul class="list-card gr-dauern">
+    {% for d in geraete.lifecycle.dauern[sichtbar:] %}
+    <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
+      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  </details>
+  {% endif %}
   {% endif %}
 
   {% if geraete.lifecycle.trends %}
+  {# `trends` war ueberhaupt nicht gedeckelt - die Liste haengt damit
+     vollstaendig am Datenbestand. #}
+  {% set sichtbar = geraete.lifecycle_sichtbar %}
   <h3 class="gr-unter">Preisverfall gegenüber dem Einführungspreis</h3>
   <ul class="list-card gr-verfall">
-    {% for v in geraete.lifecycle.trends %}
+    {% for v in geraete.lifecycle.trends[:sichtbar] %}
     <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
       {{ v.modell }} bei {{ v.anbieter }}: {{ '%.2f'|format(v.erstpreis) }} €
       (seit {{ v.erstpreis_am | date_de }}) auf {{ '%.2f'|format(v.aktuell) }} €
       <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
     {% endfor %}
   </ul>
+  {% if geraete.lifecycle.trends | length > sichtbar %}
+  <details class="gr-mehrliste"><summary>{{ geraete.lifecycle.trends | length - sichtbar }} weitere</summary>
+  <ul class="list-card gr-verfall">
+    {% for v in geraete.lifecycle.trends[sichtbar:] %}
+    <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
+      {{ v.modell }} bei {{ v.anbieter }}: {{ '%.2f'|format(v.erstpreis) }} €
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ '%.2f'|format(v.aktuell) }} €
+      <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
+    {% endfor %}
+  </ul>
+  </details>
+  {% endif %}
   {% endif %}
 
   {% if geraete.lifecycle.nachfolger %}

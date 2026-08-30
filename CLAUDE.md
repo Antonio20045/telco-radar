@@ -1752,14 +1752,60 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 > Zwei Tests stellen ihre Reihen selbst (verdeckte Linie, enge Achse) — sie
 > laufen deshalb über `_eigene_seite`, eine frische Seite je Test.
 >
+> **Der Review lief NACH dem Merge und fand zwei schwere Fehler dieser
+> Sitzung** — beide behoben, beide lehrreich (Einzelheiten in der
+> Schlussliste):
+>
+> | | Befund | Ausgeloest durch |
+> |---|---|---|
+> | **B1** | Die Wochenkarte konnte **stumm leer** werden: Ueberschrift, sonst nichts. Ab vier Bewegungen endet der Satz auf „und N weitere", `N = len - 3` stand nicht in `erlaubt`, der Waechter verwarf ihn fail-closed — und weil derselbe Zweig die Tabelle abschaltet, war der Auffangboden weg. `hat_daten` rechnete mit der lokalen, ungefilterten Liste | die vierte Preisbewegung einer Nacht |
+> | **B2** | Der Rasterschalter hob das Gatter aus: es zaehlte `rohTage`, gezeichnet werden die ZUSAMMENGEFASSTEN Punkte. Im Monatsraster faellt alles in ein Fenster, jede Reihe hat einen Punkt, und `<path>` wird fuer einen Punkt nicht gezeichnet — ein „Preisverlauf" mit **null Linien** | jeder Klick auf „Monatlich" |
+>
+> **Ein Deckel muss BEIDE Mengen kennen.** Das Gatter zaehlt jetzt `rohTage`
+> UND `tageSort`; die ZAHL im Satz bleibt die der Messtage. Und **die Achse
+> war einem schwachen Test angepasst worden** (B6): sie schrieb „1099 €",
+> waehrend Tooltip, Legende und Tabelle desselben Diagramms „1.099,00 €"
+> schreiben — weil `test_die_achse_erfindet_keinen_preis` mit `parseFloat`
+> liest. Repariert wurde jetzt der TEST. Ein schwacher Testparser darf nicht
+> bestimmen, wie die Seite aussieht.
+>
+> **Zwei Tests prueften nichts, und der zweite brauchte zwei Anlaeufe:**
+> `test_das_raster_veraendert_die_zahl_der_messtermine_nicht` zaehlte nur die
+> Kachel, nie das Bild — deshalb lief B2 an ihm vorbei. Und
+> `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm` war doppelt
+> blind: die Fixture hatte **genau** `DIAGRAMM_AB_TERMINEN` Messtage (jede
+> Verengung fiel unters Gatter) UND **jede Listung dieselben Messtage** (beim
+> Verengen fiel nie jemand heraus, die Gleichheit war trivial erfuellt). Erst
+> `_NUR_FRUEH` — ein Anbieter, der nach zwei Tagen aufhoert, samt passendem
+> `last_verified` — macht ihn wieder scharf. **Fallstrick:** ohne das
+> mitgezogene `last_verified` haengt `_punkte` den Bestaetigungstag an und
+> verlaengert die Kurve doch wieder ins verengte Fenster.
+>
+> **Die Gegenprobe gehoert an die Legende, nicht an die Tabelle** — die
+> Legende kommt aus dem Bild, die Tabelle ist der Verdaechtige. Haengt sie an
+> der Tabelle, meldet ein Fehler in genau ihr „der Test kann den Fall nicht
+> ausloesen", also den falschen Grund.
+>
+> **`LIFECYCLE_SICHTBAR` (6), und der Grund steht in der Zukunft.** Mit sechs
+> Messtagen schalten sich „Verweildauer" und „Preisverfall" ein — zusammen
+> 1234 px, Portfolio-Reiter **3328 statt 2384 px**, Budget 3000. Das ist die
+> Datenlage in etwa zwei Wochen. `dauern` war in der VORLAGE auf `[:12]`
+> gedeckelt (eine Zahl, die kein Test kennt), `trends` ueberhaupt nicht.
+> Jetzt gedeckelt im Modul, Rest zugeklappt: **2798 px**.
+>
 > **OFFEN:** (1) **71 der 89 wählbaren Geräte haben zwei Messtermine, 15
 > haben drei, 3 haben vier** — der Preisverlauf zeigt für die meisten
 > weiterhin eine Tabelle. Das ist die ehrliche Auskunft; nach etwa zwei
-> weiteren Wochen Nachtläufen kippt es von selbst, **dann ansehen**. (2) Die
-> 2-%-Überlappungsregel ist an EINEM nachgebauten Fall gemessen, im Bestand
-> gibt es ihn heute nicht. (3) `VORLAUF_TAGE` schaltet sich um den 07.09.
-> selbst um — **danach die Wochenkarte ansehen**, ob sie plausible Zahlen
-> zeigt oder weiter fast den ganzen Bestand als neu zählt.
+> weiteren Wochen Nachtläufen kippt es von selbst, **dann ansehen** — und
+> mit ihm schalten sich die zwei Lifecycle-Listen ein, also **Reiterhöhe
+> nachmessen**. (2) Die 2-%-Überlappungsregel ist an EINEM nachgebauten Fall
+> gemessen, im Bestand gibt es ihn heute nicht. (3) `VORLAUF_TAGE` schaltet
+> sich um den 07.09. selbst um — **danach die Wochenkarte ansehen**, ob sie
+> plausible Zahlen zeigt oder weiter fast den ganzen Bestand als neu zählt.
+> (4) Zwei latente Befunde des Reviews sind bewusst NICHT angefasst: die
+> Wochenkarte nennt zwei Zeiträume in einem Kasten („letzte 14 Tage" gegen
+> „Seit dem 10.08."), und `data-s-preis` mischt Barpreis und Zuzahlung in
+> EINE Sortierordnung — scharf, sobald der erste Zuzahlungs-Adapter kommt.
 
 > **Davor erledigt (30.08.2026): `/geraete.html` komplett neu gebaut.**
 > Auftragsgrundlage: `outputs/geraeteradar-wahrheit-2026-08-29.md` (die im

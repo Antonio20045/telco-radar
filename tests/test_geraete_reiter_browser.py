@@ -75,13 +75,48 @@ def _kennung(modell: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", modell.lower()).strip("-")
 
 
+# SECHS Tage, nicht vier. Mit genau `DIAGRAMM_AB_TERMINEN` Messtagen faellt
+# JEDE Verengung des Zeitraums unters Gatter - und damit war
+# `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm` nicht mehr
+# formulierbar: es gab keine Lage mehr, in der ein Anbieter aus einem
+# VERENGTEN, aber noch gezeichneten Fenster faellt. Mit sechs Tagen bleibt
+# nach der Verengung auf vier ein Diagramm stehen, und die alte
+# Gleichheitspruefung greift wieder.
+#
+# Der 03. und der 04.08. liegen bewusst in DERSELBEN Kalenderwoche: daran
+# haengt der Test, dass der Rasterschalter die Zahl der Messtermine nicht
+# veraendert.
+_MESSTAGE = ("2026-08-03", "2026-08-04", "2026-08-11", "2026-08-18",
+             "2026-08-25", "2026-08-28")
+
+
+# Medimax wird NUR an den ersten zwei Tagen gesehen.
+#
+# Ohne diese Ungleichheit hat jede Listung dieselben sechs Messtage, und dann
+# faellt beim Verengen des Zeitraums NIE ein Anbieter aus dem Bild - die
+# Zusicherung "Legende und Tabelle nennen dieselben Anbieter" ist damit nicht
+# ausloesbar, und `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm`
+# war gruen, auch wenn die Tabelle wieder ueber den vollen Zeitraum rechnete
+# (nachgeprueft: der eingebaute alte Fehler blieb unentdeckt). Ein Anbieter,
+# der frueh verschwindet, ist ausserdem der Normalfall dieses Radars -
+# mobilcom-debitel hoerte am 21.08. auf zu liefern.
+_NUR_FRUEH = "Medimax"
+
+
 def _listung(anbieter, typ, sku, preis, gid, speicher=256):
     return {
         "id": f"{anbieter.lower()}--{sku}", "sku_id": sku, "device_id": gid,
         "anbieter": anbieter, "anbieter_typ": typ, "netz": "",
         "speicher_gb": speicher, "farbe_roh": "Titannatur",
         "farbe_normalisiert": "titan-natur", "zustand": "neu",
-        "first_seen": "2026-08-01", "last_verified": "2026-08-11",
+        # `last_verified` MUSS zum letzten Messtag des Anbieters passen:
+        # `geraete_verlauf._punkte` haengt daran den Bestaetigungstag an und
+        # verlaengert die Kurve bis dorthin. Mit einem festen 11.08. fuer
+        # alle bekam Medimax trotz seiner zwei Messtage einen dritten Punkt
+        # mitten im verengten Fenster - und fiel deshalb nie heraus.
+        "first_seen": "2026-08-01",
+        "last_verified": (_MESSTAGE[1] if anbieter == _NUR_FRUEH
+                          else _MESSTAGE[-1]),
         "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": preis,
         "erstpreis": preis, "erstpreis_art": "ohne_vertrag",
         "erstpreis_am": "2026-08-01",
@@ -116,6 +151,22 @@ _DB = {"updated": "2026-08-11", "anbieter": {
     "Medimax": {"laeufe": 4, "funde_gesamt": 10},
 }, "listungen": _bestand()}
 
+
+def _historie():
+    zeilen = []
+    for e in _DB["listungen"]:
+        tage = _MESSTAGE[:2] if e["anbieter"] == _NUR_FRUEH else _MESSTAGE
+        for i, tag in enumerate(tage):
+            zeilen.append({
+                "listung_id": e["id"], "device_id": e["device_id"],
+                "anbieter": e["anbieter"], "datum": tag,
+                # Ein leicht fallender Preis: eine echte Bewegung, damit die
+                # Spalte "Veraenderung" etwas zu sagen hat.
+                "preis_ohne_vertrag": round(e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2),
+                "verfuegbarkeit": "lieferbar", "quelle_url": e["quelle_url"]})
+    return zeilen
+
+
 # Vier Messtage je Listung (30.08.2026).
 #
 # Bis dahin lief diese Fixture mit einer LEEREN Preishistorie: jede Listung
@@ -129,21 +180,6 @@ _DB = {"updated": "2026-08-11", "anbieter": {
 # Die Tage liegen bewusst in DREI Kalenderwochen: der 03. und der 04.08.
 # fallen in dieselbe: daran laesst sich zeigen, dass der Rasterschalter die
 # Zahl der MESSTERMINE nicht veraendert.
-_MESSTAGE = ("2026-08-03", "2026-08-04", "2026-08-11", "2026-08-18")
-
-
-def _historie():
-    zeilen = []
-    for e in _DB["listungen"]:
-        for i, tag in enumerate(_MESSTAGE):
-            zeilen.append({
-                "listung_id": e["id"], "device_id": e["device_id"],
-                "anbieter": e["anbieter"], "datum": tag,
-                # Ein leicht fallender Preis: eine echte Bewegung, damit die
-                # Spalte "Veraenderung" etwas zu sagen hat.
-                "preis_ohne_vertrag": round(e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2),
-                "verfuegbarkeit": "lieferbar", "quelle_url": e["quelle_url"]})
-    return zeilen
 
 
 def _chromium():
@@ -673,10 +709,21 @@ def test_die_achse_erfindet_keinen_preis(_seite):
     ein Preis, den es im Datensatz nicht gibt."""
     _frisch(_seite)
     assert _waehle_geraet(_seite)
+    # DEUTSCHE SCHREIBWEISE LESEN, nicht `parseFloat`. Die Achse schreibt
+    # wie der Rest der Seite ("1.099,00 €"), und `parseFloat("1.099")` ist
+    # 1,099 - der Test meldete damit eine Achse ausserhalb der Daten, die es
+    # nicht gab. Beim Bauen ist daraufhin einmal die SEITE angepasst worden
+    # (Achse ohne Tausendertrenner); das war die falsche Richtung, und der
+    # Reviewer hat es gemeldet: ein schwacher Testparser darf nicht
+    # bestimmen, wie die Seite aussieht.
     achse = _seite.eval_on_selector_all(
         ".gr-vsvg text",
         "e => e.filter(t => t.textContent.includes('€'))"
-        "      .map(t => parseFloat(t.textContent))")
+        "      .map(t => parseFloat(t.textContent"
+        "                 .replace(/[^0-9.,]/g, '')"
+        "                 .replace(/\\./g, '')"
+        "                 .replace(',', '.')))")
+    assert all(w == w for w in achse), f"unlesbare Achsenmarke: {achse}"
     punkte = _seite.eval_on_selector_all(
         ".gr-vpunkt title",
         "e => e.map(t => parseFloat(t.textContent.replace(/[^0-9,]/g,'')"
@@ -693,13 +740,17 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     Kacheln dem Zeitraumfilter folgten - sie nannte einen Anbieter, der im
     Bild nicht vorkam, mit einem Datum ausserhalb des Fensters.
 
-    Seit dem 30.08.2026 in ZWEI Lagen geprueft. Der Test verengte das
-    Fenster auf den letzten Tag - und damit faellt die Auswahl unter
-    `DIAGRAMM_AB_TERMINEN`: es gibt dann gar kein Diagramm und folglich
-    keine Legende, gegen die sich vergleichen liesse. Die Zusicherung, um
-    die es geht, gilt trotzdem in beiden Lagen, sie lautet nur verschieden:
-    mit Diagramm nennen Legende und Tabelle dieselben Anbieter, ohne
-    Diagramm bleibt die Tabelle stehen und folgt weiter dem Filter."""
+    Seit dem 30.08.2026 in DREI Lagen geprueft, und die mittlere ist die
+    eigentliche: volles Fenster (Diagramm steht), verengtes Fenster mit noch
+    genug Messtagen (Diagramm steht WEITER, ein frueher Anbieter faellt
+    heraus - hier greift die urspruengliche Gleichheitspruefung), und
+    Fenster auf einen Tag (kein Diagramm, Tabelle bleibt).
+
+    Die mittlere Lage war kurzzeitig verloren: mit genau
+    `DIAGRAMM_AB_TERMINEN` Messtagen in der Fixture fiel jede Verengung
+    unters Gatter, und der Ersatz - "ohne Diagramm bleibt die Tabelle
+    stehen" - war gegen den alten Fehler blind. Eine Tabelle, die wieder
+    ueber den vollen Zeitraum rechnete, waere gruen geblieben."""
     _frisch(_seite)
     assert _waehle_geraet(_seite)
 
@@ -720,8 +771,48 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     assert _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()") \
         == str(len(voll))
 
-    # 2. Fenster auf den letzten Tag: unter der Schwelle, also kein Bild -
-    #    die Tabelle bleibt und zeigt nur noch, was in diesem Tag steht.
+    # 2. Fenster VERENGT, aber noch ueber der Schwelle: das Diagramm bleibt
+    #    stehen, ein frueher Anbieter faellt heraus - und Legende und
+    #    Tabelle muessen weiter dieselben nennen.
+    #
+    #    Das ist die urspruengliche Zusicherung dieses Tests, und sie war
+    #    kurzzeitig verloren: mit genau `DIAGRAMM_AB_TERMINEN` Messtagen in
+    #    der Fixture fiel JEDE Verengung unters Gatter, es gab kein
+    #    Diagramm mehr und folglich keine Legende zum Vergleichen. Der
+    #    Ersatz war gegen den alten Fehler blind - eine Tabelle, die wieder
+    #    ueber den vollen Zeitraum rechnete, waere gruen geblieben. Die
+    #    Fixture hat deshalb sechs Messtage.
+    _seite.fill("#gr-vvon", _MESSTAGE[2])
+    _seite.wait_for_timeout(200)
+    assert _seite.is_visible("#gr-vbild svg"), (
+        "nach der Verengung auf vier Messtage muss das Diagramm stehen "
+        "bleiben - sonst prueft dieser Zweig die Gleichheit gar nicht")
+    # GEGENPROBE AN DER LEGENDE, nicht an der Tabelle. Die Legende entsteht
+    # aus den gezeichneten Reihen; die Tabelle ist der Verdaechtige dieses
+    # Tests. Haengt die Gegenprobe an der Tabelle, meldet ein Fehler in
+    # genau ihr "der Test kann den Fall nicht ausloesen" - also den falschen
+    # Grund. Es MUSS beim Verengen einer herausfallen, sonst ist die
+    # Gleichheit darunter trivial erfuellt.
+    im_bild = legende()
+    assert im_bild < voll, (
+        f"beim Verengen faellt kein Anbieter aus dem BILD ({im_bild} von "
+        f"{voll}) - der Test kann den Fall nicht ausloesen")
+    verengt = anbieter_der_tabelle()
+    assert verengt == im_bild, (
+        f"die Tabelle nennt {verengt}, das Bild zeigt {im_bild} - rechnet "
+        f"sie wieder ueber den vollen Zeitraum?")
+    tage = set(_seite.eval_on_selector_all(
+        "#gr-vtabelle tbody tr td:last-child",
+        "e => e.map(x => x.textContent.trim())"))
+    fenster = set(_seite.eval_on_selector_all(
+        "#gr-vbild .gr-vpunkt title",
+        "e => e.map(x => x.textContent.split(' am ')[1])"))
+    assert tage <= fenster, (
+        f"die Tabelle nennt ein Datum, das im Bild nicht vorkommt: "
+        f"{tage - fenster}")
+
+    # 3. Fenster auf EINEN Tag: unter der Schwelle, also kein Bild - die
+    #    Tabelle bleibt und folgt weiter dem Filter.
     bis = _seite.eval_on_selector("#gr-vbis", "e => e.value")
     _seite.fill("#gr-vvon", bis)
     _seite.wait_for_timeout(200)
@@ -731,11 +822,12 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     eng = anbieter_der_tabelle()
     assert eng, "die Tabelle verschwindet nicht mit dem Diagramm"
     assert eng <= voll, (eng, voll)
-    tage = set(_seite.eval_on_selector_all(
+    ein_tag = set(_seite.eval_on_selector_all(
         "#gr-vtabelle tbody tr td:last-child",
         "e => e.map(x => x.textContent.trim())"))
-    assert len(tage) == 1, (
-        f"die Tabelle folgt dem Filter nicht: {tage}")
+    assert len(ein_tag) == 1, (
+        f"die Tabelle folgt dem Filter nicht: {ein_tag}")
+
 
 
 def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
@@ -803,11 +895,32 @@ def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
     def termine():
         return _seite.text_content("#gr-vpkt").strip()
 
+    def bild():
+        """Was WIRKLICH gezeichnet ist - nicht nur, dass ein <svg> dasteht.
+
+        Genau hier ist der Fehler durchgerutscht: der Test zaehlte nur die
+        Kachel. Im Monats- und Quartalsraster fallen alle Messtage in EIN
+        Zeitfenster, jede Reihe hat dann einen Punkt, und `<path>` wird fuer
+        eine Reihe mit einem Punkt gar nicht gezeichnet - es stand ein
+        "Preisverlauf" mit null Linien da, und die Kachel sagte weiter die
+        richtige Zahl."""
+        return _seite.evaluate("""() => ({
+            svg: !!document.querySelector('#gr-vbild svg'),
+            sichtbar: !document.getElementById('gr-vbild').hidden,
+            linien: document.querySelectorAll('#gr-vbild path').length,
+        })""")
+
     assert termine() == str(len(_MESSTAGE)), termine()
     for raster in ("monat", "quartal", "woche"):
         _seite.click(f'.gr-vknopf[data-raster="{raster}"]')
         _seite.wait_for_timeout(150)
         assert termine() == str(len(_MESSTAGE)), f"{raster}: {termine()}"
+        # KEIN DIAGRAMM OHNE LINIE. Entweder es steht eins da und traegt
+        # wenigstens eine Linie, oder es steht keins da - ein leeres Bild
+        # ist genau das, wogegen das Gatter gebaut ist.
+        z = bild()
+        assert not z["sichtbar"] or z["linien"] > 0, (
+            f"{raster}: Diagramm ohne eine einzige Linie - {z}")
 
 
 def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
@@ -1038,3 +1151,35 @@ def test_die_achse_beschriftet_keine_zwei_linien_gleich(_eigene_seite):
     werte = [float(t.replace("\u00a0", "").replace("€", "").strip()
                     .replace(".", "").replace(",", ".")) for t in achse]
     assert min(werte) >= 900.0 - 0.01 and max(werte) <= 900.2 + 0.01, achse
+
+
+def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
+    """`#gr-vmin` und `#gr-vmax` wurden von keinem Test gegen die Daten
+    gehalten - und sie wiegen seit dem 30.08.2026 schwerer, weil sie auch im
+    Zustand OHNE Diagramm dastehen. An den Echtdaten trifft das 86 von 89
+    Geräten.
+
+    Geprüft wird gegen die Punkte, die das Bild wirklich trägt (Tooltip je
+    Messpunkt), nicht gegen eine zweite Rechnung: zwei Rechnungen für
+    dieselbe Zahl sind zwei Zahlen (CLAUDE.md §6)."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+
+    def euro_zu_zahl(text):
+        return float(text.replace(" ", "").replace("€", "").strip()
+                     .replace(".", "").replace(",", "."))
+
+    preise = _seite.eval_on_selector_all(
+        "#gr-vbild .gr-vpunkt title",
+        "e => e.map(x => x.textContent.split(': ')[1].split(' am ')[0])")
+    assert preise, "keine Messpunkte im Bild - der Test misst nichts"
+    werte = [euro_zu_zahl(p) for p in preise]
+
+    kachel_min = euro_zu_zahl(_seite.text_content("#gr-vmin"))
+    kachel_max = euro_zu_zahl(_seite.text_content("#gr-vmax"))
+    assert kachel_min == min(werte), (kachel_min, min(werte))
+    assert kachel_max == max(werte), (kachel_max, max(werte))
+    # Gegenprobe: die zwei Kacheln müssen sich unterscheiden, sonst sagt der
+    # Test nichts darüber, ob min und max verwechselt sind.
+    assert kachel_min != kachel_max, (
+        "alle Preise gleich - der Test kann eine Verwechslung nicht sehen")

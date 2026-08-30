@@ -1308,8 +1308,15 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
   var AB_TERMINEN = parseInt((stand && stand.dataset.abterminen) || '4', 10);
   /* Zwei Linien, die naeher als das beieinander liegen, sind im Bild eine.
      Anteil der gezeichneten Preisspanne, nicht Euro: 90 Cent sind bei einer
-     Spanne von 307 Euro unsichtbar und bei einer von 5 Euro deutlich. */
-  var ABSTAND = 0.02;
+     Spanne von 307 Euro unsichtbar und bei einer von 5 Euro deutlich.
+
+     AUS DEM MODUL, nicht hier hartkodiert. Die erste Fassung schrieb 0.02
+     an beide Stellen - `geraete_verlauf.LINIEN_ABSTAND` reiste in den
+     View-Dict und wurde von niemandem gelesen. Wer die Python-Konstante
+     geaendert haette, haette die Seite nicht geaendert; genau die
+     Fehlerklasse, die der Kommentar zu AB_TERMINEN zwei Zeilen weiter oben
+     vermeidet (CLAUDE.md §6, Stichwort-Vorschau). */
+  var ABSTAND = parseFloat((stand && stand.dataset.abstand) || '0.02');
   var von = document.getElementById('gr-vvon');
   var bis = document.getElementById('gr-vbis');
   var gewaehlt = null, raster = 'woche';
@@ -1411,7 +1418,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     return text.charAt(text.length - 1) === '.' ? text : text + '.';
   }
 
-  function satzFuer(g, tage) {
+  function satzFuer(g, tage, gezeichnet) {
     if (!stand) return;
     var wochen = stand.dataset.wochen;
     var nachsatz = ' Aussagen zu Preisverfall und Verweildauer ab etwa ' +
@@ -1428,7 +1435,9 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
        Diagramms sagt dann dasselbe, und zwar dort, wo die Frage entsteht -
        beide zusammen waeren dieselbe Zahl zweimal auf einem Bildschirm,
        genau die Beruhigungsregel aus CLAUDE.md 5. */
-    if (tage.length < AB_TERMINEN) { stand.hidden = true; return; }
+    if (tage.length < AB_TERMINEN || gezeichnet < AB_TERMINEN) {
+      stand.hidden = true; return;
+    }
     stand.hidden = false;
     stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
       ' vor, ' + spanne(tage)) + nachsatz;
@@ -1475,6 +1484,9 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       leer.textContent = 'Für diesen Zeitraum liegen keine Messpunkte vor.';
       bild.hidden = true; legende.hidden = true; tabelle.hidden = true;
       kacheln.hidden = true;
+      // Sonst behaelt der Satz die Zahlen des letzten Zustands, waehrend
+      // daneben steht, dass es keine Messpunkte gibt.
+      satzFuer(null, null, 0);
       return;
     }
     leer.hidden = true;
@@ -1503,7 +1515,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
        "Messpunkte", waehrend zwei Zeilen tiefer eine andere Zahl unter
        "Messtermine" stand. */
     document.getElementById('gr-vpkt').textContent = rohTage.length;
-    satzFuer(g, rohTage);
+    satzFuer(g, rohTage, tageSort.length);
 
     /* GATTER: unter AB_TERMINEN Messterminen KEIN Diagramm.
 
@@ -1511,15 +1523,34 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
        sieht aus wie ein Trend. Die Tabelle darunter sagt dasselbe ohne die
        Behauptung, und der Satz sagt, ab wann ein Verlauf entsteht. Ein
        leeres Bild mit Rasterlinien und Legende ist keine ehrlichere
-       Darstellung derselben Lage - es ist eine unehrlichere. */
-    if (rohTage.length < AB_TERMINEN) {
+       Darstellung derselben Lage - es ist eine unehrlichere.
+
+       GEZAEHLT WIRD BEIDES: die Messtage (`rohTage`) UND die Punkte, die
+       nach der Rasterung wirklich gezeichnet werden (`tageSort`). Der
+       erste Anlauf zaehlte nur die Messtage - und damit hob der
+       Rasterschalter das Gatter aus: vier Messtage im Monatsraster sind EIN
+       Zeitfenster, jede Reihe hat dann genau einen Punkt, und `<path>` wird
+       fuer eine Reihe mit einem Punkt gar nicht gezeichnet. Im echten
+       Chromium gemessen stand dort ein "Preisverlauf" mit null Linien und
+       zwei Punkten in der Bildmitte - genau das, wogegen dieses Gatter
+       gebaut ist, nur eine Stufe spaeter.
+
+       Die ZAHL im Satz bleibt die der Messtage: das Raster formt die Linie,
+       nicht die Datenlage. Nur ob ueberhaupt gezeichnet wird, haengt auch
+       daran, ob nach der Rasterung noch eine Linie uebrig ist. */
+    if (rohTage.length < AB_TERMINEN || tageSort.length < AB_TERMINEN) {
       bild.hidden = true; legende.hidden = true;
       if (zukurz) {
         zukurz.hidden = false;
         zukurz.textContent = punkt('Für dieses Gerät ' +
           termine(rohTage.length) + ' vor, ' + spanne(rohTage)) +
-          ' Ein Verlauf entsteht ab ' + AB_TERMINEN +
-          '. Bis dahin stehen die Preise als Tabelle darunter.';
+          (rohTage.length >= AB_TERMINEN
+            ? ' In diesem Raster fallen sie auf ' + tageSort.length +
+              ' Punkt' + (tageSort.length === 1 ? '' : 'e') +
+              ' zusammen – für einen Verlauf braucht es ' + AB_TERMINEN +
+              '. Ein feineres Raster zeigt mehr.'
+            : ' Ein Verlauf entsteht ab ' + AB_TERMINEN + '.') +
+          ' Bis dahin stehen die Preise als Tabelle darunter.';
       }
       tabelleBauen(reihen);
       return;
@@ -1632,17 +1663,19 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
        gleich, sind es wirklich dieselben Preise, und die doppelte Linie
        faellt weg. Gerundet wird NUR die Beschriftung - die Linie sitzt auf
        dem gerechneten Wert. */
-    /* OHNE TAUSENDERTRENNER. Der Punkt der deutschen Schreibweise macht aus
-       "1003 €" ein "1.003 €", und das ist an DIESER Stelle teuer: die
-       Achsenspalte ist 74 px breit, und `test_die_achse_erfindet_keinen_preis`
-       liest die Marken mit `parseFloat` - aus "1.003" wuerde dort 1,003, und
-       der Test meldete eine Achse ausserhalb der Daten, die es nicht gibt.
-       Die ganze Zahl steht ohnehin in der Tabelle darunter, dort mit
-       Trenner. */
+    /* DEUTSCHE SCHREIBWEISE, MIT TAUSENDERTRENNER - wie ueberall sonst auf
+       dieser Seite.
+
+       Der erste Anlauf schrieb "1099 €" ohne Trenner, und die Begruendung
+       im Kommentar war, dass `test_die_achse_erfindet_keinen_preis` die
+       Marken mit `parseFloat` liest und an "1.099" scheitert. Das ist die
+       falsche Richtung: damit war die SEITE an einen schwachen Testparser
+       angepasst, und die Achse schrieb 1099, waehrend Tooltip, Legende,
+       Kacheln und Tabelle desselben Diagramms 1.099,00 schreiben. Der Test
+       liest jetzt richtig; die Achse schreibt, was das Portal schreibt. */
     function achsentext(preis, stellen) {
       return preis.toLocaleString('de-DE', { minimumFractionDigits: stellen,
-                                             maximumFractionDigits: stellen,
-                                             useGrouping: false })
+                                             maximumFractionDigits: stellen })
              + ' €';
     }
     var stellen = 0;
@@ -1829,6 +1862,13 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       leer.hidden = false;
       leer.textContent = 'Wählen Sie oben ein Gerät – dann steht hier sein '
         + 'Preisverlauf, mit einer Linie je Anbieter.';
+      // AUCH DIE ZWEI SAETZE. Ohne das stand unter "Wählen Sie oben ein
+      // Gerät" weiter "Für dieses Gerät liegen 2 Messtermine vor, vom 3.8.
+      // bis zum 4.8." - ein Satz ueber ein Geraet, das nicht mehr gewaehlt
+      // ist -, und die globale Zahl war von der Seite verschwunden, weil
+      // `satzFuer` sie beim Gattern ausgeblendet hatte.
+      if (zukurz) { zukurz.hidden = true; zukurz.textContent = ''; }
+      satzFuer(null, null, 0);
     }
     if (q.length < 2) {
       treffer.hidden = true;
