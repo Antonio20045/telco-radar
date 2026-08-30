@@ -116,6 +116,35 @@ _DB = {"updated": "2026-08-11", "anbieter": {
     "Medimax": {"laeufe": 4, "funde_gesamt": 10},
 }, "listungen": _bestand()}
 
+# Vier Messtage je Listung (30.08.2026).
+#
+# Bis dahin lief diese Fixture mit einer LEEREN Preishistorie: jede Listung
+# hatte genau einen Messtag, den aus `last_verified`. Das reichte, solange
+# jedes gewaehlte Geraet ein Diagramm bekam - seit ein Verlauf erst ab
+# `DIAGRAMM_AB_TERMINEN` Messterminen gezeichnet wird (zwei Punkte sind eine
+# Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend), stand
+# hier kein SVG mehr, und vier Tests massen einen Leerzustand statt der
+# Grafik, die sie pruefen sollen.
+#
+# Die Tage liegen bewusst in DREI Kalenderwochen: der 03. und der 04.08.
+# fallen in dieselbe: daran laesst sich zeigen, dass der Rasterschalter die
+# Zahl der MESSTERMINE nicht veraendert.
+_MESSTAGE = ("2026-08-03", "2026-08-04", "2026-08-11", "2026-08-18")
+
+
+def _historie():
+    zeilen = []
+    for e in _DB["listungen"]:
+        for i, tag in enumerate(_MESSTAGE):
+            zeilen.append({
+                "listung_id": e["id"], "device_id": e["device_id"],
+                "anbieter": e["anbieter"], "datum": tag,
+                # Ein leicht fallender Preis: eine echte Bewegung, damit die
+                # Spalte "Veraenderung" etwas zu sagen hat.
+                "preis_ohne_vertrag": round(e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2),
+                "verfuegbarkeit": "lieferbar", "quelle_url": e["quelle_url"]})
+    return zeilen
+
 
 def _chromium():
     for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
@@ -152,6 +181,52 @@ MIN_SCHRIFT = 12
 
 
 @pytest.fixture(scope="module")
+def _umgebung(_seite):
+    """Browser und Basisadresse, fuer Tests mit einer EIGENEN Seite.
+
+    Zwei Tests stellen ihre Daten selbst (eine verdeckte Linie, eine
+    Achse mit winziger Spanne) - im echten Bestand gibt es beide Faelle
+    heute nicht. Sie ersetzen dafuer den JSON-Block und laden neu, und das
+    darf die gemeinsame Seite nicht anfassen: sie hat Modulgueltigkeit, und
+    ein Test, der danach laeuft, saehe sonst gestellte Daten. Genau das ist
+    beim Bauen einmal passiert - `test_die_achse_erfindet_keinen_preis` fiel
+    aus, weil ein Test vor ihm die Seite ueberschrieben hatte.
+    """
+    return _seite.context.browser, _seite.url
+
+
+@pytest.fixture
+def _eigene_seite(_umgebung):
+    """Eine frische Seite je Test, aus demselben Browser."""
+    browser, url = _umgebung
+    seite = browser.new_page(viewport={"width": 1440, "height": 900})
+    seite.goto(url, wait_until="load")
+    try:
+        yield seite
+    finally:
+        seite.close()
+
+
+def _stelle_daten(seite, geraet):
+    """Den Verlaufsblock ersetzen und `app.js` frisch darauf laufen lassen.
+
+    `app.js` liest den Block beim Laden, deshalb wird der geaenderte Baum als
+    Inhalt neu gesetzt. Das geht NUR auf einer eigenen Seite - auf der
+    gemeinsamen bliebe der gestellte Stand fuer alle folgenden Tests stehen.
+    """
+    seite.evaluate(
+        "(g) => { document.getElementById('gr-verlaufdaten').textContent ="
+        "           JSON.stringify([g]); }", geraet)
+    seite.set_content(seite.evaluate("document.documentElement.outerHTML"))
+    seite.wait_for_timeout(150)
+    seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    seite.fill("#gr-vsuche", geraet["label"].split()[0][:8])
+    seite.wait_for_timeout(150)
+    seite.click(".gr-vtreffer-zeile")
+    seite.wait_for_timeout(250)
+
+
+@pytest.fixture(scope="module")
 def _seite(tmp_path_factory):
     """Ein Browser, eine Seite - die Tests lesen daraus."""
     sync_playwright = pytest.importorskip(
@@ -168,7 +243,8 @@ def _seite(tmp_path_factory):
     state = root / "data" / "state"
     state.mkdir(parents=True)
     (state / "geraete_db.json").write_text(json.dumps(_DB), encoding="utf-8")
-    (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"
@@ -615,19 +691,51 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     """Zwei Zahlen fuer dieselbe Sache auf einem Bildschirm. Die Tabelle
     rechnete ueber den vollen Zeitraum, waehrend Diagramm, Legende und
     Kacheln dem Zeitraumfilter folgten - sie nannte einen Anbieter, der im
-    Bild nicht vorkam, mit einem Datum ausserhalb des Fensters."""
+    Bild nicht vorkam, mit einem Datum ausserhalb des Fensters.
+
+    Seit dem 30.08.2026 in ZWEI Lagen geprueft. Der Test verengte das
+    Fenster auf den letzten Tag - und damit faellt die Auswahl unter
+    `DIAGRAMM_AB_TERMINEN`: es gibt dann gar kein Diagramm und folglich
+    keine Legende, gegen die sich vergleichen liesse. Die Zusicherung, um
+    die es geht, gilt trotzdem in beiden Lagen, sie lautet nur verschieden:
+    mit Diagramm nennen Legende und Tabelle dieselben Anbieter, ohne
+    Diagramm bleibt die Tabelle stehen und folgt weiter dem Filter."""
     _frisch(_seite)
     assert _waehle_geraet(_seite)
-    von = _seite.eval_on_selector("#gr-vbis", "e => e.value")
-    _seite.fill("#gr-vvon", von)          # Fenster auf den letzten Tag
+
+    def anbieter_der_tabelle():
+        return set(_seite.eval_on_selector_all(
+            "#gr-vtabelle tbody tr td:first-child",
+            "e => e.map(x => x.textContent.trim())"))
+
+    def legende():
+        return set(_seite.eval_on_selector_all(
+            ".gr-vlegende-teil", "e => e.map(x => x.textContent.trim())"))
+
+    # 1. Volles Fenster: das Diagramm steht, und beide nennen dasselbe.
+    assert _seite.is_visible("#gr-vbild svg"), (
+        "ohne Diagramm prueft der erste Zweig nichts")
+    voll = anbieter_der_tabelle()
+    assert voll and voll == legende(), (voll, legende())
+    assert _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()") \
+        == str(len(voll))
+
+    # 2. Fenster auf den letzten Tag: unter der Schwelle, also kein Bild -
+    #    die Tabelle bleibt und zeigt nur noch, was in diesem Tag steht.
+    bis = _seite.eval_on_selector("#gr-vbis", "e => e.value")
+    _seite.fill("#gr-vvon", bis)
     _seite.wait_for_timeout(200)
-    legende = set(_seite.eval_on_selector_all(
-        ".gr-vlegende-teil", "e => e.map(x => x.textContent.trim())"))
-    tabelle = set(_seite.eval_on_selector_all(
-        "#gr-vtabelle tbody tr td:first-child", "e => e.map(x => x.textContent.trim())"))
-    assert tabelle == legende, (tabelle, legende)
-    kachel = _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()")
-    assert kachel == str(len(legende))
+    assert not _seite.is_visible("#gr-vbild svg"), (
+        "ein Tag ist kein Verlauf - hier darf kein Diagramm stehen")
+    assert not legende(), "keine Legende ohne Diagramm"
+    eng = anbieter_der_tabelle()
+    assert eng, "die Tabelle verschwindet nicht mit dem Diagramm"
+    assert eng <= voll, (eng, voll)
+    tage = set(_seite.eval_on_selector_all(
+        "#gr-vtabelle tbody tr td:last-child",
+        "e => e.map(x => x.textContent.trim())"))
+    assert len(tage) == 1, (
+        f"die Tabelle folgt dem Filter nicht: {tage}")
 
 
 def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
@@ -640,3 +748,293 @@ def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
     assert _seite.eval_on_selector_all("#tafel-verlauf svg", "e => e.length") == 0
     assert _seite.eval_on_selector(
         "#gr-vleer", "e => getComputedStyle(e).display") != "none"
+
+
+
+# ==========================================================================
+# NACHBESSERUNG 30.08.2026 - im echten Chromium, weil es im HTML nicht steht
+# ==========================================================================
+
+def test_die_kachel_und_der_satz_nennen_dieselbe_zahl(_seite):
+    """Antonios Befund: "Die Kachel sagt 4 Messpunkte, der Satz darunter
+    5 Messtermine."
+
+    Beide Zahlen stimmten und zaehlten Verschiedenes: die Kachel die
+    Preispunkte ueber alle Anbieter dieses Geraets, der Satz die Messtage
+    ueber ALLE Geraete. Fuer den Leser sind das zwei Zahlen fuer dieselbe
+    Sache. Jetzt zaehlen beide Messtage, und sobald eine Auswahl steht,
+    spricht auch der Satz ueber dieses eine Geraet."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+
+    kacheln = _seite.eval_on_selector_all(
+        ".gr-vkachel", "e => e.map(x => x.innerText.replace(/\\n/g, ' '))")
+    passend = [k for k in kacheln if "Messtermin" in k]
+    assert len(passend) == 1, kacheln
+    aus_kachel = int(re.search(r"\d+", passend[0]).group())
+    assert aus_kachel == len(_MESSTAGE), (passend, _MESSTAGE)
+
+    satz = (_seite.text_content("#gr-vstand") or "").strip()
+    assert f"{aus_kachel} Messtermine" in satz, (satz, aus_kachel)
+    assert ".." not in satz, f"doppelter Satzpunkt: {satz!r}"
+    # Der Gattersatz schweigt hier - sonst stuende dieselbe Zahl zweimal.
+    assert not _seite.is_visible("#gr-vzukurz")
+
+
+def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
+    """Ein Messtermin ist ein TAG, an dem gemessen wurde.
+
+    Die erste Fassung zaehlte NACH der Rasterung: der 03. und der 04.08.
+    liegen in derselben Kalenderwoche und waren damit EIN Termin, und im
+    Quartalsraster haette jedes Geraet genau einen gehabt. Der Umschalter
+    haette so die Zahl der Messungen veraendert. Das Raster formt die LINIE,
+    es formt nicht die Datenlage."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+
+    # Gegenprobe: zwei Messtage MUESSEN in dieselbe Woche fallen, sonst
+    # koennte die Rasterung die Zahl gar nicht veraendern und der Test
+    # prueft eine Regel, die nicht greifen kann.
+    from datetime import date
+    wochen = {date.fromisoformat(t).isocalendar()[:2] for t in _MESSTAGE}
+    assert len(wochen) < len(_MESSTAGE), (
+        f"alle Messtage in verschiedenen Wochen: {_MESSTAGE}")
+
+    def termine():
+        return _seite.text_content("#gr-vpkt").strip()
+
+    assert termine() == str(len(_MESSTAGE)), termine()
+    for raster in ("monat", "quartal", "woche"):
+        _seite.click(f'.gr-vknopf[data-raster="{raster}"]')
+        _seite.wait_for_timeout(150)
+        assert termine() == str(len(_MESSTAGE)), f"{raster}: {termine()}"
+
+
+def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
+    """Antonios Befund: "Die Vodafone-Linie ist unsichtbar - sie liegt bei
+    1.099,90 EUR exakt unter der mobilcom-debitel-Linie bei 1.099,00 EUR,
+    90 Cent Abstand auf einer Achse von 793 bis 1.100 EUR. In der Legende
+    steht Vodafone, im Bild ist es nicht."
+
+    Sie wird gestrichelt gezeichnet und bekommt ein Etikett an ihrem Ende -
+    beides auf ihrer WAHREN Hoehe. VERSCHOBEN WIRD NICHTS: die Y-Achse
+    gehoert dem Preis, das ist die Lehre aus der geloeschten Positionskarte,
+    deren Etiketten bis zu 235 px neben ihrem Punkt standen.
+
+    Der Fall wird gestellt - die Fixture haelt ihre Preise bewusst weit
+    auseinander. Gerechnet wird trotzdem vom echten `app.js`."""
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(seite, {
+        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
+        "speicher": 128, "suchtext": "probefall", "min": 793, "max": 1100,
+        "anbieter": 3, "messpunkte": 3 * len(tage), "messtermine": len(tage),
+        "tage": tage, "aktuell": [],
+        "reihen": [
+            {"anbieter": "mobilcom-debitel", "farbe": "#2b5bd7", "eigen": False,
+             "punkte": [{"datum": t, "preis": 1099.0} for t in tage]},
+            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
+             "punkte": [{"datum": t, "preis": 1099.9} for t in tage]},
+            {"anbieter": "o2", "farbe": "#217a3c", "eigen": False,
+             "punkte": [{"datum": t, "preis": 793.0 + i * 35}
+                        for i, t in enumerate(tage)]},
+        ]})
+
+    striche = seite.eval_on_selector_all(
+        "#gr-vbild path", "e => e.map(x => x.getAttribute('stroke-dasharray'))")
+    assert len(striche) == 3, striche
+    assert len([x for x in striche if x]) == 1, (
+        f"genau eine der drei Linien liegt verdeckt: {striche}")
+
+    etiketten = seite.eval_on_selector_all(
+        "#gr-vbild .gr-vetikett", "e => e.map(x => x.textContent)")
+    assert len(etiketten) == 1, etiketten
+    assert "Vodafone" in etiketten[0] and "1.099,90" in etiketten[0], etiketten
+
+    lage = seite.evaluate("""() => {
+        const svg = document.querySelector('#gr-vbild svg');
+        const t = svg.querySelector('.gr-vetikett');
+        const kasten = t.getBBox();
+        const kreise = [...svg.querySelectorAll('circle')]
+            .map(c => +c.getAttribute('cy'));
+        const y = +t.getAttribute('y');
+        return { abstand: Math.min(...kreise.map(cy => Math.abs(cy - y))),
+                 rechts: kasten.x + kasten.width,
+                 breite: svg.viewBox.baseVal.width,
+                 groesse: parseFloat(getComputedStyle(t).fontSize) };
+    }""")
+    assert lage["abstand"] <= 6, (
+        f"das Etikett steht {lage['abstand']} px neben jedem Punkt - genau "
+        f"der Fehler der geloeschten Positionskarte")
+    assert lage["rechts"] <= lage["breite"], (
+        f"das Etikett laeuft aus dem Bild: {lage['rechts']} > {lage['breite']}")
+    assert lage["groesse"] >= MIN_SCHRIFT, lage["groesse"]
+
+
+def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
+    """Antonios Befund: "Bei Pixel 10 Pro 128 GB zwei Datumsmarken (10.8. und
+    30.8.), dazwischen nichts."
+
+    Zwei Punkte ergeben eine Gerade, und eine Gerade durch zwei Punkte sieht
+    aus wie ein Trend. Unter der Schwelle steht deshalb die Tabelle allein,
+    mit einem Satz darueber.
+
+    Der Fall wird ueber den Zeitraumfilter hergestellt - er verengt die
+    Auswahl auf zwei Messtage, und das ist genau die Datenlage, die Antonio
+    vor sich hatte."""
+    _frisch(_seite)
+    assert _waehle_geraet(_seite)
+    assert _seite.is_visible("#gr-vbild svg"), (
+        "ohne Diagramm im Ausgangszustand prueft der Test nicht die Aenderung")
+
+    _seite.fill("#gr-vvon", _MESSTAGE[0])
+    _seite.fill("#gr-vbis", _MESSTAGE[1])
+    _seite.wait_for_timeout(200)
+
+    assert not _seite.is_visible("#gr-vbild svg"), (
+        "unter der Schwelle darf kein Diagramm stehen - auch kein leeres")
+    assert not _seite.eval_on_selector_all(".gr-vlegende-teil", "e => e.length")
+    hinweis = (_seite.text_content("#gr-vzukurz") or "").strip()
+    assert "2 Messtermine" in hinweis, hinweis
+    assert "ab 4" in hinweis, hinweis
+    assert ".." not in hinweis, f"doppelter Satzpunkt: {hinweis!r}"
+    # Und die Zahl steht nur EINMAL da.
+    assert not _seite.is_visible("#gr-vstand")
+    assert _seite.is_visible("#gr-vtabelle table"), (
+        "die Tabelle ersetzt das Diagramm, sie verschwindet nicht mit ihm")
+
+
+@pytest.mark.parametrize("tafel,knopf,schluessel", [
+    ("tafel-alarme", "euro", "sEuro"),
+    ("tafel-alarme", "prozent", "sProzent"),
+    ("tafel-katalog", "preis", "sPreis"),
+])
+def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
+        _seite, tafel, knopf, schluessel):
+    """"Bei acht Spalten und 24 Zeilen ist Sortieren nach Euro-Abstand statt
+    Prozent die erste Frage, die jemand hat."
+
+    Sortiert wird nach dem ROHWERT an der Zeile, nicht nach dem Zelltext:
+    "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €", und ein
+    Sortierer, der die Zelle liest, stellt den teuersten Preis nach vorn und
+    sieht dabei richtig aus."""
+    _frisch(_seite)
+    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+    _seite.wait_for_timeout(80)
+
+    def sichtbare_werte():
+        return _seite.eval_on_selector_all(
+            f"#{tafel} .gr-a-zeile",
+            "(e, k) => e.filter(x => getComputedStyle(x).display !== 'none')"
+            "           .map(x => parseFloat(x.dataset[k]))", schluessel)
+
+    wahl = f'#{tafel} .gr-sort[data-sort="{knopf}"]'
+
+    def geordnet():
+        """Die Reihenfolge MUSS zu dem passen, was `aria-sort` behauptet.
+
+        Absolut zu pruefen ginge hier fehl: die Prozentspalte steht schon in
+        der Vorgabe absteigend (so liefert `geraete_alarme.zeilen()`), und
+        ein Klick darauf dreht sie folglich auf aufsteigend. Ein Test, der
+        auf dem ersten Klick "absteigend" verlangt, misst nicht die
+        Sortierung, sondern die Vorbelegung."""
+        richtung = _seite.get_attribute(wahl, "aria-sort")
+        assert richtung in ("ascending", "descending"), richtung
+        werte = sichtbare_werte()
+        assert len(werte) > 1, f"{tafel}: zu wenige sichtbare Zeilen"
+        if richtung == "descending":
+            assert all(werte[i] >= werte[i + 1] for i in range(len(werte) - 1)), werte
+        else:
+            assert all(werte[i] <= werte[i + 1] for i in range(len(werte) - 1)), werte
+        return richtung
+
+    _seite.click(wahl)
+    _seite.wait_for_timeout(150)
+    erste = geordnet()
+
+    _seite.click(wahl)
+    _seite.wait_for_timeout(150)
+    zweite = geordnet()
+    assert erste != zweite, (
+        f"der zweite Klick dreht die Richtung nicht: {erste}")
+
+
+def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
+    """Der teuerste Fehler, den eine Sortierung mit Deckel machen kann.
+
+    `SICHTBAR_MAX` begrenzt die Seitenhoehe; die sichtbaren Zeilen sind die
+    ERSTEN zwoelf der aktuellen Ordnung. Bliebe `gr-a-rest` an den
+    urspruenglichen Zeilen kleben, zeigte eine Sortierung nach Euro die
+    zwoelf groessten PROZENTwerte, untereinander nach Euro geordnet - eine
+    Rangliste, die es nicht gibt, und der groesste Euro-Abstand stuende
+    nicht darunter."""
+    _frisch(_seite)
+
+    def sichtbar(schluessel):
+        return _seite.eval_on_selector_all(
+            "#tafel-alarme .gr-a-zeile",
+            "(e, k) => e.filter(x => getComputedStyle(x).display !== 'none')"
+            "           .map(x => parseFloat(x.dataset[k]))", schluessel)
+
+    def alle(schluessel):
+        return _seite.eval_on_selector_all(
+            "#tafel-alarme .gr-a-zeile",
+            "(e, k) => e.map(x => parseFloat(x.dataset[k]))", schluessel)
+
+    # Gegenprobe: der Deckel muss ueberhaupt greifen, sonst ist der Fall
+    # nicht ausloesbar und der Test gruen ohne Aussage.
+    assert len(sichtbar("sEuro")) < len(alle("sEuro")), (
+        "kein Deckel aktiv - dann prueft dieser Test nichts")
+    # Und die zwei Ordnungen muessen sich unterscheiden.
+    nach_prozent = sorted(alle("sProzent"), reverse=True)
+    assert nach_prozent != sorted(alle("sEuro"), reverse=True), (
+        "Prozent und Euro ordnen gleich - der Fall ist nicht ausloesbar")
+
+    _seite.click('#tafel-alarme .gr-sort[data-sort="euro"]')
+    _seite.wait_for_timeout(150)
+    oben = sichtbar("sEuro")
+    assert oben, "keine sichtbare Zeile nach dem Sortieren"
+    assert max(oben) == max(alle("sEuro")), (
+        "der groesste Euro-Abstand steht nicht unter den sichtbaren Zeilen - "
+        "der Deckel klebt an der alten Ordnung")
+
+
+def test_die_achse_beschriftet_keine_zwei_linien_gleich(_eigene_seite):
+    """Beim Durchspielen der Randfaelle gefunden, nicht auf Antonios Liste.
+
+    `Math.round` reicht, solange die Preisspanne mehrere Euro breit ist. Bei
+    drei Anbietern zwischen 900,00 und 900,20 EUR stand die Achse fuenfmal
+    mit "900 €" da - fuenf Hilfslinien, die behaupten, fuenf verschiedene
+    Hoehen zu benennen. Dieselbe Fehlerklasse wie die drei "1000 €" bei
+    einem Preis von 999,00, gegen die `test_die_achse_erfindet_keinen_preis`
+    gebaut ist: eine Achse, der man nicht glauben kann."""
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(seite, {
+        "id": "eng", "label": "Engfall 128 GB", "hersteller": "Eng",
+        "speicher": 128, "suchtext": "engfall", "min": 900.0, "max": 900.2,
+        "anbieter": 3, "messpunkte": 3 * len(tage), "messtermine": len(tage),
+        "tage": tage, "aktuell": [],
+        "reihen": [
+            {"anbieter": "o2", "farbe": "#2b5bd7", "eigen": False,
+             "punkte": [{"datum": t, "preis": 900.0} for t in tage]},
+            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
+             "punkte": [{"datum": t, "preis": 900.1} for t in tage]},
+            {"anbieter": "mobilcom-debitel", "farbe": "#217a3c", "eigen": False,
+             "punkte": [{"datum": t, "preis": 900.2} for t in tage]},
+        ]})
+
+    achse = seite.eval_on_selector_all(
+        ".gr-vsvg text",
+        "e => e.filter(t => t.textContent.includes('€'))"
+        "      .map(t => t.textContent.trim())")
+    assert len(achse) > 1, (
+        f"nur {len(achse)} Achsenmarke(n) - der Fall ist nicht ausloesbar: {achse}")
+    assert len(set(achse)) == len(achse), (
+        f"zwei Hilfslinien mit demselben Text: {achse}")
+
+    # Und keine Marke liegt ausserhalb der Daten - die Regel von 30.08.2026
+    # gilt weiter, sie wird nur genauer beschriftet.
+    werte = [float(t.replace("\u00a0", "").replace("€", "").strip()
+                    .replace(".", "").replace(",", ".")) for t in achse]
+    assert min(werte) >= 900.0 - 0.01 and max(werte) <= 900.2 + 0.01, achse

@@ -38,9 +38,22 @@
    2000-Euro-Geraet nichts. Die Pille ersetzt jede Legende - die Zeile sagt
    selbst, wie schlimm sie ist. #}
 {% macro alarmzeile(z, nr, rest=False) %}
+  {# Die Sortierschluessel stehen als Zahl an der ZEILE, nicht im Zelltext.
+     "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €", und ein
+     Sortierer, der das aus der Zelle liest, ordnet den teuersten Preis nach
+     vorn. Die Rohwerte kommen aus `geraete_alarme.zeilen()` - dieselben,
+     aus denen die Zelle gesetzt wird. #}
   <tr class="gr-a-zeile{% if rest %} gr-a-rest{% endif %}" data-auf="auf-{{ nr }}"
       data-marke="{{ z.hersteller }}" data-modell="{{ z.modell }}"
-      data-speicher="{{ z.speicher or '' }}" tabindex="0">
+      data-speicher="{{ z.speicher or '' }}"
+      data-s-geraet="{{ z.modell }} {{ z.speicher or '' }}"
+      data-s-laden="{{ z.bester.laden }}"
+      data-s-unser="{{ z.unser.preis }}"
+      data-s-fremd="{{ z.bester.preis }}"
+      data-s-prozent="{{ z.prozent }}"
+      data-s-euro="{{ z.euro }}"
+      data-s-stufe="{{ z.prozent }}"
+      data-s-abgerufen="{{ z.bester.abgerufen_am }}" tabindex="0">
     <td><span class="gr-a-modell">{{ z.modell }}</span>
       <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
         %}Speicher unbekannt{% endif %}</span></td>
@@ -57,14 +70,21 @@
       '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
       <span class="gr-a-euro">{{ '%.2f'|format(z.euro)|replace('.', ',') }} €</span></td>
     <td><span class="gr-pille gr-pille--{{ z.stufe }}">{{ z.stufe_name }}</span></td>
-    <td>{% if z.bester.verfuegbarkeit == 'lieferbar' %}<span
-        class="gr-pille gr-pille--ja">Verfügbar</span>
-      {% elif z.bester.verfuegbarkeit == 'ausverkauft' %}<span
-        class="gr-pille gr-pille--nein">Nicht lieferbar</span>
-      {% else %}<span class="gr-pille gr-pille--unklar">unbekannt</span>{% endif %}</td>
+    {# KEINE VERFUEGBARKEITSSPALTE MEHR (30.08.2026).
+
+       Sie stand hier mit drei Zustaenden und sagte an der echten Ausgabe in
+       12 von 13 Zeilen "unbekannt" - die Netzbetreiber-Schnittstellen
+       liefern das Feld nicht, nur ALDI TALK tut es. Eine Spalte, die in
+       neun von zehn Faellen "weiss ich nicht" sagt, kostet Breite in der
+       Tabelle, die die eine Frage dieses Reiters beantworten soll, und sie
+       kostet Vertrauen in die Spalten daneben.
+
+       Geloescht ist sie nicht: der Geraetekatalog (Reiter 2) traegt sie
+       weiter, dort ist Platz und dort steht der Bestand. Sobald die Quellen
+       das Feld verlaesslich liefern, gehoert sie zurueck. #}
     <td><span class="gr-a-klein gr-a-datum">{{ z.bester.abgerufen_am | date_de }}</span></td>
   </tr>
-  <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="8">
+  <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="7">
     <ul class="gr-a-liste">
       {% for a in z.alle %}
       <li><span{% if a.eigen %} class="gr-a-eigen"{% endif %}>{{ a.laden }}</span>
@@ -102,7 +122,21 @@
       <p class="page-kicker">Deutschland · Geräte</p>
       <h1>Was die anderen im Regal haben.</h1>
     </div>
-    {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
+    {# DAS KOPFDATUM IST DAS ABRUFDATUM, nicht der Berichtstag (30.08.2026).
+
+       Bis dahin stand hier `geraete.stand`, also der Tag der Ausgabe. Der
+       Geraetezweig laeuft aber NAECHTLICH und der Bericht zweimal die Woche:
+       am 30.08.2026 sagte der Kopf "Stand 28. August 2026", waehrend jede
+       Tabellenzeile darunter "30. August 2026" trug und der Fliesstext am
+       Seitenende es richtig erklaerte. Wer zwei Zahlen im selben Blick
+       vergleicht, haelt die juengere Seite fuer die aeltere.
+
+       `abgerufen_bis` ist der spaeteste Abruf im Bestand - dieselbe Zahl,
+       die in den Zeilen steht. Faellt der naechtliche Lauf aus, altert das
+       Kopfdatum mit den Daten, statt Frische zu behaupten. #}
+    {% if geraete.abgerufen_bis %}<span class="page-date">Preise vom {{
+      geraete.abgerufen_bis | date_de }}</span>
+    {% elif geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
   </div>
   <p class="page-lead">Wo liegen wir im Preis zurück, was führt der
   Wettbewerb, und wie tief ist sein Portfolio? Jeder Preis stammt aus den
@@ -166,15 +200,45 @@
   {% if al.gesamt %}
   <div class="gr-alarm-scroll">
   <table class="gr-alarm">
+    {# SORTIERBAR (30.08.2026). Bei acht Spalten und 24 Zeilen ist "sortiere
+       nach Euro-Abstand statt nach Prozent" die erste Frage, die jemand vor
+       dieser Tabelle hat - 15 Euro sind bei einem 200-Euro-Geraet viel und
+       bei einem 2000-Euro-Geraet nichts, und beide Sichten sind richtig.
+
+       `data-sort` nennt den Schluessel an der Zeile, `data-art` sagt, ob
+       nach Zahl oder nach Text geordnet wird. Die Vorbelegung steht auf
+       "Unterschied, absteigend" - das ist die Reihenfolge, in der
+       `geraete_alarme.zeilen()` liefert, und die Kopfzeile sagt sie jetzt
+       auch. #}
     <thead><tr>
-      <th scope="col">Gerät</th>
-      <th scope="col">günstigster Wettbewerber</th>
-      <th scope="col" class="num">unser Preis</th>
-      <th scope="col" class="num">Wettbewerbspreis</th>
-      <th scope="col" class="num">Unterschied</th>
-      <th scope="col">Einstufung</th>
-      <th scope="col">verfügbar</th>
-      <th scope="col">abgerufen</th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
+        data-art="text">Gerät</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="laden"
+        data-art="text">günstigster Wettbewerber</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="unser" data-art="zahl">unser Preis</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="fremd" data-art="zahl">Wettbewerbspreis</button></th>
+      {# EINE Spalte, ZWEI Sortierungen. Die Zelle darunter traegt beide
+         Zahlen (Prozent gross, Euro klein) - das ist die Entscheidung vom
+         30.08.2026 und sie bleibt. Zwei Spalten daraus zu machen hiesse,
+         dieselbe Groesse zweimal zu setzen; ein zweiter Knopf im Kopf
+         beantwortet Antonios Frage ohne das. #}
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="prozent" data-art="zahl" data-vor="ab"
+        aria-sort="descending">Unterschied&nbsp;%</button>{#
+        #}<span class="gr-sort-trenner" aria-hidden="true">·</span>{#
+        Ein SICHTBARES Trennzeichen zwischen den zwei Knoepfen. Ohne es las
+        die Kopfzeile "UNTERSCHIED %€" - genau der Fehler, der in dieser
+        Sitzung aus 24 Generationen und 54 Modellen "2454 Modelle" gemacht
+        hat: zwei Inline-Elemente ohne ein Zeichen dazwischen sind fuer das
+        Auge ein Wort. #}<button type="button"
+        class="gr-sort gr-sort--zweit" data-sort="euro" data-art="zahl"
+        aria-label="nach Unterschied in Euro sortieren">€</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="stufe"
+        data-art="zahl">Einstufung</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="abgerufen" data-art="text">abgerufen</button></th>
     </tr></thead>
     <tbody>
       {% for z in al.sichtbar %}{{ alarmzeile(z, loop.index) }}{% endfor %}
@@ -266,17 +330,38 @@
 
   <div class="gr-alarm-scroll">
   <table class="src-table gr-alarm" id="gr-katalogtabelle">
+    {# Dieselbe Sortiermechanik wie in Reiter 1 - `grFilterleiste` traegt
+       beide Tabellen, und der Katalog ist mit 352 Zeilen der laengere.
+       Die Preisspalte sortiert nach dem Rohwert; eine Zeile ohne Preis
+       traegt keinen Schluessel und faellt ans Ende. #}
     <thead><tr>
-      <th scope="col">Gerät</th><th scope="col">Farbe</th>
-      <th scope="col">Anbieter</th><th scope="col" class="num">Preis</th>
-      <th scope="col">Zustand</th><th scope="col">Verfügbar</th>
-      <th scope="col">Abgerufen</th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
+        data-art="text">Gerät</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="farbe"
+        data-art="text">Farbe</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="anbieter"
+        data-art="text">Anbieter</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="preis" data-art="zahl">Preis</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="zustand"
+        data-art="text">Zustand</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="verfuegbar" data-art="text">Verfügbar</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="abgerufen" data-art="text">Abgerufen</button></th>
     </tr></thead>
     <tbody>
     {% for z in geraete.katalogtabelle %}
       <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if loop.index0 >= geraete.katalog_sichtbar }}"
           data-marke="{{ z.hersteller }}" data-anbieter="{{ z.anbieter }}"
-          data-speicher="{{ z.speicher or '' }}" data-zustand="{{ z.zustand }}">
+          data-speicher="{{ z.speicher or '' }}" data-zustand="{{ z.zustand }}"
+          data-s-geraet="{{ z.modell }} {{ z.speicher or '' }}"
+          data-s-farbe="{{ z.farbe or '' }}"
+          data-s-anbieter="{{ z.anbieter }}"
+          data-s-preis="{{ z.preis if z.preis is not none else (z.zuzahlung if z.zuzahlung is not none else '') }}"
+          data-s-zustand="{{ z.zustand }}"
+          data-s-verfuegbar="{{ z.verfuegbarkeit }}"
+          data-s-abgerufen="{{ z.abgerufen_am }}">
         <td><span class="gr-a-modell">{{ z.modell }}</span>
           <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
             %}Speicher unbekannt{% endif %}</span></td>
@@ -293,6 +378,12 @@
         {# DREI Zustaende, nicht zwei. "unbekannt" heisst, dass die Quelle
            nichts gesagt hat - in Alarmrot gesetzt saehe das aus wie "nicht
            lieferbar", und bei o2 traefe es 68 von 68 Zeilen. #}
+        {# EIN WORT JE ZUSTAND, auf der ganzen Seite (30.08.2026).
+           Derselbe Zustand hiess in der Alarmtabelle "unbekannt" und hier
+           "keine Angabe" - zwei Woerter fuer eine Sache lesen sich wie zwei
+           Sachen. Die Alarmtabelle traegt die Spalte nicht mehr; hier gilt
+           "keine Angabe", weil das die Quelle beschreibt und nicht den
+           Leser. #}
         <td><span class="gr-pille gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
           %}gering{% elif z.verfuegbarkeit in ('unbekannt', '')
           %}unbekannt{% else %}kritisch{% endif %}">{{
@@ -363,18 +454,40 @@
     <div class="gr-vkachel"><b id="gr-vmin">–</b><span>Niedrigster Preis</span></div>
     <div class="gr-vkachel"><b id="gr-vmax">–</b><span>Höchster Preis</span></div>
     <div class="gr-vkachel"><b id="gr-vanb">–</b><span>Anbieter mit Daten</span></div>
-    <div class="gr-vkachel"><b id="gr-vpkt">–</b><span>Messpunkte</span></div>
+    {# MESSTERMINE, NICHT MESSPUNKTE (30.08.2026). Die Kachel zeigte die
+       Zahl der Preispunkte ueber alle Anbieter ("4"), der Satz unter dem
+       Diagramm die Zahl der Messtage ("5") - zwei Zahlen auf einem
+       Bildschirm fuer etwas, das der Leser fuer dieselbe Sache haelt.
+       Beide meinen jetzt Messtage, und der Satz darunter wird bei einer
+       Auswahl auf DIESES Geraet umgeschrieben, damit nur eine davon
+       gleichzeitig dasteht. #}
+    <div class="gr-vkachel"><b id="gr-vpkt">–</b><span>Messtermine</span></div>
   </div>
 
   {# Ohne Auswahl steht hier dieser Satz und sonst nichts. #}
   <p class="gr-erklaer" id="gr-vleer">Wählen Sie oben ein Gerät – dann steht
   hier sein Preisverlauf, mit einer Linie je Anbieter.</p>
 
+  {# Der Satz fuer den Fall, dass die Reihe fuer ein Diagramm zu kurz ist.
+     Er steht im HTML und wird von `app.js` gefuellt und eingeblendet - der
+     Text nennt die Zahl der Messtermine DIESES Geraets und die Schwelle,
+     ab der ein Verlauf entsteht. #}
+  <p class="gr-erklaer gr-basis--duenn" id="gr-vzukurz" hidden></p>
+
   <div class="gr-vbild" id="gr-vbild" hidden></div>
   <p class="gr-vlegende" id="gr-vlegende" hidden></p>
 
-  <p class="gr-erklaer gr-basis--duenn">Preisverlauf wird seit dem
-  {{ geraete.verlauf.seit | date_de }} erfasst –
+  {# EINE ZAHL ZUR ZEIT. Solange kein Geraet gewaehlt ist, spricht dieser
+     Satz ueber den ganzen Radar; sobald eine Auswahl steht, schreibt
+     `app.js` ihn auf das gewaehlte Geraet um. Vorher standen beide Zahlen
+     nebeneinander ("4 Messpunkte" / "5 Messtermine"), und der Leser konnte
+     nicht wissen, dass sie verschiedene Mengen zaehlen. #}
+  <p class="gr-erklaer gr-basis--duenn" id="gr-vstand"
+     data-alle="{{ geraete.verlauf.messtermine }}"
+     data-seit="{{ geraete.verlauf.seit | date_de }}"
+     data-wochen="{{ geraete.verlauf.belastbar_ab_wochen }}"
+     data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}">Preisverlauf
+  wird seit dem {{ geraete.verlauf.seit | date_de }} erfasst –
   {{ geraete.verlauf.messtermine }}
   {{ 'Messtermin' if geraete.verlauf.messtermine == 1 else 'Messtermine' }}.
   Aussagen zu Preisverfall und Verweildauer ab etwa
@@ -437,8 +550,35 @@
   <p class="gr-erklaer">Ein Wettbewerber, der das Vorjahresmodell im Regal
   lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
   Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17 Pro Max
-  sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz. Die
-  zweite Zahl nennt die Modelle dahinter.</p>
+  sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz.</p>
+  {# Der Satz "Die zweite Zahl nennt die Modelle dahinter" stand hier bis zum
+     30.08.2026 - er war noetig, solange die zweite Zahl kein Wort trug (und
+     hat, weil beide Zahlen verschmolzen dastanden, auf etwas gezeigt, das
+     gar nicht zu sehen war). Jetzt nennt jede Zahl sich selbst; ein Satz,
+     der eine Beschriftung erklaert, die dasteht, ist eine Erklaerung der
+     eigenen Darstellung (Beruhigungsregeln, CLAUDE.md 5). #}
+  {# BEIDE ZAHLEN TRAGEN IHR WORT, und zwischen ihnen steht ein sichtbares
+     Trennzeichen.
+
+     Bis zum 30.08.2026 stand hier `{{ t.generationen }}` und unmittelbar
+     dahinter, ohne ein Zeichen dazwischen, ein `rubrik-zusatz` mit
+     `{{ t.modelle_anzahl }} Modelle`. Beide Spans sassen in der 26 px
+     schmalen dritten Rasterspalte von `.dz-balken li`, und `margin-left:auto`
+     wirkt auf ein inline-Element ausserhalb eines Flex-Containers nicht.
+     Im Browser lasen die zwei Zahlen sich deshalb als EINE: aus 24
+     Generationen und 54 Modellen wurde "2454 Modelle", aus 20 und 41
+     "2041 Modelle". Bei 59 beobachteten Geraeten ist das die Sorte Zahl,
+     die jede andere Zahl der Seite unglaubwuerdig macht - und die
+     Generationenzahl, um die es in dieser Sektion ueberhaupt geht, war
+     dabei nirgends als eigene Zahl zu lesen.
+
+     DIE DATEN WAREN NIE FALSCH. `portfolio_tiefe` lieferte 24 und 54, beide
+     korrekt und beide unter dem Bestand. Das Akzeptanzkriterium ("keine
+     Kennzahl groesser als die Zahl beobachteter Geraete") war deshalb auch
+     im Datenmodell erfuellt - der Fehler entstand erst beim Setzen.
+
+     Die Zeile hat jetzt eine eigene Rasterspalte statt der 26 px, die fuer
+     EINE Zahl gedacht waren (`.gr-tiefe li` in style.css). #}
   <ul class="dz-balken gr-tiefe">
     {% set tiefstes = geraete.lifecycle.portfolio[0].generationen or 1 %}
     {% for t in geraete.lifecycle.portfolio %}{# eigen = rot, siehe geraete_lifecycle #}
@@ -450,8 +590,10 @@
       <span class="dz-balken-name">{{ t.anbieter }}</span>
       <span class="dz-balken-spur"><span class="dz-balken-fuell"
         style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
-      <span class="dz-balken-n">{{ t.generationen }}<span
-        class="rubrik-zusatz">{{ t.modelle_anzahl }} Modelle</span></span>
+      <span class="dz-balken-n gr-tiefe-n"><span class="gr-tiefe-gen">{{
+        t.generationen }} {{ 'Generation' if t.generationen == 1 else 'Generationen'
+        }}</span> · <span class="gr-tiefe-mod">{{ t.modelle_anzahl }} {{
+        'Modell' if t.modelle_anzahl == 1 else 'Modelle' }}</span></span>
     </li>
     {% endfor %}
   </ul>

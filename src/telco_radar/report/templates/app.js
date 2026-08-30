@@ -932,6 +932,91 @@ function grFilterleiste(tafelId, mehrId) {
     if (auf) auf.classList.toggle('gr-a-auf--an');
   });
 
+  /* SORTIEREN NACH SPALTE.
+
+     Drei Dinge, die hier leicht falsch gehen, und alle drei sind gemeint:
+
+     1. EINE ZEILE IST ZWEI ZEILEN. Zu jeder `.gr-a-zeile` gehoert ein
+        `.gr-a-auf` mit der Anbieterliste. Verschoben werden sie IMMER
+        zusammen - sonst haengt eine Anbieterliste unter einem fremden
+        Geraet, und zwar ohne dass es auffiele, solange sie zugeklappt ist.
+
+     2. SORTIERT WIRD NACH DEM ROHWERT, nicht nach dem Zelltext. "1.099,90 €"
+        ist als Zeichenkette kleiner als "199,00 €"; ein Sortierer, der die
+        Zelle liest, stellt den teuersten Preis nach vorn und sieht dabei
+        richtig aus.
+
+     3. DER DECKEL WIRD NEU VERGEBEN. `SICHTBAR_MAX` begrenzt die
+        Seitenhoehe, und die zwoelf sichtbaren Zeilen sind die ERSTEN zwoelf
+        der aktuellen Ordnung. Bliebe `gr-a-rest` an den urspruenglichen
+        Zeilen kleben, zeigte eine Sortierung nach Euro die zwoelf
+        groessten PROZENTwerte, untereinander nach Euro geordnet - eine
+        Rangliste, die es nicht gibt, und der teuerste Fall stuende nicht
+        darunter. */
+  var koepfe = tabelle.querySelectorAll('.gr-sort');
+  var deckel = tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
+             ? tabelle.querySelectorAll('.gr-a-zeile').length -
+               tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
+             : 0;
+
+  function sortiere(schluessel, art, richtung) {
+    var rumpf = tabelle.tBodies[0];
+    if (!rumpf) return;
+    var paare = [];
+    Array.prototype.forEach.call(
+      tabelle.querySelectorAll('.gr-a-zeile'), function (z) {
+        paare.push({ zeile: z, wert: z.getAttribute('data-s-' + schluessel) || '',
+                     auf: document.getElementById(z.getAttribute('data-auf')) });
+      });
+    var vz = richtung === 'ab' ? -1 : 1;
+    paare.sort(function (a, b) {
+      if (art === 'zahl') {
+        var x = parseFloat(a.wert), yy = parseFloat(b.wert);
+        if (isNaN(x)) x = -Infinity;
+        if (isNaN(yy)) yy = -Infinity;
+        if (x !== yy) return (x - yy) * vz;
+        return 0;
+      }
+      return a.wert.localeCompare(b.wert, 'de') * vz;
+    });
+    paare.forEach(function (p, i) {
+      rumpf.appendChild(p.zeile);
+      if (p.auf) rumpf.appendChild(p.auf);
+      // Der Deckel wird neu vergeben, siehe Punkt 3 oben. `deckel === 0`
+      // heisst: es gab nie Rest-Zeilen (oder "alle anzeigen" ist gedrueckt),
+      // dann bleibt alles sichtbar.
+      if (deckel) {
+        var raus = i >= deckel;
+        p.zeile.classList.toggle('gr-a-rest', raus);
+        if (p.auf) p.auf.classList.toggle('gr-a-rest', raus);
+      }
+    });
+    anwenden();
+  }
+
+  Array.prototype.forEach.call(koepfe, function (k) {
+    k.addEventListener('click', function () {
+      var schluessel = k.getAttribute('data-sort');
+      var art = k.getAttribute('data-art') || 'text';
+      // Erster Klick auf eine Zahlenspalte sortiert ABSTEIGEND: wer auf
+      // "Unterschied" klickt, will den groessten sehen, nicht den kleinsten.
+      // Bei Text ist es umgekehrt.
+      var vorher = k.getAttribute('data-vor');
+      var richtung;
+      if (vorher === 'ab') richtung = 'auf';
+      else if (vorher === 'auf') richtung = 'ab';
+      else richtung = (art === 'zahl') ? 'ab' : 'auf';
+      Array.prototype.forEach.call(koepfe, function (a) {
+        a.removeAttribute('data-vor');
+        a.removeAttribute('aria-sort');
+      });
+      k.setAttribute('data-vor', richtung);
+      k.setAttribute('aria-sort',
+                     richtung === 'ab' ? 'descending' : 'ascending');
+      sortiere(schluessel, art, richtung);
+    });
+  });
+
   // Einmal beim Laden. Manche Browser stellen Formularwerte beim Reload
   // wieder her; ohne diesen Aufruf zeigt die Tabelle dann ungefiltert an,
   // was das Auswahlfeld daneben nicht sagt.
@@ -1214,6 +1299,17 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
   var bild = document.getElementById('gr-vbild');
   var legende = document.getElementById('gr-vlegende');
   var tabelle = document.getElementById('gr-vtabelle');
+  var zukurz = document.getElementById('gr-vzukurz');
+  var stand = document.getElementById('gr-vstand');
+  /* Die zwei Schwellen kommen aus `report/geraete_verlauf.py` und stehen als
+     data-Attribute am Satz. Sie hier zu wiederholen waeren zwei Zahlen fuer
+     dieselbe Regel - genau der Fehler, den CLAUDE.md 6 fuer die
+     Stichwort-Vorschau beschreibt. */
+  var AB_TERMINEN = parseInt((stand && stand.dataset.abterminen) || '4', 10);
+  /* Zwei Linien, die naeher als das beieinander liegen, sind im Bild eine.
+     Anteil der gezeichneten Preisspanne, nicht Euro: 90 Cent sind bei einer
+     Spanne von 307 Euro unsichtbar und bei einer von 5 Euro deutlich. */
+  var ABSTAND = 0.02;
   var von = document.getElementById('gr-vvon');
   var bis = document.getElementById('gr-vbis');
   var gewaehlt = null, raster = 'woche';
@@ -1292,18 +1388,88 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     return n;
   }
 
+  /* EINE ZAHL ZUR ZEIT.
+
+     Ohne Auswahl spricht der Satz unter dem Diagramm ueber den ganzen Radar
+     ("seit dem 10. August, 5 Messtermine"). Sobald ein Geraet gewaehlt ist,
+     spricht er ueber DIESES Geraet - denn daneben steht dann die Kachel mit
+     genau dieser Zahl. Am 30.08.2026 standen beide gleichzeitig da, die
+     Kachel mit 4 und der Satz mit 5, und beide hatten recht: die eine
+     zaehlte die Termine dieses Geraets, die andere die aller Geraete. Zwei
+     richtige Zahlen fuer scheinbar dieselbe Sache sind fuer den Leser ein
+     Fehler der Seite. */
+  function termine(n) {
+    return n === 1 ? 'liegt 1 Messtermin' : 'liegen ' + n + ' Messtermine';
+  }
+  /* `tagDE` endet auf einem Punkt ("30.8."). Ein Satzpunkt dahinter ergibt
+     "30.8.." - im ersten Anlauf genau so auf der Seite gestanden, an ZWEI
+     Stellen. Deshalb setzt `punkt()` das Satzende, nicht der Aufrufer. */
+  function spanne(tage) {
+    return 'vom ' + tagDE(tage[0]) + ' bis zum ' + tagDE(tage[tage.length - 1]);
+  }
+  function punkt(text) {
+    return text.charAt(text.length - 1) === '.' ? text : text + '.';
+  }
+
+  function satzFuer(g, tage) {
+    if (!stand) return;
+    var wochen = stand.dataset.wochen;
+    var nachsatz = ' Aussagen zu Preisverfall und Verweildauer ab etwa ' +
+                   wochen + ' Wochen.';
+    if (!g || !tage || !tage.length) {
+      stand.hidden = false;
+      stand.textContent = 'Preisverlauf wird seit dem ' +
+        stand.dataset.seit + ' erfasst – ' + stand.dataset.alle + ' ' +
+        (stand.dataset.alle === '1' ? 'Messtermin' : 'Messtermine') + '.' +
+        nachsatz;
+      return;
+    }
+    /* UNTER DEM GATTER SCHWEIGT DIESER SATZ. Der Hinweis an der Stelle des
+       Diagramms sagt dann dasselbe, und zwar dort, wo die Frage entsteht -
+       beide zusammen waeren dieselbe Zahl zweimal auf einem Bildschirm,
+       genau die Beruhigungsregel aus CLAUDE.md 5. */
+    if (tage.length < AB_TERMINEN) { stand.hidden = true; return; }
+    stand.hidden = false;
+    stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
+      ' vor, ' + spanne(tage)) + nachsatz;
+  }
+
   function zeichne(g) {
     var vonT = von.value, bisT = bis.value;
-    var reihen = g.reihen.map(function (r) {
-      var ps = fassen(r.punkte.filter(function (p) {
-        return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
-      }), raster);
-      return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen, punkte: ps };
+    /* EIN MESSTERMIN IST EIN TAG, AN DEM GEMESSEN WURDE - unabhaengig
+       davon, welches Raster gerade gewaehlt ist.
+
+       Die erste Fassung zaehlte die Termine NACH `fassen()`, also die
+       gefuellten Zeitfenster. Beim Galaxy S25 128 GB standen damit "3
+       Messtermine" an der Kachel, obwohl an vier Tagen gemessen wurde -
+       zwei davon lagen in derselben Kalenderwoche. Der Umschalter
+       "Woechentlich/Monatlich" haette so die Zahl der Messungen veraendert,
+       und im Quartalsraster haette JEDES Geraet genau einen Termin gehabt.
+
+       Das Raster formt die LINIE, es formt nicht die Datenlage. Kachel,
+       Gatter und Satz rechnen deshalb auf `rohTage`; nur die Achse rechnet
+       auf den zusammengefassten Punkten. */
+    var gefiltert = g.reihen.map(function (r) {
+      return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
+               roh: r.punkte.filter(function (p) {
+                 return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
+               }) };
+    });
+    var rohMenge = {};
+    gefiltert.forEach(function (r) {
+      r.roh.forEach(function (p) { rohMenge[p.datum] = 1; });
+    });
+    var rohTage = Object.keys(rohMenge).sort();
+
+    var reihen = gefiltert.map(function (r) {
+      return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
+               punkte: fassen(r.roh, raster) };
     }).filter(function (r) { return r.punkte.length; });
 
     bild.innerHTML = '';
     legende.innerHTML = '';
     tabelle.innerHTML = '';
+    if (zukurz) { zukurz.hidden = true; zukurz.textContent = ''; }
     if (!reihen.length) {
       leer.hidden = false;
       leer.textContent = 'Für diesen Zeitraum liegen keine Messpunkte vor.';
@@ -1312,7 +1478,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       return;
     }
     leer.hidden = true;
-    bild.hidden = false; legende.hidden = false; tabelle.hidden = false;
+    tabelle.hidden = false;
     kacheln.hidden = false;
 
     var alle = [], tage = {};
@@ -1321,6 +1487,44 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     });
     var tageSort = Object.keys(tage).sort();
     var lo = Math.min.apply(null, alle), hi = Math.max.apply(null, alle);
+
+    /* DIE KACHELN UND DER SATZ GEHOEREN NICHT ZUM DIAGRAMM.
+
+       Sie stehen deshalb hier, vor dem Gatter darunter: auch ein Geraet mit
+       zwei Messterminen hat einen niedrigsten und einen hoechsten Preis,
+       und die Zahl seiner Termine ist gerade dann die wichtigste Auskunft
+       der Seite. */
+    document.getElementById('gr-vmin').textContent = euro(lo);
+    document.getElementById('gr-vmax').textContent = euro(hi);
+    document.getElementById('gr-vanb').textContent = reihen.length;
+    /* MESSTERMINE, nicht Preispunkte - dieselbe Menge, die das Gatter zaehlt
+       und die der Satz darunter nennt. Vorher stand hier `alle.length`
+       (Preispunkte ueber alle Anbieter) unter der Ueberschrift
+       "Messpunkte", waehrend zwei Zeilen tiefer eine andere Zahl unter
+       "Messtermine" stand. */
+    document.getElementById('gr-vpkt').textContent = rohTage.length;
+    satzFuer(g, rohTage);
+
+    /* GATTER: unter AB_TERMINEN Messterminen KEIN Diagramm.
+
+       Zwei Punkte ergeben eine Gerade, und eine Gerade durch zwei Punkte
+       sieht aus wie ein Trend. Die Tabelle darunter sagt dasselbe ohne die
+       Behauptung, und der Satz sagt, ab wann ein Verlauf entsteht. Ein
+       leeres Bild mit Rasterlinien und Legende ist keine ehrlichere
+       Darstellung derselben Lage - es ist eine unehrlichere. */
+    if (rohTage.length < AB_TERMINEN) {
+      bild.hidden = true; legende.hidden = true;
+      if (zukurz) {
+        zukurz.hidden = false;
+        zukurz.textContent = punkt('Für dieses Gerät ' +
+          termine(rohTage.length) + ' vor, ' + spanne(rohTage)) +
+          ' Ein Verlauf entsteht ab ' + AB_TERMINEN +
+          '. Bis dahin stehen die Preise als Tabelle darunter.';
+      }
+      tabelleBauen(reihen);
+      return;
+    }
+    bild.hidden = false; legende.hidden = false;
     // EINE SPANNE VON NULL ist der Normalfall, nicht der Sonderfall: 41 der
     // 89 waehlbaren Geraete haben genau einen Preis. Die erste Fassung schob
     // dafuer `hi` auf `lo + 1` - und beschriftete die vier Hilfslinien aus
@@ -1334,8 +1538,61 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     // `hi === lo + 1` als Erkennungsmerkmal traf jede echte Spanne von genau
     // einem Euro.
     var flach = (hi === lo);
-    var innenB = BREITE - RAND.links - RAND.rechts;
     var innenH = HOEHE - RAND.oben - RAND.unten;
+
+    function y(preis) {
+      if (flach) return RAND.oben + innenH / 2;
+      return RAND.oben + innenH - ((preis - lo) / (hi - lo)) * innenH;
+    }
+
+    /* VERDECKTE LINIEN ERKENNEN - VOR der Breitenrechnung.
+
+       `y()` haengt nur an lo/hi und der Hoehe, nicht an der Breite; die
+       Erkennung kann deshalb hier stehen und entscheiden, wie viel Platz
+       der rechte Rand fuer die Endpunkt-Etiketten braucht. Andersherum
+       stuenden die Etiketten ausserhalb des viewBox und waeren unsichtbar -
+       ein Etikett, das den Rand nicht bekommt, den es braucht, ist keine
+       Loesung fuer eine unsichtbare Linie.
+
+       Am Pixel 10 Pro gemessen: Vodafone 1099,90 EUR, mobilcom-debitel
+       1099,00 EUR, Achse von 793 bis 1100 EUR. Neunzig Cent sind auf dieser
+       Hoehe weniger als ein Pixel - die Vodafone-Linie stand in der Legende
+       und war im Bild nicht da.
+
+       VERSCHOBEN WIRD NICHTS. Die Y-Achse gehoert dem Preis; das ist die
+       Lehre aus der geloeschten Positionskarte, deren Etiketten bis zu
+       235 px neben ihrem Punkt standen, weil sie einander ausgewichen sind.
+       Die verdeckte Linie bekommt eine eigene Strichart und ein Etikett an
+       ihrem Ende, beides auf ihrer wahren Hoehe.
+
+       Verglichen wird ueber die GEMEINSAMEN Tage. Zwei Reihen ohne einen
+       gemeinsamen Tag koennen einander nicht verdecken - ohne diese
+       Bedingung galt ein Anbieter mit einem einzigen Punkt als verdeckt von
+       jedem, dessen Kurve zufaellig auf gleicher Hoehe endete. */
+    var GRENZE = ABSTAND * innenH;
+    var gelegt = [];
+    reihen.forEach(function (r) {
+      var meine = {};
+      r.punkte.forEach(function (p) { meine[p.datum] = y(p.preis); });
+      var verdeckt = null;
+      for (var i = 0; i < gelegt.length && !verdeckt; i++) {
+        var gemeinsam = 0, weit = 0;
+        for (var d in meine) {
+          if (gelegt[i].ys[d] === undefined) continue;
+          gemeinsam++;
+          if (Math.abs(meine[d] - gelegt[i].ys[d]) > GRENZE) weit++;
+        }
+        if (gemeinsam && !weit) verdeckt = gelegt[i].anbieter;
+      }
+      gelegt.push({ anbieter: r.anbieter, ys: meine });
+      r.verdeckt = verdeckt;
+    });
+
+    /* Nur wenn wirklich ein Etikett gesetzt wird, kostet es Zeichenflaeche.
+       Sonst bleibt die Kurve so breit wie bisher. */
+    var mitEtikett = reihen.some(function (r) { return r.verdeckt; });
+    var randRechts = mitEtikett ? 210 : RAND.rechts;
+    var innenB = BREITE - RAND.links - randRechts;
 
     // ZEITPROPORTIONAL, nicht ordinal. Die erste Fassung bildete auf
     // `tageSort.indexOf(datum)` ab: bei Messungen am 10.8., 21.8. und 29.8.
@@ -1349,11 +1606,6 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       if (t1 === t0) return RAND.links + innenB / 2;
       return RAND.links + ((tagNr(datum) - t0) / (t1 - t0)) * innenB;
     }
-    function y(preis) {
-      if (flach) return RAND.oben + innenH / 2;
-      return RAND.oben + innenH - ((preis - lo) / (hi - lo)) * innenH;
-    }
-
     var svg = el('svg', {
       viewBox: '0 0 ' + BREITE + ' ' + HOEHE, class: 'gr-vsvg',
       role: 'img', 'aria-label': 'Preisverlauf ' + g.label
@@ -1365,13 +1617,51 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
                        : [0, 1, 2, 3, 4].map(function (i) {
                            return lo + (hi - lo) * (i / 4);
                          });
+
+    /* KEINE ZWEI ACHSENMARKEN MIT DEMSELBEN TEXT.
+
+       `Math.round` reicht, solange die Spanne mehrere Euro breit ist. Bei
+       drei Anbietern zwischen 900,00 und 900,20 EUR stand die Achse
+       fuenfmal mit "900 €" da - fuenf Hilfslinien, die behaupten, fuenf
+       verschiedene Hoehen zu benennen. Das ist dieselbe Fehlerklasse wie
+       die drei "1000 €" bei einem Preis von 999,00: eine Achse, der man
+       nicht glauben kann.
+
+       Erst wird auf ganze Euro gerundet; sind zwei Marken dann gleich,
+       traegt die ganze Achse zwei Nachkommastellen. Bleiben sie auch dann
+       gleich, sind es wirklich dieselben Preise, und die doppelte Linie
+       faellt weg. Gerundet wird NUR die Beschriftung - die Linie sitzt auf
+       dem gerechneten Wert. */
+    /* OHNE TAUSENDERTRENNER. Der Punkt der deutschen Schreibweise macht aus
+       "1003 €" ein "1.003 €", und das ist an DIESER Stelle teuer: die
+       Achsenspalte ist 74 px breit, und `test_die_achse_erfindet_keinen_preis`
+       liest die Marken mit `parseFloat` - aus "1.003" wuerde dort 1,003, und
+       der Test meldete eine Achse ausserhalb der Daten, die es nicht gibt.
+       Die ganze Zahl steht ohnehin in der Tabelle darunter, dort mit
+       Trenner. */
+    function achsentext(preis, stellen) {
+      return preis.toLocaleString('de-DE', { minimumFractionDigits: stellen,
+                                             maximumFractionDigits: stellen,
+                                             useGrouping: false })
+             + ' €';
+    }
+    var stellen = 0;
+    var grob = stufen.map(function (p) { return achsentext(p, 0); });
+    if (grob.length !== grob.filter(function (t, i) {
+          return grob.indexOf(t) === i; }).length) {
+      stellen = 2;
+    }
+    var gesetzt = {};
     stufen.forEach(function (preis) {
+      var text = achsentext(preis, stellen);
+      if (gesetzt[text]) return;
+      gesetzt[text] = 1;
       var yy = y(preis);
-      svg.appendChild(el('line', { x1: RAND.links, x2: BREITE - RAND.rechts,
+      svg.appendChild(el('line', { x1: RAND.links, x2: RAND.links + innenB,
                                    y1: yy, y2: yy, class: 'gr-vraster' }));
       svg.appendChild(el('text', { x: RAND.links - 10, y: yy + 4,
                                    class: 'gr-vachse', 'text-anchor': 'end' },
-                         Math.round(preis) + ' €'));
+                         text));
     });
 
     // Datumsachse - waagerecht, hoechstens acht Marken.
@@ -1393,18 +1683,46 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
         return (i ? 'L' : 'M') + x(p.datum).toFixed(1) + ' ' + y(p.preis).toFixed(1);
       }).join(' ');
       if (r.punkte.length > 1) {
-        svg.appendChild(el('path', { d: d, fill: 'none', stroke: r.farbe,
-                                     'stroke-width': r.eigen ? 3 : 2,
-                                     class: 'gr-vlinie' }));
+        var attrs = { d: d, fill: 'none', stroke: r.farbe,
+                      'stroke-width': r.eigen ? 3 : 2, class: 'gr-vlinie' };
+        if (r.verdeckt) {
+          /* MEHR LUECKE ALS STRICH. Mit "7 5" deckte die obenliegende Linie
+             immer noch 58 Prozent der Laenge ab; am Pixelbild gemessen
+             blieben von der verdeckten Linie darunter 197 von 1400 Pixeln
+             uebrig, und die eigene (3 px) ueberdeckte die fremde (2 px)
+             vollstaendig. Mit "4 8" liegt zwei Dritteln der Strecke die
+             untere Linie frei - beide sind zu sehen, und keine ist
+             verschoben. */
+          attrs['stroke-dasharray'] = '4 8';
+          attrs.class = 'gr-vlinie gr-vlinie--verdeckt';
+        }
+        svg.appendChild(el('path', attrs));
       }
       r.punkte.forEach(function (p) {
-        var k = el('circle', { cx: x(p.datum), cy: y(p.preis),
-                               r: r.eigen ? 5 : 4, fill: r.farbe,
-                               class: 'gr-vpunkt' });
+        /* Der Punkt der obenliegenden Linie wird ein RING, wenn er auf einem
+           fremden Punkt sitzt: gefuellt verdeckte er ihn ganz, und an den
+           Messpunkten - genau dort, wo man den Preis abliest - saehe man nur
+           einen Anbieter. Der Ring steht auf derselben Hoehe wie der Punkt
+           darunter; verschoben wird auch hier nichts. */
+        var k = el('circle', {
+          cx: x(p.datum), cy: y(p.preis), r: r.eigen ? 5 : 4,
+          fill: r.verdeckt ? 'none' : r.farbe,
+          stroke: r.verdeckt ? r.farbe : null,
+          class: r.verdeckt ? 'gr-vpunkt gr-vpunkt--ring' : 'gr-vpunkt' });
         k.appendChild(el('title', {}, r.anbieter + ': ' + euro(p.preis) +
                                       ' am ' + tagDE(p.datum)));
         svg.appendChild(k);
       });
+      /* Das Endpunkt-Etikett bekommt NUR die verdeckte Linie. An jeder Linie
+         waere es die Legende ein zweites Mal, und der rechte Rand reicht fuer
+         zwei Namen nebeneinander nicht. */
+      if (r.verdeckt) {
+        var letzt = r.punkte[r.punkte.length - 1];
+        svg.appendChild(el('text', {
+          x: Math.min(x(letzt.datum) + 9, BREITE - 6), y: y(letzt.preis) + 4,
+          class: 'gr-vetikett', fill: r.farbe, 'text-anchor': 'start'
+        }, r.anbieter + ' ' + euro(letzt.preis)));
+      }
     });
     bild.appendChild(svg);
 
@@ -1419,17 +1737,17 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
       legende.appendChild(s);
     });
 
-    document.getElementById('gr-vmin').textContent = euro(lo);
-    document.getElementById('gr-vmax').textContent = euro(flach ? lo : hi);
-    document.getElementById('gr-vanb').textContent = reihen.length;
-    document.getElementById('gr-vpkt').textContent = alle.length;
+    tabelleBauen(reihen);
+  }
 
+  /* Die Tabelle unter dem Diagramm - und OHNE Diagramm die ganze Antwort.
+
+     Sie steht als eigene Funktion, seit das Gatter darueber sie auch dann
+     braucht, wenn kein Bild gezeichnet wird. Zwei Kopien dieser Rechnung
+     waeren zwei Meinungen darueber, was "aktueller Preis" heisst. */
+  function tabelleBauen(reihen) {
     var t = document.createElement('table');
     t.className = 'src-table gr-tabelle';
-    t.innerHTML = '<thead><tr><th scope="col">Anbieter</th>' +
-      '<th scope="col" class="num">aktueller Preis</th>' +
-      '<th scope="col" class="num">Veränderung</th>' +
-      '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
     var tb = document.createElement('tbody');
     // AUS DEN GEFILTERTEN REIHEN, nicht aus der vorgerechneten Liste.
     // `g.aktuell` rechnet ueber den vollen Zeitraum; mit einem Von-Datum vom
@@ -1447,22 +1765,40 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
                stand: letzt.datum, veraenderung: aend };
     }).sort(function (a, b) { return a.preis - b.preis; });
 
+    /* EINE SPALTE AUS LAUTER STRICHEN IST KEINE SPALTE.
+
+       "Veraenderung" bleibt leer, solange ein Anbieter nur einen Messpunkt
+       hat oder sein Preis sich nicht bewegt hat - beides ist richtig so
+       ("-0,00 EUR" waere keine Auskunft). Am Galaxy S25 standen damit drei
+       Zeilen mit drei Gedankenstrichen untereinander, und eine Spalte, in
+       der nichts steht, liest sich als kaputte Seite und nicht als ruhiger
+       Markt. Sie erscheint deshalb nur, wenn wenigstens EIN Wert darin
+       steht - dieselbe Regel, mit der "niemand guenstiger" aus der
+       Alarmtabelle geflogen ist. */
+    var mitAenderung = zeilen.some(function (z) {
+      return z.veraenderung !== null;
+    });
+    t.innerHTML = '<thead><tr><th scope="col">Anbieter</th>' +
+      '<th scope="col" class="num">aktueller Preis</th>' +
+      (mitAenderung ? '<th scope="col" class="num">Veränderung</th>' : '') +
+      '<th scope="col">zuletzt aktualisiert</th></tr></thead>';
+
     zeilen.forEach(function (z) {
       var tr = document.createElement('tr');
-      // "-0,00 EUR" und "0 Tage" sind keine Auskunft. Wer nur einen
-      // Messpunkt hat, bekommt einen Strich, keine gerechnete Null.
       var d = z.veraenderung === null ? '–'
             : (z.veraenderung > 0 ? '+' : '') + euro(z.veraenderung);
       // `textContent` statt `innerHTML`: der Anbietername ist ein DATENWERT.
       // `_quellenlage` kennt ausdruecklich Anbieter, die nur in der
       // Datenbank stehen und nicht in der Konfiguration - Legende und
       // Trefferliste setzen ihn laengst als Text.
-      [z.anbieter, euro(z.preis), d, markeDE(z.stand, raster)]
-        .forEach(function (wert, i) {
-          var td = tr.insertCell(-1);
-          if (i === 1 || i === 2) td.className = 'num';
-          td.textContent = wert;
-        });
+      var werte = mitAenderung
+        ? [z.anbieter, euro(z.preis), d, markeDE(z.stand, raster)]
+        : [z.anbieter, euro(z.preis), markeDE(z.stand, raster)];
+      werte.forEach(function (wert, i) {
+        var td = tr.insertCell(-1);
+        if (i === 1 || (mitAenderung && i === 2)) td.className = 'num';
+        td.textContent = wert;
+      });
       if (z.eigen) tr.className = 'gr-veigen';
       tb.appendChild(tr);
     });

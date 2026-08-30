@@ -2099,6 +2099,34 @@ b,strong{font-weight:700}
    "alle anzeigen" die weggefilterten Zeilen weiter an: aufgeklappt auf 20
    Zeilen, gefiltert auf Samsung, standen drei Apple-Zeilen mitten drin. Das
    `hidden`-Attribut sass richtig, nur sah man es nicht. */
+/* SORTIERBARE SPALTENKOEPFE (30.08.2026).
+
+   Ein Knopf, der wie eine Ueberschrift aussieht: dieselbe Schrift, dieselbe
+   Farbe, dieselbe Groesse wie der `<th>`-Text vorher - ein Kasten oder eine
+   Farbe je Kopfzelle waeren sieben neue Auszeichnungen in einer Tabelle,
+   die von ihrer Ruhe lebt. Dass er anklickbar ist, sagt der Zeiger und der
+   Pfeil, den die sortierte Spalte traegt.
+
+   Die Richtung steht als `aria-sort` am Knopf, nicht nur als Pfeil: ein
+   Screenreader liest die Tabelle sonst in einer Ordnung, die er nicht
+   benennen kann. */
+.gr-sort{font:inherit;color:inherit;background:none;border:0;padding:0;
+  cursor:pointer;letter-spacing:inherit;text-transform:inherit;
+  text-align:inherit}
+.gr-sort:hover{color:var(--red)}
+.gr-sort:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.gr-sort[aria-sort]::after{content:" \2193";font-size:.9em}
+.gr-sort[aria-sort="ascending"]::after{content:" \2191"}
+/* Der zweite Knopf im Kopf "Unterschied": dieselbe Groesse sortiert nach
+   Euro statt nach Prozent. Er steht kleiner da, weil er die zweite Frage
+   beantwortet, nicht die erste. */
+/* KEINE Verkleinerung. Der zweite Knopf stand mit `.92em` bei 11,04 px und
+   fiel damit unter die 12-px-Grenze, die `pruefe_portal.py` Kriterium 11 und
+   `test_keine_beschriftung_unter_zwoelf_pixeln` fuer JEDE Beschriftung der
+   Seite ziehen. Dass er die zweite Frage beantwortet, sagt seine Farbe. */
+.gr-sort--zweit{color:var(--ink-4)}
+.gr-sort-trenner{margin:0 5px;color:var(--ink-4)}
+
 .gr-a-rest{display:none}
 .gr-alarm--alle .gr-a-rest.gr-a-zeile:not([hidden]){display:table-row}
 
@@ -2365,6 +2393,18 @@ b,strong{font-weight:700}
 .gr-vachse{font-family:var(--sans);font-size:12px;fill:var(--ink-3)}
 .gr-vlinie{stroke-linejoin:round;stroke-linecap:round}
 .gr-vpunkt{stroke:var(--paper);stroke-width:1.5}
+/* Ein Punkt, der auf einem fremden Punkt sitzt, wird ein Ring - der darunter
+   bleibt sichtbar. Die Farbe steht am Element (sie ist ein Datenwert je
+   Anbieter), die Strichstaerke hier. */
+.gr-vpunkt--ring{stroke-width:2.5}
+/* Eine Linie, die hinter einer anderen liegt (weniger als zwei Prozent der
+   Preisspanne Abstand), wird gestrichelt gezeichnet und bekommt ein Etikett
+   an ihrem Ende - auf ihrer WAHREN Hoehe, nicht daneben. Am Pixel 10 Pro
+   lagen Vodafone (1099,90 EUR) und mobilcom-debitel (1099,00 EUR) 90 Cent
+   auseinander: die Legende nannte drei Anbieter, das Bild zeigte zwei
+   Linien. Die Schriftgroesse ist dieselbe wie an der Achse - Kriterium 11
+   von `pruefe_portal.py` laesst nichts unter 12 px zu. */
+.gr-vetikett{font-family:var(--sans);font-size:12px;font-weight:600}
 .gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
@@ -2388,3 +2428,40 @@ b,strong{font-weight:700}
    einer vierten Stelle hartkodiert, waehrend `var(--red)` genau dafuer da
    ist. */
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
+
+/* DIE PORTFOLIO-ZEILE HAT IHRE EIGENE RASTERSPALTE (30.08.2026).
+
+   `.dz-balken li` teilt sich `1fr 74px 26px` - und die 26 px sind fuer EINE
+   Zahl gedacht ("8"). Die Portfolio-Tiefe setzte dort zwei Zahlen hinein,
+   die Generationen und die Modelle, und die zweite steckte in einem
+   `rubrik-zusatz`. Dessen `margin-left:auto` wirkt nur im Flex- oder
+   Grid-Kontext; als inline-Element in einem 26-px-Kasten stand sie
+   unmittelbar hinter der ersten, ohne ein Zeichen dazwischen. Der Leser sah
+   "2454 Modelle", wo 24 Generationen und 54 Modelle gemeint waren.
+
+   Die Spalte ist jetzt so breit, dass beide Zahlen MIT ihrem Wort
+   hineinpassen; `white-space:nowrap` haelt "24 Generationen · 54 Modelle" in
+   einer Zeile, damit der Mittelpunkt nicht ans Zeilenende faellt und die
+   zwei Zahlen wieder untereinander stehen. */
+/* DER BALKEN BEKOMMT DEN FREIEN PLATZ, nicht der Name.
+
+   `.dz-balken li` gibt dem Namen `1fr` und dem Balken feste 74 px - richtig
+   fuer eine Liste mit langen Bezeichnungen, falsch hier: die vier
+   Anbieternamen sind kurz, und in 74 px sind 24 gegen 20 Generationen drei
+   Pixel Unterschied. Antonios Befund "die vier Balken sind fast gleich lang
+   und sagen nichts" gilt auch nach der Zahlenkorrektur, solange die Spur so
+   schmal ist. Jetzt traegt der Name, was er braucht, und der Balken den
+   Rest. */
+.gr-tiefe li{grid-template-columns:minmax(120px,190px) minmax(0,1fr) minmax(0,auto)}
+.gr-tiefe .dz-balken-spur{height:9px}
+.gr-tiefe-n{white-space:nowrap;text-align:right}
+.gr-tiefe-gen{font-weight:700;color:var(--ink-2)}
+.gr-tiefe-mod{font-weight:600;color:var(--ink-4)}
+.gr-tiefe .gr-eigen .gr-tiefe-gen{color:var(--red)}
+@media (max-width:560px){
+  /* Auf dem Telefon bricht die Zeile unter den Balken um, statt die zwei
+     Zahlen zu stauchen - gerollt statt gestaucht, dieselbe Regel wie bei
+     der geloeschten Positionskarte. */
+  .gr-tiefe li{grid-template-columns:1fr 74px}
+  .gr-tiefe-n{grid-column:1 / -1;text-align:left}
+}

@@ -70,6 +70,23 @@ _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 # Lauf darf eine echte Bewegung nicht verschlucken.
 FENSTER_TAGE = 14
 
+# Ab wann "neu im Regal" eine Marktbewegung meint und nicht die eigene
+# Messdauer (30.08.2026).
+#
+# Die Karte meldete "59 Geraete neu im Regal" - bei 59 beobachteten Geraeten.
+# Beides stimmte: die Preishistorie war 20 Tage alt, also war JEDES erfasste
+# Geraet innerhalb des Fensters erstmals gesehen worden. Der Satz sagte
+# damit nichts ueber den Markt, sondern ueber den Startzeitpunkt dieses
+# Radars - und stand als Aussage ueber den Markt da.
+#
+# Unterhalb dieser Schwelle sagt die Karte deshalb EINEN Satz und zeigt
+# keine Tabelle: die Zahl der erstmals erfassten Geraete gehoert in den
+# Nebensatz, wo sie hingehoert, und die eine echte Preisaenderung steht
+# ausgeschrieben daneben. Vier Wochen sind kein gerechneter Wert, sondern
+# der Punkt, ab dem "seit der letzten Ausgabe" und "seit Messbeginn" nicht
+# mehr dasselbe sind.
+VORLAUF_TAGE = 28
+
 EIGEN = ("vodafone",)
 
 # --------------------------------------------------------------------------
@@ -176,6 +193,21 @@ def zahlen_der_namen(*namen) -> set:
     for name in namen:
         gefunden |= zahlen_im_text(str(name or ""))
     return gefunden
+
+
+def euro(betrag: float) -> str:
+    """Ein Euro-Betrag in deutscher Schreibweise.
+
+    Die Saetze der Wochenkarte schrieben ihre Preise bis zum 30.08.2026 mit
+    `f"{wert:.2f} €"` - also "129.00 €" mit Dezimalpunkt, waehrend jede
+    Tabelle derselben Seite "129,00 €" zeigt. Solange die Saetze neben einer
+    Tabelle standen, ging das unter; seit die Karte unter kurzem Vorlauf NUR
+    aus einem Satz besteht, ist es die erste Zahl, die jemand dort liest.
+
+    Der Waechter `pruefe_zahlen` liest beide Schreibweisen ueber
+    `lies_preis` - die Umstellung aendert nichts an dem, was er durchlaesst.
+    """
+    return f"{betrag:.2f}".replace(".", ",") + " €"
 
 
 def pruefe_zahlen(text: str, erlaubt: set) -> bool:
@@ -303,23 +335,102 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     # Kachel "ausgelistet" den Einbruch gezeigt und war ausgeblendet.
     ohne_vorlauf = laeufe < 2
 
+    # WIE LANGE MESSEN WIR SCHON? Der Vorlauf entscheidet, ob "neu im Regal"
+    # eine Marktbewegung meint oder nur den Startzeitpunkt dieses Radars.
+    # Gerechnet gegen die aelteste Messung, nicht gegen `first_seen`: ein
+    # Geraet, das erst gestern in den Katalog kam, verkuerzt den Vorlauf der
+    # ganzen Sektion nicht.
+    seit = juengste[0] if juengste else None
+    bezug_tag = _tag(heute)
+    vorlauf_tage = ((bezug_tag - seit).days
+                    if seit and bezug_tag and bezug_tag >= seit else 0)
+    kurzer_vorlauf = vorlauf_tage < VORLAUF_TAGE
+
+    # DREI LAGEN, NICHT ZWEI - und die erste ist nicht die zweite.
+    #
+    #   `ohne_vorlauf`  : es gibt ueberhaupt keinen frueheren Stand (erster
+    #                     oder zweiter Lauf). Dann ist "neu im Regal" nicht
+    #                     nur schief, es ist unbelegbar, und die Karte sagt
+    #                     genau das.
+    #   `kurzer_vorlauf`: es gibt einen Vergleichsstand, aber er reicht nur
+    #                     ueber wenige Tage. "59 Geraete neu im Regal" bei 59
+    #                     beobachteten ist dann eine Aussage ueber die
+    #                     Messdauer und keine ueber den Markt.
+    #   sonst           : der Normalfall, mit Tabelle.
+    #
+    # Die erste Fassung dieser Aenderung hatte die zwei ersten Lagen
+    # zusammengeworfen - und damit den Satz "es gibt noch keinen frueheren
+    # Stand, gegen den sich vergleichen liesse" abgeschafft, den B7 Punkt 3
+    # ausdruecklich verlangt. Ein bestehender Test hat das gemeldet.
     saetze = []
-    for b in bewegungen[:5]:
-        richtung = "günstiger" if b["delta"] < 0 else "teurer"
-        saetze.append(f"{b['modell']} bei {b['anbieter']}: "
-                      f"{abs(b['delta']):.2f} € {richtung} "
-                      f"({b['von']:.2f} € auf {b['auf']:.2f} €).")
-    if neu_geraete and ohne_vorlauf:
-        saetze.append(f"{len(neu_geraete)} Gerät"
-                      f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
-                      f"erfasst – es gibt noch keinen früheren Stand, gegen "
-                      f"den sich vergleichen ließe.")
-    elif neu_geraete:
-        saetze.append(f"{len(neu_geraete)} Gerät{'e' if len(neu_geraete) != 1 else ''} "
-                      f"neu im Regal.")
-    if weg_geraete and not ohne_vorlauf:
-        saetze.append(f"{len(weg_geraete)} Gerät{'e' if len(weg_geraete) != 1 else ''} "
-                      f"aus dem Portfolio gefallen.")
+    if ohne_vorlauf:
+        for b in bewegungen[:5]:
+            richtung = "günstiger" if b["delta"] < 0 else "teurer"
+            saetze.append(f"{b['modell']} bei {b['anbieter']}: "
+                          f"{euro(abs(b['delta']))} {richtung} "
+                          f"({euro(b['von'])} auf {euro(b['auf'])}).")
+        if neu_geraete:
+            saetze.append(f"{len(neu_geraete)} Gerät"
+                          f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
+                          f"erfasst – es gibt noch keinen früheren Stand, gegen "
+                          f"den sich vergleichen ließe.")
+    elif kurzer_vorlauf and (neu_geraete or bewegungen):
+        # EIN SATZ STATT EINER TABELLE.
+        #
+        # Die Bedingung `neu_geraete or bewegungen` ist nicht kosmetisch:
+        # ohne sie stuende in einer ruhigen Woche "Seit dem 10.08. wurden 0
+        # Geraete erstmals erfasst; eine Preisaenderung ist dabei nicht
+        # aufgefallen." - ein Satz, der nichts sagt, und die Rubrik "Was
+        # diese Woche auffaellt" haette damit IMMER Inhalt. Vorher
+        # verschwand sie in diesem Fall ganz (`hat_daten` blieb falsch), und
+        # das ist die richtige Antwort: keine Zeile, die nichts sagt. Unter vier Wochen Vorlauf ist die
+        # Zahl der erstmals erfassten Geraete eine Aussage ueber uns und
+        # nicht ueber den Markt - sie steht deshalb im Nebensatz, und die
+        # Preisaenderungen, die es wirklich gab, stehen ausgeschrieben
+        # daneben statt als Tabelle mit Kopfzeile und einer Datenzeile.
+        kopf = ""
+        if seit:
+            kopf = f"Seit dem {seit.day}.{seit.month:02d}. wurden "
+        else:
+            kopf = "Bisher wurden "
+        satz = (f"{kopf}{len(neu_geraete)} "
+                f"Gerät{'e' if len(neu_geraete) != 1 else ''} erstmals "
+                f"erfasst; ")
+        if not bewegungen:
+            satz += "eine Preisänderung ist dabei nicht aufgefallen."
+        else:
+            teile = [f"{b['modell']} bei {b['anbieter']}, "
+                     f"{euro(b['von'])} → {euro(b['auf'])}"
+                     for b in bewegungen[:3]]
+            wieviele = ("eine Preisänderung ist aufgefallen"
+                        if len(bewegungen) == 1
+                        else f"{len(bewegungen)} Preisänderungen sind "
+                             f"aufgefallen")
+            satz += wieviele + ": " + "; ".join(teile)
+            if len(bewegungen) > 3:
+                satz += f" und {len(bewegungen) - 3} weitere"
+            satz += "."
+        saetze.append(satz)
+    else:
+        for b in bewegungen[:5]:
+            richtung = "günstiger" if b["delta"] < 0 else "teurer"
+            saetze.append(f"{b['modell']} bei {b['anbieter']}: "
+                          f"{euro(abs(b['delta']))} {richtung} "
+                          f"({euro(b['von'])} auf {euro(b['auf'])}).")
+        if neu_geraete:
+            saetze.append(f"{len(neu_geraete)} Gerät{'e' if len(neu_geraete) != 1 else ''} "
+                          f"neu im Regal.")
+        if weg_geraete:
+            saetze.append(f"{len(weg_geraete)} Gerät{'e' if len(weg_geraete) != 1 else ''} "
+                          f"aus dem Portfolio gefallen.")
+
+    # Das Datum im Kopfsatz ist so wenig eine Behauptung ueber den Markt wie
+    # ein Eigenname - aber der Waechter prueft JEDE Zahl, und ohne diese
+    # Anmeldung verwuerfe er den einen Satz, den die Karte dann noch hat.
+    # Dieselbe Mechanik wie `zahlen_der_namen`, und aus demselben Grund
+    # ausdruecklich statt stillschweigend.
+    if kurzer_vorlauf and not ohne_vorlauf and seit:
+        erlaubt |= zahlen_im_text(f"{seit.day}.{seit.month:02d}.")
 
     # Fail closed: ein Satz, dessen Zahlen nicht im Datensatz stehen,
     # erscheint nicht. Heute kann das nicht passieren - morgen, mit einem
@@ -335,7 +446,12 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         "neu_gelistet_geraete": len(neu_geraete),
         "verschwunden": len(verschwunden),
         "verschwunden_geraete": len(weg_geraete),
-        "bewegungen": bewegungen[:12],
+        # UNTER VIER WOCHEN VORLAUF KEINE TABELLE. Sie trug am 30.08.2026
+        # eine Kopfzeile mit sieben Spalten und GENAU EINE Datenzeile - der
+        # Satz darueber sagt dasselbe in einer Zeile und ohne, dass jemand
+        # sieben Spaltenkoepfe liest, um eine Zahl zu finden. Die Bewegungen
+        # sind nicht verloren: sie stehen ausgeschrieben im Satz.
+        "bewegungen": [] if kurzer_vorlauf else bewegungen[:12],
         "neu": [{"modell": (katalog.nach_id(e.get("device_id")).modell
                             if katalog.nach_id(e.get("device_id"))
                             else e.get("device_id")),
@@ -348,6 +464,8 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                 for e in verschwunden[:12]],
         "hat_daten": bool(geprueft or bewegungen),
         "ohne_vorlauf": ohne_vorlauf,
+        "kurzer_vorlauf": kurzer_vorlauf,
+        "vorlauf_tage": vorlauf_tage,
     }
 
 
@@ -599,7 +717,8 @@ def leer(fehler: str = "") -> dict:
         "katalogtabelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
-                       "neu": [], "weg": []},
+                       "neu": [], "weg": [], "kurzer_vorlauf": True,
+                       "vorlauf_tage": 0},
         "alle_eintraege": [], "alle_punkte": [], "katalog_obj": None,
         "export": {"stand": "", "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
                    "historie": {"datei": "", "zeilen": 0, "bytes": 0}},

@@ -266,3 +266,44 @@ def test_der_bestaetigte_preis_schlaegt_den_historieneintrag():
     assert g["reihen"][0]["punkte"] == [{"datum": "2026-08-29", "preis": 155.0}], (
         "die Kurve zeigt einen Preis, den die Datenbank fuer dieses Geraet "
         "nicht kennt")
+
+
+# --------------------------------------------------------------------------
+# NACHBESSERUNG 30.08.2026: Messtermine je Geraet
+# --------------------------------------------------------------------------
+
+def test_jedes_geraet_nennt_seine_eigenen_messtermine():
+    """Die Kachel ueber dem Diagramm zeigte `messpunkte` (Preispunkte ueber
+    alle Anbieter) unter der Ueberschrift "Messpunkte", waehrend der Satz
+    zwei Zeilen darunter die globalen `messtermine` nannte: "4 Messpunkte"
+    ueber "5 Messtermine". Beide Zahlen stimmten und zaehlten Verschiedenes -
+    fuer den Leser sind das zwei Zahlen fuer dieselbe Sache.
+
+    Ein Messtermin ist ein TAG, an dem gemessen wurde. Bei drei Anbietern an
+    zwei Tagen sind das sechs Preispunkte und zwei Termine."""
+    hist = _Historie({
+        "a": [{"datum": "2026-08-10", "preis_ohne_vertrag": 900.0}],
+        "b": [{"datum": "2026-08-10", "preis_ohne_vertrag": 880.0}],
+        "c": [{"datum": "2026-08-10", "preis_ohne_vertrag": 870.0}],
+    })
+    g = _eins(v.geraete_mit_verlauf(
+        [_l("a", "o2", 900.0), _l("b", "Vodafone", 880.0),
+         _l("c", "mobilcom-debitel", 870.0)], hist, _KATALOG))
+    assert g["messtermine"] == 2, g["tage"]
+    assert g["messpunkte"] == 6
+    assert g["messtermine"] == len(g["tage"])
+
+
+def test_die_schwelle_fuers_diagramm_steht_im_modul():
+    """Sie entscheidet, ob ueberhaupt ein Diagramm entsteht, und `app.js`
+    liest sie als data-Attribut aus der Vorlage. Zwei Zahlen fuer dieselbe
+    Regel waeren zwei Regeln - dieselbe Lehre wie bei der
+    Stichwort-Vorschau (CLAUDE.md §6)."""
+    assert v.DIAGRAMM_AB_TERMINEN >= 3, (
+        "unter drei Punkten ist jede Linie eine Gerade durch zwei Punkte")
+    assert v.aufbereiten([], _Historie(), _KATALOG)["diagramm_ab_terminen"] \
+        == v.DIAGRAMM_AB_TERMINEN
+    assert v.leer()["diagramm_ab_terminen"] == v.DIAGRAMM_AB_TERMINEN
+    # Der Leerzustand muss DIESELBEN Schluessel tragen wie der Normalfall -
+    # ein fehlender ist in Jinja kein Fehler, sondern eine stumm leere Seite.
+    assert set(v.leer()) == set(v.aufbereiten([], _Historie(), _KATALOG))

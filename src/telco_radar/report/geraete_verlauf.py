@@ -60,6 +60,32 @@ MAX_DATUMSMARKEN = 8
 # ist jede Steigung eine Gerade durch zwei Punkte.
 BELASTBAR_AB_WOCHEN = 12
 
+# Ab wie vielen MESSTERMINEN ueberhaupt ein Diagramm gezeichnet wird
+# (30.08.2026).
+#
+# Der Verlauf des Pixel 10 Pro 128 GB stand am 30.08. mit zwei Datumsmarken
+# (10.8. und 30.8.) und nichts dazwischen auf der Seite: eine Achse, zwei
+# Punkte, eine Gerade. Das war die ehrliche Datenlage - nur wurde sie als
+# vollwertiges Diagramm praesentiert, mit Rasterlinien, Legende und einer
+# Spalte "Veraenderung", die bei allen drei Anbietern auf "-" stand.
+#
+# Unter dieser Schwelle steht deshalb die Tabelle allein, mit einem Satz
+# darueber, der die Zahl der Messtermine nennt. Vier ist der Punkt, ab dem
+# eine Linie mehr zeigt als ihre zwei Enden - nicht die Schwelle, ab der
+# eine Aussage ueber Preisverfall traegt, das sind die zwoelf Wochen
+# darueber.
+DIAGRAMM_AB_TERMINEN = 4
+
+# Wie nah zwei Linien beieinander liegen duerfen, bevor die verdeckte
+# eigens sichtbar gemacht wird - als Anteil der gezeichneten Preisspanne.
+#
+# Am Pixel 10 Pro gemessen: Vodafone 1099,90 EUR, mobilcom-debitel 1099,00 EUR,
+# Achse von 793 bis 1100 EUR. Neunzig Cent auf 307 Euro Spanne sind 0,3
+# Prozent der Hoehe, also weniger als ein Pixel - die Vodafone-Linie stand
+# in der Legende und war im Bild nicht vorhanden. Eine Linie, die die
+# Legende nennt und das Bild nicht zeigt, ist schlimmer als keine Legende.
+LINIEN_ABSTAND = 0.02
+
 # Vodafone ist rot, alle anderen neutral und unterscheidbar. Die Reihenfolge
 # ist fest, damit derselbe Anbieter ueber zwei Ausgaben dieselbe Farbe
 # behaelt - eine Farbe, die je Auswahl wechselt, ist keine Kennzeichnung.
@@ -238,6 +264,16 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
             "min": min(alle), "max": max(alle),
             "anbieter": len(reihen),
             "messpunkte": len(alle),
+            # DIE ZAHL, DIE AUF DER SEITE STEHT. Bis zum 30.08.2026 zeigte
+            # die Kachel `messpunkte` unter der Ueberschrift "Messpunkte",
+            # waehrend der Satz darunter die globalen `messtermine` nannte:
+            # "4 Messpunkte" ueber "5 Messtermine", zwei Zahlen fuer etwas,
+            # das der Leser fuer dieselbe Sache haelt. `messpunkte` zaehlt
+            # Preispunkte ueber alle Anbieter, `messtermine` zaehlt TAGE -
+            # bei drei Anbietern an zwei Tagen sind das sechs und zwei.
+            # Die Kachel zeigt jetzt die Termine, weil daran auch haengt,
+            # ob ueberhaupt ein Diagramm entsteht.
+            "messtermine": len(tage),
             "tage": tage,
             "aktuell": _aktuell(reihen),
         })
@@ -280,6 +316,8 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
         "bis": tage[-1] if tage else "",
         "messtermine": len(tage),
         "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
+        "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
+        "linien_abstand": LINIEN_ABSTAND,
         "max_linien": MAX_LINIEN,
         "max_datumsmarken": MAX_DATUMSMARKEN,
     }
@@ -288,4 +326,6 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
 def leer() -> dict:
     return {"hat_daten": False, "geraete": [], "seit": "", "bis": "",
             "messtermine": 0, "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
+            "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
+            "linien_abstand": LINIEN_ABSTAND,
             "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN}

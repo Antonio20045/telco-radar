@@ -1687,7 +1687,81 @@ python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (30.08.2026): `/geraete.html` komplett neu gebaut.**
+> **Zuletzt erledigt (30.08.2026, abends): die Nachbesserung nach dem
+> Durchklicken.** Auftragsgrundlage: Antonios Befundliste „Nachbesserung
+> /geraete.html — an der Live-Seite durchgeklickt am 30.08.2026". Alle
+> Messungen: **`outputs/geraete-nachbesserung-2026-08-30.md`**. Stand danach:
+> **2172 Tests**, `pruefe_portal.py` **17 bestanden / 0 durchgefallen**,
+> Reiterhöhen 2949 / 2893 / 2184 / 2384 px.
+>
+> **Der schwerste Befund war kein Rechenfehler, sondern ein Satzfehler.** Die
+> Seite meldete „o2 2454 Modelle" bei 59 beobachteten Geräten.
+> `portfolio_tiefe` lieferte 24 Generationen und 54 Modelle — beide richtig,
+> beide unter dem Bestand. Im HTML standen sie als zwei Inline-Spans **ohne
+> ein Zeichen dazwischen** (`<span>24<span>54 Modelle</span></span>`), in
+> einer 26 px schmalen Rasterspalte, die für EINE Zahl gedacht war; das
+> `margin-left:auto` des `rubrik-zusatz` wirkt außerhalb eines Flex-Kontexts
+> nicht. Der Browser setzte „2454".
+>
+> **Warum 2147 grüne Tests das nicht sahen:** der Abnahmetest
+> `test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand` liest
+> mit `suppe.get_text(" ", strip=True)`. Nachgemessen: `get_text()` liefert
+> `'2454 Modelle'`, `get_text(" ")` liefert `'24 54 Modelle'`. **Der Trenner,
+> den der Test selbst einfügt, macht genau die Fehlerklasse unsichtbar, gegen
+> die er gebaut ist** — und sein Muster suchte ohnehin nur `\d+ Gerät`, nie
+> „Modelle". Wer eine Zahl gegen die gerenderte Seite hält, liest **ohne
+> Trenner**, so wie ein Browser Inline-Text zusammensetzt.
+>
+> | Was | Regel, die es trägt |
+> |---|---|
+> | **Portfolio-Zeile** | Beide Zahlen tragen ihr Wort, dazwischen ein sichtbarer Mittelpunkt: „24 Generationen · 54 Modelle". Eigene Rasterspalte (`.gr-tiefe li`), der Balken bekommt den freien Platz statt fester 74 px |
+> | **Kein Diagramm unter 4 Messterminen** (`geraete_verlauf.DIAGRAMM_AB_TERMINEN`) | Zwei Punkte ergeben eine Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend. Darunter: Tabelle plus ein Satz, der die Zahl nennt |
+> | **Verdeckte Linien** (`LINIEN_ABSTAND`, 2 % der Spanne) | **Verschoben wird NICHTS** — die Y-Achse gehört dem Preis. Die obenliegende Linie wird gestrichelt (`4 8`), ihr Punkt wird ein RING, und sie bekommt ein Endpunkt-Etikett auf wahrer Höhe. Am Pixelbild gemessen: mit `7 5` blieben von der Linie darunter 197 von 1400 px, mit `4 8` plus Ring 787 gegen 848 |
+> | **Ein Messtermin ist ein TAG** | Unabhängig vom Raster. Nach `fassen()` gezählt wären zwei Messungen derselben Woche EIN Termin, und im Quartalsraster hätte jedes Gerät genau einen. Das Raster formt die Linie, nicht die Datenlage |
+> | **Verfügbarkeit** | Raus aus dem Alarm-Reiter (12 von 13 Zeilen sagten „unbekannt"), geblieben im Katalog, EIN Wort je Zustand |
+> | **Wochenkarte** (`geraete_view.VORLAUF_TAGE`, 28) | Unter vier Wochen Vorlauf ein Satz statt Tabelle. „59 Geräte neu im Regal" bei 59 beobachteten ist eine Aussage über die Messdauer, nicht über den Markt |
+> | **Kopfdatum** | `abgerufen_bis`, nicht `stand`: „Preise vom 30. August 2026". Der Gerätezweig läuft nächtlich, der Bericht zweimal die Woche — der Kopf sagte 28.08., jede Zeile darunter 30.08. |
+> | **Sortierbare Spaltenköpfe** | Sortiert wird nach dem ROHWERT an der Zeile (`data-s-*`), nie nach dem Zelltext („1.099,90 €" ist als Zeichenkette kleiner als „199,00 €"). **Der Zeilendeckel wird neu vergeben** — sonst zeigt eine Euro-Sortierung die zwölf größten Prozentwerte, und der größte Euro-Abstand steht nicht darunter |
+>
+> **Drei Lagen der Wochenkarte, nicht zwei.** Die erste Fassung warf
+> `ohne_vorlauf` (es gibt überhaupt keinen früheren Stand) und
+> `kurzer_vorlauf` (er ist nur kurz) zusammen und schaffte damit den Satz „es
+> gibt noch keinen früheren Stand, gegen den sich vergleichen ließe" ab, den
+> B7 Punkt 3 verlangt. **Ein bestehender Test hat das gemeldet.**
+>
+> **Zwei Fehler fand erst das Durchspielen der Randfälle**, beide nicht auf
+> Antonios Liste: die Sätze der Wochenkarte schrieben „129.00 €" mit
+> **Dezimalpunkt** (jetzt `geraete_view.euro()`), und bei einer Preisspanne
+> von 20 Cent stand die **Achse fünfmal mit „900 €"** da — dieselbe
+> Fehlerklasse wie die drei „1000 €" bei einem Preis von 999,00. Die Achse
+> beschriftet jetzt mit zwei Nachkommastellen, sobald zwei Marken sonst
+> gleich hießen, **ohne Tausendertrenner**: der Punkt der deutschen
+> Schreibweise macht aus „1003 €" ein „1.003 €", und der Abnahmetest liest
+> die Marken mit `parseFloat`.
+>
+> **Zwei bestehende Tests sind angefasst worden, beide mit Grund** (Details
+> in der Schlussliste): die Fixture von `test_geraete_reiter_browser.py` lief
+> mit LEERER Preishistorie und damit einem Messtag je Listung — mit dem
+> Gatter maßen vier Tests einen Leerzustand statt der Grafik; und
+> `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm` verengte das
+> Fenster auf einen Tag, fiel damit unters Gatter und verglich gegen eine
+> Legende, die es nicht mehr gibt. Er prüft jetzt **beide** Lagen.
+>
+> **Fallstrick beim Bauen solcher Browser-Tests:** `page.set_content()` auf
+> der modulweiten Seite hinterlässt gestellte Daten für JEDEN folgenden Test.
+> Zwei Tests stellen ihre Reihen selbst (verdeckte Linie, enge Achse) — sie
+> laufen deshalb über `_eigene_seite`, eine frische Seite je Test.
+>
+> **OFFEN:** (1) **71 der 89 wählbaren Geräte haben zwei Messtermine, 15
+> haben drei, 3 haben vier** — der Preisverlauf zeigt für die meisten
+> weiterhin eine Tabelle. Das ist die ehrliche Auskunft; nach etwa zwei
+> weiteren Wochen Nachtläufen kippt es von selbst, **dann ansehen**. (2) Die
+> 2-%-Überlappungsregel ist an EINEM nachgebauten Fall gemessen, im Bestand
+> gibt es ihn heute nicht. (3) `VORLAUF_TAGE` schaltet sich um den 07.09.
+> selbst um — **danach die Wochenkarte ansehen**, ob sie plausible Zahlen
+> zeigt oder weiter fast den ganzen Bestand als neu zählt.
+
+> **Davor erledigt (30.08.2026): `/geraete.html` komplett neu gebaut.**
 > Auftragsgrundlage: `outputs/geraeteradar-wahrheit-2026-08-29.md` (die im
 > Auftrag genannten `claude/…`-Pfade liegen im Claude-Projekt, nicht im Repo
 > — **künftig unter `outputs/` suchen und im Plan sagen, welches Dokument

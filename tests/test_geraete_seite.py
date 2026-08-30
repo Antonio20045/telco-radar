@@ -1385,3 +1385,330 @@ def test_kein_anbieter_der_ECHTEN_konfiguration_steht_ohne_grund():
     ohne_grund = [a.name for a in _lade(wurzel).anbieter
                   if not a.aktiv and not (a.grund or "").strip()]
     assert not ohne_grund, ohne_grund
+
+
+# ==========================================================================
+# NACHBESSERUNG 30.08.2026 - was das Durchklicken der Live-Seite fand
+# ==========================================================================
+
+def test_zwei_zahlen_nebeneinander_tragen_ein_trennzeichen(tmp_path):
+    """Der Befund, der das Akzeptanzkriterium von 2147 gruenen Tests
+    ueberlebt hat: die Seite meldete „o2 2454 Modelle" bei 59 beobachteten
+    Geraeten.
+
+    DIE DATEN WAREN RICHTIG. `portfolio_tiefe` lieferte 24 Generationen und
+    54 Modelle; im HTML stand
+    `<span class="dz-balken-n">24<span class="rubrik-zusatz">54 Modelle`,
+    also zwei Inline-Elemente ohne ein Zeichen dazwischen. Der Browser setzt
+    das als "2454 Modelle".
+
+    WARUM DER BESTEHENDE TEST GRUEN BLIEB:
+    `test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand`
+    liest mit `get_text(" ", strip=True)`. Der Trenner, den er selbst
+    einfuegt, macht aus "2454" wieder "24 54" - er hat die Sorte Fehler
+    unsichtbar gemacht, gegen die er gebaut war. Dieser Test liest deshalb
+    OHNE Trenner, so wie ein Browser Inline-Text zusammensetzt.
+    """
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    bestand = geraete["bilanz"]["geraete"]
+    assert bestand, "kein Bestand - dann prueft der Test nichts"
+
+    suppe = _suppe(site, "geraete.html")
+    zeilen = suppe.select(".gr-tiefe li")
+    assert zeilen, "keine Portfolio-Zeile gerendert - der Test misst nichts"
+
+    import re
+    for li in zeilen:
+        # `get_text()` OHNE Trenner - genau die Zeichenkette, die im Browser
+        # steht. Mit " " als Trenner ist dieser Test blind.
+        text = li.get_text()
+        for n in (int(x) for x in re.findall(r"\d+", text)):
+            assert n <= bestand, (
+                f"{n} in {text!r} uebersteigt die {bestand} beobachteten "
+                f"Geraete - stehen dort zwei Zahlen ohne Trennzeichen?")
+
+
+def test_die_portfolio_zeile_nennt_generationen_und_modelle_getrennt(tmp_path):
+    """Antonios zweiter Punkt an derselben Zeile: „Die Generationenzahl, um
+    die es in dieser Sektion geht, wird nirgends angezeigt."
+
+    Sie stand da - als erste Haelfte der verschmolzenen Zahl, also
+    unlesbar. Beide Zahlen tragen jetzt ihr Wort, und die Zusicherung ist
+    `Generationen <= Modelle <= Varianten`: ein Jahrgang fasst Modelle
+    zusammen, ein Modell fasst Varianten zusammen. Dreht eine dieser
+    Rechnungen um, ist die Aussage der Sektion falsch, egal wie die Zahl
+    gesetzt ist.
+    """
+    import re
+
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    varianten = geraete["bilanz"]["skus"]
+    suppe = _suppe(site, "geraete.html")
+
+    zeilen = suppe.select(".gr-tiefe li")
+    assert zeilen, "keine Portfolio-Zeile gerendert"
+    # Gegenprobe: die Vorlage muss die Zahlen wirklich aus dem Modell
+    # nehmen - ohne diese Zuordnung prueft die Schleife eine leere Menge.
+    aus_daten = {t["anbieter"]: t for t in geraete["lifecycle"]["portfolio"]}
+    zugeordnet = 0
+
+    for li in zeilen:
+        text = li.get_text()
+        gen = re.search(r"(\d+)\s+Generatione?n?\b", text)
+        mod = re.search(r"(\d+)\s+Modelle?\b", text)
+        assert gen, f"keine Generationenzahl in {text!r}"
+        assert mod, f"keine Modellzahl in {text!r}"
+        g, m = int(gen.group(1)), int(mod.group(1))
+        assert g <= m, f"{g} Generationen bei {m} Modellen - {text!r}"
+        assert m <= varianten, f"{m} Modelle bei {varianten} Varianten"
+
+        name = li.select_one(".dz-balken-name").get_text(strip=True)
+        if name in aus_daten:
+            zugeordnet += 1
+            assert g == aus_daten[name]["generationen"]
+            assert m == aus_daten[name]["modelle_anzahl"]
+
+    assert zugeordnet == len(zeilen), (
+        f"nur {zugeordnet} von {len(zeilen)} Zeilen liessen sich den Daten "
+        f"zuordnen - ein Lookup, der ins Leere geht, ist gruen und prueft "
+        f"nichts (CLAUDE.md §6)")
+
+
+def test_das_kopfdatum_ist_das_abrufdatum(tmp_path):
+    """Der Kopf sagte „Stand 28. August 2026", jede Tabellenzeile darunter
+    „30. August 2026". Beide stimmten - der Geraetezweig laeuft naechtlich,
+    der Bericht zweimal die Woche -, aber wer zwei Zahlen im selben Blick
+    vergleicht, haelt die Seite fuer veraltet.
+
+    Die Fixture muss den Fall AUSLOESEN koennen: im Normalfall ist
+    `abgerufen_am` gleich dem Berichtstag, und dann sagen beide Kandidaten
+    dasselbe - der Test waere gruen, egal welchen der Kopf traegt."""
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    for listung in db["listungen"]:
+        listung["abgerufen_am"] = "2026-08-13"
+    site = _baue(tmp_path, db=db)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    abruf = geraete["abgerufen_bis"]
+    assert abruf, "kein Abrufdatum im Bestand - der Test misst nichts"
+    assert abruf != geraete["stand"], (
+        "Abruf- und Berichtstag sind gleich - dann sagt der Test nichts "
+        "darueber, welchen der beiden der Kopf traegt")
+
+    kopf = _suppe(site, "geraete.html").select_one(".page-date").get_text(" ", strip=True)
+    assert "Preise vom" in kopf, kopf
+    assert str(int(abruf.split("-")[2])) in kopf, (
+        f"{kopf!r} nennt nicht den Abruftag {abruf}")
+    assert str(int(geraete["stand"].split("-")[2])) not in kopf, (
+        f"{kopf!r} nennt weiterhin den Berichtstag {geraete['stand']}")
+
+
+def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
+    """An der Live-Seite gemessen sagte sie in 12 von 13 Zeilen „unbekannt":
+    die Netzbetreiber-Schnittstellen liefern das Feld nicht. Eine Spalte,
+    die in neun von zehn Faellen nichts sagt, kostet Breite in der Tabelle,
+    die die eine Frage dieses Reiters beantworten soll.
+
+    Geloescht ist die Auskunft nicht - der Katalog traegt sie weiter."""
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
+    suppe = _suppe(site, "geraete.html")
+
+    alarm = suppe.select_one("#tafel-alarme .gr-alarm")
+    assert alarm, "Alarmtabelle fehlt in der Fixture"
+    koepfe = [th.get_text(" ", strip=True).lower() for th in alarm.select("thead th")]
+    assert koepfe, "keine Spaltenkoepfe - der Test misst nichts"
+    assert not any("verfügbar" in k for k in koepfe), koepfe
+
+    # Und die Zellenzahl muss zur Kopfzeile passen. Eine Spalte aus dem Kopf
+    # zu nehmen und die Zelle stehen zu lassen, verschiebt jede Zeile.
+    erste = alarm.select_one("tbody .gr-a-zeile")
+    assert erste, "keine Datenzeile"
+    assert len(erste.select("td")) == len(koepfe), (
+        f"{len(erste.select('td'))} Zellen zu {len(koepfe)} Spaltenkoepfen")
+    aufklapper = alarm.select_one("tbody .gr-a-auf td")
+    assert int(aufklapper["colspan"]) == len(koepfe), (
+        f"colspan {aufklapper['colspan']} zu {len(koepfe)} Spalten")
+
+    # Der Katalog behaelt sie - mit EINEM Wort je Zustand.
+    katalog = suppe.select_one("#gr-katalogtabelle")
+    assert katalog, "Katalogtabelle fehlt"
+    kkoepfe = [th.get_text(" ", strip=True).lower() for th in katalog.select("thead th")]
+    assert any("verfügbar" in k for k in kkoepfe), kkoepfe
+
+
+def test_ein_zustand_hat_auf_der_ganzen_seite_ein_wort(tmp_path):
+    """Derselbe Zustand hiess in der Alarmtabelle „unbekannt" und im Katalog
+    „keine Angabe". Zwei Woerter fuer eine Sache lesen sich wie zwei
+    Sachen."""
+    # Der Normalfall der Fixture ist "lieferbar" - dann gibt es die Pille
+    # gar nicht, und der Test bewiese nichts.
+    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
+    for i, listung in enumerate(db["listungen"]):
+        if i % 2:
+            listung["verfuegbarkeit"] = "unbekannt"
+    site = _baue(tmp_path, db=db)
+    suppe = _suppe(site, "geraete.html")
+    woerter = {p.get_text(" ", strip=True).lower()
+               for p in suppe.select(".gr-pille--unbekannt, .gr-pille--unklar")}
+    assert woerter, "keine Verfuegbarkeitspille gerendert - Test misst nichts"
+    assert len(woerter) == 1, f"zwei Woerter fuer einen Zustand: {woerter}"
+
+
+def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
+    """Bei sieben Spalten und 24 Zeilen ist „sortiere nach Euro statt nach
+    Prozent" die erste Frage vor dieser Tabelle.
+
+    Geprueft wird hier die STATISCHE Voraussetzung: jeder Knopf nennt einen
+    Schluessel, und zu jedem Schluessel traegt jede Zeile einen Wert. Ob die
+    Sortierung dann richtig ordnet, misst
+    `tests/test_geraete_reiter_browser.py` im echten Chromium - eine
+    Sortierung, die es nur im Test gibt, sortiert keine Seite."""
+    site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
+    suppe = _suppe(site, "geraete.html")
+
+    for tafel in ("#tafel-alarme", "#tafel-katalog"):
+        tabelle = suppe.select_one(f"{tafel} .gr-alarm")
+        assert tabelle, f"{tafel}: Tabelle fehlt"
+        knoepfe = tabelle.select("thead .gr-sort")
+        assert knoepfe, f"{tafel}: kein sortierbarer Spaltenkopf"
+        zeilen = tabelle.select("tbody .gr-a-zeile")
+        assert zeilen, f"{tafel}: keine Datenzeile"
+        for k in knoepfe:
+            schluessel = k.get("data-sort")
+            assert schluessel, f"{tafel}: Knopf ohne data-sort"
+            assert k.get("data-art") in ("zahl", "text"), schluessel
+            fehlend = [z for z in zeilen if z.get(f"data-s-{schluessel}") is None]
+            assert not fehlend, (
+                f"{tafel}: {len(fehlend)} Zeilen ohne data-s-{schluessel} - "
+                f"sie sortierten stumm ans Ende")
+
+
+def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path):
+    """Die Karte meldete „59 Geräte neu im Regal" - bei 59 beobachteten
+    Geräten. Beides stimmte: die Preishistorie war 20 Tage alt, also war
+    JEDES erfasste Gerät innerhalb des Fensters erstmals gesehen worden.
+    Der Satz sagte damit nichts über den Markt, sondern über den
+    Startzeitpunkt dieses Radars - und stand als Aussage über den Markt da.
+    Darunter eine Tabelle mit sieben Spaltenköpfen und genau EINER
+    Datenzeile.
+
+    Unter der Schwelle steht ein Satz und keine Tabelle. Die Bewegungen sind
+    nicht verloren, sie stehen im Satz."""
+    from telco_radar.report.geraete_view import VORLAUF_TAGE
+
+    # Der Normalfall der Fixture misst seit dem 01.07., also 41 Tage - das
+    # ist der ANDERE Zweig. Hier zwei Messtage eine Woche auseinander, mit
+    # einer echten Preisbewegung dazwischen: es gibt einen Vergleichsstand
+    # (sonst greift `ohne_vorlauf`), er ist nur kurz.
+    punkte = [
+        {"listung_id": "medimax--apple-iphone-16-pro-max-256gb-schwarz",
+         "device_id": "apple-iphone-16-pro-max", "anbieter": "Medimax",
+         "datum": "2026-08-04", "preis_ohne_vertrag": 999.0,
+         "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"},
+        {"listung_id": "medimax--apple-iphone-16-pro-max-256gb-schwarz",
+         "device_id": "apple-iphone-16-pro-max", "anbieter": "Medimax",
+         "datum": "2026-08-11", "preis_ohne_vertrag": 899.0,
+         "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"},
+    ]
+    site = _baue(tmp_path, punkte=punkte)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    auf = geraete["auffaellig"]
+    # Gegenprobe: die Fixture muss WIRKLICH in diesen Zweig fallen - sonst
+    # prüft der Test einen anderen und behauptet diesen.
+    assert auf["kurzer_vorlauf"], (
+        f"{auf['vorlauf_tage']} Tage Vorlauf - die Fixture löst den Fall "
+        f"nicht aus")
+    assert auf["vorlauf_tage"] < VORLAUF_TAGE
+    assert not auf["ohne_vorlauf"], (
+        "das ist der Erstlauf-Zweig, nicht der kurze Vorlauf")
+
+    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    assert abschnitt is not None, "die Wochenkarte fehlt"
+    saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
+    assert len(saetze) == 1, f"ein Satz, keine Aufzählung: {saetze}"
+    assert "erstmals erfasst" in saetze[0], saetze
+    assert "neu im Regal" not in saetze[0], (
+        "'neu im Regal' ist bei 20 Tagen Messdauer eine Aussage ueber uns, "
+        "nicht ueber den Markt")
+    assert abschnitt.select_one("table") is None, (
+        "unter kurzem Vorlauf gehört in die Wochenkarte keine Tabelle")
+
+
+def test_ueber_vier_wochen_vorlauf_kommt_die_tabelle_zurueck(tmp_path):
+    """Der Gegenzweig. Ohne ihn prüfte der Test darüber nur, dass diese
+    Fixture keine Tabelle rendert - und wäre auch dann grün, wenn die
+    Tabelle NIE mehr erschiene."""
+    from telco_radar.report.geraete_view import VORLAUF_TAGE
+
+    # Der Normalfall der Fixture misst vom 01.07. bis zum 11.08., also
+    # 41 Tage - über der Schwelle.
+    site = _baue(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    auf = geraete["auffaellig"]
+    assert auf["vorlauf_tage"] >= VORLAUF_TAGE, auf["vorlauf_tage"]
+    assert not auf["kurzer_vorlauf"]
+    assert auf["bewegungen"], (
+        "keine Bewegung im Datensatz - dann sagt der Test nichts darüber, "
+        "ob die Tabelle zurückkommt")
+    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    assert abschnitt.select_one("table") is not None, (
+        "über der Schwelle gehört die Tabelle zurück")
+
+
+def test_die_wochenkarte_schreibt_preise_mit_komma(tmp_path):
+    """Die Sätze schrieben ihre Beträge mit `f"{wert:.2f} €"`, also
+    „129.00 €" mit Dezimalpunkt, während jede Tabelle derselben Seite
+    „129,00 €" zeigt. Solange die Sätze neben einer Tabelle standen, ging
+    das unter; seit die Karte unter kurzem Vorlauf NUR aus einem Satz
+    besteht, ist es die erste Zahl, die dort jemand liest."""
+    import re
+
+    site = _baue(tmp_path)
+    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    text = " ".join(li.get_text(" ", strip=True)
+                    for li in abschnitt.select(".gr-saetze li"))
+    assert "€" in text, f"kein Betrag in der Karte: {text!r}"
+    punkt = re.findall(r"\d+\.\d\d\s*€", text)
+    assert not punkt, f"Dezimalpunkt statt Komma: {punkt} in {text!r}"
+    assert re.search(r"\d+,\d\d\s*€", text), text
+
+
+def test_eine_ruhige_woche_erzeugt_unter_kurzem_vorlauf_gar_keine_karte(tmp_path):
+    """Der Ein-Satz-Zweig darf nicht dazu führen, dass die Rubrik „Was diese
+    Woche auffällt" IMMER etwas zeigt.
+
+    Ohne die Bedingung stünde in einer ruhigen Woche „Seit dem 10.08. wurden
+    0 Geräte erstmals erfasst; eine Preisänderung ist dabei nicht
+    aufgefallen." - ein Satz, der nichts sagt. Vorher verschwand die Sektion
+    in diesem Fall, und das ist die richtige Antwort: keine Zeile, die nichts
+    sagt (dieselbe Regel, mit der „niemand günstiger" aus der Alarmtabelle
+    geflogen ist)."""
+    class _Historie:
+        def alle_punkte(self):
+            return [{"datum": "2026-08-20"}]
+
+        def reihe(self, _listung_id):
+            return []
+
+    class _Katalog:
+        def nach_id(self, _device_id):
+            return None
+
+    auf = geraete_view._auffaellig([], _Historie(), _Katalog(),
+                                   heute="2026-08-30", laeufe=4)
+    # Gegenprobe: der Fall muss WIRKLICH im kurzen Vorlauf liegen, sonst
+    # prüft der Test einen anderen Zweig.
+    assert auf["kurzer_vorlauf"], auf["vorlauf_tage"]
+    assert not auf["saetze"], auf["saetze"]
+    assert not auf["hat_daten"], "die Sektion darf gar nicht erscheinen"
