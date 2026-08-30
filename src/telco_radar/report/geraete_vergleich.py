@@ -146,6 +146,15 @@ def _angebot(eintrag: dict, laeden: Optional[dict] = None) -> dict:
         "abgerufen_am": eintrag.get("abgerufen_am") or "",
         "farbe": eintrag.get("farbe_normalisiert") or eintrag.get("farbe_roh") or "",
         "tarif": (eintrag.get("tarif_referenz") or "").strip(),
+        # Ein Kampfpreis auf ein nicht lieferbares Geraet ist ein anderer
+        # Sachverhalt als einer auf ein lieferbares. Die Alarmtabelle zeigt
+        # das als eigene Spalte, statt beides gleich aussehen zu lassen.
+        "verfuegbarkeit": eintrag.get("verfuegbarkeit") or "unbekannt",
+        "zustand": eintrag.get("zustand") or "neu",
+        # Traegt die Markierung des Pruefberichts an die Zeile: ein Ausreisser
+        # wird gemeldet statt geloescht, und gemeldet heisst DORT sichtbar,
+        # wo jemand die Zahl liest.
+        "listung_id": eintrag.get("id") or "",
     }
 
 

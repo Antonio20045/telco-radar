@@ -75,6 +75,40 @@ def verfuegbarkeit_aus_schema(wert) -> str:
     return _VERFUEGBARKEIT.get(schluessel, "unbekannt")
 
 
+# schema.org kennt vier Zustaende. Sie werden HIER auf unser Vokabular
+# abgebildet und nicht der Wortliste in `geraete_model._ZUSTAENDE`
+# ueberlassen: dort stuende "used" als Einzelwort und traefe jeden englischen
+# Titel, der es beilaeufig benutzt.
+#
+# Gemessen am 30.08.2026, vor dieser Zeile: `UsedCondition` - der
+# schema.org-Standardbegriff fuer Gebrauchtware - ergab `zustand="neu"`, und
+# ein Shop, der seinen Gebrauchtbestand KORREKT auszeichnet, lieferte seinen
+# Gebrauchtpreis in den Neupreisvergleich. `RefurbishedCondition` traf nur
+# zufaellig, weil die Binnenmajuskel den Begriff zerlegt; kleingeschrieben
+# fiel auch der durch.
+_SCHEMA_ZUSTAND = {
+    "usedcondition": "gebraucht",
+    "refurbishedcondition": "refurbished",
+    "damagedcondition": "b-ware",
+    "newcondition": "",
+}
+
+
+def zustand_aus_schema(wert) -> str:
+    """Das Zustandswort zu einem `itemCondition`, oder "" wenn unbekannt.
+
+    Akzeptiert die volle URL, den blossen Begriff und die dict-Form
+    `{"@id": ...}`, in der Shops den Enum gern verpacken - gross wie klein
+    geschrieben.
+    """
+    if isinstance(wert, dict):
+        wert = wert.get("@id") or wert.get("name") or ""
+    if isinstance(wert, (list, tuple)):
+        wert = wert[0] if wert else ""
+    marke = str(wert or "").rstrip("/").rsplit("/", 1)[-1].strip().lower()
+    return _SCHEMA_ZUSTAND.get(marke, "")
+
+
 def lies_preis(roh) -> Optional[float]:
     """Preisangabe -> float, oder None.
 
@@ -168,8 +202,10 @@ def _aus_produktknoten(knoten: dict) -> Optional[dict]:
         # schema.org kennt den Zustand als `itemCondition`
         # (".../RefurbishedCondition"). Er steht am Produkt ODER am Angebot,
         # je nachdem, wie der Shop sein Schema baut.
-        "zustand_hinweis": str(knoten.get("itemCondition")
-                               or angebot.get("itemCondition") or ""),
+        # Produkt UND Angebot: schema.org verortet den Zustand ueblicherweise
+        # am Angebot, viele Shops setzen ihn ans Produkt.
+        "zustand_hinweis": (zustand_aus_schema(knoten.get("itemCondition"))
+                            or zustand_aus_schema(angebot.get("itemCondition"))),
         "sku": str(knoten.get("sku") or "").strip(),
         "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
         "farbe": str(farbe).strip() if isinstance(farbe, str) else "",
@@ -241,7 +277,10 @@ def produkte_aus_microdata(html: str) -> list[dict]:
             "preis": preis,
             "waehrung": (_itemprop(quelle, "priceCurrency") or "").upper(),
             "verfuegbarkeit": verfuegbarkeit_aus_schema(_itemprop(quelle, "availability")),
-            "zustand_hinweis": _itemprop(quelle, "itemCondition"),
+            # `quelle` ist das Angebot, sobald eins da ist - der Zustand kann
+            # aber am Produkt haengen. Beide fragen, wie im ld+json-Pfad.
+            "zustand_hinweis": (zustand_aus_schema(_itemprop(quelle, "itemCondition"))
+                                or zustand_aus_schema(_itemprop(produkt, "itemCondition"))),
             "sku": _itemprop(produkt, "sku"),
             "ean": _itemprop(produkt, "gtin13"),
             "farbe": _itemprop(produkt, "color"),

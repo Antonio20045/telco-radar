@@ -145,11 +145,22 @@ def test_zwei_schreibweisen_derselben_farbe_sind_ein_doppelpreis():
     assert erg["zahlen"]["doppelpreise"] == 1
 
 
-def test_die_kanonische_farbe_schlaegt_die_rohschreibweise():
-    """Kennt `config/farben.yaml` die Schreibweise, entscheidet sie - sonst
-    waeren "Navy" und "navy blue" zwei Farben."""
-    assert farbschluessel("navy", "Navy Blue") == farbschluessel("navy",
-                                                                 "Marineblau")
+def test_die_rohschreibweise_traegt_den_schluessel():
+    """Der Schluessel beantwortet "ist das buchstaeblich dieselbe Variante?",
+    nicht "welche Grundfarbe ist das?".
+
+    Die erste Fassung liess die kanonische Farbe gewinnen. Gemessen am
+    Livebestand faltet `config/farben.yaml` aber Marketingnamen zusammen -
+    21 kanonische Farben tragen mehr als eine Rohschreibweise, "schwarz"
+    steht fuer Black, Obsidian, Schwarz und Mitternacht. Zwei echte
+    Farbpreise waeren damit EIN Doppelpreis gewesen, und der entfernt seit
+    dem 30.08.2026 ohne Spannengrenze.
+    """
+    assert farbschluessel("schwarz", "Obsidian") != farbschluessel(
+        "schwarz", "Mitternacht")
+    # Ohne Rohschreibweise traegt die kanonische Farbe weiter.
+    assert farbschluessel("navy", "") == farbschluessel("navy", "")
+    assert farbschluessel("navy", "") == "navy"
 
 
 # --------------------------------------------------------------------------
@@ -258,3 +269,148 @@ def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
         "der niedrigste Preis ist der wahrscheinlichste Fehler - ein Zustand, "
         "den die Quelle nicht deckt, darf keinen Vergleich gewinnen")
     assert guenstiger("refurbished") == set()
+
+
+# --------------------------------------------------------------------------
+# Der Weg vom Schema bis zur Listung
+# --------------------------------------------------------------------------
+
+_LDJSON = """<html><head><script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Product",
+ "name":"Apple iPhone 14 Pro 128 GB Space Schwarz",
+ "color":"Space Schwarz",
+ "offers":{"@type":"Offer","price":"577.00","priceCurrency":"EUR",
+           "availability":"https://schema.org/InStock",
+           "itemCondition":"%s"}}
+</script></head><body></body></html>"""
+
+
+@pytest.mark.parametrize("marke,erwartet", [
+    ("https://schema.org/UsedCondition", "refurbished"),
+    ("https://schema.org/RefurbishedCondition", "refurbished"),
+    ("https://schema.org/refurbishedcondition", "refurbished"),
+    ("https://schema.org/DamagedCondition", "b-ware"),
+    ("https://schema.org/NewCondition", "neu"),
+])
+def test_der_zustand_kommt_vom_schema_bis_an_die_listung(marke, erwartet):
+    """Die ganze Kette, nicht nur ihr letztes Glied.
+
+    `zustand_hinweis` stand nach dem ersten Anlauf an drei Produktionsstellen
+    und in KEINEM Test - `grep zustand_hinweis tests/` war leer. Wer den
+    dict-Schluessel umbenennt oder `_erstes_angebot` anders baut, bekommt
+    weiter gruene Tests, und Gebrauchtgeraete stehen wieder im
+    Neupreisvergleich. Deshalb laeuft dieser Test durch `produkte_aus_html`,
+    nicht gegen einen handgeschriebenen String.
+    """
+    from telco_radar.collect.geraete.strukturdaten import produkte_aus_html
+    from telco_radar.geraete_model import lies_listung
+
+    saetze = produkte_aus_html(_LDJSON % marke)
+    assert saetze, "die Fixture liefert keinen Produktsatz"
+
+    listung = lies_listung(
+        titel=saetze[0]["titel"], anbieter="o2", anbieter_typ="netzbetreiber",
+        quelle_url="https://www.o2online.de/p/x", abgerufen_am="2026-08-30",
+        katalog=_KATALOG, farben={}, farbe_roh=saetze[0].get("farbe") or "",
+        zustand_hinweis=saetze[0].get("zustand_hinweis") or "",
+        preis_ohne_vertrag=577.0)
+    assert listung is not None, "der Titel trifft keinen Katalogeintrag"
+    assert listung.zustand == erwartet
+
+
+def test_ein_gebrauchtpreis_in_anderer_farbe_bleibt_stehen_und_wird_gemeldet():
+    """Die Verhaltensumkehr vom 30.08.2026, ausgeschrieben.
+
+    Bis dahin flog "577 gegen 883 EUR in zwei Farben" ueber die
+    30-Prozent-Regel aus dem Vergleich. Seit die Farbe im Schluessel steht,
+    ist das kein Doppelpreis mehr: verschiedene Farben sind nie ein
+    Widerspruch. Der Fall wird als Farbspanne BERICHTET und bleibt stehen -
+    hier faengt ihn im Ernstfall die Zustandserkennung, nicht mehr die
+    Spanne. Wer diese Entscheidung zurueckdreht, faellt ueber diesen Test.
+    """
+    eintraege = [
+        _e("samsung-galaxy-s25", 883.0, "blau", kennung="teuer"),
+        _e("samsung-galaxy-s25", 577.0, "grau", kennung="billig"),
+    ]
+    erg = pruefe(eintraege, _KATALOG)
+    assert len(erg["sauber"]) == 2
+    assert erg["zahlen"]["doppelpreise"] == 0
+    befund = next(b for b in erg["befunde"] if b["art"] == "farbspanne")
+    assert befund["entfernt"] is False
+    assert befund["spanne"] == pytest.approx(53.0, abs=0.5)
+
+
+def test_ein_unmoeglicher_farbabstand_fliegt_doch():
+    """Der Lockpreis. CLAUDE.md: "Der niedrigste Preis ist der
+    wahrscheinlichste Fehler. Jede min-Auswahl braucht einen Filter davor."
+
+    Ohne diese Grenze hatte die min-Auswahl ueber Farben hinweg gar keinen
+    Filter mehr: eine 1-Euro-Anzahlung in anderer Farbe ueberlebte, gewann
+    den Vergleich mit "908 EUR guenstiger", und die Quellenseite schrieb
+    daneben "die Farben liegen 89800 % auseinander - gezeigt".
+    """
+    eintraege = [
+        _e("samsung-galaxy-s25", 899.0, "navy", kennung="echt"),
+        _e("samsung-galaxy-s25", 1.0, "schwarz", kennung="lockpreis"),
+    ]
+    erg = pruefe(eintraege, _KATALOG)
+    assert erg["sauber"] == []
+    befund = next(b for b in erg["befunde"] if b["art"] == "farbspanne")
+    assert befund["entfernt"] is True
+
+
+def test_ein_ausreisser_bleibt_markiert_wenn_nebenan_etwas_entfernt_wird():
+    """Eine Pruefung, die nichts entfernt, darf ihr Sichtfeld nicht von einer
+    verlieren, die entfernt.
+
+    Verkettet gemessen: der Doppelpreis nimmt beide C-Zeilen heraus, die
+    Gruppe faellt unter drei Angebote, der Median wird gar nicht mehr
+    gerechnet - und die 200-EUR-Zeile stuende unmarkiert im Vergleich.
+    """
+    eintraege = [
+        _e("samsung-galaxy-s25", 900.0, "navy", kennung="a", anbieter="A"),
+        _e("samsung-galaxy-s25", 200.0, "navy", kennung="b", anbieter="B"),
+        _e("samsung-galaxy-s25", 880.0, "schwarz", kennung="c1", anbieter="C"),
+        _e("samsung-galaxy-s25", 850.0, "schwarz", kennung="c2", anbieter="C"),
+    ]
+    erg = pruefe(eintraege, _KATALOG)
+    # Gegenprobe: die C-Zeilen fliegen wirklich, sonst misst der Test nichts.
+    assert {e["id"] for e in erg["sauber"]} == {"a", "b"}
+    assert "b" in erg["auffaellig"], "der Ausreisser ist unmarkiert geblieben"
+
+
+def test_zwei_marketingfarben_derselben_grundfarbe_sind_zwei_farben():
+    """`config/farben.yaml` faltet Marketingnamen auf Grundfarben - im
+    Livebestand steht "schwarz" fuer Black, Obsidian, Schwarz und
+    Mitternacht. Auf die kanonische Farbe geschluesselt waeren zwei echte
+    Farbpreise EIN Doppelpreis, und seit der ohne Spannengrenze entfernt,
+    floegen beide aus dem Vergleich."""
+    a = dict(_e("samsung-galaxy-s25", 899.0, "Obsidian", kennung="a"),
+             farbe_normalisiert="schwarz")
+    b = dict(_e("samsung-galaxy-s25", 949.0, "Mitternacht", kennung="b"),
+             farbe_normalisiert="schwarz")
+    erg = pruefe([a, b], _KATALOG)
+    assert len(erg["sauber"]) == 2
+    assert erg["zahlen"]["doppelpreise"] == 0
+
+
+@pytest.mark.parametrize("eine,andere", [
+    ("titan rot", "titan"),
+    ("ocean ice", "ocean"),
+    ("midnight sky", "midnight"),
+])
+def test_ein_dreibuchstabiges_farbwort_ist_kein_kuerzel(eine, andere):
+    """Die erste Fassung strich jedes Anhaengsel bis drei Zeichen und traf
+    damit echte Farbwoerter. Gestrichen wird nur, was keinen Vokal hat."""
+    assert farbschluessel(None, eine) != farbschluessel(None, andere)
+
+
+@pytest.mark.parametrize("eine,andere", [
+    ("farbe 0", "farbe 1"),
+    ("blau 2", "blau 3"),
+])
+def test_eine_ziffer_am_ende_ist_kein_kuerzel(eine, andere):
+    """Eine Ziffer ist keine Abkuerzung, sondern Teil des Namens. Ohne diese
+    Haelfte der Regel fielen 24 verschiedene Farben einer Fixture auf denselben
+    Schluessel - und der ganze Bestand wurde als Doppelpreis aussortiert."""
+    assert farbschluessel(None, eine) != farbschluessel(None, andere)

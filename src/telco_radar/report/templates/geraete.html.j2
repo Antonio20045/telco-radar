@@ -1,132 +1,92 @@
 {# Geraete- und Preisradar.
 
-   Drei Fragen, die heute niemand automatisiert beantwortet: was die
-   Wettbewerber ueberhaupt fuehren, wo ein Geraet im Preis steht, und wie
-   lange es im Markt lebt.
+   VIER FRAGEN, VIER REITER. Bis zum 30.08.2026 stand alles untereinander auf
+   einer Seite, angefuehrt von einer Positionskarte mit 59 Geraeten mal vier
+   Anbietern in EINEM Bild: 114 senkrecht gedrehte Achsenbeschriftungen, 155
+   von 164 Punkten ohne Beschriftung. Drei Umschalter boten drei Ansichten
+   derselben unlesbaren Grafik an - das sind keine drei Antworten.
 
-   Die Positionskarte ist ein gerechnetes SVG, keine Bibliothek - dieselbe
-   Bauform wie die Tarif-Positionskarte. Beide Ansichten (Spalten =
-   Hersteller / Spalten = Anbieter) stehen fertig im Datensatz; der
-   Umschalter blendet um, er laedt nicht neu.
+   Die Grafik ist geloescht, nicht umgebaut. Was sie zeigen sollte, zeigt
+   jetzt eine Tabelle: die Startansicht traegt KEIN Diagramm.
 
-   Die Vollstaendigkeitsangabe steht OBEN. Eine Preiskarte mit vier von
+   Drei Regeln, die diese Vorlage tragen:
+     1. Ein Diagramm zeigt genau EIN Geraet. Es steht in "Preisverlauf" und
+        erscheint erst nach einer Auswahl - auch kein leeres davor.
+     2. Kein gedrehter Text, keine Schrift unter 12 px, keine mit "..."
+        abgeschnittene Beschriftung. Passt ein Name nicht hin, ist die
+        Ansicht zu voll: dann fallen Eintraege, nicht Buchstaben.
+     3. Keine Zeile, die nichts sagt. "niemand guenstiger" stand 36-mal in
+        der alten Tabelle; die Kachel "Bestpreis" sagt dasselbe einmal.
+
+   Alle Tafeln stehen fertig im HTML - der Reiter blendet um, er laedt nicht
+   neu und braucht kein Netz.
+
+   Die Vollstaendigkeitsangabe steht OBEN. Eine Preisuebersicht mit vier von
    dreiundzwanzig Anbietern ist keine Marktuebersicht und darf nicht so
    aussehen. #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
 {% block title %}Vodafone Product and Services Insights · Geräte und Preise{% endblock %}
 
-{# Eine Zeichenflaeche. Die Geometrie steht als data-Attribut am Container,
-   damit Abnahme und Tests sie LESEN statt sie nachzurechnen: `pruefe_portal`
-   hatte die Nulllinie als `540 - 70` hartcodiert, und sobald die Hoehe mit
-   der Zahl der Eintraege waechst, misst so eine Zahl am falschen Ort.
-
-   Der Formschalter benutzt bewusst eine ANDERE Klasse als der
-   Ansichtsschalter (`gr-flaeche--aus` statt `gr-ansicht--aus`) - sonst
-   zaehlte `test_beide_ansichten_stehen_fertig_im_html` vier ausgeblendete
-   Ansichten statt einer und fiele aus dem falschen Grund. #}
-{% macro flaeche(k, aktiv) %}
-<div class="gr-flaeche{% if not aktiv %} gr-flaeche--aus{% endif %}"
-     data-form="{{ k.form }}" data-vertrag="{{ k.preisart }}"
-     data-hoehe="{{ k.hoehe }}" data-achse="{{ k.achse_y }}"
-     data-plot-h="{{ k.plot_h }}" data-ymax="{{ k.y_max }}"
-     data-punkte="{{ k.punkte | length }}"
-     data-etiketten-verborgen="{{ k.etiketten_verborgen }}"
-     data-baender-uebersprungen="{{ geraete.bilanz.nicht_gezeigt }}">
-  <svg class="gr-svg" viewBox="0 0 {{ k.breite }} {{ k.hoehe }}"
-       role="img" aria-label="Preis-Positionskarte, Spalten nach {{ k.achsname }}">
-    {% for t in k.y_ticks %}
-    <line x1="{{ k.rand_l }}" y1="{{ t.y }}" x2="{{ k.breite - k.rand_r }}"
-          y2="{{ t.y }}" class="gr-raster"/>
-    <text x="{{ k.rand_l - 8 }}" y="{{ t.y + 4 }}" class="gr-tick"
-          text-anchor="end">{{ t.wert }} €</text>
-    {% endfor %}
-    {% for s in k.spalten %}
-    {% if not loop.first %}
-    <line x1="{{ s.x0 }}" y1="{{ k.rand_o }}" x2="{{ s.x0 }}"
-          y2="{{ k.achse_y }}" class="gr-spaltenlinie"/>
-    {% endif %}
-    {# Direkt unter die Achse. Tiefer gesetzt lief der Spaltenname in den
-       Achsenhinweis am unteren Rand - bei der Bandform steht dort ausserdem
-       der gedrehte Modellname. #}
-    <text x="{{ s.x }}" y="{{ k.achse_y + 16 }}"
-          class="gr-spaltenname" text-anchor="middle">{{ s.label }}</text>
-    {% endfor %}
-    <line x1="{{ k.rand_l }}" y1="{{ k.achse_y }}"
-          x2="{{ k.breite - k.rand_r }}" y2="{{ k.achse_y }}" class="gr-achse"/>
-    <line x1="{{ k.rand_l }}" y1="{{ k.rand_o }}" x2="{{ k.rand_l }}"
-          y2="{{ k.achse_y }}" class="gr-achse"/>
-
-    {# Die Baender der Variante A. Sie liegen VOR den Punkten, damit die
-       Querstriche darauf sichtbar bleiben.
-
-       Die PREISZAHLEN stehen bewusst NICHT hier, sondern im jeweiligen
-       `.gr-punkt`. Als eigene Knoten neben dem Band waeren sie weder vom
-       Filter noch von Kriterium 11 erfasst: ein Filter auf "256 GB" haette
-       die Kreise der anderen Groessen ausgeblendet und ihre Preiszahlen
-       stehen lassen. #}
-    {% for b in k.baender %}
-    <g class="gr-band{% if b.eigen %} gr-band--eigen{% endif %}"
-       data-band="{{ b.schluessel }}">
-      {% if not b.entartet %}
-      <line x1="{{ b.x }}" y1="{{ b.y_oben }}" x2="{{ b.x }}" y2="{{ b.y_unten }}"
-            class="gr-bandlinie"/>
-      {% endif %}
-      {# Der Modellname steht UNTER der Achse und traegt deshalb keine
-         Preisaussage - deswegen `gr-bandname` und nicht `gr-etikett`. #}
-      <text x="{{ b.name_x }}" y="{{ b.name_y }}" class="gr-bandname"
-            text-anchor="end"
-            transform="rotate(-90 {{ b.name_x }} {{ b.name_y }})">{{ b.name_kurz }}</text>
-    </g>
-    {% endfor %}
-
-    {% for p in k.punkte %}
-    <g class="gr-punkt{% if p.eigen %} gr-punkt--eigen{% endif %}"
-       data-segment="{{ p.segment }}" data-speicher="{{ p.speicher or '' }}"
-       data-aktuell="{{ '1' if p.aktuelle_generation else '0' }}"
-       data-modell="{{ p.modell }}" data-anbieter="{{ p.anbieter_anzeige }}"
-       data-anbieter-key="{{ p.anbieter }}"
-       data-preis="{{ '%.2f'|format(p.preis) }}" data-preisart="{{ p.preisart }}"
-       data-farben="{{ p.farben }}" data-farben-liste="{{ p.farben_liste | join(', ') }}"
-       data-varianten="{{ p.varianten }}"
-       data-url="{{ p.url }}" data-stand="{{ p.abgerufen_am }}"
-       data-speicher-text="{{ p.speicher or '' }}"
-       {% if p.band %}data-band="{{ p.band }}"{% endif %}
-       tabindex="0" role="button">
-      {% if p.chip %}
-      <rect x="{{ p.chip.x }}" y="{{ p.chip.y }}" width="{{ p.chip.w }}"
-            height="{{ p.chip.h }}" rx="2" class="gr-chip"/>
-      {% endif %}
-      {% if p.strich_x1 is defined %}
-      <line x1="{{ p.strich_x1 }}" y1="{{ p.cy }}" x2="{{ p.strich_x2 }}"
-            y2="{{ p.cy }}" class="gr-stufe"/>
-      {% endif %}
-      <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ p.r }}"/>
-      {% if p.beschriftet %}
-      <text x="{{ p.label_x }}" y="{{ p.label_y }}" class="gr-etikett"
-            text-anchor="{{ p.label_anker }}">{{ p.label_kurz }}</text>
-      {% endif %}
-      <title>{{ p.titel }}</title>
-    </g>
-    {% endfor %}
-    {# Der Achsenhinweis steht OBEN rechts. Unten stand er bis zum
-       11.08.2026 und lief dort in die Spaltenbeschriftung; bei der Bandform
-       haette er ausserdem im gedrehten Modellnamen gelegen. Oben ist er
-       ausserdem da, wo man ihn liest, bevor man die Grafik deutet - und
-       genau das ist der Zweck des Zusatzes "Preise von N Händlern". #}
-    <text x="{{ k.breite - k.rand_r }}" y="{{ k.rand_o - 6 }}" class="gr-achsname"
-          text-anchor="end">{{ k.achsname }}{% if k.achszusatz %} – {{ k.achszusatz }}{% endif %}</text>
-  </svg>
-</div>
+{# Eine Zeile der Alarmtabelle. Der Prozentsatz steht gross, der Euro-Betrag
+   klein darunter: 15 Euro sind bei einem 200-Euro-Geraet viel und bei einem
+   2000-Euro-Geraet nichts. Die Pille ersetzt jede Legende - die Zeile sagt
+   selbst, wie schlimm sie ist. #}
+{% macro alarmzeile(z, nr, rest=False) %}
+  <tr class="gr-a-zeile{% if rest %} gr-a-rest{% endif %}" data-auf="auf-{{ nr }}"
+      data-marke="{{ z.hersteller }}" data-modell="{{ z.modell }}"
+      data-speicher="{{ z.speicher }}" tabindex="0">
+    <td><span class="gr-a-modell">{{ z.modell }}</span>
+      <span class="gr-a-klein">{{ z.speicher }} GB</span></td>
+    <td>{{ z.bester.laden }}<a class="gr-a-quelle" href="{{ z.bester.url }}"
+        rel="noopener" title="Quelle beim Anbieter öffnen"
+        aria-label="Quelle bei {{ z.bester.laden }} öffnen">↗</a>
+      {% if z.auffaellig %}<span class="gr-a-warnung">ungewöhnlich großer
+        Abstand – Quelle prüfen</span>{% endif %}</td>
+    <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{
+      '%.2f'|format(z.unser.preis)|replace('.', ',') }} €</span></td>
+    <td class="num"><span class="gr-a-fremd">{{
+      '%.2f'|format(z.bester.preis)|replace('.', ',') }} €</span></td>
+    <td class="num"><span class="gr-a-prozent">{{
+      '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
+      <span class="gr-a-euro">{{ '%.2f'|format(z.euro)|replace('.', ',') }} €</span></td>
+    <td><span class="gr-pille gr-pille--{{ z.stufe }}">{{ z.stufe_name }}</span></td>
+    <td>{% if z.bester.verfuegbarkeit == 'lieferbar' %}<span
+        class="gr-pille gr-pille--ja">Verfügbar</span>
+      {% elif z.bester.verfuegbarkeit == 'ausverkauft' %}<span
+        class="gr-pille gr-pille--nein">Nicht lieferbar</span>
+      {% else %}<span class="gr-pille gr-pille--unklar">unbekannt</span>{% endif %}</td>
+    <td><span class="gr-a-klein">{{ z.bester.abgerufen_am | date_de }}</span></td>
+  </tr>
+  <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="8">
+    <ul class="gr-a-liste">
+      {% for a in z.alle %}
+      <li><span{% if a.eigen %} class="gr-a-eigen"{% endif %}>{{ a.laden }}</span>
+        <span>{{ '%.2f'|format(a.preis)|replace('.', ',') }} €</span>
+        <span>{{ a.zustand }}</span>
+        {% if a.farbe %}<span>{{ a.farbe }}</span>{% endif %}
+        <span>{{ a.abgerufen_am | date_de }}</span>
+        {% if a.url %}<a href="{{ a.url }}" rel="noopener">Quelle</a>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </td></tr>
 {% endmacro %}
 
-{% macro ansicht(g, name, aktiv) %}
-<div class="gr-ansicht{% if not aktiv %} gr-ansicht--aus{% endif %}"
-     id="gr-ansicht-{{ name }}" data-ansicht="{{ name }}">
-  {% for form in g.formen %}
-  {{ flaeche(g.flaechen[name ~ '_' ~ form], loop.first) }}
-  {% endfor %}
-</div>
+{# Die zwei CSV-Knoepfe. Sie stehen auf JEDEM Reiter, weil der Auftrag den
+   Gesamtueberblick will und nicht Einzeldownloads - und weil ein eigener
+   Abschnitt dafuer 308 px kostete, in denen dieselben zwei Links ein zweites
+   Mal standen. Zeilenzahl und Groesse stehen NEBEN dem Link: ein leerer
+   Download ist der teuerste Weg herauszufinden, dass sich einer nicht lohnt. #}
+{% macro exportknoepfe() %}
+{% if geraete.export and geraete.export.aktuell.zeilen %}
+<span class="gr-export-knoepfe">
+  <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
+    >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
+  <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
+    >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
+</span>
+{% endif %}
 {% endmacro %}
 
 {% block content %}
@@ -138,393 +98,110 @@
     </div>
     {% if geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Diese Seite beantwortet drei Fragen: welche Geräte ein
-  Wettbewerber überhaupt führt, wo ein Gerät im Preis steht – und wie lange es
-  im Markt lebt. Jeder Preis stammt aus den strukturierten Produktdaten des
-  Anbieters, trägt seinen Quelllink und sein Abrufdatum. Geschätzte oder
-  hochgerechnete Preise gibt es hier nicht.</p>
+  <p class="page-lead">Wo liegen wir im Preis zurück, was führt der
+  Wettbewerb, und wie tief ist sein Portfolio? Jeder Preis stammt aus den
+  strukturierten Produktdaten des Anbieters und trägt Quelllink und
+  Abrufdatum – geschätzte Preise gibt es hier nicht.</p>
 </section>
 
 {% if geraete.hat_daten %}
-{# --- Vollstaendigkeit zuerst. --------------------------------------- #}
-<section class="gr-bilanz">
-  <h2 class="rubrik">Wie vollständig ist das</h2>
-  <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>{{ geraete.bilanz.geraete }}</b><span>Geräte beobachtet</span></div>
-    <div class="t-kennzahl"><b>{{ geraete.bilanz.skus }}</b><span>Varianten (SKUs)</span></div>
-    <div class="t-kennzahl"><b>{{ geraete.bilanz.anbieter }}</b><span>Anbieter mit Daten</span></div>
-    <div class="t-kennzahl"><b>{{ geraete.bilanz.preispunkte }}</b><span>Preispunkte in der Historie</span></div>
-    {# Eine Zahl groesser null ist IMMER eine Aussage. Weg bleibt die Kachel
-       nur, wenn sie null zeigt UND es noch keinen frueheren Lauf gibt -
-       "0 ausgelistet" ist dann eine Selbstverstaendlichkeit. #}
-    {% if geraete.bilanz.ausgelistet or not geraete.bilanz.ohne_vorlauf %}
-    <div class="t-kennzahl"><b>{{ geraete.bilanz.ausgelistet }}</b><span>ausgelistet</span></div>
-    {% endif %}
-  </div>
-  <p class="t-hinweis">{{ geraete.quellenlage.liefernd }} von
-  {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern
-  Daten. Welcher warum nicht, steht auf
-  <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a> – kein
-  Anbieter fehlt dort stillschweigend.</p>
-</section>
 
-{# --- Die Positionskarte --------------------------------------------- #}
-{% if geraete.karte_hersteller.hat_daten %}
-<section class="gr-karte" id="positionskarte">
-  <h2 class="rubrik">Wo steht welches Gerät im Preis
-    <span class="rubrik-zahl">{{ geraete.bilanz.in_der_karte }}</span></h2>
-  <p class="gr-erklaer">Ein Punkt ist ein Gerät in einer Speichergröße bei
-  einem Anbieter, die Höhe ist sein Preis ohne Vertrag; Farbvarianten stehen
-  nicht einzeln, dieselbe Speichergröße kostet in jeder Farbe dasselbe.
-  Zuzahlungen aus Tarifbündeln stehen bewusst nicht hier – „1 €“ mit Vertrag
-  und „1.199 €“ ohne sind nicht dieselbe Zahl.</p>
+{% set al = geraete.alarme %}
 
-  <div class="gr-steuer">
-    <div class="gr-schalter" role="group" aria-label="Ansicht">
-      <button type="button" class="gr-knopf{% if geraete.standard_ansicht == 'hersteller' %} on{% endif %}"
-              data-schalter="ansicht" data-wert="hersteller">Spalten: Hersteller</button>
-      <button type="button" class="gr-knopf{% if geraete.standard_ansicht == 'anbieter' %} on{% endif %}"
-              data-schalter="ansicht" data-wert="anbieter">Spalten: Anbieter</button>
+{# --- Reiterleiste ---------------------------------------------------- #}
+<nav class="gr-reiter" role="tablist" aria-label="Ansichten des Geräteradars">
+  <button type="button" role="tab" aria-selected="true"
+          aria-controls="tafel-alarme" data-tafel="tafel-alarme">Preis-Alarme</button>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-katalog" data-tafel="tafel-katalog">Gerätekatalog</button>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-portfolio" data-tafel="tafel-portfolio">Portfolio</button>
+</nav>
+
+{# --- Reiter 1: Preis-Alarme ------------------------------------------ #}
+<div class="gr-tafel" id="tafel-alarme" role="tabpanel">
+  <div class="gr-kacheln">
+    {% for k in al.kacheln %}
+    <div class="gr-kachel gr-kachel--{{ k.schluessel }}">
+      <b>{{ k.zahl }}</b><span>{{ k.name }}</span><em>{{ k.schwelle }}</em>
     </div>
-    {# Der Knopfzustand folgt der Reihenfolge in `geraete_karte.FORMEN` -
-       fest verdrahtet zeigte er "Punkte" als aktiv, waehrend die Bandform
-       gerendert wurde. #}
-    <div class="gr-schalter" role="group" aria-label="Darstellung">
-      {% for form in geraete.formen %}
-      <button type="button" class="gr-knopf{% if loop.first %} on{% endif %}"
-              data-schalter="form" data-wert="{{ form }}">{{ 'Preisbänder' if form == 'band' else 'Punkte' }}</button>
-      {% endfor %}
-    </div>
-    <div class="gr-filter">
-      <label>Segment
-        <select id="gr-segment">
-          <option value="">alle</option>
-          {% for s in geraete.segmente %}
-          <option value="{{ s }}">{{ geraete.segment_label.get(s, s) }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>Speicher
-        <select id="gr-speicher">
-          <option value="">alle</option>
-          {% for s in geraete.speicherstufen %}<option value="{{ s }}">{{ s }} GB</option>{% endfor %}
-        </select>
-      </label>
-      <label>Generation
-        {# Der Filter steht bewusst NICHT auf "nur aktuelle Generation".
-           Kurz war er es, und zwei Messungen haben es kassiert:
-
-           1. Er blendete ALDI TALKs einzige Listung (Galaxy A17) aus. Die
-              Kappung rettet jeden Laden ausdruecklich davor, ganz aus der
-              Grafik zu fallen - der Standardfilter machte die Rettung
-              wirkungslos und stellte eine beschriftete, LEERE Ladenspalte
-              unter eine Legende, die vier Anbieter nennt.
-           2. Gefiltert wird in `app.js`, ausgewaehlt im HTML. Ohne
-              JavaScript las man "nur aktuelle Generation" ueber einer
-              Grafik mit allen Punkten - eine Beschriftung, die dem Bild
-              widerspricht.
-
-           Das Aufraeumen leistet die Kappung (112 -> 54 Baender), und die
-           faellt serverseitig. #}
-        <select id="gr-generation">
-          <option value="">mit Vorgängern</option>
-          <option value="1">nur aktuelle Generation</option>
-        </select>
-      </label>
-    </div>
+    {% endfor %}
   </div>
 
-  <div class="gr-karte-scroll">
-    {{ ansicht(geraete, 'hersteller', geraete.standard_ansicht == 'hersteller') }}
-    {{ ansicht(geraete, 'anbieter', geraete.standard_ansicht == 'anbieter') }}
+  {# Zustand und Preisart sind auf dieser Tafel keine Auswahl, sondern der
+     Zuschnitt: der Vergleich zeigt ausschliesslich Neugeraete ohne Vertrag.
+     Sie stehen deshalb als aktive Etiketten und nicht als Auswahlfelder -
+     ein Bedienelement, das nichts aendern kann, ist keins. Sobald ein
+     Buendelpreis-Anbieter angebunden ist, traegt `mit_vertrag` Daten und
+     die Preisart wird ein echter Umschalter. #}
+  <div class="gr-filter">
+    <label>Marke <select data-filter="marke"><option value="">alle</option>
+      {% for m in al.marken %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+    </select></label>
+    <label>Modell <select data-filter="modell"><option value="">alle</option>
+      {% for m in al.modelle %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+    </select></label>
+    <label>Speicher <select data-filter="speicher"><option value="">alle</option>
+      {% for s in al.speicher %}<option value="{{ s }}">{{ s }} GB</option>{% endfor %}
+    </select></label>
+    <label class="gr-filter--an">Zustand: neu</label>
+    <label class="gr-filter--an">Preisart: ohne Vertrag</label>
   </div>
 
-  <p class="gr-detail" id="gr-detail" role="status"></p>
-  {# Die Zahl der Punkte OHNE Etikett gilt je Flaeche und wird von `app.js`
-     beim Umschalten nachgezogen. Hier steht der Stand der Startflaeche -
-     eine feste Zahl fuer alle vier waere eine, die fuer keine gilt. #}
-  {% set start = geraete.flaechen[geraete.standard_ansicht ~ '_' ~ geraete.formen[0]] %}
-  <p class="gr-legende" id="gr-legende">{{ geraete.bilanz.in_der_karte }} Preispunkte
-  aus {{ geraete.bilanz.aggregiert_aus }} Listungen von
-  {{ geraete.bilanz.geraete_in_der_karte }} Geräten bei
-  {{ geraete.karte_anbieter.spaltenzahl }} Anbietern, zuletzt abgerufen am
-  {{ geraete.abgerufen_bis | date_de }}. Rot markiert die eigenen
-  Angebote.{# Der veraenderliche Teil steht in EINEM eigenen Element. Vorher
-     schnitt `app.js` den Satz an der Zeichenkette "Ohne Etikett bleiben" ab -
-     sobald der Satz je Darstellungsform anders anfaengt, trifft ein solcher
-     Schnitt nicht mehr, und die Legende stand doppelt auf der Seite. #}
-  <span id="gr-legende-zusatz">{%
-  if start.etiketten_verborgen %}{% if start.form == 'band' %} Die Preiszahl
-  steht nur dort, wo sie neben das Band passt
-  ({{ start.punkte|length - start.etiketten_verborgen }} von
-  {{ start.punkte|length }}); die Höhe des Bandes ist die Spanne, den genauen
-  Wert zeigt ein Klick.{% else %} Ohne Etikett bleiben
-  {{ start.etiketten_verborgen }} Punkte – dort ist die Spalte voll; der Punkt
-  steht auf seinem Preis.{% endif %}{% endif %}{%
-  if geraete.bilanz.nicht_gezeigt %} {{ geraete.bilanz.nicht_gezeigt }} weitere
-  Angebote passen nicht in die Spalten; sie stehen vollständig in der
-  CSV-Tabelle.{% endif %}</span></p>
-
-  {# Wer die Grafik auf dem Telefon nicht lesen kann, hat trotzdem Zugriff.
-     Aus DERSELBEN Punktliste - eine zweite Aufbereitung wuerde driften. #}
-  <details class="evidence gr-tabelle-auf">
-    <summary>Dieselben Zahlen als Tabelle</summary>
-    <div class="gr-scroll">
-      <table class="src-table">
-        <thead><tr><th>Gerät</th><th>Speicher</th><th>Anbieter</th>
-          <th class="num">Preis</th><th class="num">Farben</th>
-          <th>Stand</th><th>Beleg</th></tr></thead>
-        <tbody>
-          {% for p in geraete.flaechen['hersteller_chip'].punkte %}
-          <tr>
-            <td>{{ p.modell }}</td><td>{{ p.speicher or '–' }}{% if p.speicher %} GB{% endif %}</td>
-            <td>{{ p.anbieter_anzeige }}</td>
-            <td class="num">{{ '%.2f'|format(p.preis) }} €</td>
-            <td class="num">{{ p.farben }}</td>
-            <td>{{ p.abgerufen_am | date_de }}</td>
-            <td>{% if p.url %}<a href="{{ p.url }}" rel="noopener">{{ p.url | domain }}</a>{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </details>
-</section>
-{% endif %}
-
-{# --- Gesamtexport ----------------------------------------------------- #}
-{# Die vierte Luecke der internen Loesung: dort gibt es Daten nur je
-   Einzelprodukt oder je Marke. Hier steht der ganze Bestand in EINER Datei.
-   Zeilenzahl und Groesse stehen NEBEN dem Link - ein leerer Download ist
-   der teuerste Weg herauszufinden, dass sich einer nicht lohnt. #}
-{% if geraete.export and geraete.export.aktuell.zeilen %}
-<section class="gr-export" id="export">
-  <h2 class="rubrik">Alles als Tabelle</h2>
-  <ul class="gr-export-liste">
-    <li>
-      <a href="{{ geraete.export.aktuell.datei }}" download>Aktueller Bestand (CSV)</a>
-      <span class="gr-export-meta">{{ geraete.export.aktuell.zeilen }} Zeilen ·
-        {{ (geraete.export.aktuell.bytes / 1024) | round | int }} KB{%
-        if geraete.export.stand %} · Stand {{ geraete.export.stand | date_de }}{% endif %}</span>
-    </li>
-    <li>
-      <a href="{{ geraete.export.historie.datei }}" download>Preishistorie (CSV)</a>
-      <span class="gr-export-meta">{{ geraete.export.historie.zeilen }} Zeilen ·
-        {{ (geraete.export.historie.bytes / 1024) | round | int }} KB</span>
-    </li>
-  </ul>
-  <p class="gr-export-hinweis">Der Bestand trägt eine Zeile je Listung
-  (Anbieter, Modell, Speicher, Farbe, Zustand, Preis, Preisart,
-  Tarifreferenz, Verfügbarkeit, Quelle, Abrufdatum), die Historie eine je
-  Listung und Messtag – ein unveränderter Preis schreibt keine Zeile. UTF-8
-  mit BOM, Semikolon, Dezimalkomma: Excel öffnet beide im deutschen
-  Gebietsschema per Doppelklick.</p>
-</section>
-{% endif %}
-
-{# --- Wer ist guenstiger als Vodafone? (G2) ---------------------------- #}
-{# Die woertliche Frage der Fachkollegen. Die interne Loesung zeigt, DASS es #}
-{# irgendwo guenstiger ist - nicht, BEI WEM. Genau das steht hier.          #}
-{% if geraete.vergleich.hat_daten %}
-{% for achse in ['ohne_vertrag', 'mit_vertrag'] %}
-{% set v = geraete.vergleich[achse] %}
-{% if v.hat_daten %}
-{% macro vergleichszeile(z) %}
-      <tr class="gr-v-zeile{{ ' gr-v-zeile--ohne' if not z.bester }}"
-          data-typen="{{ z.guenstiger|map(attribute='typ')|join(' ') }}">
-        <th scope="row" class="gr-v-geraet">
-          <span class="szl">{{ z.modell }}</span>
-          <span class="gr-v-meta">{% if z.speicher %}{{ z.speicher }} GB{% endif %}{%
-            if z.zustand != 'neu' %} · {{ z.zustand }}{% endif %}</span>
-        </th>
-        <td class="gr-eigen-spalte">
-          <a href="{{ z.vodafone.url }}" rel="noopener">{{
-            '%.2f'|format(z.vodafone.preis)|replace('.', ',') }} €</a>
-          <span class="gr-v-datum">{{ z.vodafone.abgerufen_am|date_de }}</span>
-          {% if z.vodafone.tarif %}<span class="gr-v-tarif">{{ z.vodafone.tarif }}</span>{% endif %}
-        </td>
-        <td>
-          {% if z.bester %}
-          <span class="gr-v-name">{{ z.bester.laden }}</span>
-          <a href="{{ z.bester.url }}" rel="noopener">{{
-            '%.2f'|format(z.bester.preis)|replace('.', ',') }} €</a>
-          <span class="gr-v-datum">{{ z.bester.abgerufen_am|date_de }}</span>
-          {% if z.bester.tarif %}<span class="gr-v-tarif">{{ z.bester.tarif }}</span>{% endif %}
-          {% else %}
-          <span class="gr-v-keiner">niemand günstiger{% if z.anzahl_verglichen %}
-            ({{ z.anzahl_verglichen }} verglichen){% endif %}</span>
-          {% endif %}
-        </td>
-        <td class="num">{% if z.differenz %}−{{
-          '%.2f'|format(z.differenz)|replace('.', ',') }} €
-          <span class="gr-v-prozent">{{ '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
-          {% else %}–{% endif %}</td>
-        <td class="num">{{ z.anzahl_guenstiger or '–' }}</td>
-      </tr>
-      {% if z.guenstiger|length > 1 %}
-      <tr class="gr-v-alle">
-        <td colspan="5">
-          <details>
-            <summary>alle {{ z.guenstiger|length }} unter Vodafone</summary>
-            <ul class="gr-v-liste">
-              {% for a in z.guenstiger %}
-              <li><span class="gr-v-name">{{ a.laden }}</span>
-                <a href="{{ a.url }}" rel="noopener">{{
-                  '%.2f'|format(a.preis)|replace('.', ',') }} €</a>
-                <span class="gr-v-prozent">−{{
-                  '%.2f'|format(z.vodafone.preis - a.preis)|replace('.', ',') }} €</span>
-                <span class="gr-v-datum">{{ a.abgerufen_am|date_de }}</span>
-                {% if a.tarif %}<span class="gr-v-tarif">{{ a.tarif }}</span>{% endif %}
-              </li>
-              {% endfor %}
-            </ul>
-          </details>
-        </td>
-      </tr>
-      {% endif %}
-{% endmacro %}
-
-<section class="gr-vergleich" id="vergleich-{{ achse|replace('_','-') }}">
-  <h2 class="rubrik">Wer ist günstiger als Vodafone?
-    <span class="rubrik-zusatz">{{ 'ohne Vertrag' if achse == 'ohne_vertrag'
-      else 'Zuzahlung im Tarifbündel' }}</span></h2>
-
-  {% if v.hat_vodafone %}
-  <p class="gr-vergleich-lage">
-    {{ v.geraete }} {{ 'Gerät' if v.geraete == 1 else 'Geräte' }} im Vergleich,
-    {{ v.zeilen|length }} mit ihren Speichergrößen · bei {{ v.mit_vorteil }}
-    ist ein Wettbewerber günstiger, bei {{ v.ohne_vorteil }} nicht{%
-    if v.groesste_differenz %} · größter Abstand
-    {{ '%.2f'|format(v.groesste_differenz)|replace('.', ',') }} €{% endif %}.
-    Die Übersicht zeigt {{ v.wesentlich|length }} davon – die mit dem
-    größten Abstand, mindestens 3 % oder 15 €.
-  </p>
-
-  <div class="gr-vergleich-filter" data-vergleich-filter="{{ achse }}">
-    <button type="button" class="gr-filter-knopf is-aktiv" data-typ="alle">alle</button>
-    <button type="button" class="gr-filter-knopf" data-typ="netzbetreiber">nur Netzbetreiber</button>
-    <button type="button" class="gr-filter-knopf" data-typ="handel">nur Fachhandel</button>
+  <div class="gr-werkzeug">
+    <input type="search" class="gr-suche" data-filter="suche"
+           placeholder="Gerät suchen – Marke, Modell, Anbieter …"
+           aria-label="Alarmtabelle durchsuchen">
+    {{ exportknoepfe() }}
   </div>
 
-  <div class="gr-vergleich-scroll">
-  <table class="src-table gr-vergleich-tabelle">
-    <thead>
-      <tr>
-        <th scope="col">Gerät</th>
-        <th scope="col" class="gr-eigen-spalte">Vodafone</th>
-        <th scope="col">günstigster Wettbewerber</th>
-        <th scope="col" class="num">Differenz</th>
-        <th scope="col" class="num">darunter</th>
-      </tr>
-    </thead>
+  {% if al.gesamt %}
+  <div class="gr-alarm-scroll">
+  <table class="gr-alarm">
+    <thead><tr>
+      <th scope="col">Gerät</th>
+      <th scope="col">günstigster Wettbewerber</th>
+      <th scope="col" class="num">unser Preis</th>
+      <th scope="col" class="num">Wettbewerbspreis</th>
+      <th scope="col" class="num">Unterschied</th>
+      <th scope="col">Einstufung</th>
+      <th scope="col">verfügbar</th>
+      <th scope="col">abgerufen</th>
+    </tr></thead>
     <tbody>
-      {% for z in v.wesentlich %}{{ vergleichszeile(z) }}{% endfor %}
-      {% if not v.wesentlich %}
-      <tr><td colspan="5" class="gr-v-keiner">Kein Wettbewerber liegt mehr als 3 % oder 15 € unter Vodafone.</td></tr>
-      {% endif %}
+      {% for z in al.sichtbar %}{{ alarmzeile(z, loop.index) }}{% endfor %}
+      {% for z in al.rest %}{{ alarmzeile(z, 'r' ~ loop.index, True) }}{% endfor %}
     </tbody>
   </table>
   </div>
-  {# Ein Filter, der die Tabelle leert, muss sagen warum. Ohne diesen Satz
-     steht der Leser vor einer leeren Flaeche und haelt die Seite fuer
-     kaputt - gesehen am 29.08.2026 im Browser: "nur Fachhandel" ergab 0 von
-     62 Zeilen, weil an diesem Tag nur Netzbetreiber Daten lieferten. #}
-  <p class="gr-v-leer" hidden>Zu dieser Auswahl liegt keine Vergleichszeile
-    vor – kein Anbieter dieser Art ist bei einem der verglichenen Geräte
-    günstiger als Vodafone.</p>
+  {% if al.rest %}
+  <p class="gr-erklaer"><button type="button" class="gr-knopf" id="gr-mehr"
+    >alle {{ al.gesamt }} anzeigen</button></p>
+  {% endif %}
+  {% endif %}
+  {# Der Satz steht IMMER da und ist versteckt, solange Zeilen sichtbar sind.
+     Er gehoert dem Filter, nicht dem Datenbestand: eine leere Tabelle ohne
+     Erklaerung liest sich als kaputte Seite, und das faellt beim Filtern
+     genauso an wie beim leeren Bestand. #}
+  <p class="gr-erklaer gr-a-leer"{% if al.gesamt %} hidden{% endif %}>Zu
+  dieser Auswahl ist bei keiner Modell-Speicher-Kombination ein Wettbewerber
+  günstiger.</p>
 
-  {% if v.rest %}
-  <details class="evidence gr-vergleich-rest">
-    <summary>Alle {{ v.zeilen|length }} Zeilen zeigen – auch die
-      {{ v.rest|length }} weiteren</summary>
-    <div class="evidence-body">
-      <p class="gr-erklaer">Hier steht der vollständige Vergleich: die
-      Geräte, bei denen niemand günstiger ist, die mit einem Abstand unter
-      3 % und unter 15 €, und alles jenseits der zwanzig Zeilen der
-      Übersicht. Ein Cent Unterschied auf einen Tausender ist kein
-      Wettbewerbsbefund – die Zeile verschwindet deshalb aus der Übersicht,
-      nicht aus der Seite.</p>
-      <div class="gr-vergleich-scroll">
-      <table class="src-table gr-vergleich-tabelle">
-        <thead>
-          <tr><th scope="col">Gerät</th>
-            <th scope="col" class="gr-eigen-spalte">Vodafone</th>
-            <th scope="col">günstigster Wettbewerber</th>
-            <th scope="col" class="num">Differenz</th>
-            <th scope="col" class="num">darunter</th></tr>
-        </thead>
-        <tbody>
-          {% for z in v.rest %}{{ vergleichszeile(z) }}{% endfor %}
-        </tbody>
-      </table>
-      </div>
-    </div>
-  </details>
-  {% endif %}
-  {% endif %}
+  {# "Geraete" waere hier falsch, und ein Test haelt das fest: gezaehlt
+     werden Modell-Speicher-Kombinationen, und davon gibt es mehr als
+     Geraete. Genau diese Verwechslung stand schon einmal auf der Seite
+     ("62 Geraete im Vergleich" bei 59 beobachteten). #}
+  <p class="gr-erklaer">{{ al.verglichen }} Modelle mit ihren Speichergrößen
+  stehen einem Wettbewerber gegenüber{% if al.ohne_wettbewerber %}; bei
+  weiteren {{ al.ohne_wettbewerber }} führt kein beobachteter Anbieter
+  dasselbe Modell, sie sind deshalb in keiner der vier Kacheln gezählt{%
+  endif %}. Verglichen werden ausschließlich Neugeräte ohne Vertrag, jeweils
+  der günstigste Preis je Laden.</p>
+</div>
 
-  {% if v.ohne_vodafone %}
-  <details class="evidence gr-vergleich-luecke">
-    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
-      ({{ v.ohne_vodafone_gesamt }})</summary>
-    <div class="evidence-body">
-    <ul class="gr-v-liste">
-      {% for l in v.ohne_vodafone %}
-      <li><span class="szl">{{ l.modell }}</span>
-        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-        <span class="gr-v-prozent">ab {{
-          '%.2f'|format(l.ab_preis)|replace('.', ',') }} €</span>
-        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
-          else 'Anbieter' }}</span>
-        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% if v.ohne_vodafone_gesamt > v.ohne_vodafone|length %}
-    <p class="gr-v-meta">{{ v.ohne_vodafone_gesamt }} insgesamt.</p>
-    {% endif %}
-    </div>
-  </details>
-  {% endif %}
-</section>
-{% endif %}
-{% endfor %}
-{% endif %}
-
-{# --- Was auffaellt --------------------------------------------------- #}
-{% if geraete.auffaellig.hat_daten %}
-<section class="gr-auffaellig">
-  <h2 class="rubrik">Was diese Woche auffällt
-    <span class="rubrik-zusatz">letzte {{ geraete.fenster_tage }} Tage</span></h2>
-  <div class="gr-auffaellig-karte">
-    <ul class="gr-saetze">
-      {% for s in geraete.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
-    </ul>
-  </div>
-  {% if geraete.auffaellig.bewegungen %}
-  <div class="gr-scroll">
-  <table class="src-table gr-tabelle">
-    <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
-      <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
-      <th>Beleg</th></tr></thead>
-    <tbody>
-      {% for b in geraete.auffaellig.bewegungen %}
-      <tr>
-        <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
-        <td class="num">{{ '%.2f'|format(b.von) }} €</td>
-        <td class="num">{{ '%.2f'|format(b.auf) }} €</td>
-        <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
-          {{ '%+.2f'|format(b.delta) }} €</td>
-        <td>{{ b.datum | date_de }}</td>
-        <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  {% endif %}
-</section>
-{% endif %}
+{# --- Reiter 2: Geraetekatalog ---------------------------------------- #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
+  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 
 {# --- SKU-Matrix ------------------------------------------------------ #}
 <section class="gr-matrix" id="matrix">
@@ -591,7 +268,46 @@
     </div>
   </details>
 </section>
+</div>
 
+{# --- Reiter 3: Portfolio --------------------------------------------- #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-portfolio" role="tabpanel">
+  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
+
+{# --- Was auffaellt --------------------------------------------------- #}
+{% if geraete.auffaellig.hat_daten %}
+<section class="gr-auffaellig">
+  <h2 class="rubrik">Was diese Woche auffällt
+    <span class="rubrik-zusatz">letzte {{ geraete.fenster_tage }} Tage</span></h2>
+  <div class="gr-auffaellig-karte">
+    <ul class="gr-saetze">
+      {% for s in geraete.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% if geraete.auffaellig.bewegungen %}
+  <div class="gr-scroll">
+  <table class="src-table gr-tabelle">
+    <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
+      <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
+      <th>Beleg</th></tr></thead>
+    <tbody>
+      {% for b in geraete.auffaellig.bewegungen %}
+      <tr>
+        <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
+        <td class="num">{{ '%.2f'|format(b.von) }} €</td>
+        <td class="num">{{ '%.2f'|format(b.auf) }} €</td>
+        <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
+          {{ '%+.2f'|format(b.delta) }} €</td>
+        <td>{{ b.datum | date_de }}</td>
+        <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
 {# --- Lifecycle ------------------------------------------------------- #}
 <section class="gr-lifecycle" id="lifecycle">
   <h2 class="rubrik">Wie lange ein Gerät im Markt lebt</h2>
@@ -661,6 +377,35 @@
   </div>
   {% endif %}
 </section>
+</div>
+
+
+{# --- Betriebszahlen ganz unten. -------------------------------------- #}
+{# Sie standen bis zum 30.08.2026 als fuenf Kacheln UEBER der Seite. Das ist
+   der beste Platz, den diese Seite hat, und "250 Varianten" fuehrt zu keiner
+   Handlung. Als Satz am Fuss sagen dieselben Zahlen dasselbe und kosten
+   nichts. #}
+<section class="gr-bilanz">
+  <h2 class="rubrik">Wie vollständig ist das</h2>
+  <p class="gr-erklaer">Beobachtet werden {{ geraete.bilanz.geraete }} Geräte
+  in {{ geraete.bilanz.skus }} Varianten, zusammen
+  {{ geraete.bilanz.listungen }} Listungen bei
+  {{ geraete.bilanz.anbieter }} Anbietern; die Preishistorie trägt
+  {{ geraete.bilanz.preispunkte }} Änderungspunkte{%
+  if geraete.bilanz.ausgelistet %}, {{ geraete.bilanz.ausgelistet }} Listungen
+  sind ausgelistet{% endif %}.
+  {{ geraete.quellenlage.liefernd }} von
+  {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern
+  Daten. Welcher warum nicht, steht auf
+  <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a> – kein
+  Anbieter fehlt dort stillschweigend.</p>
+  <p class="gr-erklaer">Beide CSV-Tabellen stehen auf jedem Reiter unter
+  „Alle exportieren“: der Bestand trägt eine Zeile je Listung, die Historie
+  eine je Listung und Messtag – ein unveränderter Preis schreibt keine Zeile.
+  UTF-8 mit BOM, Semikolon, Dezimalkomma: Excel öffnet beide im deutschen
+  Gebietsschema per Doppelklick.</p>
+</section>
+
 {% else %}
 <section class="gr-leer">
   {% if geraete.fehler %}
@@ -745,5 +490,28 @@
   {% endif %}
   <p class="dz-foot">Vollständige Quellenlage:
   <a href="{{ prefix }}geraete-quellen.html">Geräte-Quellen</a>.</p>
+  {% if geraete.vergleich.ohne_vertrag.ohne_vodafone %}
+  <details class="evidence gr-vergleich-luecke">
+    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+      ({{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }})</summary>
+    <div class="evidence-body">
+    <ul class="gr-v-liste">
+      {% for l in geraete.vergleich.ohne_vertrag.ohne_vodafone %}
+      <li><span class="szl">{{ l.modell }}</span>
+        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
+        <span class="gr-v-prozent">ab {{
+          '%.2f'|format(l.ab_preis)|replace('.', ',') }} €</span>
+        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
+          else 'Anbieter' }}</span>
+        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt > geraete.vergleich.ohne_vertrag.ohne_vodafone|length %}
+    <p class="gr-v-meta">{{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }} insgesamt.</p>
+    {% endif %}
+    </div>
+  </details>
+  {% endif %}
 </section>
 {% endblock %}

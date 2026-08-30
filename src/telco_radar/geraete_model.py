@@ -314,29 +314,51 @@ def normalisiere_farbe(roh: str, tabelle: dict) -> Optional[str]:
 # und entstuende als neue Listung - eine Datenwanderung, die Listungsdauer
 # und Preisverlauf jedes betroffenen Geraets auf null zuruecksetzt. Der
 # Schluessel wird deshalb beim LESEN gerechnet und beruehrt den Store nicht.
-_KUERZEL_MAX = 3
+#
+# Gestrichen wird nur ein Kuerzel OHNE VOKAL. Die erste Fassung strich jedes
+# Anhaengsel bis drei Zeichen, und das trifft echte Farbwoerter: "titan rot"
+# wurde "titan", "ocean ice" wurde "ocean", "midnight sky" wurde "midnight".
+# Seit der Doppelpreis ohne Spannengrenze entfernt, kostet so eine
+# Verwechslung BEIDE Zeilen. Ein Kuerzel ohne Vokal ist in keiner Sprache ein
+# Farbwort; "bk", "gr", "blk" fallen, "rot", "red", "ice", "sky", "jet"
+# bleiben stehen.
+_VOKALE = set("aeiouyäöü")
+
+
+def _ist_kuerzel(teil: str) -> bool:
+    """Ein Anhaengsel, das kein eigenes Wort sein kann.
+
+    Zwei Bedingungen, beide noetig. BUCHSTABEN, weil eine Ziffer keine
+    Abkuerzung ist, sondern zum Namen gehoert - ohne diese Haelfte fielen
+    "Farbe 0" bis "Farbe 23" auf denselben Schluessel, und aus 24 Farben
+    wurde ein Doppelpreis ueber die ganze Fixture. KEIN VOKAL, weil sonst
+    echte Farbwoerter fallen: "titan rot", "ocean ice", "midnight sky".
+    """
+    return teil.isalpha() and not (set(teil) & _VOKALE)
 
 
 def farbschluessel(farbe_normalisiert: Optional[str], farbe_roh: str) -> str:
-    """Die Farbe als Vergleichsschluessel - kanonisch, wenn sie bekannt ist.
+    """Die Farbe als Vergleichsschluessel: ist das buchstaeblich dieselbe
+    Variante?
 
-    Kennt `config/farben.yaml` die Schreibweise, gewinnt die kanonische
-    Farbe: "Navy" und "navy blue" sind dann derselbe Schluessel. Kennt sie
-    sie nicht, traegt die normalisierte Rohschreibweise den Schluessel, und
-    ein angehaengtes Kuerzel von hoechstens `_KUERZEL_MAX` Zeichen faellt
-    weg.
+    Geschluesselt wird auf die ROHSCHREIBWEISE, nicht auf die kanonische
+    Farbe. Das ist am 30.08.2026 umgedreht worden, und der Grund ist
+    gemessen: `config/farben.yaml` faltet Marketingnamen auf Grundfarben, im
+    Livebestand tragen 21 kanonische Farben mehr als eine Rohschreibweise
+    ("schwarz" steht fuer Black, Obsidian, Schwarz, Mitternacht). Auf die
+    kanonische Farbe geschluesselt waeren "Obsidian" und "Mitternacht"
+    desselben Geraets EIN Schluessel - und seit der Doppelpreis ohne
+    Spannengrenze entfernt, flogen dann zwei echte Farbpreise aus dem
+    Vergleich, ohne dass jemand gefragt wird.
 
-    Die Laengengrenze ist der ganze Schutz dieser Regel: sie trennt "bk" von
-    "gold". Ohne sie wuerde aus "titan natur" und "titan schwarz" derselbe
-    Schluessel, und zwei echte Farben eines Geraets sahen wie ein
-    Doppelpreis aus.
+    Die kanonische Farbe bleibt der Rueckfall fuer Listungen ohne
+    Rohschreibweise. Fuer den Farbbericht und die `sku_id` ist sie weiterhin
+    zustaendig - dieser Schluessel beantwortet eine andere Frage.
     """
-    if farbe_normalisiert:
-        return normalisiere(farbe_normalisiert)
     teile = [t for t in normalisiere(farbe_roh).split("-") if t]
-    if len(teile) > 1 and len(teile[-1]) <= _KUERZEL_MAX:
+    if len(teile) > 1 and _ist_kuerzel(teile[-1]):
         teile = teile[:-1]
-    return "-".join(teile)
+    return "-".join(teile) or normalisiere(farbe_normalisiert or "")
 
 
 def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:

@@ -32,10 +32,18 @@ Dazu die zwei Kriterien der Runde vom 08.08.2026 (Suche und Differenzierung):
 
 Dazu das Kriterium des Geraeteradars (10.08.2026):
 
- 11. Die Preis-Positionskarte fuehrt in BEIDEN Ansichten gleich viele Punkte,
-     und jeder traegt seinen Quelllink, sein Abrufdatum und einen Titel. Sind
-     noch keine Listungen erfasst, gilt das Kriterium als uebersprungen - die
-     Seite steht dann unter ihrer Veroeffentlichungsschwelle.
+ 11. Der Geraeteradar traegt seine Reiter: kein Diagramm auf der Startansicht,
+     keine Reste der geloeschten Preisgrafik, jede Alarmzeile mit Quelllink,
+     Abrufdatum und Aufklapper, und die vier Kacheln zaehlen dasselbe wie der
+     Satz darunter. Sind noch keine Alarmzeilen erfasst, gilt das Kriterium
+     als uebersprungen - die Seite steht dann unter ihrer
+     Veroeffentlichungsschwelle.
+
+     Bis zum 30.08.2026 vermass dieses Kriterium die Positionskarte und
+     rechnete aus jeder Etikettenhoehe den Preis zurueck. Die Karte ist
+     geloescht; die drei Verbote des Auftrags (kein gedrehter Text, keine
+     Schrift unter 12 px, keine mit "..." gekuerzte Beschriftung) misst
+     `tests/test_geraete_reiter_browser.py` im echten Chromium.
 
 Dazu das Kriterium der Umbenennung (11.08.2026):
 
@@ -74,7 +82,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from bs4 import BeautifulSoup                                    # noqa: E402
 
-from telco_radar.report import geraete_karte                     # noqa: E402
 from telco_radar.report.bilder import (                          # noqa: E402
     MIND_BREITE_GROSS, ist_leer)
 
@@ -554,14 +561,19 @@ def main() -> int:
                  f"{len(falsch)} widersprechen"
                  + (f" ({', '.join(falsch)})" if falsch else ""))
 
-    # ---- Kriterium 11: die Preis-Positionskarte des Geraeteradars
+    # ---- Kriterium 11: die Reiter des Geraeteradars
     #
-    # Sie ist ein gerechnetes SVG ohne Bibliothek, und beide Ansichten stehen
-    # fertig im HTML - der Umschalter blendet nur um. Geprueft wird genau
-    # das: gleich viele Punkte in beiden Ansichten (sonst zeigt eine davon
-    # weniger, als es gibt), jeder Punkt mit Beleg und Abrufdatum, und kein
-    # Punkt ohne Titel. Fehlen die Daten noch, ist das kein Fehlschlag -
-    # dann steht die Seite unter der Veroeffentlichungsschwelle.
+    # Die Positionskarte ist am 30.08.2026 GELOESCHT worden - 59 Geraete mal
+    # vier Anbietern in einem Bild, 114 senkrecht gedrehte
+    # Achsenbeschriftungen, 155 von 164 Punkten ohne Beschriftung. Dieses
+    # Kriterium hat sie bis dahin vermessen (Preis aus Etikettenhoehe
+    # zurueckgerechnet); jetzt prueft es, dass sie WEG ist und dass die
+    # Tabelle, die sie ersetzt, ihre Belege traegt.
+    #
+    # Die drei Verbote aus Abschnitt 0 des Auftrags (kein gedrehter Text,
+    # keine Schrift unter 12 px, keine mit "..." abgeschnittene Beschriftung)
+    # werden im echten Chromium gemessen - `tests/test_geraete_reiter_browser.py`.
+    # Hier steht die strukturelle Haelfte, die am ausgelieferten HTML haengt.
     gr_datei = site / "geraete.html"
     if not gr_datei.exists():
         # KEIN "uebersprungen": render_site() erzeugt diese Seite immer,
@@ -571,86 +583,62 @@ def main() -> int:
         b.prueft(False, "11. Geraeteradar: geraete.html fehlt ganz")
     else:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
-        hersteller = gr.select("#gr-ansicht-hersteller .gr-punkt")
-        anbieter = gr.select("#gr-ansicht-anbieter .gr-punkt")
-        if not hersteller and not anbieter:
-            b.prueft(None, "11. Geraeteradar: noch keine Listungen erfasst")
+        maengel = []
+
+        # Regel 1 und 2 des Auftrags: die Startansicht traegt kein Diagramm,
+        # und es gibt keine Ansicht mit mehreren Geraeten in einem Bild.
+        start = gr.select_one("#tafel-alarme")
+        if start is None:
+            maengel.append("der Reiter 'Preis-Alarme' fehlt")
+        elif start.find("svg") is not None:
+            maengel.append("die Startansicht traegt ein Diagramm")
+        for tot in (".gr-flaeche", ".gr-punkt", ".gr-etikett", ".gr-band"):
+            if gr.select(tot):
+                maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
+
+        # Kein gedrehter Text - hier als Attribut, im Browser als gerechnete
+        # Transformation.
+        for el in gr.find_all(attrs={"transform": True}):
+            if "rotate" in (el.get("transform") or ""):
+                maengel.append("gedrehte Beschriftung im Dokument")
+                break
+
+        zeilen = gr.select(".gr-alarm .gr-a-zeile")
+        if not zeilen:
+            b.prueft(None, "11. Geraeteradar: noch keine Alarmzeile erfasst")
         else:
-            # BEIDE Ansichten pruefen. Nur die erste zu messen hiesse, die
-            # zweite nie zu pruefen - und sie ist die, wegen der die Seite
-            # existiert.
-            alle = hersteller + anbieter
-            ohne_beleg = [p for p in alle
-                          if not (p.get("data-url") or "").startswith("http")
-                          or not p.get("data-stand")]
-            ohne_titel = [p for p in alle if p.find("title") is None]
+            # Jede Zeile traegt Quelle UND Abrufdatum - der Belegzwang ist das
+            # Verkaufsargument dieser Seite.
+            ohne_beleg = [z for z in zeilen
+                          if not (z.select_one("a.gr-a-quelle[href^='http']")
+                                  and z.select(".gr-a-klein"))]
+            # Jede Zeile hat ihren Aufklapper, und der zeigt mehr als einen
+            # Anbieter - sonst waere der Klick eine Handlung ohne Ergebnis.
+            ohne_aufklapper = [z for z in zeilen
+                               if gr.find(id=z.get("data-auf")) is None]
+            if ohne_beleg:
+                maengel.append(f"{len(ohne_beleg)} Alarmzeilen ohne Beleg")
+            if ohne_aufklapper:
+                maengel.append(f"{len(ohne_aufklapper)} Zeilen ohne Aufklapper")
 
-            # DER EIGENTLICHE TEST, seit dem 11.08.2026. Bis dahin stand hier
-            # nur "kein Etikett unter der Nulllinie" - und genau daran ist die
-            # Pruefung vorbeigelaufen: der Fehler der ausgelieferten Fassung
-            # war nicht, dass Etiketten unter die Achse rutschten, sondern
-            # dass sie bis zu 235 px ueber ihr am falschen Preis standen.
-            # Deshalb wird jetzt aus jeder Etikettenhoehe der PREIS
-            # zurueckgerechnet und gegen `data-preis` gehalten.
-            #
-            # Die Geometrie kommt dabei aus den data-Attributen der Flaeche,
-            # nicht aus `540 - 70`: die Hoehe waechst mit der Zahl der
-            # Eintraege, und eine feste Zahl misst dann am falschen Ort.
-            luegner, deckungsgleich, ohne_geometrie = [], 0, 0
-            for f in gr.select(".gr-flaeche"):
-                try:
-                    achse = float(f.get("data-achse"))
-                    plot_h = float(f.get("data-plot-h"))
-                    y_max = float(f.get("data-ymax"))
-                except (TypeError, ValueError):
-                    ohne_geometrie += 1
-                    continue
-                koordinaten = set()
-                for g in f.select(".gr-punkt"):
-                    kreis = g.find("circle")
-                    if kreis is not None:
-                        koordinaten.add((kreis.get("cx"), kreis.get("cy")))
-                    text = g.select_one(".gr-etikett")
-                    if text is None or not g.get("data-preis"):
-                        continue
-                    echt = float(g["data-preis"])
-                    gelesen = geraete_karte.preis_aus_hoehe(
-                        float(text.get("y") or 0), y_max, achse, plot_h)
-                    if abs(gelesen - echt) > geraete_karte.toleranz(
-                            echt, y_max, plot_h):
-                        luegner.append(f"{text.get_text(strip=True)} "
-                                       f"({gelesen:.0f} statt {echt:.0f} EUR)")
-                deckungsgleich += len(f.select(".gr-punkt")) - len(koordinaten)
-                # Und die Trennung, an der das haengt: ein `gr-etikett` steht
-                # im Zeichenbereich, ein `gr-bandname` unter der Achse.
-                luegner += [f"Bandname ueber der Achse: {t.get_text(strip=True)}"
-                            for t in f.select(".gr-bandname")
-                            if float(t.get("y") or 0) <= achse]
-                luegner += [f"Etikett unter der Achse: {t.get_text(strip=True)}"
-                            for t in f.select(".gr-etikett")
-                            if float(t.get("y") or 0) > achse + 4]
+            # Die vier Kacheln zaehlen genau die verglichenen Kombinationen.
+            # Eine Kachel, die anders zaehlt als der Satz darunter, ist der
+            # Fehlertyp aus CLAUDE.md 6.
+            kacheln = gr.select(".gr-kacheln .gr-kachel b")
+            summe = sum(int(k.get_text(strip=True)) for k in kacheln
+                        if k.get_text(strip=True).isdigit())
+            satz = " ".join(start.get_text(" ", strip=True).split())
+            if len(kacheln) != 4:
+                maengel.append(f"{len(kacheln)} statt 4 Kennzahl-Kacheln")
+            elif f"{summe} Modelle mit ihren Speichergrößen" not in satz:
+                maengel.append(f"die Kacheln zaehlen {summe}, der Satz "
+                               f"darunter etwas anderes")
 
-            # Die Gegenprobe (CLAUDE.md §6): ein Lauf, der ueber die
-            # Flaechen NICHTS findet, ist gruen und prueft nichts. Genau das
-            # passiert bei einem Vorlagenumbau, der den Wrapper umbenennt -
-            # dann sieht die Schleife oben null Punkte, meldet null Luegner
-            # und bestaetigt eine Seite, die sie nie angesehen hat.
-            besucht = sum(len(f.select(".gr-punkt")) for f in gr.select(".gr-flaeche"))
-            vollstaendig = besucht == len(alle)
-            if not vollstaendig:
-                luegner.insert(0, f"nur {besucht} von {len(alle)} Punkten liegen "
-                                  f"in einer .gr-flaeche - die Pruefung sieht "
-                                  f"den Rest nicht")
-            ok = (len(hersteller) == len(anbieter) and not ohne_beleg
-                  and not ohne_titel and not luegner and not deckungsgleich
-                  and not ohne_geometrie and vollstaendig)
-            b.prueft(ok,
-                     f"11. Positionskarte: {len(hersteller)} Punkte je Ansicht "
-                     f"(Anbieteransicht {len(anbieter)}), {len(ohne_beleg)} ohne "
-                     f"Beleg, {len(ohne_titel)} ohne Titel, {len(luegner)} "
-                     f"Etiketten am falschen Preis, {deckungsgleich} "
-                     f"deckungsgleiche Punkte")
-            for zeile in luegner[:5]:
+            b.prueft(not maengel,
+                     f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
+                     f"{len(kacheln)} Kacheln ueber {summe} Vergleichen, "
+                     f"kein Diagramm auf der Startansicht")
+            for zeile in maengel[:5]:
                 print(f"      ! {zeile}")
 
     _browser_messungen(site, b)

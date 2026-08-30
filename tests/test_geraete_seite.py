@@ -203,63 +203,37 @@ def test_beide_seiten_werden_gerendert(tmp_path):
 
 def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     """Der Fehlertyp aus CLAUDE.md §6: ein Etikett und ein Feld, die nicht
-    dasselbe meinen."""
+    dasselbe meinen.
+
+    Gemessen werden die vier Alarmkacheln. Sie haben am 30.08.2026 die fuenf
+    Betriebskacheln ("59 Geraete beobachtet", "250 Varianten") vom besten
+    Platz der Seite abgeloest - eine Zahl, die zu keiner Handlung fuehrt,
+    gehoert nicht dorthin. Die Betriebszahlen stehen jetzt als Satz am Fuss.
+    """
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
-               for k in s.select(".gr-bilanz .t-kennzahl")}
+               for k in s.select(".gr-kacheln .gr-kachel")}
+    assert set(kacheln) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}
+
+    # Die Summe der vier Kacheln IST die Zahl der verglichenen Geraete. Zwei
+    # Zahlen, die dasselbe meinen muessen, gehoeren gegeneinander gehalten.
+    fuss = s.select_one(".gr-bilanz").get_text(" ", strip=True)
     sichtbar = [e for e in _DB["listungen"] if e["status"] != "ausgelistet"]
-    assert len(kacheln) == 5           # sonst prueft der Vergleich nichts
-    assert kacheln["Geräte beobachtet"] == str(len({e["device_id"] for e in sichtbar}))
-    assert kacheln["Varianten (SKUs)"] == str(len({e["sku_id"] for e in sichtbar}))
-    assert kacheln["Anbieter mit Daten"] == str(len({e["anbieter"] for e in sichtbar}))
-    assert kacheln["Preispunkte in der Historie"] == str(len(_PUNKTE))
-    assert kacheln["ausgelistet"] == "1"
+    assert str(len({e["device_id"] for e in sichtbar})) in fuss
+    assert str(len({e["sku_id"] for e in sichtbar})) in fuss
 
 
-def test_ausgelistete_geraete_stehen_nicht_in_der_karte(tmp_path):
-    site = _baue(tmp_path)
+def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
+    """Eine Kachel, die anders zaehlt als die Tabelle unter ihr, ist derselbe
+    Fehlertyp. Und ein Geraet ohne Wettbewerber ist NICHT unser Bestpreis -
+    es ist gar nicht verglichen."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    # EINE Flaeche, nicht die Ansicht: seit dem 11.08.2026 steht jede Ansicht
-    # in zwei Darstellungsformen im HTML, und ueber beide gezaehlt waere jede
-    # Zahl hier verdoppelt.
-    # BEIDE Formen. Aus der Chipform stammen Legende, Ueberschriftszahl und
-    # Tabelle - nur die Bandform zu messen hiesse, sie nie zu pruefen.
-    for form in ("band", "chip"):
-        punkte = s.select(f"#gr-ansicht-hersteller "
-                          f".gr-flaeche[data-form='{form}'] .gr-punkt")
-        modelle = {p.get("data-modell") for p in punkte}
-        # Das ausgelistete Galaxy S25 Ultra 512 GB von Medimax faellt raus,
-        # das aktive von Vodafone bleibt.
-        assert "Galaxy S25 Ultra" in modelle, form
-        assert len(punkte) == 4, form
-
-
-def test_beide_ansichten_stehen_fertig_im_html(tmp_path):
-    """Der Umschalter darf nicht nachladen - beide Ansichten sind gerendert,
-    JS blendet nur um."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    assert s.select_one("#gr-ansicht-hersteller") is not None
-    assert s.select_one("#gr-ansicht-anbieter") is not None
-    assert len(s.select("#gr-ansicht-hersteller .gr-punkt")) == \
-        len(s.select("#gr-ansicht-anbieter .gr-punkt"))
-    # Genau EINE ist zu Beginn sichtbar.
-    aus = [a for a in s.select(".gr-ansicht")
-           if "gr-ansicht--aus" in (a.get("class") or [])]
-    assert len(aus) == 1
-
-
-def test_spalten_der_beiden_ansichten_sind_verschieden(tmp_path):
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    hersteller = {t.get_text(strip=True)
-                  for t in s.select("#gr-ansicht-hersteller .gr-spaltenname")}
-    anbieter = {t.get_text(strip=True)
-                for t in s.select("#gr-ansicht-anbieter .gr-spaltenname")}
-    assert "Apple" in hersteller and "Samsung" in hersteller
-    assert "Medimax" in anbieter and "Vodafone" in anbieter
-    assert hersteller != anbieter
+    summe = sum(int(k.find("b").get_text(strip=True))
+                for k in s.select(".gr-kacheln .gr-kachel"))
+    tafel = " ".join(s.select_one("#tafel-alarme").get_text(" ", strip=True).split())
+    assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in tafel
 
 
 def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
@@ -269,47 +243,6 @@ def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
     assert "<svg" in roh
     for verboten in ("cdn.", "unpkg", "jsdelivr", "chart.js", "d3.", "plotly"):
         assert verboten not in roh.lower(), verboten
-
-
-def test_die_karte_zeichnet_die_eigenen_punkte_eigen(tmp_path):
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    eigen = s.select("#gr-ansicht-anbieter "
-                     ".gr-flaeche[data-form='band'] .gr-punkt--eigen")
-    assert len(eigen) == 1
-    assert eigen[0].get("data-anbieter") == "Vodafone"
-
-
-def test_jeder_punkt_traegt_beleg_und_abrufdatum(tmp_path):
-    """Kein Preis ohne Quelle und Datum - bis auf die Seite durchgereicht."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    punkte = s.select("#gr-ansicht-hersteller .gr-punkt")
-    assert punkte
-    for p in punkte:
-        assert p.get("data-url", "").startswith("http")
-        assert p.get("data-stand")
-        assert p.find("title") is not None
-
-
-def test_buendelpreise_stehen_nicht_in_der_karte(tmp_path):
-    """Teil C4: "1 €" mit Vertrag und "1.199 €" ohne duerfen nie in derselben
-    Spalte stehen."""
-    daten = json.loads(json.dumps(_DB))
-    daten["listungen"].append(_listung(
-        "Telekom", "apple-iphone-17-pro-max",
-        "apple-iphone-17-pro-max-256gb-schwarz", None, farbe="schwarz",
-        zuzahlung=1.0, tarif_referenz="MagentaMobil M"))
-    root = tmp_path
-    site = _baue(root)
-    (root / "data" / "state" / "geraete_db.json").write_text(
-        json.dumps(daten), encoding="utf-8")
-    render_site(site, root / "data" / "reports")
-    s = _suppe(site, "geraete.html")
-    preise = {p.get("data-preis") for p in s.select(".gr-punkt")}
-    assert "1.00" not in preise
-    # ... aber in der Matrix steht sie, mit ihrem Tarif daneben.
-    assert "MagentaMobil M" in (site / "geraete.html").read_text(encoding="utf-8")
 
 
 def test_matrix_zeigt_variantenzahl_und_preisspanne(tmp_path):
@@ -528,28 +461,6 @@ def test_ueber_der_schwelle_erscheint_sie_auf_JEDER_seite(tmp_path):
         assert "geraete.html" in ziele, name
 
 
-def test_die_schwelle_wird_gerechnet_und_nicht_behauptet(tmp_path):
-    """Die Navigation und die gerechnete Schwelle duerfen nicht
-    auseinanderlaufen - an beiden Zweigen gemessen, nicht nur an dem, der
-    heute gilt."""
-    for db, erwartet in ((_db_mit(3), False),
-                         (_db_mit(24, anbieter=_UEBER_DER_SCHWELLE), True)):
-        site = _baue(tmp_path / f"fall{erwartet}", db=db)
-        root = tmp_path / f"fall{erwartet}"
-        geraete = geraete_view.aufbereiten(
-            root / "data" / "state", lade_quellen(root), lade_katalog(root),
-            heute="2026-08-11")
-        erreicht = geraete_view.schwelle_erreicht(
-            anbieter=geraete["bilanz"]["anbieter"],
-            skus=geraete["bilanz"]["skus"],
-            hersteller=len(geraete["karte_hersteller"]["spalten"]))
-        assert erreicht is erwartet, geraete["bilanz"]
-        assert geraete["bilanz"]["schwelle_erreicht"] is erwartet
-        verlinkt = "geraete.html" in {
-            a.get("href") for a in _suppe(site, "geraete.html").select(".subnav a")}
-        assert verlinkt == erreicht
-
-
 def test_die_seite_erklaert_ihre_eigene_bedienung_nicht(tmp_path):
     """Beruhigungsregel des Portals (CLAUDE.md §5)."""
     site = _baue(tmp_path)
@@ -644,91 +555,6 @@ def test_keine_seite_rollt_waagerecht(_gebaut, seite, breite, hoehe):
     assert not rollt, f"{seite} bei {breite}px: waagerechter Ueberlauf ({schuldige})"
 
 
-def test_der_umschalter_blendet_ohne_neuladen_um(_gebaut):
-    """Akzeptanzkriterium aus Teil E. Im HTML nicht pruefbar - die zwei
-    Ansichten stehen beide da, entscheidend ist, was der Browser zeigt."""
-    import functools
-    import http.server
-    import socket
-    import threading
-
-    pytest.importorskip("playwright.sync_api")
-    from playwright.sync_api import sync_playwright
-
-    exe = _chromium()
-    if exe is None:
-        pytest.skip("kein Chromium gefunden")
-
-    s = socket.socket()
-    s.bind(("127.0.0.1", 0))
-    port = s.getsockname()[1]
-    s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(_gebaut))
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
-    threading.Thread(target=httpd.serve_forever, daemon=True).start()
-    try:
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(executable_path=exe,
-                                         args=["--no-sandbox",
-                                               "--disable-dev-shm-usage"])
-            page = browser.new_page(viewport={"width": 1440, "height": 900})
-            page.goto(f"http://127.0.0.1:{port}/geraete.html")
-            page.wait_for_timeout(250)
-            sichtbar = lambda wahl: page.evaluate(
-                f"document.querySelector('{wahl}').getBoundingClientRect().height > 0")
-            assert sichtbar("#gr-ansicht-hersteller")
-            assert not sichtbar("#gr-ansicht-anbieter")
-            page.click(".gr-knopf[data-schalter='ansicht'][data-wert='anbieter']")
-            page.wait_for_timeout(150)
-            assert not sichtbar("#gr-ansicht-hersteller")
-            assert sichtbar("#gr-ansicht-anbieter")
-            # Der zweite Schalter stellt die DARSTELLUNG. Er benutzt dieselbe
-            # Mechanik und eine andere Klasse; blendete er `gr-ansicht--aus`,
-            # verschwaende die halbe Grafik.
-            sichtbare_flaeche = ("#gr-ansicht-anbieter "
-                                 ".gr-flaeche:not(.gr-flaeche--aus)")
-            form_vorher = page.get_attribute(sichtbare_flaeche, "data-form")
-            andere = "chip" if form_vorher == "band" else "band"
-            page.click(f".gr-knopf[data-schalter='form'][data-wert='{andere}']")
-            page.wait_for_timeout(150)
-            assert page.get_attribute(sichtbare_flaeche, "data-form") == andere
-            assert sichtbar("#gr-ansicht-anbieter")
-            # Genau EINE Flaeche je Ansicht ist offen. Ohne diese Zeile nimmt
-            # `get_attribute` stillschweigend die erste von zweien.
-            assert page.eval_on_selector_all(
-                sichtbare_flaeche, "els => els.length") == 1
-            # Tap auf einen Punkt fuellt die Detailzeile - auf dem Telefon
-            # gibt es kein Hover, und ein <title> allein reicht dort nicht.
-            # Der Punkt muss aus der SICHTBAREN Flaeche kommen, sonst klickt
-            # Playwright in die ausgeblendete und meldet "not visible".
-            page.click(f"{sichtbare_flaeche} .gr-punkt")
-            page.wait_for_timeout(150)
-            detail = page.inner_text("#gr-detail")
-            # Und der Filter blendet, ohne die Achse zu verschieben. Diese
-            # Zusicherung misst "die Y-Achse gehoert dem Preis" im echten
-            # Browser und ist nach dem Umbau wichtiger als vorher.
-            hole_cy = (f"document.querySelector('{sichtbare_flaeche} "
-                       ".gr-punkt circle').getAttribute('cy')")
-            vorher = page.evaluate(hole_cy)
-            page.select_option("#gr-segment", "flagship")
-            page.wait_for_timeout(150)
-            nachher = page.evaluate(hole_cy)
-            browser.close()
-    finally:
-        httpd.shutdown()
-    assert "€" in detail and "bei" in detail, detail
-    assert vorher == nachher, "der Filter hat die Achse verschoben"
-
-
-# --------------------------------------------------------------------------
-# Die Befunde des zweiten Reviews (10.08.2026) - je ein Reproduktionsfall
-# --------------------------------------------------------------------------
-
-from telco_radar.report import geraete_karte  # noqa: E402
-from telco_radar.report.geraete_view import _karte, leer  # noqa: E402
-
-
 def _bandpunkte():
     """Vier Modelle mit je vier Speicherstufen - die Lage, fuer die die
     Bandform gebaut ist. Mit sechzig EINZELmodellen in einer Spalte gaebe es
@@ -755,268 +581,6 @@ def _punkt(preis, label="Modell · 256 GB", spalte="Apple", eigen=False,
             "anbieter": spalte, "shop": spalte, "eigen": eigen, "segment": "",
             "speicher": 256, "modell": label.split(" · ")[0],
             "device_id": device_id or f"{spalte}-{label}".lower()}
-
-
-def test_karte_projiziert_linear_und_beginnt_bei_null():
-    """Die Projektion hatte kein einziges Unit-Test - nur eine Fixture mit
-    fünf Listungen darüber.
-
-    Geprüft wird die Invariante, nicht ein Einzelwert: die Nulllinie liegt
-    auf der Achse, und jeder Preis sitzt linear dazwischen. Die Achse hat
-    bewusst Luft nach oben (`y_max` ist die nächste 200er-Stufe ÜBER dem
-    höchsten Preis), deshalb sitzt der teuerste Punkt nicht am Rand.
-    """
-    k = _karte([_punkt(0.0), _punkt(450.0), _punkt(800.0)],
-               "hersteller", "Hersteller")
-    grund = k["hoehe"] - k["rand_u"]
-    hoch = k["hoehe"] - k["rand_o"] - k["rand_u"]
-    for p in k["punkte"]:
-        erwartet = round(grund - p["preis"] / k["y_max"] * hoch, 1)
-        assert p["cy"] == erwartet, (p["preis"], p["cy"], erwartet)
-    assert {p["cy"] for p in k["punkte"] if p["preis"] == 0} == {float(grund)}
-    # Und die Achse fängt wirklich bei null an.
-    assert k["y_ticks"][0]["wert"] == 0
-
-
-def test_karte_haelt_die_achse_bei_guenstigen_geraeten_offen():
-    """`Y_MINDEST`: ein Portfolio aus reinen Einstiegsgeräten drängt sich
-    sonst im untersten Zehntel."""
-    k = _karte([_punkt(129.0), _punkt(199.0)], "hersteller", "Hersteller")
-    assert k["y_max"] == 800
-
-
-def test_karte_kommt_mit_einem_punkt_und_mit_lauter_gleichen_klar():
-    assert _karte([_punkt(499.0)], "hersteller", "H")["anzahl"] == 1
-    gleich = _karte([_punkt(499.0, "A · 256 GB"), _punkt(499.0, "B · 256 GB"),
-                     _punkt(499.0, "C · 256 GB")], "hersteller", "H")
-    assert gleich["anzahl"] == 3
-    # Gleicher Preis heisst gleiche HOEHE - ausgewichen wird seitlich.
-    # Vorher wanderten die Etiketten nach unten (`ly`), der Punkt blieb
-    # oben, und die Grafik behauptete drei verschiedene Preise.
-    assert len({p["cy"] for p in gleich["punkte"]}) == 1
-    assert len({p["cx"] for p in gleich["punkte"]}) == 3
-    assert len({(p["cx"], p["cy"]) for p in gleich["punkte"]}) == 3
-
-
-def test_das_etikett_haengt_am_punkt():
-    """Der Kernbefund der Evaluation vom 11.08.2026.
-
-    Vorher wurden Etiketten je Spalte sequenziell nach unten gestapelt,
-    waehrend der Punkt auf seinem Preis blieb: gemessen 181 px Versatz in der
-    Hersteller- und 235 px in der Anbieteransicht, 87 von 94 Etiketten weiter
-    als drei Prozent daneben. Wer die Grafik las, wie man Grafiken liest, las
-    um den Faktor sieben falsch.
-
-    Diese Zusicherung ist strenger als die drei, die sie ersetzt: sie
-    verlangt nicht mehr, dass das Etikett IRGENDWO oberhalb der Achse landet,
-    sondern dass es an SEINEM Punkt haengt.
-    """
-    for form, daten in (("chip", [_punkt(199.0 + i * 20, f"Modell {i} · 256 GB")
-                                  for i in range(60)]),
-                        ("band", _bandpunkte())):
-        k = _karte(daten, "hersteller", "Hersteller", form=form)
-        beschriftet = [p for p in k["punkte"] if p["beschriftet"]]
-        for p in beschriftet:
-            versatz = abs(p["label_y"] - p["cy"])
-            assert versatz <= geraete_karte.MAX_VERSATZ, (form, p["label_kurz"],
-                                                          versatz)
-        # Kein Punkt liegt deckungsgleich auf einem anderen.
-        assert len({(p["cx"], p["cy"]) for p in k["punkte"]}) == len(k["punkte"])
-        # Was kein Etikett bekommt, wird gezaehlt und traegt keinen Stummel.
-        assert all(p["label_kurz"] == "" for p in k["punkte"]
-                   if not p["beschriftet"])
-
-
-def test_kein_etikett_steht_unter_der_achse_und_kein_bandname_darueber():
-    """Die Trennung, an der der Abnahmetest haengt.
-
-    `gr-etikett` traegt eine Preisaussage und liegt im Zeichenbereich;
-    `gr-bandname` ist Achsenmoebel und liegt darunter. Geprueft wird
-    BEIDSEITIG - sonst waere die Ausnahme ein Schlupfloch, durch das jedes
-    unbequeme Etikett unter die Achse wandern koennte.
-    """
-    for form, daten in (("chip", [_punkt(199.0 + i * 20, f"Modell {i} · 256 GB")
-                                  for i in range(60)]),
-                        ("band", _bandpunkte())):
-        k = _karte(daten, "hersteller", "Hersteller", form=form)
-        # Seit dem 11.08.2026 sind die Preiszahlen der Bandform PUNKTE und
-        # keine eigenen Knoten neben dem Band: nur so erfassen der Filter und
-        # Kriterium 11 sie.
-        etiketten = [p["label_y"] for p in k["punkte"] if p["beschriftet"]]
-        assert etiketten, form
-        # Die Grenze ist `achse + 4`, nicht `achse`: ein Preis von 0 sitzt
-        # AUF der Achse, seine Textgrundlinie also knapp darunter.
-        assert all(y <= k["achse_y"] + 4 for y in etiketten), form
-        assert all(y >= k["rand_o"] - 1 for y in etiketten), form
-        assert all(b["name_y"] > k["achse_y"] for b in k["baender"]), form
-
-
-def test_die_rueckrechnung_trifft_den_echten_preis():
-    """Das Akzeptanzkriterium, maschinell.
-
-    Aus der Etikettenhoehe wird der Preis zurueckgerechnet und gegen den
-    echten gehalten. Gegen den Stand vom 11.08.2026 gemessen faellt dieser
-    Test mit 87 von 94 Etiketten durch; das ist sein Zweck.
-    """
-    for form, daten in (("chip", [_punkt(199.0 + i * 20, f"Modell {i} · 256 GB")
-                                  for i in range(60)]),
-                        ("band", _bandpunkte())):
-        k = _karte(daten, "hersteller", "Hersteller", form=form)
-        proben = [(p["label_y"], p["preis"]) for p in k["punkte"]
-                  if p["beschriftet"]]
-        assert proben, form
-        for label_y, preis in proben:
-            gelesen = geraete_karte.preis_aus_hoehe(
-                label_y, k["y_max"], k["achse_y"], k["plot_h"])
-            grenze = geraete_karte.toleranz(preis, k["y_max"], k["plot_h"])
-            assert abs(gelesen - preis) <= grenze, (form, preis, gelesen)
-
-
-def test_die_alte_stapelei_faellt_durch_die_rueckrechnung():
-    """Die Gegenprobe: ohne sie belegt der Test oben nur, dass die aktuelle
-    Rechnung zu sich selbst passt.
-
-    Nachgebaut wird die alte Entzerrung (`ly = max(cy, letzte + 14)`) auf
-    denselben Daten. Sie MUSS an der 3-Prozent-Grenze scheitern - taete sie
-    es nicht, waere die Grenze zu weit und der Test oben wertlos.
-    """
-    viele = [_punkt(199.0 + i * 20, f"Modell {i} · 256 GB") for i in range(60)]
-    k = _karte(viele, "hersteller", "Hersteller", form="chip")
-    letzte, daneben = None, 0
-    for p in sorted(k["punkte"], key=lambda p: -p["preis"]):
-        ly = p["cy"] if letzte is None else max(p["cy"], letzte + 14)
-        letzte = ly
-        gelesen = geraete_karte.preis_aus_hoehe(
-            ly + geraete_karte.BASISLINIE, k["y_max"], k["achse_y"], k["plot_h"])
-        if abs(gelesen - p["preis"]) > geraete_karte.toleranz(
-                p["preis"], k["y_max"], k["plot_h"]):
-            daneben += 1
-    assert daneben > len(k["punkte"]) / 2, (
-        f"nur {daneben} von {len(k['punkte'])} Etiketten fielen durch - "
-        "die Grenze ist zu weit, der Absicherungstest misst dann nichts")
-
-
-def test_ein_punkt_ohne_etikett_zeichnet_keinen_leeren_text(tmp_path):
-    """Ein leeres `<text>` ist kein leeres Element: es traegt seine Klasse und
-    sein `y`, und genau daran haengen die Wahrheitstests der Positionskarte.
-    Vor dem 10.08.2026 stand fuer jeden gedeckelten Punkt eines im HTML - im
-    ersten echten Lauf waren das 76 Stueck, und Kriterium 11 von
-    `pruefe_portal.py` fiel daran durch.
-
-    Der Bestand des Normalfalls hat fuenf Listungen; damit deckelt nichts,
-    und der Test waere gruen, ohne etwas zu pruefen. Deshalb eine volle
-    Spalte - und zwar mit verschiedenen SPEICHERGROESSEN, nicht mit Farben:
-    seit dem 11.08.2026 werden Farben verdichtet, sechzig Farben desselben
-    Geraets ergaeben genau EINEN Punkt und der Fall traete nie ein.
-
-    Die Preise liegen bewusst DICHT beieinander (zwei Euro Abstand). Mit den
-    frueheren zwanzig Euro passten nach dem Umbau alle sechzig Etiketten -
-    die Karte ist jetzt 1180 statt 980 px breit und packt waagerecht, statt
-    zu stapeln. Ein Deckelfall braucht deshalb echte Enge."""
-    voll = {"updated": "2026-08-11", "anbieter": {"Medimax": {"laeufe": 4}},
-            "listungen": [
-                dict(_listung("Medimax", "apple-iphone-17-pro-max",
-                              f"apple-iphone-17-pro-max-{i}gb-schwarz",
-                              199.0 + i * 2), speicher_gb=i + 1)
-                for i in range(120)]}
-    site = _baue(tmp_path, db=voll)
-    s = _suppe(site, "geraete.html")
-    flaeche = s.select_one("#gr-ansicht-hersteller .gr-flaeche[data-form='chip']")
-    punkte = flaeche.select(".gr-punkt")
-    etiketten = flaeche.select(".gr-etikett")
-    assert len(punkte) == 120
-    assert etiketten and len(etiketten) < len(punkte), \
-        "ohne gedeckelte Etiketten prueft der Test nichts"
-    assert all(e.get_text(strip=True) for e in etiketten)
-    # Die Achse kommt aus dem DOM, nicht aus `540 - 70`: die Hoehe waechst
-    # jetzt mit der Zahl der Eintraege, und eine feste Zahl misst dann am
-    # falschen Ort, ohne es zu merken.
-    achse = float(flaeche.get("data-achse"))
-    assert all(float(e.get("y")) <= achse + 4 for e in etiketten)
-    # Und die Flaeche sagt, wie viele kein Etikett tragen - eine stille
-    # Kappung waere schlimmer als eine sichtbare Luecke. Geprueft wird das
-    # Attribut, nicht der Legendentext: die Legende gehoert der AKTIVEN
-    # Flaeche, und das ist eine andere als die hier gemessene.
-    ohne = int(flaeche.get("data-etiketten-verborgen"))
-    assert ohne > 0
-    assert len(etiketten) + ohne == len(punkte), (len(etiketten), ohne, len(punkte))
-
-
-def test_farbvarianten_ergeben_einen_punkt(tmp_path):
-    """Der zweite Kernbefund der Evaluation: 60 der 85 Kreise lagen exakt
-    deckungsgleich aufeinander, weil je Farbvariante ein Punkt gezeichnet
-    wurde. Fuenf Farben desselben iPhone 17 mit 512 GB kosten alle 1199 EUR.
-
-    Farbe ist keine Preisdimension. Sie steht im Tooltip - und einzeln
-    weiterhin in der SKU-Matrix, die genau dafuer da ist."""
-    farbig = {"updated": "2026-08-11", "anbieter": {"Medimax": {"laeufe": 4}},
-              "listungen": [
-                  dict(_listung("Medimax", "apple-iphone-17-pro-max",
-                                f"apple-iphone-17-pro-max-256gb-farbe-{i}",
-                                1449.0), farbe_normalisiert=f"farbe{i}")
-                  for i in range(12)]}
-    site = _baue(tmp_path, db=farbig)
-    s = _suppe(site, "geraete.html")
-    flaeche = s.select_one("#gr-ansicht-hersteller .gr-flaeche[data-form='chip']")
-    punkte = flaeche.select(".gr-punkt")
-    assert len(punkte) == 1, "zwoelf Farben sind EIN Preispunkt"
-    assert punkte[0].get("data-farben") == "12"
-    assert "12 Farben" in punkte[0].find("title").get_text()
-    # In der Matrix stehen sie weiterhin einzeln.
-    assert len(s.select(".gr-varianten .gr-variante")) >= 12
-
-
-def test_kein_chip_verlaesst_seine_spalte():
-    """Befund 2 des zweiten Reviews, in der schaerferen Fassung.
-
-    Vorher wurde auf die halbe Spaltenbreite GEKUERZT und gehofft; geprueft
-    wird jetzt die echte Kastenbreite gegen die echten Spaltengrenzen. Neun
-    Spalten sind der Stressfall: dort passt ein langer Modellname nicht mehr,
-    und die richtige Antwort ist, das Etikett WEGZULASSEN."""
-    punkte = [_punkt(500.0 + i * 40, "Galaxy Z Fold 7 · 1024 GB",
-                     spalte=f"Marke {i}") for i in range(9)]
-    k = _karte(punkte, "hersteller", "Hersteller", form="chip")
-    nach_name = {s["name"]: s for s in k["spalten"]}
-    mit_chip = [p for p in k["punkte"] if p["chip"]]
-    # Ohne diese Zeile ist der Test gruen, sobald die Chiperzeugung ganz
-    # ausfaellt - die Schleife laeuft dann leer (CLAUDE.md §6).
-    assert mit_chip, "kein einziger Chip erzeugt - der Test prueft nichts"
-    for p in mit_chip:
-        s = nach_name[p["spalte"]]
-        assert p["chip"]["x"] >= s["x0"], (p["label_kurz"], p["chip"], s)
-        assert p["chip"]["x"] + p["chip"]["w"] <= s["x1"], \
-            (p["label_kurz"], p["chip"], s)
-
-
-def test_legende_nennt_listungen_und_das_echte_abrufdatum(tmp_path):
-    """Befund 3+4: die Legende schrieb „N Geräte" über eine Zahl von
-    LISTUNGEN und behauptete als Abrufdatum den Berichtstag."""
-    import re
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    # Zeilenumbrueche der Vorlage einebnen: geprueft wird der SATZ, nicht der
-    # Umbruch. Ohne das faellt der Test, sobald jemand die Vorlage anders
-    # umbricht - und meldet damit etwas, das niemanden betrifft.
-    legende = re.sub(r"\s+", " ", s.select_one("#gr-legende").get_text(" ", strip=True))
-    assert "Listungen" in legende
-    kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
-               for k in s.select(".gr-bilanz .t-kennzahl")}
-    # Dieselbe Zahl unter demselben Wort - an beiden Orten.
-    assert f"von {kacheln['Geräte beobachtet']} Geräten" in legende
-    # Preispunkte und Listungen sind seit der Verdichtung ZWEI Zahlen. Eine
-    # fuer beides waere genau der Fehlertyp aus CLAUDE.md §6: ein Etikett und
-    # ein Feld, die nicht dasselbe meinen.
-    flaeche = s.select_one(".gr-flaeche[data-form='chip']")
-    punkte = len(flaeche.select(".gr-punkt"))
-    assert f"{punkte} Preispunkte" in legende, legende
-    varianten = sum(int(p.get("data-varianten") or 1)
-                    for p in flaeche.select(".gr-punkt"))
-    assert f"aus {varianten} Listungen" in legende, legende
-    # Und das Abrufdatum kommt aus den Daten, nicht aus dem Bericht.
-    staende = {p.get("data-stand") for p in s.select(".gr-punkt")}
-    assert len(staende) == 1
-    from telco_radar.report.html import _fmt_date_de
-    assert _fmt_date_de(next(iter(staende))) in legende
 
 
 def test_alte_preisbewegung_steht_nicht_unter_diese_woche(tmp_path):
@@ -1125,17 +689,6 @@ def test_die_seite_entsteht_auch_wenn_die_aufbereitung_scheitert(tmp_path):
     assert (site / "geraete-quellen.html").exists()
 
 
-def test_der_notzustand_traegt_jedes_feld_der_vorlage():
-    """`leer()` muss dieselbe Form haben wie `aufbereiten()` - sonst kippt
-    die Vorlage genau dann, wenn sie den Fehler melden soll."""
-    notfall = leer("ValueError: irgendwas")
-    assert notfall["fehler"]
-    assert notfall["hat_daten"] is False
-    for schluessel in ("bilanz", "karte_hersteller", "karte_anbieter", "matrix",
-                       "lifecycle", "quellenlage", "auffaellig", "katalog"):
-        assert schluessel in notfall
-
-
 def test_preisverfall_nennt_seine_preisart(tmp_path):
     """Befund 11: eine Zeile auf Basis Zuzahlung und eine auf Basis
     Ladenpreis standen in derselben Spalte, nicht unterscheidbar - genau
@@ -1165,92 +718,6 @@ def test_preisverfall_nennt_seine_preisart(tmp_path):
 # --------------------------------------------------------------------------
 # Die Befunde des dritten Reviews (11.08.2026)
 # --------------------------------------------------------------------------
-
-def test_zwei_marken_eines_ladens_sind_eine_spalte(tmp_path):
-    """`shop`/`anzeige` aus der Konfiguration - die eigentliche
-    Verhaltensaenderung des Umbaus.
-
-    mobilcom-debitel und freenet sind derselbe Shop; als zwei Spalten
-    verglichen sie einen Laden mit sich selbst, und die Aggregation erzeugte
-    zwei deckungsgleiche Punkte. Im Testbestand steht ElectronicPartner mit
-    `shop: ep` und einem eigenen Anzeigenamen."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    spalten = {x.get_text(strip=True)
-               for x in s.select("#gr-ansicht-anbieter .gr-spaltenname")}
-    assert "ep.de (ElectronicPartner)" in spalten, spalten
-    assert "ElectronicPartner" not in spalten
-    # Und der Punkt traegt beide Namen: den Anzeigenamen fuer den Leser, den
-    # Rohnamen fuer Filter und Tests.
-    punkte = s.select("#gr-ansicht-anbieter .gr-flaeche[data-form='chip'] .gr-punkt")
-    paare = {(p.get("data-anbieter"), p.get("data-anbieter-key")) for p in punkte}
-    assert ("ep.de (ElectronicPartner)", "ElectronicPartner") in paare, paare
-
-
-def test_die_schwelle_zaehlt_laeden_und_nicht_marken(tmp_path):
-    """Die Kachel "Anbieter mit Daten" und die Spaltenzahl der Karte muessen
-    dieselbe Sache zaehlen.
-
-    Mit Marken gezaehlt schaltete sich der Navigationseintrag mit "2
-    Anbietern" frei, waehrend die Karte EINE Spalte zeigte - genau der
-    Fehlertyp aus CLAUDE.md §6: ein Etikett und ein Feld, die nicht dasselbe
-    meinen."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
-               for k in s.select(".gr-bilanz .t-kennzahl")}
-    spalten = s.select("#gr-ansicht-anbieter .gr-flaeche[data-form='chip'] "
-                       ".gr-spaltenname")
-    assert kacheln["Anbieter mit Daten"] == str(len(spalten)), (
-        kacheln["Anbieter mit Daten"], len(spalten))
-
-
-def test_der_achsenhinweis_nennt_die_datengrundlage(tmp_path):
-    """"Hersteller" zeigt nicht Apples Portfolio, sondern das, was die
-    erfassten Haendler von Apple fuehren. Solange das so ist, sagt es die
-    Spaltenzeile selbst."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    hinweise = [x.get_text(" ", strip=True) for x in s.select(".gr-achsname")]
-    assert hinweise
-    laeden = len(s.select("#gr-ansicht-anbieter .gr-flaeche[data-form='chip'] "
-                          ".gr-spaltenname"))
-    wort = "Händler" if laeden == 1 else "Händlern"
-    assert any(f"Preise von {laeden} {wort}" in h for h in hinweise), hinweise
-
-
-def test_die_tabelle_zeigt_dieselben_zahlen_wie_die_karte(tmp_path):
-    """Die Aufklapptabelle unter der Grafik ist der Zugang fuer alle, die die
-    Karte nicht lesen koennen. Sie speist sich aus DERSELBEN Punktliste -
-    eine zweite Aufbereitung wuerde driften, und niemand merkte es."""
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    punkte = s.select("#gr-ansicht-hersteller .gr-flaeche[data-form='chip'] .gr-punkt")
-    zeilen = s.select(".gr-tabelle-auf tbody tr")
-    assert len(zeilen) == len(punkte), (len(zeilen), len(punkte))
-    aus_karte = sorted(p.get("data-preis") for p in punkte)
-    aus_tabelle = sorted(
-        z.select("td")[3].get_text(strip=True).replace(" €", "") for z in zeilen)
-    assert aus_karte == aus_tabelle, (aus_karte[:3], aus_tabelle[:3])
-    for z in zeilen:
-        assert z.select_one("a[href^='http']") is not None
-
-
-def test_der_notzustand_traegt_dieselben_flaechen_wie_der_normalfall(tmp_path):
-    """`leer()` existiert, damit ein kaputter Eintrag die Seite nicht
-    mitreisst. Das kann er nur, wenn er jedes Feld traegt, das die Vorlage
-    liest - hier: dieselben vier Flaechen unter denselben Schluesseln."""
-    from telco_radar.report.geraete_view import aufbereiten, leer
-    root = tmp_path
-    _baue(root)
-    voll = aufbereiten(root / "data" / "state",
-                       lade_quellen(root), lade_katalog(root))
-    notzustand = leer("kaputt")
-    assert set(notzustand["flaechen"]) == set(voll["flaechen"])
-    for schluessel, k in notzustand["flaechen"].items():
-        assert set(k) >= set(voll["flaechen"][schluessel]) - {"y_schritt"}, schluessel
-    assert notzustand["formen"] == voll["formen"]
-
 
 def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
     """Die Sektion, die zwei Bildschirmseiten lang nichts aussagte.
@@ -1364,57 +831,78 @@ def _db_mit_vergleich():
     ]}
 
 
-def test_die_vergleichssektion_nennt_den_guenstigsten_mit_namen(tmp_path):
+def test_die_alarmtabelle_nennt_den_guenstigsten_mit_namen(tmp_path):
     """Die woertliche Anforderung: nicht DASS es guenstiger ist, sondern
     BEI WEM."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    abschnitt = s.select_one(".gr-vergleich")
-    assert abschnitt is not None, "die Sektion fehlt ganz"
-    text = abschnitt.get_text(" ", strip=True)
-    assert "Wer ist günstiger als Vodafone?" in text
+    tafel = s.select_one("#tafel-alarme")
+    assert tafel is not None, "der Reiter fehlt ganz"
+    text = tafel.get_text(" ", strip=True)
     assert "Medimax" in text, "der guenstigste Wettbewerber steht mit Namen da"
     assert "150,00" in text, "die Differenz steht da (1349 - 1199)"
     assert "11,1" in text, "und der Prozentsatz"
 
 
-def test_jede_vergleichszeile_traegt_beide_quellen_und_beide_daten(tmp_path):
+def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
+    """Vorgabe des Auftrags, und sie ist richtig: 15 Euro sind bei einem
+    200-Euro-Geraet viel und bei einem 2000-Euro-Geraet nichts. Der
+    Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
+    site = _baue(tmp_path, db=_db_mit_vergleich())
+    s = _suppe(site, "geraete.html")
+    zeile = s.select_one(".gr-alarm .gr-a-zeile")
+    assert zeile is not None, "keine einzige Alarmzeile"
+    assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
+    assert "€" in zeile.select_one(".gr-a-euro").get_text(strip=True)
+
+
+def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     """"Kein Vergleich ohne beide Quelllinks und beide Abrufdaten." Auf der
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeilen = s.select(".gr-vergleich .gr-v-zeile")
-    assert zeilen, "keine einzige Vergleichszeile"
+    zeilen = s.select(".gr-alarm .gr-a-zeile")
+    assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
-        eigen = zeile.select_one(".gr-eigen-spalte")
-        assert eigen.select_one("a[href]"), "Vodafone ohne Quelllink"
-        assert eigen.select_one(".gr-v-datum"), "Vodafone ohne Abrufdatum"
-        bester = zeile.select_one(".gr-v-name")
-        if bester is None:
-            continue          # "niemand guenstiger" - eine gueltige Zeile
-        zelle = bester.parent
-        assert zelle.select_one("a[href]"), "Wettbewerber ohne Quelllink"
-        assert zelle.select_one(".gr-v-datum"), "Wettbewerber ohne Abrufdatum"
+        assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
+        assert zeile.select(".gr-a-klein"), "Zeile ohne Abrufdatum"
+        auf = s.select_one("#" + zeile["data-auf"])
+        assert auf is not None, "Zeile ohne Aufklapper"
+        # Der Aufklapper traegt BEIDE Seiten - unsere Listung und die fremde.
+        assert auf.select("a[href]"), "Aufklapper ohne Quelllink"
 
 
-def test_der_aufklapper_listet_alle_guenstigeren(tmp_path):
+def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
+    """Der Klick auf eine Zeile zeigt die ganze Lage, nicht nur den Sieger -
+    unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    auf = s.select_one(".gr-vergleich .gr-v-alle details")
-    assert auf is not None, "zwei guenstigere Anbieter, aber kein Aufklapper"
-    namen = [x.get_text(strip=True) for x in auf.select(".gr-v-name")]
+    zeile = s.select_one(".gr-alarm .gr-a-zeile")
+    auf = s.select_one("#" + zeile["data-auf"])
+    namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
     # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
     # ElectronicPartner unter `shop: ep`. Verglichen werden Laeden - sonst
     # zaehlte derselbe Shop unter zwei Marken zweimal als "guenstiger".
-    assert set(namen) == {"Medimax", "ep"}
+    assert {"Medimax", "ep"} <= set(namen)
+    assert "Vodafone" in namen, "unser eigener Preis fehlt im Aufklapper"
 
 
-def test_die_zeile_ohne_guenstigeren_wettbewerber_bleibt_stehen(tmp_path):
-    """"Nirgends guenstiger" ist die Auskunft, wegen der man die Liste liest."""
+def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
+    """Die Umkehr vom 30.08.2026, und sie ist der Kern des Auftrags:
+    "niemand guenstiger" stand 36-mal in der alten Tabelle. Das ist keine
+    Aussage, das ist eine leere Zeile mit Text darin - die Kachel "Bestpreis"
+    sagt dasselbe einmal.
+    """
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    text = s.select_one(".gr-vergleich").get_text(" ", strip=True)
-    assert "niemand günstiger" in text
+    tafel = s.select_one("#tafel-alarme")
+    assert "niemand günstiger" not in tafel.get_text(" ", strip=True)
+
+    # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
+    # es MUSS ein Geraet geben, bei dem niemand unterbietet.
+    bestpreis = next(k for k in s.select(".gr-kacheln .gr-kachel")
+                     if k.find("span").get_text(strip=True) == "Bestpreis")
+    assert int(bestpreis.find("b").get_text(strip=True)) > 0
 
 
 def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
@@ -1433,22 +921,35 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     Beim ANSEHEN des Screenshots aufgefallen, nicht im Test."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    for datum in s.select(".gr-vergleich .gr-v-datum"):
+    gemessen = 0
+    for datum in s.select("#tafel-alarme .gr-a-klein, #tafel-alarme .gr-a-liste span"):
         text = datum.get_text(strip=True)
         if not text or not text[0].isdigit():
             continue
+        gemessen += 1
         assert "-" not in text, f"ISO-Datum auf der Seite: {text!r}"
+    assert gemessen, "kein einziges Datum gemessen - der Test prueft nichts"
 
 
-def test_der_anbieterfilter_steht_mit_drei_knoepfen_bereit(tmp_path):
+def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
+    """Marke, Modell und Speicher sind eine Auswahl; Zustand und Preisart
+    sind es NICHT - der Vergleich zeigt ausschliesslich Neugeraete ohne
+    Vertrag. Sie stehen deshalb als aktive Etiketten und nicht als
+    Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    knoepfe = [k.get("data-typ") for k in
-               s.select(".gr-vergleich-filter .gr-filter-knopf")]
-    assert knoepfe == ["alle", "netzbetreiber", "handel"]
-    # Und jede Zeile sagt, zu welchen Typen ihre guenstigeren Anbieter zaehlen.
-    for zeile in s.select(".gr-vergleich .gr-v-zeile"):
-        assert zeile.has_attr("data-typen")
+    felder = [f.get("data-filter") for f in s.select("#tafel-alarme [data-filter]")]
+    assert felder == ["marke", "modell", "speicher", "suche"]
+
+    fest = [e.get_text(" ", strip=True)
+            for e in s.select("#tafel-alarme .gr-filter label.gr-filter--an")]
+    assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
+
+    # Jede Zeile traegt die Werte, nach denen gefiltert wird.
+    for zeile in s.select(".gr-alarm .gr-a-zeile"):
+        assert zeile.has_attr("data-marke")
+        assert zeile.has_attr("data-modell")
+        assert zeile.has_attr("data-speicher")
 
 
 def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
@@ -1457,7 +958,7 @@ def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
     ohne = {"updated": "2026-08-11", "anbieter": {}, "listungen": []}
     site = _baue(tmp_path, db=ohne, punkte=[])
     s = _suppe(site, "geraete.html")
-    assert s.select_one(".gr-vergleich") is None
+    assert s.select_one("#tafel-alarme") is None
 
 
 # --------------------------------------------------------------------------
@@ -1535,7 +1036,7 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     assert s.select_one(".gr-auffaellig .gr-saetze li") is not None
-    assert s.select_one(".gr-vergleich") is not None
+    assert s.select_one("#tafel-alarme") is not None
 
 
 def test_die_geraetespalte_der_matrix_bleibt_beim_scrollen_stehen(tmp_path):
@@ -1570,40 +1071,6 @@ def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
 # W1.1: die Preisgrafik zeigt nur Neugeraete
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("zustand", ["refurbished", "b-ware", "unbekannt"])
-def test_die_preisgrafik_zeigt_nur_neugeraete(zustand):
-    """Dieselbe Regel wie im Vergleich, aus demselben Grund: die Karte
-    ordnet Punkte nach Preis auf einer Achse. Ein Gebrauchtpreis darunter
-    liest sich wie ein guenstiger Neupreis - die Y-Achse traegt keine
-    Zustandsangabe."""
-    from telco_radar.report.geraete_karte import aggregiere
-    punkte = [
-        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
-         "preis": 899.0, "zustand": "neu", "modell": "iPhone 17",
-         "hersteller": "Apple"},
-        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
-         "preis": 499.0, "zustand": zustand, "modell": "iPhone 17",
-         "hersteller": "Apple"},
-    ]
-    erg = aggregiere(punkte)
-    assert [p["preis"] for p in erg] == [899.0], (
-        f"{zustand} darf keinen Preispunkt bilden")
-
-
-def test_die_preisgrafik_behaelt_neugeraete():
-    """Gegenprobe: ohne sie waere eine Karte, die ALLES verwirft, gruen."""
-    from telco_radar.report.geraete_karte import aggregiere
-    punkte = [
-        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "o2",
-         "preis": 899.0, "zustand": "neu", "modell": "iPhone 17",
-         "hersteller": "Apple"},
-        {"device_id": "apple-iphone-17", "speicher": 256, "anbieter": "freenet",
-         "preis": 879.0, "zustand": "neu", "modell": "iPhone 17",
-         "hersteller": "Apple"},
-    ]
-    assert len(aggregiere(punkte)) == 2
-
-
 def test_die_pruefung_schaltet_die_navigation_nicht(tmp_path):
     """Befund des Reviews vom 29.08.2026: `schwelle_erreicht` nahm die
     Spaltenzahl der Herstelleransicht, und die hängt seit W1.2 an der
@@ -1633,28 +1100,6 @@ def test_die_pruefung_schaltet_die_navigation_nicht(tmp_path):
     assert geraete["bilanz"]["schwelle_erreicht"] is True
     ziele = {a.get("href") for a in _suppe(site, "index.html").select(".subnav a")}
     assert "geraete.html" in ziele
-
-
-def test_die_legende_zaehlt_die_listungen_die_wirklich_gezeichnet_werden(tmp_path):
-    """"153 Preispunkte aus 348 Listungen" war falsch, sobald die Karte nur
-    noch Neugeräte zeichnet: 9 refurbished Listungen standen im Nenner und
-    nicht in der Grafik. Auf einer Seite, deren Verkaufsargument der
-    Belegzwang ist, ist das die teuerste Sorte falscher Zahl."""
-    db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
-    for listung in db["listungen"][:6]:
-        listung["zustand"] = "refurbished"
-        listung["sku_id"] = listung["sku_id"] + "-refurbished"
-        listung["id"] = listung["id"] + "-refurbished"
-
-    _baue(tmp_path, db=db)
-    geraete = geraete_view.aufbereiten(
-        tmp_path / "data" / "state", lade_quellen(tmp_path),
-        lade_katalog(tmp_path), heute="2026-08-11")
-
-    assert geraete["bilanz"]["listungen"] == 24
-    assert geraete["bilanz"]["aggregiert_aus"] == 18, (
-        "die 6 refurbished Listungen gehören nicht in den Nenner der Grafik")
-    assert geraete["bilanz"]["in_der_karte"] <= geraete["bilanz"]["aggregiert_aus"]
 
 
 def test_der_pruefbericht_nennt_dieselben_zahlen_wie_die_pruefung(tmp_path):
@@ -1728,93 +1173,6 @@ def test_die_preisspanne_der_sku_matrix_zeigt_keinen_gebrauchtpreis(tmp_path):
 # W2: die Grafik zeigt eine Aussage, keine Tapete
 # --------------------------------------------------------------------------
 
-def test_eine_spalte_traegt_hoechstens_zwoelf_baender():
-    """Die Apple-Spalte trug rund 40 Bänder, die Samsung-Spalte 38. Die
-    Bandform war richtig gewählt – sie hatte nur keine Obergrenze. Eine
-    Spalte mit 38 Schlitzen gibt jedem Schlitz acht Pixel, und darin steht
-    kein Modellname mehr."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": f"samsung-galaxy-s{n}", "modell": f"Galaxy S{n}",
-               "hersteller": "Samsung", "shop": "o2", "anbieter": "o2",
-               "speicher": 256, "preis": 500.0 + n * 10, "zustand": "neu",
-               "generation": n, "aktuelle_generation": n == 26}
-              for n in range(1, 31)]
-    flaeche = geraete_karte.karte(geraete_karte.aggregiere(punkte),
-                                  "hersteller", "Hersteller",
-                                  form=geraete_karte.FORM_BAND)
-    je_spalte = {}
-    for b in flaeche["baender"]:
-        je_spalte[b["spalte"]] = je_spalte.get(b["spalte"], 0) + 1
-    assert je_spalte, "keine Bänder - dann prüft der Test nichts"
-    assert max(je_spalte.values()) <= geraete_karte.BAND_MAX_JE_SPALTE
-
-
-def test_die_kappung_behaelt_die_aktuelle_generation():
-    """Gekappt wird nach Rang, nicht nach Listenposition. Die aktuelle
-    Generation ist die, wegen der jemand die Grafik ansieht – sie darf nicht
-    herausfallen, weil ein Vorgänger alphabetisch vorne steht."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": f"samsung-galaxy-s{n}", "modell": f"Galaxy S{n}",
-               "hersteller": "Samsung", "shop": "o2", "anbieter": "o2",
-               "speicher": 256, "preis": 500.0, "zustand": "neu",
-               "generation": n, "aktuelle_generation": n >= 26}
-              for n in range(1, 31)]
-    flaeche = geraete_karte.karte(geraete_karte.aggregiere(punkte),
-                                  "hersteller", "Hersteller",
-                                  form=geraete_karte.FORM_BAND)
-    gezeigt = {b["name_kurz"] for b in flaeche["baender"]}
-    for n in range(26, 31):
-        assert f"Galaxy S{n}" in gezeigt, f"Galaxy S{n} fehlt"
-
-
-def test_eine_kleine_spalte_wird_nicht_gekappt():
-    """Gegenprobe: die Grenze darf nur greifen, wo sie gebraucht wird."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": f"nothing-phone-{n}", "modell": f"Phone {n}",
-               "hersteller": "Nothing", "shop": "o2", "anbieter": "o2",
-               "speicher": 256, "preis": 400.0 + n, "zustand": "neu",
-               "generation": n, "aktuelle_generation": n == 3}
-              for n in range(1, 4)]
-    flaeche = geraete_karte.karte(geraete_karte.aggregiere(punkte),
-                                  "hersteller", "Hersteller",
-                                  form=geraete_karte.FORM_BAND)
-    assert len(flaeche["baender"]) == 3
-    assert flaeche["baender_uebersprungen"] == 0
-
-
-def test_beide_ansichten_zeigen_nach_der_kappung_dieselben_punkte():
-    """`pruefe_portal.py` Kriterium 11 verlangt seit dem 10.08.2026 gleich
-    viele Punkte je Ansicht. Je SPALTE gekappt behielte die
-    Herstelleransicht (Spalte = Hersteller) andere Geräte als die
-    Anbieteransicht (Spalte = Laden) – zwei Ansichten derselben Daten mit
-    verschiedenen Punkten. Die Auswahl fällt deshalb je Hersteller, einmal
-    für beide."""
-    from telco_radar.report import geraete_karte
-
-    punkte = []
-    for n in range(1, 21):
-        for shop in ("o2", "freenet", "Vodafone"):
-            punkte.append({
-                "device_id": f"samsung-galaxy-s{n}", "modell": f"Galaxy S{n}",
-                "hersteller": "Samsung", "shop": shop, "anbieter": shop,
-                "speicher": 256, "preis": 500.0 + n * 10, "zustand": "neu",
-                "generation": n, "aktuelle_generation": n == 20})
-    agg = geraete_karte.aggregiere(punkte)
-    nach_hersteller = geraete_karte.karte(agg, "hersteller", "Hersteller",
-                                          form=geraete_karte.FORM_BAND)
-    nach_anbieter = geraete_karte.karte(agg, "shop", "Anbieter",
-                                        form=geraete_karte.FORM_BAND)
-    # Gegenprobe: die Kappung greift wirklich, sonst prüft der Test nichts.
-    assert nach_hersteller["baender_uebersprungen"] > 0
-    assert len(nach_hersteller["punkte"]) == len(nach_anbieter["punkte"])
-    schluessel = lambda k: {(p["device_id"], p.get("shop"), p.get("speicher"))
-                            for p in k["punkte"]}
-    assert schluessel(nach_hersteller) == schluessel(nach_anbieter)
-
-
 def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     """Das Akzeptanzkriterium, gemessen an der WIRKLICH gerenderten Seite.
 
@@ -1855,7 +1213,7 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # lief dieser Test an genau der Sektion vorbei, in der der zweite Fall
     # stand („62 Geräte im Vergleich") - ein Test, dessen Lookup ins Leere
     # geht, ist grün und prüft nichts (CLAUDE.md §6).
-    for auswahl in (".gr-vergleich", ".gr-matrix", ".gr-karte"):
+    for auswahl in ("#tafel-alarme", ".gr-matrix", "#tafel-katalog"):
         assert suppe.select_one(auswahl), f"{auswahl} fehlt in der Fixture"
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
@@ -1869,123 +1227,3 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     assert not zu_gross, (
         f"{zu_gross} übersteigen die {bestand} beobachteten Geräte")
 
-
-def test_die_grenze_gilt_in_BEIDEN_ansichten():
-    """Gekappt wird je Hersteller UND je Laden. Nur je Hersteller gedeckelt
-    hielt die Herstelleransicht ihre zwölf, während in der Anbieteransicht
-    sechs Hersteller in DERSELBEN Ladenspalte landeten – gemessen am
-    29.08.2026: o2 23 Bänder, Vodafone 21. Genau der Befund, der die
-    Obergrenze ausgelöst hat, nur eine Ansicht weiter."""
-    from telco_radar.report import geraete_karte
-
-    punkte = []
-    for hersteller, praefix in (("Apple", "iPhone"), ("Samsung", "Galaxy S"),
-                                ("Google", "Pixel")):
-        for n in range(1, 16):
-            for shop in ("o2", "Vodafone"):
-                punkte.append({
-                    "device_id": f"{hersteller.lower()}-{n}", "shop": shop,
-                    "modell": f"{praefix} {n}", "hersteller": hersteller,
-                    "anbieter": shop, "speicher": 256, "zustand": "neu",
-                    "preis": 400.0 + n * 20, "generation": n,
-                    "aktuelle_generation": n == 15})
-    agg = geraete_karte.aggregiere(punkte)
-    for feld, achse in (("hersteller", "Hersteller"), ("shop", "Anbieter")):
-        flaeche = geraete_karte.karte(agg, feld, achse,
-                                      form=geraete_karte.FORM_BAND)
-        je_spalte = {}
-        for b in flaeche["baender"]:
-            je_spalte[b["spalte"]] = je_spalte.get(b["spalte"], 0) + 1
-        assert je_spalte, f"{achse}: keine Bänder"
-        assert max(je_spalte.values()) <= geraete_karte.BAND_MAX_JE_SPALTE, (
-            f"{achse}: {je_spalte}")
-
-
-def test_die_rettung_eines_ladens_reisst_die_grenze_nicht():
-    """Ein Laden darf nicht ganz herausfallen – aber die Rettung VERDRÄNGT,
-    sie hängt nicht an. Angehängt stand Samsung mit 13 Bändern da, weil ALDI
-    TALKs einzige Listung ein Samsung ist."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": f"s{n}", "modell": f"Galaxy S{n}",
-               "hersteller": "Samsung", "shop": "o2", "anbieter": "o2",
-               "speicher": 256, "zustand": "neu", "preis": 500.0 + n,
-               "generation": n, "aktuelle_generation": n == 30}
-              for n in range(1, 31)]
-    punkte.append({"device_id": "a17", "modell": "Galaxy A17",
-                   "hersteller": "Samsung", "shop": "ALDI TALK",
-                   "anbieter": "ALDI TALK", "speicher": 128, "zustand": "neu",
-                   "preis": 129.0, "generation": 17,
-                   "aktuelle_generation": False})
-    gezeigt = geraete_karte.gekappt(geraete_karte.aggregiere(punkte))
-    laeden = {p["shop"] for p in gezeigt}
-    assert laeden == {"o2", "ALDI TALK"}, "ein Laden ist ganz herausgefallen"
-    assert len(gezeigt) <= geraete_karte.BAND_MAX_JE_SPALTE
-
-
-def test_die_kappung_ist_idempotent():
-    """Sie läuft an ZWEI Stellen – in `aufbereiten` für Legende und Bilanz,
-    in `karte()` für den direkten Aufruf. Wäre sie nicht idempotent, zeigte
-    die Grafik weniger als ihre eigene Legende sagt."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": f"s{n}", "modell": f"Galaxy S{n}",
-               "hersteller": "Samsung", "shop": "o2", "anbieter": "o2",
-               "speicher": 256, "zustand": "neu", "preis": 500.0 + n,
-               "generation": n, "aktuelle_generation": n == 30}
-              for n in range(1, 31)]
-    einmal = geraete_karte.gekappt(geraete_karte.aggregiere(punkte))
-    assert len(einmal) == geraete_karte.BAND_MAX_JE_SPALTE
-    assert len(geraete_karte.gekappt(einmal)) == len(einmal)
-
-
-def test_ein_punkt_ohne_preis_reisst_die_kappung_nicht():
-    """`karte()` filtert preislose Punkte, `gekappt()` tat es nicht – und
-    `-p["preis"]` wäre dort gescheitert. `aufbereiten` hätte geworfen,
-    `html.py` es abgefangen, und die Geräteseite wäre stumm auf `leer()`
-    gefallen, samt Navigationseintrag."""
-    from telco_radar.report import geraete_karte
-
-    punkte = [{"device_id": "s1", "modell": "Galaxy S1", "hersteller": "Samsung",
-               "shop": "o2", "anbieter": "o2", "speicher": 256,
-               "zustand": "neu", "preis": None, "generation": 1},
-              {"device_id": "s2", "modell": "Galaxy S2", "hersteller": "Samsung",
-               "shop": "o2", "anbieter": "o2", "speicher": 256,
-               "zustand": "neu", "preis": 500.0, "generation": 2}]
-    assert len(geraete_karte.gekappt(punkte)) == 1
-
-
-def test_kein_hersteller_faellt_ganz_aus_der_grafik():
-    """Dieselbe Regel wie für Läden, eine Achse weiter. Nur Läden zu retten
-    ließ „Nothing" ganz aus der Herstelleransicht fallen, sobald der
-    Ladendeckel band – eine Spalte, die es im Bestand gibt und in der Grafik
-    nicht, ist eine stille Falschaussage über den Markt."""
-    from telco_radar.report import geraete_karte
-
-    punkte = []
-    # Zwei große Hersteller füllen beide Ladenspalten ...
-    for hersteller in ("Apple", "Samsung"):
-        for n in range(1, 16):
-            for shop in ("o2", "Vodafone"):
-                punkte.append({
-                    "device_id": f"{hersteller}-{n}", "shop": shop,
-                    "modell": f"{hersteller} {n}", "hersteller": hersteller,
-                    "anbieter": shop, "speicher": 256, "zustand": "neu",
-                    "preis": 900.0 + n, "generation": n,
-                    "aktuelle_generation": n == 15})
-    # ... und ein kleiner mit einem einzigen, schwach gereihten Gerät.
-    punkte.append({"device_id": "nothing-1", "shop": "o2", "anbieter": "o2",
-                   "modell": "Nothing Phone (1)", "hersteller": "Nothing",
-                   "speicher": 256, "zustand": "neu", "preis": 300.0,
-                   "generation": 1, "aktuelle_generation": False})
-
-    gezeigt = geraete_karte.gekappt(geraete_karte.aggregiere(punkte))
-    assert {p["hersteller"] for p in gezeigt} == {"Apple", "Samsung", "Nothing"}
-    for feld, achse in (("hersteller", "Hersteller"), ("shop", "Anbieter")):
-        flaeche = geraete_karte.karte(geraete_karte.aggregiere(punkte), feld,
-                                      achse, form=geraete_karte.FORM_BAND)
-        je_spalte = {}
-        for b in flaeche["baender"]:
-            je_spalte[b["spalte"]] = je_spalte.get(b["spalte"], 0) + 1
-        assert max(je_spalte.values()) <= geraete_karte.BAND_MAX_JE_SPALTE, (
-            f"{achse}: {je_spalte}")

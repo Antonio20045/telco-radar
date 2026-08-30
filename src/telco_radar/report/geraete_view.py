@@ -40,7 +40,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, serie_aus_modell
-from . import geraete_karte, geraete_pruefung, geraete_vergleich
+from . import geraete_alarme, geraete_pruefung, geraete_vergleich
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -52,21 +52,15 @@ from ..analyze.geraete_store import (
 
 log = logging.getLogger(__name__)
 
-# Die Geometrie der Positionskarte steht seit dem 11.08.2026 in
-# `geraete_karte.py`. Sie ist dorthin gewandert, weil sie einen Fehler trug,
-# den kein Test fand: Etiketten wurden gestapelt, waehrend die Punkte auf
-# ihrem Preis blieben - bis zu 235 px Versatz, 87 von 94 Etiketten weiter als
-# drei Prozent daneben. Die Namen hier bleiben als Weiterleitung stehen, weil
-# `pruefe_portal.py` und mehrere Tests sie lesen.
-BREITE = geraete_karte.BREITE
-HOEHE = geraete_karte.HOEHE_MIN
-RAND_L, RAND_R, RAND_O = (geraete_karte.RAND_L, geraete_karte.RAND_R,
-                          geraete_karte.RAND_O)
-RAND_U = geraete_karte.RAND_U_CHIP
-Y_SCHRITT = geraete_karte.Y_SCHRITT
-Y_MINDEST = geraete_karte.Y_MINDEST
-_ETIKETT_BASISLINIE = geraete_karte.BASISLINIE
-_ZEICHENBREITE = geraete_karte.ZEICHENBREITE
+# Die Positionskarte ist am 30.08.2026 GELOESCHT worden, nicht umgebaut.
+# Sie zeigte 59 Geraete mal vier Anbietern in einem Bild - 114 senkrecht
+# gedrehte Achsenbeschriftungen, 155 von 164 Punkten ohne Beschriftung - und
+# drei Umschalter boten drei Ansichten derselben unlesbaren Grafik an. Ein
+# Filter darauf haette den Fehler nicht behoben, sondern verkleinert.
+#
+# Was sie zeigen sollte, zeigt jetzt eine Tabelle (`geraete_alarme.py`).
+# Ein Diagramm gibt es nur noch eines, es steht in "Preisverlauf", und es
+# zeigt genau EIN Geraet.
 
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
@@ -125,50 +119,6 @@ SEGMENT_LABEL = {"flagship": "Flaggschiff", "premium": "Premium",
 
 def _ist_eigen(anbieter: str) -> bool:
     return (anbieter or "").strip().lower() in EIGEN
-
-
-def _kurz(text: str, breite_px: float) -> str:
-    grenze = max(6, int(breite_px / _ZEICHENBREITE))
-    text = text or ""
-    return text if len(text) <= grenze else text[:grenze - 1].rstrip() + "…"
-
-
-# Ab diesem Anteil traegt ein einzelner Laden die Karte so weit, dass sein
-# Name in den Spaltentitel gehoert. Ohne diesen Satz zeigt die Spalte "Apple"
-# nicht Apples Portfolio, sondern das, was EIN Haendler von Apple fuehrt -
-# und behauptet dabei das Erste.
-_TRAEGT_DIE_KARTE = 0.8
-
-
-def _grundlage(aggregate: list, anzeige: dict) -> str:
-    """Der Satz unter dem Achsnamen: woher die Preise kommen."""
-    if not aggregate:
-        return ""
-    laeden: dict[str, int] = {}
-    for p in aggregate:
-        schluessel = p.get("shop") or p.get("anbieter") or ""
-        laeden[schluessel] = laeden.get(schluessel, 0) + 1
-    zahl = len(laeden)
-    satz = f"Preise von {zahl} {'Händler' if zahl == 1 else 'Händlern'}"
-    fuehrend, treffer = max(laeden.items(), key=lambda kv: kv[1])
-    if zahl > 1 and treffer >= _TRAEGT_DIE_KARTE * len(aggregate):
-        satz += (f", {treffer} von {len(aggregate)} Punkten "
-                 f"{anzeige.get(fuehrend, fuehrend)}")
-    return satz
-
-
-# --------------------------------------------------------------------------
-# Die Positionskarte
-# --------------------------------------------------------------------------
-# Sie steht seit dem 11.08.2026 in `geraete_karte.py`. `_karte()` bleibt als
-# Weiterleitung, weil mehrere Tests und Aufrufer sie kennen - sie reicht
-# jetzt aggregierte Preispunkte durch, nicht mehr rohe Listungen.
-
-
-def _karte(punkte: list, spaltenfeld: str, achsname: str,
-           form: str = geraete_karte.FORM_CHIP, **kw) -> dict:
-    """Weiterleitung auf `geraete_karte.karte` - siehe dort."""
-    return geraete_karte.karte(punkte, spaltenfeld, achsname, form=form, **kw)
 
 
 # --------------------------------------------------------------------------
@@ -588,25 +538,13 @@ def leer(fehler: str = "") -> dict:
         "fenster_tage": FENSTER_TAGE, "ohne_katalog": [], "db_lesbar": not fehler,
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
-                   "ausgelistet": 0, "preispunkte": 0, "in_der_karte": 0,
-                   "aggregiert_aus": 0, "hersteller": 0, "nicht_gezeigt": 0,
-                   "geraete_in_der_karte": 0,
+                   "ausgelistet": 0, "preispunkte": 0, "hersteller": 0,
                    "schwelle_erreicht": False},
         # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
-        # genau dafuer gibt es ihn. Die vier Flaechen kommen aus derselben
-        # Funktion wie im Normalfall, damit sie nicht auseinanderlaufen
-        # koennen (ein Test haelt beide Schluesselmengen gegeneinander).
-        "flaechen": {f"{ansicht}_{form}": geraete_karte.karte(
-                         [], "hersteller" if ansicht == "hersteller" else "shop",
-                         ansicht.capitalize(), form=form)
-                     for ansicht in ("hersteller", "anbieter")
-                     for form in geraete_karte.FORMEN},
-        "standard_ansicht": "hersteller",
-        "formen": list(geraete_karte.FORMEN),
-        "karte_hersteller": {"hat_daten": False, "punkte": [], "spalten": [],
-                             "etiketten_verborgen": 0, "spaltenzahl": 0},
-        "karte_anbieter": {"hat_daten": False, "punkte": [], "spalten": [],
-                           "etiketten_verborgen": 0, "spaltenzahl": 0},
+        # genau dafuer gibt es ihn. Die Alarme kommen aus derselben Funktion
+        # wie im Normalfall, damit die zwei Schluesselmengen nicht
+        # auseinanderlaufen koennen (ein Test haelt sie gegeneinander).
+        "alarme": geraete_alarme.leer(),
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": []},
@@ -753,83 +691,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     ohne_katalog = sorted({e.get("device_id") for e in sichtbar
                            if katalog.nach_id(e.get("device_id")) is None})
 
-    # Aus Listungen werden Preispunkte. Fuenf Farben desselben iPhone 17 mit
-    # 512 GB kosten alle 1199 EUR - als fuenf Punkte lagen sie deckungsgleich
-    # aufeinander und trugen fuenf Etiketten, die sich gegenseitig nach unten
-    # schoben. 60 der 85 Kreise waren so entstanden.
-    # Die Kappung faellt HIER, nicht erst in `karte()`: `_grundlage` und
-    # `bilanz.in_der_karte` lesen `aggregate`, und ungekappt meldete die
-    # Legende "153 Preispunkte", waehrend die Grafik 82 zeichnete - genau
-    # der Fehlertyp aus CLAUDE.md §6, ein Etikett und ein Feld, die nicht
-    # dasselbe meinen. `karte()` kappt weiterhin selbst (die Rechnung ist
-    # idempotent), damit ein direkter Aufruf dieselbe Auswahl bekommt.
-    aggregate = geraete_karte.gekappt(
-        geraete_karte.aggregiere(punkte_ohne_vertrag))
-
-    # Beide Ansichten bekommen dieselbe Hoehe, sonst springt die Seite beim
-    # Umschalten. Zwei Durchgaenge: erst messen, dann mit dem Maximum bauen.
-    def _flaechen(hoehe_mindestens: int = 0) -> dict:
-        raus = {}
-        # Die Anbieteransicht sortiert nach LADEN, nicht nach Markenname -
-        # sonst stuenden mobilcom-debitel und freenet als zwei Spalten
-        # nebeneinander und zeigten dasselbe Sortiment zweimal.
-        for name, feld, achsname in (("hersteller", "hersteller", "Hersteller"),
-                                     ("anbieter", "shop", "Anbieter")):
-            for form in geraete_karte.FORMEN:
-                raus[f"{name}_{form}"] = geraete_karte.karte(
-                    aggregate, feld, achsname, form=form, anzeige=anzeige,
-                    hoehe_mindestens=hoehe_mindestens,
-                    achszusatz=_grundlage(aggregate, anzeige))
-        return raus
-
-    # Synchronisiert wird JE FORM, nicht ueber beide. Der Grund der
-    # Synchronisierung ist, dass die Seite beim Umschalten nicht springt -
-    # und der haeufige Schalter ist Hersteller/Anbieter, nicht Baender/Punkte.
-    # Ueber beide Formen gerechnet erbte die Bandform die 900 px der
-    # Punktform, obwohl sie 540 braucht: 360 px leere Flaeche in der
-    # Ansicht, die als Standard gezeigt wird.
-    erst = _flaechen()
-    je_form = {}
-    for schluessel, k in erst.items():
-        form = schluessel.rsplit("_", 1)[1]
-        je_form[form] = max(je_form.get(form, 0), k["hoehe"])
-    flaechen = {}
-    for form, hoehe in je_form.items():
-        flaechen.update({s: k for s, k in _flaechen(hoehe).items()
-                         if s.rsplit("_", 1)[1] == form})
-
-    karte_hersteller = flaechen["hersteller_chip"]
     # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
     # "was kostet dasselbe Geraet bei wem" - und zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
     # schaltete sich der Navigationseintrag mit "2 Anbietern" frei, waehrend
-    # die Karte EINE Spalte zeigt und "Preise von 1 Haendler" darunter steht.
+    # nur EIN Laden lieferte.
     laeden_mit_daten = {laden.get(e.get("anbieter"), e.get("anbieter"))
                         for e in sichtbar}
-    # Die Listungen HINTER den gezeichneten Punkten - nicht alle
-    # vergleichbaren. Seit die Karte kappt, sind das zwei verschiedene
-    # Zahlen, und "83 Preispunkte aus 339 Listungen" waere wieder ein
-    # Etikett, das nicht zu seinem Feld passt.
-    gezeigte_schluessel = {(p.get("device_id"), p.get("speicher"),
-                            p.get("shop"), p.get("zustand") or "neu")
-                           for p in aggregate}
-    gezeichnete_listungen = [
-        p for p in punkte_ohne_vertrag
-        if (p.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
-        and (p.get("device_id"), p.get("speicher"), p.get("shop"),
-             p.get("zustand") or "neu") in gezeigte_schluessel]
-    # Was die Kappung weggelassen hat, wird gezaehlt und auf der Seite
-    # genannt - eine still gekappte Grafik behauptet Vollstaendigkeit.
-    alle_punkte = geraete_karte.aggregiere(punkte_ohne_vertrag)
-    nicht_gezeigt = len({(p.get("modell"), p.get("device_id"), p.get("shop"))
-                         for p in alle_punkte}) - len(
-        {(p.get("modell"), p.get("device_id"), p.get("shop"))
-         for p in aggregate})
     # Die Veroeffentlichungsschwelle rechnet gegen den BESTAND, nicht gegen
     # die Karte. Bis zum 29.08.2026 nahm sie die Spaltenzahl der
     # Herstelleransicht - und die haengt seit W1.2 an der
     # Plausibilitaetspruefung. Damit haette ein Anbieter, der an einem Tag
-    # seine Farbvarianten mit mehr als SPANNE_GRENZE Abstand bepreist, den
+    # seine Farbvarianten mit mit weiten Farbabstaenden bepreist, den
     # Navigationseintrag "Geraete" auf JEDER Seite verschwinden lassen -
     # ohne Fehler, ohne Warnung, und niemand faende die Seite mehr. Eine
     # Datenqualitaetsheuristik darf keine Navigation schalten.
@@ -846,8 +719,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # von Apple, sondern das, was dieser eine Haendler von Apple fuehrt. Dann
     # ist die Anbieteransicht die ehrlichere Startansicht - und die
     # Herstelleransicht traegt ihren Vorbehalt im Spaltentitel.
-    laeden = {p.get("shop") for p in aggregate if p.get("shop")}
-    standard = "anbieter" if len(laeden) <= 1 else "hersteller"
+    # Reiter 1. Die Alarmtabelle liest den fertigen Vergleich - sie rechnet
+    # keine Zahl zweimal (CLAUDE.md 6: zwei Rechnungen fuer dieselbe Zahl
+    # sind zwei Zahlen). Die Ausreisser-Markierung kommt aus der Pruefung:
+    # ein Ausreisser wird gemeldet statt geloescht, und gemeldet heisst DORT
+    # sichtbar, wo jemand die Zahl liest.
+    vergleich = geraete_vergleich.beide_preisarten(belastbar, katalog,
+                                                   laeden=laden)
+    alarme = geraete_alarme.zeilen(vergleich["ohne_vertrag"],
+                                   pruefung.get("auffaellig"))
 
     return {
         "pruefung": pruefung["zahlen"],
@@ -875,31 +755,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             # beim naechsten Umbau auseinander, ohne dass etwas rot wird.
             "ohne_vorlauf": auffaellig["ohne_vorlauf"],
             "preispunkte": historie.punkte_gesamt,
-            # ZWEI Zahlen, seit die Karte aggregiert: `in_der_karte` sind die
-            # gezeichneten Preispunkte, `aggregiert_aus` die Listungen
-            # dahinter. Eine einzige Zahl fuer beides waere genau der
-            # Fehlertyp aus CLAUDE.md §6 - ein Etikett und ein Feld, die
-            # nicht dasselbe meinen.
-            "in_der_karte": len(aggregate),
-            # Gezaehlt wird, was die Karte WIRKLICH aggregiert hat. Seit
-            # `aggregiere` nur Neugeraete zeichnet (W1.1), ist
-            # `len(punkte_ohne_vertrag)` eine andere Zahl - die Legende sagte
-            # damit "153 Preispunkte aus 348 Listungen", waehrend es 339
-            # waren. Auf einer Seite, deren Verkaufsargument der Belegzwang
-            # ist, ist das die teuerste Sorte falscher Zahl.
-            "aggregiert_aus": len(gezeichnete_listungen),
-            "nicht_gezeigt": nicht_gezeigt,
-            # Die Geraete IN DER KARTE, nicht die beobachteten. Seit die
-            # Karte kappt, sind das zwei Zahlen; die Legende meint ihre.
-            "geraete_in_der_karte": len({p.get("device_id") for p in aggregate}),
             "hersteller": len(hersteller_mit_daten),
             "schwelle_erreicht": erreicht,
         },
-        "flaechen": flaechen,
-        "standard_ansicht": standard,
-        "formen": list(geraete_karte.FORMEN),
-        "karte_hersteller": karte_hersteller,
-        "karte_anbieter": flaechen["anbieter_chip"],
+        "alarme": alarme,
         "segmente": sorted({p["segment"] for p in punkte_ohne_vertrag if p["segment"]}),
         "segment_label": SEGMENT_LABEL,
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
@@ -914,8 +773,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die
         # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
         # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
-        "vergleich": geraete_vergleich.beide_preisarten(belastbar, katalog,
-                                                        laeden=laden),
+        "vergleich": vergleich,
         "matrix": _matrix(sichtbar, katalog),
         "lifecycle": lifecycle,
         "quellenlage": _quellenlage(quellen, db, sichtbar),

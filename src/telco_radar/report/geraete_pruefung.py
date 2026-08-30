@@ -12,6 +12,16 @@ NETZ darunter: es faengt denselben Fehlertyp beim naechsten Adapter, bei der
 naechsten Schreibweise und bei der naechsten Quelle, ohne dass ihn wieder
 jemand im Export von Hand finden muss.
 
+Wie weit dieses Netz traegt, ist begrenzt und soll es sein. Ein
+Gebrauchtpreis, dessen Kennzeichen KEIN Eintrag der Wortliste trifft
+("aufbereitet", "second life", "Zustand: gut"), faellt hier nur noch dann
+heraus, wenn er in derselben Farbe wie ein Neupreis steht oder die Spanne
+FARBSPANNE_UNMOEGLICH reisst. Sonst wird er berichtet und bleibt. Das ist die
+Kehrseite der Farbe im Schluessel (siehe unten): sie beendet das Raten
+darueber, was ein Farbaufschlag ist, und nimmt dafuer eine Faustregel
+zurueck, die manchmal zufaellig richtig lag. Wer eine neue Schreibweise
+sieht, traegt sie in `_ZUSTAENDE` ein - das ist der Ort dafuer.
+
 Fuenf Pruefungen, alle gegen den fertigen Datensatz, alle vor dem Rendern
 und alle NACHEINANDER (siehe `pruefe`):
 
@@ -21,7 +31,8 @@ und alle NACHEINANDER (siehe `pruefe`):
                        mit zwei verschiedenen Preisen.
     Speicherinversion  Mehr Speicher kostet weniger als weniger Speicher.
     Farbspanne         Die Farben eines Geraets liegen weiter auseinander
-                       als FARBSPANNE_GRENZE. Nur berichtet.
+                       als FARBSPANNE_GRENZE. Berichtet - und oberhalb von
+                       FARBSPANNE_UNMOEGLICH auch entfernt.
     Ausreisser         Ein Preis weicht um mehr als AUSREISSER_ANTEIL vom
                        Median aller Preise fuer dasselbe (Modell, Speicher,
                        Zustand) ab. Nur berichtet, mit Markierung an der
@@ -64,6 +75,25 @@ from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
 # wenn doch, soll ihn jemand ansehen statt ihn zu verlieren. Gemessen am
 # Bestand vom 29.08.2026 lagen die echten Farbpreise bei 5,7 bis 21,6 %.
 FARBSPANNE_GRENZE = 0.25
+
+# Und ab dieser Spanne ist es kein Farbaufschlag mehr, sondern ein falsch
+# gelesenes Feld - die Gruppe wird entfernt.
+#
+# Diese zweite Grenze ist am 30.08.2026 nachgetragen worden, und ihr Fehlen
+# war ein echter Rueckschritt: mit dem Wegfall der alten Spannengrenze hatte
+# die `min`-Auswahl UEBER FARBEN HINWEG gar keinen Filter mehr, und CLAUDE.md
+# sagt dazu einen Satz - "Der niedrigste Preis ist der wahrscheinlichste
+# Fehler. Jede `min`-Auswahl braucht einen Filter davor." Nachgestellt: ein
+# o2-Lockpreis von 1,00 EUR in anderer Farbe ueberlebte und gewann den
+# Vergleich, waehrend die Quellenseite daneben "die Farben liegen 89800 %
+# auseinander - gezeigt" schrieb.
+#
+# Sie steht bei 100 %, nicht bei 30 %: ein Geraet, das in einer Farbe doppelt
+# so viel kostet wie in einer anderen, ist keine Farbvariante mehr. Alles
+# darunter wird berichtet und BLEIBT - "kein Farbaufschlag ist ein Viertel
+# des Geraetepreises; wenn doch, will ich es sehen, nicht geloescht
+# bekommen". Gemessen lagen echte Farbpreise bei 5,7 bis 21,6 %.
+FARBSPANNE_UNMOEGLICH = 1.00
 
 # Abweichung vom Median, ab der ein Preis als Ausreisser gilt.
 AUSREISSER_ANTEIL = 0.60
@@ -200,41 +230,54 @@ def _doppelpreise(eintraege: list, katalog) -> tuple[set, list]:
 
 
 def _farbspannen(eintraege: list, katalog) -> tuple[set, list]:
-    """Ein auffaellig weiter Abstand zwischen den Farben eines Geraets.
+    """Der Abstand zwischen den Farben eines Geraets.
 
-    Wird BERICHTET, nicht entfernt - anders als der Doppelpreis ist das kein
-    Selbstwiderspruch, sondern eine Preisentscheidung des Anbieters. Sie
-    kann trotzdem ein falsch gelesenes Feld sein, und dann will man sie
-    sehen.
+    Bis FARBSPANNE_UNMOEGLICH wird BERICHTET, nicht entfernt - anders als der
+    Doppelpreis ist das kein Selbstwiderspruch, sondern eine
+    Preisentscheidung des Anbieters. Darueber wird entfernt: eine Farbe, die
+    das Geraet doppelt so teuer macht, ist keine Farbe mehr, sondern ein
+    falsch gelesenes Feld (die 1-Euro-Anzahlung, der Buendelpreis, der
+    Zubehoerartikel).
     """
     gruppen: dict[tuple, dict] = {}
+    beispiele: dict[tuple, dict] = {}
     for e in eintraege:
         schluessel = (e.get("anbieter"), e.get("device_id"),
                       e.get("speicher_gb"), e.get("zustand") or "neu")
-        gruppen.setdefault(schluessel, {})[_farbe(e)] = min(
-            gruppen.get(schluessel, {}).get(_farbe(e), float("inf")), _preis(e))
+        # Der Beispieleintrag wird beim AUFBAU mitgefuehrt, nicht hinterher
+        # gesucht. Die erste Fassung suchte ihn per `next()` ueber Anbieter
+        # und Geraet - ohne Speicher und Zustand, also aus einer anderen
+        # Gruppe: der Befund trug "Galaxy S26 128 GB" und die Preise der
+        # 256-GB-Gruppe daneben.
+        beispiele.setdefault(schluessel, e)
+        farbe = _farbe(e)
+        preise = gruppen.setdefault(schluessel, {})
+        preise[farbe] = min(preise.get(farbe, float("inf")), _preis(e))
 
-    befunde = []
-    for (anbieter, _gid, _sp, _zu), je_farbe in gruppen.items():
+    raus, befunde = set(), []
+    for schluessel, je_farbe in gruppen.items():
         if len(je_farbe) < 2:
             continue
         lo, hi = min(je_farbe.values()), max(je_farbe.values())
         spanne = (hi - lo) / lo if lo else 0.0
         if spanne <= FARBSPANNE_GRENZE:
             continue
-        beispiel = next(e for e in eintraege
-                        if e.get("anbieter") == anbieter
-                        and e.get("device_id") == _gid)
+        entfernt = spanne > FARBSPANNE_UNMOEGLICH
+        if entfernt:
+            raus.update(_schluessel(e) for e in eintraege
+                        if (e.get("anbieter"), e.get("device_id"),
+                            e.get("speicher_gb"),
+                            e.get("zustand") or "neu") == schluessel)
         befunde.append({
             "art": "farbspanne",
-            "anbieter": anbieter,
-            "geraet": _label(beispiel, katalog),
+            "anbieter": schluessel[0],
+            "geraet": _label(beispiele[schluessel], katalog),
             "spanne": round(spanne * 100, 1),
             "preise": sorted(je_farbe.values()),
             "farben": sorted(je_farbe),
-            "entfernt": False,
+            "entfernt": entfernt,
         })
-    return set(), befunde
+    return raus, befunde
 
 
 def _speicherinversionen(eintraege: list, katalog) -> tuple[set, list]:
@@ -339,16 +382,27 @@ def pruefe(eintraege: list, katalog=None) -> dict:
     """
     kandidaten = [e for e in eintraege if _vergleichbar(e)]
 
+    # Die ENTFERNENDEN Pruefungen laufen nacheinander; jede sieht nur, was
+    # die vorige uebrig gelassen hat.
     raus: set = set()
     befunde: list = []
     uebrig = kandidaten
     for pruefung in (_zustand_veraltet, _doppelpreise, _speicherinversionen,
-                     _farbspannen, _ausreisser):
+                     _farbspannen):
         weg, gefunden = pruefung(uebrig, katalog)
         raus |= weg
         befunde.extend(gefunden)
         if weg:
             uebrig = [e for e in uebrig if _schluessel(e) not in weg]
+
+    # Die MELDENDE Pruefung sieht dagegen den ganzen Kandidatensatz, nicht den
+    # Rest. Verkettet gemessen: bei "A 900 | B 200 | C 880 | C 850" nimmt der
+    # Doppelpreis beide C-Zeilen heraus, die Gruppe faellt unter drei Angebote,
+    # und der Median wird gar nicht mehr gerechnet - die 200-EUR-Zeile stuende
+    # unmarkiert im Vergleich. Eine Pruefung, die nichts entfernt, darf ihr
+    # Sichtfeld nicht von einer verlieren, die entfernt.
+    _, ausreisser = _ausreisser(kandidaten, katalog)
+    befunde.extend(b for b in ausreisser if b["listung_id"] not in raus)
 
     sauber = [e for e in eintraege if _schluessel(e) not in raus]
     entfernt = [b for b in befunde if b["entfernt"]]

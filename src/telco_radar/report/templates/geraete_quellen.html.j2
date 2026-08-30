@@ -130,7 +130,7 @@
       <tr>
         <td>{{ b.anbieter }}</td>
         <td>{{ b.geraet }}</td>
-        <td>{% if b.art == "doppelpreis" %}zwei Preise für dieselbe Farbe
+        <td>{% if b.art == "doppelpreis" %}zwei Preise für dieselbe Farbe (zwei Schreibweisen)
               ({% for pr in b.preise
               %}{{ '%.2f'|format(pr)|replace('.', ',') }} €{% if not loop.last
               %} und {% endif %}{% endfor %}, {{ b.spanne|replace('.', ',') }} %

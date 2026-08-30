@@ -815,278 +815,116 @@ var TelcoFrage = (function () {
 })();
 
 /* ---------------------------------------------------------------------- *
- * Geraeteradar: Ansichtsumschalter, Filter, Detailzeile.
+ * Geraeteradar: Reiter, Filter, Zeilenaufklapper.
  *
- * Beide Ansichten der Positionskarte stehen fertig im HTML - hier wird nur
- * umgeblendet, nichts nachgeladen und nichts neu gerechnet. Genauso die
- * Filter: sie BLENDEN Punkte aus, sie verschieben keine. Das ist Absicht,
- * denn eine Achse, die sich beim Filtern verschiebt, macht zwei Ansichten
- * unvergleichbar - und die Entzerrung der Etiketten kommt aus Python.
+ * Alle Tafeln stehen fertig im HTML - hier wird nur umgeblendet, nichts
+ * nachgeladen und nichts neu gerechnet. Genauso die Filter: sie BLENDEN
+ * Zeilen aus, sie sortieren nicht um. Wer ohne JavaScript liest, sieht die
+ * erste Tafel vollstaendig; das ist die Tafel, die die Frage der Seite
+ * beantwortet.
  *
- * Auf dem Telefon gibt es kein Hover. Deshalb reagiert jeder Punkt auf Tap
- * und auf Tastatur, und die Einzelheiten stehen in einer Zeile unter der
- * Grafik statt in einer Sprechblase.
+ * Bis zum 30.08.2026 stand hier der Umschalter der Positionskarte samt
+ * Punktfilter. Die Grafik ist geloescht - 114 gedrehte Achsenbeschriftungen,
+ * 155 von 164 Punkten ohne Beschriftung -, und mit ihr dieser Code.
  * ---------------------------------------------------------------------- */
 (function () {
-  var karte = document.getElementById('positionskarte');
-  if (!karte) return;
+  var leiste = document.querySelector('.gr-reiter');
+  if (!leiste) return;
+  var knoepfe = leiste.querySelectorAll('button[data-tafel]');
 
-  var knoepfe = karte.querySelectorAll('.gr-knopf');
-  var ansichten = karte.querySelectorAll('.gr-ansicht');
-  var flaechen = karte.querySelectorAll('.gr-flaeche');
-  var detail = document.getElementById('gr-detail');
-  var legende = document.getElementById('gr-legende');
-  // Der feste Teil der Legende. Der Satz "Ohne Etikett bleiben N Punkte"
-  // gilt je FLAECHE und wird unten nachgezogen - stuende er hier mit drin,
-  // haenge er beim ersten Umschalten ein zweites Mal daran.
-  // Der veraenderliche Teil hat ein eigenes Element. An einer Zeichenkette
-  // geschnitten ("Ohne Etikett bleiben") verfehlte der Schnitt den Satz,
-  // sobald er je Darstellungsform anders anfaengt - dann stand die Legende
-  // doppelt auf der Seite.
-  var legendeZusatz = document.getElementById('gr-legende-zusatz');
-  var felder = {
-    segment: document.getElementById('gr-segment'),
-    speicher: document.getElementById('gr-speicher'),
-    generation: document.getElementById('gr-generation')
-  };
-
-  // Der Zustand ist ein Woerterbuch, kein Sonderfall je Knopf. Ein Knopf
-  // sagt ueber `data-schalter`, WELCHE Achse er stellt, und ueber
-  // `data-wert`, worauf. Der dritte Schalter ("ohne Vertrag / mit Vertrag")
-  // braucht damit keine Zeile JavaScript mehr, nur ein weiteres Attribut.
-  var zustand = {ansicht: '', form: ''};
-  for (var a = 0; a < ansichten.length; a++) {
-    if (ansichten[a].className.indexOf('gr-ansicht--aus') < 0) {
-      zustand.ansicht = ansichten[a].getAttribute('data-ansicht');
-      break;
-    }
-  }
-  for (var f = 0; f < flaechen.length; f++) {
-    if (flaechen[f].className.indexOf('gr-flaeche--aus') < 0) {
-      zustand.form = flaechen[f].getAttribute('data-form');
-      break;
-    }
-  }
-
-  function aktiveAnsicht() {
-    for (var i = 0; i < ansichten.length; i++) {
-      if (ansichten[i].getAttribute('data-ansicht') === zustand.ansicht) return ansichten[i];
-    }
-    return ansichten[0];
-  }
-
-  function blenden() {
-    for (var i = 0; i < ansichten.length; i++) {
-      ansichten[i].classList.toggle('gr-ansicht--aus',
-        ansichten[i].getAttribute('data-ansicht') !== zustand.ansicht);
-    }
-    for (var j = 0; j < flaechen.length; j++) {
-      flaechen[j].classList.toggle('gr-flaeche--aus',
-        flaechen[j].getAttribute('data-form') !== zustand.form);
-    }
-    for (var k = 0; k < knoepfe.length; k++) {
-      var achse = knoepfe[k].getAttribute('data-schalter');
-      knoepfe[k].classList.toggle('on',
-        zustand[achse] === knoepfe[k].getAttribute('data-wert'));
-    }
-  }
-
-  function leereDetail() {
-    // Sonst nennt die Zeile weiter Preis und Anbieter eines Geraets, das
-    // gerade ausgeblendet wurde oder in der anderen Ansicht steht.
-    if (detail) detail.textContent = '';
-  }
-
-  function aktiveFlaeche() {
-    return aktiveAnsicht()
-      ? aktiveAnsicht().querySelector('.gr-flaeche[data-form="' + zustand.form + '"]')
-      : null;
-  }
-
-  function filtern() {
-    leereDetail();
-    var seg = felder.segment ? felder.segment.value : '';
-    var sp = felder.speicher ? felder.speicher.value : '';
-    var gen = felder.generation ? felder.generation.value : '';
-    var sichtbar = 0;
-    var flaeche = aktiveFlaeche();
-    var alle = karte.querySelectorAll('.gr-punkt');
-    for (var i = 0; i < alle.length; i++) {
-      var p = alle[i];
-      var passt = (!seg || p.getAttribute('data-segment') === seg)
-        && (!sp || p.getAttribute('data-speicher') === sp)
-        && (!gen || p.getAttribute('data-aktuell') === '1');
-      p.classList.toggle('gr-punkt--aus', !passt);
-      if (passt && flaeche && p.closest('.gr-flaeche') === flaeche) sichtbar++;
-    }
-    // Ein Preisband ohne sichtbaren Punkt zeigt eine Spanne, die es gerade
-    // nicht mehr gibt. Es verschwindet mit seinen Punkten.
-    var baender = karte.querySelectorAll('.gr-band');
-    for (var b = 0; b < baender.length; b++) {
-      var schluessel = baender[b].getAttribute('data-band');
-      var eigene = baender[b].closest('.gr-flaeche')
-        .querySelectorAll('.gr-punkt[data-band="' + schluessel + '"]');
-      var offen = false;
-      for (var e = 0; e < eigene.length; e++) {
-        if (eigene[e].className.baseVal.indexOf('gr-punkt--aus') < 0) offen = true;
-      }
-      baender[b].classList.toggle('gr-band--aus', !offen);
-    }
-    if (legendeZusatz && flaeche) {
-      // ALLE Zahlen kommen aus der SICHTBAREN Flaeche. Vorher standen hier
-      // drei verschiedene Gesamtzahlen: eine aus der Vorlage (alle Punkte),
-      // eine gerechnete (Punkte durch Flaechen) und die der jeweils anderen
-      // Darstellungsform - keine davon galt fuer das Bild, das man ansah.
-      var gesamt = flaeche.getAttribute('data-punkte');
-      var ohne = parseInt(flaeche.getAttribute('data-etiketten-verborgen') || '0', 10);
-      // Der Satz haengt an der FORM. In der Punktform ist ein Punkt ohne
-      // Chip wirklich ein Punkt ohne Beschriftung. In der Bandform ist die
-      // Zahl am Bandende gemeint - das Band traegt seinen Modellnamen unter
-      // der Achse, und seine Hoehe IST die Preisspanne auf einer
-      // beschrifteten Achse. "Ohne Etikett" waere dort eine Falschaussage
-      // ueber eine Beschriftung, die es gar nicht geben soll.
-      var zusatz = '';
-      if (ohne && zustand.form === 'band') {
-        zusatz = ' Die Preiszahl steht nur dort, wo sie neben das Band passt'
-          + ' (' + (parseInt(gesamt, 10) - ohne) + ' von ' + gesamt + ');'
-          + ' die Höhe des Bandes ist die Spanne, den genauen Wert zeigt ein'
-          + ' Klick.';
-      } else if (ohne) {
-        zusatz = ' Ohne Etikett bleiben ' + ohne + ' Punkte – dort ist die'
-          + ' Spalte voll; der Punkt steht auf seinem Preis.';
-      }
-      // Eine gekappte Spalte muss sagen, dass sie gekappt ist. Eine Grafik,
-      // die stillschweigend zwoelf von dreissig Modellen zeigt, behauptet
-      // eine Vollstaendigkeit, die sie nicht hat.
-      // ANGEBOTE, nicht Modelle: gezaehlt werden (Modell, Geraet, Laden) -
-      // dasselbe Geraet bei drei Laeden sind drei. Und sie stehen NICHT in
-      // der Tabelle unter der Grafik: die entsteht aus denselben
-      // gezeichneten Punkten. Vollstaendig sind sie nur im CSV-Export.
-      var weg = parseInt(flaeche.getAttribute('data-baender-uebersprungen') || '0', 10);
-      if (weg) {
-        zusatz += ' ' + weg + ' weitere Angebote passen nicht in die Spalten;'
-          + ' sie stehen vollständig in der CSV-Tabelle.';
-      }
-      if (seg || sp || gen) {
-        zusatz += ' Gefiltert: ' + sichtbar + ' von ' + gesamt + ' sichtbar.';
-      }
-      if (legendeZusatz) legendeZusatz.textContent = zusatz;
-    }
-  }
-
-  for (var i = 0; i < knoepfe.length; i++) {
-    knoepfe[i].addEventListener('click', function (ev) {
-      var achse = ev.currentTarget.getAttribute('data-schalter');
-      if (!achse) return;
-      zustand[achse] = ev.currentTarget.getAttribute('data-wert');
-      blenden();
-      filtern();
-    });
-  }
-
-  Object.keys(felder).forEach(function (name) {
-    if (felder[name]) felder[name].addEventListener('change', filtern);
-  });
-
-  // Einmal beim Laden: die Baender der Startflaeche brauchen ihren Zustand,
-  // und die Legende ihre Zahl.
-  filtern();
-
-  function zeige(el) {
-    if (!detail) return;
-    var teile = [el.getAttribute('data-modell')];
-    if (el.getAttribute('data-speicher-text')) teile.push(el.getAttribute('data-speicher-text') + ' GB');
-    // Die Farben stehen jetzt als ZAHL plus Liste da, weil ein Punkt seit
-    // der Verdichtung alle Farben einer Speichergroesse vertritt. Genau
-    // deshalb liegen keine fuenf Kreise mehr aufeinander.
-    var farben = parseInt(el.getAttribute('data-farben') || '0', 10);
-    var liste = el.getAttribute('data-farben-liste') || '';
-    if (farben === 1 && liste) teile.push(liste);
-    else if (farben > 1) teile.push(farben + ' Farben' + (liste ? ' (' + liste + ')' : ''));
-    teile.push((el.getAttribute('data-preisart') === 'mit_vertrag' ? 'Zuzahlung ' : '')
-      + el.getAttribute('data-preis') + ' €');
-    teile.push('bei ' + el.getAttribute('data-anbieter'));
-    if (el.getAttribute('data-stand')) teile.push('abgerufen ' + el.getAttribute('data-stand'));
-    detail.textContent = teile.join(' · ') + ' ';
-    var url = el.getAttribute('data-url');
-    if (url) {
-      var a = document.createElement('a');
-      a.href = url;
-      a.rel = 'noopener';
-      a.textContent = 'Quelle';
-      try { a.title = new URL(url).hostname.replace(/^www\./, ''); } catch (e) {}
-      detail.appendChild(a);
-    }
-  }
-
-  karte.addEventListener('click', function (ev) {
-    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
-    if (punkt) zeige(punkt);
-  });
-  karte.addEventListener('keydown', function (ev) {
-    if (ev.key !== 'Enter' && ev.key !== ' ') return;
-    var punkt = ev.target.closest ? ev.target.closest('.gr-punkt') : null;
-    if (punkt) { ev.preventDefault(); zeige(punkt); }
-  });
-})();
-
-/* =========================================================================
-   PREISVERGLEICH GEGEN VODAFONE: der Anbieterfilter
-   =========================================================================
-   Drei Knoepfe, eine Regel: gezeigt wird eine Zeile, wenn MINDESTENS EIN
-   guenstigerer Wettbewerber zum gewaehlten Typ gehoert. Zeilen ohne
-   guenstigeren Wettbewerber stehen nur unter "alle" - unter "nur
-   Netzbetreiber" waere "niemand guenstiger" eine Aussage ueber alle
-   Anbieter, nicht ueber die gefilterten, und damit falsch.
-
-   Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
-   Detailliste unter einer Zeile, die nicht mehr da ist.
-   ====================================================================== */
-(function () {
-  var leisten = document.querySelectorAll('[data-vergleich-filter]');
-  if (!leisten.length) return;
-
-  Array.prototype.forEach.call(leisten, function (leiste) {
-    var sektion = leiste.closest('.gr-vergleich');
-    if (!sektion) return;
-    var knoepfe = leiste.querySelectorAll('.gr-filter-knopf');
-
-    // Die Sektion enthaelt seit dem 29.08.2026 ZWEI Tabellen: die Uebersicht
-    // und die Vollansicht im Aufklapper. Gefiltert wird in beiden, GEZAEHLT
-    // wird nur die Uebersicht - sonst meldet der Filter "es gibt Treffer",
-    // waehrend alle davon zugeklappt im Aufklapper stehen, und der Leser
-    // steht vor einer leeren Tabelle mit Kopfzeile ohne Erklaerung. Genau
-    // den Fall soll `.gr-v-leer` abfangen.
-    var uebersicht = sektion.querySelector('.gr-vergleich-scroll');
-
-    function anwenden(typ) {
-      var zeilen = sektion.querySelectorAll('.gr-v-zeile');
-      var sichtbar = 0;
-      for (var i = 0; i < zeilen.length; i++) {
-        var typen = (zeilen[i].getAttribute('data-typen') || '').split(' ');
-        var passt = typ === 'alle' || typen.indexOf(typ) >= 0;
-        zeilen[i].hidden = !passt;
-        if (passt && uebersicht && uebersicht.contains(zeilen[i])) sichtbar++;
-        var naechste = zeilen[i].nextElementSibling;
-        if (naechste && naechste.classList.contains('gr-v-alle')) {
-          naechste.hidden = !passt;
-        }
-      }
-      // Eine leere Tabelle ohne Satz sieht aus wie ein Fehler.
-      var leer = sektion.querySelector('.gr-v-leer');
-      if (leer) leer.hidden = sichtbar > 0;
-      if (uebersicht) uebersicht.hidden = sichtbar === 0;
-    }
-
-    Array.prototype.forEach.call(knoepfe, function (knopf) {
-      knopf.addEventListener('click', function () {
-        Array.prototype.forEach.call(knoepfe, function (k) {
-          k.classList.toggle('is-aktiv', k === knopf);
-        });
-        anwenden(knopf.getAttribute('data-typ') || 'alle');
+  Array.prototype.forEach.call(knoepfe, function (knopf) {
+    knopf.addEventListener('click', function () {
+      Array.prototype.forEach.call(knoepfe, function (k) {
+        var ziel = document.getElementById(k.getAttribute('data-tafel'));
+        var aktiv = k === knopf;
+        k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
+        if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
       });
     });
   });
+})();
+
+/* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
+ *
+ * Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
+ * Anbieterliste unter einer Zeile, die nicht mehr da ist. Dieselbe Falle
+ * wie beim alten Vergleichsfilter, nur an einer neuen Stelle.
+ */
+(function () {
+  var tafel = document.getElementById('tafel-alarme');
+  if (!tafel) return;
+  var tabelle = tafel.querySelector('.gr-alarm');
+  if (!tabelle) return;
+
+  var felder = tafel.querySelectorAll('[data-filter]');
+  var mehr = document.getElementById('gr-mehr');
+
+  function anwenden() {
+    var wahl = {};
+    var suche = '';
+    Array.prototype.forEach.call(felder, function (f) {
+      var name = f.getAttribute('data-filter');
+      if (name === 'suche') suche = (f.value || '').trim().toLowerCase();
+      else wahl[name] = f.value || '';
+      // Ein aktiver Filter ist rot hinterlegt. Er veraendert, was darunter
+      // steht, und das muss man sehen, ohne die Auswahl zu lesen.
+      var etikett = f.closest('label');
+      if (etikett && name !== 'suche') {
+        etikett.classList.toggle('gr-filter--an', !!f.value);
+      }
+    });
+
+    var zeilen = tabelle.querySelectorAll('.gr-a-zeile');
+    var sichtbar = 0;
+    for (var i = 0; i < zeilen.length; i++) {
+      var z = zeilen[i];
+      var passt = true;
+      for (var name in wahl) {
+        if (wahl[name] && z.getAttribute('data-' + name) !== wahl[name]) {
+          passt = false;
+        }
+      }
+      if (passt && suche) {
+        passt = z.textContent.toLowerCase().indexOf(suche) >= 0;
+      }
+      z.hidden = !passt;
+      if (passt) sichtbar++;
+      var auf = document.getElementById(z.getAttribute('data-auf'));
+      if (auf) auf.hidden = !passt;
+    }
+    var leer = tafel.querySelector('.gr-a-leer');
+    if (leer) leer.hidden = sichtbar > 0;
+  }
+
+  Array.prototype.forEach.call(felder, function (f) {
+    f.addEventListener('input', anwenden);
+    f.addEventListener('change', anwenden);
+  });
+
+  // Klick auf eine Zeile klappt alle Anbieter dieses Geraets auf.
+  tabelle.addEventListener('click', function (ev) {
+    if (ev.target.closest('a')) return;   // der Quelllink fuehrt hinaus
+    var zeile = ev.target.closest ? ev.target.closest('.gr-a-zeile') : null;
+    if (!zeile) return;
+    var auf = document.getElementById(zeile.getAttribute('data-auf'));
+    if (auf) auf.classList.toggle('gr-a-auf--an');
+  });
+  tabelle.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var zeile = ev.target.closest ? ev.target.closest('.gr-a-zeile') : null;
+    if (!zeile) return;
+    ev.preventDefault();
+    var auf = document.getElementById(zeile.getAttribute('data-auf'));
+    if (auf) auf.classList.toggle('gr-a-auf--an');
+  });
+
+  if (mehr) {
+    mehr.addEventListener('click', function () {
+      tabelle.classList.add('gr-alarm--alle');
+      mehr.parentNode.removeChild(mehr);
+      anwenden();
+    });
+  }
 })();
 
 /* =========================================================================
