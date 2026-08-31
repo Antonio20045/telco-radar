@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 # fuenf gleichzeitig scharf geschaltet. Ein gebauter Adapter bekommt deshalb
 # einen EIGENEN Namen - dann sagt die Konfiguration, was wirklich gelesen wird.
 METHODEN = ("api", "ldjson", "shopify", "json_endpunkt", "html", "js",
-            "vodafone_api", "o2_katalog",
+            "vodafone_api", "o2_katalog", "congstar_next",
             "kein_hardware", "deaktiviert")
 
 # Diese zwei sind gueltige Messergebnisse und keine Fehlkonfiguration, aber

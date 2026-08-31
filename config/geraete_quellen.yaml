@@ -391,24 +391,35 @@ anbieter:
     netz: Telekom
     gruppe: Deutsche Telekom
     rang: 10
-    methode: ldjson
-    aktiv: false
-    grund: >-
-      ld+json vorhanden und sauber, aber es ist der Einmalpreis im
-      Tarifbündel - der zugehörige Tarif steht nicht im strukturierten
-      Datensatz. AM 30.08.2026 an zwei echten Produktseiten nachgemessen:
-      /geraete/apple/apple-iphone-16/ trägt ein vollständiges Product-Schema
-      (name, brand, color, gtin, sku, itemCondition NewCondition) mit
-      "price": 520, /geraete/apple/apple-iphone-17/ mit 592. Vodafone führt
-      dasselbe iPhone 16 zu 849,90 EUR - die 520 sind die Anzahlung, nicht der
-      Gerätepreis, und der Seitentext bestätigt es ("mit Vertrag" achtmal,
-      "24 Monate", "Allnet Flat" siebzehnmal). Als Preis ohne Vertrag
-      gespeichert stünde congstar mit 39 Prozent Vorsprung als Sieger in der
-      Vergleichstabelle - genau die Fehlerklasse, die am 30.08.2026 beseitigt
-      worden ist. Zweiter Ausschlussgrund: der Produktname trägt KEINE
-      Speichergröße, ein Vergleich je (Modell, Speicher) ist damit gar nicht
-      möglich. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht
-      gespeichert (Teil C4, erzwungen in geraete_model.Listung).
+    methode: congstar_next
+    aktiv: true
+    hinweis: >-
+      Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit
+      belegbarem Preis ohne Vertrag - die Telekom selbst steht wegen ihrer
+      AWS-WAF nicht in dieser Datenbank. congstar trifft Apple, Samsung,
+      Google UND Xiaomi (Google fehlte bisher ganz).
+      Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM
+      TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig -
+      dieser Adapter liest es deshalb NICHT. Der Geraetepreis ohne Vertrag
+      steht stattdessen im Next.js-Flight-Payload der Produktseite
+      (`self.__next_f.push([1,"…"])`), je Variante unter
+      `prices.paymentVariants[]`, im Eintrag mit
+      `type == "ONE_TIME_PURCHASE"` UND `contractDuration == 0`, dessen Wert
+      `oneTime.listed`.
+      DIE FALLE: derselbe Knoten traegt auch `oneTime.discounted` - einen
+      Rabatt, der laut der Fussnote "bei Abschluss der ANF M" entsteht, also
+      an einen TARIFABSCHLUSS gebunden ist. Gemessen an vier Belegdateien:
+      iPhone 17 256GB listed 919,00 EUR (discounted waere 811), Galaxy S25
+      128GB 699,00 (519), Pixel 11 256GB 991,00 (757), Redmi Note 17 Pro
+      256GB 477,00 (225) - Abstand bis 252 EUR, discounted haette congstar in
+      jedem der vier Faelle faelschlich als Preisfuehrer gezeigt.
+      OFFEN: dass das Geraet auch WIRKLICH ganz ohne SIM-Vertrag zu diesem
+      Preis zu haben ist, ist nicht statisch bewiesen - die Kauflabels
+      rendert React im Browser nach. Belegt ist `contractDuration: 0`,
+      `recurring.listed: 0`, und der Marktvergleich stuetzt es (919/699/
+      991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben
+      Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein
+      versteckter Tarifzwang verursachen wuerde).
     basis_url: https://www.congstar.de
     einstiege:
       - url: https://www.congstar.de/sitemap/devices.xml
