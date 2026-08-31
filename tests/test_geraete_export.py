@@ -17,7 +17,9 @@ from pathlib import Path
 import pytest
 
 from telco_radar.geraete_model import Geraet, Katalog
+from telco_radar.report import geraete_bereinigung, geraete_pruefung
 from telco_radar.report import geraete_export as ex
+from telco_radar.report import geraete_view
 
 _KATALOG = Katalog(geraete=[
     Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
@@ -137,11 +139,25 @@ def test_eine_zuzahlung_ohne_tarifreferenz_erscheint_ohne_preis(tmp_path):
     assert zeilen[1][kopf.index("Preis EUR")] == ""
 
 
-def test_ausgelistete_geraete_stehen_nicht_im_aktuellen_export(tmp_path):
+def test_der_export_waehlt_nicht_selbst_aus(tmp_path):
+    """Geschrieben wird GENAU die uebergebene Menge - keine Zeile weniger.
+
+    Bis zum 31.08.2026 filterte `aktuell_csv` hier selbst nach `status`,
+    waehrend die Seite ihren Bestand durch `geraete_pruefung.pruefe()`
+    schickte. Zwei Rechnungen fuer dieselbe Menge sind zwei Mengen: die zwei
+    o2-Gebrauchtzeilen fielen auf der Seite heraus und standen im Export mit
+    `Zustand = neu`.
+
+    Die Auswahl faellt seitdem einmal, in `geraete_view.aufbereiten()` - der
+    Export darf sie deshalb nicht wiederholen, auch nicht "sicherheitshalber".
+    Der Fall wird hier mit einer AUSGELISTETEN Zeile gestellt, weil sie genau
+    die Bedingung traegt, die frueher hier stand; dass sie den Export nie
+    erreicht, misst `test_geraete_seite.py` an der gerenderten Seite.
+    """
     angaben = ex.schreibe_exporte(
         tmp_path, [_e(), _e(anbieter="o2", status="ausgelistet",
                             id="o2--x")], [], _KATALOG)
-    assert angaben["aktuell"]["zeilen"] == 1
+    assert angaben["aktuell"]["zeilen"] == 2
 
 
 def test_die_historie_nennt_hersteller_und_modell_statt_nur_kennungen(tmp_path):
@@ -187,3 +203,114 @@ def test_ein_semikolon_im_text_zerreisst_die_zeile_nicht(tmp_path):
         encoding="utf-8-sig"))
     assert len(zeilen[1]) == len(ex.SPALTEN_AKTUELL)
     assert zeilen[1][ex.SPALTEN_AKTUELL.index("Farbe")] == "blau; matt"
+
+
+# ==========================================================================
+# DIE VERKETTUNG: Seite und Export lesen denselben Bestand
+# ==========================================================================
+# Der Fehler, wegen dem es diesen Abschnitt gibt: `/geraete.html` schickte
+# seinen Bestand durch die Plausibilitaetspruefung, `geraete-aktuell.csv`
+# nicht. Zwei o2-Listungen, deren Rohfelder sie als gebraucht ausweisen,
+# standen deshalb im Export mit `Zustand = neu` - wer die Datei in Excel auf
+# "neu" filtert, bekam zwei Gebrauchtpreise als Neupreise.
+
+def _gebraucht_aber_als_neu_gespeichert():
+    """Die Giftzeile aus dem echten Bestand, nachgebaut.
+
+    Das Kennzeichen steht AUSSCHLIESSLICH in der Farbe - so schreibt o2 es
+    (siehe `geraete_model.zustand_aus_feldern`), und nur so haengt die
+    Reihenfolge der zwei Stufen ueberhaupt an etwas: die Bereinigung raeumt
+    das Wort aus der Farbe, die Pruefung findet es nur dort.
+    """
+    return _e(anbieter="o2", preis=577.0,
+              id="o2--apple-iphone-17-pro-max-256gb-erneuert",
+              sku_id="apple-iphone-17-pro-max-256gb-space-schwarz-refurbished",
+              farbe_roh="Space Schwarz erneuert",
+              farbe_normalisiert="space schwarz erneuert",
+              zustand="neu")
+
+
+def _ids(eintraege) -> set:
+    return {e["id"] for e in eintraege}
+
+
+def test_die_pruefung_laeuft_vor_der_bereinigung():
+    """Die Reihenfolge IST die Zusicherung - vertauscht ueberlebt die Zeile.
+
+    `pruefe()` erkennt die falsch gespeicherte Zustandsangabe an genau dem
+    Wort, das `bereinige()` aus der Farbe raeumt. Wer die zwei Stufen
+    vertauscht, schaltet die Erkennung ab, ohne dass etwas rot wird - der
+    Gebrauchtpreis stuende wieder als Neupreis im Export.
+
+    Die Gegenprobe steht im selben Test, in zwei Fassungen: einmal mit der
+    echten Bereinigung vorweg, einmal mit einer von Hand gesaeuberten Farbe.
+    Die zweite haengt an keiner fremden Umsetzung - sie zeigt die Mechanik
+    auch dann noch, wenn `bereinige()` sein Vorgehen aendert.
+    """
+    gift = _gebraucht_aber_als_neu_gespeichert()
+    gesund = _e()
+
+    _pruefung, bestand = geraete_view.belastbarer_bestand([gesund, gift],
+                                                          _KATALOG)
+    assert gift["id"] not in _ids(bestand), \
+        "der Gebrauchtpreis haette aus dem Bestand fallen muessen"
+    assert gesund["id"] in _ids(bestand), \
+        "die gesunde Zeile darf die Pruefung nicht mitnehmen"
+
+    # Gegenprobe 1: vertauscht - erst bereinigen, dann pruefen.
+    vertauscht = geraete_pruefung.pruefe(
+        geraete_bereinigung.bereinige([gesund, gift]), _KATALOG)["sauber"]
+    assert gift["id"] in _ids(vertauscht), \
+        ("in dieser Reihenfolge findet die Pruefung das Zustandswort nicht "
+         "mehr - genau deshalb steht sie vorne")
+
+    # Gegenprobe 2: ohne das Wort in der Farbe laesst die Pruefung die Zeile
+    # stehen. Sie entfernt sie also wirklich WEGEN des Wortes, und nicht aus
+    # einem anderen Grund, den dieser Fall zufaellig mittraegt.
+    ohne_wort = dict(gift, farbe_roh="Space Schwarz",
+                     farbe_normalisiert="space schwarz")
+    stehen_geblieben = geraete_pruefung.pruefe([gesund, ohne_wort],
+                                               _KATALOG)["sauber"]
+    assert gift["id"] in _ids(stehen_geblieben)
+
+
+def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
+    """Der Befund selbst, gegen die geschriebene Datei gemessen.
+
+    Die gesunde Zeile wird MITgeprueft: eine leere Datei erfuellt die
+    Bedingung "kein Gebrauchtpreis darin" auch, und dieser Test soll den
+    Unterschied zwischen "aussortiert" und "nichts geschrieben" merken.
+    """
+    gift = _gebraucht_aber_als_neu_gespeichert()
+    gesund = _e()
+    _pruefung, bestand = geraete_view.belastbarer_bestand(
+        [gesund, gift], _KATALOG)
+    angaben = ex.schreibe_exporte(tmp_path, bestand, [], _KATALOG)
+    assert angaben["aktuell"]["zeilen"] == 1
+
+    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
+        encoding="utf-8-sig"))
+    kopf = zeilen[0]
+    gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen[1:]}
+    assert gefuehrt == {gesund["id"]}
+    for zeile in zeilen[1:]:
+        assert zeile[kopf.index("Preis EUR")] != "577,00"
+
+
+def test_die_historie_fuehrt_nur_listungen_des_bestands(tmp_path):
+    """Sonst widersprechen sich die zwei Dateien.
+
+    Eine Kurve in `geraete-historie.csv` zu einer Listung, die in
+    `geraete-aktuell.csv` nicht vorkommt, ist ein Preis ohne Zeile dazu - und
+    der Leser, der beide nebeneinanderlegt, haelt die eine Datei fuer
+    unvollstaendig.
+    """
+    fremd = _p(listung_id="o2--laengst-weg", anbieter="o2")
+    angaben = ex.schreibe_exporte(tmp_path, [_e()], [_p(), fremd], _KATALOG)
+    assert angaben["historie"]["zeilen"] == 1
+
+    zeilen = _lies((tmp_path / "exporte" / "geraete-historie.csv").read_text(
+        encoding="utf-8-sig"))
+    kopf = zeilen[0]
+    gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen[1:]}
+    assert gefuehrt == {_e()["id"]}

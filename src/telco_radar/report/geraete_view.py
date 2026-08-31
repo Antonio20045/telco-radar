@@ -41,7 +41,8 @@ from typing import Optional
 
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, serie_aus_modell,
                              zustand_aus_feldern)
-from . import geraete_alarme, geraete_pruefung, geraete_vergleich, geraete_verlauf
+from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
+               geraete_vergleich, geraete_verlauf)
 from ..analyze import geraete_lifecycle
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -762,7 +763,7 @@ def leer(fehler: str = "") -> dict:
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": [], "kurzer_vorlauf": True,
                        "vorlauf_tage": 0},
-        "alle_eintraege": [], "alle_punkte": [], "katalog_obj": None,
+        "export_bestand": [], "alle_punkte": [], "katalog_obj": None,
         "export": {"stand": "", "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
                    "historie": {"datei": "", "zeilen": 0, "bytes": 0}},
         "vergleich": {"hat_daten": False, "standard": "ohne_vertrag",
@@ -789,6 +790,38 @@ def leer(fehler: str = "") -> dict:
     }
 
 
+def belastbarer_bestand(sichtbar: list, katalog) -> tuple[dict, list]:
+    """Der EINE Bestand, aus dem Seite und CSV-Export lesen. (Pruefung, Bestand)
+
+    Zwei Stufen, und ihre REIHENFOLGE ist die ganze Zusicherung dieser
+    Funktion:
+
+    1. `geraete_pruefung.pruefe()` wirft heraus, was sich selbst
+       widerspricht - der Doppelpreis, die Speicherinversion und vor allem
+       die Zeile, deren ROHFELDER sie als Gebrauchtgeraet ausweisen, waehrend
+       im Store "neu" steht.
+    2. `geraete_bereinigung.bereinige()` raeumt danach das Zustandswort aus
+       der Farbe und fasst Zwillingszeilen zusammen.
+
+    VERTAUSCHT WAERE DER FEHLER ZURUECK, BEI GRUENEN TESTS. Die Pruefung
+    erkennt eine falsch gespeicherte Zustandsangabe an genau dem Wort, das
+    die Bereinigung entfernt ("space schwarz erneuert" -> refurbished, obwohl
+    der Store "neu" sagt). Laeuft die Bereinigung zuerst, findet die Pruefung
+    nichts mehr, und die zwei o2-Gebrauchtpreise stehen wieder als Neupreise
+    in `geraete-aktuell.csv`. `tests/test_geraete_export.py` nagelt die
+    Reihenfolge samt Gegenprobe fest.
+
+    Warum das ueberhaupt eine eigene Funktion ist: bis zum 31.08.2026
+    rechnete die Seite ihre Menge hier und der Export seine eigene in
+    `geraete_export.aktuell_csv()`. Zwei Rechnungen fuer dieselbe Menge sind
+    zwei Mengen - CLAUDE.md §6 sagt denselben Satz ueber Zahlen. Sie steht
+    jetzt an EINER Stelle, und `aufbereiten()` reicht sie als
+    `export_bestand` heraus.
+    """
+    pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
+    return pruefung, geraete_bereinigung.bereinige(pruefung["sauber"])
+
+
 def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     """Alles fuer /geraete.html und /geraete-quellen.html."""
     state_dir = Path(state_dir)
@@ -800,11 +833,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # W1.2 (29.08.2026): bevor irgendetwas gerendert wird, laeuft die
     # Plausibilitaetspruefung ueber den Datensatz. Was sie aussortiert, faellt
     # aus Vergleich UND Preisgrafik - beides sind Preisaussagen, und eine
-    # Preisaussage aus zwei widerspruechlichen Zahlen ist keine. Der
-    # CSV-Export und die SKU-Ansicht sehen weiterhin ALLES: eine Zeile, die
-    # sich nicht vergleichen laesst, ist deshalb nicht verschwunden.
-    pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
-    belastbar = pruefung["sauber"]
+    # Preisaussage aus zwei widerspruechlichen Zahlen ist keine.
+    #
+    # Seit dem 31.08.2026 liest auch der CSV-Export diese Menge (siehe
+    # `belastbarer_bestand`). Vorher hiess es hier "der CSV-Export sieht
+    # weiterhin ALLES" - und genau das war der Fehler: er sah auch die zwei
+    # o2-Zeilen, deren Rohfelder sie als gebraucht ausweisen, und schrieb sie
+    # mit `Zustand = neu` in die Datei, die die Fachabteilung ausdruecklich
+    # wollte. Was die Seite nicht zeigen darf, darf der Download nicht
+    # ausliefern. Der einzige Ort, an dem die aussortierte Zeile weiterhin
+    # steht, ist Reiter 2 - und der leitet ihren Zustand selbst neu ab
+    # (`katalogzeilen`), sagt also "refurbished" statt "neu".
+    pruefung, belastbar = belastbarer_bestand(sichtbar, katalog)
 
     # Laden und Anzeigename je Anbieter. Zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
@@ -985,10 +1025,21 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
                                   if p["speicher"]}),
         "auffaellig": auffaellig,
-        # Roh fuer den CSV-Gesamtexport (report/geraete_export.py). Er
-        # entsteht in `render_site`, weil er in `site/` schreibt und diese
-        # Funktion bewusst KEINEN Schreibzugriff hat.
-        "alle_eintraege": sichtbar,
+        # Fuer den CSV-Gesamtexport (report/geraete_export.py). Er entsteht
+        # in `render_site`, weil er in `site/` schreibt und diese Funktion
+        # bewusst KEINEN Schreibzugriff hat - aber er RECHNET seine Menge
+        # nicht mehr selbst, er bekommt sie von hier.
+        #
+        # Der Schluessel hiess bis zum 31.08.2026 `alle_eintraege` und trug
+        # `sichtbar`. Beides ist jetzt falsch: es ist nicht "alles", sondern
+        # der gepruefte und bereinigte Bestand - derselbe, aus dem Vergleich,
+        # Alarme und Preisverlauf lesen. Der Name sagt das, damit die
+        # naechste Aenderung nicht wieder aus dem Wort "alle" schliesst, hier
+        # duerfe der ganze Store stehen.
+        "export_bestand": belastbar,
+        # Die Historie bleibt vollstaendig; `historie_csv` schneidet sie auf
+        # die Listungen des Bestands zu. Der Zuschnitt gehoert dorthin, wo
+        # die zwei Dateien nebeneinander entstehen.
         "alle_punkte": punkte_alle,
         "katalog_obj": katalog,
         # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die

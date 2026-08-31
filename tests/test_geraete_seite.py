@@ -11,6 +11,8 @@ Zwei Sorten Zusicherung:
    gebaut ist. Solange das Geraeteradar unter der Schwelle liegt, ist es
    ueber seinen direkten Link erreichbar und NICHT verlinkt.
 """
+import csv
+import io
 import json
 from pathlib import Path
 
@@ -254,6 +256,43 @@ def test_beide_seiten_werden_gerendert(tmp_path):
     site = _baue(tmp_path)
     assert (site / "geraete.html").exists()
     assert (site / "geraete-quellen.html").exists()
+
+
+def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
+    """Die Datei und die Seite duerfen nicht zwei Maerkte zeigen.
+
+    Bis zum 31.08.2026 rechnete jede ihre eigene Menge: die Seite schickte
+    ihren Bestand durch `geraete_pruefung.pruefe()`, der Export filterte in
+    `geraete_export.aktuell_csv()` selbst nach `status`. Am echten Bestand
+    gemessen standen dadurch zwei o2-Listungen, deren Rohfelder sie als
+    gebraucht ausweisen, in `geraete-aktuell.csv` mit `Zustand = neu` - wer
+    die Datei in Excel auf "neu" filtert, bekam zwei Gebrauchtpreise als
+    Neupreise.
+
+    Der Statusfilter des Exports ist damit ersatzlos weg; diese Zusicherung
+    ist sein Ersatz und misst sie dort, wo sie hingehoert: an der wirklich
+    geschriebenen Datei nach einem vollstaendigen `render_site()`.
+    """
+    site = _baue(tmp_path)
+    aktuell = list(csv.reader(io.StringIO(
+        (site / "exporte" / "geraete-aktuell.csv").read_text(
+            encoding="utf-8-sig")), delimiter=";"))
+    kopf, zeilen = aktuell[0], aktuell[1:]
+    gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen}
+    sichtbar = {e["id"] for e in _DB["listungen"]
+                if e["status"] != "ausgelistet"}
+    # Beide Richtungen: eine ausgelistete Zeile darf nicht dazukommen, und
+    # eine sichtbare darf nicht fehlen.
+    assert gefuehrt == sichtbar, gefuehrt ^ sichtbar
+    assert len(zeilen) == len(sichtbar), "keine Zeile doppelt"
+
+    # Und die zweite Datei fuehrt keine Kurve zu einer Listung, die in der
+    # ersten fehlt - sonst steht dort ein Preis ohne Zeile dazu.
+    historie = list(csv.reader(io.StringIO(
+        (site / "exporte" / "geraete-historie.csv").read_text(
+            encoding="utf-8-sig")), delimiter=";"))
+    h_kopf = historie[0]
+    assert {z[h_kopf.index("Listungs-ID")] for z in historie[1:]} <= gefuehrt
 
 
 def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
