@@ -271,6 +271,88 @@ def _tag(wert):
         return None
 
 
+# --------------------------------------------------------------------------
+# Der Hinweis, wenn "Was der Nachfolger mit dem Preis macht" leer ist
+# --------------------------------------------------------------------------
+# P3 (30.08.2026): die Sektion beantwortet Antonios These - laesst der
+# Wettbewerb das Vorjahresmodell nach dem Start des Nachfolgers als
+# guenstigen Einstieg stehen, waehrend Vodafone es ersetzt? Dafuer braucht
+# sie einen Nachfolger-MARKTSTART innerhalb unseres eigenen Messfensters,
+# und den kennt der Katalog heute fuer keines der beobachteten Geraete: die
+# iPhone-17-Kette hat noch kein `marktstart` (ein geratenes Datum waere
+# schlimmer), die iPhone-16- und Galaxy-S25-Ketten sind laengst erschienen,
+# bevor wir am 10.08.2026 zu messen begonnen haben. Mehr Katalogpflege loest
+# das nicht - es fehlt an einem Nachfolger, der NACH unserer ersten Messung
+# auf den Markt kam. Diese Funktion sagt das, statt die Sektion stumm
+# verschwinden zu lassen (CLAUDE.md: eine leere Sektion ohne Erklaerung
+# sieht aus wie ein Fehler, nicht wie ein ehrlicher Datenstand).
+
+_ZEITRAUM_STUFEN = ((730, "über zwei Jahren"), (540, "über eineinhalb Jahren"),
+                    (365, "über einem Jahr"), (180, "über einem halben Jahr"),
+                    (30, "über einem Monat"))
+
+
+def _zeitraum_grob(tage: int) -> str:
+    """Eine grobe Zeitangabe aus einer Tageszahl - immer eine UNTERGRENZE.
+
+    "über eineinhalb Jahren" wird nur genommen, wenn die Tage das wirklich
+    hergeben; darunter faellt die Stufe zurueck. Eine Rundung, die nach oben
+    verschoenert, waere die Sorte Zahl, die dieses Projekt gerade abschafft.
+    """
+    for schwelle, text in _ZEITRAUM_STUFEN:
+        if tage >= schwelle:
+            return text
+    return "einem Tag" if tage == 1 else f"{tage} Tagen"
+
+
+def _nachfolger_leer_hinweis(eintraege: list, punkte_alle: list, katalog,
+                             nachfolger: list) -> str:
+    """Warum "Was der Nachfolger mit dem Preis macht" heute leer ist - und
+    wann sie es nicht mehr sein wird. Siehe Kommentar oben.
+
+    Nur eine Zahl kommt aus den Daten und ist belegt: seit wann wir messen.
+    Ein Kalenderdatum fuer den naechsten Fuellstand wird bewusst NICHT
+    genannt - das waere geraten, nicht gemessen.
+    """
+    if nachfolger:
+        return ""
+    daten = [d for d in (_tag(p.get("datum")) for p in punkte_alle) if d]
+    if not daten:
+        return ""
+    seit = min(daten)
+
+    # Der juengste bekannte Nachfolger unter den beobachteten Geraeten -
+    # SINGULAR, damit der Satz auch dann stimmt, wenn der Katalog irgendwann
+    # nur noch eine einzige zu alte Kette kennt.
+    geraete_ids = sorted({e.get("device_id") for e in eintraege
+                          if e.get("device_id")})
+    luecken = []
+    for gid in geraete_ids:
+        nf = katalog.nachfolger_von(gid)
+        if nf is None:
+            continue
+        start = _tag(nf.marktstart)
+        if start is None or start >= seit:
+            continue
+        luecken.append((seit - start).days)
+
+    zusatz = ""
+    if luecken:
+        zusatz = (f" Der jüngste Nachfolger, den der Katalog kennt, kam "
+                 f"schon vor {_zeitraum_grob(min(luecken))} auf den Markt "
+                 f"– lange bevor wir zu messen begannen.")
+
+    return (
+        "Diese Tabelle soll zeigen, ob der Wettbewerb das Vorjahresmodell "
+        "nach dem Start des Nachfolgers als günstigen Einstieg im Regal "
+        "stehen lässt – während es bei Vodafone meist direkt ersetzt wird. "
+        f"Sie ist noch leer: Wir messen die Preise erst seit dem "
+        f"{seit.strftime('%d.%m.%Y')}.{zusatz} Sie füllt sich mit dem "
+        "ersten Marktstart eines Nachfolgers, der in dieses Messfenster "
+        "fällt."
+    )
+
+
 def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                 heute: str, laeufe: int = 0) -> dict:
     """Die groessten Bewegungen DIESES Zeitraums - aus den Deltas gerechnet.
@@ -791,7 +873,8 @@ def leer(fehler: str = "") -> dict:
                                       "preisart": "mit_vertrag"}},
         "lifecycle": {"duenn": True, "punkte": 0, "wochen": 0, "hinweis": "",
                       "dauern": [], "verfaelle": [], "trends": [],
-                      "nachfolger": [], "portfolio": []},
+                      "nachfolger": [], "nachfolger_hinweis": "",
+                      "portfolio": []},
         "quellenlage": {"zeilen": [], "ohne_hardware": [], "liefernd": 0,
                         "aufgefuehrt": 0, "konfiguriert": 0, "unbekannt": [],
                         "seiten": 0},
@@ -969,6 +1052,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         alle, punkte_alle, katalog, heute,
         laeufe_je_anbieter=laeufe_je_anbieter,
         termine_je_anbieter=termine_je_anbieter)
+    # P3: der Satz, der die leere Nachfolger-Sektion erklaert. Er entsteht
+    # HIER und nicht in `geraete_lifecycle.auswertung` - dort arbeitet
+    # parallel ein anderes Paket an genau dieser Rechnung.
+    lifecycle = {**lifecycle,
+                "nachfolger_hinweis": _nachfolger_leer_hinweis(
+                    alle, punkte_alle, katalog, lifecycle["nachfolger"])}
 
     # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
