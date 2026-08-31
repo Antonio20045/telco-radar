@@ -118,7 +118,93 @@ _DB = {"updated": "2026-08-11", "anbieter": {
     _listung("Medimax", "samsung-galaxy-s25-ultra",
              "samsung-galaxy-s25-ultra-512gb-schwarz", 1399.0, farbe="schwarz",
              speicher=512, status="ausgelistet", ended_since="2026-08-11"),
+
+    # ------------------------------------------------------------------
+    # DIE ZWEI FAELLE, WEGEN DERER ES ZWEI MENGEN GIBT (31.08.2026)
+    # ------------------------------------------------------------------
+    # Ohne sie ist `bereinige(sichtbar)` Zeile fuer Zeile dasselbe wie
+    # `bereinige(pruefe(sichtbar))`, und JEDER Test ueber den Unterschied
+    # der beiden Mengen ist gruen, ohne etwas zu pruefen. Genau daran ist
+    # `test_der_export_zeigt_genau_den_bestand_der_seite` gescheitert: der
+    # Pruefer konnte `aufbereiten()` auf den Rohbestand zurueckdrehen, und
+    # 2190 Tests blieben gruen.
+    #
+    # 1. EIN ZWILLINGSPAAR - dieselbe Listung unter zwei Farbschreibweisen.
+    #    Der echte Fall: o2 nimmt das Zustandswort aus der Farbe, die
+    #    `sku_id` aendert sich, der Store legt neu an und altert die alte
+    #    Zeile. Beide sind sichtbar, beide zeigen denselben Preis unter
+    #    derselben Adresse. Die gealterte traegt dazu den falschen
+    #    Store-Zustand "neu" - sie ist die Zeile, die als Neupreis in
+    #    Vergleich und CSV ginge.
+    #    `bereinige()` fasst das Paar in BEIDEN Mengen zusammen.
+    _listung("Medimax", "apple-iphone-16-pro-max",
+             "apple-iphone-16-pro-max-512gb-mitternacht-erneuert", 445.0,
+             speicher=512, status="vermutlich ausgelistet",
+             id="medimax--apple-iphone-16-pro-max-512gb-mitternacht-erneuert",
+             farbe_roh="Mitternacht erneuert", farbe_normalisiert=None,
+             zustand="neu", abgerufen_am="2026-08-10",
+             quelle_url="https://example.de/p/iphone-16-pro-max-512gb-"
+                        "mitternacht-erneuert"),
+    _listung("Medimax", "apple-iphone-16-pro-max",
+             "apple-iphone-16-pro-max-512gb-mitternacht", 445.0, speicher=512,
+             id="medimax--apple-iphone-16-pro-max-512gb-mitternacht",
+             farbe_roh="Mitternacht", farbe_normalisiert=None,
+             zustand="refurbished",
+             quelle_url="https://example.de/p/iphone-16-pro-max-512gb-"
+                        "mitternacht-erneuert"),
+    # 2. EIN DOPPELPREIS - derselbe Artikel in derselben Farbe zu zwei
+    #    Preisen, unter zwei eigenen Adressen. Der echte Fall: o2 fuehrt das
+    #    Galaxy S26 FE 128 GB als "pistachio" (811,00) und "pistachio bk"
+    #    (667,00); `farbschluessel()` erkennt das Kuerzel, `pruefe()` wirft
+    #    die GANZE Gruppe aus den Preisaussagen - welcher der beiden Preise
+    #    stimmt, sagt der Datensatz nicht.
+    #    Es sind trotzdem zwei Listungen, die jemand im Regal findet: sie
+    #    stehen im Bestand und fehlen in `belastbar`. DAS ist der Unterschied
+    #    der zwei Mengen, und er ist genau zwei Zeilen gross - hier wie im
+    #    echten Bestand.
+    _listung("Medimax", "samsung-galaxy-s25-ultra",
+             "samsung-galaxy-s25-ultra-256gb-pistachio", 811.0,
+             id="medimax--samsung-galaxy-s25-ultra-256gb-pistachio",
+             farbe_roh="Pistachio", farbe_normalisiert=None),
+    _listung("Medimax", "samsung-galaxy-s25-ultra",
+             "samsung-galaxy-s25-ultra-256gb-pistachio-bk", 667.0,
+             id="medimax--samsung-galaxy-s25-ultra-256gb-pistachio-bk",
+             farbe_roh="Pistachio BK", farbe_normalisiert=None,
+             quelle_url="https://example.de/p/galaxy-s25-ultra-256gb-"
+                        "pistachio-bk"),
 ]}
+
+# Die drei Mengen der Fixture, ALS ERWARTUNG ausgeschrieben - nicht mit
+# `bereinige()`/`pruefe()` nachgerechnet. Ein Test, der seine Erwartung aus
+# derselben Funktion holt, die er prueft, ist gruen, wenn beide falsch sind.
+_ZWILLING_GEALTERT = "medimax--apple-iphone-16-pro-max-512gb-mitternacht-erneuert"
+_DOPPELPREIS = frozenset({
+    "medimax--samsung-galaxy-s25-ultra-256gb-pistachio",
+    "medimax--samsung-galaxy-s25-ultra-256gb-pistachio-bk"})
+
+
+def _rohbestand_ids(db=None) -> set:
+    """Alles, was nicht ausgelistet ist - die Menge, aus der beide anderen
+    entstehen. Sie schaltet die Veroeffentlichungsschwelle, und nur die."""
+    return {e["id"] for e in (db or _DB)["listungen"]
+            if e["status"] != "ausgelistet"}
+
+
+def _bestand_ids(db=None) -> set:
+    """Was es GIBT: Regal, Farbbericht, CSV, Betriebszahlen.
+
+    Der Rohbestand ohne die gealterte Zwillingshaelfte - zwei Schreibweisen
+    derselben Listung sind eine Zeile.
+    """
+    return _rohbestand_ids(db) - {_ZWILLING_GEALTERT}
+
+
+def _belastbare_ids(db=None) -> set:
+    """Was gegeneinander gerechnet werden DARF: Vergleich, Alarme, Verlauf.
+
+    Der Bestand ohne das Doppelpreispaar.
+    """
+    return _bestand_ids(db) - _DOPPELPREIS
 
 _PUNKTE = [
     {"listung_id": "medimax--apple-iphone-16-pro-max-256gb-schwarz",
@@ -258,6 +344,58 @@ def test_beide_seiten_werden_gerendert(tmp_path):
     assert (site / "geraete-quellen.html").exists()
 
 
+def _katalog_objekt(tmp_path) -> object:
+    """Der Katalog der Fixture als Objekt, ohne eine Site zu rendern."""
+    (tmp_path / "config").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "config" / "geraete_katalog.yaml").write_text(
+        yaml.safe_dump(_KATALOG, allow_unicode=True, sort_keys=False),
+        encoding="utf-8")
+    return lade_katalog(tmp_path)
+
+
+def test_die_fixture_loest_beide_stufen_wirklich_aus(tmp_path):
+    """Der Waechter vor allen Mengen-Tests. Ohne ihn pruefen sie nichts.
+
+    Bis zum 31.08.2026 hatte `_DB` fuenf Listungen, an denen weder
+    `bereinige()` noch `pruefe()` etwas zu tun fanden - die drei Mengen
+    waren dieselbe Menge. `test_der_export_zeigt_genau_den_bestand_der_seite`
+    behauptete deshalb "Export == Rohbestand" und blieb gruen, als ein
+    Pruefer die ganze Verdrahtung zurueckdrehte.
+
+    Gemessen wird gegen die ECHTEN Funktionen, nicht gegen die Erwartung:
+    hier soll auffallen, wenn die Fixture ihren Fall nicht mehr aufspannt -
+    etwa weil jemand die Farbe eines Zwillings aendert oder einen der zwei
+    Doppelpreise anfasst.
+    """
+    from telco_radar.report import geraete_bereinigung
+
+    sichtbar = [e for e in _DB["listungen"] if e["status"] != "ausgelistet"]
+    katalog = _katalog_objekt(tmp_path)
+    _pruefung, bestand, belastbar = geraete_view.bestand_und_belastbar(
+        sichtbar, katalog)
+
+    assert len(bestand) < len(sichtbar), (
+        "die Bereinigung findet in dieser Fixture keinen Zwilling - dann "
+        "misst kein Test der Seite, dass sie ueberhaupt laeuft")
+    assert len(belastbar) < len(bestand), (
+        "die Pruefung nimmt in dieser Fixture keine Zeile - dann sind "
+        "Bestand und belastbare Menge dasselbe, und der Unterschied, um den "
+        "es geht, wird nirgends gemessen")
+
+    # Und die ausgeschriebenen Erwartungen treffen die gerechneten Mengen.
+    # Laufen die auseinander, ist ab hier jede Zahl in dieser Datei falsch.
+    assert {e["id"] for e in bestand} == _bestand_ids()
+    assert {e["id"] for e in belastbar} == _belastbare_ids()
+    assert _DOPPELPREIS <= _bestand_ids()
+    # Der Zwilling wird ZUSAMMENGEFASST, nicht geloescht: die ueberlebende
+    # Zeile traegt das fruehere `first_seen` und den richtigen Zustand.
+    ueberlebt = next(e for e in bestand
+                     if e["device_id"] == "apple-iphone-16-pro-max"
+                     and e["speicher_gb"] == 512)
+    assert ueberlebt["zustand"] == "refurbished", ueberlebt["zustand"]
+    assert geraete_bereinigung.zustand_der_zeile(ueberlebt) == "refurbished"
+
+
 def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
     """Die Datei und die Seite duerfen nicht zwei Maerkte zeigen.
 
@@ -265,13 +403,18 @@ def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
     ihren Bestand durch `geraete_pruefung.pruefe()`, der Export filterte in
     `geraete_export.aktuell_csv()` selbst nach `status`. Am echten Bestand
     gemessen standen dadurch zwei o2-Listungen, deren Rohfelder sie als
-    gebraucht ausweisen, in `geraete-aktuell.csv` mit `Zustand = neu` - wer
-    die Datei in Excel auf "neu" filtert, bekam zwei Gebrauchtpreise als
-    Neupreise.
+    gebraucht ausweisen, in `geraete-aktuell.csv` mit `Zustand = neu`.
 
-    Der Statusfilter des Exports ist damit ersatzlos weg; diese Zusicherung
-    ist sein Ersatz und misst sie dort, wo sie hingehoert: an der wirklich
+    Die Ueberkorrektur dagegen war, dem Export die GEPRUEFTE Menge zu geben:
+    dann fehlen die zwei Zeilen des o2-Doppelpreises, auf die der
+    Pruefbericht namentlich verweist. Der Export zeigt den BESTAND
+    (`geraete_view.bestand_und_belastbar`) - gemessen an der wirklich
     geschriebenen Datei nach einem vollstaendigen `render_site()`.
+
+    DIE DREI VERGLEICHE SIND DER PUNKT. Nur gegen den Rohbestand geprueft
+    faellt eine Rueckdrehung auf `sichtbar` nicht auf; nur gegen den Bestand
+    geprueft koennte er die belastbare Menge sein. Beide Nachbarmengen
+    stehen deshalb ausdruecklich daneben.
     """
     site = _baue(tmp_path)
     aktuell = list(csv.reader(io.StringIO(
@@ -279,12 +422,23 @@ def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
             encoding="utf-8-sig")), delimiter=";"))
     kopf, zeilen = aktuell[0], aktuell[1:]
     gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen}
-    sichtbar = {e["id"] for e in _DB["listungen"]
-                if e["status"] != "ausgelistet"}
-    # Beide Richtungen: eine ausgelistete Zeile darf nicht dazukommen, und
-    # eine sichtbare darf nicht fehlen.
-    assert gefuehrt == sichtbar, gefuehrt ^ sichtbar
-    assert len(zeilen) == len(sichtbar), "keine Zeile doppelt"
+
+    assert gefuehrt == _bestand_ids(), gefuehrt ^ _bestand_ids()
+    assert len(zeilen) == len(_bestand_ids()), "keine Zeile doppelt"
+    # Die zwei Nachbarmengen, jede mit ihrem Fehlerbild:
+    assert gefuehrt != _rohbestand_ids(), (
+        "der Export fuehrt die gealterte Zwillingshaelfte - dieselbe "
+        "Listung stuende zweimal in der Datei")
+    assert gefuehrt != _belastbare_ids(), (
+        "der Export fuehrt das Doppelpreispaar nicht - es steht namentlich "
+        "im Pruefbericht, und der verweist auf genau diese Datei")
+
+    # Die Seite zeigt dieselbe Menge. Zwei Zahlen fuer einen Bestand waeren
+    # der Fehlertyp aus CLAUDE.md §6 - und sie standen drei Zeilen
+    # auseinander: "Alle exportieren (358 Zeilen)" ueber einer Ueberschrift
+    # mit der Zahl 370.
+    s = _suppe(site, "geraete.html")
+    assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == len(gefuehrt)
 
     # Und die zweite Datei fuehrt keine Kurve zu einer Listung, die in der
     # ersten fehlt - sonst steht dort ein Preis ohne Zeile dazu.
@@ -293,6 +447,68 @@ def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
             encoding="utf-8-sig")), delimiter=";"))
     h_kopf = historie[0]
     assert {z[h_kopf.index("Listungs-ID")] for z in historie[1:]} <= gefuehrt
+
+
+def test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl(tmp_path):
+    """S3: vier Zahlen standen fuer den Bestand auf der Seite, eine davon
+    anders - und der Knopf, der weniger lieferte, hiess "Alle exportieren".
+
+    Gemessen wird an der GERENDERTEN Seite, nicht an der Aufbereitung: der
+    Fehler entstand zwischen `aufbereiten()` und der Vorlage, und genau da
+    sieht ihn ein Test, der Dicts vergleicht, nicht.
+    """
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    erwartet = len(_bestand_ids())
+
+    knopf = s.select_one(".gr-export-knoepfe a").get_text(" ", strip=True)
+    assert knopf == f"Alle exportieren ({erwartet} Zeilen)", knopf
+    assert s.select_one(".gr-katalog h2 .rubrik-zahl").get_text(
+        strip=True) == str(erwartet)
+    assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == erwartet
+    # Der Betriebszahlensatz am Fuss. Er nennt Geraete, Varianten und
+    # Listungen in EINEM Satz; sie muessen aus EINER Menge kommen.
+    fuss = " ".join(s.select_one(".gr-bilanz").get_text(" ", strip=True).split())
+    assert f"zusammen {erwartet} Listungen" in fuss, fuss
+    # Der vierte Ort ist der Knopf "alle N Zeilen zeigen" - er erscheint erst
+    # oberhalb von `KATALOG_SICHTBAR` und ist mit dieser Fixture gar nicht da.
+    # Das steht hier als ZUSICHERUNG und nicht als `if`: eine Bedingung, die
+    # nie eintritt, ist eine Prueffung, die nie laeuft. Waechst die Fixture
+    # ueber den Deckel, faellt dieser Test und die Zeile darunter wird
+    # scharf. An der ausgelieferten Seite ist der Knopf mitgemessen ("alle
+    # 360 Zeilen zeigen").
+    assert erwartet <= geraete_view.KATALOG_SICHTBAR, (
+        "die Fixture ist ueber den Deckel gewachsen - jetzt gehoert der "
+        "Knopf mitgeprueft")
+    assert s.select_one("#gr-kmehr") is None
+
+
+def test_der_farbbericht_fuehrt_keine_zustandswoerter(tmp_path):
+    """S6: der Farbbericht ist die Arbeitsliste fuer `config/farben.yaml` -
+    und stand auf dem ROHBESTAND.
+
+    Live gemessen fuehrte er deshalb "space schwarz erneuert", "grau
+    erneuert", "titanium black gebraucht" als unbekannte FARBEN auf, also
+    genau die Schreibweisen, die `ohne_zustandswort()` aus der Anzeige
+    raeumt. Wer die Liste abarbeitet, traegt Zustaende in eine Farbtabelle
+    ein.
+    """
+    from telco_radar.geraete_model import ohne_zustandswort
+    import re as _re
+
+    site = _baue(tmp_path)
+    s = _suppe(site, "geraete.html")
+    liste = [d for d in s.select("details")
+             if "Farbschreibweisen" in d.get_text()]
+    assert liste, "der Farbbericht fehlt"
+    schreibweisen = [_re.sub(r"\s*\(\d+\)$", "", li.get_text(strip=True))
+                     for li in liste[0].select("li")]
+    assert schreibweisen, "die Fixture spannt den Fall nicht auf"
+    # Die Fixture traegt "Mitternacht erneuert" (gealterte Zwillingshaelfte)
+    # und "Mitternacht" - auf dem Rohbestand stuenden BEIDE hier.
+    assert "Mitternacht" in schreibweisen
+    for wort in schreibweisen:
+        assert ohne_zustandswort(wort) == wort, wort
 
 
 def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
@@ -312,10 +528,17 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
 
     # Die Summe der vier Kacheln IST die Zahl der verglichenen Geraete. Zwei
     # Zahlen, die dasselbe meinen muessen, gehoeren gegeneinander gehalten.
-    fuss = s.select_one(".gr-bilanz").get_text(" ", strip=True)
-    sichtbar = [e for e in _DB["listungen"] if e["status"] != "ausgelistet"]
-    assert str(len({e["device_id"] for e in sichtbar})) in fuss
-    assert str(len({e["sku_id"] for e in sichtbar})) in fuss
+    # Der Betriebszahlensatz rechnet auf dem BESTAND, nicht auf dem
+    # Rohbestand: die gealterte Zwillingshälfte trägt eine eigene `sku_id`
+    # und zählte sonst als zweite Variante derselben Listung. Geprüft wird
+    # gegen den Wortlaut und nicht mit `in fuss` allein - eine Zahl, die
+    # irgendwo im Satz vorkommt, belegt nicht, dass sie an ihrer Stelle
+    # steht.
+    fuss = " ".join(s.select_one(".gr-bilanz").get_text(" ", strip=True).split())
+    im_regal = [e for e in _DB["listungen"] if e["id"] in _bestand_ids()]
+    assert f"{len({e['device_id'] for e in im_regal})} Geräte" in fuss, fuss
+    assert f"{len({e['sku_id'] for e in im_regal})} Varianten" in fuss, fuss
+    assert f"zusammen {len(im_regal)} Listungen" in fuss, fuss
 
 
 def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
@@ -356,15 +579,22 @@ def test_der_katalog_ist_eine_flache_tabelle(tmp_path):
                     "Verfügbar", "Abgerufen"], kopf
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
-    # Eine Zeile je SICHTBARER Listung, nicht je Gerät - das ist der ganze
+    # Eine Zeile je Listung des BESTANDS, nicht je Gerät - das ist der ganze
     # Punkt der flachen Form. Ausgelistete Bestände bleiben in der Datenbank
     # (sie wird per Design nie geleert), gehören aber nicht ins Regal.
-    sichtbar = [l for l in _DB["listungen"]
-                if l.get("status") in ("aktiv", "beobachtet")]
-    assert len(sichtbar) < len(_DB["listungen"]), (
-        "die Fixture hat keine ausgelistete Zeile - dann misst dieser "
-        "Vergleich nicht, dass der Status wirklich filtert")
-    assert len(zeilen) == len(sichtbar), len(zeilen)
+    #
+    # Gezählt wird gegen `_bestand_ids()` und nicht gegen eine eigene
+    # Statusabfrage. Die alte Fassung fragte `status in ("aktiv",
+    # "beobachtet")` - "beobachtet" ist gar kein Status dieses Stores, und
+    # damit fiel die gealterte Zwillingshälfte hier zufällig heraus. Der Test
+    # hätte also gestimmt, ohne dass die Bereinigung überhaupt läuft.
+    assert len(_bestand_ids()) < len(_DB["listungen"]), (
+        "die Fixture hat weder eine ausgelistete Zeile noch einen Zwilling - "
+        "dann misst dieser Vergleich nicht, dass wirklich gefiltert wird")
+    assert len(zeilen) == len(_bestand_ids()), len(zeilen)
+    # (Die Zeilen tragen keine Listungskennung; dass es DIE Kennungen des
+    # Bestands sind, misst `test_der_export_zeigt_genau_den_bestand_der_seite`
+    # an der CSV, die aus derselben Menge entsteht.)
     for z in zeilen:
         assert z.select_one(".gr-a-modell"), "Zeile ohne Modellnamen"
         assert z.select_one(".gr-a-datum"), "Zeile ohne Abrufdatum"
@@ -1273,6 +1503,16 @@ def test_die_katalogzeile_nennt_den_ABGELEITETEN_zustand(tmp_path):
     dazu, was sie ist. Ohne die Ableitung stünde dort „space schwarz
     erneuert · Zustand neu", während der Prüfbericht zwei Reiter weiter
     „refurbished" meldet - die Seite widerspräche sich selbst.
+
+    GEÄNDERT AM 31.08.2026, und zwar am Suchkriterium, nicht an der
+    Zusicherung: der Reiter zeigt seit der Trennung der zwei Mengen den
+    BEREINIGTEN Bestand, und dort steht das Wort „erneuert" nicht mehr in
+    der Farbspalte - das ist der Zweck von `bereinige()`. Über den Text
+    gesucht fand der Test seine Zeile deshalb nicht mehr. Gesucht wird sie
+    jetzt über Gerät und Anbieter, und die Zusicherung ist dadurch schärfer
+    geworden: das Kennzeichen muss von der Farbspalte in die Zustandsspalte
+    GEWANDERT sein, nicht verschwunden. Genau das kann es: `bereinige()`
+    schreibt den abgeleiteten Zustand fest, bevor es die Farbe säubert.
     """
     db = json.loads(json.dumps(_DB))
     # Der echte o2-Fall: das Kennzeichen steht NUR in der Farbe, der Store
@@ -1280,15 +1520,25 @@ def test_die_katalogzeile_nennt_den_ABGELEITETEN_zustand(tmp_path):
     db["listungen"][0]["farbe_roh"] = "Space Schwarz erneuert"
     db["listungen"][0]["farbe_normalisiert"] = None
     db["listungen"][0]["zustand"] = "neu"
+    assert db["listungen"][0]["zustand"] != "refurbished"
+    assert "erneuert" not in db["listungen"][0]["quelle_url"], (
+        "die Fixture soll den Fall 'nur in der Farbe' aufspannen")
     site = _baue(tmp_path, db=db)
     s = _suppe(site, "geraete.html")
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
-    treffer = [z for z in zeilen if "erneuert" in z.get_text()]
+    treffer = [z for z in zeilen
+               if z.get("data-anbieter") == "Medimax"
+               and "iPhone 17 Pro Max" in (z.get("data-s-geraet") or "")
+               and (z.get("data-speicher") or "") == "256"]
     assert treffer, "die Fixture spannt den Fall nicht auf"
     for z in treffer:
         assert z.get("data-zustand") == "refurbished", z.get("data-zustand")
         assert "refurbished" in z.get_text()
+        # Und das Wort steht nicht mehr zusätzlich in der Farbe - dieselbe
+        # Aussage zweimal, einmal an der falschen Stelle, war der Anlass
+        # für `geraete_bereinigung`.
+        assert "erneuert" not in (z.get("data-s-farbe") or "").lower()
 
 
 def test_die_geraetespalte_des_katalogs_bleibt_beim_scrollen_stehen(tmp_path):

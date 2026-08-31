@@ -393,8 +393,25 @@ def pruefe(eintraege: list, katalog=None) -> dict:
     `befunde` (jeder Treffer einzeln, fuer /geraete-quellen.html), `zahlen`
     (die Kurzbilanz) und `auffaellig` (die Kennungen der Zeilen, die zwar
     verglichen werden duerfen, aber einen Hinweis an der Vergleichszeile
-    tragen) zurueck. Der EINGABEDATENSATZ wird nicht veraendert - Export und
-    SKU-Ansicht sehen weiterhin alles.
+    tragen) zurueck. Der EINGABEDATENSATZ wird nicht veraendert.
+
+    WAS "AUSSORTIERT" HEISST, UND WAS NICHT (31.08.2026). Diese Funktion
+    entscheidet, was GEGENEINANDER gerechnet werden darf - nicht, was es
+    gibt. `sauber` geht deshalb nur an Preisvergleich, Alarme, Preisgrafik
+    und Preisverlauf. Der Geraetekatalog (Reiter 2), der Farbbericht und
+    beide CSV-Dateien lesen den BESTAND, also den ungeprueften, nur
+    bereinigten Datensatz (`geraete_view.bestand_und_belastbar`). Eine hier
+    aussortierte Zeile steht dort weiter, mit ihrem abgeleiteten Zustand;
+    genau das versprechen die Saetze auf `/geraete.html` und
+    `/geraete-quellen.html`, und genau das war zwischenzeitlich falsch - das
+    o2-Paar Galaxy S26 FE 128 GB stand namentlich im Pruefbericht und fehlte
+    in der CSV, auf die derselbe Absatz verweist.
+
+    Die eine Ausnahme steht NICHT hier, sondern in
+    `geraete_bereinigung.bereinige()`: zwei Schreibweisen derselben Listung
+    werden zu einer Zeile zusammengefasst, in BEIDEN Mengen. Das ist keine
+    aussortierte Zeile, sondern eine doppelt gefuehrte - ihre Preispunkte
+    fallen mit ihr aus `geraete-historie.csv` und bleiben im Store.
     """
     kandidaten = [e for e in eintraege if _vergleichbar(e)]
 

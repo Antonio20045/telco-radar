@@ -1834,15 +1834,17 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # waere genau die Sorte Angabe, die dieses Portal nicht macht.
     #
     # Was er schreibt, waehlt er NICHT selbst aus (31.08.2026): `aufbereiten`
-    # hat den Bestand einmal geprueft und bereinigt und reicht ihn als
-    # `export_bestand` heraus. Vorher filterte der Export nach `status` und
-    # die Seite nach der Plausibilitaetspruefung - zwei Rechnungen fuer
-    # dieselbe Menge, und sie liefen auseinander: zwei Gebrauchtpreise
-    # standen in `geraete-aktuell.csv` mit `Zustand = neu`.
+    # reicht den BESTAND heraus - dieselbe Menge, die Reiter 2 und der
+    # Farbbericht zeigen (`geraete_view.bestand_und_belastbar`). Vorher
+    # filterte der Export nach `status` und rechnete damit seine eigene
+    # Menge; danach bekam er kurzzeitig die BELASTBARE, und beides war
+    # falsch: einmal standen zwei Gebrauchtpreise mit `Zustand = neu` in der
+    # Datei, einmal fehlten die zwei Zeilen des o2-Doppelpreises, auf die
+    # der Pruefbericht namentlich verweist.
     try:
         from . import geraete_export as _geraete_export
         geraete["export"] = _geraete_export.schreibe_exporte(
-            site_dir, geraete.get("export_bestand") or [],
+            site_dir, geraete.get("bestand") or [],
             geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
             stand=geraete.get("stand", ""))
     except Exception as exc:                      # noqa: BLE001

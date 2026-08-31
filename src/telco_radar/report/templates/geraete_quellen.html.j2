@@ -114,10 +114,10 @@
   ungewöhnlich weit auseinanderliegen; ein Preis weit abseits aller anderen.
   Die ersten drei nehmen eine Zeile aus Vergleichstabelle und Preisgrafik,
   die letzten beiden melden sie nur – ein Discounter weit unter dem Markt ist
-  der Befund, wegen dem es diese Seite gibt, kein Datenfehler. Alles bleibt in
-  der CSV-Tabelle und in der Geräteansicht. Ein Preis, der sich nicht belegen
-  lässt, verschwindet nicht; er wird nur nicht gegen einen anderen
-  gerechnet.</p>
+  der Befund, wegen dem es diese Seite gibt, kein Datenfehler. Alles bleibt im
+  Gerätekatalog und in der CSV-Tabelle – beide zeigen den Bestand, nicht die
+  geprüfte Auswahl. Ein Preis, der sich nicht belegen lässt, verschwindet
+  nicht; er wird nur nicht gegen einen anderen gerechnet.</p>
   <p class="gr-erklaer">{{ geraete.pruefung.geprueft }} Preiszeilen geprüft,
   {{ geraete.pruefung.aussortiert }} aus dem Vergleich genommen,
   {{ geraete.pruefung.befunde }} Auffälligkeiten notiert.</p>
@@ -154,7 +154,11 @@
               Bestand wird beim nächsten Abruf dieses Anbieters berichtigt
             {% else %}{{ b.art }}
             {% endif %}</td>
-        <td>{% if b.entfernt %}nicht gezeigt{% else %}gezeigt{% endif %}</td>
+        {# "verglichen", nicht "gezeigt": die Zeile steht weiterhin im
+           Gerätekatalog und in der CSV (der Absatz über dieser Tabelle
+           verweist ausdrücklich darauf). Sie wird nur nicht gegen einen
+           anderen Preis gerechnet. #}
+        <td>{% if b.entfernt %}nicht verglichen{% else %}verglichen{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>
