@@ -656,23 +656,47 @@
 
   {% if geraete.lifecycle.nachfolger %}
   <h3 class="gr-unter">Was der Nachfolger mit dem Preis macht</h3>
+  {# P3 (30.08.2026): die Spalte "Verweildauer" kommt aus einem
+     Parallelpaket (`verweildauer_tage`, `verweildauer_untergrenze`,
+     `noch_gelistet`, `anbieter`) und existiert moeglicherweise noch nicht -
+     ausschliesslich `.get(...)`, nie Punktzugriff, damit eine fehlende
+     Angabe kein UndefinedError wird, sondern still als "–" steht. Ein
+     "mind."-Wert ist eine UNTERGRENZE (wir haben erst NACH dem Marktstart
+     zu messen begonnen); erklaert wird das EINMAL hier im Fliesstext, nicht
+     je Zelle. #}
+  <p class="gr-erklaer">Lässt der Wettbewerb das Vorjahresmodell nach dem
+  Start des Nachfolgers als günstigen Einstieg im Regal stehen, oder
+  verschwindet es – so wie bei Vodafone meist direkt? Die Spalte
+  „Verweildauer“ zählt die Tage seit dem Marktstart; ein mit „mind.“
+  markierter Wert ist eine Untergrenze – gemessen wurde erst NACH dem
+  Marktstart, der wahre erste Tag ist nicht bekannt.</p>
   <div class="gr-scroll">
   <table class="src-table gr-nachfolger">
     <thead><tr><th>Gerät</th><th>Nachfolger ab</th><th class="num">vorher</th>
-      <th class="num">+30 Tage</th><th class="num">+60</th><th class="num">+90</th></tr></thead>
+      <th class="num">+30 Tage</th><th class="num">+60</th><th class="num">+90</th>
+      <th>Verweildauer</th></tr></thead>
     <tbody>
       {% for n in geraete.lifecycle.nachfolger %}
       <tr><td>{{ n.modell }}</td><td>{{ n.nachfolger_modell }}, {{ n.marktstart | date_de }}</td>
-        <td class="num">{{ '%.0f'|format(n.basis) }} €</td>
+        {# `n.basis` kann fehlen: eine Zeile OHNE eigene Preisbasis erscheint
+           seit dem Parallelpaket trotzdem, mit leeren Preisspalten und einer
+           echten Verweildauer (`geraete_lifecycle`, "Regel 3"). Eine fehlende
+           Preisbasis ist kein Grund, die ganze Zeile zu verschweigen. #}
+        <td class="num">{% if n.basis %}{{ '%.0f'|format(n.basis) }} €{% else %}–{% endif %}</td>
         {% for tage in [30, 60, 90] %}
         <td class="num">{% if n.nach[tage] %}{{ '%.0f'|format(n.nach[tage]) }} €
           <span class="gr-klein">{{ '%+.1f'|format(n.prozent[tage]) }} %</span>{% else %}–{% endif %}</td>
         {% endfor %}
+        {% set vt = n.get('verweildauer_tage') %}
+        <td>{% if vt is not none %}{{ vt }} {{ 'Tag' if vt == 1 else 'Tage' }}{% if n.get('verweildauer_untergrenze') %} <span class="gr-klein">mind.</span>{% endif %}{% if n.get('anbieter') %} <span class="gr-klein">bei {{ n.get('anbieter') }}</span>{% endif %}{% if n.get('noch_gelistet') == False %} <span class="gr-klein">ausgelistet</span>{% endif %}{% else %}–{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   </div>
+  {% elif geraete.lifecycle.nachfolger_hinweis %}
+  <h3 class="gr-unter">Was der Nachfolger mit dem Preis macht</h3>
+  <p class="gr-erklaer">{{ geraete.lifecycle.nachfolger_hinweis }}</p>
   {% endif %}
 </section>
 </div>
