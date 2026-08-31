@@ -263,3 +263,51 @@ ergeben eine Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend.
 **Nebenbefund:** `MIND_TERMINE_JE_GERAET` heißt „je Gerät" und der Kommentar
 (`geraete_lifecycle.py:62`) sagt es ausdrücklich — `_oft_genug()` (:335) zählt aber
 je **Anbieter**. Docstring und Code widersprechen sich.
+
+**Gebaut:** **P3-a** (`4cf7a5d`, `analyze/geraete_lifecycle.py`, Tests 27 → 46) —
+Messtage je Listung, Gatter auch vor der Nachfolger-Tabelle,
+`verweildauer_nach_nachfolger()` mit Untergrenzen-Kennzeichnung.
+**P3-b** (`d846971`, Vorlage + `geraete_view.py`, 4 neue Tests) — der Satz, der die
+Leere erklärt, plus die Verweildauer-Spalte.
+
+**Der Bauer hat das Briefing korrigiert, und das war wichtig.** Ich hatte
+vorgegeben, die Schwelle je Anbieter ergebe 2 Zeilen — diese Zahl stammt aus dem
+**rohen** `termine`-Feld. Die Pipeline rechnet über `db.messtermine()`, das weitere
+Prüftage aus den Listungsfeldern ableitet; mobilcom-debitel kennt dadurch fünf statt
+zwei. Auf der echten Rechnung sind es **142 je Anbieter gegen 70 je Listung** — die
+Korrektur war also nötiger, als meine Zahl vermuten ließ. Eine Anbieterrechnung
+hätte 142 Zeilen als belastbar durchgewinkt, von denen keine vier eigene Messtage
+hat.
+
+**Die Laufzahl bleibt bewusst ein Boden.** Sie zu streichen lässt
+`test_eine_lange_beobachtung_erscheint_sehr_wohl_auf_der_seite` fallen und reißt die
+G0-Lehre vom 28.08. wieder auf: `geraete_preise.jsonl` trägt nur Änderungspunkte,
+eine Listung aus eigener Kraft hat höchstens zwei Belege.
+
+### TOR P3 — gemessen, Prüfung läuft noch
+
+| Kriterium | Messung |
+|---|---|
+| `auswertung()` heute | `duenn` True, `dauern` 0, `verfaelle` 0, `nachfolger` 0 — das gewünschte Ergebnis der ehrlichen Fassung |
+| Portfolio-Tiefe | trägt: o2 24/54/78 · Vodafone 20/41/150 `eigen` · mcd 10/18/140 · ALDI TALK 2/2/2 |
+| Verweildauer, je (Gerät, Anbieter) | 6 Zeilen, **alle `untergrenze=True`** — korrekt: Messbeginn 10.08.2026, beide Nachfolger 549 bzw. 689 Tage davor |
+| Der ausgelieferte Satz | sagt was kommt, warum es fehlt, wann es kommt — **kein geratenes Datum** |
+| „über eineinhalb Jahren" | nachgerechnet: jüngster Nachfolger 549 Tage = 1,50 Jahre vor Messbeginn. Trägt |
+| `pruefe_portal.py` | **17 bestanden, 0 durchgefallen**; Reiterhöhen 2949 / 2915 / 2184 / **2550** px |
+| Lifecycle-Tests | 46 grün |
+
+**Ein Fehler, den P3-b nebenbei behoben hat und der teuer geworden wäre:** die Spalte
+„vorher" formatierte `n.basis` ungeschützt. P3-a lässt eine Zeile MIT Verweildauer
+und OHNE Preisbasis zu — der erste solche Datensatz hätte beim Rendern einen
+`TypeError` geworfen und damit nicht die Geräteseite gekostet, sondern **den ganzen
+Lauf**. Beide Bauer sind unabhängig auf dieselbe Stelle gekommen.
+
+**Kleinbefund, notiert, nicht behoben:** `_zeitraum_grob` überzeichnet bei exakt 547
+Tagen um einen halben Tag (1,5 Jahre sind 547,5 Tage). Praktisch nicht erreichbar.
+
+**Offen:** zwei adversarische Prüfer laufen, je Paket einer, je auf einem
+eingefrorenen Commit. Die schärfste Frage an sie: der Erklärsatz erscheint über
+`{% elif %}`, also **nur solange die Tabelle leer ist**. Bekommt sie Zeilen,
+verschwindet er — dann stünde dort „709 Tage im Regal" ohne den Hinweis, dass wir
+21 Tage zugesehen haben. Der Fehler träte erst ein, wenn die Datenlage endlich
+trägt, also wenn niemand mehr hinsieht.
