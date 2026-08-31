@@ -305,9 +305,128 @@ Lauf**. Beide Bauer sind unabhängig auf dieselbe Stelle gekommen.
 **Kleinbefund, notiert, nicht behoben:** `_zeitraum_grob` überzeichnet bei exakt 547
 Tagen um einen halben Tag (1,5 Jahre sind 547,5 Tage). Praktisch nicht erreichbar.
 
-**Offen:** zwei adversarische Prüfer laufen, je Paket einer, je auf einem
-eingefrorenen Commit. Die schärfste Frage an sie: der Erklärsatz erscheint über
-`{% elif %}`, also **nur solange die Tabelle leer ist**. Bekommt sie Zeilen,
-verschwindet er — dann stünde dort „709 Tage im Regal" ohne den Hinweis, dass wir
-21 Tage zugesehen haben. Der Fehler träte erst ein, wenn die Datenlage endlich
-trägt, also wenn niemand mehr hinsieht.
+### Die Prüfung hat beide Pakete zerlegt — und mein eigenes Tor mit
+
+**Alle sieben Behauptungen von P3-b waren formal wahr** (2254 Tests grün,
+Portalcheck 17/0, kein Test angefasst) **und das Paket war trotzdem falsch.** Der
+Prüfer dazu, und es ist die Zusammenfassung dieser Sitzung:
+
+> Die Suite ist mit 2254 grünen Tests genau so grün wie am 30.08., als „o2 2454
+> Modelle" ausgeliefert wurde. Sie beweist, dass der Code tut, was der Ersteller
+> gemessen hat; sie sagt nichts darüber, ob die Aussage stimmt.
+
+**Mein Tor hat versagt, und der Grund ist lehrreich:** ich habe auf dem heutigen
+Datenstand gemessen — genau dem Zustand, in dem das Feature schläft. Beide Prüfer
+haben unabhängig denselben Griff gemacht: **einen Nachtlauf simulieren und dann
+messen.** Das ist seitdem Pflicht in jedem Auftrag und in jedem Tor.
+
+Was ein einziger Nachtlauf ausgeliefert hätte:
+
+```
+duenn False | dauern 85 (alle "21 Tage") | verfaelle 85 (alle "+0,0 %")
+85 Zeilen -> nur 11 unterscheidbare Texte
+   12x  "iPhone 17 Pro Max bei mobilcom-debitel - 21 Tage"
+Portfolio-Reiter 2550 -> 3441 px  (Kriterium 11b faellt durch)
+erste Nachfolger-Zeile: ein REFURBISHED iPhone 15
+```
+
+Ein gemeldeter Blocker war dagegen **keiner**: der „Renderabsturz beim nächsten
+Lauf" war gegen den Commit vor dem Parallelpaket gemessen; auf HEAD fängt
+`{% if n.basis %}` ihn ab. Ich habe es nachgestellt — läuft durch. Ungeprüft
+weitergereicht hätte ich einen Bauer auf ein Phantom angesetzt.
+
+### P3-a Runde 2 (`a36919c`) — von mir gegen den simulierten Nachtlauf gemessen
+
+| | vorher | nachher |
+|---|---|---|
+| `dauern` | 85 | **1** (verdient: ALDI TALK hat vier vollständige Läufe) |
+| `verfaelle` | 85 | **0**, dazu `ohne_bewegung: 1` als ehrlicher Zähler |
+| `nachfolger` | 1 (refurbished) | **0** |
+
+Drei Ursachen geschlossen: die Schwelle maß Dauer und Zahl der Blicke, **nie ob der
+Preis sich bewegt hat**; die Verweildauer zählte je Farbvariante statt je
+Regalplatz; und die Messtermine waren **zu 100 % zugerechnet** — keine der 370
+Listungen hat aus eigenem Beleg mehr als zwei Messtage, alle 68 mit Schwelle nahmen
+sie über Anbieter-Lauftage, und die Begründung dafür gilt für mobilcom-debitel nicht
+(`laeufe: 0`, `mark_stale` lief für ihn nie). Mutationsprobe 17 → 26 ohne Lücke.
+
+### P3-c (`04580e9`) — sieben Marktstartdaten, jedes belegt
+
+Pixel 11 und die Pro-Reihe auf **2026-08-20** (Vodafone UK und Three UK, beide
+publ. 20.08., „now available"), Galaxy Z Fold8/Flip8 auf **2026-08-07** (Samsung
+Newsroom, „ab dem 7. August"). Sechs weitere sind **nicht belegbar** und stehen als
+Negativliste im Dateikopf.
+
+**Meine Vorgabe war falsch**, und das ist der Grund für dieses Paket: ich hatte
+beiden Bauern geschrieben, mehr Katalogpflege löse das Problem nicht. Nachgemessen
+hatten 13 beobachtete Geräte einen Nachfolger ohne Datum. Mein Mess-Subagent hatte
+nur die Nachfolger *mit* gepflegtem `marktstart` betrachtet — die dreizehn ohne
+werden im Code stumm verworfen und waren für die Messung unsichtbar.
+
+**Entschieden (Lead):** 20.08. statt 25.08. Zwei unabhängige Betreibermitteilungen
+mit „now available" sind direkter Kaufbarkeitsbeleg, und ein Händler kann nicht vor
+dem Marktstart verkaufen. Der Widerspruch (Googles eigener Beitrag datiert 25.08.)
+steht mit allen Belegen im Katalog. **Verzerrungsrichtung notiert:** ein früherer
+Marktstart macht die Verweildauer länger, also in die Richtung, die unsere eigene
+These stützt. Alle betroffenen Zeilen sind Untergrenzen ohne Preisbasis.
+
+**Das Datum war nötig, aber nicht hinreichend.** Der zweite Blocker sitzt auf den
+Vorgänger-Listungen: Vodafone und o2 beobachten Pixel 10 erst seit dem 29.08. (zwei
+Regaltage gegen 21). Und mobilcom-debitel, der Pixel 10 **seit dem 10.08.** führt —
+zehn Tage vor dem Pixel-11-Start —, wird von seinem eigenen `laeufe: 0` ausgesperrt.
+Genau diese drei Zeilen wären die einzigen im Bestand, die den Nachfolger-Effekt als
+**echte Messung statt als Untergrenze** liefern (Basis 999,00 / 1199,00 / 1429,00 €,
+`untergrenze: False`). Ursache ist das Zeitbudget des Nachtlaufs, kein Rechenfehler.
+Projektion: ab **19.09.2026** steigt die Tabelle von 5 auf 14 Zeilen.
+
+---
+
+## P1/P2 — Abdeckung: die Frage ist beantwortet, und die Antwort ist ein belegtes Nein
+
+**Messrunde (`3009983`), 13 Anbieter, 33 echte gespeicherte Antworten** mit
+`_herkunft.json` (URL, Datum, Status, SHA-256).
+
+| Einstufung | Anbieter |
+|---|---|
+| **liefert** | congstar · Blau · klarmobil (dünn) |
+| **gesperrt mit Messung** | 1&1, otelo, smartmobil, WinSIM — alle nur Bündelzahlen |
+| **ohne Hardware-Vermarktung** | Edeka smart, Norma Connect, fraenk, SIMon mobile |
+| nicht messbar | Medimax, ElectronicPartner (Besuchszeit 02:00–08:00 UTC, Lauf war 13:10) |
+
+**Das Kriterium „mindestens 8 Anbieter" ist nachweislich nicht erreichbar** — aus
+Marktgründen, nicht aus technischen: vier führen gar keine Hardware, vier verkaufen
+Geräte nur im Bündel. Die Kategorie „gemessen, aber ohne Adapter" ist leer.
+
+**Zwei Befunde wiegen schwerer als die Zahl:**
+
+1. **Blau und klarmobil sind keine unabhängigen Marktpunkte.** 56 der 65
+   Blau-Preise stehen 1:1 auch bei o2; klarmobil trifft freenet in beiden geprüften
+   Fällen exakt. Wer Blau als achten Anbieter zählt, zählt Telefónica doppelt —
+   dieselbe Lage, für die das Projekt bei freenet/mobilcom-debitel längst „Läden
+   statt Marken" entschieden hat. **Deshalb bewusst nicht gebaut.**
+2. **Die bisherigen Medimax-Fixtures sind handgeschrieben, nicht abgerufen** —
+   „www.fremd.de", „Fremder Shop", erfundene GTIN `0194253000000`. Selbst
+   nachgesehen. Die Frage „Selektoren oder wirklich nichts da?" war aus diesen
+   Dateien **nie** beantwortbar, auch nicht in 16 Nächten. Der billigste Fix ist kein
+   Adapter, sondern eine Zeile im Nachtlauf: die erste Rohantwort je Anbieter als
+   Artefakt ablegen.
+
+**Gebaut: congstar (`c3114a0`).** Der einzige mit echter neuer Information — er liegt
+im **Telekom-Netz**, und die Telekom selbst fehlt der Datenbank mangels Zugang. Von
+mir gegen die Fixtures nachgemessen:
+
+| Gerät | `listed` (richtig) | `discounted` (Falle) |
+|---|---|---|
+| iPhone 17 256 GB | **919,00** ✓ | 811 — nicht in der Ausgabe |
+| Galaxy S25 128 GB | **699,00** ✓ | 519 — nicht in der Ausgabe |
+| Pixel 11 256 GB | **991,00** ✓ | 757 — nicht in der Ausgabe |
+| Redmi Note 17 Pro 256 GB | **477,00** ✓ | 225 — nicht in der Ausgabe |
+
+Anbieter mit Daten **4 → 5**. Die Falle ist echt: die `discounted`-Werte stehen in
+den Rohdaten, der Adapter schließt sie aus, und ein Test fällt sofort durch, wenn
+jemand umstellt.
+
+**Offen:** dass das Gerät auch ganz ohne SIM-Vertrag zu diesem Preis an der Kasse zu
+haben ist, ließ sich **statisch nicht beweisen** — die Kauflabels rendert React nach.
+Belegt sind `contractDuration: 0` und `recurring.listed: 0`, und der Marktvergleich
+stützt es. Die Einschränkung steht im Modulkopf und auf `/geraete-quellen.html`.
