@@ -7,24 +7,38 @@ Wer den Markt ueberblicken will, klickt sich durch Dutzende Downloads und
 setzt sie von Hand zusammen. Hier steht der ganze Bestand in EINER Datei,
 und die Historie in einer zweiten.
 
-DIESES MODUL FILTERT NICHT MEHR SELBST (31.08.2026)
----------------------------------------------------
-Bis dahin suchte sich der Export seine Zeilen mit einer eigenen
-Statusabfrage zusammen, waehrend die Seite ihren Bestand durch
-`geraete_pruefung.pruefe()` schickte. Zwei Rechnungen fuer dieselbe Menge
-sind zwei Mengen - und sie sind auseinandergelaufen: die zwei o2-Listungen,
-deren Rohfelder sie als "erneuert" ausweisen, fielen auf der Seite heraus
-und standen in `geraete-aktuell.csv` mit `Zustand = neu`. Wer die Datei in
-Excel auf "neu" filtert, bekam zwei Gebrauchtpreise als Neupreise - in genau
-der Datei, die die Fachabteilung ausdruecklich wollte.
-
-Der Export nimmt deshalb den FERTIG geprueften und bereinigten Bestand
-entgegen (`geraete_view.belastbarer_bestand()`, weitergereicht ueber
-`geraete["export_bestand"]`). Er entscheidet nichts mehr darueber, WAS
-gezeigt wird, sondern nur noch WIE. Wer hier wieder eine Bedingung
-einbaut - `status`, `zustand`, ein Preisfilter -, baut die zweite Menge
+DIESES MODUL FILTERT NICHT SELBST (31.08.2026)
+----------------------------------------------
+Es bekommt den BESTAND fertig herein (`geraete_view.bestand_und_belastbar()`,
+weitergereicht ueber `geraete["bestand"]`) - dieselbe Menge, die der
+Geraetekatalog und der Farbbericht zeigen. Es entscheidet nichts darueber,
+WAS in der Datei steht, sondern nur, WIE. Wer hier wieder eine Bedingung
+einbaut - `status`, `zustand`, ein Preisfilter -, baut eine zweite Menge
 zurueck, und sie wird beim naechsten Mal an einer anderen Stelle
-auseinanderlaufen.
+auseinanderlaufen. Genau das ist zweimal passiert:
+
+  * Bis dahin suchte sich der Export seine Zeilen mit einer eigenen
+    Statusabfrage zusammen, waehrend die Seite ihren Bestand durch
+    `geraete_pruefung.pruefe()` schickte. Zwei Rechnungen fuer dieselbe
+    Menge sind zwei Mengen: die zwei o2-Listungen, deren Rohfelder sie als
+    "erneuert" ausweisen, fielen auf der Seite heraus und standen hier mit
+    `Zustand = neu`.
+  * Der naheliegende Ausweg - dem Export die GEPRUEFTE Menge zu geben - war
+    die Ueberkorrektur. Der Pruefbericht auf `geraete-quellen.html` nennt
+    das o2-Paar Galaxy S26 FE 128 GB namentlich und verweist im selben
+    Absatz auf diese Datei; die zwei Zeilen fehlten dort. Die Pruefung
+    entscheidet, was gegeneinander gerechnet werden darf, nicht, was es
+    gibt.
+
+DIE ZUSTANDSSPALTE WIRD ABGELEITET, nicht aus dem Store uebernommen
+-------------------------------------------------------------------
+Der Store traegt seinen alten Wert bis zum naechsten erfolgreichen Crawl.
+Solange der Export die geprueften Zeilen bekam, raeumte
+`geraete_pruefung._zustand_veraltet()` das weg; auf dem Bestand tut es das
+nicht mehr - und eine Zusicherung, die an einer anderen Stufe haengt, ist
+keine. Gelesen wird deshalb dieselbe Ableitung wie in Reiter 2
+(`geraete_bereinigung.zustand_der_zeile`). Zwei Antworten auf dieselbe Zelle
+waeren der Fehlertyp aus CLAUDE.md §6.
 
 WARUM SEMIKOLON UND WARUM EIN BOM
 ---------------------------------
@@ -52,6 +66,8 @@ import csv
 import io
 from pathlib import Path
 from typing import Optional
+
+from .geraete_bereinigung import zustand_der_zeile
 
 # Mit BOM, damit Excel UTF-8 erkennt.
 KODIERUNG = "utf-8-sig"
@@ -109,6 +125,8 @@ def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
 
     Ohne eigene Auswahl: geschrieben wird GENAU, was hereinkommt. Die
     Entscheidung darueber faellt einmal, in `geraete_view` - siehe Modulkopf.
+    Was hier entschieden wird, ist die DARSTELLUNG einer Zelle, und die
+    Zustandsspalte wird dafuer abgeleitet statt dem Store geglaubt.
     """
     zeilen = []
     for e in sorted(eintraege, key=lambda x: (x.get("anbieter") or "",
@@ -121,7 +139,7 @@ def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
             g.hersteller if g else "", g.modell if g else e.get("device_id", ""),
             e.get("speicher_gb") or "",
             e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            e.get("zustand") or "neu",
+            zustand_der_zeile(e),
             preis, art, tarif,
             e.get("verfuegbarkeit", ""), e.get("quelle_url", ""),
             e.get("abgerufen_am", ""), e.get("id", ""), e.get("sku_id", ""),

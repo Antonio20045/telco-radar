@@ -213,14 +213,35 @@ def test_ein_semikolon_im_text_zerreisst_die_zeile_nicht(tmp_path):
 # nicht. Zwei o2-Listungen, deren Rohfelder sie als gebraucht ausweisen,
 # standen deshalb im Export mit `Zustand = neu` - wer die Datei in Excel auf
 # "neu" filtert, bekam zwei Gebrauchtpreise als Neupreise.
+#
+# Seit dem 31.08.2026 sind es ZWEI Mengen, und der Export liest die groessere
+# (`geraete_view.bestand_und_belastbar`): den Bestand, nicht die geprueften
+# Zeilen. Die Pruefung entscheidet, was gegeneinander gerechnet werden darf,
+# nicht was es gibt - die Ueberkorrektur hatte das o2-Doppelpreispaar aus der
+# Datei genommen, auf die der Pruefbericht namentlich verweist. Die
+# Zusicherung dieses Abschnitts ist deshalb enger geworden: nicht "die
+# Giftzeile fehlt", sondern "die Giftzeile sagt, was sie ist".
 
 def _gebraucht_aber_als_neu_gespeichert():
-    """Die Giftzeile aus dem echten Bestand, nachgebaut.
+    """Die Giftzeile aus dem echten Bestand, nachgebaut - OHNE ihren Zwilling.
 
     Das Kennzeichen steht AUSSCHLIESSLICH in der Farbe - so schreibt o2 es
     (siehe `geraete_model.zustand_aus_feldern`), und nur so haengt die
     Reihenfolge der zwei Stufen ueberhaupt an etwas: die Bereinigung raeumt
     das Wort aus der Farbe, die Pruefung findet es nur dort.
+
+    DER FALL IST KONSTRUIERT, UND DAS GEHOERT DAZUGESAGT. Im echten Bestand
+    stehen die zwei o2-Giftzeilen jeweils NEBEN ihrem Zwilling - derselbe
+    Artikel unter der neuen Farbschreibweise -, und ein Zwillingspaar fasst
+    `bereinige()` in beiden Reihenfolgen zusammen. Nachgemessen am Bestand
+    vom 31.08.2026 liefern deshalb beide Reihenfolgen dieselben 358 Zeilen,
+    Zeile fuer Zeile; was sich unterscheidet, ist der Pruefbericht
+    (`zustand_veraltet` 2 gegen 0).
+
+    Eine Giftzeile ohne Zwilling ist der Fall, in dem die Reihenfolge auch
+    die MENGE aendert. Er kommt heute nicht vor - eine Zusicherung, die nur
+    fuer die heutige Datenlage gilt, ist aber keine, und deshalb steht er
+    hier.
     """
     return _e(anbieter="o2", preis=577.0,
               id="o2--apple-iphone-17-pro-max-256gb-erneuert",
@@ -239,8 +260,17 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
 
     `pruefe()` erkennt die falsch gespeicherte Zustandsangabe an genau dem
     Wort, das `bereinige()` aus der Farbe raeumt. Wer die zwei Stufen
-    vertauscht, schaltet die Erkennung ab, ohne dass etwas rot wird - der
-    Gebrauchtpreis stuende wieder als Neupreis im Export.
+    vertauscht, schaltet die Erkennung ab: die Zeile faellt nicht mehr aus
+    der belastbaren Menge, und der Befund wird nicht mehr gemeldet
+    (`zustand_veraltet` faellt von 2 auf 0, am echten Bestand gemessen).
+
+    NACHGEMESSEN, und darum praeziser als die fruehere Begruendung: dass
+    "die zwei o2-Gebrauchtpreise wieder als Neupreise in geraete-aktuell.csv
+    stuenden", stimmt NICHT - sie sind Zwillinge und fallen in beiden
+    Reihenfolgen. Was die Reihenfolge sicher aendert, ist der Pruefbericht;
+    was sie beim naechsten Datensatz aendern kann, ist die Menge, und dafuer
+    braucht es genau den Fall, den diese Fixture baut: eine Giftzeile OHNE
+    Zwilling (siehe `_gebraucht_aber_als_neu_gespeichert`).
 
     Die Gegenprobe steht im selben Test, in zwei Fassungen: einmal mit der
     echten Bereinigung vorweg, einmal mit einer von Hand gesaeuberten Farbe.
@@ -250,19 +280,26 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
     gift = _gebraucht_aber_als_neu_gespeichert()
     gesund = _e()
 
-    _pruefung, bestand = geraete_view.belastbarer_bestand([gesund, gift],
-                                                          _KATALOG)
-    assert gift["id"] not in _ids(bestand), \
-        "der Gebrauchtpreis haette aus dem Bestand fallen muessen"
-    assert gesund["id"] in _ids(bestand), \
+    _pruefung, _bestand, belastbar = geraete_view.bestand_und_belastbar(
+        [gesund, gift], _KATALOG)
+    assert gift["id"] not in _ids(belastbar), \
+        "der Gebrauchtpreis haette aus der belastbaren Menge fallen muessen"
+    assert gesund["id"] in _ids(belastbar), \
         "die gesunde Zeile darf die Pruefung nicht mitnehmen"
 
+    # In der richtigen Reihenfolge wird der Befund auch GEMELDET - er steht
+    # als Zeile im Pruefbericht auf /geraete-quellen.html.
+    assert _pruefung["zahlen"]["zustand_veraltet"] >= 1
+
     # Gegenprobe 1: vertauscht - erst bereinigen, dann pruefen.
-    vertauscht = geraete_pruefung.pruefe(
-        geraete_bereinigung.bereinige([gesund, gift]), _KATALOG)["sauber"]
-    assert gift["id"] in _ids(vertauscht), \
+    andersherum = geraete_pruefung.pruefe(
+        geraete_bereinigung.bereinige([gesund, gift]), _KATALOG)
+    assert gift["id"] in _ids(andersherum["sauber"]), \
         ("in dieser Reihenfolge findet die Pruefung das Zustandswort nicht "
          "mehr - genau deshalb steht sie vorne")
+    assert andersherum["zahlen"]["zustand_veraltet"] == 0, \
+        ("und sie meldet den Befund nicht mehr: ein Fehler, den niemand "
+         "meldet, ist der Fehler, den beim naechsten Mal niemand findet")
 
     # Gegenprobe 2: ohne das Wort in der Farbe laesst die Pruefung die Zeile
     # stehen. Sie entfernt sie also wirklich WEGEN des Wortes, und nicht aus
@@ -277,22 +314,53 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
 def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
     """Der Befund selbst, gegen die geschriebene Datei gemessen.
 
+    Die Datei bekommt seit dem 31.08.2026 den BESTAND, nicht die geprueften
+    Zeilen - der Gebrauchtpreis steht also darin, und das ist richtig so:
+    die Pruefung entscheidet, was gegeneinander gerechnet werden darf, nicht
+    was es gibt. Was NICHT darin stehen darf, ist die Behauptung "Zustand =
+    neu" ueber ihn; wer die Datei in Excel auf "neu" filtert, bekaeme sonst
+    einen Gebrauchtpreis als Neupreis.
+
+    Die Zusicherung haengt deshalb nicht mehr an `pruefe()`, sondern an der
+    Zustandsspalte: `aktuell_csv` leitet sie ab
+    (`geraete_bereinigung.zustand_der_zeile`), statt dem Store zu glauben.
+    Beide Mengen werden gemessen - in der belastbaren faellt die Zeile ganz
+    heraus, im Bestand steht sie mit "refurbished".
+
     Die gesunde Zeile wird MITgeprueft: eine leere Datei erfuellt die
-    Bedingung "kein Gebrauchtpreis darin" auch, und dieser Test soll den
-    Unterschied zwischen "aussortiert" und "nichts geschrieben" merken.
+    Bedingung "kein Neupreis auf Gebrauchtdaten" auch, und dieser Test soll
+    den Unterschied zwischen "richtig ausgewiesen" und "nichts geschrieben"
+    merken.
     """
     gift = _gebraucht_aber_als_neu_gespeichert()
     gesund = _e()
-    _pruefung, bestand = geraete_view.belastbarer_bestand(
+    _pruefung, bestand, belastbar = geraete_view.bestand_und_belastbar(
         [gesund, gift], _KATALOG)
-    angaben = ex.schreibe_exporte(tmp_path, bestand, [], _KATALOG)
-    assert angaben["aktuell"]["zeilen"] == 1
 
+    # 1. Der Bestand: beide Zeilen, und die Giftzeile sagt, was sie ist.
+    angaben = ex.schreibe_exporte(tmp_path, bestand, [], _KATALOG)
+    assert angaben["aktuell"]["zeilen"] == 2
     zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
         encoding="utf-8-sig"))
     kopf = zeilen[0]
-    gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen[1:]}
-    assert gefuehrt == {gesund["id"]}
+    assert {z[kopf.index("Listungs-ID")] for z in zeilen[1:]} == {
+        gesund["id"], gift["id"]}
+    for zeile in zeilen[1:]:
+        if zeile[kopf.index("Preis EUR")] == "577,00":
+            assert zeile[kopf.index("Zustand")] == "refurbished", zeile
+            # Und das Kennzeichen steht nicht mehr in der Farbspalte.
+            assert "erneuert" not in zeile[kopf.index("Farbe")].lower()
+            break
+    else:
+        raise AssertionError("die Giftzeile fehlt in der Datei")
+
+    # 2. Die belastbare Menge: die Giftzeile ist gar nicht darin.
+    angaben = ex.schreibe_exporte(tmp_path, belastbar, [], _KATALOG)
+    assert angaben["aktuell"]["zeilen"] == 1
+    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
+        encoding="utf-8-sig"))
+    kopf = zeilen[0]
+    assert {z[kopf.index("Listungs-ID")] for z in zeilen[1:]} == {gesund["id"]}
     for zeile in zeilen[1:]:
         assert zeile[kopf.index("Preis EUR")] != "577,00"
 

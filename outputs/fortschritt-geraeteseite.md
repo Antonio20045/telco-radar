@@ -174,8 +174,60 @@ offene Naht an Reiter 2 gemeinsam auf. Ausnahme, die bleibt:
 `schwelle_erreicht()` rechnet weiter gegen den Rohbestand — eine
 Datenqualitätsheuristik darf keinen Navigationseintrag schalten.
 
-**Offen:** P0-c läuft. Danach das Tor am ausgelieferten CSV **und** an der
-gerenderten Seite, plus Screenshot mit eigenen Augen.
+### TOR P0 — bestanden, vom Lead an der gerenderten Ausgabe gemessen
+
+Nicht an den Tests der Bauer. Gerendert nach `/tmp/…/tor3`, `site/` und
+`data/state/` unangetastet.
+
+| Kriterium des Auftrags | Messung |
+|---|---|
+| Kein Zustandswort in der Farbspalte | **0** von 360 |
+| Keine zwei Zeilen mit identischem (Anbieter, Modell, Speicher, Farbe, Preis) | **0** |
+| Keine Zeile `Zustand = neu`, deren Rohdaten ein Zustandswort tragen | **0** (349 neu / 11 refurbished) |
+| Seite und Export nennen dieselben Zahlen | Exportknopf **360**, Katalogüberschrift **360**, Tabellenzeilen **360**, Fußsatz „zusammen **360** Listungen", „alle **360** Zeilen zeigen" |
+| B4 als widerlegt protokolliert | oben unter K2, mit beiden URLs |
+
+Dazu, was der Auftrag nicht verlangt, aber die Befundliste meinte:
+
+- **B1/B2/B6 auch auf der SEITE** — Reiter 2 zeigt „space schwarz" statt „space
+  schwarz erneuert", keine Dublettenpaare mehr, **alle Abrufdaten auf dem
+  30. August** (die 29.08.-Altzeilen sind weg).
+- **Der Farbbericht** führt von 59 Schreibweisen **keine** mit Zustandswort mehr.
+- **Die Zusage der Vorlagen hält wieder**: die zwei o2-Zeilen Galaxy S26 FE
+  („pistachio" 811,00 / „pistachio bk" 667,00) stehen im Bestand und in der CSV,
+  aus dem Vergleich fallen sie. `Silver Shadow (Enterprise Edition)` unversehrt.
+
+**Die S5-Mutation habe ich selbst gefahren**, nicht der Bauer:
+`"bestand": bestand` → `"bestand": sichtbar` (die vollständige Rücknahme) →
+**2 Tests fallen durch** (`test_der_export_zeigt_genau_den_bestand_der_seite`,
+`test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl`). Vorher blieben an derselben
+Stelle **alle 2190 grün**. Datei danach zurückgesetzt.
+
+`scripts/pruefe_portal.py`: **17 bestanden, 0 durchgefallen, 0 nicht prüfbar.**
+Reiterhöhen 2949 / 2915 / 2184 / 2362 px (Grenze 3000).
+Screenshot bei 1440 px gerendert und **angesehen** — Herstellermix in Reiter 1
+stimmt (Samsung, Google, Xiaomi), die vier Kacheln summieren sich zu 47 und der
+Satz darunter nennt dieselbe 47.
+
+**Ein Fund des Bauers, den niemand beauftragt hatte, und er ist wichtig:** die
+Bereinigung löscht das Beweisstück, aus dem der Zustand abgeleitet wird — o2
+schreibt „erneuert" bei einem Teil der Strecke nur in die Farbe. Auf dem Bestand,
+der nicht mehr durch `pruefe()` läuft, hätte Reiter 2 danach „mitternacht ·
+Zustand **neu**" gezeigt. Der Zustand wird jetzt abgeleitet, **bevor** die Farbe
+gesäubert wird, und `zustand_der_zeile()` ist die EINE Ableitung für Reiter 2 und
+die CSV-Spalte — die vorher dem Store glaubte, also eine dritte Fassung derselben
+Regel war.
+
+**Offen aus P0:**
+1. **B5 und B7 sind NICHT erledigt** — der Katalog öffnet weiter alphabetisch bei
+   Apple/o2, und der Quelllink ist weiter ein nackter Pfeil. Beides ist P4 und
+   dort bewusst zurückgestellt, nicht vergessen.
+2. Der Doppelpreisfall Galaxy S26 FE bleibt **ungeklärt** (offener Punkt seit dem
+   29.08.): der Prüfbericht meldet ihn, der Vergleich lässt ihn aus, der Bestand
+   zeigt beide Preise. Welcher stimmt, weiß niemand.
+3. `_auffaellig()` und `geraete_lifecycle.auswertung()` lesen weiter `alle`
+   inklusive ausgelisteter Zeilen — bewusst: auf `belastbar` gezwungen verlören
+   sie genau die Daten, wegen derer es sie gibt (Auslistungen, Verweildauer).
 
 ---
 

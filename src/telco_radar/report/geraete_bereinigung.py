@@ -76,7 +76,8 @@ Adresse (`...-space-schwarz-erneuert-details`), nur hat der Store seinen
 alten, falschen Wert bis zum naechsten Crawl behalten. Auf den
 gespeicherten Zustand geschluesselt blieben genau diese zwei Zwillinge
 stehen (360 gegen 362 Zeilen), und zwar die zwei, bei denen die falsche
-Haelfte als NEUgeraet in den Preisvergleich ginge. `_zustand()` leitet ihn
+Haelfte als NEUgeraet in den Preisvergleich ginge. `zustand_der_zeile()`
+leitet ihn
 deshalb aus Titel, Farbe und Adresse ab - dieselbe Rechnung wie in
 `geraete_view.katalogzeilen()`, aus demselben Grund: der Store ist die
 schwaechere Quelle.
@@ -89,16 +90,24 @@ haengt, ist keine.
 
 Die Zahlen der Auslieferung
 ---------------------------
-`geraete_view.geprueft_und_bereinigt()` verkettet beide Stufen, und nur die
-Kette ist die ausgelieferte Zahl (Bestand vom 30.08.2026):
+`bereinige()` steht in ZWEI Rechnungen, und sie liefern verschiedene Zahlen
+(Bestand vom 31.08.2026, nachgemessen):
 
-    370 sichtbar  ->  366 nach pruefe()  ->  358 nach bereinige()
+    Bestand    = bereinige(sichtbar)          370 -> **360**
+    belastbar  = bereinige(pruefe(sichtbar))  370 -> 366 -> **358**
+
+Der Unterschied sind genau zwei Zeilen: o2 fuehrt das Galaxy S26 FE 128 GB
+unter zwei Adressen als "pistachio" (811,00) und "pistachio bk" (667,00) -
+ein Doppelpreis, also keine Preisaussage, aber sehr wohl zwei Listungen, die
+es gibt. Sie stehen im Gerätekatalog und in der CSV und fehlen in Vergleich,
+Alarmen und Preisverlauf. Welche Menge wo hingehoert, entscheidet
+`geraete_view.bestand_und_belastbar()`; wer eine dieser Zahlen zitiert, sagt
+dazu, welche gemeint ist - sie sind nicht dieselbe.
 
 `pruefe()` nimmt vier Zeilen (zwei falsch gespeicherte Zustaende, ein
 Doppelpreis), darunter zwei Haelften von Zwillingspaaren; `bereinige()`
-fasst danach die verbleibenden **acht** Paare zusammen. Auf den sichtbaren
-Bestand allein angewandt sind es 370 -> 360. Wer eine dieser Zahlen zitiert,
-sagt dazu, welche Menge gemeint ist - sie sind nicht dieselbe.
+fasst danach die verbleibenden **acht** Paare zusammen, auf dem sichtbaren
+Bestand allein sind es **zehn**.
 
 Was der Zwilling an Historie mitnimmt
 -------------------------------------
@@ -166,7 +175,28 @@ def bereinige(eintraege: list[dict]) -> list[dict]:
 
 
 def _mit_sauberer_farbe(eintrag: dict) -> dict:
-    """Eine Kopie des Eintrags, deren Farbfelder kein Zustandswort tragen.
+    """Eine Kopie des Eintrags: Zustand festgeschrieben, Farbe ohne dessen Wort.
+
+    DIE REIHENFOLGE INNERHALB DIESER FUNKTION IST DIE GANZE POINTE. Der
+    Zustand wird aus den ROHEN Feldern abgeleitet und in die Kopie
+    geschrieben, BEVOR das Kennzeichen aus der Farbe faellt - sonst loescht
+    Schritt 1 das Beweisstueck, aus dem Schritt 2 und jeder spaetere Leser
+    ihn ableiten.
+
+    Ohne diese Zeile stuende eine Listung, deren Kennzeichen NUR in der Farbe
+    steht, im Geraetekatalog als "mitternacht - Zustand neu" da: der
+    Store-Wert ist falsch, und das einzige Gegenzeugnis ist gerade
+    weggeraeumt worden. Im Bestand vom 31.08.2026 gibt es diesen Fall nicht -
+    alle zehn betroffenen Zeilen nennen ihr Kennzeichen zusaetzlich im Titel
+    und in der Adresse (siehe Modulkopf) -, und genau deshalb steht die Zeile
+    hier: eine Zusicherung, die nur fuer die heutige Datenlage gilt, ist
+    keine, und o2 hat sein Kennzeichen schon einmal in genau ein Feld
+    geschrieben (`geraete_model.zustand_aus_feldern`).
+    `tests/test_geraete_seite.py::test_die_katalogzeile_nennt_den_
+    ABGELEITETEN_zustand` baut den Fall.
+
+    Der Store wird dabei NICHT angefasst; korrigiert wird die Kopie, aus der
+    die Seite liest.
 
     Kopiert wird IMMER, auch wenn nichts zu streichen war: ein Aufrufer, der
     das Ergebnis veraendert, darf nicht je nach Datenlage mal den Store
@@ -180,6 +210,7 @@ def _mit_sauberer_farbe(eintrag: dict) -> dict:
     Shadow (Enterprise Edition)" ein "Silver Shadow (Enterprise Edition".
     """
     kopie = copy(eintrag)
+    kopie["zustand"] = zustand_der_zeile(eintrag)
     for feld in FARBFELDER:
         wert = kopie.get(feld)
         if wert:
@@ -251,7 +282,11 @@ def _zwillingsschluessel(eintrag: dict) -> tuple:
         eintrag.get("anbieter"),
         eintrag.get("device_id"),
         eintrag.get("speicher_gb"),
-        _zustand(eintrag),
+        # Auf den Kopien von Schritt 1 ist das der festgeschriebene Wert;
+        # die Funktion ist auf ihnen idempotent. Sie steht hier trotzdem und
+        # nicht als `eintrag["zustand"]`, damit der Schluessel auch dann
+        # stimmt, wenn ihn jemand auf rohe Store-Eintraege anwendet.
+        zustand_der_zeile(eintrag),
         eintrag.get("preis_ohne_vertrag"),
         eintrag.get("zuzahlung"),
         eintrag.get("tarif_referenz"),
@@ -261,11 +296,24 @@ def _zwillingsschluessel(eintrag: dict) -> tuple:
     )
 
 
-def _zustand(eintrag: dict) -> str:
-    """Der Zustand, wie ihn die heutige Regel liest.
+def zustand_der_zeile(eintrag: dict) -> str:
+    """Der Zustand, wie ihn die heutige Regel liest. DIE EINE Ableitung.
 
-    Dieselbe Ableitung wie in `geraete_view.katalogzeilen()`, und dieselbe
-    Einschraenkung: die Ableitung kann ein GEBRAUCHTgeraet beweisen (ein
+    Sie stand am 31.08.2026 in DREI Fassungen: hier, in
+    `geraete_view.katalogzeilen()` und - als schweigendes Vertrauen auf den
+    Store - im CSV-Export. Drei Fassungen einer Regel sind drei Regeln, und
+    die dritte war die falsche: `geraete_export.aktuell_csv()` schrieb
+    `eintrag["zustand"]` roh in die Spalte. Solange der Export die
+    GEPRUEFTE Menge bekam, deckte `geraete_pruefung._zustand_veraltet()`
+    das zu; seit er den BESTAND bekommt (siehe
+    `geraete_view.bestand_und_belastbar`), tut es das nicht mehr. Eine
+    Zusicherung, die an einer anderen Stufe haengt, ist keine.
+
+    Deshalb oeffentlich und deshalb hier: dieses Modul ist der Ort, an dem
+    der ANGEZEIGTE Bestand entsteht, und Reiter 2 wie CSV zeigen dieselbe
+    Zeile - sie duerfen nicht zwei Antworten auf dieselbe Zelle geben.
+
+    Die Einschraenkung: die Ableitung kann ein GEBRAUCHTgeraet beweisen (ein
     Kennzeichen in Titel, Farbe oder Adresse), sie kann kein Neugeraet
     beweisen - "neu" ist dort nur die Abwesenheit eines Kennzeichens. Faellt
     sie auf "neu" zurueck, gilt deshalb der gespeicherte Wert: den hat der

@@ -39,8 +39,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, serie_aus_modell,
-                             zustand_aus_feldern)
+from ..geraete_model import serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_vergleich, geraete_verlauf)
 from ..analyze import geraete_lifecycle
@@ -553,16 +552,19 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
     for e in eintraege:
         g = katalog.nach_id(e.get("device_id")) if katalog else None
         preis = e.get("preis_ohne_vertrag")
-        # Der Zustand wird NEU ABGELEITET, nicht aus dem Store uebernommen.
+        # Der Zustand wird ABGELEITET, nicht aus dem Store uebernommen.
         # Sonst steht in dieser Tabelle "space schwarz erneuert - Zustand
         # neu", waehrend der Pruefbericht zwei Reiter weiter "refurbished"
         # sagt: die Seite widerspraeche sich selbst, und der Store ist die
         # schwaechere Quelle - er traegt seinen alten Wert bis zum naechsten
         # erfolgreichen Crawl.
-        zustand = zustand_aus_feldern(
-            e.get("titel_roh"), e.get("farbe_roh"), e.get("quelle_url"))
-        if zustand in VERGLEICHBARE_ZUSTAENDE:
-            zustand = e.get("zustand") or "neu"
+        #
+        # Gerufen wird die EINE Ableitung (`geraete_bereinigung`), nicht eine
+        # eigene Fassung davon. Auf dem Bestand ist sie ohnehin schon
+        # gelaufen und hat ihr Ergebnis in die Kopie geschrieben - das ist
+        # der Grund, warum diese Zeile auch bei einer Farbe funktioniert,
+        # aus der das Kennzeichen gerade entfernt wurde.
+        zustand = geraete_bereinigung.zustand_der_zeile(e)
         zeilen.append({
             "modell": g.modell if g else (e.get("device_id") or "?"),
             "hersteller": g.hersteller if g else "",
@@ -614,6 +616,14 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     Kein Anbieter verschwindet stillschweigend (Teil E). Das gilt auch fuer
     die Marken ohne Hardware-Vermarktung: sie stehen in einer eigenen Zeile,
     nicht als leere Karte im Raster.
+
+    `eintraege` ist der BESTAND, nicht der Rohbestand: die Geraetezahl je
+    Anbieter steht hier neben derselben Zahl auf `/geraete.html`, und aus
+    zwei Mengen gerechnet waeren es zwei Zahlen (o2: 78 gegen 68). Der
+    Zustand eines Anbieters kann daran nicht kippen - eine Zwillingsgruppe
+    laesst immer einen Ueberlebenden, ein liefernder Anbieter bleibt also
+    liefernd. Die GEPRUEFTE Menge waere hier dagegen falsch: ein Anbieter,
+    dessen Preise sich alle widersprechen, liefert trotzdem.
     """
     mit_daten = {e.get("anbieter") for e in eintraege}
     bekannt = {a.name for a in quellen.anbieter}
@@ -763,7 +773,7 @@ def leer(fehler: str = "") -> dict:
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": [], "kurzer_vorlauf": True,
                        "vorlauf_tage": 0},
-        "export_bestand": [], "alle_punkte": [], "katalog_obj": None,
+        "bestand": [], "alle_punkte": [], "katalog_obj": None,
         "export": {"stand": "", "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
                    "historie": {"datei": "", "zeilen": 0, "bytes": 0}},
         "vergleich": {"hat_daten": False, "standard": "ohne_vertrag",
@@ -790,36 +800,64 @@ def leer(fehler: str = "") -> dict:
     }
 
 
-def belastbarer_bestand(sichtbar: list, katalog) -> tuple[dict, list]:
-    """Der EINE Bestand, aus dem Seite und CSV-Export lesen. (Pruefung, Bestand)
+def bestand_und_belastbar(sichtbar: list, katalog) -> tuple[dict, list, list]:
+    """Die ZWEI Mengen dieser Seite. Gibt (Pruefung, Bestand, belastbar).
 
-    Zwei Stufen, und ihre REIHENFOLGE ist die ganze Zusicherung dieser
-    Funktion:
+    Es sind zwei, nicht eine, und das ist die Regel dieses Projekts und
+    nicht der Zuschnitt dieser Funktion: **die Plausibilitaetspruefung
+    entscheidet, was GEGENEINANDER gerechnet werden darf - nicht, was es
+    gibt.** Ein Ausreisser widerspricht dem Markt und wird gemeldet, nicht
+    geloescht; ein Doppelpreis widerspricht sich selbst und darf deshalb in
+    keiner Preisaussage stehen - aber er ist trotzdem eine Listung, die
+    jemand im Regal findet.
 
-    1. `geraete_pruefung.pruefe()` wirft heraus, was sich selbst
-       widerspricht - der Doppelpreis, die Speicherinversion und vor allem
-       die Zeile, deren ROHFELDER sie als Gebrauchtgeraet ausweisen, waehrend
-       im Store "neu" steht.
-    2. `geraete_bereinigung.bereinige()` raeumt danach das Zustandswort aus
-       der Farbe und fasst Zwillingszeilen zusammen.
+        Bestand    = bereinige(sichtbar)          -> Geraetekatalog
+                                                    (Reiter 2), Farbbericht,
+                                                    CSV-Export, `bilanz`
+        belastbar  = bereinige(pruefe(sichtbar))  -> Preisvergleich, Alarme,
+                                                    Preisverlauf, Lifecycle
 
-    VERTAUSCHT WAERE DER FEHLER ZURUECK, BEI GRUENEN TESTS. Die Pruefung
-    erkennt eine falsch gespeicherte Zustandsangabe an genau dem Wort, das
-    die Bereinigung entfernt ("space schwarz erneuert" -> refurbished, obwohl
-    der Store "neu" sagt). Laeuft die Bereinigung zuerst, findet die Pruefung
-    nichts mehr, und die zwei o2-Gebrauchtpreise stehen wieder als Neupreise
-    in `geraete-aktuell.csv`. `tests/test_geraete_export.py` nagelt die
-    Reihenfolge samt Gegenprobe fest.
+    Am Bestand vom 31.08.2026 gemessen: 370 sichtbar -> **360** Bestand ->
+    **358** belastbar. Der Unterschied sind genau zwei Zeilen, das
+    o2-Doppelpreispaar Galaxy S26 FE 128 GB ("pistachio" 811,00 und
+    "pistachio bk" 667,00 unter zwei eigenen Adressen).
 
-    Warum das ueberhaupt eine eigene Funktion ist: bis zum 31.08.2026
-    rechnete die Seite ihre Menge hier und der Export seine eigene in
-    `geraete_export.aktuell_csv()`. Zwei Rechnungen fuer dieselbe Menge sind
-    zwei Mengen - CLAUDE.md §6 sagt denselben Satz ueber Zahlen. Sie steht
-    jetzt an EINER Stelle, und `aufbereiten()` reicht sie als
-    `export_bestand` heraus.
+    WARUM DAS EINMAL FALSCH WAR. Bis zum 31.08.2026 gab diese Funktion die
+    belastbare Menge an ALLES heraus, auch an den CSV-Export. Damit standen
+    zwei Saetze auf der ausgelieferten Seite, die nicht mehr stimmten -
+    Reiter 2: "was aus dem Preisvergleich faellt, verschwindet nicht", und
+    `geraete-quellen.html`: "Alles bleibt in der CSV-Tabelle". Das
+    S26-FE-Paar stand namentlich im Pruefbericht und fehlte in der Datei,
+    auf die derselbe Absatz verwies: der Leser wird auf einen Befund
+    gestossen, zur CSV geschickt und findet die Zeile dort nicht.
+
+    Beide Mengen sind sauber im Sinne der Anzeige - keine Farbe mit
+    Zustandswort, keine Zeile "Zustand = neu" auf Gebrauchtdaten, keine
+    Dublette -, denn `bereinige()` laeuft in beiden.
+
+    ZUR REIHENFOLGE INNERHALB VON `belastbar`. Sie bleibt: erst `pruefe()`,
+    dann `bereinige()`. Der Grund ist ein anderer, als bis zum 31.08.2026
+    hier stand - die alte Begruendung ("vertauscht stuenden die zwei
+    o2-Gebrauchtpreise wieder als Neupreise in `geraete-aktuell.csv`")
+    reproduziert NICHT: nachgemessen liefern beide Reihenfolgen denselben
+    Bestand, Zeile fuer Zeile, weil die zwei Giftzeilen Zwillinge sind und
+    so oder so fallen. Was sich messbar unterscheidet, ist der PRUEFBERICHT:
+    `zustand_veraltet` steht in dieser Reihenfolge auf 2, vertauscht auf 0.
+    `pruefe()` erkennt die falsch gespeicherte Zustandsangabe an genau dem
+    Wort, das `bereinige()` aus der Farbe raeumt - laeuft die Bereinigung
+    zuerst, findet die Pruefung nichts mehr zu melden. Ein Befund, den
+    niemand mehr meldet, ist der Fehler, den beim naechsten Mal niemand
+    findet.
+
+    Und die Reihenfolge traegt ueber den heutigen Bestand hinaus: eine
+    Giftzeile OHNE Zwilling faellt nur so heraus. Genau die bauen die zwei
+    Tests in `tests/test_geraete_export.py` - ein Fall, den der echte
+    Bestand heute nicht enthaelt.
     """
     pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
-    return pruefung, geraete_bereinigung.bereinige(pruefung["sauber"])
+    return (pruefung,
+            geraete_bereinigung.bereinige(sichtbar),
+            geraete_bereinigung.bereinige(pruefung["sauber"]))
 
 
 def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
@@ -830,21 +868,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
-    # W1.2 (29.08.2026): bevor irgendetwas gerendert wird, laeuft die
-    # Plausibilitaetspruefung ueber den Datensatz. Was sie aussortiert, faellt
-    # aus Vergleich UND Preisgrafik - beides sind Preisaussagen, und eine
-    # Preisaussage aus zwei widerspruechlichen Zahlen ist keine.
+    # ZWEI MENGEN, und jede Zeile darunter sagt, welche sie meint (siehe
+    # `bestand_und_belastbar`):
     #
-    # Seit dem 31.08.2026 liest auch der CSV-Export diese Menge (siehe
-    # `belastbarer_bestand`). Vorher hiess es hier "der CSV-Export sieht
-    # weiterhin ALLES" - und genau das war der Fehler: er sah auch die zwei
-    # o2-Zeilen, deren Rohfelder sie als gebraucht ausweisen, und schrieb sie
-    # mit `Zustand = neu` in die Datei, die die Fachabteilung ausdruecklich
-    # wollte. Was die Seite nicht zeigen darf, darf der Download nicht
-    # ausliefern. Der einzige Ort, an dem die aussortierte Zeile weiterhin
-    # steht, ist Reiter 2 - und der leitet ihren Zustand selbst neu ab
-    # (`katalogzeilen`), sagt also "refurbished" statt "neu".
-    pruefung, belastbar = belastbarer_bestand(sichtbar, katalog)
+    #   `bestand`   was es GIBT - bereinigt, aber ungeprueft. Regal,
+    #               Farbbericht, CSV, Betriebszahlen.
+    #   `belastbar` was gegeneinander gerechnet werden DARF. Vergleich,
+    #               Alarme, Preisverlauf, Lifecycle.
+    #
+    # `sichtbar` bleibt der ROHBESTAND und hat genau noch einen Verbraucher:
+    # die Veroeffentlichungsschwelle (siehe unten). Eine
+    # Datenqualitaetsheuristik darf keine Navigation schalten.
+    pruefung, bestand, belastbar = bestand_und_belastbar(sichtbar, katalog)
 
     # Laden und Anzeigename je Anbieter. Zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
@@ -939,9 +974,17 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
     # nicht den Berichtstag behaupten. Auf einer Seite, deren Verkaufsargument
     # der Belegzwang ist, ist das die teuerste Sorte falscher Zahl.
-    abrufdaten = sorted(e.get("abgerufen_am") for e in sichtbar
+    # Auf dem BESTAND, nicht auf dem Rohbestand: der Kopf sagt "Preise vom
+    # ...", und gemeint sind die Preise, die auf dieser Seite stehen. Eine
+    # zusammengefasste Zwillingshaelfte darf das Datum nicht setzen.
+    abrufdaten = sorted(e.get("abgerufen_am") for e in bestand
                         if e.get("abgerufen_am"))
-    ohne_katalog = sorted({e.get("device_id") for e in sichtbar
+    # Ebenfalls Bestand: die Liste ist die Arbeitsliste fuer
+    # `config/geraete_katalog.yaml` und beantwortet "welche Zeile dieser
+    # Seite kann ich nicht benennen". Eine Zeile, die auf der Seite nicht
+    # steht, gehoert nicht in eine Arbeitsliste. Der Merge nimmt dabei keine
+    # `device_id` weg - der Ueberlebende traegt dieselbe.
+    ohne_katalog = sorted({e.get("device_id") for e in bestand
                            if katalog.nach_id(e.get("device_id")) is None})
 
     # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
@@ -949,24 +992,35 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
     # schaltete sich der Navigationseintrag mit "2 Anbietern" frei, waehrend
     # nur EIN Laden lieferte.
-    laeden_mit_daten = {laden.get(e.get("anbieter"), e.get("anbieter"))
-                        for e in sichtbar}
-    # Die Veroeffentlichungsschwelle rechnet gegen den BESTAND, nicht gegen
-    # die Karte. Bis zum 29.08.2026 nahm sie die Spaltenzahl der
-    # Herstelleransicht - und die haengt seit W1.2 an der
+    def _laeden(menge):
+        return {laden.get(e.get("anbieter"), e.get("anbieter")) for e in menge}
+
+    def _hersteller(menge):
+        return {g.hersteller
+                for g in (katalog.nach_id(e.get("device_id")) for e in menge)
+                if g and g.hersteller}
+
+    # DIE VEROEFFENTLICHUNGSSCHWELLE RECHNET GEGEN DEN ROHBESTAND - als
+    # einzige Zahl dieser Funktion. Bis zum 29.08.2026 nahm sie die
+    # Spaltenzahl der Herstelleransicht, und die hing an der
     # Plausibilitaetspruefung. Damit haette ein Anbieter, der an einem Tag
     # seine Farbvarianten mit weiten Farbabstaenden bepreist, den
     # Navigationseintrag "Geraete" auf JEDER Seite verschwinden lassen -
     # ohne Fehler, ohne Warnung, und niemand faende die Seite mehr. Eine
-    # Datenqualitaetsheuristik darf keine Navigation schalten.
-    hersteller_mit_daten = {
-        g.hersteller for g in (katalog.nach_id(e.get("device_id"))
-                               for e in sichtbar)
-        if g and g.hersteller}
+    # Datenqualitaetsheuristik darf keine Navigation schalten (CLAUDE.md §6).
+    # Das gilt fuer die Bereinigung genauso: sie kann heute keinen Anbieter
+    # verlieren (ein Zwillingspaar laesst immer einen Ueberlebenden), aber
+    # eine Schwelle, die sich auf diese Eigenschaft verlaesst, ist keine.
     erreicht = schwelle_erreicht(
-        anbieter=len(laeden_mit_daten),
+        anbieter=len(_laeden(sichtbar)),
         skus=len({e.get("sku_id") for e in sichtbar}),
-        hersteller=len(hersteller_mit_daten))
+        hersteller=len(_hersteller(sichtbar)))
+
+    # Die Betriebszahlen am Fuss der Seite stehen in EINEM Satz ("N Geraete
+    # in M Varianten, zusammen L Listungen bei A Anbietern") - sie muessen
+    # also aus EINER Menge kommen, und zwar aus der, die die Seite zeigt.
+    laeden_mit_daten = _laeden(bestand)
+    hersteller_mit_daten = _hersteller(bestand)
 
     # Reiter 1. Die Alarmtabelle liest den fertigen Vergleich - sie rechnet
     # keine Zahl zweimal (CLAUDE.md 6: zwei Rechnungen fuer dieselbe Zahl
@@ -985,15 +1039,20 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das den
         # Unterschied zwischen "577-899 EUR" und "850-899 EUR".
         "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
-        # Reiter 2 zeigt den BESTAND, also `sichtbar` und nicht `belastbar`:
-        # eine refurbished Zeile gehoert nicht in den Vergleich, aber sehr
-        # wohl in den Katalog.
-        "katalogtabelle": katalogzeilen(sichtbar, katalog),
+        # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
+        # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
+        # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau
+        # das verspricht der Satz ueber der Tabelle.
+        "katalogtabelle": katalogzeilen(bestand, katalog),
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "pruefung": pruefung["zahlen"],
         "pruefbefunde": pruefung["befunde"],
-        "hat_daten": bool(sichtbar),
+        # `bereinige()` leert eine nicht leere Menge nie (jede
+        # Zwillingsgruppe behaelt einen Ueberlebenden), die zwei Ausdruecke
+        # sind also gleichwertig - gefragt wird trotzdem die Menge, die die
+        # Seite zeigt.
+        "hat_daten": bool(bestand),
         "stand": heute,
         "abgerufen_bis": abrufdaten[-1] if abrufdaten else "",
         "abgerufen_ab": abrufdaten[0] if abrufdaten else "",
@@ -1001,9 +1060,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "ohne_katalog": ohne_katalog,
         "db_lesbar": db.lesbar,
         "bilanz": {
-            "geraete": len({e.get("device_id") for e in sichtbar}),
-            "listungen": len(sichtbar),
-            "skus": len({e.get("sku_id") for e in sichtbar}),
+            "geraete": len({e.get("device_id") for e in bestand}),
+            "listungen": len(bestand),
+            "skus": len({e.get("sku_id") for e in bestand}),
             "anbieter": len(laeden_mit_daten),
             "ausgelistet": sum(1 for e in alle
                                if e.get("status") == STATUS_AUSGELISTET),
@@ -1030,13 +1089,13 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # bewusst KEINEN Schreibzugriff hat - aber er RECHNET seine Menge
         # nicht mehr selbst, er bekommt sie von hier.
         #
-        # Der Schluessel hiess bis zum 31.08.2026 `alle_eintraege` und trug
-        # `sichtbar`. Beides ist jetzt falsch: es ist nicht "alles", sondern
-        # der gepruefte und bereinigte Bestand - derselbe, aus dem Vergleich,
-        # Alarme und Preisverlauf lesen. Der Name sagt das, damit die
-        # naechste Aenderung nicht wieder aus dem Wort "alle" schliesst, hier
-        # duerfe der ganze Store stehen.
-        "export_bestand": belastbar,
+        # Der Schluessel hiess `alle_eintraege` (er trug den Rohbestand),
+        # dann `export_bestand` (er trug die belastbare Menge). Beide Namen
+        # sagten nicht, was drin ist, und der zweite hat die zwei
+        # S26-FE-Zeilen aus der CSV entfernt, waehrend zwei Saetze der Seite
+        # das Gegenteil versprachen. Jetzt heisst er wie die Menge:
+        # `bestand`, gelesen von `geraete_export.schreibe_exporte`.
+        "bestand": bestand,
         # Die Historie bleibt vollstaendig; `historie_csv` schneidet sie auf
         # die Listungen des Bestands zu. Der Zuschnitt gehoert dorthin, wo
         # die zwei Dateien nebeneinander entstehen.
@@ -1047,7 +1106,14 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
         "vergleich": vergleich,
         "lifecycle": lifecycle,
-        "quellenlage": _quellenlage(quellen, db, sichtbar),
-        "farbbericht": _farbbericht(sichtbar),
+        # Beide auf dem BESTAND. Die Quellenseite nennt je Anbieter eine
+        # Geraetezahl, die neben derselben Zahl auf `geraete.html` steht -
+        # aus zwei Mengen gerechnet waeren es zwei Zahlen. Und der
+        # Farbbericht ist die Arbeitsliste fuer `config/farben.yaml`: auf dem
+        # Rohbestand fuehrte er neun Schreibweisen, die gar keine Farben sind
+        # ("space schwarz erneuert", "grau erneuert") - genau die, die
+        # `ohne_zustandswort()` aus der Anzeige raeumt.
+        "quellenlage": _quellenlage(quellen, db, bestand),
+        "farbbericht": _farbbericht(bestand),
         "katalog": _katalogluecken(katalog),
     }
