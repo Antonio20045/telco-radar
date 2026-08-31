@@ -137,17 +137,77 @@ geliefert; die tragenden habe ich selbst nachgemessen und bestätigt:
 Drei Zusicherungen hielten der Prüfung stand und bleiben: kein Verlust echter Ware,
 die fünf Farbvarianten überleben, das Ergebnis ist über 20 Shuffles stabil.
 
-**Offen:**
-1. P0-a (Verdrahtung) läuft noch. Die Prüferbefunde **S1, S3, S4, S8** betreffen
-   `belastbarer_bestand`, die Zeilenzahl am Exportknopf und
-   `tests/test_geraete_seite.py` — sie wurden gegen den **halbfertigen** Stand
-   gemessen und müssen nach dem Abschluss neu gemessen werden, bevor sie als
-   Befunde gelten.
-2. Der Prüfer meldet, die Katalogtabelle (Reiter 2) lese `sichtbar` statt des
-   bereinigten Bestands — dann erreichte die Bereinigung den Leser gar nicht,
-   sondern nur die CSV. **Nach P0-a an der gerenderten Seite nachmessen.**
-3. Zwei Zahlen für dieselbe Menge: Katalogüberschrift 370 gegen Exportknopf 358.
-   Ebenfalls erst nach P0-a beurteilbar.
-4. Der Doppelpreisfall Galaxy S26 FE („pistachio" / „pistachio bk", 144 € Abstand)
-   ist weiterhin **ungeklärt** — er wird gemeldet und entfernt, nicht aufgelöst.
-   Offener Punkt seit dem 29.08.
+**P0-b Runde 2 (`0ab34db`) — vom Lead nachgemessen und angenommen:**
+
+| Behauptung | Meine Messung |
+|---|---|
+| Farben ohne Kennzeichen kommen zeichengenau zurück | `'Silver Shadow (Enterprise Edition)'`, `'Blau (neu)'`, `'Grau, matt'`, `'Titan-'` — unverändert |
+| Mehrwort-Kennzeichen fallen | `B-Ware`, `wie neu`, `second-hand`, `Open-Box`, `2. Wahl`, `geprueft und zertifiziert` — alle gestrichen |
+| Ausgelieferte CSV | 358 Zeilen, 15 Spalten (kein `zwilling_ids`), 0 Zustandswörter, Klammerfarbe unversehrt |
+| `first_seen` geerbt / `zwilling_ids` | je 8 Zeilen |
+
+**P0-a Prüfung (adversarisch, eigener Worktree auf `4fba9af`) — sieben Befunde.**
+S1 (verstümmelte Klammerfarbe) ist durch Runde 2 bereits behoben, an der
+ausgelieferten CSV verifiziert. Die übrigen stehen und gehen als **P0-c** zurück:
+
+| | Befund | Messung |
+|---|---|---|
+| **S5 Blocker** | Die zentrale Regel hält **kein** Test | `export_bestand: belastbar → sichtbar` gesetzt: **alle 2190 Tests bleiben grün**, der Export liefert wieder 370 Zeilen mit zwei Gebrauchtpreisen als „neu". `test_der_export_zeigt_genau_den_bestand_der_seite` behauptet `Export == Rohbestand` — den Zustand, den die Änderung abschafft — und ist grün, weil seine Fixture den Fall nie auslöst |
+| S2 | Die Verdrahtung bricht eine Zusage, die auf **zwei ausgelieferten Seiten** steht | o2 Galaxy S26 FE („pistachio"/„pistachio bk") fällt aus der CSV, während `geraete-quellen.html` wörtlich verspricht „Alles bleibt in der CSV-Tabelle … verschwindet nicht" und die Zeile namentlich als Befund führt |
+| S3 | Zwei Zahlen für dieselbe Menge, im selben Reiter | Knopf „**Alle** exportieren (358 Zeilen)" gegen Überschrift „370", Historie 361 gegen 373 |
+| S4 | Die Begründung des Commits reproduziert nicht | Beide Reihenfolgen liefern **denselben Bestand, Zeile für Zeile**. Der einzige Unterschied ist `zustand_veraltet` 2 gegen 0 im Prüfbericht. Die Reihenfolge bleibt richtig — die Begründung war behauptet, nicht gemessen |
+| S6 | Der Farbbericht sieht die Bereinigung nicht | listet weiter `space schwarz erneuert`, `marble gray erneuert`, `titanium black gebraucht` … — genau die Schreibweisen, die `ohne_zustandswort()` dort heraushalten soll |
+| S7 | `pruefe()` dokumentiert den alten Vertrag | `geraete_pruefung.py:396` verspricht „Export und SKU-Ansicht sehen weiterhin alles" |
+
+**Die Architekturentscheidung des Leads (P0-c): es sind ZWEI Mengen, nicht eine.**
+Gemessen, beide erfüllen alle Tor-Kriterien:
+
+| Menge | Rechnung | Zeilen | Verbraucher |
+|---|---|---|---|
+| **Bestand** | `bereinige(sichtbar)` | **360** | Katalog, Farbbericht, CSV, Kennzahlen |
+| **belastbar** | `bereinige(pruefe(sichtbar))` | **358** | Vergleich, Alarme, Preisgrafik, Lifecycle |
+
+Der Unterschied sind genau die zwei S26-FE-Zeilen. Das ist die Regel des Projekts,
+nicht eine Erfindung: die Plausibilitätsprüfung entscheidet, was GEGENEINANDER
+gerechnet werden darf — nicht, was es gibt. Damit lösen sich S2, S3, S6 und die
+offene Naht an Reiter 2 gemeinsam auf. Ausnahme, die bleibt:
+`schwelle_erreicht()` rechnet weiter gegen den Rohbestand — eine
+Datenqualitätsheuristik darf keinen Navigationseintrag schalten.
+
+**Offen:** P0-c läuft. Danach das Tor am ausgelieferten CSV **und** an der
+gerenderten Seite, plus Screenshot mit eigenen Augen.
+
+---
+
+## P3 — Datenlage vorab gemessen (vor jedem Bauauftrag)
+
+Die entscheidende Zahl: **die ganze Datenbank kennt drei Messtage** (10.08., 29.08.,
+30.08.).
+
+| Frage | Antwort |
+|---|---|
+| Listungen mit ≥ 4 Messterminen | **0 von 370** (28 haben einen Messtag, 342 haben zwei) |
+| Längste Beobachtungsspanne | **20 Tage** gegen eine Schwelle von 21 → 0 erfüllen sie |
+| `dauern` / `verfaelle` / `duenn` | 0 / 0 / **True** — die Seite zeigt bereits korrekt den Dünn-Satz |
+| Schwelle je Anbieter (heute im Code) | 2 von 370 Zeilen |
+| Schwelle je Gerät (wie dokumentiert) | **0 von 370** — die Korrektur leert die Seite **nicht**, sie ist schon leer |
+| Portfolio-Tiefe | **trägt vollständig** (o2 24/54/78, Vodafone 20/41/150 `eigen`, mobilcom-debitel 10/18/140, ALDI TALK 2/2/2) |
+
+**Der Nachfolger-Effekt ist strukturell nicht befüllbar.** Es gibt 4 Kandidaten mit
+gepflegtem `marktstart`, aber alle Nachfolger kamen **570–710 Tage vor** unserem
+ersten Messpunkt auf den Markt: `basis = _preis_am(eigene, start)` ist für alle vier
+`None`, weil kein Preis am oder vor dem Stichtag existiert. **Mehr Katalogpflege
+löst das nicht** — die Sektion füllt sich erst mit einem Marktstart, der IN unser
+Messfenster fällt, realistisch ab Mitte Oktober (30 Tage nach dem Apple-Event am
+9. September).
+
+**Entscheidung (Antonio, auf Vorlage des Leads): ehrliche Fassung, Rechnung
+vorbereiten.** Gebaut werden (1) die Schwelle je Gerät wie dokumentiert, (2) die
+fehlende Hälfte des Nachfolger-Effekts als Rechnung mit Test gegen konstruierte
+Daten, (3) ein sichtbarer Satz, warum die Sektion leer ist und ab wann sie füllt.
+Die Schwellen werden **nicht** an die heutige Datenlage gesenkt — zwei Messpunkte
+ergeben eine Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend.
+
+**Nebenbefund:** `MIND_TERMINE_JE_GERAET` heißt „je Gerät" und der Kommentar
+(`geraete_lifecycle.py:62`) sagt es ausdrücklich — `_oft_genug()` (:335) zählt aber
+je **Anbieter**. Docstring und Code widersprechen sich.
