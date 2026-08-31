@@ -491,6 +491,32 @@ def serie_aus_modell(modell: str) -> str:
     return " ".join(teile).strip() or (modell or "").strip()
 
 
+# Womit die Teile eines mehrteiligen Kennzeichens im Text verbunden sein
+# duerfen. Der Handel schreibt dasselbe Wort als "B-Ware", "B Ware" und
+# "2. Wahl"; `normalisiere()` faltet all das ohnehin auf einen Bindestrich,
+# die Wortliste in `_ZUSTAENDE` steht deshalb in dieser einen Schreibweise.
+_ZUSTAND_TRENNER = r"[\s._\-]+"
+
+
+def _zustandsmuster(wort: str) -> str:
+    """Das Suchmuster fuer ein Kennzeichen der Wortliste.
+
+    Jedes Teilwort maskiert, die Teile mit `_ZUSTAND_TRENNER` verbunden -
+    "b-ware" trifft damit "B-Ware", "B Ware" und "b.ware".
+
+    Bis zum 31.08.2026 stand hier eine Kette aus zwei `.replace()` auf dem
+    Ergebnis von `re.escape`, und die zweite zerlegte die erste: aus
+    "b-ware" wurde `b[\s[\s-]]ware` - eine Zeichenklasse plus ein literales
+    "]", das in keiner Farbe steht. SECHS der neun Kennzeichen waren damit
+    tot ("b-ware", "wie-neu", "second-hand", "open-box", "zweite-wahl",
+    "2-wahl", "geprueft-und-zertifiziert"), und aufgefallen ist es nicht,
+    weil der Livebestand zufaellig nur die einwortigen "erneuert" und
+    "gebraucht" fuehrt. Ein Muster wird deshalb aus den TEILEN gebaut und
+    nicht aus dem fertigen Ergebnis nachtraeglich repariert.
+    """
+    return _ZUSTAND_TRENNER.join(re.escape(teil) for teil in wort.split("-"))
+
+
 def ohne_zustandswort(farbe: str) -> str:
     """Die Farbe ohne das Zustandskennzeichen.
 
@@ -506,6 +532,18 @@ def ohne_zustandswort(farbe: str) -> str:
     Bleibt nach dem Streichen nichts uebrig, wird die Farbe UNVERAENDERT
     zurueckgegeben: eine geleerte Farbe verloere die Dimension, und zwei
     verschiedene Geraete teilten sich eine ID.
+
+    WURDE NICHTS GESTRICHEN, wird die Farbe unveraendert zurueckgegeben -
+    Zeichen fuer Zeichen. Das Aufraeumen der Interpunktion haengt seit dem
+    31.08.2026 daran, und zwar weil es sonst Farben beschaedigt, die nie ein
+    Kennzeichen trugen: `.strip(" -,;/()[]")` lief unbedingt und machte aus
+    "Silver Shadow (Enterprise Edition)" ein "Silver Shadow (Enterprise
+    Edition" - eine geoeffnete Klammer, die nie geschlossen wird. Die Zeile
+    steht so im Livebestand (mobilcom-debitel, Galaxy S25 128 GB) und im
+    CSV-Export. Solange nur `lies_listung` diese Funktion rief, fiel das
+    nicht auf; seit `report.geraete_bereinigung` den GANZEN Bestand
+    hindurchschickt, waere es ausgeliefert worden. Aufgeraeumt wird nur, wo
+    tatsaechlich ein Loch entstanden ist.
     """
     roh = (farbe or "").strip()
     if not roh:
@@ -515,15 +553,17 @@ def ohne_zustandswort(farbe: str) -> str:
     # hat in der sku_id nichts verloren.
     woerter = [w for _, gruppe in _ZUSTAENDE for w in gruppe] + list(_UNSICHER)
     rest = roh
+    getroffen = 0
     for wort in sorted(woerter, key=len, reverse=True):
-        # Ein Bindestrich im Muster steht fuer "Bindestrich ODER Leerzeichen"
-        # ("wie-neu" trifft auch "wie neu"). `re.escape` maskiert den
-        # Bindestrich, deshalb wird die maskierte Form ersetzt; faellt diese
-        # Maskierung in einer kuenftigen Python-Fassung weg, greift der
-        # zweite Zweig.
-        muster = re.escape(wort).replace(r"\-", r"[\s\-]").replace("-", r"[\s\-]")
-        rest = re.sub(rf"(?<![a-z0-9]){muster}(?![a-z0-9])", " ", rest,
-                      flags=re.IGNORECASE)
+        rest, treffer = re.subn(
+            rf"(?<![a-z0-9]){_zustandsmuster(wort)}(?![a-z0-9])", " ", rest,
+            flags=re.IGNORECASE)
+        getroffen += treffer
+    # KEIN Kennzeichen gefunden: die Farbe geht unveraendert zurueck. Siehe
+    # Docstring - alles andere waere eine Aenderung an Daten, ueber die diese
+    # Funktion nichts weiss.
+    if not getroffen:
+        return roh
     # Was ein gestrichenes Wort an Klammern und Kommas zuruecklaesst, ist
     # keine Farbe: "Schwarz (gebraucht)" wurde sonst zu "Schwarz ( )" - und
     # landete genau so im Farbbericht, den diese Funktion sauber halten soll.
