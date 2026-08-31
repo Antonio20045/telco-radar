@@ -748,6 +748,54 @@ def test_ohne_zustandswort_raeumt_auch_die_interpunktion_ab(roh, erwartet):
     assert ohne_zustandswort(roh) == erwartet
 
 
+@pytest.mark.parametrize("farbe", [
+    # Der Fall, der die Regel erzwungen hat: `.strip(" -,;/()[]")` lief bis
+    # zum 31.08.2026 unbedingt und machte hieraus "Silver Shadow (Enterprise
+    # Edition" - eine geoeffnete Klammer, die nie geschlossen wird. Die Zeile
+    # steht so im Livebestand (mobilcom-debitel, Galaxy S25 128 GB) und im
+    # CSV-Export. Solange nur `lies_listung` diese Funktion rief, fiel es
+    # nicht auf; seit `report.geraete_bereinigung` den GANZEN Bestand
+    # hindurchschickt, waere es ausgeliefert worden.
+    "Silver Shadow (Enterprise Edition)",
+    "Blau [Sondermodell]",
+    "Grau,",
+    "Titan Natur -",
+    "Blau/Grau",
+])
+def test_eine_farbe_ohne_kennzeichen_kommt_zeichengenau_zurueck(farbe):
+    """Wo nichts gestrichen wurde, wird auch nichts aufgeraeumt. Das
+    Aufraeumen der Interpunktion ist die FOLGE einer Streichung, kein
+    eigener Zweck - es hat keine Regel darueber, wie eine Farbe auszusehen
+    hat."""
+    assert ohne_zustandswort(farbe) == farbe
+
+
+@pytest.mark.parametrize("roh,erwartet", [
+    # Jedes mehrteilige Kennzeichen der Wortliste einzeln, in beiden
+    # Schreibweisen des Handels. Bis zum 31.08.2026 traf KEINES davon: der
+    # Musterbau zerlegte sein eigenes Ergebnis zu `b[\s[\s-]]ware`, einer
+    # Zeichenklasse plus einem literalen "]". Sechs von neun Kennzeichen
+    # waren damit tot, und aufgefallen ist es nicht, weil der Livebestand
+    # zufaellig nur die einwortigen "erneuert" und "gebraucht" fuehrt.
+    ("Schwarz B-Ware", "Schwarz"),
+    ("Schwarz B Ware", "Schwarz"),
+    ("Schwarz wie-neu", "Schwarz"),
+    ("Schwarz wie neu", "Schwarz"),
+    ("Grau second-hand", "Grau"),
+    ("Grau second hand", "Grau"),
+    ("Blau Open-Box", "Blau"),
+    ("Blau open box", "Blau"),
+    ("Schwarz zweite-Wahl", "Schwarz"),
+    ("Schwarz zweite Wahl", "Schwarz"),
+    ("Blau 2-Wahl", "Blau"),
+    ("Titan Natur (2. Wahl)", "Titan Natur"),
+    ("Grau geprueft-und-zertifiziert", "Grau"),
+    ("Grau geprueft und zertifiziert", "Grau"),
+])
+def test_auch_ein_mehrteiliges_kennzeichen_faellt_aus_der_farbe(roh, erwartet):
+    assert ohne_zustandswort(roh) == erwartet
+
+
 def test_ein_unbekannter_zustand_wird_abgewiesen():
     """Seit der Zustand ueber die Sichtbarkeit in Vergleich und Preisgrafik
     entscheidet, laesst ein Adapter mit "Neu" statt "neu" seine Listungen
