@@ -1,0 +1,26 @@
+Sitemap: https://www.klarmobil.de/sitemap.xml
+Sitemap: https://www.klarmobil.de/mic/sitemap.xml
+
+User-agent: *
+Disallow: /cc/
+Disallow: /error/
+Disallow: /handyshop/
+Disallow: /images/
+Disallow: /kmadmin/
+Disallow: /login/
+Disallow: /tracking/
+Disallow: /order.php
+Disallow: /wartung/
+Disallow: /snippets/
+Disallow: /shop/cart/
+Disallow: /shop/checkout/
+Disallow: /shop/my-account/
+Disallow: /shop/personal-data/
+Disallow: /shop/compare/
+Disallow: /shop/rest/
+Disallow: /shop/ws410/
+Disallow: /shop/*?q=*
+Disallow: /shop/*?sort=*
+Disallow: /shop/*?*&sort=*
+Disallow: /shop/*?text=*
+Disallow: /shop/*?*&text=*

@@ -1,0 +1,22 @@
+User-agent: *
+Disallow: /bestelldaten/
+Disallow: /bestellung/
+Disallow: /warenkorb/
+Disallow: /snippets/
+Disallow: /sitecfg/
+Disallow: /meta/
+Disallow: /*?*pagina=*
+
+User-agent: googlebot
+Disallow: /bestelldaten/
+Disallow: /bestellung/
+Disallow: /warenkorb/
+Disallow: /snippets/
+Disallow: /sitecfg/
+Disallow: /meta/
+Disallow: /are-wp/
+Disallow: /e-shop/directbuy/
+Disallow: /mein-blau/
+Disallow: /suche/
+Disallow: /*?*pagina=*
+
