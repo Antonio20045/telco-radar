@@ -57,9 +57,10 @@
     <td><span class="gr-a-modell">{{ z.modell }}</span>
       <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
         %}Speicher unbekannt{% endif %}</span></td>
-    <td>{{ z.bester.laden }}<a class="gr-a-quelle" href="{{ z.bester.url }}"
-        rel="noopener" title="Quelle beim Anbieter öffnen"
-        aria-label="Quelle bei {{ z.bester.laden }} öffnen">↗</a>
+    <td>{% if z.bester.url %}<a class="gr-a-quelle" href="{{ z.bester.url }}"
+        rel="noopener" title="Quelle bei {{ z.bester.laden }} öffnen">{{
+        z.bester.laden }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+      {% else %}{{ z.bester.laden }}{% endif %}
       {% if z.auffaellig %}<span class="gr-a-warnung">ungewöhnlich großer
         Abstand – Quelle prüfen</span>{% endif %}</td>
     <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{
@@ -335,12 +336,19 @@
   was aus dem Preisvergleich fällt, verschwindet nicht, es wird nur nicht
   gegen etwas gerechnet, das es nicht ist. Zwei Schreibweisen derselben
   Listung stehen dabei als eine Zeile.</p>
-  {# KEINE Zustandsvorbelegung. Reiter 1 filtert auf "neu", weil er
-     vergleicht; dieser Reiter zeigt den Bestand und sagt das im Satz
-     darueber. Mit der Vorbelegung liefen drei Zahlen auseinander: die
-     Ueberschrift zaehlte 352, sichtbar waren 12 statt 18 (die Sortierung
-     nach Preis zieht gebrauchte Geraete nach oben, der Filter versteckte
-     sie), und der Knopf versprach 352, lieferte aber 341. #}
+  {# ZUSTAND=NEU VORBELEGT (B5, 31.08.2026) - diesmal ohne die drei
+     auseinanderlaufenden Zahlen vom 30.08. (Commit 79085f0): damals stand
+     "neu" im <select>, waehrend die SORTIERUNG unveraendert alphabetisch
+     blieb - der Deckel schnitt die unfilterte Liste bei zwoelf ab, und erst
+     DANACH versteckte der Filter einen Teil davon, sodass sichtbar weniger
+     als der Deckel versprach. `katalogzeilen()` sortiert seitdem
+     "neu" komplett vor den Rest (siehe dortiger Kommentar) - der Deckel
+     schneidet also nie mehr mitten durch eine gemischte Gruppe, und die
+     Vorbelegung hier versteckt serverseitig sichtbar gerenderte Zeilen
+     nicht mehr weg, sie bestaetigt nur, was ohnehin oben steht. Ueberschrift,
+     Deckel und "alle anzeigen" lesen weiterhin dieselbe, UNGEFILTERTE
+     Gesamtzahl - nur die Reihenfolge hat sich geaendert, keine Zeile ist
+     verschwunden. #}
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
     <label class="gr-fbox"><span>Marke</span>
@@ -369,7 +377,7 @@
         <option value="">alle</option>
         {% for z in geraete.katalogtabelle | map(attribute='zustand')
               | unique | sort %}
-        <option value="{{ z }}">{{ z }}</option>{% endfor %}
+        <option value="{{ z }}"{{ ' selected' if z == 'neu' }}>{{ z }}</option>{% endfor %}
       </select></label>
     <label class="gr-fbox gr-fbox--weit"><span>Suche</span>
       <input type="search" data-filter="suche" placeholder="Modell, Farbe, Anbieter …"></label>
@@ -413,9 +421,11 @@
           <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
             %}Speicher unbekannt{% endif %}</span></td>
         <td>{{ z.farbe or '–' }}</td>
-        <td>{{ z.anbieter }}{% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}
-          {% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
-             aria-label="Quelle bei {{ z.anbieter }}">↗</a>{% endif %}</td>
+        <td>{% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
+             title="Quelle bei {{ z.anbieter }} öffnen">{{ z.anbieter }}<span
+             class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}{{ z.anbieter }}{% endif %}
+          {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
         <td class="num">{% if z.preis is not none
           %}{{ '%.2f'|format(z.preis)|replace('.', ',') }} €{% elif z.zuzahlung is not none
           %}{{ '%.2f'|format(z.zuzahlung)|replace('.', ',') }} €

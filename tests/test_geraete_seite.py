@@ -562,6 +562,53 @@ def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
         assert verboten not in roh.lower(), verboten
 
 
+def test_katalogzeilen_stellt_neu_komplett_vor_den_rest_und_mischt_hersteller():
+    """B5 (31.08.2026): die Standardansicht oeffnete auf zwoelf Apple-Zeilen
+    bei o2 - reine Gruppierung nach Hersteller, alphabetisch beginnend bei
+    "Apple". `katalogzeilen()` sortiert seitdem "neu" komplett vor den Rest
+    und reihum je Hersteller (`_interleave_je_hersteller`, dieselbe Technik
+    wie `pipeline._interleave_by_source`).
+
+    Unit-Test auf `katalogzeilen()` selbst, nicht ueber die gerenderte Seite:
+    schneller, und er trifft die Rechnung, nicht nur ihr HTML-Abbild. Die
+    Zusicherung fuer die ECHTE Bildschirmseite (Pixel, drei Hersteller ohne
+    Scrollen) steht in `tests/test_geraete_reiter_browser.py`.
+    """
+    from telco_radar.geraete_model import Geraet, Katalog, device_id
+
+    katalog = Katalog(geraete=[
+        Geraet(hersteller=h, modell=f"{h} Modell", generation=1)
+        for h in ("Apple", "Samsung", "Google")
+    ])
+
+    def _e(hersteller, zustand="neu"):
+        return {"device_id": device_id(hersteller, f"{hersteller} Modell"),
+                "anbieter": "Medimax", "preis_ohne_vertrag": 1.0,
+                "zuzahlung": None, "speicher_gb": 256, "farbe_roh": "Schwarz",
+                "farbe_normalisiert": "schwarz", "zustand": zustand,
+                "verfuegbarkeit": "lieferbar", "quelle_url": "", "abgerufen_am": ""}
+
+    # Vier Apple-Zeilen zuerst in der Eingabe - wie im echten Bestand, wo
+    # "Apple" alphabetisch zuerst kommt - dazwischen je eine gebrauchte
+    # Zeile von Samsung und Google.
+    eintraege = ([_e("Apple")] * 4 + [_e("Samsung", "refurbished")]
+                + [_e("Google", "refurbished")] + [_e("Samsung")] + [_e("Google")])
+    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
+
+    assert len(zeilen) == len(eintraege), (
+        "eine Umsortierung darf keine Zeile verlieren")
+    zustaende = [z["zustand"] for z in zeilen]
+    erster_rest = zustaende.index("refurbished")
+    assert set(zustaende[:erster_rest]) == {"neu"}, (
+        "die neu-Zeilen stehen nicht mehr komplett vor dem Rest")
+    assert "neu" not in zustaende[erster_rest:], (
+        "eine neu-Zeile ist hinter den Rest gerutscht")
+    # Reihum: unter den ersten drei neu-Zeilen sind schon drei Hersteller,
+    # nicht viermal Apple.
+    erste_drei = {z["hersteller"] for z in zeilen[:3]}
+    assert erste_drei == {"Apple", "Samsung", "Google"}, zeilen[:3]
+
+
 def test_der_katalog_ist_eine_flache_tabelle(tmp_path):
     """Reiter 2 zeigt seit dem 30.08.2026 EINE Zeile je (Gerät, Speicher,
     Farbe, Anbieter) statt einer Matrix mit 65 Aufklappern.
