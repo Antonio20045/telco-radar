@@ -1087,7 +1087,24 @@ def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
 
     Der Testbestand hat genau zwei Messpunkte an zwei Tagen - unter der
     Schwelle. Gegen den alten Stand gemessen stuenden hier Zeilen mit
-    "0 Tage" und "+0.0 %"."""
+    "0 Tage" und "+0.0 %".
+
+    Die Pruefung war bis zum 31.08.2026 eine reine Teilkettensuche
+    (`"0 Tage" not in text`) - ohne Wortgrenze traf sie auch "20 Tage",
+    "30 Tage" oder jede andere Zahl, die auf eine Null endet. Genau das
+    passierte, als der Nachfolger-Hinweis (P3) einen Satz mit "20 Tage"
+    in dieselbe Sektion brachte: der Test fiel durch, obwohl keine echte
+    "0 Tage"-Zeile auf der Seite stand. Repariert wird der TEST, nicht der
+    Satz - eine Zahl, die auf 0 endet, ist keine Null. Die Gegenprobe
+    unten haelt fest, dass eine ECHTE "0 Tage"-Zeile weiterhin durchfaellt,
+    sonst waere die Reparatur nur ein stummgeschalteter Test."""
+    import re
+
+    def _hat_echte_null(text: str, muster: str) -> bool:
+        # Negative Lookbehind auf eine Ziffer: "20 Tage" hat vor der "0"
+        # eine "2", eine echte Null hat davor keine Ziffer.
+        return re.search(rf"(?<!\d){re.escape(muster)}", text) is not None
+
     site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
     s = _suppe(site, "geraete.html")
     basis = s.select_one(".gr-basis")
@@ -1097,8 +1114,16 @@ def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
     assert not s.select(".gr-dauern li"), "Verweildauer ohne Datenbasis"
     assert not s.select(".gr-verfall li"), "Preisverfall ohne Datenbasis"
     text = s.select_one(".gr-lifecycle").get_text(" ", strip=True)
-    assert "0 Tage" not in text
-    assert "+0.0 %" not in text
+    # Gegenprobe zuerst: der Testbestand ENTHAELT "20 Tage" (aus dem
+    # Nachfolger-Hinweis) - waere die Pruefung noch die alte
+    # Teilkettensuche, faellt dieser Test schon hier durch.
+    assert "20 Tage" in text, "Testfall veraendert - Gegenprobe greift nicht"
+    assert not _hat_echte_null(text, "0 Tage"), text
+    assert not _hat_echte_null(text, "0.0 %"), text
+    # Gegenprobe, dass die Pruefung nicht zahnlos geworden ist: eine ECHTE
+    # Null-Zeile muss weiterhin auffallen.
+    assert _hat_echte_null("Verweildauer: 0 Tage bei Testshop", "0 Tage")
+    assert _hat_echte_null("Preisverfall: +0.0 % seit gestern", "0.0 %")
     # Und die zwei Textfehler von damals kommen nicht zurueck.
     assert "1 Wochen" not in text
     assert "ueber" not in text
@@ -2017,64 +2042,89 @@ def test_eine_ruhige_woche_erzeugt_unter_kurzem_vorlauf_gar_keine_karte(tmp_path
 
 
 # ==========================================================================
-# P3 (31.08.2026): "Was der Nachfolger mit dem Preis macht" - der Hinweis,
-# wenn die Sektion leer ist, und die Verweildauer-Spalte, wenn sie es nicht
-# ist. `analyze/geraete_lifecycle.py` ist hier bewusst NICHT angefasst - ein
-# Parallelpaket liefert dort `verweildauer_tage`, `verweildauer_untergrenze`,
-# `noch_gelistet` und `anbieter` (gelandet waehrend dieser Sitzung). Die
-# Vorlage liest sie trotzdem ausschliesslich per `.get(...)`, nie per
-# Punktzugriff - eine fehlende Angabe darf nie zu einer Ausnahme werden.
+# P3 (31.08.2026, nach Runde 1 der Zurueckweisung): "Was der Nachfolger mit
+# dem Preis macht" - der Hinweis, wenn die Sektion leer ist, die
+# Verweildauer-Spalte, wenn sie es nicht ist, und der Zeilendeckel gegen die
+# 3000-px-Grenze. `analyze/geraete_lifecycle.py` ist hier bewusst NICHT
+# angefasst - ein Parallelpaket liefert dort `anbieter`, `zustand`,
+# `verweildauer_tage`, `verweildauer_untergrenze`, `noch_gelistet`,
+# `beobachtet_seit` und `zuletzt_bestaetigt` je Zeile.
 # ==========================================================================
 
-def test_die_leere_nachfolger_sektion_erklaert_sich(tmp_path):
-    """Mit dem Normalfall-Bestand (`_KATALOG`/`_PUNKTE`) bleibt die Sektion
-    leer: der einzige terminierte Nachfolger im Test-Katalog (iPhone 17 Pro
-    Max) hat kein `marktstart`, genau wie im echten Bestand vom 31.08.2026.
-    Eine leere Sektion ohne Erklaerung sieht wie ein Fehler aus; sie muss
-    sagen, was sie beantworten SOLL, warum sie heute nichts zeigt und wann
-    sie sich fuellt - mit einer Zahl, die aus den Daten kommt (seit wann
-    gemessen wird), nie mit einem geratenen Kalenderdatum.
-    """
+def test_b1_leer_hinweis_nennt_die_echte_beobachtungsschwelle(tmp_path):
+    """B1: nicht "kein Nachfolger im Messfenster", sondern die echte
+    Schwelle (`geraete_lifecycle.MIND_TAGE_JE_GERAET`) - und eine Zahl, die
+    an KEINER anderen Stelle der Sektion schon steht (B7)."""
+    from telco_radar.analyze import geraete_lifecycle as gl
+
     site = _baue(tmp_path)
     geraete = geraete_view.aufbereiten(
         tmp_path / "data" / "state", lade_quellen(tmp_path),
         lade_katalog(tmp_path), heute="2026-08-11")
-    # Gegenprobe: der Fall muss wirklich die leere Sektion treffen, sonst
-    # prueft der Test den falschen Zweig.
-    assert not geraete["lifecycle"]["nachfolger"], (
-        "Fixture liefert schon eine Nachfolger-Zeile - falscher Testfall")
+    assert not geraete["lifecycle"]["nachfolger"], "falscher Testfall"
+    text = geraete["lifecycle"]["nachfolger_hinweis"]
+
+    grenze = gl.MIND_TAGE_JE_GERAET
+    assert f"mindestens {grenze} Tage" in text, text
+    # Die alte, falsche Begruendung darf nicht wiederkommen.
+    assert "Messfenster" not in text
+    assert "kam" not in text or "Katalog kennt" not in text
 
     suppe = _suppe(site, "geraete.html")
     abschnitt = suppe.select_one("#lifecycle")
-    assert abschnitt.select_one("table.gr-nachfolger") is None, (
-        "eine leere Liste darf keine (leere) Tabelle rendern")
-
     ueberschrift = [h for h in abschnitt.select("h3.gr-unter")
                     if "Nachfolger" in h.get_text()]
-    assert ueberschrift, "die Ueberschrift der Sektion fehlt ganz"
-    hinweis = ueberschrift[0].find_next_sibling("p")
-    assert hinweis is not None, "kein erklaerender Satz nach der Ueberschrift"
-    text = hinweis.get_text(" ", strip=True)
+    assert ueberschrift, "die Ueberschrift fehlt"
+    absatz = ueberschrift[0].find_next_sibling("p")
+    assert absatz.get_text(" ", strip=True) == text
 
-    # 1. Was die Sektion beantworten wird.
-    assert "Vorjahresmodell" in text and "Nachfolger" in text
-    # 2. Warum sie heute nichts zeigt - MIT der Zahl aus den Daten (seit
-    #    wann gemessen wird: `_PUNKTE` beginnt am 01.07.2026), nicht mit
-    #    einer freien Behauptung.
-    assert "seit dem 01.07.2026" in text, text
-    # 3. Wann sie sich fuellt - ohne ein geratenes Kalenderdatum.
-    assert "Messfenster" in text
-    import re
-    assert not re.search(r"\bab dem \d", text), (
-        f"ein konkretes Kalenderdatum fuer den Fuellstand waere geraten: {text!r}")
+
+def test_b3_zaehlt_geraete_ohne_marktstart_statt_katalogpflege_abzuwerten(tmp_path):
+    """B3: die Behauptung "mehr Katalogpflege loest das nicht" war falsch
+    und ist gestrichen. Stattdessen zaehlt der Satz die betroffenen Geraete
+    - nachgerechnet gegen denselben Testkatalog, nicht angenommen."""
+    site = _baue(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    text = geraete["lifecycle"]["nachfolger_hinweis"]
+    assert "Katalogpflege" not in text
+    assert "löst das nicht" not in text
+
+    katalog = lade_katalog(tmp_path)
+    ids = {e["device_id"] for e in _DB["listungen"]}
+    ohne_datum = sum(
+        1 for gid in ids
+        if (nf := katalog.nachfolger_von(gid)) is not None
+        and not (nf.marktstart or "").strip())
+    assert ohne_datum >= 1, "Gegenprobe: der Testkatalog muss eine Luecke haben"
+    wort = "Gerät fehlt" if ohne_datum == 1 else "Geräten fehlt"
+    assert f"Bei {ohne_datum} {wort}" in text, text
+
+
+def test_b6_keine_tatsachenbehauptung_ueber_vodafone_oder_wettbewerb(tmp_path):
+    """B6: "waehrend es bei Vodafone meist direkt ersetzt wird" war eine
+    unbelegte Behauptung, die der eigene Bestand widerlegt (Vodafone fuehrt
+    das iPhone 15 selbst 710 Tage nach dem iPhone-16-Start). Weder im
+    leeren noch im gefuellten Zustand darf sie wiederkommen."""
+    site_leer = _baue(tmp_path / "leer")
+    html_leer = (site_leer / "geraete.html").read_text(encoding="utf-8")
+    site_voll = _baue_mit_nachfolger(tmp_path / "voll")
+    html_voll = (site_voll / "geraete.html").read_text(encoding="utf-8")
+
+    verboten = ["meist direkt ersetzt", "während es bei Vodafone",
+               "waehrend es bei Vodafone"]
+    for name, html in (("leer", html_leer), ("voll", html_voll)):
+        for fragment in verboten:
+            assert fragment not in html, (
+                f"unbelegte Behauptung im {name}-Zustand: {fragment!r}")
 
 
 def _katalog_mit_terminiertem_nachfolger(marktstart: str):
     """Ein eigenstaendiger Katalog (nicht `_KATALOG`): ein Vorgaenger, dessen
     Nachfolger einen `marktstart` traegt - der Fall, den es im echten
-    Bestand vom 31.08.2026 noch nicht gibt (dort fehlt er allen vier
-    Kandidaten, siehe CLAUDE.md), den die Vorlage aber tragen muss, sobald
-    er eintritt."""
+    Bestand noch nicht gibt, den die Vorlage aber tragen muss, sobald er
+    eintritt."""
     from telco_radar.geraete_model import device_id as did
     return {"geraete": [
         {"hersteller": "Testmarke", "modell": "Fon X", "generation": 1,
@@ -2089,9 +2139,10 @@ def _baue_mit_nachfolger(tmp_path: Path, marktstart: str = "2026-01-01",
                          status: str = "vermutlich ausgelistet"):
     """Wie `_baue()`, aber mit einem eigenen Katalog und einer Preishistorie
     des Vorgaengers, die vier Messtage ueber mindestens 21 Tage traegt -
-    genau die Schwelle, hinter der die Nachfolger-Zeile seit dem 31.08.2026
-    steht (`geraete_lifecycle._belastbar`). Ohne sie bleibt die Sektion leer,
-    egal was in der Vorlage steht."""
+    genau die Schwelle, hinter der die Nachfolger-Zeile steht
+    (`geraete_lifecycle._belastbar`). "vermutlich ausgelistet" statt
+    "ausgelistet", damit die Listung SICHTBAR bleibt (`_SICHTBAR`) und die
+    Seite nicht in ihren Leerzustand faellt."""
     katalog, v_id, _ = _katalog_mit_terminiertem_nachfolger(marktstart)
     root = tmp_path
     (root / "config").mkdir(parents=True, exist_ok=True)
@@ -2142,15 +2193,11 @@ def _baue_mit_nachfolger(tmp_path: Path, marktstart: str = "2026-01-01",
     return site
 
 
-def test_die_verweildauer_spalte_mit_realen_daten(tmp_path):
-    """Marktstart des Nachfolgers am 01.01.2026, eigene Messung erst ab dem
-    25.06.2026: die Beobachtung beginnt NACH dem Marktstart, also ist die
-    Verweildauer eine Untergrenze - genau der Fall, den CLAUDE.md fuer alle
-    vier heutigen Kandidaten beschreibt. Die Listung ist zudem "vermutlich
-    ausgelistet" (die erste Stufe der Zwei-Stufen-Auslistung, noch
-    sichtbar) statt "aktiv", damit auch der `noch_gelistet`-Zweig eine echte
-    Zeile durchlaeuft - vollstaendig "ausgelistet" faellt aus `_SICHTBAR`
-    heraus und liesse die ganze Seite in ihren Leerzustand fallen."""
+def test_b2_spalte_zeigt_gemessenen_anteil_und_kollidiert_nicht_mit_verweildauer(tmp_path):
+    """B2: kein "mind." mehr (liest sich als Untergrenze, obwohl der
+    weitaus groesste Teil der Zahl unbelegt ist), sondern der wirklich
+    GEMESSENE Anteil daneben. Und die Spalte heisst nicht "Verweildauer" -
+    der Reiter traegt bereits eine Liste dieses Namens."""
     site = _baue_mit_nachfolger(tmp_path, marktstart="2026-01-01",
                                 status="vermutlich ausgelistet")
     geraete = geraete_view.aufbereiten(
@@ -2159,46 +2206,189 @@ def test_die_verweildauer_spalte_mit_realen_daten(tmp_path):
     eff = geraete["lifecycle"]["nachfolger"]
     assert eff, "die Fixture muss eine echte Nachfolger-Zeile liefern"
     n = eff[0]
-    # Gegenprobe: der Fall muss wirklich die Untergrenze treffen, sonst
-    # prueft der Test den falschen Zweig.
     assert n["verweildauer_untergrenze"] is True, n
-    assert n["noch_gelistet"] is False, n
-    assert n["verweildauer_tage"] == 222, n  # 01.01. -> 11.08.2026
+    assert n["verweildauer_tage"] == 222, n       # 01.01. -> 11.08.2026
+    assert n["beobachtet_tage"] == 47, n          # 25.06. -> 11.08.2026
+
+    suppe = _suppe(site, "geraete.html")
+    abschnitt = suppe.select_one("#lifecycle")
+    tabelle = abschnitt.select_one("table.gr-nachfolger")
+    assert tabelle is not None, "die Tabelle haette entstehen muessen"
+
+    kopf_text = tabelle.select_one("thead").get_text()
+    assert "Seit dem Nachfolger" in kopf_text
+    assert "Verweildauer" not in kopf_text
+    assert "Anbieter" in kopf_text
+
+    zeile = tabelle.select("tbody tr")[0]
+    zellen = zeile.select("td")
+    text_ganze_zeile = zeile.get_text(" ", strip=True)
+    assert "222" in text_ganze_zeile and "47" in text_ganze_zeile
+    assert "davon" in text_ganze_zeile and "gemessen" in text_ganze_zeile
+    assert "mind." not in text_ganze_zeile
+    # Anbieter steht jetzt in einer EIGENEN Spalte, nicht mehr zusaetzlich
+    # im Text der letzten Zelle ("bei Medimax" waere doppelt gemoppelt).
+    assert zellen[1].get_text(strip=True) == "Medimax"
+    assert "Medimax" not in zellen[-1].get_text()
+
+    # Kollisionspruefung: "Verweildauer" darf in dieser Tabelle nirgends
+    # stehen - nur in der Liste "Verweildauer im Regal" darueber.
+    assert "Verweildauer" not in tabelle.get_text()
+
+
+def test_die_zustandsspalte_erscheint_nur_bei_mehr_als_einem_zustand(tmp_path):
+    """Eine Spalte, die immer "neu" sagt, ist Ballast - sie erscheint nur,
+    wenn wirklich ein zweiter Zustand vorkommt.
+
+    `effekte` liefert heute ausschliesslich vergleichbare Zustaende ("neu");
+    ein zweiter Zustand ist ein Zukunftsfall, den nur ein Monkeypatch
+    erzeugen kann - genau dafuer ist er hier."""
+    # Fall 1: alle Zeilen "neu" (Standard von `_listung()`) - keine Spalte.
+    site = _baue_mit_nachfolger(tmp_path / "einheitlich")
+    suppe = _suppe(site, "geraete.html")
+    tabelle = suppe.select_one("table.gr-nachfolger")
+    assert "Zustand" not in tabelle.select_one("thead").get_text()
+
+
+def test_die_zustandsspalte_erscheint_bei_einem_zweiten_zustand(tmp_path, monkeypatch):
+    """Gegenprobe zum Test oben: kommt ein zweiter Zustand vor, MUSS er
+    sichtbar werden."""
+    echt = geraete_view.geraete_lifecycle.auswertung
+
+    def _zwei_zustaende(*args, **kwargs):
+        erg = echt(*args, **kwargs)
+        eff = list(erg["nachfolger"])
+        if eff:
+            zweite = dict(eff[0])
+            zweite["anbieter"] = "o2"
+            zweite["zustand"] = "refurbished"
+            eff.append(zweite)
+        erg["nachfolger"] = eff
+        return erg
+
+    monkeypatch.setattr(geraete_view.geraete_lifecycle, "auswertung",
+                        _zwei_zustaende)
+    site = _baue_mit_nachfolger(tmp_path)
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
+    zustaende = {n.get("zustand") for n in geraete["lifecycle"]["nachfolger"]}
+    assert len(zustaende) == 2, (
+        f"Gegenprobe: die Fixture muss zwei Zustaende liefern, hat {zustaende}")
 
     suppe = _suppe(site, "geraete.html")
     tabelle = suppe.select_one("table.gr-nachfolger")
-    assert tabelle is not None, "die Tabelle haette entstehen muessen"
-    zeile = tabelle.select("tbody tr")[0]
-    zelle = zeile.select("td")[-1]
-    text = zelle.get_text(" ", strip=True)
+    assert tabelle is not None
+    assert "Zustand" in tabelle.select_one("thead").get_text()
+    zeilen_texte = [tr.get_text(" ", strip=True)
+                    for tr in tabelle.select("tbody tr")]
+    assert any("refurbished" in t for t in zeilen_texte), zeilen_texte
 
-    assert "222" in text and "Tage" in text, text
-    # Die Untergrenze MUSS sichtbar werden - kein "222 Tage", das wie eine
-    # fertige Messung aussieht.
-    assert "mind." in text, f"die Untergrenze fehlt in der Zelle: {text!r}"
-    assert "Medimax" in text, text
-    assert "ausgelistet" in text, text
 
-    # Der leer-Hinweis darf jetzt NICHT mehr erscheinen - die Sektion hat
-    # eine echte Tabelle, keinen Ersatztext daneben.
+def test_b4_die_tabelle_bleibt_unter_der_hoehengrenze_bei_vielen_zeilen(tmp_path):
+    """B4: die Tabelle war die einzige Liste des Reiters ohne Zeilendeckel
+    und riss die 3000-px-Grenze. `NACHFOLGER_SICHTBAR` steht auf 0 (siehe
+    Modulkommentar fuer die Messreihe) - bei vielen Zeilen erscheint deshalb
+    GAR KEIN Tabellenkopf oberhalb der Falz, sondern EIN Aufklapper mit der
+    vollstaendigen Tabelle. Dieser Test prueft die STRUKTUR (Zeilendeckel
+    greift, Hoehe waechst nicht unbegrenzt mit dem Bestand); die tatsaechliche
+    Pixelzahl haelt `scripts/pruefe_portal.py` fest (siehe Bericht)."""
+    katalog_geraete = []
+    listungen = []
+    punkte = []
+    from telco_radar.geraete_model import device_id as did
+    n = 9  # mehr als jeder bisherige LIFECYCLE_SICHTBAR-Wert
+    for i in range(1, n + 1):
+        katalog_geraete.append({"hersteller": "Testmarke", "modell": f"Fon {i}X",
+                                "generation": i, "marktstart": "2025-06-01",
+                                "speicher": [128], "segment": "mid"})
+        katalog_geraete.append({"hersteller": "Testmarke", "modell": f"Fon {i}Y",
+                                "generation": i, "vorgaenger": f"Fon {i}X",
+                                "marktstart": "2026-01-01",
+                                "speicher": [128], "segment": "mid"})
+        vid = did("Testmarke", f"Fon {i}X")
+        sku = f"{vid}-128gb-schwarz"
+        listungen.append(_listung("Medimax", vid, sku, 450.0, farbe="schwarz",
+                                  speicher=128))
+        lid = f"medimax--{sku}"
+        for datum, preis in (("2026-07-15", 440.0), ("2026-07-25", 430.0)):
+            punkte.append({"listung_id": lid, "device_id": vid,
+                           "anbieter": "Medimax", "datum": datum,
+                           "preis_ohne_vertrag": preis,
+                           "verfuegbarkeit": "lieferbar",
+                           "quelle_url": "https://example.de/p"})
+    root = tmp_path
+    (root / "config").mkdir(parents=True, exist_ok=True)
+    for name, daten in (("geraete_katalog.yaml", {"geraete": katalog_geraete}),
+                        ("farben.yaml", _FARBEN),
+                        ("geraete_quellen.yaml", _QUELLEN)):
+        (root / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+    state = root / "data" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    db = {"updated": "2026-08-11",
+         "anbieter": {"Medimax": {"laeufe": 4, "funde_gesamt": n}},
+         "listungen": listungen}
+    (state / "geraete_db.json").write_text(json.dumps(db), encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text(
+        "\n".join(json.dumps(p) for p in punkte) + "\n", encoding="utf-8")
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / "2026-08-11.json").write_text(json.dumps({
+        "date": "2026-08-11", "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+        "stats": {}, "regions": [],
+    }), encoding="utf-8")
+    (reports / "2026-08-11.md").write_text("# Bericht\n", encoding="utf-8")
+    site = root / "site"
+    render_site(site, reports)
+
+    geraete = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute="2026-08-11")
+    eff = geraete["lifecycle"]["nachfolger"]
+    assert len(eff) == n, (
+        f"Gegenprobe: die Fixture muss {n} Nachfolger-Zeilen liefern, hat {len(eff)}")
+
+    suppe = _suppe(site, "geraete.html")
     abschnitt = suppe.select_one("#lifecycle")
-    hinweise = [p for p in abschnitt.select("p.gr-erklaer")
-               if "Diese Tabelle soll zeigen" in p.get_text()]
-    assert not hinweise, "der Leer-Hinweis und die Tabelle stehen gleichzeitig"
+    tabellen = abschnitt.select("table.gr-nachfolger")
+    # NACHFOLGER_SICHTBAR = 0: keine sichtbare Tabelle OBERHALB des
+    # Aufklappers - nur genau EINE, und die steht IM Aufklapper.
+    assert len(tabellen) == 1, (
+        f"erwartet genau eine Tabelle (im Aufklapper), gefunden {len(tabellen)}")
+    aufklapper = abschnitt.select_one("details.gr-mehrliste:has(table.gr-nachfolger)")
+    assert aufklapper is not None, "die Tabelle muss im Aufklapper stehen"
+    assert str(n) in aufklapper.select_one("summary").get_text()
+    assert len(aufklapper.select("tbody tr")) == n
+
+    # Gegenprobe zur Zahlenregel (CLAUDE.md, 30.08.2026-Vorfall): zwei
+    # Zahlen ohne Zeichen dazwischen lesen sich im Browser als EINE. Geprueft
+    # wird OHNE Trenner (`get_text()`, kein `get_text(" ")`) - genau die
+    # Zeichenkette, die im Browser steht.
+    for tr in aufklapper.select("tbody tr")[:2]:
+        letzte_zelle = tr.select("td")[-1].get_text()
+        assert "222 Tage" in letzte_zelle, letzte_zelle
+        assert "davon 41 Tage" in letzte_zelle, letzte_zelle
+        # "22241" waere die verschmolzene Form der beiden Zahlen oben -
+        # sie darf in der ECHTEN Browser-Zeichenkette nicht vorkommen.
+        assert "22241" not in letzte_zelle, letzte_zelle
 
 
 def test_die_zelle_uebersteht_fehlende_verweildauer_felder(tmp_path, monkeypatch):
-    """`.get(...)` statt Punktzugriff: eine Zeile ohne die vier neuen Felder
-    (der Stand vor dem Parallelpaket, oder ein kuenftiger Aufrufer, der sie
-    nicht liefert) darf die Seite nicht mit einer Ausnahme zum Absturz
-    bringen - die Zelle zeigt still einen Gedankenstrich."""
+    """`.get(...)` statt Punktzugriff: eine Zeile ohne die neuen Felder
+    (kuenftiger Aufrufer, der sie nicht liefert) darf die Seite nicht mit
+    einer Ausnahme zum Absturz bringen - die Zelle zeigt still einen
+    Gedankenstrich, `noch_gelistet` wird bei einem fehlenden Feld NICHT
+    stillschweigend zu "steht noch im Regal" (B8)."""
     echt = geraete_view.geraete_lifecycle.auswertung
 
     def _ohne_die_neuen_felder(*args, **kwargs):
         ergebnis = echt(*args, **kwargs)
         for eintrag in ergebnis["nachfolger"]:
             for feld in ("verweildauer_tage", "verweildauer_untergrenze",
-                        "noch_gelistet", "anbieter"):
+                        "noch_gelistet", "anbieter", "beobachtet_seit",
+                        "zuletzt_bestaetigt"):
                 eintrag.pop(feld, None)
         return ergebnis
 
@@ -2210,20 +2400,42 @@ def test_die_zelle_uebersteht_fehlende_verweildauer_felder(tmp_path, monkeypatch
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None, "auch ohne die neuen Felder muss die Zeile stehen"
     zeile = tabelle.select("tbody tr")[0]
-    zelle = zeile.select("td")[-1]
-    assert zelle.get_text(strip=True) == "–", (
-        f"ohne die neuen Felder erwartet: '–', bekommen: {zelle.get_text()!r}")
-    # Die Kopfzelle steht trotzdem - nur die Zeile bleibt leer.
-    assert "Verweildauer" in tabelle.select_one("thead").get_text()
+    zellen = zeile.select("td")
+    assert zellen[-1].get_text(strip=True) == "–", (
+        f"ohne die neuen Felder erwartet: '–', bekommen: {zellen[-1].get_text()!r}")
+    # Anbieter-Spalte: fehlt der Wert, steht dort ein Gedankenstrich, nicht
+    # ein leerer Zellinhalt oder eine Ausnahme.
+    assert zellen[1].get_text(strip=True) == "–"
 
 
-def test_die_erklaerung_der_verweildauer_spalte_steht_einmal_im_fliesstext(tmp_path):
-    """"mind." je Zelle zu erklaeren waere eine Bedienungsanleitung auf
-    jeder Zeile (CLAUDE.md, Beruhigungsregeln). Der Satz steht genau einmal,
-    vor der Tabelle."""
+def test_die_zelle_uebersteht_kaputte_preis_und_datumsfelder(tmp_path, monkeypatch):
+    """Dieselbe Absicherung fuer `prozent`/`nach`/`marktstart` - keine
+    dieser drei Formatierungen darf auf einem fehlenden oder unpassenden
+    Wert eine Ausnahme werfen (B8: `prozent[30]=None` bei gesetztem Preis,
+    `nach`/`prozent` fehlen ganz, `marktstart=None`)."""
+    echt = geraete_view.geraete_lifecycle.auswertung
+
+    def _kaputte_felder(*args, **kwargs):
+        erg = echt(*args, **kwargs)
+        erg["nachfolger"] = [{
+            "device_id": "test-a", "nachfolger": "test-b",
+            "nachfolger_modell": "Test B", "marktstart": None,
+            "anbieter": "Testshop", "zustand": "neu", "basis": None,
+            "modell": "Test A",
+        }]
+        return erg
+
+    monkeypatch.setattr(geraete_view.geraete_lifecycle, "auswertung",
+                        _kaputte_felder)
     site = _baue_mit_nachfolger(tmp_path)
     suppe = _suppe(site, "geraete.html")
-    abschnitt = suppe.select_one("#lifecycle")
-    text = abschnitt.get_text(" ", strip=True)
-    assert text.count("Untergrenze") == 1, (
-        f"die Erklaerung soll genau einmal stehen, steht {text.count('Untergrenze')}x")
+    tabelle = suppe.select_one("table.gr-nachfolger")
+    assert tabelle is not None
+    zeile = tabelle.select("tbody tr")[0]
+    zellen = [td.get_text(" ", strip=True) for td in zeile.select("td")]
+    assert zellen[0] == "Test A"
+    assert zellen[1] == "Testshop"
+    # Kein Datum hinter "Test B" - `marktstart=None` durchlaeuft den
+    # Datumsfilter nicht.
+    assert "Test B" in zeile.get_text()
+    assert "None" not in zeile.get_text()

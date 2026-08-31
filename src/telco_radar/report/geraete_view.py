@@ -104,6 +104,33 @@ VORLAUF_TAGE = 28
 # geloescht.
 LIFECYCLE_SICHTBAR = 6
 
+# Die Nachfolger-Tabelle bekommt ihren EIGENEN Deckel, nicht LIFECYCLE_SICHTBAR
+# (B4/B4-Nachbesserung der Zurueckweisung vom 31.08.2026) - und er steht auf
+# NULL. Das ist keine Verlegenheitsloesung, sondern das Ergebnis einer
+# Messreihe, nicht einer Vermutung:
+#
+#   dauern+trends bei je 6 Zeilen (LIFECYCLE_SICHTBAR), Nachfolger LEER:
+#                                                          2672-2759 px
+#   + Nachfolger-Ueberschrift, Erklaersatz, Tabellenkopf (fester Aufschlag,
+#     entsteht mit der ERSTEN Zeile ueberhaupt):                  ~188 px
+#   + je Zeile (echtes Chromium, Playwright-Bounding-Box):          ~55 px
+#
+# Bei 328 px Rest bis zur 3000-px-Grenze reicht das fuer den Aufschlag
+# allein - und schon EINE sichtbare Zeile reisst sie in der Kombination mit
+# sechs vollen dauern/trends-Zeilen (gemessen: 2964-3050 px, abhaengig vom
+# Gesamtbestand). `dauern` und `trends` sind eigene, laengst ausgelieferte
+# Merkmale und werden hier NICHT enger gestellt, um dieser Tabelle Platz zu
+# verschaffen - das waere eine Nebenwirkung auf ein fremdes Merkmal fuer
+# einen Fall, der noch nicht eingetreten ist.
+#
+# Bei NULL sichtbaren Zeilen zeigt der Reiter deshalb GAR KEINE Tabelle
+# oberhalb der Falz dieser Sektion - nur den Erklaersatz und darunter EINEN
+# Aufklapper mit der vollstaendigen Tabelle (siehe Vorlage). Das ist
+# dieselbe Regel wie bei jedem anderen Aufklapper dieser Seite: der Rest
+# ist zugeklappt, nicht geloescht - hier ist der "Rest" nur ausnahmsweise
+# alles.
+NACHFOLGER_SICHTBAR = 0
+
 EIGEN = ("vodafone",)
 
 # --------------------------------------------------------------------------
@@ -274,83 +301,133 @@ def _tag(wert):
 # --------------------------------------------------------------------------
 # Der Hinweis, wenn "Was der Nachfolger mit dem Preis macht" leer ist
 # --------------------------------------------------------------------------
-# P3 (30.08.2026): die Sektion beantwortet Antonios These - laesst der
-# Wettbewerb das Vorjahresmodell nach dem Start des Nachfolgers als
-# guenstigen Einstieg stehen, waehrend Vodafone es ersetzt? Dafuer braucht
-# sie einen Nachfolger-MARKTSTART innerhalb unseres eigenen Messfensters,
-# und den kennt der Katalog heute fuer keines der beobachteten Geraete: die
-# iPhone-17-Kette hat noch kein `marktstart` (ein geratenes Datum waere
-# schlimmer), die iPhone-16- und Galaxy-S25-Ketten sind laengst erschienen,
-# bevor wir am 10.08.2026 zu messen begonnen haben. Mehr Katalogpflege loest
-# das nicht - es fehlt an einem Nachfolger, der NACH unserer ersten Messung
-# auf den Markt kam. Diese Funktion sagt das, statt die Sektion stumm
-# verschwinden zu lassen (CLAUDE.md: eine leere Sektion ohne Erklaerung
-# sieht aus wie ein Fehler, nicht wie ein ehrlicher Datenstand).
+# P3 (31.08.2026, nach der Zurueckweisung Runde 1): die erste Fassung dieses
+# Satzes behauptete zwei Dinge, die beide nicht stimmten - beide vom Lead
+# selbst so in den Auftrag geschrieben, beide von einem adversarischen
+# Pruefer nachgemessen widerlegt:
+#
+#   (1) "die Tabelle ist leer, weil kein Nachfolger ins Messfenster faellt".
+#       Falsch: sie ist leer, weil `geraete_lifecycle._belastbar` VOR der
+#       Nachfolger-Frage greift - 21 Tage Listungsdauer, und am 31.08.2026
+#       erreicht KEINE der 370 Listungen mehr als 20. Ein einziger
+#       Nachtlauf (last_verified +1) laesst 69 davon kippen; der Satz muss
+#       also den echten Riegel nennen (die Beobachtungsdauer), nicht einen
+#       erfundenen (die Terminlage der Nachfolger).
+#   (2) "mehr Katalogpflege loest das nicht". Falsch: 13 der 59 beobachteten
+#       Geraete haben einen Nachfolger im Katalog OHNE `marktstart`
+#       (Pixel 10 -> Pixel 11 z.B.), waehrend nur 4 ein Datum tragen. Ein
+#       fehlendes Datum ist ein Pflegeruecktand, kein Naturgesetz - die
+#       Behauptung des Gegenteils war unbelegt und stand trotzdem als
+#       Tatsachensatz auf der Seite (derselbe Fehler wie unten bei "waehrend
+#       Vodafone ersetzt").
+#
+# Diese Fassung nennt deshalb ausschliesslich Groessen, die aus den Daten
+# UND den oeffentlichen Konstanten von `geraete_lifecycle` kommen
+# (`MIND_TAGE_JE_GERAET`, `listungsdauer()`) - nichts wird mehr geschaetzt
+# oder behauptet. Auch die alte Zusatzzeile ("kam vor ueber eineinhalb
+# Jahren auf den Markt") ist gestrichen: sie waehlte nur unter den VIER
+# datierten Ketten und verschwieg damit die 13 undatierten, die dem Leser
+# ein falsches Bild gaben ("der Katalog kennt nur alte Nachfolger" - er
+# kennt vor allem gar keine Daten). `_zeitraum_grob()` faellt mit ihr weg;
+# die Funktion rundete an vier von fuenf Stufengrenzen falsch auf (549 Tage
+# waeren als "ueber zwei Jahren" gemeldet worden) und wurde von keinem Test
+# aufgerufen - eine ungetestete Rundungsfunktion, die niemand mehr braucht.
+#
+# Und: KEINE Tatsachenbehauptung ueber das Verhalten von Vodafone oder dem
+# Wettbewerb mehr. Vodafone fuehrt das iPhone 15 selbst 710 Tage nach dem
+# Start des iPhone 16 - also laenger als jeder andere gemessene Fall. Die
+# Sektion stellt die Frage, sie beantwortet sie nicht vorab.
 
-_ZEITRAUM_STUFEN = ((730, "über zwei Jahren"), (540, "über eineinhalb Jahren"),
-                    (365, "über einem Jahr"), (180, "über einem halben Jahr"),
-                    (30, "über einem Monat"))
 
-
-def _zeitraum_grob(tage: int) -> str:
-    """Eine grobe Zeitangabe aus einer Tageszahl - immer eine UNTERGRENZE.
-
-    "über eineinhalb Jahren" wird nur genommen, wenn die Tage das wirklich
-    hergeben; darunter faellt die Stufe zurueck. Eine Rundung, die nach oben
-    verschoenert, waere die Sorte Zahl, die dieses Projekt gerade abschafft.
-    """
-    for schwelle, text in _ZEITRAUM_STUFEN:
-        if tage >= schwelle:
-            return text
-    return "einem Tag" if tage == 1 else f"{tage} Tagen"
-
-
-def _nachfolger_leer_hinweis(eintraege: list, punkte_alle: list, katalog,
+def _nachfolger_leer_hinweis(eintraege: list, katalog,
                              nachfolger: list) -> str:
     """Warum "Was der Nachfolger mit dem Preis macht" heute leer ist - und
     wann sie es nicht mehr sein wird. Siehe Kommentar oben.
 
-    Nur eine Zahl kommt aus den Daten und ist belegt: seit wann wir messen.
-    Ein Kalenderdatum fuer den naechsten Fuellstand wird bewusst NICHT
-    genannt - das waere geraten, nicht gemessen.
+    Jede Zahl im Satz kommt aus einer oeffentlichen Konstante oder wird an
+    Ort und Stelle aus *eintraege*/*katalog* gezaehlt - keine geschaetzte
+    Staffelung, kein Kalenderdatum.
     """
     if nachfolger:
         return ""
-    daten = [d for d in (_tag(p.get("datum")) for p in punkte_alle) if d]
-    if not daten:
-        return ""
-    seit = min(daten)
 
-    # Der juengste bekannte Nachfolger unter den beobachteten Geraeten -
-    # SINGULAR, damit der Satz auch dann stimmt, wenn der Katalog irgendwann
-    # nur noch eine einzige zu alte Kette kennt.
+    grenze = geraete_lifecycle.MIND_TAGE_JE_GERAET
+    dauern_alle = [geraete_lifecycle.listungsdauer(e) for e in eintraege]
+    dauern_alle = [d for d in dauern_alle if d is not None]
+    laengste = max(dauern_alle) if dauern_alle else 0
+
+    # B7 der Zurueckweisung: "seit dem 10.08.2026" stand hier UND im
+    # "duenn"-Hinweis direkt darueber, wortgleich. `laengste` faellt heute
+    # (20 Tage) zufaellig mit der dortigen Beobachtungsspanne zusammen - eine
+    # zweite Formulierung derselben Zahl waere derselbe Fehler in neuer
+    # Verkleidung. Berichtet wird deshalb der ABSTAND zur Schwelle, eine Zahl,
+    # die an KEINER anderen Stelle der Seite steht.
+    abstand = grenze - laengste
+    if abstand > 0:
+        dauer_satz = (f"Der Abstand zur nötigen Beobachtungsdauer beträgt "
+                      f"heute noch {abstand} {'Tag' if abstand == 1 else 'Tage'}.")
+    else:
+        dauer_satz = ("Die nötige Beobachtungsdauer ist für mindestens eine "
+                      "Listung bereits erreicht.")
+
+    # Geraete mit einem Nachfolger im Katalog, dem das Marktstart-Datum
+    # fehlt - der Beleg gegen "mehr Katalogpflege loest das nicht" (siehe
+    # Kommentar oben). Gezaehlt wird je GERAET, nicht je Listung: ein
+    # Katalogeintrag fehlt einmal, unabhaengig davon, bei wie vielen
+    # Anbietern er beobachtet wird.
     geraete_ids = sorted({e.get("device_id") for e in eintraege
                           if e.get("device_id")})
-    luecken = []
+    ohne_datum = 0
     for gid in geraete_ids:
         nf = katalog.nachfolger_von(gid)
-        if nf is None:
-            continue
-        start = _tag(nf.marktstart)
-        if start is None or start >= seit:
-            continue
-        luecken.append((seit - start).days)
+        if nf is not None and not (nf.marktstart or "").strip():
+            ohne_datum += 1
 
     zusatz = ""
-    if luecken:
-        zusatz = (f" Der jüngste Nachfolger, den der Katalog kennt, kam "
-                 f"schon vor {_zeitraum_grob(min(luecken))} auf den Markt "
-                 f"– lange bevor wir zu messen begannen.")
+    if ohne_datum:
+        zusatz = (
+            f" Bei {ohne_datum} {'Gerät fehlt' if ohne_datum == 1 else 'Geräten fehlt'} "
+            f"dafür zusätzlich das Marktstart-Datum ihres Nachfolgers im "
+            f"Katalog.")
 
     return (
-        "Diese Tabelle soll zeigen, ob der Wettbewerb das Vorjahresmodell "
-        "nach dem Start des Nachfolgers als günstigen Einstieg im Regal "
-        "stehen lässt – während es bei Vodafone meist direkt ersetzt wird. "
-        f"Sie ist noch leer: Wir messen die Preise erst seit dem "
-        f"{seit.strftime('%d.%m.%Y')}.{zusatz} Sie füllt sich mit dem "
-        "ersten Marktstart eines Nachfolgers, der in dieses Messfenster "
-        "fällt."
+        "Diese Tabelle soll zeigen, wie lange ein Vorjahresmodell nach dem "
+        "Start seines Nachfolgers im Regal bleibt – bei uns wie beim "
+        "Wettbewerb. Eine Zeile entsteht erst, wenn eine Listung "
+        f"mindestens {grenze} Tage lang beobachtet wurde und ihr Nachfolger "
+        f"im Katalog ein Marktstart-Datum trägt. {dauer_satz}"
+        f"{zusatz} Sobald beides zusammenkommt, entsteht die erste Zeile."
     )
+
+
+def _mit_beobachtungsbeleg(nachfolger: list) -> list:
+    """Ergaenzt jede Nachfolger-Zeile um `beobachtet_tage`: wie viele Tage
+    der gemeldeten Verweildauer WIRKLICH gemessen sind, statt aus dem
+    Katalogdatum des Nachfolgers zurueckgerechnet (B2 der Zurueckweisung
+    vom 31.08.2026).
+
+    `verweildauer_tage` misst vom MARKTSTART DES NACHFOLGERS bis zur
+    letzten Bestaetigung - bei allen heutigen Kandidaten faengt die eigene
+    Beobachtung aber erst Jahre nach diesem Marktstart an
+    (`verweildauer_untergrenze=True`). Ein Etikett "mind." beschreibt das
+    als Untergrenze und suggeriert damit "die Wahrheit ist noch groesser" -
+    das Gegenteil dessen, was zaehlt: der weitaus groesste Teil der Zahl ist
+    gar nicht gemessen, sondern aus dem Katalogdatum angenommen. Die Seite
+    zeigt deshalb zusaetzlich, wie viele Tage zwischen dem Beobachtungsbeginn
+    (`beobachtet_seit`) und der letzten Bestaetigung (`zuletzt_bestaetigt`)
+    wirklich liegen - beide Felder kommen aus demselben Parallelpaket und
+    werden per `.get(...)` gelesen, eine fehlende Angabe ergibt `None` und
+    die Vorlage zeigt dann nur die Gesamtzahl.
+    """
+    ergebnis = []
+    for n in nachfolger:
+        beginn = _tag(n.get("beobachtet_seit"))
+        ende = _tag(n.get("zuletzt_bestaetigt"))
+        beleg = ((ende - beginn).days
+                 if beginn is not None and ende is not None and ende >= beginn
+                 else None)
+        ergebnis.append({**n, "beobachtet_tage": beleg})
+    return ergebnis
 
 
 def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
@@ -852,6 +929,7 @@ def leer(fehler: str = "") -> dict:
         "katalogtabelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
+        "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
         "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
                        "neu": [], "weg": [], "kurzer_vorlauf": True,
                        "vorlauf_tage": 0},
@@ -1052,12 +1130,14 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         alle, punkte_alle, katalog, heute,
         laeufe_je_anbieter=laeufe_je_anbieter,
         termine_je_anbieter=termine_je_anbieter)
-    # P3: der Satz, der die leere Nachfolger-Sektion erklaert. Er entsteht
-    # HIER und nicht in `geraete_lifecycle.auswertung` - dort arbeitet
-    # parallel ein anderes Paket an genau dieser Rechnung.
+    # P3: der Satz, der die leere Nachfolger-Sektion erklaert, und der Beleg
+    # dafuer, wie viel einer gefuellten Zeile wirklich gemessen ist. Beides
+    # entsteht HIER und nicht in `geraete_lifecycle.auswertung` - dort
+    # arbeitet parallel ein anderes Paket an der Rechnung selbst.
     lifecycle = {**lifecycle,
+                "nachfolger": _mit_beobachtungsbeleg(lifecycle["nachfolger"]),
                 "nachfolger_hinweis": _nachfolger_leer_hinweis(
-                    alle, punkte_alle, katalog, lifecycle["nachfolger"])}
+                    alle, katalog, lifecycle["nachfolger"])}
 
     # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
@@ -1135,6 +1215,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "katalogtabelle": katalogzeilen(bestand, katalog),
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
+        "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
         "pruefung": pruefung["zahlen"],
         "pruefbefunde": pruefung["befunde"],
         # `bereinige()` leert eine nicht leere Menge nie (jede
