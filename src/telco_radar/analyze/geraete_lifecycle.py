@@ -34,11 +34,18 @@ direkt ersetzt - und er haengt NICHT am Preis.
 
 Vier Regeln tragen die Zahl:
 
-1. Gerechnet wird je (Geraet, Anbieter), nicht je Listung. Ein Geraet steht
-   bei einem Haendler in acht Farben und drei Speichergroessen; die Frage
-   "wie lange bleibt es im Regal" beantwortet das REGAL, nicht die einzelne
-   Farbvariante. Anfang und Ende der Gruppe sind deshalb das frueheste
-   `first_seen` und das spaeteste `last_verified` ihrer Listungen.
+1. Gerechnet wird je (Geraet, Anbieter, ZUSTAND), nicht je Listung. Ein
+   Geraet steht bei einem Haendler in acht Farben und drei
+   Speichergroessen; die Frage "wie lange bleibt es im Regal" beantwortet
+   das REGAL, nicht die einzelne Farbvariante. Anfang und Ende der Gruppe
+   sind deshalb das frueheste `first_seen` und das spaeteste
+   `last_verified` ihrer Listungen. Der Zustand steht im Schluessel, weil
+   Neu- und Gebrauchtware zwei Preise und zwei Regalplaetze sind - und weil
+   ein laenger beobachteter Gebrauchteintrag der Neuware sonst ihre
+   Untergrenzen-Kennzeichnung nimmt (siehe `_zustand`). Die Tabelle selbst
+   zeigt NUR Neuware: ein refurbished iPhone ist kein guenstiger Einstieg
+   ins Neugeraetesortiment, und genau das war am 31.08.2026 ihre erste und
+   einzige Zeile.
 
 2. Die Zahl sagt, ob sie eine UNTERGRENZE ist. Alle heutigen Kandidaten haben
    ihren Nachfolger-Marktstart 570 bis 710 Tage vor unserem ersten Messpunkt
@@ -68,8 +75,23 @@ Vier Regeln tragen die Zahl:
    die Seite sagt den Duenn-Satz.
 
 Die Zeile traegt fuer das Darstellungspaket zusaetzlich zu den bisherigen
-Schluesseln: `anbieter`, `verweildauer_tage`, `verweildauer_untergrenze`,
-`noch_gelistet`, `beobachtet_seit` und `zuletzt_bestaetigt`.
+Schluesseln: `anbieter`, `zustand`, `varianten`, `verweildauer_tage`,
+`verweildauer_untergrenze`, `noch_gelistet`, `beobachtet_seit` und
+`zuletzt_bestaetigt`.
+
+KARDINALITAET: eine Zeile je (Geraet, Anbieter, Zustand) - NICHT je Geraet.
+Die These der Sektion vergleicht Anbieter miteinander ("der Wettbewerb laesst
+stehen, bei uns wird ersetzt"); je Geraet zusammengefasst muesste EINE
+Verweildauer fuer ALDI TALK (710 Tage) und Vodafone/o2 (709) gewaehlt werden,
+und mit ihr EIN `verweildauer_untergrenze` und EIN `noch_gelistet`. Genau die
+Zusammenfassung wuerde die Aussage verfaelschen, gegen die dieses Modul
+gebaut ist: die Untergrenze der einen Gruppe ginge in der Messung der anderen
+unter. Die Vorlage braucht dafuer eine Anbieterspalte.
+
+`dauern` und `verfaelle` tragen aus demselben Grund `zustand` und
+`varianten`; `verfaelle` zusaetzlich `speicher_gb`, und `auswertung` gibt
+`ohne_bewegung` zurueck - die Zahl der Regalplaetze, die die Schwelle nehmen
+und ihren Preis nie bewegt haben.
 """
 from __future__ import annotations
 
@@ -77,7 +99,7 @@ import logging
 from datetime import date, datetime
 from typing import Optional
 
-from ..geraete_model import Katalog, serie_aus_modell
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Katalog, serie_aus_modell
 from .geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
 
 log = logging.getLogger(__name__)
@@ -149,6 +171,68 @@ def _datum(wert) -> Optional[date]:
         return datetime.strptime(str(wert or "").strip(), "%Y-%m-%d").date()
     except (ValueError, TypeError):
         return None
+
+
+# --------------------------------------------------------------------------
+# DER ZUSTAND IST EINE PREISDIMENSION, KEIN ETIKETT
+# --------------------------------------------------------------------------
+# Neu, refurbished und B-Ware sind drei verschiedene Preise und drei
+# verschiedene Regalplaetze. Der ganze Geraetezweig fuehrt den Zustand
+# deshalb in der `sku_id`, und Vergleich, Preisgrafik und Plausibilitaets-
+# pruefung zeigen ausschliesslich `VERGLEICHBARE_ZUSTAENDE`.
+#
+# Diese Datei war bis zum 31.08.2026 die EINZIGE Stelle, die darueber
+# hinweggruppierte. Der Preis dafuer stand messbar im Bestand: die erste und
+# einzige Zeile der Nachfolger-Tabelle war ein refurbished iPhone 15 bei
+# ALDI TALK - als Beleg fuer die These "der Wettbewerb laesst das
+# Vorjahresmodell als guenstigen Einstieg stehen". Ein Gebrauchtgeraet ist
+# kein Einstieg ins Neugeraetesortiment.
+#
+# Schlimmer war die zweite Wirkung: `beginn = min(first_seen)` ueber eine
+# gemischte Gruppe nimmt der Neuware die Untergrenzen-Kennzeichnung, wenn ein
+# laenger beobachteter Gebrauchteintrag daneben liegt. Dann behauptet die
+# Zeile eine MESSUNG, wo eine Annahme steht - der teuerste Fehler, den diese
+# Sektion machen kann.
+def _zustand(eintrag: dict) -> str:
+    """Der Rohwert, wie ihn der Store fuehrt ("" = Altbestand ohne Feld)."""
+    return (eintrag.get("zustand") or "").strip().lower()
+
+
+def _zustand_etikett(eintrag: dict) -> str:
+    """Der Wert fuer Gruppenschluessel und Ausgabe. "" heisst neu - so
+    rechnet `VERGLEICHBARE_ZUSTAENDE`, und zwei Schreibweisen fuer denselben
+    Zustand waeren zwei Regalplaetze."""
+    return _zustand(eintrag) or "neu"
+
+
+def _vergleichbar(eintrag: dict) -> bool:
+    return _zustand(eintrag) in VERGLEICHBARE_ZUSTAENDE
+
+
+def _gruppiere(eintraege: list, schluessel) -> dict:
+    """Listungen nach einem Schluessel buendeln, Reihenfolge erhalten."""
+    gruppen: dict = {}
+    for e in eintraege:
+        gruppen.setdefault(schluessel(e), []).append(e)
+    return gruppen
+
+
+def _regal(gruppe: list) -> tuple:
+    """(Beginn, Ende, Tage) eines Regalplatzes - fruehestes `first_seen`,
+    spaetestes `last_verified`.
+
+    Acht Farben und drei Speichergroessen desselben Geraets sind EIN
+    Regalplatz. Bis zum 31.08.2026 zaehlte die Liste "Verweildauer im Regal"
+    je Farbvariante: ein simulierter Nachtlauf ergab 85 Zeilen mit 11
+    unterscheidbaren Texten, zwoelfmal "iPhone 17 Pro Max bei
+    mobilcom-debitel - 21 Tage" untereinander.
+    """
+    anfaenge = [d for d in (_datum(e.get("first_seen")) for e in gruppe) if d]
+    enden = [d for d in (_datum(e.get("last_verified")) for e in gruppe) if d]
+    if not anfaenge or not enden:
+        return None, None, None
+    von, bis = min(anfaenge), max(enden)
+    return (von, bis, None) if bis < von else (von, bis, (bis - von).days)
 
 
 # --------------------------------------------------------------------------
@@ -226,8 +310,24 @@ def _preis_am(punkte: list, stichtag: date, art: str = "preis_ohne_vertrag") -> 
 
 
 def _eigene_punkte(punkte: list, device_id: str,
-                   anbieter: Optional[str] = None) -> list:
-    """Die Preispunkte, die zu diesem Geraet (und ggf. Anbieter) gehoeren.
+                   anbieter: Optional[str] = None,
+                   listung_ids: Optional[set] = None) -> list:
+    """Die Preispunkte, die zu dieser Preisreihe gehoeren.
+
+    `listung_ids` ist der genaue Weg und der einzige, den `auswertung`
+    benutzt: die Gruppe kennt ihre Listungen, und ueber die `listung_id`
+    haengt jeder Punkt an genau einer. Nur so bleiben ZUSTAND, Speicher und
+    Farbe draussen, die ein Filter auf (Geraet, Anbieter) mitnaehme.
+
+    Gemessen am Bestand vom 31.08.2026, warum das noetig ist:
+
+        2026-08-29  o2  apple-iphone-15  schwarz              721,00  (neu)
+        2026-08-29  o2  apple-iphone-15  schwarz-refurbished  613,00
+
+    `_preis_am` nimmt bei gleichem Datum den LETZTEN Treffer der Liste. Als
+    Basis kaeme der Gebrauchtpreis - allein, weil seine Zeile spaeter in der
+    Datei steht. Heute latent (alle `basis` sind None), scharf sobald ein
+    Geraet beobachtet wird, bevor sein Nachfolger erscheint.
 
     Der Rueckfall auf die ganze Liste gilt nur ohne Anbieterfilter und nur,
     wenn kein einziger Punkt ein `device_id` traegt - so rechnen aeltere
@@ -236,6 +336,8 @@ def _eigene_punkte(punkte: list, device_id: str,
     aller Haendler, und der Nachfolger-Effekt verrechnete den Discounter
     gegen den Netzbetreiber.
     """
+    if listung_ids is not None:
+        return [p for p in punkte if p.get("listung_id") in listung_ids]
     treffer = [p for p in punkte
                if p.get("device_id") == device_id
                and (anbieter is None or p.get("anbieter") == anbieter)]
@@ -248,7 +350,8 @@ def _eigene_punkte(punkte: list, device_id: str,
 
 def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
                       heute: Optional[str] = None,
-                      anbieter: Optional[str] = None) -> Optional[dict]:
+                      anbieter: Optional[str] = None,
+                      listung_ids: Optional[set] = None) -> Optional[dict]:
     """Was der Marktstart des Nachfolgers mit dem PREIS des Vorgaengers macht.
 
     Gibt None, wenn es keinen Nachfolger im Katalog gibt, wenn dessen
@@ -267,7 +370,7 @@ def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
     start = _datum(nachfolger.marktstart)
     if start is None:
         return None
-    eigene = _eigene_punkte(punkte, device_id, anbieter)
+    eigene = _eigene_punkte(punkte, device_id, anbieter, listung_ids)
     basis = _preis_am(eigene, start)
     if basis is None or basis == 0:
         return None
@@ -309,14 +412,22 @@ def verweildauer_nach_nachfolger(eintraege: list,
                                  katalog: Katalog) -> Optional[dict]:
     """Wie lange steht der Vorgaenger NACH dem Marktstart seines Nachfolgers?
 
-    *eintraege* sind die Listungen EINER (Geraet, Anbieter)-Gruppe - acht
-    Farben und drei Speichergroessen desselben Geraets sind ein Regalplatz,
-    keine acht Antworten (Modulkopf, Regel 1). Gerechnet wird deshalb vom
-    fruehesten `first_seen` bis zum spaetesten `last_verified` der Gruppe.
+    *eintraege* sind die Listungen EINER (Geraet, Anbieter, Zustand)-Gruppe -
+    acht Farben und drei Speichergroessen desselben Geraets sind ein
+    Regalplatz, keine acht Antworten (Modulkopf, Regel 1). Gerechnet wird
+    deshalb vom fruehesten `first_seen` bis zum spaetesten `last_verified`
+    der Gruppe.
 
-    Gibt None ohne Nachfolger, ohne dessen `marktstart` und ohne ein
-    verwertbares `last_verified` - eine Verweildauer ohne rechte Kante waere
-    geraten.
+    DER ZUSTAND GEHOERT IN DEN SCHLUESSEL, nicht erst in die Ausgabe: eine
+    gemischte Gruppe beantwortet zwei Fragen mit einer Zahl, und ihr
+    `min(first_seen)` nimmt der Neuware die Untergrenzen-Kennzeichnung, wenn
+    ein laenger beobachteter Gebrauchteintrag daneben liegt. Diese Funktion
+    prueft es selbst nach und verweigert die Antwort - eine Zusicherung, die
+    nur der Aufrufer einhaelt, ist keine.
+
+    Gibt None ohne Nachfolger, ohne dessen `marktstart`, ohne ein
+    verwertbares `last_verified` (eine Verweildauer ohne rechte Kante waere
+    geraten) und bei gemischten Zustaenden.
 
     `verweildauer_tage` ist die Zahl der Tage vom Marktstart des Nachfolgers
     bis zur letzten Bestaetigung, mindestens 0: verschwindet der Vorgaenger
@@ -326,15 +437,23 @@ def verweildauer_nach_nachfolger(eintraege: list,
     `verweildauer_untergrenze` ist True, wenn unsere Beobachtung erst NACH
     dem Marktstart begonnen hat. Dann ist die Zahl kein gemessener Verlauf,
     sondern eine Untergrenze: das Geraet stand mindestens so lange im Regal,
-    wie wir zugesehen haben. Bei allen vier Kandidaten des Bestands vom
-    31.08.2026 ist genau das der Fall (570 bis 710 Tage Vorlauf).
+    wie wir zugesehen haben. Bei allen SECHS (Geraet, Anbieter, Zustand)-
+    Gruppen des Bestands vom 31.08.2026 ist genau das der Fall (570 bis 710
+    Tage Vorlauf).
 
-    `noch_gelistet` beantwortet "steht es heute noch da" aus dem Status des
-    Stores - `heute` verschiebt den Status nicht, es taugt nur zum Vergleich
-    und ist deshalb hier nur der Vollstaendigkeit halber entgegengenommen.
+    `noch_gelistet` beantwortet "steht es noch da" aus dem Status des Stores.
+
+    Diese Funktion nimmt bewusst KEIN `heute` entgegen: sie rechnet
+    ausschliesslich zwischen gespeicherten Daten (Marktstart, erste Sichtung,
+    letzte Bestaetigung) und kennt `date.today()` nicht. Ein Parameter, den
+    niemand liest, ist eine Zusicherung, die niemand einhaelt - und eine
+    Docstring, die einen Parameter erklaert, den die Signatur nicht hat, ist
+    genau der Textwiderspruch, gegen den dieses Modul gebaut ist.
     """
     eintraege = [e for e in eintraege if e]
     if not eintraege:
+        return None
+    if len({_zustand_etikett(e) for e in eintraege}) > 1:
         return None
     device_id = eintraege[0].get("device_id")
     nachfolger = katalog.nachfolger_von(device_id)
@@ -360,6 +479,8 @@ def verweildauer_nach_nachfolger(eintraege: list,
     return {
         "device_id": device_id,
         "anbieter": eintraege[0].get("anbieter") or "",
+        "zustand": _zustand_etikett(eintraege[0]),
+        "varianten": len(eintraege),
         "nachfolger": nachfolger.device_id,
         "nachfolger_modell": nachfolger.modell,
         "marktstart": nachfolger.marktstart,
@@ -524,6 +645,31 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         name: sorted({d for d in (_datum(t) for t in (tage or [])) if d})
         for name, tage in termine_je_anbieter.items()}
 
+    # DIE ZURECHNUNG BRAUCHT EINEN VOLLSTAENDIGEN LAUF, sonst folgt aus dem
+    # Ausbleiben der Alterung nichts.
+    #
+    # Ein Prueftermin des Anbieters im Fenster der Listung galt bis zum
+    # 31.08.2026 als Beobachtung DIESER Listung. Die Begruendung war die
+    # Zwei-Stufen-Auslistung: waere sie an dem Tag nicht gefunden worden,
+    # haette `mark_stale` sie gealtert. Genau das stimmt fuer
+    # mobilcom-debitel nicht - `mark_stale` laeuft nur `if
+    # bilanz.vollstaendig`, und mobilcom-debitel steht bei `laeufe: 0`: sein
+    # Lauf wird am Zeitbudget nie fertig. Am 14. und 21.08. wurde die
+    # Listung also nicht nachweislich angesehen; der Deckel ist der Grund
+    # ihrer Unvollstaendigkeit, und aus einem Deckel folgt kein Blick.
+    #
+    # Gemessen an einem simulierten Nachtlauf: ohne diese Bedingung nehmen
+    # 68 Listungen die Termin-Schwelle, alle von mobilcom-debitel und alle
+    # ausschliesslich ueber zugerechnete Tage. Mit ihr sind es null.
+    #
+    # Wurde GAR KEINE Laufbilanz uebergeben (aeltere Aufrufer, Tests), ist
+    # nichts zu pruefen - dann bleibt es bei der Zurechnung. Eine leere
+    # Bilanz ist keine Bilanz mit Nullen.
+    def _zurechenbar(name) -> bool:
+        if not laeufe_je_anbieter:
+            return True
+        return int(laeufe_je_anbieter.get(name, 0) or 0) >= 1
+
     def _messtage(eintrag) -> int:
         """Verschiedene Tage, an denen DIESE Listung gemessen wurde."""
         tage = set(punkte_je_listung.get(eintrag.get("id") or "", ()))
@@ -535,9 +681,12 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         # geratene Grenze waere schlimmer als eine fehlende.
         von = _datum(eintrag.get("first_seen")) or (min(tage) if tage else None)
         bis = _datum(eintrag.get("last_verified")) or (max(tage) if tage else None)
-        for tag in termine_daten.get(eintrag.get("anbieter")) or ():
-            if (von is None or tag >= von) and (bis is None or tag <= bis):
-                tage.add(tag)
+        if _zurechenbar(eintrag.get("anbieter")):
+            for tag in termine_daten.get(eintrag.get("anbieter")) or ():
+                # EINSCHLIESSLICH der Raender: der Lauf, der die Listung zum
+                # ersten Mal sah, IST ihr erster Messtermin.
+                if (von is None or tag >= von) and (bis is None or tag <= bis):
+                    tage.add(tag)
         return len(tage)
 
     def _oft_genug(eintrag) -> bool:
@@ -568,36 +717,93 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         return (tage is not None and tage >= MIND_TAGE_JE_GERAET
                 and _oft_genug(eintrag))
 
+    # DIE VERWEILDAUER ZAEHLT REGALPLAETZE, KEINE FARBVARIANTEN.
+    # (Geraet, Anbieter, Zustand) - derselbe Schluessel wie beim
+    # Nachfolger-Effekt und aus demselben Grund. Ein simulierter Nachtlauf
+    # ergab je Listung gerechnet 85 Zeilen mit 11 unterscheidbaren Texten.
+    # Der Zustand steht mit im Schluessel, weil Neu- und Gebrauchtware zwei
+    # Regalplaetze sind - hier bleiben BEIDE stehen (anders als beim
+    # Nachfolger-Effekt): "das Gebrauchtgeraet steht seit 90 Tagen im Regal"
+    # ist eine wahre Aussage, sie muss nur als solche gekennzeichnet sein.
     dauern = []
-    for e in eintraege:
-        tage = listungsdauer(e)
+    for (gid, anbieter, zustand), gruppe in sorted(
+            _gruppiere(eintraege, lambda e: (e.get("device_id") or "",
+                                             e.get("anbieter") or "",
+                                             _zustand_etikett(e))).items()):
         # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis, dass
         # noch nicht lange genug gemessen wurde.
-        if not _belastbar(e):
+        _, _, tage = _regal(gruppe)
+        if tage is None or tage < MIND_TAGE_JE_GERAET:
             continue
-        g = katalog.nach_id(e.get("device_id"))
+        if not any(_oft_genug(e) for e in gruppe):
+            continue
+        g = katalog.nach_id(gid)
+        aktive = [e for e in gruppe if e.get("status") == STATUS_AKTIV]
         dauern.append({
-            "device_id": e.get("device_id"),
-            "modell": g.modell if g else e.get("device_id"),
-            "anbieter": e.get("anbieter"),
+            "device_id": gid,
+            "modell": g.modell if g else gid,
+            "anbieter": anbieter,
+            "zustand": zustand,
+            "varianten": len(gruppe),
             "tage": tage,
-            "status": e.get("status"),
+            # Der Regalplatz gilt als aktiv, solange EINE Variante aktiv ist.
+            # Sonst der Status der zuletzt bestaetigten - "ausgelistet" ist
+            # eine Aussage ueber den Platz, nicht ueber eine Farbe.
+            "status": (STATUS_AKTIV if aktive else
+                       max(gruppe, key=lambda e: str(e.get("last_verified") or ""))
+                       .get("status")),
         })
 
+    # DER PREISVERFALL ZAEHLT PREISE, KEINE FARBEN - und keine Nullzeilen.
+    #
+    # Zwei Aenderungen vom 31.08.2026, beide an einem simulierten Nachtlauf
+    # gemessen (85 Zeilen, ALLE "+0,0 %"):
+    #
+    # 1. Geschluesselt auf (Geraet, Anbieter, Zustand, SPEICHER). Anders als
+    #    bei der Verweildauer gehoert der Speicher hier in den Schluessel:
+    #    256 und 512 GB sind zwei Produkte mit zwei Preisen, ihr Verfall
+    #    darf nicht in eine Zeile fallen. Die FARBEN fallen zusammen - das
+    #    ist derselbe Zuschnitt wie in `geraete_vergleich` (Modell,
+    #    Speicher, Zustand).
+    # 2. Eine Zeile braucht eine gemessene BEWEGUNG. "+0,0 % seit 21 Tagen"
+    #    ist kein Preisverfall, sondern der Beweis, dass noch nichts
+    #    passiert ist - genau die Sorte Zeile, wegen der die Schwelle
+    #    ueberhaupt existiert (Kommentarblock oben). Die Schwelle misst
+    #    Dauer und Zahl der Blicke, nie ob der Preis sich je bewegt hat.
+    #    Wie viele Regalplaetze stillstehen, steht als Zahl im Ergebnis
+    #    (`ohne_bewegung`) - verschwiegen wird nichts.
     verfaelle = []
-    for e in eintraege:
+    ohne_bewegung = 0
+    for schluessel, gruppe in sorted(
+            _gruppiere(eintraege, lambda e: (e.get("device_id") or "",
+                                             e.get("anbieter") or "",
+                                             _zustand_etikett(e),
+                                             e.get("speicher_gb"))).items(),
+            key=lambda kv: [str(t) for t in kv[0]]):
+        gid, anbieter, zustand, speicher = schluessel
+        # Der Vertreter ist die am LAENGSTEN beobachtete Variante, nicht die
+        # billigste: "Der niedrigste Preis ist der wahrscheinlichste Fehler".
+        tauglich = [e for e in gruppe
+                    if preisverfall(e) is not None
+                    and (_spanne(e.get("erstpreis_am"), e.get("last_verified"))
+                         or 0) >= MIND_TAGE_JE_GERAET
+                    and _oft_genug(e)]
+        if not tauglich:
+            continue
+        e = max(tauglich, key=lambda x: (
+            _spanne(x.get("erstpreis_am"), x.get("last_verified")) or 0,
+            str(x.get("sku_id") or "")))
         v = preisverfall(e)
-        if v is None:
+        if not v["absolut"]:
+            ohne_bewegung += 1
             continue
-        beobachtet = _spanne(e.get("erstpreis_am"), e.get("last_verified"))
-        if (beobachtet is None or beobachtet < MIND_TAGE_JE_GERAET
-                or not _oft_genug(e)):
-            # "+0.0 % seit gestern" ist keine Preisentwicklung.
-            continue
-        g = katalog.nach_id(e.get("device_id"))
-        verfaelle.append({**v, "device_id": e.get("device_id"),
-                          "modell": g.modell if g else e.get("device_id"),
-                          "anbieter": e.get("anbieter")})
+        g = katalog.nach_id(gid)
+        verfaelle.append({**v, "device_id": gid,
+                          "modell": g.modell if g else gid,
+                          "anbieter": anbieter,
+                          "zustand": zustand,
+                          "speicher_gb": speicher,
+                          "varianten": len(tauglich)})
     verfaelle.sort(key=lambda v: v["prozent"])
 
     # Duenn ist die Basis, solange KEINE Kennzahl etwas hergibt.
@@ -607,21 +813,35 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     # Schwelle wie alles andere. Die Preisspalten koennen leer bleiben, die
     # Verweildauer nicht - sie ist die Zahl, wegen der die Sektion dasteht
     # (Modulkopf, Regel 3).
+    # NUR NEUWARE, und der Zustand steht im Schluessel.
+    #
+    # Die These lautet "der Wettbewerb laesst das Vorjahresmodell als
+    # guenstigen EINSTIEG stehen". Am 31.08.2026 war die erste und einzige
+    # Zeile dieser Tabelle ein refurbished iPhone 15 bei ALDI TALK - ein
+    # Gebrauchtgeraet ist kein Einstieg ins Neugeraetesortiment, und es ist
+    # dieselbe Verwechslung, gegen die `VERGLEICHBARE_ZUSTAENDE` gebaut ist.
+    # Ein Zustand, der sich nicht bestimmen laesst, faellt heraus und wird
+    # NICHT als neu angenommen.
     gruppen: dict[tuple, list] = {}
     for e in eintraege:
         gid = e.get("device_id")
-        if not gid:
+        if not gid or not _vergleichbar(e):
             continue
-        gruppen.setdefault((gid, e.get("anbieter") or ""), []).append(e)
+        gruppen.setdefault((gid, e.get("anbieter") or "",
+                            _zustand_etikett(e)), []).append(e)
 
     effekte = []
-    for (gid, name), gruppe in sorted(gruppen.items()):
+    for (gid, name, _zust), gruppe in sorted(gruppen.items()):
         if not any(_belastbar(e) for e in gruppe):
             continue
         verweil = verweildauer_nach_nachfolger(gruppe, katalog)
         if verweil is None:
             continue
-        preis = nachfolger_effekt(gid, katalog, punkte, heute, anbieter=name)
+        # Die Preisreihe kommt ueber die LISTUNGS-IDs dieser Gruppe, nicht
+        # ueber (Geraet, Anbieter): sonst holt sie sich den Gebrauchtpreis
+        # desselben Tages als Basis (siehe `_eigene_punkte`).
+        preis = nachfolger_effekt(gid, katalog, punkte, heute, anbieter=name,
+                                  listung_ids={e.get("id") for e in gruppe})
         g = katalog.nach_id(gid)
         effekte.append({**(preis or _leere_preisspalten()), **verweil,
                         "modell": g.modell if g else gid})
@@ -661,6 +881,9 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         "hinweis": hinweis,
         "dauern": sorted(dauern, key=lambda d: -d["tage"]),
         "verfaelle": verfaelle,
+        # Wie viele Regalplaetze die Schwelle nehmen, aber ihren Preis nie
+        # bewegt haben. Eine Zahl statt einer Bildschirmseite Nullzeilen.
+        "ohne_bewegung": ohne_bewegung,
         # Ein Trend wird nur ausgewiesen, wenn die Datenbasis ihn traegt.
         # Sonst steht die Messung da, aber nicht die Behauptung.
         "trends": [] if duenn else verfaelle[:12],
