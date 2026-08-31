@@ -266,3 +266,111 @@ def test_die_drei_grossen_netzbetreiber_sind_erfasst():
 def test_alle_drei_beobachtungsebenen_sind_besetzt(stufe):
     quellen = lade_quellen(_ROOT)
     assert [a for a in quellen.anbieter if a.typ == stufe]
+
+
+# --------------------------------------------------------------------------
+# Die aus dem Berichtsarchiv belegten Marktstarts (31.08.2026)
+# --------------------------------------------------------------------------
+#
+# Diese Daten sind Handarbeit: sie stammen aus `data/reports/*.json`, und die
+# Belege stehen woertlich ueber den Eintraegen in `config/geraete_katalog.yaml`.
+# Sie stehen hier fest, weil ein versehentlich ueberschriebenes Datum NICHTS
+# kaputtmacht, was auffaellt - es verschiebt nur jede Verweildauer und jedes
+# 30/60/90-Tage-Fenster, und die Zahlen sehen danach genauso plausibel aus.
+
+# device_id -> (marktstart, Beleg in Kurzform)
+BELEGTE_MARKTSTARTS = {
+    "google-pixel-11":           ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro":       ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro-xl":    ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro-fold":  ("2026-08-20", "Vodafone UK, 20.08.2026"),
+    "samsung-galaxy-z-fold8":       ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
+    "samsung-galaxy-z-fold8-ultra": ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
+    "samsung-galaxy-z-flip8":       ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
+}
+
+# Was an derselben Stelle NICHT stehen darf. Beides sind Daten, die im
+# Archiv prominenter auftreten als der Verkaufsstart - und beide wuerden die
+# Verweildauer systematisch zu lang und den Preisverfall zu frueh rechnen.
+VORSTELLUNGSTERMINE = {
+    "google-pixel-11":        "2026-08-12",   # Vorstellung der Pixel-11-Reihe
+    "google-pixel-11-pro":    "2026-08-12",
+    "google-pixel-11-pro-xl": "2026-08-12",
+    "samsung-galaxy-z-fold8": "2026-07-22",   # Galaxy Unpacked July 2026
+    "samsung-galaxy-z-flip8": "2026-07-22",
+}
+
+
+def test_die_belegten_marktstarts_stehen_unveraendert_im_katalog():
+    katalog = lade_katalog(_ROOT)
+    for device_id, (datum, beleg) in BELEGTE_MARKTSTARTS.items():
+        g = katalog.nach_id(device_id)
+        assert g is not None, f"{device_id} fehlt im Katalog"
+        assert g.marktstart == datum, (
+            f"{g.modell}: erwartet {datum} ({beleg}), gefunden {g.marktstart!r}. "
+            f"Wer das aendert, aendert jede Verweildauer und jedes "
+            f"30/60/90-Tage-Fenster dieses Geraets - der Beleg steht ueber dem "
+            f"Eintrag in config/geraete_katalog.yaml.")
+
+
+def test_kein_marktstart_ist_der_vorstellungstermin():
+    """`marktstart` ist der VERKAUFSSTART. Die Konvention steht am Kopf des
+    Katalogs und ist an den Bestandseintraegen belegt (iPhone 16: vorgestellt
+    am 09.09.2024, eingetragen ist der 20.09.2024).
+
+    Das ist kein theoretischer Fehler: im Archiv ist der Vorstellungstermin
+    die haeufigere Angabe. Zur Pixel-11-Reihe stehen dort fuenf Meldungen vom
+    12.08.2026 ("Google hat am 12. August 2026 die Pixel-11-Serie
+    vorgestellt") und zwei vom 20.08.2026 - wer die Mehrheit nimmt, liegt um
+    acht Tage daneben."""
+    katalog = lade_katalog(_ROOT)
+    for device_id, verboten in VORSTELLUNGSTERMINE.items():
+        g = katalog.nach_id(device_id)
+        assert g is not None and g.marktstart != verboten, (
+            f"{device_id}: {verboten} ist der Vorstellungs-, nicht der "
+            f"Verkaufstermin")
+
+
+def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
+    """Die Gegenprobe zum Test darueber, und der eigentliche Zweck der
+    Pflege: `nachfolger_effekt` und `verweildauer_nach_nachfolger` geben
+    `None` zurueck, sobald der Nachfolger keinen `marktstart` hat - still,
+    ohne Fehler, ununterscheidbar von "kein Effekt gemessen".
+
+    Geprueft wird deshalb der Weg, den die Auswertung geht: vom VORGAENGER
+    aus nach dem Nachfolger fragen und sein Datum vorfinden."""
+    katalog = lade_katalog(_ROOT)
+    ketten = [(g.vorgaenger, g) for g in katalog.geraete
+              if g.device_id in BELEGTE_MARKTSTARTS and g.vorgaenger]
+    # Ohne diese Zeile waere der Test auch dann gruen, wenn `vorgaenger`
+    # ueberall leer waere und die Schleife nichts durchliefe.
+    assert len(ketten) == 6, ketten   # alle ausser dem Fold8 Ultra ohne Kette
+    for _, nachfolger in ketten:
+        vorgaenger = next(v for v in katalog.geraete
+                          if v.hersteller == nachfolger.hersteller
+                          and v.modell == nachfolger.vorgaenger)
+        gefunden = katalog.nachfolger_von(vorgaenger.device_id)
+        assert gefunden is not None and gefunden.device_id == nachfolger.device_id
+        assert gefunden.marktstart, (
+            f"{vorgaenger.modell}: der Nachfolger {gefunden.modell} hat keinen "
+            f"marktstart - die Nachfolger-Analyse faellt fuer dieses Geraet "
+            f"still aus")
+
+
+def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
+    """Eine vertauschte oder verrutschte Jahreszahl faellt sonst nirgends
+    auf. Geprueft werden nur Paare, bei denen BEIDE Daten gepflegt sind."""
+    katalog = lade_katalog(_ROOT)
+    paare = []
+    for g in katalog.geraete:
+        if not (g.marktstart and g.vorgaenger):
+            continue
+        for v in katalog.geraete:
+            if (v.hersteller == g.hersteller and v.modell == g.vorgaenger
+                    and v.marktstart):
+                paare.append((v, g))
+    assert len(paare) >= 4, "keine vergleichbaren Paare - der Test prueft nichts"
+    for vorgaenger, nachfolger in paare:
+        assert nachfolger.marktstart > vorgaenger.marktstart, (
+            f"{nachfolger.modell} ({nachfolger.marktstart}) startet nicht nach "
+            f"{vorgaenger.modell} ({vorgaenger.marktstart})")

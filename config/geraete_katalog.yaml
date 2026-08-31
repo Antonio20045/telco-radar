@@ -50,6 +50,39 @@
 # Eintragen kann man ein Datum aus der Pressemitteilung des Herstellers
 # (Verkaufsstart, nicht Ankündigung) - eine Zeile pro Recherche, keine
 # Massenpflege.
+#
+# -----------------------------------------------------------------------------
+# AM 31.08.2026 IM BERICHTSARCHIV GESUCHT UND NICHT BELEGBAR
+# -----------------------------------------------------------------------------
+# Durchsucht wurden alle `data/reports/*.json` (16.07.-28.08.2026), Meldungen
+# und Prosaberichte samt der Veröffentlichungsdaten in der Quellenliste. Belegt
+# und eingetragen wurden dabei die Pixel-11-Reihe (2026-08-20) und die
+# Z-Fold8-/Z-Flip8-Reihe (2026-08-07); die Begründungen stehen jeweils über den
+# Einträgen. NICHT belegbar waren:
+#
+#   iPhone 17, iPhone 17 Pro   Marktstart liegt VOR dem Archivbeginn. Das
+#                              Archiv kennt sie nur als etablierte Geräte -
+#                              Bericht 2026-08-27 führt das iPhone 17 als
+#                              meistverkauftes Smartphone des 2. Quartals 2026.
+#   iPhone 17e                 kommt im ganzen Archiv KEIN einziges Mal vor.
+#   Galaxy S26, S26 Ultra      ebenfalls vor Archivbeginn; das S26 Ultra steht
+#                              im selben Quartalsranking, das S26 taucht nur in
+#                              Rabatt- und Gebrauchtmeldungen auf.
+#   Galaxy A57                 nur Preismeldungen (Bericht 2026-08-15: Rabatt
+#                              bei PcComponentes; 2026-08-25: Preiserhöhung in
+#                              Indien) - kein Launch.
+#   Galaxy S26 FE              ist am 31.08.2026 noch GAR NICHT auf dem Markt.
+#                              Bericht 2026-08-19: "die Markteinführung wird
+#                              Anfang kommenden Monats erwartet"; Bericht
+#                              2026-08-21 nennt den 27. August als Termin der
+#                              Vorstellung. Frühestens nach dem September-Lauf
+#                              nachtragen - und dann den VERKAUFS-, nicht den
+#                              Vorstellungstag.
+#
+# Wer hier nachpflegt: die Veröffentlichungsdaten der einzelnen Meldungen
+# stehen NICHT an den Highlights (die tragen nur das Berichtsdatum), sondern in
+# der Quellenliste "Wochenueberblick" des Prosaberichts (`briefing_md`), je
+# Zeile in Klammern hinter dem Link.
 # =============================================================================
 
 geraete:
@@ -456,10 +489,40 @@ geraete:
 
   # ----------------------------------------------------------------- Google
   # Die Marke, die in den Price Alerts der internen Lösung ganz fehlt.
+
+  # ---------------------------------------------------------------------------
+  # MARKTSTART DER PIXEL-11-REIHE: 2026-08-20, belegt aus dem Berichtsarchiv
+  # ---------------------------------------------------------------------------
+  # Vorgestellt am 12.08.2026 (Bericht 2026-08-19, Google Pixel: "Google hat am
+  # 12. August 2026 die Pixel-11-Serie vorgestellt") - das ist NICHT der
+  # Marktstart. Die Vorbestellphase ist bis zum 19./20.08. belegt: Bericht
+  # 2026-08-14 (Charter/Spectrum Mobile, "nimmt bis 19. August Vorbestellungen
+  # ... an"), Bericht 2026-08-19 (Xataka Movil, MediaMarkt Spanien "bei
+  # Vorbestellung ... bis 20. August").
+  #
+  # Erster belegter VERKAUFSTAG ist der 20.08.2026 - zwei unabhaengige
+  # Pressemitteilungen desselben Tages (Veroeffentlichungsdatum aus der
+  # Quellenliste des Berichts vom 2026-08-25):
+  #   Vodafone UK, 2026-08-20: "The new Google Pixel 11, Pixel 11 Pro Fold,
+  #     Pixel 11 Pro and Pixel 11 Pro XL now available with Vodafone"
+  #   Three UK, 2026-08-20: "Get the latest Google Pixel 11 range on Three
+  #     Mobile today"
+  # Bestaetigt am Folgetag durch Univers Freebox, 2026-08-21: "Free Mobile
+  # vermarktet nach den Vorbestellungen jetzt Google Pixel 11 ... direkt".
+  #
+  # WIDERSPRUCH, bewusst hier notiert statt weggelassen: Googles eigener
+  # Beitrag "You can officially buy the Pixel 11 phones and Pixel Watch 5."
+  # ist auf den 25.08.2026 datiert (Bericht 2026-08-26). Der Vorrang des
+  # 20.08. ist keine Abwaegung nach Gefuehl, sondern eine Reihenfolge: ein
+  # Haendler kann nicht vor dem Marktstart verkaufen, also ist der 20.08. eine
+  # obere Schranke, waehrend der 25.08. nur eine spaete Meldung sein kann.
+  # Wer lieber dem Hersteller folgt, aendert die vier Zeilen unten auf
+  # 2026-08-25 - die Belege stehen dafuer hier beisammen.
   - hersteller: Google
     modell: Pixel 11
     generation: 11
     vorgaenger: Pixel 10
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
     speicher: [256, 512]
     segment: flagship
 
@@ -467,6 +530,7 @@ geraete:
     modell: Pixel 11 Pro
     generation: 11
     vorgaenger: Pixel 10 Pro
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
     speicher: [256, 512, 1024]
     segment: flagship
 
@@ -474,6 +538,7 @@ geraete:
     modell: Pixel 11 Pro XL
     generation: 11
     vorgaenger: Pixel 10 Pro XL
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
     speicher: [256, 512, 1024]
     segment: flagship
 
@@ -484,6 +549,9 @@ geraete:
     modell: Pixel 11 Pro Fold
     generation: 11
     vorgaenger: Pixel 10 Pro Fold
+    # Dieselbe Vodafone-UK-Mitteilung vom 20.08.2026 nennt das Pro Fold
+    # ausdruecklich beim Namen - siehe Block oben.
+    marktstart: 2026-08-20
     speicher: [256, 512, 1024]
     segment: flagship
 
@@ -521,10 +589,35 @@ geraete:
     speicher: [128, 256, 512]
     segment: premium
 
+  # ---------------------------------------------------------------------------
+  # MARKTSTART DER Z-FOLD8-/Z-FLIP8-REIHE: 2026-08-07, belegt aus dem Archiv
+  # ---------------------------------------------------------------------------
+  # Der seltene Fall, in dem der Tag WOERTLICH in einer Meldung steht. Bericht
+  # 2026-08-07, Samsung Newsroom, "Samsung Officially Launches Galaxy Z Fold8
+  # Ultra, Fold8, Flip8, Watch Ultra2 and Watch9":
+  #   "Die neuen Foldables Galaxy Z Fold8 Ultra, Fold8, Flip8 sowie die
+  #    Smartwatches Watch Ultra2 und Watch9 sind ab dem 7. August weltweit bei
+  #    Mobilfunkanbietern und im Handel erhaeltlich."
+  #
+  # Vorgestellt wurden sie am 22.07.2026 (Bericht 2026-08-07, Samsung: "Am
+  # 22. Juli wurden auf dem Galaxy Unpacked Event das Galaxy Z Fold8 Ultra,
+  # Galaxy Z Fold8 und Galaxy Z Flip8 vorgestellt") - das ist der
+  # Vorstellungstermin und gehoert NICHT in dieses Feld.
+  #
+  # Drei unabhaengige Bestaetigungen desselben Verkaufsstarts:
+  #   Three UK (Bericht 2026-08-07): "Galaxy Z Fold8, Z Fold8 Ultra and Z Flip8
+  #     now available" (so auch die Adresse der Mitteilung)
+  #   Univers Freebox (Bericht 2026-08-08): "Free Mobile lance officiellement
+  #     les nouveaux Galaxy Z Fold8 et Z Flip8"
+  #   Telepolis (Bericht 2026-08-08): "Samsung hat in Polen ... in den freien
+  #     Verkauf gebracht"
+  # Und die Gegenprobe zur Abgrenzung: Telepolis meldet am 2026-08-07 noch
+  # Rekord-Vorbestellungen "vor dem offiziellen Verkaufsstart".
   - hersteller: Samsung
     modell: Galaxy Z Fold8
     generation: 8
     vorgaenger: Galaxy Z Fold 7
+    marktstart: 2026-08-07   # siehe Block oben (Samsung Newsroom, "ab dem 7. August")
     aliase: ["Galaxy Z Fold 8"]
     speicher: [256, 512, 1024]
     segment: flagship
@@ -532,6 +625,7 @@ geraete:
   - hersteller: Samsung
     modell: Galaxy Z Fold8 Ultra
     generation: 8
+    marktstart: 2026-08-07   # dieselbe Mitteilung wie beim Fold8, siehe Block oben
     aliase: ["Galaxy Z Fold 8 Ultra"]
     speicher: [256, 512, 1024]
     segment: flagship
@@ -540,6 +634,7 @@ geraete:
     modell: Galaxy Z Flip8
     generation: 8
     vorgaenger: Galaxy Z Flip 7
+    marktstart: 2026-08-07   # siehe Block oben (Samsung Newsroom, "ab dem 7. August")
     aliase: ["Galaxy Z Flip 8"]
     speicher: [256, 512]
     segment: flagship
