@@ -6,21 +6,29 @@ zeichnen ist trivial, und sie sieht gut aus. Deshalb steht in jedem
 Ergebnis, worauf es beruht, und unter `_MIND_PUNKTE` Messpunkten heisst es
 "Datenbasis noch duenn" - nicht "Trend".
 """
+from pathlib import Path
+
 import pytest
 
 from telco_radar.analyze.geraete_lifecycle import (
     MIND_PUNKTE,
+    MIND_TAGE_JE_GERAET,
+    MIND_TERMINE_JE_GERAET,
     MIND_WOCHEN,
     auswertung,
     listungsdauer,
     nachfolger_effekt,
     portfolio_tiefe,
     preisverfall,
+    verweildauer_nach_nachfolger,
 )
 from telco_radar.analyze.geraete_store import (
     STATUS_AKTIV,
     STATUS_AUSGELISTET,
+    GeraeteDB,
+    Preishistorie,
 )
+from telco_radar.geraete_config import lade_katalog
 from telco_radar.geraete_model import Geraet, Katalog
 
 _KATALOG = Katalog(geraete=[
@@ -412,3 +420,492 @@ def test_drei_prueftermine_reichen_nicht():
                                         ["2026-08-01", "2026-08-10",
                                          "2026-08-27"]})
     assert a["dauern"] == [] and a["duenn"] is True
+
+
+# --------------------------------------------------------------------------
+# Die Schwelle zaehlt je LISTUNG, nicht je Anbieter (31.08.2026)
+#
+# Der Kommentar ueber `MIND_TERMINE_JE_GERAET` versprach seit dem 28.08.2026
+# "und zwar JE GERAET"; `_oft_genug` las dagegen
+# `termine_je_anbieter[eintrag["anbieter"]]`. Ein einziges lange beobachtetes
+# Geraet schaltete damit den ganzen Anbieter frei - also auch die elf, die es
+# seit gestern gibt. Gegen den alten Stand fallen
+# `test_die_termin_schwelle_zaehlt_je_listung_nicht_je_anbieter` und
+# `test_ein_prueftermin_vor_der_ersten_sichtung_zaehlt_nicht_mit` durch; sie
+# sind der Reproduktionsfall.
+# --------------------------------------------------------------------------
+
+def _termin_eintrag(lid, device="apple-iphone-16-pro-max", anbieter="Medimax",
+                    first="2026-01-01", last="2026-04-01", status=STATUS_AKTIV,
+                    preis=1199.0, erstpreis=1449.0):
+    """Eine Listung mit eigener ID - die Preishistorie ist darauf geschluesselt."""
+    return {"id": lid, "sku_id": f"{device}-256gb-schwarz-{lid}",
+            "device_id": device, "anbieter": anbieter, "anbieter_typ": "handel",
+            "first_seen": first, "last_verified": last, "status": status,
+            "preis_ohne_vertrag": preis, "erstpreis": erstpreis,
+            "erstpreis_art": "ohne_vertrag", "erstpreis_am": first}
+
+
+def test_die_termin_schwelle_zaehlt_je_listung_nicht_je_anbieter():
+    """Vier Prueftermine des ANBIETERS, zwei Listungen mit verschiedenen
+    Beobachtungsfenstern: nur die, in deren Fenster vier Termine liegen,
+    bekommt eine Zeile.
+
+    Die zweite Listung ist ausdruecklich NICHT an der Spanne gescheitert -
+    das wird im selben Test nachgewiesen, sonst prueft er die falsche Regel.
+    """
+    termine = {"Medimax": ["2026-01-01", "2026-02-01", "2026-03-01",
+                           "2026-04-01"]}
+    lang = _termin_eintrag("lang", first="2026-01-01", last="2026-04-01")
+    kurz = _termin_eintrag("kurz", device="apple-iphone-17-pro-max",
+                           first="2026-03-01", last="2026-04-01",
+                           erstpreis=1299.0, preis=1249.0)
+
+    # Der Fall tritt ohne die Zusicherung wirklich ein: je ANBIETER gerechnet
+    # nimmt "kurz" die Termin-Schwelle (vier Termine stehen in der Liste),
+    # und die 21-Tage-Spanne nimmt sie ebenfalls.
+    assert len(termine["Medimax"]) >= MIND_TERMINE_JE_GERAET
+    assert listungsdauer(kurz) == 31 >= MIND_TAGE_JE_GERAET
+
+    a = auswertung([lang, kurz], [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=termine)
+    zugeordnet = {d["device_id"]: d for d in a["dauern"]}
+    assert len(zugeordnet) == len(a["dauern"]) == 1, a["dauern"]
+    assert "apple-iphone-16-pro-max" in zugeordnet
+    assert zugeordnet["apple-iphone-16-pro-max"]["tage"] == 90
+    assert all(v["device_id"] == "apple-iphone-16-pro-max"
+               for v in a["verfaelle"])
+
+
+def test_die_laufzahl_des_anbieters_bleibt_der_boden():
+    """Der bewusst verbliebene Rest Anbieterrechnung - und seine Grenze.
+
+    Eine Laufzahl laesst sich keinem Fenster zuordnen, aber sie ist die
+    einzige Auskunft, die einen Lauf ueberlebt, dessen Bestaetigung ein
+    spaeterer ueberschrieben hat: `last_verified` behaelt nur den juengsten.
+    Wer sie streicht, sperrt genau die Ware aus, die ein Jahr lang
+    unveraendert im Regal steht (Lehre G0 vom 28.08.2026).
+
+    Was NICHT mehr gilt: die blosse LAENGE der Terminliste des Anbieters.
+    Sie gab bis zum 31.08.2026 jeder Listung dieselbe Zahl - auch der, die
+    es erst seit dem vorletzten Termin gibt.
+    """
+    eintrag = _termin_eintrag("l1", first="2026-01-01", last="2026-04-01")
+    termine = {"Medimax": ["2026-03-30", "2026-04-01"]}
+    assert listungsdauer(eintrag) == 90 >= MIND_TAGE_JE_GERAET
+
+    viele = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                       laeufe_je_anbieter={"Medimax": 40},
+                       termine_je_anbieter=termine)
+    assert [d["tage"] for d in viele["dauern"]] == [90]
+
+    # Die Gegenprobe: dieselben zwei Termine, aber drei Laeufe. Ohne sie
+    # belegte der Test nur, dass die Zeile immer erscheint.
+    wenige = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                        laeufe_je_anbieter={"Medimax": 3},
+                        termine_je_anbieter=termine)
+    assert wenige["dauern"] == [] and wenige["duenn"] is True
+
+
+def test_ohne_jede_termininformation_entscheidet_allein_die_spanne():
+    """Der Rueckfall, und er ist der Grund, warum die Umstellung keine
+    Altbestaende stillegt.
+
+    Liegt gar keine Terminauskunft vor - kein Prueftag, keine Laufzahl, kein
+    Preispunkt -, wird die Zahl NICHT erfunden: die Termin-Bedingung
+    entfaellt, die Spanne gilt weiter. Ohne diesen Zweig faellt jede Listung
+    durch, deren Preis sich nie geaendert hat, denn ihre eigenen Belege sind
+    genau zwei (`erstpreis_am` und `last_verified`).
+    """
+    eintrag = _termin_eintrag("l1", anbieter="expert", first="2026-01-01",
+                              last="2026-08-10")
+    # Der Fall tritt wirklich ein: aus eigener Kraft hat die Listung zwei
+    # Messtage, also weniger als die Schwelle verlangt.
+    a = auswertung([eintrag], [], _KATALOG, heute="2026-08-11")
+    assert [d["tage"] for d in a["dauern"]] == [221]
+    assert a["duenn"] is False
+
+    # Und die Gegenprobe: sobald es eine Terminauskunft GIBT, entscheidet sie.
+    b = auswertung([eintrag], [], _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2026-08-01", "2026-08-10"]})
+    assert b["dauern"] == []
+
+
+def test_ein_prueftermin_vor_der_ersten_sichtung_zaehlt_nicht_mit():
+    """Das Fenster ist `first_seen` bis `last_verified`. Ein Lauf, der vor
+    der ersten Sichtung dieser Listung stattfand, hat sie nicht gesehen."""
+    eintrag = _termin_eintrag("l1", first="2026-03-01", last="2026-04-01")
+    termine = {"Medimax": ["2026-01-01", "2026-01-15", "2026-02-01",
+                           "2026-03-15", "2026-04-01"]}
+    assert len(termine["Medimax"]) >= MIND_TERMINE_JE_GERAET
+    a = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=termine)
+    # Im Fenster liegen 15.03. und 01.04.; dazu erstpreis_am (01.03.) - drei.
+    assert a["dauern"] == [], a["hinweis"]
+
+    # Gegenprobe: derselbe Anbieter, dieselben Termine, aber ein Fenster,
+    # das vier davon enthaelt.
+    lang = _termin_eintrag("l2", first="2026-01-01", last="2026-04-01")
+    b = auswertung([lang], [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=termine)
+    assert [d["tage"] for d in b["dauern"]] == [90]
+
+
+# --------------------------------------------------------------------------
+# Die Schwelle gilt auch fuer die Nachfolger-Tabelle
+# --------------------------------------------------------------------------
+
+def test_ohne_die_schwelle_keine_nachfolger_zeile():
+    """Bis zum 31.08.2026 lief `effekte` durch KEIN Gatter - die einzige
+    Sektion, die aus zwei Messpunkten eine Aussage machte."""
+    punkte = _punkte(("2025-08-01", 1449.0), ("2025-09-25", 1299.0),
+                     ("2025-10-30", 1149.0), ("2025-12-15", 999.0),
+                     listung_id="jung")
+    jung = _termin_eintrag("jung", anbieter="expert", first="2026-08-01",
+                           last="2026-08-10")
+
+    # Der Fall tritt ohne das Gatter wirklich ein: die Preisrechnung allein
+    # liefert eine vollstaendige Zeile.
+    roh = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte)
+    assert roh is not None and roh["nach"][90] == 999.0
+    assert listungsdauer(jung) == 9 < MIND_TAGE_JE_GERAET
+
+    a = auswertung([jung], punkte, _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2026-08-01", "2026-08-04",
+                                                   "2026-08-07", "2026-08-10"]})
+    assert a["nachfolger"] == [], "neun Tage sind keine Lifecycle-Zeile"
+
+
+def test_ueber_der_schwelle_erscheint_die_nachfolger_zeile():
+    """Die Gegenprobe: dieselben Preispunkte, aber eine Listung, die vier
+    Prueftermine ueber mehr als 21 Tage hinter sich hat."""
+    punkte = _punkte(("2025-08-01", 1449.0), ("2025-09-25", 1299.0),
+                     ("2025-10-30", 1149.0), ("2025-12-15", 999.0),
+                     listung_id="alt")
+    alt = _termin_eintrag("alt", anbieter="expert", first="2025-06-01",
+                          last="2026-08-10")
+    a = auswertung([alt], punkte, _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-08-01", "2025-09-25",
+                                                   "2025-10-30", "2025-12-15"]})
+    assert len(a["nachfolger"]) == 1
+    zeile = a["nachfolger"][0]
+    assert zeile["device_id"] == "apple-iphone-16-pro-max"
+    assert zeile["anbieter"] == "expert"
+    assert zeile["nachfolger"] == "apple-iphone-17-pro-max"
+    assert zeile["basis"] == 1449.0 and zeile["nach"][90] == 999.0
+    assert zeile["verweildauer_tage"] == 325
+    assert zeile["verweildauer_untergrenze"] is False
+    assert zeile["noch_gelistet"] is True
+
+
+# --------------------------------------------------------------------------
+# Die fehlende Haelfte des Nachfolger-Effekts: die Verweildauer
+#
+# Die Anforderung lautet vollstaendig "Preis des Vorgaengers 30/60/90 Tage
+# nach Marktstart des Nachfolgers UND wie lange er danach noch im Regal
+# bleibt". Der zweite Halbsatz ist die These der Fachabteilung - und er
+# haengt am Preis NICHT.
+# --------------------------------------------------------------------------
+
+def _regal(first, last, status=STATUS_AKTIV, anbieter="expert",
+           device="apple-iphone-16-pro-max", lid="l1"):
+    return _termin_eintrag(lid, device=device, anbieter=anbieter,
+                           first=first, last=last, status=status)
+
+
+def test_der_vorgaenger_verschwindet_vor_dem_marktstart_des_nachfolgers():
+    """"Keinen Tag" ist die ehrliche Antwort - und keine negative Dauer.
+
+    Das ist die Vodafone-Seite von Antonios These: das alte Geraet ist aus
+    dem Regal, bevor der Nachfolger ueberhaupt kommt.
+    """
+    v = verweildauer_nach_nachfolger(
+        [_regal("2025-01-01", "2025-08-01", status=STATUS_AUSGELISTET)],
+        _KATALOG)
+    # Der Fall tritt wirklich ein: die letzte Bestaetigung liegt VOR dem
+    # Marktstart des Nachfolgers.
+    assert v["marktstart"] == "2025-09-19" > "2025-08-01"
+    assert v["verweildauer_tage"] == 0
+    assert v["noch_gelistet"] is False
+    assert v["verweildauer_untergrenze"] is False
+
+
+def test_der_vorgaenger_bleibt_ueber_den_marktstart_hinaus_im_regal():
+    """Die Wettbewerber-Seite derselben These - und die Zahl, die sie
+    pruefbar macht."""
+    v = verweildauer_nach_nachfolger([_regal("2025-01-01", "2026-08-10")],
+                                     _KATALOG)
+    assert v["verweildauer_tage"] == 325       # 19.09.2025 -> 10.08.2026
+    assert v["noch_gelistet"] is True
+    assert v["verweildauer_untergrenze"] is False
+    assert v["anbieter"] == "expert"
+    assert v["device_id"] == "apple-iphone-16-pro-max"
+    assert v["nachfolger"] == "apple-iphone-17-pro-max"
+    assert v["nachfolger_modell"] == "iPhone 17 Pro Max"
+
+
+def test_erst_nach_dem_marktstart_gemessen_ist_eine_untergrenze():
+    """Der Fall des echten Bestands: alle Kandidaten haben ihren
+    Nachfolger-Marktstart 570 bis 710 Tage vor unserem ersten Messpunkt.
+
+    Belastbar sagen laesst sich dann nur "steht mindestens so lange noch im
+    Regal" - eine Untergrenze, kein Verlauf. Eine Zahl, die so tut, als
+    haetten wir die ganze Zeit gemessen, waere eine Falschaussage.
+    """
+    spaet = verweildauer_nach_nachfolger([_regal("2025-11-30", "2026-08-10")],
+                                         _KATALOG)
+    assert spaet["verweildauer_untergrenze"] is True
+    assert spaet["verweildauer_tage"] == 325
+    assert spaet["beobachtet_seit"] == "2025-11-30"
+
+    # Gegenprobe im selben Test: dieselbe rechte Kante, aber eine
+    # Beobachtung, die VOR dem Marktstart begonnen hat. Ohne sie koennte das
+    # Feld konstant True sein und der Test waere trotzdem gruen.
+    frueh = verweildauer_nach_nachfolger([_regal("2025-01-01", "2026-08-10")],
+                                         _KATALOG)
+    assert frueh["verweildauer_untergrenze"] is False
+    assert frueh["verweildauer_tage"] == spaet["verweildauer_tage"]
+
+
+def test_der_beobachtungsbeginn_zaehlt_auch_den_erstpreis():
+    """Ein Altbestand kann einen `erstpreis_am` tragen, der aelter ist als
+    sein `first_seen`. Der aeltere der beiden Belege ist der Beginn."""
+    e = _regal("2025-11-30", "2026-08-10")
+    e["erstpreis_am"] = "2025-01-05"
+    v = verweildauer_nach_nachfolger([e], _KATALOG)
+    assert v["beobachtet_seit"] == "2025-01-05"
+    assert v["verweildauer_untergrenze"] is False
+
+
+def test_die_verweildauer_rechnet_ueber_den_regalplatz_nicht_die_farbe():
+    """Acht Farben und drei Speichergroessen sind EIN Regalplatz. Gerechnet
+    wird vom fruehesten `first_seen` bis zum spaetesten `last_verified`."""
+    gruppe = [_regal("2025-11-30", "2026-02-01", lid="a"),
+              _regal("2025-01-01", "2026-08-10", lid="b"),
+              _regal("2026-01-01", "2026-03-01", lid="c",
+                     status=STATUS_AUSGELISTET)]
+    v = verweildauer_nach_nachfolger(gruppe, _KATALOG)
+    assert v["beobachtet_seit"] == "2025-01-01"
+    assert v["zuletzt_bestaetigt"] == "2026-08-10"
+    assert v["verweildauer_tage"] == 325
+    assert v["noch_gelistet"] is True          # zwei der drei sind aktiv
+
+
+def test_ohne_marktstart_des_nachfolgers_keine_verweildauer():
+    """Ein geratenes Datum waere schlimmer als ein fehlendes - dieselbe
+    Regel wie bei der Preisrechnung."""
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="iPhone 16 Pro Max", generation=16),
+        Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
+               vorgaenger="iPhone 16 Pro Max"),      # ohne marktstart
+    ])
+    # Der Fall tritt wirklich ein: es GIBT einen Nachfolger, nur kein Datum.
+    assert katalog.nachfolger_von("apple-iphone-16-pro-max") is not None
+    assert verweildauer_nach_nachfolger([_regal("2025-01-01", "2026-08-10")],
+                                        katalog) is None
+
+
+def test_ohne_nachfolger_keine_verweildauer():
+    v = verweildauer_nach_nachfolger(
+        [_regal("2025-01-01", "2026-08-10",
+                device="apple-iphone-17-pro-max")], _KATALOG)
+    assert v is None
+
+
+def test_ohne_letzte_bestaetigung_keine_verweildauer():
+    """Eine Verweildauer ohne rechte Kante waere geraten."""
+    e = _regal("2025-01-01", "2026-08-10")
+    e["last_verified"] = ""
+    assert verweildauer_nach_nachfolger([e], _KATALOG) is None
+
+
+def test_eine_zeile_ohne_preisbasis_traegt_trotzdem_die_verweildauer():
+    """Die Entscheidung des Modulkopfs (Regel 3), an echten Daten
+    nachgestellt: alle vier Kandidaten des Bestands vom 31.08.2026 haben
+    KEINEN Preis vom oder vor dem Marktstart ihres Nachfolgers.
+
+    Faellt die Zeile daran, verschweigt die Sektion eine echte Messung (die
+    Verweildauer) wegen einer fehlenden (dem Preis von damals).
+    """
+    # Erst ab 2025-11-30 gemessen, der Nachfolger kam am 2025-09-19.
+    punkte = _punkte(("2025-11-30", 1199.0), ("2026-06-01", 1099.0),
+                     listung_id="l1")
+    eintrag = _regal("2025-11-30", "2026-08-10")
+
+    # Der Fall tritt wirklich ein: die Preisrechnung allein gibt None.
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, punkte,
+                             anbieter="expert") is None
+
+    a = auswertung([eintrag], punkte, _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-11-30", "2026-02-01",
+                                                   "2026-06-01", "2026-08-10"]})
+    assert len(a["nachfolger"]) == 1
+    zeile = a["nachfolger"][0]
+    assert zeile["verweildauer_tage"] == 325
+    assert zeile["verweildauer_untergrenze"] is True
+    assert zeile["noch_gelistet"] is True
+    # Die Preisspalten sind LEER, aber vollstaendig: die Darstellung soll nie
+    # zwischen zwei Formen unterscheiden muessen.
+    assert zeile["basis"] is None
+    assert zeile["nach"] == {30: None, 60: None, 90: None}
+    assert zeile["prozent"] == {30: None, 60: None, 90: None}
+
+
+def test_die_nachfolger_zeile_traegt_die_vereinbarten_schluessel():
+    """Die Schnittstelle zum Darstellungspaket. Ein fehlendes Feld faellt
+    dort erst beim Rendern auf - und dann ohne Fehlermeldung."""
+    punkte = _punkte(("2025-08-01", 1449.0), ("2025-10-30", 1149.0),
+                     listung_id="l1")
+    a = auswertung([_regal("2025-06-01", "2026-08-10")], punkte, _KATALOG,
+                   heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-08-01", "2025-10-30",
+                                                   "2026-02-01", "2026-08-10"]})
+    erwartet = {"device_id", "modell", "anbieter", "nachfolger",
+                "nachfolger_modell", "marktstart", "basis", "nach", "prozent",
+                "verweildauer_tage", "verweildauer_untergrenze",
+                "noch_gelistet", "beobachtet_seit", "zuletzt_bestaetigt"}
+    assert len(a["nachfolger"]) == 1
+    assert erwartet <= set(a["nachfolger"][0])
+
+
+def test_je_anbieter_eine_eigene_nachfolger_zeile():
+    """Die These lautet "Wettbewerber lassen stehen, Vodafone ersetzt" - sie
+    ist ohne die Anbieterspalte nicht pruefbar. Und die Preisreihe des einen
+    Haendlers darf nie gegen die des anderen gerechnet werden."""
+    punkte = (_punkte(("2025-08-01", 1449.0), ("2025-12-15", 999.0),
+                      listung_id="a")
+              + [{"listung_id": "b", "datum": d, "preis_ohne_vertrag": p,
+                  "device_id": "apple-iphone-16-pro-max",
+                  "anbieter": "Vodafone"}
+                 for d, p in (("2025-08-01", 1399.0), ("2025-12-15", 1349.0))])
+    eintraege = [_regal("2025-06-01", "2026-08-10", lid="a"),
+                 _regal("2025-06-01", "2025-10-01", lid="b",
+                        anbieter="Vodafone", status=STATUS_AUSGELISTET)]
+    termine = {"expert": ["2025-08-01", "2025-10-01", "2025-12-15",
+                          "2026-08-10"],
+               "Vodafone": ["2025-06-01", "2025-08-01", "2025-09-01",
+                            "2025-10-01"]}
+    a = auswertung(eintraege, punkte, _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter=termine)
+    zugeordnet = {z["anbieter"]: z for z in a["nachfolger"]}
+    assert len(zugeordnet) == len(a["nachfolger"]) == 2, a["nachfolger"]
+    assert zugeordnet["expert"]["verweildauer_tage"] == 325
+    assert zugeordnet["expert"]["noch_gelistet"] is True
+    assert zugeordnet["Vodafone"]["verweildauer_tage"] == 12   # 19.09.-01.10.
+    assert zugeordnet["Vodafone"]["noch_gelistet"] is False
+    # Getrennte Preisreihen: 999 gegen 1349 am selben Tag.
+    assert zugeordnet["expert"]["nach"][90] == 999.0
+    assert zugeordnet["Vodafone"]["basis"] == 1399.0
+
+
+# --------------------------------------------------------------------------
+# Der Waechter gegen den ECHTEN Bestand
+#
+# Er nagelt die Lage vom 31.08.2026 fest: drei Messtage, laengste Spanne 20
+# Tage, also keine einzige Lifecycle-Zeile. Faellt er durch, hat sich die
+# DATENLAGE geaendert und nicht der Code - dann gehoert die Seite angesehen
+# (Handover §8a: "nach etwa zwei weiteren Wochen Nachtlaeufen kippt es von
+# selbst, dann ansehen").
+# --------------------------------------------------------------------------
+
+_WURZEL = Path(__file__).resolve().parents[1]
+_DB = _WURZEL / "data" / "state" / "geraete_db.json"
+_HISTORIE = _WURZEL / "data" / "state" / "geraete_preise.jsonl"
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_der_echte_bestand_traegt_heute_keine_lifecycle_zeile():
+    db = GeraeteDB(_DB)
+    historie = Preishistorie(_HISTORIE)
+    katalog = lade_katalog(_WURZEL)
+    alle = db.eintraege()
+    punkte = historie.alle_punkte()
+
+    # Dieselbe Vorbereitung wie in `report/geraete_view.py`.
+    termine_je_anbieter, laeufe_je_anbieter = {}, {}
+    for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
+        termine = set(db.messtermine(name))
+        termine.update(p.get("datum") for p in punkte
+                       if p.get("anbieter") == name and p.get("datum"))
+        termine_je_anbieter[name] = sorted(termine)
+        laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
+
+    a = auswertung(alle, punkte, katalog, heute="2026-08-31",
+                   laeufe_je_anbieter=laeufe_je_anbieter,
+                   termine_je_anbieter=termine_je_anbieter)
+
+    spannen = [listungsdauer(e) for e in alle]
+    laengste = max([s for s in spannen if s is not None], default=0)
+    assert laengste < MIND_TAGE_JE_GERAET, (
+        f"laengste Beobachtung {laengste} Tage - die Datenlage hat die "
+        f"Schwelle genommen. Seite ansehen, nicht den Test anpassen.")
+
+    assert a["duenn"] is True
+    assert a["dauern"] == []
+    assert a["verfaelle"] == [] and a["trends"] == []
+    assert a["nachfolger"] == [], (
+        "Nachfolger-Zeilen ohne 4 Messtermine ueber 21 Tage: "
+        f"{[z['device_id'] for z in a['nachfolger']]}")
+    # Die Portfolio-Tiefe traegt dagegen vollstaendig - sie braucht keine
+    # Historie, nur den heutigen Bestand.
+    assert a["portfolio"], "ohne Portfolio-Tiefe waere die Sektion leer"
+    assert all(t["modelle_anzahl"] >= t["generationen"] for t in a["portfolio"])
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_die_gegenprobe_je_anbieter_gegen_je_listung():
+    """Die Messung, wegen der die Zaehlung umgestellt wurde.
+
+    Je ANBIETER gerechnet nehmen im Bestand vom 31.08.2026 142 von 370
+    Listungen die Termin-Schwelle - darunter alle 140 von mobilcom-debitel,
+    obwohl im Fenster der meisten nur zwei oder drei der fuenf Prueftage
+    liegen. Je LISTUNG gerechnet sind es 70.
+
+    Diese beiden Zahlen sind hier nicht festgenagelt - sie wachsen mit jedem
+    Nachtlauf. Festgenagelt ist die EIGENSCHAFT: verschiebt man dieselbe
+    ANZAHL Prueftermine aus dem Fenster der Listungen heraus, muessen Zeilen
+    verschwinden. Unter der alten Rechnung aendert sich nichts, denn sie zaehlt
+    nur die Laenge der Liste.
+
+    Die Spannen des echten Bestands liegen alle unter 21 Tagen; damit die
+    Gegenprobe die TERMIN-Bedingung misst und nicht die Spanne, wird
+    `first_seen` fuer beide Laeufe gleich weit zurueckgesetzt.
+    """
+    db = GeraeteDB(_DB)
+    historie = Preishistorie(_HISTORIE)
+    katalog = lade_katalog(_WURZEL)
+    alle = db.eintraege()
+    punkte = historie.alle_punkte()
+    termine_je_anbieter, laeufe_je_anbieter = {}, {}
+    for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
+        termine = set(db.messtermine(name))
+        termine.update(p.get("datum") for p in punkte
+                       if p.get("anbieter") == name and p.get("datum"))
+        termine_je_anbieter[name] = sorted(termine)
+        laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
+
+    gedehnt = [{**e, "first_seen": "2020-01-01"} for e in alle]
+    im_fenster = auswertung(gedehnt, punkte, katalog, heute="2026-08-31",
+                            laeufe_je_anbieter=laeufe_je_anbieter,
+                            termine_je_anbieter=termine_je_anbieter)
+
+    # Dieselbe Anzahl Termine je Anbieter, aber allesamt vor der ersten
+    # Sichtung. Wer nur zaehlt, sieht keinen Unterschied.
+    verschoben = {name: [f"2019-{1 + i % 12:02d}-01" for i in range(len(tage))]
+                  for name, tage in termine_je_anbieter.items()}
+    assert ([len(v) for v in verschoben.values()]
+            == [len(termine_je_anbieter[n]) for n in verschoben]), \
+        "die Gegenprobe muss dieselbe ANZAHL Termine stellen"
+    ausserhalb = auswertung(gedehnt, punkte, katalog, heute="2026-08-31",
+                            laeufe_je_anbieter=laeufe_je_anbieter,
+                            termine_je_anbieter=verschoben)
+
+    assert im_fenster["dauern"], "ohne Durchlaesser prueft die Gegenprobe nichts"
+    assert len(ausserhalb["dauern"]) < len(im_fenster["dauern"]), (
+        f"{len(ausserhalb['dauern'])} statt weniger als "
+        f"{len(im_fenster['dauern'])} - Termine ausserhalb des Fensters "
+        f"zaehlen weiterhin mit")
+
+    # Was uebrig bleibt, kommt allein ueber den Laufzahl-Boden herein.
+    assert all(laeufe_je_anbieter.get(d["anbieter"], 0) >= MIND_TERMINE_JE_GERAET
+               for d in ausserhalb["dauern"])

@@ -23,6 +23,53 @@ laesst sich trotzdem eine Kurve zeichnen, und sie sieht gut aus - genau das
 tut diese Seite nicht. Unterhalb von `MIND_PUNKTE` Messpunkten traegt jedes
 Ergebnis `duenn: True` und einen Satz, der die Zahl nennt, auf der es beruht.
 Ein Test haelt das fest.
+
+DIE VERWEILDAUER NACH DEM MARKTSTART DES NACHFOLGERS
+----------------------------------------------------
+Die Anforderung der Fachabteilung lautet vollstaendig: "Preis des Vorgaengers
+30/60/90 Tage nach Marktstart des Nachfolgers UND wie lange er danach noch im
+Regal bleibt." Der zweite Halbsatz ist die eigentliche These - Wettbewerber
+lassen das Vorjahresmodell als guenstigen Einstieg stehen, bei Vodafone wird
+direkt ersetzt - und er haengt NICHT am Preis.
+
+Vier Regeln tragen die Zahl:
+
+1. Gerechnet wird je (Geraet, Anbieter), nicht je Listung. Ein Geraet steht
+   bei einem Haendler in acht Farben und drei Speichergroessen; die Frage
+   "wie lange bleibt es im Regal" beantwortet das REGAL, nicht die einzelne
+   Farbvariante. Anfang und Ende der Gruppe sind deshalb das frueheste
+   `first_seen` und das spaeteste `last_verified` ihrer Listungen.
+
+2. Die Zahl sagt, ob sie eine UNTERGRENZE ist. Alle heutigen Kandidaten haben
+   ihren Nachfolger-Marktstart 570 bis 710 Tage vor unserem ersten Messpunkt
+   (10.08.2026): belastbar sagen laesst sich ueber sie nur "steht 709 Tage
+   nach dem Marktstart seines Nachfolgers noch im Regal" - eine Untergrenze,
+   kein Verlauf. Wer daraus eine gemessene Verweildauer macht, behauptet eine
+   Beobachtung, die es nie gab. `verweildauer_untergrenze` traegt genau
+   diesen Unterschied: True heisst "wir haben erst NACH dem Marktstart zu
+   messen begonnen".
+
+3. Eine Zeile OHNE Preisbasis erscheint trotzdem - mit Verweildauer und
+   leeren Preisspalten. Das ist die Entscheidung dieser Datei, und sie ist
+   begruendet: `basis` fehlt genau dann, wenn wir vor dem Marktstart des
+   Nachfolgers noch nicht gemessen haben - heute bei ALLEN sechs
+   (Geraet, Anbieter)-Paaren des Bestands. Wuerde die Zeile daran
+   scheitern, verschwiege die Sektion eine echte Messung (die Verweildauer,
+   sauber untergrenzt) wegen einer fehlenden (dem Preis von damals). Eine
+   leere Preisspalte ist ehrlich; eine fehlende Zeile ist eine Auskunft,
+   die wir haetten geben koennen. `nach` und `prozent` tragen dabei ihre
+   vollen Schluessel mit None - die Darstellung soll nie zwischen zwei
+   Formen unterscheiden muessen.
+
+4. Die Tabelle steht hinter DERSELBEN Schwelle wie alles andere hier: vier
+   Messtermine ueber mindestens 21 Tage. Bis zum 31.08.2026 lief sie durch
+   kein Gatter und war damit die einzige Sektion, die aus zwei Messpunkten
+   eine Aussage machte. Reicht es fuer kein Geraet, ist die Liste leer und
+   die Seite sagt den Duenn-Satz.
+
+Die Zeile traegt fuer das Darstellungspaket zusaetzlich zu den bisherigen
+Schluesseln: `anbieter`, `verweildauer_tage`, `verweildauer_untergrenze`,
+`noch_gelistet`, `beobachtet_seit` und `zuletzt_bestaetigt`.
 """
 from __future__ import annotations
 
@@ -62,6 +109,33 @@ MIND_WOCHEN = 12
 # Gezaehlt werden jetzt VERSCHIEDENE Messtage und die Spanne dazwischen, und
 # zwar JE GERAET: ein Portfolio, in dem ein Geraet lange beobachtet wird und
 # elf andere seit gestern, hat keine zwoelf belastbaren Zeilen.
+#
+# GENAU DAS TAT DER CODE BIS ZUM 31.08.2026 NICHT. `_oft_genug` las
+# `termine_je_anbieter[eintrag["anbieter"]]` und zaehlte damit JE ANBIETER:
+# ein einziges lange beobachtetes Geraet schaltete den ganzen Anbieter frei,
+# also auch die elf von gestern. Docstring und Code widersprachen sich - die
+# Fehlerklasse "eine Zusicherung in einer Docstring ist keine Zusicherung",
+# an der dieses Projekt schon einmal 18 Tage lang vorbeigelaufen ist.
+#
+# Gezaehlt wird jetzt das FENSTER DER LISTUNG: ihre eigenen Preispunkte, ihr
+# `erstpreis_am`, ihr `last_verified` - und die Prueftermine ihres Anbieters,
+# SOWEIT SIE ZWISCHEN `first_seen` UND `last_verified` LIEGEN. Der letzte
+# Teil ist kein Rueckfall in die Anbieterrechnung, sondern die Lehre aus G0
+# (28.08.2026): `geraete_preise.jsonl` traegt nur AENDERUNGSpunkte, ein
+# stabiler Preis schreibt keine Zeile. Wer nur die eigenen Punkte zaehlt,
+# sperrt genau die Ware aus, die ein halbes Jahr unveraendert im Regal steht,
+# und laesst die herein, deren Verfuegbarkeit flattert. Ein Prueftermin
+# INNERHALB des Fensters ist dagegen eine echte Beobachtung dieser Listung:
+# sie war davor da und danach noch da, und die Zwei-Stufen-Auslistung haette
+# sie sonst gealtert.
+#
+# Die LAUFZAHL des Anbieters bleibt daneben ein Boden. Sie laesst sich
+# keinem Fenster zuordnen, ist aber die einzige Auskunft, die einen Lauf
+# ueberlebt, dessen Bestaetigung ein spaeterer ueberschrieben hat - und ohne
+# sie faellt die Ware durch, die seit einem Jahr unveraendert im Regal steht.
+# Das ist der bewusst verbliebene Rest Anbieterrechnung; er betrifft im
+# Bestand vom 31.08.2026 zwei von 370 Listungen (ALDI TALK, vier Laeufe bei
+# drei bekannten Terminen), und beide scheitern ohnehin an der Spanne.
 MIND_TERMINE_JE_GERAET = 4
 MIND_TAGE_JE_GERAET = 21
 
@@ -151,13 +225,41 @@ def _preis_am(punkte: list, stichtag: date, art: str = "preis_ohne_vertrag") -> 
     return gueltig
 
 
+def _eigene_punkte(punkte: list, device_id: str,
+                   anbieter: Optional[str] = None) -> list:
+    """Die Preispunkte, die zu diesem Geraet (und ggf. Anbieter) gehoeren.
+
+    Der Rueckfall auf die ganze Liste gilt nur ohne Anbieterfilter und nur,
+    wenn kein einziger Punkt ein `device_id` traegt - so rechnen aeltere
+    Aufrufer und Tests, die eine reine Preisreihe uebergeben. MIT Anbieter
+    darf er nicht greifen: dann waere die "Preisreihe dieses Haendlers" die
+    aller Haendler, und der Nachfolger-Effekt verrechnete den Discounter
+    gegen den Netzbetreiber.
+    """
+    treffer = [p for p in punkte
+               if p.get("device_id") == device_id
+               and (anbieter is None or p.get("anbieter") == anbieter)]
+    if treffer:
+        return treffer
+    if anbieter is None:
+        return punkte
+    return [p for p in punkte if p.get("anbieter") == anbieter]
+
+
 def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
-                      heute: Optional[str] = None) -> Optional[dict]:
-    """Was der Marktstart des Nachfolgers mit dem Preis des Vorgaengers macht.
+                      heute: Optional[str] = None,
+                      anbieter: Optional[str] = None) -> Optional[dict]:
+    """Was der Marktstart des Nachfolgers mit dem PREIS des Vorgaengers macht.
 
     Gibt None, wenn es keinen Nachfolger im Katalog gibt, wenn dessen
     `marktstart` fehlt (ein geratenes Datum waere schlimmer als keines) oder
     wenn wir vor dem Start noch gar nicht gemessen haben.
+
+    Die zweite Haelfte der Frage - wie lange der Vorgaenger danach noch im
+    Regal steht - haengt am Preis NICHT und wohnt deshalb in
+    `verweildauer_nach_nachfolger`. `auswertung` setzt beide zusammen; eine
+    fehlende Preisbasis nimmt der Zeile ihre Preisspalten, nicht ihre
+    Existenz (Modulkopf, Regel 3).
     """
     nachfolger = katalog.nachfolger_von(device_id)
     if nachfolger is None:
@@ -165,7 +267,7 @@ def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
     start = _datum(nachfolger.marktstart)
     if start is None:
         return None
-    eigene = [p for p in punkte if p.get("device_id") == device_id] or punkte
+    eigene = _eigene_punkte(punkte, device_id, anbieter)
     basis = _preis_am(eigene, start)
     if basis is None or basis == 0:
         return None
@@ -187,9 +289,85 @@ def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
         "nachfolger": nachfolger.device_id,
         "nachfolger_modell": nachfolger.modell,
         "marktstart": nachfolger.marktstart,
+        "anbieter": anbieter or "",
         "basis": basis,
         "nach": nach,
         "prozent": prozent,
+    }
+
+
+# Die Preisspalten einer Zeile OHNE Basis. Dieselben Schluessel wie im
+# Normalfall - eine Darstellung, die zwischen zwei Formen unterscheiden muss,
+# unterscheidet irgendwann falsch.
+def _leere_preisspalten() -> dict:
+    return {"basis": None,
+            "nach": {t: None for t in _FENSTER},
+            "prozent": {t: None for t in _FENSTER}}
+
+
+def verweildauer_nach_nachfolger(eintraege: list,
+                                 katalog: Katalog) -> Optional[dict]:
+    """Wie lange steht der Vorgaenger NACH dem Marktstart seines Nachfolgers?
+
+    *eintraege* sind die Listungen EINER (Geraet, Anbieter)-Gruppe - acht
+    Farben und drei Speichergroessen desselben Geraets sind ein Regalplatz,
+    keine acht Antworten (Modulkopf, Regel 1). Gerechnet wird deshalb vom
+    fruehesten `first_seen` bis zum spaetesten `last_verified` der Gruppe.
+
+    Gibt None ohne Nachfolger, ohne dessen `marktstart` und ohne ein
+    verwertbares `last_verified` - eine Verweildauer ohne rechte Kante waere
+    geraten.
+
+    `verweildauer_tage` ist die Zahl der Tage vom Marktstart des Nachfolgers
+    bis zur letzten Bestaetigung, mindestens 0: verschwindet der Vorgaenger
+    VOR dem Marktstart, ist die ehrliche Antwort "keinen Tag" und nicht eine
+    negative Dauer.
+
+    `verweildauer_untergrenze` ist True, wenn unsere Beobachtung erst NACH
+    dem Marktstart begonnen hat. Dann ist die Zahl kein gemessener Verlauf,
+    sondern eine Untergrenze: das Geraet stand mindestens so lange im Regal,
+    wie wir zugesehen haben. Bei allen vier Kandidaten des Bestands vom
+    31.08.2026 ist genau das der Fall (570 bis 710 Tage Vorlauf).
+
+    `noch_gelistet` beantwortet "steht es heute noch da" aus dem Status des
+    Stores - `heute` verschiebt den Status nicht, es taugt nur zum Vergleich
+    und ist deshalb hier nur der Vollstaendigkeit halber entgegengenommen.
+    """
+    eintraege = [e for e in eintraege if e]
+    if not eintraege:
+        return None
+    device_id = eintraege[0].get("device_id")
+    nachfolger = katalog.nachfolger_von(device_id)
+    if nachfolger is None:
+        return None
+    start = _datum(nachfolger.marktstart)
+    if start is None:
+        return None
+
+    enden = [d for d in (_datum(e.get("last_verified")) for e in eintraege) if d]
+    if not enden:
+        return None
+    ende = max(enden)
+
+    # Der Beobachtungsbeginn der GRUPPE. `erstpreis_am` zaehlt mit: bei einer
+    # Listung, die aus einem Altbestand uebernommen wurde, ist es der aeltere
+    # der beiden Belege.
+    anfaenge = [d for d in (_datum(e.get(feld))
+                            for e in eintraege
+                            for feld in ("first_seen", "erstpreis_am")) if d]
+    beginn = min(anfaenge) if anfaenge else ende
+
+    return {
+        "device_id": device_id,
+        "anbieter": eintraege[0].get("anbieter") or "",
+        "nachfolger": nachfolger.device_id,
+        "nachfolger_modell": nachfolger.modell,
+        "marktstart": nachfolger.marktstart,
+        "verweildauer_tage": max(0, (ende - start).days),
+        "verweildauer_untergrenze": beginn > start,
+        "noch_gelistet": any(e.get("status") == STATUS_AKTIV for e in eintraege),
+        "beobachtet_seit": beginn.isoformat(),
+        "zuletzt_bestaetigt": ende.isoformat(),
     }
 
 
@@ -329,27 +507,73 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     # Preishistorie weiss es nicht, sie schweigt bei unveraendertem Preis.
     # Ohne Bilanz (aeltere Bestaende, Tests) wird die Zahl nicht erfunden,
     # sondern die Termine-Bedingung entfaellt - die Spanne gilt weiter.
+    #
+    # GEZAEHLT WIRD JE LISTUNG, nicht je Anbieter (siehe den Block bei
+    # MIND_TERMINE_JE_GERAET): ein Prueftermin des Anbieters zaehlt nur, wenn
+    # er INNERHALB des Beobachtungsfensters dieser Listung liegt.
     laeufe_je_anbieter = laeufe_je_anbieter or {}
     termine_je_anbieter = termine_je_anbieter or {}
+
+    punkte_je_listung: dict[str, set] = {}
+    for p in punkte:
+        lid, tag = p.get("listung_id"), _datum(p.get("datum"))
+        if lid and tag is not None:
+            punkte_je_listung.setdefault(lid, set()).add(tag)
+
+    termine_daten = {
+        name: sorted({d for d in (_datum(t) for t in (tage or [])) if d})
+        for name, tage in termine_je_anbieter.items()}
+
+    def _messtage(eintrag) -> int:
+        """Verschiedene Tage, an denen DIESE Listung gemessen wurde."""
+        tage = set(punkte_je_listung.get(eintrag.get("id") or "", ()))
+        for feld in ("erstpreis_am", "last_verified"):
+            tag = _datum(eintrag.get(feld))
+            if tag is not None:
+                tage.add(tag)
+        # Das Fenster der Listung. Fehlt eine Kante, bleibt sie offen - eine
+        # geratene Grenze waere schlimmer als eine fehlende.
+        von = _datum(eintrag.get("first_seen")) or (min(tage) if tage else None)
+        bis = _datum(eintrag.get("last_verified")) or (max(tage) if tage else None)
+        for tag in termine_daten.get(eintrag.get("anbieter")) or ():
+            if (von is None or tag >= von) and (bis is None or tag <= bis):
+                tage.add(tag)
+        return len(tage)
 
     def _oft_genug(eintrag) -> bool:
         if not termine_je_anbieter and not laeufe_je_anbieter:
             return True
-        name = eintrag.get("anbieter")
-        # Das MAXIMUM beider Quellen: `laeufe` zaehlt vollstaendige Laeufe,
-        # deren Einzeldaten ein Altbestand nicht mehr kennt (last_verified
-        # behaelt nur den juengsten); die Termine-Liste kennt auch
-        # Teillaeufe. Beide sind echte Messungen, keine erfindet etwas.
-        n = max(len(termine_je_anbieter.get(name) or []),
-                int(laeufe_je_anbieter.get(name, 0)))
-        return n >= MIND_TERMINE_JE_GERAET
+        # Die TERMINE zaehlen je Listung und nur im eigenen Fenster - das ist
+        # die Aenderung vom 31.08.2026. Die LAUFZAHL bleibt daneben ein
+        # Boden, und das ist Absicht: sie ist die einzige Auskunft, die einen
+        # Lauf ueberlebt, dessen Bestaetigung ein spaeterer ueberschrieben
+        # hat (`last_verified` behaelt nur den juengsten). Ohne sie faellt
+        # genau die Ware durch, die seit einem Jahr unveraendert im Regal
+        # steht - der Fehler, den G0 am 28.08.2026 behoben hat.
+        #
+        # Der Unterschied zur alten Rechnung sitzt in der anderen Haelfte:
+        # `len(termine_je_anbieter[name])` gab JEDER Listung des Anbieters
+        # dieselbe Zahl. Im Bestand vom 31.08.2026 waren das fuer alle 140
+        # mobilcom-debitel-Listungen fuenf Termine - auch fuer die, die es
+        # erst seit dem vorletzten davon gibt.
+        laeufe = int(laeufe_je_anbieter.get(eintrag.get("anbieter"), 0) or 0)
+        return max(_messtage(eintrag), laeufe) >= MIND_TERMINE_JE_GERAET
+
+    def _belastbar(eintrag) -> bool:
+        """Vier Messtermine ueber mindestens 21 Tage - die eine Schwelle,
+        die jede Lifecycle-Zeile nehmen muss. Auch die Nachfolger-Zeile:
+        bis zum 31.08.2026 lief sie durch KEIN Gatter und war damit die
+        einzige Sektion, die aus zwei Messpunkten eine Aussage machte."""
+        tage = listungsdauer(eintrag)
+        return (tage is not None and tage >= MIND_TAGE_JE_GERAET
+                and _oft_genug(eintrag))
 
     dauern = []
     for e in eintraege:
         tage = listungsdauer(e)
         # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis, dass
         # noch nicht lange genug gemessen wurde.
-        if tage is None or tage < MIND_TAGE_JE_GERAET or not _oft_genug(e):
+        if not _belastbar(e):
             continue
         g = katalog.nach_id(e.get("device_id"))
         dauern.append({
@@ -379,13 +603,28 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     # Duenn ist die Basis, solange KEINE Kennzahl etwas hergibt.
     duenn = not dauern and not verfaelle
 
+    # Der Nachfolger-Effekt, je (Geraet, Anbieter) und hinter derselben
+    # Schwelle wie alles andere. Die Preisspalten koennen leer bleiben, die
+    # Verweildauer nicht - sie ist die Zahl, wegen der die Sektion dasteht
+    # (Modulkopf, Regel 3).
+    gruppen: dict[tuple, list] = {}
+    for e in eintraege:
+        gid = e.get("device_id")
+        if not gid:
+            continue
+        gruppen.setdefault((gid, e.get("anbieter") or ""), []).append(e)
+
     effekte = []
-    for gid in sorted({e.get("device_id") for e in eintraege if e.get("device_id")}):
-        ergebnis = nachfolger_effekt(gid, katalog, punkte, heute)
-        if ergebnis is not None:
-            g = katalog.nach_id(gid)
-            effekte.append({**ergebnis,
-                            "modell": g.modell if g else gid})
+    for (gid, name), gruppe in sorted(gruppen.items()):
+        if not any(_belastbar(e) for e in gruppe):
+            continue
+        verweil = verweildauer_nach_nachfolger(gruppe, katalog)
+        if verweil is None:
+            continue
+        preis = nachfolger_effekt(gid, katalog, punkte, heute, anbieter=name)
+        g = katalog.nach_id(gid)
+        effekte.append({**(preis or _leere_preisspalten()), **verweil,
+                        "modell": g.modell if g else gid})
 
     # Zahlwoerter beugen, Umlaute benutzen. Die alte Fassung schrieb an
     # prominenter Stelle "seit 1 Wochen" und "Messpunkte ueber 85 Listungen".
