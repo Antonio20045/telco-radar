@@ -1183,3 +1183,184 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
     # Test nichts darüber, ob min und max verwechselt sind.
     assert kachel_min != kachel_max, (
         "alle Preise gleich - der Test kann eine Verwechslung nicht sehen")
+
+
+# --------------------------------------------------------------------------
+# B5 (31.08.2026): "Standardansicht nach Hersteller und Aktualitaet
+# sortiert, vorgefiltert auf Zustand = neu, erste Bildschirmseite zeigt
+# mindestens drei Hersteller."
+#
+# EIGENE Seite, EIGENER Bestand - nicht `_seite`/`_KATALOG`. Die gemeinsame
+# Fixture kennt nur zwei Hersteller (Apple/Samsung im Wechsel); die
+# Zusicherung "mindestens drei Hersteller ohne Scrollen" ist mit ihr gar
+# nicht auslösbar. Ein eigener Bau ist hier billiger als ein Fixture-Umbau,
+# der Dutzende andere Tests (Alarmstufen, Markenfilter) mitreissen wuerde.
+# --------------------------------------------------------------------------
+
+_B5_HERSTELLER = ("Apple", "Samsung", "Google", "Xiaomi")
+
+_B5_KATALOG = {"geraete": [
+    {"hersteller": "Apple", "modell": "iPhone 17", "generation": 17,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Apple", "modell": "iPhone 14", "generation": 14,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Samsung", "modell": "Galaxy S26", "generation": 26,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Samsung", "modell": "Galaxy S23", "generation": 23,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Google", "modell": "Pixel 11", "generation": 11,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Google", "modell": "Pixel 8", "generation": 8,
+     "speicher": [256], "segment": "flagship"},
+    {"hersteller": "Xiaomi", "modell": "Redmi 17T", "generation": 17,
+     "speicher": [256], "segment": "mid"},
+    {"hersteller": "Xiaomi", "modell": "Redmi 14T", "generation": 14,
+     "speicher": [256], "segment": "mid"},
+]}
+_B5_FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
+_B5_QUELLEN = {"anbieter": [
+    {"name": "Medimax", "typ": "handel", "rang": 1, "methode": "ldjson",
+     "basis_url": "https://www.medimax.de",
+     "einstiege": [{"url": "https://www.medimax.de/c/116"}]},
+]}
+
+
+def _b5_id(modell: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", modell.lower()).strip("-")
+
+
+def _b5_listung(modell: str, hersteller: str, preis: float,
+                zustand: str = "neu") -> dict:
+    gid = f"{hersteller.lower()}-{_b5_id(modell)}"
+    sku = f"{gid}-256gb-schwarz{'-ref' if zustand != 'neu' else ''}"
+    return {
+        "id": f"medimax--{sku}", "sku_id": sku, "device_id": gid,
+        "anbieter": "Medimax", "anbieter_typ": "handel", "netz": "",
+        "speicher_gb": 256, "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz", "zustand": zustand,
+        "first_seen": "2026-08-01", "last_verified": "2026-08-31",
+        "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": preis,
+        "erstpreis": preis, "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-08-01",
+        "quelle_url": f"https://example.de/p/{sku}",
+        "abgerufen_am": "2026-08-31", "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch", "einstiege": ["https://example.de/liste"],
+    }
+
+
+def _b5_bestand() -> list:
+    """Zwei NEUgeraete je Hersteller (acht insgesamt - ueber dem Deckel von
+    zwoelf ist das nicht, aber die Reihenfolge ist trotzdem messbar), dazu
+    EIN refurbished Apple-Geraet. "Apple" steht alphabetisch vorn - wenn die
+    Standardsortierung trotzdem neu vor gebraucht stellt, darf das
+    refurbished-Geraet nicht vor den anderen drei Herstellern stehen."""
+    zeilen = []
+    for g in _B5_KATALOG["geraete"]:
+        zeilen.append(_b5_listung(g["modell"], g["hersteller"],
+                                  1.0 * g["generation"] * 40))
+    zeilen.append(_b5_listung("iPhone 14", "Apple", 111.0,
+                              zustand="refurbished"))
+    return zeilen
+
+
+_B5_DB = {"updated": "2026-08-31",
+         "anbieter": {"Medimax": {"laeufe": 4, "funde_gesamt": 9}},
+         "listungen": _b5_bestand()}
+
+
+@pytest.fixture(scope="module")
+def _b5_seite(_seite, tmp_path_factory):
+    """Eine eigene Seite, aber im SELBEN Browser wie `_seite` - ein zweiter
+    `sync_playwright()`-Kontext im selben Prozess scheitert ("It looks like
+    you are using Playwright Sync API inside the asyncio loop"), solange der
+    erste noch offen ist (Modulgueltigkeit von `_seite`). Dieselbe
+    Wiederverwendung wie bei `_umgebung`/`_eigene_seite`, nur mit einem
+    EIGENEN lokalen Server fuer den abweichenden Bestand.
+    """
+    root = tmp_path_factory.mktemp("b5")
+    (root / "config").mkdir()
+    for name, daten in (("geraete_katalog.yaml", _B5_KATALOG),
+                        ("farben.yaml", _B5_FARBEN),
+                        ("geraete_quellen.yaml", _B5_QUELLEN)):
+        (root / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+    state = root / "data" / "state"
+    state.mkdir(parents=True)
+    (state / "geraete_db.json").write_text(json.dumps(_B5_DB), encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True)
+    site = root / "site"
+    render_site(site, reports, cfg=None)
+
+    browser = _seite.context.browser
+    with _server(site) as basis:
+        seite = browser.new_page(viewport={"width": 1440, "height": 900})
+        seite.goto(f"{basis}/geraete.html", wait_until="load")
+        seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+        seite.wait_for_timeout(80)
+        # "Erste Bildschirmseite" gilt AB DEM REITER, nicht ab dem Seitenkopf:
+        # der Zeitungskopf plus die Reihen der Titelseite darueber sind ein
+        # Preis, den jede Unterseite dieser Site einmal zahlt, unabhaengig
+        # von der Sortierung DIESES Reiters. Ohne den Scroll misst der Test,
+        # ob der Zeitungskopf kurz ist - nicht, ob der Katalog es ist. An
+        # der echten Ausgabe gemessen: ohne Scroll passt GAR KEINE Zeile mehr
+        # ins Bild (der Kopf allein braucht ueber 840 px), mit Scroll zum
+        # Reiter acht.
+        seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
+        seite.wait_for_timeout(80)
+        yield seite
+        seite.close()
+
+
+def test_die_erste_bildschirmseite_zeigt_mindestens_drei_hersteller(_b5_seite):
+    """Wortlaut des Auftrags. Gemessen wird in PIXELN (Bounding-Box
+    innerhalb des Sichtfensters), nicht an der Zeilenzahl - "erste
+    Bildschirmseite" ist eine Aussage ueber das, was ohne Scrollen zu sehen
+    ist, keine ueber die Position in einer Liste."""
+    marken = _b5_seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-k-zeile",
+        "(zeilen, hoehe) => zeilen"
+        "  .filter(z => getComputedStyle(z).display !== 'none'"
+        "             && z.getBoundingClientRect().top < hoehe"
+        "             && z.getBoundingClientRect().top >= 0)"
+        "  .map(z => z.dataset.marke)", 900)
+    assert len(set(marken)) >= 3, (
+        f"nur {len(set(marken))} Hersteller ohne Scrollen: {marken}")
+
+
+def test_die_standardansicht_ist_auf_neugeraete_vorsortiert(_b5_seite):
+    """Ohne Scrollen: kein refurbished Geraet zwischen den neuen - die
+    Sortierung stellt "neu" komplett vor den Rest, nicht nur mehrheitlich.
+    """
+    zustaende = _b5_seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-k-zeile",
+        "(zeilen, hoehe) => zeilen"
+        "  .filter(z => getComputedStyle(z).display !== 'none'"
+        "             && z.getBoundingClientRect().top < hoehe"
+        "             && z.getBoundingClientRect().top >= 0)"
+        "  .map(z => z.dataset.zustand)", 900)
+    assert zustaende, "keine Zeile ohne Scrollen sichtbar - der Test misst nichts"
+    assert set(zustaende) == {"neu"}, zustaende
+
+
+def test_der_zustandsfilter_steht_von_anfang_an_auf_neu(_b5_seite):
+    """Die Vorbelegung des <select> - sichtbar, ohne dass jemand klickt."""
+    wert = _b5_seite.eval_on_selector(
+        "#tafel-katalog [data-filter='zustand']", "e => e.value")
+    assert wert == "neu", wert
+
+
+def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
+    """Der Fehler vom 30.08. (Commit 79085f0): drei Zahlen liefen
+    auseinander, weil eine Vorbelegung Zeilen per JS versteckte, die
+    Ueberschrift und der "alle anzeigen"-Knopf aber weiterhin die volle
+    Zahl nannten. Diese Fassung filtert serverseitig nichts heraus - die
+    Gegenprobe: die Zahl der ZEILEN IM DOM (versteckt oder nicht) ist exakt
+    der Bestand, unabhaengig von der Vorbelegung des Filters."""
+    anzahl = _b5_seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-k-zeile", "e => e.length")
+    assert anzahl == len(_B5_DB["listungen"])
+    ueberschrift = _b5_seite.text_content(".gr-katalog h2 .rubrik-zahl").strip()
+    assert ueberschrift == str(len(_B5_DB["listungen"]))

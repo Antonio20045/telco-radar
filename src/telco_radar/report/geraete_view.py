@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import json
 import logging
+from itertools import zip_longest
 from pathlib import Path
 from typing import Optional
 
@@ -692,6 +693,62 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 KATALOG_SICHTBAR = 12
 
 
+def _katalog_betrag(z: dict):
+    """Der GEZEIGTE Betrag einer Zeile, fuer Sortierung und Tiebreaks.
+
+    Nicht `preis` allein: die Spalte zeigt bei einer Zeile ohne Barpreis die
+    Zuzahlung. Mit `float("inf")` fuer fehlende Preise landete eine
+    1-Euro-Zuzahlung hinter einem 1199-Euro-Barpreis - heute folgenlos (alle
+    Zeilen tragen einen Barpreis), aber der naechste Buendelpreis-Adapter
+    loest es aus.
+    """
+    for feld in ("preis", "zuzahlung"):
+        if z[feld] is not None:
+            return z[feld]
+    return float("inf")
+
+
+def _katalog_innerhalb_schluessel(z: dict):
+    """Sortierschluessel INNERHALB eines Herstellers: Aktualitaet zuerst.
+
+    `generation` ist die Nummer INNERHALB einer Baureihe (Galaxy A57 traegt
+    57, Galaxy S26 traegt 26) - absteigend sortiert fuehrt deshalb das
+    NEUESTE Geraet JE BAUREIHE, nicht automatisch das mit der groessten Zahl
+    ueber alle Baureihen hinweg. Eine fehlende Generation (kein Katalog-
+    treffer) faellt ans Ende ihrer Gruppe statt als "0" ganz nach vorn.
+    """
+    gen = z.get("generation")
+    return (0 if gen is not None else 1, -(gen or 0), z["modell"] or "",
+            z["speicher"] or 0, _katalog_betrag(z), z["anbieter"] or "")
+
+
+def _interleave_je_hersteller(zeilen: list) -> list:
+    """Reihum je Hersteller statt Hersteller fuer Hersteller.
+
+    Dieselbe Technik wie `pipeline._interleave_by_source` fuer die
+    Analysten-Stapel, und aus demselben Grund: eine reine Gruppierung laesst
+    den alphabetisch ERSTEN Hersteller den ganzen sichtbaren Bereich vor dem
+    Deckel verbrauchen. B5 (31.08.2026), gemessen an der Ausgabe vom
+    30.08.: die ersten zwoelf Zeilen waren zwoelf o2-iPhone-14-Varianten,
+    waehrend Samsung (138 Listungen), Google (70) und Xiaomi (20) erst nach
+    Scrollen kamen - bei alphabetischer Herstellersortierung aendert daran
+    auch eine bessere Sortierung INNERHALB der Gruppe nichts.
+
+    Die Herstellerreihenfolge selbst ist alphabetisch (deterministisch,
+    testbar) - anders als bei den Analysten-Stapeln gibt es hier kein
+    "juengstes Item je Quelle", nach dem sich eine andere Reihenfolge
+    rechtfertigen liesse.
+    """
+    gruppen: dict[str, list] = {}
+    for z in sorted(zeilen, key=_katalog_innerhalb_schluessel):
+        gruppen.setdefault(z["hersteller"] or "", []).append(z)
+    geordnet = [gruppen[h] for h in sorted(gruppen)]
+    ergebnis: list = []
+    for runde in zip_longest(*geordnet):
+        ergebnis.extend(z for z in runde if z is not None)
+    return ergebnis
+
+
 def katalogzeilen(eintraege: list, katalog) -> list[dict]:
     """Reiter 2 als FLACHE Tabelle: eine Zeile je (Geraet, Speicher, Farbe,
     Anbieter).
@@ -706,6 +763,26 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
     Vergleich und Diagramm. Dieser Reiter ist der Bestand, nicht die Aussage:
     was aus dem Vergleich faellt, verschwindet nicht, es wird nur nicht gegen
     etwas gerechnet, das es nicht ist.
+
+    DIE STANDARDANSICHT (B5, 31.08.2026). Die Seite oeffnete auf zwoelf
+    Apple-Zeilen bei o2 - die Sortierung war rein alphabetisch (Hersteller,
+    Modell), und "iPhone 14" steht alphabetisch ganz vorn. Zwei Aenderungen,
+    keine davon ein Filter im Sinne von "Zeilen verschwinden":
+
+      1. Neugeraete zuerst, gebrauchte danach. Der DECKEL (KATALOG_SICHTBAR)
+         blendet nur nach POSITION aus - eine Umsortierung reicht deshalb,
+         damit die erste Bildschirmseite ohne jedes JavaScript schon
+         "vorgefiltert" aussieht: eine echte Reihenfolge, keine Behauptung,
+         die erst ein Skript einloest. Genau das hatte eine fruehere Fassung
+         umgekehrt geloest (ein vorbelegtes <select>, das Zeilen per JS
+         VERSTECKT) und damit drei auseinanderlaufende Zahlen gebaut
+         (Ueberschrift 352, sichtbar 12 statt 18, Knopf 352, geliefert 341
+         - Commit 79085f0). Diese Fassung filtert nichts heraus: die
+         Zeilenzahl bleibt exakt der Bestand, Ueberschrift, Deckel und
+         "alle anzeigen" lesen weiterhin dieselbe, vollstaendige Liste.
+      2. Reihum je Hersteller statt Hersteller fuer Hersteller
+         (`_interleave_je_hersteller`), innerhalb mit der hoechsten
+         Generation ihrer Baureihe zuerst (`_katalog_innerhalb_schluessel`).
     """
     zeilen = []
     for e in eintraege:
@@ -727,6 +804,10 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
         zeilen.append({
             "modell": g.modell if g else (e.get("device_id") or "?"),
             "hersteller": g.hersteller if g else "",
+            # Nur fuer die Standardsortierung (Aktualitaet) - keine eigene
+            # Spalte, dieselbe Zahl steht schon in der Positionskarten-Logik
+            # von `aufbereiten()` fuer den Preisvergleich.
+            "generation": g.generation if g else None,
             "speicher": e.get("speicher_gb"),
             "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
             "anbieter": e.get("anbieter"),
@@ -740,25 +821,10 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
             "url": e.get("quelle_url") or "",
             "abgerufen_am": e.get("abgerufen_am") or "",
         })
-    # Nach Modell, dann Speicher, dann dem GEZEIGTEN Betrag: wer ein Geraet
-    # sucht, findet seine Zeilen beieinander, und innerhalb steht der
-    # guenstigste oben.
-    #
-    # "Der gezeigte Betrag" und nicht `preis`: die Spalte zeigt bei einer
-    # Zeile ohne Barpreis die Zuzahlung. Mit `float("inf")` fuer fehlende
-    # Preise landete eine 1-Euro-Zuzahlung hinter einem 1199-Euro-Barpreis,
-    # und der Kommentar darueber behauptete das Gegenteil. Heute folgenlos
-    # (alle 352 Zeilen tragen einen Barpreis), aber der naechste
-    # Buendelpreis-Adapter loest es aus.
-    def betrag(z):
-        for feld in ("preis", "zuzahlung"):
-            if z[feld] is not None:
-                return z[feld]
-        return float("inf")
 
-    return sorted(zeilen, key=lambda z: (
-        z["hersteller"], z["modell"], z["speicher"] or 0,
-        betrag(z), z["anbieter"] or ""))
+    neu = [z for z in zeilen if z["zustand"] == "neu"]
+    rest = [z for z in zeilen if z["zustand"] != "neu"]
+    return _interleave_je_hersteller(neu) + _interleave_je_hersteller(rest)
 
 
 # `_matrix()` ist am 30.08.2026 geloescht worden, mit der Sektion, die es
