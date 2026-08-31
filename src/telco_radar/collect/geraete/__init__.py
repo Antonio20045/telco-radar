@@ -246,6 +246,7 @@ def _registriere_anbieter_adapter() -> None:
     Der Import steht in einer Funktion, weil die Module aus diesem Paket
     `GeraeteAbrufFehler` importieren - auf Modulebene waere das ein Zirkel.
     """
+    from . import congstar as congstar_modul
     from . import o2 as o2_modul
     from . import vodafone as vodafone_modul
 
@@ -255,6 +256,12 @@ def _registriere_anbieter_adapter() -> None:
     registriere("o2_katalog", Adapter(name="o2_katalog",
                                       lies=o2_modul.lies,
                                       direkt=True))
+    # Kein `ernte` noetig: die Sitemap traegt echte `<loc>`-Adressen, die
+    # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
+    # `direkt`: die Einstiegsseite (Sitemap) ist nur ein Verzeichnis, die
+    # Preise stehen erst auf den einzelnen Produktseiten.
+    registriere("congstar_next", Adapter(name="congstar_next",
+                                         lies=congstar_modul.lies))
 
 
 _registriere_anbieter_adapter()
