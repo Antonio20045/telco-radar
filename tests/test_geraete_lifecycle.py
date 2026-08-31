@@ -852,29 +852,18 @@ def test_der_echte_bestand_traegt_heute_keine_lifecycle_zeile():
     assert all(t["modelle_anzahl"] >= t["generationen"] for t in a["portfolio"])
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
-def test_die_gegenprobe_je_anbieter_gegen_je_listung():
-    """Die Messung, wegen der die Zaehlung umgestellt wurde.
+def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
+    """Der echte Bestand, wahlweise nach einem simulierten NACHTLAUF.
 
-    Je ANBIETER gerechnet nehmen im Bestand vom 31.08.2026 142 von 370
-    Listungen die Termin-Schwelle - darunter alle 140 von mobilcom-debitel,
-    obwohl im Fenster der meisten nur zwei oder drei der fuenf Prueftage
-    liegen. Je LISTUNG gerechnet sind es 70.
-
-    Diese beiden Zahlen sind hier nicht festgenagelt - sie wachsen mit jedem
-    Nachtlauf. Festgenagelt ist die EIGENSCHAFT: verschiebt man dieselbe
-    ANZAHL Prueftermine aus dem Fenster der Listungen heraus, muessen Zeilen
-    verschwinden. Unter der alten Rechnung aendert sich nichts, denn sie zaehlt
-    nur die Laenge der Liste.
-
-    Die Spannen des echten Bestands liegen alle unter 21 Tagen; damit die
-    Gegenprobe die TERMIN-Bedingung misst und nicht die Spanne, wird
-    `first_seen` fuer beide Laeufe gleich weit zurueckgesetzt.
+    Der Zustand von heute ist der, in dem dieses Feature SCHLAEFT: die
+    laengste Beobachtung misst 20 Tage, die Schwelle 21. Wer nur ihn misst,
+    misst nichts. `nachtlauf=True` bestaetigt jede aktive Listung auf den
+    31.08.2026 und ergaenzt den Anbieter-Termin - der Zustand von morgen.
     """
     db = GeraeteDB(_DB)
     historie = Preishistorie(_HISTORIE)
     katalog = lade_katalog(_WURZEL)
-    alle = db.eintraege()
+    alle = [dict(e) for e in db.eintraege()]
     punkte = historie.alle_punkte()
     termine_je_anbieter, laeufe_je_anbieter = {}, {}
     for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
@@ -883,10 +872,108 @@ def test_die_gegenprobe_je_anbieter_gegen_je_listung():
                        if p.get("anbieter") == name and p.get("datum"))
         termine_je_anbieter[name] = sorted(termine)
         laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
+    if nachtlauf:
+        for e in alle:
+            if e.get("status") == STATUS_AKTIV:
+                e["last_verified"] = "2026-08-31"
+        for name in termine_je_anbieter:
+            termine_je_anbieter[name] = sorted(
+                set(termine_je_anbieter[name]) | {"2026-08-31"})
+    if laeufe_ueberschreiben is not None:
+        laeufe_je_anbieter = {n: laeufe_ueberschreiben
+                              for n in laeufe_je_anbieter}
+    return alle, punkte, katalog, termine_je_anbieter, laeufe_je_anbieter
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
+    """Der Waechter fuer den Zustand von MORGEN.
+
+    Vor dem 31.08.2026 ergab derselbe simulierte Nachtlauf 85 Zeilen
+    Verweildauer (alle "21 Tage", 11 unterscheidbare Texte, zwoelfmal
+    dasselbe Geraet beim selben Haendler) und 85 Zeilen Preisverfall (alle
+    "+0,0 %") - genau die zwei Bildschirmseiten, deren Abschaffung der
+    Kommentarblock ueber `MIND_TERMINE_JE_GERAET` beschreibt.
+    """
+    alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
+    a = auswertung(alle, punkte, katalog, heute="2026-08-31",
+                   laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
+
+    # Der Fall traete ohne die Zusicherungen wirklich ein: es GIBT genug
+    # aktive Listungen mit 21 Tagen Spanne und unbewegtem Preis.
+    kandidaten = [e for e in alle
+                  if e.get("status") == STATUS_AKTIV
+                  and listungsdauer(e) is not None
+                  and listungsdauer(e) >= MIND_TAGE_JE_GERAET]
+    assert len(kandidaten) >= 80, len(kandidaten)
+    unbewegt = [e for e in kandidaten
+                if preisverfall(e) and preisverfall(e)["absolut"] == 0]
+    assert len(unbewegt) >= 80, len(unbewegt)
+
+    # 1. Keine Zeile ohne Preisbewegung.
+    assert all(v["absolut"] for v in a["verfaelle"]), \
+        [v for v in a["verfaelle"] if not v["absolut"]][:3]
+    assert a["ohne_bewegung"] == 0 or a["verfaelle"] == []
+
+    # 2. Jede Verweildauer-Zeile ist ein eigener Regalplatz.
+    schluessel = [(d["device_id"], d["anbieter"], d["zustand"])
+                  for d in a["dauern"]]
+    assert len(schluessel) == len(set(schluessel)), schluessel
+
+    # 3. Keine Nachfolger-Zeile ueber Gebrauchtware.
+    assert all(z["zustand"] == "neu" for z in a["nachfolger"]), \
+        [(z["device_id"], z["anbieter"], z["zustand"]) for z in a["nachfolger"]]
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_ohne_vollstaendigen_lauf_wird_nichts_zugerechnet():
+    """B2 am echten Bestand: mobilcom-debitel steht bei `laeufe: 0`.
+
+    `mark_stale` laeuft nur `if bilanz.vollstaendig` - aus dem Ausbleiben der
+    Alterung folgt fuer diesen Anbieter nichts. Seine Prueftage vom 14. und
+    21.08. stammen aus den Feldern ANDERER Listungen; der Lauf war gedeckelt,
+    und ein Deckel ist kein Blick.
+    """
+    alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
+    assert laeufe["mobilcom-debitel"] == 0, laeufe
+    assert len(termine["mobilcom-debitel"]) >= MIND_TERMINE_JE_GERAET
+
+    echt = auswertung(alle, punkte, katalog, heute="2026-08-31",
+                      laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
+    assert not [d for d in echt["dauern"] if d["anbieter"] == "mobilcom-debitel"]
+
+    # Die Gegenprobe: EIN vollstaendiger Lauf, und dieselben Termine zaehlen.
+    # Ohne sie belegte der Test nur, dass die Zeilen nie erscheinen.
+    mit_lauf = dict(laeufe, **{"mobilcom-debitel": 1})
+    b = auswertung(alle, punkte, katalog, heute="2026-08-31",
+                   laeufe_je_anbieter=mit_lauf, termine_je_anbieter=termine)
+    zugerechnet = [d for d in b["dauern"] if d["anbieter"] == "mobilcom-debitel"]
+    assert zugerechnet, "die Zurechnung greift bei vollstaendigem Lauf"
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_die_gegenprobe_je_anbieter_gegen_je_listung():
+    """Die Messung, wegen der die Zaehlung umgestellt wurde.
+
+    Festgenagelt ist nicht die Zahl (sie waechst mit jedem Nachtlauf),
+    sondern die EIGENSCHAFT: verschiebt man dieselbe ANZAHL Prueftermine aus
+    dem Fenster der Listungen heraus, muessen Zeilen verschwinden. Unter der
+    alten Rechnung aendert sich nichts - sie zaehlt nur die Laenge der Liste.
+
+    Zwei Stellschrauben halten die Messung auf der Termin-Bedingung: die
+    Spannen des echten Bestands liegen unter 21 Tagen, deshalb wird
+    `first_seen` fuer beide Laeufe gleich weit zurueckgesetzt; und der
+    Laufzahl-Boden wuerde einen Anbieter mit >= 4 vollstaendigen Laeufen
+    unabhaengig von jedem Termin durchlassen, deshalb steht er hier fuer alle
+    auf 1 - das erlaubt die Zurechnung (B2) und traegt keine Zeile allein.
+    """
+    alle, punkte, katalog, termine_je_anbieter, laeufe = _echter_bestand(
+        laeufe_ueberschreiben=1)
+    assert all(n < MIND_TERMINE_JE_GERAET for n in laeufe.values())
 
     gedehnt = [{**e, "first_seen": "2020-01-01"} for e in alle]
     im_fenster = auswertung(gedehnt, punkte, katalog, heute="2026-08-31",
-                            laeufe_je_anbieter=laeufe_je_anbieter,
+                            laeufe_je_anbieter=laeufe,
                             termine_je_anbieter=termine_je_anbieter)
 
     # Dieselbe Anzahl Termine je Anbieter, aber allesamt vor der ersten
@@ -897,15 +984,341 @@ def test_die_gegenprobe_je_anbieter_gegen_je_listung():
             == [len(termine_je_anbieter[n]) for n in verschoben]), \
         "die Gegenprobe muss dieselbe ANZAHL Termine stellen"
     ausserhalb = auswertung(gedehnt, punkte, katalog, heute="2026-08-31",
-                            laeufe_je_anbieter=laeufe_je_anbieter,
+                            laeufe_je_anbieter=laeufe,
                             termine_je_anbieter=verschoben)
 
     assert im_fenster["dauern"], "ohne Durchlaesser prueft die Gegenprobe nichts"
-    assert len(ausserhalb["dauern"]) < len(im_fenster["dauern"]), (
-        f"{len(ausserhalb['dauern'])} statt weniger als "
-        f"{len(im_fenster['dauern'])} - Termine ausserhalb des Fensters "
-        f"zaehlen weiterhin mit")
+    assert ausserhalb["dauern"] == [], (
+        f"{len(ausserhalb['dauern'])} Zeilen aus Terminen ausserhalb jedes "
+        f"Fensters")
 
-    # Was uebrig bleibt, kommt allein ueber den Laufzahl-Boden herein.
-    assert all(laeufe_je_anbieter.get(d["anbieter"], 0) >= MIND_TERMINE_JE_GERAET
-               for d in ausserhalb["dauern"])
+
+# --------------------------------------------------------------------------
+# Der Regalplatz, der Zustand und die Preisbewegung (Nachbesserung 31.08.2026)
+#
+# Drei Befunde eines simulierten Nachtlaufs, alle an echten Daten gemessen:
+# 85 Verweildauer-Zeilen mit 11 unterscheidbaren Texten, 85 Preisverfaelle
+# mit "+0,0 %", und als einzige Nachfolger-Zeile ein Gebrauchtgeraet.
+# --------------------------------------------------------------------------
+
+def _variante(lid, farbe="schwarz", speicher=256, zustand="neu", preis=1199.0,
+              erstpreis=1449.0, device="apple-iphone-16-pro-max",
+              anbieter="Medimax", first="2026-01-01", last="2026-04-01",
+              status=STATUS_AKTIV):
+    """Eine Farb-/Speichervariante EINES Regalplatzes."""
+    e = _termin_eintrag(lid, device=device, anbieter=anbieter, first=first,
+                        last=last, status=status, preis=preis,
+                        erstpreis=erstpreis)
+    e["sku_id"] = f"{device}-{speicher}gb-{farbe}" + (
+        "" if zustand == "neu" else f"-{zustand}")
+    e["speicher_gb"] = speicher
+    e["farbe_normalisiert"] = farbe
+    e["zustand"] = zustand
+    return e
+
+
+_VIER_TERMINE = {"Medimax": ["2026-01-01", "2026-02-01", "2026-03-01",
+                             "2026-04-01"]}
+
+
+def test_acht_farben_sind_ein_regalplatz_keine_acht_zeilen():
+    """Der Befund: zwoelfmal "iPhone 17 Pro Max bei mobilcom-debitel -
+    21 Tage" untereinander."""
+    farben = [_variante(f"l{i}", farbe=f, preis=1199.0, erstpreis=1449.0)
+              for i, f in enumerate(("schwarz", "weiss", "blau", "titan"))]
+    # Der Fall tritt ohne die Zusicherung wirklich ein: vier Listungen, die
+    # jede fuer sich die Schwelle nimmt.
+    assert all(listungsdauer(e) == 90 for e in farben)
+
+    a = auswertung(farben, [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=_VIER_TERMINE)
+    assert len(a["dauern"]) == 1, [d["modell"] for d in a["dauern"]]
+    zeile = a["dauern"][0]
+    assert zeile["tage"] == 90 and zeile["varianten"] == 4
+    assert zeile["zustand"] == "neu"
+    # Und der Preisverfall faellt ebenfalls in EINE Zeile, weil alle vier
+    # denselben Speicher haben.
+    assert len(a["verfaelle"]) == 1, a["verfaelle"]
+
+
+def test_zwei_speichergroessen_sind_zwei_preise_aber_ein_regalplatz():
+    """Der Unterschied zwischen den beiden Listen: 256 und 512 GB sind zwei
+    Produkte mit zwei Preisen - ihr Verfall darf nicht in eine Zeile fallen.
+    Im Regal steht trotzdem EIN Geraet."""
+    gruppe = [_variante("a", speicher=256, preis=1199.0, erstpreis=1449.0),
+              _variante("b", speicher=512, preis=1399.0, erstpreis=1749.0)]
+    a = auswertung(gruppe, [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=_VIER_TERMINE)
+    assert len(a["dauern"]) == 1, "ein Regalplatz"
+    assert len(a["verfaelle"]) == 2, "zwei Preise"
+    assert {v["speicher_gb"] for v in a["verfaelle"]} == {256, 512}
+
+
+def test_der_zustand_trennt_zwei_regalplaetze():
+    """Neu und refurbished sind zwei Preise und zwei Regalplaetze - der
+    ganze Geraetezweig fuehrt den Zustand in der `sku_id`, diese Datei war
+    bis zum 31.08.2026 die einzige Stelle, die darueber hinweggruppierte."""
+    gruppe = [_variante("neu", zustand="neu", preis=1199.0, erstpreis=1449.0),
+              _variante("alt", zustand="refurbished", preis=799.0,
+                        erstpreis=899.0)]
+    a = auswertung(gruppe, [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=_VIER_TERMINE)
+    assert len(a["dauern"]) == 2
+    assert {d["zustand"] for d in a["dauern"]} == {"neu", "refurbished"}
+    assert {v["zustand"] for v in a["verfaelle"]} == {"neu", "refurbished"}
+
+
+def test_ein_unbewegter_preis_ist_kein_preisverfall():
+    """"+0,0 % seit 21 Tagen" ist kein Preisverfall, sondern der Beweis,
+    dass noch nichts passiert ist. Verschwiegen wird er trotzdem nicht -
+    `ohne_bewegung` zaehlt ihn."""
+    steht = _variante("a", preis=1449.0, erstpreis=1449.0)
+    faellt = _variante("b", speicher=512, preis=1299.0, erstpreis=1449.0)
+    # Der Fall tritt wirklich ein: die Zeile waere sonst da, sie ist nur leer.
+    assert preisverfall(steht)["prozent"] == 0.0
+
+    a = auswertung([steht, faellt], [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=_VIER_TERMINE)
+    assert [v["speicher_gb"] for v in a["verfaelle"]] == [512]
+    assert a["ohne_bewegung"] == 1
+    # Die Verweildauer bleibt: ein Preis, der sich nicht bewegt, ist trotzdem
+    # ein Geraet im Regal.
+    assert len(a["dauern"]) == 1
+
+
+def test_der_vertreter_einer_preisgruppe_ist_der_am_laengsten_beobachtete():
+    """Nicht der billigste ("Der niedrigste Preis ist der wahrscheinlichste
+    Fehler"), nicht der teuerste und nicht der erste der Liste.
+
+    Der Fall ist so gebaut, dass die Regel die EINZIGE ist, die den richtigen
+    Eintrag waehlt: die am laengsten beobachtete Variante ist weder die
+    billigste noch die teuerste und steht in der Mitte der Liste.
+    """
+    lang = _variante("lang", farbe="schwarz", first="2026-01-01",
+                     preis=1099.0, erstpreis=1449.0)
+    kurz = _variante("kurz", farbe="weiss", first="2026-01-15",
+                     preis=999.0, erstpreis=1449.0)
+    # Der Fall tritt wirklich ein: BEIDE Varianten nehmen die Schwelle, die
+    # kuerzere ist die billigere, und ohne die Regel gewaenne sie.
+    einzeln = auswertung([kurz], [], _KATALOG, heute="2026-04-02",
+                         termine_je_anbieter=_VIER_TERMINE)
+    assert [v["aktuell"] for v in einzeln["verfaelle"]] == [999.0]
+    assert preisverfall(kurz)["prozent"] < preisverfall(lang)["prozent"]
+
+    # Die laengste steht ABSICHTLICH in der MITTE: sonst gewaenne auch ein
+    # "nimm den ersten" oder "nimm den letzten", und der Test misst die
+    # Listenreihenfolge statt der Regel.
+    mittel = _variante("mittel", farbe="blau", first="2026-01-10",
+                       preis=1199.0, erstpreis=1449.0)
+    a = auswertung([kurz, lang, mittel], [], _KATALOG, heute="2026-04-02",
+                   termine_je_anbieter=_VIER_TERMINE)
+    assert len(a["verfaelle"]) == 1
+    assert a["verfaelle"][0]["aktuell"] == 1099.0
+    assert a["verfaelle"][0]["varianten"] == 3
+
+
+def test_gebrauchtware_belegt_die_nachfolger_these_nicht():
+    """Der Befund: die erste und einzige Zeile der Sektion war ein
+    refurbished iPhone 15 bei ALDI TALK.
+
+    Die These lautet "der Wettbewerb laesst das Vorjahresmodell als
+    guenstigen EINSTIEG stehen" - ein Gebrauchtgeraet ist kein Einstieg ins
+    Neugeraetesortiment."""
+    alt = _variante("alt", zustand="refurbished", first="2025-01-01",
+                    last="2026-08-10", anbieter="expert")
+    a = auswertung([alt], [], _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-01-01", "2025-06-01",
+                                                   "2026-01-01", "2026-08-10"]})
+    # Der Fall tritt ohne die Zusicherung wirklich ein: die Listung nimmt
+    # jede andere Bedingung, und ihr Geraet HAT einen Nachfolger im Katalog.
+    assert [d["zustand"] for d in a["dauern"]] == ["refurbished"]
+    assert _KATALOG.nachfolger_von("apple-iphone-16-pro-max") is not None
+    assert a["nachfolger"] == [], a["nachfolger"]
+
+    # Die Gegenprobe: dieselbe Listung als Neuware.
+    neu = {**alt, "zustand": "neu"}
+    b = auswertung([neu], [], _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-01-01", "2025-06-01",
+                                                   "2026-01-01", "2026-08-10"]})
+    assert [z["zustand"] for z in b["nachfolger"]] == ["neu"]
+
+
+def test_ein_unbestimmbarer_zustand_gilt_nicht_als_neu():
+    """"unbekannt" faellt heraus und wird NICHT als neu angenommen -
+    dieselbe Regel wie in Vergleich und Preisgrafik."""
+    unklar = _variante("u", zustand="unbekannt", first="2025-01-01",
+                       last="2026-08-10", anbieter="expert")
+    a = auswertung([unklar], [], _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter={"expert": ["2025-01-01", "2025-06-01",
+                                                   "2026-01-01", "2026-08-10"]})
+    assert a["nachfolger"] == []
+
+
+def test_ein_gebrauchteintrag_nimmt_der_neuware_nicht_die_untergrenze():
+    """Der teuerste Fehler, den diese Sektion machen kann - konstruiert.
+
+    Die Neuware wird erst 31 Tage NACH dem Marktstart des Nachfolgers
+    gesehen: ihre Verweildauer ist eine Untergrenze. Ein laenger beobachteter
+    GEBRAUCHTeintrag desselben Geraets beim selben Haendler wuerde in einer
+    gemischten Gruppe das `min(first_seen)` stellen - und aus der Untergrenze
+    eine Messung machen.
+    """
+    # Marktstart des Nachfolgers: 2025-09-19.
+    neuware = _variante("neu", zustand="neu", first="2025-10-20",
+                        last="2026-08-10", anbieter="expert")
+    gebraucht = _variante("alt", zustand="refurbished", first="2024-08-01",
+                          last="2026-08-10", anbieter="expert")
+    termine = {"expert": ["2024-08-01", "2025-10-20", "2026-01-01",
+                          "2026-04-01", "2026-08-10"]}
+
+    allein = auswertung([neuware], [], _KATALOG, heute="2026-08-11",
+                        termine_je_anbieter=termine)
+    assert len(allein["nachfolger"]) == 1
+    assert allein["nachfolger"][0]["verweildauer_untergrenze"] is True
+
+    # Der Fall tritt ohne die Trennung wirklich ein: gemeinsam gerechnet
+    # liegt der Beginn 2024-08-01 und damit VOR dem Marktstart.
+    gemischt = verweildauer_nach_nachfolger([neuware, gebraucht], _KATALOG)
+    assert gemischt is None, "eine gemischte Gruppe darf nicht antworten"
+
+    zusammen = auswertung([neuware, gebraucht], [], _KATALOG,
+                          heute="2026-08-11", termine_je_anbieter=termine)
+    assert len(zusammen["nachfolger"]) == 1, zusammen["nachfolger"]
+    zeile = zusammen["nachfolger"][0]
+    assert zeile["zustand"] == "neu"
+    assert zeile["verweildauer_untergrenze"] is True, \
+        "der Gebrauchteintrag hat der Neuware die Untergrenze genommen"
+    assert zeile["beobachtet_seit"] == "2025-10-20"
+
+
+# --------------------------------------------------------------------------
+# Die Preisbasis, und die vier Regeln, die bis zum 31.08.2026 kein Test hielt
+# --------------------------------------------------------------------------
+
+def test_die_preisbasis_nimmt_nicht_den_gebrauchtpreis_desselben_tages():
+    """Der Befund an echten Punkten:
+
+        2026-08-29  o2  apple-iphone-15  schwarz              721,00  (neu)
+        2026-08-29  o2  apple-iphone-15  schwarz-refurbished  613,00
+
+    `_preis_am` nimmt bei gleichem Datum den LETZTEN Treffer der Liste - als
+    Basis kaeme der Gebrauchtpreis, allein weil seine Zeile spaeter in der
+    Datei steht.
+    """
+    neu = _variante("neu", zustand="neu", first="2025-01-01",
+                    last="2026-08-10", anbieter="o2")
+    gebraucht = _variante("alt", zustand="refurbished", first="2025-01-01",
+                          last="2026-08-10", anbieter="o2")
+    punkte = [
+        {"listung_id": "neu", "device_id": "apple-iphone-16-pro-max",
+         "anbieter": "o2", "datum": "2025-09-01", "preis_ohne_vertrag": 721.0},
+        # Dieselbe Firma, dasselbe Geraet, derselbe Tag - aber gebraucht,
+        # und die Zeile steht SPAETER in der Datei.
+        {"listung_id": "alt", "device_id": "apple-iphone-16-pro-max",
+         "anbieter": "o2", "datum": "2025-09-01", "preis_ohne_vertrag": 613.0},
+    ]
+    termine = {"o2": ["2025-01-01", "2025-09-01", "2026-01-01", "2026-08-10"]}
+
+    # Der Fall tritt ohne die Zusicherung wirklich ein: ueber (Geraet,
+    # Anbieter) gefiltert gewinnt der Gebrauchtpreis.
+    ueber_anbieter = nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG,
+                                       punkte, heute="2026-08-11",
+                                       anbieter="o2")
+    assert ueber_anbieter["basis"] == 613.0
+
+    a = auswertung([neu, gebraucht], punkte, _KATALOG, heute="2026-08-11",
+                   termine_je_anbieter=termine)
+    assert len(a["nachfolger"]) == 1
+    assert a["nachfolger"][0]["basis"] == 721.0, "der Neupreis ist die Basis"
+
+
+def test_eine_fremde_preisreihe_ist_keine_basis():
+    """M13 der Mutationsprobe: der Rueckfall von `_eigene_punkte` darf MIT
+    Anbieter nicht auf die ganze Liste greifen.
+
+    Die Docstring verspricht es woertlich, und bis zum 31.08.2026 meldete
+    kein einziger von 735 Tests etwas, wenn man den Zweig herausnahm.
+    """
+    fremd = _punkte(("2025-08-01", 1449.0), ("2025-12-15", 999.0),
+                    listung_id="fremd")          # anbieter="expert"
+    # Der Fall tritt wirklich ein: fuer "expert" ergeben dieselben Punkte
+    # sehr wohl eine Basis.
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, fremd,
+                             heute="2026-01-01", anbieter="expert") is not None
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, fremd,
+                             heute="2026-01-01", anbieter="Medimax") is None
+    # Und ueber die Listungs-IDs derselbe Schutz.
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, fremd,
+                             heute="2026-01-01",
+                             listung_ids={"eigen"}) is None
+    assert nachfolger_effekt("apple-iphone-16-pro-max", _KATALOG, fremd,
+                             heute="2026-01-01",
+                             listung_ids={"fremd"}) is not None
+
+
+def test_der_lauf_der_die_listung_zum_ersten_mal_sah_zaehlt_mit():
+    """M1: die Fenstergrenze ist EINSCHLIESSLICH. Der Lauf, der eine Listung
+    erstmals sah, ist ihr erster Messtermin - er hat sie ja gesehen.
+
+    Der Fall ist so gebaut, dass genau dieser eine Tag entscheidet:
+    `erstpreis_am` liegt bewusst NICHT auf `first_seen`, sonst faellt der
+    Randtermin mit einem eigenen Beleg zusammen und die Regel ist nicht
+    messbar. (Der rechte Rand ist immer `last_verified` und damit selbst ein
+    eigener Beleg - dort kann die Frage nicht auftreten.)
+    """
+    eintrag = _termin_eintrag("l1", first="2026-01-01", last="2026-04-01")
+    eintrag["erstpreis_am"] = "2026-02-15"
+    # Eigene Belege: 15.02. und 01.04. Dazu zwei Prueftermine, einer davon
+    # exakt auf `first_seen`.
+    termine = {"Medimax": ["2026-01-01", "2026-03-01"]}
+    a = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                   laeufe_je_anbieter={"Medimax": 1},
+                   termine_je_anbieter=termine)
+    assert [d["tage"] for d in a["dauern"]] == [90], \
+        "der Termin auf `first_seen` ist der vierte Messtag"
+
+    # Der Fall tritt wirklich ein: einen Tag frueher liegt derselbe Termin
+    # ausserhalb, und die Zeile faellt.
+    davor = {"Medimax": ["2025-12-31", "2026-03-01"]}
+    b = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                   laeufe_je_anbieter={"Medimax": 1},
+                   termine_je_anbieter=davor)
+    assert b["dauern"] == []
+
+
+def test_am_marktstag_selbst_gemessen_ist_keine_untergrenze():
+    """M3: die Randbedingung von `beginn > start`.
+
+    Wer am Tag des Marktstarts schon zusieht, hat den Regalplatz von Tag null
+    an gemessen - das ist eine Messung, keine Untergrenze. Erst der Tag
+    DANACH macht sie zu einer.
+    """
+    am_tag = verweildauer_nach_nachfolger(
+        [_regal("2025-09-19", "2026-08-10")], _KATALOG)   # Marktstart
+    assert am_tag["verweildauer_untergrenze"] is False
+    einen_tag_spaeter = verweildauer_nach_nachfolger(
+        [_regal("2025-09-20", "2026-08-10")], _KATALOG)
+    assert einen_tag_spaeter["verweildauer_untergrenze"] is True
+    assert am_tag["verweildauer_tage"] == einen_tag_spaeter["verweildauer_tage"]
+
+
+def test_die_letzte_bestaetigung_ist_ein_messtag():
+    """M12: `last_verified` gehoert in die eigenen Belege der Listung.
+
+    Konstruiert so, dass genau er die Schwelle entscheidet: drei Termine im
+    Fenster plus `erstpreis_am` ergeben drei verschiedene Tage, mit der
+    letzten Bestaetigung sind es vier.
+    """
+    eintrag = _termin_eintrag("l1", first="2026-01-01", last="2026-04-01")
+    termine = {"Medimax": ["2026-01-01", "2026-02-01", "2026-03-01"]}
+    a = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                   laeufe_je_anbieter={"Medimax": 1},
+                   termine_je_anbieter=termine)
+    assert [d["tage"] for d in a["dauern"]] == [90]
+
+    # Der Fall tritt wirklich ein: ohne den vierten Tag faellt die Zeile.
+    weniger = {"Medimax": ["2026-01-01", "2026-02-01"]}
+    b = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                   laeufe_je_anbieter={"Medimax": 1},
+                   termine_je_anbieter=weniger)
+    assert b["dauern"] == []
