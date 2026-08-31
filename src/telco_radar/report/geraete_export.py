@@ -7,6 +7,25 @@ Wer den Markt ueberblicken will, klickt sich durch Dutzende Downloads und
 setzt sie von Hand zusammen. Hier steht der ganze Bestand in EINER Datei,
 und die Historie in einer zweiten.
 
+DIESES MODUL FILTERT NICHT MEHR SELBST (31.08.2026)
+---------------------------------------------------
+Bis dahin suchte sich der Export seine Zeilen mit einer eigenen
+Statusabfrage zusammen, waehrend die Seite ihren Bestand durch
+`geraete_pruefung.pruefe()` schickte. Zwei Rechnungen fuer dieselbe Menge
+sind zwei Mengen - und sie sind auseinandergelaufen: die zwei o2-Listungen,
+deren Rohfelder sie als "erneuert" ausweisen, fielen auf der Seite heraus
+und standen in `geraete-aktuell.csv` mit `Zustand = neu`. Wer die Datei in
+Excel auf "neu" filtert, bekam zwei Gebrauchtpreise als Neupreise - in genau
+der Datei, die die Fachabteilung ausdruecklich wollte.
+
+Der Export nimmt deshalb den FERTIG geprueften und bereinigten Bestand
+entgegen (`geraete_view.belastbarer_bestand()`, weitergereicht ueber
+`geraete["export_bestand"]`). Er entscheidet nichts mehr darueber, WAS
+gezeigt wird, sondern nur noch WIE. Wer hier wieder eine Bedingung
+einbaut - `status`, `zustand`, ein Preisfilter -, baut die zweite Menge
+zurueck, und sie wird beim naechsten Mal an einer anderen Stelle
+auseinanderlaufen.
+
 WARUM SEMIKOLON UND WARUM EIN BOM
 ---------------------------------
 Beides fuer genau einen Zweck: dass die Datei sich in Excel mit deutschem
@@ -25,7 +44,7 @@ Tausendertrennung: aus 1.349,90 wuerde 134990.
 DIE PREISART STEHT IN EINER EIGENEN SPALTE, nicht in der Preisspalte. Wer
 eine Tabelle nach Preis sortiert, in der 49,95 (Zuzahlung) neben 1349,90
 (Ladenpreis) steht, bekommt eine Rangliste, die nichts bedeutet - dieselbe
-Disziplin wie in der Positionskarte und im Preisvergleich.
+Disziplin wie im Preisvergleich.
 """
 from __future__ import annotations
 
@@ -37,9 +56,6 @@ from typing import Optional
 # Mit BOM, damit Excel UTF-8 erkennt.
 KODIERUNG = "utf-8-sig"
 TRENNER = ";"
-
-# Ein sichtbarer Bestand ist einer, der noch im Regal steht.
-_SICHTBAR = ("aktiv", "vermutlich ausgelistet")
 
 SPALTEN_AKTUELL = [
     "Anbieter", "Anbietertyp", "Hersteller", "Modell", "Speicher GB", "Farbe",
@@ -89,13 +105,15 @@ def _schreibe(spalten: list, zeilen: list) -> str:
 
 
 def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
-    """Alle sichtbaren Listungen des letzten Standes. (Inhalt, Zeilenzahl)"""
+    """Der uebergebene Bestand, eine Zeile je Listung. (Inhalt, Zeilenzahl)
+
+    Ohne eigene Auswahl: geschrieben wird GENAU, was hereinkommt. Die
+    Entscheidung darueber faellt einmal, in `geraete_view` - siehe Modulkopf.
+    """
     zeilen = []
     for e in sorted(eintraege, key=lambda x: (x.get("anbieter") or "",
                                               x.get("device_id") or "",
                                               x.get("speicher_gb") or 0)):
-        if e.get("status") not in _SICHTBAR:
-            continue
         preis, art, tarif = _preis_und_art(e)
         g = katalog.nach_id(e.get("device_id")) if katalog else None
         zeilen.append([
@@ -112,16 +130,27 @@ def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
 
 
 def historie_csv(punkte: list, eintraege: list, katalog) -> tuple[str, int]:
-    """Die gesamte Preishistorie, eine Zeile je (Listung, Datum, Preis).
+    """Die Preishistorie DERSELBEN Listungen, eine Zeile je (Listung, Datum).
 
     Hersteller und Modell kommen aus der Datenbank bzw. dem Katalog, nicht
     aus dem Historienpunkt: der traegt nur `device_id`, und eine Tabelle mit
     einer Spalte voller Kennungen ist in Excel unbrauchbar.
+
+    Gefiltert wird auf die Kennungen aus `eintraege` - also auf denselben
+    Bestand, den `aktuell_csv` schreibt. Ohne diesen Schnitt widersprechen
+    sich die zwei Dateien: die Historie fuehrte eine Kurve fuer eine
+    Listung, die in der aktuellen Tabelle nicht vorkommt, und wer beide
+    nebeneinander legt, findet einen Preis ohne Zeile dazu. Der Preis dafuer
+    ist, dass mit einer ausgelisteten oder aussortierten Listung auch ihre
+    Historie aus dem Export faellt - im STORE bleibt sie unangetastet, und
+    die Verweildauer rechnet weiter auf ihr.
     """
     nach_id = {e.get("id"): e for e in eintraege}
     zeilen = []
     for p in sorted(punkte, key=lambda x: (x.get("datum") or "",
                                            x.get("listung_id") or "")):
+        if p.get("listung_id") not in nach_id:
+            continue
         g = katalog.nach_id(p.get("device_id")) if katalog else None
         eintrag = nach_id.get(p.get("listung_id")) or {}
         preis, art, tarif = _preis_und_art(p)
@@ -139,6 +168,12 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
                      stand: str = "") -> dict:
     """Beide Dateien nach `site/exporte/`. Gibt die Angaben fuer die Seite.
 
+    `eintraege` ist der FERTIG gepruefte und bereinigte Bestand, also
+    dieselbe Menge, aus der die Seite ihre Preisaussagen baut. Eine leere
+    Liste ist ein zulaessiger Fall - dann entstehen beide Dateien mit ihrer
+    Kopfzeile, und die Seite nennt daneben eine Null. Ein fehlender Download
+    waere die schlechtere Auskunft als ein leerer.
+
     Die Zeilenzahl steht NEBEN dem Link, nicht nur in der Datei: wer einen
     Export herunterlaedt, will vorher wissen, ob er sich lohnt - und ein
     leerer Download ist der teuerste Weg, das herauszufinden.
@@ -146,8 +181,8 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
     ordner = Path(site_dir) / "exporte"
     ordner.mkdir(parents=True, exist_ok=True)
 
-    inhalt_a, zeilen_a = aktuell_csv(eintraege, katalog)
-    inhalt_h, zeilen_h = historie_csv(punkte, eintraege, katalog)
+    inhalt_a, zeilen_a = aktuell_csv(eintraege or [], katalog)
+    inhalt_h, zeilen_h = historie_csv(punkte or [], eintraege or [], katalog)
     (ordner / "geraete-aktuell.csv").write_text(inhalt_a, encoding=KODIERUNG)
     (ordner / "geraete-historie.csv").write_text(inhalt_h, encoding=KODIERUNG)
 

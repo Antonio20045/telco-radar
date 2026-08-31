@@ -1832,10 +1832,17 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Groesse neben dem Link, und diese Zahlen kommen aus den wirklich
     # geschriebenen Dateien. Ein Link mit gerechneter statt gemessener Zahl
     # waere genau die Sorte Angabe, die dieses Portal nicht macht.
+    #
+    # Was er schreibt, waehlt er NICHT selbst aus (31.08.2026): `aufbereiten`
+    # hat den Bestand einmal geprueft und bereinigt und reicht ihn als
+    # `export_bestand` heraus. Vorher filterte der Export nach `status` und
+    # die Seite nach der Plausibilitaetspruefung - zwei Rechnungen fuer
+    # dieselbe Menge, und sie liefen auseinander: zwei Gebrauchtpreise
+    # standen in `geraete-aktuell.csv` mit `Zustand = neu`.
     try:
         from . import geraete_export as _geraete_export
         geraete["export"] = _geraete_export.schreibe_exporte(
-            site_dir, geraete.get("alle_eintraege") or [],
+            site_dir, geraete.get("export_bestand") or [],
             geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
             stand=geraete.get("stand", ""))
     except Exception as exc:                      # noqa: BLE001

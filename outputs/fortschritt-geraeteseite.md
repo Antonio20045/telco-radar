@@ -98,8 +98,56 @@ auswertbar; P1/P2 beginnen deshalb mit einer Messrunde, nicht mit Adapteraufträ
 
 ## P0 — Datenwahrheit
 
-**Gebaut:** *(läuft)*
+**Gebaut:** zwei Pakete. **P0-b** `report/geraete_bereinigung.py` + 17 Tests
+(`79f652a`) — `bereinige()` räumt das Zustandswort aus der Farbe und fasst
+Zwillingszeilen zusammen, als reine Lesefunktion ohne Eingriff in den Store.
+**P0-a** verdrahtet `pruefe() → bereinige() → Seite UND Export` — *läuft noch*.
 
-**Gemessen:** *(offen)*
+**Gemessen (Lead, an der echten Kette, nicht an den Tests der Bauer):**
 
-**Offen:** *(offen)*
+```
+roh 370 → pruefe 366 → bereinige 358
+```
+
+| Tor-Kriterium | Ergebnis |
+|---|---|
+| Zustandswort in der Farbspalte | **0** |
+| Identische (Anbieter, Modell, Speicher, Farbe, Preis) | **keine** |
+| `Zustand = neu`, dessen Rohdaten gebraucht sagen | **0** |
+| Vodafone-Farbvarianten iPhone 17 256 GB | alle **5** erhalten |
+| Entfernt | genau **12**, alle o2 — 10 Zwillinge mit überlebendem Partner, 2 Doppelpreis |
+| Kollateralschaden | keiner (Vodafone 150, mobilcom-debitel 140, ALDI TALK 2 unverändert) |
+
+Der Bauer hatte **360** gemeldet, weil er gegen die rohen 370 rechnete statt gegen
+die 366 nach `pruefe()`. Die Zahl der Auslieferung ist 358. Genau dafür misst der
+Lead selbst.
+
+**P0-b ist zurückgewiesen, Runde 1 von 2.** Der adversarische Prüfer hat 12 Befunde
+geliefert; die tragenden habe ich selbst nachgemessen und bestätigt:
+
+| | Befund | Meine Messung |
+|---|---|---|
+| **Blocker** | `ohne_zustandswort()` strippt Aufräumzeichen **unbedingt** | `'Silver Shadow (Enterprise Edition)' → '…Edition'` — der Fall steht im echten Bestand (mobilcom-debitel, 899,00 €) und ginge verstümmelt live |
+| schwer | Der Musterbau für mehrteilige Kennzeichen ist kaputt (`geraete_model.py:513`, `[\s\[\s\-]]` trifft nie) | `'Schwarz B-Ware'`, `'wie neu'`, `'second-hand'`, `'Open-Box'` bleiben **unverändert**; 6 von 9 Kennzeichen sind für die Bereinigung tot |
+| schwer | 11 von 17 Tests sind grün, wenn `bereinige()` nichts tut | `test_ohne_die_bereinigung_…` ruft `bereinige()` **gar nicht auf** — sein Rumpf befragt zwei Fixture-Literale, seine Docstring nennt ihn „die Gegenprobe" |
+| schwer | 8 von 9 Schlüsselbestandteilen wirkungslos | weggelassen bleibt es bei 360 Gruppen; nur ohne Farbe kippt es auf 272 |
+| mittel | Die Prämisse des Modulkopfs ist falsch | **keine** der 370 Zeilen trägt das Kennzeichen nur in der Farbe — alle zehn auch in Titel UND URL |
+| mittel | Die halbe Preishistorie des Zwillings fällt weg | 10 Punkte vom 29.08. verlassen `geraete-historie.csv` |
+
+Drei Zusicherungen hielten der Prüfung stand und bleiben: kein Verlust echter Ware,
+die fünf Farbvarianten überleben, das Ergebnis ist über 20 Shuffles stabil.
+
+**Offen:**
+1. P0-a (Verdrahtung) läuft noch. Die Prüferbefunde **S1, S3, S4, S8** betreffen
+   `belastbarer_bestand`, die Zeilenzahl am Exportknopf und
+   `tests/test_geraete_seite.py` — sie wurden gegen den **halbfertigen** Stand
+   gemessen und müssen nach dem Abschluss neu gemessen werden, bevor sie als
+   Befunde gelten.
+2. Der Prüfer meldet, die Katalogtabelle (Reiter 2) lese `sichtbar` statt des
+   bereinigten Bestands — dann erreichte die Bereinigung den Leser gar nicht,
+   sondern nur die CSV. **Nach P0-a an der gerenderten Seite nachmessen.**
+3. Zwei Zahlen für dieselbe Menge: Katalogüberschrift 370 gegen Exportknopf 358.
+   Ebenfalls erst nach P0-a beurteilbar.
+4. Der Doppelpreisfall Galaxy S26 FE („pistachio" / „pistachio bk", 144 € Abstand)
+   ist weiterhin **ungeklärt** — er wird gemeldet und entfernt, nicht aufgelöst.
+   Offener Punkt seit dem 29.08.
