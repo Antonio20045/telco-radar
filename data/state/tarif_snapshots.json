@@ -7,16 +7,17 @@
    "bonus|10gb",
    "dir bereits ab unter|20€",
    "dir bis zu x|50€",
+   "durchschnittliche nutzer wählen bis|50gb",
    "eine laufzeit von bis|24monate",
    "einm. anschlusspreis|0.00€",
    "einm. anschlusspreis|39.99€",
    "einmalig gb und mtl.|500mb",
    "einmalig|10gb",
-   "festnetz mit bis zu|150mb",
    "g mit max.|100mb",
    "g mit max.|15mb",
    "g mit max.|300mb",
    "gb einmalig und monatlich|500mb",
+   "gb mit bis zu|300mb",
    "gutes g-netz mit ca.|99%",
    "jedes jahr|10gb",
    "jedes jahr|1gb",
@@ -24,18 +25,21 @@
    "max.|100mb",
    "max.|15mb",
    "max.|300mb",
-   "mobile m plus|50gb",
-   "monatlich kündbar. jetzt inkl.|10€",
-   "nach bundle bis zu|15€",
+   "oder hotspot-nutzung empfehlen sich|100gb",
    "plus bundle sparst du|5€",
    "plus bundles spare|5€",
-   "rabatt jeden monat und|0€",
+   "surfen reichen häufig bis|20gb",
+   "surfgeschwindigkeit bis zu oder|300mb",
    "uns schon für unter|20€",
    "unsere testkarte und nutze|30tage",
+   "x|50gb",
    "zwischen monatlicher kündigung und|24monate",
+   "|0.00€",
+   "|1.00€",
    "|100gb",
    "|10gb",
    "|150gb",
+   "|150mb",
    "|15gb",
    "|19.99€",
    "|1gb",
@@ -51,13 +55,11 @@
    "|39.98€",
    "|39.99€",
    "|50gb",
-   "|58.49€",
    "|59.98€",
    "|59.99€",
-   "|5gb",
-   "|63.49€"
+   "|5gb"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -83,7 +85,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -117,7 +119,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -151,7 +153,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -160,11 +162,11 @@
    "|10.99€",
    "|10gb",
    "|14.99€",
+   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
    "|216€",
-   "|264€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -175,7 +177,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -202,7 +204,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -217,7 +219,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -240,18 +242,16 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
    "fußnote zu|40€",
-   "statt|995€",
    "|0€",
    "|12monate",
    "|1399€",
    "|1899€",
    "|2999€",
-   "|299€",
    "|40€",
    "|499€",
    "|6999€",
@@ -259,7 +259,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -350,11 +350,13 @@
    "neu abschließt bekommst du|200€",
    "pro fold bis zu|500€",
    "rabatt entfällt automatisch nach|24monate",
+   "rabatte entfallen automatisch nach|24monate",
    "reisen dafür bekommst du|2gb",
    "s gb zusätzlich insgesamt|100gb",
    "s gb zusätzlich insgesamt|110gb",
    "s gb zusätzlich insgesamt|35gb",
    "s gb zusätzlich insgesamt|40gb",
+   "s oder m mit|24monate",
    "selbständig dann bekommst du|24monate",
    "sich dein tarifpreis um|2€",
    "sich der tarifpreis um|15€",
@@ -393,6 +395,7 @@
    "x|15€",
    "z fold8 ultra mindestens|500€",
    "zusätzliches datenvolumen freischalten jeweils|250mb",
+   "zusätzlich|70gb",
    "|0€",
    "|10%",
    "|100%",
@@ -401,6 +404,7 @@
    "|10gb",
    "|10€",
    "|12.49€",
+   "|12.66€",
    "|120gb",
    "|12monate",
    "|12€",
@@ -411,12 +415,14 @@
    "|15gb",
    "|15€",
    "|160€",
+   "|16€",
    "|18gb",
    "|19.99€",
    "|1monat",
    "|1€",
    "|20%",
    "|20gb",
+   "|20€",
    "|24.99€",
    "|24monate",
    "|25%",
@@ -438,7 +444,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -457,6 +463,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-08-28"
+  "stand": "2026-09-02"
  }
 }
