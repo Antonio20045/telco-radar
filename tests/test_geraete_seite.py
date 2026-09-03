@@ -2645,3 +2645,41 @@ def test_die_zelle_uebersteht_kaputte_preis_und_datumsfelder(tmp_path, monkeypat
     # Datumsfilter nicht.
     assert "Test B" in zeile.get_text()
     assert "None" not in zeile.get_text()
+
+
+# --------------------------------------------------------------------------
+# Die Preisform steht an der Zahl (03.09.2026)
+# --------------------------------------------------------------------------
+
+def test_ein_ratengesamtbetrag_wird_auf_der_seite_als_solcher_gezeigt(tmp_path):
+    """Der Befund vom 03.09.2026: o2s Preisspalte trug den Gesamtbetrag einer
+    24-Monats-Ratenzahlung in derselben Optik wie freenets Barpreis.
+
+    Der Fall hier ist der gemessene: 1,00 EUR Anzahlung plus 24 x 30,00 EUR
+    ergeben 721,00 EUR. Auf der Seite muss beides stehen - die Zahl UND
+    woraus sie besteht.
+    """
+    db = json.loads(json.dumps(_DB))
+    db["listungen"].append(_listung(
+        "o2", "apple-iphone-16-pro-max",
+        "apple-iphone-16-pro-max-256gb-schwarz", 721.0, farbe="schwarz",
+        id="o2--apple-iphone-16-pro-max-256gb-schwarz",
+        anbieter_typ="netzbetreiber", netz="o2",
+        anzahlung=1.0, monatsrate=30.0, laufzeit_monate=24,
+        zins_effektiv=0.0))
+
+    site = _baue(tmp_path, db=db)
+    text = (site / "geraete.html").read_text(encoding="utf-8")
+    assert "in 24 Raten (0 %)" in text
+    # Und die Zusicherung dahinter: ein Barpreis bekommt den Zusatz NICHT.
+    # Der Bestand traegt vier Haendlerzeilen ohne Ratenfelder.
+    assert text.count("in 24 Raten") < text.count("gr-a-modell")
+
+
+def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
+    """Solange o2 und Vodafone in derselben Spalte stehen, ist "ausschliesslich
+    Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat."""
+    site = _baue(tmp_path)
+    text = (site / "geraete.html").read_text(encoding="utf-8")
+    assert "ausschließlich Neugeräte ohne Vertrag" not in text
+    assert "nicht dasselbe wie ein Barpreis" in text

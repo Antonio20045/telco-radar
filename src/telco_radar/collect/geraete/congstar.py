@@ -4,9 +4,14 @@ WARUM DIESER ANBIETER
 ----------------------
 Eine Messrunde vom 31.08.2026 hat congstar als den einen Anbieter
 identifiziert, der echte neue Marktinformation bringt: er liegt im
-TELEKOM-NETZ, und die Telekom selbst steht wegen ihrer AWS-WAF nicht in
-dieser Datenbank. Er trifft Apple, Samsung, Google UND Xiaomi - Google fehlt
-der Fachabteilung in ihrer bisherigen Loesung ausdruecklich.
+TELEKOM-NETZ, und die Telekom selbst steht nicht in dieser Datenbank, weil
+sie ihren Geraetepreis nur als Ratenzahlung ausweist. (Bis zum 03.09.2026
+stand hier "wegen ihrer AWS-WAF". Nachgemessen: die WAF ist vorhanden -
+AWS_WAF_API_KEY und ein awswaf.com-Captcha im ausgelieferten HTML -, aber sie
+blockiert den Abruf nicht; die Kategorieseite antwortet mit TelcoRadar/1.0
+ueber HTTP/2 mit HTTP 200. Der Grund steht vollstaendig bei `Telekom` in
+`config/geraete_quellen.yaml`.) Er trifft Apple, Samsung, Google UND Xiaomi -
+Google fehlt der Fachabteilung in ihrer bisherigen Loesung ausdruecklich.
 
 Der Befund vom 30.08.2026 (siehe die alte `grund`-Zeile in
 `config/geraete_quellen.yaml`, noch als Kommentar dort nachzulesen) bleibt

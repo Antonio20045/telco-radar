@@ -293,6 +293,13 @@ def _preisfelder(anbieter, satz: dict) -> dict:
 
     `Listung.__post_init__` ist die dritte Sicherung: eine Zuzahlung ohne
     `tarif_referenz` wirft dort.
+
+    SEIT DEM 03.09.2026 REICHT SIE DIE PREISFORM MIT DURCH. Ein Ladenpreis
+    ist nicht automatisch ein Barpreis: o2s Zahl ist der Gesamtbetrag einer
+    24-Monats-Ratenzahlung. Wo ein Adapter Anzahlung, Rate und Laufzeit
+    gelesen hat, wandern sie an die Listung und von dort auf die Seite. Wo er
+    sie nicht gelesen hat, bleibt alles wie bisher - diese Funktion erfindet
+    keine Preisform und leitet keine aus dem Anbieternamen ab.
     """
     preis = satz.get("preis")
     zuzahlung = satz.get("zuzahlung")
@@ -304,7 +311,11 @@ def _preisfelder(anbieter, satz: dict) -> dict:
                 "preis_mit_vertrag_ab": satz.get("monatspreis")}
     if preis is None or ist_lockpreis(preis):
         return {"preis_ohne_vertrag": None}
-    return {"preis_ohne_vertrag": preis}
+    return {"preis_ohne_vertrag": preis,
+            "anzahlung": satz.get("anzahlung"),
+            "monatsrate": satz.get("monatsrate"),
+            "laufzeit_monate": satz.get("laufzeit_monate"),
+            "zins_effektiv": satz.get("zins_effektiv")}
 
 
 def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,

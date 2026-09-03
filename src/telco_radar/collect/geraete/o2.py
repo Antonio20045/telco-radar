@@ -44,6 +44,32 @@ ZWEI FALLEN IN DIESEM KATALOG
    (gemessen: 92 von 93 Eintraegen gehen exakt auf). Wer `oneTimePrice`
    naehme, schriebe 1 EUR in die Preisspalte - genau den Lockpreis, den der
    Waechter draussen haelt.
+
+DIE ZAHL IST KEIN BARPREIS (ergaenzt am 03.09.2026)
+---------------------------------------------------
+`totalPrice` ist der Gesamtbetrag eines Teilzahlungsgeschaefts, nicht der
+Preis an einer Kasse. Das iPhone 14 128 GB mitternacht steht mit
+`oneTimePrice: 1`, `monthlyPrice: 30.0`, `totalPrice: 721.0` im Katalog, und
+die verlinkte Produktseite sagt es woertlich: "Geraet Anzahlung: 1,00 EUR",
+"(Gesamtpreis Geraet: 721,00 EUR)". Bis zum 03.09.2026 stand diese Zahl in
+derselben Spalte wie freenets Barpreis von 949,00 EUR - gleiche Optik, andere
+Groesse.
+
+Deshalb liest dieser Adapter jetzt die ganze Struktur und nicht nur die
+Summe: `anzahlung`, `monatsrate` und `laufzeit_monate`. Die Laufzeit steht im
+Angebotsnamen (`...-24xhigh`), also in der Quelle selbst - sie wird nicht aus
+Summe und Rate zurueckgerechnet, denn ein Ergebnis, das nur ZUFAELLIG
+aufgeht, waere geraten. Geht die Probe `anzahlung + n * rate == totalPrice`
+nicht auf, wird die Laufzeit verworfen und die Zahl steht unetikettiert da -
+lieber kein Etikett als ein falsches.
+
+`zins_effektiv` traegt die 0.0, weil o2 sie auf der Produktseite als
+gesetzlichen Finanzierungshinweis ausweist ("Der Sollzins liegt bei 0 %, der
+effektive Jahreszins bei 0 %"). Sie ist damit belegt, nicht angenommen; ein
+Anbieter ohne diesen Nachweis bekaeme hier `None`.
+
+Die Preishistorie bleibt davon unberuehrt: gespeichert wird weiterhin
+`totalPrice`, und kein Preispunkt aus einem frueheren Lauf wird umgedeutet.
 """
 from __future__ import annotations
 
@@ -68,11 +94,46 @@ _OFFER_RE = re.compile(
 _BUENDEL_RE = re.compile(r"\bmit\b", re.IGNORECASE)
 
 
+# Die Ratenzahl steht am Ende des Angebotsnamens: "...-mitternacht-24xhigh".
+# Bewusst ein EIGENER Ausdruck neben `_OFFER_RE` und nicht dessen Gruppe:
+# `_OFFER_RE` verlangt den ganzen Slug samt Speicher und Farbe. Ein Eintrag,
+# dessen Name davon abweicht, verliert dann Speicher und Farbe - er soll
+# deswegen aber nicht auch noch seine Preisform verlieren.
+_RATEN_RE = re.compile(r"-(?P<raten>\d+)x\w+$")
+
+# Der Cent, um den eine Rechenprobe danebenliegen darf. Groesser gewaehlt
+# waere sie keine Probe mehr, kleiner scheiterte sie an der Rundung.
+_TOLERANZ = 0.01
+
+
 def _preis(wert) -> Optional[float]:
     try:
         return float(wert)
     except (TypeError, ValueError):
         return None
+
+
+def _laufzeit(angebot: str, anzahlung: Optional[float],
+              monatsrate: Optional[float],
+              gesamt: Optional[float]) -> Optional[int]:
+    """Die Ratenzahl aus dem Angebotsnamen - aber nur, wenn sie aufgeht.
+
+    Die Zahl kommt aus der Quelle, die Rechenprobe entscheidet, ob sie
+    benutzt wird: `anzahlung + n * rate == totalPrice` (Toleranz ein Cent).
+    Das ist dieselbe Kontrolle, die der Modulkopf seit dem 28.08.2026 als
+    Messbefund nennt - hier wird sie zur Bedingung, statt nur protokolliert
+    zu werden. Faellt sie durch, gibt es kein Etikett; die Zahl bleibt, was
+    sie ist, und behauptet nur nichts mehr ueber ihre Form.
+    """
+    m = _RATEN_RE.search(angebot or "")
+    if not m or anzahlung is None or monatsrate is None or gesamt is None:
+        return None
+    raten = int(m.group("raten"))
+    if raten <= 0:
+        return None
+    if abs(anzahlung + raten * monatsrate - gesamt) > _TOLERANZ:
+        return None
+    return raten
 
 
 def lies(text: str, url: str = "") -> list[dict]:
@@ -95,13 +156,18 @@ def lies(text: str, url: str = "") -> list[dict]:
         if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
             continue                      # Geraet plus Zubehoer, siehe Modulkopf
 
-        preis = _preis((h.get("price") or {}).get("totalPrice"))
+        preisblock = h.get("price") or {}
+        preis = _preis(preisblock.get("totalPrice"))
         if preis is None:
             continue
 
         m = _OFFER_RE.match(angebot)
         speicher = int(m.group("gb")) if m else None
         farbe = m.group("farbe").replace("-", " ").strip() if m else ""
+
+        anzahlung = _preis(preisblock.get("oneTimePrice"))
+        monatsrate = _preis(preisblock.get("monthlyPrice"))
+        laufzeit = _laufzeit(angebot, anzahlung, monatsrate, preis)
 
         # Die Seite, die ein Mensch aufrufen kann - sie traegt in ihrer
         # eigenen Adresse `ohne-tarif=ja`, also genau die Preisart, die hier
@@ -113,6 +179,11 @@ def lies(text: str, url: str = "") -> list[dict]:
                                           f"{speicher} GB" if speicher else "",
                                           farbe) if x),
             "preis": preis,
+            # Die Preisform, aus der Quelle gelesen - siehe Modulkopf.
+            "anzahlung": anzahlung if laufzeit else None,
+            "monatsrate": monatsrate if laufzeit else None,
+            "laufzeit_monate": laufzeit,
+            "zins_effektiv": 0.0 if laufzeit else None,
             "waehrung": "EUR",
             "verfuegbarkeit": "unbekannt",
             "sku": str(h.get("externalId") or "").strip(),

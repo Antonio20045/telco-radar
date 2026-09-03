@@ -791,6 +791,48 @@ class Sku:
 _DATUM_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+def ratenhinweis(anzahlung: Optional[float], monatsrate: Optional[float],
+                 laufzeit_monate: Optional[int],
+                 zins_effektiv: Optional[float] = None) -> str:
+    """Wie eine Ratenzahl auf der Seite bezeichnet wird - an EINER Stelle.
+
+    Der Befund vom 03.09.2026: o2s Preisspalte traegt `totalPrice`, also den
+    Gesamtbetrag eines Teilzahlungsgeschaefts (1,00 EUR Anzahlung plus 24 x
+    30,00 EUR = 721,00 EUR), und stand bis dahin in derselben Spalte wie
+    freenets Barpreis - gleiche Optik, andere Groesse. Diese Funktion liefert
+    den Zusatz, der den Unterschied sichtbar macht: "in 24 Raten (0 %)".
+
+    Sie steht hier und nicht im Renderer, weil der Renderer sonst eine zweite
+    Wahrheit neben dem Modell fuehrte - dieselbe Lehre wie bei `_belegstufe`
+    (`collect/geraete/__init__.py`): eine Namensliste im Template haette
+    jeder neue Anbieter still verfehlt.
+
+    Leer heisst leer: ohne Laufzeit steht die Zahl wie bisher da. Eine
+    Ratenzahl OHNE ihre Laufzeit zu etikettieren waere geraten, und der
+    Zinssatz erscheint nur, wenn er belegt uebergeben wurde - `None` ist
+    "unbekannt", nicht "null Prozent".
+    """
+    if not laufzeit_monate:
+        return ""
+    text = f"in {int(laufzeit_monate)} Raten"
+    if zins_effektiv is not None:
+        prozent = f"{float(zins_effektiv):.2f}".rstrip("0").rstrip(".")
+        text += f" ({prozent.replace('.', ',')} %)"
+    return text
+
+
+def ratenhinweis_aus_eintrag(eintrag: dict) -> str:
+    """Derselbe Hinweis fuer einen Bestandssatz aus `geraete_db.json`.
+
+    Bestandssaetze aus Laeufen vor dem 03.09.2026 tragen die Felder nicht -
+    sie bekommen einen leeren Hinweis und werden nicht nachtraeglich
+    umgedeutet. Was damals gemessen wurde, bleibt, wie es gemessen wurde.
+    """
+    return ratenhinweis(eintrag.get("anzahlung"), eintrag.get("monatsrate"),
+                        eintrag.get("laufzeit_monate"),
+                        eintrag.get("zins_effektiv"))
+
+
 @dataclass
 class Listung:
     """Was EIN Anbieter zu EINEM Zeitpunkt fuer eine SKU verlangt.
@@ -812,6 +854,19 @@ class Listung:
     preis_mit_vertrag_ab: Optional[float] = None
     zuzahlung: Optional[float] = None
     tarif_referenz: str = ""
+    # WIE die Zahl in `preis_ohne_vertrag` zustande kommt. Bei o2 und der
+    # Telekom ist sie kein Barpreis, sondern die Summe aus Anzahlung und n
+    # Monatsraten - dieselbe Spalte, andere Groesse. Diese drei Felder sind
+    # die Kennzeichnung, und sie kommen aus der Quelle: `oneTimePrice`,
+    # `monthlyPrice` und die Ratenzahl aus dem Angebotsnamen. Wer sie leer
+    # laesst, behauptet nichts - dann steht die Zahl wie bisher da.
+    anzahlung: Optional[float] = None
+    monatsrate: Optional[float] = None
+    laufzeit_monate: Optional[int] = None
+    # 0.0 heisst BELEGT null Prozent, None heisst unbekannt - der
+    # Unterschied, den `effektivpreis.py:33-39` fuer den Anschlusspreis
+    # schon macht: eine fehlende Angabe ist nicht dasselbe wie eine Null.
+    zins_effektiv: Optional[float] = None
     verfuegbarkeit: str = "unbekannt"
     confidence: str = "mittel"
     speicher_gb: Optional[int] = None
@@ -842,7 +897,8 @@ class Listung:
             raise ValueError(f"unbekannter zustand: {self.zustand!r}")
         if self.confidence not in CONFIDENCE:
             raise ValueError(f"unbekannte confidence: {self.confidence!r}")
-        for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung"):
+        for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
+                     "zuzahlung", "anzahlung", "monatsrate"):
             wert = getattr(self, feld)
             if wert is None:
                 continue
@@ -850,6 +906,13 @@ class Listung:
             if wert < 0:
                 raise ValueError(f"negativer preis in {feld}: {wert}")
             setattr(self, feld, round(wert, 2))
+        if self.laufzeit_monate is not None:
+            self.laufzeit_monate = int(self.laufzeit_monate)
+            if self.laufzeit_monate <= 0:
+                raise ValueError(f"laufzeit_monate muss positiv sein: "
+                                 f"{self.laufzeit_monate}")
+        if self.zins_effektiv is not None:
+            self.zins_effektiv = float(self.zins_effektiv)
         # Teil C4: "iPhone fuer 1 Euro" ist ohne den Tarif dahinter eine Zahl
         # ohne Bedeutung. JEDE Buendelzahl braucht ihren Tarif - auch
         # `preis_mit_vertrag_ab`, sonst waere sie das Schlupfloch, durch das
@@ -879,6 +942,12 @@ class Listung:
         return "kein_preis"
 
     @property
+    def ratenhinweis(self) -> str:
+        """Der Zusatz, der aus einer Preiszahl eine Preisaussage macht."""
+        return ratenhinweis(self.anzahlung, self.monatsrate,
+                            self.laufzeit_monate, self.zins_effektiv)
+
+    @property
     def preis(self) -> Optional[float]:
         """Der Preis DIESER Preisart. Wer beide Arten mischen will, muss es
         ausdruecklich tun - hier gibt es keinen gemeinsamen Nenner."""
@@ -902,6 +971,10 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
                  preis_mit_vertrag_ab: Optional[float] = None,
                  zuzahlung: Optional[float] = None,
                  tarif_referenz: str = "",
+                 anzahlung: Optional[float] = None,
+                 monatsrate: Optional[float] = None,
+                 laufzeit_monate: Optional[int] = None,
+                 zins_effektiv: Optional[float] = None,
                  verfuegbarkeit: str = "unbekannt",
                  confidence: str = "mittel",
                  speicher_gb: Optional[int] = None,
@@ -957,7 +1030,9 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
         quelle_url=quelle_url, abgerufen_am=abgerufen_am, netz=netz,
         preis_ohne_vertrag=preis_ohne_vertrag, uvp=uvp,
         preis_mit_vertrag_ab=preis_mit_vertrag_ab, zuzahlung=zuzahlung,
-        tarif_referenz=tarif_referenz, verfuegbarkeit=verfuegbarkeit,
+        tarif_referenz=tarif_referenz, anzahlung=anzahlung,
+        monatsrate=monatsrate, laufzeit_monate=laufzeit_monate,
+        zins_effektiv=zins_effektiv, verfuegbarkeit=verfuegbarkeit,
         confidence=confidence, speicher_gb=speicher_gb, farbe_roh=farbe_roh,
         farbe_normalisiert=kanonisch, ean=ean, zustand=zustand,
         titel_roh=(titel or "").strip(), einstieg_url=einstieg_url)

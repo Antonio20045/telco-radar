@@ -408,10 +408,15 @@ unabhängiger zweiter Marktpunkt.
 Ohne Vodafone bleiben 240 Wettbewerbslistungen aus drei unabhängigen Quellen.
 
 **Der gravierendste Deckungsfehler:** `congstar` ist der einzige *aktive*
-Anbieter **ohne eine einzige Listung** und ohne Lauf-Protokolleintrag —
-angebunden am 31.08.2026, seither kein Fund. Damit ist das **Telekom-Netz im
-Gerätepreisradar vollständig unbelegt** (Telekom selbst inaktiv;
-klarmobil / Edeka smart / Norma Connect / fraenk deaktiviert).
+Anbieter **ohne eine einzige Listung** und ohne Lauf-Protokolleintrag. Der
+Grund ist am 03.09.2026 an den GitHub-Actions-Läufen gemessen und **kein
+Ausfall, sondern eine fehlende Messung**: der Commit, der congstar auf
+`congstar_next` und `aktiv: true` stellt (`27ef589`, 31.08.2026), ist Vorfahr
+**keines** der fünf letzten Nachtläufe — alle fünf trugen an ihrem `headSha`
+noch `aktiv: false`. Der Lauf vom 03.09.2026 protokolliert entsprechend
+„congstar -> uebersprungen, 0 Listungen aus 0 Produktseiten". Bis zum nächsten
+Nachtlauf bleibt das **Telekom-Netz im Gerätepreisradar unbelegt** (Telekom
+selbst inaktiv; klarmobil / Edeka smart / Norma Connect / fraenk deaktiviert).
 
 **Gar nicht konfiguriert:** Cyberport, notebooksbilliger.de, Otto, Gravis,
 Conrad, Kaufland, Tchibo mobil, yourfone, ja! mobil — sowie Lidl Connect,
@@ -825,8 +830,10 @@ mitgeben.
 cd <repo> && PYTHONPATH=src python3 -m pytest -q
 ```
 
-Referenzlauf vom 03.09.2026 auf dieser Maschine: **2188 passed, 33 skipped,
-2 failed, 49 errors in 149 s.** Die 2 Fehlschläge (`tests/test_promo_seite.py`)
+Referenzlauf vom 03.09.2026 auf dieser Maschine, vor Phase 1: **2188 passed,
+33 skipped, 2 failed, 49 errors in 149 s.** Nach Phase 1 (Preisform der
+o2-Zahl): **2208 passed** bei unveränderten 33 skipped / 2 failed / 49 errors
+— die zwanzig neuen Tests, kein alter gebrochen. Die 2 Fehlschläge (`tests/test_promo_seite.py`)
 und die 49 Fehler (`tests/test_geraete_reiter_browser.py`) sind **ausschließlich
 Umgebungsfolgen**: `PIL` (Pillow) ist nicht installiert, weshalb
 `report/bilder.ist_leer` (`bilder.py:207-213`) in den Ausnahmezweig fällt und
@@ -1118,10 +1125,13 @@ der Seite; das Telekom-Netz ist nicht länger unbelegt.
    `/shop/geraet/`) als Quelllink verwenden. **Achtung:** die Produktseite trägt
    den Betrag nicht (§ 3.2) — also `beleg_gefunden = False`, wie bei Vodafone.
    Keine Ausnahme für den eigenen neuen Adapter.
-4. **congstar** (§ 4.1): 0 Funde seit dem 31.08.2026 bei `aktiv: true`
-   diagnostizieren. Der Adapter existiert und ist getestet
-   (`tests/test_geraete_adapter_congstar.py`) — der Ausfall liegt also am
-   Einstieg, am Zeitbudget oder an einer Änderung der Seite.
+4. **congstar** (§ 4.1): Die Diagnose ist erledigt (03.09.2026) —
+   `aktiv: true` war zu keinem Laufzeitpunkt in Produktion, es gibt also
+   nichts zu reparieren, sondern einen Lauf abzuwarten. Der Befund steht im
+   `grund`-Feld. **Zu prüfen ist erst der erste echte Lauf:** bleibt er leer,
+   ist die robots.txt von `www.congstar.de` die erste Messung (für die
+   Messrunde vom 31.08.2026 lag keine vor), danach Zeitbudget und Deckel
+   (`max_produkte` steht auf dem Standard 60 bei 55 Sitemap-Adressen).
 5. **Robots erneut prüfen und die Prüfung festhalten.** Der heutige Befund
    (nur `/is-bin/intershop.*` gesperrt) muss im `hinweis` mit Datum stehen, und
    `RobotsWaechter` muss ihn zur Laufzeit erneut lesen — nicht die

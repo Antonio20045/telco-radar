@@ -282,8 +282,14 @@ class GeraeteDB:
             # Preisfelder: ein Wert, den der Extraktor diesmal NICHT fand,
             # ueberschreibt den bekannten nicht. Sonst waere jede Luecke in
             # der Extraktion eine Preisaenderung.
+            #
+            # Die Preisform (`anzahlung`, `monatsrate`, `laufzeit_monate`,
+            # `zins_effektiv`) folgt derselben Regel. Sie beschreibt den
+            # AKTUELLEN Preis; die Historie in `geraete_preise.jsonl` wird
+            # davon nicht angefasst und kein alter Preispunkt umgedeutet.
             for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                         "zuzahlung"):
+                         "zuzahlung", "anzahlung", "monatsrate",
+                         "laufzeit_monate", "zins_effektiv"):
                 wert = getattr(listung, feld)
                 if wert is not None:
                     eintrag[feld] = wert

@@ -64,10 +64,19 @@
       {% else %}{{ z.bester.laden }}{% endif %}
       {% if z.auffaellig %}<span class="gr-a-warnung">ungewöhnlich großer
         Abstand – Quelle prüfen</span>{% endif %}</td>
+    {# Der Zusatz "in 24 Raten (0 %)" kommt aus `geraete_model.ratenhinweis`,
+       nicht aus einer Anbieterliste an dieser Stelle: o2s Zahl ist der
+       Gesamtbetrag einer Ratenzahlung und stand bis zum 03.09.2026 in
+       derselben Optik wie freenets Barpreis. Wo die Quelle keine Rate
+       nennt, bleibt die Zelle wie bisher. #}
     <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{
-      '%.2f'|format(z.unser.preis)|replace('.', ',') }} €</span></td>
+      '%.2f'|format(z.unser.preis)|replace('.', ',') }} €</span>{%
+      if z.unser.ratenhinweis %}
+      <span class="gr-a-klein">{{ z.unser.ratenhinweis }}</span>{% endif %}</td>
     <td class="num"><span class="gr-a-fremd">{{
-      '%.2f'|format(z.bester.preis)|replace('.', ',') }} €</span></td>
+      '%.2f'|format(z.bester.preis)|replace('.', ',') }} €</span>{%
+      if z.bester.ratenhinweis %}
+      <span class="gr-a-klein">{{ z.bester.ratenhinweis }}</span>{% endif %}</td>
     <td class="num"><span class="gr-a-prozent">{{
       '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
       <span class="gr-a-euro">{{ '%.2f'|format(z.euro)|replace('.', ',') }} €</span></td>
@@ -90,7 +99,9 @@
     <ul class="gr-a-liste">
       {% for a in z.alle %}
       <li><span{% if a.eigen %} class="gr-a-eigen"{% endif %}>{{ a.laden }}</span>
-        <span>{{ '%.2f'|format(a.preis)|replace('.', ',') }} €</span>
+        <span>{{ '%.2f'|format(a.preis)|replace('.', ',') }} €{%
+          if a.ratenhinweis %} <span class="gr-klein">{{ a.ratenhinweis
+          }}</span>{% endif %}</span>
         <span>{{ a.zustand }}</span>
         {% if a.farbe %}<span>{{ a.farbe }}</span>{% endif %}
         <span>{{ a.abgerufen_am | date_de }}</span>
@@ -311,8 +322,10 @@
   stehen einem Wettbewerber gegenüber{% if al.ohne_wettbewerber %}; bei
   weiteren {{ al.ohne_wettbewerber }} führt kein beobachteter Anbieter
   dieselbe Kombination aus Modell und Speichergröße, sie sind deshalb in
-  keiner der vier Kacheln gezählt{% endif %}. Verglichen werden ausschließlich Neugeräte ohne Vertrag, jeweils
-  der günstigste Preis je Laden.</p>
+  keiner der vier Kacheln gezählt{% endif %}. Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag, jeweils
+  der günstigste Preis je Laden. Wo ein Anbieter das Gerät nur gegen
+  Ratenzahlung abgibt, steht der Gesamtbetrag der Raten in der Spalte — er
+  ist an der Ratenzahl erkennbar und nicht dasselbe wie ein Barpreis.</p>
 </div>
 
 {# --- Reiter 2: Geraetekatalog ---------------------------------------- #}
@@ -453,7 +466,8 @@
           {% else %}{{ z.anbieter }}{% endif %}
           {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
         <td class="num">{% if z.preis is not none
-          %}{{ '%.2f'|format(z.preis)|replace('.', ',') }} €{% elif z.zuzahlung is not none
+          %}{{ '%.2f'|format(z.preis)|replace('.', ',') }} €{% if z.ratenhinweis
+            %} <span class="gr-a-klein">{{ z.ratenhinweis }}</span>{% endif %}{% elif z.zuzahlung is not none
           %}{{ '%.2f'|format(z.zuzahlung)|replace('.', ',') }} €
             <span class="gr-a-klein">Zuzahlung{% if z.tarif %}, {{ z.tarif }}{% endif %}</span>
           {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>

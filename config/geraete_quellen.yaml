@@ -277,19 +277,32 @@ anbieter:
     methode: json_endpunkt
     aktiv: false
     grund: >-
-      Erreichbar, aber es gibt dort keinen Gerätepreis ohne Vertrag zu lesen.
-      Nachgemessen am 11.08.2026 an
+      Der Blocker ist nicht der Zugang, sondern die Preisform. Nachgemessen
+      am 11.08.2026 an
       /shop/geraet/apple/apple-iphone-17-pro-max/silber-256-gb (HTTP 200,
-      2,8 MB, HTTP/1.1 — über HTTP/2 antwortet eine WAF-Challenge): kein
-      ld+json, kein Microdata, und im Zustandsobjekt window.__INITIAL_STATE__
-      trägt productDetailed.productDetailsData zwar Modellname, Farben und
-      Speicherstufen, aber als Preis nur einen deltaPrice je Stufe — also
-      einen Aufschlag ohne Grundbetrag. Die einzigen absoluten Beträge stehen
-      unter productDetailed.installmentConfiguratorItems als upfrontPrice je
+      2,8 MB, HTTP/1.1): kein ld+json, kein Microdata, und im Zustandsobjekt
+      window.__INITIAL_STATE__ trägt productDetailed.productDetailsData zwar
+      Modellname, Farben und Speicherstufen, aber als Preis nur einen
+      deltaPrice je Stufe — also einen Aufschlag ohne Grundbetrag. Die
+      einzigen absoluten Beträge stehen unter
+      productDetailed.installmentConfiguratorItems als upfrontPrice je
       Ratenlaufzeit (12/24/36 Monate) und sind damit Zuzahlungen im Bündel,
-      keine Ladenpreise. Ein Adapter kann Telekom deshalb erst liefern, wenn
-      er die Zuzahlung MIT ihrer Tarifreferenz schreibt — die Sammelschicht
-      kann das seit dem 11.08.2026, der Extraktor fehlt.
+      keine Ladenpreise.
+      ZUR AWS-WAF, korrigiert am 03.09.2026: Sie ist vorhanden — das
+      ausgelieferte HTML führt AWS_WAF_API_KEY und eine
+      AWS_WAF_INTEGRATION_URL auf ein Captcha unter awswaf.com. Sie blockiert
+      den Abruf aber nicht: die Kategorieseite /shop/geraete/smartphones/
+      ohne-vertrag antwortet mit TelcoRadar/1.0 über HTTP/2 mit HTTP 200,
+      ohne 403 und ohne Challenge. Die frühere Formulierung "über HTTP/2
+      antwortet eine WAF-Challenge" war falsch und ist ersetzt; sie ersatzlos
+      zu streichen wäre es ebenso gewesen. Offen bleibt die httpx-eigene
+      202-Antwort (CLAUDE.md:683-687) — gemessen wurde mit curl.
+      Und: dieselbe Kategorieseite liefert serverseitig absolute Beträge für
+      zehn Geräte (upfrontPrice + 36 × recurringPrice == totalPrice bei 10
+      von 10). Das ist ein 36-Monats-Ratengesamtbetrag, kein Barpreis — er
+      gehört erst auf die Seite, wenn die Preisform ein eigenes Datum ist,
+      sonst schlägt er jeden Barpreis im Vergleich. Ein Adapter kann Telekom
+      deshalb erst liefern, wenn er die Preisform mitschreibt.
       Die Linkernte steht: die Übersichtsseite führt zehn Produktadressen als
       echte a-href mit dem Pfadmuster /shop/geraet/.
     basis_url: https://www.telekom.de
@@ -393,10 +406,29 @@ anbieter:
     rang: 10
     methode: congstar_next
     aktiv: true
+    grund: >-
+      ANGEBUNDEN UND AKTIV, aber noch nie gelaufen - der leere Bestand ist
+      kein Messergebnis, sondern das Fehlen einer Messung. Gemessen am
+      03.09.2026 an den GitHub-Actions-Läufen von geraete.yml: die fünf
+      letzten Nachtläufe (33303341444 vom 30.08. bis 33730902762 vom 03.09.)
+      trugen an ihrem headSha ausnahmslos noch "methode: ldjson, aktiv:
+      false"; der Commit, der auf congstar_next und aktiv: true umstellt
+      (27ef589), ist Vorfahr von keinem dieser fünf Läufe. Die Protokollzeile
+      des Laufs 33730902762 vom 03.09.2026 08:15 UTC sagt entsprechend
+      "congstar -> uebersprungen, 0 Listungen aus 0 Produktseiten" und nennt
+      als Grund den alten Text von aktiv: false. Es ist also weder ein
+      Adapter- noch ein Zugangsproblem: die Aktivierung war zum Startzeitpunkt
+      des letzten Laufs (07:58 UTC) noch nicht auf main. Der erste belastbare
+      Befund fällt mit dem nächsten Nachtlauf an. Bleibt er dann leer, ist
+      als Erstes die robots.txt von www.congstar.de zu messen - für diese
+      Messrunde lag keine vor.
     hinweis: >-
       Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit
-      belegbarem Preis ohne Vertrag - die Telekom selbst steht wegen ihrer
-      AWS-WAF nicht in dieser Datenbank. congstar trifft Apple, Samsung,
+      belegbarem Preis ohne Vertrag - die Telekom selbst steht nicht in
+      dieser Datenbank, weil ihr Gerätepreis nur als Ratenzahlung ausgewiesen
+      wird (nicht, wie hier bis zum 03.09.2026 stand, wegen ihrer AWS-WAF:
+      die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe grund
+      beim Anbieter Telekom). congstar trifft Apple, Samsung,
       Google UND Xiaomi (Google fehlte bisher ganz).
       Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM
       TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig -

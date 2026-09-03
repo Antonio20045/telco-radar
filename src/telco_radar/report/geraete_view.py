@@ -40,7 +40,7 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import serie_aus_modell
+from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_vergleich, geraete_verlauf)
 from ..analyze import geraete_lifecycle
@@ -958,6 +958,7 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
             "netz": e.get("netz") or "",
             "zustand": zustand,
             "preis": preis,
+            "ratenhinweis": ratenhinweis_aus_eintrag(e),
             "zuzahlung": e.get("zuzahlung"),
             "tarif": e.get("tarif_referenz") or "",
             "verfuegbarkeit": e.get("verfuegbarkeit") or "unbekannt",
