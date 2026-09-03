@@ -223,6 +223,7 @@ Wichtige Dateien:
 | `scripts/migriere_seen_store.py` | Seen-Store v1 → v2, prüft selbst nach und bricht bei Hash-Verlust ab |
 | `.github/workflows/radar.yml` | Cron Di + Fr 08:30 UTC + manuell; committet data/+site/, curlt Render-Hook (mit 15s sleep!) |
 | `tests/` | pytest-Suite (Fixtures, kein Netz/LLM nötig) |
+| `docs/clean-code-referenz.md` | **Clean-Code-Prüfkatalog** (seit 03.09.2026): Einträge P/C/E/F/G/J/N/T mit Bewertung PASS/FLAG/n. z. und Schweregraden S1–S4; Repo-Kopf übersetzt ihn nach Python/pytest. Wissensbasis für den `diff-reviewer`-Agenten — siehe §7 |
 
 **Secrets im Repo** (Settings → Actions): `ANTHROPIC` (Antonios API-Key —
 der Workflow akzeptiert `ANTHROPIC_API_KEY` ODER `ANTHROPIC`) und
@@ -1672,6 +1673,22 @@ python scripts/validate_sources.py          # Quellen-Health (Netz nötig)
 python -m telco_radar.pipeline --no-llm     # E2E ohne API-Key
 # Site nur neu rendern (ohne Crawl): render_site() aus report/html.py nutzen
 ```
+
+**Clean-Code-Audit (seit 03.09.2026).** `docs/clean-code-referenz.md` ist die
+Wissensbasis, gegen die jeder Diff vor dem Commit geprüft wird — der
+`diff-reviewer`-Agent (`.claude/agents/diff-reviewer.md`) arbeitet mit ihr:
+Kategorie für Kategorie durch den geänderten Code, je Eintrag
+PASS / FLAG / n. z., Schweregrad S1 (Tests & Korrektheits-/Sicherheitsverstöße)
+bis S4 (Anzahl Klassen/Methoden). S1/S2-FLAGs einzeln melden, S3/S4 gebündelt.
+Der Repo-Kopf der Referenz übersetzt die Einträge in die hiesige Wirklichkeit:
+pytest statt JUnit, `pruefe_portal.py` + `schiess_screenshot.py` als
+dokumentierte Smoke-Tests, wo Tests nicht greifen (Optik der gerenderten
+Seite, Aussage einer gerechneten Grafik), `config/*.yaml` statt `config.js`,
+und der S1-Katalog der hiesigen Sicherheitsregeln (robots.txt inkl.
+Crawl-Delay/Visit-time, keine ID-Enumeration beim Tarif-Sammler, Seen-Store
+nimmt nur Gelesenes auf, kein Commit von lokalem State, Schwellen rechnet der
+Code). Die hauseigenen Wahrheitstests (`tests/test_seiten_zahlen.py` & Co.)
+bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8. Antonios Anforderungen / Stil (unbedingt beachten)
 

@@ -10,6 +10,10 @@ nicht die Arbeit zu loben.
 
 Prüfe in dieser Reihenfolge:
 
+0. Lauf den Prüfkatalog `docs/clean-code-referenz.md` über den geänderten
+   Code: Kategorie für Kategorie, je Eintrag PASS/FLAG/n. z., Schweregrad
+   S1–S4 (S1 = Tests & Korrektheits-/Sicherheitsverstöße). S1/S2-FLAGs
+   nennst du einzeln, S3/S4 gebündelt am Ende.
 1. Verletzt der Diff eine harte Regel aus CLAUDE.md? (site/ von Hand,
    seen.jsonl, ID aus Titeltext gehasht, Secrets, Lauf-Artefakte im Commit)
 2. Decken die Tests die neue Logik wirklich ab, oder testen sie nur den
