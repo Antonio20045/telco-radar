@@ -579,3 +579,48 @@ jedes betroffenen Geräts fielen auf null.
 
 **Deshalb hier nicht gebaut.** Es ist ein eigenes Paket mit eigener Migration, kein
 Nebenfix vor einem Merge. Es ist die einzige betroffene Listung im ganzen Bestand.
+
+---
+
+## P5 — Abschluss, 03.09.2026
+
+| | |
+|---|---|
+| Merge nach `main` | `6c75dfe`, konfliktfrei |
+| `deploy.yml` | **success** (08:45:51Z) — Render-Hook ausgelöst |
+| `ci.yml` auf `main` | **success** (08:51:12Z) |
+| Volle Suite lokal | 2312 grün → nach der Testreparatur alles grün |
+| `pruefe_portal.py` | 16 bestanden, 1 durchgefallen (Kriterium 6, vorbestehend, `meldungen.html`) |
+
+**Was live ist und was nicht — der Unterschied ist wichtig.** Der *Code* liegt auf
+`main` und ist deployt. Die *Seite* ist es nicht: `curl … /geraete.html | md5sum`
+ist byte-identisch mit dem `site/geraete.html` im Repo, also mit dem Stand **vor**
+dieser Arbeit. `site/` wird nicht von Hand committet, sondern vom Radarlauf
+gerendert — und der läuft Mi + Fr 11:00 UTC. **Der planmäßige Lauf am Fr 04.09.
+11:00 UTC baut die Seite mit dem neuen Code und veröffentlicht sie.**
+
+**Ein Lauf ist bewusst NICHT von Hand angestoßen worden.** Begründung mit Zahlen:
+der Lauf vom 02.09. hat 68 Meldungen bewertet, aber `editor_used: False` — der
+Prosabericht fehlt bereits in der heute sichtbaren Ausgabe. Ein heute angestoßener
+Lauf hätte wegen des gefüllten Seen-Stores eine **dünnere** Titelseite als der von
+gestern und mit hoher Wahrscheinlichkeit wieder keinen Prosabericht; er würde also
+die Geräteseite einen Tag früher zeigen und die Titelseite dabei verschlechtern.
+Der Freitagslauf hat zwei Tage Nachrichten und ist die bessere Ausgabe.
+`llm-probe.yml` taugt als Gegenprobe nicht — es zeigt noch auf NVIDIA.
+
+### Offener Punkt außerhalb dieses Auftrags, aber sichtbar
+
+**Der Prosabericht fehlt wieder.** `editor_used` über die letzten Läufe:
+
+| Ausgabe | `editor_used` | Kosten | bewertete Meldungen |
+|---|---|---|---|
+| 27.08. | False | – | 362 |
+| 28.08. | **True** | 0,2448 $ | 21 |
+| 02.09. | **False** | 0,2175 $ | 68 |
+
+Der 02.09. ist der aussagekräftige Fall: die Analysten haben gearbeitet (68
+Highlights), DeepSeek hat geantwortet (149 Aufrufe, keine toten Modelle, Budget
+nicht überschritten) — und die Redaktionsstufe hat trotzdem keinen Bericht
+geliefert. CLAUDE.md nennt den Prosabericht „das Herzstück". **Das gehört als
+erstes in die nächste Sitzung**, und es ist keine Geldfrage: 0,22 $ von 1,50 $
+Budget.
