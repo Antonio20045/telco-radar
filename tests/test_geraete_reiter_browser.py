@@ -30,6 +30,7 @@ import glob
 import http.server
 import json
 import re
+import shutil
 import socket
 import threading
 from pathlib import Path
@@ -579,10 +580,25 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     _seite.fill("#tafel-alarme [data-filter='suche']", "")
 
 
-def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
-    """Trifft die Suche NUR eine Zeile, die hinter "alle anzeigen" steckt,
-    sieht der Leser eine Tabellenkopfzeile mit nichts darunter. Gezaehlt
-    werden muss, was wirklich dasteht - nicht, was zum Filter passt."""
+def test_eine_suche_ueber_eine_zunaechst_versteckte_zeile_zeigt_sie(_seite):
+    """UMGEDREHT durch die B2-Nachbesserung vom 31.08.2026, mit Begruendung.
+
+    Bis dahin blieb eine Zeile hinter "alle anzeigen" (`gr-a-rest`) auch
+    dann versteckt, wenn die Suche sie als EINZIGEN Treffer fand - der
+    Leser sah "kein Treffer" fuer eine Zeile, die wirklich im Bestand
+    steht. Exakt derselbe Fehlertyp wie B2 (der Deckel haengt an der
+    POSITION, nicht am Filter): zwei Klicks auf einen Spaltenkopf liessen
+    dort 348 passende Zeilen hinter dem Deckel verschwinden, hier laesst
+    eine einzige Suche eine passende Zeile verschwinden - dieselbe Ursache,
+    zwei Ausloeser.
+
+    Seit dem Fix zaehlt `anwenden()` nur unter den TREFFERN: ein einzelner
+    Treffer liegt IMMER unter dem Deckel (1 <= irgendein Deckel > 0) und
+    wird deshalb gezeigt, unabhaengig davon, ob er vor der Suche als
+    `gr-a-rest` markiert war. Die alte Fassung dieses Tests verlangte das
+    Gegenteil - eine Suche mit genau einem Treffer, die "kein Treffer"
+    zeigt - und hielt damit den Fehler fest, den B2 behebt.
+    """
     _frisch(_seite)
     rest = _seite.eval_on_selector_all(
         "#tafel-alarme .gr-a-rest.gr-a-zeile", "e => e.length")
@@ -592,9 +608,15 @@ def test_eine_leere_auswahl_ueber_versteckte_zeilen_zeigt_den_satz(_seite):
         "e => e.textContent.trim()")
     _seite.fill("#tafel-alarme [data-filter='suche']", suchwort)
     _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 0
+    assert _sichtbare_zeilen(_seite) == 1, (
+        "der einzige Treffer der Suche bleibt versteckt")
     assert _seite.eval_on_selector(
-        "#tafel-alarme .gr-a-leer", "e => getComputedStyle(e).display") != "none"
+        "#tafel-alarme .gr-a-leer", "e => getComputedStyle(e).display") == "none"
+    gefundenes_modell = _seite.eval_on_selector(
+        "#tafel-alarme .gr-a-zeile:not([hidden]) .gr-a-modell",
+        "e => e.textContent.trim()")
+    assert gefundenes_modell == suchwort, (
+        "die sichtbare Zeile ist nicht die gesuchte")
     _seite.fill("#tafel-alarme [data-filter='suche']", "")
 
 
@@ -1199,23 +1221,18 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
 
 _B5_HERSTELLER = ("Apple", "Samsung", "Google", "Xiaomi")
 
+# SIEBEN Geraete je Hersteller, nicht zwei (Nachbesserung, 31.08.2026,
+# B7 der Zurueckweisung Runde 2). Mit zwei Geraeten je Hersteller passt
+# schon eine REINE Gruppierung (kein Reihum) in die sichtbaren acht Zeilen
+# und schliesst alle vier Hersteller ein - der Mutationstest "Reihum
+# entfernen" faellt an keinem der beiden Tests auf, die genau das pruefen
+# sollen sollen. Mit sieben Geraeten fuellt "Apple" allein die ganze
+# sichtbare Flaeche, und nur ein echtes Reihum zeigt einen zweiten
+# Hersteller.
 _B5_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17", "generation": 17,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Apple", "modell": "iPhone 14", "generation": 14,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Samsung", "modell": "Galaxy S26", "generation": 26,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Samsung", "modell": "Galaxy S23", "generation": 23,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Google", "modell": "Pixel 11", "generation": 11,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Google", "modell": "Pixel 8", "generation": 8,
-     "speicher": [256], "segment": "flagship"},
-    {"hersteller": "Xiaomi", "modell": "Redmi 17T", "generation": 17,
-     "speicher": [256], "segment": "mid"},
-    {"hersteller": "Xiaomi", "modell": "Redmi 14T", "generation": 14,
-     "speicher": [256], "segment": "mid"},
+    {"hersteller": h, "modell": f"{h} Modell {n}", "generation": n,
+     "speicher": [256], "segment": "flagship"}
+    for h in ("Apple", "Samsung", "Google", "Xiaomi") for n in range(1, 8)
 ]}
 _B5_FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
 _B5_QUELLEN = {"anbieter": [
@@ -1225,13 +1242,16 @@ _B5_QUELLEN = {"anbieter": [
 ]}
 
 
-def _b5_id(modell: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", modell.lower()).strip("-")
-
-
 def _b5_listung(modell: str, hersteller: str, preis: float,
                 zustand: str = "neu") -> dict:
-    gid = f"{hersteller.lower()}-{_b5_id(modell)}"
+    # `device_id()` aus `geraete_model`, NICHT eine eigene Nachbildung: eine
+    # zweite Rechnung fuer dieselbe ID lief hier schon einmal auseinander
+    # (Xiaomi/Redmi-Fall der ersten Nachbesserung) - `device_id()` kuerzt
+    # den Hersteller aus dem Modellnamen, wenn er ihn bereits traegt
+    # ("Apple Modell 1" -> "apple-modell-1", NICHT
+    # "apple-apple-modell-1"), und genau das tat diese Fixture nicht.
+    from telco_radar.geraete_model import device_id
+    gid = device_id(hersteller, modell)
     sku = f"{gid}-256gb-schwarz{'-ref' if zustand != 'neu' else ''}"
     return {
         "id": f"medimax--{sku}", "sku_id": sku, "device_id": gid,
@@ -1249,17 +1269,19 @@ def _b5_listung(modell: str, hersteller: str, preis: float,
 
 
 def _b5_bestand() -> list:
-    """Zwei NEUgeraete je Hersteller (acht insgesamt - ueber dem Deckel von
-    zwoelf ist das nicht, aber die Reihenfolge ist trotzdem messbar), dazu
-    EIN refurbished Apple-Geraet. "Apple" steht alphabetisch vorn - wenn die
-    Standardsortierung trotzdem neu vor gebraucht stellt, darf das
-    refurbished-Geraet nicht vor den anderen drei Herstellern stehen."""
+    """Sieben NEUgeraete je Hersteller (28 insgesamt, ueber dem Deckel von
+    zwoelf), dazu DREI refurbished Zeilen - je eine bei Apple, Samsung und
+    Xiaomi, auf ein bereits vorhandenes neu-Geraet desselben Herstellers
+    (B2/B3-Nachbesserung, 31.08.2026): so bleibt "Zustand: neu" filterbar
+    UND jeder Hersteller behaelt mindestens sechs passende Zeilen, auch
+    nachdem die drei nicht-passenden herausgefiltert sind."""
     zeilen = []
     for g in _B5_KATALOG["geraete"]:
         zeilen.append(_b5_listung(g["modell"], g["hersteller"],
                                   1.0 * g["generation"] * 40))
-    zeilen.append(_b5_listung("iPhone 14", "Apple", 111.0,
-                              zustand="refurbished"))
+    for h in ("Apple", "Samsung", "Xiaomi"):
+        zeilen.append(_b5_listung(f"{h} Modell 1", h, 55.0,
+                                  zustand="refurbished"))
     return zeilen
 
 
@@ -1298,28 +1320,49 @@ def _b5_seite(_seite, tmp_path_factory):
     with _server(site) as basis:
         seite = browser.new_page(viewport={"width": 1440, "height": 900})
         seite.goto(f"{basis}/geraete.html", wait_until="load")
-        seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
-        seite.wait_for_timeout(80)
-        # "Erste Bildschirmseite" gilt AB DEM REITER, nicht ab dem Seitenkopf:
-        # der Zeitungskopf plus die Reihen der Titelseite darueber sind ein
-        # Preis, den jede Unterseite dieser Site einmal zahlt, unabhaengig
-        # von der Sortierung DIESES Reiters. Ohne den Scroll misst der Test,
-        # ob der Zeitungskopf kurz ist - nicht, ob der Katalog es ist. An
-        # der echten Ausgabe gemessen: ohne Scroll passt GAR KEINE Zeile mehr
-        # ins Bild (der Kopf allein braucht ueber 840 px), mit Scroll zum
-        # Reiter acht.
-        seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
-        seite.wait_for_timeout(80)
-        yield seite
+        yield {"seite": seite, "basis": basis}
         seite.close()
+
+
+def _b5_frisch(_b5_seite):
+    """Ein unberuehrter Ausgangszustand fuer einen Test - `_b5_seite` ist
+    modulgueltig und mehrere Tests klicken auf denselben Spaltenkopf; ohne
+    einen echten Neuladen saehe ein Test die Sortierung/Filterwahl eines
+    vorigen Tests. Dieselbe Rolle wie `_frisch()` fuer `_seite`."""
+    seite = _b5_seite["seite"]
+    seite.goto(f"{_b5_seite['basis']}/geraete.html", wait_until="load")
+    seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    seite.wait_for_timeout(80)
+    # "Erste Bildschirmseite" gilt AB DEM REITER, nicht ab dem Seitenkopf:
+    # der Zeitungskopf plus die Reihen der Titelseite darueber sind ein
+    # Preis, den jede Unterseite dieser Site einmal zahlt, unabhaengig von
+    # der Sortierung DIESES Reiters. Ohne den Scroll misst der Test, ob der
+    # Zeitungskopf kurz ist - nicht, ob der Katalog es ist. An der echten
+    # Ausgabe gemessen: ohne Scroll passt GAR KEINE Zeile mehr ins Bild (der
+    # Kopf allein braucht ueber 840 px), mit Scroll zum Reiter acht.
+    seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
+    seite.wait_for_timeout(80)
+    return seite
 
 
 def test_die_erste_bildschirmseite_zeigt_mindestens_drei_hersteller(_b5_seite):
     """Wortlaut des Auftrags. Gemessen wird in PIXELN (Bounding-Box
     innerhalb des Sichtfensters), nicht an der Zeilenzahl - "erste
     Bildschirmseite" ist eine Aussage ueber das, was ohne Scrollen zu sehen
-    ist, keine ueber die Position in einer Liste."""
-    marken = _b5_seite.eval_on_selector_all(
+    ist, keine ueber die Position in einer Liste.
+
+    B7 der Zurueckweisung (Runde 2): mit ZWEI Geraeten je Hersteller fuellt
+    schon eine REINE Gruppierung (kein Reihum) die acht sichtbaren Zeilen
+    mit allen vier Herstellern - der Mutationstest "Reihum entfernen" fiel
+    an diesem Test nicht auf. Die Fixture traegt seitdem SIEBEN Geraete je
+    Hersteller: "Apple" allein wuerde die ganze sichtbare Flaeche fuellen,
+    und nur ein echtes Reihum zeigt einen zweiten Hersteller. Gegengeprueft
+    per Hand: mit `_interleave_je_hersteller` durch eine reine
+    `sorted(zeilen, key=...)` ersetzt, faellt dieser Test (1 statt >=3
+    Hersteller).
+    """
+    seite = _b5_frisch(_b5_seite)
+    marken = seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-k-zeile",
         "(zeilen, hoehe) => zeilen"
         "  .filter(z => getComputedStyle(z).display !== 'none'"
@@ -1330,24 +1373,10 @@ def test_die_erste_bildschirmseite_zeigt_mindestens_drei_hersteller(_b5_seite):
         f"nur {len(set(marken))} Hersteller ohne Scrollen: {marken}")
 
 
-def test_die_standardansicht_ist_auf_neugeraete_vorsortiert(_b5_seite):
-    """Ohne Scrollen: kein refurbished Geraet zwischen den neuen - die
-    Sortierung stellt "neu" komplett vor den Rest, nicht nur mehrheitlich.
-    """
-    zustaende = _b5_seite.eval_on_selector_all(
-        "#gr-katalogtabelle .gr-k-zeile",
-        "(zeilen, hoehe) => zeilen"
-        "  .filter(z => getComputedStyle(z).display !== 'none'"
-        "             && z.getBoundingClientRect().top < hoehe"
-        "             && z.getBoundingClientRect().top >= 0)"
-        "  .map(z => z.dataset.zustand)", 900)
-    assert zustaende, "keine Zeile ohne Scrollen sichtbar - der Test misst nichts"
-    assert set(zustaende) == {"neu"}, zustaende
-
-
 def test_der_zustandsfilter_steht_von_anfang_an_auf_neu(_b5_seite):
     """Die Vorbelegung des <select> - sichtbar, ohne dass jemand klickt."""
-    wert = _b5_seite.eval_on_selector(
+    seite = _b5_frisch(_b5_seite)
+    wert = seite.eval_on_selector(
         "#tafel-katalog [data-filter='zustand']", "e => e.value")
     assert wert == "neu", wert
 
@@ -1359,8 +1388,285 @@ def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
     Zahl nannten. Diese Fassung filtert serverseitig nichts heraus - die
     Gegenprobe: die Zahl der ZEILEN IM DOM (versteckt oder nicht) ist exakt
     der Bestand, unabhaengig von der Vorbelegung des Filters."""
-    anzahl = _b5_seite.eval_on_selector_all(
+    seite = _b5_frisch(_b5_seite)
+    anzahl = seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-k-zeile", "e => e.length")
     assert anzahl == len(_B5_DB["listungen"])
-    ueberschrift = _b5_seite.text_content(".gr-katalog h2 .rubrik-zahl").strip()
+    ueberschrift = seite.text_content(".gr-katalog h2 .rubrik-zahl").strip()
     assert ueberschrift == str(len(_B5_DB["listungen"]))
+
+
+# --------------------------------------------------------------------------
+# B2/B3 der Zurueckweisung (31.08.2026): der Deckel folgt jetzt dem Filter,
+# nicht mehr der Position. Beide Tests fahren die Reproduktion des Pruefers
+# selbst nach: zwei Klicks auf die Spalte "Zustand", danach "alle anzeigen".
+# --------------------------------------------------------------------------
+
+def _b5_treffer_neu() -> int:
+    return sum(1 for e in _B5_DB["listungen"] if e["zustand"] == "neu")
+
+
+def test_b2_zwei_sortierklicks_lassen_den_deckel_nicht_kollabieren(_b5_seite):
+    """B2: "Zwei Klicks auf den Spaltenkopf Zustand" liessen elf
+    nicht-passende Zeilen in den Deckel rutschen, waehrend die passenden
+    dahinter verschwanden - sichtbar fiel von zwoelf auf eins.
+
+    Gegengeprueft per Hand: in `app.js` `deckel > 0 && !alleZeigen` durch
+    `false` ersetzt (der Deckel greift nie), dieser Test faellt (sichtbar
+    > deckel statt ==).
+    """
+    from telco_radar.report.geraete_view import KATALOG_SICHTBAR
+    seite = _b5_frisch(_b5_seite)
+    seite.click('#gr-katalogtabelle .gr-sort[data-sort="zustand"]')
+    seite.wait_for_timeout(120)
+    seite.click('#gr-katalogtabelle .gr-sort[data-sort="zustand"]')
+    seite.wait_for_timeout(120)
+    sichtbar = seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
+    erwartet = min(KATALOG_SICHTBAR, _b5_treffer_neu())
+    assert sichtbar == erwartet, (
+        f"{sichtbar} sichtbar nach zwei Sortierklicks, erwartet {erwartet}")
+
+
+def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
+    """B3: der Knopf versprach "alle 360 zeigen", lieferte 349 - die im
+    Knopf genannte Zahl und die nach dem Klick sichtbare muessen
+    uebereinstimmen, unabhaengig vom aktiven Filter.
+
+    Gegengeprueft per Hand: `mehr.textContent = ...` in `app.js`
+    entfernt (der Knopf behaelt seinen SSR-Text mit der Gesamtzahl), dieser
+    Test faellt, weil die im Knopf genannte Zahl dann nicht mehr zur
+    tatsaechlich sichtbaren passt.
+    """
+    seite = _b5_frisch(_b5_seite)
+    knopf_text = seite.text_content("#gr-kmehr")
+    versprochen = int(knopf_text.split()[1])
+    seite.click("#gr-kmehr")
+    seite.wait_for_timeout(120)
+    sichtbar = seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
+    assert sichtbar == versprochen, (
+        f"Knopf versprach {versprochen}, sichtbar sind {sichtbar}")
+    assert versprochen == _b5_treffer_neu(), (
+        "der Knopf verspricht nicht die Zahl der TREFFER unter dem "
+        f"aktiven Filter: {versprochen} != {_b5_treffer_neu()}")
+
+
+# --------------------------------------------------------------------------
+# B4/B5/B7 der Zurueckweisung (31.08.2026): der Quelllink im Anker - auf
+# der grossen, gemeinsamen Fixture (`_seite`), nicht auf der B5-eigenen:
+# diese drei Zusicherungen sind unabhaengig von Herstellervielfalt oder
+# Filterzustand und gelten fuer BEIDE Tabellen des echten Bestands.
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("tafel", ["tafel-alarme", "tafel-katalog"])
+def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
+    """B7 (Runde 2): fuenf neue Tests der ersten Nachbesserung waren alle
+    B5-Tests - keiner hielt B7 selbst. Eine Rueckabwicklung (Name wieder
+    als Text VOR dem Anker, wie vor der ersten Nachbesserung) liess keinen
+    von ihnen fallen. Diese Zusicherung prueft die Struktur direkt: kein
+    Zeichen der Anbieterzelle steht vor dem `<a>`.
+
+    Gegengeprueft per Hand: die Vorlage auf
+    `{{ z.anbieter }}<a class="gr-a-quelle">...</a>` zurueckgedreht (Name
+    ausserhalb des Ankers), dieser Test faellt (`vorText` ist dann der
+    Anbietername statt eines leeren Strings).
+    """
+    _frisch(_seite)
+    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+    _seite.wait_for_timeout(80)
+    ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+      (a) => {
+        var zelle = a.closest('td');
+        var vorText = '';
+        for (var n = zelle.firstChild; n && n !== a; n = n.nextSibling) {
+          vorText += n.textContent || '';
+        }
+        return {vorText: vorText.trim(), ankerText: a.textContent.trim()};
+      }
+    """)
+    assert ergebnis["vorText"] == "", (
+        f"{tafel}: Text VOR dem Anker in der Anbieterzelle: "
+        f"{ergebnis['vorText']!r}")
+    assert ergebnis["ankerText"], f"{tafel}: der Anker ist leer"
+
+
+@pytest.mark.parametrize("tafel", ["tafel-alarme", "tafel-katalog"])
+def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, tafel):
+    """B4: `.src-table a` (Spezifitaet 0-1-1) schlug `.gr-a-quelle`
+    (0-1-0) im Katalog - der Name erbte 10 px, Grossbuchstaben, Fettschrift,
+    Rot. In der Alarmtabelle (kein `.src-table`) blieb dagegen selbst mit
+    korrekter Farbe nur der Pfeil als Hinweis auf einen Link - keine
+    dauerhafte Unterstreichung, B7s urspruengliche Beschwerde erneut.
+
+    Gegengeprueft per Hand: `.gr-alarm a.gr-a-quelle` in `style.css` auf
+    `.gr-a-quelle` (ohne `.gr-alarm`, ohne `a`) zurueckgestutzt - im
+    Katalog schlaegt danach wieder `.src-table a` (fontSize 10px statt
+    14px), dieser Test faellt.
+    """
+    _frisch(_seite)
+    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+    _seite.wait_for_timeout(80)
+    link = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+      (a) => ({
+        fontSize: getComputedStyle(a).fontSize,
+        textTransform: getComputedStyle(a).textTransform,
+        color: getComputedStyle(a).color,
+        zellFarbe: getComputedStyle(a.closest('td')).color,
+        textDecorationLine: getComputedStyle(a).textDecorationLine,
+      })
+    """)
+    assert link["fontSize"] == "14px", link
+    assert link["textTransform"] == "none", link
+    assert link["color"] == link["zellFarbe"], (
+        "der Link faerbt sich anders als sein Zelltext ohne Hover: " + str(link))
+    assert link["textDecorationLine"] == "underline", (
+        "kein dauerhafter Hinweis auf einen Link ohne Hover: " + str(link))
+
+
+@pytest.mark.parametrize("tafel", ["tafel-alarme", "tafel-katalog"])
+def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, tafel):
+    """B5: der `keydown`-Handler auf der Zeile rief fuer Enter/Space
+    `preventDefault()` auf ALLEM innerhalb `.gr-a-zeile` auf - ohne den
+    `closest('a')`-Ausstieg, den der `click`-Handler daneben hat. Ein
+    fokussierter Quelllink war damit per Tastatur nicht auszuloesen.
+
+    Gegengeprueft per Hand: den `closest('a')`-Ausstieg im
+    `keydown`-Handler in `app.js` entfernt, dieser Test faellt
+    (`defaultPrevented` wird `true`).
+    """
+    _frisch(_seite)
+    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+    _seite.wait_for_timeout(80)
+    ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+      (el) => {
+        el.focus();
+        var ev = new KeyboardEvent('keydown', {key: 'Enter', bubbles: true, cancelable: true});
+        var nichtVerhindert = el.dispatchEvent(ev);
+        return {defaultPrevented: !nichtVerhindert, fokussiert: document.activeElement === el};
+      }
+    """)
+    assert ergebnis["fokussiert"], f"{tafel}: der Link laesst sich nicht fokussieren"
+    assert not ergebnis["defaultPrevented"], (
+        f"{tafel}: Enter auf dem Link wird verhindert - die Tastatur "
+        "kann ihn nicht ausloesen")
+
+
+
+# --------------------------------------------------------------------------
+# P1 (dritte Nachbesserung, 31.08.2026): Rueckweisung des Coordinators.
+# "Deine Fixture hat den Fall zweimal nicht ausgeloest." Beide vorigen
+# Fassungen bauten ihre EIGENE, kleine Fixture - und beide Male kam die
+# Datenlage der SYNTHETISCHEN Fixture zufaellig anders heraus als die der
+# ECHTEN Daten (erst zwei Geraete je Hersteller, dann sieben Geraete je
+# Hersteller statt sieben FARBEN eines einzigen Geraets). Dieser Test misst
+# deshalb direkt gegen `data/state/geraete_db.json` und
+# `config/geraete_katalog.yaml` - keine eigene Erfindung mehr dazwischen.
+# --------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def _echte_seite(_seite, tmp_path_factory):
+    """Dieselbe Seite wie `_seite`, aber aus dem ECHTEN Bestand des Repos
+    gerendert - nicht aus `_KATALOG`/`_DB`. Wiederverwendet den Browser von
+    `_seite` aus demselben Grund wie `_b5_seite`: ein zweiter
+    `sync_playwright()`-Kontext im selben Prozess scheitert, solange der
+    erste noch offen ist.
+    """
+    root = tmp_path_factory.mktemp("echt")
+    (root / "config").mkdir()
+    for name in ("geraete_katalog.yaml", "farben.yaml", "geraete_quellen.yaml"):
+        shutil.copy(REPO / "config" / name, root / "config" / name)
+    state = root / "data" / "state"
+    state.mkdir(parents=True)
+    shutil.copy(REPO / "data" / "state" / "geraete_db.json",
+               state / "geraete_db.json")
+    shutil.copy(REPO / "data" / "state" / "geraete_preise.jsonl",
+               state / "geraete_preise.jsonl")
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True)
+    site = root / "site"
+    render_site(site, reports, cfg=None)
+
+    browser = _seite.context.browser
+    with _server(site) as basis:
+        seite = browser.new_page(viewport={"width": 1440, "height": 900})
+        seite.goto(f"{basis}/geraete.html", wait_until="load")
+        seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+        seite.wait_for_timeout(100)
+        seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
+        seite.wait_for_timeout(100)
+        yield seite
+        seite.close()
+
+
+def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
+        _echte_seite):
+    """Die Rueckweisung woertlich: an den echten Daten gemessen standen
+    zwoelf sichtbare Zeilen fuer nur ZWEI Hersteller (iPhone 17 Pro x7,
+    Fairphone 6 x5) - ein einzelner Geraeteblock fuellte mehr als die
+    Haelfte der zwoelf sichtbaren Zeilen allein.
+
+    ERST die Gegenprobe: die Datenlage muss den Fall ueberhaupt ausloesen
+    koennen, sonst ist dieser Test wie die beiden vorigen grün, ohne etwas
+    zu pruefen. Gemessen wird direkt gegen `katalogzeilen()` auf dem echten
+    Bestand - keine Fixture, keine Erfindung.
+    """
+    from telco_radar.geraete_config import lade_katalog
+    from telco_radar.analyze.geraete_store import (
+        GeraeteDB, STATUS_AKTIV, STATUS_VERMUTLICH,
+    )
+    from telco_radar.report import geraete_view
+
+    katalog = lade_katalog(REPO)
+    db = GeraeteDB(REPO / "data" / "state" / "geraete_db.json")
+    alle = db.eintraege()
+    sichtbar_roh = [e for e in alle
+                    if e.get("status") in (STATUS_AKTIV, STATUS_VERMUTLICH)]
+    _pruefung, bestand, _belastbar = geraete_view.bestand_und_belastbar(
+        sichtbar_roh, katalog)
+    zeilen = geraete_view.katalogzeilen(bestand, katalog)
+
+    from collections import Counter
+    bloecke = Counter((z["hersteller"], z["modell"], z["speicher"]) for z in zeilen)
+    groesster_block = max(bloecke.values())
+    halbe_sichtflaeche = geraete_view.KATALOG_SICHTBAR / 2
+    assert groesster_block > halbe_sichtflaeche, (
+        f"die Datenlage kann den Fall nicht ausloesen - groesster Block "
+        f"hat {groesster_block} Zeilen, das sind nicht mehr als die Haelfte "
+        f"von {geraete_view.KATALOG_SICHTBAR} sichtbaren Zeilen. Dieser "
+        "Test misst nichts, solange das nicht stimmt."
+    )
+
+    # JETZT die eigentliche Zusicherung, im echten Chromium auf den echten
+    # Daten - genau der Ort, an dem der Coordinator den Fehler zweimal
+    # gefunden hat, nachdem zwei synthetische Fixtures ihn verfehlten.
+    marken = _echte_seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+        "      .map(x => x.dataset.marke)")
+    assert len(marken) > 0, "keine einzige Zeile sichtbar - der Test misst nichts"
+    assert len(set(marken)) >= 3, (
+        f"nur {len(set(marken))} Hersteller unter den {len(marken)} "
+        f"sichtbaren Zeilen an den echten Daten: {sorted(set(marken))}")
+
+
+def test_p1_kein_block_zeigt_mehr_als_zwei_zeilen_ohne_alle_anzeigen(_echte_seite):
+    """Die Kehrseite derselben Rueckweisung: der Deckel darf die B6-Gruppierung
+    nicht wieder aufloesen. Kein Geraet darf mehr als `BLOCK_SICHTBAR`
+    Zeilen zeigen, bevor "alle anzeigen" gedrueckt wurde - unabhaengig
+    davon, wie viele Farbvarianten es wirklich gibt."""
+    from telco_radar.report import geraete_view
+    from collections import Counter
+
+    zeilen = _echte_seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+        "      .map(x => x.dataset.sGeraet)")
+    verteilung = Counter(zeilen)
+    ueberschritten = {g: n for g, n in verteilung.items()
+                      if n > geraete_view.BLOCK_SICHTBAR}
+    assert not ueberschritten, (
+        f"Geraete mit mehr als {geraete_view.BLOCK_SICHTBAR} sichtbaren "
+        f"Zeilen ohne 'alle anzeigen': {ueberschritten}")

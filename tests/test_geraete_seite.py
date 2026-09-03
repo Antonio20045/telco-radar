@@ -470,17 +470,34 @@ def test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl(tmp_path):
     # Listungen in EINEM Satz; sie muessen aus EINER Menge kommen.
     fuss = " ".join(s.select_one(".gr-bilanz").get_text(" ", strip=True).split())
     assert f"zusammen {erwartet} Listungen" in fuss, fuss
-    # Der vierte Ort ist der Knopf "alle N Zeilen zeigen" - er erscheint erst
-    # oberhalb von `KATALOG_SICHTBAR` und ist mit dieser Fixture gar nicht da.
-    # Das steht hier als ZUSICHERUNG und nicht als `if`: eine Bedingung, die
-    # nie eintritt, ist eine Prueffung, die nie laeuft. Waechst die Fixture
-    # ueber den Deckel, faellt dieser Test und die Zeile darunter wird
-    # scharf. An der ausgelieferten Seite ist der Knopf mitgemessen ("alle
-    # 360 Zeilen zeigen").
+    # Der vierte Ort ist der Knopf "alle N Zeilen zeigen". UMGEDREHT durch
+    # P1 (dritte Nachbesserung, 31.08.2026, Coordinator-Entscheidung): bis
+    # dahin erschien er erst, wenn die GESAMTZAHL ueber `KATALOG_SICHTBAR`
+    # lag - diese Fixture liegt mit sieben Zeilen darunter, der Knopf fehlte
+    # also. Seitdem deckelt die Standardansicht zusaetzlich JEDEN
+    # Geraete-Block auf `BLOCK_SICHTBAR` (2) Zeilen, unabhaengig von der
+    # Gesamtzahl - und genau diese Fixture traegt einen Block mit DREI
+    # Zeilen (Samsung Galaxy S25 Ultra 256GB: Vodafone plus das
+    # Doppelpreis-Paar "pistachio"/"pistachio bk", die BEIDE im Bestand
+    # bleiben, siehe Modulkopf von `geraete_bereinigung`). Der Knopf muss
+    # also erscheinen, obwohl die Gesamtzahl unter dem Deckel liegt - die
+    # alte Zusicherung war eine Aussage ueber die Gesamtzahl, die neue ist
+    # eine ueber jeden einzelnen Block.
     assert erwartet <= geraete_view.KATALOG_SICHTBAR, (
         "die Fixture ist ueber den Deckel gewachsen - jetzt gehoert der "
         "Knopf mitgeprueft")
-    assert s.select_one("#gr-kmehr") is None
+    from collections import Counter
+    bloecke = Counter((r["data-marke"], r.select_one(".gr-a-modell").get_text(strip=True),
+                       r.get("data-speicher"))
+                      for r in s.select("#gr-katalogtabelle .gr-k-zeile"))
+    assert max(bloecke.values()) > geraete_view.BLOCK_SICHTBAR, (
+        "die Fixture hat keinen Block ueber BLOCK_SICHTBAR mehr - dann "
+        "prueft der Knopf-Teil dieses Tests nichts")
+    knopf_mehr = s.select_one("#gr-kmehr")
+    assert knopf_mehr is not None, (
+        "der Knopf fehlt, obwohl ein Block ueber BLOCK_SICHTBAR liegt")
+    knopf_text = " ".join(knopf_mehr.get_text(" ", strip=True).split())
+    assert knopf_text == f"alle {erwartet} Zeilen zeigen"
 
 
 def test_der_farbbericht_fuehrt_keine_zustandswoerter(tmp_path):
@@ -562,51 +579,191 @@ def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
         assert verboten not in roh.lower(), verboten
 
 
-def test_katalogzeilen_stellt_neu_komplett_vor_den_rest_und_mischt_hersteller():
-    """B5 (31.08.2026): die Standardansicht oeffnete auf zwoelf Apple-Zeilen
-    bei o2 - reine Gruppierung nach Hersteller, alphabetisch beginnend bei
-    "Apple". `katalogzeilen()` sortiert seitdem "neu" komplett vor den Rest
-    und reihum je Hersteller (`_interleave_je_hersteller`, dieselbe Technik
-    wie `pipeline._interleave_by_source`).
-
-    Unit-Test auf `katalogzeilen()` selbst, nicht ueber die gerenderte Seite:
-    schneller, und er trifft die Rechnung, nicht nur ihr HTML-Abbild. Die
-    Zusicherung fuer die ECHTE Bildschirmseite (Pixel, drei Hersteller ohne
-    Scrollen) steht in `tests/test_geraete_reiter_browser.py`.
-    """
-    from telco_radar.geraete_model import Geraet, Katalog, device_id
-
-    katalog = Katalog(geraete=[
-        Geraet(hersteller=h, modell=f"{h} Modell", generation=1)
-        for h in ("Apple", "Samsung", "Google")
+def _b_katalog(zustand_je_geraet=None):
+    """Katalog mit drei Herstellern und je einer flagship- und einer
+    mid/entry-Baureihe - genug, um Segment- und Baureihenordnung zu
+    unterscheiden."""
+    from telco_radar.geraete_model import Geraet, Katalog
+    return Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="Apple X", generation=1,
+               segment="flagship"),
+        Geraet(hersteller="Samsung", modell="Galaxy S26 Ultra",
+               generation=26, segment="flagship"),
+        Geraet(hersteller="Samsung", modell="Galaxy S25 Ultra",
+               generation=25, segment="flagship"),
+        Geraet(hersteller="Samsung", modell="Galaxy A57", generation=57,
+               segment="mid"),
+        Geraet(hersteller="Google", modell="Pixel 11", generation=11,
+               segment="flagship"),
     ])
 
-    def _e(hersteller, zustand="neu"):
-        return {"device_id": device_id(hersteller, f"{hersteller} Modell"),
-                "anbieter": "Medimax", "preis_ohne_vertrag": 1.0,
-                "zuzahlung": None, "speicher_gb": 256, "farbe_roh": "Schwarz",
-                "farbe_normalisiert": "schwarz", "zustand": zustand,
-                "verfuegbarkeit": "lieferbar", "quelle_url": "", "abgerufen_am": ""}
 
-    # Vier Apple-Zeilen zuerst in der Eingabe - wie im echten Bestand, wo
-    # "Apple" alphabetisch zuerst kommt - dazwischen je eine gebrauchte
-    # Zeile von Samsung und Google.
-    eintraege = ([_e("Apple")] * 4 + [_e("Samsung", "refurbished")]
-                + [_e("Google", "refurbished")] + [_e("Samsung")] + [_e("Google")])
+def _b_zeile(hersteller, modell, zustand="neu", preis=1.0, anbieter="A",
+            farbe="schwarz", speicher=256):
+    from telco_radar.geraete_model import device_id
+    return {"device_id": device_id(hersteller, modell), "anbieter": anbieter,
+            "preis_ohne_vertrag": preis, "zuzahlung": None,
+            "speicher_gb": speicher, "farbe_roh": farbe,
+            "farbe_normalisiert": farbe, "zustand": zustand,
+            "verfuegbarkeit": "lieferbar", "quelle_url": "", "abgerufen_am": ""}
+
+
+def test_katalogzeilen_haelt_ein_geraet_in_einem_block_zusammen():
+    """B6 der Zurueckweisung vom 31.08.2026 (Runde 1 der Nachbesserung war
+    zurueckgewiesen worden, weil ihre reine Herstellermischung Zeilen
+    DESSELBEN Geraets ueber die ganze Tabelle verteilte - 69 von 90
+    Geraeten in bis zu zwoelf Bloecken. "Wer ein Geraet sucht, findet seine
+    Zeilen beieinander" ist der Zweck dieses Reiters seit seinem Bau.
+
+    Die Fixture verteilt ABSICHTLICH sieben Zeilen desselben Geraets ueber
+    die Eingabe, dazwischen andere Hersteller - genau das Muster, an dem
+    die reine Zeilenmischung scheiterte.
+    """
+    katalog = _b_katalog()
+    eintraege = [
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="A", preis=999),
+        _b_zeile("Apple", "Apple X"),
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="B", preis=899),
+        _b_zeile("Google", "Pixel 11"),
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="C", zustand="refurbished", preis=799),
+        _b_zeile("Samsung", "Galaxy A57"),
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="D", preis=949),
+        _b_zeile("Apple", "Apple X"),
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="E", preis=929),
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="F", zustand="refurbished", preis=749),
+        # Anbieter C ein zweites Mal, diesmal "neu" - deckt zwei Regeln
+        # zugleich ab: `_katalog_zeile_schluessel` bevorzugt "neu"
+        # INNERHALB desselben Anbieters unabhaengig vom Preis (C-neu/850
+        # steht vor C-refurbished/799, obwohl 799 < 850), und C ruecht mit
+        # seinem NEU-Preis (850) in die Gruppenreihenfolge ein, nicht mit
+        # seinem refurbished-Preis.
+        _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="C", zustand="neu", preis=850),
+    ]
     zeilen = geraete_view.katalogzeilen(eintraege, katalog)
+    assert len(zeilen) == len(eintraege), "eine Umsortierung darf keine Zeile verlieren"
 
-    assert len(zeilen) == len(eintraege), (
-        "eine Umsortierung darf keine Zeile verlieren")
-    zustaende = [z["zustand"] for z in zeilen]
-    erster_rest = zustaende.index("refurbished")
-    assert set(zustaende[:erster_rest]) == {"neu"}, (
-        "die neu-Zeilen stehen nicht mehr komplett vor dem Rest")
-    assert "neu" not in zustaende[erster_rest:], (
-        "eine neu-Zeile ist hinter den Rest gerutscht")
-    # Reihum: unter den ersten drei neu-Zeilen sind schon drei Hersteller,
-    # nicht viermal Apple.
-    erste_drei = {z["hersteller"] for z in zeilen[:3]}
-    assert erste_drei == {"Apple", "Samsung", "Google"}, zeilen[:3]
+    positionen = [i for i, z in enumerate(zeilen)
+                 if z["hersteller"] == "Samsung" and z["modell"] == "Galaxy S26 Ultra"]
+    assert positionen == list(range(positionen[0], positionen[0] + len(positionen))), (
+        f"die sieben S26-Ultra-Zeilen stehen nicht zusammenhaengend: {positionen}")
+
+    # Innerhalb des Blocks: REIHUM je Anbieter, dessen guenstigste Zeile
+    # zuerst (P1, dritte Nachbesserung, 31.08.2026 -
+    # `_interleave_je_anbieter_im_block`). Das ersetzt die fruehere
+    # Zusicherung "neu komplett vor dem Rest" - die haette dem guenstigsten
+    # ANBIETER erlaubt, mit seinen eigenen Farbvarianten allein die
+    # sichtbaren Plaetze zu fuellen, und genau das hat der Coordinator an
+    # den echten Daten gemessen (iPhone 17 Pro: 7 Zeilen, 3 Anbieter).
+    block = zeilen[positionen[0]:positionen[-1] + 1]
+    anbieter_je_zeile = [z["anbieter"] for z in block]
+    assert anbieter_je_zeile == ["F", "C", "B", "E", "D", "A", "C"], (
+        f"die Reihenfolge ist nicht reihum je Anbieter: {anbieter_je_zeile}")
+    zustaende_je_zeile = [z["zustand"] for z in block]
+    assert zustaende_je_zeile == ["refurbished", "neu", "neu", "neu", "neu",
+                                  "neu", "refurbished"], (
+        "C fuehrt nicht mit seiner NEU-Zeile trotz hoeherem Preis: "
+        f"{list(zip(anbieter_je_zeile, zustaende_je_zeile))}")
+    # Die ERSTEN BLOCK_SICHTBAR Zeilen sind zwei VERSCHIEDENE Anbieter (F,
+    # C) - der Zweck der Deckelung.
+    from telco_radar.report.geraete_view import BLOCK_SICHTBAR
+    sichtbare_anbieter = {z["anbieter"] for z in block[:BLOCK_SICHTBAR]}
+    assert len(sichtbare_anbieter) == BLOCK_SICHTBAR, (
+        f"die ersten {BLOCK_SICHTBAR} Zeilen sind nicht {BLOCK_SICHTBAR} "
+        f"verschiedene Anbieter: {sichtbare_anbieter}")
+    block_rest_flags = [z["block_rest"] for z in block]
+    assert block_rest_flags == [False, False, True, True, True, True, True], (
+        f"block_rest markiert nicht genau die ersten {BLOCK_SICHTBAR} als "
+        f"sichtbar: {block_rest_flags}")
+
+
+def test_katalogzeilen_ordnet_nach_segment_nicht_nach_roher_generation():
+    """B1 der Zurueckweisung vom 31.08.2026: die Nachbesserung sortierte
+    flach nach `-generation` UEBER den ganzen Hersteller und reproduzierte
+    damit den Fehler vom 29.08.2026 eine Ebene hoeher - eine Galaxy A57
+    (Generation 57) schlug jede S- oder Z-Reihe (Generation <= 26), weil
+    `generation` nur INNERHALB einer Baureihe eine Zahl ist.
+
+    `segment` ist das Feld, das ueber Baureihen hinweg vergleichbar ist -
+    diese Fixture haelt eine A57 (mid, Generation 57 - die hoechste Zahl
+    der Fixture) gegen zwei flagship-Ultra-Modelle (Generation 25/26).
+    """
+    katalog = _b_katalog()
+    eintraege = [
+        _b_zeile("Samsung", "Galaxy A57"),
+        _b_zeile("Samsung", "Galaxy S25 Ultra"),
+        _b_zeile("Samsung", "Galaxy S26 Ultra"),
+    ]
+    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
+    modelle = [z["modell"] for z in zeilen]
+    assert modelle.index("Galaxy A57") > modelle.index("Galaxy S26 Ultra"), (
+        f"die Mittelklasse A57 steht vor dem Flaggschiff: {modelle}")
+    # Innerhalb desselben Segments (flagship) zaehlt die Generation: S26
+    # Ultra vor S25 Ultra.
+    assert modelle.index("Galaxy S26 Ultra") < modelle.index("Galaxy S25 Ultra"), modelle
+
+
+def test_katalogzeilen_mischt_bloecke_reihum_je_hersteller():
+    """B5, jetzt auf BLOCK- statt Zeilenebene gemessen: unter den ersten
+    drei BLOECKEN (nicht Zeilen) stehen drei verschiedene Hersteller,
+    obwohl "Apple" in der Eingabe zuerst und mit den meisten Zeilen steht.
+    """
+    katalog = _b_katalog()
+    eintraege = ([_b_zeile("Apple", "Apple X")] * 4
+                + [_b_zeile("Samsung", "Galaxy S26 Ultra")]
+                + [_b_zeile("Google", "Pixel 11")])
+    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
+    erste_drei_hersteller = []
+    for z in zeilen:
+        if z["hersteller"] not in erste_drei_hersteller:
+            erste_drei_hersteller.append(z["hersteller"])
+        if len(erste_drei_hersteller) == 3:
+            break
+    assert set(erste_drei_hersteller) == {"Apple", "Samsung", "Google"}, zeilen
+
+
+def test_katalogzeilen_ist_deterministisch_bei_gleichstand():
+    """B8 der Zurueckweisung: ohne Farbe als Tiebreak blieb die Reihenfolge
+    bei gleichem Betrag/Anbieter unterbestimmt und hing an der
+    Eingabereihenfolge - 18 von 30 Mischungen derselben Daten lieferten
+    eine andere Zeilenfolge. Zwei Zeilen desselben Geraets, derselbe
+    Anbieter, derselbe Preis, nur die Farbe unterscheidet sie."""
+    import random
+    katalog = _b_katalog()
+    eintraege = [
+        _b_zeile("Apple", "Apple X", anbieter="A", preis=500, farbe="schwarz"),
+        _b_zeile("Apple", "Apple X", anbieter="A", preis=500, farbe="blau"),
+    ]
+    erwartet = None
+    random.seed(7)
+    for _ in range(20):
+        gemischt = list(eintraege)
+        random.shuffle(gemischt)
+        zeilen = geraete_view.katalogzeilen(gemischt, katalog)
+        farben = tuple(z["farbe"] for z in zeilen)
+        if erwartet is None:
+            erwartet = farben
+        assert farben == erwartet, (
+            f"die Reihenfolge haengt an der Eingabe: {farben} != {erwartet}")
+
+
+def test_katalogzeilen_stellt_einen_hersteller_ohne_katalogtreffer_ans_ende():
+    """B9 der Zurueckweisung: die Docstring behauptete, eine Zeile ohne
+    Katalogtreffer falle ans Ende ihrer Gruppe - `hersteller == ""` und
+    `sorted(gruppen)` stellten den leeren String aber an den ANFANG, ihre
+    Gruppe eroeffnete das Reihum."""
+    katalog = _b_katalog()
+    eintraege = [
+        {"device_id": "unbekanntes-geraet", "anbieter": "A",
+         "preis_ohne_vertrag": 1.0, "zuzahlung": None, "speicher_gb": 256,
+         "farbe_roh": "Schwarz", "farbe_normalisiert": "schwarz",
+         "zustand": "neu", "verfuegbarkeit": "lieferbar", "quelle_url": "",
+         "abgerufen_am": ""},
+        _b_zeile("Apple", "Apple X"),
+    ]
+    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
+    assert zeilen[0]["hersteller"] == "Apple", (
+        "der Hersteller ohne Katalogtreffer fuehrt das Reihum an: "
+        f"{[z['hersteller'] for z in zeilen]}")
 
 
 def test_der_katalog_ist_eine_flache_tabelle(tmp_path):

@@ -2071,16 +2071,38 @@ b,strong{font-weight:700}
   display:block;line-height:1.15}
 .gr-a-euro{font-family:var(--sans);font-size:12px;color:var(--ink-4);
   display:block;margin-top:2px}
-/* B7 (31.08.2026): der Anbietername TRAEGT den Link, statt neben einem
-   nackten Pfeil zu stehen. Bis dahin war nur der Pfeil klickbar, der Name
-   reine Textzelle - fuer ein Auge ohne den `title` unsichtbar, dass die
-   Zeile ueberhaupt einen Link hat. `color:inherit` laesst den Namen wie
-   normalen Zelltext aussehen (Hausregel: Links faerben erst bei Hover),
-   die Unterstreichung beim Hover ist die Zusicherung, die vorher fehlte. */
-.gr-a-quelle{color:inherit;text-decoration:none}
-.gr-a-quelle:hover{color:var(--red);text-decoration:underline}
+/* B7 (31.08.2026, Runde 2 der Zurueckweisung): der Anbietername TRAEGT
+   den Link, statt neben einem nackten Pfeil zu stehen. Bis dahin war nur
+   der Pfeil klickbar, der Name reine Textzelle - fuer ein Auge ohne den
+   `title` unsichtbar, dass die Zeile ueberhaupt einen Link hat.
+
+   B4 der Zurueckweisung hat zwei Fehler der ersten Fassung gemessen, in
+   entgegengesetzte Richtungen:
+
+   1. IM KATALOG (Reiter 2, `.src-table gr-alarm`) SCHLUG `.src-table a`
+      (Spezifitaet 0-1-1) `.gr-a-quelle` (0-1-0). Weil der Name jetzt IM
+      Anker steht, erbte er die ganze fremde Regel: 10 px, Grossbuchstaben,
+      Fettschrift, Rot - "MOBILCOM-DEBITEL". `.gr-alarm a.gr-a-quelle`
+      (0-2-1) schlaegt `.src-table a` unabhaengig von der Reihenfolge im
+      Stylesheet, UND `font:inherit` mitsamt `text-transform`/
+      `letter-spacing` setzt jede Eigenschaft zurueck, die `.src-table a`
+      setzt - sonst gewinnt die Spezifitaet nur EINEN Kampf (Farbe) und
+      verliert den Rest der Eigenschaften einzeln (die Kaskade wirkt je
+      EIGENSCHAFT, nicht je Regel).
+   2. IN DER ALARMTABELLE (Reiter 1, nur `.gr-alarm`, kein `.src-table`)
+      gewann `color:inherit` unbestritten - und `text-decoration:none` galt
+      bis zum Hover. Ohne Maus blieb dort NUR der Pfeil als Hinweis auf
+      einen Link: B7s urspruengliche Beschwerde, unveraendert. Eine
+      staendige, aber gedaempfte Unterstreichung (nicht die rote
+      Akzentfarbe - das waere in einer Tabelle voller Zeilen zu laut) ist
+      jetzt die Grundzusicherung; sie faerbt sich beim Hover um. */
+.gr-alarm a.gr-a-quelle{color:inherit;font:inherit;text-transform:none;
+  letter-spacing:normal;text-decoration:underline;
+  text-decoration-color:var(--ink-4);text-decoration-thickness:1px;
+  text-underline-offset:2px}
+.gr-alarm a.gr-a-quelle:hover{color:var(--red);text-decoration-color:var(--red)}
 .gr-a-pfeil{color:var(--ink-4);margin-left:5px;text-decoration:none}
-.gr-a-quelle:hover .gr-a-pfeil{color:var(--red)}
+.gr-alarm a.gr-a-quelle:hover .gr-a-pfeil{color:var(--red)}
 .gr-a-warnung{display:block;font-family:var(--sans);font-size:12px;
   color:var(--al-mittel);margin-top:3px}
 

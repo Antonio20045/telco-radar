@@ -336,19 +336,35 @@
   was aus dem Preisvergleich fällt, verschwindet nicht, es wird nur nicht
   gegen etwas gerechnet, das es nicht ist. Zwei Schreibweisen derselben
   Listung stehen dabei als eine Zeile.</p>
-  {# ZUSTAND=NEU VORBELEGT (B5, 31.08.2026) - diesmal ohne die drei
-     auseinanderlaufenden Zahlen vom 30.08. (Commit 79085f0): damals stand
-     "neu" im <select>, waehrend die SORTIERUNG unveraendert alphabetisch
-     blieb - der Deckel schnitt die unfilterte Liste bei zwoelf ab, und erst
-     DANACH versteckte der Filter einen Teil davon, sodass sichtbar weniger
-     als der Deckel versprach. `katalogzeilen()` sortiert seitdem
-     "neu" komplett vor den Rest (siehe dortiger Kommentar) - der Deckel
-     schneidet also nie mehr mitten durch eine gemischte Gruppe, und die
-     Vorbelegung hier versteckt serverseitig sichtbar gerenderte Zeilen
-     nicht mehr weg, sie bestaetigt nur, was ohnehin oben steht. Ueberschrift,
-     Deckel und "alle anzeigen" lesen weiterhin dieselbe, UNGEFILTERTE
-     Gesamtzahl - nur die Reihenfolge hat sich geaendert, keine Zeile ist
-     verschwunden. #}
+  {# ZUSTAND=NEU VORBELEGT (B5, zweimal nachgebessert am 31.08.2026).
+
+     Runde 1 hatte diese Vorbelegung mit einer globalen Sortierregel
+     abgesichert ("neu" komplett vor dem Rest in `katalogzeilen()`), damit
+     die Vorbelegung serverseitig nie eine sichtbar gerenderte Zeile
+     versteckt (dieselbe Lehre wie Commit 79085f0: "neu" stand im <select>,
+     waehrend die Sortierung unveraendert alphabetisch blieb und der Deckel
+     die unfilterte Liste bei zwoelf abschnitt, bevor der Filter griff -
+     sichtbar weniger als der Deckel versprach).
+
+     Runde 2 (B6 der Zurueckweisung) hat genau diese globale Sortierregel
+     wieder entfernt: sie zerriss die Zeilen EINES Geraets ueber die ganze
+     Tabelle, sobald es sowohl neue als auch gebrauchte Listungen hatte -
+     69 von 90 Geraeten standen in bis zu zwoelf Bloecken verstreut, obwohl
+     "wer ein Geraet sucht, findet seine Zeilen beieinander" der Zweck
+     dieses Reiters seit seinem Bau ist. `katalogzeilen()` mischt seitdem
+     auf BLOCK-Ebene (ein Geraet bleibt IMMER zusammen), nicht mehr global
+     nach Zustand getrennt.
+
+     Dass die Vorbelegung trotzdem sicher ist, sorgt jetzt NICHT mehr die
+     Sortierung, sondern der DECKEL SELBST (`app.js`, `anwenden()`): er
+     zaehlt seit derselben Nachbesserung nur noch unter den TREFFERN des
+     aktiven Filters, nicht mehr nach roher Position - eine passende Zeile
+     kann also nie hinter einer unpassenden verschwinden, egal wie die
+     Grundsortierung aussieht. Ueberschrift, Deckel-Budget und Export lesen
+     weiterhin dieselbe, UNGEFILTERTE Gesamtzahl; nur "alle anzeigen"
+     verspricht seitdem die Zahl der TREFFER (siehe `app.js`), nicht mehr
+     die Gesamtzahl - sonst versprach der Knopf bei aktivem Filter mehr, als
+     ein Klick liefert. #}
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
     <label class="gr-fbox"><span>Marke</span>
@@ -407,8 +423,21 @@
     </tr></thead>
     <tbody>
     {% for z in geraete.katalogtabelle %}
-      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if loop.index0 >= geraete.katalog_sichtbar }}"
+      {# P1 (dritte Nachbesserung, 31.08.2026): `gr-a-rest` kommt aus
+         `z.zeilen_rest`, nicht mehr aus der rohen `loop.index0` - eine
+         Zeile bleibt in der Standardansicht verborgen, wenn sie ENTWEDER
+         `block_rest` ist (mehr als `BLOCK_SICHTBAR` Zeilen ihres eigenen
+         Geraete-Blocks) ODER die zwoelf Plaetze unter den nicht schon
+         block-gedeckelten Zeilen vergeben sind - beides ist bereits in
+         `katalogzeilen()` verrechnet, damit ein Leser OHNE JavaScript
+         dieselbe Standardansicht sieht wie mit. `data-blockrest` traegt
+         die block-eigene Haelfte zusaetzlich als Attribut: `app.js` muss
+         sie bei jeder Filteraenderung NEU anwenden koennen, waehrend die
+         Positionshaelfte (`KATALOG_SICHTBAR`) dort laengst filterbewusst
+         nachgerechnet wird (B2). #}
+      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if z.zeilen_rest }}"
           data-marke="{{ z.hersteller }}" data-anbieter="{{ z.anbieter }}"
+          data-blockrest="{{ '1' if z.block_rest else '' }}"
           data-speicher="{{ z.speicher or '' }}" data-zustand="{{ z.zustand }}"
           data-s-geraet="{{ z.modell }} {{ z.speicher or '' }}"
           data-s-farbe="{{ z.farbe or '' }}"
@@ -455,7 +484,13 @@
   </div>
   <p class="gr-erklaer gr-a-leer" hidden>Zu dieser Auswahl steht keine Zeile im
   Bestand.</p>
-  {% if geraete.katalogtabelle | length > geraete.katalog_sichtbar %}
+  {# P1 (dritte Nachbesserung, 31.08.2026): die Bedingung fragt jetzt
+     `zeilen_rest` ab, nicht mehr nur die Gesamtzahl gegen den
+     Positionsdeckel - sonst faehlt der Knopf ganz, wenn ausschliesslich
+     `block_rest`-Zeilen verborgen sind (wenige Bloecke, aber einer mit
+     mehr als `BLOCK_SICHTBAR` Zeilen), und ein Leser ohne JavaScript
+     koennte sie nie aufdecken. #}
+  {% if geraete.katalogtabelle | selectattr('zeilen_rest') | list %}
   <p class="gr-erklaer"><button type="button" class="gr-mehr" id="gr-kmehr">alle
     {{ geraete.katalogtabelle | length }} Zeilen zeigen</button></p>
   {% endif %}

@@ -692,6 +692,20 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 # gemessene Hoehe halten kann.
 KATALOG_SICHTBAR = 12
 
+# Wie viele Zeilen EIN Geraete-Block in der Standardansicht zeigt (P1,
+# dritte Nachbesserung 31.08.2026 - Coordinator-Entscheidung nach dem
+# zweiten Ruecklauf). Der Auftrag: "was haben die anderen im Regal" ist
+# mit sieben Farbvarianten DESSELBEN iPhones nicht beantwortet, mit drei
+# Herstellern schon. Gemessen an den echten Daten (`geraete_db.json`,
+# 31.08.2026): ein einzelner Block (iPhone 17 Pro, sieben Zeilen: drei
+# Vodafone-, drei mobilcom-debitel-, eine o2-Farbvariante) fuellte davor
+# mehr als die Haelfte der zwoelf sichtbaren Zeilen - zusammen mit dem
+# naechsten Block (Fairphone 6, fuenf Zeilen) blieben nur ZWEI Hersteller
+# sichtbar, obwohl mindestens drei gefordert sind. Der Block bleibt dabei
+# GANZ erhalten (B6) - dieser Deckel schneidet nur, was OHNE Klick auf
+# "alle anzeigen" sichtbar ist, nicht den Block selbst.
+BLOCK_SICHTBAR = 2
+
 
 def _katalog_betrag(z: dict):
     """Der GEZEIGTE Betrag einer Zeile, fuer Sortierung und Tiebreaks.
@@ -708,44 +722,150 @@ def _katalog_betrag(z: dict):
     return float("inf")
 
 
-def _katalog_innerhalb_schluessel(z: dict):
-    """Sortierschluessel INNERHALB eines Herstellers: Aktualitaet zuerst.
+# Segmentrang fuer den Vergleich UEBER Baureihen hinweg (B1-Nachbesserung,
+# 31.08.2026). `generation` ist NUR innerhalb einer Baureihe eine Zahl
+# (Galaxy A57 traegt 57, Galaxy S26 traegt 26) - eine erste Fassung
+# sortierte trotzdem flach nach `-generation` ueber den ganzen Hersteller,
+# und reproduzierte damit exakt den Fehler vom 29.08.2026, den der Auftrag
+# wortwoertlich als Warnung nennt: Samsungs erste Bildschirmseite fuehrte
+# mit einer Galaxy A57, das Flaggschiff S26 stand auf Platz fuenf.
+#
+# `segment` ist das Feld, das der Katalog PFLEGT und das ueber Baureihen
+# hinweg VERGLEICHBAR ist (flagship/premium/mid/entry) - anders als die
+# Generation ist es keine Zahl, die an ihrer Baureihe haengt. Es fuehrt die
+# Blockreihenfolge; die Generation zaehlt erst DANACH, und dann nur noch
+# INNERHALB derselben Baureihe (siehe `_katalog_block_schluessel`).
+_SEGMENT_RANG = {"flagship": 0, "premium": 1, "mid": 2, "entry": 3}
 
-    `generation` ist die Nummer INNERHALB einer Baureihe (Galaxy A57 traegt
-    57, Galaxy S26 traegt 26) - absteigend sortiert fuehrt deshalb das
-    NEUESTE Geraet JE BAUREIHE, nicht automatisch das mit der groessten Zahl
-    ueber alle Baureihen hinweg. Eine fehlende Generation (kein Katalog-
-    treffer) faellt ans Ende ihrer Gruppe statt als "0" ganz nach vorn.
+
+def _katalog_segment_rang(segment: str) -> int:
+    return _SEGMENT_RANG.get((segment or "").strip().lower(), 4)
+
+
+def _katalog_zeile_schluessel(z: dict):
+    """Sortierschluessel INNERHALB eines Geraete-Blocks (B6/B8-Nachbesserung,
+    31.08.2026): "neu" zuerst, dann der guenstigste Betrag, dann Anbieter
+    und Farbe als volldeterministische Tiebreaks. Ohne Farbe blieb die
+    Reihenfolge unterbestimmt - 18 von 30 Mischungen derselben Eingabe
+    lieferten eine andere Zeilenfolge (B8), weil Pythons `sorted()` bei
+    gleichem Schluessel die EINGABEreihenfolge beibehaelt und die haengt in
+    Produktion an der Satzfolge in `geraete_db.json`.
     """
-    gen = z.get("generation")
-    return (0 if gen is not None else 1, -(gen or 0), z["modell"] or "",
-            z["speicher"] or 0, _katalog_betrag(z), z["anbieter"] or "")
+    return (0 if z["zustand"] == "neu" else 1, _katalog_betrag(z),
+            z["anbieter"] or "", z["farbe"] or "")
 
 
-def _interleave_je_hersteller(zeilen: list) -> list:
-    """Reihum je Hersteller statt Hersteller fuer Hersteller.
+def _katalog_block_schluessel(block: dict):
+    """Sortierschluessel FUER die Geraete-Bloecke eines Herstellers.
 
-    Dieselbe Technik wie `pipeline._interleave_by_source` fuer die
-    Analysten-Stapel, und aus demselben Grund: eine reine Gruppierung laesst
-    den alphabetisch ERSTEN Hersteller den ganzen sichtbaren Bereich vor dem
-    Deckel verbrauchen. B5 (31.08.2026), gemessen an der Ausgabe vom
-    30.08.: die ersten zwoelf Zeilen waren zwoelf o2-iPhone-14-Varianten,
-    waehrend Samsung (138 Listungen), Google (70) und Xiaomi (20) erst nach
-    Scrollen kamen - bei alphabetischer Herstellersortierung aendert daran
-    auch eine bessere Sortierung INNERHALB der Gruppe nichts.
+    Segment zuerst (siehe Modulkopf oben), dann die Baureihe alphabetisch -
+    NICHT die Generation, denn "Z Fold8" gegen "S26 Ultra" waere derselbe
+    Kategorienfehler eine Ebene hoeher: zwei verschiedene Baureihen sind
+    ueber ihre Generationszahl so wenig vergleichbar wie A- und S-Reihe.
+    Erst INNERHALB derselben Baureihe zaehlt die Generation absteigend -
+    dort ist sie eine echte Zahl (Galaxy S26 vor Galaxy S25).
+    """
+    gen = block["generation"]
+    return (_katalog_segment_rang(block["segment"]), block["serie"] or "",
+            0 if gen is not None else 1, -(gen or 0), block["modell"] or "",
+            block["speicher"] or 0)
 
-    Die Herstellerreihenfolge selbst ist alphabetisch (deterministisch,
-    testbar) - anders als bei den Analysten-Stapeln gibt es hier kein
-    "juengstes Item je Quelle", nach dem sich eine andere Reihenfolge
-    rechtfertigen liesse.
+
+def _interleave_je_anbieter_im_block(zeilen: list) -> list:
+    """Reihum je Anbieter INNERHALB eines Geraete-Blocks (P1, dritte
+    Nachbesserung 31.08.2026) - dieselbe Technik wie
+    `_interleave_je_hersteller`, eine Ebene tiefer.
+
+    Ohne sie fuellte der GUENSTIGSTE Anbieter mit seinen eigenen
+    Farbvarianten die beiden sichtbaren Zeilen dieses Blocks
+    (`BLOCK_SICHTBAR`) - gemessen am iPhone 17 Pro: drei Vodafone-Farben
+    waeren vor der ersten mobilcom-debitel-Zeile gestanden. Die Deckelung
+    braeuchte dann zwei Farben DESSELBEN Ladens statt zweier verschiedener
+    Laeden, und die Preisspalte vergliche nichts - "je Anbieter die
+    guenstigste" ist deshalb der fuehrende Schluessel: die Anbietergruppen
+    selbst sind nach ihrer je EIGENEN guenstigsten Zeile geordnet, und erst
+    dann wird reihum eine Zeile je Anbieter genommen.
     """
     gruppen: dict[str, list] = {}
-    for z in sorted(zeilen, key=_katalog_innerhalb_schluessel):
-        gruppen.setdefault(z["hersteller"] or "", []).append(z)
-    geordnet = [gruppen[h] for h in sorted(gruppen)]
+    for z in sorted(zeilen, key=_katalog_zeile_schluessel):
+        gruppen.setdefault(z["anbieter"] or "", []).append(z)
+    geordnet = [gruppen[a] for a in
+                sorted(gruppen, key=lambda a: (_katalog_betrag(gruppen[a][0]), a))]
     ergebnis: list = []
     for runde in zip_longest(*geordnet):
         ergebnis.extend(z for z in runde if z is not None)
+    return ergebnis
+
+
+def _katalog_bloecke(zeilen: list) -> list:
+    """Fasst Zeilen zu Geraete-Bloecken zusammen: (Hersteller, Modell,
+    Speicher). Ein Block bleibt beim Mischen IMMER zusammen (B6, 31.08.2026
+    - siehe `_interleave_je_hersteller`) - "wer ein Geraet sucht, findet
+    seine Zeilen beieinander", der Zweck, den der Vorgaenger dieser Zeile
+    schon einmal trug und den die reine Herstellermischung ersatzlos
+    gestrichen hatte: 69 von 90 Geraeten standen in bis zu zwoelf Bloecken
+    ueber die ganze Tabelle verteilt.
+
+    JEDE Zeile traegt danach `block_rest`: True, wenn sie die
+    `BLOCK_SICHTBAR`-Grenze ihres eigenen Blocks ueberschreitet (P1, dritte
+    Nachbesserung, 31.08.2026). Das ist eine reine ANZEIGE-Markierung -
+    die Zeile bleibt im Block, an ihrer Stelle, sie wird nur in der
+    Standardansicht nicht gezeigt (siehe `app.js`, `anwenden()`). Ein Block
+    mit sieben Farbvarianten desselben Geraets fuellte sonst allein einen
+    Grossteil der zwoelf sichtbaren Zeilen der ganzen Tabelle - gemessen am
+    iPhone 17 Pro (sieben Zeilen) plus Fairphone 6 (fuenf): zusammen zwoelf
+    Zeilen, aber nur ZWEI Hersteller, obwohl mindestens drei gefordert
+    sind.
+    """
+    bloecke: dict[tuple, dict] = {}
+    for z in zeilen:
+        schluessel = (z["hersteller"], z["modell"], z["speicher"])
+        b = bloecke.get(schluessel)
+        if b is None:
+            b = {"hersteller": z["hersteller"], "modell": z["modell"],
+                 "speicher": z["speicher"], "generation": z.get("generation"),
+                 "serie": z.get("serie") or "", "segment": z.get("segment") or "",
+                 "zeilen": []}
+            bloecke[schluessel] = b
+        b["zeilen"].append(z)
+    for b in bloecke.values():
+        b["zeilen"] = _interleave_je_anbieter_im_block(b["zeilen"])
+        for i, z in enumerate(b["zeilen"]):
+            z["block_rest"] = i >= BLOCK_SICHTBAR
+    return sorted(bloecke.values(), key=_katalog_block_schluessel)
+
+
+def _interleave_je_hersteller(zeilen: list) -> list:
+    """Reihum je Hersteller statt Hersteller fuer Hersteller - auf
+    BLOCK-Ebene, nicht auf Zeilenebene (B6-Nachbesserung, 31.08.2026).
+
+    Dieselbe Technik wie `pipeline._interleave_by_source` fuer die
+    Analysten-Stapel: eine reine Gruppierung laesst den alphabetisch ersten
+    Hersteller den ganzen sichtbaren Bereich vor dem Deckel verbrauchen
+    (B5, 31.08.2026, an der Ausgabe vom 30.08. gemessen: zwoelf
+    o2-iPhone-14-Varianten vorn, Samsung/Google/Xiaomi erst nach Scrollen).
+    Gemischt wird aber je BLOCK: ein Geraet (Hersteller+Modell+Speicher)
+    ist die kleinste Einheit, die reihum weitergereicht wird, und alle
+    seine Zeilen wandern gemeinsam - sonst zerreisst dieselbe Mischung, die
+    B5 loest, genau das, was Reiter 2 seit seinem Bau verspricht (B6).
+
+    Die Herstellerreihenfolge selbst ist alphabetisch (deterministisch,
+    testbar) - mit EINER Ausnahme: ein Hersteller ohne Namen (kein
+    Katalogtreffer, `hersteller == ""`) faellt ans ENDE (B9, 31.08.2026).
+    `sorted()` stellt einen leeren String sonst an den Anfang, und genau
+    diese Gruppe eroeffnete dann das Reihum - die Docstring behauptete das
+    Gegenteil, ohne dass eine Zeile Code es einloeste.
+    """
+    bloecke = _katalog_bloecke(zeilen)
+    gruppen: dict[str, list] = {}
+    for b in bloecke:
+        gruppen.setdefault(b["hersteller"] or "", []).append(b)
+    geordnet = [gruppen[h] for h in sorted(gruppen, key=lambda h: (h == "", h))]
+    ergebnis: list = []
+    for runde in zip_longest(*geordnet):
+        for block in runde:
+            if block is not None:
+                ergebnis.extend(block["zeilen"])
     return ergebnis
 
 
@@ -764,25 +884,47 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
     was aus dem Vergleich faellt, verschwindet nicht, es wird nur nicht gegen
     etwas gerechnet, das es nicht ist.
 
-    DIE STANDARDANSICHT (B5, 31.08.2026). Die Seite oeffnete auf zwoelf
-    Apple-Zeilen bei o2 - die Sortierung war rein alphabetisch (Hersteller,
-    Modell), und "iPhone 14" steht alphabetisch ganz vorn. Zwei Aenderungen,
-    keine davon ein Filter im Sinne von "Zeilen verschwinden":
+    DIE STANDARDANSICHT (B5, zurueckgewiesen und nachgebessert am
+    31.08.2026). Die Seite oeffnete auf zwoelf Apple-Zeilen bei o2 - die
+    Sortierung war rein alphabetisch (Hersteller, Modell), und "iPhone 14"
+    steht alphabetisch ganz vorn.
 
-      1. Neugeraete zuerst, gebrauchte danach. Der DECKEL (KATALOG_SICHTBAR)
-         blendet nur nach POSITION aus - eine Umsortierung reicht deshalb,
-         damit die erste Bildschirmseite ohne jedes JavaScript schon
-         "vorgefiltert" aussieht: eine echte Reihenfolge, keine Behauptung,
-         die erst ein Skript einloest. Genau das hatte eine fruehere Fassung
-         umgekehrt geloest (ein vorbelegtes <select>, das Zeilen per JS
-         VERSTECKT) und damit drei auseinanderlaufende Zahlen gebaut
-         (Ueberschrift 352, sichtbar 12 statt 18, Knopf 352, geliefert 341
-         - Commit 79085f0). Diese Fassung filtert nichts heraus: die
-         Zeilenzahl bleibt exakt der Bestand, Ueberschrift, Deckel und
-         "alle anzeigen" lesen weiterhin dieselbe, vollstaendige Liste.
-      2. Reihum je Hersteller statt Hersteller fuer Hersteller
-         (`_interleave_je_hersteller`), innerhalb mit der hoechsten
-         Generation ihrer Baureihe zuerst (`_katalog_innerhalb_schluessel`).
+    Die ERSTE Nachbesserung hatte einen globalen Schnitt "neu komplett vor
+    dem Rest" plus eine flache Herstellermischung - und geriet damit in
+    einen Zielkonflikt, den der zweite Pruefdurchgang aufgedeckt hat (B6):
+    dieselbe Mischung, die Herstellervielfalt herstellt, zerreisst die
+    Zeilen EINES Geraets ueber die ganze Tabelle (69 von 90 Geraeten in bis
+    zu zwoelf Bloecken). Und die flache Generation als Sortierschluessel
+    reproduzierte den Fehler vom 29.08.2026 eine Ebene hoeher (B1): eine
+    Galaxy A57 (Generation 57) schlug jede S- oder Z-Reihe, weil
+    `generation` nur innerhalb ihrer eigenen Baureihe eine Zahl ist.
+
+    Diese Fassung loest beides zugleich, indem sie auf BLOCK-Ebene mischt
+    (`_katalog_bloecke`, `_interleave_je_hersteller`) statt auf Zeilenebene:
+
+      1. Ein GERAET (Hersteller, Modell, Speicher) ist ein Block. Seine
+         Zeilen bleiben IMMER zusammen, sortiert "neu" vor Rest und danach
+         nach Betrag (`_katalog_zeile_schluessel`) - wer ein Geraet sucht,
+         findet seine Zeilen beieinander, der guenstigste Preis oben (B6).
+      2. Die Bloecke EINES Herstellers sind nach SEGMENT geordnet
+         (flagship vor premium vor mid vor entry), nicht nach roher
+         Generation - das ist das Feld, das ueber Baureihen hinweg
+         vergleichbar ist. Erst innerhalb derselben Baureihe zaehlt die
+         Generation absteigend (`_katalog_block_schluessel`, B1).
+      3. Die Bloecke MEHRERER Hersteller laufen reihum
+         (`_interleave_je_hersteller`) statt Hersteller fuer Hersteller -
+         sonst verbraucht der alphabetisch erste Hersteller den ganzen
+         sichtbaren Bereich vor dem Deckel (B5).
+
+    Ob "neu" wirklich vorn STEHT (nicht nur innerhalb seines eigenen
+    Blocks, sondern sichtbar ohne Scrollen), regelt seit der Nachbesserung
+    NICHT mehr diese Sortierung, sondern der Zustandsfilter zusammen mit
+    dem filterbewussten Deckel (`app.js`, `anwenden()`, B2/B3): eine
+    Umsortierung allein kann das nicht mehr leisten, sobald ein Geraet
+    sowohl neue als auch gebrauchte Zeilen hat - genau der Fall, den B6
+    zeigt. Diese Funktion filtert weiterhin NICHTS heraus: die Zeilenzahl
+    bleibt exakt der Bestand, Ueberschrift, Deckel und "alle anzeigen"
+    lesen dieselbe, vollstaendige Liste.
     """
     zeilen = []
     for e in eintraege:
@@ -804,10 +946,11 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
         zeilen.append({
             "modell": g.modell if g else (e.get("device_id") or "?"),
             "hersteller": g.hersteller if g else "",
-            # Nur fuer die Standardsortierung (Aktualitaet) - keine eigene
-            # Spalte, dieselbe Zahl steht schon in der Positionskarten-Logik
-            # von `aufbereiten()` fuer den Preisvergleich.
+            # Nur fuer die Standardsortierung (Block/Baureihe/Segment) -
+            # keine eigene Spalte.
             "generation": g.generation if g else None,
+            "serie": serie_aus_modell(g.modell) if g else "",
+            "segment": g.segment if g else "",
             "speicher": e.get("speicher_gb"),
             "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
             "anbieter": e.get("anbieter"),
@@ -822,9 +965,27 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
             "abgerufen_am": e.get("abgerufen_am") or "",
         })
 
-    neu = [z for z in zeilen if z["zustand"] == "neu"]
-    rest = [z for z in zeilen if z["zustand"] != "neu"]
-    return _interleave_je_hersteller(neu) + _interleave_je_hersteller(rest)
+    ergebnis = _interleave_je_hersteller(zeilen)
+
+    # `zeilen_rest` ist die EINE Zusicherung, die sowohl das SSR-Markup
+    # (kein JavaScript) als auch `app.js` beim ersten Laden lesen: eine
+    # Zeile bleibt in der Standardansicht verborgen, wenn sie ENTWEDER
+    # `block_rest` ist (ueber `BLOCK_SICHTBAR` ihres eigenen Blocks
+    # hinaus, P1) ODER die zwoelf sichtbaren Plaetze unter den nicht schon
+    # block-gedeckelten Zeilen bereits vergeben sind (`KATALOG_SICHTBAR`).
+    # Ohne diese Verrechnung saehe ein Leser OHNE JavaScript weiterhin
+    # sieben Farbvarianten desselben Geraets vor den ersten zwoelf
+    # Positionen - block_rest existiert serverseitig, wurde bis hierhin nur
+    # noch nicht mit dem Zeilendeckel verrechnet.
+    sichtbar_zaehler = 0
+    for z in ergebnis:
+        if z["block_rest"]:
+            z["zeilen_rest"] = True
+            continue
+        z["zeilen_rest"] = sichtbar_zaehler >= KATALOG_SICHTBAR
+        if not z["zeilen_rest"]:
+            sichtbar_zaehler += 1
+    return ergebnis
 
 
 # `_matrix()` ist am 30.08.2026 geloescht worden, mit der Sektion, die es
