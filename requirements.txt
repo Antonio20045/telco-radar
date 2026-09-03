@@ -30,5 +30,10 @@ fastapi>=0.115
 #
 # Beide fallen GESCHLOSSEN aus: fehlt die Bibliothek, wird nichts uebersetzt -
 # nicht alles.
-py3langid>=0.2
+# <0.4 seit 03.09.2026: 0.4.0 hat die API geaendert - der Import
+# `from py3langid.langid import LanguageIdentifier, MODEL_FILE` (sprache.py)
+# scheitert, die Spracherkennung enthaelt sich, 14 Uebersetzungs-Tests fallen.
+# Gruen gewesen ist die Suite zuletzt mit 0.3.0 (CI-Lauf 33333961330,
+# 30.08.2026). Eine Anpassung an 0.4 ist ein eigener Auftrag, kein Pin.
+py3langid>=0.2,<0.4
 trafilatura>=1.8
