@@ -308,9 +308,10 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe), Datenbasis und Lücken. Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete.html` — **Preiswahrheit und Kuerzung** (29.08.2026, abends) | „Kann ich der Zahl trauen, und finde ich sie?" | Die Seite ist **5254 statt 18299 px** lang. Der Vergleich zeigt nur Zeilen mit ≥ 3 % **oder** ≥ 15 € Abstand (ODER, nicht UND: bei 200 € sind 15 € viel und 3 % wenig, bei 2000 € umgekehrt), alles Uebrige steht hinter Aufklappern — SKU-Matrix, 65 Varianten, Ausfallgruende, Vollansicht. Die Grafik zeigt hoechstens **12 Baender je Spalte** und als Standard nur die aktuelle Generation JE BAUREIHE. Nichts ist geloescht |
 | `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
+| `geraete.html` — **Leseseite ohne Erklaersektionen** (03.09.2026) | „Zeig mir die Regale, nicht deine Datenpflege." | Antonio hat die Erklaer- und Kommentarabschnitte kassiert: der Einleitungssatz ueber die Preisbasis, die Sektion „Wie vollstaendig ist das" (Betriebszahlen am Fuss) und die ganze Sektion „Datenbasis und Luecken" („Warum diese N nichts liefern", „Ohne Hardware-Vermarktung beobachtet", Marktstart-Satz, Farbbericht) sind GELÖSCHT. Ueberlebt und in den Portfolio-Reiter gezogen hat nur der Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone nicht" — eine Sortiments-Aussage, kein Kommentar; ein Test nagelt ihn auf `#tafel-portfolio` fest. Die Arbeitslisten stehen im Protokoll des naechtlichen Laufs (Farben/Titel standen dort ohnehin; Marktstart- und Vorgaenger-Luecken loggt `geraete_pipeline` seitdem mit), das „warum liefert wer nichts" steht auf `geraete-quellen.html` — erreichbar ueber EINEN Fusslink, weil mit den Sektionen alle drei bisherigen Links fielen (Review-Befund B1: sonst waere die Quellenseite fertig und unauffindbar). `geraete_view` berechnet `farbbericht`/`katalog`-Luecken/`ohne_katalog` nicht mehr; `quellenlage` und `bilanz` bleiben (Quellenseite bzw. Navigationsschwelle lesen sie) |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `uebersetzung/<id>.html` (nicht verlinkt) | „Was steht da eigentlich?" | Die **vollständige** deutsche Fassung eines fremdsprachigen Artikels. Kein Nav-Eintrag: erreichbar über den roten Link der Meldungskarte. Oben und ohne Scrollen: „Maschinelle Übersetzung", die Ausgangssprache und der Link zum Original — die Übersetzung tritt NEBEN das Original, nicht an seine Stelle. Dateiname ist die `Item.id` (SHA-256 über die normalisierte URL), damit ein Archivbericht in einem Jahr noch trifft |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala; seit 11.08.2026 der **Newsletter-Abschnitt** (nur Zahlen, Warnung ab 80 % des Tageskontingents) |
@@ -1703,6 +1704,48 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
 ## 8a. Der nächste Auftrag
+
+> **Zuletzt erledigt (03.09.2026, Antonio direkt): die Erklaersektionen
+> der Geräteseite gelöscht.** Antonio: *„was mir nicht gefällt auf der
+> geräteseite sind diese ganzen erklärungen und kommentare: Datenbasis und
+> Lücken, Warum diese 15 nichts liefern […]. bitte lösche diese komischen
+> abschnitte."* Gelöscht: der Einleitungssatz unter der Überschrift
+> („Wo liegen wir im Preis zurück … geschätzte Preise gibt es hier
+> nicht"), die Sektion „Wie vollständig ist das" am Fuß und die komplette
+> Sektion „Datenbasis und Lücken" mit allen Unterpunkten. Stand danach:
+> **2188 Tests grün**, `pruefe_portal.py` 10 bestanden, CI inkl.
+> Browser-Tests grün, live byte-identisch (Commit `29f0988`). Einzelheiten
+> unter §5 in der Tabellenzeile „Leseseite ohne Erklaersektionen".
+>
+> **Drei Dinge waren dabei zu beachten:**
+> 1. **Der Daten-Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone
+>    nicht" bleibt** — er ist eine Sortiments-Aussage, kein Kommentar, und
+>    steht jetzt im Portfolio-Reiter (Test nagelt die Zugehörigkeit fest).
+> 2. **Die Arbeitslisten leben im Protokoll weiter, nicht auf der Seite.**
+>    Farben/Titel ohne Katalogtreffer loggte der Nachtlauf ohnehin; die
+>    zwei Katalog-Lücken (Modelle ohne Marktstartdatum, Vorgänger ohne
+>    Katalogziel) loggt `geraete_pipeline` seitdem zusätzlich. Bekannte
+>    Grenze: die Farb-Protokollzeile zählt nur die Anbieter des LAUFENDEN
+>    Laufs (Deckel 40) — fällt ein Anbieter eine Nacht aus, fehlen seine
+>    Schreibweisen in genau der Nacht; die alte Seitenliste rechnete über
+>    den ganzen Bestand.
+> 3. **Ein Fußlink auf `geraete-quellen.html` ist zurückgekommen** — mit
+>    den Sektionen fielen alle drei bisherigen Links, und die Quellenseite
+>    wäre fertig und unauffindbar gewesen (Review-Befund B1, dieselbe
+>    Fehlerklasse wie der Navigationseintrag am 11.08.).
+>
+> **VORBEIgehende Befunde, am HEAD reproduziert, NICHT Teil dieses
+> Auftrags:** (1) `pruefe_portal.py` Kriterium 8b fällt durch — **66 leere
+> Promo-Bilddateien** unter `site/promo/images/` sind ausgeliefert
+> (0 Byte bzw. leer; Dateinamen stehen in der Kriteriumsmeldung). Der
+> letzte Lauf hat sie offenbar so committet; aufräumen oder neu holen.
+> (2) `tests/test_promo_seite.py`: zwei Screenshot-Tests fallen
+> (`test_die_echten_screenshots_bestehen_die_pruefung`,
+> `test_der_leere_screenshot_wird_nicht_ausgeliefert`) — vermutlich
+> derselbe Komplex wie 8b. (3) Der Wahrheitstest für Gerätezahlen
+> (`test_keine_geraetezahl_…`) misst seit dem Wegfall des Bilanzsatzes an
+> der WOCHENKARTE (Erstlauf-Fixture) — trägt die Seite künftig wieder
+> eine Gerätezahl an anderem Ort, den Test mitnehmen.
 
 > **Zuletzt erledigt (30.08.2026, abends): die Nachbesserung nach dem
 > Durchklicken.** Auftragsgrundlage: Antonios Befundliste „Nachbesserung
