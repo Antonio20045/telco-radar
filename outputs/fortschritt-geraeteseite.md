@@ -430,3 +430,83 @@ jemand umstellt.
 haben ist, ließ sich **statisch nicht beweisen** — die Kauflabels rendert React nach.
 Belegt sind `contractDuration: 0` und `recurring.listed: 0`, und der Marktvergleich
 stützt es. Die Einschränkung steht im Modulkopf und auf `/geraete-quellen.html`.
+
+---
+
+## P4 Runde 3 und Tor P4 — 03.09.2026 (`f47d3a3`)
+
+**Runde 2 war zurückgewiesen worden**, und zwar gezielt: sie hatte die Blöcke
+zusammengeführt (69 zerrissene Geräte → 0), damit aber die erste Bildschirmseite
+verloren. Gemessen im echten Chromium bei 1440×900, Katalog an den Seitenanfang
+gescrollt: **12 sichtbare Zeilen, davon 7 Farbvarianten des iPhone 17 Pro und 5 des
+Fairphone 6 — ZWEI Hersteller**, gefordert sind drei.
+
+**Warum der Test des Bauers grün blieb:** seine Fixture trug sieben *Geräte* je
+Hersteller, die echten Daten tragen sieben *Farben eines Geräts*. Derselbe Fehlertyp
+wie am 30.08. (`get_text(" ")`): das Prüfmittel bildet die Fehlerklasse nicht ab.
+
+**Entscheidung (Lead, statt einer dritten Schleife):** der Block deckelt sich selbst.
+In der Standardansicht zeigt ein Geräteblock höchstens **zwei** Zeilen
+(`BLOCK_SICHTBAR`), „alle anzeigen" zeigt weiterhin alles, vollständig gruppiert.
+Innerhalb des Blocks wird **reihum je Anbieter** genommen — sonst füllte der
+günstigste Laden beide Zeilen mit seinen eigenen Farbvarianten, und die Preisspalte
+verglich nichts.
+
+### Tor P4, gemessen am ausgelieferten Ergebnis — NACH dem Rebase auf `main`
+
+Der Rebase brachte vier Commits: zwei Nachtläufe des Gerätezweigs und den Radarlauf
+vom 02.09. **Die Daten unter allen Toren haben sich damit geändert, deshalb ist jedes
+Tor ein zweites Mal gemessen worden**, nicht fortgeschrieben.
+
+| Tor | Messung |
+|---|---|
+| Erste Bildschirmseite (1440×900) | 12 Zeilen, **6 Hersteller** — Apple, Fairphone, Google, Nothing, Samsung, Xiaomi (vorher 2) |
+| Zusammenhalt der Blöcke | 90 Geräte, **0 zerrissen** (Runde 1: 69) |
+| `pruefe_portal.py --site` | **16 bestanden, 1 durchgefallen** |
+| Kriterium 11b (Reiterhöhen) | 2928 / 2875 / 2162 / 2729 px, Grenze 3000 — **bestanden** |
+| Kriterium 11 | 26 Alarmzeilen, 4 Kacheln über 46 Vergleichen, kein Diagramm auf der Startansicht |
+| Export gegen Seite | 378 Zeilen, **0** Zustandswörter in der Farbe, **0** echte Dubletten, **0** Zeilen `Zustand = neu` auf Gebrauchtdaten |
+| Drei Zeilen gegen Quelle und CSV | iPhone 17 Pro/Vodafone, Fairphone 6/ALDI TALK, Galaxy S26 Plus/o2 — Farbe, Zustand, Preis, Verfügbarkeit, Abrufdatum **identisch**; Quelllinks auf die echten Produktseiten (`vodafone.de`, `alditalk.de`, `o2online.de`), **kein** `api.vodafone.de` |
+| Screenshots 1440 und 390 px | selbst angesehen. Blick-Test in fünf Sekunden beantwortet: „am weitesten zurück" = Redmi Note 15 Pro, 45,7 % bei freenet |
+| `pytest tests/test_geraete_seite.py tests/test_geraete_reiter_browser.py` | **135 grün** |
+
+**Der eine Durchfaller ist Kriterium 6** (14 px Hochskalierung eines Bildes auf
+`meldungen.html`, `f1b13df9668f39bf-1280.jpg`). Er betrifft die Geräteseite nicht,
+hängt am Bildbestand des Radarlaufs vom 02.09. und ist die vom 15.08. bekannte,
+datenabhängige Fehlerklasse. **Nicht in dieser Phase behoben, weil nicht in ihrem
+Zuschnitt** — nicht, weil er unwichtig wäre.
+
+### Was der Rebase an der Datenlage geändert hat
+
+- **Medimax und ElectronicPartner liefern zum ersten Mal** (je 2 Listungen, erster
+  Messtermin 02.09.). Damit ist die offene Frage vom 29.08. nach 16 stummen Nächten
+  beantwortet: es lag nicht an den Selektoren. **6 Anbieter**, 389 Listungen.
+- **Fünf Messtermine statt zwei.** Die P3-Schwelle (4) greift jetzt: die
+  Lifecycle-Abschnitte sind aufgewacht, der Portfolio-Reiter wuchs von 875 auf
+  1076 px (eigene Messung) bzw. steht bei 2729 px nach Kriterium 11b — **unter**
+  der Grenze, aber das ist die Stelle, die beim nächsten Zuwachs zuerst reißt.
+- Die Nachfolger-Tabelle steht weiter in ihrer **ehrlichen leeren Fassung** und nennt
+  den echten Grund: „Bei 7 Geräten fehlt das Marktstart-Datum ihres Nachfolgers."
+
+### Offen — als offen, nicht als erledigt
+
+1. **Die einzige Verweildauer-Zeile ist ein refurbished Gerät und sagt es nicht.**
+   „Verweildauer im Regal · 23 Tage · iPhone 15 bei ALDI TALK" — diese Listung trägt
+   im Store `zustand: refurbished`. Die Zahl ist richtig (die Listung stand wirklich
+   23 Tage), aber wer die Zeile liest, denkt an ein Neugerät. **Ein fehlendes
+   Etikett, keine falsche Zahl** — deshalb nicht kurz vor dem Merge nachgeschoben,
+   sondern hier notiert.
+2. **Derselbe Laden heißt auf zwei Reitern verschieden.** Die Alarmtabelle nennt
+   „freenet", der Katalog „mobilcom-debitel" — `config/geraete_quellen.yaml` führt
+   `name: mobilcom-debitel`, `shop: freenet`, `anzeige: freenet (mobilcom-debitel)`.
+   **Das dafür gebaute Feld `anzeige` benutzt keine der beiden Stellen.** Wer in der
+   Alarmtabelle „freenet" liest und im Katalog danach filtert, findet ihn nicht.
+   Nicht behoben, weil der Alarm-Reiter mit 2928 px nur 72 px unter der 3000er
+   Grenze liegt und der längere Name eine Höhenmessung wert ist, keine Randnotiz.
+3. **Kriterium 6** (siehe oben), vorbestehend und datenabhängig.
+4. Unverändert offen aus P1/P2: Telekom, MediaMarkt/Saturn und expert brauchen
+   Adapter **plus Fixture-Rekorder für einen lokalen Lauf bei Antonio** — dieser
+   Container bekommt HTTP 202 (AWS-WAF). Von hier aus kein Versuch, keine
+   Challenge-Umgehung.
+5. `mobilcom-debitel` steht weiter auf `laeufe: 0` (Zeitbudget), womit die drei
+   Zeilen fehlen, die dem Nachfolger-Effekt eine gemessene Grundlage gäben.
