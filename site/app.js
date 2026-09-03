@@ -1798,7 +1798,81 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
         }, r.anbieter + ' ' + euro(letzt.preis)));
       }
     });
+
+    /* DER BESTPREIS-STEMPEL (idealo-Muster, 04.09.2026).
+
+       Die Kachel "Niedrigster Preis" sagt, WIE tief es war. Sie sagt nicht,
+       WANN - und genau das ist die Frage, die man an einen Verlauf hat.
+       Der Stempel beantwortet sie im Bild: ein Ring auf dem tiefsten Punkt
+       und darunter das Datum.
+
+       ER TRAEGT DEN PREIS NICHT NOCH EINMAL. Die Zahl steht schon in der
+       Kachel, und "eine Zahl steht je Ort genau EINMAL" (Beruhigungsregeln)
+       gilt auch dann, wenn die zweite Stelle ein SVG ist. Der Ring sitzt auf
+       der Preishoehe, das Etikett auf derselben Hoehe daneben - die Y-Achse
+       gehoert dem Preis, hier wird so wenig verschoben wie in der geloeschten
+       Positionskarte.
+
+       Bei flacher Reihe entfaellt er: wenn jeder Punkt derselbe Preis ist,
+       ist jeder der billigste, und ein Stempel behauptete einen Tiefpunkt,
+       den es nicht gibt. */
+    var bestMarke = null, bestX = 0;
+    if (!flach) {
+      var bester = null;
+      reihen.forEach(function (r) {
+        r.punkte.forEach(function (p) {
+          /* Bei gleichem Preis gewinnt der FRUEHERE Tag: gefragt ist, seit
+             wann es so billig ist, nicht wer zuletzt nachgezogen hat. */
+          if (!bester || p.preis < bester.preis ||
+              (p.preis === bester.preis && p.datum < bester.datum)) {
+            bester = { preis: p.preis, datum: p.datum,
+                       anbieter: r.anbieter, farbe: r.farbe };
+          }
+        });
+      });
+      if (bester) {
+        var bx = x(bester.datum), by = y(bester.preis);
+        var ring = el('circle', {
+          cx: bx, cy: by, r: 9, fill: 'none', stroke: bester.farbe,
+          class: 'gr-vbest' });
+        ring.appendChild(el('title', {}, 'Billigster gemessener Stand: ' +
+                            bester.anbieter + ' ' + euro(bester.preis) +
+                            ' am ' + tagDE(bester.datum)));
+        svg.appendChild(ring);
+        /* Das Etikett kippt nach links, sobald es sonst aus dem Bild
+           liefe - der tiefste Punkt liegt oft am rechten Rand.
+
+           GEMESSEN, NICHT GESCHAETZT. Die erste Fassung reservierte pauschal
+           78 px; im Chromium gemessen ist "billigster Stand 4.8." aber
+           110,3 px breit, und bei einem Tiefpunkt auf 92 Prozent der
+           Zeitachse standen 30 px ausserhalb der viewBox - abgeschnitten war
+           ausgerechnet das Datum, also die einzige Auskunft dieses
+           Etiketts. `getComputedTextLength()` gibt es genau dafuer; es
+           braucht den Knoten IM Baum, deshalb wird erst angehaengt und dann
+           gemessen. */
+        bestMarke = el('text', {
+          x: bx + 14, y: by + 4, class: 'gr-vbestmarke',
+          fill: bester.farbe, 'text-anchor': 'start'
+        }, 'billigster Stand ' + tagDE(bester.datum));
+        bestX = bx;
+        svg.appendChild(bestMarke);
+      }
+    }
     bild.appendChild(svg);
+
+    /* ERST JETZT MESSEN. `getComputedTextLength()` gibt an einem Knoten
+       ausserhalb des Dokuments 0 zurueck - der Zweig kippte dann nie, und
+       der Test fand das Etikett 112 px ausserhalb der viewBox. Der Baum
+       oben wird detached aufgebaut; die Messung gehoert deshalb hinter das
+       Einhaengen und nicht davor. */
+    if (bestMarke) {
+      var breit = bestMarke.getComputedTextLength ?
+                  bestMarke.getComputedTextLength() : 0;
+      if (bestX + 14 + breit > BREITE - 6) {
+        bestMarke.setAttribute('x', bestX - 14);
+        bestMarke.setAttribute('text-anchor', 'end');
+      }
+    }
 
     reihen.forEach(function (r) {
       var s = document.createElement('span');

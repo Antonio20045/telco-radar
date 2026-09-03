@@ -15,10 +15,26 @@ name: Geraete- und Preisradar
 # "ausgelistet"). Dieser Lauf holt sie nach.
 #
 # Er ist bewusst UNABHAENGIG vom Wochenlauf: er fasst weder den Seen-Store
-# noch die Berichte an, er rendert die Website nicht und er ruft kein Modell.
-# Er schreibt genau zwei Dateien - data/state/geraete_db.json und
-# data/state/geraete_preise.jsonl. Die Seite entsteht beim naechsten
-# regulaeren Lauf aus diesem Stand.
+# noch die Berichte an und er ruft kein Modell.
+#
+# SEIT DEM 04.09.2026 RENDERT ER DIE WEBSITE.
+# Vorher tat er das nicht, mit der Begruendung "die Seite entsteht beim
+# naechsten regulaeren Lauf aus diesem Stand". Das war die Luecke: der
+# regulaere Lauf ist Mi und Fr, dieser hier laeuft taeglich - ein Ergebnis
+# der Nacht zum Samstag stand also bis Mittwoch nicht auf der Seite.
+# Gemessen am 03.09.2026: der Crawllauf schrieb 491 Listungen, darunter
+# erstmals 134 congstar-Zeilen und 67 o2-Zeilen mit vollstaendigen
+# Ratenfeldern - und live war davon nichts zu sehen, weil der letzte Build
+# vom Nachmittag stammte. Dieselbe Fehlerklasse wie der Navigationseintrag
+# am 11.08.: gebaut, geprueft, committet und fuer jeden Leser nicht da.
+#
+# Das Rendern fasst kein Netz an und kein Modell (`render_site` ist rein
+# lesend, CLAUDE.md § 6) - es kostet also nichts ausser Rechenzeit. Der
+# Push auf `main` loest `deploy.yml` aus, das den Render-Hook curlt.
+#
+# Es steht NACH dem Commit des Bestands, und das ist die Lehre aus Lauf
+# 31422689829: eine Stufe vor dem Veroeffentlichen kann den ganzen Lauf
+# kosten. Ein Messtag ist nicht nachholbar, ein Seitenaufbau schon.
 
 on:
   schedule:
@@ -85,6 +101,18 @@ jobs:
           path: geraete.log
           if-no-files-found: warn
 
+      # ERST DER MESSWERT, DANN DIE SEITE - und zwar in zwei Schritten mit
+      # zwei Commits.
+      #
+      # Die erste Fassung dieser Aenderung renderte VOR dem Commit. Das ist
+      # genau der Aufbau, an dem Lauf 31422689829 gescheitert ist: die
+      # Nebenstufe lag vor dem Veroeffentlichen, sie fiel aus, und von 45
+      # erfolgreichen Minuten wurde nichts committet. `render_site` laeuft
+      # ueber das GANZE Portal - Promo, Tarife, Lieferzeit, Newsletter,
+      # Uebersetzung -, und nur der Geraeteteil ist dort in ein try/except
+      # gehuellt. Ein Messtag einer Zeitreihe ist nicht nachholbar; eine
+      # nicht neu gebaute Seite ist es sehr wohl (der naechste Lauf holt sie
+      # nach). Also wird der Bestand zuerst gesichert.
       - name: Commit state
         run: |
           git config user.name "telco-radar-bot"
@@ -105,3 +133,61 @@ jobs:
             sleep $((2 ** i))
           done
           exit 1
+
+      - name: Render site
+        # `continue-on-error`, weil der Bestand oben schon sicher ist: ein
+        # Fehler hier kostet einen Seitenaufbau, keinen Messtag.
+        continue-on-error: true
+        env:
+          PYTHONPATH: src
+        # MIT `cfg`, nie ohne: `render_site(site, reports)` ohne den dritten
+        # Parameter rendert stillschweigend eine halbe Seite - transparenz.html
+        # verliert den Quellenbestand, wettbewerb.html den halben Inhalt, und
+        # zwar ohne Fehler und ohne Warnung (CLAUDE.md § 6).
+        run: |
+          python -c "
+          from pathlib import Path
+          from telco_radar.config import load_config
+          from telco_radar.report.html import render_site
+          root = Path('.')
+          render_site(root / 'site', root / 'data' / 'reports', load_config(root))
+          print('site gerendert')
+          "
+
+      - name: Commit site
+        continue-on-error: true
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add site
+          if git diff --cached --quiet; then
+            echo "Keine Aenderung an der Seite."
+            exit 0
+          fi
+          git commit -m "geraeteradar: Seite neu gebaut $(date -u +%Y-%m-%d)"
+          BRANCH="${GITHUB_REF_NAME}"
+          # Bei einem Rebase-Konflikt auf generiertem HTML wird NICHT
+          # zusammengefuehrt, sondern neu gebaut: `site/` ist Ausgabe, kein
+          # Quelltext, und "ours"/"theirs" waere hier eine halbe Seite aus
+          # zwei Laeufen. Der Rebase wird abgebrochen und der Versuch mit dem
+          # frischen Stand wiederholt.
+          for i in 1 2 3; do
+            if git pull --rebase origin "$BRANCH" && git push origin "HEAD:$BRANCH"; then
+              exit 0
+            fi
+            git rebase --abort || true
+            git reset --hard "origin/$BRANCH"
+            python -c "
+          from pathlib import Path
+          from telco_radar.config import load_config
+          from telco_radar.report.html import render_site
+          root = Path('.')
+          render_site(root / 'site', root / 'data' / 'reports', load_config(root))
+          " || exit 0
+            git add site
+            git diff --cached --quiet && exit 0
+            git commit -m "geraeteradar: Seite neu gebaut $(date -u +%Y-%m-%d)"
+            echo "Push fehlgeschlagen, Versuch $i - Seite neu gebaut"
+            sleep $((2 ** i))
+          done
+          echo "Seite konnte nicht gepusht werden; der Bestand ist oben gesichert."

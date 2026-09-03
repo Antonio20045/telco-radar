@@ -389,7 +389,8 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
 # --------------------------------------------------------------------------
 
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
-    for tid in ("tafel-katalog", "tafel-verlauf", "tafel-portfolio", "tafel-alarme"):
+    for tid in ("tafel-katalog", "tafel-tco", "tafel-verlauf",
+                "tafel-portfolio", "tafel-alarme"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
@@ -402,7 +403,8 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
 
 
 @pytest.mark.parametrize("tid", ["tafel-alarme", "tafel-katalog",
-                                 "tafel-verlauf", "tafel-portfolio"])
+                                 "tafel-verlauf", "tafel-portfolio",
+                                 "tafel-tco"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch."""
@@ -632,7 +634,8 @@ def test_kein_aufklapper_steht_offen(_seite):
     Fixture, in der ein offenes `<details>` fast nichts kostet.
     """
     _frisch(_seite)
-    for tid in ("tafel-alarme", "tafel-katalog", "tafel-verlauf", "tafel-portfolio"):
+    for tid in ("tafel-alarme", "tafel-tco", "tafel-katalog",
+                "tafel-verlauf", "tafel-portfolio"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         offen = _seite.eval_on_selector_all(
@@ -1670,3 +1673,135 @@ def test_p1_kein_block_zeigt_mehr_als_zwei_zeilen_ohne_alle_anzeigen(_echte_seit
     assert not ueberschritten, (
         f"Geraete mit mehr als {geraete_view.BLOCK_SICHTBAR} sichtbaren "
         f"Zeilen ohne 'alle anzeigen': {ueberschritten}")
+
+
+# --------------------------------------------------------------------------
+# Der Bestpreis-Stempel (04.09.2026, idealo-Muster)
+#
+# Die Kachel "Niedrigster Preis" sagt, WIE tief es war. Der Stempel sagt,
+# WANN - und das ist die einzige der beiden Auskuenfte, die nur das Bild
+# geben kann.
+# --------------------------------------------------------------------------
+
+def _probe_mit_tiefpunkt(tage, tiefster: int):
+    """Eine Reihe, deren billigster Tag feststeht - der an Position
+    `tiefster`. Alle anderen Punkte liegen darueber."""
+    return {
+        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
+        "speicher": 128, "suchtext": "probefall", "min": 700, "max": 900,
+        "anbieter": 1, "messpunkte": len(tage), "messtermine": len(tage),
+        "tage": list(tage), "aktuell": [],
+        "reihen": [{"anbieter": "o2", "farbe": "#217a3c", "eigen": False,
+                    "punkte": [{"datum": t,
+                                "preis": 700.0 if i == tiefster else 900.0}
+                               for i, t in enumerate(tage)]}],
+    }
+
+
+def test_der_bestpreis_stempel_sitzt_auf_dem_billigsten_punkt(_eigene_seite):
+    """Der Ring steht auf der PREISHOEHE des tiefsten Punktes.
+
+    Die Y-Achse gehoert dem Preis - dieselbe Regel, an der die geloeschte
+    Positionskarte gescheitert ist (Etiketten bis zu 235 px neben ihrem
+    Punkt). Ein Stempel, der ein paar Pixel neben seinem Tiefpunkt sitzt,
+    behauptet einen anderen Tag.
+    """
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(seite, _probe_mit_tiefpunkt(tage, tiefster=1))
+
+    lage = seite.evaluate("""() => {
+        const svg = document.querySelector('#gr-vbild svg');
+        const ring = svg.querySelector('.gr-vbest');
+        if (!ring) return null;
+        // Der tiefste gezeichnete Punkt ist der mit dem GROESSTEN cy:
+        // die SVG-Y-Achse zeigt nach unten, ein niedriger Preis liegt tief.
+        const punkte = [...svg.querySelectorAll('circle.gr-vpunkt')]
+            .map(c => ({ cx: +c.getAttribute('cx'), cy: +c.getAttribute('cy') }));
+        const tief = punkte.reduce((a, b) => (b.cy > a.cy ? b : a));
+        return { rx: +ring.getAttribute('cx'), ry: +ring.getAttribute('cy'),
+                 px: tief.cx, py: tief.cy };
+    }""")
+    assert lage is not None, "es gibt einen Bestpreis-Stempel"
+    assert abs(lage["ry"] - lage["py"]) < 0.5, (
+        f"der Ring sitzt auf der Preishoehe des Tiefpunkts: {lage}")
+    assert abs(lage["rx"] - lage["px"]) < 0.5, (
+        f"und auf seinem Tag: {lage}")
+
+
+def test_der_bestpreis_stempel_nennt_den_tag_und_nicht_den_preis(_eigene_seite):
+    """Die Zahl steht schon in der Kachel "Niedrigster Preis".
+
+    "Eine Zahl steht je Ort genau EINMAL" gilt auch dann, wenn die zweite
+    Stelle ein SVG ist. Der Stempel traegt deshalb das DATUM; der Preis
+    steht in seinem `title` und damit nicht auf der Seite.
+    """
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(seite, _probe_mit_tiefpunkt(tage, tiefster=1))
+
+    text = seite.eval_on_selector("#gr-vbild .gr-vbestmarke",
+                                  "e => e.textContent")
+    assert "700" not in text and "€" not in text, (
+        f"der Stempel wiederholt den Preis der Kachel nicht: {text!r}")
+    # Der zweite Messtag der Fixture, in der Schreibweise der Seite.
+    tag, monat = tage[1].split("-")[2], tage[1].split("-")[1]
+    assert f"{int(tag)}.{int(monat)}." in text, (
+        f"der Stempel nennt den billigsten Tag: {text!r} (erwartet {tage[1]})")
+
+
+def test_ohne_preisunterschied_gibt_es_keinen_bestpreis_stempel(_eigene_seite):
+    """Wenn jeder Punkt derselbe Preis ist, ist jeder der billigste.
+
+    Ein Stempel behauptete dann einen Tiefpunkt, den es nicht gibt - und er
+    stuende auf einem beliebigen der gleich hohen Tage. Die Gegenprobe steht
+    im Test darueber: mit Unterschied gibt es ihn sehr wohl.
+    """
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    flach = _probe_mit_tiefpunkt(tage, tiefster=-1)
+    for p in flach["reihen"][0]["punkte"]:
+        p["preis"] = 900.0
+    flach["min"] = flach["max"] = 900
+    _stelle_daten(seite, flach)
+
+    assert seite.eval_on_selector_all("#gr-vbild .gr-vbest",
+                                      "e => e.length") == 0, (
+        "eine flache Reihe bekommt keinen Bestpreis-Stempel")
+
+
+@pytest.mark.parametrize("tiefster", range(len(_MESSTAGE)))
+def test_der_bestpreis_stempel_bleibt_im_bild(_eigene_seite, tiefster):
+    """Das Etikett bleibt in der Zeichenflaeche - an JEDER Lage des
+    Tiefpunkts.
+
+    JEDE, und das ist der Punkt. Die erste Fassung dieses Tests legte den
+    Tiefpunkt nur auf den LETZTEN Tag; dort kippt das Etikett ohnehin, der
+    Test mass also genau die Seite des `if`, die funktioniert. Auch zwei
+    ausgesuchte Lagen reichen nicht: an dieser Fixture gemessen liegt der
+    kritische Bereich zwischen zwei Messtagen, und welcher Tag ihn trifft,
+    haengt am Zeitraster - eine Zahl, die sich mit dem naechsten
+    Rasterschalter verschiebt.
+
+    Die Breite wird deshalb GEMESSEN und nicht geschaetzt: die Marke ist im
+    Chromium 114-118 px breit, die alte Schaetzung reservierte 78.
+    """
+    seite = _eigene_seite
+    tage = list(_MESSTAGE)
+    _stelle_daten(seite, _probe_mit_tiefpunkt(tage, tiefster=tiefster))
+
+    lage = seite.evaluate("""() => {
+        const svg = document.querySelector('#gr-vbild svg');
+        const t = svg.querySelector('.gr-vbestmarke');
+        if (!t) return null;
+        const k = t.getBBox();
+        return { links: k.x, rechts: k.x + k.width,
+                 breite: svg.viewBox.baseVal.width };
+    }""")
+    if lage is None:
+        # Faellt der Tiefpunkt im Wochenraster mit einem Nachbarn zusammen,
+        # ist die Reihe flach und traegt zu Recht keinen Stempel.
+        pytest.skip("in diesem Raster gibt es keinen eigenen Tiefpunkt")
+    assert lage["links"] >= 0, f"das Etikett beginnt im Bild: {lage}"
+    assert lage["rechts"] <= lage["breite"], (
+        f"und endet darin: {lage}")

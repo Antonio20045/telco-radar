@@ -87,6 +87,8 @@
   <button type="button" role="tab" aria-selected="true"
           aria-controls="tafel-alarme" data-tafel="tafel-alarme">Preis-Alarme</button>
   <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-tco" data-tafel="tafel-tco">Was kostet es</button>
+  <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-katalog" data-tafel="tafel-katalog">Gerätekatalog</button>
   <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Preisverlauf</button>
@@ -2792,6 +2794,127 @@
   der günstigste Preis je Laden. Wo ein Anbieter das Gerät nur gegen
   Ratenzahlung abgibt, steht der Gesamtbetrag der Raten in der Spalte — er
   ist an der Ratenzahl erkennbar und nicht dasselbe wie ein Barpreis.</p>
+</div>
+
+
+<div class="gr-tafel gr-tafel--aus" id="tafel-tco" role="tabpanel">
+  <div class="gr-werkzeug">
+
+<span class="gr-export-knoepfe">
+  <a class="gr-knopf" href="exporte/geraete-aktuell.csv" download
+    >Alle exportieren (509 Zeilen)</a>
+  <a class="gr-knopf" href="exporte/geraete-historie.csv" download
+    >Preishistorie (526)</a>
+</span>
+
+</div>
+
+<section class="gr-tco" id="tco">
+  <h2 class="rubrik">Was ein Gerät über 24 Monate kostet</h2>
+
+  
+  <p class="gr-erklaer">Gerechnet wird, was ein Bündel aus Gerät und Tarif in
+  24 Monaten zusammen kostet: Gerätezuzahlung plus
+  Geräteraten plus Tarifgrundpreis plus Anschlusspreis. Jeder dieser Posten
+  steht einzeln daneben, und was nicht gemessen ist, steht als Lücke da –
+  ein unbekannter Anschlusspreis heißt nicht, dass es keinen gibt.</p>
+  <p class="gr-erklaer">Die Grenze: verglichen werden Gesamtkosten, nicht
+  Leistungen – ein Tarif mit mehr Datenvolumen kostet zu Recht mehr, und das
+  rechnet diese Tafel nicht heraus.</p>
+
+  
+
+  
+  
+  <p class="gr-erklaer gr-basis--duenn">Für keine Zeile ist die Rechnung
+  heute vollständig: es fehlen die Tarifpreise. Bis sie da sind, steht hier
+  keine Gesamtsumme – eine gerundete Schätzung wäre eine Meinung mit
+  Eurozeichen.</p>
+  
+
+  
+  <h3 class="gr-tueber">Was der Rechnung noch fehlt</h3>
+  <ul class="gr-tposten gr-tposten--offen">
+    
+    <li><span>Tarifgrundpreis</span><em>Phase 6 (Tarife: Bestand und Bezug)</em></li>
+    
+    <li><span>Anschlusspreis</span><em>Phase 6 (Anschlusspreis aus dem Produktinformationsblatt)</em></li>
+    
+    <li><span>Boni und Rabatte</span><em>offen – Boni stehen bei allen Anbietern im Fließtext</em></li>
+    
+  </ul>
+
+  
+  <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
+  <table class="gr-ttab gr-ttab--bereit">
+    <thead><tr>
+      <th scope="col">Anbieter</th><th scope="col">Neugeräte</th>
+      <th scope="col">Preisform</th>
+      <th scope="col">Geräteseite vollständig</th>
+    </tr></thead>
+    <tbody>
+    
+    <tr class="gr-tzeile--eigen">
+      <td>Vodafone</td>
+      <td>150</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    <tr>
+      <td>mobilcom-debitel</td>
+      <td>149</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    <tr>
+      <td>congstar</td>
+      <td>123</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    <tr>
+      <td>o2</td>
+      <td>56</td>
+      <td>Ratenzahlung</td>
+      
+      <td>55 von 55
+        mit geprüfter Ratenrechnung</td>
+    </tr>
+    
+    <tr>
+      <td>ALDI TALK</td>
+      <td>3</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    <tr>
+      <td>ElectronicPartner</td>
+      <td>2</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    <tr>
+      <td>Medimax</td>
+      <td>2</td>
+      <td>Barkauf</td>
+      
+      <td>–</td>
+    </tr>
+    
+    </tbody>
+  </table>
+  
+</section>
 </div>
 
 
@@ -17166,6 +17289,12 @@
 
 <section class="gr-verlauf" id="verlauf">
   <h2 class="rubrik">Wie sich ein Preis entwickelt hat</h2>
+
+  
+  <p class="gr-erklaer">Die Kurve zeigt den Gerätepreis, nicht die
+  Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif und
+  Anschlusspreis. Was davon schon gemessen ist, steht im Reiter
+  „Was kostet es“.</p>
 
   
   <div class="gr-vsuche">

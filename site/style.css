@@ -2046,6 +2046,50 @@ b,strong{font-weight:700}
 .gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
 .gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
 
+/* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
+   Alarmtabelle - dieselbe Seite, dieselben Spaltenkoepfe -, hat aber eine
+   eigene Klassenfamilie: die zwei Tabellen beantworten verschiedene Fragen
+   und werden getrennt gedeckelt. */
+.gr-ttab{width:100%;border-collapse:collapse;margin:18px 0 0}
+.gr-ttab th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);text-align:left;font-weight:400;
+  padding:0 10px 7px 0;border-bottom:1px solid var(--rule)}
+.gr-ttab td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule-2);
+  vertical-align:top;font-size:14px}
+.gr-t-anbieter{font-family:var(--serif);font-size:15px;font-weight:600;
+  display:block}
+/* Die Leitzahl (E2): TCO-24 gross, Ø/Monat daneben klein. */
+.gr-t-leit{font-family:var(--serif);font-size:19px;font-weight:700;
+  white-space:nowrap}
+/* Eine Luecke sieht NICHT aus wie eine Zahl. Sie steht in der Grotesk der
+   Etiketten, nicht in der Serife der Betraege - wer die Spalte ueberfliegt,
+   soll sie nicht fuer einen kleinen Preis halten. */
+.gr-t-luecke{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.gr-tzeile--eigen .gr-t-anbieter{color:var(--red)}
+.gr-tdetail td{padding:0 0 11px;border-bottom:1px solid var(--rule-2)}
+.gr-tdetail summary{font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4);
+  cursor:pointer}
+.gr-tdetail summary:hover{color:var(--ink)}
+.gr-tposten{list-style:none;margin:9px 0 0;padding:0;font-size:13.5px}
+.gr-tposten li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
+  border-bottom:1px solid var(--rule-2)}
+.gr-tposten li:last-child{border-bottom:0}
+.gr-tposten em{font-style:normal;margin-left:auto;color:var(--ink-3)}
+.gr-tposten--luecke em,.gr-tposten--offen em{color:var(--ink-4);
+  font-family:var(--sans);font-size:12px}
+.gr-tposten--offen{margin-top:4px}
+.gr-tueber{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);font-weight:400;
+  margin:26px 0 0;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+/* Das Euro-Delta gegen uns. Rot heisst hier NICHT "schlecht", sondern
+   "guenstiger als wir" - dieselbe Bedeutung wie in der Alarmtabelle. */
+.gr-tdelta{margin:18px 0 0;border-left:3px solid var(--rule);padding-left:13px}
+.gr-tdelta-zeile{font-size:13.5px;line-height:1.6;margin:0 0 5px}
+.gr-tdelta-zeile b{font-family:var(--serif);font-size:17px}
+.gr-tdelta--unter{border-left:0}
+.gr-tdelta--unter b{color:var(--red)}
+
 /* Die Alarmtabelle. */
 .gr-alarm{width:100%;border-collapse:collapse}
 .gr-alarm th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
@@ -2435,6 +2479,10 @@ b,strong{font-weight:700}
    Linien. Die Schriftgroesse ist dieselbe wie an der Achse - Kriterium 11
    von `pruefe_portal.py` laesst nichts unter 12 px zu. */
 .gr-vetikett{font-family:var(--sans);font-size:12px;font-weight:600}
+/* Der Bestpreis-Stempel. 12 px ist die Untergrenze der Seite - Kriterium 11
+   von `pruefe_portal.py` misst sie im GERENDERTEN SVG, nicht im Quelltext. */
+.gr-vbest{stroke-width:1.5;stroke-dasharray:3 3;fill:none}
+.gr-vbestmarke{font-family:var(--sans);font-size:12px;font-weight:600}
 .gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}

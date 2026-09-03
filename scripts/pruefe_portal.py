@@ -240,19 +240,34 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
     except ImportError:
         b.prueft(None, "Browser-Messungen (playwright fehlt)")
         return
-    if not Path(_CHROMIUM).exists():
-        treffer = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
-        if not treffer:
-            b.prueft(None, "Browser-Messungen (kein Chromium gefunden)")
-            return
-        pfad = treffer[-1]
-    else:
+    # Die zwei festen Pfade sind Linux (Sandbox bzw. Runner). Findet keiner
+    # etwas, wird Playwright SELBST gefragt, statt die Messung abzusagen:
+    # `executable_path=None` heisst "nimm den Browser, den du verwaltest" -
+    # genau den, den `tests/test_geraete_reiter_browser.py` benutzt. Ohne
+    # diesen Rueckfall meldete das Skript auf einem Mac "kein Chromium
+    # gefunden" und uebersprang fuenf Kriterien, waehrend die Browsertests
+    # derselben Arbeitskopie liefen. Ein uebersprungenes Kriterium sieht in
+    # der Bilanz aus wie ein bestandenes - dieselbe Lehre wie beim
+    # Chromium-Schritt in `ci.yml` (09.08.2026).
+    pfad = None
+    if Path(_CHROMIUM).exists():
         pfad = _CHROMIUM
+    else:
+        treffer = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux/chrome"))
+        if treffer:
+            pfad = treffer[-1]
 
     begriff = _haeufigster_absender(site)
 
     with _server(site) as wurzel, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=pfad)
+        try:
+            browser = p.chromium.launch(executable_path=pfad)
+        except Exception as exc:  # noqa: BLE001
+            # Der Grund gehoert in die Bilanz. "Kein Chromium" und "Chromium
+            # startet nicht" sind zwei verschiedene Befunde, und der zweite
+            # ist ohne seinen Text nicht zu beheben.
+            b.prueft(None, f"Browser-Messungen ({type(exc).__name__})")
+            return
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
         _reiterhoehen(seite, wurzel, b)
 
@@ -633,11 +648,11 @@ def main() -> int:
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # Die VIER Reiter, in der Reihenfolge des Auftrags. Ein fehlender
+        # Die FUENF Reiter, in der Reihenfolge des Auftrags. Ein fehlender
         # Reiter faellt sonst nur dadurch auf, dass niemand ihn vermisst.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-alarme", "tafel-katalog", "tafel-verlauf",
-                    "tafel-portfolio"]
+        erwartet = ["tafel-alarme", "tafel-tco", "tafel-katalog",
+                    "tafel-verlauf", "tafel-portfolio"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
 

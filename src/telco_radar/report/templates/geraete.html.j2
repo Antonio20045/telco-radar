@@ -208,6 +208,8 @@
   <button type="button" role="tab" aria-selected="true"
           aria-controls="tafel-alarme" data-tafel="tafel-alarme">Preis-Alarme</button>
   <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-tco" data-tafel="tafel-tco">Was kostet es</button>
+  <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-katalog" data-tafel="tafel-katalog">Gerätekatalog</button>
   <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Preisverlauf</button>
@@ -328,7 +330,190 @@
   ist an der Ratenzahl erkennbar und nicht dasselbe wie ein Barpreis.</p>
 </div>
 
-{# --- Reiter 2: Geraetekatalog ---------------------------------------- #}
+{# --- Reiter 2: Was kostet es (TCO-24) --------------------------------
+     Eigene Tafel und ausdruecklich KEINE weitere Spalte der Alarmtabelle:
+     "wo liegen wir zurueck" und "was kostet es" sind zwei Fragen (Strategie
+     § 8). Heute traegt sie ihre Luecke - null Buendel, weil kein Adapter
+     Tarifpreise sammelt. Sie zeigt deshalb, WAS schon gemessen ist und was
+     fehlt, statt aus einem Geraetepreis eine Gesamtsumme zu runden. #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-tco" role="tabpanel">
+  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
+
+<section class="gr-tco" id="tco">
+  <h2 class="rubrik">Was ein Gerät über {{ geraete.tco.horizont }} Monate kostet</h2>
+
+  {# Methode in zwei Saetzen, Grenze in einem - im Stil der Tarifseite
+     ("Grundlage ist das gesetzlich vorgeschriebene Produktinformationsblatt,
+     nicht die Werbeseite"). #}
+  <p class="gr-erklaer">Gerechnet wird, was ein Bündel aus Gerät und Tarif in
+  {{ geraete.tco.horizont }} Monaten zusammen kostet: Gerätezuzahlung plus
+  Geräteraten plus Tarifgrundpreis plus Anschlusspreis. Jeder dieser Posten
+  steht einzeln daneben, und was nicht gemessen ist, steht als Lücke da –
+  ein unbekannter Anschlusspreis heißt nicht, dass es keinen gibt.</p>
+  <p class="gr-erklaer">Die Grenze: verglichen werden Gesamtkosten, nicht
+  Leistungen – ein Tarif mit mehr Datenvolumen kostet zu Recht mehr, und das
+  rechnet diese Tafel nicht heraus.</p>
+
+  {% if not geraete.tco.lesbar %}
+  {# B6: unlesbar ist nicht "nichts gefunden". Ohne diesen Zweig meldete die
+     Tafel bei kaputter Datei eine leere Datenlage. #}
+  <p class="gr-erklaer gr-basis--duenn">Der Bündelbestand
+  (<code>geraete_tco.json</code>) war nicht lesbar. Was hier steht, ist
+  deshalb unvollständig – das ist ein Lesefehler und keine Auskunft über den
+  Markt.</p>
+  {% endif %}
+
+  {% if geraete.tco.zeilen %}
+  {# DAS GATTER HAENGT AN DEN ZEILEN, NICHT AN `hat_tco`.
+
+     Mit `hat_tco` verschwand die ganze Tabelle, sobald KEINE Zeile
+     belastbar war - samt der Zuzahlungen und Raten, die sehr wohl gemessen
+     sind. Genau das ist der naechste reale Zustand: nach Phase 4 (die
+     Adapter liefern Zuzahlung und Rate) und vor Phase 6 (die Tarifpreise).
+     Der Docstring von `_zeile` sagt zu, dass Gemessenes sichtbar bleibt;
+     mit `hat_tco` hielt die Seite diese Zusage nicht ein, und der Test dazu
+     blieb trotzdem gruen, weil er die Moduldaten prueft. #}
+  {% if not geraete.tco.hat_tco %}
+  <p class="gr-erklaer gr-basis--duenn">Für keine Zeile ist die Rechnung
+  vollständig – die Bestandteile stehen trotzdem da, sie ergeben nur noch
+  keine Gesamtsumme.</p>
+  {% endif %}
+
+  {# --- Das Euro-Delta gegen uns. Nur wo BEIDE Seiten eine belastbare
+         Zahl tragen; eine Haelfte mit Luecke ergibt kein Vorzeichen. #}
+  {% if geraete.tco.delta %}
+  <div class="gr-tdelta">
+    {% for d in geraete.tco.delta[:3] %}
+    <p class="gr-tdelta-zeile{% if d.guenstiger %} gr-tdelta--unter{% endif %}">
+      <b>{{ '%.2f'|format(d.abstand)|replace('.', ',') }} €</b>
+      {{ 'günstiger als Vodafone' if d.guenstiger else 'teurer als Vodafone' }}
+      über {{ geraete.tco.horizont }} Monate: {{ d.geraet }} bei
+      {{ d.anbieter }} ({{ d.tarif }}) gegen {{ d.eigen_tarif }}.
+      {% if d.quelle_url %}<a href="{{ d.quelle_url }}" rel="nofollow noopener"
+        target="_blank">Beleg {{ d.anbieter }}</a>{% endif %}{% if
+        d.eigen_quelle_url %} · <a href="{{ d.eigen_quelle_url }}"
+        rel="nofollow noopener" target="_blank">Beleg Vodafone</a>{% endif %}
+    </p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <table class="gr-ttab">
+    <thead><tr>
+      <th scope="col">Gerät</th><th scope="col">Anbieter und Tarif</th>
+      <th scope="col">TCO {{ geraete.tco.horizont }} Monate</th>
+      <th scope="col">Ø je Monat</th><th scope="col">Beleg</th>
+    </tr></thead>
+    <tbody>
+    {% for z in geraete.tco.zeilen %}
+    <tr class="gr-tzeile{% if z.eigen %} gr-tzeile--eigen{% endif %}">
+      <td>{{ z.geraet }}</td>
+      <td><span class="gr-t-anbieter">{{ z.anbieter }}</span>
+          <span class="gr-a-klein">{{ z.tarif }}</span></td>
+      {# DIE LEITZAHL, und sie steht nur bei belastbarer Rechnung. `gesamt`
+         waere auch ohne Tarifgrundpreis eine Zahl - dann ist es aber der
+         Geraetebetrag und keine TCO. #}
+      <td>{% if z.gesamt is not none %}<b class="gr-t-leit">{{
+        '%.2f'|format(z.gesamt)|replace('.', ',') }} €</b>{% else %}<span
+        class="gr-t-luecke">nicht berechenbar</span>{% endif %}</td>
+      <td>{% if z.monatlich is not none %}{{
+        '%.2f'|format(z.monatlich)|replace('.', ',') }} €{% else %}–{% endif %}</td>
+      {# Ein Buendel ohne Quelllink bekommt KEINEN leeren Anker. Ein
+         `<a href="">` mit leerem Text ist ein Bedienelement, das nichts tut
+         - und es taeuscht einen Beleg vor, den es nicht gibt. #}
+      <td>{% if z.quelle_url %}<a href="{{ z.quelle_url }}"
+            rel="nofollow noopener" target="_blank">{{ z.quelle_url | domain
+            }}</a>{% else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
+          {% if z.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
+            z.abgerufen_am | date_de }}</span>{% endif %}</td>
+    </tr>
+    <tr class="gr-tdetail"><td colspan="5">
+      <details>
+        <summary>Woraus die Zahl besteht</summary>
+        <ul class="gr-tposten">
+          {% for p in z.bestandteile %}
+          <li><span>{{ p.name }}</span><em>{{
+            '%.2f'|format(p.betrag)|replace('.', ',') }} €</em></li>
+          {% endfor %}
+          {% for l in z.luecken %}
+          <li class="gr-tposten--luecke"><span>{{ l.name }}</span><em>nicht
+            gemessen{% if l.phase %} – {{ l.phase }}{% endif %}</em></li>
+          {% endfor %}
+        </ul>
+        {% if z.restbetrag %}
+        {# Was jenseits des Horizonts liegt, steht NEBEN der Zahl statt aus
+           ihr herauszufallen - sonst waere die 24-Monats-Kappung genau die
+           CHECK24-Methodik, die das Strategiedokument verwirft. #}
+        <p class="gr-basis--duenn">Nach {{ geraete.tco.horizont }} Monaten
+        offen: {{ '%.2f'|format(z.restbetrag)|replace('.', ',') }} € Geräteraten.</p>
+        {% endif %}
+        {% if z.geraeteanteil is not none %}
+        <p class="gr-basis--duenn">Gegen denselben Tarif ohne Gerät gerechnet
+        zahlt man für das Gerät {{
+        '%.2f'|format(z.geraeteanteil)|replace('.', ',') }} €.</p>
+        {% endif %}
+        {% if z.rabatte_offen %}
+        <p class="gr-basis--duenn">Nicht eingerechnet: {{
+        '%.2f'|format(z.rabatte_offen)|replace('.', ',') }} € an benannten
+        Boni und Rabatten.</p>
+        {% endif %}
+      </details>
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if geraete.tco.zeilen_gesamt > geraete.tco.zeilen|length %}
+  <p class="gr-basis--duenn">{{ geraete.tco.zeilen|length }} von {{
+  geraete.tco.zeilen_gesamt }} Bündeln gezeigt.</p>
+  {% endif %}
+
+  {% else %}
+  {# Der ehrliche Leerzustand. Er sagt, WARUM hier keine Zahl steht - eine
+     leere Tafel ohne Grund sieht aus wie ein Fehler. #}
+  <p class="gr-erklaer gr-basis--duenn">Für keine Zeile ist die Rechnung
+  heute vollständig: es fehlen die Tarifpreise. Bis sie da sind, steht hier
+  keine Gesamtsumme – eine gerundete Schätzung wäre eine Meinung mit
+  Eurozeichen.</p>
+  {% endif %}
+
+  {# --- Was noch fehlt, und wer es liefert. Einmal benannt statt in jeder
+         Zeile wiederholt. #}
+  <h3 class="gr-tueber">Was der Rechnung noch fehlt</h3>
+  <ul class="gr-tposten gr-tposten--offen">
+    {% for o in geraete.tco.offene_posten %}
+    <li><span>{{ o.name }}</span><em>{{ o.phase }}</em></li>
+    {% endfor %}
+  </ul>
+
+  {% if geraete.tco.bereitschaft %}
+  <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
+  <table class="gr-ttab gr-ttab--bereit">
+    <thead><tr>
+      <th scope="col">Anbieter</th><th scope="col">Neugeräte</th>
+      <th scope="col">Preisform</th>
+      <th scope="col">Geräteseite vollständig</th>
+    </tr></thead>
+    <tbody>
+    {% for b in geraete.tco.bereitschaft %}
+    <tr{% if b.eigen %} class="gr-tzeile--eigen"{% endif %}>
+      <td>{{ b.anbieter }}</td>
+      <td>{{ b.listungen }}</td>
+      <td>{{ b.preisform }}</td>
+      {# Die Geraeteseite gilt als vollstaendig, wenn eine Ratenzahlung mit
+         ihren drei Feldern vorliegt UND die Rechenprobe aufgeht. Ein
+         Barpreis ist als Kassenzahl vollstaendig, taugt fuer ein Buendel
+         aber nur mit Tarif - er steht deshalb als Preisform da. #}
+      <td>{% if b.mit_raten %}{{ b.raten_probe_ok }} von {{ b.mit_raten }}
+        mit geprüfter Ratenrechnung{% else %}–{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+</div>
+
+{# --- Reiter 3: Geraetekatalog ---------------------------------------- #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
   <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 
@@ -508,7 +693,7 @@
 </section>
 </div>
 
-{# --- Reiter 3: Preisverlauf ------------------------------------------
+{# --- Reiter 4: Preisverlauf ------------------------------------------
    Das EINZIGE Diagramm der Seite, und es zeigt genau EIN Geraet.
 
    Die Reihenfolge von oben nach unten ist vorgegeben und nicht verhandelbar:
@@ -521,6 +706,16 @@
 
 <section class="gr-verlauf" id="verlauf">
   <h2 class="rubrik">Wie sich ein Preis entwickelt hat</h2>
+
+  {# Der Effektivpreis-Gedanke als ERKLAERUNG, nicht als Zahl. Handyhase und
+     Finanztip rechnen ihn aus Geraetepreis, Tarif und Boni zusammen - genau
+     die Posten, die diesem Radar heute fehlen. Eine eigene Zahl daraus waere
+     geraten; der Satz sagt stattdessen, was die Kurve NICHT zeigt, und
+     verweist auf die Tafel, die die Frage beantworten wird. #}
+  <p class="gr-erklaer">Die Kurve zeigt den Gerätepreis, nicht die
+  Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif und
+  Anschlusspreis. Was davon schon gemessen ist, steht im Reiter
+  „Was kostet es“.</p>
 
   {% if not geraete.verlauf.hat_daten %}
   <p class="gr-erklaer gr-basis--duenn">Für den Preisverlauf liegen noch keine
@@ -606,7 +801,7 @@
 </section>
 </div>
 
-{# --- Reiter 4: Portfolio --------------------------------------------- #}
+{# --- Reiter 5: Portfolio --------------------------------------------- #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-portfolio" role="tabpanel">
   <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 

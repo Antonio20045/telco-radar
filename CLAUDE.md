@@ -1706,7 +1706,104 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (03.09.2026, Antonio direkt): die Erklaersektionen
+> **Zuletzt erledigt (04.09.2026): Phase 6a — die Website aus dem
+> Nachtlauf, die TCO-Ansicht als Skelett und der Bestpreis-Stempel.**
+> Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 6, § 8 Phase 8, § 10
+> (E2/E3). Stand danach: **2349 Tests grün** (vorher 2254 — die Differenz ist
+> zum größten Teil KEIN neuer Test, sondern die 49 Browser-Tests, die vorher
+> mangels Chromium als Fehler durchliefen), `pruefe_portal.py`
+> **15 bestanden / 2 durchgefallen / 0 nicht prüfbar**.
+>
+> **Der erste Befund war kein Fehler im Code, sondern eine Lücke im
+> Fahrplan.** Der Crawllauf vom 03.09. (Run 33808917268) hatte 491 Listungen
+> geschrieben — erstmals 134 congstar-Zeilen und 67 o2-Zeilen mit
+> vollständigen Ratenfeldern. Live war davon nichts zu sehen: `geraete.yml`
+> rendert die Website nicht („die Seite entsteht beim nächsten regulären
+> Lauf"), und der reguläre Lauf ist **Mi und Fr**, während der Gerätezweig
+> **täglich** läuft. Ein Ergebnis der Nacht zum Samstag stand also bis
+> Mittwoch nicht auf der Seite. Dieselbe Fehlerklasse wie der
+> Navigationseintrag am 11.08.: gebaut, geprüft, committet und für jeden
+> Leser nicht da. **`geraete.yml` rendert seitdem selbst** und committet
+> `site/` mit; der Push löst `deploy.yml` aus.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **`report/geraete_tco_view.py`** (neu), Reiter 2 „Was kostet es" | Gerechnet wird ausschließlich in `tco_model`. Der Renderer addiert keinen Euro — zwei Rechnungen für dieselbe Zahl sind zwei Zahlen |
+> | **Keine Zahl ohne `Tco.belastbar`** | `tco_24()` liefert auch ohne Tarifgrundpreis ein `gesamt` — das ist dann der Gerätebetrag und keine TCO. Die Tafel hält ihn zurück und zeigt die benannte Lücke. Ein Test prüft im selben Lauf, dass `tco_24()` sehr wohl eine Zahl liefert; sonst bewiese er nur, dass es keine gab |
+> | **Jede Lücke trägt ihre Phase** („Phase 6 (Tarife: Bestand und Bezug)") | „Keine Tarifdaten" ist eine Feststellung, „keine Tarifdaten, Phase 6" eine Auskunft |
+> | **„Was der Rechnung noch fehlt" wird GERECHNET** (`_offene_posten`) | Als feste Liste zeigte der Abschnitt „Tarifgrundpreis fehlt", während die Tabelle darüber einen auswies — sichtbar falsch in dem Moment, in dem Phase 6 liefert. **Gefunden beim ANSEHEN der Tafel mit gestellten Bündeln, nicht in einem Test** |
+> | **Das Euro-Delta trägt BEIDE Quelllinks** | Die Tabelle ist auf `SICHTBAR_MAX` (20) gedeckelt, eine gemeldete Zeile steht also nicht zwingend darin. Ohne die Links wäre der Deckel eine stille Beleglosigkeit |
+> | **`restbetrag`/`rabatte_offen` werden durchgereicht**, nicht auf `None` gedreht | Ein `or None` machte aus dem gemessenen 0.0 („die Raten laufen genau 24 Monate") eine Lücke („nicht gemessen") — genau die Verwechslung, gegen die dieser Zweig gebaut ist. Ob der Satz erscheint, entscheidet die Vorlage |
+> | **Bestpreis-Stempel** im Preisverlauf (`app.js`) | Er nennt den TAG, nicht den Preis: die Kachel „Niedrigster Preis" trägt die Zahl schon, und „eine Zahl steht je Ort genau EINMAL" gilt auch, wenn die zweite Stelle ein SVG ist. Der Ring sitzt auf der Preishöhe — die Y-Achse gehört dem Preis. Bei flacher Reihe entfällt er: ist jeder Punkt gleich teuer, ist jeder der billigste |
+>
+> **Die Datenlage, gegen die das gebaut ist:** `data/state/geraete_tco.json`
+> gibt es **nicht** — null Bündel, null SIM-only-Referenzen, also **keine
+> einzige berechenbare TCO**. Die Tafel zeigt deshalb ihre Lücke und
+> daneben, was je Anbieter schon steht (o2: 55 von 55 mit geprüfter
+> Ratenrechnung, alle übrigen Barkauf). Mit gestellten Bündeln ist der
+> Vollzustand durchgerechnet und **angesehen**: Leitzahl, Ø/Monat,
+> Bestandteile, Restbetrag („Nach 24 Monaten offen: 360,00 €"),
+> Geräteanteil gegen die SIM-only-Referenz und das Delta-Banner stehen.
+>
+> **Chromium ist lokal installiert worden** (`python3 -m playwright install
+> chromium`). Damit laufen die 49 vorher fehlgeschlagenen Browser-Tests, und
+> `pruefe_portal.py` misst wieder alle Kriterien — es suchte den Browser nur
+> an zwei **Linux**-Pfaden und meldete auf einem Mac „kein Chromium
+> gefunden", also fünf übersprungene Kriterien. Ein übersprungenes Kriterium
+> sieht in der Bilanz aus wie ein bestandenes; das Skript fragt jetzt
+> notfalls Playwright selbst.
+>
+> **Der `diff-reviewer` hat drei S1 und fünf S2 gefunden, alle behoben.**
+> Die drei, die am meisten gekostet hätten:
+>
+> | | Befund | Ausgelöst durch |
+> |---|---|---|
+> | **B1** | `float(e["preis_ohne_vertrag"])` in der Bereitschaftszählung. `preis_ohne_vertrag` ist ein **eigenes** Optional-Feld und hängt nicht an den Ratenfeldern — eine Listung mit Ratenform ohne Barpreis wirft. `render_site` fängt das ab, aber der Auffangboden ist `geraete_view.leer()`: **alle fünf Reiter leer und der Navigationseintrag „Geräte" von jeder Seite verschwunden.** Rechnet jetzt `Ratenzahlung.deckt()` | die nächsten Adapter (Phase 4: Zuzahlung mit Tarifreferenz statt Kassenpreis) |
+> | **B2** | Das Delta prüfte `Tco.belastbar` — und das verlangt **nur** den Tarifgrundpreis. Eine Zeile ohne gemessene Geräterate galt als belastbar, und ihre Differenz zu einer vollständigen Zeile ist der fehlende Gerätepreis, kein Preisvorteil („760,99 € günstiger als Vodafone"). Jetzt `_vergleichbar()`, dieselbe Schwelle wie `Geraeteanteil.belastbar` | ein Anbieter, der Tarif aber keinen Gerätepreis liefert |
+> | **B3** | `{z["sku_id"]: z for z in zeilen}` — bei zwei Vodafone-Tarifen zum selben Gerät gewann der **letzte**, und weil vorher aufsteigend sortiert wird, war das immer das **teuerste** eigene Bündel. Das dreht das Vorzeichen des Banners um | Vodafone führt dasselbe Gerät regelmäßig auf mehreren Tarifen |
+>
+> Dazu: **B5** — die erste Fassung von `geraete.yml` renderte **vor** dem
+> Commit, also genau der Aufbau von Lauf 31422689829 („von 45 erfolgreichen
+> Minuten wurde nichts veröffentlicht"). Jetzt Bestand zuerst, dann Seite,
+> zwei Commits, beide Nachschritte `continue-on-error`. Ein Messtag ist
+> nicht nachholbar, ein Seitenaufbau schon. **B4** — das Delta hatte keine
+> Wesentlichkeitsschwelle und hätte „0,00 € teurer als Vodafone"
+> geschrieben; es benutzt jetzt `geraete_vergleich.WESENTLICH_*`. **B6** —
+> `TcoDB.lesbar` wurde weggeworfen, eine kaputte Datei sah aus wie „keine
+> Daten". **B7** — der Bestpreis-Stempel reservierte 78 px für ein 118 px
+> breites Etikett; `getComputedTextLength()` gibt an einem Knoten
+> **außerhalb des Dokuments** 0 zurück, die Messung gehört also hinter das
+> Einhängen. **B8** — `{% if hat_tco %}` verwarf die ganze Tabelle, sobald
+> keine Zeile belastbar ist; das Gatter hängt jetzt an den Zeilen.
+>
+> **Der lehrreichste Punkt war der Test zu B7.** Die erste Reparatur kam mit
+> zwei ausgesuchten Tiefpunktlagen — und **keine der beiden löste den Fehler
+> aus** (an dieser Fixture liegt der kritische Bereich zwischen zwei
+> Messtagen). Der Test läuft jetzt über **alle** Lagen. Dieselbe Falle, vor
+> der der Review gewarnt hatte, im Reparaturversuch prompt wiederholt.
+>
+> **OFFEN:**
+> 1. **Der Preisverlauf zeigt heute für KEIN Gerät ein Diagramm.** 8 von 89
+>    Geräten erreichen die 4 Messtermine — aber im Wochenraster fallen die
+>    dichten Messungen vom 29.8. bis 3.9. auf ein bis drei Punkte zusammen,
+>    und `DIAGRAMM_AB_TERMINEN` zählt die ZUSAMMENGEFASSTEN (B2, 30.08.).
+>    Der Bestpreis-Stempel ist damit gebaut, getestet und dormant. Nach ein
+>    bis zwei weiteren Wochen Nachtläufen **ansehen**, ob Kurven entstehen.
+> 2. **Die TCO-Tafel bleibt leer, bis Phase 6 Tarifpreise liefert.** Das ist
+>    der Zustand, gegen den sie gebaut ist — aber wer sie in vier Wochen
+>    unverändert leer vorfindet, prüft nicht die Tafel, sondern Phase 6.
+> 3. **`pruefe_portal.py` Kriterium 6** (14 px Hochskalierung auf
+>    `meldungen.html`) und **8b** (66 leere Promo-Bilddateien unter
+>    `site/promo/images/`, samt der zwei zugehörigen Tests in
+>    `tests/test_promo_seite.py`) sind **vorbestehend** und waren nicht Teil
+>    dieses Auftrags. 8b steht seit dem 03.09. im Handover, Kriterium 6 seit
+>    dem 15.08.
+> 4. **Das Delta-Banner rechnet über ALLE Bündel, die Tabelle zeigt 20.**
+>    Das ist Absicht (der größte Abstand ist die Schlagzeile) und durch die
+>    zwei Quelllinks gedeckt — sollte es verwirren, gehört der gemeldete
+>    Treffer in die Tabelle gezogen, nicht das Banner gekappt.
+
+> **Davor erledigt (03.09.2026, Antonio direkt): die Erklaersektionen
 > der Geräteseite gelöscht.** Antonio: *„was mir nicht gefällt auf der
 > geräteseite sind diese ganzen erklärungen und kommentare: Datenbasis und
 > Lücken, Warum diese 15 nichts liefern […]. bitte lösche diese komischen

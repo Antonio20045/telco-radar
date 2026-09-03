@@ -42,8 +42,9 @@ from typing import Optional
 
 from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
-               geraete_vergleich, geraete_verlauf)
+               geraete_tco_view, geraete_vergleich, geraete_verlauf)
 from ..analyze import geraete_lifecycle
+from ..analyze.tco_store import TcoDB
 from ..analyze.geraete_store import (
     GeraeteDB,
     Preishistorie,
@@ -1127,6 +1128,7 @@ def leer(fehler: str = "") -> dict:
         "alarme": geraete_alarme.leer(),
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
         "verlauf": geraete_verlauf.leer(),
+        "tco": geraete_tco_view.leer(),
         "katalogtabelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
@@ -1225,6 +1227,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     state_dir = Path(state_dir)
     db = GeraeteDB(state_dir / "geraete_db.json")
     historie = Preishistorie(state_dir / "geraete_preise.jsonl")
+    # Der Buendelbestand ist eine EIGENE Datei und heute nicht vorhanden -
+    # `TcoDB` faengt das ab und startet leer (`analyze/tco_store`). Er wird
+    # hier gelesen und nicht in `geraete_pipeline`, weil dieser Reiter beim
+    # RENDERN entsteht: er hat keinen eigenen State und keine LLM-Stufe,
+    # dieselbe Bauform wie `report/wettbewerb.py`.
+    tco_db = TcoDB(state_dir / "geraete_tco.json")
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
@@ -1399,6 +1407,13 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das den
         # Unterschied zwischen "577-899 EUR" und "850-899 EUR".
         "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
+        # Der TCO-Reiter rechnet auf `belastbar` wie der Verlauf: eine
+        # Bereitschaftszahl, die einen falsch gespeicherten Gebrauchtpreis
+        # mitzaehlt, behauptet eine Messung, die der Vergleich schon
+        # verworfen hat.
+        "tco": geraete_tco_view.aufbereiten(
+            tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
+            lesbar=tco_db.lesbar),
         # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
         # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
         # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau
