@@ -350,9 +350,31 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
                             zeile)
                 return
 
-    # 2) Ein einzelner Betrag unter dem Entgelt-Bezeichner.
+    # 2) Die senkrechte Tabellenform (Vodafone): Zeilen sind Kategorien,
+    #    Spalten sind Preisphasen. Sie steht VOR den Einzelbetrags-Mustern,
+    #    weil ein "Listenpreis"-Block sonst ueber den erstbesten Betrag der
+    #    Seite gelesen wuerde - und der erste Betrag einer Preistabelle ist
+    #    nicht ihr Grundpreis, sondern nur ihre erste Zeile.
+    if _preis_zeilenweise(text, t):
+        return
+
+    # 3) Ein einzelner Betrag unter dem Entgelt-Bezeichner.
     muster = re.compile(r"(?:Entgelt für das|exkl\. Hardware|Monatlich)"
                         r"[^\n]{0,60}?" + _GELD, re.I)
+    treffer = muster.search(text)
+    if treffer:
+        t.setze("grundgebuehr", zahl(treffer.group(1)),
+                _zeile_mit(text, muster))
+        return
+
+    # 4) Der Entgelt-Bezeichner traegt den PRODUKTNAMEN statt des Wortes
+    #    "Komplettprodukt": congstar schreibt "Entgelt Allnet Flat L (ohne
+    #    Endgerät) 29,00 € / Monat" (gemessen 04.09.2026). Das Muster
+    #    verlangt deshalb die Monatsangabe HINTER dem Betrag - sie ist es,
+    #    die aus der Zahl einen Grundpreis macht und sie von einem
+    #    einmaligen Entgelt unterscheidet.
+    muster = re.compile(r"Entgelt\b[^\n]{0,70}?" + _GELD
+                        + r"\s*(?:/|pro|je)\s*Monat", re.I)
     treffer = muster.search(text)
     if treffer:
         t.setze("grundgebuehr", zahl(treffer.group(1)),
@@ -458,6 +480,148 @@ def _kategorien_aus_spalten(rohzeilen: list[str], kopf: int,
     return namen
 
 
+# --------------------------------------------------------------------------- #
+# Die zweite Tabellenform: Zeilen sind Kategorien, Spalten sind PREISPHASEN
+#
+# Telekom schreibt die Geraetestaffel WAAGERECHT - eine Zeile Betraege unter
+# fuenf Spaltenueberschriften (`_kategorien_aus_spalten`). Vodafone schreibt
+# dieselbe Auskunft SENKRECHT, und stellt daneben die Zeitachse:
+#
+#     Listenpreis inkl. MwSt.        Monat 1-24        ab Monat 25
+#     ohne Smartphone                  49,95 €           49,95 €
+#     mit Basic Phone                  54,95 €           54,95 €
+#     mit Top Smartphone               89,95 €           89,95 €
+#
+# Das ist die einzige Stelle in diesem Projekt, an der ein Anbieter seine
+# Preisphasen SELBST auszeichnet - "Monat 1-24" und "ab Monat 25" sind keine
+# Auslegung, sondern zwei Spaltenueberschriften. Genau dafuer gibt es
+# `tarif_model.Preisphase`, und bis zum 04.09.2026 stand dort in jedem
+# Datensatz die Ersatzphase "1 bis Vertragsende" aus `lies_text`.
+#
+# Gelesen wird auf dem NORMALISIERTEN Text und nicht auf den Rohzeilen: hier
+# steht das Etikett am Zeilenanfang und die Betraege dahinter, in
+# Leserichtung. Die Zeichenposition, die bei Telekom die Zuordnung traegt,
+# wird nicht gebraucht - und wo man sie nicht braucht, ist sie eine
+# zusaetzliche Fehlerquelle.
+#
+# GEMESSEN am 04.09.2026 an den elf aktuell vermarkteten Vodafone-Tarifen
+# (VF-Mobil-XS/S/M/L/XL, je mit und ohne Smartphone, plus Smart XS): in
+# ALLEN elf tragen "Monat 1-24" und "ab Monat 25" denselben Betrag. Die
+# Phasen sind also heute im ganzen Bestand gleich hoch - die Struktur ist
+# trotzdem echt, und sie ist der Ort, an dem eine Rabattphase auftauchen
+# WIRD.
+
+_BETRAG_MIT_WAEHRUNG = re.compile(r"(\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:€|EUR)")
+
+# Woran eine Zeile als GERAETEstufe erkannt wird. Vodafone stellt in
+# dieselbe Tabellenform auch Tarifoptionen ("ohne/mit 5 Jahresversprechen",
+# "ohne/mit zusaetzlichem Datenvolumen"). Die als Geraetepreisstaffel
+# abzulegen waere eine Falschaussage: niemand bekommt dort ein Telefon.
+_GERAETESTUFE = re.compile(r"smartphone|phone|handy|tablet|endger", re.I)
+
+# Der Tabellenkopf. "Listenpreis" allein reicht nicht - erst zusammen mit
+# einer Monatsspalte ist es diese Tabelle.
+_PREISKOPF = re.compile(r"Listenpreis|Monatlicher Preis|Monatspreis", re.I)
+_MONATSSPALTE = re.compile(r"(ab\s+)?Monat\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?",
+                           re.I)
+
+
+def _phasenspalten(kopfzeile: str) -> list[tuple[int, int | None]]:
+    """Die Monatsspalten einer Preistabelle, in Spaltenreihenfolge.
+
+    "Monat 1-24" -> (1, 24), "ab Monat 25" -> (25, None), "Monat 13" -> (13,
+    13). Das offene Ende ist bewusst `None` und nicht die Laufzeit: ein
+    Vertrag, der nach der Mindestlaufzeit weiterlaeuft, hat dort kein
+    Enddatum, und `Preisphase.monate()` rechnet mit `None` gegen den
+    uebergebenen Horizont.
+    """
+    spalten: list[tuple[int, int | None]] = []
+    for treffer in _MONATSSPALTE.finditer(kopfzeile):
+        ab, von, bis = treffer.group(1), treffer.group(2), treffer.group(3)
+        start = int(von)
+        if bis:
+            spalten.append((start, int(bis)))
+        elif ab:
+            spalten.append((start, None))
+        else:
+            spalten.append((start, start))
+    return spalten
+
+
+def _tabellenzeilen(zeilen: list[str],
+                    kopf: int) -> list[tuple[str, list[float], str]]:
+    """Die Preiszeilen unter einem Tabellenkopf: (Etikett, Betraege, Zeile).
+
+    Die ZEILE wandert mit, weil sie der Beleg ist. Sie aus Etikett und
+    Betraegen wieder zusammenzusetzen waere eine zweite Schreibweise
+    derselben Zahl - und `Tarif.fehlende_belege()` prueft die Fundstelle
+    gegen den Rohtext: "1.099,00 EUR" zurueckformatiert als "1099,00 €"
+    stuende dort nicht, und der Beleg fiele aus.
+
+    Abgebrochen wird bei der ersten Zeile OHNE Betrag, sobald mindestens
+    eine Zeile gelesen ist - im normalisierten Text sind die Leerzeilen
+    weg, und der Fuss ("Vodafone GmbH - Ferdinand-Braun-Platz 1") ist die
+    naechste betragslose Zeile. Ohne diesen Abbruch liest die Tabelle die
+    Hausnummer als Preis.
+    """
+    posten: list[tuple[str, list[float], str]] = []
+    for zeile in zeilen[kopf + 1:kopf + 16]:
+        treffer = list(_BETRAG_MIT_WAEHRUNG.finditer(zeile))
+        if not treffer:
+            if posten:
+                break
+            continue
+        etikett = " ".join(zeile[:treffer[0].start()].split())
+        betraege = [zahl(t.group(1)) for t in treffer]
+        if not etikett or any(b is None for b in betraege):
+            continue
+        posten.append((etikett, betraege, zeile))
+    return posten
+
+
+def _preis_zeilenweise(text: str, t: Tarif) -> bool:
+    """Grundgebuehr, Preisphasen und Geraetestaffel aus der senkrechten Form.
+
+    Gibt zurueck, ob die Tabelle gefunden UND gelesen wurde. Der Aufrufer
+    faellt sonst auf die Einzelbetrags-Muster zurueck.
+
+    Die Grundgebuehr ist der KLEINSTE Betrag der ersten Phasenspalte -
+    dieselbe Regel wie bei der waagerechten Form (`_preis`), und aus
+    demselben Grund: die Stufe ohne Geraet ist der Tarifpreis, jede andere
+    enthaelt eine Finanzierung.
+    """
+    zeilen = text.splitlines()
+    for i, zeile in enumerate(zeilen):
+        if not _PREISKOPF.search(zeile):
+            continue
+        spalten = _phasenspalten(zeile)
+        if not spalten:
+            continue
+        posten = _tabellenzeilen(zeilen, i)
+        if not posten:
+            continue
+
+        _, betraege, basiszeile = min(posten, key=lambda p: p[1][0])
+        t.setze("grundgebuehr", betraege[0], basiszeile)
+
+        # Nur wenn Spaltenzahl und Betragszahl zusammenpassen. Passen sie
+        # nicht, ist die Zuordnung Phase -> Betrag geraten, und eine
+        # geratene Phase ist schlimmer als gar keine: sie sieht aus wie eine
+        # Messung. Dann bleibt es bei der Ersatzphase aus `lies_text`.
+        if len(spalten) == len(betraege):
+            t.setze("preisphasen",
+                    [Preisphase(von_monat=von, bis_monat=bis, betrag=betrag)
+                     for (von, bis), betrag in zip(spalten, betraege)],
+                    zeile)
+
+        staffel = [Geraetepreis(kategorie=name, betrag=werte[0])
+                   for name, werte, _z in posten if _GERAETESTUFE.search(name)]
+        if len(staffel) >= 2:
+            t.setze("geraetepreisstaffel", staffel, zeile)
+        return True
+    return False
+
+
 def _anschlusspreis(text: str, t: Tarif) -> None:
     muster = re.compile(
         r"(?:Anschlusspreis|Bereitstellungspreis|einmalige[sn]?\s+Entgelt)"
@@ -483,6 +647,14 @@ def _versionsstand(text: str, t: Tarif) -> None:
 
 def _anbieter(text: str, t: Tarif) -> None:
     for name, muster in (
+        # congstar steht VOR Telekom, und das ist keine Reihenfolgefrage,
+        # sondern eine Korrektheitsfrage: das congstar-PIB traegt im Fuss
+        # "congstar - eine Marke der Telekom Deutschland GmbH". Heute rettet
+        # nur der Zeilenumbruch mitten in diesem Satz das Ergebnis - stuende
+        # er auf einer Zeile, waeren alle congstar-Tarife als Telekom in der
+        # Datenbank. Eine Marke ist nicht ihr Mutterkonzern; congstar
+        # verkauft eigene Tarife zu eigenen Preisen.
+        ("congstar", r"\bcongstar\b"),
         ("Telekom", r"Telekom Deutschland GmbH"),
         ("o2", r"Telefónica Germany"),
         ("1&1", r"1&1 (?:Telecom|Mobilfunk)"),
