@@ -791,6 +791,100 @@ class Sku:
 _DATUM_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+# Der Cent, um den eine Geldrechnung dieses Moduls danebenliegen darf.
+# Groesser gewaehlt waere die Rechenprobe keine Probe mehr, kleiner
+# scheiterte sie an der Rundung auf zwei Nachkommastellen (G26).
+TOLERANZ_EURO = 0.01
+
+
+def probe_geht_auf(anzahlung: Optional[float], monatsrate: Optional[float],
+                   laufzeit_monate: Optional[int],
+                   gesamt: Optional[float]) -> bool:
+    """`anzahlung + n * rate == gesamt`, auf einen Cent genau.
+
+    DIE EINE STELLE, an der diese Rechnung steht. Sie ist die billigste
+    verfuegbare Korrektheitskontrolle fuer einen Ratengesamtbetrag: bei o2
+    ging sie am 03.09.2026 bei 95 von 95 Katalogeintraegen auf, bei der
+    Telekom bei 10 von 10. Der o2-Adapter benutzt sie, um zu entscheiden,
+    ob die Ratenzahl aus dem Angebotsnamen ueberhaupt gelten darf, und
+    `Ratenzahlung` benutzt sie, um einen Gesamtbetrag gegenzupruefen.
+
+    Ein fehlender Teil laesst sie durchfallen - eine Probe, die ohne Zahlen
+    zustimmt, prueft nichts.
+    """
+    if anzahlung is None or monatsrate is None or gesamt is None:
+        return False
+    if not laufzeit_monate or laufzeit_monate <= 0:
+        return False
+    return abs(anzahlung + laufzeit_monate * monatsrate - gesamt) <= TOLERANZ_EURO
+
+
+@dataclass
+class Ratenzahlung:
+    """Anzahlung plus n Monatsraten - EINE Preisform, als eigene Groesse.
+
+    Das Strategiedokument nennt sie in § 6.1 `raten_gesamt` (der
+    Phase-2-Auftrag schreibt `rate_gesamt`, gemeint ist dasselbe; die
+    Schreibweise des Dokuments gewinnt, weil Phase 3 die Formenliste
+    darauf aufbaut). Sie steht hier als eigene Struktur, weil derselbe
+    Sachverhalt an ZWEI Stellen vorkommt: die Barkauf-Strecke eines
+    Netzbetreibers (o2s `totalPrice` ist der Gesamtbetrag eines
+    Teilzahlungsgeschaefts, kein Kassenpreis) und die Geraetefinanzierung
+    innerhalb eines Buendels (`tco_model.Buendel`). Zwei Kopien derselben
+    Rechnung waeren zwei Rechnungen.
+
+    `gesamt` ist GERECHNET, nie gespeichert. Ein abgelegter Gesamtbetrag
+    koennte seinen Bestandteilen widersprechen, und dann steht im Datensatz
+    eine Meinung statt einer Messung.
+
+    Felder:
+      anzahlung        was bei Vertragsschluss faellig ist (0.0 ist ein
+                       gemessener Betrag, None gibt es hier nicht)
+      monatsrate       die gleichbleibende Rate
+      laufzeit_monate  wie viele davon; kommt aus der QUELLE, wird nie aus
+                       Summe und Rate zurueckgerechnet
+      zins_effektiv    0.0 heisst BELEGT null Prozent, None heisst
+                       unbekannt - derselbe Unterschied wie beim
+                       Anschlusspreis in `report/effektivpreis.py`
+    """
+
+    anzahlung: float
+    monatsrate: float
+    laufzeit_monate: int
+    zins_effektiv: Optional[float] = None
+
+    def __post_init__(self):
+        for feld in ("anzahlung", "monatsrate"):
+            wert = float(getattr(self, feld))
+            if wert < 0:
+                raise ValueError(f"negativer betrag in {feld}: {wert}")
+            setattr(self, feld, round(wert, 2))
+        self.laufzeit_monate = int(self.laufzeit_monate)
+        if self.laufzeit_monate <= 0:
+            raise ValueError(f"laufzeit_monate muss positiv sein: "
+                             f"{self.laufzeit_monate}")
+        if self.zins_effektiv is not None:
+            self.zins_effektiv = float(self.zins_effektiv)
+            if self.zins_effektiv < 0:
+                raise ValueError(f"negativer zins_effektiv: "
+                                 f"{self.zins_effektiv}")
+
+    @property
+    def gesamt(self) -> float:
+        """Was das Geraet ueber die ganze Ratenlaufzeit kostet."""
+        return round(self.anzahlung + self.laufzeit_monate * self.monatsrate, 2)
+
+    @property
+    def hinweis(self) -> str:
+        """Der Zusatz, der aus einer Preiszahl eine Preisaussage macht."""
+        return ratenhinweis(self.laufzeit_monate, self.zins_effektiv)
+
+    def deckt(self, gesamt: Optional[float]) -> bool:
+        """Passt diese Ratenzahlung zu einem gemessenen Gesamtbetrag?"""
+        return probe_geht_auf(self.anzahlung, self.monatsrate,
+                              self.laufzeit_monate, gesamt)
+
+
 def ratenhinweis(laufzeit_monate: Optional[int],
                  zins_effektiv: Optional[float] = None) -> str:
     """Wie eine Ratenzahl auf der Seite bezeichnet wird - an EINER Stelle.
@@ -951,6 +1045,25 @@ class Listung:
         if self.zuzahlung is not None:
             return "buendel"
         return "kein_preis"
+
+    @property
+    def ratenzahlung(self) -> Optional[Ratenzahlung]:
+        """Die vier Preisformfelder als EINE Groesse - oder None.
+
+        Sie liegen an der Listung flach, weil sie so im Bestand stehen und
+        so aus dem Adapter kommen. Wer mit ihnen RECHNET, nimmt diese
+        Struktur: sie kennt ihren Gesamtbetrag und ihre Rechenprobe, und
+        `tco_model` benutzt dieselbe fuer die Geraetefinanzierung im
+        Buendel. Fehlt eines der drei Pflichtfelder, gibt es keine
+        Ratenzahlung - ein halbes Teilzahlungsgeschaeft ist keins.
+        """
+        if (self.anzahlung is None or self.monatsrate is None
+                or not self.laufzeit_monate):
+            return None
+        return Ratenzahlung(anzahlung=self.anzahlung,
+                            monatsrate=self.monatsrate,
+                            laufzeit_monate=self.laufzeit_monate,
+                            zins_effektiv=self.zins_effektiv)
 
     @property
     def ratenhinweis(self) -> str:

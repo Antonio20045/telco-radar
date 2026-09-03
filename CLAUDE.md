@@ -198,6 +198,7 @@ Wichtige Dateien:
 | `config/farben.yaml` | Farbschreibweise -> kanonische Farbe. Eine unbekannte Farbe wird BEHALTEN und nicht geraten; der Farbbericht am Fuss von `/geraete.html` ist die Arbeitsliste fuer diese Datei |
 | `data/state/geraete_db.json` | Aktueller Stand je Listung, mit Zwei-Stufen-Auslistung wie `promo_db.json`. Nichts wird geloescht - genau daraus entsteht die Listungsdauer |
 | `data/state/geraete_preise.jsonl` | NUR die Aenderungspunkte des Preises. Ein unveraenderter Preis schreibt keine Zeile; die rechte Kante jeder Kurve ist `last_verified` in der DB |
+| `data/state/geraete_tco.json` | Buendel (SKU x Anbieter x Tarif) und die SIM-only-Referenz je Anbieter und Tarif — die Posten, aus denen `tco_model.tco_24()` die Leitzahl rechnet. **Eigene Datei, eigene IDs** (`buendel--…`, `simonly--…`), damit keine `listung_id` verschoben werden kann; **ein Datensatz zeigt EINE Messung**, weil eine TCO eine Summe ist. Wird erst angelegt, wenn ein Lauf Buendel liefert |
 | `config/lieferzeit_warenkorb.yaml` | Der feste Warenkorb des Lieferzeit-Radars: Produkte mit EINER Variante, eine Test-PLZ, je Anbieter das Ident-Verfahren |
 | `config/fruehwarnung.yaml` | Fuenf CTM-Kernfragen mit falsifizierbaren Indikatoren. Der Wert steckt darin, dass sie VORHER feststehen |
 | `data/state/clusters.jsonl` | Ereignis-Gedaechtnis. ID aus der kanonischen URL, nie aus dem Titel |

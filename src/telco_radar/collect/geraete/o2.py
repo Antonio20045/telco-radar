@@ -78,6 +78,7 @@ import re
 from typing import Optional
 
 from . import GeraeteAbrufFehler
+from ...geraete_model import probe_geht_auf
 
 # "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh"
 #   -> Speicher 256, Farbe "canyon"
@@ -101,10 +102,6 @@ _BUENDEL_RE = re.compile(r"\bmit\b", re.IGNORECASE)
 # deswegen aber nicht auch noch seine Preisform verlieren.
 _RATEN_RE = re.compile(r"-(?P<raten>\d+)x\w+$")
 
-# Der Cent, um den eine Rechenprobe danebenliegen darf. Groesser gewaehlt
-# waere sie keine Probe mehr, kleiner scheiterte sie an der Rundung.
-_TOLERANZ = 0.01
-
 
 def _preis(wert) -> Optional[float]:
     try:
@@ -124,14 +121,17 @@ def _laufzeit(angebot: str, anzahlung: Optional[float],
     Messbefund nennt - hier wird sie zur Bedingung, statt nur protokolliert
     zu werden. Faellt sie durch, gibt es kein Etikett; die Zahl bleibt, was
     sie ist, und behauptet nur nichts mehr ueber ihre Form.
+
+    Gerechnet wird sie in `geraete_model.probe_geht_auf` und nur dort - der
+    Ratengesamtbetrag im Buendel (`tco_model`) prueft mit derselben Zeile.
+    Hier steht das, was NUR fuer o2 gilt: dass die Ratenzahl im
+    Angebotsnamen steht.
     """
     m = _RATEN_RE.search(angebot or "")
-    if not m or anzahlung is None or monatsrate is None or gesamt is None:
+    if not m:
         return None
     raten = int(m.group("raten"))
-    if raten <= 0:
-        return None
-    if abs(anzahlung + raten * monatsrate - gesamt) > _TOLERANZ:
+    if not probe_geht_auf(anzahlung, monatsrate, raten, gesamt):
         return None
     return raten
 
