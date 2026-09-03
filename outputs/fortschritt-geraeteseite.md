@@ -510,3 +510,72 @@ Zuschnitt** — nicht, weil er unwichtig wäre.
    Challenge-Umgehung.
 5. `mobilcom-debitel` steht weiter auf `laeufe: 0` (Zeitbudget), womit die drei
    Zeilen fehlen, die dem Nachfolger-Effekt eine gemessene Grundlage gäben.
+
+---
+
+## Nachlauf 03.09.2026: die vier Tests, die der neue Datenstand umgeworfen hat
+
+Nach dem Rebase war die volle Suite **2312 grün, 4 rot**. Alle vier hingen an der
+Datenänderung der Nacht, keiner an der ausgelieferten Seite. Ein Opus-Bauer hat sie
+umgebaut, mit der ausdrücklichen Vorgabe **scharf machen, nicht grün machen**.
+
+| Test | Fall | Was jetzt geprüft wird |
+|---|---|---|
+| `…kette_der_auslieferung…` | Zustand festgenagelt | Die festen `(370, 366, 358)` sind weg. Geprüft werden Beziehungen: `fertig ⊆ geprueft ⊆ sichtbar`, `|gestrichen| == zahlen["aussortiert"]`, jede gestrichene Zeile hat einen Überlebenden mit demselben Zwillingsschlüssel. Die exakten Zahlen stehen jetzt an einer **gestellten** Lage |
+| `…verliert_nur_o2_zeilen…` | Fall existiert nicht mehr | Die zehn o2-Zwillinge sind ausgelistet, `bereinige()` nimmt am 03.09. **null** Zeilen weg. Die Zusicherung prüft jetzt eine konstruierte Zwillingsmenge (mit Gegenprobe: gleiche Zeilen, verschiedene Preise → niemand fällt); gegen die echten Daten bleibt nur, was dauerhaft gilt — kein fremder Anbieter fällt, auch bei null Zwillingen |
+| `…traegt_heute_keine_lifecycle_zeile` | Schwelle genommen | Umbenannt: eine Zeile entsteht **erst ab** `MIND_TAGE_JE_GERAET`. Fixture mit 20 und mit 21 Tagen, beide mit denselben vier Terminen, damit die Termin-Bedingung nicht mitentscheidet |
+| `…gegenprobe_je_anbieter_gegen_je_listung` | **kein Produktionsfehler** | siehe unten |
+
+**Der vierte war der einzige Kandidat für einen echten Fehler, und er war keiner.**
+Meine eigene Hypothese — die Galaxy A17 nehme die Schwelle über zugerechnete
+Anbietertermine — ist **widerlegt**: die Listung trägt fünf **eigene** Preispunkte.
+Die Gegenprobe sah eine A17-Zeile nur, weil sie selbst `first_seen` aller Listungen
+auf 2020 zurückdreht, um die Tages-Schwelle aus der Messung zu nehmen. Sie
+verwechselte „keine zugerechneten Termine" mit „keine Zeilen".
+
+**Selbst nachgerechnet, unabhängig vom Bauer:** `auswertung()` liefert auf den echten
+Daten **genau eine** `dauern`-Zeile — „iPhone 15 · ALDI TALK · refurbished ·
+23 Tage", dieselbe, die auf der Seite steht. Keine A17-Zeile, weder erzeugt noch
+weggefiltert.
+
+**Mutationsprobe, von mir selbst durchgeführt** (nicht die gemeldete): Tages-Schwelle
+in `geraete_lifecycle.py:736` entfernt → **6 Tests rot**, darunter beide neuen. Datei
+danach wiederhergestellt.
+
+Stand: `tests/test_geraete_bereinigung.py` + `tests/test_geraete_lifecycle.py`
+**100 grün**, restliche Suite **2219 grün / 2 übersprungen / 0 rot**.
+
+### Neuer Befund, oberster offener Punkt: zwei Telefone unter einer `sku_id`
+
+Beim Nachrechnen des A17-Falls gefunden, **vorbestehend und heute schon live**:
+
+ALDI TALK führt unter der einen Listung `aldi-talk--samsung-galaxy-a17-128gb-schwarz`
+**zwei verschiedene Geräte**:
+
+| Quell-URL | Preis |
+|---|---|
+| `…a17-**lte**-128-gb-black-**sm-a175f**-dsb--beclad-starter-kit…` | **129,00 €** |
+| `…a17-**5g**-128-gb-black-**sm-a176b**-ds…` | 155,00 € → 159,00 € |
+
+Vodafones Vergleichsseite ist `samsung-galaxy-a17-**5g**.html`, 219,90 €. Die
+Alarmzeile auf der Startansicht — **„Galaxy A17 · ALDI TALK · 219,90 gegen 129,00 ·
+41,3 % · KRITISCH"** — vergleicht damit **ein 5G-Gerät mit einem LTE-Gerät**. Gegen
+ALDIs echtes 5G-Modell wären es 159,00 €, also **27,7 %**. Die Zeile bleibt der
+Sache nach richtig (ALDI ist billiger), die **Zahl ist es nicht**.
+
+Nebenwirkung: jeder Nachtlauf schreibt beide Preise als Änderungspunkt (129 → 159 →
+129 …) — zwei Punkte je Datum an allen fünf Messtagen. Es ist die dokumentierte
+Sägezahn-Klasse, nur eine Stufe früher: nicht ein falsch getroffener Katalogeintrag,
+sondern **zwei Produkte auf einer `sku_id`**.
+
+**Warum die Plausibilitätsprüfung es durchlässt, ist genau benennbar:** 129 € gegen
+159 € ist eine Spanne von **23,3 %**, und `SPANNE_GRENZE` steht auf 30 % — kalibriert
+an echten Farbaufschlägen (5,7–21,6 %) gegen echte Fehler (53 % und 112 %). Der Fall
+liegt in der Lücke. **Die Schwelle zu senken wäre die falsche Antwort** — sie löschte
+wahre Farbpreise. Die Wurzel ist die fehlende Variantendimension (LTE/5G) in der
+`sku_id`, und die zu ändern ist laut CLAUDE.md eine **Datenwanderung**: der
+Altbestand gälte als ausgelistet und entstünde neu, Listungsdauer und Preisverlauf
+jedes betroffenen Geräts fielen auf null.
+
+**Deshalb hier nicht gebaut.** Es ist ein eigenes Paket mit eigener Migration, kein
+Nebenfix vor einem Merge. Es ist die einzige betroffene Listung im ganzen Bestand.

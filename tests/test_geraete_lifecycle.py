@@ -6,6 +6,7 @@ zeichnen ist trivial, und sie sieht gut aus. Deshalb steht in jedem
 Ergebnis, worauf es beruht, und unter `_MIND_PUNKTE` Messpunkten heisst es
 "Datenbasis noch duenn" - nicht "Trend".
 """
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
@@ -22,6 +23,9 @@ from telco_radar.analyze.geraete_lifecycle import (
     preisverfall,
     verweildauer_nach_nachfolger,
 )
+# Privat, und bewusst: die Zuordnung einer Zeile zu ihrem Regalplatz haengt
+# an genau dieser Ableitung. Wer sie im Test nachbaut, prueft seinen Nachbau.
+from telco_radar.analyze.geraete_lifecycle import _zustand_etikett
 from telco_radar.analyze.geraete_store import (
     STATUS_AKTIV,
     STATUS_AUSGELISTET,
@@ -813,52 +817,62 @@ _DB = _WURZEL / "data" / "state" / "geraete_db.json"
 _HISTORIE = _WURZEL / "data" / "state" / "geraete_preise.jsonl"
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
-def test_der_echte_bestand_traegt_heute_keine_lifecycle_zeile():
-    db = GeraeteDB(_DB)
-    historie = Preishistorie(_HISTORIE)
-    katalog = lade_katalog(_WURZEL)
-    alle = db.eintraege()
-    punkte = historie.alle_punkte()
+def _termine_im_fenster(erster, letzter, anzahl=MIND_TERMINE_JE_GERAET):
+    """`anzahl` Prueftermine zwischen den beiden Tagen, Raender eingeschlossen."""
+    von, bis = date.fromisoformat(erster), date.fromisoformat(letzter)
+    schritt = (bis - von) / (anzahl - 1)
+    return [(von + schritt * i).isoformat() for i in range(anzahl)]
 
-    # Dieselbe Vorbereitung wie in `report/geraete_view.py`.
-    termine_je_anbieter, laeufe_je_anbieter = {}, {}
-    for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
-        termine = set(db.messtermine(name))
-        termine.update(p.get("datum") for p in punkte
-                       if p.get("anbieter") == name and p.get("datum"))
-        termine_je_anbieter[name] = sorted(termine)
-        laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
 
-    a = auswertung(alle, punkte, katalog, heute="2026-08-31",
-                   laeufe_je_anbieter=laeufe_je_anbieter,
-                   termine_je_anbieter=termine_je_anbieter)
+def test_eine_verweildauer_zeile_entsteht_erst_ab_der_tages_schwelle():
+    """Fall (c): die Datenlage hat die Schwelle genommen, also prueft der
+    Test jetzt die Schwelle statt den Zustand von gestern.
 
-    spannen = [listungsdauer(e) for e in alle]
-    laengste = max([s for s in spannen if s is not None], default=0)
-    assert laengste < MIND_TAGE_JE_GERAET, (
-        f"laengste Beobachtung {laengste} Tage - die Datenlage hat die "
-        f"Schwelle genommen. Seite ansehen, nicht den Test anpassen.")
+    Bis zum 03.09.2026 hiess dieser Test
+    `test_der_echte_bestand_traegt_heute_keine_lifecycle_zeile` und
+    behauptete `a["dauern"] == []`. Das war eine Aussage ueber die
+    Messdauer, nicht ueber die Mechanik: seit dem Nachtlauf vom 02.09.2026
+    steht das refurbished iPhone 15 bei ALDI TALK 23 Tage im Regal, und die
+    Zeile "Verweildauer im Regal - 23 Tage" steht zu Recht auf der Seite.
 
-    assert a["duenn"] is True
-    assert a["dauern"] == []
-    assert a["verfaelle"] == [] and a["trends"] == []
-    assert a["nachfolger"] == [], (
-        "Nachfolger-Zeilen ohne 4 Messtermine ueber 21 Tage: "
-        f"{[z['device_id'] for z in a['nachfolger']]}")
-    # Die Portfolio-Tiefe traegt dagegen vollstaendig - sie braucht keine
-    # Historie, nur den heutigen Bestand.
-    assert a["portfolio"], "ohne Portfolio-Tiefe waere die Sektion leer"
-    assert all(t["modelle_anzahl"] >= t["generationen"] for t in a["portfolio"])
+    Geprueft wird deshalb die Regel, die dahinter steht, in BEIDEN Zweigen:
+    ein Regalplatz mit `MIND_TAGE_JE_GERAET - 1` Tagen bekommt keine Zeile,
+    derselbe Regalplatz mit `MIND_TAGE_JE_GERAET` Tagen bekommt eine. Beide
+    Lagen tragen dieselben vier Prueftermine im eigenen Fenster - sonst
+    entschiede der Test ueber die Termin-Bedingung statt ueber die
+    Tages-Schwelle, und das misst schon
+    `test_die_termin_schwelle_zaehlt_je_listung_nicht_je_anbieter`.
+    """
+    letzter = "2026-04-01"
+    knapp_darunter = (date.fromisoformat(letzter)
+                      - timedelta(days=MIND_TAGE_JE_GERAET - 1)).isoformat()
+    genau_drauf = (date.fromisoformat(letzter)
+                   - timedelta(days=MIND_TAGE_JE_GERAET)).isoformat()
+
+    for erster, erwartet in ((knapp_darunter, 0), (genau_drauf, 1)):
+        eintrag = _termin_eintrag("l1", first=erster, last=letzter)
+        termine = {"Medimax": _termine_im_fenster(erster, letzter)}
+        # Die Termin-Bedingung ist in BEIDEN Lagen erfuellt; unterschieden
+        # wird allein die Spanne.
+        assert len(termine["Medimax"]) == MIND_TERMINE_JE_GERAET
+        a = auswertung([eintrag], [], _KATALOG, heute="2026-04-02",
+                       termine_je_anbieter=termine)
+        assert len(a["dauern"]) == erwartet, (erster, a["dauern"])
+        if erwartet:
+            assert a["dauern"][0]["tage"] == MIND_TAGE_JE_GERAET
 
 
 def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
     """Der echte Bestand, wahlweise nach einem simulierten NACHTLAUF.
 
-    Der Zustand von heute ist der, in dem dieses Feature SCHLAEFT: die
-    laengste Beobachtung misst 20 Tage, die Schwelle 21. Wer nur ihn misst,
-    misst nichts. `nachtlauf=True` bestaetigt jede aktive Listung auf den
-    31.08.2026 und ergaenzt den Anbieter-Termin - der Zustand von morgen.
+    `nachtlauf=True` bestaetigt jede aktive Listung auf den 31.08.2026 und
+    ergaenzt den Anbieter-Termin. Das war der "Zustand von morgen", als der
+    Bestand am 31.08.2026 noch keine Listung ueber der Tages-Schwelle trug;
+    seit dem Nachtlauf vom 02.09.2026 gibt es sie (23 Tage), und der
+    simulierte Termin liegt vor dem echten Stand. Die Simulation bleibt
+    trotzdem der schaerfere Fall fuer die zwei Tests, die sie benutzen: sie
+    stellt die Nullzeilen-Lage her, in der VIELE Listungen die Spanne gerade
+    eben nehmen.
     """
     db = GeraeteDB(_DB)
     historie = Preishistorie(_HISTORIE)
@@ -883,6 +897,44 @@ def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
         laeufe_je_anbieter = {n: laeufe_ueberschreiben
                               for n in laeufe_je_anbieter}
     return alle, punkte, katalog, termine_je_anbieter, laeufe_je_anbieter
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_jede_lifecycle_zeile_des_echten_bestands_nimmt_die_schwelle():
+    """Was am echten Bestand gilt, egal wie lange schon gemessen wird.
+
+    Nicht mehr "es gibt keine Zeile" (das war der Zustand bis zum
+    02.09.2026), sondern: JEDE Zeile, die entsteht, ist durch die Schwelle
+    gedeckt - `MIND_TAGE_JE_GERAET` Tage zwischen erster und letzter
+    Bestaetigung ihres Regalplatzes, und mindestens eine ihrer Listungen mit
+    genug Messterminen. Eine Zeile ueber einen Regalplatz, den es so nicht
+    gibt, faellt hier auf.
+    """
+    alle, punkte, katalog, termine, laeufe = _echter_bestand()
+    a = auswertung(alle, punkte, katalog, heute="2026-09-03",
+                   laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
+
+    zugeordnet = 0
+    for zeile in a["dauern"]:
+        gruppe = [e for e in alle
+                  if (e.get("device_id"), e.get("anbieter"),
+                      _zustand_etikett(e)) == (zeile["device_id"],
+                                               zeile["anbieter"],
+                                               zeile["zustand"])]
+        assert gruppe, zeile
+        zugeordnet += 1
+        erste = min(e["first_seen"] for e in gruppe)
+        letzte = max(e["last_verified"] for e in gruppe)
+        spanne = (date.fromisoformat(letzte) - date.fromisoformat(erste)).days
+        assert zeile["tage"] == spanne >= MIND_TAGE_JE_GERAET, (zeile, spanne)
+        assert zeile["varianten"] == len(gruppe)
+    # Ein Lookup, der ins Leere geht, ist gruen und prueft nichts.
+    assert zugeordnet == len(a["dauern"])
+
+    # Die Portfolio-Tiefe traegt unabhaengig von der Historie - sie braucht
+    # nur den heutigen Bestand.
+    assert a["portfolio"], "ohne Portfolio-Tiefe waere die Sektion leer"
+    assert all(t["modelle_anzahl"] >= t["generationen"] for t in a["portfolio"])
 
 
 @pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
@@ -951,21 +1003,53 @@ def test_ohne_vollstaendigen_lauf_wird_nichts_zugerechnet():
     assert zugerechnet, "die Zurechnung greift bei vollstaendigem Lauf"
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
-def test_die_gegenprobe_je_anbieter_gegen_je_listung():
-    """Die Messung, wegen der die Zaehlung umgestellt wurde.
+def _eigene_messtage(gruppe, punkte) -> int:
+    """Die Tage, an denen DIESE Listungen selbst gemessen wurden.
 
-    Festgenagelt ist nicht die Zahl (sie waechst mit jedem Nachtlauf),
-    sondern die EIGENSCHAFT: verschiebt man dieselbe ANZAHL Prueftermine aus
-    dem Fenster der Listungen heraus, muessen Zeilen verschwinden. Unter der
-    alten Rechnung aendert sich nichts - sie zaehlt nur die Laenge der Liste.
+    Also ihre eigenen Preispunkte plus `erstpreis_am` und `last_verified` -
+    ohne jeden zugerechneten Prueftermin ihres Anbieters. Das ist die eine
+    Groesse, die von `termine_je_anbieter` gar nicht abhaengt.
+    """
+    ids = {e.get("id") for e in gruppe}
+    tage = {p["datum"] for p in punkte
+            if p.get("listung_id") in ids and p.get("datum")}
+    for e in gruppe:
+        tage.update(t for t in (e.get("erstpreis_am"), e.get("last_verified"))
+                    if t)
+    return len(tage)
+
+
+@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+def test_ein_prueftermin_ausserhalb_des_fensters_traegt_keine_zeile():
+    """Fall (d), ergebnisoffen geprueft: KEIN Fehler im Produktionscode.
+
+    Bis zum 03.09.2026 verlangte dieser Test `ausserhalb["dauern"] == []`
+    und meldete "1 Zeile aus Terminen ausserhalb jedes Fensters" - die
+    Galaxy A17 bei ALDI TALK. Nachgerechnet an
+    `data/state/geraete_preise.jsonl`: diese Listung traegt EIGENE
+    Preispunkte am 29., 30., 31.08. sowie am 01. und 02.09.2026, also fuenf
+    eigene Messtage. Sie nimmt die Termin-Schwelle ohne jeden zugerechneten
+    Anbietertermin - die Zeile ist berechtigt, und die alte Zusicherung
+    verwechselte "keine zugerechneten Termine" mit "keine Zeilen".
+
+    (Ihre echte Spanne ist 4 Tage; im ausgelieferten Bestand entsteht die
+    Zeile deshalb gar nicht. Sie erscheint nur hier, weil die Gegenprobe
+    `first_seen` aller Listungen auf 2020 zurueckdreht, um die
+    Tages-Schwelle aus der Messung zu nehmen.)
+
+    Festgenagelt ist damit die EIGENSCHAFT, nicht die Zahl: verschiebt man
+    dieselbe ANZAHL Prueftermine aus dem Fenster der Listungen heraus,
+    muessen Zeilen verschwinden - und was uebrig bleibt, traegt sich aus
+    eigenen Messtagen. Unter der alten Rechnung (je Anbieter gezaehlt)
+    aendert sich nichts, sie zaehlt nur die Laenge der Liste.
 
     Zwei Stellschrauben halten die Messung auf der Termin-Bedingung: die
     Spannen des echten Bestands liegen unter 21 Tagen, deshalb wird
     `first_seen` fuer beide Laeufe gleich weit zurueckgesetzt; und der
     Laufzahl-Boden wuerde einen Anbieter mit >= 4 vollstaendigen Laeufen
-    unabhaengig von jedem Termin durchlassen, deshalb steht er hier fuer alle
-    auf 1 - das erlaubt die Zurechnung (B2) und traegt keine Zeile allein.
+    unabhaengig von jedem Termin durchlassen, deshalb steht er hier fuer
+    alle auf 1 - das erlaubt die Zurechnung (B2) und traegt keine Zeile
+    allein.
     """
     alle, punkte, katalog, termine_je_anbieter, laeufe = _echter_bestand(
         laeufe_ueberschreiben=1)
@@ -987,10 +1071,28 @@ def test_die_gegenprobe_je_anbieter_gegen_je_listung():
                             laeufe_je_anbieter=laeufe,
                             termine_je_anbieter=verschoben)
 
-    assert im_fenster["dauern"], "ohne Durchlaesser prueft die Gegenprobe nichts"
-    assert ausserhalb["dauern"] == [], (
-        f"{len(ausserhalb['dauern'])} Zeilen aus Terminen ausserhalb jedes "
-        f"Fensters")
+    schluessel = lambda a: {(d["device_id"], d["anbieter"], d["zustand"])
+                            for d in a["dauern"]}
+    drin, draussen = schluessel(im_fenster), schluessel(ausserhalb)
+    assert drin, "ohne Durchlaesser prueft die Gegenprobe nichts"
+    assert draussen < drin, (
+        "die verschobenen Termine kosten keine einzige Zeile - gezaehlt wird "
+        "wieder je Anbieter statt im Fenster der Listung")
+
+    # Und die Uebriggebliebenen haengen an keinem Termin: sie tragen ihre
+    # Messtage selbst. Ohne diese Zeile bliebe offen, ob die Gegenprobe
+    # zufaellig etwas durchgelassen hat.
+    for zeile in ausserhalb["dauern"]:
+        gruppe = [e for e in gedehnt
+                  if (e.get("device_id"), e.get("anbieter"),
+                      _zustand_etikett(e)) == (zeile["device_id"],
+                                               zeile["anbieter"],
+                                               zeile["zustand"])]
+        assert gruppe, zeile
+        assert _eigene_messtage(gruppe, punkte) >= MIND_TERMINE_JE_GERAET, (
+            f"{zeile['device_id']} bei {zeile['anbieter']} steht ohne eigene "
+            f"Messtage da - dann kam die Zeile doch aus einem zugerechneten "
+            f"Termin ausserhalb ihres Fensters")
 
 
 # --------------------------------------------------------------------------

@@ -343,26 +343,97 @@ def _echter_bestand():
             if e.get("status") in ("aktiv", "vermutlich ausgelistet")]
 
 
-def test_die_kette_der_auslieferung_am_echten_bestand():
-    """Die Zahl, die auf der Seite steht - nicht die dieses Teilstuecks.
+def _ids(eintraege):
+    return {e["id"] for e in eintraege}
 
-    Ausgeliefert wird `geraete_view.geprueft_und_bereinigt()`, also
-    `pruefe()` UND DANN `bereinige()`. Beide Zahlen auseinanderzuhalten ist
-    der Zweck dieses Tests: `bereinige()` allein nimmt zehn Paare, in der
-    Kette sind es acht, weil `pruefe()` zwei Haelften vorher als falsch
-    gespeicherten Zustand herauswirft.
 
-    Die Zahlen sind am Bestand vom 30.08.2026 gemessen. Aendert ein
-    Nachtlauf den Bestand, faellt dieser Test - und dann gehoert nachgesehen,
-    ob die Kette noch dasselbe tut, nicht die Zahl blind nachgezogen. Das
-    ist der eine Test, der die echten Daten anfasst; die Zusicherungen
-    darunter gelten unabhaengig vom Datenstand.
+def test_die_kette_der_auslieferung_nimmt_nur_weg_was_sie_meldet():
+    """Fall (a): der Test nagelte einen ZUSTAND fest, wo eine REGEL gilt.
+
+    Bis zum 03.09.2026 stand hier `(len(sichtbar), len(geprueft),
+    len(fertig)) == (370, 366, 358)` - drei am Bestand vom 30.08.2026
+    abgelesene Zahlen. Zwei Nachtlaeufe spaeter waren es (378, 376, 376),
+    und der Test meldete den naechsten Nachtlauf statt den naechsten Umbau:
+    dieselbe Fehlerklasse wie die Datums-Zeitbomben aus CLAUDE.md. Die
+    exakten Zahlen stehen jetzt in
+    `test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage`
+    auseinander, wo sie aus einer gestellten Lage kommen und nicht aus
+    `data/state/`.
+
+    Gegen die echten Daten gilt hier nur noch, was dauerhaft gelten MUSS:
+
+    1. Die Kette nimmt weg, sie erfindet nicht - `fertig` liegt in
+       `geprueft` liegt in `sichtbar`.
+    2. `pruefe()` streicht genau dann, wenn sie es auch meldet. Die Zahl
+       `zahlen["aussortiert"]` steht auf `/geraete-quellen.html`; laufen
+       Streichung und Meldung auseinander, behauptet die Seite eine
+       Datenlage, die es nicht gibt.
+    3. `bereinige()` faellt nur ueber ZWILLINGE: zu jeder gestrichenen
+       Zeile bleibt eine mit demselben Zwillingsschluessel stehen.
+    4. Die Kette ist nie laenger als `bereinige()` allein - das ist der
+       Punkt, den die alten drei Zahlen zeigen sollten: vorher zu pruefen
+       kann Zeilen kosten, nie welche schaffen.
     """
     sichtbar = _echter_bestand()
-    geprueft = pruefe(sichtbar, lade_katalog(_WURZEL))["sauber"]
+    bericht = pruefe(sichtbar, lade_katalog(_WURZEL))
+    geprueft = bericht["sauber"]
     fertig = bereinige(geprueft)
-    assert (len(sichtbar), len(geprueft), len(fertig)) == (370, 366, 358)
-    assert len(bereinige(sichtbar)) == 360
+
+    assert _ids(fertig) <= _ids(geprueft) <= _ids(sichtbar)
+
+    gestrichen = _ids(sichtbar) - _ids(geprueft)
+    assert len(gestrichen) == bericht["zahlen"]["aussortiert"]
+    assert bool(gestrichen) == any(b["entfernt"] for b in bericht["befunde"]), (
+        "gestrichen ohne Befund oder Befund ohne Streichung")
+
+    ueberlebende = {_zwillingsschluessel(e) for e in fertig}
+    for weg in (e for e in geprueft if e["id"] not in _ids(fertig)):
+        assert _zwillingsschluessel(weg) in ueberlebende, (
+            f"{weg['id']} ist keine doppelt gefuehrte Zeile, sondern weg")
+
+    assert len(fertig) <= len(bereinige(sichtbar))
+
+
+def test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage():
+    """Die exakten Zahlen - aus einer GESTELLTEN Lage, nicht aus dem Store.
+
+    Sechs Zeilen, in denen jeder Schritt genau einmal greift: ein
+    o2-Zwillingspaar (dieselbe Adresse, derselbe Preis, die alte
+    Schreibweise gealtert daneben), ein Doppelpreis-Paar, das `pruefe()`
+    ganz herauswirft, und zwei echte Vodafone-Farbvarianten, die beide
+    Schritte ueberstehen muessen.
+
+    Damit steht wieder da, was die alte Fassung an den echten Daten zeigen
+    wollte: die Kette (6 -> 4 -> 3) und `bereinige()` allein (6 -> 5) sind
+    ZWEI Zahlen, weil `pruefe()` das Doppelpreis-Paar wegnimmt, bevor die
+    Zwillingssuche es sieht.
+    """
+    url = "https://www.o2online.de/e-shop/iphone-15-mitternacht-erneuert-details"
+    zwilling_alt = _e(farbe_roh="mitternacht erneuert", preis=445.0, url=url,
+                      status="vermutlich ausgelistet", abgerufen="2026-08-29",
+                      kennung="o2-alt")
+    zwilling_neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz",
+                      preis=445.0, url=url, kennung="o2-neu")
+    # Zwei Preise fuer dieselbe Farbe desselben Geraets: ein Widerspruch mit
+    # sich selbst, den `pruefe()` als Doppelpreis herauswirft - beide
+    # Haelften, weil der Datensatz nicht sagt, welche stimmt.
+    doppel = [_e(gid="apple-iphone-16", farbe_roh="blau", farbe_norm="blau",
+                 zustand="neu", preis=preis, kennung=f"doppel-{preis:.0f}",
+                 url=f"https://www.o2online.de/e-shop/iphone-16-{preis:.0f}")
+              for preis in (699.0, 899.0)]
+    varianten = [
+        _e(anbieter="Vodafone", gid="apple-iphone-17", speicher=256,
+           farbe_roh=farbe, zustand="neu", preis=949.9, kennung=f"vf-{farbe}",
+           url="https://www.vodafone.de/privat/handys/iphone-17.html")
+        for farbe in ("Salbei", "Nebelblau")]
+
+    sichtbar = [zwilling_alt, zwilling_neu, *doppel, *varianten]
+    bericht = pruefe(sichtbar, lade_katalog(_WURZEL))
+    fertig = bereinige(bericht["sauber"])
+
+    assert (len(sichtbar), len(bericht["sauber"]), len(fertig)) == (6, 4, 3)
+    assert len(bereinige(sichtbar)) == 5, "ohne Pruefung bleibt das Doppelpaar"
+    assert _ids(fertig) == {"o2-neu", "vf-Salbei", "vf-Nebelblau"}
 
 
 def test_am_echten_bestand_bleibt_keine_farbe_mit_zustandswort():
@@ -374,15 +445,66 @@ def test_am_echten_bestand_bleibt_keine_farbe_mit_zustandswort():
     assert uebrig == []
 
 
-def test_am_echten_bestand_verliert_nur_o2_zeilen():
-    """Die Zwillinge stammen alle aus o2s Umbenennung. Faellt hier ein
-    anderer Anbieter, hat der Schluessel echte Ware eingeebnet - und das
-    faellt sonst erst auf, wenn jemand die Seite mit dem Markt vergleicht."""
-    sichtbar = _echter_bestand()
-    behalten = {e["id"] for e in bereinige(sichtbar)}
-    weg = [e for e in sichtbar if e["id"] not in behalten]
-    assert weg, "kein einziger Zwilling gefunden - der Test misst nichts"
+def test_der_zwilling_faellt_und_die_echte_ware_daneben_bleibt():
+    """Fall (b): der gemessene Fall gibt es in den echten Daten nicht mehr.
+
+    Die zehn verschmutzten o2-Zwillinge vom 29.08.2026 sind inzwischen
+    ausgelistet und fallen aus `sichtbar`; am Bestand vom 03.09.2026 nimmt
+    `bereinige()` NULL Zeilen weg. Der alte Test hier verlangte deshalb zu
+    Recht `assert weg` und fiel durch - still gruen werden darf er nicht
+    ("ein Test, dessen Lookup ins Leere geht, ist gruen und prueft nichts").
+
+    Die Zusicherung steht jetzt an einer GESTELLTEN Lage, in der sie
+    greifen MUSS: ein o2-Zwillingspaar neben zwei echten
+    Vodafone-Farbvarianten und einer zweiten o2-Adresse. Weg darf genau die
+    gealterte Haelfte des Paares.
+
+    Die Gegenprobe steht im selben Test: nimmt man dem Paar seine
+    Zwillingseigenschaft (verschiedene Preise), faellt niemand mehr - sonst
+    waere die erste Haelfte auch dann erfuellt, wenn die Regel alles
+    einebnete.
+    """
+    url = "https://www.o2online.de/e-shop/iphone-15-mitternacht-erneuert-details"
+    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
+             abgerufen="2026-08-29", preis=445.0, url=url, kennung="o2-alt")
+    neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz", preis=445.0,
+             url=url, kennung="o2-neu")
+    andere_adresse = _e(farbe_roh="blau", farbe_norm="blau", preis=445.0,
+                        url="https://www.o2online.de/e-shop/iphone-15-blau",
+                        kennung="o2-blau")
+    varianten = [
+        _e(anbieter="Vodafone", gid="apple-iphone-17", speicher=256,
+           farbe_roh=farbe, zustand="neu", preis=949.9, kennung=f"vf-{farbe}",
+           url="https://www.vodafone.de/privat/handys/iphone-17.html")
+        for farbe in ("Salbei", "Nebelblau")]
+
+    bestand = [alt, neu, andere_adresse, *varianten]
+    behalten = _ids(bereinige(bestand))
+    weg = [e for e in bestand if e["id"] not in behalten]
+    assert [e["id"] for e in weg] == ["o2-alt"]
     assert {e["anbieter"] for e in weg} == {"o2"}
+
+    # Gegenprobe: ohne die Zwillingseigenschaft faellt keine Zeile.
+    kein_zwilling = [{**alt, "preis_ohne_vertrag": 399.0}, neu,
+                     andere_adresse, *varianten]
+    assert len(bereinige(kein_zwilling)) == len(kein_zwilling), (
+        "der gestellte Fall loest gar keine Zusammenfassung aus")
+
+
+def test_am_echten_bestand_faellt_kein_fremder_anbieter():
+    """Was am echten Bestand DAUERHAFT gilt - auch bei null Zwillingen.
+
+    Die Zwillinge stammen alle aus o2s Umbenennung. Faellt hier ein anderer
+    Anbieter, hat der Schluessel echte Ware eingeebnet - und das faellt
+    sonst erst auf, wenn jemand die Seite mit dem Markt vergleicht. Ob es
+    heute ueberhaupt einen Zwilling gibt, ist eine Frage der Datenlage und
+    steht deshalb NICHT mehr als Zusicherung hier; dass die Regel greift,
+    wenn es einen gibt, misst der Test darueber an gestellten Zeilen.
+    """
+    sichtbar = _echter_bestand()
+    behalten = _ids(bereinige(sichtbar))
+    weg = [e for e in sichtbar if e["id"] not in behalten]
+    assert {e["anbieter"] for e in weg} <= {"o2"}, [e["id"] for e in weg]
 
 
 def test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden():
