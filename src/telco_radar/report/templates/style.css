@@ -1958,7 +1958,7 @@ b,strong{font-weight:700}
 /* Die Positionskarte ist ein gerechnetes SVG (report/geraete_view._karte),
    keine Bibliothek - dieselbe Bauform wie die Tarifkarte. Hier steht nur,
    wie sie aussieht; WO die Punkte sitzen, entscheidet Python. */
-.gr-bilanz,.gr-karte,.gr-auffaellig,.gr-matrix,.gr-lifecycle,.gr-luecken,
+.gr-karte,.gr-auffaellig,.gr-matrix,.gr-lifecycle,
 .gr-quellen,.gr-methode,.gr-leer{margin:26px 0 34px}
 .gr-erklaer,.gr-legende,.gr-basis,.gr-ruhe{font-size:13.5px;line-height:1.6;
   color:var(--ink-2);max-width:74ch;margin:8px 0 14px}.gr-unter{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;

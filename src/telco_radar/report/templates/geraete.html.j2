@@ -23,12 +23,13 @@
    Alle Tafeln stehen fertig im HTML - der Reiter blendet um, er laedt nicht
    neu und braucht kein Netz.
 
-   Die Vollstaendigkeitsangabe steht seit dem 30.08.2026 UNTEN, nicht mehr
-   oben. Der Grund ist nicht, dass sie unwichtig waere, sondern dass sie den
-   besten Platz der Seite belegte, ohne zu einer Handlung zu fuehren
-   ("250 Varianten"). Sie nennt weiterhin, wie viele der 23 Anbieter wirklich
-   liefern - eine Preisuebersicht mit vier von dreiundzwanzig ist keine
-   Marktuebersicht und darf nicht so aussehen. #}
+   Seit dem 03.09.2026 traegt die Seite KEINE Erklarsektionen mehr: der
+   Einleitungssatz ueber die Preisbasis, der Betriebszahlenabsatz ("Wie
+   vollstaendig ist das") und die Sektion "Datenbasis und Luecken" sind auf
+   Antonios Auftrag geloescht. Wer liefern sollte und warum nicht, steht auf
+   geraete-quellen.html; die Arbeitslisten (unbekannte Farbschreibweisen,
+   Titel ohne Katalogtreffer) stehen im Protokoll des naechtlichen Laufs -
+   geraete.html ist eine Leseseite, kein Pflegeradar. #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
 {% block title %}Vodafone Product and Services Insights · Geräte und Preise{% endblock %}
@@ -185,10 +186,6 @@
       geraete.abgerufen_bis | date_de }}</span>
     {% elif geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
   </div>
-  <p class="page-lead">Wo liegen wir im Preis zurück, was führt der
-  Wettbewerb, und wie tief ist sein Portfolio? Jeder Preis stammt aus den
-  strukturierten Produktdaten des Anbieters und trägt Quelllink und
-  Abrufdatum – geschätzte Preise gibt es hier nicht.</p>
 </section>
 
 {% if geraete.hat_daten %}
@@ -812,37 +809,44 @@
   <p class="gr-erklaer">{{ geraete.lifecycle.nachfolger_hinweis }}</p>
   {% endif %}
 </section>
+
+{# Der EINZIGE Ueberlebende der Erklaersektionen (03.09.2026). Er steht hier,
+   weil er keine Erklaerung, sondern eine Sortiments-Aussage ist: welche
+   Geraete der Wettbewerb fuehrt, die wir nicht fuehren - die Frage dieses
+   Reiters. #}
+{% if geraete.vergleich.ohne_vertrag.ohne_vodafone %}
+<details class="evidence gr-vergleich-luecke">
+  <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+    ({{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }})</summary>
+  <div class="evidence-body">
+  <ul class="gr-v-liste">
+    {% for l in geraete.vergleich.ohne_vertrag.ohne_vodafone %}
+    <li><span class="szl">{{ l.modell }}</span>
+      {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
+      <span class="gr-v-prozent">ab {{
+        '%.2f'|format(l.ab_preis)|replace('.', ',') }} €</span>
+      <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
+        else 'Anbieter' }}</span>
+      <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt > geraete.vergleich.ohne_vertrag.ohne_vodafone|length %}
+  <p class="gr-v-meta">{{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }} insgesamt.</p>
+  {% endif %}
+  </div>
+</details>
+{% endif %}
 </div>
 
+{# Der EINE Weg zur Quellenseite (B1 des Reviews vom 03.09.2026). Mit den
+   Erklaersektionen fielen alle drei Links auf geraete-quellen.html - die
+   Seite waere fertig, geprueft und fuer jeden Leser unauffindbar gewesen.
+   Eine Zeile am Fuss, kein Absatz: sie nennt kein Wort, das die Seite
+   ueber sich selbst sagt. #}
+<p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Welche
+Anbieter liefern Geräte, welche warum nicht</a>.</p>
 
-{# --- Betriebszahlen ganz unten. -------------------------------------- #}
-{# Sie standen bis zum 30.08.2026 als fuenf Kacheln UEBER der Seite. Das ist
-   der beste Platz, den diese Seite hat, und "250 Varianten" fuehrt zu keiner
-   Handlung. Als Satz am Fuss sagen dieselben Zahlen dasselbe und kosten
-   nichts. #}
-<section class="gr-bilanz">
-  <h2 class="rubrik">Wie vollständig ist das</h2>
-  <p class="gr-erklaer">Beobachtet werden {{ geraete.bilanz.geraete }} Geräte
-  in {{ geraete.bilanz.skus }} Varianten, zusammen
-  {{ geraete.bilanz.listungen }} Listungen bei
-  {{ geraete.bilanz.anbieter }} Anbietern; die Preishistorie trägt
-  {{ geraete.bilanz.preispunkte }} Änderungspunkte{%
-  if geraete.bilanz.ausgelistet %}, {{ geraete.bilanz.ausgelistet }} Listungen
-  sind ausgelistet{% endif %}.
-  Die Preise sind zuletzt am
-  <b>{{ geraete.abgerufen_bis | date_de }}</b> abgerufen worden – das ist der
-  Tag, an dem sie gemessen wurden, nicht der Tag dieser Ausgabe.
-  {{ geraete.quellenlage.liefernd }} von
-  {{ geraete.quellenlage.konfiguriert }} konfigurierten Anbietern liefern
-  Daten. Welcher warum nicht, steht auf
-  <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a> – kein
-  Anbieter fehlt dort stillschweigend.</p>
-  <p class="gr-erklaer">Beide CSV-Tabellen stehen auf jedem Reiter unter
-  „Alle exportieren“: der Bestand trägt eine Zeile je Listung, die Historie
-  eine je Listung und Messtag – ein unveränderter Preis schreibt keine Zeile.
-  UTF-8 mit BOM, Semikolon, Dezimalkomma: Excel öffnet beide im deutschen
-  Gebietsschema per Doppelklick.</p>
-</section>
 
 {% else %}
 <section class="gr-leer">
@@ -869,87 +873,4 @@
 </section>
 {% endif %}
 
-{# --- Datenbasis und Luecken ------------------------------------------ #}
-<section class="gr-luecken" id="luecken">
-  <h2 class="rubrik">Datenbasis und Lücken</h2>
-  <p class="gr-erklaer">Was fehlt, ist so wichtig wie was da ist. Eine
-  Preiskarte ohne den größten Händler des Landes ist keine Marktübersicht –
-  sie sagt es hier, statt es aussehen zu lassen wie Vollständigkeit.</p>
-
-  {% set stumm = geraete.quellenlage.zeilen | rejectattr('liefert') | list %}
-  {% if stumm %}
-  <p class="gr-erklaer">Ohne Daten sind derzeit
-    <b>{{ stumm | map(attribute='name') | join(', ') }}</b>. Der Grund steht
-    je Anbieter im Aufklapper und ausführlich auf
-    <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a>.</p>
-  <details class="evidence gr-quellenkurz">
-    <summary>Warum diese {{ stumm | length }} nichts liefern</summary>
-    <div class="evidence-body">
-      <ul class="list-card">
-        {% for z in stumm %}
-        <li class="list-row"><b>{{ z.name }}</b> – {{ z.grund or 'liefert derzeit keine Geräte' }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </details>
-  {% endif %}
-
-  {% if geraete.quellenlage.ohne_hardware %}
-  <p class="gr-ruhe">Ohne Hardware-Vermarktung beobachtet:
-  {% for z in geraete.quellenlage.ohne_hardware %}{{ z.name }}{% if not loop.last %}, {% endif %}{% endfor %}.</p>
-  {% endif %}
-
-  {% if geraete.ohne_katalog %}
-  <p class="muted-note">{{ geraete.ohne_katalog | length }} Listungen tragen ein
-  Gerät, das <code>config/geraete_katalog.yaml</code> nicht (mehr) kennt. Sie
-  stehen unter ihrer Kennung statt unter ihrem Modellnamen:
-  {{ geraete.ohne_katalog | join(', ') }}.</p>
-  {% endif %}
-
-  {% if geraete.katalog.ohne_marktstart %}
-  <p class="muted-note">{{ geraete.katalog.ohne_marktstart | length }} von
-  {{ geraete.katalog.modelle }} Modellen im Katalog haben kein belegtes
-  Marktstartdatum. Für sie gibt es keine Nachfolger-Analyse – ein geratenes
-  Datum wäre schlimmer als ein fehlendes.</p>
-  {% endif %}
-
-  {% if geraete.farbbericht %}
-  <details class="evidence">
-    <summary>{{ geraete.farbbericht | length }} unbekannte Farbschreibweisen</summary>
-    <div class="evidence-body">
-      <p>Diese Schreibweisen kennt <code>config/farben.yaml</code> nicht. Sie
-      bleiben erhalten und werden nicht geraten – bis die Tabelle sie kennt,
-      zählen zwei Schreibweisen derselben Farbe als zwei Varianten.</p>
-      <ul class="pill-cloud">
-        {% for f in geraete.farbbericht %}<li>{{ f.schreibweise }} ({{ f.listungen }})</li>{% endfor %}
-      </ul>
-    </div>
-  </details>
-  {% endif %}
-  <p class="dz-foot">Vollständige Quellenlage:
-  <a href="{{ prefix }}geraete-quellen.html">Geräte-Quellen</a>.</p>
-  {% if geraete.vergleich.ohne_vertrag.ohne_vodafone %}
-  <details class="evidence gr-vergleich-luecke">
-    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
-      ({{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }})</summary>
-    <div class="evidence-body">
-    <ul class="gr-v-liste">
-      {% for l in geraete.vergleich.ohne_vertrag.ohne_vodafone %}
-      <li><span class="szl">{{ l.modell }}</span>
-        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-        <span class="gr-v-prozent">ab {{
-          '%.2f'|format(l.ab_preis)|replace('.', ',') }} €</span>
-        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
-          else 'Anbieter' }}</span>
-        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% if geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt > geraete.vergleich.ohne_vertrag.ohne_vodafone|length %}
-    <p class="gr-v-meta">{{ geraete.vergleich.ohne_vertrag.ohne_vodafone_gesamt }} insgesamt.</p>
-    {% endif %}
-    </div>
-  </details>
-  {% endif %}
-</section>
 {% endblock %}

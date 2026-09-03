@@ -1101,33 +1101,6 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     }
 
 
-def _farbbericht(eintraege: list) -> list:
-    """Unbekannte Farbschreibweisen mit der Zahl ihrer Listungen.
-
-    Die Arbeitsliste fuer config/farben.yaml. Sie speist sich aus den
-    FARBFELDERN der Quellen - eine Farbe, die nur im Titel stand und die
-    Tabelle nicht kennt, taucht hier nicht auf, weil sie gar nicht erst
-    uebernommen wird (das waere Raten).
-    """
-    gezaehlt: dict[str, int] = {}
-    for e in eintraege:
-        if e.get("farbe_roh") and not e.get("farbe_normalisiert"):
-            gezaehlt[e["farbe_roh"]] = gezaehlt.get(e["farbe_roh"], 0) + 1
-    return [{"schreibweise": k, "listungen": v}
-            for k, v in sorted(gezaehlt.items(), key=lambda kv: (-kv[1], kv[0]))]
-
-
-def _katalogluecken(katalog) -> dict:
-    ohne_start = [g.modell for g in katalog.geraete if not g.marktstart]
-    ohne_kette = [g.modell for g in katalog.geraete
-                  if g.vorgaenger and katalog.nach_id(g.vorgaenger_device_id) is None]
-    return {
-        "modelle": len(katalog.geraete),
-        "ohne_marktstart": sorted(ohne_start),
-        "ohne_kette": sorted(ohne_kette),
-    }
-
-
 # --------------------------------------------------------------------------
 # Der Einstieg
 # --------------------------------------------------------------------------
@@ -1141,7 +1114,7 @@ def leer(fehler: str = "") -> dict:
     """
     return {
         "hat_daten": False, "stand": "", "abgerufen_bis": "", "abgerufen_ab": "",
-        "fenster_tage": FENSTER_TAGE, "ohne_katalog": [], "db_lesbar": not fehler,
+        "fenster_tage": FENSTER_TAGE, "db_lesbar": not fehler,
         "fehler": fehler,
         "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
                    "ausgelistet": 0, "preispunkte": 0, "hersteller": 0,
@@ -1183,8 +1156,6 @@ def leer(fehler: str = "") -> dict:
         "quellenlage": {"zeilen": [], "ohne_hardware": [], "liefernd": 0,
                         "aufgefuehrt": 0, "konfiguriert": 0, "unbekannt": [],
                         "seiten": 0},
-        "farbbericht": [],
-        "katalog": {"modelle": 0, "ohne_marktstart": [], "ohne_kette": []},
     }
 
 
@@ -1375,14 +1346,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # zusammengefasste Zwillingshaelfte darf das Datum nicht setzen.
     abrufdaten = sorted(e.get("abgerufen_am") for e in bestand
                         if e.get("abgerufen_am"))
-    # Ebenfalls Bestand: die Liste ist die Arbeitsliste fuer
-    # `config/geraete_katalog.yaml` und beantwortet "welche Zeile dieser
-    # Seite kann ich nicht benennen". Eine Zeile, die auf der Seite nicht
-    # steht, gehoert nicht in eine Arbeitsliste. Der Merge nimmt dabei keine
-    # `device_id` weg - der Ueberlebende traegt dieselbe.
-    ohne_katalog = sorted({e.get("device_id") for e in bestand
-                           if katalog.nach_id(e.get("device_id")) is None})
-
     # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
     # "was kostet dasselbe Geraet bei wem" - und zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
@@ -1454,7 +1417,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "abgerufen_bis": abrufdaten[-1] if abrufdaten else "",
         "abgerufen_ab": abrufdaten[0] if abrufdaten else "",
         "fenster_tage": FENSTER_TAGE,
-        "ohne_katalog": ohne_katalog,
         "db_lesbar": db.lesbar,
         "bilanz": {
             "geraete": len({e.get("device_id") for e in bestand}),
@@ -1505,12 +1467,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "lifecycle": lifecycle,
         # Beide auf dem BESTAND. Die Quellenseite nennt je Anbieter eine
         # Geraetezahl, die neben derselben Zahl auf `geraete.html` steht -
-        # aus zwei Mengen gerechnet waeren es zwei Zahlen. Und der
-        # Farbbericht ist die Arbeitsliste fuer `config/farben.yaml`: auf dem
-        # Rohbestand fuehrte er neun Schreibweisen, die gar keine Farben sind
-        # ("space schwarz erneuert", "grau erneuert") - genau die, die
-        # `ohne_zustandswort()` aus der Anzeige raeumt.
+        # aus zwei Mengen gerechnet waeren es zwei Zahlen.
+        # Die Arbeitsliste fuer `config/farben.yaml` steht seit dem 03.09.2026
+        # NICHT mehr auf dieser Seite: sie zaehlt der naechtliche Lauf ins
+        # Protokoll (`Geraeteradar: unbekannte Farbschreibweisen ...`),
+        # bereinigt um Zustandswoerter an der Quelle (geraete_model).
         "quellenlage": _quellenlage(quellen, db, bestand),
-        "farbbericht": _farbbericht(bestand),
-        "katalog": _katalogluecken(katalog),
     }

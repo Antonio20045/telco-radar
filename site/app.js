@@ -843,7 +843,6 @@ var TelcoFrage = (function () {
     });
   });
 })();
-
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
  *
  * Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
@@ -863,6 +862,39 @@ function grFilterleiste(tafelId, mehrId) {
 
   var felder = tafel.querySelectorAll('[data-filter]');
   var mehr = document.getElementById(mehrId);
+  // Der ganze Absatz, nicht nur der Knopf: ein leeres <p> mit Rand bliebe
+  // sonst als Luecke stehen, sobald der Knopf sich versteckt.
+  var mehrAbsatz = mehr ? (mehr.closest('p') || mehr) : null;
+
+  /* DER DECKEL FOLGT DEM FILTER (B2/B3, 31.08.2026 - Runde 2 der
+     Zurueckweisung).
+
+     Bis dahin klebte `gr-a-rest` an einer POSITION: einmal beim Laden aus
+     der SSR-Reihenfolge gesetzt, einmal je Sortierklick neu vergeben
+     (`sortiere()`), aber in BEIDEN Faellen unabhaengig davon, ob die Zeile
+     an dieser Position ueberhaupt zum aktiven Filter passte. Zwei Klicks
+     auf den Spaltenkopf "Zustand" (Reiter 2, Vorbelegung "neu") reichten,
+     um elf nicht-passende Zeilen in den Deckel zu schieben und 348
+     passende dahinter verschwinden zu lassen - derselbe Fehlertyp wie
+     Commit 79085f0, nur ueber einen anderen Ausloeser.
+
+     Jetzt zaehlt `anwenden()` NUR unter den TREFFERN: die ersten `deckel`
+     Zeilen, die den aktiven Filter bestehen, bleiben sichtbar (oder alle,
+     sobald "alle anzeigen" gedrueckt ist) - unabhaengig davon, an welcher
+     Position sie in der aktuellen Sortierung stehen. `sortiere()` muss
+     `gr-a-rest` deshalb nicht mehr selbst vergeben; sie ordnet nur noch die
+     DOM-Knoten um und ruft danach `anwenden()`.
+
+     Und der Knopf "alle N zeigen" verspricht nur noch, was er wirklich
+     liefert: N ist die Zahl der TREFFER unter dem aktiven Filter, nicht die
+     serverseitige Gesamtzahl - sonst versprach er bei aktivem "neu"-Filter
+     "alle 360 zeigen" und lieferte 349 (B3). Die serverseitige Zahl
+     (Ueberschrift, Export) bleibt unveraendert die Gesamtzahl - sie ist
+     eine Aussage ueber den BESTAND, kein Versprechen ueber diese Anzeige. */
+  var deckel = tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
+             ? tabelle.querySelectorAll('.gr-a-zeile').length -
+               tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
+             : 0;
 
   function anwenden() {
     var alleZeigen = tabelle.classList.contains('gr-alarm--alle');
@@ -881,7 +913,8 @@ function grFilterleiste(tafelId, mehrId) {
     });
 
     var zeilen = tabelle.querySelectorAll('.gr-a-zeile');
-    var sichtbar = 0;
+    var treffer = 0;   // wie viele Zeilen ueberhaupt zum Filter passen
+    var sichtbar = 0;  // wie viele davon der Deckel wirklich zeigt
     for (var i = 0; i < zeilen.length; i++) {
       var z = zeilen[i];
       var passt = true;
@@ -893,21 +926,42 @@ function grFilterleiste(tafelId, mehrId) {
       if (passt && suche) {
         passt = z.textContent.toLowerCase().indexOf(suche) >= 0;
       }
-      z.hidden = !passt;
-      // Gezaehlt wird, was der Leser WIRKLICH sieht. Eine Rest-Zeile passt
-      // vielleicht zum Filter, steht aber bis zum Klick auf "alle anzeigen"
-      // per CSS nicht da - mitgezaehlt blendete sie den Erklaersatz aus, und
-      // vor dem Leser stand eine Tabellenkopfzeile mit nichts darunter.
-      // Denselben Waechter hatte der alte Vergleichsfilter, mit Begruendung;
-      // beim Umbau ist er verlorengegangen.
-      if (passt && (!z.classList.contains('gr-a-rest') || alleZeigen)) {
-        sichtbar++;
-      }
       var auf = document.getElementById(z.getAttribute('data-auf'));
+      z.hidden = !passt;
       if (auf) auf.hidden = !passt;
+      if (passt) {
+        treffer++;
+        // P1 (dritte Nachbesserung, 31.08.2026): eine `blockrest`-Zeile
+        // (mehr als `BLOCK_SICHTBAR` Zeilen ihres eigenen Geraete-Blocks)
+        // bleibt IMMER verborgen, unabhaengig vom Positionsdeckel - sie
+        // zaehlt deshalb auch nicht gegen `sichtbar`. Ohne diese
+        // Unterscheidung fuellte ein einzelner Block mit sieben
+        // Farbvarianten desselben Geraets einen Grossteil der zwoelf
+        // sichtbaren Zeilen der GANZEN Tabelle; mit ihr bleiben davon nur
+        // die zwei guenstigsten je Anbieter sichtbar (siehe
+        // `geraete_view._interleave_je_anbieter_im_block`), der Rest steht
+        // direkt dahinter bereit, sobald "alle anzeigen" gedrueckt ist.
+        var blockRest = z.getAttribute('data-blockrest') === '1';
+        // Siehe Kommentar bei `var deckel` oben: der Positionsdeckel
+        // zaehlt nur unter den TREFFERN, nicht nach roher Position.
+        var raus = (blockRest && !alleZeigen)
+                 || (deckel > 0 && !alleZeigen && sichtbar >= deckel);
+        z.classList.toggle('gr-a-rest', raus);
+        if (auf) auf.classList.toggle('gr-a-rest', raus);
+        if (!raus) sichtbar++;
+      }
+      // Eine nicht-passende Zeile behaelt ihre `gr-a-rest`-Klasse
+      // unveraendert - sie ist ohnehin `hidden`, und wird sie spaeter
+      // wieder zum Treffer, rechnet der naechste Lauf dieser Schleife sie
+      // frisch ein.
     }
     var leer = tafel.querySelector('.gr-a-leer');
     if (leer) leer.hidden = sichtbar > 0;
+
+    if (mehrAbsatz) {
+      mehrAbsatz.hidden = alleZeigen || treffer <= deckel;
+      if (mehr) mehr.textContent = 'alle ' + treffer + ' Zeilen zeigen';
+    }
   }
 
   Array.prototype.forEach.call(felder, function (f) {
@@ -925,6 +979,13 @@ function grFilterleiste(tafelId, mehrId) {
   });
   tabelle.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    // B5 (31.08.2026): derselbe Ausstieg wie im `click`-Handler oben fehlte
+    // hier. Ohne ihn ass `preventDefault()` das Enter eines fokussierten
+    // Quelllinks: fokussierbar, aber mit der Tastatur nicht auszuloesen -
+    // genau die Zugaenglichkeit, mit der B7 begruendet wurde, und B7
+    // vergroessert die betroffene Flaeche vom 5-px-Pfeil auf den ganzen
+    // Namen.
+    if (ev.target.closest('a')) return;
     var zeile = ev.target.closest ? ev.target.closest('.gr-a-zeile') : null;
     if (!zeile) return;
     ev.preventDefault();
@@ -934,7 +995,7 @@ function grFilterleiste(tafelId, mehrId) {
 
   /* SORTIEREN NACH SPALTE.
 
-     Drei Dinge, die hier leicht falsch gehen, und alle drei sind gemeint:
+     Zwei Dinge, die hier leicht falsch gehen, und beide sind gemeint:
 
      1. EINE ZEILE IST ZWEI ZEILEN. Zu jeder `.gr-a-zeile` gehoert ein
         `.gr-a-auf` mit der Anbieterliste. Verschoben werden sie IMMER
@@ -946,18 +1007,10 @@ function grFilterleiste(tafelId, mehrId) {
         Zelle liest, stellt den teuersten Preis nach vorn und sieht dabei
         richtig aus.
 
-     3. DER DECKEL WIRD NEU VERGEBEN. `SICHTBAR_MAX` begrenzt die
-        Seitenhoehe, und die zwoelf sichtbaren Zeilen sind die ERSTEN zwoelf
-        der aktuellen Ordnung. Bliebe `gr-a-rest` an den urspruenglichen
-        Zeilen kleben, zeigte eine Sortierung nach Euro die zwoelf
-        groessten PROZENTwerte, untereinander nach Euro geordnet - eine
-        Rangliste, die es nicht gibt, und der teuerste Fall stuende nicht
-        darunter. */
+     Der DECKEL wird hier NICHT mehr vergeben (B2, 31.08.2026) - das
+     erledigt `anwenden()` am Ende dieser Funktion, filterbewusst statt
+     positionsbewusst. Diese Funktion ordnet nur noch die DOM-Knoten um. */
   var koepfe = tabelle.querySelectorAll('.gr-sort');
-  var deckel = tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
-             ? tabelle.querySelectorAll('.gr-a-zeile').length -
-               tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
-             : 0;
 
   function sortiere(schluessel, art, richtung) {
     var rumpf = tabelle.tBodies[0];
@@ -979,17 +1032,9 @@ function grFilterleiste(tafelId, mehrId) {
       }
       return a.wert.localeCompare(b.wert, 'de') * vz;
     });
-    paare.forEach(function (p, i) {
+    paare.forEach(function (p) {
       rumpf.appendChild(p.zeile);
       if (p.auf) rumpf.appendChild(p.auf);
-      // Der Deckel wird neu vergeben, siehe Punkt 3 oben. `deckel === 0`
-      // heisst: es gab nie Rest-Zeilen (oder "alle anzeigen" ist gedrueckt),
-      // dann bleibt alles sichtbar.
-      if (deckel) {
-        var raus = i >= deckel;
-        p.zeile.classList.toggle('gr-a-rest', raus);
-        if (p.auf) p.auf.classList.toggle('gr-a-rest', raus);
-      }
     });
     anwenden();
   }
@@ -1025,10 +1070,6 @@ function grFilterleiste(tafelId, mehrId) {
   if (mehr) {
     mehr.addEventListener('click', function () {
       tabelle.classList.add('gr-alarm--alle');
-      // Der ganze Absatz, nicht nur der Knopf: ein leeres <p> mit Rand bleibt
-      // sonst als Luecke stehen.
-      var absatz = mehr.closest('p') || mehr;
-      absatz.parentNode.removeChild(absatz);
       anwenden();
     });
   }

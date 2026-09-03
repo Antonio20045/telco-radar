@@ -198,6 +198,28 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         log.info("Geraeteradar: unbekannte Farbschreibweisen (Arbeitsliste "
                  "fuer config/farben.yaml): %s",
                  ", ".join(bilanz["unbekannte_farben"]))
+    # Zwei Katalog-Arbeitslisten: Modelle ohne belegtes Marktstartdatum
+    # (ohne sie gibt es keine Nachfolger-Analyse) und Vorgaenger-Bezuege,
+    # die auf kein Katalogmodell zeigen (Konfigurationsfehler). Beide
+    # standen bis zum 03.09.2026 als Absaetze in der Sektion "Datenbasis
+    # und Luecken" auf geraete.html - Antonio hat die Sektion kassiert,
+    # und das Protokoll ist seit je der Kanal fuer Arbeitslisten des
+    # naechtlichen Laufs. Der MARKTSTART ist der eine Punkt, den nur ein
+    # Mensch schliessen kann; ohne diese Zeile waere die Liste still
+    # verschwunden.
+    ohne_start = [g.modell for g in katalog.geraete if not g.marktstart]
+    if ohne_start:
+        log.info("Geraeteradar: %d von %d Katalogmodellen ohne Marktstartdatum "
+                 "(Arbeitsliste fuer config/geraete_katalog.yaml, keine "
+                 "Nachfolger-Analyse): %s",
+                 len(ohne_start), len(katalog.geraete),
+                 " | ".join(ohne_start[:25]))
+    ohn_kette = [g.modell for g in katalog.geraete
+                 if g.vorgaenger and katalog.nach_id(g.vorgaenger_device_id) is None]
+    if ohn_kette:
+        log.warning("Geraeteradar: Vorgaenger-Bezug ohne Katalogziel in "
+                    "config/geraete_katalog.yaml: %s",
+                    " | ".join(ohn_kette[:25]))
     return bilanz
 
 

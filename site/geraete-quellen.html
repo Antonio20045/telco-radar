@@ -86,7 +86,7 @@
     <span class="rubrik-zahl">21</span></h2>
   <div class="t-bilanz-reihe">
     <div class="t-kennzahl"><b>6</b><span>liefern Geräte</span></div>
-    <div class="t-kennzahl"><b>6</b><span>abgefragte Einstiegsseiten</span></div>
+    <div class="t-kennzahl"><b>7</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
 
@@ -192,7 +192,7 @@
     <span class="sdot ok"></span>
     liefert
   </td>
-  <td class="num">149</td>
+  <td class="num">150</td>
   <td class="gr-grund">
     Eigene Referenz, nicht Teil der Wettbewerbsauswertung. Gemessen am 28.08.2026: die Liste nennt 51 Geraete, die Detailnutzlast je Geraet den Preis OHNE Vertrag je Variante (Speicher x Farbe). Der Befund vom 11.08.2026 - &#34;im Roh-HTML steht kein Preis&#34; - bleibt richtig; er gilt fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404).
     
@@ -295,7 +295,7 @@
     <span class="sdot ok"></span>
     liefert
   </td>
-  <td class="num">72</td>
+  <td class="num">68</td>
   <td class="gr-grund">
     Der Befund vom 11.08.2026 bleibt richtig und gilt für die HTML-Seite: deren ld+json trägt &#34;price&#34;:&#34;1.00&#34;, den Lockpreis im Tarifbündel. Gelesen wird stattdessen der Katalog, den die Einstiegsseite /e-shop/ selbst aufruft - eine Antwort, 93 Geräte (28.08.2026), Preis als `totalPrice` der Ratenzahlung OHNE Tarif (`hwOnly=true`; die Detailadresse jedes Geräts trägt `ohne-tarif=ja`). Nachgerechnet: Anzahlung plus 24 Monatsraten ergibt bei 92 der 93 Einträge exakt den totalPrice. 18 Einträge sind Gerät PLUS Zubehör (&#34;mit Watch Ultra 3&#34;) und werden verworfen - ihr Preis gilt für beides zusammen. ROBOTS: `Disallow: /e-shop/rest/` steht ausschließlich in der Gruppe `User-agent: googlebot`, zusammen mit /chat-ui/ und /ebooking/. Die für uns gültige Gruppe `User-agent: *` sperrt den Pfad nicht; unser Absender ist TelcoRadar/1.0.
     
@@ -353,14 +353,14 @@
     <span class="gr-hersteller">Deutsche Telekom</span>
   </td>
   <td>discount · Telekom-Netz</td>
-  <td><code>ldjson</code></td>
+  <td><code>congstar_next</code></td>
   <td>
-    <span class="sdot quarantaene"></span>
-    nicht angebunden
+    <span class="sdot empty"></span>
+    angebunden, ohne Fund
   </td>
   <td class="num">0</td>
   <td class="gr-grund">
-    ld+json vorhanden und sauber, aber es ist der Einmalpreis im Tarifbündel - der zugehörige Tarif steht nicht im strukturierten Datensatz. AM 30.08.2026 an zwei echten Produktseiten nachgemessen: /geraete/apple/apple-iphone-16/ trägt ein vollständiges Product-Schema (name, brand, color, gtin, sku, itemCondition NewCondition) mit &#34;price&#34;: 520, /geraete/apple/apple-iphone-17/ mit 592. Vodafone führt dasselbe iPhone 16 zu 849,90 EUR - die 520 sind die Anzahlung, nicht der Gerätepreis, und der Seitentext bestätigt es (&#34;mit Vertrag&#34; achtmal, &#34;24 Monate&#34;, &#34;Allnet Flat&#34; siebzehnmal). Als Preis ohne Vertrag gespeichert stünde congstar mit 39 Prozent Vorsprung als Sieger in der Vergleichstabelle - genau die Fehlerklasse, die am 30.08.2026 beseitigt worden ist. Zweiter Ausschlussgrund: der Produktname trägt KEINE Speichergröße, ein Vergleich je (Modell, Speicher) ist damit gar nicht möglich. Eine Zuzahlung ohne ihren Tarif wird von diesem Radar nicht gespeichert (Teil C4, erzwungen in geraete_model.Listung).
+    Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit belegbarem Preis ohne Vertrag - die Telekom selbst steht wegen ihrer AWS-WAF nicht in dieser Datenbank. congstar trifft Apple, Samsung, Google UND Xiaomi (Google fehlte bisher ganz). Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig - dieser Adapter liest es deshalb NICHT. Der Geraetepreis ohne Vertrag steht stattdessen im Next.js-Flight-Payload der Produktseite (`self.__next_f.push([1,&#34;…&#34;])`), je Variante unter `prices.paymentVariants[]`, im Eintrag mit `type == &#34;ONE_TIME_PURCHASE&#34;` UND `contractDuration == 0`, dessen Wert `oneTime.listed`. DIE FALLE: derselbe Knoten traegt auch `oneTime.discounted` - einen Rabatt, der laut der Fussnote &#34;bei Abschluss der ANF M&#34; entsteht, also an einen TARIFABSCHLUSS gebunden ist. Gemessen an vier Belegdateien: iPhone 17 256GB listed 919,00 EUR (discounted waere 811), Galaxy S25 128GB 699,00 (519), Pixel 11 256GB 991,00 (757), Redmi Note 17 Pro 256GB 477,00 (225) - Abstand bis 252 EUR, discounted haette congstar in jedem der vier Faelle faelschlich als Preisfuehrer gezeigt. OFFEN: dass das Geraet auch WIRKLICH ganz ohne SIM-Vertrag zu diesem Preis zu haben ist, ist nicht statisch bewiesen - die Kauflabels rendert React im Browser nach. Belegt ist `contractDuration: 0`, `recurring.listed: 0`, und der Marktvergleich stuetzt es (919/699/ 991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein versteckter Tarifzwang verursachen wuerde).
     
     <span class="gr-einstiege"><a href="https://www.congstar.de/sitemap/devices.xml" rel="noopener">Geräte-Sitemap</a></span>
     
@@ -585,11 +585,11 @@
   ungewöhnlich weit auseinanderliegen; ein Preis weit abseits aller anderen.
   Die ersten drei nehmen eine Zeile aus Vergleichstabelle und Preisgrafik,
   die letzten beiden melden sie nur – ein Discounter weit unter dem Markt ist
-  der Befund, wegen dem es diese Seite gibt, kein Datenfehler. Alles bleibt in
-  der CSV-Tabelle und in der Geräteansicht. Ein Preis, der sich nicht belegen
-  lässt, verschwindet nicht; er wird nur nicht gegen einen anderen
-  gerechnet.</p>
-  <p class="gr-erklaer">367 Preiszeilen geprüft,
+  der Befund, wegen dem es diese Seite gibt, kein Datenfehler. Alles bleibt im
+  Gerätekatalog und in der CSV-Tabelle – beide zeigen den Bestand, nicht die
+  geprüfte Auswahl. Ein Preis, der sich nicht belegen lässt, verschwindet
+  nicht; er wird nur nicht gegen einen anderen gerechnet.</p>
+  <p class="gr-erklaer">364 Preiszeilen geprüft,
   2 aus dem Vergleich genommen,
   3 Auffälligkeiten notiert.</p>
   
@@ -606,7 +606,8 @@
               179,00 €
               (84,3 % daneben)
             </td>
-        <td>gezeigt</td>
+        
+        <td>verglichen</td>
       </tr>
     
       <tr>
@@ -617,7 +618,8 @@
               179,00 €
               (101,7 % daneben)
             </td>
-        <td>gezeigt</td>
+        
+        <td>verglichen</td>
       </tr>
     
       <tr>
@@ -627,7 +629,8 @@
               (667,00 € und 811,00 €, 21,6 %
               Abstand) – pistachio / pistachio bk
             </td>
-        <td>nicht gezeigt</td>
+        
+        <td>nicht verglichen</td>
       </tr>
     
     </tbody>

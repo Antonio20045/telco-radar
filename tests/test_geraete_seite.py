@@ -466,11 +466,11 @@ def test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl(tmp_path):
     assert s.select_one(".gr-katalog h2 .rubrik-zahl").get_text(
         strip=True) == str(erwartet)
     assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == erwartet
-    # Der Betriebszahlensatz am Fuss. Er nennt Geraete, Varianten und
-    # Listungen in EINEM Satz; sie muessen aus EINER Menge kommen.
-    fuss = " ".join(s.select_one(".gr-bilanz").get_text(" ", strip=True).split())
-    assert f"zusammen {erwartet} Listungen" in fuss, fuss
-    # Der vierte Ort ist der Knopf "alle N Zeilen zeigen". UMGEDREHT durch
+    # Der Betriebszahlensatz am Fuss ist am 03.09.2026 mit der ganzen
+    # Sektion "Wie vollstaendig ist das" von der Seite gefallen - der
+    # Bestand steht jetzt nur noch an den drei Orten, die dieser Test
+    # kennt, und das ist einer weniger als vorher.
+    # Der dritte Ort ist der Knopf "alle N Zeilen zeigen". UMGEDREHT durch
     # P1 (dritte Nachbesserung, 31.08.2026, Coordinator-Entscheidung): bis
     # dahin erschien er erst, wenn die GESAMTZAHL ueber `KATALOG_SICHTBAR`
     # lag - diese Fixture liegt mit sieben Zeilen darunter, der Knopf fehlte
@@ -500,34 +500,6 @@ def test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl(tmp_path):
     assert knopf_text == f"alle {erwartet} Zeilen zeigen"
 
 
-def test_der_farbbericht_fuehrt_keine_zustandswoerter(tmp_path):
-    """S6: der Farbbericht ist die Arbeitsliste fuer `config/farben.yaml` -
-    und stand auf dem ROHBESTAND.
-
-    Live gemessen fuehrte er deshalb "space schwarz erneuert", "grau
-    erneuert", "titanium black gebraucht" als unbekannte FARBEN auf, also
-    genau die Schreibweisen, die `ohne_zustandswort()` aus der Anzeige
-    raeumt. Wer die Liste abarbeitet, traegt Zustaende in eine Farbtabelle
-    ein.
-    """
-    from telco_radar.geraete_model import ohne_zustandswort
-    import re as _re
-
-    site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    liste = [d for d in s.select("details")
-             if "Farbschreibweisen" in d.get_text()]
-    assert liste, "der Farbbericht fehlt"
-    schreibweisen = [_re.sub(r"\s*\(\d+\)$", "", li.get_text(strip=True))
-                     for li in liste[0].select("li")]
-    assert schreibweisen, "die Fixture spannt den Fall nicht auf"
-    # Die Fixture traegt "Mitternacht erneuert" (gealterte Zwillingshaelfte)
-    # und "Mitternacht" - auf dem Rohbestand stuenden BEIDE hier.
-    assert "Mitternacht" in schreibweisen
-    for wort in schreibweisen:
-        assert ohne_zustandswort(wort) == wort, wort
-
-
 def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     """Der Fehlertyp aus CLAUDE.md §6: ein Etikett und ein Feld, die nicht
     dasselbe meinen.
@@ -535,7 +507,9 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     Gemessen werden die vier Alarmkacheln. Sie haben am 30.08.2026 die fuenf
     Betriebskacheln ("59 Geraete beobachtet", "250 Varianten") vom besten
     Platz der Seite abgeloest - eine Zahl, die zu keiner Handlung fuehrt,
-    gehoert nicht dorthin. Die Betriebszahlen stehen jetzt als Satz am Fuss.
+    gehoert nicht dorthin. Der Betriebszahlensatz am Fuss ist am 03.09.2026
+    ganz von der Seite gefallen; die Bestandszahlen werden deshalb gegen
+    die Aufbereitung gehalten.
     """
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
@@ -545,17 +519,22 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
 
     # Die Summe der vier Kacheln IST die Zahl der verglichenen Geraete. Zwei
     # Zahlen, die dasselbe meinen muessen, gehoeren gegeneinander gehalten.
-    # Der Betriebszahlensatz rechnet auf dem BESTAND, nicht auf dem
-    # Rohbestand: die gealterte Zwillingshälfte trägt eine eigene `sku_id`
-    # und zählte sonst als zweite Variante derselben Listung. Geprüft wird
-    # gegen den Wortlaut und nicht mit `in fuss` allein - eine Zahl, die
-    # irgendwo im Satz vorkommt, belegt nicht, dass sie an ihrer Stelle
-    # steht.
-    fuss = " ".join(s.select_one(".gr-bilanz").get_text(" ", strip=True).split())
+    # Der Betriebszahlensatz am Fuss ist am 03.09.2026 von der Seite gefallen
+    # (Antonio: keine Erklaerkommentare auf der Geraeteseite) - die
+    # Bestandszahlen stehen jetzt nur noch in der Aufbereitung, und genau da
+    # werden sie gehalten. Sie rechnet auf dem BESTAND, nicht auf dem
+    # Rohbestand: die gealterte Zwillingshaelfte traegt eine eigene `sku_id`
+    # und zaehlte sonst als zweite Variante derselben Listung.
+    geraete = geraete_view.aufbereiten(
+        tmp_path / "data" / "state", lade_quellen(tmp_path),
+        lade_katalog(tmp_path), heute="2026-08-11")
     im_regal = [e for e in _DB["listungen"] if e["id"] in _bestand_ids()]
-    assert f"{len({e['device_id'] for e in im_regal})} Geräte" in fuss, fuss
-    assert f"{len({e['sku_id'] for e in im_regal})} Varianten" in fuss, fuss
-    assert f"zusammen {len(im_regal)} Listungen" in fuss, fuss
+    assert geraete["bilanz"]["geraete"] == len({e["device_id"] for e in im_regal})
+    assert geraete["bilanz"]["skus"] == len({e["sku_id"] for e in im_regal})
+    assert geraete["bilanz"]["listungen"] == len(im_regal)
+    # Die Kachelsumme zaehlt verglichene Geraete und kann deshalb nie ueber
+    # dem Bestand liegen - der Fehlertyp von S3 ("2454 Modelle").
+    assert sum(int(v) for v in kacheln.values()) <= len(im_regal)
 
 
 def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
@@ -1362,10 +1341,12 @@ def test_ohne_vorlauf_sagt_die_wochenkarte_was_sie_zeigt(tmp_path):
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
     assert saetze, "kein einziger Satz"
     assert any("erfasst" in x and "vergleichen" in x for x in saetze), saetze
-    # Die Kachel "0 ausgelistet" ist ohne Vorlauf keine Aussage.
-    kacheln = {k.find("span").get_text(strip=True)
-               for k in s.select(".gr-bilanz .t-kennzahl")}
-    assert "ausgelistet" not in kacheln
+    # Die Kachel "0 ausgelistet" ist am 03.09.2026 mit der ganzen
+    # Betriebszahlen-Sektion von der Seite gefallen. Eine Ersatz-Assertion
+    # gegen die Wochenkarten-Saetze wurde bewusst NICHT gebaut: kein
+    # Satztemplate dieses Abschnitts kann das Wort "ausgelistet" ueberhaupt
+    # tragen (geraete_view, Saetze 542-623) - ein Test, der nie schlagen
+    # kann, prueft nichts (CLAUDE.md 6).
 
 
 def test_jede_zahl_der_wochenkarte_stammt_aus_dem_datensatz(tmp_path):
@@ -1507,6 +1488,12 @@ def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
     text = luecke.get_text(" ", strip=True)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "Galaxy S25 Ultra" in text
+    # Der Aufklapper ist am 03.09.2026 mit der ganzen Erklaersektion vom
+    # Seitenfuss in den Portfolio-Reiter gezogen worden (er ist eine
+    # Sortiments-Aussage, kein Kommentar) - und diese Zugehoerigkeit hier
+    # festgenagelt, sonst wandert er beim naechsten Umbau unbemerkt zurueck.
+    assert any(el.get("id") == "tafel-portfolio" for el in luecke.parents), (
+        "der Aufklapper steht nicht im Portfolio-Reiter")
 
 
 def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
@@ -1812,7 +1799,22 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
         zusatz.append(weitere)
     db["listungen"] = db["listungen"] + zusatz
 
-    site = _baue(tmp_path, db=db)
+    # ERSTLAUF statt Normalfall: Der Betriebszahlensatz am Fuss ("59 Geräte
+    # in 250 Varianten"), der letzte garantierte Ort einer Gerätezahl, ist
+    # am 03.09.2026 mit der ganzen Erklaersektion von der Seite gefallen.
+    # Der lebende Ort ist seitdem die Wochenkarte ("wurden N Geräte erstmals
+    # erfasst") - und die entsteht nur ohne frueheren Stand. Ohne diesen
+    # Zusatz faende der Test keine einzige Gerätezahl und misste nichts.
+    for listung in db["listungen"]:
+        listung["first_seen"] = "2026-08-11"
+    erste = [{"listung_id": l["id"], "device_id": l["device_id"],
+              "anbieter": l["anbieter"], "datum": "2026-08-11",
+              "preis_ohne_vertrag": l["preis_ohne_vertrag"],
+              "verfuegbarkeit": l.get("verfuegbarkeit", "lieferbar"),
+              "quelle_url": l.get("quelle_url", "https://example.de/p")}
+             for l in db["listungen"]]
+
+    site = _baue(tmp_path, db=db, punkte=erste)
     geraete = geraete_view.aufbereiten(
         tmp_path / "data" / "state", lade_quellen(tmp_path),
         lade_katalog(tmp_path), heute="2026-08-11")
