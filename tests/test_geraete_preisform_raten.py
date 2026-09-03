@@ -131,18 +131,18 @@ def test_o2_ohne_monatsrate_kein_etikett():
 # --------------------------------------------------------------------------
 
 def test_der_hinweis_nennt_ratenzahl_und_belegten_zinssatz():
-    assert ratenhinweis(1.0, 30.0, 24, 0.0) == "in 24 Raten (0 %)"
+    assert ratenhinweis(24, 0.0) == "in 24 Raten (0 %)"
 
 
 def test_ohne_belegten_zinssatz_steht_kein_prozentsatz_da():
     """`None` heisst unbekannt. Ein erfundenes "(0 %)" waere eine Aussage
     ueber einen Vertrag, die niemand gemessen hat."""
-    assert ratenhinweis(1.0, 30.0, 24) == "in 24 Raten"
+    assert ratenhinweis(24) == "in 24 Raten"
 
 
 def test_ohne_laufzeit_kein_hinweis():
-    assert ratenhinweis(1.0, 30.0, None, 0.0) == ""
-    assert ratenhinweis(None, None, None) == ""
+    assert ratenhinweis(None, 0.0) == ""
+    assert ratenhinweis(None) == ""
 
 
 def test_ein_bestandssatz_ohne_die_felder_bekommt_keinen_hinweis():
@@ -233,6 +233,48 @@ def test_der_bestand_haelt_die_preisform_und_verliert_sie_nicht(tmp_path,
     db.upsert([_listung()], "2026-09-04")
     assert db.eintraege()[0]["laufzeit_monate"] == 24, \
         "ein Ausfall der Extraktion ist keine Preisformaenderung"
+
+
+def test_ein_ANDERER_preis_ohne_ratenfelder_verliert_die_alte_form(
+        tmp_path, katalog, farben):
+    """Die Form gehoert zu DER Zahl, mit der sie gemessen wurde.
+
+    Steigt o2 bei einem Geraet auf Barkauf um, meldet der Adapter einen
+    neuen Preis und KEINE Laufzeit (die Rechenprobe geht dann nicht mehr
+    auf). Bliebe die alte Form stehen, traege der frische Barpreis das
+    Etikett "in 24 Raten (0 %)" vom Vortag - schlimmer als gar keins.
+    """
+    def _listung(preis, **kw):
+        return lies_listung(
+            titel="Apple iPhone 14 128 GB mitternacht", anbieter="o2",
+            anbieter_typ="netzbetreiber", quelle_url="https://www.o2online.de/p",
+            abgerufen_am="2026-09-03", katalog=katalog, farben=farben,
+            preis_ohne_vertrag=preis, **kw)
+
+    db = GeraeteDB(tmp_path / "geraete_db.json")
+    db.upsert([_listung(721.0, anzahlung=1.0, monatsrate=30.0,
+                        laufzeit_monate=24, zins_effektiv=0.0)], "2026-09-03")
+    assert ratenhinweis_aus_eintrag(db.eintraege()[0]) == "in 24 Raten (0 %)"
+
+    db.upsert([_listung(949.0)], "2026-09-04")
+    eintrag = db.eintraege()[0]
+    assert eintrag["preis_ohne_vertrag"] == 949.0
+    for feld in ("anzahlung", "monatsrate", "laufzeit_monate", "zins_effektiv"):
+        assert feld not in eintrag, f"{feld} beschreibt einen alten Preis"
+    assert ratenhinweis_aus_eintrag(eintrag) == ""
+
+
+def test_ein_negativer_zinssatz_kommt_nicht_in_den_bestand(katalog, farben):
+    """Ein Anbieter, der bei der Ratenzahlung draufzahlt, ist ein
+    Vorzeichenfehler in der Quelle - dieselbe Sicherung wie bei jedem
+    anderen Geldfeld der Listung."""
+    with pytest.raises(ValueError, match="zins_effektiv"):
+        lies_listung(
+            titel="Apple iPhone 14 128 GB mitternacht", anbieter="o2",
+            anbieter_typ="netzbetreiber", quelle_url="https://www.o2online.de/p",
+            abgerufen_am="2026-09-03", katalog=katalog, farben=farben,
+            preis_ohne_vertrag=721.0, anzahlung=1.0, monatsrate=30.0,
+            laufzeit_monate=24, zins_effektiv=-0.5)
 
 
 def test_die_preishistorie_wird_nicht_umgedeutet(tmp_path, katalog, farben):

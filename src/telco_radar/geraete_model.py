@@ -791,8 +791,7 @@ class Sku:
 _DATUM_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
-def ratenhinweis(anzahlung: Optional[float], monatsrate: Optional[float],
-                 laufzeit_monate: Optional[int],
+def ratenhinweis(laufzeit_monate: Optional[int],
                  zins_effektiv: Optional[float] = None) -> str:
     """Wie eine Ratenzahl auf der Seite bezeichnet wird - an EINER Stelle.
 
@@ -811,6 +810,12 @@ def ratenhinweis(anzahlung: Optional[float], monatsrate: Optional[float],
     Ratenzahl OHNE ihre Laufzeit zu etikettieren waere geraten, und der
     Zinssatz erscheint nur, wenn er belegt uebergeben wurde - `None` ist
     "unbekannt", nicht "null Prozent".
+
+    Anzahlung und Monatsrate stehen bewusst NICHT in der Signatur: der
+    Hinweis nennt sie nicht, und ein Parameter, den der Rumpf nicht liest,
+    behauptet einen Zusammenhang, den es nicht gibt. Wer die Betraege
+    zeigen will, baut dafuer eine eigene Funktion - diese hier ist der
+    Zusatz NEBEN der Preiszahl, nicht ihre Zerlegung.
     """
     if not laufzeit_monate:
         return ""
@@ -828,8 +833,7 @@ def ratenhinweis_aus_eintrag(eintrag: dict) -> str:
     sie bekommen einen leeren Hinweis und werden nicht nachtraeglich
     umgedeutet. Was damals gemessen wurde, bleibt, wie es gemessen wurde.
     """
-    return ratenhinweis(eintrag.get("anzahlung"), eintrag.get("monatsrate"),
-                        eintrag.get("laufzeit_monate"),
+    return ratenhinweis(eintrag.get("laufzeit_monate"),
                         eintrag.get("zins_effektiv"))
 
 
@@ -913,6 +917,13 @@ class Listung:
                                  f"{self.laufzeit_monate}")
         if self.zins_effektiv is not None:
             self.zins_effektiv = float(self.zins_effektiv)
+            # Dieselbe Sicherung wie bei den Preisfeldern darueber. Ein
+            # negativer Effektivzins waere eine Ratenzahlung, bei der der
+            # Anbieter draufzahlt - im Zweifel ein Vorzeichenfehler in der
+            # Quelle, und der gehoert nicht unbemerkt auf die Seite.
+            if self.zins_effektiv < 0:
+                raise ValueError(f"negativer zins_effektiv: "
+                                 f"{self.zins_effektiv}")
         # Teil C4: "iPhone fuer 1 Euro" ist ohne den Tarif dahinter eine Zahl
         # ohne Bedeutung. JEDE Buendelzahl braucht ihren Tarif - auch
         # `preis_mit_vertrag_ab`, sonst waere sie das Schlupfloch, durch das
@@ -944,8 +955,7 @@ class Listung:
     @property
     def ratenhinweis(self) -> str:
         """Der Zusatz, der aus einer Preiszahl eine Preisaussage macht."""
-        return ratenhinweis(self.anzahlung, self.monatsrate,
-                            self.laufzeit_monate, self.zins_effektiv)
+        return ratenhinweis(self.laufzeit_monate, self.zins_effektiv)
 
     @property
     def preis(self) -> Optional[float]:

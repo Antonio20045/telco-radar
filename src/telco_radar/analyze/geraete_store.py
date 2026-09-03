@@ -57,6 +57,12 @@ _HISTORIENFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
 # Vertragspreis ist, bekam nie einen Historienpunkt.
 _PREISFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung")
 
+# Die Felder, die die PREISFORM von `preis_ohne_vertrag` beschreiben. Sie
+# gehoeren zusammen und zu genau der Zahl, mit der sie gemessen wurden -
+# siehe `GeraeteDB.upsert`.
+_PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate",
+                    "zins_effektiv")
+
 
 def _ist_ausfall(feld: str, wert) -> bool:
     """Steht dieser Wert fuer "diesmal nicht gemessen"?
@@ -279,17 +285,30 @@ class GeraeteDB:
                 eintrag["einstiege"] = heimat
             if listung.titel_roh:
                 eintrag["titel_roh"] = listung.titel_roh
+            # Eine Preisform gehoert zu DER Zahl, mit der sie gemessen
+            # wurde. Kommt ein ANDERER Preis herein und dieser Lauf nennt
+            # keine Laufzeit, ist die gespeicherte Form nicht ausgefallen,
+            # sondern ueberholt: sonst traegt ein frischer Barpreis das
+            # Etikett "in 24 Raten (0 %)" vom Vortag - genau die
+            # Verwechslung, gegen die die Kennzeichnung gebaut ist. Ein
+            # falsches Etikett ist schlimmer als keins.
+            if (listung.laufzeit_monate is None
+                    and listung.preis_ohne_vertrag is not None
+                    and eintrag.get("preis_ohne_vertrag") is not None
+                    and eintrag["preis_ohne_vertrag"]
+                    != listung.preis_ohne_vertrag):
+                for feld in _PREISFORMFELDER:
+                    eintrag.pop(feld, None)
             # Preisfelder: ein Wert, den der Extraktor diesmal NICHT fand,
             # ueberschreibt den bekannten nicht. Sonst waere jede Luecke in
             # der Extraktion eine Preisaenderung.
             #
-            # Die Preisform (`anzahlung`, `monatsrate`, `laufzeit_monate`,
-            # `zins_effektiv`) folgt derselben Regel. Sie beschreibt den
-            # AKTUELLEN Preis; die Historie in `geraete_preise.jsonl` wird
-            # davon nicht angefasst und kein alter Preispunkt umgedeutet.
+            # Die Preisform folgt derselben Regel, solange die Zahl
+            # dieselbe bleibt (siehe oben). Sie beschreibt den AKTUELLEN
+            # Preis; die Historie in `geraete_preise.jsonl` wird davon
+            # nicht angefasst und kein alter Preispunkt umgedeutet.
             for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                         "zuzahlung", "anzahlung", "monatsrate",
-                         "laufzeit_monate", "zins_effektiv"):
+                         "zuzahlung") + _PREISFORMFELDER:
                 wert = getattr(listung, feld)
                 if wert is not None:
                     eintrag[feld] = wert

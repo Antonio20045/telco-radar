@@ -1346,12 +1346,26 @@ für normal. *Vor Phase 1 klären, auf welcher Umgebung abgenommen wird.*
 
 ## 10. Offene Entscheidungen für Antonio
 
+**Stand 03.09.2026: alle sieben sind entschieden.** Die Beschlüsse stehen in
+`PHASE0_ENTSCHEIDUNGEN.md` — im Arbeitsverzeichnis neben diesem Repo-Klon,
+nicht im Repo, weil sie die Auftragslage beschreiben und nicht den Code. Sie
+sind für alle Folgephasen bindend und von Antonio jederzeit revidierbar.
+
+Die Fragen bleiben hier stehen. Eine Entscheidung ohne die Frage, die sie
+beantwortet, ist in einem halben Jahr nicht mehr nachvollziehbar — und eine
+der sieben (E2) ist **gegen** die ausdrückliche Empfehlung dieses Dokuments
+gefallen. Genau das soll man sehen können.
+
 **E1 — Ehrlichkeit vor Fülle?**
 Phase 3 nimmt Vergleichszeilen von der Seite, bis Phase 4 sie in korrekter Form
 zurückbringt. Zwischen beiden Phasen zeigt die Seite weniger als heute.
 *Alternative:* Phase 3 und 4 als eine Auslieferung zusammenfassen — größerer
 Schritt, kein sichtbarer Rückschritt.
-→ **Zu entscheiden: zwei kleine Phasen mit Delle oder eine große ohne.**
+→ **Entschieden (E1): Ehrlichkeit vor Fülle, also zwei kleine Phasen.**
+Vergleichszeilen dürfen vorübergehend von der Seite verschwinden; falsch oder
+unsauber gekennzeichnete Zahlen nie. Begründung des PM: Trust ist der Kernwert
+dieses Radars — Verivox hat Bündelvergleiche wegen unsichtbarer Geräteanteile
+ganz eingestellt, und genau diese Transparenz ist hier der Vorteil.
 
 **E2 — Welcher Horizont ist die Leitzahl?**
 § 6.3 empfiehlt zwei Kennzahlen. Auf einer Seite für Manager ohne technischen
@@ -1360,6 +1374,15 @@ Hintergrund braucht es trotzdem **eine** Zahl, die groß steht.
 `tco_voll` (bis abbezahlt, wahrhaftig, vergleicht 24 gegen 36 Monate).**
 Empfehlung: `tco_voll` groß, `tco_bindung` klein darunter — die Seite sagt sonst
 dasselbe, was CHECK24 sagt, und übernimmt dessen Schwäche.
+→ **Entschieden (E2): TCO-24 ist die Leitzahl** — also `tco_bindung`, die
+Gesamtkosten über 24 Monate, groß; **Ø/Monat** daneben als greifbare
+Zweitzahl; das **Euro-Delta zu Vodafone** als Banner. Das ist die Gegenposition
+zur Empfehlung oben, und sie ist bewusst gewählt (Lesbarkeit für eine
+Führungskraft ohne technischen Hintergrund).
+Die Schwäche aus § 6.3 wird damit nicht geerbt, sondern ausgewiesen: was
+jenseits des Horizonts liegt, steht als **offener Restbetrag** neben der Zahl,
+statt aus ihr herauszufallen. Eine 24-Monats-Zahl, die eine 36-Monats-Rate
+verschweigt, wäre genau die CHECK24-Kappung, die § 5.4 verwirft.
 
 **E3 — Wird Vodafone als Listenpreis oder als Bündelbetrag geführt?**
 Vodafones 709,90 € sind der `uvp`-Wert; 703,00 € ist der Betrag im 12-Monats-
@@ -1367,6 +1390,9 @@ Bündel. Beide sind belegt, beide sind wahr, sie beantworten verschiedene Fragen
 → **Zu entscheiden: Welche Zahl steht in der Positionskarte für „unser Preis"?**
 Das ist keine technische Frage — sie entscheidet, wogegen sich Vodafone auf
 seiner eigenen Wettbewerbsseite misst.
+→ **Entschieden (E3): beide, klar getrennt.** 709,90 € (`uvp`, Listenpreis)
+steht im Barpreis-Vergleich; 703,00 € (12-Monats-Bündel) ausschließlich in der
+TCO-Sicht. Nie mischen, nie in derselben Tabelle vergleichen.
 
 **E4 — Wie weit darf der HTTP-Client angepasst werden?**
 Telekom antwortet curl mit 200 und (dokumentiert) httpx mit 202. robots.txt
@@ -1374,6 +1400,10 @@ erlaubt den Abruf ausdrücklich. Ist ein anderer TLS-Client eine legitime
 technische Anpassung oder eine Umgehung?
 → **Antonios Grenzziehung wird als Regel in `CLAUDE.md` gebraucht**, nicht als
 Einzelfallentscheidung im Adapter.
+→ **Entschieden (E4): nur Standard-Clients mit ehrlichem User-Agent** (curl,
+sauber konfigurierter httpx). Kein Fingerprint-Impersoning, keine Umgehung von
+Bot-Schutz — auch dann nicht, wenn es funktionieren würde. Braucht die Telekom
+das, wird dokumentiert verzichtet; congstar bleibt der Telekom-Netz-Proxy.
 
 **E5 — Wird der Elektronikfachhandel aufgegeben oder ausgebaut?**
 Amazon, MediaMarkt, Saturn, expert, Euronics sind gesperrt oder nicht
@@ -1383,12 +1413,18 @@ Betreiber. Als Barpreis-Referenz ist er aber die einzige saubere Vergleichsbasis
 gegen die Ratenangebote der Netzbetreiber.
 → **Zu entscheiden: eine Phase 9 für zwei bis drei Barpreis-Händler, oder die
 bewusste Beschränkung auf Netzbetreiber und Zweitmarken.**
+→ **Entschieden (E5): ausbauen, billig zuerst.** Cyberport und
+notebooksbilliger.de sind die nächsten Adapter-Kandidaten — nach Messung, nicht
+auf Verdacht. Amazon parkt bis zu Antonios PartnerNet-Entscheidung,
+MediaMarkt/Saturn (Kampagnenseite) nur bei Restbudget.
 
 **E6 — Wer pflegt den Katalog?**
 Phase 2 stellt die Arbeitsliste her; 54 fehlende Marktstartdaten und die
 iPhone-18-Reihe muss ein Mensch eintragen (§ 4.3, R6). Ohne feste Zuständigkeit
 verfällt die Liste wie heute im Log.
-→ **Zu entscheiden: Wer, in welchem Rhythmus?**
+→ **Entschieden (E6): Owner ist Seneca**, wöchentlicher Review-Lauf.
+Datenpflege per Engineer-Run nur mit belegter Quelle (Marktstart etc.); was
+unklar bleibt, geht als Liste mit höchstens fünf Punkten an Antonio.
 
 **E7 — Markenliste zusammenführen?**
 `config/promo_sources.yaml` und `config/geraete_quellen.yaml` beobachten
@@ -1397,6 +1433,9 @@ Geräteradar nicht; fünf umgekehrt.
 → **Zu entscheiden: eine gemeinsame Markenliste als dritte Konfigurationsdatei,
 oder bewusst getrennt halten (die Quellenarten sind verschieden — dieselbe
 Begründung wie in `TELCO_RADAR_HANDOVER.md` §12).**
+→ **Entschieden (E7): zusammenführen — aber später und als eigener Schritt.**
+Ein kleiner Refactor in einer späteren Phase, damit das Risiko klein bleibt;
+bis dahin steht die Divergenz als Kommentar in beiden Konfigurationsdateien.
 
 ---
 
