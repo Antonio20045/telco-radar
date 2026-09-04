@@ -557,8 +557,22 @@ def _referenzkarte(ref: dict) -> dict:
         # in `naeherung` und auf der Seite in einem eigenen Satz - nicht in
         # dem Feld, das "hier gibt es nichts" bedeutet.
         "leer_grund": "",
-        "tarif": ref["tarif"], "label": f"TCO-{ref['monate']}",
-        "laufzeit": ref["monate"],
+        "tarif": ref["tarif"],
+        # DIE LEITZAHL TRAEGT IHRE EIGENE BINDUNG (A5.1; QA-Befund F-R2-2,
+        # 04.09.2026). `ref["monate"]` ist das FENSTER des verglichenen
+        # Buendels (36 bei o2), `ref["tarif_monate"]` das, was die Referenz
+        # wirklich rechnet: 24 Tarifmonate plus Barkauf, und in Monat 25-36
+        # bindet Vodafone gar nicht. Alle 30 Referenzkarten des Bestands
+        # trugen "TCO-36" und "Gerechnet ueber 36 Monate Bindung" - eine
+        # richtige Zahl unter einer falschen Aussage. Das Fenster bleibt am
+        # Referenz-Dict (`monate`): daran haengen das Euro-Delta (`_delta`,
+        # `gleiche_laufzeit`) und die Referenzlinie in G1, und beides ist
+        # E-2 - eine Entscheidung Antonios, nicht dieser Karte. Geaendert ist
+        # die BESCHRIFTUNG, nicht die Rechnung: 52 Deltas vorher, 52 nachher,
+        # auf den Cent gleich.
+        "label": f"TCO-{ref['tarif_monate']}",
+        "laufzeit": ref["tarif_monate"],
+        "fenster": ref["monate"],
         "belastbar": True, "naeherung": True,
         # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
         # Neugeraet-Zahl und spielt im Vergleich mit.

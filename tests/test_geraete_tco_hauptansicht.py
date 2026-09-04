@@ -149,6 +149,62 @@ def test_die_referenz_nimmt_den_guenstigsten_belegten_vodafone_tarif(bestand):
     assert ref["monatlich"] == min(betraege)
 
 
+def test_die_referenzkarte_traegt_ihre_eigene_bindung(bestand):
+    """QA-Befund F-R2-2 (A5.1): alle 30 Referenzkarten trugen "TCO-36" und
+    "Gerechnet ueber 36 Monate Bindung" - gerechnet waren 24 Tarifmonate
+    plus Barkauf. Das Etikett nennt jetzt die Bindung der REFERENZ; das
+    Vergleichsfenster bleibt am Referenz-Dict (`monate`, E-2)."""
+    referenzen = [(m, k) for m in bestand["modelle"] for k in m["karten"]
+                  if k["naeherung"]]
+    assert referenzen, "keine Referenzkarte - der Test prueft nichts"
+    for modell, karte in referenzen:
+        ref = modell["referenz"]
+        assert karte["label"] == f"TCO-{ref['tarif_monate']}"
+        assert karte["laufzeit"] == karte["tarif_bindung"] == ref["tarif_monate"]
+        assert karte["fenster"] == ref["monate"]
+    # Der Fall tritt WIRKLICH ein: mindestens eine Referenz rechnet
+    # kuerzer, als das verglichene Buendel bindet.
+    assert any(k["laufzeit"] != k["fenster"] for _, k in referenzen), \
+        "kein Modell mit 24 Tarifmonaten gegen 36 Monate Bindung"
+
+
+def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
+    """Die Gegenprobe des Auftrags: das Euro-Delta rechnet weiter gegen das
+    Fenster, nicht gegen das neue Etikett. Zwei Betraege auf den Cent,
+    dazu die Regel fuer alle."""
+    def delta(mid, anbieter):
+        return [k["delta"] for k in _modell(bestand, mid)["karten"]
+                if k["anbieter"] == anbieter and k["zustand"] == "neu"][0]
+    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -123.94
+    assert delta("apple-iphone-15-128", "o2")["betrag"] == -307.95
+    for modell in bestand["modelle"]:
+        ref = modell["referenz"]
+        if not ref or ref.get("aus_buendel"):
+            continue
+        for k in modell["karten"]:
+            if k.get("delta"):
+                assert k["delta"]["gleiche_laufzeit"] == \
+                    (k["laufzeit"] == ref["monate"])
+                if k["laufzeit"] == ref["monate"]:
+                    assert k["delta"]["betrag"] == \
+                        round(k["gesamt"] - ref["gesamt"], 2)
+
+
+def test_g1_stellt_die_referenz_in_ihre_eigene_bindungsgruppe(bestand):
+    """Der Gruppenkopf "36 Monate Bindung" stand ueber dem Vodafone-Balken.
+    Jetzt steht der Balken unter "24 Monate Bindung"; die Referenzlinie
+    bleibt in der 36er-Gruppe und sagt, woraus sie besteht."""
+    svg = grafik.balken(_modell(bestand, "apple-iphone-15-128"))
+    kopf24 = svg.index("24 Monate Bindung")
+    kopf36 = svg.index("36 Monate Bindung")
+    balken = svg.index("Vodafone <tspan")
+    assert kopf24 < balken < kopf36
+    linie = svg.index('class="gr-g1-ref"')
+    assert linie > kopf36
+    assert "Barkauf + 24 Monate Tarif" in svg
+    assert svg.count("gr-g1-null") == 2
+
+
 def test_das_delta_nennt_referenztarif_und_datum(bestand):
     deltas = [k["delta"] for m in bestand["modelle"] for k in m["karten"]
               if k.get("delta")]

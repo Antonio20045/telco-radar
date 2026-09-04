@@ -35,6 +35,24 @@ def test_das_euro_delta_steht_am_g1_balken():
     assert svg.count("gr-g1-delta") == 1
 
 
+def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
+    """F-R2-2 auf der Seite: Etikett, Rechenweg und Gruppenkopf nennen die
+    Bindung der Referenz (24 Tarifmonate, Barkauf bindet nicht)."""
+    s = _baue(tmp_path)
+    ref = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="Vodafone"]')
+    assert ref.select_one(".gr-kk-marke").get_text(strip=True) == "Referenzrechnung"
+    assert ref.select_one(".gr-kk-leit b").get_text(strip=True) == "TCO-24"
+    assert ref["data-laufzeit"] == "24"
+    text = " ".join(ref.get_text(" ", strip=True).split())
+    assert "36 Monate Bindung" not in text
+    assert "24 Monate Tarifbindung; das Gerät ist bar gekauft und bindet nicht" in text
+    assert "binden 36 Monate" in text
+    # Das o2-Angebot daneben rechnet weiterhin ueber seine 36 Monate.
+    o2 = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
+    assert o2.select_one(".gr-kk-leit b").get_text(strip=True) == "TCO-36"
+    assert "Gerechnet über 36 Monate Bindung" in " ".join(o2.get_text(" ", strip=True).split())
+
+
 def test_die_tafel_spricht_katalog_d(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")

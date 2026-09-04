@@ -549,6 +549,18 @@
     }} kostet, weist die Quelle nicht aus – deshalb steht dazu keine Zahl
     auf der Karte.</p>
     {% endif %}
+    {# DIE REFERENZ NENNT IHRE EIGENE BINDUNG (F-R2-2): 24 Tarifmonate,
+       das Geraet ist bar gekauft und bindet nicht. "Gerechnet ueber 36
+       Monate Bindung" stand auf 30 Karten, auf denen 24 gerechnet waren. #}
+    {% if k.naeherung %}
+    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
+    Tarifbindung; das Gerät ist bar gekauft und bindet nicht{% if k.fenster
+    and k.fenster != k.laufzeit %} – die Angebote daneben binden {{ k.fenster
+    }} Monate, das Euro-Delta rechnet sie gegen diese Summe{% endif %}.
+    Enthalten sind der Barpreis und alle fest anfallenden Kosten der
+    Tarifbindung; nicht enthalten sind Versand, Nutzungsentgelte über den
+    Tarif hinaus und jeder Bonus, der hier nicht beim Namen steht.</p>
+    {% else %}
     <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
     Bindung{% if k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
     k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
@@ -556,6 +568,7 @@
     fest anfallenden Kosten dieser Bindung; nicht enthalten sind Versand,
     Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
     beim Namen steht.</p>
+    {% endif %}
     {% if k.quelle_url %}<p class="gr-basis--duenn"><a href="{{ k.quelle_url }}"
       rel="nofollow noopener" target="_blank">Beleg {{ k.anbieter }}</a>{%
       if k.abgerufen_am %} · abgerufen {{ k.abgerufen_am | date_de }}{% endif

@@ -173,15 +173,26 @@ def balken(modell: dict) -> str:
             # rechtsbuendig gesetzt stand "Vodafone-Referenz 2.278,10 €"
             # zur Haelfte ausserhalb der Zeichenflaeche. Eine Beschriftung,
             # die nicht ganz da ist, ist keine.
-            rechts = x + 5 + 160 > BREITE
+            # UND SIE SAGT, WORAUS SIE BESTEHT, wo ihre Bindung nicht die
+            # der Gruppe ist (F-R2-2): die Linie steht in der 36-Monats-
+            # Gruppe, gerechnet sind Barkauf plus 24 Tarifmonate. Ohne den
+            # Zusatz liest sich "Vodafone-Referenz 1.428,70 EUR" unter dem
+            # Kopf "36 Monate Bindung" als 36-Monats-Zahl.
+            tarif_monate = referenz.get("tarif_monate")
+            text = f'Vodafone-Referenz {euro(referenz["gesamt"])}'
+            if (tarif_monate and tarif_monate != laufzeit
+                    and referenz.get("geraet_betrag") is not None):
+                text += f' · Barkauf + {tarif_monate} Monate Tarif'
+            # ~6,6 px je Zeichen bei 12 px Grotesk - grosszuegig gerundet,
+            # damit der Kipp-Punkt eher zu frueh als zu spaet greift.
+            rechts = x + 5 + int(len(text) * 6.6) > BREITE
             teile.append(
                 f'<line class="gr-g1-ref" x1="{x:.1f}" y1="{y - 8:.0f}" '
                 f'x2="{x:.1f}" y2="{unten:.0f}" />'
                 f'<text class="gr-g1-reftext" x="{x - 5 if rechts else x + 5:.1f}" '
                 f'y="{y - 12:.0f}"'
                 + (' text-anchor="end"' if rechts else '')
-                + f'>Vodafone-Referenz '
-                f'{_t(euro(referenz["gesamt"]))}</text>')
+                + f'>{_t(text)}</text>')
 
         for karte in gruppe["karten"]:
             slug = anbieter_slug(karte["anbieter"])
