@@ -2,8 +2,8 @@
  "updated": "2026-09-04",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 10,
-   "funde_gesamt": 35,
+   "laeufe": 11,
+   "funde_gesamt": 40,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 5,
    "letzter_fund": "2026-09-04",
@@ -18,8 +18,8 @@
    ]
   },
   "Vodafone": {
-   "laeufe": 8,
-   "funde_gesamt": 1194,
+   "laeufe": 9,
+   "funde_gesamt": 1343,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 149,
    "termine": [
@@ -34,8 +34,8 @@
    "letzter_fund": "2026-09-04"
   },
   "o2": {
-   "laeufe": 8,
-   "funde_gesamt": 540,
+   "laeufe": 9,
+   "funde_gesamt": 607,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 67,
    "termine": [
@@ -51,7 +51,7 @@
   },
   "mobilcom-debitel": {
    "laeufe": 0,
-   "funde_gesamt": 1004,
+   "funde_gesamt": 1137,
    "letzte_funde": 133,
    "termine": [
     "2026-08-29",
@@ -66,29 +66,31 @@
   },
   "ElectronicPartner": {
    "laeufe": 0,
-   "funde_gesamt": 40,
+   "funde_gesamt": 60,
    "letzte_funde": 20,
    "termine": [
     "2026-09-02",
-    "2026-09-03"
+    "2026-09-03",
+    "2026-09-04"
    ],
-   "letzter_fund": "2026-09-03"
+   "letzter_fund": "2026-09-04"
   },
   "Medimax": {
    "laeufe": 0,
-   "funde_gesamt": 40,
+   "funde_gesamt": 60,
    "letzte_funde": 20,
    "termine": [
     "2026-09-02",
-    "2026-09-03"
+    "2026-09-03",
+    "2026-09-04"
    ],
-   "letzter_fund": "2026-09-03"
+   "letzter_fund": "2026-09-04"
   },
   "congstar": {
    "laeufe": 2,
-   "funde_gesamt": 270,
+   "funde_gesamt": 404,
    "letzter_lauf": "2026-09-04",
-   "letzte_funde": 135,
+   "letzte_funde": 134,
    "termine": [
     "2026-09-03",
     "2026-09-04"
@@ -235,10 +237,10 @@
    "erstpreis": 299.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-03",
-   "letzter_check": "2026-09-03",
+   "last_verified": "2026-09-04",
+   "letzter_check": "2026-09-04",
    "quelle_url": "https://www.ep.de/p/1518879/galaxy-a37-5g-a376b-128gb",
-   "abgerufen_am": "2026-09-03",
+   "abgerufen_am": "2026-09-04",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -257,7 +259,7 @@
    "speicher_gb": 128,
    "farbe_roh": "",
    "farbe_normalisiert": null,
-   "ean": "8806099028084",
+   "ean": "8806099028145",
    "zustand": "neu",
    "first_seen": "2026-09-02",
    "status": "aktiv",
@@ -265,10 +267,10 @@
    "erstpreis": 389.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-03",
-   "letzter_check": "2026-09-03",
-   "quelle_url": "https://www.ep.de/p/1518897/galaxy-a57-5g-a576b-128gb",
-   "abgerufen_am": "2026-09-03",
+   "last_verified": "2026-09-04",
+   "letzter_check": "2026-09-04",
+   "quelle_url": "https://www.ep.de/p/1518896/galaxy-a57-5g-a576b-128gb",
+   "abgerufen_am": "2026-09-04",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
@@ -276,6 +278,36 @@
    ],
    "titel_roh": "Samsung Galaxy A57 5G A576B 128GB",
    "preis_ohne_vertrag": 389.0
+  },
+  {
+   "id": "medimax--samsung-galaxy-a37-128gb-ohne-farbe",
+   "sku_id": "samsung-galaxy-a37-128gb-ohne-farbe",
+   "device_id": "samsung-galaxy-a37",
+   "anbieter": "Medimax",
+   "anbieter_typ": "handel",
+   "netz": "",
+   "speicher_gb": 128,
+   "farbe_roh": "",
+   "farbe_normalisiert": null,
+   "ean": "8806099035167",
+   "zustand": "neu",
+   "first_seen": "2026-09-04",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 289.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-09-04",
+   "last_verified": "2026-09-04",
+   "letzter_check": "2026-09-04",
+   "quelle_url": "https://www.medimax.de/p/1518879/galaxy-a37-5g-a376b-128gb",
+   "abgerufen_am": "2026-09-04",
+   "verfuegbarkeit": "lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.medimax.de/c/116/telefon-navi/handy-smartphone/smartphones"
+   ],
+   "titel_roh": "Samsung Galaxy A37 5G A376B 128GB",
+   "preis_ohne_vertrag": 289.0
   },
   {
    "id": "medimax--samsung-galaxy-a57-128gb-ohne-farbe",
@@ -295,10 +327,10 @@
    "erstpreis": 349.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-02",
-   "last_verified": "2026-09-03",
-   "letzter_check": "2026-09-03",
+   "last_verified": "2026-09-04",
+   "letzter_check": "2026-09-04",
    "quelle_url": "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb",
-   "abgerufen_am": "2026-09-03",
+   "abgerufen_am": "2026-09-04",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
