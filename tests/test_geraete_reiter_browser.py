@@ -1805,3 +1805,34 @@ def test_der_bestpreis_stempel_bleibt_im_bild(_eigene_seite, tiefster):
     assert lage["links"] >= 0, f"das Etikett beginnt im Bild: {lage}"
     assert lage["rechts"] <= lage["breite"], (
         f"und endet darin: {lage}")
+
+
+@pytest.mark.parametrize("tid", ["tafel-alarme", "tafel-katalog",
+                                 "tafel-verlauf", "tafel-portfolio",
+                                 "tafel-tco"])
+def test_kein_reiter_rollt_auf_dem_telefon_waagerecht(_umgebung, tid):
+    """Eine Seite, die waagerecht rollt, ist auf dem Telefon unbenutzbar.
+
+    Die Regel steht seit dem Geraete-Neubau im Stylesheet ("Eine breite
+    Tabelle rollt IN SICH, nie die ganze Seite") - geprueft hat sie
+    niemand, und zwei Tabellen des TCO-Reiters hielten sie nicht: die
+    Bereitschaftstabelle (vorbestehend seit Phase 6a) und die
+    SIM-only-Referenzen. Gemessen schoben sie das Dokument auf einem
+    390-px-Telefon auf 480 px.
+
+    Der bestehende Hoehentest misst auf 1440 px und sieht das nicht; und
+    `test_keine_seite_rollt_waagerecht` prueft die Seite im
+    AUSGANGSzustand, in dem vier der fuenf Reiter ausgeblendet sind.
+    Gemessen wird deshalb hier, Reiter fuer Reiter, im Telefonformat.
+    """
+    browser, url = _umgebung
+    seite = browser.new_page(viewport={"width": 390, "height": 844})
+    try:
+        seite.goto(url, wait_until="load")
+        seite.click(f".gr-reiter button[data-tafel='{tid}']")
+        seite.wait_for_timeout(80)
+        breite = seite.evaluate("document.documentElement.scrollWidth")
+        sichtbar = seite.evaluate("document.documentElement.clientWidth")
+        assert breite <= sichtbar, f"{tid}: {breite} px statt {sichtbar} px"
+    finally:
+        seite.close()

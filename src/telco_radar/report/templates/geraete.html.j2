@@ -340,6 +340,13 @@
    Als Makro, nicht als zwei Kopien: zwei Kopien einer Tabelle sind zwei
    Tabellen, und die zweite wird beim naechsten Umbau vergessen. #}
 {% macro referenztabelle(zeilen) %}
+{# `gr-scroll`: eine breite Tabelle rollt IN SICH, nie die ganze Seite.
+   Gemessen an der ausgelieferten Seite auf 390 px: ohne den Behaelter
+   schob genau diese Tabelle das Dokument auf 480 px - vier Spalten, deren
+   letzte "Produktinformationsblatt" plus Datum traegt. Eine Seite, die
+   waagerecht rollt, ist auf dem Telefon unbenutzbar; dieselbe Regel und
+   derselbe Behaelter wie bei der SKU-Matrix und der Bewegungstabelle. #}
+<div class="gr-scroll">
 <table class="gr-ttab gr-ttab--simonly">
   <thead><tr>
     <th scope="col">Anbieter und Tarif</th>
@@ -363,6 +370,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% endmacro %}
 
 <div class="gr-tafel gr-tafel--aus" id="tafel-tco" role="tabpanel">
@@ -553,6 +561,11 @@
 
   {% if geraete.tco.bereitschaft %}
   <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
+  {# Derselbe Behaelter aus demselben Grund wie bei der Referenztabelle:
+     vier Spalten passen auf 390 px nicht nebeneinander. Gemessen schob
+     genau diese Tabelle das Dokument auf 480 px - vorbestehend seit
+     Phase 6a, gefunden beim Nachmessen der neuen Tafel auf dem Telefon. #}
+  <div class="gr-scroll">
   <table class="gr-ttab gr-ttab--bereit">
     <thead><tr>
       <th scope="col">Anbieter</th><th scope="col">Neugeräte</th>
@@ -575,6 +588,7 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
   {% endif %}
 </section>
 </div>
