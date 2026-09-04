@@ -45,6 +45,19 @@
 #                        Tarife selbst. Kein Link wird geerntet, keine
 #                        zweite Adresse abgerufen. Der Satz traegt
 #                        `preistyp: live_shop`.
+#   methode: kacheln     Wie `ldjson`, nur ohne strukturierte Daten:
+#                        gelesen werden die PREISKACHELN, die der Anbieter
+#                        selbst als solche auszeichnet. Auch dieser Satz
+#                        traegt `preistyp: live_shop`.
+#                        Nur wo es die anderen zwei Wege nicht gibt - eine
+#                        Kachel ist Auszeichnung einer Seite und kein
+#                        Datenformat, sie kann sich mit einem Redesign
+#                        aendern. Bei o2 gibt es die anderen zwei nicht:
+#                        die Tarifseite traegt genau ein ld+json (eine
+#                        BreadcrumbList), und die Pflichtblaetter zu allen
+#                        Tarifen ausser einem liegen unter /assets/ - ein
+#                        Pfad, den die fuer uns gueltige robots-Gruppe
+#                        `User-agent: *` sperrt.
 #
 # Das Blatt traegt den Vermarktungsstand, die Shop-Seite den Preis von
 # heute. Beide sind richtig, und sie DUERFEN auseinanderlaufen - die
@@ -216,6 +229,57 @@ quellen:
     einstieg:
       - https://www.1und1.de/handytarife
     max_dokumente: 10
+
+  - anbieter: o2
+    methode: kacheln
+    # Gemessen 04.09.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
+    # 210 KB statisches HTML, ZWOELF Preiskacheln
+    # (`article.teaser-with-price`). Gelesen wurden daraus
+    #   O2 Mobile S / S Flex              19,99 / 19,99 EUR    15 GB+
+    #   O2 Mobile on Demand M / M Flex    19,99 / 29,99 EUR    50 GB+
+    #   O2 Mobile L / L Flex              24,99 / 34,99 EUR   150 GB+
+    #   O2 Mobile Unlimited S Special / Flex  24,99 / 34,99 EUR
+    #   O2 Mobile Unlimited M / Flex          29,99 / 39,99 EUR
+    #   O2 Mobile Unlimited L / Flex          39,99 / 59,99 EUR
+    # dazu je Kachel der Anschlusspreis (39,99 EUR, bei drei Tarifen
+    # "0,00 € statt 39,99 €" - es gilt die erste Zahl) und die
+    # Mindestlaufzeit aus dem ANGEKREUZTEN Auswahlknopf (24 Monate; bei
+    # den Flex-Kacheln steht dort "Monatlich kündbar", und dann bleibt das
+    # Feld LEER statt 1 zu heissen).
+    #
+    # DIE GEGENPROBE: "O2 Mobile Unlimited M Flex" steht seit dem
+    # 10.06.2026 mit 39,99 EUR im Bestand - gelesen aus dem
+    # Produktinformationsblatt, dem einzigen o2-Mobilfunkblatt, das die
+    # Rechtsseite verlinkt. Die Kachel nennt denselben Betrag. Zwei
+    # getrennte Wege, dieselbe Zahl; ohne diese Ueberschneidung waere die
+    # Kachellesart unbelegt geblieben.
+    # Beide Saetze bleiben stehen. Sie tragen dieselbe Tarif-ID, also
+    # bekommt der zweite im selben Lauf den Hash-Zusatz
+    # (`uebernimm_stand`) - das ist die vorgesehene Behandlung fuer zwei
+    # Funde mit derselben Titelzeile und genau richtig: das Blatt und die
+    # Kachel sind zwei Messungen, nicht zwei Fassungen.
+    #
+    # WOZU: ohne diese zwoelf Saetze kann KEIN o2-Buendelpreis in
+    # `geraete_tco.json`. Der Geraetekatalog nennt seinen Tarif
+    # "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)", die Kachel heisst
+    # "O2 Mobile on Demand M" - die zwei Namen treffen sich nie. Die
+    # Bruecke ist der Slug `o2-mobile-on-demand-m-plus`, den die Kachel in
+    # ihrem eigenen Link "Handy hinzufügen" fuehrt und der Katalog in
+    # `dimension59`. Er landet in `Tarif.buendel_slug`.
+    #
+    # WARUM DIESE SEITE UND NICHT /tarife/: beide tragen dieselben zwoelf
+    # Kacheln mit denselben Betraegen (gemessen 04.09.2026). Diese hier
+    # sagt im Titel, was die Zahl ist - ein Tarifpreis OHNE Geraet
+    # ("Handyvertrag ohne Handy: günstige SIM-Only Tarife"). Genau das ist
+    # die Bedingung, unter der ein Betrag als SIM-only-Massstab taugt.
+    # Die zweite Seite wird deshalb NICHT zusaetzlich abgerufen.
+    #
+    # ROBOTS (04.09.2026 gelesen): die Gruppe `User-agent: *` sperrt
+    # /auth/, /login/, /aktionen/, /assets/, /snippets/, /postpaid/ und
+    # weitere - NICHT /tarife/.
+    einstieg:
+      - https://www.o2online.de/tarife/handyvertrag-ohne-handy/
+    max_dokumente: 15
 
 # --- Warum die PIB-Blaetter von 1&1 weiterhin fehlen
 # hilfe-center.1und1.de/produktinformationsblaetter ist eine Next.js-Seite

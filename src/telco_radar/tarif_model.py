@@ -126,6 +126,15 @@ class Tarif:
     # --- Vertrag
     laufzeit_monate: Optional[int] = None
     kuendigungsfrist_monate: Optional[int] = None
+    # Unter welchem Slug der Anbieter DENSELBEN Tarif im Geraetebuendel
+    # fuehrt. Kein Leistungsmerkmal, sondern ein Fremdschluessel: o2 nennt
+    # seinen Tarif in der SIM-only-Kachel "O2 Mobile on Demand M" und im
+    # Geraetekatalog "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+
+    # (24 Mon.)" - die zwei Namen treffen sich nie, der Slug
+    # (`o2-mobile-on-demand-m-plus`) steht auf BEIDEN Seiten und wird von
+    # o2 selbst gesetzt. `tarif_bezug.ueber_slug` loest damit auf; leer
+    # heisst "der Anbieter stellt diese Verbindung nicht her".
+    buendel_slug: str = ""
 
     # --- Herkunft
     dokument_url: str = ""

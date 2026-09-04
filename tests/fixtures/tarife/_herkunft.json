@@ -12,6 +12,18 @@
       "gzip": true,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 55171
+    },
+    {
+      "datei": "o2_handyvertrag_ohne_handy.html.gz",
+      "url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
+      "abgerufen_am": "2026-09-04",
+      "http_status": 200,
+      "content_type": "text/html;charset=UTF-8",
+      "bytes_roh": 210306,
+      "sha256_roh": "66a329e8b8b175382281e84406c3239b5a3ae89d2e9adaf427b46aeabac658b2",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 27457
     }
   ]
 }

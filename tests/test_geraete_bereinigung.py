@@ -510,13 +510,24 @@ def test_am_echten_bestand_faellt_kein_fremder_anbieter():
 def test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden():
     """Zusammengefasst heisst: die Aussage steht weiterhin da. Zu jeder
     entfernten Zeile muss eine bleiben, die DIESELBE Adresse und DENSELBEN
-    Preis traegt - sonst ist eine Preisaussage verschwunden."""
+    Preis traegt - sonst ist eine Preisaussage verschwunden.
+
+    `preis_ohne_vertrag` wird mit `.get()` gelesen und nicht mit `[]`:
+    seit dem 04.09.2026 gibt es Listungen, die dieses Feld GAR NICHT
+    tragen - 1&1 verkauft ausschliesslich im Buendel, seine Zahl steht in
+    `preis_mit_vertrag_ab`. Mit dem harten Zugriff fiel dieser Test am
+    echten Bestand mit `KeyError` aus, also mit einer Ausnahme statt mit
+    einer Aussage ueber die Bereinigung. `None` ist hier ein gueltiger
+    Teil des Schluessels: zwei Zeilen ohne Barpreis unter derselben
+    Adresse sind fuer diese Frage dasselbe.
+    """
     sichtbar = _echter_bestand()
     fertig = bereinige(sichtbar)
     behalten = {e["id"] for e in fertig}
-    geblieben = {(e["quelle_url"], e["preis_ohne_vertrag"]) for e in fertig}
+    geblieben = {(e["quelle_url"], e.get("preis_ohne_vertrag"))
+                 for e in fertig}
     for weg in (e for e in sichtbar if e["id"] not in behalten):
-        assert (weg["quelle_url"], weg["preis_ohne_vertrag"]) in geblieben
+        assert (weg["quelle_url"], weg.get("preis_ohne_vertrag")) in geblieben
 
 
 def test_am_echten_bestand_ueberleben_die_vodafone_farbvarianten():

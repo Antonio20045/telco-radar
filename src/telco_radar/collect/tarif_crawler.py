@@ -50,9 +50,9 @@ import yaml
 from bs4 import BeautifulSoup
 
 from ..models import Item
-from ..tarif_model import PREISTYP_LIVE_SHOP, Tarif
+from ..tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Tarif
 from .http import fetch
-from . import tarif_ldjson
+from . import tarif_kacheln, tarif_ldjson
 from .tarif_pdf import dokument_hash, ist_tarifdokument, lies_text, text_aus_pdf
 
 log = logging.getLogger(__name__)
@@ -109,6 +109,27 @@ EINHEIT = {
 #              Bauart wie `direkt=True` im Geraetezweig.
 METHODE_DOKUMENTE = "dokumente"
 METHODE_LDJSON = "ldjson"
+# `kacheln`  Wie `ldjson` - die Einstiegsseite IST die Nutzlast -, nur ohne
+#            strukturierte Daten: gelesen werden die Preiskacheln, die der
+#            Anbieter selbst als solche auszeichnet. Gebaut fuer o2, dessen
+#            Tarifseite genau ein ld+json traegt (eine BreadcrumbList) und
+#            dessen uebrige Pflichtblaetter unter `/assets/` liegen - einem
+#            Pfad, den die fuer uns gueltige robots-Gruppe sperrt.
+METHODE_KACHELN = "kacheln"
+
+# Die Lesarten, deren Einstiegsseite selbst die Nutzlast ist: kein Link
+# wird geerntet, keine zweite Adresse geholt. Sie teilen sich denselben
+# Sammelweg und unterscheiden sich nur im Extraktor.
+_SEITEN_LESARTEN = {
+    METHODE_LDJSON: tarif_ldjson.tarife_aus_html,
+    METHODE_KACHELN: tarif_kacheln.tarife_aus_html,
+}
+
+# Die GEBAUTEN Methoden - eine einzige Liste, gegen die sich Konfiguration
+# und Test messen. Sie steht hier und nicht im Test, damit eine neu gebaute
+# Lesart nicht an zwei Stellen nachgetragen werden muss (und die zweite
+# vergessen wird).
+METHODEN = (METHODE_DOKUMENTE, *sorted(_SEITEN_LESARTEN))
 
 
 @dataclass
@@ -500,6 +521,41 @@ def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
     zwei Fassungen desselben Tarifs statt zweier Produkte.
     """
     tid = tarif_id(tarif.anbieter, tarif.name)
+
+    # ZWEI LESARTEN SIND ZWEI ZEITREIHEN, KEINE ZWEI FASSUNGEN.
+    #
+    # Live gemessen am 04.09.2026: o2s Produktinformationsblatt und o2s
+    # SIM-only-Kachel nennen beide "O2 Mobile Unlimited M Flex" - dieselbe
+    # Tarif-ID, zwei voellig verschiedene Quellen. Ohne diese Zeilen wurde
+    # der Kachelsatz zur naechsten FASSUNG des Blattes, und `vergleiche`
+    # meldete als Tarifaenderung, was in Wahrheit der Unterschied zwischen
+    # einem PDF und einer Werbeseite ist (das Blatt nennt eine
+    # Mindestlaufzeit, die Flex-Kachel keine).
+    #
+    # Genau dagegen ist `preistyp` gebaut: "Beide duerfen auseinanderlaufen;
+    # die Abweichung ist die Auskunft, nicht der Fehler." Eine gemeinsame
+    # Zeitreihe kann das nicht abbilden - in ihr ueberschreibt die eine
+    # Lesart die andere.
+    #
+    # Der Zusatz ist der PREISTYP und nicht ein Hash: er ist je Quelle
+    # konstant, also bleibt der Schluessel ueber die Laeufe stabil. Ein
+    # Inhaltshash (wie beim Fall darunter) waere hier falsch - er aenderte
+    # sich mit jeder Preisaenderung, und die Zeitreihe zerfiele in
+    # Einzelsaetze.
+    #
+    # Wer zuerst da war, behaelt den kurzen Schluessel. Das ist keine
+    # Rangfolge, sondern Bestandsschutz: die vorhandene Zeitreihe soll
+    # nicht umziehen.
+    vorheriger = speicher.letzter(tid)
+    if (vorheriger is not None
+            and vorheriger.get("preistyp", PREISTYP_DOKUMENT)
+            != tarif.preistyp):
+        log.info("Tarif %r liegt schon als %r vor - der neue Satz (%s) "
+                 "bekommt eine eigene Zeitreihe", tarif.name,
+                 vorheriger.get("preistyp", PREISTYP_DOKUMENT),
+                 tarif.preistyp)
+        tid = f"{tid}#{tarif.preistyp}"
+
     if tid in im_lauf and im_lauf[tid] != herkunft:
         # ZWEI verschiedene Funde mit derselben Titelzeile im SELBEN Lauf.
         # Live gemessen am 08.08.2026: o2 fuehrt `o2-home-l-flex` und
@@ -564,10 +620,17 @@ def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
     return text, dokument_hash(rohdaten)
 
 
-def _sammle_ldjson(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
-                   speicher: TarifSpeicher, bilanz: dict, items: list,
-                   im_lauf: dict, besucht: list, erlaubt: set) -> None:
+def _sammle_seite(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
+                  speicher: TarifSpeicher, bilanz: dict, items: list,
+                  im_lauf: dict, besucht: list, erlaubt: set,
+                  extrahiere) -> None:
     """Eine Quelle, deren Einstiegsseite selbst die Tarife traegt.
+
+    `extrahiere` ist die Lesart (`_SEITEN_LESARTEN`): strukturierte Daten
+    nach schema.org oder die Preiskacheln des Anbieters. Der Weg drumherum
+    ist derselbe, und er steht deshalb genau einmal hier - zwei Kopien
+    waeren zwei Delta-Schichten, und die zweite meldete irgendwann anders
+    als die erste.
 
     Es wird KEIN Link geerntet und keine zweite Adresse geholt: die Seite
     ist die Nutzlast. Damit ist die Regel "nur abrufen, was verlinkt ist"
@@ -591,7 +654,7 @@ def _sammle_ldjson(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
                      str(exc)[:120])
             continue
         bilanz["geholt"] += 1
-        gefunden = tarif_ldjson.tarife_aus_html(
+        gefunden = extrahiere(
             html, anbieter=quelle.anbieter, seiten_url=einstieg,
             abgerufen_am=jetzt.date().isoformat())
         if not gefunden:
@@ -603,7 +666,7 @@ def _sammle_ldjson(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
             # unterscheiden (die Telekom-Lehre vom 04.09.2026).
             bilanz["ohne_links"] += 1
             log.warning("Tarifquelle %s (%s): HTTP %s, %d Bytes, aber KEIN "
-                        "Tarif in den strukturierten Daten",
+                        "Tarif in der Nutzlast der Seite",
                         einstieg, quelle.anbieter,
                         getattr(antwort, "status_code", "?"),
                         len(getattr(antwort, "content", b"") or b""))
@@ -644,10 +707,11 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     im_lauf: dict[str, str] = {}
 
     for quelle in quellen:
-        if quelle.methode == METHODE_LDJSON:
-            _sammle_ldjson(quelle, http_cfg, hole=hole, jetzt=jetzt,
-                           speicher=speicher, bilanz=bilanz, items=items,
-                           im_lauf=im_lauf, besucht=besucht, erlaubt=erlaubt)
+        if quelle.methode in _SEITEN_LESARTEN:
+            _sammle_seite(quelle, http_cfg, hole=hole, jetzt=jetzt,
+                          speicher=speicher, bilanz=bilanz, items=items,
+                          im_lauf=im_lauf, besucht=besucht, erlaubt=erlaubt,
+                          extrahiere=_SEITEN_LESARTEN[quelle.methode])
             continue
         if quelle.methode != METHODE_DOKUMENTE:
             # Eine unbekannte Methode wird laut, nicht still: sonst faellt
@@ -656,7 +720,7 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             bilanz["fehler"] += 1
             log.warning("Tarifquelle %s: unbekannte methode %r - "
                         "uebersprungen (bekannt: %s)", quelle.anbieter,
-                        quelle.methode, (METHODE_DOKUMENTE, METHODE_LDJSON))
+                        quelle.methode, METHODEN)
             continue
         links: list[str] = []
         texte: dict[str, str] = {}

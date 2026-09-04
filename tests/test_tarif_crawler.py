@@ -792,11 +792,110 @@ def test_vertippte_methode_wird_laut_und_nicht_zur_vorgabe(tmp_path):
 
 def test_die_ausgelieferte_config_kennt_nur_gebaute_methoden():
     from telco_radar.collect.tarif_crawler import (
-        METHODE_DOKUMENTE, METHODE_LDJSON,
+        METHODE_KACHELN, METHODE_LDJSON, METHODEN,
     )
     quellen = lade_quellen(Path(__file__).resolve().parents[1])
-    assert {q.methode for q in quellen} <= {METHODE_DOKUMENTE, METHODE_LDJSON}
+    assert {q.methode for q in quellen} <= set(METHODEN)
     einsundeins = [q for q in quellen if q.anbieter == "1&1"]
     assert len(einsundeins) == 1
     assert einsundeins[0].methode == METHODE_LDJSON
     assert einsundeins[0].einstieg == ["https://www.1und1.de/handytarife"]
+    # o2 steht ZWEIMAL: einmal mit seinen Pflichtblaettern, einmal mit den
+    # Preiskacheln der SIM-only-Seite. Das ist kein Duplikat, sondern die
+    # Regel aus dem Konfigkopf ("Ein Anbieter darf in beiden Lesarten
+    # auftauchen") - und ohne die Kacheln kaeme kein o2-Buendel in den
+    # TCO-Bestand.
+    o2 = [q for q in quellen if q.anbieter == "o2"]
+    assert {q.methode for q in o2} == {"dokumente", METHODE_KACHELN}
+    kacheln = [q for q in o2 if q.methode == METHODE_KACHELN][0]
+    assert kacheln.einstieg == [
+        "https://www.o2online.de/tarife/handyvertrag-ohne-handy/"]
+
+
+# --------------------------------------------------------------------------
+# Zwei Lesarten sind zwei Zeitreihen
+# --------------------------------------------------------------------------
+
+def _stand(name, preistyp, grundgebuehr, laufzeit=None):
+    from telco_radar.tarif_model import HOCH, Tarif
+    tarif = Tarif(anbieter="o2", name=name, preistyp=preistyp,
+                  abgerufen_am="2026-09-04", rohtext=f"{name} {grundgebuehr}")
+    tarif.confidence["grundgebuehr"] = HOCH
+    tarif.grundgebuehr = grundgebuehr
+    tarif.laufzeit_monate = laufzeit
+    return tarif
+
+
+def _lege_ab(speicher, tarif, herkunft, im_lauf=None):
+    from telco_radar.collect.tarif_crawler import uebernimm_stand
+    bilanz = {"grundlinie": 0, "unveraendert": 0, "geaendert": 0,
+              "kleingedruckt": 0}
+    items = []
+    uebernimm_stand(tarif, hash_=herkunft, herkunft=herkunft,
+                    speicher=speicher, bilanz=bilanz,
+                    im_lauf=im_lauf if im_lauf is not None else {},
+                    items=items, jetzt=JETZT)
+    return bilanz, items
+
+
+def test_shop_preis_wird_keine_neue_fassung_des_pflichtblattes(tmp_path):
+    """Der Fehler, den der erste o2-Kachellauf am 04.09.2026 gezeigt hat.
+
+    Blatt und Kachel nennen denselben Tarif ("O2 Mobile Unlimited M Flex")
+    und tragen deshalb dieselbe Tarif-ID. In EINER Zeitreihe wird die
+    Kachel zur naechsten Fassung des Blattes - und `vergleiche` meldet als
+    Tarifaenderung, was in Wahrheit der Unterschied zwischen einem PDF und
+    einer Werbeseite ist. Genau dagegen ist `preistyp` gebaut.
+    """
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+
+    bilanz, _ = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
+                                          PREISTYP_DOKUMENT, 39.99, 24),
+                         "https://o2.de/blatt.pdf")
+    assert bilanz["grundlinie"] == 1
+
+    bilanz, items = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
+                                              PREISTYP_LIVE_SHOP, 39.99),
+                             "kachelhash")
+    # Eine eigene Grundlinie - KEINE Aenderungsmeldung.
+    assert bilanz["grundlinie"] == 1 and bilanz["geaendert"] == 0
+    assert items == []
+    assert [s["tarif_id"] for s in speicher.staende] == [
+        "o2:o2-mobile-unlimited-m-flex",
+        "o2:o2-mobile-unlimited-m-flex#live_shop"]
+
+
+def test_der_zusatz_bleibt_ueber_die_laeufe_stabil(tmp_path):
+    """Er ist der PREISTYP und kein Inhaltshash.
+
+    Ein Hash aenderte sich mit jeder Preisaenderung - die Zeitreihe der
+    zweiten Lesart zerfiele in lauter Einzelsaetze, und kein Diff
+    verbaende je zwei Staende.
+    """
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_DOKUMENT, 24.99),
+             "https://o2.de/blatt.pdf")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99),
+             "hash-eins")
+    bilanz, items = _lege_ab(speicher,
+                             _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99),
+                             "hash-zwei")
+    assert bilanz["geaendert"] == 1 and len(items) == 1
+    assert [s["tarif_id"] for s in speicher.staende] == [
+        "o2:o2-mobile-l", "o2:o2-mobile-l#live_shop", "o2:o2-mobile-l#live_shop"]
+
+
+def test_dieselbe_lesart_bleibt_eine_zeitreihe(tmp_path):
+    """Die Gegenprobe: ohne sie truennte die Regel auch, was zusammengehoert."""
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99), "a")
+    bilanz, _ = _lege_ab(speicher,
+                         _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "b")
+    assert bilanz["geaendert"] == 1
+    assert {s["tarif_id"] for s in speicher.staende} == {"o2:o2-mobile-l"}

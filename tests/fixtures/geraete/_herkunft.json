@@ -300,6 +300,21 @@
       "gzip": true,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 53960
+    },
+    {
+      "datei": "o2_katalog_buendel.json.gz",
+      "url": "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__",
+      "abgerufen_am": "2026-09-04",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 583104,
+      "sha256_roh": "a1ed5240f50b475bbff5fddd6c4c6aed7c12a96e77d10484f2190e1803c541d2",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 47077,
+      "kopfzeilen": {
+        "Accept": "application/vnd.commerce.message+json"
+      }
     }
   ]
 }

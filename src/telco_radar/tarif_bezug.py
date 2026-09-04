@@ -195,6 +195,53 @@ class Tarifbestand:
                      grund=f"Name im Produktinformationsblatt: "
                            f"{satz.get('name', '')}")
 
+    # -------------------------------------------------------------- Slug
+
+    def ueber_slug(self, anbieter: str, slug: str) -> Optional[Bezug]:
+        """Der Weg mit Guete `hoch` - ueber den Slug des Anbieters selbst.
+
+        Er ist noetig, weil ein Name manchmal auf keiner der zwei Seiten
+        derselbe ist. o2 (gemessen 04.09.2026) nennt denselben Tarif
+
+            im Geraetekatalog   "O2 Mobile on Demand M Plus mit 50 GB+
+                                (24 Mon.)"
+            in der SIM-only-Kachel  "O2 Mobile on Demand M", 19,99 EUR
+
+        Kein Namensvergleich der Welt bringt diese zwei zusammen, und
+        genau das SOLL er nicht: "M" und "M Plus" sind verschiedene
+        Zeichenketten, und eine Heuristik, die "Plus" wegwirft, wuerfe
+        beim naechsten Tarif etwas Bedeutungstragendes weg.
+
+        Was die zwei verbindet, ist keine Aehnlichkeit, sondern eine
+        Angabe: die Kachel verlinkt unter "Handy hinzufügen" den Slug
+        `o2-mobile-on-demand-m-plus`, und derselbe Slug steht im Katalog
+        am Buendel. Der Anbieter stellt die Verbindung her, dieses Modul
+        liest sie nur nach - deshalb `hoch` und nicht `mittel`.
+
+        Wie bei `ueber_betrag` gilt: zwei Treffer sind keine schwache
+        Zuordnung, sondern gar keine.
+        """
+        gesucht = (slug or "").strip().lower()
+        if not gesucht:
+            return None
+        marke = tarif_id(anbieter, "")
+        treffer = [s for s in self.je_id.values()
+                   if str(s.get("buendel_slug") or "").strip().lower() == gesucht
+                   and tarif_id(s.get("anbieter", ""), "") == marke]
+        if len(treffer) != 1:
+            if treffer:
+                log.info("Tarifbezug ueber den Slug %r bei %s ist nicht "
+                         "eindeutig (%d Tarife) - verworfen", gesucht,
+                         anbieter, len(treffer))
+            return None
+        satz = treffer[0]
+        return Bezug(
+            tarif_id=satz["tarif_id"], tarif_name=satz.get("name", ""),
+            guete=HOCH,
+            grund=(f"Der Anbieter verlinkt von der SIM-only-Kachel "
+                   f"{satz.get('name', '')!r} aus genau diesen Buendeltarif "
+                   f"({gesucht})"))
+
     # ------------------------------------------------------------ Betrag
 
     def ueber_betrag(self, anbieter: str, betrag: Optional[float]
@@ -227,12 +274,20 @@ class Tarifbestand:
     # ------------------------------------------------------------ beides
 
     def loese(self, anbieter: str, referenz: str = "",
-              betrag: Optional[float] = None) -> Optional[Bezug]:
-        """Erst der Name, dann der Betrag. Nie umgekehrt.
+              betrag: Optional[float] = None,
+              slug: str = "") -> Optional[Bezug]:
+        """Erst der Name, dann der Slug, dann der Betrag. Nie umgekehrt.
 
         Ein Name, der trifft, ist die staerkere Aussage; ihn zugunsten
         eines gleich hohen Betrags zu uebergehen hiesse, eine Messung durch
         eine Wahrscheinlichkeit zu ersetzen.
+
+        Der Slug steht dazwischen und nicht vorn: er ist genauso belegt wie
+        der Name (beides steht in der Quelle), aber er ist die Auskunft des
+        ANBIETERS ueber seine eigene Produktordnung, waehrend der Name die
+        Auskunft des Pflichtdokuments ist. Wo beide etwas sagen, gilt das
+        Blatt.
         """
         return (self.ueber_namen(anbieter, referenz)
+                or self.ueber_slug(anbieter, slug)
                 or self.ueber_betrag(anbieter, betrag))

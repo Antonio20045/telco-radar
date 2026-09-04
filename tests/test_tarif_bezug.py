@@ -398,3 +398,81 @@ def test_zwei_tarife_mit_derselben_titelzeile_ergeben_einen_massstab():
     # Beleg gehoeren zusammen.
     assert referenzen[0].tarif_sim_only_monatlich == 44.99
     assert referenzen[0].quelle_url == "https://x.de/erstes.pdf"
+
+
+# --------------------------------------------------------------------------
+# Der dritte Weg: der Slug, den der Anbieter selbst setzt
+# --------------------------------------------------------------------------
+# Er ist am 04.09.2026 dazugekommen, weil o2 seinen Buendeltarif anders
+# nennt als seinen SIM-only-Tarif und weder Name noch Betrag die zwei
+# verbinden. Verbunden werden sie von o2: die SIM-only-Kachel verlinkt
+# unter "Handy hinzufügen" genau den Slug, den der Geraetekatalog am
+# Buendel fuehrt.
+
+_O2_KACHEL = dict(buendel_slug="o2-mobile-on-demand-m-plus")
+
+
+def test_der_slug_loest_auf_wo_der_name_es_nicht_kann():
+    bestand = Tarifbestand([
+        _satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL)])
+    katalogname = "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
+    # Der Name trifft NICHT - und das ist richtig so: "M" und "M Plus"
+    # sind verschiedene Zeichenketten, und eine Heuristik, die "Plus"
+    # wegwirft, wuerfe beim naechsten Tarif etwas Bedeutungstragendes weg.
+    assert bestand.ueber_namen("o2", katalogname) is None
+    bezug = bestand.loese("o2", katalogname,
+                          slug="o2-mobile-on-demand-m-plus")
+    assert bezug is not None
+    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
+    assert bezug.guete == HOCH and bezug.belastbar
+    assert "Handy" not in bezug.grund      # der Grund nennt die Sache, nicht den Knopf
+    assert "o2-mobile-on-demand-m-plus" in bezug.grund
+
+
+def test_der_name_gewinnt_ueber_den_slug():
+    """Das Blatt schlaegt die Produktordnung des Shops.
+
+    Beides ist belegt; das Pflichtdokument ist die staerkere Quelle.
+    """
+    bestand = Tarifbestand([
+        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
+        _satz("o2", "O2 Mobile L Plus", 29.99,
+              buendel_slug="o2-mobile-l-plus-2")])
+    bezug = bestand.loese("o2", "O2 Mobile L Plus", slug="o2-mobile-l-plus")
+    assert bezug.tarif_id == "o2:o2-mobile-l-plus"
+    assert "Produktinformationsblatt" in bezug.grund
+
+
+def test_zwei_tarife_mit_demselben_slug_loesen_nicht_auf():
+    """Zwei Treffer sind keine schwache Zuordnung, sondern gar keine -
+    dieselbe Regel wie beim Betrag."""
+    bestand = Tarifbestand([
+        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
+        _satz("o2", "O2 Mobile L Zweitfassung", 24.99,
+              buendel_slug="o2-mobile-l-plus")])
+    assert bestand.ueber_slug("o2", "o2-mobile-l-plus") is None
+
+
+def test_der_slug_gilt_nur_innerhalb_des_anbieters():
+    bestand = Tarifbestand([
+        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus")])
+    assert bestand.ueber_slug("Vodafone", "o2-mobile-l-plus") is None
+
+
+def test_ein_leerer_slug_loest_nichts_auf():
+    """Sonst traefe jeder Bestandssatz ohne Slug jede Anfrage ohne Slug."""
+    bestand = Tarifbestand([_satz("o2", "O2 Mobile L", 24.99)])
+    assert bestand.ueber_slug("o2", "") is None
+    assert bestand.ueber_slug("o2", "   ") is None
+    assert bestand.loese("o2", "Gibtsnicht", slug="") is None
+
+
+def test_der_slug_kommt_vor_dem_betrag():
+    """Ein Betrag ist ein schwacher Schluessel - der Slug ist eine Angabe."""
+    bestand = Tarifbestand([
+        _satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL),
+        _satz("o2", "O2 Mobile S", 14.99)])
+    bezug = bestand.loese("o2", "Gibtsnicht", betrag=14.99,
+                          slug="o2-mobile-on-demand-m-plus")
+    assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
+    assert bezug.guete == HOCH
