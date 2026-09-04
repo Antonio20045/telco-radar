@@ -2226,13 +2226,19 @@ b,strong{font-weight:700}
   .gr-tafel{padding:16px 14px 20px}
   .gr-alarm{min-width:700px}
   .gr-alarm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  /* Die SIM-only-Referenzen: vier Spalten, deren letzte
-     "Produktinformationsblatt" plus Datum traegt. Gemessen schob sie auf
-     390 px die ganze Seite auf 480 px. Sie bekommt ihre Mindestbreite und
-     rollt IN ihrem `gr-scroll`-Behaelter - gestaucht waere die Belegspalte
-     unlesbar, und der Beleg ist der Grund, warum die Zahl dasteht. */
+  /* Die drei Tabellen des TCO-Reiters rollen IN ihrem `gr-scroll`-Behaelter
+     und bekommen dafuer ihre Mindestbreite. Gestaucht waere bei zweien die
+     BELEGSPALTE unlesbar, und der Beleg ist der Grund, warum die Zahl
+     dasteht; `--bereit` hat keine und braucht die Breite nur fuer ihre vier
+     Spalten.
+
+     Natuerliche Breite auf 390 px gemessen, jede einzeln: `--bereit` 437
+     (sie war es, die den Vorzustand auf 480 px Rechtskante schob),
+     `--simonly` 403, `--leit` 436. `--leit` rendert erst, wenn Phase 4
+     Buendel liefert - der Wert stammt aus einem gestellten Bestand. */
   .gr-ttab--simonly{min-width:520px}
   .gr-ttab--bereit{min-width:440px}
+  .gr-ttab--leit{min-width:560px}
 }
 
 /* Was auffaellt */
@@ -2246,6 +2252,18 @@ b,strong{font-weight:700}
 
 /* SKU-Matrix */
 .gr-matrix-scroll,.gr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Der Behaelter KOSTET 14 px, und das ist gemessen statt uebersehen:
+   `overflow-x:auto` macht aus ihm einen eigenen Block-Formatting-Context,
+   also kollabiert der Aussenabstand der Tabelle nicht mehr mit dem des
+   Absatzes darueber. Der Abstand springt von 18 auf 32 px; der TCO-Reiter
+   stand danach auf 1440 px bei 2641 statt 2627 px.
+   Bewusst NICHT weggeraeumt: die Gegenrechnung (`margin-top` an den
+   Behaelter, 0 an die erste Tabelle) traefe `.gr-scroll` auch dort, wo es
+   eine `.src-table` haelt, und verschoebe eine Seite, um die es hier nicht
+   geht. 2641 von 3000 (Kriterium 11b) sind Luft genug; auf 390 px ist der
+   Reiter durch die Behaelter ohnehin 209 px KUERZER. Wer den TCO-Reiter
+   einmal nahe an den Deckel bringt, hat hier drei Behaelter mal 14 px
+   liegen. */
 /* Eine breite Tabelle rollt IN SICH, nie die ganze Seite. Ohne diese zwei
    Behaelter schob die Bewegungstabelle auf 390 px die komplette Seite nach
    rechts - und eine Seite, die waagerecht rollt, ist auf dem Telefon

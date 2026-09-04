@@ -153,6 +153,50 @@ _DB = {"updated": "2026-08-11", "anbieter": {
 }, "listungen": _bestand()}
 
 
+# Der TCO-Bestand der Fixture.
+#
+# Bis zum 04.09.2026 gab es ihn nicht, und das machte den Reiter "Was kostet
+# es" zur halb ungeprueften Seite: ohne `geraete_tco.json` startet `TcoDB`
+# leer, `referenzen()` und `buendel()` geben `[]`, und damit rendern ZWEI der
+# drei Tabellen dieses Reiters ueberhaupt nicht - die SIM-only-Referenzen
+# (Makro, zweimal aufgerufen) und die Leitzahl-Tabelle. Der Breitentest
+# darunter wurde allein von der dritten rot, und die Behaelter der zwei
+# anderen waren von keinem Test der Suite gedeckt.
+#
+# 14 Referenzen, weil `REFERENZEN_SICHTBAR` bei 12 deckelt: so entsteht auch
+# der Aufklapper "Die uebrigen N Tarife" und mit ihm der ZWEITE Aufruf des
+# Makros. Vier Buendel mit Tarifgrundpreis UND Geraeterate, damit
+# `tco_24()` belastbar rechnet und die Leitzahl-Tabelle Zeilen bekommt -
+# der Zustand, den Phase 4 herstellen wird.
+_TCO_REFERENZEN = [
+    {"id": f"simonly--{a.lower()}--tarif-{i}", "anbieter": a,
+     "tarif_name": f"{a} Tarif {i}", "tarif_id": f"{a.lower()}:tarif-{i}",
+     "tarif_id_guete": "hoch", "tarif_sim_only_monatlich": 19.99 + i,
+     "anschlusspreis": None, "rabatte": [],
+     "quelle_url": f"https://example.de/pib/{a.lower()}-{i}",
+     "abgerufen_am": "2026-09-04", "first_seen": "2026-09-04",
+     "last_verified": "2026-09-04"}
+    for i, a in enumerate(["Vodafone", "o2"] * 7)
+]
+
+_TCO_BUENDEL = [
+    {"id": f"buendel--{sku}", "sku_id": sku, "anbieter": anb,
+     "tarif_name": f"{anb} Tarif {i}", "tarif_id": f"{anb.lower()}:tarif-{i}",
+     "tarif_id_guete": "hoch", "tarif_monatlich": 19.99 + i,
+     "geraet_zuzahlung": 1.0, "geraet_monatsrate": 20.0 + i,
+     "laufzeit_monate": 24, "anschlusspreis": None, "rabatte": [],
+     "quelle_url": f"https://example.de/p/{sku}",
+     "abgerufen_am": "2026-09-04", "first_seen": "2026-09-04",
+     "last_verified": "2026-09-04"}
+    for i, (anb, sku) in enumerate(
+        [("Vodafone", "vf-0"), ("o2", "o2-1"),
+         ("Vodafone", "vf-2"), ("o2", "o2-3")])
+]
+
+_TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL,
+        "sim_only": _TCO_REFERENZEN}
+
+
 def _historie():
     zeilen = []
     for e in _DB["listungen"]:
@@ -282,6 +326,7 @@ def _seite(tmp_path_factory):
     (state / "geraete_db.json").write_text(json.dumps(_DB), encoding="utf-8")
     (state / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8")
+    (state / "geraete_tco.json").write_text(json.dumps(_TCO), encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"
@@ -1836,3 +1881,29 @@ def test_kein_reiter_rollt_auf_dem_telefon_waagerecht(_umgebung, tid):
         assert breite <= sichtbar, f"{tid}: {breite} px statt {sichtbar} px"
     finally:
         seite.close()
+
+
+def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
+    """Jede `.gr-ttab` sitzt in einem `.gr-scroll`.
+
+    Der Breitentest darueber misst die WIRKUNG und ist damit an die
+    Datenlage gebunden: eine Tabelle, die heute keine Zeilen hat, rendert
+    nicht und kann nicht ueberlaufen. Genau daran ist die erste Fassung
+    dieses Reiters vorbeigelaufen - die Leitzahl-Tabelle steht hinter
+    `{% if geraete.tco.zeilen %}` und bekommt ihre Zeilen erst, wenn ein
+    Adapter Buendel liefert (Phase 4).
+
+    Dieser Test misst deshalb die REGEL statt ihrer Wirkung: er faellt auch
+    dann, wenn jemand eine vierte Tabelle ohne Behaelter ergaenzt, und er
+    faellt, bevor sie Daten hat.
+    """
+    tabellen = _seite.evaluate(
+        """() => Array.from(document.querySelectorAll('table.gr-ttab'))
+                     .map(t => ({klassen: t.className,
+                                 drin: !!t.closest('.gr-scroll')}))""")
+    # Ohne diese Zeile prueft der Test bei leerem Reiter nichts und ist
+    # trotzdem gruen - dieselbe Falle wie der Lookup, der 0 von 7 traf.
+    assert len(tabellen) >= 4, (
+        f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}")
+    ohne = [t["klassen"] for t in tabellen if not t["drin"]]
+    assert not ohne, f"Tabellen ohne Rollbehaelter: {ohne}"

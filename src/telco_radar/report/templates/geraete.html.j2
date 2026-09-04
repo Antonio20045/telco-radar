@@ -341,11 +341,18 @@
    Tabellen, und die zweite wird beim naechsten Umbau vergessen. #}
 {% macro referenztabelle(zeilen) %}
 {# `gr-scroll`: eine breite Tabelle rollt IN SICH, nie die ganze Seite.
-   Gemessen an der ausgelieferten Seite auf 390 px: ohne den Behaelter
-   schob genau diese Tabelle das Dokument auf 480 px - vier Spalten, deren
-   letzte "Produktinformationsblatt" plus Datum traegt. Eine Seite, die
-   waagerecht rollt, ist auf dem Telefon unbenutzbar; dieselbe Regel und
-   derselbe Behaelter wie bei der SKU-Matrix und der Bewegungstabelle. #}
+   Vier Spalten, deren letzte "Produktinformationsblatt" plus Datum traegt;
+   auf 390 px einzeln gemessen wird sie 403 px breit und reicht bis 446.
+   Die 480 px, auf die der Reiter im Vorzustand lief, gehen NICHT auf ihr
+   Konto, sondern auf das der Bereitschaftstabelle weiter unten (437 breit)
+   - eine Zahl gehoert an die Tabelle, an der sie gemessen wurde. Eine
+   Seite, die waagerecht rollt, ist auf dem Telefon unbenutzbar; dieselbe
+   Regel und derselbe Behaelter wie bei der SKU-Matrix (dort
+   `gr-matrix-scroll`) und der Bewegungstabelle.
+
+   Das Makro wird ZWEIMAL aufgerufen - offen und im Aufklapper "Die
+   uebrigen N Tarife" -, zwei Behaelter im Template ergeben also drei auf
+   der Seite. #}
 <div class="gr-scroll">
 <table class="gr-ttab gr-ttab--simonly">
   <thead><tr>
@@ -435,7 +442,16 @@
   </div>
   {% endif %}
 
-  <table class="gr-ttab">
+  {# Derselbe Behaelter aus demselben Grund - und diese hier ist die
+     WICHTIGSTE Tabelle des Reiters: sie traegt die Leitzahl. Sie steht
+     hinter `{% raw %}{% if geraete.tco.zeilen %}{% endraw %}` und rendert
+     heute nicht, weil kein Adapter Buendel liefert (Phase 4); genau
+     deshalb ist sie beim Nachmessen der Seite nicht aufgefallen. Mit
+     gestellten Buendeln auf 390 px gemessen: ohne Behaelter 436 px statt
+     390. Wer nur repariert, was die heutigen Daten zeigen, repariert die
+     Haelfte - dieselbe Fehlerklasse wie `max_produkte` und `mark_stale`. #}
+  <div class="gr-scroll">
+  <table class="gr-ttab gr-ttab--leit">
     <thead><tr>
       <th scope="col">Gerät</th><th scope="col">Anbieter und Tarif</th>
       <th scope="col">TCO {{ geraete.tco.horizont }} Monate</th>
@@ -499,6 +515,7 @@
     {% endfor %}
     </tbody>
   </table>
+  </div>
   {% if geraete.tco.zeilen_gesamt > geraete.tco.zeilen|length %}
   <p class="gr-basis--duenn">{{ geraete.tco.zeilen|length }} von {{
   geraete.tco.zeilen_gesamt }} Bündeln gezeigt.</p>
@@ -562,9 +579,11 @@
   {% if geraete.tco.bereitschaft %}
   <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
   {# Derselbe Behaelter aus demselben Grund wie bei der Referenztabelle:
-     vier Spalten passen auf 390 px nicht nebeneinander. Gemessen schob
-     genau diese Tabelle das Dokument auf 480 px - vorbestehend seit
-     Phase 6a, gefunden beim Nachmessen der neuen Tafel auf dem Telefon. #}
+     vier Spalten passen auf 390 px nicht nebeneinander. Diese hier ist die
+     Tabelle, die den Reiter im Vorzustand auf 480 px Rechtskante schob
+     (437 px breit) - vorbestehend seit Phase 6a, gefunden beim Nachmessen
+     der neuen Tafel auf dem Telefon. Sie hat als einzige der drei KEINE
+     Belegspalte; ihre Mindestbreite traegt nur die vier Spalten. #}
   <div class="gr-scroll">
   <table class="gr-ttab gr-ttab--bereit">
     <thead><tr>
