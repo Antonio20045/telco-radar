@@ -2659,6 +2659,12 @@ b,strong{font-weight:700}
   color:var(--ink-2)}
 .gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
+/* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
+   Zahl und nicht zu den Bausteinen - Grotesk, klein, aber nicht unter
+   12 px (Hausregel seit 30.08.2026). Ohne eigene Regel erbte er die
+   Serife der Karte und stand so gross wie die Leitzahl daneben. */
+.gr-kk-basis{margin:-4px 0 8px;font-family:var(--sans);font-size:12px;
+  line-height:1.4;color:var(--ink-4)}
 .gr-kk-24 b{font-weight:600}
 .gr-kk-eff .gr-a-klein{display:block}
 .gr-kk-hinweis,.gr-kk-luecke{color:var(--ink-3);font-style:italic}

@@ -645,6 +645,14 @@ KAT_BONUS = "bonus"
 
 POSTEN_BUENDEL = "Bündelpreis (Tarif und Gerät zusammen)"
 POSTEN_TARIFBINDUNG = "Tarifbindung"
+# EIN FLEXTARIF IST KEINE LUECKE, SONDERN EINE AUSSAGE. CLAUDE.md § 6:
+# "«Keine Mindestlaufzeit» ist 0, nicht None. Eine Aussage, kein fehlender
+# Wert." Ueber eine Bindung, die es nicht gibt, ist auch kein Tarifbetrag
+# geschuldet - eine TCO ueber die Laufzeit ist fuer diesen Tarif nicht
+# definiert, und das ist etwas anderes als "nicht gemessen". Im
+# Tarifbestand vom 04.09.2026 tragen 8 von 44 Tarifen die 0 (congstar 5,
+# o2 3).
+POSTEN_TARIF_FLEX = "Tarif ohne Mindestlaufzeit"
 
 
 @dataclass
@@ -692,7 +700,10 @@ class TcoBindung:
                 # Ein Grundpreis ohne gemessene Bindung steht in KEINEM
                 # Bestandteil - die Summe waere dann der Geraetebetrag
                 # allein und saehe wie ein sehr guenstiges Buendel aus.
-                and POSTEN_TARIFBINDUNG not in self.luecken)
+                # Dasselbe gilt fuer einen Flextarif, nur aus dem
+                # umgekehrten Grund: dort ist der Betrag nicht geschuldet.
+                and POSTEN_TARIFBINDUNG not in self.luecken
+                and POSTEN_TARIF_FLEX not in self.luecken)
 
     @property
     def label(self) -> str:
@@ -735,6 +746,8 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         # Fehlt die Tarifbindung, ist die Karte nicht rechenbar: sie mit der
         # Ratenlaufzeit gleichzusetzen addierte bei o2 zwoelf Tarifmonate,
         # die niemand schuldet (12 x 19,99 EUR = 239,88 EUR zu viel).
+        # `if x` und nicht `is not None`: eine 0 ist keine Laenge. Ein
+        # Flextarif bindet nicht, die Geraeteraten schon.
         laengen = [x for x in (e.tarif_bindung, e.raten_laufzeit) if x]
         e.bindung = max(laengen) if laengen else None
 
@@ -754,6 +767,11 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
                     f"{buendel.tarif_monatlich:.2f} €".replace(".", ","),
             "betrag": round(buendel.tarif_monatlich * e.tarif_bindung, 2),
             "kategorie": KAT_TARIF})
+    elif e.tarif_bindung == 0:
+        # Monatlich kuendbar: der Kunde schuldet den Tarif nicht ueber die
+        # Laufzeit, sondern Monat fuer Monat. Ihn ueber 36 Monate zu
+        # summieren waere eine Bindung, die der Vertrag nicht kennt.
+        e.luecken.append(POSTEN_TARIF_FLEX)
     else:
         # Der Grundpreis steht, aber niemand hat gemessen, wie lange er
         # geschuldet ist. Beides ist eine Luecke, und sie hat einen eigenen
@@ -833,7 +851,12 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
                              * min(LEITFRAGE_MONATE,
                                    buendel.laufzeit_monate), 2)
     for r in buendel.rabatte:
-        gezahlt -= r.wert(LEITFRAGE_MONATE)
+        # Ueber den kuerzeren der beiden Zeitraeume: laeuft der Vertrag nur
+        # zwoelf Monate, gibt es keinen Bonus fuer Monat 13 bis 24. Mit
+        # festen 24 stand bei einer 12-Monats-Bindung "noch offen: 120,00 €"
+        # da, wo nichts mehr offen ist - die Differenz war allein
+        # `wert(24) - wert(12)`.
+        gezahlt -= r.wert(min(LEITFRAGE_MONATE, e.bindung or LEITFRAGE_MONATE))
     e.gezahlt_nach_24 = round(gezahlt, 2)
     e.offen_nach_24 = round(e.gesamt - e.gezahlt_nach_24, 2)
     return e

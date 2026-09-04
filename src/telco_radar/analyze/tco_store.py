@@ -59,7 +59,14 @@ log = logging.getLogger(__name__)
 
 # Die Felder eines Buendels, die eine Messung sind - sie werden gemeinsam
 # geschrieben, siehe Modulkopf.
+# `buendel_monatlich` und `tarif_bindung_monate` STEHEN HIER MIT, seit es
+# sie gibt (Phase R). Diese Liste ist eine POSITIVLISTE - dieselbe Falle
+# wie `_items_payload` in `analyze/agents.py`: ein neues Feld am Datensatz
+# landet hier NICHT von selbst, und ein Buendel, dessen einziger Preis der
+# Buendelmonatsbetrag ist (1&1), waere beim Ablegen still preislos
+# geworden.
 _MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
+               "tarif_bindung_monate", "buendel_monatlich",
                "geraet_zuzahlung", "geraet_monatsrate",
                "laufzeit_monate", "anschlusspreis", "quelle_url",
                "abgerufen_am")
@@ -137,7 +144,12 @@ class TcoDB:
             if not isinstance(satz, Buendel):
                 raise TypeError(f"kein Buendel: {type(satz).__name__}")
             if (satz.geraet_zuzahlung is not None
-                    or satz.geraet_monatsrate is not None) \
+                    or satz.geraet_monatsrate is not None
+                    # Ein Buendelmonatspreis IST ein Geraetepreis - er
+                    # traegt Tarif und Geraet in einer Zahl. Ohne ihn hier
+                    # haette ein 1&1-Satz die Regel unterlaufen und einen
+                    # Preis ohne nachschlagbaren Tarif abgelegt.
+                    or satz.buendel_monatlich is not None) \
                     and not (satz.tarif_id or "").strip():
                 # Phase 6, Abnahmekriterium 3: kein Buendelpreis im Bestand
                 # ohne aufloesbaren Tarif. Die Regel steht HIER und nicht im

@@ -408,6 +408,7 @@ def _raten(eintrag: dict):
 # Store ein Betriebsfeld ergaenzt.
 _BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_id",
                    "tarif_id_guete", "tarif_monatlich",
+                   "tarif_bindung_monate", "buendel_monatlich",
                    "geraet_zuzahlung", "geraet_monatsrate", "laufzeit_monate",
                    "anschlusspreis", "quelle_url", "abgerufen_am")
 
@@ -647,6 +648,24 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
               if historie is not None else [])
     g2 = geraete_tco_grafik.historie(reihen)
 
+    # DIE TABELLE ALLER BUENDEL KOMMT AUS DENSELBEN KARTEN wie die
+    # Hauptansicht - nicht aus einer zweiten Rechnung.
+    #
+    # Bis zum 04.09.2026 stand hier `zeilen` aus `tco_24()`, und damit
+    # trug derselbe Reiter dasselbe Buendel mit ZWEI Gesamtsummen und zwei
+    # "Ø je Monat": die Karte "TCO-36 652,75 € · Ø 18,13 €", die Tabelle
+    # darunter "TCO 24 Monate 568,75 € · Ø 23,70 €". Zwei Rechnungen fuer
+    # dieselbe Zahl sind zwei Zahlen (CLAUDE.md § 6). `zeilen` bleibt als
+    # Datenlage-Auskunft (`hat_tco`, `_offene_posten`) - gezeigt wird sie
+    # nicht mehr.
+    #
+    # Die Referenzrechnungen stehen NICHT darin: sie sind kein Buendel,
+    # sondern der Massstab daneben.
+    tabelle = [k for m in modelle["modelle"] for k in m["karten"]
+               if k["belastbar"] and not k["naeherung"]]
+    tabelle.sort(key=lambda k: (k["schnitt_monat"] or 9e9, k["geraet"],
+                                k["anbieter"]))
+
     return {
         # "Es gibt eine TCO zu zeigen" - nicht "es gibt Geraetedaten".
         # Die zwei auseinanderzuhalten ist der Grund, warum die Tafel heute
@@ -686,6 +705,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Auskunft ueber die Datenlage, nur nicht mehr der Inhalt der
         # Tafel.
         "modelle": modelle["modelle"],
+        "tabelle": tabelle,
         "modell_vorgabe": modelle["vorgabe"],
         "modelle_gesamt": modelle["gesamt"],
         "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
@@ -700,6 +720,7 @@ def leer() -> dict:
             "offene_posten": _offene_posten([]),
             "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
             "horizont": TCO_HORIZONT,
-            "modelle": [], "modell_vorgabe": "", "modelle_gesamt": 0,
+            "modelle": [], "tabelle": [], "modell_vorgabe": "",
+            "modelle_gesamt": 0,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
             "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}}

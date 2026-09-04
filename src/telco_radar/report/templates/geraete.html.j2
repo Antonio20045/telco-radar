@@ -69,17 +69,15 @@
        Gesamtbetrag einer Ratenzahlung und stand bis zum 03.09.2026 in
        derselben Optik wie freenets Barpreis. Wo die Quelle keine Rate
        nennt, bleibt die Zelle wie bisher. #}
-    <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{
-      '%.2f'|format(z.unser.preis)|replace('.', ',') }} €</span>{%
+    <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{ z.unser.preis | euro }}</span>{%
       if z.unser.ratenhinweis %}
       <span class="gr-a-klein">{{ z.unser.ratenhinweis }}</span>{% endif %}</td>
-    <td class="num"><span class="gr-a-fremd">{{
-      '%.2f'|format(z.bester.preis)|replace('.', ',') }} €</span>{%
+    <td class="num"><span class="gr-a-fremd">{{ z.bester.preis | euro }}</span>{%
       if z.bester.ratenhinweis %}
       <span class="gr-a-klein">{{ z.bester.ratenhinweis }}</span>{% endif %}</td>
     <td class="num"><span class="gr-a-prozent">{{
       '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
-      <span class="gr-a-euro">{{ '%.2f'|format(z.euro)|replace('.', ',') }} €</span></td>
+      <span class="gr-a-euro">{{ z.euro | euro }}</span></td>
     <td><span class="gr-pille gr-pille--{{ z.stufe }}">{{ z.stufe_name }}</span></td>
     {# KEINE VERFUEGBARKEITSSPALTE MEHR (30.08.2026).
 
@@ -99,7 +97,7 @@
     <ul class="gr-a-liste">
       {% for a in z.alle %}
       <li><span{% if a.eigen %} class="gr-a-eigen"{% endif %}>{{ a.laden }}</span>
-        <span>{{ '%.2f'|format(a.preis)|replace('.', ',') }} €{%
+        <span>{{ a.preis | euro }}{%
           if a.ratenhinweis %} <span class="gr-klein">{{ a.ratenhinweis
           }}</span>{% endif %}</span>
         <span>{{ a.zustand }}</span>
@@ -233,13 +231,10 @@
    Kacheln, Filter, Suche, Sortierung, Zeilenaufklapper und "alle anzeigen"
    stehen unveraendert; sie stehen nur nicht mehr vor der Leitfrage. #}
 {% macro alarmtafel(al) %}
-  <div class="gr-kacheln">
-    {% for k in al.kacheln %}
-    <div class="gr-kachel gr-kachel--{{ k.schluessel }}">
-      <b>{{ k.zahl }}</b><span>{{ k.name }}</span><em>{{ k.schwelle }}</em>
-    </div>
-    {% endfor %}
-  </div>
+  {# DIE VIER KENNZAHLEN STEHEN OBEN ALS CHIPS und nicht ein zweites Mal
+     hier: eine Zahl steht je Ort genau EINMAL (Beruhigungsregel vom
+     07.08.2026). Bis zum 04.09.2026 standen sie wortgleich in beiden
+     Bloecken derselben Tafel. #}
 
   {# Zustand und Preisart sind auf dieser Tafel keine Auswahl, sondern der
      Zuschnitt: der Vergleich zeigt ausschliesslich Neugeraete ohne Vertrag.
@@ -380,8 +375,8 @@
   <tr{% if r.eigen %} class="gr-tzeile--eigen"{% endif %}>
     <td><span class="gr-t-anbieter">{{ r.anbieter }}</span>
         <span class="gr-a-klein">{{ r.tarif }}</span></td>
-    <td>{{ '%.2f'|format(r.monatlich)|replace('.', ',') }} €</td>
-    <td>{{ '%.2f'|format(r.ueber_horizont)|replace('.', ',') }} €</td>
+    <td>{{ r.monatlich | euro }}</td>
+    <td>{{ r.ueber_horizont | euro }}</td>
     <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
           rel="nofollow noopener" target="_blank">Produktinformationsblatt</a>{%
         else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
@@ -416,6 +411,18 @@
      unbeschriftete Gesamtsumme waere ueber zwei Laufzeiten nicht lesbar. #}
   <p class="gr-kk-leit"><b>{{ k.label }}</b> <span>{{ k.gesamt | euro }}</span></p>
   <p class="gr-kk-zweit">Ø {{ k.schnitt_monat | euro }}/Monat</p>
+  {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
+     Ø-Werte, in denen verschieden viele Tarifmonate stecken. Bei o2 sind
+     es 24 von 36 (der Tarif bindet kuerzer als die Raten laufen), bei
+     1&1 alle 36. Das Mass ist das aus A5.3; der Satz ist der Disclaimer,
+     den Katalog D dazu verlangt. #}
+  {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}
+  <p class="gr-kk-basis">darin {{ k.tarif_bindung }} von {{ k.laufzeit }}
+  Monaten Tarif – so lange bindet er</p>
+  {% elif k.ab_preis %}
+  <p class="gr-kk-basis">Monatspreis „ab“ – der Anbieter nennt ihn für den
+  günstigsten Tarif dieses Geräts</p>
+  {% endif %}
 
   <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
     k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
@@ -428,8 +435,11 @@
   {# A5.2, PFLICHTZEILE: Antonios Leitfrage, woertlich beantwortet - auch
      und gerade bei 36 Monaten Bindung. #}
   {% if k.gezahlt_nach_24 is not none %}
+  {# "DANACH", NICHT "DAVON": die offenen Raten sind der Rest der
+     Gesamtsumme, kein Teil der genannten 24-Monats-Zahlung. "davon" war
+     ein Label, das etwas anderes meint als sein Feld. #}
   <p class="gr-kk-24">nach 24 Monaten gezahlt: <b>{{ k.gezahlt_nach_24 | euro
-    }}</b>{% if k.offen_nach_24 %} · davon noch offen: {{ k.offen_nach_24 | euro
+    }}</b>{% if k.offen_nach_24 %} · danach noch offen: {{ k.offen_nach_24 | euro
     }}{% if k.offene_raten %} ({{ k.offene_raten }} Geräteraten){% endif %}{%
     endif %}</p>
   {% endif %}
@@ -467,8 +477,11 @@
   {% if k.naeherung %}
   <p class="gr-kk-hinweis">Gerechnet, kein Angebot: Vodafone weist zu diesem
   Gerät keinen Bündelpreis aus. Addiert sind der Tarifgrundpreis aus dem
-  Produktinformationsblatt und der eigene Barpreis des Geräts – beide
-  belegt, die Summe ist unsere.</p>
+  Produktinformationsblatt für {{ k.referenz.tarif_monate }} Monate
+  Mindestlaufzeit und der eigene Barpreis des Geräts – beide belegt, die
+  Summe ist unsere.{% if k.referenz.fortgeschrieben %} Für einen Teil der
+  Laufzeit nennt das Blatt keinen Preis; dort gilt der zuletzt belegte
+  fort.{% endif %}</p>
   {% endif %}
 
   {# Der Rechenweg. Jede Zahl der Karte ist hier nachlesbar, samt dem, was
@@ -539,6 +552,19 @@
   Leistungen – ein Tarif mit mehr Datenvolumen kostet zu Recht mehr, und das
   rechnet diese Tafel nicht heraus.</p>
 
+  {# --- Die Preis-Alarme als Chips (H4) ------------------------------
+         SIE STEHEN VOR DEM MODELLGATTER und nicht darin: die Alarme
+         haengen an den Barpreisen, nicht an den Buendeln. Innerhalb von
+         `{% raw %}{% if geraete.tco.modelle %}{% endraw %}` verschwanden
+         sie, sobald kein Buendel im Bestand steht - und mit ihnen die
+         einzige Zahl, die dieser Reiter dann noch haette. #}
+  <ul class="gr-chips" aria-label="Preis-Alarme">
+    {% for k in geraete.alarme.kacheln %}
+    <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
+      <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
+    {% endfor %}
+  </ul>
+
   {% if geraete.tco.modelle %}
   {% set vorgabe = geraete.tco.modell_vorgabe %}
 
@@ -555,14 +581,6 @@
     mindestens einem erhobenen Bündel</span>
   </div>
 
-  {# --- 2. Die Preis-Alarme als Chips (H4) --------------------------- #}
-  <ul class="gr-chips" aria-label="Preis-Alarme">
-    {% for k in geraete.alarme.kacheln %}
-    <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
-      <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
-    {% endfor %}
-  </ul>
-
   {# --- 3./4. Je Modell die Karten und die Balkengrafik --------------- #}
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
@@ -578,9 +596,12 @@
         <option value="gesamt">Gesamtkosten je Laufzeitgruppe</option>
         <option value="einmalig">Gerät einmalig</option>
       </select></label>
+      {# JE ANBIETER EIN Eintrag, nicht je Karte: zwei o2-Tarife zum
+         selben Geraet ergaeben sonst zweimal "o2" im Auswahlfeld. #}
       <label>Anbieter <select data-anbieterfilter>
         <option value="">alle</option>
-        {% for k in m.karten %}<option value="{{ k.anbieter }}">{{ k.anbieter }}</option>{% endfor %}
+        {% for a in m.karten | map(attribute='anbieter') | unique | sort %}
+        <option value="{{ a }}">{{ a }}</option>{% endfor %}
       </select></label>
     </div>
 
@@ -630,128 +651,51 @@
   Markt.</p>
   {% endif %}
 
-  {% if geraete.tco.zeilen %}
-  {# DIE TABELLE ALLER BUENDEL - seit Phase R im Aufklapper.
+  {% if geraete.tco.tabelle %}
+  {# ALLE BUENDEL ALS TABELLE - aus DENSELBEN Karten wie die Hauptansicht.
 
      Die Hauptansicht zeigt EIN Geraet mit allen Anbietern; diese Tabelle
      zeigt alle Geraete mit ihrem guenstigsten Buendel. Zwei Fragen, zwei
-     Ansichten - geloescht ist nichts, sie steht nur nicht mehr vor der
-     Leitfrage. C.3 verlangt ausserdem, dass jeder Betrag einer Grafik in
-     einer Tabelle nachlesbar ist; das hier ist sie. #}
+     Ansichten, EINE Rechnung: bis zum 04.09.2026 stand hier eine zweite
+     (`tco_24`, auf 24 Monate gekappt), und derselbe Reiter trug dasselbe
+     Buendel mit zwei Gesamtsummen. C.3 verlangt ausserdem, dass jeder
+     Betrag einer Grafik in einer Tabelle nachlesbar ist; das hier ist
+     sie. #}
   <details class="gr-auf" id="gr-tco-tabelle">
-  <summary>Alle Bündel als Tabelle ({{ geraete.tco.zeilen_gesamt }})</summary>
-  {# DAS GATTER HAENGT AN DEN ZEILEN, NICHT AN `hat_tco`.
-
-     Mit `hat_tco` verschwand die ganze Tabelle, sobald KEINE Zeile
-     belastbar war - samt der Zuzahlungen und Raten, die sehr wohl gemessen
-     sind. Genau das ist der naechste reale Zustand: nach Phase 4 (die
-     Adapter liefern Zuzahlung und Rate) und vor Phase 6 (die Tarifpreise).
-     Der Docstring von `_zeile` sagt zu, dass Gemessenes sichtbar bleibt;
-     mit `hat_tco` hielt die Seite diese Zusage nicht ein, und der Test dazu
-     blieb trotzdem gruen, weil er die Moduldaten prueft. #}
-  {% if not geraete.tco.hat_tco %}
-  <p class="gr-erklaer gr-basis--duenn">Für keine Zeile ist die Rechnung
-  vollständig – die Bestandteile stehen trotzdem da, sie ergeben nur noch
-  keine Gesamtsumme.</p>
-  {% endif %}
-
-  {# --- Das Euro-Delta gegen uns. Nur wo BEIDE Seiten eine belastbare
-         Zahl tragen; eine Haelfte mit Luecke ergibt kein Vorzeichen. #}
-  {% if geraete.tco.delta %}
-  <div class="gr-tdelta">
-    {% for d in geraete.tco.delta[:3] %}
-    <p class="gr-tdelta-zeile{% if d.guenstiger %} gr-tdelta--unter{% endif %}">
-      <b>{{ '%.2f'|format(d.abstand)|replace('.', ',') }} €</b>
-      {{ 'günstiger als Vodafone' if d.guenstiger else 'teurer als Vodafone' }}
-      über {{ geraete.tco.horizont }} Monate: {{ d.geraet }} bei
-      {{ d.anbieter }} ({{ d.tarif }}) gegen {{ d.eigen_tarif }}.
-      {% if d.quelle_url %}<a href="{{ d.quelle_url }}" rel="nofollow noopener"
-        target="_blank">Beleg {{ d.anbieter }}</a>{% endif %}{% if
-        d.eigen_quelle_url %} · <a href="{{ d.eigen_quelle_url }}"
-        rel="nofollow noopener" target="_blank">Beleg Vodafone</a>{% endif %}
-    </p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  {# Derselbe Behaelter aus demselben Grund - und diese hier ist die
-     WICHTIGSTE Tabelle des Reiters: sie traegt die Leitzahl. Sie steht
-     hinter `{% raw %}{% if geraete.tco.zeilen %}{% endraw %}` und rendert
-     heute nicht, weil kein Adapter Buendel liefert (Phase 4); genau
-     deshalb ist sie beim Nachmessen der Seite nicht aufgefallen. Mit
-     gestellten Buendeln auf 390 px gemessen: ohne Behaelter 436 px statt
-     390. Wer nur repariert, was die heutigen Daten zeigen, repariert die
-     Haelfte - dieselbe Fehlerklasse wie `max_produkte` und `mark_stale`. #}
+  <summary>Alle Bündel als Tabelle ({{ geraete.tco.tabelle | length }})</summary>
   <div class="gr-scroll">
   <table class="gr-ttab gr-ttab--leit">
     <thead><tr>
       <th scope="col">Gerät</th><th scope="col">Anbieter und Tarif</th>
-      <th scope="col">TCO {{ geraete.tco.horizont }} Monate</th>
-      <th scope="col">Ø je Monat</th><th scope="col">Beleg</th>
+      <th scope="col">Gesamtkosten</th>
+      <th scope="col">Ø je Monat</th>
+      <th scope="col">nach 24 Monaten</th><th scope="col">Beleg</th>
     </tr></thead>
     <tbody>
-    {% for z in geraete.tco.zeilen %}
+    {% for z in geraete.tco.tabelle %}
     <tr class="gr-tzeile{% if z.eigen %} gr-tzeile--eigen{% endif %}">
       <td>{{ z.geraet }}</td>
       <td><span class="gr-t-anbieter">{{ z.anbieter }}</span>
           <span class="gr-a-klein">{{ z.tarif }}</span></td>
-      {# DIE LEITZAHL, und sie steht nur bei belastbarer Rechnung. `gesamt`
-         waere auch ohne Tarifgrundpreis eine Zahl - dann ist es aber der
-         Geraetebetrag und keine TCO. #}
-      <td>{% if z.gesamt is not none %}<b class="gr-t-leit">{{
-        '%.2f'|format(z.gesamt)|replace('.', ',') }} €</b>{% else %}<span
-        class="gr-t-luecke">nicht berechenbar</span>{% endif %}</td>
-      <td>{% if z.monatlich is not none %}{{
-        '%.2f'|format(z.monatlich)|replace('.', ',') }} €{% else %}–{% endif %}</td>
-      {# Ein Buendel ohne Quelllink bekommt KEINEN leeren Anker. Ein
-         `<a href="">` mit leerem Text ist ein Bedienelement, das nichts tut
-         - und es taeuscht einen Beleg vor, den es nicht gibt. #}
+      {# DIE LEITZAHL TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine
+         unbeschriftete Gesamtsumme ist ueber zwei Bindungsdauern nicht
+         lesbar. #}
+      <td><b class="gr-t-leit">{{ z.gesamt | euro }}</b>
+          <span class="gr-a-klein">{{ z.label }}</span></td>
+      <td>{{ z.schnitt_monat | euro }}</td>
+      <td>{{ z.gezahlt_nach_24 | euro }}{% if z.offen_nach_24 %}
+          <span class="gr-a-klein">danach offen {{ z.offen_nach_24 | euro
+          }}</span>{% endif %}</td>
       <td>{% if z.quelle_url %}<a href="{{ z.quelle_url }}"
             rel="nofollow noopener" target="_blank">{{ z.quelle_url | domain
             }}</a>{% else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
           {% if z.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
             z.abgerufen_am | date_de }}</span>{% endif %}</td>
     </tr>
-    <tr class="gr-tdetail"><td colspan="5">
-      <details>
-        <summary>Woraus die Zahl besteht</summary>
-        <ul class="gr-tposten">
-          {% for p in z.bestandteile %}
-          <li><span>{{ p.name }}</span><em>{{
-            '%.2f'|format(p.betrag)|replace('.', ',') }} €</em></li>
-          {% endfor %}
-          {% for l in z.luecken %}
-          <li class="gr-tposten--luecke"><span>{{ l.name }}</span><em>nicht
-            gemessen{% if l.phase %} – {{ l.phase }}{% endif %}</em></li>
-          {% endfor %}
-        </ul>
-        {% if z.restbetrag %}
-        {# Was jenseits des Horizonts liegt, steht NEBEN der Zahl statt aus
-           ihr herauszufallen - sonst waere die 24-Monats-Kappung genau die
-           CHECK24-Methodik, die das Strategiedokument verwirft. #}
-        <p class="gr-basis--duenn">Nach {{ geraete.tco.horizont }} Monaten
-        offen: {{ '%.2f'|format(z.restbetrag)|replace('.', ',') }} € Geräteraten.</p>
-        {% endif %}
-        {% if z.geraeteanteil is not none %}
-        <p class="gr-basis--duenn">Gegen denselben Tarif ohne Gerät gerechnet
-        zahlt man für das Gerät {{
-        '%.2f'|format(z.geraeteanteil)|replace('.', ',') }} €.</p>
-        {% endif %}
-        {% if z.rabatte_offen %}
-        <p class="gr-basis--duenn">Nicht eingerechnet: {{
-        '%.2f'|format(z.rabatte_offen)|replace('.', ',') }} € an benannten
-        Boni und Rabatten.</p>
-        {% endif %}
-      </details>
-    </td></tr>
     {% endfor %}
     </tbody>
   </table>
   </div>
-  {% if geraete.tco.zeilen_gesamt > geraete.tco.zeilen|length %}
-  <p class="gr-basis--duenn">{{ geraete.tco.zeilen|length }} von {{
-  geraete.tco.zeilen_gesamt }} Bündeln gezeigt.</p>
-  {% endif %}
   </details>
 
   {% else %}
@@ -990,9 +934,9 @@
           {% else %}{{ z.anbieter }}{% endif %}
           {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
         <td class="num">{% if z.preis is not none
-          %}{{ '%.2f'|format(z.preis)|replace('.', ',') }} €{% if z.ratenhinweis
+          %}{{ z.preis | euro }}{% if z.ratenhinweis
             %} <span class="gr-a-klein">{{ z.ratenhinweis }}</span>{% endif %}{% elif z.zuzahlung is not none
-          %}{{ '%.2f'|format(z.zuzahlung)|replace('.', ',') }} €
+          %}{{ z.zuzahlung | euro }}
             <span class="gr-a-klein">Zuzahlung{% if z.tarif %}, {{ z.tarif }}{% endif %}</span>
           {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>
         <td><span class="gr-pille gr-pille--{{ 'bestpreis' if z.zustand == 'neu' else 'mittel' }}">{{ z.zustand }}</span></td>
@@ -1229,8 +1173,8 @@
       {% for b in geraete.auffaellig.bewegungen %}
       <tr>
         <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
-        <td class="num">{{ '%.2f'|format(b.von) }} €</td>
-        <td class="num">{{ '%.2f'|format(b.auf) }} €</td>
+        <td class="num">{{ b.von | euro }}</td>
+        <td class="num">{{ b.auf | euro }}</td>
         <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
           {{ '%+.2f'|format(b.delta) }} €</td>
         <td>{{ b.datum | date_de }}</td>
@@ -1336,8 +1280,8 @@
   <ul class="list-card gr-verfall">
     {% for v in geraete.lifecycle.trends[:sichtbar] %}
     <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
-      {{ v.modell }} bei {{ v.anbieter }}: {{ '%.2f'|format(v.erstpreis) }} €
-      (seit {{ v.erstpreis_am | date_de }}) auf {{ '%.2f'|format(v.aktuell) }} €
+      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
       <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
     {% endfor %}
   </ul>
@@ -1346,8 +1290,8 @@
   <ul class="list-card gr-verfall">
     {% for v in geraete.lifecycle.trends[sichtbar:] %}
     <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
-      {{ v.modell }} bei {{ v.anbieter }}: {{ '%.2f'|format(v.erstpreis) }} €
-      (seit {{ v.erstpreis_am | date_de }}) auf {{ '%.2f'|format(v.aktuell) }} €
+      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
       <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
     {% endfor %}
   </ul>
@@ -1436,8 +1380,7 @@
     {% for l in geraete.vergleich.ohne_vertrag.ohne_vodafone %}
     <li><span class="szl">{{ l.modell }}</span>
       {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-      <span class="gr-v-prozent">ab {{
-        '%.2f'|format(l.ab_preis)|replace('.', ',') }} €</span>
+      <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
       <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
         else 'Anbieter' }}</span>
       <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>

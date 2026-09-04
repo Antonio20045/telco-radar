@@ -46,11 +46,13 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+from . import geraete_vergleich
 from .effektivpreis import phasensumme
 from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
-from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, Buendel,
+from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, POSTEN_TARIF,
+                         POSTEN_TARIFBINDUNG, POSTEN_TARIF_FLEX, Buendel,
                          effektiv_ohne_geraet, tco_bindung)
 
 log = logging.getLogger(__name__)
@@ -199,6 +201,10 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
         try:
             fertig.append(Buendel(
                 sku_id=e.get("sku_id", ""), anbieter=e.get("anbieter", ""),
+                # Der Tarifname ist der, den die Produktseite nennt - ein
+                # Fremdschluessel auf `tarife.jsonl` entsteht daraus nicht,
+                # weil 1&1s Tarife nicht im Tarifbestand stehen. Die Karte
+                # traegt deshalb keinen Tarifbeleg und sagt das.
                 tarif_name=e["tarif_referenz"],
                 buendel_monatlich=float(betrag),
                 laufzeit_monate=int(e.get("laufzeit_monate") or 24),
@@ -234,6 +240,13 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     eff = effektiv_ohne_geraet(kennzahl,
                                barpreis["betrag"] if barpreis else None)
     return {
+        # B.2.5 GILT AUCH HIER. Eine Karte ohne Zahl braucht ihren Grund -
+        # `_leere_karte` fuellt ihn, diese Funktion tat es nicht, und die
+        # Vorlage rendert dann einen leeren Absatz unter Anbieter und
+        # Tarif. Der Fall entsteht mit dem ersten Buendel auf einem
+        # Flextarif; im Bestand vom 04.09.2026 tragen acht von 44 Tarifen
+        # `laufzeit_monate: 0`.
+        "leer_grund": "" if kennzahl.belastbar else _grund(kennzahl),
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
         # Dieselbe Klasse auf Karte, Balken und Legende - C.3 verlangt die
@@ -276,8 +289,41 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "abgerufen_am": b.abgerufen_am,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
         "naeherung": False,
-        "leer_grund": "",
+        # "ab": `preis_mit_vertrag_ab` heisst so, weil der Anbieter ihn fuer
+        # den guenstigsten Tarif dieses Geraets nennt. Die Karte sagt es -
+        # eine Leitzahl aus einem Ab-Preis ohne diesen Hinweis waere eine
+        # exakte Zahl mit einem unausgesprochenen Vorbehalt.
+        "ab_preis": b.buendel_monatlich is not None,
     }
+
+
+# Was auf der Karte steht, wenn die Rechnung nicht traegt. Jede Luecke
+# bekommt einen Satz in der Sprache der Seite - "POSTEN_TARIFBINDUNG" ist
+# ein Feldname und keine Auskunft.
+_GRUND_JE_LUECKE = {
+    POSTEN_TARIF: ("Der Tarifgrundpreis dieses Bündels ist nicht erhoben – "
+                   "ohne ihn ist es kein Gesamtpreis, sondern ein "
+                   "Gerätebetrag."),
+    POSTEN_TARIFBINDUNG: ("Wie lange der Tarif bindet, ist nicht belegt – "
+                          "und ohne die Bindung gibt es keine Laufzeit, "
+                          "über die sich rechnen ließe."),
+    POSTEN_TARIF_FLEX: ("Der Tarif ist monatlich kündbar. Über eine "
+                        "Bindung, die es nicht gibt, ist kein Tarifbetrag "
+                        "geschuldet – eine Gesamtsumme über die Laufzeit "
+                        "wäre erfunden."),
+}
+
+
+def _grund(kennzahl) -> str:
+    """Warum diese Karte keine Zahl traegt - in der Reihenfolge der Ursachen."""
+    for posten in (POSTEN_TARIF, POSTEN_TARIF_FLEX, POSTEN_TARIFBINDUNG):
+        if posten in kennzahl.luecken:
+            return _GRUND_JE_LUECKE[posten]
+    if kennzahl.gesamt is None:
+        return ("Zu diesem Bündel ist kein einziger Posten erhoben – es "
+                "steht als Angebot da, nicht als Preis.")
+    return ("Die Rechnung ist unvollständig: " +
+            ", ".join(kennzahl.luecken) + " nicht gemessen.")
 
 
 def _phase_ab(tarif: dict, monat: int) -> Optional[float]:
@@ -304,6 +350,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
             "luecken": [], "boni": [], "boni_abzug": 0.0, "quelle_url": "",
             "abgerufen_am": "", "tarif_quelle_url": "", "naeherung": False,
             "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
+            "ab_preis": False,
             "sku_id": "", "modell_id": "", "geraet": "", "tarif_id": "",
             "tarif_id_guete": "", "tarif_bindung": None,
             "raten_laufzeit": None}
@@ -342,18 +389,43 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
                          betrag=p.get("betrag"))
               for p in (tarif.get("preisphasen") or [])
               if p.get("betrag") is not None]
-    summe = phasensumme(phasen, monate) if phasen else None
+
+    # DER TARIF ZAEHLT SEINE EIGENE MINDESTLAUFZEIT, NICHT DAS FENSTER.
+    #
+    # Das ist dieselbe Regel, die `tco_bindung` fuer die Buendelkarte
+    # anwendet (A5.5) - und sie hat auf BEIDEN Seiten zu gelten, sonst
+    # vergleicht das Delta zwei verschieden zusammengesetzte Koerbe. Vorher
+    # rechnete die Referenz 36 x 29,95 EUR, waehrend die o2-Karte daneben
+    # 24 x 19,99 EUR trug: die Referenz war um 12 x 29,95 = 359,40 EUR zu
+    # teuer, und ALLE 54 Delta-Zeilen der Seite sagten "guenstiger als
+    # Vodafone", keine einzige "teurer". Eine Rechnung, die systematisch
+    # zugunsten des Wettbewerbers ausfaellt, ist kein Wettbewerbsradar.
+    #
+    # Gemessen am Vorgabemodell (iPhone 17 Pro 256 GB): das Delta faellt
+    # von -483,34 auf -123,94 EUR.
+    tarif_monate = tarif.get("laufzeit_monate")
+    if tarif_monate:
+        tarif_monate = min(int(tarif_monate), monate)
+    else:
+        # Ohne belegte Mindestlaufzeit bleibt nur das Fenster - und die
+        # Karte sagt, dass hier fortgeschrieben wurde.
+        tarif_monate = monate
+    summe = phasensumme(phasen, tarif_monate) if phasen else None
     # "Fortgeschrieben" heisst: das Blatt sagt zu diesen Monaten nichts, und
     # es gilt der zuletzt belegte Preis weiter. Das ist die vorsichtige
     # Annahme (dieselbe wie in `phasensumme`), aber sie ist eine Annahme -
     # deshalb steht sie auf der Karte und nicht nur im Code.
     abgedeckt = 0
     for phase in phasen:
-        abgedeckt = max(abgedeckt,
-                        monate if phase.bis_monat is None else phase.bis_monat)
-    fortgeschrieben = abgedeckt < monate
+        abgedeckt = max(abgedeckt, tarif_monate if phase.bis_monat is None
+                        else phase.bis_monat)
+    fortgeschrieben = abgedeckt < tarif_monate
     if summe is None:
-        summe = round(referenz.tarif_sim_only_monatlich * monate, 2)
+        summe = round(referenz.tarif_sim_only_monatlich * tarif_monate, 2)
+        fortgeschrieben = fortgeschrieben or not phasen
+    if not tarif.get("laufzeit_monate"):
+        # Der Tarifbetrag laeuft ueber das ganze Fenster, weil niemand eine
+        # Mindestlaufzeit belegt hat. Auch das ist eine Fortschreibung.
         fortgeschrieben = True
     gesamt = round(summe + geraet["betrag"], 2)
     return {
@@ -367,6 +439,7 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
         "geraet_quelle_url": geraet.get("quelle_url", ""),
         "geraet_abgerufen_am": geraet.get("abgerufen_am", ""),
         "monate": monate,
+        "tarif_monate": tarif_monate,
         "gesamt": gesamt,
         "schnitt_monat": round(gesamt / monate, 2),
         "fortgeschrieben": fortgeschrieben,
@@ -407,19 +480,24 @@ def _referenzkarte(ref: dict) -> dict:
         # dem Feld, das "hier gibt es nichts" bedeutet.
         "leer_grund": "",
         "tarif": ref["tarif"], "label": f"TCO-{ref['monate']}",
-        "laufzeit": ref["monate"], "tarif_bindung": ref["monate"],
+        "laufzeit": ref["monate"],
         "belastbar": True, "naeherung": True,
         "gesamt": ref["gesamt"], "schnitt_monat": ref["schnitt_monat"],
         "monatlich": ref["monatlich"],
         # Auch die Referenz beantwortet Antonios Frage: nach 24 Monaten hat
         # man den Barpreis laengst gezahlt und den Tarif fuer 24 Monate.
+        # Das Geraet ist am ersten Tag bezahlt, der Tarif laeuft seine
+        # Mindestlaufzeit - nach 24 Monaten ist damit alles gezahlt, was
+        # geschuldet ist. Vorher stand hier "davon noch offen: 359,40 €"
+        # fuer ein bar gekauftes Geraet auf einem 24-Monats-Tarif.
         "gezahlt_nach_24": round(
             ref["geraet_betrag"]
-            + ref["monatlich"] * min(LEITFRAGE_MONATE, ref["monate"]), 2),
+            + ref["monatlich"] * min(LEITFRAGE_MONATE, ref["tarif_monate"]), 2),
+        "tarif_bindung": ref["tarif_monate"],
         "bestandteile": [
-            {"name": f"Gerät ohne Vertrag · Barpreis",
+            {"name": "Gerät ohne Vertrag · Barpreis",
              "betrag": ref["geraet_betrag"], "kategorie": "einmalig"},
-            {"name": f"Tarif · {ref['monate']} Monate {ref['tarif']}",
+            {"name": f"Tarif · {ref['tarif_monate']} Monate {ref['tarif']}",
              "betrag": ref["tarif_summe"], "kategorie": "tarif"}],
         # Der Anschlusspreis steht in KEINEM der fuenf Vodafone-Blaetter -
         # unbekannt ist nicht kostenlos.
@@ -437,6 +515,14 @@ def _referenzkarte(ref: dict) -> dict:
 # Das Delta gegen die Referenz
 # --------------------------------------------------------------------------
 
+def _wesentlich(differenz: float, bezug: float) -> bool:
+    """ODER, nicht UND - bei 200 EUR sind 15 EUR viel und 3 Prozent wenig."""
+    abstand = abs(differenz)
+    prozent = (abstand / bezug * 100) if bezug else 0.0
+    return (prozent >= geraete_vergleich.WESENTLICH_PROZENT
+            or abstand >= geraete_vergleich.WESENTLICH_EURO)
+
+
 def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     """Euro primaer, Prozent sekundaer - und nur bei gleicher Laufzeit.
 
@@ -449,11 +535,26 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
         return None
     if karte["gesamt"] is None or not karte["laufzeit"]:
         return None
+    if karte["eigen"]:
+        # Ein eigenes Buendel IST die Referenz (oder ein zweites eigenes
+        # Angebot). "0,00 € teurer als die Vodafone-Referenz" auf einer
+        # Vodafone-Karte war der Befund B4 aus Phase 6a, hier neu
+        # entstanden.
+        return None
     gleiche_laufzeit = karte["laufzeit"] == referenz["monate"]
     betrag = (round(karte["gesamt"] - referenz["gesamt"], 2)
               if gleiche_laufzeit else None)
     monatlich = round(karte["schnitt_monat"] - referenz["schnitt_monat"], 2)
     bezug = betrag if betrag is not None else monatlich
+    # WESENTLICHKEIT, dieselbe Schwelle und dieselbe Begruendung wie in
+    # `geraete_vergleich` und `geraete_tco_view._delta`: unter drei Prozent
+    # ODER fuenfzehn Euro ist der Abstand keine Meldung. Ohne sie schriebe
+    # das lauteste Element der Karte bei zwei gleich teuren Angeboten
+    # "0,00 € teurer als die Vodafone-Referenz".
+    massstab = referenz["gesamt"] if betrag is not None \
+        else referenz["schnitt_monat"]
+    if not _wesentlich(bezug, massstab):
+        return None
     return {
         "betrag": betrag,
         "prozent": (round(abs(betrag) / referenz["gesamt"] * 100, 1)

@@ -265,6 +265,13 @@ G2_RECHTS = 210
 # Dieselbe Schwelle wie im Preisverlauf-Reiter: zwei Punkte ergeben eine
 # Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend.
 MIND_PUNKTE = 2
+# WARUM DIESE SCHWELLE ANDERS IST ALS DIE DES NACHBARN im selben Reiter
+# (`geraete_verlauf.DIAGRAMM_AB_TERMINEN`, 4): dort steht die Kurve EINES
+# gewaehlten Geraets, und zwei Punkte ergaeben eine Gerade, die wie ein
+# Trend aussieht. Hier steht die Uebersicht ueber ALLE Reihen mit mehr als
+# einer Messung - sie beantwortet "wo hat sich ueberhaupt etwas bewegt",
+# und dafuer ist die zweite Messung genau die Nachricht. C.2 des
+# Lastenhefts nennt sie ausdruecklich ("<2 Messpunkte: Empty-State").
 # Hoechstens so viele Reihen in einem Bild. Mehr Linien in einem
 # Euro-Massstab sind ein Knaeuel, kein Verlauf.
 MAX_REIHEN = 5
@@ -287,15 +294,41 @@ def historie(reihen: list) -> dict:
     `tabelle` (dieselben Zahlen als Text - C.2 verlangt sie ausdruecklich
     fuer Mobilgeraete und Screenreader) und `ereignisse`.
     """
-    brauchbar = [r for r in reihen if len(r.get("punkte") or []) >= MIND_PUNKTE]
+    # ERST PARSEN, DANN ZAEHLEN. Vorher wurde auf der ROHEN Punktzahl
+    # gefiltert und erst danach das Datum gelesen: eine Reihe, deren
+    # Datumsangaben alle unlesbar sind ("29.08.2026" statt "2026-08-29"),
+    # kam mit leerer Punktliste bis `punkte[0]` und riss einen IndexError -
+    # und der nimmt ueber `geraete_view.leer()` den Navigationseintrag
+    # "Geraete" von JEDER Seite des Portals. Dieselbe Fehlerklasse wie
+    # Befund B1 aus Phase 6a, diesmal von einer Datenzeile ausgeloest.
+    #
+    # ZUSAMMENGEFASST WIRD JE TAG (letzter Stand des Tages): zwei
+    # Messungen desselben Tages ergaeben sonst ein senkrechtes Segment,
+    # und der Nachbar im selben Reiter zaehlt seit dem 30.08.2026
+    # ausdruecklich MESSTAGE statt roher Punkte.
+    brauchbar = []
+    for reihe in reihen:
+        je_tag: dict = {}
+        for punkt in (reihe.get("punkte") or []):
+            tag = _tag(punkt.get("datum"))
+            if tag is None:
+                continue
+            try:
+                je_tag[tag] = float(punkt["betrag"])
+            except (TypeError, ValueError, KeyError):
+                continue
+        if len(je_tag) < MIND_PUNKTE:
+            continue
+        brauchbar.append(dict(reihe, punkte=[
+            {"datum": tag.isoformat(), "betrag": betrag}
+            for tag, betrag in sorted(je_tag.items())]))
     brauchbar.sort(key=lambda r: (-len(r["punkte"]), r["name"]))
     brauchbar = brauchbar[:MAX_REIHEN]
     if not brauchbar:
         return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}
 
     punkte_alle = [(_tag(p["datum"]), float(p["betrag"]))
-                   for r in brauchbar for p in r["punkte"]
-                   if _tag(p["datum"]) is not None]
+                   for r in brauchbar for p in r["punkte"]]
     if len(punkte_alle) < MIND_PUNKTE:
         return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}
 

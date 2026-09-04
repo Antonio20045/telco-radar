@@ -514,7 +514,7 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
-               for k in s.select(".gr-kacheln .gr-kachel")}
+               for k in s.select(".gr-chips .gr-chip")}
     assert set(kacheln) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}
 
     # Die Summe der vier Kacheln IST die Zahl der verglichenen Geraete. Zwei
@@ -544,7 +544,7 @@ def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
     summe = sum(int(k.find("b").get_text(strip=True))
-                for k in s.select(".gr-kacheln .gr-kachel"))
+                for k in s.select(".gr-chips .gr-chip"))
     tafel = " ".join(s.select_one("#tafel-tco").get_text(" ", strip=True).split())
     assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in tafel
 
@@ -1475,7 +1475,7 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
 
     # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
     # es MUSS ein Geraet geben, bei dem niemand unterbietet.
-    bestpreis = next(k for k in s.select(".gr-kacheln .gr-kachel")
+    bestpreis = next(k for k in s.select(".gr-chips .gr-chip")
                      if k.find("span").get_text(strip=True) == "Bestpreis")
     assert int(bestpreis.find("b").get_text(strip=True)) > 0
 
