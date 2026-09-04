@@ -1793,6 +1793,22 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > **Der Zusatz ist der Preistyp und kein Inhaltshash** — ein Hash änderte
 > sich mit jeder Preisänderung, und die Zeitreihe zerfiele in Einzelsätze.
 >
+> **Der Geräteanteil stand danach immer noch leer — an demselben
+> Namensbruch, eine Ebene weiter** (§ 14.5). `sim_only_id` schlüsselt auf
+> den NAMEN, und `geraeteanteil()` verglich ihn; über den Namen sind
+> „…M Plus mit 50 GB+ (24 Mon.)" und „O2 Mobile on Demand M" zwei Tarife.
+> Verglichen wird jetzt der **`tarif_id`**, ersatzweise der Name — dieselbe
+> verlinkte Angabe, auf der schon der Fremdschlüssel steht. Alle 20
+> sichtbaren Zeilen tragen jetzt „Gegen denselben Tarif ohne Gerät
+> gerechnet zahlt man für das Gerät … €". Rechenprobe iPhone 15 Pro:
+> 1216,75 − (24 × 19,99 + 39,99) = **697,00 €** — nicht 24 × 34,00 = 816,00,
+> denn im Bündel kostet der Tarif 5,00 € weniger im Monat, und die
+> 24 × 5,00 = 120,00 € bekommt man nur mit dem Gerät. Drei Regeln halten
+> die Umstellung eng: der Name bleibt Rückfall für Sätze ohne ID, eine
+> HALB gefüllte Paarung fällt ebenfalls auf den Namen zurück („ID gegen
+> nichts" wäre immer ungleich und schaltete den Anteil stillschweigend ab),
+> und zwei Referenzen zu einer Tarif-ID ergeben **keine**.
+>
 > **Schritt 2 des Auftrags endet mit einer Absage, und diesmal mit Grund**
 > (§ 14.4). `BFF_EXT = /shop/api/eshop/bff-de` **existiert**: `/bff-de/`
 > antwortet `application/json` (HTTP 500, `DT_UNKNOWN_ERROR`), ohne

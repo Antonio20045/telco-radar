@@ -1926,7 +1926,50 @@ dieselbe Lage wie bei Euronics (§ 6 der Übergabe).
 kein Live-Adapter gebaut worden und keine Ersatzkonstruktion. Was fehlt,
 wird als fehlend geführt.
 
-### 14.5 Nachmessen
+### 14.5 Der Geräteanteil — er blieb an einem Schlüssel hängen
+
+Mit den ersten 62 Bündeln stand die Spalte leer, wegen der `tco_model`
+überhaupt existiert: der **effektive Gerätepreis**,
+`tco_24(Bündel) − tco_24(SIM-only)`. Die Zahl, die auf keiner
+Anbieterseite steht.
+
+Der Grund war kein fehlender Datensatz, sondern derselbe Namensbruch wie
+in § 14.3, eine Ebene weiter: `sim_only_id` schlüsselt auf den **Namen**,
+und `geraeteanteil()` verglich ihn. Das Bündel heißt „O2 Mobile on Demand
+M **Plus** mit 50 GB+ (24 Mon.)", die Referenz „O2 Mobile on Demand M" —
+über den Namen sind das zwei Tarife.
+
+Verglichen wird jetzt der **`tarif_id`**, ersatzweise der Name. Die ID ist
+der aufgelöste Fremdschlüssel; ihn zu haben ist bei einem Bündel ohnehin
+Bedingung. Dass die zwei Namen denselben Vertrag meinen, sagt o2 selbst —
+es ist dieselbe verlinkte Angabe, auf der schon der Fremdschlüssel steht.
+
+Drei Regeln halten die Umstellung eng:
+
+| Regel | Warum |
+|---|---|
+| Der Namensvergleich bleibt als **Rückfall** für Sätze ohne ID, und er bleibt eine **Ausnahme**, keine Lücke | Zwei verschiedene Tarife gegeneinander zu rechnen ist ein Fehler im Aufruf, keine Datenlage |
+| Eine **halb** gefüllte Paarung fällt ebenfalls auf den Namen zurück | „ID gegen nichts" wäre immer ungleich und schaltete den Geräteanteil stillschweigend ab |
+| Zu **einer** Tarif-ID zwei Referenzen ⇒ **keine** | Zwei Maßstäbe sind kein schwacher Maßstab, sondern gar keiner — dieselbe Regel wie in `tarif_bezug.ueber_betrag`. Vodafone veröffentlicht jeden Tarif zweimal, der Fall ist real |
+
+Gerechnet an den 62 Bündeln tragen **alle 20 sichtbaren Zeilen** den Satz
+„Gegen denselben Tarif ohne Gerät gerechnet zahlt man für das Gerät … €".
+Rechenprobe iPhone 15 Pro 128 GB:
+
+```
+Bündel   1,00 + 24 × 34,00 + 24 × 14,99 + 39,99 = 1216,75 €
+SIM-only              24 × 19,99          + 39,99 =  519,75 €
+                                          Differenz  697,00 €
+```
+
+Die 697,00 € sind **nicht** 24 × 34,00 = 816,00 €, und die Differenz ist
+kein Rechenfehler: im Bündel kostet der Tarif 5,00 € weniger im Monat
+(14,99 statt 19,99), und 24 × 5,00 = 120,00 € gehören zum Gerätepreis, weil
+man sie nur bekommt, wenn man das Gerät nimmt. Genau dafür ist die
+Differenz gebaut. Daneben stehen unverändert die zwölf offenen Raten
+(408,00 €) — sie fallen nicht unter den Tisch.
+
+### 14.6 Nachmessen
 
 ```bash
 # Die zwoelf o2-Tarife aus den Preiskacheln, mit ihren Belegen
@@ -1941,6 +1984,9 @@ python -m pytest tests/test_geraete_buendel_o2.py -q
 # Der ganze Weg in der Pipeline (Buendel landen in geraete_tco.json,
 # NICHT in geraete_db.json)
 python -m pytest tests/test_geraete_pipeline.py -q
+
+# Der Geraeteanteil ueber den Fremdschluessel, samt Gegenprobe
+python -m pytest tests/test_tco_model.py tests/test_geraete_tco_view.py -q
 
 # Belegkette der neuen Fixtures: sha256 des ENTPACKTEN Inhalts
 python - <<'PY'
@@ -1958,7 +2004,7 @@ print("Belegkette in Ordnung")
 PY
 ```
 
-### 14.6 Was offen bleibt
+### 14.7 Was offen bleibt
 
 1. **Ein Bündel steht ohne Tarif da und wird verworfen**: der Promo-Tarif
    „O2 Mobile on Demand M mit 50 GB+ (24 Mon.)" (Angebotsslug
