@@ -475,9 +475,20 @@
     %}</span></p>
   {% endif %}
 
+  {# F5, PFLICHTZEILE "ab Monat 25" (Katalog D, B.2): eine Zahl, wo das
+     Pflichtdokument eine Preisphase nach der Mindestlaufzeit nennt - sonst
+     die BENANNTE Luecke. Eine stumme Auslassung liest sich als "es aendert
+     sich nichts", und genau das sagt keine Quelle: o2s Kachel-Lesart traegt
+     `preisphasen: []`, 1&1s Tarife stehen nicht im Tarifbestand. #}
   {% if k.nach_bindung is not none and k.tarif_bindung %}
   <p class="gr-kk-nach">ab Monat {{ k.tarif_bindung + 1 }}: {{
     k.nach_bindung | euro }} Tarifgrundpreis</p>
+  {% elif k.tarif_bindung or k.laufzeit %}
+  <p class="gr-kk-nach gr-kk-nach--luecke">ab Monat {{ (k.tarif_bindung or
+    k.laufzeit) + 1 }}: nicht belegt – {% if k.tarif_quelle_url %}das
+    Pflichtdokument nennt keine Preisphase nach der Mindestlaufzeit{% elif
+    k.tarif_id %}die Tarifquelle nennt keine Preisphase nach der
+    Mindestlaufzeit{% else %}der Tarif steht nicht im Tarifbestand{% endif %}</p>
   {% endif %}
 
   {% for b in k.boni %}
@@ -498,13 +509,18 @@
   {% endif %}
 
   {% if k.naeherung %}
-  <p class="gr-kk-hinweis">Gerechnet, kein Angebot: Vodafone weist zu diesem
-  Gerät keinen Bündelpreis aus. Addiert sind der Tarifgrundpreis aus dem
+  {# F1, STUFE 1 (04.09.2026): "Vodafone weist zu diesem Geraet keinen
+     Buendelpreis aus" war falsch - die Geraeteseite und die glados-API
+     nennen einen (iPhone 17 Pro 256 GB: 1 EUR + 36 x 33,00 EUR). Er ist
+     nur NICHT ERHOBEN. Eine Naeherung darf sich Naeherung nennen; sie darf
+     dem Anbieter nichts absprechen, das er ausweist. #}
+  <p class="gr-kk-hinweis">Referenzrechnung, kein Angebot: der
+  Vodafone-Bündelpreis zu diesem Gerät ist noch nicht erhoben – gerechnet
+  aus dem eigenen Barpreis des Geräts und dem Tarifgrundpreis aus dem
   Produktinformationsblatt für {{ k.referenz.tarif_monate }} Monate
-  Mindestlaufzeit und der eigene Barpreis des Geräts – beide belegt, die
-  Summe ist unsere.{% if k.referenz.fortgeschrieben %} Für einen Teil der
-  Laufzeit nennt das Blatt keinen Preis; dort gilt der zuletzt belegte
-  fort.{% endif %}</p>
+  Mindestlaufzeit. Beide belegt, die Summe ist unsere.{% if
+  k.referenz.fortgeschrieben %} Für einen Teil der Laufzeit nennt das Blatt
+  keinen Preis; dort gilt der zuletzt belegte fort.{% endif %}</p>
   {% endif %}
 
   {# Der Rechenweg. Jede Zahl der Karte ist hier nachlesbar, samt dem, was

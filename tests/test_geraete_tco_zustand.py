@@ -97,11 +97,13 @@ def _referenzen():
 
 
 def _tarife():
+    # o2 mit `preisphasen: []` wie die echte Kachel-Lesart (preistyp
+    # live_shop): die Quelle schweigt ueber die Zeit nach der
+    # Mindestlaufzeit - die Karte muss die Luecke BENENNEN (F5).
     return [{"anbieter": "o2", "name": "O2 Mobile on Demand M",
              "tarif_id": "o2:on-demand-m", "art": "mobilfunk",
              "grundgebuehr": 19.99, "laufzeit_monate": 24,
-             "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                              "betrag": 19.99}],
+             "preisphasen": [],
              "dokument_url": "https://example.de/pib/o2-m",
              "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}},
             {"anbieter": "Vodafone", "name": "Vodafone Mobil XS",
@@ -378,3 +380,35 @@ def test_ohne_erneuertes_buendel_kein_etikett(tmp_path):
     assert not tafel.select(".gr-g1-zustand")
     assert not tafel.select(".gr-t-zustand")
     assert "erneuert" not in tafel.get_text(" ")
+
+
+# --------------------------------------------------------------------------
+# F1 (Stufe 1) und F5 an der gerenderten Seite
+# --------------------------------------------------------------------------
+
+def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(tmp_path):
+    """F5: "ab Monat 25" steht auf JEDER Karte mit Zahl - als Betrag, wo das
+    Pflichtdokument eine Preisphase nennt (Vodafone Mobil XS: 29,95 EUR),
+    sonst als benannte Luecke (o2: `preisphasen: []`). Eine stumme
+    Auslassung liest sich als "es aendert sich nichts"."""
+    s = _baue(tmp_path)
+    tafel = s.select_one("#tafel-tco")
+    mit_zahl = [k for k in tafel.select(".gr-kkarte")
+                if "gr-kkarte--leer" not in k.get("class", [])]
+    assert len(mit_zahl) == 3            # o2 neu, o2 erneuert, Referenz
+    for k in mit_zahl:
+        assert k.select_one(".gr-kk-nach") is not None, k["data-anbieter"]
+
+    referenz = tafel.select_one('.gr-kkarte[data-anbieter="Vodafone"]')
+    assert "ab Monat 25: 29,95 € Tarifgrundpreis" in " ".join(
+        referenz.select_one(".gr-kk-nach").get_text(" ", strip=True).split())
+    o2 = tafel.select_one('.gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
+    luecke = o2.select_one(".gr-kk-nach--luecke")
+    assert luecke is not None
+    assert "ab Monat 25: nicht belegt" in " ".join(luecke.get_text(" ", strip=True).split())
+
+    # F1, Stufe 1: die Referenz spricht dem Anbieter nichts ab, das er
+    # ausweist - sie nennt sich Naeherung und den Buendelpreis "nicht erhoben".
+    hinweis = " ".join(referenz.select_one(".gr-kk-hinweis").get_text(" ", strip=True).split())
+    assert "noch nicht erhoben" in hinweis
+    assert "weist zu diesem Gerät keinen Bündelpreis aus" not in tafel.get_text(" ")

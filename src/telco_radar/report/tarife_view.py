@@ -186,13 +186,22 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
     konfiguriert = sorted({q.anbieter for q in (quellen or [])})
     fehlend = [a for a in konfiguriert if a not in vorhanden]
 
+    # DAS KOPFDATUM IST DAS DATUM DES NEUESTEN TARIFSATZES, nicht das des
+    # letzten Wochenberichts (QA-Befund F3, Abnahmekriterium G7): `html.py`
+    # reicht `heute=latest["date"]` durch, und am 04.09.2026 stand damit
+    # "Stand 2026-09-02" ueber 44 Saetzen, die alle `abgerufen_am:
+    # 2026-09-04` trugen. `heute` bleibt der Rueckfall fuer einen Bestand
+    # ohne Abrufdatum.
+    abgerufen = [str(s.get("abgerufen_am") or "") for s in staende]
+    stand = max((a for a in abgerufen if a), default=heute)
+
     return {
         "zeilen": zeilen,
         "unbegrenzt": [z for z in zeilen if z["unbegrenzt"]],
         "karte": _karte(zeilen),
         "horizont": VERGLEICHSMONATE,
         "hat_daten": bool(zeilen),
-        "stand": heute,
+        "stand": stand,
         "bilanz": {
             "tarife": len(zeilen),
             "anbieter": len(vorhanden),

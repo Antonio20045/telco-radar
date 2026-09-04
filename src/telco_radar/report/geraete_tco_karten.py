@@ -483,6 +483,10 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
         fortgeschrieben = True
     gesamt = round(summe + geraet["betrag"], 2)
     return {
+        # F5 auch an der Referenz: das Blatt nennt "ab Monat 25" (Vodafone
+        # Mobil XS: 29,95 EUR) - die Zeile steht auf jeder Karte mit Zahl.
+        "nach_bindung": (_phase_ab(tarif, tarif_monate + 1)
+                         if tarif.get("laufzeit_monate") else None),
         "tarif": referenz.tarif_name,
         "tarif_id": referenz.tarif_id,
         "monatlich": referenz.tarif_sim_only_monatlich,
@@ -551,6 +555,7 @@ def _referenzkarte(ref: dict) -> dict:
             ref["geraet_betrag"]
             + ref["monatlich"] * min(LEITFRAGE_MONATE, ref["tarif_monate"]), 2),
         "tarif_bindung": ref["tarif_monate"],
+        "nach_bindung": ref.get("nach_bindung"),
         "bestandteile": [
             {"name": "Gerät ohne Vertrag · Barpreis",
              "betrag": ref["geraet_betrag"], "kategorie": "einmalig"},

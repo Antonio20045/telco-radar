@@ -319,3 +319,19 @@ def test_kaputte_zeilen_werden_ueberlesen(tmp_path):
     p.write_text('{"tarif_id":"a","anbieter":"X","grundgebuehr":10.0}\n'
                  'kaputt\n\n', encoding="utf-8")
     assert len(tarife_view.aufbereiten(p, [])["zeilen"]) == 1
+
+
+def test_das_kopfdatum_ist_das_des_neuesten_tarifsatzes(tmp_path):
+    """QA-Befund F3 (Abnahmekriterium G7): `html.py` reicht das Datum des
+    letzten WOCHENBERICHTS als `heute` durch - am 04.09.2026 stand damit
+    "Stand 2026-09-02" ueber 44 Saetzen vom 2026-09-04. Der Kopf traegt das
+    Datum des neuesten Satzes; `heute` bleibt der Rueckfall ohne Abrufdatum.
+    """
+    p = _state(tmp_path, [_satz("t:a", "Telekom", "A", 20.0, 10.0,
+                                abgerufen_am="2026-09-02"),
+                          _satz("o:b", "o2", "B", 25.0, 10.0,
+                                abgerufen_am="2026-09-04")])
+    assert tarife_view.aufbereiten(p, [], heute="2026-09-02")["stand"] == "2026-09-04"
+    (tmp_path / "ohne").mkdir()
+    ohne = _state(tmp_path / "ohne", [_satz("t:a", "Telekom", "A", 20.0, 10.0)])
+    assert tarife_view.aufbereiten(ohne, [], heute="2026-09-02")["stand"] == "2026-09-02"
