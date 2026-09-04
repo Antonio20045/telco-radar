@@ -167,13 +167,12 @@ def _zeile(buendel: Buendel, referenz, katalog, geraet_je_sku) -> dict:
 
     return {
         "sku_id": buendel.sku_id,
-        # Der Name kommt aus dem Katalog, und der Weg dorthin fuehrt ueber
-        # die LISTUNG derselben SKU - nie ueber ein Zerlegen der `sku_id`.
-        # `apple-iphone-16-128gb-blaugruen` liesse sich zwar zu
-        # `apple-iphone-16` zurechtschneiden, aber eine Farbe mit Bindestrich
-        # ("space-grau") verschoebe den Schnitt, und dann stuende dasselbe
-        # Geraet unter zwei Namen in derselben Tabelle. Dieselbe Regel wie
-        # in `geraete_model`: die ID kommt aus dem Katalog, nie aus dem Text.
+        # Der Name kommt aus dem Katalog: ueber die LISTUNG derselben SKU,
+        # ersatzweise ueber die Katalog-ID am Anfang der SKU
+        # (`geraet_aus_sku` - die laengste Katalog-ID vor dem
+        # Speichersegment, kein Schnitt am Bindestrich; eine Farbe mit
+        # Bindestrich liegt dahinter). Dieselbe Regel wie in
+        # `geraete_model`: die ID kommt aus dem Katalog, nie aus dem Text.
         "geraet": _label(katalog, *geraet_je_sku.get(buendel.sku_id,
                                                      ("", None)),
                          rueckfall=buendel.sku_id),
@@ -598,6 +597,10 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             geraet_je_sku.setdefault(e["sku_id"],
                                      (e.get("device_id") or "",
                                       e.get("speicher_gb")))
+    # Buendel ohne Listung: das Geraet kommt aus dem Katalog, ueber die
+    # Katalog-ID am Anfang der SKU (`geraete_tco_karten.geraet_aus_sku`).
+    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
+                                                    katalog)
 
     zeilen = []
     for b in buendel:
@@ -708,6 +711,9 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "tabelle": tabelle,
         "modell_vorgabe": modelle["vorgabe"],
         "modelle_gesamt": modelle["gesamt"],
+        # Buendel, die weder Listung noch Katalog aufloesen - benannt, mit
+        # Grund (F-R2-3). Ein Slug als Geraetename war keins von beidem.
+        "ohne_zuordnung": modelle["ohne_zuordnung"],
         "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
         "g2": g2,
     }
@@ -721,7 +727,7 @@ def leer() -> dict:
             "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
             "horizont": TCO_HORIZONT,
             "modelle": [], "tabelle": [], "modell_vorgabe": "",
-            "modelle_gesamt": 0,
+            "modelle_gesamt": 0, "ohne_zuordnung": [],
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
             "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
                    "reihen_gesamt": 0, "ausgelassen": []}}

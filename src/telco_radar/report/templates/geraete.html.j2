@@ -617,6 +617,16 @@
     {% endfor %}
   </ul>
 
+  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN, nicht als
+     Modell "ohne-geraet" im Auswahlfeld (F-R2-3). Vor dem Modellgatter,
+     damit die Zeile auch dann steht, wenn KEIN Buendel aufloest. #}
+  {% if geraete.tco.ohne_zuordnung %}
+  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
+  Tafel, weil kein Gerät zuzuordnen ist: {% for u in geraete.tco.ohne_zuordnung
+  %}{{ u.anbieter }}, <code>{{ u.sku_id }}</code> – {{ u.grund }}{% if not
+  loop.last %}; {% endif %}{% endfor %}.</p>
+  {% endif %}
+
   {% if geraete.tco.modelle %}
   {% set vorgabe = geraete.tco.modell_vorgabe %}
 

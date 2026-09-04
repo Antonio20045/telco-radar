@@ -466,6 +466,96 @@ def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
     assert "gr-anb--1-1" in grafik.historie(reihen)["svg"]
 
 
+# --------------------------------------------------------------------------
+# F-R2-3: kein Slug als Geraetename
+# --------------------------------------------------------------------------
+
+_SKU_OHNE_LISTUNG = "apple-iphone-16-pro-max-256gb-titan-weiss"
+
+
+def _buendel_ohne_listung(sku=_SKU_OHNE_LISTUNG, anbieter="o2"):
+    b = Buendel(sku_id=sku, anbieter=anbieter,
+                tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+                tarif_id="o2:o2-mobile-on-demand-m", tarif_monatlich=14.99,
+                geraet_zuzahlung=1.0, geraet_monatsrate=42.0,
+                laufzeit_monate=36, anschlusspreis=39.99,
+                quelle_url="https://www.o2online.de/e-shop/apple/"
+                           "apple-iphone-16-pro-max-256gb-titan-weiss-details",
+                abgerufen_am="2026-09-04")
+    b.tarif_bindung_monate = 24
+    return b
+
+
+def test_geraet_aus_sku_loest_ueber_den_katalog():
+    """Die laengste Katalog-ID vor dem Speichersegment - kein Schnitt am
+    Bindestrich. Die Faelle, an denen ein Schnitt scheitern wuerde: Pro
+    gegen Pro Max, Pro gegen Pro Fold, 16 gegen 16e, Farbe mit
+    Bindestrich, Zustandssuffix."""
+    katalog = lade_katalog(WURZEL)
+    f = karten.geraet_aus_sku
+    assert f(_SKU_OHNE_LISTUNG, katalog) == ("apple-iphone-16-pro-max", 256)
+    assert f("apple-iphone-16-pro-256gb-titan-weiss", katalog) == \
+        ("apple-iphone-16-pro", 256)
+    assert f("google-pixel-10-pro-fold-256gb-obsidian", katalog) == \
+        ("google-pixel-10-pro-fold", 256)
+    assert f("google-pixel-10-pro-256gb-obsidian", katalog) == \
+        ("google-pixel-10-pro", 256)
+    assert f("apple-iphone-16e-128gb-weiss", katalog) == ("apple-iphone-16e", 128)
+    assert f("apple-iphone-16-128gb-space-grau-refurbished", katalog) == \
+        ("apple-iphone-16", 128)
+    assert f("apple-iphone-16-ohne-speicher-schwarz", katalog) == \
+        ("apple-iphone-16", None)
+    # Kein Treffer: fremde ID, oder eine Katalog-ID ohne Speichersegment.
+    assert f("fremdmarke-modell-128gb-rot", katalog) == ("", None)
+    assert f("apple-iphone-16-pro-max-titan-weiss", katalog) == ("", None)
+    assert f("", katalog) == ("", None) and f(_SKU_OHNE_LISTUNG, None) == ("", None)
+
+
+def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
+    """QA-Befund F-R2-3: das o2-Buendel zum iPhone 16 Pro Max 256 GB hat
+    keine Listung im Geraetebestand und stand als Modell "ohne-geraet" im
+    Auswahlfeld, als Ueberschrift und als `data-modell`."""
+    ergebnis = karten.modelle([_buendel_ohne_listung()], [], [], {},
+                              lade_katalog(WURZEL))
+    assert ergebnis["ohne_zuordnung"] == []
+    assert [m["id"] for m in ergebnis["modelle"]] == ["apple-iphone-16-pro-max-256"]
+    modell = ergebnis["modelle"][0]
+    assert modell["name"] == "iPhone 16 Pro Max 256 GB"
+    assert modell["titel"] == "Apple iPhone 16 Pro Max 256 GB"
+    assert modell["hersteller"] == "Apple"
+    o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
+    assert o2["belastbar"] and o2["label"] == "TCO-36"
+    assert o2["zustand"] == "unbekannt", "keine Listung belegt keinen Zustand"
+
+
+def test_ein_buendel_ohne_katalogtreffer_faellt_benannt_heraus():
+    """Weder Listung noch Katalog: kein Modell, sondern eine Zeile mit SKU,
+    Anbieter und Grund - kein Slug als Geraetename."""
+    ergebnis = karten.modelle([_buendel_ohne_listung("fremdmarke-modell-128gb-rot")],
+                              [], [], {}, lade_katalog(WURZEL))
+    assert ergebnis["modelle"] == [] and ergebnis["gesamt"] == 0
+    assert len(ergebnis["ohne_zuordnung"]) == 1
+    offen = ergebnis["ohne_zuordnung"][0]
+    assert offen["sku_id"] == "fremdmarke-modell-128gb-rot"
+    assert offen["anbieter"] == "o2"
+    assert "Katalog" in offen["grund"] and "Listung" in offen["grund"]
+
+
+def test_kein_slug_als_geraetename_am_echten_bestand(bestand):
+    """Die Abnahme des Auftrags am Bestand von heute: kein Modell
+    "ohne-geraet", kein Name, der nach einer SKU aussieht, und jede
+    Auslassung traegt ihren Grund."""
+    for m in bestand["modelle"]:
+        assert not m["id"].startswith("ohne-geraet"), m["id"]
+        assert "gb-" not in m["name"] and m["name"] != m["id"], m["name"]
+        assert m["hersteller"], m["id"]
+    for offen in bestand["ohne_zuordnung"]:
+        assert offen["grund"] and offen["sku_id"] and offen["anbieter"]
+    treffer = [m for m in bestand["modelle"] if m["id"] == "apple-iphone-16-pro-max-256"]
+    assert treffer, "das o2-Buendel ohne Listung fehlt als Modell"
+    assert treffer[0]["titel"] == "Apple iPhone 16 Pro Max 256 GB"
+
+
 def test_ein_eigenes_buendel_verdraengt_die_naeherung():
     """Vodafone steht je Modell EINMAL - als Angebot oder als Rechnung.
 

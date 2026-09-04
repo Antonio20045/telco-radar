@@ -44,6 +44,7 @@ verglichen ausser `Ø/Monat` (A5.3).
 from __future__ import annotations
 
 import logging
+import re
 from typing import Optional
 
 from . import geraete_vergleich
@@ -148,6 +149,80 @@ def modell_schluessel(device_id: str, speicher) -> str:
     """
     stufe = f"-{int(speicher)}" if speicher else ""
     return f"{device_id or 'ohne-geraet'}{stufe}"
+
+
+# Das Speichersegment einer `sku_id` (`geraete_model.sku_id`): direkt hinter
+# der Geraete-ID steht "<n>gb-" oder "ohne-speicher-", dann die Farbe.
+_SPEICHER_SEGMENT = re.compile(r"^(?:(\d+)gb|ohne-speicher)-")
+
+
+def geraet_aus_sku(sku_id: str, katalog) -> tuple:
+    """(device_id, speicher) einer `sku_id` - ueber den KATALOG, nicht
+    ueber den Text.
+
+    Ein Buendel traegt nur seine `sku_id`; Name und Modellschluessel haengen
+    an der `device_id`, und die stand bisher ausschliesslich an der LISTUNG
+    derselben SKU. Fehlt die Listung (o2 fuehrt das iPhone 16 Pro Max
+    256 GB im Buendelkatalog, aber nicht mehr im Barpreis-Katalog), stand
+    das Buendel unter dem Rohschluessel "ohne-geraet" - im Auswahlfeld,
+    als Ueberschrift und als `data-modell` (QA-Befund F-R2-3, 04.09.2026).
+
+    Das ist KEIN Zerlegen der SKU am Bindestrich: `sku_id()` schreibt die
+    Geraete-ID des Katalogs woertlich an den Anfang, dahinter das
+    Speichersegment als harte Grenze. Gesucht wird die LAENGSTE Katalog-ID,
+    auf die genau "<id>-<n>gb-" folgt - "apple-iphone-16-pro-max" schlaegt
+    "apple-iphone-16-pro", und "apple-iphone-16" trifft "apple-iphone-16e-"
+    nicht, weil hinter der ID kein Bindestrich steht. Eine Farbe mit
+    Bindestrich ("space-grau") liegt HINTER dem Speichersegment und
+    verschiebt nichts. Trifft keine Katalog-ID, ist die Antwort leer - und
+    der Aufrufer benennt das Buendel als nicht zugeordnet, statt es unter
+    einem Slug zu zeigen.
+    """
+    sku = (sku_id or "").strip()
+    if not sku or katalog is None:
+        return "", None
+    treffer = None
+    for g in getattr(katalog, "geraete", []) or []:
+        gid = getattr(g, "device_id", "") or ""
+        if not gid or not sku.startswith(gid + "-"):
+            continue
+        rest = _SPEICHER_SEGMENT.match(sku[len(gid) + 1:])
+        if rest is None:
+            continue
+        if treffer is None or len(gid) > len(treffer[0]):
+            treffer = (gid, int(rest.group(1)) if rest.group(1) else None)
+    return treffer or ("", None)
+
+
+GRUND_OHNE_ZUORDNUNG = ("im Gerätebestand steht keine Listung zu dieser SKU, "
+                        "und der Katalog kennt das Gerät nicht")
+
+
+def ergaenze_geraete_aus_katalog(geraet_je_sku: dict, buendel, katalog
+                                 ) -> list:
+    """Buendel-SKUs ohne Listung ueber den Katalog nachtragen.
+
+    Traegt `geraet_je_sku` fuer jede aufloesbare SKU nach und gibt die
+    NICHT aufloesbaren zurueck - je eine Zeile mit SKU, Anbieter und dem
+    Grund, damit die Seite sie beim Namen nennt. Ein Slug als Geraetename
+    ist weder Zuordnung noch Ausschluss.
+    """
+    offen = []
+    for b in buendel:
+        sku = getattr(b, "sku_id", "") or ""
+        if not sku or sku in geraet_je_sku or getattr(b, "ohne_geraet", False):
+            continue
+        device_id, speicher = geraet_aus_sku(sku, katalog)
+        if device_id:
+            geraet_je_sku[sku] = (device_id, speicher)
+        else:
+            offen.append({"sku_id": sku,
+                          "anbieter": getattr(b, "anbieter", ""),
+                          "grund": GRUND_OHNE_ZUORDNUNG})
+    for o in offen:
+        log.warning("TCO: Buendel %s (%s) nicht zugeordnet - %s",
+                    o["sku_id"], o["anbieter"], o["grund"])
+    return offen
 
 
 def _name(katalog, device_id: str, speicher, rueckfall: str = "") -> str:
@@ -710,15 +785,21 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     """Alle Modelle mit mindestens einem Buendel, je Modell vier Anbieter.
 
     Rueckgabe:
-        modelle   [{id, name, hersteller, speicher, karten, referenz,
-                    laufzeiten, spanne, anbieter_mit_zahl}]
-        vorgabe   die ID des Modells, das ohne Klick sichtbar ist
+        modelle         [{id, name, hersteller, speicher, karten, referenz,
+                          laufzeiten, spanne, anbieter_mit_zahl}]
+        vorgabe         die ID des Modells, das ohne Klick sichtbar ist
+        ohne_zuordnung  Buendel, deren SKU weder eine Listung noch ein
+                        Katalogeintrag aufloest - mit Grund, nie als Modell
     """
     geraet_je_sku: dict = {}
     for e in listungen:
         if e.get("sku_id"):
             geraet_je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
                                                    e.get("speicher_gb")))
+    # Ein Buendel ohne Listung derselben SKU bekommt sein Geraet aus dem
+    # Katalog (F-R2-3); was auch dort nicht steht, faellt BENANNT heraus.
+    ohne_zuordnung = ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
+                                                  katalog)
     belege = barpreise(listungen)
     zustaende = _zustand_je_listung(listungen)
 
@@ -727,7 +808,9 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     for b in alle:
         if not isinstance(b, Buendel) or b.ohne_geraet:
             continue
-        device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
+        if b.sku_id not in geraet_je_sku:
+            continue          # steht in `ohne_zuordnung`, mit Grund
+        device_id, speicher = geraet_je_sku[b.sku_id]
         mid = modell_schluessel(device_id, speicher)
         tarif = tarife.get(b.tarif_id) if b.tarif_id else None
         karte = _karte(b, tarif, _barpreis_fuer(belege.get(b.sku_id, {}),
@@ -841,7 +924,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     # eine Rangliste des Marktes, und der Marktueberblick steht im Katalog.
     fertig.sort(key=lambda m: (-len(m["anbieter_mit_zahl"]), m["name"]))
     return {"modelle": fertig, "vorgabe": _vorgabe(fertig),
-            "gesamt": len(fertig)}
+            "gesamt": len(fertig), "ohne_zuordnung": ohne_zuordnung}
 
 
 # --------------------------------------------------------------------------
