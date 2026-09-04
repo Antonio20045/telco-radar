@@ -1749,6 +1749,19 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > Wochenbericht) nicht angefasst; `MAX_REIHEN = 5` in G2 — sobald mehr als
 > fünf Reihen bewegt sind, fällt die kleinste Bewegung aus dem Bild und
 > steht nur im Satz, dann ansehen.
+>
+> **Nachtrag (05.09.2026, Release-Lauf, `BRIEF_R3_RELEASE.md`): gepusht und
+> live bewiesen.** Testsuite auf `d38d4f8` erneut gelaufen: **2627 grün / 3
+> rot / 30 skipped**, dieselben drei Roten wie an `8d8ed25` — keine neuen.
+> `render_site()` neu gerendert: `site/geraete.html` byte-identisch (sha256
+> `212d17dc…`), einzige Abweichung war `site/data/keyword-index.json` (reine
+> Datums-Zeitbombe, `stand` gegen `date.today()`, zurückgesetzt). Push
+> `8d8ed25..d38d4f8` ohne Force, `deploy.yml` lief automatisch
+> (Run `33927508158`, success). Live nach ~1 Minute: sha256 identisch mit
+> der committeten Seite; alle drei Befunde live gegengelesen (Fließtext
+> nennt alle vier G2-Ereignisse, 0× „Gerechnet über 36 Monate Bindung" /
+> 30× „TCO-24", 0× „ohne-geraet"). Vollständiger Beleg:
+> `outputs/phase-r3-2026-09-04.md` Sektion „Review, Push, Live".
 
 > **Zuletzt erledigt (04.09.2026, abends): Phase R2 — die Befunde der
 > fremden Augen.** Auftragsgrundlage: `PHASE_R2_BRIEF.md` auf Basis von
