@@ -892,9 +892,13 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Referenzrechnung ist (die nennt sich selbst "kein Angebot" -
         # QA-Befund S3); die etikettierten stehen daneben, mit Zahl.
         angebote = [k for k in karten if k["belastbar"] and not k["naeherung"]]
-        betraege = [k["gesamt"] for k in karten
-                    if k["belastbar"] and k["vergleichbar"]
-                    and k["gesamt"] is not None]
+        # DIE SPANNE IST DIE DER ANGEBOTE. Die Referenzrechnung stand bis zum
+        # 04.09.2026 mit darin - und seit sie ihre eigene Bindung traegt
+        # (F-R2-2), hiesse das "TCO-36 von 1.120,75 bis 1.428,70 EUR" mit
+        # einer TCO-24-Zahl als Obergrenze. Dieselbe Fehlerklasse wie das
+        # Etikett selbst, eine Zeile weiter oben auf der Seite.
+        betraege = [k["gesamt"] for k in angebote
+                    if k["vergleichbar"] and k["gesamt"] is not None]
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
                      rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])

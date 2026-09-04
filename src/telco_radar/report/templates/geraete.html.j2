@@ -651,7 +651,8 @@
       %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
       %} · davon {{ m.zustand_offen }} ohne belegten Zustand{% endif %}{% if m.spanne %} ·
       TCO{% if m.laufzeiten | length == 1 %}-{{ m.laufzeiten[0] }}{% endif
-      %} von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{%
+      %}{% if m.spanne[0] == m.spanne[1] %} {{ m.spanne[0] | euro }}{% else
+      %} von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{% endif %}{%
       endif %}{% if m.laufzeiten %} · Bindung {{ m.laufzeiten | join(' und ') }}
       Monate{% endif %}</p>
 

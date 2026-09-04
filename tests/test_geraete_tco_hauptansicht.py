@@ -168,6 +168,19 @@ def test_die_referenzkarte_traegt_ihre_eigene_bindung(bestand):
         "kein Modell mit 24 Tarifmonaten gegen 36 Monate Bindung"
 
 
+def test_die_spanne_des_bandes_ist_die_der_angebote(bestand):
+    """"TCO-36 von 1.120,75 bis 1.428,70 EUR" nannte als Obergrenze die
+    Referenzrechnung - seit F-R2-2 eine TCO-24-Zahl. Die Spanne meint die
+    Angebote, so wie ihr Zaehler."""
+    modell = _modell(bestand, "apple-iphone-15-128")
+    ref = [k for k in modell["karten"] if k["naeherung"]][0]
+    angebote = [k["gesamt"] for k in modell["karten"]
+                if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]]
+    assert modell["spanne"] == [min(angebote), max(angebote)]
+    # Der Gegenfall tritt ein: die Referenz laege ausserhalb der Spanne.
+    assert ref["gesamt"] > max(angebote)
+
+
 def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     """Die Gegenprobe des Auftrags: das Euro-Delta rechnet weiter gegen das
     Fenster, nicht gegen das neue Etikett. Zwei Betraege auf den Cent,

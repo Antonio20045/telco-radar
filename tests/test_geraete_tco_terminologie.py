@@ -57,7 +57,11 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     band = " ".join(tafel.select_one(".gr-mband").get_text(" ", strip=True).split())
-    assert "TCO-36 von" in band and "Gesamtkosten" not in band
+    # Ein einziges vergleichbares Angebot: "TCO-36 652,75 €", nicht "von
+    # 652,75 € bis 652,75 €" - und die Referenzrechnung (TCO-24) zaehlt
+    # nicht in die Spanne der Angebote (F-R2-2).
+    assert "TCO-36 " in band and "Gesamtkosten" not in band
+    assert " bis " not in band.split("TCO-36")[1].split("·")[0]
     assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
     option = tafel.select_one('select[data-sortiere] option[value="gesamt"]')
     assert option.get_text(strip=True) == "TCO je Laufzeitgruppe"
