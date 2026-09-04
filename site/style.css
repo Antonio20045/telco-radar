@@ -2226,6 +2226,13 @@ b,strong{font-weight:700}
   .gr-tafel{padding:16px 14px 20px}
   .gr-alarm{min-width:700px}
   .gr-alarm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Die SIM-only-Referenzen: vier Spalten, deren letzte
+     "Produktinformationsblatt" plus Datum traegt. Gemessen schob sie auf
+     390 px die ganze Seite auf 480 px. Sie bekommt ihre Mindestbreite und
+     rollt IN ihrem `gr-scroll`-Behaelter - gestaucht waere die Belegspalte
+     unlesbar, und der Beleg ist der Grund, warum die Zahl dasteht. */
+  .gr-ttab--simonly{min-width:520px}
+  .gr-ttab--bereit{min-width:440px}
 }
 
 /* Was auffaellt */
