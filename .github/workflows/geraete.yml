@@ -199,3 +199,40 @@ jobs:
             sleep $((2 ** i))
           done
           echo "Seite konnte nicht gepusht werden; der Bestand ist oben gesichert."
+
+      # Der Push oben loest KEINEN Deploy aus - und das ist kein Verdacht,
+      # sondern gemessen: `deploy.yml` lief zuletzt um 00:58 UTC fuer den
+      # letzten Push von Hand, die zwei Commits dieses Laufs kamen um 01:03
+      # UTC, und danach steht in der Lauf-Liste nichts mehr. Live stand
+      # deshalb am Morgen des 04.09.2026 der Stand von 4f9dacb (02:25 CEST),
+      # waehrend `95fa07f` (03:03 CEST) im Repo lag.
+      #
+      # Der Grund ist eine Regel von GitHub, keine Fehlkonfiguration: ein
+      # Push mit dem voreingestellten `GITHUB_TOKEN` startet keine weiteren
+      # Workflows (Schleifenschutz). `radar.yml` weiss das laengst und curlt
+      # den Hook selbst; dieser Lauf hat sein `site/` erst seit dem
+      # 04.09.2026 (Phase 6a) im Gepaeck und hat die Zeile nie bekommen.
+      # Ohne sie ist der naechtliche Seitenaufbau dieselbe Fehlerklasse wie
+      # der Navigationseintrag am 11.08.: gebaut, geprueft, committet - und
+      # fuer jeden Leser nicht da.
+      - name: Trigger Render deploy
+        continue-on-error: true
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK not set - skipping"; exit 0
+          fi
+          sleep 15  # Render klont sofort; der Push braucht den Vorlauf
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
+            # 202 = "Accepted": angenommen und asynchron gefahren. Ohne
+            # diesen Fall stiess die Schleife fuenf Deploys an fuer einen
+            # Hook, der beim ersten Mal richtig geantwortet hatte.
+            if [ "$code" = "200" ] || [ "$code" = "201" ] || [ "$code" = "202" ]; then
+              echo "Render deploy triggered (HTTP $code)"; exit 0
+            fi
+            echo "Render hook returned HTTP $code (attempt $attempt/5) - retrying in 30s"
+            sleep 30
+          done
+          echo "Render hook nicht erreichbar - die Seite liegt im Repo, nur nicht live."

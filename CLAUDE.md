@@ -991,6 +991,21 @@ Website spricht.
   workflow" auf `main`. Gegenprobe, dass live wirklich ankam, was geprüft
   wurde: `curl -sS https://telco-radar.onrender.com/index.html | md5sum`
   gegen `md5sum < site/index.html`.
+- **Ein Push AUS EINEM WORKFLOW HERAUS löst erst recht keinen Deploy aus.**
+  Der Sonderfall des Punktes darüber, und er hat am 04.09.2026 zugeschlagen:
+  `geraete.yml` rendert seit Phase 6a seine Seite selbst und pusht `site/`
+  mit dem voreingestellten `GITHUB_TOKEN` — und ein solcher Push startet nach
+  GitHubs Schleifenschutz **keine weiteren Workflows**. `deploy.yml` lief
+  zuletzt um 00:58 UTC für einen Push von Hand, die zwei Bot-Commits des
+  Nachtlaufs kamen um 01:03 UTC, danach steht in `gh run list` nichts mehr;
+  live stand um 03:20 UTC noch `4f9dacb` (02:25 CEST), während `95fa07f`
+  (03:03 CEST) im Repo lag. Der Kommentar im Workflow behauptete das
+  Gegenteil („der Push auf `main` loest `deploy.yml` aus"). `radar.yml` weiß
+  das längst und **curlt den Hook selbst**; `geraete.yml` tut es seit dem
+  04.09.2026 auch. Wer einen Workflow `site/` committen lässt, gibt ihm den
+  Hook-Schritt mit — sonst ist es dieselbe Fehlerklasse wie der
+  Navigationseintrag am 11.08.: gebaut, geprüft, committet, und für jeden
+  Leser nicht da.
 - **Newsrooms:** Der Fetcher (collect/http.py) probiert Browser-UA und
   Bot-UA. Harte Fälle stehen als `type: official` in der Watchlist und werden
   nicht gecrawlt (Stand 08/2026 noch fünf: TIM, Cosmote, UScellular, Ooredoo,
@@ -1705,6 +1720,53 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 - Kostenlos bleiben (GitHub Actions + Render Free).
 
 ## 8a. Der nächste Auftrag
+
+> **Zuletzt erledigt (04.09.2026, ~03:20): der Bergungslauf nach Phase 6.**
+> Der Lauf davor endete um 03:06 an seinem Turn-Limit — mitten in einer
+> Änderung, ohne Abschluss und ohne Push. Geborgen wurde sein letzter Befund
+> **plus einer, der erst beim Bergen sichtbar wurde**.
+>
+> **Der mobile Scroll-Fix war KEIN Artefakt-Hack.** Die Sorge, der nächtliche
+> Lauf könnte ihn wegrendern, war unbegründet und ist nachgemessen statt
+> geglaubt: Quelle (`geraete.html.j2` + `style.css`) lag committet in
+> `a823330`, im Baum lag nur das **gebaute** `site/`. Ein voller
+> `render_site(…, load_config(root))` erzeugt es **byte-identisch** — und
+> ändert an keiner anderen Seite des Portals ein Zeichen. Zwei Behälter im
+> Template ergeben drei auf der Seite: `referenztabelle` ist ein MAKRO und
+> wird zweimal aufgerufen (offen und in „Die übrigen 13 Tarife").
+>
+> **Der neue Browser-Test ist gegengeprüft, nicht behauptet.** Mit auf
+> `95fa07f` zurückgesetzter Quelle fällt **genau** `tafel-tco`
+> (414 px auf einem 390-px-Telefon), die anderen vier Reiter bleiben grün.
+>
+> | Der Befund, der erst beim Bergen kam | Messung |
+> |---|---|
+> | **Der Nachtlauf kann seine Seite gar nicht veröffentlichen.** `geraete.yml` pusht `site/` mit dem `GITHUB_TOKEN`, und ein solcher Push startet keine Workflows | `deploy.yml` zuletzt 00:58 UTC (Push von Hand), Bot-Commits 01:03 UTC, danach nichts. Live lag `4f9dacb` statt `95fa07f`. Der Hook-Schritt steht jetzt in `geraete.yml`, wie in `radar.yml` — siehe §6 |
+>
+> Stand: **2449 Tests grün**, 2 rot (die vorbestehenden
+> Promo-Screenshot-Tests), 14 skipped. `pruefe_portal.py`
+> **15 bestanden / 2 durchgefallen** (8b und 6, beide vorbestehend);
+> Kriterium 11b misst den TCO-Reiter bei **2641 px** — der zusätzliche
+> Behälter kostet kein Höhenbudget.
+>
+> **OFFEN (unverändert aus Phase 6, nichts davon angefasst):**
+> 1. Die neun Telekom-Sätze stammen aus einem LOKALEN Lauf und altern in
+>    Actions still weiter (202-Challenge). Ob ein anderer HTTP-Client die
+>    Grenze zur Umgehung überschreitet, steht in `STRATEGY_GERAETE_TCO.md`
+>    R3 und ist **Antonios Entscheidung**, nicht die einer Session.
+> 2. `data/state/geraete_tco.json` trägt `buendel: 0` und `sim_only: 25` —
+>    nachgezählt, und genau die 25 stehen als Beleglinks auf der Seite
+>    (12 offen, 13 im Aufklapper). Die TCO-Tabelle bleibt leer, bis **Phase
+>    4** einen Adapter mit Zuzahlung UND Tarifreferenz liefert. Wer sie in
+>    vier Wochen unverändert leer vorfindet, prüft nicht die Tafel.
+> 3. Eine echte Rabattphase steht in keinem Dokument des Bestands — die
+>    Tarifseite bleibt deshalb aus der Navigation.
+> 4. **`site/tarife.html` schreibt „Stand 2026-09-02"**, während alle 32
+>    Tarifsätze `abgerufen_am: 2026-09-04` tragen. Vorbestehend, jetzt
+>    schärfer belegt als am 04.09. früh, und weiterhin NICHT angefasst —
+>    dieselbe Fehlerklasse wie das Kopfdatum der Geräteseite am 30.08.
+>    (`abgerufen_bis` statt `stand`).
+> 5. Vodafones Blätter füllen `art` nicht (alle zehn `art=""`).
 
 > **Zuletzt erledigt (04.09.2026, nachts): Phase 6 — Tarife, Bestand und
 > Bezug.** Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 8 Phase 6.
