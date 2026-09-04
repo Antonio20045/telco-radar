@@ -302,6 +302,49 @@ def _tag(text: str) -> Optional[date]:
         return None
 
 
+def _ereignisse(reihe: dict) -> list:
+    """Die Preisaenderungen EINER Reihe zwischen aufeinanderfolgenden
+    eindeutigen Messtagen - fuer Marker, Fliesstext und Rangfolge.
+
+    Eine Aenderung ist ein Unterschied von mindestens einem Cent zum
+    vorigen Messtag. Gerechnet wird EINMAL, hier; wer den Pfeil, den Satz
+    oder die Auswahl der gezeichneten Reihen aendern will, aendert diese
+    Funktion und nicht eine der drei Stellen.
+    """
+    punkte = sorted(
+        [(t, b) for t, b in ((_tag(p["datum"]), float(p["betrag"]))
+                             for p in (reihe.get("punkte") or []))
+         if t is not None])
+    ereignisse, vorher = [], None
+    for t, b in punkte:
+        if vorher is not None and abs(b - vorher) >= 0.01:
+            delta = round(b - vorher, 2)
+            ereignisse.append({
+                "name": reihe.get("name", ""),
+                "anbieter": reihe.get("anbieter", ""),
+                "datum": t.isoformat(), "betrag": b, "delta": delta,
+                "richtung": "hoch" if delta > 0 else "runter",
+                "quelle_url": reihe.get("quelle_url", "")})
+        vorher = b
+    return ereignisse
+
+
+def _reihenrang(reihe: dict) -> tuple:
+    """Bewegte Reihen vor flachen, die groesste Bewegung zuerst.
+
+    Erst dann zaehlen die Zahl der Ereignisse und die der Messpunkte, und
+    der Name bricht nur noch den Gleichstand. Eine flache Reihe kann damit
+    keine bewegte verdraengen - und wo der Deckel greift, faellt zuerst,
+    was sich nicht geaendert hat. Der Anbieter steht mit im Schluessel,
+    damit zwei gleichnamige Reihen deterministisch stehen.
+    """
+    ereignisse = reihe.get("ereignisse") or []
+    groesste = max((abs(e["delta"]) for e in ereignisse), default=0.0)
+    return (not ereignisse, -groesste, -len(ereignisse),
+            -len(reihe.get("punkte") or []),
+            reihe.get("name", ""), reihe.get("anbieter", ""))
+
+
 def historie(reihen: list) -> dict:
     """G2: Preisverlauf je Modell x Anbieter, mit Ereignismarkern.
 
@@ -364,17 +407,38 @@ def historie(reihen: list) -> dict:
     # S8: die Bildunterschrift sagt "5 von 9 Reihen", nicht "5 Reihen" -
     # der Deckel ist eine Auswahl, und eine Auswahl nennt ihre Grundmenge.
     reihen_gesamt = len(brauchbar)
-    brauchbar.sort(key=lambda r: (-len(r["punkte"]), r["name"]))
+
+    # EREIGNIS SCHLAEGT ALPHABET (QA-Befund F-R2-1, 04.09.2026). Bis dahin
+    # sortierte der Deckel nach Punktzahl und dann nach NAMEN - und weil
+    # alle acht Reihen des Bestands genau zwei Punkte hatten, entschied das
+    # Alphabet: "Galaxy ..." schlug "Nothing ..." und "Pixel ...". Gezeichnet
+    # wurden drei congstar-Linien ohne jede Aenderung, unsichtbar blieb der
+    # groesste Preissprung des ganzen Bestands (o2 Pixel 10 Pro, 793 -> 973
+    # EUR am 03.09.). Dieselbe Fehlerklasse wie B2, nur andersherum: dort
+    # falsch-positive Pfeile, hier falsch-negative.
+    #
+    # UND DIE EREIGNISSE DES FLIESSTEXTS KOMMEN AUS DER GRUNDMENGE, nicht aus
+    # den gezeichneten Reihen: "Erhoehungen und Senkungen im Messzeitraum"
+    # ist ein Satz ueber den Bestand, und er nannte zwei Ereignisse, wo vier
+    # existierten - waehrend `gr-verlaufdaten` derselben Seite alle vier
+    # kannte. Die Bildunterschrift legt die Kappung offen ("5 von 8
+    # Reihen"), der Satz tat es nicht. Die Marker der Grafik entstehen aus
+    # DENSELBEN Ereignissen (`je_tag` unten) - eine Rechnung, zwei Orte.
+    for reihe in brauchbar:
+        reihe["ereignisse"] = _ereignisse(reihe)
+    ereignisse = [e for r in brauchbar for e in r["ereignisse"]]
+    bewegt = sum(1 for r in brauchbar if r["ereignisse"])
+    brauchbar.sort(key=_reihenrang)
     brauchbar = brauchbar[:MAX_REIHEN]
     if not brauchbar:
         return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
-                "reihen_gesamt": 0, "ausgelassen": ausgelassen}
+                "reihen_gesamt": 0, "bewegt": 0, "ausgelassen": ausgelassen}
 
     punkte_alle = [(_tag(p["datum"]), float(p["betrag"]))
                    for r in brauchbar for p in r["punkte"]]
     if len(punkte_alle) < MIND_PUNKTE:
         return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
-                "reihen_gesamt": 0, "ausgelassen": ausgelassen}
+                "reihen_gesamt": 0, "bewegt": 0, "ausgelassen": ausgelassen}
 
     tage = [t for t, _ in punkte_alle]
     betraege = [b for _, b in punkte_alle]
@@ -443,7 +507,7 @@ def historie(reihen: list) -> dict:
                      f'y="{G2_HOEHE - 12}" text-anchor="middle">'
                      f'{tag.strftime("%d.%m.")}</text>')
 
-    tabelle, ereignisse = [], []
+    tabelle = []
     for nr, reihe in enumerate(brauchbar):
         slug = anbieter_slug(reihe["anbieter"])
         punkte = sorted(
@@ -453,22 +517,21 @@ def historie(reihen: list) -> dict:
                         for i, (t, b) in enumerate(punkte))
         teile.append(f'<path class="gr-g2-linie gr-anb--{slug}" d="{pfad}" '
                      f'fill="none" />')
-        vorher = None
+        # Die Marker kommen aus `_ereignisse`, nicht aus einer zweiten
+        # Rechnung in der Schleife - sonst koennten Pfeil und Fliesstext
+        # auseinanderlaufen.
+        je_tag = {e["datum"]: e for e in reihe["ereignisse"]}
         for t, b in punkte:
             klasse = "gr-g2-punkt"
             titel = f'{reihe["name"]} · {reihe["anbieter"]} · ' \
                     f'{t.strftime("%d.%m.%Y")}: {euro(b)}'
-            if vorher is not None and abs(b - vorher) >= 0.01:
-                richtung = "hoch" if b > vorher else "runter"
-                klasse += f" gr-g2-punkt--{richtung}"
-                delta = round(b - vorher, 2)
+            ereignis = je_tag.get(t.isoformat())
+            if ereignis is not None:
+                delta = ereignis["delta"]
+                klasse += f" gr-g2-punkt--{ereignis['richtung']}"
                 zeichen = "+" if delta > 0 else "−"
                 titel += f' ({zeichen}{euro(abs(delta))} gegenüber ' \
                          f'dem letzten Messpunkt)'
-                ereignisse.append({
-                    "name": reihe["name"], "anbieter": reihe["anbieter"],
-                    "datum": t.isoformat(), "betrag": b, "delta": delta,
-                    "richtung": richtung, "quelle_url": reihe.get("quelle_url", "")})
                 teile.append(
                     f'<text class="gr-g2-marker" x="{x(t)}" '
                     f'y="{y(b) - 10}" text-anchor="middle">'
@@ -476,7 +539,6 @@ def historie(reihen: list) -> dict:
             teile.append(f'<circle class="{klasse} gr-anb--{slug}" '
                          f'cx="{x(t)}" cy="{y(b)}" r="4">'
                          f'<title>{_t(titel)}</title></circle>')
-            vorher = b
         # Die Legende steht rechts NEBEN dem Bild, nicht darunter: eine
         # Legende unter der Grafik zwingt auf dem Telefon zum Querscrollen.
         teile.append(
@@ -499,5 +561,6 @@ def historie(reihen: list) -> dict:
     ereignisse.sort(key=lambda e: (e["datum"], e["name"]), reverse=True)
     return {"svg": "".join(teile), "tabelle": tabelle,
             "ereignisse": ereignisse, "reihen": len(brauchbar),
-            "reihen_gesamt": reihen_gesamt, "ausgelassen": ausgelassen,
+            "reihen_gesamt": reihen_gesamt, "bewegt": bewegt,
+            "ausgelassen": ausgelassen,
             "von": von.isoformat(), "bis": bis.isoformat()}

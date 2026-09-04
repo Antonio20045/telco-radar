@@ -1048,21 +1048,33 @@
   {% if geraete.tco.g2.svg %}
   <figure class="gr-grafik gr-grafik--g2">
     {{ geraete.tco.g2.svg | safe }}
+    {# DIE AUSWAHL NENNT IHRE REGEL: wo der Deckel greift, sagt die
+       Unterschrift, dass die Reihen mit Preisaenderung zuerst gezeichnet
+       sind - sonst liest sich "5 von 8" als beliebige Stichprobe
+       (QA-Befund F-R2-1). #}
     <figcaption>{% if geraete.tco.g2.reihen_gesamt > geraete.tco.g2.reihen
     %}{{ geraete.tco.g2.reihen }} von {{ geraete.tco.g2.reihen_gesamt }} Reihen{%
     else %}{{ geraete.tco.g2.reihen }} Reihen{% endif %} mit mindestens zwei
     eindeutigen Messpunkten, {{ geraete.tco.g2.von | date_de }} bis {{
-    geraete.tco.g2.bis | date_de }}. Ein Pfeil steht für eine Änderung
-    zwischen zwei Messungen; Datum und Betrag stehen am Punkt und in der
-    Tabelle darunter.</figcaption>
+    geraete.tco.g2.bis | date_de }}{% if geraete.tco.g2.reihen_gesamt >
+    geraete.tco.g2.reihen %} – Reihen mit Preisänderung zuerst{% endif %}.
+    Ein Pfeil steht für eine Änderung zwischen zwei Messungen; Datum und
+    Betrag stehen am Punkt und in der Tabelle darunter.</figcaption>
   </figure>
   {{ g2_ausgelassen(geraete.tco.g2) }}
 
+  {# DER SATZ RECHNET UEBER DIE GRUNDMENGE, nicht ueber die gezeichneten
+     Reihen (F-R2-1) - und sagt es, wo die zwei Mengen auseinanderfallen.
+     Ueber sechs Ereignisse wird nicht stumm gekappt, sondern gezaehlt. #}
   {% if geraete.tco.g2.ereignisse %}
-  <p class="gr-erklaer">Erhöhungen und Senkungen im Messzeitraum:
+  <p class="gr-erklaer gr-g2-ereignisse">Erhöhungen und Senkungen im
+  Messzeitraum{% if geraete.tco.g2.reihen_gesamt > geraete.tco.g2.reihen %},
+  über alle {{ geraete.tco.g2.reihen_gesamt }} Reihen{% endif %}:
   {% for e in geraete.tco.g2.ereignisse[:6] %}{{ e.datum | date_de }}
   {{ e.name }} bei {{ e.anbieter }} {{ '+' if e.delta > 0 else '−' }}{{
-  e.delta | abs | euro }}{% if not loop.last %}; {% endif %}{% endfor %}.</p>
+  e.delta | abs | euro }}{% if not loop.last %}; {% endif %}{% endfor %}{%
+  if geraete.tco.g2.ereignisse | length > 6 %} und {{
+  geraete.tco.g2.ereignisse | length - 6 }} weitere{% endif %}.</p>
   {% endif %}
 
   {# DIE TABELLE UNTER DER GRAFIK ist keine Zugabe, sondern C.2: auf dem
