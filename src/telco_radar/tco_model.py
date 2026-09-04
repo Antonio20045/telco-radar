@@ -244,6 +244,20 @@ class Buendel:
     tarif_id: str = ""
     tarif_id_guete: str = ""
     tarif_monatlich: Optional[float] = None
+    # Die Mindestlaufzeit des TARIFS, in Monaten. Sie steht nicht in der
+    # Geraetenutzlast, sondern im Tarifbestand (`data/state/tarife.jsonl`,
+    # ueber `tarif_id`) - deshalb setzt sie der Aufrufer und nicht der
+    # Speicher. o2 bindet den Tarif 24 Monate und finanziert das Geraet
+    # ueber 36; wer die zwei gleichsetzt, addiert zwoelf Tarifmonate, die
+    # niemand schuldet (A5.5).
+    tarif_bindung_monate: Optional[int] = None
+    # EIN Monatsbetrag fuer Tarif UND Geraet zusammen - so verkauft 1&1
+    # (§ 13.2 der Strategie: `"price": "44.99"` ist der Buendelmonatspreis,
+    # einen Barpreis gibt es dort nicht). Er tritt an die Stelle von
+    # `tarif_monatlich` PLUS `geraet_monatsrate`; ihn in seine zwei Haelften
+    # zu zerlegen waere eine Rechnung dieses Projekts und keine Angabe des
+    # Anbieters.
+    buendel_monatlich: Optional[float] = None
     geraet_zuzahlung: Optional[float] = None
     geraet_monatsrate: Optional[float] = None
     laufzeit_monate: int = STANDARD_LAUFZEIT
@@ -262,8 +276,9 @@ class Buendel:
         self.anbieter = self.anbieter.strip()
         self.tarif_name = self.tarif_name.strip()
         self.sku_id = (self.sku_id or "").strip()
-        for feld in ("tarif_monatlich", "geraet_zuzahlung",
-                     "geraet_monatsrate", "anschlusspreis"):
+        for feld in ("tarif_monatlich", "buendel_monatlich",
+                     "geraet_zuzahlung", "geraet_monatsrate",
+                     "anschlusspreis"):
             wert = getattr(self, feld)
             if wert is None:
                 continue
@@ -271,12 +286,26 @@ class Buendel:
             if wert < 0:
                 raise ValueError(f"negativer preis in {feld}: {wert}")
             setattr(self, feld, round(wert, 2))
+        if self.buendel_monatlich is not None and (
+                self.tarif_monatlich is not None
+                or self.geraet_monatsrate is not None):
+            # Sonst stuende derselbe Monat zweimal in der Summe: einmal als
+            # Buendelbetrag und einmal als seine Bestandteile. Wer beides
+            # kennt, traegt die Bestandteile ein - sie sagen mehr.
+            raise ValueError("ein Buendelmonatspreis steht ANSTELLE von "
+                             "Tarifpreis und Geraeterate, nicht daneben")
+        if self.tarif_bindung_monate is not None:
+            self.tarif_bindung_monate = int(self.tarif_bindung_monate)
+            if self.tarif_bindung_monate < 0:
+                raise ValueError("negative Tarifbindung: "
+                                 f"{self.tarif_bindung_monate}")
         self.laufzeit_monate = int(self.laufzeit_monate)
         if self.laufzeit_monate <= 0:
             raise ValueError(f"laufzeit_monate muss positiv sein: "
                              f"{self.laufzeit_monate}")
         if not self.sku_id and (self.geraet_zuzahlung is not None
-                                or self.geraet_monatsrate is not None):
+                                or self.geraet_monatsrate is not None
+                                or self.buendel_monatlich is not None):
             # Sonst haette eine SIM-only-Referenz einen Geraetepreis, und die
             # Differenz aus beiden - der effektive Geraetepreis - zoege ihn
             # von sich selbst ab.
@@ -555,3 +584,274 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     if mit.gesamt is not None and ohne.gesamt is not None:
         ergebnis.betrag = round(mit.gesamt - ohne.gesamt, 2)
     return ergebnis
+
+
+# --------------------------------------------------------------------------
+# Phase R: die Kennzahl ueber die BINDUNG, nicht ueber einen festen Horizont
+# --------------------------------------------------------------------------
+#
+# Warum es diese zweite Rechnung gibt
+# -----------------------------------
+# `tco_24` kappt bei 24 Monaten. Das war richtig, solange die Frage lautete
+# "was kostet ein Buendel in der ueblichen Tarifmindestlaufzeit". Am
+# 04.09.2026 ist der Bestand gemessen worden, und er sagt etwas anderes:
+# **jedes** erhobene Buendel ist eine 36-Monats-Geraetefinanzierung (o2
+# 62/62, 1&1 35/35), und o2 trennt dabei sogar die Tarifbindung (24 Monate)
+# von der Ratenlaufzeit (36). Eine reine 24-Monats-Rangliste waere damit
+# entweder leer oder - schlimmer - sie vergliche Ungleiches.
+#
+# Die Anforderung A5 (ANFORDERUNGEN_TCO_FIRST.md, 04.09.2026) zieht daraus
+# fuenf Regeln, und dieses Modul setzt sie um:
+#
+#   A5.1  Die Leitzahl heisst `TCO-<Bindung>` und traegt ihre Laufzeit IMMER
+#         im Namen. Nie unbeschriftet, nie zwei Laufzeiten in einer Rangfolge.
+#   A5.2  Antonios Leitfrage wird woertlich beantwortet, auch bei 36 Monaten:
+#         `gezahlt_nach_24` und `offen_nach_24` stehen als Pflichtzeile an
+#         jeder Karte. Eine auf 24 gekappte Zahl OHNE diesen Ausweis waere
+#         die CHECK24-Methodik, die § 5.4 der Strategie verwirft.
+#   A5.3  Quervergleichsmass ueber Laufzeiten hinweg ist `schnitt_monat`
+#         (Gesamt / Bindung) - und nur dieses.
+#   A5.4  Zwei Laufzeitgruppen, zwei Nulllinien (das rechnet die Grafik).
+#   A5.5  Bei getrennten Laufzeiten fuehrt die LAENGERE die Karte, und die
+#         Aufspaltung steht im Rechenweg.
+#
+# Der eine Unterschied zu `tco_24`, der bewusst gemacht ist
+# ---------------------------------------------------------
+# `tco_24` rechnet Rabatte NIE ein (Regel 3 im Modulkopf). Diese Rechnung
+# zieht **belegte** Boni ab - so steht es im Terminologie-Katalog D des
+# Lastenhefts ("TCO-24 = ... − belegte Boni") und so verlangt es die
+# Balkengrafik G1, die den Bonus als eigenes, negatives Segment zeigt. Der
+# Widerspruch zu Regel 3 ist keiner: dort ging es um CHECK24s
+# "bestenfalls realisierbare Verguenstigungen", also um einen unterstellten
+# Bestfall. Hier wird nur abgezogen, was als `Rabatt` mit Namen, Frist und
+# Beleg im Datensatz steht, und jeder Abzug erscheint einzeln mit seiner
+# Bedingung - "niemals STILL einrechnen" (Katalog D) ist damit erfuellt.
+# Im Bestand vom 04.09.2026 traegt kein einziges Buendel einen Rabatt; der
+# Unterschied ist heute also null und morgen belegt.
+
+# Der Horizont von Antonios Leitfrage: "was zahlt der Kunde ueber 24 Monate
+# gesamt". Er ist NICHT die Bindung - er ist die Frage, die an jeder Karte
+# beantwortet wird, egal wie lang die Bindung laeuft.
+LEITFRAGE_MONATE = 24
+
+# Die Kategorien der Bestandteile. Die Balkengrafik stapelt nach ihnen, die
+# Tabelle liest dieselbe Liste - eine zweite Zuordnung in der Vorlage waere
+# eine zweite Rechnung (CLAUDE.md § 6).
+KAT_EINMALIG = "einmalig"
+KAT_TARIF = "tarif"
+KAT_RATEN = "raten"
+KAT_BUENDEL = "buendel"
+KAT_BONUS = "bonus"
+
+POSTEN_BUENDEL = "Bündelpreis (Tarif und Gerät zusammen)"
+POSTEN_TARIFBINDUNG = "Tarifbindung"
+
+
+@dataclass
+class TcoBindung:
+    """Die Kennzahl eines Buendels ueber seine eigene Bindungsdauer.
+
+    Felder:
+      bindung          ueber wie viele Monate gerechnet wurde (A5.5:
+                       max(Tarifbindung, Ratenlaufzeit))
+      tarif_bindung    Mindestlaufzeit des Tarifs, aus dem Tarifbestand
+      raten_laufzeit   Laufzeit der Geraeteraten, aus der Anbieternutzlast
+      gesamt           die Leitzahl `TCO-<bindung>`
+      schnitt_monat    gesamt / bindung - das einzige laufzeituebergreifend
+                       zulaessige Vergleichsmass (A5.3)
+      gezahlt_nach_24  was der Kunde nach 24 Monaten gezahlt HAT (A5.2)
+      offen_nach_24    was danach noch offen ist (A5.2)
+      bestandteile     [{name, betrag, kategorie}] in Rechenreihenfolge
+      luecken          benannte fehlende Posten - nie als Null gerechnet
+      boni             die abgezogenen Nachlaesse, einzeln mit Bedingung
+      boni_abzug       ihre Summe (positiv), bereits in `gesamt` abgezogen
+    """
+
+    bindung: Optional[int] = None
+    tarif_bindung: Optional[int] = None
+    raten_laufzeit: Optional[int] = None
+    gesamt: Optional[float] = None
+    schnitt_monat: Optional[float] = None
+    gezahlt_nach_24: Optional[float] = None
+    offen_nach_24: Optional[float] = None
+    bestandteile: list = field(default_factory=list)
+    luecken: list[str] = field(default_factory=list)
+    boni: list = field(default_factory=list)
+    boni_abzug: float = 0.0
+
+    @property
+    def belastbar(self) -> bool:
+        """Dieselbe Schwelle wie `Tco.belastbar`, eine Ebene weiter.
+
+        Ohne Bindungsdauer gibt es keine Leitzahl - `TCO-?` ist keine
+        Beschriftung (A5.1). Und ohne Tarifanteil ist die Zahl der
+        Geraetebetrag und keine TCO.
+        """
+        return (self.gesamt is not None and self.bindung is not None
+                and POSTEN_TARIF not in self.luecken
+                # Ein Grundpreis ohne gemessene Bindung steht in KEINEM
+                # Bestandteil - die Summe waere dann der Geraetebetrag
+                # allein und saehe wie ein sehr guenstiges Buendel aus.
+                and POSTEN_TARIFBINDUNG not in self.luecken)
+
+    @property
+    def label(self) -> str:
+        """`TCO-36` - die Laufzeit steht IM Namen (A5.1)."""
+        return f"TCO-{self.bindung}" if self.bindung else "TCO"
+
+
+def tco_bindung(buendel: Buendel) -> TcoBindung:
+    """Die Leitzahl eines Buendels ueber seine Bindung - eine reine Funktion.
+
+    Zwei Preisformen, eine Rechnung:
+
+    * **aufgeteilt** (o2): Tarifgrundpreis und Geraeterate stehen getrennt,
+      und sie laufen verschieden lang. Der Tarif zaehlt seine
+      Mindestlaufzeit, die Rate ihre Ratenlaufzeit, und die Karte fuehrt die
+      laengere der beiden (A5.5).
+    * **zusammen** (1&1): der Anbieter nennt EINEN Monatsbetrag fuer Tarif
+      und Geraet. Ihn aufzuteilen waere eine Rechnung dieses Projekts und
+      keine Angabe des Anbieters (§ 13.2 der Strategie) - also wird er als
+      ein Posten gefuehrt und als solcher beschriftet.
+
+    Was fehlt, wird als fehlend gefuehrt: eine Luecke ist nie eine Null
+    (§ 6.4, wortgleich aus `effektivpreis.py`). 0.0 dagegen IST ein
+    gemessener Betrag - "kein Anschlusspreis" und "Anschlusspreis 0 EUR"
+    sind zwei verschiedene Auskuenfte.
+    """
+    e = TcoBindung()
+
+    zusammen = buendel.buendel_monatlich is not None
+    e.raten_laufzeit = (buendel.laufzeit_monate
+                        if (zusammen or buendel.geraet_monatsrate is not None)
+                        else None)
+    e.tarif_bindung = buendel.tarif_bindung_monate
+
+    if zusammen:
+        # EIN Betrag ueber die Laufzeit, die der Anbieter selbst nennt.
+        e.bindung = buendel.laufzeit_monate
+    else:
+        # Der Tarif laeuft seine Mindestlaufzeit, die Rate ihre eigene.
+        # Fehlt die Tarifbindung, ist die Karte nicht rechenbar: sie mit der
+        # Ratenlaufzeit gleichzusetzen addierte bei o2 zwoelf Tarifmonate,
+        # die niemand schuldet (12 x 19,99 EUR = 239,88 EUR zu viel).
+        laengen = [x for x in (e.tarif_bindung, e.raten_laufzeit) if x]
+        e.bindung = max(laengen) if laengen else None
+
+    # ---- Tarif ----------------------------------------------------------
+    if zusammen:
+        e.bestandteile.append({
+            "name": f"{POSTEN_BUENDEL} · {buendel.laufzeit_monate} × "
+                    f"{buendel.buendel_monatlich:.2f} €".replace(".", ","),
+            "betrag": round(buendel.buendel_monatlich
+                            * buendel.laufzeit_monate, 2),
+            "kategorie": KAT_BUENDEL})
+    elif buendel.tarif_monatlich is None:
+        e.luecken.append(POSTEN_TARIF)
+    elif e.tarif_bindung:
+        e.bestandteile.append({
+            "name": f"Tarif · {e.tarif_bindung} × "
+                    f"{buendel.tarif_monatlich:.2f} €".replace(".", ","),
+            "betrag": round(buendel.tarif_monatlich * e.tarif_bindung, 2),
+            "kategorie": KAT_TARIF})
+    else:
+        # Der Grundpreis steht, aber niemand hat gemessen, wie lange er
+        # geschuldet ist. Beides ist eine Luecke, und sie hat einen eigenen
+        # Namen - sonst suchte der naechste Leser den Tarifpreis.
+        e.luecken.append(POSTEN_TARIFBINDUNG)
+
+    # ---- Geraet ---------------------------------------------------------
+    if not buendel.ohne_geraet and not zusammen:
+        if buendel.geraet_zuzahlung is not None:
+            e.bestandteile.append({"name": POSTEN_ZUZAHLUNG,
+                                   "betrag": buendel.geraet_zuzahlung,
+                                   "kategorie": KAT_EINMALIG})
+        else:
+            e.luecken.append(POSTEN_ZUZAHLUNG)
+        if buendel.geraet_monatsrate is not None:
+            e.bestandteile.append({
+                "name": f"Geräteraten · {buendel.laufzeit_monate} × "
+                        f"{buendel.geraet_monatsrate:.2f} €".replace(".", ","),
+                "betrag": round(buendel.geraet_monatsrate
+                                * buendel.laufzeit_monate, 2),
+                "kategorie": KAT_RATEN})
+        else:
+            e.luecken.append(POSTEN_RATE)
+
+    # ---- Anschluss ------------------------------------------------------
+    if buendel.anschlusspreis is not None:
+        e.bestandteile.append({"name": POSTEN_ANSCHLUSS,
+                               "betrag": buendel.anschlusspreis,
+                               "kategorie": KAT_EINMALIG})
+    else:
+        e.luecken.append(POSTEN_ANSCHLUSS)
+
+    # ---- Boni -----------------------------------------------------------
+    # Abgezogen wird nur, was benannt und befristet im Datensatz steht, und
+    # jeder Abzug erscheint einzeln - siehe der Absatz im Kopf dieses
+    # Abschnitts.
+    if buendel.rabatte and e.bindung:
+        for r in buendel.rabatte:
+            wert = r.wert(e.bindung)
+            if not wert:
+                continue
+            e.boni.append({"name": r.name, "betrag": wert,
+                           "beleg_url": r.beleg_url})
+            e.bestandteile.append({"name": f"Bonus · {r.name}",
+                                   "betrag": -wert, "kategorie": KAT_BONUS})
+        e.boni_abzug = round(sum(b["betrag"] for b in e.boni), 2)
+    elif not buendel.rabatte:
+        # Kein erfasster Bonus heisst nicht "es gibt keinen" - dieselbe
+        # Regel wie in `tco_24`.
+        e.luecken.append(POSTEN_RABATTE)
+
+    if not e.bestandteile:
+        return e
+
+    e.gesamt = round(sum(p["betrag"] for p in e.bestandteile), 2)
+    if e.bindung:
+        e.schnitt_monat = round(e.gesamt / e.bindung, 2)
+
+    # ---- Antonios Leitfrage, woertlich (A5.2) ---------------------------
+    # Gezahlt hat der Kunde nach 24 Monaten: alle Einmalposten, den Tarif
+    # fuer hoechstens 24 seiner Monate und die Rate fuer hoechstens 24 ihrer
+    # Monate. Boni innerhalb der ersten 24 Monate mindern auch diese Zahl -
+    # sie werden mit demselben Horizont gerechnet wie der Rest.
+    gezahlt = 0.0
+    for p in e.bestandteile:
+        if p["kategorie"] == KAT_EINMALIG:
+            gezahlt += p["betrag"]
+    if zusammen:
+        gezahlt += round(buendel.buendel_monatlich
+                         * min(LEITFRAGE_MONATE, buendel.laufzeit_monate), 2)
+    else:
+        if buendel.tarif_monatlich is not None and e.tarif_bindung:
+            gezahlt += round(buendel.tarif_monatlich
+                             * min(LEITFRAGE_MONATE, e.tarif_bindung), 2)
+        if buendel.geraet_monatsrate is not None:
+            gezahlt += round(buendel.geraet_monatsrate
+                             * min(LEITFRAGE_MONATE,
+                                   buendel.laufzeit_monate), 2)
+    for r in buendel.rabatte:
+        gezahlt -= r.wert(LEITFRAGE_MONATE)
+    e.gezahlt_nach_24 = round(gezahlt, 2)
+    e.offen_nach_24 = round(e.gesamt - e.gezahlt_nach_24, 2)
+    return e
+
+
+def effektiv_ohne_geraet(kennzahl: TcoBindung,
+                         barpreis: Optional[float]) -> Optional[float]:
+    """`Ø/Monat − (Geräte-Barpreis ÷ Bindung)` - die Finanztip-Formel.
+
+    Was bleibt, ist der monatliche Preis des TARIFS, wenn man das Geraet zu
+    seinem Marktpreis herausrechnet. Sie beantwortet die Frage, die ein
+    Buendelpreis verdeckt: zahle ich hier fuer den Tarif oder fuer das
+    Telefon?
+
+    Ohne belegten Barpreis gibt es keine Zahl - **nicht** eine mit einem
+    geschaetzten Geraetewert. Das ist E1, und es ist der Grund, warum diese
+    Funktion ein `None` zurueckgeben darf.
+    """
+    if barpreis is None or not kennzahl.belastbar or not kennzahl.bindung:
+        return None
+    return round(kennzahl.schnitt_monat - barpreis / kennzahl.bindung, 2)
