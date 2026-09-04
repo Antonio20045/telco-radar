@@ -1671,6 +1671,12 @@ worden — sie braucht eine eigene Messung und eine eigene Entscheidung. Die
 Telekom-Tarife stehen weiterhin über ihre Produktinformationsblätter im
 Bestand.
 
+> **Nachtrag 04.09.2026:** diese Messung ist gemacht worden, siehe § 14.4.
+> Ergebnis: der Endpunkt existiert und antwortet JSON, aber **keine Seite
+> gibt eine konkrete Tarifadresse darunter aus** — und der einzige Ort, an
+> dem sie stünde (das JS-Bündel auf `static.eshop.telekom.de`), antwortet
+> auf seine robots.txt mit HTTP 403. Es bleibt bei den PIB-Dokumenten.
+
 ### 13.5 Nachmessen
 
 ```bash
@@ -1698,3 +1704,287 @@ for h in ("tests/fixtures/geraete/_herkunft.json",
 print("Belegkette in Ordnung")
 PY
 ```
+
+---
+
+## 14. Nachtrag 04.09.2026 — Phase S: die Bündel und die Telekom-Schnittstelle
+
+Alles in diesem Abschnitt ist am 04.09.2026 aus der Arbeitsumgebung
+gemessen worden, mit `curl`/`httpx`/`urllib` und dem Absender
+`TelcoRadar/1.0`, ohne Fingerprint-Trick und ohne Browser-Kennung.
+robots.txt wurde vor jedem Abruf gelesen. Abgerufen wurde ausschließlich,
+was in der Konfiguration steht oder auf einer Einstiegsseite verlinkt ist.
+
+Die Ausgangslage: `data/state/geraete_tco.json` trug `buendel: 0`. Die
+TCO-Tafel zeigte ihren Maßstab (25 SIM-only-Referenzen) und keine einzige
+Rechnung. Nach dieser Phase stehen **62 Bündel und 37 Referenzen**.
+
+### 14.1 o2-Bündel: dieselbe Adresse, ein Parameter weniger
+
+Die Frage des Auftrags war, ob die Katalog-Antworten für Tarifvarianten
+andere Nutzlasten liefern. Die Antwort ist ja — und der Umschalter steht
+in der Antwort selbst, die der Sammler seit dem 28.08.2026 liest.
+`/e-shop/` gibt **beide** Adressen wörtlich in seiner eigenen Nutzlast
+aus:
+
+| Adresse | Antwort | Zustand |
+|---|---|---|
+| `…/__not-specified__?hwOnly=true` | 537 KB, 95 Geräte, `bundle: null` | `HW_ONLY` |
+| `…/__not-specified__` | 583 KB, 88 Geräte, `bundle` gefüllt | `BUNDLE` |
+
+`hwCatalogSwitcherStateValue.hwOnlyOrBundleState` nennt den Zustand,
+`showSwitcher: true` sagt, dass die Seite die zwei Fassungen ihren Lesern
+selbst anbietet. Es ist derselbe Pfad, derselbe Medientyp
+(`application/vnd.commerce.message+json`) und dieselbe robots-Lage
+(§ 13 des Adapters: `Disallow: /e-shop/rest/` steht nur in der
+Googlebot-Gruppe). **Kein Parameter ist geraten, keine Kombinatorik
+durchprobiert.**
+
+Der Bündeleintrag trägt in seinen typisierten Feldern:
+
+```
+price.oneTimePrice     1,00 €      Gerätezuzahlung
+price.monthlyPrice    60,49 €      Geräterate PLUS Tarif, zusammen
+price.totalPrice    2.178,64 €     = oneTime + 36 × monthly
+price.activationFee   39,99 €      Anschlusspreis
+rateDurationValue   36 Monate      Laufzeit der Geräteraten
+bundle.tariffName   "O<sub>2</sub> Mobile L Plus mit 150 GB+ (24 Mon.)"
+```
+
+**`monthlyPrice` ist die Summe, nicht die Geräterate.** Getrennt stehen
+die zwei nur im Trackingblock `ecommerceProductValue.attributes`
+(`metric3` = Gerät mtl., `metric2` = Tarif mtl., `metric5` = Anzahlung,
+`metric4` = Anschlusspreis, `dimension59` = Tarif-Slug). Ein Trackingfeld
+ist kein Preisfeld — deshalb wird ihm nichts geglaubt, was sich nicht
+gegen die typisierten Zahlen **derselben Antwort** nachrechnen lässt. Drei
+Proben, alle drei Bedingung statt Protokoll:
+
+| Probe | 04.09.2026 |
+|---|---|
+| `metric3 + metric2 == monthlyPrice` | 66 / 66 |
+| `metric5 == oneTimePrice` | 66 / 66 |
+| `metric4 == activationFee` | 66 / 66 |
+| `oneTimePrice + n × monthlyPrice == totalPrice` | 66 / 66 |
+
+Von den 88 Einträgen sind 22 Gerät PLUS Zubehör („mit AirPods Pro 3") und
+fallen mit derselben Regel heraus wie im Gerätekatalog.
+
+**Gegenprobe an den Produktseiten, die o2 selbst verlinkt.** Acht der im
+Katalog genannten `-details?…&tarif=…`-Adressen wurden abgerufen (HTTP 200,
+je rund 950 KB). Sie tragen **serverseitig** einen `pdp:PriceSummaryValue`:
+
+```
+totalRecurringCharges   "48,99 €"
+  "Gerät mtl. (36 Raten):"                        "34,00 €"
+  "Tarif mtl. (Mindestlaufzeit 24 Monate):"       "14,99 €"
+totalNonRecurringCharges "47,98 €"
+  "Gerät Anzahlung:"                               "1,00 €"
+  "einmaliger Anschlusspreis"                     "39,99 €"
+  "Versandkosten:"                                  "6,99 €"
+```
+
+Bei **sieben von sieben** vergleichbaren Fällen stimmen die Beträge auf den
+Cent mit `metric3`/`metric2` überein (der achte führt der Katalog unter
+einem anderen `description`-Namen). Damit ist die Trackinglesart nicht nur
+in sich stimmig, sondern gegen eine zweite, unabhängige Ausgabe desselben
+Anbieters belegt.
+
+**Die Detailseiten werden im Betrieb NICHT abgerufen.** 66 Seiten à rund
+950 KB wären 63 MB je Nacht für eine Aufteilung, die in der einen
+Katalogantwort schon steht. Der Adapter holt eine Adresse.
+
+`Versandkosten` bleiben draußen: `tco_model` kennt den Posten nicht, und
+ihn in den Anschlusspreis zu addieren hieße, zwei verschiedene Entgelte in
+einer Zahl zu führen.
+
+### 14.2 o2-Tarife: warum die Kacheln, und warum sie belegt sind
+
+Ein Bündel ohne auflösbaren Tarif wird verworfen (`TcoDB.upsert_buendel`).
+Der o2-Tarifbestand kannte drei Sätze — `o2:o2-home-l-175-250-300-flex`
+(zweimal, Festnetz) und `o2:o2-mobile-unlimited-m-flex` —, und **keiner
+davon ist einer der beiden, die o2 heute mit Gerät verkauft.** Ohne
+Tarifsätze wären alle 63 Bündel verworfen worden.
+
+Die zwei üblichen Wege gibt es bei o2 nicht:
+
+* `https://www.o2online.de/tarife/handyvertrag-ohne-handy/` (HTTP 200,
+  210.306 Bytes) trägt genau **ein** `application/ld+json`, und das ist
+  eine `BreadcrumbList`. Kein `Product`-Knoten — dieselbe Lage wie bei
+  Telekom und 1&1s Gerätestrecke.
+* `https://www.o2online.de/recht/produktinformationsblatt/` verlinkt **drei**
+  PDFs, davon **eines** zu einem Mobilfunktarif („O2 Mobile Unlimited M
+  Flex ab 10.06.2026"). Genau der steht im Bestand.
+* Die Pflichtblätter zu allen übrigen Tarifen sind zwar verlinkt — aber
+  unter `https://www.o2online.de/assets/blobs/pdfs/…`, und **`/assets/`
+  steht in der für uns gültigen robots-Gruppe `User-agent: *` auf
+  `Disallow`.** Sie werden deshalb nicht geholt. Das ist kein
+  Ausweichmanöver, sondern die Regel: was die robots.txt sperrt, wird nicht
+  gelesen, auch wenn ein Umweg offen stünde.
+
+Die Tarife stehen trotzdem serverseitig da — in zwölf Preiskacheln, die o2
+selbst als solche auszeichnet (`article.teaser-with-price`, darin ein
+`<tef-price>` mit `slot="price"`). Gelesen werden sie mit
+`methode: kacheln` (`collect/tarif_kacheln.py`), und der Satz trägt
+`preistyp: live_shop` wie jede Shop-Messung seit § 13.3.
+
+| Tarif | mtl. | Anschluss | Volumen | Mindestlaufzeit |
+|---|---|---|---|---|
+| O2 Mobile S / S Flex | 19,99 / 19,99 € | 39,99 € | 15 GB+ | 24 / — |
+| O2 Mobile on Demand M / M Flex | 19,99 / 29,99 € | 39,99 € | 50 GB+ | 24 / — |
+| O2 Mobile L / L Flex | 24,99 / 34,99 € | 0,00 / 39,99 € | 150 GB+ | 24 / — |
+| O2 Mobile Unlimited S Special / Flex | 24,99 / 34,99 € | 39,99 € | — | 24 / — |
+| O2 Mobile Unlimited M / Flex | 29,99 / 39,99 € | 0,00 / 39,99 € | — | 24 / — |
+| O2 Mobile Unlimited L / Flex | 39,99 / 59,99 € | 0,00 / 39,99 € | — | 24 / — |
+
+**Die Gegenprobe, die dieser Lesart ihr Vertrauen gibt:** „O2 Mobile
+Unlimited M Flex" steht seit dem 10.06.2026 mit **39,99 €** im Bestand —
+gelesen aus dem Produktinformationsblatt, dem einzigen o2-Mobilfunkblatt,
+das die Rechtsseite verlinkt. Die Kachel derselben Seite nennt denselben
+Betrag. Zwei vollständig getrennte Wege, dieselbe Zahl. Ohne diese
+Überschneidung wäre die Kachellesart unbelegt geblieben, und sie wäre nicht
+gebaut worden.
+
+Was die Kachel **nicht** hergibt, steht auch nicht im Satz: „Unbegrenzt"
+ist kein Datenvolumen (`None`, nicht eine erfundene Zahl), „Monatlich
+kündbar" ist keine Mindestlaufzeit (`None`, nicht 1), und
+„Allnet-Flat & EU-Roaming inklusive" ist eine Werbezeile im Fließtext und
+kein `allnet_flat: true` — dieselbe Regel wie in § 13.3 gegen
+„All-Net-Flat S".
+
+**Zwei Lesarten sind zwei Zeitreihen.** Blatt und Kachel nennen denselben
+Tarif und tragen deshalb dieselbe Tarif-ID. Im ersten Livelauf wurde der
+Kachelsatz damit zur nächsten *Fassung* des Blattes, und `vergleiche`
+meldete als Tarifänderung, was in Wahrheit der Unterschied zwischen einem
+PDF und einer Werbeseite ist (das Blatt nennt eine Mindestlaufzeit, die
+Flex-Kachel keine). `uebernimm_stand` trennt die zwei jetzt an ihrem
+`preistyp`: der zweite bekommt `…#live_shop`. Der Zusatz ist der Preistyp
+und **kein Inhaltshash** — ein Hash änderte sich mit jeder Preisänderung,
+und die Zeitreihe der zweiten Lesart zerfiele in Einzelsätze.
+
+Bestand danach: **44 Tarifsätze** (Telekom 9, Vodafone 10, congstar 10,
+o2 15), daraus **37 SIM-only-Referenzen** statt 25.
+
+### 14.3 Die Brücke: der Slug, den der Anbieter selbst setzt
+
+Der Gerätekatalog nennt seinen Tarif „O2 Mobile on Demand M **Plus** mit
+50 GB+ (24 Mon.)", die SIM-only-Kachel heißt „O2 Mobile on Demand M". Über
+den Namen löst das nichts auf — und das ist richtig so: „M" und „M Plus"
+sind verschiedene Zeichenketten, und eine Heuristik, die „Plus" wegwirft,
+würfe beim nächsten Tarif etwas Bedeutungstragendes weg.
+
+Was die zwei verbindet, ist keine Ähnlichkeit, sondern eine **Angabe**. Die
+Kachel führt einen Link „Handy hinzufügen":
+
+```
+https://www.o2online.de/e-shop/?tarif=o2-mobile-on-demand-m-plus
+```
+
+und derselbe Slug steht im Katalog am Bündel (`dimension59`). o2 stellt die
+Verbindung her, `tarif_bezug.ueber_slug` liest sie nur nach — deshalb Güte
+**`hoch`** und nicht `mittel`. Wie beim Betragsweg gilt: zwei Treffer sind
+keine schwache Zuordnung, sondern gar keine.
+
+Die Reihenfolge in `loese()` ist **Name → Slug → Betrag**. Der Slug steht
+nicht vorn: er ist genauso belegt wie der Name, aber er ist die Auskunft
+des Anbieters über seine eigene Produktordnung, während der Name die des
+Pflichtdokuments ist. Wo beide etwas sagen, gilt das Blatt.
+
+### 14.4 Telekom-Tarif-BFF: gemessen, verzichtet — und diesmal mit Grund
+
+Die offene Frage aus § 13.4 ist beantwortet. Vier Abrufe am 04.09.2026:
+
+| Adresse | Antwort |
+|---|---|
+| `https://www.telekom.de/content/robots` | HTTP 200, 151 Bytes. `User-agent: *` sperrt **nur** `/is-bin/intershop.enfinity/BOS/` und `/is-bin/intershop.static/` — `/shop/api/` ist **nicht** gesperrt |
+| `https://www.telekom.de/shop/api/eshop/bff-de` | HTTP **302** → `http://eshop-bff-assembly.eshop-de-prod.svc.cluster.local:8050/bff-de/` — eine clusterinterne Adresse, von außen nicht auflösbar |
+| `https://www.telekom.de/shop/api/eshop/bff-de/` | HTTP **500**, `application/json`, 147 Bytes: `{"code":"DT_UNKNOWN_ERROR","error":true,"retryable":false,…}` |
+| `https://www.telekom.de/shop/api/eshop/builder` | HTTP **401**, leerer Rumpf |
+
+**Der Endpunkt existiert und antwortet JSON.** Er ist erreichbar, robots
+erlaubt ihn, und an der Wurzel gibt er eine strukturierte Fehlermeldung —
+das ist eine laufende Schnittstelle, keine Attrappe.
+
+**Es gibt trotzdem keinen Adapter, und der Grund ist nicht Technik,
+sondern die Hausregel.** Die Tarifseite `/shop/tarife/handyvertrag`
+(HTTP 200, 2,26 MB) gibt unter `/shop/api/eshop/` genau **zwei** Pfade aus:
+`bff-de` (die Basis) und `builder` (401). **Keine Seite dieses Shops nennt
+eine konkrete Tarif-Ressource darunter.** Sie zu erraten wäre genau die
+Pfad-Kombinatorik, die § 87b und die Regel „nur was Seiten selbst
+verlinken/parametrisieren" ausschließen — dieselbe Grenze wie bei o2s
+Blob-IDs.
+
+Der einzige Ort, an dem die Pfade stünden, ist das JS-Bündel, das die Seite
+lädt (`static.eshop.telekom.de/de/prod/dtdl/new/shop/assets/client.*.js`).
+Es ist **nicht abgerufen worden**: `https://static.eshop.telekom.de/robots.txt`
+antwortet mit **HTTP 403**. Nach der eigenen Regel dieses Projekts —
+ausgeschrieben in `geraete_pipeline._hole_fabrik`: „eine fehlende robots.txt
+(404) heißt *keine Regeln*, eine verweigerte (403) heißt *nicht anfassen*"
+— ist der Host damit gesperrt. Ein 403 auf die robots.txt selbst ist
+dieselbe Lage wie bei Euronics (§ 6 der Übergabe).
+
+**Die Telekom-Tarife bleiben bei ihren Produktinformationsblättern.** Es ist
+kein Live-Adapter gebaut worden und keine Ersatzkonstruktion. Was fehlt,
+wird als fehlend geführt.
+
+### 14.5 Nachmessen
+
+```bash
+# Die zwoelf o2-Tarife aus den Preiskacheln, mit ihren Belegen
+python -m pytest tests/test_tarif_kacheln.py -q
+
+# Der dritte Weg des Fremdschluessels (Slug) und die zwei Zeitreihen
+python -m pytest tests/test_tarif_bezug.py tests/test_tarif_crawler.py -q
+
+# Die o2-Buendel: drei Rechenproben, Verwerfen ohne Tarif, die TCO-24
+python -m pytest tests/test_geraete_buendel_o2.py -q
+
+# Der ganze Weg in der Pipeline (Buendel landen in geraete_tco.json,
+# NICHT in geraete_db.json)
+python -m pytest tests/test_geraete_pipeline.py -q
+
+# Belegkette der neuen Fixtures: sha256 des ENTPACKTEN Inhalts
+python - <<'PY'
+import gzip, hashlib, json, pathlib
+for h in ("tests/fixtures/geraete/_herkunft.json",
+          "tests/fixtures/tarife/_herkunft.json"):
+    basis = pathlib.Path(h).parent
+    for e in json.load(open(h))["eintraege"]:
+        f = basis / e["datei"]
+        if not f.exists():
+            continue
+        roh = gzip.open(f, "rb").read() if e.get("gzip") else f.read_bytes()
+        assert hashlib.sha256(roh).hexdigest() == e["sha256_roh"], e["datei"]
+print("Belegkette in Ordnung")
+PY
+```
+
+### 14.6 Was offen bleibt
+
+1. **Ein Bündel steht ohne Tarif da und wird verworfen**: der Promo-Tarif
+   „O2 Mobile on Demand M mit 50 GB+ (24 Mon.)" (Angebotsslug
+   `privatkunden-o2-mobile-on-demand-m-online-promo`, `dimension59`
+   `o2-mobile-on-demand-m`). Er steht in **keiner** SIM-only-Kachel; o2
+   führt unter demselben Anzeigenamen nur die `-plus`-Fassung. Das ist die
+   richtige Folge, keine Lücke im Code — aber wenn diese Zahl steigt, ist
+   die Arbeitsliste `config/tarif_quellen.yaml`, und das Protokoll nennt
+   die Namen (`Buendel: … ohne aufloesbaren Tarif`).
+2. **Der Tarifbetrag im Bündel ist niedriger als der der SIM-only-Kachel**
+   (14,99 gegen 19,99 €, 19,99 gegen 24,99 €). o2 sagt auf der Produktseite
+   selbst, dass es zum Geräteratenplan „einen attraktiven monatlichen
+   Rabatt auf deinen Tarif" gibt, und zwar über dessen ganze Laufzeit — die
+   TCO-24 rechnet also durchgehend mit dem Bündelbetrag. Ein `Rabatt`
+   daraus zu machen wäre eine Deutung; die Differenz steht als Differenz
+   zweier gemessener Zahlen da, und genau daraus rechnet `Geraeteanteil`.
+3. **Ein Bündel ohne Listung** (`apple-iphone-16-pro-max-256gb-titan-weiss`,
+   1 von 62): der Bündelkatalog führt ein Gerät, das der Katalog ohne Tarif
+   nicht führt. Die Tafel zeigt dann die SKU statt des Katalognamens. Das
+   ist eine Anzeigefrage und kein Datenfehler.
+4. **Nur o2 liefert Bündel.** Die Lesart ist anbieterunabhängig gebaut
+   (`kind: buendel` plus `Adapter.lies_buendel`); Vodafone, congstar,
+   Telekom und 1&1 brauchen je einen eigenen Leser. 1&1 liefert seinen
+   Bündelmonatspreis heute als Listung (§ 13.2) und **ohne** Aufteilung in
+   Geräterate und Tarif — ein Bündel daraus wäre eine Rechnung dieses
+   Projekts.
+5. **Templates unverändert.** Der Befund aus Phase Q bleibt: die
+   Geräteseite kennt zwei Preisarten und zeigt 1&1s Bündelmonatspreis als
+   „ohne Preis". Das ist Phase R.
