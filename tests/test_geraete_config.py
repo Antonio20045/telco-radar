@@ -374,3 +374,46 @@ def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
         assert nachfolger.marktstart > vorgaenger.marktstart, (
             f"{nachfolger.modell} ({nachfolger.marktstart}) startet nicht nach "
             f"{vorgaenger.modell} ({vorgaenger.marktstart})")
+
+
+# --------------------------------------------------------------------------
+# Die Buendel-Lesart in der ausgelieferten Konfiguration
+# --------------------------------------------------------------------------
+
+def test_buendel_ist_eine_crawlbare_einstiegsart():
+    """`crawlable` liest `EINSTIEG_ARTEN` und zaehlt nicht selbst auf.
+
+    Die erste Fassung tat es doch, und eine neu ergaenzte Art waere damit
+    als "nicht crawlbar" durchgefallen - der Anbieter haette seinen
+    Einstieg verloren, ohne dass jemand den Grund erfaehrt.
+    """
+    from telco_radar.geraete_config import EINSTIEG_ARTEN, Einstieg
+    assert "buendel" in EINSTIEG_ARTEN
+    assert Einstieg(url="https://x.de/", kind="buendel").crawlable
+
+
+def test_o2_traegt_beide_lesarten_derselben_adresse():
+    """Der Katalog mit und ohne `?hwOnly=true` - beide gibt o2 selbst aus.
+
+    Die zwei Adressen unterscheiden sich in genau diesem Parameter; steht
+    hier je eine andere, ist eine davon geraten.
+    """
+    from telco_radar.geraete_config import lade_quellen
+    o2 = lade_quellen(Path(__file__).resolve().parents[1]).nach_name("o2")
+    je_art = {e.kind: e.url for e in o2.einstiege}
+    assert set(je_art) == {"static", "buendel"}
+    assert je_art["static"] == je_art["buendel"] + "?hwOnly=true"
+
+
+def test_die_buendel_lesart_ist_gebaut():
+    """Ein `kind: buendel` ohne `lies_buendel` am Adapter waere eine
+    Einstiegsseite, die jede Nacht abgerufen und nie gelesen wird."""
+    from telco_radar.collect.geraete import ADAPTER
+    from telco_radar.geraete_config import lade_quellen
+    quellen = lade_quellen(Path(__file__).resolve().parents[1])
+    for anbieter in quellen.anbieter:
+        if not any(e.kind == "buendel" for e in anbieter.einstiege):
+            continue
+        adapter = ADAPTER.get(anbieter.methode)
+        assert adapter is not None, anbieter.name
+        assert adapter.lies_buendel is not None, anbieter.name

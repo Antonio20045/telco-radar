@@ -194,3 +194,207 @@ def lies(text: str, url: str = "") -> list[dict]:
             "quelle": "o2_katalog",
         })
     return out
+
+
+# --------------------------------------------------------------------------
+# DER BUENDELKATALOG - dieselbe Adresse, ein Parameter weniger
+# --------------------------------------------------------------------------
+# GEMESSEN AM 04.09.2026
+# ----------------------
+# `/e-shop/` gibt die Katalogadresse in ZWEI Fassungen aus, beide woertlich
+# in seiner eigenen Nutzlast:
+#
+#     .../__not-specified__?hwOnly=true     95 Geraete OHNE Tarif
+#     .../__not-specified__                 88 Geraete MIT Tarif
+#
+# Es ist derselbe Pfad und derselbe Umschalter, den die Seite ihren Lesern
+# anbietet: die Antwort sagt selbst, in welchem Zustand sie steht
+# (`hwCatalogSwitcherStateValue.hwOnlyOrBundleState` = `HW_ONLY` bzw.
+# `BUNDLE`, `showSwitcher: true`). Es wird also kein Parameter erraten und
+# keine Kombinatorik durchprobiert - die zweite Adresse steht in der
+# Konfiguration, weil o2 sie in seiner ersten ausliefert.
+#
+# Der Buendeleintrag traegt, was ein `tco_model.Buendel` braucht:
+#
+#     price.oneTimePrice     1,00 EUR   Geraetezuzahlung
+#     price.monthlyPrice    60,49 EUR   Geraeterate PLUS Tarif, zusammen
+#     price.activationFee   39,99 EUR   Anschlusspreis
+#     rateDurationValue     36 Monate   Laufzeit der Geraeteraten
+#     bundle.tariffName     "O<sub>2</sub> Mobile L Plus mit 150 GB+ (24 Mon.)"
+#     bundle.tariffOfferName "privatkunden-o2-mobile-l-plus-online-hwv"
+#
+# DIE AUFTEILUNG STEHT IM TRACKINGBLOCK - UND SIE WIRD NACHGERECHNET
+# ------------------------------------------------------------------
+# `monthlyPrice` ist die SUMME aus Geraeterate und Tarif. Getrennt stehen
+# die zwei nur in `ecommerceProductValue.attributes`, dem Block, mit dem die
+# Seite ihre Webanalyse fuettert:
+#
+#     metric3  "40.5"   Geraet mtl.
+#     metric2  "19.99"  Tarif mtl.
+#     metric5  "1"      Anzahlung
+#     metric4  "0.0"    Anschlusspreis
+#     dimension59 "o2-mobile-l-plus"   der Tarif-Slug
+#
+# Ein Trackingfeld ist kein Preisfeld, und deshalb wird ihm hier nichts
+# geglaubt, was sich nicht gegen die TYPISIERTEN Zahlen derselben Antwort
+# nachrechnen laesst. Drei Proben, alle drei Bedingung:
+#
+#     metric3 + metric2 == price.monthlyPrice
+#     metric5           == price.oneTimePrice
+#     metric4           == price.activationFee
+#
+# Ueber die 66 Buendel des Messtags gehen alle drei bei 66 von 66 auf. Geht
+# eine nicht auf, wird der Satz verworfen - ein Trackingblock, der der
+# Preisstruktur widerspricht, ist keine Messung, sondern ein geaendertes
+# Nutzlastformat.
+#
+# Zusaetzlich gegengeprueft an den Produktseiten, die o2 selbst verlinkt:
+# acht `-details?tarif=...`-Seiten tragen serverseitig einen
+# `pdp:PriceSummaryValue` mit den Zeilen "Geraet mtl. (36 Raten)" und
+# "Tarif mtl. (Mindestlaufzeit 24 Monate)". Bei sieben von acht (die achte
+# fuehrt der Katalog unter anderem Namen) stimmen die Betraege auf den Cent
+# mit metric3/metric2 ueberein. Die Detailseiten werden im Betrieb NICHT
+# abgerufen: 66 Seiten a rund 950 KB waeren 63 MB je Nacht fuer eine
+# Aufteilung, die schon in der einen Katalogantwort steht.
+#
+# WAS DER TARIFBETRAG IST - UND WAS NICHT
+# ---------------------------------------
+# 19,99 EUR ist der Tarifpreis IN DIESEM BUENDEL. Die SIM-only-Kachel
+# desselben Tarifs nennt 24,99 EUR; o2 sagt auf der Produktseite selbst,
+# dass es zum Geraeteratenplan "einen attraktiven monatlichen Rabatt auf
+# deinen Tarif" gibt. Beide Zahlen stehen im Bestand, und die Differenz ist
+# genau die Auskunft, um die es geht - `Geraeteanteil` zieht die eine TCO
+# von der anderen ab. Hier wird deshalb NICHT der Kachelpreis eingesetzt
+# und auch kein Rabatt daraus gerechnet: gespeichert wird, was fuer dieses
+# Buendel zu zahlen ist.
+#
+# Die Zubehoerbuendel werden mit derselben Regel verworfen wie im
+# Geraetekatalog (` mit ` in Beschreibung oder Angebotsname): 22 der 88.
+# Ihr Preis gilt fuer Geraet PLUS Zubehoer, und was der Zubehoerteil ist,
+# steht nirgends.
+
+# "36 Monate" - mit geschuetztem Leerzeichen in der Quelle.
+_DAUER_RE = re.compile(r"(\d+)")
+
+# Die Trackingfelder tragen HTML: "O<sub>2</sub> Mobile L Plus mit 150 GB+".
+# Der Tarifname wandert in `Buendel.tarif_name` und von dort auf die Seite;
+# ein `<sub>` im Datenfeld waere dort entweder sichtbares Markup oder eine
+# stille Abhaengigkeit von der Escaping-Regel der Vorlage.
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _ohne_markup(text: str) -> str:
+    return " ".join(_TAG_RE.sub("", text or "").split())
+
+
+def _gleich(a: Optional[float], b: Optional[float]) -> bool:
+    """Ein Cent ist kein Rundungsfehler - dieselbe Toleranz wie ueberall."""
+    if a is None or b is None:
+        return False
+    return abs(float(a) - float(b)) < 0.005
+
+
+def _buendelsatz(h: dict) -> Optional[dict]:
+    """Ein Katalogeintrag wird ein Buendel-Rohsatz - oder nichts."""
+    modell = str(h.get("description") or "").strip()
+    angebot = str(h.get("offerName") or "").strip()
+    if not modell:
+        return None
+    if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
+        return None                       # Geraet plus Zubehoer
+
+    buendel = h.get("bundle") or {}
+    tarif_name = _ohne_markup(buendel.get("tariffName") or "")
+    if not tarif_name:
+        # Ohne Tarif ist eine Buendelzahl bedeutungslos - dieselbe Regel
+        # wie in `geraete_model.Listung` und `tco_model.Buendel`.
+        return None
+
+    preisblock = h.get("price") or {}
+    gesamt = _preis(preisblock.get("totalPrice"))
+    monatlich = _preis(preisblock.get("monthlyPrice"))
+    anzahlung = _preis(preisblock.get("oneTimePrice"))
+    anschluss = _preis(preisblock.get("activationFee"))
+
+    dauer = _DAUER_RE.search(str(h.get("rateDurationValue") or ""))
+    laufzeit = int(dauer.group(1)) if dauer else None
+    if laufzeit is None or not probe_geht_auf(anzahlung, monatlich,
+                                              laufzeit, gesamt):
+        # Dieselbe Probe wie beim Geraetekatalog, hier auf der Summe aus
+        # Rate und Tarif. Geht sie nicht auf, stimmt die Laufzeit nicht -
+        # und ohne Laufzeit ist eine Monatszahl keine Aussage.
+        return None
+
+    werte = (h.get("ecommerceProductValue") or {}).get("attributes") or {}
+    geraet_rate = _preis(werte.get("metric3"))
+    tarif_rate = _preis(werte.get("metric2"))
+    if geraet_rate is None or tarif_rate is None:
+        return None
+    # Die drei Proben aus dem Modulkopf. Sie sind Bedingung, nicht Protokoll.
+    if not _gleich(geraet_rate + tarif_rate, monatlich):
+        return None
+    if not _gleich(_preis(werte.get("metric5")), anzahlung):
+        return None
+    if not _gleich(_preis(werte.get("metric4")), anschluss):
+        return None
+
+    m = _OFFER_RE.match(angebot)
+    speicher = int(m.group("gb")) if m else None
+    farbe = m.group("farbe").replace("-", " ").strip() if m else ""
+    ziel = ((h.get("detailWwwAbsoluteCall") or {}).get("constantPayload")
+            or {}).get("link") or {}
+    return {
+        "titel": " ".join(x for x in (modell,
+                                      f"{speicher} GB" if speicher else "",
+                                      farbe) if x),
+        "farbe": farbe,
+        "speicher_gb": speicher,
+        "sku": str(h.get("externalId") or "").strip(),
+        "tarif_name": tarif_name,
+        # Der Slug, ueber den `tarif_bezug.ueber_slug` aufloest. Er steht im
+        # Katalog am Buendel und in der SIM-only-Kachel am Link "Handy
+        # hinzufuegen" - o2 stellt die Verbindung her, nicht dieses Modul.
+        "tarif_slug": str(werte.get("dimension59") or "").strip(),
+        "tarif_monatlich": tarif_rate,
+        "geraet_zuzahlung": anzahlung,
+        "geraet_monatsrate": geraet_rate,
+        "anschlusspreis": anschluss,
+        "laufzeit_monate": laufzeit,
+        "url": str(ziel.get("uri") or "").strip(),
+        "quelle": "o2_buendel",
+    }
+
+
+def lies_buendel(text: str, url: str = "") -> list[dict]:
+    """Den Buendelkatalog in Rohsaetze zerlegen.
+
+    Wirft, wenn die Antwort gar keine Buendelantwort ist. Das ist NICHT
+    dasselbe wie "keine Buendel gefunden": eine Antwort im Zustand
+    `HW_ONLY` an dieser Stelle heisst, dass der Umschalter sich geaendert
+    hat, und ihre Geraete als Buendel zu lesen ergaebe 95 Saetze ohne
+    Tarif. Ein leeres Ergebnis waere dafuer die falsche Meldung - dieselbe
+    Unterscheidung wie bei `GeraeteAbrufFehler` ueberall sonst.
+    """
+    try:
+        daten = json.loads(text or "")
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise GeraeteAbrufFehler(f"o2-Buendelkatalog unlesbar: {exc}") from exc
+    if not isinstance(daten, dict) or "hardware" not in daten:
+        raise GeraeteAbrufFehler("o2-Buendelkatalog ohne Feld 'hardware'")
+
+    zustand = (((daten.get("hwCatalogSwitcherStateValue") or {})
+                .get("hwOnlyOrBundleSwitcherValue") or {})
+               .get("hwOnlyOrBundleState") or {}).get("name")
+    if zustand != "BUNDLE":
+        raise GeraeteAbrufFehler(
+            f"o2-Katalog steht auf {zustand!r} statt 'BUNDLE' - diese "
+            f"Antwort traegt keine Tarifbuendel")
+
+    out: list[dict] = []
+    for h in (daten.get("hardware") or []):
+        if not isinstance(h, dict):
+            continue
+        satz = _buendelsatz(h)
+        if satz is not None:
+            out.append(satz)
+    return out

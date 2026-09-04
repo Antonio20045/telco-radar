@@ -402,6 +402,32 @@ anbieter:
       - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true
         label: Geraetekatalog ohne Tarif
         kind: static
+      # DIESELBE ADRESSE, EIN PARAMETER WENIGER - und beide gibt /e-shop/ in
+      # seiner eigenen Nutzlast aus. Es ist der Umschalter, den die Seite
+      # ihren Lesern anbietet ("ohne Tarif" / "mit Tarif"); die Antwort sagt
+      # selbst, in welchem Zustand sie steht
+      # (hwCatalogSwitcherStateValue.hwOnlyOrBundleState = HW_ONLY | BUNDLE).
+      # Kein Parameter ist geraten, keine Kombinatorik durchprobiert.
+      #
+      # `kind: buendel` heisst: die Saetze werden KEINE Listungen. Ein
+      # Buendelmonatspreis gehoert nicht in dieselbe Spalte wie ein
+      # Barpreis - er landet als tco_model.Buendel in geraete_tco.json.
+      #
+      # Gemessen 04.09.2026: HTTP 200, 583 KB, 88 Eintraege, davon 22
+      # Geraet PLUS Zubehoer (verworfen). Von den 66 uebrigen gehen alle
+      # drei Rechenproben bei 66 von 66 auf:
+      #   metric3 + metric2 == monthlyPrice   (Geraeterate + Tarif)
+      #   metric5           == oneTimePrice   (Anzahlung)
+      #   metric4           == activationFee  (Anschlusspreis)
+      # Gegengeprueft an acht Produktseiten, die o2 selbst verlinkt: ihr
+      # serverseitiger pdp:PriceSummaryValue nennt dieselben Betraege
+      # ("Geraet mtl. (36 Raten): 34,00 €", "Tarif mtl.
+      # (Mindestlaufzeit 24 Monate): 14,99 €"). Im Betrieb werden diese
+      # Seiten NICHT abgerufen - 66 Seiten a rund 950 KB fuer eine
+      # Aufteilung, die schon in der einen Katalogantwort steht.
+      - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__
+        label: Geraetekatalog mit Tarif
+        kind: buendel
 
   - name: 1&1
     typ: netzbetreiber

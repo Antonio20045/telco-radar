@@ -35,6 +35,7 @@ from typing import Callable, Optional
 
 from .analyze.geraete_store import GeraeteDB, Preishistorie
 from .analyze.tarif_referenzen import aus_bestand
+from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import sammle
@@ -155,21 +156,30 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     historie.save()
     db.save(heute)
 
-    # --- Der Massstab aus dem Tarifbestand.
+    # --- Der Massstab aus dem Tarifbestand - und die Buendel dazu.
     #
     # `geraete_tco.json` gab es bis zum 04.09.2026 nicht: null Buendel, null
-    # SIM-only-Referenzen, also keine einzige rechenbare TCO. Die Buendel
-    # bleiben offen (sie brauchen einen Adapter, der Zuzahlung UND Tarif
-    # ausweist, Phase 4) - die Referenzen aber nicht: was ein Tarif OHNE
-    # Geraet kostet, steht seit Phase 6 belegt in `tarife.jsonl`.
+    # SIM-only-Referenzen, also keine einzige rechenbare TCO. Seit dem
+    # 04.09.2026 stehen BEIDE Seiten: die Referenzen aus `tarife.jsonl`
+    # (was ein Tarif OHNE Geraet kostet) und die Buendel aus den
+    # Buendel-Einstiegen der Anbieter (`kind: buendel`).
+    #
+    # Sie stehen in DIESER Reihenfolge, und das ist keine Kosmetik: ein
+    # Buendel ohne aufloesbaren Tarif wird verworfen, und aufloesen kann
+    # nur, wer den Tarifbestand gelesen hat. Beides braucht denselben
+    # `Tarifbestand`, er wird deshalb einmal geladen.
     #
     # Das steht HIER und nicht im Renderer. Eine Zahl, die beim Rendern
     # entsteht, ist keine Messung, sondern eine Ableitung - und zwei
     # Ableitungen derselben Zahl an zwei Orten sind zwei Zahlen. Der
     # naechtliche Lauf ist der Ort, an dem der Geraetebestand entsteht;
     # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
+    rohbuendel = [b for bilanz in ergebnis["anbieter"]
+                  for b in getattr(bilanz, "buendel", [])]
     referenzen: list = []
     tarife = 0
+    neue_buendel = 0
+    buendelbilanz = None
     geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
@@ -197,6 +207,17 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             if entfernt:
                 log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
                          "entfernt", entfernt)
+            if rohbuendel:
+                # AUFFRISCHEN, nicht ersetzen - anders als die Referenzen.
+                # Ein Buendel ist eine MESSUNG an einer Anbieterseite, keine
+                # Ableitung aus dem Tarifbestand; faellt der Abruf einer
+                # Nacht aus, darf sein Verschwinden nicht als "gibt es nicht
+                # mehr" gelten. Dieselbe Haltung wie bei `GeraeteDB`, die
+                # nichts loescht.
+                buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
+                if buendelbilanz.buendel:
+                    neue_buendel, _ = tco.upsert_buendel(
+                        buendelbilanz.buendel, heute)
             tco.save(heute)
             # ERST HIER. `save()` kann werfen (Platte, Rechte, Pfad), und
             # der Auffangboden unten faengt das ab - eine Bilanz, die schon
@@ -210,6 +231,16 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
     log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
              len(referenzen), tarife,
+             "" if geschrieben else " - NICHT GESCHRIEBEN")
+    # Die Buendelzeile steht AUCH da, wenn nichts ankam: "0 von 0" heisst
+    # "kein Anbieter liefert Buendel", "0 von 63" heisst "der Tarifbestand
+    # traegt ihre Tarife nicht" - zwei ganz verschiedene Arbeitslisten, und
+    # ohne beide Zahlen sind sie nicht zu unterscheiden.
+    log.info("Buendel: %d von %d Rohsaetzen uebernommen (%d neu)%s%s",
+             len(buendelbilanz.buendel) if buendelbilanz else 0,
+             len(rohbuendel), neue_buendel,
+             f", {buendelbilanz.verworfen} verworfen" if buendelbilanz
+             and buendelbilanz.verworfen else "",
              "" if geschrieben else " - NICHT GESCHRIEBEN")
 
     kollisionen = list(getattr(db, "kollisionen", []))
@@ -228,6 +259,12 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "unbekannte_titel_gesamt": len(ergebnis["unbekannte_titel"]),
         "unbekannte_farben": sorted({f for b in ergebnis["anbieter"]
                                      for f in b.unbekannte_farben})[:40],
+        # Zwei Zahlen, nicht eine: `rohbuendel` sagt, was die Anbieter
+        # geliefert haben, `buendel` was davon einen Tarif im Bestand hat.
+        "rohbuendel": len(rohbuendel),
+        "buendel": len(buendelbilanz.buendel) if buendelbilanz else 0,
+        "buendel_neu": neue_buendel,
+        "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
         "kollisionen": len(kollisionen),
         # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
         # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`

@@ -72,7 +72,13 @@ class Einstieg:
 
     @property
     def crawlable(self) -> bool:
-        return self.kind in ("static", "js", "sitemap", "shopify")
+        # `EINSTIEG_ARTEN` und nicht eine zweite Aufzaehlung: die erste
+        # Fassung dieser Zeile listete die Arten noch einmal auf, und eine
+        # neu ergaenzte Art waere damit als "nicht crawlbar" durchgefallen -
+        # der Anbieter haette seinen Einstieg verloren, ohne dass jemand
+        # den Grund erfaehrt (dieselbe Fehlerklasse, gegen die die Warnung
+        # in `_parse_einstiege` gebaut ist).
+        return self.kind in EINSTIEG_ARTEN
 
 
 @dataclass
@@ -223,7 +229,11 @@ def lade_farben(root: Path) -> dict:
     return tabelle
 
 
-EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js")
+# `buendel` ist keine dritte Abrufart, sondern eine zweite LESART: die
+# Antwort wird nicht auf Listungen, sondern auf Geraet-plus-Tarif-Buendel
+# gelesen und landet in `geraete_tco.json`. Der Adapter muss dafuer ein
+# `lies_buendel` mitbringen; hat er keins, sagt die Bilanz das.
+EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js", "buendel")
 
 
 def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
