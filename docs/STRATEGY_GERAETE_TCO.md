@@ -2034,3 +2034,13 @@ PY
 5. **Templates unverändert.** Der Befund aus Phase Q bleibt: die
    Geräteseite kennt zwei Preisarten und zeigt 1&1s Bündelmonatspreis als
    „ohne Preis". Das ist Phase R.
+6. **Bündel altern nicht.** `upsert_buendel` frischt auf und ersetzt nicht
+   — richtig so, denn ein ausgefallener Abruf darf kein Angebot löschen
+   (dieselbe Haltung wie `GeraeteDB`). Anders als dort gibt es aber **keine
+   Zwei-Stufen-Auslistung**: ein Bündel, das o2 einstellt, bleibt mit
+   seinem alten `last_verified` im Bestand stehen. Heute sagt die Zeile ihr
+   Abrufdatum selbst, die Aussage ist also nicht falsch — aber wer in vier
+   Wochen ein Bündel mit drei Wochen altem Datum sieht, sieht ein
+   ausgelaufenes Angebot. Ein `mark_stale` für `TcoDB` braucht dieselbe
+   Sorgfalt wie das der Geräte (nur für vollständig gelesene Anbieter
+   altern) und ist deshalb ein eigener Schritt, kein Nebeneffekt.

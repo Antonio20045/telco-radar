@@ -1840,6 +1840,13 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > 4. **Templates unverändert (Phase R).** Der Phase-Q-Befund bleibt: die
 >    Geräteseite kennt zwei Preisarten und zeigt 1&1s Bündelmonatspreis als
 >    „ohne Preis".
+> 4b. **Bündel altern nicht.** `upsert_buendel` frischt auf statt zu
+>    ersetzen (richtig — ein ausgefallener Abruf darf kein Angebot
+>    löschen), aber es gibt keine Zwei-Stufen-Auslistung wie bei
+>    `GeraeteDB`. Ein eingestelltes Bündel bleibt mit altem
+>    `last_verified` stehen; die Zeile nennt ihr Abrufdatum, ist also nicht
+>    falsch — aber ein `mark_stale` für `TcoDB` fehlt und braucht dieselbe
+>    Sorgfalt wie das der Geräte.
 > 5. **Ein drittes vorbestehendes Rot war da und ist behoben:**
 >    `test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden`
 >    fiel mit `KeyError: 'preis_ohne_vertrag'` aus, seit es Listungen ohne
