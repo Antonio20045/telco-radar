@@ -1809,6 +1809,20 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > nichts" wäre immer ungleich und schaltete den Anteil stillschweigend ab),
 > und zwei Referenzen zu einer Tarif-ID ergeben **keine**.
 >
+> **Der Reiter riss danach sein Höhenbudget — und die alte Schätzung war
+> falsch** (§ 14.6). `pruefe_portal.py` Kriterium 11b maß **4604 px** gegen
+> 3000. Der Kommentar an `SICHTBAR_MAX` rechnete mit 84 px je Zeile und
+> 38 px je Referenz; an der echten Seite gemessen sind es **97** und **67** —
+> die Zahlen stammten aus einer Tafel ohne Bündel. Mit den zwölf offenen
+> SIM-only-Referenzen passen **drei** Bündel unter das Budget. Jetzt
+> **8 Zeilen / 4 Referenzen = 2900 px**; gelöscht ist nichts, die übrigen
+> stehen im Aufklapper. `REFERENZEN_SICHTBAR = 0` geht NICHT — die Vorlage
+> hängt Überschrift, Erklärsatz und Aufklapper an derselben Bedingung, bei
+> null verschwände der ganze Abschnitt. **Das ist eine Notbremse, keine
+> Lösung: die Tafel braucht Platz für ihre Bündel, und den schafft nur
+> Phase R.** `pruefe_portal.py` danach **15 bestanden / 2 durchgefallen**
+> (8b und 6, beide vorbestehend).
+>
 > **Schritt 2 des Auftrags endet mit einer Absage, und diesmal mit Grund**
 > (§ 14.4). `BFF_EXT = /shop/api/eshop/bff-de` **existiert**: `/bff-de/`
 > antwortet `application/json` (HTTP 500, `DT_UNKNOWN_ERROR`), ohne

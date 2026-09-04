@@ -63,19 +63,47 @@ log = logging.getLogger(__name__)
 # nichts miteinander zu tun haben.
 EIGEN = "vodafone"
 
-# Hoechstens so viele TCO-Zeilen ohne Aufklappen. Gerechnet wie
-# `geraete_vergleich.UEBERSICHT_MAX_ZEILEN`: die Seite steht unter einem
-# Hoehenbudget von 3000 px je Reiter (`pruefe_portal.py` Kriterium 11b), eine
-# Zeile dieser Tafel misst mit ihrem Aufklapper rund 84 px, der Kopf der
-# Tafel rund 900. Ein Deckel in Zeilen ist immer nur ein Stellvertreter fuer
-# eine Grenze in Pixeln (CLAUDE.md § 6) - deshalb misst 11b die WIRKLICH
+# Hoechstens so viele TCO-Zeilen ohne Aufklappen. Die Seite steht unter
+# einem Hoehenbudget von 3000 px je Reiter (`pruefe_portal.py` Kriterium
+# 11b), und ein Deckel in Zeilen ist immer nur ein Stellvertreter fuer eine
+# Grenze in Pixeln (CLAUDE.md § 6) - deshalb misst 11b die WIRKLICH
 # ausgelieferte Seite und nicht diese Zahl.
-SICHTBAR_MAX = 20
+#
+# BIS ZUM 04.09.2026 STANDEN HIER 20 UND 12, und die Rechnung daneben
+# schaetzte eine Zeile auf 84 px. Beides war an einer Tafel OHNE Buendel
+# kalibriert. Mit den ersten 62 Buendeln riss der Reiter das Budget:
+# an der echten Seite nachgemessen (37 Referenzen, Chromium 1440x900)
+#
+#     Zeilen  Referenzen   tafel-tco
+#         20          12      4604 px   <- Budget gerissen
+#         12          12      3824 px
+#          9           4      2997 px   <- 3 px Luft, zu knapp
+#          8           4      2900 px   <- gewaehlt
+#
+# Eine TCO-Zeile misst mit ihrem zugeklappten Aufklapper rund 97 px, eine
+# Referenzzeile rund 67 - nicht 84 und 38. Die Schaetzung von damals ist
+# durch die Messung ersetzt.
+#
+# WARUM DIE REFERENZEN MITGEBEN MUSSTEN: mit den zwoelf offenen Referenzen
+# passen genau DREI Buendel unter das Budget, und eine Tafel mit dem Titel
+# "Was ein Geraet ueber 24 Monate kostet" beantwortet mit drei von 62
+# Zeilen ihre eigene Frage nicht. Vor dieser Phase WAREN die Referenzen der
+# Inhalt der Tafel - es gab nichts anderes; jetzt sind sie der Massstab
+# hinter den Zahlen. Geloescht ist nichts: die uebrigen stehen im
+# Aufklapper, der schon vorher dreizehn von ihnen trug.
+#
+# NULL geht dabei nicht: die Vorlage haengt Ueberschrift, Erklaersatz UND
+# den Aufklapper an `{% if geraete.tco.referenzen %}`. Bei 0 verschwaende
+# nicht die offene Tabelle, sondern der ganze Abschnitt samt allen Belegen.
+#
+# Das ist eine Notbremse, keine Loesung: die Tafel braucht Platz fuer ihre
+# Buendel, und den schafft nur ein Umbau ihres Aufbaus (Phase R).
+SICHTBAR_MAX = 8
 
-# Hoechstens so viele SIM-only-Referenzen offen. Sie sind kuerzer als eine
-# TCO-Zeile (kein Aufklapper, rund 38 px) und stehen unter demselben
-# Hoehenbudget; der Rest steht zugeklappt darunter und ist NICHT geloescht.
-REFERENZEN_SICHTBAR = 12
+# Hoechstens so viele SIM-only-Referenzen offen; der Rest steht zugeklappt
+# darunter und ist NICHT geloescht. Gemessen: rund 67 px je Zeile, siehe
+# die Tabelle bei `SICHTBAR_MAX`.
+REFERENZEN_SICHTBAR = 4
 
 # Welche Phase welchen fehlenden Posten liefert. Die Tafel nennt sie, damit
 # eine Luecke ein Datum bekommt statt eines Achselzuckens - "keine

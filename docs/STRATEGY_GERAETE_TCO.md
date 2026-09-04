@@ -1969,7 +1969,44 @@ man sie nur bekommt, wenn man das Gerät nimmt. Genau dafür ist die
 Differenz gebaut. Daneben stehen unverändert die zwölf offenen Raten
 (408,00 €) — sie fallen nicht unter den Tisch.
 
-### 14.6 Nachmessen
+### 14.6 Der Reiter riss sein Höhenbudget — und die alte Schätzung war falsch
+
+Mit den ersten 62 Bündeln fiel `pruefe_portal.py` **Kriterium 11b** durch:
+der TCO-Reiter maß **4604 px** gegen ein Budget von 3000. Das ist die
+Fehlerklasse, die CLAUDE.md § 6 beschreibt — *„ein Deckel in ZEILEN ist nur
+ein Stellvertreter für eine Grenze in PIXELN"* — und diesmal war auch der
+Stellvertreter falsch kalibriert: der Kommentar an `SICHTBAR_MAX` rechnete
+mit **84 px je Zeile** und **38 px je Referenz**. An der echten Seite
+gemessen (Chromium 1440 × 900, 62 Bündel, 37 Referenzen) sind es **97** und
+**67**. Die Zahlen stammten aus einer Tafel ohne Bündel.
+
+| Zeilen | Referenzen offen | `tafel-tco` |
+|---:|---:|---:|
+| 20 | 12 | 4604 px |
+| 12 | 12 | 3824 px |
+| 6 | 12 | 3240 px |
+| 9 | 4 | 2997 px |
+| **8** | **4** | **2900 px** |
+
+Mit den zwölf offenen Referenzen passen **drei** Bündel unter das Budget —
+eine Tafel mit dem Titel „Was ein Gerät über 24 Monate kostet" beantwortet
+mit drei von 62 Zeilen ihre eigene Frage nicht. Deshalb geben die
+Referenzen mit: vor dieser Phase **waren** sie der Inhalt der Tafel, es gab
+nichts anderes; jetzt sind sie der Maßstab hinter den Zahlen. Gelöscht ist
+nichts — die übrigen stehen im Aufklapper, der schon vorher dreizehn von
+ihnen trug.
+
+`REFERENZEN_SICHTBAR = 0` geht dabei **nicht**: die Vorlage hängt
+Überschrift, Erklärsatz UND den Aufklapper an
+`{% if geraete.tco.referenzen %}`. Bei null verschwände nicht die offene
+Tabelle, sondern der ganze Abschnitt samt allen Belegen.
+
+**Das ist eine Notbremse, keine Lösung.** Die Tafel braucht Platz für ihre
+Bündel, und den schafft nur ein Umbau ihres Aufbaus — Phase R. Bis dahin
+zeigt sie 8 von 62 und sagt das in ihrer eigenen Zeile („… von 62 Bündeln
+gezeigt").
+
+### 14.7 Nachmessen
 
 ```bash
 # Die zwoelf o2-Tarife aus den Preiskacheln, mit ihren Belegen
@@ -2004,7 +2041,7 @@ print("Belegkette in Ordnung")
 PY
 ```
 
-### 14.7 Was offen bleibt
+### 14.8 Was offen bleibt
 
 1. **Ein Bündel steht ohne Tarif da und wird verworfen**: der Promo-Tarif
    „O2 Mobile on Demand M mit 50 GB+ (24 Mon.)" (Angebotsslug
