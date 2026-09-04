@@ -874,7 +874,7 @@ var TelcoFrage = (function () {
  */
 (function () {
   var wahl = document.getElementById('gr-modell');
-  var bloecke = document.querySelectorAll('.gr-modell');
+  var bloecke = document.querySelectorAll('.gr-tmodell');
   if (!bloecke.length) return;
 
   if (wahl) {

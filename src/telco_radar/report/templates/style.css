@@ -2588,15 +2588,25 @@ b,strong{font-weight:700}
 .gr-anb--aldi-talk{--anb:#00447c}
 .gr-anb--medimax{--anb:#8a8f00}
 .gr-anb--electronicpartner{--anb:#00736b}
-.gr-kkarte,.gr-g1-seg,.gr-g2-linie,.gr-g2-punkt,.gr-g2-legende{--anb:#57534a}
+/* KEIN `--anb`-Vorgabewert AUF diesen Elementen: sie tragen die
+   Anbieterklasse selbst, beide Regeln haetten dieselbe Spezifitaet, und
+   die spaetere gewaenne - alle Balken standen damit grau da, obwohl die
+   Anbieterfarbe definiert war. Der Rueckfall gehoert deshalb in das
+   `var()` an der Verwendungsstelle. */
 
 /* Modell-Selector und Ergebnisband */
 .gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
   margin:16px 0 12px;padding-bottom:12px;border-bottom:2px solid var(--rule-ink)}
 .gr-msel label{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-3)}
+/* `min-width:0` UND `max-width:100%`: ein `<select>` nimmt sonst die
+   Breite seiner laengsten Option an ("Samsung Galaxy Z Fold8 Ultra 256 GB
+   – 3 Anbieter"), und ein Flex-Kind hat voreingestellt `min-width:auto`.
+   Auf 390 px lief die Seite damit 429 px breit - dieselbe Fehlerklasse
+   wie beim Zeitungskopf am 11.08.2026. */
 .gr-msel select{font-family:var(--sans);font-size:14px;padding:6px 8px;
-  border:1px solid var(--rule);background:var(--paper-2);max-width:520px}
+  border:1px solid var(--rule);background:var(--paper-2);max-width:100%;
+  min-width:0;flex:1 1 240px}
 .gr-mband{margin:0 0 12px}
 
 /* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
@@ -2617,18 +2627,26 @@ b,strong{font-weight:700}
 .gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
   border:1px solid var(--rule);background:var(--paper-2)}
 
+/* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
+   Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
+   SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`
+   gesetzt erbte jede Karte darin das Umbruchverbot - jede Zeile stand
+   auf EINER Zeile, die min-content-Breite einer Karte war 1346 px, und
+   die Seite lief auf dem Telefon 1389 px breit statt 390. Im HTML war
+   davon nichts zu sehen; gemessen wurde es im Browser. */
+
 /* Die Karten. Vier Slots je Modell, gleiche Felder an gleicher Stelle -
    dieselbe Regel wie auf der Promo-Uebersicht. Eine Karte ohne Zahl ist
    NICHT kleiner gesetzt: sie traegt eine Auskunft, keinen Mangel. */
 .gr-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
   gap:14px;margin:0 0 18px}
-.gr-kkarte{border-top:3px solid var(--anb);padding:10px 12px 12px;
+.gr-kkarte{border-top:3px solid var(--anb,#57534a);padding:10px 12px 12px;
   background:var(--paper-2);border-left:1px solid var(--rule-2);
   border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
 .gr-kkarte--leer{background:transparent;border-top-color:var(--rule)}
 .gr-kk-kopf{margin:0;font-family:var(--sans);font-size:12px;
   letter-spacing:.06em;text-transform:uppercase}
-.gr-kk-anbieter{font-weight:700;color:var(--anb)}
+.gr-kk-anbieter{font-weight:700;color:var(--anb,#57534a)}
 .gr-kk-marke{font-size:10px;letter-spacing:.08em;color:var(--ink-4);
   border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
 .gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
@@ -2666,15 +2684,17 @@ b,strong{font-weight:700}
 .gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
 .gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
 .gr-g1-reftext{font-family:var(--sans);font-size:11px;fill:var(--al-kritisch)}
-.gr-g1-seg{fill:var(--anb)}
+.gr-g1-seg{fill:var(--anb,#57534a)}
 .gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
   stroke-dasharray:3 3}
 .gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g2-raster--x{stroke-dasharray:2 4}
 .gr-g2-achse{font-family:var(--sans);font-size:11px;fill:var(--ink-4)}
-.gr-g2-linie{stroke:var(--anb);stroke-width:2}
-.gr-g2-punkt{fill:var(--anb)}
+.gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g2-punkt{fill:var(--anb,#57534a)}
 .gr-g2-marker{font-size:12px;fill:var(--ink-3)}
-.gr-g2-legende{font-family:var(--sans);font-size:11.5px;fill:var(--anb)}
+.gr-g2-legende{font-family:var(--sans);font-size:11.5px;
+  fill:var(--anb,#57534a)}
 
 /* Auf dem Telefon wird GEROLLT, nicht gestaucht: eine Grafik mit 1180 px
    Zeichenbreite auf 390 px zu skalieren ergibt 3,5 px hohe Schrift

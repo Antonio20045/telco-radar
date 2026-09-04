@@ -28,7 +28,7 @@ gehoert in die Karte, wo sein Grund danebensteht.
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 from xml.sax.saxutils import escape
 
@@ -168,11 +168,19 @@ def balken(modell: dict) -> str:
         # Die Referenzlinie - nur in der Gruppe, deren Laufzeit sie rechnet.
         if referenz and referenz.get("monate") == laufzeit:
             x = LINKS + _skala(referenz["gesamt"], hoechst)
+            # DAS ETIKETT KIPPT NACH LINKS, wenn es sonst aus dem Bild
+            # liefe. Die Referenz ist regelmaessig der teuerste Balken -
+            # rechtsbuendig gesetzt stand "Vodafone-Referenz 2.278,10 €"
+            # zur Haelfte ausserhalb der Zeichenflaeche. Eine Beschriftung,
+            # die nicht ganz da ist, ist keine.
+            rechts = x + 5 + 160 > BREITE
             teile.append(
                 f'<line class="gr-g1-ref" x1="{x:.1f}" y1="{y - 8:.0f}" '
                 f'x2="{x:.1f}" y2="{unten:.0f}" />'
-                f'<text class="gr-g1-reftext" x="{x + 5:.1f}" '
-                f'y="{y - 12:.0f}">Vodafone-Referenz '
+                f'<text class="gr-g1-reftext" x="{x - 5 if rechts else x + 5:.1f}" '
+                f'y="{y - 12:.0f}"'
+                + (' text-anchor="end"' if rechts else '')
+                + f'>Vodafone-Referenz '
                 f'{_t(euro(referenz["gesamt"]))}</text>')
 
         for karte in gruppe["karten"]:
@@ -338,9 +346,23 @@ def historie(reihen: list) -> dict:
                      f'<text class="gr-g2-achse" x="{G2_LINKS - 8}" '
                      f'y="{yy + 4}" text-anchor="end">{beschriftung} €</text>')
 
-    # X-Achse: erster und letzter Tag, dazu die Mitte.
-    for tag in sorted({von, bis}):
-        teile.append(f'<text class="gr-g2-achse" x="{x(tag)}" '
+    # X-ACHSE: WOCHENRASTER KURZFRISTIG, MONATSRASTER AB DREI MONATEN
+    # (C.2). Der Abstand der Marken sagt, wie dicht gemessen wurde - eine
+    # Achse mit nur zwei Beschriftungen laesst offen, ob dazwischen taeglich
+    # oder gar nicht gemessen wurde.
+    schritt = 7 if spanne_tage <= 92 else 30
+    marke = von
+    gesetzt = []
+    while marke <= bis:
+        gesetzt.append(marke)
+        marke = marke + timedelta(days=schritt)
+    if bis not in gesetzt and (bis - gesetzt[-1]).days > schritt // 3:
+        gesetzt.append(bis)
+    for tag in gesetzt:
+        teile.append(f'<line class="gr-g2-raster gr-g2-raster--x" '
+                     f'x1="{x(tag)}" y1="{G2_OBEN}" x2="{x(tag)}" '
+                     f'y2="{G2_HOEHE - G2_UNTEN}" />'
+                     f'<text class="gr-g2-achse" x="{x(tag)}" '
                      f'y="{G2_HOEHE - 12}" text-anchor="middle">'
                      f'{tag.strftime("%d.%m.")}</text>')
 

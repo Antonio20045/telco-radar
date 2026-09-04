@@ -553,7 +553,7 @@
 
   {# --- 3./4. Je Modell die Karten und die Balkengrafik --------------- #}
   {% for m in geraete.tco.modelle %}
-  <div class="gr-modell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
+  <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.hersteller }} {{ m.name }}</h3>
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.spanne %} ·
       Gesamtkosten von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{%
