@@ -247,7 +247,9 @@ def _registriere_anbieter_adapter() -> None:
     `GeraeteAbrufFehler` importieren - auf Modulebene waere das ein Zirkel.
     """
     from . import congstar as congstar_modul
+    from . import einsundeins as einsundeins_modul
     from . import o2 as o2_modul
+    from . import telekom as telekom_modul
     from . import vodafone as vodafone_modul
 
     registriere("vodafone_api", Adapter(name="vodafone_api",
@@ -262,6 +264,22 @@ def _registriere_anbieter_adapter() -> None:
     # Preise stehen erst auf den einzelnen Produktseiten.
     registriere("congstar_next", Adapter(name="congstar_next",
                                          lies=congstar_modul.lies))
+    # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
+    # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
+    # als echte `<a href>` darin - der Adapter liest sie aus demselben
+    # Text und braucht kein eigenes `ernte`.
+    registriere("telekom_kategorie", Adapter(name="telekom_kategorie",
+                                             lies=telekom_modul.lies,
+                                             direkt=True))
+    # NICHT `direkt`: die Kategorieseite `/smartphones` traegt kein
+    # Produktschema, nur die verlinkten Produktseiten. Die Linkernte ist
+    # ANBIETEREIGEN, weil die Seite neben ihren 42 Katalogkacheln 125
+    # weitere Adressen derselben Domain fuehrt - siehe
+    # `einsundeins.ernte`.
+    registriere("einsundeins_buendel",
+                Adapter(name="einsundeins_buendel",
+                        lies=einsundeins_modul.lies,
+                        ernte=einsundeins_modul.ernte))
 
 
 _registriere_anbieter_adapter()
@@ -303,12 +321,35 @@ def _preisfelder(anbieter, satz: dict) -> dict:
     """
     preis = satz.get("preis")
     zuzahlung = satz.get("zuzahlung")
+    monatspreis = satz.get("monatspreis")
     tarif = (satz.get("tarif") or "").strip()
 
     if zuzahlung is not None and tarif:
         return {"preis_ohne_vertrag": None, "zuzahlung": float(zuzahlung),
                 "tarif_referenz": tarif,
-                "preis_mit_vertrag_ab": satz.get("monatspreis")}
+                "preis_mit_vertrag_ab": monatspreis}
+    if monatspreis is not None and tarif:
+        # DER BUENDELPREIS OHNE ZUZAHLUNG (seit dem 04.09.2026, 1&1).
+        # Bis dahin brauchte ein Buendel eine Zuzahlung, um ueberhaupt
+        # gespeichert zu werden - der Monatspreis war nur ihr Beiwerk.
+        # 1&1 kennt keine Zuzahlung: das Geraet steckt vollstaendig im
+        # Monatspreis (44,99 EUR = iPhone 17 Pro + All-Net-Flat S ueber 36
+        # Monate), und `preis_ohne_vertrag` gibt es dort ueberhaupt nicht.
+        #
+        # Ein Buendel ohne Barpreis ist trotzdem ein Buendel, und unter
+        # TCO-first ist sein Monatspreis die Leitgroesse. Er landet
+        # deshalb in `preis_mit_vertrag_ab` - nie in `preis_ohne_vertrag`,
+        # denn dort stuende er neben Kassenpreisen und waere plausibel
+        # falsch. Der Lockpreis-Waechter unten sieht ihn gar nicht erst;
+        # er ist die Sicherung fuer Zahlen, die als Ladenpreis ausgegeben
+        # werden, und das behauptet hier niemand.
+        #
+        # Die Laufzeit wandert mit: eine Monatszahl ohne die Zahl der
+        # Monate ist keine Aussage ueber die Bindung.
+        return {"preis_ohne_vertrag": None,
+                "preis_mit_vertrag_ab": float(monatspreis),
+                "tarif_referenz": tarif,
+                "laufzeit_monate": satz.get("laufzeit_monate")}
     if preis is None or ist_lockpreis(preis):
         return {"preis_ohne_vertrag": None}
     return {"preis_ohne_vertrag": preis,

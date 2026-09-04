@@ -1518,3 +1518,183 @@ PYTHONPATH=src python3 -m pytest -q
 
 > Auf der Geräteseite steht keine Zahl mehr, deren Bedeutung man erst der
 > Quelle entnehmen muss — und keine Quelle mehr, die die Zahl nicht enthält.
+
+---
+
+## 13. Nachtrag 04.09.2026 — Phase Q: die Live-Quellen
+
+Alles in diesem Abschnitt ist am 04.09.2026 aus der Arbeitsumgebung
+gemessen worden, mit `curl`/`httpx` und dem Absender `TelcoRadar/1.0`, ohne
+Fingerprint-Trick und ohne Browser-Kennung. robots.txt wurde vor jedem
+Abruf gelesen. Abgerufen wurde ausschließlich, was in der Konfiguration
+steht oder auf einer Einstiegsseite verlinkt ist.
+
+### 13.1 Telekom-Geräte: angebunden, mit Preisform
+
+`https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag` antwortet mit
+HTTP 200 und 2,23 MB. `window.__INITIAL_STATE__.productList.data` trägt zehn
+Geräte mit absoluten Beträgen. Die Rechenprobe
+`upfrontPrice + n × recurringPrice == totalPrice` ging bei **10 von 10** auf:
+
+| Gerät | Anzahlung | Rate | × | Gesamt |
+|---|---|---|---|---|
+| Apple iPhone 17 Pro 256 GB | 99,00 € | 30,50 € | 36 | 1.197,00 € |
+| Apple iPhone 17 Pro Max 256 GB | 199,00 € | 31,90 € | 36 | 1.347,40 € |
+| Samsung Galaxy Z Fold8 Ultra 256 GB | 399,00 € | 50,00 € | 36 | 2.199,00 € |
+| Google Pixel 11 256 GB | 99,00 € | 25,00 € | 36 | 999,00 € |
+| Xiaomi 17T Pro 512 GB | 1,00 € | 24,30 € | 36 | 875,80 € |
+
+Das ist ein **36-Monats-Ratengesamtbetrag, kein Kassenpreis**. Genau deshalb
+war der alte `grund` in `geraete_quellen.yaml` richtig — und genau deshalb
+ist er jetzt erfüllt statt umgangen: `collect/geraete/telekom.py` schreibt
+`anzahlung`, `monatsrate` und `laufzeit_monate` mit; geht die Probe nicht
+auf, wird der Satz verworfen. Ein Gesamtbetrag, der seinen Bestandteilen
+widerspricht, ist keine Messung, sondern ein geändertes Nutzlastformat.
+
+Der Befund vom 11.08.2026 zur **Produktseite** (§ 3) bleibt unverändert
+richtig: dort steht je Speicherstufe nur ein `deltaPrice`. Deshalb liest der
+Adapter die Kategorieseite und nur sie (`direkt=True`) — kein Nachladen.
+Die zehn Produktadressen stehen als echte `<a href="/shop/geraet/…">` im
+selben HTML und werden dem Gerät über seine drei Slugs **zugeordnet**, nicht
+aus ihnen konstruiert.
+
+Unverändert offen: aus dem GitHub-Actions-IP-Bereich antwortet telekom.de
+httpx mit HTTP 202 und rund 2 KB Challenge-HTML. Der Adapter ändert daran
+nichts. Fällt der Abruf so aus, trägt die Nutzlast kein Gerät, die Seite
+gilt als ungelesen, und der Bestand altert **nicht**.
+
+### 13.2 1&1-Geräte: angebunden als Bündel, ohne Barpreis
+
+`https://mobile.1und1.de/iphone-17-pro`, HTTP 200, 325 KB. Das ld+json
+trägt `"price": "44.99"` — und das ist der **Monatspreis des Bündels**, wie
+die Seite selbst sagt: `"description": "iPhone 17 Pro mit 1&1
+All-Net-Flat S"`, `window.currentHardwareOfferDuration = '36'`.
+
+Der Grund, der 1&1 seit 08/2026 draußen hielt, war also richtig. Falsch war
+nur die Folgerung: 1&1 verkauft Geräte ausschließlich im Tarifbund, einen
+Barpreis gibt es dort nicht — und unter TCO-first ist der Monatspreis
+ohnehin die Leitgröße. Er landet in `preis_mit_vertrag_ab` mit
+`tarif_referenz` und `laufzeit_monate`; `preis_ohne_vertrag` bleibt **leer**.
+Ihn aus 44,99 € × 36 minus Tarifpreis zu rechnen wäre eine Rechnung dieses
+Projekts und keine Angabe des Anbieters.
+
+Die Linkernte ist anbietereigen: die Kategorieseite `/smartphones` führt
+**167** Adressen der eigenen Domain, davon **42** Produktseiten. Geerntet
+wird nur, was die Seite selbst als Katalogkachel auszeichnet
+(`a.hardware-box__heading`) — ein Pfadmuster kann das nicht leisten, weil
+`/iphone-17-pro` und `/handyvertrag-ohne-laufzeit` pfadgleich sind.
+
+**Nicht in dieser Phase:** die Preismatrix über Tarif × Speicher. Die Seite
+lädt sie erst im Browser nach; sie aus einer einzigen Zahl zu
+vervielfältigen hieße, acht von neun Sätzen zu erfinden. Das ist ein
+eigener Spike.
+
+### 13.3 Tarife: eine zweite Lesart, `preistyp`
+
+Bis zum 04.09.2026 stammte jeder Satz in `tarife.jsonl` aus einem
+Pflichtdokument nach § 1 TK-TransparenzV. Das ist die belastbarste Quelle
+dieses Marktes und die trägste: das Blatt trägt den Vermarktungsstand, die
+Shop-Seite den Preis von heute.
+
+Neu ist deshalb **nicht** ein Ersatz, sondern eine zweite Messung mit
+eigenem Etikett — `Tarif.preistyp` ist `dokument` (Vorgabe, jeder
+Bestandssatz) oder `live_shop`. Beide dürfen auseinanderlaufen; die
+Abweichung ist die Auskunft, nicht der Fehler. Die PIB-Einträge bleiben
+unverändert im Sammler.
+
+`config/tarif_quellen.yaml` kennt dazu `methode: ldjson` — die
+Einstiegsseite IST die Nutzlast, es wird kein Link geerntet und keine zweite
+Adresse geholt. Gemessen an `https://www.1und1.de/handytarife` (HTTP 200,
+452 KB, statisch): sieben Product-Knoten in einem `@graph`.
+
+| Tarif | Grundgebühr | Volumen |
+|---|---|---|
+| 1&1 All-Net-Flat S | 14,99 € | 10 GB |
+| 1&1 All-Net-Flat M | 14,99 € | 50 GB |
+| 1&1 All-Net-Flat L | 19,99 € | 150 GB |
+| 1&1 Unlimited on demand S / M / L | 19,99 / 19,99 / 24,99 € | 10 / 50 / 150 GB |
+| 1&1 Unlimited XL | 39,99 € | — (nicht genannt) |
+
+Dass S und M denselben Betrag tragen, steht so in der Quelle und wird nicht
+geglättet. Laufzeit, Preisphase und `allnet_flat` bleiben leer: die Knoten
+nennen sie nicht, und ein Marketingname ist keine Leistungszusage in einem
+Datenfeld.
+
+Dass diese Zahl ein Tarifpreis **ohne Gerät** ist, sagt der Anbieter selbst:
+derselbe Graph mit denselben Beträgen steht auf der SIM-only-Seite
+`/handytarife-ohne-handy`. Die wird deshalb nicht zusätzlich abgerufen — sie
+ergäbe dieselben sieben Tarife ein zweites Mal.
+
+Ein Geräte-Knoten wird von einem Tarif-Knoten an der **Marke** getrennt: ein
+Tarif trägt die des Anbieters („1&1"), ein Gerät die des Herstellers
+(„Apple"). Genau diese Verwechslung war der ursprüngliche 1&1-Blocker.
+
+Nebenbefund und mitkorrigiert: `als_item` schrieb in **jede** Tarifmeldung
+„Quelle ist das gesetzlich vorgeschriebene Produktinformationsblatt". Für
+einen Shop-Preis ist dieser Satz falsch — eine Zahl aus den strukturierten
+Daten einer Werbeseite trägt keine gesetzliche Wahrheitsbewehrung. Die
+Meldung nennt jetzt ihre Quellenart.
+
+### 13.4 Telekom-Tarife live: gemessen, verzichtet
+
+Der Auftrag sah eine Live-Tarifquelle im Telekom-Shop vor. **Sie existiert
+serverseitig nicht.** Dreimal gemessen am 04.09.2026:
+
+* `https://www.telekom.de/mobilfunk/tarife` → 301-Kette über OAuth
+  (`prompt=none`) → HTTP 200 auf `/shop/tarife/handyvertrag`, 2,26 MB.
+* `https://www.telekom.de/shop/tarif/magenta-mobil-m` (von dieser Seite
+  verlinkt) → HTTP 200, 1,60 MB.
+
+Auf beiden Seiten:
+
+* `__INITIAL_STATE__.tariffHtmlSnippet` ist
+  `{"apiState": "NULL", "snippet": {"data": []}}` — die Tarifkacheln werden
+  erst im Browser nachgeladen.
+* `productList.data` ist leer. Auf der **Geräte**seite stehen dort zehn
+  Einträge; es ist also keine Sperre, sondern diese Seite rendert ihre
+  Kacheln nicht serverseitig.
+* Das einzige ld+json trägt `BreadcrumbList`, `Organization`, `FAQPage` —
+  keinen `Product`-Knoten.
+
+Die Beträge, die man im HTML **doch** findet (29,95 / 9,95 / 39,95 …),
+stehen ausschließlich in Übersetzungstexten unter
+`translation.cart.global.magentaOneDiscountDetailsModal.*` und in
+FAQ-Absätzen — Marketingfließtext über den MagentaEINS-Rabatt, nicht an
+einem Tarif. Sie einer MagentaMobil-Linie zuzuordnen wäre geraten. Nach E1
+wird eine fehlende Zahl als fehlend geführt, und es ist deshalb **kein**
+Telekom-Live-Adapter gebaut worden: ein Adapter für eine Nutzlastform, die
+niemand gesehen hat, wäre eine erfundene Fixture mit Codeanhang.
+
+Der nächste Schritt wäre die Schnittstelle, die die Seite selbst aufruft
+(`appData.BFF_EXT = /shop/api/eshop/bff-de`). Sie ist **nicht** versucht
+worden — sie braucht eine eigene Messung und eine eigene Entscheidung. Die
+Telekom-Tarife stehen weiterhin über ihre Produktinformationsblätter im
+Bestand.
+
+### 13.5 Nachmessen
+
+```bash
+# Telekom-Geraete: zehn Saetze, jede Rechenprobe geht auf
+python -m pytest tests/test_geraete_adapter_telekom_1und1.py -q
+
+# 1&1-Tarife aus den strukturierten Daten
+python -m pytest tests/test_tarif_ldjson.py -q
+
+# Die zweite Lesart im Sammler (nur die Einstiegsseite wird geholt)
+python -m pytest tests/test_tarif_crawler.py -q
+
+# Belegkette der Fixtures: sha256 des ENTPACKTEN Inhalts
+python - <<'PY'
+import gzip, hashlib, json, pathlib
+for h in ("tests/fixtures/geraete/_herkunft.json",
+          "tests/fixtures/tarife/_herkunft.json"):
+    basis = pathlib.Path(h).parent
+    for e in json.load(open(h))["eintraege"]:
+        f = basis / e["datei"]
+        if not f.exists():
+            continue
+        roh = gzip.open(f, "rb").read() if e.get("gzip") else f.read_bytes()
+        assert hashlib.sha256(roh).hexdigest() == e["sha256_roh"], e["datei"]
+print("Belegkette in Ordnung")
+PY
+```
