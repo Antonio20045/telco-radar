@@ -2647,12 +2647,12 @@ b,strong{font-weight:700}
 .gr-kk-kopf{margin:0;font-family:var(--sans);font-size:12px;
   letter-spacing:.06em;text-transform:uppercase}
 .gr-kk-anbieter{font-weight:700;color:var(--anb,#57534a)}
-.gr-kk-marke{font-size:10px;letter-spacing:.08em;color:var(--ink-4);
+.gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
   border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
 .gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
   color:var(--ink-2)}
 .gr-kk-leit{margin:0;display:flex;align-items:baseline;gap:8px}
-.gr-kk-leit b{font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+.gr-kk-leit b{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
   color:var(--ink-3);text-transform:uppercase}
 .gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
 .gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
@@ -2678,23 +2678,29 @@ b,strong{font-weight:700}
   text-transform:uppercase;fill:var(--ink-3)}
 .gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
   fill:var(--ink)}
-.gr-g1-ref-etikett{font-weight:400;font-size:10.5px;fill:var(--ink-4)}
-.gr-g1-tarif{font-family:var(--serif);font-size:10.5px;fill:var(--ink-3)}
+.gr-g1-ref-etikett{font-weight:400;font-size:12px;fill:var(--ink-4)}
+.gr-g1-tarif{font-family:var(--serif);font-size:12px;fill:var(--ink-3)}
 .gr-g1-betrag{font-family:var(--serif);font-size:13px;fill:var(--ink)}
 .gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
 .gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
-.gr-g1-reftext{font-family:var(--sans);font-size:11px;fill:var(--al-kritisch)}
+.gr-g1-reftext{font-family:var(--sans);font-size:12px;fill:var(--al-kritisch)}
 .gr-g1-seg{fill:var(--anb,#57534a)}
 .gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
   stroke-dasharray:3 3}
 .gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
 .gr-g2-raster--x{stroke-dasharray:2 4}
-.gr-g2-achse{font-family:var(--sans);font-size:11px;fill:var(--ink-4)}
+.gr-g2-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
 .gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
 .gr-g2-punkt{fill:var(--anb,#57534a)}
 .gr-g2-marker{font-size:12px;fill:var(--ink-3)}
-.gr-g2-legende{font-family:var(--sans);font-size:11.5px;
+.gr-g2-legende{font-family:var(--sans);font-size:12px;
   fill:var(--anb,#57534a)}
+
+/* KEINE SCHRIFT UNTER 12 PIXELN, auch nicht im SVG. Die Regel gilt auf
+   dieser Seite seit dem 30.08.2026 und wird im echten Chromium gemessen:
+   passt ein Name nicht hin, fallen Eintraege und nicht Buchstaben. Die
+   linke Spalte von G1 ist deshalb 300 px breit - der laengste Tarifname
+   des Bestands misst dort 12 px hoch rund 277 px. */
 
 /* Auf dem Telefon wird GEROLLT, nicht gestaucht: eine Grafik mit 1180 px
    Zeichenbreite auf 390 px zu skalieren ergibt 3,5 px hohe Schrift

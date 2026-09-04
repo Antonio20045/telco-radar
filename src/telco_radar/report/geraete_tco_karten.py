@@ -373,6 +373,31 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
     }
 
 
+def _referenz_aus_buendel(karte: dict) -> dict:
+    """Ein ECHTES eigenes Buendel schlaegt jede Naeherung.
+
+    Wo Vodafone selbst ein Buendel zu diesem Geraet ausweist, ist das die
+    Referenz - und die gerechnete Summe aus Tarif und Barpreis entfaellt.
+    Beides nebeneinander stuende zweimal unter demselben Namen auf einer
+    Karte, und der Leser muesste raten, welche der zwei Zahlen "unser
+    Preis" ist. Dieselbe Regel wie ueberall auf dieser Seite: eine Zahl
+    steht je Ort genau EINMAL.
+    """
+    return {
+        "tarif": karte["tarif"], "tarif_id": karte.get("tarif_id", ""),
+        "monatlich": karte.get("monatlich") or karte.get("buendel_monatlich"),
+        "tarif_summe": None,
+        "tarif_quelle_url": karte.get("tarif_quelle_url", ""),
+        "tarif_abgerufen_am": karte.get("abgerufen_am", ""),
+        "geraet_betrag": None,
+        "geraet_quelle_url": karte.get("quelle_url", ""),
+        "geraet_abgerufen_am": karte.get("abgerufen_am", ""),
+        "monate": karte["laufzeit"], "gesamt": karte["gesamt"],
+        "schnitt_monat": karte["schnitt_monat"], "fortgeschrieben": False,
+        "aus_buendel": True,
+    }
+
+
 def _referenzkarte(ref: dict) -> dict:
     """Die Referenzrechnung als Karte - sichtbar als Naeherung markiert."""
     karte = _leere_karte("Vodafone")
@@ -536,17 +561,27 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
                     belege_modell[anbieter] = beleg
 
         laufzeiten = sorted({k["laufzeit"] for k in karten if k["laufzeit"]})
-        # Die Referenz rechnet ueber die Laufzeit, die die meisten Karten
-        # dieses Modells binden - so entsteht das Euro-Delta dort, wo es
-        # etwas aussagt.
-        referenz = _vodafone_referenz(referenzen, tarife, belege_modell,
-                                      laufzeiten[-1] if laufzeiten else 0)
+        # ERST DAS EIGENE BUENDEL, DANN DIE NAEHERUNG. Wo Vodafone selbst
+        # ein Buendel zu diesem Geraet ausweist, ist es die Referenz; die
+        # gerechnete Summe traete sonst als zweite Vodafone-Karte daneben.
+        eigene = [k for k in karten if k["eigen"] and k["belastbar"]]
+        naeherung = None
+        if eigene:
+            referenz = _referenz_aus_buendel(
+                min(eigene, key=lambda k: k["gesamt"]))
+        else:
+            # Die Naeherung rechnet ueber die Laufzeit, die die meisten
+            # Karten dieses Modells binden - so entsteht das Euro-Delta
+            # dort, wo es etwas aussagt.
+            referenz = _vodafone_referenz(referenzen, tarife, belege_modell,
+                                          laufzeiten[-1] if laufzeiten else 0)
+            naeherung = referenz
         for k in karten:
             k["delta"] = _delta(k, referenz)
 
         vorhanden = {k["anbieter"] for k in karten}
-        if referenz is not None:
-            karten.append(_referenzkarte(referenz))
+        if naeherung is not None:
+            karten.append(_referenzkarte(naeherung))
             vorhanden.add("Vodafone")
         for anbieter in ANBIETER_REIHENFOLGE:
             if anbieter not in vorhanden:

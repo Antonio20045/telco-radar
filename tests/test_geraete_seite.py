@@ -545,7 +545,7 @@ def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
     s = _suppe(site, "geraete.html")
     summe = sum(int(k.find("b").get_text(strip=True))
                 for k in s.select(".gr-kacheln .gr-kachel"))
-    tafel = " ".join(s.select_one("#tafel-alarme").get_text(" ", strip=True).split())
+    tafel = " ".join(s.select_one("#tafel-tco").get_text(" ", strip=True).split())
     assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in tafel
 
 
@@ -1409,7 +1409,7 @@ def test_die_alarmtabelle_nennt_den_guenstigsten_mit_namen(tmp_path):
     BEI WEM."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-alarme")
+    tafel = s.select_one("#tafel-tco")
     assert tafel is not None, "der Reiter fehlt ganz"
     text = tafel.get_text(" ", strip=True)
     assert "Medimax" in text, "der guenstigste Wettbewerber steht mit Namen da"
@@ -1423,7 +1423,7 @@ def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
     Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
+    zeile = s.select_one("#tafel-tco .gr-a-zeile")
     assert zeile is not None, "keine einzige Alarmzeile"
     assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
     assert "€" in zeile.select_one(".gr-a-euro").get_text(strip=True)
@@ -1434,7 +1434,7 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeilen = s.select("#tafel-alarme .gr-a-zeile")
+    zeilen = s.select("#tafel-tco .gr-a-zeile")
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
@@ -1452,7 +1452,7 @@ def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
     unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
+    zeile = s.select_one("#tafel-tco .gr-a-zeile")
     auf = s.select_one("#" + zeile["data-auf"])
     namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
     # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
@@ -1470,7 +1470,7 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
     """
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-alarme")
+    tafel = s.select_one("#tafel-tco")
     assert "niemand günstiger" not in tafel.get_text(" ", strip=True)
 
     # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
@@ -1503,7 +1503,7 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
     gemessen = 0
-    for datum in s.select("#tafel-alarme .gr-a-klein, #tafel-alarme .gr-a-liste span"):
+    for datum in s.select("#tafel-tco .gr-a-klein, #tafel-tco .gr-a-liste span"):
         text = datum.get_text(strip=True)
         if not text or not text[0].isdigit():
             continue
@@ -1519,15 +1519,15 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    felder = [f.get("data-filter") for f in s.select("#tafel-alarme [data-filter]")]
+    felder = [f.get("data-filter") for f in s.select("#tafel-tco [data-filter]")]
     assert felder == ["marke", "modell", "speicher", "suche"]
 
     fest = [e.get_text(" ", strip=True)
-            for e in s.select("#tafel-alarme .gr-filter label.gr-filter--an")]
+            for e in s.select("#tafel-tco .gr-filter label.gr-filter--an")]
     assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
 
     # Jede Zeile traegt die Werte, nach denen gefiltert wird.
-    for zeile in s.select("#tafel-alarme .gr-a-zeile"):
+    for zeile in s.select("#tafel-tco .gr-a-zeile"):
         assert zeile.has_attr("data-marke")
         assert zeile.has_attr("data-modell")
         assert zeile.has_attr("data-speicher")
@@ -1539,7 +1539,7 @@ def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
     ohne = {"updated": "2026-08-11", "anbieter": {}, "listungen": []}
     site = _baue(tmp_path, db=ohne, punkte=[])
     s = _suppe(site, "geraete.html")
-    assert s.select_one("#tafel-alarme") is None
+    assert s.select_one("#tafel-tco") is None
 
 
 # --------------------------------------------------------------------------
@@ -1617,7 +1617,7 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     assert s.select_one(".gr-auffaellig .gr-saetze li") is not None
-    assert s.select_one("#tafel-alarme") is not None
+    assert s.select_one("#tafel-tco") is not None
 
 
 def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
@@ -1826,7 +1826,7 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # lief dieser Test an genau der Sektion vorbei, in der der zweite Fall
     # stand („62 Geräte im Vergleich") - ein Test, dessen Lookup ins Leere
     # geht, ist grün und prüft nichts (CLAUDE.md §6).
-    for auswahl in ("#tafel-alarme", ".gr-katalog", "#tafel-katalog"):
+    for auswahl in ("#tafel-tco", ".gr-katalog", "#tafel-katalog"):
         assert suppe.select_one(auswahl), f"{auswahl} fehlt in der Fixture"
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
@@ -2040,7 +2040,7 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
 
-    alarm = suppe.select_one("#tafel-alarme .gr-alarm")
+    alarm = suppe.select_one("#tafel-tco .gr-alarm")
     assert alarm, "Alarmtabelle fehlt in der Fixture"
     koepfe = [th.get_text(" ", strip=True).lower() for th in alarm.select("thead th")]
     assert koepfe, "keine Spaltenkoepfe - der Test misst nichts"
@@ -2093,7 +2093,7 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
 
-    for tafel in ("#tafel-alarme", "#tafel-katalog"):
+    for tafel in ("#tafel-tco", "#tafel-katalog"):
         tabelle = suppe.select_one(f"{tafel} .gr-alarm")
         assert tabelle, f"{tafel}: Tabelle fehlt"
         knoepfe = tabelle.select("thead .gr-sort")
