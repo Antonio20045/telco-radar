@@ -1743,11 +1743,35 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > |---|---|
 > | **Der Nachtlauf kann seine Seite gar nicht veröffentlichen.** `geraete.yml` pusht `site/` mit dem `GITHUB_TOKEN`, und ein solcher Push startet keine Workflows | `deploy.yml` zuletzt 00:58 UTC (Push von Hand), Bot-Commits 01:03 UTC, danach nichts. Live lag `4f9dacb` statt `95fa07f`. Der Hook-Schritt steht jetzt in `geraete.yml`, wie in `radar.yml` — siehe §6 |
 >
-> Stand: **2449 Tests grün**, 2 rot (die vorbestehenden
+> **Der `diff-reviewer` hat ein S1 und zwei S2 gefunden, alle behoben** —
+> und das S1 lag genau in der Zusicherung, die der Fix zu geben schien:
+>
+> | | Befund | Ausgelöst durch |
+> |---|---|---|
+> | **S1** | **Die Browser-Fixture schrieb kein `geraete_tco.json`.** Damit startet `TcoDB` leer, und ZWEI der drei Tabellen des TCO-Reiters rendern gar nicht — die SIM-only-Referenzen und die Leitzahl-Tabelle. Der neue Breitentest wurde **allein von der Bereitschaftstabelle** rot; Behälter und `min-width` der SIM-only-Tabelle waren von keinem Test gedeckt. Fixture stellt jetzt 14 Referenzen (über `REFERENZEN_SICHTBAR` = 12, damit auch der Aufklapper entsteht) und vier Bündel | jemand, der den Behälter „aufräumt" — 2450 Tests wären grün geblieben |
+> | **S2** | **Die WICHTIGSTE Tabelle war nicht angefasst**: die Leitzahl-Tabelle, fünf Spalten, ohne Behälter. Sie steht hinter `{% if geraete.tco.zeilen %}` und rendert erst, wenn Phase 4 Bündel liefert — deshalb fiel sie beim Nachmessen nicht auf. Mit gestellten Bündeln: **436 px** auf 390 | der erste Bündel-Adapter |
+> | **S2** | **Der Behälter kostet 14 px** (BFC, der Außenabstand kollabiert nicht mehr): 18 → 32 px, Reiter 2627 → 2641. Bewusst nicht weggeräumt — die Gegenrechnung träfe `.gr-scroll` auch dort, wo es eine `.src-table` hält. Jetzt steht die Zahl im Stylesheet | — |
+>
+> Dazu S3: die **480 px standen an der falschen Tabelle**. Zwei Kommentare
+> schrieben sie der SIM-only-Tabelle zu; gemessen ist sie die Rechtskante
+> der BEREITSCHAFTStabelle (437 breit), die SIM-only reicht bis 446 (403
+> breit). Korrigiert — eine kopierte Fremdmessung ist eine Falle für den
+> nächsten Leser.
+>
+> **Neu: ein Test, der die REGEL statt ihrer Wirkung misst** — jede
+> `table.gr-ttab` liegt in einem `.gr-scroll`. Der Breitentest hängt an der
+> Datenlage (eine Tabelle ohne Zeilen kann nicht überlaufen); dieser fällt
+> auch bei einer vierten Tabelle, und er fällt, **bevor** sie Daten hat.
+> Gegengeprüft je Behälter einzeln: nimmt man den der SIM-only-Tabelle
+> heraus, fallen beide Tests; nimmt man den der Leitzahl heraus, ebenfalls.
+>
+> Stand: **2450 Tests grün**, 2 rot (die vorbestehenden
 > Promo-Screenshot-Tests), 14 skipped. `pruefe_portal.py`
 > **15 bestanden / 2 durchgefallen** (8b und 6, beide vorbestehend);
-> Kriterium 11b misst den TCO-Reiter bei **2641 px** — der zusätzliche
-> Behälter kostet kein Höhenbudget.
+> Kriterium 11b misst den TCO-Reiter bei **2641 px**. Live byte-identisch
+> gegengeprüft (`geraete.html`, `style.css`, `tarife.html`, `index.html`);
+> auf der Seite stehen 3 Behälter und **25 SIM-only-Beleglinks** — genau
+> die 25 Sätze aus `geraete_tco.json`.
 >
 > **OFFEN (unverändert aus Phase 6, nichts davon angefasst):**
 > 1. Die neun Telekom-Sätze stammen aus einem LOKALEN Lauf und altern in
