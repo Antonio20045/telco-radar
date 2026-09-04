@@ -723,4 +723,5 @@ def leer() -> dict:
             "modelle": [], "tabelle": [], "modell_vorgabe": "",
             "modelle_gesamt": 0,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-            "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}}
+            "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
+                   "reihen_gesamt": 0, "ausgelassen": []}}

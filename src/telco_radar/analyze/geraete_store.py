@@ -195,6 +195,13 @@ class GeraeteDB:
         neu = 0
         gesehen: set[str] = set()
         self.kollisionen = []
+        # Die ROHSAETZE, die dieser Aufruf wegen einer Kollision NICHT
+        # eingetragen hat. Der Aufrufer braucht sie, um fuer sie auch keine
+        # Historie zu schreiben - sonst entsteht genau die Saegezahnkurve,
+        # die der Kommentar unten verhindern will, nur eine Stufe spaeter
+        # (QA-Befund B2, 04.09.2026: ALDI TALKs Galaxy A17 sprang in
+        # `geraete_preise.jsonl` jeden Tag zwischen 129 und 159 EUR).
+        self.uebergangen: list = []
         for roh in listungen:
             listung = _als_listung(roh)
             lid = listung.listung_id
@@ -212,6 +219,7 @@ class GeraeteDB:
                 # Historie in jedem Lauf zwei Aenderungspunkte hin und zurueck
                 # und die Kurve saehe aus wie ein Preiskampf.
                 self.kollisionen.append((lid, listung.titel_roh))
+                self.uebergangen.append(roh)
                 continue
             gesehen.add(lid)
             if eintrag is None:

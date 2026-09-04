@@ -394,6 +394,22 @@
    woertlich von dort: `TCO-<Laufzeit>`, `Ø X €/Monat`, `monatlich X €`,
    `Gerät einmalig X €`, `eff. X €/M. ohne Gerät`, `ab Monat 25: X €`.
    Ein Synonym waere ein zweites Mass. #}
+{# EINE MESSLUECKE WIRD BENANNT, NICHT GEZEICHNET (QA-Befund B2): eine Reihe,
+   deren Listung an einem Tag zwei Preise trug, bekommt keinen Pfeil - und
+   eine Reihe, der danach keine zwei Punkte bleiben, steht hier mit Grund.
+   Die Betraege stehen dabei, damit die Luecke pruefbar ist. #}
+{% macro g2_ausgelassen(g2) %}
+  {% if g2.ausgelassen %}
+  <p class="gr-erklaer gr-basis--duenn gr-g2-ausgelassen">Nicht gezeichnet,
+  weil dieselbe Listung an einem Tag zwei Preise trug – eine Messlücke,
+  keine Preisbewegung: {% for a in g2.ausgelassen %}{{ a.name }} bei {{
+  a.anbieter }} ({{ a.tage | length }} {{ 'Messtag' if a.tage | length == 1
+  else 'Messtage' }}, zuletzt {{ a.tage[-1] | date_de }}: {{
+  a.betraege[a.tage[-1]] | map('euro') | join(' und ') }}){% if not loop.last
+  %}; {% endif %}{% endfor %}.</p>
+  {% endif %}
+{% endmacro %}
+
 {% macro tcokarte(k) %}
 <article class="gr-kkarte gr-anb--{{ k.slug }}{% if k.eigen %} gr-kkarte--eigen{% endif %}{% if not k.belastbar %} gr-kkarte--leer{% endif %}"
          data-anbieter="{{ k.anbieter }}"
@@ -1014,12 +1030,15 @@
   {% if geraete.tco.g2.svg %}
   <figure class="gr-grafik gr-grafik--g2">
     {{ geraete.tco.g2.svg | safe }}
-    <figcaption>{{ geraete.tco.g2.reihen }} Reihen mit mindestens zwei
-    Messpunkten, {{ geraete.tco.g2.von | date_de }} bis {{
+    <figcaption>{% if geraete.tco.g2.reihen_gesamt > geraete.tco.g2.reihen
+    %}{{ geraete.tco.g2.reihen }} von {{ geraete.tco.g2.reihen_gesamt }} Reihen{%
+    else %}{{ geraete.tco.g2.reihen }} Reihen{% endif %} mit mindestens zwei
+    eindeutigen Messpunkten, {{ geraete.tco.g2.von | date_de }} bis {{
     geraete.tco.g2.bis | date_de }}. Ein Pfeil steht für eine Änderung
     zwischen zwei Messungen; Datum und Betrag stehen am Punkt und in der
     Tabelle darunter.</figcaption>
   </figure>
+  {{ g2_ausgelassen(geraete.tco.g2) }}
 
   {% if geraete.tco.g2.ereignisse %}
   <p class="gr-erklaer">Erhöhungen und Senkungen im Messzeitraum:
@@ -1044,7 +1063,10 @@
       <tr><td><span class="gr-t-anbieter">{{ r.name }}</span>
           <span class="gr-a-klein">{{ r.anbieter }}</span></td>
         <td>{% for p in r.punkte %}{{ p.datum | date_de }} {{ p.betrag | euro
-          }}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+          }}{% if not loop.last %} · {% endif %}{% endfor %}{% if r.mehrdeutig
+          %} <span class="gr-t-luecke">{{ r.mehrdeutig | length }} {{ 'Tag' if
+          r.mehrdeutig | length == 1 else 'Tage' }} mit zwei Preisen
+          ausgelassen</span>{% endif %}</td>
         <td>{{ r.von | euro }}</td><td>{{ r.bis | euro }}</td>
         <td>{{ r.delta | euro }}</td>
         <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
@@ -1058,6 +1080,7 @@
   </details>
   {% else %}
   {# Der ehrliche Leerzustand nach C.2 - keine interpolierte Scheinkurve. #}
+  {{ g2_ausgelassen(geraete.tco.g2) }}
   <p class="gr-erklaer gr-basis--duenn">Für keine Reihe aus Gerät und
   Anbieter liegen bisher zwei Messpunkte vor. Bis dahin steht hier keine
   Linie: zwei Punkte ergeben eine Gerade, ein Punkt ergibt gar nichts, und

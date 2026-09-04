@@ -113,13 +113,29 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
 
     neu_gesamt = gealtert_gesamt = punkte = 0
     bilanzen = []
+    kollisionen: list = []
     for bilanz in ergebnis["anbieter"]:
         anbieter = quellen.nach_name(bilanz.name)
         neu, gesehen = db.upsert(bilanz.listungen, heute)
         neu_gesamt += neu
+        # NUR WAS DIE DATENBANK GENOMMEN HAT, BEKOMMT EINEN HISTORIENPUNKT.
+        # `upsert` verwirft den zweiten Satz derselben ID (zwei Artikel,
+        # die die Zuordnung nicht unterscheiden konnte) - und diese Schleife
+        # schrieb ihn bis zum 04.09.2026 trotzdem in die Historie. Ergebnis:
+        # ALDI TALKs "Galaxy A17 LTE + Starter Kit" (129 EUR) und "Galaxy
+        # A17 5G" (159 EUR) treffen beide den Katalogeintrag "Galaxy A17",
+        # teilen sich eine Listungs-ID, und `geraete_preise.jsonl` trug je
+        # Tag zwei Zeilen: 13 von 15 Pfeilen in G2 zeigten eine
+        # Preisaenderung, die nie stattgefunden hat (QA-Befund B2).
+        uebergangen = {id(x) for x in getattr(db, "uebergangen", [])}
         for listung in bilanz.listungen:
+            if id(listung) in uebergangen:
+                continue
             if historie.schreibe(listung, heute):
                 punkte += 1
+        # Ueber ALLE Anbieter sammeln: `db.kollisionen` gilt je Aufruf, und
+        # am Ende der Schleife stand nur die Liste des letzten Anbieters.
+        kollisionen.extend(getattr(db, "kollisionen", []))
         if bilanz.vollstaendig:
             leitseite = (anbieter.crawled_einstiege[0].url
                          if anbieter and anbieter.crawled_einstiege else "")
@@ -243,7 +259,15 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
              and buendelbilanz.verworfen else "",
              "" if geschrieben else " - NICHT GESCHRIEBEN")
 
-    kollisionen = list(getattr(db, "kollisionen", []))
+    if kollisionen:
+        # Die Arbeitsliste fuer den Katalog: zwei Artikel auf einer ID sind
+        # zwei Produkte, die der Katalog nicht auseinanderhaelt.
+        log.warning("Geraeteradar: %d Kollisionen - zwei Artikel desselben "
+                    "Laufs auf einer Listungs-ID, der zweite ist weder "
+                    "eingetragen noch in der Historie: %s",
+                    len(kollisionen),
+                    "; ".join(f"{lid} <- {titel!r}"
+                              for lid, titel in kollisionen[:12]))
     bilanz = {
         "status": "ok",
         "anbieter": bilanzen,

@@ -49,6 +49,7 @@ from typing import Optional
 from . import geraete_vergleich
 from .effektivpreis import phasensumme
 from .geraete_tco_grafik import anbieter_slug
+from .geraete_verlauf import messtage
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, POSTEN_TARIF,
@@ -830,13 +831,14 @@ def historienreihen(eintraege: list, historie, katalog) -> list:
         if e.get("zustand") not in _ZUSTAND:
             continue
         lid = e.get("id") or ""
-        punkte = []
-        for satz in historie.reihe(lid):
-            betrag = satz.get("preis_ohne_vertrag")
-            if betrag is None or not satz.get("datum"):
-                continue
-            punkte.append({"datum": satz["datum"], "betrag": float(betrag)})
-        if len(punkte) < 2:
+        # DIESELBE MESSTAG-REGEL WIE IN DER INTERAKTIVEN GRAFIK
+        # (`geraete_verlauf.messtage`): ein Tag mit zwei Preisen derselben
+        # Listung ist eine Messluecke. Er faellt aus der Kurve und steht in
+        # `mehrdeutig`, damit die Grafik ihn BENENNT statt ihn als Pfeil zu
+        # zeichnen (QA-Befund B2).
+        eindeutig, mehrdeutig = messtage(historie.reihe(lid))
+        punkte = [{"datum": t, "betrag": b} for t, b in sorted(eindeutig.items())]
+        if len(punkte) < 2 and not mehrdeutig:
             continue
         device_id, speicher = je_sku.get(e.get("sku_id", ""), ("", None))
         reihen.append({
@@ -845,5 +847,7 @@ def historienreihen(eintraege: list, historie, katalog) -> list:
             "anbieter": e.get("anbieter", ""),
             "modell_id": modell_schluessel(device_id, speicher),
             "quelle_url": e.get("quelle_url", ""),
-            "punkte": punkte})
+            "punkte": punkte,
+            "mehrdeutig": [{"datum": t, "betraege": mehrdeutig[t]}
+                           for t in sorted(mehrdeutig)]})
     return reihen

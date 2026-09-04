@@ -314,31 +314,57 @@ def historie(reihen: list) -> dict:
     # Messungen desselben Tages ergaeben sonst ein senkrechtes Segment,
     # und der Nachbar im selben Reiter zaehlt seit dem 30.08.2026
     # ausdruecklich MESSTAGE statt roher Punkte.
-    brauchbar = []
+    #
+    # UND ZWEI PREISE AN EINEM TAG SIND KEIN PREIS, sondern eine Messluecke
+    # (QA-Befund B2, 04.09.2026): dieselbe Regel wie in der interaktiven
+    # Grafik, aus derselben Funktion (`geraete_verlauf.messtage`). Bis dahin
+    # nahm diese Stelle den LETZTEN Stand des Tages und die interaktive den
+    # NIEDRIGSTEN - die Seite widersprach sich selbst, und mit den rohen
+    # Punkten davor zeigten 13 von 15 Pfeilen eine Aenderung, die es nie
+    # gab. Ein mehrdeutiger Tag faellt aus der Kurve, bekommt keinen Pfeil
+    # und keinen Eintrag im Fliesstext; die Reihe NENNT ihn stattdessen
+    # (`mehrdeutig`), und eine Reihe, der danach keine zwei Punkte bleiben,
+    # steht als `ausgelassen` unter der Grafik - mit Grund.
+    from .geraete_verlauf import messtage  # spaet: kein Importkreis
+    brauchbar, ausgelassen = [], []
     for reihe in reihen:
-        je_tag: dict = {}
+        saetze = []
         for punkt in (reihe.get("punkte") or []):
             tag = _tag(punkt.get("datum"))
-            if tag is None:
-                continue
-            try:
-                je_tag[tag] = float(punkt["betrag"])
-            except (TypeError, ValueError, KeyError):
-                continue
-        if len(je_tag) < MIND_PUNKTE:
-            continue
-        brauchbar.append(dict(reihe, punkte=[
-            {"datum": tag.isoformat(), "betrag": betrag}
-            for tag, betrag in sorted(je_tag.items())]))
+            if tag is not None:
+                saetze.append({"datum": tag.isoformat(),
+                               "betrag": punkt.get("betrag")})
+        eindeutig, doppelt = messtage(saetze, feld="betrag")
+        for m in (reihe.get("mehrdeutig") or []):
+            tag = _tag(m.get("datum"))
+            if tag is not None:
+                doppelt[tag.isoformat()] = list(m.get("betraege") or [])
+                eindeutig.pop(tag.isoformat(), None)
+        punkte = [{"datum": t, "betrag": b} for t, b in sorted(eindeutig.items())]
+        mehrdeutig = [{"datum": t, "betraege": doppelt[t]} for t in sorted(doppelt)]
+        if len(punkte) >= MIND_PUNKTE:
+            brauchbar.append(dict(reihe, punkte=punkte, mehrdeutig=mehrdeutig))
+        elif mehrdeutig:
+            ausgelassen.append({
+                "name": reihe.get("name", ""),
+                "anbieter": reihe.get("anbieter", ""),
+                "quelle_url": reihe.get("quelle_url", ""),
+                "tage": [m["datum"] for m in mehrdeutig],
+                "betraege": {m["datum"]: m["betraege"] for m in mehrdeutig}})
+    # S8: die Bildunterschrift sagt "5 von 9 Reihen", nicht "5 Reihen" -
+    # der Deckel ist eine Auswahl, und eine Auswahl nennt ihre Grundmenge.
+    reihen_gesamt = len(brauchbar)
     brauchbar.sort(key=lambda r: (-len(r["punkte"]), r["name"]))
     brauchbar = brauchbar[:MAX_REIHEN]
     if not brauchbar:
-        return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}
+        return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
+                "reihen_gesamt": 0, "ausgelassen": ausgelassen}
 
     punkte_alle = [(_tag(p["datum"]), float(p["betrag"]))
                    for r in brauchbar for p in r["punkte"]]
     if len(punkte_alle) < MIND_PUNKTE:
-        return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}
+        return {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
+                "reihen_gesamt": 0, "ausgelassen": ausgelassen}
 
     tage = [t for t, _ in punkte_alle]
     betraege = [b for _, b in punkte_alle]
@@ -454,10 +480,14 @@ def historie(reihen: list) -> dict:
                        for t, b in punkte],
             "von": punkte[0][1], "bis": punkte[-1][1],
             "delta": round(punkte[-1][1] - punkte[0][1], 2),
+            # Die ausgelassenen Tage stehen in der Tabelle - eine Luecke,
+            # die niemand nennt, liest sich als "unveraendert".
+            "mehrdeutig": reihe.get("mehrdeutig") or [],
         })
 
     teile.append('</svg>')
     ereignisse.sort(key=lambda e: (e["datum"], e["name"]), reverse=True)
     return {"svg": "".join(teile), "tabelle": tabelle,
             "ereignisse": ereignisse, "reihen": len(brauchbar),
+            "reihen_gesamt": reihen_gesamt, "ausgelassen": ausgelassen,
             "von": von.isoformat(), "bis": bis.isoformat()}

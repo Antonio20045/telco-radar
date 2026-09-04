@@ -1537,6 +1537,20 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
   function termine(n) {
     return n === 1 ? 'liegt 1 Messtermin' : 'liegen ' + n + ' Messtermine';
   }
+  /* EINE MESSLUECKE WIRD BENANNT (QA-Befund B2). Die Tage mit zwei Preisen
+     derselben Listung fehlen in den Reihen - `geraete_verlauf.messtage` hat
+     sie herausgenommen -, und ohne diesen Satz laese sich die Luecke als
+     "unveraendert". */
+  function mehrdeutigSatz(g) {
+    if (!g || !g.mehrdeutig || !g.mehrdeutig.length) return '';
+    return g.mehrdeutig.map(function (m) {
+      var n = m.tage.length;
+      return ' ' + m.anbieter + ' nannte an ' + n +
+        (n === 1 ? ' Messtag' : ' Messtagen') +
+        ' zwei Preise derselben Listung – diese Tage sind als Messlücke ' +
+        'ausgelassen, nicht als Preisänderung gezählt.';
+    }).join('');
+  }
   /* `tagDE` endet auf einem Punkt ("30.8."). Ein Satzpunkt dahinter ergibt
      "30.8.." - im ersten Anlauf genau so auf der Seite gestanden, an ZWEI
      Stellen. Deshalb setzt `punkt()` das Satzende, nicht der Aufrufer. */
@@ -1569,7 +1583,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     }
     stand.hidden = false;
     stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
-      ' vor, ' + spanne(tage)) + nachsatz;
+      ' vor, ' + spanne(tage)) + nachsatz + mehrdeutigSatz(g);
   }
 
   function zeichne(g) {
@@ -1677,9 +1691,12 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
             ? ' In diesem Raster fallen sie auf ' + tageSort.length +
               ' Punkt' + (tageSort.length === 1 ? '' : 'e') +
               ' zusammen – für einen Verlauf braucht es ' + AB_TERMINEN +
-              '. Ein feineres Raster zeigt mehr.'
+              /* S6: "Wöchentlich" ist das feinste Raster - der Hinweis
+                 versprach dort etwas, das es nicht gibt. */
+              (raster === 'woche' ? '.' : '. Ein feineres Raster zeigt mehr.')
             : ' Ein Verlauf entsteht ab ' + AB_TERMINEN + '.') +
-          ' Bis dahin stehen die Preise als Tabelle darunter.';
+          ' Bis dahin stehen die Preise als Tabelle darunter.' +
+          mehrdeutigSatz(g);
       }
       tabelleBauen(reihen);
       return;

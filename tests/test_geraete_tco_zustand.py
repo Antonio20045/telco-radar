@@ -284,7 +284,10 @@ def _speicherform(b: Buendel) -> dict:
             "last_verified": HEUTE}
 
 
-def _baue(tmp_path: pathlib.Path, erneuert: bool = True) -> BeautifulSoup:
+def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
+          punkte: list | None = None) -> BeautifulSoup:
+    """`punkte` ersetzt die Preishistorie - `test_geraete_preis_mehrdeutig`
+    stellt darueber Tage mit zwei Preisen derselben Listung."""
     root = tmp_path / ("mit" if erneuert else "ohne")
     (root / "config").mkdir(parents=True)
     for name, daten in (("geraete_katalog.yaml", _KATALOG),
@@ -301,12 +304,13 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True) -> BeautifulSoup:
             "o2": {"laeufe": 4, "funde_gesamt": 2},
             "Vodafone": {"laeufe": 4, "funde_gesamt": 1}},
         "listungen": listungen}), encoding="utf-8")
-    (state / "geraete_preise.jsonl").write_text("\n".join(json.dumps({
-        "listung_id": e["id"], "device_id": e["device_id"],
-        "anbieter": e["anbieter"], "datum": "2026-08-20",
-        "preis_ohne_vertrag": e["preis_ohne_vertrag"],
-        "quelle_url": e["quelle_url"]}) for e in listungen) + "\n",
-        encoding="utf-8")
+    if punkte is None:
+        punkte = [{"listung_id": e["id"], "device_id": e["device_id"],
+                   "anbieter": e["anbieter"], "datum": "2026-08-20",
+                   "preis_ohne_vertrag": e["preis_ohne_vertrag"],
+                   "quelle_url": e["quelle_url"]} for e in listungen]
+    (state / "geraete_preise.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in punkte) + "\n", encoding="utf-8")
     buendel = [_buendel(SKU_NEU, 20.0, zustand="neu")]
     if erneuert:
         buendel.append(_buendel(SKU_ERNEUERT, 17.0, zustand="refurbished"))

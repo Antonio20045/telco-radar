@@ -633,3 +633,42 @@ def test_ein_geaenderter_buendelpreis_frischt_den_satz_auf(tmp_path):
     assert tco["buendel"][0]["geraet_monatsrate"] == 30.0
     assert tco["buendel"][0]["first_seen"] == "2026-09-04"
     assert tco["buendel"][0]["last_verified"] == "2026-09-05"
+
+
+def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
+    """QA-Befund B2 (04.09.2026): `db.upsert` verwirft den zweiten Satz
+    desselben Laufs auf einer ID - und die Pipeline schrieb seine Historie
+    trotzdem. Bei ALDI TALK ("Galaxy A17 LTE + Starter Kit" und "Galaxy A17
+    5G" auf EINER Listungs-ID) trug `geraete_preise.jsonl` deshalb je Tag
+    zwei Zeilen, und 13 von 15 Pfeilen in G2 zeigten eine Aenderung, die es
+    nie gab.
+
+    Hier: zwei Produktseiten, die auf dieselbe SKU treffen, mit zwei
+    Preisen. Die Datenbank nimmt eine, die Historie bekommt EINE Zeile -
+    und ihr Preis ist der der Datenbank.
+    """
+    root = _root(tmp_path)
+    produkt = _SEITEN["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"]
+    zweit = produkt.replace("1449", "1099")
+    assert zweit != produkt, "die Fixture muss den Preis 1449 tragen"
+    kategorie = _SEITEN["https://www.medimax.de/c/116/smartphones"].replace(
+        "/p/1518897/galaxy-a57-5g-a576b-128gb",
+        "/p/1514137/iphone-17-pro-max-256gb-zweit")
+    seiten = dict(_SEITEN)
+    seiten["https://www.medimax.de/c/116/smartphones"] = kategorie
+    seiten["https://www.medimax.de/p/1514137/iphone-17-pro-max-256gb-zweit"] = zweit
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole(seiten))
+    assert bilanz["status"] == "ok"
+    # Die Kollision tritt wirklich ein - sonst misst der Test nichts.
+    assert bilanz["kollisionen"] == 1
+    assert bilanz["preispunkte"] == 1
+
+    db = json.loads((root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+    (eintrag,) = db["listungen"]
+    zeilen = [json.loads(z) for z in (root / "data" / "state" / "geraete_preise.jsonl")
+              .read_text(encoding="utf-8").strip().splitlines()]
+    assert len(zeilen) == 1
+    assert zeilen[0]["listung_id"] == eintrag["id"]
+    assert zeilen[0]["preis_ohne_vertrag"] == eintrag["preis_ohne_vertrag"]

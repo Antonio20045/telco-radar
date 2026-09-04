@@ -249,23 +249,35 @@ def test_zwei_anbieter_eines_diagramms_teilen_nie_eine_farbe():
         [r["anbieter"] for r in g["reihen"]], farben))
 
 
-def test_der_bestaetigte_preis_schlaegt_den_historieneintrag():
-    """"Der niedrigste Preis ist der wahrscheinlichste Fehler; jede
-    min-Auswahl braucht einen Filter davor." Hier stand ein nacktes Minimum.
+def test_zwei_preise_an_einem_tag_sind_eine_messluecke_kein_punkt():
+    """Bis zum 04.09.2026 stand hier "der bestaetigte Preis schlaegt den
+    Historieneintrag": aus 129 und 155 EUR am selben Tag wurde der Preis der
+    Datenbank. QA-Befund B2 dreht das um - zwei gleichzeitig gueltige Preise
+    derselben Listung sind eine MESSLUECKE, keine Messung. Welcher der zwei
+    in der Datenbank steht, haengt davon ab, welcher Artikel im Lauf zuerst
+    kam; ihn zu zeichnen waere eine Wahl, keine Auskunft.
 
-    Der Fall ist echt: eine ALDI-TALK-Listung traegt am 29.08.2026 zwei
-    Historienzeilen (129 und 155 EUR), weil zwei Produkte unter derselben
-    listung_id laufen. Die Pruefung meldet das, filtert aber EINTRAEGE - die
-    Historie zu einem ueberlebenden Eintrag wird roh gelesen.
+    Der Fall ist echt: ALDI TALKs "Galaxy A17 LTE + Starter Kit" (129 EUR)
+    und "Galaxy A17 5G" (155/159 EUR) laufen unter derselben listung_id.
     """
     hist = _Historie({"a": [{"datum": "2026-08-29", "preis_ohne_vertrag": 129.0},
                             {"datum": "2026-08-29", "preis_ohne_vertrag": 155.0}]})
-    g = _eins(v.geraete_mit_verlauf(
-        [_l("a", "ALDI TALK", 155.0, last_verified="2026-08-29")], hist,
-        _KATALOG))
-    assert g["reihen"][0]["punkte"] == [{"datum": "2026-08-29", "preis": 155.0}], (
-        "die Kurve zeigt einen Preis, den die Datenbank fuer dieses Geraet "
-        "nicht kennt")
+    listungen = [_l("a", "ALDI TALK", 155.0, last_verified="2026-08-29")]
+    # Kein Punkt - auch nicht der bestaetigte aus der Datenbank.
+    assert v._punkte(listungen, hist) == []
+    assert v.geraete_mit_verlauf(listungen, hist, _KATALOG) == []
+    # Aber die Luecke ist benannt, mit beiden Betraegen.
+    assert v.mehrdeutige_tage(listungen, hist) == [
+        {"anbieter": "ALDI TALK", "listung_id": "a", "tage": ["2026-08-29"],
+         "betraege": {"2026-08-29": [129.0, 155.0]}}]
+    # Und ein zweiter, eindeutiger Tag derselben Listung bleibt erhalten.
+    hist2 = _Historie({"a": [{"datum": "2026-08-29", "preis_ohne_vertrag": 129.0},
+                             {"datum": "2026-08-29", "preis_ohne_vertrag": 155.0},
+                             {"datum": "2026-08-30", "preis_ohne_vertrag": 129.0}]})
+    punkte = v._punkte([_l("a", "ALDI TALK", 129.0, last_verified="2026-08-31")],
+                       hist2)
+    assert [(p["datum"], p["preis"]) for p in punkte] == [
+        ("2026-08-30", 129.0), ("2026-08-31", 129.0)]
 
 
 # --------------------------------------------------------------------------

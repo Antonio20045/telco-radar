@@ -131,6 +131,61 @@ def _label(geraet, speicher) -> str:
     return f"{geraet.modell} {speicher} GB" if speicher else geraet.modell
 
 
+def messtage(saetze: list, feld: str = "preis_ohne_vertrag") -> tuple[dict, dict]:
+    """Je Tag EIN Betrag - oder der Tag ist mehrdeutig.
+
+    Rueckgabe `(eindeutig, mehrdeutig)`:
+        eindeutig   {datum: betrag}      Tage, an denen die Listung genau
+                                         EINEN Preis trug
+        mehrdeutig  {datum: [betraege]}  Tage mit ZWEI verschiedenen Preisen
+                                         derselben Listung
+
+    ZWEI GLEICHZEITIG GUELTIGE PREISE DERSELBEN LISTUNG AM SELBEN TAG SIND
+    EINE MESSLUECKE, KEINE PREISBEWEGUNG (QA-Befund B2, 04.09.2026). ALDI
+    TALKs "Galaxy A17 LTE + Starter Kit" (129 EUR) und "Galaxy A17 5G"
+    (159 EUR) trafen beide den Katalogeintrag "Galaxy A17" und teilten sich
+    eine Listungs-ID; `geraete_preise.jsonl` trug je Tag zwei Zeilen, und
+    13 von 15 Pfeilen der Historie zeigten eine Aenderung, die es nie gab.
+
+    Diese Funktion ist die EINE Quelle fuer beide Ansichten des Reiters -
+    die statische G2 (`geraete_tco_grafik.historie`) und die interaktive
+    Verlaufsgrafik (`gr-verlaufdaten`, ueber `_punkte`). Vorher las die
+    eine "den letzten Stand des Tages" und die andere "den niedrigsten",
+    und dieselbe Seite widersprach sich selbst (C.3).
+    """
+    je_tag: dict = {}
+    for satz in saetze or []:
+        datum = str(satz.get("datum") or "").strip()
+        betrag = satz.get(feld)
+        if not datum or betrag is None:
+            continue
+        try:
+            betrag = round(float(betrag), 2)
+        except (TypeError, ValueError):
+            continue
+        je_tag.setdefault(datum, set()).add(betrag)
+    eindeutig = {t: next(iter(b)) for t, b in je_tag.items() if len(b) == 1}
+    mehrdeutig = {t: sorted(b) for t, b in je_tag.items() if len(b) > 1}
+    return eindeutig, mehrdeutig
+
+
+def mehrdeutige_tage(listungen: list, historie) -> list[dict]:
+    """Je Listung mit mehrdeutigen Messtagen ein Eintrag - fuer die Seite.
+
+    Die Tage fehlen in den Kurven (Messluecke); HIER stehen sie, damit die
+    Luecke benannt ist und nicht wie "unveraendert" liest.
+    """
+    out = []
+    for e in listungen:
+        _, mehrdeutig = messtage(historie.reihe(e.get("id") or ""))
+        if not mehrdeutig:
+            continue
+        tage = sorted(mehrdeutig)
+        out.append({"anbieter": e.get("anbieter"), "listung_id": e.get("id"),
+                    "tage": tage, "betraege": {t: mehrdeutig[t] for t in tage}})
+    return out
+
+
 def _punkte(listungen: list, historie) -> list[dict]:
     """Alle Messpunkte einer Listungsmenge, aelteste zuerst.
 
@@ -143,15 +198,16 @@ def _punkte(listungen: list, historie) -> list[dict]:
     """
     punkte = []
     for e in listungen:
-        for satz in historie.reihe(e.get("id") or ""):
-            preis = satz.get("preis_ohne_vertrag")
-            if preis is None or not satz.get("datum"):
-                continue
-            punkte.append({"datum": satz["datum"], "anbieter": e.get("anbieter"),
-                           "preis": float(preis), "art": "gemessen"})
+        # Mehrdeutige Tage fallen HERAUS - siehe `messtage`. Auch der
+        # Bestaetigungspunkt: an einem Tag mit zwei Preisen ist der Preis
+        # in der Datenbank einer von beiden, und welcher, sagt niemand.
+        eindeutig, mehrdeutig = messtage(historie.reihe(e.get("id") or ""))
+        for datum, preis in sorted(eindeutig.items()):
+            punkte.append({"datum": datum, "anbieter": e.get("anbieter"),
+                           "preis": preis, "art": "gemessen"})
         letzt = e.get("last_verified")
         preis = e.get("preis_ohne_vertrag")
-        if letzt and preis is not None:
+        if letzt and preis is not None and letzt not in mehrdeutig:
             punkte.append({"datum": letzt, "anbieter": e.get("anbieter"),
                            "preis": float(preis), "art": "bestaetigt"})
     # Je (Anbieter, Tag) genau ein Punkt: zwei Farben desselben Geraets sind
@@ -250,6 +306,9 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
         alle = [p["preis"] for r in reihen for p in r["punkte"]]
         tage = sorted({p["datum"] for r in reihen for p in r["punkte"]})
         geraete.append({
+            # Die Messluecken dieses Geraets, benannt: `app.js` schreibt
+            # daraus den Satz unter die Grafik.
+            "mehrdeutig": mehrdeutige_tage(listungen, historie),
             "id": f"{gid}-{speicher or 0}",
             "label": _label(g, speicher),
             "hersteller": g.hersteller if g else "",
