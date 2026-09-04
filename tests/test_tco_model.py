@@ -267,9 +267,48 @@ def test_ein_fremder_anbieter_ergibt_keinen_geraetepreis():
 
 def test_ein_fremder_tarif_ergibt_keinen_geraetepreis():
     """Sonst misst die Differenz den Tarifunterschied und nennt ihn
-    Geraetepreis."""
+    Geraetepreis.
+
+    Seit dem 04.09.2026 entscheidet der `tarif_id`, nicht der Name - der
+    Name ist, was auf der jeweiligen Seite stand, die ID ist der
+    aufgeloeste Fremdschluessel.
+    """
     with pytest.raises(ValueError, match="Tarifen"):
-        geraeteanteil(_buendel(), _referenz(tarif_name="o2 Mobile L"))
+        geraeteanteil(_buendel(), _referenz(tarif_id="o2:o2-mobile-l",
+                                            tarif_name="o2 Mobile L"))
+
+
+def test_zwei_namen_fuer_denselben_tarif_rechnen_trotzdem():
+    """Der Fall, wegen dem die Regel auf die ID umgestellt wurde.
+
+    o2 nennt denselben Tarif im Geraetekatalog "O2 Mobile on Demand M Plus
+    mit 50 GB+ (24 Mon.)" und in der SIM-only-Kachel "O2 Mobile on Demand
+    M". Ueber den Namen verglichen waeren das zwei Tarife, und der
+    Geraeteanteil - die Zahl, wegen der dieses Modul existiert - bliebe
+    fuer JEDES o2-Buendel leer.
+    """
+    ergebnis = geraeteanteil(
+        _buendel(tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"),
+        _referenz(tarif_name="O2 Mobile on Demand M"))
+    assert ergebnis.betrag is not None
+    # Gegenprobe, dass der Fall ohne die Regel wirklich eintraete: ohne IDs
+    # auf beiden Seiten faellt derselbe Aufruf wieder auf den Namen zurueck.
+    with pytest.raises(ValueError, match="Tarifen"):
+        geraeteanteil(
+            _buendel(tarif_id="",
+                     tarif_name="O2 Mobile on Demand M Plus mit 50 GB+"),
+            _referenz(tarif_id="", tarif_name="O2 Mobile on Demand M"))
+
+
+def test_ohne_ids_bleibt_der_name_die_pruefung():
+    """Der Rueckfall fuer Saetze, die keinen Fremdschluessel tragen."""
+    ergebnis = geraeteanteil(_buendel(tarif_id=""), _referenz(tarif_id=""))
+    assert ergebnis.betrag is not None
+    # Eine HALB gefuellte Paarung faellt ebenfalls auf den Namen zurueck -
+    # ein Vergleich "ID gegen nichts" waere immer ungleich und schaltete
+    # den Geraeteanteil stillschweigend ab.
+    ergebnis = geraeteanteil(_buendel(), _referenz(tarif_id=""))
+    assert ergebnis.betrag is not None
 
 
 def test_die_sim_only_referenz_rechnet_ueber_denselben_weg():

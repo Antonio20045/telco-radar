@@ -506,6 +506,25 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     Geraetepreis. Das ist ein Fehler im Aufruf und keine Datenluecke,
     deshalb faellt er als Ausnahme auf und nicht als Luecke.
 
+    WORAN "DERSELBE TARIF" GEMESSEN WIRD (geaendert am 04.09.2026)
+    --------------------------------------------------------------
+    Zuerst am `tarif_id`, und nur ersatzweise am Namen. Der Name ist, was
+    auf der jeweiligen Seite stand; die ID ist der aufgeloeste
+    Fremdschluessel auf `data/state/tarife.jsonl`, und ihn zu haben ist bei
+    einem Buendel ohnehin Bedingung (`TcoDB.upsert_buendel`).
+
+    Der Unterschied ist an o2 gemessen: der Geraetekatalog nennt seinen
+    Tarif "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)", die
+    SIM-only-Kachel desselben Tarifs heisst "O2 Mobile on Demand M". Ueber
+    den Namen verglichen sind das zwei Tarife, und der Geraeteanteil - die
+    Zahl, wegen der dieses Modul existiert - bliebe fuer JEDES o2-Buendel
+    leer. Ueber die ID sind es zwei Fassungen desselben Vertrags, und zwar
+    weil o2 das selbst so verlinkt (`tarif_bezug.ueber_slug`).
+
+    Der Namensvergleich bleibt als Rueckfall fuer Saetze OHNE ID stehen -
+    und er bleibt eine Ausnahme und keine Luecke: zwei verschiedene Tarife
+    gegeneinander zu rechnen ist ein Fehler im Aufruf.
+
     Die Luecken beider Seiten werden zusammengefuehrt und WEITERGEREICHT:
     fehlt auf einer Seite der Anschlusspreis, ist die Differenz nur so gut
     wie die schlechtere der zwei Rechnungen.
@@ -514,7 +533,12 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
         raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
                          f"verschiedenen Anbietern: {buendel.anbieter!r} / "
                          f"{referenz.anbieter!r}")
-    if normalisiere(buendel.tarif_name) != normalisiere(referenz.tarif_name):
+    ids = ((buendel.tarif_id or "").strip(), (referenz.tarif_id or "").strip())
+    if all(ids):
+        if ids[0] != ids[1]:
+            raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
+                             f"verschiedenen Tarifen: {ids[0]!r} / {ids[1]!r}")
+    elif normalisiere(buendel.tarif_name) != normalisiere(referenz.tarif_name):
         raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
                          f"verschiedenen Tarifen: {buendel.tarif_name!r} / "
                          f"{referenz.tarif_name!r}")

@@ -1721,6 +1721,119 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (04.09.2026, mittags): Phase S — die Bündel stehen,
+> und die Telekom-Schnittstelle ist gemessen statt vermutet.**
+> Auftragsgrundlage: `PHASE_S_BRIEF.md`, Messungen und Belege in
+> `docs/STRATEGY_GERAETE_TCO.md § 14`. Stand danach: **2564 Tests grün**,
+> 14 skipped, **2 rot** (die vorbestehenden Promo-Screenshot-Tests).
+>
+> **`geraete_tco.json` trägt nicht mehr `buendel: 0`, sondern 62 Bündel
+> und 37 SIM-only-Referenzen.** Die Lücke war kein fehlender Anbieter,
+> sondern eine ungelesene Antwort:
+>
+> | Adresse | Antwort | Zustand |
+> |---|---|---|
+> | `…/__not-specified__?hwOnly=true` | 537 KB, 95 Geräte | `HW_ONLY` (bisher) |
+> | `…/__not-specified__` | 583 KB, 88 Geräte, `bundle` gefüllt | `BUNDLE` (neu) |
+>
+> **Beide Adressen gibt `/e-shop/` in seiner eigenen Nutzlast aus**, und die
+> Antwort nennt ihren Zustand selbst
+> (`hwCatalogSwitcherStateValue.hwOnlyOrBundleState`, `showSwitcher: true`).
+> Kein Parameter ist geraten.
+>
+> **Ein Trackingfeld ist kein Preisfeld.** Die Aufteilung in Geräterate und
+> Tarifbetrag steht bei o2 nur in `ecommerceProductValue.attributes`
+> (`metric3`/`metric2`). Geglaubt wird ihr nur, was sich gegen die
+> TYPISIERTEN Zahlen derselben Antwort nachrechnen lässt — drei Proben, alle
+> drei Bedingung statt Protokoll, alle drei **66 von 66**:
+> `metric3 + metric2 == monthlyPrice`, `metric5 == oneTimePrice`,
+> `metric4 == activationFee`. Gegengeprüft an acht Produktseiten, die o2
+> selbst verlinkt: deren serverseitiger `pdp:PriceSummaryValue` nennt
+> dieselben Beträge („Gerät mtl. (36 Raten): 34,00 €", „Tarif mtl.
+> (Mindestlaufzeit 24 Monate): 14,99 €") — 7 von 7 auf den Cent. **Im
+> Betrieb werden diese Seiten NICHT abgerufen**: 66 Seiten à ~950 KB für
+> eine Aufteilung, die in der einen Katalogantwort schon steht.
+>
+> **`kind: buendel` ist eine zweite LESART, keine dritte Abrufart.** Die
+> Sätze gehen an der Listungsstrecke vorbei nach `geraete_tco.json` — ein
+> Bündelmonatspreis in der Spalte eines Kassenpreises war der Befund, mit
+> dem dieses Vorhaben angefangen hat. `Adapter.lies_buendel` +
+> `Anbieterbilanz.buendel` + `analyze/tco_buendel.py`; der Adapter ist
+> anbieterunabhängig gebaut, nur der Leser ist o2-eigen.
+>
+> **Ohne o2-Tarife wäre kein einziges Bündel in den Bestand gekommen**
+> (`upsert_buendel` nimmt keinen Gerätepreis ohne auflösbaren Tarif). Der
+> o2-Bestand kannte drei Tarife, keiner davon einer der beiden, die o2 heute
+> mit Gerät verkauft. Die zwei üblichen Wege gibt es dort nicht: die
+> SIM-only-Seite trägt genau ein ld+json (eine `BreadcrumbList`), die
+> Rechtsseite verlinkt drei PDFs (eines mobil), und **die übrigen
+> Pflichtblätter liegen unter `/assets/` — ein Pfad, den die für uns gültige
+> robots-Gruppe sperrt. Sie werden nicht geholt.** Neu deshalb
+> `methode: kacheln` (`collect/tarif_kacheln.py`): zwölf Preiskacheln, die
+> o2 selbst als solche auszeichnet, mit `preistyp: live_shop`.
+> **Die Gegenprobe, die der Lesart ihr Vertrauen gibt:** „O2 Mobile
+> Unlimited M Flex" steht mit 39,99 € aus dem Produktinformationsblatt im
+> Bestand — die Kachel nennt denselben Betrag. Bestand jetzt **44 Tarife**
+> (Telekom 9, Vodafone 10, congstar 10, o2 15).
+>
+> **Die Brücke ist ein Slug, keine Ähnlichkeit.** Der Katalog nennt seinen
+> Tarif „O2 Mobile on Demand M **Plus** mit 50 GB+ (24 Mon.)", die Kachel
+> heißt „O2 Mobile on Demand M" — über den Namen löst das nichts auf, und
+> das ist richtig so. Die Kachel verlinkt unter „Handy hinzufügen"
+> `?tarif=o2-mobile-on-demand-m-plus`, und derselbe Slug steht im Katalog am
+> Bündel (`dimension59`). `tarif_bezug.ueber_slug`, Güte **`hoch`**:
+> der Anbieter stellt die Verbindung her, wir lesen sie nach. Reihenfolge in
+> `loese()`: **Name → Slug → Betrag**.
+>
+> **Ein Befund kam erst aus dem ersten Livelauf:** Blatt und Kachel tragen
+> dieselbe Tarif-ID, also wurde der Kachelsatz zur nächsten **Fassung** des
+> Pflichtblattes — und `vergleiche` meldete als Tarifänderung, was der
+> Unterschied zwischen einem PDF und einer Werbeseite ist. Zwei Lesarten
+> sind zwei Zeitreihen; `uebernimm_stand` hängt dem zweiten `#live_shop` an.
+> **Der Zusatz ist der Preistyp und kein Inhaltshash** — ein Hash änderte
+> sich mit jeder Preisänderung, und die Zeitreihe zerfiele in Einzelsätze.
+>
+> **Schritt 2 des Auftrags endet mit einer Absage, und diesmal mit Grund**
+> (§ 14.4). `BFF_EXT = /shop/api/eshop/bff-de` **existiert**: `/bff-de/`
+> antwortet `application/json` (HTTP 500, `DT_UNKNOWN_ERROR`), ohne
+> Schrägstrich 302 auf eine clusterinterne Adresse
+> (`…svc.cluster.local:8050`); `/content/robots` sperrt den Pfad nicht.
+> Gebaut wird trotzdem nichts: **keine Seite dieses Shops nennt eine
+> konkrete Tarif-Ressource darunter** — nur `bff-de` (Basis) und `builder`
+> (HTTP 401). Sie zu erraten wäre Pfad-Kombinatorik. Der einzige Ort, an dem
+> sie stünden, ist das JS-Bündel auf `static.eshop.telekom.de`, und dessen
+> **robots.txt antwortet mit HTTP 403** — nach der eigenen Regel dieses
+> Projekts („404 heißt keine Regeln, 403 heißt nicht anfassen",
+> `geraete_pipeline._hole_fabrik`) ist der Host damit gesperrt. Die
+> Telekom-Tarife bleiben bei ihren PIB-Dokumenten.
+>
+> **OFFEN:**
+> 1. **Ein Bündel wird jede Nacht verworfen**: der Promo-Tarif „O2 Mobile on
+>    Demand M" (ohne „Plus") steht in keiner SIM-only-Kachel. Richtige
+>    Folge, keine Lücke — aber wenn die Zahl steigt, ist die Arbeitsliste
+>    `config/tarif_quellen.yaml`; das Protokoll nennt die Namen
+>    (`Buendel: … ohne aufloesbaren Tarif`).
+> 2. **Der Tarifbetrag im Bündel ist niedriger als der der SIM-only-Kachel**
+>    (14,99 gegen 19,99 €). o2 nennt das selbst einen Rabatt auf den Tarif
+>    über die Laufzeit des Ratenplans. Beide Zahlen stehen gemessen im
+>    Bestand; daraus ein `Rabatt`-Objekt zu machen wäre eine Deutung. Die
+>    Differenz IST die Auskunft — `Geraeteanteil` rechnet sie.
+> 3. **Nur o2 liefert Bündel.** Vodafone, congstar, Telekom und 1&1 brauchen
+>    je einen eigenen `lies_buendel`. 1&1s Monatspreis (§ 13.2) trägt **keine**
+>    Aufteilung in Geräterate und Tarif; ein Bündel daraus wäre gerechnet.
+> 4. **Templates unverändert (Phase R).** Der Phase-Q-Befund bleibt: die
+>    Geräteseite kennt zwei Preisarten und zeigt 1&1s Bündelmonatspreis als
+>    „ohne Preis".
+> 5. **Ein drittes vorbestehendes Rot war da und ist behoben:**
+>    `test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden`
+>    fiel mit `KeyError: 'preis_ohne_vertrag'` aus, seit es Listungen ohne
+>    Barpreis gibt (1&1 verkauft nur im Bündel). Der Test las das Feld hart
+>    statt mit `.get()` — er warf also eine Ausnahme, statt eine Aussage über
+>    die Bereinigung zu treffen.
+> 6. **`config/settings.yaml → http.user_agent` ist weiterhin eine
+>    Chrome-Kennung** (Beobachtung aus Phase Q, PM-Entscheidung steht aus).
+>    Alle Messungen dieser Phase sind mit `TelcoRadar/1.0` gemacht.
+
 > **Zuletzt erledigt (04.09.2026, ~03:20): der Bergungslauf nach Phase 6.**
 > Der Lauf davor endete um 03:06 an seinem Turn-Limit — mitten in einer
 > Änderung, ohne Abschluss und ohne Push. Geborgen wurde sein letzter Befund

@@ -47,7 +47,8 @@ from __future__ import annotations
 import logging
 
 from . import geraete_vergleich
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung
+from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
+                             normalisiere)
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
                          POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
                          _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ, Buendel,
@@ -532,9 +533,31 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     referenzen = _aus_speicher(referenzen, SimOnlyReferenz, _REFERENZ_FELDER)
 
     referenz_je_schluessel = {}
+    # ZWEITER Index ueber (Anbieter, tarif_id). Er ist der Weg, der bei o2
+    # ueberhaupt trifft: die SIM-only-Kachel heisst "O2 Mobile on Demand M",
+    # der Geraetekatalog nennt denselben Tarif "…M Plus mit 50 GB+
+    # (24 Mon.)", und `sim_only_id` schluesselt auf den NAMEN. Ueber den
+    # Namen bliebe der Geraeteanteil fuer jedes o2-Buendel leer.
+    #
+    # Ein Anbieter, der zu EINER Tarif-ID zwei Referenzen fuehrt, bekommt
+    # keine: zwei Massstaebe sind kein schwacher Massstab, sondern gar
+    # keiner - dieselbe Regel wie in `tarif_bezug.ueber_betrag`. Vodafone
+    # veroeffentlicht jeden Tarif zweimal, der Fall ist real.
+    referenz_je_id: dict[tuple, object] = {}
+    mehrdeutig: set = set()
     for r in referenzen:
-        if isinstance(r, SimOnlyReferenz):
-            referenz_je_schluessel[r.id] = r
+        if not isinstance(r, SimOnlyReferenz):
+            continue
+        referenz_je_schluessel[r.id] = r
+        if (r.tarif_id or "").strip():
+            schluessel = (normalisiere(r.anbieter), r.tarif_id.strip())
+            if schluessel in referenz_je_id:
+                mehrdeutig.add(schluessel)
+            referenz_je_id[schluessel] = r
+    for schluessel in mehrdeutig:
+        log.info("SIM-only-Massstab fuer %s ist nicht eindeutig (%s) - "
+                 "kein Geraeteanteil", schluessel[1], schluessel[0])
+        referenz_je_id.pop(schluessel, None)
 
     # sku_id -> (device_id, speicher). Beides steht an der Listung; ein
     # Buendel traegt nur die `sku_id`, und der Katalogname haengt an der
@@ -552,8 +575,14 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             # Eine SIM-only-Zeile ist kein Angebot dieser Tafel, sondern der
             # Massstab dahinter. Sie steht in `referenzen`.
             continue
+        # Erst der Name, dann die ID - dieselbe Rangfolge wie in
+        # `tarif_bezug.loese`: was auf der Seite stand, schlaegt die
+        # aufgeloeste Zuordnung, wenn beide etwas sagen.
         referenz = referenz_je_schluessel.get(
             sim_only_id(b.anbieter, b.tarif_name))
+        if referenz is None and (b.tarif_id or "").strip():
+            referenz = referenz_je_id.get(
+                (normalisiere(b.anbieter), b.tarif_id.strip()))
         zeilen.append(_zeile(b, referenz, katalog, geraet_je_sku))
 
     zeilen.sort(key=lambda z: (not z["belastbar"], z["gesamt"] is None,

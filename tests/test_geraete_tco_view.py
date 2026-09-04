@@ -590,3 +590,92 @@ def test_eine_referenz_ohne_betrag_macht_den_tarifpreis_nicht_erledigt():
     d = aufbereiten([], [_ref(tarif_sim_only_monatlich=None)], [], None)
     assert d["referenzen"] == [] and d["referenzen_gesamt"] == 0
     assert POSTEN_TARIF in {p["name"] for p in d["offene_posten"]}
+
+
+# --------------------------------------------------------------------------
+# Der Massstab ueber den Fremdschluessel
+# --------------------------------------------------------------------------
+# `sim_only_id` schluesselt auf den NAMEN, und bei o2 heisst derselbe Tarif
+# auf den zwei Seiten verschieden. Ohne den zweiten Index bliebe der
+# Geraeteanteil fuer jedes o2-Buendel leer.
+
+def _o2_buendel(**kw):
+    satz = {"id": "buendel--o2--iphone--plus", "sku_id": "iphone-15-pro-128gb",
+            "anbieter": "o2",
+            "tarif_name": "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+            "tarif_id": "o2:o2-mobile-on-demand-m", "tarif_id_guete": "hoch",
+            "tarif_monatlich": 14.99, "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 34.0, "laufzeit_monate": 36,
+            "anschlusspreis": 39.99, "abgerufen_am": "2026-09-04",
+            "quelle_url": "https://www.o2online.de/e-shop/x"}
+    satz.update(kw)
+    return satz
+
+
+def _o2_referenz(**kw):
+    satz = {"id": "simonly--o2--o2-mobile-on-demand-m", "anbieter": "o2",
+            "tarif_name": "O2 Mobile on Demand M",
+            "tarif_id": "o2:o2-mobile-on-demand-m", "tarif_id_guete": "hoch",
+            "tarif_sim_only_monatlich": 19.99, "anschlusspreis": 39.99,
+            "abgerufen_am": "2026-09-04",
+            "quelle_url": "https://www.o2online.de/tarife/"}
+    satz.update(kw)
+    return satz
+
+
+def _o2_listung():
+    return [{"sku_id": "iphone-15-pro-128gb", "device_id": "apple-iphone-15-pro",
+             "speicher_gb": 128, "anbieter": "o2", "status": "aktiv",
+             "preis_ohne_vertrag": 1099.0, "zustand": "neu"}]
+
+
+def test_der_massstab_wird_ueber_den_tarif_id_gefunden():
+    """Der Name trifft nicht - und genau deshalb gibt es den zweiten Index.
+
+    Gegenprobe im selben Test: nimmt man dem Buendel seine ID, findet die
+    Zuordnung nichts mehr. Sonst bewiese der Test nur, dass irgendetwas
+    einen Geraeteanteil liefert.
+    """
+    daten = aufbereiten([_o2_buendel()], [_o2_referenz()], _o2_listung(),
+                        katalog=None)
+    zeile = daten["zeilen"][0]
+    # 1,00 + 24 x 34,00 + 24 x 14,99 + 39,99 = 1216,75
+    # SIM-only: 24 x 19,99 + 39,99 = 519,75  ->  Differenz 697,00
+    assert abs(zeile["gesamt"] - 1216.75) < 0.005
+    assert abs(zeile["geraeteanteil"] - 697.0) < 0.005
+
+    ohne = aufbereiten([_o2_buendel(tarif_id="")], [_o2_referenz()],
+                       _o2_listung(), katalog=None)
+    assert ohne["zeilen"][0]["geraeteanteil"] is None
+
+
+def test_zwei_referenzen_zu_einer_tarif_id_ergeben_keinen_massstab():
+    """Zwei Massstaebe sind kein schwacher Massstab, sondern gar keiner.
+
+    Vodafone veroeffentlicht jeden Tarif zweimal (mit und ohne
+    Geraetestaffel) - der Fall ist real, nicht konstruiert.
+    """
+    daten = aufbereiten(
+        [_o2_buendel()],
+        [_o2_referenz(),
+         _o2_referenz(id="simonly--o2--o2-mobile-on-demand-m-zweitfassung",
+                      tarif_name="O2 Mobile on Demand M Zweitfassung",
+                      tarif_sim_only_monatlich=24.99)],
+        _o2_listung(), katalog=None)
+    assert daten["zeilen"][0]["geraeteanteil"] is None
+
+
+def test_der_name_schlaegt_den_fremdschluessel():
+    """Dieselbe Rangfolge wie in `tarif_bezug.loese`.
+
+    Trifft der Name, wird er genommen - auch wenn eine zweite Referenz
+    dieselbe ID traegt.
+    """
+    gleichnamig = _o2_referenz(
+        id="simonly--o2--o2-mobile-on-demand-m-plus-mit-50-gb-24-mon",
+        tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        tarif_sim_only_monatlich=9.99)
+    daten = aufbereiten([_o2_buendel()], [gleichnamig, _o2_referenz()],
+                        _o2_listung(), katalog=None)
+    # Ueber den Namen: SIM-only 24 x 9,99 + 39,99 = 279,75 -> 937,00
+    assert abs(daten["zeilen"][0]["geraeteanteil"] - 937.0) < 0.005
