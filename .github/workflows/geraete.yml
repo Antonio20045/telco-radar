@@ -117,10 +117,18 @@ jobs:
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
-          # Gezielt nur die zwei Dateien dieser Stufe. Kein `git add data/`:
+          # Gezielt nur die drei Dateien dieser Stufe. Kein `git add data/`:
           # dieser Lauf hat mit dem Seen-Store und den Berichten nichts zu
           # tun, und ein weiter Pfad wuerde fremde Aenderungen mitnehmen.
-          git add data/state/geraete_db.json data/state/geraete_preise.jsonl
+          #
+          # `geraete_tco.json` steht seit dem 04.09.2026 dabei. Ohne diese
+          # Zeile schriebe der Lauf die SIM-only-Referenzen zwar in den
+          # Runner - die Seite entstuende also richtig -, aber die Datei
+          # selbst kaeme nie im Repo an. Solange die Referenzen abgeleitet
+          # sind, faellt das nicht auf; sobald ein Adapter BUENDEL liefert
+          # (Phase 4), waere jede Nacht die Messung der vorigen weg.
+          git add data/state/geraete_db.json data/state/geraete_preise.jsonl \
+                  data/state/geraete_tco.json
           if git diff --cached --quiet; then
             echo "Keine Aenderung am Geraetebestand."
             exit 0
