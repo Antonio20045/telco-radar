@@ -38,7 +38,12 @@ _ANZAHLUNG, _RATE, _GESAMT = 1.0, 30.0, 721.0
 def _buendel(**kw) -> Buendel:
     """Ein vollstaendiges Buendel; jeder Test aendert nur, was er misst."""
     felder = dict(sku_id="apple-iphone-14-128gb-mitternacht", anbieter="o2",
-                  tarif_name="o2 Mobile M", tarif_monatlich=29.99,
+                  tarif_name="o2 Mobile M",
+                  # Seit Phase 6 traegt ein Buendel den Fremdschluessel auf
+                  # `data/state/tarife.jsonl` - ohne ihn nimmt `TcoDB` einen
+                  # Geraetepreis nicht mehr auf.
+                  tarif_id="o2:o2-mobile-m", tarif_id_guete="hoch",
+                  tarif_monatlich=29.99,
                   geraet_zuzahlung=_ANZAHLUNG, geraet_monatsrate=_RATE,
                   laufzeit_monate=24, anschlusspreis=39.99,
                   quelle_url="https://www.o2online.de/tarife/mobile-m",
@@ -49,6 +54,7 @@ def _buendel(**kw) -> Buendel:
 
 def _referenz(**kw) -> SimOnlyReferenz:
     felder = dict(anbieter="o2", tarif_name="o2 Mobile M",
+                  tarif_id="o2:o2-mobile-m", tarif_id_guete="hoch",
                   tarif_sim_only_monatlich=19.99, anschlusspreis=39.99,
                   quelle_url="https://www.o2online.de/tarife/mobile-m-sim",
                   abgerufen_am="2026-09-03")
@@ -539,3 +545,108 @@ def test_der_echte_bestand_behaelt_jede_id_und_jeden_betrag(tmp_path):
     assert len(vorher["listungen"]) > 100, "der Bestand ist unerwartet duenn"
     assert _nach_id(danach["listungen"]) == _nach_id(vorher["listungen"])
     assert original.read_bytes() == unberuehrt, "data/state/ angefasst"
+
+
+# --------------------------------------------------------------------------
+# Der Fremdschluessel (Phase 6, Abnahmekriterium 3)
+# --------------------------------------------------------------------------
+
+def test_ein_geraetepreis_ohne_tarif_id_kommt_nicht_in_den_bestand(tmp_path):
+    """"Kein Buendelpreis im Bestand ohne aufloesbaren tarif_id."
+
+    Die Regel sitzt am SPEICHER und nicht am Datensatz: ein Buendel zu
+    bauen und festzustellen, dass sein Tarif nicht aufloest, ist ein
+    gueltiger Zwischenschritt - es abzulegen waere eine Zahl, deren
+    Bezugsgroesse niemand nachschlagen kann.
+    """
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    with pytest.raises(ValueError, match="ohne aufloesbaren Tarif"):
+        db.upsert_buendel([_buendel(tarif_id="")], "2026-09-04")
+    # Und die Gegenprobe: MIT Schluessel geht dasselbe Buendel durch.
+    # Ohne sie bewiese der Test nur, dass irgendetwas wirft.
+    neu, _ = db.upsert_buendel([_buendel()], "2026-09-04")
+    assert neu == 1
+
+
+def test_eine_sim_only_zeile_braucht_keinen_geraetepreis_und_keinen_schluessel(
+        tmp_path):
+    """Die Sperre gilt dem GERAETEpreis, nicht jedem Datensatz.
+
+    Ein Buendel ohne Geraet traegt keine Zuzahlung und keine Rate - es gibt
+    dort keine Zahl, deren Bezug fehlen koennte.
+    """
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    ohne = _buendel(sku_id="", tarif_id="", geraet_zuzahlung=None,
+                    geraet_monatsrate=None)
+    neu, _ = db.upsert_buendel([ohne], "2026-09-04")
+    assert neu == 1
+
+
+def test_der_schluessel_ueberlebt_das_schreiben_und_lesen(tmp_path):
+    """Sonst stuende er im Datensatz und nicht in der Datei - und die
+    naechste Sitzung faende einen Bestand ohne Bezug."""
+    pfad = tmp_path / "geraete_tco.json"
+    db = TcoDB(pfad)
+    db.upsert_buendel([_buendel(tarif_id="o2:o2-mobile-m",
+                                tarif_id_guete="mittel")], "2026-09-04")
+    db.setze_referenzen([_referenz()], "2026-09-04")
+    db.save("2026-09-04")
+
+    wieder = TcoDB(pfad)
+    assert wieder.buendel()[0]["tarif_id"] == "o2:o2-mobile-m"
+    assert wieder.buendel()[0]["tarif_id_guete"] == "mittel"
+    assert wieder.referenzen()[0]["tarif_id"] == "o2:o2-mobile-m"
+
+
+def test_die_referenz_reicht_ihren_schluessel_an_ihr_buendel_weiter():
+    """`als_buendel()` ist derselbe Datensatz in anderer Form.
+
+    Verloere er dabei den Schluessel, waere die SIM-only-Zeile im selben
+    Bestand plotzlich beziehungslos - und `tco_24` rechnete gegen einen
+    Tarif, den niemand nachschlagen kann.
+    """
+    b = _referenz(tarif_id="o2:o2-mobile-m", tarif_id_guete="hoch").als_buendel()
+    assert b.tarif_id == "o2:o2-mobile-m"
+    assert b.tarif_id_guete == "hoch"
+
+
+def test_der_referenzbestand_wird_ersetzt_und_waechst_nicht(tmp_path):
+    """Abgeleitete Daten werden neu gesetzt, nicht ergaenzt.
+
+    Am 04.09.2026 gemessen: nach zwei Laeufen standen 40 Referenzen zu 32
+    Tarifen auf der Seite - fuenfzehn davon zu Tarifnamen, die es im
+    Bestand nicht mehr gab. Beide Laeufe hatten fuer sich richtig
+    gerechnet; aufgefallen ist es beim ANSEHEN der Tafel.
+    """
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    db.setze_referenzen([_referenz(tarif_name="Alter Name")], "2026-09-04")
+    neu, entfernt = db.ersetze_referenzen(
+        [_referenz(tarif_name="Neuer Name")], "2026-09-04")
+    assert (neu, entfernt) == (1, 1)
+    assert [r["tarif_name"] for r in db.referenzen()] == ["Neuer Name"]
+
+
+def test_zweimal_dasselbe_ersetzen_entfernt_nichts(tmp_path):
+    """Der Normalfall des naechtlichen Laufs: nichts hat sich geaendert.
+
+    Ohne diese Zeile bewiese der Test darueber nur, dass etwas geloescht
+    wird - nicht, dass unveraenderte Referenzen stehen bleiben.
+    """
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    db.ersetze_referenzen([_referenz()], "2026-09-04")
+    neu, entfernt = db.ersetze_referenzen([_referenz()], "2026-09-05")
+    assert (neu, entfernt) == (0, 0)
+    assert db.referenzen()[0]["last_verified"] == "2026-09-05"
+
+
+def test_das_ersetzen_laesst_die_buendel_unberuehrt(tmp_path):
+    """Ein Buendel ist eine MESSUNG und wird nie stillschweigend geloescht.
+
+    Die Trennung ist der ganze Punkt: die Referenzen leitet dieses Projekt
+    aus `tarife.jsonl` ab, die Buendel misst es bei einem Anbieter.
+    """
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    db.upsert_buendel([_buendel()], "2026-09-04")
+    db.ersetze_referenzen([], "2026-09-04")
+    assert len(db.buendel()) == 1
+    assert db.referenzen() == []

@@ -105,7 +105,7 @@
     {% for p in tarife.karte.punkte %}
     <circle cx="{{ p.cx }}" cy="{{ p.cy }}" r="{{ 7 if p.eigen else 5 }}"
             class="t-punkt{% if p.eigen %} t-punkt--eigen{% endif %}">
-      <title>{{ p.anbieter }} {{ p.name }} · {{ '%.2f'|format(p.effektiv) }} € effektiv{% if p.ueber_linie is not none %} · {{ '%+.2f'|format(p.ueber_linie) }} € gegenüber dem Üblichen{% endif %}</title>
+      <title>{{ p.anbieter }} {{ p.name }} · {{ '%.2f'|format(p.effektiv)|replace('.', ',') }} € effektiv{% if p.ueber_linie is not none %} · {{ '%+.2f'|format(p.ueber_linie)|replace('.', ',') }} € gegenüber dem Üblichen{% endif %}</title>
     </circle>
     {% endfor %}
   </svg>
@@ -135,15 +135,15 @@
     </div>
     <div class="t-werte">
       <span class="t-wert">
-        <b>{% if z.effektiv is not none %}{{ '%.2f'|format(z.effektiv) }} €{% else %}—{% endif %}</b>
+        <b>{% if z.effektiv is not none %}{{ '%.2f'|format(z.effektiv)|replace('.', ',') }} €{% else %}—{% endif %}</b>
         <i>effektiv je Monat</i>
       </span>
       <span class="t-wert">
-        <b>{% if z.unbegrenzt %}unbegrenzt{% elif z.je_gb is not none %}{{ '%.2f'|format(z.je_gb) }} €{% else %}—{% endif %}</b>
+        <b>{% if z.unbegrenzt %}unbegrenzt{% elif z.je_gb is not none %}{{ '%.2f'|format(z.je_gb)|replace('.', ',') }} €{% else %}—{% endif %}</b>
         <i>{% if z.unbegrenzt %}Datenvolumen{% else %}je Gigabyte{% endif %}</i>
       </span>
       <span class="t-wert">
-        <b>{% if z.grundgebuehr is not none %}{{ '%.2f'|format(z.grundgebuehr) }} €{% else %}—{% endif %}</b>
+        <b>{% if z.grundgebuehr is not none %}{{ '%.2f'|format(z.grundgebuehr)|replace('.', ',') }} €{% else %}—{% endif %}</b>
         <i>Listenpreis</i>
       </span>
     </div>

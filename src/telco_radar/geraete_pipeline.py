@@ -34,6 +34,9 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from .analyze.geraete_store import GeraeteDB, Preishistorie
+from .analyze.tarif_referenzen import aus_bestand
+from .analyze.tco_store import TcoDB
+from .tarif_bezug import Tarifbestand
 from .collect.geraete import sammle
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
@@ -152,6 +155,42 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     historie.save()
     db.save(heute)
 
+    # --- Der Massstab aus dem Tarifbestand.
+    #
+    # `geraete_tco.json` gab es bis zum 04.09.2026 nicht: null Buendel, null
+    # SIM-only-Referenzen, also keine einzige rechenbare TCO. Die Buendel
+    # bleiben offen (sie brauchen einen Adapter, der Zuzahlung UND Tarif
+    # ausweist, Phase 4) - die Referenzen aber nicht: was ein Tarif OHNE
+    # Geraet kostet, steht seit Phase 6 belegt in `tarife.jsonl`.
+    #
+    # Das steht HIER und nicht im Renderer. Eine Zahl, die beim Rendern
+    # entsteht, ist keine Messung, sondern eine Ableitung - und zwei
+    # Ableitungen derselben Zahl an zwei Orten sind zwei Zahlen. Der
+    # naechtliche Lauf ist der Ort, an dem der Geraetebestand entsteht;
+    # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
+    referenzen: list = []
+    tarife = 0
+    try:
+        bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
+        tarife = len(bestand)
+        referenzen = aus_bestand(bestand)
+        tco = TcoDB(zustand / "geraete_tco.json")
+        # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
+        # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
+        # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
+        _, entfernt = tco.ersetze_referenzen(referenzen, heute)
+        if entfernt:
+            log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
+                     "entfernt", entfernt)
+        tco.save(heute)
+    except Exception as exc:  # noqa: BLE001
+        # Ein Fehler hier darf den Geraetebestand nicht kosten - der ist
+        # zu diesem Zeitpunkt schon gespeichert, und ein Messtag ist nicht
+        # nachholbar (Lauf 31422689829).
+        log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
+    log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen",
+             len(referenzen), tarife)
+
     kollisionen = list(getattr(db, "kollisionen", []))
     bilanz = {
         "status": "ok",
@@ -169,6 +208,11 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "unbekannte_farben": sorted({f for b in ergebnis["anbieter"]
                                      for f in b.unbekannte_farben})[:40],
         "kollisionen": len(kollisionen),
+        # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
+        # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`
+        # gefuellt ist, hat der Schreibversuch geworfen.
+        "sim_only_referenzen": len(referenzen),
+        "tarife_im_bestand": tarife,
         "sekunden": round(time.monotonic() - beginn, 1),
     }
     log.info("Geraeteradar: %d Anbieter abgefragt, %d Listungen (%d neu), "

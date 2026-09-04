@@ -164,7 +164,15 @@ def tarif_id(anbieter: str, name: str) -> str:
     """
     name = re.sub(r"\((?:19|20)\d{2}\)", " ", name or "")
     name = re.sub(r"\b(?:19|20)\d{2}\b", " ", name)
-    name = re.sub(r"\((?:Mobilfunk|Festnetz)\)", " ", name, flags=re.I)
+    # Die Dokumentgattung in Klammern gehoert nicht zum Tarifnamen.
+    # congstar schreibt "Allnet Flat L (Postpaid Mobilfunk)", die Telekom
+    # "MagentaMobil L (Mobilfunk)" - beides ist eine Einordnung des
+    # BLATTES, keine Produktbezeichnung. Ohne "Postpaid"/"Prepaid" in
+    # dieser Zeile hiess congstars stabiler Schluessel
+    # `congstar:allnet-flat-l-postpaid-mobilfunk`, und eine Tarifangabe
+    # "Allnet Flat L" von einer Produktseite traf ihn nie.
+    name = re.sub(r"\((?:(?:Post|Pre)paid\s+)?(?:Mobilfunk|Festnetz)\)",
+                  " ", name, flags=re.I)
     schlank = re.sub(r"[^a-z0-9]+", "-",
                      name.lower().replace("ä", "ae").replace("ö", "oe")
                      .replace("ü", "ue").replace("ß", "ss")).strip("-")

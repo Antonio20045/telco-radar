@@ -336,6 +336,35 @@
      § 8). Heute traegt sie ihre Luecke - null Buendel, weil kein Adapter
      Tarifpreise sammelt. Sie zeigt deshalb, WAS schon gemessen ist und was
      fehlt, statt aus einem Geraetepreis eine Gesamtsumme zu runden. #}
+{# Die Referenztabelle steht an ZWEI Orten (offen und im Aufklapper).
+   Als Makro, nicht als zwei Kopien: zwei Kopien einer Tabelle sind zwei
+   Tabellen, und die zweite wird beim naechsten Umbau vergessen. #}
+{% macro referenztabelle(zeilen) %}
+<table class="gr-ttab gr-ttab--simonly">
+  <thead><tr>
+    <th scope="col">Anbieter und Tarif</th>
+    <th scope="col">je Monat</th>
+    <th scope="col">über {{ geraete.tco.horizont }} Monate</th>
+    <th scope="col">Beleg</th>
+  </tr></thead>
+  <tbody>
+  {% for r in zeilen %}
+  <tr{% if r.eigen %} class="gr-tzeile--eigen"{% endif %}>
+    <td><span class="gr-t-anbieter">{{ r.anbieter }}</span>
+        <span class="gr-a-klein">{{ r.tarif }}</span></td>
+    <td>{{ '%.2f'|format(r.monatlich)|replace('.', ',') }} €</td>
+    <td>{{ '%.2f'|format(r.ueber_horizont)|replace('.', ',') }} €</td>
+    <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
+          rel="nofollow noopener" target="_blank">Produktinformationsblatt</a>{%
+        else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
+        {% if r.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
+          r.abgerufen_am | date_de }}</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
 <div class="gr-tafel gr-tafel--aus" id="tafel-tco" role="tabpanel">
   <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 
@@ -469,11 +498,48 @@
 
   {% else %}
   {# Der ehrliche Leerzustand. Er sagt, WARUM hier keine Zahl steht - eine
-     leere Tafel ohne Grund sieht aus wie ein Fehler. #}
+     leere Tafel ohne Grund sieht aus wie ein Fehler.
+
+     ER SAGT SEIT DEM 04.09.2026 ETWAS ANDERES. Vorher stand hier fest "es
+     fehlen die Tarifpreise", und das war in dem Moment falsch, in dem
+     Phase 6 sie lieferte: darunter stehen jetzt 30 belegte Tarifpreise.
+     Was fehlt, ist die andere Haelfte - welches Geraet zu welchem Tarif
+     zu welcher Zuzahlung, und die liefert der Adapter (Phase 4). #}
+  {% if geraete.tco.referenzen %}
+  <p class="gr-erklaer gr-basis--duenn">Es gibt hier noch keine Zeile: die
+  Tarifpreise stehen (unten), aber kein Anbieter weist bisher aus, welches
+  Gerät zu welchem Tarif mit welcher Zuzahlung läuft. Ohne diese Verbindung
+  gibt es kein Bündel zu rechnen – eine gerundete Schätzung wäre eine
+  Meinung mit Eurozeichen.</p>
+  {% else %}
   <p class="gr-erklaer gr-basis--duenn">Für keine Zeile ist die Rechnung
   heute vollständig: es fehlen die Tarifpreise. Bis sie da sind, steht hier
   keine Gesamtsumme – eine gerundete Schätzung wäre eine Meinung mit
   Eurozeichen.</p>
+  {% endif %}
+  {% endif %}
+
+  {# --- Der Massstab: was der Tarif OHNE Geraet kostet.
+
+         Diese Zahl ist der Grund, warum ein effektiver Geraetepreis
+         ueberhaupt rechenbar ist - `geraeteanteil()` zieht die eine TCO von
+         der anderen ab, und was bleibt, ist der Betrag, den der Anbieter
+         fuer das Geraet nimmt. Auf keiner Werbeseite dieses Marktes steht
+         sie; sie steht im Produktinformationsblatt nach § 1
+         TK-TransparenzV. #}
+  {% if geraete.tco.referenzen %}
+  <h3 class="gr-tueber">Was der Tarif allein kostet</h3>
+  <p class="gr-erklaer">{{ geraete.tco.referenzen_gesamt }} Tarife aus den
+  Produktinformationsblättern – dem gesetzlich vorgeschriebenen Dokument,
+  nicht der Werbeseite. Der Betrag gilt <b>ohne Gerät</b>; er ist der
+  Maßstab, gegen den ein Gerätepreis im Bündel überhaupt bestimmbar wird.</p>
+  {{ referenztabelle(geraete.tco.referenzen) }}
+  {% if geraete.tco.referenzen_rest %}
+  <details class="gr-auf">
+    <summary>Die übrigen {{ geraete.tco.referenzen_rest | length }} Tarife</summary>
+    {{ referenztabelle(geraete.tco.referenzen_rest) }}
+  </details>
+  {% endif %}
   {% endif %}
 
   {# --- Was noch fehlt, und wer es liefert. Einmal benannt statt in jeder

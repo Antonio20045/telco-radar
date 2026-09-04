@@ -114,8 +114,18 @@ def _zeile_mit(text: str, muster: re.Pattern) -> str:
 
 
 def _name_und_art(text: str, t: Tarif) -> None:
-    """Der Produktname steht als eigene Zeile, meist mit der Art in Klammern."""
-    muster = re.compile(r"^(.{3,80}?)\s*\((Mobilfunk|Festnetz)\)\s*$", re.I)
+    """Der Produktname steht als eigene Zeile, meist mit der Art in Klammern.
+
+    Die Klammer kann die Abrechnungsform mitfuehren: congstar schreibt
+    "Allnet Flat L (Postpaid Mobilfunk)". Ohne sie im Muster fiel der Name
+    in den Rueckfallzweig und trug den Klammerzusatz mit - auf der Seite
+    stand dann "Allnet Flat XL mit Upgrade-Versprechen (Postpaid" samt
+    offener Klammer, weil die Zeile im PDF umbricht. Die Art blieb dabei
+    leer, und ein Tarif ohne Art faellt aus jeder Filterung heraus.
+    """
+    muster = re.compile(
+        r"^(.{3,80}?)\s*\((?:(?:Post|Pre)paid\s+)?(Mobilfunk|Festnetz)\)\s*$",
+        re.I)
     for zeile in text.splitlines():
         treffer = muster.match(zeile.strip())
         if treffer:
@@ -128,7 +138,13 @@ def _name_und_art(text: str, t: Tarif) -> None:
         z = zeile.strip()
         if (3 < len(z) < 80 and not _KENNZEICHEN.search(z)
                 and not z.endswith(".") and re.search(r"[A-Za-zÄÖÜ]", z)):
-            t.setze("name", z, zeile)
+            # Eine offene Klammer am Ende ist ein Zeilenumbruch im PDF,
+            # kein Namensbestandteil: congstars XL-Blatt bricht
+            # "(Postpaid Mobilfunk)" um, und auf der Seite stand
+            # "Allnet Flat XL mit Upgrade-Versprechen (Postpaid". Der
+            # BELEG bleibt die vollstaendige Zeile - abgeschnitten wird
+            # der Wert, nicht die Fundstelle.
+            t.setze("name", re.sub(r"\s*\([^)]*$", "", z).strip() or z, zeile)
             return
 
 

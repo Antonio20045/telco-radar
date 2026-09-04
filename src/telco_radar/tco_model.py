@@ -234,6 +234,15 @@ class Buendel:
     sku_id: str = ""
     anbieter: str = ""
     tarif_name: str = ""
+    # Der Fremdschluessel auf `data/state/tarife.jsonl` (`tarif_bezug.py`).
+    # Er tritt NEBEN den Namen und nicht an seine Stelle: der Name ist, was
+    # auf der Produktseite stand, die ID ist, was im Produktinformations-
+    # blatt steht. Laufen die zwei auseinander, ist genau das die Auskunft.
+    # `tarif_id_guete` sagt, wie die Verbindung zustande kam - "hoch" ueber
+    # den Namen, "mittel" ueber den Monatsbetrag (Vodafones Nutzlast nennt
+    # keinen Tarifnamen, § 6.2 Nr. 7 der Strategie).
+    tarif_id: str = ""
+    tarif_id_guete: str = ""
     tarif_monatlich: Optional[float] = None
     geraet_zuzahlung: Optional[float] = None
     geraet_monatsrate: Optional[float] = None
@@ -318,6 +327,8 @@ class SimOnlyReferenz:
 
     anbieter: str = ""
     tarif_name: str = ""
+    tarif_id: str = ""
+    tarif_id_guete: str = ""
     tarif_sim_only_monatlich: Optional[float] = None
     anschlusspreis: Optional[float] = None
     rabatte: list[Rabatt] = field(default_factory=list)
@@ -355,6 +366,8 @@ class SimOnlyReferenz:
         """
         return Buendel(sku_id="", anbieter=self.anbieter,
                        tarif_name=self.tarif_name,
+                       tarif_id=self.tarif_id,
+                       tarif_id_guete=self.tarif_id_guete,
                        tarif_monatlich=self.tarif_sim_only_monatlich,
                        anschlusspreis=self.anschlusspreis,
                        rabatte=list(self.rabatte), quelle_url=self.quelle_url,

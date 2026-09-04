@@ -59,11 +59,13 @@ log = logging.getLogger(__name__)
 
 # Die Felder eines Buendels, die eine Messung sind - sie werden gemeinsam
 # geschrieben, siehe Modulkopf.
-_MESSFELDER = ("tarif_monatlich", "geraet_zuzahlung", "geraet_monatsrate",
+_MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
+               "geraet_zuzahlung", "geraet_monatsrate",
                "laufzeit_monate", "anschlusspreis", "quelle_url",
                "abgerufen_am")
 
-_REFERENZ_MESSFELDER = ("tarif_sim_only_monatlich", "anschlusspreis",
+_REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
+                        "tarif_sim_only_monatlich", "anschlusspreis",
                         "quelle_url", "abgerufen_am")
 
 
@@ -129,6 +131,22 @@ class TcoDB:
         for satz in buendel:
             if not isinstance(satz, Buendel):
                 raise TypeError(f"kein Buendel: {type(satz).__name__}")
+            if (satz.geraet_zuzahlung is not None
+                    or satz.geraet_monatsrate is not None) \
+                    and not (satz.tarif_id or "").strip():
+                # Phase 6, Abnahmekriterium 3: kein Buendelpreis im Bestand
+                # ohne aufloesbaren Tarif. Die Regel steht HIER und nicht im
+                # Datensatz, weil "im Bestand" genau diese Datei meint - ein
+                # Buendel zu bauen und festzustellen, dass sein Tarif nicht
+                # aufloest, ist ein gueltiger Zwischenschritt; es
+                # ABZULEGEN waere eine Zahl, deren Bezugsgroesse niemand
+                # nachschlagen kann. Dieselbe Haltung wie
+                # `geraete_model.Listung`, die eine Zuzahlung ohne
+                # `tarif_referenz` gar nicht erst entstehen laesst.
+                raise ValueError(
+                    f"Geraetepreis ohne aufloesbaren Tarif: {satz.id} "
+                    f"(tarif_name={satz.tarif_name!r}). Ein Buendelpreis "
+                    f"ohne tarif_id wird verworfen, nicht gespeichert.")
             bid = satz.id
             eintrag = self._buendel.get(bid)
             if eintrag is None:
@@ -163,6 +181,39 @@ class TcoDB:
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]
             eintrag["last_verified"] = today
         return neu
+
+    def ersetze_referenzen(self, referenzen, today: str) -> tuple[int, int]:
+        """Den Referenzbestand VOLLSTAENDIG neu setzen. Gibt (neu, entfernt).
+
+        Warum hier ersetzt und sonst nirgends in diesem Projekt gelöscht
+        wird: die SIM-only-Referenzen sind ABGELEITET. Sie entstehen bei
+        jedem Lauf neu aus `data/state/tarife.jsonl` und sind kein eigener
+        Messwert - anders als eine Listung, deren Verschwinden selbst eine
+        Nachricht ist (`GeraeteDB.mark_stale` altert deshalb in zwei
+        Stufen, statt zu loeschen).
+
+        Ohne diese Methode waechst der Bestand bei jeder Umbenennung: am
+        04.09.2026 standen nach zwei Laeufen 40 Referenzen zu 32 Tarifen
+        auf der Seite, darunter fuenfzehn, die aus dem Tarifbestand
+        laengst verschwunden waren. Aufgefallen ist es beim ANSEHEN der
+        Tafel - kein Test hat es gemeldet, weil beide Laeufe fuer sich
+        richtig gerechnet haben.
+
+        Sobald eine ZWEITE Quelle Referenzen liefert (etwa ein Adapter,
+        der den SIM-only-Preis von der Anbieterseite liest), gehoert an
+        diese Stelle eine Herkunft und kein pauschales Ersetzen mehr.
+        Heute gibt es genau eine Quelle.
+        """
+        # AUFFRISCHEN, dann wegnehmen - nicht leeren und neu befuellen.
+        # Beim Leeren verloere jede Referenz ihr `first_seen`, und dann
+        # waere jede von ihnen bei jedem Lauf "seit heute bekannt";
+        # ausserdem zaehlte `neu` jedes Mal den ganzen Bestand.
+        neu = self.setze_referenzen(referenzen, today)
+        gewuenscht = {satz.id for satz in referenzen}
+        veraltet = [rid for rid in self._referenzen if rid not in gewuenscht]
+        for rid in veraltet:
+            del self._referenzen[rid]
+        return neu, len(veraltet)
 
     @staticmethod
     def _schreibe_messung(eintrag: dict, satz, felder: tuple) -> None:

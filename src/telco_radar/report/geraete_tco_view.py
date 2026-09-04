@@ -71,6 +71,11 @@ EIGEN = "vodafone"
 # ausgelieferte Seite und nicht diese Zahl.
 SICHTBAR_MAX = 20
 
+# Hoechstens so viele SIM-only-Referenzen offen. Sie sind kuerzer als eine
+# TCO-Zeile (kein Aufklapper, rund 38 px) und stehen unter demselben
+# Hoehenbudget; der Rest steht zugeklappt darunter und ist NICHT geloescht.
+REFERENZEN_SICHTBAR = 12
+
 # Welche Phase welchen fehlenden Posten liefert. Die Tafel nennt sie, damit
 # eine Luecke ein Datum bekommt statt eines Achselzuckens - "keine
 # Tarifdaten" allein ist eine Feststellung, "keine Tarifdaten, Phase 6" ist
@@ -372,11 +377,13 @@ def _raten(eintrag: dict):
 # Felder fuehrt (`id`, `first_seen`, `last_verified`), die kein Feld des
 # Datensatzes sind - ein Sternchen daraus waere ein TypeError, sobald der
 # Store ein Betriebsfeld ergaenzt.
-_BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_monatlich",
+_BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_id",
+                   "tarif_id_guete", "tarif_monatlich",
                    "geraet_zuzahlung", "geraet_monatsrate", "laufzeit_monate",
                    "anschlusspreis", "quelle_url", "abgerufen_am")
 
-_REFERENZ_FELDER = ("anbieter", "tarif_name", "tarif_sim_only_monatlich",
+_REFERENZ_FELDER = ("anbieter", "tarif_name", "tarif_id", "tarif_id_guete",
+                    "tarif_sim_only_monatlich",
                     "anschlusspreis", "quelle_url", "abgerufen_am")
 
 
@@ -428,7 +435,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
 _OHNE_BUENDEL = (POSTEN_TARIF, POSTEN_ANSCHLUSS, POSTEN_RABATTE)
 
 
-def _offene_posten(zeilen: list) -> list[dict]:
+def _offene_posten(zeilen: list, referenzen: list | None = None) -> list[dict]:
     """Die Vereinigung der Luecken aller Zeilen, in fester Reihenfolge.
 
     Die VEREINIGUNG und nicht der Durchschnitt: gefragt ist, was der
@@ -438,11 +445,65 @@ def _offene_posten(zeilen: list) -> list[dict]:
     Die Reihenfolge kommt aus `PHASE_JE_LUECKE` und nicht aus einem `set` -
     eine Liste, die je Lauf anders sortiert ist, erzeugt bei jedem Rendern
     einen Diff in `site/` und damit einen Commit ohne Inhalt.
+
+    OHNE Buendel wird die Liste aus dem gerechnet, was der Bestand HAT.
+    Vorher stand dort fest "Tarifgrundpreis fehlt, Phase 6" - und genau das
+    ist am 04.09.2026 falsch geworden, als Phase 6 32 Tarife von vier
+    Anbietern lieferte. Dieselbe Fehlerklasse, gegen die dieser Abschnitt
+    ueberhaupt gerechnet statt hingeschrieben wird (B-Befund vom
+    04.09.2026, gefunden beim ANSEHEN der Tafel).
     """
-    offen = {n for z in zeilen for n in
-             (l["name"] for l in z["luecken"])} if zeilen else set(_OHNE_BUENDEL)
+    if zeilen:
+        offen = {n for z in zeilen for n in (l["name"] for l in z["luecken"])}
+    else:
+        offen = set(_OHNE_BUENDEL)
+        # Ein Tarifgrundpreis, der im Bestand steht, ist kein offener
+        # Posten mehr - auch wenn noch kein Buendel ihn benutzt.
+        if referenzen:
+            offen.discard(POSTEN_TARIF)
+            if any(r.anschlusspreis is not None for r in referenzen
+                   if isinstance(r, SimOnlyReferenz)):
+                offen.discard(POSTEN_ANSCHLUSS)
     return [{"name": n, "phase": PHASE_JE_LUECKE[n]}
             for n in PHASE_JE_LUECKE if n in offen]
+
+
+def _referenztabelle(referenzen: list) -> list[dict]:
+    """Der Massstab, den Phase 6 geliefert hat: was der Tarif ALLEIN kostet.
+
+    Diese Zahl ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
+    rechenbar ist (`tco_model.SimOnlyReferenz`) - und sie steht in keiner
+    Werbung. Sie kommt aus dem Produktinformationsblatt nach § 1
+    TK-TransparenzV, dem einzigen Dokument dieses Marktes, das rechtlich
+    wahrheitsbewehrt ist.
+
+    Sortiert nach Anbieter und Betrag, nicht nach Guenstigkeit: das ist
+    keine Rangliste. Ein Tarif mit mehr Datenvolumen kostet zu Recht mehr,
+    und diese Tafel rechnet das nicht heraus.
+    """
+    zeilen = []
+    for r in referenzen:
+        if not isinstance(r, SimOnlyReferenz):
+            continue
+        if r.tarif_sim_only_monatlich is None:
+            continue
+        zeilen.append({
+            "anbieter": r.anbieter,
+            "eigen": _eigen(r.anbieter),
+            "tarif": r.tarif_name,
+            "tarif_id": r.tarif_id,
+            "monatlich": r.tarif_sim_only_monatlich,
+            # Ueber den Horizont gerechnet, damit die Zahl in derselben
+            # Einheit steht wie die Leitzahl der Tabelle darueber. Gerechnet
+            # wird sie hier und nicht im Template - ein Renderer, der
+            # multipliziert, ist eine zweite Rechnung.
+            "ueber_horizont": round(r.tarif_sim_only_monatlich * TCO_HORIZONT, 2),
+            "anschlusspreis": r.anschlusspreis,
+            "quelle_url": r.quelle_url,
+            "abgerufen_am": r.abgerufen_am,
+        })
+    return sorted(zeilen, key=lambda z: (not z["eigen"], z["anbieter"],
+                                         z["monatlich"]))
 
 
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
@@ -487,6 +548,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     zeilen.sort(key=lambda z: (not z["belastbar"], z["gesamt"] is None,
                               z["gesamt"] or 0.0, z["geraet"]))
     bereit = _bereitschaft(eintraege)
+    massstab = _referenztabelle(referenzen)
 
     return {
         # "Es gibt eine TCO zu zeigen" - nicht "es gibt Geraetedaten".
@@ -512,7 +574,13 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Tarifpreise liefert: die Tabelle zeigte dann einen Tarifgrundpreis
         # und der Abschnitt darunter behauptete, er fehle. Aufgefallen beim
         # ANSEHEN der Tafel mit gestellten Buendeln, nicht in einem Test.
-        "offene_posten": _offene_posten(zeilen),
+        "offene_posten": _offene_posten(zeilen, referenzen),
+        # Was Phase 6 geliefert hat - der Massstab, auch ohne ein einziges
+        # Buendel. Die Tafel war bis zum 04.09.2026 vollstaendig leer, und
+        # der Grund stand eine Ebene tiefer: es gab keine Tarifpreise.
+        "referenzen": massstab[:REFERENZEN_SICHTBAR],
+        "referenzen_gesamt": len(massstab),
+        "referenzen_rest": massstab[REFERENZEN_SICHTBAR:],
         "horizont": TCO_HORIZONT,
     }
 
@@ -522,4 +590,5 @@ def leer() -> dict:
     return {"hat_tco": False, "zeilen": [], "zeilen_gesamt": 0,
             "delta": [], "bereitschaft": [], "lesbar": True,
             "offene_posten": _offene_posten([]),
+            "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
             "horizont": TCO_HORIZONT}

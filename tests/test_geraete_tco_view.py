@@ -15,7 +15,10 @@ vom 03.09.2026 (1 EUR Anzahlung, 24 x 30 EUR Rate = 721 EUR).
 KEIN NETZ, KEINE UHR, KEIN gemeinsamer Zustand zwischen den Tests.
 """
 from telco_radar.geraete_model import Geraet, Katalog, VERGLEICHBARE_ZUSTAENDE
-from telco_radar.report.geraete_tco_view import aufbereiten, leer
+from telco_radar.report.geraete_tco_view import (REFERENZEN_SICHTBAR,
+                                                aufbereiten, leer)
+from telco_radar.tco_model import (POSTEN_ANSCHLUSS, POSTEN_TARIF,
+                                   TCO_HORIZONT, SimOnlyReferenz)
 from telco_radar.tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE,
                                    POSTEN_TARIF, Buendel, SimOnlyReferenz,
                                    geraeteanteil, tco_24)
@@ -474,3 +477,89 @@ def test_ein_buendel_ohne_listung_heisst_nicht_fragezeichen():
     d = aufbereiten([_buendel(sku_id="apple-iphone-99-256gb-blau")], [], [],
                     katalog=None)
     assert d["zeilen"][0]["geraet"] == "apple-iphone-99-256gb-blau"
+
+
+# --------------------------------------------------------------------------
+# Der Massstab aus dem Tarifbestand (Phase 6)
+# --------------------------------------------------------------------------
+
+def _ref(anbieter="Telekom", tarif="MagentaMobil L", monatlich=59.95, **kw):
+    felder = dict(anbieter=anbieter, tarif_name=tarif,
+                  tarif_id="telekom:magentamobil-l", tarif_id_guete="hoch",
+                  tarif_sim_only_monatlich=monatlich,
+                  quelle_url="https://www.telekom.de/pib/x",
+                  abgerufen_am="2026-09-04")
+    felder.update(kw)
+    return SimOnlyReferenz(**felder)
+
+
+def test_die_tafel_zeigt_den_tarifpreis_auch_ohne_ein_einziges_buendel():
+    """Der Zustand am 04.09.2026: 30 Tarifpreise, null Buendel.
+
+    Die Tafel war bis dahin vollstaendig leer, und der Grund lag eine Ebene
+    tiefer - es gab keine Tarifpreise. Jetzt gibt es sie, und der Massstab
+    ist genau die Zahl, die auf keiner Werbeseite dieses Marktes steht.
+    """
+    d = aufbereiten([], [_ref()], [], None)
+    assert d["zeilen"] == []
+    assert d["referenzen_gesamt"] == 1
+    zeile = d["referenzen"][0]
+    assert zeile["monatlich"] == 59.95
+    # Ueber den Horizont gerechnet - im MODUL, nicht in der Vorlage.
+    assert zeile["ueber_horizont"] == round(59.95 * TCO_HORIZONT, 2)
+    assert zeile["quelle_url"]
+
+
+def test_der_tarifgrundpreis_ist_kein_offener_posten_mehr_wenn_er_dasteht():
+    """Der Abschnitt "Was der Rechnung noch fehlt" wird GERECHNET.
+
+    Als feste Liste haette er "Tarifgrundpreis fehlt, Phase 6" gemeldet,
+    waehrend die Tabelle darunter dreissig Tarifgrundpreise zeigt -
+    dieselbe Fehlerklasse, gegen die dieser Abschnitt am 04.09.2026
+    ueberhaupt gerechnet statt hingeschrieben wurde.
+    """
+    ohne = {p["name"] for p in aufbereiten([], [], [], None)["offene_posten"]}
+    mit = {p["name"] for p in
+           aufbereiten([], [_ref()], [], None)["offene_posten"]}
+    assert POSTEN_TARIF in ohne
+    assert POSTEN_TARIF not in mit
+
+
+def test_ein_belegter_anschlusspreis_schliesst_auch_diesen_posten():
+    mit = {p["name"] for p in
+           aufbereiten([], [_ref(anschlusspreis=39.99)], [], None)
+           ["offene_posten"]}
+    assert POSTEN_ANSCHLUSS not in mit
+    # 0.0 ist ein gemessener Betrag und keine Luecke - dieselbe Regel wie
+    # ueberall in diesem Zweig.
+    null = {p["name"] for p in
+            aufbereiten([], [_ref(anschlusspreis=0.0)], [], None)
+            ["offene_posten"]}
+    assert POSTEN_ANSCHLUSS not in null
+
+
+def test_der_massstab_ist_gedeckelt_und_verliert_nichts():
+    """Ein Deckel schneidet die Ansicht, nicht den Bestand.
+
+    Die Seite steht unter einem Hoehenbudget je Reiter; was darueber
+    hinausgeht, steht zugeklappt darunter und ist NICHT geloescht.
+    """
+    viele = [_ref(tarif=f"Tarif {i}", monatlich=10.0 + i) for i in range(30)]
+    d = aufbereiten([], viele, [], None)
+    assert len(d["referenzen"]) == REFERENZEN_SICHTBAR
+    assert len(d["referenzen"]) + len(d["referenzen_rest"]) == 30
+    assert d["referenzen_gesamt"] == 30
+
+
+def test_der_eigene_anbieter_steht_oben():
+    """Dieselbe Ordnung wie auf jeder anderen Tafel dieser Seite."""
+    d = aufbereiten([], [_ref(anbieter="Telekom"),
+                         _ref(anbieter="Vodafone", monatlich=99.0)], [], None)
+    assert d["referenzen"][0]["anbieter"] == "Vodafone"
+    assert d["referenzen"][0]["eigen"] is True
+
+
+def test_eine_referenz_ohne_preis_steht_nicht_im_massstab():
+    """Ein Massstab ohne Zahl ist keiner."""
+    d = aufbereiten([], [_ref(tarif_sim_only_monatlich=None)], [], None)
+    assert d["referenzen"] == []

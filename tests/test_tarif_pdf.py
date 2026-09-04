@@ -588,3 +588,33 @@ def test_ein_einzelner_listenpreis_ohne_zeitachse_wird_gelesen():
            "Listenpreis inkl. MwSt. 14,99 €\n")
     t = lies_text(roh)
     assert t.grundgebuehr == 14.99
+
+
+def test_die_abrechnungsform_in_der_klammer_gehoert_nicht_zum_namen(congstar_l):
+    """congstar schreibt "Allnet Flat L (Postpaid Mobilfunk)".
+
+    Ohne "Postpaid" im Muster fiel der Name in den Rueckfallzweig und trug
+    den Klammerzusatz mit - und die ART blieb leer, womit der Tarif aus
+    jeder Filterung herausfaellt (die SIM-only-Referenzen schliessen
+    Festnetz aus und braeuchten dafuer eine Art).
+    """
+    assert congstar_l.name == "Allnet Flat L"
+    assert congstar_l.art == "mobilfunk"
+
+
+def test_eine_offene_klammer_am_zeilenende_ist_ein_umbruch():
+    """congstars XL-Blatt bricht "(Postpaid Mobilfunk)" um.
+
+    Auf der Seite stand dadurch "Allnet Flat XL mit Upgrade-Versprechen
+    (Postpaid" - mit offener Klammer. Abgeschnitten wird der WERT, nicht
+    die Fundstelle: der Beleg bleibt die vollstaendige Zeile, sonst faende
+    `fehlende_belege()` sie im Rohtext nicht wieder.
+    """
+    roh = ("Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
+           "Allnet Flat XL mit Upgrade-Versprechen (Postpaid\n"
+           "Mindestvertragslaufzeit 24 Monate\n"
+           "Entgelt Allnet Flat XL (ohne Endgerät) 35,00 € / Monat\n")
+    t = lies_text(roh)
+    assert t.name == "Allnet Flat XL mit Upgrade-Versprechen"
+    assert t.fundstellen["name"].endswith("(Postpaid")
+    assert t.fehlende_belege() == []
