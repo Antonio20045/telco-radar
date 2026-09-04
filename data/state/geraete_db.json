@@ -2,8 +2,8 @@
  "updated": "2026-09-04",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 12,
-   "funde_gesamt": 45,
+   "laeufe": 13,
+   "funde_gesamt": 50,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 5,
    "letzter_fund": "2026-09-04",
@@ -18,8 +18,8 @@
    ]
   },
   "Vodafone": {
-   "laeufe": 10,
-   "funde_gesamt": 1492,
+   "laeufe": 11,
+   "funde_gesamt": 1641,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 149,
    "termine": [
@@ -34,8 +34,8 @@
    "letzter_fund": "2026-09-04"
   },
   "o2": {
-   "laeufe": 10,
-   "funde_gesamt": 674,
+   "laeufe": 11,
+   "funde_gesamt": 741,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 67,
    "termine": [
@@ -51,8 +51,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 0,
-   "funde_gesamt": 1267,
-   "letzte_funde": 130,
+   "funde_gesamt": 1400,
+   "letzte_funde": 133,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -88,7 +88,7 @@
   },
   "congstar": {
    "laeufe": 2,
-   "funde_gesamt": 536,
+   "funde_gesamt": 668,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 132,
    "termine": [
@@ -98,8 +98,8 @@
    "letzter_fund": "2026-09-04"
   },
   "1&1": {
-   "laeufe": 1,
-   "funde_gesamt": 35,
+   "laeufe": 2,
+   "funde_gesamt": 70,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 35,
    "termine": [
@@ -835,7 +835,7 @@
    "letzter_check": "2026-09-04",
    "quelle_url": "https://mobile.1und1.de/samsung-galaxy-s26-fe",
    "abgerufen_am": "2026-09-04",
-   "verfuegbarkeit": "vorbestellbar",
+   "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://mobile.1und1.de/smartphones"
