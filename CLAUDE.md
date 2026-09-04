@@ -309,7 +309,8 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` **Geräte** — **TCO-first seit 04.09.2026** | „Was zahlt der Kunde über 24 Monate gesamt?" Vier Reiter: TCO-Vergleich (Hauptansicht, ohne Klick aktiv) · Gerätekatalog · Preis- und TCO-Historie · Portfolio. Je Modell vier Anbieterkarten mit `TCO-<Bindung>`, `Ø €/Monat`, „nach 24 Monaten gezahlt", Rechenweg — oder mit benanntem Leerzustand. Dazu G1 (Balkenvergleich je Anbieter, zwei Laufzeitgruppen) und G2 (Preisverlauf), beide servergerendertes SVG. Einzelheiten in §8a |
+| `geraete.html` — der Stand DAVOR (bis 04.09.2026) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete.html` — **Preiswahrheit und Kuerzung** (29.08.2026, abends) | „Kann ich der Zahl trauen, und finde ich sie?" | Die Seite ist **5254 statt 18299 px** lang. Der Vergleich zeigt nur Zeilen mit ≥ 3 % **oder** ≥ 15 € Abstand (ODER, nicht UND: bei 200 € sind 15 € viel und 3 % wenig, bei 2000 € umgekehrt), alles Uebrige steht hinter Aufklappern — SKU-Matrix, 65 Varianten, Ausfallgruende, Vollansicht. Die Grafik zeigt hoechstens **12 Baender je Spalte** und als Standard nur die aktuelle Generation JE BAUREIHE. Nichts ist geloescht |
 | `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
 | `geraete.html` — **Leseseite ohne Erklaersektionen** (03.09.2026) | „Zeig mir die Regale, nicht deine Datenpflege." | Antonio hat die Erklaer- und Kommentarabschnitte kassiert: der Einleitungssatz ueber die Preisbasis, die Sektion „Wie vollstaendig ist das" (Betriebszahlen am Fuss) und die ganze Sektion „Datenbasis und Luecken" („Warum diese N nichts liefern", „Ohne Hardware-Vermarktung beobachtet", Marktstart-Satz, Farbbericht) sind GELÖSCHT. Ueberlebt und in den Portfolio-Reiter gezogen hat nur der Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone nicht" — eine Sortiments-Aussage, kein Kommentar; ein Test nagelt ihn auf `#tafel-portfolio` fest. Die Arbeitslisten stehen im Protokoll des naechtlichen Laufs (Farben/Titel standen dort ohnehin; Marktstart- und Vorgaenger-Luecken loggt `geraete_pipeline` seitdem mit), das „warum liefert wer nichts" steht auf `geraete-quellen.html` — erreichbar ueber EINEN Fusslink, weil mit den Sektionen alle drei bisherigen Links fielen (Review-Befund B1: sonst waere die Quellenseite fertig und unauffindbar). `geraete_view` berechnet `farbbericht`/`katalog`-Luecken/`ohne_katalog` nicht mehr; `quellenlage` und `bilanz` bleiben (Quellenseite bzw. Navigationsschwelle lesen sie) |
@@ -1721,7 +1722,112 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (04.09.2026, mittags): Phase S — die Bündel stehen,
+> **Zuletzt erledigt (04.09.2026, nachmittags): Phase R — die Geräteseite
+> ist TCO-first, mit den zwei Pflicht-Grafen.** Auftragsgrundlage:
+> `PHASE_R_BRIEF.md` und `ANFORDERUNGEN_TCO_FIRST.md` (Lastenheft des
+> Insights-PM, v1.1, Abschnitte A/B/C/D/G bindend). Stand danach:
+> **2608 Tests grün**, 13 skipped, **2 rot** (die vorbestehenden
+> Promo-Screenshot-Tests); `pruefe_portal.py` **15 bestanden / 2
+> durchgefallen** (8b und 6, beide vorbestehend). Live byte-identisch
+> gegengeprüft.
+>
+> **Die Seite beantwortet ohne Klick Antonios Leitfrage.** Vier Reiter
+> statt fünf: *TCO-Vergleich* (Hauptansicht, aktiv) · Gerätekatalog ·
+> Preis- und TCO-Historie · Portfolio. „Was kostet es" ist aufgelöst —
+> sein Inhalt IST die Hauptansicht; die Preis-Alarme verlieren ihren
+> Reiter und stehen als **Chips** im Kopf, die ganze Alarmtabelle samt
+> Filtern, Suche, Sortierung und Zeilenaufklappern einen Aufklapper
+> darunter (H4, kein Bedienelement gestrichen).
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **`tco_model.tco_bindung()`** — die Leitzahl rechnet über die BINDUNG, nicht über feste 24 Monate | Jedes erhobene Bündel ist eine 36-Monats-Finanzierung, und o2 trennt Tarifbindung (24) von Ratenlaufzeit (36). Die **längere** führt die Karte (A5.5); die Tarifbindung auf die Ratenlaufzeit zu dehnen addierte 12 × 19,99 € = **239,88 €**, die niemand schuldet |
+> | **Die Bindung steht IM Etikett**: `TCO-36`, nie eine unbeschriftete Gesamtsumme (A5.1) | Über zwei Laufzeiten ist eine nackte Zahl nicht lesbar. Das einzige laufzeitübergreifende Maß ist `Ø €/Monat` (A5.3) — und es ist die Default-Sortierung |
+> | **Pflichtzeile an jeder Karte mit Zahl** (A5.2): „nach 24 Monaten gezahlt … davon noch offen … (12 Geräteraten)" | Das ist die wörtliche Antwort auf „was zahlt der Kunde über 24 Monate gesamt" — auch bei 36 Monaten Bindung. Live 118-mal auf der Seite |
+> | **Die Tarifbindung kommt aus `tarife.jsonl`** über `tarif_id`, gesetzt in `geraete_view` | Sie steht in KEINER Gerätenutzlast. Fehlt sie, ist die Karte nicht belastbar und sagt es — geraten wird nichts |
+> | **1&1 wird nicht zerlegt** (`Buendel.buendel_monatlich`) | Der Anbieter nennt EINEN Monatsbetrag für Tarif und Gerät (§ 13.2). Ihn in zwei Hälften zu teilen wäre unsere Rechnung und keine Angabe des Anbieters |
+> | **Vier Anbieter je Modell, immer** | Telekom steht auf allen 59 Modellen mit „Datenstand fehlt – Quelle in Vorbereitung … (Phase T)". Ein weggelassener Anbieter sieht aus wie ein Anbieter, den es nicht gibt (B.2.5) |
+>
+> **Die Vodafone-Referenz ist gerechnet und sagt es.** Vodafone führt 151
+> Listungen, alle mit Barpreis, **keine mit Tarifbezug** — es gibt kein
+> eigenes Bündel. Ohne Vergleichszahl hätte die Tafel keine Referenzlinie
+> und das Euro-Delta aus B.2 wäre unerfüllbar; C.1 lässt dafür
+> ausdrücklich eine **gekennzeichnete Näherung** zu. Sie ist
+> Tarifgrundpreis aus dem Produktinformationsblatt (phasengewichtet über
+> `effektivpreis.phasensumme`) **plus** eigener Barpreis desselben Geräts:
+> beide Summanden gemessen, gerechnet ist nur ihre Summe. Genommen wird
+> der **günstigste** belegte Vodafone-Tarif (Mobil XS, 29,95 €) — die für
+> uns ungünstigste und damit konservative Wahl. **Ein echtes eigenes
+> Bündel schlägt die Näherung** (`_referenz_aus_buendel`); sonst stünde
+> Vodafone zweimal unter demselben Namen auf einer Karte.
+>
+> **G1 und G2 sind servergerendertes SVG** (`report/geraete_tco_grafik.py`)
+> — keine Bibliothek, kein CDN, und damit in jedem `curl`, Test und
+> Screenshot. G1 stapelt je Anbieter (einmalig / Tarif / Geräteraten /
+> Bonus negativ) und trennt **24 und 36 Monate in zwei Blöcke mit eigener
+> Nulllinie** (A5.4); unter zwei Zahlen entsteht statt einer Grafik eine
+> Texttafel. G2 zeichnet nur Reihen mit **≥ 2 Messpunkten** (heute 5 von
+> 562 Listungen), mit ↑/↓-Markern, Wochenraster und der Datentabelle
+> darunter (C.2). **Einen TCO-Verlauf gibt es nicht** und er wird nicht
+> gerechnet: der Bündelbestand kennt je Bündel genau einen Stand, eine
+> Kurve daraus wäre interpoliert.
+>
+> **Die Rechenprobe, live nachgeprüft** (o2, iPhone 17 Pro 256 GB,
+> „O2 Mobile L Plus mit 150 GB+ (24 Mon.)"):
+> `0,00 + 1,00 + 24 × 19,99 + 36 × 36,50 = 1.794,76 €`, Ø **49,85 €/M.**,
+> nach 24 Monaten gezahlt **1.356,76 €**, offen **438,00 €**. Der Auftrag
+> rechnete mit 39,99 € Anschlusspreis und kam auf 1.834,75 €; **im Bestand
+> steht 0,00 €** — o2 nimmt für die L-Linie keinen Anschlusspreis. Es gilt
+> das Gerechnete.
+>
+> **Drei Fehler hat nur das ANSEHEN gezeigt, bei grünen Tests:**
+> (1) `.gr-modell` gibt es seit dem 30.08.2026 in der SKU-Matrix, **mit
+> `white-space:nowrap`** — der neue Modellblock trug denselben Namen und
+> vererbte das Umbruchverbot in jede Karte: min-content 1346 px, die Seite
+> lief auf dem Telefon **1389 statt 390 px** breit. Der Block heißt jetzt
+> `gr-tmodell`. (2) **Alle Balken standen grau da**: der `--anb`-Rückfall
+> stand als eigene Regel AUF denselben Elementen wie die Anbieterfarbe —
+> gleiche Spezifität, die spätere gewinnt; ein Rückfall gehört in das
+> `var()` an der Verwendungsstelle. (3) Das Etikett der Referenzlinie lief
+> rechts aus dem Bild (die Referenz ist regelmäßig der teuerste Balken).
+>
+> **Zwei Fehler haben nur die neuen Tests gezeigt:** Vodafone stand als
+> Bündel UND als Näherung auf derselben Karte (siehe oben), und die
+> **Browser-Fixture hatte kein `tarife.jsonl`** — ohne Tarifbindung war
+> keine Karte belastbar, und die ganze Hauptansicht war von keinem
+> Browser-Test gedeckt. Dieselbe Falle wie das fehlende
+> `geraete_tco.json` am 04.09.2026, eine Ebene weiter.
+>
+> **`pruefe_portal.py` Kriterium 11 kannte die alte Ordnung als Regel**
+> („die Startansicht trägt kein Diagramm", fünf Reiter) und ist auf das
+> Lastenheft umgestellt: vier Reiter, G1 in der Hauptansicht, G2 im
+> Historie-Reiter, die 24-Monats-Zeile. Reiterhöhen **2090 / 1873 / 1872 /
+> 1883 px** gegen ein Budget von 3000.
+>
+> **OFFEN:**
+> 1. **Telekom bleibt leer, bis Phase T läuft.** 59 Leerzustände sind
+>    ehrlich, aber Abnahmekriterium G2 („vier Anbieter sichtbar") ist erst
+>    mit dem lokalen Lauf wirklich erfüllt.
+> 2. **G2 zeigt heute 5 Reihen von 562 Listungen.** Der Rest hat einen
+>    Messpunkt. Nach zwei weiteren Wochen Nachtläufen **ansehen**, ob die
+>    Kurvenschar lesbar bleibt — `MAX_REIHEN` steht auf 5.
+> 3. **Ein TCO-Verlauf braucht zwei verschiedene Bündelstände.** Er
+>    entsteht von selbst; wer ihn in vier Wochen nicht sieht, prüft, ob
+>    `geraete_tco.json` überhaupt einen zweiten Stand geschrieben hat.
+> 4. **Die Seite ist 1,39 statt 0,91 MB.** 59 Modellblöcke stehen fertig
+>    im HTML (kein zweiter Renderer, keine Bibliothek); das ist der Preis
+>    dafür. Wird es zu viel, gehört der Deckel auf die Zahl der
+>    vorgerenderten Modelle, nicht auf ihre Karten.
+> 5. **Kein „(0 %)" an der Ratenzeile** (Katalog D nennt es): dass die
+>    Ratensumme genau der ausgewiesenen Summe entspricht, ist gemessen —
+>    eine Aussage über den effektiven Jahreszins ist es nicht.
+> 6. **Nicht gebaut aus B.3:** Filter nach Netz, Datenvolumen und „Gerät
+>    einmalig bis". `netz` ist im Bestand bei jeder Listung leer, und ein
+>    Filter ohne Daten ist ein Bedienelement, das nichts tut. Gebaut sind
+>    Sortierung (Ø/Monat · Gesamtkosten je Laufzeitgruppe · Gerät
+>    einmalig) und Anbieterfilter.
+
+> **Davor erledigt (04.09.2026, mittags): Phase S — die Bündel stehen,
 > und die Telekom-Schnittstelle ist gemessen statt vermutet.**
 > Auftragsgrundlage: `PHASE_S_BRIEF.md`, Messungen und Belege in
 > `docs/STRATEGY_GERAETE_TCO.md § 14`. Stand danach: **2564 Tests grün**,
