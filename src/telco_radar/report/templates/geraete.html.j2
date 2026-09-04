@@ -485,6 +485,18 @@
       <li class="gr-tposten--luecke"><span>{{ l }}</span><em>nicht gemessen</em></li>
       {% endfor %}
     </ul>
+    {# DIE NACH-LAUFZEIT-LUECKE WIRD BENANNT, NICHT VERSCHWIEGEN.
+       "ab Monat 25" steht nur da, wo eine PREISPHASE des Pflichtdokuments
+       ihn nennt. o2s Preiskacheln tun das nicht (`preisphasen: []`), und
+       den Grundpreis fortzuschreiben wäre eine Behauptung über einen
+       Zeitraum, über den die Quelle schweigt. Eine stumme Auslassung sähe
+       dagegen aus wie "es ändert sich nichts" - genau die
+       Kostenfallen-Kritik aus der Recherche § 2.3. #}
+    {% if k.nach_bindung is none and k.tarif_bindung %}
+    <p class="gr-basis--duenn">Was der Tarif ab Monat {{ k.tarif_bindung + 1
+    }} kostet, weist die Quelle nicht aus – deshalb steht dazu keine Zahl
+    auf der Karte.</p>
+    {% endif %}
     <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
     Bindung{% if k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
     k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
