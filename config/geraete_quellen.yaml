@@ -396,6 +396,21 @@ anbieter:
       `User-agent: googlebot`, zusammen mit /chat-ui/ und /ebooking/. Die für
       uns gültige Gruppe `User-agent: *` sperrt den Pfad nicht; unser
       Absender ist TelcoRadar/1.0.
+      SEIT DEM 04.09.2026 WIRD DIESELBE ADRESSE EIN ZWEITES MAL GELESEN,
+      ohne `hwOnly=true` — auch sie gibt /e-shop/ in seiner eigenen Nutzlast
+      aus, und die Antwort nennt ihren Zustand selbst (HW_ONLY | BUNDLE).
+      Sie trägt 88 Geräte MIT Tarif; 22 davon sind Gerät plus Zubehör und
+      fallen heraus. Aus den übrigen 66 werden Bündel für
+      `data/state/geraete_tco.json` — Zuzahlung, Geräterate, Tarifbetrag,
+      Anschlusspreis und Laufzeit getrennt —, KEINE Listungen: ein
+      Bündelmonatspreis gehört nicht in dieselbe Spalte wie ein Barpreis.
+      Die Aufteilung in Geräterate und Tarif steht nur im Trackingblock der
+      Antwort und wird deshalb gegen die typisierten Zahlen derselben
+      Antwort nachgerechnet (Summe = monthlyPrice, Anzahlung = oneTimePrice,
+      Anschluss = activationFee); geht eine Probe nicht auf, wird der Satz
+      verworfen. Am 04.09.2026 gingen alle drei bei 66 von 66 auf, und
+      sieben von sieben nachgeprüften Produktseiten nennen dieselben Beträge
+      in ihrem serverseitigen pdp:PriceSummaryValue.
     einstiege:
       # Die Einstiegsseite IST die Nutzlast (direkt=True): eine Antwort mit
       # allen Geraeten und Preisen, keine Produktseite wird nachgeladen.
