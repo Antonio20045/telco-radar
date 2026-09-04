@@ -626,8 +626,12 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
             continue
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
+        # Der ZUSTAND reist mit - er ist dieselbe Erkennung wie die, aus
+        # der die `-refurbished`-Strecke der SKU entsteht, und die
+        # TCO-Tafel braucht ihn als Feld, nicht als Suffix (QA-Befund B1).
         out.append({**satz, "sku_id": listung.sku_id,
                     "anbieter": anbieter.name,
+                    "zustand": listung.zustand,
                     "quelle_url": listung.quelle_url})
     return out
 

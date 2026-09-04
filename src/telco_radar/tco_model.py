@@ -265,6 +265,18 @@ class Buendel:
     rabatte: list[Rabatt] = field(default_factory=list)
     quelle_url: str = ""
     abgerufen_am: str = ""
+    # DER GERAETEZUSTAND, wie ihn die Listung derselben SKU traegt
+    # (`geraete_model.ZUSTAENDE`: neu | refurbished | b-ware | unbekannt).
+    # Er ist eine PREISDIMENSION und kein Etikett (CLAUDE.md § 6) - ein
+    # erneuertes iPhone 15 fuer 17,00 EUR im Monat ist ein anderes Produkt
+    # als das neue fuer 20,00 EUR, kein guenstigeres Angebot. Bis zum
+    # 04.09.2026 kannte das Buendel den Zustand nicht, und die Kartenauswahl
+    # nahm je (Anbieter, Tarif) die guenstigste Karte: zehn o2-Karten
+    # fuehrten erneuerte Geraete unbeschriftet gegen Neugeraete von 1&1 und
+    # Vodafone (QA-Befund B1). Leer heisst "nicht belegt" - und unbelegt
+    # gilt als `unbekannt`, nie als neu (`geraete_tco_karten.zustand_des_
+    # buendels`).
+    zustand: str = ""
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():
@@ -276,6 +288,7 @@ class Buendel:
         self.anbieter = self.anbieter.strip()
         self.tarif_name = self.tarif_name.strip()
         self.sku_id = (self.sku_id or "").strip()
+        self.zustand = (self.zustand or "").strip().lower()
         for feld in ("tarif_monatlich", "buendel_monatlich",
                      "geraet_zuzahlung", "geraet_monatsrate",
                      "anschlusspreis"):

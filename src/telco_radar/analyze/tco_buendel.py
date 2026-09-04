@@ -124,6 +124,7 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 geraet_monatsrate=satz.get("geraet_monatsrate"),
                 laufzeit_monate=int(satz.get("laufzeit_monate") or 0) or 24,
                 anschlusspreis=satz.get("anschlusspreis"),
+                zustand=str(satz.get("zustand") or ""),
                 quelle_url=str(satz.get("quelle_url") or ""),
                 abgerufen_am=heute))
         except (ValueError, TypeError) as exc:

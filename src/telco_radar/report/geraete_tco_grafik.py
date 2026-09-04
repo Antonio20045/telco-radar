@@ -185,11 +185,18 @@ def balken(modell: dict) -> str:
 
         for karte in gruppe["karten"]:
             slug = anbieter_slug(karte["anbieter"])
+            # DAS ZUSTANDSETIKETT STEHT AM BALKEN, nicht nur an der Karte:
+            # der Balken wird fuer sich gelesen, und ein unbeschrifteter
+            # kurzer Balken eines erneuerten Geraets liest sich als das
+            # guenstigste Angebot (QA-Befund B1, H5).
+            etikett = karte.get("zustand_etikett") or ""
             teile.append(
                 f'<text class="gr-g1-anbieter" x="0" y="{y + 13:.0f}">'
                 f'{_t(karte["anbieter"])}'
                 + (' <tspan class="gr-g1-ref-etikett">Referenz</tspan>'
                    if karte.get("naeherung") else '')
+                + (f' <tspan class="gr-g1-zustand">{_t(etikett)}</tspan>'
+                   if etikett else '')
                 + '</text>'
                 f'<text class="gr-g1-tarif" x="0" y="{y + 25:.0f}">'
                 f'{_t(karte["tarif"])}</text>')
@@ -210,7 +217,8 @@ def balken(modell: dict) -> str:
                     f'y="{y:.0f}" width="{breite:.1f}" '
                     f'height="{BALKEN_HOEHE}" '
                     f'fill-opacity="{DECKKRAFT.get(kat, 0.6)}">'
-                    f'<title>{_t(karte["anbieter"])}: '
+                    f'<title>{_t(karte["anbieter"])}'
+                    + (f' ({_t(etikett)})' if etikett else '') + ': '
                     f'{_t(posten.get("name") or KATEGORIE_NAME.get(kat, kat))} '
                     f'{_t(euro(betrag))}</title></rect>')
                 x += breite

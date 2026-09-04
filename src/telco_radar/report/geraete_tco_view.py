@@ -410,7 +410,7 @@ _BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_id",
                    "tarif_id_guete", "tarif_monatlich",
                    "tarif_bindung_monate", "buendel_monatlich",
                    "geraet_zuzahlung", "geraet_monatsrate", "laufzeit_monate",
-                   "anschlusspreis", "quelle_url", "abgerufen_am")
+                   "anschlusspreis", "quelle_url", "abgerufen_am", "zustand")
 
 _REFERENZ_FELDER = ("anbieter", "tarif_name", "tarif_id", "tarif_id_guete",
                     "tarif_sim_only_monatlich",

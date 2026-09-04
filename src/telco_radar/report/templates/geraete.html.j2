@@ -400,10 +400,16 @@
          data-laufzeit="{{ k.laufzeit or 0 }}"
          data-schnitt="{{ k.schnitt_monat if k.schnitt_monat is not none else '' }}"
          data-gesamt="{{ k.gesamt if k.gesamt is not none else '' }}"
-         data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}">
+         data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}"
+         data-zustand="{{ k.zustand }}">
+  {# DAS ZUSTANDSETIKETT steht im Kopf, vor jeder Zahl (H5). "unser
+     Angebot" traegt nur eine Vodafone-Karte MIT Zahl, die kein Rechenweg
+     ist - die leere trug es bis zum 04.09.2026 auch (QA-Befund S3). #}
   <p class="gr-kk-kopf"><span class="gr-kk-anbieter">{{ k.anbieter }}</span>{%
+    if k.zustand_etikett %} <span class="gr-kk-marke gr-kk-marke--zustand">{{
+    k.zustand_etikett }}</span>{% endif %}{%
     if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
-    elif k.eigen %} <span class="gr-kk-marke">unser Angebot</span>{% endif %}</p>
+    elif k.eigen and k.belastbar %} <span class="gr-kk-marke">unser Angebot</span>{% endif %}</p>
   {% if k.tarif %}<p class="gr-kk-tarif">{{ k.tarif }}</p>{% endif %}
 
   {% if k.belastbar %}
@@ -466,6 +472,7 @@
   {# Euro primaer, Prozent sekundaer - und ueber verschiedene Laufzeiten
      gibt es KEIN Euro-Delta, sondern nur den Abstand im Ø/Monat (A5.3/A5.4). #}
   <p class="gr-kk-delta{% if k.delta.guenstiger %} gr-kk-delta--unter{% endif %}">{%
+    if k.zustand_etikett %}{{ k.zustand_etikett }}: {% endif %}{%
     if k.delta.betrag is not none %}{{ k.delta.abstand | euro }}{% if
     k.delta.prozent %} ({{ '%.1f'|format(k.delta.prozent)|replace('.', ',') }} %){%
     endif %}{% else %}{{ k.delta.abstand | euro }} je Monat{% endif %}
@@ -585,7 +592,9 @@
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.hersteller }} {{ m.name }}</h3>
-    <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.spanne %} ·
+    <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert
+      %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
+      %} · davon {{ m.zustand_offen }} ohne belegten Zustand{% endif %}{% if m.spanne %} ·
       Gesamtkosten von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{%
       endif %}{% if m.laufzeiten %} · Bindung {{ m.laufzeiten | join(' und ') }}
       Monate{% endif %}</p>
@@ -673,8 +682,9 @@
     </tr></thead>
     <tbody>
     {% for z in geraete.tco.tabelle %}
-    <tr class="gr-tzeile{% if z.eigen %} gr-tzeile--eigen{% endif %}">
-      <td>{{ z.geraet }}</td>
+    <tr class="gr-tzeile{% if z.eigen %} gr-tzeile--eigen{% endif %}" data-zustand="{{ z.zustand }}">
+      <td>{{ z.geraet }}{% if z.zustand_etikett %} <span class="gr-a-klein gr-t-zustand">{{
+          z.zustand_etikett }}</span>{% endif %}</td>
       <td><span class="gr-t-anbieter">{{ z.anbieter }}</span>
           <span class="gr-a-klein">{{ z.tarif }}</span></td>
       {# DIE LEITZAHL TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine

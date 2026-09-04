@@ -65,11 +65,14 @@ log = logging.getLogger(__name__)
 # landet hier NICHT von selbst, und ein Buendel, dessen einziger Preis der
 # Buendelmonatsbetrag ist (1&1), waere beim Ablegen still preislos
 # geworden.
+# `zustand` seit dem 04.09.2026 (QA-Befund B1): der Geraetezustand ist eine
+# Preisdimension, und ein Buendel, das ihn nicht mitfuehrt, sieht in der
+# Tafel aus wie ein Neugeraet.
 _MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
                "tarif_bindung_monate", "buendel_monatlich",
                "geraet_zuzahlung", "geraet_monatsrate",
                "laufzeit_monate", "anschlusspreis", "quelle_url",
-               "abgerufen_am")
+               "abgerufen_am", "zustand")
 
 _REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
                         "tarif_sim_only_monatlich", "anschlusspreis",

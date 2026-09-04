@@ -2649,6 +2649,13 @@ b,strong{font-weight:700}
 .gr-kk-anbieter{font-weight:700;color:var(--anb,#57534a)}
 .gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
   border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
+/* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
+   damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
+.gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
+  font-weight:700}
+.gr-g1-zustand{font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
+.gr-t-zustand{color:var(--red,#e60000);font-weight:700}
 .gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
   color:var(--ink-2)}
 .gr-kk-leit{margin:0;display:flex;align-items:baseline;gap:8px}

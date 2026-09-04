@@ -358,6 +358,16 @@ def test_ein_eigenes_buendel_verdraengt_die_naeherung():
                   "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
                   "preis_ohne_vertrag": 1199.90,
                   "quelle_url": "https://vodafone.invalid/p",
+                  "abgerufen_am": "2026-09-04"},
+                 # Seit dem 04.09.2026 (B1) gilt ein Buendel ohne belegten
+                 # Zustand als "unbekannt" und steht ausserhalb des
+                 # Vergleichs - ein Delta bekommt nur ein belegtes
+                 # Neugeraet. Die o2-Listung derselben SKU belegt ihn.
+                 {"id": "o2--sku-1", "sku_id": "sku-1",
+                  "device_id": "apple-iphone-17-pro", "anbieter": "o2",
+                  "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
+                  "preis_ohne_vertrag": 1149.00,
+                  "quelle_url": "https://o2.invalid/p",
                   "abgerufen_am": "2026-09-04"}]
     referenzen = [SimOnlyReferenz(anbieter="Vodafone",
                                   tarif_name="Vodafone Mobil XS",

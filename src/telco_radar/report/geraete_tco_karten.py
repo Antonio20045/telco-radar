@@ -49,7 +49,7 @@ from typing import Optional
 from . import geraete_vergleich
 from .effektivpreis import phasensumme
 from .geraete_tco_grafik import anbieter_slug
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, normalisiere
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, POSTEN_TARIF,
                          POSTEN_TARIFBINDUNG, POSTEN_TARIF_FLEX, Buendel,
@@ -88,6 +88,49 @@ LEER_GRUND = {
 # ist ein anderes Produkt und kein guenstigeres Angebot - dieselbe Regel und
 # dieselbe Konstante wie im Barpreisvergleich.
 _ZUSTAND = VERGLEICHBARE_ZUSTAENDE
+
+# Was auf der Karte steht, wenn das Geraet kein Neugeraet ist - oder wenn
+# niemand belegt hat, was es ist. "erneuert" ist das Wort, das o2 selbst
+# benutzt; "Zustand nicht belegt" ist ehrlicher als ein stilles "neu".
+ZUSTAND_ETIKETT = {"neu": "", "refurbished": "erneuert", "b-ware": "B-Ware",
+                   "unbekannt": "Zustand nicht belegt"}
+
+
+def zustand_des_buendels(b: Buendel, zustand_je_listung: dict) -> str:
+    """Der Geraetezustand eines Buendels - belegt oder `unbekannt`.
+
+    Drei Quellen, in dieser Reihenfolge: das Feld am Buendel (seit dem
+    04.09.2026 vom Sammler geschrieben), die Listung DERSELBEN SKU beim
+    selben Anbieter (`geraete_db.json` traegt `zustand` an jeder Listung),
+    und die Zustandsstrecke der SKU selbst (`sku_id(..., zustand)` haengt
+    `-refurbished` an - dieselbe Erkennung, nur als Suffix). Was keine der
+    drei belegt, ist `unbekannt`. NIE `neu`: ein fehlender Beleg ist kein
+    Neugeraet, und genau diese Annahme hat zehn erneuerte o2-Geraete als
+    Sieger gegen Neugeraete gefuehrt (QA-Befund B1, PM-Entscheidung H5).
+    """
+    zustand = (b.zustand or "").strip().lower()
+    if zustand in ZUSTAENDE:
+        return zustand
+    zustand = zustand_je_listung.get((normalisiere(b.anbieter), b.sku_id), "")
+    if zustand in ZUSTAENDE:
+        return zustand
+    for kandidat in ZUSTAENDE:
+        if kandidat in _ZUSTAND:
+            continue          # ein fehlendes Suffix belegt kein Neugeraet
+        if b.sku_id.endswith("-" + normalisiere(kandidat)):
+            return kandidat
+    return "unbekannt"
+
+
+def _zustand_je_listung(listungen: list) -> dict:
+    """(Anbieter, sku_id) -> Zustand, aus dem Geraetebestand."""
+    out: dict = {}
+    for e in listungen:
+        sku = e.get("sku_id") or ""
+        zustand = (e.get("zustand") or "").strip().lower()
+        if sku and zustand in ZUSTAENDE:
+            out.setdefault((normalisiere(e.get("anbieter", "")), sku), zustand)
+    return out
 
 
 def _eigen(anbieter: str) -> bool:
@@ -208,6 +251,7 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
                 tarif_name=e["tarif_referenz"],
                 buendel_monatlich=float(betrag),
                 laufzeit_monate=int(e.get("laufzeit_monate") or 24),
+                zustand=e.get("zustand") or "",
                 quelle_url=e.get("quelle_url", ""),
                 abgerufen_am=e.get("abgerufen_am", "")))
         except (TypeError, ValueError) as exc:
@@ -221,7 +265,7 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
 # --------------------------------------------------------------------------
 
 def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
-           katalog, geraet_je_sku: dict) -> dict:
+           katalog, geraet_je_sku: dict, zustand: str = "unbekannt") -> dict:
     """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_model`.
 
     Diese Funktion addiert keinen Euro. Sie holt die Kennzahl, haengt die
@@ -249,6 +293,14 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "leer_grund": "" if kennzahl.belastbar else _grund(kennzahl),
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
+        # DER ZUSTAND STEHT AN DER KARTE, und `vergleichbar` sagt, ob sie
+        # im Vergleich des Modellblocks mitspielt: nur ein Neugeraet wird
+        # gegen die Neugeraet-Referenz gestellt. Ein erneuertes Geraet
+        # bekommt sein Etikett auf Karte, Balken und - wo eins entsteht -
+        # im Delta-Satz (H5).
+        "zustand": zustand,
+        "zustand_etikett": ZUSTAND_ETIKETT.get(zustand, zustand),
+        "vergleichbar": zustand in _ZUSTAND,
         # Dieselbe Klasse auf Karte, Balken und Legende - C.3 verlangt die
         # Anbieterfarbe konsistent ueber ALLE Grafiken und Tabellen.
         "slug": anbieter_slug(b.anbieter),
@@ -351,6 +403,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
             "abgerufen_am": "", "tarif_quelle_url": "", "naeherung": False,
             "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
             "ab_preis": False,
+            "zustand": "", "zustand_etikett": "", "vergleichbar": False,
             "sku_id": "", "modell_id": "", "geraet": "", "tarif_id": "",
             "tarif_id_guete": "", "tarif_bindung": None,
             "raten_laufzeit": None}
@@ -482,6 +535,9 @@ def _referenzkarte(ref: dict) -> dict:
         "tarif": ref["tarif"], "label": f"TCO-{ref['monate']}",
         "laufzeit": ref["monate"],
         "belastbar": True, "naeherung": True,
+        # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
+        # Neugeraet-Zahl und spielt im Vergleich mit.
+        "zustand": "neu", "zustand_etikett": "", "vergleichbar": True,
         "gesamt": ref["gesamt"], "schnitt_monat": ref["schnitt_monat"],
         "monatlich": ref["monatlich"],
         # Auch die Referenz beantwortet Antonios Frage: nach 24 Monaten hat
@@ -535,6 +591,11 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
         return None
     if karte["gesamt"] is None or not karte["laufzeit"]:
         return None
+    if not karte.get("vergleichbar", True):
+        # Ein erneuertes Geraet ist kein Konkurrent des Neugeraets (H5).
+        # "775,35 EUR guenstiger als die Vodafone-Referenz" stand am
+        # 04.09.2026 unter einem gebrauchten iPhone 15 gegen ein neues.
+        return None
     if karte["eigen"]:
         # Ein eigenes Buendel IST die Referenz (oder ein zweites eigenes
         # Angebot). "0,00 € teurer als die Vodafone-Referenz" auf einer
@@ -580,7 +641,8 @@ def _rang(karte: dict) -> tuple:
     Rangfolge fuehren darf. Karten ohne Zahl stehen hinten - sie sind kein
     guenstigstes Angebot, sondern eine Luecke.
     """
-    return (not karte["belastbar"], karte["naeherung"],
+    return (not karte["belastbar"], not karte.get("vergleichbar", True),
+            karte["naeherung"],
             karte["schnitt_monat"] if karte["schnitt_monat"] is not None
             else 9e9, karte["anbieter"])
 
@@ -618,6 +680,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             geraet_je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
                                                    e.get("speicher_gb")))
     belege = barpreise(listungen)
+    zustaende = _zustand_je_listung(listungen)
 
     alle = list(buendel) + buendel_aus_listungen(listungen)
     gruppen: dict = {}
@@ -629,7 +692,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         tarif = tarife.get(b.tarif_id) if b.tarif_id else None
         karte = _karte(b, tarif, _barpreis_fuer(belege.get(b.sku_id, {}),
                                                 b.anbieter),
-                       katalog, geraet_je_sku)
+                       katalog, geraet_je_sku,
+                       zustand=zustand_des_buendels(b, zustaende))
         gruppen.setdefault(mid, {"id": mid, "device_id": device_id,
                                  "speicher": speicher, "karten": [],
                                  "skus": set()})
@@ -643,9 +707,17 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Farben ist dreimal derselbe Preis, und drei gleiche Karten
         # nebeneinander sind der "Dedupe-Toggle"-Fall aus B.3, nur ohne
         # Schalter. Genommen wird die guenstigste.
+        #
+        # DER ZUSTAND GEHOERT IN DEN SCHLUESSEL. Ohne ihn nahm diese Stelle
+        # je (Anbieter, Tarif) die guenstigste Karte - und die guenstigste
+        # war bei zehn o2-Modellen das erneuerte Geraet. Der Store trug
+        # beide (iPhone 15 128 GB: neu 20,00 EUR, erneuert 17,00 EUR im
+        # Monat); die Tafel zeigte nur das erneuerte, ohne Etikett, als
+        # Sieger gegen die Neugeraete von 1&1 und Vodafone (QA-Befund B1).
         je_angebot: dict = {}
         for k in karten:
-            schluessel = (k["anbieter"], k["tarif"], k["laufzeit"])
+            schluessel = (k["anbieter"], k["tarif"], k["laufzeit"],
+                          k["zustand"])
             bisher = je_angebot.get(schluessel)
             if bisher is None or (k["schnitt_monat"] or 9e9) < \
                     (bisher["schnitt_monat"] or 9e9):
@@ -665,7 +737,11 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # ERST DAS EIGENE BUENDEL, DANN DIE NAEHERUNG. Wo Vodafone selbst
         # ein Buendel zu diesem Geraet ausweist, ist es die Referenz; die
         # gerechnete Summe traete sonst als zweite Vodafone-Karte daneben.
-        eigene = [k for k in karten if k["eigen"] and k["belastbar"]]
+        # ... und nur ein NEUGERAET: ein erneuertes eigenes Buendel als
+        # Massstab fuer neue Wettbewerbergeraete waere derselbe Fehler mit
+        # umgekehrtem Vorzeichen.
+        eigene = [k for k in karten
+                  if k["eigen"] and k["belastbar"] and k["vergleichbar"]]
         naeherung = None
         if eigene:
             referenz = _referenz_aus_buendel(
@@ -688,8 +764,14 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             if anbieter not in vorhanden:
                 karten.append(_leere_karte(anbieter))
 
+        # DIE SPANNE UND DIE ZAEHLER MEINEN DEN VERGLEICH, also die
+        # Neugeraete. Ein Angebot ist jede Karte mit Zahl, die KEINE
+        # Referenzrechnung ist (die nennt sich selbst "kein Angebot" -
+        # QA-Befund S3); die etikettierten stehen daneben, mit Zahl.
+        angebote = [k for k in karten if k["belastbar"] and not k["naeherung"]]
         betraege = [k["gesamt"] for k in karten
-                    if k["belastbar"] and k["gesamt"] is not None]
+                    if k["belastbar"] and k["vergleichbar"]
+                    and k["gesamt"] is not None]
         fertig.append({
             "id": mid,
             "name": _name(katalog, gruppe["device_id"], gruppe["speicher"],
@@ -699,10 +781,15 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "karten": karten,
             "referenz": referenz,
             "laufzeiten": laufzeiten,
-            "angebote": len([k for k in karten if k["belastbar"]]),
+            "angebote": len(angebote),
+            # Wie viele der Angebote NICHT im Vergleich stehen, je Grund -
+            # das Band sagt "davon 1 erneuert", nicht "3 Angebote" allein.
+            "erneuert": len([k for k in angebote
+                             if k["zustand"] in ("refurbished", "b-ware")]),
+            "zustand_offen": len([k for k in angebote
+                                  if k["zustand"] == "unbekannt"]),
             "spanne": ([min(betraege), max(betraege)] if betraege else []),
-            "anbieter_mit_zahl": sorted({k["anbieter"] for k in karten
-                                         if k["belastbar"]}),
+            "anbieter_mit_zahl": sorted({k["anbieter"] for k in angebote}),
         })
 
     # Die Reihenfolge des Auswahlfeldes: die meisten Anbieter zuerst - dort
