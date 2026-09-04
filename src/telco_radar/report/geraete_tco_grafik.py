@@ -146,9 +146,9 @@ def balken(modell: dict) -> str:
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
-        f'aria-label="Gesamtkosten für {_t(name)} je Anbieter, '
+        f'aria-label="TCO für {_t(name)} je Anbieter, '
         f'nach Bindungsdauer getrennt">',
-        f'<title>Gesamtkosten für {_t(name)} je Anbieter</title>',
+        f'<title>TCO für {_t(name)} je Anbieter</title>',
     ]
 
     y = 0.0
@@ -230,9 +230,19 @@ def balken(modell: dict) -> str:
                     f'width="{breite:.1f}" height="{BALKEN_HOEHE}">'
                     f'<title>Bonus {_t(bonus["name"])} '
                     f'−{_t(euro(bonus["betrag"]))}</title></rect>')
+            # S4 / C.1: das Euro-Delta zur Referenz steht IN der Grafik, am
+            # Balken - dieselbe Zahl wie auf der Karte (`_delta`), nicht
+            # neu gerechnet. Nur bei gleicher Laufzeit gibt es einen
+            # Euro-Betrag; sonst bleibt der Balken beim Betrag.
+            delta = karte.get("delta") or {}
+            delta_text = ""
+            if delta.get("betrag") is not None:
+                zeichen = "−" if delta.get("guenstiger") else "+"
+                delta_text = (f' <tspan class="gr-g1-delta">'
+                              f'{zeichen}{_t(euro(delta["abstand"]))}</tspan>')
             teile.append(
                 f'<text class="gr-g1-betrag" x="{x + 8:.1f}" '
-                f'y="{y + 18:.0f}">{_t(euro(karte["gesamt"]))}</text>')
+                f'y="{y + 18:.0f}">{_t(euro(karte["gesamt"]))}{delta_text}</text>')
             y += BALKEN_HOEHE + BALKEN_ABSTAND
         y += GRUPPE_ABSTAND
 

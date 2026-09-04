@@ -2653,6 +2653,7 @@ b,strong{font-weight:700}
    damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
 .gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
   font-weight:700}
+.gr-g1-delta{font-family:var(--sans);font-size:11px;fill:var(--ink-4)}
 .gr-g1-zustand{font-family:var(--sans);font-size:11px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
 .gr-t-zustand{color:var(--red,#e60000);font-weight:700}
@@ -2697,6 +2698,12 @@ b,strong{font-weight:700}
 .gr-g1-ref-etikett{font-weight:400;font-size:12px;fill:var(--ink-4)}
 .gr-g1-tarif{font-family:var(--serif);font-size:12px;fill:var(--ink-3)}
 .gr-g1-betrag{font-family:var(--serif);font-size:13px;fill:var(--ink)}
+/* Der Betrag steht regelmaessig UEBER der gestrichelten Referenzlinie (die
+   Referenz ist meist der teuerste Balken, und seit dem Delta am Balken ist
+   der Text laenger). Ein Halo in Papierfarbe haelt die Ziffern lesbar,
+   statt die Linie durch sie hindurchlaufen zu lassen. */
+.gr-g1-betrag{paint-order:stroke;stroke:var(--paper);stroke-width:4px;
+  stroke-linejoin:round}
 .gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
 .gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
 .gr-g1-reftext{font-family:var(--sans);font-size:12px;fill:var(--al-kritisch)}

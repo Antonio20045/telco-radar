@@ -450,7 +450,8 @@
     k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
     k.laufzeit }} Monate{% else %}monatlich {{ k.monatlich | euro }}{%
     if k.zuzahlung is not none %} · Gerät einmalig {{ k.zuzahlung | euro }}{%
-    endif %}{% if k.rate is not none %} · {{ k.raten_laufzeit }} Raten à {{
+    endif %}{% if k.rate is not none %} · {% if k.raten_summe is not none %}{{
+    k.raten_summe | euro }} in {% endif %}{{ k.raten_laufzeit }} Raten à {{
     k.rate | euro }}{% endif %}{% if k.anschlusspreis is not none %} ·
     Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
 
@@ -613,7 +614,7 @@
     <select id="gr-modell" data-vorgabe="{{ vorgabe }}">
       {% for m in geraete.tco.modelle %}
       <option value="{{ m.id }}"{% if m.id == vorgabe %} selected{% endif %}>{{
-        m.hersteller }} {{ m.name }} – {{ m.anbieter_mit_zahl | length }} Anbieter</option>
+        m.titel }} – {{ m.anbieter_mit_zahl | length }} Anbieter</option>
       {% endfor %}
     </select>
     <span class="gr-a-klein">{{ geraete.tco.modelle_gesamt }} Geräte mit
@@ -623,18 +624,19 @@
   {# --- 3./4. Je Modell die Karten und die Balkengrafik --------------- #}
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
-    <h3 class="gr-tueber">{{ m.hersteller }} {{ m.name }}</h3>
+    <h3 class="gr-tueber">{{ m.titel }}</h3>
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert
       %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
       %} · davon {{ m.zustand_offen }} ohne belegten Zustand{% endif %}{% if m.spanne %} ·
-      Gesamtkosten von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{%
+      TCO{% if m.laufzeiten | length == 1 %}-{{ m.laufzeiten[0] }}{% endif
+      %} von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{%
       endif %}{% if m.laufzeiten %} · Bindung {{ m.laufzeiten | join(' und ') }}
       Monate{% endif %}</p>
 
     <div class="gr-ksteuer">
       <label>Sortierung <select data-sortiere>
         <option value="schnitt">Ø je Monat, aufsteigend</option>
-        <option value="gesamt">Gesamtkosten je Laufzeitgruppe</option>
+        <option value="gesamt">TCO je Laufzeitgruppe</option>
         <option value="einmalig">Gerät einmalig</option>
       </select></label>
       {# JE ANBIETER EIN Eintrag, nicht je Karte: zwei o2-Tarife zum
@@ -654,7 +656,8 @@
     {% if m.svg %}
     <figure class="gr-grafik">
       {{ m.svg | safe }}
-      <figcaption>Gesamtkosten je Anbieter, nach Bindungsdauer getrennt.
+      <figcaption>TCO je Anbieter, nach Bindungsdauer getrennt; der Abstand
+      zur Vodafone-Referenz steht am Balken.
       Jeder Balken ist gestapelt: {% for a in m.legende %}{{ a.name }}{%
       if not loop.last %}, {% endif %}{% endfor %}. Die gestrichelte Linie
       ist die Vodafone-Referenz. Alle Beträge stehen in den Karten darüber –
@@ -708,7 +711,7 @@
   <table class="gr-ttab gr-ttab--leit">
     <thead><tr>
       <th scope="col">Gerät</th><th scope="col">Anbieter und Tarif</th>
-      <th scope="col">Gesamtkosten</th>
+      <th scope="col">TCO</th>
       <th scope="col">Ø je Monat</th>
       <th scope="col">nach 24 Monaten</th><th scope="col">Beleg</th>
     </tr></thead>

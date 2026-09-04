@@ -170,6 +170,21 @@ def _hersteller(katalog, device_id: str) -> str:
     return getattr(g, "hersteller", "") or ""
 
 
+def titel(hersteller: str, name: str) -> str:
+    """Hersteller plus Modellname - ohne den Hersteller zu verdoppeln.
+
+    Xiaomi, Nothing und Fairphone tragen ihren Namen IM Modellnamen
+    ("Xiaomi 17", "Nothing Phone (3)", "Fairphone 6"); "Xiaomi Xiaomi 17
+    512 GB" stand am 04.09.2026 in acht Ueberschriften und im Auswahlfeld
+    (QA-Befund S12).
+    """
+    h = (hersteller or "").strip()
+    n = (name or "").strip()
+    if not h or normalisiere(n).startswith(normalisiere(h)):
+        return n
+    return f"{h} {n}"
+
+
 # --------------------------------------------------------------------------
 # Die Bausteine: Barpreise und Buendel aus den zwei Speichern
 # --------------------------------------------------------------------------
@@ -330,6 +345,10 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "buendel_monatlich": b.buendel_monatlich,
         "zuzahlung": b.geraet_zuzahlung,
         "rate": b.geraet_monatsrate,
+        # Katalog D: "X € in 36 Raten" - die Summe kommt aus dem Posten der
+        # Kennzahl, nicht aus einer Multiplikation in der Vorlage.
+        "raten_summe": next((p.get("betrag") for p in kennzahl.bestandteile
+                             if p.get("kategorie") == "raten"), None),
         "anschlusspreis": b.anschlusspreis,
         "nach_bindung": nach_bindung,
         "eff_ohne_geraet": eff,
@@ -398,6 +417,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
             "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
             "offen_nach_24": None, "offene_raten": 0, "monatlich": None,
             "buendel_monatlich": None, "zuzahlung": None, "rate": None,
+            "raten_summe": None,
             "anschlusspreis": None, "nach_bindung": None,
             "eff_ohne_geraet": None, "eff_basis": None, "bestandteile": [],
             "luecken": [], "boni": [], "boni_abzug": 0.0, "quelle_url": "",
@@ -778,11 +798,14 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         betraege = [k["gesamt"] for k in karten
                     if k["belastbar"] and k["vergleichbar"]
                     and k["gesamt"] is not None]
+        name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
+                     rueckfall=mid)
+        hersteller = _hersteller(katalog, gruppe["device_id"])
         fertig.append({
             "id": mid,
-            "name": _name(katalog, gruppe["device_id"], gruppe["speicher"],
-                          rueckfall=mid),
-            "hersteller": _hersteller(katalog, gruppe["device_id"]),
+            "name": name,
+            "hersteller": hersteller,
+            "titel": titel(hersteller, name),
             "speicher": gruppe["speicher"],
             "karten": karten,
             "referenz": referenz,
