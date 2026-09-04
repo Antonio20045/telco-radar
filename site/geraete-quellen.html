@@ -85,8 +85,8 @@
   <h2 class="rubrik">Alle beobachteten Anbieter
     <span class="rubrik-zahl">21</span></h2>
   <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>7</b><span>liefern Geräte</span></div>
-    <div class="t-kennzahl"><b>7</b><span>abgefragte Einstiegsseiten</span></div>
+    <div class="t-kennzahl"><b>8</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>9</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
 
@@ -124,16 +124,16 @@
     <span class="gr-hersteller">Deutsche Telekom</span>
   </td>
   <td>netzbetreiber</td>
-  <td><code>json_endpunkt</code></td>
+  <td><code>telekom_kategorie</code></td>
   <td>
-    <span class="sdot quarantaene"></span>
-    nicht angebunden
+    <span class="sdot empty"></span>
+    angebunden, ohne Fund
   </td>
   <td class="num">0</td>
   <td class="gr-grund">
-    Der Blocker ist nicht der Zugang, sondern die Preisform. Nachgemessen am 11.08.2026 an /shop/geraet/apple/apple-iphone-17-pro-max/silber-256-gb (HTTP 200, 2,8 MB, HTTP/1.1): kein ld+json, kein Microdata, und im Zustandsobjekt window.__INITIAL_STATE__ trägt productDetailed.productDetailsData zwar Modellname, Farben und Speicherstufen, aber als Preis nur einen deltaPrice je Stufe — also einen Aufschlag ohne Grundbetrag. Die einzigen absoluten Beträge stehen unter productDetailed.installmentConfiguratorItems als upfrontPrice je Ratenlaufzeit (12/24/36 Monate) und sind damit Zuzahlungen im Bündel, keine Ladenpreise. ZUR AWS-WAF, korrigiert am 03.09.2026: Sie ist vorhanden — das ausgelieferte HTML führt AWS_WAF_API_KEY und eine AWS_WAF_INTEGRATION_URL auf ein Captcha unter awswaf.com. Sie blockiert den Abruf aber nicht: die Kategorieseite /shop/geraete/smartphones/ ohne-vertrag antwortet mit TelcoRadar/1.0 über HTTP/2 mit HTTP 200, ohne 403 und ohne Challenge. Die frühere Formulierung &#34;über HTTP/2 antwortet eine WAF-Challenge&#34; war falsch und ist ersetzt; sie ersatzlos zu streichen wäre es ebenso gewesen. Offen bleibt die httpx-eigene 202-Antwort (CLAUDE.md:683-687) — gemessen wurde mit curl. Und: dieselbe Kategorieseite liefert serverseitig absolute Beträge für zehn Geräte (upfrontPrice + 36 × recurringPrice == totalPrice bei 10 von 10). Das ist ein 36-Monats-Ratengesamtbetrag, kein Barpreis — er gehört erst auf die Seite, wenn die Preisform ein eigenes Datum ist, sonst schlägt er jeden Barpreis im Vergleich. Ein Adapter kann Telekom deshalb erst liefern, wenn er die Preisform mitschreibt. Die Linkernte steht: die Übersichtsseite führt zehn Produktadressen als echte a-href mit dem Pfadmuster /shop/geraet/.
+    ANGEBUNDEN SEIT 04.09.2026 — mit einer Preisform, die keine Barpreisform ist. Die Kategorieseite /shop/geraete/smartphones/ ohne-vertrag antwortet dem Absender TelcoRadar/1.0 mit HTTP 200 und 2,23 MB und trägt in window.__INITIAL_STATE__.productList.data zehn Geräte mit absoluten Beträgen: upfrontPrice, recurringPrice über 36 Raten und totalPrice. Nachgerechnet geht die Probe bei 10 von 10 auf (Apple iPhone 17 Pro: 99,00 + 36 × 30,50 = 1197,00; Samsung Galaxy Z Fold8 Ultra: 399,00 + 36 × 50,00 = 2199,00). Das ist ein 36-Monats-Ratengesamtbetrag und kein Kassenpreis, und genau das ist die Bedingung, die der alte Grund gestellt hatte: der Adapter schreibt die Preisform mit (anzahlung, monatsrate, laufzeit_monate), und geht die Probe nicht auf, wird der Satz verworfen statt als Barpreis gespeichert. Der Befund vom 11.08.2026 zur PRODUKTSEITE bleibt richtig und ist der Grund, warum hier die Kategorieseite steht: productDetailed. productDetailsData trägt je Speicherstufe nur einen deltaPrice, also einen Aufschlag ohne Grundbetrag. Einen Zinssatz nennt die Seite nicht; zins_effektiv bleibt leer und heißt &#34;unbekannt&#34;, nicht &#34;null Prozent&#34;. Die zehn Produktadressen stehen als echte a-href (/shop/geraet/) im selben HTML und werden dem Gerät über seine drei Slugs zugeordnet — nicht aus ihnen zusammengesetzt. GRENZE, unverändert: aus dem GitHub-Actions-IP-Bereich antwortet telekom.de httpx mit HTTP 202 und rund 2 KB Challenge-HTML (CLAUDE.md § 6). Der Adapter ändert daran nichts und soll es nicht — ein Fingerprint-Trick wäre eine Umgehung. Fällt der Abruf so aus, trägt die Nutzlast kein Gerät, die Seite gilt als ungelesen, und die Bestandsdaten altern NICHT. ROBOTS (04.09.2026 gelesen): /robots.txt sperrt für User-agent * nur /is-bin/intershop.enfinity/BOS/ und /is-bin/intershop.static/. Die Shop-Pfade sind frei.
     
-    <span class="gr-einstiege"><a href="https://www.telekom.de/mobilfunk/geraete/smartphone" rel="noopener">Smartphones</a></span>
+    <span class="gr-einstiege"><a href="https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag" rel="noopener">Smartphones ohne Vertrag</a></span>
     
   </td>
 </tr>
@@ -311,14 +311,14 @@
     <span class="gr-hersteller">United Internet</span>
   </td>
   <td>netzbetreiber</td>
-  <td><code>ldjson</code></td>
+  <td><code>einsundeins_buendel</code></td>
   <td>
-    <span class="sdot quarantaene"></span>
-    nicht angebunden
+    <span class="sdot ok"></span>
+    liefert
   </td>
-  <td class="num">0</td>
+  <td class="num">35</td>
   <td class="gr-grund">
-    Es GIBT ld+json, aber sein offers.price ist der MONATSPREIS des Tarifs (37,99 EUR), nicht der Gerätepreis. Diese Zahl in der Preisspalte wäre falsch - und zwar plausibel falsch. Erst anbinden, wenn der Gerätepreis belegbar getrennt vorliegt.
+    ANGEBUNDEN SEIT 04.09.2026 — als BÜNDEL, nicht als Barpreis. Der alte Grund bleibt in seinem Kern richtig: offers.price im ld+json ist der MONATSPREIS des Bündels aus Gerät und Tarif, nicht der Gerätepreis (gemessen 04.09.2026 an mobile.1und1.de/iphone-17-pro: HTTP 200, 325 KB, &#34;iPhone 17 Pro mit 1&amp;1 All-Net-Flat S&#34;, price 44.99). Als Barpreis gespeichert wäre die Zahl plausibel falsch. Falsch war nur die Folgerung, dass man deshalb warten müsse: 1&amp;1 verkauft Geräte ausschließlich im Tarifbund, einen Barpreis gibt es dort nicht — und unter TCO-first ist der Monatspreis ohnehin die Leitgröße. Der Betrag landet deshalb in preis_mit_vertrag_ab, zusammen mit tarif_referenz (aus der description der Seite) und laufzeit_monate (36, aus window.currentHardwareOfferDuration). preis_ohne_vertrag bleibt LEER; ihn aus 44,99 × 36 minus Tarifpreis zu rechnen wäre eine Rechnung dieses Projekts und keine Angabe des Anbieters. Ohne Tarifnamen in der Beschreibung wird der Satz verworfen — eine Bündelzahl ohne ihren Vertrag ist bedeutungslos. Gelesen wird je Produktseite genau die VORAUSGEWÄHLTE Variante (window.currentProductVariants: cosmic orange, 256 GB). Die Preismatrix über Tarif × Speicher lädt die Seite erst im Browser nach; sie braucht einen eigenen Spike und wird hier nicht aus einer einzigen Zahl vervielfältigt. LINKERNTE: die Kategorieseite /smartphones führt 167 Adressen der eigenen Domain, davon 42 Produktseiten. Geerntet wird ausschließlich, was die Seite selbst als Katalogkachel auszeichnet (a.hardware-box__heading). Ein Pfadmuster kann das nicht leisten - /iphone-17-pro und /handyvertrag-ohne-laufzeit sind pfadgleich. ROBOTS (04.09.2026 gelesen): mobile.1und1.de sperrt für User-agent * /xml/, /static/, /modules/ sowie einzelne Aktions- und Bestellstrecken. /smartphones und die Produktseiten sind frei, der Parameter ?chosenTariff= ist ausdrücklich erlaubt. Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) - dort trägt derselbe Anbieter seine eigene Marke, hier trägt das Gerät die des Herstellers.
     
     <span class="gr-einstiege"><a href="https://mobile.1und1.de/smartphones" rel="noopener">Smartphones</a></span>
     
@@ -358,7 +358,7 @@
     <span class="sdot ok"></span>
     liefert
   </td>
-  <td class="num">134</td>
+  <td class="num">135</td>
   <td class="gr-grund">
     Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit belegbarem Preis ohne Vertrag - die Telekom selbst steht nicht in dieser Datenbank, weil ihr Gerätepreis nur als Ratenzahlung ausgewiesen wird (nicht, wie hier bis zum 03.09.2026 stand, wegen ihrer AWS-WAF: die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe grund beim Anbieter Telekom). congstar trifft Apple, Samsung, Google UND Xiaomi (Google fehlte bisher ganz). Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig - dieser Adapter liest es deshalb NICHT. Der Geraetepreis ohne Vertrag steht stattdessen im Next.js-Flight-Payload der Produktseite (`self.__next_f.push([1,&#34;…&#34;])`), je Variante unter `prices.paymentVariants[]`, im Eintrag mit `type == &#34;ONE_TIME_PURCHASE&#34;` UND `contractDuration == 0`, dessen Wert `oneTime.listed`. DIE FALLE: derselbe Knoten traegt auch `oneTime.discounted` - einen Rabatt, der laut der Fussnote &#34;bei Abschluss der ANF M&#34; entsteht, also an einen TARIFABSCHLUSS gebunden ist. Gemessen an vier Belegdateien: iPhone 17 256GB listed 919,00 EUR (discounted waere 811), Galaxy S25 128GB 699,00 (519), Pixel 11 256GB 991,00 (757), Redmi Note 17 Pro 256GB 477,00 (225) - Abstand bis 252 EUR, discounted haette congstar in jedem der vier Faelle faelschlich als Preisfuehrer gezeigt. OFFEN: dass das Geraet auch WIRKLICH ganz ohne SIM-Vertrag zu diesem Preis zu haben ist, ist nicht statisch bewiesen - die Kauflabels rendert React im Browser nach. Belegt ist `contractDuration: 0`, `recurring.listed: 0`, und der Marktvergleich stuetzt es (919/699/ 991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein versteckter Tarifzwang verursachen wuerde).
     
@@ -589,7 +589,7 @@
   Gerätekatalog und in der CSV-Tabelle – beide zeigen den Bestand, nicht die
   geprüfte Auswahl. Ein Preis, der sich nicht belegen lässt, verschwindet
   nicht; er wird nur nicht gegen einen anderen gerechnet.</p>
-  <p class="gr-erklaer">494 Preiszeilen geprüft,
+  <p class="gr-erklaer">495 Preiszeilen geprüft,
   10 aus dem Vergleich genommen,
   2 Auffälligkeiten notiert.</p>
   
