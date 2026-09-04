@@ -349,3 +349,126 @@ def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
     finally:
         http_modul.fetch = echt
     assert bilanz["listungen"] == 2, bilanz["anbieter"]
+
+
+# --------------------------------------------------------------------------
+# Der Massstab aus dem Tarifbestand (Phase 6, 04.09.2026)
+#
+# Die Stufe schreibt seit heute `data/state/geraete_tco.json` mit - die
+# SIM-only-Referenzen, ohne die ein Geraeteanteil nicht bestimmbar ist.
+# Sie steht NACH `db.save()`: ein Messtag ist nicht nachholbar, ein
+# Massstab schon (Lehre aus Lauf 31422689829).
+# --------------------------------------------------------------------------
+
+_TARIFE = [
+    {"tarif_id": "telekom:magentamobil-l", "anbieter": "Telekom",
+     "name": "MagentaMobil L", "art": "mobilfunk", "grundgebuehr": 59.95,
+     "anschlusspreis": None, "preisphasen": [],
+     "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
+     "abgerufen_am": "2026-08-11"},
+    {"tarif_id": "o2:o2-home-l", "anbieter": "o2", "name": "O2 Home L",
+     "art": "festnetz", "grundgebuehr": 44.99, "anschlusspreis": None,
+     "preisphasen": [], "dokument_url": "https://x.de/home-l.pdf",
+     "abgerufen_am": "2026-08-11"},
+]
+
+
+def _mit_tarifen(root: Path, saetze=None) -> Path:
+    zustand = root / "data" / "state"
+    zustand.mkdir(parents=True, exist_ok=True)
+    (zustand / "tarife.jsonl").write_text(
+        "".join(json.dumps(s, ensure_ascii=False) + "\n"
+                for s in (_TARIFE if saetze is None else saetze)),
+        encoding="utf-8")
+    return root
+
+
+def test_der_lauf_schreibt_die_sim_only_referenzen(tmp_path):
+    root = _mit_tarifen(_root(tmp_path))
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    namen = [r["tarif_name"] for r in tco["sim_only"]]
+    # Der Festnetztarif ist KEIN Massstab fuer ein Smartphone-Buendel.
+    assert namen == ["MagentaMobil L"]
+    assert tco["sim_only"][0]["tarif_id"] == "telekom:magentamobil-l"
+    assert tco["sim_only"][0]["tarif_sim_only_monatlich"] == 59.95
+    assert bilanz["sim_only_referenzen"] == 1
+    assert bilanz["tarife_im_bestand"] == 2
+
+
+def test_ohne_tarifbestand_bleibt_der_geraetebestand_unberuehrt(tmp_path):
+    """Kein `tarife.jsonl`: die Stufe laeuft durch, ohne etwas zu verlieren."""
+    root = _root(tmp_path)
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+    assert bilanz["status"] == "ok"
+    assert bilanz["sim_only_referenzen"] == 0
+    assert (root / "data" / "state" / "geraete_db.json").exists()
+    assert GeraeteDB(root / "data" / "state" / "geraete_db.json").eintraege()
+
+
+def test_ein_leerer_tarifbestand_loescht_den_massstab_nicht(tmp_path):
+    """"Nicht gelesen" ist nicht "leer".
+
+    `Tarifbestand.aus_datei` wirft bei fehlender Datei nicht. Ein
+    Baseline-Reset, ein Merge-Konflikt oder ein Wettlauf mit `radar.yml`
+    saehe damit aus wie "es gibt keine Tarife mehr" - und `ersetze_
+    referenzen` loeschte den ganzen Massstab, ohne einen Fehler zu melden.
+    Dieselbe Fehlerklasse wie `promo_store.mark_stale` ohne
+    `gepruefte_seiten`.
+    """
+    root = _mit_tarifen(_root(tmp_path))
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
+    (root / "data" / "state" / "tarife.jsonl").unlink()
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
+                               hole=_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert len(tco["sim_only"]) == 1          # noch da
+    assert bilanz["sim_only_referenzen"] == 0  # aber nicht geschrieben
+
+
+def test_ein_verschwundener_tarif_verschwindet_aus_dem_massstab(tmp_path):
+    """Die Gegenprobe: was der Bestand wirklich hergibt, wird ersetzt.
+
+    Ohne sie bewiese der Test darueber nur, dass nie geloescht wird - und
+    dann waere der Massstab wieder die wachsende Liste, gegen die
+    `ersetze_referenzen` gebaut ist.
+    """
+    root = _mit_tarifen(_root(tmp_path))
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
+    anders = dict(_TARIFE[0], tarif_id="telekom:magentamobil-m",
+                  name="MagentaMobil M", grundgebuehr=49.95)
+    _mit_tarifen(root, [anders])
+
+    run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert [r["tarif_name"] for r in tco["sim_only"]] == ["MagentaMobil M"]
+
+
+def test_ein_fehler_beim_massstab_kostet_den_messtag_nicht(tmp_path, monkeypatch):
+    """Der Geraetebestand ist zu diesem Zeitpunkt schon gespeichert.
+
+    Ein Messtag ist nicht nachholbar, ein Massstab schon - deshalb steht
+    der Block nach `db.save()` und in seinem eigenen Auffangboden.
+    """
+    import telco_radar.geraete_pipeline as pipeline
+    root = _mit_tarifen(_root(tmp_path))
+
+    def kaputt(*_a, **_k):
+        raise OSError("Platte voll")
+    monkeypatch.setattr(pipeline.TcoDB, "save", kaputt)
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+    assert bilanz["status"] == "ok"
+    assert bilanz["listungen"] > 0
+    assert (root / "data" / "state" / "geraete_db.json").exists()
+    # Und die Bilanz behauptet NICHT, geschrieben zu haben - das ist der
+    # einzige Fall, fuer den dieser Zaehler gebaut ist.
+    assert bilanz["sim_only_referenzen"] == 0

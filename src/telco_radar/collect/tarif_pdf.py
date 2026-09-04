@@ -408,7 +408,8 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
     treffer = muster.search(text)
     if treffer:
         zeile = _zeile_mit(text, muster)
-        if not _ABRECHNUNG_IN_WOCHEN.search(zeile):
+        if not (_ABRECHNUNG_IN_WOCHEN.search(zeile)
+                or _VERTRAG_IN_WOCHEN.search(text)):
             t.setze("grundgebuehr", zahl(treffer.group(1)), zeile)
         return
     if kopf is not None:
@@ -567,7 +568,32 @@ _PREISKOPF = re.compile(r"Listenpreis|Monatlicher Preis|Monatspreis", re.I)
 # deshalb von selbst richtig. Der einzelne Listenpreis (Fall 5) braucht die
 # Sperre ausdruecklich - ohne sie stand Vodafones CallYa mit 14,99 EUR als
 # Monatspreis im Bestand.
+#
+# ZWEI MUSTER, WEIL DER TAKT AN ZWEI STELLEN STEHT. congstar schreibt ihn
+# an den Betrag ("10,00 € / 4 Wochen"), Vodafone an den VERTRAG - und den
+# Preis eine Zeile weiter, ohne jede Zeitangabe:
+#
+#     Vertragslaufszeiten 4 Wochen, Kündigungsfrist 1 Monat
+#     Listenpreis inkl. MwSt.                        14,99 €
+#
+# Die erste Fassung dieser Sperre pruefte nur die Trefferzeile und lief an
+# genau dem Dokument vorbei, mit dem sie begruendet wurde. Gemessen an
+# `vodafone_callya_allnet_flat_m` - die Fixture liegt bei, damit die
+# Begruendung nachpruefbar ist.
+#
+# Gebunden wird an die VERTRAGSLAUFZEIT, nicht an das Wort "Wochen"
+# irgendwo: "Kuendigungsfrist 4 Wochen" kommt in monatlich abgerechneten
+# Vertraegen vor, und eine Regel darauf loeschte deren Preis.
 _ABRECHNUNG_IN_WOCHEN = re.compile(r"(?:/|pro|je)\s*\d*\s*Woche", re.I)
+_VERTRAG_IN_WOCHEN = re.compile(r"Vertragslaufs?zeiten?[^\n]{0,30}?\d+\s*Wochen",
+                                re.I)
+
+# Wie viele Zeilen unter einem Tabellenkopf noch zur Tabelle gehoeren
+# koennen. Gemessen: die laengste Staffel im Bestand hat sechs Zeilen
+# (Vodafone "mit Smartphone"), dazu Zwischenzeilen ohne Betrag. Der Deckel
+# ist eine Notbremse, die eigentliche Grenze ist die erste betragslose
+# Zeile nach der ersten Preiszeile.
+_TABELLENTIEFE = 15
 _MONATSSPALTE = re.compile(r"(ab\s+)?Monat\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?",
                            re.I)
 
@@ -611,7 +637,7 @@ def _tabellenzeilen(zeilen: list[str],
     Hausnummer als Preis.
     """
     posten: list[tuple[str, list[float], str]] = []
-    for zeile in zeilen[kopf + 1:kopf + 16]:
+    for zeile in zeilen[kopf + 1:kopf + 1 + _TABELLENTIEFE]:
         treffer = list(_BETRAG_MIT_WAEHRUNG.finditer(zeile))
         if not treffer:
             if posten:
@@ -695,11 +721,12 @@ def _anbieter(text: str, t: Tarif) -> None:
     for name, muster in (
         # congstar steht VOR Telekom, und das ist keine Reihenfolgefrage,
         # sondern eine Korrektheitsfrage: das congstar-PIB traegt im Fuss
-        # "congstar - eine Marke der Telekom Deutschland GmbH". Heute rettet
-        # nur der Zeilenumbruch mitten in diesem Satz das Ergebnis - stuende
-        # er auf einer Zeile, waeren alle congstar-Tarife als Telekom in der
-        # Datenbank. Eine Marke ist nicht ihr Mutterkonzern; congstar
-        # verkauft eigene Tarife zu eigenen Preisen.
+        # "congstar - eine Marke der Telekom Deutschland GmbH". Bis zum
+        # 04.09.2026 rettete nur der Zeilenumbruch mitten in diesem Satz
+        # das Ergebnis - stuende er auf einer Zeile, waeren alle
+        # congstar-Tarife als Telekom in der Datenbank gelandet. Eine
+        # Marke ist nicht ihr Mutterkonzern; congstar verkauft eigene
+        # Tarife zu eigenen Preisen (29,00 gegen 59,95 EUR).
         ("congstar", r"\bcongstar\b"),
         ("Telekom", r"Telekom Deutschland GmbH"),
         ("o2", r"Telefónica Germany"),

@@ -170,26 +170,47 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
     referenzen: list = []
     tarife = 0
+    geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
         tarife = len(bestand)
         referenzen = aus_bestand(bestand)
-        tco = TcoDB(zustand / "geraete_tco.json")
-        # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
-        # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
-        # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
-        _, entfernt = tco.ersetze_referenzen(referenzen, heute)
-        if entfernt:
-            log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
-                     "entfernt", entfernt)
-        tco.save(heute)
+        if not referenzen:
+            # "NICHT GELESEN" IST NICHT "LEER". `Tarifbestand.aus_datei`
+            # wirft bei fehlender Datei nicht, sondern liefert einen leeren
+            # Bestand - ein Baseline-Reset, ein Merge-Konflikt oder ein
+            # Wettlauf mit `radar.yml` saehe damit aus wie "es gibt keine
+            # Tarife mehr", und `ersetze_referenzen` loeschte den ganzen
+            # Massstab. Dieselbe Fehlerklasse wie bei
+            # `promo_store.mark_stale` ohne `gepruefte_seiten` und beim
+            # `PromoExtractionError`, beide in CLAUDE.md § 6 als teuer
+            # dokumentiert.
+            log.warning("Tarif-Referenzen: der Tarifbestand liefert keine "
+                        "einzige Referenz (%d Saetze gelesen) - der "
+                        "bisherige Massstab bleibt unangetastet", tarife)
+        else:
+            tco = TcoDB(zustand / "geraete_tco.json")
+            # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
+            # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
+            # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
+            _, entfernt = tco.ersetze_referenzen(referenzen, heute)
+            if entfernt:
+                log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
+                         "entfernt", entfernt)
+            tco.save(heute)
+            # ERST HIER. `save()` kann werfen (Platte, Rechte, Pfad), und
+            # der Auffangboden unten faengt das ab - eine Bilanz, die schon
+            # vorher "25 Referenzen" meldet, ist genau im einzigen Fall
+            # blind, fuer den sie gebaut ist.
+            geschrieben = True
     except Exception as exc:  # noqa: BLE001
         # Ein Fehler hier darf den Geraetebestand nicht kosten - der ist
         # zu diesem Zeitpunkt schon gespeichert, und ein Messtag ist nicht
         # nachholbar (Lauf 31422689829).
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
-    log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen",
-             len(referenzen), tarife)
+    log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
+             len(referenzen), tarife,
+             "" if geschrieben else " - NICHT GESCHRIEBEN")
 
     kollisionen = list(getattr(db, "kollisionen", []))
     bilanz = {
@@ -211,7 +232,7 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
         # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`
         # gefuellt ist, hat der Schreibversuch geworfen.
-        "sim_only_referenzen": len(referenzen),
+        "sim_only_referenzen": len(referenzen) if geschrieben else 0,
         "tarife_im_bestand": tarife,
         "sekunden": round(time.monotonic() - beginn, 1),
     }

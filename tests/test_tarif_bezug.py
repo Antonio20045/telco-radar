@@ -19,6 +19,14 @@ from telco_radar.tarif_model import HOCH, MITTEL
 from telco_radar.tco_model import SimOnlyReferenz
 
 _WURZEL = Path(__file__).parent.parent
+# Die MESSUNG vom 04.09.2026, als Fixture. Sie liegt hier und nicht in
+# `data/state/`, weil ein Baseline-Reset (CLAUDE.md § 6: die vier
+# State-Dateien per `git rm` entfernen) sonst diese Testdatei mitnaehme -
+# und ein Test, der an einem Betriebszustand haengt, meldet den naechsten
+# Reset statt den naechsten Fehler.
+_FIXTURE = _WURZEL / "tests" / "fixtures" / "tarife" / "bestand_2026-09-04.jsonl"
+# Der AUSGELIEFERTE Bestand. Genau EIN Test sieht ihn an, und der prueft
+# das Abnahmekriterium der Phase 6, nicht das Verhalten des Codes.
 _BESTAND = _WURZEL / "data" / "state" / "tarife.jsonl"
 
 
@@ -40,7 +48,7 @@ def _satz(anbieter: str, name: str, grundgebuehr=None, **kw) -> dict:
 
 @pytest.fixture(scope="module")
 def echt() -> Tarifbestand:
-    return Tarifbestand.aus_datei(_BESTAND)
+    return Tarifbestand.aus_datei(_FIXTURE)
 
 
 # --------------------------------------------------------------------------
@@ -252,17 +260,33 @@ def test_ein_fehlender_anschlusspreis_bleibt_none_und_wird_nicht_null():
     assert aus_bestand(bestand)[0].anschlusspreis is None
 
 
-def test_der_bestand_auf_der_platte_ist_json_und_nicht_leer():
-    """Die Gegenprobe zur Fixture: die Datei im Repo ist wirklich gefuellt.
+def test_der_ausgelieferte_bestand_erfuellt_das_abnahmekriterium():
+    """Phase 6: "`tarife.jsonl` enthaelt Tarife von mindestens drei Anbietern."
 
-    Ohne sie liefe die halbe Datei gegen einen leeren Bestand und waere
-    trotzdem gruen - dieselbe Falle wie der Lookup ins Leere vom
-    09.08.2026.
+    Der EINZIGE Test, der die Betriebsdatei ansieht - und er prueft
+    absichtlich nicht den Code, sondern den Bestand. Wird er rot, ist nicht
+    eine Funktion kaputt, sondern das Kriterium nicht mehr erfuellt (etwa
+    nach einem Baseline-Reset). Alles Verhalten haengt an der Fixture
+    daneben.
     """
     zeilen = [json.loads(z) for z in
               _BESTAND.read_text(encoding="utf-8").splitlines() if z.strip()]
-    assert len(zeilen) >= 30
     assert all(z.get("tarif_id") for z in zeilen)
+    assert len({z["anbieter"] for z in zeilen}) >= 3
+
+
+def test_fixture_und_betriebsdatei_sind_dasselbe_format():
+    """Sonst prueft die halbe Datei ein Format, das es nicht gibt.
+
+    Die Fixture ist eine Kopie vom 04.09.2026 und darf im Aufbau nicht von
+    der Datei abweichen, die der Sammler wirklich schreibt - dieselbe
+    Ueberlegung wie beim Test, der PDF und Textfixture gegeneinander haelt.
+    """
+    def felder(pfad):
+        zeilen = [json.loads(z) for z in
+                  pfad.read_text(encoding="utf-8").splitlines() if z.strip()]
+        return set().union(*(set(z) for z in zeilen)) if zeilen else set()
+    assert felder(_FIXTURE) == felder(_BESTAND)
 
 
 def test_das_geraeteblatt_eines_tarifs_ist_keine_zweite_referenz():
@@ -307,9 +331,70 @@ def test_das_geraeteblatt_bleibt_wenn_sein_preis_abweicht():
 
 def test_der_echte_bestand_traegt_jeden_massstab_genau_einmal():
     """Gegen die Datei im Repo gemessen - keine Dublette im Massstab."""
-    referenzen = aus_bestand(Tarifbestand.aus_datei(_BESTAND))
+    referenzen = aus_bestand(Tarifbestand.aus_datei(_FIXTURE))
     ids = [r.id for r in referenzen]
     assert len(ids) == len(set(ids))
     # Und die Vodafone-Geraeteblaetter sind wirklich draussen; ohne diese
     # Zeile bewiese der Test nur, dass IDs eindeutig sind.
     assert not [r for r in referenzen if "mit Smartphone" in r.tarif_name]
+
+
+# --------------------------------------------------------------------------
+# Nachtrag aus dem Review vom 04.09.2026
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("anbieter,referenz", [
+    # Die Marke steht im Blatt, nicht auf der Produktseite (Vodafone).
+    ("Vodafone", "Mobil M"),
+    ("Vodafone", "Vodafone Mobil M"),
+])
+def test_die_marke_darf_auf_der_einen_seite_fehlen(echt, anbieter, referenz):
+    assert echt.ueber_namen(anbieter, referenz) is not None
+
+
+@pytest.mark.parametrize("anbieter,referenz,erwartet", [
+    # ... und andersherum: im Blatt steht sie NICHT, auf der Produktseite
+    # schon. Das ist bei Telekom und congstar der Regelfall - und genau die
+    # Richtung, die die erste Fassung nicht aufloeste. Weil
+    # `TcoDB.upsert_buendel` ohne `tarif_id` wirft, haette Phase 4 fuer
+    # beide Anbieter keinen einzigen Buendelpreis speichern koennen.
+    ("Telekom", "Telekom MagentaMobil L", "telekom:magentamobil-l"),
+    ("congstar", "congstar Allnet Flat L", "congstar:allnet-flat-l"),
+])
+def test_die_marke_darf_auch_auf_der_anderen_seite_stehen(echt, anbieter,
+                                                          referenz, erwartet):
+    bezug = echt.ueber_namen(anbieter, referenz)
+    assert bezug is not None, f"{anbieter} / {referenz}"
+    assert bezug.tarif_id == erwartet
+
+
+def test_die_marke_verbindet_keine_verschiedenen_tarife(echt):
+    """Die Gegenprobe zur Praefix-Regel.
+
+    Sie darf Schreibweisen zusammenfuehren, nicht Tarife. Ohne diese Zeile
+    bewiese der Test darueber nur, dass die Regel etwas findet.
+    """
+    assert echt.ueber_namen("Telekom", "Telekom MagentaMobil XL") \
+        .tarif_id == "telekom:magentamobil-xl"
+    assert echt.ueber_namen("Telekom", "Telekom MagentaMobil Gibtsnicht") is None
+
+
+def test_zwei_tarife_mit_derselben_titelzeile_ergeben_einen_massstab():
+    """Live gemessen fuehrt o2 zwei PDFs mit derselben Ueberschrift.
+
+    `SimOnlyReferenz.id` ist (Anbieter, Tarifname) und kann sie nicht
+    trennen. Ohne die Sperre uebernaehme der Speicher den ZWEITEN Satz und
+    behielte den Schluessel des ersten - die Zeile truege dann einen Betrag
+    aus dem einen und einen `tarif_id` aus dem anderen Dokument.
+    """
+    ersterer = _satz("o2", "O2 Mobile L 175/250/300 Flex", 44.99)
+    ersterer["dokument_url"] = "https://x.de/erstes.pdf"
+    zweiter = _satz("o2", "O2 Mobile L 175/250/300 Flex", 54.99)
+    zweiter["tarif_id"] += "#abcd1234"      # so trennt sie der Tarifspeicher
+    zweiter["dokument_url"] = "https://x.de/zweites.pdf"
+    referenzen = aus_bestand(Tarifbestand([ersterer, zweiter]))
+    assert len(referenzen) == 1
+    # Der ueberlebende Satz ist in sich stimmig: sein Betrag und sein
+    # Beleg gehoeren zusammen.
+    assert referenzen[0].tarif_sim_only_monatlich == 44.99
+    assert referenzen[0].quelle_url == "https://x.de/erstes.pdf"

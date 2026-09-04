@@ -25,8 +25,13 @@ werden konnte, erscheint nicht.
 
 Was ausgeschlossen ist, und warum
 ---------------------------------
-* **Festnetz.** Ein Festnetztarif ist kein Massstab fuer einen
-  Geraetepreis; o2 fuehrt zwei davon im Bestand.
+* **Festnetz** - soweit das Blatt seine Art auszeichnet. Ein
+  Festnetztarif ist kein Massstab fuer einen Geraetepreis; o2 fuehrt zwei
+  davon im Bestand. ACHTUNG, die Regel greift nur, wo `art` gesetzt ist:
+  Vodafones Blaetter tragen die Art gar nicht (alle zehn Saetze im Bestand
+  haben `art=""`), dort haelt heute allein die Quellenkonfiguration
+  (`bevorzugt: vf-mobil-`) die DSL-Blaetter draussen. Wer dort ein
+  Festnetzblatt hereinlaesst, bekommt es als SIM-only-Referenz.
 * **Tarife ohne Grundpreis.** Ohne Betrag kein Massstab.
 * **Die erste Preisphase ist der Preis.** Traegt ein Tarif mehrere Phasen,
   gilt die, die bei Vertragsschluss laeuft - nicht ihr Durchschnitt. Was
@@ -103,6 +108,7 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
                      (satz.get("name") or "").strip().lower())] = betrag
 
     referenzen: list[SimOnlyReferenz] = []
+    gesehen: dict[str, str] = {}
     for satz in bestand.saetze():
         if (satz.get("art") or "").lower() in _UNGEEIGNET:
             continue
@@ -121,7 +127,7 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
             log.debug("SIM-only-Referenz uebersprungen: %r ist das "
                       "Geraeteblatt von %r", name, ohne_zusatz)
             continue
-        referenzen.append(SimOnlyReferenz(
+        referenz = SimOnlyReferenz(
             anbieter=anbieter,
             tarif_name=name,
             # Die Referenz KOMMT aus dem Bestand - ihr Schluessel ist damit
@@ -134,5 +140,26 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
                             else float(satz["anschlusspreis"])),
             quelle_url=satz.get("dokument_url", ""),
             abgerufen_am=satz.get("abgerufen_am", ""),
-        ))
+        )
+        # ZWEI TARIFE MIT DERSELBEN TITELZEILE ergeben eine ID.
+        # `SimOnlyReferenz.id` ist (Anbieter, Tarifname) - live gemessen
+        # fuehrt o2 `o2-home-l-flex` und `o2-home-l-175-flex` als getrennte
+        # PDFs mit derselben Ueberschrift (CLAUDE.md § 6). Der Tarifspeicher
+        # trennt sie ueber einen Hash-Zusatz an der `tarif_id`, dieser
+        # Schluessel kann das nicht.
+        #
+        # Ohne die Sperre uebernaehme `TcoDB` den ZWEITEN Satz und behielte
+        # dabei den Schluessel des ersten - die Zeile truege dann einen
+        # Betrag aus dem einen und einen `tarif_id` aus dem anderen
+        # Dokument. Der erste gewinnt und der zweite wird gemeldet: ein
+        # Massstab, dessen Beleg auf ein anderes Blatt zeigt, ist schlimmer
+        # als ein fehlender.
+        if referenz.id in gesehen:
+            log.warning("SIM-only-Referenz %s doppelt: %r und %r tragen "
+                        "dieselbe Titelzeile - der zweite Satz bleibt "
+                        "draussen", referenz.id, gesehen[referenz.id],
+                        satz.get("tarif_id"))
+            continue
+        gesehen[referenz.id] = satz.get("tarif_id", "")
+        referenzen.append(referenz)
     return referenzen

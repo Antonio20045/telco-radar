@@ -17,11 +17,9 @@ KEIN NETZ, KEINE UHR, KEIN gemeinsamer Zustand zwischen den Tests.
 from telco_radar.geraete_model import Geraet, Katalog, VERGLEICHBARE_ZUSTAENDE
 from telco_radar.report.geraete_tco_view import (REFERENZEN_SICHTBAR,
                                                 aufbereiten, leer)
-from telco_radar.tco_model import (POSTEN_ANSCHLUSS, POSTEN_TARIF,
-                                   TCO_HORIZONT, SimOnlyReferenz)
 from telco_radar.tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE,
-                                   POSTEN_TARIF, Buendel, SimOnlyReferenz,
-                                   geraeteanteil, tco_24)
+                                   POSTEN_TARIF, TCO_HORIZONT, Buendel,
+                                   SimOnlyReferenz, geraeteanteil, tco_24)
 
 # Das Rechenbeispiel des Auftrags: 1 EUR + 24 x 30 EUR = 721 EUR.
 _ANZAHLUNG, _RATE = 1.0, 30.0
@@ -563,3 +561,32 @@ def test_eine_referenz_ohne_preis_steht_nicht_im_massstab():
     """Ein Massstab ohne Zahl ist keiner."""
     d = aufbereiten([], [_ref(tarif_sim_only_monatlich=None)], [], None)
     assert d["referenzen"] == []
+
+
+def test_der_anschlusspreis_gilt_erst_als_erledigt_wenn_ihn_alle_tragen():
+    """"Vereinigung, nicht Durchschnitt" - die Regel der Funktion.
+
+    Mit `any` meldete die Seite den Anschlusspreis als erledigt, sobald
+    EIN Tarif von fuenfundzwanzig ihn nennt. Ein Posten, den nur die
+    Haelfte der Anbieter ausweist, ist eine offene Baustelle.
+    """
+    gemischt = aufbereiten([], [_ref(tarif="A", anschlusspreis=39.99),
+                                _ref(tarif="B", anschlusspreis=None)],
+                           [], None)
+    assert POSTEN_ANSCHLUSS in {p["name"] for p in gemischt["offene_posten"]}
+    alle = aufbereiten([], [_ref(tarif="A", anschlusspreis=39.99),
+                            _ref(tarif="B", anschlusspreis=0.0)], [], None)
+    assert POSTEN_ANSCHLUSS not in {p["name"] for p in alle["offene_posten"]}
+
+
+def test_eine_referenz_ohne_betrag_macht_den_tarifpreis_nicht_erledigt():
+    """Gerechnet wird gegen den MASSSTAB, nicht gegen die rohe Liste.
+
+    Eine Referenz ohne Betrag faellt aus der Tabelle heraus. Gegen die rohe
+    Liste gerechnet meldete die Seite oben "es fehlen die Tarifpreise" und
+    unten "Tarifgrundpreis: erledigt" - genau der Selbstwiderspruch, gegen
+    den dieser Abschnitt ueberhaupt gerechnet statt hingeschrieben wird.
+    """
+    d = aufbereiten([], [_ref(tarif_sim_only_monatlich=None)], [], None)
+    assert d["referenzen"] == [] and d["referenzen_gesamt"] == 0
+    assert POSTEN_TARIF in {p["name"] for p in d["offene_posten"]}

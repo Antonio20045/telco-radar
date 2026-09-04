@@ -16,8 +16,8 @@ import pytest
 
 from telco_radar.collect import tarif_crawler
 from telco_radar.collect.tarif_crawler import (
-    Feldaenderung, TarifSpeicher, als_item, dokumentlinks, lade_quellen,
-    sammle, tarif_id, vergleiche,
+    Feldaenderung, TarifSpeicher, _sortiere, als_item, dokumentlinks,
+    juengste_fassung, lade_quellen, linktexte, sammle, tarif_id, vergleiche,
 )
 from telco_radar.tarif_model import Tarif
 
@@ -487,8 +487,6 @@ def test_dieselbe_adresse_bleibt_eine_versionsfolge(tmp_path):
 # in vier Vermarktungsstaenden - der aelteste von 2017.
 # --------------------------------------------------------------------------- #
 
-from telco_radar.collect.tarif_crawler import juengste_fassung, linktexte  # noqa: E402
-
 _TELEKOM = "https://www.telekom.de/produktinformationsblatt/"
 
 
@@ -560,7 +558,6 @@ def test_bevorzugt_findet_den_tarif_in_der_linkbeschriftung():
     Versprechen" sagt alles. Ohne den Text kann die Vorauswahl dort nur
     die Seitenreihenfolge nehmen - und die ist keine Zusage.
     """
-    from telco_radar.collect.tarif_crawler import _sortiere
     links = ["https://www.congstar.de/x/Produktinformationsblatt_9001.pdf",
              "https://www.congstar.de/x/Produktinformationsblatt_549.pdf"]
     texte = {links[0]: "Produktinformationsblatt Homespot & Go S",
@@ -625,7 +622,6 @@ def test_der_erste_wunsch_frisst_nicht_den_ganzen_einkauf():
     damit NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
     Dieselbe Ueberlegung wie `_interleave_by_source` in der Pipeline.
     """
-    from telco_radar.collect.tarif_crawler import _sortiere
     links = ([f"https://x.de/magentamobil-s-{i}" for i in range(9)]
              + ["https://x.de/magentamobil-m-1", "https://x.de/magentamobil-l-1"])
     gereiht = _sortiere(links, ["magentamobil-s-", "magentamobil-m-",
@@ -643,7 +639,6 @@ def test_unerwuenschtes_steht_hinten_und_geht_nicht_verloren():
     Was kein Wunsch trifft, faellt in Seitenreihenfolge ans Ende - es kann
     einen Deckel unterschreiten, aber es verschwindet nicht aus der Liste.
     """
-    from telco_radar.collect.tarif_crawler import _sortiere
     links = ["https://x.de/anderes-a", "https://x.de/wunsch-1",
              "https://x.de/anderes-b"]
     assert _sortiere(links, ["wunsch"]) == ["https://x.de/wunsch-1",

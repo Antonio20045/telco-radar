@@ -594,9 +594,10 @@ def test_die_abrechnungsform_in_der_klammer_gehoert_nicht_zum_namen(congstar_l):
     """congstar schreibt "Allnet Flat L (Postpaid Mobilfunk)".
 
     Ohne "Postpaid" im Muster fiel der Name in den Rueckfallzweig und trug
-    den Klammerzusatz mit - und die ART blieb leer, womit der Tarif aus
-    jeder Filterung herausfaellt (die SIM-only-Referenzen schliessen
-    Festnetz aus und braeuchten dafuer eine Art).
+    den Klammerzusatz mit - und die ART blieb leer. Das ist die
+    gefaehrlichere Haelfte: die SIM-only-Referenzen schliessen Festnetz
+    ueber `art` aus, und ein Tarif ohne Art passiert diese Sperre
+    ungehindert.
     """
     assert congstar_l.name == "Allnet Flat L"
     assert congstar_l.art == "mobilfunk"
@@ -618,3 +619,38 @@ def test_eine_offene_klammer_am_zeilenende_ist_ein_umbruch():
     assert t.name == "Allnet Flat XL mit Upgrade-Versprechen"
     assert t.fundstellen["name"].endswith("(Postpaid")
     assert t.fehlende_belege() == []
+
+
+@pytest.fixture(scope="module")
+def callya() -> Tarif:
+    return lies_text(text("vodafone_callya_allnet_flat_m"))
+
+
+def test_callya_ist_das_echte_dokument_hinter_der_wochensperre(callya):
+    """Die Begruendung in `tarif_quellen.yaml` wird hier nachpruefbar.
+
+    Sie sagt, der Extraktor sperre Vierwochenpreise "ohnehin". Die erste
+    Fassung der Sperre pruefte nur die Trefferzeile und lief an genau
+    diesem Dokument vorbei: der Takt steht bei Vodafone am VERTRAG, der
+    Preis eine Zeile weiter und ohne jede Zeitangabe.
+
+        Vertragslaufszeiten 4 Wochen, Kündigungsfrist 1 Monat
+        Listenpreis inkl. MwSt.                        14,99 €
+    """
+    assert "Vertragslaufszeiten 4 Wochen" in callya.rohtext
+    assert "14,99" in callya.rohtext
+    assert callya.grundgebuehr is None
+    assert callya.ist_quarantaene
+
+
+def test_die_wochensperre_haengt_an_der_vertragslaufzeit():
+    """Nicht am Wort "Wochen" irgendwo im Dokument.
+
+    "Kuendigungsfrist 4 Wochen" kommt in monatlich abgerechneten
+    Vertraegen vor - eine Regel darauf loeschte deren Preis.
+    """
+    roh = ("Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
+           "Ein Tarif\n"
+           "Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 4 Wochen\n"
+           "Listenpreis inkl. MwSt. 29,99 €\n")
+    assert lies_text(roh).grundgebuehr == 29.99

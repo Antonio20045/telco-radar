@@ -435,7 +435,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
 _OHNE_BUENDEL = (POSTEN_TARIF, POSTEN_ANSCHLUSS, POSTEN_RABATTE)
 
 
-def _offene_posten(zeilen: list, referenzen: list | None = None) -> list[dict]:
+def _offene_posten(zeilen: list, massstab: list | None = None) -> list[dict]:
     """Die Vereinigung der Luecken aller Zeilen, in fester Reihenfolge.
 
     Die VEREINIGUNG und nicht der Durchschnitt: gefragt ist, was der
@@ -457,12 +457,21 @@ def _offene_posten(zeilen: list, referenzen: list | None = None) -> list[dict]:
         offen = {n for z in zeilen for n in (l["name"] for l in z["luecken"])}
     else:
         offen = set(_OHNE_BUENDEL)
-        # Ein Tarifgrundpreis, der im Bestand steht, ist kein offener
-        # Posten mehr - auch wenn noch kein Buendel ihn benutzt.
-        if referenzen:
+        # Gerechnet wird gegen den MASSSTAB, also gegen die Zeilen, die
+        # wirklich auf der Seite stehen - nicht gegen die rohe Liste.
+        # Eine Referenz ohne Betrag faellt aus `_referenztabelle` heraus;
+        # gegen die rohe Liste gerechnet meldete die Seite dann oben "es
+        # fehlen die Tarifpreise" und unten "Tarifgrundpreis: erledigt".
+        if massstab:
+            # Ein Tarifgrundpreis, der im Bestand steht, ist kein offener
+            # Posten mehr - auch wenn noch kein Buendel ihn benutzt.
             offen.discard(POSTEN_TARIF)
-            if any(r.anschlusspreis is not None for r in referenzen
-                   if isinstance(r, SimOnlyReferenz)):
+            # ALLE, nicht IRGENDEINE. Die Docstring dieser Funktion sagt
+            # "Vereinigung, nicht Durchschnitt": ein Posten, den nur die
+            # Haelfte der Anbieter ausweist, ist eine offene Baustelle. Mit
+            # `any` meldete die Seite den Anschlusspreis als erledigt,
+            # sobald EIN Tarif von fuenfundzwanzig ihn nennt.
+            if all(z["anschlusspreis"] is not None for z in massstab):
                 offen.discard(POSTEN_ANSCHLUSS)
     return [{"name": n, "phase": PHASE_JE_LUECKE[n]}
             for n in PHASE_JE_LUECKE if n in offen]
@@ -477,9 +486,11 @@ def _referenztabelle(referenzen: list) -> list[dict]:
     TK-TransparenzV, dem einzigen Dokument dieses Marktes, das rechtlich
     wahrheitsbewehrt ist.
 
-    Sortiert nach Anbieter und Betrag, nicht nach Guenstigkeit: das ist
-    keine Rangliste. Ein Tarif mit mehr Datenvolumen kostet zu Recht mehr,
-    und diese Tafel rechnet das nicht heraus.
+    Sortiert wird der EIGENE Anbieter zuerst, dann nach Anbietername und
+    Betrag - dieselbe Ordnung wie auf jeder anderen Tafel dieser Seite. Es
+    ist ausdruecklich KEINE Rangliste nach Guenstigkeit: ein Tarif mit mehr
+    Datenvolumen kostet zu Recht mehr, und diese Tafel rechnet das nicht
+    heraus.
     """
     zeilen = []
     for r in referenzen:
@@ -574,7 +585,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Tarifpreise liefert: die Tabelle zeigte dann einen Tarifgrundpreis
         # und der Abschnitt darunter behauptete, er fehle. Aufgefallen beim
         # ANSEHEN der Tafel mit gestellten Buendeln, nicht in einem Test.
-        "offene_posten": _offene_posten(zeilen, referenzen),
+        "offene_posten": _offene_posten(zeilen, massstab),
         # Was Phase 6 geliefert hat - der Massstab, auch ohne ein einziges
         # Buendel. Die Tafel war bis zum 04.09.2026 vollstaendig leer, und
         # der Grund stand eine Ebene tiefer: es gab keine Tarifpreise.

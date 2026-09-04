@@ -72,6 +72,22 @@ log = logging.getLogger(__name__)
 _CENT = 0.005
 
 
+def _ohne_marke(tid: str, anbieter: str) -> str:
+    """Die Tarif-ID ohne den Markennamen im Produktteil.
+
+    `vodafone:vodafone-mobil-m` und `vodafone:mobil-m` sind derselbe
+    Tarif, verschieden geschrieben. Der ANBIETERteil der ID bleibt stehen -
+    er trennt die Anbieter, und genau das soll er.
+    """
+    marke = tarif_id(anbieter, "")
+    if ":" not in tid:
+        return tid
+    kopf, _, rumpf = tid.partition(":")
+    if rumpf.startswith(f"{marke}-"):
+        rumpf = rumpf[len(marke) + 1:]
+    return f"{kopf}:{rumpf}"
+
+
 @dataclass(frozen=True)
 class Bezug:
     """Eine hergestellte Verbindung - mit ihrer Guete und ihrem Weg.
@@ -155,14 +171,20 @@ class Tarifbestand:
         gesucht = tarif_id(anbieter, referenz)
         satz = self.je_id.get(gesucht)
         if satz is None:
-            # Zweiter Versuch: der Anbietername steht im Tarifnamen des
-            # Bestands, aber nicht in der Referenz - Vodafone nennt seinen
+            # Zweiter Versuch OHNE Markennamen, und zwar auf BEIDEN Seiten.
+            #
+            # Die Marke steht mal hier, mal dort: Vodafone nennt seinen
             # Tarif im PIB "Vodafone Mobil M", auf der Produktseite steht
-            # "Mobil M". Umgekehrt kommt es genauso vor.
-            marke = tarif_id(anbieter, "")
-            ohne_marke = gesucht[len(marke) + 1:] if ":" in gesucht else gesucht
+            # "Mobil M" - bei Telekom und congstar ist es genau umgekehrt
+            # ("MagentaMobil L" im Blatt, "Telekom MagentaMobil L" auf der
+            # Seite). Die erste Fassung dieser Funktion loeste nur die eine
+            # Richtung auf, und das war ausgerechnet die seltenere: fuer
+            # congstar und Telekom haette Phase 4 damit KEINEN einzigen
+            # Buendelpreis speichern koennen, weil `TcoDB.upsert_buendel`
+            # ohne `tarif_id` wirft.
+            kern = _ohne_marke(gesucht, anbieter)
             for tid, kandidat in self.je_id.items():
-                if tid == f"{marke}:{marke.split(':')[0]}-{ohne_marke}":
+                if _ohne_marke(tid, anbieter) == kern:
                     satz = kandidat
                     gesucht = tid
                     break

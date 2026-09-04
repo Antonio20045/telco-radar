@@ -128,6 +128,11 @@ class TcoDB:
         """
         neu = 0
         gesehen: set[str] = set()
+        # VOLLSTAENDIG PRUEFEN, BEVOR ETWAS GESCHRIEBEN WIRD. Ein Wurf
+        # mitten in der Schleife liesse die schon aufgenommenen Buendel im
+        # Speicher stehen - ein Aufrufer, der die Ausnahme faengt und
+        # `save()` ruft, schriebe einen halben Messtag in die Datei. Ein
+        # Adapter uebergibt seine achtzig Buendel in EINEM Aufruf.
         for satz in buendel:
             if not isinstance(satz, Buendel):
                 raise TypeError(f"kein Buendel: {type(satz).__name__}")
@@ -147,6 +152,8 @@ class TcoDB:
                     f"Geraetepreis ohne aufloesbaren Tarif: {satz.id} "
                     f"(tarif_name={satz.tarif_name!r}). Ein Buendelpreis "
                     f"ohne tarif_id wird verworfen, nicht gespeichert.")
+
+        for satz in buendel:
             bid = satz.id
             eintrag = self._buendel.get(bid)
             if eintrag is None:

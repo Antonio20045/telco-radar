@@ -186,7 +186,21 @@ def dokumentlinks(html: str, basis: str, muster: list[str]) -> list[str]:
     Nur echte `<a href>`. Was hier nicht herauskommt, wird nicht abgerufen -
     das ist die technische Fassung der Regel gegen ID-Enumeration.
     """
-    gefunden: list[str] = []
+    return [url for url, _text in _ankerpaare(html, basis, muster)]
+
+
+def _ankerpaare(html: str, basis: str,
+                muster: list[str]) -> list[tuple[str, str]]:
+    """Adresse und Linkbeschriftung jedes zulaessigen Dokumentlinks.
+
+    DIE EINE STELLE, die entscheidet, was abgerufen werden darf. Die Regel
+    gegen ID-Enumeration haengt daran; zwei Funktionen mit je eigener
+    Filterung waeren zwei Regeln, und die zweite driftet beim naechsten
+    Umbau. Die erste Fassung von `linktexte` hatte genau das: sie liess
+    `mailto:`, `#` und den Selbstlink durch, waehrend `dokumentlinks` sie
+    verwarf - bei congstar traegt die Einstiegsseite das Pfadmuster selbst.
+    """
+    gefunden: list[tuple[str, str]] = []
     gesehen: set[str] = set()
     suppe = BeautifulSoup(html or "", "html.parser")
     for anker in suppe.find_all("a"):
@@ -202,7 +216,7 @@ def dokumentlinks(html: str, basis: str, muster: list[str]) -> list[str]:
             continue
         if voll not in gesehen:
             gesehen.add(voll)
-            gefunden.append(voll)
+            gefunden.append((voll, " ".join(anker.get_text().split())))
     return gefunden
 
 
@@ -217,25 +231,13 @@ def linktexte(html: str, basis: str, muster: list[str]) -> dict[str, str]:
     Adresse liest, kann dort nur die Seitenreihenfolge nehmen, und die ist
     keine Zusage.
 
-    Bewusst eine EIGENE Funktion neben `dokumentlinks`: die Regel gegen
-    ID-Enumeration haengt daran, dass genau eine Stelle bestimmt, was
-    abgerufen werden darf. Ein zweiter Rueckgabewert an derselben Funktion
-    haette diese Stelle beweglich gemacht.
+    Beide Funktionen lesen dieselbe Stelle (`_ankerpaare`) - die Regel
+    gegen ID-Enumeration haengt daran, dass genau eine entscheidet, was
+    abgerufen werden darf. `dokumentlinks` bleibt trotzdem die Funktion,
+    die der Sammler fragt: sie beantwortet die Frage "was darf ich holen",
+    diese hier nur "wie heisst es".
     """
-    texte: dict[str, str] = {}
-    suppe = BeautifulSoup(html or "", "html.parser")
-    for anker_ in suppe.find_all("a"):
-        href = (anker_.get("href") or "").strip()
-        if not href:
-            continue
-        voll = urljoin(basis, href)
-        pfad = urlsplit(voll).path.lower()
-        if muster and not any(m in pfad for m in muster):
-            continue
-        beschriftung = " ".join(anker_.get_text().split())
-        if beschriftung and voll not in texte:
-            texte[voll] = beschriftung
-    return texte
+    return {url: text for url, text in _ankerpaare(html, basis, muster) if text}
 
 
 # Der Slug eines Telekom-Dokuments endet auf dem Vermarktungsdatum:
@@ -314,7 +316,7 @@ def _sortiere(links: list[str], bevorzugt: list[str],
     # keiner - dieselbe Ueberlegung wie `_interleave_by_source` in der
     # Pipeline.
     sortiert: list[str] = []
-    for runde in range(max(len(f) for f in faecher)):
+    for runde in range(max((len(f) for f in faecher[:-1]), default=0)):
         for fach in faecher[:-1]:
             if runde < len(fach):
                 sortiert.append(fach[runde])
@@ -494,8 +496,13 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                 antwort = hole(einstieg, http_cfg)
                 gefunden = dokumentlinks(antwort.text, einstieg,
                                          quelle.pfadmuster)
-                texte.update(linktexte(antwort.text, einstieg,
-                                       quelle.pfadmuster))
+                # setdefault statt update: innerhalb einer Seite gewinnt
+                # der ERSTE Linktext, ueber mehrere Einstiegsseiten soll
+                # dasselbe gelten. Mit `update` gewaenne dort der letzte -
+                # zwei Regeln fuer dieselbe Frage.
+                for adresse, beschriftung in linktexte(
+                        antwort.text, einstieg, quelle.pfadmuster).items():
+                    texte.setdefault(adresse, beschriftung)
             except Exception as exc:  # noqa: BLE001
                 bilanz["fehler"] += 1
                 log.info("Tarifquelle %s nicht lesbar: %s", einstieg,
@@ -521,7 +528,16 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             erlaubt.update(gefunden)
             links.extend(gefunden)
 
+        # `verlinkt` zaehlt, was nach der Auswahl "juengste Fassung" noch
+        # in Frage kommt - nicht, was auf der Seite stand. Die rohe Zahl
+        # steht in der Protokollzeile der Einstiegsseite; hier interessiert,
+        # aus wie vielen Kandidaten der Deckel schneidet.
+        vor_auswahl = len(links)
         links = juengste_fassung(links)
+        if vor_auswahl != len(links):
+            log.info("Tarifquelle %s: %d von %d Adressen sind aeltere "
+                     "Vermarktungsfassungen", quelle.anbieter,
+                     vor_auswahl - len(links), vor_auswahl)
         bilanz["verlinkt"] += len(links)
         for url in _sortiere(links, quelle.bevorzugt,
                              texte)[:quelle.max_dokumente]:
