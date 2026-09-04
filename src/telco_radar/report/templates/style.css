@@ -2568,3 +2568,119 @@ b,strong{font-weight:700}
   .gr-tiefe li{grid-template-columns:1fr 74px}
   .gr-tiefe-n{grid-column:1 / -1;text-align:left}
 }
+
+/* ===================================================================
+   PHASE R - die TCO-Hauptansicht der Geraeteseite (04.09.2026)
+
+   Eine Anbieterfarbe, ueberall dieselbe (C.3): `gr-anb--<slug>` faerbt
+   die Karte, den Balken in G1 und die Linie in G2. Die Kostenart
+   unterscheidet sich in der DECKKRAFT, nicht in der Farbe - sonst
+   braeuchte jede Kombination aus Anbieter und Posten einen eigenen Ton,
+   und die Legende waere laenger als die Grafik.
+   =================================================================== */
+.gr-anb--o2{--anb:#0019a5}
+.gr-anb--1-1{--anb:#00589e}
+.gr-anb--telekom{--anb:#e20074}
+.gr-anb--vodafone{--anb:#e60000}
+.gr-anb--congstar{--anb:#f5a800}
+.gr-anb--mobilcom-debitel{--anb:#6b4f9e}
+.gr-anb--freenet{--anb:#6b4f9e}
+.gr-anb--aldi-talk{--anb:#00447c}
+.gr-anb--medimax{--anb:#8a8f00}
+.gr-anb--electronicpartner{--anb:#00736b}
+.gr-kkarte,.gr-g1-seg,.gr-g2-linie,.gr-g2-punkt,.gr-g2-legende{--anb:#57534a}
+
+/* Modell-Selector und Ergebnisband */
+.gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin:16px 0 12px;padding-bottom:12px;border-bottom:2px solid var(--rule-ink)}
+.gr-msel label{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+.gr-msel select{font-family:var(--sans);font-size:14px;padding:6px 8px;
+  border:1px solid var(--rule);background:var(--paper-2);max-width:520px}
+.gr-mband{margin:0 0 12px}
+
+/* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
+   stehen deshalb im Kopf der Hauptansicht, nicht in einem eigenen Reiter. */
+.gr-chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;
+  margin:0 0 16px}
+.gr-chip{font-family:var(--sans);font-size:12px;padding:5px 10px;
+  border:1px solid var(--rule);background:var(--paper-2)}
+.gr-chip b{font-family:var(--serif);font-size:16px;margin-right:4px}
+.gr-chip em{font-style:normal;color:var(--ink-4);margin-left:4px}
+.gr-chip--kritisch b{color:var(--al-kritisch)}
+.gr-chip--mittel b{color:var(--al-mittel)}
+.gr-chip--gering b{color:var(--al-gering)}
+.gr-chip--bestpreis b{color:var(--al-bestpreis)}
+
+.gr-ksteuer{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+.gr-ksteuer label{font-family:var(--sans);font-size:12px;color:var(--ink-3)}
+.gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
+  border:1px solid var(--rule);background:var(--paper-2)}
+
+/* Die Karten. Vier Slots je Modell, gleiche Felder an gleicher Stelle -
+   dieselbe Regel wie auf der Promo-Uebersicht. Eine Karte ohne Zahl ist
+   NICHT kleiner gesetzt: sie traegt eine Auskunft, keinen Mangel. */
+.gr-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
+  gap:14px;margin:0 0 18px}
+.gr-kkarte{border-top:3px solid var(--anb);padding:10px 12px 12px;
+  background:var(--paper-2);border-left:1px solid var(--rule-2);
+  border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.gr-kkarte--leer{background:transparent;border-top-color:var(--rule)}
+.gr-kk-kopf{margin:0;font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase}
+.gr-kk-anbieter{font-weight:700;color:var(--anb)}
+.gr-kk-marke{font-size:10px;letter-spacing:.08em;color:var(--ink-4);
+  border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
+.gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
+  color:var(--ink-2)}
+.gr-kk-leit{margin:0;display:flex;align-items:baseline;gap:8px}
+.gr-kk-leit b{font-family:var(--sans);font-size:11px;letter-spacing:.08em;
+  color:var(--ink-3);text-transform:uppercase}
+.gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
+.gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
+  color:var(--ink-2)}
+.gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
+.gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
+.gr-kk-24 b{font-weight:600}
+.gr-kk-eff .gr-a-klein{display:block}
+.gr-kk-hinweis,.gr-kk-luecke{color:var(--ink-3);font-style:italic}
+.gr-kk-delta{margin:6px 0 6px;font-family:var(--sans);font-size:12.5px;
+  font-weight:600;color:var(--al-kritisch)}
+.gr-kk-delta--unter{color:var(--al-bestpreis)}
+.gr-kk-weg{margin-top:6px}
+.gr-kk-weg summary{font-family:var(--sans);font-size:12px;cursor:pointer;
+  color:var(--ink-3)}
+
+/* G1 und G2 */
+.gr-grafik{margin:0 0 18px;padding:0}
+.gr-grafik figcaption{font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);margin-top:6px;line-height:1.5}
+.gr-g1,.gr-g2{display:block;width:100%;height:auto}
+.gr-g1-gruppe{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;fill:var(--ink-3)}
+.gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
+  fill:var(--ink)}
+.gr-g1-ref-etikett{font-weight:400;font-size:10.5px;fill:var(--ink-4)}
+.gr-g1-tarif{font-family:var(--serif);font-size:10.5px;fill:var(--ink-3)}
+.gr-g1-betrag{font-family:var(--serif);font-size:13px;fill:var(--ink)}
+.gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
+.gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
+.gr-g1-reftext{font-family:var(--sans);font-size:11px;fill:var(--al-kritisch)}
+.gr-g1-seg{fill:var(--anb)}
+.gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
+  stroke-dasharray:3 3}
+.gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g2-achse{font-family:var(--sans);font-size:11px;fill:var(--ink-4)}
+.gr-g2-linie{stroke:var(--anb);stroke-width:2}
+.gr-g2-punkt{fill:var(--anb)}
+.gr-g2-marker{font-size:12px;fill:var(--ink-3)}
+.gr-g2-legende{font-family:var(--sans);font-size:11.5px;fill:var(--anb)}
+
+/* Auf dem Telefon wird GEROLLT, nicht gestaucht: eine Grafik mit 1180 px
+   Zeichenbreite auf 390 px zu skalieren ergibt 3,5 px hohe Schrift
+   (Befund vom 11.08.2026 zur geloeschten Positionskarte). */
+@media (max-width:900px){
+  .gr-grafik{overflow-x:auto}
+  .gr-g1,.gr-g2{width:1180px;max-width:none}
+  .gr-karten{grid-template-columns:1fr}
+}

@@ -18,6 +18,7 @@ from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
 from . import differenzierung_view
+from . import geraete_tco_grafik as _geraete_tco_grafik
 from . import fruehwarnung as fruehwarnung_mod
 from . import lieferzeit_view as lieferzeit_view_mod
 from . import luecken as luecken_mod
@@ -102,6 +103,11 @@ def _env() -> Environment:
                       autoescape=select_autoescape(["html", "htm", "xml", "j2"]))
     env.filters["domain"] = lambda u: urlsplit(u or "").netloc.removeprefix("www.")
     env.filters["date_de"] = _fmt_date_de
+    # EINE Eurofassung fuer die ganze Seite. Vorher stand in jeder Vorlage
+    # `'%.2f'|format(x)|replace('.', ',')` - dieselbe Rechnung an einem
+    # Dutzend Stellen, und ohne Tausenderpunkt: "1794,76" statt
+    # "1.794,76 EUR". Gerechnet wird dabei nichts, es wird geschrieben.
+    env.filters["euro"] = _geraete_tco_grafik.euro
     env.filters["monat_de"] = _fmt_monat_de
     return env
 

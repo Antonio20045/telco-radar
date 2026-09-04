@@ -832,15 +832,103 @@ var TelcoFrage = (function () {
   if (!leiste) return;
   var knoepfe = leiste.querySelectorAll('button[data-tafel]');
 
+  function zeige(knopf) {
+    Array.prototype.forEach.call(knoepfe, function (k) {
+      var ziel = document.getElementById(k.getAttribute('data-tafel'));
+      var aktiv = k === knopf;
+      k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
+      if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
+    });
+  }
+
   Array.prototype.forEach.call(knoepfe, function (knopf) {
-    knopf.addEventListener('click', function () {
-      Array.prototype.forEach.call(knoepfe, function (k) {
-        var ziel = document.getElementById(k.getAttribute('data-tafel'));
-        var aktiv = k === knopf;
-        k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
-        if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
+    knopf.addEventListener('click', function () { zeige(knopf); });
+  });
+
+  /* DEEP-LINKS AUF DIE ALTEN REITER DUERFEN NICHT INS LEERE FUEHREN.
+   * Bis zum 04.09.2026 hiessen die Reiter `tafel-alarme` und `tafel-tco`,
+   * und `#verlauf`, `#katalog`, `#tco` stehen als Sprungziele in Mails und
+   * Lesezeichen. `#tafel-alarme` gibt es nicht mehr - ein solcher Link
+   * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
+   * scheinbar nicht bewegt. */
+  var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
+             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
+             'lifecycle': 'tafel-portfolio'};
+  function ausHash() {
+    var id = (location.hash || '').replace(/^#/, '');
+    if (!id) return;
+    var ziel = ALT[id] || id;
+    var knopf = leiste.querySelector('[data-tafel="' + ziel + '"]');
+    if (knopf) zeige(knopf);
+  }
+  ausHash();
+  window.addEventListener('hashchange', ausHash);
+})();
+
+/* Die Anbieterkarten der Hauptansicht: Modellauswahl, Sortierung, Filter.
+ *
+ * ES WIRD NICHTS GERECHNET. Die Betraege stehen als `data-`-Attribute an
+ * der Karte, gerechnet hat sie `tco_model` - eine Sortierung, die den Wert
+ * aus dem sichtbaren Text liest, sortierte "1.099,90" vor "199,00"
+ * (derselbe Fehler wie in der Alarmtabelle am 30.08.2026).
+ */
+(function () {
+  var wahl = document.getElementById('gr-modell');
+  var bloecke = document.querySelectorAll('.gr-modell');
+  if (!bloecke.length) return;
+
+  if (wahl) {
+    wahl.addEventListener('change', function () {
+      Array.prototype.forEach.call(bloecke, function (b) {
+        b.hidden = b.getAttribute('data-modell') !== wahl.value;
       });
     });
+  }
+
+  function zahl(el, feld) {
+    var wert = parseFloat(el.getAttribute('data-' + feld));
+    return isNaN(wert) ? Infinity : wert;
+  }
+
+  Array.prototype.forEach.call(bloecke, function (block) {
+    var behaelter = block.querySelector('.gr-karten');
+    var sortiere = block.querySelector('[data-sortiere]');
+    var filter = block.querySelector('[data-anbieterfilter]');
+    if (!behaelter) return;
+    var karten = Array.prototype.slice.call(
+      behaelter.querySelectorAll('.gr-kkarte'));
+
+    function ordne() {
+      var art = sortiere ? sortiere.value : 'schnitt';
+      var sortiert = karten.slice().sort(function (a, b) {
+        /* Karten ohne Zahl stehen immer hinten - sie sind kein guenstigstes
+         * Angebot, sondern eine Luecke. */
+        var leerA = a.classList.contains('gr-kkarte--leer') ? 1 : 0;
+        var leerB = b.classList.contains('gr-kkarte--leer') ? 1 : 0;
+        if (leerA !== leerB) return leerA - leerB;
+        /* Gesamtkosten NUR innerhalb einer Laufzeitgruppe (A5.4): ueber
+         * Laufzeiten hinweg vergliche die Summe die Bindung, nicht den
+         * Preis. Deshalb erst nach Laufzeit, dann nach Betrag. */
+        if (art === 'gesamt') {
+          var lA = zahl(a, 'laufzeit'), lB = zahl(b, 'laufzeit');
+          if (lA !== lB) return lA - lB;
+          return zahl(a, 'gesamt') - zahl(b, 'gesamt');
+        }
+        if (art === 'einmalig') return zahl(a, 'einmalig') - zahl(b, 'einmalig');
+        return zahl(a, 'schnitt') - zahl(b, 'schnitt');
+      });
+      sortiert.forEach(function (k) { behaelter.appendChild(k); });
+    }
+
+    function sieben() {
+      var nur = filter ? filter.value : '';
+      karten.forEach(function (k) {
+        k.hidden = !!nur && k.getAttribute('data-anbieter') !== nur;
+      });
+    }
+
+    if (sortiere) sortiere.addEventListener('change', ordne);
+    if (filter) filter.addEventListener('change', sieben);
   });
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
@@ -1075,7 +1163,7 @@ function grFilterleiste(tafelId, mehrId) {
   }
 }
 
-grFilterleiste('tafel-alarme', 'gr-mehr');
+grFilterleiste('tafel-tco', 'gr-mehr');
 grFilterleiste('tafel-katalog', 'gr-kmehr');
 
 /* =========================================================================

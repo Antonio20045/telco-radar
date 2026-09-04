@@ -47,6 +47,7 @@ import logging
 from typing import Optional
 
 from .effektivpreis import phasensumme
+from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, Buendel,
@@ -235,6 +236,9 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     return {
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
+        # Dieselbe Klasse auf Karte, Balken und Legende - C.3 verlangt die
+        # Anbieterfarbe konsistent ueber ALLE Grafiken und Tabellen.
+        "slug": anbieter_slug(b.anbieter),
         "geraet": _name(katalog, device_id, speicher, rueckfall=b.sku_id),
         "anbieter": b.anbieter,
         "eigen": _eigen(b.anbieter),
@@ -290,6 +294,7 @@ def _phase_ab(tarif: dict, monat: int) -> Optional[float]:
 def _leere_karte(anbieter: str, grund: str = "") -> dict:
     """Ein Anbieter ohne Zahl - mit Namen und mit Begruendung (B.2.5)."""
     return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
+            "slug": anbieter_slug(anbieter),
             "label": "", "laufzeit": None, "belastbar": False,
             "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
             "offen_nach_24": None, "offene_raten": 0, "monatlich": None,

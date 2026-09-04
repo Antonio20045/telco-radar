@@ -636,38 +636,53 @@ def main() -> int:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
         maengel = []
 
-        # Regel 1 und 2 des Auftrags: die Startansicht traegt kein Diagramm,
-        # und es gibt keine Ansicht mit mehreren Geraeten in einem Bild.
-        # Ein SVG in `#tafel-alarme` meldete bis zum 30.08.2026 ZWEI Maengel
-        # (hier und in der Reiterflaechen-Pruefung unten) - dieselbe Sache,
-        # zweimal gezaehlt.
-        start = gr.select_one("#tafel-alarme")
+        # PHASE R (04.09.2026): DIE HAUPTANSICHT IST DIE TCO-SICHT.
+        #
+        # Bis dahin stand hier die umgekehrte Regel - "die Startansicht
+        # traegt kein Diagramm" - und sie war richtig, solange die
+        # Startansicht die Alarmtabelle war. Das Lastenheft dreht das um
+        # (A1/A3): die Seite beantwortet ohne Klick "was zahlt der Kunde
+        # ueber 24 Monate gesamt", und ZWEI Grafiken sind Pflichtinhalt.
+        # Ein Redesign ohne sie gilt als nicht geliefert.
+        #
+        # Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte:
+        # keine Ansicht mit 114 gedrehten Etiketten und 248 Punkten in
+        # einem Bild.
+        start = gr.select_one("#tafel-tco")
         if start is None:
-            maengel.append("der Reiter 'Preis-Alarme' fehlt")
+            maengel.append("die Hauptansicht 'TCO-Vergleich' fehlt")
         for tot in (".gr-flaeche", ".gr-punkt", ".gr-etikett", ".gr-band"):
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # Die FUENF Reiter, in der Reihenfolge des Auftrags. Ein fehlender
-        # Reiter faellt sonst nur dadurch auf, dass niemand ihn vermisst.
+        # Die VIER Reiter, in der Reihenfolge des Lastenhefts (B.1). Ein
+        # fehlender Reiter faellt sonst nur dadurch auf, dass niemand ihn
+        # vermisst - und ein wiederauferstandener Reiter "Was kostet es"
+        # waere genau die doppelte Darstellung, die B.1 aufloest.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-alarme", "tafel-tco", "tafel-katalog",
-                    "tafel-verlauf", "tafel-portfolio"]
+        erwartet = ["tafel-tco", "tafel-katalog", "tafel-verlauf",
+                    "tafel-portfolio"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
 
-        # Reiter 3 ist der EINZIGE Ort mit einem Diagramm, und auch dort
-        # steht ohne Auswahl keins - auch kein leeres. Das SVG entsteht in
-        # `app.js`; im ausgelieferten Dokument darf es nirgends stehen.
-        # In den REITERFLAECHEN, nicht im ganzen Dokument: die Kopfleiste
-        # traegt ein Lupen-Icon als SVG, und das ist kein Diagramm. Die erste
-        # Fassung dieser Regel fiel genau darueber - sie meldete "ein
-        # Diagramm steht fertig im Dokument" und meinte den Suchknopf.
-        vorgerendert = [t.get("id") for t in gr.select(".gr-tafel")
-                        if t.find("svg") is not None]
-        if vorgerendert:
-            maengel.append(f"Diagramm steht fertig im Dokument ({vorgerendert}), "
-                           "obwohl es erst nach einer Geraeteauswahl entstehen darf")
+        # G1 UND G2 stehen fertig im Dokument - servergerendert, ohne
+        # Bibliothek. Eine Grafik, die erst im Browser entsteht, steht in
+        # keinem `curl` und in keinem Screenshot.
+        if start is not None and start.select_one("svg.gr-g1") is None:
+            maengel.append("G1 (TCO-Balkenvergleich) fehlt in der Hauptansicht")
+        verlaufflaeche = gr.select_one("#tafel-verlauf")
+        if verlaufflaeche is not None and \
+                verlaufflaeche.select_one("svg.gr-g2") is None and \
+                verlaufflaeche.select_one("#gr-verlaufdaten") is not None:
+            # KEIN Mangel ohne Messreihen: unter zwei Messpunkten je Reihe
+            # ist der ehrliche Leerzustand die richtige Ausgabe (C.2).
+            maengel.append("G2 (Preis-/TCO-Historie) fehlt im Historie-Reiter")
+
+        # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
+        # beantwortet. Sie steht an JEDER Karte mit einer Zahl.
+        if start is not None and start.select(".gr-kkarte") \
+                and not start.select(".gr-kk-24"):
+            maengel.append("keine Karte beantwortet 'nach 24 Monaten gezahlt'")
         # KEIN Mangel, wenn der Datensatz fehlt: die Vorlage rendert ihn nur
         # bei `verlauf.hat_daten`, und das rechnet auf den GEPRUEFTEN
         # Eintraegen. Ein Bestand, der nur gebrauchte Geraete oder nur
@@ -685,7 +700,7 @@ def main() -> int:
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        zeilen = gr.select("#tafel-alarme .gr-a-zeile")
+        zeilen = gr.select("#tafel-tco .gr-a-zeile")
         if not zeilen:
             # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
             # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
@@ -721,7 +736,7 @@ def main() -> int:
             # Die vier Kacheln zaehlen genau die verglichenen Kombinationen.
             # Eine Kachel, die anders zaehlt als der Satz darunter, ist der
             # Fehlertyp aus CLAUDE.md 6.
-            kacheln = gr.select(".gr-kacheln .gr-kachel b")
+            kacheln = gr.select(".gr-chips .gr-chip b")
             summe = sum(int(k.get_text(strip=True)) for k in kacheln
                         if k.get_text(strip=True).isdigit())
             # `start` kann None sein - dann ist die Tafel umbenannt worden,
@@ -731,7 +746,7 @@ def main() -> int:
             satz = (" ".join(start.get_text(" ", strip=True).split())
                     if start is not None else "")
             if len(kacheln) != 4:
-                maengel.append(f"{len(kacheln)} statt 4 Kennzahl-Kacheln")
+                maengel.append(f"{len(kacheln)} statt 4 Alarm-Chips")
             elif f"{summe} Modelle mit ihren Speichergrößen" not in satz:
                 maengel.append(f"die Kacheln zaehlen {summe}, der Satz "
                                f"darunter etwas anderes")
@@ -742,8 +757,8 @@ def main() -> int:
             # fuer den, der es liest.
             b.prueft(not maengel,
                      f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
-                     f"{len(kacheln)} Kacheln ueber {summe} Vergleichen, "
-                     f"kein Diagramm auf der Startansicht"
+                     f"{len(kacheln)} Chips ueber {summe} Vergleichen, "
+                     f"G1 und G2 stehen fertig im Dokument"
                      if not maengel else
                      "11. Geraeteradar: " + "; ".join(maengel[:5]))
 
