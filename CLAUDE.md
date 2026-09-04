@@ -1722,6 +1722,38 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (04.09.2026, abends): Phase R2 — die Befunde der
+> fremden Augen.** Auftragsgrundlage: `PHASE_R2_BRIEF.md` auf Basis von
+> `QA_BEFUND_R_2026-09-04-1550.md`. **Abschlussbericht mit allen Messungen,
+> Live-Beweisen und den bewusst offenen Punkten:
+> `outputs/phase-r2-2026-09-04.md` — dort weiterlesen.** Stand danach:
+> **2614 Tests grün, 30 skipped, 3 rot** (vorbestehend: zwei
+> Promo-Screenshot-Tests, `test_folien` gegen den degenerierten
+> Tagesbericht); `pruefe_portal.py` 11 / 6 — 11 und 11b bestanden, fünf
+> Kriterien fallen an der leeren Titelseite des Radar-Laufs von 11:00 UTC
+> (siehe unten). Live byte-identisch.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **B1: `Buendel.zustand`** — Feld, Positivliste, Collector, Leser | Der Store trug zu iPhone 15 128 GB BEIDE o2-Bündel (neu 20,00 / erneuert 17,00 €), die Kartenauswahl nahm je (Anbieter, Tarif, Laufzeit) die günstigste — die erneuerte, ohne ein Wort. Jetzt steht der Zustand im Dedupe-Schlüssel; unbelegt gilt als `unbekannt`, **nie als neu**; Delta, Spanne, Referenz nur unter Neugeräten; Etikett „erneuert" auf Karte, G1-Balken UND Tabelle |
+> | **B2: `geraete_verlauf.messtage`** — EINE Messtag-Regel für G2 und `gr-verlaufdaten` | Zwei Preise derselben Listung am selben Tag sind eine Messlücke, kein Pfeil — und sie wird BENANNT. Ursache: zwei ALDI-Produkte (A17 **LTE** + Starter-Kit, A17 **5G**) auf einem Katalogeintrag, und `geraete_pipeline` schrieb die Historie auch für den Satz, den `upsert` als Kollision verworfen hatte. Jetzt schreibt sie nur, was die DB genommen hat (`db.uebergangen`). 2 Pfeile statt 15 |
+> | **F1 Stufe 1** | Die Referenzkarte sagt „Bündelpreis noch nicht erhoben", nicht mehr „Vodafone weist keinen aus" — die glados-API weist einen aus. **Stufe 2 nicht gebaut:** die Nutzlast nennt Beträge und `offerCoreHash`, keinen Tarifnamen, und Vodafones Beträge lösen nicht eindeutig auf |
+> | **F5** | Jede Karte mit Zahl trägt „ab Monat 25" — als Betrag (Referenz, aus dem PIB) oder als **benannte Lücke** (`.gr-kk-nach--luecke`). 126 Karten, 0 stumm |
+> | **F3** | `tarife.html` trägt `max(abgerufen_am)`, nicht das Datum des Wochenberichts |
+> | **S2/S4/S12** | Katalog D („TCO-36 von … bis", „X € in 36 Raten"), Euro-Delta am G1-Balken mit Halo, kein doppelter Hersteller. S3 in B1, S6/S8 in B2, S11 war im geborgenen Stand erledigt |
+>
+> **Bewusst NICHT:** Katalogeintrag „Galaxy A17 5G" (schlüsselt neun
+> Listungen bei fünf Anbietern um — Datenwanderung, braucht ein
+> Migrationsskript), S5 (G1 mobil — braucht einen zweiten Renderer mit
+> Beschriftung ÜBER dem Balken), A5.5/S1 (E-2 bei Antonio).
+>
+> **Fallstrick des Tages:** der Radar-Lauf `040d551` (11:00 UTC) hat **0
+> Meldungen bewertet** — beide DeepSeek-Modelle `unavailable`, und der
+> Anthropic-Anker hat NICHT übernommen (Kosten 0 $). Die Live-Titelseite hat
+> seitdem eine Schlagzeile, CI ist seit `a8ebdfe` rot (`test_folien` gegen
+> genau diesen Bericht). Der Stapelschutz hat gehalten (877 ungelesen).
+> Das ist Antonios Guthaben-/Anker-Frage, nicht die Geräteseite.
+
 > **Zuletzt erledigt (04.09.2026, nachmittags): Phase R — die Geräteseite
 > ist TCO-first, mit den zwei Pflicht-Grafen.** Auftragsgrundlage:
 > `PHASE_R_BRIEF.md` und `ANFORDERUNGEN_TCO_FIRST.md` (Lastenheft des

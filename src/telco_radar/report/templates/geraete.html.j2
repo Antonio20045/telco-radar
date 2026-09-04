@@ -486,10 +486,9 @@
     k.nach_bindung | euro }} Tarifgrundpreis</p>
   {% elif k.tarif_bindung or k.laufzeit %}
   <p class="gr-kk-nach gr-kk-nach--luecke">ab Monat {{ (k.tarif_bindung or
-    k.laufzeit) + 1 }}: nicht belegt – {% if k.tarif_quelle_url %}das
-    Pflichtdokument nennt keine Preisphase nach der Mindestlaufzeit{% elif
-    k.tarif_id %}die Tarifquelle nennt keine Preisphase nach der
-    Mindestlaufzeit{% else %}der Tarif steht nicht im Tarifbestand{% endif %}</p>
+    k.laufzeit) + 1 }}: nicht belegt – {% if k.tarif_id %}die Tarifquelle
+    nennt keine Preisphase nach der Mindestlaufzeit{% else %}der Tarif steht
+    nicht im Tarifbestand{% endif %}</p>
   {% endif %}
 
   {% for b in k.boni %}

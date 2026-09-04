@@ -2653,8 +2653,10 @@ b,strong{font-weight:700}
    damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
 .gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
   font-weight:700}
-.gr-g1-delta{font-family:var(--sans);font-size:11px;fill:var(--ink-4)}
-.gr-g1-zustand{font-family:var(--sans);font-size:11px;font-weight:700;
+/* 12 px, nicht 11: kein Text unter zwoelf Pixeln (Hausregel seit dem
+   30.08.2026, `test_keine_beschriftung_unter_zwoelf_pixeln`). */
+.gr-g1-delta{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
 .gr-t-zustand{color:var(--red,#e60000);font-weight:700}
 .gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
