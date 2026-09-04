@@ -45,6 +45,7 @@ from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_tco_view, geraete_vergleich, geraete_verlauf)
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
+from ..tarif_bezug import Tarifbestand
 from ..analyze.geraete_store import (
     GeraeteDB,
     Preishistorie,
@@ -1233,6 +1234,13 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # RENDERN entsteht: er hat keinen eigenen State und keine LLM-Stufe,
     # dieselbe Bauform wie `report/wettbewerb.py`.
     tco_db = TcoDB(state_dir / "geraete_tco.json")
+    # DER TARIFBESTAND GEHOERT ZUR TCO-ANSICHT, nicht nur zum Tarifzweig:
+    # er traegt die MINDESTLAUFZEIT des Tarifs, und ohne sie ist keine
+    # Leitzahl rechenbar. o2 bindet den Tarif 24 Monate und finanziert das
+    # Geraet ueber 36 - wer die zwei gleichsetzt, addiert zwoelf
+    # Tarifmonate, die niemand schuldet (A5.5). Fehlt die Datei, bleibt
+    # `je_id` leer und die Karten sagen ihre Luecke.
+    tarifbestand = Tarifbestand.aus_datei(state_dir / "tarife.jsonl")
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
@@ -1413,7 +1421,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # verworfen hat.
         "tco": geraete_tco_view.aufbereiten(
             tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
-            lesbar=tco_db.lesbar),
+            lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
+            historie=historie),
         # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
         # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
         # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau

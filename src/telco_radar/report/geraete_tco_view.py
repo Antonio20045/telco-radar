@@ -46,7 +46,7 @@ from __future__ import annotations
 
 import logging
 
-from . import geraete_vergleich
+from . import geraete_tco_grafik, geraete_tco_karten, geraete_vergleich
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
@@ -547,7 +547,8 @@ def _referenztabelle(referenzen: list) -> list[dict]:
 
 
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
-                lesbar: bool = True) -> dict:
+                lesbar: bool = True, tarife: dict | None = None,
+                historie=None) -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
     `buendel` und `referenzen` sind die Datensaetze aus
@@ -618,6 +619,34 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     bereit = _bereitschaft(eintraege)
     massstab = _referenztabelle(referenzen)
 
+    # ---- Phase R: die Hauptansicht -------------------------------------
+    #
+    # DIE TARIFBINDUNG STEHT NICHT IN DER GERAETENUTZLAST. o2 bindet den
+    # Tarif 24 Monate und finanziert das Geraet ueber 36; die 24 stehen im
+    # Tarifbestand (`tarife.jsonl`, ueber `tarif_id`). Ohne sie ist keine
+    # Karte rechenbar - deshalb wird sie HIER gesetzt und nicht in der
+    # Kennzahl geraten (A5.5).
+    tarife = tarife or {}
+    for b in buendel:
+        if isinstance(b, Buendel) and b.tarif_id:
+            satz = tarife.get(b.tarif_id) or {}
+            laufzeit = satz.get("laufzeit_monate")
+            if laufzeit:
+                b.tarif_bindung_monate = int(laufzeit)
+
+    modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
+                                         tarife, katalog)
+    for modell in modelle["modelle"]:
+        # Die Grafik rechnet NUR Geometrie: die Betraege stehen schon in
+        # den Karten, und zwei Rechnungen fuer dieselbe Zahl waeren zwei
+        # Zahlen.
+        modell["svg"] = geraete_tco_grafik.balken(modell)
+        modell["legende"] = geraete_tco_grafik.legende(modell)
+
+    reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
+              if historie is not None else [])
+    g2 = geraete_tco_grafik.historie(reihen)
+
     return {
         # "Es gibt eine TCO zu zeigen" - nicht "es gibt Geraetedaten".
         # Die zwei auseinanderzuhalten ist der Grund, warum die Tafel heute
@@ -650,6 +679,17 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "referenzen_gesamt": len(massstab),
         "referenzen_rest": massstab[REFERENZEN_SICHTBAR:],
         "horizont": TCO_HORIZONT,
+        # ---- Phase R ---------------------------------------------------
+        # Die Hauptansicht: je Modell vier Anbieter und eine Grafik. Sie
+        # steht NEBEN den Feldern darueber und ersetzt sie nicht - der
+        # Massstab (SIM-only) und die Bereitschaft sind weiterhin die
+        # Auskunft ueber die Datenlage, nur nicht mehr der Inhalt der
+        # Tafel.
+        "modelle": modelle["modelle"],
+        "modell_vorgabe": modelle["vorgabe"],
+        "modelle_gesamt": modelle["gesamt"],
+        "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
+        "g2": g2,
     }
 
 
@@ -659,4 +699,7 @@ def leer() -> dict:
             "delta": [], "bereitschaft": [], "lesbar": True,
             "offene_posten": _offene_posten([]),
             "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
-            "horizont": TCO_HORIZONT}
+            "horizont": TCO_HORIZONT,
+            "modelle": [], "modell_vorgabe": "", "modelle_gesamt": 0,
+            "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
+            "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0}}
