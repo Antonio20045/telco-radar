@@ -1722,6 +1722,34 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (05.09.2026, nachts): Phase R3 — die drei Befunde
+> der R2-Abnahme.** Auftragsgrundlage: `PHASE R3` (PM, 04.09.2026 ab 20:00)
+> auf Basis von `QA_BEFUND_R2_2026-09-04.md` (nicht im Repo). **Abschluss-
+> bericht mit allen Messungen: `outputs/phase-r3-2026-09-04.md` — dort
+> weiterlesen.** Vier Commits (`7604a08`, `689afb2`, `81369a1`, `8611835`),
+> je Schritt einer; **52 Euro-Deltas vorher/nachher auf den Cent gleich.**
+> Stand danach: **2627 Tests grün, 3 rot** (vorbestehend, siehe R2), 30
+> skipped; `pruefe_portal.py` 11 / 6 wie nach R2 (fünf an der leeren
+> Titelseite, 8b die leeren Promo-Bilder); TCO-Reiter 2241 px.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **F-R2-1: G2 zeichnet bewegte Reihen vor flachen** (`_reihenrang`), die Ereignisse für Marker UND Fließtext kommen aus `_ereignisse()` über die **Grundmenge** | Bei Gleichstand in der Punktzahl brach das Alphabet: drei flache congstar-Linien im Bild, der größte Preissprung des Bestands (o2 Pixel 10 Pro, +180 €) nicht — und der Satz „Erhöhungen und Senkungen" nannte 2 von 4. Jetzt sagt die Unterschrift „Reihen mit Preisänderung zuerst", der Satz „über alle 8 Reihen", ab sieben Ereignissen „und N weitere" |
+> | **F-R2-2: die Referenzkarte trägt ihre eigene Bindung** — `TCO-24`, `laufzeit = tarif_monate`, eigener Rechenweg-Satz, Vodafone-Balken unter „24 Monate Bindung", Referenzlinie „· Barkauf + 24 Monate Tarif" | 30 Karten sagten „TCO-36 … Gerechnet über 36 Monate Bindung" für 24 Tarifmonate plus Barkauf. **Geändert ist die Beschriftung, nicht die Rechnung**: `ref["monate"]` (Fenster 36) bleibt am Referenz-Dict, daran hängen `_delta`/`gleiche_laufzeit` und die Referenzlinie (E-2, Antonio). Neues Kartenfeld `fenster` |
+> | **F-R2-2 Nachtrag: die Spanne des Bandes ist die der Angebote** | Nur beim Ansehen: „TCO-36 von 1.120,75 € bis 1.428,70 €" hatte die TCO-24-Referenz als Obergrenze. `spanne` rechnet jetzt wie `angebote`; ein einziges Angebot steht als eine Zahl, nicht „von X bis X" |
+> | **F-R2-3: `geraet_aus_sku()`** — die längste Katalog-`device_id`, auf die das Speichersegment folgt; `ergaenze_geraete_aus_katalog()` in `modelle()` UND `geraete_tco_view.aufbereiten()`; Unauflösbares als `ohne_zuordnung` mit Grund vor dem Modellgatter | Das o2-Bündel zum iPhone 16 Pro Max 256 GB hat keine Listung und stand als Modell „ohne-geraet". Kein Schnitt am Bindestrich: `sku_id()` schreibt die Katalog-ID wörtlich voran, das Speichersegment ist die Grenze (Pro Max schlägt Pro, 16 trifft 16e nicht). Der Zweig „kein Katalogtreffer" ist getestet, im Bestand nicht beobachtet |
+>
+> **Fallstrick:** `laufzeit` an der Referenzkarte hängt an `_gruppen` (G1),
+> `data-laufzeit` (JS-Sortierung „TCO je Laufzeitgruppe"), `tarif_bindung`
+> (F5-Zeile) — aber NICHT an `laufzeiten`/`spanne` des Modells, die vor dem
+> Anhängen der Karte gerechnet werden. Wer die Referenz wieder ins Fenster
+> zieht, zieht 30 Balken zurück unter einen falschen Gruppenkopf.
+>
+> **Bewusst offen:** E-2/A5.5 bei Antonio; rote CI (E-3, leerer
+> Wochenbericht) nicht angefasst; `MAX_REIHEN = 5` in G2 — sobald mehr als
+> fünf Reihen bewegt sind, fällt die kleinste Bewegung aus dem Bild und
+> steht nur im Satz, dann ansehen.
+
 > **Zuletzt erledigt (04.09.2026, abends): Phase R2 — die Befunde der
 > fremden Augen.** Auftragsgrundlage: `PHASE_R2_BRIEF.md` auf Basis von
 > `QA_BEFUND_R_2026-09-04-1550.md`. **Abschlussbericht mit allen Messungen,
