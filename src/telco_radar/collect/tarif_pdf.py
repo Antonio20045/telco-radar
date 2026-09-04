@@ -380,6 +380,21 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
         t.setze("grundgebuehr", zahl(treffer.group(1)),
                 _zeile_mit(text, muster))
         return
+
+    # 5) Ein einzelner Listenpreis ohne Phasenspalten. Vodafones
+    #    Prepaid-Blaetter (CallYa) benutzen denselben Bezeichner wie die
+    #    Postpaid-Tabelle, nur ohne Zeitachse: "Listenpreis inkl. MwSt.
+    #    14,99 €". Das steht bewusst NACH der Tabellenform - dort traegt
+    #    die Kopfzeile denselben Bezeichner und keinen Betrag, und wer hier
+    #    zuerst suchte, faende in einem Postpaid-Blatt die erste
+    #    Tabellenzeile statt des Grundpreises.
+    muster = re.compile(r"Listenpreis[^\n]{0,60}?" + _GELD, re.I)
+    treffer = muster.search(text)
+    if treffer:
+        zeile = _zeile_mit(text, muster)
+        if not _ABRECHNUNG_IN_WOCHEN.search(zeile):
+            t.setze("grundgebuehr", zahl(treffer.group(1)), zeile)
+        return
     if kopf is not None:
         for zeile in zeilen[kopf:kopf + 12]:
             treffer = re.search(_GELD, zeile)
@@ -522,6 +537,21 @@ _GERAETESTUFE = re.compile(r"smartphone|phone|handy|tablet|endger", re.I)
 # Der Tabellenkopf. "Listenpreis" allein reicht nicht - erst zusammen mit
 # einer Monatsspalte ist es diese Tabelle.
 _PREISKOPF = re.compile(r"Listenpreis|Monatlicher Preis|Monatspreis", re.I)
+
+# Ein Preis je VIER WOCHEN ist kein Monatspreis, und `Tarif.grundgebuehr`
+# meint einen Monatspreis - `Preisphase` rechnet in Monaten, `tco_24` ueber
+# 24 davon. Prepaid rechnet im Vierwochentakt: congstar schreibt "Entgelt
+# Prepaid Allnet M (ohne Endgerät) 10,00 € / 4 Wochen", Vodafone bei CallYa
+# "Listenpreis inkl. MwSt. 14,99 €" ueber "Vertragslaufszeiten 4 Wochen"
+# (gemessen 04.09.2026). Dreizehn Zyklen im Jahr sind nicht zwoelf Monate;
+# die Zahl umzurechnen waere eine Rechnung dieses Projekts und keine
+# Angabe des Anbieters.
+#
+# Das Muster fuer die Monatsangabe (Fall 4) verlangt "/ Monat" und faellt
+# deshalb von selbst richtig. Der einzelne Listenpreis (Fall 5) braucht die
+# Sperre ausdruecklich - ohne sie stand Vodafones CallYa mit 14,99 EUR als
+# Monatspreis im Bestand.
+_ABRECHNUNG_IN_WOCHEN = re.compile(r"(?:/|pro|je)\s*\d*\s*Woche", re.I)
 _MONATSSPALTE = re.compile(r"(ab\s+)?Monat\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?",
                            re.I)
 

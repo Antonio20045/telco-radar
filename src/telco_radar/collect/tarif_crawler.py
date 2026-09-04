@@ -198,19 +198,120 @@ def dokumentlinks(html: str, basis: str, muster: list[str]) -> list[str]:
     return gefunden
 
 
-def _sortiere(links: list[str], bevorzugt: list[str]) -> list[str]:
-    """Bevorzugte Slugs nach vorn - alphabetisch waeren es Tarife von 2017."""
+def linktexte(html: str, basis: str, muster: list[str]) -> dict[str, str]:
+    """Zu jeder Dokumentadresse ihre Linkbeschriftung.
+
+    Warum das gebraucht wird: congstar legt 317 Produktinformationsblaetter
+    unter durchnumerierten Dateinamen ab
+    (`Produktinformationsblatt_549.pdf`). In der ADRESSE steht kein
+    Tarifname - im Linktext steht er ("Produktinformationsblatt congstar
+    Allnet Flat L mit Upgrade-Versprechen"). Eine Vorauswahl, die nur die
+    Adresse liest, kann dort nur die Seitenreihenfolge nehmen, und die ist
+    keine Zusage.
+
+    Bewusst eine EIGENE Funktion neben `dokumentlinks`: die Regel gegen
+    ID-Enumeration haengt daran, dass genau eine Stelle bestimmt, was
+    abgerufen werden darf. Ein zweiter Rueckgabewert an derselben Funktion
+    haette diese Stelle beweglich gemacht.
+    """
+    texte: dict[str, str] = {}
+    suppe = BeautifulSoup(html or "", "html.parser")
+    for anker_ in suppe.find_all("a"):
+        href = (anker_.get("href") or "").strip()
+        if not href:
+            continue
+        voll = urljoin(basis, href)
+        pfad = urlsplit(voll).path.lower()
+        if muster and not any(m in pfad for m in muster):
+            continue
+        beschriftung = " ".join(anker_.get_text().split())
+        if beschriftung and voll not in texte:
+            texte[voll] = beschriftung
+    return texte
+
+
+# Der Slug eines Telekom-Dokuments endet auf dem Vermarktungsdatum:
+# `magentamobil-l-20240801`. Bewusst nur vierstellige Jahre ab 2000 -
+# dieselbe Ueberlegung wie beim Datum aus dem Link in `collect/rss.py`:
+# ein sechsstelliges Muster faende jede Artikelnummer.
+_VERMARKTUNGSDATUM = re.compile(r"-(20\d{6})$")
+
+
+def juengste_fassung(links: list[str]) -> list[str]:
+    """Je Tarif nur die neueste Vermarktungsfassung, in Seitenreihenfolge.
+
+    Die Telekom laesst ALLE Faelle seit 2017 verlinkt stehen: allein
+    `magentamobil-l` gibt es in vier Staenden (20170601, 20180831,
+    20220701, 20240801). Ohne diese Auswahl bekam der Sammler am
+    04.09.2026 genau das - vier Fassungen desselben Tarifs, und weil sie
+    alle dieselbe Titelzeile "MagentaMobil L" tragen, bekam die STABILE
+    Tarif-ID `telekom:magentamobil-l` den Stand von 2017, waehrend der
+    aktuelle unter einem Hash-Zusatz landete. Die Zeitreihe haette also am
+    toten Produkt gehangen.
+
+    Adressen ohne Datumsendung (o2, Vodafone, congstar) bleiben unberuehrt.
+    Verglichen wird als Zeichenkette - `YYYYMMDD` sortiert von sich aus
+    richtig.
+    """
+    neueste: dict[str, tuple[str, str]] = {}
+    for url in links:
+        name = urlsplit(url).path.rstrip("/").rsplit("/", 1)[-1]
+        treffer = _VERMARKTUNGSDATUM.search(name)
+        if not treffer:
+            continue
+        stamm = url[:url.rfind(treffer.group(0))]
+        if stamm not in neueste or treffer.group(1) > neueste[stamm][0]:
+            neueste[stamm] = (treffer.group(1), url)
+    behalten = {url for _, url in neueste.values()}
+    return [u for u in links
+            if not _VERMARKTUNGSDATUM.search(
+                urlsplit(u).path.rstrip("/").rsplit("/", 1)[-1])
+            or u in behalten]
+
+
+def _sortiere(links: list[str], bevorzugt: list[str],
+              texte: dict[str, str] | None = None) -> list[str]:
+    """Bevorzugte Dokumente nach vorn - alphabetisch waeren es Tarife von 2017.
+
+    Gesucht wird in der Adresse UND in der Linkbeschriftung. Ohne den Text
+    ist congstar nicht steuerbar (durchnumerierte Dateinamen), ohne die
+    Adresse nicht die Telekom (Beschriftung ist dort ueberall dieselbe).
+    """
     if not bevorzugt:
         return links
+    texte = texte or {}
 
-    def rang(u: str) -> tuple[int, str]:
-        klein = u.lower()
+    # Je Wunsch ein Fach, plus eins fuer alles Uebrige. Innerhalb eines
+    # Fachs bleibt die SEITENREIHENFOLGE: vorher entschied das Alphabet,
+    # und das ist hier keine Ordnung, sondern eine Muenze - congstar stellt
+    # seine laufenden Tarife nach oben, und
+    # `Produktinformationsblatt_549.pdf` steht alphabetisch vor `_9001.pdf`,
+    # ohne dass die Zahl etwas bedeutet.
+    faecher: list[list[str]] = [[] for _ in range(len(bevorzugt) + 1)]
+    for url in links:
+        klein = url.lower() + " " + texte.get(url, "").lower()
         for i, b in enumerate(bevorzugt):
             if b in klein:
-                return (i, u)
-        return (len(bevorzugt), u)
+                faecher[i].append(url)
+                break
+        else:
+            faecher[-1].append(url)
 
-    return sorted(links, key=rang)
+    # REIHUM, nicht Fach fuer Fach. Der Unterschied ist am 04.09.2026
+    # gemessen worden: `magentamobil-s-` trifft neun Dokumente (der Tarif,
+    # seine Flex-, Young-, Friends- und Happy-Varianten), und weil sie alle
+    # vor dem ersten M-Dokument standen, brachte ein Deckel von zwoelf
+    # NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
+    # Ein Wunschzettel, dessen erster Punkt den ganzen Einkauf frisst, ist
+    # keiner - dieselbe Ueberlegung wie `_interleave_by_source` in der
+    # Pipeline.
+    sortiert: list[str] = []
+    for runde in range(max(len(f) for f in faecher)):
+        for fach in faecher[:-1]:
+            if runde < len(fach):
+                sortiert.append(fach[runde])
+    sortiert.extend(faecher[-1])
+    return sortiert
 
 
 class TarifSpeicher:
@@ -367,7 +468,7 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     bilanz = {"quellen": len(quellen), "einstiege": 0, "verlinkt": 0,
               "geholt": 0, "gelesen": 0, "quarantaene": 0, "grundlinie": 0,
               "unveraendert": 0, "geaendert": 0, "kleingedruckt": 0,
-              "fehler": 0, "meldungen": 0}
+              "fehler": 0, "ohne_links": 0, "meldungen": 0}
     besucht: list[str] = []
     erlaubt: set[str] = set()
     items: list[Item] = []
@@ -376,6 +477,7 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
 
     for quelle in quellen:
         links: list[str] = []
+        texte: dict[str, str] = {}
         for einstieg in quelle.einstieg:
             erlaubt.add(einstieg)
             bilanz["einstiege"] += 1
@@ -384,16 +486,37 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                 antwort = hole(einstieg, http_cfg)
                 gefunden = dokumentlinks(antwort.text, einstieg,
                                          quelle.pfadmuster)
+                texte.update(linktexte(antwort.text, einstieg,
+                                       quelle.pfadmuster))
             except Exception as exc:  # noqa: BLE001
                 bilanz["fehler"] += 1
                 log.info("Tarifquelle %s nicht lesbar: %s", einstieg,
                          str(exc)[:120])
                 continue
+            if not gefunden:
+                # Eine Einstiegsseite ohne einen einzigen Dokumentlink ist
+                # der lauteste Befund dieses Sammlers - und er war bis zum
+                # 04.09.2026 vollkommen stumm. Genau so ist die Telekom
+                # zwei Monate lang als "liefert nichts" gefuehrt worden:
+                # ihre Seite antwortet aus GitHub Actions mit einer
+                # Challenge (HTTP 202, rund 2 KB), die kein Fehler ist und
+                # keinen Link enthaelt. Aus derselben Sandbox heraus
+                # liefert dieselbe Adresse 200 und 1114 Links. Ohne Status
+                # und Groesse in der Zeile ist das nicht zu unterscheiden.
+                bilanz["ohne_links"] += 1
+                log.warning("Tarifquelle %s (%s): HTTP %s, %d Bytes, aber "
+                            "KEIN Dokumentlink zum Muster %s",
+                            einstieg, quelle.anbieter,
+                            getattr(antwort, "status_code", "?"),
+                            len(getattr(antwort, "content", b"") or b""),
+                            quelle.pfadmuster or ["(alle)"])
             erlaubt.update(gefunden)
             links.extend(gefunden)
 
+        links = juengste_fassung(links)
         bilanz["verlinkt"] += len(links)
-        for url in _sortiere(links, quelle.bevorzugt)[:quelle.max_dokumente]:
+        for url in _sortiere(links, quelle.bevorzugt,
+                             texte)[:quelle.max_dokumente]:
             try:
                 besucht.append(url)
                 ergebnis = _hole_dokument(url, http_cfg, hole)
@@ -471,9 +594,10 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     bilanz["nicht_verlinkt"] = sorted(set(besucht) - erlaubt)
     log.info("Tarif-Sammler: %d Quellen, %d verlinkt, %d geholt, %d gelesen, "
              "%d Grundlinie, %d unveraendert, %d geaendert (davon %d nur "
-             "Kleingedrucktes), %d Quarantaene, %d Fehler",
+             "Kleingedrucktes), %d Quarantaene, %d Fehler, %d Einstiege ohne "
+             "Dokumentlink",
              bilanz["quellen"], bilanz["verlinkt"], bilanz["geholt"],
              bilanz["gelesen"], bilanz["grundlinie"], bilanz["unveraendert"],
              bilanz["geaendert"], bilanz["kleingedruckt"],
-             bilanz["quarantaene"], bilanz["fehler"])
+             bilanz["quarantaene"], bilanz["fehler"], bilanz["ohne_links"])
     return items, bilanz

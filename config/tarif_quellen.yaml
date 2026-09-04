@@ -18,6 +18,17 @@
 # Slugs sind 404. Beim Bau dieses Moduls wurde `magentamobil-l-20250401`
 # geraten - es gibt nur `magentamobil-data-l-20250401`.
 #
+# WIE AUS 1114 LINKS FUENF DOKUMENTE WERDEN
+# ------------------------------------------
+# Drei Stufen, in dieser Reihenfolge (`collect/tarif_crawler.py`):
+#
+#   1. `pfadmuster`  - was ueberhaupt ein Tarifdokument sein kann.
+#   2. juengste Fassung - je Adressstamm nur der neueste Vermarktungsstand.
+#      Die Telekom laesst alle Faelle seit 2017 verlinkt stehen.
+#   3. `bevorzugt`   - welche Tarife uns interessieren. Gesucht wird in der
+#      Adresse UND in der Linkbeschriftung; congstar numeriert seine
+#      Dateinamen durch und nennt den Tarif nur im Linktext.
+#
 # FREQUENZ
 # --------
 # Einmal woechentlich. Diese Dokumente aendern sich selten, und genau
@@ -25,23 +36,114 @@
 
 quellen:
   - anbieter: Telekom
-    # 1177 verlinkte Produktinformationsblaetter, als echte <a>-Tags.
+    # 1114 verlinkte Produktinformationsblaetter, als echte <a>-Tags
+    # (gemessen 04.09.2026 aus der Sandbox: HTTP 200, 581 KB).
     # Die Telekom liefert das PDF unter dem Slug OHNE .pdf-Endung und mit
     # Content-Type application/pdf - deshalb entscheidet der Content-Type,
     # nicht die Dateiendung.
+    #
+    # ACHTUNG, GEMESSENER UNTERSCHIED ZWISCHEN SANDBOX UND ACTIONS:
+    # Im Lauf 33644684296 (02.09.2026) meldete der Sammler "3 verlinkt, 0
+    # Fehler" - die drei sind o2. Von der Telekom kam KEIN Link, ohne dass
+    # etwas geworfen haette. Das ist die in CLAUDE.md dokumentierte
+    # 202-Challenge: telekom.de antwortet httpx aus dem Actions-IP-Bereich
+    # mit HTTP 202 und rund 2 KB Challenge-HTML statt mit der Seite. HTTP
+    # 202 ist kein Fehlerstatus, `raise_for_status()` laesst ihn durch, und
+    # eine Seite ohne <a> liefert eben keine Links. Seit dem 04.09.2026
+    # sagt der Sammler das laut (`ohne_links` in der Bilanz, WARNING mit
+    # Status und Byte-Zahl) - vorher war der Ausfall vollkommen stumm.
+    # Ein Fingerprint-Trick waere hier keine Loesung, sondern eine
+    # Umgehung; die Grenze steht in STRATEGY_GERAETE_TCO.md R3.
     einstieg:
       - https://www.telekom.de/produktinformationsblatt
     pfadmuster:
       - /produktinformationsblatt/
-    # Aus 1177 Dokumenten die aktuellen herausgreifen. Alphabetisch die
-    # ersten drei zu nehmen liefert Tarife von 2017.
+    # Die aktuell vermarktete Hauptlinie und ihre Flex-Varianten - je ein
+    # Wunsch, je ein Dokument. Das "-2" ist die Jahrtausendziffer des
+    # Vermarktungsdatums und damit die Grenze zum naechsten Tarif:
+    # "magentamobil-s-2" trifft `magentamobil-s-20240801`, aber weder
+    # `magentamobil-s-flex-20240801` noch `magentamobil-s-young-20251007`.
+    #
+    # Ohne diese Schaerfe holte der Sammler am 04.09.2026 NEUNMAL
+    # MagentaMobil S in seinen Varianten und kein einziges Mal M, L, XL
+    # oder Basic: `magentamobil-s-` trifft neun Dokumente, und die standen
+    # alle vor dem ersten M. Der Sammler geht seither reihum durch die
+    # Wuensche (`_sortiere`) - beides zusammen ergibt die Auswahl unten.
+    #
+    # `max_dokumente` ist genau die Zahl der Wuensche. Damit bestimmt
+    # ausschliesslich diese Liste, was geholt wird; ein Auffuellen aus den
+    # 1114 uebrigen Adressen brachte am 04.09.2026 undatierte Dauerlinks
+    # (`magentamobil-s-flex` ohne Datum) mit derselben Titelzeile wie ihr
+    # datiertes Gegenstueck - und damit Tarif-IDs mit Hash-Zusatz fuer
+    # zwei Dokumente desselben Produkts.
     bevorzugt:
-      - "magentamobil-basic-2"
-      - "magentamobil-l-2"
-      - "magentamobil-m-2"
       - "magentamobil-s-2"
+      - "magentamobil-m-2"
+      - "magentamobil-l-2"
       - "magentamobil-xl-2"
-    max_dokumente: 5
+      - "magentamobil-basic-2"
+      - "magentamobil-s-flex-2"
+      - "magentamobil-m-flex-2"
+      - "magentamobil-l-flex-2"
+      - "magentamobil-xl-flex-2"
+    max_dokumente: 9
+
+  - anbieter: Vodafone
+    # Gemessen 04.09.2026: `vodafone.de/infofaxe` (bis dahin der einzige
+    # notierte Kandidat) traegt genau DREI PDFs, alle unter
+    # `/infofaxe/1xx.pdf` - alte numerierte Infofaxe, kein
+    # Tarifverzeichnis. Die echten Einstiege stehen dort verlinkt: die
+    # `/hilfe/pib-*.html`-Seiten. Die Mobilfunkseite traegt 195 PDF-Links,
+    # die CallYa-Seite 10; kein einziger Fehltreffer zum Muster ".pdf".
+    #
+    # Vodafones PIB ist das einzige Dokument im Bestand, das seine
+    # PREISPHASEN selbst auszeichnet ("Monat 1-24" / "ab Monat 25") - und
+    # das einzige, das die SIM-only-Stufe und die Geraetestufen desselben
+    # Tarifs in einer Tabelle nebeneinanderstellt. Genau daraus entsteht
+    # der Massstab, gegen den ein Geraeteanteil rechenbar wird.
+    #
+    # Die CallYa-Seite (10 PDFs) ist gemessen und BEWUSST nicht
+    # eingetragen: CallYa rechnet im Vierwochentakt ("Vertragslaufszeiten
+    # 4 Wochen"), und `Tarif.grundgebuehr` meint einen Monatspreis.
+    # Dreizehn Zyklen im Jahr in zwoelf Monate umzurechnen waere eine
+    # Rechnung dieses Projekts und keine Angabe des Anbieters. Der
+    # Extraktor sperrt solche Preise seit dem 04.09.2026 ohnehin
+    # (`_ABRECHNUNG_IN_WOCHEN`) - die Seite abzurufen kostet dann nur noch
+    # Zeit.
+    einstieg:
+      - https://www.vodafone.de/hilfe/pib-privatkunden-tarife-mobilfunk.html
+    pfadmuster:
+      - ".pdf"
+    # "vf-mobil-" trifft am 04.09.2026 genau die zehn aktuell vermarkteten
+    # Mobilfunktarife (XS/S/M/L/XL, je ohne und mit Smartphone) und nichts
+    # sonst. Die Dateinamen tragen den Vermarktungsmonat im Klartext
+    # ("VF-Mobil-M-Juli-2026.pdf"), nicht das YYYYMMDD-Muster der Telekom -
+    # die Stufe "juengste Fassung" greift hier also nicht.
+    bevorzugt:
+      - "vf-mobil-"
+    max_dokumente: 10
+
+  - anbieter: congstar
+    # Netz Telekom, eigene Preise. Gemessen 04.09.2026: die Startseite
+    # verlinkt `/produktinformationsblaetter/` (Linkernte, kein Rateversuch),
+    # dort stehen 317 Dokumente in drei Pfadvarianten - deshalb das Muster
+    # auf dem DATEINAMEN und nicht auf einem Verzeichnis: "/pibs/" allein
+    # laesst 26 Dokumente der Variante `/fileadmin/produktinformationsblatt/`
+    # liegen.
+    #
+    # Die Dateinamen sind durchnumeriert (`Produktinformationsblatt_549.pdf`)
+    # und tragen keinen Tarifnamen. Der steht in der Linkbeschriftung, und
+    # nur deshalb kann `bevorzugt` hier ueberhaupt etwas ausrichten.
+    einstieg:
+      - https://www.congstar.de/produktinformationsblaetter/
+    pfadmuster:
+      - "produktinformationsblatt"
+    # Nur Postpaid. congstars Prepaid-Blaetter nennen ihren Preis je vier
+    # Wochen ("10,00 € / 4 Wochen", gemessen 04.09.2026) - siehe die
+    # Begruendung bei Vodafone.
+    bevorzugt:
+      - "congstar allnet flat"
+    max_dokumente: 10
 
   - anbieter: o2
     # Die PDFs liegen auf static2.o9.de unter Blob-IDs. Verlinkt sind sie
@@ -57,9 +159,5 @@ quellen:
 # ohne statische Links; im HTML stehen nur die Chunk-Dateien. Der Katalog
 # entsteht erst im Browser. Das ist derselbe Fall wie bei den JS-Promo-Seiten
 # und braucht den JS-Collector - kein Grund, hier einen geratenen Pfad
-# einzutragen.
-#
-# --- Warum Vodafone hier steht, aber nicht als Wettbewerber
-# vodafone.de/infofaxe liefert HTTP 200. Aufgenommen wird es, sobald die
-# Linkernte dort gemessen ist - der eigene Konzern gehoert in die
-# Positionskarte, sonst zeigt sie den Markt ohne den eigenen Punkt.
+# einzutragen. Der Befund ist seit 08/2026 unveraendert und am 04.09.2026
+# NICHT neu gemessen worden; wer ihn anfasst, misst zuerst nach.

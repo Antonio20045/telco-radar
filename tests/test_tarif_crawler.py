@@ -477,3 +477,175 @@ def test_dieselbe_adresse_bleibt_eine_versionsfolge(tmp_path):
                       typ="text/plain")}))
     assert bilanz["geaendert"] == 1
     assert len(items) == 1
+
+
+# --------------------------------------------------------------------------- #
+# Die Vorauswahl: juengste Fassung und Linkbeschriftung
+#
+# Nachgetragen am 04.09.2026. Bis dahin wurden aus 1114 verlinkten
+# Telekom-Dokumenten fuenf ausgewaehlt, und VIER davon waren derselbe Tarif
+# in vier Vermarktungsstaenden - der aelteste von 2017.
+# --------------------------------------------------------------------------- #
+
+from telco_radar.collect.tarif_crawler import juengste_fassung, linktexte  # noqa: E402
+
+_TELEKOM = "https://www.telekom.de/produktinformationsblatt/"
+
+
+def test_von_vier_staenden_bleibt_der_neueste():
+    """Live gemessen: `magentamobil-l` steht in vier Faellen verlinkt.
+
+    Alle vier tragen die Titelzeile "MagentaMobil L". Ohne diese Auswahl
+    bekam die STABILE Tarif-ID `telekom:magentamobil-l` den Stand von 2017
+    (54,95 EUR, ohne erkannte Laufzeit), waehrend der aktuelle Stand
+    (59,95 EUR) unter einem Hash-Zusatz landete - die Zeitreihe haengt dann
+    am toten Produkt.
+    """
+    links = [_TELEKOM + s for s in ("magentamobil-l-20170601",
+                                    "magentamobil-l-20180831",
+                                    "magentamobil-l-20220701",
+                                    "magentamobil-l-20240801")]
+    assert juengste_fassung(links) == [_TELEKOM + "magentamobil-l-20240801"]
+
+
+def test_verschiedene_tarife_bleiben_alle():
+    """Gruppiert wird nach Adressstamm, nicht nach Anbieter."""
+    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
+                                    "magentamobil-m-20240801",
+                                    "magentamobil-m-20180831")]
+    assert juengste_fassung(links) == [_TELEKOM + "magentamobil-s-20240801",
+                                       _TELEKOM + "magentamobil-m-20240801"]
+
+
+def test_eine_variante_ist_ein_eigener_tarif():
+    """`-flex` und `-young` sind eigene, aktuell vermarktete Tarife.
+
+    Sie duerfen nicht als aeltere Fassung des Grundtarifs verschwinden -
+    ihr Adressstamm ist ein anderer.
+    """
+    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
+                                    "magentamobil-s-flex-20240801",
+                                    "magentamobil-s-young-20251007")]
+    assert juengste_fassung(links) == links
+
+
+def test_adressen_ohne_datum_bleiben_unberuehrt():
+    """o2, Vodafone und congstar datieren ihre Dateinamen nicht so.
+
+    Die Reihenfolge bleibt die der Seite - sie ist bei congstar die einzige
+    Ordnung, die es gibt, solange `bevorzugt` nichts trifft.
+    """
+    links = ["https://static2.o9.de/resource/blob/2241742/x/o2-mobile-m.pdf",
+             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf",
+             "https://www.vodafone.de/x/VF-Mobil-M-Juli-2026.pdf"]
+    assert juengste_fassung(links) == links
+
+
+def test_eine_achtstellige_zahl_ohne_jahr_ist_kein_datum():
+    """Dieselbe Vorsicht wie beim Datum aus dem Link in `collect/rss.py`.
+
+    `-19990101` waere ein Datum, `-12345678` ist eine Artikelnummer. Ohne
+    die Jahresgrenze frisst die Regel jede numerierte Adresse - und
+    loeschte bei congstar reihenweise Dokumente.
+    """
+    links = ["https://x.de/a/doc-12345678", "https://x.de/a/doc-99887766"]
+    assert juengste_fassung(links) == links
+
+
+def test_bevorzugt_findet_den_tarif_in_der_linkbeschriftung():
+    """congstar numeriert seine Dateinamen durch.
+
+    `Produktinformationsblatt_549.pdf` sagt nichts; der Linktext
+    "Produktinformationsblatt congstar Allnet Flat L mit Upgrade-
+    Versprechen" sagt alles. Ohne den Text kann die Vorauswahl dort nur
+    die Seitenreihenfolge nehmen - und die ist keine Zusage.
+    """
+    from telco_radar.collect.tarif_crawler import _sortiere
+    links = ["https://www.congstar.de/x/Produktinformationsblatt_9001.pdf",
+             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf"]
+    texte = {links[0]: "Produktinformationsblatt Homespot & Go S",
+             links[1]: "Produktinformationsblatt congstar Allnet Flat L"}
+    assert _sortiere(links, ["congstar allnet flat"], texte)[0] == links[1]
+    # Ohne die Beschriftung bleibt es bei der Seitenreihenfolge - und die
+    # ist bei congstar die einzige Ordnung, die es gibt: die Seite stellt
+    # die laufenden Tarife nach oben.
+    assert _sortiere(links, ["congstar allnet flat"]) == links
+
+
+def test_linktexte_liest_dieselbe_menge_wie_dokumentlinks():
+    """Sonst bekaeme die Vorauswahl eine Beschriftung zu einer Adresse, die
+    gar nicht abgerufen werden darf - oder umgekehrt keine zu einer, die es
+    darf."""
+    html = ('<a href="/pib/Produktinformationsblatt_1.pdf">Allnet Flat S</a>'
+            '<a href="/agb/">AGB</a>'
+            '<a href="/pib/Produktinformationsblatt_2.pdf">Allnet Flat M</a>')
+    basis = "https://www.congstar.de/produktinformationsblaetter/"
+    links = dokumentlinks(html, basis, ["produktinformationsblatt"])
+    texte = linktexte(html, basis, ["produktinformationsblatt"])
+    assert set(texte) == set(links)
+    assert texte[links[0]] == "Allnet Flat S"
+
+
+def test_ein_einstieg_ohne_dokumentlink_meldet_sich(caplog, tmp_path):
+    """Der stumme Ausfall, der die Telekom zwei Monate gekostet hat.
+
+    Ihre Seite antwortet aus GitHub Actions mit einer Challenge: HTTP 202,
+    rund 2 KB, kein <a>. Das ist kein Fehlerstatus, `raise_for_status()`
+    laesst ihn durch, und der Sammler zaehlte still "0 verlinkt" weiter.
+    Ohne Status und Groesse in der Zeile ist eine Challenge nicht von einer
+    leeren Rubrik zu unterscheiden.
+    """
+    import logging
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "tarif_quellen.yaml").write_text(
+        "quellen:\n  - anbieter: Telekom\n    einstieg:\n"
+        "      - https://www.telekom.de/produktinformationsblatt\n"
+        "    pfadmuster:\n      - /produktinformationsblatt/\n",
+        encoding="utf-8")
+
+    class Challenge:
+        status_code = 202
+        text = "<html><body>bitte warten</body></html>"
+        content = b"x" * 2048
+        headers = {"content-type": "text/html"}
+
+    with caplog.at_level(logging.WARNING):
+        _, bilanz = sammle(tmp_path, {}, hole=lambda u, c: Challenge())
+    assert bilanz["ohne_links"] == 1
+    assert bilanz["fehler"] == 0        # es war eben KEIN Fehler
+    assert "202" in caplog.text and "2048" in caplog.text
+
+
+def test_der_erste_wunsch_frisst_nicht_den_ganzen_einkauf():
+    """Reihum durch die Wuensche, nicht Wunsch fuer Wunsch.
+
+    Am 04.09.2026 gemessen: "magentamobil-s-" trifft neun Telekom-Dokumente
+    (der Tarif plus Flex-, Young-, Friends- und Happy-Varianten), und sie
+    stehen alle vor dem ersten M-Dokument. Ein Deckel von zwoelf brachte
+    damit NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
+    Dieselbe Ueberlegung wie `_interleave_by_source` in der Pipeline.
+    """
+    from telco_radar.collect.tarif_crawler import _sortiere
+    links = ([f"https://x.de/magentamobil-s-{i}" for i in range(9)]
+             + ["https://x.de/magentamobil-m-1", "https://x.de/magentamobil-l-1"])
+    gereiht = _sortiere(links, ["magentamobil-s-", "magentamobil-m-",
+                                "magentamobil-l-"])
+    assert gereiht[:3] == ["https://x.de/magentamobil-s-0",
+                           "https://x.de/magentamobil-m-1",
+                           "https://x.de/magentamobil-l-1"]
+    # Ohne Reihum stuenden hier die naechsten acht S-Dokumente.
+    assert gereiht[3] == "https://x.de/magentamobil-s-1"
+
+
+def test_unerwuenschtes_steht_hinten_und_geht_nicht_verloren():
+    """Ein Deckel schneidet, die Vorauswahl loescht nicht.
+
+    Was kein Wunsch trifft, faellt in Seitenreihenfolge ans Ende - es kann
+    einen Deckel unterschreiten, aber es verschwindet nicht aus der Liste.
+    """
+    from telco_radar.collect.tarif_crawler import _sortiere
+    links = ["https://x.de/anderes-a", "https://x.de/wunsch-1",
+             "https://x.de/anderes-b"]
+    assert _sortiere(links, ["wunsch"]) == ["https://x.de/wunsch-1",
+                                            "https://x.de/anderes-a",
+                                            "https://x.de/anderes-b"]

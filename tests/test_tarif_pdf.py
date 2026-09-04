@@ -552,3 +552,39 @@ def test_die_neuen_fixtures_kommen_aus_ihrem_pdf():
         assert aus_pdf.als_dict() | {"dokument_hash": "", "abgerufen_am": ""} \
             == lies_text(text(name)).als_dict() | {"dokument_hash": "",
                                                    "abgerufen_am": ""}
+
+
+def test_ein_vierwochenpreis_ist_kein_monatspreis():
+    """Vodafones CallYa: "Listenpreis inkl. MwSt. 14,99 €", vier Wochen.
+
+    `Tarif.grundgebuehr` meint einen Monatspreis - `Preisphase` rechnet in
+    Monaten und `tco_24` ueber 24 davon. Dreizehn Zyklen im Jahr in zwoelf
+    Monate umzurechnen waere eine Rechnung dieses Projekts und keine Angabe
+    des Anbieters. Ohne diese Sperre stand CallYa Allnet Flat M mit 14,99
+    EUR als Monatspreis im Bestand - gemessen am 04.09.2026, bevor die
+    Sperre stand.
+    """
+    roh = ("Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
+           "CallYa Allnet Flat M\n"
+           "Vertragslaufszeiten 4 Wochen, Kündigungsfrist 1 Monat\n"
+           "Listenpreis inkl. MwSt. 14,99 € / 4 Wochen\n")
+    t = lies_text(roh)
+    assert t.grundgebuehr is None
+    # Ohne Preis UND ohne Laufzeit ist es fuer dieses Modell kein Tarif -
+    # es faellt in die Quarantaene statt mit einer Monatszahl in die
+    # Datenbank, die keine ist.
+    assert t.ist_quarantaene
+
+
+def test_ein_einzelner_listenpreis_ohne_zeitachse_wird_gelesen():
+    """Die Gegenprobe: dieselbe Zeile OHNE Wochenangabe ist ein Preis.
+
+    Ohne diesen Test bewiese der Test darueber nur, dass irgendetwas nicht
+    gelesen wird - nicht, dass die Wochenangabe der Grund ist.
+    """
+    roh = ("Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
+           "Ein Tarif\n"
+           "Mindestvertragslaufzeit 24 Monate\n"
+           "Listenpreis inkl. MwSt. 14,99 €\n")
+    t = lies_text(roh)
+    assert t.grundgebuehr == 14.99
