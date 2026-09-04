@@ -2,8 +2,8 @@
  "updated": "2026-09-04",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 13,
-   "funde_gesamt": 50,
+   "laeufe": 14,
+   "funde_gesamt": 55,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 5,
    "letzter_fund": "2026-09-04",
@@ -18,8 +18,8 @@
    ]
   },
   "Vodafone": {
-   "laeufe": 11,
-   "funde_gesamt": 1641,
+   "laeufe": 12,
+   "funde_gesamt": 1790,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 149,
    "termine": [
@@ -34,10 +34,10 @@
    "letzter_fund": "2026-09-04"
   },
   "o2": {
-   "laeufe": 11,
-   "funde_gesamt": 741,
+   "laeufe": 12,
+   "funde_gesamt": 805,
    "letzter_lauf": "2026-09-04",
-   "letzte_funde": 67,
+   "letzte_funde": 64,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -51,7 +51,7 @@
   },
   "mobilcom-debitel": {
    "laeufe": 0,
-   "funde_gesamt": 1400,
+   "funde_gesamt": 1533,
    "letzte_funde": 133,
    "termine": [
     "2026-08-29",
@@ -98,8 +98,8 @@
    "letzter_fund": "2026-09-04"
   },
   "1&1": {
-   "laeufe": 2,
-   "funde_gesamt": 70,
+   "laeufe": 3,
+   "funde_gesamt": 105,
    "letzter_lauf": "2026-09-04",
    "letzte_funde": 35,
    "termine": [
@@ -16500,6 +16500,40 @@
    "preis_ohne_vertrag": 955.0,
    "anzahlung": 7.0,
    "monatsrate": 39.5,
+   "laufzeit_monate": 24,
+   "zins_effektiv": 0.0
+  },
+  {
+   "id": "o2--samsung-galaxy-s25-ultra-256gb-titan-blau-refurbished",
+   "sku_id": "samsung-galaxy-s25-ultra-256gb-titan-blau-refurbished",
+   "device_id": "samsung-galaxy-s25-ultra",
+   "anbieter": "o2",
+   "anbieter_typ": "netzbetreiber",
+   "netz": "",
+   "speicher_gb": 256,
+   "farbe_roh": "titanium silverblue",
+   "farbe_normalisiert": "titan-blau",
+   "ean": "",
+   "zustand": "refurbished",
+   "first_seen": "2026-09-04",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 889.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-09-04",
+   "last_verified": "2026-09-04",
+   "letzter_check": "2026-09-04",
+   "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=ja&zielgruppe=privatkunden&ratenzahlung=24&vertragsart=ratenzahlung",
+   "abgerufen_am": "2026-09-04",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true"
+   ],
+   "titel_roh": "Samsung Galaxy S25 Ultra (gebraucht) 256 GB titanium silverblue erneuert",
+   "preis_ohne_vertrag": 889.0,
+   "anzahlung": 1.0,
+   "monatsrate": 37.0,
    "laufzeit_monate": 24,
    "zins_effektiv": 0.0
   },
