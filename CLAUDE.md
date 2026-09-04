@@ -1706,6 +1706,98 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (04.09.2026, nachts): Phase 6 — Tarife, Bestand und
+> Bezug.** Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 8 Phase 6.
+> Stand danach: **2443 Tests grün** (vorher 2427; die zwei roten
+> Promo-Screenshot-Tests sind vorbestehend und am unveränderten Baum
+> nachgemessen), `pruefe_portal.py` **15 bestanden / 2 durchgefallen**
+> (8b und 6, beide vorbestehend). Live verifiziert, byte-identisch.
+>
+> **Der Tarifbestand: 3 Sätze von EINEM Anbieter → 32 Sätze von VIER.**
+> Telekom 9, Vodafone 10, congstar 10, o2 3; jeder mit Grundgebühr, keiner
+> in Quarantäne. Damit ist das Abnahmekriterium erfüllt.
+>
+> | Befund | Die eine Regel, die ihn trägt |
+> |---|---|
+> | **Die Telekom liefert — nur nicht in Actions.** Aus der Sandbox: HTTP 200, 581 KB, 1114 Dokumentlinks, fünf gelesene PDFs, null Fehler. Im Lauf 33644684296 (02.09.) dagegen „3 verlinkt, 0 Fehler" — die drei sind o2 | Das ist die 202-Challenge (§6). HTTP 202 ist **kein** Fehlerstatus, `raise_for_status()` lässt ihn durch, und eine Seite ohne `<a>` liefert eben keine Links. Der Sammler war dabei **vollkommen stumm**; er meldet jetzt `ohne_links` mit Status und Byte-Zahl |
+> | **Vodafone schreibt seine Preistabelle SENKRECHT** — Zeilen sind Kategorien, Spalten sind Preisphasen („Monat 1-24" / „ab Monat 25") | Der Extraktor kannte nur Telekoms waagerechte Staffel und las bei Vodafone **keinen einzigen Preis**. Es ist zugleich die einzige Stelle im Bestand, an der ein Anbieter seine Preisphasen SELBST auszeichnet — vorher stand in jedem Datensatz die Ersatzphase „1 bis Vertragsende" |
+> | **Eine Tarifoption ist keine Gerätestufe** | Vodafone stellt „mit 5 Jahresversprechen" in dieselbe Tabellenform wie „mit Top Smartphone". Für die zwei Euro bekommt niemand ein Telefon |
+> | **Prepaid bleibt draußen** | congstar: „10,00 € / 4 Wochen", Vodafone CallYa: „14,99 €" unter „Vertragslaufszeiten 4 Wochen". `grundgebuehr` meint einen MONATSpreis; dreizehn Zyklen im Jahr in zwölf Monate umzurechnen wäre eine Rechnung dieses Projekts |
+> | **Aus 1114 Adressen werden neun** — drei Stufen: `pfadmuster`, jüngste Fassung je Adressstamm, `bevorzugt` reihum | Ohne Stufe 2 bekam die **stabile** ID `telekom:magentamobil-l` den Stand von **2017**, der aktuelle landete unter einem Hash-Zusatz; ohne Stufe 3 holte ein Deckel von zwölf **neunmal** MagentaMobil S und kein einziges Mal M, L, XL oder Basic |
+>
+> **Der Fremdschlüssel steht** (`src/telco_radar/tarif_bezug.py`): `hoch`
+> über den Namen (kanonische Tarif-ID, Markenpräfix auf BEIDEN Seiten
+> auflösbar), `mittel` über den Betrag und nur bei Eindeutigkeit.
+> `TcoDB.upsert_buendel` nimmt seit heute **keinen Gerätepreis ohne
+> auflösbaren `tarif_id`** mehr auf.
+>
+> **Vodafones Betragsproblem (§ 6.2 Nr. 7) ist gemessen und NICHT gelöst,
+> und das ist die Antwort:** von den zwei Beträgen der Gerätenutzlast löst
+> **keiner** auf. 41,95 € steht im Blatt „Vodafone Mobil S", aber als Zeile
+> *„mit zusätzlichem Datenvolumen"* — eine Tarifoption, kein Tarif (der
+> kostet 39,95 €). 31,45 € steht in keinem Blatt; am nächsten liegt 31,95 €,
+> und „fast" ist keine Zuordnung. Dazu strukturell: Vodafone
+> veröffentlicht jeden Tarif ZWEIMAL, mit und ohne Gerätestaffel, beide mit
+> demselben Grundpreis — ein Betrag trifft dort regelmäßig zwei Datensätze,
+> und zwei Treffer sind keine schwache Zuordnung, sondern gar keine.
+>
+> **Die TCO-Tafel zeigt zum ersten Mal echte Zahlen.** Nicht die Bündel —
+> die brauchen einen Adapter (Phase 4) —, sondern den **Maßstab**:
+> 25 SIM-only-Referenzen aus dem Tarifbestand, jede mit Betrag, Beleglink
+> und Abrufdatum (`analyze/tarif_referenzen.py`, geschrieben vom
+> nächtlichen Lauf nach `db.save()`). Das ist die Zahl, ohne die ein
+> Geräteanteil nicht bestimmbar ist, und sie steht auf keiner Werbeseite
+> dieses Marktes.
+>
+> **Drei Befunde hat nur das ANSEHEN der Tafel gezeigt, bei grünen Tests:**
+> (1) „Was der Rechnung noch fehlt" meldete weiter „Tarifgrundpreis fehlt,
+> Phase 6", während die Tabelle darunter 25 Tarifgrundpreise zeigte;
+> (2) nach zwei Läufen standen **40 Referenzen zu 32 Tarifen** auf der
+> Seite — Referenzen sind ABGELEITET und werden jetzt ersetzt statt
+> ergänzt (`ersetze_referenzen`, aufgefrischt und dann weggenommen, sonst
+> verlöre jede ihr `first_seen`); (3) derselbe Maßstab stand zweimal
+> untereinander, weil Vodafone jeden Tarif zweimal veröffentlicht.
+>
+> **Der `diff-reviewer` hat vier S1 und sechs S2 gefunden, alle behoben.**
+> Die drei teuersten: die Vierwochen-Sperre griff bei **genau dem
+> Dokument nicht, mit dem sie begründet wird** (der Takt steht bei Vodafone
+> am Vertrag, der Preis eine Zeile weiter — jetzt liegt eine echte
+> CallYa-Fixture bei); `ersetze_referenzen([])` hätte den **ganzen Maßstab
+> gelöscht**, wenn `tarife.jsonl` einmal fehlt („nicht gelesen" ist nicht
+> „leer", dieselbe Fehlerklasse wie `mark_stale` ohne `gepruefte_seiten`);
+> und `ueber_namen` löste das Markenpräfix nur in EINER Richtung auf — der
+> selteneren. Bei Telekom und congstar steht die Marke auf der
+> Produktseite und nicht im Blatt, und weil `upsert_buendel` ohne
+> `tarif_id` wirft, hätte Phase 4 für beide Anbieter **keinen einzigen
+> Bündelpreis** speichern können.
+>
+> **OFFEN:**
+> 1. **Die neun Telekom-Sätze kommen aus einem LOKALEN Lauf und können in
+>    Actions nicht aufgefrischt werden** (202-Challenge). Sie tragen
+>    `abgerufen_am: 2026-09-04`, und dieses Datum wird stehen bleiben. Das
+>    ist keine Falschaussage — die Seite sagt, wann sie geholt wurden —,
+>    aber es ist eine stille Alterung. **Die Entscheidung, ob ein anderer
+>    HTTP-Client (Requests statt httpx) die Grenze zur Umgehung
+>    überschreitet, steht in `STRATEGY_GERAETE_TCO.md` R3 und ist NICHT
+>    getroffen.** Der Sammler meldet den Ausfall jetzt wenigstens laut.
+> 2. **Die TCO-Tabelle selbst bleibt leer, bis ein Adapter Bündel
+>    liefert** (Phase 4: Zuzahlung MIT Tarifreferenz). Gemessen: von 525
+>    Listungen trägt **keine** eine `tarif_referenz` oder `zuzahlung`; nur
+>    o2 hat 67 mit Ratenfeldern. Wer die Tafel in vier Wochen unverändert
+>    ohne Zeilen vorfindet, prüft nicht die Tafel, sondern Phase 4.
+> 3. **Eine echte Rabattphase steht in keinem Dokument des Bestands.** Bei
+>    ALLEN elf aktuell vermarkteten Vodafone-Tarifen tragen „Monat 1-24"
+>    und „ab Monat 25" denselben Betrag. Die Veröffentlichungsschwelle der
+>    Tarifseite verlangt „ein Tarif mit echter Rabattphase" (§5) und ist
+>    damit **nicht** erfüllt — drei Anbieter und zwölf Mobilfunktarife
+>    stehen inzwischen. Die Seite bleibt aus der Navigation.
+> 4. **`site/tarife.html` schreibt „Stand 2026-09-02"** im ISO-Format,
+>    während jede Zeile darunter „4. September 2026" sagt. Vorbestehend,
+>    beim Ansehen gefunden, NICHT angefasst.
+> 5. Vodafones Blätter füllen `art` nicht (alle zehn: `art=""`). Die
+>    Festnetz-Sperre der SIM-only-Referenzen greift dort nicht; heute hält
+>    allein `bevorzugt: vf-mobil-` die DSL-Blätter draußen.
+
 > **Zuletzt erledigt (04.09.2026): Phase 6a — die Website aus dem
 > Nachtlauf, die TCO-Ansicht als Skelett und der Bestpreis-Stempel.**
 > Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 6, § 8 Phase 8, § 10
