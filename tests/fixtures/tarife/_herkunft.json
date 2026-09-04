@@ -1,0 +1,17 @@
+{
+  "zweck": "Messrunde 04.09.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Tarifquelle, abgerufen mit dem Absender TelcoRadar/1.0. sha256_roh gilt fuer den ENTPACKTEN Inhalt. Dieselbe Form wie tests/fixtures/geraete/_herkunft.json.",
+  "eintraege": [
+    {
+      "datei": "1und1_handytarife.html.gz",
+      "url": "https://www.1und1.de/handytarife",
+      "abgerufen_am": "2026-09-04",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 452202,
+      "sha256_roh": "c728eac09cf5851d181950365fbc1367276973d2bfbe7d376128cfcaafb39e2f",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 55171
+    }
+  ]
+}

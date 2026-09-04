@@ -33,6 +33,29 @@
 # --------
 # Einmal woechentlich. Diese Dokumente aendern sich selten, und genau
 # deshalb ist jede Aenderung ein Signal.
+#
+# ZWEI LESARTEN, SEIT DEM 04.09.2026
+# -----------------------------------
+#   methode: dokumente   Der Regelfall und die belastbarste Quelle dieses
+#                        Marktes: von der Einstiegsseite werden VERLINKTE
+#                        Pflichtdokumente nach § 1 TK-TransparenzV geholt
+#                        und gelesen. Der Satz traegt `preistyp: dokument`.
+#   methode: ldjson      Die Einstiegsseite IST die Nutzlast: ihre
+#                        strukturierten Daten nach schema.org tragen die
+#                        Tarife selbst. Kein Link wird geerntet, keine
+#                        zweite Adresse abgerufen. Der Satz traegt
+#                        `preistyp: live_shop`.
+#
+# Das Blatt traegt den Vermarktungsstand, die Shop-Seite den Preis von
+# heute. Beide sind richtig, und sie DUERFEN auseinanderlaufen - die
+# Abweichung ist die Auskunft, nicht der Fehler. Deshalb steht der Preistyp
+# an jedem Satz und wird nicht wegnormalisiert. Ein Anbieter darf in beiden
+# Lesarten auftauchen; die PIB-Blaetter bleiben, wo sie sind.
+#
+# Eine unbekannte `methode` wird NICHT stillschweigend zur Vorgabe: sie
+# faellt in `tarif_crawler.sammle()` mit einer Warnung auf. Ein Tippfehler
+# soll nicht dazu fuehren, dass eine Shop-Seite als Dokumentverzeichnis
+# gelesen wird und null Links liefert.
 
 quellen:
   - anbieter: Telekom
@@ -154,10 +177,86 @@ quellen:
       - ".pdf"
     max_dokumente: 5
 
-# --- Warum 1&1 (noch) fehlt
+  # --------------------------------------------------------------- LIVE-SHOP
+  # Ab hier: `methode: ldjson`. Die Seite selbst ist die Nutzlast.
+
+  - anbieter: 1&1
+    methode: ldjson
+    # Gemessen 04.09.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
+    # 452 KB statisches HTML, ein `application/ld+json` mit einem @graph
+    # aus SIEBEN Product-Knoten. Gelesen wurden daraus
+    #   1&1 All-Net-Flat S   14,99 EUR   10 GB
+    #   1&1 All-Net-Flat M   14,99 EUR   50 GB
+    #   1&1 All-Net-Flat L   19,99 EUR  150 GB
+    #   1&1 Unlimited on demand S/M/L   19,99 / 19,99 / 24,99 EUR
+    #   1&1 Unlimited XL     39,99 EUR  (ohne GB-Angabe in der description)
+    # Uebernommen werden Name, Grundgebuehr und - wenn die `description`
+    # sie nennt - das Datenvolumen. Sonst NICHTS: die Knoten nennen weder
+    # Laufzeit noch Preisphase, also traegt der Satz keine. Dass S und M
+    # denselben Betrag tragen, steht so in der Quelle und wird nicht
+    # geglaettet.
+    #
+    # WARUM DIESE ZAHL EIN TARIFPREIS OHNE GERAET IST: derselbe Graph mit
+    # denselben Betraegen steht auf der SIM-only-Seite
+    # https://www.1und1.de/handytarife-ohne-handy - der Anbieter stellt ihn
+    # dort selbst als Preis ohne Hardware aus. Die Seite wird deshalb NICHT
+    # zusaetzlich abgerufen: derselbe Graph unter zwei Adressen ergaebe
+    # dieselben sieben Tarife zweimal, und der Sammler haengte an den
+    # zweiten Satz einen Hash-Zusatz.
+    #
+    # ABGRENZUNG GEGEN DEN GERAETEZWEIG: mobile.1und1.de/iphone-17-pro
+    # traegt AUCH einen Product-Knoten mit `offers.price`, dort aber
+    # 44,99 EUR als Monatspreis des BUENDELS. Unterschieden wird an der
+    # Marke - ein Tarif traegt die des Anbieters ("1&1"), ein Geraet die
+    # des Herstellers ("Apple"). Fremde Marke heisst: uebersprungen und
+    # protokolliert.
+    #
+    # ROBOTS (04.09.2026 gelesen): www.1und1.de sperrt /xml/, /static/,
+    # /suche* und eine Reihe von Parametern; /handytarife ist frei.
+    einstieg:
+      - https://www.1und1.de/handytarife
+    max_dokumente: 10
+
+# --- Warum die PIB-Blaetter von 1&1 weiterhin fehlen
 # hilfe-center.1und1.de/produktinformationsblaetter ist eine Next.js-Seite
 # ohne statische Links; im HTML stehen nur die Chunk-Dateien. Der Katalog
 # entsteht erst im Browser. Das ist derselbe Fall wie bei den JS-Promo-Seiten
 # und braucht den JS-Collector - kein Grund, hier einen geratenen Pfad
 # einzutragen. Der Befund ist seit 08/2026 unveraendert und am 04.09.2026
 # NICHT neu gemessen worden; wer ihn anfasst, misst zuerst nach.
+# Der Eintrag oben ersetzt ihn NICHT: er liefert den heutigen Shop-Preis,
+# nicht das Pflichtdokument mit Laufzeit, Drosselung und Kleingedrucktem.
+
+# --- Warum der TELEKOM-SHOP hier NICHT als Live-Quelle steht
+# Gemessen am 04.09.2026, dreimal, mit dem Absender TelcoRadar/1.0:
+#
+#   https://www.telekom.de/mobilfunk/tarife
+#       HTTP 200 nach der OAuth-Kette (prompt=none) auf
+#       /shop/tarife/handyvertrag, 2,26 MB.
+#   https://www.telekom.de/shop/tarif/magenta-mobil-m
+#       HTTP 200, 1,60 MB. (Verlinkt von der Seite darueber - kein
+#       geratener Pfad.)
+#
+# Auf BEIDEN Seiten steht KEIN Tarifpreis serverseitig:
+#   * `window.__INITIAL_STATE__.tariffHtmlSnippet` ist
+#     {"apiState": "NULL", "snippet": {"data": []}} - die Tarifkacheln
+#     werden erst im Browser nachgeladen.
+#   * `productList.data` ist eine leere Liste (auf der GERAETEseite
+#     dagegen zehn Eintraege - es ist also keine Sperre, sondern diese
+#     eine Seite rendert ihre Kacheln nicht serverseitig).
+#   * Das einzige ld+json der Seite traegt BreadcrumbList, Organization
+#     und FAQPage - keinen Product-Knoten.
+#
+# Die Betraege, die man im HTML DOCH findet (29,95 / 9,95 / 39,95 ...),
+# stehen ausschliesslich in Uebersetzungstexten unter
+# `translation.cart.global.magentaOneDiscountDetailsModal.*` und in
+# FAQ-Absaetzen - also in Marketingfliesstext ueber den MagentaEINS-Rabatt,
+# nicht an einem Tarif. Sie einer MagentaMobil-Linie zuzuordnen waere
+# geraten; nach E1 wird eine fehlende Zahl als fehlend gefuehrt.
+#
+# Der naechste Schritt waere die Schnittstelle, die die Seite selbst
+# aufruft (BFF_EXT = /shop/api/eshop/bff-de). Sie ist NICHT versucht
+# worden: sie steht nicht in dieser Phase, und ihr Aufruf braucht eine
+# eigene Messung und eine eigene Entscheidung. Die Live-Preise der Telekom
+# bleiben bis dahin offen - die Tarife stehen weiterhin ueber ihre
+# Produktinformationsblaetter im Bestand (Eintrag ganz oben).

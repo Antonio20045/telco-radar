@@ -50,8 +50,9 @@ import yaml
 from bs4 import BeautifulSoup
 
 from ..models import Item
-from ..tarif_model import Tarif
+from ..tarif_model import PREISTYP_LIVE_SHOP, Tarif
 from .http import fetch
+from . import tarif_ldjson
 from .tarif_pdf import dokument_hash, ist_tarifdokument, lies_text, text_aus_pdf
 
 log = logging.getLogger(__name__)
@@ -97,6 +98,19 @@ EINHEIT = {
 }
 
 
+# Die zwei Lesarten einer Tarifquelle.
+#
+# `dokumente`  Der urspruengliche und weiterhin der Regelfall: von der
+#              Einstiegsseite werden VERLINKTE Pflichtdokumente geholt und
+#              durch `tarif_pdf` gelesen.
+# `ldjson`     Die Einstiegsseite IST die Nutzlast: ihre strukturierten
+#              Daten nach schema.org tragen die Tarife selbst. Kein Link
+#              wird geerntet, keine zweite Adresse abgerufen - dieselbe
+#              Bauart wie `direkt=True` im Geraetezweig.
+METHODE_DOKUMENTE = "dokumente"
+METHODE_LDJSON = "ldjson"
+
+
 @dataclass
 class Quelle:
     anbieter: str
@@ -104,6 +118,7 @@ class Quelle:
     pfadmuster: list[str] = field(default_factory=list)
     bevorzugt: list[str] = field(default_factory=list)
     max_dokumente: int = 5
+    methode: str = METHODE_DOKUMENTE
 
 
 @dataclass
@@ -150,6 +165,12 @@ def lade_quellen(root: Path) -> list[Quelle]:
             pfadmuster=[str(m).lower() for m in (q.get("pfadmuster") or [])],
             bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
             max_dokumente=int(q.get("max_dokumente") or 5),
+            # Eine unbekannte Methode wird NICHT stillschweigend zur
+            # Vorgabe gemacht. Sie faellt in `sammle()` als Fehler auf -
+            # ein Tippfehler in der Konfiguration soll nicht dazu fuehren,
+            # dass eine Shop-Seite als Dokumentverzeichnis gelesen wird und
+            # null Links liefert.
+            methode=str(q.get("methode") or METHODE_DOKUMENTE).strip(),
         ))
     return quellen
 
@@ -403,9 +424,28 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
     Kosmetik: "Telekom aendert den Preis" liest jeder, "Telekom halbiert das
     Datenvolumen bei gleichem Preis" ist die Meldung, die es sonst nirgends
     gibt.
+
+    UND DIE MELDUNG NENNT IHRE QUELLENART (seit dem 04.09.2026). Bis dahin
+    stand in jeder Meldung "Quelle ist das gesetzlich vorgeschriebene
+    Produktinformationsblatt" - ein starker Satz, und fuer einen Shop-Preis
+    schlicht falsch. Eine Zahl aus den strukturierten Daten einer
+    Werbeseite traegt keine gesetzliche Wahrheitsbewehrung, und sie soll
+    sich auch nicht so anfuehlen. `Tarif.preistyp` entscheidet, welcher der
+    zwei Saetze darunter steht.
     """
     nur_klein = all(a.ist_kleingedruckt for a in aenderungen)
     preis = [a for a in aenderungen if a.feld in PREISFELDER]
+    dokument = tarif.preistyp != PREISTYP_LIVE_SHOP
+    quelle_kurz = "Produktinformationsblatt" if dokument else "Shop-Seite"
+    # Mit Praeposition, damit beide Saetze deutsch bleiben: "im
+    # Produktinformationsblatt" gegen "auf der Shop-Seite".
+    quelle_wo = ("im Produktinformationsblatt" if dokument
+                 else "auf der Shop-Seite")
+    quelle_satz = ("Quelle ist das gesetzlich vorgeschriebene "
+                   "Produktinformationsblatt." if dokument else
+                   "Quelle sind die strukturierten Daten der Shop-Seite "
+                   "des Anbieters (schema.org) - der beworbene Preis von "
+                   "heute, nicht das Pflichtdokument.")
     if nur_klein:
         titel = (f"{tarif.anbieter} ändert stillschweigend die Konditionen "
                  f"von {tarif.name}")
@@ -413,22 +453,26 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
                       "Preis sich bewegt — und ohne Pressemitteilung. ")
     elif preis:
         titel = f"{tarif.anbieter} ändert den Preis von {tarif.name}"
-        einleitung = "Der Preis im Produktinformationsblatt hat sich geändert. "
+        einleitung = f"Der Preis {quelle_wo} hat sich geändert. "
     else:
         titel = f"{tarif.anbieter} ändert {tarif.name}"
-        einleitung = "Das Produktinformationsblatt hat sich geändert. "
+        einleitung = ("Das Produktinformationsblatt hat sich geändert. "
+                      if dokument else
+                      "Die Shop-Seite hat sich geändert. ")
 
     liste = " · ".join(a.lesbar() for a in aenderungen[:8])
     kennung = f"{tarif_id(tarif.anbieter, tarif.name)}|{tarif.dokument_hash}"
     return Item(
         title=titel,
         url=tarif.dokument_url,
-        source_name=f"{tarif.anbieter} (Produktinformationsblatt)",
+        source_name=f"{tarif.anbieter} ({quelle_kurz})",
         region="europe",
         operator=tarif.anbieter,
         published=stand,
-        summary=(einleitung + liste + ". Quelle ist das gesetzlich "
-                 "vorgeschriebene Produktinformationsblatt.")[:900],
+        summary=(einleitung + liste + ". " + quelle_satz)[:900],
+        # `origin` bleibt der Name des ZWEIGS und nicht der der Quellenart:
+        # er sagt der Pipeline, welcher Sammler die Meldung erzeugt hat.
+        # Ein zweiter Wert waere ein zweiter Zweig, den niemand kennt.
         origin="tarif_dokument",
         source_url=tarif.dokument_url,
         # Aus Tarif UND Dokument-Hash: zwei Aenderungen desselben Tarifs
@@ -436,6 +480,62 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
         # fuer die schon berichtete erste.
         id=dokument_hash(kennung)[:16],
     )
+
+
+def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
+                    speicher: TarifSpeicher, bilanz: dict, im_lauf: dict,
+                    items: list, jetzt: datetime) -> None:
+    """Einen gelesenen Tarif in die Zeitreihe legen - und melden, was neu ist.
+
+    DIE EINE STELLE, an der ueber Grundlinie, Unveraendertheit und Meldung
+    entschieden wird. Sie steht hier als eigene Funktion, seit es ZWEI
+    Lesarten gibt (Pflichtdokument und Shop-Seite): zwei Kopien dieser
+    Entscheidungskette waeren zwei Delta-Schichten, und die zweite wuerde
+    irgendwann anders melden als die erste.
+
+    `herkunft` ist, was den einzelnen Fund identifiziert - bei einem
+    Dokument seine Adresse, bei einem ld+json-Knoten sein Fingerabdruck.
+    Der Unterschied ist noetig, weil sieben Tarife derselben Seite
+    dieselbe Adresse tragen; ohne ihn waeren zwei gleichnamige Knoten
+    zwei Fassungen desselben Tarifs statt zweier Produkte.
+    """
+    tid = tarif_id(tarif.anbieter, tarif.name)
+    if tid in im_lauf and im_lauf[tid] != herkunft:
+        # ZWEI verschiedene Funde mit derselben Titelzeile im SELBEN Lauf.
+        # Live gemessen am 08.08.2026: o2 fuehrt `o2-home-l-flex` und
+        # `o2-home-l-175-flex` als getrennte PDFs, beide mit der
+        # Ueberschrift "O2 Home L 175/250/300 Flex". Ohne Unterscheidung
+        # waere das zweite eine neue Fassung des ersten - und der Diff
+        # meldete bei jedem Lauf abwechselnd hin und her.
+        #
+        # Zwei Staende NACHEINANDER sind eine Versionsfolge, zwei im
+        # selben Lauf sind zwei Produkte.
+        tid = f"{tid}#{dokument_hash(herkunft)[:8]}"
+    im_lauf[tid] = herkunft
+    satz = tarif.als_dict()
+    satz["tarif_id"] = tid
+    vorher = speicher.letzter(tid)
+
+    if vorher is None:
+        bilanz["grundlinie"] += 1
+        speicher.ergaenze(satz)
+        return
+    if vorher.get("dokument_hash") == hash_:
+        bilanz["unveraendert"] += 1
+        speicher.beruehre(tid, jetzt.date().isoformat())
+        return
+
+    aenderungen = vergleiche(vorher, tarif)
+    speicher.ergaenze(satz)
+    if not aenderungen:
+        # Neuer Hash, gleiche Werte: der Anbieter hat das Layout
+        # angefasst, nicht den Tarif. Keine Meldung.
+        bilanz["unveraendert"] += 1
+        return
+    bilanz["geaendert"] += 1
+    if all(a.ist_kleingedruckt for a in aenderungen):
+        bilanz["kleingedruckt"] += 1
+    items.append(als_item(tarif, aenderungen, jetzt))
 
 
 def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
@@ -464,6 +564,64 @@ def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
     return text, dokument_hash(rohdaten)
 
 
+def _sammle_ldjson(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
+                   speicher: TarifSpeicher, bilanz: dict, items: list,
+                   im_lauf: dict, besucht: list, erlaubt: set) -> None:
+    """Eine Quelle, deren Einstiegsseite selbst die Tarife traegt.
+
+    Es wird KEIN Link geerntet und keine zweite Adresse geholt: die Seite
+    ist die Nutzlast. Damit ist die Regel "nur abrufen, was verlinkt ist"
+    hier trivial erfuellt - abgerufen wird ausschliesslich die Adresse, die
+    in der Konfiguration steht.
+
+    `geholt` zaehlt die Seite mit, `verlinkt` nicht: es wurde nichts
+    verlinkt. Eine Null in einer Spalte, die hier gar nichts messen kann,
+    waere eine Falschmeldung im Protokoll.
+    """
+    for einstieg in quelle.einstieg:
+        erlaubt.add(einstieg)
+        bilanz["einstiege"] += 1
+        try:
+            besucht.append(einstieg)
+            antwort = hole(einstieg, http_cfg)
+            html = antwort.text
+        except Exception as exc:  # noqa: BLE001
+            bilanz["fehler"] += 1
+            log.info("Tarifquelle %s nicht lesbar: %s", einstieg,
+                     str(exc)[:120])
+            continue
+        bilanz["geholt"] += 1
+        gefunden = tarif_ldjson.tarife_aus_html(
+            html, anbieter=quelle.anbieter, seiten_url=einstieg,
+            abgerufen_am=jetzt.date().isoformat())
+        if not gefunden:
+            # Derselbe Befund wie eine Einstiegsseite ohne Dokumentlink,
+            # und er muss genauso laut sein: eine Seite, die 200 und 450 KB
+            # liefert und trotzdem keinen Tarif hergibt, hat entweder ihr
+            # Format geaendert oder eine Challenge ausgeliefert. Ohne
+            # Status und Groesse in der Zeile ist das nicht zu
+            # unterscheiden (die Telekom-Lehre vom 04.09.2026).
+            bilanz["ohne_links"] += 1
+            log.warning("Tarifquelle %s (%s): HTTP %s, %d Bytes, aber KEIN "
+                        "Tarif in den strukturierten Daten",
+                        einstieg, quelle.anbieter,
+                        getattr(antwort, "status_code", "?"),
+                        len(getattr(antwort, "content", b"") or b""))
+            continue
+        for tarif, hash_ in gefunden[:quelle.max_dokumente]:
+            if tarif.ist_quarantaene:
+                bilanz["quarantaene"] += 1
+                log.info("Tarif %r von %s traegt weder Preis noch Laufzeit - "
+                         "Quarantaene", tarif.name, einstieg)
+                continue
+            bilanz["gelesen"] += 1
+            # Die Herkunft ist hier der Fingerabdruck des Knotens: alle
+            # Tarife dieser Seite teilen sich ihre Adresse.
+            uebernimm_stand(tarif, hash_, hash_, speicher=speicher,
+                            bilanz=bilanz, im_lauf=im_lauf, items=items,
+                            jetzt=jetzt)
+
+
 def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
            hole=None) -> tuple[list[Item], dict]:
     """Alle Quellen crawlen, Dokumente lesen, Aenderungen melden.
@@ -486,6 +644,20 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     im_lauf: dict[str, str] = {}
 
     for quelle in quellen:
+        if quelle.methode == METHODE_LDJSON:
+            _sammle_ldjson(quelle, http_cfg, hole=hole, jetzt=jetzt,
+                           speicher=speicher, bilanz=bilanz, items=items,
+                           im_lauf=im_lauf, besucht=besucht, erlaubt=erlaubt)
+            continue
+        if quelle.methode != METHODE_DOKUMENTE:
+            # Eine unbekannte Methode wird laut, nicht still: sonst faellt
+            # ein Tippfehler in der Konfiguration erst auf, wenn jemand
+            # merkt, dass ein Anbieter seit Wochen nichts mehr liefert.
+            bilanz["fehler"] += 1
+            log.warning("Tarifquelle %s: unbekannte methode %r - "
+                        "uebersprungen (bekannt: %s)", quelle.anbieter,
+                        quelle.methode, (METHODE_DOKUMENTE, METHODE_LDJSON))
+            continue
         links: list[str] = []
         texte: dict[str, str] = {}
         for einstieg in quelle.einstieg:
@@ -573,44 +745,11 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                 continue
             bilanz["gelesen"] += 1
 
-            tid = tarif_id(tarif.anbieter, tarif.name)
-            if tid in im_lauf and im_lauf[tid] != url:
-                # ZWEI verschiedene Dokumente mit derselben Titelzeile im
-                # SELBEN Lauf. Live gemessen am 08.08.2026: o2 fuehrt
-                # `o2-home-l-flex` und `o2-home-l-175-flex` als getrennte
-                # PDFs, beide mit der Ueberschrift "O2 Home L 175/250/300
-                # Flex". Ohne Unterscheidung waere das zweite eine neue
-                # Fassung des ersten - und der Diff meldete bei jedem Lauf
-                # abwechselnd hin und her.
-                #
-                # Zwei Staende NACHEINANDER sind eine Versionsfolge, zwei
-                # im selben Lauf sind zwei Produkte.
-                tid = f"{tid}#{dokument_hash(url)[:8]}"
-            im_lauf[tid] = url
-            satz = tarif.als_dict()
-            satz["tarif_id"] = tid
-            vorher = speicher.letzter(tid)
-
-            if vorher is None:
-                bilanz["grundlinie"] += 1
-                speicher.ergaenze(satz)
-                continue
-            if vorher.get("dokument_hash") == hash_:
-                bilanz["unveraendert"] += 1
-                speicher.beruehre(tid, jetzt.date().isoformat())
-                continue
-
-            aenderungen = vergleiche(vorher, tarif)
-            speicher.ergaenze(satz)
-            if not aenderungen:
-                # Neuer Hash, gleiche Werte: der Anbieter hat das Layout
-                # angefasst, nicht den Tarif. Keine Meldung.
-                bilanz["unveraendert"] += 1
-                continue
-            bilanz["geaendert"] += 1
-            if all(a.ist_kleingedruckt for a in aenderungen):
-                bilanz["kleingedruckt"] += 1
-            items.append(als_item(tarif, aenderungen, jetzt))
+            # Die Adresse ist die Herkunft des Dokuments - siehe
+            # `uebernimm_stand`.
+            uebernimm_stand(tarif, hash_, url, speicher=speicher,
+                            bilanz=bilanz, im_lauf=im_lauf, items=items,
+                            jetzt=jetzt)
 
     speicher.speichern()
     bilanz["meldungen"] = len(items)
