@@ -6,13 +6,23 @@ den Spike vom selben Tag. Pflichtlektüre: `CLAUDE.md`,
 die Bauanleitung), `scripts/spike_saturn_geraetepreis.py` (statischer
 Modus), `QUELLEN_MAP.md` §6 (Händler).
 
+**Runde 2 (05.09.2026, spät): der UA-Befund von R1 ist behoben — siehe
+Abschnitt „R2" am Ende dieser Datei.** Der Rest dieses Dokuments ist der
+Bericht der ersten Runde, KORRIGIERT an der einen widerlegten Stelle (§1,
+UA-Absatz) — nicht neu geschrieben, damit sichtbar bleibt, was R1 falsch
+behauptet hat und was jetzt gilt.
+
 ## Ergebnis in einem Satz
 
 Saturn liefert seit heute echte Gerätepreise per reinem HTTP-GET (kein
 Playwright, robots-konform), mit einem geprüften Marktplatz-Filter — der
 erste Produktivlauf hat **21 Listungen aus 6 von 17 konfigurierten
 Markenseiten** erhoben, und mindestens ein Saturn-Preis steht jetzt sichtbar
-in einer Händlerkarte auf `geraete.html`.
+in einer Händlerkarte auf `geraete.html`. **Korrektur aus R2: dieser Lauf
+sendete dabei PRIMARY die Chrome-Kennung aus `config/settings.yaml:549`,
+nicht die hier ursprünglich behauptete ehrliche Kennung — siehe §1 und den
+R2-Abschnitt.** Die 21 Zeilen sind seither durch einen echten,
+UA-belegten Lauf mit der ehrlichen Kennung ersetzt (R2, 22 Zeilen).
 
 ## 1. Der Sammler (Abnahmekriterium 1)
 
@@ -20,11 +30,26 @@ in einer Händlerkarte auf `geraete.html`.
 registriert `direkt=True` (die Markenseite IST ihre Nutzlast, keine
 Produktseite wird nachgeladen — genau der Struktur-Fund des Spikes).
 
-- **Reiner `httpx`-GET** über die bestehende Sammelschicht
-  (`collect.http.fetch`), UA `TelcoRadar/1.0
-  (+https://telco-radar.onrender.com/ueber)`. Kein Playwright im
-  Produktionspfad — der Adapter ruft ausschließlich `saturn.lies(html, url)`
-  auf reinem HTML auf, es gibt keinen Browser-Codepfad.
+- **UA — WIDERLEGT in R1, KORRIGIERT in R2** (`EVAL_saturn-adapter-r1.md`
+  Befund 1, Schwere 1). Diese Zeile behauptete ursprünglich, der Sammler
+  sende `TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)`. Das war
+  falsch: `collect.http.fetch` sendet ohne weitere Angabe PRIMARY das, was
+  `http_cfg.get("user_agent", ...)` liefert — und das ist global
+  `config/settings.yaml:549`, die volle Chrome-Vortäuschung. Der Adapter
+  selbst tat nichts falsch (er ruft ausschließlich `saturn.lies(html, url)`
+  auf fertigem HTML auf, kein eigener HTTP-Aufruf, kein Browser-Codepfad),
+  aber die Nutzlast, auf der er arbeitete, kam mit der falschen Kennung
+  herein. Da alle 17 Abrufe sofort 200 lieferten, wurde nicht einmal der
+  ehrliche Fallback (`BOT_UA`) je gesendet — der Bericht beschrieb einen
+  Codepfad, der in diesem Lauf nie erreicht wurde.
+  **Seit R2 (siehe R2-Abschnitt unten) trägt `config/geraete_quellen.yaml`
+  für Saturn einen PER-ANBIETER-UA-Überschreiber
+  (`Anbieter.user_agent`), der genau die hier ursprünglich behauptete
+  Kennung jetzt tatsächlich als Primary sendet — belegt mit einem Test auf
+  der wirklich gesendeten Kopfzeile, nicht nur mit dieser Behauptung.**
+- Kein Playwright im Produktionspfad — der Adapter ruft ausschließlich
+  `saturn.lies(html, url)` auf reinem HTML auf, es gibt keinen
+  Browser-Codepfad.
 - **Extraktion über beide vom Auftrag genannten Strukturen derselben
   Antwort:**
   - `ld+json`-`ItemList` (wiederverwendet über
@@ -325,3 +350,177 @@ geraete.yml`), nicht im Wochenlauf.** Begründung:
    Datenpflege, keine Korrektheitsfrage.
 5. **Die TCO-Tafel zeigt kein Modell, das AUSSCHLIESSLICH Saturn führt**
    (§5) — bestehende Architekturgrenze der Tafel, bewusst nicht angefasst.
+
+---
+
+## R2 — die ehrliche Kennung als Primary, Daten neu erhoben (05.09.2026, spät)
+
+Auftragsgrundlage: `BRIEF_SATURN_ADAPTER_R2.md` (Workspace-Engineer), folgt
+auf `EVAL_saturn-adapter-r1.md` (Urteil **NEEDS_WORK**).
+
+### Der Urteilsbezug
+
+Der Evaluator hat R1 in genau einem Punkt widerlegt (Befund 1, Schwere 1):
+„Die Erhebung lief mit Chrome-Impersonating-UA. E4-Verstoß im
+Produktionspfad des Saturn-Adapters; die 21 committeten Preiszeilen stammen
+aus diesen Abrufen." Eigene Ausführung des Evaluators
+(`load_config()` + `http_cfg.get('user_agent', BROWSER_UA)`): Primary =
+`config/settings.yaml:549`, volle Chrome-Vortäuschung, für alle 17
+Saturn-Abrufe. Kriterien 2–7 (Marktplatz-Filter, Katalogzuordnung, Suite,
+Artefakt, Lokallauf) waren BELEGT und sind von diesem Befund nicht
+betroffen — R2 rührt ausschließlich den UA-Punkt an.
+
+### Der Mechanismus: per-Anbieter-UA-Override
+
+`settings.yaml` bleibt unverändert (Zeile 549 unangetastet — Entscheidung
+E-1 liegt weiterhin bei Antonio, nicht bei diesem Ticket). Stattdessen ein
+Überschreiber, der NUR Saturn betrifft:
+
+| Wo | Was |
+|---|---|
+| `config/geraete_quellen.yaml`, Saturn-Eintrag | neues Feld `user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"` |
+| `geraete_config.Anbieter` | neues Feld `user_agent: str = ""`, geladen wie `kopfzeilen` — leer heißt „globales `http_cfg` gilt wie überall sonst" |
+| `collect.geraete.sammle_anbieter` | reicht `anbieter.user_agent` NUR an `hole()` weiter, wenn der Anbieter ihn setzt — bestehende `hole(url)`/`hole(url, kopfzeilen=…)`-Testattrappen bleiben für jeden anderen Anbieter gültig |
+| `geraete_pipeline._hole_fabrik` | baut aus dem Überschreiber ein EIGENES `http_cfg` NUR für diesen Aufruf (`{**http_cfg, "user_agent": user_agent}`); `fetch()` selbst wird unverändert aufgerufen, sieht also nichts Neues |
+| `collect.http.fetch`/`_ist_ehrliche_kennung` | erkennt JEDE `TelcoRadar/1.0`-Kennung als ehrlich (Präfixvergleich statt Gleichheitsvergleich mit der einen alten `BOT_UA`-Zeichenkette) — sonst bekäme die neue Kennung Chrome-Client-Hints (Widerspruch in sich) und der Fallback wäre die alte `BOT_UA` statt `BROWSER_UA` |
+
+Die robots.txt-Abrufe laufen bewusst weiter über das GLOBALE `http_cfg`
+(dieselbe Bewusstheit wie beim bestehenden `kopfzeilen`-Mechanismus,
+Modulkopf von `collect/geraete/__init__.py`) — die Gruppenzuordnung einer
+robots.txt hängt an unserer erklärten Identität (`TelcoRadar/1.0`, siehe
+`geraete_quellen.yaml`), nicht an der Kopfzeile des Abrufs, der die Datei
+holt.
+
+### Der Test, der den UA belegt (Abnahmekriterium 1)
+
+Drei neue Tests in `tests/test_geraete_adapter_saturn.py`, alle auf der
+WIRKLICH GESENDETEN httpx-Kopfzeile, nicht auf der Behauptung des Codes:
+
+```
+test_saturn_ua_ist_primary_auch_bei_globaler_chrome_konfiguration
+test_ohne_per_anbieter_override_bleibt_das_globale_http_cfg_primary
+test_saturn_anbieter_reicht_seine_ehrliche_kennung_bis_zur_kopfzeile
+```
+
+Der erste ist der R1-Fall wörtlich nachgebaut: `http_cfg = {"user_agent":
+<Chrome-UA aus R1>}` (global, wie aus `config/settings.yaml`), `httpx.get`
+gestubbt und die Kopfzeilen des einzigen Abrufs mitgeschnitten. Ergebnis:
+`headers["User-Agent"] == "TelcoRadar/1.0
+(+https://telco-radar.onrender.com/ueber)"` — als PRIMARY, ein 200er löst
+keinen zweiten Versuch aus. Der zweite ist die Gegenprobe: OHNE Override
+bleibt das globale `http_cfg` Primary (Fallback-Architektur unangetastet).
+Der dritte fährt den ganzen Weg von der ausgelieferten Konfiguration bis
+zur Kopfzeile, ohne Testattrappe dazwischen (`sammle_anbieter` mit dem
+echten Saturn-Anbieter): robots.txt bekommt die globale Chrome-Kennung
+(bewusst, s. o.), die Markenseite die ehrliche.
+
+Zusätzlich hält `test_landet_als_listung_im_bestand` (überarbeitet) und
+`test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht`
+(ergänzt) die Wiring auf der Ebene von `sammle_anbieter` bzw. der
+ausgelieferten Konfiguration fest.
+
+### Die Daten neu erhoben (Abnahmekriterium 2)
+
+`scripts/lokallauf_saturn.py --frist 600`, unverändert (das Skript
+brauchte keine Änderung — der Überschreiber sitzt in der Konfiguration,
+nicht im Skript), lokal am 05.09.2026, 18:17–18:19 UTC (161,2 s) erneut
+gelaufen. Vorher: die 21 R1-Zeilen aus `geraete_db.json`/
+`geraete_preise.jsonl` sowie der Saturn-Eintrag der Anbieter-Bilanz per
+Hand entfernt (`GeraeteDB`/`Preishistorie`, keine Handbearbeitung der
+JSON-Struktur — damit bleibt das Dateiformat exakt das, das die Klassen
+selbst schreiben würden). Alle 17 konfigurierten Markenseiten antworteten
+erneut mit HTTP 200 — **keine Zeile musste als Messgrenze entfernt
+werden**, weil keine URL mit der ehrlichen Kennung scheiterte:
+
+```
+18:17:12 GET /robots.txt                200   18:18:32 GET .../iphone-16-plus     200
+18:17:12 GET .../iphone-14              200   18:18:45 GET .../iphone-16-pro      200
+18:17:22 GET .../iphone-14-pro          200   18:18:53 GET .../iphone-16-pro-max  200
+18:17:32 GET .../iphone-14-pro-max      200   18:19:03 GET .../iphone-16e         200
+18:17:42 GET .../iphone-15              200   18:19:13 GET .../iphone-17          200
+18:17:52 GET .../iphone-15-plus         200   18:19:23 GET .../iphone-17-pro      200
+18:18:03 GET .../iphone-15-pro          200   18:19:32 GET .../iphone-17-pro-max  200
+18:18:12 GET .../iphone-15-pro-max      200   18:19:43 GET .../iphone-air         200
+18:18:22 GET .../iphone-16              200   18:19:53 GET .../iphone-17e         200
+```
+
+(alle Zeitangaben UTC, 05.09.2026; Basis `https://www.saturn.de`, jeweils
+gefolgt von der genannten `/de/brand/apple/iphone/...`-Adresse)
+
+Protokollzeile:
+
+```
+Geraeteradar: 1 Anbieter abgefragt, 22 Listungen (22 neu), 22 Preispunkte,
+0 gealtert, Bestand 595, 161.2s
+```
+
+**22 statt 21 Zeilen — beides ist ein ehrliches Ergebnis (Abnahmekriterium
+2), keine Diskrepanz zu erklären:** dieselben **6 von 17** Markenseiten
+liefern Saturn-eigene Preise (iPhone 16/16e/17/17 Pro/Air/17e, unverändert
+gegenüber R1), und **alle 21 R1-Preise stimmen mit diesem Lauf exakt
+überein** (gegengeprüft, siehe unten) — plus EINE neue Variante, die
+zwischen dem R1- und dem R2-Lauf auf der `iphone-16`-Markenseite
+hinzugekommen ist:
+
+| Modell | Preis | Beleg |
+|---|---|---|
+| iPhone 16 128 GB Weiß **(neu seit R1)** | 839,99 € | `saturn.de/de/product/_apple-iphone-16-5g-128-gb-weiss-…` |
+| iPhone 16 Plus 128 GB Weiß/Schwarz | 939,99 € | unverändert |
+| iPhone 16e 128 GB Schwarz | 589,00 € | unverändert |
+| iPhone 17 256 GB (5 Farben) | 939,99 € | unverändert |
+| iPhone 17 Pro 256 GB Tiefblau/Silber | 1.179,00 € | unverändert |
+| iPhone 17 Pro 1 TB Tiefblau | 1.589,00 € | unverändert |
+| iPhone 17 Pro 512 GB Silber | 1.419,00 € | unverändert |
+| iPhone Air 256 GB (3 Farben) | 909,00 € | unverändert |
+| iPhone Air 1 TB Himmelblau | 1.349,00 € | unverändert |
+| iPhone 17e 256 GB Weiß/Hellrosa | 699,00 € | unverändert |
+| iPhone 17e 512 GB Hellrosa | 949,00 € | unverändert |
+| iPhone 17e 512 GB Weiß/Schwarz | 939,99 € | unverändert |
+
+Die elf strukturell leeren bzw. rein marktplatzgetragenen Markenseiten aus
+§3 sind gegen zwei Stichproben (`iphone-15-pro`, `iphone-16-pro`) mit der
+ehrlichen Kennung NACHGEMESSEN worden: unverändert 12 gelistete Angebote,
+0 Saturn-eigene, 12 Marktplatz — dieselbe Marktaussage wie in R1, nicht
+UA-abhängig.
+
+`git diff` gegen den R1-Commit zeigt genau diesen Befund: 21 identische
+Zeilen (Inhalt UND Position unverändert, weil `Preishistorie`/`GeraeteDB`
+in derselben Reihenfolge neu schreiben) plus eine neue — kein
+Preis hat sich zwischen den beiden Läufen verschoben.
+
+### settings.yaml (Abnahmekriterium 3)
+
+```
+$ git diff f63691b -- config/settings.yaml   # f63691b = R1-Commit
+(kein Ergebnis - die Datei ist unveraendert)
+```
+
+Zeile 549 trägt weiterhin die Chrome-Kennung; E-1 bleibt offen und bei
+Antonio.
+
+### Suite (Abnahmekriterium 4)
+
+```
+2 failed, 2743 passed, 14 skipped
+```
+
+Dieselben zwei vorbestehenden Roten wie im R1-Maßstab
+(`tests/test_promo_seite.py::test_die_echten_screenshots_bestehen_die_pruefung`,
+`tests/test_promo_seite.py::test_der_leere_screenshot_wird_nicht_ausgeliefert`)
+— unverändert, keine neuen. 2743 statt 2740, weil drei neue Tests
+dazugekommen sind (siehe oben).
+
+### Site-Artefakt (Abnahmekriterium 6)
+
+`render_site()` erneut gegen den aktualisierten Bestand gelaufen,
+`site/geraete.html` (und die abhängigen Seiten) neu committet;
+`site/data/keyword-index.json` per `git checkout --` auf den committeten
+Stand zurückgesetzt (Datums-Zeitbombe gegen `date.today()`, dieselbe
+Regel wie in R1 §6).
+
+### Offen (unverändert aus R1, durch R2 nicht berührt)
+
+Siehe Abschnitt „Offen" oben, Punkte 1–5 — R2 hat an keinem davon etwas
+geändert. Punkt 1 („nur 6 von 17 Markenseiten liefern heute Daten") gilt
+mit R2 unverändert weiter; die 22. Zeile ist eine neue VARIANTE derselben
+6 Seiten, keine siebte liefernde Seite.

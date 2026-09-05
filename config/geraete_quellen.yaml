@@ -163,10 +163,11 @@ anbieter:
       Auftrag genannte Kategorie-ID (/de/category/_..._701440.html) ist
       dagegen eine tote, im Sitemap-Index nicht mehr gefuehrte Adresse
       (HTTP 200, aber 0 Artikel) und wird NICHT verwendet.
-      GRENZE, gemessen im ersten Produktivlauf (05.09.2026,
-      scripts/lokallauf_saturn.py): NUR 6 der 17 Markenseiten liefern
-      Saturn-eigene Listungen (iPhone 16/16e/17/17 Pro/Air/17e, 21
-      Listungen). Die uebrigen ELF liefern strukturell einwandfrei, aber
+      GRENZE, gemessen im Produktivlauf mit der ehrlichen Kennung
+      (05.09.2026, R2, scripts/lokallauf_saturn.py): NUR 6 der 17
+      Markenseiten liefern Saturn-eigene Listungen (iPhone
+      16/16e/17/17 Pro/Air/17e, 22 Listungen). Die uebrigen ELF liefern
+      strukturell einwandfrei, aber
       ZU DIESEM ZEITPUNKT keine einzige Saturn-eigene
       (nicht-Marktplatz-)Listung: iPhone 14/14 Pro/14 Pro Max/15/15 Plus/
       15 Pro Max (0 Angebote insgesamt) sowie iPhone 15 Pro/16 Plus/16 Pro/
