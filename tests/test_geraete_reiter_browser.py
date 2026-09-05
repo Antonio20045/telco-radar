@@ -395,7 +395,7 @@ def _sichtbare_marken(seite):
 # Die drei Regeln, die ueber allem stehen
 # --------------------------------------------------------------------------
 
-def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
+def test_die_startansicht_traegt_genau_die_pflichtgrafiken(_seite):
     """UMGEKEHRT SEIT PHASE R, und mit Grund.
 
     Bis zum 04.09.2026 hiess diese Zusicherung "auf der Startansicht steht
@@ -404,16 +404,21 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     IST die TCO-Sicht, und der Balkenvergleich ist Pflichtinhalt. Ein
     Redesign ohne ihn gilt als nicht geliefert.
 
-    Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte: EIN
-    Bild, das ein Modell zeigt - keine Ansicht mit allen Geraeten in einer
-    Flaeche, keine gedrehten Etiketten.
+    Seit BRIEF_ZEITREIHE (05.09.2026) sind es ZWEI: der neue Zeitreihen-
+    Graph (G0) UEBER den Balkenbloecken, und G1 darunter - beide zeigen
+    dasselbe, EINE gewaehlte Geraet.
+
+    Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte: kein
+    Bild mit allen Geraeten in einer Flaeche, keine gedrehten Etiketten.
     """
     sichtbar = _seite.eval_on_selector_all(
         "#tafel-tco svg",
         "e => e.filter(x => x.getBoundingClientRect().width > 0).length")
-    assert sichtbar == 1, "genau eine Grafik - die des gewaehlten Modells"
+    assert sichtbar == 2, "genau zwei Grafiken - G0 und G1 des gewaehlten Modells"
     assert _seite.eval_on_selector_all(
         "#tafel-tco svg.gr-g1", "e => e.length") > 0, "G1 fehlt"
+    assert _seite.eval_on_selector_all(
+        "#tafel-tco svg.gr-g0", "e => e.length") > 0, "G0 fehlt"
     # Kein Rest der geloeschten Preisgrafik.
     assert _seite.eval_on_selector_all(
         "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
