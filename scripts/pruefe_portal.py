@@ -636,40 +636,47 @@ def main() -> int:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
         maengel = []
 
-        # PHASE R (04.09.2026): DIE HAUPTANSICHT IST DIE TCO-SICHT.
+        # BRIEF_FADEN (05.09.2026): DIE HAUPTANSICHT ANTWORTET MIT EINER
+        # ZAHL UND EINEM GRAPHEN.
         #
-        # Bis dahin stand hier die umgekehrte Regel - "die Startansicht
-        # traegt kein Diagramm" - und sie war richtig, solange die
-        # Startansicht die Alarmtabelle war. Das Lastenheft dreht das um
-        # (A1/A3): die Seite beantwortet ohne Klick "was zahlt der Kunde
-        # ueber 24 Monate gesamt", und ZWEI Grafiken sind Pflichtinhalt.
-        # Ein Redesign ohne sie gilt als nicht geliefert.
+        # Bis zum 04.09.2026 stand hier die umgekehrte Regel ("die
+        # Startansicht traegt kein Diagramm"), richtig solange die
+        # Startansicht die Alarmtabelle war. Phase R drehte das um und
+        # verlangte ZWEI Grafiken (G0 und G1). BRIEF_FADEN dreht ein
+        # zweites Mal: G1 verlaesst die Ansicht wieder - "ein Graph, keine
+        # Konkurrenz-Visualisierungen" (Antonio, 05.09.2026 nachmittags).
+        # G0 (die Zeitreihe) bleibt die EINZIGE Grafik je Modellblock.
         #
         # Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte:
         # keine Ansicht mit 114 gedrehten Etiketten und 248 Punkten in
         # einem Bild.
         start = gr.select_one("#tafel-tco")
         if start is None:
-            maengel.append("die Hauptansicht 'TCO-Vergleich' fehlt")
+            maengel.append("die Hauptansicht 'Vergleich' fehlt")
         for tot in (".gr-flaeche", ".gr-punkt", ".gr-etikett", ".gr-band"):
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # Die VIER Reiter, in der Reihenfolge des Lastenhefts (B.1). Ein
-        # fehlender Reiter faellt sonst nur dadurch auf, dass niemand ihn
-        # vermisst - und ein wiederauferstandener Reiter "Was kostet es"
-        # waere genau die doppelte Darstellung, die B.1 aufloest.
+        # ZWEI REITER (BRIEF_FADEN, 05.09.2026), nicht mehr vier: "Preis-
+        # und TCO-Historie" und "Portfolio" haben ihren Knopf verloren (ihr
+        # Markup bleibt im Dokument, nur ungeknopft - PM entscheidet
+        # separat ueber ihr Schicksal). Ein wiederauferstandener dritter
+        # Knopf waere genau die Rueckkehr der vier Produkte auf einer
+        # Seite, die der Auftrag aufloest.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-tco", "tafel-katalog", "tafel-verlauf",
-                    "tafel-portfolio"]
+        erwartet = ["tafel-tco", "tafel-katalog"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
 
-        # G1 UND G2 stehen fertig im Dokument - servergerendert, ohne
-        # Bibliothek. Eine Grafik, die erst im Browser entsteht, steht in
-        # keinem `curl` und in keinem Screenshot.
-        if start is not None and start.select_one("svg.gr-g1") is None:
-            maengel.append("G1 (TCO-Balkenvergleich) fehlt in der Hauptansicht")
+        # G0 steht fertig im Dokument - servergerendert, ohne Bibliothek.
+        # G1 (der Balkenvergleich) darf in dieser Ansicht NICHT mehr
+        # stehen (Kriterium 1) - seine Rechnung bleibt im Code, nur der
+        # Aufruf im Template ist geloescht.
+        if start is not None and start.select_one("svg.gr-g0") is None:
+            maengel.append("G0 (die Zeitreihe) fehlt in der Hauptansicht")
+        if start is not None and start.select_one("svg.gr-g1") is not None:
+            maengel.append("G1 (TCO-Balkenvergleich) wird noch gerendert - "
+                           "BRIEF_FADEN verlangt genau eine Grafik je Modellblock")
         verlaufflaeche = gr.select_one("#tafel-verlauf")
         if verlaufflaeche is not None and \
                 verlaufflaeche.select_one("svg.gr-g2") is None and \
@@ -758,7 +765,7 @@ def main() -> int:
             b.prueft(not maengel,
                      f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
                      f"{len(kacheln)} Chips ueber {summe} Vergleichen, "
-                     f"G1 und G2 stehen fertig im Dokument"
+                     f"G0 steht fertig im Dokument, G1 nicht mehr gerendert"
                      if not maengel else
                      "11. Geraeteradar: " + "; ".join(maengel[:5]))
 

@@ -366,7 +366,12 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
                          "html.parser")
 
 
-def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_balken_und_tabelle(tmp_path):
+def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_und_tabelle(tmp_path):
+    """BRIEF_FADEN (05.09.2026): G1 (der Balken) ist aus DIESER Ansicht
+    entfernt - der Test prueft das Etikett deshalb nur noch an Karte und
+    Tabelle. Dass `geraete_tco_grafik.balken()` das Etikett weiterhin
+    rechnet (Code bleibt, nur der Aufruf im Template ist geloescht), haelt
+    die Gegenprobe unten UND `test_das_etikett_steht_am_g1_balken` oben."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     karten_o2 = tafel.select('.gr-kkarte[data-anbieter="o2"]')
@@ -381,8 +386,13 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_balken_und_tabelle(tm
     assert neu.select_one(".gr-kk-marke--zustand") is None
     assert neu.select_one(".gr-kk-delta") is not None
 
-    balken = tafel.select("svg.gr-g1 .gr-g1-zustand")
-    assert [b.get_text(strip=True) for b in balken] == ["erneuert"]
+    # G1 wird nicht mehr gerendert - G0 (die Zeitreihe) ist die einzige
+    # Grafik je Modellblock (BRIEF_FADEN, Kriterium 1).
+    assert tafel.select_one("svg.gr-g1") is None
+    # Die Rechnung bleibt trotzdem korrekt, nur nicht mehr aufgerufen -
+    # dieselbe Zusicherung wie `test_das_etikett_steht_am_g1_balken`.
+    svg = grafik.balken(_modell())
+    assert 'class="gr-g1-zustand">erneuert</tspan>' in svg
 
     zeile = tafel.select_one('#gr-tco-tabelle tr[data-zustand="refurbished"]')
     assert zeile is not None

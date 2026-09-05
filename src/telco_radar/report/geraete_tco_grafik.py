@@ -465,6 +465,32 @@ def zeitreihe(reihen: list) -> dict:
                     f'cy="{y(b)}" r="{"5" if einzeln else "4"}">'
                     f'<title>{_t(reihe["anbieter"])} · '
                     f'{t.strftime("%d.%m.%Y")}: {euro(b)}</title></circle>')
+                if einzeln:
+                    # KEIN NACKTER PUNKT (BRIEF_FADEN, 05.09.2026): ein
+                    # einzelner Messpunkt ohne Beschriftung liest sich als
+                    # "keine Werte" - Antonios QA-Befund 3 an Telekoms
+                    # Einzelpunkt vom 05.09.2026. Die Beschriftung nennt das
+                    # Datum, nicht nur die Existenz einer Serie - derselbe
+                    # Belegzwang wie am Tooltip.
+                    #
+                    # DIE AUSRICHTUNG HAENGT VON DER HAELFTE AB, NICHT VON
+                    # EINEM FESTEN "middle": ein Einzelpunkt liegt oft am
+                    # rechten Rand (der juengste, oft einzige Messtag), und
+                    # "middle" liess die Haelfte des Textes in die
+                    # Anbieter-Legende rechts vom Bild laufen. Ein Punkt in
+                    # der rechten Haelfte bekommt seine Beschriftung nach
+                    # LINKS, einer in der linken Haelfte nach RECHTS - so
+                    # bleibt sie innerhalb der Zeichenflaeche.
+                    mitte_x = G0_LINKS + (G0_BREITE - G0_LINKS - G0_RECHTS) / 2
+                    if x(t) > mitte_x:
+                        anker, tx = "end", x(t) - 9
+                    else:
+                        anker, tx = "start", x(t) + 9
+                    teile.append(
+                        f'<text class="gr-g0-einzeln gr-anb--{slug}" '
+                        f'x="{tx}" y="{y(b) - 10}" text-anchor="{anker}">'
+                        f'Serie startet · 1. Messpunkt '
+                        f'{_t(t.strftime("%d.%m.%Y"))}</text>')
 
         teile.append(
             f'<text class="gr-g0-legende gr-anb--{slug}" '

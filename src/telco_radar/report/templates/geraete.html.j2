@@ -29,10 +29,26 @@
    Antonios Auftrag geloescht. Wer liefern sollte und warum nicht, steht auf
    geraete-quellen.html; die Arbeitslisten (unbekannte Farbschreibweisen,
    Titel ohne Katalogtreffer) stehen im Protokoll des naechtlichen Laufs -
-   geraete.html ist eine Leseseite, kein Pflegeradar. #}
+   geraete.html ist eine Leseseite, kein Pflegeradar.
+
+   BRIEF_FADEN (05.09.2026, Senecas Freigabe): EINE Frage, EIN Graph. Die
+   Titelseiten-Ueberschrift ("Dieses Geraet - wo kaufe ich es am
+   guenstigsten?") ist gescheitert (Antonios Urteil: umgangssprachlich,
+   "ich" mehrdeutig) und weicht der sachlichen "Gerätepreise im Vergleich".
+   Die Reiterleiste traegt nur noch "Vergleich" (diese Tafel) und
+   "Gerätekatalog" - "Preis- und TCO-Historie" und "Portfolio" verlieren
+   ihren Knopf, ihr Markup bleibt UNVERAENDERT im Dokument stehen (nicht
+   geloescht, nur nicht mehr verlinkt; ihr Schicksal entscheidet der PM
+   separat). G1 (der TCO-Balkenvergleich) wird aus DIESER Ansicht
+   ENTFERNT - Datenquelle und Rechnung (`geraete_tco_grafik.balken`,
+   `m.svg`/`m.legende`) bleiben im Code, nur der Aufruf im Template ist
+   geloescht: G0 (die Zeitreihe) ist die einzige Grafik je Modellblock.
+   Ampel-Kacheln (Preis-Alarme) und die Analysten-Tabellen (alle Buendel,
+   Tarife) ziehen hinter EINE "Details"-Aufklappung - Seneca: "Unerklaert
+   ist selten ein Beschriftungsproblem, meistens ein Existenzproblem." #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
-{% block title %}Vodafone Product and Services Insights · Dieses Gerät – wo kaufe ich es am günstigsten?{% endblock %}
+{% block title %}Vodafone Product and Services Insights · Gerätepreise im Vergleich{% endblock %}
 
 {# Eine Zeile der Alarmtabelle. Der Prozentsatz steht gross, der Euro-Betrag
    klein darunter: 15 Euro sind bei einem 200-Euro-Geraet viel und bei einem
@@ -177,7 +193,7 @@
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Deutschland · Geräte</p>
-      <h1>Dieses Gerät — wo kaufe ich es am günstigsten?</h1>
+      <h1>Gerätepreise im Vergleich</h1>
     </div>
     {# DAS KOPFDATUM IST DAS ABRUFDATUM, nicht der Berichtstag (30.08.2026).
 
@@ -202,27 +218,30 @@
 {% set al = geraete.alarme %}
 
 {# --- Reiterleiste ---------------------------------------------------- #}
-{# VIER REITER, UND DER ERSTE IST DIE TCO-ANSICHT (Phase R, B.1).
+{# ZWEI REITER (BRIEF_FADEN, 05.09.2026) - "Vergleich" ist die
+   Antwortfrage der Seite selbst, "Gerätekatalog" der Bestand dahinter.
 
-   Vorher waren es fuenf, und der erste hiess "Preis-Alarme". Die Seite
-   beantwortete damit ohne Klick die Frage "wo liegen wir im Barpreis
-   zurueck" - eine gute Frage, aber nicht die des Portals. Antonios
-   Leitfrage lautet "was zahlt der Kunde ueber 24 Monate gesamt", und sie
-   wird jetzt ohne Klick beantwortet.
+   Bis zum 04.09.2026 waren es vier: "TCO-Vergleich" hiess so, weil er sich
+   von "Preis-Alarme" (fuenf Reiter, bis 30.08.) absetzte - Antonios Urteil
+   vom 05.09. nennt "TCO-Vergleich" selbst noch unklar ("Portfolio ohne
+   erkennbaren Zweck", "er mag genau EIN Ding - den Graphen mit
+   Modellauswahl"). "Preis- und TCO-Historie" und "Portfolio" verlieren
+   ihren Knopf; ihre Tafeln (`#tafel-verlauf`, `#tafel-portfolio`) bleiben
+   UNVERAENDERT im Dokument - nicht geloescht, nur nicht mehr verlinkt
+   (Seneca: "die dahinterliegenden Seiten ... PM entscheidet separat ueber
+   ihr Schicksal"). Ein Deep-Link auf `#verlauf`/`#lifecycle` findet in
+   `app.js` keinen Knopf mehr und bleibt auf der ersten Tafel stehen - kein
+   Fehler, nur kein Sprungziel mehr.
 
-   Der Reiter "Was kostet es" ist damit aufgeloest: sein Inhalt IST die
-   Hauptansicht. Die Preis-Alarme verlieren ihren Reiter und stehen als
-   Chips im Kopf der Hauptansicht (H4) - jeder Alarm bleibt sichtbar, die
-   ganze Alarmtabelle steht einen Aufklapper darunter. #}
+   Der Reiter "Was kostet es" war schon vorher aufgeloest: sein Inhalt IST
+   die Hauptansicht. Die Preis-Alarme und alle Analysten-Tabellen stehen
+   seit BRIEF_FADEN hinter EINER "Details"-Aufklappung, nicht mehr offen im
+   Kopf der Tafel. #}
 <nav class="gr-reiter" role="tablist" aria-label="Ansichten des Geräteradars">
   <button type="button" role="tab" aria-selected="true"
-          aria-controls="tafel-tco" data-tafel="tafel-tco">TCO-Vergleich</button>
+          aria-controls="tafel-tco" data-tafel="tafel-tco">Vergleich</button>
   <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-katalog" data-tafel="tafel-katalog">Gerätekatalog</button>
-  <button type="button" role="tab" aria-selected="false"
-          aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Preis- und TCO-Historie</button>
-  <button type="button" role="tab" aria-selected="false"
-          aria-controls="tafel-portfolio" data-tafel="tafel-portfolio">Portfolio</button>
 </nav>
 
 {# --- Reiter 1: Preis-Alarme ------------------------------------------ #}
@@ -613,12 +632,17 @@
    eine Karte ohne Wert ist eine Auskunft, kein Mangel. Keine erfundene
    Zahl, kein Balken - deshalb traegt die Karte weder `data-gesamt` noch
    `data-schnitt`/`data-einmalig`, und keine Sortierung/Balkengrafik
-   rechnet sie mit. #}
-{% macro haendlerkarte(name) %}
+   rechnet sie mit.
+
+   `seit` NENNT DEN START, NICHT EIN VERSPRECHEN (BRIEF_FADEN, 05.09.2026):
+   "Beschaffung läuft" allein wirkte auf Antonio unfertig statt geplant
+   ("drei graue Kärtchen ohne Zahl ohne Datum"). Ein Lieferdatum gibt es
+   nicht - das waere erfunden -, der Beginn der Beschaffung schon. #}
+{% macro haendlerkarte(name, seit) %}
 <article class="gr-kkarte gr-kkarte--leer gr-kkarte--haendler" data-anbieter="{{ name }}">
   <p class="gr-kk-kopf"><span class="gr-kk-anbieter">{{ name }}</span>
     <span class="gr-kk-marke">Händler</span></p>
-  <p class="gr-kk-luecke">Händler — Beschaffung läuft</p>
+  <p class="gr-kk-luecke">Händler — Beschaffung läuft seit {{ seit | date_de }}</p>
 </article>
 {% endmacro %}
 
@@ -640,19 +664,6 @@
      traegt ihr eigenes Thema (die Linien dieses Geraets), keine allgemeine
      Methodik. #}
 
-  {# --- Die Preis-Alarme als Chips (H4) ------------------------------
-         SIE STEHEN VOR DEM MODELLGATTER und nicht darin: die Alarme
-         haengen an den Barpreisen, nicht an den Buendeln. Innerhalb von
-         `{% raw %}{% if geraete.tco.modelle %}{% endraw %}` verschwanden
-         sie, sobald kein Buendel im Bestand steht - und mit ihnen die
-         einzige Zahl, die dieser Reiter dann noch haette. #}
-  <ul class="gr-chips" aria-label="Preis-Alarme">
-    {% for k in geraete.alarme.kacheln %}
-    <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
-      <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
-    {% endfor %}
-  </ul>
-
   {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN, nicht als
      Modell "ohne-geraet" im Auswahlfeld (F-R2-3). Vor dem Modellgatter,
      damit die Zeile auch dann steht, wenn KEIN Buendel aufloest. #}
@@ -665,9 +676,15 @@
 
   {% if geraete.tco.modelle %}
   {% set vorgabe = geraete.tco.modell_vorgabe %}
+  {# Der Beginn der Beschaffung bei Haendlern ohne Tarifbuendel - siehe
+     `haendlerkarte()` und die Legende am Zeitreihen-Block. EIN Datum, EINE
+     Stelle, die es setzt. #}
+  {% set haendler_seit = "2026-09-05" %}
 
-  {# --- 1. Der Modell-Selector --------------------------------------- #}
-  <div class="gr-msel">
+  {# --- 1. Der Modell-Selector, gross und sofort (BRIEF_FADEN) --------
+         Direkt unter der Reiterleiste, VOR jeder anderen Zahl der Tafel -
+         nichts steht mehr zwischen Ueberschrift und Auswahl. #}
+  <div class="gr-msel gr-msel--gross">
     <label for="gr-modell">Gerät</label>
     <select id="gr-modell" data-vorgabe="{{ vorgabe }}">
       {% for m in geraete.tco.modelle %}
@@ -679,16 +696,35 @@
     mindestens einem erhobenen Bündel</span>
   </div>
 
-  {# --- 3./4. Je Modell die Karten und die Balkengrafik --------------- #}
+  {# --- 2.-4. Je Modell: Antwortzeile, Zeitreihe (G0), Anbieterkarten -- #}
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.titel }}</h3>
 
-    {# --- 2. Der Zeitreihen-Block: der neue Hauptgraph ------------------
-           BRIEF_ZEITREIHE (05.09.2026). Er steht UEBER den Balkenbloecken
-           und ersetzt sie nicht (Kriterium 4) - im Stil der gebilligten
-           Skizze: kein Fliesstext ausser der EINEN Chart-Chrome-Zeile
-           (Kriterium 3), servergerendertes SVG wie G1/G2, keine
+    {# --- 2. Die eine Antwortzeile (BRIEF_FADEN, 05.09.2026) ------------
+           "Was kostet dieses Gerät?" - sachlich beantwortet, in EINEM
+           Satz, zwischen Auswahl und Graph. Beide Zahlen kommen aus
+           `geraete_tco_karten.modelle()` (`m.antwort`) und tragen ihren
+           Anbieter: eine Zahl ohne Absender ist auf dieser Seite nicht
+           nachpruefbar. #}
+    {% if m.antwort.geraetepreis is not none or m.antwort.tarif_gesamt is not none %}
+    <p class="gr-antwort">{% if m.antwort.geraetepreis is not none
+      %}Günstigster Gerätepreis: <b>{{ m.antwort.geraetepreis | euro
+      }}</b> ({{ m.antwort.geraetepreis_anbieter }}){% endif %}{% if
+      m.antwort.geraetepreis is not none and m.antwort.tarif_gesamt is not none
+      %} · {% endif %}{% if m.antwort.tarif_gesamt is not none
+      %}günstig mit Tarif: <b>{{ m.antwort.tarif_gesamt | euro }}</b>
+      ({{ m.antwort.tarif_anbieter }}){% endif %}</p>
+    {% else %}
+    <p class="gr-antwort gr-antwort--leer">Für dieses Gerät liegt noch kein
+    Angebot mit Preis vor.</p>
+    {% endif %}
+
+    {# --- 3. Der Zeitreihen-Block: die EINZIGE Grafik dieser Ansicht ----
+           BRIEF_ZEITREIHE (05.09.2026), BRIEF_FADEN (05.09.2026: G1
+           verlaesst diese Ansicht, G0 bleibt allein). Im Stil der
+           gebilligten Skizze: kein Fliesstext ausser der EINEN
+           Chart-Chrome-Zeile (Kriterium 3), servergerendertes SVG, keine
            Bibliothek. Die Belege stehen hinter dem Aufklapper darunter
            (Kriterium 5), nicht neben der Grafik. #}
     {% set zr = m.zeitreihe %}
@@ -716,14 +752,15 @@
 
     {# A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel und sind
        fuer diese Seite Haendler mit reinem Geraetepreis - ihre Beschaffung
-       laeuft (QUELLEN_MAP.md), es gibt noch keinen Messpunkt. Sie stehen
-       trotzdem JE GERAET als Legenden-Eintrag OHNE Linie: kein Pfad, kein
-       Kreis, keine erfundene Zahl - nur der Name und der Vermerk. #}
+       laeuft seit {{ haendler_seit }} (QUELLEN_MAP.md, Ersterkundung). Sie
+       stehen trotzdem JE GERAET als Legenden-Eintrag OHNE Linie: kein
+       Pfad, kein Kreis, keine erfundene Zahl - nur der Name und der
+       datierte Vermerk. #}
     <ul class="gr-g0-haendler" aria-label="Händler ohne erfasste Zeitreihe">
       {% for h in ("Amazon", "Expert", "Saturn") %}
       <li class="gr-g0-haendler-zeile"><span class="gr-g0-haendler-name">{{
         h }}</span><span class="gr-g0-haendler-vermerk">Händler —
-        Beschaffung läuft</span></li>
+        Beschaffung läuft seit {{ haendler_seit | date_de }}</span></li>
       {% endfor %}
     </ul>
 
@@ -751,9 +788,10 @@
       </select></label>
     </div>
 
+    {# --- 4. Die Anbieterkarten, direkt unter dem Graph ------------------ #}
     <div class="gr-karten">
       {% for k in m.karten %}{{ tcokarte(k) }}{% endfor %}
-      {% for h in ("Amazon", "Expert", "Saturn") %}{{ haendlerkarte(h) }}{% endfor %}
+      {% for h in ("Amazon", "Expert", "Saturn") %}{{ haendlerkarte(h, haendler_seit) }}{% endfor %}
     </div>
 
     {% if not zr.hat_daten %}
@@ -775,23 +813,12 @@
     </details>
     {% endif %}
 
-    {# G1 - servergerendert, ohne Bibliothek und ohne CDN. #}
-    {% if m.svg %}
-    <figure class="gr-grafik">
-      {{ m.svg | safe }}
-      <figcaption>TCO je Anbieter, nach Bindungsdauer getrennt; der Abstand
-      zur Vodafone-Referenz steht am Balken.
-      Jeder Balken ist gestapelt: {% for a in m.legende %}{{ a.name }}{%
-      if not loop.last %}, {% endif %}{% endfor %}. Die gestrichelte Linie
-      ist die Vodafone-Referenz. Alle Beträge stehen in den Karten darüber –
-      die Grafik ist die Ansicht, die Karte die Quelle.</figcaption>
-    </figure>
-    {% else %}
-    <p class="gr-erklaer gr-basis--duenn">Für dieses Gerät steht heute nur
-    eine Zahl – ein Balkenvergleich mit einem Balken vergliche nichts.
-    Sobald ein zweiter Anbieter ein Bündel zu diesem Gerät ausweist,
-    entsteht die Grafik hier.</p>
-    {% endif %}
+    {# G1 (der TCO-Balkenvergleich) wird in dieser Ansicht bewusst NICHT
+       mehr gerendert (BRIEF_FADEN, 05.09.2026, Kriterium 1): G0 ist die
+       einzige Grafik je Modellblock. Die Rechnung bleibt im Code
+       (`geraete_tco_grafik.balken()`, `m.svg`/`m.legende` werden in
+       `geraete_tco_view.aufbereiten()` weiterhin gefuellt) - nur der
+       Aufruf hier ist geloescht, nicht die Datenquelle. #}
   </div>
   {% endfor %}
 
@@ -801,7 +828,30 @@
   rechnen. Was schon gemessen ist, steht unten.</p>
   {% endif %}
 
-  {# --- Die Preis-Alarme in voller Laenge (H4: kein Funktionsverlust) - #}
+  {# --- 5. Details: Ampel-Kacheln und Analysten-Tabellen (BRIEF_FADEN) -
+         Seneca: "Unerklärt ist selten ein Beschriftungsproblem, meistens
+         ein Existenzproblem" - die Kacheln bleiben ERST einmal hinter der
+         Klappe, die Existenz-Frage ist PM-Sache. EINE Aufklappung fuer
+         alles, was Analyse statt Antwort ist: die Preis-Alarme (Chips UND
+         volle Tabelle), alle Buendel als Tabelle, der Tarif-Massstab. Sie
+         steht EINMAL, nicht je Modellblock - ihr Inhalt ist seitenweit
+         (alle Geraete), nicht auf das gewaehlte Modell eingegrenzt; da
+         immer nur EIN Modellblock sichtbar ist, steht sie effektiv dort,
+         wo gerade gelesen wird. #}
+  <details class="gr-auf gr-tafel-details" id="gr-details">
+    <summary>Details</summary>
+
+    {# --- Die Preis-Alarme als Chips (H4) --------------------------------
+           SIE STEHEN VOR DEM MODELLGATTER-INHALT und nicht darin: die
+           Alarme haengen an den Barpreisen, nicht an den Buendeln. #}
+    <ul class="gr-chips" aria-label="Preis-Alarme">
+      {% for k in geraete.alarme.kacheln %}
+      <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
+        <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
+      {% endfor %}
+    </ul>
+
+    {# --- Die Preis-Alarme in voller Laenge (kein Funktionsverlust) --- #}
   <details class="gr-auf" id="gr-alarme">
     <summary>Alle Preis-Alarme{% if geraete.alarme.gesamt %} ({{
       geraete.alarme.gesamt }}){% endif %} – wo ein Wettbewerber im Barpreis
@@ -921,9 +971,12 @@
   {% endif %}
   </details>
   {% endif %}
+  </details>
+  {# --- Ende der Details-Aufklappung (BRIEF_FADEN) -------------------- #}
 
   {# --- Was noch fehlt, und wer es liefert. Einmal benannt statt in jeder
-         Zeile wiederholt. #}
+         Zeile wiederholt. Bewusst AUSSERHALB der Details-Aufklappung: sie
+         ist eine Auskunft ueber die DATENLAGE, keine Analysten-Tabelle. #}
   <details class="gr-auf" id="gr-datenlage">
   <summary>Was der Rechnung noch fehlt, und was je Anbieter schon gemessen
   ist</summary>
@@ -1173,7 +1226,7 @@
   <p class="gr-erklaer">Die Kurve zeigt den Gerätepreis, nicht die
   Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif und
   Anschlusspreis. Was davon schon gemessen ist, steht im Reiter
-  „TCO-Vergleich“.</p>
+  „Vergleich“.</p>
 
   {# --- G2: die Historie, servergerendert ----------------------------- #}
   {% if geraete.tco.g2.svg %}

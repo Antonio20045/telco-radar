@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 
 import pytest
 
@@ -106,6 +107,51 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
         assert karte["leer_grund"].strip()
         for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
             assert jargon not in karte["leer_grund"]
+
+
+def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand):
+    """BRIEF_FADEN (05.09.2026): "Günstigster Gerätepreis: X € (Anbieter) ·
+    günstig mit Tarif: Y € (Anbieter)" - EIN Satz, EINE Antwort.
+
+    Die zwei Zahlen haben verschiedene Vergleichsmengen, und das ist kein
+    Widerspruch: der GERAETEPREIS ist ein reiner Barpreis - dafuer zaehlt
+    auch Vodafones Naeherungskarte, denn ihr Barpreis ist real gemessen,
+    nur ihr Buendel ist gerechnet. Der TARIF-GESAMTPREIS ist ein Angebot,
+    das man wirklich kaufen kann - eine Naeherung ("kein Angebot", QA-Befund
+    S3) darf diese Zahl nicht fuehren. Am echten Bestand: Vodafone fuehrt
+    den Barpreis, aber keine eigene Tarifbuendel-Zahl fuer dieses Geraet;
+    1&1 fuehrt die guenstigste echte Gesamtsumme.
+    """
+    modell = _modell(bestand, "apple-iphone-17-pro-256")
+    antwort = modell["antwort"]
+    assert antwort["geraetepreis"] == 1199.90
+    assert antwort["geraetepreis_anbieter"] == "Vodafone"
+    assert antwort["tarif_gesamt"] == 1619.64
+    assert antwort["tarif_anbieter"] == "1&1"
+    # Gegenprobe: die zwei Gewinner sind wirklich verschiedene Anbieter -
+    # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
+    # zwei Metriken.
+    assert antwort["geraetepreis_anbieter"] != antwort["tarif_anbieter"]
+    # Die Vodafone-Karte, die den Geraetepreis fuehrt, ist selbst eine
+    # Naeherungsrechnung - genau der Fall, den die Antwortzeile absichtlich
+    # zulaesst.
+    vodafone = next(k for k in modell["karten"] if k["anbieter"] == "Vodafone")
+    assert vodafone["naeherung"] is True
+
+
+def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
+    """Die Gegenprobe zum Test oben: kaeme die Naeherungskarte fuer die
+    "mit Tarif"-Zahl in Frage, waere IHRE (viel hoehere) Gesamtsumme nie
+    die guenstigste - der Test haelt trotzdem ausdruecklich fest, dass der
+    Gewinner ueberhaupt kein `naeherung`-Angebot sein darf."""
+    for modell in bestand["modelle"]:
+        antwort = modell["antwort"]
+        if antwort["tarif_anbieter"] is None:
+            continue
+        gewinner = next(k for k in modell["karten"]
+                        if k["anbieter"] == antwort["tarif_anbieter"]
+                        and k["gesamt"] == antwort["tarif_gesamt"])
+        assert gewinner["naeherung"] is False, modell["id"]
 
 
 def test_die_rechenprobe_steht_auf_der_karte(bestand):
@@ -349,6 +395,45 @@ def test_jeder_balken_traegt_seine_aussage_als_text(bestand):
     svg = grafik.balken(_modell(bestand, "apple-iphone-17-pro-256"))
     assert svg.count("<title>") >= 1
     assert 'role="img"' in svg and "aria-label=" in svg
+
+
+def test_die_balkenlaenge_entspricht_dem_betrag(bestand):
+    """BRIEF_FADEN (05.09.2026): der Test zog hierher aus dem Browser - G1
+    ist aus der TCO-Ansicht entfernt (Kriterium 1), aber die Rechnung
+    bleibt im Code, und die Balkenlaenge ist SERVERGERECHNETE Geometrie
+    (`_skala()`), keine CSS-Layoutfrage. Ein statischer Test misst sie
+    ebenso genau wie ein Browser - die Lehre vom 10.08.2026 bleibt: eine
+    Grafik ist erst fertig, wenn jemand ihre AUSSAGE nachgerechnet hat,
+    damals standen 87 von 94 Etiketten weiter als drei Prozent neben ihrem
+    Punkt.
+
+    Gemessen wird je Laufzeitgruppe: alle Balken derselben Gruppe teilen
+    sich eine Nulllinie und einen Massstab, das Verhaeltnis aus Laenge und
+    Betrag muss also fuer alle gleich sein.
+    """
+    modell = _modell(bestand, "apple-iphone-17-pro-256")
+    svg = grafik.balken(modell)
+    assert svg, "kein G1 fuer dieses Modell - der Test prueft nichts"
+    breite_je_anbieter: dict[str, float] = {}
+    for treffer in re.finditer(
+            r'<rect class="gr-g1-seg[^"]*"[^>]*width="([\d.]+)"[^>]*>'
+            r'\s*<title>([^:<]+):', svg):
+        breite = float(treffer.group(1))
+        # Die Kartenwerte kennen "1&1", die SVG-Beschriftung "1&amp;1" -
+        # dieselbe Entschaerfung wie ueberall, wo XML-Escaping auf einen
+        # Klartextschluessel trifft.
+        anbieter = treffer.group(2).replace("&amp;", "&")
+        breite_je_anbieter[anbieter] = (
+            breite_je_anbieter.get(anbieter, 0.0) + breite)
+    gesamt_je_anbieter = {k["anbieter"]: k["gesamt"] for k in modell["karten"]
+                          if k["belastbar"] and k["laufzeit"] == 36}
+    verhaeltnisse = [breite_je_anbieter[a] / g
+                     for a, g in gesamt_je_anbieter.items()
+                     if a in breite_je_anbieter and g]
+    assert len(verhaeltnisse) >= 2, \
+        f"eine Gruppe braucht zwei Balken: {gesamt_je_anbieter}"
+    assert max(verhaeltnisse) - min(verhaeltnisse) < 0.002, \
+        f"die Balken folgen nicht einem Massstab: {gesamt_je_anbieter}"
 
 
 def test_die_grafik_rechnet_keine_eigene_zahl(bestand):

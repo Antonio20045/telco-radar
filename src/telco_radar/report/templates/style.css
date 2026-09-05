@@ -2619,7 +2619,34 @@ b,strong{font-weight:700}
 .gr-msel select{font-family:var(--sans);font-size:14px;padding:6px 8px;
   border:1px solid var(--rule);background:var(--paper-2);max-width:100%;
   min-width:0;flex:1 1 240px}
+/* GROSS UND SOFORT (BRIEF_FADEN, 05.09.2026): die Geraeteauswahl ist die
+   erste Handlung der Seite, direkt unter der Reiterleiste - nichts steht
+   mehr davor. Label und Select treten dafuer groesser auf als jedes
+   andere Bedienelement dieser Tafel. */
+.gr-msel--gross{padding-bottom:16px;margin-top:6px}
+.gr-msel--gross label{font-size:13px}
+.gr-msel--gross select{font-family:var(--serif);font-size:20px;
+  padding:10px 12px;flex:1 1 320px}
 .gr-mband{margin:0 0 12px}
+
+/* Die eine Antwortzeile (BRIEF_FADEN, 05.09.2026): "Was kostet dieses
+   Gerät?" - sachlich beantwortet, zwischen Auswahl und Graph, nichts
+   sonst dazwischen. Serife, groesser als Fliesstext, aber kleiner als die
+   Leitzahl einer Karte (27 px) - sie ist die Zusammenfassung, nicht die
+   Kartenrechnung selbst. */
+.gr-antwort{font-family:var(--serif);font-size:19px;line-height:1.4;
+  margin:0 0 16px}
+.gr-antwort b{font-weight:700}
+.gr-antwort--leer{font-family:var(--sans);font-size:13px;color:var(--ink-3);
+  font-style:italic}
+
+/* Die Details-Aufklappung (BRIEF_FADEN): Ampel-Kacheln und
+   Analysten-Tabellen sind hier zusammengefasst, damit sie nicht mehr im
+   Lesefluss zwischen Auswahl und Anbieterkarten stehen. */
+.gr-tafel-details{margin-top:8px}
+.gr-tafel-details > summary{font-family:var(--sans);font-size:13px;
+  font-weight:600;letter-spacing:.02em;cursor:pointer;color:var(--ink-2)}
+.gr-tafel-details .gr-chips{margin-top:12px}
 
 /* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
    stehen deshalb im Kopf der Hauptansicht, nicht in einem eigenen Reiter. */
@@ -2726,6 +2753,11 @@ b,strong{font-weight:700}
    einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
    bewegte Linie eines anderen Anbieters an ihm vorbeilaeuft. */
 .gr-g0-punkt--einzeln{stroke:var(--paper);stroke-width:1.5}
+/* Die Beschriftung des Einzelpunkts (BRIEF_FADEN, 05.09.2026): "Serie
+   startet" statt eines nackten Punkts, der wie "keine Werte" aussieht. 12
+   px, keine Zeile darf kleiner sein (Hausregel seit 30.08.2026). */
+.gr-g0-einzeln{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
 .gr-g0-legende{font-family:var(--sans);font-size:12px;
   fill:var(--anb,#57534a)}
 /* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
