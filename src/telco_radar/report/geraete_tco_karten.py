@@ -864,10 +864,18 @@ def _vorgabe(modelle: list) -> str:
     und sonst faellt die Wahl auf das erste Modell der Liste. Eine
     Vorgabe, die an einem einzelnen Geraet haengt, waere ohne diesen
     Rueckfall ein Leerzustand, sobald Apple ein Modell umbenennt.
+
+    F-5 (05.09.2026): `bundle_anbieter` zaehlt die Anbieter mit einem
+    TCO-Buendel zu diesem Modell - eine ANDERE Menge als die
+    "Anbieter"-Zahl, die die Seite jetzt zeigt (die Preispunkte-Reihen der
+    Zeitreihe, `geraete_tco_grafik.zeitreihe().anbieterzahl`). Diese
+    Schwelle bleibt bewusst bundle-bezogen: die Leitfrage handelt von einem
+    RECHENBAREN Tarif-Vergleich ("mit Tarif X bei Anbieter Y"), nicht von
+    Preispunkten in einem Chart.
     """
     for modell in modelle:
         if modell["id"] == LEITFRAGE_MODELL and len(
-                modell["anbieter_mit_zahl"]) >= 2:
+                modell["bundle_anbieter"]) >= 2:
             return modell["id"]
     return modelle[0]["id"] if modelle else ""
 
@@ -878,7 +886,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
 
     Rueckgabe:
         modelle         [{id, name, hersteller, speicher, karten, referenz,
-                          laufzeiten, spanne, anbieter_mit_zahl}]
+                          laufzeiten, spanne, bundle_anbieter}]
         vorgabe         die ID des Modells, das ohne Klick sichtbar ist
         ohne_zuordnung  Buendel, deren SKU weder eine Listung noch ein
                         Katalogeintrag aufloest - mit Grund, nie als Modell
@@ -1071,15 +1079,18 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "zustand_offen": len([k for k in angebote
                                   if k["zustand"] == "unbekannt"]),
             "spanne": ([min(betraege), max(betraege)] if betraege else []),
-            "anbieter_mit_zahl": sorted({k["anbieter"] for k in angebote}),
+            # F-5: NICHT die "Anbieter"-Zahl der Seite (siehe Docstring
+            # oben) - nur der Sortier-/Vorgabe-Schluessel dieser Funktion.
+            "bundle_anbieter": sorted({k["anbieter"] for k in angebote}),
             "antwort": antwort,
         })
 
-    # Die Reihenfolge des Auswahlfeldes: die meisten Anbieter zuerst - dort
-    # beantwortet die Seite ihre Frage am vollstaendigsten -, dann nach
-    # Namen. NICHT nach Preis: eine nach Betrag sortierte Modellliste ist
-    # eine Rangliste des Marktes, und der Marktueberblick steht im Katalog.
-    fertig.sort(key=lambda m: (-len(m["anbieter_mit_zahl"]), m["name"]))
+    # Die Reihenfolge des Auswahlfeldes: die meisten Buendel-Anbieter zuerst
+    # - dort beantwortet die Seite ihre Tarif-Frage am vollstaendigsten -,
+    # dann nach Namen. NICHT nach Preis: eine nach Betrag sortierte
+    # Modellliste ist eine Rangliste des Marktes, und der Marktueberblick
+    # steht im Katalog.
+    fertig.sort(key=lambda m: (-len(m["bundle_anbieter"]), m["name"]))
     return {"modelle": fertig, "vorgabe": _vorgabe(fertig),
             "gesamt": len(fertig), "ohne_zuordnung": ohne_zuordnung}
 

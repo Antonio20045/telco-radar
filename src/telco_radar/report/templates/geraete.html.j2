@@ -706,9 +706,15 @@
   <div class="gr-msel gr-msel--gross">
     <label for="gr-modell">Gerät</label>
     <select id="gr-modell" data-vorgabe="{{ vorgabe }}">
+      {# F-5 (05.09.2026): DIESELBE Zaehlweise wie der Chart darunter -
+         `m.zeitreihe.anbieterzahl` kommt aus `geraete_tco_grafik.zeitreihe()`
+         und ist die Zahl, die auch dessen aria-label und `chrome`-Zeile
+         traegt (`geraete_verlauf.reihen_fuer_listungen`). Vorher stand hier
+         `m.anbieter_mit_zahl | length` - die Zahl der TCO-Buendel-Anbieter,
+         eine ANDERE Menge als die Preispunkte-Reihen der Zeitreihe. #}
       {% for m in geraete.tco.modelle %}
       <option value="{{ m.id }}"{% if m.id == vorgabe %} selected{% endif %}>{{
-        m.titel }} – {{ m.anbieter_mit_zahl | length }} Anbieter</option>
+        m.titel }} – {{ m.zeitreihe.anbieterzahl }} Anbieter</option>
       {% endfor %}
     </select>
     <span class="gr-a-klein">{{ geraete.tco.modelle_gesamt }} Geräte mit
