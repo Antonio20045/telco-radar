@@ -756,6 +756,25 @@
       {% for h in ("Amazon", "Expert", "Saturn") %}{{ haendlerkarte(h) }}{% endfor %}
     </div>
 
+    {% if not zr.hat_daten %}
+    {# BRIEF_RAHMEN2_R3 (05.09.2026): ohne Zeitreihen-Graph gibt es kein
+       `zr.linien` - die Aufklappung gehoert trotzdem in diesen Block, nur
+       NACH den Karten statt nach dem Graphen (der Platzhaltersatz oben
+       bleibt unveraendert). Beleg je Karte: Anbieter, die gerechnete
+       Bindung statt gemessener Punkte - es gibt noch keine Zeitreihe -,
+       und das Abrufdatum als Zeitraum. #}
+    <details class="gr-auf">
+      <summary>Wie gerechnet?</summary>
+      <ul class="gr-tposten">
+        {% for k in m.karten if k.belastbar %}
+        <li><span>{{ k.anbieter }}</span><em>{{ k.laufzeit }} {{ 'Monat' if
+          k.laufzeit == 1 else 'Monate' }}{% if k.abgerufen_am %} · {{
+          k.abgerufen_am | date_de }}{% endif %}</em></li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+
     {# G1 - servergerendert, ohne Bibliothek und ohne CDN. #}
     {% if m.svg %}
     <figure class="gr-grafik">

@@ -74,8 +74,14 @@ def test_wie_gerechnet_steht_hoechstens_einmal_je_modellblock(tmp_path):
     einmal je Modell unter dem Zeitreihen-Graph. Die obere ist ERSATZLOS
     gestrichen, die untere bleibt (sie ist beim Graphen richtig
     platziert): GENAU EINE Aufklappung dieses Namens je Modellblock, keine
-    ausserhalb."""
-    s = _baue(tmp_path)
+    ausserhalb.
+
+    BRIEF_RAHMEN2_R3 (05.09.2026): die Fixture traegt seitdem zusaetzlich
+    einen GRAPHLOSEN Block (`graphloses_modell=True`) - drei echte
+    Modellbloecke im Bestand haben keinen Zeitreihen-Graphen und trugen
+    deshalb GAR KEINE Aufklappung. `== 1` gilt seitdem fuer beide Arten
+    von Block."""
+    s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select_one("#gr-tco-wie") is None, \
         "die seitenweite 'Wie gerechnet?'-Aufklappung ist nicht mehr da"
@@ -104,6 +110,34 @@ def _ohne_details_ausser(tafel: BeautifulSoup, modellbloecke) -> str:
     for block in kopie.select(".gr-tmodell"):
         block.decompose()
     return kopie.get_text(" ")
+
+
+def test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung(tmp_path):
+    """BRIEF_RAHMEN2_R3 (05.09.2026): der Evaluator fand 3 von 59
+    Modellbloecken ohne Aufklappung, weil sie ohne Preishistorie keinen
+    Zeitreihen-Graphen haben und die Aufklappung im Template am Graphen
+    hing (`samsung-galaxy-s24-ultra-512`, `nothing-phone-4a-pro-128`,
+    `apple-iphone-16-pro-max-256`). Ihre Karten tragen trotzdem Zahlen -
+    dieselbe Aufklappung gehoert auch dort hin, nur nach den Karten statt
+    nach dem Graphen."""
+    s = _baue(tmp_path, graphloses_modell=True)
+    # `modell_schluessel(device_id, speicher)` aus SKU_GRAPHLOS
+    # ("apple-iphone-16-pro-max-256gb-schwarz"): Geraete-ID plus Speicher.
+    block = s.select_one('.gr-tmodell[data-modell="apple-iphone-16-pro-max-256"]')
+    assert block is not None, "der graphlose Block fehlt in der gerenderten Seite"
+    assert block.select_one("figure.gr-grafik--zeitreihe") is None, \
+        "der Test prueft nur einen Block ohne Zeitreihen-Graph"
+
+    wie_gerechnet = [d for d in block.select("details.gr-auf")
+                     if d.select_one("summary").get_text(strip=True)
+                     == "Wie gerechnet?"]
+    assert len(wie_gerechnet) == 1, \
+        f"graphloser Block: {len(wie_gerechnet)} Aufklappungen statt 1"
+
+    # Sie steht NACH den Karten, nicht davor - anders als beim Graphen.
+    kinder = [k for k in block.find_all(recursive=False)]
+    karten = block.select_one(".gr-karten")
+    assert kinder.index(karten) < kinder.index(wie_gerechnet[0])
 
 
 # --------------------------------------------------------------------------

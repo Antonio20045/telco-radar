@@ -112,3 +112,62 @@ zurückgesetzt, kein Inhalt geändert.
 
 Branch `openclaw/ticket-rahmen2`, nicht gemerged — PM merged nach
 Evaluator-PASS. A5.5/E-2, CI und `llm.py` unberührt.
+
+## R3 (05.09.2026, klein): die drei graphlosen Blöcke bekommen ihre Aufklappung
+
+Auftragsgrundlage: `BRIEF_RAHMEN2_R3.md`. Der Evaluator fand 3 von 59
+Modellblöcken **ohne** „Wie gerechnet?"-Aufklappung —
+`samsung-galaxy-s24-ultra-512`, `nothing-phone-4a-pro-128`,
+`apple-iphone-16-pro-max-256`. Ursache: die Aufklappung hing im Template
+am Zeitreihen-Graph (`{% if zr.hat_daten %}`); diesen drei Geräten fehlt
+jede Preishistorie (SKU ohne Listung, über den Katalog nachgetragen,
+F-R2-3), also `zr.hat_daten == False`, also gar keine Aufklappung — obwohl
+ihre Karten Zahlen tragen.
+
+**Umgesetzt** (`templates/geraete.html.j2`): im `{% else %}`-Zweig des
+Zeitreihen-Blocks bleibt der Platzhaltersatz „Für dieses Gerät liegt noch
+keine Preishistorie vor …" unverändert stehen; zusätzlich steht **nach dem
+`.gr-karten`-Block** (statt nach dem Graphen) eine zweite `{% if not
+zr.hat_daten %}`-geschützte `details.gr-auf`-Aufklappung mit
+`<summary>Wie gerechnet?</summary>`. Inhalt: eine Zeile je belastbarer
+Karte dieses Blocks — Anbieter · Monate (die gerechnete Bindung, da es
+noch keine gemessenen Preispunkte gibt) · Abrufdatum (`date_de`). Kein
+CSS geändert — `gr-auf`/`gr-tposten` sind dieselben Klassen wie bei der
+graphtragenden Fassung.
+
+**Tests** (`tests/test_geraete_tco_zustand.py`, `tests/test_geraete_rahmen.py`):
+die gemeinsame Fixture `_baue()` bekommt einen neuen, standardmäßig
+ausgeschalteten Parameter `graphloses_modell` (kein bestehender Aufrufer
+ändert sein Ergebnis). Eingeschaltet hängt sie ein zweites Buendel an
+(`SKU_GRAPHLOS = apple-iphone-16-pro-max-256gb-schwarz` — derselbe Slug
+wie einer der drei echten Fälle) **ohne** Listung in `geraete_db.json` und
+**ohne** Preishistorie-Zeile — genau der reale Mechanismus (F-R2-3:
+`geraet_aus_sku()` löst die SKU über den Katalog auf, `belastbar` hängt
+nur an der Buendel-Rechnung, nicht an der Listung).
+`test_wie_gerechnet_steht_hoechstens_einmal_je_modellblock` läuft jetzt
+mit `graphloses_modell=True` — die Schleife über alle `.gr-tmodell`-Blöcke
+prüft `== 1` seitdem für BEIDE Blockarten. Neuer Test
+`test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung`:
+sucht gezielt den graphlosen Block (`figure.gr-grafik--zeitreihe` fehlt),
+prüft genau eine Aufklappung und dass sie NACH `.gr-karten` steht (nicht
+davor, wie es beim Graphen der Fall wäre).
+
+**Gegenprobe am echten Bestand:** `grep -c '<summary>Wie gerechnet?</summary>'`
+→ **59** (vorher 56), `grep -c 'gr-grafik--zeitreihe'` → **56** unverändert.
+Alle drei genannten SKUs einzeln mit BeautifulSoup nachgemessen: kein
+Zeitreihen-Graph, genau eine Aufklappung, Position nach `.gr-karten`.
+
+**Suite:** `PYTHONPATH=src /opt/homebrew/bin/python3 -m pytest -q` →
+**2 failed / 2698 passed / 14 skipped** (245,1 s) — dieselben zwei
+vorbestehenden Promo-Screenshot-Fehlschläge wie im Maßstab des Auftrags,
+ein neuer grüner Test gegenüber dem Stand davor (2697 → 2698 passed).
+
+**Site:** `render_site(site, reports, load_config(root))` neu ausgeführt.
+`git diff --stat`: `site/geraete.html` (148 Zeilen, die drei betroffenen
+Blöcke), `site/data/keyword-index.json` (reine Datums-Zeitbombe) mit
+`git checkout --` zurückgesetzt. Kein `style.css`-Diff — es wurden nur
+bestehende Klassen wiederverwendet.
+
+**Commit:** ein fokussierter Commit (Template + Tests + Site) auf
+`openclaw/ticket-rahmen2`, gepusht. Nicht gemerged — PM merged nach
+Evaluator-PASS.

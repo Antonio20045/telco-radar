@@ -46,6 +46,12 @@ SKU_NEU = "apple-iphone-15-128gb-schwarz"
 SKU_ERNEUERT = "apple-iphone-15-128gb-schwarz-refurbished"
 HEUTE = "2026-09-04"
 
+# BRIEF_RAHMEN2_R3 (05.09.2026): ein zweites Modell OHNE Listung in
+# `geraete_db.json` und OHNE Preishistorie - ueber den Katalog nachgetragen
+# (F-R2-3), belastbare Karte, aber `zeitreihe.hat_daten == False`. Derselbe
+# Slug wie einer der drei echten graphlosen Bloecke im Bestand.
+SKU_GRAPHLOS = "apple-iphone-16-pro-max-256gb-schwarz"
+
 
 # --------------------------------------------------------------------------
 # Bausteine
@@ -287,12 +293,25 @@ def _speicherform(b: Buendel) -> dict:
 
 
 def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
-          punkte: list | None = None) -> BeautifulSoup:
+          punkte: list | None = None,
+          graphloses_modell: bool = False) -> BeautifulSoup:
     """`punkte` ersetzt die Preishistorie - `test_geraete_preis_mehrdeutig`
-    stellt darueber Tage mit zwei Preisen derselben Listung."""
+    stellt darueber Tage mit zwei Preisen derselben Listung.
+
+    `graphloses_modell` (BRIEF_RAHMEN2_R3, 05.09.2026) haengt ein zweites
+    Buendel (SKU_GRAPHLOS) an, dem keine Listung und keine Preishistorie
+    gegenuebersteht - derselbe Fall wie bei den drei echten Bloecken ohne
+    Zeitreihen-Graph. Default False: kein bestehender Aufrufer von `_baue`
+    aendert sein Ergebnis."""
     root = tmp_path / ("mit" if erneuert else "ohne")
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
+    katalog = _KATALOG
+    if graphloses_modell:
+        katalog = {"geraete": _KATALOG["geraete"] + [
+            {"hersteller": "Apple", "modell": "iPhone 16 Pro Max",
+             "generation": 16, "marktstart": "2024-09-20", "speicher": [256],
+             "segment": "premium"}]}
+    for name, daten in (("geraete_katalog.yaml", katalog),
                         ("farben.yaml", _FARBEN),
                         ("geraete_quellen.yaml", _QUELLEN)):
         (root / "config" / name).write_text(
@@ -316,6 +335,12 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
     buendel = [_buendel(SKU_NEU, 20.0, zustand="neu")]
     if erneuert:
         buendel.append(_buendel(SKU_ERNEUERT, 17.0, zustand="refurbished"))
+    if graphloses_modell:
+        # Bewusst KEINE Listung in `geraete_db.json` und KEIN Punkt in
+        # `geraete_preise.jsonl` fuer dieses Geraet - `geraet_aus_sku()`
+        # loest es trotzdem ueber den Katalog auf (F-R2-3), die Karte
+        # rechnet, aber `listungen_je_modell` bleibt fuer diese ID leer.
+        buendel.append(_buendel(SKU_GRAPHLOS, 20.0, zustand="neu"))
     (state / "geraete_tco.json").write_text(json.dumps({
         "updated": HEUTE, "buendel": [_speicherform(b) for b in buendel],
         "sim_only": [{"id": r.id, "anbieter": r.anbieter,
