@@ -647,6 +647,37 @@
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.titel }}</h3>
+
+    {# --- 2. Der Zeitreihen-Block: der neue Hauptgraph ------------------
+           BRIEF_ZEITREIHE (05.09.2026). Er steht UEBER den Balkenbloecken
+           und ersetzt sie nicht (Kriterium 4) - im Stil der gebilligten
+           Skizze: kein Fliesstext ausser der EINEN Chart-Chrome-Zeile
+           (Kriterium 3), servergerendertes SVG wie G1/G2, keine
+           Bibliothek. Die Belege stehen hinter dem Aufklapper darunter
+           (Kriterium 5), nicht neben der Grafik. #}
+    {% set zr = m.zeitreihe %}
+    {% if zr.hat_daten %}
+    <figure class="gr-grafik gr-grafik--zeitreihe">
+      {{ zr.svg | safe }}
+      <figcaption class="gr-g0-chrome">{{ zr.chrome }}</figcaption>
+    </figure>
+    <details class="gr-auf">
+      <summary>Wie gerechnet?</summary>
+      <ul class="gr-tposten">
+        {% for l in zr.linien %}
+        <li><span>{{ l.anbieter }}</span><em>{{ l.punkte }} {{ 'Punkt' if
+          l.punkte == 1 else 'Punkte' }}{% if l.von != l.bis %} · {{ l.von_de
+          }} bis {{ l.bis_de }}{% else %} · {{ l.von_de }}{% endif
+          %}</em></li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% else %}
+    <p class="gr-erklaer gr-basis--duenn">Für dieses Gerät liegt noch keine
+    Preishistorie vor – die Zeitreihe entsteht, sobald ein zweiter Lauf
+    einen Preis dieses Geräts sieht.</p>
+    {% endif %}
+
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert
       %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
       %} · davon {{ m.zustand_offen }} ohne belegten Zustand{% endif %}{% if m.spanne %} ·

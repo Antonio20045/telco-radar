@@ -47,6 +47,7 @@ from __future__ import annotations
 import logging
 
 from . import geraete_tco_grafik, geraete_tco_karten, geraete_vergleich
+from . import geraete_verlauf
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
 from ..tarif_model import PREISTYP_LIVE_SHOP
@@ -648,12 +649,27 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
 
     modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
                                          tarife, katalog)
+
+    # DER ZEITREIHEN-BLOCK (BRIEF_ZEITREIHE, 05.09.2026) - der neue
+    # Hauptgraph ueber den Balkenbloecken. Er braucht die LISTUNGEN je
+    # Modell, nicht die Buendel - deshalb einmal vorab gruppiert, statt je
+    # Modell erneut ueber `eintraege` zu laufen.
+    listungen_je_modell: dict[str, list] = {}
+    for e in eintraege:
+        mid = geraete_tco_karten.modell_schluessel(e.get("device_id"),
+                                                    e.get("speicher_gb"))
+        listungen_je_modell.setdefault(mid, []).append(e)
+
     for modell in modelle["modelle"]:
         # Die Grafik rechnet NUR Geometrie: die Betraege stehen schon in
         # den Karten, und zwei Rechnungen fuer dieselbe Zahl waeren zwei
         # Zahlen.
         modell["svg"] = geraete_tco_grafik.balken(modell)
         modell["legende"] = geraete_tco_grafik.legende(modell)
+        reihen = geraete_verlauf.reihen_fuer_listungen(
+            listungen_je_modell.get(modell["id"], []), historie
+        ) if historie is not None else []
+        modell["zeitreihe"] = geraete_tco_grafik.zeitreihe(reihen)
 
     reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
               if historie is not None else [])

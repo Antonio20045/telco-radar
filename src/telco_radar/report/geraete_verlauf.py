@@ -282,6 +282,25 @@ def _reihen(punkte: list) -> list[dict]:
     return reihen
 
 
+def reihen_fuer_listungen(listungen: list, historie) -> list[dict]:
+    """Reihen EINER Listungsmenge - der gemeinsame Weg fuer Reiter 3 UND den
+    Zeitreihen-Block der Hauptansicht (BRIEF_ZEITREIHE, 05.09.2026).
+
+    Dieselbe Filterung wie `geraete_mit_verlauf`: nur Neugeraete mit
+    Barpreis. Ein Gebrauchtpreis und ein Neupreis in derselben Linie waeren
+    zwei Produkte, und ein Sprung dazwischen saehe aus wie ein Preissturz.
+
+    Die Aufrufer geben schon eine auf EIN Geraet eingegrenzte Menge herein
+    (Reiter 3 gruppiert nach (device_id, speicher_gb), der Zeitreihen-Block
+    nach `geraete_tco_karten.modell_schluessel`); diese Funktion rechnet
+    nur noch die Reihen daraus, nicht die Gruppierung.
+    """
+    passende = [e for e in listungen
+                if (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+                and e.get("preis_ohne_vertrag") is not None]
+    return _reihen(_punkte(passende, historie))
+
+
 def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
     """Je (Modell, Speicher) ein waehlbares Geraet mit seinen Reihen.
 

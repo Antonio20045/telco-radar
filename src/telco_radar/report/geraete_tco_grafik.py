@@ -280,6 +280,218 @@ def legende(modell: dict) -> list:
 
 
 # --------------------------------------------------------------------------
+# G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026)
+# --------------------------------------------------------------------------
+#
+# Der Hauptgraph der Hauptansicht: je gewaehltem Geraet eine Linie je
+# Anbieter, Gerätepreis ueber die Zeit. Anders als G2 (Marktueberblick
+# ueber ALLE Modelle, gedeckelt auf fuenf bewegte Reihen) zeigt dieser Graph
+# GENAU EIN Geraet mit ALLEN seinen Anbietern (bis `MAX_LINIEN` aus
+# `geraete_verlauf`, Vodafone nie verdraengt) - dieselbe Aufgabenteilung wie
+# zwischen G1 (ein Geraet) und der Alarmtabelle (der ganze Markt).
+
+G0_BREITE = 1180
+G0_HOEHE = 300
+G0_LINKS = 76
+G0_UNTEN = 34
+G0_OBEN = 16
+G0_RECHTS = 210
+
+# Ab wie vielen Tagen zwischen zwei aufeinanderfolgenden Messpunkten
+# DERSELBEN Linie aus einer Verbindung eine SAMMELLUECKE wird. Die
+# Sammlung laeuft taeglich (der bestaetigte Punkt haengt sich an
+# `last_verified` jedes Laufs); ein bestaetigter Preis, der zwei bis fuenf
+# Tage keine neue Zeile schreibt, ist normale Kadenz - eine Woche ganz ohne
+# jede Bestaetigung ist keine Verzoegerung mehr, sondern ein Ausfall der
+# Sammlung. Am gemessenen Bestand (05.09.2026) unterscheidet das die
+# echten Luecken (19 Tage) sauber von den kurzen Abstaenden derselben
+# Woche (2 bis 5 Tage) - mit jeder Schwelle zwischen zwei und achtzehn
+# Tagen waere das Ergebnis heute gleich, aber diese ist die, die eine
+# Woche ganz ohne Bestaetigung als das behandelt, was sie ist.
+G0_LUECKE_TAGE = 7
+
+
+def _tage_dieses_geraets(reihen: list) -> list:
+    """Alle Tage, an denen IRGENDEIN Anbieter dieses Geraets einen Preis
+    zeigt - fuer die Chart-Chrome-Zeile UND die Luecken-Markierung."""
+    tage = set()
+    for r in reihen:
+        for p in r.get("punkte") or []:
+            tag = _tag(p.get("datum"))
+            if tag is not None:
+                tage.add(tag)
+    return sorted(tage)
+
+
+def _luecken(tage: list, schwelle: int = G0_LUECKE_TAGE) -> list:
+    """Die Intervalle zwischen zwei Messtagen dieses Geraets, die weiter
+    auseinanderliegen als `schwelle` Tage - fuer die Schattierung im Bild."""
+    return [(a, b) for a, b in zip(tage, tage[1:])
+            if (b - a).days > schwelle]
+
+
+def zeitreihe(reihen: list) -> dict:
+    """G0: Gerätepreis über die Zeit, je Anbieter, fuer EIN gewaehltes
+    Geraet - der neue Hauptgraph ueber den Balkenbloecken.
+
+    `reihen` kommt aus `geraete_verlauf.reihen_fuer_listungen()` und ist
+    schon auf EIN Geraet eingegrenzt; diese Funktion rechnet nur noch
+    Geometrie (Regel 1 des Modulkopfs).
+
+    Die drei Regeln des Auftrags:
+      1. Eine Linie nur ab zwei Messpunkten; EIN Punkt bleibt ein Punkt -
+         hier wird nichts erfunden, um daraus eine Linie zu machen.
+      2. Ehrliche Achse: `von`/`bis` sind der echte erste und letzte
+         Messtag DIESES Geraets, proportional zur echten Kalenderzeit -
+         eine Sammelluecke bleibt darin leerer Raum. Ueberspringt eine
+         Linie selbst eine Luecke (`G0_LUECKE_TAGE`), wird sie NICHT
+         durchgezogen: der Lauf endet, ein neuer beginnt.
+      3. Kein Fliesstext hier - die Chart-Chrome-Zeile baut die Vorlage aus
+         `messtage`/`seit`, dieses Modul liefert nur die zwei Zahlen.
+    """
+    tage = _tage_dieses_geraets(reihen)
+    if not tage:
+        return {"svg": "", "hat_daten": False, "messtage": 0, "seit": "",
+                "bis": "", "linien": [], "chrome": ""}
+
+    luecken = _luecken(tage)
+    von, bis = tage[0], tage[-1]
+    spanne_tage = max(1, (bis - von).days)
+
+    alle_preise = [p["preis"] for r in reihen for p in (r.get("punkte") or [])]
+    tief, hoch = min(alle_preise), max(alle_preise)
+    if hoch <= tief:
+        hoch = tief + 1.0
+    # Etwas Luft nach oben und unten - dieselbe Rechnung wie G2, damit kein
+    # Punkt auf der Achse klebt.
+    polster = (hoch - tief) * 0.12
+    tief, hoch = tief - polster, hoch + polster
+
+    def x(tag: date) -> float:
+        breite = G0_BREITE - G0_LINKS - G0_RECHTS
+        return round(G0_LINKS + (tag - von).days / spanne_tage * breite, 1)
+
+    def y(preis: float) -> float:
+        hoehe = G0_HOEHE - G0_OBEN - G0_UNTEN
+        return round(G0_HOEHE - G0_UNTEN
+                     - (preis - tief) / (hoch - tief) * hoehe, 1)
+
+    teile = [
+        f'<svg class="gr-g0" viewBox="0 0 {G0_BREITE} {G0_HOEHE}" '
+        f'width="100%" height="{G0_HOEHE}" role="img" '
+        f'aria-label="Gerätepreis über die Zeit, {len(reihen)} Anbieter, '
+        f'{_t(von.isoformat())} bis {_t(bis.isoformat())}">',
+        f'<title>Gerätepreis über die Zeit, {_t(von.isoformat())} bis '
+        f'{_t(bis.isoformat())}</title>',
+    ]
+
+    # Y-Achse: fuenf Marken, dieselbe Rundungsregel wie G2.
+    marken = [tief + (hoch - tief) * i / 4 for i in range(5)]
+    genau = len({f"{m:.0f}" for m in marken}) < len(marken)
+    for marke in marken:
+        yy = y(marke)
+        beschriftung = (f"{marke:.2f}".replace(".", ",") if genau
+                        else f"{marke:.0f}")
+        teile.append(f'<line class="gr-g0-raster" x1="{G0_LINKS}" y1="{yy}" '
+                     f'x2="{G0_BREITE - G0_RECHTS}" y2="{yy}" />'
+                     f'<text class="gr-g0-achse" x="{G0_LINKS - 8}" '
+                     f'y="{yy + 4}" text-anchor="end">{beschriftung} €</text>')
+
+    # X-Achse: Wochenraster kurzfristig, Monatsraster ab drei Monaten -
+    # dieselbe Regel wie G2.
+    schritt = 7 if spanne_tage <= 92 else 30
+    marke = von
+    gesetzt = []
+    while marke <= bis:
+        gesetzt.append(marke)
+        marke = marke + timedelta(days=schritt)
+    if bis not in gesetzt and (bis - gesetzt[-1]).days > schritt // 3:
+        gesetzt.append(bis)
+    for tag in gesetzt:
+        teile.append(f'<line class="gr-g0-raster gr-g0-raster--x" '
+                     f'x1="{x(tag)}" y1="{G0_OBEN}" x2="{x(tag)}" '
+                     f'y2="{G0_HOEHE - G0_UNTEN}" />'
+                     f'<text class="gr-g0-achse" x="{x(tag)}" '
+                     f'y="{G0_HOEHE - 12}" text-anchor="middle">'
+                     f'{tag.strftime("%d.%m.")}</text>')
+
+    # Die Sammelluecke bekommt ein Feld im Bild - sonst ist der leere Raum
+    # zwischen zwei Rasterlinien nicht von einer ruhigen Woche zu
+    # unterscheiden.
+    for lo, hi in luecken:
+        x1, x2 = x(lo), x(hi)
+        teile.append(f'<rect class="gr-g0-luecke" x="{x1}" y="{G0_OBEN}" '
+                     f'width="{x2 - x1:.1f}" '
+                     f'height="{G0_HOEHE - G0_OBEN - G0_UNTEN}">'
+                     f'<title>Sammellücke {_t(lo.strftime("%d.%m.%Y"))} bis '
+                     f'{_t(hi.strftime("%d.%m.%Y"))} – in dieser Zeit liegt '
+                     f'kein Messpunkt vor.</title></rect>')
+
+    linien = []
+    for nr, reihe in enumerate(reihen):
+        slug = anbieter_slug(reihe["anbieter"])
+        punkte = sorted(
+            ((t, p["preis"]) for p in (reihe.get("punkte") or [])
+             for t in [_tag(p.get("datum"))] if t is not None),
+            key=lambda tb: tb[0])
+        if not punkte:
+            continue
+
+        # In LAEUFE zerlegen: getrennt an jeder Luecke DIESER Linie - Regel
+        # 2 des Modulkopfs ("Linien enden und beginnen neu"). Gerechnet wird
+        # gegen den Abstand der Linie SELBST, nicht gegen die Luecken des
+        # ganzen Geraets: ein Anbieter, der zwischen zwei eigenen Punkten
+        # laenger schweigt als `G0_LUECKE_TAGE`, hat fuer diese Spanne
+        # keinen Beleg - unabhaengig davon, ob ein anderer Anbieter in der
+        # Zwischenzeit gemessen wurde.
+        laeufe = [[punkte[0]]]
+        for (t0, _), (t1, b1) in zip(punkte, punkte[1:]):
+            if (t1 - t0).days > G0_LUECKE_TAGE:
+                laeufe.append([])
+            laeufe[-1].append((t1, b1))
+
+        for lauf in laeufe:
+            if len(lauf) >= 2:
+                pfad = " ".join(f"{'M' if i == 0 else 'L'}{x(t)} {y(b)}"
+                                for i, (t, b) in enumerate(lauf))
+                teile.append(f'<path class="gr-g0-linie gr-anb--{slug}" '
+                             f'd="{pfad}" fill="none" />')
+            einzeln = len(lauf) == 1
+            for t, b in lauf:
+                klasse = "gr-g0-punkt" + (" gr-g0-punkt--einzeln"
+                                          if einzeln else "")
+                teile.append(
+                    f'<circle class="{klasse} gr-anb--{slug}" cx="{x(t)}" '
+                    f'cy="{y(b)}" r="{"5" if einzeln else "4"}">'
+                    f'<title>{_t(reihe["anbieter"])} · '
+                    f'{t.strftime("%d.%m.%Y")}: {euro(b)}</title></circle>')
+
+        teile.append(
+            f'<text class="gr-g0-legende gr-anb--{slug}" '
+            f'x="{G0_BREITE - G0_RECHTS + 12}" y="{22 + nr * 20}">'
+            f'{_t(reihe["anbieter"])}</text>')
+        linien.append({"anbieter": reihe["anbieter"], "farbe": reihe["farbe"],
+                       "eigen": reihe["eigen"], "punkte": len(punkte),
+                       "von": punkte[0][0].isoformat(),
+                       "bis": punkte[-1][0].isoformat(),
+                       "von_de": punkte[0][0].strftime("%d.%m.%Y"),
+                       "bis_de": punkte[-1][0].strftime("%d.%m.%Y")})
+
+    teile.append('</svg>')
+    # DIE CHART-CHROME-ZEILE ENTSTEHT HIER UND NICHT IN DER VORLAGE - eine
+    # einzige Zeichenkette statt einer Rechnung aus Datumsfiltern im
+    # Template, damit kein zweiter Ort je einen abweichenden Wortlaut
+    # erzeugen kann (Kriterium 3 des Auftrags: "kein Fliesstext" ausser
+    # GENAU diesem einen Satz).
+    chrome = (f"Sammlung läuft · {len(tage)} "
+             f"{'Messtag' if len(tage) == 1 else 'Messtage'} · "
+             f"seit {von.strftime('%d.%m.%Y')}")
+    return {"svg": "".join(teile), "hat_daten": True, "messtage": len(tage),
+            "seit": von.isoformat(), "bis": bis.isoformat(), "linien": linien,
+            "chrome": chrome}
+
+
+# --------------------------------------------------------------------------
 # G2 - die Preishistorie
 # --------------------------------------------------------------------------
 
