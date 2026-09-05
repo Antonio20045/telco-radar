@@ -427,6 +427,11 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # (o2s Medientyp, Vodafones oeffentlicher Browser-Schluessel), brauchen
     # eine Attrappe mit zweitem Parameter.
     kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
+    # Derselbe Gedanke fuer den User-Agent (BRIEF_SATURN_ADAPTER_R2): NUR
+    # wenn der Anbieter ihn ueberschreibt (Saturn), bekommt `hole()`
+    # ueberhaupt ein drittes Argument - jede bestehende Testattrappe mit
+    # `hole(url)` oder `hole(url, kopfzeilen=None)` bleibt gueltig.
+    user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
 
     def _hole(url: str) -> str:
         darf, grund = waechter.darf(url, jetzt)
@@ -437,7 +442,12 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             time.sleep(warte)
         letzter_abruf[0] = time.monotonic()
         bilanz.besucht.append(url)
-        status, text = hole(url, kopfzeilen) if kopfzeilen else hole(url)
+        kwargs = {}
+        if kopfzeilen:
+            kwargs["kopfzeilen"] = kopfzeilen
+        if user_agent:
+            kwargs["user_agent"] = user_agent
+        status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}")
         return text

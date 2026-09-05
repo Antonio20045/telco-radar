@@ -116,6 +116,17 @@ class Anbieter:
     # steht in der jeweils eigenen oeffentlichen Seite, es ist kein Geheimnis
     # und keine Umgehung.
     kopfzeilen: dict = field(default_factory=dict)
+    # Ein PER-ANBIETER-UEBERSCHREIBER fuer den User-Agent, leer = das
+    # globale `http_cfg` (config/settings.yaml, Antonios Entscheidung E-1)
+    # gilt wie ueberall sonst. Gebaut fuer Saturn (BRIEF_SATURN_ADAPTER_R2,
+    # 05.09.2026, Evaluator-Befund an R1): die globale Chrome-Kennung ging
+    # dort als PRIMARY hinaus, obwohl der Bericht eine ehrliche Kennung
+    # behauptete - eine Konfigurationszeile, die NUR diesen einen Anbieter
+    # betrifft, statt der globalen `settings.yaml`, die Antonio vorbehalten
+    # bleibt. `collect.geraete.sammle_anbieter` reicht den Wert an
+    # `hole()` weiter, das daraus ein eigenes `http_cfg` fuer GENAU diese
+    # Abrufe baut - `fetch()` selbst bleibt unveraendert aufgerufen.
+    user_agent: str = ""
     einstiege: list = field(default_factory=list)
 
     @property
@@ -345,6 +356,7 @@ def lade_quellen(root: Path) -> QuellenConfig:
             hinweis=str(a.get("hinweis") or "").strip(),
             kopfzeilen={str(k): str(v) for k, v in
                         (a.get("kopfzeilen") or {}).items()},
+            user_agent=str(a.get("user_agent") or "").strip(),
             einstiege=einstiege,
         ))
     return QuellenConfig(anbieter=out)

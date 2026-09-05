@@ -234,10 +234,12 @@ def test_landet_als_listung_im_bestand(katalog, farben, iphone17pro_html,
     anbieter.rate_limit_sekunden = 0
 
     seiten = {_URL_17_PRO: iphone17pro_html, _URL_17: iphone17_html}
+    gesehene_user_agents = []
 
-    def hole(url, kopfzeilen=None):
+    def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /api/v1/msg\n")
+        gesehene_user_agents.append(user_agent)
         return (200, seiten[url])
 
     bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-05",
@@ -253,6 +255,13 @@ def test_landet_als_listung_im_bestand(katalog, farben, iphone17pro_html,
     assert treffer.confidence == "hoch"
     assert treffer.abgerufen_am == "2026-09-05"
     assert treffer.quelle_url.startswith("https://www.saturn.de/de/product/")
+    # R2-Regressionstest (EVAL_saturn-adapter-r1.md Befund 1): der
+    # Anbieter reicht seine ehrliche Kennung an JEDEN Markenseiten-Abruf
+    # weiter - unabhaengig davon, was `http_cfg` global traegt (das ist
+    # hier `hole()`s Sache, siehe test_saturn_ua_ist_primary_auch_bei_
+    # globaler_chrome_konfiguration unten fuer die Kopfzeilenprobe).
+    assert gesehene_user_agents == [
+        "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"] * 2
 
 
 def test_ist_direkt_und_ohne_ernte_registriert():
@@ -272,6 +281,141 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
     assert anbieter.grund == ""
     assert "05.09.2026" in anbieter.hinweis
     assert "isProductOfTypeMarketplace" in anbieter.hinweis
+    # R2 (EVAL_saturn-adapter-r1.md Befund 1): die ausgelieferte
+    # Konfiguration traegt die per-Anbieter-Kennung, unabhaengig davon, was
+    # config/settings.yaml global sagt.
+    assert anbieter.user_agent == \
+        "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     # Start-Scope laut Auftrag: alle Apple-iPhone-Serien des Katalogs.
     assert len(anbieter.einstiege) == 17
     assert all("/de/brand/apple/iphone/" in e.url for e in anbieter.einstiege)
+
+
+# ==========================================================================
+# R2: die ehrliche Kennung als PRIMARY - der belegte UA auf Kopfzeilenebene
+# ==========================================================================
+# EVAL_saturn-adapter-r1.md Befund 1 (Schwere 1): R1 behauptete im Bericht,
+# `collect.http.fetch` sende `TelcoRadar/1.0 (+https://telco-radar.
+# onrender.com/ueber)` - tatsaechlich ging als PRIMARY die volle
+# Chrome-Vortaeuschung aus config/settings.yaml:549 hinaus, weil der Adapter
+# das globale `http_cfg` unveraendert benutzte. Diese Tests messen die
+# WIRKLICH GESENDETE Kopfzeile auf httpx-Ebene, nicht nur, was der Code
+# behauptet zu tun - genau der Punkt, an dem R1 widerlegt wurde.
+
+_CHROME_UA_R1 = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+_EHRLICHE_UA = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+
+
+def _fake_response(status_code=200, text="<html></html>"):
+    import httpx as _httpx
+
+    request = _httpx.Request("GET", "https://www.saturn.de/de/brand/apple/iphone/iphone-17")
+    response = _httpx.Response(status_code, text=text, request=request)
+    return response
+
+
+def test_saturn_ua_ist_primary_auch_bei_globaler_chrome_konfiguration(monkeypatch):
+    """Genau der R1-Fall: `http_cfg` traegt global die Chrome-Kennung aus
+    config/settings.yaml (hier nachgebaut, nicht die Datei selbst, damit der
+    Test nicht an ihr haengt) - und trotzdem muss die ERSTE (Primary)
+    ausgehende Kopfzeile fuer Saturn die Brief-UA-Zeichenkette tragen."""
+    import httpx
+
+    from telco_radar.geraete_pipeline import _hole_fabrik
+
+    gesehene_kopfzeilen = []
+
+    def fake_get(url, timeout=None, headers=None, follow_redirects=None,
+                verify=None):
+        gesehene_kopfzeilen.append(dict(headers or {}))
+        return _fake_response()
+
+    monkeypatch.setattr(httpx, "get", fake_get)
+
+    # Das globale http_cfg, wie es aus config/settings.yaml kommt - Chrome,
+    # exakt der Wert, den der Evaluator gegen R1 nachgemessen hat.
+    http_cfg = {"user_agent": _CHROME_UA_R1}
+    hole = _hole_fabrik(http_cfg)
+
+    status, _text = hole(
+        "https://www.saturn.de/de/brand/apple/iphone/iphone-17",
+        user_agent=_EHRLICHE_UA)
+
+    assert status == 200
+    assert len(gesehene_kopfzeilen) == 1, \
+        "ein 200er darf keinen zweiten (Fallback-)Versuch ausloesen"
+    primary_header = gesehene_kopfzeilen[0]["User-Agent"]
+    assert primary_header == _EHRLICHE_UA
+    assert primary_header != _CHROME_UA_R1
+
+
+def test_ohne_per_anbieter_override_bleibt_das_globale_http_cfg_primary(monkeypatch):
+    """Gegenprobe: OHNE `user_agent`-Override (jeder andere Anbieter) sendet
+    `hole()` weiterhin genau das globale `http_cfg` als Primary - die
+    Fallback-Architektur ist unangetastet, nur Saturn bekommt die
+    Ausnahme."""
+    import httpx
+
+    from telco_radar.geraete_pipeline import _hole_fabrik
+
+    gesehene_kopfzeilen = []
+
+    def fake_get(url, timeout=None, headers=None, follow_redirects=None,
+                verify=None):
+        gesehene_kopfzeilen.append(dict(headers or {}))
+        return _fake_response()
+
+    monkeypatch.setattr(httpx, "get", fake_get)
+
+    http_cfg = {"user_agent": _CHROME_UA_R1}
+    hole = _hole_fabrik(http_cfg)
+
+    status, _text = hole("https://www.example.de/irgendeine-produktseite")
+
+    assert status == 200
+    assert gesehene_kopfzeilen[0]["User-Agent"] == _CHROME_UA_R1
+
+
+def test_saturn_anbieter_reicht_seine_ehrliche_kennung_bis_zur_kopfzeile(monkeypatch):
+    """Der ganze Weg von der ausgelieferten Konfiguration bis zur
+    httpx-Kopfzeile, ohne Testattrappe dazwischen: `sammle_anbieter` mit dem
+    ECHTEN Saturn-Anbieter und dem ECHTEN `_hole_fabrik(http_cfg)` - das
+    globale `http_cfg` traegt Chrome (der R1-Fall), die Markenseite
+    antwortet trotzdem mit der ehrlichen Kennung als Primary."""
+    import httpx
+
+    from telco_radar.geraete_config import lade_quellen
+    from telco_radar.geraete_pipeline import _hole_fabrik
+
+    anbieter = lade_quellen(_WURZEL).nach_name("Saturn")
+    anbieter.einstiege = [e for e in anbieter.einstiege if e.url == _URL_17]
+    anbieter.rate_limit_sekunden = 0
+
+    gesehene_kopfzeilen = []
+
+    def fake_get(url, timeout=None, headers=None, follow_redirects=None,
+                verify=None):
+        gesehene_kopfzeilen.append(dict(headers or {}))
+        if url.endswith("/robots.txt"):
+            return _fake_response(200, "User-agent: *\nDisallow: /api/v1/msg\n")
+        return _fake_response(200, ('<script>window.__PRELOADED_STATE__ = '
+                                    '{"apolloState": {}};</script>'))
+
+    monkeypatch.setattr(httpx, "get", fake_get)
+
+    hole = _hole_fabrik({"user_agent": _CHROME_UA_R1})
+    bilanz = sammle_anbieter(anbieter, katalog=None, farben={}, hole=hole,
+                             heute="2026-09-05",
+                             waechter=RobotsWaechter(hole=hole),
+                             jetzt=datetime(2026, 9, 5, 12, tzinfo=timezone.utc))
+
+    assert bilanz.status == "leer"          # leere Apollo-State, kein Fehler
+    assert len(gesehene_kopfzeilen) == 2    # robots.txt + eine Markenseite
+    # Robots.txt-Abruf UND Markenseiten-Abruf: robots.txt geht ueber die
+    # unveraenderte, globale Konfiguration (Chrome bleibt dort Primary -
+    # dieselbe Bewusstheit wie bei `kopfzeilen`, siehe Modulkopf von
+    # `collect/geraete/__init__.py`), die Markenseite bekommt die ehrliche
+    # Kennung.
+    assert gesehene_kopfzeilen[0]["User-Agent"] == _CHROME_UA_R1   # robots.txt
+    assert gesehene_kopfzeilen[1]["User-Agent"] == _EHRLICHE_UA    # Markenseite

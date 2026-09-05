@@ -130,6 +130,15 @@ anbieter:
     # 34s, aber dieses Radar fragt hier einen Cloudflare-Host ab, keine
     # Presse-Feeds. Dieselbe konservative Haltung wie bei Telekom.
     rate_limit_sekunden: 10
+    # PER-ANBIETER-UEBERSCHREIBER des User-Agent (BRIEF_SATURN_ADAPTER_R2,
+    # 05.09.2026, EVAL_saturn-adapter-r1.md Befund 1): R1 behauptete diese
+    # Kennung im Bericht, sendete aber PRIMAER die Chrome-Vortaeuschung aus
+    # config/settings.yaml:549 - der Evaluator hat das an den echten
+    # Kopfzeilen widerlegt. Diese Zeile erzwingt die ehrliche Kennung als
+    # Primary NUR fuer Saturn, ohne die globale settings.yaml anzufassen
+    # (E-1 bleibt Antonios Entscheidung). Der 200er-Erfolg der 6 liefernden
+    # Markenseiten steht damit nicht mehr auf einer Chrome-Vortaeuschung.
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     # `grund` ist gestrichen: das Feld beantwortet "warum NICHT aktiv", und
     # die Frage stellt sich seit dem 05.09.2026 nicht mehr (siehe Spike
     # outputs/saturn-spike-2026-09-05.md und die Produktivmessung im
