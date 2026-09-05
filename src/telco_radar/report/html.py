@@ -85,6 +85,21 @@ def _fmt_monat_de(iso_monat: str) -> str:
         return iso_monat
 
 
+def _redaktion_ausfall_ctx(report: dict) -> dict | None:
+    """Fuer eine Runde ohne bewertete Meldung (E3B): der Vorlage fertig
+    formatierte Angaben mitgeben, statt Datumsrechnung in Jinja zu treiben.
+
+    `pipeline.run()` traegt das Feld nur ein, wenn es selbst die letzte
+    gueltige Redaktion uebernommen hat (siehe
+    analyze/redaktion_kontinuitaet.py) - hier wird es nur noch angezeigt.
+    """
+    ausfall = report.get("redaktion_ausfall")
+    if not ausfall:
+        return None
+    return {"stand_de": _fmt_date_de(ausfall.get("stand", "")),
+            "grund": ausfall.get("grund", "")}
+
+
 def _env() -> Environment:
     # "j2" MUSS in der Liste stehen. select_autoescape() sieht nur die LETZTE
     # Dateiendung an, und jede Vorlage hier heisst "*.html.j2" - mit
@@ -1343,8 +1358,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
                             _faden(highlights, _fuehrende_saetze(briefing_md)),
                             belegt=[h.get("url") for h in kurzpfad])
         competitors = _prep_competitors(report)
-        wochen.append({"date": report["date"], "highlights": highlights,
-                       "competitors": competitors})
+        wochen.append({
+            "date": report["date"], "highlights": highlights,
+            # E3B: eine uebernommene Redaktion traegt woertlich dieselben
+            # Wettbewerber-Profile wie ihr Ursprung. Ohne diese Ausnahme
+            # stuende "dieselbe Woche" ein zweites Mal im Themenverlauf der
+            # Wettbewerbsseite (report/wettbewerb.py), als haetten zwei
+            # unabhaengige Laeufe zufaellig dasselbe gefunden. Die
+            # Meldungen selbst (`highlights`) brauchen das nicht: die
+            # Chronik dort schluesselt auf die URL und verwirft die zweite
+            # Nennung ohnehin - unter dem WAHREN, frueheren Datum.
+            "competitors": [] if report.get("redaktion_ausfall") else competitors,
+        })
         public_highlights = []
         for h in highlights:
             public_h = dict(h)
@@ -1352,6 +1377,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             public_highlights.append(public_h)
         ctx = {
             "report": report, "date_de": _fmt_date_de(report["date"]),
+            # E3B: eine Runde ohne bewertete Meldung zeigt weiter die letzte
+            # gueltige Redaktion (pipeline.py); None auf jeder normalen Woche.
+            "redaktion_ausfall": _redaktion_ausfall_ctx(report),
             "highlights": highlights,
             "explorer_json": _json_for_script(public_highlights),
             "front": front,
@@ -1406,8 +1434,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         # kosten, deshalb wird der Fehler protokolliert und nicht geworfen.
         try:
             from . import folien as folien_mod
+            # E3B: bei einer uebernommenen Redaktion soll die Coverfolie
+            # ("Stand ...") das Datum des Inhalts zeigen, nicht das Datum
+            # der leeren Runde - sonst behauptet die Folie ein Datum, das
+            # zu keiner Meldung darauf passt. Die Datei liegt trotzdem unter
+            # dem Datum DIESER Ausgabe, damit der Link am Berichtsfuss trifft.
+            folien_report = report
+            if report.get("redaktion_ausfall"):
+                folien_report = dict(
+                    report, date=report["redaktion_ausfall"].get(
+                        "stand", report["date"]))
             (folien_dir / f"{report['date']}.html").write_text(
-                folien_mod.baue(report), encoding="utf-8")
+                folien_mod.baue(folien_report), encoding="utf-8")
         except Exception as exc:  # noqa: BLE001
             log.error("Foliensatz fuer %s nicht erzeugt: %s",
                       report["date"], exc)
@@ -1917,7 +1955,18 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             # Die Zahl, die die Seite wirklich zeigen kann: bewertete
             # Meldungen nach dem Ausfiltern stillgelegter Quellen. NICHT
             # stats.new - das sind die neu GESAMMELTEN.
-            n_bewertet=len(_flatten(latest)) if latest else 0,
+            #
+            # `stats.bewertete` (E3B, 05.09.2026) ist die ehrliche Zahl DES
+            # LAUFS, auch wenn die Titelseite gerade eine uebernommene
+            # Redaktion zeigt - dann zaehlt `_flatten(latest)` die Meldungen
+            # der UEBERNOMMENEN Ausgabe, und "davon relevant" wuerde eine
+            # Analyse behaupten, die diese Runde nie gemacht hat. Berichte
+            # von vor diesem Feld kennen es nicht (`None`), und fuer sie
+            # gilt weiter die alte Rechnung.
+            n_bewertet=(
+                latest.get("stats", {}).get("bewertete")
+                if latest and latest.get("stats", {}).get("bewertete") is not None
+                else (len(_flatten(latest)) if latest else 0)),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             # Die CTM-Linse erklaert sich hier und nur hier: die Startseite
             # zeigt die Etiketten, die Transparenzseite sagt, was sie
