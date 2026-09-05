@@ -236,6 +236,38 @@ def test_normale_woche_zeigt_keinen_ausfall_hinweis(tmp_path):
     render_site(site, reports)
     html = (site / "index.html").read_text(encoding="utf-8")
     assert "ausfall-hinweis" not in html
+    meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
+    assert "ausfall-hinweis" not in meldungen
+
+
+def test_meldungenseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
+    """E3B-R2: meldungen.html zeigte dieselbe uebernommene Redaktion wie die
+    Titelseite unter der Ueberschrift der HEUTIGEN Ausgabe - ohne jeden
+    Alters- oder Ausfallhinweis (die Luecke aus Runde 1). Die Korrektur aus
+    Runde 1 war nur auf woche.html.j2 angewendet."""
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    (reports / "2026-08-01.json").write_text(
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
+    ausfall = {"stand": "2026-08-01",
+               "grund": "es gab in dieser Runde keine neuen Meldungen "
+                        "zu bewerten"}
+    leer = _bericht("2026-08-10", highlights=[], redaktion_ausfall=ausfall)
+    leer["regions"] = json.loads(
+        (reports / "2026-08-01.json").read_text())["regions"]
+    leer["run"]["editor_used"] = False
+    (reports / "2026-08-10.json").write_text(json.dumps(leer), encoding="utf-8")
+
+    site = tmp_path / "site"
+    render_site(site, reports)
+    meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
+
+    # Die Ueberschrift traegt weiterhin das Datum der HEUTIGEN (leeren) Runde -
+    # sie ist keine Falschaussage, solange der Hinweis daneben steht.
+    assert "Ausgabe vom 10. August 2026" in meldungen
+    assert "Stand: 1. August 2026" in meldungen
+    assert "es gab in dieser Runde keine neuen Meldungen" in meldungen
+    assert "Testbetreiber senkt Preis" in meldungen
 
 
 # --------------------------------------------------------------------------- #
