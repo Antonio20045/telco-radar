@@ -38,7 +38,7 @@ from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
-from .collect.geraete import sammle
+from .collect.geraete import ADAPTER, sammle
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -200,6 +200,35 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # Ableitungen derselben Zahl an zwei Orten sind zwei Zahlen. Der
     # naechtliche Lauf ist der Ort, an dem der Geraetebestand entsteht;
     # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
+    #
+    # TARIFNAMEN AUFLOESEN, BEVOR DER TARIFBESTAND BEFRAGT WIRD (B1,
+    # 05.09.2026): manche Anbieter (Vodafone) nennen in ihrer Buendelantwort
+    # keinen Klarnamen, nur einen Hash - ein zweiter, GEZIELTER Abruf je
+    # Geraet (nicht je Rohsatz) kann ihn nachliefern (siehe
+    # `vodafone.loese_tarifnamen`). Das gehoert hierher und nicht in den
+    # Adapter: ein `lies_buendel()` bleibt ein reiner Text-zu-Daten-
+    # Uebersetzer ohne eigenes Netz, diese Stufe darf zusaetzliche GETs
+    # machen. Ein Fehler hier darf den Geraetebestand nicht kosten - er
+    # ist zu diesem Zeitpunkt schon gespeichert.
+    for bilanz in ergebnis["anbieter"]:
+        if not bilanz.buendel:
+            continue
+        anbieter = quellen.nach_name(bilanz.name)
+        adapter = ADAPTER.get(anbieter.methode) if anbieter else None
+        if adapter is None or adapter.loese_tarifnamen is None:
+            continue
+        try:
+            aufgeloest = adapter.loese_tarifnamen(
+                hole, dict(getattr(anbieter, "kopfzeilen", None) or {}),
+                bilanz.buendel)
+            if aufgeloest:
+                log.info("%s: %d von %d Buendel-Tarifnamen ueber die "
+                         "Tarifschnittstelle aufgeloest",
+                         bilanz.name, aufgeloest, len(bilanz.buendel))
+        except Exception as exc:                          # noqa: BLE001
+            log.warning("%s: Tarifnamen-Aufloesung gescheitert (%s)",
+                        bilanz.name, exc)
+
     rohbuendel = [b for bilanz in ergebnis["anbieter"]
                   for b in getattr(bilanz, "buendel", [])]
     referenzen: list = []

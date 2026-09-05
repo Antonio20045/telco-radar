@@ -80,18 +80,31 @@ class Adapter:
     keine Produktseiten nachgeladen (so arbeitet Shopify).
 
     `lies_buendel(text, url) -> list[rohsatz]` ist die ZWEITE Lesart
-    derselben Quelle und wird nur fuer Einstiege mit `kind: buendel`
-    aufgerufen. Ihre Saetze werden KEINE Listungen: sie tragen Zuzahlung,
-    Geraeterate, Tarifbetrag und Tarifbezug und gehoeren damit in
-    `geraete_tco.json`, nicht in die Preisspalte der Geraeteseite. o2
-    liefert beide Lesarten unter derselben Adresse - einmal mit
-    `?hwOnly=true` (Geraete ohne Tarif), einmal ohne (Buendel).
+    derselben Quelle. Fuer einen Einstieg mit `kind: buendel` (o2: eine
+    EIGENE Adresse, die nur Buendel traegt) wird sie ANSTELLE von `lies`
+    aufgerufen. Fuer einen NORMALEN Einstieg ohne diesen `kind` wird sie
+    ZUSAETZLICH zu `lies` auf JEDER Produktseite aufgerufen, die die
+    generische Ernte-Schleife ohnehin schon holt (Vodafone, B1,
+    05.09.2026: dieselbe Detailantwort traegt Geraetepreis UND
+    Buendelpreise, ein zweiter Abruf waere redundant). Ihre Saetze werden
+    KEINE Listungen: sie tragen Zuzahlung, Geraeterate, Tarifbetrag und
+    Tarifbezug und gehoeren damit in `geraete_tco.json`, nicht in die
+    Preisspalte der Geraeteseite.
+
+    `loese_tarifnamen(hole, kopfzeilen, rohbuendel) -> int` ist OPTIONAL
+    und laeuft NICHT waehrend des Sammelns, sondern danach, aus der
+    Pipeline heraus (`geraete_pipeline.py`) - ein Adapter bleibt sonst ein
+    reiner Text-zu-Daten-Uebersetzer ohne eigenes Netz. Sie darf
+    zusaetzliche GETs machen, um einen Tarifnamen aufzuloesen, den die
+    Sammelantwort selbst nicht nennt (Vodafone: nur ein `offerCoreHash`,
+    keine Klarname - siehe `vodafone.py` Modulkopf, Abschnitt B1).
     """
     name: str
     lies: Callable
     ernte: Optional[Callable] = None
     direkt: bool = False
     lies_buendel: Optional[Callable] = None
+    loese_tarifnamen: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
     # als "mittel" ausweist, obwohl sie aus ld+json stammt.
@@ -271,7 +284,14 @@ def _registriere_anbieter_adapter() -> None:
 
     registriere("vodafone_api", Adapter(name="vodafone_api",
                                         lies=vodafone_modul.lies,
-                                        ernte=vodafone_modul.ernte))
+                                        ernte=vodafone_modul.ernte,
+                                        # B1 (05.09.2026): dieselbe
+                                        # Detailantwort traegt unter
+                                        # `atomics[].prices.composition`
+                                        # auch die Buendelpreise - siehe
+                                        # Adapter-Docstring oben.
+                                        lies_buendel=vodafone_modul.lies_buendel,
+                                        loese_tarifnamen=vodafone_modul.loese_tarifnamen))
     # Zwei Lesarten derselben Adresse: `lies` fuer den Katalog ohne Tarif
     # (`?hwOnly=true`), `lies_buendel` fuer den mit. o2 gibt beide Adressen
     # in der Nutzlast von /e-shop/ selbst aus.
@@ -557,6 +577,21 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 continue
             _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute,
                        bilanz)
+            if adapter.lies_buendel is not None:
+                # ZWEITE LESART DERSELBEN SEITE (B1, Vodafone): dieselbe
+                # Antwort, die `lies()` gerade in Listungen zerlegt hat,
+                # traegt auch die Buendelpreise. Ein eigener `kind:
+                # buendel`-Einstieg (wie bei o2) braucht nur, wer dafuer
+                # eine EIGENE Adresse hat - hier ist es dieselbe.
+                try:
+                    roh_buendel = adapter.lies_buendel(seite, url) or []
+                except GeraeteAbrufFehler as exc:
+                    log.info("%s: %s Buendel unlesbar (%s)",
+                            anbieter.name, url, exc)
+                else:
+                    bilanz.buendel.extend(
+                        _mit_sku(roh_buendel, anbieter, einstieg, katalog,
+                                farben, heute, bilanz))
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
 

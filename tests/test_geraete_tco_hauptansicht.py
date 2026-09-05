@@ -115,15 +115,24 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
 
     Die zwei Zahlen haben verschiedene Vergleichsmengen, und das ist kein
     Widerspruch: der GERAETEPREIS ist ein reiner Barpreis - dafuer zaehlt
-    auch Vodafones Naeherungskarte, denn ihr Barpreis ist real gemessen,
-    nur ihr Buendel ist gerechnet, UND die drei Haendler ohne Tarifbuendel
-    (Amazon/Expert/Saturn - F-4a', PM-Nachtrag 05.09.2026). Der
-    TARIF-GESAMTPREIS ist ein Angebot, das man wirklich kaufen kann - eine
-    Naeherung ("kein Angebot", QA-Befund S3) darf diese Zahl nicht fuehren,
-    und die drei Haendler auch nicht: sie fuehren kein Tarifbuendel. Am
-    echten Bestand: Saturn fuehrt den guenstigsten Barpreis (1.179,00 EUR,
-    vor Vodafones 1.199,90 EUR - der gemessene PM-Befund); 1&1 fuehrt die
-    guenstigste echte Gesamtsumme mit Tarif.
+    auch Vodafones Karte, denn ihr Barpreis ist real gemessen, egal ob ihr
+    Buendel gerechnet oder ein echtes Angebot ist, UND die drei Haendler
+    ohne Tarifbuendel (Amazon/Expert/Saturn - F-4a', PM-Nachtrag
+    05.09.2026). Der TARIF-GESAMTPREIS ist ein Angebot, das man wirklich
+    kaufen kann - eine Naeherung ("kein Angebot", QA-Befund S3) darf diese
+    Zahl nicht fuehren, und die drei Haendler auch nicht: sie fuehren kein
+    Tarifbuendel. Am echten Bestand: Saturn fuehrt den guenstigsten
+    Barpreis (1.179,00 EUR, vor Vodafones 1.199,90 EUR - der gemessene
+    PM-Befund); 1&1 fuehrt die guenstigste echte Gesamtsumme mit Tarif.
+
+    REGRESSION B1 R3 (06.09.2026): Vodafone fuehrt seit dem echten
+    Lokallauf (R2, 05.09.2026) ein ECHTES Buendel zu genau diesem Modell
+    (`apple-iphone-17-pro-256gb-cosmic-orange`) - die Karte ist damit keine
+    Naeherung mehr (`_referenz_aus_buendel` schlaegt `_vodafone_referenz`,
+    siehe `test_ein_eigenes_buendel_verdraengt_die_naeherung`). Der
+    Barpreis der Karte bleibt trotzdem derselbe eigene Vodafone-Beleg wie
+    zuvor - nur das Etikett "gerechnet" faellt weg, weil die Zahl jetzt
+    gemessen ist.
     """
     modell = _modell(bestand, "apple-iphone-17-pro-256")
     antwort = modell["antwort"]
@@ -135,11 +144,11 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
     # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
     # zwei Metriken.
     assert antwort["geraetepreis_anbieter"] != antwort["tarif_anbieter"]
-    # Vodafones Naeherungskarte bleibt trotzdem eine gueltige Kandidatin
-    # fuer den Geraetepreis (ihr Barpreis ist real gemessen) - sie fuehrt
-    # nur nicht mehr, seit Saturn guenstiger ist.
+    # Vodafones Karte bleibt trotzdem eine gueltige Kandidatin fuer den
+    # Geraetepreis (ihr Barpreis ist real gemessen) - sie fuehrt nur nicht
+    # mehr, seit Saturn guenstiger ist.
     vodafone = next(k for k in modell["karten"] if k["anbieter"] == "Vodafone")
-    assert vodafone["naeherung"] is True
+    assert vodafone["naeherung"] is False
     assert vodafone["geraetepreis"] == 1199.90
 
 
@@ -237,17 +246,23 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
     kostet das Buendel".
 
     Gemessen am Vorgabemodell (iPhone 17 Pro 256 GB): o2 weist eine
-    Zuzahlung plus Ratensumme aus (1.315,00 €), Vodafones Referenz einen
-    eigenen Barpreis (1.199,90 €) - beide fuehren mit ihrem Geraetepreis.
+    Zuzahlung plus Ratensumme aus (1.315,00 €), Vodafone einen eigenen
+    Barpreis (1.199,90 €) - beide fuehren mit ihrem Geraetepreis.
     1&1 nennt nur EINEN Buendelmonatspreis (§ 13.2, kein Geraetepreis
     ausgewiesen) und bleibt deshalb bei seiner TCO-Zahl.
+
+    REGRESSION B1 R3 (06.09.2026): Vodafone fuehrt seit dem echten
+    Lokallauf ein ECHTES Buendel zu diesem Modell und ist damit keine
+    Naeherungskarte mehr (siehe Test oben) - gefunden wird sie deshalb
+    ueber ihren Anbieternamen, nicht mehr ueber `naeherung`. Ihr
+    Geraetepreis bleibt derselbe eigene Barpreisbeleg.
     """
     modell = _modell(bestand, "apple-iphone-17-pro-256")
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
     assert o2["geraetepreis"] == 1315.00
     assert o2["geraetepreis"] < o2["gesamt"]
 
-    vodafone = [k for k in modell["karten"] if k["naeherung"]][0]
+    vodafone = [k for k in modell["karten"] if k["anbieter"] == "Vodafone"][0]
     assert vodafone["geraetepreis"] == 1199.90
     assert vodafone["geraetepreis"] < vodafone["gesamt"]
 
@@ -281,7 +296,16 @@ def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
 
 
 def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet(bestand):
-    modell = _modell(bestand, "apple-iphone-17-pro-256")
+    """REGRESSION B1 R3 (06.09.2026): das bisherige Vorgabemodell (iPhone
+    17 Pro 256 GB) hat seit dem echten Vodafone-Lokallauf ein EIGENES
+    Buendel und braucht deshalb keine Naeherung mehr
+    (`_referenz_aus_buendel` schlaegt `_vodafone_referenz` - siehe
+    `test_ein_eigenes_buendel_verdraengt_die_naeherung`). Am Bestand vom
+    06.09.2026 traegt genau EIN Modell noch eine echte Naeherungskarte
+    (google-pixel-10-128, fuer das Vodafone kein eigenes Buendel fuehrt) -
+    dieser Test braucht also genau diesen Fall, nicht mehr das
+    Vorgabemodell."""
+    modell = _modell(bestand, "google-pixel-10-128")
     karte = [k for k in modell["karten"] if k["naeherung"]][0]
     ref = modell["referenz"]
     assert karte["anbieter"] == "Vodafone"
@@ -294,8 +318,12 @@ def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet(bestand):
 
 def test_die_referenz_nimmt_den_guenstigsten_belegten_vodafone_tarif(bestand):
     """Die konservative Wahl: der guenstigste eigene Tarif ist die fuer uns
-    unguenstigste Referenz."""
-    ref = _modell(bestand, "apple-iphone-17-pro-256")["referenz"]
+    unguenstigste Referenz.
+
+    REGRESSION B1 R3 (06.09.2026): dasselbe Modellwechsel wie im Test
+    oben - google-pixel-10-128 ist am Bestand vom 06.09.2026 das einzige
+    Modell mit einer echten Naeherungskarte."""
+    ref = _modell(bestand, "google-pixel-10-128")["referenz"]
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
     betraege = [r["tarif_sim_only_monatlich"] for r in tco["sim_only"]
                 if r["anbieter"] == "Vodafone"
@@ -325,8 +353,15 @@ def test_die_referenzkarte_traegt_ihre_eigene_bindung(bestand):
 def test_die_spanne_des_bandes_ist_die_der_angebote(bestand):
     """"TCO-36 von 1.120,75 bis 1.428,70 EUR" nannte als Obergrenze die
     Referenzrechnung - seit F-R2-2 eine TCO-24-Zahl. Die Spanne meint die
-    Angebote, so wie ihr Zaehler."""
-    modell = _modell(bestand, "apple-iphone-15-128")
+    Angebote, so wie ihr Zaehler.
+
+    REGRESSION B1 R3 (06.09.2026): iPhone 15 128 GB fuehrt seit dem echten
+    Vodafone-Lokallauf zwei EIGENE Vodafone-Buendel und damit keine
+    Naeherungskarte mehr. google-pixel-10-128 ist am Bestand vom
+    06.09.2026 das einzige Modell mit einer echten Naeherungskarte - und
+    braucht sie fuer genau diesen Gegenfall (Referenz ausserhalb der
+    Spanne)."""
+    modell = _modell(bestand, "google-pixel-10-128")
     ref = [k for k in modell["karten"] if k["naeherung"]][0]
     angebote = [k["gesamt"] for k in modell["karten"]
                 if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]]
@@ -338,12 +373,22 @@ def test_die_spanne_des_bandes_ist_die_der_angebote(bestand):
 def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     """Die Gegenprobe des Auftrags: das Euro-Delta rechnet weiter gegen das
     Fenster, nicht gegen das neue Etikett. Zwei Betraege auf den Cent,
-    dazu die Regel fuer alle."""
+    dazu die Regel fuer alle.
+
+    REGRESSION B1 R3 (06.09.2026): beide Modelle fuehren seit dem echten
+    Vodafone-Lokallauf ein EIGENES Vodafone-Buendel, das jetzt die Referenz
+    stellt (`_referenz_aus_buendel`) statt der gerechneten Naeherung
+    (`_vodafone_referenz`) - die Referenzsumme selbst ist damit eine
+    andere GEMESSENE Zahl (iPhone 17 Pro: Vodafone bindet dieses Geraet
+    real an "Mobil XS" ueber 36 Monate = 1.955,80 EUR statt der vorherigen
+    Naeherung; iPhone 15: real 1.469,80 EUR), und die Deltas aendern sich
+    entsprechend. Die Regel selbst (Euro-Delta haengt am Fenster, nicht am
+    Etikett) bleibt unveraendert - nur die Betraege sind neu gemessen."""
     def delta(mid, anbieter):
         return [k["delta"] for k in _modell(bestand, mid)["karten"]
                 if k["anbieter"] == anbieter and k["zustand"] == "neu"][0]
-    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -123.94
-    assert delta("apple-iphone-15-128", "o2")["betrag"] == -307.95
+    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -161.04
+    assert delta("apple-iphone-15-128", "o2")["betrag"] == -349.05
     for modell in bestand["modelle"]:
         ref = modell["referenz"]
         if not ref or ref.get("aus_buendel"):
@@ -360,8 +405,15 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
 def test_g1_stellt_die_referenz_in_ihre_eigene_bindungsgruppe(bestand):
     """Der Gruppenkopf "36 Monate Bindung" stand ueber dem Vodafone-Balken.
     Jetzt steht der Balken unter "24 Monate Bindung"; die Referenzlinie
-    bleibt in der 36er-Gruppe und sagt, woraus sie besteht."""
-    svg = grafik.balken(_modell(bestand, "apple-iphone-15-128"))
+    bleibt in der 36er-Gruppe und sagt, woraus sie besteht.
+
+    REGRESSION B1 R3 (06.09.2026): iPhone 15 128 GB fuehrt seit dem echten
+    Vodafone-Lokallauf ein EIGENES Buendel und damit keine Naeherungskarte
+    (`gr-g1-ref-etikett`) mehr - der Balken mit dem "Referenz"-Zusatz gibt
+    es fuer dieses Modell nicht. google-pixel-10-128 ist am Bestand vom
+    06.09.2026 das einzige Modell, an dem der hier geprüfte Fall (Referenz
+    bindet kuerzer als die verglichenen Buendel) noch eintritt."""
+    svg = grafik.balken(_modell(bestand, "google-pixel-10-128"))
     kopf24 = svg.index("24 Monate Bindung")
     kopf36 = svg.index("36 Monate Bindung")
     balken = svg.index("Vodafone <tspan")
