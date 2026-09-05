@@ -954,6 +954,42 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
                      rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
+
+        # DIE EINE ANTWORTZEILE (BRIEF_FADEN, 05.09.2026): "Was kostet
+        # dieses Geraet?" - zwei Zahlen, je mit ihrem Anbieter, sonst ist
+        # eine Zahl auf dieser Seite nicht nachpruefbar. Beide nur ueber
+        # NEUGERAETE (`vergleichbar`) - ein erneuertes Geraet darf die
+        # Antwort nicht unterbieten, das ist eine andere Preisdimension
+        # (CLAUDE.md §6).
+        #
+        # DIE ZWEI ZAHLEN HABEN VERSCHIEDENE VERGLEICHSMENGEN, und das ist
+        # kein Widerspruch: der GERAETEPREIS ist ein reiner Barpreis und
+        # braucht kein eigenes Tarifbuendel, deshalb zaehlt auch die
+        # Naeherungskarte mit (Vodafone fuehrt oft keinen Buendelpreis, wohl
+        # aber einen eigenen Barpreis). Der TARIF-GESAMTPREIS ist dagegen
+        # ein Angebot, das man wirklich kaufen kann - eine Naeherung ("kein
+        # Angebot", QA-Befund S3) darf hier nicht gewinnen.
+        vergleichbar_alle = [k for k in karten if k["vergleichbar"]]
+        geraetepreise = [k for k in vergleichbar_alle
+                         if k["geraetepreis"] is not None]
+        guenstigstes_geraet = (min(geraetepreise,
+                                   key=lambda k: k["geraetepreis"])
+                               if geraetepreise else None)
+        tarifangebote = [k for k in angebote
+                         if k["vergleichbar"] and k["gesamt"] is not None]
+        guenstigster_tarif = (min(tarifangebote, key=lambda k: k["gesamt"])
+                              if tarifangebote else None)
+        antwort = {
+            "geraetepreis": (guenstigstes_geraet["geraetepreis"]
+                             if guenstigstes_geraet else None),
+            "geraetepreis_anbieter": (guenstigstes_geraet["anbieter"]
+                                      if guenstigstes_geraet else None),
+            "tarif_gesamt": (guenstigster_tarif["gesamt"]
+                             if guenstigster_tarif else None),
+            "tarif_anbieter": (guenstigster_tarif["anbieter"]
+                               if guenstigster_tarif else None),
+        }
+
         fertig.append({
             "id": mid,
             "name": name,
@@ -972,6 +1008,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
                                   if k["zustand"] == "unbekannt"]),
             "spanne": ([min(betraege), max(betraege)] if betraege else []),
             "anbieter_mit_zahl": sorted({k["anbieter"] for k in angebote}),
+            "antwort": antwort,
         })
 
     # Die Reihenfolge des Auswahlfeldes: die meisten Anbieter zuerst - dort

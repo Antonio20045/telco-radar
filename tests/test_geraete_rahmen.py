@@ -188,12 +188,20 @@ def test_keine_balkengrafik_zeichnet_einen_haendler():
 
 # --------------------------------------------------------------------------
 # Kriterium 3: die Seitenueberschrift
+#
+# BRIEF_FADEN (05.09.2026, PM/Seneca): die Frage-Ueberschrift aus
+# BRIEF_RAHMEN ist gescheitert (Antonio: "Digga, spinnst du?" - flapsig,
+# "ich" mehrdeutig) und weicht der sachlichen "Gerätepreise im Vergleich".
+# Dieser Test hielt bis dahin die AELTERE Entscheidung fest; er haelt jetzt
+# die neuere - derselbe Vorgang wie bei jeder umgekehrten Regel dieses
+# Projekts (CLAUDE.md §6: "eine falsche Vorgabe kassiert").
 # --------------------------------------------------------------------------
 
-def test_die_ueberschrift_stellt_antonios_frage(tmp_path):
+def test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage(tmp_path):
     s = _baue(tmp_path)
     h1 = s.select_one("h1")
-    assert h1.get_text(strip=True) == \
-        "Dieses Gerät — wo kaufe ich es am günstigsten?"
+    assert h1.get_text(strip=True) == "Gerätepreise im Vergleich"
     titel = s.select_one("title").get_text(strip=True)
-    assert "Dieses Gerät" in titel and "günstigsten" in titel
+    assert "Gerätepreise im Vergleich" in titel
+    assert "Dieses Gerät" not in str(s)
+    assert "wo kaufe ich es am günstigsten" not in str(s)

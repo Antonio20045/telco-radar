@@ -230,6 +230,53 @@ def test_ohne_jeden_messpunkt_gibt_es_keine_grafik():
 
 
 # --------------------------------------------------------------------------
+# Kein nackter Punkt (BRIEF_FADEN, 05.09.2026, Kriterium 5)
+#
+# Antonios QA-Befund 3: "Telekoms Einzel-Punkt im Zeitreihen-Graph liest
+# sich als 'keine Werte' - die ehrliche Luecke sieht aus wie ein Defekt."
+# Ein einzelner Messpunkt bekommt seitdem eine sichtbare Beschriftung am
+# Punkt statt nur einem Tooltip.
+# --------------------------------------------------------------------------
+
+def test_ein_einzelner_messpunkt_traegt_eine_sichtbare_beschriftung():
+    reihen = [_reihe("Telekom", [("2026-09-05", 1197.0)])]
+    ergebnis = grafik.zeitreihe(reihen)
+    assert ('class="gr-g0-einzeln gr-anb--telekom"' in ergebnis["svg"])
+    assert "Serie startet · 1. Messpunkt 05.09.2026" in ergebnis["svg"]
+
+
+def test_eine_verbundene_linie_traegt_keine_einzelpunkt_beschriftung():
+    reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1315.0)])]
+    ergebnis = grafik.zeitreihe(reihen)
+    assert "gr-g0-einzeln" not in ergebnis["svg"]
+    assert "Serie startet" not in ergebnis["svg"]
+
+
+def test_nur_der_isolierte_punkt_traegt_die_beschriftung_nicht_die_linie():
+    """Wie `test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe`: zwei
+    verbundene Punkte, ein dritter isolierter hinter der Sammelluecke - nur
+    der dritte ist "einzeln" und bekommt die Beschriftung."""
+    reihen = [_reihe("Vodafone", [
+        ("2026-08-29", 1199.9), ("2026-09-01", 1199.9),
+        ("2026-09-25", 1149.9),
+    ])]
+    ergebnis = grafik.zeitreihe(reihen)
+    assert ergebnis["svg"].count("gr-g0-einzeln") == 1
+    assert ergebnis["svg"].count("Serie startet") == 1
+    assert "Serie startet · 1. Messpunkt 25.09.2026" in ergebnis["svg"]
+
+
+def test_gemischte_reihen_beschriften_nur_den_einzelnen_punkt():
+    reihen = [
+        _reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1310.0)]),
+        _reihe("Telekom", [("2026-09-05", 1197.0)]),
+    ]
+    ergebnis = grafik.zeitreihe(reihen)
+    assert ergebnis["svg"].count("Serie startet") == 1
+    assert "Serie startet · 1. Messpunkt 05.09.2026" in ergebnis["svg"]
+
+
+# --------------------------------------------------------------------------
 # Die Chart-Chrome-Zeile - kein Fliesstext, ein einziger Satz
 # --------------------------------------------------------------------------
 

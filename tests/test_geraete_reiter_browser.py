@@ -314,6 +314,26 @@ def _eigene_seite(_umgebung):
         seite.close()
 
 
+def _zeige_tafel(seite, tafel_id):
+    """Wie ein Klick auf den Reiter-Knopf - ohne Knopf.
+
+    BRIEF_FADEN (05.09.2026): "Preis- und TCO-Historie" und "Portfolio"
+    haben ihren Knopf in `.gr-reiter` verloren (die Tafeln selbst bleiben
+    im Dokument, sie sind nur nicht mehr verlinkt - PM entscheidet separat
+    ueber ihr Schicksal). Diese Tests pruefen weiterhin den INHALT dieser
+    Tafeln, unveraendert seit ihrem jeweiligen Bau; nur der Weg dorthin ist
+    jetzt ein direkter DOM-Zugriff statt eines Klicks. Dieselbe Wirkung wie
+    `app.js`s `zeige()`, nur ohne dessen Knopf-Referenz.
+    """
+    seite.evaluate(
+        "(id) => { document.querySelectorAll('.gr-tafel').forEach("
+        "e => e.classList.toggle('gr-tafel--aus', e.id !== id)); "
+        "document.querySelectorAll('.gr-reiter button[data-tafel]').forEach("
+        "b => b.setAttribute('aria-selected', "
+        "b.getAttribute('data-tafel') === id ? 'true' : 'false')); }",
+        tafel_id)
+
+
 def _stelle_daten(seite, geraet):
     """Den Verlaufsblock ersetzen und `app.js` frisch darauf laufen lassen.
 
@@ -326,7 +346,7 @@ def _stelle_daten(seite, geraet):
         "           JSON.stringify([g]); }", geraet)
     seite.set_content(seite.evaluate("document.documentElement.outerHTML"))
     seite.wait_for_timeout(150)
-    seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    _zeige_tafel(seite, "tafel-verlauf")
     seite.fill("#gr-vsuche", geraet["label"].split()[0][:8])
     seite.wait_for_timeout(150)
     seite.click(".gr-vtreffer-zeile")
@@ -395,18 +415,21 @@ def _sichtbare_marken(seite):
 # Die drei Regeln, die ueber allem stehen
 # --------------------------------------------------------------------------
 
-def test_die_startansicht_traegt_genau_die_pflichtgrafiken(_seite):
-    """UMGEKEHRT SEIT PHASE R, und mit Grund.
+def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
+    """UMGEKEHRT SEIT PHASE R, dann UMGEKEHRT SEIT BRIEF_FADEN.
 
     Bis zum 04.09.2026 hiess diese Zusicherung "auf der Startansicht steht
     ueberhaupt kein Diagramm" - richtig, solange die Startansicht die
-    Alarmtabelle war. Das Lastenheft dreht sie um (A3): die Hauptansicht
-    IST die TCO-Sicht, und der Balkenvergleich ist Pflichtinhalt. Ein
-    Redesign ohne ihn gilt als nicht geliefert.
+    Alarmtabelle war. Das Lastenheft drehte sie um (A3): die Hauptansicht
+    IST die TCO-Sicht, und zwischen BRIEF_ZEITREIHE und BRIEF_FADEN standen
+    hier ZWEI Grafiken (G0 und G1).
 
-    Seit BRIEF_ZEITREIHE (05.09.2026) sind es ZWEI: der neue Zeitreihen-
-    Graph (G0) UEBER den Balkenbloecken, und G1 darunter - beide zeigen
-    dasselbe, EINE gewaehlte Geraet.
+    BRIEF_FADEN (05.09.2026, Kriterium 1): G1 verlaesst DIESE Ansicht -
+    G0 (die Zeitreihe) ist die einzige Grafik je Modellblock. G1s Rechnung
+    bleibt im Code (`geraete_tco_grafik.balken()`, `m.svg`/`m.legende`
+    werden weiterhin gefuellt) und ist ab jetzt in
+    `tests/test_geraete_tco_hauptansicht.py` statisch geprueft - nur der
+    Aufruf im Template ist geloescht.
 
     Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte: kein
     Bild mit allen Geraeten in einer Flaeche, keine gedrehten Etiketten.
@@ -414,9 +437,10 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafiken(_seite):
     sichtbar = _seite.eval_on_selector_all(
         "#tafel-tco svg",
         "e => e.filter(x => x.getBoundingClientRect().width > 0).length")
-    assert sichtbar == 2, "genau zwei Grafiken - G0 und G1 des gewaehlten Modells"
+    assert sichtbar == 1, "genau eine Grafik - G0 des gewaehlten Modells"
     assert _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-g1", "e => e.length") > 0, "G1 fehlt"
+        "#tafel-tco svg.gr-g1", "e => e.length") == 0, \
+        "G1 wird in dieser Ansicht nicht mehr gerendert"
     assert _seite.eval_on_selector_all(
         "#tafel-tco svg.gr-g0", "e => e.length") > 0, "G0 fehlt"
     # Kein Rest der geloeschten Preisgrafik.
@@ -484,8 +508,12 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
 # --------------------------------------------------------------------------
 
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
-    for tid in ("tafel-katalog", "tafel-verlauf",
-                "tafel-portfolio", "tafel-tco"):
+    """BRIEF_FADEN (05.09.2026): NUR NOCH ZWEI Knoepfe in `.gr-reiter"" -
+    "Preis- und TCO-Historie" und "Portfolio" haben ihren verloren. Dieser
+    Test prueft den KLICK-Mechanismus und laeuft deshalb nur noch ueber die
+    zwei wirklich klickbaren Reiter; dass die zwei uebrigen Tafeln ohne
+    Klick weiterhin einzeln umblendbar sind, haelt die Gegenprobe danach."""
+    for tid in ("tafel-katalog", "tafel-tco"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
@@ -497,12 +525,44 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
         assert aktiv == [tid], "genau ein Reiter ist ausgewaehlt"
 
 
+def test_die_reiterleiste_hat_nur_noch_zwei_knoepfe(_seite):
+    knoepfe = _seite.eval_on_selector_all(
+        ".gr-reiter button[data-tafel]",
+        "e => e.map(x => x.getAttribute('data-tafel'))")
+    assert knoepfe == ["tafel-tco", "tafel-katalog"]
+    beschriftung = _seite.eval_on_selector_all(
+        ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
+    assert beschriftung == ["Vergleich", "Gerätekatalog"]
+    _zeige_tafel(_seite, "tafel-tco")
+
+
+def test_die_ungeknopften_tafeln_bleiben_im_dokument(_seite):
+    """"Nicht geloescht, nur nicht mehr verlinkt": ihr Markup steht weiter
+    im HTML und laesst sich weiterhin einzeln zeigen - nur ohne Knopf."""
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(60)
+    sichtbar = _seite.eval_on_selector_all(
+        ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
+    assert sichtbar == ["tafel-verlauf"]
+
+    _zeige_tafel(_seite, "tafel-portfolio")
+    _seite.wait_for_timeout(60)
+    sichtbar = _seite.eval_on_selector_all(
+        ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
+    assert sichtbar == ["tafel-portfolio"]
+    _zeige_tafel(_seite, "tafel-tco")
+
+
 @pytest.mark.parametrize("tid", ["tafel-tco", "tafel-katalog",
                                  "tafel-verlauf", "tafel-portfolio"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
-    18.412 px hoch."""
-    _seite.click(f".gr-reiter button[data-tafel='{tid}']")
+    18.412 px hoch.
+
+    BRIEF_FADEN (05.09.2026): "tafel-verlauf" und "tafel-portfolio" tragen
+    keinen Knopf mehr - gezeigt wird ueber `_zeige_tafel` statt Klick, die
+    Hoehenzusicherung gilt unveraendert fuer beide, weil ihr Markup steht."""
+    _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate("document.documentElement.scrollHeight")
     assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px"
@@ -521,15 +581,18 @@ def _frisch(seite):
     """
     seite.reload(wait_until="load")
     seite.click(".gr-reiter button[data-tafel='tafel-tco']")
-    # DIE ALARMTABELLE STEHT SEIT PHASE R IN EINEM AUFKLAPPER. Sie hat
-    # ihren eigenen Reiter verloren (H4: die vier Alarme sind Chips im Kopf
-    # der Hauptansicht), und ihre Zeilen sind zugeklappt nicht bedienbar -
-    # ein Klick auf eine Zeile in einem geschlossenen `<details>` trifft
-    # nichts. Getestet wird weiterhin die Tabelle, nicht der Aufklapper;
-    # deshalb wird er hier geoeffnet und nicht in jedem Test einzeln.
-    auf = seite.query_selector("#gr-alarme")
-    if auf is not None:
-        seite.evaluate("document.getElementById('gr-alarme').open = true")
+    # DIE ALARMTABELLE STEHT SEIT PHASE R IN EINEM AUFKLAPPER, UND SEIT
+    # BRIEF_FADEN (05.09.2026) STECKT DIESER AUFKLAPPER IN EINEM WEITEREN
+    # ("Details", `#gr-details`). Ein `<details>` verbirgt seine Kinder per
+    # UA-Regel (`details:not([open]) > *:not(summary){display:none}`) -
+    # das gilt fuer NACHFAHREN transitiv: ein offenes `#gr-alarme` bleibt
+    # unsichtbar, solange sein Elternelement zu ist. Beide werden deshalb
+    # geoeffnet, nicht nur das innere.
+    for kennung in ("gr-details", "gr-alarme"):
+        auf = seite.query_selector(f"#{kennung}")
+        if auf is not None:
+            seite.evaluate(
+                f"document.getElementById('{kennung}').open = true")
     seite.wait_for_timeout(60)
 
 
@@ -742,11 +805,12 @@ def test_kein_aufklapper_steht_offen(_seite):
     _seite.wait_for_timeout(60)
     for tid in ("tafel-tco", "tafel-katalog",
                 "tafel-verlauf", "tafel-portfolio"):
-        _seite.click(f".gr-reiter button[data-tafel='{tid}']")
+        _zeige_tafel(_seite, tid)
         _seite.wait_for_timeout(60)
         offen = _seite.eval_on_selector_all(
             f"#{tid} details[open]", "e => e.length")
         assert offen == 0, tid
+    _zeige_tafel(_seite, "tafel-tco")
 
 
 def test_die_seite_traegt_das_echte_abrufdatum(_seite):
@@ -778,7 +842,7 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
 def _waehle_geraet(seite, begriff="galaxy"):
     """Ein Geraet im Suchfeld auswaehlen. Gibt False, wenn die Fixture keins
     hergibt - dann darf der Aufrufer nicht schweigend durchlaufen."""
-    seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    _zeige_tafel(seite, "tafel-verlauf")
     seite.wait_for_timeout(80)
     if seite.query_selector("#gr-vsuche") is None:
         return False
@@ -795,7 +859,7 @@ def test_ohne_auswahl_steht_kein_diagramm_da(_seite):
     """"Solange kein Gerät gewählt ist, steht hier KEIN Diagramm. Auch kein
     leeres." Ein leerer Rahmen sieht aus, als seien die Daten weg."""
     _frisch(_seite)
-    _seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
+    _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(80)
     # GEMESSEN WIRD `#gr-vbild`, NICHT DER GANZE REITER. Seit Phase R
     # steht im selben Reiter die servergerenderte Historie (G2) - sie ist
@@ -1939,7 +2003,7 @@ def test_kein_reiter_rollt_auf_dem_telefon_waagerecht(_umgebung, tid):
     seite = browser.new_page(viewport={"width": 390, "height": 844})
     try:
         seite.goto(url, wait_until="load")
-        seite.click(f".gr-reiter button[data-tafel='{tid}']")
+        _zeige_tafel(seite, tid)
         seite.wait_for_timeout(80)
         breite = seite.evaluate("document.documentElement.scrollWidth")
         sichtbar = seite.evaluate("document.documentElement.clientWidth")
@@ -1977,47 +2041,17 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
 # ==========================================================================
 # PHASE R - die TCO-Hauptansicht im echten Browser (04.09.2026)
 #
-# Diese vier Faelle stehen hier und nicht im Modultest, weil sie erst im
-# Browser entstehen: die Balkenlaenge ist gerechnete Geometrie, die
-# Reihenfolge der Karten eine JS-Sortierung, und die Modellauswahl blendet
-# um, ohne zu laden. Ein HTML-Test saehe bei allen vier nur Markup.
+# Diese Faelle stehen hier und nicht im Modultest, weil sie erst im Browser
+# entstehen: die Reihenfolge der Karten ist eine JS-Sortierung, und die
+# Modellauswahl blendet um, ohne zu laden. Ein HTML-Test saehe bei beiden
+# nur Markup.
+#
+# DIE BALKENLAENGE (G1) IST SEIT BRIEF_FADEN (05.09.2026) NICHT MEHR HIER:
+# G1 wird in dieser Ansicht nicht mehr gerendert (Kriterium 1), und seine
+# Geometrie ist ohnehin SERVERGERECHNET, keine Browser-Layoutfrage - die
+# Zusicherung steht jetzt statisch in
+# `tests/test_geraete_tco_hauptansicht.py::test_die_balkenlaenge_entspricht_dem_betrag`.
 # ==========================================================================
-
-def test_die_balkenlaenge_entspricht_dem_betrag(_seite):
-    """Die Lehre vom 10.08.2026: eine Grafik ist erst fertig, wenn jemand
-    ihre AUSSAGE nachgerechnet hat. Damals standen 87 von 94 Etiketten
-    weiter als drei Prozent neben ihrem Punkt.
-
-    Gemessen wird je Laufzeitgruppe: alle Balken derselben Gruppe teilen
-    sich eine Nulllinie und einen Massstab, das Verhaeltnis aus Laenge und
-    Betrag muss also fuer alle gleich sein.
-    """
-    _frisch(_seite)
-    werte = _seite.evaluate("""() => {
-      const block = document.querySelector('.gr-tmodell:not([hidden])');
-      const svg = block.querySelector('svg.gr-g1');
-      if (!svg) return [];
-      const karten = {};
-      block.querySelectorAll('.gr-kkarte').forEach(k => {
-        const g = parseFloat(k.getAttribute('data-gesamt'));
-        if (!isNaN(g)) karten[k.getAttribute('data-anbieter')] = g;
-      });
-      const out = [];
-      svg.querySelectorAll('rect.gr-g1-seg').forEach(r => {
-        const t = r.querySelector('title').textContent;
-        const anbieter = t.split(':')[0];
-        out.push([anbieter, parseFloat(r.getAttribute('width'))]);
-      });
-      const summe = {};
-      out.forEach(([a, w]) => { summe[a] = (summe[a] || 0) + w; });
-      return Object.keys(summe).map(a => [a, summe[a], karten[a]]);
-    }""")
-    assert werte, "keine Balken gemessen - der Test prueft nichts"
-    verhaeltnisse = [breite / betrag for _, breite, betrag in werte if betrag]
-    assert len(verhaeltnisse) >= 2, f"eine Gruppe braucht zwei Balken: {werte}"
-    assert max(verhaeltnisse) - min(verhaeltnisse) < 0.002, \
-        f"die Balken folgen nicht einem Massstab: {werte}"
-
 
 def test_die_karten_stehen_in_der_reihenfolge_des_monatsmasses(_seite):
     """A5.3: Ø/Monat ist das EINZIGE Mass, das ueber Laufzeiten hinweg
