@@ -2629,16 +2629,38 @@ b,strong{font-weight:700}
   padding:10px 12px;flex:1 1 320px}
 .gr-mband{margin:0 0 12px}
 
-/* Die eine Antwortzeile (BRIEF_FADEN, 05.09.2026): "Was kostet dieses
-   Gerät?" - sachlich beantwortet, zwischen Auswahl und Graph, nichts
-   sonst dazwischen. Serife, groesser als Fliesstext, aber kleiner als die
-   Leitzahl einer Karte (27 px) - sie ist die Zusammenfassung, nicht die
-   Kartenrechnung selbst. */
-.gr-antwort{font-family:var(--serif);font-size:19px;line-height:1.4;
-  margin:0 0 16px}
-.gr-antwort b{font-weight:700}
-.gr-antwort--leer{font-family:var(--sans);font-size:13px;color:var(--ink-3);
-  font-style:italic}
+/* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
+   05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite
+   existiert"). Vorher 19px Fliesstext, kleiner als die Karten-Leitzahl
+   (27px) - genau das war der Befund ("geht unter dem Chart unter").
+   Jetzt groesser als jede Kartenzahl (32px), weil diese EINE Zeile ueber
+   der ganzen Tafel steht, nicht neben 66 Anbieterkarten. Linien statt
+   Kasten (Hausregel: "keine Schatten, kein Radius"): eine eigene
+   3px-Rubriklinie grenzt sie ab, keine Flaeche. */
+.gr-antwort{margin:0 0 20px;padding:16px 0 2px;border-top:3px solid var(--ink)}
+.gr-antwort-reihe{display:flex;flex-wrap:wrap;gap:6px 40px;margin:0}
+.gr-antwort-leit{margin:0;display:flex;flex-direction:column;gap:3px;
+  min-width:0}
+.gr-antwort-leit b{font-family:var(--sans);font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;font-weight:600;
+  color:var(--ink-3)}
+/* `.gr-antwort-zahlzeile` blockifiziert im Flex-Kontext (direktes Kind von
+   `.gr-antwort-leit`); Zahl und Anbieter darin bleiben inline und teilen
+   sich die Grundlinie - dieselbe Bauform wie `.gr-kk-leit`, nur mit einem
+   dritten Element (Anbieter) daneben statt einer zweiten Zeile. */
+.gr-antwort-zahl{font-family:var(--serif);font-size:32px;font-weight:700;
+  line-height:1.1;color:var(--ink)}
+.gr-antwort-anbieter{font-family:var(--sans);font-size:14px;
+  color:var(--ink-3)}
+/* Die Erklaerzeile (Vision-Befund 8, F-4a): "guenstig mit Tarif: X €" ist
+   fuer Laien mehrdeutig (teurer? guenstiger?) - dieser eine Satz
+   unterscheidet die zwei Begriffe. Kein Methodenabsatz: sans, klein,
+   gedaempft, wie jede andere Nebenzeile dieser Tafel (`.gr-a-klein`). */
+.gr-antwort-erklaer{margin:10px 0 0;font-family:var(--sans);
+  font-size:12.5px;line-height:1.4;color:var(--ink-3)}
+.gr-antwort--leer{border-top:1px solid var(--rule);padding:12px 0;
+  margin:0 0 16px;font-family:var(--sans);font-size:13px;
+  color:var(--ink-3);font-style:italic}
 
 /* Die Details-Aufklappung (BRIEF_FADEN): Ampel-Kacheln und
    Analysten-Tabellen sind hier zusammengefasst, damit sie nicht mehr im

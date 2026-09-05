@@ -720,20 +720,50 @@
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.titel }}</h3>
 
-    {# --- 2. Die eine Antwortzeile (BRIEF_FADEN, 05.09.2026) ------------
+    {# --- 2. Die eine Antwortzeile (BRIEF_FADEN, 05.09.2026; Dominanz +
+           Erklaerzeile: BRIEF F-4a, 05.09.2026 abends, hoechste
+           Prioritaet) ---------------------------------------------------
            "Was kostet dieses Gerät?" - sachlich beantwortet, in EINEM
            Satz, zwischen Auswahl und Graph. Beide Zahlen kommen aus
            `geraete_tco_karten.modelle()` (`m.antwort`) und tragen ihren
            Anbieter: eine Zahl ohne Absender ist auf dieser Seite nicht
-           nachpruefbar. #}
+           nachpruefbar.
+
+           F-4a (Vision-Befund, Antonio 18:52: "die Antwortzeile ist der
+           Grund, warum die Seite existiert"): die Zeile ging bisher als
+           19px-Flieszsatz unter dem Chart unter - nichts unterschied sie
+           von einer Textzeile. Jetzt traegt sie die groesste Zahl der
+           Tafel (32px Serife, Anlehnung an die Karten-Leitzahl
+           `.gr-kk-leit`/27px, aber groesser: diese EINE Zeile steht ueber
+           der ganzen Tafel, nicht neben 66 Karten) mit einer eigenen
+           3px-Rubriklinie - Linien statt Kasten (Hausregel), keine
+           Flaeche, kein Schatten, kein Radius. Dazu die Erklaerzeile:
+           "günstig mit Tarif: 1.619,64 €" ist fuer die Zielgruppe
+           mehrdeutig (teurer? guenstiger? Vision-Befund 8) - sie
+           unterscheidet "Gerätepreis" und "mit Tarif" in einem Satz,
+           kein Methodenabsatz. Nur im Datenfall (Antwort vorhanden): die
+           leere Zeile hat nichts zu erklaeren. #}
     {% if m.antwort.geraetepreis is not none or m.antwort.tarif_gesamt is not none %}
-    <p class="gr-antwort">{% if m.antwort.geraetepreis is not none
-      %}Günstigster Gerätepreis: <b>{{ m.antwort.geraetepreis | euro
-      }}</b> ({{ m.antwort.geraetepreis_anbieter }}){% endif %}{% if
-      m.antwort.geraetepreis is not none and m.antwort.tarif_gesamt is not none
-      %} · {% endif %}{% if m.antwort.tarif_gesamt is not none
-      %}günstig mit Tarif: <b>{{ m.antwort.tarif_gesamt | euro }}</b>
-      ({{ m.antwort.tarif_anbieter }}){% endif %}</p>
+    <div class="gr-antwort">
+      <div class="gr-antwort-reihe">
+        {% if m.antwort.geraetepreis is not none %}
+        <p class="gr-antwort-leit"><b>Günstigster Gerätepreis</b><span
+          class="gr-antwort-zahlzeile"><span class="gr-antwort-zahl">{{
+          m.antwort.geraetepreis | euro }}</span> <span
+          class="gr-antwort-anbieter">({{ m.antwort.geraetepreis_anbieter
+          }})</span></span></p>
+        {% endif %}
+        {% if m.antwort.tarif_gesamt is not none %}
+        <p class="gr-antwort-leit"><b>günstig mit Tarif</b><span
+          class="gr-antwort-zahlzeile"><span class="gr-antwort-zahl">{{
+          m.antwort.tarif_gesamt | euro }}</span> <span
+          class="gr-antwort-anbieter">({{ m.antwort.tarif_anbieter
+          }})</span></span></p>
+        {% endif %}
+      </div>
+      <p class="gr-antwort-erklaer">Gerätepreis: einmalig ohne Vertrag ·
+      mit Tarif: Gesamtpreis über 24 Monate</p>
+    </div>
     {% else %}
     <p class="gr-antwort gr-antwort--leer">Für dieses Gerät liegt noch kein
     Angebot mit Preis vor.</p>
