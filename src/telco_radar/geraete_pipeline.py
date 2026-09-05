@@ -75,9 +75,19 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 
     from .collect.http import fetch
 
-    def hole(url: str, kopfzeilen: Optional[dict] = None):
+    def hole(url: str, kopfzeilen: Optional[dict] = None,
+             user_agent: Optional[str] = None):
+        # `user_agent` ist der PER-ANBIETER-UEBERSCHREIBER (Anbieter.
+        # user_agent, siehe geraete_config.py) - er baut ein EIGENES
+        # http_cfg nur fuer diesen Aufruf, das globale `http_cfg` (aus
+        # config/settings.yaml, Entscheidung E-1) bleibt fuer jeden anderen
+        # Anbieter unangetastet. `fetch()` sieht davon nichts Neues: es
+        # bekommt schlicht ein `http_cfg`, dessen `user_agent` schon den
+        # honoreichen Wert traegt, und leitet daraus PRIMARY/Fallback wie
+        # immer ab.
+        cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
         try:
-            antwort = fetch(url, http_cfg, extra_headers=kopfzeilen or None)
+            antwort = fetch(url, cfg, extra_headers=kopfzeilen or None)
         except httpx.HTTPStatusError as exc:
             # Der Statuscode IST hier die Auskunft - 404 heisst etwas
             # anderes als 403, und beide etwas anderes als "kein Netz".

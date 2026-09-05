@@ -555,6 +555,45 @@ def _referenztabelle(referenzen: list) -> list[dict]:
                                          z["monatlich"]))
 
 
+# Die drei vom PM benannten Haendler ohne Tarifbuendel (QUELLEN_MAP.md §6,
+# Ersterkundung 05.09.2026): fuer sie gibt es keine TCO zu rechnen, nur den
+# reinen Geraetepreis. Dieselbe Liste steht in der Vorlage
+# (`haendlerkarte`/die Zeitreihen-Legende) - EINE Liste, damit eine
+# zukuenftige Ergaenzung nicht an einer der beiden Stellen vergessen wird.
+HAENDLER_OHNE_BUENDEL = ("Amazon", "Expert", "Saturn")
+
+
+def _haendler_ohne_buendel_preise(listungen: list) -> dict:
+    """Je Haendler aus `HAENDLER_OHNE_BUENDEL`: der guenstigste NEU-Preis
+    dieses Modells, falls schon erhoben - sonst `None`.
+
+    Ein Wert hier ersetzt in der Vorlage die "Beschaffung laeuft
+    seit"-Auskunft durch die echte Zahl. Mehrere Farbvarianten desselben
+    Modells+Speichers sind unterschiedliche SKUs mit demselben oder sehr
+    aehnlichem Preis (dieselbe Konvention wie beim "Guenstigster
+    Geraetepreis" der Antwortzeile darueber) - der guenstigste gewinnt,
+    nicht der zuletzt gelesene.
+    """
+    out: dict = {}
+    for name in HAENDLER_OHNE_BUENDEL:
+        kandidaten = [
+            l for l in listungen
+            if l.get("anbieter") == name
+            and l.get("preis_ohne_vertrag") is not None
+            and (l.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+        ]
+        if not kandidaten:
+            out[name] = None
+            continue
+        bester = min(kandidaten, key=lambda l: l["preis_ohne_vertrag"])
+        out[name] = {
+            "preis": bester["preis_ohne_vertrag"],
+            "quelle_url": bester.get("quelle_url", ""),
+            "abgerufen_am": bester.get("abgerufen_am", ""),
+        }
+    return out
+
+
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 lesbar: bool = True, tarife: dict | None = None,
                 historie=None) -> dict:
@@ -670,6 +709,20 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             listungen_je_modell.get(modell["id"], []), historie
         ) if historie is not None else []
         modell["zeitreihe"] = geraete_tco_grafik.zeitreihe(reihen)
+        # A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel - sie
+        # bekommen keine `tcokarte`. Sobald einer von ihnen fuer DIESES
+        # Modell trotzdem einen reinen Geraetepreis liefert (Saturn seit
+        # dem 05.09.2026), soll die Karte ihn zeigen statt ihrer
+        # "Beschaffung laeuft"-Auskunft zu wiederholen - dieselbe einzelne
+        # Zahl, mit der auch die Vorlage die Zeitreihen-Legende entscheidet.
+        modell["haendler_ohne_buendel"] = _haendler_ohne_buendel_preise(
+            listungen_je_modell.get(modell["id"], []))
+        # Fertig gefiltert statt in der Vorlage nachgebaut: welche der drei
+        # noch OHNE Preis sind, entscheidet dieselbe eine Zahl wie oben -
+        # ein zweiter Filter im Template koennte auseinanderlaufen.
+        modell["haendler_offen"] = [
+            h for h in HAENDLER_OHNE_BUENDEL
+            if modell["haendler_ohne_buendel"].get(h) is None]
 
     reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
               if historie is not None else [])

@@ -646,6 +646,25 @@
 </article>
 {% endmacro %}
 
+{# Saturn seit dem 05.09.2026 (Adapter saturn_brand): sobald ein Haendler
+   ohne Tarifbuendel fuer DIESES Modell einen reinen Geraetepreis liefert,
+   ersetzt diese Karte `haendlerkarte()` - dieselbe Form wie `tcokarte`
+   (Kopf, eine Leitzahl, ein Beleglink), aber ohne jede TCO-Rechnung: es
+   gibt keinen Tarif dazu, also auch kein Ø/Monat und keine Ratenzeile. #}
+{% macro haendlerpreiskarte(name, eintrag) %}
+<article class="gr-kkarte gr-kkarte--haendler" data-anbieter="{{ name }}">
+  <p class="gr-kk-kopf"><span class="gr-kk-anbieter">{{ name }}</span>
+    <span class="gr-kk-marke">Händler</span></p>
+  <p class="gr-kk-leit"><b>Gerätepreis</b> <span>{{ eintrag.preis | euro }}</span></p>
+  <p class="gr-basis--duenn">Ohne Vertrag – {{ name }} führt zu diesem Gerät
+  kein Tarifbündel, nur den reinen Kassenpreis.</p>
+  {% if eintrag.quelle_url %}<p class="gr-basis--duenn"><a
+    href="{{ eintrag.quelle_url }}" rel="nofollow noopener" target="_blank">Beleg
+    {{ name }}</a>{% if eintrag.abgerufen_am %} · abgerufen {{
+    eintrag.abgerufen_am | date_de }}{% endif %}</p>{% endif %}
+</article>
+{% endmacro %}
+
 <div class="gr-tafel" id="tafel-tco" role="tabpanel">
 
 <section class="gr-tco" id="tco">
@@ -751,18 +770,28 @@
     {% endif %}
 
     {# A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel und sind
-       fuer diese Seite Haendler mit reinem Geraetepreis - ihre Beschaffung
-       laeuft seit {{ haendler_seit }} (QUELLEN_MAP.md, Ersterkundung). Sie
-       stehen trotzdem JE GERAET als Legenden-Eintrag OHNE Linie: kein
-       Pfad, kein Kreis, keine erfundene Zahl - nur der Name und der
-       datierte Vermerk. #}
+       fuer diese Seite Haendler mit reinem Geraetepreis - solange fuer
+       DIESES Modell noch keiner erhoben ist, laeuft ihre Beschaffung seit
+       {{ haendler_seit }} (QUELLEN_MAP.md, Ersterkundung). Sie stehen dann
+       JE GERAET als Legenden-Eintrag OHNE Linie: kein Pfad, kein Kreis,
+       keine erfundene Zahl - nur der Name und der datierte Vermerk.
+
+       SEIT DEM 05.09.2026 (Saturn-Adapter) faellt ein Haendler aus dieser
+       Liste, sobald `m.haendler_ohne_buendel` fuer ihn einen Preis nennt -
+       dieselbe eine Zahl, die auch die Karte darunter zeigt
+       (`haendlerpreiskarte`). Zwei verschiedene Signale fuer dieselbe
+       Frage ("hat dieser Haendler Daten zu diesem Geraet?") liefen sonst
+       auseinander: ein Haendler mit echtem Preis stand als Linie in der
+       Grafik UND als "Beschaffung laeuft" in dieser Liste. #}
+    {% if m.haendler_offen %}
     <ul class="gr-g0-haendler" aria-label="Händler ohne erfasste Zeitreihe">
-      {% for h in ("Amazon", "Expert", "Saturn") %}
+      {% for h in m.haendler_offen %}
       <li class="gr-g0-haendler-zeile"><span class="gr-g0-haendler-name">{{
         h }}</span><span class="gr-g0-haendler-vermerk">Händler —
         Beschaffung läuft seit {{ haendler_seit | date_de }}</span></li>
       {% endfor %}
     </ul>
+    {% endif %}
 
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert
       %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
@@ -788,10 +817,18 @@
       </select></label>
     </div>
 
-    {# --- 4. Die Anbieterkarten, direkt unter dem Graph ------------------ #}
+    {# --- 4. Die Anbieterkarten, direkt unter dem Graph ------------------
+           Seit dem 05.09.2026 (Saturn-Adapter): ein Haendler ohne
+           Tarifbuendel bekommt die echte Karte (`haendlerpreiskarte`),
+           sobald `m.haendler_ohne_buendel` einen Preis nennt - sonst
+           bleibt es bei der "Beschaffung laeuft"-Karte. #}
     <div class="gr-karten">
       {% for k in m.karten %}{{ tcokarte(k) }}{% endfor %}
-      {% for h in ("Amazon", "Expert", "Saturn") %}{{ haendlerkarte(h, haendler_seit) }}{% endfor %}
+      {% for h in ("Amazon", "Expert", "Saturn") %}
+        {% set eintrag = m.haendler_ohne_buendel.get(h) %}
+        {% if eintrag %}{{ haendlerpreiskarte(h, eintrag) }}
+        {% else %}{{ haendlerkarte(h, haendler_seit) }}{% endif %}
+      {% endfor %}
     </div>
 
     {% if not zr.hat_daten %}

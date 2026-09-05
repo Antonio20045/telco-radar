@@ -265,6 +265,7 @@ def _registriere_anbieter_adapter() -> None:
     from . import congstar as congstar_modul
     from . import einsundeins as einsundeins_modul
     from . import o2 as o2_modul
+    from . import saturn as saturn_modul
     from . import telekom as telekom_modul
     from . import vodafone as vodafone_modul
 
@@ -300,6 +301,13 @@ def _registriere_anbieter_adapter() -> None:
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
                         ernte=einsundeins_modul.ernte))
+    # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
+    # stehen bereits in dieser einen Antwort, keine Produktseite wird
+    # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
+    # der Adapter selbst aus dem Apollo-Cache (saturn.py).
+    registriere("saturn_brand", Adapter(name="saturn_brand",
+                                        lies=saturn_modul.lies,
+                                        direkt=True))
 
 
 _registriere_anbieter_adapter()
@@ -419,6 +427,11 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # (o2s Medientyp, Vodafones oeffentlicher Browser-Schluessel), brauchen
     # eine Attrappe mit zweitem Parameter.
     kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
+    # Derselbe Gedanke fuer den User-Agent (BRIEF_SATURN_ADAPTER_R2): NUR
+    # wenn der Anbieter ihn ueberschreibt (Saturn), bekommt `hole()`
+    # ueberhaupt ein drittes Argument - jede bestehende Testattrappe mit
+    # `hole(url)` oder `hole(url, kopfzeilen=None)` bleibt gueltig.
+    user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
 
     def _hole(url: str) -> str:
         darf, grund = waechter.darf(url, jetzt)
@@ -429,7 +442,12 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             time.sleep(warte)
         letzter_abruf[0] = time.monotonic()
         bilanz.besucht.append(url)
-        status, text = hole(url, kopfzeilen) if kopfzeilen else hole(url)
+        kwargs = {}
+        if kopfzeilen:
+            kwargs["kopfzeilen"] = kopfzeilen
+        if user_agent:
+            kwargs["user_agent"] = user_agent
+        status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}")
         return text

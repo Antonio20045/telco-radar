@@ -1,5 +1,5 @@
 {
-  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung.",
+  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0.",
   "eintraege": [
     {
       "datei": "1und1_produkt_iphone17.html.gz",
@@ -315,6 +315,30 @@
       "kopfzeilen": {
         "Accept": "application/vnd.commerce.message+json"
       }
+    },
+    {
+      "datei": "saturn_produkt_iphone17_pro.html.gz",
+      "url": "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro",
+      "abgerufen_am": "2026-09-05",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes_roh": 907129,
+      "sha256_roh": "c073df460c5aeb659545f649ce9846ea67dad9d2ff2d26b297a43a360d23f53c",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 125846
+    },
+    {
+      "datei": "saturn_produkt_iphone17.html.gz",
+      "url": "https://www.saturn.de/de/brand/apple/iphone/iphone-17",
+      "abgerufen_am": "2026-09-05",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes_roh": 1186555,
+      "sha256_roh": "7e2eef6d7b4182a9f7fec16703a0b1a81b1a2323413a13a2637ed41ed242e923",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 138642
     }
   ]
 }
