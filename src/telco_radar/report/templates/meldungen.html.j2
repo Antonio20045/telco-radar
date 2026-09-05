@@ -63,6 +63,17 @@
 <div class="meldungen-kopf">
   <p class="page-kicker">Ausgabe vom {{ date_de }}</p>
   <h1>Alle Meldungen</h1>
+  {# E3B-R2: dieselbe Ausnahme wie am Aufmacher der Titelseite
+     (woche.html.j2) - eine Runde ohne bewertete Meldung zeigt hier
+     weiterhin die letzte gueltige Redaktion, und das muss an der Stelle
+     stehen, wo der Leser die Ausgabe-Datierung liest. Ohne diesen Hinweis
+     stand "Ausgabe vom 4. September" ueber Meldungen vom 28.08. #}
+  {% if redaktion_ausfall %}
+  <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
+    die Runde vom {{ date_de }} blieb ohne Bewertung:
+    {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
+    zuletzt vollständig redigierte Ausgabe.</p>
+  {% endif %}
 </div>
 
 {% if ressorts %}

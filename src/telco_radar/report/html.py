@@ -1540,6 +1540,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         env.get_template("meldungen.html.j2").render(
             prefix="", archive=archive, num_operators=num_operators,
             date_de=(latest_ctx or {}).get("date_de", ""),
+            # E3B-R2: dieselbe uebernommene Redaktion wie auf der Titelseite -
+            # ohne den Hinweis stand hier "Ausgabe vom 4. September" ueber
+            # Meldungen vom 28.08., ohne jeden Alters- oder Ausfallhinweis.
+            redaktion_ausfall=(latest_ctx or {}).get("redaktion_ausfall"),
             highlights=(latest_ctx or {}).get("highlights", []),
             # Nach Ressort gruppiert und innerhalb gewichtet - vorher waren
             # es 193 identisch gebaute Zeilen untereinander.
