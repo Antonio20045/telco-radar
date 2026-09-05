@@ -116,27 +116,91 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
     Die zwei Zahlen haben verschiedene Vergleichsmengen, und das ist kein
     Widerspruch: der GERAETEPREIS ist ein reiner Barpreis - dafuer zaehlt
     auch Vodafones Naeherungskarte, denn ihr Barpreis ist real gemessen,
-    nur ihr Buendel ist gerechnet. Der TARIF-GESAMTPREIS ist ein Angebot,
-    das man wirklich kaufen kann - eine Naeherung ("kein Angebot", QA-Befund
-    S3) darf diese Zahl nicht fuehren. Am echten Bestand: Vodafone fuehrt
-    den Barpreis, aber keine eigene Tarifbuendel-Zahl fuer dieses Geraet;
-    1&1 fuehrt die guenstigste echte Gesamtsumme.
+    nur ihr Buendel ist gerechnet, UND die drei Haendler ohne Tarifbuendel
+    (Amazon/Expert/Saturn - F-4a', PM-Nachtrag 05.09.2026). Der
+    TARIF-GESAMTPREIS ist ein Angebot, das man wirklich kaufen kann - eine
+    Naeherung ("kein Angebot", QA-Befund S3) darf diese Zahl nicht fuehren,
+    und die drei Haendler auch nicht: sie fuehren kein Tarifbuendel. Am
+    echten Bestand: Saturn fuehrt den guenstigsten Barpreis (1.179,00 EUR,
+    vor Vodafones 1.199,90 EUR - der gemessene PM-Befund); 1&1 fuehrt die
+    guenstigste echte Gesamtsumme mit Tarif.
     """
     modell = _modell(bestand, "apple-iphone-17-pro-256")
     antwort = modell["antwort"]
-    assert antwort["geraetepreis"] == 1199.90
-    assert antwort["geraetepreis_anbieter"] == "Vodafone"
+    assert antwort["geraetepreis"] == 1179.0
+    assert antwort["geraetepreis_anbieter"] == "Saturn"
     assert antwort["tarif_gesamt"] == 1619.64
     assert antwort["tarif_anbieter"] == "1&1"
     # Gegenprobe: die zwei Gewinner sind wirklich verschiedene Anbieter -
     # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
     # zwei Metriken.
     assert antwort["geraetepreis_anbieter"] != antwort["tarif_anbieter"]
-    # Die Vodafone-Karte, die den Geraetepreis fuehrt, ist selbst eine
-    # Naeherungsrechnung - genau der Fall, den die Antwortzeile absichtlich
-    # zulaesst.
+    # Vodafones Naeherungskarte bleibt trotzdem eine gueltige Kandidatin
+    # fuer den Geraetepreis (ihr Barpreis ist real gemessen) - sie fuehrt
+    # nur nicht mehr, seit Saturn guenstiger ist.
     vodafone = next(k for k in modell["karten"] if k["anbieter"] == "Vodafone")
     assert vodafone["naeherung"] is True
+    assert vodafone["geraetepreis"] == 1199.90
+
+
+def test_antwortzeile_bezieht_haendler_ohne_buendel_ins_minimum_ein(bestand):
+    """F-4a' (PM-Nachtrag, 05.09.2026, dringend): die Leitzahl der Seite
+    darf ihrer eigenen Haendlerkarte nicht widersprechen. Generischer Test
+    ueber ALLE Modelle: das Antwortzeilen-Minimum ist <= jedem sichtbaren
+    Haendler-Gerätepreis (Amazon/Expert/Saturn) desselben Modellblocks -
+    egal ob dieser Haendler eine Karte in `karten` hat (er hat nie eine,
+    weil er kein Tarifbuendel fuehrt)."""
+    import json as _json
+
+    listungen = _json.loads(
+        (ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))["listungen"]
+    geprueft = 0
+    for modell in bestand["modelle"]:
+        antwort = modell["antwort"]
+        if antwort["geraetepreis"] is None:
+            continue
+        eigene = [e for e in listungen
+                 if karten.modell_schluessel(e.get("device_id"),
+                                             e.get("speicher_gb"))
+                 == modell["id"]]
+        haendler = karten._haendler_geraetepreise(eigene)
+        for name, eintrag in haendler.items():
+            if eintrag is None:
+                continue
+            geprueft += 1
+            assert antwort["geraetepreis"] <= eintrag["preis"], (
+                f"{modell['id']}: Antwortzeile {antwort['geraetepreis']} "
+                f"> {name} {eintrag['preis']}")
+    # Gegenprobe: der Testlauf hat wirklich mindestens einen Haendlerpreis
+    # gesehen - sonst prueft die Schleife oben nichts (Saturn fuehrt am
+    # echten Bestand vom 05.09.2026 mindestens ein Modell).
+    assert geprueft > 0
+
+
+def test_antwortzeile_bleibt_unveraendert_ohne_haendlerpreise(bestand):
+    """Gegenprobe zum PM-Nachtrag: ein Modell OHNE Amazon/Expert/Saturn in
+    der Aufstellung darf durch die Erweiterung nicht anders rechnen - sonst
+    waere die neue Regel ein globaler Eingriff statt einer gezielten
+    Ergaenzung. Fairphone 6 256 GB fuehrt im Bestand vom 05.09.2026 keinen
+    der drei Haendler."""
+    modell = _modell(bestand, "fairphone-6-256")
+    listungen = __import__("json").loads(
+        (ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))["listungen"]
+    eigene = [e for e in listungen
+             if karten.modell_schluessel(e.get("device_id"),
+                                         e.get("speicher_gb")) == modell["id"]]
+    haendler = karten._haendler_geraetepreise(eigene)
+    assert all(v is None for v in haendler.values()), (
+        "die Gegenprobe braucht ein Modell ohne Haendlerpreis")
+    # Unveraendert: der guenstigste Kartenanbieter fuehrt weiter, exakt wie
+    # vor der Erweiterung.
+    antwort = modell["antwort"]
+    guenstigste_karte = min(
+        (k for k in modell["karten"]
+         if k["vergleichbar"] and k["geraetepreis"] is not None),
+        key=lambda k: k["geraetepreis"])
+    assert antwort["geraetepreis"] == guenstigste_karte["geraetepreis"]
+    assert antwort["geraetepreis_anbieter"] == guenstigste_karte["anbieter"]
 
 
 def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
