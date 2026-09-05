@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-04",
+ "updated": "2026-09-05",
  "buendel": [
   {
    "id": "buendel--o2--apple-iphone-14-128gb-schwarz--o2-mobile-on-demand-m-plus-mit-50-gb-24-mon",
@@ -1138,6 +1138,111 @@
  ],
  "sim_only": [
   {
+   "id": "simonly--1-1--1-1-all-net-flat-l",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 All-Net-Flat L",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-all-net-flat-l",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 19.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-all-net-flat-m",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 All-Net-Flat M",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-all-net-flat-m",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 14.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-all-net-flat-s",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 All-Net-Flat S",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-all-net-flat-s",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 14.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-unlimited-on-demand-l",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 Unlimited on demand L",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-unlimited-on-demand-l",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 24.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-unlimited-on-demand-m",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 Unlimited on demand M",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-unlimited-on-demand-m",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 19.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-unlimited-on-demand-s",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 Unlimited on demand S",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-unlimited-on-demand-s",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 19.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
+   "id": "simonly--1-1--1-1-unlimited-xl",
+   "anbieter": "1&1",
+   "tarif_name": "1&1 Unlimited XL",
+   "first_seen": "2026-09-05",
+   "tarif_id": "11:1-1-unlimited-xl",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 39.99,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.1und1.de/handytarife",
+   "abgerufen_am": "2026-09-04",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
+  },
+  {
    "id": "simonly--telekom--magentamobil-basic",
    "anbieter": "Telekom",
    "tarif_name": "MagentaMobil Basic",
@@ -1147,23 +1252,25 @@
    "tarif_sim_only_monatlich": 24.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/magentamobil-basic-20240801",
-   "abgerufen_am": "2026-09-04",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--telekom--magentamobil-l",
    "anbieter": "Telekom",
    "tarif_name": "MagentaMobil L",
    "first_seen": "2026-09-04",
-   "tarif_id": "telekom:magentamobil-l",
+   "tarif_id": "telekom:magentamobil-l#live_shop",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 59.95,
    "anschlusspreis": null,
-   "quelle_url": "https://www.telekom.de/produktinformationsblatt/magentamobil-l-20240801",
-   "abgerufen_am": "2026-09-04",
+   "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17797#js-tileSectionRef",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--telekom--magentamobil-l-flex",
@@ -1175,23 +1282,25 @@
    "tarif_sim_only_monatlich": 59.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-l-flex-20211005",
-   "abgerufen_am": "2026-09-04",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--telekom--magentamobil-m",
    "anbieter": "Telekom",
    "tarif_name": "MagentaMobil M",
    "first_seen": "2026-09-04",
-   "tarif_id": "telekom:magentamobil-m",
+   "tarif_id": "telekom:magentamobil-m#live_shop",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 49.95,
    "anschlusspreis": null,
-   "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-m-20211121",
-   "abgerufen_am": "2026-09-04",
+   "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17791#js-tileSectionRef",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--telekom--magentamobil-m-flex",
@@ -1203,23 +1312,25 @@
    "tarif_sim_only_monatlich": 49.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-m-flex-20211005",
-   "abgerufen_am": "2026-09-04",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--telekom--magentamobil-s",
    "anbieter": "Telekom",
    "tarif_name": "MagentaMobil S",
    "first_seen": "2026-09-04",
-   "tarif_id": "telekom:magentamobil-s",
+   "tarif_id": "telekom:magentamobil-s#live_shop",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 39.95,
    "anschlusspreis": null,
-   "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-s-20211121",
-   "abgerufen_am": "2026-09-04",
+   "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17785#js-tileSectionRef",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--telekom--magentamobil-s-flex",
@@ -1231,23 +1342,25 @@
    "tarif_sim_only_monatlich": 39.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-s-flex-20211005",
-   "abgerufen_am": "2026-09-04",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--telekom--magentamobil-xl",
    "anbieter": "Telekom",
    "tarif_name": "MagentaMobil XL",
    "first_seen": "2026-09-04",
-   "tarif_id": "telekom:magentamobil-xl",
+   "tarif_id": "telekom:magentamobil-xl#live_shop",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 84.95,
    "anschlusspreis": null,
-   "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-xl-20211121",
-   "abgerufen_am": "2026-09-04",
+   "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17803#js-tileSectionRef",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--telekom--magentamobil-xl-flex",
@@ -1259,9 +1372,25 @@
    "tarif_sim_only_monatlich": 84.95,
    "anschlusspreis": null,
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-xl-flex-20211005",
-   "abgerufen_am": "2026-09-04",
+   "abgerufen_am": "2026-09-05",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
+  },
+  {
+   "id": "simonly--telekom--magentamobil-xs",
+   "anbieter": "Telekom",
+   "tarif_name": "MagentaMobil XS",
+   "first_seen": "2026-09-05",
+   "tarif_id": "telekom:magentamobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_sim_only_monatlich": 29.95,
+   "anschlusspreis": null,
+   "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17779#js-tileSectionRef",
+   "abgerufen_am": "2026-09-05",
+   "rabatte": [],
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--vodafone--vodafone-mobil-l",
@@ -1275,7 +1404,8 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-L-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--vodafone--vodafone-mobil-m",
@@ -1289,7 +1419,8 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-M-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--vodafone--vodafone-mobil-s",
@@ -1303,7 +1434,8 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-S-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--vodafone--vodafone-mobil-xl",
@@ -1317,7 +1449,8 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XL-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--vodafone--vodafone-mobil-xs",
@@ -1331,7 +1464,8 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XS-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-l",
@@ -1345,7 +1479,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_545.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-l-flex",
@@ -1359,7 +1494,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_549.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-m",
@@ -1373,7 +1509,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_540.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-m-flex",
@@ -1387,7 +1524,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_548.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-s-flex-mit-gb",
@@ -1401,7 +1539,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_559.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-s-mit-gb",
@@ -1415,7 +1554,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_560.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-xl-flex-mit-upgrade-versprechen",
@@ -1429,7 +1569,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_550.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-xl-mit-upgrade-versprechen",
@@ -1443,7 +1584,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_546.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-xs-flex-mit-gb",
@@ -1457,7 +1599,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_544.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--congstar--allnet-flat-xs-mit-gb",
@@ -1471,7 +1614,8 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_543.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--o2--o2-mobile-l",
@@ -1485,7 +1629,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-l-flex",
@@ -1499,7 +1644,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-on-demand-m",
@@ -1513,7 +1659,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-on-demand-m-flex",
@@ -1527,7 +1674,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-s",
@@ -1541,7 +1689,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-s-flex",
@@ -1555,7 +1704,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-l",
@@ -1569,7 +1719,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-l-flex",
@@ -1583,7 +1734,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-m",
@@ -1597,7 +1749,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-m-flex",
@@ -1611,7 +1764,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-m-flex-2026",
@@ -1625,7 +1779,8 @@
    "quelle_url": "https://static2.o9.de/resource/blob/2241742/f853005b6defea74a5b4b10da9240e49/o2-mobile-unlimited-m-flex-2026-download-data.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "dokument"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-s-special",
@@ -1639,7 +1794,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   },
   {
    "id": "simonly--o2--o2-mobile-unlimited-s-special-flex",
@@ -1653,7 +1809,8 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-04"
+   "last_verified": "2026-09-05",
+   "quelle_art": "live_shop"
   }
  ]
 }

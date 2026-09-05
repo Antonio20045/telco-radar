@@ -85,7 +85,7 @@
   <h2 class="rubrik">Alle beobachteten Anbieter
     <span class="rubrik-zahl">21</span></h2>
   <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>8</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>9</b><span>liefern Geräte</span></div>
     <div class="t-kennzahl"><b>10</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
@@ -126,10 +126,10 @@
   <td>netzbetreiber</td>
   <td><code>telekom_kategorie</code></td>
   <td>
-    <span class="sdot empty"></span>
-    angebunden, ohne Fund
+    <span class="sdot ok"></span>
+    liefert
   </td>
-  <td class="num">0</td>
+  <td class="num">10</td>
   <td class="gr-grund">
     ANGEBUNDEN SEIT 04.09.2026 — mit einer Preisform, die keine Barpreisform ist. Die Kategorieseite /shop/geraete/smartphones/ ohne-vertrag antwortet dem Absender TelcoRadar/1.0 mit HTTP 200 und 2,23 MB und trägt in window.__INITIAL_STATE__.productList.data zehn Geräte mit absoluten Beträgen: upfrontPrice, recurringPrice über 36 Raten und totalPrice. Nachgerechnet geht die Probe bei 10 von 10 auf (Apple iPhone 17 Pro: 99,00 + 36 × 30,50 = 1197,00; Samsung Galaxy Z Fold8 Ultra: 399,00 + 36 × 50,00 = 2199,00). Das ist ein 36-Monats-Ratengesamtbetrag und kein Kassenpreis, und genau das ist die Bedingung, die der alte Grund gestellt hatte: der Adapter schreibt die Preisform mit (anzahlung, monatsrate, laufzeit_monate), und geht die Probe nicht auf, wird der Satz verworfen statt als Barpreis gespeichert. Der Befund vom 11.08.2026 zur PRODUKTSEITE bleibt richtig und ist der Grund, warum hier die Kategorieseite steht: productDetailed. productDetailsData trägt je Speicherstufe nur einen deltaPrice, also einen Aufschlag ohne Grundbetrag. Einen Zinssatz nennt die Seite nicht; zins_effektiv bleibt leer und heißt &#34;unbekannt&#34;, nicht &#34;null Prozent&#34;. Die zehn Produktadressen stehen als echte a-href (/shop/geraet/) im selben HTML und werden dem Gerät über seine drei Slugs zugeordnet — nicht aus ihnen zusammengesetzt. GRENZE, unverändert: aus dem GitHub-Actions-IP-Bereich antwortet telekom.de httpx mit HTTP 202 und rund 2 KB Challenge-HTML (CLAUDE.md § 6). Der Adapter ändert daran nichts und soll es nicht — ein Fingerprint-Trick wäre eine Umgehung. Fällt der Abruf so aus, trägt die Nutzlast kein Gerät, die Seite gilt als ungelesen, und die Bestandsdaten altern NICHT. ROBOTS (04.09.2026 gelesen): /robots.txt sperrt für User-agent * nur /is-bin/intershop.enfinity/BOS/ und /is-bin/intershop.static/. Die Shop-Pfade sind frei.
     
@@ -589,7 +589,7 @@
   Gerätekatalog und in der CSV-Tabelle – beide zeigen den Bestand, nicht die
   geprüfte Auswahl. Ein Preis, der sich nicht belegen lässt, verschwindet
   nicht; er wird nur nicht gegen einen anderen gerechnet.</p>
-  <p class="gr-erklaer">495 Preiszeilen geprüft,
+  <p class="gr-erklaer">505 Preiszeilen geprüft,
   10 aus dem Vergleich genommen,
   2 Auffälligkeiten notiert.</p>
   
