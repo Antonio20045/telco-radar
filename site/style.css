@@ -315,6 +315,15 @@ b,strong{font-weight:700}
   font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 .archivhinweis a{color:var(--red);border-bottom:1px solid var(--red)}
 
+/* E3B, 05.09.2026: Hinweis, dass eine leere Bewertungsrunde die letzte
+   gueltige Redaktion zeigt (analyze/redaktion_kontinuitaet.py) - dieselbe
+   Bauform wie .ueb-hinweis (eigener Untergrund, Linie links, vor dem
+   Inhalt), weil beide dasselbe tun: dem Leser VOR dem Text sagen, was er
+   liest. */
+.ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
+  padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
+  line-height:1.5;color:var(--ink-2)}
+
 
 /* ================================================  MELDUNGEN (Ressort) == */
 /* Alle Meldungen der Woche, nach Ressort gegliedert und innerhalb
