@@ -236,6 +236,18 @@ def test_normale_woche_zeigt_keinen_ausfall_hinweis(tmp_path):
     render_site(site, reports)
     html = (site / "index.html").read_text(encoding="utf-8")
     assert "ausfall-hinweis" not in html
+
+
+def test_meldungenseite_normale_woche_ohne_hinweis(tmp_path):
+    """E3B-R3: dieselbe Pruefung wie oben, aber fuer meldungen.html - als
+    eigene Testfunktion statt als angehaengte Zeilen an den Aufmacher-Test,
+    damit beide Seiten unabhaengig fassbar sind (R2-Befund des Evaluators)."""
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    (reports / "2026-08-10.json").write_text(
+        json.dumps(_bericht("2026-08-10")), encoding="utf-8")
+    site = tmp_path / "site"
+    render_site(site, reports)
     meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
     assert "ausfall-hinweis" not in meldungen
 
