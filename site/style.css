@@ -2704,7 +2704,29 @@ b,strong{font-weight:700}
 .gr-grafik{margin:0 0 18px;padding:0}
 .gr-grafik figcaption{font-family:var(--sans);font-size:12px;
   color:var(--ink-4);margin-top:6px;line-height:1.5}
-.gr-g1,.gr-g2{display:block;width:100%;height:auto}
+.gr-g1,.gr-g2,.gr-g0{display:block;width:100%;height:auto}
+
+/* G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026). Dieselbe
+   Bauform wie G2 (Raster, Achse, Linie, Punkt, Legende); eigene Klassen,
+   weil G0 zusaetzlich eine Sammelluecke UND einzelne Punkte kennt, die G2
+   nicht zeichnet. */
+.gr-g0-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g0-raster--x{stroke-dasharray:2 4}
+.gr-g0-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g0-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g0-punkt{fill:var(--anb,#57534a)}
+/* Ein Anbieter mit nur EINEM Punkt traegt keine Linie - der Punkt ist
+   etwas groesser (siehe `r` in `geraete_tco_grafik.zeitreihe`) und bekommt
+   einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
+   bewegte Linie eines anderen Anbieters an ihm vorbeilaeuft. */
+.gr-g0-punkt--einzeln{stroke:var(--paper);stroke-width:1.5}
+.gr-g0-legende{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+/* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
+   sie darf nicht lauter sein als die Linien selbst. */
+.gr-g0-luecke{fill:var(--ink);opacity:.05}
+.gr-g0-chrome{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  margin-top:6px}
 .gr-g1-gruppe{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
   text-transform:uppercase;fill:var(--ink-3)}
 .gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
@@ -2744,6 +2766,6 @@ b,strong{font-weight:700}
    (Befund vom 11.08.2026 zur geloeschten Positionskarte). */
 @media (max-width:900px){
   .gr-grafik{overflow-x:auto}
-  .gr-g1,.gr-g2{width:1180px;max-width:none}
+  .gr-g1,.gr-g2,.gr-g0{width:1180px;max-width:none}
   .gr-karten{grid-template-columns:1fr}
 }
