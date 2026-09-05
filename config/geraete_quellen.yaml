@@ -472,10 +472,15 @@ anbieter:
       Geraet-x-Tarif-Buendel (`atomics[].prices.composition`, 2-4 je
       Variante) ohne Klarnamen - nur einen `offerCoreHash`. Aufgeloest wird
       er ueber einen zweiten, GEZIELTEN Abruf je `hardwareId` gegen
-      `/glados/v2/tariff/v2/hardware` (live gemessen: gut ein Drittel der
-      Hashes loest auf, der Rest bleibt ohne Namen und faellt beim
-      Tarifabgleich verworfen - siehe `outputs/phase-b1-buendel-vodafone-
-      2026-09-05.md`).
+      `/glados/v2/tariff/v2/hardware`. Die erste Schaetzung ("gut ein
+      Drittel") stammte aus einer Stichprobe von 15 Geraeten/30 Hashes; der
+      volle Lauf vom 05.09.2026 (51 Geraete, 596 Rohsaetze) misst 339 von
+      596 Hashes ueber die Schnittstelle aufloesbar (56,9 %), davon
+      matchen 253 (42,5 % von 596) gegen den hier erfassten Tarifbestand
+      (10 Basistarife XS-XL). Der groesste Rest sind FamilyCard-Varianten
+      (86 Stueck) - namentlich aufgeloest, aber nicht Teil des Bestands,
+      also kein Aufloesungsfehler - siehe `outputs/phase-b1-buendel-
+      vodafone-2026-09-05.md`.
     einstiege:
       - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
         label: Geraeteliste (Schnittstelle der Uebersichtsseite)
