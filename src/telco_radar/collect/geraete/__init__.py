@@ -265,6 +265,7 @@ def _registriere_anbieter_adapter() -> None:
     from . import congstar as congstar_modul
     from . import einsundeins as einsundeins_modul
     from . import o2 as o2_modul
+    from . import saturn as saturn_modul
     from . import telekom as telekom_modul
     from . import vodafone as vodafone_modul
 
@@ -300,6 +301,13 @@ def _registriere_anbieter_adapter() -> None:
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
                         ernte=einsundeins_modul.ernte))
+    # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
+    # stehen bereits in dieser einen Antwort, keine Produktseite wird
+    # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
+    # der Adapter selbst aus dem Apollo-Cache (saturn.py).
+    registriere("saturn_brand", Adapter(name="saturn_brand",
+                                        lies=saturn_modul.lies,
+                                        direkt=True))
 
 
 _registriere_anbieter_adapter()

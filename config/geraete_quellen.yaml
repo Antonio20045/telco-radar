@@ -30,10 +30,10 @@
 #                 eine Diagnose ohne Adapter. Die gültige Liste steht in
 #                 `geraete_config.METHODEN`; ein Tippfehler deaktiviert den
 #                 Anbieter sichtbar, statt still null zu liefern.
-#                 GEBAUT (Stand 04.09.2026): `ldjson` (inklusive der
+#                 GEBAUT (Stand 05.09.2026): `ldjson` (inklusive der
 #                 schema.org-Microdata-Stufe), `shopify`, `vodafone_api`,
 #                 `o2_katalog`, `congstar_next`, `telekom_kategorie`,
-#                 `einsundeins_buendel`.
+#                 `einsundeins_buendel`, `saturn_brand`.
 #                 DIAGNOSE OHNE ADAPTER: `json_endpunkt`, `html`, `js`, `api`
 #                 - gemessen und dokumentiert, aber nichts liest sie. Sie sind
 #                 bewusst keine gemeinsame Methode: fünf Anbieter tragen
@@ -121,19 +121,106 @@ anbieter:
     typ: handel
     gruppe: Ceconomy
     rang: 2
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Gleiche Plattform und gleiche Sperre wie MediaMarkt (HTTP 403 auf
-      Produktseiten, Preise nur im __PRELOADED_STATE__ der Kampagnenseite).
-      Beide gehören zu Ceconomy - wer sie als zwei Wettbewerber führt, zählt
-      einen doppelt.
+    methode: saturn_brand
+    aktiv: true
     basis_url: https://www.saturn.de
+    # Zehn Sekunden statt der Voreinstellung, obwohl robots.txt fuer
+    # User-agent "*" keinen Crawl-delay nennt (gelesen 05.09.2026) - 17
+    # Markenseiten hintereinander bei zwei Sekunden waeren immer noch nur
+    # 34s, aber dieses Radar fragt hier einen Cloudflare-Host ab, keine
+    # Presse-Feeds. Dieselbe konservative Haltung wie bei Telekom.
+    rate_limit_sekunden: 10
+    # `grund` ist gestrichen: das Feld beantwortet "warum NICHT aktiv", und
+    # die Frage stellt sich seit dem 05.09.2026 nicht mehr (siehe Spike
+    # outputs/saturn-spike-2026-09-05.md und die Produktivmessung im
+    # zugehoerigen Bericht outputs/phase-saturn-adapter-2026-09-05.md).
+    hinweis: >-
+      ANGEBUNDEN SEIT 05.09.2026, nach dem Spike vom selben Tag - der
+      alte Befund ("HTTP 403 auf Produktseiten wie MediaMarkt") war eine
+      Verwechslung mit der falschen Zielseite (der frueher konfigurierten
+      Kampagnenseite). Jede Markenseite
+      (/de/brand/<hersteller>/<serie>/<modell>) traegt den Preis
+      SERVERSEITIG in zwei unabhaengigen Strukturen derselben Antwort:
+      einem ld+json-Block vom Typ ItemList UND window.__PRELOADED_STATE__
+      (Apollo-Cache). Nur der Apollo-Cache traegt das Feld
+      isProductOfTypeMarketplace - PFLICHT, um Saturn-eigene Preise von
+      Drittanbietern im Marktplatz zu trennen (auf
+      /de/brand/apple/iphone/iphone-17 sind 7 von 12 gelisteten Angeboten
+      fremd, mit bis zu 2036 EUR fuer ein Geraet, das Saturn selbst fuer
+      939,99 EUR fuehrt). Reiner HTTP-GET ohne Playwright reicht; kein
+      Browser im Produktionspfad, keine der zwei robots-gesperrten
+      GraphQL-Operationen (GetPaidBundles/GetFreeBundles) wird beruehrt -
+      der Preis steht schon in der ersten Antwort. Die im urspruenglichen
+      Auftrag genannte Kategorie-ID (/de/category/_..._701440.html) ist
+      dagegen eine tote, im Sitemap-Index nicht mehr gefuehrte Adresse
+      (HTTP 200, aber 0 Artikel) und wird NICHT verwendet.
+      GRENZE: sechs der 17 unten gefuehrten Markenseiten (Stand 05.09.2026)
+      liefern strukturell einwandfrei, aber ZU DIESEM ZEITPUNKT keine
+      einzige Saturn-eigene (nicht-Marktplatz-)Listung - iPhone 14/14 Pro/
+      14 Pro Max/15/15 Plus/15 Pro Max fuehrt Saturn aktuell offenbar nur
+      ueber Drittanbieter oder gar nicht mehr neu. Das ist kein
+      Abruffehler (die Seite antwortet 200 und ist strukturell lesbar),
+      sondern eine Marktaussage - der Bericht fuehrt jede Seite einzeln.
     einstiege:
-      - url: https://www.saturn.de/de/campaign/angebote-smartphones
-        label: Angebote Smartphones
+      # Jede Zeile ist eine Markenseite, die Modelle des Geraetekatalogs
+      # (config/geraete_katalog.yaml) fuehrt - Start-Scope laut Auftrag
+      # (BRIEF_SATURN_ADAPTER.md): alle Apple-iPhone-Serien des Katalogs.
+      # Jede Adresse ist am 05.09.2026 einzeln mit HTTP 200 gemessen
+      # (siehe outputs/phase-saturn-adapter-2026-09-05.md fuer die
+      # vollstaendige Tabelle inkl. der aktuell leeren). `direkt=True` in
+      # der Adapter-Registry: jede Seite IST ihre Nutzlast, es wird keine
+      # Produktseite nachgeladen - kein `pfadmuster` noetig.
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14
+        label: iPhone 14
         kind: static
-        pfadmuster: /de/product/
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14-pro
+        label: iPhone 14 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14-pro-max
+        label: iPhone 14 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15
+        label: iPhone 15
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-plus
+        label: iPhone 15 Plus
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-pro
+        label: iPhone 15 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-pro-max
+        label: iPhone 15 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16
+        label: iPhone 16
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-plus
+        label: iPhone 16 Plus
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-pro
+        label: iPhone 16 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-pro-max
+        label: iPhone 16 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16e
+        label: iPhone 16e
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17
+        label: iPhone 17
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro
+        label: iPhone 17 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro-max
+        label: iPhone 17 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-air
+        label: iPhone Air
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17e
+        label: iPhone 17e
+        kind: static
 
   - name: expert
     typ: handel

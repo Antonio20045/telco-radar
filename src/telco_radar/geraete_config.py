@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 # einen EIGENEN Namen - dann sagt die Konfiguration, was wirklich gelesen wird.
 METHODEN = ("api", "ldjson", "shopify", "json_endpunkt", "html", "js",
             "vodafone_api", "o2_katalog", "congstar_next",
-            "telekom_kategorie", "einsundeins_buendel",
+            "telekom_kategorie", "einsundeins_buendel", "saturn_brand",
             "kein_hardware", "deaktiviert")
 
 # Diese zwei sind gueltige Messergebnisse und keine Fehlkonfiguration, aber
