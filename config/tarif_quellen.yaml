@@ -254,9 +254,40 @@ quellen:
     # 2021 stammen. Diese Live-Kacheln sind damit die AKTUELLERE Quelle
     # fuer denselben Betrag - Einzelheiten in
     # `collect/tarif_telekom_kacheln.py`.
+    #
+    # NACHMESSUNG 05.09.2026 (R2, Evaluator-Befund): geprueft, ob diese
+    # Seite AUCH die vier Flex-Varianten als Kachel traegt - sie tut es
+    # nicht, und `max_dokumente` ist NICHT die Ursache dafuer (5 gefundene
+    # Kacheln bei `max_dokumente: 5` ist keine Kappung, sondern deckt sich
+    # mit dem, was die Seite wirklich liefert). Drei Gegenproben, alle
+    # lokal mit `TelcoRadar/1.0`:
+    #   1. Frischer Abruf derselben URL: weiterhin GENAU fuenf Treffer auf
+    #      `TariffTileModified_TariffTileModified__<hash>` (XS/S/M/L/XL,
+    #      keine sechste/siebte Kachel).
+    #   2. `__INITIAL_STATE__` derselben Seite rekursiv nach jedem Schluessel
+    #      durchsucht, der "flex" enthaelt UND eine Zahl neben sich fuehrt:
+    #      16 Treffer, alle Marketing-/Rechtstext (uebersetzungen,
+    #      MagentaEINS-Bedingungen) - keiner ein strukturierter Tarifpreis.
+    #      `productList.data` und `tariffv2.currentTariffs` sind leer.
+    #   3. Die naheliegende ZWEITE Seite `/shop/tarife/smartphone-tarife-flex`
+    #      (Routen-ID aus derselben `__INITIAL_STATE__`) und alle acht
+    #      Flex-Tarif-Detailseiten (`/shop/tarif/magenta-mobil-{xs,s,m,l,xl}
+    #      -flex`, `.../magenta-mobil-data-{s,m,l}-flex`) einzeln abgerufen:
+    #      alle HTTP 200, aber null Treffer auf die Kachel-Klasse UND kein
+    #      einziges `ld+json` mit einem Product-/Offer-Knoten (nur
+    #      BreadcrumbList/Organization/FAQPage - derselbe Befund wie bei den
+    #      Nicht-Flex-Detailseiten, die ebenfalls keinen Preis fuehren).
+    # Ergebnis: kein Selektor auf dieser Domain liefert einen belegten
+    # Flex-Preis. Das ist eine gemessene Grenze der Quelle, keine
+    # Konfigurationsentscheidung - `max_dokumente` steht trotzdem auf 12
+    # statt exakt 5, damit eine kuenftige sechste/siebte Kachel (etwa eine
+    # nachgezogene Flex-Variante) nicht an dieser Zahl scheitert. Die vier
+    # Flex-Tarife und "MagentaMobil Basic" bleiben PDF-versorgt; ihr Stand
+    # (2021) steht ehrlich an ihrer eigenen Zeile, siehe
+    # `outputs/phase-t1-r2-2026-09-05.md`.
     einstieg:
       - https://www.telekom.de/shop/tarife/handyvertrag
-    max_dokumente: 5
+    max_dokumente: 12
 
   - anbieter: o2
     methode: kacheln
