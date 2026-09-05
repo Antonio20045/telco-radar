@@ -52,7 +52,7 @@ from bs4 import BeautifulSoup
 from ..models import Item
 from ..tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Tarif
 from .http import fetch
-from . import tarif_kacheln, tarif_ldjson
+from . import tarif_kacheln, tarif_ldjson, tarif_telekom_kacheln
 from .tarif_pdf import dokument_hash, ist_tarifdokument, lies_text, text_aus_pdf
 
 log = logging.getLogger(__name__)
@@ -116,6 +116,15 @@ METHODE_LDJSON = "ldjson"
 #            dessen uebrige Pflichtblaetter unter `/assets/` liegen - einem
 #            Pfad, den die fuer uns gueltige robots-Gruppe sperrt.
 METHODE_KACHELN = "kacheln"
+# `telekom_kacheln`  Wie `kacheln`, nur fuer ein anderes Markup: die
+#            Telekom zeichnet ihre Tarife nicht als strukturiertes
+#            Web-Component-Attribut aus (wie o2), sondern als
+#            React-CSS-Modul-Klassen (`TariffTileModified_...`). Eigener
+#            Extraktor, weil das Muster ein anderes ist - siehe
+#            `tarif_telekom_kacheln.py` fuer die Messung und die Regel,
+#            warum der DURCHGESTRICHENE Preis zaehlt und nicht der grosse
+#            "Ø"-Kombipreis.
+METHODE_TELEKOM_KACHELN = "telekom_kacheln"
 
 # Die Lesarten, deren Einstiegsseite selbst die Nutzlast ist: kein Link
 # wird geerntet, keine zweite Adresse geholt. Sie teilen sich denselben
@@ -123,6 +132,7 @@ METHODE_KACHELN = "kacheln"
 _SEITEN_LESARTEN = {
     METHODE_LDJSON: tarif_ldjson.tarife_aus_html,
     METHODE_KACHELN: tarif_kacheln.tarife_aus_html,
+    METHODE_TELEKOM_KACHELN: tarif_telekom_kacheln.tarife_aus_html,
 }
 
 # Die GEBAUTEN Methoden - eine einzige Liste, gegen die sich Konfiguration

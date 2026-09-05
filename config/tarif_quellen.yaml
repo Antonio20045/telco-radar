@@ -58,6 +58,14 @@
 #                        Tarifen ausser einem liegen unter /assets/ - ein
 #                        Pfad, den die fuer uns gueltige robots-Gruppe
 #                        `User-agent: *` sperrt.
+#   methode: telekom_kacheln  Eigene Lesart fuer ein eigenes Markup: die
+#                        Telekom zeichnet ihre Tarifkacheln nicht als
+#                        Web-Component-Attribut aus (wie o2), sondern als
+#                        React-CSS-Modul-Klassen. Siehe
+#                        `collect/tarif_telekom_kacheln.py` fuer die
+#                        Messung vom 05.09.2026 und die Regel, warum der
+#                        DURCHGESTRICHENE Preis zaehlt und nicht der grosse
+#                        "Ø"-Kombipreis.
 #
 # Das Blatt traegt den Vermarktungsstand, die Shop-Seite den Preis von
 # heute. Beide sind richtig, und sie DUERFEN auseinanderlaufen - die
@@ -230,6 +238,26 @@ quellen:
       - https://www.1und1.de/handytarife
     max_dokumente: 10
 
+  - anbieter: Telekom
+    methode: telekom_kacheln
+    # Gemessen 05.09.2026, lokal, Absender TelcoRadar/1.0: HTTP 200,
+    # 2,26 MB. Fuenf Tarifkacheln (XS/S/M/L/XL), servergerendert als
+    # React-CSS-Modul-Markup - nicht im JSON-Zustand (siehe Fussnote unten,
+    # die fuer den ZUSTAND weiterhin richtig ist).
+    #
+    # Uebernommen wird der DURCHGESTRICHENE Preis je Kachel (39,95 / 49,95
+    # / 59,95 / 84,95 / 29,95 EUR fuer S/M/L/XL/XS), nicht die gross
+    # gezeigte "Ø"-Zahl (34,95 / 39,95 / 49,95 / 74,95 / 24,95 EUR) - die
+    # ist ein bedingter Kombipreis. Gegenprobe: der durchgestrichene Preis
+    # trifft fuer S/M/L/XL exakt die Betraege aus den Produktinformations-
+    # blaettern (Eintrag ganz oben in dieser Datei), die teils noch aus
+    # 2021 stammen. Diese Live-Kacheln sind damit die AKTUELLERE Quelle
+    # fuer denselben Betrag - Einzelheiten in
+    # `collect/tarif_telekom_kacheln.py`.
+    einstieg:
+      - https://www.telekom.de/shop/tarife/handyvertrag
+    max_dokumente: 5
+
   - anbieter: o2
     methode: kacheln
     # Gemessen 04.09.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
@@ -291,7 +319,9 @@ quellen:
 # Der Eintrag oben ersetzt ihn NICHT: er liefert den heutigen Shop-Preis,
 # nicht das Pflichtdokument mit Laufzeit, Drosselung und Kleingedrucktem.
 
-# --- Warum der TELEKOM-SHOP hier NICHT als Live-Quelle steht
+# --- Warum der ZUSTAND der Telekom-Shop-Seite weiterhin keinen Tarifpreis
+#     traegt (die Seite SELBST ist seit dem 05.09.2026 trotzdem Live-Quelle,
+#     siehe der Eintrag "methode: telekom_kacheln" oben)
 # Gemessen am 04.09.2026, dreimal, mit dem Absender TelcoRadar/1.0:
 #
 #   https://www.telekom.de/mobilfunk/tarife
@@ -312,15 +342,23 @@ quellen:
 #     und FAQPage - keinen Product-Knoten.
 #
 # Die Betraege, die man im HTML DOCH findet (29,95 / 9,95 / 39,95 ...),
-# stehen ausschliesslich in Uebersetzungstexten unter
+# stehen GROSSTENTEILS in Uebersetzungstexten unter
 # `translation.cart.global.magentaOneDiscountDetailsModal.*` und in
 # FAQ-Absaetzen - also in Marketingfliesstext ueber den MagentaEINS-Rabatt,
-# nicht an einem Tarif. Sie einer MagentaMobil-Linie zuzuordnen waere
+# nicht an einem Tarif. Sie einer MagentaMobil-Linie zuzuordnen waere dort
 # geraten; nach E1 wird eine fehlende Zahl als fehlend gefuehrt.
 #
+# KORREKTUR VOM 05.09.2026: das gilt fuer den ZUSTAND, nicht mehr fuer die
+# ganze Seite. Dieselbe Seite rendert ihre fuenf Tarifkacheln zusaetzlich
+# als HTML (React-CSS-Modul-Markup, keine `__INITIAL_STATE__`-Auswertung
+# noetig) - und DORT stehen 29,95 und 39,95 sehr wohl an einem echten
+# Tarif ("MagentaMobil XS" bzw. "S"), nicht nur im Rabatt-Modaltext. Siehe
+# den Eintrag "methode: telekom_kacheln" oben und
+# `collect/tarif_telekom_kacheln.py`.
+#
 # Der naechste Schritt waere die Schnittstelle, die die Seite selbst
-# aufruft (BFF_EXT = /shop/api/eshop/bff-de). Sie ist NICHT versucht
-# worden: sie steht nicht in dieser Phase, und ihr Aufruf braucht eine
-# eigene Messung und eine eigene Entscheidung. Die Live-Preise der Telekom
-# bleiben bis dahin offen - die Tarife stehen weiterhin ueber ihre
-# Produktinformationsblaetter im Bestand (Eintrag ganz oben).
+# aufruft (BFF_EXT = /shop/api/eshop/bff-de). Sie ist WEITERHIN nicht
+# versucht worden - fuer den Tarifpreis braucht es sie seit dem
+# 05.09.2026 auch nicht mehr; die Produktinformationsblaetter (Eintrag
+# ganz oben) bleiben als Pflichtdokument im Bestand, tragen aber nicht
+# mehr allein die Live-Sicht.

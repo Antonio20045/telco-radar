@@ -24,6 +24,19 @@
       "gzip": true,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 27457
+    },
+    {
+      "datei": "telekom_shop_tarife_handyvertrag.html.gz",
+      "url": "https://www.telekom.de/shop/tarife/handyvertrag",
+      "abgerufen_am": "2026-09-05",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes_roh": 2267192,
+      "sha256_roh": "e4353c05950fc4576c6007c8345583d770d701d92aaf49888435ca07f721a99b",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 500679,
+      "hinweis": "Fuenf Tarifkacheln (XS/S/M/L/XL) servergerendert als React-CSS-Modul-Markup (TariffTileModified_...); window.__INITIAL_STATE__ traegt weiterhin keinen Tarifpreis (tariffv2.plans leer, tariffHtmlSnippet.snippet.data leer) - siehe collect/tarif_telekom_kacheln.py."
     }
   ]
 }
