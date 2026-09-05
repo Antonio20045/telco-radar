@@ -52,7 +52,7 @@
     </div>
     <div class="t-kennzahl">
       <b>{{ tarife.bilanz.mit_luecken }}</b>
-      <span>mit bekannten Lücken</span>
+      <span>mit offenen Punkten (z. B. Cashback)</span>
     </div>
   </div>
   <p class="t-hinweis">Erfasst: {{ tarife.vorhanden | join(', ') }}.
@@ -61,7 +61,10 @@
   Nicht erfasst sind Anbieter, deren Dokumentenverzeichnis erst im Browser
   entsteht – dort steht im Quelltext kein Link, dem man folgen könnte.
   Ein fehlender Anbieter heißt nicht, dass er teurer oder billiger ist; er
-  fehlt schlicht.</p>
+  fehlt schlicht. „Offene Punkte" heißt: das Dokument nennt einen Wert wie
+  Cashback oder Anschlusspreis nicht – nicht, dass er null ist. In der
+  Positionskarte darunter stehen nur Tarife mit bekanntem Datenvolumen;
+  Tarife ohne Volumengrenze stehen als eigene Liste daneben.</p>
 </section>
 
 {# --- Die Positionskarte #}
@@ -132,6 +135,9 @@
         {% if z.url %}<a href="{{ z.url }}" rel="noopener">{{ z.name }}</a>
         {% else %}{{ z.name }}{% endif %}
       </h3>
+      {% if z.referenz_url %}
+      <p class="t-referenz"><a href="{{ z.referenz_url }}" rel="noopener">Produktinformationsblatt (Referenz)</a>{% if z.referenz_stand %}, Stand {{ z.referenz_stand }}{% endif %}</p>
+      {% endif %}
     </div>
     <div class="t-werte">
       <span class="t-wert">

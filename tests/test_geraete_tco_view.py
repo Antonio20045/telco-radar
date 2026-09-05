@@ -508,6 +508,25 @@ def test_die_tafel_zeigt_den_tarifpreis_auch_ohne_ein_einziges_buendel():
     assert zeile["quelle_url"]
 
 
+def test_die_referenztabelle_beschriftet_ihren_beleg_nach_der_quellenart():
+    """S-Q1/T3 (Review 05.09.2026): ein Beleglink, der eine Shop-Seite
+    "Produktinformationsblatt" nennt, ist selbst eine Falschangabe.
+
+    Vorgabewert bleibt `dokument` (ein Satz von vor dem 05.09.2026 kennt
+    das Feld nicht) - die Vorlage zeigt fuer ihn weiterhin
+    "Produktinformationsblatt".
+    """
+    d = aufbereiten([], [
+        _ref(tarif="A", quelle_art="dokument", quelle_url="https://x.de/pib"),
+        _ref(tarif="B", quelle_art="live_shop", quelle_url="https://x.de/shop"),
+        _ref(tarif="C", quelle_url="https://x.de/alt"),   # kein quelle_art
+    ], [], None)
+    by_tarif = {z["tarif"]: z for z in d["referenzen"]}
+    assert by_tarif["A"]["quelle_ist_dokument"] is True
+    assert by_tarif["B"]["quelle_ist_dokument"] is False
+    assert by_tarif["C"]["quelle_ist_dokument"] is True
+
+
 def test_der_tarifgrundpreis_ist_kein_offener_posten_mehr_wenn_er_dasteht():
     """Der Abschnitt "Was der Rechnung noch fehlt" wird GERECHNET.
 

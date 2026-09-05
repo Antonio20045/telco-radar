@@ -378,7 +378,7 @@
     <td>{{ r.monatlich | euro }}</td>
     <td>{{ r.ueber_horizont | euro }}</td>
     <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
-          rel="nofollow noopener" target="_blank">Produktinformationsblatt</a>{%
+          rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}</a>{%
         else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
         {% if r.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
           r.abgerufen_am | date_de }}</span>{% endif %}</td>

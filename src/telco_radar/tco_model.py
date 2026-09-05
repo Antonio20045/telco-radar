@@ -79,6 +79,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
+from .tarif_model import PREISTYP_DOKUMENT
 
 # Der Horizont der Leitzahl: 24 Monate, die uebliche Tarifmindestlaufzeit.
 # Entscheidung E2 vom 03.09.2026 - dieselbe Zahl und dieselbe Begruendung
@@ -365,6 +366,13 @@ class SimOnlyReferenz:
     Hardware. Der Name traegt "sim_only" ausgeschrieben, weil ein blosses
     `monatlich` neben `Buendel.tarif_monatlich` genau die Verwechslung
     einlaedt, gegen die dieser Datensatz gebaut ist.
+
+    `quelle_art` uebernimmt `Tarif.preistyp` (`dokument` | `live_shop`) -
+    die Seite braucht sie, um ihren Beleglink richtig zu beschriften:
+    "Produktinformationsblatt" fuer ein Pflichtdokument, "Shop-Seite" fuer
+    eine Live-Lesart. Der Vorgabewert ist `dokument`, damit ein Satz aus
+    der Zeit vor dem 05.09.2026 beim Wiedereinlesen genau das bleibt, was
+    er war (dieselbe Ueberlegung wie bei `Tarif.preistyp`).
     """
 
     anbieter: str = ""
@@ -376,6 +384,7 @@ class SimOnlyReferenz:
     rabatte: list[Rabatt] = field(default_factory=list)
     quelle_url: str = ""
     abgerufen_am: str = ""
+    quelle_art: str = PREISTYP_DOKUMENT
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():

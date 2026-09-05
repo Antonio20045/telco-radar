@@ -76,7 +76,7 @@ _MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
 
 _REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
                         "tarif_sim_only_monatlich", "anschlusspreis",
-                        "quelle_url", "abgerufen_am")
+                        "quelle_url", "abgerufen_am", "quelle_art")
 
 
 class TcoDB:

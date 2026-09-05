@@ -49,6 +49,7 @@ import logging
 from . import geraete_tco_grafik, geraete_tco_karten, geraete_vergleich
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
+from ..tarif_model import PREISTYP_LIVE_SHOP
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
                          POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
                          _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ, Buendel,
@@ -413,7 +414,8 @@ _BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_id",
 
 _REFERENZ_FELDER = ("anbieter", "tarif_name", "tarif_id", "tarif_id_guete",
                     "tarif_sim_only_monatlich",
-                    "anschlusspreis", "quelle_url", "abgerufen_am")
+                    "anschlusspreis", "quelle_url", "abgerufen_am",
+                    "quelle_art")
 
 
 def _rabatte(eintrag: dict) -> list:
@@ -511,9 +513,14 @@ def _referenztabelle(referenzen: list) -> list[dict]:
 
     Diese Zahl ist der Grund, warum ein effektiver Geraetepreis ueberhaupt
     rechenbar ist (`tco_model.SimOnlyReferenz`) - und sie steht in keiner
-    Werbung. Sie kommt aus dem Produktinformationsblatt nach § 1
+    Werbung. Meistens kommt sie aus dem Produktinformationsblatt nach § 1
     TK-TransparenzV, dem einzigen Dokument dieses Marktes, das rechtlich
-    wahrheitsbewehrt ist.
+    wahrheitsbewehrt ist - seit dem 05.09.2026 kann sie auch aus einer
+    LIVE-Shop-Seite stammen (`Tarif.preistyp == "live_shop"`,
+    `analyze/tarif_referenzen.py`). `quelle_ist_dokument` traegt das an die
+    Vorlage weiter: nur ein Pflichtdokument heisst dort
+    "Produktinformationsblatt", eine Shop-Seite heisst "Shop-Seite" - ein
+    Beleglink, der das falsche Wort traegt, ist selbst eine Falschangabe.
 
     Sortiert wird der EIGENE Anbieter zuerst, dann nach Anbietername und
     Betrag - dieselbe Ordnung wie auf jeder anderen Tafel dieser Seite. Es
@@ -541,6 +548,7 @@ def _referenztabelle(referenzen: list) -> list[dict]:
             "anschlusspreis": r.anschlusspreis,
             "quelle_url": r.quelle_url,
             "abgerufen_am": r.abgerufen_am,
+            "quelle_ist_dokument": r.quelle_art != PREISTYP_LIVE_SHOP,
         })
     return sorted(zeilen, key=lambda z: (not z["eigen"], z["anbieter"],
                                          z["monatlich"]))

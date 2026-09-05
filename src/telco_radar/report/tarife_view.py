@@ -20,6 +20,23 @@ Ein Tarif mit unbegrenztem Volumen hat auf einer Volumenachse keinen Ort.
 Ihn ans rechte Ende zu setzen waere eine erfundene Zahl, und sie zoege die
 Ausgleichsgerade mit. Solche Tarife stehen als eigene Liste darunter - mit
 ihrem Effektivpreis, denn der ist bekannt und vergleichbar.
+
+Die Live-Shop-Lesart fuehrt die Zeile, das Pflichtdokument bleibt Referenz
+------------------------------------------------------------------------
+Traegt ein Tarif zwei Staende - einen aus dem Pflichtdokument (`dokument`)
+und einen aus der Shop-Seite von heute (`live_shop`), beide mit derselben
+Titelzeile -, zeigt die Seite nur noch EINE Zeile: die der Live-Lesart, mit
+ihrem eigenen Beleglink. Das Pflichtdokument verschwindet nicht aus dem
+Bestand (`data/state/tarife.jsonl` behaelt beide Zeitreihen), es tritt hier
+nur zurueck - als zweiter, kleinerer Link "Produktinformationsblatt
+(Referenz)" an derselben Zeile, wenn seine Adresse eine andere ist.
+
+Der Anlass: sechs der neun Telekom-Blaetter stammen aus dem Jahr 2021
+(`…-20211121`, `…-20211005`) und werden bei jedem Lauf nur neu ABGERUFEN,
+nie neu AUSGESTELLT - `abgerufen_am` wandert weiter, waehrend die Seite
+"Stand [heutiges Datum]" ueber einem fuenf Jahre alten Dokument zeigt. Die
+Shop-Kachel (`collect/tarif_telekom_kacheln.py`) traegt denselben Betrag,
+aber mit dem Stand von heute und einem Link auf die Verkaufsseite.
 """
 from __future__ import annotations
 
@@ -27,7 +44,7 @@ import json
 import logging
 from pathlib import Path
 
-from ..tarif_model import Preisphase, Tarif
+from ..tarif_model import PREISTYP_LIVE_SHOP, Preisphase, Tarif
 from .effektivpreis import VERGLEICHSMONATE, Effektivpreis, rechne, regression
 
 log = logging.getLogger(__name__)
@@ -104,7 +121,51 @@ def _zeile(satz: dict) -> dict:
         "url": tarif.dokument_url,
         "stand": tarif.versionsstand or tarif.abgerufen_am or "",
         "eigen": (tarif.anbieter or "").strip().lower() in EIGEN,
+        # Nur gesetzt, wenn _bevorzuge_live_shop() ein Pflichtdokument
+        # mit derselben Titelzeile zurueckgestuft hat.
+        "referenz_url": satz.get("_referenz_url") or "",
+        "referenz_stand": satz.get("_referenz_stand") or "",
     }
+
+
+def _bevorzuge_live_shop(staende: list[dict]) -> list[dict]:
+    """Von zwei Staenden mit derselben Titelzeile gewinnt die Live-Lesart.
+
+    Nur wenn BEIDE preistypen fuer (Anbieter, Name) vorkommen: der
+    `dokument`-Satz faellt aus der Liste, seine Adresse und sein Stand
+    wandern als Referenz auf den ueberlebenden `live_shop`-Satz. Alles
+    andere (zwei Tarife mit verschiedenem Namen, zwei Faelle derselben
+    Lesart) bleibt unberuehrt.
+    """
+    gruppen: dict[tuple[str, str], list[dict]] = {}
+    for satz in staende:
+        schluessel = ((satz.get("anbieter") or "").strip().lower(),
+                      (satz.get("name") or "").strip().lower())
+        gruppen.setdefault(schluessel, []).append(satz)
+
+    ergebnis: list[dict] = []
+    for staende_der_gruppe in gruppen.values():
+        live = [s for s in staende_der_gruppe
+                if s.get("preistyp") == PREISTYP_LIVE_SHOP]
+        dokument = [s for s in staende_der_gruppe
+                   if s.get("preistyp") != PREISTYP_LIVE_SHOP]
+        if not live or not dokument:
+            ergebnis.extend(staende_der_gruppe)
+            continue
+        # Beide Lesarten vorhanden: die Live-Saetze bleiben, jeder
+        # Dokument-Satz wird zu einer Referenz auf dem ERSTEN Live-Satz -
+        # zwei Flex-Fassungen desselben Namens gibt es hier nicht, aber
+        # zwei Dokument-Versionen (alt/neu) waeren sonst zwei Referenzen
+        # auf derselben Zeile.
+        primaer = live[0]
+        for d in dokument:
+            url = str(d.get("dokument_url") or "")
+            if url and url != primaer.get("dokument_url"):
+                primaer.setdefault("_referenz_url", url)
+                primaer.setdefault("_referenz_stand",
+                                   d.get("abgerufen_am") or "")
+        ergebnis.extend(live)
+    return ergebnis
 
 
 def _karte(zeilen: list[dict]) -> dict:
@@ -178,7 +239,7 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
     Positionskarte mit zwei von sechs Anbietern ist keine Marktuebersicht,
     und sie darf nicht so aussehen.
     """
-    staende = lade_staende(Path(state_pfad))
+    staende = _bevorzuge_live_shop(lade_staende(Path(state_pfad)))
     zeilen = [_zeile(s) for s in staende]
     zeilen.sort(key=lambda z: (z["effektiv"] is None, z["effektiv"] or 0))
 

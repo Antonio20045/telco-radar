@@ -37,6 +37,26 @@ Was ausgeschlossen ist, und warum
   gilt die, die bei Vertragsschluss laeuft - nicht ihr Durchschnitt. Was
   ueber 24 Monate daraus wird, rechnet `report/effektivpreis.py`, und zwar
   an EINER Stelle.
+
+DIE LIVE-SHOP-LESART SCHLAEGT DAS PFLICHTDOKUMENT (seit 05.09.2026)
+--------------------------------------------------------------------
+Traegt derselbe Anbieter denselben Tarifnamen ZWEIMAL im Bestand - einmal
+als `dokument` (Pflichtblatt), einmal als `live_shop` (Shop-Seite von
+heute) -, gewinnt die Live-Lesart die SIM-only-Referenz. Das ist der
+Telekom-Fall: sechs ihrer neun Pflichtblaetter stammen aus dem Jahr 2021
+(`mobilfunk-magentamobil-s-20211121` u.ae.) und werden bei jedem Lauf nur
+neu ANGESEHEN, nie neu AUSGESTELLT - `abgerufen_am` wandert, der Inhalt
+nicht. Die Shop-Kacheln (`collect/tarif_telekom_kacheln.py`) tragen
+denselben Betrag, aber mit dem Stand von heute und einem Link auf die
+Verkaufsseite statt auf ein fuenf Jahre altes PDF.
+
+Das Pflichtdokument bleibt trotzdem im Bestand und in der Zeitreihe stehen
+("nichts wird geloescht") - es tritt hier nur als MASSSTAB zurueck, hinter
+die aktuellere Messung desselben Betrags. `_bevorzugt_live()` sortiert die
+Saetze dafuer VOR der Dublettenpruefung um; die generische Regel darunter
+("zwei Saetze, dieselbe Titelzeile, der zweite bleibt draussen") tut den
+Rest unveraendert - sie entscheidet dann nur noch, WELCHER der zwei
+Saetze zuerst dran ist, nicht ob einer verworfen wird.
 """
 from __future__ import annotations
 
@@ -45,7 +65,7 @@ import re
 from typing import Optional
 
 from ..tarif_bezug import Tarifbestand
-from ..tarif_model import HOCH
+from ..tarif_model import HOCH, PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
 from ..tco_model import SimOnlyReferenz
 
 log = logging.getLogger(__name__)
@@ -89,6 +109,18 @@ def _erste_phase(satz: dict) -> Optional[float]:
     return None if grund is None else float(grund)
 
 
+def _bevorzugt_live(saetze: list[dict]) -> list[dict]:
+    """Live-Shop-Saetze zuerst, sonst die Reihenfolge des Bestands.
+
+    Ein stabiler Sortierschluessel: innerhalb derselben Lesart aendert sich
+    nichts. Trifft die Dublettenregel unten auf zwei Saetze mit derselben
+    Titelzeile, steht der `live_shop`-Satz jetzt vorn und gewinnt deshalb -
+    ohne dass die Regel selbst etwas von Preistypen wissen muesste.
+    """
+    return sorted(saetze,
+                  key=lambda s: s.get("preistyp") != PREISTYP_LIVE_SHOP)
+
+
 def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
     """Je Tarif mit belegtem Grundpreis eine SIM-only-Referenz.
 
@@ -97,11 +129,13 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
     "kostenlos"; das ist die Regel aus `report/effektivpreis.py`, und die
     TCO fuehrt sie als Luecke.
     """
+    saetze = _bevorzugt_live(bestand.saetze())
+
     # Betrag je (Anbieter, Tarifname) - fuer die Dublettenregel unten.
     # Verglichen wird auf Kleinschreibung: der Zusatz steht auf beiden
     # Blaettern gleich, der Name selbst nicht immer.
     je_name: dict[tuple[str, str], float] = {}
-    for satz in bestand.saetze():
+    for satz in saetze:
         betrag = _erste_phase(satz)
         if betrag is not None:
             je_name[((satz.get("anbieter") or "").strip().lower(),
@@ -109,7 +143,7 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
 
     referenzen: list[SimOnlyReferenz] = []
     gesehen: dict[str, str] = {}
-    for satz in bestand.saetze():
+    for satz in saetze:
         if (satz.get("art") or "").lower() in _UNGEEIGNET:
             continue
         betrag = _erste_phase(satz)
@@ -140,6 +174,7 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
                             else float(satz["anschlusspreis"])),
             quelle_url=satz.get("dokument_url", ""),
             abgerufen_am=satz.get("abgerufen_am", ""),
+            quelle_art=satz.get("preistyp") or PREISTYP_DOKUMENT,
         )
         # ZWEI TARIFE MIT DERSELBEN TITELZEILE ergeben eine ID.
         # `SimOnlyReferenz.id` ist (Anbieter, Tarifname) - live gemessen

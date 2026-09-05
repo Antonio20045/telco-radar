@@ -400,6 +400,30 @@ def test_zwei_tarife_mit_derselben_titelzeile_ergeben_einen_massstab():
     assert referenzen[0].quelle_url == "https://x.de/erstes.pdf"
 
 
+def test_die_live_shop_lesart_schlaegt_das_pflichtdokument():
+    """Der Telekom-Fall: dasselbe Tarifblatt gibt es als 2021er-PDF UND
+    als heutige Shop-Kachel, beide mit demselben Betrag.
+
+    Die Shop-Kachel gewinnt die Referenz - unabhaengig davon, in welcher
+    Reihenfolge die zwei Saetze im Bestand stehen.
+    """
+    pdf = _satz("Telekom", "MagentaMobil S", 39.95,
+                dokument_url=("https://www.telekom.de/produktinformations"
+                              "blatt/mobilfunk-magentamobil-s-20211121"),
+                abgerufen_am="2026-09-04")
+    kachel = _satz("Telekom", "MagentaMobil S", 39.95, preistyp="live_shop",
+                   dokument_url=("https://www.telekom.de/shop/tarife/"
+                                 "smartphone-tarife?tariffId=MF_17785"),
+                   abgerufen_am="2026-09-05")
+    kachel["tarif_id"] += "#live_shop"        # so trennt sie der Speicher
+
+    for bestand in (Tarifbestand([pdf, kachel]), Tarifbestand([kachel, pdf])):
+        referenzen = aus_bestand(bestand)
+        assert len(referenzen) == 1
+        assert referenzen[0].quelle_url == kachel["dokument_url"]
+        assert referenzen[0].abgerufen_am == "2026-09-05"
+
+
 # --------------------------------------------------------------------------
 # Der dritte Weg: der Slug, den der Anbieter selbst setzt
 # --------------------------------------------------------------------------
