@@ -348,11 +348,27 @@ def zeitreihe(reihen: list) -> dict:
          durchgezogen: der Lauf endet, ein neuer beginnt.
       3. Kein Fliesstext hier - die Chart-Chrome-Zeile baut die Vorlage aus
          `messtage`/`seit`, dieses Modul liefert nur die zwei Zahlen.
+
+    F-5 (05.09.2026): `anbieterzahl` IST die Zaehlweise fuer das Wort
+    "Anbieter" auf der ganzen Modelltafel - PM-vorgegeben als "die
+    Preispunkte-Reihen der Zeitreihe", also `len(reihen)`. Das
+    Auswahl-Dropdown zeigt genau diese Zahl (`m.zeitreihe.anbieterzahl` in
+    der Vorlage) statt sie ueber eine zweite Menge (die TCO-Buendel-Karten)
+    neu zu zaehlen - vorher stand dort `len(anbieter_mit_zahl)`, eine ANDERE
+    Zahl fuer dasselbe Wort. Haendler (Amazon/Expert/Saturn) sind hier NICHT
+    herausgerechnet, obwohl die PM-Regel sie textlich als "kein Anbieter"
+    bezeichnet: sobald ein Haendler fuer dieses Geraet einen Barpreis
+    beitraegt, zeichnet ihn diese Funktion als eigene Reihe (siehe
+    `geraete_verlauf.reihen_fuer_listungen`, das nicht nach `anbieter_typ`
+    filtert) - ihn aus der Zaehlung zu nehmen, ohne ihn auch aus der Grafik
+    zu nehmen, waere eine DRITTE Zaehlweise und liesse Dropdown und Chart
+    wieder auseinanderlaufen. Offener Fall, siehe
+    outputs/phase-f5-anbieterzaehlung-2026-09-05.md.
     """
     tage = _tage_dieses_geraets(reihen)
     if not tage:
         return {"svg": "", "hat_daten": False, "messtage": 0, "seit": "",
-                "bis": "", "linien": [], "chrome": ""}
+                "bis": "", "linien": [], "chrome": "", "anbieterzahl": 0}
 
     luecken = _luecken(tage)
     von, bis = tage[0], tage[-1]
@@ -376,10 +392,15 @@ def zeitreihe(reihen: list) -> dict:
         return round(G0_HOEHE - G0_UNTEN
                      - (preis - tief) / (hoch - tief) * hoehe, 1)
 
+    # F-5 (05.09.2026): DIE EINE ZAEHLWEISE fuer "Anbieter" auf dieser Tafel
+    # - Preispunkte-Reihen der Zeitreihe, PM-vorgegeben. Das Auswahl-Dropdown
+    # (`geraete.html.j2`) uebernimmt genau diese Zahl aus dem Rueckgabewert
+    # statt sie ein zweites Mal zu zaehlen (keine duplizierte Rechnung).
+    anbieterzahl = len(reihen)
     teile = [
         f'<svg class="gr-g0" viewBox="0 0 {G0_BREITE} {G0_HOEHE}" '
         f'width="100%" height="{G0_HOEHE}" role="img" '
-        f'aria-label="Gerätepreis über die Zeit, {len(reihen)} Anbieter, '
+        f'aria-label="Gerätepreis über die Zeit, {anbieterzahl} Anbieter, '
         f'{_t(von.isoformat())} bis {_t(bis.isoformat())}">',
         f'<title>Gerätepreis über die Zeit, {_t(von.isoformat())} bis '
         f'{_t(bis.isoformat())}</title>',
@@ -514,7 +535,7 @@ def zeitreihe(reihen: list) -> dict:
              f"seit {von.strftime('%d.%m.%Y')}")
     return {"svg": "".join(teile), "hat_daten": True, "messtage": len(tage),
             "seit": von.isoformat(), "bis": bis.isoformat(), "linien": linien,
-            "chrome": chrome}
+            "chrome": chrome, "anbieterzahl": anbieterzahl}
 
 
 # --------------------------------------------------------------------------
