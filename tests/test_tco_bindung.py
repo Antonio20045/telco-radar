@@ -176,7 +176,17 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
     """Gegen `data/state/geraete_tco.json`, nicht gegen eine Fixture.
 
     Der Tarifbestand liefert die Bindung; ohne ihn stuende hier fuer JEDES
-    der 62 Buendel eine Luecke, und der ganze Reiter waere leer.
+    der 62 o2-Buendel eine Luecke, und der ganze Reiter waere leer.
+
+    REGRESSION B1 R3 (06.09.2026): der Test filterte bisher NICHT nach
+    Anbieter, obwohl sein eigener Name "jede o2 Zeile" sagt - das fiel nie
+    auf, weil `geraete_tco.json` bis zum echten Vodafone-Lokallauf (R2,
+    05.09.2026) ausschliesslich o2-Buendel enthielt. Die 253 echten
+    Vodafone-Buendel binden UNTERSCHIEDLICH lang (12/24/36 Monate, siehe
+    `outputs/phase-b1-buendel-vodafone-2026-09-05.md` Rechenproben) - das
+    ist Vodafones eigene Datenlage, keine Regel des o2-Musters, und der
+    Test darf sie nicht mitpruefen. Der Filter macht aus dem Test wieder
+    das, was sein Name immer schon behauptet hat.
     """
     tco = json.loads((WURZEL / "data/state/geraete_tco.json").read_text())
     bindung_je_tarif = {}
@@ -185,8 +195,9 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
         if satz.get("tarif_id") and satz.get("laufzeit_monate"):
             bindung_je_tarif[satz["tarif_id"]] = satz["laufzeit_monate"]
 
+    o2_saetze = [s for s in tco["buendel"] if s["anbieter"] == "o2"]
     geprueft = 0
-    for satz in tco["buendel"]:
+    for satz in o2_saetze:
         b = Buendel(sku_id=satz["sku_id"], anbieter=satz["anbieter"],
                     tarif_name=satz["tarif_name"],
                     tarif_id=satz.get("tarif_id", ""),
@@ -202,8 +213,8 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
         assert e.bindung == 36 and e.tarif_bindung == 24
         assert e.offen_nach_24 == round(satz["geraet_monatsrate"] * 12, 2)
         geprueft += 1
-    assert geprueft == len(tco["buendel"]) >= 62, \
-        "der Test muss ALLE Saetze angefasst haben, sonst prueft er nichts"
+    assert geprueft == len(o2_saetze) >= 62, \
+        "der Test muss ALLE o2-Saetze angefasst haben, sonst prueft er nichts"
 
 
 def test_der_leitfragehorizont_ist_vierundzwanzig_monate():
