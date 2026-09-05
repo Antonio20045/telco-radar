@@ -438,12 +438,13 @@
      es 24 von 36 (der Tarif bindet kuerzer als die Raten laufen), bei
      1&1 alle 36. Das Mass ist das aus A5.3; der Satz ist der Disclaimer,
      den Katalog D dazu verlangt. #}
+  {# A-R1: die "ab"-Erklaerung ist Methode, kein Datum dieser Karte - sie
+     steht seitdem im Rechenweg (unten), nicht im Lesefluss. Die
+     kartenspezifische Bindungszeile bleibt: sie nennt eine Zahl DIESER
+     Karte, keine allgemeine Regel. #}
   {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}
   <p class="gr-kk-basis">darin {{ k.tarif_bindung }} von {{ k.laufzeit }}
   Monaten Tarif – so lange bindet er</p>
-  {% elif k.ab_preis %}
-  <p class="gr-kk-basis">Monatspreis „ab“ – der Anbieter nennt ihn für den
-  günstigsten Tarif dieses Geräts</p>
   {% endif %}
 
   <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
@@ -508,20 +509,12 @@
     %}, Stand {{ k.delta.referenz_datum | date_de }}{% endif %})</p>
   {% endif %}
 
-  {% if k.naeherung %}
-  {# F1, STUFE 1 (04.09.2026): "Vodafone weist zu diesem Geraet keinen
-     Buendelpreis aus" war falsch - die Geraeteseite und die glados-API
-     nennen einen (iPhone 17 Pro 256 GB: 1 EUR + 36 x 33,00 EUR). Er ist
-     nur NICHT ERHOBEN. Eine Naeherung darf sich Naeherung nennen; sie darf
-     dem Anbieter nichts absprechen, das er ausweist. #}
-  <p class="gr-kk-hinweis">Referenzrechnung, kein Angebot: der
-  Vodafone-Bündelpreis zu diesem Gerät ist noch nicht erhoben – gerechnet
-  aus dem eigenen Barpreis des Geräts und dem Tarifgrundpreis aus dem
-  Produktinformationsblatt für {{ k.referenz.tarif_monate }} Monate
-  Mindestlaufzeit. Beide belegt, die Summe ist unsere.{% if
-  k.referenz.fortgeschrieben %} Für einen Teil der Laufzeit nennt das Blatt
-  keinen Preis; dort gilt der zuletzt belegte fort.{% endif %}</p>
-  {% endif %}
+  {# A-R1: die Naeherungs-Erklaerung ("Referenzrechnung, kein Angebot: ...")
+     stand hier frei im Lesefluss und ist in den Rechenweg gewandert (F1,
+     Stufe 1, unveraendert im Wortlaut - nur der Ort ist neu). Das kurze
+     Etikett "Referenzrechnung" im Kartenkopf (oben, `.gr-kk-marke`) sagt
+     weiterhin auf den ersten Blick, dass diese Karte gerechnet und kein
+     Angebot ist. #}
 
   {# Der Rechenweg. Jede Zahl der Karte ist hier nachlesbar, samt dem, was
      NICHT drinsteht - CHECK24 nennt in derselben Lage "alle fest
@@ -549,10 +542,27 @@
     }} kostet, weist die Quelle nicht aus – deshalb steht dazu keine Zahl
     auf der Karte.</p>
     {% endif %}
+    {# A-R1: die "ab"-Erklaerung war eine Kartenerklaerzeile im Lesefluss,
+       jetzt steht sie hier - Wortlaut unveraendert. #}
+    {% if k.ab_preis %}
+    <p class="gr-basis--duenn">Monatspreis „ab“ – der Anbieter nennt ihn für
+    den günstigsten Tarif dieses Geräts.</p>
+    {% endif %}
     {# DIE REFERENZ NENNT IHRE EIGENE BINDUNG (F-R2-2): 24 Tarifmonate,
        das Geraet ist bar gekauft und bindet nicht. "Gerechnet ueber 36
        Monate Bindung" stand auf 30 Karten, auf denen 24 gerechnet waren. #}
     {% if k.naeherung %}
+    {# F1, STUFE 1 (04.09.2026, A-R1 hierher verschoben): "Vodafone weist
+       zu diesem Geraet keinen Buendelpreis aus" war falsch - die
+       Geraeteseite und die glados-API nennen einen (iPhone 17 Pro
+       256 GB: 1 EUR + 36 x 33,00 EUR). Er ist nur NICHT ERHOBEN. #}
+    <p class="gr-kk-hinweis">Referenzrechnung, kein Angebot: der
+    Vodafone-Bündelpreis zu diesem Gerät ist noch nicht erhoben – gerechnet
+    aus dem eigenen Barpreis des Geräts und dem Tarifgrundpreis aus dem
+    Produktinformationsblatt für {{ k.referenz.tarif_monate }} Monate
+    Mindestlaufzeit. Beide belegt, die Summe ist unsere.{% if
+    k.referenz.fortgeschrieben %} Für einen Teil der Laufzeit nennt das
+    Blatt keinen Preis; dort gilt der zuletzt belegte fort.{% endif %}</p>
     <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
     Tarifbindung; das Gerät ist bar gekauft und bindet nicht{% if k.fenster
     and k.fenster != k.laufzeit %} – die Angebote daneben binden {{ k.fenster
@@ -584,25 +594,44 @@
 </article>
 {% endmacro %}
 
+{# A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel - fuer sie gibt
+   es keine TCO zu rechnen, nur einen reinen Geraetepreis, und dessen
+   Beschaffung laeuft erst an (QUELLEN_MAP.md, Ersterkundung 05.09.2026).
+   Dieselbe Form wie ein Anbieter ohne Datenstand (B.2.5, `gr-kkarte--leer`):
+   eine Karte ohne Wert ist eine Auskunft, kein Mangel. Keine erfundene
+   Zahl, kein Balken - deshalb traegt die Karte weder `data-gesamt` noch
+   `data-schnitt`/`data-einmalig`, und keine Sortierung/Balkengrafik
+   rechnet sie mit. #}
+{% macro haendlerkarte(name) %}
+<article class="gr-kkarte gr-kkarte--leer gr-kkarte--haendler" data-anbieter="{{ name }}">
+  <p class="gr-kk-kopf"><span class="gr-kk-anbieter">{{ name }}</span>
+    <span class="gr-kk-marke">Händler</span></p>
+  <p class="gr-kk-luecke">Händler — Beschaffung läuft</p>
+</article>
+{% endmacro %}
+
 <div class="gr-tafel" id="tafel-tco" role="tabpanel">
 
 <section class="gr-tco" id="tco">
-  <h2 class="rubrik">Was ein Gerät mit Tarif wirklich kostet</h2>
-
-  {# Methode in zwei Saetzen, Grenze in einem - im Stil der Tarifseite
-     ("Grundlage ist das gesetzlich vorgeschriebene Produktinformationsblatt,
-     nicht die Werbeseite"). #}
-  <p class="gr-erklaer">Gerechnet wird, was ein Bündel aus Gerät und Tarif
-  über seine Bindung zusammen kostet: Gerätezuzahlung plus Geräteraten plus
-  Tarifgrundpreis plus Anschlusspreis, abzüglich benannter Boni. Jeder
-  Posten steht im Rechenweg einzeln daneben, und was nicht gemessen ist,
-  steht als Lücke da – ein unbekannter Anschlusspreis heißt nicht, dass es
-  keinen gibt. Die Bindung steht in jedem Etikett, weil der Markt sie
-  unterschiedlich lang setzt: alle heute erhobenen Bündel finanzieren das
-  Gerät über 36 Monate, o2 bindet den Tarif dabei 24.</p>
-  <p class="gr-erklaer">Die Grenze: verglichen werden Gesamtkosten, nicht
-  Leistungen – ein Tarif mit mehr Datenvolumen kostet zu Recht mehr, und das
-  rechnet diese Tafel nicht heraus.</p>
+  {# A-R1 (BRIEF_RAHMEN, 05.09.2026): "Alles, was die Seite ueber sich
+     selbst erklaert, verschwindet aus dem Lesefluss." Die alte
+     Buendel-Sicht-Ueberschrift ("Was ein Gerät mit Tarif wirklich kostet")
+     entfaellt ersatzlos - die Frage stellt bereits der Seitentitel. Die
+     zwei Methodensaetze, die hier standen, stehen jetzt gekuerzt hinter
+     GENAU EINER Aufklappung; die je Modell bestehende ("Wie gerechnet?"
+     bei der Zeitreihe) bleibt ihr eigenes Thema (die Linien dieses
+     Geraets) und traegt keine allgemeine Methodik. #}
+  <details class="gr-auf" id="gr-tco-wie">
+    <summary>Wie gerechnet?</summary>
+    <p class="gr-erklaer">Gerechnet wird, was ein Bündel aus Gerät und Tarif
+    über seine Bindung zusammen kostet: Gerätezuzahlung plus Geräteraten
+    plus Tarifgrundpreis plus Anschlusspreis, abzüglich benannter Boni –
+    einzeln im Rechenweg jeder Karte, eine Lücke bleibt eine Lücke. Die
+    Bindung steht in jedem Etikett, weil der Markt sie unterschiedlich lang
+    setzt.</p>
+    <p class="gr-erklaer">Verglichen werden Gesamtkosten, nicht Leistungen –
+    ein Tarif mit mehr Datenvolumen kostet zu Recht mehr.</p>
+  </details>
 
   {# --- Die Preis-Alarme als Chips (H4) ------------------------------
          SIE STEHEN VOR DEM MODELLGATTER und nicht darin: die Alarme
@@ -678,6 +707,19 @@
     einen Preis dieses Geräts sieht.</p>
     {% endif %}
 
+    {# A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel und sind
+       fuer diese Seite Haendler mit reinem Geraetepreis - ihre Beschaffung
+       laeuft (QUELLEN_MAP.md), es gibt noch keinen Messpunkt. Sie stehen
+       trotzdem JE GERAET als Legenden-Eintrag OHNE Linie: kein Pfad, kein
+       Kreis, keine erfundene Zahl - nur der Name und der Vermerk. #}
+    <ul class="gr-g0-haendler" aria-label="Händler ohne erfasste Zeitreihe">
+      {% for h in ("Amazon", "Expert", "Saturn") %}
+      <li class="gr-g0-haendler-zeile"><span class="gr-g0-haendler-name">{{
+        h }}</span><span class="gr-g0-haendler-vermerk">Händler —
+        Beschaffung läuft</span></li>
+      {% endfor %}
+    </ul>
+
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert
       %} · davon {{ m.erneuert }} erneuert{% endif %}{% if m.zustand_offen
       %} · davon {{ m.zustand_offen }} ohne belegten Zustand{% endif %}{% if m.spanne %} ·
@@ -704,6 +746,7 @@
 
     <div class="gr-karten">
       {% for k in m.karten %}{{ tcokarte(k) }}{% endfor %}
+      {% for h in ("Amazon", "Expert", "Saturn") %}{{ haendlerkarte(h) }}{% endfor %}
     </div>
 
     {# G1 - servergerendert, ohne Bibliothek und ohne CDN. #}
