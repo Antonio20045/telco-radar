@@ -172,3 +172,53 @@ runden), F-4d (Rot-Kollision Telekom-Serie/Marken-Rot), F-4e
 („Serie startet"-Kollisionen, Serif/Sans-Bruch) stehen laut ROADMAP „pending
 — nach F-4a" und sind bewusst nicht in dieser schmal geschnittenen Runde
 angefasst.
+
+## Nachtrag (05.09.2026, dringend): Antwortzeile zählt Händler
+
+PM-Ergänzung während der laufenden Runde: Kriterium 3 der Abnahme wurde
+ersetzt. Befund am echten Bestand — die Leitzahl widersprach ihrer eigenen
+Nachbarkarte auf derselben Modelltafel:
+
+| | Vorher | Nachher |
+|---|---|---|
+| Günstigster Gerätepreis, Apple iPhone 17 Pro 256 GB | **1.199,90 € (Vodafone)** | **1.179,00 € (Saturn)** |
+
+Ursache: `geraete_tco_karten.modelle()` bildete das Minimum der
+Antwortzeile ausschließlich über `karten` — also über Anbieter mit einem
+echten Tarifbündel (Telekom/1&1/o2/Vodafone plus dessen Näherungskarte).
+Amazon, Expert und Saturn führen nie ein Bündel und hatten deshalb nie eine
+Karte in dieser Menge, obwohl ihr reiner Gerätepreis eine Ebene weiter
+unten auf derselben Tafel als Händlerkarte steht
+(`geraete_tco_view._haendler_ohne_buendel_preise`, seit dem
+Saturn-Adapter R2 mit echten Daten gefüllt).
+
+**Behoben, eine Rechnung statt zwei:** die Händler-Logik
+(`HAENDLER_OHNE_BUENDEL`, die Preisermittlung je Modell) ist von
+`geraete_tco_view.py` nach `geraete_tco_karten.py` gezogen — dorthin, wo
+auch die Antwortzeile entsteht — und `geraete_tco_view.py` referenziert sie
+jetzt nur noch (`HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL`).
+Zwei Kopien derselben Frage waren erst die Lücke, die den PM-Befund möglich
+gemacht hat. `modelle()` gruppiert `listungen` jetzt zusätzlich je Modell
+(nicht nur je Buendel-SKU) und hängt die drei Händlerpreise — wo erhoben —
+als zusätzliche Kandidaten an das Geräte­preis-Minimum. **„günstig mit
+Tarif" bleibt unverändert**: nur `angebote`/`tarifangebote` (echte Bündel,
+keine Näherung, keine Händler — sie führen kein Tarifbündel).
+
+**Neue Tests** (`tests/test_geraete_tco_hauptansicht.py`, gegen den echten
+Bestand):
+- die bestehende Antwortzeilen-Zusicherung ist auf den korrigierten Wert
+  umgestellt (1.179,00 €/Saturn statt 1.199,90 €/Vodafone) — Vodafones
+  Näherungskarte bleibt als Kandidatin gültig, führt nur nicht mehr;
+- ein generischer Test über ALLE Modelle: das Antwortzeilen-Minimum ist
+  `<=` jedem erhobenen Amazon/Expert/Saturn-Gerätepreis desselben
+  Modellblocks (mit Gegenprobe, dass die Schleife wirklich mindestens
+  einen Händlerpreis prüft);
+- eine Gegenprobe, dass ein Modell OHNE Händlerpreise (Fairphone 6 256 GB)
+  unverändert bleibt — die Erweiterung ist gezielt, kein globaler Eingriff.
+
+**Suite:** 2 failed (vorbestehend, Promo-Screenshots) / 2750 passed
+(+3 gegenüber dem Hauptteil dieses Berichts) / 14 skipped.
+
+**Bewusst nicht angefasst:** die Werte-Tests, die o2 als Referenzpunkt für
+`tarif_gesamt` nutzen (`test_die_rechenprobe_steht_auf_der_karte` u. Ä.) —
+sie hängen an keiner Zahl, die diese Erweiterung berührt.

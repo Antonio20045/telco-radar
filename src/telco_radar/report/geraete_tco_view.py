@@ -555,43 +555,13 @@ def _referenztabelle(referenzen: list) -> list[dict]:
                                          z["monatlich"]))
 
 
-# Die drei vom PM benannten Haendler ohne Tarifbuendel (QUELLEN_MAP.md §6,
-# Ersterkundung 05.09.2026): fuer sie gibt es keine TCO zu rechnen, nur den
-# reinen Geraetepreis. Dieselbe Liste steht in der Vorlage
-# (`haendlerkarte`/die Zeitreihen-Legende) - EINE Liste, damit eine
-# zukuenftige Ergaenzung nicht an einer der beiden Stellen vergessen wird.
-HAENDLER_OHNE_BUENDEL = ("Amazon", "Expert", "Saturn")
-
-
-def _haendler_ohne_buendel_preise(listungen: list) -> dict:
-    """Je Haendler aus `HAENDLER_OHNE_BUENDEL`: der guenstigste NEU-Preis
-    dieses Modells, falls schon erhoben - sonst `None`.
-
-    Ein Wert hier ersetzt in der Vorlage die "Beschaffung laeuft
-    seit"-Auskunft durch die echte Zahl. Mehrere Farbvarianten desselben
-    Modells+Speichers sind unterschiedliche SKUs mit demselben oder sehr
-    aehnlichem Preis (dieselbe Konvention wie beim "Guenstigster
-    Geraetepreis" der Antwortzeile darueber) - der guenstigste gewinnt,
-    nicht der zuletzt gelesene.
-    """
-    out: dict = {}
-    for name in HAENDLER_OHNE_BUENDEL:
-        kandidaten = [
-            l for l in listungen
-            if l.get("anbieter") == name
-            and l.get("preis_ohne_vertrag") is not None
-            and (l.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
-        ]
-        if not kandidaten:
-            out[name] = None
-            continue
-        bester = min(kandidaten, key=lambda l: l["preis_ohne_vertrag"])
-        out[name] = {
-            "preis": bester["preis_ohne_vertrag"],
-            "quelle_url": bester.get("quelle_url", ""),
-            "abgerufen_am": bester.get("abgerufen_am", ""),
-        }
-    return out
+# Die drei vom PM benannten Haendler ohne Tarifbuendel: EINE Liste und EINE
+# Rechnung in `geraete_tco_karten` (dort auch von der Antwortzeile benutzt,
+# F-4a') - eine zweite Kopie hier war genau die Luecke, an der die
+# Antwortzeile die Haendlerpreise nie gesehen hat, obwohl dieselbe Tafel sie
+# eine Karte weiter unten schon zeigte.
+HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL
+_haendler_ohne_buendel_preise = geraete_tco_karten._haendler_geraetepreise
 
 
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,

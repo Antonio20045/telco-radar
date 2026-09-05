@@ -348,6 +348,46 @@ def _barpreis_fuer(belege: dict, anbieter: str) -> Optional[dict]:
     return dict(guenstigster, fremd=True)
 
 
+# Die drei vom PM benannten Haendler ohne Tarifbuendel (QUELLEN_MAP.md §6,
+# Ersterkundung 05.09.2026): fuer sie gibt es keine TCO zu rechnen, nur den
+# reinen Geraetepreis. EINE Liste fuer die Haendlerkarten (Vorlage) UND die
+# Antwortzeile (`_haendler_geraetepreise` unten) - eine zweite Kopie in
+# `geraete_tco_view.py` waere genau die Luecke gewesen, die den PM-Befund
+# vom 05.09.2026 (Saturn 1.179,00 EUR unterbot die Antwortzeile-Vodafone-
+# Zahl 1.199,90 EUR, ohne dass die Antwortzeile es je gesehen haette) erst
+# moeglich gemacht hat.
+HAENDLER_OHNE_BUENDEL = ("Amazon", "Expert", "Saturn")
+
+
+def _haendler_geraetepreise(listungen: list) -> dict:
+    """Je Haendler aus `HAENDLER_OHNE_BUENDEL`: der guenstigste NEU-Preis
+    dieses Modells, falls schon erhoben - sonst `None`.
+
+    Dieselbe Funktion traegt zwei Verwendungen: die Haendlerkarten der
+    Vorlage (ueber `geraete_tco_view.aufbereiten`) UND die Antwortzeile
+    (`modelle()` unten) - EINE Rechnung fuer eine Frage, sonst laufen beide
+    auseinander wie am 05.09.2026 geschehen.
+    """
+    out: dict = {}
+    for name in HAENDLER_OHNE_BUENDEL:
+        kandidaten = [
+            l for l in listungen
+            if l.get("anbieter") == name
+            and l.get("preis_ohne_vertrag") is not None
+            and (l.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+        ]
+        if not kandidaten:
+            out[name] = None
+            continue
+        bester = min(kandidaten, key=lambda l: l["preis_ohne_vertrag"])
+        out[name] = {
+            "preis": bester["preis_ohne_vertrag"],
+            "quelle_url": bester.get("quelle_url", ""),
+            "abgerufen_am": bester.get("abgerufen_am", ""),
+        }
+    return out
+
+
 def buendel_aus_listungen(listungen: list) -> list[Buendel]:
     """Die Buendel, die als LISTUNG im Geraetebestand stehen - heute 1&1.
 
@@ -855,6 +895,18 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     belege = barpreise(listungen)
     zustaende = _zustand_je_listung(listungen)
 
+    # Fuer die Antwortzeile (F-4a': "guenstigster Geraetepreis" gilt auch
+    # ueber die Haendler ohne Tarifbuendel). Amazon, Expert und Saturn
+    # bekommen NIE eine Karte in `gruppen` - sie liefern kein Buendel, also
+    # auch keinen Eintrag in `alle` unten. Ohne diese eigene Gruppierung
+    # nach MODELL (nicht nach SKU der Buendel) waere ihr Preis fuer die
+    # Antwortzeile unsichtbar, obwohl er auf derselben Seite als
+    # Haendlerkarte steht.
+    listungen_je_modell: dict[str, list] = {}
+    for e in listungen:
+        mid_e = modell_schluessel(e.get("device_id"), e.get("speicher_gb"))
+        listungen_je_modell.setdefault(mid_e, []).append(e)
+
     alle = list(buendel) + buendel_aus_listungen(listungen)
     gruppen: dict = {}
     for b in alle:
@@ -972,6 +1024,18 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         vergleichbar_alle = [k for k in karten if k["vergleichbar"]]
         geraetepreise = [k for k in vergleichbar_alle
                          if k["geraetepreis"] is not None]
+        # F-4a' (PM, 05.09.2026, 19:xx): das Minimum gilt auch ueber die
+        # Haendler OHNE Tarifbuendel (Amazon/Expert/Saturn) - sie tragen
+        # keine Karte in `karten` (kein Buendel, siehe oben), stehen aber
+        # als eigene Haendlerkarte auf DERSELBEN Modelltafel. Gemessener
+        # Fall: Saturn 1.179,00 EUR unterbot Vodafones 1.199,90 EUR, ohne
+        # dass die Antwortzeile es je gesehen haette - E1-Verstoss, die
+        # Leitzahl widersprach ihrer eigenen Nachbarkarte.
+        for haendler, eintrag in _haendler_geraetepreise(
+                listungen_je_modell.get(mid, [])).items():
+            if eintrag is not None:
+                geraetepreise.append({"anbieter": haendler,
+                                      "geraetepreis": eintrag["preis"]})
         guenstigstes_geraet = (min(geraetepreise,
                                    key=lambda k: k["geraetepreis"])
                                if geraetepreise else None)
