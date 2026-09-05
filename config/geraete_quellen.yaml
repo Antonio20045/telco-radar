@@ -468,6 +468,14 @@ anbieter:
       11.08.2026 - "im Roh-HTML steht kein Preis" - bleibt richtig; er gilt
       fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite
       selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404).
+      SEIT DEM 05.09.2026 (B1) traegt dieselbe Detailantwort auch
+      Geraet-x-Tarif-Buendel (`atomics[].prices.composition`, 2-4 je
+      Variante) ohne Klarnamen - nur einen `offerCoreHash`. Aufgeloest wird
+      er ueber einen zweiten, GEZIELTEN Abruf je `hardwareId` gegen
+      `/glados/v2/tariff/v2/hardware` (live gemessen: gut ein Drittel der
+      Hashes loest auf, der Rest bleibt ohne Namen und faellt beim
+      Tarifabgleich verworfen - siehe `outputs/phase-b1-buendel-vodafone-
+      2026-09-05.md`).
     einstiege:
       - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
         label: Geraeteliste (Schnittstelle der Uebersichtsseite)

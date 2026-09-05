@@ -101,7 +101,16 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
             bilanz.ohne_geraet += 1
             continue
 
+        # `betrag` wurde hier bis zum 05.09.2026 nie mitgegeben, obwohl
+        # `Tarifbestand.loese()` den Weg schon kennt (B1-Review): ein
+        # Rohsatz ohne Namen UND ohne treffenden Slug hatte damit nie eine
+        # dritte Chance. Guete `mittel` bleibt selten und nur bei
+        # Eindeutigkeit (siehe `tarif_bezug.ueber_betrag`) - fuer
+        # Vodafone bereits als strukturell unwahrscheinlich dokumentiert
+        # (derselbe Betrag steht dort regelmaessig an zwei Tarifen), aber
+        # das ist kein Grund, den Versuch zu unterlassen.
         bezug = bestand.loese(anbieter, tarif_name,
+                              betrag=satz.get("tarif_monatlich"),
                               slug=str(satz.get("tarif_slug") or ""))
         if bezug is None:
             bilanz.ohne_tarif += 1
