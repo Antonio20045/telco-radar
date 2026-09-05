@@ -52,27 +52,58 @@ def test_keine_erklaerung_steht_ausserhalb_einer_aufklappung(tmp_path):
 
 
 def test_der_waechter_prueft_wirklich_etwas(tmp_path):
-    """Gegenprobe: mindestens zwei der Marker tauchen an dieser Fixture
+    """Gegenprobe: mindestens einer der Marker taucht an dieser Fixture
     UEBERHAUPT auf (nur eben hinter einer Aufklappung) - sonst prueft der
-    Test oben nur, dass niemand danach sucht."""
+    Test oben nur, dass niemand danach sucht.
+
+    BRIEF_RAHMEN2 (05.09.2026, Befund 2): "Gerechnet wird" stand in der
+    seitenweiten "Wie gerechnet?"-Aufklappung, die ersatzlos gestrichen ist
+    (sie stand doppelt - siehe `test_wie_gerechnet_steht_hoechstens_einmal_
+    je_modellblock`). Der Marker zaehlt seitdem 0-mal, auch hinter einer
+    Aufklappung, und ist deshalb kein Beleg mehr fuer diesen Waechter.
+    """
     s = _baue(tmp_path)
     ganze_seite = str(s)
     gefunden = {m: ganze_seite.count(m) for m in VERBOTSMARKER}
-    assert gefunden["Gerechnet wird"] >= 1, gefunden
     assert gefunden["Referenzrechnung, kein Angebot"] >= 1, gefunden
 
 
-def test_die_seitenueberschrift_traegt_genau_eine_wie_gerechnet_aufklappung(tmp_path):
-    """'genau EINER Aufklappung je Seite' - die zwei Methodensaetze stehen
-    in EINEM neuen Block, nicht verteilt auf mehrere."""
+def test_wie_gerechnet_steht_hoechstens_einmal_je_modellblock(tmp_path):
+    """BRIEF_RAHMEN2 (05.09.2026, Befund 2): 'Wie gerechnet?' stand
+    zweimal - einmal seitenweit ueber der Kennzahlenreihe (`#gr-tco-wie`),
+    einmal je Modell unter dem Zeitreihen-Graph. Die obere ist ERSATZLOS
+    gestrichen, die untere bleibt (sie ist beim Graphen richtig
+    platziert): GENAU EINE Aufklappung dieses Namens je Modellblock, keine
+    ausserhalb."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    block = tafel.select_one("#gr-tco-wie")
-    assert block is not None, "die Seiten-Aufklappung 'Wie gerechnet?' fehlt"
-    assert block.select_one("summary").get_text(strip=True) == "Wie gerechnet?"
-    assert "Gerechnet wird" in block.get_text(" ")
+    assert tafel.select_one("#gr-tco-wie") is None, \
+        "die seitenweite 'Wie gerechnet?'-Aufklappung ist nicht mehr da"
+
+    modellbloecke = tafel.select(".gr-tmodell")
+    assert modellbloecke, "der Test prueft nichts ohne Modellblock"
+    for block in modellbloecke:
+        wie_gerechnet = [d for d in block.select("details.gr-auf")
+                         if d.select_one("summary").get_text(strip=True)
+                         == "Wie gerechnet?"]
+        assert len(wie_gerechnet) == 1, \
+            f"{block.get('data-modell')}: {len(wie_gerechnet)} statt 1"
+
+    # Ausserhalb jedes Modellblocks, aber innerhalb der Tafel, darf keine
+    # weitere "Wie gerechnet?"-Aufklappung stehen - sonst waere die
+    # Verdopplung nur verschoben, nicht behoben.
+    ausserhalb = _ohne_details_ausser(tafel, modellbloecke)
+    assert "Wie gerechnet?" not in ausserhalb
     # Die alte Buendel-Sicht-Ueberschrift ist weg, nicht umbenannt.
     assert "Was ein Gerät mit Tarif wirklich kostet" not in str(s)
+
+
+def _ohne_details_ausser(tafel: BeautifulSoup, modellbloecke) -> str:
+    """Der Text der Tafel ohne jeden Modellblock - fuer die Ausserhalb-Probe."""
+    kopie = BeautifulSoup(str(tafel), "html.parser")
+    for block in kopie.select(".gr-tmodell"):
+        block.decompose()
+    return kopie.get_text(" ")
 
 
 # --------------------------------------------------------------------------

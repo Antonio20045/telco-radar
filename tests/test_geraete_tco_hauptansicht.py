@@ -120,6 +120,46 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
     assert karte["offene_raten"] == 12
 
 
+def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
+    """A-R5 (BRIEF_RAHMEN2, 05.09.2026): die Leitzahl der Karte ist der
+    reine Geraetepreis, nicht die TCO-Buendelzahl - die Ueberschrift der
+    Seite fragt "wo kaufe ich DIESES GERAET am guenstigsten", nicht "was
+    kostet das Buendel".
+
+    Gemessen am Vorgabemodell (iPhone 17 Pro 256 GB): o2 weist eine
+    Zuzahlung plus Ratensumme aus (1.315,00 €), Vodafones Referenz einen
+    eigenen Barpreis (1.199,90 €) - beide fuehren mit ihrem Geraetepreis.
+    1&1 nennt nur EINEN Buendelmonatspreis (§ 13.2, kein Geraetepreis
+    ausgewiesen) und bleibt deshalb bei seiner TCO-Zahl.
+    """
+    modell = _modell(bestand, "apple-iphone-17-pro-256")
+    o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
+    assert o2["geraetepreis"] == 1315.00
+    assert o2["geraetepreis"] < o2["gesamt"]
+
+    vodafone = [k for k in modell["karten"] if k["naeherung"]][0]
+    assert vodafone["geraetepreis"] == 1199.90
+    assert vodafone["geraetepreis"] < vodafone["gesamt"]
+
+    einsundeins = [k for k in modell["karten"] if k["anbieter"] == "1&1"][0]
+    assert einsundeins["belastbar"]
+    assert einsundeins["geraetepreis"] is None, \
+        "1&1 nennt nur einen Buendelpreis - eine Aufteilung waere erfunden"
+
+    # Gegenprobe auf dem ganzen Bestand: wo ein Geraetepreis ausgewiesen
+    # ist, ist er nie groesser als die TCO, die ihn und den Tarif traegt -
+    # sonst waere er die falsche der zwei Zahlen.
+    geprueft = 0
+    for m in bestand["modelle"]:
+        for k in m["karten"]:
+            if not k["belastbar"] or k["geraetepreis"] is None:
+                continue
+            geprueft += 1
+            assert k["geraetepreis"] <= k["gesamt"] + 0.01, \
+                f"{k['anbieter']} {m['id']}: Geraetepreis groesser als TCO"
+    assert geprueft >= 2, "der Test prueft nichts ohne echte Geraetepreise"
+
+
 def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
     """§ 13.2: der Anbieter nennt EINEN Monatsbetrag. Ihn aufzuteilen waere
     unsere Rechnung."""

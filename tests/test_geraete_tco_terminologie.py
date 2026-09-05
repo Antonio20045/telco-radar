@@ -37,11 +37,18 @@ def test_das_euro_delta_steht_am_g1_balken():
 
 def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
     """F-R2-2 auf der Seite: Etikett, Rechenweg und Gruppenkopf nennen die
-    Bindung der Referenz (24 Tarifmonate, Barkauf bindet nicht)."""
+    Bindung der Referenz (24 Tarifmonate, Barkauf bindet nicht).
+
+    BRIEF_RAHMEN2 (A-R5): die Leitzahl ist seitdem der Geraetepreis, das
+    TCO-Etikett steht als Sekundaerzeile ("mit Tarif: ...") - die Bindung
+    bleibt darin lesbar, nur nicht mehr an der groessten Zahl der Karte.
+    """
     s = _baue(tmp_path)
     ref = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="Vodafone"]')
     assert ref.select_one(".gr-kk-marke").get_text(strip=True) == "Referenzrechnung"
-    assert ref.select_one(".gr-kk-leit b").get_text(strip=True) == "TCO-24"
+    assert ref.select_one(".gr-kk-leit b").get_text(strip=True) == "Gerätepreis"
+    zweit = " ".join(ref.select_one(".gr-kk-zweit").get_text(" ", strip=True).split())
+    assert zweit == "mit Tarif: TCO-24 1.428,70 €"
     assert ref["data-laufzeit"] == "24"
     text = " ".join(ref.get_text(" ", strip=True).split())
     assert "36 Monate Bindung" not in text
@@ -49,7 +56,9 @@ def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
     assert "binden 36 Monate" in text
     # Das o2-Angebot daneben rechnet weiterhin ueber seine 36 Monate.
     o2 = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
-    assert o2.select_one(".gr-kk-leit b").get_text(strip=True) == "TCO-36"
+    assert o2.select_one(".gr-kk-leit b").get_text(strip=True) == "Gerätepreis"
+    o2_zweit = " ".join(o2.select_one(".gr-kk-zweit").get_text(" ", strip=True).split())
+    assert o2_zweit == "mit Tarif: TCO-36 1.120,75 €"
     assert "Gerechnet über 36 Monate Bindung" in " ".join(o2.get_text(" ", strip=True).split())
 
 
@@ -65,7 +74,9 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
     option = tafel.select_one('select[data-sortiere] option[value="gesamt"]')
     assert option.get_text(strip=True) == "TCO je Laufzeitgruppe"
-    assert [th.get_text(strip=True) for th in tafel.select("#gr-tco-tabelle th")][2] == "TCO"
+    # A-R5: die Geraetespalte steht VOR der TCO-Spalte.
+    ths = [th.get_text(strip=True) for th in tafel.select("#gr-tco-tabelle th")]
+    assert ths[2] == "Gerätepreis" and ths[3] == "TCO"
     assert "Gesamtkosten" not in tafel.select_one("figure.gr-grafik figcaption").get_text()
     # Ratenzeile: "X € in 36 Raten" - die Summe aus der Kennzahl.
     o2 = tafel.select_one('.gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')

@@ -303,6 +303,31 @@ def barpreise(listungen: list) -> dict:
     return je_sku
 
 
+def _geraetepreis(barpreis: Optional[dict], zuzahlung: Optional[float],
+                  raten_summe: Optional[float]) -> Optional[float]:
+    """Der reine Geraetepreis inkl. Finanzierung - die Leitzahl der Karte
+    (BRIEF_RAHMEN2, 05.09.2026: A-R5 - die Grafik darueber zeigt
+    Geraetepreise, die Karten fuehrten mit der TCO-Buendelzahl. Das
+    widersprach der Ueberschrift "Dieses Geraet - wo kaufe ich es am
+    guenstigsten?").
+
+    Dieselbe Regel wie im Zeitreihen-Graph (G0/G2, `historienreihen`):
+    zuerst der EIGENE Barpreis ohne Vertrag - ein FREMDER (der guenstigste
+    Marktpreis eines anderen Anbieters, `_barpreis_fuer`s Rueckfall) zaehlt
+    hier nicht, er ist ein anderes Angebot. Fehlt der eigene Barpreis, aber
+    die Rechnung traegt eine Ratenfinanzierung (Zuzahlung plus Ratensumme,
+    das o2-Muster), ist DAS der Geraetepreis inkl. Finanzierung. Traegt
+    keins von beiden etwas - 1&1 nennt nur EINEN Buendelmonatspreis fuer
+    Tarif und Geraet zusammen, § 13.2 -, bleibt die Antwort `None` und die
+    Karte fuehrt weiter mit ihrer TCO-Buendelzahl. Keine Erfindung.
+    """
+    if barpreis is not None and not barpreis.get("fremd"):
+        return round(barpreis["betrag"], 2)
+    if zuzahlung is not None and raten_summe is not None:
+        return round(zuzahlung + raten_summe, 2)
+    return None
+
+
 def _barpreis_fuer(belege: dict, anbieter: str) -> Optional[dict]:
     """Erst der EIGENE Barpreis des Anbieters, dann der guenstigste Markt.
 
@@ -380,6 +405,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
 
     eff = effektiv_ohne_geraet(kennzahl,
                                barpreis["betrag"] if barpreis else None)
+    # Katalog D: "X € in 36 Raten" - dieselbe Summe traegt auch die
+    # Geraetepreis-Leitzahl (A-R5), einmal gerechnet statt zweimal.
+    raten_summe = next((p.get("betrag") for p in kennzahl.bestandteile
+                        if p.get("kategorie") == "raten"), None)
+    geraetepreis = _geraetepreis(barpreis, b.geraet_zuzahlung, raten_summe)
     return {
         # B.2.5 GILT AUCH HIER. Eine Karte ohne Zahl braucht ihren Grund -
         # `_leere_karte` fuellt ihn, diese Funktion tat es nicht, und die
@@ -407,6 +437,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "tarif": b.tarif_name,
         "tarif_id": b.tarif_id,
         "tarif_id_guete": b.tarif_id_guete,
+        # A-R5: DER GERAETEPREIS IST DIE LEITZAHL, das TCO-Etikett/-Label
+        # steht daneben als Sekundaerzeile ("mit Tarif: ..."). `label` und
+        # `gesamt` bleiben unveraendert die TCO-Zahl - nur die Vorlage
+        # entscheidet, welche der beiden Zahlen zuerst und gross steht.
+        "geraetepreis": geraetepreis,
         # A5.1: die Laufzeit steht IM Namen der Leitzahl.
         "label": kennzahl.label,
         "laufzeit": kennzahl.bindung,
@@ -428,8 +463,7 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "rate": b.geraet_monatsrate,
         # Katalog D: "X € in 36 Raten" - die Summe kommt aus dem Posten der
         # Kennzahl, nicht aus einer Multiplikation in der Vorlage.
-        "raten_summe": next((p.get("betrag") for p in kennzahl.bestandteile
-                             if p.get("kategorie") == "raten"), None),
+        "raten_summe": raten_summe,
         "anschlusspreis": b.anschlusspreis,
         "nach_bindung": nach_bindung,
         "eff_ohne_geraet": eff,
@@ -494,6 +528,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
     """Ein Anbieter ohne Zahl - mit Namen und mit Begruendung (B.2.5)."""
     return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
             "slug": anbieter_slug(anbieter),
+            "geraetepreis": None,
             "label": "", "laufzeit": None, "belastbar": False,
             "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
             "offen_nach_24": None, "offene_raten": 0, "monatlich": None,
@@ -621,7 +656,11 @@ def _referenz_aus_buendel(karte: dict) -> dict:
         "tarif_summe": None,
         "tarif_quelle_url": karte.get("tarif_quelle_url", ""),
         "tarif_abgerufen_am": karte.get("abgerufen_am", ""),
-        "geraet_betrag": None,
+        # A-R5: traegt das Quellbuendel bereits einen Geraetepreis (eigener
+        # Barpreis oder Zuzahlung+Ratensumme), fuehrt die Referenzkarte
+        # damit - sonst faellt sie auf ihre TCO-Zahl zurueck, wie jede
+        # andere Karte ohne belegten Geraetepreis auch.
+        "geraet_betrag": karte.get("geraetepreis"),
         "geraet_quelle_url": karte.get("quelle_url", ""),
         "geraet_abgerufen_am": karte.get("abgerufen_am", ""),
         "monate": karte["laufzeit"], "gesamt": karte["gesamt"],
@@ -655,6 +694,13 @@ def _referenzkarte(ref: dict) -> dict:
         "laufzeit": ref["tarif_monate"],
         "fenster": ref["monate"],
         "belastbar": True, "naeherung": True,
+        # A-R5: der Barpreis des Geraets bei Vodafone ist der Geraetepreis
+        # inkl. Finanzierung dieser Karte - er ist einer der zwei GEMESSENEN
+        # Summanden, aus denen die Naeherung ihre TCO rechnet (siehe
+        # Modulkopf). Kommt die Referenz aus einem echten Vodafone-Buendel,
+        # steht hier stattdessen dessen eigener Geraetepreis (oder `None`,
+        # wenn das Buendel selbst keinen belegt).
+        "geraetepreis": ref["geraet_betrag"],
         # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
         # Neugeraet-Zahl und spielt im Vergleich mit.
         "zustand": "neu", "zustand_etikett": "", "vergleichbar": True,

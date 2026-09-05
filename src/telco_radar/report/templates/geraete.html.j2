@@ -429,10 +429,22 @@
   {% if k.tarif %}<p class="gr-kk-tarif">{{ k.tarif }}</p>{% endif %}
 
   {% if k.belastbar %}
-  {# DIE LEITZAHL, und ihre Laufzeit steht IM Etikett (A5.1). Eine
-     unbeschriftete Gesamtsumme waere ueber zwei Laufzeiten nicht lesbar. #}
+  {# DIE LEITZAHL IST DER GERAETEPREIS (A-R5, BRIEF_RAHMEN2 05.09.2026):
+     der Zeitreihen-Graph darueber zeigt Geraetepreise, die Ueberschrift
+     fragt "wo kaufe ich DIESES GERAET am guenstigsten" - eine Karte, die
+     stattdessen mit der TCO-Buendelzahl fuehrt, beantwortet eine andere
+     Frage als die Seite stellt. Die TCO bleibt die zweite Zahl, mit ihrer
+     Laufzeit IM Etikett (A5.1); wo kein Geraetepreis belegt ist (1&1: EIN
+     Buendelmonatspreis fuer Tarif und Geraet zusammen, § 13.2 - eine
+     Aufteilung waere unsere Erfindung), fuehrt die Karte weiter mit ihr. #}
+  {% if k.geraetepreis is not none %}
+  <p class="gr-kk-leit"><b>Gerätepreis</b> <span>{{ k.geraetepreis | euro }}</span></p>
+  <p class="gr-kk-zweit">mit Tarif: <b>{{ k.label }}</b> {{ k.gesamt | euro }}</p>
+  <p class="gr-kk-omonat">Ø {{ k.schnitt_monat | euro }}/Monat</p>
+  {% else %}
   <p class="gr-kk-leit"><b>{{ k.label }}</b> <span>{{ k.gesamt | euro }}</span></p>
   <p class="gr-kk-zweit">Ø {{ k.schnitt_monat | euro }}/Monat</p>
+  {% endif %}
   {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
      Ø-Werte, in denen verschieden viele Tarifmonate stecken. Bei o2 sind
      es 24 von 36 (der Tarif bindet kuerzer als die Raten laufen), bei
@@ -616,22 +628,17 @@
   {# A-R1 (BRIEF_RAHMEN, 05.09.2026): "Alles, was die Seite ueber sich
      selbst erklaert, verschwindet aus dem Lesefluss." Die alte
      Buendel-Sicht-Ueberschrift ("Was ein Gerät mit Tarif wirklich kostet")
-     entfaellt ersatzlos - die Frage stellt bereits der Seitentitel. Die
-     zwei Methodensaetze, die hier standen, stehen jetzt gekuerzt hinter
-     GENAU EINER Aufklappung; die je Modell bestehende ("Wie gerechnet?"
-     bei der Zeitreihe) bleibt ihr eigenes Thema (die Linien dieses
-     Geraets) und traegt keine allgemeine Methodik. #}
-  <details class="gr-auf" id="gr-tco-wie">
-    <summary>Wie gerechnet?</summary>
-    <p class="gr-erklaer">Gerechnet wird, was ein Bündel aus Gerät und Tarif
-    über seine Bindung zusammen kostet: Gerätezuzahlung plus Geräteraten
-    plus Tarifgrundpreis plus Anschlusspreis, abzüglich benannter Boni –
-    einzeln im Rechenweg jeder Karte, eine Lücke bleibt eine Lücke. Die
-    Bindung steht in jedem Etikett, weil der Markt sie unterschiedlich lang
-    setzt.</p>
-    <p class="gr-erklaer">Verglichen werden Gesamtkosten, nicht Leistungen –
-    ein Tarif mit mehr Datenvolumen kostet zu Recht mehr.</p>
-  </details>
+     entfaellt ersatzlos - die Frage stellt bereits der Seitentitel.
+
+     BRIEF_RAHMEN2 (05.09.2026, Befund 2): die zwei Methodensaetze standen
+     hier NOCH EINMAL hinter einer eigenen "Wie gerechnet?"-Aufklappung -
+     ueber der Kennzahlenreihe, eine zweite stand unter dem Zeitreihen-Graph
+     je Modell. Zwei Aufklappungen desselben Namens auf einem Bildschirm
+     sind kein Lesefluss, sondern eine Verdopplung. Diese hier ist ERSATZLOS
+     GESTRICHEN; die je Modell bestehende ("Wie gerechnet?" bei der
+     Zeitreihe, unten) bleibt - sie ist beim Graphen richtig platziert und
+     traegt ihr eigenes Thema (die Linien dieses Geraets), keine allgemeine
+     Methodik. #}
 
   {# --- Die Preis-Alarme als Chips (H4) ------------------------------
          SIE STEHEN VOR DEM MODELLGATTER und nicht darin: die Alarme
@@ -808,6 +815,7 @@
   <table class="gr-ttab gr-ttab--leit">
     <thead><tr>
       <th scope="col">Gerät</th><th scope="col">Anbieter und Tarif</th>
+      <th scope="col">Gerätepreis</th>
       <th scope="col">TCO</th>
       <th scope="col">Ø je Monat</th>
       <th scope="col">nach 24 Monaten</th><th scope="col">Beleg</th>
@@ -819,7 +827,13 @@
           z.zustand_etikett }}</span>{% endif %}</td>
       <td><span class="gr-t-anbieter">{{ z.anbieter }}</span>
           <span class="gr-a-klein">{{ z.tarif }}</span></td>
-      {# DIE LEITZAHL TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine
+      {# A-R5: die GERAETESPALTE steht vor der TCO-Spalte - dieselbe
+         Reihenfolge wie auf der Karte darueber. Ohne belegten Geraetepreis
+         (1&1: EIN Buendelmonatspreis fuer Tarif und Geraet zusammen)
+         steht die benannte Luecke statt einer erfundenen Zahl. #}
+      <td>{% if z.geraetepreis is not none %}{{ z.geraetepreis | euro }}{%
+          else %}<span class="gr-t-luecke">nicht ausgewiesen</span>{% endif %}</td>
+      {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine
          unbeschriftete Gesamtsumme ist ueber zwei Bindungsdauern nicht
          lesbar. #}
       <td><b class="gr-t-leit">{{ z.gesamt | euro }}</b>
