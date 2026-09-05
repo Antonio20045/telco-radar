@@ -95,13 +95,17 @@ def test_jede_karte_ohne_zahl_nennt_ihren_grund(bestand):
 
 
 def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
-    """Telekom hat 0 Listungen (202-Challenge). Genau das sagt die Karte -
-    und sie nennt die Phase, die es aufloest."""
+    """Telekom hat in dieser Fixture 0 Buendel-Listungen. Genau das sagt
+    die Karte - in einem Satz, den ein Manager ohne Technikhintergrund
+    liest (S-Q1, Review 05.09.2026): kein "GitHub Actions", keine
+    "202-Challenge", keine "Phase T". Die technische Ursache steht dafuer
+    in `config/geraete_quellen.yaml`, nicht mehr im Nutzer-Sichtbaren."""
     for modell in bestand["modelle"]:
         karte = [k for k in modell["karten"] if k["anbieter"] == "Telekom"][0]
         assert not karte["belastbar"]
-        assert "Datenstand fehlt" in karte["leer_grund"]
-        assert "Phase T" in karte["leer_grund"]
+        assert karte["leer_grund"].strip()
+        for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
+            assert jargon not in karte["leer_grund"]
 
 
 def test_die_rechenprobe_steht_auf_der_karte(bestand):

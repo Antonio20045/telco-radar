@@ -74,11 +74,17 @@ LEITFRAGE_MODELL = "apple-iphone-17-pro-256"
 # Warum ein Anbieter heute keine Zahl hat. Der Satz steht auf der Karte,
 # nicht in einem Protokoll - eine Luecke ohne Begruendung sieht aus wie ein
 # Fehler der Seite.
+#
+# S-Q1 (Review vom 05.09.2026): der Telekom-Satz nannte woertlich "GitHub
+# Actions", "202-Challenge" und "Phase T" - Begriffe aus der Werkstatt, die
+# ein Manager ohne Technikhintergrund nicht liest. Die TECHNISCHE Ursache
+# steht weiterhin in `config/geraete_quellen.yaml` (dort ist sie am Platz -
+# wer Quellen pflegt, braucht sie), hier steht nur noch, was es fuer die
+# Zahl bedeutet: sie fehlt heute und kommt mit der naechsten Messung.
 LEER_GRUND = {
-    "Telekom": ("Datenstand fehlt – Quelle in Vorbereitung. Der Abruf aus "
-                "GitHub Actions beantwortet telekom.de mit einer "
-                "202-Challenge; die Bündelpreise kommen mit dem lokalen "
-                "Lauf (Phase T)."),
+    "Telekom": ("Für dieses Modell ist bei Telekom noch kein Bündelpreis "
+                "erhoben – die Vergleichszahl folgt mit der nächsten "
+                "wöchentlichen Messung."),
     "1&1": ("Für dieses Modell ist bei 1&1 kein Bündel erhoben – die "
             "Kategorieseite führt es nicht als eigene Produktkachel."),
     "o2": "Für dieses Modell ist bei o2 kein Bündel erhoben.",
