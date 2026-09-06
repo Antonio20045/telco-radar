@@ -431,14 +431,49 @@ def test_echte_config_gibt_telekom_die_ehrliche_kennung():
     """BRIEF_TELEKOM_TAEGLICH_R3_E4: NUR Telekom bekommt den Override, keine
     andere Quelle - `config/settings.yaml` bleibt fuer alle anderen die
     einzige Quelle des Absenders.
+
+    Telekom traegt seit BRIEF_TELEKOM_R6 ZWEI Eintraege (Pflichtdokumente
+    UND `methode: telekom_kacheln`) - `next()` allein haette hier nur den
+    ersten geprueft und die Kacheln-Quelle stillschweigend durchgelassen.
     """
     quellen = lade_quellen(Path(__file__).resolve().parents[1])
-    telekom = next(q for q in quellen if q.anbieter == "Telekom")
+    telekom = [q for q in quellen if q.anbieter == "Telekom"]
     andere = [q for q in quellen if q.anbieter != "Telekom"]
-    assert telekom.user_agent is not None
-    assert telekom.user_agent.startswith("TelcoRadar/1.0")
-    assert "Chrome" not in telekom.user_agent and "Mozilla" not in telekom.user_agent
+    assert len(telekom) >= 2
+    for q in telekom:
+        assert q.user_agent is not None
+        assert q.user_agent.startswith("TelcoRadar/1.0")
+        assert "Chrome" not in q.user_agent and "Mozilla" not in q.user_agent
     assert all(q.user_agent is None for q in andere)
+
+
+def test_beleg_deckt_alle_konfigurierten_telekom_einstiege_ab():
+    """Abnahmekriterium 3 (BRIEF_TELEKOM_R6): keine behauptete
+    Vollstaendigkeit ohne Messung. Jede in `config/tarif_quellen.yaml`
+    konfigurierte Telekom-Einstiegs-URL - das Pflichtdokument-Verzeichnis
+    UND die Shop-Kacheln (`methode: telekom_kacheln`) - muss als eigener
+    Request im committeten Laufzeitbeleg stehen. Fehlt eine, hat der
+    Bericht eine Vollstaendigkeit behauptet, die niemand gemessen hat.
+    """
+    root = Path(__file__).resolve().parents[1]
+    quellen = [q for q in lade_quellen(root) if q.anbieter == "Telekom"]
+    erwartet = {u for q in quellen for u in q.einstieg}
+    assert erwartet, "Config traegt keine Telekom-Einstiegs-URL mehr"
+
+    belege = sorted((root / "outputs").glob("beleg-telekom-lokallauf-*.json"))
+    assert belege, "kein Laufzeitbeleg unter outputs/ committet"
+    beleg = json.loads(belege[-1].read_text(encoding="utf-8"))
+    beleg_urls = {r["url"] for r in beleg["requests"]}
+
+    fehlend = erwartet - beleg_urls
+    assert not fehlend, (
+        f"Telekom-Einstiegs-URLs ohne Requestbeleg: {fehlend}")
+    # Kriterium 2: jeder Beleg-Eintrag ehrlich, browserlos, HTTP-GET.
+    assert beleg["alle_ehrlich"] is True
+    for r in beleg["requests"]:
+        assert r["transport"] == "http-get"
+        assert r["browser"] is False
+        assert r["user_agent"].startswith("TelcoRadar/1.0")
 
 
 def test_telekom_pfad_uebergibt_die_ehrliche_kennung_an_fetch(tmp_path):
