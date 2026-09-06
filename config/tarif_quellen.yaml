@@ -98,6 +98,23 @@ quellen:
     # Status und Byte-Zahl) - vorher war der Ausfall vollkommen stumm.
     # Ein Fingerprint-Trick waere hier keine Loesung, sondern eine
     # Umgehung; die Grenze steht in STRATEGY_GERAETE_TCO.md R3.
+    #
+    # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4,
+    # 06.09.2026): `config/settings.yaml -> http.user_agent` traegt seit
+    # Phase Q eine Chrome-Kennung, global fuer alle 196 Quellen. Ein
+    # gemessener Lokallauf hat gezeigt, dass telekom.de diese Chrome-Kennung
+    # anstandslos annimmt und der ehrliche `TelcoRadar/1.0`-Absender nie
+    # auch nur versucht wurde (Runde 2, `outputs/telekom-taeglich-r2-beleg-
+    # 2026-09-06.md`). Ein Lauf am 06.09.2026 direkt gegen telekom.de mit
+    # genau diesem Absender bestaetigt HTTP 200 - kein Bot-Schutz, keine
+    # Umgehung noetig. Diese Zeile setzt den Absender NUR fuer Telekom;
+    # `http.user_agent` bleibt fuer jede andere Quelle unveraendert, das ist
+    # die PM-Entscheidung, die weiterhin aussteht. Die 202-Challenge oben
+    # betrifft den GitHub-Actions-IP-Bereich, nicht diesen Absenderwechsel:
+    # aus der Sandbox bzw. von Antonios Rechner (H1, woechentlicher
+    # Lokallauf) kommt der Abruf so oder so durch, in Actions bleibt er
+    # unabhaengig von der UA weiterhin offen.
+    user_agent: "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
     einstieg:
       - https://www.telekom.de/produktinformationsblatt
     pfadmuster:
@@ -240,6 +257,10 @@ quellen:
 
   - anbieter: Telekom
     methode: telekom_kacheln
+    # Derselbe Per-Anbieter-Override wie beim PIB-Eintrag oben
+    # (BRIEF_TELEKOM_TAEGLICH_R3_E4): auch diese Quelle ist mit dem
+    # ehrlichen Absender gemessen, nicht mit der globalen Chrome-Kennung.
+    user_agent: "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
     # Gemessen 05.09.2026, lokal, Absender TelcoRadar/1.0: HTTP 200,
     # 2,26 MB. Fuenf Tarifkacheln (XS/S/M/L/XL), servergerendert als
     # React-CSS-Modul-Markup - nicht im JSON-Zustand (siehe Fussnote unten,

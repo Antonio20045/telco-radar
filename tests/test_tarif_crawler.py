@@ -427,6 +427,104 @@ def test_echte_config_ist_ladbar():
         assert q.max_dokumente > 0
 
 
+def test_echte_config_gibt_telekom_die_ehrliche_kennung():
+    """BRIEF_TELEKOM_TAEGLICH_R3_E4: NUR Telekom bekommt den Override, keine
+    andere Quelle - `config/settings.yaml` bleibt fuer alle anderen die
+    einzige Quelle des Absenders.
+
+    Telekom traegt seit BRIEF_TELEKOM_R6 ZWEI Eintraege (Pflichtdokumente
+    UND `methode: telekom_kacheln`) - `next()` allein haette hier nur den
+    ersten geprueft und die Kacheln-Quelle stillschweigend durchgelassen.
+    """
+    quellen = lade_quellen(Path(__file__).resolve().parents[1])
+    telekom = [q for q in quellen if q.anbieter == "Telekom"]
+    andere = [q for q in quellen if q.anbieter != "Telekom"]
+    assert len(telekom) >= 2
+    for q in telekom:
+        assert q.user_agent is not None
+        assert q.user_agent.startswith("TelcoRadar/1.0")
+        assert "Chrome" not in q.user_agent and "Mozilla" not in q.user_agent
+    assert all(q.user_agent is None for q in andere)
+
+
+def test_beleg_deckt_alle_konfigurierten_telekom_einstiege_ab():
+    """Abnahmekriterium 3 (BRIEF_TELEKOM_R6): keine behauptete
+    Vollstaendigkeit ohne Messung. Jede in `config/tarif_quellen.yaml`
+    konfigurierte Telekom-Einstiegs-URL - das Pflichtdokument-Verzeichnis
+    UND die Shop-Kacheln (`methode: telekom_kacheln`) - muss als eigener
+    Request im committeten Laufzeitbeleg stehen. Fehlt eine, hat der
+    Bericht eine Vollstaendigkeit behauptet, die niemand gemessen hat.
+    """
+    root = Path(__file__).resolve().parents[1]
+    quellen = [q for q in lade_quellen(root) if q.anbieter == "Telekom"]
+    erwartet = {u for q in quellen for u in q.einstieg}
+    assert erwartet, "Config traegt keine Telekom-Einstiegs-URL mehr"
+
+    belege = sorted((root / "outputs").glob("beleg-telekom-lokallauf-*.json"))
+    assert belege, "kein Laufzeitbeleg unter outputs/ committet"
+    beleg = json.loads(belege[-1].read_text(encoding="utf-8"))
+    beleg_urls = {r["url"] for r in beleg["requests"]}
+
+    fehlend = erwartet - beleg_urls
+    assert not fehlend, (
+        f"Telekom-Einstiegs-URLs ohne Requestbeleg: {fehlend}")
+    # Kriterium 2: jeder Beleg-Eintrag ehrlich, browserlos, HTTP-GET.
+    assert beleg["alle_ehrlich"] is True
+    for r in beleg["requests"]:
+        assert r["transport"] == "http-get"
+        assert r["browser"] is False
+        assert r["user_agent"].startswith("TelcoRadar/1.0")
+
+
+def test_telekom_pfad_uebergibt_die_ehrliche_kennung_an_fetch(tmp_path):
+    """Abnahmekriterium 1: der Code, nicht nur die Konfiguration, reicht den
+    Per-Anbieter-Override bis an `fetch()` durch - fuer die Einstiegsseite
+    UND fuer jedes Dokument, das von ihr aus geholt wird.
+    """
+    verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
+    gesehen: dict[str, dict] = {}
+
+    def hole(url, http_cfg, *a, **kw):
+        gesehen[url] = http_cfg
+        if url == EINSTIEG:
+            return _Antwort(f'<a href="{verlinkt}">L</a>')
+        return _Antwort(_pib_text(), typ="text/plain")
+
+    ehrlich = "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    config = f"""
+quellen:
+  - anbieter: Telekom
+    einstieg: ["{EINSTIEG}"]
+    pfadmuster: ["/produktinformationsblatt/"]
+    user_agent: "{ehrlich}"
+"""
+    root = _repo(tmp_path, config)
+    basis_cfg = {"user_agent": "Mozilla/5.0 Chrome"}
+    sammle(root, basis_cfg, jetzt=JETZT, hole=hole)
+
+    assert gesehen[EINSTIEG]["user_agent"] == ehrlich
+    assert gesehen[verlinkt]["user_agent"] == ehrlich
+    # Kein In-Place-Mutieren: die globale Konfiguration bleibt unberuehrt.
+    assert basis_cfg["user_agent"] == "Mozilla/5.0 Chrome"
+
+
+def test_quelle_ohne_user_agent_bekommt_die_globale_konfiguration(tmp_path):
+    """o2 (und jede andere Quelle ohne `user_agent:`) darf keinen Override
+    untergeschoben bekommen - sie sieht `http_cfg` unveraendert.
+    """
+    gesehen: dict[str, dict] = {}
+
+    def hole(url, http_cfg, *a, **kw):
+        gesehen[url] = http_cfg
+        return _Antwort("<html></html>")
+
+    root = _repo(tmp_path, CONFIG)  # CONFIG traegt kein user_agent-Feld
+    basis_cfg = {"user_agent": "Mozilla/5.0 Chrome"}
+    sammle(root, basis_cfg, jetzt=JETZT, hole=hole)
+
+    assert gesehen[EINSTIEG] is basis_cfg
+
+
 def test_bevorzugte_slugs_kommen_zuerst():
     links = [f"{EINSTIEG}/call-start-2017", f"{EINSTIEG}/magentamobil-l-2024"]
     sortiert = tarif_crawler._sortiere(links, ["magentamobil-l-2"])

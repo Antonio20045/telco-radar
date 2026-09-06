@@ -1,0 +1,95 @@
+{
+  "datum": "2026-09-06",
+  "anzahl_requests": 11,
+  "alle_ehrlich": true,
+  "requests": [
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-s-20211121",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-m-20211121",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/magentamobil-l-20240801",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-xl-20211121",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/magentamobil-basic-20240801",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-s-flex-20211005",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-m-flex-20211005",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-l-flex-20211005",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-xl-flex-20211005",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/tarife/handyvertrag",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    }
+  ]
+}

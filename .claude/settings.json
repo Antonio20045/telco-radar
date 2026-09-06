@@ -38,6 +38,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/antonio/Developer/jarvis-ext/scripts/stop-hook-commit.sh",
+            "timeout": 120
+          }
+        ]
+      }
     ]
   }
 }
