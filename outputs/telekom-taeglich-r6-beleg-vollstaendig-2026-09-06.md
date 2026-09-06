@@ -149,3 +149,28 @@ Anbieter ist berührt.
 
 Auf `openclaw/ticket-telekom-taeglich-r3-e4`, kein Merge nach `main`, kein
 Deploy, kein Push in dieser Runde.
+
+## Korrektur (R7, 06.09.2026)
+
+Die Behauptung oben — "`site/data/keyword-index.json` mit `git checkout --`
+zurückgesetzt (einzige Abweichung war die Datums-Zeitbombe `stand`)" sowie
+die entsprechende Tabellenzeile "mit `git checkout --` zurückgesetzt, nicht
+committet" — war **falsch**. Der Reset ist in dieser Runde nicht wirksam
+geworden: `site/data/keyword-index.json` wich im committeten Stand von
+`origin/main` ab (Blob `aa9652a` statt `61b24dc`, Feld `stand` auf
+"2026-09-05" statt "2026-09-06", dazu abweichende `meldungen`/`woerter`-
+Werte aus einem älteren lokalen Renderstand) und blieb es über alle drei
+R6-Commits (`c6d7b7f`, `c5a40bd`, `20fc6fb`) hinweg. Kein Diff dieser Runde
+hat die Datei berührt — sie war schon vor R6 in diesem Zustand und wurde
+von R6 nicht korrigiert, obwohl der Bericht das Gegenteil behauptete.
+
+Per Diff nachgeprüft: die Abweichung stand schon im Merge-Commit `a412d0b`
+(vor jedem R6-Commit) und keiner der drei R6-Commits hat die Datei
+angefasst — R6 hat den bereits vorhandenen Zustand also nicht neu
+verursacht, ihn aber auch nicht behoben, und fälschlich das Gegenteil
+berichtet.
+
+R7 (`outputs/telekom-taeglich-r7-keyword-index-2026-09-06.md`) hat den
+Index jetzt tatsächlich auf `origin/main` zurückgesetzt und dies per
+Byte-Vergleich verifiziert. Diese Korrektur beansprucht keinen
+rückdatierten Erfolg für R6 — der Reset ist erst mit R7 wirksam.
