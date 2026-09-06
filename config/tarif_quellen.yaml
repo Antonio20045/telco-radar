@@ -29,6 +29,19 @@ quellen:
     # Die Telekom liefert das PDF unter dem Slug OHNE .pdf-Endung und mit
     # Content-Type application/pdf - deshalb entscheidet der Content-Type,
     # nicht die Dateiendung.
+    #
+    # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4,
+    # 06.09.2026): `config/settings.yaml -> http.user_agent` traegt seit
+    # Phase Q eine Chrome-Kennung, global fuer alle 196 Quellen. Ein
+    # gemessener Lokallauf hat gezeigt, dass telekom.de diese Chrome-Kennung
+    # anstandslos annimmt und der ehrliche `TelcoRadar/1.0`-Absender nie
+    # auch nur versucht wurde (Runde 2, `outputs/telekom-taeglich-r2-beleg-
+    # 2026-09-06.md`). Ein Lauf am 06.09.2026 direkt gegen telekom.de mit
+    # genau diesem Absender bestaetigt HTTP 200 - kein Bot-Schutz, keine
+    # Umgehung noetig. Diese Zeile setzt den Absender NUR fuer Telekom;
+    # `http.user_agent` bleibt fuer jede andere Quelle unveraendert, das ist
+    # die PM-Entscheidung, die weiterhin aussteht.
+    user_agent: "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
     einstieg:
       - https://www.telekom.de/produktinformationsblatt
     pfadmuster:

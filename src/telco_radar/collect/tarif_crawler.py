@@ -104,6 +104,14 @@ class Quelle:
     pfadmuster: list[str] = field(default_factory=list)
     bevorzugt: list[str] = field(default_factory=list)
     max_dokumente: int = 5
+    # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4).
+    # `config/settings.yaml -> http.user_agent` ist die globale Kennung fuer
+    # alle 196 Quellen dieses Projekts; sie hier zu aendern traefe jeden
+    # anderen Anbieter mit. Eine Quelle, die stattdessen den ehrlichen
+    # `TelcoRadar/1.0`-Absender tragen soll, bekommt das Feld hier gesetzt -
+    # ohne Zeile in `tarif_quellen.yaml` bleibt es `None` und `http_cfg`
+    # unveraendert.
+    user_agent: str | None = None
 
 
 @dataclass
@@ -150,6 +158,7 @@ def lade_quellen(root: Path) -> list[Quelle]:
             pfadmuster=[str(m).lower() for m in (q.get("pfadmuster") or [])],
             bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
             max_dokumente=int(q.get("max_dokumente") or 5),
+            user_agent=(str(q["user_agent"]) if q.get("user_agent") else None),
         ))
     return quellen
 
@@ -375,13 +384,18 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     im_lauf: dict[str, str] = {}
 
     for quelle in quellen:
+        # Per-Anbieter-Override, NICHT die globale Konfiguration: eine
+        # Quelle mit `user_agent:` bekommt ihre eigene Kopie von `http_cfg`,
+        # jede andere Quelle sieht `http_cfg` unveraendert.
+        quelle_cfg = ({**http_cfg, "user_agent": quelle.user_agent}
+                      if quelle.user_agent else http_cfg)
         links: list[str] = []
         for einstieg in quelle.einstieg:
             erlaubt.add(einstieg)
             bilanz["einstiege"] += 1
             try:
                 besucht.append(einstieg)
-                antwort = hole(einstieg, http_cfg)
+                antwort = hole(einstieg, quelle_cfg)
                 gefunden = dokumentlinks(antwort.text, einstieg,
                                          quelle.pfadmuster)
             except Exception as exc:  # noqa: BLE001
@@ -396,7 +410,7 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
         for url in _sortiere(links, quelle.bevorzugt)[:quelle.max_dokumente]:
             try:
                 besucht.append(url)
-                ergebnis = _hole_dokument(url, http_cfg, hole)
+                ergebnis = _hole_dokument(url, quelle_cfg, hole)
             except Exception as exc:  # noqa: BLE001
                 bilanz["fehler"] += 1
                 log.info("Tarifdokument %s nicht lesbar: %s", url,

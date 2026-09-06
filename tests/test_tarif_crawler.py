@@ -427,6 +427,69 @@ def test_echte_config_ist_ladbar():
         assert q.max_dokumente > 0
 
 
+def test_echte_config_gibt_telekom_die_ehrliche_kennung():
+    """BRIEF_TELEKOM_TAEGLICH_R3_E4: NUR Telekom bekommt den Override, keine
+    andere Quelle - `config/settings.yaml` bleibt fuer alle anderen die
+    einzige Quelle des Absenders.
+    """
+    quellen = lade_quellen(Path(__file__).resolve().parents[1])
+    telekom = next(q for q in quellen if q.anbieter == "Telekom")
+    andere = [q for q in quellen if q.anbieter != "Telekom"]
+    assert telekom.user_agent is not None
+    assert telekom.user_agent.startswith("TelcoRadar/1.0")
+    assert "Chrome" not in telekom.user_agent and "Mozilla" not in telekom.user_agent
+    assert all(q.user_agent is None for q in andere)
+
+
+def test_telekom_pfad_uebergibt_die_ehrliche_kennung_an_fetch(tmp_path):
+    """Abnahmekriterium 1: der Code, nicht nur die Konfiguration, reicht den
+    Per-Anbieter-Override bis an `fetch()` durch - fuer die Einstiegsseite
+    UND fuer jedes Dokument, das von ihr aus geholt wird.
+    """
+    verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
+    gesehen: dict[str, dict] = {}
+
+    def hole(url, http_cfg, *a, **kw):
+        gesehen[url] = http_cfg
+        if url == EINSTIEG:
+            return _Antwort(f'<a href="{verlinkt}">L</a>')
+        return _Antwort(_pib_text(), typ="text/plain")
+
+    ehrlich = "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    config = f"""
+quellen:
+  - anbieter: Telekom
+    einstieg: ["{EINSTIEG}"]
+    pfadmuster: ["/produktinformationsblatt/"]
+    user_agent: "{ehrlich}"
+"""
+    root = _repo(tmp_path, config)
+    basis_cfg = {"user_agent": "Mozilla/5.0 Chrome"}
+    sammle(root, basis_cfg, jetzt=JETZT, hole=hole)
+
+    assert gesehen[EINSTIEG]["user_agent"] == ehrlich
+    assert gesehen[verlinkt]["user_agent"] == ehrlich
+    # Kein In-Place-Mutieren: die globale Konfiguration bleibt unberuehrt.
+    assert basis_cfg["user_agent"] == "Mozilla/5.0 Chrome"
+
+
+def test_quelle_ohne_user_agent_bekommt_die_globale_konfiguration(tmp_path):
+    """o2 (und jede andere Quelle ohne `user_agent:`) darf keinen Override
+    untergeschoben bekommen - sie sieht `http_cfg` unveraendert.
+    """
+    gesehen: dict[str, dict] = {}
+
+    def hole(url, http_cfg, *a, **kw):
+        gesehen[url] = http_cfg
+        return _Antwort("<html></html>")
+
+    root = _repo(tmp_path, CONFIG)  # CONFIG traegt kein user_agent-Feld
+    basis_cfg = {"user_agent": "Mozilla/5.0 Chrome"}
+    sammle(root, basis_cfg, jetzt=JETZT, hole=hole)
+
+    assert gesehen[EINSTIEG] is basis_cfg
+
+
 def test_bevorzugte_slugs_kommen_zuerst():
     links = [f"{EINSTIEG}/call-start-2017", f"{EINSTIEG}/magentamobil-l-2024"]
     sortiert = tarif_crawler._sortiere(links, ["magentamobil-l-2"])

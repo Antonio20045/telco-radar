@@ -88,25 +88,24 @@
   <h2 class="rubrik">Wie vollständig ist das</h2>
   <div class="t-bilanz-reihe">
     <div class="t-kennzahl">
-      <b>3</b>
+      <b>8</b>
       <span>Tarife in der Datenbank</span>
     </div>
     <div class="t-kennzahl">
-      <b>1</b>
+      <b>2</b>
       <span>Anbieter erfasst</span>
     </div>
     <div class="t-kennzahl">
-      <b>0</b>
+      <b>5</b>
       <span>davon in der Karte</span>
     </div>
     <div class="t-kennzahl">
-      <b>3</b>
+      <b>8</b>
       <span>mit bekannten Lücken</span>
     </div>
   </div>
-  <p class="t-hinweis">Erfasst: o2.
-  Konfiguriert, aber ohne Daten:
-  Telekom.
+  <p class="t-hinweis">Erfasst: Telekom, o2.
+  
   Nicht erfasst sind Anbieter, deren Dokumentenverzeichnis erst im Browser
   entsteht – dort steht im Quelltext kein Link, dem man folgen könnte.
   Ein fehlender Anbieter heißt nicht, dass er teurer oder billiger ist; er
@@ -114,6 +113,115 @@
 </section>
 
 
+
+<section class="t-karte">
+  <h2 class="rubrik">Wer liegt über dem Üblichen</h2>
+  <p class="t-erklaer">Jeder Punkt ist ein Tarif: nach rechts mehr
+  Datenvolumen, nach oben höherer Effektivpreis.
+  Die Linie ist der Marktdurchschnitt – was ein
+  Tarif bei diesem Volumen üblicherweise kostet. Punkte darüber sind relativ
+  teuer, Punkte darunter relativ günstig.</p>
+
+  <svg class="t-svg" viewBox="0 0 760 420"
+       role="img" aria-label="Streudiagramm: Datenvolumen gegen Effektivpreis">
+    
+    <line x1="58" y1="18"
+          x2="58" y2="376"
+          class="t-achse"/>
+    <line x1="58" y1="376"
+          x2="760" y2="376"
+          class="t-achse"/>
+    
+    <line x1="58" y1="376.0"
+          x2="760" y2="376.0" class="t-raster"/>
+    <text x="50" y="380.0"
+          class="t-tick" text-anchor="end">0 €</text>
+    
+    <line x1="58" y1="308.5"
+          x2="760" y2="308.5" class="t-raster"/>
+    <text x="50" y="312.5"
+          class="t-tick" text-anchor="end">13 €</text>
+    
+    <line x1="58" y1="241.0"
+          x2="760" y2="241.0" class="t-raster"/>
+    <text x="50" y="245.0"
+          class="t-tick" text-anchor="end">26 €</text>
+    
+    <line x1="58" y1="173.5"
+          x2="760" y2="173.5" class="t-raster"/>
+    <text x="50" y="177.5"
+          class="t-tick" text-anchor="end">39 €</text>
+    
+    <line x1="58" y1="106.0"
+          x2="760" y2="106.0" class="t-raster"/>
+    <text x="50" y="110.0"
+          class="t-tick" text-anchor="end">52 €</text>
+    
+    <line x1="58" y1="38.5"
+          x2="760" y2="38.5" class="t-raster"/>
+    <text x="50" y="42.5"
+          class="t-tick" text-anchor="end">65 €</text>
+    
+    
+    <text x="58.0" y="394"
+          class="t-tick" text-anchor="middle">0</text>
+    
+    <text x="192.6" y="394"
+          class="t-tick" text-anchor="middle">17</text>
+    
+    <text x="327.2" y="394"
+          class="t-tick" text-anchor="middle">34</text>
+    
+    <text x="461.8" y="394"
+          class="t-tick" text-anchor="middle">51</text>
+    
+    <text x="596.3" y="394"
+          class="t-tick" text-anchor="middle">68</text>
+    
+    <text x="730.9" y="394"
+          class="t-tick" text-anchor="middle">85</text>
+    
+    <text x="760" y="414"
+          class="t-achsname" text-anchor="end">Datenvolumen in GB</text>
+
+    
+    <line x1="58.0" y1="143.6"
+          x2="742.0" y2="38.8"
+          class="t-fair"/>
+    
+
+    
+    <circle cx="97.6" cy="246.4" r="5"
+            class="t-punkt">
+      <title>Telekom MagentaMobil Basic · 24.95 € effektiv · -20.98 € gegenüber dem Üblichen</title>
+    </circle>
+    
+    <circle cx="105.5" cy="90.7" r="5"
+            class="t-punkt">
+      <title>Telekom MagentaMobil L · 54.95 € effektiv · +8.79 € gegenüber dem Üblichen</title>
+    </circle>
+    
+    <circle cx="137.2" cy="80.3" r="5"
+            class="t-punkt">
+      <title>Telekom MagentaMobil L · 56.95 € effektiv · +9.85 € gegenüber dem Üblichen</title>
+    </circle>
+    
+    <circle cx="374.7" cy="64.7" r="5"
+            class="t-punkt">
+      <title>Telekom MagentaMobil L · 59.95 € effektiv · +5.84 € gegenüber dem Üblichen</title>
+    </circle>
+    
+    <circle cx="691.3" cy="64.7" r="5"
+            class="t-punkt">
+      <title>Telekom MagentaMobil L · 59.95 € effektiv · -3.50 € gegenüber dem Üblichen</title>
+    </circle>
+    
+  </svg>
+
+  <ul class="t-legende">
+    <li>Telekom</li><li>o2</li>
+  </ul>
+</section>
 
 
 
@@ -124,6 +232,46 @@
   sechsten Gigabyte unbenutzbar. Deshalb steht hier neben dem Preis immer der
   Preis je Gigabyte und das, was der Preis nicht zeigt.</p>
 
+  
+  <article class="t-zeile">
+    <div class="t-kopf">
+      <span class="t-anbieter">Telekom</span>
+      <h3 class="t-name">
+        <a href="https://www.telekom.de/produktinformationsblatt/magentamobil-basic-20240801" rel="noopener">MagentaMobil Basic</a>
+        
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>24.95 €</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>4.99 €</b>
+        <i>je Gigabyte</i>
+      </span>
+      <span class="t-wert">
+        <b>24.95 €</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    
+    <ul class="t-flags">
+      
+      <li class="t-flag">5 GB Datenvolumen</li>
+      
+      <li class="t-flag t-flag--schlecht">Nach dem Volumen nur noch 64 KBit/s</li>
+      
+      <li class="t-flag t-flag--schlecht">24 Monate Bindung</li>
+      
+    </ul>
+    
+    
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    Anschlusspreis, Cashback/Wechselbonus. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    
+  </article>
   
   <article class="t-zeile">
     <div class="t-kopf">
@@ -229,6 +377,162 @@
       <li class="t-flag t-flag--gut">Ohne Mindestlaufzeit</li>
       
       <li class="t-flag t-flag--gut">Allnet-Flat enthalten</li>
+      
+    </ul>
+    
+    
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    Anschlusspreis, Cashback/Wechselbonus. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    
+  </article>
+  
+  <article class="t-zeile">
+    <div class="t-kopf">
+      <span class="t-anbieter">Telekom</span>
+      <h3 class="t-name">
+        <a href="https://www.telekom.de/produktinformationsblatt/magentamobil-l-20170601" rel="noopener">MagentaMobil L</a>
+        
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>54.95 €</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>9.16 €</b>
+        <i>je Gigabyte</i>
+      </span>
+      <span class="t-wert">
+        <b>54.95 €</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    
+    <ul class="t-flags">
+      
+      <li class="t-flag">6 GB Datenvolumen</li>
+      
+      <li class="t-flag t-flag--schlecht">Nach dem Volumen nur noch 64 KBit/s</li>
+      
+    </ul>
+    
+    
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    Anschlusspreis, Cashback/Wechselbonus. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    
+  </article>
+  
+  <article class="t-zeile">
+    <div class="t-kopf">
+      <span class="t-anbieter">Telekom</span>
+      <h3 class="t-name">
+        <a href="https://www.telekom.de/produktinformationsblatt/magentamobil-l-20180831" rel="noopener">MagentaMobil L</a>
+        
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>56.95 €</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>5.70 €</b>
+        <i>je Gigabyte</i>
+      </span>
+      <span class="t-wert">
+        <b>56.95 €</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    
+    <ul class="t-flags">
+      
+      <li class="t-flag">10 GB Datenvolumen</li>
+      
+      <li class="t-flag t-flag--schlecht">Nach dem Volumen nur noch 64 KBit/s</li>
+      
+    </ul>
+    
+    
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    Anschlusspreis, Cashback/Wechselbonus. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    
+  </article>
+  
+  <article class="t-zeile">
+    <div class="t-kopf">
+      <span class="t-anbieter">Telekom</span>
+      <h3 class="t-name">
+        <a href="https://www.telekom.de/produktinformationsblatt/magentamobil-l-20220701" rel="noopener">MagentaMobil L</a>
+        
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>59.95 €</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>1.50 €</b>
+        <i>je Gigabyte</i>
+      </span>
+      <span class="t-wert">
+        <b>59.95 €</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    
+    <ul class="t-flags">
+      
+      <li class="t-flag">40 GB Datenvolumen</li>
+      
+      <li class="t-flag t-flag--schlecht">Nach dem Volumen nur noch 64 KBit/s</li>
+      
+      <li class="t-flag t-flag--schlecht">24 Monate Bindung</li>
+      
+    </ul>
+    
+    
+    <p class="t-luecke">Nicht bekannt und deshalb nicht eingerechnet:
+    Anschlusspreis, Cashback/Wechselbonus. Das heißt nicht „kostenlos“ – es heißt, dass
+    im Dokument nichts dazu steht.</p>
+    
+  </article>
+  
+  <article class="t-zeile">
+    <div class="t-kopf">
+      <span class="t-anbieter">Telekom</span>
+      <h3 class="t-name">
+        <a href="https://www.telekom.de/produktinformationsblatt/magentamobil-l-20240801" rel="noopener">MagentaMobil L</a>
+        
+      </h3>
+    </div>
+    <div class="t-werte">
+      <span class="t-wert">
+        <b>59.95 €</b>
+        <i>effektiv je Monat</i>
+      </span>
+      <span class="t-wert">
+        <b>0.75 €</b>
+        <i>je Gigabyte</i>
+      </span>
+      <span class="t-wert">
+        <b>59.95 €</b>
+        <i>Listenpreis</i>
+      </span>
+    </div>
+    
+    <ul class="t-flags">
+      
+      <li class="t-flag">80 GB Datenvolumen</li>
+      
+      <li class="t-flag t-flag--schlecht">Nach dem Volumen nur noch 64 KBit/s</li>
+      
+      <li class="t-flag t-flag--schlecht">24 Monate Bindung</li>
       
     </ul>
     
