@@ -315,6 +315,15 @@ b,strong{font-weight:700}
   font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
 .archivhinweis a{color:var(--red);border-bottom:1px solid var(--red)}
 
+/* E3B, 05.09.2026: Hinweis, dass eine leere Bewertungsrunde die letzte
+   gueltige Redaktion zeigt (analyze/redaktion_kontinuitaet.py) - dieselbe
+   Bauform wie .ueb-hinweis (eigener Untergrund, Linie links, vor dem
+   Inhalt), weil beide dasselbe tun: dem Leser VOR dem Text sagen, was er
+   liest. */
+.ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
+  padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
+  line-height:1.5;color:var(--ink-2)}
+
 
 /* ================================================  MELDUNGEN (Ressort) == */
 /* Alle Meldungen der Woche, nach Ressort gegliedert und innerhalb
@@ -1900,6 +1909,9 @@ b,strong{font-weight:700}
 .t-name{font-family:var(--serif);font-size:20px;margin:0}
 .t-name a{color:inherit;text-decoration:none}
 .t-name a:hover{color:var(--red)}
+.t-referenz{flex-basis:100%;margin:0;font-family:var(--sans);font-size:11px;
+  color:var(--ink-3)}
+.t-referenz a{color:inherit}
 .t-werte{display:flex;flex-wrap:wrap;gap:30px;margin:10px 0 6px}
 .t-wert b{font-family:var(--serif);font-size:22px;display:block;line-height:1.1}
 .t-wert i{font-style:normal;font-family:var(--sans);font-size:10.5px;
@@ -2046,6 +2058,50 @@ b,strong{font-weight:700}
 .gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
 .gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
 
+/* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
+   Alarmtabelle - dieselbe Seite, dieselben Spaltenkoepfe -, hat aber eine
+   eigene Klassenfamilie: die zwei Tabellen beantworten verschiedene Fragen
+   und werden getrennt gedeckelt. */
+.gr-ttab{width:100%;border-collapse:collapse;margin:18px 0 0}
+.gr-ttab th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);text-align:left;font-weight:400;
+  padding:0 10px 7px 0;border-bottom:1px solid var(--rule)}
+.gr-ttab td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule-2);
+  vertical-align:top;font-size:14px}
+.gr-t-anbieter{font-family:var(--serif);font-size:15px;font-weight:600;
+  display:block}
+/* Die Leitzahl (E2): TCO-24 gross, Ø/Monat daneben klein. */
+.gr-t-leit{font-family:var(--serif);font-size:19px;font-weight:700;
+  white-space:nowrap}
+/* Eine Luecke sieht NICHT aus wie eine Zahl. Sie steht in der Grotesk der
+   Etiketten, nicht in der Serife der Betraege - wer die Spalte ueberfliegt,
+   soll sie nicht fuer einen kleinen Preis halten. */
+.gr-t-luecke{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.gr-tzeile--eigen .gr-t-anbieter{color:var(--red)}
+.gr-tdetail td{padding:0 0 11px;border-bottom:1px solid var(--rule-2)}
+.gr-tdetail summary{font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4);
+  cursor:pointer}
+.gr-tdetail summary:hover{color:var(--ink)}
+.gr-tposten{list-style:none;margin:9px 0 0;padding:0;font-size:13.5px}
+.gr-tposten li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
+  border-bottom:1px solid var(--rule-2)}
+.gr-tposten li:last-child{border-bottom:0}
+.gr-tposten em{font-style:normal;margin-left:auto;color:var(--ink-3)}
+.gr-tposten--luecke em,.gr-tposten--offen em{color:var(--ink-4);
+  font-family:var(--sans);font-size:12px}
+.gr-tposten--offen{margin-top:4px}
+.gr-tueber{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);font-weight:400;
+  margin:26px 0 0;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+/* Das Euro-Delta gegen uns. Rot heisst hier NICHT "schlecht", sondern
+   "guenstiger als wir" - dieselbe Bedeutung wie in der Alarmtabelle. */
+.gr-tdelta{margin:18px 0 0;border-left:3px solid var(--rule);padding-left:13px}
+.gr-tdelta-zeile{font-size:13.5px;line-height:1.6;margin:0 0 5px}
+.gr-tdelta-zeile b{font-family:var(--serif);font-size:17px}
+.gr-tdelta--unter{border-left:0}
+.gr-tdelta--unter b{color:var(--red)}
+
 /* Die Alarmtabelle. */
 .gr-alarm{width:100%;border-collapse:collapse}
 .gr-alarm th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
@@ -2182,6 +2238,19 @@ b,strong{font-weight:700}
   .gr-tafel{padding:16px 14px 20px}
   .gr-alarm{min-width:700px}
   .gr-alarm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Die drei Tabellen des TCO-Reiters rollen IN ihrem `gr-scroll`-Behaelter
+     und bekommen dafuer ihre Mindestbreite. Gestaucht waere bei zweien die
+     BELEGSPALTE unlesbar, und der Beleg ist der Grund, warum die Zahl
+     dasteht; `--bereit` hat keine und braucht die Breite nur fuer ihre vier
+     Spalten.
+
+     Natuerliche Breite auf 390 px gemessen, jede einzeln: `--bereit` 437
+     (sie war es, die den Vorzustand auf 480 px Rechtskante schob),
+     `--simonly` 403, `--leit` 436. `--leit` rendert erst, wenn Phase 4
+     Buendel liefert - der Wert stammt aus einem gestellten Bestand. */
+  .gr-ttab--simonly{min-width:520px}
+  .gr-ttab--bereit{min-width:440px}
+  .gr-ttab--leit{min-width:560px}
 }
 
 /* Was auffaellt */
@@ -2195,6 +2264,18 @@ b,strong{font-weight:700}
 
 /* SKU-Matrix */
 .gr-matrix-scroll,.gr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Der Behaelter KOSTET 14 px, und das ist gemessen statt uebersehen:
+   `overflow-x:auto` macht aus ihm einen eigenen Block-Formatting-Context,
+   also kollabiert der Aussenabstand der Tabelle nicht mehr mit dem des
+   Absatzes darueber. Der Abstand springt von 18 auf 32 px; der TCO-Reiter
+   stand danach auf 1440 px bei 2641 statt 2627 px.
+   Bewusst NICHT weggeraeumt: die Gegenrechnung (`margin-top` an den
+   Behaelter, 0 an die erste Tabelle) traefe `.gr-scroll` auch dort, wo es
+   eine `.src-table` haelt, und verschoebe eine Seite, um die es hier nicht
+   geht. 2641 von 3000 (Kriterium 11b) sind Luft genug; auf 390 px ist der
+   Reiter durch die Behaelter ohnehin 209 px KUERZER. Wer den TCO-Reiter
+   einmal nahe an den Deckel bringt, hat hier drei Behaelter mal 14 px
+   liegen. */
 /* Eine breite Tabelle rollt IN SICH, nie die ganze Seite. Ohne diese zwei
    Behaelter schob die Bewegungstabelle auf 390 px die komplette Seite nach
    rechts - und eine Seite, die waagerecht rollt, ist auf dem Telefon
@@ -2435,6 +2516,10 @@ b,strong{font-weight:700}
    Linien. Die Schriftgroesse ist dieselbe wie an der Achse - Kriterium 11
    von `pruefe_portal.py` laesst nichts unter 12 px zu. */
 .gr-vetikett{font-family:var(--sans);font-size:12px;font-weight:600}
+/* Der Bestpreis-Stempel. 12 px ist die Untergrenze der Seite - Kriterium 11
+   von `pruefe_portal.py` misst sie im GERENDERTEN SVG, nicht im Quelltext. */
+.gr-vbest{stroke-width:1.5;stroke-dasharray:3 3;fill:none}
+.gr-vbestmarke{font-family:var(--sans);font-size:12px;font-weight:600}
 .gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
@@ -2494,4 +2579,261 @@ b,strong{font-weight:700}
      der geloeschten Positionskarte. */
   .gr-tiefe li{grid-template-columns:1fr 74px}
   .gr-tiefe-n{grid-column:1 / -1;text-align:left}
+}
+
+/* ===================================================================
+   PHASE R - die TCO-Hauptansicht der Geraeteseite (04.09.2026)
+
+   Eine Anbieterfarbe, ueberall dieselbe (C.3): `gr-anb--<slug>` faerbt
+   die Karte, den Balken in G1 und die Linie in G2. Die Kostenart
+   unterscheidet sich in der DECKKRAFT, nicht in der Farbe - sonst
+   braeuchte jede Kombination aus Anbieter und Posten einen eigenen Ton,
+   und die Legende waere laenger als die Grafik.
+   =================================================================== */
+.gr-anb--o2{--anb:#0019a5}
+.gr-anb--1-1{--anb:#00589e}
+.gr-anb--telekom{--anb:#e20074}
+.gr-anb--vodafone{--anb:#e60000}
+.gr-anb--congstar{--anb:#f5a800}
+.gr-anb--mobilcom-debitel{--anb:#6b4f9e}
+.gr-anb--freenet{--anb:#6b4f9e}
+.gr-anb--aldi-talk{--anb:#00447c}
+.gr-anb--medimax{--anb:#8a8f00}
+.gr-anb--electronicpartner{--anb:#00736b}
+/* KEIN `--anb`-Vorgabewert AUF diesen Elementen: sie tragen die
+   Anbieterklasse selbst, beide Regeln haetten dieselbe Spezifitaet, und
+   die spaetere gewaenne - alle Balken standen damit grau da, obwohl die
+   Anbieterfarbe definiert war. Der Rueckfall gehoert deshalb in das
+   `var()` an der Verwendungsstelle. */
+
+/* Modell-Selector und Ergebnisband */
+.gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin:16px 0 12px;padding-bottom:12px;border-bottom:2px solid var(--rule-ink)}
+.gr-msel label{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+/* `min-width:0` UND `max-width:100%`: ein `<select>` nimmt sonst die
+   Breite seiner laengsten Option an ("Samsung Galaxy Z Fold8 Ultra 256 GB
+   – 3 Anbieter"), und ein Flex-Kind hat voreingestellt `min-width:auto`.
+   Auf 390 px lief die Seite damit 429 px breit - dieselbe Fehlerklasse
+   wie beim Zeitungskopf am 11.08.2026. */
+.gr-msel select{font-family:var(--sans);font-size:14px;padding:6px 8px;
+  border:1px solid var(--rule);background:var(--paper-2);max-width:100%;
+  min-width:0;flex:1 1 240px}
+/* GROSS UND SOFORT (BRIEF_FADEN, 05.09.2026): die Geraeteauswahl ist die
+   erste Handlung der Seite, direkt unter der Reiterleiste - nichts steht
+   mehr davor. Label und Select treten dafuer groesser auf als jedes
+   andere Bedienelement dieser Tafel. */
+.gr-msel--gross{padding-bottom:16px;margin-top:6px}
+.gr-msel--gross label{font-size:13px}
+.gr-msel--gross select{font-family:var(--serif);font-size:20px;
+  padding:10px 12px;flex:1 1 320px}
+.gr-mband{margin:0 0 12px}
+
+/* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
+   05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite
+   existiert"). Vorher 19px Fliesstext, kleiner als die Karten-Leitzahl
+   (27px) - genau das war der Befund ("geht unter dem Chart unter").
+   Jetzt groesser als jede Kartenzahl (32px), weil diese EINE Zeile ueber
+   der ganzen Tafel steht, nicht neben 66 Anbieterkarten. Linien statt
+   Kasten (Hausregel: "keine Schatten, kein Radius"): eine eigene
+   3px-Rubriklinie grenzt sie ab, keine Flaeche. */
+.gr-antwort{margin:0 0 20px;padding:16px 0 2px;border-top:3px solid var(--ink)}
+.gr-antwort-reihe{display:flex;flex-wrap:wrap;gap:6px 40px;margin:0}
+.gr-antwort-leit{margin:0;display:flex;flex-direction:column;gap:3px;
+  min-width:0}
+.gr-antwort-leit b{font-family:var(--sans);font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;font-weight:600;
+  color:var(--ink-3)}
+/* `.gr-antwort-zahlzeile` blockifiziert im Flex-Kontext (direktes Kind von
+   `.gr-antwort-leit`); Zahl und Anbieter darin bleiben inline und teilen
+   sich die Grundlinie - dieselbe Bauform wie `.gr-kk-leit`, nur mit einem
+   dritten Element (Anbieter) daneben statt einer zweiten Zeile. */
+.gr-antwort-zahl{font-family:var(--serif);font-size:32px;font-weight:700;
+  line-height:1.1;color:var(--ink)}
+.gr-antwort-anbieter{font-family:var(--sans);font-size:14px;
+  color:var(--ink-3)}
+/* Die Erklaerzeile (Vision-Befund 8, F-4a): "guenstig mit Tarif: X €" ist
+   fuer Laien mehrdeutig (teurer? guenstiger?) - dieser eine Satz
+   unterscheidet die zwei Begriffe. Kein Methodenabsatz: sans, klein,
+   gedaempft, wie jede andere Nebenzeile dieser Tafel (`.gr-a-klein`). */
+.gr-antwort-erklaer{margin:10px 0 0;font-family:var(--sans);
+  font-size:12.5px;line-height:1.4;color:var(--ink-3)}
+.gr-antwort--leer{border-top:1px solid var(--rule);padding:12px 0;
+  margin:0 0 16px;font-family:var(--sans);font-size:13px;
+  color:var(--ink-3);font-style:italic}
+
+/* Die Details-Aufklappung (BRIEF_FADEN): Ampel-Kacheln und
+   Analysten-Tabellen sind hier zusammengefasst, damit sie nicht mehr im
+   Lesefluss zwischen Auswahl und Anbieterkarten stehen. */
+.gr-tafel-details{margin-top:8px}
+.gr-tafel-details > summary{font-family:var(--sans);font-size:13px;
+  font-weight:600;letter-spacing:.02em;cursor:pointer;color:var(--ink-2)}
+.gr-tafel-details .gr-chips{margin-top:12px}
+
+/* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
+   stehen deshalb im Kopf der Hauptansicht, nicht in einem eigenen Reiter. */
+.gr-chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;
+  margin:0 0 16px}
+.gr-chip{font-family:var(--sans);font-size:12px;padding:5px 10px;
+  border:1px solid var(--rule);background:var(--paper-2)}
+.gr-chip b{font-family:var(--serif);font-size:16px;margin-right:4px}
+.gr-chip em{font-style:normal;color:var(--ink-4);margin-left:4px}
+.gr-chip--kritisch b{color:var(--al-kritisch)}
+.gr-chip--mittel b{color:var(--al-mittel)}
+.gr-chip--gering b{color:var(--al-gering)}
+.gr-chip--bestpreis b{color:var(--al-bestpreis)}
+
+.gr-ksteuer{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+.gr-ksteuer label{font-family:var(--sans);font-size:12px;color:var(--ink-3)}
+.gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
+  border:1px solid var(--rule);background:var(--paper-2)}
+
+/* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
+   Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
+   SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`
+   gesetzt erbte jede Karte darin das Umbruchverbot - jede Zeile stand
+   auf EINER Zeile, die min-content-Breite einer Karte war 1346 px, und
+   die Seite lief auf dem Telefon 1389 px breit statt 390. Im HTML war
+   davon nichts zu sehen; gemessen wurde es im Browser. */
+
+/* Die Karten. Vier Slots je Modell, gleiche Felder an gleicher Stelle -
+   dieselbe Regel wie auf der Promo-Uebersicht. Eine Karte ohne Zahl ist
+   NICHT kleiner gesetzt: sie traegt eine Auskunft, keinen Mangel. */
+.gr-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
+  gap:14px;margin:0 0 18px}
+.gr-kkarte{border-top:3px solid var(--anb,#57534a);padding:10px 12px 12px;
+  background:var(--paper-2);border-left:1px solid var(--rule-2);
+  border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.gr-kkarte--leer{background:transparent;border-top-color:var(--rule)}
+/* A-R3: Haendler ohne Tarifbuendel - dieselbe leere Kartenform, nur ohne
+   Anbieterfarbe (sie hat keinen Balken, an dem eine Farbe haengen koennte). */
+.gr-kkarte--haendler{border-top-color:var(--rule)}
+.gr-kk-kopf{margin:0;font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase}
+.gr-kk-anbieter{font-weight:700;color:var(--anb,#57534a)}
+.gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
+  border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
+/* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
+   damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
+.gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
+  font-weight:700}
+/* 12 px, nicht 11: kein Text unter zwoelf Pixeln (Hausregel seit dem
+   30.08.2026, `test_keine_beschriftung_unter_zwoelf_pixeln`). */
+.gr-g1-delta{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
+.gr-t-zustand{color:var(--red,#e60000);font-weight:700}
+.gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
+  color:var(--ink-2)}
+.gr-kk-leit{margin:0;display:flex;align-items:baseline;gap:8px}
+.gr-kk-leit b{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  color:var(--ink-3);text-transform:uppercase}
+.gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
+.gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
+  color:var(--ink-2)}
+.gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
+.gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
+/* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
+   Zahl und nicht zu den Bausteinen - Grotesk, klein, aber nicht unter
+   12 px (Hausregel seit 30.08.2026). Ohne eigene Regel erbte er die
+   Serife der Karte und stand so gross wie die Leitzahl daneben. */
+/* .gr-kk-omonat: die Ø/Monat-Zeile, seit A-R5 (BRIEF_RAHMEN2) die dritte
+   statt die zweite Zahl der Karte - dieselbe zurueckgenommene Stimme wie
+   die Bindungszeile daneben. */
+.gr-kk-basis,.gr-kk-omonat{margin:-4px 0 8px;font-family:var(--sans);
+  font-size:12px;line-height:1.4;color:var(--ink-4)}
+.gr-kk-24 b{font-weight:600}
+.gr-kk-eff .gr-a-klein{display:block}
+.gr-kk-hinweis,.gr-kk-luecke{color:var(--ink-3);font-style:italic}
+/* Die benannte Nach-Laufzeit-Luecke (F5) steht in derselben Stimme wie die
+   uebrigen Luecken der Karte - kursiv, zurueckgenommen, aber da. */
+.gr-kk-nach--luecke{color:var(--ink-3);font-style:italic}
+.gr-kk-delta{margin:6px 0 6px;font-family:var(--sans);font-size:12.5px;
+  font-weight:600;color:var(--al-kritisch)}
+.gr-kk-delta--unter{color:var(--al-bestpreis)}
+.gr-kk-weg{margin-top:6px}
+.gr-kk-weg summary{font-family:var(--sans);font-size:12px;cursor:pointer;
+  color:var(--ink-3)}
+
+/* G1 und G2 */
+.gr-grafik{margin:0 0 18px;padding:0}
+.gr-grafik figcaption{font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);margin-top:6px;line-height:1.5}
+.gr-g1,.gr-g2,.gr-g0{display:block;width:100%;height:auto}
+
+/* G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026). Dieselbe
+   Bauform wie G2 (Raster, Achse, Linie, Punkt, Legende); eigene Klassen,
+   weil G0 zusaetzlich eine Sammelluecke UND einzelne Punkte kennt, die G2
+   nicht zeichnet. */
+.gr-g0-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g0-raster--x{stroke-dasharray:2 4}
+.gr-g0-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g0-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g0-punkt{fill:var(--anb,#57534a)}
+/* Ein Anbieter mit nur EINEM Punkt traegt keine Linie - der Punkt ist
+   etwas groesser (siehe `r` in `geraete_tco_grafik.zeitreihe`) und bekommt
+   einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
+   bewegte Linie eines anderen Anbieters an ihm vorbeilaeuft. */
+.gr-g0-punkt--einzeln{stroke:var(--paper);stroke-width:1.5}
+/* Die Beschriftung des Einzelpunkts (BRIEF_FADEN, 05.09.2026): "Serie
+   startet" statt eines nackten Punkts, der wie "keine Werte" aussieht. 12
+   px, keine Zeile darf kleiner sein (Hausregel seit 30.08.2026). */
+.gr-g0-einzeln{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+.gr-g0-legende{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+/* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
+   sie darf nicht lauter sein als die Linien selbst. */
+.gr-g0-luecke{fill:var(--ink);opacity:.05}
+.gr-g0-chrome{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  margin-top:6px}
+/* A-R3: die drei Haendler als Legenden-Eintrag OHNE Linie - dieselbe
+   Stimme wie eine leere Karte (`.gr-kk-luecke`), aber ausserhalb des
+   SVG, weil sie keinen Messpunkt tragen. */
+.gr-g0-haendler{list-style:none;margin:8px 0 0;padding:0;display:flex;
+  flex-wrap:wrap;gap:3px 16px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-g0-haendler-name{font-weight:700;margin-right:4px}
+.gr-g0-haendler-vermerk{font-style:italic}
+.gr-g1-gruppe{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;fill:var(--ink-3)}
+.gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
+  fill:var(--ink)}
+.gr-g1-ref-etikett{font-weight:400;font-size:12px;fill:var(--ink-4)}
+.gr-g1-tarif{font-family:var(--serif);font-size:12px;fill:var(--ink-3)}
+.gr-g1-betrag{font-family:var(--serif);font-size:13px;fill:var(--ink)}
+/* Der Betrag steht regelmaessig UEBER der gestrichelten Referenzlinie (die
+   Referenz ist meist der teuerste Balken, und seit dem Delta am Balken ist
+   der Text laenger). Ein Halo in Papierfarbe haelt die Ziffern lesbar,
+   statt die Linie durch sie hindurchlaufen zu lassen. */
+.gr-g1-betrag{paint-order:stroke;stroke:var(--paper);stroke-width:4px;
+  stroke-linejoin:round}
+.gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
+.gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
+.gr-g1-reftext{font-family:var(--sans);font-size:12px;fill:var(--al-kritisch)}
+.gr-g1-seg{fill:var(--anb,#57534a)}
+.gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
+  stroke-dasharray:3 3}
+.gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g2-raster--x{stroke-dasharray:2 4}
+.gr-g2-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g2-punkt{fill:var(--anb,#57534a)}
+.gr-g2-marker{font-size:12px;fill:var(--ink-3)}
+.gr-g2-legende{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+
+/* KEINE SCHRIFT UNTER 12 PIXELN, auch nicht im SVG. Die Regel gilt auf
+   dieser Seite seit dem 30.08.2026 und wird im echten Chromium gemessen:
+   passt ein Name nicht hin, fallen Eintraege und nicht Buchstaben. Die
+   linke Spalte von G1 ist deshalb 300 px breit - der laengste Tarifname
+   des Bestands misst dort 12 px hoch rund 277 px. */
+
+/* Auf dem Telefon wird GEROLLT, nicht gestaucht: eine Grafik mit 1180 px
+   Zeichenbreite auf 390 px zu skalieren ergibt 3,5 px hohe Schrift
+   (Befund vom 11.08.2026 zur geloeschten Positionskarte). */
+@media (max-width:900px){
+  .gr-grafik{overflow-x:auto}
+  .gr-g1,.gr-g2,.gr-g0{width:1180px;max-width:none}
+  .gr-karten{grid-template-columns:1fr}
 }

@@ -514,7 +514,7 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
-               for k in s.select(".gr-kacheln .gr-kachel")}
+               for k in s.select(".gr-chips .gr-chip")}
     assert set(kacheln) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}
 
     # Die Summe der vier Kacheln IST die Zahl der verglichenen Geraete. Zwei
@@ -544,8 +544,8 @@ def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
     summe = sum(int(k.find("b").get_text(strip=True))
-                for k in s.select(".gr-kacheln .gr-kachel"))
-    tafel = " ".join(s.select_one("#tafel-alarme").get_text(" ", strip=True).split())
+                for k in s.select(".gr-chips .gr-chip"))
+    tafel = " ".join(s.select_one("#tafel-tco").get_text(" ", strip=True).split())
     assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in tafel
 
 
@@ -1409,7 +1409,7 @@ def test_die_alarmtabelle_nennt_den_guenstigsten_mit_namen(tmp_path):
     BEI WEM."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-alarme")
+    tafel = s.select_one("#tafel-tco")
     assert tafel is not None, "der Reiter fehlt ganz"
     text = tafel.get_text(" ", strip=True)
     assert "Medimax" in text, "der guenstigste Wettbewerber steht mit Namen da"
@@ -1423,7 +1423,7 @@ def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
     Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
+    zeile = s.select_one("#tafel-tco .gr-a-zeile")
     assert zeile is not None, "keine einzige Alarmzeile"
     assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
     assert "€" in zeile.select_one(".gr-a-euro").get_text(strip=True)
@@ -1434,7 +1434,7 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeilen = s.select("#tafel-alarme .gr-a-zeile")
+    zeilen = s.select("#tafel-tco .gr-a-zeile")
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
@@ -1452,7 +1452,7 @@ def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
     unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-alarme .gr-a-zeile")
+    zeile = s.select_one("#tafel-tco .gr-a-zeile")
     auf = s.select_one("#" + zeile["data-auf"])
     namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
     # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
@@ -1470,12 +1470,12 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
     """
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-alarme")
+    tafel = s.select_one("#tafel-tco")
     assert "niemand günstiger" not in tafel.get_text(" ", strip=True)
 
     # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
     # es MUSS ein Geraet geben, bei dem niemand unterbietet.
-    bestpreis = next(k for k in s.select(".gr-kacheln .gr-kachel")
+    bestpreis = next(k for k in s.select(".gr-chips .gr-chip")
                      if k.find("span").get_text(strip=True) == "Bestpreis")
     assert int(bestpreis.find("b").get_text(strip=True)) > 0
 
@@ -1503,7 +1503,7 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
     gemessen = 0
-    for datum in s.select("#tafel-alarme .gr-a-klein, #tafel-alarme .gr-a-liste span"):
+    for datum in s.select("#tafel-tco .gr-a-klein, #tafel-tco .gr-a-liste span"):
         text = datum.get_text(strip=True)
         if not text or not text[0].isdigit():
             continue
@@ -1519,15 +1519,15 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _suppe(site, "geraete.html")
-    felder = [f.get("data-filter") for f in s.select("#tafel-alarme [data-filter]")]
+    felder = [f.get("data-filter") for f in s.select("#tafel-tco [data-filter]")]
     assert felder == ["marke", "modell", "speicher", "suche"]
 
     fest = [e.get_text(" ", strip=True)
-            for e in s.select("#tafel-alarme .gr-filter label.gr-filter--an")]
+            for e in s.select("#tafel-tco .gr-filter label.gr-filter--an")]
     assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
 
     # Jede Zeile traegt die Werte, nach denen gefiltert wird.
-    for zeile in s.select("#tafel-alarme .gr-a-zeile"):
+    for zeile in s.select("#tafel-tco .gr-a-zeile"):
         assert zeile.has_attr("data-marke")
         assert zeile.has_attr("data-modell")
         assert zeile.has_attr("data-speicher")
@@ -1539,7 +1539,7 @@ def test_ohne_vergleichsdaten_steht_die_sektion_gar_nicht_da(tmp_path):
     ohne = {"updated": "2026-08-11", "anbieter": {}, "listungen": []}
     site = _baue(tmp_path, db=ohne, punkte=[])
     s = _suppe(site, "geraete.html")
-    assert s.select_one("#tafel-alarme") is None
+    assert s.select_one("#tafel-tco") is None
 
 
 # --------------------------------------------------------------------------
@@ -1617,7 +1617,7 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
     assert s.select_one(".gr-auffaellig .gr-saetze li") is not None
-    assert s.select_one("#tafel-alarme") is not None
+    assert s.select_one("#tafel-tco") is not None
 
 
 def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
@@ -1826,7 +1826,7 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # lief dieser Test an genau der Sektion vorbei, in der der zweite Fall
     # stand („62 Geräte im Vergleich") - ein Test, dessen Lookup ins Leere
     # geht, ist grün und prüft nichts (CLAUDE.md §6).
-    for auswahl in ("#tafel-alarme", ".gr-katalog", "#tafel-katalog"):
+    for auswahl in ("#tafel-tco", ".gr-katalog", "#tafel-katalog"):
         assert suppe.select_one(auswahl), f"{auswahl} fehlt in der Fixture"
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
@@ -2040,7 +2040,7 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
 
-    alarm = suppe.select_one("#tafel-alarme .gr-alarm")
+    alarm = suppe.select_one("#tafel-tco .gr-alarm")
     assert alarm, "Alarmtabelle fehlt in der Fixture"
     koepfe = [th.get_text(" ", strip=True).lower() for th in alarm.select("thead th")]
     assert koepfe, "keine Spaltenkoepfe - der Test misst nichts"
@@ -2093,7 +2093,7 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
 
-    for tafel in ("#tafel-alarme", "#tafel-katalog"):
+    for tafel in ("#tafel-tco", "#tafel-katalog"):
         tabelle = suppe.select_one(f"{tafel} .gr-alarm")
         assert tabelle, f"{tafel}: Tabelle fehlt"
         knoepfe = tabelle.select("thead .gr-sort")
@@ -2645,3 +2645,41 @@ def test_die_zelle_uebersteht_kaputte_preis_und_datumsfelder(tmp_path, monkeypat
     # Datumsfilter nicht.
     assert "Test B" in zeile.get_text()
     assert "None" not in zeile.get_text()
+
+
+# --------------------------------------------------------------------------
+# Die Preisform steht an der Zahl (03.09.2026)
+# --------------------------------------------------------------------------
+
+def test_ein_ratengesamtbetrag_wird_auf_der_seite_als_solcher_gezeigt(tmp_path):
+    """Der Befund vom 03.09.2026: o2s Preisspalte trug den Gesamtbetrag einer
+    24-Monats-Ratenzahlung in derselben Optik wie freenets Barpreis.
+
+    Der Fall hier ist der gemessene: 1,00 EUR Anzahlung plus 24 x 30,00 EUR
+    ergeben 721,00 EUR. Auf der Seite muss beides stehen - die Zahl UND
+    woraus sie besteht.
+    """
+    db = json.loads(json.dumps(_DB))
+    db["listungen"].append(_listung(
+        "o2", "apple-iphone-16-pro-max",
+        "apple-iphone-16-pro-max-256gb-schwarz", 721.0, farbe="schwarz",
+        id="o2--apple-iphone-16-pro-max-256gb-schwarz",
+        anbieter_typ="netzbetreiber", netz="o2",
+        anzahlung=1.0, monatsrate=30.0, laufzeit_monate=24,
+        zins_effektiv=0.0))
+
+    site = _baue(tmp_path, db=db)
+    text = (site / "geraete.html").read_text(encoding="utf-8")
+    assert "in 24 Raten (0 %)" in text
+    # Und die Zusicherung dahinter: ein Barpreis bekommt den Zusatz NICHT.
+    # Der Bestand traegt vier Haendlerzeilen ohne Ratenfelder.
+    assert text.count("in 24 Raten") < text.count("gr-a-modell")
+
+
+def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
+    """Solange o2 und Vodafone in derselben Spalte stehen, ist "ausschliesslich
+    Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat."""
+    site = _baue(tmp_path)
+    text = (site / "geraete.html").read_text(encoding="utf-8")
+    assert "ausschließlich Neugeräte ohne Vertrag" not in text
+    assert "nicht dasselbe wie ein Barpreis" in text

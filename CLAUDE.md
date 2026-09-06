@@ -198,6 +198,7 @@ Wichtige Dateien:
 | `config/farben.yaml` | Farbschreibweise -> kanonische Farbe. Eine unbekannte Farbe wird BEHALTEN und nicht geraten; der Farbbericht am Fuss von `/geraete.html` ist die Arbeitsliste fuer diese Datei |
 | `data/state/geraete_db.json` | Aktueller Stand je Listung, mit Zwei-Stufen-Auslistung wie `promo_db.json`. Nichts wird geloescht - genau daraus entsteht die Listungsdauer |
 | `data/state/geraete_preise.jsonl` | NUR die Aenderungspunkte des Preises. Ein unveraenderter Preis schreibt keine Zeile; die rechte Kante jeder Kurve ist `last_verified` in der DB |
+| `data/state/geraete_tco.json` | Buendel (SKU x Anbieter x Tarif) und die SIM-only-Referenz je Anbieter und Tarif — die Posten, aus denen `tco_model.tco_24()` die Leitzahl rechnet. **Eigene Datei, eigene IDs** (`buendel--…`, `simonly--…`), damit keine `listung_id` verschoben werden kann; **ein Datensatz zeigt EINE Messung**, weil eine TCO eine Summe ist. Wird erst angelegt, wenn ein Lauf Buendel liefert |
 | `config/lieferzeit_warenkorb.yaml` | Der feste Warenkorb des Lieferzeit-Radars: Produkte mit EINER Variante, eine Test-PLZ, je Anbieter das Ident-Verfahren |
 | `config/fruehwarnung.yaml` | Fuenf CTM-Kernfragen mit falsifizierbaren Indikatoren. Der Wert steckt darin, dass sie VORHER feststehen |
 | `data/state/clusters.jsonl` | Ereignis-Gedaechtnis. ID aus der kanonischen URL, nie aus dem Titel |
@@ -308,7 +309,8 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** (nicht verlinkt) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
+| `geraete.html` **Geräte** — **TCO-first seit 04.09.2026** | „Was zahlt der Kunde über 24 Monate gesamt?" Vier Reiter: TCO-Vergleich (Hauptansicht, ohne Klick aktiv) · Gerätekatalog · Preis- und TCO-Historie · Portfolio. Je Modell vier Anbieterkarten mit `TCO-<Bindung>`, `Ø €/Monat`, „nach 24 Monaten gezahlt", Rechenweg — oder mit benanntem Leerzustand. Dazu G1 (Balkenvergleich je Anbieter, zwei Laufzeitgruppen) und G2 (Preisverlauf), beide servergerendertes SVG. Einzelheiten in §8a |
+| `geraete.html` — der Stand DAVOR (bis 04.09.2026) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
 | `geraete.html` — **Preiswahrheit und Kuerzung** (29.08.2026, abends) | „Kann ich der Zahl trauen, und finde ich sie?" | Die Seite ist **5254 statt 18299 px** lang. Der Vergleich zeigt nur Zeilen mit ≥ 3 % **oder** ≥ 15 € Abstand (ODER, nicht UND: bei 200 € sind 15 € viel und 3 % wenig, bei 2000 € umgekehrt), alles Uebrige steht hinter Aufklappern — SKU-Matrix, 65 Varianten, Ausfallgruende, Vollansicht. Die Grafik zeigt hoechstens **12 Baender je Spalte** und als Standard nur die aktuelle Generation JE BAUREIHE. Nichts ist geloescht |
 | `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
 | `geraete.html` — **Leseseite ohne Erklaersektionen** (03.09.2026) | „Zeig mir die Regale, nicht deine Datenpflege." | Antonio hat die Erklaer- und Kommentarabschnitte kassiert: der Einleitungssatz ueber die Preisbasis, die Sektion „Wie vollstaendig ist das" (Betriebszahlen am Fuss) und die ganze Sektion „Datenbasis und Luecken" („Warum diese N nichts liefern", „Ohne Hardware-Vermarktung beobachtet", Marktstart-Satz, Farbbericht) sind GELÖSCHT. Ueberlebt und in den Portfolio-Reiter gezogen hat nur der Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone nicht" — eine Sortiments-Aussage, kein Kommentar; ein Test nagelt ihn auf `#tafel-portfolio` fest. Die Arbeitslisten stehen im Protokoll des naechtlichen Laufs (Farben/Titel standen dort ohnehin; Marktstart- und Vorgaenger-Luecken loggt `geraete_pipeline` seitdem mit), das „warum liefert wer nichts" steht auf `geraete-quellen.html` — erreichbar ueber EINEN Fusslink, weil mit den Sektionen alle drei bisherigen Links fielen (Review-Befund B1: sonst waere die Quellenseite fertig und unauffindbar). `geraete_view` berechnet `farbbericht`/`katalog`-Luecken/`ohne_katalog` nicht mehr; `quellenlage` und `bilanz` bleiben (Quellenseite bzw. Navigationsschwelle lesen sie) |
@@ -990,6 +992,21 @@ Website spricht.
   workflow" auf `main`. Gegenprobe, dass live wirklich ankam, was geprüft
   wurde: `curl -sS https://telco-radar.onrender.com/index.html | md5sum`
   gegen `md5sum < site/index.html`.
+- **Ein Push AUS EINEM WORKFLOW HERAUS löst erst recht keinen Deploy aus.**
+  Der Sonderfall des Punktes darüber, und er hat am 04.09.2026 zugeschlagen:
+  `geraete.yml` rendert seit Phase 6a seine Seite selbst und pusht `site/`
+  mit dem voreingestellten `GITHUB_TOKEN` — und ein solcher Push startet nach
+  GitHubs Schleifenschutz **keine weiteren Workflows**. `deploy.yml` lief
+  zuletzt um 00:58 UTC für einen Push von Hand, die zwei Bot-Commits des
+  Nachtlaufs kamen um 01:03 UTC, danach steht in `gh run list` nichts mehr;
+  live stand um 03:20 UTC noch `4f9dacb` (02:25 CEST), während `95fa07f`
+  (03:03 CEST) im Repo lag. Der Kommentar im Workflow behauptete das
+  Gegenteil („der Push auf `main` loest `deploy.yml` aus"). `radar.yml` weiß
+  das längst und **curlt den Hook selbst**; `geraete.yml` tut es seit dem
+  04.09.2026 auch. Wer einen Workflow `site/` committen lässt, gibt ihm den
+  Hook-Schritt mit — sonst ist es dieselbe Fehlerklasse wie der
+  Navigationseintrag am 11.08.: gebaut, geprüft, committet, und für jeden
+  Leser nicht da.
 - **Newsrooms:** Der Fetcher (collect/http.py) probiert Browser-UA und
   Bot-UA. Harte Fälle stehen als `type: official` in der Watchlist und werden
   nicht gecrawlt (Stand 08/2026 noch fünf: TIM, Cosmote, UScellular, Ooredoo,
@@ -1705,7 +1722,595 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
-> **Zuletzt erledigt (03.09.2026, Antonio direkt): die Erklaersektionen
+> **Zuletzt erledigt (05.09.2026, nachts): Phase R3 — die drei Befunde
+> der R2-Abnahme.** Auftragsgrundlage: `PHASE R3` (PM, 04.09.2026 ab 20:00)
+> auf Basis von `QA_BEFUND_R2_2026-09-04.md` (nicht im Repo). **Abschluss-
+> bericht mit allen Messungen: `outputs/phase-r3-2026-09-04.md` — dort
+> weiterlesen.** Vier Commits (`7604a08`, `689afb2`, `81369a1`, `8611835`),
+> je Schritt einer; **52 Euro-Deltas vorher/nachher auf den Cent gleich.**
+> Stand danach: **2627 Tests grün, 3 rot** (vorbestehend, siehe R2), 30
+> skipped; `pruefe_portal.py` 11 / 6 wie nach R2 (fünf an der leeren
+> Titelseite, 8b die leeren Promo-Bilder); TCO-Reiter 2241 px.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **F-R2-1: G2 zeichnet bewegte Reihen vor flachen** (`_reihenrang`), die Ereignisse für Marker UND Fließtext kommen aus `_ereignisse()` über die **Grundmenge** | Bei Gleichstand in der Punktzahl brach das Alphabet: drei flache congstar-Linien im Bild, der größte Preissprung des Bestands (o2 Pixel 10 Pro, +180 €) nicht — und der Satz „Erhöhungen und Senkungen" nannte 2 von 4. Jetzt sagt die Unterschrift „Reihen mit Preisänderung zuerst", der Satz „über alle 8 Reihen", ab sieben Ereignissen „und N weitere" |
+> | **F-R2-2: die Referenzkarte trägt ihre eigene Bindung** — `TCO-24`, `laufzeit = tarif_monate`, eigener Rechenweg-Satz, Vodafone-Balken unter „24 Monate Bindung", Referenzlinie „· Barkauf + 24 Monate Tarif" | 30 Karten sagten „TCO-36 … Gerechnet über 36 Monate Bindung" für 24 Tarifmonate plus Barkauf. **Geändert ist die Beschriftung, nicht die Rechnung**: `ref["monate"]` (Fenster 36) bleibt am Referenz-Dict, daran hängen `_delta`/`gleiche_laufzeit` und die Referenzlinie (E-2, Antonio). Neues Kartenfeld `fenster` |
+> | **F-R2-2 Nachtrag: die Spanne des Bandes ist die der Angebote** | Nur beim Ansehen: „TCO-36 von 1.120,75 € bis 1.428,70 €" hatte die TCO-24-Referenz als Obergrenze. `spanne` rechnet jetzt wie `angebote`; ein einziges Angebot steht als eine Zahl, nicht „von X bis X" |
+> | **F-R2-3: `geraet_aus_sku()`** — die längste Katalog-`device_id`, auf die das Speichersegment folgt; `ergaenze_geraete_aus_katalog()` in `modelle()` UND `geraete_tco_view.aufbereiten()`; Unauflösbares als `ohne_zuordnung` mit Grund vor dem Modellgatter | Das o2-Bündel zum iPhone 16 Pro Max 256 GB hat keine Listung und stand als Modell „ohne-geraet". Kein Schnitt am Bindestrich: `sku_id()` schreibt die Katalog-ID wörtlich voran, das Speichersegment ist die Grenze (Pro Max schlägt Pro, 16 trifft 16e nicht). Der Zweig „kein Katalogtreffer" ist getestet, im Bestand nicht beobachtet |
+>
+> **Fallstrick:** `laufzeit` an der Referenzkarte hängt an `_gruppen` (G1),
+> `data-laufzeit` (JS-Sortierung „TCO je Laufzeitgruppe"), `tarif_bindung`
+> (F5-Zeile) — aber NICHT an `laufzeiten`/`spanne` des Modells, die vor dem
+> Anhängen der Karte gerechnet werden. Wer die Referenz wieder ins Fenster
+> zieht, zieht 30 Balken zurück unter einen falschen Gruppenkopf.
+>
+> **Bewusst offen:** E-2/A5.5 bei Antonio; rote CI (E-3, leerer
+> Wochenbericht) nicht angefasst; `MAX_REIHEN = 5` in G2 — sobald mehr als
+> fünf Reihen bewegt sind, fällt die kleinste Bewegung aus dem Bild und
+> steht nur im Satz, dann ansehen.
+>
+> **Nachtrag (05.09.2026, Release-Lauf, `BRIEF_R3_RELEASE.md`): gepusht und
+> live bewiesen.** Testsuite auf `d38d4f8` erneut gelaufen: **2627 grün / 3
+> rot / 30 skipped**, dieselben drei Roten wie an `8d8ed25` — keine neuen.
+> `render_site()` neu gerendert: `site/geraete.html` byte-identisch (sha256
+> `212d17dc…`), einzige Abweichung war `site/data/keyword-index.json` (reine
+> Datums-Zeitbombe, `stand` gegen `date.today()`, zurückgesetzt). Push
+> `8d8ed25..d38d4f8` ohne Force, `deploy.yml` lief automatisch
+> (Run `33927508158`, success). Live nach ~1 Minute: sha256 identisch mit
+> der committeten Seite; alle drei Befunde live gegengelesen (Fließtext
+> nennt alle vier G2-Ereignisse, 0× „Gerechnet über 36 Monate Bindung" /
+> 30× „TCO-24", 0× „ohne-geraet"). Vollständiger Beleg:
+> `outputs/phase-r3-2026-09-04.md` Sektion „Review, Push, Live".
+
+> **Zuletzt erledigt (04.09.2026, abends): Phase R2 — die Befunde der
+> fremden Augen.** Auftragsgrundlage: `PHASE_R2_BRIEF.md` auf Basis von
+> `QA_BEFUND_R_2026-09-04-1550.md`. **Abschlussbericht mit allen Messungen,
+> Live-Beweisen und den bewusst offenen Punkten:
+> `outputs/phase-r2-2026-09-04.md` — dort weiterlesen.** Stand danach:
+> **2614 Tests grün, 30 skipped, 3 rot** (vorbestehend: zwei
+> Promo-Screenshot-Tests, `test_folien` gegen den degenerierten
+> Tagesbericht); `pruefe_portal.py` 11 / 6 — 11 und 11b bestanden, fünf
+> Kriterien fallen an der leeren Titelseite des Radar-Laufs von 11:00 UTC
+> (siehe unten). Live byte-identisch.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **B1: `Buendel.zustand`** — Feld, Positivliste, Collector, Leser | Der Store trug zu iPhone 15 128 GB BEIDE o2-Bündel (neu 20,00 / erneuert 17,00 €), die Kartenauswahl nahm je (Anbieter, Tarif, Laufzeit) die günstigste — die erneuerte, ohne ein Wort. Jetzt steht der Zustand im Dedupe-Schlüssel; unbelegt gilt als `unbekannt`, **nie als neu**; Delta, Spanne, Referenz nur unter Neugeräten; Etikett „erneuert" auf Karte, G1-Balken UND Tabelle |
+> | **B2: `geraete_verlauf.messtage`** — EINE Messtag-Regel für G2 und `gr-verlaufdaten` | Zwei Preise derselben Listung am selben Tag sind eine Messlücke, kein Pfeil — und sie wird BENANNT. Ursache: zwei ALDI-Produkte (A17 **LTE** + Starter-Kit, A17 **5G**) auf einem Katalogeintrag, und `geraete_pipeline` schrieb die Historie auch für den Satz, den `upsert` als Kollision verworfen hatte. Jetzt schreibt sie nur, was die DB genommen hat (`db.uebergangen`). 2 Pfeile statt 15 |
+> | **F1 Stufe 1** | Die Referenzkarte sagt „Bündelpreis noch nicht erhoben", nicht mehr „Vodafone weist keinen aus" — die glados-API weist einen aus. **Stufe 2 nicht gebaut:** die Nutzlast nennt Beträge und `offerCoreHash`, keinen Tarifnamen, und Vodafones Beträge lösen nicht eindeutig auf |
+> | **F5** | Jede Karte mit Zahl trägt „ab Monat 25" — als Betrag (Referenz, aus dem PIB) oder als **benannte Lücke** (`.gr-kk-nach--luecke`). 126 Karten, 0 stumm |
+> | **F3** | `tarife.html` trägt `max(abgerufen_am)`, nicht das Datum des Wochenberichts |
+> | **S2/S4/S12** | Katalog D („TCO-36 von … bis", „X € in 36 Raten"), Euro-Delta am G1-Balken mit Halo, kein doppelter Hersteller. S3 in B1, S6/S8 in B2, S11 war im geborgenen Stand erledigt |
+>
+> **Bewusst NICHT:** Katalogeintrag „Galaxy A17 5G" (schlüsselt neun
+> Listungen bei fünf Anbietern um — Datenwanderung, braucht ein
+> Migrationsskript), S5 (G1 mobil — braucht einen zweiten Renderer mit
+> Beschriftung ÜBER dem Balken), A5.5/S1 (E-2 bei Antonio).
+>
+> **Fallstrick des Tages:** der Radar-Lauf `040d551` (11:00 UTC) hat **0
+> Meldungen bewertet** — beide DeepSeek-Modelle `unavailable`, und der
+> Anthropic-Anker hat NICHT übernommen (Kosten 0 $). Die Live-Titelseite hat
+> seitdem eine Schlagzeile, CI ist seit `a8ebdfe` rot (`test_folien` gegen
+> genau diesen Bericht). Der Stapelschutz hat gehalten (877 ungelesen).
+> Das ist Antonios Guthaben-/Anker-Frage, nicht die Geräteseite.
+
+> **Zuletzt erledigt (04.09.2026, nachmittags): Phase R — die Geräteseite
+> ist TCO-first, mit den zwei Pflicht-Grafen.** Auftragsgrundlage:
+> `PHASE_R_BRIEF.md` und `ANFORDERUNGEN_TCO_FIRST.md` (Lastenheft des
+> Insights-PM, v1.1, Abschnitte A/B/C/D/G bindend). Stand danach:
+> **2608 Tests grün**, 13 skipped, **2 rot** (die vorbestehenden
+> Promo-Screenshot-Tests); `pruefe_portal.py` **15 bestanden / 2
+> durchgefallen** (8b und 6, beide vorbestehend). Live byte-identisch
+> gegengeprüft.
+>
+> **Die Seite beantwortet ohne Klick Antonios Leitfrage.** Vier Reiter
+> statt fünf: *TCO-Vergleich* (Hauptansicht, aktiv) · Gerätekatalog ·
+> Preis- und TCO-Historie · Portfolio. „Was kostet es" ist aufgelöst —
+> sein Inhalt IST die Hauptansicht; die Preis-Alarme verlieren ihren
+> Reiter und stehen als **Chips** im Kopf, die ganze Alarmtabelle samt
+> Filtern, Suche, Sortierung und Zeilenaufklappern einen Aufklapper
+> darunter (H4, kein Bedienelement gestrichen).
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **`tco_model.tco_bindung()`** — die Leitzahl rechnet über die BINDUNG, nicht über feste 24 Monate | Jedes erhobene Bündel ist eine 36-Monats-Finanzierung, und o2 trennt Tarifbindung (24) von Ratenlaufzeit (36). Die **längere** führt die Karte (A5.5); die Tarifbindung auf die Ratenlaufzeit zu dehnen addierte 12 × 19,99 € = **239,88 €**, die niemand schuldet |
+> | **Die Bindung steht IM Etikett**: `TCO-36`, nie eine unbeschriftete Gesamtsumme (A5.1) | Über zwei Laufzeiten ist eine nackte Zahl nicht lesbar. Das einzige laufzeitübergreifende Maß ist `Ø €/Monat` (A5.3) — und es ist die Default-Sortierung |
+> | **Pflichtzeile an jeder Karte mit Zahl** (A5.2): „nach 24 Monaten gezahlt … davon noch offen … (12 Geräteraten)" | Das ist die wörtliche Antwort auf „was zahlt der Kunde über 24 Monate gesamt" — auch bei 36 Monaten Bindung. Live 118-mal auf der Seite |
+> | **Die Tarifbindung kommt aus `tarife.jsonl`** über `tarif_id`, gesetzt in `geraete_view` | Sie steht in KEINER Gerätenutzlast. Fehlt sie, ist die Karte nicht belastbar und sagt es — geraten wird nichts |
+> | **1&1 wird nicht zerlegt** (`Buendel.buendel_monatlich`) | Der Anbieter nennt EINEN Monatsbetrag für Tarif und Gerät (§ 13.2). Ihn in zwei Hälften zu teilen wäre unsere Rechnung und keine Angabe des Anbieters |
+> | **Vier Anbieter je Modell, immer** | Telekom steht auf allen 59 Modellen mit „Datenstand fehlt – Quelle in Vorbereitung … (Phase T)". Ein weggelassener Anbieter sieht aus wie ein Anbieter, den es nicht gibt (B.2.5) |
+>
+> **Die Vodafone-Referenz ist gerechnet und sagt es.** Vodafone führt 151
+> Listungen, alle mit Barpreis, **keine mit Tarifbezug** — es gibt kein
+> eigenes Bündel. Ohne Vergleichszahl hätte die Tafel keine Referenzlinie
+> und das Euro-Delta aus B.2 wäre unerfüllbar; C.1 lässt dafür
+> ausdrücklich eine **gekennzeichnete Näherung** zu. Sie ist
+> Tarifgrundpreis aus dem Produktinformationsblatt (phasengewichtet über
+> `effektivpreis.phasensumme`) **plus** eigener Barpreis desselben Geräts:
+> beide Summanden gemessen, gerechnet ist nur ihre Summe. Genommen wird
+> der **günstigste** belegte Vodafone-Tarif (Mobil XS, 29,95 €) — die für
+> uns ungünstigste und damit konservative Wahl. **Ein echtes eigenes
+> Bündel schlägt die Näherung** (`_referenz_aus_buendel`); sonst stünde
+> Vodafone zweimal unter demselben Namen auf einer Karte.
+>
+> **G1 und G2 sind servergerendertes SVG** (`report/geraete_tco_grafik.py`)
+> — keine Bibliothek, kein CDN, und damit in jedem `curl`, Test und
+> Screenshot. G1 stapelt je Anbieter (einmalig / Tarif / Geräteraten /
+> Bonus negativ) und trennt **24 und 36 Monate in zwei Blöcke mit eigener
+> Nulllinie** (A5.4); unter zwei Zahlen entsteht statt einer Grafik eine
+> Texttafel. G2 zeichnet nur Reihen mit **≥ 2 Messpunkten** (heute 5 von
+> 562 Listungen), mit ↑/↓-Markern, Wochenraster und der Datentabelle
+> darunter (C.2). **Einen TCO-Verlauf gibt es nicht** und er wird nicht
+> gerechnet: der Bündelbestand kennt je Bündel genau einen Stand, eine
+> Kurve daraus wäre interpoliert.
+>
+> **Die Rechenprobe, live nachgeprüft** (o2, iPhone 17 Pro 256 GB,
+> „O2 Mobile L Plus mit 150 GB+ (24 Mon.)"):
+> `0,00 + 1,00 + 24 × 19,99 + 36 × 36,50 = 1.794,76 €`, Ø **49,85 €/M.**,
+> nach 24 Monaten gezahlt **1.356,76 €**, offen **438,00 €**. Der Auftrag
+> rechnete mit 39,99 € Anschlusspreis und kam auf 1.834,75 €; **im Bestand
+> steht 0,00 €** — o2 nimmt für die L-Linie keinen Anschlusspreis. Es gilt
+> das Gerechnete.
+>
+> **Drei Fehler hat nur das ANSEHEN gezeigt, bei grünen Tests:**
+> (1) `.gr-modell` gibt es seit dem 30.08.2026 in der SKU-Matrix, **mit
+> `white-space:nowrap`** — der neue Modellblock trug denselben Namen und
+> vererbte das Umbruchverbot in jede Karte: min-content 1346 px, die Seite
+> lief auf dem Telefon **1389 statt 390 px** breit. Der Block heißt jetzt
+> `gr-tmodell`. (2) **Alle Balken standen grau da**: der `--anb`-Rückfall
+> stand als eigene Regel AUF denselben Elementen wie die Anbieterfarbe —
+> gleiche Spezifität, die spätere gewinnt; ein Rückfall gehört in das
+> `var()` an der Verwendungsstelle. (3) Das Etikett der Referenzlinie lief
+> rechts aus dem Bild (die Referenz ist regelmäßig der teuerste Balken).
+>
+> **Zwei Fehler haben nur die neuen Tests gezeigt:** Vodafone stand als
+> Bündel UND als Näherung auf derselben Karte (siehe oben), und die
+> **Browser-Fixture hatte kein `tarife.jsonl`** — ohne Tarifbindung war
+> keine Karte belastbar, und die ganze Hauptansicht war von keinem
+> Browser-Test gedeckt. Dieselbe Falle wie das fehlende
+> `geraete_tco.json` am 04.09.2026, eine Ebene weiter.
+>
+> **`pruefe_portal.py` Kriterium 11 kannte die alte Ordnung als Regel**
+> („die Startansicht trägt kein Diagramm", fünf Reiter) und ist auf das
+> Lastenheft umgestellt: vier Reiter, G1 in der Hauptansicht, G2 im
+> Historie-Reiter, die 24-Monats-Zeile. Reiterhöhen **2090 / 1873 / 1872 /
+> 1883 px** gegen ein Budget von 3000.
+>
+> **OFFEN:**
+> 1. **Telekom bleibt leer, bis Phase T läuft.** 59 Leerzustände sind
+>    ehrlich, aber Abnahmekriterium G2 („vier Anbieter sichtbar") ist erst
+>    mit dem lokalen Lauf wirklich erfüllt.
+> 2. **G2 zeigt heute 5 Reihen von 562 Listungen.** Der Rest hat einen
+>    Messpunkt. Nach zwei weiteren Wochen Nachtläufen **ansehen**, ob die
+>    Kurvenschar lesbar bleibt — `MAX_REIHEN` steht auf 5.
+> 3. **Ein TCO-Verlauf braucht zwei verschiedene Bündelstände.** Er
+>    entsteht von selbst; wer ihn in vier Wochen nicht sieht, prüft, ob
+>    `geraete_tco.json` überhaupt einen zweiten Stand geschrieben hat.
+> 4. **Die Seite ist 1,39 statt 0,91 MB.** 59 Modellblöcke stehen fertig
+>    im HTML (kein zweiter Renderer, keine Bibliothek); das ist der Preis
+>    dafür. Wird es zu viel, gehört der Deckel auf die Zahl der
+>    vorgerenderten Modelle, nicht auf ihre Karten.
+> 5. **Kein „(0 %)" an der Ratenzeile** (Katalog D nennt es): dass die
+>    Ratensumme genau der ausgewiesenen Summe entspricht, ist gemessen —
+>    eine Aussage über den effektiven Jahreszins ist es nicht.
+> 6. **Nicht gebaut aus B.3:** Filter nach Netz, Datenvolumen und „Gerät
+>    einmalig bis". `netz` ist im Bestand bei jeder Listung leer, und ein
+>    Filter ohne Daten ist ein Bedienelement, das nichts tut. Gebaut sind
+>    Sortierung (Ø/Monat · Gesamtkosten je Laufzeitgruppe · Gerät
+>    einmalig) und Anbieterfilter.
+
+> **Davor erledigt (04.09.2026, mittags): Phase S — die Bündel stehen,
+> und die Telekom-Schnittstelle ist gemessen statt vermutet.**
+> Auftragsgrundlage: `PHASE_S_BRIEF.md`, Messungen und Belege in
+> `docs/STRATEGY_GERAETE_TCO.md § 14`. Stand danach: **2564 Tests grün**,
+> 14 skipped, **2 rot** (die vorbestehenden Promo-Screenshot-Tests).
+>
+> **`geraete_tco.json` trägt nicht mehr `buendel: 0`, sondern 62 Bündel
+> und 37 SIM-only-Referenzen.** Die Lücke war kein fehlender Anbieter,
+> sondern eine ungelesene Antwort:
+>
+> | Adresse | Antwort | Zustand |
+> |---|---|---|
+> | `…/__not-specified__?hwOnly=true` | 537 KB, 95 Geräte | `HW_ONLY` (bisher) |
+> | `…/__not-specified__` | 583 KB, 88 Geräte, `bundle` gefüllt | `BUNDLE` (neu) |
+>
+> **Beide Adressen gibt `/e-shop/` in seiner eigenen Nutzlast aus**, und die
+> Antwort nennt ihren Zustand selbst
+> (`hwCatalogSwitcherStateValue.hwOnlyOrBundleState`, `showSwitcher: true`).
+> Kein Parameter ist geraten.
+>
+> **Ein Trackingfeld ist kein Preisfeld.** Die Aufteilung in Geräterate und
+> Tarifbetrag steht bei o2 nur in `ecommerceProductValue.attributes`
+> (`metric3`/`metric2`). Geglaubt wird ihr nur, was sich gegen die
+> TYPISIERTEN Zahlen derselben Antwort nachrechnen lässt — drei Proben, alle
+> drei Bedingung statt Protokoll, alle drei **66 von 66**:
+> `metric3 + metric2 == monthlyPrice`, `metric5 == oneTimePrice`,
+> `metric4 == activationFee`. Gegengeprüft an acht Produktseiten, die o2
+> selbst verlinkt: deren serverseitiger `pdp:PriceSummaryValue` nennt
+> dieselben Beträge („Gerät mtl. (36 Raten): 34,00 €", „Tarif mtl.
+> (Mindestlaufzeit 24 Monate): 14,99 €") — 7 von 7 auf den Cent. **Im
+> Betrieb werden diese Seiten NICHT abgerufen**: 66 Seiten à ~950 KB für
+> eine Aufteilung, die in der einen Katalogantwort schon steht.
+>
+> **`kind: buendel` ist eine zweite LESART, keine dritte Abrufart.** Die
+> Sätze gehen an der Listungsstrecke vorbei nach `geraete_tco.json` — ein
+> Bündelmonatspreis in der Spalte eines Kassenpreises war der Befund, mit
+> dem dieses Vorhaben angefangen hat. `Adapter.lies_buendel` +
+> `Anbieterbilanz.buendel` + `analyze/tco_buendel.py`; der Adapter ist
+> anbieterunabhängig gebaut, nur der Leser ist o2-eigen.
+>
+> **Ohne o2-Tarife wäre kein einziges Bündel in den Bestand gekommen**
+> (`upsert_buendel` nimmt keinen Gerätepreis ohne auflösbaren Tarif). Der
+> o2-Bestand kannte drei Tarife, keiner davon einer der beiden, die o2 heute
+> mit Gerät verkauft. Die zwei üblichen Wege gibt es dort nicht: die
+> SIM-only-Seite trägt genau ein ld+json (eine `BreadcrumbList`), die
+> Rechtsseite verlinkt drei PDFs (eines mobil), und **die übrigen
+> Pflichtblätter liegen unter `/assets/` — ein Pfad, den die für uns gültige
+> robots-Gruppe sperrt. Sie werden nicht geholt.** Neu deshalb
+> `methode: kacheln` (`collect/tarif_kacheln.py`): zwölf Preiskacheln, die
+> o2 selbst als solche auszeichnet, mit `preistyp: live_shop`.
+> **Die Gegenprobe, die der Lesart ihr Vertrauen gibt:** „O2 Mobile
+> Unlimited M Flex" steht mit 39,99 € aus dem Produktinformationsblatt im
+> Bestand — die Kachel nennt denselben Betrag. Bestand jetzt **44 Tarife**
+> (Telekom 9, Vodafone 10, congstar 10, o2 15).
+>
+> **Die Brücke ist ein Slug, keine Ähnlichkeit.** Der Katalog nennt seinen
+> Tarif „O2 Mobile on Demand M **Plus** mit 50 GB+ (24 Mon.)", die Kachel
+> heißt „O2 Mobile on Demand M" — über den Namen löst das nichts auf, und
+> das ist richtig so. Die Kachel verlinkt unter „Handy hinzufügen"
+> `?tarif=o2-mobile-on-demand-m-plus`, und derselbe Slug steht im Katalog am
+> Bündel (`dimension59`). `tarif_bezug.ueber_slug`, Güte **`hoch`**:
+> der Anbieter stellt die Verbindung her, wir lesen sie nach. Reihenfolge in
+> `loese()`: **Name → Slug → Betrag**.
+>
+> **Ein Befund kam erst aus dem ersten Livelauf:** Blatt und Kachel tragen
+> dieselbe Tarif-ID, also wurde der Kachelsatz zur nächsten **Fassung** des
+> Pflichtblattes — und `vergleiche` meldete als Tarifänderung, was der
+> Unterschied zwischen einem PDF und einer Werbeseite ist. Zwei Lesarten
+> sind zwei Zeitreihen; `uebernimm_stand` hängt dem zweiten `#live_shop` an.
+> **Der Zusatz ist der Preistyp und kein Inhaltshash** — ein Hash änderte
+> sich mit jeder Preisänderung, und die Zeitreihe zerfiele in Einzelsätze.
+>
+> **Der Geräteanteil stand danach immer noch leer — an demselben
+> Namensbruch, eine Ebene weiter** (§ 14.5). `sim_only_id` schlüsselt auf
+> den NAMEN, und `geraeteanteil()` verglich ihn; über den Namen sind
+> „…M Plus mit 50 GB+ (24 Mon.)" und „O2 Mobile on Demand M" zwei Tarife.
+> Verglichen wird jetzt der **`tarif_id`**, ersatzweise der Name — dieselbe
+> verlinkte Angabe, auf der schon der Fremdschlüssel steht. Alle 20
+> sichtbaren Zeilen tragen jetzt „Gegen denselben Tarif ohne Gerät
+> gerechnet zahlt man für das Gerät … €". Rechenprobe iPhone 15 Pro:
+> 1216,75 − (24 × 19,99 + 39,99) = **697,00 €** — nicht 24 × 34,00 = 816,00,
+> denn im Bündel kostet der Tarif 5,00 € weniger im Monat, und die
+> 24 × 5,00 = 120,00 € bekommt man nur mit dem Gerät. Drei Regeln halten
+> die Umstellung eng: der Name bleibt Rückfall für Sätze ohne ID, eine
+> HALB gefüllte Paarung fällt ebenfalls auf den Namen zurück („ID gegen
+> nichts" wäre immer ungleich und schaltete den Anteil stillschweigend ab),
+> und zwei Referenzen zu einer Tarif-ID ergeben **keine**.
+>
+> **Der Reiter riss danach sein Höhenbudget — und die alte Schätzung war
+> falsch** (§ 14.6). `pruefe_portal.py` Kriterium 11b maß **4604 px** gegen
+> 3000. Der Kommentar an `SICHTBAR_MAX` rechnete mit 84 px je Zeile und
+> 38 px je Referenz; an der echten Seite gemessen sind es **97** und **67** —
+> die Zahlen stammten aus einer Tafel ohne Bündel. Mit den zwölf offenen
+> SIM-only-Referenzen passen **drei** Bündel unter das Budget. Jetzt
+> **8 Zeilen / 4 Referenzen = 2900 px**; gelöscht ist nichts, die übrigen
+> stehen im Aufklapper. `REFERENZEN_SICHTBAR = 0` geht NICHT — die Vorlage
+> hängt Überschrift, Erklärsatz und Aufklapper an derselben Bedingung, bei
+> null verschwände der ganze Abschnitt. **Das ist eine Notbremse, keine
+> Lösung: die Tafel braucht Platz für ihre Bündel, und den schafft nur
+> Phase R.** `pruefe_portal.py` danach **15 bestanden / 2 durchgefallen**
+> (8b und 6, beide vorbestehend).
+>
+> **Schritt 2 des Auftrags endet mit einer Absage, und diesmal mit Grund**
+> (§ 14.4). `BFF_EXT = /shop/api/eshop/bff-de` **existiert**: `/bff-de/`
+> antwortet `application/json` (HTTP 500, `DT_UNKNOWN_ERROR`), ohne
+> Schrägstrich 302 auf eine clusterinterne Adresse
+> (`…svc.cluster.local:8050`); `/content/robots` sperrt den Pfad nicht.
+> Gebaut wird trotzdem nichts: **keine Seite dieses Shops nennt eine
+> konkrete Tarif-Ressource darunter** — nur `bff-de` (Basis) und `builder`
+> (HTTP 401). Sie zu erraten wäre Pfad-Kombinatorik. Der einzige Ort, an dem
+> sie stünden, ist das JS-Bündel auf `static.eshop.telekom.de`, und dessen
+> **robots.txt antwortet mit HTTP 403** — nach der eigenen Regel dieses
+> Projekts („404 heißt keine Regeln, 403 heißt nicht anfassen",
+> `geraete_pipeline._hole_fabrik`) ist der Host damit gesperrt. Die
+> Telekom-Tarife bleiben bei ihren PIB-Dokumenten.
+>
+> **OFFEN:**
+> 1. **Ein Bündel wird jede Nacht verworfen**: der Promo-Tarif „O2 Mobile on
+>    Demand M" (ohne „Plus") steht in keiner SIM-only-Kachel. Richtige
+>    Folge, keine Lücke — aber wenn die Zahl steigt, ist die Arbeitsliste
+>    `config/tarif_quellen.yaml`; das Protokoll nennt die Namen
+>    (`Buendel: … ohne aufloesbaren Tarif`).
+> 2. **Der Tarifbetrag im Bündel ist niedriger als der der SIM-only-Kachel**
+>    (14,99 gegen 19,99 €). o2 nennt das selbst einen Rabatt auf den Tarif
+>    über die Laufzeit des Ratenplans. Beide Zahlen stehen gemessen im
+>    Bestand; daraus ein `Rabatt`-Objekt zu machen wäre eine Deutung. Die
+>    Differenz IST die Auskunft — `Geraeteanteil` rechnet sie.
+> 3. **Nur o2 liefert Bündel.** Vodafone, congstar, Telekom und 1&1 brauchen
+>    je einen eigenen `lies_buendel`. 1&1s Monatspreis (§ 13.2) trägt **keine**
+>    Aufteilung in Geräterate und Tarif; ein Bündel daraus wäre gerechnet.
+> 4. **Templates unverändert (Phase R).** Der Phase-Q-Befund bleibt: die
+>    Geräteseite kennt zwei Preisarten und zeigt 1&1s Bündelmonatspreis als
+>    „ohne Preis".
+> 4b. **Bündel altern nicht.** `upsert_buendel` frischt auf statt zu
+>    ersetzen (richtig — ein ausgefallener Abruf darf kein Angebot
+>    löschen), aber es gibt keine Zwei-Stufen-Auslistung wie bei
+>    `GeraeteDB`. Ein eingestelltes Bündel bleibt mit altem
+>    `last_verified` stehen; die Zeile nennt ihr Abrufdatum, ist also nicht
+>    falsch — aber ein `mark_stale` für `TcoDB` fehlt und braucht dieselbe
+>    Sorgfalt wie das der Geräte.
+> 5. **Ein drittes vorbestehendes Rot war da und ist behoben:**
+>    `test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden`
+>    fiel mit `KeyError: 'preis_ohne_vertrag'` aus, seit es Listungen ohne
+>    Barpreis gibt (1&1 verkauft nur im Bündel). Der Test las das Feld hart
+>    statt mit `.get()` — er warf also eine Ausnahme, statt eine Aussage über
+>    die Bereinigung zu treffen.
+> 6. **`config/settings.yaml → http.user_agent` ist weiterhin eine
+>    Chrome-Kennung** (Beobachtung aus Phase Q, PM-Entscheidung steht aus).
+>    Alle Messungen dieser Phase sind mit `TelcoRadar/1.0` gemacht.
+
+> **Zuletzt erledigt (04.09.2026, ~03:20): der Bergungslauf nach Phase 6.**
+> Der Lauf davor endete um 03:06 an seinem Turn-Limit — mitten in einer
+> Änderung, ohne Abschluss und ohne Push. Geborgen wurde sein letzter Befund
+> **plus einer, der erst beim Bergen sichtbar wurde**.
+>
+> **Der mobile Scroll-Fix war KEIN Artefakt-Hack.** Die Sorge, der nächtliche
+> Lauf könnte ihn wegrendern, war unbegründet und ist nachgemessen statt
+> geglaubt: Quelle (`geraete.html.j2` + `style.css`) lag committet in
+> `a823330`, im Baum lag nur das **gebaute** `site/`. Ein voller
+> `render_site(…, load_config(root))` erzeugt es **byte-identisch** — und
+> ändert an keiner anderen Seite des Portals ein Zeichen. Zwei Behälter im
+> Template ergeben drei auf der Seite: `referenztabelle` ist ein MAKRO und
+> wird zweimal aufgerufen (offen und in „Die übrigen 13 Tarife").
+>
+> **Der neue Browser-Test ist gegengeprüft, nicht behauptet.** Mit auf
+> `95fa07f` zurückgesetzter Quelle fällt **genau** `tafel-tco`
+> (414 px auf einem 390-px-Telefon), die anderen vier Reiter bleiben grün.
+>
+> | Der Befund, der erst beim Bergen kam | Messung |
+> |---|---|
+> | **Der Nachtlauf kann seine Seite gar nicht veröffentlichen.** `geraete.yml` pusht `site/` mit dem `GITHUB_TOKEN`, und ein solcher Push startet keine Workflows | `deploy.yml` zuletzt 00:58 UTC (Push von Hand), Bot-Commits 01:03 UTC, danach nichts. Live lag `4f9dacb` statt `95fa07f`. Der Hook-Schritt steht jetzt in `geraete.yml`, wie in `radar.yml` — siehe §6 |
+>
+> **Der `diff-reviewer` hat ein S1 und zwei S2 gefunden, alle behoben** —
+> und das S1 lag genau in der Zusicherung, die der Fix zu geben schien:
+>
+> | | Befund | Ausgelöst durch |
+> |---|---|---|
+> | **S1** | **Die Browser-Fixture schrieb kein `geraete_tco.json`.** Damit startet `TcoDB` leer, und ZWEI der drei Tabellen des TCO-Reiters rendern gar nicht — die SIM-only-Referenzen und die Leitzahl-Tabelle. Der neue Breitentest wurde **allein von der Bereitschaftstabelle** rot; Behälter und `min-width` der SIM-only-Tabelle waren von keinem Test gedeckt. Fixture stellt jetzt 14 Referenzen (über `REFERENZEN_SICHTBAR` = 12, damit auch der Aufklapper entsteht) und vier Bündel | jemand, der den Behälter „aufräumt" — 2450 Tests wären grün geblieben |
+> | **S2** | **Die WICHTIGSTE Tabelle war nicht angefasst**: die Leitzahl-Tabelle, fünf Spalten, ohne Behälter. Sie steht hinter `{% if geraete.tco.zeilen %}` und rendert erst, wenn Phase 4 Bündel liefert — deshalb fiel sie beim Nachmessen nicht auf. Mit gestellten Bündeln: **436 px** auf 390 | der erste Bündel-Adapter |
+> | **S2** | **Der Behälter kostet 14 px** (BFC, der Außenabstand kollabiert nicht mehr): 18 → 32 px, Reiter 2627 → 2641. Bewusst nicht weggeräumt — die Gegenrechnung träfe `.gr-scroll` auch dort, wo es eine `.src-table` hält. Jetzt steht die Zahl im Stylesheet | — |
+>
+> Dazu S3: die **480 px standen an der falschen Tabelle**. Zwei Kommentare
+> schrieben sie der SIM-only-Tabelle zu; gemessen ist sie die Rechtskante
+> der BEREITSCHAFTStabelle (437 breit), die SIM-only reicht bis 446 (403
+> breit). Korrigiert — eine kopierte Fremdmessung ist eine Falle für den
+> nächsten Leser.
+>
+> **Neu: ein Test, der die REGEL statt ihrer Wirkung misst** — jede
+> `table.gr-ttab` liegt in einem `.gr-scroll`. Der Breitentest hängt an der
+> Datenlage (eine Tabelle ohne Zeilen kann nicht überlaufen); dieser fällt
+> auch bei einer vierten Tabelle, und er fällt, **bevor** sie Daten hat.
+> Gegengeprüft je Behälter einzeln: nimmt man den der SIM-only-Tabelle
+> heraus, fallen beide Tests; nimmt man den der Leitzahl heraus, ebenfalls.
+>
+> Stand: **2450 Tests grün**, 2 rot (die vorbestehenden
+> Promo-Screenshot-Tests), 14 skipped. `pruefe_portal.py`
+> **15 bestanden / 2 durchgefallen** (8b und 6, beide vorbestehend);
+> Kriterium 11b misst den TCO-Reiter bei **2641 px**. Live byte-identisch
+> gegengeprüft (`geraete.html`, `style.css`, `tarife.html`, `index.html`);
+> auf der Seite stehen 3 Behälter und **25 SIM-only-Beleglinks** — genau
+> die 25 Sätze aus `geraete_tco.json`.
+>
+> **OFFEN (unverändert aus Phase 6, nichts davon angefasst):**
+> 1. Die neun Telekom-Sätze stammen aus einem LOKALEN Lauf und altern in
+>    Actions still weiter (202-Challenge). Ob ein anderer HTTP-Client die
+>    Grenze zur Umgehung überschreitet, steht in `STRATEGY_GERAETE_TCO.md`
+>    R3 und ist **Antonios Entscheidung**, nicht die einer Session.
+> 2. `data/state/geraete_tco.json` trägt `buendel: 0` und `sim_only: 25` —
+>    nachgezählt, und genau die 25 stehen als Beleglinks auf der Seite
+>    (12 offen, 13 im Aufklapper). Die TCO-Tabelle bleibt leer, bis **Phase
+>    4** einen Adapter mit Zuzahlung UND Tarifreferenz liefert. Wer sie in
+>    vier Wochen unverändert leer vorfindet, prüft nicht die Tafel.
+> 3. Eine echte Rabattphase steht in keinem Dokument des Bestands — die
+>    Tarifseite bleibt deshalb aus der Navigation.
+> 4. **`site/tarife.html` schreibt „Stand 2026-09-02"**, während alle 32
+>    Tarifsätze `abgerufen_am: 2026-09-04` tragen. Vorbestehend, jetzt
+>    schärfer belegt als am 04.09. früh, und weiterhin NICHT angefasst —
+>    dieselbe Fehlerklasse wie das Kopfdatum der Geräteseite am 30.08.
+>    (`abgerufen_bis` statt `stand`).
+> 5. Vodafones Blätter füllen `art` nicht (alle zehn `art=""`).
+
+> **Zuletzt erledigt (04.09.2026, nachts): Phase 6 — Tarife, Bestand und
+> Bezug.** Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 8 Phase 6.
+> Stand danach: **2443 Tests grün** (vorher 2427; die zwei roten
+> Promo-Screenshot-Tests sind vorbestehend und am unveränderten Baum
+> nachgemessen), `pruefe_portal.py` **15 bestanden / 2 durchgefallen**
+> (8b und 6, beide vorbestehend). Live verifiziert, byte-identisch.
+>
+> **Der Tarifbestand: 3 Sätze von EINEM Anbieter → 32 Sätze von VIER.**
+> Telekom 9, Vodafone 10, congstar 10, o2 3; jeder mit Grundgebühr, keiner
+> in Quarantäne. Damit ist das Abnahmekriterium erfüllt.
+>
+> | Befund | Die eine Regel, die ihn trägt |
+> |---|---|
+> | **Die Telekom liefert — nur nicht in Actions.** Aus der Sandbox: HTTP 200, 581 KB, 1114 Dokumentlinks, fünf gelesene PDFs, null Fehler. Im Lauf 33644684296 (02.09.) dagegen „3 verlinkt, 0 Fehler" — die drei sind o2 | Das ist die 202-Challenge (§6). HTTP 202 ist **kein** Fehlerstatus, `raise_for_status()` lässt ihn durch, und eine Seite ohne `<a>` liefert eben keine Links. Der Sammler war dabei **vollkommen stumm**; er meldet jetzt `ohne_links` mit Status und Byte-Zahl |
+> | **Vodafone schreibt seine Preistabelle SENKRECHT** — Zeilen sind Kategorien, Spalten sind Preisphasen („Monat 1-24" / „ab Monat 25") | Der Extraktor kannte nur Telekoms waagerechte Staffel und las bei Vodafone **keinen einzigen Preis**. Es ist zugleich die einzige Stelle im Bestand, an der ein Anbieter seine Preisphasen SELBST auszeichnet — vorher stand in jedem Datensatz die Ersatzphase „1 bis Vertragsende" |
+> | **Eine Tarifoption ist keine Gerätestufe** | Vodafone stellt „mit 5 Jahresversprechen" in dieselbe Tabellenform wie „mit Top Smartphone". Für die zwei Euro bekommt niemand ein Telefon |
+> | **Prepaid bleibt draußen** | congstar: „10,00 € / 4 Wochen", Vodafone CallYa: „14,99 €" unter „Vertragslaufszeiten 4 Wochen". `grundgebuehr` meint einen MONATSpreis; dreizehn Zyklen im Jahr in zwölf Monate umzurechnen wäre eine Rechnung dieses Projekts |
+> | **Aus 1114 Adressen werden neun** — drei Stufen: `pfadmuster`, jüngste Fassung je Adressstamm, `bevorzugt` reihum | Ohne Stufe 2 bekam die **stabile** ID `telekom:magentamobil-l` den Stand von **2017**, der aktuelle landete unter einem Hash-Zusatz; ohne Stufe 3 holte ein Deckel von zwölf **neunmal** MagentaMobil S und kein einziges Mal M, L, XL oder Basic |
+>
+> **Der Fremdschlüssel steht** (`src/telco_radar/tarif_bezug.py`): `hoch`
+> über den Namen (kanonische Tarif-ID, Markenpräfix auf BEIDEN Seiten
+> auflösbar), `mittel` über den Betrag und nur bei Eindeutigkeit.
+> `TcoDB.upsert_buendel` nimmt seit heute **keinen Gerätepreis ohne
+> auflösbaren `tarif_id`** mehr auf.
+>
+> **Vodafones Betragsproblem (§ 6.2 Nr. 7) ist gemessen und NICHT gelöst,
+> und das ist die Antwort:** von den zwei Beträgen der Gerätenutzlast löst
+> **keiner** auf. 41,95 € steht im Blatt „Vodafone Mobil S", aber als Zeile
+> *„mit zusätzlichem Datenvolumen"* — eine Tarifoption, kein Tarif (der
+> kostet 39,95 €). 31,45 € steht in keinem Blatt; am nächsten liegt 31,95 €,
+> und „fast" ist keine Zuordnung. Dazu strukturell: Vodafone
+> veröffentlicht jeden Tarif ZWEIMAL, mit und ohne Gerätestaffel, beide mit
+> demselben Grundpreis — ein Betrag trifft dort regelmäßig zwei Datensätze,
+> und zwei Treffer sind keine schwache Zuordnung, sondern gar keine.
+>
+> **Die TCO-Tafel zeigt zum ersten Mal echte Zahlen.** Nicht die Bündel —
+> die brauchen einen Adapter (Phase 4) —, sondern den **Maßstab**:
+> 25 SIM-only-Referenzen aus dem Tarifbestand, jede mit Betrag, Beleglink
+> und Abrufdatum (`analyze/tarif_referenzen.py`, geschrieben vom
+> nächtlichen Lauf nach `db.save()`). Das ist die Zahl, ohne die ein
+> Geräteanteil nicht bestimmbar ist, und sie steht auf keiner Werbeseite
+> dieses Marktes.
+>
+> **Drei Befunde hat nur das ANSEHEN der Tafel gezeigt, bei grünen Tests:**
+> (1) „Was der Rechnung noch fehlt" meldete weiter „Tarifgrundpreis fehlt,
+> Phase 6", während die Tabelle darunter 25 Tarifgrundpreise zeigte;
+> (2) nach zwei Läufen standen **40 Referenzen zu 32 Tarifen** auf der
+> Seite — Referenzen sind ABGELEITET und werden jetzt ersetzt statt
+> ergänzt (`ersetze_referenzen`, aufgefrischt und dann weggenommen, sonst
+> verlöre jede ihr `first_seen`); (3) derselbe Maßstab stand zweimal
+> untereinander, weil Vodafone jeden Tarif zweimal veröffentlicht.
+>
+> **Der `diff-reviewer` hat vier S1 und sechs S2 gefunden, alle behoben.**
+> Die drei teuersten: die Vierwochen-Sperre griff bei **genau dem
+> Dokument nicht, mit dem sie begründet wird** (der Takt steht bei Vodafone
+> am Vertrag, der Preis eine Zeile weiter — jetzt liegt eine echte
+> CallYa-Fixture bei); `ersetze_referenzen([])` hätte den **ganzen Maßstab
+> gelöscht**, wenn `tarife.jsonl` einmal fehlt („nicht gelesen" ist nicht
+> „leer", dieselbe Fehlerklasse wie `mark_stale` ohne `gepruefte_seiten`);
+> und `ueber_namen` löste das Markenpräfix nur in EINER Richtung auf — der
+> selteneren. Bei Telekom und congstar steht die Marke auf der
+> Produktseite und nicht im Blatt, und weil `upsert_buendel` ohne
+> `tarif_id` wirft, hätte Phase 4 für beide Anbieter **keinen einzigen
+> Bündelpreis** speichern können.
+>
+> **OFFEN:**
+> 1. **Die neun Telekom-Sätze kommen aus einem LOKALEN Lauf und können in
+>    Actions nicht aufgefrischt werden** (202-Challenge). Sie tragen
+>    `abgerufen_am: 2026-09-04`, und dieses Datum wird stehen bleiben. Das
+>    ist keine Falschaussage — die Seite sagt, wann sie geholt wurden —,
+>    aber es ist eine stille Alterung. **Die Entscheidung, ob ein anderer
+>    HTTP-Client (Requests statt httpx) die Grenze zur Umgehung
+>    überschreitet, steht in `STRATEGY_GERAETE_TCO.md` R3 und ist NICHT
+>    getroffen.** Der Sammler meldet den Ausfall jetzt wenigstens laut.
+> 2. **Die TCO-Tabelle selbst bleibt leer, bis ein Adapter Bündel
+>    liefert** (Phase 4: Zuzahlung MIT Tarifreferenz). Gemessen: von 525
+>    Listungen trägt **keine** eine `tarif_referenz` oder `zuzahlung`; nur
+>    o2 hat 67 mit Ratenfeldern. Wer die Tafel in vier Wochen unverändert
+>    ohne Zeilen vorfindet, prüft nicht die Tafel, sondern Phase 4.
+> 3. **Eine echte Rabattphase steht in keinem Dokument des Bestands.** Bei
+>    ALLEN elf aktuell vermarkteten Vodafone-Tarifen tragen „Monat 1-24"
+>    und „ab Monat 25" denselben Betrag. Die Veröffentlichungsschwelle der
+>    Tarifseite verlangt „ein Tarif mit echter Rabattphase" (§5) und ist
+>    damit **nicht** erfüllt — drei Anbieter und zwölf Mobilfunktarife
+>    stehen inzwischen. Die Seite bleibt aus der Navigation.
+> 4. **`site/tarife.html` schreibt „Stand 2026-09-02"** im ISO-Format,
+>    während jede Zeile darunter „4. September 2026" sagt. Vorbestehend,
+>    beim Ansehen gefunden, NICHT angefasst.
+> 5. Vodafones Blätter füllen `art` nicht (alle zehn: `art=""`). Die
+>    Festnetz-Sperre der SIM-only-Referenzen greift dort nicht; heute hält
+>    allein `bevorzugt: vf-mobil-` die DSL-Blätter draußen.
+
+> **Zuletzt erledigt (04.09.2026): Phase 6a — die Website aus dem
+> Nachtlauf, die TCO-Ansicht als Skelett und der Bestpreis-Stempel.**
+> Auftragsgrundlage: `docs/STRATEGY_GERAETE_TCO.md` § 6, § 8 Phase 8, § 10
+> (E2/E3). Stand danach: **2349 Tests grün** (vorher 2254 — die Differenz ist
+> zum größten Teil KEIN neuer Test, sondern die 49 Browser-Tests, die vorher
+> mangels Chromium als Fehler durchliefen), `pruefe_portal.py`
+> **15 bestanden / 2 durchgefallen / 0 nicht prüfbar**.
+>
+> **Der erste Befund war kein Fehler im Code, sondern eine Lücke im
+> Fahrplan.** Der Crawllauf vom 03.09. (Run 33808917268) hatte 491 Listungen
+> geschrieben — erstmals 134 congstar-Zeilen und 67 o2-Zeilen mit
+> vollständigen Ratenfeldern. Live war davon nichts zu sehen: `geraete.yml`
+> rendert die Website nicht („die Seite entsteht beim nächsten regulären
+> Lauf"), und der reguläre Lauf ist **Mi und Fr**, während der Gerätezweig
+> **täglich** läuft. Ein Ergebnis der Nacht zum Samstag stand also bis
+> Mittwoch nicht auf der Seite. Dieselbe Fehlerklasse wie der
+> Navigationseintrag am 11.08.: gebaut, geprüft, committet und für jeden
+> Leser nicht da. **`geraete.yml` rendert seitdem selbst** und committet
+> `site/` mit; der Push löst `deploy.yml` aus.
+>
+> | Was | Die eine Regel, die es trägt |
+> |---|---|
+> | **`report/geraete_tco_view.py`** (neu), Reiter 2 „Was kostet es" | Gerechnet wird ausschließlich in `tco_model`. Der Renderer addiert keinen Euro — zwei Rechnungen für dieselbe Zahl sind zwei Zahlen |
+> | **Keine Zahl ohne `Tco.belastbar`** | `tco_24()` liefert auch ohne Tarifgrundpreis ein `gesamt` — das ist dann der Gerätebetrag und keine TCO. Die Tafel hält ihn zurück und zeigt die benannte Lücke. Ein Test prüft im selben Lauf, dass `tco_24()` sehr wohl eine Zahl liefert; sonst bewiese er nur, dass es keine gab |
+> | **Jede Lücke trägt ihre Phase** („Phase 6 (Tarife: Bestand und Bezug)") | „Keine Tarifdaten" ist eine Feststellung, „keine Tarifdaten, Phase 6" eine Auskunft |
+> | **„Was der Rechnung noch fehlt" wird GERECHNET** (`_offene_posten`) | Als feste Liste zeigte der Abschnitt „Tarifgrundpreis fehlt", während die Tabelle darüber einen auswies — sichtbar falsch in dem Moment, in dem Phase 6 liefert. **Gefunden beim ANSEHEN der Tafel mit gestellten Bündeln, nicht in einem Test** |
+> | **Das Euro-Delta trägt BEIDE Quelllinks** | Die Tabelle ist auf `SICHTBAR_MAX` (20) gedeckelt, eine gemeldete Zeile steht also nicht zwingend darin. Ohne die Links wäre der Deckel eine stille Beleglosigkeit |
+> | **`restbetrag`/`rabatte_offen` werden durchgereicht**, nicht auf `None` gedreht | Ein `or None` machte aus dem gemessenen 0.0 („die Raten laufen genau 24 Monate") eine Lücke („nicht gemessen") — genau die Verwechslung, gegen die dieser Zweig gebaut ist. Ob der Satz erscheint, entscheidet die Vorlage |
+> | **Bestpreis-Stempel** im Preisverlauf (`app.js`) | Er nennt den TAG, nicht den Preis: die Kachel „Niedrigster Preis" trägt die Zahl schon, und „eine Zahl steht je Ort genau EINMAL" gilt auch, wenn die zweite Stelle ein SVG ist. Der Ring sitzt auf der Preishöhe — die Y-Achse gehört dem Preis. Bei flacher Reihe entfällt er: ist jeder Punkt gleich teuer, ist jeder der billigste |
+>
+> **Die Datenlage, gegen die das gebaut ist:** `data/state/geraete_tco.json`
+> gibt es **nicht** — null Bündel, null SIM-only-Referenzen, also **keine
+> einzige berechenbare TCO**. Die Tafel zeigt deshalb ihre Lücke und
+> daneben, was je Anbieter schon steht (o2: 55 von 55 mit geprüfter
+> Ratenrechnung, alle übrigen Barkauf). Mit gestellten Bündeln ist der
+> Vollzustand durchgerechnet und **angesehen**: Leitzahl, Ø/Monat,
+> Bestandteile, Restbetrag („Nach 24 Monaten offen: 360,00 €"),
+> Geräteanteil gegen die SIM-only-Referenz und das Delta-Banner stehen.
+>
+> **Chromium ist lokal installiert worden** (`python3 -m playwright install
+> chromium`). Damit laufen die 49 vorher fehlgeschlagenen Browser-Tests, und
+> `pruefe_portal.py` misst wieder alle Kriterien — es suchte den Browser nur
+> an zwei **Linux**-Pfaden und meldete auf einem Mac „kein Chromium
+> gefunden", also fünf übersprungene Kriterien. Ein übersprungenes Kriterium
+> sieht in der Bilanz aus wie ein bestandenes; das Skript fragt jetzt
+> notfalls Playwright selbst.
+>
+> **Der `diff-reviewer` hat drei S1 und fünf S2 gefunden, alle behoben.**
+> Die drei, die am meisten gekostet hätten:
+>
+> | | Befund | Ausgelöst durch |
+> |---|---|---|
+> | **B1** | `float(e["preis_ohne_vertrag"])` in der Bereitschaftszählung. `preis_ohne_vertrag` ist ein **eigenes** Optional-Feld und hängt nicht an den Ratenfeldern — eine Listung mit Ratenform ohne Barpreis wirft. `render_site` fängt das ab, aber der Auffangboden ist `geraete_view.leer()`: **alle fünf Reiter leer und der Navigationseintrag „Geräte" von jeder Seite verschwunden.** Rechnet jetzt `Ratenzahlung.deckt()` | die nächsten Adapter (Phase 4: Zuzahlung mit Tarifreferenz statt Kassenpreis) |
+> | **B2** | Das Delta prüfte `Tco.belastbar` — und das verlangt **nur** den Tarifgrundpreis. Eine Zeile ohne gemessene Geräterate galt als belastbar, und ihre Differenz zu einer vollständigen Zeile ist der fehlende Gerätepreis, kein Preisvorteil („760,99 € günstiger als Vodafone"). Jetzt `_vergleichbar()`, dieselbe Schwelle wie `Geraeteanteil.belastbar` | ein Anbieter, der Tarif aber keinen Gerätepreis liefert |
+> | **B3** | `{z["sku_id"]: z for z in zeilen}` — bei zwei Vodafone-Tarifen zum selben Gerät gewann der **letzte**, und weil vorher aufsteigend sortiert wird, war das immer das **teuerste** eigene Bündel. Das dreht das Vorzeichen des Banners um | Vodafone führt dasselbe Gerät regelmäßig auf mehreren Tarifen |
+>
+> Dazu: **B5** — die erste Fassung von `geraete.yml` renderte **vor** dem
+> Commit, also genau der Aufbau von Lauf 31422689829 („von 45 erfolgreichen
+> Minuten wurde nichts veröffentlicht"). Jetzt Bestand zuerst, dann Seite,
+> zwei Commits, beide Nachschritte `continue-on-error`. Ein Messtag ist
+> nicht nachholbar, ein Seitenaufbau schon. **B4** — das Delta hatte keine
+> Wesentlichkeitsschwelle und hätte „0,00 € teurer als Vodafone"
+> geschrieben; es benutzt jetzt `geraete_vergleich.WESENTLICH_*`. **B6** —
+> `TcoDB.lesbar` wurde weggeworfen, eine kaputte Datei sah aus wie „keine
+> Daten". **B7** — der Bestpreis-Stempel reservierte 78 px für ein 118 px
+> breites Etikett; `getComputedTextLength()` gibt an einem Knoten
+> **außerhalb des Dokuments** 0 zurück, die Messung gehört also hinter das
+> Einhängen. **B8** — `{% if hat_tco %}` verwarf die ganze Tabelle, sobald
+> keine Zeile belastbar ist; das Gatter hängt jetzt an den Zeilen.
+>
+> **Der lehrreichste Punkt war der Test zu B7.** Die erste Reparatur kam mit
+> zwei ausgesuchten Tiefpunktlagen — und **keine der beiden löste den Fehler
+> aus** (an dieser Fixture liegt der kritische Bereich zwischen zwei
+> Messtagen). Der Test läuft jetzt über **alle** Lagen. Dieselbe Falle, vor
+> der der Review gewarnt hatte, im Reparaturversuch prompt wiederholt.
+>
+> **OFFEN:**
+> 1. **Der Preisverlauf zeigt heute für KEIN Gerät ein Diagramm.** 8 von 89
+>    Geräten erreichen die 4 Messtermine — aber im Wochenraster fallen die
+>    dichten Messungen vom 29.8. bis 3.9. auf ein bis drei Punkte zusammen,
+>    und `DIAGRAMM_AB_TERMINEN` zählt die ZUSAMMENGEFASSTEN (B2, 30.08.).
+>    Der Bestpreis-Stempel ist damit gebaut, getestet und dormant. Nach ein
+>    bis zwei weiteren Wochen Nachtläufen **ansehen**, ob Kurven entstehen.
+> 2. **Die TCO-Tafel bleibt leer, bis Phase 6 Tarifpreise liefert.** Das ist
+>    der Zustand, gegen den sie gebaut ist — aber wer sie in vier Wochen
+>    unverändert leer vorfindet, prüft nicht die Tafel, sondern Phase 6.
+> 3. **`pruefe_portal.py` Kriterium 6** (14 px Hochskalierung auf
+>    `meldungen.html`) und **8b** (66 leere Promo-Bilddateien unter
+>    `site/promo/images/`, samt der zwei zugehörigen Tests in
+>    `tests/test_promo_seite.py`) sind **vorbestehend** und waren nicht Teil
+>    dieses Auftrags. 8b steht seit dem 03.09. im Handover, Kriterium 6 seit
+>    dem 15.08.
+> 4. **Das Delta-Banner rechnet über ALLE Bündel, die Tabelle zeigt 20.**
+>    Das ist Absicht (der größte Abstand ist die Schlagzeile) und durch die
+>    zwei Quelllinks gedeckt — sollte es verwirren, gehört der gemeldete
+>    Treffer in die Tabelle gezogen, nicht das Banner gekappt.
+
+> **Davor erledigt (03.09.2026, Antonio direkt): die Erklaersektionen
 > der Geräteseite gelöscht.** Antonio: *„was mir nicht gefällt auf der
 > geräteseite sind diese ganzen erklärungen und kommentare: Datenbasis und
 > Lücken, Warum diese 15 nichts liefern […]. bitte lösche diese komischen

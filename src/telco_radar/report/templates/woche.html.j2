@@ -108,6 +108,20 @@
     </nav>
     {% endif %}
 
+    {# E3B, 05.09.2026: 0 bewertete Meldungen sollen die Titelseite nicht
+       leerraeumen (analyze/redaktion_kontinuitaet.py). Der Aufmacher und der
+       Wochenbericht weiter unten zeigen dann weiterhin die letzte gueltige
+       Ausgabe - dieser Hinweis sagt VOR dem Aufmacher, dass und seit wann.
+       Er steht nur, wenn die Uebernahme wirklich stattgefunden hat: an
+       jeder normalen Woche ist `redaktion_ausfall` None und hier steht
+       nichts - Kriterium 1 aus `pruefe_portal.py` bleibt unberuehrt. #}
+    {% if redaktion_ausfall %}
+    <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }} –
+      die Runde vom {{ date_de }} blieb ohne Bewertung:
+      {{ redaktion_ausfall.grund }}. Diese Seite zeigt weiterhin die
+      zuletzt vollständig redigierte Ausgabe.</p>
+    {% endif %}
+
     {% if front.aufmacher %}
     {% set a = front.aufmacher %}
     <article class="aufmacher{% if not a.image %} ohne-bild{% endif %}{% if (a.schlagzeile or '')|length <= 70 %} kurz{% endif %}">
@@ -326,13 +340,25 @@
     <div class="card">
       <div class="card-head"><h2>Der Wochenbericht</h2>
         <a href="{{ prefix }}transparenz.html">Quellen</a></div>
+      {# Zweiter "Stand:"-Hinweis (E3B) - der erste steht oben beim
+         Aufmacher. Beide sind noetig: Aufmacher und Wochenbericht sind zwei
+         eigenstaendige Bloecke, und wer per Sprungmarke direkt hierher
+         kommt, soll das Alter des Textes nicht erst am Aufmacher lesen
+         muessen. #}
+      {% if redaktion_ausfall %}
+      <p class="ausfall-hinweis">Stand: {{ redaktion_ausfall.stand_de }}</p>
+      {% endif %}
       {# Ein Halbsatz, keine Bilanz. Hier standen bis zum 08.08.2026 drei
          Saetze mit vier Zahlen; die Zahl "13 zum sofortigen Ansehen" stand
          ausserdem an jeder betroffenen Meldung noch einmal als Prioritaet
          5/5. #}
       <p class="berichtszeile">
         {% if report.stats %}<b>{{ highlights|length }} relevante Meldungen</b>
-        aus {{ report.stats.get('new', '–') }} neuen{% endif %}{% if lesezeit %}
+        {% if redaktion_ausfall %}{# E3B: "aus 877 neuen" waere die Zahl der
+           HEUTIGEN Runde neben Meldungen einer FRUEHEREN - zwei Zahlen aus
+           zwei verschiedenen Laeufen in einem Satz. #}
+        {% else %}aus {{ report.stats.get('new', '–') }} neuen{% endif -%}
+        {% endif %}{% if lesezeit %}
         &middot; Lesezeit ca. {{ lesezeit }} Minuten{% endif %}
       </p>
       {% if toc %}

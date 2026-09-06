@@ -26,13 +26,20 @@
 #                 Dieselbe Regel wie `rang` in promo_sources.yaml: Marktgewicht
 #                 steht in keiner Zahl dieses Projekts.
 #   eigen         true nur für Vodafone: eigene Referenz, kein Wettbewerber
-#   methode       ldjson | shopify | json_endpunkt | html | js | api |
-#                 kein_hardware | deaktiviert
-#                 IMPLEMENTIERT sind derzeit `ldjson` (inklusive der
-#                 schema.org-Microdata-Stufe) und `shopify`. Alles andere ist
-#                 gemessen, dokumentiert und wartet auf einen eigenen Adapter -
-#                 drei stabile Adapter sind mehr wert als zwanzig, die zur
-#                 Hälfte leere Ergebnisse liefern (Teil F des Auftrags).
+#   methode       Der Name des ADAPTERS, der diesen Anbieter liest - oder
+#                 eine Diagnose ohne Adapter. Die gültige Liste steht in
+#                 `geraete_config.METHODEN`; ein Tippfehler deaktiviert den
+#                 Anbieter sichtbar, statt still null zu liefern.
+#                 GEBAUT (Stand 05.09.2026): `ldjson` (inklusive der
+#                 schema.org-Microdata-Stufe), `shopify`, `vodafone_api`,
+#                 `o2_katalog`, `congstar_next`, `telekom_kategorie`,
+#                 `einsundeins_buendel`, `saturn_brand`.
+#                 DIAGNOSE OHNE ADAPTER: `json_endpunkt`, `html`, `js`, `api`
+#                 - gemessen und dokumentiert, aber nichts liest sie. Sie sind
+#                 bewusst keine gemeinsame Methode: fünf Anbieter tragen
+#                 `json_endpunkt` und meinen fünf verschiedene Nutzlasten.
+#                 KEIN ABRUF: `kein_hardware` (gemessen: verkauft keine
+#                 Geräte), `deaktiviert`.
 #   aktiv         false = wird nicht abgefragt. Dann ist `grund` PFLICHT; er
 #                 steht wörtlich auf /geraete-quellen.html. Kein Anbieter
 #                 verschwindet stillschweigend.
@@ -114,19 +121,123 @@ anbieter:
     typ: handel
     gruppe: Ceconomy
     rang: 2
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Gleiche Plattform und gleiche Sperre wie MediaMarkt (HTTP 403 auf
-      Produktseiten, Preise nur im __PRELOADED_STATE__ der Kampagnenseite).
-      Beide gehören zu Ceconomy - wer sie als zwei Wettbewerber führt, zählt
-      einen doppelt.
+    methode: saturn_brand
+    aktiv: true
     basis_url: https://www.saturn.de
+    # Zehn Sekunden statt der Voreinstellung, obwohl robots.txt fuer
+    # User-agent "*" keinen Crawl-delay nennt (gelesen 05.09.2026) - 17
+    # Markenseiten hintereinander bei zwei Sekunden waeren immer noch nur
+    # 34s, aber dieses Radar fragt hier einen Cloudflare-Host ab, keine
+    # Presse-Feeds. Dieselbe konservative Haltung wie bei Telekom.
+    rate_limit_sekunden: 10
+    # PER-ANBIETER-UEBERSCHREIBER des User-Agent (BRIEF_SATURN_ADAPTER_R2,
+    # 05.09.2026, EVAL_saturn-adapter-r1.md Befund 1): R1 behauptete diese
+    # Kennung im Bericht, sendete aber PRIMAER die Chrome-Vortaeuschung aus
+    # config/settings.yaml:549 - der Evaluator hat das an den echten
+    # Kopfzeilen widerlegt. Diese Zeile erzwingt die ehrliche Kennung als
+    # Primary NUR fuer Saturn, ohne die globale settings.yaml anzufassen
+    # (E-1 bleibt Antonios Entscheidung). Der 200er-Erfolg der 6 liefernden
+    # Markenseiten steht damit nicht mehr auf einer Chrome-Vortaeuschung.
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    # `grund` ist gestrichen: das Feld beantwortet "warum NICHT aktiv", und
+    # die Frage stellt sich seit dem 05.09.2026 nicht mehr (siehe Spike
+    # outputs/saturn-spike-2026-09-05.md und die Produktivmessung im
+    # zugehoerigen Bericht outputs/phase-saturn-adapter-2026-09-05.md).
+    hinweis: >-
+      ANGEBUNDEN SEIT 05.09.2026, nach dem Spike vom selben Tag - der
+      alte Befund ("HTTP 403 auf Produktseiten wie MediaMarkt") war eine
+      Verwechslung mit der falschen Zielseite (der frueher konfigurierten
+      Kampagnenseite). Jede Markenseite
+      (/de/brand/<hersteller>/<serie>/<modell>) traegt den Preis
+      SERVERSEITIG in zwei unabhaengigen Strukturen derselben Antwort:
+      einem ld+json-Block vom Typ ItemList UND window.__PRELOADED_STATE__
+      (Apollo-Cache). Nur der Apollo-Cache traegt das Feld
+      isProductOfTypeMarketplace - PFLICHT, um Saturn-eigene Preise von
+      Drittanbietern im Marktplatz zu trennen (auf
+      /de/brand/apple/iphone/iphone-17 sind 7 von 12 gelisteten Angeboten
+      fremd, mit bis zu 2036 EUR fuer ein Geraet, das Saturn selbst fuer
+      939,99 EUR fuehrt). Reiner HTTP-GET ohne Playwright reicht; kein
+      Browser im Produktionspfad, keine der zwei robots-gesperrten
+      GraphQL-Operationen (GetPaidBundles/GetFreeBundles) wird beruehrt -
+      der Preis steht schon in der ersten Antwort. Die im urspruenglichen
+      Auftrag genannte Kategorie-ID (/de/category/_..._701440.html) ist
+      dagegen eine tote, im Sitemap-Index nicht mehr gefuehrte Adresse
+      (HTTP 200, aber 0 Artikel) und wird NICHT verwendet.
+      GRENZE, gemessen im Produktivlauf mit der ehrlichen Kennung
+      (05.09.2026, R2, scripts/lokallauf_saturn.py): NUR 6 der 17
+      Markenseiten liefern Saturn-eigene Listungen (iPhone
+      16/16e/17/17 Pro/Air/17e, 22 Listungen). Die uebrigen ELF liefern
+      strukturell einwandfrei, aber
+      ZU DIESEM ZEITPUNKT keine einzige Saturn-eigene
+      (nicht-Marktplatz-)Listung: iPhone 14/14 Pro/14 Pro Max/15/15 Plus/
+      15 Pro Max (0 Angebote insgesamt) sowie iPhone 15 Pro/16 Plus/16 Pro/
+      16 Pro Max/17 Pro Max (Angebote vorhanden, aber ausnahmslos
+      Marktplatz-Drittanbieter oder - bei 16 Plus/16 Pro Max - schon in der
+      "iphone-16"-Seite mit erfasst, siehe outputs/phase-saturn-adapter-
+      2026-09-05.md). Saturn fuehrt diese Modelle aktuell offenbar nur
+      ueber Drittanbieter oder gar nicht mehr neu. Das ist kein
+      Abruffehler (die Seite antwortet 200 und ist strukturell lesbar),
+      sondern eine Marktaussage - der Bericht fuehrt jede Seite einzeln.
     einstiege:
-      - url: https://www.saturn.de/de/campaign/angebote-smartphones
-        label: Angebote Smartphones
+      # Jede Zeile ist eine Markenseite, die Modelle des Geraetekatalogs
+      # (config/geraete_katalog.yaml) fuehrt - Start-Scope laut Auftrag
+      # (BRIEF_SATURN_ADAPTER.md): alle Apple-iPhone-Serien des Katalogs.
+      # Jede Adresse ist am 05.09.2026 einzeln mit HTTP 200 gemessen
+      # (siehe outputs/phase-saturn-adapter-2026-09-05.md fuer die
+      # vollstaendige Tabelle inkl. der aktuell leeren). `direkt=True` in
+      # der Adapter-Registry: jede Seite IST ihre Nutzlast, es wird keine
+      # Produktseite nachgeladen - kein `pfadmuster` noetig.
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14
+        label: iPhone 14
         kind: static
-        pfadmuster: /de/product/
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14-pro
+        label: iPhone 14 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-14-pro-max
+        label: iPhone 14 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15
+        label: iPhone 15
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-plus
+        label: iPhone 15 Plus
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-pro
+        label: iPhone 15 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-15-pro-max
+        label: iPhone 15 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16
+        label: iPhone 16
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-plus
+        label: iPhone 16 Plus
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-pro
+        label: iPhone 16 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16-pro-max
+        label: iPhone 16 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-16e
+        label: iPhone 16e
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17
+        label: iPhone 17
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro
+        label: iPhone 17 Pro
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro-max
+        label: iPhone 17 Pro Max
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-air
+        label: iPhone Air
+        kind: static
+      - url: https://www.saturn.de/de/brand/apple/iphone/iphone-17e
+        label: iPhone 17e
+        kind: static
 
   - name: expert
     typ: handel
@@ -274,30 +385,61 @@ anbieter:
     typ: netzbetreiber
     gruppe: Deutsche Telekom
     rang: 1
-    methode: json_endpunkt
-    aktiv: false
-    grund: >-
-      Erreichbar, aber es gibt dort keinen Gerätepreis ohne Vertrag zu lesen.
-      Nachgemessen am 11.08.2026 an
-      /shop/geraet/apple/apple-iphone-17-pro-max/silber-256-gb (HTTP 200,
-      2,8 MB, HTTP/1.1 — über HTTP/2 antwortet eine WAF-Challenge): kein
-      ld+json, kein Microdata, und im Zustandsobjekt window.__INITIAL_STATE__
-      trägt productDetailed.productDetailsData zwar Modellname, Farben und
-      Speicherstufen, aber als Preis nur einen deltaPrice je Stufe — also
-      einen Aufschlag ohne Grundbetrag. Die einzigen absoluten Beträge stehen
-      unter productDetailed.installmentConfiguratorItems als upfrontPrice je
-      Ratenlaufzeit (12/24/36 Monate) und sind damit Zuzahlungen im Bündel,
-      keine Ladenpreise. Ein Adapter kann Telekom deshalb erst liefern, wenn
-      er die Zuzahlung MIT ihrer Tarifreferenz schreibt — die Sammelschicht
-      kann das seit dem 11.08.2026, der Extraktor fehlt.
-      Die Linkernte steht: die Übersichtsseite führt zehn Produktadressen als
-      echte a-href mit dem Pfadmuster /shop/geraet/.
+    methode: telekom_kategorie
+    aktiv: true
     basis_url: https://www.telekom.de
+    # Mindestens zehn Sekunden, obwohl nur EINE Seite abgerufen wird: die
+    # Zahl steht hier, damit sie auch dann gilt, wenn irgendwann ein
+    # zweiter Einstieg dazukommt.
+    rate_limit_sekunden: 10
+    max_produkte: 15
+    # `grund` ist gestrichen und nicht etwa leer geblieben: das Feld
+    # beantwortet die Frage "warum NICHT aktiv", und die stellt sich seit
+    # dem 04.09.2026 nicht mehr. Was gemessen wurde, steht in `hinweis`
+    # und damit weiterhin wörtlich auf /geraete-quellen.html.
+    hinweis: >-
+      ANGEBUNDEN SEIT 04.09.2026 — mit einer Preisform, die keine
+      Barpreisform ist. Die Kategorieseite /shop/geraete/smartphones/
+      ohne-vertrag antwortet dem Absender TelcoRadar/1.0 mit HTTP 200 und
+      2,23 MB und trägt in window.__INITIAL_STATE__.productList.data zehn
+      Geräte mit absoluten Beträgen: upfrontPrice, recurringPrice über 36
+      Raten und totalPrice. Nachgerechnet geht die Probe bei 10 von 10 auf
+      (Apple iPhone 17 Pro: 99,00 + 36 × 30,50 = 1197,00; Samsung Galaxy Z
+      Fold8 Ultra: 399,00 + 36 × 50,00 = 2199,00). Das ist ein
+      36-Monats-Ratengesamtbetrag und kein Kassenpreis, und genau das ist
+      die Bedingung, die der alte Grund gestellt hatte: der Adapter
+      schreibt die Preisform mit (anzahlung, monatsrate, laufzeit_monate),
+      und geht die Probe nicht auf, wird der Satz verworfen statt als
+      Barpreis gespeichert.
+      Der Befund vom 11.08.2026 zur PRODUKTSEITE bleibt richtig und ist der
+      Grund, warum hier die Kategorieseite steht: productDetailed.
+      productDetailsData trägt je Speicherstufe nur einen deltaPrice, also
+      einen Aufschlag ohne Grundbetrag. Einen Zinssatz nennt die Seite
+      nicht; zins_effektiv bleibt leer und heißt "unbekannt", nicht "null
+      Prozent". Die zehn Produktadressen stehen als echte a-href
+      (/shop/geraet/) im selben HTML und werden dem Gerät über seine drei
+      Slugs zugeordnet — nicht aus ihnen zusammengesetzt.
+      GRENZE, unverändert: aus dem GitHub-Actions-IP-Bereich antwortet
+      telekom.de httpx mit HTTP 202 und rund 2 KB Challenge-HTML
+      (CLAUDE.md § 6). Der Adapter ändert daran nichts und soll es nicht —
+      ein Fingerprint-Trick wäre eine Umgehung. Fällt der Abruf so aus,
+      trägt die Nutzlast kein Gerät, die Seite gilt als ungelesen, und die
+      Bestandsdaten altern NICHT.
+      ROBOTS (04.09.2026 gelesen): /robots.txt sperrt für User-agent * nur
+      /is-bin/intershop.enfinity/BOS/ und /is-bin/intershop.static/. Die
+      Shop-Pfade sind frei.
     einstiege:
-      - url: https://www.telekom.de/mobilfunk/geraete/smartphone
-        label: Smartphones
+      # Die Kategorieseite IST die Nutzlast (direkt=True): sie trägt die
+      # Beträge serverseitig, es wird keine Produktseite nachgeladen.
+      # /mobilfunk/geraete/smartphone landet über eine OAuth-Kette
+      # (prompt=none) auf genau dieser Adresse — eine Kette weniger ist
+      # eine Fehlerquelle weniger.
+      # Kein `pfadmuster`: es wirkt nur auf eine Linkernte, und die findet
+      # hier nicht statt. Eine Zeile, die nichts tut, behauptet einen
+      # Abruf, den es nicht gibt.
+      - url: https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag
+        label: Smartphones ohne Vertrag
         kind: static
-        pfadmuster: /shop/geraet/
 
   - name: Vodafone
     typ: netzbetreiber
@@ -326,6 +468,19 @@ anbieter:
       11.08.2026 - "im Roh-HTML steht kein Preis" - bleibt richtig; er gilt
       fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite
       selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404).
+      SEIT DEM 05.09.2026 (B1) traegt dieselbe Detailantwort auch
+      Geraet-x-Tarif-Buendel (`atomics[].prices.composition`, 2-4 je
+      Variante) ohne Klarnamen - nur einen `offerCoreHash`. Aufgeloest wird
+      er ueber einen zweiten, GEZIELTEN Abruf je `hardwareId` gegen
+      `/glados/v2/tariff/v2/hardware`. Die erste Schaetzung ("gut ein
+      Drittel") stammte aus einer Stichprobe von 15 Geraeten/30 Hashes; der
+      volle Lauf vom 05.09.2026 (51 Geraete, 596 Rohsaetze) misst 339 von
+      596 Hashes ueber die Schnittstelle aufloesbar (56,9 %), davon
+      matchen 253 (42,5 % von 596) gegen den hier erfassten Tarifbestand
+      (10 Basistarife XS-XL). Der groesste Rest sind FamilyCard-Varianten
+      (86 Stueck) - namentlich aufgeloest, aber nicht Teil des Bestands,
+      also kein Aufloesungsfehler - siehe `outputs/phase-b1-buendel-
+      vodafone-2026-09-05.md`.
     einstiege:
       - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
         label: Geraeteliste (Schnittstelle der Uebersichtsseite)
@@ -358,30 +513,107 @@ anbieter:
       `User-agent: googlebot`, zusammen mit /chat-ui/ und /ebooking/. Die für
       uns gültige Gruppe `User-agent: *` sperrt den Pfad nicht; unser
       Absender ist TelcoRadar/1.0.
+      SEIT DEM 04.09.2026 WIRD DIESELBE ADRESSE EIN ZWEITES MAL GELESEN,
+      ohne `hwOnly=true` — auch sie gibt /e-shop/ in seiner eigenen Nutzlast
+      aus, und die Antwort nennt ihren Zustand selbst (HW_ONLY | BUNDLE).
+      Sie trägt 88 Geräte MIT Tarif; 22 davon sind Gerät plus Zubehör und
+      fallen heraus. Aus den übrigen 66 werden Bündel für
+      `data/state/geraete_tco.json` — Zuzahlung, Geräterate, Tarifbetrag,
+      Anschlusspreis und Laufzeit getrennt —, KEINE Listungen: ein
+      Bündelmonatspreis gehört nicht in dieselbe Spalte wie ein Barpreis.
+      Die Aufteilung in Geräterate und Tarif steht nur im Trackingblock der
+      Antwort und wird deshalb gegen die typisierten Zahlen derselben
+      Antwort nachgerechnet (Summe = monthlyPrice, Anzahlung = oneTimePrice,
+      Anschluss = activationFee); geht eine Probe nicht auf, wird der Satz
+      verworfen. Am 04.09.2026 gingen alle drei bei 66 von 66 auf, und
+      sieben von sieben nachgeprüften Produktseiten nennen dieselben Beträge
+      in ihrem serverseitigen pdp:PriceSummaryValue.
     einstiege:
       # Die Einstiegsseite IST die Nutzlast (direkt=True): eine Antwort mit
       # allen Geraeten und Preisen, keine Produktseite wird nachgeladen.
       - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__?hwOnly=true
         label: Geraetekatalog ohne Tarif
         kind: static
+      # DIESELBE ADRESSE, EIN PARAMETER WENIGER - und beide gibt /e-shop/ in
+      # seiner eigenen Nutzlast aus. Es ist der Umschalter, den die Seite
+      # ihren Lesern anbietet ("ohne Tarif" / "mit Tarif"); die Antwort sagt
+      # selbst, in welchem Zustand sie steht
+      # (hwCatalogSwitcherStateValue.hwOnlyOrBundleState = HW_ONLY | BUNDLE).
+      # Kein Parameter ist geraten, keine Kombinatorik durchprobiert.
+      #
+      # `kind: buendel` heisst: die Saetze werden KEINE Listungen. Ein
+      # Buendelmonatspreis gehoert nicht in dieselbe Spalte wie ein
+      # Barpreis - er landet als tco_model.Buendel in geraete_tco.json.
+      #
+      # Gemessen 04.09.2026: HTTP 200, 583 KB, 88 Eintraege, davon 22
+      # Geraet PLUS Zubehoer (verworfen). Von den 66 uebrigen gehen alle
+      # drei Rechenproben bei 66 von 66 auf:
+      #   metric3 + metric2 == monthlyPrice   (Geraeterate + Tarif)
+      #   metric5           == oneTimePrice   (Anzahlung)
+      #   metric4           == activationFee  (Anschlusspreis)
+      # Gegengeprueft an acht Produktseiten, die o2 selbst verlinkt: ihr
+      # serverseitiger pdp:PriceSummaryValue nennt dieselben Betraege
+      # ("Geraet mtl. (36 Raten): 34,00 €", "Tarif mtl.
+      # (Mindestlaufzeit 24 Monate): 14,99 €"). Im Betrieb werden diese
+      # Seiten NICHT abgerufen - 66 Seiten a rund 950 KB fuer eine
+      # Aufteilung, die schon in der einen Katalogantwort steht.
+      - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__
+        label: Geraetekatalog mit Tarif
+        kind: buendel
 
   - name: 1&1
     typ: netzbetreiber
     gruppe: United Internet
     rang: 4
-    methode: ldjson
-    aktiv: false
-    grund: >-
-      Es GIBT ld+json, aber sein offers.price ist der MONATSPREIS des Tarifs
-      (37,99 EUR), nicht der Gerätepreis. Diese Zahl in der Preisspalte wäre
-      falsch - und zwar plausibel falsch. Erst anbinden, wenn der Gerätepreis
-      belegbar getrennt vorliegt.
+    methode: einsundeins_buendel
+    aktiv: true
     basis_url: https://mobile.1und1.de
+    rate_limit_sekunden: 2
+    # 42 Kacheln plus Luft. Der Deckel bleibt kleiner als die 167 Adressen
+    # der Seite - fiele die Kachelernte je aus und griffe eine allgemeine
+    # Linkernte, liefe der Sammler in den Deckel und die Seite gälte als
+    # unvollständig gelesen, statt still hundert Themenseiten abzurufen.
+    max_produkte: 45
+    hinweis: >-
+      ANGEBUNDEN SEIT 04.09.2026 — als BÜNDEL, nicht als Barpreis. Der
+      alte Grund bleibt in seinem Kern richtig: offers.price im ld+json
+      ist der MONATSPREIS des Bündels aus Gerät und Tarif, nicht der
+      Gerätepreis (gemessen 04.09.2026 an mobile.1und1.de/iphone-17-pro:
+      HTTP 200, 325 KB, "iPhone 17 Pro mit 1&1 All-Net-Flat S",
+      price 44.99). Als Barpreis gespeichert wäre die Zahl plausibel
+      falsch. Falsch war nur die Folgerung, dass man deshalb warten müsse:
+      1&1 verkauft Geräte ausschließlich im Tarifbund, einen Barpreis gibt
+      es dort nicht — und unter TCO-first ist der Monatspreis ohnehin die
+      Leitgröße.
+      Der Betrag landet deshalb in preis_mit_vertrag_ab, zusammen mit
+      tarif_referenz (aus der description der Seite) und laufzeit_monate
+      (36, aus window.currentHardwareOfferDuration).
+      preis_ohne_vertrag bleibt LEER; ihn aus 44,99 × 36 minus Tarifpreis
+      zu rechnen wäre eine Rechnung dieses Projekts und keine Angabe des
+      Anbieters. Ohne Tarifnamen in der Beschreibung wird der Satz
+      verworfen — eine Bündelzahl ohne ihren Vertrag ist bedeutungslos.
+      Gelesen wird je Produktseite genau die VORAUSGEWÄHLTE Variante
+      (window.currentProductVariants: cosmic orange, 256 GB). Die
+      Preismatrix über Tarif × Speicher lädt die Seite erst im Browser
+      nach; sie braucht einen eigenen Spike und wird hier nicht aus einer
+      einzigen Zahl vervielfältigt.
+      LINKERNTE: die Kategorieseite /smartphones führt 167 Adressen der
+      eigenen Domain, davon 42 Produktseiten. Geerntet wird ausschließlich,
+      was die Seite selbst als Katalogkachel auszeichnet
+      (a.hardware-box__heading). Ein Pfadmuster kann das nicht leisten -
+      /iphone-17-pro und /handyvertrag-ohne-laufzeit sind pfadgleich.
+      ROBOTS (04.09.2026 gelesen): mobile.1und1.de sperrt für User-agent *
+      /xml/, /static/, /modules/ sowie einzelne Aktions- und
+      Bestellstrecken. /smartphones und die Produktseiten sind frei, der
+      Parameter ?chosenTariff= ist ausdrücklich erlaubt.
+      Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus
+      config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
+      dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
+      Gerät die des Herstellers.
     einstiege:
       - url: https://mobile.1und1.de/smartphones
         label: Smartphones
         kind: static
-        pfadmuster: mobile.1und1.de/
 
   # ===================================================== DISCOUNT & ZWEITMARKEN
 
@@ -393,10 +625,29 @@ anbieter:
     rang: 10
     methode: congstar_next
     aktiv: true
+    grund: >-
+      ANGEBUNDEN UND AKTIV, aber noch nie gelaufen - der leere Bestand ist
+      kein Messergebnis, sondern das Fehlen einer Messung. Gemessen am
+      03.09.2026 an den GitHub-Actions-Läufen von geraete.yml: die fünf
+      letzten Nachtläufe (33303341444 vom 30.08. bis 33730902762 vom 03.09.)
+      trugen an ihrem headSha ausnahmslos noch "methode: ldjson, aktiv:
+      false"; der Commit, der auf congstar_next und aktiv: true umstellt
+      (27ef589), ist Vorfahr von keinem dieser fünf Läufe. Die Protokollzeile
+      des Laufs 33730902762 vom 03.09.2026 08:15 UTC sagt entsprechend
+      "congstar -> uebersprungen, 0 Listungen aus 0 Produktseiten" und nennt
+      als Grund den alten Text von aktiv: false. Es ist also weder ein
+      Adapter- noch ein Zugangsproblem: die Aktivierung war zum Startzeitpunkt
+      des letzten Laufs (07:58 UTC) noch nicht auf main. Der erste belastbare
+      Befund fällt mit dem nächsten Nachtlauf an. Bleibt er dann leer, ist
+      als Erstes die robots.txt von www.congstar.de zu messen - für diese
+      Messrunde lag keine vor.
     hinweis: >-
       Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit
-      belegbarem Preis ohne Vertrag - die Telekom selbst steht wegen ihrer
-      AWS-WAF nicht in dieser Datenbank. congstar trifft Apple, Samsung,
+      belegbarem Preis ohne Vertrag - die Telekom selbst steht nicht in
+      dieser Datenbank, weil ihr Gerätepreis nur als Ratenzahlung ausgewiesen
+      wird (nicht, wie hier bis zum 03.09.2026 stand, wegen ihrer AWS-WAF:
+      die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe grund
+      beim Anbieter Telekom). congstar trifft Apple, Samsung,
       Google UND Xiaomi (Google fehlte bisher ganz).
       Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM
       TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig -

@@ -16,8 +16,8 @@ import pytest
 
 from telco_radar.collect import tarif_crawler
 from telco_radar.collect.tarif_crawler import (
-    Feldaenderung, TarifSpeicher, als_item, dokumentlinks, lade_quellen,
-    sammle, tarif_id, vergleiche,
+    Feldaenderung, TarifSpeicher, _sortiere, als_item, dokumentlinks,
+    juengste_fassung, lade_quellen, linktexte, sammle, tarif_id, vergleiche,
 )
 from telco_radar.tarif_model import Tarif
 
@@ -540,3 +540,425 @@ def test_dieselbe_adresse_bleibt_eine_versionsfolge(tmp_path):
                       typ="text/plain")}))
     assert bilanz["geaendert"] == 1
     assert len(items) == 1
+
+
+# --------------------------------------------------------------------------- #
+# Die Vorauswahl: juengste Fassung und Linkbeschriftung
+#
+# Nachgetragen am 04.09.2026. Bis dahin wurden aus 1114 verlinkten
+# Telekom-Dokumenten fuenf ausgewaehlt, und VIER davon waren derselbe Tarif
+# in vier Vermarktungsstaenden - der aelteste von 2017.
+# --------------------------------------------------------------------------- #
+
+_TELEKOM = "https://www.telekom.de/produktinformationsblatt/"
+
+
+def test_von_vier_staenden_bleibt_der_neueste():
+    """Live gemessen: `magentamobil-l` steht in vier Faellen verlinkt.
+
+    Alle vier tragen die Titelzeile "MagentaMobil L". Ohne diese Auswahl
+    bekam die STABILE Tarif-ID `telekom:magentamobil-l` den Stand von 2017
+    (54,95 EUR, ohne erkannte Laufzeit), waehrend der aktuelle Stand
+    (59,95 EUR) unter einem Hash-Zusatz landete - die Zeitreihe haengt dann
+    am toten Produkt.
+    """
+    links = [_TELEKOM + s for s in ("magentamobil-l-20170601",
+                                    "magentamobil-l-20180831",
+                                    "magentamobil-l-20220701",
+                                    "magentamobil-l-20240801")]
+    assert juengste_fassung(links) == [_TELEKOM + "magentamobil-l-20240801"]
+
+
+def test_verschiedene_tarife_bleiben_alle():
+    """Gruppiert wird nach Adressstamm, nicht nach Anbieter."""
+    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
+                                    "magentamobil-m-20240801",
+                                    "magentamobil-m-20180831")]
+    assert juengste_fassung(links) == [_TELEKOM + "magentamobil-s-20240801",
+                                       _TELEKOM + "magentamobil-m-20240801"]
+
+
+def test_eine_variante_ist_ein_eigener_tarif():
+    """`-flex` und `-young` sind eigene, aktuell vermarktete Tarife.
+
+    Sie duerfen nicht als aeltere Fassung des Grundtarifs verschwinden -
+    ihr Adressstamm ist ein anderer.
+    """
+    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
+                                    "magentamobil-s-flex-20240801",
+                                    "magentamobil-s-young-20251007")]
+    assert juengste_fassung(links) == links
+
+
+def test_adressen_ohne_datum_bleiben_unberuehrt():
+    """o2, Vodafone und congstar datieren ihre Dateinamen nicht so.
+
+    Die Reihenfolge bleibt die der Seite - sie ist bei congstar die einzige
+    Ordnung, die es gibt, solange `bevorzugt` nichts trifft.
+    """
+    links = ["https://static2.o9.de/resource/blob/2241742/x/o2-mobile-m.pdf",
+             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf",
+             "https://www.vodafone.de/x/VF-Mobil-M-Juli-2026.pdf"]
+    assert juengste_fassung(links) == links
+
+
+def test_eine_achtstellige_zahl_ohne_jahr_ist_kein_datum():
+    """Dieselbe Vorsicht wie beim Datum aus dem Link in `collect/rss.py`.
+
+    `-19990101` waere ein Datum, `-12345678` ist eine Artikelnummer. Ohne
+    die Jahresgrenze frisst die Regel jede numerierte Adresse - und
+    loeschte bei congstar reihenweise Dokumente.
+    """
+    links = ["https://x.de/a/doc-12345678", "https://x.de/a/doc-99887766"]
+    assert juengste_fassung(links) == links
+
+
+def test_bevorzugt_findet_den_tarif_in_der_linkbeschriftung():
+    """congstar numeriert seine Dateinamen durch.
+
+    `Produktinformationsblatt_549.pdf` sagt nichts; der Linktext
+    "Produktinformationsblatt congstar Allnet Flat L mit Upgrade-
+    Versprechen" sagt alles. Ohne den Text kann die Vorauswahl dort nur
+    die Seitenreihenfolge nehmen - und die ist keine Zusage.
+    """
+    links = ["https://www.congstar.de/x/Produktinformationsblatt_9001.pdf",
+             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf"]
+    texte = {links[0]: "Produktinformationsblatt Homespot & Go S",
+             links[1]: "Produktinformationsblatt congstar Allnet Flat L"}
+    assert _sortiere(links, ["congstar allnet flat"], texte)[0] == links[1]
+    # Ohne die Beschriftung bleibt es bei der Seitenreihenfolge - und die
+    # ist bei congstar die einzige Ordnung, die es gibt: die Seite stellt
+    # die laufenden Tarife nach oben.
+    assert _sortiere(links, ["congstar allnet flat"]) == links
+
+
+def test_linktexte_liest_dieselbe_menge_wie_dokumentlinks():
+    """Sonst bekaeme die Vorauswahl eine Beschriftung zu einer Adresse, die
+    gar nicht abgerufen werden darf - oder umgekehrt keine zu einer, die es
+    darf."""
+    html = ('<a href="/pib/Produktinformationsblatt_1.pdf">Allnet Flat S</a>'
+            '<a href="/agb/">AGB</a>'
+            '<a href="/pib/Produktinformationsblatt_2.pdf">Allnet Flat M</a>')
+    basis = "https://www.congstar.de/produktinformationsblaetter/"
+    links = dokumentlinks(html, basis, ["produktinformationsblatt"])
+    texte = linktexte(html, basis, ["produktinformationsblatt"])
+    assert set(texte) == set(links)
+    assert texte[links[0]] == "Allnet Flat S"
+
+
+def test_ein_einstieg_ohne_dokumentlink_meldet_sich(caplog, tmp_path):
+    """Der stumme Ausfall, der die Telekom zwei Monate gekostet hat.
+
+    Ihre Seite antwortet aus GitHub Actions mit einer Challenge: HTTP 202,
+    rund 2 KB, kein <a>. Das ist kein Fehlerstatus, `raise_for_status()`
+    laesst ihn durch, und der Sammler zaehlte still "0 verlinkt" weiter.
+    Ohne Status und Groesse in der Zeile ist eine Challenge nicht von einer
+    leeren Rubrik zu unterscheiden.
+    """
+    import logging
+    (tmp_path / "config").mkdir()
+    (tmp_path / "config" / "tarif_quellen.yaml").write_text(
+        "quellen:\n  - anbieter: Telekom\n    einstieg:\n"
+        "      - https://www.telekom.de/produktinformationsblatt\n"
+        "    pfadmuster:\n      - /produktinformationsblatt/\n",
+        encoding="utf-8")
+
+    class Challenge:
+        status_code = 202
+        text = "<html><body>bitte warten</body></html>"
+        content = b"x" * 2048
+        headers = {"content-type": "text/html"}
+
+    with caplog.at_level(logging.WARNING):
+        _, bilanz = sammle(tmp_path, {}, hole=lambda u, c: Challenge())
+    assert bilanz["ohne_links"] == 1
+    assert bilanz["fehler"] == 0        # es war eben KEIN Fehler
+    assert "202" in caplog.text and "2048" in caplog.text
+
+
+def test_der_erste_wunsch_frisst_nicht_den_ganzen_einkauf():
+    """Reihum durch die Wuensche, nicht Wunsch fuer Wunsch.
+
+    Am 04.09.2026 gemessen: "magentamobil-s-" trifft neun Telekom-Dokumente
+    (der Tarif plus Flex-, Young-, Friends- und Happy-Varianten), und sie
+    stehen alle vor dem ersten M-Dokument. Ein Deckel von zwoelf brachte
+    damit NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
+    Dieselbe Ueberlegung wie `_interleave_by_source` in der Pipeline.
+    """
+    links = ([f"https://x.de/magentamobil-s-{i}" for i in range(9)]
+             + ["https://x.de/magentamobil-m-1", "https://x.de/magentamobil-l-1"])
+    gereiht = _sortiere(links, ["magentamobil-s-", "magentamobil-m-",
+                                "magentamobil-l-"])
+    assert gereiht[:3] == ["https://x.de/magentamobil-s-0",
+                           "https://x.de/magentamobil-m-1",
+                           "https://x.de/magentamobil-l-1"]
+    # Ohne Reihum stuenden hier die naechsten acht S-Dokumente.
+    assert gereiht[3] == "https://x.de/magentamobil-s-1"
+
+
+def test_unerwuenschtes_steht_hinten_und_geht_nicht_verloren():
+    """Ein Deckel schneidet, die Vorauswahl loescht nicht.
+
+    Was kein Wunsch trifft, faellt in Seitenreihenfolge ans Ende - es kann
+    einen Deckel unterschreiten, aber es verschwindet nicht aus der Liste.
+    """
+    links = ["https://x.de/anderes-a", "https://x.de/wunsch-1",
+             "https://x.de/anderes-b"]
+    assert _sortiere(links, ["wunsch"]) == ["https://x.de/wunsch-1",
+                                            "https://x.de/anderes-a",
+                                            "https://x.de/anderes-b"]
+
+
+# --------------------------------------------------------------------------- #
+# Die zweite Lesart: die Einstiegsseite IST die Nutzlast (seit 04.09.2026)
+# --------------------------------------------------------------------------- #
+
+_SHOP = "https://www.1und1.de/handytarife"
+
+CONFIG_LDJSON = f"""
+quellen:
+  - anbieter: 1&1
+    methode: ldjson
+    einstieg: ["{_SHOP}"]
+    max_dokumente: 10
+"""
+
+
+def _shop_seite(*betraege: str) -> str:
+    """Eine Shop-Seite mit je einem Product-Knoten pro Betrag."""
+    knoten = "".join(
+        '<script type="application/ld+json">'
+        '{"@type": "Product", "name": "1&1 All-Net-Flat %s", '
+        '"description": "1&1 All-Net-Flat %s 10 GB", '
+        '"brand": {"name": "1&1"}, '
+        '"offers": {"priceCurrency": "EUR", "price": "%s"}}</script>'
+        % (name, name, betrag)
+        for name, betrag in zip("SML", betraege))
+    return f"<html><body>{knoten}</body></html>"
+
+
+def _staende(root: Path) -> list[dict]:
+    pfad = root / "data" / "state" / "tarife.jsonl"
+    return [json.loads(z) for z in pfad.read_text(encoding="utf-8").splitlines()
+            if z.strip()]
+
+
+def test_ldjson_quelle_ruft_ausschliesslich_ihre_einstiegsseite_ab(tmp_path):
+    """Kein Link wird geerntet, keine zweite Adresse geholt. Damit ist die
+    Regel "nur abrufen, was verlinkt ist" hier trivial erfuellt - abgerufen
+    wird genau die Adresse, die in der Konfiguration steht."""
+    netz = _Netz({
+        _SHOP: _Antwort(_shop_seite("14.99", "19.99")
+                        + '<a href="https://www.1und1.de/handytarife-ohne-handy">SIM</a>'),
+        "https://www.1und1.de/handytarife-ohne-handy": _Antwort(_shop_seite("14.99")),
+    })
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert netz.abgerufen == [_SHOP]
+    assert bilanz["geholt"] == 1
+    assert bilanz["gelesen"] == 2
+    # `verlinkt` bleibt 0: es wurde nichts verlinkt. Eine Null in einer
+    # Spalte, die hier nichts messen kann, waere eine Falschmeldung.
+    assert bilanz["verlinkt"] == 0
+
+
+def test_ldjson_satz_traegt_preistyp_und_shop_adresse(tmp_path):
+    netz = _Netz({_SHOP: _Antwort(_shop_seite("14.99"))})
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    sammle(root, {}, jetzt=JETZT, hole=netz)
+    satz = _staende(root)[0]
+    assert satz["preistyp"] == "live_shop"
+    assert satz["dokument_url"] == _SHOP
+    assert satz["grundgebuehr"] == 14.99
+    assert satz["anbieter"] == "1&1"
+
+
+def test_pib_satz_bleibt_ein_dokumentsatz(tmp_path):
+    """Der Vorgabewert ist `dokument`. Jeder Bestandssatz aus der Zeit vor
+    dem 04.09.2026 bleibt beim Wiedereinlesen genau das, was er war."""
+    verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
+    netz = _Netz({EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+                  verlinkt: _Antwort(_pib_text(), typ="text/plain")})
+    root = _repo(tmp_path, CONFIG)
+    sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert _staende(root)[0]["preistyp"] == "dokument"
+
+
+def test_zwei_knoten_einer_seite_bleiben_zwei_tarife(tmp_path):
+    """Sieben Tarife teilen sich eine Adresse. Waere die Herkunft die
+    Adresse statt der Fingerabdruck, waeren zwei gleichnamige Knoten zwei
+    Fassungen desselben Tarifs statt zweier Produkte."""
+    netz = _Netz({_SHOP: _Antwort(_shop_seite("14.99", "19.99", "24.99"))})
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert bilanz["grundlinie"] == 3
+    assert len({s["tarif_id"] for s in _staende(root)}) == 3
+
+
+def test_zweiter_lauf_derselben_shop_seite_meldet_nichts(tmp_path):
+    netz = _Netz({_SHOP: _Antwort(_shop_seite("14.99", "19.99"))})
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    sammle(root, {}, jetzt=JETZT, hole=netz)
+    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert bilanz["unveraendert"] == 2 and bilanz["grundlinie"] == 0
+    assert items == []
+
+
+def test_geaenderter_shop_preis_wird_gemeldet(tmp_path):
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    sammle(root, {}, jetzt=JETZT,
+           hole=_Netz({_SHOP: _Antwort(_shop_seite("14.99"))}))
+    items, bilanz = sammle(root, {}, jetzt=JETZT,
+                           hole=_Netz({_SHOP: _Antwort(_shop_seite("12.99"))}))
+    assert bilanz["geaendert"] == 1
+    assert len(items) == 1
+    assert "14.99" in items[0].summary and "12.99" in items[0].summary
+    # Die Meldung nennt ihre Quellenart. "Gesetzlich vorgeschriebenes
+    # Produktinformationsblatt" waere hier schlicht falsch - eine Zahl aus
+    # den strukturierten Daten einer Werbeseite traegt keine gesetzliche
+    # Wahrheitsbewehrung.
+    assert "Der Preis auf der Shop-Seite hat sich geändert" in items[0].summary
+    assert "Produktinformationsblatt" not in items[0].summary
+    assert items[0].source_name == "1&1 (Shop-Seite)"
+
+
+def test_shop_seite_ohne_tarif_faellt_auf_statt_stumm_zu_bleiben(tmp_path, caplog):
+    """Derselbe Befund wie eine Einstiegsseite ohne Dokumentlink, und er
+    muss genauso laut sein: eine Seite, die 200 und 450 KB liefert und
+    trotzdem keinen Tarif hergibt, hat ihr Format geaendert oder eine
+    Challenge ausgeliefert."""
+    netz = _Netz({_SHOP: _Antwort("<html><body>Bitte warten</body></html>")})
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    with caplog.at_level("WARNING"):
+        _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert bilanz["ohne_links"] == 1
+    assert bilanz["gelesen"] == 0
+    assert "KEIN Tarif" in caplog.text
+
+
+def test_toter_shop_einstieg_kippt_den_lauf_nicht(tmp_path):
+    root = _repo(tmp_path, CONFIG_LDJSON)
+    _, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz({}))
+    assert bilanz["fehler"] == 1 and bilanz["gelesen"] == 0
+
+
+def test_vertippte_methode_wird_laut_und_nicht_zur_vorgabe(tmp_path):
+    """Ohne diese Zeile faellt ein Tippfehler erst auf, wenn jemand merkt,
+    dass ein Anbieter seit Wochen nichts mehr liefert."""
+    netz = _Netz({_SHOP: _Antwort(_shop_seite("14.99"))})
+    root = _repo(tmp_path, CONFIG_LDJSON.replace("methode: ldjson",
+                                                 "methode: ldjsom"))
+    _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
+    assert bilanz["fehler"] == 1
+    assert netz.abgerufen == []
+
+
+def test_die_ausgelieferte_config_kennt_nur_gebaute_methoden():
+    from telco_radar.collect.tarif_crawler import (
+        METHODE_KACHELN, METHODE_LDJSON, METHODEN,
+    )
+    quellen = lade_quellen(Path(__file__).resolve().parents[1])
+    assert {q.methode for q in quellen} <= set(METHODEN)
+    einsundeins = [q for q in quellen if q.anbieter == "1&1"]
+    assert len(einsundeins) == 1
+    assert einsundeins[0].methode == METHODE_LDJSON
+    assert einsundeins[0].einstieg == ["https://www.1und1.de/handytarife"]
+    # o2 steht ZWEIMAL: einmal mit seinen Pflichtblaettern, einmal mit den
+    # Preiskacheln der SIM-only-Seite. Das ist kein Duplikat, sondern die
+    # Regel aus dem Konfigkopf ("Ein Anbieter darf in beiden Lesarten
+    # auftauchen") - und ohne die Kacheln kaeme kein o2-Buendel in den
+    # TCO-Bestand.
+    o2 = [q for q in quellen if q.anbieter == "o2"]
+    assert {q.methode for q in o2} == {"dokumente", METHODE_KACHELN}
+    kacheln = [q for q in o2 if q.methode == METHODE_KACHELN][0]
+    assert kacheln.einstieg == [
+        "https://www.o2online.de/tarife/handyvertrag-ohne-handy/"]
+
+
+# --------------------------------------------------------------------------
+# Zwei Lesarten sind zwei Zeitreihen
+# --------------------------------------------------------------------------
+
+def _stand(name, preistyp, grundgebuehr, laufzeit=None):
+    from telco_radar.tarif_model import HOCH, Tarif
+    tarif = Tarif(anbieter="o2", name=name, preistyp=preistyp,
+                  abgerufen_am="2026-09-04", rohtext=f"{name} {grundgebuehr}")
+    tarif.confidence["grundgebuehr"] = HOCH
+    tarif.grundgebuehr = grundgebuehr
+    tarif.laufzeit_monate = laufzeit
+    return tarif
+
+
+def _lege_ab(speicher, tarif, herkunft, im_lauf=None):
+    from telco_radar.collect.tarif_crawler import uebernimm_stand
+    bilanz = {"grundlinie": 0, "unveraendert": 0, "geaendert": 0,
+              "kleingedruckt": 0}
+    items = []
+    uebernimm_stand(tarif, hash_=herkunft, herkunft=herkunft,
+                    speicher=speicher, bilanz=bilanz,
+                    im_lauf=im_lauf if im_lauf is not None else {},
+                    items=items, jetzt=JETZT)
+    return bilanz, items
+
+
+def test_shop_preis_wird_keine_neue_fassung_des_pflichtblattes(tmp_path):
+    """Der Fehler, den der erste o2-Kachellauf am 04.09.2026 gezeigt hat.
+
+    Blatt und Kachel nennen denselben Tarif ("O2 Mobile Unlimited M Flex")
+    und tragen deshalb dieselbe Tarif-ID. In EINER Zeitreihe wird die
+    Kachel zur naechsten Fassung des Blattes - und `vergleiche` meldet als
+    Tarifaenderung, was in Wahrheit der Unterschied zwischen einem PDF und
+    einer Werbeseite ist. Genau dagegen ist `preistyp` gebaut.
+    """
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+
+    bilanz, _ = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
+                                          PREISTYP_DOKUMENT, 39.99, 24),
+                         "https://o2.de/blatt.pdf")
+    assert bilanz["grundlinie"] == 1
+
+    bilanz, items = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
+                                              PREISTYP_LIVE_SHOP, 39.99),
+                             "kachelhash")
+    # Eine eigene Grundlinie - KEINE Aenderungsmeldung.
+    assert bilanz["grundlinie"] == 1 and bilanz["geaendert"] == 0
+    assert items == []
+    assert [s["tarif_id"] for s in speicher.staende] == [
+        "o2:o2-mobile-unlimited-m-flex",
+        "o2:o2-mobile-unlimited-m-flex#live_shop"]
+
+
+def test_der_zusatz_bleibt_ueber_die_laeufe_stabil(tmp_path):
+    """Er ist der PREISTYP und kein Inhaltshash.
+
+    Ein Hash aenderte sich mit jeder Preisaenderung - die Zeitreihe der
+    zweiten Lesart zerfiele in lauter Einzelsaetze, und kein Diff
+    verbaende je zwei Staende.
+    """
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_DOKUMENT, 24.99),
+             "https://o2.de/blatt.pdf")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99),
+             "hash-eins")
+    bilanz, items = _lege_ab(speicher,
+                             _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99),
+                             "hash-zwei")
+    assert bilanz["geaendert"] == 1 and len(items) == 1
+    assert [s["tarif_id"] for s in speicher.staende] == [
+        "o2:o2-mobile-l", "o2:o2-mobile-l#live_shop", "o2:o2-mobile-l#live_shop"]
+
+
+def test_dieselbe_lesart_bleibt_eine_zeitreihe(tmp_path):
+    """Die Gegenprobe: ohne sie truennte die Regel auch, was zusammengehoert."""
+    from telco_radar.collect.tarif_crawler import TarifSpeicher
+    from telco_radar.tarif_model import PREISTYP_LIVE_SHOP
+    speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99), "a")
+    bilanz, _ = _lege_ab(speicher,
+                         _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "b")
+    assert bilanz["geaendert"] == 1
+    assert {s["tarif_id"] for s in speicher.staende} == {"o2:o2-mobile-l"}

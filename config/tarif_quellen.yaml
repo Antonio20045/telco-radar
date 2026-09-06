@@ -18,17 +18,86 @@
 # Slugs sind 404. Beim Bau dieses Moduls wurde `magentamobil-l-20250401`
 # geraten - es gibt nur `magentamobil-data-l-20250401`.
 #
+# WIE AUS 1114 LINKS FUENF DOKUMENTE WERDEN
+# ------------------------------------------
+# Drei Stufen, in dieser Reihenfolge (`collect/tarif_crawler.py`):
+#
+#   1. `pfadmuster`  - was ueberhaupt ein Tarifdokument sein kann.
+#   2. juengste Fassung - je Adressstamm nur der neueste Vermarktungsstand.
+#      Die Telekom laesst alle Faelle seit 2017 verlinkt stehen.
+#   3. `bevorzugt`   - welche Tarife uns interessieren. Gesucht wird in der
+#      Adresse UND in der Linkbeschriftung; congstar numeriert seine
+#      Dateinamen durch und nennt den Tarif nur im Linktext.
+#
 # FREQUENZ
 # --------
 # Einmal woechentlich. Diese Dokumente aendern sich selten, und genau
 # deshalb ist jede Aenderung ein Signal.
+#
+# ZWEI LESARTEN, SEIT DEM 04.09.2026
+# -----------------------------------
+#   methode: dokumente   Der Regelfall und die belastbarste Quelle dieses
+#                        Marktes: von der Einstiegsseite werden VERLINKTE
+#                        Pflichtdokumente nach § 1 TK-TransparenzV geholt
+#                        und gelesen. Der Satz traegt `preistyp: dokument`.
+#   methode: ldjson      Die Einstiegsseite IST die Nutzlast: ihre
+#                        strukturierten Daten nach schema.org tragen die
+#                        Tarife selbst. Kein Link wird geerntet, keine
+#                        zweite Adresse abgerufen. Der Satz traegt
+#                        `preistyp: live_shop`.
+#   methode: kacheln     Wie `ldjson`, nur ohne strukturierte Daten:
+#                        gelesen werden die PREISKACHELN, die der Anbieter
+#                        selbst als solche auszeichnet. Auch dieser Satz
+#                        traegt `preistyp: live_shop`.
+#                        Nur wo es die anderen zwei Wege nicht gibt - eine
+#                        Kachel ist Auszeichnung einer Seite und kein
+#                        Datenformat, sie kann sich mit einem Redesign
+#                        aendern. Bei o2 gibt es die anderen zwei nicht:
+#                        die Tarifseite traegt genau ein ld+json (eine
+#                        BreadcrumbList), und die Pflichtblaetter zu allen
+#                        Tarifen ausser einem liegen unter /assets/ - ein
+#                        Pfad, den die fuer uns gueltige robots-Gruppe
+#                        `User-agent: *` sperrt.
+#   methode: telekom_kacheln  Eigene Lesart fuer ein eigenes Markup: die
+#                        Telekom zeichnet ihre Tarifkacheln nicht als
+#                        Web-Component-Attribut aus (wie o2), sondern als
+#                        React-CSS-Modul-Klassen. Siehe
+#                        `collect/tarif_telekom_kacheln.py` fuer die
+#                        Messung vom 05.09.2026 und die Regel, warum der
+#                        DURCHGESTRICHENE Preis zaehlt und nicht der grosse
+#                        "Ø"-Kombipreis.
+#
+# Das Blatt traegt den Vermarktungsstand, die Shop-Seite den Preis von
+# heute. Beide sind richtig, und sie DUERFEN auseinanderlaufen - die
+# Abweichung ist die Auskunft, nicht der Fehler. Deshalb steht der Preistyp
+# an jedem Satz und wird nicht wegnormalisiert. Ein Anbieter darf in beiden
+# Lesarten auftauchen; die PIB-Blaetter bleiben, wo sie sind.
+#
+# Eine unbekannte `methode` wird NICHT stillschweigend zur Vorgabe: sie
+# faellt in `tarif_crawler.sammle()` mit einer Warnung auf. Ein Tippfehler
+# soll nicht dazu fuehren, dass eine Shop-Seite als Dokumentverzeichnis
+# gelesen wird und null Links liefert.
 
 quellen:
   - anbieter: Telekom
-    # 1177 verlinkte Produktinformationsblaetter, als echte <a>-Tags.
+    # 1114 verlinkte Produktinformationsblaetter, als echte <a>-Tags
+    # (gemessen 04.09.2026 aus der Sandbox: HTTP 200, 581 KB).
     # Die Telekom liefert das PDF unter dem Slug OHNE .pdf-Endung und mit
     # Content-Type application/pdf - deshalb entscheidet der Content-Type,
     # nicht die Dateiendung.
+    #
+    # ACHTUNG, GEMESSENER UNTERSCHIED ZWISCHEN SANDBOX UND ACTIONS:
+    # Im Lauf 33644684296 (02.09.2026) meldete der Sammler "3 verlinkt, 0
+    # Fehler" - die drei sind o2. Von der Telekom kam KEIN Link, ohne dass
+    # etwas geworfen haette. Das ist die in CLAUDE.md dokumentierte
+    # 202-Challenge: telekom.de antwortet httpx aus dem Actions-IP-Bereich
+    # mit HTTP 202 und rund 2 KB Challenge-HTML statt mit der Seite. HTTP
+    # 202 ist kein Fehlerstatus, `raise_for_status()` laesst ihn durch, und
+    # eine Seite ohne <a> liefert eben keine Links. Seit dem 04.09.2026
+    # sagt der Sammler das laut (`ohne_links` in der Bilanz, WARNING mit
+    # Status und Byte-Zahl) - vorher war der Ausfall vollkommen stumm.
+    # Ein Fingerprint-Trick waere hier keine Loesung, sondern eine
+    # Umgehung; die Grenze steht in STRATEGY_GERAETE_TCO.md R3.
     #
     # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4,
     # 06.09.2026): `config/settings.yaml -> http.user_agent` traegt seit
@@ -40,21 +109,102 @@ quellen:
     # genau diesem Absender bestaetigt HTTP 200 - kein Bot-Schutz, keine
     # Umgehung noetig. Diese Zeile setzt den Absender NUR fuer Telekom;
     # `http.user_agent` bleibt fuer jede andere Quelle unveraendert, das ist
-    # die PM-Entscheidung, die weiterhin aussteht.
+    # die PM-Entscheidung, die weiterhin aussteht. Die 202-Challenge oben
+    # betrifft den GitHub-Actions-IP-Bereich, nicht diesen Absenderwechsel:
+    # aus der Sandbox bzw. von Antonios Rechner (H1, woechentlicher
+    # Lokallauf) kommt der Abruf so oder so durch, in Actions bleibt er
+    # unabhaengig von der UA weiterhin offen.
     user_agent: "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
     einstieg:
       - https://www.telekom.de/produktinformationsblatt
     pfadmuster:
       - /produktinformationsblatt/
-    # Aus 1177 Dokumenten die aktuellen herausgreifen. Alphabetisch die
-    # ersten drei zu nehmen liefert Tarife von 2017.
+    # Die aktuell vermarktete Hauptlinie und ihre Flex-Varianten - je ein
+    # Wunsch, je ein Dokument. Das "-2" ist die Jahrtausendziffer des
+    # Vermarktungsdatums und damit die Grenze zum naechsten Tarif:
+    # "magentamobil-s-2" trifft `magentamobil-s-20240801`, aber weder
+    # `magentamobil-s-flex-20240801` noch `magentamobil-s-young-20251007`.
+    #
+    # Ohne diese Schaerfe holte der Sammler am 04.09.2026 NEUNMAL
+    # MagentaMobil S in seinen Varianten und kein einziges Mal M, L, XL
+    # oder Basic: `magentamobil-s-` trifft neun Dokumente, und die standen
+    # alle vor dem ersten M. Der Sammler geht seither reihum durch die
+    # Wuensche (`_sortiere`) - beides zusammen ergibt die Auswahl unten.
+    #
+    # `max_dokumente` ist genau die Zahl der Wuensche. Damit bestimmt
+    # ausschliesslich diese Liste, was geholt wird; ein Auffuellen aus den
+    # 1114 uebrigen Adressen brachte am 04.09.2026 undatierte Dauerlinks
+    # (`magentamobil-s-flex` ohne Datum) mit derselben Titelzeile wie ihr
+    # datiertes Gegenstueck - und damit Tarif-IDs mit Hash-Zusatz fuer
+    # zwei Dokumente desselben Produkts.
     bevorzugt:
-      - "magentamobil-basic-2"
-      - "magentamobil-l-2"
-      - "magentamobil-m-2"
       - "magentamobil-s-2"
+      - "magentamobil-m-2"
+      - "magentamobil-l-2"
       - "magentamobil-xl-2"
-    max_dokumente: 5
+      - "magentamobil-basic-2"
+      - "magentamobil-s-flex-2"
+      - "magentamobil-m-flex-2"
+      - "magentamobil-l-flex-2"
+      - "magentamobil-xl-flex-2"
+    max_dokumente: 9
+
+  - anbieter: Vodafone
+    # Gemessen 04.09.2026: `vodafone.de/infofaxe` (bis dahin der einzige
+    # notierte Kandidat) traegt genau DREI PDFs, alle unter
+    # `/infofaxe/1xx.pdf` - alte numerierte Infofaxe, kein
+    # Tarifverzeichnis. Die echten Einstiege stehen dort verlinkt: die
+    # `/hilfe/pib-*.html`-Seiten. Die Mobilfunkseite traegt 195 PDF-Links,
+    # die CallYa-Seite 10; kein einziger Fehltreffer zum Muster ".pdf".
+    #
+    # Vodafones PIB ist das einzige Dokument im Bestand, das seine
+    # PREISPHASEN selbst auszeichnet ("Monat 1-24" / "ab Monat 25") - und
+    # das einzige, das die SIM-only-Stufe und die Geraetestufen desselben
+    # Tarifs in einer Tabelle nebeneinanderstellt. Genau daraus entsteht
+    # der Massstab, gegen den ein Geraeteanteil rechenbar wird.
+    #
+    # Die CallYa-Seite (10 PDFs) ist gemessen und BEWUSST nicht
+    # eingetragen: CallYa rechnet im Vierwochentakt ("Vertragslaufszeiten
+    # 4 Wochen"), und `Tarif.grundgebuehr` meint einen Monatspreis.
+    # Dreizehn Zyklen im Jahr in zwoelf Monate umzurechnen waere eine
+    # Rechnung dieses Projekts und keine Angabe des Anbieters. Der
+    # Extraktor sperrt solche Preise seit dem 04.09.2026 ohnehin
+    # (`_ABRECHNUNG_IN_WOCHEN`) - die Seite abzurufen kostet dann nur noch
+    # Zeit.
+    einstieg:
+      - https://www.vodafone.de/hilfe/pib-privatkunden-tarife-mobilfunk.html
+    pfadmuster:
+      - ".pdf"
+    # "vf-mobil-" trifft am 04.09.2026 genau die zehn aktuell vermarkteten
+    # Mobilfunktarife (XS/S/M/L/XL, je ohne und mit Smartphone) und nichts
+    # sonst. Die Dateinamen tragen den Vermarktungsmonat im Klartext
+    # ("VF-Mobil-M-Juli-2026.pdf"), nicht das YYYYMMDD-Muster der Telekom -
+    # die Stufe "juengste Fassung" greift hier also nicht.
+    bevorzugt:
+      - "vf-mobil-"
+    max_dokumente: 10
+
+  - anbieter: congstar
+    # Netz Telekom, eigene Preise. Gemessen 04.09.2026: die Startseite
+    # verlinkt `/produktinformationsblaetter/` (Linkernte, kein Rateversuch),
+    # dort stehen 317 Dokumente in drei Pfadvarianten - deshalb das Muster
+    # auf dem DATEINAMEN und nicht auf einem Verzeichnis: "/pibs/" allein
+    # laesst 26 Dokumente der Variante `/fileadmin/produktinformationsblatt/`
+    # liegen.
+    #
+    # Die Dateinamen sind durchnumeriert (`Produktinformationsblatt_549.pdf`)
+    # und tragen keinen Tarifnamen. Der steht in der Linkbeschriftung, und
+    # nur deshalb kann `bevorzugt` hier ueberhaupt etwas ausrichten.
+    einstieg:
+      - https://www.congstar.de/produktinformationsblaetter/
+    pfadmuster:
+      - "produktinformationsblatt"
+    # Nur Postpaid. congstars Prepaid-Blaetter nennen ihren Preis je vier
+    # Wochen ("10,00 € / 4 Wochen", gemessen 04.09.2026) - siehe die
+    # Begruendung bei Vodafone.
+    bevorzugt:
+      - "congstar allnet flat"
+    max_dokumente: 10
 
   - anbieter: o2
     # Die PDFs liegen auf static2.o9.de unter Blob-IDs. Verlinkt sind sie
@@ -65,14 +215,202 @@ quellen:
       - ".pdf"
     max_dokumente: 5
 
-# --- Warum 1&1 (noch) fehlt
+  # --------------------------------------------------------------- LIVE-SHOP
+  # Ab hier: `methode: ldjson`. Die Seite selbst ist die Nutzlast.
+
+  - anbieter: 1&1
+    methode: ldjson
+    # Gemessen 04.09.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
+    # 452 KB statisches HTML, ein `application/ld+json` mit einem @graph
+    # aus SIEBEN Product-Knoten. Gelesen wurden daraus
+    #   1&1 All-Net-Flat S   14,99 EUR   10 GB
+    #   1&1 All-Net-Flat M   14,99 EUR   50 GB
+    #   1&1 All-Net-Flat L   19,99 EUR  150 GB
+    #   1&1 Unlimited on demand S/M/L   19,99 / 19,99 / 24,99 EUR
+    #   1&1 Unlimited XL     39,99 EUR  (ohne GB-Angabe in der description)
+    # Uebernommen werden Name, Grundgebuehr und - wenn die `description`
+    # sie nennt - das Datenvolumen. Sonst NICHTS: die Knoten nennen weder
+    # Laufzeit noch Preisphase, also traegt der Satz keine. Dass S und M
+    # denselben Betrag tragen, steht so in der Quelle und wird nicht
+    # geglaettet.
+    #
+    # WARUM DIESE ZAHL EIN TARIFPREIS OHNE GERAET IST: derselbe Graph mit
+    # denselben Betraegen steht auf der SIM-only-Seite
+    # https://www.1und1.de/handytarife-ohne-handy - der Anbieter stellt ihn
+    # dort selbst als Preis ohne Hardware aus. Die Seite wird deshalb NICHT
+    # zusaetzlich abgerufen: derselbe Graph unter zwei Adressen ergaebe
+    # dieselben sieben Tarife zweimal, und der Sammler haengte an den
+    # zweiten Satz einen Hash-Zusatz.
+    #
+    # ABGRENZUNG GEGEN DEN GERAETEZWEIG: mobile.1und1.de/iphone-17-pro
+    # traegt AUCH einen Product-Knoten mit `offers.price`, dort aber
+    # 44,99 EUR als Monatspreis des BUENDELS. Unterschieden wird an der
+    # Marke - ein Tarif traegt die des Anbieters ("1&1"), ein Geraet die
+    # des Herstellers ("Apple"). Fremde Marke heisst: uebersprungen und
+    # protokolliert.
+    #
+    # ROBOTS (04.09.2026 gelesen): www.1und1.de sperrt /xml/, /static/,
+    # /suche* und eine Reihe von Parametern; /handytarife ist frei.
+    einstieg:
+      - https://www.1und1.de/handytarife
+    max_dokumente: 10
+
+  - anbieter: Telekom
+    methode: telekom_kacheln
+    # Derselbe Per-Anbieter-Override wie beim PIB-Eintrag oben
+    # (BRIEF_TELEKOM_TAEGLICH_R3_E4): auch diese Quelle ist mit dem
+    # ehrlichen Absender gemessen, nicht mit der globalen Chrome-Kennung.
+    user_agent: "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
+    # Gemessen 05.09.2026, lokal, Absender TelcoRadar/1.0: HTTP 200,
+    # 2,26 MB. Fuenf Tarifkacheln (XS/S/M/L/XL), servergerendert als
+    # React-CSS-Modul-Markup - nicht im JSON-Zustand (siehe Fussnote unten,
+    # die fuer den ZUSTAND weiterhin richtig ist).
+    #
+    # Uebernommen wird der DURCHGESTRICHENE Preis je Kachel (39,95 / 49,95
+    # / 59,95 / 84,95 / 29,95 EUR fuer S/M/L/XL/XS), nicht die gross
+    # gezeigte "Ø"-Zahl (34,95 / 39,95 / 49,95 / 74,95 / 24,95 EUR) - die
+    # ist ein bedingter Kombipreis. Gegenprobe: der durchgestrichene Preis
+    # trifft fuer S/M/L/XL exakt die Betraege aus den Produktinformations-
+    # blaettern (Eintrag ganz oben in dieser Datei), die teils noch aus
+    # 2021 stammen. Diese Live-Kacheln sind damit die AKTUELLERE Quelle
+    # fuer denselben Betrag - Einzelheiten in
+    # `collect/tarif_telekom_kacheln.py`.
+    #
+    # NACHMESSUNG 05.09.2026 (R2, Evaluator-Befund): geprueft, ob diese
+    # Seite AUCH die vier Flex-Varianten als Kachel traegt - sie tut es
+    # nicht, und `max_dokumente` ist NICHT die Ursache dafuer (5 gefundene
+    # Kacheln bei `max_dokumente: 5` ist keine Kappung, sondern deckt sich
+    # mit dem, was die Seite wirklich liefert). Drei Gegenproben, alle
+    # lokal mit `TelcoRadar/1.0`:
+    #   1. Frischer Abruf derselben URL: weiterhin GENAU fuenf Treffer auf
+    #      `TariffTileModified_TariffTileModified__<hash>` (XS/S/M/L/XL,
+    #      keine sechste/siebte Kachel).
+    #   2. `__INITIAL_STATE__` derselben Seite rekursiv nach jedem Schluessel
+    #      durchsucht, der "flex" enthaelt UND eine Zahl neben sich fuehrt:
+    #      16 Treffer, alle Marketing-/Rechtstext (uebersetzungen,
+    #      MagentaEINS-Bedingungen) - keiner ein strukturierter Tarifpreis.
+    #      `productList.data` und `tariffv2.currentTariffs` sind leer.
+    #   3. Die naheliegende ZWEITE Seite `/shop/tarife/smartphone-tarife-flex`
+    #      (Routen-ID aus derselben `__INITIAL_STATE__`) und alle acht
+    #      Flex-Tarif-Detailseiten (`/shop/tarif/magenta-mobil-{xs,s,m,l,xl}
+    #      -flex`, `.../magenta-mobil-data-{s,m,l}-flex`) einzeln abgerufen:
+    #      alle HTTP 200, aber null Treffer auf die Kachel-Klasse UND kein
+    #      einziges `ld+json` mit einem Product-/Offer-Knoten (nur
+    #      BreadcrumbList/Organization/FAQPage - derselbe Befund wie bei den
+    #      Nicht-Flex-Detailseiten, die ebenfalls keinen Preis fuehren).
+    # Ergebnis: kein Selektor auf dieser Domain liefert einen belegten
+    # Flex-Preis. Das ist eine gemessene Grenze der Quelle, keine
+    # Konfigurationsentscheidung - `max_dokumente` steht trotzdem auf 12
+    # statt exakt 5, damit eine kuenftige sechste/siebte Kachel (etwa eine
+    # nachgezogene Flex-Variante) nicht an dieser Zahl scheitert. Die vier
+    # Flex-Tarife und "MagentaMobil Basic" bleiben PDF-versorgt; ihr Stand
+    # (2021) steht ehrlich an ihrer eigenen Zeile, siehe
+    # `outputs/phase-t1-r2-2026-09-05.md`.
+    einstieg:
+      - https://www.telekom.de/shop/tarife/handyvertrag
+    max_dokumente: 12
+
+  - anbieter: o2
+    methode: kacheln
+    # Gemessen 04.09.2026 mit dem Absender TelcoRadar/1.0: HTTP 200,
+    # 210 KB statisches HTML, ZWOELF Preiskacheln
+    # (`article.teaser-with-price`). Gelesen wurden daraus
+    #   O2 Mobile S / S Flex              19,99 / 19,99 EUR    15 GB+
+    #   O2 Mobile on Demand M / M Flex    19,99 / 29,99 EUR    50 GB+
+    #   O2 Mobile L / L Flex              24,99 / 34,99 EUR   150 GB+
+    #   O2 Mobile Unlimited S Special / Flex  24,99 / 34,99 EUR
+    #   O2 Mobile Unlimited M / Flex          29,99 / 39,99 EUR
+    #   O2 Mobile Unlimited L / Flex          39,99 / 59,99 EUR
+    # dazu je Kachel der Anschlusspreis (39,99 EUR, bei drei Tarifen
+    # "0,00 € statt 39,99 €" - es gilt die erste Zahl) und die
+    # Mindestlaufzeit aus dem ANGEKREUZTEN Auswahlknopf (24 Monate; bei
+    # den Flex-Kacheln steht dort "Monatlich kündbar", und dann bleibt das
+    # Feld LEER statt 1 zu heissen).
+    #
+    # DIE GEGENPROBE: "O2 Mobile Unlimited M Flex" steht seit dem
+    # 10.06.2026 mit 39,99 EUR im Bestand - gelesen aus dem
+    # Produktinformationsblatt, dem einzigen o2-Mobilfunkblatt, das die
+    # Rechtsseite verlinkt. Die Kachel nennt denselben Betrag. Zwei
+    # getrennte Wege, dieselbe Zahl; ohne diese Ueberschneidung waere die
+    # Kachellesart unbelegt geblieben.
+    # Beide Saetze bleiben stehen. Sie tragen dieselbe Tarif-ID, also
+    # bekommt der zweite im selben Lauf den Hash-Zusatz
+    # (`uebernimm_stand`) - das ist die vorgesehene Behandlung fuer zwei
+    # Funde mit derselben Titelzeile und genau richtig: das Blatt und die
+    # Kachel sind zwei Messungen, nicht zwei Fassungen.
+    #
+    # WOZU: ohne diese zwoelf Saetze kann KEIN o2-Buendelpreis in
+    # `geraete_tco.json`. Der Geraetekatalog nennt seinen Tarif
+    # "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)", die Kachel heisst
+    # "O2 Mobile on Demand M" - die zwei Namen treffen sich nie. Die
+    # Bruecke ist der Slug `o2-mobile-on-demand-m-plus`, den die Kachel in
+    # ihrem eigenen Link "Handy hinzufügen" fuehrt und der Katalog in
+    # `dimension59`. Er landet in `Tarif.buendel_slug`.
+    #
+    # WARUM DIESE SEITE UND NICHT /tarife/: beide tragen dieselben zwoelf
+    # Kacheln mit denselben Betraegen (gemessen 04.09.2026). Diese hier
+    # sagt im Titel, was die Zahl ist - ein Tarifpreis OHNE Geraet
+    # ("Handyvertrag ohne Handy: günstige SIM-Only Tarife"). Genau das ist
+    # die Bedingung, unter der ein Betrag als SIM-only-Massstab taugt.
+    # Die zweite Seite wird deshalb NICHT zusaetzlich abgerufen.
+    #
+    # ROBOTS (04.09.2026 gelesen): die Gruppe `User-agent: *` sperrt
+    # /auth/, /login/, /aktionen/, /assets/, /snippets/, /postpaid/ und
+    # weitere - NICHT /tarife/.
+    einstieg:
+      - https://www.o2online.de/tarife/handyvertrag-ohne-handy/
+    max_dokumente: 15
+
+# --- Warum die PIB-Blaetter von 1&1 weiterhin fehlen
 # hilfe-center.1und1.de/produktinformationsblaetter ist eine Next.js-Seite
 # ohne statische Links; im HTML stehen nur die Chunk-Dateien. Der Katalog
 # entsteht erst im Browser. Das ist derselbe Fall wie bei den JS-Promo-Seiten
 # und braucht den JS-Collector - kein Grund, hier einen geratenen Pfad
-# einzutragen.
+# einzutragen. Der Befund ist seit 08/2026 unveraendert und am 04.09.2026
+# NICHT neu gemessen worden; wer ihn anfasst, misst zuerst nach.
+# Der Eintrag oben ersetzt ihn NICHT: er liefert den heutigen Shop-Preis,
+# nicht das Pflichtdokument mit Laufzeit, Drosselung und Kleingedrucktem.
+
+# --- Warum der ZUSTAND der Telekom-Shop-Seite weiterhin keinen Tarifpreis
+#     traegt (die Seite SELBST ist seit dem 05.09.2026 trotzdem Live-Quelle,
+#     siehe der Eintrag "methode: telekom_kacheln" oben)
+# Gemessen am 04.09.2026, dreimal, mit dem Absender TelcoRadar/1.0:
 #
-# --- Warum Vodafone hier steht, aber nicht als Wettbewerber
-# vodafone.de/infofaxe liefert HTTP 200. Aufgenommen wird es, sobald die
-# Linkernte dort gemessen ist - der eigene Konzern gehoert in die
-# Positionskarte, sonst zeigt sie den Markt ohne den eigenen Punkt.
+#   https://www.telekom.de/mobilfunk/tarife
+#       HTTP 200 nach der OAuth-Kette (prompt=none) auf
+#       /shop/tarife/handyvertrag, 2,26 MB.
+#   https://www.telekom.de/shop/tarif/magenta-mobil-m
+#       HTTP 200, 1,60 MB. (Verlinkt von der Seite darueber - kein
+#       geratener Pfad.)
+#
+# Auf BEIDEN Seiten steht KEIN Tarifpreis serverseitig:
+#   * `window.__INITIAL_STATE__.tariffHtmlSnippet` ist
+#     {"apiState": "NULL", "snippet": {"data": []}} - die Tarifkacheln
+#     werden erst im Browser nachgeladen.
+#   * `productList.data` ist eine leere Liste (auf der GERAETEseite
+#     dagegen zehn Eintraege - es ist also keine Sperre, sondern diese
+#     eine Seite rendert ihre Kacheln nicht serverseitig).
+#   * Das einzige ld+json der Seite traegt BreadcrumbList, Organization
+#     und FAQPage - keinen Product-Knoten.
+#
+# Die Betraege, die man im HTML DOCH findet (29,95 / 9,95 / 39,95 ...),
+# stehen GROSSTENTEILS in Uebersetzungstexten unter
+# `translation.cart.global.magentaOneDiscountDetailsModal.*` und in
+# FAQ-Absaetzen - also in Marketingfliesstext ueber den MagentaEINS-Rabatt,
+# nicht an einem Tarif. Sie einer MagentaMobil-Linie zuzuordnen waere dort
+# geraten; nach E1 wird eine fehlende Zahl als fehlend gefuehrt.
+#
+# KORREKTUR VOM 05.09.2026: das gilt fuer den ZUSTAND, nicht mehr fuer die
+# ganze Seite. Dieselbe Seite rendert ihre fuenf Tarifkacheln zusaetzlich
+# als HTML (React-CSS-Modul-Markup, keine `__INITIAL_STATE__`-Auswertung
+# noetig) - und DORT stehen 29,95 und 39,95 sehr wohl an einem echten
+# Tarif ("MagentaMobil XS" bzw. "S"), nicht nur im Rabatt-Modaltext. Siehe
+# den Eintrag "methode: telekom_kacheln" oben und
+# `collect/tarif_telekom_kacheln.py`.
+#
+# Der naechste Schritt waere die Schnittstelle, die die Seite selbst
+# aufruft (BFF_EXT = /shop/api/eshop/bff-de). Sie ist WEITERHIN nicht
+# versucht worden - fuer den Tarifpreis braucht es sie seit dem
+# 05.09.2026 auch nicht mehr; die Produktinformationsblaetter (Eintrag
+# ganz oben) bleiben als Pflichtdokument im Bestand, tragen aber nicht
+# mehr allein die Live-Sicht.

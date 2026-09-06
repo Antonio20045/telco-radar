@@ -28,6 +28,7 @@ from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.diff_curator import DiffStore
 from .analyze import highlight_topics
+from .analyze import redaktion_kontinuitaet
 from .analyze import vorsortierung as vorsortierung_mod
 from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
@@ -1316,6 +1317,32 @@ def run(root: Path, use_llm: bool | None = None,
         "analysts": analyst_telemetry,
     }
 
+    # ---------------------------------------- Redaktion ausgefallen? (E3B)
+    # 0 bewertete Meldungen heisst: die Titelseite haette nichts zu zeigen -
+    # "Diese Woche keine priorisierte Meldung" oder, schlimmer, den
+    # unverdichteten Roh-Digest aus dem Ausnahmezweig oben. `stats`/`run_log`
+    # bleiben unveraendert die ehrliche Bilanz DIESER Runde; nur die
+    # Meldungen und der Fliesstext des veroeffentlichten Berichts werden von
+    # der letzten gueltigen Redaktion uebernommen. Der Grund unterscheidet
+    # die zwei Faelle, die dazu fuehren koennen: eine wirklich ruhige Woche
+    # ohne neuen Stoff ist kein Ausfall des Analyse-Dienstes, und sollte sich
+    # auch nicht so lesen.
+    #
+    # `stats["bewertete"]` wird VOR der Uebernahme festgehalten - sonst
+    # laese `transparenz.html` (die eine Seite, die genau das beantworten
+    # soll: "kann ich dem Ding trauen?") die Zahl der UEBERNOMMENEN
+    # Meldungen als waeren sie die Ausbeute der heutigen Analyse. Report/
+    # html.py faellt fuer Berichte von vor diesem Feld auf die Highlight-
+    # Zaehlung zurueck (siehe `n_bewertet` in render_site()).
+    stats["bewertete"] = redaktion_kontinuitaet.bewertete_meldungen(
+        {"regions": regional})
+    grund = ("es gab keine neuen Meldungen zu bewerten" if not new_items else
+             "eine vorübergehende Störung des Analyse-Dienstes")
+    regional, body, competitor_profiles, redaktion_ausfall = (
+        redaktion_kontinuitaet.uebernehmen(
+            regional, body, competitor_profiles, reports_dir,
+            today.isoformat(), grund))
+
     report_md = editor.report_header(today, stats) + body
     report_path = reports_dir / f"{today.isoformat()}.md"
     report_path.write_text(report_md, encoding="utf-8")
@@ -1329,6 +1356,8 @@ def run(root: Path, use_llm: bool | None = None,
         "competitors": competitor_profiles,
         "run": run_log,
     }
+    if redaktion_ausfall:
+        report_json["redaktion_ausfall"] = redaktion_ausfall
     json_path = reports_dir / f"{today.isoformat()}.json"
     json_path.write_text(
         json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")

@@ -78,11 +78,33 @@ class Adapter:
 
     `direkt=True` heisst: die Einstiegsseite IST die Nutzlast, es werden
     keine Produktseiten nachgeladen (so arbeitet Shopify).
+
+    `lies_buendel(text, url) -> list[rohsatz]` ist die ZWEITE Lesart
+    derselben Quelle. Fuer einen Einstieg mit `kind: buendel` (o2: eine
+    EIGENE Adresse, die nur Buendel traegt) wird sie ANSTELLE von `lies`
+    aufgerufen. Fuer einen NORMALEN Einstieg ohne diesen `kind` wird sie
+    ZUSAETZLICH zu `lies` auf JEDER Produktseite aufgerufen, die die
+    generische Ernte-Schleife ohnehin schon holt (Vodafone, B1,
+    05.09.2026: dieselbe Detailantwort traegt Geraetepreis UND
+    Buendelpreise, ein zweiter Abruf waere redundant). Ihre Saetze werden
+    KEINE Listungen: sie tragen Zuzahlung, Geraeterate, Tarifbetrag und
+    Tarifbezug und gehoeren damit in `geraete_tco.json`, nicht in die
+    Preisspalte der Geraeteseite.
+
+    `loese_tarifnamen(hole, kopfzeilen, rohbuendel) -> int` ist OPTIONAL
+    und laeuft NICHT waehrend des Sammelns, sondern danach, aus der
+    Pipeline heraus (`geraete_pipeline.py`) - ein Adapter bleibt sonst ein
+    reiner Text-zu-Daten-Uebersetzer ohne eigenes Netz. Sie darf
+    zusaetzliche GETs machen, um einen Tarifnamen aufzuloesen, den die
+    Sammelantwort selbst nicht nennt (Vodafone: nur ein `offerCoreHash`,
+    keine Klarname - siehe `vodafone.py` Modulkopf, Abschnitt B1).
     """
     name: str
     lies: Callable
     ernte: Optional[Callable] = None
     direkt: bool = False
+    lies_buendel: Optional[Callable] = None
+    loese_tarifnamen: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
     # als "mittel" ausweist, obwohl sie aus ld+json stammt.
@@ -114,6 +136,13 @@ class Anbieterbilanz:
     status: str = "ok"        # ok | leer | fehler | uebersprungen | frist | nicht_umgesetzt
     grund: str = ""
     listungen: list = field(default_factory=list)
+    # Rohsaetze aus Buendel-Einstiegen. Sie sind KEINE Listungen und werden
+    # nicht in `geraete_db.json` aufgenommen - die Pipeline macht daraus
+    # `tco_model.Buendel`, sobald sie ihren Tarif aufloesen kann. Sie stehen
+    # hier und nicht in `listungen`, weil ein Buendelmonatspreis in der
+    # Preisspalte der Geraeteseite eine Zahl ohne gemeinsame Einheit waere -
+    # derselbe Befund, mit dem dieses Vorhaben angefangen hat.
+    buendel: list = field(default_factory=list)
     gelesene_einstiege: set = field(default_factory=set)
     seiten_versucht: int = 0
     produkte_abgerufen: int = 0
@@ -247,14 +276,28 @@ def _registriere_anbieter_adapter() -> None:
     `GeraeteAbrufFehler` importieren - auf Modulebene waere das ein Zirkel.
     """
     from . import congstar as congstar_modul
+    from . import einsundeins as einsundeins_modul
     from . import o2 as o2_modul
+    from . import saturn as saturn_modul
+    from . import telekom as telekom_modul
     from . import vodafone as vodafone_modul
 
     registriere("vodafone_api", Adapter(name="vodafone_api",
                                         lies=vodafone_modul.lies,
-                                        ernte=vodafone_modul.ernte))
+                                        ernte=vodafone_modul.ernte,
+                                        # B1 (05.09.2026): dieselbe
+                                        # Detailantwort traegt unter
+                                        # `atomics[].prices.composition`
+                                        # auch die Buendelpreise - siehe
+                                        # Adapter-Docstring oben.
+                                        lies_buendel=vodafone_modul.lies_buendel,
+                                        loese_tarifnamen=vodafone_modul.loese_tarifnamen))
+    # Zwei Lesarten derselben Adresse: `lies` fuer den Katalog ohne Tarif
+    # (`?hwOnly=true`), `lies_buendel` fuer den mit. o2 gibt beide Adressen
+    # in der Nutzlast von /e-shop/ selbst aus.
     registriere("o2_katalog", Adapter(name="o2_katalog",
                                       lies=o2_modul.lies,
+                                      lies_buendel=o2_modul.lies_buendel,
                                       direkt=True))
     # Kein `ernte` noetig: die Sitemap traegt echte `<loc>`-Adressen, die
     # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
@@ -262,6 +305,29 @@ def _registriere_anbieter_adapter() -> None:
     # Preise stehen erst auf den einzelnen Produktseiten.
     registriere("congstar_next", Adapter(name="congstar_next",
                                          lies=congstar_modul.lies))
+    # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
+    # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
+    # als echte `<a href>` darin - der Adapter liest sie aus demselben
+    # Text und braucht kein eigenes `ernte`.
+    registriere("telekom_kategorie", Adapter(name="telekom_kategorie",
+                                             lies=telekom_modul.lies,
+                                             direkt=True))
+    # NICHT `direkt`: die Kategorieseite `/smartphones` traegt kein
+    # Produktschema, nur die verlinkten Produktseiten. Die Linkernte ist
+    # ANBIETEREIGEN, weil die Seite neben ihren 42 Katalogkacheln 125
+    # weitere Adressen derselben Domain fuehrt - siehe
+    # `einsundeins.ernte`.
+    registriere("einsundeins_buendel",
+                Adapter(name="einsundeins_buendel",
+                        lies=einsundeins_modul.lies,
+                        ernte=einsundeins_modul.ernte))
+    # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
+    # stehen bereits in dieser einen Antwort, keine Produktseite wird
+    # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
+    # der Adapter selbst aus dem Apollo-Cache (saturn.py).
+    registriere("saturn_brand", Adapter(name="saturn_brand",
+                                        lies=saturn_modul.lies,
+                                        direkt=True))
 
 
 _registriere_anbieter_adapter()
@@ -293,18 +359,52 @@ def _preisfelder(anbieter, satz: dict) -> dict:
 
     `Listung.__post_init__` ist die dritte Sicherung: eine Zuzahlung ohne
     `tarif_referenz` wirft dort.
+
+    SEIT DEM 03.09.2026 REICHT SIE DIE PREISFORM MIT DURCH. Ein Ladenpreis
+    ist nicht automatisch ein Barpreis: o2s Zahl ist der Gesamtbetrag einer
+    24-Monats-Ratenzahlung. Wo ein Adapter Anzahlung, Rate und Laufzeit
+    gelesen hat, wandern sie an die Listung und von dort auf die Seite. Wo er
+    sie nicht gelesen hat, bleibt alles wie bisher - diese Funktion erfindet
+    keine Preisform und leitet keine aus dem Anbieternamen ab.
     """
     preis = satz.get("preis")
     zuzahlung = satz.get("zuzahlung")
+    monatspreis = satz.get("monatspreis")
     tarif = (satz.get("tarif") or "").strip()
 
     if zuzahlung is not None and tarif:
         return {"preis_ohne_vertrag": None, "zuzahlung": float(zuzahlung),
                 "tarif_referenz": tarif,
-                "preis_mit_vertrag_ab": satz.get("monatspreis")}
+                "preis_mit_vertrag_ab": monatspreis}
+    if monatspreis is not None and tarif:
+        # DER BUENDELPREIS OHNE ZUZAHLUNG (seit dem 04.09.2026, 1&1).
+        # Bis dahin brauchte ein Buendel eine Zuzahlung, um ueberhaupt
+        # gespeichert zu werden - der Monatspreis war nur ihr Beiwerk.
+        # 1&1 kennt keine Zuzahlung: das Geraet steckt vollstaendig im
+        # Monatspreis (44,99 EUR = iPhone 17 Pro + All-Net-Flat S ueber 36
+        # Monate), und `preis_ohne_vertrag` gibt es dort ueberhaupt nicht.
+        #
+        # Ein Buendel ohne Barpreis ist trotzdem ein Buendel, und unter
+        # TCO-first ist sein Monatspreis die Leitgroesse. Er landet
+        # deshalb in `preis_mit_vertrag_ab` - nie in `preis_ohne_vertrag`,
+        # denn dort stuende er neben Kassenpreisen und waere plausibel
+        # falsch. Der Lockpreis-Waechter unten sieht ihn gar nicht erst;
+        # er ist die Sicherung fuer Zahlen, die als Ladenpreis ausgegeben
+        # werden, und das behauptet hier niemand.
+        #
+        # Die Laufzeit wandert mit: eine Monatszahl ohne die Zahl der
+        # Monate ist keine Aussage ueber die Bindung.
+        return {"preis_ohne_vertrag": None,
+                "preis_mit_vertrag_ab": float(monatspreis),
+                "tarif_referenz": tarif,
+                "laufzeit_monate": satz.get("laufzeit_monate")}
     if preis is None or ist_lockpreis(preis):
         return {"preis_ohne_vertrag": None}
-    return {"preis_ohne_vertrag": preis}
+    return {"preis_ohne_vertrag": preis,
+            "anzahlung": satz.get("anzahlung"),
+            "monatsrate": satz.get("monatsrate"),
+            "laufzeit_monate": satz.get("laufzeit_monate"),
+            "zins_effektiv": satz.get("zins_effektiv")}
 
 
 def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
@@ -347,6 +447,11 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # (o2s Medientyp, Vodafones oeffentlicher Browser-Schluessel), brauchen
     # eine Attrappe mit zweitem Parameter.
     kopfzeilen = dict(getattr(anbieter, "kopfzeilen", None) or {})
+    # Derselbe Gedanke fuer den User-Agent (BRIEF_SATURN_ADAPTER_R2): NUR
+    # wenn der Anbieter ihn ueberschreibt (Saturn), bekommt `hole()`
+    # ueberhaupt ein drittes Argument - jede bestehende Testattrappe mit
+    # `hole(url)` oder `hole(url, kopfzeilen=None)` bleibt gueltig.
+    user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
 
     def _hole(url: str) -> str:
         darf, grund = waechter.darf(url, jetzt)
@@ -357,7 +462,12 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             time.sleep(warte)
         letzter_abruf[0] = time.monotonic()
         bilanz.besucht.append(url)
-        status, text = hole(url, kopfzeilen) if kopfzeilen else hole(url)
+        kwargs = {}
+        if kopfzeilen:
+            kwargs["kopfzeilen"] = kopfzeilen
+        if user_agent:
+            kwargs["user_agent"] = user_agent
+        status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
             raise GeraeteAbrufFehler(f"HTTP {status}")
         return text
@@ -374,6 +484,31 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             continue
         except Exception as exc:                       # noqa: BLE001
             gruende.append(f"{einstieg.url}: {type(exc).__name__}: {str(exc)[:120]}")
+            continue
+
+        # `kind: buendel` heisst: dieselbe Nutzlastform, andere Lesart.
+        # Der Einstieg wird gelesen und NICHT geerntet; seine Saetze gehen
+        # an der Listungsstrecke vorbei in `bilanz.buendel`.
+        if einstieg.kind == "buendel":
+            if adapter.lies_buendel is None:
+                gruende.append(f"{einstieg.url}: die Methode "
+                               f"{anbieter.methode!r} kennt keine "
+                               f"Buendellesart")
+                continue
+            try:
+                roh = adapter.lies_buendel(inhalt, einstieg.url) or []
+                bilanz.buendel.extend(
+                    _mit_sku(roh, anbieter, einstieg, katalog, farben,
+                             heute, bilanz))
+            except GeraeteAbrufFehler as exc:
+                # Laut, nicht still: eine Buendelantwort, die keine ist,
+                # heisst "das Nutzlastformat hat sich geaendert" - und ein
+                # leeres Ergebnis waere dafuer die falsche Meldung.
+                gruende.append(f"{einstieg.url}: {exc}")
+                log.warning("%s: Buendelkatalog nicht lesbar (%s)",
+                            anbieter.name, exc)
+                continue
+            bilanz.gelesene_einstiege.add(einstieg.url)
             continue
 
         # `direkt` heisst: die Einstiegsseite IST die Nutzlast. Der
@@ -442,6 +577,21 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 continue
             _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute,
                        bilanz)
+            if adapter.lies_buendel is not None:
+                # ZWEITE LESART DERSELBEN SEITE (B1, Vodafone): dieselbe
+                # Antwort, die `lies()` gerade in Listungen zerlegt hat,
+                # traegt auch die Buendelpreise. Ein eigener `kind:
+                # buendel`-Einstieg (wie bei o2) braucht nur, wer dafuer
+                # eine EIGENE Adresse hat - hier ist es dieselbe.
+                try:
+                    roh_buendel = adapter.lies_buendel(seite, url) or []
+                except GeraeteAbrufFehler as exc:
+                    log.info("%s: %s Buendel unlesbar (%s)",
+                            anbieter.name, url, exc)
+                else:
+                    bilanz.buendel.extend(
+                        _mit_sku(roh_buendel, anbieter, einstieg, katalog,
+                                farben, heute, bilanz))
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
 
@@ -487,6 +637,56 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
         bilanz.listungen.append(listung)
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
+
+
+def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
+             heute: str, bilanz: Anbieterbilanz) -> list[dict]:
+    """Jedem Buendel-Rohsatz seine `sku_id` geben - oder ihn verwerfen.
+
+    Ein Buendel zeigt auf ein GERAET, und der Schluessel dafuer ist
+    dieselbe `sku_id`, die eine Listung traegt (`tco_model.Buendel.sku_id`).
+    Sie wird deshalb auf demselben Weg gebildet wie dort - ueber
+    `lies_listung` und damit ueber den KATALOG, nie ueber ein Zerlegen des
+    Titels. Wer sie hier anders rechnete, baute eine zweite Namensmenge:
+    die TCO-Tafel schlaegt den Geraetenamen ueber die Listung derselben SKU
+    nach und faende nichts.
+
+    Der Satz bekommt an dieser Stelle bewusst KEINEN Preis mit. Eine
+    Listung, die aus einem Buendel entstuende, truege einen Monatsbetrag in
+    einer Spalte voller Kassenpreise - genau der Befund, mit dem dieses
+    Vorhaben angefangen hat. Gebraucht wird hier nur der Schluessel.
+
+    Ein Titel ohne Katalogtreffer landet in derselben Arbeitsliste wie im
+    Listungsweg (`unbekannte_titel`): dass ein Geraet dem Katalog fehlt,
+    ist eine Auskunft und keine Eigenheit dieser Lesart.
+    """
+    out: list[dict] = []
+    for satz in rohsaetze:
+        listung = lies_listung(
+            titel=satz.get("titel", ""), anbieter=anbieter.name,
+            anbieter_typ=anbieter.typ, netz=anbieter.netz,
+            quelle_url=urljoin(einstieg.url, satz.get("url") or "")
+            or einstieg.url,
+            abgerufen_am=heute, katalog=katalog, farben=farben,
+            confidence=_belegstufe(satz.get("quelle")),
+            farbe_roh=satz.get("farbe") or "",
+            speicher_gb=satz.get("speicher_gb"),
+            einstieg_url=einstieg.url)
+        if listung is None:
+            titel = (satz.get("titel") or "").strip()
+            if titel:
+                bilanz.unbekannte_titel.append(titel)
+            continue
+        if listung.farbe_roh and listung.farbe_normalisiert is None:
+            bilanz.unbekannte_farben.append(listung.farbe_roh)
+        # Der ZUSTAND reist mit - er ist dieselbe Erkennung wie die, aus
+        # der die `-refurbished`-Strecke der SKU entsteht, und die
+        # TCO-Tafel braucht ihn als Feld, nicht als Suffix (QA-Befund B1).
+        out.append({**satz, "sku_id": listung.sku_id,
+                    "anbieter": anbieter.name,
+                    "zustand": listung.zustand,
+                    "quelle_url": listung.quelle_url})
+    return out
 
 
 def _ohne_sammelknoten(listungen: list) -> list:

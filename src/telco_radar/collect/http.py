@@ -80,6 +80,27 @@ _BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then giv
 _BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
 
 
+def _ist_ehrliche_kennung(ua: str) -> bool:
+    """True, wenn `ua` sich selbst als das Programm ausgibt statt als Browser.
+
+    Bis zum 05.09.2026 gab es dafuer genau EINEN bekannten Wert (`BOT_UA`),
+    und die UA-Logik unten verglich stumpf auf Gleichheit damit. Der
+    per-Anbieter-UA-Override (BRIEF_SATURN_ADAPTER_R2) fuehrt eine ZWEITE
+    ehrliche Kennung ein - dieselbe Projekt-Identitaet
+    ("TelcoRadar/1.0"), aber mit einer anderen Kontaktadresse
+    (`+https://telco-radar.onrender.com/ueber` statt des Repo-Links). Ein
+    reiner Gleichheitsvergleich haette diese zweite Kennung wie eine
+    unbekannte, browserfremde UND unehrliche Zeichenkette behandelt: sie
+    haette Chrome-Client-Hints bekommen (Widerspruch in sich, siehe unten)
+    und als Fallback die ALTE `BOT_UA` gezogen statt des Browser-UA - beides
+    das Gegenteil dessen, was ein ehrlicher Absender verspricht. Der
+    Praefix-Vergleich erkennt JEDE TelcoRadar-Kennung als ehrlich, ohne die
+    bestehenden zwei Werte (`BOT_UA`, `BROWSER_UA`) oder ihre Rollen
+    zueinander zu aendern.
+    """
+    return (ua or "").startswith("TelcoRadar/1.0")
+
+
 # --------------------------------------------------------------------------- #
 # Host-Drosselung
 #
@@ -223,7 +244,7 @@ def fetch(url: str, http_cfg: dict,
     """
     timeout = float(timeout_override or http_cfg.get("timeout_seconds", 20))
     primary = http_cfg.get("user_agent", BROWSER_UA)
-    fallback = BOT_UA if primary != BOT_UA else BROWSER_UA
+    fallback = BROWSER_UA if _ist_ehrliche_kennung(primary) else BOT_UA
     uas = (primary,) if schnell else (primary, fallback)
     wartezeiten = (0.0,) if schnell else (0.0, *_BACKOFF_WAITS)
 
@@ -245,10 +266,11 @@ def fetch(url: str, http_cfg: dict,
             "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
             "Referer": site_root,
         }
-        # Nur mit dem Browser-UA. Client-Hints unter dem Bot-UA waeren ein
-        # Widerspruch in sich: der eine Kopf sagt "ich bin ein Programm", der
-        # andere "ich bin Chrome".
-        if ua != BOT_UA:
+        # Nur mit dem Browser-UA. Client-Hints unter einer ehrlichen Kennung
+        # waeren ein Widerspruch in sich: der eine Kopf sagt "ich bin ein
+        # Programm", der andere "ich bin Chrome" - und das gilt fuer JEDE
+        # ehrliche Kennung, nicht nur die eine feste `BOT_UA`-Zeichenkette.
+        if not _ist_ehrliche_kennung(ua):
             headers.update(_CLIENT_HINTS)
         if extra_headers:
             headers.update(extra_headers)

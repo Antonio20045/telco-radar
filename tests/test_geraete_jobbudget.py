@@ -76,3 +76,28 @@ def test_die_jobfrist_passt_zum_workflow():
         (wurzel / ".github" / "workflows" / "radar.yml").read_text(encoding="utf-8"))
     minuten = workflow["jobs"]["radar"]["timeout-minutes"]
     assert s["job_frist_sekunden"] == minuten * 60
+
+
+def test_der_nachtlauf_committet_alle_drei_zustandsdateien():
+    """Was der Lauf schreibt, muss er auch abliefern.
+
+    `run_geraete_stage` schreibt seit dem 04.09.2026 drei Dateien:
+    `geraete_db.json`, `geraete_preise.jsonl` und - neu - `geraete_tco.json`
+    mit den SIM-only-Referenzen. Der Workflow addiert sie namentlich (kein
+    `git add data/`, sonst naehme er den Seen-Store mit).
+
+    Fehlte die dritte Zeile, entstuende die Seite trotzdem richtig - die
+    Datei liegt zur Renderzeit im Runner -, aber im Repo kaeme sie nie an.
+    Solange die Referenzen ABGELEITET sind, faellt das nicht auf; sobald
+    ein Adapter Buendel liefert (Phase 4), waere jede Nacht die Messung der
+    vorigen weg. Dieselbe Fehlerklasse wie der Navigationseintrag vom
+    11.08.2026: gebaut, geprueft, und fuer jeden Leser nicht da.
+    """
+    text = (Path(__file__).parent.parent / ".github" / "workflows"
+            / "geraete.yml").read_text(encoding="utf-8")
+    zeile = [z for z in text.splitlines() if "git add data/state" in z]
+    assert zeile, "der Workflow addiert keine Zustandsdatei mehr"
+    block = text[text.index(zeile[0]):text.index(zeile[0]) + 300]
+    for datei in ("geraete_db.json", "geraete_preise.jsonl",
+                  "geraete_tco.json"):
+        assert datei in block, datei

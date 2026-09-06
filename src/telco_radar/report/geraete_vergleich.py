@@ -40,7 +40,7 @@ from __future__ import annotations
 from typing import Optional
 
 from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ratenhinweis_aus_eintrag
 
 # Ab wann ein Preisunterschied ein BEFUND ist und kein Rundungsrauschen.
 # Am 29.08.2026 standen 62 Zeilen auf der Seite, davon 36 "niemand
@@ -145,6 +145,10 @@ def _angebot(eintrag: dict, laeden: Optional[dict] = None) -> dict:
         "abgerufen_am": eintrag.get("abgerufen_am") or "",
         "farbe": eintrag.get("farbe_normalisiert") or eintrag.get("farbe_roh") or "",
         "tarif": (eintrag.get("tarif_referenz") or "").strip(),
+        # Wie diese Zahl zustande kommt: "in 24 Raten (0 %)" bei o2, leer bei
+        # einem Barpreis. Der Text kommt aus dem Modell, damit Alarmtabelle,
+        # Katalog und jede spaetere Ansicht dieselbe Formulierung benutzen.
+        "ratenhinweis": ratenhinweis_aus_eintrag(eintrag),
         # Ein Kampfpreis auf ein nicht lieferbares Geraet ist ein anderer
         # Sachverhalt als einer auf ein lieferbares. Die Alarmtabelle zeigt
         # das als eigene Spalte, statt beides gleich aussehen zu lassen.

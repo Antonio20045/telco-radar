@@ -349,3 +349,326 @@ def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
     finally:
         http_modul.fetch = echt
     assert bilanz["listungen"] == 2, bilanz["anbieter"]
+
+
+# --------------------------------------------------------------------------
+# Der Massstab aus dem Tarifbestand (Phase 6, 04.09.2026)
+#
+# Die Stufe schreibt seit heute `data/state/geraete_tco.json` mit - die
+# SIM-only-Referenzen, ohne die ein Geraeteanteil nicht bestimmbar ist.
+# Sie steht NACH `db.save()`: ein Messtag ist nicht nachholbar, ein
+# Massstab schon (Lehre aus Lauf 31422689829).
+# --------------------------------------------------------------------------
+
+_TARIFE = [
+    {"tarif_id": "telekom:magentamobil-l", "anbieter": "Telekom",
+     "name": "MagentaMobil L", "art": "mobilfunk", "grundgebuehr": 59.95,
+     "anschlusspreis": None, "preisphasen": [],
+     "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
+     "abgerufen_am": "2026-08-11"},
+    {"tarif_id": "o2:o2-home-l", "anbieter": "o2", "name": "O2 Home L",
+     "art": "festnetz", "grundgebuehr": 44.99, "anschlusspreis": None,
+     "preisphasen": [], "dokument_url": "https://x.de/home-l.pdf",
+     "abgerufen_am": "2026-08-11"},
+]
+
+
+def _mit_tarifen(root: Path, saetze=None) -> Path:
+    zustand = root / "data" / "state"
+    zustand.mkdir(parents=True, exist_ok=True)
+    (zustand / "tarife.jsonl").write_text(
+        "".join(json.dumps(s, ensure_ascii=False) + "\n"
+                for s in (_TARIFE if saetze is None else saetze)),
+        encoding="utf-8")
+    return root
+
+
+def test_der_lauf_schreibt_die_sim_only_referenzen(tmp_path):
+    root = _mit_tarifen(_root(tmp_path))
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    namen = [r["tarif_name"] for r in tco["sim_only"]]
+    # Der Festnetztarif ist KEIN Massstab fuer ein Smartphone-Buendel.
+    assert namen == ["MagentaMobil L"]
+    assert tco["sim_only"][0]["tarif_id"] == "telekom:magentamobil-l"
+    assert tco["sim_only"][0]["tarif_sim_only_monatlich"] == 59.95
+    assert bilanz["sim_only_referenzen"] == 1
+    assert bilanz["tarife_im_bestand"] == 2
+
+
+def test_ohne_tarifbestand_bleibt_der_geraetebestand_unberuehrt(tmp_path):
+    """Kein `tarife.jsonl`: die Stufe laeuft durch, ohne etwas zu verlieren."""
+    root = _root(tmp_path)
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+    assert bilanz["status"] == "ok"
+    assert bilanz["sim_only_referenzen"] == 0
+    assert (root / "data" / "state" / "geraete_db.json").exists()
+    assert GeraeteDB(root / "data" / "state" / "geraete_db.json").eintraege()
+
+
+def test_ein_leerer_tarifbestand_loescht_den_massstab_nicht(tmp_path):
+    """"Nicht gelesen" ist nicht "leer".
+
+    `Tarifbestand.aus_datei` wirft bei fehlender Datei nicht. Ein
+    Baseline-Reset, ein Merge-Konflikt oder ein Wettlauf mit `radar.yml`
+    saehe damit aus wie "es gibt keine Tarife mehr" - und `ersetze_
+    referenzen` loeschte den ganzen Massstab, ohne einen Fehler zu melden.
+    Dieselbe Fehlerklasse wie `promo_store.mark_stale` ohne
+    `gepruefte_seiten`.
+    """
+    root = _mit_tarifen(_root(tmp_path))
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
+    (root / "data" / "state" / "tarife.jsonl").unlink()
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
+                               hole=_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert len(tco["sim_only"]) == 1          # noch da
+    assert bilanz["sim_only_referenzen"] == 0  # aber nicht geschrieben
+
+
+def test_ein_verschwundener_tarif_verschwindet_aus_dem_massstab(tmp_path):
+    """Die Gegenprobe: was der Bestand wirklich hergibt, wird ersetzt.
+
+    Ohne sie bewiese der Test darueber nur, dass nie geloescht wird - und
+    dann waere der Massstab wieder die wachsende Liste, gegen die
+    `ersetze_referenzen` gebaut ist.
+    """
+    root = _mit_tarifen(_root(tmp_path))
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
+    anders = dict(_TARIFE[0], tarif_id="telekom:magentamobil-m",
+                  name="MagentaMobil M", grundgebuehr=49.95)
+    _mit_tarifen(root, [anders])
+
+    run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert [r["tarif_name"] for r in tco["sim_only"]] == ["MagentaMobil M"]
+
+
+def test_ein_fehler_beim_massstab_kostet_den_messtag_nicht(tmp_path, monkeypatch):
+    """Der Geraetebestand ist zu diesem Zeitpunkt schon gespeichert.
+
+    Ein Messtag ist nicht nachholbar, ein Massstab schon - deshalb steht
+    der Block nach `db.save()` und in seinem eigenen Auffangboden.
+    """
+    import telco_radar.geraete_pipeline as pipeline
+    root = _mit_tarifen(_root(tmp_path))
+
+    def kaputt(*_a, **_k):
+        raise OSError("Platte voll")
+    monkeypatch.setattr(pipeline.TcoDB, "save", kaputt)
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole())
+    assert bilanz["status"] == "ok"
+    assert bilanz["listungen"] > 0
+    assert (root / "data" / "state" / "geraete_db.json").exists()
+    # Und die Bilanz behauptet NICHT, geschrieben zu haben - das ist der
+    # einzige Fall, fuer den dieser Zaehler gebaut ist.
+    assert bilanz["sim_only_referenzen"] == 0
+
+
+# --------------------------------------------------------------------------
+# Buendel: die zweite Lesart, die an der Listungsstrecke vorbeigeht
+# --------------------------------------------------------------------------
+# `kind: buendel` liest dieselbe Nutzlastform auf Geraet-plus-Tarif statt
+# auf Listungen. Die Saetze landen in `geraete_tco.json` und NICHT in
+# `geraete_db.json` - ein Buendelmonatspreis in der Spalte eines
+# Kassenpreises war der Befund, mit dem dieses Vorhaben angefangen hat.
+
+_O2_BUENDEL_URL = "https://www.o2online.de/e-shop/rest/catalog/buendel"
+
+_O2_QUELLEN = {"anbieter": [
+    {"name": "o2", "typ": "netzbetreiber", "methode": "o2_katalog", "rang": 1,
+     "basis_url": "https://www.o2online.de", "rate_limit_sekunden": 0,
+     "einstiege": [{"url": _O2_BUENDEL_URL, "label": "mit Tarif",
+                    "kind": "buendel"}]},
+]}
+
+_O2_TARIFE = [
+    {"tarif_id": "o2:o2-mobile-on-demand-m", "anbieter": "o2",
+     "name": "O2 Mobile on Demand M", "grundgebuehr": 19.99,
+     "buendel_slug": "o2-mobile-on-demand-m-plus", "art": "mobilfunk",
+     "dokument_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
+     "abgerufen_am": "2026-09-04", "preisphasen": []},
+]
+
+
+def _o2_antwort(monatlich=48.99, gesamt=1764.64):
+    """Ein Buendelkatalog mit EINEM Eintrag, in der Form, die o2 liefert."""
+    return json.dumps({
+        "hwCatalogSwitcherStateValue": {"hwOnlyOrBundleSwitcherValue": {
+            "hwOnlyOrBundleState": {"name": "BUNDLE"}}},
+        "hardware": [{
+            "description": "Apple iPhone 17 Pro Max",
+            "offerName": ("privatkunden-apple-iphone-17-pro-max-"
+                          "256gb-titan-natur-36xhigh"),
+            "externalId": "4510 301298 00",
+            "rateDurationValue": "36 Monate",
+            "price": {"oneTimePrice": 1.0, "monthlyPrice": monatlich,
+                      "totalPrice": gesamt, "activationFee": 39.99},
+            "bundle": {"tariffName": "O<sub>2</sub> Mobile on Demand M Plus "
+                                     "mit 50 GB+ (24 Mon.)"},
+            "ecommerceProductValue": {"attributes": {
+                "metric3": f"{monatlich - 14.99:.2f}", "metric2": "14.99",
+                "metric5": "1", "metric4": "39.99",
+                "dimension59": "o2-mobile-on-demand-m-plus"}},
+            "detailWwwAbsoluteCall": {"constantPayload": {"link": {
+                "uri": "https://www.o2online.de/e-shop/apple/x-details"}}},
+        }]})
+
+
+def _o2_root(tmp_path: Path, tarife=None) -> Path:
+    root = tmp_path
+    (root / "config").mkdir(exist_ok=True)
+    for name, daten in (("geraete_katalog.yaml", _KATALOG),
+                        ("farben.yaml", _FARBEN),
+                        ("geraete_quellen.yaml", _O2_QUELLEN)):
+        (root / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+    zustand = root / "data" / "state"
+    zustand.mkdir(parents=True, exist_ok=True)
+    (zustand / "tarife.jsonl").write_text(
+        "\n".join(json.dumps(t, ensure_ascii=False)
+                  for t in (_O2_TARIFE if tarife is None else tarife)) + "\n",
+        encoding="utf-8")
+    return root
+
+
+def _o2_hole(antwort=None):
+    def hole(url, kopfzeilen=None):
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\nDisallow: /auth/\n")
+        if url == _O2_BUENDEL_URL:
+            return (200, _o2_antwort() if antwort is None else antwort)
+        return (404, "")
+    return hole
+
+
+def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path):
+    root = _o2_root(tmp_path)
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(),
+                               hole=_o2_hole())
+    assert bilanz["listungen"] == 0
+    assert bilanz["rohbuendel"] == 1
+    assert bilanz["buendel"] == 1 and bilanz["buendel_neu"] == 1
+
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert len(tco["buendel"]) == 1
+    satz = tco["buendel"][0]
+    assert satz["sku_id"] == "apple-iphone-17-pro-max-256gb-titan-natur"
+    assert satz["tarif_id"] == "o2:o2-mobile-on-demand-m"
+    assert satz["geraet_zuzahlung"] == 1.0
+    assert satz["geraet_monatsrate"] == 34.0
+    assert satz["tarif_monatlich"] == 14.99
+    assert satz["anschlusspreis"] == 39.99
+    assert satz["laufzeit_monate"] == 36
+    # Kein Geraet in `geraete_db.json`: der Buendelbetrag hat in der
+    # Preisspalte nichts verloren.
+    assert not (root / "data" / "state" / "geraete_db.json").exists() or \
+        json.loads((root / "data" / "state" / "geraete_db.json")
+                   .read_text(encoding="utf-8"))["listungen"] == []
+
+
+def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
+    """Die Regel von `upsert_buendel`, hier als Auswahl statt als Wurf.
+
+    Ohne sie kostet ein einziger unaufloesbarer Satz die ganze Uebergabe -
+    und der Bestand haette null Buendel statt der uebrigen.
+    """
+    root = _o2_root(tmp_path, tarife=[
+        {**_O2_TARIFE[0], "buendel_slug": "ein-ganz-anderer-tarif",
+         "name": "O2 Etwas Anderes",
+         "tarif_id": "o2:o2-etwas-anderes"}])
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(),
+                               hole=_o2_hole())
+    assert bilanz["rohbuendel"] == 1
+    assert bilanz["buendel"] == 0 and bilanz["buendel_ohne_tarif"] == 1
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert tco["buendel"] == []
+
+
+def test_eine_unlesbare_buendelantwort_schreibt_nichts_und_altert_nicht(tmp_path):
+    """Ein geaendertes Nutzlastformat ist nicht 'keine Buendel mehr'."""
+    root = _o2_root(tmp_path)
+    run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
+    bilanz = run_geraete_stage(
+        root, {}, "2026-09-05", jetzt=_jetzt(),
+        hole=_o2_hole(json.dumps({"hardware": [], "hwCatalogSwitcherStateValue":
+                                  {"hwOnlyOrBundleSwitcherValue": {
+                                      "hwOnlyOrBundleState":
+                                          {"name": "HW_ONLY"}}}})))
+    assert bilanz["rohbuendel"] == 0
+    o2 = [a for a in bilanz["anbieter"] if a["anbieter"] == "o2"][0]
+    assert "HW_ONLY" in o2["grund"]
+    # Der Bestand von gestern steht unveraendert - Buendel werden
+    # aufgefrischt, nicht ersetzt.
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert len(tco["buendel"]) == 1
+    assert tco["buendel"][0]["last_verified"] == "2026-09-04"
+
+
+def test_ein_geaenderter_buendelpreis_frischt_den_satz_auf(tmp_path):
+    root = _o2_root(tmp_path)
+    run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
+    bilanz = run_geraete_stage(
+        root, {}, "2026-09-05", jetzt=_jetzt(),
+        # 30,00 statt 34,00 Geraeterate: Summe und Gesamtbetrag ziehen mit,
+        # sonst faellt der Satz an seiner eigenen Rechenprobe.
+        hole=_o2_hole(_o2_antwort(monatlich=44.99, gesamt=1620.64)))
+    assert bilanz["buendel"] == 1 and bilanz["buendel_neu"] == 0
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    assert len(tco["buendel"]) == 1
+    assert tco["buendel"][0]["geraet_monatsrate"] == 30.0
+    assert tco["buendel"][0]["first_seen"] == "2026-09-04"
+    assert tco["buendel"][0]["last_verified"] == "2026-09-05"
+
+
+def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
+    """QA-Befund B2 (04.09.2026): `db.upsert` verwirft den zweiten Satz
+    desselben Laufs auf einer ID - und die Pipeline schrieb seine Historie
+    trotzdem. Bei ALDI TALK ("Galaxy A17 LTE + Starter Kit" und "Galaxy A17
+    5G" auf EINER Listungs-ID) trug `geraete_preise.jsonl` deshalb je Tag
+    zwei Zeilen, und 13 von 15 Pfeilen in G2 zeigten eine Aenderung, die es
+    nie gab.
+
+    Hier: zwei Produktseiten, die auf dieselbe SKU treffen, mit zwei
+    Preisen. Die Datenbank nimmt eine, die Historie bekommt EINE Zeile -
+    und ihr Preis ist der der Datenbank.
+    """
+    root = _root(tmp_path)
+    produkt = _SEITEN["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"]
+    zweit = produkt.replace("1449", "1099")
+    assert zweit != produkt, "die Fixture muss den Preis 1449 tragen"
+    kategorie = _SEITEN["https://www.medimax.de/c/116/smartphones"].replace(
+        "/p/1518897/galaxy-a57-5g-a576b-128gb",
+        "/p/1514137/iphone-17-pro-max-256gb-zweit")
+    seiten = dict(_SEITEN)
+    seiten["https://www.medimax.de/c/116/smartphones"] = kategorie
+    seiten["https://www.medimax.de/p/1514137/iphone-17-pro-max-256gb-zweit"] = zweit
+
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                               hole=_hole(seiten))
+    assert bilanz["status"] == "ok"
+    # Die Kollision tritt wirklich ein - sonst misst der Test nichts.
+    assert bilanz["kollisionen"] == 1
+    assert bilanz["preispunkte"] == 1
+
+    db = json.loads((root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+    (eintrag,) = db["listungen"]
+    zeilen = [json.loads(z) for z in (root / "data" / "state" / "geraete_preise.jsonl")
+              .read_text(encoding="utf-8").strip().splitlines()]
+    assert len(zeilen) == 1
+    assert zeilen[0]["listung_id"] == eintrag["id"]
+    assert zeilen[0]["preis_ohne_vertrag"] == eintrag["preis_ohne_vertrag"]

@@ -59,7 +59,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -85,7 +85,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -119,7 +119,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -153,7 +153,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -162,11 +162,11 @@
    "|10.99€",
    "|10gb",
    "|14.99€",
-   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
    "|216€",
+   "|264€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -177,7 +177,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -204,7 +204,7 @@
    "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -219,7 +219,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -242,7 +242,7 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -259,27 +259,23 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
    "als monatliche gutschrift von|8.34€",
    "als option dazubuchen für|3.99€",
-   "auf deinen vodafone mobil-tarif|24monate",
    "außerhalb der eu. mit|2gb",
    "bei uns nur einmal|1€",
    "beim tarifpreis.|24monate",
    "bekommst du monate lang|10%",
    "bis zu|12monate",
-   "bis zu|500€",
    "buchst bekommst du zusätzlich|50%",
    "da ist hast du|15tage",
    "das geht bis zu|6monate",
    "daten-geschwindigkeit um bis zu|0.03mb",
    "dauerhaft|49.99€",
-   "deine mobilfunk-rechnung verteilt auf|12monate",
    "deinen tarifpreis verteilt auf|12monate",
-   "deines alten handys auf|260€",
    "den einmalpreis und oder|36monat",
    "den tarifpreis du zahlst|24.99€",
    "der einmalige anschlusspreis von|39.99€",
@@ -296,7 +292,6 @@
    "eine ratenzahlung über oder|36monate",
    "einer monatlichen geräte-zuzahlung von|10€",
    "entfallen mit laufzeitende nach|24monate",
-   "erhöhung des kaufpreises auf|260€",
    "euro tarifpreis und mindestens|10€",
    "familycard s und m|20%",
    "freischalten jeweils mb für|3€",
@@ -327,8 +322,6 @@
    "lang. das sind insgesamt|200€",
    "m gb zusätzlich insgesamt|100gb",
    "m gb zusätzlich insgesamt|200gb",
-   "mit dem tauschbonus von|120€",
-   "mit dem tauschbonus von|240€",
    "mit einem datenvolumen von|107gb",
    "mit einem datenvolumen von|135gb",
    "mit einem mindestwert von|1€",
@@ -345,10 +338,8 @@
    "monate lang jeden monat|10€",
    "monate lang jeden monat|20€",
    "monate lang jeden monat|5€",
-   "monate lang|20€",
    "monatliche abogebühr von derzeit|21.99€",
    "neu abschließt bekommst du|200€",
-   "pro fold bis zu|500€",
    "rabatt entfällt automatisch nach|24monate",
    "rabatte entfallen automatisch nach|24monate",
    "reisen dafür bekommst du|2gb",
@@ -360,26 +351,18 @@
    "selbständig dann bekommst du|24monate",
    "sich dein tarifpreis um|2€",
    "sich der tarifpreis um|15€",
-   "sich der zusatzbonus auf|260€",
    "smartphone dazubuchen und|200€",
    "smartphone-akkus ist weniger als|80%",
-   "sparst du|25%",
    "sparst weitere|25%",
    "standardpreis|39.99€",
    "statt|15gb",
    "statt|30gb",
    "statt|39.99€",
    "statt|60gb",
-   "summe bekommst du mindestens|500€",
    "surfst langsamer sobald du|100%",
    "tarif gigamobil young xs|25%",
    "tarifpreis du zahlst statt|39.99€",
-   "tauschbonus von sind das|200€",
-   "tauschbonus von sind das|300€",
-   "tauschbonus von sind das|400€",
-   "tauschbonus von sind das|500€",
    "und im mobil m|40gb",
-   "und keine kaufpreis-erhöhung auf|260€",
    "und zwar nachdem du|4monate",
    "uns zahlst du einmalig|39.99€",
    "unser mobilfunknetz funkt zu|100%",
@@ -393,7 +376,6 @@
    "xs gb zusätzlich insgesamt|26gb",
    "xs gb zusätzlich insgesamt|28gb",
    "x|15€",
-   "z fold8 ultra mindestens|500€",
    "zusätzliches datenvolumen freischalten jeweils|250mb",
    "zusätzlich|70gb",
    "|0€",
@@ -414,12 +396,10 @@
    "|15.99€",
    "|15gb",
    "|15€",
-   "|160€",
    "|16€",
    "|18gb",
    "|19.99€",
    "|1monat",
-   "|1€",
    "|20%",
    "|20gb",
    "|20€",
@@ -438,13 +418,11 @@
    "|50gb",
    "|5€",
    "|60gb",
-   "|60€",
    "|8.34€",
-   "|80€",
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -463,6 +441,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-09-02"
+  "stand": "2026-09-04"
  }
 }

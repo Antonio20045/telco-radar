@@ -34,7 +34,11 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from .analyze.geraete_store import GeraeteDB, Preishistorie
-from .collect.geraete import sammle
+from .analyze.tarif_referenzen import aus_bestand
+from .analyze.tco_buendel import aus_rohsaetzen
+from .analyze.tco_store import TcoDB
+from .tarif_bezug import Tarifbestand
+from .collect.geraete import ADAPTER, sammle
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -71,9 +75,19 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 
     from .collect.http import fetch
 
-    def hole(url: str, kopfzeilen: Optional[dict] = None):
+    def hole(url: str, kopfzeilen: Optional[dict] = None,
+             user_agent: Optional[str] = None):
+        # `user_agent` ist der PER-ANBIETER-UEBERSCHREIBER (Anbieter.
+        # user_agent, siehe geraete_config.py) - er baut ein EIGENES
+        # http_cfg nur fuer diesen Aufruf, das globale `http_cfg` (aus
+        # config/settings.yaml, Entscheidung E-1) bleibt fuer jeden anderen
+        # Anbieter unangetastet. `fetch()` sieht davon nichts Neues: es
+        # bekommt schlicht ein `http_cfg`, dessen `user_agent` schon den
+        # honoreichen Wert traegt, und leitet daraus PRIMARY/Fallback wie
+        # immer ab.
+        cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
         try:
-            antwort = fetch(url, http_cfg, extra_headers=kopfzeilen or None)
+            antwort = fetch(url, cfg, extra_headers=kopfzeilen or None)
         except httpx.HTTPStatusError as exc:
             # Der Statuscode IST hier die Auskunft - 404 heisst etwas
             # anderes als 403, und beide etwas anderes als "kein Netz".
@@ -109,13 +123,29 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
 
     neu_gesamt = gealtert_gesamt = punkte = 0
     bilanzen = []
+    kollisionen: list = []
     for bilanz in ergebnis["anbieter"]:
         anbieter = quellen.nach_name(bilanz.name)
         neu, gesehen = db.upsert(bilanz.listungen, heute)
         neu_gesamt += neu
+        # NUR WAS DIE DATENBANK GENOMMEN HAT, BEKOMMT EINEN HISTORIENPUNKT.
+        # `upsert` verwirft den zweiten Satz derselben ID (zwei Artikel,
+        # die die Zuordnung nicht unterscheiden konnte) - und diese Schleife
+        # schrieb ihn bis zum 04.09.2026 trotzdem in die Historie. Ergebnis:
+        # ALDI TALKs "Galaxy A17 LTE + Starter Kit" (129 EUR) und "Galaxy
+        # A17 5G" (159 EUR) treffen beide den Katalogeintrag "Galaxy A17",
+        # teilen sich eine Listungs-ID, und `geraete_preise.jsonl` trug je
+        # Tag zwei Zeilen: 13 von 15 Pfeilen in G2 zeigten eine
+        # Preisaenderung, die nie stattgefunden hat (QA-Befund B2).
+        uebergangen = {id(x) for x in getattr(db, "uebergangen", [])}
         for listung in bilanz.listungen:
+            if id(listung) in uebergangen:
+                continue
             if historie.schreibe(listung, heute):
                 punkte += 1
+        # Ueber ALLE Anbieter sammeln: `db.kollisionen` gilt je Aufruf, und
+        # am Ende der Schleife stand nur die Liste des letzten Anbieters.
+        kollisionen.extend(getattr(db, "kollisionen", []))
         if bilanz.vollstaendig:
             leitseite = (anbieter.crawled_einstiege[0].url
                          if anbieter and anbieter.crawled_einstiege else "")
@@ -152,7 +182,131 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     historie.save()
     db.save(heute)
 
-    kollisionen = list(getattr(db, "kollisionen", []))
+    # --- Der Massstab aus dem Tarifbestand - und die Buendel dazu.
+    #
+    # `geraete_tco.json` gab es bis zum 04.09.2026 nicht: null Buendel, null
+    # SIM-only-Referenzen, also keine einzige rechenbare TCO. Seit dem
+    # 04.09.2026 stehen BEIDE Seiten: die Referenzen aus `tarife.jsonl`
+    # (was ein Tarif OHNE Geraet kostet) und die Buendel aus den
+    # Buendel-Einstiegen der Anbieter (`kind: buendel`).
+    #
+    # Sie stehen in DIESER Reihenfolge, und das ist keine Kosmetik: ein
+    # Buendel ohne aufloesbaren Tarif wird verworfen, und aufloesen kann
+    # nur, wer den Tarifbestand gelesen hat. Beides braucht denselben
+    # `Tarifbestand`, er wird deshalb einmal geladen.
+    #
+    # Das steht HIER und nicht im Renderer. Eine Zahl, die beim Rendern
+    # entsteht, ist keine Messung, sondern eine Ableitung - und zwei
+    # Ableitungen derselben Zahl an zwei Orten sind zwei Zahlen. Der
+    # naechtliche Lauf ist der Ort, an dem der Geraetebestand entsteht;
+    # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
+    #
+    # TARIFNAMEN AUFLOESEN, BEVOR DER TARIFBESTAND BEFRAGT WIRD (B1,
+    # 05.09.2026): manche Anbieter (Vodafone) nennen in ihrer Buendelantwort
+    # keinen Klarnamen, nur einen Hash - ein zweiter, GEZIELTER Abruf je
+    # Geraet (nicht je Rohsatz) kann ihn nachliefern (siehe
+    # `vodafone.loese_tarifnamen`). Das gehoert hierher und nicht in den
+    # Adapter: ein `lies_buendel()` bleibt ein reiner Text-zu-Daten-
+    # Uebersetzer ohne eigenes Netz, diese Stufe darf zusaetzliche GETs
+    # machen. Ein Fehler hier darf den Geraetebestand nicht kosten - er
+    # ist zu diesem Zeitpunkt schon gespeichert.
+    for bilanz in ergebnis["anbieter"]:
+        if not bilanz.buendel:
+            continue
+        anbieter = quellen.nach_name(bilanz.name)
+        adapter = ADAPTER.get(anbieter.methode) if anbieter else None
+        if adapter is None or adapter.loese_tarifnamen is None:
+            continue
+        try:
+            aufgeloest = adapter.loese_tarifnamen(
+                hole, dict(getattr(anbieter, "kopfzeilen", None) or {}),
+                bilanz.buendel)
+            if aufgeloest:
+                log.info("%s: %d von %d Buendel-Tarifnamen ueber die "
+                         "Tarifschnittstelle aufgeloest",
+                         bilanz.name, aufgeloest, len(bilanz.buendel))
+        except Exception as exc:                          # noqa: BLE001
+            log.warning("%s: Tarifnamen-Aufloesung gescheitert (%s)",
+                        bilanz.name, exc)
+
+    rohbuendel = [b for bilanz in ergebnis["anbieter"]
+                  for b in getattr(bilanz, "buendel", [])]
+    referenzen: list = []
+    tarife = 0
+    neue_buendel = 0
+    buendelbilanz = None
+    geschrieben = False
+    try:
+        bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
+        tarife = len(bestand)
+        referenzen = aus_bestand(bestand)
+        if not referenzen:
+            # "NICHT GELESEN" IST NICHT "LEER". `Tarifbestand.aus_datei`
+            # wirft bei fehlender Datei nicht, sondern liefert einen leeren
+            # Bestand - ein Baseline-Reset, ein Merge-Konflikt oder ein
+            # Wettlauf mit `radar.yml` saehe damit aus wie "es gibt keine
+            # Tarife mehr", und `ersetze_referenzen` loeschte den ganzen
+            # Massstab. Dieselbe Fehlerklasse wie bei
+            # `promo_store.mark_stale` ohne `gepruefte_seiten` und beim
+            # `PromoExtractionError`, beide in CLAUDE.md § 6 als teuer
+            # dokumentiert.
+            log.warning("Tarif-Referenzen: der Tarifbestand liefert keine "
+                        "einzige Referenz (%d Saetze gelesen) - der "
+                        "bisherige Massstab bleibt unangetastet", tarife)
+        else:
+            tco = TcoDB(zustand / "geraete_tco.json")
+            # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
+            # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
+            # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
+            _, entfernt = tco.ersetze_referenzen(referenzen, heute)
+            if entfernt:
+                log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
+                         "entfernt", entfernt)
+            if rohbuendel:
+                # AUFFRISCHEN, nicht ersetzen - anders als die Referenzen.
+                # Ein Buendel ist eine MESSUNG an einer Anbieterseite, keine
+                # Ableitung aus dem Tarifbestand; faellt der Abruf einer
+                # Nacht aus, darf sein Verschwinden nicht als "gibt es nicht
+                # mehr" gelten. Dieselbe Haltung wie bei `GeraeteDB`, die
+                # nichts loescht.
+                buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
+                if buendelbilanz.buendel:
+                    neue_buendel, _ = tco.upsert_buendel(
+                        buendelbilanz.buendel, heute)
+            tco.save(heute)
+            # ERST HIER. `save()` kann werfen (Platte, Rechte, Pfad), und
+            # der Auffangboden unten faengt das ab - eine Bilanz, die schon
+            # vorher "25 Referenzen" meldet, ist genau im einzigen Fall
+            # blind, fuer den sie gebaut ist.
+            geschrieben = True
+    except Exception as exc:  # noqa: BLE001
+        # Ein Fehler hier darf den Geraetebestand nicht kosten - der ist
+        # zu diesem Zeitpunkt schon gespeichert, und ein Messtag ist nicht
+        # nachholbar (Lauf 31422689829).
+        log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
+    log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
+             len(referenzen), tarife,
+             "" if geschrieben else " - NICHT GESCHRIEBEN")
+    # Die Buendelzeile steht AUCH da, wenn nichts ankam: "0 von 0" heisst
+    # "kein Anbieter liefert Buendel", "0 von 63" heisst "der Tarifbestand
+    # traegt ihre Tarife nicht" - zwei ganz verschiedene Arbeitslisten, und
+    # ohne beide Zahlen sind sie nicht zu unterscheiden.
+    log.info("Buendel: %d von %d Rohsaetzen uebernommen (%d neu)%s%s",
+             len(buendelbilanz.buendel) if buendelbilanz else 0,
+             len(rohbuendel), neue_buendel,
+             f", {buendelbilanz.verworfen} verworfen" if buendelbilanz
+             and buendelbilanz.verworfen else "",
+             "" if geschrieben else " - NICHT GESCHRIEBEN")
+
+    if kollisionen:
+        # Die Arbeitsliste fuer den Katalog: zwei Artikel auf einer ID sind
+        # zwei Produkte, die der Katalog nicht auseinanderhaelt.
+        log.warning("Geraeteradar: %d Kollisionen - zwei Artikel desselben "
+                    "Laufs auf einer Listungs-ID, der zweite ist weder "
+                    "eingetragen noch in der Historie: %s",
+                    len(kollisionen),
+                    "; ".join(f"{lid} <- {titel!r}"
+                              for lid, titel in kollisionen[:12]))
     bilanz = {
         "status": "ok",
         "anbieter": bilanzen,
@@ -168,7 +322,18 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "unbekannte_titel_gesamt": len(ergebnis["unbekannte_titel"]),
         "unbekannte_farben": sorted({f for b in ergebnis["anbieter"]
                                      for f in b.unbekannte_farben})[:40],
+        # Zwei Zahlen, nicht eine: `rohbuendel` sagt, was die Anbieter
+        # geliefert haben, `buendel` was davon einen Tarif im Bestand hat.
+        "rohbuendel": len(rohbuendel),
+        "buendel": len(buendelbilanz.buendel) if buendelbilanz else 0,
+        "buendel_neu": neue_buendel,
+        "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
         "kollisionen": len(kollisionen),
+        # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
+        # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`
+        # gefuellt ist, hat der Schreibversuch geworfen.
+        "sim_only_referenzen": len(referenzen) if geschrieben else 0,
+        "tarife_im_bestand": tarife,
         "sekunden": round(time.monotonic() - beginn, 1),
     }
     log.info("Geraeteradar: %d Anbieter abgefragt, %d Listungen (%d neu), "

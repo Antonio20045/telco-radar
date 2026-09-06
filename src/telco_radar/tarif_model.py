@@ -48,6 +48,28 @@ PFLICHTFELDER = ("grundgebuehr", "laufzeit_monate")
 
 HOCH, MITTEL, NIEDRIG = "hoch", "mittel", "niedrig"
 
+# WOHER DER PREIS KOMMT - und warum das ein eigenes Feld ist.
+#
+# Bis zum 04.09.2026 stammte jeder Satz in `tarife.jsonl` aus einem
+# Pflichtdokument nach § 1 TK-TransparenzV. Das ist die belastbarste Quelle
+# dieses Marktes, aber nicht die aktuellste: das Blatt traegt den
+# Vermarktungsstand, die Shop-Seite den heutigen Aktionspreis. Beide sind
+# richtig, und sie duerfen auseinanderlaufen.
+#
+# Sie in dieselbe Spalte zu schreiben, ohne den Unterschied mitzufuehren,
+# waere derselbe Fehler wie o2s Ratengesamtbetrag neben freenets Barpreis
+# (`geraete_model.Ratenzahlung`): gleiche Optik, andere Groesse. Deshalb
+# traegt jeder Satz, woher seine Zahl kommt.
+#
+# `dokument`   Produktinformationsblatt / Vertragszusammenfassung. Der
+#              Vorgabewert - jeder Bestandssatz aus der Zeit davor ist das.
+# `live_shop`  Strukturierte Daten einer Shop-Seite (schema.org). Der Preis,
+#              den der Anbieter heute bewirbt, ohne gesetzliche
+#              Wahrheitsbewehrung und ohne die Pflichtfelder des Blattes.
+PREISTYP_DOKUMENT = "dokument"
+PREISTYP_LIVE_SHOP = "live_shop"
+PREISTYPEN = (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP)
+
 
 @dataclass
 class Preisphase:
@@ -104,6 +126,15 @@ class Tarif:
     # --- Vertrag
     laufzeit_monate: Optional[int] = None
     kuendigungsfrist_monate: Optional[int] = None
+    # Unter welchem Slug der Anbieter DENSELBEN Tarif im Geraetebuendel
+    # fuehrt. Kein Leistungsmerkmal, sondern ein Fremdschluessel: o2 nennt
+    # seinen Tarif in der SIM-only-Kachel "O2 Mobile on Demand M" und im
+    # Geraetekatalog "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+
+    # (24 Mon.)" - die zwei Namen treffen sich nie, der Slug
+    # (`o2-mobile-on-demand-m-plus`) steht auf BEIDEN Seiten und wird von
+    # o2 selbst gesetzt. `tarif_bezug.ueber_slug` loest damit auf; leer
+    # heisst "der Anbieter stellt diese Verbindung nicht her".
+    buendel_slug: str = ""
 
     # --- Herkunft
     dokument_url: str = ""
@@ -111,6 +142,10 @@ class Tarif:
     versionsstand: str = ""
     abgerufen_am: str = ""
     rohtext: str = ""
+    # Aus welcher Art Quelle der Preis stammt (siehe PREISTYPEN oben). Der
+    # Vorgabewert ist `dokument`, damit jeder Bestandssatz aus der Zeit vor
+    # dem 04.09.2026 beim Wiedereinlesen genau das bleibt, was er war.
+    preistyp: str = PREISTYP_DOKUMENT
 
     # --- Nachweis
     confidence: dict = field(default_factory=dict)   # feld -> hoch/mittel/niedrig

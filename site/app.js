@@ -832,15 +832,103 @@ var TelcoFrage = (function () {
   if (!leiste) return;
   var knoepfe = leiste.querySelectorAll('button[data-tafel]');
 
+  function zeige(knopf) {
+    Array.prototype.forEach.call(knoepfe, function (k) {
+      var ziel = document.getElementById(k.getAttribute('data-tafel'));
+      var aktiv = k === knopf;
+      k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
+      if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
+    });
+  }
+
   Array.prototype.forEach.call(knoepfe, function (knopf) {
-    knopf.addEventListener('click', function () {
-      Array.prototype.forEach.call(knoepfe, function (k) {
-        var ziel = document.getElementById(k.getAttribute('data-tafel'));
-        var aktiv = k === knopf;
-        k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
-        if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
+    knopf.addEventListener('click', function () { zeige(knopf); });
+  });
+
+  /* DEEP-LINKS AUF DIE ALTEN REITER DUERFEN NICHT INS LEERE FUEHREN.
+   * Bis zum 04.09.2026 hiessen die Reiter `tafel-alarme` und `tafel-tco`,
+   * und `#verlauf`, `#katalog`, `#tco` stehen als Sprungziele in Mails und
+   * Lesezeichen. `#tafel-alarme` gibt es nicht mehr - ein solcher Link
+   * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
+   * scheinbar nicht bewegt. */
+  var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
+             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
+             'lifecycle': 'tafel-portfolio'};
+  function ausHash() {
+    var id = (location.hash || '').replace(/^#/, '');
+    if (!id) return;
+    var ziel = ALT[id] || id;
+    var knopf = leiste.querySelector('[data-tafel="' + ziel + '"]');
+    if (knopf) zeige(knopf);
+  }
+  ausHash();
+  window.addEventListener('hashchange', ausHash);
+})();
+
+/* Die Anbieterkarten der Hauptansicht: Modellauswahl, Sortierung, Filter.
+ *
+ * ES WIRD NICHTS GERECHNET. Die Betraege stehen als `data-`-Attribute an
+ * der Karte, gerechnet hat sie `tco_model` - eine Sortierung, die den Wert
+ * aus dem sichtbaren Text liest, sortierte "1.099,90" vor "199,00"
+ * (derselbe Fehler wie in der Alarmtabelle am 30.08.2026).
+ */
+(function () {
+  var wahl = document.getElementById('gr-modell');
+  var bloecke = document.querySelectorAll('.gr-tmodell');
+  if (!bloecke.length) return;
+
+  if (wahl) {
+    wahl.addEventListener('change', function () {
+      Array.prototype.forEach.call(bloecke, function (b) {
+        b.hidden = b.getAttribute('data-modell') !== wahl.value;
       });
     });
+  }
+
+  function zahl(el, feld) {
+    var wert = parseFloat(el.getAttribute('data-' + feld));
+    return isNaN(wert) ? Infinity : wert;
+  }
+
+  Array.prototype.forEach.call(bloecke, function (block) {
+    var behaelter = block.querySelector('.gr-karten');
+    var sortiere = block.querySelector('[data-sortiere]');
+    var filter = block.querySelector('[data-anbieterfilter]');
+    if (!behaelter) return;
+    var karten = Array.prototype.slice.call(
+      behaelter.querySelectorAll('.gr-kkarte'));
+
+    function ordne() {
+      var art = sortiere ? sortiere.value : 'schnitt';
+      var sortiert = karten.slice().sort(function (a, b) {
+        /* Karten ohne Zahl stehen immer hinten - sie sind kein guenstigstes
+         * Angebot, sondern eine Luecke. */
+        var leerA = a.classList.contains('gr-kkarte--leer') ? 1 : 0;
+        var leerB = b.classList.contains('gr-kkarte--leer') ? 1 : 0;
+        if (leerA !== leerB) return leerA - leerB;
+        /* Gesamtkosten NUR innerhalb einer Laufzeitgruppe (A5.4): ueber
+         * Laufzeiten hinweg vergliche die Summe die Bindung, nicht den
+         * Preis. Deshalb erst nach Laufzeit, dann nach Betrag. */
+        if (art === 'gesamt') {
+          var lA = zahl(a, 'laufzeit'), lB = zahl(b, 'laufzeit');
+          if (lA !== lB) return lA - lB;
+          return zahl(a, 'gesamt') - zahl(b, 'gesamt');
+        }
+        if (art === 'einmalig') return zahl(a, 'einmalig') - zahl(b, 'einmalig');
+        return zahl(a, 'schnitt') - zahl(b, 'schnitt');
+      });
+      sortiert.forEach(function (k) { behaelter.appendChild(k); });
+    }
+
+    function sieben() {
+      var nur = filter ? filter.value : '';
+      karten.forEach(function (k) {
+        k.hidden = !!nur && k.getAttribute('data-anbieter') !== nur;
+      });
+    }
+
+    if (sortiere) sortiere.addEventListener('change', ordne);
+    if (filter) filter.addEventListener('change', sieben);
   });
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
@@ -1075,7 +1163,7 @@ function grFilterleiste(tafelId, mehrId) {
   }
 }
 
-grFilterleiste('tafel-alarme', 'gr-mehr');
+grFilterleiste('tafel-tco', 'gr-mehr');
 grFilterleiste('tafel-katalog', 'gr-kmehr');
 
 /* =========================================================================
@@ -1449,6 +1537,20 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
   function termine(n) {
     return n === 1 ? 'liegt 1 Messtermin' : 'liegen ' + n + ' Messtermine';
   }
+  /* EINE MESSLUECKE WIRD BENANNT (QA-Befund B2). Die Tage mit zwei Preisen
+     derselben Listung fehlen in den Reihen - `geraete_verlauf.messtage` hat
+     sie herausgenommen -, und ohne diesen Satz laese sich die Luecke als
+     "unveraendert". */
+  function mehrdeutigSatz(g) {
+    if (!g || !g.mehrdeutig || !g.mehrdeutig.length) return '';
+    return g.mehrdeutig.map(function (m) {
+      var n = m.tage.length;
+      return ' ' + m.anbieter + ' nannte an ' + n +
+        (n === 1 ? ' Messtag' : ' Messtagen') +
+        ' zwei Preise derselben Listung – diese Tage sind als Messlücke ' +
+        'ausgelassen, nicht als Preisänderung gezählt.';
+    }).join('');
+  }
   /* `tagDE` endet auf einem Punkt ("30.8."). Ein Satzpunkt dahinter ergibt
      "30.8.." - im ersten Anlauf genau so auf der Seite gestanden, an ZWEI
      Stellen. Deshalb setzt `punkt()` das Satzende, nicht der Aufrufer. */
@@ -1481,7 +1583,7 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
     }
     stand.hidden = false;
     stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
-      ' vor, ' + spanne(tage)) + nachsatz;
+      ' vor, ' + spanne(tage)) + nachsatz + mehrdeutigSatz(g);
   }
 
   function zeichne(g) {
@@ -1589,9 +1691,12 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
             ? ' In diesem Raster fallen sie auf ' + tageSort.length +
               ' Punkt' + (tageSort.length === 1 ? '' : 'e') +
               ' zusammen – für einen Verlauf braucht es ' + AB_TERMINEN +
-              '. Ein feineres Raster zeigt mehr.'
+              /* S6: "Wöchentlich" ist das feinste Raster - der Hinweis
+                 versprach dort etwas, das es nicht gibt. */
+              (raster === 'woche' ? '.' : '. Ein feineres Raster zeigt mehr.')
             : ' Ein Verlauf entsteht ab ' + AB_TERMINEN + '.') +
-          ' Bis dahin stehen die Preise als Tabelle darunter.';
+          ' Bis dahin stehen die Preise als Tabelle darunter.' +
+          mehrdeutigSatz(g);
       }
       tabelleBauen(reihen);
       return;
@@ -1798,7 +1903,81 @@ grFilterleiste('tafel-katalog', 'gr-kmehr');
         }, r.anbieter + ' ' + euro(letzt.preis)));
       }
     });
+
+    /* DER BESTPREIS-STEMPEL (idealo-Muster, 04.09.2026).
+
+       Die Kachel "Niedrigster Preis" sagt, WIE tief es war. Sie sagt nicht,
+       WANN - und genau das ist die Frage, die man an einen Verlauf hat.
+       Der Stempel beantwortet sie im Bild: ein Ring auf dem tiefsten Punkt
+       und darunter das Datum.
+
+       ER TRAEGT DEN PREIS NICHT NOCH EINMAL. Die Zahl steht schon in der
+       Kachel, und "eine Zahl steht je Ort genau EINMAL" (Beruhigungsregeln)
+       gilt auch dann, wenn die zweite Stelle ein SVG ist. Der Ring sitzt auf
+       der Preishoehe, das Etikett auf derselben Hoehe daneben - die Y-Achse
+       gehoert dem Preis, hier wird so wenig verschoben wie in der geloeschten
+       Positionskarte.
+
+       Bei flacher Reihe entfaellt er: wenn jeder Punkt derselbe Preis ist,
+       ist jeder der billigste, und ein Stempel behauptete einen Tiefpunkt,
+       den es nicht gibt. */
+    var bestMarke = null, bestX = 0;
+    if (!flach) {
+      var bester = null;
+      reihen.forEach(function (r) {
+        r.punkte.forEach(function (p) {
+          /* Bei gleichem Preis gewinnt der FRUEHERE Tag: gefragt ist, seit
+             wann es so billig ist, nicht wer zuletzt nachgezogen hat. */
+          if (!bester || p.preis < bester.preis ||
+              (p.preis === bester.preis && p.datum < bester.datum)) {
+            bester = { preis: p.preis, datum: p.datum,
+                       anbieter: r.anbieter, farbe: r.farbe };
+          }
+        });
+      });
+      if (bester) {
+        var bx = x(bester.datum), by = y(bester.preis);
+        var ring = el('circle', {
+          cx: bx, cy: by, r: 9, fill: 'none', stroke: bester.farbe,
+          class: 'gr-vbest' });
+        ring.appendChild(el('title', {}, 'Billigster gemessener Stand: ' +
+                            bester.anbieter + ' ' + euro(bester.preis) +
+                            ' am ' + tagDE(bester.datum)));
+        svg.appendChild(ring);
+        /* Das Etikett kippt nach links, sobald es sonst aus dem Bild
+           liefe - der tiefste Punkt liegt oft am rechten Rand.
+
+           GEMESSEN, NICHT GESCHAETZT. Die erste Fassung reservierte pauschal
+           78 px; im Chromium gemessen ist "billigster Stand 4.8." aber
+           110,3 px breit, und bei einem Tiefpunkt auf 92 Prozent der
+           Zeitachse standen 30 px ausserhalb der viewBox - abgeschnitten war
+           ausgerechnet das Datum, also die einzige Auskunft dieses
+           Etiketts. `getComputedTextLength()` gibt es genau dafuer; es
+           braucht den Knoten IM Baum, deshalb wird erst angehaengt und dann
+           gemessen. */
+        bestMarke = el('text', {
+          x: bx + 14, y: by + 4, class: 'gr-vbestmarke',
+          fill: bester.farbe, 'text-anchor': 'start'
+        }, 'billigster Stand ' + tagDE(bester.datum));
+        bestX = bx;
+        svg.appendChild(bestMarke);
+      }
+    }
     bild.appendChild(svg);
+
+    /* ERST JETZT MESSEN. `getComputedTextLength()` gibt an einem Knoten
+       ausserhalb des Dokuments 0 zurueck - der Zweig kippte dann nie, und
+       der Test fand das Etikett 112 px ausserhalb der viewBox. Der Baum
+       oben wird detached aufgebaut; die Messung gehoert deshalb hinter das
+       Einhaengen und nicht davor. */
+    if (bestMarke) {
+      var breit = bestMarke.getComputedTextLength ?
+                  bestMarke.getComputedTextLength() : 0;
+      if (bestX + 14 + breit > BREITE - 6) {
+        bestMarke.setAttribute('x', bestX - 14);
+        bestMarke.setAttribute('text-anchor', 'end');
+      }
+    }
 
     reihen.forEach(function (r) {
       var s = document.createElement('span');

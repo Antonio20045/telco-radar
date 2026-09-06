@@ -57,6 +57,12 @@ _HISTORIENFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
 # Vertragspreis ist, bekam nie einen Historienpunkt.
 _PREISFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung")
 
+# Die Felder, die die PREISFORM von `preis_ohne_vertrag` beschreiben. Sie
+# gehoeren zusammen und zu genau der Zahl, mit der sie gemessen wurden -
+# siehe `GeraeteDB.upsert`.
+_PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate",
+                    "zins_effektiv")
+
 
 def _ist_ausfall(feld: str, wert) -> bool:
     """Steht dieser Wert fuer "diesmal nicht gemessen"?
@@ -189,6 +195,13 @@ class GeraeteDB:
         neu = 0
         gesehen: set[str] = set()
         self.kollisionen = []
+        # Die ROHSAETZE, die dieser Aufruf wegen einer Kollision NICHT
+        # eingetragen hat. Der Aufrufer braucht sie, um fuer sie auch keine
+        # Historie zu schreiben - sonst entsteht genau die Saegezahnkurve,
+        # die der Kommentar unten verhindern will, nur eine Stufe spaeter
+        # (QA-Befund B2, 04.09.2026: ALDI TALKs Galaxy A17 sprang in
+        # `geraete_preise.jsonl` jeden Tag zwischen 129 und 159 EUR).
+        self.uebergangen: list = []
         for roh in listungen:
             listung = _als_listung(roh)
             lid = listung.listung_id
@@ -206,6 +219,7 @@ class GeraeteDB:
                 # Historie in jedem Lauf zwei Aenderungspunkte hin und zurueck
                 # und die Kurve saehe aus wie ein Preiskampf.
                 self.kollisionen.append((lid, listung.titel_roh))
+                self.uebergangen.append(roh)
                 continue
             gesehen.add(lid)
             if eintrag is None:
@@ -279,11 +293,30 @@ class GeraeteDB:
                 eintrag["einstiege"] = heimat
             if listung.titel_roh:
                 eintrag["titel_roh"] = listung.titel_roh
+            # Eine Preisform gehoert zu DER Zahl, mit der sie gemessen
+            # wurde. Kommt ein ANDERER Preis herein und dieser Lauf nennt
+            # keine Laufzeit, ist die gespeicherte Form nicht ausgefallen,
+            # sondern ueberholt: sonst traegt ein frischer Barpreis das
+            # Etikett "in 24 Raten (0 %)" vom Vortag - genau die
+            # Verwechslung, gegen die die Kennzeichnung gebaut ist. Ein
+            # falsches Etikett ist schlimmer als keins.
+            if (listung.laufzeit_monate is None
+                    and listung.preis_ohne_vertrag is not None
+                    and eintrag.get("preis_ohne_vertrag") is not None
+                    and eintrag["preis_ohne_vertrag"]
+                    != listung.preis_ohne_vertrag):
+                for feld in _PREISFORMFELDER:
+                    eintrag.pop(feld, None)
             # Preisfelder: ein Wert, den der Extraktor diesmal NICHT fand,
             # ueberschreibt den bekannten nicht. Sonst waere jede Luecke in
             # der Extraktion eine Preisaenderung.
+            #
+            # Die Preisform folgt derselben Regel, solange die Zahl
+            # dieselbe bleibt (siehe oben). Sie beschreibt den AKTUELLEN
+            # Preis; die Historie in `geraete_preise.jsonl` wird davon
+            # nicht angefasst und kein alter Preispunkt umgedeutet.
             for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                         "zuzahlung"):
+                         "zuzahlung") + _PREISFORMFELDER:
                 wert = getattr(listung, feld)
                 if wert is not None:
                     eintrag[feld] = wert
