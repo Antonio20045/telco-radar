@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-06",
+ "updated": "2026-09-07",
  "buendel": [
   {
    "id": "buendel--vodafone--apple-iphone-15-128gb-schwarz--mobil-m",
@@ -17,10 +17,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-15.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-15-128gb-schwarz--mobil-s",
+   "sku_id": "apple-iphone-15-128gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 58.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-15.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-15-128gb-schwarz--mobil-xs",
@@ -42,6 +63,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-15-256gb-schwarz--mobil-m",
+   "sku_id": "apple-iphone-15-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 34.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-15.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-15-256gb-schwarz--mobil-xs",
@@ -80,10 +122,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-16-128gb-blau--mobil-xs",
@@ -105,6 +147,48 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-16-128gb-blaugruen--mobil-m",
+   "sku_id": "apple-iphone-16-128gb-blaugruen",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 34.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-16-128gb-blaugruen--mobil-s",
+   "sku_id": "apple-iphone-16-128gb-blaugruen",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 69.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-16-128gb-blaugruen--mobil-xs",
@@ -164,10 +248,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-16-128gb-schwarz--mobil-xs",
@@ -191,6 +275,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--apple-iphone-16-128gb-weiss--mobil-m",
+   "sku_id": "apple-iphone-16-128gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 34.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--apple-iphone-16-128gb-weiss--mobil-s",
    "sku_id": "apple-iphone-16-128gb-weiss",
    "anbieter": "Vodafone",
@@ -206,10 +311,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-16-128gb-weiss--mobil-xs",
@@ -290,10 +395,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-16e-128gb-weiss--mobil-m",
@@ -353,10 +458,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-16e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-256gb-gruen--mobil-m",
@@ -374,10 +479,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-256gb-gruen--mobil-xs",
@@ -395,10 +500,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-256gb-nebelblau--mobil-m",
@@ -416,10 +521,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-256gb-nebelblau--mobil-s",
+   "sku_id": "apple-iphone-17-256gb-nebelblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 78.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-256gb-nebelblau--mobil-xs",
@@ -443,6 +569,90 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--apple-iphone-17-256gb-schwarz--mobil-m",
+   "sku_id": "apple-iphone-17-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 39.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-256gb-schwarz--mobil-s",
+   "sku_id": "apple-iphone-17-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 78.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-256gb-schwarz--mobil-xs",
+   "sku_id": "apple-iphone-17-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 26.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-256gb-violett--mobil-m",
+   "sku_id": "apple-iphone-17-256gb-violett",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 39.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--apple-iphone-17-256gb-violett--mobil-s",
    "sku_id": "apple-iphone-17-256gb-violett",
    "anbieter": "Vodafone",
@@ -458,10 +668,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-256gb-violett--mobil-xs",
@@ -542,10 +752,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-512gb-gruen--mobil-xs",
@@ -563,10 +773,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-512gb-nebelblau--mobil-m",
@@ -590,6 +800,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--apple-iphone-17-512gb-nebelblau--mobil-xs",
+   "sku_id": "apple-iphone-17-512gb-nebelblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 33.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--apple-iphone-17-512gb-schwarz--mobil-s",
    "sku_id": "apple-iphone-17-512gb-schwarz",
    "anbieter": "Vodafone",
@@ -611,6 +842,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--apple-iphone-17-512gb-schwarz--mobil-xs",
+   "sku_id": "apple-iphone-17-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 33.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--apple-iphone-17-512gb-violett--mobil-m",
    "sku_id": "apple-iphone-17-512gb-violett",
    "anbieter": "Vodafone",
@@ -626,10 +878,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-512gb-violett--mobil-s",
@@ -668,10 +920,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-512gb-weiss--mobil-m",
@@ -731,10 +983,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-1024gb-cosmic-orange--mobil-s",
+   "sku_id": "apple-iphone-17-pro-1024gb-cosmic-orange",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 141.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-1024gb-tiefblau--mobil-m",
@@ -773,10 +1046,52 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-1024gb-tiefblau--mobil-xs",
+   "sku_id": "apple-iphone-17-pro-1024gb-tiefblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 47.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-256gb-cosmic-orange--mobil-s",
+   "sku_id": "apple-iphone-17-pro-256gb-cosmic-orange",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 99.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-256gb-cosmic-orange--mobil-xs",
@@ -794,10 +1109,73 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-256gb-silber--mobil-m",
+   "sku_id": "apple-iphone-17-pro-256gb-silber",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 49.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-256gb-tiefblau--mobil-m",
+   "sku_id": "apple-iphone-17-pro-256gb-tiefblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 49.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-512gb-cosmic-orange--mobil-m",
+   "sku_id": "apple-iphone-17-pro-512gb-cosmic-orange",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 60.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-512gb-silber--mobil-m",
@@ -815,10 +1193,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-512gb-tiefblau--mobil-m",
@@ -836,10 +1214,52 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-512gb-tiefblau--mobil-xs",
+   "sku_id": "apple-iphone-17-pro-512gb-tiefblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 40.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-256gb-silber--mobil-s",
+   "sku_id": "apple-iphone-17-pro-max-256gb-silber",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 111.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-max-256gb-silber--mobil-xs",
@@ -878,10 +1298,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-max-256gb-tiefblau--mobil-s",
@@ -899,10 +1319,73 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-256gb-tiefblau--mobil-xs",
+   "sku_id": "apple-iphone-17-pro-max-256gb-tiefblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 37.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-512gb-cosmic-orange--mobil-m",
+   "sku_id": "apple-iphone-17-pro-max-512gb-cosmic-orange",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 66.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-512gb-cosmic-orange--mobil-s",
+   "sku_id": "apple-iphone-17-pro-max-512gb-cosmic-orange",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 132.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17-pro-max-512gb-cosmic-orange--mobil-xs",
@@ -941,10 +1424,73 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-512gb-silber--mobil-xs",
+   "sku_id": "apple-iphone-17-pro-max-512gb-silber",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 44.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17-pro-max-512gb-tiefblau--mobil-m",
+   "sku_id": "apple-iphone-17-pro-max-512gb-tiefblau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 66.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17e-256gb-hellrosa--mobil-s",
+   "sku_id": "apple-iphone-17e-256gb-hellrosa",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 57.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-256gb-hellrosa--mobil-xs",
@@ -968,6 +1514,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--apple-iphone-17e-256gb-schwarz--mobil-m",
+   "sku_id": "apple-iphone-17e-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 28.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--apple-iphone-17e-256gb-schwarz--mobil-s",
    "sku_id": "apple-iphone-17e-256gb-schwarz",
    "anbieter": "Vodafone",
@@ -983,10 +1550,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-256gb-schwarz--mobil-xs",
@@ -1008,6 +1575,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--apple-iphone-17e-256gb-weiss--mobil-m",
+   "sku_id": "apple-iphone-17e-256gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 28.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-256gb-weiss--mobil-s",
@@ -1088,10 +1676,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-512gb-hellrosa--mobil-xs",
@@ -1109,10 +1697,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-512gb-schwarz--mobil-m",
@@ -1130,10 +1718,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-512gb-schwarz--mobil-s",
@@ -1193,10 +1781,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17e.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-17e-512gb-weiss--mobil-s",
@@ -1235,10 +1823,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-himmelblau--mobil-s",
@@ -1256,10 +1844,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-himmelblau--mobil-xs",
@@ -1277,10 +1865,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-lichtgold--mobil-m",
@@ -1298,10 +1886,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-lichtgold--mobil-s",
@@ -1319,10 +1907,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-lichtgold--mobil-xs",
@@ -1340,10 +1928,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-space-schwarz--mobil-m",
@@ -1361,10 +1949,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-space-schwarz--mobil-s",
@@ -1382,10 +1970,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-1024gb-space-schwarz--mobil-xs",
@@ -1403,10 +1991,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-himmelblau--mobil-m",
@@ -1424,10 +2012,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-himmelblau--mobil-s",
@@ -1445,10 +2033,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-himmelblau--mobil-xs",
@@ -1466,10 +2054,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-space-schwarz--mobil-m",
@@ -1487,10 +2075,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-space-schwarz--mobil-s",
@@ -1508,10 +2096,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-space-schwarz--mobil-xs",
@@ -1529,10 +2117,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-wolkenweiss--mobil-m",
@@ -1550,10 +2138,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-wolkenweiss--mobil-s",
@@ -1571,10 +2159,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-256gb-wolkenweiss--mobil-xs",
@@ -1592,10 +2180,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-himmelblau--mobil-m",
@@ -1613,10 +2201,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-himmelblau--mobil-s",
@@ -1634,10 +2222,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-himmelblau--mobil-xs",
@@ -1655,10 +2243,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-lichtgold--mobil-m",
@@ -1676,10 +2264,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-lichtgold--mobil-s",
@@ -1697,10 +2285,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-lichtgold--mobil-xs",
@@ -1718,10 +2306,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-space-schwarz--mobil-m",
@@ -1739,10 +2327,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-space-schwarz--mobil-s",
@@ -1760,10 +2348,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--apple-iphone-air-512gb-space-schwarz--mobil-xs",
@@ -1781,10 +2369,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/iphone-air.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--fairphone-6-256gb-horizon-black--mobil-m",
+   "sku_id": "fairphone-6-256gb-horizon-black",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 22.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/fairphone-6.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--fairphone-6-256gb-horizon-black--mobil-s",
@@ -1827,6 +2436,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-10-128gb-schwarz--mobil-m",
+   "sku_id": "google-pixel-10-128gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 24.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10-pro-128gb-schwarz--mobil-m",
@@ -1886,10 +2516,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-10-pro-xl-256gb-schwarz--mobil-s",
+   "sku_id": "google-pixel-10-pro-xl-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 69.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10-pro-xl-256gb-schwarz--mobil-xs",
@@ -1907,10 +2558,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-10a-128gb-berry--mobil-m",
+   "sku_id": "google-pixel-10a-128gb-berry",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 20.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-128gb-berry--mobil-xs",
@@ -1949,10 +2621,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-128gb-fog--mobil-s",
@@ -1970,10 +2642,31 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-10a-128gb-fog--mobil-xs",
+   "sku_id": "google-pixel-10a-128gb-fog",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 13.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-128gb-schwarz--mobil-s",
@@ -1991,10 +2684,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-128gb-schwarz--mobil-xs",
@@ -2012,10 +2705,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-128gb-violett--mobil-m",
@@ -2058,6 +2751,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-10a-256gb-schwarz--mobil-m",
+   "sku_id": "google-pixel-10a-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 24.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-10a.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-10a-256gb-schwarz--mobil-s",
@@ -2117,10 +2831,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-256gb-hibiscus--mobil-s",
@@ -2138,10 +2852,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-256gb-hibiscus--mobil-xs",
@@ -2159,10 +2873,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-256gb-pistachio--mobil-m",
+   "sku_id": "google-pixel-11-256gb-pistachio",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 32.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-256gb-pistachio--mobil-xs",
@@ -2180,10 +2915,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-256gb-schwarz--mobil-m",
@@ -2222,10 +2957,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-256gb-schwarz--mobil-xs",
@@ -2264,10 +2999,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-512gb-frost--mobil-xs",
@@ -2306,10 +3041,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-512gb-schwarz--mobil-xs",
@@ -2348,10 +3083,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-256gb-canyon--mobil-s",
+   "sku_id": "google-pixel-11-pro-256gb-canyon",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 84.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-256gb-canyon--mobil-xs",
@@ -2369,10 +3125,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-256gb-fog--mobil-s",
@@ -2411,10 +3167,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-256gb-olive--mobil-m",
@@ -2453,10 +3209,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-256gb-schwarz--mobil-m",
+   "sku_id": "google-pixel-11-pro-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 42.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-256gb-schwarz--mobil-s",
@@ -2474,10 +3251,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-256gb-schwarz--mobil-xs",
@@ -2516,10 +3293,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-512gb-canyon--mobil-xs",
@@ -2558,10 +3335,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-512gb-fog--mobil-xs",
+   "sku_id": "google-pixel-11-pro-512gb-fog",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 31.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-512gb-olive--mobil-m",
@@ -2579,10 +3377,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-512gb-olive--mobil-s",
@@ -2621,10 +3419,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-512gb-schwarz--mobil-m",
@@ -2642,10 +3440,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-512gb-schwarz--mobil-s",
@@ -2663,10 +3461,31 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-512gb-schwarz--mobil-xs",
+   "sku_id": "google-pixel-11-pro-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 31.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-fold-256gb-schwarz--mobil-m",
@@ -2684,10 +3503,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-fold.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-canyon--mobil-xs",
@@ -2705,10 +3524,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-fog--mobil-m",
+   "sku_id": "google-pixel-11-pro-xl-256gb-fog",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 50.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-fog--mobil-s",
@@ -2747,10 +3587,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-olive--mobil-m",
@@ -2810,10 +3650,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-schwarz--mobil-m",
@@ -2831,10 +3671,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-256gb-schwarz--mobil-s",
@@ -2873,10 +3713,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-canyon--mobil-s",
+   "sku_id": "google-pixel-11-pro-xl-512gb-canyon",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 111.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-canyon--mobil-xs",
@@ -2894,10 +3755,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-fog--mobil-m",
@@ -2936,10 +3797,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-fog--mobil-xs",
@@ -2963,6 +3824,48 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-olive--mobil-m",
+   "sku_id": "google-pixel-11-pro-xl-512gb-olive",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 55.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-olive--mobil-s",
+   "sku_id": "google-pixel-11-pro-xl-512gb-olive",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 111.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-olive--mobil-xs",
    "sku_id": "google-pixel-11-pro-xl-512gb-olive",
    "anbieter": "Vodafone",
@@ -2978,10 +3881,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-schwarz--mobil-m",
+   "sku_id": "google-pixel-11-pro-xl-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 55.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-schwarz--mobil-s",
@@ -3005,6 +3929,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--google-pixel-11-pro-xl-512gb-schwarz--mobil-xs",
+   "sku_id": "google-pixel-11-pro-xl-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 37.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/google-pixel-11-pro-xl.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-blau--mobil-m",
    "sku_id": "samsung-galaxy-a17-128gb-blau",
    "anbieter": "Vodafone",
@@ -3020,10 +3965,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-blau--mobil-s",
@@ -3041,10 +3986,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-blau--mobil-xs",
@@ -3062,10 +4007,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-schwarz--mobil-m",
@@ -3083,10 +4028,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-schwarz--mobil-s",
@@ -3104,10 +4049,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a17-128gb-schwarz--mobil-xs",
@@ -3125,10 +4070,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a37-128gb-awesome-charcoal--mobil-m",
@@ -3146,10 +4091,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a37-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-a37-128gb-awesome-charcoal--mobil-xs",
+   "sku_id": "samsung-galaxy-a37-128gb-awesome-charcoal",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 10.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a37-5g.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a57-256gb-awesome-gray--mobil-m",
@@ -3167,10 +4133,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a57-256gb-awesome-gray--mobil-s",
@@ -3188,10 +4154,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a57-256gb-awesome-gray--mobil-xs",
@@ -3209,10 +4175,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a57-256gb-awesome-navy--mobil-m",
@@ -3230,10 +4196,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-a57-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-a57-256gb-awesome-navy--mobil-s",
@@ -3335,10 +4301,52 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s25-fe-128gb-blau--mobil-m",
+   "sku_id": "samsung-galaxy-s25-fe-128gb-blau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 27.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s25-fe-128gb-blau--mobil-s",
+   "sku_id": "samsung-galaxy-s25-fe-128gb-blau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 55.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s25-fe-128gb-blau--mobil-xs",
@@ -3356,10 +4364,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s25-fe-128gb-jetblack--mobil-m",
@@ -3377,10 +4385,31 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s25-fe-128gb-jetblack--mobil-xs",
+   "sku_id": "samsung-galaxy-s25-fe-128gb-jetblack",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 18.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s25-fe.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-256gb-cobalt-violet--mobil-m",
@@ -3402,6 +4431,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-256gb-cobalt-violet--mobil-s",
+   "sku_id": "samsung-galaxy-s26-256gb-cobalt-violet",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 76.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-256gb-cobalt-violet--mobil-xs",
@@ -3446,6 +4496,69 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-256gb-sky-blue--mobil-xs",
+   "sku_id": "samsung-galaxy-s26-256gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 25.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-256gb-weiss--mobil-m",
+   "sku_id": "samsung-galaxy-s26-256gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 38.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-256gb-weiss--mobil-s",
+   "sku_id": "samsung-galaxy-s26-256gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 76.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-cobalt-violet--mobil-m",
    "sku_id": "samsung-galaxy-s26-512gb-cobalt-violet",
    "anbieter": "Vodafone",
@@ -3461,10 +4574,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-cobalt-violet--mobil-s",
@@ -3482,10 +4595,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-schwarz--mobil-m",
@@ -3509,6 +4622,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-512gb-schwarz--mobil-s",
+   "sku_id": "samsung-galaxy-s26-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 91.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-schwarz--mobil-xs",
    "sku_id": "samsung-galaxy-s26-512gb-schwarz",
    "anbieter": "Vodafone",
@@ -3528,6 +4662,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-512gb-sky-blue--mobil-s",
+   "sku_id": "samsung-galaxy-s26-512gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 91.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-weiss--mobil-m",
@@ -3566,10 +4721,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-512gb-weiss--mobil-xs",
@@ -3587,10 +4742,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-fe-128gb-grau--mobil-m",
@@ -3612,6 +4767,27 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-fe-128gb-grau--mobil-s",
+   "sku_id": "samsung-galaxy-s26-fe-128gb-grau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 57.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-fe-128gb-grau--mobil-xs",
@@ -3671,10 +4847,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-fe-256gb-grau--mobil-m",
@@ -3713,10 +4889,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-fe-256gb-pistachio--mobil-m",
@@ -3740,6 +4916,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-fe-256gb-pistachio--mobil-s",
+   "sku_id": "samsung-galaxy-s26-fe-256gb-pistachio",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 64.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-fe-256gb-pistachio--mobil-xs",
    "sku_id": "samsung-galaxy-s26-fe-256gb-pistachio",
    "anbieter": "Vodafone",
@@ -3755,10 +4952,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-fe.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-cobalt-violet--mobil-m",
+   "sku_id": "samsung-galaxy-s26-plus-256gb-cobalt-violet",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 45.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-cobalt-violet--mobil-s",
@@ -3803,6 +5021,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-schwarz--mobil-s",
+   "sku_id": "samsung-galaxy-s26-plus-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 91.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-schwarz--mobil-xs",
    "sku_id": "samsung-galaxy-s26-plus-256gb-schwarz",
    "anbieter": "Vodafone",
@@ -3818,10 +5057,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-weiss--mobil-s",
@@ -3845,6 +5084,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-256gb-weiss--mobil-xs",
+   "sku_id": "samsung-galaxy-s26-plus-256gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 30.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-schwarz--mobil-m",
    "sku_id": "samsung-galaxy-s26-plus-512gb-schwarz",
    "anbieter": "Vodafone",
@@ -3866,6 +5126,48 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-schwarz--mobil-s",
+   "sku_id": "samsung-galaxy-s26-plus-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 106.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-schwarz--mobil-xs",
+   "sku_id": "samsung-galaxy-s26-plus-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 35.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-sky-blue--mobil-m",
    "sku_id": "samsung-galaxy-s26-plus-512gb-sky-blue",
    "anbieter": "Vodafone",
@@ -3881,10 +5183,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-sky-blue--mobil-s",
@@ -3902,10 +5204,31 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-weiss--mobil-m",
+   "sku_id": "samsung-galaxy-s26-plus-512gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 53.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-weiss--mobil-s",
@@ -3923,10 +5246,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-plus.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-plus-512gb-weiss--mobil-xs",
@@ -3971,6 +5294,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-1024gb-schwarz--mobil-s",
+   "sku_id": "samsung-galaxy-s26-ultra-1024gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 135.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-s26-ultra-256gb-cobalt-violet--mobil-s",
    "sku_id": "samsung-galaxy-s26-ultra-256gb-cobalt-violet",
    "anbieter": "Vodafone",
@@ -3986,10 +5330,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-ultra-256gb-cobalt-violet--mobil-xs",
@@ -4007,10 +5351,52 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-256gb-schwarz--mobil-m",
+   "sku_id": "samsung-galaxy-s26-ultra-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 48.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-256gb-sky-blue--mobil-m",
+   "sku_id": "samsung-galaxy-s26-ultra-256gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 48.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-ultra-256gb-sky-blue--mobil-s",
@@ -4091,10 +5477,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-schwarz--mobil-xs",
@@ -4116,6 +5502,90 @@
    "zustand": "neu",
    "rabatte": [],
    "last_verified": "2026-09-06"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-sky-blue--mobil-m",
+   "sku_id": "samsung-galaxy-s26-ultra-512gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 56.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-sky-blue--mobil-s",
+   "sku_id": "samsung-galaxy-s26-ultra-512gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 112.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-sky-blue--mobil-xs",
+   "sku_id": "samsung-galaxy-s26-ultra-512gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 37.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-weiss--mobil-s",
+   "sku_id": "samsung-galaxy-s26-ultra-512gb-weiss",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 112.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-s26-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-s26-ultra-512gb-weiss--mobil-xs",
@@ -4160,6 +5630,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip-7-256gb-jetblack--mobil-s",
+   "sku_id": "samsung-galaxy-z-flip-7-256gb-jetblack",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 88.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip7.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-flip-7-256gb-jetblack--mobil-xs",
    "sku_id": "samsung-galaxy-z-flip-7-256gb-jetblack",
    "anbieter": "Vodafone",
@@ -4181,6 +5672,48 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-cream--mobil-m",
+   "sku_id": "samsung-galaxy-z-flip8-256gb-cream",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 45.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-cream--mobil-s",
+   "sku_id": "samsung-galaxy-z-flip8-256gb-cream",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 91.5,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-grau--mobil-xs",
    "sku_id": "samsung-galaxy-z-flip8-256gb-grau",
    "anbieter": "Vodafone",
@@ -4196,10 +5729,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-rosa--mobil-m",
@@ -4217,10 +5750,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-rosa--mobil-s",
@@ -4244,6 +5777,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip8-256gb-rosa--mobil-xs",
+   "sku_id": "samsung-galaxy-z-flip8-256gb-rosa",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 30.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-cream--mobil-m",
    "sku_id": "samsung-galaxy-z-flip8-512gb-cream",
    "anbieter": "Vodafone",
@@ -4265,6 +5819,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-grau--mobil-m",
+   "sku_id": "samsung-galaxy-z-flip8-512gb-grau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 54.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-grau--mobil-s",
    "sku_id": "samsung-galaxy-z-flip8-512gb-grau",
    "anbieter": "Vodafone",
@@ -4280,10 +5855,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-rosa--mobil-m",
@@ -4301,10 +5876,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-rosa--mobil-s",
@@ -4322,10 +5897,52 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-flip8-512gb-rosa--mobil-xs",
+   "sku_id": "samsung-galaxy-z-flip8-512gb-rosa",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 36.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-flip8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold-7-256gb-jetblack--mobil-m",
+   "sku_id": "samsung-galaxy-z-fold-7-256gb-jetblack",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 69.75,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold7.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold-7-256gb-jetblack--mobil-s",
@@ -4385,10 +6002,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-256gb-grau--mobil-s",
@@ -4454,6 +6071,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold8-256gb-violett--mobil-xs",
+   "sku_id": "samsung-galaxy-z-fold8-256gb-violett",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 42.5,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-512gb-cream--mobil-m",
    "sku_id": "samsung-galaxy-z-fold8-512gb-cream",
    "anbieter": "Vodafone",
@@ -4469,10 +6107,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-512gb-cream--mobil-xs",
@@ -4559,6 +6197,48 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold8-512gb-violett--mobil-xs",
+   "sku_id": "samsung-galaxy-z-fold8-512gb-violett",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 48.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-256gb-cream--mobil-xs",
+   "sku_id": "samsung-galaxy-z-fold8-ultra-256gb-cream",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 48.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-256gb-grau--mobil-m",
    "sku_id": "samsung-galaxy-z-fold8-ultra-256gb-grau",
    "anbieter": "Vodafone",
@@ -4595,10 +6275,52 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-256gb-grau--mobil-xs",
+   "sku_id": "samsung-galaxy-z-fold8-ultra-256gb-grau",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil XS",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-xs",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 31.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 48.0,
+   "laufzeit_monate": 36,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-256gb-violet-shadow--mobil-m",
+   "sku_id": "samsung-galaxy-z-fold8-ultra-256gb-violet-shadow",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 72.0,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-256gb-violet-shadow--mobil-s",
@@ -4637,10 +6359,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-512gb-cream--mobil-m",
@@ -4658,10 +6380,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-512gb-cream--mobil-s",
@@ -4721,10 +6443,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/samsung-galaxy-z-fold8-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--samsung-galaxy-z-fold8-ultra-512gb-grau--mobil-xs",
@@ -4790,6 +6512,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--xiaomi-17-512gb-schwarz--mobil-s",
+   "sku_id": "xiaomi-17-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 81.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--xiaomi-17-512gb-schwarz--mobil-xs",
    "sku_id": "xiaomi-17-512gb-schwarz",
    "anbieter": "Vodafone",
@@ -4805,10 +6548,31 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--xiaomi-17-ultra-512gb-schwarz--mobil-m",
+   "sku_id": "xiaomi-17-ultra-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 53.25,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17-ultra.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-17-ultra-512gb-schwarz--mobil-s",
@@ -4826,10 +6590,31 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17-ultra.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
+  },
+  {
+   "id": "buendel--vodafone--xiaomi-17t-256gb-schwarz--mobil-m",
+   "sku_id": "xiaomi-17t-256gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil M",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-m",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 51.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 25.5,
+   "laufzeit_monate": 24,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17t.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-17t-256gb-schwarz--mobil-s",
@@ -4847,10 +6632,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17t.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-17t-256gb-schwarz--mobil-xs",
@@ -4937,6 +6722,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--xiaomi-17t-pro-512gb-schwarz--mobil-s",
+   "sku_id": "xiaomi-17t-pro-512gb-schwarz",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 0.99,
+   "geraet_monatsrate": 63.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-17t-pro.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--xiaomi-17t-pro-512gb-schwarz--mobil-xs",
    "sku_id": "xiaomi-17t-pro-512gb-schwarz",
    "anbieter": "Vodafone",
@@ -4973,10 +6779,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-17-128gb-deep-blue--mobil-s",
@@ -4994,10 +6800,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-17-128gb-deep-blue--mobil-xs",
@@ -5015,10 +6821,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-17-128gb-schwarz--mobil-m",
@@ -5036,10 +6842,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-17-128gb-schwarz--mobil-s",
@@ -5057,10 +6863,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-17-128gb-schwarz--mobil-xs",
@@ -5078,10 +6884,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-15-256gb-blau--mobil-m",
@@ -5099,10 +6905,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-15-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-15-256gb-blau--mobil-s",
@@ -5120,10 +6926,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-15-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-15-256gb-blau--mobil-xs",
@@ -5141,10 +6947,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-15-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-128gb-schwarz--mobil-m",
@@ -5162,10 +6968,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-128gb-schwarz--mobil-s",
@@ -5183,10 +6989,10 @@
    "laufzeit_monate": 12,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-128gb-schwarz--mobil-xs",
@@ -5204,10 +7010,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-pro-256gb-schwarz--mobil-m",
@@ -5225,10 +7031,10 @@
    "laufzeit_monate": 24,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-pro-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-pro-256gb-schwarz--mobil-s",
@@ -5294,6 +7100,27 @@
    "last_verified": "2026-09-06"
   },
   {
+   "id": "buendel--vodafone--xiaomi-redmi-note-17-pro-256gb-sky-blue--mobil-s",
+   "sku_id": "xiaomi-redmi-note-17-pro-256gb-sky-blue",
+   "anbieter": "Vodafone",
+   "tarif_name": "Mobil S",
+   "first_seen": "2026-09-07",
+   "tarif_id": "vodafone:vodafone-mobil-s",
+   "tarif_id_guete": "hoch",
+   "tarif_monatlich": 41.95,
+   "tarif_bindung_monate": null,
+   "buendel_monatlich": null,
+   "geraet_zuzahlung": 1.0,
+   "geraet_monatsrate": 33.0,
+   "laufzeit_monate": 12,
+   "anschlusspreis": 0.0,
+   "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-pro-5g.html",
+   "abgerufen_am": "2026-09-07",
+   "zustand": "neu",
+   "rabatte": [],
+   "last_verified": "2026-09-07"
+  },
+  {
    "id": "buendel--vodafone--xiaomi-redmi-note-17-pro-256gb-sky-blue--mobil-xs",
    "sku_id": "xiaomi-redmi-note-17-pro-256gb-sky-blue",
    "anbieter": "Vodafone",
@@ -5309,10 +7136,10 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.vodafone.de/privat/handys/xiaomi-redmi-note-17-pro-5g.html",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "zustand": "neu",
    "rabatte": [],
-   "last_verified": "2026-09-06"
+   "last_verified": "2026-09-07"
   },
   {
    "id": "buendel--o2--apple-iphone-14-128gb-schwarz--o2-mobile-on-demand-m-plus-mit-50-gb-24-mon",
@@ -5328,9 +7155,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5349,9 +7176,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-128gb-mitternacht-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -5370,9 +7197,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-dunkellila-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5409,9 +7236,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-max-512gb-gold-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5430,9 +7257,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5451,9 +7278,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-128gb-schwarz-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -5472,9 +7299,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5493,9 +7320,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-blau-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -5514,9 +7341,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-128gb-titan-natur-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5535,9 +7362,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-15-pro-max-256gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5556,9 +7383,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-blau-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -5577,9 +7404,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5598,9 +7425,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-plus-128gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5619,9 +7446,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-128gb-titan-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5640,9 +7467,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16-pro-max-256gb-titan-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5661,9 +7488,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-16e-128gb-weiss-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5682,9 +7509,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5703,9 +7530,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-256gb-schwarz-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -5724,9 +7551,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-256gb-silber-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5745,9 +7572,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17-pro-max-256gb-tiefblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5766,9 +7593,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-17e-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5787,9 +7614,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/apple/apple-iphone-air-256gb-himmelblau-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5808,9 +7635,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/fairphone/fairphone-6-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5829,9 +7656,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-10-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5850,9 +7677,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-128gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5871,9 +7698,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-fold-256gb-moonstone-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5892,9 +7719,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-10-pro-xl-256gb-obsidian-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5913,9 +7740,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-10a-128gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5934,9 +7761,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-11-256gb-frost-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5955,9 +7782,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-fold-256gb-olive-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5976,9 +7803,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/google/google-pixel-11-pro-xl-256gb-canyon-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -5997,9 +7824,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/nothing/nothing-phone-3-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6018,9 +7845,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/nothing/nothing-phone-4a-pro-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6039,9 +7866,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a37-128gb-awesome-charcoal-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6060,9 +7887,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a56-128gb-awesome-graphite-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6081,9 +7908,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-a57-128gb-awesome-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6102,9 +7929,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s23-128gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6141,9 +7968,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-128gb-onyx-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6162,9 +7989,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s24-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6201,9 +8028,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-navy-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6222,9 +8049,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-grau-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -6243,9 +8070,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-256gb-blueblack-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6264,9 +8091,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-silverblue-erneuert-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "refurbished"
@@ -6303,9 +8130,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-ultra-256gb-titanium-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6324,9 +8151,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6345,9 +8172,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ee-256gb-black-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6366,9 +8193,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-fe-128gb-pistachio-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6387,9 +8214,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-plus-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6408,9 +8235,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 0.0,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s26-ultra-256gb-cobalt-violet-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-l-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6429,9 +8256,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-flip8-256gb-pink-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6450,9 +8277,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-256gb-lavender-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6471,9 +8298,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/samsung/samsung-galaxy-z-fold8-ultra-256gb-violet-shadow-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6492,9 +8319,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17-512gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6513,9 +8340,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-256gb-schwarz-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6534,9 +8361,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-17t-pro-512gb-violett-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6573,9 +8400,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-15-pro-256gb-schwarz-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6594,9 +8421,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-256gb-blue-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6615,9 +8442,9 @@
    "laufzeit_monate": 36,
    "anschlusspreis": 39.99,
    "quelle_url": "https://www.o2online.de/e-shop/xiaomi/xiaomi-redmi-note-17-pro-max-256gb-cloud-5g-details?ohne-tarif=nein&zielgruppe=privatkunden&ratenzahlung=36&vertragsart=ratenzahlung&tarif=o2-mobile-on-demand-m-plus",
-   "abgerufen_am": "2026-09-06",
+   "abgerufen_am": "2026-09-07",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "tarif_bindung_monate": null,
    "buendel_monatlich": null,
    "zustand": "neu"
@@ -6636,7 +8463,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6651,7 +8478,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6666,7 +8493,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6681,7 +8508,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6696,7 +8523,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6711,7 +8538,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6726,7 +8553,7 @@
    "quelle_url": "https://www.1und1.de/handytarife",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6741,7 +8568,7 @@
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/magentamobil-basic-20240801",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6756,7 +8583,7 @@
    "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17797#js-tileSectionRef",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6771,7 +8598,7 @@
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-l-flex-20211005",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6786,7 +8613,7 @@
    "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17791#js-tileSectionRef",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6801,7 +8628,7 @@
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-m-flex-20211005",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6816,7 +8643,7 @@
    "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17785#js-tileSectionRef",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6831,7 +8658,7 @@
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-s-flex-20211005",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6846,7 +8673,7 @@
    "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17803#js-tileSectionRef",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6861,7 +8688,7 @@
    "quelle_url": "https://www.telekom.de/produktinformationsblatt/mobilfunk-magentamobil-xl-flex-20211005",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6876,7 +8703,7 @@
    "quelle_url": "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17779#js-tileSectionRef",
    "abgerufen_am": "2026-09-06",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -6891,7 +8718,7 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-L-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6906,7 +8733,7 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-M-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6921,7 +8748,7 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-S-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6936,7 +8763,7 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XL-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6951,7 +8778,7 @@
    "quelle_url": "https://www.vodafone.de/media/downloads/pdf/VF-Mobil-XS-Juli-2026.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6966,7 +8793,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_545.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6981,7 +8808,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_549.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -6996,7 +8823,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_540.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7011,7 +8838,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_548.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7026,7 +8853,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_559.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7041,7 +8868,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_560.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7056,7 +8883,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_550.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7071,7 +8898,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_546.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7086,7 +8913,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/files_congstar/documents/PIBs/2026/congstar/Produktinformationsblatt_544.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7101,7 +8928,7 @@
    "quelle_url": "https://www.congstar.de/fileadmin/produktinformationsblatt/Produktinformationsblatt_543.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7116,7 +8943,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7131,7 +8958,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7146,7 +8973,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7161,7 +8988,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7176,7 +9003,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7191,7 +9018,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7206,7 +9033,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7221,7 +9048,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7236,7 +9063,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7251,7 +9078,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7266,7 +9093,7 @@
    "quelle_url": "https://static2.o9.de/resource/blob/2241742/f853005b6defea74a5b4b10da9240e49/o2-mobile-unlimited-m-flex-2026-download-data.pdf",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "dokument"
   },
   {
@@ -7281,7 +9108,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   },
   {
@@ -7296,7 +9123,7 @@
    "quelle_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
    "abgerufen_am": "2026-09-04",
    "rabatte": [],
-   "last_verified": "2026-09-06",
+   "last_verified": "2026-09-07",
    "quelle_art": "live_shop"
   }
  ]
