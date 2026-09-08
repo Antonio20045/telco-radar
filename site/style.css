@@ -42,6 +42,16 @@
   --serif:'Source Serif 4','Source Serif Pro',Charter,'Bitstream Charter',
           'Liberation Serif',Georgia,'Times New Roman',serif;
   --sans:'Libre Franklin','Helvetica Neue','Liberation Sans',Helvetica,Arial,sans-serif;
+  /* F-4e (Optik-Schritt 5, 09.09.2026): die Sans-Schrift DES SYSTEMS - ohne
+     den Webfont. Graph-Beschriftungen sollen nicht davon abhaengen, ob
+     Google Fonts laedt; "Libre Franklin" wird ohnehin nur in 600/700/800
+     geliefert, die 12-px-Beschriftungen liefen also schon auf dem
+     Rueckfall. Angewandt auf die "Serie startet"-Annotationen, die
+     Spannen-Annotation der Y-Achse (F-4c) und die G2-Ereignispfeile (die
+     als einzige Graph-Klasse bisher gar keine Schriftregel trugen und
+     die Koerperserbe erbten). */
+  --sans-system:'Helvetica Neue','Liberation Sans',Helvetica,Arial,
+                system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --ease:cubic-bezier(.22,1,.36,1);
 }
@@ -2780,17 +2790,42 @@ b,strong{font-weight:700}
 .gr-g0-raster{stroke:var(--rule-2);stroke-width:1}
 .gr-g0-raster--x{stroke-dasharray:2 4}
 .gr-g0-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+/* F-4c (09.09.2026): die Spannen-Annotation der Y-Achse - "Spanne: ~150 €"
+   ueber der Zeichenflaeche. System-Sans (F-4e), gleiche Groesse wie die
+   Achsenmarken, aber dunkler (sie sagt etwas UEBER die Achse, sie ist
+   keine Achsenmarke). */
+.gr-g0-spanne{font-family:var(--sans-system);font-size:12px;
+  fill:var(--ink-3)}
+/* F-4d (09.09.2026): die eigene Reihe mit MEHR GEWICHT - rot ist auf
+   diesem Portal die Farbe des eigenen Angebots, mit gleicher
+   Strichstaerke las sich Telekom-Magenta daneben als zweite rote Linie.
+   Dieselbe Auszeichnung wie im interaktiven Chart (app.js,
+   `r.eigen ? 3 : 2`). */
 .gr-g0-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g0-linie--eigen{stroke-width:3}
 .gr-g0-punkt{fill:var(--anb,#57534a)}
 /* Ein Anbieter mit nur EINEM Punkt traegt keine Linie - der Punkt ist
-   etwas groesser (siehe `r` in `geraete_tco_grafik.zeitreihe`) und bekommt
+   etwas groesser (siehe `_symbol` in `geraete_tco_grafik`) und bekommt
    einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
    bewegte Linie eines anderen Anbieters an ihm vorbeilaeuft. */
 .gr-g0-punkt--einzeln{stroke:var(--paper);stroke-width:1.5}
+/* F-4b (09.09.2026): jedes Symbol ausser dem Kreis ist gefuellt wie der
+   Kreis; der RING ist ein offener Kreis mit Strich in Anbieterfarbe.
+   Diese Regel steht NACH der Einzel-Punkt-Regel, damit der Papier-Halo
+   dem Ring seinen Strich nicht ueberschreibt - gleiche Spezifitaet,
+   die spatere gewinnt. */
+.gr-g0-punkt--ring{fill:none;stroke:var(--anb,#57534a);stroke-width:2.4}
+/* Das Legenden-Symbol (F-4b): `<use>` aus den defs derselben Grafik -
+   Fuellung vom referenzierenden Element, genau wie am Datenpunkt. */
+.gr-g0-legendesymbol{fill:var(--anb,#57534a)}
+.gr-g0-legendesymbol--ring{fill:none;stroke:var(--anb,#57534a);
+  stroke-width:2.4}
 /* Die Beschriftung des Einzelpunkts (BRIEF_FADEN, 05.09.2026): "Serie
    startet" statt eines nackten Punkts, der wie "keine Werte" aussieht. 12
-   px, keine Zeile darf kleiner sein (Hausregel seit 30.08.2026). */
-.gr-g0-einzeln{font-family:var(--sans);font-size:12px;
+   px, keine Zeile darf kleiner sein (Hausregel seit 30.08.2026) - und
+   seit F-4e (09.09.2026) in der Sans-Schrift des SYSTEMS statt des
+   Webfonts. */
+.gr-g0-einzeln{font-family:var(--sans-system);font-size:12px;
   fill:var(--anb,#57534a)}
 .gr-g0-legende{font-family:var(--sans);font-size:12px;
   fill:var(--anb,#57534a)}
@@ -2831,7 +2866,10 @@ b,strong{font-weight:700}
 .gr-g2-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
 .gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
 .gr-g2-punkt{fill:var(--anb,#57534a)}
-.gr-g2-marker{font-size:12px;fill:var(--ink-3)}
+/* F-4e (09.09.2026): die Ereignispfeile trugen ALS EINZIGE Graph-Klasse
+   keine Schriftregel und erbten die Koerperserbe des Portals - dieselbe
+   Sans-Schrift des Systems wie die uebrigen Graph-Beschriftungen. */
+.gr-g2-marker{font-family:var(--sans-system);font-size:12px;fill:var(--ink-3)}
 .gr-g2-legende{font-family:var(--sans);font-size:12px;
   fill:var(--anb,#57534a)}
 

@@ -1,0 +1,10 @@
+Vollsuite Optik 5 (Endstand f2f096d + site/; Browser-Tests enthalten)
+
+$ export PYTHONPATH=src && python3 -m pytest -q
+2880 passed, 12 skipped, 73 warnings in 313.68s (0:05:13)
+
+Baseline des Baumes (f7b44ad): 2880 passed / 0 failed / 12 skipped
+→ identisch: keine neuen Roten, kein Test geschwächt, gelöscht oder
+übersprungen. Vier Neukalibrierungen in tests/test_geraete_zeitreihe.py
+(je begründet im Test und in outputs/phase-optik5-2026-09-09.md Kriterium 7);
+jede wurde einzeln gegen den alten Stand geprüft und fiel vor der Anpassung.
