@@ -702,26 +702,61 @@
 
   {# --- 1. Der Modell-Selector, gross und sofort (BRIEF_FADEN) --------
          Direkt unter der Reiterleiste, VOR jeder anderen Zahl der Tafel -
-         nichts steht mehr zwischen Ueberschrift und Auswahl. #}
-  <div class="gr-msel gr-msel--gross">
-    <label for="gr-modell">Gerät</label>
-    <select id="gr-modell" data-vorgabe="{{ vorgabe }}">
-      {# F-5 (05.09.2026): DIESELBE Zaehlweise wie der Chart darunter -
-         `m.zeitreihe.anbieterzahl` kommt aus `geraete_tco_grafik.zeitreihe()`
-         und ist die Zahl, die auch dessen aria-label und `chrome`-Zeile
-         traegt (`geraete_verlauf.reihen_fuer_listungen`). Vorher stand hier
-         `m.anbieter_mit_zahl | length` - die Zahl der TCO-Buendel-Anbieter,
-         eine ANDERE Menge als die Preispunkte-Reihen der Zeitreihe. #}
-      {% for m in geraete.tco.modelle %}
-      <option value="{{ m.id }}"{% if m.id == vorgabe %} selected{% endif %}>{{
-        m.titel }} – {{ m.zeitreihe.anbieterzahl }} Anbieter</option>
-      {% endfor %}
-    </select>
-    <span class="gr-a-klein">{{ geraete.tco.modelle_gesamt }} Geräte mit
-    mindestens einem erhobenen Bündel</span>
+         nichts steht mehr zwischen Ueberschrift und Auswahl.
+
+         GRAPH-1 (BRIEF_GRAPH1, 08.09.2026, AUFTRAG_GERAETESEITE.md §2a):
+         die Tarifband-Auswahl steht NEBEN der Geraeteauswahl, gleiche
+         Interaktionsform (derselbe `<select>`-Stil, `gr-msel--gross`). Sie
+         ist EIN gemeinsames Feld ueber alle Modelle (drei feste Optionen,
+         §7) - welche davon fuer das gerade gewaehlte Geraet echte Buendel
+         tragen, steht als `data-baender` an jeder Modell-Option und wird
+         von `app.js` ausgewertet (nicht erlaubte Optionen werden
+         deaktiviert, nicht entfernt: Aufgabe 1 "nur Baender anbieten, fuer
+         die Buendel existieren" gilt fuers ANGEBOT, nicht fuer die
+         Existenz der Option). Der eigentliche Graph steht "darunter", als
+         eigenes Element je Modell (Punkt 2 des Auftrags laesst diese Wahl
+         ausdruecklich offen) - dieselbe Begruendung wie bei G0: ein Graph
+         je Modellwechsel neu aufzubauen waere eine zweite Geometrie fuer
+         dieselbe Zahl. #}
+  <div class="gr-msel gr-msel--gross gr-msel--zwei">
+    <div class="gr-msel-feld">
+      <label for="gr-modell">Gerät</label>
+      <select id="gr-modell" data-vorgabe="{{ vorgabe }}">
+        {# F-5 (05.09.2026): DIESELBE Zaehlweise wie der Chart darunter -
+           `m.zeitreihe.anbieterzahl` kommt aus `geraete_tco_grafik.zeitreihe()`
+           und ist die Zahl, die auch dessen aria-label und `chrome`-Zeile
+           traegt (`geraete_verlauf.reihen_fuer_listungen`). Vorher stand hier
+           `m.anbieter_mit_zahl | length` - die Zahl der TCO-Buendel-Anbieter,
+           eine ANDERE Menge als die Preispunkte-Reihen der Zeitreihe. #}
+        {% for m in geraete.tco.modelle %}
+        <option value="{{ m.id }}"{% if m.id == vorgabe %} selected{% endif
+          %} data-baender="{{ m.baender | map(attribute='key') | join(' ') }}">{{
+          m.titel }} – {{ m.zeitreihe.anbieterzahl }} Anbieter</option>
+        {% endfor %}
+      </select>
+      <span class="gr-a-klein">{{ geraete.tco.modelle_gesamt }} Geräte mit
+      mindestens einem erhobenen Bündel</span>
+    </div>
+    {% set vorgabe_modell = geraete.tco.modelle | selectattr('id', 'equalto',
+      vorgabe) | first %}
+    {% if vorgabe_modell and vorgabe_modell.baender %}
+    <div class="gr-msel-feld">
+      <label for="gr-band">Tarifband</label>
+      <select id="gr-band" data-vorgabe="{{ vorgabe_modell.baender[0].key }}">
+        {% for b in geraete.tco.baender_katalog %}
+        <option value="{{ b.key }}"{% if b.key ==
+          vorgabe_modell.baender[0].key %} selected{% endif %}>{{ b.label
+          }} ({{ b.bereich }})</option>
+        {% endfor %}
+      </select>
+      <span class="gr-a-klein">Gerät × Tarifniveau – eine Linie je Anbieter
+      mit Bündel in diesem Band</span>
+    </div>
+    {% endif %}
   </div>
 
-  {# --- 2.-4. Je Modell: Antwortzeile, Zeitreihe (G0), Anbieterkarten -- #}
+  {# --- 2.-5. Je Modell: Antwortzeile, Zeitreihe (G0), Tarifband-Graph
+         (GRAPH-1), Anbieterkarten ---------------------------------------- #}
   {% for m in geraete.tco.modelle %}
   <div class="gr-tmodell" data-modell="{{ m.id }}"{% if m.id != vorgabe %} hidden{% endif %}>
     <h3 class="gr-tueber">{{ m.titel }}</h3>
@@ -827,6 +862,48 @@
         Beschaffung läuft seit {{ haendler_seit | date_de }}</span></li>
       {% endfor %}
     </ul>
+    {% endif %}
+
+    {# --- GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): Geraet x Tarifniveau, unter
+           G0 als eigenes Element (§2a laesst die Platzierung ausdruecklich
+           offen). Je Band ein Panel, nur fuer Baender MIT echtem Buendel
+           (`m.baender` filtert das schon in Python) - `#gr-band` (oben,
+           neben der Geraeteauswahl) schaltet sie per `data-band` um,
+           dieselbe Mechanik wie `data-modell` an `.gr-tmodell`. #}
+    {% if m.baender %}
+    <div class="gr-tband-block">
+      {% for b in m.baender %}
+      <div class="gr-tband" data-band="{{ b.key }}"{% if loop.index0 != 0
+        %} hidden{% endif %}>
+        <h4 class="gr-tband-kopf">{{ b.label }} ({{ b.bereich }}) – TCO-24
+        je Anbieter</h4>
+        {% if b.grafik.hat_daten %}
+        <figure class="gr-grafik gr-grafik--tcoband">
+          {{ b.grafik.svg | safe }}
+          <figcaption class="gr-g0-chrome">{{ b.grafik.chrome }}</figcaption>
+        </figure>
+        {% else %}
+        <p class="gr-erklaer gr-basis--duenn">Für {{ m.titel }} liegt im
+        Band {{ b.label }} noch kein Bündel vor.</p>
+        {% endif %}
+        {% if b.fehlend %}
+        <ul class="gr-g0-haendler" aria-label="Anbieter ohne Bündel in diesem
+          Band">
+          {% for f in b.fehlend %}
+          <li class="gr-g0-haendler-zeile"><span
+            class="gr-g0-haendler-name">{{ f.anbieter }}</span><span
+            class="gr-g0-haendler-vermerk">{{ f.grund }}</span></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="gr-erklaer gr-basis--duenn">Für {{ m.titel }} liegt in keinem
+    Tarifband ein Bündel vor – die Gerät-×-Tarifniveau-Auswahl entsteht,
+    sobald ein Anbieter dafür einen Tarif mit erhobenem Datenvolumen
+    ausweist.</p>
     {% endif %}
 
     <p class="gr-erklaer gr-mband">{{ m.angebote }} Angebote{% if m.erneuert

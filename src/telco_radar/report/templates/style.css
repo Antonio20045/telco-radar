@@ -2629,6 +2629,18 @@ b,strong{font-weight:700}
   padding:10px 12px;flex:1 1 320px}
 .gr-mband{margin:0 0 12px}
 
+/* GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): die Tarifband-Auswahl steht NEBEN
+   der Geraeteauswahl - zwei `.gr-msel-feld` statt Label/Select direkt als
+   Flex-Kinder von `.gr-msel`, damit jedes Feld seine Unterzeile
+   (`.gr-a-klein`) mitnimmt und trotzdem umbricht wie zuvor. */
+.gr-msel--zwei{align-items:flex-start}
+.gr-msel-feld{display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  flex:1 1 320px;min-width:0}
+.gr-msel-feld .gr-a-klein{flex-basis:100%}
+.gr-tband-block{margin:12px 0}
+.gr-tband-kopf{font-family:var(--sans);font-size:13px;font-weight:700;
+  letter-spacing:.02em;color:var(--ink-3);margin:0 0 6px}
+
 /* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
    05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite
    existiert"). Vorher 19px Fliesstext, kleiner als die Karten-Leitzahl

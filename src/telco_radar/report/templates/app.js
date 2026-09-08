@@ -931,6 +931,53 @@ var TelcoFrage = (function () {
     if (filter) filter.addEventListener('change', sieben);
   });
 })();
+/* GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): die Tarifband-Auswahl NEBEN der
+ * Geraeteauswahl (AUFTRAG_GERAETESEITE.md §2a/§7). Ein gemeinsames Feld
+ * ueber alle Modelle - welche der drei Optionen fuer das gewaehlte Geraet
+ * echte Buendel traegt, steht als `data-baender` an der Modell-Option.
+ * Nicht angebotene Baender werden DEAKTIVIERT, nicht entfernt: Aufgabe 1
+ * verlangt "nur Baender anbieten, fuer die Buendel existieren" - der
+ * native `<select>` zeigt eine deaktivierte Option zwar, laesst sie aber
+ * nicht anwaehlen, und die Auswahl bleibt bei jedem Geraet an derselben
+ * Stelle stehen (kein Element verschwindet aus dem Feld).
+ */
+(function () {
+  var modellwahl = document.getElementById('gr-modell');
+  var bandwahl = document.getElementById('gr-band');
+  if (!modellwahl || !bandwahl) return;
+
+  function baenderFuerModell(id) {
+    var opt = modellwahl.querySelector('option[value="' + id + '"]');
+    return opt ? (opt.getAttribute('data-baender') || '').split(' ')
+      .filter(Boolean) : [];
+  }
+
+  function zeigePanel() {
+    var block = document.querySelector(
+      '.gr-tmodell[data-modell="' + modellwahl.value + '"]');
+    if (!block) return;
+    var panels = block.querySelectorAll('.gr-tband');
+    Array.prototype.forEach.call(panels, function (p) {
+      p.hidden = p.getAttribute('data-band') !== bandwahl.value;
+    });
+  }
+
+  function wendeOptionenAn() {
+    var erlaubt = baenderFuerModell(modellwahl.value);
+    Array.prototype.forEach.call(bandwahl.options, function (o) {
+      o.disabled = erlaubt.indexOf(o.value) === -1;
+    });
+    var aktuell = bandwahl.options[bandwahl.selectedIndex];
+    if ((!aktuell || aktuell.disabled) && erlaubt.length) {
+      bandwahl.value = erlaubt[0];
+    }
+    zeigePanel();
+  }
+
+  modellwahl.addEventListener('change', wendeOptionenAn);
+  bandwahl.addEventListener('change', zeigePanel);
+  wendeOptionenAn();
+})();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
  *
  * Der Aufklapper einer ausgeblendeten Zeile geht mit; sonst haengt eine
