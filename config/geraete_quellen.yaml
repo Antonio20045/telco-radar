@@ -390,9 +390,18 @@ anbieter:
     basis_url: https://www.telekom.de
     # Mindestens zehn Sekunden, obwohl nur EINE Seite abgerufen wird: die
     # Zahl steht hier, damit sie auch dann gilt, wenn irgendwann ein
-    # zweiter Einstieg dazukommt.
+    # zweiter Einstieg dazukommt. Seit B2 sind es SECHS Einstiege (einer
+    # ohne Vertrag plus fuenf Buendelseiten je Tarif) - der Abstand gilt.
     rate_limit_sekunden: 10
     max_produkte: 15
+    # Per-Anbieter-Override des Absenders (BRIEF_B2_BUENDEL_TELEKOM,
+    # 08.09.2026) - dasselbe Muster wie bei Saturn und den Telekom-
+    # Tarifquellen: `config/settings.yaml -> http.user_agent` traegt
+    # global eine Chrome-Kennung, und die B2-Erhebung ist mit dem
+    # ehrlichen Absender gemessen (HTTP 200 auf allen fuenf
+    # Buendelseiten). Nur Telekom bekommt diese Kennung, jede andere
+    # Quelle bleibt unveraendert.
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     # `grund` ist gestrichen und nicht etwa leer geblieben: das Feld
     # beantwortet die Frage "warum NICHT aktiv", und die stellt sich seit
     # dem 04.09.2026 nicht mehr. Was gemessen wurde, steht in `hinweis`
@@ -440,6 +449,42 @@ anbieter:
       - url: https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag
         label: Smartphones ohne Vertrag
         kind: static
+      # ------------------------------------------------------------------
+      # B2 (08.09.2026): DIE BÜNDELSEITEN — dieselbe Kategorieseite mit
+      # tariffId-Parameter, je MagentaMobil-Tarif eine Antwort. Der
+      # Parameter und sein Muster nennt die Kategorieseite selbst in
+      # ihrem Pagination-Link (?…&tariffId=MF_17791&itemPerPage=24…),
+      # die fünf Werte nennt die Tarifübersicht /shop/tarife/handyvertrag
+      # im „Tarif auswählen“-Link JE KACHEL (XS=MF_17779, S=MF_17785,
+      # M=MF_17791, L=MF_17797, XL=MF_17803) — nichts davon ist geraten.
+      # Gemessen 08.09.2026 (lokal, TelcoRadar/1.0, alle HTTP 200):
+      # je Antwort 10 Einträge, davon 9 Geräte (eine Werbekachel ohne
+      # Namen fällt weg); Zuzahlung, Geräterate und Gesamtbetrag sind je
+      # Tarif andere (Pixel 11 Pro 256: 99 + 36×28,30 / 99 + 36×25,50 /
+      # 1 + 36×22,70 €). Der Tarifname steht in derselben Antwort
+      # (productList.selectedPlan.name), ebenso der Anschlusspreis
+      # (oneTimeTariffFee, 39,95 €) — siehe collect/geraete/telekom.py.
+      # `kind: buendel` heißt: die Sätze werden KEINE Listungen, sie
+      # landen als tco_model.Buendel in geraete_tco.json.
+      # MF_17502 taucht zwar in Links der Tarifseite auf, trägt aber
+      # keine Kachel und keinen Namen — ohne Klarname wäre ein Satz
+      # daraus eine Zuzahlung ohne benennbaren Tarif.
+      # ------------------------------------------------------------------
+      - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779
+        label: Bündel MagentaMobil XS
+        kind: buendel
+      - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785
+        label: Bündel MagentaMobil S
+        kind: buendel
+      - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791
+        label: Bündel MagentaMobil M
+        kind: buendel
+      - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797
+        label: Bündel MagentaMobil L
+        kind: buendel
+      - url: https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803
+        label: Bündel MagentaMobil XL
+        kind: buendel
 
   - name: Vodafone
     typ: netzbetreiber

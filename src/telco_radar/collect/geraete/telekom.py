@@ -69,6 +69,73 @@ OAuth-Kette mit `prompt=none` auf die Shop-Adresse. Der Sammler folgt
 Umleitungen ohnehin; die Kategorieadresse steht deshalb direkt in der
 Konfiguration - eine Kette weniger ist eine Fehlerquelle weniger.
 
+DER BUENDELKATALOG: DIE GLEICHE SEITE, EINMAL JE TARIF (B2, 08.09.2026)
+-----------------------------------------------------------------------
+Die Kategorieseite kennt einen Parameter, den sie selbst in ihrem
+Pagination-Link nennt:
+
+    /shop/geraete/smartphones?currentPage=2&tariffId=MF_17791&
+        itemPerPage=24&excludedCurrentPage=1&bp=acquisition
+
+Mit `tariffId` aendert sich die GANZE Preisstruktur der Antwort - Zuzahlung,
+Geraeterate und Ratengesamtbetrag sind je Tarif andere (gemessen am
+Google Pixel 11 Pro 256 GB: MagentaMobil S 99 € + 36 x 28,30 €,
+MagentaMobil M 99 € + 36 x 25,50 €, MagentaMobil XL 1 € + 36 x 22,70 €).
+Das ist genau die Geraet-x-Tarif-Kombinatorik, die kein Produktinformations-
+blatt und keine Produktseite (T2-Befund: nur `deltaPrice`) liefert.
+
+Die fuenf gueltigen `tariffId`-Werte nennt die Telekom selbst: die
+Tarifuebersicht /shop/tarife/handyvertrag verlinkt je Kachel ihre ID
+(MagentaMobil XS=MF_17779, S=MF_17785, M=MF_17791, L=MF_17797,
+XL=MF_17803). Weder der Parameter noch ein Wert wird hier erraten - dieselbe
+Regel wie bei o2, wo die Bündeladresse in der Nutzlast der ersten steht.
+
+JE ANTWORT EIN TARIF, UNTER `productList.selectedPlan`
+------------------------------------------------------
+`selectedPlan.id` (MF_17785) und `selectedPlan.name` ("MagentaMobil S") -
+der TARIFNAME STEHT IN DERSELBEN ANTWORT, es braucht keinen zweiten
+Endpunkt und keine Aufloesung nach dem Sammeln (der Unterschied zu
+Vodafone, dessen `offerCoreHash` einen eigenen GET je Geraet braucht).
+Dazu zwei typisierte Preise in `selectedPlan.prices`:
+
+    oneTimeTariffFee (priceType activationFee)  39,95 €  Anschlusspreis
+    monthlyTariffFee (priceType recurringFee)   39,95 €  Tarif monatlich
+
+UND DER GERÄTEPREIS JE EINTRAG WIRD DAGEGEN NACHGERECHNET
+---------------------------------------------------------
+Je Geraet steht unter `formattedPrices.recurringTariffPrice.price` der
+Tarifpreis, den DIESE Seite fuer DIESEN Tarif nennt (id
+"MF_17785-MRC-Price"). Zwei Proben sind Bedingung, nicht Protokoll:
+
+    1. Die Preis-ID beginnt mit selectedPlan.id + "-" - sonst gehoerte der
+       je-Geraet-Block zu einem anderen Tarif als der selectedPlan, und der
+       Satz waere falsch etikettiert.
+    2. formattedPrices.recurringTariffPrice == selectedPlan.monthlyTariffFee
+       - sonst widerspricht die Antwort sich selbst; gemessen am 08.09.2026
+       gehen beide bei 9 von 9 Geraeten auf.
+
+Dazu kommt die Ratenprobe, die `lies()` schon kennt (`_preisform`:
+upfrontPrice + numberOfInstallments x recurringPrice == totalPrice) - auch
+fuer Buendel gilt: geht sie nicht auf, wird der Satz verworfen.
+
+Eine Antwort OHNE selectedPlan (die ohne-vertrag-Seite traegt `null`)
+ist keine Buendelantwort, und das ist kein Fehler sondern Auskunft:
+`lies_buendel()` wirft in diesem Fall - dasselbe Muster wie o2s
+HW_ONLY-Zustandscheck, aus demselben Grund (ein leeres Ergebnis waere die
+falsche Meldung fuer ein geaendertes Nutzlastformat).
+
+WAS DER SLUG HIER IST
+---------------------
+`tarif_slug` traegt die MF-ID des Tarifs. Der Telekom-Bestand loest heute
+noch ueber den NAMEN auf (`tarif_bezug.ueber_namen`, "MagentaMobil S"
+steht wortgleich im PIB-Bestand); die Kachel-Pipeline setzt noch kein
+`buendel_slug`. Der Slug steht trotzdem im Satz: er ist die Ordnung des
+ANBIETERS (dieselbe ID nennt die Kachel im "Tarif auswählen"-Link), und
+wenn ein Tarif je umbenannt wird, ist diese Brücke bereits gelegt.
+
+EIN EINTRAG OHEN `name` ist eine Werbekachel der Seite ("higherTariff-
+Discount", tileType), kein Geraet - er wird uebergangen, nicht geraten.
+
 DIE GRENZE, DIE BLEIBT
 ----------------------
 Aus GitHub Actions antwortet telekom.de httpx mit HTTP 202 und rund 2 KB
@@ -235,5 +302,145 @@ def lies(text: str, url: str = "") -> list[dict]:
             "speicher_gb": speicher,
             "url": _passende_adresse(eintrag, links),
             "quelle": "telekom_kategorie",
+        })
+    return out
+
+
+# --------------------------------------------------------------------------
+# DER BUENDELKATALOG - dieselbe Seite mit tariffId-Parameter (B2, siehe
+# Modulkopf)
+# --------------------------------------------------------------------------
+
+def _gleich(a: Optional[float], b: Optional[float]) -> bool:
+    """Ein Cent ist kein Rundungsfehler - dieselbe Toleranz wie bei o2
+    und Vodafone."""
+    if a is None or b is None:
+        return False
+    return abs(float(a) - float(b)) < 0.005
+
+
+def _preis(wert) -> Optional[float]:
+    try:
+        return float(wert)
+    except (TypeError, ValueError):
+        return None
+
+
+def _selected_plan(product_list: dict) -> dict:
+    """`selectedPlan` mit ID und Name - oder GeraeteAbrufFehler.
+
+    Eine Antwort ohne gewaehlten Tarif (die ohne-vertrag-Seite traegt
+    `null`) ist keine Buendelantwort. Ein leeres Ergebnis waere dafuer die
+    falsche Meldung - dieselbe Unterscheidung wie bei o2s
+    HW_ONLY-Zustandscheck.
+    """
+    plan = product_list.get("selectedPlan")
+    if not isinstance(plan, dict):
+        raise GeraeteAbrufFehler(
+            "Telekom-Kategorieseite ohne productList.selectedPlan - keine "
+            "Buendelantwort (tariffId-Parameter fehlt?)")
+    if not str(plan.get("id") or "").strip() or \
+            not str(plan.get("name") or "").strip():
+        raise GeraeteAbrufFehler(
+            "Telekom-selectedPlan ohne id oder name - kein Tarifname, "
+            "keine Buendelaussage")
+    return plan
+
+
+def _plan_preise(plan: dict) -> tuple[Optional[float], Optional[float]]:
+    """(Anschlusspreis, Tarif-Monatsgebuehr) aus den typisierten Preisen
+    des selectedPlan - jeder ueber seinen `priceType`, nicht ueber die
+    Reihenfolge in der Liste."""
+    anschluss: Optional[float] = None
+    monatlich: Optional[float] = None
+    for p in (plan.get("prices") or []):
+        if not isinstance(p, dict):
+            continue
+        wert = _preis(p.get("actualValue"))
+        if wert is None:
+            continue
+        if p.get("priceType") == "activationFee":
+            anschluss = wert
+        elif p.get("priceType") == "recurringFee":
+            monatlich = wert
+    return anschluss, monatlich
+
+
+def lies_buendel(text: str, url: str = "") -> list[dict]:
+    """Die Kategorieseite MIT Tariffilter in Buendel-Rohsaetze zerlegen.
+
+    Sie IST die Nutzlast (`kind: buendel`-Einstieg, kein `ernte`, keine
+    Produktseite wird nachgeladen). Der Tarifname kommt aus demselben
+    Zustandsobjekt wie die Geraetepreise - `selectedPlan.name` - und wird
+    nicht aus einer zweiten Quelle erraten.
+    """
+    daten = zustand(text)
+    product_list = daten.get("productList") or {}
+    eintraege = product_list.get("data")
+    if not isinstance(eintraege, list):
+        raise GeraeteAbrufFehler("Telekom-Nutzlast: productList.data ist "
+                                 "keine Liste")
+    plan = _selected_plan(product_list)
+    tarif_id = str(plan.get("id") or "").strip()
+    tarif_name = str(plan.get("name") or "").strip()
+    anschluss, tarif_monatlich = _plan_preise(plan)
+    if tarif_monatlich is None:
+        # Ohne Tarif-Monatsgebuehr ist kein Buendel benennbar - der Satz
+        # waere eine Zuzahlung ohne die Gegenleistung, die sie erkauft.
+        raise GeraeteAbrufFehler(
+            f"Telekom-selectedPlan {tarif_name!r} ohne recurringFee - "
+            "keine Buendelaussage")
+
+    links = _produktlinks(text, url)
+    out: list[dict] = []
+    for eintrag in eintraege:
+        if not isinstance(eintrag, dict):
+            continue
+        name = str(eintrag.get("name") or "").strip()
+        if not name:
+            continue                      # Werbekachel, siehe Modulkopf
+
+        form = _preisform(eintrag.get("price") or {})
+        if form is None:
+            log.info("Telekom-Buendel: %r ohne nachrechenbare Ratenform - "
+                     "verworfen", name)
+            continue
+
+        # Die zwei Proben aus dem Modulkopf: der je-Geraet-Tarifpreis muss
+        # zum selectedPlan gehoeren (ID) und ihm entsprechen (Betrag).
+        geraet_tarif = (((eintrag.get("formattedPrices") or {})
+                         .get("recurringTariffPrice") or {}).get("price")
+                        or {})
+        geraet_tarif_id = str(geraet_tarif.get("id") or "").strip()
+        if not geraet_tarif_id.startswith(f"{tarif_id}-"):
+            log.info("Telekom-Buendel: %r nennt Tarifpreis %r statt "
+                     "selectedPlan %r - verworfen", name, geraet_tarif_id,
+                     tarif_id)
+            continue
+        if not _gleich(_preis(geraet_tarif.get("actualValue")),
+                       tarif_monatlich):
+            log.info("Telekom-Buendel: %r widerspricht dem selectedPlan-"
+                     "Tarifpreis - verworfen", name)
+            continue
+
+        farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
+        out.append({
+            "titel": " ".join(x for x in (name,
+                                          f"{speicher} GB" if speicher else "",
+                                          farbe) if x),
+            "farbe": farbe,
+            "speicher_gb": speicher,
+            "sku": str(eintrag.get("id") or "").strip(),
+            "tarif_name": tarif_name,
+            # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
+            # Modulkopf ("WAS DER SLUG HIER IST").
+            "tarif_slug": tarif_id,
+            "tarif_monatlich": tarif_monatlich,
+            "geraet_zuzahlung": form["anzahlung"],
+            "geraet_monatsrate": form["monatsrate"],
+            "anschlusspreis": anschluss,
+            "laufzeit_monate": form["laufzeit_monate"],
+            "url": _passende_adresse(eintrag, links),
+            "quelle": "telekom_buendel",
         })
     return out

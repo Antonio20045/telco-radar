@@ -309,8 +309,15 @@ def _registriere_anbieter_adapter() -> None:
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
     # Text und braucht kein eigenes `ernte`.
+    #
+    # B2 (08.09.2026): derselbe Adapter liest auch die Buendel-Kategorieseite
+    # (`?tariffId=MF_...`, eigene Einstiege mit `kind: buendel` je Tarif).
+    # Der Tarifname steht in derselben Antwort (`productList.selectedPlan`),
+    # deshalb braucht Telekom anders als Vodafone keinen
+    # `loese_tarifnamen`-Haken.
     registriere("telekom_kategorie", Adapter(name="telekom_kategorie",
                                              lies=telekom_modul.lies,
+                                             lies_buendel=telekom_modul.lies_buendel,
                                              direkt=True))
     # NICHT `direkt`: die Kategorieseite `/smartphones` traegt kein
     # Produktschema, nur die verlinkten Produktseiten. Die Linkernte ist
@@ -434,12 +441,6 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         return bilanz
 
     erlaubt: set[str] = set()
-    abstand = waechter.abstand(anbieter.basis_url or anbieter.einstiege[0].url,
-                               anbieter.rate_limit_sekunden)
-    letzter_abruf = [0.0]
-    gruende: list[str] = []
-    frist_erreicht = False
-
     # Zusaetzliche Kopfzeilen werden NUR uebergeben, wenn der Anbieter welche
     # deklariert. Damit bleibt der Vertrag `hole(url)` fuer alle bestehenden
     # Aufrufer und jede vorhandene Testattrappe unveraendert gueltig - nur
@@ -452,6 +453,27 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # ueberhaupt ein drittes Argument - jede bestehende Testattrappe mit
     # `hole(url)` oder `hole(url, kopfzeilen=None)` bleibt gueltig.
     user_agent = (getattr(anbieter, "user_agent", "") or "").strip() or None
+
+    # DER ROBOTS-ABRUF GEHOERT ZUM CRAWL DIESES ANBIETERS (B2,
+    # 08.09.2026) - und tragt deshalb auch dessen Absender. Bis hier ging
+    # er mit der globalen Kennung aus settings.yaml hinaus, obwohl der
+    # Anbieter selbst unter seinem ehrlichen Namen anfragt; der T2-
+    # Laufzeitbeleg hat genau das gemeldet (1 von 7 Requests mit Chrome-UA
+    # auf robots.txt), und der Beleg existiert, um so etwas zu finden. Ein
+    # Anbieter MIT Override bekommt deshalb eine eigene, provider-bezogene
+    # Waechter-Sicht (einmalige robots.txt-Abfrage je Host, wie immer);
+    # ohne Override bleibt es der geteilte Waechter mit der globalen
+    # Kennung - die PM-Entscheidung zu settings.yaml steht weiter aus
+    # (CLAUDE.md).
+    if user_agent:
+        waechter = RobotsWaechter(
+            hole=lambda url: hole(url, user_agent=user_agent))
+
+    abstand = waechter.abstand(anbieter.basis_url or anbieter.einstiege[0].url,
+                               anbieter.rate_limit_sekunden)
+    letzter_abruf = [0.0]
+    gruende: list[str] = []
+    frist_erreicht = False
 
     def _hole(url: str) -> str:
         darf, grund = waechter.darf(url, jetzt)
@@ -599,7 +621,15 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         bilanz.status = "frist"
         bilanz.grund = "Zeitbudget des Geraetezweigs erschoepft"
     elif bilanz.gelesene_einstiege:
-        bilanz.status = "ok" if bilanz.listungen else "leer"
+        # BUENDEL ZAEHLEN MIT (B2, 08.09.2026): Bis hier sagte "leer" auch
+        # einem Anbieter, der NUR Buendel geliefert hat - ein `kind:
+        # buendel`-Einstieg erzeugt absichtlich keine Listungen, und seine
+        # Saetze in `bilanz.buendel` waren fuer diesen Status unsichtbar.
+        # "leer" heisst "nichts gefunden", und neun Buendel sind nicht
+        # nichts. (`vollstaendig` gilt fuer "ok" und "leer" gleichermassen -
+        # die Auslistungslogik ruehrt ein reiner Buendellieferant nicht an.)
+        bilanz.status = ("ok" if (bilanz.listungen or bilanz.buendel)
+                         else "leer")
         bilanz.grund = "; ".join(gruende)[:300]
     else:
         # Keine einzige Einstiegsseite vollstaendig gelesen. Der Anbieter

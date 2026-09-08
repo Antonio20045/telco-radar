@@ -79,7 +79,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
-from .tarif_model import PREISTYP_DOKUMENT
+from .tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
 
 # Der Horizont der Leitzahl: 24 Monate, die uebliche Tarifmindestlaufzeit.
 # Entscheidung E2 vom 03.09.2026 - dieselbe Zahl und dieselbe Begruendung
@@ -567,6 +567,21 @@ class Geraeteanteil:
             if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ]
 
 
+def _zeitreihen_basis(tid: str) -> str:
+    """Die Tarif-ID ohne den `#live_shop`-Lesart-Zusatz.
+
+    ZWEI LESARTEN SIND ZWEI ZEITREIHEN, ABER EIN TARIF (B2, 08.09.2026):
+    der PIB-Eintrag `telekom:magentamobil-l` und die Shop-Kachel
+    `telekom:magentamobil-l#live_shop` sind derselbe Vertrag - der Zusatz
+    ist der PREISTYP und wird in `tarif_crawler.uebernimm_stand` genau
+    deshalb als konstanter Zusatz gesetzt. Gestrichen wird NUR er: ein
+    HASH-Zusatz (zwei gleichnamige, verschiedene Produkte wie o2-home-l-
+    flex und -175-flex) bleibt stehen und trennt weiterhin.
+    """
+    zusatz = f"#{PREISTYP_LIVE_SHOP}"
+    return tid[: -len(zusatz)] if tid.endswith(zusatz) else tid
+
+
 def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     """Der effektive Geraetepreis: `tco_24(Buendel) - tco_24(SIM-only)`.
 
@@ -597,6 +612,14 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     und er bleibt eine Ausnahme und keine Luecke: zwei verschiedene Tarife
     gegeneinander zu rechnen ist ein Fehler im Aufruf.
 
+    GEMESSEN WIRD DIE ZEITREIHEN-BASIS (B2, 08.09.2026): der Preistyp-
+    Zusatz `#live_shop` unterscheidet zwei Lesarten desselben Tariffs, nicht
+    zwei Tarife. Die Telekom-Referenz kommt aus der Shop-Kachel (die
+    Dublettenregel in `tarif_referenzen.aus_bestand` laesst die Live-Lesart
+    vorn), das Buendel loest auf den PIB-Eintrag - bis hier warf genau
+    diese Paarung, und der Auffangboden des Renderers machte daraus fuenf
+    leere Reiter statt einen Geraeteanteil.
+
     Die Luecken beider Seiten werden zusammengefuehrt und WEITERGEREICHT:
     fehlt auf einer Seite der Anschlusspreis, ist die Differenz nur so gut
     wie die schlechtere der zwei Rechnungen.
@@ -607,7 +630,7 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
                          f"{referenz.anbieter!r}")
     ids = ((buendel.tarif_id or "").strip(), (referenz.tarif_id or "").strip())
     if all(ids):
-        if ids[0] != ids[1]:
+        if _zeitreihen_basis(ids[0]) != _zeitreihen_basis(ids[1]):
             raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
                              f"verschiedenen Tarifen: {ids[0]!r} / {ids[1]!r}")
     elif normalisiere(buendel.tarif_name) != normalisiere(referenz.tarif_name):
