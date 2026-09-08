@@ -46,6 +46,7 @@
   {% macro wr_zeile(z) %}
   <tr class="wr-zeile wr-status--{{ z.status }}">
     <td>{{ z.anbieter }}</td>
+    <td class="wr-tarif">{% if z.tarif %}{{ z.tarif }}{% else %}–{% endif %}</td>
     <td class="num">{% if z.gesamt is not none %}{{ '%.2f'|format(z.gesamt) }} €{% else %}–{% endif %}</td>
     <td>{{ z.band_label or '–' }}{% if z.status == 'vergleichbar' and z.vf_gesamt is not none %} · VF {{ '%.2f'|format(z.vf_gesamt) }} €{% endif %}</td>
     <td class="num wr-prozent{% if z.prozent is not none %}{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}{% endif %}">
@@ -74,7 +75,7 @@
     {% endif %}
     <div class="gr-scroll">
     <table class="src-table wr-tabelle">
-      <thead><tr><th>Anbieter</th><th class="num">TCO-24</th><th>Band</th>
+      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">TCO-24</th><th>Band</th>
         <th class="num">Abweichung</th><th>Beleg</th></tr></thead>
       <tbody>{% for z in g.zeilen %}{{ wr_zeile(z) }}{% endfor %}</tbody>
     </table>

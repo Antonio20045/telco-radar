@@ -142,6 +142,38 @@ def _grund(anbieter: str, hat_irgendein_buendel: bool) -> str:
     return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
+def alle_karten_je_band(modell: dict,
+                        band_je_tarif: dict) -> dict[str, dict[str, list]]:
+    """Je Band ALLE echten Karten jedes Anbieters, nach Gesamt sortiert.
+
+    Rueckgabe: `{band_key: {anbieter: [karte, ...]}}` - nur Baender mit
+    mindestens einem echten Buendel stehen darin, und je Anbieter steht
+    die GUENSTIGSTE Karte zuerst (ks[0] ist dieselbe Karte, die
+    `karten_je_band` liefert). Diese Funktion ist der EINE Ort, an dem
+    "Geraet x Tarifband" gruppiert wird; der Graph (`karten_je_band` via
+    `baender_fuer_modell`) liest die guenstigste Karte je Anbieter, der
+    Wettbewerbs-Radar (RAD-1b) liest ALLE - ein Anbieter, der dasselbe
+    Geraet in ZWEI Tarifen desselben Bandes fuehrt (Telekom XS/S/M alle
+    im Band Klein), hat auch ZWEI Vergleichspaare, nicht eines.
+    """
+    # Nur ECHTE Buendel (Regel 2 des Modulkopfs) - die Naeherungskarte ist
+    # kein Angebot.
+    echte = [k for k in (modell.get("karten") or [])
+             if k.get("belastbar") and not k.get("naeherung")
+             and k.get("gesamt") is not None]
+
+    je_band: dict[str, dict[str, list]] = {}
+    for k in echte:
+        band = band_je_tarif.get(k.get("tarif_id") or "")
+        if not band:
+            continue          # kein Datenvolumen erhoben oder unbegrenzt
+        je_band.setdefault(band, {}).setdefault(k["anbieter"], []).append(k)
+    for je_anbieter in je_band.values():
+        for karten in je_anbieter.values():
+            karten.sort(key=lambda k: k["gesamt"])
+    return je_band
+
+
 def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
     """Je Band die guenstigste ECHTE Karte jedes Anbieters (Regel 1-3 oben).
 
@@ -151,25 +183,13 @@ def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
     Graph) und `wettbewerbs_radar` (die %-Abweichung, RAD-1) lesen beide
     von hier - keine zweite Gruppierung fuer dieselbe Frage.
     """
-    # Nur ECHTE Buendel (Regel 2 des Modulkopfs) - die Naeherungskarte ist
-    # kein Angebot.
-    echte = [k for k in (modell.get("karten") or [])
-             if k.get("belastbar") and not k.get("naeherung")
-             and k.get("gesamt") is not None]
-
-    je_band: dict[str, dict] = {}
-    for k in echte:
-        band = band_je_tarif.get(k.get("tarif_id") or "")
-        if not band:
-            continue          # kein Datenvolumen erhoben oder unbegrenzt
-        bisher = je_band.setdefault(band, {})
-        vorhandene = bisher.get(k["anbieter"])
-        # Die GUENSTIGSTE Karte dieses Anbieters in diesem Band traegt die
-        # Linie - dieselbe Wahl wie ueberall auf dieser Seite (ein
-        # Anbieter, eine Zahl je Ort).
-        if vorhandene is None or k["gesamt"] < vorhandene["gesamt"]:
-            bisher[k["anbieter"]] = k
-    return je_band
+    alle = alle_karten_je_band(modell, band_je_tarif)
+    # Die GUENSTIGSTE Karte dieses Anbieters in diesem Band traegt die
+    # Linie - dieselbe Wahl wie ueberall auf dieser Seite (ein
+    # Anbieter, eine Zahl je Ort). `alle_karten_je_band` sortiert nach
+    # Gesamt, also ist ks[0] genau diese Karte.
+    return {band: {anbieter: ks[0] for anbieter, ks in je_anbieter.items()}
+            for band, je_anbieter in alle.items()}
 
 
 def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
