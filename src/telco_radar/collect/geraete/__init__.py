@@ -303,8 +303,17 @@ def _registriere_anbieter_adapter() -> None:
     # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
     # `direkt`: die Einstiegsseite (Sitemap) ist nur ein Verzeichnis, die
     # Preise stehen erst auf den einzelnen Produktseiten.
+    #
+    # B3 (08.09.2026): derselbe Adapter liest auch die TARIFseiten als
+    # Buendelkatalog (eigene Einstiege mit `kind: buendel` je Tarif) - die
+    # Kombinatorik Geraet x Tarif steht dort serverseitig im selben
+    # Flight-Payload, die Gerateseite traegt nur die Hardware-Preise. Der
+    # Tarifname steht in derselben Antwort (`prefetchedPlan.variants[].title`),
+    # deshalb braucht congstar anders als Vodafone keinen
+    # `loese_tarifnamen`-Haken - derselbe Grund wie bei der Telekom.
     registriere("congstar_next", Adapter(name="congstar_next",
-                                         lies=congstar_modul.lies))
+                                         lies=congstar_modul.lies,
+                                         lies_buendel=congstar_modul.lies_buendel))
     # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
@@ -701,6 +710,12 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
             confidence=_belegstufe(satz.get("quelle")),
             farbe_roh=satz.get("farbe") or "",
             speicher_gb=satz.get("speicher_gb"),
+            # Der ZUSTAND reist auch auf dem Buendelweg mit (B3, congstar:
+            # `condition` als eigenes Feld). Vorher stand er nur im Titel
+            # (o2, Telekom) oder in der Farbe - ein Anbieter, der ihn
+            # strukturiert nennt, wurde darueber still als "neu" gelesen.
+            # Rohsaetze ohne das Feld aendern nichts (`or ""`).
+            zustand_hinweis=satz.get("zustand_hinweis") or "",
             einstieg_url=einstieg.url)
         if listung is None:
             titel = (satz.get("titel") or "").strip()
