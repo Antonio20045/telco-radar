@@ -330,7 +330,8 @@ def _luecken(tage: list, schwelle: int = G0_LUECKE_TAGE) -> list:
             if (b - a).days > schwelle]
 
 
-def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis") -> dict:
+def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
+             klasse: str = "gr-g0") -> dict:
     """G0: Gerätepreis über die Zeit, je Anbieter, fuer EIN gewaehltes
     Geraet - der neue Hauptgraph ueber den Balkenbloecken.
 
@@ -340,6 +341,14 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis") -> dict:
     (`report/geraete_tco_band.py`) mit `messgroesse="TCO-24"` - eine zweite
     Kopie der Geometrie waere die Regel, die dieses Modul selbst verbietet
     (CLAUDE.md §6: zwei Rechnungen fuer dieselbe Zahl sind zwei Zahlen).
+
+    `klasse` traegt NUR die CSS-Klasse des Wurzel-`<svg>` (die inneren
+    Elemente bleiben `gr-g0-*`, dieselbe Geometrie-Stylesheet-Klasse fuer
+    beide Verwendungen). GRAPH-1 setzt hier `"gr-tcoband"` statt `"gr-g0"` -
+    zwei SVGs mit derselben Wurzelklasse im selben `.gr-tmodell`-Block
+    waeren fuer `svg.gr-g0`-Selektoren (Tests UND `app.js`) nicht mehr
+    unterscheidbar, sobald ein Modell keine G0-Zeitreihe hat und nur noch
+    der Band-Graph als "das eine" `svg.gr-g0` erschiene.
 
     `reihen` kommt aus `geraete_verlauf.reihen_fuer_listungen()` und ist
     schon auf EIN Geraet eingegrenzt; diese Funktion rechnet nur noch
@@ -405,7 +414,7 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis") -> dict:
     # statt sie ein zweites Mal zu zaehlen (keine duplizierte Rechnung).
     anbieterzahl = len(reihen)
     teile = [
-        f'<svg class="gr-g0" viewBox="0 0 {G0_BREITE} {G0_HOEHE}" '
+        f'<svg class="{_t(klasse)}" viewBox="0 0 {G0_BREITE} {G0_HOEHE}" '
         f'width="100%" height="{G0_HOEHE}" role="img" '
         f'aria-label="{_t(messgroesse)} über die Zeit, {anbieterzahl} Anbieter, '
         f'{_t(von.isoformat())} bis {_t(bis.isoformat())}">',
