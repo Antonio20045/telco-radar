@@ -53,9 +53,17 @@ WAS ES TUT
    ausschliesslich in diesem Skript aktiv und betrifft keinen anderen
    Aufrufer im Projekt.
 2. `geraete_pipeline.run_geraete_stage()` NUR fuer den Telekom-Anbieter
-   (T2: die Geraetekategorie `methode: telekom_kategorie`). Ohne
-   Laufzeitbeleg - der ist ein T1-Kriterium (BRIEF_TELEKOM_TAEGLICH_R3_E4);
-   T2 bleibt unangetastet.
+   (T2: die Geraetekategorie `methode: telekom_kategorie`, seit B2 samt
+   der fuenf `kind: buendel`-Einstiege je MagentaMobil-Tarif). Seit B2
+   (BRIEF_B2_BUENDEL_TELEKOM, 08.09.2026) MIT eigenem Laufzeitbeleg:
+   derselbe Protokollhaken, dieselben Felder, eigene Datei
+   (`beleg-telekom-geraete-<datum>.json`) - der T1-Beleg bleibt unberuehrt
+   und seine Vollstaendigkeitspruefung (tests/test_tarif_crawler.py) liest
+   weiterhin nur die `beleg-telekom-lokallauf-*`-Dateien. Der Haken sitzt
+   fuer T2 um `telco_radar.collect.http.fetch` als Modul-Attribut (die
+   `hole`-Fabrik der Pipeline importiert die Funktion zur Laufzeit), wird
+   nach der Stage zurueckgenommen und erfasst auch die robots.txt- und
+   Kategorieseitenaabrufe - jeder Abruf, der wirklich hinausgeht.
 
 Beide schreiben in dieselben Bestandsdateien wie der normale Lauf
 (`data/state/tarife.jsonl`, `geraete_db.json`, `geraete_preise.jsonl`,
@@ -111,9 +119,10 @@ def _hole_mit_beleg(beleg: list):
     Playwright/Selenium). Keine Antwortkoerper, Cookies oder Zugangsdaten -
     nur die Kopfzeile, die den Absender verraet.
 
-    Aktiv NUR fuer die Dauer dieses Skripts und NUR fuer T1: `fetch()` selbst
-    bleibt unveraendert, jeder andere Aufrufer im Projekt (einschliesslich
-    T2) sieht davon nichts.
+    Aktiv NUR fuer die Dauer dieses Skripts: `fetch()` selbst bleibt
+    unveraendert, jeder andere Aufrufer im Projekt sieht davon nichts -
+    T1 uebergibt den Haken als `hole`-Argument, T2 erhaelt ihn als
+    Modul-Attribut (siehe main).
     """
     from telco_radar.collect.http import fetch as _echter_fetch
 
@@ -157,6 +166,38 @@ def _nur_telekom_geraete(original_lade_quellen):
     return _gefiltert
 
 
+def _schreibe_beleg(root: Path, name: str, datum: str, beleg: list,
+                    log) -> Path:
+    """Einen Laufzeitbeleg versioniert wegschreiben und ehrlich pruefen.
+
+    Dieselbe Logik fuer T1 und T2 (seit B2): schreiben, zaehlen, und jeden
+    Request melden, der NICHT mit `TelcoRadar/1.0` gesendet wurde - als
+    ERROR, nicht als Erfolg. Gibt den Belegpfad zurueck.
+    """
+    unehrlich = [e for e in beleg
+                 if not _ist_ehrliche_kennung(e.get("user_agent"))]
+    beleg_datei = root / "outputs" / f"{name}-{datum}.json"
+    beleg_datei.parent.mkdir(parents=True, exist_ok=True)
+    beleg_datei.write_text(json.dumps({
+        "datum": datum,
+        "anzahl_requests": len(beleg),
+        "alle_ehrlich": not unehrlich,
+        "requests": beleg,
+    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    log.info("Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
+             beleg_datei, len(beleg), not unehrlich)
+    if unehrlich:
+        log.error("BEFUND: %d von %d Telekom-Requests wurden NICHT mit "
+                  "TelcoRadar/1.0 gesendet (Browser-Imitation oder UA-"
+                  "Wechsel). Details in %s. Das ist ein Abnahme-Befund, "
+                  "kein Erfolg.", len(unehrlich), len(beleg), beleg_datei)
+    else:
+        log.info("Alle %d Telekom-Requests bestaetigt mit ehrlichem "
+                 "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
+                 len(beleg))
+    return beleg_datei
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=".")
@@ -193,37 +234,29 @@ def main() -> None:
     # `resp.request.headers`. Ehrlich heisst hier: beginnt mit
     # "TelcoRadar/1.0" - alles andere ist eine Browser- oder sonstige
     # Fremdkennung und wird als Befund ausgewiesen, nicht verschwiegen.
-    unehrlich = [e for e in beleg
-                 if not _ist_ehrliche_kennung(e.get("user_agent"))]
-    beleg_datei = root / "outputs" / f"beleg-telekom-lokallauf-{heute}.json"
-    beleg_datei.parent.mkdir(parents=True, exist_ok=True)
-    beleg_datei.write_text(json.dumps({
-        "datum": heute,
-        "anzahl_requests": len(beleg),
-        "alle_ehrlich": not unehrlich,
-        "requests": beleg,
-    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    log.info("Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
-              beleg_datei, len(beleg), not unehrlich)
-    if unehrlich:
-        log.error("BEFUND: %d von %d Telekom-Requests wurden NICHT mit "
-                   "TelcoRadar/1.0 gesendet (Browser-Imitation oder UA-"
-                   "Wechsel). Details in %s. Das ist ein Abnahme-Befund, "
-                   "kein Erfolg.", len(unehrlich), len(beleg), beleg_datei)
-    else:
-        log.info("Alle %d Telekom-Requests bestaetigt mit ehrlichem "
-                 "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
-                 len(beleg))
+    _schreibe_beleg(root, "beleg-telekom-lokallauf", heute, beleg, log)
 
-    # --- T2: Geraete --------------------------------------------------------
+    # --- T2: Geraete, seit B2 mit eigenem Laufzeitbeleg ---------------------
     log.info("=== T2: Telekom-Geraetekategorie ===")
-    geraete_pipeline.lade_quellen = _nur_telekom_geraete(
-        geraete_config.lade_quellen)
-    bilanz_geraete = geraete_pipeline.run_geraete_stage(
-        root, http_cfg, heute, frist_sekunden=args.frist)
+    beleg_t2: list[dict] = []
+    from telco_radar.collect import http as _http_mod
+    # Der Haken wird VOR dem Patchen gebaut: seine Closure haelt dann den
+    # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
+    # auf sich selbst zeigen lassen.
+    _patch_fetch = _hole_mit_beleg(beleg_t2)
+    _echter_fetch = _http_mod.fetch
+    _http_mod.fetch = _patch_fetch
+    try:
+        geraete_pipeline.lade_quellen = _nur_telekom_geraete(
+            geraete_config.lade_quellen)
+        bilanz_geraete = geraete_pipeline.run_geraete_stage(
+            root, http_cfg, heute, frist_sekunden=args.frist)
+    finally:
+        _http_mod.fetch = _echter_fetch
     log.info("T2-Bilanz: %s", {k: v for k, v in bilanz_geraete.items()
                                if k not in ("unbekannte_titel",
                                             "unbekannte_farben")})
+    _schreibe_beleg(root, "beleg-telekom-geraete", heute, beleg_t2, log)
 
     log.info("Fertig. Jetzt rendern (report.html.render_site) und committen -"
              " dieses Skript tut beides bewusst nicht.")
