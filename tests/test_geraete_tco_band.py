@@ -185,21 +185,45 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     assert telekom_fehlend, "Telekom überall gezeichnet - der Lückenfall fehlt"
 
 
-def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand):
-    """(d) Ein Modell, das nur ueber 1&1 ein Buendel fuehrt - dessen Tarif
-    kein Datenvolumen traegt und deshalb in KEINEM Band auftaucht -, zeigt
-    eine leere Bandliste statt einer erfundenen Linie."""
-    kandidaten = [
-        m for m in bestand["modelle"]["modelle"]
-        if not band.baender_fuer_modell(m, bestand["band_je_tarif"])
-    ]
-    assert kandidaten, "kein Modell ohne Band im Bestand - Test prueft nichts"
-    for m in kandidaten:
-        # Trotzdem KEIN belastbares Modell ganz ohne echtes Buendel - sonst
-        # waere der Fall trivial (das Modell haette gar keine Karten).
-        echte = [k for k in m["karten"]
-                if k["belastbar"] and not k["naeherung"]]
-        assert echte, f"{m['id']} hat gar kein echtes Buendel - kein echter Fall"
+def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
+    """(d) Ein Modell, dessen einzige Buendel an Tarife ohne Datenvolumen
+    haengen, zeigt eine leere Bandliste statt einer erfundenen Linie.
+
+    BIS B4 (08.09.2026) war das der NATUERLICHE Fall jedes 1&1-Modells: die
+    Buendel kamen aus dem Listung-Umweg ohne tarif_id, also ohne Band. Seit
+    B4 loest jeder 1&1-Satz auf die All-Net-Flat S (Band Klein) auf, und
+    der Bestand kennt den Fall nicht mehr - der Test KONSTRUIERT ihn
+    deshalb am echten Tarifbestand (1&1 Unlimited XL traegt kein
+    Datenvolumen), statt an einer Datenlage zu haengen, die ein
+    Erhebungsstand wegnehmen kann (dieselbe Kalibrierung wie beim
+    Balken-Test in B-2). Die Gegenprobe mit der All-Net-Flat S beweist,
+    dass die leere Bandliste am TARIF liegt und nicht an einer kaputten
+    Fixture."""
+    sku = "apple-iphone-15-999gb-schwarz"
+    listung = {"sku_id": sku, "device_id": "apple-iphone-15",
+               "speicher_gb": 999, "anbieter": "1&1",
+               "abgerufen_am": "2026-09-08"}
+
+    def _modell_mit(tarif_id: str, tarif_name: str):
+        buendel = [Buendel(sku_id=sku, anbieter="1&1",
+                           tarif_name=tarif_name, tarif_id=tarif_id,
+                           buendel_monatlich=54.99, laufzeit_monate=36,
+                           abgerufen_am="2026-09-08")]
+        modelle = karten.modelle(buendel, [listung], [], tarife,
+                                 lade_katalog(WURZEL))
+        assert modelle["modelle"], "das konstruierte Modell muss entstehen"
+        return modelle["modelle"][0]
+
+    ohne = _modell_mit("11:1-1-unlimited-xl", "1&1 Unlimited XL")
+    echte = [k for k in ohne["karten"]
+             if k["belastbar"] and not k["naeherung"]]
+    assert echte, "das konstruierte Modell hat kein echtes Buendel - kein Fall"
+    assert band.baender_fuer_modell(ohne, bestand["band_je_tarif"]) == [], \
+        "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
+
+    mit_band = _modell_mit("11:1-1-all-net-flat-s", "1&1 All-Net-Flat S")
+    assert band.baender_fuer_modell(mit_band, bestand["band_je_tarif"]), \
+        "Gegenprobe: die All-Net-Flat S (10 GB) muss Band Klein gebaeren"
 
 
 # --------------------------------------------------------------------------
