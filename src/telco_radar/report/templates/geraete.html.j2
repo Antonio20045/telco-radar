@@ -646,12 +646,18 @@
    `seit` NENNT DEN START, NICHT EIN VERSPRECHEN (BRIEF_FADEN, 05.09.2026):
    "Beschaffung läuft" allein wirkte auf Antonio unfertig statt geplant
    ("drei graue Kärtchen ohne Zahl ohne Datum"). Ein Lieferdatum gibt es
-   nicht - das waere erfunden -, der Beginn der Beschaffung schon. #}
+   nicht - das waere erfunden -, der Beginn der Beschaffung schon.
+
+   F-6 (Optik-Schritt 5, 09.09.2026): die Kennzeichnung steht auf dieser
+   Karte GENAU EINMAL - das Badge "Händler" im Kopf. Der Satz darunter
+   begann zusaetzlich mit "Händler - ", und beides zusammen las sich
+   doppelt (PM-Befund 16:37, Desktop). Der Satz behaelt seinen Inhalt,
+   er verliert nur den wiederholten Wortanfang. #}
 {% macro haendlerkarte(name, seit) %}
 <article class="gr-kkarte gr-kkarte--leer gr-kkarte--haendler" data-anbieter="{{ name }}">
   <p class="gr-kk-kopf"><span class="gr-kk-anbieter">{{ name }}</span>
     <span class="gr-kk-marke">Händler</span></p>
-  <p class="gr-kk-luecke">Händler — Beschaffung läuft seit {{ seit | date_de }}</p>
+  <p class="gr-kk-luecke">Beschaffung läuft seit {{ seit | date_de }}</p>
 </article>
 {% endmacro %}
 
