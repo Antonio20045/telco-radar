@@ -412,10 +412,13 @@ def test_saturn_anbieter_reicht_seine_ehrliche_kennung_bis_zur_kopfzeile(monkeyp
 
     assert bilanz.status == "leer"          # leere Apollo-State, kein Fehler
     assert len(gesehene_kopfzeilen) == 2    # robots.txt + eine Markenseite
-    # Robots.txt-Abruf UND Markenseiten-Abruf: robots.txt geht ueber die
-    # unveraenderte, globale Konfiguration (Chrome bleibt dort Primary -
-    # dieselbe Bewusstheit wie bei `kopfzeilen`, siehe Modulkopf von
-    # `collect/geraete/__init__.py`), die Markenseite bekommt die ehrliche
-    # Kennung.
-    assert gesehene_kopfzeilen[0]["User-Agent"] == _CHROME_UA_R1   # robots.txt
+    # Robots.txt-Abruf UND Markenseiten-Abruf: BEIDE mit der ehrlichen
+    # Kennung des Anbieters. Bis B2 (08.09.2026) ging robots.txt mit der
+    # globalen Chrome-Konfiguration hinaus - der T2-Laufzeitbeleg der
+    # Telekom-Erhebung hat genau das als Befund gemeldet (1 von 7 Requests,
+    # `outputs/beleg-telekom-geraete-2026-09-08.json`), und der Beleg der
+    # Erhebung verlangt 100 %. Der robots-Abruf gehört zum Crawl DIESES
+    # Anbieters; Anbieter OHNE Override bleiben bei der globalen Kennung
+    # (PM-Entscheidung zu settings.yaml steht aus).
+    assert gesehene_kopfzeilen[0]["User-Agent"] == _EHRLICHE_UA    # robots.txt
     assert gesehene_kopfzeilen[1]["User-Agent"] == _EHRLICHE_UA    # Markenseite

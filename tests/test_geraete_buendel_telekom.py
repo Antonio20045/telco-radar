@@ -311,3 +311,41 @@ def test_adapter_registry_traegt_telekoms_buendelhaken():
     # Der Tarifname steht in derselben Antwort — Telekom braucht anders
     # als Vodafone keinen Haken für die Namensauflösung nach dem Sammeln.
     assert adapter.loese_tarifnamen is None
+
+
+def test_der_robots_abruf_traegt_den_absender_des_anbieters(katalog, farben):
+    """B2-Befund vom 08.09.2026, erster Lauf: alle sechs Seitenrequests
+    gingen mit TelcoRadar/1.0 hinaus, der robots.txt-Abruf davor aber mit
+    der globalen Chrome-Kennung aus settings.yaml (Laufzeitbeleg
+    `beleg-telekom-geraete-2026-09-08.json`, 1 von 7 Requests unehrlich).
+    Der robots-Abruf gehört zum Crawl DIESES Anbieters und trägt deshalb
+    denselben Absender — ein Anbieter ohne Override bleibt beim geteilten
+    Wächter (PM-Entscheidung zu settings.yaml steht aus)."""
+    gesehen: dict[str, str | None] = {}
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        gesehen[url] = user_agent
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\nDisallow: /is-bin/\n")
+        return 200, _fixture(
+            "telekom_kategorie_buendel_magentamobil_s.html.gz")
+
+    anbieter = Anbieter(
+        name="Telekom", typ="netzbetreiber", methode="telekom_kategorie",
+        basis_url="https://www.telekom.de", rate_limit_sekunden=0,
+        user_agent="TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
+        einstiege=[Einstieg(
+            url="https://www.telekom.de/shop/geraete/smartphones"
+                "?tariffId=MF_17785",
+            label="Bündel MagentaMobil S", kind="buendel")])
+
+    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-08",
+                             RobotsWaechter(hole=hole))
+    assert bilanz.status == "ok" and bilanz.buendel
+    robots = [u for u in gesehen if u.endswith("/robots.txt")]
+    assert robots, "kein robots.txt-Abruf erfolgt — der Test prüft nichts"
+    # Die Lookup-Zeile: JEDER Abruf dieses Anbieters — robots.txt wie
+    # Bündelseite — mit demselben ehrlichen Absender.
+    assert gesehen and all(
+        ua == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+        for ua in gesehen.values()), gesehen
