@@ -40,10 +40,13 @@ die Referenz ist Vodafones GUENSTIGSTES Buendel (am echten Bestand 59 von
 83 Geraeten im Band Klein), und o2 fuehrt dieselben Geraete dort regelmaessig
 nicht. Gegen sie gerechnet waere fast jede Zeile ein Mismatch, OBWOHL echte
 Paare existieren (iPhone 15: VF-Basis Klein 1.235,80, aber VF selbst Mittel
-1.949,80 gegen o2 Mittel 808,75). Bevorzugtes Band ist das der Referenz,
-sonst Vodafones billigste gemeinsame Band-Karte - die konservative Wahl.
-Liegt der Wettbewerber in einem anderen Band oder laesst sich keins von
-beiden bestimmen (kein Datenvolumen erhoben, oder unbegrenzt), heisst die
+1.949,80 gegen o2 Mittel 808,75). Seit RAD-1b (08.09.2026, abends) steht
+JEDE echte Karte des Wettbewerbers in JEDEM gemeinsamen Band als eigenes
+Paar da - bis dahin zeigte die Seite je Wettbewerber genau EINE Zeile (die
+guenstigste Karte eines bevorzugten Bandes), und von den 51 Paaren des
+Bestands fehlten 21, alleine 18 davon Telekom XS/S/M im Band Klein.
+Liegt der Wettbewerber in keinem gemeinsamen Band oder laesst sich keins
+von beiden bestimmen (kein Datenvolumen erhoben, oder unbegrenzt), heisst die
 Zeile ehrlich "Band-Mismatch" statt eine Zahl zu erfinden -
 AUFTRAG_GERAETESEITE.md §2b: "bei Band-Mismatch ehrlich benennen, nicht
 mischen".
@@ -104,6 +107,11 @@ SICHTBAR_MAX = 15
 HAENDLER_SICHTBAR_MAX = 20
 
 _BAND_LABEL = {k: l for k, l, _ in geraete_tco_band.BAENDER}
+# Einfuegereihenfolge der Baender in einer Gruppe: die Ordnung aus
+# `BAENDER` (Klein, Mittel, Gross) - alphabetisch waere "gross, klein,
+# mittel" und stuende quer zum Rest des Moduls. Wirkt nur bei
+# prozent-Gleichstand (die Endsortierung der Zeilen rechnet nach Prozent).
+_BAND_RANG = {k: i for i, (k, _, _) in enumerate(geraete_tco_band.BAENDER)}
 
 
 def _band_label(band: Optional[str]) -> str:
@@ -232,21 +240,27 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
 
 
 def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
-    """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + drei
-    Wettbewerberzeilen, IMMER alle drei genannt (kein_buendel statt
+    """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + Zeilen der
+    drei Wettbewerber, IMMER alle drei genannt (kein_buendel statt
     Weglassen), sortiert aufsteigend nach %-Abweichung.
 
-    Die Karte des Wettbewerbers und seine VODAFONE-Gegenkarte kommen aus
-    der GRAPH-1-Bandlogik (`geraete_tco_band.karten_je_band`): verglichen
-    wird im Band, in dem BEIDE das Geraet fuehren - nicht die letzte Karte
-    aus `modell["karten"]` (ein Anbieter fuehrt dasselbe Geraet in mehreren
-    Baendern; ein Dict-Verstaendnis ueber `anbieter` haette willkuerlich
-    die letzte genommen, am echten Bestand gemessen: 1 vergleichbare Zeile
-    statt 21, Stand 08.09.2026). Gibt es kein gemeinsames Band: ehrlicher
-    Band-Mismatch mit seiner GUENSTIGSTEN Karte als Beleg."""
+    Die Karten des Wettbewerbers und seine VODAFONE-Gegenkarte kommen aus
+    der GRAPH-1-Bandlogik (`geraete_tco_band.alle_karten_je_band` /
+    `karten_je_band`): verglichen wird im Band, in dem BEIDE das Geraet
+    fuehren. Seit RAD-1b steht JEDE echte Karte des Wettbewerbers in
+    JEDEM gemeinsamen Band als eigenes Paar da - nicht nur die guenstigste
+    Karte eines bevorzugten Bandes (am echten Bestand gemessen, Stand
+    08.09.2026: 51 Paare im Bestand, 30 gezeichnet; Telekom fuehrt je
+    Geraet XS/S/M, alle drei im Band Klein - die Seite zeigte nur XS).
+    Ein erneuertes Geraet im gemeinsamen Band steht als nicht
+    vergleichbare Zeile mit Grund daneben (B1-Zustandsregel), es verdraengt
+    die vergleichbare Karte nicht mehr. Gibt es kein gemeinsames Band:
+    ehrlicher Band-Mismatch mit seiner GUENSTIGSTEN Karte als Beleg."""
     gruppen = []
     for modell in modelle:
         basis = _vodafone_basis(modell, band_je_tarif)
+        alle_je_band = geraete_tco_band.alle_karten_je_band(modell,
+                                                            band_je_tarif)
         je_band = geraete_tco_band.karten_je_band(modell, band_je_tarif)
         uebrig = _guenstigste_echte_karte_je_anbieter(modell)
         if basis is None:
@@ -269,19 +283,24 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
             continue
         zeilen = []
         for a in NETZ_WETTBEWERBER:
-            gemeinsam = [b for b, je in je_band.items()
+            # ALLE gemeinsamen Baender, ALLE Karten: ein Anbieter, der das
+            # Geraet in ZWEI Tarifen desselben Bandes fuehrt, hat auch
+            # ZWEI Vergleichspaare (RAD-1b; am Bestand gemessen: Telekom
+            # XS/S/M alle im Band Klein - vorher stand nur die guenstigste
+            # der drei, 18 von 51 Paaren fehlten auf der Seite). Die
+            # VF-Gegenkarte bleibt die GUENSTIGSTE VF-Karte des Bandes -
+            # die fuer Vodafone konservative Wahl (eine Behauptung "VF ist
+            # X % teurer" muss auch gegen VF's billigstes Angebot im Band
+            # halten).
+            gemeinsam = {b: je for b, je in alle_je_band.items()
                          if a in je and "Vodafone" in je
-                         and je["Vodafone"].get("vergleichbar", True)]
+                         and je_band[b]["Vodafone"].get("vergleichbar", True)}
             if gemeinsam:
-                # Bevorzugt das Band der Referenz; sonst Vodafones
-                # GUENSTIGSTE Karte unter den gemeinsamen Baendern - die
-                # fuer Vodafone konservative Wahl (eine Behauptung "VF ist
-                # X % teurer" muss auch gegen VF's billigstes Angebot im
-                # Band halten).
-                b = (basis["band"] if basis and basis["band"] in gemeinsam
-                     else min(gemeinsam,
-                              key=lambda band: je_band[band]["Vodafone"]["gesamt"]))
-                zeilen.append(_paar_zeile(a, b, je_band[b][a], je_band[b]["Vodafone"]))
+                for b, karten_wb in sorted(gemeinsam.items(),
+                                            key=lambda kv: _BAND_RANG[kv[0]]):
+                    for karte_wb in karten_wb[a]:
+                        zeilen.append(_paar_zeile(
+                            a, b, karte_wb, je_band[b]["Vodafone"]))
                 continue
             karte_anders = uebrig.get(a)
             if karte_anders is not None:

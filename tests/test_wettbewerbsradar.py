@@ -76,6 +76,7 @@ def _tarife() -> list[dict]:
     return [xs,
             satz("Vodafone", "Vodafone Mobil M", "vf:m", 60, 39.95),
             satz("o2", "O2 Mobile S", "o2:k", 10, 9.99),
+            satz("o2", "O2 Mobile S Plus", "o2:k2", 12, 12.99),
             satz("o2", "O2 Mobile M", "o2:m", 40, 19.99),
             satz("o2", "O2 Mobile L", "o2:g", 100, 39.99),
             satz("o2", "O2 Mobile L Plus", "o2:g2", 80, 44.99)]
@@ -120,16 +121,18 @@ def _bestand():
     ]
     buendel = [
         # M1: Vodafone hat ZWEI echte Bündel (vf:xs Klein, vf:m Mittel),
-        # o2 führt Klein UND Mittel - GEMEINSAME Bänder sind Klein und
-        # Mittel, und die Zeile muss das Band der REFERENZ (Klein)
-        # bevorzugen. Das ist der Paar-Pfad aus dem R2-Fix (band-korrekte
-        # Kartenauswahl): VF-Gegenkarte im selben Band statt der letzten
-        # Karte des Anbieters.
+        # o2 führt Klein (ZWEI Tarife: o2:k und o2:k2 - derselbe
+        # Dedupe-Schluessel wie eine Farbe, also wirklich zwei Karten im
+        # SELBEN Band) UND Mittel. GEMEINSAME Bänder sind Klein und Mittel
+        # - RAD-1b: JEDE gemeinsame Karte wird ein Paar, die Klein-Zeilen
+        # rechnen gegen die VF-Karte im Band Klein, die Mittel-Zeile gegen
+        # die im Band Mittel.
         _buendel(SKU_M1, "vf:xs", "Vodafone Mobil XS", 29.95, 30.0,
                  anbieter="Vodafone"),
         _buendel(SKU_M1, "vf:m", "Vodafone Mobil M", 39.95, 40.0,
                  anbieter="Vodafone"),
         _buendel(SKU_M1, "o2:k", "O2 Mobile S", 9.99, 1.0),
+        _buendel(SKU_M1, "o2:k2", "O2 Mobile S Plus", 12.99, 1.5),
         _buendel(SKU_M1, "o2:m", "O2 Mobile M", 19.99, 2.0),
         # M2: KEIN echtes VF-Bündel, nur die Näherung (Barpreis plus
         # SIM-only-Referenz) im Band Klein - o2 im selben Band, deutlich
@@ -213,8 +216,11 @@ def test_sortierung_negativste_abweichung_zuerst():
 
 def test_kein_buendel_nennt_alle_drei_wettbewerber():
     """(c) B.2.5: ein weggelassener Anbieter sieht aus wie einer, den es
-    nicht gibt. Jede Gruppe traegt EXAKT die drei Zeilen Telekom, 1&1, o2 -
-    mit und ohne Zahl, mit und ohne Vodafone-Basis."""
+    nicht gibt. Jede Gruppe traegt die drei Anbieter Telekom, 1&1, o2 -
+    mit und ohne Zahl, mit und ohne Vodafone-Basis. Die ZEILENZAHL ist
+    seit RAD-1b offen (mehrere Paare je Anbieter im selben Band); ohne
+    VF-Basis bleibt es exakt bei drei, weil es nichts zu paarweise
+    Rechnendes gibt."""
     gruppen, _, _ = _gruppen()
     erwartet = set(wr.NETZ_WETTBEWERBER)
     assert erwartet == {"Telekom", "1&1", "o2"}
@@ -222,7 +228,8 @@ def test_kein_buendel_nennt_alle_drei_wettbewerber():
     for gid, g in gruppen.items():
         anbieter = {z["anbieter"] for z in g["zeilen"]}
         assert anbieter == erwartet, f"{gid}: {anbieter}"
-        assert len(g["zeilen"]) == 3
+        if g["vodafone"] is None:
+            assert len(g["zeilen"]) == 3, gid
 
     # Die zwei konstruierten Lueckenfaelle: ohne o2-Karte ueberhaupt
     # (M1: Telekom und 1&1) und ohne Vodafone-Basis (M4: alle drei ohne
@@ -263,12 +270,45 @@ def test_band_mismatch_fuehrt_die_guenstigste_echte_karte():
     assert o2["grund"], "Band-Mismatch muss benannt sein"
 
 
+def test_zwei_karten_im_selben_band_werden_zwei_paare():
+    """RAD-1b, Abnahmekriterium 2 (konstruiert): führt ein Wettbewerber
+    ZWEI Karten im selben gemeinsamen Band (o2:k und o2:k2, beide Band
+    Klein), stehen auch ZWEI Paar-Zeilen in genau diesem Band - nicht nur
+    die günstigste (der RAD-1-Zustand, gegen den dieser Test gebaut ist).
+    Die Gegenprobe stellt sicher, dass die Fixture den Fall wirklich
+    auslöst."""
+    gruppen, modelle, band_je_tarif = _gruppen()
+    m1 = gruppen["apple-iphone-15-128"]
+    modell = next(m for m in modelle if m["id"] == "apple-iphone-15-128")
+
+    karten_klein = [k for k in modell["karten"]
+                    if k["anbieter"] == "o2" and k.get("belastbar")
+                    and not k.get("naeherung") and k.get("gesamt") is not None
+                    and band_je_tarif.get(k.get("tarif_id") or "") == "klein"
+                    and k.get("vergleichbar", True)]
+    assert len(karten_klein) >= 2, \
+        "Fixture prueft nichts: zweite o2-Karte im Band Klein fehlt"
+
+    paare_klein = [z for z in m1["zeilen"]
+                   if z["anbieter"] == "o2" and z["band"] == "klein"
+                   and z["status"] == wr.STATUS_VERGLEICHBAR]
+    assert len(paare_klein) >= 2, \
+        f"nur {len(paare_klein)} Paar-Zeilen im Band Klein"
+    # Jede Zeile nennt IHRE Karte: die Gesamtbeträge der Zeilen sind
+    # genau die der Karten (beide Richtungen - keine Karte doppelt,
+    # keine Karte vergessen).
+    assert {z["gesamt"] for z in paare_klein} == \
+        {k["gesamt"] for k in karten_klein}
+    assert len({z["tarif"] for z in paare_klein}) == len(paare_klein), \
+        "Paare ohne unterscheidbaren Tarif - die Spalte taugte nichts"
+
+
 def test_vergleichbarkeit_nur_im_gemeinsamen_band():
     """(e) Beide Pfade einer Zahl, konstruiert: M1 läuft ueber den PAAR-Pfad
-    (VF-Echtbündel im gemeinsamen Band, Bandwahl bevorzugt das Band der
-    Referenz, wenn mehrere gemeinsame existieren), M2 ueber den BASIS-Pfad
-    (Näherung im selben Band). Beide rechnen gegen eine Vodafone-Zahl
-    IMSELBEN Band - die Gegenkarte oder die Basis."""
+    (VF-Echtbündel im gemeinsamen Band; seit RAD-1b mit einer Zeile je
+    gemeinsamen Band), M2 ueber den BASIS-Pfad (Näherung im selben Band).
+    Beide rechnen gegen eine Vodafone-Zahl IMSELBEN Band - die Gegenkarte
+    oder die Basis."""
     gruppen, modelle, band_je_tarif = _gruppen()
     by_id = {m["id"]: m for m in modelle}
     vergleichbare = [(g, z) for g in gruppen.values() for z in g["zeilen"]
@@ -294,13 +334,23 @@ def test_vergleichbarkeit_nur_im_gemeinsamen_band():
         "beide Pfade muessen konstruiert eintreten, sonst prueft die " \
         "Verzweigung nichts"
 
-    # Die Bandwahl bei MEHREREN gemeinsamen Bändern: M1 hat Klein und
-    # Mittel gemeinsam, die Referenz liegt in Klein -> die Zeile steht im
-    # Band Klein, nicht im (fuer o2 guenstigeren) Mittel.
+    # RAD-1b: MEHRERE gemeinsame Bänder liefern MEHRERE Paare - M1 hat
+    # Klein und Mittel gemeinsam, also steht eine o2-Zeile je Band, und
+    # JEDE rechnet gegen die VF-Karte IHRES Bandes (Klein gegen die
+    # günstigste VF-Karte Klein - das ist zugleich die Basis -, Mittel
+    # gegen die VF-Karte Mittel, nicht gegen die billigere Basis).
     m1 = gruppen["apple-iphone-15-128"]
-    o2 = next(z for z in m1["zeilen"] if z["anbieter"] == "o2")
-    assert o2["band"] == "klein"
-    assert o2["vf_gesamt"] == m1["vodafone"]["gesamt"]
+    o2_zeilen = [z for z in m1["zeilen"]
+                 if z["anbieter"] == "o2" and z["status"] == wr.STATUS_VERGLEICHBAR]
+    band_der_zeilen = {z["band"] for z in o2_zeilen}
+    assert band_der_zeilen == {"klein", "mittel"}, band_der_zeilen
+    for z in o2_zeilen:
+        vf_karte = band.karten_je_band(
+            next(m for m in modelle if m["id"] == "apple-iphone-15-128"),
+            band_je_tarif)[z["band"]]["Vodafone"]
+        assert z["vf_gesamt"] == vf_karte["gesamt"]
+    klein = next(z for z in o2_zeilen if z["band"] == "klein")
+    assert klein["vf_gesamt"] == m1["vodafone"]["gesamt"]
 
 
 # --------------------------------------------------------------------------
@@ -531,6 +581,24 @@ def test_auf_der_seite_fehlt_kein_netzbetreiber(tmp_path):
         assert {"Telekom", "1&1", "o2"} <= namen, namen
 
 
+def test_die_seite_zeigt_den_tarif_jeder_karte(tmp_path):
+    """RAD-1b: seit mehrere Zeilen desselben Anbieters im selben Band
+    stehen koennen, unterscheidet erst die Tarif-Spalte die Zeilen - sie
+    muss im gerenderten Artefakt gefuellt sein, nicht nur im Dict (T1 des
+    diff-reviewers: eine Dateneben-Pruefung alone beweist die Spalte
+    nicht)."""
+    suppe = BeautifulSoup(_seite(tmp_path)["wettbewerbsradar.html"],
+                          "html.parser")
+    zeilen = suppe.select(".wr-zeile")
+    assert zeilen, "keine Zeile gerendert - Test prueft nichts"
+    tarife = [z.select("td")[1].get_text(strip=True) for z in zeilen]
+    assert "O2 Mobile S" in tarife, \
+        "der Tarif der o2-Karte steht nicht in der Tarif-Spalte"
+    # Zeilen ohne Karte tragen keinen Tarif - dort steht das Gedankenstrich-
+    # Zeichen, nie ein leerer Pfad.
+    assert all(t for t in tarife), "leere Tarif-Zelle gerendert"
+
+
 def test_die_geraeteseite_traegt_den_fusslink(tmp_path):
     """(k) RAD-1 Aufgabe 2: der Radar ist von geraete.html aus verlinkt,
     sobald er vergleichbare Zeilen hat - und in der Navigation derselben
@@ -564,12 +632,48 @@ def echt():
             "band_je_tarif": view["tco"]["band_je_tarif"]}
 
 
-def test_am_echten_bestand_hat_jede_gruppe_alle_drei_zeilen(echt):
+def test_am_echten_bestand_nennt_jede_gruppe_alle_drei_wettbewerber(echt):
     gruppen = echt["radar"]["gruppen"]
     assert gruppen, "kein Modell im Bestand - der Test pruefte nichts"
     for g in gruppen:
-        assert len(g["zeilen"]) == 3
         assert {z["anbieter"] for z in g["zeilen"]} == set(wr.NETZ_WETTBEWERBER)
+
+
+def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
+    """RAD-1b, Abnahmekriterium 1/2: jedes echte Paar im Bestand (je
+    Wettbewerber-Karte in einem Band, in dem Vodafone eine vergleichbare
+    Karte fuehrt) wird auch gezeichnet - als INVARIANTE, die beide Seiten
+    aus demselben Bestand rechnet, nicht als Tageszahl. Bis RAD-1b fehlten
+    21 von 51 (Telekom XS/S/M im Band Klein: nur die guenstigste Karte
+    eines bevorzugten Bandes wurde gezeichnet).
+
+    Gezaehlt werden nur PAAR-PFAD-Zeilen (Band in `vf_gemeinsam`): eine
+    Basis-Pfad-Zeile (VF-Naeherung im selben Band, kein echtes VF-Buendel)
+    ist eine eigene, korrekte Zeile - sie als fehlendes Paar zu zaehlen
+    wuerde den Test rot machen, sobald der Bestand den ersten Basis-Pfad-
+    Fall liefert (diff-reviewer-Befund S1, an der konstruierten Fixture
+    M2 nachgewiesen: paare 3, gezeichnet 4)."""
+    by_id = {m["id"]: m for m in echt["modelle"]}
+    paare = 0
+    gezeichnet = 0
+    for g in echt["radar"]["gruppen"]:
+        modell = by_id[g["id"]]
+        alle_je_band = band.alle_karten_je_band(modell, echt["band_je_tarif"])
+        vf_gemeinsam = {b for b, je in alle_je_band.items()
+                        if "Vodafone" in je
+                        and je["Vodafone"][0].get("vergleichbar", True)}
+        for a in wr.NETZ_WETTBEWERBER:
+            for b in vf_gemeinsam:
+                karten = alle_je_band[b].get(a) or []
+                paare += len([k for k in karten
+                              if k.get("vergleichbar", True)])
+            gezeichnet += len([z for z in g["zeilen"]
+                               if z["anbieter"] == a
+                               and z["status"] == wr.STATUS_VERGLEICHBAR
+                               and z["band"] in vf_gemeinsam])
+    assert paare, "kein Paar im Bestand - Datenlage gemaess Brief geprueft?"
+    assert gezeichnet == paare, \
+        f"{paare - gezeichnet} Paare im Bestand fehlen auf der Seite"
 
 
 def test_am_echten_bestand_ist_jede_zahl_gegen_die_vf_zahl_im_selben_band(echt):
