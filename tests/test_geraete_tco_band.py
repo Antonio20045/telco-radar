@@ -153,18 +153,36 @@ def test_vorgabefall_zeigt_genau_die_anbieter_mit_echten_buendeln(bestand):
 
 
 def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
-    """Die Datenlage aus BRIEF_GRAPH1: Telekom, congstar und 1&1 liefern
-    heute in KEINEM Band ein zeichenbares Buendel fuer dieses Geraet -
-    jedes der drei Baender nennt sie beim Namen, keins laesst sie einfach
-    weg."""
+    """BRIEF_GRAPH1, Aufgabe 4: KEIN erwarteter Anbieter darf in einem Band
+    still verschwinden - jeder ist entweder gezeichnet oder mit Grund
+    benannt. Bis B2 (08.09.2026) hielt dieser Test die Datenlage fest
+    (Telekom, congstar und 1&1 in KEINEM Band zeichenbar); seit dem
+    Telekom-Lokallauf fuehrt Telekom ECHTE Bündel und ist im Band Klein
+    gezeichnet, in anderen ehrlich fehlend. Gemessen wird deshalb die
+    REGEL: je Band gilt gezeichnet-oder-benannt fuer ALLE erwarteten
+    Anbieter - und beide Telekom-Zustaende treten wirklich ein
+    (Lookup-Zeile, sonst pruefte der Test nur einen von beiden)."""
     modell = _modell(bestand, VORGABE_MODELL)
     baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"])
     assert baender, "kein Band vorhanden - Test prueft nichts"
+    je_band = band.karten_je_band(modell, bestand["band_je_tarif"])
+    telekom_gezeichnet = telekom_fehlend = 0
     for eintrag in baender:
+        gezeichnet = set(je_band.get(eintrag["key"]) or {})
         namen = {f["anbieter"] for f in eintrag["fehlend"]}
-        assert {"Telekom", "congstar", "1&1"} <= namen
+        # gezeichnet ODER benannt - niemand wird still weggelassen
+        assert gezeichnet | namen >= set(band.ERWARTETE_ANBIETER), \
+            f"Band {eintrag['key']}: {set(band.ERWARTETE_ANBIETER) - gezeichnet - namen} fehlt still"
+        assert not (gezeichnet & namen), \
+            f"Band {eintrag['key']}: {gezeichnet & namen} ist gezeichnet UND fehlend"
         for f in eintrag["fehlend"]:
             assert f["grund"], f"{f['anbieter']} hat keinen Grund"
+        if "Telekom" in gezeichnet:
+            telekom_gezeichnet += 1
+        if "Telekom" in namen:
+            telekom_fehlend += 1
+    assert telekom_gezeichnet, "Telekom nirgends gezeichnet - Bestand ohne Bündel?"
+    assert telekom_fehlend, "Telekom überall gezeichnet - der Lückenfall fehlt"
 
 
 def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand):
