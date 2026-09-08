@@ -46,8 +46,8 @@ from __future__ import annotations
 
 import logging
 
-from . import geraete_tco_grafik, geraete_tco_karten, geraete_vergleich
-from . import geraete_verlauf
+from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
+from . import geraete_vergleich, geraete_verlauf
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
 from ..tarif_model import PREISTYP_LIVE_SHOP
@@ -669,6 +669,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                                                     e.get("speicher_gb"))
         listungen_je_modell.setdefault(mid, []).append(e)
 
+    # GRAPH-1 (08.09.2026): der Tarifband-Index steht EINMAL fuer alle
+    # Modelle - er kommt aus demselben Tarifbestand wie die Tarifbindung
+    # oben, nur mit einer anderen Lesart (Datenvolumen statt Laufzeit).
+    band_je_tarif = geraete_tco_band.tarif_baender(tarife)
+
     for modell in modelle["modelle"]:
         # Die Grafik rechnet NUR Geometrie: die Betraege stehen schon in
         # den Karten, und zwei Rechnungen fuer dieselbe Zahl waeren zwei
@@ -693,6 +698,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         modell["haendler_offen"] = [
             h for h in HAENDLER_OHNE_BUENDEL
             if modell["haendler_ohne_buendel"].get(h) is None]
+        # GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): Geraet x Tarifniveau, eine
+        # Linie je Anbieter mit echtem Buendel in diesem Band
+        # (AUFTRAG_GERAETESEITE.md §2a/§7). Eigener Baustein, eigene Datei -
+        # `report/geraete_tco_band.py`.
+        modell["baender"] = geraete_tco_band.baender_fuer_modell(
+            modell, band_je_tarif)
 
     reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
               if historie is not None else [])
@@ -763,6 +774,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "ohne_zuordnung": modelle["ohne_zuordnung"],
         "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
         "g2": g2,
+        # GRAPH-1: der feste Bandkatalog (§7) fuer die Tarifband-Auswahl -
+        # EINMAL hier benannt, damit die Vorlage ihn nicht ein zweites Mal
+        # aus der Konstante abschreibt (CLAUDE.md §6).
+        "baender_katalog": [{"key": k, "label": l, "bereich": b}
+                            for k, l, b in geraete_tco_band.BAENDER],
     }
 
 
@@ -777,4 +793,6 @@ def leer() -> dict:
             "modelle_gesamt": 0, "ohne_zuordnung": [],
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
             "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
-                   "reihen_gesamt": 0, "ausgelassen": []}}
+                   "reihen_gesamt": 0, "ausgelassen": []},
+            "baender_katalog": [{"key": k, "label": l, "bereich": b}
+                                for k, l, b in geraete_tco_band.BAENDER]}
