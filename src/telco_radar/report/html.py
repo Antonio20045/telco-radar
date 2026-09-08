@@ -1273,6 +1273,25 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     env.globals["geraete_verlinkt"] = bool(
         geraete["bilanz"].get("schwelle_erreicht"))
 
+    # ---- Wettbewerbs-Radar (RAD-1, 08.09.2026): AUFTRAG_GERAETESEITE.md
+    # §2b. Rechnet HIER, nicht erst bei der eigenen Seite - der
+    # Navigationseintrag steht in `base.html.j2`, also auf jeder Seite, und
+    # der Fusslink auf `geraete.html` braucht dasselbe Global. Dieselbe
+    # Veroeffentlichungsschwelle-Disziplin wie bei "Geraete" selbst: eine
+    # Seite ohne eine einzige vergleichbare Zeile ginge sonst in die
+    # Navigation und behauptete eine Antwort, die sie nicht hat.
+    from . import wettbewerbsradar as _wettbewerbsradar_mod
+    try:
+        wettbewerbsradar_view = _wettbewerbsradar_mod.radar(
+            geraete["tco"], geraete["vergleich"]["ohne_vertrag"],
+            geraete["quellenlage"])
+    except Exception as exc:  # noqa: BLE001
+        log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
+                  type(exc).__name__, exc)
+        wettbewerbsradar_view = _wettbewerbsradar_mod.leer()
+    env.globals["wettbewerbsradar_verlinkt"] = bool(
+        wettbewerbsradar_view["hat_vergleichbare_zeilen"])
+
     # ---- Rechtstexte: aus demselben Grund HIER und nicht bei ihrer Seite.
     # Die Fusszeile steht in `base.html.j2`, also auf JEDER Seite - und die
     # Schwelle "Impressum vollstaendig" entscheidet zusaetzlich darueber, ob
@@ -1908,6 +1927,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "geraete-quellen.html").write_text(
         env.get_template("geraete_quellen.html.j2").render(
             prefix="", geraete=geraete),
+        encoding="utf-8")
+    (site_dir / "wettbewerbsradar.html").write_text(
+        env.get_template("wettbewerbsradar.html.j2").render(
+            prefix="", wettbewerbsradar=wettbewerbsradar_view),
         encoding="utf-8")
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.

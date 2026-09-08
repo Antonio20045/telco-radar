@@ -1,0 +1,156 @@
+{# Wettbewerbs-Radar (RAD-1, 08.09.2026): AUFTRAG_GERAETESEITE.md §2b.
+
+   Die Leitzahl ist die %-Abweichung MIT VORZEICHEN, nicht der Absolutpreis
+   - Absolutpreise stehen als Beleg daneben. Sortiert wird aufsteigend: die
+   groesste Benachteiligung Vodafones (der negativste Wert) zuerst. Siehe
+   `report/wettbewerbsradar.py` fuer die ausgeschriebene Herleitung der
+   Sortierrichtung.
+
+   Zwei Abschnitte, nie gemischt (Aufgabe f): Netzbetreiber vergleichen
+   TCO-24 gegen TCO-24, Haendler vergleichen Geraetepreis gegen
+   Geraetepreis. Nicht erhebbare Haendler stehen NAMENTLICH, nie
+   stillschweigend weggelassen. #}
+{% extends "base.html.j2" %}
+{% set active = 'wettbewerbsradar' %}
+{% block title %}Vodafone Product and Services Insights · Wettbewerbs-Radar{% endblock %}
+
+{% block content %}
+<section class="page-hero wide">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Geräte · Wettbewerbsvergleich</p>
+      <h1>Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h1>
+    </div>
+  </div>
+  <p class="page-lead">Leitzahl ist die Abweichung in Prozent, mit
+  Vorzeichen – nicht der Absolutpreis. Ein negativer Wert heißt: ein
+  Wettbewerber ist bei diesem Gerät günstiger als Vodafone. Ganz oben stehen
+  die Geräte, bei denen dieser Abstand am größten ist. Die Absolutpreise
+  stehen daneben als Beleg, mit Quelle und Abrufdatum – sie sind der Beweis,
+  nicht die Botschaft. Grundlage der Netzbetreiber-Zeilen ist die TCO über
+  24 Monate (Gerät plus Tarif); Netzbetreiber werden nur innerhalb
+  desselben Tarifbandes verglichen (Klein/Mittel/Groß nach Datenvolumen) –
+  liegen zwei Angebote in verschiedenen Bändern, steht das ausdrücklich da,
+  statt sie zu vermischen.</p>
+</section>
+
+{% if wettbewerbsradar.hat_daten %}
+<section class="wr-sektion">
+  <h2 class="rubrik">Netzbetreiber – TCO über 24 Monate</h2>
+  <p class="gr-erklaer">Vodafones eigener TCO-24-Wert je Gerät ist die
+  Grundlage; Telekom, 1&amp;1 und o2 stehen darunter – mit einer
+  %-Abweichung, gerechnet gegen Vodafones Preis im selben
+  Datenvolumen-Band (Klein/Mittel/Groß), sonst mit einer benannten Lücke.
+  Kein Anbieter wird weggelassen, auch nicht, wenn er keine Zahl trägt.</p>
+
+  {% macro wr_zeile(z) %}
+  <tr class="wr-zeile wr-status--{{ z.status }}">
+    <td>{{ z.anbieter }}</td>
+    <td class="num">{% if z.gesamt is not none %}{{ '%.2f'|format(z.gesamt) }} €{% else %}–{% endif %}</td>
+    <td>{{ z.band_label or '–' }}{% if z.status == 'vergleichbar' and z.vf_gesamt is not none %} · VF {{ '%.2f'|format(z.vf_gesamt) }} €{% endif %}</td>
+    <td class="num wr-prozent{% if z.prozent is not none %}{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}{% endif %}">
+      {%- if z.prozent is not none -%}
+        {{ '%+.1f'|format(z.prozent) }} %
+      {%- else -%}
+        {% if z.status == 'band_mismatch' %}Band-Mismatch{% elif z.status == 'kein_buendel' %}kein Bündel erhoben{% elif z.status == 'nicht_vergleichbar' %}nicht vergleichbar{% else %}–{% endif %}
+      {%- endif -%}
+    </td>
+    <td class="wr-beleg">
+      {% if z.quelle_url %}<a href="{{ z.quelle_url }}" rel="noopener">{{ z.quelle_url | domain }}</a>{% if z.abgerufen_am %} · {{ z.abgerufen_am }}{% endif %}
+      {% elif z.grund %}<span class="wr-grund">{{ z.grund }}</span>{% else %}–{% endif %}
+    </td>
+  </tr>
+  {% endmacro %}
+
+  {% macro wr_gruppe(g) %}
+  <div class="wr-gruppe">
+    <h3 class="wr-gruppenkopf">{{ g.titel }}{% if g.speicher %} · {{ g.speicher }} GB{% endif %}</h3>
+    {% if g.vodafone %}
+    <p class="wr-basis">Vodafone-Basis: <b>{{ '%.2f'|format(g.vodafone.gesamt) }} €</b> TCO-24
+      ({{ g.vodafone.tarif }}, Band {{ g.vodafone.band_label }}{% if g.vodafone.naeherung %}, gerechnete Näherung{% endif %})
+      {% if g.vodafone.quelle_url %} · <a href="{{ g.vodafone.quelle_url }}" rel="noopener">{{ g.vodafone.quelle_url | domain }}</a>{% if g.vodafone.abgerufen_am %} · {{ g.vodafone.abgerufen_am }}{% endif %}{% endif %}</p>
+    {% else %}
+    <p class="wr-basis wr-basis--leer">{{ g.vodafone_grund }}</p>
+    {% endif %}
+    <div class="gr-scroll">
+    <table class="src-table wr-tabelle">
+      <thead><tr><th>Anbieter</th><th class="num">TCO-24</th><th>Band</th>
+        <th class="num">Abweichung</th><th>Beleg</th></tr></thead>
+      <tbody>{% for z in g.zeilen %}{{ wr_zeile(z) }}{% endfor %}</tbody>
+    </table>
+    </div>
+  </div>
+  {% endmacro %}
+
+  {% for g in wettbewerbsradar.gruppen_sichtbar %}{{ wr_gruppe(g) }}{% endfor %}
+  {% if wettbewerbsradar.gruppen_rest %}
+  <details class="gr-auf">
+    <summary>Alle {{ wettbewerbsradar.gruppen | length }} Geräte anzeigen</summary>
+    {% for g in wettbewerbsradar.gruppen_rest %}{{ wr_gruppe(g) }}{% endfor %}
+  </details>
+  {% endif %}
+</section>
+
+<section class="wr-sektion">
+  <h2 class="rubrik">Händler – Gerätepreis</h2>
+  <p class="gr-erklaer">Saturn, mobilcom-debitel und Amazon (falls Preise
+  vorliegen) verkaufen ohne eigenen Tarif – hier zählt der reine
+  Gerätepreis gegen Vodafones Gerätepreis, dieselbe %-Logik wie oben, aber
+  nie gegen eine TCO gerechnet.</p>
+  {% if wettbewerbsradar.haendler %}
+  <div class="gr-scroll">
+  <table class="src-table wr-tabelle">
+    <thead><tr><th>Gerät</th><th>Händler</th><th class="num">Vodafone</th>
+      <th class="num">Händler</th><th class="num">Abweichung</th><th>Beleg</th></tr></thead>
+    <tbody>
+      {% macro wr_haendler_zeile(h) %}
+      <tr class="wr-zeile">
+        <td>{{ h.hersteller }} {{ h.modell }}{% if h.speicher %} · {{ h.speicher }} GB{% endif %}</td>
+        <td>{{ h.anbieter }}</td>
+        <td class="num">{{ '%.2f'|format(h.vodafone_preis) }} €</td>
+        <td class="num">{{ '%.2f'|format(h.preis) }} €</td>
+        <td class="num wr-prozent{{ ' wr-prozent--negativ' if h.prozent < 0 else ' wr-prozent--positiv' }}">{{ '%+.1f'|format(h.prozent) }} %</td>
+        <td class="wr-beleg">{% if h.url %}<a href="{{ h.url }}" rel="noopener">{{ h.url | domain }}</a>{% if h.abgerufen_am %} · {{ h.abgerufen_am }}{% endif %}{% else %}–{% endif %}</td>
+      </tr>
+      {% endmacro %}
+      {% for h in wettbewerbsradar.haendler_sichtbar %}{{ wr_haendler_zeile(h) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if wettbewerbsradar.haendler_rest %}
+  <details class="gr-auf">
+    <summary>Alle {{ wettbewerbsradar.haendler | length }} Händler-Zeilen anzeigen</summary>
+    <div class="gr-scroll">
+    <table class="src-table wr-tabelle">
+      <tbody>{% for h in wettbewerbsradar.haendler_rest %}{{ wr_haendler_zeile(h) }}{% endfor %}</tbody>
+    </table>
+    </div>
+  </details>
+  {% endif %}
+  {% else %}
+  <p class="gr-erklaer">Zu keinem Gerät liegt bei Vodafone UND einem Händler
+  gleichzeitig ein belegter Gerätepreis vor.</p>
+  {% endif %}
+</section>
+
+{% if wettbewerbsradar.nicht_erhebbar %}
+<section class="wr-sektion">
+  <h2 class="rubrik">Nicht erhebbar</h2>
+  <p class="gr-erklaer">Diese Händler gehören zum Vergleichskreis, liefern
+  aber heute keine Daten – benannt statt stillschweigend weggelassen.</p>
+  <table class="src-table">
+    <thead><tr><th>Anbieter</th><th>Warum</th></tr></thead>
+    <tbody>
+      {% for a in wettbewerbsradar.nicht_erhebbar %}
+      <tr><td>{{ a.anbieter }}</td><td>{{ a.grund }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+{% else %}
+<p class="gr-erklaer">Noch keine Gerätedaten erhoben – der Wettbewerbs-Radar
+füllt sich mit dem nächsten Lauf.</p>
+{% endif %}
+{% endblock %}

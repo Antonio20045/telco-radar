@@ -142,25 +142,20 @@ def _grund(anbieter: str, hat_irgendein_buendel: bool) -> str:
     return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
-def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
-    """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
+def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
+    """Je Band die guenstigste ECHTE Karte jedes Anbieters (Regel 1-3 oben).
 
-    Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
-    Buendel - kein leeres Band wird als Auswahloption angeboten (Aufgabe 1:
-    "pro Modell nur Bänder anbieten, für die Bündel existieren"). Je Eintrag:
-        key, label, bereich   - siehe `BAENDER`
-        grafik                 - `geraete_tco_grafik.zeitreihe(...)`,
-                                  Y-Achse TCO-24 (Aufgabe 3)
-        fehlend                 - [{"anbieter","grund"}] fuer jeden
-                                  erwarteten Anbieter ohne Linie in diesem
-                                  Band (Aufgabe 4)
+    Rueckgabe: `{band_key: {anbieter: karte}}` - nur Baender mit mindestens
+    einem echten Buendel stehen darin. Diese Funktion ist der EINE Ort, an
+    dem "Geraet x Tarifband" gruppiert wird; `baender_fuer_modell` (der
+    Graph) und `wettbewerbs_radar` (die %-Abweichung, RAD-1) lesen beide
+    von hier - keine zweite Gruppierung fuer dieselbe Frage.
     """
     # Nur ECHTE Buendel (Regel 2 des Modulkopfs) - die Naeherungskarte ist
     # kein Angebot.
     echte = [k for k in (modell.get("karten") or [])
              if k.get("belastbar") and not k.get("naeherung")
              and k.get("gesamt") is not None]
-    anbieter_mit_irgendeinem_buendel = {k["anbieter"] for k in echte}
 
     je_band: dict[str, dict] = {}
     for k in echte:
@@ -174,6 +169,33 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
         # Anbieter, eine Zahl je Ort).
         if vorhandene is None or k["gesamt"] < vorhandene["gesamt"]:
             bisher[k["anbieter"]] = k
+    return je_band
+
+
+def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
+    """Wer fuer dieses Geraet UEBERHAUPT ein echtes Buendel fuehrt - in
+    IRGENDEINEM Band. Getrennt von `karten_je_band`, weil `_grund` beide
+    Mengen braucht (siehe dort)."""
+    return {k["anbieter"] for k in (modell.get("karten") or [])
+            if k.get("belastbar") and not k.get("naeherung")
+            and k.get("gesamt") is not None}
+
+
+def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
+    """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
+
+    Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
+    Buendel - kein leeres Band wird als Auswahloption angeboten (Aufgabe 1:
+    "pro Modell nur Bänder anbieten, für die Bündel existieren"). Je Eintrag:
+        key, label, bereich   - siehe `BAENDER`
+        grafik                 - `geraete_tco_grafik.zeitreihe(...)`,
+                                  Y-Achse TCO-24 (Aufgabe 3)
+        fehlend                 - [{"anbieter","grund"}] fuer jeden
+                                  erwarteten Anbieter ohne Linie in diesem
+                                  Band (Aufgabe 4)
+    """
+    je_band = karten_je_band(modell, band_je_tarif)
+    mit_irgendeinem_buendel = anbieter_mit_irgendeinem_buendel(modell)
 
     ergebnis = []
     for key, label, bereich in BAENDER:
@@ -186,7 +208,7 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
                                                                kv[0]))]
         vorhanden = set(karten_je_anbieter)
         fehlend = [{"anbieter": a,
-                    "grund": _grund(a, a in anbieter_mit_irgendeinem_buendel)}
+                    "grund": _grund(a, a in mit_irgendeinem_buendel)}
                    for a in ERWARTETE_ANBIETER if a not in vorhanden]
         ergebnis.append({
             "key": key, "label": label, "bereich": bereich,

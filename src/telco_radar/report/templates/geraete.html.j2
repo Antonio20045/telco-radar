@@ -213,6 +213,15 @@
   </div>
 </section>
 
+{# RAD-1 (08.09.2026): der eine Fusslink auf den Wettbewerbs-Radar - kein
+   Erklaersatz, nur der Weg dorthin (Aufgabe 2: "verlinkt ... UND
+   geraete.html"). Dieselbe Ausnahme wie der Fusslink auf
+   geraete-quellen.html: ein Bedienelement, kein Kommentar. #}
+{% if wettbewerbsradar_verlinkt %}
+<p class="gr-erklaer"><a href="{{ prefix }}wettbewerbsradar.html">Wettbewerbs-Radar:
+  alle Geräte nach Abweichung zu Vodafone sortiert</a>.</p>
+{% endif %}
+
 {% if geraete.hat_daten %}
 
 {% set al = geraete.alarme %}
