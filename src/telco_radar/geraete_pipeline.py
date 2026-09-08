@@ -39,6 +39,7 @@ from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, sammle
+from .collect.geraete.congstar import ergaenze_pib_slug
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -238,6 +239,19 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
+        # DIE CONGSTAR-BRUECKE (B3, 08.09.2026): congstar nummeriert Tarif
+        # und Pflichtblatt mit derselben Zahl (PlanVariant 540 verlinkt
+        # Produktinformationsblatt_540.pdf, der Bestandssatz desselben
+        # Tarifs traegt dieselbe Adresse). Die Nummer ist das Pendant zum
+        # "Handy hinzufügen"-Slug der o2-Kachel: der Anbieter stellt die
+        # Verbindung her, dieses Modul liest sie nur nach - am Bestandssatz
+        # und am Buendel-Rohsatz (congstar.lies_buendel). Ohne sie fielen
+        # vier der acht congstar-PlanVarianten unter "ohne aufloesbaren
+        # Tarif", weil der Seiten-Titel ("Allnet Flat S") und der Blattname
+        # ("Allnet Flat S mit GB+") sich ueber den Namen nie treffen.
+        # Zur Laufzeit und nicht dauerhaft am Bestand: die Zeitreihe in
+        # tarife.jsonl bleibt unberuehrt.
+        ergaenze_pib_slug(bestand)
         tarife = len(bestand)
         referenzen = aus_bestand(bestand)
         if not referenzen:

@@ -56,9 +56,20 @@ WETTBEWERBERKREIS
 Netzbetreiber: Telekom, 1&1, o2 - dieselben drei, die
 `geraete_tco_karten.ANBIETER_REIHENFOLGE` neben Vodafone ohnehin auf JEDER
 Karte fuehrt (B.2.5: "ein Anbieter, der weggelassen wird, sieht aus wie
-einen, den es nicht gibt"). congstar bleibt bewusst draussen - dieselbe
-Regel wie auf der Hauptansicht ("eine leere Zeile fuer jede denkbare
-Zweitmarke waere eine Wand aus Luecken"), und §2b nennt es nicht.
+einen, den es nicht gibt"). Sie stehen je Modell IMMER da, auch ohne
+Bündel (ehrliches kein_buendel statt Weglassen).
+
+Zweitmarken (B3, 08.09.2026): congstar - mit Karte, wo er eine hat, und
+OHNE Platzhalter, wo er keine hat. Bis B-3 blieb congstar draussen, weil
+er keine Bündel lieferte und eine leere Zeile je Modell nur Lücken
+waere ("eine leere Zeile fuer jede denkbare Zweitmarke waere eine Wand
+aus Luecken"); seit der Bündelerhebung auf seinen Tarifseiten liefert er
+72 Sätze zu 4 Geräten. Wo congstar dasselbe Gerät im selben Band führt
+wie Vodafone, entsteht das Vergleichspaar automatisch; wo nicht, entsteht
+NICHTS - congstar ist kein Vollsortimenter, und 55 kein_buendel-Zeilen
+waere genau die Wand, gegen die die Regel gebaut wurde. Der Unterschied
+zu den Netzbetreibern ist also nicht die Marke, sondern der Anspruch:
+die drei führen nahezu alle Geräte, congstar führt vier.
 
 Haendler (Gerätepreis, eigener Abschnitt): Saturn, mobilcom-debitel, Amazon
 - ausdruecklich im Auftrag genannt. Sie vergleichen GERAETEPREIS gegen
@@ -93,6 +104,14 @@ from . import geraete_tco_band, geraete_tco_karten
 # Vodafone fuehrt.
 NETZ_WETTBEWERBER = tuple(a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE
                           if a != "Vodafone")
+
+# Zweitmarken mit Bündelerhebung (B3, siehe Modulkopf "WETTBEWERBERKREIS"):
+# Zeile NUR, wo sie eine Karte haben - kein Platzhalter, wo sie keine haben.
+ZWEITMARKEN_MIT_BUENDEL = ("congstar",)
+
+# Der Kreis, der Paare bilden KANN (Platzhalter macht allein der
+# Netzbetreiber-Kreis, siehe netzbetreiber_gruppen).
+ALLE_WETTBEWERBER = NETZ_WETTBEWERBER + ZWEITMARKEN_MIT_BUENDEL
 
 STATUS_VERGLEICHBAR = "vergleichbar"
 STATUS_BAND_MISMATCH = "band_mismatch"
@@ -229,7 +248,7 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     beste: dict[str, dict] = {}
     for k in (modell.get("karten") or []):
         a = k["anbieter"]
-        if a == "Vodafone" or a not in NETZ_WETTBEWERBER:
+        if a == "Vodafone" or a not in ALLE_WETTBEWERBER:
             continue
         if not (k.get("belastbar") and not k.get("naeherung")
                 and k.get("gesamt") is not None):
@@ -242,7 +261,8 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
 def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
     """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + Zeilen der
     drei Wettbewerber, IMMER alle drei genannt (kein_buendel statt
-    Weglassen), sortiert aufsteigend nach %-Abweichung.
+    Weglassen), dazu Zweitmarken MIT Karte ohne Platzhalter (B3) - sortiert
+    aufsteigend nach %-Abweichung.
 
     Die Karten des Wettbewerbers und seine VODAFONE-Gegenkarte kommen aus
     der GRAPH-1-Bandlogik (`geraete_tco_band.alle_karten_je_band` /
@@ -263,6 +283,7 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
                                                             band_je_tarif)
         je_band = geraete_tco_band.karten_je_band(modell, band_je_tarif)
         uebrig = _guenstigste_echte_karte_je_anbieter(modell)
+        hat_karte = {k.get("anbieter") for k in (modell.get("karten") or [])}
         if basis is None:
             zeilen = [{"anbieter": a, "status": STATUS_KEIN_BUENDEL,
                       "prozent": None,
@@ -270,7 +291,10 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
                       "tarif": (uebrig.get(a) or {}).get("tarif", ""),
                       "band": None, "band_label": "",
                       "grund": "", **_beleg("", "")}
-                     for a in NETZ_WETTBEWERBER]
+                     # Zweitmarken auch hier nur MIT Karte (B3, kein
+                     # Platzhalter - siehe der Kommentar unten).
+                     for a in ALLE_WETTBEWERBER
+                     if a in NETZ_WETTBEWERBER or a in hat_karte]
             gruppen.append({
                 "id": modell["id"], "titel": modell["titel"],
                 "hersteller": modell["hersteller"], "speicher": modell["speicher"],
@@ -282,7 +306,13 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
             })
             continue
         zeilen = []
-        for a in NETZ_WETTBEWERBER:
+        for a in ALLE_WETTBEWERBER:
+            # ZWEITMARKEN OHNE PLATZHALTER (B3): congstar ist kein
+            # Vollsortimenter - führt er das Gerät nicht im Bündel, bleibt
+            # die Zeile ganz aus (kein kein_buendel-Platzhalter, siehe
+            # Modulkopf). Die Netzbetreiber stehen IMMER da.
+            if a not in NETZ_WETTBEWERBER and a not in hat_karte:
+                continue
             # ALLE gemeinsamen Baender, ALLE Karten: ein Anbieter, der das
             # Geraet in ZWEI Tarifen desselben Bandes fuehrt, hat auch
             # ZWEI Vergleichspaare (RAD-1b; am Bestand gemessen: Telekom

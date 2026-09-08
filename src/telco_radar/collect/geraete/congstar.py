@@ -89,14 +89,114 @@ Adapter umgeht ihn nicht und bringt keine eigene Pruefung mit. Fuer diese
 Messrunde liegt keine gespeicherte robots.txt vor; ein Host ohne robots.txt
 (HTTP 404) ist im Web der Normalfall und bedeutet "keine Regeln", nicht
 "nicht anfassen" - dieselbe Lehre wie bei api.vodafone.de.
+
+DER BUENDELKATALOG: DIE TARIFFSEITE, NICHT DIE GERAETESEITE (B3, 08.09.2026)
+-----------------------------------------------------------------------------
+Die Zahlweisen der GERAETEseite (oben) tragen nur die Hardware: `oneTime`
+und `recurring` sind `DevicePrice`-Objekte, ein Tarifpreis steht dort
+nicht - die Fussnoten der Rabatte nennen zwar "Bei Abschluss der ANF M",
+aber was die ANF M kostet, sagt die Gerateseite nicht. Der Kauffluss mit
+Tarifwahl ist ein clientseitiger Konfigurator.
+
+Die Kombinatorik Geraet x Tarif steht stattdessen auf den vier Tarifseiten
+
+    https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-xs/
+    .../allnet-flat-s/   .../allnet-flat-m/   .../allnet-flat-l/
+
+und zwar serverseitig, im selben Flight-Payload wie oben, unter
+
+    prefetchedPlan.variants[]   je Tarif + Flex-Variante, MIT Preisen:
+        title, minimumContractDuration,
+        prices.recurring.{listed,discounted}     Tarif monatlich
+        prices.activation.{listed,discounted}    Bereitstellungspreis
+        media.productInformationSheetUrl         das Pflichtblatt
+    variants[].devices[]       je PlanVariant die Geraete
+    devices[].variants[]       je Geraet Speicher x Farbe (condition, gtin)
+    variants[].prices.paymentVariants[]  je Variante die Zahlweisen
+
+Diese vier Adressen nennt congstar selbst: die Sitemap pages.xml fuehrt
+genau sie (`/sitemap-index.xml` -> `pages.xml`), und die Navigation jeder
+Gerate- und Tarifseite verlinkt sie. Keine Adresse ist geraten; eine
+Postpaid-Seite "allnet-flat-xl" existiert nicht (gemessen 08.09.2026 in
+pages.xml) - XL laeuft nur als Pflichtblatt im Bestand, und das ist eine
+ehrlich benannte Messgrenze, keine Luecke dieser Erhebung.
+
+DIE EINE REGEL: IM BUENDEL GILT DER RABATT - `discounted`, NICHT `listed`
+-------------------------------------------------------------------------
+Fuer den BARPREIS ist `listed` richtig und `discounted` die Falle (oben).
+Im Buendel ist es GENAU UMGEKEHRT: Der Nachlass auf die Hardware-Rate
+entsteht laut Fussnote "Bei Abschluss der ANF M (24 Monate Laufzeit) ...
+reduziert sich die monatliche Rate der Hardware dauerhaft" - er gilt also
+genau fuer den Abschluss, den ein Buendel IST. Wer das Buendel mit der
+listed-Rate rechnen wuerde, berechnete einen Preis, den kein Kunde dieser
+Kombination zahlt. Dasselbe gilt fuer Tarif und Anschlusspreis: M kostet
+listed 25 EUR, aber "Bei Abschluss bis zum 29.09.2026 reduziert sich der
+monatliche Grundpreis dauerhaft um 1 EUR" (24), und der Bereitstellungspreis
+ist "geschenkt" (0 statt 15/35 EUR). Gespeichert wird, was der Kundschaft
+dieser Kombination berechnet wird - dieselbe Regel wie bei o2 ("gespeichert
+wird, was fuer dieses Buendel zu zahlen ist").
+
+DIE NACHRECHNUNG IST BEDINGUNG, NICHT PROTOKOLL
+-----------------------------------------------
+`total` der Zahlweise ist der Gesamtbetrag MIT Rabatten; die Probe
+`oneTime.discounted + n x recurring.discounted == total` geht bei der
+36-Monats-Zahlweise der M-Seite an allen Varianten exakt auf (z. B.
+iPhone 17 Pro 512 GB: 97 + 36 x 33,50 = 1303). Geht sie nicht auf -
+etwa weil ein Rabatt nur fuer einen Teil der Raten gilt -, wird der Satz
+verworfen: ein Gesamtbetrag, der seinen eigenen Bestandteilen widerspricht,
+ist keine Messung.
+
+ZWEI ZAHLWEISEN, EIN SAETZ
+--------------------------
+Je Variante stehen ZWEI Ratenlaeufen nebeneinander (24 und 36 Monate, beide
+gleiches `total` - congstar finanziert zum Nulltarif, kuerzer heisst hoehere
+Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt. Der
+Bestandsschluessel eines Buendels ist (SKU x Anbieter x Tarif) OHNE Laufzeit
+(`tco_model.buendel_id`); beide Laeufe zu liefern wuerde still einer den
+anderen ueberschreiben. Erhoben wird die 36-Monats-Finanzierung - o2 und
+Telekom fuehren ihre Buendel ebenfalls als 36-Raten-Vertrag bei 24 Monaten
+Tarifbindung, und A5.5 (Phase R) setzt die laengere Laufzeit als die, die
+die Karte fuehrt. Die 24er-Zahlweise ist dadurch kein Datenverlust: sie
+rechnet sich aus demselben `total` (kuerzere Laufzeit, hoehere Rate).
+
+DER SLUG IST DIE NUMMER DES PFLICHTBLATTS
+-----------------------------------------
+congstar nummeriert Tarif und Pflichtblatt mit derselben Zahl: die
+PlanVariant 540 ("Allnet Flat M") verlinkt `Produktinformationsblatt_540.pdf`,
+und der Bestandssatz `congstar:allnet-flat-m` traegt dieselbe Adresse in
+`dokument_url` (alle 10 congstar-Saetze, Nummern 543-560, jeweils
+eindeutig - gemessen 08.09.2026). Der ADAPTER liest die Nummer aus dem
+`productInformationSheetUrl` der PlanVariant; `ergaenze_pib_slug()` setzt
+das Gegenstueck am Bestandssatz (o2-analog: der Anbieter stellt die
+Verbindung her, dieses Modul liest sie nur nach - dort ist es der
+"Handy hinzufugen"-Slug der Kachel, hier die Blattnummer).
+
+Der Name allein traegt NICHT: die Seite nennt den S-Tarif "Allnet Flat S",
+das Pflichtblatt "Allnet Flat S mit GB+" - ueber den Namen treffen sich die
+zwei nie, und der SIM-only-Betrag (20 EUR) steht fuer S UND S Flex im
+Blattbestand, ist also als Bruecke mehrdeutig. Ohne die Nummernbruecke
+fielen vier der acht PlanVarianten (XS, S samt Flex) sang- und klanglos
+unter "ohne aufloesbaren Tarif".
+
+DER SPEICHER KOMMT AUS `referenceGB`, NICHT AUS `size`
+------------------------------------------------------
+Das Galaxy S26 Ultra mit 1 TB traegt `size: 1` und `referenceGB: 1024` -
+`size` allein waere "1 GB" und wuerde eine eigene SKU gebaeren, die kein
+Katalogeintrag je trifft (dieselbe Falle wie "silber-1-tb" bei der Telekom,
+die dort die Einheit im Slug loest). `referenceGB` steht bei jeder Variante
+und stimmt mit der Einheit im Namen ueberein.
 """
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Optional
 
 from . import GeraeteAbrufFehler
+from ...geraete_model import probe_geht_auf
+
+log = logging.getLogger(__name__)
 
 # Jedes Fragment ist EIN JS-Stringliteral: `[1,"...escaped..."]`. Die
 # Escapes (\", \\, \n, \uXXXX) folgen derselben Grammatik wie JSON-Strings,
@@ -267,3 +367,223 @@ def lies(text: str, url: str = "") -> list[dict]:
             "quelle": "congstar_next",
         })
     return out
+
+
+# --------------------------------------------------------------------------
+# DER BUENDELKATALOG - die Tarifseite, siehe Modulkopf (B3, 08.09.2026)
+# --------------------------------------------------------------------------
+
+# Der Anfang eines PlanVariant-Objekts: `type` UND `title` zusammen stehen
+# nur dort - Geraeteobjekte tragen `category`, Zahlweisen gar keinen Titel.
+_PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
+
+# ".../Produktinformationsblatt_540.pdf" -> "540". Der Pfad davor variiert
+# (/fileadmin/produktinformationsblatt/ wie auch /fileadmin/files_congstar/
+# documents/PIBs/2026/congstar/ - gemessen im Bestand 08.09.2026), deshalb
+# steht das Muster auf dem DATEINAMEN und nicht auf einem Verzeichnis -
+# dieselbe Lehre wie beim congstar-Block in `config/tarif_quellen.yaml`.
+_PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
+
+# Die Ratenlaufzeit der erhobenen Zahlweise - siehe Modulkopf
+# ("ZWEI ZAHLWEISEN, EIN SAETZ").
+_RATENLAUFZEIT = 36
+
+
+def _preis(wert) -> Optional[float]:
+    try:
+        return float(wert)
+    except (TypeError, ValueError):
+        return None
+
+
+def _planvarianten(nutzlast: str) -> list[dict]:
+    """Alle PlanVariant-Objekte (Tarif und seine Flex-Variante) der
+    Tarifseite-Nutzlast - dieselbe Bauart wie `_varianten`, nur mit dem
+    Anfangsmuster des Plans statt des Geraets."""
+    out: list[dict] = []
+    for treffer in _PLAN_START_RE.finditer(nutzlast):
+        roh = _balanciertes_objekt(nutzlast, treffer.start())
+        if roh is None:
+            continue
+        try:
+            obj = json.loads(roh)
+        except (json.JSONDecodeError, ValueError):
+            continue
+        if isinstance(obj, dict) and isinstance(obj.get("prices"), dict):
+            out.append(obj)
+    return out
+
+
+def _pib_nummer(plan: dict) -> str:
+    """Die Nummer des Pflichtblatts, das DIESE PlanVariant selbst verlinkt.
+
+    Die Probe haengt an der Plan-ID: die PlanVariant 540 ("Allnet Flat M")
+    verlinkt `Produktinformationsblatt_540.pdf`. Stimmt der Dateiname nicht
+    mit der ID ueberein, ist die Verbindung keine - dann bleibt der Satz
+    beim Namens- und Betragsweg der Aufloesung (`tarif_slug` leer, nicht
+    geraten).
+    """
+    pid = str(plan.get("id") or "").strip()
+    url = str(((plan.get("media") or {}).get("productInformationSheetUrl"))
+              or "").strip()
+    treffer = _PIB_NR_RE.search(url)
+    if not treffer or not pid or treffer.group(1) != pid:
+        return ""
+    return treffer.group(1)
+
+
+def _buendelzahlweise(variante: dict) -> Optional[dict]:
+    """Zuzahlung und Rate der 36-Monats-Zahlweise - nur wenn die Probe
+    aufgeht (Modulkopf: die Nachrechnung ist Bedingung, nicht Protokoll)."""
+    for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
+        if not isinstance(zahlweise, dict):
+            continue
+        if zahlweise.get("type") != "INSTALLMENT_PLAN":
+            continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
+        if str(zahlweise.get("subtype") or "").upper() != "UNSPECIFIED":
+            continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
+        if zahlweise.get("contractDuration") != _RATENLAUFZEIT:
+            continue
+        anzahlung = _preis((zahlweise.get("oneTime") or {}).get("discounted"))
+        rate = _preis((zahlweise.get("recurring") or {}).get("discounted"))
+        gesamt = _preis(zahlweise.get("total"))
+        if anzahlung is None or rate is None or gesamt is None:
+            continue
+        if not probe_geht_auf(anzahlung, rate, _RATENLAUFZEIT, gesamt):
+            continue
+        return {"zuzahlung": anzahlung, "rate": rate}
+    return None
+
+
+def _speicher_gb(memory) -> Optional[int]:
+    """`referenceGB` vor `size` - das 1-TB-Geraet traegt `size: 1`
+    (Modulkopf, "DER SPEICHER KOMMT AUS referenceGB")."""
+    for feld in ("referenceGB", "size"):
+        try:
+            return int((memory or {}).get(feld))
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def lies_buendel(text: str, url: str = "") -> list[dict]:
+    """Aus einer Tarifseite je (PlanVariant x Geraet x Speicher) einen
+    Buendel-Rohsatz (`kind: buendel`-Einstieg, keine Ernte, keine
+    Produktseite wird nachgeladen - die Seite IST die Nutzlast).
+
+    Wirft, wenn die Antwort gar keine Tarifseite ist (kein Flight-Payload,
+    kein `prefetchedPlan`) - dasselbe Muster wie bei o2 und Telekom: ein
+    leeres Ergebnis waere die falsche Meldung fuer ein geaendertes
+    Nutzlastformat. Eine einzelne PlanVariant ohne Tarifpreis oder ohne
+    Geraete liefert dagegen nur ihre leere Ausbeute - die andere Variante
+    derselben Seite kann noch liefern.
+    """
+    nutzlast = _nutzlast(text)
+    if not nutzlast:
+        raise GeraeteAbrufFehler(
+            "congstar-Tarifseite ohne Next.js-Flight-Nutzlast (self.__next_f)")
+    plaene = _planvarianten(nutzlast)
+    if not plaene:
+        raise GeraeteAbrufFehler(
+            "congstar-Tarifseite ohne prefetchedPlan.variants - keine "
+            "Buendelantwort (Tarifseite umgezogen?)")
+
+    out: list[dict] = []
+    for plan in plaene:
+        tarif_name = str(plan.get("title") or "").strip()
+        if not tarif_name:
+            continue
+        preise = plan.get("prices") or {}
+        tarif_monatlich = _preis((preise.get("recurring") or {}).get("discounted"))
+        if tarif_monatlich is None:
+            # Ohne Tarifpreis ist keine Buendelaussage moeglich - derselbe
+            # Grund wie beim Telekom-selectedPlan ohne recurringFee.
+            log.info("congstar-Buendel: PlanVariant %r ohne Tarifpreis - "
+                     "uebersprungen", tarif_name)
+            continue
+        anschluss = _preis((preise.get("activation") or {}).get("discounted"))
+        tarif_slug = _pib_nummer(plan)
+
+        for geraet in (plan.get("devices") or []):
+            if not isinstance(geraet, dict):
+                continue
+            # JE SPEICHERGROESSE (UND ZUSTAND) EIN SATZ: die Zahlweise ist
+            # bei jeder Farbe derselben Groesse identisch (gemessen an allen
+            # vier Tarifseiten); die erste Variante mit lesbarer Zahlweise
+            # vertritt den Satz - dedupliziert, wie der Auftrag es verlangt.
+            gesehen: set = set()
+            for variante in (geraet.get("variants") or []):
+                if not isinstance(variante, dict):
+                    continue
+                speicher = _speicher_gb(variante.get("memory"))
+                zustand = str(variante.get("condition") or "").strip().upper()
+                if (speicher, zustand) in gesehen:
+                    continue
+                form = _buendelzahlweise(variante)
+                if form is None:
+                    continue
+                titel = str(variante.get("title") or "").strip()
+                if not titel:
+                    continue
+                gesehen.add((speicher, zustand))
+                out.append({
+                    "titel": titel,
+                    "farbe": str((variante.get("color") or {})
+                                 .get("name") or "").strip(),
+                    "speicher_gb": speicher,
+                    "sku": str(variante.get("id") or "").strip(),
+                    "ean": str(variante.get("gtin") or "").strip(),
+                    # Dasselbe rohe `condition`-Feld wie im Listungsweg -
+                    # die Einordnung leistet `zustand_aus_feldern` ueber
+                    # `lies_listung`, siehe Docstring von `lies()`.
+                    "zustand_hinweis": str(variante.get("condition") or ""),
+                    "tarif_name": tarif_name,
+                    # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
+                    # IST DIE NUMMER DES PFLICHTBLATTS").
+                    "tarif_slug": tarif_slug,
+                    "tarif_monatlich": tarif_monatlich,
+                    "geraet_zuzahlung": form["zuzahlung"],
+                    "geraet_monatsrate": form["rate"],
+                    "anschlusspreis": anschluss,
+                    "laufzeit_monate": _RATENLAUFZEIT,
+                    # Die Tarifseite ist die Seite, auf der diese Zahlen
+                    # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
+                    "url": url,
+                    "quelle": "congstar_tarifseite",
+                })
+    return out
+
+
+def ergaenze_pib_slug(bestand) -> int:
+    """Am congstar-Tarifbestand die Nummern-Bruecke setzen (Modulkopf,
+    "DER SLUG IST DIE NUMMER DES PFLICHTBLATTS").
+
+    Ergaenzt congstar-Saetzen OHNE `buendel_slug` die Nummer aus ihrer
+    Pflichtblatt-Adresse - nur wo die Nummer unter den congstar-Saetzen
+    EINDEUTIG ist; zwei Blatter derselben Nummer waeren keine Bruecke,
+    sondern eine Mehrdeutigkeit (dieselbe Regel wie `ueber_slug`). Schon
+    gesetzte Werte bleiben unberuehrt. Gibt die Zahl der ergaenzten
+    Saetze zurueck.
+
+    Aufgerufen von der Pipeline, direkt nach dem Laden des Bestands. Das
+    ist bewusst KEINE dauerhafte Aenderung an `tarife.jsonl`: die Zeitreihe
+    bleibt unberuehrt, und die Bruecke entsteht bei jedem Lauf neu aus der
+    Blattnummer, die der Anbieter in beide Adressen schreibt.
+    """
+    saetze = [s for s in bestand.je_id.values()
+              if str(s.get("anbieter") or "").lower() == "congstar"]
+    nummern: dict[str, list] = {}
+    for satz in saetze:
+        treffer = _PIB_NR_RE.search(str(satz.get("dokument_url") or ""))
+        if treffer:
+            nummern.setdefault(treffer.group(1), []).append(satz)
+    gesetzt = 0
+    for nummer, gruppe in nummern.items():
+        if len(gruppe) != 1:
+            continue
+        satz = gruppe[0]
+        if str(satz.get("buendel_slug") or "").strip():
+            continue
+        satz["buendel_slug"] = nummer
+        gesetzt += 1
+    return gesetzt

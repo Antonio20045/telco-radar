@@ -670,28 +670,17 @@ anbieter:
     rang: 10
     methode: congstar_next
     aktiv: true
-    grund: >-
-      ANGEBUNDEN UND AKTIV, aber noch nie gelaufen - der leere Bestand ist
-      kein Messergebnis, sondern das Fehlen einer Messung. Gemessen am
-      03.09.2026 an den GitHub-Actions-Läufen von geraete.yml: die fünf
-      letzten Nachtläufe (33303341444 vom 30.08. bis 33730902762 vom 03.09.)
-      trugen an ihrem headSha ausnahmslos noch "methode: ldjson, aktiv:
-      false"; der Commit, der auf congstar_next und aktiv: true umstellt
-      (27ef589), ist Vorfahr von keinem dieser fünf Läufe. Die Protokollzeile
-      des Laufs 33730902762 vom 03.09.2026 08:15 UTC sagt entsprechend
-      "congstar -> uebersprungen, 0 Listungen aus 0 Produktseiten" und nennt
-      als Grund den alten Text von aktiv: false. Es ist also weder ein
-      Adapter- noch ein Zugangsproblem: die Aktivierung war zum Startzeitpunkt
-      des letzten Laufs (07:58 UTC) noch nicht auf main. Der erste belastbare
-      Befund fällt mit dem nächsten Nachtlauf an. Bleibt er dann leer, ist
-      als Erstes die robots.txt von www.congstar.de zu messen - für diese
-      Messrunde lag keine vor.
+    # `grund` ist gestrichen (B3, 08.09.2026): das Feld beantwortet "warum
+    # NICHT aktiv", und congstar laeuft seit dem 04.09.2026 nachtlich mit
+    # Listungen. Die Messhistorie der Aktivierung (fuenf Nachtlaeufe bis zum
+    # 03.09. ohne den aktivierenden Commit 27ef589 im headSha, erster Lauf
+    # danach mit 134 congstar-Zeilen) steht im Protokoll der Laeufe.
     hinweis: >-
       Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit
       belegbarem Preis ohne Vertrag - die Telekom selbst steht nicht in
       dieser Datenbank, weil ihr Gerätepreis nur als Ratenzahlung ausgewiesen
       wird (nicht, wie hier bis zum 03.09.2026 stand, wegen ihrer AWS-WAF:
-      die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe grund
+      die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe Eintrag
       beim Anbieter Telekom). congstar trifft Apple, Samsung,
       Google UND Xiaomi (Google fehlte bisher ganz).
       Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM
@@ -716,12 +705,48 @@ anbieter:
       991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben
       Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein
       versteckter Tarifzwang verursachen wuerde).
+      BUENDEL SEIT B3 (08.09.2026): Die Geraet-x-Tarif-Kombinatorik steht
+      NICHT auf der Geräteseite (deren Zahlweisen tragen nur die Hardware),
+      sondern auf den vier Tarifseiten unter /handytarife/allnet-flat-tarife/
+      - serverseitig im selben Flight-Payload unter prefetchedPlan.variants[]
+      mit Tarifpreis, Bereitstellungspreis und je Geraet den Ratenzahlweisen.
+      Die vier Adressen nennt congstar selbst in der sitemap pages.xml; eine
+      Postpaid-Seite allnet-flat-xl existiert dort nicht (XL laeuft nur als
+      Pflichtblatt) - das ist eine Messgrenze, keine Luecke. Im Buendel gilt
+      der Rabatt (`discounted`), fuer den Barpreis gilt `listed` - beides
+      mit Begründung im Modulkopf von congstar.py. Der Tarifbezug läuft
+      ueber die Nummer des Pflichtblatts (PlanVariant 540 verlinkt
+      Produktinformationsblatt_540.pdf, der Bestandssatz dieselbe Adresse) -
+      das Pendant zum "Handy hinzufügen"-Slug der o2-Kachel. robots.txt
+      gemessen 08.09.2026: offen, kein Crawl-delay, keine Besuchszeit.
+    # Per-Anbieter-Override des Absenders (BRIEF_B3_BUENDEL_CONGSTAR,
+    # 08.09.2026) - dasselbe Muster wie bei Telekom und Saturn: die globale
+    # Kennung in settings.yaml ist eine Chrome-Vortaeuschung, und die
+    # B3-Erhebung ist mit dem ehrlichen Absender gemessen (HTTP 200 auf
+    # allen vier Tarifseiten). Der robots.txt-Abruf traegt ihn seit B2
+    # ebenfalls (provider-bezogene Waechter-Sicht).
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     basis_url: https://www.congstar.de
     einstiege:
       - url: https://www.congstar.de/sitemap/devices.xml
         label: Geräte-Sitemap
         kind: sitemap
         pfadmuster: /geraete/
+      # B3: die vier Tarifseiten als Buendelkatalog (kind: buendel, kein
+      # Ernten - die Seite ist die Nutzlast). congstar nennt alle vier
+      # Adressen selbst in der sitemap pages.xml.
+      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-xs/
+        label: Allnet Flat XS (Bündel)
+        kind: buendel
+      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-s/
+        label: Allnet Flat S (Bündel)
+        kind: buendel
+      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/
+        label: Allnet Flat M (Bündel)
+        kind: buendel
+      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-l/
+        label: Allnet Flat L (Bündel)
+        kind: buendel
 
   - name: fraenk
     typ: discount

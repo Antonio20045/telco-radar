@@ -1,0 +1,471 @@
+{
+  "datum": "2026-09-08",
+  "anzahl_requests": 58,
+  "alle_ehrlich": true,
+  "requests": [
+    {
+      "url": "https://www.congstar.de/robots.txt",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/sitemap/devices.xml",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/anio/anio-6/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/airpods-max-2/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/airpods-pro-3/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-airpods-4-aktive-geraeuschunterdrueckung/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-ipad-a16-wifi-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-ipad-a16-wifi/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-ipad-air-11-wifi-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-ipad-pro-13-wifi-m5/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-16/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-iphone-air/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/apple/apple-watch-s11-gps-46-mm-aluminium/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/fairphone/fairphone-gen-6-1/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/fairphone/fairphone-gen-6/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/google/google-pixel-11-pro-xl/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/google/google-pixel-11-pro/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/google/google-pixel-11/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/google/google-pixel-8-zustand-wie-neu/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/motorola/motorola-edge-70-fusion/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/motorola/motorola-g77/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/motorola/motorola-moto-g37/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/motorola/motorola-signature/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/nothing/nothing-phone-3/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/nothing/nothing-phone-4a-pro/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-a17-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-a37/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-a57/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25-fe/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s25/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-1/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-fe/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26-ultra/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-s26/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-tab-s10-fe-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-xcover-7-ee/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-z-flip8/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8-ultra/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-z-fold8/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/leica-leitzphone-powered-by-xiaomi/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17-ultra/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t-pro/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-17t/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-17-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g-1/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-15-pro-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xiaomi/xiaomi-redmi-note-17-pro-max-5g/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/geraete/xplora/xplora-kidswatch-x6play-esim-2025/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-xs/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-s/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-l/",
+      "host": "www.congstar.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    }
+  ]
+}
