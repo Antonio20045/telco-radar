@@ -2863,6 +2863,7 @@ b,strong{font-weight:700}
 .wr-basis--leer{color:var(--ink-4);font-style:italic}
 .wr-basis a{color:var(--red)}
 .wr-tabelle td,.wr-tabelle th{font-size:12.5px}
+.wr-tarif{font-family:var(--sans);color:var(--ink-2)}
 .wr-prozent{font-variant-numeric:lining-nums;font-weight:700}
 .wr-prozent--negativ{color:var(--al-kritisch)}
 .wr-prozent--positiv{color:var(--al-bestpreis)}
