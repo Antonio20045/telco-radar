@@ -98,12 +98,24 @@ class Adapter:
     zusaetzliche GETs machen, um einen Tarifnamen aufzuloesen, den die
     Sammelantwort selbst nicht nennt (Vodafone: nur ein `offerCoreHash`,
     keine Klarname - siehe `vodafone.py` Modulkopf, Abschnitt B1).
+
+    `buendel_auf_produktseite` (Voreinstellung True) sagt, ob die zweite
+    Lesart auf den Produktseiten des ERNTE-Wegs ueberhaupt sinvoll ist.
+    Vodafone traegt seine Buendel in derselben Detailantwort wie die
+    Listungen (B1) - dort gehoert der Zusatzaufruf hin. congstar (B3)
+    liest seine Buendel auf EIGENEN Tarifseiten-Einstiegen (`kind:
+    buendel`, wie Telekom und o2); seine Produktseiten tragen KEIN
+    prefetchedPlan, der Zusatzaufruf wuerde auf jeder der 55 Seiten
+    werfen. Ein Adapter mit eigenen Buendel-Einstiegen setzt die Flagge
+    auf False - die Einstiege selbst rufen `lies_buendel` natuerlich
+    weiterhin.
     """
     name: str
     lies: Callable
     ernte: Optional[Callable] = None
     direkt: bool = False
     lies_buendel: Optional[Callable] = None
+    buendel_auf_produktseite: bool = True
     loese_tarifnamen: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
@@ -311,9 +323,14 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifname steht in derselben Antwort (`prefetchedPlan.variants[].title`),
     # deshalb braucht congstar anders als Vodafone keinen
     # `loese_tarifnamen`-Haken - derselbe Grund wie bei der Telekom.
+    # `buendel_auf_produktseite=False`: Die Produktseiten tragen KEIN
+    # prefetchedPlan - der Zusatzaufruf des Ernte-Wegs wuerde auf jeder der
+    # bis zu 55 Seiten werfen (gemessen am ersten B3-Lauf), die Bündel
+    # kommen ausschliesslich über die Tarifseiten-Einstiege.
     registriere("congstar_next", Adapter(name="congstar_next",
                                          lies=congstar_modul.lies,
-                                         lies_buendel=congstar_modul.lies_buendel))
+                                         lies_buendel=congstar_modul.lies_buendel,
+                                         buendel_auf_produktseite=False))
     # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
@@ -608,12 +625,17 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 continue
             _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute,
                        bilanz)
-            if adapter.lies_buendel is not None:
+            if adapter.lies_buendel is not None \
+                    and adapter.buendel_auf_produktseite:
                 # ZWEITE LESART DERSELBEN SEITE (B1, Vodafone): dieselbe
                 # Antwort, die `lies()` gerade in Listungen zerlegt hat,
                 # traegt auch die Buendelpreise. Ein eigener `kind:
                 # buendel`-Einstieg (wie bei o2) braucht nur, wer dafuer
-                # eine EIGENE Adresse hat - hier ist es dieselbe.
+                # eine EIGENE Adresse hat - hier ist es dieselbe. Adapter
+                # MIT eigenen Buendel-Einstiegen schalten den Zusatzaufruf
+                # ab (`buendel_auf_produktseite`, B3: congstar - seine
+                # Produktseiten tragen keinen Plan, der Aufruf wuerde auf
+                # jeder von ihnen werfen).
                 try:
                     roh_buendel = adapter.lies_buendel(seite, url) or []
                 except GeraeteAbrufFehler as exc:

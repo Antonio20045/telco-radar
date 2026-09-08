@@ -421,6 +421,43 @@ def test_adapter_registry_traegt_congstars_buendelhaken():
     assert adapter.loese_tarifnamen is None
 
 
+def test_auf_den_produktseiten_wird_keine_buendellesart_gerufen(katalog, farben,
+                                                                 monkeypatch):
+    """B3-Befund am ersten Lauf: der generische Ernte-Weg ruft die zweite
+    Lesart auf JEDER Produktseite auf (Vodafone-Muster, B1) - congstars
+    Produktseiten tragen aber keinen Plan, der Aufruf warf auf jeder der
+    55 Seiten. `buendel_auf_produktseite=False` schaltet ihn ab; die
+    Bündel-Einstiege rufen `lies_buendel` weiterhin (siehe Test oben)."""
+    aufrufe = []
+    monkeypatch.setattr(
+        "telco_radar.collect.geraete.congstar.lies_buendel",
+        lambda text, url="": aufrufe.append(url) or [])
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url.endswith("/robots.txt"):
+            return _ROBOTS_FREI
+        if url.endswith("/sitemap/devices.xml"):
+            return 200, ('<?xml version="1.0"?><urlset>'
+                         '<url><loc>https://www.congstar.de/geraete/apple/'
+                         'apple-iphone-17/</loc></url></urlset>')
+        return 200, _fixture("congstar_produkt_iphone17.html.gz")
+
+    anbieter = Anbieter(
+        name="congstar", typ="discount", netz="Telekom",
+        methode="congstar_next", basis_url="https://www.congstar.de",
+        rate_limit_sekunden=0,
+        einstiege=[Einstieg(
+            url="https://www.congstar.de/sitemap/devices.xml",
+            kind="sitemap", pfadmuster="/geraete/")])
+    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-08",
+                             RobotsWaechter(hole=hole))
+    assert bilanz.status == "ok"
+    assert aufrufe == [], "lies_buendel wurde auf einer Produktseite gerufen"
+    # Vodafone trägt die Flagge nicht explizit - die Voreinstellung True
+    # hält seinen B1-Weg unverändert.
+    assert ADAPTER["vodafone_api"].buendel_auf_produktseite is True
+
+
 def test_die_konfiguration_traegt_vier_buendel_einstiege():
     from telco_radar.geraete_config import lade_quellen
     quellen = lade_quellen(_WURZEL)
