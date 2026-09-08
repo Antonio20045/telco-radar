@@ -315,6 +315,41 @@ def test_der_index_kennt_nur_woerter_ab_vier_zeichen(archiv):
     assert all(len(w) >= 4 for w in index["woerter"])
 
 
+def test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl(archiv, monkeypatch):
+    """K-1: `meldungen` (und der ganze Index) haengen am DATENSTAND, nicht
+    am Kalenderdatum des Rebuild-Moments. Zwei Rebuilds zu verschiedenen
+    Tagen - hier der Tag des juengsten Berichts und zwei Wochen spaeter -
+    muessen fuer denselben Berichtsbestand byte-identisch rechnen.
+
+    Simuliert wird der Rebuild-Moment ueber die Wanduhr (`date.today()`),
+    denn genau dort las die alte Fassung ihr Fenster: jedes naechtliche
+    Rendern nach Mitternacht liess den aeltesten Bericht aus dem
+    30-Tage-Fenster fallen (08-05 am simulierten 06-09.) - 1716 zu 1624
+    im Ticket, 3 zu 2 an dieser Fixture."""
+    from telco_radar.newsletter import filters
+
+    def klebe_heute(tag):
+        class KlebeDatum(filters.date):
+            @classmethod
+            def today(cls):
+                return tag
+        monkeypatch.setattr(filters, "date", KlebeDatum)
+
+    ergebnisse = []
+    for rebuild_tag in (date(2026, 8, 8), date(2026, 9, 6)):
+        klebe_heute(rebuild_tag)
+        ergebnisse.append(baue_stichwort_index(archiv, tage=30))
+    assert ergebnisse[0] == ergebnisse[1], (
+        f"Rebuild am {date(2026, 8, 8)} und am {date(2026, 9, 6)} "
+        f"rechnen verschieden: {ergebnisse[0]['meldungen']} gegen "
+        f"{ergebnisse[1]['meldungen']} Meldungen")
+    # Die Zahl ist die der DATENLAGE, nicht irgendeine zwischen zwei
+    # Wanduhren: der juengste Bericht (08-08) ist der Anker, sein Fenster
+    # [07-09, ...] traegt beide Berichte, der Mai-Bericht bleibt draussen.
+    assert ergebnisse[0]["meldungen"] == 3
+    assert ergebnisse[0]["stand"] == "2026-08-08"
+
+
 # ==========================================================  Katalog  ======
 
 def test_die_kategorien_zeigen_auf_echte_ressorts():

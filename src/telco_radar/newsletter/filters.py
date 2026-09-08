@@ -372,6 +372,31 @@ def _index_woerter(text: str) -> set[str]:
     return {w.lower() for w in _INDEX_WORT.findall(text or "")}
 
 
+def _neuester_bericht(reports_dir: Path) -> date | None:
+    """Das Datum des juengsten Berichts im Archiv - der Datenstand.
+
+    Der Anker des Vorschau-Fensters, wenn kein `heute` gegeben ist. Bis zum
+    09.09.2026 (K-1) war dieser Anker die Wanduhr des Rebuild-Moments: jedes
+    naechtliche Rendern nach Mitternacht liess die aeltesten Berichte aus dem
+    30-Tage-Fenster fallen, und `meldungen` sank ohne jede Datenveraenderung
+    (1716 auf 1624, fundiert im R3-Release; im Stand vom 09.09.: 1737 auf
+    1241, weil die Wanduhr vier Tage hinter dem juengsten Bericht lag).
+    Am juengsten Bericht angehaengt, liefert derselbe Bestand zu jeder
+    Stunde dieselbe Zahl - das Fenster wandert nur, wenn ein neuer Bericht
+    dazu kommt.
+    """
+    stems = [p.stem for p in Path(reports_dir).glob("*.json")
+             if re.fullmatch(r"\d{4}-\d{2}-\d{2}", p.stem)]
+    if not stems:
+        return None
+    try:
+        return date.fromisoformat(max(stems))
+    except ValueError:
+        # Ein Stamm, der wie ein Datum aussieht und keiner ist: der Anker
+        # faellt auf die Wanduhr zurueck, statt den ganzen Index zu kosten.
+        return None
+
+
 def baue_stichwort_index(reports_dir: Path, *, tage: int = 30,
                          heute: date | None = None) -> dict:
     """Der Index fuer die clientseitige Vorschau (`site/data/keyword-index.json`).
@@ -379,7 +404,13 @@ def baue_stichwort_index(reports_dir: Path, *, tage: int = 30,
     Enthaelt nur Woerter ab vier Zeichen - dieselbe Grenze wie
     `min_stichwort_laenge`. Kuerzere kann niemand als Stichwort eintragen,
     sie muessten also gar nicht erst ausgeliefert werden.
+
+    Ohne `heute` ist der Anker der juengste Bericht des Archivs, nicht die
+    Wanduhr (K-1, siehe `_neuester_bericht`): ein Rebuild um Mitternacht
+    erzeugt damit dieselben Zahlen wie der am Vortag.
     """
+    if heute is None:
+        heute = _neuester_bericht(reports_dir)
     texte = _texte_aus_berichten(reports_dir, tage, heute)
     zaehler: dict[str, int] = {}
     for text in texte:
