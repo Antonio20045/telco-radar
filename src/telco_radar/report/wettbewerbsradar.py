@@ -77,7 +77,7 @@ Beispiel auf: "hier ist Vodafone 10 % teurer als der Wettbewerber" ist DER
 Fall, fuer den die Seite geoeffnet wird, und das ist rechnerisch der
 NEGATIVE Wert (Wettbewerber guenstiger). Sortiert wird deshalb aufsteigend
 (negativste/"zuungunsten Vodafones"-Werte zuerst) - siehe
-`outputs/phase-rad1-2026-09-08.md` fuer die ausgeschriebene Begruendung.
+`outputs/rad1-2026-09-08.md` fuer die ausgeschriebene Begruendung.
 """
 from __future__ import annotations
 
@@ -242,8 +242,8 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
     aus `modell["karten"]` (ein Anbieter fuehrt dasselbe Geraet in mehreren
     Baendern; ein Dict-Verstaendnis ueber `anbieter` haette willkuerlich
     die letzte genommen, am echten Bestand gemessen: 1 vergleichbare Zeile
-    statt 26). Gibt es kein gemeinsames Band: ehrlicher Band-Mismatch mit
-    seiner GUENSTIGSTEN Karte als Beleg."""
+    statt 21, Stand 08.09.2026). Gibt es kein gemeinsames Band: ehrlicher
+    Band-Mismatch mit seiner GUENSTIGSTEN Karte als Beleg."""
     gruppen = []
     for modell in modelle:
         basis = _vodafone_basis(modell, band_je_tarif)
