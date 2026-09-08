@@ -36,12 +36,13 @@ def test_das_euro_delta_steht_am_g1_balken():
 
 
 def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
-    """F-R2-2 auf der Seite: Etikett, Rechenweg und Gruppenkopf nennen die
-    Bindung der Referenz (24 Tarifmonate, Barkauf bindet nicht).
+    """Ticket TCO24-1 (08.09.2026): die Leitzahl ist auf der ganzen Seite
+    IMMER TCO-24 (AUFTRAG_GERAETESEITE.md §3, "Immer 24 Monate") - kein
+    Angebot traegt mehr eine variable Bindung als Vergleichshorizont, und
+    keine Referenzkarte rechnet mehr ueber ein fremdes Fenster.
 
-    BRIEF_RAHMEN2 (A-R5): die Leitzahl ist seitdem der Geraetepreis, das
-    TCO-Etikett steht als Sekundaerzeile ("mit Tarif: ...") - die Bindung
-    bleibt darin lesbar, nur nicht mehr an der groessten Zahl der Karte.
+    BRIEF_RAHMEN2 (A-R5): die Leitzahl der Karte ist der Geraetepreis, das
+    TCO-Etikett steht als Sekundaerzeile ("mit Tarif: ...").
     """
     s = _baue(tmp_path)
     ref = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="Vodafone"]')
@@ -51,26 +52,33 @@ def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
     assert zweit == "mit Tarif: TCO-24 1.428,70 €"
     assert ref["data-laufzeit"] == "24"
     text = " ".join(ref.get_text(" ", strip=True).split())
-    assert "36 Monate Bindung" not in text
+    assert "36 Monate" not in text
+    assert "TCO-36" not in text
     assert "24 Monate Tarifbindung; das Gerät ist bar gekauft und bindet nicht" in text
-    assert "binden 36 Monate" in text
-    # Das o2-Angebot daneben rechnet weiterhin ueber seine 36 Monate.
+    # Das o2-Angebot daneben rechnet die LEITZAHL ebenfalls ueber 24 Monate -
+    # seine Geraeteraten laufen zwar 36 Monate, aber die 12 Raten jenseits
+    # des Horizonts stehen als eigener, klar bezeichneter Restbetrag daneben
+    # und NICHT in der TCO-Zahl (Abnahmekriterium 2).
     o2 = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
     assert o2.select_one(".gr-kk-leit b").get_text(strip=True) == "Gerätepreis"
     o2_zweit = " ".join(o2.select_one(".gr-kk-zweit").get_text(" ", strip=True).split())
-    assert o2_zweit == "mit Tarif: TCO-36 1.120,75 €"
-    assert "Gerechnet über 36 Monate Bindung" in " ".join(o2.get_text(" ", strip=True).split())
+    assert o2_zweit == "mit Tarif: TCO-24 880,75 €"
+    o2_text = " ".join(o2.get_text(" ", strip=True).split())
+    assert "TCO-36" not in o2_text and "36 Monate Bindung" not in o2_text
+    assert "Gerechnet über 24 Monate Bindung" in o2_text
+    assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
 
 
 def test_die_tafel_spricht_katalog_d(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     band = " ".join(tafel.select_one(".gr-mband").get_text(" ", strip=True).split())
-    # Ein einziges vergleichbares Angebot: "TCO-36 652,75 €", nicht "von
-    # 652,75 € bis 652,75 €" - und die Referenzrechnung (TCO-24) zaehlt
-    # nicht in die Spanne der Angebote (F-R2-2).
-    assert "TCO-36 " in band and "Gesamtkosten" not in band
-    assert " bis " not in band.split("TCO-36")[1].split("·")[0]
+    # Ein einziges vergleichbares Angebot: "TCO-24 880,75 €", nicht "von
+    # 880,75 € bis 880,75 €" - und die Referenzrechnung zaehlt nicht in die
+    # Spanne der Angebote (F-R2-2). Ticket TCO24-1: das Etikett ist IMMER
+    # TCO-24, nie mehr eine variable Bindung.
+    assert "TCO-24 " in band and "TCO-36" not in band and "Gesamtkosten" not in band
+    assert " bis " not in band.split("TCO-24")[1].split("·")[0]
     assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
     option = tafel.select_one('select[data-sortiere] option[value="gesamt"]')
     assert option.get_text(strip=True) == "TCO je Laufzeitgruppe"
