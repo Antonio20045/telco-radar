@@ -120,6 +120,15 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 tarif_name=tarif_name,
                 tarif_id=bezug.tarif_id, tarif_id_guete=bezug.guete,
                 tarif_monatlich=satz.get("tarif_monatlich"),
+                # DER KOMBINIERTE MONATSBETRAG (§ 13.2, 1&1 seit B4): er
+                # tritt AN DIE STELLE von `tarif_monatlich` und `geraet_
+                # monatsrate`, und `Buendel.__post_init__` erzwingt genau
+                # das - ein Satz mit beidem wirft. Ohne diese Zeile waere
+                # ein 1&1-Satz still preislos durch diese Stufe gegangen
+                # (derselbe Fehlertyp wie die Positivliste `_MESSFELDER`
+                # im Store: ein Feld, das niemand durchreicht, existiert
+                # fuer den Bestand nicht).
+                buendel_monatlich=satz.get("buendel_monatlich"),
                 geraet_zuzahlung=satz.get("geraet_zuzahlung"),
                 geraet_monatsrate=satz.get("geraet_monatsrate"),
                 laufzeit_monate=int(satz.get("laufzeit_monate") or 0) or 24,

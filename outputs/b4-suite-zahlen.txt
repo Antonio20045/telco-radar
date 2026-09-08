@@ -1,0 +1,40 @@
+B-4 1&1-Bündel — Suite-Zahlen (Branch openclaw/ticket-b4-buendel-1u1, HEAD a76ac94)
+=====================================================================================
+
+SMOKE-CHECK (Tests der B-4-Bausubstanz)
+  pytest tests/test_geraete_tco_band.py tests/test_wettbewerbsradar.py -q
+  -> 29 passed in 1.51s
+
+VOLLSUTE — LAUF 1 (2026-09-08, ~23:0x Uhr, PYTHONPATH=src, pytest -q)
+  2787 passed, 105 skipped, 0 failed in 268.34s (0:04:28)   [EXIT=0]
+
+  Befund zu den Zahlen:
+  - 0 failed: die zwei bekannten Promo-Screenshot-Roten der B-3-Basis sind
+    in diesem Stand GRÜN (test_promo_seite.py einzeln nachgemessen:
+    23 passed, 0 failed, 0 skipped).
+  - 105 skipped statt Basis 14: 91 Skips mehr, Grund "playwright fehlt"
+    (Python-Paket in dieser Worktree-Umgebung nicht installiert;
+    Browser-Binaries liegen unter ~/Library/Caches/ms-playwright).
+    Beispiel: tests/test_geraete_reiter_browser.py -> 69 skipped in 0.16s.
+    Die Browser-Abdeckung fehlte in Lauf 1 damit vollständig.
+
+VOLLSUITE — LAUF 2 (nach Reparatur: python3 -m pip install playwright==1.60.0
+                     + chromium-build 1223 nachgeladen, 92.4 MiB)
+  2880 passed, 12 skipped, 0 failed in 294.49s (0:04:54)   [EXIT=0]
+
+  Gegenüber der B-3-Basis (2 failed / 2854 passed / 14 skipped):
+  - 0 failed: keine neuen Roten; die zwei bekannten Promo-Screenshot-Roten
+    sind in DIESEM Stand grün (test_promo_seite.py einzeln: 23 passed,
+    0 failed, 0 skipped) - Besserstellung, keine Regression.
+  - 2880 statt 2854 passed: +26 durch die B-4-Tests (14 in 5ff6a1c,
+    Rekalibrierung a76ac94, Bündel-/Radar-Tests in c069a84/06c3b69).
+  - 12 statt 14 skipped: Umgebungsskips (Chromium-/Fixture-abhängig,
+    gleiche Klasse wie die 14 der Basis; einer in
+    test_geraete_reiter_browser.py im Einzellauf bestätigt).
+  - Browser-Abdeckung bestätigt: test_geraete_reiter_browser.py einzeln
+    68 passed / 1 skipped in 31s (vor der Reparatur 69 skipped in 0.16s).
+
+  Umgebungshinweis: Lauf 1 und Lauf 2 im selben Baum/HEAD (a76ac94);
+  einziger Unterschied war das fehlende playwright-Paket (pip-CommandLineTools-
+  Python ohne playwright; Browser-Binaries lagen teils in fremder Build-
+  Nummer 1228 vor, benötigt wurde 1223 -> nachgeladen).

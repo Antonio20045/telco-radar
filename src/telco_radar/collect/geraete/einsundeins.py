@@ -72,9 +72,60 @@ ROBOTS.TXT (04.09.2026 gelesen)
 Bestellstrecken. Die Produktseiten und `/smartphones` sind frei; der
 Parameter `?chosenTariff=` ist sogar ausdruecklich erlaubt. Unser Absender
 ist `TelcoRadar/1.0` und faellt unter `*`.
+
+DER BUENDELKATALOG: DIE PREISKARTE AUF DER GERAETESEITE (B4, 08.09.2026)
+-------------------------------------------------------------------------
+Die Geraet-x-Tarif-Kombinatorik ueber ALLE Tarife traegt die Seite NICHT
+serverseitig - der Konfigurator laedt seine Tariftabelle erst im Browser
+nach. Gemessen 08.09.2026: `?chosenTariff=tariff-anf-m-mvl` liefert eine
+BYTE-IDENTISCHE Antwort wie die Seite ohne Parameter (326 604 Bytes), das
+ld+json bleibt bei "All-Net-Flat S", 44,99. Auch der von der Seite selbst
+verlinkte Tarifdetails-Iframe (`/details-all-net-flat-preisliste?…`) ist
+nur eine 48-KB-JavaScript-Huelle ohne einen Preis. Echte Tarifwaehler gibt
+es an dieser Quelle nur im Browser - das ist eine Messgrenze, keine Luecke.
+
+Was serverseitig da ist, ist die Preiskarte des DEFAULT-Tarifs ueber ALLE
+Farben und Speichergroessen - und damit mehr als das ld+json, das nur die
+VORAUSGEWAEHLTE Variante bepreist:
+
+    function setHwdPrices() { hwdVariantsPrices = {
+        'product-COSMIC_ORANGE-256': [4499,],
+        'product-COSMIC_ORANGE-256-bundle-hw-…-WEISS-0': [5399,],
+        …
+
+Die Schluessel OHNE `-bundle-`-Segment sind das Tarifbuendel (Wert in
+CENT); die mit sind ZUBEHOER-Bundles (AirPods, `data-iframe="/Details
+AirPods4"`), kein Tarif - ihr Preis steht HOEHER als der Tarifbund und
+wird ueber den Schluessel verworfen, nicht ueber den Betrag. Der Tarifname
+desselben Bündels steht in derselben Antwort (`<span id="tariff-
+description">1&1 All-Net-Flat S</span>`), seine Slug im eigenen
+Tarifdetails-Link (`?chosenTariff=tariff-anf-s-mvl`), seine Laufzeit in
+`window.currentHardwareOfferDuration`. Gemessen an zehn Geräteseiten
+(08.09.2026): der Default-Tarif ist ueberall die 1&1 All-Net-Flat S, die
+Dauer ueberall 36, und der Preis ist bei jeder Farbe derselben
+Speichergroesse identisch - je Speichergroesse EIN Satz, die erste Farbe
+vertritt ihn (dieselbe Dedupe-Regel wie congstar B3).
+
+DER EINE MONATSBETRAG WIRD NICHT AUFGETEILT (§ 13.2)
+----------------------------------------------------
+Der Datalayer der Seite nennt eine Aufteilung - und widerlegt sich selbst:
+Hardware-Rate 45,00 plus Tarif 14,99 waere 59,99, das Buendel kostet aber
+44,99 (ld+json und Preiskarte, beide 256 GB). Die Differenz von 15,00 ist
+ein unbenannter Nachlass, der nur im Verbund gilt; bei 512 GB sind es 18,00.
+Diese Zahlen in `geraet_monatsrate` und `tarif_monatlich` zu schreiben
+waere eine Aufspaltung OHNE Beleg - genau der Fall, fuer den
+`tco_model.Buendel.buendel_monatlich` existiert. Der Satz traegt deshalb
+NUR den kombinierten Monatsbetrag, dazu die Laufzeit der Hardware-Angebots.
+
+KEINE ZUSAETZLICHEN ABRUFE: `lies_buendel` liest SELBE Antwort, die der
+Ernte-Weg fuer die Listung ohnehin holt (`buendel_auf_produktseite` bleibt
+an, dasselbe Muster wie Vodafone B1). Der Parameter `?size=` (robots:
+erlaubt) wuerde dieselbe Karte je Speichergroesse einzeln liefern - die
+Karte steht schon in EINER Antwort, also wird er nicht benutzt.
 """
 from __future__ import annotations
 
+import html as html_modul
 import logging
 import re
 from typing import Optional
@@ -82,6 +133,7 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
+from . import GeraeteAbrufFehler
 from ...tarif_model import zahl
 from ..tarif_ldjson import ld_json_bloecke
 
@@ -201,6 +253,161 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
                     "Raster leer oder Markup geaendert",
                     basis_url, _KACHEL_KLASSE, len(text or ""))
     return out
+
+
+# --------------------------------------------------------------------------
+# DER BUENDELKATALOG - die Preiskarte der Geräteseite (B4, siehe Modulkopf)
+# --------------------------------------------------------------------------
+
+# Der Anfang der serverseitig gerenderten Preiskarte. Ihr Objekt enthaelt
+# keine verschachtelten Klammern - der Schnitt am ersten `};` nach dem
+# Anfang ist deshalb sicher (und der JS-Quelltext der Seite nutzt dieselbe
+# Form an jedem Gerät).
+_PREISKARTE_ANFANG = "hwdVariantsPrices = {"
+
+# Ein SCHLUESSEL der Preiskarte ohne Zubehoer-Segment:
+# `'product-COSMIC_ORANGE-256': [ 4499, ]`. Das `-bundle-…`-Segment steht
+# ZWISCHEN Speicher und schliessendem Anfuehrungszeichen - das Muster
+# fordert das Anfuehrungszeichen direkt hinter der Speicherzahl und
+# verwirft die Zubehoer-Schluessel deshalb ueber ihre FORM, nicht ueber
+# ihren (hoeheren) Betrag.
+_PREISKARTE_SCHLUESSEL = re.compile(
+    r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)")
+
+# Der Tarifname des Bündels, wie die Seite ihn neben dem Preis setzt.
+_TARIF_SPAN_RE = re.compile(
+    r'<span id="tariff-description">([^<]*)</span>')
+
+# Die Slug des Tarifs aus dem Tarifdetails-Link, den die Seite selbst
+# setzt (`data-iframe="…?chosenTariff=tariff-anf-s-mvl&…"`).
+_SLUG_RE = re.compile(r"[?&]chosenTariff=([A-Za-z0-9_.-]+)")
+
+
+def _preiskarte(text: str) -> str:
+    """Der Rumpf der Preiskarte - oder `""`, wenn die Seite keine trägt.
+
+    Wirft nicht: Eine Geräteseite ohne `hwdVariantsPrices` ist ein
+    GERAETESEITE-ohne-Preiskarte, und darueber entscheidet `lies_buendel`
+    mit einer eigenen, lautenden Ausnahme - hier wird nur geschnitten.
+    """
+    anfang = (text or "").find(_PREISKARTE_ANFANG)
+    if anfang < 0:
+        return ""
+    ende = text.find("};", anfang)
+    if ende < 0:
+        return ""
+    return text[anfang:ende]
+
+
+def _tarifname(text: str) -> str:
+    """Der Tarif des Bündels aus dem `tariff-description`-Span, alternativ
+    aus der ld+json-Beschreibung (derselbe Anbietertext an zwei Stellen)."""
+    treffer = _TARIF_SPAN_RE.search(text or "")
+    if treffer:
+        name = html_modul.unescape(treffer.group(1)).strip()
+        if name:
+            return name
+    for block in ld_json_bloecke(text or ""):
+        knoten = block if isinstance(block, dict) else {}
+        if knoten.get("@type") != "Product":
+            continue
+        name = _tarif_aus_beschreibung(knoten.get("description"))
+        if name:
+            return name
+    return ""
+
+
+def lies_buendel(text: str, url: str = "") -> list[dict]:
+    """Aus einer Geräteseite je SPEICHERGROESSE einen Bündel-Rohsatz.
+
+    Die Karte preist den Default-Tarif der Seite (gemessen an zehn Seiten:
+    ueberall die 1&1 All-Net-Flat S) über alle Farben - die erste Farbe
+    vertritt ihre Groesse. Der Satz traegt NUR den kombinierten Monatsbetrag
+    (`buendel_monatlich`, § 13.2): die Aufteilung der Seite widerspricht
+    sich selbst (Modulkopf), und ein Betrag ohne Beleg wird nicht
+    aufgespalten.
+
+    Wirft, wenn die Seite gar keine Preiskarte trägt - eine Geräteseite
+    ohne `hwdVariantsPrices` ist ein geaendertes Markup, und ein leeres
+    Ergebnis waere dafuer die falsche Meldung (dasselbe Muster wie bei
+    o2, Telekom und congstar). Eine Karte ohne lesbaren Tarifnamen liefert
+    nur ihre leere Ausbeute mit einer Protokollzeile - ein Satz ohne
+    benannten Tarif ist bedeutungslos, die Karte darunter kann aber noch
+    eine andere Groesse hergeben (der Name steht einmal je Seite, also
+    trifft das heute die ganze Seite - gelogt, nicht geworfen).
+    """
+    karte = _preiskarte(text)
+    if not karte:
+        raise GeraeteAbrufFehler(
+            f"1&1-Geräteseite ohne hwdVariantsPrices ({len(text or '')} Bytes)"
+            " - kein Bündelkatalog (Markup geändert?)")
+
+    tarif = _tarifname(text)
+    if not tarif:
+        log.info("1&1: %s nennt keinen Tarifnamen (tariff-description/"
+                 "Beschreibung) - Bündelsätze verworfen", url)
+        return []
+    slug_treffer = _SLUG_RE.search(text or "")
+    tarif_slug = slug_treffer.group(1) if slug_treffer else ""
+    dauer = laufzeit_monate(text)
+
+    marke, name = _marke_name(text)
+    out: list[dict] = []
+    gesehen: dict[int, tuple[str, float]] = {}
+    for treffer in _PREISKARTE_SCHLUESSEL.finditer(karte):
+        gb = int(treffer.group("gb"))
+        farbe = treffer.group("farbe").replace("_", " ").strip().lower()
+        betrag = round(int(treffer.group("cents")) / 100.0, 2)
+        vorher = gesehen.get(gb)
+        if vorher is not None:
+            if vorher[1] != betrag:
+                # Gemessen kommt das nicht vor (zehn Seiten, je Farbe
+                # derselbe Preis) - sollte eine Seite es doch tun, steht
+                # es im Protokoll und der ERSTE Eintrag bleibt, statt
+                # still die billigste Farbe zu nehmen.
+                log.warning("1&1: %s trägt zwei Preise für %d GB (%.2f und "
+                            "%.2f) - der erste bleibt", url, gb, vorher[1],
+                            betrag)
+            continue
+        gesehen[gb] = (farbe, betrag)
+        if not name:
+            continue          # ohne Gerätname kein Titel, also kein Satz
+        out.append({
+            "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe)
+                              if x),
+            "farbe": farbe,
+            "speicher_gb": gb,
+            "tarif_name": tarif,
+            # Die Ordnung des Anbieters aus dem Tarifdetails-Link (Modulkopf)
+            "tarif_slug": tarif_slug,
+            # § 13.2: EIN Betrag für Tarif und Gerät - keine Aufspaltung
+            # ohne Beleg (der Datalayer widerspricht sich selbst, Modulkopf).
+            "buendel_monatlich": betrag,
+            "laufzeit_monate": dauer,
+            "url": url,
+            "quelle": "einsundeins_buendel",
+        })
+    return out
+
+
+def _marke_name(text: str) -> tuple[str, str]:
+    """Marke und Modellname aus dem Product-Knoten der Seite.
+
+    Derselbe Knoten, aus dem auch `lies()` baut - zwei Lesarten desselben
+    Textes sollen nicht zwei Namen fuer dasselbe Gerät gebären.
+    """
+    for block in ld_json_bloecke(text or ""):
+        knoten = block if isinstance(block, dict) else {}
+        typ = knoten.get("@type")
+        if typ != "Product" and not (isinstance(typ, list) and "Product" in typ):
+            continue
+        marke = knoten.get("brand")
+        marke_name = (marke.get("name") if isinstance(marke, dict)
+                      else marke) or ""
+        name = str(knoten.get("name") or "").strip()
+        if name:
+            return str(marke_name).strip(), name
+    return "", ""
 
 
 def lies(text: str, url: str = "") -> list[dict]:

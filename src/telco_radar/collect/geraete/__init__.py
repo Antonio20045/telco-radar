@@ -350,10 +350,19 @@ def _registriere_anbieter_adapter() -> None:
     # ANBIETEREIGEN, weil die Seite neben ihren 42 Katalogkacheln 125
     # weitere Adressen derselben Domain fuehrt - siehe
     # `einsundeins.ernte`.
+    #
+    # B4 (08.09.2026): derselbe Adapter liest auf JEDER Produktseite auch
+    # deren Bündelpreiskarte (`hwdVariantsPrices`, Default-Tarif ueber alle
+    # Farben und Speichergroessen) - dieselbe Antwort, die `lies()` fuer
+    # die Listung ohnehin zerlegt, kein zusaetzlicher Abruf (Vodafone-B1-
+    # Muster; `buendel_auf_produktseite` bleibt an). Der Satz traegt nur
+    # den kombinierten Monatsbetrag (§ 13.2), siehe `einsundeins.lies_
+    # buendel`.
     registriere("einsundeins_buendel",
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
-                        ernte=einsundeins_modul.ernte))
+                        ernte=einsundeins_modul.ernte,
+                        lies_buendel=einsundeins_modul.lies_buendel))
     # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
     # stehen bereits in dieser einen Antwort, keine Produktseite wird
     # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
