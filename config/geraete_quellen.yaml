@@ -619,6 +619,14 @@ anbieter:
     # Linkernte, liefe der Sammler in den Deckel und die Seite gälte als
     # unvollständig gelesen, statt still hundert Themenseiten abzurufen.
     max_produkte: 45
+    # Per-Anbieter-Override des Absenders (BRIEF_B4_BUENDEL_EINSUNDEINS,
+    # 08.09.2026) - dasselbe Muster wie bei Telekom, Saturn und congstar:
+    # die globale Kennung in settings.yaml ist eine Chrome-Vortaeuschung,
+    # und die B4-Erhebung ist mit dem ehrlichen Absender gemessen (HTTP 200
+    # auf Kategorie- und Produktseiten, Probe an zehn Geräten). Der
+    # robots.txt-Abruf trägt ihn seit B2 ebenfalls (provider-bezogene
+    # Wächter-Sicht in `sammle_anbieter`).
+    user_agent: "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     hinweis: >-
       ANGEBUNDEN SEIT 04.09.2026 — als BÜNDEL, nicht als Barpreis. Der
       alte Grund bleibt in seinem Kern richtig: offers.price im ld+json

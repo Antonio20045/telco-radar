@@ -1,0 +1,359 @@
+{
+  "datum": "2026-09-08",
+  "anzahl_requests": 44,
+  "alle_ehrlich": true,
+  "requests": [
+    {
+      "url": "https://mobile.1und1.de/robots.txt",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/smartphones",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-17-pro-max",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-17-pro",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-17",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-17e",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-16",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-air",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-15",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-16-plus",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/iphone-16e",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26-ultra",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26-plus",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s25",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-a57",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-a17-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-z-flip8",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-z-fold8",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-z-fold8-ultra",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s25-edge",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-s26-fe",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/samsung-galaxy-a27-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/google-pixel-10a",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/google-pixel-11",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/google-pixel-11-pro",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/google-pixel-11-pro-fold",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/google-pixel-11-pro-xl",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-17t-pro",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-17t",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-17-ultra",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-17",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-redmi-17c-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-redmi-note-17-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/xiaomi-redmi-note-17-pro-max-5g",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/motorola-razr-70",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/motorola-moto-g77",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/fairphone-6",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/honor-magic8-lite",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/honor-600",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/honor-magic-v6",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/nothing-phone-4a-pro",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/nothing-phone-3",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    }
+  ]
+}
