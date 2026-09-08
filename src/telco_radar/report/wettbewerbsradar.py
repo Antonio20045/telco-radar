@@ -32,13 +32,21 @@ auch die TCO-Hauptansicht und ihr Delta-Banner benutzen (echtes Buendel
 schlaegt die gerechnete Naeherung, siehe `geraete_tco_karten._referenzkarte`).
 Es gibt also GENAU EINE Vodafone-Basis je Geraet, kein Band-Sammelsurium.
 
-Ein Wettbewerber wird dagegen NUR verglichen, wenn sein Tarif im SELBEN
-Tarifband liegt wie der Tarif der Vodafone-Basis (GRAPH-1-Bandlogik,
-`geraete_tco_band.tarif_baender`). Liegt er in einem anderen Band oder laesst
-sich keins von beiden bestimmen (kein Datenvolumen erhoben, oder
-unbegrenzt), heisst die Zeile ehrlich "Band-Mismatch" statt eine Zahl zu
-erfinden - AUFTRAG_GERAETESEITE.md §2b: "bei Band-Mismatch ehrlich
-benennen, nicht mischen".
+Ein Wettbewerber wird dagegen NUR verglichen, wenn es ein Tarifband gibt,
+in dem BEIDE das Geraet fuehren (GRAPH-1-Bandlogik,
+`geraete_tco_band.tarif_baender` + `karten_je_band`). Die Abweichung rechnet
+dann gegen VODAFONES KARTE IN DIESEM BAND - nicht blind gegen die Referenz:
+die Referenz ist Vodafones GUENSTIGSTES Buendel (am echten Bestand 59 von
+83 Geraeten im Band Klein), und o2 fuehrt dieselben Geraete dort regelmaessig
+nicht. Gegen sie gerechnet waere fast jede Zeile ein Mismatch, OBWOHL echte
+Paare existieren (iPhone 15: VF-Basis Klein 1.235,80, aber VF selbst Mittel
+1.949,80 gegen o2 Mittel 808,75). Bevorzugtes Band ist das der Referenz,
+sonst Vodafones billigste gemeinsame Band-Karte - die konservative Wahl.
+Liegt der Wettbewerber in einem anderen Band oder laesst sich keins von
+beiden bestimmen (kein Datenvolumen erhoben, oder unbegrenzt), heisst die
+Zeile ehrlich "Band-Mismatch" statt eine Zahl zu erfinden -
+AUFTRAG_GERAETESEITE.md §2b: "bei Band-Mismatch ehrlich benennen, nicht
+mischen".
 
 WETTBEWERBERKREIS
 ------------------
@@ -156,9 +164,9 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
     if basis["band"] is None or band is None or band != basis["band"]:
         vf_band = basis["band_label"]
         wb_band = _band_label(band)
-        grund = (f"Vodafone vergleicht im Band {vf_band!r}, {anbieter} bietet "
-                f"dieses Gerät im Band {wb_band!r} – nicht vergleichbar "
-                "(Tarifband-Mismatch).")
+        grund = (f"Kein Tarifband, in dem beide dieses Gerät führen "
+                f"(Vodafone: {vf_band}, {anbieter}: {wb_band}) – "
+                "nicht vergleichbar (Tarifband-Mismatch).")
         return {"anbieter": anbieter, "status": STATUS_BAND_MISMATCH,
                 "prozent": None, "gesamt": karte["gesamt"],
                 "tarif": karte.get("tarif", ""), "band": band,
@@ -167,25 +175,85 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
     prozent = round((karte["gesamt"] - basis["gesamt"]) / basis["gesamt"] * 100, 1)
     return {"anbieter": anbieter, "status": STATUS_VERGLEICHBAR,
             "prozent": prozent, "gesamt": karte["gesamt"],
+            "vf_gesamt": basis["gesamt"],
             "tarif": karte.get("tarif", ""), "band": band,
             "band_label": _band_label(band), "grund": "",
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", ""))}
 
 
+def _paar_zeile(anbieter: str, band: str, wb_karte: dict,
+                vf_karte: dict) -> dict:
+    """Vergleichbare Zeile: beide Karten liegen im SELBEN Band, und die
+    Abweichung rechnet gegen VODAFONES KARTE IN DIESEM BAND - nicht gegen
+    die Referenz des Geraets. Der Grund: Vodafones Referenz ist sein
+    GUENSTIGSTES Buendel und liegt deshalb bei 59 von 83 Modellen im Band
+    Klein, waehrend kein Wettbewerber dort fuehrt - eine Abweichung gegen
+    sie waere genau der Apfel-Birnen-Vergleich, den die Bandlogik
+    verbietet (iPhone 15: o2 nur Mittel 808,75, VF-Basis Klein 1.235,80,
+    VF selbst Mittel 1.949,80). GRAPH-1 vergleicht INNERHALB eines Bandes;
+    diese Zeile tut dasselbe und nennt die VF-Gegenkarte im Beleg."""
+    if not wb_karte.get("vergleichbar", True):
+        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
+                "prozent": None, "gesamt": wb_karte["gesamt"],
+                "vf_gesamt": vf_karte["gesamt"],
+                "tarif": wb_karte.get("tarif", ""), "band": band,
+                "band_label": _band_label(band),
+                "grund": (f"{anbieter} führt für dieses Gerät nur ein "
+                          f"{wb_karte.get('zustand_etikett') or 'nicht neues'} "
+                          "Gerät – kein Vergleich gegen ein Neugerät."),
+                **_beleg(wb_karte.get("quelle_url", ""),
+                         wb_karte.get("abgerufen_am", ""))}
+    prozent = round((wb_karte["gesamt"] - vf_karte["gesamt"])
+                    / vf_karte["gesamt"] * 100, 1)
+    return {"anbieter": anbieter, "status": STATUS_VERGLEICHBAR,
+            "prozent": prozent, "gesamt": wb_karte["gesamt"],
+            "vf_gesamt": vf_karte["gesamt"],
+            "tarif": wb_karte.get("tarif", ""), "band": band,
+            "band_label": _band_label(band), "grund": "",
+            **_beleg(wb_karte.get("quelle_url", ""),
+                     wb_karte.get("abgerufen_am", ""))}
+
+
+def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
+    """Je Wettbewerber seine GUENSTIGSTE echte Karte (Band egal) - die
+    Belegzeile fuer einen Band-Mismatch. Dieselbe Auswahlregel wie
+    `geraete_tco_band.karten_je_band`, nur ohne die Bandtrennung."""
+    beste: dict[str, dict] = {}
+    for k in (modell.get("karten") or []):
+        a = k["anbieter"]
+        if a == "Vodafone" or a not in NETZ_WETTBEWERBER:
+            continue
+        if not (k.get("belastbar") and not k.get("naeherung")
+                and k.get("gesamt") is not None):
+            continue
+        if a not in beste or k["gesamt"] < beste[a]["gesamt"]:
+            beste[a] = k
+    return beste
+
+
 def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
     """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + drei
     Wettbewerberzeilen, IMMER alle drei genannt (kein_buendel statt
-    Weglassen), sortiert aufsteigend nach %-Abweichung."""
+    Weglassen), sortiert aufsteigend nach %-Abweichung.
+
+    Die Karte des Wettbewerbers und seine VODAFONE-Gegenkarte kommen aus
+    der GRAPH-1-Bandlogik (`geraete_tco_band.karten_je_band`): verglichen
+    wird im Band, in dem BEIDE das Geraet fuehren - nicht die letzte Karte
+    aus `modell["karten"]` (ein Anbieter fuehrt dasselbe Geraet in mehreren
+    Baendern; ein Dict-Verstaendnis ueber `anbieter` haette willkuerlich
+    die letzte genommen, am echten Bestand gemessen: 1 vergleichbare Zeile
+    statt 26). Gibt es kein gemeinsames Band: ehrlicher Band-Mismatch mit
+    seiner GUENSTIGSTEN Karte als Beleg."""
     gruppen = []
     for modell in modelle:
-        karten_je_anbieter = {k["anbieter"]: k for k in modell.get("karten", [])
-                              if k["anbieter"] != "Vodafone"}
         basis = _vodafone_basis(modell, band_je_tarif)
+        je_band = geraete_tco_band.karten_je_band(modell, band_je_tarif)
+        uebrig = _guenstigste_echte_karte_je_anbieter(modell)
         if basis is None:
             zeilen = [{"anbieter": a, "status": STATUS_KEIN_BUENDEL,
                       "prozent": None,
-                      "gesamt": (karten_je_anbieter.get(a) or {}).get("gesamt"),
-                      "tarif": (karten_je_anbieter.get(a) or {}).get("tarif", ""),
+                      "gesamt": (uebrig.get(a) or {}).get("gesamt"),
+                      "tarif": (uebrig.get(a) or {}).get("tarif", ""),
                       "band": None, "band_label": "",
                       "grund": "", **_beleg("", "")}
                      for a in NETZ_WETTBEWERBER]
@@ -199,9 +267,28 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
                 "zeilen": zeilen, "rang": float("inf"),
             })
             continue
-        zeilen = [_zeile_fuer_anbieter(a, karten_je_anbieter.get(a), basis,
-                                       band_je_tarif)
-                 for a in NETZ_WETTBEWERBER]
+        zeilen = []
+        for a in NETZ_WETTBEWERBER:
+            gemeinsam = [b for b, je in je_band.items()
+                         if a in je and "Vodafone" in je
+                         and je["Vodafone"].get("vergleichbar", True)]
+            if gemeinsam:
+                # Bevorzugt das Band der Referenz; sonst Vodafones
+                # GUENSTIGSTE Karte unter den gemeinsamen Baendern - die
+                # fuer Vodafone konservative Wahl (eine Behauptung "VF ist
+                # X % teurer" muss auch gegen VF's billigstes Angebot im
+                # Band halten).
+                b = (basis["band"] if basis and basis["band"] in gemeinsam
+                     else min(gemeinsam,
+                              key=lambda band: je_band[band]["Vodafone"]["gesamt"]))
+                zeilen.append(_paar_zeile(a, b, je_band[b][a], je_band[b]["Vodafone"]))
+                continue
+            karte_anders = uebrig.get(a)
+            if karte_anders is not None:
+                zeilen.append(_zeile_fuer_anbieter(a, karte_anders, basis,
+                                                   band_je_tarif))
+                continue
+            zeilen.append(_zeile_fuer_anbieter(a, None, basis, band_je_tarif))
         zeilen.sort(key=lambda z: z["prozent"] if z["prozent"] is not None
                     else float("inf"))
         rang = min((z["prozent"] for z in zeilen if z["prozent"] is not None),

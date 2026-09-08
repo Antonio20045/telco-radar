@@ -39,15 +39,15 @@
   <h2 class="rubrik">Netzbetreiber – TCO über 24 Monate</h2>
   <p class="gr-erklaer">Vodafones eigener TCO-24-Wert je Gerät ist die
   Grundlage; Telekom, 1&amp;1 und o2 stehen darunter – mit einer
-  %-Abweichung, wenn ihr Tarif im selben Datenvolumen-Band liegt, sonst mit
-  einer benannten Lücke. Kein Anbieter wird weggelassen, auch nicht, wenn
-  er keine Zahl trägt.</p>
+  %-Abweichung, gerechnet gegen Vodafones Preis im selben
+  Datenvolumen-Band (Klein/Mittel/Groß), sonst mit einer benannten Lücke.
+  Kein Anbieter wird weggelassen, auch nicht, wenn er keine Zahl trägt.</p>
 
   {% macro wr_zeile(z) %}
   <tr class="wr-zeile wr-status--{{ z.status }}">
     <td>{{ z.anbieter }}</td>
     <td class="num">{% if z.gesamt is not none %}{{ '%.2f'|format(z.gesamt) }} €{% else %}–{% endif %}</td>
-    <td>{{ z.band_label or '–' }}</td>
+    <td>{{ z.band_label or '–' }}{% if z.status == 'vergleichbar' and z.vf_gesamt is not none %} · VF {{ '%.2f'|format(z.vf_gesamt) }} €{% endif %}</td>
     <td class="num wr-prozent{% if z.prozent is not none %}{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}{% endif %}">
       {%- if z.prozent is not none -%}
         {{ '%+.1f'|format(z.prozent) }} %
