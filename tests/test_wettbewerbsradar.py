@@ -353,6 +353,100 @@ def test_vergleichbarkeit_nur_im_gemeinsamen_band():
     assert klein["vf_gesamt"] == m1["vodafone"]["gesamt"]
 
 
+def _zweitmarken_bestand():
+    """Eigener Bestand fuer die Zweitmarkenregel (B3): congstar MIT Karte
+    auf zwei Modellen (M1 mit VF-Basis, M4 ohne), OHNE Karte auf M2. Nicht
+    in `_bestand()` gemischt - die konstruierten Tests dort schreiben die
+    exakte Anbietermenge der drei Netzbetreiber fest, und genau die ist
+    der Zustand VOR der Zweitmarkenregel."""
+    tarife = {t["tarif_id"]: t for t in _tarife()}
+    # congstar-Tarif im Band Klein (10 GB, wie o2:k) - dasselbe Band wie
+    # vf:xs, also entsteht das Paar auf dem gemeinsamen Band-Pfad.
+    tarife["cs:s"] = {"anbieter": "congstar", "name": "Allnet Flat S",
+                      "tarif_id": "cs:s", "art": "mobilfunk",
+                      "grundgebuehr": 12.0, "laufzeit_monate": 24,
+                      "datenvolumen_gb": 10, "preisphasen": [],
+                      "dokument_url": "https://example.de/pib/cs-s",
+                      "abgerufen_am": HEUTE, "confidence": {},
+                      "fundstellen": {}}
+    listungen = [
+        _listung("Vodafone", SKU_M1, 709.90),
+        _listung("Vodafone", SKU_M2, 1000.00),
+        _listung("o2", SKU_M4, 649.00),
+    ]
+    buendel = [
+        _buendel(SKU_M1, "vf:xs", "Vodafone Mobil XS", 29.95, 30.0,
+                 anbieter="Vodafone"),
+        _buendel(SKU_M1, "cs:s", "Allnet Flat S", 12.0, 2.0,
+                 anbieter="congstar"),
+        _buendel(SKU_M2, "vf:xs", "Vodafone Mobil XS", 29.95, 40.0,
+                 anbieter="Vodafone"),
+        # M4 ohne jeden Vodafone-Preis: der Basis-los-Zweig. congstar MIT
+        # Karte - auch hier zaehlt die Karte, nicht die Marke.
+        _buendel(SKU_M4, "cs:s", "Allnet Flat S", 12.0, 10.0,
+                 anbieter="congstar"),
+    ]
+    referenzen = [SimOnlyReferenz(
+        anbieter="Vodafone", tarif_name="Vodafone Mobil XS",
+        tarif_id="vf:xs", tarif_sim_only_monatlich=29.95,
+        quelle_url="https://example.de/pib/vf-xs", abgerufen_am=HEUTE)]
+    ergebnis = karten.modelle(buendel, listungen, referenzen, tarife,
+                              lade_katalog(WURZEL))
+    return ergebnis["modelle"], band.tarif_baender(tarife)
+
+
+def test_zweitmarke_steht_nur_mit_karte_da():
+    """B3, konstruiert: congstar steht im Radar NUR, wo er eine Karte hat -
+    als Paar im gemeinsamen Band (M1), und ohne VF-Basis als Zeile, die
+    seine guenstigste Karte als Zahl traegt (M4). OHNE Karte bleibt die
+    Zeile ganz aus (M2): kein kein_buendel-Platzhalter, denn congstar ist
+    kein Vollsortimenter - 55 Platzhalter waeren genau die Wand aus
+    Luecken, gegen die die Regel gebaut wurde. Die drei Netzbetreiber
+    stehen in allen drei Gruppen IMMER da."""
+    modelle, band_je_tarif = _zweitmarken_bestand()
+    gruppen = {g["id"]: g for g in
+               wr.netzbetreiber_gruppen(modelle, band_je_tarif)}
+
+    # Gegenproben: die Fixture loest beide Faelle wirklich aus (Lektion
+    # aus dem Adapter-Befund - eine Fixture ohne den Fall beweist nichts).
+    m1_modell = next(m for m in modelle if m["id"] == "apple-iphone-15-128")
+    assert any(k["anbieter"] == "congstar" for k in m1_modell["karten"]), \
+        "Fixture prueft nichts: congstar-Karte auf M1 fehlt"
+    m2_modell = next(m for m in modelle if m["id"] == "apple-iphone-15-256")
+    assert not any(k["anbieter"] == "congstar" for k in m2_modell["karten"])
+
+    # M1: Paar im gemeinsamen Band Klein, mit Tarif und Beleg.
+    m1 = gruppen["apple-iphone-15-128"]
+    assert m1["vodafone"] is not None
+    congstar = [z for z in m1["zeilen"] if z["anbieter"] == "congstar"]
+    assert len(congstar) == 1
+    assert congstar[0]["status"] == wr.STATUS_VERGLEICHBAR
+    assert congstar[0]["band"] == "klein"
+    assert congstar[0]["tarif"] == "Allnet Flat S"
+    assert congstar[0]["prozent"] is not None
+    assert congstar[0]["quelle_url"].endswith("/cs:s/" + SKU_M1)
+
+    # M2: congstar-Karte fehlt -> KEINE Zeile, kein Platzhalter. Die drei
+    # Netzbetreiber stehen da wie bisher.
+    m2 = gruppen["apple-iphone-15-256"]
+    assert "congstar" not in {z["anbieter"] for z in m2["zeilen"]}
+    assert set(wr.NETZ_WETTBEWERBER) <= {z["anbieter"] for z in m2["zeilen"]}
+
+    # M4: keine VF-Basis - congstar trotzdem mit ZAHL (seine guenstigste
+    # Karte), die Netzbetreiber ohne.
+    m4 = gruppen["apple-iphone-15-512"]
+    assert m4["vodafone"] is None
+    zeilen_congstar = [z for z in m4["zeilen"] if z["anbieter"] == "congstar"]
+    assert len(zeilen_congstar) == 1
+    assert zeilen_congstar[0]["gesamt"] is not None, \
+        "ohne VF-Basis muss die congstar-Karte als Zahl stehen bleiben"
+    assert zeilen_congstar[0]["tarif"] == "Allnet Flat S"
+    for a in wr.NETZ_WETTBEWERBER:
+        nb = next(z for z in m4["zeilen"] if z["anbieter"] == a)
+        assert nb["status"] == wr.STATUS_KEIN_BUENDEL
+        assert nb["gesamt"] is None
+
+
 # --------------------------------------------------------------------------
 # Haendler und nicht Erhebbare (reine Leseschichten)
 # --------------------------------------------------------------------------
@@ -633,10 +727,38 @@ def echt():
 
 
 def test_am_echten_bestand_nennt_jede_gruppe_alle_drei_wettbewerber(echt):
+    """Die drei Netzbetreiber stehen je Gruppe IMMER da (kein_buendel statt
+    Weglassen). Seit B3 kann daneben congstar stehen - als Zweitmarke MIT
+    Karte und OHNE Platzhalter: nie sonst ein Anbieter, und congstar nur
+    in Gruppen, zu denen er wirklich Bündel liefert (am Bestand vom
+    08.09.2026: 4 von 59 Modellen). Die Regel, nicht die alte Datenlage:
+    vorher war congstar Bestandteil dieser Gleichung, weil er leer war."""
     gruppen = echt["radar"]["gruppen"]
     assert gruppen, "kein Modell im Bestand - der Test pruefte nichts"
-    for g in gruppen:
-        assert {z["anbieter"] for z in g["zeilen"]} == set(wr.NETZ_WETTBEWERBER)
+    # Die Gruppe selbst traegt KEINE karten (nur id/titel/.../zeilen) - die
+    # Karten haengen am MODELL. Der Lookup laeuft ueber die Modell-ID, und
+    # die Zuordnung wird gegenzaehlt (CLAUDE.md §6: ein Lookup, der ins
+    # Leere geht, ist gruen und prueft nichts).
+    modelle_je_id = {m["id"]: m for m in echt["modelle"]}
+    assert len(modelle_je_id) == len(echt["modelle"])
+    zugeordnet = [modelle_je_id.get(g["id"]) for g in gruppen]
+    assert all(zugeordnet), "Gruppe ohne Modell - der Test pruefte nichts"
+    mit_congstar = 0
+    for g, modell in zip(gruppen, zugeordnet):
+        anbieter = {z["anbieter"] for z in g["zeilen"]}
+        assert set(wr.NETZ_WETTBEWERBER) <= anbieter
+        assert anbieter <= set(wr.ALLE_WETTBEWERBER), (
+            f"unbekannter Anbieter in den Zeilen: {anbieter}")
+        hat_karte = {k.get("anbieter") for k in modell.get("karten") or []}
+        if "congstar" in anbieter:
+            mit_congstar += 1
+            assert "congstar" in hat_karte, (
+                "congstar-Zeile ohne congstar-Karte - ein Platzhalter, "
+                "genau was die Zweitmarkenregel verbietet")
+    assert 0 < mit_congstar < len(gruppen), (
+        f"congstar in {mit_congstar} von {len(gruppen)} Gruppen - stünde er "
+        "in allen, wäre das die Platzhalter-Wand; in keiner, fehlte die "
+        "B3-Erhebung auf dem Radar")
 
 
 def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
@@ -652,7 +774,11 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     ist eine eigene, korrekte Zeile - sie als fehlendes Paar zu zaehlen
     wuerde den Test rot machen, sobald der Bestand den ersten Basis-Pfad-
     Fall liefert (diff-reviewer-Befund S1, an der konstruierten Fixture
-    M2 nachgewiesen: paare 3, gezeichnet 4)."""
+    M2 nachgewiesen: paare 3, gezeichnet 4).
+
+    Seit B3 zaehlt der Kreis auch die Zweitmarken (congstar): ihre Paare
+    entstehen nach derselben Regel, und wo keine Karte steht, liefert die
+    Zaehlung leer - die Invariante bleibt fuer beide Kreise dieselbe."""
     by_id = {m["id"]: m for m in echt["modelle"]}
     paare = 0
     gezeichnet = 0
@@ -662,7 +788,7 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
         vf_gemeinsam = {b for b, je in alle_je_band.items()
                         if "Vodafone" in je
                         and je["Vodafone"][0].get("vergleichbar", True)}
-        for a in wr.NETZ_WETTBEWERBER:
+        for a in wr.ALLE_WETTBEWERBER:
             for b in vf_gemeinsam:
                 karten = alle_je_band[b].get(a) or []
                 paare += len([k for k in karten
