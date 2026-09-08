@@ -154,17 +154,31 @@ def test_jede_karte_ohne_zahl_nennt_ihren_grund(bestand):
 
 
 def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
-    """Telekom hat in dieser Fixture 0 Buendel-Listungen. Genau das sagt
-    die Karte - in einem Satz, den ein Manager ohne Technikhintergrund
-    liest (S-Q1, Review 05.09.2026): kein "GitHub Actions", keine
-    "202-Challenge", keine "Phase T". Die technische Ursache steht dafuer
-    in `config/geraete_quellen.yaml`, nicht mehr im Nutzer-Sichtbaren."""
+    """B2 (08.09.2026): Telekom fuehrt seit dem Lokallauf ECHTE Bündel
+    (45 Sätze, 9 Geräte × 5 MagentaMobil-Tarife). Bis dahin hatte die
+    Karte überall ihren Leerzustand - der Test prüft jetzt BEIDE Zustände
+    ehrlich: belastbar mit Zahl, wo ein Bündel steht; leer mit Satz, den
+    ein Manager ohne Technik-Hintergrund liest (S-Q1, Review 05.09.2026):
+    kein "GitHub Actions", keine "202-Challenge", keine "Phase T". Die
+    technische Ursache steht in `config/geraete_quellen.yaml`, nicht im
+    Nutzer-Sichtbaren."""
+    mit_zahl = leer = 0
     for modell in bestand["modelle"]:
-        karte = [k for k in modell["karten"] if k["anbieter"] == "Telekom"][0]
-        assert not karte["belastbar"]
-        assert karte["leer_grund"].strip()
-        for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
-            assert jargon not in karte["leer_grund"]
+        karten = [k for k in modell["karten"] if k["anbieter"] == "Telekom"]
+        assert karten, f"{modell['id']}: Telekom-Karte fehlt (B.2.5)"
+        for karte in karten:
+            if karte["belastbar"]:
+                mit_zahl += 1
+                assert karte["gesamt"] is not None
+            else:
+                leer += 1
+                assert karte["leer_grund"].strip()
+                for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
+                    assert jargon not in karte["leer_grund"]
+    # Lookup-Zeile: ein Test, der nur einen der zwei Zustaende trifft,
+    # prueft nicht, was er behauptet - der Bestand traegt beide.
+    assert mit_zahl, "keine belastbare Telekom-Karte im Bestand"
+    assert leer, "kein Telekom-Leerzustand im Bestand"
 
 
 def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand):
@@ -589,12 +603,28 @@ def test_g1_entsteht_erst_ab_zwei_zahlen(bestand):
 
 
 def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
-    modell = _modell(bestand, "apple-iphone-17-pro-256")
-    svg = grafik.balken(modell)
+    """B2 (08.09.2026): apple-iphone-17-pro-256 fuehrt inzwischen EIN
+    Telekom-Bündel - der Balken gehoert dort also HIN. Gemessen wird die
+    REGEL statt eines festen Modells: ein Modell MIT belastbarer
+    Telekom-Karte zeichnet ihren Balken, ein Modell OHNE zeichnet keinen
+    (ein Balken der Laenge null mit Namen liest sich als kostenlos)."""
+    mit = [m for m in bestand["modelle"]
+           if any(k["anbieter"] == "Telekom" and k["belastbar"]
+                  for k in m["karten"])]
+    ohne = [m for m in bestand["modelle"]
+            if any(k["anbieter"] == "Telekom" and not k["belastbar"]
+                   for k in m["karten"])]
+    assert mit, "kein Modell mit Telekom-Bündel - der positive Fall fehlt"
+    assert ohne, "kein Modell ohne Telekom-Bündel - der negative Fall fehlt"
+
+    svg = grafik.balken(mit[0])
+    assert "Telekom" in svg, "ein vorhandenes Bündel muss einen Balken haben"
+
+    svg = grafik.balken(ohne[0])
     assert "Telekom" not in svg, \
         "ein Balken der Laenge null mit Namen liest sich als kostenlos"
-    for anbieter in ("o2", "1&amp;1", "Vodafone"):
-        assert anbieter in svg
+    assert svg.count('class="gr-g1-betrag"') >= 2, \
+        "die Grafik ist leer - der Test prueft nichts"
 
 
 def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
@@ -641,31 +671,45 @@ def test_die_balkenlaenge_entspricht_dem_betrag(bestand):
     Tarife desselben Geraets) - `gesamt_je_anbieter` haette nur die letzte
     behalten, waehrend die gemessene Breite ALLE drei Vodafone-Balken
     summiert. "google-pixel-10-128" fuehrt je Anbieter genau EINE Karte und
-    bleibt deshalb das gemessene Modell.
+    blieb das gemessene Modell.
+
+    B2 (08.09.2026, abends): auch das ist Datenlage, keine Regel - der
+    Bestand traegt inzwischen ZWEI Vodafone-Bunden zu google-pixel-10-128,
+    und der Test fiel am Rettungsstand 88abc8e VOR jeder B2-Aenderung rot.
+    Gemessen wird deshalb jetzt je BALKENREIHE gegen den Betrag, der auf
+    der Reihe selbst steht (`gr-g1-betrag`): alle Segmente einer Reihe
+    teilen sich y, ihr Betrag steht 18 px darunter, und das Verhaeltnis
+    Breite/Betrag muss fuer jede Reihe derselbe Massstab sein. Das misst
+    die Regel selbst und ueberlebt jede Kardenzahl je Anbieter.
     """
     modell = _modell(bestand, "google-pixel-10-128")
     svg = grafik.balken(modell)
     assert svg, "kein G1 fuer dieses Modell - der Test prueft nichts"
-    breite_je_anbieter: dict[str, float] = {}
+
+    # Segmente je Reihe (gleiches y) summieren; den Betrag der Reihe aus
+    # ihrem eigenen Etikett lesen (steht 18 px unter dem Reihenanfang).
+    breite_je_y: dict[float, float] = {}
     for treffer in re.finditer(
-            r'<rect class="gr-g1-seg[^"]*"[^>]*width="([\d.]+)"[^>]*>'
-            r'\s*<title>([^:<]+):', svg):
-        breite = float(treffer.group(1))
-        # Die Kartenwerte kennen "1&1", die SVG-Beschriftung "1&amp;1" -
-        # dieselbe Entschaerfung wie ueberall, wo XML-Escaping auf einen
-        # Klartextschluessel trifft.
-        anbieter = treffer.group(2).replace("&amp;", "&")
-        breite_je_anbieter[anbieter] = (
-            breite_je_anbieter.get(anbieter, 0.0) + breite)
-    gesamt_je_anbieter = {k["anbieter"]: k["gesamt"] for k in modell["karten"]
-                          if k["belastbar"] and k["laufzeit"] == 24}
-    verhaeltnisse = [breite_je_anbieter[a] / g
-                     for a, g in gesamt_je_anbieter.items()
-                     if a in breite_je_anbieter and g]
+            r'<rect class="gr-g1-seg[^"]*"[^>]*y="([\d.]+)"[^>]*'
+            r'width="([\d.]+)"', svg):
+        y = float(treffer.group(1))
+        breite_je_y[y] = breite_je_y.get(y, 0.0) + float(treffer.group(2))
+    betraege_je_y = {
+        float(t.group(1)): float(t.group(2).replace(".", "")
+                                 .replace(",", "."))
+        for t in re.finditer(
+            r'<text class="gr-g1-betrag"[^>]*y="([\d.]+)">([\d.,]+) €', svg)}
+
+    verhaeltnisse = []
+    for y, breite in breite_je_y.items():
+        betrag = next((b for ky, b in betraege_je_y.items()
+                       if 10 <= ky - y <= 25), None)
+        if betrag:
+            verhaeltnisse.append(breite / betrag)
     assert len(verhaeltnisse) >= 2, \
-        f"eine Gruppe braucht zwei Balken: {gesamt_je_anbieter}"
+        f"eine Gruppe braucht zwei Balken: {breite_je_y} / {betraege_je_y}"
     assert max(verhaeltnisse) - min(verhaeltnisse) < 0.002, \
-        f"die Balken folgen nicht einem Massstab: {gesamt_je_anbieter}"
+        f"die Balken folgen nicht einem Massstab: {verhaeltnisse}"
 
 
 def test_die_grafik_rechnet_keine_eigene_zahl(bestand):

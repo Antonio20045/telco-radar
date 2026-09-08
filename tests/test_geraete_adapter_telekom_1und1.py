@@ -214,12 +214,25 @@ def test_telekom_ende_des_zustands_wird_nicht_am_ersten_semikolon_geraten():
 def test_telekom_landet_als_listung_mit_preisform_im_bestand(katalog, farben,
                                                              telekom_html):
     """Der ganze Weg, mit der AUSGELIEFERTEN Konfiguration: ein Abruf, zehn
-    Listungen, und jede traegt ihren Ratenhinweis."""
+    Listungen, und jede traegt ihren Ratenhinweis.
+
+    Seit B2 (08.09.2026) fuehrt die Konfiguration ZUSAETZLICH fuenf
+    `kind: buendel`-Einstiege - die Bündel-Lesart dieser Fixture (ohne
+    selectedPlan) ist absichtlich keine Bündelantwort und würde den Lauf
+    als Fehler werten. Dieser Test misst die LISTUNGS-Strecke und hält
+    den Einstieg deshalb auf den statischen Zweig enghalten; die
+    Bündelstrecke hat ihre eigene Datei (test_geraete_buendel_telekom.py).
+    """
     anbieter = lade_quellen(_WURZEL).nach_name("Telekom")
     assert anbieter.aktiv and anbieter.methode == "telekom_kategorie"
+    anbieter.einstiege = [e for e in anbieter.einstiege
+                          if e.kind != "buendel"]
     anbieter.rate_limit_sekunden = 0
 
-    def hole(url, kopfzeilen=None):
+    # Der ECHTEN Konfiguration folgt der ehrliche Absender: Telekom
+    # traegt seit B2 einen `user_agent`-Override, und `hole()` bekommt
+    # ihn als drittes Argument (derselbe Vertrag wie beim Saturn-Adapter).
+    def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /is-bin/intershop.static/\n")
         return (200, telekom_html)

@@ -309,6 +309,35 @@ def test_ein_fremder_tarif_ergibt_keinen_geraetepreis():
                                             tarif_name="o2 Mobile L"))
 
 
+def test_die_live_shop_lesart_ist_derselbe_tarif():
+    """B2-Befund vom 08.09.2026 (Telekom): Die SIM-only-Referenz kommt aus
+    der Shop-Kachel (`…#live_shop` - die Dublettenregel in
+    `tarif_referenzen.aus_bestand` laesst die Live-Lesart vorn), das
+    Buendel loest auf den PIB-Eintrag ohne Zusatz. Dieselbe Zeitreihen-
+    Basis, derselbe Tarif - vorher warf genau diese Paarung, und der
+    Auffangboden des Renderers machte daraus fuenf leere Reiter statt
+    einen Geraeteanteil (Render-Log: "Geraetedaten nicht aufbereitbar").
+    """
+    ergebnis = geraeteanteil(
+        _buendel(anbieter="Telekom", tarif_name="MagentaMobil L",
+                 tarif_id="telekom:magentamobil-l"),
+        _referenz(anbieter="Telekom", tarif_name="MagentaMobil L",
+                  tarif_id="telekom:magentamobil-l#live_shop"))
+    assert ergebnis.betrag is not None
+    assert ergebnis.belastbar is True
+
+
+def test_ein_hash_zusatz_bleibt_ein_fremder_tarif():
+    """Gegenprobe zur Live-Lesart: Ein HASH-Zusatz an der tarif_id trennt
+    zwei gleichnamige, VERSCHIEDENE Produkte (o2-home-l-flex und
+    o2-home-l-175-flex, CLAUDE.md § 6) - er wird NICHT mitgestrichen,
+    sonst maesse die Differenz zwei Vertrage gegeneinander."""
+    with pytest.raises(ValueError, match="Tarifen"):
+        geraeteanteil(
+            _buendel(tarif_id="o2:o2-home-l-flex"),
+            _referenz(tarif_id="o2:o2-home-l-flex#8f3a1c"))
+
+
 def test_zwei_namen_fuer_denselben_tarif_rechnen_trotzdem():
     """Der Fall, wegen dem die Regel auf die ID umgestellt wurde.
 
