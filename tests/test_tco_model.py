@@ -171,6 +171,37 @@ def test_eine_kuerzere_ratenlaufzeit_hat_keinen_rest():
     assert ergebnis.restbetrag == 0.0
 
 
+def test_ein_buendelmonatspreis_wird_wie_eine_rate_auf_24_gekappt():
+    """1&1 nennt EINEN Monatsbetrag fuer Tarif und Geraet (§ 13.2) - er wird
+    genauso auf 24 Monate gekappt wie eine Geraterate, der Rest steht als
+    Restbetrag daneben (Ticket TCO24-1)."""
+    b = Buendel(sku_id="apple-iphone-14-128gb-mitternacht", anbieter="1&1",
+               tarif_name="1&1 Allnet Flat", tarif_id="einsundeins:allnet",
+               tarif_id_guete="hoch", buendel_monatlich=44.99,
+               laufzeit_monate=36, quelle_url="https://www.1und1.de/x",
+               abgerufen_am="2026-09-03")
+    ergebnis = tco_24(b)
+    assert ergebnis.bestandteile == {
+        "Bündelpreis (Tarif und Gerät zusammen) (24 von 36)": 1079.76,
+    }
+    assert ergebnis.gesamt == 1079.76
+    assert ergebnis.restbetrag == 539.88, "12 offene Monate a 44,99 EUR"
+    assert ergebnis.belastbar is True
+
+
+def test_ein_buendelmonatspreis_binnen_24_monaten_hat_keinen_rest():
+    b = Buendel(sku_id="apple-iphone-14-128gb-mitternacht", anbieter="1&1",
+               tarif_name="1&1 Allnet Flat", tarif_id="einsundeins:allnet",
+               tarif_id_guete="hoch", buendel_monatlich=44.99,
+               laufzeit_monate=24, quelle_url="https://www.1und1.de/x",
+               abgerufen_am="2026-09-03")
+    ergebnis = tco_24(b)
+    assert ergebnis.bestandteile == {
+        "Bündelpreis (Tarif und Gerät zusammen) (24 von 24)": 1079.76,
+    }
+    assert ergebnis.restbetrag == 0.0
+
+
 def test_rabatte_stehen_daneben_und_nie_in_der_zahl():
     """Der Nachlass aendert die Kennzahl um KEINEN Cent."""
     rabatte = [Rabatt(name="Wechselbonus", betrag_monatlich=10.0, von_monat=1,

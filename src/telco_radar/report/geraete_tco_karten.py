@@ -53,9 +53,26 @@ from .geraete_tco_grafik import anbieter_slug
 from .geraete_verlauf import messtage
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
-from ..tco_model import (LEITFRAGE_MONATE, POSTEN_ANSCHLUSS, POSTEN_TARIF,
-                         POSTEN_TARIFBINDUNG, POSTEN_TARIF_FLEX, Buendel,
-                         effektiv_ohne_geraet, tco_bindung)
+from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_RATE,
+                         POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
+                         Buendel, tco_24)
+
+# Ticket TCO24-1 (08.09.2026): die Leitzahl der Seite ist IMMER TCO-24
+# (AUFTRAG_GERAETESEITE.md §3 - "Immer 24 Monate", verbindlich). Bis dahin
+# fuehrte diese Tafel `tco_bindung()` - eine Kennzahl ueber die eigene
+# Bindung des Buendels (24 ODER 36 Monate), sichtbar als "TCO-36". Das war
+# der deklarierte Fehler: 324 sichtbare "TCO-36" auf der Live-Seite, gegen
+# eine Norm, die genau das ausschliesst. Ersetzt durch `tco_24()` - dieselbe
+# Bibliotheksfunktion, die `test_tco_model.py` seit E2 (03.09.2026) haelt.
+# Raten jenseits 24 Monate stehen als `Tco.restbetrag` daneben, nie in der
+# Leitzahl.
+
+# Die Laufzeit, mit der JEDE Karte und die Referenz rechnen - keine
+# Variable mehr, seit die Norm "Immer 24 Monate" sagt.
+LAUFZEIT = TCO_HORIZONT
+LABEL = f"TCO-{TCO_HORIZONT}"
+# "ab Monat 25" - der erste Monat NACH dem festen Horizont. F5, Katalog D.
+AB_MONAT = TCO_HORIZONT + 1
 
 log = logging.getLogger(__name__)
 
@@ -426,37 +443,62 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
 # Eine Karte
 # --------------------------------------------------------------------------
 
+def _bestandteile_mit_kategorie(kennzahl) -> list:
+    """`tco_24`s Posten (Name -> Betrag) mit ihrer Kostenart, fuer die
+    Balkengrafik (`geraete_tco_grafik.balken`) - dieselbe Kategorienliste,
+    die zuvor `tco_bindung` fuehrte. `tco_24` speichert die Posten als
+    Woerterbuch (Name -> Betrag, dieselbe Reihenfolge wie gerechnet); die
+    Grafik braucht dieselben Zeilen als Liste mit ihrer Kostenart, das ist
+    Formatierung und keine zweite Rechnung.
+    """
+    posten = []
+    for name, betrag in kennzahl.bestandteile.items():
+        if name in (POSTEN_ZUZAHLUNG, POSTEN_ANSCHLUSS):
+            kat = "einmalig"
+        elif name.startswith(POSTEN_BUENDEL):
+            kat = "buendel"
+        elif name.startswith(POSTEN_RATE):
+            kat = "raten"
+        else:
+            kat = "tarif"
+        posten.append({"name": name, "betrag": betrag, "kategorie": kat})
+    return posten
+
+
 def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
            katalog, geraet_je_sku: dict, zustand: str = "unbekannt") -> dict:
     """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_model`.
 
     Diese Funktion addiert keinen Euro. Sie holt die Kennzahl, haengt die
     Belege daran und formt die Pflichtzeilen des Katalogs D.
-    """
-    kennzahl = tco_bindung(b)
-    device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
-    nach_bindung = None
-    if tarif and kennzahl.tarif_bindung:
-        # "ab Monat 25: X EUR" - die Grundgebuehr nach der Mindestlaufzeit,
-        # aus den PREISPHASEN des Pflichtdokuments. Sie ist die Antwort auf
-        # die Kostenfallen-Kritik (Recherche § 2.3) und wird NICHT geraten:
-        # gibt es keine Phase fuer den Monat danach, steht dort nichts.
-        nach_bindung = _phase_ab(tarif, kennzahl.tarif_bindung + 1)
 
-    eff = effektiv_ohne_geraet(kennzahl,
-                               barpreis["betrag"] if barpreis else None)
-    # Katalog D: "X € in 36 Raten" - dieselbe Summe traegt auch die
-    # Geraetepreis-Leitzahl (A-R5), einmal gerechnet statt zweimal.
-    raten_summe = next((p.get("betrag") for p in kennzahl.bestandteile
-                        if p.get("kategorie") == "raten"), None)
+    TICKET TCO24-1: die Leitzahl ist `tco_24()`, IMMER 24 Monate
+    (AUFTRAG_GERAETESEITE.md §3). Bis dahin fuehrte diese Funktion
+    `tco_bindung()`, eine Kennzahl ueber die eigene Bindung des Buendels -
+    sichtbar als "TCO-36", der deklarierte Fehler dieses Tickets.
+    """
+    kennzahl = tco_24(b)
+    device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
+    # "ab Monat 25: X EUR" - die Grundgebuehr nach dem festen 24-Monats-
+    # Horizont, aus den PREISPHASEN des Pflichtdokuments. Sie ist die
+    # Antwort auf die Kostenfallen-Kritik (Recherche § 2.3) und wird NICHT
+    # geraten: gibt es keine Phase fuer den Monat danach, steht dort nichts.
+    nach_bindung = _phase_ab(tarif, AB_MONAT) if tarif else None
+
+    eff = None
+    if barpreis is not None and kennzahl.belastbar:
+        eff = round(kennzahl.monatlich - barpreis["betrag"] / TCO_HORIZONT, 2)
+    # Katalog D: "X € in 36 Raten" - die volle Ratensumme (nicht auf 24
+    # Monate gekappt), dieselbe Zahl traegt auch die Geraetepreis-Leitzahl
+    # (A-R5), einmal gerechnet statt zweimal.
+    raten_summe = (round(b.geraet_monatsrate * b.laufzeit_monate, 2)
+                  if b.geraet_monatsrate is not None else None)
     geraetepreis = _geraetepreis(barpreis, b.geraet_zuzahlung, raten_summe)
     return {
         # B.2.5 GILT AUCH HIER. Eine Karte ohne Zahl braucht ihren Grund -
         # `_leere_karte` fuellt ihn, diese Funktion tat es nicht, und die
         # Vorlage rendert dann einen leeren Absatz unter Anbieter und
-        # Tarif. Der Fall entsteht mit dem ersten Buendel auf einem
-        # Flextarif; im Bestand vom 04.09.2026 tragen acht von 44 Tarifen
-        # `laufzeit_monate: 0`.
+        # Tarif.
         "leer_grund": "" if kennzahl.belastbar else _grund(kennzahl),
         "sku_id": b.sku_id,
         "modell_id": modell_schluessel(device_id, speicher),
@@ -482,18 +524,32 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         # `gesamt` bleiben unveraendert die TCO-Zahl - nur die Vorlage
         # entscheidet, welche der beiden Zahlen zuerst und gross steht.
         "geraetepreis": geraetepreis,
-        # A5.1: die Laufzeit steht IM Namen der Leitzahl.
-        "label": kennzahl.label,
-        "laufzeit": kennzahl.bindung,
-        "tarif_bindung": kennzahl.tarif_bindung,
-        "raten_laufzeit": kennzahl.raten_laufzeit,
+        # TICKET TCO24-1: Laufzeit und Etikett sind Konstanten - "Immer 24
+        # Monate" ist keine Ableitung aus dem Buendel mehr.
+        "label": LABEL,
+        "laufzeit": LAUFZEIT,
+        "ab_monat": AB_MONAT,
+        # Informativ: die eigene Mindestlaufzeit des TARIFS (kann von den
+        # 24 Monaten der Leitzahl abweichen, z. B. bei einem Flextarif) und
+        # die tatsaechliche Laufzeit der Geraeteraten. Beide bestimmen die
+        # Leitzahl NICHT mehr - die tut es nie, seit sie fest ist.
+        "tarif_bindung": b.tarif_bindung_monate,
+        "raten_laufzeit": (b.laufzeit_monate
+                           if (b.geraet_monatsrate is not None
+                               or b.buendel_monatlich is not None) else None),
         "belastbar": kennzahl.belastbar,
         "gesamt": kennzahl.gesamt if kennzahl.belastbar else None,
-        "schnitt_monat": kennzahl.schnitt_monat if kennzahl.belastbar else None,
-        # A5.2, Pflichtzeile: Antonios Frage, woertlich beantwortet.
-        "gezahlt_nach_24": kennzahl.gezahlt_nach_24,
-        "offen_nach_24": kennzahl.offen_nach_24,
-        "offene_raten": (max(0, (b.laufzeit_monate or 0) - LEITFRAGE_MONATE)
+        "schnitt_monat": kennzahl.monatlich if kennzahl.belastbar else None,
+        # A5.2, Pflichtzeile, jetzt woertlich statt gerechnet: die Leitzahl
+        # IST der 24-Monats-Betrag, "gezahlt nach 24 Monaten" ist deshalb
+        # `gesamt` selbst. "Danach noch offen" ist der Restbetrag aus
+        # `tco_model` - er veraendert weder TCO-24 noch deren Sortierung
+        # (Abnahmekriterium 2).
+        "gezahlt_nach_24": kennzahl.gesamt if kennzahl.belastbar else None,
+        "offen_nach_24": (kennzahl.restbetrag
+                          if kennzahl.belastbar and kennzahl.restbetrag
+                          else None),
+        "offene_raten": (max(0, (b.laufzeit_monate or 0) - TCO_HORIZONT)
                          if b.geraet_monatsrate is not None
                          or b.buendel_monatlich is not None else 0),
         # Die Bausteine, jeder mit dem Label aus Katalog D.
@@ -501,17 +557,20 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "buendel_monatlich": b.buendel_monatlich,
         "zuzahlung": b.geraet_zuzahlung,
         "rate": b.geraet_monatsrate,
-        # Katalog D: "X € in 36 Raten" - die Summe kommt aus dem Posten der
-        # Kennzahl, nicht aus einer Multiplikation in der Vorlage.
+        # Katalog D: "X € in 36 Raten" - die volle Ratensumme, siehe oben.
         "raten_summe": raten_summe,
         "anschlusspreis": b.anschlusspreis,
         "nach_bindung": nach_bindung,
         "eff_ohne_geraet": eff,
         "eff_basis": barpreis,
-        "bestandteile": kennzahl.bestandteile,
+        "bestandteile": _bestandteile_mit_kategorie(kennzahl),
         "luecken": kennzahl.luecken,
-        "boni": kennzahl.boni,
-        "boni_abzug": kennzahl.boni_abzug,
+        # Rabatte werden nie in die Leitzahl gerechnet (tco_model Regel 3,
+        # AUFTRAG_GERAETESEITE §3: "Prämien, Cashback [...] bleiben
+        # außerhalb der TCO-24"); `tco_24` fuehrt sie deshalb nicht mehr
+        # einzeln ab, nur ihre Summe steht als Auskunft in `rabatte_offen`.
+        "boni": [],
+        "boni_abzug": kennzahl.rabatte_offen,
         "quelle_url": b.quelle_url,
         "abgerufen_am": b.abgerufen_am,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
@@ -524,28 +583,22 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     }
 
 
-# Was auf der Karte steht, wenn die Rechnung nicht traegt. Jede Luecke
-# bekommt einen Satz in der Sprache der Seite - "POSTEN_TARIFBINDUNG" ist
-# ein Feldname und keine Auskunft.
+# Was auf der Karte steht, wenn die Rechnung nicht traegt. `tco_24` kennt
+# seit Ticket TCO24-1 nur noch EINE Luecke, die eine Karte unbelastbar
+# macht: den fehlenden Tarifgrundpreis (`POSTEN_TARIF`). Die Flextarif-/
+# Tarifbindungs-Sonderfaelle von `tco_bindung` entfallen - "Immer 24
+# Monate" rechnet den Tarifgrundpreis unabhaengig von der Mindestlaufzeit.
 _GRUND_JE_LUECKE = {
     POSTEN_TARIF: ("Der Tarifgrundpreis dieses Bündels ist nicht erhoben – "
                    "ohne ihn ist es kein Gesamtpreis, sondern ein "
                    "Gerätebetrag."),
-    POSTEN_TARIFBINDUNG: ("Wie lange der Tarif bindet, ist nicht belegt – "
-                          "und ohne die Bindung gibt es keine Laufzeit, "
-                          "über die sich rechnen ließe."),
-    POSTEN_TARIF_FLEX: ("Der Tarif ist monatlich kündbar. Über eine "
-                        "Bindung, die es nicht gibt, ist kein Tarifbetrag "
-                        "geschuldet – eine Gesamtsumme über die Laufzeit "
-                        "wäre erfunden."),
 }
 
 
 def _grund(kennzahl) -> str:
     """Warum diese Karte keine Zahl traegt - in der Reihenfolge der Ursachen."""
-    for posten in (POSTEN_TARIF, POSTEN_TARIF_FLEX, POSTEN_TARIFBINDUNG):
-        if posten in kennzahl.luecken:
-            return _GRUND_JE_LUECKE[posten]
+    if POSTEN_TARIF in kennzahl.luecken:
+        return _GRUND_JE_LUECKE[POSTEN_TARIF]
     if kennzahl.gesamt is None:
         return ("Zu diesem Bündel ist kein einziger Posten erhoben – es "
                 "steht als Angebot da, nicht als Preis.")
@@ -569,7 +622,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
     return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
             "slug": anbieter_slug(anbieter),
             "geraetepreis": None,
-            "label": "", "laufzeit": None, "belastbar": False,
+            "label": "", "laufzeit": None, "ab_monat": None, "belastbar": False,
             "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
             "offen_nach_24": None, "offene_raten": 0, "monatlich": None,
             "buendel_monatlich": None, "zuzahlung": None, "rate": None,
@@ -590,9 +643,14 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
 # Die Vodafone-Referenz: gemessene Summanden, gerechnete Summe
 # --------------------------------------------------------------------------
 
-def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
-                       monate: int) -> Optional[dict]:
-    """Tarif ohne Geraet + eigener Barpreis, ueber dieselbe Laufzeit.
+def _vodafone_referenz(referenzen: list, tarife: dict,
+                       barpreise_der_sku: dict) -> Optional[dict]:
+    """Tarif ohne Geraet + eigener Barpreis, ueber den festen 24-Monats-
+    Horizont (TICKET TCO24-1: "Immer 24 Monate" - AUFTRAG_GERAETESEITE.md
+    §3. Bis dahin rechnete diese Funktion ueber ein variables FENSTER,
+    das die laengste Bindung der verglichenen Buendel uebernahm - der
+    Grund, warum 30 Referenzkarten "TCO-36" trugen, obwohl Vodafone gar
+    kein 36-Monats-Angebot hat).
 
     Genommen wird der GUENSTIGSTE belegte Vodafone-Mobilfunktarif. Die Wahl
     steht hier ausgeschrieben, weil sie das Ergebnis faerbt: der
@@ -610,7 +668,7 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
                 if _eigen(getattr(r, "anbieter", ""))
                 and getattr(r, "tarif_sim_only_monatlich", None) is not None]
     geraet = (barpreise_der_sku or {}).get("Vodafone")
-    if not vodafone or geraet is None or not monate:
+    if not vodafone or geraet is None:
         return None
     referenz = min(vodafone, key=lambda r: r.tarif_sim_only_monatlich)
     tarif = tarife.get(referenz.tarif_id) or {}
@@ -620,49 +678,24 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
               for p in (tarif.get("preisphasen") or [])
               if p.get("betrag") is not None]
 
-    # DER TARIF ZAEHLT SEINE EIGENE MINDESTLAUFZEIT, NICHT DAS FENSTER.
-    #
-    # Das ist dieselbe Regel, die `tco_bindung` fuer die Buendelkarte
-    # anwendet (A5.5) - und sie hat auf BEIDEN Seiten zu gelten, sonst
-    # vergleicht das Delta zwei verschieden zusammengesetzte Koerbe. Vorher
-    # rechnete die Referenz 36 x 29,95 EUR, waehrend die o2-Karte daneben
-    # 24 x 19,99 EUR trug: die Referenz war um 12 x 29,95 = 359,40 EUR zu
-    # teuer, und ALLE 54 Delta-Zeilen der Seite sagten "guenstiger als
-    # Vodafone", keine einzige "teurer". Eine Rechnung, die systematisch
-    # zugunsten des Wettbewerbers ausfaellt, ist kein Wettbewerbsradar.
-    #
-    # Gemessen am Vorgabemodell (iPhone 17 Pro 256 GB): das Delta faellt
-    # von -483,34 auf -123,94 EUR.
-    tarif_monate = tarif.get("laufzeit_monate")
-    if tarif_monate:
-        tarif_monate = min(int(tarif_monate), monate)
-    else:
-        # Ohne belegte Mindestlaufzeit bleibt nur das Fenster - und die
-        # Karte sagt, dass hier fortgeschrieben wurde.
-        tarif_monate = monate
-    summe = phasensumme(phasen, tarif_monate) if phasen else None
-    # "Fortgeschrieben" heisst: das Blatt sagt zu diesen Monaten nichts, und
-    # es gilt der zuletzt belegte Preis weiter. Das ist die vorsichtige
-    # Annahme (dieselbe wie in `phasensumme`), aber sie ist eine Annahme -
-    # deshalb steht sie auf der Karte und nicht nur im Code.
+    summe = phasensumme(phasen, TCO_HORIZONT) if phasen else None
+    # "Fortgeschrieben" heisst: das Blatt sagt zu einem Teil der 24 Monate
+    # nichts, und es gilt der zuletzt belegte Preis weiter. Das ist die
+    # vorsichtige Annahme (dieselbe wie in `phasensumme`), aber sie ist
+    # eine Annahme - deshalb steht sie auf der Karte und nicht nur im Code.
     abgedeckt = 0
     for phase in phasen:
-        abgedeckt = max(abgedeckt, tarif_monate if phase.bis_monat is None
+        abgedeckt = max(abgedeckt, TCO_HORIZONT if phase.bis_monat is None
                         else phase.bis_monat)
-    fortgeschrieben = abgedeckt < tarif_monate
+    fortgeschrieben = abgedeckt < TCO_HORIZONT
     if summe is None:
-        summe = round(referenz.tarif_sim_only_monatlich * tarif_monate, 2)
+        summe = round(referenz.tarif_sim_only_monatlich * TCO_HORIZONT, 2)
         fortgeschrieben = fortgeschrieben or not phasen
-    if not tarif.get("laufzeit_monate"):
-        # Der Tarifbetrag laeuft ueber das ganze Fenster, weil niemand eine
-        # Mindestlaufzeit belegt hat. Auch das ist eine Fortschreibung.
-        fortgeschrieben = True
     gesamt = round(summe + geraet["betrag"], 2)
     return {
         # F5 auch an der Referenz: das Blatt nennt "ab Monat 25" (Vodafone
         # Mobil XS: 29,95 EUR) - die Zeile steht auf jeder Karte mit Zahl.
-        "nach_bindung": (_phase_ab(tarif, tarif_monate + 1)
-                         if tarif.get("laufzeit_monate") else None),
+        "nach_bindung": _phase_ab(tarif, AB_MONAT),
         "tarif": referenz.tarif_name,
         "tarif_id": referenz.tarif_id,
         "monatlich": referenz.tarif_sim_only_monatlich,
@@ -672,10 +705,10 @@ def _vodafone_referenz(referenzen: list, tarife: dict, barpreise_der_sku: dict,
         "geraet_betrag": geraet["betrag"],
         "geraet_quelle_url": geraet.get("quelle_url", ""),
         "geraet_abgerufen_am": geraet.get("abgerufen_am", ""),
-        "monate": monate,
-        "tarif_monate": tarif_monate,
+        "monate": TCO_HORIZONT,
+        "tarif_monate": TCO_HORIZONT,
         "gesamt": gesamt,
-        "schnitt_monat": round(gesamt / monate, 2),
+        "schnitt_monat": round(gesamt / TCO_HORIZONT, 2),
         "fortgeschrieben": fortgeschrieben,
     }
 
@@ -718,19 +751,12 @@ def _referenzkarte(ref: dict) -> dict:
         # dem Feld, das "hier gibt es nichts" bedeutet.
         "leer_grund": "",
         "tarif": ref["tarif"],
-        # DIE LEITZAHL TRAEGT IHRE EIGENE BINDUNG (A5.1; QA-Befund F-R2-2,
-        # 04.09.2026). `ref["monate"]` ist das FENSTER des verglichenen
-        # Buendels (36 bei o2), `ref["tarif_monate"]` das, was die Referenz
-        # wirklich rechnet: 24 Tarifmonate plus Barkauf, und in Monat 25-36
-        # bindet Vodafone gar nicht. Alle 30 Referenzkarten des Bestands
-        # trugen "TCO-36" und "Gerechnet ueber 36 Monate Bindung" - eine
-        # richtige Zahl unter einer falschen Aussage. Das Fenster bleibt am
-        # Referenz-Dict (`monate`): daran haengen das Euro-Delta (`_delta`,
-        # `gleiche_laufzeit`) und die Referenzlinie in G1, und beides ist
-        # E-2 - eine Entscheidung Antonios, nicht dieser Karte. Geaendert ist
-        # die BESCHRIFTUNG, nicht die Rechnung: 52 Deltas vorher, 52 nachher,
-        # auf den Cent gleich.
-        "label": f"TCO-{ref['tarif_monate']}",
+        # TICKET TCO24-1: die Leitzahl ist IMMER TCO-24 - `ref["monate"]`
+        # und `ref["tarif_monate"]` sind seit `_vodafone_referenz` beide
+        # der feste Horizont (`TCO_HORIZONT`), keine variable Fensterzahl
+        # mehr. Vorher trugen alle 30 Referenzkarten "TCO-36" bei einer
+        # Rechnung, die 24 Tarifmonate plus Barkauf war (QA-Befund F-R2-2).
+        "label": LABEL, "ab_monat": AB_MONAT,
         "laufzeit": ref["tarif_monate"],
         "fenster": ref["monate"],
         "belastbar": True, "naeherung": True,
@@ -754,7 +780,7 @@ def _referenzkarte(ref: dict) -> dict:
         # fuer ein bar gekauftes Geraet auf einem 24-Monats-Tarif.
         "gezahlt_nach_24": round(
             ref["geraet_betrag"]
-            + ref["monatlich"] * min(LEITFRAGE_MONATE, ref["tarif_monate"]), 2),
+            + ref["monatlich"] * min(TCO_HORIZONT, ref["tarif_monate"]), 2),
         "tarif_bindung": ref["tarif_monate"],
         "nach_bindung": ref.get("nach_bindung"),
         "bestandteile": [
@@ -982,11 +1008,10 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             referenz = _referenz_aus_buendel(
                 min(eigene, key=lambda k: k["gesamt"]))
         else:
-            # Die Naeherung rechnet ueber die Laufzeit, die die meisten
-            # Karten dieses Modells binden - so entsteht das Euro-Delta
-            # dort, wo es etwas aussagt.
-            referenz = _vodafone_referenz(referenzen, tarife, belege_modell,
-                                          laufzeiten[-1] if laufzeiten else 0)
+            # TICKET TCO24-1: die Naeherung rechnet ueber den festen
+            # 24-Monats-Horizont - keine Laufzeit mehr, die sie sich von
+            # den Karten dieses Modells leiht.
+            referenz = _vodafone_referenz(referenzen, tarife, belege_modell)
             naeherung = referenz
         for k in karten:
             k["delta"] = _delta(k, referenz)

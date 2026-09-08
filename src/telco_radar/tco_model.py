@@ -470,32 +470,53 @@ def tco_24(buendel: Buendel) -> Tco:
     nichts gespeichert. Der Horizont steht fest (E2); die Ratenlaufzeit des
     Geraets darf davon abweichen, und was jenseits liegt, steht in
     `restbetrag` statt in der Kennzahl.
+
+    Zwei Preisformen, eine Kappung bei 24 Monaten
+    ----------------------------------------------
+    * **aufgeteilt** (o2 u.a.): Tarifgrundpreis und Geraeterate stehen
+      getrennt und werden je fuer sich auf den Horizont gekappt.
+    * **zusammen** (1&1, `buendel_monatlich`): der Anbieter nennt EINEN
+      Monatsbetrag fuer Tarif und Geraet (§ 13.2 der Strategie - ihn
+      aufzuteilen waere eine Rechnung dieses Projekts). Er wird als EIN
+      Posten gefuehrt und genauso auf 24 Monate gekappt wie eine Rate; was
+      jenseits liegt, steht ebenso in `restbetrag`.
     """
     ergebnis = Tco(horizont=TCO_HORIZONT)
 
-    if buendel.tarif_monatlich is not None:
-        ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
-            round(buendel.tarif_monatlich * TCO_HORIZONT, 2)
+    if buendel.buendel_monatlich is not None:
+        im_horizont = min(buendel.laufzeit_monate, TCO_HORIZONT)
+        ergebnis.bestandteile[f"{POSTEN_BUENDEL} ({im_horizont} von "
+                              f"{buendel.laufzeit_monate})"] = \
+            round(buendel.buendel_monatlich * im_horizont, 2)
+        offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
+        ergebnis.restbetrag = round(buendel.buendel_monatlich * offen, 2)
     else:
-        ergebnis.luecken.append(POSTEN_TARIF)
-
-    if not buendel.ohne_geraet:
-        # 0.0 ist ein gemessener Betrag ("keine Zuzahlung"), None ist eine
-        # Luecke ("nicht gemessen"). Der Unterschied ist der ganze Punkt.
-        if buendel.geraet_zuzahlung is not None:
-            ergebnis.bestandteile[POSTEN_ZUZAHLUNG] = buendel.geraet_zuzahlung
+        if buendel.tarif_monatlich is not None:
+            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
+                round(buendel.tarif_monatlich * TCO_HORIZONT, 2)
         else:
-            ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
+            ergebnis.luecken.append(POSTEN_TARIF)
 
-        if buendel.geraet_monatsrate is not None:
-            im_horizont = min(buendel.laufzeit_monate, TCO_HORIZONT)
-            ergebnis.bestandteile[f"Geräteraten ({im_horizont} von "
-                                  f"{buendel.laufzeit_monate})"] = \
-                round(buendel.geraet_monatsrate * im_horizont, 2)
-            offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
-            ergebnis.restbetrag = round(buendel.geraet_monatsrate * offen, 2)
-        else:
-            ergebnis.luecken.append(POSTEN_RATE)
+        if not buendel.ohne_geraet:
+            # 0.0 ist ein gemessener Betrag ("keine Zuzahlung"), None ist
+            # eine Luecke ("nicht gemessen"). Der Unterschied ist der ganze
+            # Punkt.
+            if buendel.geraet_zuzahlung is not None:
+                ergebnis.bestandteile[POSTEN_ZUZAHLUNG] = \
+                    buendel.geraet_zuzahlung
+            else:
+                ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
+
+            if buendel.geraet_monatsrate is not None:
+                im_horizont = min(buendel.laufzeit_monate, TCO_HORIZONT)
+                ergebnis.bestandteile[f"Geräteraten ({im_horizont} von "
+                                      f"{buendel.laufzeit_monate})"] = \
+                    round(buendel.geraet_monatsrate * im_horizont, 2)
+                offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
+                ergebnis.restbetrag = round(buendel.geraet_monatsrate * offen,
+                                            2)
+            else:
+                ergebnis.luecken.append(POSTEN_RATE)
 
     if buendel.anschlusspreis is not None:
         ergebnis.bestandteile[POSTEN_ANSCHLUSS] = buendel.anschlusspreis
