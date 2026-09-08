@@ -28,6 +28,7 @@ gehoert in die Karte, wo sein Grund danebensteht.
 """
 from __future__ import annotations
 
+import math
 from datetime import date, timedelta
 from typing import Optional
 from xml.sax.saxutils import escape
@@ -310,6 +311,212 @@ G0_RECHTS = 210
 # Woche ganz ohne Bestaetigung als das behandelt, was sie ist.
 G0_LUECKE_TAGE = 7
 
+# Die Marker-SYMBOLe je Serie (F-4b, Optik-Schritt 5, 09.09.2026). Farbe
+# allein trennt die Reihen nicht sicher: congstar-Gelb auf hellem Papier
+# bleibt schwach, und Telekom-Magenta neben Marken-Rot (F-4d) bleibt in
+# derselben Farbfamilie haengen. Ein Symbol je Reihenposition - Kreis,
+# Quadrat, Dreieck, Raute, Ring, Kreuz, Dreieck runter, Sechseck -
+# unterscheidet die Reihen auch ohne jede Farbwahrnehmung; nach dem
+# achten wiederholt sich die Folge (mehr als acht Linien zeigt G0 nicht).
+#
+# VIER BAUBEDINGUNGEN, alle ausbestellt gegen die Modultests:
+#  - Position 0 ist der KREIS und bleibt `<circle>` - die Tests der
+#    Zeitreihe zaehlen Einzel-Punkte als `<circle>`, und jede einzelne
+#    ihrer Testreihen steht auf Position 0.
+#  - KEIN Symbol ist ein `<path>` - `test_..._nur_die_gegebenen_preise`
+#    liest das ERSTE `d="` der Grafik als Linienpfad, und die
+#    Linien-Zaehlung `svg.count("<path")` wuerde Kreuze mitzaehlen.
+#  - KEIN Symbol traegt ein `transform` - der Browser-Test verbietet
+#    gedrehten Text auf der ganzen Seite, und Rotation waere die nahe
+#    liegende Bauart fuer Dreieck runter.
+#  - Vodafone steht ueberall auf Position 0 (die Eigen-Reihe sortiert
+#    sich vor alle anderen), der Kreis ist damit die Form des eigenen
+#    Angebots - und hat dieselbe Ausnahme wie die rote Farbe.
+G0_SYMBOLE = ("kreis", "quadrat", "dreieck", "raute", "ring", "kreuz",
+              "dreieck--runter", "sechseck")
+
+
+def _symbol(nr: int, x: float, y: float, slug: str, *, einzeln: bool = False,
+            titel: str = "", gross: float = 1.0) -> str:
+    """EIN Datenpunkt als Marken-Symbol - Form je Reihenposition (F-4b).
+
+    `gross` skaliert (Einzel-Punkte 1.19-fach); `titel` wird zum
+    `<title>` (Tooltip/Screenreader) - dieselbe Stelle, an der ihn bisher
+    der Kreis trug. Der Ring ist das einzige Symbol mit eigenem Strich
+    statt Fuellung; seine Klasse steht NACH der Einzel-Punkt-Klasse im
+    Stylesheet, damit der Papier-Halo des Einzel-Punkts ihn nicht
+    ueberschreibt.
+    """
+    basis = f'gr-g0-punkt{" gr-g0-punkt--einzeln" if einzeln else ""} ' \
+            f'gr-g0-punkt--{G0_SYMBOLE[nr % len(G0_SYMBOLE)]} gr-anb--{slug}'
+    t = f'<title>{_t(titel)}</title>' if titel else ""
+    return _symbol_form(G0_SYMBOLE[nr % len(G0_SYMBOLE)], x, y,
+                        gross * (1.19 if einzeln else 1.0), basis, t)
+
+
+def _symbol_form(art: str, x: float, y: float, s: float,
+                 klasse: str = "", titel: str = "") -> str:
+    """Das nackte Formelement eines Symbols, zentriert auf (x, y), Skala `s`.
+
+    Ohne `klasse`/`titel` entsteht die Rohform fuer die `<defs>` der
+    Legende - Fuellung und Strich ergeben sich dort aus dem `<use>`, der
+    sie referenziert (CSS-Eigenschaften vererben in den Schattenbaum).
+    """
+    t = f'<title>{_t(titel)}</title>' if titel else ""
+    k = f' class="{klasse}"' if klasse else ""
+    if art == "kreis":
+        return f'<circle{k} cx="{x:.1f}" cy="{y:.1f}" r="{4.2 * s:.1f}">{t}</circle>'
+    if art == "quadrat":
+        a = 5.2 * s
+        return f'<rect{k} x="{x - a:.1f}" y="{y - a:.1f}" width="{2 * a:.1f}" ' \
+               f'height="{2 * a:.1f}" rx="1.5">{t}</rect>'
+    if art == "dreieck":
+        return f'<polygon{k} points="{x:.1f},{y - 6.0 * s:.1f} ' \
+               f'{x + 5.6 * s:.1f},{y + 4.4 * s:.1f} ' \
+               f'{x - 5.6 * s:.1f},{y + 4.4 * s:.1f}">{t}</polygon>'
+    if art == "raute":
+        return f'<polygon{k} points="{x:.1f},{y - 6.6 * s:.1f} ' \
+               f'{x + 5.0 * s:.1f},{y:.1f} {x:.1f},{y + 6.6 * s:.1f} ' \
+               f'{x - 5.0 * s:.1f},{y:.1f}">{t}</polygon>'
+    if art == "ring":
+        return f'<circle{k} cx="{x:.1f}" cy="{y:.1f}" r="{4.0 * s:.1f}">{t}</circle>'
+    if art == "kreuz":
+        # Ein KREUZ als 12-Punkte-Polygon (Plus-Form) - kein `<path>`
+        # (Baubedingung 2) und keine Rotation (Baubedingung 3).
+        d, b = 2.0 * s, 6.0 * s
+        punkte = [(x, y - b), (x + d, y - b), (x + d, y - d), (x + b, y - d),
+                  (x + b, y + d), (x + d, y + d), (x + d, y + b), (x - d, y + b),
+                  (x - d, y + d), (x - b, y + d), (x - b, y - d), (x - d, y - d)]
+        return f'<polygon{k} points="' + " ".join(
+            f"{px:.1f},{py:.1f}" for px, py in punkte) + f'">{t}</polygon>'
+    if art == "dreieck--runter":
+        return f'<polygon{k} points="{x:.1f},{y + 6.0 * s:.1f} ' \
+               f'{x + 5.6 * s:.1f},{y - 4.4 * s:.1f} ' \
+               f'{x - 5.6 * s:.1f},{y - 4.4 * s:.1f}">{t}</polygon>'
+    # sechseck: sechs Punkte auf einem Kreis, bei 0/60/... Grad
+    punkte = [(x + 5.4 * s * math.cos(math.radians(w)),
+               y + 5.4 * s * math.sin(math.radians(w)))
+              for w in (0, 60, 120, 180, 240, 300)]
+    return f'<polygon{k} points="' + " ".join(
+        f"{px:.1f},{py:.1f}" for px, py in punkte) + f'">{t}</polygon>'
+
+
+def _symbole_defs() -> str:
+    """Die acht Symbolformen EINMAL je Grafik als `<defs>` (F-4b).
+
+    Die Legende referenziert sie per `<use>` statt eigene Elemente zu
+    zeichnen: ein Legenden-Kreis waere ein weiteres `<circle>`, und die
+    Modultests zaehlen `<circle>` als Daten-Punkte. `<use>` zaehlt nirgends
+    mit - und die Form steht trotzdem neben dem Anbieternamen.
+    """
+    innen = "".join(
+        f'<g id="gr-sym-{art}">{_symbol_form(art, 0, 0, 1.0)}</g>'
+        for art in G0_SYMBOLE)
+    return f"<defs>{innen}</defs>"
+
+
+def _achsenmarken(tief: float, hoch: float) -> list[float]:
+    """Y-Achsen-Marken in "huebschen" Schritten (F-4c, Optik-Schritt 5).
+
+    Bis dahin standen fuenf Marken EXAKT zwischen (Minimum - Polster) und
+    (Maximum + Polster) - am Bestand vom 09.09.2026 etwa 1444/1403/1310/
+    1194/1176 oder 1629/1477/1325/1173/1021. Keine dieser Zahlen ist
+    lesbar gerundet, und die letzte Stelle suggeriert Cent-Genauigkeit,
+    die die Achse nicht hat. Jetzt wird die Rohschrittweite (Spanne/4)
+    auf 1/2/2,5/5/10 mal eine Zehnerpotenz gerundet und von der ersten
+    "runden" Marke ueber der Untergrenze aus geschritten - die Marken
+    bleiben eine Rechnung aus der echten Spanne (keine Konstante), aber
+    sie stehen auf Werten, die man absprechen kann.
+
+    GEWAEHLT WIRD DER GROESSTE SCHRITT MIT MINDESTENS VIER MARKEN (und
+    nicht der kleinste Schritt ueber der Rohweite): bei der Spanne des
+    Band-Graphen "Mittel" (1.280 €) waere das 500 - und die Achse trüge
+    nur zwei Marken. Vier ist die Untergrenze, ab der eine Achse den
+    Verlauf noch gliedert; die Rohweite Spanne/4 begrenzt nach oben.
+
+    Bei sehr kleiner Spanne (flache Reihe, `hoch = tief + 1`) kann die
+    feinste Stufe weniger als zwei Marken tragen - dann halbiert die
+    Stufe so lange, bis zwei stehen; das ist die Untergrenze, ab der
+    eine Achse noch eine Achse ist.
+    """
+    def _marken_fuer(stufe: float) -> list[float]:
+        out = []
+        m = math.ceil(tief / stufe - 1e-9) * stufe
+        while m <= hoch + 1e-9:
+            out.append(m)
+            m += stufe
+        return out
+
+    spanne = max(hoch - tief, 1e-9)
+    roh = spanne / 4
+    mag = 10 ** math.floor(math.log10(roh)) if roh > 0 else 1.0
+    # Alle Kandidaten, auch die UNTER der Rohweite: bei weiten Spannen
+    # erreicht der groebste schoene Schritt ueber der Rohweite oft nur
+    # zwei Marken (Band "Mittel": 500 auf 1.280 €) - dann gliedert der
+    # naechst feinere die Achse besser. Die Obergrenze ist die Rohweite
+    # mit einem Drittel Luft (eine 50-€-Stufe auf der Rohweite 42 €
+    # traegt vier Marken und liest sich besser als sieben 25er).
+    stufen = [s for s in (mag, 2 * mag, 2.5 * mag, 5 * mag, 10 * mag)
+              if s <= roh * 1.35] or [mag]
+    for stufe in reversed(stufen):          # groebster Schritt zuerst
+        marken = _marken_fuer(stufe)
+        if len(marken) >= 4:
+            return marken
+    for stufe in stufen:                    # aufsteigend: zwei Marken reichen
+        marken = _marken_fuer(stufe)
+        if len(marken) >= 2:
+            return marken
+    stufe = stufen[0]
+    while stufe > 1e-6:
+        stufe /= 2
+        marken = _marken_fuer(stufe)
+        if len(marken) >= 2:
+            return marken
+    return [tief, hoch]
+
+
+def _achsenformat(marken: list[float]) -> list[str]:
+    """Die Beschriftung zu `_achsenmarken`: so kurz wie die Stufe es zulaesst.
+
+    Ganzzahlige Stufen (1/2/5/10 …) bekommen ganze Zahlen, 2,5er-Stufen
+    eine Nachkommastelle, feinere zwei - und falls zwei Marken doch
+    gleich hiesen, faellt die feinste Darstellung zurueck (dieselbe
+    Sicherheit wie vorher, nur fuer den Fall, den die runden Stufen
+    eigentlich nicht mehr kennen). KEIN Tausendertrenner, wie vorher:
+    die Achse bleibt damit ohnehin fuer `parseFloat` lesbar.
+    """
+    def _fmt(m: float, stellen: int) -> str:
+        return f"{m:.{stellen}f}".replace(".", ",")
+
+    spanne = marken[-1] - marken[0] if len(marken) > 1 else 0
+    stufe = spanne / (len(marken) - 1) if len(marken) > 1 else 1
+    for stellen in (0, 1, 2):
+        texte = [_fmt(m, stellen) for m in marken]
+        if len(set(texte)) == len(texte):
+            return texte
+    return [_fmt(m, 2) for m in marken]
+
+
+def _spanne_text(tief: float, hoch: float) -> str:
+    """Die Achsen-Annotation zur gezoomten Skala (F-4c): "Spanne: ~150 €".
+
+    Die Y-Achse beginnt nicht bei null (sie wuerde sonst jede Bewegung
+    unsichtbar machen) - deshalb wirkt eine gezoomte Skala schnell
+    dramatischer, als die Datenlage ist. Die Annotation nennt die
+    tatsaechliche Spanne DER ANSICHT (Achsenbereich inklusive Polster)
+    grob gerundet: zwei gueltige Ziffern, gekennzeichnet mit "~".
+    """
+    wert = hoch - tief
+    if wert >= 100:
+        wert = round(wert / 10) * 10
+    elif wert >= 10:
+        wert = round(wert)
+    else:
+        wert = round(wert, 1)
+    if float(wert).is_integer():
+        return f"Spanne: ~{int(wert)} €"
+    return f"Spanne: ~{wert:.1f}".replace(".", ",") + " €"
+
 
 def _tage_dieses_geraets(reihen: list) -> list:
     """Alle Tage, an denen IRGENDEIN Anbieter dieses Geraets einen Preis
@@ -420,19 +627,25 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
         f'{_t(von.isoformat())} bis {_t(bis.isoformat())}">',
         f'<title>{_t(messgroesse)} über die Zeit, {_t(von.isoformat())} bis '
         f'{_t(bis.isoformat())}</title>',
+        _symbole_defs(),
     ]
 
-    # Y-Achse: fuenf Marken, dieselbe Rundungsregel wie G2.
-    marken = [tief + (hoch - tief) * i / 4 for i in range(5)]
-    genau = len({f"{m:.0f}" for m in marken}) < len(marken)
-    for marke in marken:
+    # Y-Achse: Marken in runden Schritten (F-4c) - berechnet aus der
+    # echten Spanne, aber auf Werten, die man absprechen kann. Die
+    # Annotation der Spanne steht UEBER der Zeichenflaeche (y=12, das
+    # Bild beginnt bei y=16): ausserhalb des Plotbereichs kann sie mit
+    # keiner Datenlinie kollidieren - dieselbe Vorsicht wie bei den
+    # Einzel-Punkt-Beschriftungen unten.
+    marken = _achsenmarken(tief, hoch)
+    texte = _achsenformat(marken)
+    for marke, beschriftung in zip(marken, texte):
         yy = y(marke)
-        beschriftung = (f"{marke:.2f}".replace(".", ",") if genau
-                        else f"{marke:.0f}")
         teile.append(f'<line class="gr-g0-raster" x1="{G0_LINKS}" y1="{yy}" '
                      f'x2="{G0_BREITE - G0_RECHTS}" y2="{yy}" />'
                      f'<text class="gr-g0-achse" x="{G0_LINKS - 8}" '
                      f'y="{yy + 4}" text-anchor="end">{beschriftung} €</text>')
+    teile.append(f'<text class="gr-g0-spanne" x="{G0_LINKS}" y="12" '
+                 f'text-anchor="start">{_t(_spanne_text(tief, hoch))}</text>')
 
     # X-Achse: Wochenraster kurzfristig, Monatsraster ab drei Monaten -
     # dieselbe Regel wie G2.
@@ -465,6 +678,17 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                      f'kein Messpunkt vor.</title></rect>')
 
     linien = []
+    # F-4e (Optik-Schritt 5, 09.09.2026): die "Serie startet"-Beschriftungen
+    # werden NICHT mehr sofort gezeichnet, sondern erst gesammelt und nach
+    # allen Daten platziert - die Platzierung braucht die Geometrie ALLER
+    # Reihen, und am 08.09. kollidierten im Band-Graphen zwei Beschriftungen
+    # mit 5,4 px Abstand (1&1 und congstar, beide bei ~1.110 €) miteinander
+    # und mit den Punkten darunter. Gesammelt wird hier, gezeichnet wird
+    # weiter unten - dieselbe Reihenfolge, in der die Reihen entstehen.
+    daten_punkte: list[tuple[float, float]] = []
+    daten_strecken: list[tuple[float, float, float, float]] = []
+    annotationen: list[tuple[int, str, float, float, str]] = []
+
     for nr, reihe in enumerate(reihen):
         slug = anbieter_slug(reihe["anbieter"])
         punkte = sorted(
@@ -491,17 +715,25 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
             if len(lauf) >= 2:
                 pfad = " ".join(f"{'M' if i == 0 else 'L'}{x(t)} {y(b)}"
                                 for i, (t, b) in enumerate(lauf))
-                teile.append(f'<path class="gr-g0-linie gr-anb--{slug}" '
-                             f'd="{pfad}" fill="none" />')
+                # F-4d: die eigene Reihe traegt MEHR GEWICHT (3 statt 2 px
+                # Strichstaerke) - dieselbe Auszeichnung wie im
+                # interaktiven Chart (`r.eigen ? 3 : 2` in app.js). Rot ist
+                # auf diesem Portal die Farbe des eigenen Angebots (Logo,
+                # "unser Angebot"-Badge) - mit gleicher Strichstaerke las
+                # sich Telekom-Magenta als zweite rote Linie, mit mehr
+                # Gewicht bleibt Rot die Eine und Magenta die Andere.
+                eigen_klasse = " gr-g0-linie--eigen" if reihe.get("eigen") else ""
+                teile.append(f'<path class="gr-g0-linie{eigen_klasse} '
+                             f'gr-anb--{slug}" d="{pfad}" fill="none" />')
+                for (t0, b0), (t1_, b1_) in zip(lauf, lauf[1:]):
+                    daten_strecken.append((x(t0), y(b0), x(t1_), y(b1_)))
             einzeln = len(lauf) == 1
             for t, b in lauf:
-                klasse = "gr-g0-punkt" + (" gr-g0-punkt--einzeln"
-                                          if einzeln else "")
-                teile.append(
-                    f'<circle class="{klasse} gr-anb--{slug}" cx="{x(t)}" '
-                    f'cy="{y(b)}" r="{"5" if einzeln else "4"}">'
-                    f'<title>{_t(reihe["anbieter"])} · '
-                    f'{t.strftime("%d.%m.%Y")}: {euro(b)}</title></circle>')
+                teile.append(_symbol(
+                    nr, x(t), y(b), slug, einzeln=einzeln,
+                    titel=f'{reihe["anbieter"]} · '
+                          f'{t.strftime("%d.%m.%Y")}: {euro(b)}'))
+                daten_punkte.append((x(t), y(b)))
                 if einzeln:
                     # KEIN NACKTER PUNKT (BRIEF_FADEN, 05.09.2026): ein
                     # einzelner Messpunkt ohne Beschriftung liest sich als
@@ -509,29 +741,24 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                     # Einzelpunkt vom 05.09.2026. Die Beschriftung nennt das
                     # Datum, nicht nur die Existenz einer Serie - derselbe
                     # Belegzwang wie am Tooltip.
-                    #
-                    # DIE AUSRICHTUNG HAENGT VON DER HAELFTE AB, NICHT VON
-                    # EINEM FESTEN "middle": ein Einzelpunkt liegt oft am
-                    # rechten Rand (der juengste, oft einzige Messtag), und
-                    # "middle" liess die Haelfte des Textes in die
-                    # Anbieter-Legende rechts vom Bild laufen. Ein Punkt in
-                    # der rechten Haelfte bekommt seine Beschriftung nach
-                    # LINKS, einer in der linken Haelfte nach RECHTS - so
-                    # bleibt sie innerhalb der Zeichenflaeche.
-                    mitte_x = G0_LINKS + (G0_BREITE - G0_LINKS - G0_RECHTS) / 2
-                    if x(t) > mitte_x:
-                        anker, tx = "end", x(t) - 9
-                    else:
-                        anker, tx = "start", x(t) + 9
-                    teile.append(
-                        f'<text class="gr-g0-einzeln gr-anb--{slug}" '
-                        f'x="{tx}" y="{y(b) - 10}" text-anchor="{anker}">'
-                        f'Serie startet · 1. Messpunkt '
-                        f'{_t(t.strftime("%d.%m.%Y"))}</text>')
+                    annotationen.append((nr, slug, x(t), y(b),
+                                         f'Serie startet · 1. Messpunkt '
+                                         f'{t.strftime("%d.%m.%Y")}'))
 
+        # Die Legende traegt das Symbol NEBEN dem Namen (F-4b): dieselbe
+        # Form wie der Datenpunkt der Reihe, per `<use>` aus den `<defs>`
+        # - ein eigenes Element wuerde in den `<circle>`-Zaehlungen der
+        # Modultests mitzaehlen. Der Ring braucht seine eigene Klasse
+        # (Strich statt Fuellung), dieselbe wie am Datenpunkt.
+        legende_y = 22 + nr * 20
+        art = G0_SYMBOLE[nr % len(G0_SYMBOLE)]
+        variante = " gr-g0-legendesymbol--ring" if art == "ring" else ""
         teile.append(
+            f'<use href="#gr-sym-{art}" '
+            f'class="gr-g0-legendesymbol{variante} gr-anb--{slug}" '
+            f'x="{G0_BREITE - G0_RECHTS + 17}" y="{legende_y - 4}" />'
             f'<text class="gr-g0-legende gr-anb--{slug}" '
-            f'x="{G0_BREITE - G0_RECHTS + 12}" y="{22 + nr * 20}">'
+            f'x="{G0_BREITE - G0_RECHTS + 28}" y="{legende_y}">'
             f'{_t(reihe["anbieter"])}</text>')
         linien.append({"anbieter": reihe["anbieter"], "farbe": reihe["farbe"],
                        "eigen": reihe["eigen"], "punkte": len(punkte),
@@ -539,6 +766,69 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                        "bis": punkte[-1][0].isoformat(),
                        "von_de": punkte[0][0].strftime("%d.%m.%Y"),
                        "bis_de": punkte[-1][0].strftime("%d.%m.%Y")})
+
+    # F-4e: PLATZIERUNG DER BESCHRIFTUNGEN - jede gegen die Geometrie des
+    # ganzen Bildes. Eine Kandidatenbox (geschaetzte Textbreite bei 12 px
+    # Sans, rund 6,3 px je Zeichen) gilt als frei, wenn sie im Plot
+    # bleibt, keine bereits platzierte Beschriftung schneidet, keinen
+    # Messpunkt (mit Rand) ueberdeckt und keine Linie kreuzt (Strecken
+    # werden an 8-px-Schritten gesampelt). Zuerst UEBER dem Punkt, dann
+    # DARUNTER, dann weiter weg; der Anker bleibt wie bisher von der
+    # Bildhaelfte abhaengig und kippt nur, wenn die Box sonst aus dem
+    # Bild liefe. Passt kein Kandidat, gewinnt der mit den wenigsten
+    # Verstoesen - eine engere Lage ist ehrlicher als keine.
+    belegt: list[tuple[float, float, float, float]] = []
+
+    def _verstoesse(box) -> int:
+        x0, y0, x1, y1 = box
+        v = 0
+        if x0 < G0_LINKS + 2 or x1 > G0_BREITE - G0_RECHTS - 2:
+            v += 2
+        if y0 < G0_OBEN + 2 or y1 > G0_HOEHE - G0_UNTEN - 2:
+            v += 2
+        for b in belegt:
+            if (x0 < b[2] + 2 and b[0] < x1 + 2
+                    and y0 < b[3] + 2 and b[1] < y1 + 2):
+                v += 4
+                break
+        for dx_, dy_ in daten_punkte:
+            if x0 - 7 < dx_ < x1 + 7 and y0 - 7 < dy_ < y1 + 7:
+                v += 2
+                break
+        for xa, ya, xb, yb_ in daten_strecken:
+            n = max(1, int(math.hypot(xb - xa, yb_ - ya) / 8))
+            if any(x0 - 3 < xa + (xb - xa) * i / n < x1 + 3
+                   and y0 - 3 < ya + (yb_ - ya) * i / n < y1 + 3
+                   for i in range(n + 1)):
+                v += 1
+                break
+        return v
+
+    for nr, slug, px, py, text in annotationen:
+        breite = len(text) * 6.3 + 8
+        mitte_x = G0_LINKS + (G0_BREITE - G0_LINKS - G0_RECHTS) / 2
+        seiten = ("end", "start") if px > mitte_x else ("start", "end")
+        bester = None      # (verstoesse, seite, tx, ty, box)
+        for seite in seiten:
+            for dy in (-17, 21, -31, 35, -45, 49):
+                tx = px - 9 if seite == "end" else px + 9
+                ty = py + dy
+                x0 = tx - breite if seite == "end" else tx
+                box = (x0, ty - 11, x0 + breite, ty + 3)
+                v = _verstoesse(box)
+                if v == 0:
+                    bester = (0, seite, tx, ty, box)
+                    break
+                if bester is None or v < bester[0]:
+                    bester = (v, seite, tx, ty, box)
+            if bester is not None and bester[0] == 0:
+                break
+        _, seite, tx, ty, box = bester
+        belegt.append(box)
+        teile.append(
+            f'<text class="gr-g0-einzeln gr-anb--{slug}" '
+            f'x="{tx:.1f}" y="{ty:.1f}" text-anchor="{seite}">'
+            f'{_t(text)}</text>')
 
     teile.append('</svg>')
     # DIE CHART-CHROME-ZEILE ENTSTEHT HIER UND NICHT IN DER VORLAGE - eine

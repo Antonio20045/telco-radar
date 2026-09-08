@@ -131,7 +131,13 @@ def test_die_19_tage_luecke_wird_nicht_ueberbrueckt():
                      [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" not in ergebnis["svg"]
-    assert ergebnis["svg"].count("<circle") == 2
+    # Neukalibriert am 09.09.2026 (Optik-Schritt 5, F-4b): Daten-Punkte
+    # sind seitdem Marken-SYMBOLE (Kreis, Quadrat, Dreieck, ...), nicht
+    # mehr durchgaengig `<circle>` - gezaehlt wird das Klassenpraefix
+    # `gr-g0-punkt`, das nur Daten-Punkte tragen (Legenden-Symbole sind
+    # `<use class="gr-g0-legendesymbol…">`, defs-Formen tragen gar keine
+    # Klasse). Vorher: `svg.count("<circle")`.
+    assert ergebnis["svg"].count('class="gr-g0-punkt ') == 2
     assert ergebnis["svg"].count("gr-g0-punkt--einzeln") == 2
 
 
@@ -156,7 +162,9 @@ def test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe():
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["svg"].count("<path") == 1
     assert ergebnis["svg"].count("gr-g0-punkt--einzeln") == 1
-    assert ergebnis["svg"].count("<circle") == 3
+    # Neukalibriert am 09.09.2026 (F-4b): Symbole statt fester Kreise -
+    # siehe test_die_19_tage_luecke_wird_nicht_ueberbrueckt.
+    assert ergebnis["svg"].count('class="gr-g0-punkt ') == 3
 
 
 def test_die_luecke_bekommt_ein_sichtbares_feld():
@@ -217,7 +225,9 @@ def test_genau_ein_messpunkt_erzeugt_keine_linie_im_ganzen_bild():
     reihen = [_reihe("Telekom", [("2026-09-05", 1197.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" not in ergebnis["svg"]
-    assert ergebnis["svg"].count("<circle") == 1
+    # Neukalibriert am 09.09.2026 (F-4b): Symbole statt fester Kreise -
+    # siehe test_die_19_tage_luecke_wird_nicht_ueberbrueckt.
+    assert ergebnis["svg"].count('class="gr-g0-punkt ') == 1
     assert ergebnis["messtage"] == 1
     assert ergebnis["seit"] == "2026-09-05"
 
@@ -319,6 +329,12 @@ def test_es_werden_nur_die_gegebenen_preise_gezeichnet():
     keine dritte, interpolierte Koordinate dazwischen."""
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1310.0)])]
     ergebnis = grafik.zeitreihe(reihen)
-    pfad = ergebnis["svg"].split('d="')[1].split('"')[0]
-    befehle = [c for c in pfad if c in "ML"]
+    # Neukalibriert am 09.09.2026 (F-4b): der Linienpfad wird per Regex am
+    # `gr-g0-linie`-Element gelesen - das naive `split('d="')` traf seit
+    # den Symbol-defs (`id="gr-sym-kreis"`) die id statt des Pfades.
+    import re as _re
+    treffer = _re.search(r'class="gr-g0-linie[^"]*" d="([^"]+)"',
+                         ergebnis["svg"])
+    assert treffer, "kein Linienpfad in der Grafik"
+    befehle = [c for c in treffer.group(1) if c in "ML"]
     assert befehle == ["M", "L"]
