@@ -309,8 +309,15 @@ def _registriere_anbieter_adapter() -> None:
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
     # Text und braucht kein eigenes `ernte`.
+    #
+    # B2 (08.09.2026): derselbe Adapter liest auch die Buendel-Kategorieseite
+    # (`?tariffId=MF_...`, eigene Einstiege mit `kind: buendel` je Tarif).
+    # Der Tarifname steht in derselben Antwort (`productList.selectedPlan`),
+    # deshalb braucht Telekom anders als Vodafone keinen
+    # `loese_tarifnamen`-Haken.
     registriere("telekom_kategorie", Adapter(name="telekom_kategorie",
                                              lies=telekom_modul.lies,
+                                             lies_buendel=telekom_modul.lies_buendel,
                                              direkt=True))
     # NICHT `direkt`: die Kategorieseite `/smartphones` traegt kein
     # Produktschema, nur die verlinkten Produktseiten. Die Linkernte ist
@@ -599,7 +606,15 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         bilanz.status = "frist"
         bilanz.grund = "Zeitbudget des Geraetezweigs erschoepft"
     elif bilanz.gelesene_einstiege:
-        bilanz.status = "ok" if bilanz.listungen else "leer"
+        # BUENDEL ZAEHLEN MIT (B2, 08.09.2026): Bis hier sagte "leer" auch
+        # einem Anbieter, der NUR Buendel geliefert hat - ein `kind:
+        # buendel`-Einstieg erzeugt absichtlich keine Listungen, und seine
+        # Saetze in `bilanz.buendel` waren fuer diesen Status unsichtbar.
+        # "leer" heisst "nichts gefunden", und neun Buendel sind nicht
+        # nichts. (`vollstaendig` gilt fuer "ok" und "leer" gleichermassen -
+        # die Auslistungslogik ruehrt ein reiner Buendellieferant nicht an.)
+        bilanz.status = ("ok" if (bilanz.listungen or bilanz.buendel)
+                         else "leer")
         bilanz.grund = "; ".join(gruende)[:300]
     else:
         # Keine einzige Einstiegsseite vollstaendig gelesen. Der Anbieter
