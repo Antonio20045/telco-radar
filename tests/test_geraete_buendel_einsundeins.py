@@ -249,12 +249,35 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1079.76)
 
 
-def test_der_zustand_kommt_als_neu_aus_dem_titelweg():
+def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
     """1&1 nennt keinen strukturierten Zustand; die Sätze laufen durch
     denselben `lies_listung`-Weg wie jede Listung und erben dessen
     Erkennung (kein Kennzeichen in Titel/Farbe/Hinweis -> neu). Ein
     Bündel ohne belegten Zustand wäre in der Tafel nicht vergleichbar
     (QA-Befund B1)."""
+    # Die echte A57-Seite, NUR der Farbschlüssel der 128-GB-Zeile trägt ein
+    # Kennzeichen (o2 schreibt "erneuert" genauso in die Farbe). Der 256-GB-
+    # Satz bleibt sauber - ein Lauf zeigt damit beide Richtungen: ohne
+    # Kennzeichen wird "neu" GELEITET (Titelweg), nicht vergeblich
+    # weggefasst, und mit Kennzeichen wäre ein fester "neu"-Default rot.
+    seite = _fixture("einsundeins_produktseite_galaxy_a57.html.gz").replace(
+        "AWESOME_GRAY-128", "GRAU_ERNEUERT-128")
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url.endswith("/robots.txt"):
+            return _ROBOTS_FREI
+        if url.endswith("/smartphones"):
+            return 200, _katalogseite(_A57_URL)
+        return 200, seite
+
+    bilanz = sammle_anbieter(_anbieter(), katalog, farben, hole,
+                             "2026-09-08", RobotsWaechter(hole=hole))
+    assert bilanz.status == "ok"
+    assert [b["zustand"] for b in bilanz.buendel] == ["refurbished", "neu"]
+    # Der Zustand ist dieselbe Erkennung, aus der die `-refurbished`-Strecke
+    # der SKU entsteht - ohne sie wäre die Tafel-Zeile nicht vergleichbar.
+    assert "refurbished" in bilanz.buendel[0]["sku_id"]
+    assert "refurbished" not in bilanz.buendel[1]["sku_id"]
 
 
 # ==========================================================================
