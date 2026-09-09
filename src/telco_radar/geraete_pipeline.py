@@ -211,24 +211,38 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # Uebersetzer ohne eigenes Netz, diese Stufe darf zusaetzliche GETs
     # machen. Ein Fehler hier darf den Geraetebestand nicht kosten - er
     # ist zu diesem Zeitpunkt schon gespeichert.
+    #
+    # S2-C (09.09.2026): dieselbe Stelle traegt jetzt auch den
+    # BETRAGS-Haken `Adapter.ergaenze_buendel` (1&1: die
+    # Bereitstellungsgebuehr steht erst im Tarifdetails-Iframe). Beide
+    # Haken laufen NACH dem Sammeln und VOR `aus_rohsaetzen` - was sie
+    # an die Rohsaetze schreiben, landet im selben Zug im Bestand.
     for bilanz in ergebnis["anbieter"]:
         if not bilanz.buendel:
             continue
         anbieter = quellen.nach_name(bilanz.name)
         adapter = ADAPTER.get(anbieter.methode) if anbieter else None
-        if adapter is None or adapter.loese_tarifnamen is None:
+        if adapter is None:
             continue
-        try:
-            aufgeloest = adapter.loese_tarifnamen(
-                hole, dict(getattr(anbieter, "kopfzeilen", None) or {}),
-                bilanz.buendel)
-            if aufgeloest:
-                log.info("%s: %d von %d Buendel-Tarifnamen ueber die "
-                         "Tarifschnittstelle aufgeloest",
-                         bilanz.name, aufgeloest, len(bilanz.buendel))
-        except Exception as exc:                          # noqa: BLE001
-            log.warning("%s: Tarifnamen-Aufloesung gescheitert (%s)",
-                        bilanz.name, exc)
+        for haken, meldung in (
+                (adapter.loese_tarifnamen,
+                 "%s: %d von %d Buendel-Tarifnamen ueber die "
+                 "Tarifschnittstelle aufgeloest"),
+                (adapter.ergaenze_buendel,
+                 "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
+                 "ergaenzt (%d Rohsaetze)")):
+            if haken is None:
+                continue
+            try:
+                gesetzt = haken(
+                    hole, dict(getattr(anbieter, "kopfzeilen", None) or {}),
+                    bilanz.buendel)
+                if gesetzt:
+                    log.info(meldung, bilanz.name, gesetzt,
+                             len(bilanz.buendel))
+            except Exception as exc:                      # noqa: BLE001
+                log.warning("%s: Buendel-Nachsammeln gescheitert (%s)",
+                            bilanz.name, exc)
 
     rohbuendel = [b for bilanz in ergebnis["anbieter"]
                   for b in getattr(bilanz, "buendel", [])]

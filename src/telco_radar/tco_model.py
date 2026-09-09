@@ -479,7 +479,11 @@ def tco_24(buendel: Buendel) -> Tco:
       Monatsbetrag fuer Tarif und Geraet (§ 13.2 der Strategie - ihn
       aufzuteilen waere eine Rechnung dieses Projekts). Er wird als EIN
       Posten gefuehrt und genauso auf 24 Monate gekappt wie eine Rate; was
-      jenseits liegt, steht ebenso in `restbetrag`.
+      jenseits liegt, steht ebenso in `restbetrag`. Die GERAETEZUZAHLUNG
+      steht daneben als ihr eigener Posten (S2-C, 09.09.2026: 1&1 nennt
+      sie je Variante in `hwdVariantsOneOffPaymentFees`); bis dahin fiel
+      sie in dieser Preisform unter den Tisch, weil sie nur in der
+      aufgeteilten vorkam.
     """
     ergebnis = Tco(horizont=TCO_HORIZONT)
 
@@ -490,6 +494,14 @@ def tco_24(buendel: Buendel) -> Tco:
             round(buendel.buendel_monatlich * im_horizont, 2)
         offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
         ergebnis.restbetrag = round(buendel.buendel_monatlich * offen, 2)
+        # Ein Bündel mit Monatsbetrag traegt immer ein Geraet - ein Satz
+        # ohne SKU wirft schon `Buendel.__post_init__`. Dieselbe Regel wie
+        # in der aufgeteilten Form: None ist eine LUECKE, 0.0 ein
+        # gemessener "keine".
+        if buendel.geraet_zuzahlung is not None:
+            ergebnis.bestandteile[POSTEN_ZUZAHLUNG] = buendel.geraet_zuzahlung
+        else:
+            ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
     else:
         if buendel.tarif_monatlich is not None:
             ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \

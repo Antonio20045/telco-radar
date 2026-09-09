@@ -79,10 +79,45 @@ Die Geraet-x-Tarif-Kombinatorik ueber ALLE Tarife traegt die Seite NICHT
 serverseitig - der Konfigurator laedt seine Tariftabelle erst im Browser
 nach. Gemessen 08.09.2026: `?chosenTariff=tariff-anf-m-mvl` liefert eine
 BYTE-IDENTISCHE Antwort wie die Seite ohne Parameter (326 604 Bytes), das
-ld+json bleibt bei "All-Net-Flat S", 44,99. Auch der von der Seite selbst
-verlinkte Tarifdetails-Iframe (`/details-all-net-flat-preisliste?…`) ist
-nur eine 48-KB-JavaScript-Huelle ohne einen Preis. Echte Tarifwaehler gibt
-es an dieser Quelle nur im Browser - das ist eine Messgrenze, keine Luecke.
+ld+json bleibt bei "All-Net-Flat S", 44,99. Echte Tarifwaehler gibt es an
+dieser Quelle nur im Browser - das ist eine Messgrenze, keine Luecke.
+
+DIE EINMALZAHLUNG DES GERAETS (S2-C, 09.09.2026)
+-------------------------------------------------
+DIE GERAETE-EINMALZAHLUNG steht in derselben Antwort wie die Preiskarte:
+`hwdVariantsOneOffPaymentFees = {"product-COSMIC_ORANGE-256":"360,–", …}`
+- dieselben Schluessel wie `hwdVariantsPrices`, Werte als deutsche
+Betraege, mit Gedankenstrich statt der Centstelle ("360,-" heisst
+360,00 EUR). Die Zuweisung steht hinter der Bedingung
+`window.currentHardwareOfferDuration === '36'`: die Einmalzahlung gibt es
+NUR bei der 36-Monats-Finanzierung. Fehlt der Block, fehlt die Zahl - und
+"nicht genannt" bleibt leer statt 0.00 (dieselbe Regel wie beim
+`depositValue` oben).
+
+DER TARIFDETAILS-IFRAME UND DIE BEREITSTELLUNGSGEBUEHR (S2-C, 09.09.2026)
+-------------------------------------------------------------------------
+Bis zum 08.09.2026 stand hier, der von der Seite verlinkte Tarifdetails-
+Iframe sei "eine 48-KB-JavaScript-Huelle ohne einen Preis". Das war falsch
+gemessen: Er traegt keinen BUNDELpreis (sein Smartphoneangebot sagt
+woertlich "Preis abhängig vom gewählten Smartphone"), sehr aber die
+EINMALIGE BEREITSTELLUNGSGEBUEHR des Tarifs - nachgemessen 09.09.2026 an
+`/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&…`
+(HTTP 200, 48 112 B, Absender TelcoRadar/1.0):
+
+    <td><strong>Einmalige Bereitstellungsgebühr</strong></td>
+    <td><div><strong>Tarif ohne Smartphone:</strong> 19,90&nbsp;€<br>
+        <strong>Tarif mit Smartphone:</strong> 39,90&nbsp;€</div></td>
+
+Die Gebuehr ist TARIFF- und GERATEUNABHAENGIG - gegenprobe mit anderem
+Geraet (hw-samsung-galaxy-a57) und anderem Tarif (tariff-anf-m-mvl):
+jeweils 19,90/39,90. Erhoben wird sie als `anschlusspreis` auf dem
+BUNDEL-Satz (unser Bündel hat immer ein Smartphone, also 39,90) durch
+`ergaenze_bereitstellungsgebuehr()` - EIN GET je Tarif-Slug, nicht je
+Geraet, die Adresse nimmt der Adapter unverandert aus dem `data-iframe`-
+Attribut der Geräteseite (nur verlinkte Adressen). robots.txt (gelesen
+09.09.2026): der Pfad ist fuer `User-agent: *` frei - gesperrt sind
+/xml/, /static/, /modules/ und Bestellstrecken, nicht /details-all-net-
+flat-preisliste.
 
 Was serverseitig da ist, ist die Preiskarte des DEFAULT-Tarifs ueber ALLE
 Farben und Speichergroessen - und damit mehr als das ld+json, das nur die
@@ -128,7 +163,8 @@ from __future__ import annotations
 import html as html_modul
 import logging
 import re
-from typing import Optional
+import time
+from typing import Callable, Optional
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
@@ -282,6 +318,13 @@ _TARIF_SPAN_RE = re.compile(
 # setzt (`data-iframe="…?chosenTariff=tariff-anf-s-mvl&…"`).
 _SLUG_RE = re.compile(r"[?&]chosenTariff=([A-Za-z0-9_.-]+)")
 
+# Der Tarifdetails-Link der Seite (S2-C). Das Attribut nennt die Adresse,
+# die der Anbieter selbst fuer die Tarifdetails setzt - relativ, deshalb
+# wird sie gegen die Geräteseite aufgeloest. Erstes Vorkommen: die Seite
+# setzt denselben Link mehrfach (Konfigurator und Fußnote), und sie sind
+# identisch.
+_TARIFDETAILS_RE = re.compile(r'data-iframe="(/details-[^"]+)"')
+
 
 def _preiskarte(text: str) -> str:
     """Der Rumpf der Preiskarte - oder `""`, wenn die Seite keine trägt.
@@ -297,6 +340,51 @@ def _preiskarte(text: str) -> str:
     if ende < 0:
         return ""
     return text[anfang:ende]
+
+
+# --------------------------------------------------------------------------
+# DIE EINMALZAHLUNG - `hwdVariantsOneOffPaymentFees` (S2-C, Modulkopf)
+# --------------------------------------------------------------------------
+
+# Anfang und Schluss derselben Form wie bei der Preiskarte: das Objekt
+# enthaelt keine verschachtelten Klammern, der Schnitt am ersten `};` ist
+# sicher. Der Block steht hinter `currentHardwareOfferDuration === '36'`
+# - fehlt er, gibt es die Einmalzahlung bei diesem Angebot nicht, und
+# KEIN Feld wird gefuellt.
+_EINMALZAHLUNG_ANFANG = "hwdVariantsOneOffPaymentFees = {"
+
+# `'product-COSMIC_ORANGE-256': "360,–"` - dieselbe SCHLUESSELFORM wie die
+# Preiskarte (Zubehoer-Schluessel fallen damit ueber ihre Form, das
+# Anfuehrungszeichen direkt hinter der Speicherzahl), der Wert ist ein
+# deutscher Betrag ALS ZEICHENKETTE. `zahl()` nimmt ihm En-Gedankenstrich
+# und Waehrungszeichen ab.
+_EINMALZAHLUNG_SCHLUESSEL = re.compile(
+    r"[\"']product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)[\"']\s*:\s*"
+    r"[\"'](?P<wert>[^\"']*)[\"']")
+
+
+def _einmalzahlungen(text: str) -> dict:
+    """Die Geräte-Einmalzahlung je (Farbe in ROHSCHREIBWEISE, GB).
+
+    Leer, wenn die Seite den Block nicht traegt - das ist ein eigener,
+    gueltiger Zustand (die Zuweisung steht hinter der Bedingung
+    `=== '36'`, Modulkopf) und KEIN Fehler; darueber entscheidet der
+    Aufrufer.
+    """
+    roh = text or ""
+    anfang = roh.find(_EINMALZAHLUNG_ANFANG)
+    if anfang < 0:
+        return {}
+    ende = roh.find("};", anfang)
+    if ende < 0:
+        return {}
+    out: dict = {}
+    for treffer in _EINMALZAHLUNG_SCHLUESSEL.finditer(roh[anfang:ende]):
+        betrag = zahl(treffer.group("wert"))
+        if betrag is None:
+            continue
+        out[(treffer.group("farbe"), int(treffer.group("gb")))] = betrag
+    return out
 
 
 def _tarifname(text: str) -> str:
@@ -352,11 +440,16 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
     dauer = laufzeit_monate(text)
 
     marke, name = _marke_name(text)
+    # Die Einmalzahlung desselben Angebots (S2-C, Modulkopf): leer ist
+    # ein gueltiger Zustand - der Block steht hinter `=== '36'`.
+    einmalzahlungen = _einmalzahlungen(text)
+    tarifdetails = _tarifdetails_url(text, url)
     out: list[dict] = []
     gesehen: dict[int, tuple[str, float]] = {}
     for treffer in _PREISKARTE_SCHLUESSEL.finditer(karte):
         gb = int(treffer.group("gb"))
-        farbe = treffer.group("farbe").replace("_", " ").strip().lower()
+        farbe_roh = treffer.group("farbe")
+        farbe = farbe_roh.replace("_", " ").strip().lower()
         betrag = round(int(treffer.group("cents")) / 100.0, 2)
         vorher = gesehen.get(gb)
         if vorher is not None:
@@ -372,6 +465,14 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
         gesehen[gb] = (farbe, betrag)
         if not name:
             continue          # ohne Gerätname kein Titel, also kein Satz
+        # DIE EINMALZAHLUNG DES GERAETS, geschluesselt ueber dieselbe
+        # Rohschreibweise wie die Preiskarte. Fehlt der Schlussel, bleibt
+        # das Feld leer - der Betrag einer ANDEREN Farbe derselben Groesse
+        # waere eine Annahme, keine Messung.
+        einmalzahlung = einmalzahlungen.get((farbe_roh, gb))
+        if einmalzahlungen and einmalzahlung is None:
+            log.info("1&1: %s nennt keine Einmalzahlung für %s/%d GB - "
+                     "Feld bleibt offen", url, farbe_roh, gb)
         out.append({
             "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe)
                               if x),
@@ -383,7 +484,14 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
             # § 13.2: EIN Betrag für Tarif und Gerät - keine Aufspaltung
             # ohne Beleg (der Datalayer widerspricht sich selbst, Modulkopf).
             "buendel_monatlich": betrag,
+            # S2-C: die Geräte-Einmalzahlung dieser Variante bei der
+            # 36-Monats-Finanzierung - None heisst "nicht genannt", nicht
+            # "kostet nichts".
+            "geraet_zuzahlung": einmalzahlung,
             "laufzeit_monate": dauer,
+            # Der Tarifdetails-Link des ANBIETERS, fuer die
+            # Bereitstellungsgebühr (siehe ergaenze_bereitstellungsgebuehr).
+            "tarifdetails_url": tarifdetails,
             "url": url,
             "quelle": "einsundeins_buendel",
         })
@@ -408,6 +516,129 @@ def _marke_name(text: str) -> tuple[str, str]:
         if name:
             return str(marke_name).strip(), name
     return "", ""
+
+
+# --------------------------------------------------------------------------
+# DIE BEREITSTELLUNGSGEBUEHR aus dem Tarifdetails-Iframe (S2-C, Modulkopf)
+# --------------------------------------------------------------------------
+
+# Mindestabstand zweier Abrufe derselben Domain - dieselbe Zahl wie der
+# `rate_limit_sekunden` des Anbieters in geraete_quellen.yaml und wie
+# Vodafones Tarif-Haken (`_TARIF_RATE_LIMIT`).
+_GEBUEHR_ABSTAND = 2.0
+
+# Die Gebühr steht in der Tariftabelle des Iframes, wortgleich beim
+# Anbieter (Modulkopf). Gesucht wird der Betrag hinter "Tarif MIT
+# Smartphone" - das Bündel hat immer ein Gerät; der ohne-Smartphone-Preis
+# gehoert zum SIM-only-Tarif und steht im Tarifbestand, nicht hier.
+# Das Fenster begrenzt den Satz auf die Zeilen NACH der Überschrift,
+# damit nicht ein "Tarif mit Smartphone" aus einem anderen Abschnitt
+# Treffer wird.
+_GEBUEHR_FENSTER = 2000
+_BEREITSTELLUNGS_RE = re.compile(r"Einmalige Bereitstellungsgebühr")
+_MIT_SMARTPHONE_RE = re.compile(
+    r"Tarif mit Smartphone:?\s*</strong>\s*([^<]{1,40})")
+
+
+def _tarifdetails_url(text: str, basis_url: str) -> str:
+    """Die Adresse des Tarifdetails-Iframes, wie der Anbieter sie setzt."""
+    treffer = _TARIFDETAILS_RE.search(text or "")
+    if not treffer:
+        return ""
+    return urljoin(basis_url or "https://mobile.1und1.de",
+                   html_modul.unescape(treffer.group(1)))
+
+
+def bereitstellungsgebuehr(text: str) -> Optional[float]:
+    """Die einmalige Bereitstellungsgebühr des Tarifs MIT Smartphone.
+
+    None, wenn die Antwort sie nicht nennt - der Iframe ist auch ohne
+    diese Zeile eine gueltige Tarifseite, und ein fehlender Betrag wird
+    nie angenommen (E1).
+    """
+    roh = text or ""
+    anfang = _BEREITSTELLUNGS_RE.search(roh)
+    if not anfang:
+        return None
+    treffer = _MIT_SMARTPHONE_RE.search(roh, anfang.end(),
+                                        anfang.end() + _GEBUEHR_FENSTER)
+    if not treffer:
+        return None
+    return zahl(html_modul.unescape(treffer.group(1)))
+
+
+def ergaenze_bereitstellungsgebuehr(hole: Callable, kopfzeilen: dict,
+                                    rohbuendel: list) -> int:
+    """`anschlusspreis` auf bereits gesammelte 1&1-Bündelsätze setzen.
+
+    EIN GET JE TARIF-SLUG, nicht je Gerät: Die Gebühr ist tarif- und
+    geräteunabhängig (gemessen, Modulkopf), und alle heute bekannten
+    1&1-Bündel laufen auf demselben Default-Tarif - der Lauf macht also
+    EINEN zusaetzlichen Abruf. Die Adresse steht im `tarifdetails_url`-
+    Feld der Saetze, unverändert aus dem `data-iframe`-Attribut der
+    Geräteseite uebernommen (nur verlinkte Adressen).
+
+    Nicht von `lies_buendel()` selbst aufgerufen: ein Adapter bleibt ein
+    reiner Text-zu-Daten-Uebersetzer ohne eigenes Netz (dieselbe Regel
+    wie bei `vodafone.loese_tarifnamen`); diese Funktion laeuft ueber
+    `Adapter.ergaenze_buendel` aus der Pipeline, NACHDEM alle Anbieter
+    gesammelt sind, und mutiert die Saetze in place.
+
+    Ein gescheiterter Abruf laesst die Saetze UNVERAENDERT - keine
+    Annahme, kein Default (E1), und ein einziger toter Iframe darf die
+    Bündel des Laufs nicht kosten. Zurueck kommt die Zahl der Saetze mit
+    neu gesetzter Gebühr.
+    """
+    # Ein Vertreter je Slug: die erste `tarifdetails_url` dieses Slugs.
+    vertreter: dict[str, str] = {}
+    for satz in (rohbuendel or []):
+        if satz.get("quelle") != "einsundeins_buendel":
+            continue
+        if satz.get("anschlusspreis") is not None:
+            continue
+        slug = str(satz.get("tarif_slug") or "").strip()
+        adresse = str(satz.get("tarifdetails_url") or "").strip()
+        if not slug or not adresse:
+            continue
+        vertreter.setdefault(slug, adresse)
+
+    gebuehren: dict[str, float] = {}
+    letzter = 0.0
+    for slug, adresse in sorted(vertreter.items()):
+        warte = _GEBUEHR_ABSTAND - (time.monotonic() - letzter)
+        if letzter and warte > 0:
+            time.sleep(warte)
+        letzter = time.monotonic()
+        try:
+            status, text = hole(adresse, kopfzeilen=kopfzeilen)
+        except Exception:                                 # noqa: BLE001
+            log.info("1&1: Tarifdetails zu %s nicht abrufbar - "
+                     "Bereitstellungsgebühr bleibt offen", slug)
+            continue
+        if not (200 <= int(status) < 300):
+            log.info("1&1: Tarifdetails zu %s mit HTTP %s - "
+                     "Bereitstellungsgebühr bleibt offen", slug, status)
+            continue
+        gebuehr = bereitstellungsgebuehr(text)
+        if gebuehr is None:
+            log.info("1&1: Tarifdetails zu %s nennen keine "
+                     "Bereitstellungsgebühr - Feld bleibt offen", slug)
+            continue
+        gebuehren[slug] = gebuehr
+
+    gesetzt = 0
+    for satz in (rohbuendel or []):
+        if satz.get("quelle") != "einsundeins_buendel":
+            continue
+        if satz.get("anschlusspreis") is not None:
+            continue
+        slug = str(satz.get("tarif_slug") or "").strip()
+        gebuehr = gebuehren.get(slug)
+        if gebuehr is None:
+            continue
+        satz["anschlusspreis"] = gebuehr
+        gesetzt += 1
+    return gesetzt
 
 
 def lies(text: str, url: str = "") -> list[dict]:
