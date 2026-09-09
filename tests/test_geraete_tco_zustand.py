@@ -283,6 +283,7 @@ def _speicherform(b: Buendel) -> dict:
             "tarif_name": b.tarif_name, "tarif_id": b.tarif_id,
             "tarif_id_guete": b.tarif_id_guete,
             "tarif_monatlich": b.tarif_monatlich,
+            "buendel_monatlich": b.buendel_monatlich,
             "geraet_zuzahlung": b.geraet_zuzahlung,
             "geraet_monatsrate": b.geraet_monatsrate,
             "laufzeit_monate": b.laufzeit_monate,
@@ -294,7 +295,8 @@ def _speicherform(b: Buendel) -> dict:
 
 def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
           punkte: list | None = None,
-          graphloses_modell: bool = False) -> BeautifulSoup:
+          graphloses_modell: bool = False,
+          eins_und_eins: bool = False) -> BeautifulSoup:
     """`punkte` ersetzt die Preishistorie - `test_geraete_preis_mehrdeutig`
     stellt darueber Tage mit zwei Preisen derselben Listung.
 
@@ -302,7 +304,14 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
     Buendel (SKU_GRAPHLOS) an, dem keine Listung und keine Preishistorie
     gegenuebersteht - derselbe Fall wie bei den drei echten Bloecken ohne
     Zeitreihen-Graph. Default False: kein bestehender Aufrufer von `_baue`
-    aendert sein Ergebnis."""
+    aendert sein Ergebnis.
+
+    `eins_und_eins` (S-Q4, 09.09.2026) haengt eine 1&1-Karte an DASSELBE
+    Modell: ein Buendel mit `buendel_monatlich` und OHNE Aufteilung (§ 13.2,
+    Bauweise wie test_geraete_buendel_einsundeins), tarif_id leer wie im
+    echten Bestand - die Karte muss ihre "ab Monat 25"-Luecke selbst
+    benennen. Dient dem Terminologie-Test der BAU-Zeile und der
+    Monatsraten/Geräteraten-Unterscheidung."""
     root = tmp_path / ("mit" if erneuert else "ohne")
     (root / "config").mkdir(parents=True)
     katalog = _KATALOG
@@ -341,6 +350,18 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
         # loest es trotzdem ueber den Katalog auf (F-R2-3), die Karte
         # rechnet, aber `listungen_je_modell` bleibt fuer diese ID leer.
         buendel.append(_buendel(SKU_GRAPHLOS, 20.0, zustand="neu"))
+    if eins_und_eins:
+        # § 13.2: NUR der kombinierte Monatsbetrag, keine Aufteilung - die
+        # Bauweise der echten 1&1-Saetze (44,99 €/36 Monate, siehe
+        # test_geraete_buendel_einsundeins). tarif_id bleibt leer, weil
+        # 1&1-Tarife nicht im Tarifbestand stehen (F5-Kommentar im
+        # Template).
+        buendel.append(Buendel(
+            sku_id=SKU_NEU, anbieter="1&1",
+            tarif_name="1&1 All-Net-Flat S",
+            buendel_monatlich=44.99, laufzeit_monate=36, zustand="neu",
+            quelle_url="https://example.de/einsundeins/" + SKU_NEU,
+            abgerufen_am=HEUTE))
     (state / "geraete_tco.json").write_text(json.dumps({
         "updated": HEUTE, "buendel": [_speicherform(b) for b in buendel],
         "sim_only": [{"id": r.id, "anbieter": r.anbieter,
