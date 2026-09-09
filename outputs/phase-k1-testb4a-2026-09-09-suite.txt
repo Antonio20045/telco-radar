@@ -1,0 +1,11 @@
+Vollsuite (blockierend) auf openclaw/ticket-k1-testb4a nach K-1 + TEST-B4a
+Datum: 2026-09-09, Basis main e1e71aa
+
+Aufruf: PYTHONPATH=src python3 -m pytest -q
+
+2881 passed, 12 skipped, 73 warnings in 320.09s (0:05:20)
+
+Baseline vor dem Ticket: 2880 passed / 0 failed / 12 skipped
+Differenz: +1 (test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl,
+         tests/test_newsletter_filters.py)
+Kein Test geschwaecht, geloescht oder uebersprungen.
