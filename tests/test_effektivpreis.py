@@ -352,6 +352,37 @@ def test_die_bilanz_zaehlt_was_ihr_etikett_sagt(tmp_path):
                for z in tarife_view.aufbereiten(p, [])["zeilen"])
 
 
+def test_die_stat_zeile_am_echten_bestand():
+    """S-Q2 (09.09.2026): dieselben vier Zahlen wie der gestellte Test
+    oben, aber gegen den committeten Bestand in data/state/tarife.jsonl
+    gerechnet (F5-Muster: eine Fixture beweist nur, dass die Rechnung mit
+    sich selbst stimmt). Zwei Zusicherungen kommen hinzu, die nur der
+    echte Bestand pruefen kann:
+
+    * die Cashback-Luecke traegt JEDER Tarif - deshalb steht sie als Satz
+      im Hinweis und in keiner der vier Zahlen. Der Test haelt damit auch
+      den HINWEISSATZ wahr ("stehen in keinem Produktinformationsblatt und
+      fehlen deshalb bei jedem Tarif"): nennt eines Tages ein Blatt
+      Cashback, ist die Seite falsch, nicht der Test.
+    * jeder Tarif hat GENAU EINEN Grund, Punkt der Karte zu sein oder
+      nicht - niemand wird doppelt gezaehlt oder vergessen.
+    """
+    p = (Path(__file__).resolve().parents[1] / "data" / "state"
+         / "tarife.jsonl")
+    view = tarife_view.aufbereiten(p, [])
+    assert view["hat_daten"], "der committete Bestand ist leer"
+    b, zeilen, karte = view["bilanz"], view["zeilen"], view["karte"]
+    assert all("Cashback/Wechselbonus" in z["luecken"] for z in zeilen)
+    ohne_ort = sum(1 for z in zeilen if z["volumen"] and not z["belastbar"])
+    assert (b["in_der_karte"] + b["ohne_volumen"] + b["unbegrenzt"]
+            + ohne_ort) == b["tarife"], "jeder Tarif genau ein Grund"
+    assert b["in_der_karte"] == len(karte["punkte"])
+    assert b["ohne_anschlusspreis"] == sum(
+        1 for z in zeilen if "Anschlusspreis" in z["luecken"])
+    assert b["ohne_volumen"] == sum(
+        1 for z in zeilen if not z["volumen"] and not z["unbegrenzt"])
+
+
 def test_leerer_speicher_ergibt_leere_seite(tmp_path):
     view = tarife_view.aufbereiten(tmp_path / "gibtsnicht.jsonl", [])
     assert view["hat_daten"] is False

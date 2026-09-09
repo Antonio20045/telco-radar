@@ -18,8 +18,10 @@ Unbegrenzte Tarife stehen NICHT in der Wolke
 --------------------------------------------
 Ein Tarif mit unbegrenztem Volumen hat auf einer Volumenachse keinen Ort.
 Ihn ans rechte Ende zu setzen waere eine erfundene Zahl, und sie zoege die
-Ausgleichsgerade mit. Solche Tarife stehen als eigene Liste darunter - mit
-ihrem Effektivpreis, denn der ist bekannt und vergleichbar.
+Ausgleichsgerade mit. Solche Tarife stehen in der Tabelle unten - mit ihrem
+Effektivpreis, denn der ist bekannt und vergleichbar (S-Q2, 09.09.2026:
+eine "eigene Liste" gibt es nicht, und der Hinweis unter der Bilanz sagt
+das mit seiner Zahl).
 
 Die Live-Shop-Lesart fuehrt die Zeile, das Pflichtdokument bleibt Referenz
 ------------------------------------------------------------------------
