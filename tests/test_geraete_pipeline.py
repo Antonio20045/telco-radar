@@ -672,3 +672,119 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
     assert len(zeilen) == 1
     assert zeilen[0]["listung_id"] == eintrag["id"]
     assert zeilen[0]["preis_ohne_vertrag"] == eintrag["preis_ohne_vertrag"]
+
+
+# --------------------------------------------------------------------------
+# S-5 (09.09.2026): die 1&1-SIM-only-Messung im Referenzblock
+# --------------------------------------------------------------------------
+# `sammle_simonly` holt die SIM-only-Seite des Anbieters samt der je Kachel
+# verlinkten Tarifdetails. Diese Tests pruefen die STEUERLOGIK in der
+# Pipeline - der Collector selbst steht in
+# tests/test_tarif_einsundeins_simonly.py mit der echten Seiten-Fixture.
+
+import gzip as _gzip
+
+from telco_radar.collect.tarif_einsundeins_simonly import (
+    SEITEN_URL as _SIMONLY_URL)
+
+_TARIF_FIX = Path(__file__).parent / "fixtures" / "tarife"
+
+_EINSUND_EINS = [
+    {"tarif_id": "11:1-1-all-net-flat-s", "anbieter": "1&1",
+     "name": "1&1 All-Net-Flat S", "art": "mobilfunk",
+     "grundgebuehr": 14.99, "anschlusspreis": None, "preisphasen": [],
+     "dokument_url": "https://www.1und1.de/handytarife",
+     "abgerufen_am": "2026-08-11"},
+    {"tarif_id": "telekom:magentamobil-l", "anbieter": "Telekom",
+     "name": "MagentaMobil L", "art": "mobilfunk", "grundgebuehr": 59.95,
+     "anschlusspreis": None, "preisphasen": [],
+     "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
+     "abgerufen_am": "2026-08-11"},
+]
+
+
+def _simonly_hole(seite_ok=True):
+    """`_hole` plus die 1&1-SIM-only-Welt: robots frei, die echte
+    Seiten-Fixture und EIN Tarifdetails-Dokument fuer alle Slugs."""
+    standard = _hole()
+    with _gzip.open(_TARIF_FIX / "1und1_handytarife_ohne_handy.html.gz",
+                    "rt", encoding="utf-8") as fh:
+        seite = fh.read()
+    with _gzip.open(_TARIF_FIX / "1und1_details_all_net_flat_s.html.gz",
+                    "rt", encoding="utf-8") as fh:
+        details = fh.read()
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url == _SIMONLY_URL:
+            return (200, seite) if seite_ok else (503, "")
+        if "mobile.1und1.de/details-all-net-flat-preisliste" in url:
+            return (200, details)
+        if url == "https://mobile.1und1.de/robots.txt":
+            return (200, "User-agent: *\n")
+        return standard(url)
+    return hole
+
+
+def test_simonly_messung_ersetzt_die_bestandsableitung(tmp_path, monkeypatch):
+    """Die bessere Lesart gewinnt: Quelle, Anschlusspreis und Volumen der
+    1&1-Saetze kommen von der SIM-only-Seite, der Rest des Massstabs
+    bleibt, wie er war."""
+    from telco_radar.collect import tarif_einsundeins_simonly
+    monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
+    root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
+
+    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
+                      hole=_simonly_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
+    s = nach_name["1&1 All-Net-Flat S"]
+    assert s["quelle_url"] == _SIMONLY_URL
+    assert s["anschlusspreis"] == 19.9
+    assert s["volumen_gb"] == 10.0
+    assert s["tarif_sim_only_monatlich"] == 14.99
+    assert [rab["name"] for rab in s["rabatte"]]
+    # Der Telekom-Satz ist unberuehrt auf seiner Pflichtblatt-Quelle
+    # stehen geblieben - kein 1&1-Handgriff darf ihn anfassen.
+    assert nach_name["MagentaMobil L"]["quelle_url"] == \
+        "https://www.telekom.de/pib/magentamobil-l"
+
+
+def test_simonly_messung_ersetzt_nur_was_sie_misst(tmp_path, monkeypatch):
+    """Teildeckung darf nichts loeschen (Review B3): Ein 1&1-Tarif, den die
+    Seite nicht (mehr) listet, behaelt seine Bestandsableitung - sonst
+    wuerde `ersetze_referenzen` ihn still entfernen und seine Buendel
+    ihren Massstab verlieren."""
+    from telco_radar.collect import tarif_einsundeins_simonly
+    monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
+    alt = dict(_EINSUND_EINS[0], tarif_id="11:1-1-alt-tarif",
+               name="1&1 Alt-Tarif", grundgebuehr=9.99)
+    root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS + [alt])
+
+    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
+                      hole=_simonly_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
+    # Der gemessene Tarif ist von der Messung, der ungemessene vom
+    # Bestand - und beide sind DA.
+    assert nach_name["1&1 All-Net-Flat S"]["quelle_url"] == _SIMONLY_URL
+    assert nach_name["1&1 Alt-Tarif"]["quelle_url"] == \
+        "https://www.1und1.de/handytarife"
+
+
+def test_gescheiterte_simonly_messung_laesst_den_bestand_stehen(tmp_path):
+    """HTTP 503 auf der SIM-only-Seite: Messgrenze. Die Bestandsableitung
+    bleibt ungekuerzt stehen - ein Ausfall darf den Massstab nicht
+    leeren, nur seine Herkunft einen Augenblick alt machen."""
+    root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
+
+    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
+                      hole=_simonly_hole(seite_ok=False))
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
+    assert nach_name["1&1 All-Net-Flat S"]["quelle_url"] == \
+        "https://www.1und1.de/handytarife"
+    assert nach_name["1&1 All-Net-Flat S"]["anschlusspreis"] is None
+    assert len(tco["sim_only"]) == 2
