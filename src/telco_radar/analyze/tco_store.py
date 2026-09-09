@@ -74,9 +74,14 @@ _MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
                "laufzeit_monate", "anschlusspreis", "quelle_url",
                "abgerufen_am", "zustand")
 
+# `bindung_monate` und `volumen_gb` seit S-5 (09.09.2026): dieselbe
+# Positivliste-Pflicht wie bei `_MESSFELDER` - ein Messfeld, das hier
+# fehlt, wuerde beim naechsten Lauf still geleert, obwohl die Quelle es
+# weiterhin nennt.
 _REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
                         "tarif_sim_only_monatlich", "anschlusspreis",
-                        "quelle_url", "abgerufen_am", "quelle_art")
+                        "quelle_url", "abgerufen_am", "quelle_art",
+                        "bindung_monate", "volumen_gb")
 
 
 class TcoDB:
