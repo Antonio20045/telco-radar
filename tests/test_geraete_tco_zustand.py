@@ -296,7 +296,9 @@ def _speicherform(b: Buendel) -> dict:
 def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
           punkte: list | None = None,
           graphloses_modell: bool = False,
-          eins_und_eins: bool = False) -> BeautifulSoup:
+          eins_und_eins: bool = False,
+          einmalzahlung: float | None = None,
+          anschlusspreis: float | None = None) -> BeautifulSoup:
     """`punkte` ersetzt die Preishistorie - `test_geraete_preis_mehrdeutig`
     stellt darueber Tage mit zwei Preisen derselben Listung.
 
@@ -311,7 +313,13 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
     Bauweise wie test_geraete_buendel_einsundeins), tarif_id leer wie im
     echten Bestand - die Karte muss ihre "ab Monat 25"-Luecke selbst
     benennen. Dient dem Terminologie-Test der BAU-Zeile und der
-    Monatsraten/Geräteraten-Unterscheidung."""
+    Monatsraten/Geräteraten-Unterscheidung.
+
+    `einmalzahlung`/`anschlusspreis` (S2-C, 09.09.2026) setzen die zwei
+    neuen 1&1-Felder auf genau dieser Karte - beide None (Default) lassen
+    jeden bestehenden Aufrufer unveraendert. Die Werte sind die echten
+    der iPhone-Fixture (360,00/39,90), siehe test_geraete_buendel_
+    einsundeins."""
     root = tmp_path / ("mit" if erneuert else "ohne")
     (root / "config").mkdir(parents=True)
     katalog = _KATALOG
@@ -360,6 +368,7 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
             sku_id=SKU_NEU, anbieter="1&1",
             tarif_name="1&1 All-Net-Flat S",
             buendel_monatlich=44.99, laufzeit_monate=36, zustand="neu",
+            geraet_zuzahlung=einmalzahlung, anschlusspreis=anschlusspreis,
             quelle_url="https://example.de/einsundeins/" + SKU_NEU,
             abgerufen_am=HEUTE))
     (state / "geraete_tco.json").write_text(json.dumps({

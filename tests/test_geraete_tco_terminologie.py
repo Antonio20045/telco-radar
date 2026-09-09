@@ -128,3 +128,30 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     o2 = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
     o2_text = " ".join(o2.get_text(" ", strip=True).split())
     assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
+
+
+def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
+    """S2-C (09.09.2026): die BAU-Zeile einer 1&1-Karte nennt die Geräte-
+    Einmalzahlung und die Bereitstellungsgebühr, wo 1&1 sie bis dahin
+    verschwieg - als eigene Posten hinter dem Monatsbetrag, klein und in
+    derselben Zeile, kein Redesign. Die Werte sind die der echten
+    iPhone-Fixture (360,00/39,90, siehe test_geraete_buendel_einsundeins).
+
+    Die Leitzahl rechnet BEIDE mit - sonst wäre die Zahl neben der Zeile
+    eine zweite Rechnung für dieselbe Karte: 24 x 44,99 + 360 + 39,90
+    = 1.479,66 €."""
+    s = _baue(tmp_path, eins_und_eins=True,
+              einmalzahlung=360.0, anschlusspreis=39.9)
+    eins = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="1&1"]')
+    assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
+    bau = " ".join(eins.select_one(".gr-kk-bau").get_text(" ", strip=True).split())
+    assert bau == ("monatlich 44,99 € für Tarif und Gerät zusammen · "
+                   "36 Monate (24 davon in der TCO-24) · "
+                   "Gerät einmalig 360,00 € · Anschlusspreis 39,90 €")
+    text = " ".join(eins.get_text(" ", strip=True).split())
+    assert "TCO-24 1.479,66 €" in text
+    # Ohne die Felder druckt KEINER von beiden - die Alt-Zeile steht exakt
+    # in test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten
+    # (derselbe _baue-Aufruf ohne die zwei Parameter); die offene
+    # Einmalzahlung steht als benannte Luecke im Rechenweg, nicht als 0,00
+    # in der Finanzzeile.

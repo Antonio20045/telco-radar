@@ -491,12 +491,15 @@
     k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
     k.raten_laufzeit or k.laufzeit }} Monate{% if k.raten_laufzeit and
     k.raten_laufzeit > k.laufzeit %} ({{ k.laufzeit }} davon in der
-    TCO-{{ k.laufzeit }}){% endif %}{% else %}monatlich {{ k.monatlich | euro }}{%
-    if k.zuzahlung is not none %} · Gerät einmalig {{ k.zuzahlung | euro }}{%
-    endif %}{% if k.rate is not none %} · {% if k.raten_summe is not none %}{{
-    k.raten_summe | euro }} in {% endif %}{{ k.raten_laufzeit }} Raten à {{
-    k.rate | euro }}{% endif %}{% if k.anschlusspreis is not none %} ·
-    Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
+    TCO-{{ k.laufzeit }}){% endif %}{% if k.zuzahlung is not none %} · Gerät
+    einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
+    none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
+    %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
+    Gerät einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.rate is not none
+    %} · {% if k.raten_summe is not none %}{{ k.raten_summe | euro }} in
+    {% endif %}{{ k.raten_laufzeit }} Raten à {{ k.rate | euro }}{% endif %}{%
+    if k.anschlusspreis is not none %} · Anschlusspreis {{
+    k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
 
   {# A5.2, PFLICHTZEILE: Antonios Leitfrage, woertlich beantwortet - auch
      und gerade bei 36 Monaten Bindung. #}

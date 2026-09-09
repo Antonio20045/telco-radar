@@ -412,6 +412,13 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
     EINEN Monatsbetrag fuer Tarif und Geraet (`preis_mit_vertrag_ab`) und
     die Laufzeit dazu. Genau so wird er gefuehrt: als
     `Buendel.buendel_monatlich`, ungeteilt.
+
+    DIESE BRUECKE WEICHT VOR GEMESSENEN BUENDELN (S2-C, 09.09.2026):
+    seit der Bündellesart (B4) liefert 1&1 dasselbe Angebot auch als
+    Bündelsatz mit tarif_id, Einmalzahlung und Bereitstellungsgebühr - die
+    Angebots-Dedupe in `modelle()` zieht die gemessene Karte vor
+    (`_angebot_rang`). Eine Listung ohne Bündel-Adapter bleibt dagegen
+    vollgueltig stehen; diese Funktion ist ihre einzige Karte.
     """
     fertig = []
     for e in listungen:
@@ -880,6 +887,21 @@ def _rang(karte: dict) -> tuple:
             else 9e9, karte["anbieter"])
 
 
+def _angebot_rang(karte: dict) -> tuple:
+    """Die Angebots-Dedupe in `modelle()`: QUELLE vor Preis (S2-C).
+
+    Einem Anbieter mit Bündel-Adapter steht dasselbe Angebot ZWEIMAL im
+    Bestand - als Listung (nur der Monatsbetrag) und als gemessenes Bündel
+    (mit Einmalzahlung, Bereitstellungsgebühr und tarif_id). Die Listung
+    kann die billigere Karte sein, weil ihr Posten FEHLEN; sie darf das
+    gemessene Angebot deshalb nicht verdraengen. Erst wenn BEIDE Karten
+    aus derselben Quelle kommen, entscheidet der Preis.
+    """
+    return (1 if karte.get("aus_listung") else 0,
+            karte["schnitt_monat"] if karte["schnitt_monat"] is not None
+            else 9e9)
+
+
 def _vorgabe(modelle: list) -> str:
     """Welches Modell ohne Klick sichtbar ist.
 
@@ -942,6 +964,18 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         listungen_je_modell.setdefault(mid_e, []).append(e)
 
     alle = list(buendel) + buendel_aus_listungen(listungen)
+    # GEMESSENE BUENDEL SCHLAGEN LISTUNGS-BUENDEL DESSELBEN ANGEBOTS
+    # (S2-C, 09.09.2026): fuer 1&1 stehen beide Lesarten nebeneinander - die
+    # Listung nur mit dem Monatsbetrag, das Bündel im Store seit S2-C auch
+    # mit Einmalzahlung und Bereitstellungsgebühr samt tarif_id. In der
+    # Preisordnung des Monatsbetrags war die LISTUNG die guenstigere Karte,
+    # weil ihr Felder fehlen: Sie verdraengte das gemessene Angebot und
+    # riss ihm tarif_id und Band mit (im Wettbewerbs-Radar standen alle
+    # 1&1-Zeilen als Band-Mismatch da, Beleg vom Vortag). Die Listung ist
+    # die BRUECKE fuer Anbieter OHNE Bündel-Adapter - hat derselbe
+    # Anbieter ein gemessenes Bündel, ist sie die schwaechere Quelle und
+    # weicht, egal was sie kostet.
+    listung_ids = {id(b) for b in alle[len(buendel):]}
     gruppen: dict = {}
     for b in alle:
         if not isinstance(b, Buendel) or b.ohne_geraet:
@@ -955,6 +989,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
                                                 b.anbieter),
                        katalog, geraet_je_sku,
                        zustand=zustand_des_buendels(b, zustaende))
+        if id(b) in listung_ids:
+            karte["aus_listung"] = True
         gruppen.setdefault(mid, {"id": mid, "device_id": device_id,
                                  "speicher": speicher, "karten": [],
                                  "skus": set()})
@@ -967,7 +1003,9 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Nur EINE Karte je (Anbieter, Tarif): dasselbe Geraet in drei
         # Farben ist dreimal derselbe Preis, und drei gleiche Karten
         # nebeneinander sind der "Dedupe-Toggle"-Fall aus B.3, nur ohne
-        # Schalter. Genommen wird die guenstigste.
+        # Schalter. Genommen wird die guenstigste - und zuerst die
+        # GEMESSENE (`_angebot_rang`, S2-C: eine billigere Listungskarte
+        # ist billig, weil ihr Felder fehlen).
         #
         # DER ZUSTAND GEHOERT IN DEN SCHLUESSEL. Ohne ihn nahm diese Stelle
         # je (Anbieter, Tarif) die guenstigste Karte - und die guenstigste
@@ -980,8 +1018,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             schluessel = (k["anbieter"], k["tarif"], k["laufzeit"],
                           k["zustand"])
             bisher = je_angebot.get(schluessel)
-            if bisher is None or (k["schnitt_monat"] or 9e9) < \
-                    (bisher["schnitt_monat"] or 9e9):
+            if bisher is None or _angebot_rang(k) < _angebot_rang(bisher):
                 je_angebot[schluessel] = k
         karten = sorted(je_angebot.values(), key=_rang)
 

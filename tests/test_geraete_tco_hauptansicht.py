@@ -40,6 +40,7 @@ def bestand():
                     tarif_name=satz["tarif_name"],
                     tarif_id=satz.get("tarif_id", ""),
                     tarif_monatlich=satz.get("tarif_monatlich"),
+                    buendel_monatlich=satz.get("buendel_monatlich"),
                     geraet_zuzahlung=satz.get("geraet_zuzahlung"),
                     geraet_monatsrate=satz.get("geraet_monatsrate"),
                     laufzeit_monate=satz.get("laufzeit_monate", 24),
@@ -210,13 +211,20 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
     1.079,76 EUR - 1&1s Buendelmonatspreis wird jetzt auf 24 statt 36
     Monate gekappt (dieselbe Kappung wie jede Geraeterate), der Rest steht
     als Restbetrag daneben und veraendert die Antwortzeile nicht.
+
+    S2-C (09.09.2026): 1&1s 1.079,76 EUR waren UNVOLLSTAENDIG - ohne die
+    je Variante erhobene Geräte-Einmalzahlung (360,00) und die
+    Bereitstellungsgebühr (39,90) liegt die Karte bei 1.479,66 EUR, und
+    congstars 1.093,00 EUR (unveraendert, eigene Messung) fuehren. Genau
+    dafuer ist dieser Ticket da: die unvollstaendige Zahl unterbot
+    vorher ein echtes Angebot.
     """
     modell = _modell(bestand, "apple-iphone-17-pro-256")
     antwort = modell["antwort"]
     assert antwort["geraetepreis"] == 1179.0
     assert antwort["geraetepreis_anbieter"] == "Saturn"
-    assert antwort["tarif_gesamt"] == 1079.76
-    assert antwort["tarif_anbieter"] == "1&1"
+    assert antwort["tarif_gesamt"] == 1093.0
+    assert antwort["tarif_anbieter"] == "congstar"
     # Gegenprobe: die zwei Gewinner sind wirklich verschiedene Anbieter -
     # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
     # zwei Metriken.
@@ -381,12 +389,15 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
 
 def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
     """§ 13.2: der Anbieter nennt EINEN Monatsbetrag. Ihn aufzuteilen waere
-    unsere Rechnung."""
+    unsere Rechnung. Die beiden EINMALIGEN Posten der Karte (S2-C:
+    Geräte-Einmalzahlung und Bereitstellungsgebühr) sind KEINE Aufteilung
+    - sie stehen neben dem Bündelpreis, nicht in ihm."""
     karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
              if k["anbieter"] == "1&1"][0]
     assert karte["buendel_monatlich"] == 44.99
     assert karte["monatlich"] is None and karte["rate"] is None
-    assert [p["kategorie"] for p in karte["bestandteile"]] == ["buendel"]
+    assert [p["kategorie"] for p in karte["bestandteile"]] == \
+        ["buendel", "einmalig", "einmalig"]
 
 
 def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet():
