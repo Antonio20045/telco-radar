@@ -99,6 +99,13 @@ class Adapter:
     Sammelantwort selbst nicht nennt (Vodafone: nur ein `offerCoreHash`,
     keine Klarname - siehe `vodafone.py` Modulkopf, Abschnitt B1).
 
+    `ergaenze_buendel(hole, kopfzeilen, rohbuendel) -> int` ist dieselbe
+    Bauform fuer BETRAEGE statt Namen (S2-C, 09.09.2026): 1&1 nennt seine
+    Bereitstellungsgebuehr erst im Tarifdetails-Iframe, einer eigenen
+    Adresse, die die Geräteseite selbst verlinkt. Der Haken macht EIN GET
+    je Tarif-Slug und setzt `anschlusspreis` auf den Saetzen - siehe
+    `einsundeins.ergaenze_bereitstellungsgebuehr`.
+
     `buendel_auf_produktseite` (Voreinstellung True) sagt, ob die zweite
     Lesart auf den Produktseiten des ERNTE-Wegs ueberhaupt sinvoll ist.
     Vodafone traegt seine Buendel in derselben Detailantwort wie die
@@ -117,6 +124,7 @@ class Adapter:
     lies_buendel: Optional[Callable] = None
     buendel_auf_produktseite: bool = True
     loese_tarifnamen: Optional[Callable] = None
+    ergaenze_buendel: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
     # als "mittel" ausweist, obwohl sie aus ld+json stammt.
@@ -358,11 +366,19 @@ def _registriere_anbieter_adapter() -> None:
     # Muster; `buendel_auf_produktseite` bleibt an). Der Satz traegt nur
     # den kombinierten Monatsbetrag (§ 13.2), siehe `einsundeins.lies_
     # buendel`.
+    #
+    # S2-C (09.09.2026): dieselbe Antwort traegt AUCH die Geräte-
+    # Einmalzahlung je Variante (`hwdVariantsOneOffPaymentFees`) und den
+    # Tarifdetails-Link. Die BEREITSTELLUNGSGEBUEHR steht erst hinter
+    # jenem Link - dafuer der `ergaenze_buendel`-Haken: ein GET je
+    # Tarif-Slug, nach dem Sammeln, aus der Pipeline.
     registriere("einsundeins_buendel",
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
                         ernte=einsundeins_modul.ernte,
-                        lies_buendel=einsundeins_modul.lies_buendel))
+                        lies_buendel=einsundeins_modul.lies_buendel,
+                        ergaenze_buendel=(
+                            einsundeins_modul.ergaenze_bereitstellungsgebuehr)))
     # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
     # stehen bereits in dieser einen Antwort, keine Produktseite wird
     # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
