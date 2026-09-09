@@ -263,12 +263,23 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
         "horizont": VERGLEICHSMONATE,
         "hat_daten": bool(zeilen),
         "stand": stand,
+        # Die Bilanz zaehlt, was ihr Etikett sagt (S-Q2): "in der Karte"
+        # sind die Punkte der Karte (bekanntes, begrenztes Volumen UND
+        # rechenbarer Preis), "ohne Anschlusspreis" zaehlt genau diese
+        # eine Luecke. Die Cashback-Luecke zaehlt hier NICHT mit - sie
+        # traegt JEDES Produktinformationsblatt (S-Q2-Befund: 52 von 52),
+        # sie ist eine Eigenschaft der Dokumentenart und keine Aussage
+        # ueber diesen Bestand. Sie steht als Satz im Hinweis.
         "bilanz": {
             "tarife": len(zeilen),
             "anbieter": len(vorhanden),
             "belastbar": sum(1 for z in zeilen if z["belastbar"]),
-            "mit_luecken": sum(1 for z in zeilen if z["luecken"]),
             "in_der_karte": len(_karte(zeilen)["punkte"]),
+            "ohne_anschlusspreis": sum(
+                1 for z in zeilen if "Anschlusspreis" in z["luecken"]),
+            "ohne_volumen": sum(
+                1 for z in zeilen if not z["volumen"] and not z["unbegrenzt"]),
+            "unbegrenzt": sum(1 for z in zeilen if z["unbegrenzt"]),
         },
         "vorhanden": vorhanden,
         "konfiguriert": konfiguriert,

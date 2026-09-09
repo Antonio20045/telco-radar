@@ -308,6 +308,50 @@ def test_view_legt_die_vollstaendigkeit_offen(tmp_path):
     assert view["bilanz"]["tarife"] == 1
 
 
+def test_die_bilanz_zaehlt_was_ihr_etikett_sagt(tmp_path):
+    """S-Q2 (09.09.2026): die Stat-Zeile der Tarifseite zählt vier Zahlen,
+    und jede muss das bedeuten, was danebensteht.
+
+    "in der Karte" sind die PUNKTE der Positionskarte - die Karte nimmt
+    nur Tarife mit bekanntem, begrenztem Volumen UND rechenbarem Preis
+    (ein Tarif ohne Grundpreis ist kein Punkt, auch nicht mit Volumen).
+    "ohne Anschlusspreis-Angabe" zählt genau diese eine Lücke - die
+    Cashback-Lücke, die JEDES Blatt trägt, gehört NICHT hinein, sie steht
+    als Satz im Hinweis (im Bestand vom 09.09.2026: 52 von 52 Tarifen -
+    eine Zahl, die wie ein Defekt klänge und keine wäre).
+    """
+    saetze = [
+        # mit Volumen, mit Anschlusspreis: der einzige Punkt der Karte
+        _satz("t:a", "Telekom", "A", 20.0, 10.0),
+        # mit Volumen, OHNE Anschlusspreis: Punkt, aber Lücke gezählt
+        _satz("t:b", "o2", "B", 30.0, 20.0, anschlusspreis=None),
+        # ohne Volumenangabe: Zeile in der Tabelle, kein Ort auf der Achse
+        _satz("t:c", "o2", "C", 25.0, None, anschlusspreis=None),
+        # ohne Grundpreis: nicht belastbar, deshalb kein Punkt - obwohl
+        # das Volumen bekannt ist. Genau das ist der zweite Grund, warum
+        # die Karte anders zählt als die Tabelle.
+        _satz("t:d", "Telekom", "D", None, 5.0,
+              grundgebuehr=None, preisphasen=[]),
+    ]
+    # Unbegrenzt kommt aus JSON nicht heil zurück (siehe Test oben).
+    saetze.append(json.loads(json.dumps(
+        _satz("t:u", "o2", "Unlimited", 40.0, None))))
+    saetze[-1]["datenvolumen_gb"] = float("inf")
+    p = _state(tmp_path, saetze)
+
+    bilanz = tarife_view.aufbereiten(p, [])["bilanz"]
+    assert bilanz["tarife"] == 5
+    assert bilanz["in_der_karte"] == 2, "nur A und B sind Punkte"
+    assert bilanz["ohne_anschlusspreis"] == 2, "B und C nennen keinen"
+    assert bilanz["ohne_volumen"] == 1, "nur C nennt kein Volumen"
+    assert bilanz["unbegrenzt"] == 1
+    assert bilanz["belastbar"] == 4, "D hat keinen Grundpreis"
+    # Die Cashback-Lücke tragen alle fünf - und keine der vier Zahlen
+    # oben zählt sie. Genau deshalb steht sie als Satz im Hinweis.
+    assert all("Cashback/Wechselbonus" in z["luecken"]
+               for z in tarife_view.aufbereiten(p, [])["zeilen"])
+
+
 def test_leerer_speicher_ergibt_leere_seite(tmp_path):
     view = tarife_view.aufbereiten(tmp_path / "gibtsnicht.jsonl", [])
     assert view["hat_daten"] is False
