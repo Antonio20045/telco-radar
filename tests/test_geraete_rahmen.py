@@ -16,6 +16,8 @@ Kartenarten ab, die die Erklaerzeilen bisher trugen.
 """
 from __future__ import annotations
 
+import re
+
 from bs4 import BeautifulSoup
 
 from test_geraete_tco_zustand import _baue
@@ -135,9 +137,64 @@ def test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung(tmp
         f"graphloser Block: {len(wie_gerechnet)} Aufklappungen statt 1"
 
     # Sie steht NACH den Karten, nicht davor - anders als beim Graphen.
+    # Seit OPTIK-6 (09.09.2026) tragen die Karten ihre eigene Klappe; die
+    # Positionspruefung laeuft gegen die KLASPE (direktes Kind des
+    # Modellblocks), nicht gegen den Kartenbehaelter darin.
     kinder = [k for k in block.find_all(recursive=False)]
-    karten = block.select_one(".gr-karten")
-    assert kinder.index(karten) < kinder.index(wie_gerechnet[0])
+    klappe = block.select_one("details.gr-karten-auf")
+    assert klappe is not None, "die Kartenklappe fehlt"
+    assert klappe.select_one(".gr-karten") is not None
+    assert kinder.index(klappe) < kinder.index(wie_gerechnet[0])
+
+
+# --------------------------------------------------------------------------
+# OPTIK-6 (09.09.2026): die Anbieterkarten hinter EINER Klappe
+# --------------------------------------------------------------------------
+
+def test_die_anbieterkarten_stehen_in_einer_geschlossenen_klappe(tmp_path):
+    """OPTIK-6: Der TCO-Reiter mass am echten Bestand 4732 px gegen das
+    Limit von 3000 (`pruefe_portal.py` 11b) - allein die Karten des
+    Vorgabemodells belegen 2749 px. Sie stehen seither in EINER
+    standardmaessig geschlossenen Klappe je Modellblock; NICHTS ist
+    geloescht (E1), der Inhalt bleibt im Dokument erreichbar.
+
+    Dieser Test ist neu (rot-vor gilt nicht): die Klappe existierte vor
+    OPTIK-6 nicht, der erste Assert (`klappe is not None`) faellt am
+    Altstand. Der Browser-Test daneben misst das Oeffnen ohne Netz."""
+    s = _baue(tmp_path, graphloses_modell=True)
+    tafel = s.select_one("#tafel-tco")
+    assert tafel is not None
+    bloecke = tafel.select(".gr-tmodell")
+    assert bloecke, "der Test prueft nichts ohne Modellblock"
+    for block in bloecke:
+        klappe = block.select_one("details.gr-karten-auf")
+        assert klappe is not None, \
+            f"{block.get('data-modell')}: keine Kartenklappe"
+        assert not klappe.has_attr("open"), \
+            f"{block.get('data-modell')}: Klappe steht offen im HTML"
+        karten = klappe.select(".gr-kkarte")
+        assert karten, f"{block.get('data-modell')}: Klappe ohne Karten"
+        # Sortierung und Filter stehen MIT in der Klappe - ein Steuerpult
+        # ueber einer geschlossenen Klappe waere ein Bedienelement, dessen
+        # Wirkung man nicht sehen kann.
+        assert klappe.select_one(".gr-ksteuer") is not None
+        # Keine Karte steht AUSSERHALB der Klappe: was aus ihr faelle,
+        # waere entweder Informationsverlust (E1) oder ein zweiter, nicht
+        # geklappter Anzeigort fuer dasselbe Angebot.
+        for karte in block.select(".gr-kkarte"):
+            assert karte.find_parent("details", class_="gr-karten-auf"), \
+                f"{block.get('data-modell')}: Karte ausserhalb der Klappe"
+        # Die Zahl der Ueberschrift meint die GEZEICHNETE Menge - dieselbe
+        # Regel wie bei der Legende der alten Positionskarte: eine Klammer,
+        # die anders zaehlt als der Bestand darunter, ist der Fehlertyp
+        # "153 Preispunkte aus 348 Listungen".
+        summary = klappe.select_one("summary")
+        assert summary is not None
+        treffer = re.search(r"\((\d+)\)", summary.get_text())
+        assert treffer, f"Ueberschrift ohne Zahl: {summary.get_text()!r}"
+        assert int(treffer.group(1)) == len(karten), \
+            (f"{block.get('data-modell')}: Ueberschrift zaehlt "
+             f"{treffer.group(1)}, Klappe traegt {len(karten)} Karten")
 
 
 # --------------------------------------------------------------------------

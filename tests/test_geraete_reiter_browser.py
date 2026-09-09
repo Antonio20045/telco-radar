@@ -593,6 +593,17 @@ def _frisch(seite):
         if auf is not None:
             seite.evaluate(
                 f"document.getElementById('{kennung}').open = true")
+    # DIE ANBIETERKARTEN STEHEN SEIT OPTIK-6 (09.09.2026) IN EINER EIGENEN
+    # Klappe je Modellblock - dieselbe Transitivitaet wie oben: die Karte
+    # selbst ist kein `<details>`, aber sie bleibt unsichtbar, solange die
+    # Klappe zu ist. Tests, die Karten LESEN (data-Attribute), braucht das
+    # nicht; Tests, die sie BEDIENEN (`select_option` auf die Sortierung
+    # braucht ein sichtbares Element), schon. Geoeffnet wird nur die
+    # Klappe DES SICHTBAREN Modellblocks.
+    seite.evaluate(
+        """() => document.querySelectorAll(
+             '.gr-tmodell:not([hidden]) details.gr-karten-auf')
+           .forEach(k => { k.open = true; })""")
     seite.wait_for_timeout(60)
 
 
@@ -2100,3 +2111,115 @@ def test_jede_karte_mit_zahl_beantwortet_die_leitfrage(_seite):
                      && !k.querySelector('.gr-kk-24'))
         .map(k => k.getAttribute('data-anbieter'))""")
     assert fehlend == []
+
+
+# ==========================================================================
+# OPTIK-6 (09.09.2026): die Anbieterkarten hinter EINER Klappe
+#
+# Der TCO-Reiter mass am echten Bestand 4732 px gegen das Limit von 3000
+# (`pruefe_portal.py` 11b); die Karten des Vorgabemodells belegen allein
+# 2749 px, und ihre Zahl waechst mit jedem Buendel. Sie stehen seither in
+# einer standardmaessig GESCHLOSSENEN Klappe je Modellblock - 11b misst
+# den Anfangszustand, und dieser Abschnitt hier misst das, was 11b NICHT
+# messen kann: dass die Klappe wirklich zu startet und dass ihr Inhalt
+# beim Oeffnen ohne EINEN Netzwerkabruf sichtbar wird (statisch im
+# Dokument, reines UI). Beide Tests sind NEU - die Klappe existierte vor
+# OPTIK-6 nicht, ein rot-vor/hinter-Schema greift nicht.
+# ==========================================================================
+
+def test_die_kartenklappe_startet_geschlossen(_seite):
+    """Der Anfangszustand ist der, den 11b misst: waere die Klappe im HTML
+    offen (`open`-Attribut), stuende der ganze Kartenbestand wieder in der
+    Anfangshoehe - die Kompaktheit waere nur gerendert, nicht gebaut."""
+    _seite.reload(wait_until="load")
+    _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
+    _seite.wait_for_timeout(60)
+    zustand = _seite.evaluate("""() => {
+      const block = document.querySelector('.gr-tmodell:not([hidden])');
+      if (!block) return null;
+      const klappe = block.querySelector('details.gr-karten-auf');
+      if (!klappe) return null;
+      return {offen: klappe.open,
+              karten: klappe.querySelectorAll('.gr-kkarte').length};
+    }""")
+    assert zustand is not None, "kein Modellblock mit Kartenklappe"
+    assert zustand["offen"] is False, "die Klappe startet offen"
+    assert zustand["karten"] > 0, "die Klappe traegt keine Karte"
+
+
+def test_die_kartenklappe_oeffnet_ohne_netzwerk(_seite):
+    """E1 + Aufklapp-Pflicht aus dem Auftrag: alles bleibt im Dokument
+    erreichbar, und das Oeffnen ist reines UI - kein Nachladen, keine
+    Serverinteraktion. Jede Anfrage, die waehrend des Oeffnens entsteht,
+    macht diesen Test rot.
+
+    Gezaehlt werden nur SAME-ORIGIN-Anfragen: die Webfonts der Seite
+    (Google Fonts, display=swap) duerfen auch NACH dem load-Event noch
+    einsetzen, und auf einem kalten Runner wuerde genau so eine den Test
+    falsch rot machen. Fuer die Zusicherung "kein Nachladen von Inhalten"
+    ist der Ursprung der scharfe Massstab - Inhalte laegen unter der
+    eigenen Adresse."""
+    _seite.reload(wait_until="load")
+    _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
+    _seite.wait_for_timeout(60)
+    ursprung = _seite.url.rsplit("/", 1)[0]
+
+    anfragen: list[str] = []
+
+    def _zaehle(anfrage) -> None:
+        if anfrage.url.startswith(ursprung):
+            anfragen.append(anfrage.url)
+
+    _seite.on("request", _zaehle)
+    try:
+        ergebnis = _seite.evaluate("""() => {
+          const klappe = document.querySelector(
+            '.gr-tmodell:not([hidden]) details.gr-karten-auf');
+          if (!klappe) return null;
+          klappe.open = true;
+          const karte = klappe.querySelector('.gr-kkarte');
+          return {sichtbar: !!karte.offsetParent,
+                  hoehe: Math.round(karte.getBoundingClientRect().height)};
+        }""")
+        _seite.wait_for_timeout(200)
+    finally:
+        _seite.remove_listener("request", _zaehle)
+        # Den Ausgangszustand zurueckgeben: die Seite hat Modulgueltigkeit,
+        # und ein spaeterer Test misst sonst eine aufgeklappte Klappe.
+        _seite.evaluate("""() => document.querySelectorAll(
+              'details.gr-karten-auf').forEach(k => { k.open = false; })""")
+    assert ergebnis is not None, "keine Kartenklappe im Modellblock"
+    assert ergebnis["sichtbar"], "die Karte bleibt nach dem Oeffnen unsichtbar"
+    assert ergebnis["hoehe"] > 100, \
+        f"die Karte hat nach dem Oeffnen nur {ergebnis['hoehe']} px Hoehe"
+    assert anfragen == [], \
+        f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
+
+
+def test_der_anbieterfilter_wirkt_auch_in_der_klappe(_seite):
+    """Der Anbieterfilter war seit Phase R (04.09.2026) von keinem Test
+    bedient (diff-reviewer OPTIK-6) - und seit OPTIK-6 steht er in der
+    Kartenklappe. Beides deckt dieser Test: Klappe auf, Filter auf einen
+    Anbieter, nur dessen Karten bleiben, Gegenprobe ohne Filter."""
+    _frisch(_seite)
+    anbieter = _seite.evaluate(
+        """() => document.querySelector(
+              '.gr-tmodell:not([hidden]) [data-anbieterfilter] option[value]:not([value=""])')
+            ?.value || ''""")
+    assert anbieter, "die Fixture kennt keinen Anbieter im Filter"
+    _seite.select_option(
+        ".gr-tmodell:not([hidden]) [data-anbieterfilter]", anbieter)
+    _seite.wait_for_timeout(80)
+    namen = _seite.eval_on_selector_all(
+        ".gr-tmodell:not([hidden]) .gr-kkarte:not([hidden])",
+        "e => [...new Set(e.map(k => k.dataset.anbieter))]")
+    assert set(namen) == {anbieter}, namen
+    # Gegenprobe: ohne Filter sind WENIGSTENS zwei Anbieter sichtbar -
+    # sonst traefe der Filter eine Fixture, die ohnehin nur einen kennt.
+    _seite.select_option(
+        ".gr-tmodell:not([hidden]) [data-anbieterfilter]", "")
+    _seite.wait_for_timeout(80)
+    alle = _seite.eval_on_selector_all(
+        ".gr-tmodell:not([hidden]) .gr-kkarte:not([hidden])",
+        "e => [...new Set(e.map(k => k.dataset.anbieter))]")
+    assert len(set(alle)) >= 2, alle

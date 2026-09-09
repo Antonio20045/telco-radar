@@ -945,34 +945,56 @@
       endif %}{% if m.laufzeiten %} · gerechnet über {{ m.laufzeiten | join(' und ') }}
       Monate{% endif %}</p>
 
-    <div class="gr-ksteuer">
-      <label>Sortierung <select data-sortiere>
-        <option value="schnitt">Ø je Monat, aufsteigend</option>
-        <option value="gesamt">TCO-24, aufsteigend</option>
-        <option value="einmalig">Gerät einmalig</option>
-      </select></label>
-      {# JE ANBIETER EIN Eintrag, nicht je Karte: zwei o2-Tarife zum
-         selben Geraet ergaeben sonst zweimal "o2" im Auswahlfeld. #}
-      <label>Anbieter <select data-anbieterfilter>
-        <option value="">alle</option>
-        {% for a in m.karten | map(attribute='anbieter') | unique | sort %}
-        <option value="{{ a }}">{{ a }}</option>{% endfor %}
-      </select></label>
-    </div>
+    {# --- 4. Die Anbieterkarten hinter EINER Klappe (OPTIK-6, 09.09.2026).
+           Bis dahin standen alle Karten offen unter dem Graph, und der
+           Reiter mass am echten Bestand 4732 px gegen das Limit von 3000
+           (`pruefe_portal.py` 11b): die Karten des Vorgabemodells
+           belegen allein 2749 px (22 Karten, vier Spalten), und ihre Zahl
+           waechst mit jedem Buendel, das ein Adapter liefert. Ein Deckel
+           in KARTEN waere eine Auswahl nach Listenposition - dieselbe
+           Fehlerklasse wie `max_produkte` (CLAUDE.md § 6) -, deshalb
+           klappt der ganze Block zu: Die Anfangshohe haengt damit nicht
+           mehr am Bündelbestand, und beim Aufklappen darf die Seite
+           wachsen. Der Inhalt steht fertig im Dokument, das Oeffnen ist
+           reines UI ohne Netzwerk.
 
-    {# --- 4. Die Anbieterkarten, direkt unter dem Graph ------------------
-           Seit dem 05.09.2026 (Saturn-Adapter): ein Haendler ohne
-           Tarifbuendel bekommt die echte Karte (`haendlerpreiskarte`),
-           sobald `m.haendler_ohne_buendel` einen Preis nennt - sonst
-           bleibt es bei der "Beschaffung laeuft"-Karte. #}
-    <div class="gr-karten">
-      {% for k in m.karten %}{{ tcokarte(k) }}{% endfor %}
-      {% for h in ("Amazon", "Expert", "Saturn") %}
-        {% set eintrag = m.haendler_ohne_buendel.get(h) %}
-        {% if eintrag %}{{ haendlerpreiskarte(h, eintrag) }}
-        {% else %}{{ haendlerkarte(h, haendler_seit) }}{% endif %}
-      {% endfor %}
-    </div>
+           Sortierung und Anbieterfilter stehen MIT in der Klappe: ein
+           Steuerpult ueber einer geschlossenen Klappe waere ein
+           Bedienelement, dessen Wirkung man nicht sehen kann. Die Zahl in
+           der Ueberschrift zaehlt die Karten DER KLASPE - Angebote,
+           Referenzrechnung, Leerkarten und Haendler zusammen; die
+           Angebotszahl darueber (`gr-mband`) meint eine andere Menge. #}
+    {% set haendler_namen = ("Amazon", "Expert", "Saturn") %}
+    <details class="gr-auf gr-karten-auf">
+      <summary>Anbieterkarten ({{ m.karten | length + haendler_namen | length }})</summary>
+      <div class="gr-ksteuer">
+        <label>Sortierung <select data-sortiere>
+          <option value="schnitt">Ø je Monat, aufsteigend</option>
+          <option value="gesamt">TCO-24, aufsteigend</option>
+          <option value="einmalig">Gerät einmalig</option>
+        </select></label>
+        {# JE ANBIETER EIN Eintrag, nicht je Karte: zwei o2-Tarife zum
+           selben Geraet ergaeben sonst zweimal "o2" im Auswahlfeld. #}
+        <label>Anbieter <select data-anbieterfilter>
+          <option value="">alle</option>
+          {% for a in m.karten | map(attribute='anbieter') | unique | sort %}
+          <option value="{{ a }}">{{ a }}</option>{% endfor %}
+        </select></label>
+      </div>
+
+      {# Seit dem 05.09.2026 (Saturn-Adapter): ein Haendler ohne
+         Tarifbuendel bekommt die echte Karte (`haendlerpreiskarte`),
+         sobald `m.haendler_ohne_buendel` einen Preis nennt - sonst
+         bleibt es bei der "Beschaffung laeuft"-Karte. #}
+      <div class="gr-karten">
+        {% for k in m.karten %}{{ tcokarte(k) }}{% endfor %}
+        {% for h in haendler_namen %}
+          {% set eintrag = m.haendler_ohne_buendel.get(h) %}
+          {% if eintrag %}{{ haendlerpreiskarte(h, eintrag) }}
+          {% else %}{{ haendlerkarte(h, haendler_seit) }}{% endif %}
+        {% endfor %}
+      </div>
+    </details>
 
     {% if not zr.hat_daten %}
     {# BRIEF_RAHMEN2_R3 (05.09.2026): ohne Zeitreihen-Graph gibt es kein

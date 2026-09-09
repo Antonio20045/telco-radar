@@ -126,8 +126,16 @@ def test_details_wrapper_steht_wirklich_zu(tmp_path):
 
 
 def test_die_anbieterkarten_stehen_ausserhalb_der_details_aufklappung(tmp_path):
-    """Die Antwort selbst - die Anbieterkarten - darf NICHT hinter der
-    Klappe verschwinden, nur die Analyse drumherum."""
+    """Die Anbieterkarten duerfen NICHT in der ANALYSE-Aufklappung stecken
+    (#gr-details: Alarme, Buendel-Tabelle, Tarifmassstab) - das waeren zwei
+    Klapptiefen fuer dieselben Karten.
+
+    SEIT OPTIK-6 (09.09.2026) haben die Karten ihre EIGENE Klappe je
+    Modellblock (`details.gr-karten-auf`, standardmaessig zu, damit der
+    Reiter seine Hoehe haelt - `pruefe_portal.py` 11b). Das ist keine
+    Rueckkehr dieses Verbots: die Kartenklappe ist eine eigene, sichtbare
+    und direkt beim Modell verortete Aufklappung, keine Analyse-Schachtel.
+    Wer hier liest, pruefe gegen `gr-karten-auf`, nicht gegen diese Regel."""
     s = _baue(tmp_path)
     karten = s.select_one("#tafel-tco .gr-karten")
     assert karten is not None
