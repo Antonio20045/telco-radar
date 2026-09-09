@@ -147,17 +147,21 @@ def balken(modell: dict) -> str:
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
-        f'aria-label="TCO für {_t(name)} je Anbieter, '
-        f'nach Bindungsdauer getrennt">',
+        f'aria-label="TCO für {_t(name)} je Anbieter">',
         f'<title>TCO für {_t(name)} je Anbieter</title>',
     ]
 
     y = 0.0
     for gruppe in gruppen:
         laufzeit = gruppe["laufzeit"]
+        # S-Q4: der Gruppenkopf nennt den RECHNUNGSHORONT ("gerechnet über
+        # N Monate"), keine Bindung - die Karten daneben nennen die
+        # Bindungen selbst (Tarif bindet 24, Geräteraten laufen 36), und
+        # seit TCO24-1 ist der Horizont immer 24. "{N} Monate Bindung"
+        # waere derselbe Widerspruch, nur in der Grafik.
         teile.append(
             f'<text class="gr-g1-gruppe" x="0" y="{y + 20:.0f}">'
-            f'{laufzeit} Monate Bindung</text>')
+            f'gerechnet über {laufzeit} Monate</text>')
         # Die eigene Nulllinie der Gruppe (A5.4).
         oben = y + GRUPPE_KOPF - 6
         unten = oben + len(gruppe["karten"]) * (BALKEN_HOEHE
@@ -178,7 +182,7 @@ def balken(modell: dict) -> str:
             # der Gruppe ist (F-R2-2): die Linie steht in der 36-Monats-
             # Gruppe, gerechnet sind Barkauf plus 24 Tarifmonate. Ohne den
             # Zusatz liest sich "Vodafone-Referenz 1.428,70 EUR" unter dem
-            # Kopf "36 Monate Bindung" als 36-Monats-Zahl.
+            # Kopf "gerechnet über 36 Monate" als 36-Monats-Zahl.
             tarif_monate = referenz.get("tarif_monate")
             text = f'Vodafone-Referenz {euro(referenz["gesamt"])}'
             if (tarif_monate and tarif_monate != laufzeit

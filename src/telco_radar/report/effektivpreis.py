@@ -27,7 +27,7 @@ Der Effektivpreis allein belohnt aggressive Drosselung. Ein Tarif mit 5 GB
 und danach 64 KBit/s ist pro Monat billig und pro Gigabyte teuer, und ab
 dem sechsten Gigabyte ist er unbenutzbar. Deshalb steht neben dem
 Effektivpreis immer der Preis je GB **und** die Qualitaetsmerkmale
-(Drosselwert, Volumenautomatik, Laufzeitbindung). Eine Rangliste nach
+(Drosselwert, Volumenautomatik, Mindestlaufzeit). Eine Rangliste nach
 Effektivpreis allein waere eine Rangliste der Drosselung.
 
 Eine fehlende Komponente ist eine LUECKE, keine Null
@@ -128,8 +128,14 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
     if tarif.laufzeit_monate == 0:
         flags.append(Qualitaetsflag("laufzeit", "Ohne Mindestlaufzeit", True))
     elif tarif.laufzeit_monate:
+        # S-Q4: "Mindestlaufzeit", nicht "Bindung" - die Seite rechnet ueber
+        # 24 Monate (ihren Horizont), und ein blosses "N Monate Bindung"
+        # waere von derselben Zahl nicht mehr davon zu unterscheiden. Die
+        # Mindestlaufzeit ist die des Tarifs, das Wort dafuer steht auch im
+        # Abschnitt "Was diese Zahlen nicht koennen".
         flags.append(Qualitaetsflag(
-            "laufzeit", f"{tarif.laufzeit_monate} Monate Bindung", False))
+            "laufzeit", f"{tarif.laufzeit_monate} Monate Mindestlaufzeit",
+            False))
 
     if tarif.allnet_flat:
         flags.append(Qualitaetsflag("allnet", "Allnet-Flat enthalten", True))

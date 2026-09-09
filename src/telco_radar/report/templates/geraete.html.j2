@@ -489,7 +489,9 @@
 
   <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
     k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
-    k.laufzeit }} Monate{% else %}monatlich {{ k.monatlich | euro }}{%
+    k.raten_laufzeit or k.laufzeit }} Monate{% if k.raten_laufzeit and
+    k.raten_laufzeit > k.laufzeit %} ({{ k.laufzeit }} davon in der
+    TCO-{{ k.laufzeit }}){% endif %}{% else %}monatlich {{ k.monatlich | euro }}{%
     if k.zuzahlung is not none %} · Gerät einmalig {{ k.zuzahlung | euro }}{%
     endif %}{% if k.rate is not none %} · {% if k.raten_summe is not none %}{{
     k.raten_summe | euro }} in {% endif %}{{ k.raten_laufzeit }} Raten à {{
@@ -504,7 +506,8 @@
      ein Label, das etwas anderes meint als sein Feld. #}
   <p class="gr-kk-24">nach 24 Monaten gezahlt: <b>{{ k.gezahlt_nach_24 | euro
     }}</b>{% if k.offen_nach_24 %} · danach noch offen: {{ k.offen_nach_24 | euro
-    }}{% if k.offene_raten %} ({{ k.offene_raten }} Geräteraten){% endif %}{%
+    }}{% if k.offene_raten %} ({{ k.offene_raten }} {{ 'Monatsraten' if
+    k.buendel_monatlich is not none else 'Geräteraten' }}){% endif %}{%
     endif %}</p>
   {% endif %}
 
@@ -611,11 +614,20 @@
     Tarifbindung; nicht enthalten sind Versand, Nutzungsentgelte über den
     Tarif hinaus und jeder Bonus, der hier nicht beim Namen steht.</p>
     {% else %}
-    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
-    Bindung{% if k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
+    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet - Tarif und
+       Geraeteraten. Die 24 Monate sind der Rechnungshorizont (TCO24-1,
+       "immer 24 Monate Sicht") und heissen so; "24 Monate Bindung" ueber
+       einem Ratenplan, der 36 laeuft, war der Widerspruch, den die Karten
+       selbst aufloesten. Entsprechend enthalten sind die Kosten der
+       ERSTEN 24 Monate - der Rest steht als offener Betrag auf der Karte,
+       nicht in der Zahl. #}
+    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate{% if
+    k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
     k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
     Geräteraten laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind alle
-    fest anfallenden Kosten dieser Bindung; nicht enthalten sind Versand,
+    fest anfallenden Kosten der ersten {{ k.laufzeit }} Monate{% if
+    k.offen_nach_24 %}; was danach noch läuft, steht als offener Betrag auf
+    der Karte{% endif %}. Nicht enthalten sind Versand,
     Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
     beim Namen steht.</p>
     {% endif %}
@@ -927,13 +939,13 @@
       TCO{% if m.laufzeiten | length == 1 %}-{{ m.laufzeiten[0] }}{% endif
       %}{% if m.spanne[0] == m.spanne[1] %} {{ m.spanne[0] | euro }}{% else
       %} von {{ m.spanne[0] | euro }} bis {{ m.spanne[1] | euro }}{% endif %}{%
-      endif %}{% if m.laufzeiten %} · Bindung {{ m.laufzeiten | join(' und ') }}
+      endif %}{% if m.laufzeiten %} · gerechnet über {{ m.laufzeiten | join(' und ') }}
       Monate{% endif %}</p>
 
     <div class="gr-ksteuer">
       <label>Sortierung <select data-sortiere>
         <option value="schnitt">Ø je Monat, aufsteigend</option>
-        <option value="gesamt">TCO je Laufzeitgruppe</option>
+        <option value="gesamt">TCO-24, aufsteigend</option>
         <option value="einmalig">Gerät einmalig</option>
       </select></label>
       {# JE ANBIETER EIN Eintrag, nicht je Karte: zwei o2-Tarife zum

@@ -65,7 +65,14 @@ def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
     assert o2_zweit == "mit Tarif: TCO-24 880,75 €"
     o2_text = " ".join(o2.get_text(" ", strip=True).split())
     assert "TCO-36" not in o2_text and "36 Monate Bindung" not in o2_text
-    assert "Gerechnet über 24 Monate Bindung" in o2_text
+    # S-Q4 (09.09.2026): "Gerechnet über 24 Monate Bindung" war derselbe
+    # Widerspruch, nur als Satz - die Karte darunter sagt "Tarif bindet 24,
+    # Geräteraten laufen 36". Der Horizont heisst jetzt Horizont, "Bindung"
+    # nennen nur noch Tarif und Raten selbst.
+    assert "24 Monate Bindung" not in o2_text
+    assert ("Gerechnet über 24 Monate – der Tarif bindet 24 Monate, "
+            "die Geräteraten laufen 36") in o2_text
+    assert "Kosten der ersten 24 Monate" in o2_text
     assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
 
 
@@ -81,7 +88,10 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     assert " bis " not in band.split("TCO-24")[1].split("·")[0]
     assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
     option = tafel.select_one('select[data-sortiere] option[value="gesamt"]')
-    assert option.get_text(strip=True) == "TCO je Laufzeitgruppe"
+    # S-Q4 (09.09.2026): jede Karte ist TCO-24 (TCO24-1, konstantes
+    # LAUFZEIT/T_HORIZONT), eine "Laufzeitgruppe" existiert auf der Seite
+    # nicht mehr - das Etikett nennt, was die Sortierung tut.
+    assert option.get_text(strip=True) == "TCO-24, aufsteigend"
     # A-R5: die Geraetespalte steht VOR der TCO-Spalte.
     ths = [th.get_text(strip=True) for th in tafel.select("#gr-tco-tabelle th")]
     assert ths[2] == "Gerätepreis" and ths[3] == "TCO"
@@ -92,3 +102,29 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     assert "720,00 € in 36 Raten à 20,00 €" in bau
     # Kein "(0 %)" auf einer TCO-Karte: der Zinssatz ist dort nicht gemessen.
     assert "(0 %)" not in tafel.get_text(" ")
+
+
+def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path):
+    """S-Q4 (09.09.2026): die BAU-Zeile einer 1&1-Karte nennt die DAUER der
+    Monatszahlung - 36 Monate, vorher stand der Rechnungshorizont 24 darueber
+    und las sich als "zahlst du 24 Monate lang" - und sagt mit der Leitzahl,
+    dass die TCO-24 nur 24 davon enthaelt. Was nach 24 Monaten offen ist,
+    sind auf DIESER Karte Monatsraten aus Tarif und Geraet zusammen; die
+    aufgeteilt erhobene o2-Karte daneben sagt weiterhin Geräteraten. Der
+    Fall `raten_laufzeit < laufzeit` (Klammerteil wuerde Unsinn drucken)
+    ist durch die Bedingung `>` im Template ausgeschlossen - hier steht
+    er als Gegenprobe: 36 > 24 druckt, und NUR dann."""
+    s = _baue(tmp_path, eins_und_eins=True)
+    eins = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="1&1"]')
+    assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
+    bau = " ".join(eins.select_one(".gr-kk-bau").get_text(" ", strip=True).split())
+    assert bau == ("monatlich 44,99 € für Tarif und Gerät zusammen · "
+                   "36 Monate (24 davon in der TCO-24)")
+    eins_text = " ".join(eins.get_text(" ", strip=True).split())
+    assert "danach noch offen: 539,88 € (12 Monatsraten)" in eins_text
+    assert "Geräteraten" not in eins_text
+    # Die o2-Karte (tarif_monatlich + geraet_monatsrate getrennt erhoben)
+    # behaelt "Geräteraten" - zwei Karten, zwei wahre Woerter.
+    o2 = s.select_one('#tafel-tco .gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
+    o2_text = " ".join(o2.get_text(" ", strip=True).split())
+    assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text

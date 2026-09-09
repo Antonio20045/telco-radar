@@ -505,8 +505,12 @@ def test_g1_hat_fuer_die_referenz_keine_zweite_bindungsgruppe_mehr():
     laufzeit` ist nie mehr wahr) - sie zeigt sich nur noch mit gestellten
     Karten (`test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie`)."""
     svg = grafik.balken(_naeherungs_modell())
-    assert "24 Monate Bindung" in svg
+    assert "gerechnet über 24 Monate" in svg
     assert "36 Monate Bindung" not in svg
+    # S-Q4 (09.09.2026): der Gruppenkopf nennt den RECHNUNGSHORIZONT,
+    # keine Bindung - "Bindung" nennen nur noch Tarif und Geraeteraten
+    # selbst (auf den Karten daneben).
+    assert "Monate Bindung" not in svg
     assert "Barkauf" not in svg
     assert svg.count("gr-g1-null") == 1
     linie = svg.index('class="gr-g1-ref"')
@@ -641,7 +645,8 @@ def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
               "karten": [karte("o2", 36, 1800.0), karte("Telekom", 24, 1200.0)]}
     svg = grafik.balken(modell)
     assert svg.count("gr-g1-null") == 2, "je Laufzeitgruppe eine Nulllinie"
-    assert "24 Monate Bindung" in svg and "36 Monate Bindung" in svg
+    assert "gerechnet über 24 Monate" in svg \
+        and "gerechnet über 36 Monate" in svg
 
 
 def test_jeder_balken_traegt_seine_aussage_als_text(bestand):
