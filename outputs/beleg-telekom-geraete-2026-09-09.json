@@ -1,0 +1,63 @@
+{
+  "datum": "2026-09-09",
+  "anzahl_requests": 7,
+  "alle_ehrlich": true,
+  "requests": [
+    {
+      "url": "https://www.telekom.de/robots.txt",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17779",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17791",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17797",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17803",
+      "host": "www.telekom.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    }
+  ]
+}
