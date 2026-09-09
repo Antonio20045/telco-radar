@@ -37,6 +37,30 @@
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 500679,
       "hinweis": "Fuenf Tarifkacheln (XS/S/M/L/XL) servergerendert als React-CSS-Modul-Markup (TariffTileModified_...); window.__INITIAL_STATE__ traegt weiterhin keinen Tarifpreis (tariffv2.plans leer, tariffHtmlSnippet.snippet.data leer) - siehe collect/tarif_telekom_kacheln.py."
+    },
+    {
+      "datei": "1und1_handytarife_ohne_handy.html.gz",
+      "url": "https://www.1und1.de/handytarife-ohne-handy",
+      "abgerufen_am": "2026-09-09",
+      "http_status": 200,
+      "content_type": "text/html",
+      "bytes_roh": 444227,
+      "sha256_roh": "7ad67019e3b1f55dc134af7b0ecf2dc05cb0301defeb8d15434d57341ba89dba",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 53000
+    },
+    {
+      "datei": "1und1_details_all_net_flat_s.html.gz",
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "abgerufen_am": "2026-09-09",
+      "http_status": 200,
+      "content_type": "text/html",
+      "bytes_roh": 48112,
+      "sha256_roh": "d10f04ac61d5dfd9aaab4a3310de95d3b331d0fb849a49836a326a053994d0ce",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 11157
     }
   ]
 }

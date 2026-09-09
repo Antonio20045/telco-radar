@@ -12155,12 +12155,14 @@
    "tarif_id": "11:1-1-all-net-flat-l",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 19.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
    "rabatte": [],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 150.0
   },
   {
    "id": "simonly--1-1--1-1-all-net-flat-m",
@@ -12170,12 +12172,14 @@
    "tarif_id": "11:1-1-all-net-flat-m",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 14.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
    "rabatte": [],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 50.0
   },
   {
    "id": "simonly--1-1--1-1-all-net-flat-s",
@@ -12185,12 +12189,23 @@
    "tarif_id": "11:1-1-all-net-flat-s",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 14.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
-   "rabatte": [],
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
+   "rabatte": [
+    {
+     "name": "Aktionspreis: 3 Monate je 9,99 €",
+     "betrag_monatlich": null,
+     "einmalbetrag": null,
+     "von_monat": 1,
+     "bis_monat": 3,
+     "beleg_url": "https://www.1und1.de/handytarife-ohne-handy"
+    }
+   ],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 10.0
   },
   {
    "id": "simonly--1-1--1-1-unlimited-on-demand-l",
@@ -12200,12 +12215,14 @@
    "tarif_id": "11:1-1-unlimited-on-demand-l",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 24.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
    "rabatte": [],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 150.0
   },
   {
    "id": "simonly--1-1--1-1-unlimited-on-demand-m",
@@ -12215,12 +12232,14 @@
    "tarif_id": "11:1-1-unlimited-on-demand-m",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 19.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
    "rabatte": [],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 50.0
   },
   {
    "id": "simonly--1-1--1-1-unlimited-on-demand-s",
@@ -12230,12 +12249,23 @@
    "tarif_id": "11:1-1-unlimited-on-demand-s",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 19.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
-   "rabatte": [],
+   "anschlusspreis": 19.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
+   "rabatte": [
+    {
+     "name": "Aktionspreis: 3 Monate je 14,99 €",
+     "betrag_monatlich": null,
+     "einmalbetrag": null,
+     "von_monat": 1,
+     "bis_monat": 3,
+     "beleg_url": "https://www.1und1.de/handytarife-ohne-handy"
+    }
+   ],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": 10.0
   },
   {
    "id": "simonly--1-1--1-1-unlimited-xl",
@@ -12245,12 +12275,14 @@
    "tarif_id": "11:1-1-unlimited-xl",
    "tarif_id_guete": "hoch",
    "tarif_sim_only_monatlich": 39.99,
-   "anschlusspreis": null,
-   "quelle_url": "https://www.1und1.de/handytarife",
-   "abgerufen_am": "2026-09-04",
+   "anschlusspreis": 39.9,
+   "quelle_url": "https://www.1und1.de/handytarife-ohne-handy",
+   "abgerufen_am": "2026-09-09",
    "rabatte": [],
    "last_verified": "2026-09-09",
-   "quelle_art": "live_shop"
+   "quelle_art": "live_shop",
+   "bindung_monate": null,
+   "volumen_gb": null
   },
   {
    "id": "simonly--telekom--magentamobil-basic",

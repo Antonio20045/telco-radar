@@ -40,6 +40,8 @@ from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, sammle
 from .collect.geraete.congstar import ergaenze_pib_slug
+from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
+from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -282,6 +284,56 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                         "einzige Referenz (%d Saetze gelesen) - der "
                         "bisherige Massstab bleibt unangetastet", tarife)
         else:
+            # S-5 (09.09.2026): 1&1-SIM-only-Referenzen von der SIM-only-Seite
+            # des Anbieters. Bis heute entstanden sie als Ableitung aus dem
+            # ld+json von `/handytarife` (der Seite MIT Handy) - Name und
+            # Grundgebuehr, ohne Phase, Volumen oder Anschlusspreis. Die
+            # dedizierte Messung (`collect/tarif_einsundeins_simonly.py`)
+            # traegt all das und ersetzt deswegen fuer DIESEN Anbieter die
+            # Bestandsableitung in der Ersetzungsmenge - dieselbe Logik wie
+            # `_bevorzugt_live` in `tarif_referenzen`: von zwei Lesarten
+            # desselben Tarifs gewinnt die bessere Messung, die schlechtere
+            # bleibt im Tarifbestand stehen.
+            #
+            # Misslingt die Messung (Netz, robots, Parse), bleiben die
+            # Bestandsreferenzen von ganz oben in der Menge - ein Ausfall
+            # darf den Massstab nicht leeren. Und der Merge steht UNTER
+            # dem Leere-Waechter von eben: waere der Tarifbestand selbst
+            # unlesbar, duerfen auch die gemessenen 1&1-Saetze keinen
+            # TEILBESTAND schreiben, der die Fremd-Referenzen beim
+            # Ersetzen loescht.
+            try:
+                simonly_refs, simonly_protokoll = sammle_simonly(hole, heute)
+            except Exception as exc:                 # noqa: BLE001
+                simonly_refs = []
+                log.warning("1&1 SIM-only-Messung gescheitert (%s) - die "
+                            "Bestandsableitung bleibt stehen", exc)
+            if simonly_refs:
+                # NUR ERSETZEN, WAS DIE MESSUNG AUCH MISST (Review B3,
+                # 09.09.2026): Wirft das Kreuzzeug einzelne Tarife weg
+                # (Kachel und ld+json uneinig) oder verliert eine Kachel
+                # ihren Titel, wuerde ein pauschaler Anbieter-Filter genau
+                # diese aus der Ersetzungsmenge nehmen - und
+                # `ersetze_referenzen` LOESCHT ihre Bestandssaetze. Die
+                # Bündel dieser Tarife verloeren still ihren Massstab.
+                # Ein Tarif, den die Messung nicht hergibt, behaelt deshalb
+                # seine Bestandsableitung; die Zahl der Rueckfaelle steht
+                # im Protokoll.
+                gemessen = {r.tarif_name for r in simonly_refs}
+                zurueckgefallen = sum(
+                    1 for r in referenzen
+                    if r.anbieter == SIMONLY_ANBIETER
+                    and r.tarif_name not in gemessen)
+                referenzen = [r for r in referenzen
+                              if r.anbieter != SIMONLY_ANBIETER
+                              or r.tarif_name not in gemessen] + simonly_refs
+                log.info("1&1 SIM-only: %d Referenzen von der SIM-only-Seite "
+                         "(%s, %d Tarifdetails gelesen%s)",
+                         len(simonly_refs),
+                         simonly_protokoll.get("seite", ""),
+                         simonly_protokoll.get("details", 0),
+                         f", {zurueckgefallen} nur im Bestand"
+                         if zurueckgefallen else "")
             tco = TcoDB(zustand / "geraete_tco.json")
             # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
             # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei

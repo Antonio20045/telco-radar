@@ -373,6 +373,13 @@ class SimOnlyReferenz:
     eine Live-Lesart. Der Vorgabewert ist `dokument`, damit ein Satz aus
     der Zeit vor dem 05.09.2026 beim Wiedereinlesen genau das bleibt, was
     er war (dieselbe Ueberlegung wie bei `Tarif.preistyp`).
+
+    `bindung_monate` und `volumen_gb` (seit S-5, 09.09.2026) sind
+    Messfelder wie die Preise: sie stehen nur da, wo eine erhobene Quelle
+    sie nennt. Die SIM-only-Seite von 1&1 misst das Volumen je Kachel und
+    nennt KEINE Bindungsdauer - ihr Referenzsatz traegt also 10.0 GB und
+    `bindung_monate=None`, und beides ist die Aussage. Vor S-5 gab es die
+    Felder nicht; alte Saetze bleiben ohne sie lesbar (Vorgabe `None`).
     """
 
     anbieter: str = ""
@@ -385,6 +392,8 @@ class SimOnlyReferenz:
     quelle_url: str = ""
     abgerufen_am: str = ""
     quelle_art: str = PREISTYP_DOKUMENT
+    bindung_monate: Optional[int] = None
+    volumen_gb: Optional[float] = None
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():
@@ -401,6 +410,15 @@ class SimOnlyReferenz:
             if wert < 0:
                 raise ValueError(f"negativer preis in {feld}: {wert}")
             setattr(self, feld, round(wert, 2))
+        if self.bindung_monate is not None:
+            if int(self.bindung_monate) < 0:
+                raise ValueError(f"negative bindung_monate: "
+                                 f"{self.bindung_monate}")
+            self.bindung_monate = int(self.bindung_monate)
+        if self.volumen_gb is not None:
+            if float(self.volumen_gb) < 0:
+                raise ValueError(f"negatives volumen_gb: {self.volumen_gb}")
+            self.volumen_gb = round(float(self.volumen_gb), 1)
 
     @property
     def id(self) -> str:
