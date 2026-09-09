@@ -1,0 +1,87 @@
+{
+  "datum": "2026-09-09",
+  "anzahl_requests": 10,
+  "alle_ehrlich": true,
+  "requests": [
+    {
+      "url": "https://www.1und1.de/robots.txt",
+      "host": "www.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://www.1und1.de/handytarife-ohne-handy",
+      "host": "www.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/robots.txt",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-s-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-m-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-l-mvl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    },
+    {
+      "url": "https://mobile.1und1.de/details-all-net-flat-preisliste?chosenTariff=tariff-anf-xxl-unlimited-xl-ovl&chosenNet=1u1&lightbox=true&bk=false",
+      "host": "mobile.1und1.de",
+      "transport": "http-get",
+      "browser": false,
+      "status": 200,
+      "user_agent": "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
+    }
+  ]
+}
