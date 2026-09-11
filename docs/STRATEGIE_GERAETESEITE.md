@@ -1,5 +1,13 @@
 # Strategie Geräteseite — Ist-Stand und Phasenplan
 
+> **Umsetzungsstand 11.09.2026, abends:** P1 und P2 sind gebaut, gemergt (main `a4f7928`,
+> lokal, 8 Commits vor origin) und unabhängig abgenommen (Evaluator, 9 Kriterien, Gesamturteil
+> ANNAHME; Belege `/tmp/eval-p1p2-20260911/`, Suite 2929 passed + 18 neue Tests, pruefe_portal
+> 11b bestanden mit tco 2202 px). Karten folgen der Bandwahl mit korrekten Zählern
+> (iPhone 17 Pro: klein 12, mittel 9, groß 11 von 22 — die im Bau genannte „13" war eine
+> Fehlzählung, 12 ist datenbasiert richtig). P2 rettet ab dem ersten gelaufenen Nachtlauf
+> Historie — wirksam erst nach Push auf origin/main. P3–P5 offen.
+
 **Stand 11.09.2026. Grundlage: Ist-Stand-Audit an HEAD `be42b4f` (= Live-Stand, byte-identisch
 verifiziert). Methode: 4 parallele Auditoren (UX/Design, Datenqualität, TCO-Korrektheit,
 Anforderungsabgleich) mit Screenshot- und Messpflicht, danach adversarielle Gegenprobe der
