@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entwurf · Ein Gerät im Tarifvergleich — TCO-24 je Anbieter</title>
+<style>
+  /* ---------------------------------------------------------------
+     Entwurf Geräteseite, 12.09.2026.
+     Formsprache: reduziert, Lichtmodus. Alle Farben als Rollen
+     (palette.md-Muster); Dark Mode wäre ein reiner Wertetausch.
+     Validiert (validate_palette.js, light, surface #fcfcfb):
+     - Balkengrafik (Emphasis): #e60000 + #898781 — Kontrast 3:1 ok,
+       CVD-Trennung ok; grau ist de-emphasis, keine Serienfarbe.
+     - Verlauf (6 kategoriale Serien): #2a78d6 #eb6834 #1baf7a #eda100
+       #e87ba4 #e60000 — alle Checks bestanden; Kontrast-WARN bei
+       aqua/gelb/magenta → Relief durch sichtbare Wertzahlen an jedem
+       Punkt und die Wertetabelle darunter.
+  ---------------------------------------------------------------- */
+  :root {
+    color-scheme: light;
+    --seite: #f9f9f7;
+    --flaeche: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #898781;
+    --grat: #e1e0d9;
+    --grat-2: #c3c2b7;
+    --vf: #e60000;              /* Vodafone-Referenz (Emphasis) */
+    --grau: #898781;            /* Wettbewerber-Balken (de-emphasis) */
+    --s-1: #2a78d6; --s-2: #eb6834; --s-3: #1baf7a;
+    --s-4: #eda100; --s-5: #e87ba4;
+    --radius: 6px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--seite);
+    color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: inherit; }
+
+  .entwurfbanner {
+    background: #f0efec;
+    color: var(--ink-2);
+    font-size: 12px;
+    text-align: center;
+    padding: 5px 16px;
+    border-bottom: 1px solid var(--grat);
+  }
+
+  .seite { max-width: 1080px; margin: 0 auto; padding: 28px 24px 64px; }
+
+  /* ---------- Kopf ---------- */
+  .marke {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .marke-name { font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+  .exporte { display: flex; gap: 8px; }
+  .knopf {
+    display: inline-block; font-size: 13px; color: var(--ink);
+    background: var(--flaeche); border: 1px solid var(--grat-2);
+    border-radius: var(--radius); padding: 6px 12px; text-decoration: none;
+  }
+  .knopf:hover { background: #f0efec; }
+
+  h1 { font-size: 26px; font-weight: 650; line-height: 1.25; margin: 0 0 6px; }
+  .unterzeile { margin: 0 0 20px; color: var(--ink-2); max-width: 68ch; }
+  .unterzeile a { font-weight: 550; }
+
+  .reiter { display: flex; gap: 4px; border-bottom: 1px solid var(--grat-2); margin-bottom: 24px; flex-wrap: wrap; }
+  .reiter a, .reiter span {
+    padding: 8px 14px 9px; font-size: 14px; text-decoration: none;
+    color: var(--ink-2); border-radius: 6px 6px 0 0; border-bottom: 2px solid transparent;
+  }
+  .reiter span.aktiv {
+    color: var(--ink); font-weight: 600;
+    border-bottom-color: var(--vf);
+  }
+  .reiter a:hover { background: #f0efec; color: var(--ink); }
+
+  /* ---------- Selektoren ---------- */
+  .wahl { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
+  .wahl label { display: block; font-size: 12px; color: var(--ink-3); margin-bottom: 4px; }
+  select {
+    font: inherit; color: var(--ink); background: var(--flaeche);
+    border: 1px solid var(--grat-2); border-radius: var(--radius);
+    padding: 7px 10px; min-width: 300px; max-width: 100%;
+  }
+  .baender { display: flex; border: 1px solid var(--grat-2); border-radius: var(--radius); overflow: hidden; }
+  .baender button {
+    font: inherit; font-size: 14px; padding: 7px 14px; border: 0;
+    background: var(--flaeche); color: var(--ink-2); cursor: pointer;
+    border-right: 1px solid var(--grat);
+  }
+  .baender button:last-child { border-right: 0; }
+  .baender button[aria-pressed="true"] { background: #efeef4; color: var(--ink); font-weight: 600; }
+  .baender button:focus-visible, .knopf:focus-visible { outline: 2px solid var(--vf); outline-offset: 1px; }
+  .wahl-fussnote { font-size: 12px; color: var(--ink-3); margin: 6px 0 26px; }
+  .wahl-fussnote a { color: var(--ink-2); }
+
+  /* ---------- Modellkopf ---------- */
+  .modellkopf { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+  .modellkopf h2 { font-size: 19px; font-weight: 650; margin: 0; }
+  .modellkopf .barpreis {
+    font-size: 13.5px; color: var(--ink-2);
+    padding-left: 18px; border-left: 1px solid var(--grat-2);
+  }
+  .modellkopf .barpreis strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Der eine Graph: Balken ---------- */
+  .hauptgraph {
+    background: var(--flaeche); border: 1px solid var(--grat);
+    border-radius: 8px; padding: 20px 22px 16px; margin-bottom: 26px;
+  }
+  .graph-titel { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .graph-titel h3 { font-size: 17px; font-weight: 650; margin: 0; }
+  .bandchip {
+    font-size: 12.5px; color: var(--ink-2); background: #f0efec;
+    border-radius: 99px; padding: 2px 10px;
+  }
+  .graph-unterzeile { font-size: 12.5px; color: var(--ink-3); margin: 4px 0 18px; }
+
+  .balkenzeile {
+    display: grid; grid-template-columns: 190px 1fr 205px; gap: 0 14px;
+    align-items: center; padding: 7px 6px; border-radius: 6px;
+  }
+  .balkenzeile:hover { background: #f6f5f1; }
+  .balken-name { min-width: 0; }
+  .balken-name .anbieter { font-weight: 600; font-size: 14.5px; display: inline-block; }
+  .balken-name .tarifzeile { display: block; font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vf-chip {
+    display: inline-block; font-size: 10.5px; font-weight: 600; color: var(--vf);
+    border: 1px solid var(--vf); border-radius: 99px; padding: 0 7px;
+    margin-left: 7px; vertical-align: 1px; letter-spacing: .02em;
+  }
+  .balken-spur { position: relative; height: 16px; }
+  .balken-fill {
+    position: absolute; left: 0; top: 0; height: 16px;
+    background: var(--grau); border-radius: 0 4px 4px 0;
+  }
+  .balkenzeile.ist-vf .balken-fill { background: var(--vf); }
+  .balkenzeile.ist-vf .anbieter { font-weight: 700; }
+  .balken-wert { text-align: left; font-variant-numeric: tabular-nums; }
+  .balken-wert .wert { font-weight: 650; font-size: 14.5px; display: block; }
+  .balken-wert .delta { font-size: 12px; color: var(--ink-2); display: block; }
+  .balken-wert .referenz { font-size: 12px; color: var(--vf); font-weight: 600; }
+
+  .lueckenzeile {
+    font-size: 12.5px; color: var(--ink-3);
+    margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--grat);
+  }
+  .lueckenzeile strong { color: var(--ink-2); font-weight: 600; }
+
+  /* Aufklapper 1 über der Falz: Wie gerechnet? */
+  details.wie-gerechnet { margin-top: 12px; font-size: 13px; }
+  details.wie-gerechnet summary {
+    cursor: pointer; color: var(--ink-2); font-weight: 550;
+    list-style: none; padding: 2px 0;
+  }
+  details.wie-gerechnet summary::before { content: "+ "; color: var(--ink-3); }
+  details.wie-gerechnet[open] summary::before { content: "− "; }
+  details.wie-gerechnet div { color: var(--ink-2); max-width: 78ch; padding: 6px 0 2px 14px; }
+  details.wie-gerechnet code { font-size: 12.5px; background: #f0efec; padding: 1px 5px; border-radius: 4px; }
+
+  /* ---------- Ohne Tarifband ---------- */
+  .ohne-band { margin-bottom: 26px; }
+  .ohne-band h3 { font-size: 15px; font-weight: 650; margin: 0 0 8px; }
+  .ohne-band .zeile {
+    font-size: 13.5px; color: var(--ink-2); padding: 7px 0;
+    border-top: 1px solid var(--grat);
+  }
+  .ohne-band .zeile:last-child { border-bottom: 1px solid var(--grat); }
+  .ohne-band .label { color: var(--ink-3); display: inline-block; min-width: 21ch; }
+  .ohne-band strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Bündelliste (Karten als Zeilen) ---------- */
+  .buendel { margin-bottom: 30px; }
+  .buendel h3 { font-size: 15px; font-weight: 650; margin: 0 0 4px; }
+  .buendel .hinweis { font-size: 12px; color: var(--ink-3); margin: 0 0 10px; }
+  .bnd-kopf, .bnd summary {
+    display: grid; gap: 0 12px;
+    grid-template-columns: 105px 1fr 105px 118px 120px 20px;
+    align-items: baseline; font-size: 13.5px;
+  }
+  .bnd-kopf {
+    font-size: 11.5px; color: var(--ink-3); text-transform: uppercase;
+    letter-spacing: .04em; padding: 0 6px 6px; border-bottom: 1px solid var(--grat-2);
+  }
+  .bnd { border-bottom: 1px solid var(--grat); }
+  .bnd summary {
+    cursor: pointer; list-style: none; padding: 9px 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .bnd summary::-webkit-details-marker { display: none; }
+  .bnd summary:hover { background: #f6f5f1; }
+  .bnd summary:focus-visible { outline: 2px solid var(--vf); outline-offset: -2px; border-radius: 4px; }
+  .bnd .c-an { font-weight: 600; }
+  .bnd .c-tarif { color: var(--ink-2); min-width: 0; }
+  .bnd .c-tco { font-weight: 650; }
+  .bnd .c-delta { color: var(--ink-2); }
+  .bnd .c-bar { color: var(--ink-2); }
+  .bnd .c-chev { color: var(--ink-3); text-align: right; }
+  .bnd[open] .c-chev::before { content: "−"; }
+  .bnd:not([open]) .c-chev::before { content: "+"; }
+  .bnd-rw {
+    margin: 0 6px 12px; padding: 10px 14px; background: #f6f5f1;
+    border-radius: 6px; font-size: 12.5px; color: var(--ink-2);
+    max-width: 82ch;
+  }
+  .bnd-rw .rw-summe { color: var(--ink); font-weight: 550; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .bnd-rw .rw-meta { margin-bottom: 4px; }
+  .bnd-rw .rw-beleg { color: var(--ink-3); }
+
+  /* ---------- Verlauf ---------- */
+  .verlauf {
+    background: var(--flaeche); border: 1px solid var(--grat);
+    border-radius: 8px; padding: 20px 22px 18px; margin-bottom: 30px;
+  }
+  .verlauf h2 { font-size: 17px; font-weight: 650; margin: 0 0 2px; }
+  .verlauf .standzeile { font-size: 12.5px; color: var(--ink-3); margin: 0 0 18px; }
+  .verlauf .standzeile strong { color: var(--ink-2); font-weight: 600; }
+
+  .plot { position: relative; height: 250px; margin: 6px 44px 4px 44px; }
+  .plot .gitter {
+    position: absolute; left: 0; right: 0; height: 1px; background: var(--grat);
+  }
+  .plot .gitter .tick {
+    position: absolute; left: -44px; top: -7px; width: 36px; text-align: right;
+    font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums;
+  }
+  .plot svg.linie { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .punkt { position: absolute; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 2px var(--flaeche); }
+  .punkt-label {
+    position: absolute; transform: translate(-50%, -50%); white-space: nowrap;
+    font-size: 11px; line-height: 1.25; color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .punkt-label i.key {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 4px;
+  }
+  .punkt-label .wert { color: var(--ink); font-weight: 600; }
+  .punkt-label .delta-note { color: var(--s-2); font-weight: 600; }
+  .plot-notiz-m { display: none; position: absolute; right: 1%; top: 5%; font-size: 10.5px; color: var(--s-2); font-weight: 600; }
+  .x-achse { position: relative; height: 18px; margin-left: 44px; margin-right: 44px; }
+  .x-achse span {
+    position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .x-achse span:first-child { transform: none; }
+  .x-achse span:last-child { transform: translateX(-100%); }
+  .plot-legende { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 0 4px; padding-left: 44px; }
+  .plot-legende span { font-size: 11.5px; color: var(--ink-2); }
+  .plot-legende i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+
+  .verlauf-tabelle { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
+  .verlauf-tabelle th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ink-3); font-weight: 550; border-bottom: 1px solid var(--grat-2); padding: 4px 10px 6px 0;
+  }
+  .verlauf-tabelle td { border-bottom: 1px solid var(--grat); padding: 6px 10px 6px 0; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .verlauf-tabelle td:first-child { color: var(--ink); font-weight: 550; }
+  .verlauf-hinweis { font-size: 12.5px; color: var(--ink-3); margin: 14px 0 0; }
+  .verlauf-hinweis a { color: var(--ink-2); }
+
+  /* ---------- Fuß ---------- */
+  .fuss { border-top: 1px solid var(--grat-2); padding-top: 16px; font-size: 12.5px; color: var(--ink-3); }
+  .fuss p { margin: 0 0 8px; max-width: 88ch; }
+  .fuss strong { color: var(--ink-2); font-weight: 600; }
+  .fuss nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  .fuss nav a { color: var(--ink-2); }
+
+  /* ---------- Mobil ---------- */
+  @media (max-width: 640px) {
+    .seite { padding: 20px 16px 48px; }
+    .wahl { gap: 14px; }
+    select { min-width: 0; width: 100%; }
+    .baender { width: 100%; }
+    .baender button { flex: 1; padding: 8px 4px; font-size: 13px; }
+    .modellkopf { gap: 8px; }
+    .modellkopf .barpreis { border-left: 0; padding-left: 0; }
+
+    .balkenzeile { grid-template-columns: 1fr auto; grid-template-areas: "name wert" "spur spur" "delta delta"; row-gap: 5px; }
+    .balken-name { grid-area: name; }
+    .balken-spur { grid-area: spur; }
+    .balken-wert { grid-area: wert; text-align: right; }
+    .balken-wert .delta { text-align: right; }
+    .balkenzeile .delta-frei { grid-area: delta; font-size: 12px; color: var(--ink-3); }
+
+    .bnd-kopf { display: none; }
+    .bnd summary {
+      grid-template-columns: 1fr auto; grid-template-areas: "an tco" "tar bar" "dl chev";
+      row-gap: 3px;
+    }
+    .bnd .c-an { grid-area: an; }
+    .bnd .c-tco { grid-area: tco; text-align: right; }
+    .bnd .c-tarif { grid-area: tar; }
+    .bnd .c-delta { grid-area: dl; }
+    .bnd .c-bar { grid-area: bar; text-align: right; }
+    .bnd .c-chev { grid-area: chev; }
+    .plot { margin-left: 40px; margin-right: 8px; height: 230px; }
+    .plot .gitter .tick { left: -40px; width: 33px; font-size: 10px; }
+    .x-achse { margin-left: 40px; margin-right: 8px; }
+    .plot-legende { padding-left: 40px; gap: 10px 14px; }
+    /* Zu wenig Platz für sechs nebeneinanderliegende Punkte-Labels:
+       Werte stehen in der Tabelle direkt darunter, die Meldung des
+       Verlaufs (mobilcom-debitel +150 EUR) bleibt als Notiz stehen. */
+    .punkt-label { display: none; }
+    .plot-notiz-m { display: block; }
+    .verlauf-tabelle { table-layout: fixed; font-size: 12px; }
+    .verlauf-tabelle th, .verlauf-tabelle td { padding: 5px 6px 5px 0; overflow-wrap: anywhere; }
+  }
+</style>
+</head>
+<body>
+<p class="entwurfbanner">Statischer Design-Entwurf · 12.09.2026 · Zahlen aus <code>data/state</code> (Stand 11.09.2026) · Zielseiten Radar/Katalog nicht mitgeliefert</p>
+
+<div class="seite">
+
+  <div class="marke">
+    <span class="marke-name">Product &amp; Services Insights · Geräteseite</span>
+    <span class="exporte">
+      <a class="knopf" href="exporte/geraete-aktuell.csv" download>CSV · Stand 11.09.</a>
+      <a class="knopf" href="exporte/geraete-historie.csv" download>CSV · Preishistorie</a>
+    </span>
+  </div>
+
+  <h1>Ein Gerät im Tarifvergleich</h1>
+  <p class="unterzeile">
+    Alle Anbieter eines Modells im gewählten Tarifband, Leitzahl TCO-24 — die Gesamtkosten
+    über 24 Monate. Schwesterseite:
+    <a href="wettbewerbsradar.html">Wettbewerbs-Radar — alle Geräte nach Abweichung zu Vodafone&nbsp;→</a>
+  </p>
+
+  <nav class="reiter" aria-label="Ansichten">
+    <span class="aktiv" aria-current="page">Vergleich</span>
+    <a href="wettbewerbsradar.html">Wettbewerbs-Radar</a>
+    <a href="#verlauf">Preisverlauf</a>
+    <a href="geraete.html#tafel-katalog">Gerätekatalog</a>
+  </nav>
+
+  <!-- Auswahl: Gerät × Tarifband (Auftrag §2a) -->
+  <section aria-label="Auswahl">
+    <div class="wahl">
+      <div>
+        <label for="geraet">Gerät</label>
+        <select id="geraet">
+          <option selected>Apple iPhone 17 Pro · 256 GB</option>
+          <option>Apple iPhone 17 Pro · 512 GB</option>
+          <option>Apple iPhone 17 Pro Max · 256 GB</option>
+          <option>Apple iPhone 17 · 256 GB</option>
+          <option>Apple iPhone 17 · 512 GB</option>
+          <option>Apple iPhone Air · 256 GB</option>
+          <option>Apple iPhone 16 · 128 GB</option>
+          <option>Samsung Galaxy S26 Ultra · 256 GB</option>
+          <option>Samsung Galaxy S26 Ultra · 512 GB</option>
+          <option>Samsung Galaxy Z Fold8 · 256 GB</option>
+          <option>Google Pixel 11 Pro XL · 256 GB</option>
+          <option>Google Pixel 11 · 256 GB</option>
+        </select>
+      </div>
+      <div>
+        <label id="band-label">Tarifband</label>
+        <div class="baender" role="group" aria-labelledby="band-label" id="band-wahl">
+          <button type="button" data-band="klein" aria-pressed="true">Klein · bis 20 GB</button>
+          <button type="button" data-band="mittel" aria-pressed="false">Mittel · 21–60 GB</button>
+          <button type="button" data-band="gross" aria-pressed="false">Groß · über 60 GB</button>
+        </div>
+      </div>
+    </div>
+    <p class="wahl-fussnote">
+      Stand 11.09.2026 · 85 Geräte mit mindestens einem erhobenen Bündel (Entwurf zeigt Auszug)
+      · Bänder aus den erhobenen Datenvolumina, <a href="tarife.html">Tarifübersicht</a>
+    </p>
+  </section>
+
+  <div class="modellkopf">
+    <h2>iPhone 17 Pro · 256 GB</h2>
+    <p class="barpreis">
+      Gerätepreis ohne Vertrag: <strong>1.179–1.449&nbsp;€</strong>
+      · 6 Anbieter · Messwerte 10.08.–11.09.2026
+    </p>
+  </div>
+
+  <!-- DER eine Graph: TCO-24 je Anbieter für Gerät × Band -->
+  <section class="hauptgraph" aria-label="TCO-24 je Anbieter">
+    <div class="graph-titel">
+      <h3>TCO-24 je Anbieter</h3>
+      <span class="bandchip" id="graph-bandchip">Band Klein · bis 20 GB</span>
+    </div>
+    <p class="graph-unterzeile" id="graph-unterzeile">
+      Günstigstes Bündel je Anbieter · 4 von 5 Anbietern mit Bündel · Δ = Abstand zur Vodafone-Referenz
+    </p>
+
+    <div class="balkenliste" id="balkenliste">
+      <div class="balkenzeile">
+        <div class="balken-name"><span class="anbieter">congstar</span><span class="tarifzeile">Allnet Flat XS · 15 GB</span></div>
+        <div class="balken-spur"><div class="balken-fill" style="width:68.3%"></div></div>
+        <div class="balken-wert"><span class="wert">1.093,00&nbsp;€</span><span class="delta">−466,80&nbsp;€ · −29,9&nbsp;%</span></div>
+      </div>
+      <div class="balkenzeile">
+        <div class="balken-name"><span class="anbieter">1&amp;1</span><span class="tarifzeile">All-Net-Flat S · 10 GB</span></div>
+        <div class="balken-spur"><div class="balken-fill" style="width:92.5%"></div></div>
+        <div class="balken-wert"><span class="wert">1.479,66&nbsp;€</span><span class="delta">−80,14&nbsp;€ · −5,1&nbsp;%</span></div>
+      </div>
+      <div class="balkenzeile ist-vf">
+        <div class="balken-name"><span class="anbieter">Vodafone</span><span class="vf-chip">unser Angebot</span><span class="tarifzeile">Mobil XS · 18 GB</span></div>
+        <div class="balken-spur"><div class="balken-fill" style="width:97.5%"></div></div>
+        <div class="balken-wert"><span class="wert">1.559,80&nbsp;€</span><span class="referenz">Referenz</span></div>
+      </div>
+      <div class="balkenzeile">
+        <div class="balken-name"><span class="anbieter">Telekom</span><span class="tarifzeile">MagentaMobil XS · 20 GB</span></div>
+        <div class="balken-spur"><div class="balken-fill" style="width:98.2%"></div></div>
+        <div class="balken-wert"><span class="wert">1.570,55&nbsp;€</span><span class="delta">+10,75&nbsp;€ · +0,7&nbsp;%</span></div>
+      </div>
+    </div>
+
+    <p class="lueckenzeile" id="lueckenzeile">
+      Kein Bündel im Band Klein: <strong>o2</strong> · Nicht erhebbar: <strong>Amazon, MediaMarkt, expert, Euronics</strong>
+    </p>
+
+    <details class="wie-gerechnet">
+      <summary>Wie gerechnet?</summary>
+      <div>
+        <p style="margin:0 0 6px">
+          <code>TCO-24 = Gerätezuzahlung + Anschlusspreis + 24 × Tarifgrundpreis + Geräteraten bis Monat 24</code>.
+          Raten, die über Monat 24 hinaus laufen, stehen als eigener Restbetrag im Rechenweg jeder Zeile —
+          sie verfälschen die Leitzahl nicht. Wechselprämien, Cashback und Inzahlungnahme sind nicht enthalten
+          (Auftrag §3). Der Gerätepreis ohne Vertrag bleibt davon getrennt als zweite Zahl im Modellkopf.
+        </p>
+        <p style="margin:0">
+          <strong>Begriffe:</strong> TCO-24 = Gesamtkosten über 24 Monate ·
+          Band = Datenvolumen-Klasse des Tarifs (Klein bis 20 GB · Mittel 21–60 GB · Groß über 60 GB) ·
+          Δ = Abstand zum günstigsten Vodafone-Bündel im selben Band. Rot markiert das Vodafone-Angebot.
+        </p>
+      </div>
+    </details>
+  </section>
+
+  <!-- Ohne Tarifband: kompakt, kein Karten-Mischbestand -->
+  <section class="ohne-band" aria-label="Ohne Tarifband">
+    <h3>Ohne Tarifband</h3>
+    <p class="zeile"><span class="label">Unbegrenzte Tarife (kein Band, §7)</span>
+      o2 Unlimited M Plus <strong>1.356,76&nbsp;€</strong> · Telekom MagentaMobil XL <strong>2.658,15&nbsp;€</strong></p>
+    <p class="zeile"><span class="label">Händler ohne Bündel (nur Barpreis)</span>
+      Saturn <strong>1.179&nbsp;€</strong> · mobilcom-debitel <strong>1.449&nbsp;€</strong></p>
+  </section>
+
+  <!-- Alle Bündel im gewählten Band: Karten als Zeilen, Rechenweg je Zeile -->
+  <section class="buendel" aria-label="Alle Bündel im Band">
+    <h3 id="bnd-titel">Alle Bündel im Band Klein — iPhone 17 Pro 256 GB</h3>
+    <p class="hinweis">Jede Zeile klappt ihren Rechenweg und Beleg auf. Ein Aufklapper je Zeile, nicht mehr.</p>
+    <div class="bnd-kopf" aria-hidden="true">
+      <span>Anbieter</span><span>Tarif · Volumen</span><span>TCO-24</span><span>Δ zu Vodafone</span><span>Barpreis</span><span></span>
+    </div>
+    <div id="bndliste">
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">congstar</span>
+          <span class="c-tarif">Allnet Flat XS · 15 GB</span>
+          <span class="c-tco">1.093,00&nbsp;€</span>
+          <span class="c-delta">−466,80&nbsp;€</span>
+          <span class="c-bar">1.225&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.093,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 30,50&nbsp;€ Geräterate (732,00&nbsp;€) + 24 × 15,00&nbsp;€ Tarif (360,00&nbsp;€) + 0,00&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 45,54&nbsp;€/Monat · Ratenlaufzeit 36 Monate — nach Monat 24 noch 366,00&nbsp;€ offen (getrennt ausgewiesen, nicht in TCO-24) · Rabatte: keine erhoben, keine eingerechnet</div>
+          <div class="rw-beleg">Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026</div>
+        </div>
+      </details>
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">congstar</span>
+          <span class="c-tarif">Allnet Flat XS Flex · 15 GB</span>
+          <span class="c-tco">1.177,00&nbsp;€</span>
+          <span class="c-delta">−382,80&nbsp;€</span>
+          <span class="c-bar">1.225&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.177,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 34,00&nbsp;€ Geräterate (816,00&nbsp;€) + 24 × 15,00&nbsp;€ Tarif (360,00&nbsp;€) + 0,00&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 49,04&nbsp;€/Monat · monatlich kündbar (Flex) · nach Monat 24 noch 408,00&nbsp;€ offen</div>
+          <div class="rw-beleg">Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026</div>
+        </div>
+      </details>
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">1&amp;1</span>
+          <span class="c-tarif">All-Net-Flat S · 10 GB</span>
+          <span class="c-tco">1.479,66&nbsp;€</span>
+          <span class="c-delta">−80,14&nbsp;€</span>
+          <span class="c-bar">—</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.479,66&nbsp;€ = 360,00&nbsp;€ Zuzahlung + 24 × 44,99&nbsp;€ Bündelpreis (1.079,76&nbsp;€) + 39,90&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 61,65&nbsp;€/Monat · Bündelpreis aus Tarif und Gerät zusammen, Laufzeit 36 Monate — nach Monat 24 noch 539,88&nbsp;€ offen</div>
+          <div class="rw-beleg">Beleg: mobile.1und1.de — abgerufen 11.09.2026 · kein Barpreis: 1&amp;1 verkauft dieses Gerät nur im Bündel</div>
+        </div>
+      </details>
+
+      <details class="bnd" open>
+        <summary>
+          <span class="c-an">Vodafone</span>
+          <span class="c-tarif">Mobil XS · 18 GB</span>
+          <span class="c-tco">1.559,80&nbsp;€</span>
+          <span class="c-delta">Referenz</span>
+          <span class="c-bar">1.199,90&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.559,80&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 33,00&nbsp;€ Geräterate (792,00&nbsp;€) + 24 × 31,95&nbsp;€ Tarif (766,80&nbsp;€) + 0,00&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 64,99&nbsp;€/Monat · Ratenlaufzeit 36 Monate — nach Monat 24 noch 396,00&nbsp;€ offen (getrennt ausgewiesen, nicht in TCO-24) · Rabatte: keine erhoben, keine eingerechnet</div>
+          <div class="rw-beleg">Beleg: vodafone.de — abgerufen 06.09.2026 · Barpreis 1.199,90&nbsp;€ vom 29.08.2026</div>
+        </div>
+      </details>
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">Telekom</span>
+          <span class="c-tarif">MagentaMobil XS · 20 GB</span>
+          <span class="c-tco">1.570,55&nbsp;€</span>
+          <span class="c-delta">+10,75&nbsp;€</span>
+          <span class="c-bar">1.197&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.570,55&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 29,70&nbsp;€ Geräterate (712,80&nbsp;€) + 24 × 29,95&nbsp;€ Tarif (718,80&nbsp;€) + 39,95&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 65,44&nbsp;€/Monat · Ratenlaufzeit 36 Monate — nach Monat 24 noch 356,40&nbsp;€ offen</div>
+          <div class="rw-beleg">Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026</div>
+        </div>
+      </details>
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">Telekom</span>
+          <span class="c-tarif">MagentaMobil S · 6 GB</span>
+          <span class="c-tco">1.810,55&nbsp;€</span>
+          <span class="c-delta">+250,75&nbsp;€</span>
+          <span class="c-bar">1.197&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.810,55&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 29,70&nbsp;€ Geräterate (712,80&nbsp;€) + 24 × 39,95&nbsp;€ Tarif (958,80&nbsp;€) + 39,95&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 75,44&nbsp;€/Monat · nach Monat 24 noch 356,40&nbsp;€ offen</div>
+          <div class="rw-beleg">Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026</div>
+        </div>
+      </details>
+
+      <details class="bnd">
+        <summary>
+          <span class="c-an">Telekom</span>
+          <span class="c-tarif">MagentaMobil M · 12 GB</span>
+          <span class="c-tco">1.983,35&nbsp;€</span>
+          <span class="c-delta">+423,55&nbsp;€</span>
+          <span class="c-bar">1.197&nbsp;€</span>
+          <span class="c-chev"></span>
+        </summary>
+        <div class="bnd-rw">
+          <div class="rw-summe">1.983,35&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 26,90&nbsp;€ Geräterate (645,60&nbsp;€) + 24 × 49,95&nbsp;€ Tarif (1.198,80&nbsp;€) + 39,95&nbsp;€ Anschluss</div>
+          <div class="rw-meta">Ø 82,64&nbsp;€/Monat · nach Monat 24 noch 322,80&nbsp;€ offen</div>
+          <div class="rw-beleg">Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026</div>
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- Verlauf: Historie und Export wieder erreichbar -->
+  <section class="verlauf" id="verlauf" aria-label="Preisverlauf">
+    <h2>Preisverlauf · iPhone 17 Pro 256 GB</h2>
+    <p class="standzeile">
+      Gerätepreis ohne Vertrag · 10.08.–11.09.2026 · <strong>5 Messtage</strong> dieses Modells
+      (Kampagne mit Lücken) · Die TCO-24-Historie je Bündel beginnt mit dem ersten nächtlichen Lauf
+      am <strong>12.09.2026</strong> und wächst täglich.
+    </p>
+
+    <div class="plot" id="plot" role="img" aria-label="Punkt-Plot der Barpreise: mobilcom-debitel steigt von 1.299 auf 1.449 Euro; alle übrigen Anbieter haben je einen Messpunkt zwischen 1.179 und 1.315 Euro.">
+      <div class="gitter" style="top:14.3%"><span class="tick">1.400</span></div>
+      <div class="gitter" style="top:42.9%"><span class="tick">1.300</span></div>
+      <div class="gitter" style="top:71.4%"><span class="tick">1.200</span></div>
+      <svg class="linie" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0.8%" y1="57.4%" x2="98.5%" y2="14.6%" stroke="#eb6834" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+      </svg>
+      <!-- Punkte: x = Datum (10.08.=0 % … 11.09.=100 %), y = Preis (1.150–1.500 €) -->
+      <span class="punkt" style="left:0.8%; top:57.4%; background:#eb6834"></span>
+      <span class="punkt-label" style="left:9%; top:57.4%"><i class="key" style="background:#eb6834"></i><span class="wert">1.299&nbsp;€</span> mobilcom-debitel</span>
+
+      <span class="punkt" style="left:59.4%; top:85.7%; background:#e60000"></span>
+      <span class="punkt-label" style="left:47%; top:85.7%"><i class="key" style="background:#e60000"></i><span class="wert">1.199,90&nbsp;€</span> Vodafone</span>
+
+      <span class="punkt" style="left:59.4%; top:52.9%; background:#1baf7a"></span>
+      <span class="punkt-label" style="left:51%; top:47.5%"><i class="key" style="background:#1baf7a"></i><span class="wert">1.315&nbsp;€</span> o2</span>
+
+      <span class="punkt" style="left:75%; top:78.6%; background:#2a78d6"></span>
+      <span class="punkt-label" style="left:69%; top:72%"><i class="key" style="background:#2a78d6"></i><span class="wert">1.225&nbsp;€</span> congstar</span>
+
+      <span class="punkt" style="left:81.3%; top:91.7%; background:#eda100"></span>
+      <span class="punkt-label" style="left:74%; top:97%"><i class="key" style="background:#eda100"></i><span class="wert">1.179&nbsp;€</span> Saturn</span>
+
+      <span class="punkt" style="left:81.3%; top:86.6%; background:#e87ba4"></span>
+      <span class="punkt-label" style="left:91%; top:82%"><i class="key" style="background:#e87ba4"></i><span class="wert">1.197&nbsp;€</span> Telekom</span>
+
+      <span class="punkt" style="left:98.5%; top:14.6%; background:#eb6834"></span>
+      <span class="punkt-label" style="left:87%; top:21%"><i class="key" style="background:#eb6834"></i><span class="wert">1.449&nbsp;€</span> mobilcom-debitel <span class="delta-note">+150&nbsp;€ seit 10.08.</span></span>
+
+      <span class="plot-notiz-m">mobilcom-debitel: +150&nbsp;€<br>seit 10.08. → 1.449&nbsp;€</span>
+    </div>
+    <div class="x-achse" aria-hidden="true">
+      <span style="left:0.8%">10.08.</span>
+      <span style="left:59.4%">29.08.</span>
+      <span style="left:81.3%">05.09.</span>
+      <span style="left:98.5%">11.09.</span>
+    </div>
+    <div class="plot-legende" aria-label="Anbieter im Verlauf">
+      <span><i style="background:#e60000"></i>Vodafone</span>
+      <span><i style="background:#2a78d6"></i>congstar</span>
+      <span><i style="background:#eb6834"></i>mobilcom-debitel</span>
+      <span><i style="background:#1baf7a"></i>o2</span>
+      <span><i style="background:#eda100"></i>Saturn</span>
+      <span><i style="background:#e87ba4"></i>Telekom</span>
+    </div>
+
+    <table class="verlauf-tabelle">
+      <caption class="hinweis" style="font-size:12px;color:var(--ink-3);text-align:left;padding-bottom:6px">Werte des Verlaufs als Tabelle</caption>
+      <thead>
+        <tr><th>Anbieter</th><th>Messung</th><th>Gerätepreis ohne Vertrag</th><th>Veränderung</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>mobilcom-debitel</td><td>10.08. → 11.09.2026</td><td>1.299&nbsp;€ → 1.449&nbsp;€</td><td>+150&nbsp;€</td></tr>
+        <tr><td>Vodafone</td><td>29.08.2026</td><td>1.199,90&nbsp;€</td><td>ein Messpunkt</td></tr>
+        <tr><td>o2</td><td>29.08.2026</td><td>1.315&nbsp;€</td><td>ein Messpunkt</td></tr>
+        <tr><td>congstar</td><td>03.09.2026</td><td>1.225&nbsp;€</td><td>ein Messpunkt</td></tr>
+        <tr><td>Saturn</td><td>05.09.2026</td><td>1.179&nbsp;€</td><td>ein Messpunkt</td></tr>
+        <tr><td>Telekom</td><td>05.09.2026</td><td>1.197&nbsp;€</td><td>ein Messpunkt</td></tr>
+      </tbody>
+    </table>
+
+    <p class="verlauf-hinweis">
+      1&amp;1 verkauft dieses Gerät nur im Bündel — kein Barpreis messbar.
+      Vollständige Messreihe als <a href="exporte/geraete-historie.csv" download>Preishistorie (CSV)</a>,
+      aktueller Stand als <a href="exporte/geraete-aktuell.csv" download>CSV · Stand 11.09.</a>
+    </p>
+  </section>
+
+  <footer class="fuss">
+    <p>
+      <strong>Methodik:</strong> TCO-24 = Gerätezuzahlung + Anschlusspreis + 24 × Tarifgrundpreis +
+      Geräteraten bis Monat 24 (Restbeträge getrennt ausgewiesen). Gerätepreis ohne Vertrag und TCO-24
+      sind zwei Zahlen und werden nie vermischt (Auftrag §3). Bänder: Klein bis 20 GB · Mittel 21–60 GB ·
+      Groß über 60 GB — unbegrenzte Tarife bleiben außerhalb.
+    </p>
+    <p>
+      Datenstand 11.09.2026 · 589 Bündel und 600 Listungen in data/state · Telekom-Bündel vom 09.09.
+      (Erhebungslücke, nicht Portfoliolücke). Nicht erhebbar: Amazon (kein API-Zugang), MediaMarkt,
+      expert, Euronics (HTTP 403).
+    </p>
+    <nav aria-label="Weitere Seiten">
+      <a href="wettbewerbsradar.html">Wettbewerbs-Radar — alle Geräte nach Abweichung</a>
+      <a href="tarife.html">Tarifübersicht — Bänder und Tarifsätze</a>
+      <a href="geraete.html#tafel-katalog">Gerätekatalog</a>
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+    </nav>
+  </footer>
+
+</div>
+
+<script>
+/* Bandwechsel: Balkengrafik und Bündelliste folgen der Auswahl (Auftrag §2a).
+   Zahlen aus data/state/geraete_tco.json + tarife.jsonl, Stand 11.09.2026,
+   TCO-24 nachgerechnet mit tco_model.tco_24. */
+const BAENDER = {
+  klein: {
+    chip: "Band Klein · bis 20 GB",
+    unterzeile: "Günstigstes Bündel je Anbieter · 4 von 5 Anbietern mit Bündel · Δ = Abstand zur Vodafone-Referenz",
+    max: 1600,
+    luecken: "Kein Bündel im Band Klein: <strong>o2</strong> · Nicht erhebbar: <strong>Amazon, MediaMarkt, expert, Euronics</strong>",
+    zeilen: [
+      { an: "congstar", tarif: "Allnet Flat XS · 15 GB", tco: 1093.00 },
+      { an: "1&1", tarif: "All-Net-Flat S · 10 GB", tco: 1479.66 },
+      { an: "Vodafone", tarif: "Mobil XS · 18 GB", tco: 1559.80, vf: true },
+      { an: "Telekom", tarif: "MagentaMobil XS · 20 GB", tco: 1570.55 }
+    ],
+    tabelle: [
+      ["congstar", "Allnet Flat XS · 15 GB", "1.093,00&nbsp;€", "−466,80&nbsp;€", "1.225&nbsp;€",
+        "1.093,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 30,50&nbsp;€ Geräterate (732,00&nbsp;€) + 24 × 15,00&nbsp;€ Tarif (360,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 45,54&nbsp;€/Monat · Ratenlaufzeit 36 Monate — nach Monat 24 noch 366,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["congstar", "Allnet Flat XS Flex · 15 GB", "1.177,00&nbsp;€", "−382,80&nbsp;€", "1.225&nbsp;€",
+        "1.177,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 34,00&nbsp;€ Geräterate (816,00&nbsp;€) + 24 × 15,00&nbsp;€ Tarif (360,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 49,04&nbsp;€/Monat · monatlich kündbar (Flex) · nach Monat 24 noch 408,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["1&1", "All-Net-Flat S · 10 GB", "1.479,66&nbsp;€", "−80,14&nbsp;€", "—",
+        "1.479,66&nbsp;€ = 360,00&nbsp;€ Zuzahlung + 24 × 44,99&nbsp;€ Bündelpreis (1.079,76&nbsp;€) + 39,90&nbsp;€ Anschluss",
+        "Ø 61,65&nbsp;€/Monat · Bündelpreis aus Tarif und Gerät zusammen, Laufzeit 36 Monate — nach Monat 24 noch 539,88&nbsp;€ offen",
+        "Beleg: mobile.1und1.de — abgerufen 11.09.2026 · kein Barpreis: 1&amp;1 verkauft nur im Bündel"],
+      ["Vodafone", "Mobil XS · 18 GB", "1.559,80&nbsp;€", "Referenz", "1.199,90&nbsp;€",
+        "1.559,80&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 33,00&nbsp;€ Geräterate (792,00&nbsp;€) + 24 × 31,95&nbsp;€ Tarif (766,80&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 64,99&nbsp;€/Monat · Ratenlaufzeit 36 Monate — nach Monat 24 noch 396,00&nbsp;€ offen",
+        "Beleg: vodafone.de — abgerufen 06.09.2026 · Barpreis 1.199,90&nbsp;€ vom 29.08.2026"],
+      ["Telekom", "MagentaMobil XS · 20 GB", "1.570,55&nbsp;€", "+10,75&nbsp;€", "1.197&nbsp;€",
+        "1.570,55&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 29,70&nbsp;€ Geräterate (712,80&nbsp;€) + 24 × 29,95&nbsp;€ Tarif (718,80&nbsp;€) + 39,95&nbsp;€ Anschluss",
+        "Ø 65,44&nbsp;€/Monat · nach Monat 24 noch 356,40&nbsp;€ offen",
+        "Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026"],
+      ["Telekom", "MagentaMobil S · 6 GB", "1.810,55&nbsp;€", "+250,75&nbsp;€", "1.197&nbsp;€",
+        "1.810,55&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 29,70&nbsp;€ Geräterate (712,80&nbsp;€) + 24 × 39,95&nbsp;€ Tarif (958,80&nbsp;€) + 39,95&nbsp;€ Anschluss",
+        "Ø 75,44&nbsp;€/Monat · nach Monat 24 noch 356,40&nbsp;€ offen",
+        "Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026"],
+      ["Telekom", "MagentaMobil M · 12 GB", "1.983,35&nbsp;€", "+423,55&nbsp;€", "1.197&nbsp;€",
+        "1.983,35&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 26,90&nbsp;€ Geräterate (645,60&nbsp;€) + 24 × 49,95&nbsp;€ Tarif (1.198,80&nbsp;€) + 39,95&nbsp;€ Anschluss",
+        "Ø 82,64&nbsp;€/Monat · nach Monat 24 noch 322,80&nbsp;€ offen",
+        "Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026"]
+    ]
+  },
+  mittel: {
+    chip: "Band Mittel · 21–60 GB",
+    unterzeile: "Günstigstes Bündel je Anbieter · 2 von 5 Anbietern mit Bündel · Δ = Abstand zur Vodafone-Referenz",
+    max: 2200,
+    luecken: "Kein Bündel im Band Mittel: <strong>o2, Telekom, 1&amp;1</strong> · Nicht erhebbar: <strong>Amazon, MediaMarkt, expert, Euronics</strong>",
+    zeilen: [
+      { an: "congstar", tarif: "Allnet Flat S · 50 GB", tco: 1165.00 },
+      { an: "Vodafone", tarif: "Mobil S · 35 GB", tco: 2195.80, vf: true }
+    ],
+    tabelle: [
+      ["congstar", "Allnet Flat S · 50 GB", "1.165,00&nbsp;€", "−1.030,80&nbsp;€", "1.225&nbsp;€",
+        "1.165,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 28,50&nbsp;€ Geräterate (684,00&nbsp;€) + 24 × 20,00&nbsp;€ Tarif (480,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 48,54&nbsp;€/Monat · nach Monat 24 noch 342,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["congstar", "Allnet Flat S Flex · 50 GB", "1.297,00&nbsp;€", "−898,80&nbsp;€", "1.225&nbsp;€",
+        "1.297,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 34,00&nbsp;€ Geräterate (816,00&nbsp;€) + 24 × 20,00&nbsp;€ Tarif (480,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 54,04&nbsp;€/Monat · monatlich kündbar (Flex) · nach Monat 24 noch 408,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["Vodafone", "Mobil S · 35 GB", "2.195,80&nbsp;€", "Referenz", "1.199,90&nbsp;€",
+        "2.195,80&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 12 × 99,00&nbsp;€ Geräterate (1.188,00&nbsp;€) + 24 × 41,95&nbsp;€ Tarif (1.006,80&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 91,49&nbsp;€/Monat · Ratenlaufzeit nur 12 Monate — keine offenen Raten nach Monat 24",
+        "Beleg: vodafone.de — abgerufen 11.09.2026 · Barpreis 1.199,90&nbsp;€ vom 29.08.2026"],
+      ["Vodafone", "Mobil M · 60 GB", "2.435,80&nbsp;€", "+240,00&nbsp;€", "1.199,90&nbsp;€",
+        "2.435,80&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 49,50&nbsp;€ Geräterate (1.188,00&nbsp;€) + 24 × 51,95&nbsp;€ Tarif (1.246,80&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 101,49&nbsp;€/Monat · Ratenlaufzeit 24 Monate — keine offenen Raten nach Monat 24",
+        "Beleg: vodafone.de — abgerufen 11.09.2026 · Barpreis 1.199,90&nbsp;€ vom 29.08.2026"]
+    ]
+  },
+  gross: {
+    chip: "Band Groß · über 60 GB",
+    unterzeile: "Günstigstes Bündel je Anbieter · 3 von 5 Anbietern mit Bündel · Vodafone fehlt in diesem Band — keine Δ-Angabe",
+    max: 2200,
+    luecken: "Kein Bündel im Band Groß: <strong>Vodafone, 1&amp;1</strong> · Nicht erhebbar: <strong>Amazon, MediaMarkt, expert, Euronics</strong>",
+    zeilen: [
+      { an: "congstar", tarif: "Allnet Flat M · 125 GB", tco: 1237.00 },
+      { an: "o2", tarif: "Mobile L Plus · 150 GB", tco: 1356.76 },
+      { an: "Telekom", tarif: "MagentaMobil L · 80 GB", tco: 2156.15 }
+    ],
+    tabelle: [
+      ["congstar", "Allnet Flat M · 125 GB", "1.237,00&nbsp;€", "—", "1.225&nbsp;€",
+        "1.237,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 27,50&nbsp;€ Geräterate (660,00&nbsp;€) + 24 × 24,00&nbsp;€ Tarif (576,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 51,54&nbsp;€/Monat · nach Monat 24 noch 330,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["congstar", "Allnet Flat L · 200 GB", "1.333,00&nbsp;€", "—", "1.225&nbsp;€",
+        "1.333,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 26,50&nbsp;€ Geräterate (636,00&nbsp;€) + 24 × 29,00&nbsp;€ Tarif (696,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 55,54&nbsp;€/Monat · nach Monat 24 noch 318,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["o2", "Mobile L Plus · 150 GB", "1.356,76&nbsp;€", "—", "1.315&nbsp;€",
+        "1.356,76&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 36,50&nbsp;€ Geräterate (876,00&nbsp;€) + 24 × 19,99&nbsp;€ Tarif (479,76&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 56,53&nbsp;€/Monat · nach Monat 24 noch 438,00&nbsp;€ offen",
+        "Beleg: o2.de — abgerufen 08.09.2026 · Barpreis 1.315&nbsp;€ vom 29.08.2026"],
+      ["congstar", "Allnet Flat M Flex · 125 GB", "1.393,00&nbsp;€", "—", "1.225&nbsp;€",
+        "1.393,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 34,00&nbsp;€ Geräterate (816,00&nbsp;€) + 24 × 24,00&nbsp;€ Tarif (576,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 58,04&nbsp;€/Monat · monatlich kündbar (Flex) · nach Monat 24 noch 408,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["congstar", "Allnet Flat L Flex · 200 GB", "1.513,00&nbsp;€", "—", "1.225&nbsp;€",
+        "1.513,00&nbsp;€ = 1,00&nbsp;€ Zuzahlung + 24 × 34,00&nbsp;€ Geräterate (816,00&nbsp;€) + 24 × 29,00&nbsp;€ Tarif (696,00&nbsp;€) + 0,00&nbsp;€ Anschluss",
+        "Ø 63,04&nbsp;€/Monat · monatlich kündbar (Flex) · nach Monat 24 noch 408,00&nbsp;€ offen",
+        "Beleg: congstar.de — abgerufen 11.09.2026 · Barpreis 1.225&nbsp;€ vom 03.09.2026"],
+      ["Telekom", "MagentaMobil L · 80 GB", "2.156,15&nbsp;€", "—", "1.197&nbsp;€",
+        "2.156,15&nbsp;€ = 99,00&nbsp;€ Zuzahlung + 24 × 24,10&nbsp;€ Geräterate (578,40&nbsp;€) + 24 × 59,95&nbsp;€ Tarif (1.438,80&nbsp;€) + 39,95&nbsp;€ Anschluss",
+        "Ø 89,84&nbsp;€/Monat · nach Monat 24 noch 289,20&nbsp;€ offen",
+        "Beleg: telekom.de — abgerufen 09.09.2026 · Barpreis 1.197&nbsp;€ vom 05.09.2026"]
+    ]
+  }
+};
+
+const euro = n => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "&nbsp;€";
+
+function zeichne(bandKey) {
+  const b = BAENDER[bandKey];
+  const vfTco = (b.zeilen.find(z => z.vf) || {}).tco;
+
+  document.getElementById("graph-bandchip").textContent = b.chip;
+  document.getElementById("graph-unterzeile").textContent = b.unterzeile;
+  document.getElementById("lueckenzeile").innerHTML = b.luecken;
+  document.getElementById("bnd-titel").textContent =
+    "Alle Bündel im " + b.chip.split(" · ")[0] + " — iPhone 17 Pro 256 GB";
+
+  const liste = document.getElementById("balkenliste");
+  liste.innerHTML = b.zeilen.map(z => {
+    const breite = (z.tco / b.max * 100).toFixed(1);
+    let deltaHtml;
+    if (z.vf) deltaHtml = '<span class="referenz">Referenz</span>';
+    else if (vfTco) {
+      const d = z.tco - vfTco;
+      const p = (d / vfTco * 100);
+      deltaHtml = '<span class="delta">' + (d >= 0 ? "+" : "−") +
+        Math.abs(d).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+        "&nbsp;€ · " + (p >= 0 ? "+" : "−") + Math.abs(p).toLocaleString("de-DE", { maximumFractionDigits: 1 }) +
+        "&nbsp;%</span>";
+    } else deltaHtml = '<span class="delta">keine Referenz im Band</span>';
+    return '<div class="balkenzeile' + (z.vf ? " ist-vf" : "") + '">' +
+      '<div class="balken-name"><span class="anbieter">' + z.an + "</span>" +
+      (z.vf ? '<span class="vf-chip">unser Angebot</span>' : "") +
+      '<span class="tarifzeile">' + z.tarif + "</span></div>" +
+      '<div class="balken-spur"><div class="balken-fill" style="width:' + breite + '%"></div></div>' +
+      '<div class="balken-wert"><span class="wert">' + euro(z.tco) + "</span>" + deltaHtml + "</div></div>";
+  }).join("");
+
+  const vfZeileOffen = b.tabelle.findIndex(r => r[3] === "Referenz");
+  document.getElementById("bndliste").innerHTML = b.tabelle.map((r, i) =>
+    '<details class="bnd"' + (i === vfZeileOffen ? " open" : "") + "><summary>" +
+    '<span class="c-an">' + r[0] + "</span>" +
+    '<span class="c-tarif">' + r[1] + "</span>" +
+    '<span class="c-tco">' + r[2] + "</span>" +
+    '<span class="c-delta">' + r[3] + "</span>" +
+    '<span class="c-bar">' + r[4] + "</span>" +
+    '<span class="c-chev"></span></summary>' +
+    '<div class="bnd-rw"><div class="rw-summe">' + r[5] + "</div>" +
+    '<div class="rw-meta">' + r[6] + "</div>" +
+    '<div class="rw-beleg">' + r[7] + "</div></div></details>"
+  ).join("");
+}
+
+document.getElementById("band-wahl").addEventListener("click", ev => {
+  const knopf = ev.target.closest("button[data-band]");
+  if (!knopf) return;
+  document.querySelectorAll("#band-wahl button").forEach(b =>
+    b.setAttribute("aria-pressed", b === knopf ? "true" : "false"));
+  zeichne(knopf.dataset.band);
+});
+</script>
+</body>
+</html>
