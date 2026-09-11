@@ -117,7 +117,7 @@ jobs:
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
-          # Gezielt nur die drei Dateien dieser Stufe. Kein `git add data/`:
+          # Gezielt nur die vier Dateien dieser Stufe. Kein `git add data/`:
           # dieser Lauf hat mit dem Seen-Store und den Berichten nichts zu
           # tun, und ein weiter Pfad wuerde fremde Aenderungen mitnehmen.
           #
@@ -129,6 +129,13 @@ jobs:
           # (Phase 4), waere jede Nacht die Messung der vorigen weg.
           git add data/state/geraete_db.json data/state/geraete_preise.jsonl \
                   data/state/geraete_tco.json
+          if [ -f data/state/geraete_tco_historie.jsonl ]; then
+            # Die Buendel-Preishistorie (P2, 11.09.2026) kann kein spaeterer
+            # Lauf neu erzeugen und wird deshalb mitgesichert. Fehlt die
+            # Datei noch (erste Nacht ohne Buendel), darf das Add sie nicht
+            # scheitern lassen und die drei oben mitziehen.
+            git add data/state/geraete_tco_historie.jsonl
+          fi
           if git diff --cached --quiet; then
             echo "Keine Aenderung am Geraetebestand."
             exit 0

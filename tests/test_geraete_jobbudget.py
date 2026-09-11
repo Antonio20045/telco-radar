@@ -78,7 +78,7 @@ def test_die_jobfrist_passt_zum_workflow():
     assert s["job_frist_sekunden"] == minuten * 60
 
 
-def test_der_nachtlauf_committet_alle_drei_zustandsdateien():
+def test_der_nachtlauf_committet_alle_vier_zustandsdateien():
     """Was der Lauf schreibt, muss er auch abliefern.
 
     `run_geraete_stage` schreibt seit dem 04.09.2026 drei Dateien:
@@ -92,6 +92,10 @@ def test_der_nachtlauf_committet_alle_drei_zustandsdateien():
     ein Adapter Buendel liefert (Phase 4), waere jede Nacht die Messung der
     vorigen weg. Dieselbe Fehlerklasse wie der Navigationseintrag vom
     11.08.2026: gebaut, geprueft, und fuer jeden Leser nicht da.
+
+    Die VIERTE Datei (P2, 11.09.2026) verschaerft das: die
+    Buendel-Preishistorie `geraete_tco_historie.jsonl` kann KEIN Spaeterer
+    Lauf neu erzeugen - ein nicht committeter Messtag ist fuer immer weg.
     """
     text = (Path(__file__).parent.parent / ".github" / "workflows"
             / "geraete.yml").read_text(encoding="utf-8")
@@ -99,5 +103,5 @@ def test_der_nachtlauf_committet_alle_drei_zustandsdateien():
     assert zeile, "der Workflow addiert keine Zustandsdatei mehr"
     block = text[text.index(zeile[0]):text.index(zeile[0]) + 300]
     for datei in ("geraete_db.json", "geraete_preise.jsonl",
-                  "geraete_tco.json"):
+                  "geraete_tco.json", "geraete_tco_historie.jsonl"):
         assert datei in block, datei

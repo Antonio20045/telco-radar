@@ -40,10 +40,31 @@ ist keine Messung dieses Laufs.
 
 Was hier bewusst NICHT steht
 ----------------------------
-Keine Zwei-Stufen-Auslistung (`mark_stale`) und keine Preishistorie. Beides
-braucht erst einen Lauf, der Buendel wirklich sammelt - den gibt es noch
-nicht, und eine Alterungslogik ohne einen einzigen Lauf waere gegen nichts
-gemessen. Bis dahin wird nichts geloescht.
+Keine Zwei-Stufen-Auslistung (`mark_stale`) - eine Alterungslogik ohne
+einen einzigen Lauf waere gegen nichts gemessen. Bis dahin wird nichts
+geloescht.
+
+Die Preishistorie steht hier sehr wohl - seit P2 (11.09.2026)
+-------------------------------------------------------------
+`geraete_tco.json` bleibt der AKTUELLE Stand je Buendel: die Seite liest
+weiter nur ihn. Daneben waechst
+
+    data/state/geraete_tco_historie.jsonl
+
+eine Zeile je (buendel_id, datum) mit den Messfeldern, der gerechneten
+Leitzahl `gesamt` (eingefroren aus `tco_model.tco_24`, damit P5 die Reihe
+zeichnen kann, ohne die Rechnung frueherer Laeufe nachzubauen) und
+`abgerufen_am`. Die Schreibregeln:
+
+* gleiches Datum je Buendel -> die Zeile wird ERSETZT. Ein wiederholter
+  Lauf am selben Tag ist dieselbe Messung, kein zweiter Punkt (sonst
+  luege die Reihe ab P5 um die Zahl der Nachtlaeufe, nicht um den Markt).
+* neues Datum -> neue Zeile dazu; ALTE Tage bleiben unveraendert stehen.
+  Ein Messtag ist nicht nachholbar - deshalb wird die Datei beim
+  Zusammenfuehren gelesen und nie blind neu geschrieben.
+* Es gibt keine Rueckrechnung aus den frueheren Stand-Commits
+  (Entscheidung 3 im Strategiedokument): die Reihe beginnt ehrlich mit
+  dem ersten Lauf nach der Umstellung.
 """
 from __future__ import annotations
 
@@ -53,7 +74,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
-from ..tco_model import Buendel, SimOnlyReferenz, sim_only_id
+from ..tco_model import Buendel, SimOnlyReferenz, sim_only_id, tco_24
 
 log = logging.getLogger(__name__)
 
@@ -83,18 +104,34 @@ _REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
                         "quelle_url", "abgerufen_am", "quelle_art",
                         "bindung_monate", "volumen_gb")
 
+# Die Append-Historie liegt NEBEN der Stand-Datei (P2, 11.09.2026) - siehe
+# Modulkopf. Ihr Name ist fest, weil der naechtliche Lauf sie namentlich
+# committet (.github/workflows/geraete.yml).
+_HISTORIE_NAME = "geraete_tco_historie.jsonl"
+
 
 class TcoDB:
     """data/state/geraete_tco.json - Buendel und SIM-only-Referenzen.
 
     Format: {"updated": "YYYY-MM-DD", "buendel": [...], "sim_only": [...]}.
+
+    Daneben fuehrt der Store die Preishistorie
+    `geraete_tco_historie.jsonl` (Attribut `historie_path`): eine Zeile je
+    (buendel_id, datum), siehe Modulkopf.
     """
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, historie_path: Optional[Path] = None):
         self.path = Path(path)
+        self.historie_path = (Path(historie_path) if historie_path is not None
+                              else self.path.parent / _HISTORIE_NAME)
         self._buendel: dict[str, dict] = {}
         self._referenzen: dict[str, dict] = {}
         self.updated = ""
+        # Die Messungen dieses PROZESSES, noch nicht geschrieben: der
+        # Schluessel ist (buendel_id, datum), ein zweiter Upsert am selben
+        # Tag ersetzt den ersten - dieselbe Idempotenz, die beim
+        # Zusammenfuehren mit der Datei gilt.
+        self._historie_pendente: dict[tuple[str, str], dict] = {}
         # Eine unlesbare Datei ist NICHT dasselbe wie "noch nichts gefunden" -
         # dieselbe Unterscheidung wie in `GeraeteDB` und aus demselben Grund:
         # sonst meldet die Seite eine leere Datenlage, wo ein Lesefehler war.
@@ -187,6 +224,12 @@ class TcoDB:
             self._schreibe_messung(eintrag, satz, _MESSFELDER)
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]
             eintrag["last_verified"] = today
+            # Dieselbe Messung auch fuer die Historie vormerken - am `today`
+            # dieses Aufrufs, nicht am `save()`-Datum: die Zeile gehoert dem
+            # Lauf, der sie gemessen hat. Der Schluessel ersetzt bei
+            # wiederholtem Upsert denselben Tag still (idempotent).
+            self._historie_pendente[(bid, today)] = self._historie_zeile(
+                satz, today)
         return neu, gesehen
 
     def setze_referenzen(self, referenzen, today: str) -> int:
@@ -248,6 +291,24 @@ class TcoDB:
         for feld in felder:
             eintrag[feld] = getattr(satz, feld)
 
+    @staticmethod
+    def _historie_zeile(satz: Buendel, datum: str) -> dict:
+        """Eine Zeile der Preishistorie - siehe Modulkopf (P2).
+
+        Die Messfelder kommen aus derselben Positivliste wie der Stand
+        (`_MESSFELDER`): ein neues Messfeld muss in BEIDEN landen, sonst
+        klaffe Stand und Historie auseinander. `gesamt` ist die Leitzahl
+        der Messung, eingefroren aus `tco_model.tco_24` - die Rechnung
+        bleibt dort, hier steht nur ihr Ergebnis von damals. Sie kann
+        `None` sein (Messung ohne jeden Posten); das ist eine ehrliche
+        Luecke und kein Fehler.
+        """
+        zeile = {"id": satz.id, "datum": datum}
+        for feld in _MESSFELDER:
+            zeile[feld] = getattr(satz, feld)
+        zeile["gesamt"] = tco_24(satz).gesamt
+        return zeile
+
     # ---------------------------------------------------------------- save
 
     def save(self, today: str) -> bool:
@@ -257,6 +318,12 @@ class TcoDB:
         Buendel liefert (Phase 6/7 des Strategiedokuments), soll dieser
         Zweig im naechtlichen Lauf nichts hinterlassen: eine Datei mit zwei
         leeren Listen sieht im Repo aus wie ein Ergebnis und ist keins.
+
+        Seit P2 schreibt `save` ZUSAETZLICH die vorgemerkten Historienzeilen
+        dieses Laufs in `geraete_tco_historie.jsonl`. Die Stand-Datei wird
+        ZUERST gesichert: ein Fehler an der Historie darf den Messtag der
+        Gegenwart nicht kosten (der Rueckgabewert bleibt an der Stand-Datei
+        gebunden).
         """
         if not self._buendel and not self._referenzen:
             return False
@@ -266,4 +333,55 @@ class TcoDB:
                  "sim_only": self.referenzen()}
         self.path.write_text(json.dumps(daten, ensure_ascii=False, indent=1),
                              encoding="utf-8")
+        self._schreibe_historie()
+        return True
+
+    def _schreibe_historie(self) -> bool:
+        """Fuegt die Messungen dieses Laufs in die Historie ein.
+
+        True heisst geschrieben, False heisst "nichts zu schreiben" ODER
+        "nicht angefasst" - eine unlesbare Historie wird uebersprungen und
+        NICHT durch eine nur-neue ersetzt: das Zusammenfuegen haette den
+        Rest der Datei vernichtet, gegen genau das ist P2 gebaut. Der
+        Schaden ist im Protokoll sichtbar, der Bestand trotzdem gesichert.
+
+        Ein Schreibfehler (Platte, Rechte) wirft dagegen - er darf nicht
+        als Erfolg durchgehen.
+        """
+        if not self._historie_pendente:
+            return False
+        zusammen: dict[tuple[str, str], dict] = {}
+        if self.historie_path.exists():
+            try:
+                text = self.historie_path.read_text(encoding="utf-8")
+                saetze = [json.loads(zeile) for zeile in text.splitlines()
+                          if zeile.strip()]
+            except (json.JSONDecodeError, OSError) as exc:
+                log.warning("%s unlesbar (%s) - Historie NICHT angefasst, "
+                            "nur der Stand geschrieben",
+                            self.historie_path.name, exc)
+                return False
+            if any(not isinstance(satz, dict)
+                   or not (satz.get("id") or "").strip()
+                   or not (satz.get("datum") or "").strip()
+                   for satz in saetze):
+                # Eine Zeile ohne Schluessel liesse sich nicht zusammen-
+                # fuehren; sie ueberspringen hiesse sie loeschen.
+                log.warning("%s enthaelt Zeilen ohne (id, datum) - "
+                            "Historie NICHT angefasst",
+                            self.historie_path.name)
+                return False
+            for satz in saetze:
+                # Bestehende Reihenfolge bleibt stehen; ein Doppel-Schluessel
+                # aus frueheren Laeufen haelt den INHALT des letzten.
+                zusammen[(satz["id"], satz["datum"])] = satz
+        # Die Messungen dieses Laufs ERSETZEN einen gleichschluessigen Tag
+        # an dessen Stelle und neue Tage haengen hinten an - alte Tage
+        # bleiben in Inhalt und Stellung unveraendert.
+        zusammen.update(self._historie_pendente)
+        self.historie_path.parent.mkdir(parents=True, exist_ok=True)
+        self.historie_path.write_text(
+            "".join(json.dumps(satz, ensure_ascii=False) + "\n"
+                    for satz in zusammen.values()),
+            encoding="utf-8")
         return True
