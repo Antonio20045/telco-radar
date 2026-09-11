@@ -321,28 +321,35 @@ def barpreise(listungen: list) -> dict:
 
 
 def _geraetepreis(barpreis: Optional[dict], zuzahlung: Optional[float],
-                  raten_summe: Optional[float]) -> Optional[float]:
-    """Der reine Geraetepreis inkl. Finanzierung - die Leitzahl der Karte
-    (BRIEF_RAHMEN2, 05.09.2026: A-R5 - die Grafik darueber zeigt
-    Geraetepreise, die Karten fuehrten mit der TCO-Buendelzahl. Das
-    widersprach der Ueberschrift "Dieses Geraet - wo kaufe ich es am
-    guenstigsten?").
+                  raten_summe: Optional[float]) -> tuple[Optional[float],
+                                                         Optional[str]]:
+    """Der Geraetepreis der Karte - MIT SEINER ART (P1/TCO-1, 11.09.2026).
+
+    Rueckgabe `(betrag, art)`, art ist "barpreis" oder "finanzierung"
+    (beides `None`, wenn nichts belegt ist). Die Art entscheidet auf der
+    Karte ueber das Etikett: Der EIGENE Barpreis ohne Vertrag heisst
+    „Gerätepreis“ (A-R5, BRIEF_RAHMEN2 05.09.2026). Die Summe aus Zuzahlung
+    und ALLEN Raten (das o2-Muster, bei congstar Galaxy S26 Ultra 1024
+    am 11.09.2026 auf acht Karten unter „Gerätepreis“ gestanden) ist eine
+    tariff-abhaengige FINANZIERUNGSSUMME - AUFTRAG_GERAETESEITE.md §3:
+    „Zwei Zahlen, nie vermischt“. Sie heisst jetzt „Finanzierung gesamt“
+    und wird aus der Gerätepreis-Antwort der Modelltafel ausgeschlossen.
 
     Dieselbe Regel wie im Zeitreihen-Graph (G0/G2, `historienreihen`):
     zuerst der EIGENE Barpreis ohne Vertrag - ein FREMDER (der guenstigste
     Marktpreis eines anderen Anbieters, `_barpreis_fuer`s Rueckfall) zaehlt
     hier nicht, er ist ein anderes Angebot. Fehlt der eigene Barpreis, aber
-    die Rechnung traegt eine Ratenfinanzierung (Zuzahlung plus Ratensumme,
-    das o2-Muster), ist DAS der Geraetepreis inkl. Finanzierung. Traegt
-    keins von beiden etwas - 1&1 nennt nur EINEN Buendelmonatspreis fuer
-    Tarif und Geraet zusammen, § 13.2 -, bleibt die Antwort `None` und die
-    Karte fuehrt weiter mit ihrer TCO-Buendelzahl. Keine Erfindung.
+    die Rechnung traegt eine Ratenfinanzierung, ist DAS der Geraetepreis
+    inkl. Finanzierung. Traegt keins von beiden etwas - 1&1 nennt nur EINEN
+    Buendelmonatspreis fuer Tarif und Geraet zusammen, § 13.2 -, bleibt die
+    Antwort `None` und die Karte fuehrt weiter mit ihrer TCO-Buendelzahl.
+    Keine Erfindung.
     """
     if barpreis is not None and not barpreis.get("fremd"):
-        return round(barpreis["betrag"], 2)
+        return round(barpreis["betrag"], 2), "barpreis"
     if zuzahlung is not None and raten_summe is not None:
-        return round(zuzahlung + raten_summe, 2)
-    return None
+        return round(zuzahlung + raten_summe, 2), "finanzierung"
+    return None, None
 
 
 def _barpreis_fuer(belege: dict, anbieter: str) -> Optional[dict]:
@@ -500,7 +507,8 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     # (A-R5), einmal gerechnet statt zweimal.
     raten_summe = (round(b.geraet_monatsrate * b.laufzeit_monate, 2)
                   if b.geraet_monatsrate is not None else None)
-    geraetepreis = _geraetepreis(barpreis, b.geraet_zuzahlung, raten_summe)
+    geraetepreis, geraetepreis_art = _geraetepreis(
+        barpreis, b.geraet_zuzahlung, raten_summe)
     return {
         # B.2.5 GILT AUCH HIER. Eine Karte ohne Zahl braucht ihren Grund -
         # `_leere_karte` fuellt ihn, diese Funktion tat es nicht, und die
@@ -530,7 +538,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         # steht daneben als Sekundaerzeile ("mit Tarif: ..."). `label` und
         # `gesamt` bleiben unveraendert die TCO-Zahl - nur die Vorlage
         # entscheidet, welche der beiden Zahlen zuerst und gross steht.
+        # P1/TCO-1: die ART entscheidet ueber das Etikett - nur der eigene
+        # Barpreis heisst „Gerätepreis“, die Finanzierungssumme heisst
+        # „Finanzierung gesamt“ (§3, zwei Zahlen, nie vermischt).
         "geraetepreis": geraetepreis,
+        "geraetepreis_art": geraetepreis_art,
         # TICKET TCO24-1: Laufzeit und Etikett sind Konstanten - "Immer 24
         # Monate" ist keine Ableitung aus dem Buendel mehr.
         "label": LABEL,
@@ -628,7 +640,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
     """Ein Anbieter ohne Zahl - mit Namen und mit Begruendung (B.2.5)."""
     return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
             "slug": anbieter_slug(anbieter),
-            "geraetepreis": None,
+            "geraetepreis": None, "geraetepreis_art": None,
             "label": "", "laufzeit": None, "ab_monat": None, "belastbar": False,
             "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
             "offen_nach_24": None, "offene_raten": 0, "monatlich": None,
@@ -710,6 +722,9 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
         "tarif_quelle_url": referenz.quelle_url,
         "tarif_abgerufen_am": referenz.abgerufen_am,
         "geraet_betrag": geraet["betrag"],
+        # Der Geraetebetrag der Naeherung ist der EIGENE Vodafone-Barpreis
+        # (aus `barpreise_der_sku`) - also ein Barpreis, keine Finanzierung.
+        "geraet_art": "barpreis",
         "geraet_quelle_url": geraet.get("quelle_url", ""),
         "geraet_abgerufen_am": geraet.get("abgerufen_am", ""),
         "monate": TCO_HORIZONT,
@@ -739,8 +754,11 @@ def _referenz_aus_buendel(karte: dict) -> dict:
         # A-R5: traegt das Quellbuendel bereits einen Geraetepreis (eigener
         # Barpreis oder Zuzahlung+Ratensumme), fuehrt die Referenzkarte
         # damit - sonst faellt sie auf ihre TCO-Zahl zurueck, wie jede
-        # andere Karte ohne belegten Geraetepreis auch.
+        # andere Karte ohne belegten Geraetepreis auch. P1: die ART kommt
+        # mit, damit die Referenzkarte dieselbe Trennung von Barpreis und
+        # Finanzierungssumme traegt wie ihre Quelle.
         "geraet_betrag": karte.get("geraetepreis"),
+        "geraet_art": karte.get("geraetepreis_art"),
         "geraet_quelle_url": karte.get("quelle_url", ""),
         "geraet_abgerufen_am": karte.get("abgerufen_am", ""),
         "monate": karte["laufzeit"], "gesamt": karte["gesamt"],
@@ -774,6 +792,10 @@ def _referenzkarte(ref: dict) -> dict:
         # steht hier stattdessen dessen eigener Geraetepreis (oder `None`,
         # wenn das Buendel selbst keinen belegt).
         "geraetepreis": ref["geraet_betrag"],
+        # P1/TCO-1: auch die Referenzkarte nennt ihre Zahl beim Namen -
+        # aus `_vodafone_referenz` ist es immer der eigene Barpreis, aus
+        # `_referenz_aus_buendel` die Art des Quellbuendels.
+        "geraetepreis_art": ref.get("geraet_art"),
         # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
         # Neugeraet-Zahl und spielt im Vergleich mit.
         "zustand": "neu", "zustand_etikett": "", "vergleichbar": True,
@@ -1092,8 +1114,16 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # ein Angebot, das man wirklich kaufen kann - eine Naeherung ("kein
         # Angebot", QA-Befund S3) darf hier nicht gewinnen.
         vergleichbar_alle = [k for k in karten if k["vergleichbar"]]
+        # P1/TCO-1 (11.09.2026): „Günstigster Gerätepreis“ ist ein Preis
+        # OHNE Vertrag - eine Finanzierungssumme (Zuzahlung + alle Raten)
+        # ist tarif-abhaengig und keine von beiden. Sie hatte bis P1 die
+        # Antwortzeile geführt, wo kein einziger Barpreis gemessen war
+        # (Galaxy S26 Ultra 1024: „1.285,00 € (congstar)“), und widersprach
+        # damit ihrer eigenen Kartendefinition. Jetzt zaehlen nur noch
+        # Barpreise; ist keiner gemessen, fehlt die Zahl ehrlich.
         geraetepreise = [k for k in vergleichbar_alle
-                         if k["geraetepreis"] is not None]
+                         if k["geraetepreis"] is not None
+                         and k.get("geraetepreis_art") != "finanzierung"]
         # F-4a' (PM, 05.09.2026, 19:xx): das Minimum gilt auch ueber die
         # Haendler OHNE Tarifbuendel (Amazon/Expert/Saturn) - sie tragen
         # keine Karte in `karten` (kein Buendel, siehe oben), stehen aber

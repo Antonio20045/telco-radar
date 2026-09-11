@@ -673,6 +673,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # Modelle - er kommt aus demselben Tarifbestand wie die Tarifbindung
     # oben, nur mit einer anderen Lesart (Datenvolumen statt Laufzeit).
     band_je_tarif = geraete_tco_band.tarif_baender(tarife)
+    # P1 (11.09.2026): das Datenvolumen je tarif_id - dieselbe Datei, die
+    # dritte Lesart. Es traegt die GB-Angabe je Karte und die Angabe in der
+    # Band-Werteliste; getrennt von `band_je_tarif`, weil eine Karte ohne
+    # Band sehr wohl ein Volumen haben kann (unbegrenzt, §7).
+    gb_je_tarif = {tid: (satz or {}).get("datenvolumen_gb")
+                   for tid, satz in (tarife or {}).items()}
 
     for modell in modelle["modelle"]:
         # Die Grafik rechnet NUR Geometrie: die Betraege stehen schon in
@@ -698,12 +704,24 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         modell["haendler_offen"] = [
             h for h in HAENDLER_OHNE_BUENDEL
             if modell["haendler_ohne_buendel"].get(h) is None]
+        # P1 (UX-1, 11.09.2026): JE Karte ihre Bandzugehoerigkeit - aus
+        # demselben Bandindex wie der Graph, nicht aus einer zweiten
+        # Gruppierung. Karten ohne Band (Händler ohne TCO, unbegrenzte
+        # Tarife, Tarife ohne Volumen, Leerkarten) tragen KEIN data-band
+        # und stehen in der Vorlage in der eigenen, markierten Gruppe.
+        # Die Referenzrechnung bekommt das Band IHRES Tarifs - sie ist
+        # keine Näherung eines Angebots in einem fremden Band.
+        for k in modell["karten"]:
+            tid = (k.get("tarif_id") or "").strip()
+            k["band"] = band_je_tarif.get(tid)
+            k["band_gb_text"] = geraete_tco_band.gb_text(gb_je_tarif.get(tid))
         # GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): Geraet x Tarifniveau, eine
         # Linie je Anbieter mit echtem Buendel in diesem Band
         # (AUFTRAG_GERAETESEITE.md §2a/§7). Eigener Baustein, eigene Datei -
-        # `report/geraete_tco_band.py`.
+        # `report/geraete_tco_band.py`. P1: die Werteliste bekommt ihr
+        # Datenvolumen aus derselben Lesart wie die Karten.
         modell["baender"] = geraete_tco_band.baender_fuer_modell(
-            modell, band_je_tarif)
+            modell, band_je_tarif, gb_je_tarif)
 
     reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
               if historie is not None else [])
