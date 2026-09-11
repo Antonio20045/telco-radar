@@ -31,14 +31,19 @@ from test_geraete_tco_zustand import _baue
 # --------------------------------------------------------------------------
 
 def test_g1_steht_nicht_mehr_im_dokument(tmp_path):
+    """O1 (11.09.2026) dreht die Regel ein zweites Mal: G0 (die je-Modell-
+    Zeitreihe) verlaesst DIESE Ansicht ebenfalls und wandert in O4 in den
+    Verlaufs-Reiter - der EINE Graph ist der HTML/CSS-Balken. In der
+    Vergleichsansicht steht deshalb KEIN SVG mehr; `m.zeitreihe` wird in
+    `geraete_tco_view.aufbereiten()` weiterhin gefuellt (Kappe im Template,
+    dieselbe wie bei G1)."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select("svg.gr-g1") == []
-    for block in tafel.select(".gr-tmodell"):
-        assert block.select_one("svg.gr-g0") is not None, \
-            f"{block.get('data-modell')}: G0 fehlt"
-        assert len(block.select("svg")) == 1, \
-            f"{block.get('data-modell')}: mehr als eine Grafik"
+    assert tafel.select("svg") == [], \
+        "in der Vergleichsansicht steht noch ein SVG"
+    assert len(tafel.select(".gr-hgraph")) == 1, \
+        "genau ein Graph-Modul (der Balken)"
 
 
 # --------------------------------------------------------------------------
@@ -54,7 +59,7 @@ def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
     block = tafel.select_one(".gr-tmodell")
     kinder = [k for k in block.find_all(recursive=False)]
     antwort = block.select_one(".gr-antwort")
-    graph = block.select_one("figure.gr-grafik--zeitreihe")
+    graph = block.select_one(".gr-hgraph")
     assert antwort is not None, "die Antwortzeile fehlt"
     assert graph is not None, "der Zeitreihen-Graph fehlt"
     assert kinder.index(antwort) < kinder.index(graph), \

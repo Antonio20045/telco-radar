@@ -212,8 +212,14 @@ _TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL,
 # Die Preisphase mit `bis_monat: 24` und die zweite ab 25 sind kein
 # Beiwerk: an ihnen haengt die Zeile "ab Monat 25" (Katalog D).
 _TARIFE = [
+    # O1 (11.09.2026): `datenvolumen_gb` je Tarif (10 + 10*i verteilt die
+    # 14 Tarife ueber alle drei Baender) - ohne Volumen hat kein Modell ein
+    # Band und der Graph der Vergleichsansicht waere von keinem dieser
+    # Tests gedeckt (derselbe Fixture-Fehler wie das fehlende
+    # `geraete_tco.json` am 04.09.2026, eine Ebene weiter).
     {"anbieter": a, "name": f"{a} Tarif {i}", "tarif_id": f"{a.lower()}:tarif-{i}",
      "art": "mobilfunk", "grundgebuehr": 19.99 + i, "laufzeit_monate": 24,
+     "datenvolumen_gb": 10 + i * 10,
      "preisphasen": [{"von_monat": 1, "bis_monat": 24, "betrag": 19.99 + i},
                      {"von_monat": 25, "bis_monat": None,
                       "betrag": 24.99 + i}],
@@ -431,18 +437,20 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     `tests/test_geraete_tco_hauptansicht.py` statisch geprueft - nur der
     Aufruf im Template ist geloescht.
 
-    Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte: kein
-    Bild mit allen Geraeten in einer Flaeche, keine gedrehten Etiketten.
+    O1 (11.09.2026) dreht die Regel ein drittes Mal: G0 verlaesst die
+    Vergleichsansicht ebenfalls (O4 bindet ihn im Verlaufs-Reiter wieder
+    an) - der EINE Graph ist der HTML/CSS-Balken `.gr-hgraph`, und in der
+    ganzen Tafel steht kein SVG mehr. Was BLEIBT, ist die Regel gegen die
+    geloeschte Positionskarte: kein Bild mit allen Geraeten in einer
+    Flaeche, keine gedrehten Etiketten.
     """
-    sichtbar = _seite.eval_on_selector_all(
-        "#tafel-tco svg",
-        "e => e.filter(x => x.getBoundingClientRect().width > 0).length")
-    assert sichtbar == 1, "genau eine Grafik - G0 des gewaehlten Modells"
     assert _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-g1", "e => e.length") == 0, \
-        "G1 wird in dieser Ansicht nicht mehr gerendert"
+        "#tafel-tco svg", "e => e.length") == 0, \
+        "in der Vergleichsansicht steht noch ein SVG (G0 gehoert nach O4 " \
+        "in den Verlaufs-Reiter, der Balken ist HTML/CSS)"
     assert _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-g0", "e => e.length") > 0, "G0 fehlt"
+        "#tafel-tco .gr-hgraph", "e => e.length") == 1, \
+        "genau ein Graph-Modul - der Balken des gewaehlten Modells"
     # Kein Rest der geloeschten Preisgrafik.
     assert _seite.eval_on_selector_all(
         "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
@@ -2090,15 +2098,31 @@ def test_die_sortierung_ordnet_nach_dem_rohwert(_seite):
 
 
 def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
+    """O1: statt 88 Bloecke umzublenden baut app.js Titel, Antwortzeile und
+    Balkenzeilen aus dem JSON-Knoten neu - ohne Neuladen, mit denselben
+    Zeichenketten wie der Server-Render."""
     _frisch(_seite)
     auswahl = _seite.eval_on_selector_all(
         "#gr-modell option", "e => e.map(o => o.value)")
     assert len(auswahl) >= 2, "die Fixture kennt nur ein Modell"
     _seite.select_option("#gr-modell", auswahl[1])
-    _seite.wait_for_timeout(80)
-    sichtbar = _seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden])", "e => e.map(x => x.dataset.modell)")
-    assert sichtbar == [auswahl[1]]
+    _seite.wait_for_timeout(250)
+    titel = _seite.eval_on_selector("#gr-tco-titel", "e => e.textContent")
+    assert titel.strip(), "der Titel des gewaehlten Modells fehlt"
+    zeilen = _seite.eval_on_selector_all(
+        "#tafel-tco .gr-bz",
+        "e => e.map(x => x.getAttribute('data-anbieter'))")
+    assert zeilen, "der Graph des gewaehlten Modells hat keine Zeilen"
+    erwartete = _seite.evaluate(
+        """(id) => JSON.parse(
+             document.getElementById('gr-graph-daten').textContent)
+           .modelle.find(m => m.id === id)
+           .baender[Object.keys(JSON.parse(
+             document.getElementById('gr-graph-daten').textContent)
+             .modelle.find(m => m.id === id).baender)[0]]
+           .zeilen.map(z => z.anbieter)""", auswahl[1])
+    assert sorted(zeilen) == sorted(erwartete), \
+        f"Graph zeigt {zeilen}, der Datenknoten sagt {erwartete}"
 
 
 def test_jede_karte_mit_zahl_beantwortet_die_leitfrage(_seite):

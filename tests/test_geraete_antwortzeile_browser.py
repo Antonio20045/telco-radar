@@ -95,24 +95,26 @@ def _seite(tmp_path_factory):
 # Kriterium 1: Schriftgroesse und DOM-Reihenfolge
 # --------------------------------------------------------------------------
 
-def test_leitzahl_ist_mindestens_so_gross_wie_chart_titel_und_achsen(_seite):
+def test_leitzahl_ist_mindestens_so_gross_wie_der_graph(_seite):
     """Die Zahl der Antwortzeile ist die groesste Schrift dieses
-    Seitenabschnitts - konkret: nicht kleiner als die Chart-Chrome-Zeile
-    (`.gr-g0-chrome`, der einzige Fliesstext am Graphen) und keine der
-    Achsenbeschriftungen (`.gr-g0-achse`)."""
+    Seitenabschnitts - konkret: nicht kleiner als der Titel des Graphen
+    (`.gr-hgraph-titel`) und keine der gedruckten Werte darin
+    (`.gr-bz-tco`). Seit O1 ist der Graph ein HTML/CSS-Balken statt des
+    SVG-Chrome (G0 wandert in O4 in den Verlaufs-Reiter) - dieselbe
+    Zusicherung, am neuen Graphen gemessen."""
     leitzahl = _seite.eval_on_selector(
         "#tafel-tco .gr-tmodell:not([hidden]) .gr-antwort-zahl",
         "(e) => parseFloat(getComputedStyle(e).fontSize)")
     chart_titel = _seite.eval_on_selector(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-g0-chrome",
+        "#tafel-tco .gr-hgraph-titel",
         "(e) => parseFloat(getComputedStyle(e).fontSize)")
-    achsen = _seite.eval_on_selector_all(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-g0-achse",
+    werte = _seite.eval_on_selector_all(
+        "#tafel-tco .gr-bz-tco",
         "(es) => es.map(e => parseFloat(getComputedStyle(e).fontSize))")
 
-    assert achsen, "keine Achsenbeschriftung gefunden - Fixture ohne Chart?"
+    assert werte, "keine Graph-Zeile gefunden - Fixture ohne Balken?"
     assert leitzahl >= chart_titel, (leitzahl, chart_titel)
-    assert all(leitzahl >= a for a in achsen), (leitzahl, achsen)
+    assert all(leitzahl >= a for a in werte), (leitzahl, werte)
     # Gegenprobe: die Messung ist nicht zufaellig trivial (z. B. weil beide
     # winzig waeren) - die Leitzahl muss wirklich deutlich groesser sein
     # als die 12px-Chrome-/Achsenschrift, nicht nur auf dem Papier gleich.
@@ -129,7 +131,7 @@ def test_dom_reihenfolge_auswahl_antwortzeile_chart_bleibt(_seite):
         "const block = document.querySelector("
         "  '#tafel-tco .gr-tmodell:not([hidden])'); "
         "const antwort = block.querySelector('.gr-antwort'); "
-        "const chart = block.querySelector('figure.gr-grafik--zeitreihe'); "
+        "const chart = block.querySelector('.gr-hgraph'); "
         "return [alle.indexOf(msel), alle.indexOf(antwort), "
         "alle.indexOf(chart)]; }")
     msel_pos, antwort_pos, chart_pos = positionen
@@ -148,16 +150,23 @@ def test_erklaerzeile_ist_vorhanden_kurz_und_direkt_benachbart(_seite):
         "const erk = antwort.querySelector('.gr-antwort-erklaer'); "
         "if (!erk) return null; "
         "return {text: erk.textContent.trim(), "
-        "istKindDerAntwortzeile: erk.parentElement === antwort, "
-        "istLetztesKind: antwort.lastElementChild === erk}; }")
+        "istKindDerAntwortzeile: erk.parentElement === antwort}; }")
     assert ergebnis is not None, "die Erklaerzeile fehlt"
     assert ergebnis["text"], "die Erklaerzeile ist leer"
     assert len(ergebnis["text"]) <= 80, \
         f"{len(ergebnis['text'])} Zeichen: {ergebnis['text']!r}"
     assert ergebnis["istKindDerAntwortzeile"], \
         "die Erklaerzeile steht nicht in der Antwortzeile"
-    assert ergebnis["istLetztesKind"], \
-        "die Erklaerzeile ist nicht direkt benachbart"
+    # Seit O1 steht nach der Erklaerzeile der (versteckte) Leer-Satz der
+    # Antwortzeile - er wechselt mit dem Modell zwischen Zahl und
+    # Leerzustand. "Direkt benachbart" heisst deshalb: nach der Erklaerzeile
+    # folgt nichts SICHTBARES mehr.
+    sichtbar = _seite.eval_on_selector(
+        "#tafel-tco .gr-tmodell:not([hidden]) .gr-antwort",
+        "(a) => [...a.querySelectorAll('.gr-antwort--leer')]"
+        "      .filter(c => !c.hidden).length")
+    assert sichtbar == 0, \
+        "hinter der Erklaerzeile steht Sichtbares, das nicht dorthin gehört"
 
 
 def test_erklaerzeile_unterscheidet_geraetepreis_und_tarif(_seite):

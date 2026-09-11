@@ -165,7 +165,7 @@ def test_die_delta_texte_sind_deutsch_und_vorzeichenbehaftet(bestand):
             continue
         assert z["delta_text"].startswith(("−", "+")), z["delta_text"]
         assert " € · " in z["delta_text"], z["delta_text"]
-        assert "%)" in z["delta_text"], z["delta_text"]
+        assert z["delta_text"].endswith(" %"), z["delta_text"]
         assert "," in z["delta_text"], z["delta_text"]
         vorzeichen = "−" if z["delta_euro"] < 0 else "+"
         assert z["delta_text"].startswith(vorzeichen)
@@ -235,7 +235,8 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     balken = _baender(modell, tarife)[0]["balken"]
     assert [z["anbieter"] for z in balken["zeilen"]] == ["o2"]
     assert balken["luecke"]["nur_erneuert"] == ["Telekom"]
-    assert sorted(balken["luecke"]["kein_buendel"]) == ["1&1", "Vodafone"]
+    assert sorted(balken["luecke"]["kein_buendel"]) == \
+        ["1&1", "Vodafone", "congstar"]
 
 
 # --------------------------------------------------------------------------

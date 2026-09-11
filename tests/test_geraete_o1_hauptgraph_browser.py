@@ -433,8 +433,9 @@ def test_modellwechsel_zeigt_das_gewaehlte_geraet(seite):
 
     seite.select_option("#gr-modell", "samsung-galaxy-s26-256")
     seite.wait_for_timeout(120)
-    titel = seite.query_selector("#gr-tco-titel").inner_text()
-    assert "Galaxy S26" in titel
+    # `.gr-tueber` setzt uppercase - gelesen wird kleingeschrieben.
+    titel = seite.query_selector("#gr-tco-titel").inner_text().lower()
+    assert "galaxy s26" in titel
     zeilen = seite.query_selector_all("#tafel-tco .gr-bz")
     assert len(zeilen) == 1
     assert "1&1" in zeilen[0].inner_text()
@@ -446,12 +447,11 @@ def test_modellwechsel_zeigt_das_gewaehlte_geraet(seite):
 
 def test_modellwechsel_auf_band_loses_geraet_zeigt_den_leerzustand(seite):
     seite.select_option("#gr-modell", "google-pixel-11-128")
-    seite.wait_for_timeout(120)
+    seite.wait_for_timeout(250)
     assert seite.eval_on_selector_all(
         "#tafel-tco .gr-bz", "e => e.length") == 0
-    unter = seite.query_selector("#gr-hgraph").inner_text()
-    assert "kein Tarifband" in unter or "kein Bündel in einem Tarifband" \
-        in unter, unter
+    unter = seite.query_selector(".gr-hgraph").inner_text()
+    assert "keinem Tarifband" in unter, unter
 
 
 def test_bandwechsel_baut_die_zeilen_aus_dem_json(seite):
@@ -525,6 +525,16 @@ def test_der_leerzustand_ohne_modelle_bleibt_ehrlich(tmp_path):
     der Graph-Knoten existiert dann nicht, und app.js darf nicht auf ihn
     zugreifen (Guard gegen einen TypeError auf der leeren Seite)."""
     site = _baue(tmp_path)
-    html = (site / "geraete.html").read_text()
+    # Dieselbe Welt, aber OHNE Bündel - nur der Tarif- und Listungsbestand
+    # bleibt stehen (er beweist, dass die Lücke am Bündel liegt, nicht an
+    # kaputten Daten).
+    tco = json.loads((tmp_path / "site_baum" / "data" / "state"
+                      / "geraete_tco.json").read_text())
+    tco["buendel"] = []
+    reports = tmp_path / "site_baum" / "data" / "reports"
+    (tmp_path / "site_baum" / "data" / "state" / "geraete_tco.json") \
+        .write_text(json.dumps(tco))
+    render_site(tmp_path / "leer", reports)
+    html = (tmp_path / "leer" / "geraete.html").read_text()
     assert "Es gibt heute kein einziges Bündel" in html
     assert "gr-graph-daten" not in html
