@@ -774,7 +774,8 @@ def main() -> int:
             b.prueft(not maengel,
                      f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
                      f"{len(kacheln)} Chips ueber {summe} Vergleichen, "
-                     f"G0 steht fertig im Dokument, G1 nicht mehr gerendert"
+                     f"der Balkengraph steht, kein SVG in der "
+                     f"Vergleichsansicht"
                      if not maengel else
                      "11. Geraeteradar: " + "; ".join(maengel[:5]))
 
