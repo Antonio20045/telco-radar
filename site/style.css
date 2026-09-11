@@ -2650,6 +2650,27 @@ b,strong{font-weight:700}
 .gr-tband-block{margin:12px 0}
 .gr-tband-kopf{font-family:var(--sans);font-size:13px;font-weight:700;
   letter-spacing:.02em;color:var(--ink-3);margin:0 0 6px}
+/* P1 (UX-5, 11.09.2026): die exakten TCO-24-Werte je Anbieter ALS TEXT
+   unter dem Band-Chart - der Hover-Tooltip existiert am Telefon nicht.
+   Eine Zeile je Anbieter: Name (mit Tarif und GB) links, Betrag rechts,
+   in der Anbieterfarbe des Charts; Linien statt Kasten (Hausregel). */
+.gr-tband-werte{margin:6px 0 2px;padding:0;display:grid;gap:0}
+.gr-tband-wert{display:flex;justify-content:space-between;gap:16px;
+  align-items:baseline;padding:5px 0 4px;border-top:1px solid var(--rule-2);
+  font-family:var(--sans)}
+.gr-tband-wert:first-child{border-top:none}
+.gr-tband-wert dt{font-size:13px;font-weight:700;color:var(--anb,#57534a);
+  margin:0;min-width:0}
+.gr-tband-wert dd{margin:0;font-family:var(--serif);font-size:16px;
+  font-weight:700;white-space:nowrap}
+.gr-tband-wert--eigen dt::after{content:" · unser Angebot";
+  font-weight:400;font-size:12px;color:var(--ink-4)}
+/* P1 (UX-1): die markierte Gruppe der Karten OHNE Tarifband in der
+   Kartenklappe - ganze Rasterbreite, dieselbe Stimme wie die
+   Händler-Vermerke am Graphen, kein Kasten. */
+.gr-kband-gruppe{grid-column:1 / -1;margin:6px 0 0;padding:8px 0 2px;
+  border-top:2px solid var(--rule);font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
 
 /* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
    05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite

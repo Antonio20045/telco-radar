@@ -865,7 +865,11 @@ var TelcoFrage = (function () {
   window.addEventListener('hashchange', ausHash);
 })();
 
-/* Die Anbieterkarten der Hauptansicht: Modellauswahl, Sortierung, Filter.
+/* Die Anbieterkarten der Hauptansicht: Modellauswahl, Sortierung, Filter -
+ * und seit P1 (UX-1, 11.09.2026) DIE BANDWAHL: Die Klappe zeigt die Karten
+ * des gewaehlten Tarifbands, Karten ohne Band bleiben als eigene markierte
+ * Gruppe stehen ("Ohne Tarifband", §7), Karten anderer Baender werden
+ * VERSTECKT, nicht entfernt.
  *
  * ES WIRD NICHTS GERECHNET. Die Betraege stehen als `data-`-Attribute an
  * der Karte, gerechnet hat sie `tco_model` - eine Sortierung, die den Wert
@@ -874,62 +878,120 @@ var TelcoFrage = (function () {
  */
 (function () {
   var wahl = document.getElementById('gr-modell');
+  var bandwahl = document.getElementById('gr-band');
   var bloecke = document.querySelectorAll('.gr-tmodell');
   if (!bloecke.length) return;
-
-  if (wahl) {
-    wahl.addEventListener('change', function () {
-      Array.prototype.forEach.call(bloecke, function (b) {
-        b.hidden = b.getAttribute('data-modell') !== wahl.value;
-      });
-    });
-  }
 
   function zahl(el, feld) {
     var wert = parseFloat(el.getAttribute('data-' + feld));
     return isNaN(wert) ? Infinity : wert;
   }
 
-  Array.prototype.forEach.call(bloecke, function (block) {
+  function vergleiche(art) {
+    return function (a, b) {
+      /* Karten ohne Zahl stehen immer hinten - sie sind kein guenstigstes
+       * Angebot, sondern eine Luecke. */
+      var leerA = a.classList.contains('gr-kkarte--leer') ? 1 : 0;
+      var leerB = b.classList.contains('gr-kkarte--leer') ? 1 : 0;
+      if (leerA !== leerB) return leerA - leerB;
+      /* Gesamtkosten NUR innerhalb einer Laufzeitgruppe (A5.4): ueber
+       * Laufzeiten hinweg verglich die Summe die Bindung, nicht den
+       * Preis. Deshalb erst nach Laufzeit, dann nach Betrag. */
+      if (art === 'gesamt') {
+        var lA = zahl(a, 'laufzeit'), lB = zahl(b, 'laufzeit');
+        if (lA !== lB) return lA - lB;
+        return zahl(a, 'gesamt') - zahl(b, 'gesamt');
+      }
+      if (art === 'einmalig') return zahl(a, 'einmalig') - zahl(b, 'einmalig');
+      return zahl(a, 'schnitt') - zahl(b, 'schnitt');
+    };
+  }
+
+  function ordneBlock(block) {
     var behaelter = block.querySelector('.gr-karten');
     var sortiere = block.querySelector('[data-sortiere]');
     var filter = block.querySelector('[data-anbieterfilter]');
+    var zahlEl = block.querySelector('.gr-kzahl');
     if (!behaelter) return;
     var karten = Array.prototype.slice.call(
       behaelter.querySelectorAll('.gr-kkarte'));
+    var gruppe = behaelter.querySelector('.gr-kband-gruppe');
+    var art = sortiere ? sortiere.value : 'schnitt';
+    var band = bandwahl ? bandwahl.value : '';
+    var nur = filter ? filter.value : '';
+    var sortiert = karten.slice().sort(vergleiche(art));
 
-    function ordne() {
-      var art = sortiere ? sortiere.value : 'schnitt';
-      var sortiert = karten.slice().sort(function (a, b) {
-        /* Karten ohne Zahl stehen immer hinten - sie sind kein guenstigstes
-         * Angebot, sondern eine Luecke. */
-        var leerA = a.classList.contains('gr-kkarte--leer') ? 1 : 0;
-        var leerB = b.classList.contains('gr-kkarte--leer') ? 1 : 0;
-        if (leerA !== leerB) return leerA - leerB;
-        /* Gesamtkosten NUR innerhalb einer Laufzeitgruppe (A5.4): ueber
-         * Laufzeiten hinweg vergliche die Summe die Bindung, nicht den
-         * Preis. Deshalb erst nach Laufzeit, dann nach Betrag. */
-        if (art === 'gesamt') {
-          var lA = zahl(a, 'laufzeit'), lB = zahl(b, 'laufzeit');
-          if (lA !== lB) return lA - lB;
-          return zahl(a, 'gesamt') - zahl(b, 'gesamt');
-        }
-        if (art === 'einmalig') return zahl(a, 'einmalig') - zahl(b, 'einmalig');
-        return zahl(a, 'schnitt') - zahl(b, 'schnitt');
-      });
-      sortiert.forEach(function (k) { behaelter.appendChild(k); });
+    function passt(k) {
+      var kband = k.getAttribute('data-band');
+      /* Ohne Bandauswahl (Modell ohne Baender) steht alles offen; mit
+       * Auswahl gehoeren die Karten OHNE Band zur markierten Gruppe - sie
+       * werden nie ins Band einsortiert und nie weggefiltert, nur Karten
+       * ANDERER Baender verschwinden. */
+      var bandein = !band || !kband || kband === band;
+      var anbieter = !nur || k.getAttribute('data-anbieter') === nur;
+      return bandein && anbieter;
     }
 
-    function sieben() {
-      var nur = filter ? filter.value : '';
-      karten.forEach(function (k) {
-        k.hidden = !!nur && k.getAttribute('data-anbieter') !== nur;
-      });
+    var sichtbar = 0;
+    function stelle(k) {
+      var ok = passt(k);
+      k.hidden = !ok;
+      if (ok) { behaelter.appendChild(k); sichtbar++; }
     }
+    /* ERST die Karten des Bands (sortiert), DANN der Trenner, DANN die
+     * eigene Gruppe ohne Band (sortiert) - die Gruppe trennt, sie sortiert
+     * nichts ein. Versteckte Karten behalten ihre Position im Dokument. */
+    sortiert.filter(function (k) { return k.getAttribute('data-band'); })
+            .forEach(stelle);
+    if (gruppe) {
+      /* Der Trenner steht nur da, wo er etwas trennt: ohne Bandauswahl
+       * oder ohne eine sichtbare Karte dahinter waere er ein Etikett
+       * ueber nichts. */
+      gruppe.hidden = !band || !sortiert.some(function (k) {
+        return !k.getAttribute('data-band') && passt(k);
+      });
+      behaelter.appendChild(gruppe);
+    }
+    sortiert.filter(function (k) { return !k.getAttribute('data-band'); })
+            .forEach(stelle);
+    if (zahlEl) {
+      zahlEl.textContent = sichtbar === karten.length
+        ? String(karten.length)
+        : sichtbar + ' von ' + karten.length;
+    }
+  }
 
-    if (sortiere) sortiere.addEventListener('change', ordne);
-    if (filter) filter.addEventListener('change', sieben);
+  function ordneAlle() {
+    Array.prototype.forEach.call(bloecke, ordneBlock);
+  }
+
+  if (wahl) {
+    wahl.addEventListener('change', function () {
+      Array.prototype.forEach.call(bloecke, function (b) {
+        b.hidden = b.getAttribute('data-modell') !== wahl.value;
+      });
+      /* Der Modellwechsel kann die Bandwahl mit-verschieben (nicht jedes
+       * Geraet hat jedes Band) - `wendeOptionenAn` unten setzt den Wert
+       * ohne change-Event, deshalb hier erneut anwenden. */
+      ordneAlle();
+    });
+  }
+  /* DIE BANDWAHL STEUERT DIE KARTEN MIT (P1/UX-1): dasselbe Feld, das die
+   * Band-Panels umschaltet, ordnet die Kartenklappe - zwei Stellen, eine
+   * Auswahl. */
+  if (bandwahl) bandwahl.addEventListener('change', ordneAlle);
+
+  Array.prototype.forEach.call(bloecke, function (block) {
+    var sortiere = block.querySelector('[data-sortiere]');
+    var filter = block.querySelector('[data-anbieterfilter]');
+    if (sortiere) sortiere.addEventListener('change', function () {
+      ordneBlock(block);
+    });
+    if (filter) filter.addEventListener('change', function () {
+      ordneBlock(block);
+    });
   });
+  ordneAlle();
 })();
 /* GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): die Tarifband-Auswahl NEBEN der
  * Geraeteauswahl (AUFTRAG_GERAETESEITE.md §2a/§7). Ein gemeinsames Feld
