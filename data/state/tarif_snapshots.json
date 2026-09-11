@@ -59,7 +59,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -67,10 +67,13 @@
    "du sie mindestens alle|6monate",
    "durchschnitt im g netz|221.7mb",
    "g-highspeed bis|300mb",
+   "gb statt|40gb",
+   "inkl.|5€",
    "internet mit bis zu|300mb",
    "mbit s im down-und|28.4mb",
    "mehr als|200gb",
    "nach deaktivierung hast du|3monate",
+   "ohne grundgebühr|4.99€",
    "s im down- und|35.3mb",
    "telefonieren für umgerechnet nur|7.50€",
    "upload im g lte-netz|69.3mb",
@@ -85,7 +88,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -119,7 +122,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -153,7 +156,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -162,11 +165,11 @@
    "|10.99€",
    "|10gb",
    "|14.99€",
-   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
    "|216€",
+   "|264€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -177,7 +180,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -188,8 +191,10 @@
    "|10.99€",
    "|10gb",
    "|12gb",
-   "|16gb",
+   "|15gb",
+   "|168€",
    "|19.99€",
+   "|20gb",
    "|240€",
    "|48€",
    "|49.99€",
@@ -201,10 +206,9 @@
    "|6gb",
    "|72€",
    "|8.99€",
-   "|8gb",
    "|9.99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -219,7 +223,7 @@
    "vielnutzer|50gb",
    "wenignutzer|15gb"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -241,7 +245,7 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
@@ -258,7 +262,7 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -268,22 +272,28 @@
    "bei uns nur einmal|1€",
    "beim tarifpreis.|24monate",
    "bekommst du monate lang|10%",
+   "bestellst zahlst du einmal|1€",
    "bis zu|12monate",
    "buchst bekommst du zusätzlich|50%",
    "da ist hast du|15tage",
    "das geht bis zu|6monate",
+   "das xiaomi t pro|512gb",
    "daten-geschwindigkeit um bis zu|0.03mb",
    "dauerhaft|49.99€",
    "deinen tarifpreis verteilt auf|12monate",
    "den einmalpreis und oder|36monat",
    "den tarifpreis du zahlst|24.99€",
    "der einmalige anschlusspreis von|39.99€",
+   "der mobilfunk-vertrag besteht tarifpreis|17.50€",
+   "der mobilfunk-vertrag besteht tarifpreis|8.50€",
    "der rabatt endet nach|24monate",
    "der rabatt entfällt nach|24monate",
    "die komplette mindestlaufzeit von|24monate",
    "download und bis zu|100mb",
    "du ein smartphone dazubuchst.|24monate",
    "du im eu-ausland mit|85gb",
+   "du im monat statt|62.95€",
+   "du im monat statt|75.45€",
    "du sparst pro monat.|24monate",
    "du sparst|25%",
    "du sparst|39.99€",
@@ -352,6 +362,7 @@
    "sich der tarifpreis um|15€",
    "smartphone dazubuchen und|200€",
    "smartphone-akkus ist weniger als|80%",
+   "solange der mobilfunk-vertrag besteht|50.95€",
    "sparst weitere|25%",
    "standardpreis|39.99€",
    "statt|15gb",
@@ -361,6 +372,7 @@
    "surfst langsamer sobald du|100%",
    "tarif gigamobil young xs|25%",
    "tarifpreis du zahlst statt|39.99€",
+   "und einer ratenzahlungsvereinbarung von|36monate",
    "und im mobil m|40gb",
    "und zwar nachdem du|4monate",
    "uns zahlst du einmalig|39.99€",
@@ -369,12 +381,15 @@
    "vodafone mobil l|120gb",
    "von uns bis zu|12monate",
    "wenn du|80%",
+   "xiaomi redmi note pro|256gb",
    "xs bis m mit|24monate",
    "xs gb zusätzlich insgesamt|20gb",
    "xs gb zusätzlich insgesamt|25gb",
    "xs gb zusätzlich insgesamt|26gb",
    "xs gb zusätzlich insgesamt|28gb",
    "x|15€",
+   "zahlst du im monat|59.45€",
+   "zahlst du im monat|68.45€",
    "zusätzliches datenvolumen freischalten jeweils|250mb",
    "zusätzlich|70gb",
    "|0€",
@@ -421,7 +436,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -430,8 +445,8 @@
    "ab|179€",
    "ab|189€",
    "ab|1€",
+   "ab|229€",
    "ab|49€",
-   "ab|89€",
    "ab|99€",
    "ab|9€",
    "|10€",
@@ -440,6 +455,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-09-09"
+  "stand": "2026-09-11"
  }
 }
