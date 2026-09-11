@@ -109,12 +109,12 @@ BOM, Dezimalkomma) wie bestehende.
 3. **Karten werden Tabellenzeilen:** auf 390 px ruhiger lesbar; Anbieter-Suche/-filter
    erübrigen sich bei 4–7 Zeilen je Bandliste.
 
-## 5. Offene Entscheidungen für Antonio
+## 5. Entscheidungen von Antonio (11.09.2026, abends)
 
-1. **Entwurf freigeben oder anpassen?** Ansehen unter `docs/entwuerfe/geraete-optik-2026-09-11/`
-   (Anleitung oben). Der Bau (O1–O4) startet nur nach Freigabe.
-2. **Radar-Seite bekommt die Portfolio-Abschnitte** („Wie lange lebt ein Gerät im Markt") —
-   einverstanden? Alternativ eigener vierter Reiter auf der Geräteseite.
+1. **Entwurf FREIGEGEBEN** („ist okay"). Bau der Phasen O1–O4 als eigener Lauf in der
+   Nachfolgesession; Übergabe-Prompt: `AUFTRAG_OPTIK_GERAETESEITE.md` (Repo-Wurzel).
+2. **Portfolio-Abschnitte gehen auf die Radar-Seite** (empfohlene Option A angenommen);
+   kein vierter Reiter auf der Geräteseite.
 
 ## 6. Artefakte und Beweise
 
