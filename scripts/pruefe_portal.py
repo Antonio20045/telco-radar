@@ -232,6 +232,41 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
              "11b. Reiterhoehen: " + ", ".join(gemessen) + " px"
              + (f" - ZU HOCH: {'; '.join(zu_hoch)}" if zu_hoch else ""))
 
+    # O1/A1 (11.09.2026 abends): DIE ERSTE ZEILE DES GRAPHEN UEBER DER
+    # TELEFON-FALZ - am ECHTEN Bestand gemessen, nicht an der Fixture der
+    # Browsertests. Deren Antwortzeile ist eine Zeile kuerzer: Ihre
+    # Anbieternamen ("(o2)") passen neben die Zahl, waehrend "(congstar)"
+    # am echten Stand unter die Zahl bricht. Gemessen am 11.09.2026 endete
+    # die erste Balkenzeile deshalb am echten Bestand bei 862 von 844 px,
+    # waehrend der Fixture-Test gruen lief - eine Falz, die nur die Fixture
+    # kennt, ist keine. Ohne Graphzeile (Vorgabegeraet ohne Band) entfaellt
+    # die Messung ohne Mangel: ein Leerzustand hat keine Falzfrage.
+    mobil = seite.context.browser.new_page(
+        viewport={"width": _MOBIL_BREITE, "height": 844})
+    try:
+        mobil.goto(f"{wurzel}/geraete.html", wait_until="load")
+        mobil.wait_for_timeout(300)
+        box = mobil.evaluate("""() => {
+          const e = document.querySelector('#tafel-tco .gr-bz');
+          if (!e) return null;
+          const r = e.getBoundingClientRect();
+          return {endet: Math.round(r.bottom),
+                  quer: Math.max(document.documentElement.scrollWidth,
+                                 document.body.scrollWidth)};
+        }""")
+        if box:
+            quer = box["quer"] <= _MOBIL_BREITE + 1
+            b.prueft(box["endet"] <= 844 and quer,
+                     f"11c. Graphfalz (Telefon {_MOBIL_BREITE}x844): erste "
+                     f"Balkenzeile endet bei {box['endet']} px (Falz 844)"
+                     + ("" if quer
+                        else f", Seite {box['quer']} px breit"))
+        else:
+            b.prueft(None, "11c. Graphfalz (Telefon): Graph ohne Zeile "
+                           "(Vorgabegerät ohne Band)")
+    finally:
+        mobil.close()
+
 
 def _browser_messungen(site: Path, b: Bilanz) -> None:
     """Kriterium 1, 6, 7, 10 und 12 - alles, was eine Darstellung braucht."""
