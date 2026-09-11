@@ -668,15 +668,24 @@ def main() -> int:
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
 
-        # G0 steht fertig im Dokument - servergerendert, ohne Bibliothek.
-        # G1 (der Balkenvergleich) darf in dieser Ansicht NICHT mehr
-        # stehen (Kriterium 1) - seine Rechnung bleibt im Code, nur der
-        # Aufruf im Template ist geloescht.
-        if start is not None and start.select_one("svg.gr-g0") is None:
-            maengel.append("G0 (die Zeitreihe) fehlt in der Hauptansicht")
-        if start is not None and start.select_one("svg.gr-g1") is not None:
-            maengel.append("G1 (TCO-Balkenvergleich) wird noch gerendert - "
-                           "BRIEF_FADEN verlangt genau eine Grafik je Modellblock")
+        # O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Graph ist der
+        # HTML/CSS-Balken ".gr-hgraph" ("TCO-24 je Anbieter" für das
+        # gewählte Modell x Band). G0 (die je-Modell-Zeitreihe) und G1
+        # (der SVG-Balkenvergleich) sind aus dieser Ansicht ENTFERNT -
+        # G0 wandert in O4 in den Verlaufs-Reiter; ihre Rechnungen bleiben
+        # im Code (`m.zeitreihe`/`m.svg` werden weiter gefüllt). Bis O1
+        # prüfte dieses Kriterium "svg.gr-g0 vorhanden" - die Erwartung
+        # folgt hiermit dem Auftrag, nicht umgekehrt.
+        if start is not None and start.select_one(".gr-hgraph") is None:
+            maengel.append("der Balkengraph (TCO-24 je Anbieter) fehlt in "
+                           "der Hauptansicht")
+        if start is not None and start.select_one("svg.gr-g0") is not None:
+            maengel.append("G0 (die Zeitreihe) steht noch in der "
+                           "Vergleichsansicht - sie gehört in den "
+                           "Verlaufs-Reiter (O4)")
+        if start is not None and start.select("svg"):
+            maengel.append("in der Vergleichsansicht steht noch ein SVG "
+                           "- der Graph ist HTML/CSS-Balken (O1)")
         verlaufflaeche = gr.select_one("#tafel-verlauf")
         if verlaufflaeche is not None and \
                 verlaufflaeche.select_one("svg.gr-g2") is None and \

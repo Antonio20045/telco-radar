@@ -967,12 +967,11 @@ var TelcoFrage = (function () {
 
   if (wahl) {
     wahl.addEventListener('change', function () {
-      Array.prototype.forEach.call(bloecke, function (b) {
-        b.hidden = b.getAttribute('data-modell') !== wahl.value;
-      });
-      /* Der Modellwechsel kann die Bandwahl mit-verschieben (nicht jedes
-       * Geraet hat jedes Band) - `wendeOptionenAn` unten setzt den Wert
-       * ohne change-Event, deshalb hier erneut anwenden. */
+      /* O1 (11.09.2026): nur noch EIN Modellblock steht im Dokument - das
+       * Umschalten von 88 Bloecken ist dem Graph-Wechsel aus
+       * #gr-graph-daten gewichen. Diese Klappe ordnet nur ihre Karten;
+       * dass sie bei anderem Modell ganz versteckt wird, entscheidet der
+       * Graph-Block unten. */
       ordneAlle();
     });
   }
@@ -993,39 +992,137 @@ var TelcoFrage = (function () {
   });
   ordneAlle();
 })();
-/* GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): die Tarifband-Auswahl NEBEN der
- * Geraeteauswahl (AUFTRAG_GERAETESEITE.md §2a/§7). Ein gemeinsames Feld
- * ueber alle Modelle - welche der drei Optionen fuer das gewaehlte Geraet
- * echte Buendel traegt, steht als `data-baender` an der Modell-Option.
- * Nicht angebotene Baender werden DEAKTIVIERT, nicht entfernt: Aufgabe 1
- * verlangt "nur Baender anbieten, fuer die Buendel existieren" - der
- * native `<select>` zeigt eine deaktivierte Option zwar, laesst sie aber
- * nicht anwaehlen, und die Auswahl bleibt bei jedem Geraet an derselben
- * Stelle stehen (kein Element verschwindet aus dem Feld).
+/* O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Graph - "TCO-24 je
+ * Anbieter" für das gewählte Modell × Tarifband.
+ *
+ * NUR DAS VORGABEMODELL steht serverseitig im Dokument (bis O1 waren es
+ * 88 Modellblöcke, 3,9 MB HTML). Dieser Block macht den Geräte-Selektor
+ * für ALLE Modelle funktional: Titel, Antwortzeile und die Balkenzeilen
+ * jedes Modells × Bandes kommen aus dem JSON-Knoten #gr-graph-daten -
+ * denselben `balken`-Strukturen, die der Server für das Vorgabemodell
+ * gerendert hat. ES WIRD NICHTS GERECHNET und nichts formatiert: alle
+ * Zeichenketten (Wert, Δ, Legende) entstehen in Python, hier werden sie
+ * nur gesetzt.
+ *
+ * Die Bündel-Karten stehen bewusst nur für das Vorgabegerät - O2 baut sie
+ * zu Tabellenzeilen um. Bei anderem Modell versteckt sich die Kartenklappe
+ * und ein Hinweis verweist auf «Alle Bündel als Tabelle», die auf das
+ * gewählte Modell gefiltert wird (data-modell an jeder Zeile).
  */
 (function () {
   var modellwahl = document.getElementById('gr-modell');
   var bandwahl = document.getElementById('gr-band');
-  if (!modellwahl || !bandwahl) return;
+  var knoten = document.getElementById('gr-graph-daten');
+  if (!modellwahl || !knoten) return;
+  var daten;
+  try {
+    daten = JSON.parse(knoten.textContent);
+  } catch (e) {
+    return;
+  }
+  if (!daten || !daten.modelle || !daten.modelle.length) return;
+  var vorgabe = daten.vorgabe || daten.modelle[0].id;
 
-  function baenderFuerModell(id) {
-    var opt = modellwahl.querySelector('option[value="' + id + '"]');
-    return opt ? (opt.getAttribute('data-baender') || '').split(' ')
-      .filter(Boolean) : [];
+  function element(id) { return document.getElementById(id); }
+
+  function modellDat(id) {
+    for (var i = 0; i < daten.modelle.length; i++) {
+      if (daten.modelle[i].id === id) return daten.modelle[i];
+    }
+    return null;
   }
 
-  function zeigePanel() {
-    var block = document.querySelector(
-      '.gr-tmodell[data-modell="' + modellwahl.value + '"]');
-    if (!block) return;
-    var panels = block.querySelectorAll('.gr-tband');
-    Array.prototype.forEach.call(panels, function (p) {
-      p.hidden = p.getAttribute('data-band') !== bandwahl.value;
+  function baueZeile(z) {
+    var zeile = document.createElement('div');
+    zeile.className = 'gr-bz gr-anb--' + z.slug +
+      (z.eigen ? ' gr-bz--eigen' : '');
+    zeile.setAttribute('data-anbieter', z.anbieter);
+    zeile.setAttribute('data-tco', String(z.gesamt));
+
+    var name = document.createElement('div');
+    name.className = 'gr-bz-name';
+    var an = document.createElement('span');
+    an.className = 'gr-bz-anbieter';
+    an.textContent = z.anbieter;
+    name.appendChild(an);
+    if (z.eigen) {
+      var chip = document.createElement('span');
+      chip.className = 'gr-bz-chip';
+      chip.textContent = 'unser Angebot';
+      name.appendChild(chip);
+    }
+    var tarif = document.createElement('span');
+    tarif.className = 'gr-bz-tarif';
+    tarif.textContent = z.tarif + (z.gb ? ' · ' + z.gb : '');
+    name.appendChild(tarif);
+    zeile.appendChild(name);
+
+    var spur = document.createElement('div');
+    spur.className = 'gr-bz-spur';
+    var fill = document.createElement('div');
+    fill.className = 'gr-bz-fill';
+    fill.style.width = z.breite + '%';
+    spur.appendChild(fill);
+    zeile.appendChild(spur);
+
+    var wert = document.createElement('div');
+    wert.className = 'gr-bz-wert';
+    var tco = document.createElement('span');
+    tco.className = 'gr-bz-tco';
+    tco.textContent = z.gesamt_text;
+    wert.appendChild(tco);
+    var neben = document.createElement('span');
+    if (z.referenz) {
+      neben.className = 'gr-bz-ref';
+      neben.textContent = 'Referenz';
+    } else if (z.delta_text) {
+      neben.className = 'gr-bz-delta';
+      neben.textContent = z.delta_text;
+    }
+    if (neben.className) wert.appendChild(neben);
+    zeile.appendChild(wert);
+    return zeile;
+  }
+
+  function setzeAntwort(a) {
+    var paare = [
+      ['gr-antwort-block-geraet', 'gr-antwort-geraet',
+       'gr-antwort-geraet-anbieter', a.geraetepreis,
+       a.geraetepreis_anbieter],
+      ['gr-antwort-block-tarif', 'gr-antwort-tarif',
+       'gr-antwort-tarif-anbieter', a.tarif_gesamt, a.tarif_anbieter],
+    ];
+    var mindEins = false;
+    paare.forEach(function (p) {
+      var block = element(p[0]), zahl = element(p[1]),
+          anbieter = element(p[2]);
+      if (!block || !zahl || !anbieter) return;
+      block.hidden = p[3] == null;
+      if (p[3] != null) {
+        mindEins = true;
+        zahl.textContent = p[3];
+        anbieter.textContent = '(' + (p[4] || '') + ')';
+      }
+    });
+    if (element('gr-antwort-erklaer')) {
+      element('gr-antwort-erklaer').hidden = !mindEins;
+    }
+    if (element('gr-antwort-leer')) {
+      element('gr-antwort-leer').hidden = mindEins;
+    }
+  }
+
+  function filtereTabelle(mid, alles) {
+    var zeilen = document.querySelectorAll(
+      '#gr-tco-tabelle .gr-tzeile[data-modell]');
+    Array.prototype.forEach.call(zeilen, function (z) {
+      z.hidden = !alles && z.getAttribute('data-modell') !== mid;
     });
   }
 
-  function wendeOptionenAn() {
-    var erlaubt = baenderFuerModell(modellwahl.value);
+  function wendeBandOptionenAn(m) {
+    if (!bandwahl) return;
+    var erlaubt = m && m.baender ? Object.keys(m.baender) : [];
     Array.prototype.forEach.call(bandwahl.options, function (o) {
       o.disabled = erlaubt.indexOf(o.value) === -1;
     });
@@ -1033,12 +1130,73 @@ var TelcoFrage = (function () {
     if ((!aktuell || aktuell.disabled) && erlaubt.length) {
       bandwahl.value = erlaubt[0];
     }
-    zeigePanel();
   }
 
-  modellwahl.addEventListener('change', wendeOptionenAn);
-  bandwahl.addEventListener('change', zeigePanel);
-  wendeOptionenAn();
+  function baueGraph() {
+    var m = modellDat(modellwahl.value);
+    if (!m) return;
+
+    var titel = element('gr-tco-titel');
+    if (titel) titel.textContent = m.titel;
+    setzeAntwort(m.antwort || {});
+
+    var liste = element('gr-balkenliste');
+    var chip = element('gr-bandchip');
+    var unter = element('gr-hgraph-unter');
+    var luecke = element('gr-lueckenzeile');
+    wendeBandOptionenAn(m);
+    var band = (m.baender || {})[bandwahl ? bandwahl.value : ''];
+    if (liste) {
+      while (liste.firstChild) liste.removeChild(liste.firstChild);
+    }
+    if (band) {
+      if (chip) chip.textContent = band.chip;
+      if (unter) unter.textContent = band.unterzeile;
+      if (luecke) {
+        luecke.textContent = band.luecke_text || '';
+        luecke.hidden = !band.luecke_text;
+      }
+      if (liste) {
+        band.zeilen.forEach(function (z) {
+          liste.appendChild(baueZeile(z));
+        });
+      }
+    } else {
+      /* Ein Modell ohne ein einziges Band: der ehrliche Leerzustand -
+       * derselbe Satz, den die Vorlage für ein band-loses Vorgabemodell
+       * rendert (eine Quelle: geraete_tco_band.BAND_LEER_TEXT). Er steht
+       * im eigenen .gr-hgraph-leer-Element und nicht in der Unterzeile,
+       * weil die auf dem Telefon versteckt ist (A1: Falz vor Chrome). */
+      if (chip) chip.textContent = '';
+      if (unter) unter.textContent = '';
+      if (luecke) {
+        luecke.textContent = '';
+        luecke.hidden = true;
+      }
+      if (liste) {
+        var leer = document.createElement('p');
+        leer.className = 'gr-hgraph-leer';
+        leer.textContent = m.band_leer ||
+          'Für dieses Gerät liegt kein Bündel vor.';
+        liste.appendChild(leer);
+      }
+    }
+
+    /* Die Kartenklappe gehört zum Vorgabegerät (siehe Blockkopf); bei
+     * anderem Modell versteckt sie sich, statt fremde Karten als aktuelle
+     * zu zeigen, und die Bündel-Tabelle schneidet sich auf das gewählte
+     * Gerät zu. */
+    var istVorgabe = m.id === vorgabe;
+    var klappe = document.querySelector('.gr-karten-auf');
+    if (klappe) klappe.hidden = !istVorgabe;
+    var hinweis = element('gr-karten-hinweis');
+    if (hinweis) hinweis.hidden = istVorgabe;
+    filtereTabelle(m.id, istVorgabe);
+  }
+
+  modellwahl.addEventListener('change', baueGraph);
+  if (bandwahl) bandwahl.addEventListener('change', baueGraph);
+  baueGraph();
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
  *
