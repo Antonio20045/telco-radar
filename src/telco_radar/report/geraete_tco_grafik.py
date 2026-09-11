@@ -350,12 +350,18 @@ def _symbol(nr: int, x: float, y: float, slug: str, *, einzeln: bool = False,
     statt Fuellung; seine Klasse steht NACH der Einzel-Punkt-Klasse im
     Stylesheet, damit der Papier-Halo des Einzel-Punkts ihn nicht
     ueberschreibt.
+
+    P1 (11.09.2026): `titel` wird hier NICHT mehr vorformatiert - diese
+    Funktion baute ein `<title>…</title>`, `_symbol_form` escapte die ganze
+    Zeile ERNEUT, und im Browser stand `&lt;title&gt;o2 · …&lt;/title&gt;`
+    als Text statt als Tooltip (UX-Nebenbefund der Audit-Gegenprobe,
+    gegenprueft am Band-Panel). Der rohe Titel durchreicht, das Escaping
+    passiert GENAU EINMAL in `_symbol_form`.
     """
     basis = f'gr-g0-punkt{" gr-g0-punkt--einzeln" if einzeln else ""} ' \
             f'gr-g0-punkt--{G0_SYMBOLE[nr % len(G0_SYMBOLE)]} gr-anb--{slug}'
-    t = f'<title>{_t(titel)}</title>' if titel else ""
     return _symbol_form(G0_SYMBOLE[nr % len(G0_SYMBOLE)], x, y,
-                        gross * (1.19 if einzeln else 1.0), basis, t)
+                        gross * (1.19 if einzeln else 1.0), basis, titel)
 
 
 def _symbol_form(art: str, x: float, y: float, s: float,

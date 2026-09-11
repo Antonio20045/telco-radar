@@ -110,6 +110,31 @@ def tarif_baender(tarife: dict) -> dict:
     return out
 
 
+def gb_text(gb) -> str:
+    """Das Datenvolumen als lesbarer Text - "18 GB", "unbegrenzt" oder ""
+
+    P1 (11.09.2026): jede Bandkarte und jeder Eintrag der Band-Werteliste
+    nennt sein Datenvolumen - ohne GB-Angabe ist eine Bandauswahl nicht
+    nachpruefbar (UX-1). Unbegrenzt bleibt dabei „unbegrenzt“ und kein GB-
+    Wert: §7 fuehrt es als Markierung ausserhalb der Bänder, nicht als
+    Vergleichsstufe. Dasselbe gilt fuer `float('inf')`, das der echte
+    Tarifbestand dafuer schreibt.
+    """
+    if gb is None:
+        return ""
+    try:
+        wert = float(gb)
+    except (TypeError, ValueError):
+        return ""
+    if math.isnan(wert):
+        return ""
+    if math.isinf(wert):
+        return "unbegrenzt"
+    # :g laesst 18.0 zu "18" werden und haelt 7.5 als "7.5" - die Seite
+    # schreibt Nachkommastellen nur, wenn das Erhobene sie hat.
+    return f"{wert:g} GB"
+
+
 def _eigen(anbieter: str) -> bool:
     return (anbieter or "").strip().lower() == "vodafone"
 
@@ -201,7 +226,8 @@ def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
             and k.get("gesamt") is not None}
 
 
-def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
+def baender_fuer_modell(modell: dict, band_je_tarif: dict,
+                        gb_je_tarif: dict | None = None) -> list[dict]:
     """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
 
     Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
@@ -213,7 +239,16 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
         fehlend                 - [{"anbieter","grund"}] fuer jeden
                                   erwarteten Anbieter ohne Linie in diesem
                                   Band (Aufgabe 4)
+        werte (P1, 11.09.2026) - [{"anbieter","slug","eigen","tarif","gb",
+                                  "gesamt"}] je Anbieter MIT Linie: die
+                                  exakten TCO-24 als SICHTBARER TEXT unter
+                                  dem Chart, nicht nur im Hover-Tooltip, den
+                                  es am Telefon nicht gibt (UX-5). `gb`
+                                  braucht `gb_je_tarif` (tarif_id ->
+                                  Datenvolumen, dieselbe Datei wie
+                                  `band_je_tarif`); ohne es steht "" da.
     """
+    gb_je_tarif = gb_je_tarif or {}
     je_band = karten_je_band(modell, band_je_tarif)
     mit_irgendeinem_buendel = anbieter_mit_irgendeinem_buendel(modell)
 
@@ -222,10 +257,13 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
         karten_je_anbieter = je_band.get(key)
         if not karten_je_anbieter:
             continue           # kein einziges Buendel in diesem Band
-        reihen = [_reihe(anbieter, karte)
-                  for anbieter, karte in sorted(karten_je_anbieter.items(),
-                                                key=lambda kv: (not _eigen(kv[0]),
-                                                               kv[0]))]
+        # DSELBE Ordnung wie die Reihen der Grafik: der eigene Anbieter
+        # zuerst, dann nach Name - Werteliste und Chart nennen dieselben
+        # Anbieter in derselben Reihenfolge, sonst sucht der Leser eine
+        # Zahl an der falschen Stelle.
+        geordnet = sorted(karten_je_anbieter.items(),
+                          key=lambda kv: (not _eigen(kv[0]), kv[0]))
+        reihen = [_reihe(anbieter, karte) for anbieter, karte in geordnet]
         vorhanden = set(karten_je_anbieter)
         fehlend = [{"anbieter": a,
                     "grund": _grund(a, a in mit_irgendeinem_buendel)}
@@ -235,5 +273,17 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict) -> list[dict]:
             "grafik": geraete_tco_grafik.zeitreihe(
                 reihen, messgroesse="TCO-24", klasse="gr-tcoband"),
             "fehlend": fehlend,
+            "werte": [{
+                "anbieter": anbieter,
+                "slug": geraete_tco_grafik.anbieter_slug(anbieter),
+                "eigen": _eigen(anbieter),
+                "tarif": karte.get("tarif", ""),
+                "gb": gb_text((gb_je_tarif or {}).get(
+                    karte.get("tarif_id") or "")),
+                # DSELBE Zahl wie Graph, Karte und Tabelle - `gesamt` ist
+                # schon `tco_24().gesamt` (Regel 1 des Modulkopfs).
+                "gesamt": karte["gesamt"],
+                "abgerufen_am": karte.get("abgerufen_am", ""),
+            } for anbieter, karte in geordnet],
         })
     return ergebnis
