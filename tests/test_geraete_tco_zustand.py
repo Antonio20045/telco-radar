@@ -109,12 +109,16 @@ def _tarife():
     return [{"anbieter": "o2", "name": "O2 Mobile on Demand M",
              "tarif_id": "o2:on-demand-m", "art": "mobilfunk",
              "grundgebuehr": 19.99, "laufzeit_monate": 24,
+             # O1 (11.09.2026): ein Datenvolumen je Tarif, damit die
+             # Fixture Bänder hat und der Graph Zeilen rendert.
+             "datenvolumen_gb": 50,
              "preisphasen": [],
              "dokument_url": "https://example.de/pib/o2-m",
              "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}},
             {"anbieter": "Vodafone", "name": "Vodafone Mobil XS",
              "tarif_id": "vf:xs", "art": "mobilfunk",
              "grundgebuehr": 29.95, "laufzeit_monate": 24,
+             "datenvolumen_gb": 18,
              "preisphasen": [{"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
                              {"von_monat": 25, "bis_monat": None,
                               "betrag": 29.95}],
@@ -357,7 +361,14 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
         # `geraete_preise.jsonl` fuer dieses Geraet - `geraet_aus_sku()`
         # loest es trotzdem ueber den Katalog auf (F-R2-3), die Karte
         # rechnet, aber `listungen_je_modell` bleibt fuer diese ID leer.
-        buendel.append(_buendel(SKU_GRAPHLOS, 20.0, zustand="neu"))
+        # O1 (11.09.2026): der Tarif dieses Buendels traegt KEIN
+        # Datenvolumen - damit bleibt das Modell auch nach O1 „ohne Graph“,
+        # weil der Graph an Baendern haengt (nicht mehr an der Zeitreihe).
+        graphlos = _buendel(SKU_GRAPHLOS, 20.0, zustand="neu")
+        graphlos = Buendel(
+            **{**graphlos.__dict__, "tarif_id": "o2:ohne-volumen",
+               "tarif_name": "O2 Mobile on Demand M Flex"})
+        buendel.append(graphlos)
     if eins_und_eins:
         # § 13.2: NUR der kombinierte Monatsbetrag, keine Aufteilung - die
         # Bauweise der echten 1&1-Saetze (44,99 €/36 Monate, siehe
@@ -381,8 +392,17 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
                       "quelle_url": r.quelle_url, "abgerufen_am": HEUTE,
                       "first_seen": HEUTE, "last_verified": HEUTE}
                      for r in _referenzen()]}), encoding="utf-8")
+    tarife = list(_tarife())
+    if graphloses_modell:
+        ohne = {"anbieter": "o2", "name": "O2 Mobile on Demand M Flex",
+                "tarif_id": "o2:ohne-volumen", "art": "mobilfunk",
+                "grundgebuehr": 14.99, "laufzeit_monate": 24,
+                "preisphasen": [],
+                "dokument_url": "https://example.de/pib/o2-flex",
+                "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+        tarife.append(ohne)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in _tarife()) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / f"{HEUTE}.json").write_text(json.dumps({
@@ -428,8 +448,12 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_und_tabelle(tmp_path)
     assert zeile is not None
     assert zeile.select_one(".gr-t-zustand").get_text(strip=True) == "erneuert"
 
-    band = " ".join(tafel.select_one(".gr-mband").get_text(" ", strip=True).split())
-    assert "2 Angebote · davon 1 erneuert" in band
+    # Die gr-mband-Angebotszeile ("2 Angebote · davon 1 erneuert") ist mit
+    # O1 entfallen - die fuenf Zaehlsysteme der Vergleichsansicht sind auf
+    # DIE EINE Fussnote unter dem Graphen gesammelt, und die nennt Geraete,
+    # keine Angebote. Das Etikett selbst steht weiterhin auf Karte UND
+    # Tabelle (oben geprueft) - der Zweck der Zeile bleibt erfuellt.
+    assert tafel.select_one(".gr-mband") is None
     # Die leere Vodafone-Karte gibt es hier nicht, die gefuellte ist die
     # Referenzrechnung - und die heisst nicht "unser Angebot" (S3).
     marken = [m.get_text(strip=True) for m in tafel.select(".gr-kk-marke")]

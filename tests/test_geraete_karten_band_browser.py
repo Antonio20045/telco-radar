@@ -336,71 +336,71 @@ def test_karten_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
 
 def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     """UX-5: die exakten Werte steckten nur im SVG-Tooltip, den es am
-    Telefon nicht gibt. Jetzt trägt jedes Band-Panel eine Werteliste als
-    sichtbaren Text."""
+    Telefon nicht gibt. Seit O1 ist der Graph HTML/CSS - jede Balkenzeile
+    DRUCKT ihren Wert (kein Tooltip, kein Hover)."""
     _seite.select_option("#gr-band", "klein")
-    _seite.wait_for_timeout(120)
-    klein = _seite.eval_on_selector(
-        ".gr-tmodell:not([hidden]) .gr-tband[data-band='klein']",
-        "e => e.innerText")
+    _seite.wait_for_timeout(250)
+    klein = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
+                                    "e => e.innerText")
     assert "1.032,76" in klein, (
         f"der o2-TCO-24 (1 + 24x24,99 + 24x18) steht nicht als Text: {klein}")
     assert "18 GB" in klein, "das Datenvolumen des Band-Tarifs fehlt"
 
     _seite.select_option("#gr-band", "mittel")
-    _seite.wait_for_timeout(120)
-    mittel = _seite.eval_on_selector(
-        ".gr-tmodell:not([hidden]) .gr-tband[data-band='mittel']",
-        "e => e.innerText")
+    _seite.wait_for_timeout(250)
+    mittel = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
+                                     "e => e.innerText")
     # Vodafone: 1 + 24x26,99 + 24x15 = 1.008,76; congstar: 1.177,00
     assert "1.008,76" in mittel and "1.177,00" in mittel, mittel
 
 
 def test_die_werteliste_nennt_dieselben_zahlen_wie_die_karten(_seite):
-    """Keine zweite Rechnung: die Werte unter dem Chart sind dieselben, die
-    die Karte je Anbieter trägt (`data-gesamt`) - zwei Stellen, eine Zahl."""
+    """Keine zweite Rechnung: die Zahl je Graph-Zeile ist dieselbe, die
+    die Karte desselben Anbieters trägt (`data-gesamt`) - zwei Stellen,
+    eine Zahl. Der Graph zeigt die GÜNSTIGSTE Karte des Anbieters im
+    Band; mehrere Karten desselben Anbieters vergleichen gegen ihr
+    Minimum."""
     _klappe_auf(_seite)
     _seite.select_option("#gr-band", "mittel")
-    _seite.wait_for_timeout(120)
+    _seite.wait_for_timeout(250)
     lage = _seite.evaluate("""() => {
       const block = document.querySelector('.gr-tmodell:not([hidden])');
-      const panel = block.querySelector(".gr-tband[data-band='mittel']");
+      const zeilen = [...block.querySelectorAll('.gr-bz')];
       const karten = [...block.querySelectorAll('.gr-kkarte')]
           .filter(k => k.getAttribute('data-band') === 'mittel');
       return {
-        werte: panel.querySelector('.gr-tband-werte')
-               ? panel.querySelector('.gr-tband-werte').innerText : '',
+        zeilen: zeilen.map(z => ({anbieter: z.getAttribute('data-anbieter'),
+                                  tco: z.getAttribute('data-tco')})),
         karten: karten.map(k => ({anbieter: k.dataset.anbieter,
                                  gesamt: k.getAttribute('data-gesamt')})),
       };
     }""")
-    assert lage["werte"], "keine Werteliste im Band-Panel"
-    for karte in lage["karten"]:
-        # `data-gesamt` trägt den Rohwert (Punkt als Dezimaltrenner);
-        # die Seite schreibt deutsch.
-        erwartet = (f"{float(karte['gesamt']):,.2f}"
-                    .replace(",", "X").replace(".", ",").replace("X", "."))
-        assert erwartet in lage["werte"], (
-            f"{karte['anbieter']}: Kartenwert {erwartet} fehlt in der "
-            f"Werteliste: {lage['werte']!r}")
+    assert lage["zeilen"], "keine Balkenzeilen im Graph"
+    for zeile in lage["zeilen"]:
+        karten = [float(k["gesamt"]) for k in lage["karten"]
+                  if k["anbieter"] == zeile["anbieter"]]
+        assert karten, f"{zeile['anbieter']}: keine Karte im Band"
+        assert abs(float(zeile["tco"]) - min(karten)) < 0.005, (
+            f"{zeile['anbieter']}: Graph rechnet {zeile['tco']}, die "
+            f"günstigste Karte sagt {min(karten)}")
 
 
 def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
-    """390 px: die Werteliste muss ohne Hover UND ohne Querscroll lesbar
-    sein - sonst ist sie am Telefon die alte Tooltip-Falle in neuem Gewand."""
+    """390 px: die Graph-Werte müssen ohne Hover UND ohne Querscroll lesbar
+    sein - sonst ist der Balken am Telefon die alte Tooltip-Falle in neuem
+    Gewand."""
     seite = _seite.context.browser.new_page(viewport={"width": 390,
                                                       "height": 844})
     try:
         seite.goto(_seite.url, wait_until="load")
         seite.click('[data-tafel="tafel-tco"]')
         seite.select_option("#gr-band", "mittel")
-        seite.wait_for_timeout(120)
+        seite.wait_for_timeout(250)
         breite = seite.evaluate("document.documentElement.scrollWidth")
         sichtbar = seite.evaluate("document.documentElement.clientWidth")
         assert breite <= sichtbar, f"{breite} px statt {sichtbar} px"
-        text = seite.eval_on_selector(
-            ".gr-tmodell:not([hidden]) .gr-tband[data-band='mittel']",
-            "e => e.innerText")
+        text = seite.eval_on_selector("#tafel-tco .gr-hgraph",
+                                      "e => e.innerText")
         assert "1.008,76" in text and "1.177,00" in text, text
     finally:
         seite.close()
@@ -475,18 +475,15 @@ def test_die_antwortzeile_fuehrt_keine_finanzierungssumme_als_geraetepreis(
 # Randnotiz aus der Audit-Gegenprobe: doppelt-escaped Tooltips heilen
 # --------------------------------------------------------------------------
 
-def test_die_bandpanel_tooltips_sind_nicht_doppelt_escaped(_seite):
-    """UX-Nebenbefund: die `<title>` der Band-Panels standen als
-    `&lt;title&gt;…` im DOM - doppelt escaped, damit zeigt der Browser
-    keinen Tooltip. Geheilt wird mit derselben Berührung (P1)."""
+def test_der_graph_traegt_keine_tooltips_mehr(_seite):
+    """Der UX-Nebenbefund (doppelt escapte `<title>`-Tooltips in den
+    Band-Panels) ist mit O1 GEGENSTANDSLOS: Der Graph ist HTML/CSS und
+    trägt kein einziges `<title>` - jede Zeile druckt Anbieter, Tarif,
+    Wert und Δ als Text. Ein Tooltip-Fehler kann nur zurückkommen, wenn
+    ein SVG zurückkommt - genau das verhindert A2."""
     _seite.select_option("#gr-band", "klein")
-    _seite.wait_for_timeout(120)
-    titel = _seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden]) .gr-tband[data-band='klein'] title",
-        "e => e.map(t => t.textContent)")
-    assert titel, "das Panel trägt überhaupt keinen Tooltip-Titel"
-    kaputt = [t for t in titel if "<title" in t or "&lt;" in t or "&amp;" in t]
-    assert kaputt == [], f"doppelt escapte Tooltips: {kaputt[:2]}"
-    # Und der gepanzerte Punkt nennt Anbieter, Datum und Betrag - derselbe
-    # Belegzwang wie überall auf dieser Seite.
-    assert any("·" in t and "€" in t for t in titel), titel
+    _seite.wait_for_timeout(250)
+    assert _seite.eval_on_selector_all(
+        "#tafel-tco title", "e => e.length") == 0
+    erste = _seite.eval_on_selector("#tafel-tco .gr-bz", "e => e.innerText")
+    assert "€" in erste, f"Zeile ohne gedruckten Wert: {erste!r}"

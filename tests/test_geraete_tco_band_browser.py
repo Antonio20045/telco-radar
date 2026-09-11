@@ -187,28 +187,25 @@ def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):
 
 
 def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
-    # Ausgangslage: das erste verfuegbare Band (Klein, o2) ist sichtbar.
-    sichtbares_band = _seite.eval_on_selector(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-tband:not([hidden])",
-        "(e) => e.getAttribute('data-band')")
-    assert sichtbares_band == "klein"
-    text_klein = _seite.eval_on_selector(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-tband:not([hidden])",
-        "(e) => e.textContent")
+    """O1: statt Band-Panels umzublenden baut app.js die Balkenzeilen aus
+    dem JSON-Knoten neu - derselbe Nutzereffekt, eine Datenquelle."""
+    # Ausgangslage: das erste verfuegbare Band (Klein, o2) ist gerendert.
+    chip = _seite.eval_on_selector("#gr-bandchip", "(e) => e.textContent")
+    assert "Klein" in chip, chip
+    text_klein = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
+                                         "(e) => e.textContent")
     assert "o2" in text_klein
 
     # Umschalten auf Mittel (Vodafone).
     _seite.select_option("#gr-band", "mittel")
-    sichtbares_band = _seite.eval_on_selector(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-tband:not([hidden])",
-        "(e) => e.getAttribute('data-band')")
-    assert sichtbares_band == "mittel"
-    text_mittel = _seite.eval_on_selector(
-        "#tafel-tco .gr-tmodell:not([hidden]) .gr-tband:not([hidden])",
-        "(e) => e.textContent")
+    _seite.wait_for_timeout(250)
+    chip = _seite.eval_on_selector("#gr-bandchip", "(e) => e.textContent")
+    assert "Mittel" in chip, chip
+    text_mittel = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
+                                          "(e) => e.textContent")
     assert "Vodafone" in text_mittel
-    # Das Klein-Panel ist jetzt versteckt, nicht entfernt.
-    versteckt = _seite.eval_on_selector(
-        '#tafel-tco .gr-tmodell:not([hidden]) .gr-tband[data-band="klein"]',
-        "(e) => e.hidden")
-    assert versteckt is True
+    # Die Panels des alten Bands existieren nicht mehr im Dokument - der
+    # Graph ist EIN Modul, kein Stapel verdeckter Panels (A2).
+    assert _seite.eval_on_selector_all(
+        "#tafel-tco .gr-tband", "e => e.length") == 0, \
+        "die alten Band-Panels stehen noch im Dokument"

@@ -115,36 +115,45 @@ def _ohne_details_ausser(tafel: BeautifulSoup, modellbloecke) -> str:
 
 
 def test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung(tmp_path):
-    """BRIEF_RAHMEN2_R3 (05.09.2026): der Evaluator fand 3 von 59
-    Modellbloecken ohne Aufklappung, weil sie ohne Preishistorie keinen
-    Zeitreihen-Graphen haben und die Aufklappung im Template am Graphen
-    hing (`samsung-galaxy-s24-ultra-512`, `nothing-phone-4a-pro-128`,
-    `apple-iphone-16-pro-max-256`). Ihre Karten tragen trotzdem Zahlen -
-    dieselbe Aufklappung gehoert auch dort hin, nur nach den Karten statt
-    nach dem Graphen."""
+    """BRIEF_RAHMEN2_R3 (05.09.2026) fand 3 von 59 Modellbloecken ohne
+    Aufklappung. O1 (11.09.2026) hat den Fall umgedreht: Es steht nur noch
+    der EINE Modellblock der Vorgabe im Dokument, und die
+    "Wie gerechnet?"-Aufklappung haengt am GRAPHEN. Ein Modell ohne ein
+    einziges Band steht im Dropdown UND im JSON-Knoten mit seinem
+    Leerlauf-Satz - der Wechsel dorthin ist derselbe Pfad wie jeder andere
+    Modellwechsel, und der Leerlauf ist der ehrliche Zustand statt einer
+    Aufklappung ueber nichts."""
+    import json
     s = _baue(tmp_path, graphloses_modell=True)
-    # `modell_schluessel(device_id, speicher)` aus SKU_GRAPHLOS
-    # ("apple-iphone-16-pro-max-256gb-schwarz"): Geraete-ID plus Speicher.
-    block = s.select_one('.gr-tmodell[data-modell="apple-iphone-16-pro-max-256"]')
-    assert block is not None, "der graphlose Block fehlt in der gerenderten Seite"
-    assert block.select_one("figure.gr-grafik--zeitreihe") is None, \
-        "der Test prueft nur einen Block ohne Zeitreihen-Graph"
+    tafel = s.select_one("#tafel-tco")
 
-    wie_gerechnet = [d for d in block.select("details.gr-auf")
+    assert s.select_one(
+        '.gr-tmodell[data-modell="apple-iphone-16-pro-max-256"]') is None, \
+        "mit O1 steht nur der Vorgabeblock im Dokument (die 88-fache " \
+        "Wiederholung entfaellt)"
+
+    option = s.select_one(
+        '#gr-modell option[value="apple-iphone-16-pro-max-256"]')
+    assert option is not None, "das band-lose Modell fehlt im Dropdown"
+    knoten = json.loads(tafel.select_one("#gr-graph-daten").get_text())
+    im_json = [m for m in knoten["modelle"]
+               if m["id"] == "apple-iphone-16-pro-max-256"]
+    assert im_json and im_json[0]["band_leer"], \
+        "der Leerlauf-Satz fehlt im JSON-Knoten"
+
+    vorgabe = tafel.select_one(".gr-tmodell")
+    wie_gerechnet = [d for d in vorgabe.select("details.gr-auf")
                      if d.select_one("summary").get_text(strip=True)
                      == "Wie gerechnet?"]
-    assert len(wie_gerechnet) == 1, \
-        f"graphloser Block: {len(wie_gerechnet)} Aufklappungen statt 1"
-
-    # Sie steht NACH den Karten, nicht davor - anders als beim Graphen.
-    # Seit OPTIK-6 (09.09.2026) tragen die Karten ihre eigene Klappe; die
-    # Positionspruefung laeuft gegen die KLASPE (direktes Kind des
-    # Modellblocks), nicht gegen den Kartenbehaelter darin.
-    kinder = [k for k in block.find_all(recursive=False)]
-    klappe = block.select_one("details.gr-karten-auf")
+    assert len(wie_gerechnet) == 1
+    kinder = [k for k in vorgabe.find_all(recursive=False)]
+    klappe = vorgabe.select_one("details.gr-karten-auf")
     assert klappe is not None, "die Kartenklappe fehlt"
-    assert klappe.select_one(".gr-karten") is not None
-    assert kinder.index(klappe) < kinder.index(wie_gerechnet[0])
+    # Die Aufklappung steht IM Graph-Modul, die Kartenklappe DANACH -
+    # beide sind direkte Kinder des Modellblocks, in dieser Reihenfolge.
+    hgraph = vorgabe.select_one(".gr-hgraph")
+    assert wie_gerechnet[0].find_parent("section", class_="gr-hgraph") is hgraph
+    assert kinder.index(hgraph) < kinder.index(klappe)
 
 
 # --------------------------------------------------------------------------
@@ -184,17 +193,16 @@ def test_die_anbieterkarten_stehen_in_einer_geschlossenen_klappe(tmp_path):
         for karte in block.select(".gr-kkarte"):
             assert karte.find_parent("details", class_="gr-karten-auf"), \
                 f"{block.get('data-modell')}: Karte ausserhalb der Klappe"
-        # Die Zahl der Ueberschrift meint die GEZEICHNETE Menge - dieselbe
-        # Regel wie bei der Legende der alten Positionskarte: eine Klammer,
-        # die anders zaehlt als der Bestand darunter, ist der Fehlertyp
-        # "153 Preispunkte aus 348 Listungen".
+        # O1 (11.09.2026): die Zahl in der Ueberschrift ist WEG - die
+        # Zaehlsysteme der Vergleichsansicht sind auf DIE EINE Fussnote
+        # gesammelt, und "(N Karten)" meinte Angebote, Referenzrechnung,
+        # Leerkarten und Haendler zusammen. Eine Klammer, die anders
+        # zaehlt als der Bestand darunter, bleibt verboten - jetzt dadurch,
+        # dass gar keine mehr dasteht (O2 baut die Karten zu Zeilen um).
         summary = klappe.select_one("summary")
         assert summary is not None
-        treffer = re.search(r"\((\d+)\)", summary.get_text())
-        assert treffer, f"Ueberschrift ohne Zahl: {summary.get_text()!r}"
-        assert int(treffer.group(1)) == len(karten), \
-            (f"{block.get('data-modell')}: Ueberschrift zaehlt "
-             f"{treffer.group(1)}, Klappe traegt {len(karten)} Karten")
+        assert not re.search(r"\d", summary.get_text()), \
+            f"Ueberschrift traegt noch eine Zahl: {summary.get_text()!r}"
 
 
 # --------------------------------------------------------------------------
@@ -218,16 +226,19 @@ def test_haendler_stehen_je_modell_im_balkenblock_ohne_wert(tmp_path):
 
 
 def test_haendler_stehen_je_modell_als_legende_ohne_linie(tmp_path):
+    """O1 (11.09.2026): die drei 'Beschaffung läuft'-Einzelsaetze am
+    Zeitreihen-Block sind EINE Legendenzeile unter dem Graphen - dieselbe
+    Zeile, die auch fehlende Buendel-Anbieter nennt (A3). Keine Linie,
+    kein Balken, kein erfundener Wert."""
     s = _baue(tmp_path)
     for modell in s.select("#tafel-tco .gr-tmodell"):
-        legende = modell.select_one(".gr-g0-haendler")
-        assert legende is not None, "die Haendler-Legende fehlt am Zeitreihen-Block"
+        legende = modell.select_one(".gr-lueckenzeile")
+        assert legende is not None, "die Legendenzeile fehlt unter dem Graphen"
         text = " ".join(legende.get_text(" ", strip=True).split())
         for name in HAENDLER:
-            assert name in text
-        assert text.count("Beschaffung läuft") == 3
+            assert name in text, f"{name} fehlt in der Legendenzeile"
+        assert text.count("Beschaffung läuft") == 1
         assert "€" not in text
-        # Kein Balken, keine Linie: die Legende steht ausserhalb des SVG.
         assert legende.find("svg") is None
 
 

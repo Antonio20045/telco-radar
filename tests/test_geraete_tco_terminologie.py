@@ -6,6 +6,8 @@ tmp_path). Gemessen wird am gerenderten HTML, weil die Woerter dort stehen.
 """
 from __future__ import annotations
 
+from bs4 import BeautifulSoup
+
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report import geraete_tco_karten as karten
@@ -79,13 +81,23 @@ def test_die_referenzkarte_behauptet_keine_36_monate(tmp_path):
 def test_die_tafel_spricht_katalog_d(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    band = " ".join(tafel.select_one(".gr-mband").get_text(" ", strip=True).split())
-    # Ein einziges vergleichbares Angebot: "TCO-24 880,75 €", nicht "von
-    # 880,75 € bis 880,75 €" - und die Referenzrechnung zaehlt nicht in die
-    # Spanne der Angebote (F-R2-2). Ticket TCO24-1: das Etikett ist IMMER
-    # TCO-24, nie mehr eine variable Bindung.
-    assert "TCO-24 " in band and "TCO-36" not in band and "Gesamtkosten" not in band
-    assert " bis " not in band.split("TCO-24")[1].split("·")[0]
+    # O1 (11.09.2026): die gr-mband-Zeile ist entfallen (fuenf Zaehlsysteme
+    # -> EINE Fussnote). Die Etikett-Zusicherung des Katalogs D lebt im
+    # Graphen: der Titel nennt TCO-24, und kein "TCO-36" steht in der
+    # Tafel. Eine SPANNE nennt der Graph nicht mehr - jede Zeile eine Zahl.
+    graph_titel = tafel.select_one(".gr-hgraph-titel")
+    assert graph_titel is not None and graph_titel.get_text(strip=True) == \
+        "TCO-24 je Anbieter"
+    # "Gesamtkosten" ist seit O1 als WORT in der Begriffslegende des
+    # Graphen erlaubt ("TCO-24 = Gesamtkosten über 24 Monate") - verboten
+    # bleibt es als ETIKETT einer Zahl. Gemessen wird deshalb ohne die
+    # Wie-gerechnet-Aufklappung.
+    kopie = BeautifulSoup(str(tafel), "html.parser")
+    for d in kopie.select("details.gr-hgraph-wie"):
+        d.decompose()
+    tafel_text = kopie.get_text(" ")
+    assert "TCO-24" in tafel_text and "TCO-36" not in tafel_text \
+        and "Gesamtkosten" not in tafel_text
     assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
     option = tafel.select_one('select[data-sortiere] option[value="gesamt"]')
     # S-Q4 (09.09.2026): jede Karte ist TCO-24 (TCO24-1, konstantes
@@ -95,7 +107,8 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
     # A-R5: die Geraetespalte steht VOR der TCO-Spalte.
     ths = [th.get_text(strip=True) for th in tafel.select("#gr-tco-tabelle th")]
     assert ths[2] == "Gerätepreis" and ths[3] == "TCO"
-    assert "Gesamtkosten" not in tafel.select_one("figure.gr-grafik figcaption").get_text()
+    # (Die figcaption der alten SVG-Grafiken ist mit O1 aus dieser Ansicht
+    # entfernt - der Graph ist HTML/CSS-Balken ohne Chrome-Abbildung.)
     # Ratenzeile: "X € in 36 Raten" - die Summe aus der Kennzahl.
     o2 = tafel.select_one('.gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
     bau = " ".join(o2.select_one(".gr-kk-bau").get_text(" ", strip=True).split())

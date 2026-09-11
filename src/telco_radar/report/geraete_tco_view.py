@@ -722,10 +722,57 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Datenvolumen aus derselben Lesart wie die Karten.
         modell["baender"] = geraete_tco_band.baender_fuer_modell(
             modell, band_je_tarif, gb_je_tarif)
+        # O1: der Leerlauf des Graphen für Modelle ohne ein einziges Band -
+        # ein Satz, der an Modell (Vorlage) und JSON-Knoten (app.js)
+        # dieselbe Stelle hat, statt zweimal im Code zu stehen.
+        modell["band_leer"] = (None if modell["baender"]
+                               else geraete_tco_band.BAND_LEER_TEXT)
 
     reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
               if historie is not None else [])
     g2 = geraete_tco_grafik.historie(reihen)
+
+    # ---- O1: der JSON-Knoten für den Selektor --------------------------
+    #
+    # Die Vergleichsansicht rendert NUR das Vorgabemodell serverseitig -
+    # die 88-fache Wiederholung der Modellblöcke entfällt (HTML 3,9 MB →
+    # unter 1,5 MB). Damit der Geräte-Selektor trotzdem für ALLE Modelle
+    # funktional ist (O1-Auftrag Punkt 2), trägt dieser Knoten je Modell
+    # Titel, Antwortzeile und alle Band-Graphen - dieselben `balken`-
+    # Strukturen, die die Vorlage für das Vorgabemodell rendert. KEINE
+    # ZWEITE RECHNUNG und keine zweite Formatierung: `app.js` setzt die
+    # fertigen Zeichenketten, es liest keine Beträge.
+    graph_daten = {
+        "stand": max((getattr(b, "abgerufen_am", "") or "" for b in buendel),
+                     default=""),
+        "gesamt": modelle["gesamt"],
+        "vorgabe": modelle["vorgabe"],
+        "modelle": [{
+            "id": modell["id"],
+            "titel": modell["titel"],
+            # Die Antwortzeile wechselt mit dem Modell - ihre Zahlen
+            # gehören zu ihm. Formatiert, mit None für eine fehlende Zahl
+            # (der JS-Teil versteckt den zugehörigen Block dann).
+            "antwort": {
+                "geraetepreis": (geraete_tco_grafik.euro(
+                    modell["antwort"]["geraetepreis"])
+                    if modell["antwort"]["geraetepreis"] is not None else None),
+                "geraetepreis_anbieter": modell["antwort"][
+                    "geraetepreis_anbieter"],
+                "tarif_gesamt": (geraete_tco_grafik.euro(
+                    modell["antwort"]["tarif_gesamt"])
+                    if modell["antwort"]["tarif_gesamt"] is not None else None),
+                "tarif_anbieter": modell["antwort"]["tarif_anbieter"],
+            },
+            "baender": {b["key"]: {
+                "label": b["label"], "bereich": b["bereich"],
+                "chip": b["chip"], "unterzeile": b["unterzeile"],
+                "zeilen": b["balken"]["zeilen"],
+                "luecke_text": b["balken"]["luecke_text"],
+            } for b in modell.get("baender") or []},
+            "band_leer": modell.get("band_leer"),
+        } for modell in modelle["modelle"]],
+    }
 
     # DIE TABELLE ALLER BUENDEL KOMMT AUS DENSELBEN KARTEN wie die
     # Hauptansicht - nicht aus einer zweiten Rechnung.
@@ -787,6 +834,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "tabelle": tabelle,
         "modell_vorgabe": modelle["vorgabe"],
         "modelle_gesamt": modelle["gesamt"],
+        # O1: der JSON-Knoten für den Selektor (siehe oben) - None im
+        # Leerzustand, die Vorlage rendert ihn nur mit Modellen.
+        "graph_daten": graph_daten,
+        # EINE Quelle fuer den Beginn der Händler-Beschaffung (Vorlage und
+        # Legendenzeile des Graphen lesen dieselbe Konstante).
+        "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
         # Buendel, die weder Listung noch Katalog aufloesen - benannt, mit
         # Grund (F-R2-3). Ein Slug als Geraetename war keins von beidem.
         "ohne_zuordnung": modelle["ohne_zuordnung"],
@@ -813,7 +866,8 @@ def leer() -> dict:
             "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
             "horizont": TCO_HORIZONT,
             "modelle": [], "tabelle": [], "modell_vorgabe": "",
-            "modelle_gesamt": 0, "ohne_zuordnung": [],
+            "modelle_gesamt": 0, "ohne_zuordnung": [], "graph_daten": None,
+            "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
             "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
                    "reihen_gesamt": 0, "ausgelassen": []},
