@@ -2672,6 +2672,67 @@ b,strong{font-weight:700}
   border-top:2px solid var(--rule);font-family:var(--sans);font-size:12px;
   color:var(--ink-4)}
 
+/* --------------------------------------------------------------------
+   O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Balkengraph.
+   "TCO-24 je Anbieter" für das gewählte Modell × Band - HTML/CSS-Balken
+   statt SVG: kein Querscroll auf 390 px, Werte immer im Textfluss.
+
+   FARBE: Grau für Wettbewerber, Vodafone-Rot für die eigene Zeile - die
+   bewusste Ausnahme von der C.3-Anbieterfarbe, mit der der freigegebene
+   Entwurf diesen Graphen validiert hat ("grau ist de-emphasis, keine
+   Serienfarbe"): der Balken zeigt eine RANGFOLGE mit einer hervorgehobenen
+   Referenz, kein Serien-Vergleich. Anbieterfarben tragen weiterhin Karte,
+   Tabelle und die Zeitreihen (O4). Linien statt Kasten (Hausregel).
+   -------------------------------------------------------------------- */
+.gr-hgraph{margin:6px 0 22px;border-top:1px solid var(--rule-ink);
+  padding-top:12px}
+.gr-hgraph-kopf{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin:0 0 2px}
+.gr-hgraph-titel{font-family:var(--sans);font-size:13.5px;font-weight:700;
+  letter-spacing:.02em;color:var(--ink);margin:0}
+.gr-bandchip{font-family:var(--sans);font-size:12px;color:var(--ink-3);
+  background:var(--paper-3);padding:2px 8px}
+.gr-hgraph-unter{margin:2px 0 10px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-balkenliste{margin:0}
+.gr-bz{display:grid;grid-template-columns:minmax(150px,200px) 1fr 205px;
+  gap:2px 16px;align-items:center;padding:6px 0 5px;
+  border-bottom:1px solid var(--rule-2)}
+.gr-bz:last-child{border-bottom:none}
+.gr-bz-name{min-width:0}
+.gr-bz-anbieter{font-family:var(--sans);font-size:13.5px;font-weight:700;
+  color:var(--ink)}
+.gr-bz-chip{font-family:var(--sans);font-size:12px;font-weight:600;
+  color:var(--red);border:1px solid var(--red);padding:0 6px;
+  margin-left:7px;white-space:nowrap}
+.gr-bz-tarif{display:block;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.gr-bz-spur{position:relative;height:14px;min-width:0}
+.gr-bz-fill{position:absolute;left:0;top:0;height:14px;
+  background:var(--ink-4)}
+.gr-bz--eigen .gr-bz-fill{background:var(--red)}
+.gr-bz-wert{text-align:right;min-width:0}
+.gr-bz-tco{font-family:var(--serif);font-size:16.5px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.gr-bz-delta{display:block;font-family:var(--sans);font-size:12px;
+  color:var(--ink-3);font-variant-numeric:tabular-nums}
+.gr-bz-ref{display:block;font-family:var(--sans);font-size:12px;
+  font-weight:600;color:var(--red)}
+.gr-lueckenzeile{margin:12px 0 0;padding-top:10px;
+  border-top:1px solid var(--rule);font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-hgraph-leer{margin:2px 0 8px;font-family:var(--sans);font-size:12.5px;
+  color:var(--ink-3)}
+.gr-hgraph-wie{margin:10px 0 0}
+.gr-tco-fussnote{margin:14px 0 0;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-karten-hinweis{font-style:italic}
+/* Der Leer-Satz der Antwortzeile steht INNERHALB von .gr-antwort, die
+   ihre eigene 3px-Linie trägt - hier kein zweiter Rahmen. */
+.gr-antwort .gr-antwort--leer{border-top:none;padding:0 0 10px;margin:0}
+
+
 /* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
    05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite
    existiert"). Vorher 19px Fliesstext, kleiner als die Karten-Leitzahl
@@ -2704,6 +2765,55 @@ b,strong{font-weight:700}
 .gr-antwort--leer{border-top:1px solid var(--rule);padding:12px 0;
   margin:0 0 16px;font-family:var(--sans);font-size:13px;
   color:var(--ink-3);font-style:italic}
+
+/* Mobil: Zeilen gestapelt statt gestaucht - Name und Wert teilen sich die
+   erste Zeile, die Balkenspur läuft darunter über die volle Breite. Kein
+   Querscroll, keine Schrift unter 12 px (Hausregeln der Vorlage). */
+@media (max-width:640px){
+  .gr-bz{grid-template-columns:1fr auto;
+    grid-template-areas:"name wert" "spur spur";row-gap:2px;padding:2px 0 2px}
+  .gr-bz-name{grid-area:name}
+  .gr-bz-wert{grid-area:wert}
+  .gr-bz-spur{grid-area:spur}
+  .gr-bz-chip{margin-left:5px}
+  .gr-bz-tco{font-size:15px}
+  /* O1/A1: die beste Zeile muss OHNE Scrollen im Bild stehen. Dafür rücken
+     auf dem Telefon alles, was vor ihr steht, auf sein Maß: Auswahl und
+     Antwortzeile verlieren ihre Schreibtischgröße (Desktop unverändert -
+     dort steht die Falz bei 900 px mit Luft), die Chart-Chrome-Zeile
+     entfällt ganz (ihre Δ-Erklärung steht in "Wie gerechnet?"), und der
+     Modelltitel rückt näher. Gemessen am 390x844-Telefon: Header+Hero+
+     Reiter kosten 465 px - der Rest gehört der Leitantwort.
+     Nachschärfung vom 11.09.2026 abends: am ECHTEN Bestand endete die
+     erste Balkenzeile bei 862 von 844 px - die Fixture-Antwortzeile ist
+     eine Zeile kürzer, weil ihre Anbieternamen ("(o2)") neben die Zahl
+     passen, während "(congstar)" am echten Stand unter die Zahl bricht.
+     Die Zeile bleibt dominanter als alles andere auf der Tafel (20 px
+     Serife gegen 15 px Graphwerte), aber ihr Zeilenmaß gehört der Falz;
+     das Falzmaß am echten Bestand nagelt Kriterium 11 von
+     pruefe_portal.py. */
+  .gr-msel{margin:4px 0 4px;padding-bottom:4px;gap:5px}
+  .gr-msel--gross{padding-bottom:4px;margin-top:0}
+  .gr-msel--gross select{font-family:var(--sans);font-size:15px;
+    padding:5px 8px}
+  .gr-msel-feld{flex-basis:100%;gap:6px}
+  .gr-msel-feld select{flex-basis:170px}
+  .gr-tueber{margin-top:2px}
+  .gr-antwort{padding:6px 0 2px;margin:0 0 6px}
+  /* Der Spalt zwischen den zwei Zahlen ist auf dem Telefon kleiner als auf
+     dem Schreibtisch: er gibt den Bloecken die Breite, die der Anbieter in
+     Klammern braucht, um NEBEN der Zahl zu stehen. Bricht er darunter
+     (langer Discounter-Name), bleibt die Zeile trotzdem ueber der Falz -
+     das Falzmass laesst beide Faelle zu, gemessen am echten Bestand. */
+  .gr-antwort-reihe{gap:4px 12px}
+  .gr-antwort-leit{flex:1 1 44%;min-width:0}
+  .gr-antwort-zahl{font-size:20px;line-height:1.2}
+  .gr-antwort-anbieter{font-size:12.5px}
+  .gr-antwort-erklaer{margin-top:3px;font-size:12px}
+  .gr-hgraph{margin:0 0 12px;padding-top:4px}
+  .gr-hgraph-kopf{margin-bottom:0}
+  .gr-hgraph-unter{display:none}
+}
 
 /* Die Details-Aufklappung (BRIEF_FADEN): Ampel-Kacheln und
    Analysten-Tabellen sind hier zusammengefasst, damit sie nicht mehr im
