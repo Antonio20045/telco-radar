@@ -2088,6 +2088,22 @@ b,strong{font-weight:700}
   display:inline-block}
 .gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
 .gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
+/* O4: die Export-Knoepfe in der Kopfzeile der Geraete- und der Radar-
+   Seite (page-hero-row, flex-end/space-between). flex:none, damit sie
+   neben dem Datum stehen statt es zu verdraengen; mobil umbricht die
+   Zeile ohnehin (flex-wrap). */
+.page-hero-row .gr-export-knoepfe{flex:none;max-width:100%}
+/* AUF DEM TELEFON IST DIE GANZE KNOPFREIHE weggeblendet (O4, 15.09.2026) -
+   derselbe Praezedenz wie O3, das den UNTERTITEL komplett wegblendet: die
+   drei Knoepfe brauchen gewrappt 77 px, die erste Balkenzeile der
+   Leitzahl endete am echten Bestand bei 810 von 844 px Falz - mit
+   Knöpfen 887. Kriterium 11c (Leitantwort ueber der Falz) geht vor die
+   Platzierung des Entwurfs, der eine Desktop-Kopfzeile zeichnet. Der
+   CSV-Download ist ohnehin ein Excel-Workflow des Schreibtischs; die
+   Dateien bleiben unter ihrer URL erreichbar. */
+@media (max-width:900px){
+  .page-hero-row .gr-export-knoepfe{display:none}
+}
 
 /* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
    Alarmtabelle - dieselbe Seite, dieselben Spaltenkoepfe -, hat aber eine
@@ -3064,6 +3080,14 @@ b,strong{font-weight:700}
 /* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
    sie darf nicht lauter sein als die Linien selbst. */
 .gr-g0-luecke{fill:var(--ink);opacity:.05}
+/* O4: der G0-Block im Verlaufs-Reiter - Titel in der Etiketten-
+   Typografie der Seite (Grotesk-Label, dieselbe Familie wie die
+   Rubrik-Zeile darunter), damit er nicht mit der Serifen-Rubrik
+   konkurriert. */
+.gr-g0-block{margin:0 0 20px}
+.gr-g0-titel{margin:0 0 8px;font-family:var(--sans);font-size:12px;
+  font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3)}
 .gr-g0-chrome{font-family:var(--sans);font-size:12px;color:var(--ink-4);
   margin-top:6px}
 /* A-R3: die drei Haendler als Legenden-Eintrag OHNE Linie - dieselbe

@@ -1039,6 +1039,10 @@ var TelcoFrage = (function () {
   var fragmentLager = null;
   var fragmentVersprechen = null;
   var vorgabeGruppe = null;
+  /* O4: dasselbe Lager-Konzept für den G0-Block des Verlaufs-Reiters -
+   * eigene Map, eigener Vorgabe-Klon, derselbe Satz Regeln. */
+  var g0Lager = null;
+  var vorgabeG0 = null;
   var wechselFolge = 0;
   var zuletztModell = null;
 
@@ -1055,6 +1059,11 @@ var TelcoFrage = (function () {
   (function () {
     var anfangsGruppe = element('gr-bnd-gruppe');
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
+    /* O4: der G0-Klon derselben Lektion - wird er erst im Vorgabe-Durchlauf
+     * gezogen, klont ein Deep-Link-Rückweg die FREMDEN Zeilen als
+     * "Vorgabe" (derselbe Fehler wie S2 bei den Bündel-Zeilen). */
+    var anfangsG0 = element('gr-g0-lager');
+    if (anfangsG0) vorgabeG0 = anfangsG0.cloneNode(true);
   })();
 
   function holeFragment() {
@@ -1072,6 +1081,14 @@ var TelcoFrage = (function () {
             doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
             function (l) {
               fragmentLager[l.getAttribute('data-modell')] = l;
+            });
+          /* O4: die G0-Blöcke stehen imSELBEN Fragment - eine Anfrage,
+           * zwei Montagepunkte. */
+          g0Lager = {};
+          Array.prototype.forEach.call(
+            doc.querySelectorAll('.gr-g0-lager[data-modell]'),
+            function (l) {
+              g0Lager[l.getAttribute('data-modell')] = l;
             });
           return fragmentLager;
         });
@@ -1129,6 +1146,45 @@ var TelcoFrage = (function () {
     }, function () {
       if (meineFolge !== wechselFolge) return;
       fertig(null, true);
+    });
+  }
+
+  /* O4: der G0-Block des Verlaufs-Reiters folgt demselben Modell wie
+   * die Bündel-Zeilen - aus demSELBEN Fragment (keine zweite Anfrage),
+   * als fertiges Markup eingesetzt (kein Client-Renderer: das SVG und
+   * die Wertetabelle entstehen serverseitig aus DEMSELBEN Makro wie der
+   * First Paint des Vorgabemodells).
+   *
+   * EIGENE Folgen-Nummer: teilt er die von `setzeBuendel`, wirft jeder
+   * Wechsel die noch laufende Bündel-Antwort weg (und umgekehrt) - zwei
+   * Montagepunkte, zwei Guards. Beim ERSTEN Wechsel ist das Fragment
+   * noch nicht da: der Nicht-Vorgabe-Zweig wartet auf dieselbe Anfrage
+   * wie die Bündel-Zeilen, statt leer zu bleiben. */
+  var g0Folge = 0;
+
+  function fuelleG0(knoten) {
+    var lager = element('gr-g0-lager');
+    if (!lager) return;
+    while (lager.firstChild) lager.removeChild(lager.firstChild);
+    if (knoten) {
+      var klon = document.importNode(knoten, true);
+      while (klon.firstChild) lager.appendChild(klon.firstChild);
+    }
+  }
+
+  function setzeG0(m) {
+    if (!element('gr-g0-lager')) return;
+    if (m.id === vorgabe) {
+      fuelleG0(vorgabeG0);
+      return;
+    }
+    var meineFolge = ++g0Folge;
+    holeFragment().then(function () {
+      if (meineFolge !== g0Folge) return;
+      fuelleG0(g0Lager ? g0Lager[m.id] : null);
+    }, function () {
+      if (meineFolge !== g0Folge) return;
+      fuelleG0(null);
     });
   }
 
@@ -1262,6 +1318,7 @@ var TelcoFrage = (function () {
     if (m.id !== zuletztModell) {
       zuletztModell = m.id;
       setzeBuendel(m, band, bandKey);
+      setzeG0(m);
     } else {
       setzeBndTitel(m, band);
       stelleZeilen(bandKey);
