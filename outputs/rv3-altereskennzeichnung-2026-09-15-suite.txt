@@ -1,0 +1,6 @@
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_geraete_lifecycle.py::test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen
+1 failed, 2972 passed, 12 skipped, 73 warnings in 340.24s (0:05:40)
+done
