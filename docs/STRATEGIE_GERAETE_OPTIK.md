@@ -126,3 +126,31 @@ BOM, Dezimalkomma) wie bestehende.
 - Verbindung zu bestehenden Plänen: ersetzt P4 aus `STRATEGIE_GERAETESEITE.md`; P3
   (Bandabdeckung) und P5 (TCO-Zeitachse) unverändert; UX-Befund-IDs UX-2/3/4/5/6/7 und
   RM-1/2/3 werden durch O1–O4 abgedeckt.
+
+## 7. Umsetzungsstand
+
+- **O1 FERTIG** (gemergt als `0546c6c`, 14.09.2026): Eine-Graph-Hauptansicht „TCO-24 je
+  Anbieter" mit gedruckten Werten + Δ, Vodafone-Emphasis, Legendenzeile statt 145
+  Fehlend-Zeilen, 88 Blöcke → 1 gewähltes Modell, HTML 3,9 → 1,5 MB, Falz-Kriterium 11c neu.
+  Details im Merge-Commit; Evaluator 8/9 ohne S1/S2.
+- **O2 FERTIG** (gemergt als `d140da6`, 15.09.2026): Bündelkarten → Tabellenzeilen
+  (4 Kernspalten + je 1 Rechenweg-Aufklapper; Pflichtzeile, Belege, Abrufdatum erhalten,
+  A6-Zählung testgesichert), Gruppe „Ohne Tarifband", Alarmtabelle (48 Zeilen, 4 Chips) und
+  „Bei Wettbewerbern gelistet" (29) auf `wettbewerbsradar.html` umgezogen — Geräteseite ohne
+  Reste (Container, JS, Strings). Gemessen: pytest 2987/3/14 (3 vorbestehende Pillow-Rote),
+  pruefe_portal 17/1 (nur 8b vorbestehend), 11b 2400/1894 px, 11c Graphfalz 820 < 844,
+  `<details>` gesamt 24 / 0 über der Falz (1440+390). Belege:
+  `/tmp/optik-o1-o4/o2/` (baubericht.md, evaluator.md, rot-vor-gruen.txt, Screenshots).
+  - Evaluator: **BESTANDEN MIT AUFLAGEN** (9/9 Kriterien, kein S1). Befunde:
+    **S2** — Merge ohne `site/`-Neurender; committetes `site/geraete.html` ist noch der
+    O1-Stand. Regel bleibt: Render-Kommits erst nach O4 oder auf Antonios Wunsch; der
+    nächtliche `geraete.yml`-Cron heilt selbst — **nach Antonios Push live gegenprüfen**.
+    **S3 → O3** — der Modell-Umschalter zeigt Bündel-ZEILEN nur fürs Vorgabegerät (19 von
+    423); die alte „Alle Bündel als Tabelle" fiel in O2 ersatzlos weg. O3 muss den
+    Modellwechsel für alle Geräte mit echten Zeilen schließen. **S4 → O3** —
+    überzeichnender Template-Kommentar („des GEWÄHLTEN Modells"), tote View-Felder
+    (`tabelle`/`zeilen`/`_delta`/`hat_tco`), ID-Rest `gr-karten-hinweis`; Radar mobil
+    ~18.500 px ohne Höhengrenze (Beobachtung, O3/O4 im Blick).
+  - O1-Restpunkte, an O3 übergeben: Wortlaut „führt kein Bündel" (`geraete_tco_band.py:388`,
+    Entwurf sagt „fehlt"); zwei tote `or True`-Asserts (`test_geraete_vergleich.py:194`,
+    `test_geraete_anbieterzaehlung.py:65`).
