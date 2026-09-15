@@ -2665,25 +2665,6 @@ b,strong{font-weight:700}
   font-weight:700;white-space:nowrap}
 .gr-tband-wert--eigen dt::after{content:" · unser Angebot";
   font-weight:400;font-size:12px;color:var(--ink-4)}
-/* P1 (UX-1): die markierte Gruppe der Karten OHNE Tarifband in der
-   Kartenklappe - ganze Rasterbreite, dieselbe Stimme wie die
-   Händler-Vermerke am Graphen, kein Kasten. */
-.gr-kband-gruppe{grid-column:1 / -1;margin:6px 0 0;padding:8px 0 2px;
-  border-top:2px solid var(--rule);font-family:var(--sans);font-size:12px;
-  color:var(--ink-4)}
-
-/* --------------------------------------------------------------------
-   O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Balkengraph.
-   "TCO-24 je Anbieter" für das gewählte Modell × Band - HTML/CSS-Balken
-   statt SVG: kein Querscroll auf 390 px, Werte immer im Textfluss.
-
-   FARBE: Grau für Wettbewerber, Vodafone-Rot für die eigene Zeile - die
-   bewusste Ausnahme von der C.3-Anbieterfarbe, mit der der freigegebene
-   Entwurf diesen Graphen validiert hat ("grau ist de-emphasis, keine
-   Serienfarbe"): der Balken zeigt eine RANGFOLGE mit einer hervorgehobenen
-   Referenz, kein Serien-Vergleich. Anbieterfarben tragen weiterhin Karte,
-   Tabelle und die Zeitreihen (O4). Linien statt Kasten (Hausregel).
-   -------------------------------------------------------------------- */
 .gr-hgraph{margin:6px 0 22px;border-top:1px solid var(--rule-ink);
   padding-top:12px}
 .gr-hgraph-kopf{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
@@ -2728,6 +2709,93 @@ b,strong{font-weight:700}
 .gr-tco-fussnote{margin:14px 0 0;font-family:var(--sans);font-size:12px;
   color:var(--ink-4)}
 .gr-karten-hinweis{font-style:italic}
+
+/* --------------------------------------------------------------------
+   O2 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): die Bündel-Zeilen.
+   Jedes Bündel des gewählten Modells ist EINE Zeile mit fünf Kernangaben
+   (Anbieter, Tarif · Volumen, TCO-24, Δ, Gerät ohne Vertrag) und EINEM
+   schmalen Rechenweg-Aufklapper - Form nach dem freigegebenen Entwurf
+   (`.bnd` in docs/entwuerfe/geraete-optik-2026-09-11/entwurf.html).
+   Linien statt Kasten: die Zeile trennt eine Haarlinie, die Anbieterfarbe
+   sitzt als 3px-Balken am linken Rand (dieselbe Farbe wie am Graphen).
+   -------------------------------------------------------------------- */
+.gr-buendel{margin:6px 0 26px;border-top:1px solid var(--rule-ink);
+  padding-top:12px}
+.gr-buendel[hidden]{display:none}
+.gr-bnd-titel{font-family:var(--serif);font-size:17px;font-weight:700;
+  margin:0 0 6px}
+.gr-bnd-kopf,.gr-bnd summary{
+  display:grid;gap:0 14px;
+  grid-template-columns:132px minmax(0,1fr) 118px 138px 128px 18px;
+  align-items:baseline}
+/* 12px, nicht 11.5px wie die Seitenetiketten: die Bündel-Tabelle steht
+   im Reiter 1, und der kennt keine Schrift unter 12px
+   (`test_keine_beschriftung_unter_zwoelf_pixeln`). */
+.gr-bnd-kopf{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  text-transform:uppercase;letter-spacing:.04em;padding:0 6px 6px 9px;
+  border-bottom:1px solid var(--rule-2)}
+.gr-bnd-kopf span:nth-child(3),.gr-bnd-kopf span:nth-child(4),
+.gr-bnd-kopf span:nth-child(5){text-align:right}
+.gr-bnd{border-bottom:1px solid var(--rule);border-left:3px solid
+  var(--anb,#57534a);margin:0 0 0}
+.gr-bnd summary{cursor:pointer;list-style:none;padding:9px 6px 9px 6px;
+  font-variant-numeric:tabular-nums;line-height:1.45}
+.gr-bnd summary::-webkit-details-marker{display:none}
+.gr-bnd summary:hover{background:var(--paper-2)}
+.gr-bnd summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.gr-bnd-name{font-weight:700;color:var(--anb,#57534a)}
+.gr-bnd-tarif{font-family:var(--serif);font-size:13px;color:var(--ink-2);
+  min-width:0}
+.gr-bnd-tco{text-align:right;font-family:var(--serif);font-size:15px;
+  font-weight:650}
+/* 12px - siehe .gr-bnd-kopf: Reiter-1-Regel, keine Ausnahme für Etiketten
+   an der Zahl selbst. */
+.gr-bnd-label{font-family:var(--sans);font-style:normal;font-size:12px;
+  color:var(--ink-4);margin-left:3px;white-space:nowrap}
+.gr-bnd-label--fin{display:block;margin:0}
+.gr-bnd-delta,.gr-bnd-bar{text-align:right;font-family:var(--sans);
+  font-size:13px;color:var(--ink-2)}
+.gr-bnd-delta{white-space:nowrap}
+.gr-bnd-chev{text-align:right;color:var(--ink-4);font-family:var(--sans)}
+.gr-bnd:not([open]) .gr-bnd-chev::before{content:"+"}
+.gr-bnd[open] .gr-bnd-chev::before{content:"−"}
+.gr-bnd-rw{margin:0 6px 12px;padding:10px 14px;background:var(--paper-2);
+  border-left:1px solid var(--rule-2);border-right:1px solid var(--rule-2);
+  border-bottom:1px solid var(--rule-2);font-size:13px;color:var(--ink-2);
+  max-width:82ch}
+.gr-bnd-rw-z{margin:0 0 6px;color:var(--ink);font-weight:550;
+  font-variant-numeric:tabular-nums}
+.gr-bnd-rw-bar{margin:0 0 6px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+/* Die Gruppe ohne Tarifband (§ 7): klar getrennt UNTER der Bandliste -
+   eigene Überschrift, eigene Haarlinie, keine Kartenmischung. */
+.gr-ohneband{margin-top:18px;border-top:2px solid var(--rule);
+  padding-top:10px}
+.gr-ohneband-kopf{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 2px}
+.gr-haendlerzeile{margin:6px 0 0;padding:7px 6px;font-size:13px;
+  color:var(--ink-2);border-top:1px solid var(--rule);
+  font-variant-numeric:tabular-nums}
+.gr-haendlerzeile b{color:var(--ink);font-weight:700}
+
+/* Auf dem Telefon werden die Zeilen GESTAPELT, nicht gequetscht (derselbe
+   Grundsatz wie am Graphen): Anbieter und TCO oben, Tarif und Gerät darunter,
+   Delta und Chevron in der dritten Reihe. Die Zahlenspalten richten sich
+   rechts aus, weil sie unten rechts im Stapel landen. */
+@media (max-width:900px){
+  .gr-bnd-kopf{display:none}
+  .gr-bnd{border-left-width:3px}
+  .gr-bnd summary{
+    grid-template-columns:1fr auto;row-gap:3px;
+    grid-template-areas:"an tco" "tar bar" "dl chev"}
+  .gr-bnd-an{grid-area:an;min-width:0}
+  .gr-bnd-tco{grid-area:tco;text-align:right}
+  .gr-bnd-tarif{grid-area:tar}
+  .gr-bnd-bar{grid-area:bar;text-align:right}
+  .gr-bnd-delta{grid-area:dl}
+  .gr-bnd-chev{grid-area:chev}
+  .gr-bnd-rw{margin:0 0 12px;padding:10px 12px}
+}
 /* Der Leer-Satz der Antwortzeile steht INNERHALB von .gr-antwort, die
    ihre eigene 3px-Linie trägt - hier kein zweiter Rahmen. */
 .gr-antwort .gr-antwort--leer{border-top:none;padding:0 0 10px;margin:0}
@@ -2836,34 +2904,13 @@ b,strong{font-weight:700}
 .gr-chip--gering b{color:var(--al-gering)}
 .gr-chip--bestpreis b{color:var(--al-bestpreis)}
 
-.gr-ksteuer{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px}
-.gr-ksteuer label{font-family:var(--sans);font-size:12px;color:var(--ink-3)}
-.gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
-  border:1px solid var(--rule);background:var(--paper-2)}
-
 /* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
    Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
    SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`
    gesetzt erbte jede Karte darin das Umbruchverbot - jede Zeile stand
-   auf EINER Zeile, die min-content-Breite einer Karte war 1346 px, und
-   die Seite lief auf dem Telefon 1389 px breit statt 390. Im HTML war
-   davon nichts zu sehen; gemessen wurde es im Browser. */
-
-/* Die Karten. Vier Slots je Modell, gleiche Felder an gleicher Stelle -
-   dieselbe Regel wie auf der Promo-Uebersicht. Eine Karte ohne Zahl ist
-   NICHT kleiner gesetzt: sie traegt eine Auskunft, keinen Mangel. */
-.gr-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
-  gap:14px;margin:0 0 18px}
-.gr-kkarte{border-top:3px solid var(--anb,#57534a);padding:10px 12px 12px;
-  background:var(--paper-2);border-left:1px solid var(--rule-2);
-  border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
-.gr-kkarte--leer{background:transparent;border-top-color:var(--rule)}
-/* A-R3: Haendler ohne Tarifbuendel - dieselbe leere Kartenform, nur ohne
-   Anbieterfarbe (sie hat keinen Balken, an dem eine Farbe haengen koennte). */
-.gr-kkarte--haendler{border-top-color:var(--rule)}
-.gr-kk-kopf{margin:0;font-family:var(--sans);font-size:12px;
-  letter-spacing:.06em;text-transform:uppercase}
-.gr-kk-anbieter{font-weight:700;color:var(--anb,#57534a)}
+   auf EINER Zeile, die min-content-Breite war 1346 px, und die Seite
+   lief auf dem Telefon 1389 px breit statt 390. Im HTML war davon nichts
+   zu sehen; gemessen wurde es im Browser. */
 .gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
   border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
 /* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
@@ -2876,14 +2923,6 @@ b,strong{font-weight:700}
 .gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
 .gr-t-zustand{color:var(--red,#e60000);font-weight:700}
-.gr-kk-tarif{margin:2px 0 8px;font-family:var(--serif);font-size:14px;
-  color:var(--ink-2)}
-.gr-kk-leit{margin:0;display:flex;align-items:baseline;gap:8px}
-.gr-kk-leit b{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
-  color:var(--ink-3);text-transform:uppercase}
-.gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
-.gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
-  color:var(--ink-2)}
 .gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
 /* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
@@ -2893,7 +2932,7 @@ b,strong{font-weight:700}
 /* .gr-kk-omonat: die Ø/Monat-Zeile, seit A-R5 (BRIEF_RAHMEN2) die dritte
    statt die zweite Zahl der Karte - dieselbe zurueckgenommene Stimme wie
    die Bindungszeile daneben. */
-.gr-kk-basis,.gr-kk-omonat{margin:-4px 0 8px;font-family:var(--sans);
+.gr-kk-basis{margin:-4px 0 8px;font-family:var(--sans);
   font-size:12px;line-height:1.4;color:var(--ink-4)}
 .gr-kk-24 b{font-weight:600}
 .gr-kk-eff .gr-a-klein{display:block}
@@ -2904,10 +2943,6 @@ b,strong{font-weight:700}
 .gr-kk-delta{margin:6px 0 6px;font-family:var(--sans);font-size:12.5px;
   font-weight:600;color:var(--al-kritisch)}
 .gr-kk-delta--unter{color:var(--al-bestpreis)}
-.gr-kk-weg{margin-top:6px}
-.gr-kk-weg summary{font-family:var(--sans);font-size:12px;cursor:pointer;
-  color:var(--ink-3)}
-
 /* G1 und G2 */
 .gr-grafik{margin:0 0 18px;padding:0}
 .gr-grafik figcaption{font-family:var(--sans);font-size:12px;
@@ -3016,7 +3051,6 @@ b,strong{font-weight:700}
 @media (max-width:900px){
   .gr-grafik{overflow-x:auto}
   .gr-g1,.gr-g2,.gr-g0,.gr-tcoband{width:1180px;max-width:none}
-  .gr-karten{grid-template-columns:1fr}
 }
 
 /* Wettbewerbs-Radar (RAD-1, 08.09.2026). Reuse-first: `.src-table`,
