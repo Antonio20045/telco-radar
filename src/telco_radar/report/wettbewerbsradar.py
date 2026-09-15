@@ -402,7 +402,8 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
     return out
 
 
-def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict) -> dict:
+def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
+          alarme: dict | None = None) -> dict:
     """Alles fuer wettbewerbsradar.html.
 
     `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts
@@ -410,6 +411,15 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict) -> dict:
     `haendler_sichtbar`/`haendler_rest` sind nur die Kappung der
     ANSICHT - dieselbe Bauform wie `geraete_alarme.zeilen()`
     (`sichtbar`/`rest`).
+
+    `alarme` (seit O2, 11.09.2026) ist die Aufbereitung aus
+    `geraete_view.aufbereiten` - die Alarmtabelle steht seither HIER und
+    nicht mehr in der Vergleichsansicht der Geraeteseite. Sie wird als
+    GANZES durchgereicht, nicht neu gerechnet: dieselbe Tabelle, derselbe
+    Deckel, derselbe Ort - nur die Seite ist eine andere. Dazu
+    `ohne_vodafone` aus demselben Vergleich: der Sortiments-Aufklapper
+    "Bei Wettbewerbern gelistet" antwortet dieselbe Frage ueber das
+    Sortiment, die der Radar ueber den Preis stellt.
     """
     band_je_tarif = tco.get("band_je_tarif") or {}
     gruppen = netzbetreiber_gruppen(tco.get("modelle", []), band_je_tarif)
@@ -417,6 +427,7 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict) -> dict:
     fehlt = nicht_erhebbar(quellenlage)
     hat_vergleichbare = any(z["prozent"] is not None
                             for g in gruppen for z in g["zeilen"])
+    ohne = (vergleich_ohne_vertrag or {}).get("ohne_vodafone") or []
     return {
         "gruppen": gruppen,
         "gruppen_sichtbar": gruppen[:SICHTBAR_MAX],
@@ -428,7 +439,24 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict) -> dict:
         "hat_daten": bool(gruppen),
         "hat_vergleichbare_zeilen": hat_vergleichbare or bool(haendler),
         "anbieter_erwartet": list(NETZ_WETTBEWERBER),
+        # O2: die Alarmtabelle - VOLLSTAENDIG durchgereicht (der Deckel
+        # kappt nur die Ansicht, `sichtbar` + `rest` ist die ganze Liste).
+        "alarme": alarme if alarme is not None else _alarme_leer(),
+        # O2: der Sortiments-Aufklapper - "gelistet, aber nicht bei uns"
+        # ist die Sortimentshaelfte derselben Radar-Frage.
+        "ohne_vodafone": ohne,
+        "ohne_vodafone_gesamt": (vergleich_ohne_vertrag or {}).get(
+            "ohne_vodafone_gesamt", len(ohne)),
     }
+
+
+def _alarme_leer() -> dict:
+    """Der Notzustand der Alarmtabelle - `geraete_alarme.leer()`, ohne den
+    Import quer durch die Tafeln zu ziehen (derselbe Grund wie bei
+    `EIGEN` im Modulkopf: eine Abhaengigkeit zwischen zwei Seiten, die
+    sonst nichts miteinander zu tun haben)."""
+    from . import geraete_alarme
+    return geraete_alarme.leer()
 
 
 def leer() -> dict:
@@ -436,4 +464,6 @@ def leer() -> dict:
             "haendler": [], "haendler_sichtbar": [], "haendler_rest": [],
             "nicht_erhebbar": [],
             "hat_daten": False, "hat_vergleichbare_zeilen": False,
-            "anbieter_erwartet": list(NETZ_WETTBEWERBER)}
+            "anbieter_erwartet": list(NETZ_WETTBEWERBER),
+            "alarme": _alarme_leer(),
+            "ohne_vodafone": [], "ohne_vodafone_gesamt": 0}

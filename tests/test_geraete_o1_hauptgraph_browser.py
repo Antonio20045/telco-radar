@@ -476,31 +476,27 @@ def test_bandwechsel_baut_die_zeilen_aus_dem_json(seite):
     assert zurueck == vorher
 
 
-def test_modellwechsel_versteckt_die_karten_und_filtret_die_tabelle(seite):
-    """Die 88-fache Wiederholung der Modellblöcke entfällt - die Karten
-    stehen nur für das Vorgabegerät. Bei anderem Gerät benennt die Tafel
-    das ehrlich und filtert die Alle-Bündel-Tabelle auf dieses Gerät."""
-    klappe = seite.query_selector(".gr-karten-auf")
-    assert klappe.is_visible(), "beim Vorgabemodell stehen die Karten offen"
+def test_modellwechsel_versteckt_die_buendel_tabelle(seite):
+    """Die 88-fache Wiederholung der Modellblöcke entfällt - die Bündel-
+    Tabelle mit ihren Rechenwegen (seit O2 die Kartenform) steht nur für
+    das Vorgabegerät. Bei anderem Gerät benennt die Tafel das ehrlich;
+    die Werte je Band zeigt der Graph aus dem JSON-Knoten."""
+    tabelle = seite.query_selector("#gr-buendel")
+    assert tabelle.is_visible(), "beim Vorgabemodell steht die Tabelle offen"
     seite.select_option("#gr-modell", "samsung-galaxy-s26-256")
     seite.wait_for_timeout(120)
-    assert not klappe.is_visible(), \
-        "die Kartenklappe zeigt sonst fremde Karten als aktuelle"
+    assert not tabelle.is_visible(), \
+        "die Tabelle zeigt sonst fremde Bündel als aktuelle"
     hinweis = seite.query_selector("#gr-karten-hinweis")
     assert hinweis is not None and hinweis.is_visible()
-    sichtbar = seite.eval_on_selector_all(
-        "#gr-tco-tabelle .gr-tzeile",
-        "es => es.filter(e => getComputedStyle(e).display !== 'none')"
-        "      .map(e => e.getAttribute('data-modell'))")
-    assert sichtbar and set(sichtbar) == {"samsung-galaxy-s26-256"}, sichtbar
-    # Zurueck auf die Vorgabe: alles wieder da, Filter weg.
+    # Der Graph des gewählten Geräts steht weiterhin (aus dem JSON-Knoten).
+    zeilen = seite.eval_on_selector_all(
+        "#tafel-tco .gr-bz", "e => e.length")
+    assert zeilen, "der Graph des gewählten Modells hat keine Zeilen"
+    # Zurueck auf die Vorgabe: die Tabelle wieder da.
     seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
     seite.wait_for_timeout(120)
-    assert klappe.is_visible()
-    sichtbar = seite.eval_on_selector_all(
-        "#gr-tco-tabelle .gr-tzeile",
-        "es => es.filter(e => getComputedStyle(e).display !== 'none').length")
-    assert sichtbar > 1, "der Tabellenfilter wurde nicht zurückgesetzt"
+    assert tabelle.is_visible()
 
 
 def test_keine_schrift_unter_zwoelf_pixel_im_graph(seite):

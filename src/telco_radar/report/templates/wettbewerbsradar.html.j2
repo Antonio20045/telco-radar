@@ -15,6 +15,191 @@
 {% block title %}Vodafone Product and Services Insights · Wettbewerbs-Radar{% endblock %}
 
 {% block content %}
+
+{# ==========================================================================
+   O2 (11.09.2026): die Alarmtabelle - von der Vergleichsansicht der
+   Geraeteseite HIERHER gezogen. Die Radar-Seite sortiert Geraete nach
+   Abweichung zu Vodafone; die Alarmtabelle ist dieselbe Aussicht im
+   Detail (Barpreis ohne Vertrag), und ihr Ort neben der TCO-Uebersicht
+   macht die zwei Masse nebeneinander sichtbar, die sie ohnehin sind.
+   Die Macros sind Zeile fuer Zeile uebernommen - KEINE Zeile ist
+   gestrichen: Kacheln, Filter, Suche, Sortierung, Zeilenaufklapper und
+   "alle anzeigen" stehen unveraendert. #}
+{# Eine Zeile der Alarmtabelle. Der Prozentsatz steht gross, der Euro-Betrag
+   klein darunter: 15 Euro sind bei einem 200-Euro-Geraet viel und bei einem
+   2000-Euro-Geraet nichts. Die Pille ersetzt jede Legende - die Zeile sagt
+   selbst, wie schlimm sie ist. (Seit O2 steht sie auf dem Wettbewerbs-
+   Radar - unverändert, nur der Ort ist neu.) #}
+{% macro alarmzeile(z, nr, rest=False) %}
+  {# Die Sortierschluessel stehen als Zahl an der ZEILE, nicht im Zelltext.
+     "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €", und ein
+     Sortierer, der das aus der Zelle liest, ordnet den teuersten Preis nach
+     vorn. Die Rohwerte kommen aus `geraete_alarme.zeilen()` - dieselben,
+     aus denen die Zelle gesetzt wird. #}
+  <tr class="gr-a-zeile{% if rest %} gr-a-rest{% endif %}" data-auf="auf-{{ nr }}"
+      data-marke="{{ z.hersteller }}" data-modell="{{ z.modell }}"
+      data-speicher="{{ z.speicher or '' }}"
+      data-s-geraet="{{ z.modell }} {{ z.speicher or '' }}"
+      data-s-laden="{{ z.bester.laden }}"
+      data-s-unser="{{ z.unser.preis }}"
+      data-s-fremd="{{ z.bester.preis }}"
+      data-s-prozent="{{ z.prozent }}"
+      data-s-euro="{{ z.euro }}"
+      data-s-stufe="{{ z.prozent }}"
+      data-s-abgerufen="{{ z.bester.abgerufen_am }}" tabindex="0">
+    <td><span class="gr-a-modell">{{ z.modell }}</span>
+      <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
+        %}Speicher unbekannt{% endif %}</span></td>
+    <td>{% if z.bester.url %}<a class="gr-a-quelle" href="{{ z.bester.url }}"
+        rel="noopener" title="Quelle bei {{ z.bester.laden }} öffnen">{{
+        z.bester.laden }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+      {% else %}{{ z.bester.laden }}{% endif %}
+      {% if z.auffaellig %}<span class="gr-a-warnung">ungewöhnlich großer
+        Abstand – Quelle prüfen</span>{% endif %}</td>
+    {# Der Zusatz "in 24 Raten (0 %)" kommt aus `geraete_model.ratenhinweis`,
+       nicht aus einer Anbieterliste an dieser Stelle: o2s Zahl ist der
+       Gesamtbetrag einer Ratenzahlung und stand bis zum 03.09.2026 in
+       derselben Optik wie freenets Barpreis. Wo die Quelle keine Rate
+       nennt, bleibt die Zelle wie bisher. #}
+    <td class="num"><span class="gr-a-unser gr-a-unser--zurueck">{{ z.unser.preis | euro }}</span>{%
+      if z.unser.ratenhinweis %}
+      <span class="gr-a-klein">{{ z.unser.ratenhinweis }}</span>{% endif %}</td>
+    <td class="num"><span class="gr-a-fremd">{{ z.bester.preis | euro }}</span>{%
+      if z.bester.ratenhinweis %}
+      <span class="gr-a-klein">{{ z.bester.ratenhinweis }}</span>{% endif %}</td>
+    <td class="num"><span class="gr-a-prozent">{{
+      '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
+      <span class="gr-a-euro">{{ z.euro | euro }}</span></td>
+    <td><span class="gr-pille gr-pille--{{ z.stufe }}">{{ z.stufe_name }}</span></td>
+    {# KEINE VERFUEGBARKEITSSPALTE (30.08.2026): sie sagte an der echten
+       Ausgabe in 12 von 13 Zeilen "unbekannt". Geloescht ist sie nicht -
+       der Geraetekatalog der Geraeteseite traegt sie weiter. #}
+    <td><span class="gr-a-klein gr-a-datum">{{ z.bester.abgerufen_am | date_de }}</span></td>
+  </tr>
+  <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="auf-{{ nr }}"><td colspan="7">
+    <ul class="gr-a-liste">
+      {% for a in z.alle %}
+      <li><span{% if a.eigen %} class="gr-a-eigen"{% endif %}>{{ a.laden }}</span>
+        <span>{{ a.preis | euro }}{%
+          if a.ratenhinweis %} <span class="gr-klein">{{ a.ratenhinweis
+          }}</span>{% endif %}</span>
+        <span>{{ a.zustand }}</span>
+        {% if a.farbe %}<span>{{ a.farbe }}</span>{% endif %}
+        <span>{{ a.abgerufen_am | date_de }}</span>
+        {% if a.url %}<a href="{{ a.url }}" rel="noopener">Quelle</a>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </td></tr>
+{% endmacro %}
+
+{% macro alarmtafel(al) %}
+  {# DIE VIER KENNZAHLEN STEHEN OBEN ALS CHIPS und nicht ein zweites Mal
+     hier: eine Zahl steht je Ort genau EINMAL (Beruhigungsregel vom
+     07.08.2026). Bis zum 04.09.2026 standen sie wortgleich in beiden
+     Bloecken derselben Tafel. #}
+
+  {# Zustand und Preisart sind auf dieser Tafel keine Auswahl, sondern der
+     Zuschnitt: der Vergleich zeigt ausschliesslich Neugeraete ohne Vertrag.
+     Sie stehen deshalb als aktive Etiketten und nicht als Auswahlfelder -
+     ein Bedienelement, das nichts aendern kann, ist keins. Sobald ein
+     Buendelpreis-Anbieter angebunden ist, traegt `mit_vertrag` Daten und
+     die Preisart wird ein echter Umschalter. #}
+  <div class="gr-filter">
+    <label>Marke <select data-filter="marke"><option value="">alle</option>
+      {% for m in al.marken %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+    </select></label>
+    <label>Modell <select data-filter="modell"><option value="">alle</option>
+      {% for m in al.modelle %}<option value="{{ m }}">{{ m }}</option>{% endfor %}
+    </select></label>
+    <label>Speicher <select data-filter="speicher"><option value="">alle</option>
+      {% for s in al.speicher %}<option value="{{ s }}">{{ s }} GB</option>{% endfor %}
+    </select></label>
+    <label class="gr-filter--an">Zustand: neu</label>
+    <label class="gr-filter--an">Preisart: ohne Vertrag</label>
+  </div>
+
+  <div class="gr-werkzeug">
+    <input type="search" class="gr-suche" data-filter="suche"
+           placeholder="Gerät suchen – Marke, Modell, Anbieter …"
+           aria-label="Alarmtabelle durchsuchen">
+  </div>
+
+  {% if al.gesamt %}
+  <div class="gr-alarm-scroll">
+  <table class="gr-alarm">
+    {# SORTIERBAR (30.08.2026). Bei acht Spalten und 24 Zeilen ist "sortiere
+       nach Euro-Abstand statt nach Prozent" die erste Frage, die jemand vor
+       dieser Tabelle hat - 15 Euro sind bei einem 200-Euro-Geraet viel und
+       bei einem 2000-Euro-Geraet nichts, und beide Sichten sind richtig.
+
+       `data-sort` nennt den Schluessel an der Zeile, `data-art` sagt, ob
+       nach Zahl oder nach Text geordnet wird. Die Vorbelegung steht auf
+       "Unterschied, absteigend" - das ist die Reihenfolge, in der
+       `geraete_alarme.zeilen()` liefert, und die Kopfzeile sagt sie jetzt
+       auch. #}
+    <thead><tr>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
+        data-art="text">Gerät</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="laden"
+        data-art="text">günstigster Wettbewerber</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="unser" data-art="zahl">unser Preis</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="fremd" data-art="zahl">Wettbewerbspreis</button></th>
+      {# EINE Spalte, ZWEI Sortierungen. Die Zelle darunter traegt beide
+         Zahlen (Prozent gross, Euro klein) - das ist die Entscheidung vom
+         30.08.2026 und sie bleibt. Zwei Spalten daraus zu machen hiesse,
+         dieselbe Groesse zweimal zu setzen; ein zweiter Knopf im Kopf
+         beantwortet Antonios Frage ohne das. #}
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="prozent" data-art="zahl" data-vor="ab"
+        aria-sort="descending">Unterschied&nbsp;%</button>{#
+        #}<span class="gr-sort-trenner" aria-hidden="true">·</span>{#
+        Ein SICHTBARES Trennzeichen zwischen den zwei Knoepfen. Ohne es las
+        die Kopfzeile "UNTERSCHIED %€" - genau der Fehler, der in dieser
+        Sitzung aus 24 Generationen und 54 Modellen "2454 Modelle" gemacht
+        hat: zwei Inline-Elemente ohne ein Zeichen dazwischen sind fuer das
+        Auge ein Wort. #}<button type="button"
+        class="gr-sort gr-sort--zweit" data-sort="euro" data-art="zahl"
+        aria-label="nach Unterschied in Euro sortieren">€</button></th>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="stufe"
+        data-art="zahl">Einstufung</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="abgerufen" data-art="text">abgerufen</button></th>
+    </tr></thead>
+    <tbody>
+      {% for z in al.sichtbar %}{{ alarmzeile(z, loop.index) }}{% endfor %}
+      {% for z in al.rest %}{{ alarmzeile(z, 'r' ~ loop.index, True) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if al.rest %}
+  <p class="gr-erklaer"><button type="button" class="gr-knopf" id="gr-mehr"
+    >alle {{ al.gesamt }} anzeigen</button></p>
+  {% endif %}
+  {% endif %}
+  {# Der Satz steht IMMER da und ist versteckt, solange Zeilen sichtbar sind.
+     Er gehoert dem Filter, nicht dem Datenbestand: eine leere Tabelle ohne
+     Erklaerung liest sich als kaputte Seite, und das faellt beim Filtern
+     genauso an wie beim leeren Bestand. #}
+  <p class="gr-erklaer gr-a-leer"{% if al.gesamt %} hidden{% endif %}>Zu
+  dieser Auswahl ist bei keiner Modell-Speicher-Kombination ein Wettbewerber
+  günstiger.</p>
+
+  {# "Geraete" waere hier falsch, und ein Test haelt das fest: gezaehlt
+     werden Modell-Speicher-Kombinationen, und davon gibt es mehr als
+     Geraete. Genau diese Verwechslung stand schon einmal auf der Seite
+     ("62 Geraete im Vergleich" bei 59 beobachteten). #}
+  <p class="gr-erklaer">{{ al.verglichen }} Modelle mit ihren Speichergrößen
+  stehen einem Wettbewerber gegenüber{% if al.ohne_wettbewerber %}; bei
+  weiteren {{ al.ohne_wettbewerber }} führt kein beobachteter Anbieter
+  dieselbe Kombination aus Modell und Speichergröße, sie sind deshalb in
+  keiner der vier Kacheln gezählt{% endif %}. Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag, jeweils
+  der günstigste Preis je Laden. Wo ein Anbieter das Gerät nur gegen
+  Ratenzahlung abgibt, steht der Gesamtbetrag der Raten in der Spalte — er
+  ist an der Ratenzahl erkennbar und nicht dasselbe wie ein Barpreis.</p>
+{% endmacro %}
 <section class="page-hero wide">
   <div class="page-hero-row">
     <div>
@@ -33,6 +218,29 @@
   liegen zwei Angebote in verschiedenen Bändern, steht das ausdrücklich da,
   statt sie zu vermischen.</p>
 </section>
+
+{# O2 (11.09.2026): die Alarmtabelle - Barpreis ohne Vertrag, wo ein
+   Wettbewerber unter uns liegt. Sie stand bis O2 in der Vergleichsansicht
+   der Geraeteseite; hier steht sie neben der TCO-Uebersicht, deren
+   Schwester im Detail sie ist. Die vier Kacheln (Kritisch/Mittel/Gering/
+   Bestpreis) zaehlen dieselben Zeilen wie die Tabelle unter ihnen. #}
+{% if wettbewerbsradar.alarme.hat_daten or wettbewerbsradar.alarme.kacheln %}
+<div class="wr-sektion" id="wr-alarme">
+  <h2 class="rubrik">Preis-Alarme – Barpreis ohne Vertrag</h2>
+  <p class="gr-erklaer">Bei diesen Geräten liegt ein Wettbewerber im
+  Gerätepreis unter Vodafone – mit Abstand in Prozent und Euro, dem
+  günstigsten Anbieter mit Namen und dem Beleg dazu. Vier Stufen sortieren
+  die Meldungen; die Tabelle darunter führt jede Zeile mit Quelllink und
+  Abrufdatum.</p>
+  <ul class="gr-chips" aria-label="Preis-Alarme">
+    {% for k in wettbewerbsradar.alarme.kacheln %}
+    <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
+      <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
+    {% endfor %}
+  </ul>
+  {{ alarmtafel(wettbewerbsradar.alarme) }}
+</div>
+{% endif %}
 
 {% if wettbewerbsradar.hat_daten %}
 <section class="wr-sektion">
@@ -95,6 +303,13 @@
   </details>
   {% endif %}
 </section>
+{% else %}
+<section class="wr-sektion">
+  <h2 class="rubrik">Netzbetreiber – TCO über 24 Monate</h2>
+  <p class="gr-erklaer">Noch keine Gerätedaten erhoben – der Wettbewerbs-Radar
+  füllt sich mit dem nächsten Lauf.</p>
+</section>
+{% endif %}
 
 <section class="wr-sektion">
   <h2 class="rubrik">Händler – Gerätepreis</h2>
@@ -138,6 +353,39 @@
   {% endif %}
 </section>
 
+{# O2 (11.09.2026): der Sortiments-Aufklapper - welche Geräte der
+   Wettbewerb führt, die Vodafone nicht führt. Er stand bis O2 im
+   Portfolio-Block der Geraeteseite; er ist eine Sortiments-Aussage und
+   damit dieselbe Frage, die der Radar über den Preis stellt. #}
+{% if wettbewerbsradar.ohne_vodafone %}
+<section class="wr-sektion" id="wr-gelistet">
+  <h2 class="rubrik">Bei Wettbewerbern gelistet, bei Vodafone nicht</h2>
+  <p class="gr-erklaer">Diese Geräte führt mindestens ein beobachteter
+  Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt den
+  günstigsten Anbieter, der sie führt.</p>
+  <details class="evidence gr-vergleich-luecke">
+    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+      ({{ wettbewerbsradar.ohne_vodafone_gesamt }})</summary>
+    <div class="evidence-body">
+    <ul class="gr-v-liste">
+      {% for l in wettbewerbsradar.ohne_vodafone %}
+      <li><span class="szl">{{ l.modell }}</span>
+        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
+        <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
+        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
+          else 'Anbieter' }}</span>
+        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if wettbewerbsradar.ohne_vodafone_gesamt > wettbewerbsradar.ohne_vodafone|length %}
+    <p class="gr-v-meta">{{ wettbewerbsradar.ohne_vodafone_gesamt }} insgesamt.</p>
+    {% endif %}
+    </div>
+  </details>
+</section>
+{% endif %}
+
 {% if wettbewerbsradar.nicht_erhebbar %}
 <section class="wr-sektion">
   <h2 class="rubrik">Nicht erhebbar</h2>
@@ -154,8 +402,4 @@
 </section>
 {% endif %}
 
-{% else %}
-<p class="gr-erklaer">Noch keine Gerätedaten erhoben – der Wettbewerbs-Radar
-füllt sich mit dem nächsten Lauf.</p>
-{% endif %}
 {% endblock %}

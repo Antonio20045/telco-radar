@@ -147,82 +147,69 @@ def test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung(tmp
                      == "Wie gerechnet?"]
     assert len(wie_gerechnet) == 1
     kinder = [k for k in vorgabe.find_all(recursive=False)]
-    klappe = vorgabe.select_one("details.gr-karten-auf")
-    assert klappe is not None, "die Kartenklappe fehlt"
-    # Die Aufklappung steht IM Graph-Modul, die Kartenklappe DANACH -
-    # beide sind direkte Kinder des Modellblocks, in dieser Reihenfolge.
+    tabelle = vorgabe.select_one("#gr-buendel")
+    assert tabelle is not None, "die Bündel-Tabelle fehlt"
+    # Die Aufklappung steht IM Graph-Modul, die Tabelle DANACH - beide sind
+    # direkte Kinder des Modellblocks, in dieser Reihenfolge (O2: die
+    # Kartenklappe ist die offene Tabelle geworden).
     hgraph = vorgabe.select_one(".gr-hgraph")
     assert wie_gerechnet[0].find_parent("section", class_="gr-hgraph") is hgraph
-    assert kinder.index(hgraph) < kinder.index(klappe)
+    assert kinder.index(hgraph) < kinder.index(tabelle)
 
 
 # --------------------------------------------------------------------------
-# OPTIK-6 (09.09.2026): die Anbieterkarten hinter EINER Klappe
+# O2 (11.09.2026): die Bündel-Zeilen - Kartenklappe und Karten sind weg
 # --------------------------------------------------------------------------
 
-def test_die_anbieterkarten_stehen_in_einer_geschlossenen_klappe(tmp_path):
-    """OPTIK-6: Der TCO-Reiter mass am echten Bestand 4732 px gegen das
-    Limit von 3000 (`pruefe_portal.py` 11b) - allein die Karten des
-    Vorgabemodells belegen 2749 px. Sie stehen seither in EINER
-    standardmaessig geschlossenen Klappe je Modellblock; NICHTS ist
-    geloescht (E1), der Inhalt bleibt im Dokument erreichbar.
-
-    Dieser Test ist neu (rot-vor gilt nicht): die Klappe existierte vor
-    OPTIK-6 nicht, der erste Assert (`klappe is not None`) faellt am
-    Altstand. Der Browser-Test daneben misst das Oeffnen ohne Netz."""
+def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
+    """O2 ersetzt die OPTIK-6-Klappe: jede Karte ist EINE Zeile mit EINEM
+    eigenen Aufklapper - keine geschlossene Sammelklappe mehr, kein
+    Steuerpult. Die Anfangshöhe hält stattdessen die Zeilenform selbst
+    (eine zusammengeklappte Zeile ist eine Zeile hoch)."""
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
     assert tafel is not None
-    bloecke = tafel.select(".gr-tmodell")
-    assert bloecke, "der Test prueft nichts ohne Modellblock"
-    for block in bloecke:
-        klappe = block.select_one("details.gr-karten-auf")
-        assert klappe is not None, \
-            f"{block.get('data-modell')}: keine Kartenklappe"
-        assert not klappe.has_attr("open"), \
-            f"{block.get('data-modell')}: Klappe steht offen im HTML"
-        karten = klappe.select(".gr-kkarte")
-        assert karten, f"{block.get('data-modell')}: Klappe ohne Karten"
-        # Sortierung und Filter stehen MIT in der Klappe - ein Steuerpult
-        # ueber einer geschlossenen Klappe waere ein Bedienelement, dessen
-        # Wirkung man nicht sehen kann.
-        assert klappe.select_one(".gr-ksteuer") is not None
-        # Keine Karte steht AUSSERHALB der Klappe: was aus ihr faelle,
-        # waere entweder Informationsverlust (E1) oder ein zweiter, nicht
-        # geklappter Anzeigort fuer dasselbe Angebot.
-        for karte in block.select(".gr-kkarte"):
-            assert karte.find_parent("details", class_="gr-karten-auf"), \
-                f"{block.get('data-modell')}: Karte ausserhalb der Klappe"
-        # O1 (11.09.2026): die Zahl in der Ueberschrift ist WEG - die
-        # Zaehlsysteme der Vergleichsansicht sind auf DIE EINE Fussnote
-        # gesammelt, und "(N Karten)" meinte Angebote, Referenzrechnung,
-        # Leerkarten und Haendler zusammen. Eine Klammer, die anders
-        # zaehlt als der Bestand darunter, bleibt verboten - jetzt dadurch,
-        # dass gar keine mehr dasteht (O2 baut die Karten zu Zeilen um).
-        summary = klappe.select_one("summary")
-        assert summary is not None
-        assert not re.search(r"\d", summary.get_text()), \
-            f"Ueberschrift traegt noch eine Zahl: {summary.get_text()!r}"
+    block = tafel.select_one(".gr-tmodell")
+    assert block is not None, "der Test prüft nichts ohne Modellblock"
+    assert block.select_one("details.gr-karten-auf") is None, \
+        "die Kartenklappe steht noch"
+    assert not block.select(".gr-kkarte"), "Karten stehen noch"
+    zeilen = block.select("#gr-bndliste .gr-bnd")
+    assert zeilen, "die Zeilenliste ist leer"
+    for zeile in zeilen:
+        assert not zeile.has_attr("open"), \
+            f"{zeile.get('data-anbieter')}: Zeile steht offen im HTML"
+    # Keine Zähler in der Überschrift der Tabelle - eine Klammer, die
+    # anders zählt als der Bestand darunter, bleibt verboten (O1-Regel,
+    # jetzt an der Tabelle; der Modellname mit seiner GB-Zahl ist kein
+    # Zähler).
+    titel = block.select_one("#gr-bnd-titel")
+    assert titel is not None
+    assert "Karten" not in titel.get_text(), titel.get_text()
+    assert not re.search(r"\(\d+", titel.get_text()), titel.get_text()
 
 
 # --------------------------------------------------------------------------
 # Kriterium 2: Haendler als benannte Luecke
 # --------------------------------------------------------------------------
 
-def test_haendler_stehen_je_modell_im_balkenblock_ohne_wert(tmp_path):
+def test_haendler_ohne_preis_stehen_nur_in_der_legende(tmp_path):
+    """O2: die 'Beschaffung läuft'-Platzhalterkarten fallen - die
+    Legendenzeile aus O1 trägt dieselbe Information (Auftrag 2). Amazon und
+    Expert stehen also NUR dort, nirgends als Karte oder Zeile mit
+    'Beschaffung läuft'-Satz."""
     s = _baue(tmp_path)
-    for modell in s.select("#tafel-tco .gr-tmodell"):
-        karten = {name: modell.select_one(
-            f'.gr-kkarte--haendler[data-anbieter="{name}"]') for name in HAENDLER}
-        for name, karte in karten.items():
-            assert karte is not None, f"{name} fehlt im Balkenblock"
-            # Keine erfundene Zahl: keins der data-*-Attribute, aus denen
-            # Sortierung und G1-Balkenlaenge rechnen.
-            for attr in ("data-gesamt", "data-schnitt", "data-einmalig"):
-                assert karte.get(attr) in (None, ""), \
-                    f"{name} traegt {attr}={karte.get(attr)!r}"
-            assert "Beschaffung läuft" in karte.get_text(" ", strip=True)
-            assert "€" not in karte.get_text(" ", strip=True)
+    tafel = s.select_one("#tafel-tco")
+    kopie = BeautifulSoup(str(tafel), "html.parser")
+    for k in kopie.select("script"):
+        k.decompose()
+    text = kopie.get_text(" ")
+    for name in HAENDLER:
+        assert name in text, f"{name} fehlt ganz"
+    assert text.count("Beschaffung läuft") == 1, \
+        "der Satz steht mehrfach da - die Legende trägt ihn allein"
+    assert not tafel.select(".gr-kkarte--haendler"), \
+        "Händlerplatzhalterkarten stehen noch"
 
 
 def test_haendler_stehen_je_modell_als_legende_ohne_linie(tmp_path):

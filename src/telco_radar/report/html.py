@@ -1284,7 +1284,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     try:
         wettbewerbsradar_view = _wettbewerbsradar_mod.radar(
             geraete["tco"], geraete["vergleich"]["ohne_vertrag"],
-            geraete["quellenlage"])
+            geraete["quellenlage"], alarme=geraete["alarme"])
     except Exception as exc:  # noqa: BLE001
         log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)

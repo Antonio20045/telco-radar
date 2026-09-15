@@ -266,12 +266,17 @@ def _datum_de(iso: str) -> str:
         return iso
 
 
-def _delta_text(euro: Optional[float], prozent: Optional[float]) -> Optional[str]:
+def delta_text(euro: Optional[float], prozent: Optional[float]) -> Optional[str]:
     """"−466,80 € · −29,9 %" - EINE Stelle für dieses Format.
 
     Diese Zeichenkette entsteht hier in Python und wird von Vorlage UND
     `app.js` nur noch gesetzt - eine zweite Formatierung im Browser waere
     eine zweite Beschriftung fuer dieselbe Zahl (CLAUDE.md §6).
+
+    Seit O2 (11.09.2026) liest sie auch die Buendel-ZEILE der Vergleichs-
+    ansicht (`geraete_tco_view` haengt sie als `delta_kurz` an die Karte):
+    Graph und Zeile tragen dieselbe Zeichenkette, nicht zwei Formate fuer
+    dieselbe Differenz. Deshalb ist sie kein `_`-Privatweg mehr.
     """
     if euro is None:
         return None
@@ -342,7 +347,7 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
             "breite": 0.0,
             "delta_euro": delta_euro,
             "delta_prozent": delta_prozent,
-            "delta_text": _delta_text(delta_euro, delta_prozent),
+            "delta_text": delta_text(delta_euro, delta_prozent),
             "referenz": ist_ref,
             "zustand_etikett": karte.get("zustand_etikett") or "",
         })

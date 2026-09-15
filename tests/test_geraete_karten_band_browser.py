@@ -210,35 +210,25 @@ def _seite(tmp_path_factory):
         browser.close()
 
 
-def _klappe_auf(seite):
-    """Die Kartenklappe des sichtbaren Modellblocks öffnen - die Karten
-    stehen statisch im Dokument, aber unsichtbar, solange die Klappe zu
-    ist (Transitivitaet der `<details>`-UA-Regel)."""
-    seite.evaluate("""() => document.querySelectorAll(
-         '.gr-tmodell:not([hidden]) details.gr-karten-auf')
-       .forEach(k => { k.open = true; })""")
-    seite.wait_for_timeout(60)
-
-
 def _sichtbare_anbieter(seite):
-    """Anbieter der Karten, die der Leser wirklich sieht - nicht die, die
-    nur kein `hidden`-Attribut tragen (dieselbe Messregel wie
-    `_sichtbare_zeilen` in test_geraete_reiter_browser.py)."""
+    """Anbieter der Bündel-ZEILEN, die der Leser wirklich sieht - nicht
+    die, die nur kein `hidden`-Attribut tragen (dieselbe Messregel wie
+    `_sichtbare_zeilen` in test_geraete_reiter_browser.py). Seit O2 stehen
+    die Zeilen offen unter dem Graphen - keine Kartenklappe mehr."""
     return seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden]) .gr-kkarte",
-        "e => e.filter(k => getComputedStyle(k).display !== 'none')"
-        "      .map(k => k.dataset.anbieter)")
+        "#gr-bndliste .gr-bnd",
+        "e => e.filter(z => getComputedStyle(z).display !== 'none')"
+        "      .map(z => z.dataset.anbieter)")
 
 
 # --------------------------------------------------------------------------
 # Auftrag 2: die Bandwahl filtert die Kartenansicht
 # --------------------------------------------------------------------------
 
-def test_die_kartenliste_aendert_sich_bei_bandwechsel(_seite):
+def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
-    Bänder gemischt. Jetzt zeigt sie die Karten des gewählten Bands - und
-    die Liste ist nach dem Wechsel eine ANDERE."""
-    _klappe_auf(_seite)
+    Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
+    gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE."""
     _seite.select_option("#gr-band", "klein")
     _seite.wait_for_timeout(120)
     klein = _sichtbare_anbieter(_seite)
@@ -255,32 +245,30 @@ def test_die_kartenliste_aendert_sich_bei_bandwechsel(_seite):
         f"die Kartenliste folgt der Bandwahl nicht: {klein} == {mittel}")
 
 
-def test_karten_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
-    """Versteckt, nicht entfernt: die Klappe ist statisch im Dokument, und
+def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
+    """Versteckt, nicht entfernt: die Zeilen sind statisch im Dokument, und
     ein Bandwechsel darf kein Nachladen auslösen (OPTIK-6/E1)."""
-    _klappe_auf(_seite)
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(120)
     verdeckt = _seite.eval_on_selector(
-        '.gr-tmodell:not([hidden]) .gr-kkarte[data-band="klein"]',
+        '#gr-bndliste .gr-bnd[data-band="klein"]',
         "e => ({versteckt: e.hidden,"
         "       sichtbar: getComputedStyle(e).display !== 'none'})")
-    assert verdeckt["versteckt"] is True, "die Klein-Karte trägt kein hidden"
-    assert verdeckt["sichtbar"] is False, "die Klein-Karte steht noch da"
+    assert verdeckt["versteckt"] is True, "die Klein-Zeile trägt kein hidden"
+    assert verdeckt["sichtbar"] is False, "die Klein-Zeile steht noch da"
 
 
-def test_jede_bandkarte_traegt_ihre_gb_angabe(_seite):
+def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
     """Ohne GB-Angabe ist eine Bandauswahl nicht nachprüfbar: der Leser
-    muss sehen, WARUM diese Karte im Band Klein steht."""
-    _klappe_auf(_seite)
+    muss sehen, WARUM diese Zeile im Band Klein steht."""
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(120)
     gb = _seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden]) .gr-kkarte[data-band]",
-        "e => e.map(k => ({anbieter: k.dataset.anbieter,"
-        "                  gb: (k.querySelector('.gr-kk-tarif') || {})"
+        "#gr-bndliste .gr-bnd[data-band]",
+        "e => e.map(z => ({anbieter: z.dataset.anbieter,"
+        "                  gb: (z.querySelector('.gr-bnd-tarif') || {})"
         "                       .textContent || ''}))")
-    assert gb, "keine Karte mit Band im Dokument"
+    assert gb, "keine Zeile mit Band im Dokument"
     for eintrag in gb:
         assert "GB" in eintrag["gb"] or "unbegrenzt" in eintrag["gb"], (
             f"{eintrag['anbieter']} nennt kein Datenvolumen: {eintrag}")
@@ -290,44 +278,40 @@ def test_jede_bandkarte_traegt_ihre_gb_angabe(_seite):
 # Auftrag 1: Karten ohne Band als eigene, klar markierte Gruppe
 # --------------------------------------------------------------------------
 
-def test_karten_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
+def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     """§7: Unbegrenzte Tarife und Tarife ohne erhobenes Volumen fallen aus
-    dem Bandraster - sie werden als eigene Gruppe NACH dem Band geführt,
-    nicht heimlich in ein Band einsortiert (o2-Unlimited-Karte, UX-1)."""
-    _klappe_auf(_seite)
+    dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
+    Tarifband' UNTER der Bandliste (#gr-ohneband), nicht heimlich in einem
+    Band (o2-Unlimited-Zeile, UX-1)."""
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(120)
     lage = _seite.evaluate("""() => {
-      const klappe = document.querySelector(
-        '.gr-tmodell:not([hidden]) details.gr-karten-auf');
-      const behaelter = klappe.querySelector('.gr-karten');
-      const gruppe = behaelter.querySelector('.gr-kband-gruppe');
-      const karten = [...behaelter.querySelectorAll('.gr-kkarte')];
+      const tafel = document.querySelector('#tafel-tco');
+      const gruppe = tafel.querySelector('#gr-ohneband');
+      const zeilen = gruppe ? [...gruppe.querySelectorAll('.gr-bnd')] : [];
       return {
         gruppeDa: !!gruppe,
-        gruppeSichtbar: !!gruppe && getComputedStyle(gruppe).display !== 'none',
+        gruppeSichtbar: !!gruppe
+            && getComputedStyle(gruppe).display !== 'none',
         gruppeText: gruppe ? gruppe.textContent.trim() : '',
-        // Position: alle Karten MIT Band stehen vor der Gruppe, alle ohne
-        // dahinter - die Gruppe trennt, sie sortiert nicht ein.
-        davor: karten.filter(k => k.compareDocumentPosition(gruppe)
-                            & Node.DOCUMENT_POSITION_FOLLOWING
-                            && k.hasAttribute('data-band')).length,
-        ohneBandDahinter: karten.filter(
-            k => !(k.compareDocumentPosition(gruppe)
-                   & Node.DOCUMENT_POSITION_FOLLOWING)
-               && !k.hasAttribute('data-band')).length,
-        unlimitedOhneBand: karten.some(k => k.dataset.anbieter === 'o2'
-            && k.textContent.includes('O2 Unlimited')
-            && !k.hasAttribute('data-band')),
+        zeilenOhneBand: zeilen.filter(z => !z.hasAttribute('data-band')).length,
+        unlimitedOhneBand: zeilen.some(z => z.dataset.anbieter === 'o2'
+            && z.textContent.includes('O2 Unlimited')
+            && !z.hasAttribute('data-band')),
+        nachDerBandliste: !!gruppe && !!tafel.querySelector('#gr-bndliste')
+            && tafel.querySelector('#gr-bndliste')
+                 .compareDocumentPosition(gruppe)
+               & Node.DOCUMENT_POSITION_FOLLOWING,
       };
     }""")
     assert lage["gruppeDa"], "es gibt keine markierte Gruppe ohne Tarifband"
     assert lage["gruppeSichtbar"], "die Gruppe ist versteckt"
     assert "Ohne Tarifband" in lage["gruppeText"], lage["gruppeText"]
-    assert lage["davor"] > 0, "keine Bandkarte vor der Gruppe"
-    assert lage["ohneBandDahinter"] > 0, "keine Karte ohne Band hinter der Gruppe"
+    assert lage["zeilenOhneBand"] > 0, "keine Zeile ohne Band in der Gruppe"
     assert lage["unlimitedOhneBand"], (
-        "die o2-Unlimited-Karte ist in ein Band einsortiert statt markiert")
+        "die o2-Unlimited-Zeile ist in ein Band einsortiert statt markiert")
+    assert lage["nachDerBandliste"], (
+        "die Gruppe steht nicht hinter der Bandliste")
 
 
 # --------------------------------------------------------------------------
@@ -356,33 +340,32 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
 
 def test_die_werteliste_nennt_dieselben_zahlen_wie_die_karten(_seite):
     """Keine zweite Rechnung: die Zahl je Graph-Zeile ist dieselbe, die
-    die Karte desselben Anbieters trägt (`data-gesamt`) - zwei Stellen,
-    eine Zahl. Der Graph zeigt die GÜNSTIGSTE Karte des Anbieters im
-    Band; mehrere Karten desselben Anbieters vergleichen gegen ihr
-    Minimum."""
-    _klappe_auf(_seite)
+    die Bündel-Zeile desselben Anbieters trägt (`data-gesamt`) - zwei
+    Stellen, eine Zahl. Der Graph zeigt die GÜNSTIGSTE Zeile des
+    Anbieters im Band; mehrere Zeilen desselben Anbieters vergleichen
+    gegen ihr Minimum."""
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(250)
     lage = _seite.evaluate("""() => {
       const block = document.querySelector('.gr-tmodell:not([hidden])');
       const zeilen = [...block.querySelectorAll('.gr-bz')];
-      const karten = [...block.querySelectorAll('.gr-kkarte')]
-          .filter(k => k.getAttribute('data-band') === 'mittel');
+      const bnd = [...block.querySelectorAll('#gr-bndliste .gr-bnd')]
+          .filter(z => z.getAttribute('data-band') === 'mittel');
       return {
         zeilen: zeilen.map(z => ({anbieter: z.getAttribute('data-anbieter'),
                                   tco: z.getAttribute('data-tco')})),
-        karten: karten.map(k => ({anbieter: k.dataset.anbieter,
-                                 gesamt: k.getAttribute('data-gesamt')})),
+        bnd: bnd.map(z => ({anbieter: z.dataset.anbieter,
+                            gesamt: z.getAttribute('data-gesamt')})),
       };
     }""")
     assert lage["zeilen"], "keine Balkenzeilen im Graph"
     for zeile in lage["zeilen"]:
-        karten = [float(k["gesamt"]) for k in lage["karten"]
-                  if k["anbieter"] == zeile["anbieter"]]
-        assert karten, f"{zeile['anbieter']}: keine Karte im Band"
-        assert abs(float(zeile["tco"]) - min(karten)) < 0.005, (
+        bnd = [float(z["gesamt"]) for z in lage["bnd"]
+               if z["anbieter"] == zeile["anbieter"]]
+        assert bnd, f"{zeile['anbieter']}: keine Bündelzeile im Band"
+        assert abs(float(zeile["tco"]) - min(bnd)) < 0.005, (
             f"{zeile['anbieter']}: Graph rechnet {zeile['tco']}, die "
-            f"günstigste Karte sagt {min(karten)}")
+            f"günstigste Zeile sagt {min(bnd)}")
 
 
 def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
@@ -416,41 +399,52 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat."""
-    _klappe_auf(_seite)
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(120)
+    # Der Rechenweg steht im geschlossenen Aufklapper - innerText zeigt ihn
+    # nur, wenn die Zeile offen ist (Transitivitaet der <details>-Regel).
     congstar = _seite.eval_on_selector(
-        ".gr-tmodell:not([hidden]) .gr-kkarte[data-anbieter='congstar']",
-        """e => ({
-             leit: e.querySelector('.gr-kk-leit b').textContent,
-             text: e.innerText,
-             gesamt: e.getAttribute('data-gesamt') })""")
-    assert congstar["leit"] == "Finanzierung gesamt", congstar["leit"]
-    # 1,00 € Zuzahlung + 36 x 25,00 € Raten
-    assert "901,00" in congstar["text"], congstar["text"]
-    # Die Karte behauptet keinen REINEN Gerätepreis ohne Vertrag - weder als
-    # Zahl noch als Wort an der Leitzahl.
-    assert "Gerätepreis" not in congstar["text"].split("Rechenweg")[0], (
-        congstar["text"])
-    assert "nicht erhoben" in congstar["text"], (
-        "die Karte nennt die Lücke beim Gerätepreis ohne Vertrag nicht")
+        "#gr-bndliste .gr-bnd[data-anbieter='congstar']"
+        "[data-band='mittel']",
+        """e => {
+          e.open = true;
+          const rw = e.querySelector('.gr-bnd-rw');
+          return {
+            bar: e.querySelector('.gr-bnd-bar').textContent,
+            summary: e.querySelector('summary').innerText,
+            rw: rw ? rw.innerText : '',
+            gesamt: e.getAttribute('data-gesamt') };
+        }""")
+    _seite.evaluate(
+        "() => document.querySelectorAll('.gr-bnd')"
+        ".forEach(z => { z.open = false; })")
+    # 1,00 € Zuzahlung + 36 x 25,00 € Raten - die Spalte heißt die Zahl
+    # beim Namen (Finanzierung), nicht "Gerätepreis".
+    assert "Finanzierung" in congstar["bar"], congstar["bar"]
+    assert "901,00" in congstar["bar"], congstar["bar"]
+    assert "Gerätepreis" not in congstar["bar"], congstar["bar"]
+    # Die Zeile behauptet keinen REINEN Gerätepreis ohne Vertrag - die
+    # Lücke steht im Rechenweg benannt da.
+    assert "nicht erhoben" in congstar["rw"], (
+        "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht")
     # Die TCO-24 bleibt die zweite, getrennte Zahl.
-    assert "TCO-24" in congstar["text"] and "1.177,00" in congstar["text"]
+    assert "TCO-24" in congstar["summary"] and "1.177,00" in congstar["summary"]
 
 
 def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
     """Gegenprobe: Karten mit gemessenem eigenen Barpreis (o2, Vodafone)
     führen unverändert mit „Gerätepreis“ - das neue Etikett gilt nur der
     Finanzierungssumme, nicht dem Barpreis."""
-    _klappe_auf(_seite)
     _seite.select_option("#gr-band", "klein")
     _seite.wait_for_timeout(120)
     o2 = _seite.eval_on_selector(
-        ".gr-tmodell:not([hidden]) .gr-kkarte[data-anbieter='o2']"
-        "[data-band='klein']",
-        "e => ({leit: e.querySelector('.gr-kk-leit b').textContent,"
+        "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='klein']",
+        "e => ({bar: e.querySelector('.gr-bnd-bar').textContent,"
         "          text: e.innerText})")
-    assert o2["leit"] == "Gerätepreis", o2["leit"]
+    # Ein gemessener Barpreis steht OHNE Finanzierungs-Etikett in der
+    # Spalte - nur die tarifabhängige Summe heißt Finanzierung.
+    assert "Finanzierung" not in o2["bar"], o2["bar"]
+    assert "999,00" in o2["bar"], o2["bar"]
     assert "999,00" in o2["text"], o2["text"]
 
 
