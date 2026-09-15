@@ -206,6 +206,20 @@
       <p class="page-kicker">Geräte · Wettbewerbsvergleich</p>
       <h1>Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h1>
     </div>
+    {# O4 (STRATEGIE_GERAETE_OPTIK §3): der EINE zentrale Export-Ort DIESER
+       Seite. Die Datei trägt TCO-24 der Netzbetreiber UND den Händler-
+       Barpreis zusammen; ihre Abweichungsspalte ist aus derselben Rechnung
+       GELESEN, die diese Seite rendert (`report/wettbewerbsradar.py`) - der
+       Export rechnet keine Prozentzahl selbst. Als KNOPF in der Kopfzeile
+       und nicht als Tabelle: der Radar ist mobil ohnehin rund 20.400 px
+       hoch (bekannt, gemeldet), und ein offener Tabellenabschnitt würde
+       ihn schlechter machen. #}
+    {% if wettbewerbsradar.export and wettbewerbsradar.export.zeilen %}
+    <span class="gr-export-knoepfe">
+      <a class="gr-knopf" href="{{ wettbewerbsradar.export.datei }}" download
+        >Radar-Export ({{ wettbewerbsradar.export.zeilen }} Zeilen)</a>
+    </span>
+    {% endif %}
   </div>
   <p class="page-lead">Leitzahl ist die Abweichung in Prozent, mit
   Vorzeichen – nicht der Absolutpreis. Ein negativer Wert heißt: ein

@@ -1,0 +1,78 @@
+{# Der G0-Block: die Barpreis-Zeitreihe EINES Modells (O4, 15.09.2026).
+
+   Bis O1 stand diese Grafik in der Vergleichsansicht; O1 kappte den Aufruf
+   ("G0 gehört zur Preisfrage und wandert in O4 in den Verlaufs-Reiter"),
+   die Rechnung blieb im Code. Dieses Makro bindet sie wieder an - am NEUEN
+   Ort, im Verlaufs-Reiter, direkt unter dem Reiter-Kopf.
+
+   Dieselbe Quelldatei für zwei Stellen (KEIN zweiter Renderer):
+     * die Geräteseite rendert es serverseitig für das VORGABEMODELL
+       (First Paint ohne JavaScript, lesbar ohne jede Anfrage),
+     * das Fragment `geraete_buendel_fragment.html.j2` rendert es für jedes
+       andere Modell in einen eigenen Lager-Knoten - `app.js` setzt beim
+       Modellwechsel das fertige Markup ein, genau wie bei den Bündel-
+       Zeilen (O3/S3). Nichts wird im Browser gezeichnet oder gerechnet.
+
+   Die Regeln der bestehenden Zeitreihe gelten unverändert: kein Diagramm
+   ohne Messpunkt, keine herbeigelogenen Punkte, ein einzelner Punkt bleibt
+   ein Punkt. Der Leerzustand ist ein Satz, kein leeres Koordinatensystem. #}
+{% macro g0block(m) %}
+{% set zr = m.zeitreihe %}
+<div class="gr-g0-block">
+  <h3 class="gr-g0-titel">Barpreis über die Zeit · {{ m.titel }}</h3>
+  {% if zr.hat_daten %}
+  {# Die Standzeile nach dem Entwurf (§2): Zeitraum, Messtage DIESES
+     Modells, und der ehrliche Hinweis, was die Kurve NICHT zeigt. #}
+  <p class="gr-erklaer gr-basis--duenn">Gerätepreis ohne Vertrag · {{
+    zr.seit | date_de }} bis {{ zr.bis | date_de }} · {{ zr.messtage }}
+  {{ 'Messtag' if zr.messtage == 1 else 'Messtage' }} dieses Modells.</p>
+  <figure class="gr-grafik gr-grafik--zeitreihe">
+    {{ zr.svg | safe }}
+    <figcaption class="gr-g0-chrome">{{ zr.chrome }}</figcaption>
+  </figure>
+
+  {# Die Werte desselben Bildes als Tabelle (Entwurf: "Werte des Verlaufs
+     als Tabelle"): auf dem Telefon rollt keine Legende, und ein
+     Screenreader liest keine Linie. Eine Reihe mit einem Messpunkt sagt
+     "ein Messpunkt" - eine Veränderung daraus wäre erfunden. #}
+  <details class="gr-auf">
+    <summary>Werte des Verlaufs</summary>
+    <div class="gr-scroll">
+    <table class="gr-ttab gr-g0-werte">
+      <thead><tr><th scope="col">Anbieter</th>
+        <th scope="col">Messung</th>
+        <th scope="col">Gerätepreis ohne Vertrag</th>
+        <th scope="col">Veränderung</th></tr></thead>
+      <tbody>
+      {% for l in zr.linien %}
+      <tr>
+        <td><span class="gr-t-anbieter">{{ l.anbieter }}</span></td>
+        <td>{% if l.von != l.bis %}{{ l.von_de }} → {{ l.bis_de }}{% else
+          %}{{ l.von_de }}{% endif %}</td>
+        <td>{% if l.von != l.bis %}{{ l.von_preis | euro }} → {{
+          l.bis_preis | euro }}{% else %}{{ l.von_preis | euro }}{% endif %}</td>
+        <td>{% if l.punkte > 1 %}{{ '+' if l.delta > 0 else '−' }}{{
+          l.delta | abs | euro }}{% else %}<span class="gr-t-luecke">ein
+          Messpunkt</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </details>
+  {% if m.ohne_barpreis %}
+  <p class="gr-erklaer gr-basis--duenn">Ohne messbaren Barpreis: {{
+    m.ohne_barpreis | join(', ') }} – {{
+    'dieser Anbieter verkauft das Gerät nur im Bündel.'
+    if m.ohne_barpreis | length == 1 else
+    'diese Anbieter verkaufen das Gerät nur im Bündel.' }}</p>
+  {% endif %}
+  {% else %}
+  {# Der ehrliche Leerzustand - derselbe Wortlaut, den die Seite bis O1
+     unter der Grafik trug: keine Kurve aus einem Messpunkt. #}
+  <p class="gr-erklaer gr-basis--duenn">Für dieses Gerät liegt noch keine
+  Preishistorie vor – die Zeitreihe entsteht, sobald ein Lauf einen Preis
+  dieses Geräts sieht.</p>
+  {% endif %}
+</div>
+{% endmacro %}

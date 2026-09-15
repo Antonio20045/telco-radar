@@ -63,24 +63,10 @@
 {# O3 (15.09.2026): die Bündel-ZEILEN stehen in der Teilvorlage
    `_geraete_buendel.html.j2` - dieselbe Quelle für die Seite (Vorgabe-
    modell, serverseitig) und das lazy Fragment `geraete_buendel_fragment
-   .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`). #}
+   .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
+   O4 (15.09.2026): derselbe Weg für den G0-Block des Verlaufs-Reiters. #}
 {% from "_geraete_buendel.html.j2" import buendelzeile, buendelgruppe %}
-
-{# Die zwei CSV-Knoepfe. Sie stehen auf JEDEM Reiter, weil der Auftrag den
-   Gesamtueberblick will und nicht Einzeldownloads - und weil ein eigener
-   Abschnitt dafuer 308 px kostete, in denen dieselben zwei Links ein zweites
-   Mal standen. Zeilenzahl und Groesse stehen NEBEN dem Link: ein leerer
-   Download ist der teuerste Weg herauszufinden, dass sich einer nicht lohnt. #}
-{% macro exportknoepfe() %}
-{% if geraete.export and geraete.export.aktuell.zeilen %}
-<span class="gr-export-knoepfe">
-  <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
-    >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
-  <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
-    >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
-</span>
-{% endif %}
-{% endmacro %}
+{% from "_geraete_g0.html.j2" import g0block %}
 
 {% block content %}
 <section class="page-hero wide">
@@ -104,6 +90,22 @@
     {% if geraete.abgerufen_bis %}<span class="page-date">Preise vom {{
       geraete.abgerufen_bis | date_de }}</span>
     {% elif geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
+    {# O4 (STRATEGIE_GERAETE_OPTIK §3): die Export-Knoepfe stehen EINMAL
+       zentral, hier in der Kopfzeile (Marke-Bereich wie im Entwurf), und
+       nicht mehr auf jedem Reiter - dieselben Links dreimal auf einer
+       Seite waren die Duplikate, die der Auftrag streicht. Der
+       Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Die
+       Schwesterseite verlinkt IHREN Export an ihrer eigenen Kopfzeile. #}
+    {% if geraete.export and geraete.export.aktuell.zeilen %}
+    <span class="gr-export-knoepfe">
+      <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
+        >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
+      <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
+        >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
+        >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+    </span>
+    {% endif %}
   </div>
 </section>
 
@@ -731,13 +733,13 @@ nach Abweichung zu Vodafone&nbsp;→</a></span></p>
       </div>
     </dl>
   </section>
-  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 </section>
 </div>
 
-{# --- Reiter 2: Geraetekatalog ---------------------------------------- #}
+{# --- Reiter 2: Geraetekatalog ----------------------------------------
+   (Die CSV-Knoepfe standen bis O4 je Reiter oben in einem `gr-werkzeug`-
+   DIV; sie stehen EINMAL in der Kopfzeile - siehe den Kommentar dort.) #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
-  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 
 {# --- Der Bestand als FLACHE Tabelle ----------------------------------
    Bis zum 30.08.2026 stand hier eine Matrix Modell x Anbieter plus 65
@@ -924,7 +926,22 @@ nach Abweichung zu Vodafone&nbsp;→</a></span></p>
    `<svg>`-Knoten wird von `app.js` erst erzeugt, wenn eine Auswahl steht;
    im Ausgangszustand ist an seiner Stelle nur ein Satz.                #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-verlauf" role="tabpanel">
-  <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
+
+{# --- O4: G0, die Barpreis-Zeitreihe des GEWÄHLTEN Modells -------------
+   Bis O1 stand diese Grafik in der Vergleichsansicht; O1 kappte den
+   Aufruf und lieess die Rechnung im Code. Hier ist sie wieder angebunden:
+   serverseitig fuer das VORGABEMODELL (First Paint ohne JavaScript), beim
+   Modellwechsel aus demselben Fragment wie die Bündel-Zeilen (`app.js`,
+   setzt fertiges Markup - kein zweiter Renderer). Der Montagepunkt ist
+   `#gr-g0-lager`; der Klon des Vorgabe-Zustands wird beim Laden gezogen
+   (die S2-Lektion von O3 gilt hier genauso). #}
+{% if geraete.tco.modelle %}
+{% set g0_modell = geraete.tco.modelle | selectattr('id', 'equalto',
+  geraete.tco.modell_vorgabe) | first %}
+{% if g0_modell %}
+<div id="gr-g0-lager">{{ g0block(g0_modell) }}</div>
+{% endif %}
+{% endif %}
 
 <section class="gr-verlauf" id="verlauf">
   <h2 class="rubrik">Wie sich ein Preis entwickelt hat</h2>
@@ -1013,15 +1030,32 @@ nach Abweichung zu Vodafone&nbsp;→</a></span></p>
   Lauf misst weiter; der nächste Punkt entsteht mit dem nächsten Lauf.</p>
   {% endif %}
 
-  {# Ein TCO-VERLAUF steht hier bewusst nicht. Der Buendelbestand kennt je
-     Buendel genau einen Stand (erhoben am 04.09.2026); eine Kurve daraus
-     waere interpoliert, und C.2 verbietet die interpolierte Scheinkurve
-     ausdruecklich. Sie entsteht von selbst, sobald zwei naechtliche Laeufe
-     verschiedene Buendelstaende geschrieben haben. #}
+  {# Die TCO-24-HISTORIE JE BÜNDEL, ehrlich benannt (O4, Entwurf §2).
+
+     Bis O4 behauptete dieser Satz, der Bündelbestand kenne je Bündel
+     "genau einen Stand" - seit dem 12.09.2026 schreibt jeder nächtliche
+     Lauf seine Messung nach `geraete_tco_historie.jsonl`, und der Satz
+     wäre von der Datei widerlegt. Jetzt nennt er das ECHTE Startdatum und
+     die Zahl der Messtage aus `TcoDB.historie_lage()` - kein festgeschrie-
+     benes Datum, das an einem anderen Bestand zur Behauptung wird.
+
+     Eine KURVE daraus steht weiterhin nicht: P5 (die TCO-Zeitachse) ist
+     ein eigener, noch offener Schritt - zwei Messtage sind keine Reihe,
+     und "ein Slot, ein Graph" gilt (Strategie §4.1). #}
+  {% if geraete.tco.historie_lage.seit %}
+  <p class="gr-erklaer gr-basis--duenn">Die TCO-24-Historie je Bündel
+  beginnt mit dem ersten nächtlichen Lauf am {{
+  geraete.tco.historie_lage.seit | date_de }} und wächst mit jedem Lauf
+  ({{ geraete.tco.historie_lage.messtage }}
+  {{ 'Messtag' if geraete.tco.historie_lage.messtage == 1
+     else 'Messtage' }}, {{
+  geraete.tco.historie_lage.buendel }} Bündel bisher). Eine Kurve der
+  Gesamtkosten entsteht daraus, sobald genügend Messtage daliegen.</p>
+  {% else %}
   <p class="gr-erklaer gr-basis--duenn">Einen Verlauf der Gesamtkosten gibt
-  es hier noch nicht: der Bündelbestand kennt je Bündel bisher genau einen
-  Stand. Sobald zwei Läufe verschiedene Stände geschrieben haben, steht die
-  zweite Kurve neben dieser.</p>
+  es noch nicht: die Historie je Bündel beginnt mit dem ersten nächtlichen
+  Lauf, der sie schreibt.</p>
+  {% endif %}
 
   {% if not geraete.verlauf.hat_daten %}
   <p class="gr-erklaer gr-basis--duenn">Für den Preisverlauf liegen noch keine

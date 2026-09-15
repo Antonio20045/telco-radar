@@ -541,9 +541,87 @@ HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL
 _haendler_ohne_buendel_preise = geraete_tco_karten._haendler_geraetepreise
 
 
+def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
+                   band_je_tarif: dict, anbieter_typen: dict | None) -> dict:
+    """Die Zeilen des TCO-Gesamtexports (O4) - WERTE, keine Form.
+
+    Der Export filtert nicht selbst (Doktrin des Modulkopfs von
+    `geraete_export`): hier steht JEDES Bündel des Bestands, auch eines
+    ohne Tarifband und ohne auflösbare Gerätezordnung - seine Modellspalte
+    trägt dann die SKU als Rueckfall, genau wie `aktuell_csv` die device_id
+    nennt, wenn der Katalog nichts hergibt. Aufgeloest wird ueber denselben
+    Weg wie die Modelltafel (`geraet_je_sku` aus den Listungen, ergaenzt
+    um den Katalog), und die TCO-24-Spalte ist `tco_model.tco_24()` -
+    dieselbe Funktion wie Karte, Graph und Radar. Diese Funktion liefert
+    ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
+
+    Die SIM-only-Zeilen sind DERSELBE Massstab, den die Tafel zeigt
+    (`_referenztabelle`), inklusive `ueber_horizont` als ihrer TCO-24 -
+    gerechnet wurde das schon, hier wird es nur gelesen.
+    """
+    # geraet_je_sku: derselbe Aufbau wie in `geraete_tco_karten.modelle()`
+    # - Liste der Listungen, ergaenzt um den Katalog (F-R2-3). Die Funktion
+    # ist rein, ein zweiter Aufruf liefert dieselbe Abbildung.
+    geraet_je_sku: dict = {}
+    for e in eintraege:
+        if e.get("sku_id"):
+            geraet_je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
+                                                   e.get("speicher_gb")))
+    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
+                                                    katalog)
+    typen = anbieter_typen or {}
+    # Das Band als LESEBARES Wort (Klein/Mittel/Groß) - `band_label()` ist
+    # dieselbe Ableitung, die der Chip der Vergleichsansicht trägt; ein
+    # Schlüssel ("klein") in der Spalte wäre eine zweite Sprache für
+    # dieselbe Sache.
+    band_von = geraete_tco_band.band_label
+
+    zeilen = []
+    for b in buendel:
+        if not isinstance(b, Buendel):
+            continue
+        device_id, speicher = (geraet_je_sku.get(b.sku_id) or ("", None))
+        g = katalog.nach_id(device_id) if (katalog and device_id) else None
+        kennzahl = tco_24(b)
+        zeilen.append({
+            "modell": (getattr(g, "modell", "") or device_id or b.sku_id),
+            "hersteller": getattr(g, "hersteller", "") if g else "",
+            "speicher": speicher,
+            "anbieter": b.anbieter,
+            "anbieter_typ": typen.get(b.anbieter, ""),
+            "tarif": b.tarif_name,
+            "band": band_von(band_je_tarif.get(b.tarif_id or "")),
+            "zustand": b.zustand or "",
+            "zuzahlung": b.geraet_zuzahlung,
+            "tarif_monatlich": b.tarif_monatlich,
+            "geraet_monatsrate": b.geraet_monatsrate,
+            "buendel_monatlich": b.buendel_monatlich,
+            "laufzeit": b.laufzeit_monate,
+            "anschlusspreis": b.anschlusspreis,
+            "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
+            "abgerufen_am": b.abgerufen_am,
+            "quelle_url": b.quelle_url,
+        })
+    sim = []
+    for r in massstab:
+        sim.append({
+            "anbieter": r["anbieter"],
+            "anbieter_typ": typen.get(r["anbieter"], ""),
+            "tarif": r["tarif"],
+            "band": band_von(band_je_tarif.get(r.get("tarif_id") or "")),
+            "tarif_monatlich": r["monatlich"],
+            "anschlusspreis": r["anschlusspreis"],
+            "tco24": r["ueber_horizont"],
+            "abgerufen_am": r["abgerufen_am"],
+            "quelle_url": r["quelle_url"],
+        })
+    return {"buendel": zeilen, "sim_only": sim}
+
+
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 lesbar: bool = True, tarife: dict | None = None,
-                historie=None) -> dict:
+                historie=None, anbieter_typen: dict | None = None,
+                tco_historie: dict | None = None) -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
     `buendel` und `referenzen` sind die Datensaetze aus
@@ -552,6 +630,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     besteht die Tafel aus ihrem Erklaertext, der Bereitschaftstabelle und
     der benannten Luecke. Das ist der Zustand, gegen den dieses Modul gebaut
     ist.
+
+    `anbieter_typen` (O4) ist {Name: Typ} aus der Quellenkonfiguration -
+    der TCO-Export braucht die Spalte, und der Store trägt sie nicht.
+    `tco_historie` (O4) ist `TcoDB.historie_lage()` - der ehrliche Satz
+    über die Bündel-Historie im Verlaufs-Reiter nennt ihr ECHTES
+    Startdatum, nicht das des Entwurfstages.
     """
     buendel = _aus_speicher(buendel, Buendel, _BUENDEL_FELDER)
     referenzen = _aus_speicher(referenzen, SimOnlyReferenz, _REFERENZ_FELDER)
@@ -667,6 +751,16 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             listungen_je_modell.get(modell["id"], []), historie
         ) if historie is not None else []
         modell["zeitreihe"] = geraete_tco_grafik.zeitreihe(reihen)
+        # O4: welcher Anbieter dieses Modells KEINE Barpreis-Reihe hat -
+        # der ehrliche Satz unter der G0-Grafik im Verlaufs-Reiter (Entwurf
+        # §2: "1&1 verkauft dieses Gerät nur im Bündel — kein Barpreis
+        # messbar"). Gemeint sind Anbieter mit ECHTEM Bündel (Karte mit
+        # SKU), die ohne Zeile dastehen - die Näherung ist kein Bündel,
+        # und ein Händler ohne Bündel ist keine Lücke.
+        mit_reihe = {l["anbieter"] for l in modell["zeitreihe"]["linien"]}
+        modell["ohne_barpreis"] = sorted(
+            {k["anbieter"] for k in modell["karten"]
+             if k.get("sku_id") and k["anbieter"] not in mit_reihe})
         # A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel - sie
         # bekommen keine `tcokarte`. Sobald einer von ihnen fuer DIESES
         # Modell trotzdem einen reinen Geraetepreis liefert (Saturn seit
@@ -860,6 +954,17 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Vergleichbarkeitspruefung seiner %-Abweichung und rechnet ihn
         # deshalb nicht ein zweites Mal aus `tarife`.
         "band_je_tarif": band_je_tarif,
+        # O4: die Zeilen des TCO-Gesamtexports - WERTE, aufgeloest an
+        # derselben Stelle wie die Tafel (Modellname, Band, TCO-24 aus
+        # `tco_24`). Format macht `geraete_export.tco_csv`; was drinsteht,
+        # entscheidet diese Funktion, nicht der Export.
+        "export": _export_zeilen(buendel, massstab, eintraege, katalog,
+                                 band_je_tarif, anbieter_typen),
+        # O4: die Lage der Bündel-Historie - der ehrliche Satz im Verlaufs-
+        # Reiter nennt ihr ECHTES Startdatum. Der Notzustand sagt "läuft
+        # noch nicht" statt eines geratenen Datums.
+        "historie_lage": tco_historie if tco_historie is not None else {
+            "messtage": 0, "seit": "", "buendel": 0},
     }
 
 
@@ -878,4 +983,6 @@ def leer() -> dict:
                    "reihen_gesamt": 0, "ausgelassen": []},
             "baender_katalog": [{"key": k, "label": l, "bereich": b}
                                 for k, l, b in geraete_tco_band.BAENDER],
-            "band_je_tarif": {}}
+            "band_je_tarif": {},
+            "export": {"buendel": [], "sim_only": []},
+            "historie_lage": {"messtage": 0, "seit": "", "buendel": 0}}

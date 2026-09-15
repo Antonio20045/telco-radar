@@ -735,6 +735,25 @@ def main() -> int:
             # KEIN Mangel ohne Messreihen: unter zwei Messpunkten je Reihe
             # ist der ehrliche Leerzustand die richtige Ausgabe (C.2).
             maengel.append("G2 (Preis-/TCO-Historie) fehlt im Historie-Reiter")
+        # O4 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): G0 ist SEIT O4 im
+        # Verlaufs-Reiter angebunden - serverseitig fuer das Vorgabemodell,
+        # per lazy Fragment fuer jedes andere. Erwartet wird der Block MIT
+        # Grafik oder mit seinem ehrlichen Leerzustand ("keine
+        # Preishistorie"); fehlt der Block GANZ, ist die Anbindung gerissen
+        # - derselbe Befund wie die unerreichbare Verlaufs-Tafel vor O3.
+        if verlaufflaeche is not None and \
+                verlaufflaeche.select_one("#gr-g0-lager") is not None:
+            lager = verlaufflaeche.select_one("#gr-g0-lager")
+            hat_g0 = (lager.select_one("svg.gr-g0") is not None
+                      or "keine Preishistorie" in lager.get_text(" ",
+                                                                 strip=True))
+            if not hat_g0:
+                maengel.append("G0 (Barpreis-Zeitreihe) fehlt im "
+                               "Verlaufs-Reiter - weder Grafik noch "
+                               "Leerzustand (O4)")
+        elif verlaufflaeche is not None and gr.select_one("#gr-graph-daten"):
+            maengel.append("der G0-Block (#gr-g0-lager) fehlt im "
+                           "Verlaufs-Reiter, obwohl Modelle existieren (O4)")
 
         # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
         # beantwortet. Seit O2 (11.09.2026) steht sie im Rechenweg-Aufklapper

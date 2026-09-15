@@ -311,13 +311,19 @@ def test_die_chrome_zeile_beugt_bei_einem_messtag_richtig():
 
 def test_die_chrome_zeile_ist_der_einzige_satz_im_belegtext():
     """Kein Methodentext im Beleg - `linien` traegt nur Anbieter, Punkte,
-    Zeitraum je Linie (Kriterium 5)."""
+    Zeitraum und (seit O4) die Betraege fuer die Wertetabelle, alles
+    Zahlen und Daten, kein Satz."""
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1310.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert set(ergebnis["linien"][0]) == {
-        "anbieter", "farbe", "eigen", "punkte", "von", "bis", "von_de", "bis_de"}
+        "anbieter", "farbe", "eigen", "punkte", "von", "bis", "von_de",
+        "bis_de", "von_preis", "bis_preis", "delta"}
     assert ergebnis["linien"][0]["von_de"] == "29.08.2026"
     assert ergebnis["linien"][0]["bis_de"] == "05.09.2026"
+    # O4: Erst- und Letztpreis aus denselben Punkten, die gezeichnet werden
+    assert ergebnis["linien"][0]["von_preis"] == 1315.0
+    assert ergebnis["linien"][0]["bis_preis"] == 1310.0
+    assert ergebnis["linien"][0]["delta"] == -5.0
 
 
 # --------------------------------------------------------------------------

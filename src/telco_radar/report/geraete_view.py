@@ -1422,7 +1422,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "tco": geraete_tco_view.aufbereiten(
             tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
             lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
-            historie=historie),
+            historie=historie,
+            # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
+            # Store traegt ihn nicht) und die Lage der Buendel-Historie
+            # fuer den ehrlichen Satz im Verlaufs-Reiter.
+            anbieter_typen={a.name: a.typ for a in quellen.anbieter},
+            tco_historie=tco_db.historie_lage()),
         # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
         # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
         # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau

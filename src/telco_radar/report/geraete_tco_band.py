@@ -415,6 +415,22 @@ def _chip(key: str) -> str:
     return f"Band {label} · {bereich}"
 
 
+def band_label(band) -> str:
+    """Das Band als lesbares Wort ('Klein'), leer wenn keins ist.
+
+    O4: der TCO-Export traegt dieselbe Bezeichnung, die der Chip der
+    Vergleichsansicht zeigt - ein 'klein' in der Spalte waere eine zweite
+    Sprache fuer dieselbe Sache. Ein UNBEKANNTES Band wird mit seinem
+    Schluessel benannt statt erraten (dieselbe Regel wie eine unbekannte
+    Farbe in farben.yaml).
+    """
+    if not band:
+        return ""
+    if band in _BAND_LABEL:
+        return _BAND_LABEL[band][0]
+    return str(band)
+
+
 def baender_fuer_modell(modell: dict, band_je_tarif: dict,
                         gb_je_tarif: dict | None = None) -> list[dict]:
     """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).

@@ -1921,16 +1921,28 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # der Pruefbericht namentlich verweist.
     try:
         from . import geraete_export as _geraete_export
+        # O4: dazu die TCO-Zeilen (aufgeloest in der View) und die FERTIGE
+        # Radar-Aufbereitung - der Radar-Export liest seine Prozentzahlen
+        # aus derselben Rechnung, die wettbewerbsradar.html rendert, und
+        # rechnet sie nicht ein zweites Mal.
         geraete["export"] = _geraete_export.schreibe_exporte(
             site_dir, geraete.get("bestand") or [],
             geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
-            stand=geraete.get("stand", ""))
+            stand=geraete.get("stand", ""),
+            tco=(geraete.get("tco") or {}).get("export"),
+            radar=wettbewerbsradar_view)
     except Exception as exc:                      # noqa: BLE001
         # Wie beim Rest dieser Stufe: ein gescheiterter Export darf die
         # Seite nicht kosten - aber er verschwindet auch nicht still.
         log.error("Geraete-Export gescheitert: %s: %s", type(exc).__name__, exc)
         from . import geraete_export as _geraete_export
         geraete["export"] = _geraete_export.leer()
+        wettbewerbsradar_view["export"] = _geraete_export.leer()["radar"]
+    else:
+        # Der Radar nennt Zeilenzahl und Groesse SEINER Datei an seinem
+        # eigenen zentralen Ort (Kopfzeile) - dieselbe Zahl, die in der
+        # Datei steht, nicht eine gerechnete.
+        wettbewerbsradar_view["export"] = geraete["export"]["radar"]
 
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
