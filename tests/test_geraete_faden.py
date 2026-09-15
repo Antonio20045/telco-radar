@@ -23,6 +23,8 @@ erneuert, Vodafone als Referenzrechnung.
 """
 from __future__ import annotations
 
+import pytest
+
 from test_geraete_tco_zustand import _baue
 
 
@@ -93,60 +95,50 @@ def test_der_seitentitel_ist_sachlich(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# Kriterium 4: Ampel-Kacheln und Analysten-Tabellen nur in <details>
+# Kriterium 4 (O2, 11.09.2026): die Alarm-Kacheln und -Tabelle stehen auf
+# dem WETTBEWERBS-RADAR, nicht mehr auf der Geräteseite - ihr neuer Ort
+# hält tests/test_wettbewerbsradar_alarme.py fest. Hier bleibt die Regel,
+# dass die Vergleichsansicht sie NICHT mehr trägt (kein Doppelt), und dass
+# der Tarifmaßstab weiterhin hinter einer Aufklappung steht.
 # --------------------------------------------------------------------------
 
-def test_ampel_kacheln_stehen_nur_in_einer_aufklappung(tmp_path):
+def test_die_vergleichsansicht_traegt_keine_alarmtafel_mehr(tmp_path):
     s = _baue(tmp_path)
-    chips = s.select_one("#tafel-tco .gr-chips")
-    assert chips is not None, "die Ampel-Kacheln fehlen"
-    aufklappung = chips.find_parent("details")
-    assert aufklappung is not None, \
-        "die Ampel-Kacheln stehen ausserhalb einer Aufklappung"
-    assert aufklappung.get("id") == "gr-details"
+    tafel = s.select_one("#tafel-tco")
+    assert tafel.select_one(".gr-chips") is None, \
+        "die Ampel-Kacheln stehen noch in der Vergleichsansicht"
+    assert tafel.select_one("#gr-alarme") is None
+    assert tafel.select_one("#gr-tco-tabelle") is None, \
+        "'Alle Bündel als Tabelle' ist in die Zeilen-Tabelle aufgegangen"
 
 
-def test_die_analysten_tabellen_stehen_nur_in_einer_aufklappung(tmp_path):
+def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
+    """Der Maßstab (was der Tarif allein kostet) bleibt Analyse und steht
+    hinter einer eigenen, geschlossenen Aufklappung."""
     s = _baue(tmp_path)
-    for kennung in ("gr-alarme", "gr-tco-tabelle", "gr-massstab"):
-        tabelle = s.select_one(f"#tafel-tco #{kennung}")
-        if tabelle is None:
-            # gr-massstab z.B. steht nur, wenn Referenzen im Bestand sind -
-            # kein Mangel, aber der Test darf nicht schweigend nichts pruefen.
-            continue
-        aufklappung = tabelle.find_parent(
-            lambda el: el.name == "details" and el.get("id") == "gr-details")
-        assert aufklappung is not None, \
-            f"#{kennung} steht nicht innerhalb von #gr-details"
+    tafel = s.select_one("#tafel-tco")
+    massstab = tafel.select_one("#gr-massstab")
+    if massstab is None:
+        pytest.skip("keine Referenzen im Bestand der Fixture")
+    assert massstab.name == "details"
+    assert massstab.get("open") is None, "die Aufklappung ist offen"
+    assert massstab.select_one(".gr-ttab--simonly") is not None
 
 
-def test_details_wrapper_steht_wirklich_zu(tmp_path):
-    """Gegenprobe: die Aufklappung ist zu Beginn geschlossen - sonst
-    pruefte Kriterium 4 eine Struktur, die ohnehin immer offen daliegt."""
+def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
+    """Die Bündel-Zeilen (seit O2 die Kartenform) stehen OFFEN unter dem
+    Graphen - nicht in einer Analyse-Aufklappung verschachtelt. Zwei
+    Klapptiefen für dasselbe Angebot blieben verboten."""
     s = _baue(tmp_path)
-    wrapper = s.select_one("#tafel-tco #gr-details")
-    assert wrapper is not None
-    assert wrapper.get("open") is None, "die Details-Aufklappung ist offen"
-    assert wrapper.select_one("summary").get_text(strip=True) == "Details"
-
-
-def test_die_anbieterkarten_stehen_ausserhalb_der_details_aufklappung(tmp_path):
-    """Die Anbieterkarten duerfen NICHT in der ANALYSE-Aufklappung stecken
-    (#gr-details: Alarme, Buendel-Tabelle, Tarifmassstab) - das waeren zwei
-    Klapptiefen fuer dieselben Karten.
-
-    SEIT OPTIK-6 (09.09.2026) haben die Karten ihre EIGENE Klappe je
-    Modellblock (`details.gr-karten-auf`, standardmaessig zu, damit der
-    Reiter seine Hoehe haelt - `pruefe_portal.py` 11b). Das ist keine
-    Rueckkehr dieses Verbots: die Kartenklappe ist eine eigene, sichtbare
-    und direkt beim Modell verortete Aufklappung, keine Analyse-Schachtel.
-    Wer hier liest, pruefe gegen `gr-karten-auf`, nicht gegen diese Regel."""
-    s = _baue(tmp_path)
-    karten = s.select_one("#tafel-tco .gr-karten")
-    assert karten is not None
-    assert karten.find_parent(
-        lambda el: el.name == "details" and el.get("id") == "gr-details"
-    ) is None, "die Anbieterkarten stecken in der Details-Aufklappung"
+    tafel = s.select_one("#tafel-tco")
+    for zeile in tafel.select("#gr-buendel .gr-bnd"):
+        elter = zeile.parent
+        while elter is not None and elter.name is not None:
+            if elter.name == "details" and \
+                    "gr-bnd" not in (elter.get("class") or []):
+                pytest.fail("Bündelzeile steckt in einer Aufklappung: "
+                            + str(elter)[:80])
+            elter = elter.parent
 
 
 # --------------------------------------------------------------------------
@@ -155,11 +147,16 @@ def test_die_anbieterkarten_stehen_ausserhalb_der_details_aufklappung(tmp_path):
 # --------------------------------------------------------------------------
 
 def test_haendler_ohne_zeitreihe_nennen_den_beginn_der_beschaffung(tmp_path):
+    """O2: die Händler ohne Preis stehen in der EINEN Legendenzeile unter
+    dem Graphen (nicht mehr als eigene Karten) - mit dem Beginn der
+    Beschaffung, ohne erfundene Zahl."""
     s = _baue(tmp_path)
-    for karte in s.select("#tafel-tco .gr-kkarte--haendler"):
-        text = karte.get_text(" ", strip=True)
-        assert "Beschaffung läuft seit" in text
-        assert "€" not in text
+    tafel = s.select_one("#tafel-tco")
+    legende = tafel.select_one(".gr-lueckenzeile")
+    assert legende is not None, "die Legendenzeile fehlt"
+    text = " ".join(legende.get_text(" ", strip=True).split())
+    assert "Beschaffung läuft seit" in text
+    assert "€" not in text
 
 
 # --------------------------------------------------------------------------

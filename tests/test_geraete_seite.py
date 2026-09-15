@@ -512,7 +512,7 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     die Aufbereitung gehalten.
     """
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
                for k in s.select(".gr-chips .gr-chip")}
     assert set(kacheln) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}
@@ -542,11 +542,11 @@ def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
     Fehlertyp. Und ein Geraet ohne Wettbewerber ist NICHT unser Bestpreis -
     es ist gar nicht verglichen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     summe = sum(int(k.find("b").get_text(strip=True))
                 for k in s.select(".gr-chips .gr-chip"))
-    tafel = " ".join(s.select_one("#tafel-tco").get_text(" ", strip=True).split())
-    assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in tafel
+    abschnitt = " ".join(s.select_one("#wr-alarme").get_text(" ", strip=True).split())
+    assert f"{summe} Modelle mit ihren Speichergrößen stehen einem Wettbewerber gegenüber" in abschnitt
 
 
 def test_kein_cdn_und_keine_chart_bibliothek(tmp_path):
@@ -1406,12 +1406,13 @@ def _db_mit_vergleich():
 
 def test_die_alarmtabelle_nennt_den_guenstigsten_mit_namen(tmp_path):
     """Die woertliche Anforderung: nicht DASS es guenstiger ist, sondern
-    BEI WEM."""
+    BEI WEM. Seit O2 (11.09.2026) steht die Tabelle auf dem Wettbewerbs-
+    Radar - derselbe Inhalt, derselbe Satz."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-tco")
-    assert tafel is not None, "der Reiter fehlt ganz"
-    text = tafel.get_text(" ", strip=True)
+    s = _suppe(site, "wettbewerbsradar.html")
+    abschnitt = s.select_one("#wr-alarme")
+    assert abschnitt is not None, "der Alarm-Abschnitt fehlt auf dem Radar"
+    text = abschnitt.get_text(" ", strip=True)
     assert "Medimax" in text, "der guenstigste Wettbewerber steht mit Namen da"
     assert "150,00" in text, "die Differenz steht da (1349 - 1199)"
     assert "11,1" in text, "und der Prozentsatz"
@@ -1422,8 +1423,8 @@ def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
     200-Euro-Geraet viel und bei einem 2000-Euro-Geraet nichts. Der
     Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-tco .gr-a-zeile")
+    s = _suppe(site, "wettbewerbsradar.html")
+    zeile = s.select_one("#wr-alarme .gr-a-zeile")
     assert zeile is not None, "keine einzige Alarmzeile"
     assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
     assert "€" in zeile.select_one(".gr-a-euro").get_text(strip=True)
@@ -1433,8 +1434,8 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     """"Kein Vergleich ohne beide Quelllinks und beide Abrufdaten." Auf der
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    zeilen = s.select("#tafel-tco .gr-a-zeile")
+    s = _suppe(site, "wettbewerbsradar.html")
+    zeilen = s.select("#wr-alarme .gr-a-zeile")
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), "Wettbewerber ohne Quelllink"
@@ -1451,8 +1452,8 @@ def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
     """Der Klick auf eine Zeile zeigt die ganze Lage, nicht nur den Sieger -
     unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    zeile = s.select_one("#tafel-tco .gr-a-zeile")
+    s = _suppe(site, "wettbewerbsradar.html")
+    zeile = s.select_one("#wr-alarme .gr-a-zeile")
     auf = s.select_one("#" + zeile["data-auf"])
     namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
     # LADENnamen, nicht Markennamen: die Testkonfiguration fuehrt
@@ -1469,31 +1470,32 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
     sagt dasselbe einmal.
     """
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    tafel = s.select_one("#tafel-tco")
-    assert "niemand günstiger" not in tafel.get_text(" ", strip=True)
+    radar = _suppe(site, "wettbewerbsradar.html")
+    assert "niemand günstiger" not in radar.get_text(" ", strip=True)
 
     # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
     # es MUSS ein Geraet geben, bei dem niemand unterbietet.
-    bestpreis = next(k for k in s.select(".gr-chips .gr-chip")
+    bestpreis = next(k for k in radar.select(".gr-chips .gr-chip")
                      if k.find("span").get_text(strip=True) == "Bestpreis")
     assert int(bestpreis.find("b").get_text(strip=True)) > 0
 
 
 def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
+    """O2 (11.09.2026): der Aufklapper ist eine Sortiments-Aussage - dieselbe
+    Frage, die der Wettbewerbs-Radar stellt - und steht deshalb dort. Der
+    Pin hier verhindert die stille Rueckkehr auf die Geraeteseite."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    luecke = s.select_one(".gr-vergleich-luecke")
+    radar = _suppe(site, "wettbewerbsradar.html")
+    luecke = radar.select_one(".gr-vergleich-luecke")
     assert luecke is not None
     text = luecke.get_text(" ", strip=True)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "Galaxy S25 Ultra" in text
-    # Der Aufklapper ist am 03.09.2026 mit der ganzen Erklaersektion vom
-    # Seitenfuss in den Portfolio-Reiter gezogen worden (er ist eine
-    # Sortiments-Aussage, kein Kommentar) - und diese Zugehoerigkeit hier
-    # festgenagelt, sonst wandert er beim naechsten Umbau unbemerkt zurueck.
-    assert any(el.get("id") == "tafel-portfolio" for el in luecke.parents), (
-        "der Aufklapper steht nicht im Portfolio-Reiter")
+    assert any(el.get("id") == "wr-gelistet" for el in luecke.parents), (
+        "der Aufklapper steht nicht im Radar-Abschnitt 'wr-gelistet'")
+    geraete = _suppe(site, "geraete.html")
+    assert geraete.select_one(".gr-vergleich-luecke") is None, \
+        "der Aufklapper steht noch auf der Geraeteseite"
 
 
 def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
@@ -1518,16 +1520,16 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     Vertrag. Sie stehen deshalb als aktive Etiketten und nicht als
     Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
-    felder = [f.get("data-filter") for f in s.select("#tafel-tco [data-filter]")]
+    s = _suppe(site, "wettbewerbsradar.html")
+    felder = [f.get("data-filter") for f in s.select("#wr-alarme [data-filter]")]
     assert felder == ["marke", "modell", "speicher", "suche"]
 
     fest = [e.get_text(" ", strip=True)
-            for e in s.select("#tafel-tco .gr-filter label.gr-filter--an")]
+            for e in s.select("#wr-alarme .gr-filter label.gr-filter--an")]
     assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
 
     # Jede Zeile traegt die Werte, nach denen gefiltert wird.
-    for zeile in s.select("#tafel-tco .gr-a-zeile"):
+    for zeile in s.select("#wr-alarme .gr-a-zeile"):
         assert zeile.has_attr("data-marke")
         assert zeile.has_attr("data-modell")
         assert zeile.has_attr("data-speicher")
@@ -2038,9 +2040,9 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
 
     Geloescht ist die Auskunft nicht - der Katalog traegt sie weiter."""
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
 
-    alarm = suppe.select_one("#tafel-tco .gr-alarm")
+    alarm = suppe.select_one("#wr-alarme .gr-alarm")
     assert alarm, "Alarmtabelle fehlt in der Fixture"
     koepfe = [th.get_text(" ", strip=True).lower() for th in alarm.select("thead th")]
     assert koepfe, "keine Spaltenkoepfe - der Test misst nichts"
@@ -2092,9 +2094,13 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
     Sortierung, die es nur im Test gibt, sortiert keine Seite."""
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
+    radar = _suppe(site, "wettbewerbsradar.html")
 
-    for tafel in ("#tafel-tco", "#tafel-katalog"):
-        tabelle = suppe.select_one(f"{tafel} .gr-alarm")
+    # O2: die Alarm-Tabelle steht auf dem Radar, der Katalog auf der
+    # Geraeteseite - geprueft wird jede an ihrem Ort.
+    for tafel, suppe_davon in (("#wr-alarme", radar),
+                               ("#tafel-katalog", suppe)):
+        tabelle = suppe_davon.select_one(f"{tafel} .gr-alarm")
         assert tabelle, f"{tafel}: Tabelle fehlt"
         knoepfe = tabelle.select("thead .gr-sort")
         assert knoepfe, f"{tafel}: kein sortierbarer Spaltenkopf"

@@ -416,23 +416,24 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
                          "html.parser")
 
 
-def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_und_tabelle(tmp_path):
+def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_path):
     """BRIEF_FADEN (05.09.2026): G1 (der Balken) ist aus DIESER Ansicht
-    entfernt - der Test prueft das Etikett deshalb nur noch an Karte und
-    Tabelle. Dass `geraete_tco_grafik.balken()` das Etikett weiterhin
-    rechnet (Code bleibt, nur der Aufruf im Template ist geloescht), haelt
-    die Gegenprobe unten UND `test_das_etikett_steht_am_g1_balken` oben."""
+    entfernt - seit O2 (11.09.2026) sind die Karten Tabellenzeilen, und
+    der Test prueft das Etikett an den ZEILEN. Dass `geraete_tco_grafik.
+    balken()` das Etikett weiterhin rechnet (Code bleibt, nur der Aufruf
+    im Template ist geloescht), haelt die Gegenprobe unten UND
+    `test_das_etikett_steht_am_g1_balken` oben."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    karten_o2 = tafel.select('.gr-kkarte[data-anbieter="o2"]')
-    assert len(karten_o2) == 2
+    zeilen_o2 = tafel.select('.gr-bnd[data-anbieter="o2"]')
+    assert len(zeilen_o2) == 2
 
-    erneuert = tafel.select_one('.gr-kkarte[data-zustand="refurbished"]')
+    erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
     assert erneuert is not None
     assert erneuert.select_one(".gr-kk-marke--zustand").get_text(strip=True) == "erneuert"
     assert erneuert.select_one(".gr-kk-delta") is None, \
         "das erneuerte Geraet ist kein Konkurrent des Neugeraets"
-    neu = tafel.select_one('.gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
+    neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert neu.select_one(".gr-kk-marke--zustand") is None
     assert neu.select_one(".gr-kk-delta") is not None
 
@@ -444,17 +445,20 @@ def test_die_gerenderte_seite_traegt_das_etikett_auf_karte_und_tabelle(tmp_path)
     svg = grafik.balken(_modell())
     assert 'class="gr-g1-zustand">erneuert</tspan>' in svg
 
-    zeile = tafel.select_one('#gr-tco-tabelle tr[data-zustand="refurbished"]')
-    assert zeile is not None
-    assert zeile.select_one(".gr-t-zustand").get_text(strip=True) == "erneuert"
+    # Die alte "Alle Bündel als Tabelle" (mit ihrer eigenen Zustandsspalte
+    # `.gr-t-zustand`) ist mit O2 in die Zeilen-Tabelle aufgegangen - das
+    # Etikett steht jetzt an der Zeile selbst.
+    assert tafel.select_one("#gr-tco-tabelle") is None
+    assert not tafel.select(".gr-t-zustand")
+    assert "erneuert" in " ".join(erneuert.get_text(" ", strip=True).split())
 
     # Die gr-mband-Angebotszeile ("2 Angebote · davon 1 erneuert") ist mit
     # O1 entfallen - die fuenf Zaehlsysteme der Vergleichsansicht sind auf
     # DIE EINE Fussnote unter dem Graphen gesammelt, und die nennt Geraete,
-    # keine Angebote. Das Etikett selbst steht weiterhin auf Karte UND
-    # Tabelle (oben geprueft) - der Zweck der Zeile bleibt erfuellt.
+    # keine Angebote. Das Etikett selbst steht weiterhin auf der Zeile
+    # (oben geprueft) - der Zweck der Zeile bleibt erfuellt.
     assert tafel.select_one(".gr-mband") is None
-    # Die leere Vodafone-Karte gibt es hier nicht, die gefuellte ist die
+    # Die leere Vodafone-Zeile gibt es hier nicht, die gefuellte ist die
     # Referenzrechnung - und die heisst nicht "unser Angebot" (S3).
     marken = [m.get_text(strip=True) for m in tafel.select(".gr-kk-marke")]
     assert "unser Angebot" not in marken
@@ -464,10 +468,9 @@ def test_ohne_erneuertes_buendel_kein_etikett(tmp_path):
     """Die Gegenprobe: dieselbe Seite ohne das zweite Buendel."""
     s = _baue(tmp_path, erneuert=False)
     tafel = s.select_one("#tafel-tco")
-    assert len(tafel.select('.gr-kkarte[data-anbieter="o2"]')) == 1
+    assert len(tafel.select('.gr-bnd[data-anbieter="o2"]')) == 1
     assert not tafel.select(".gr-kk-marke--zustand")
     assert not tafel.select(".gr-g1-zustand")
-    assert not tafel.select(".gr-t-zustand")
     assert "erneuert" not in tafel.get_text(" ")
 
 
@@ -476,22 +479,22 @@ def test_ohne_erneuertes_buendel_kein_etikett(tmp_path):
 # --------------------------------------------------------------------------
 
 def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(tmp_path):
-    """F5: "ab Monat 25" steht auf JEDER Karte mit Zahl - als Betrag, wo das
+    """F5: "ab Monat 25" steht auf JEDER Zeile mit Zahl - als Betrag, wo das
     Pflichtdokument eine Preisphase nennt (Vodafone Mobil XS: 29,95 EUR),
     sonst als benannte Luecke (o2: `preisphasen: []`). Eine stumme
     Auslassung liest sich als "es aendert sich nichts"."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    mit_zahl = [k for k in tafel.select(".gr-kkarte")
-                if "gr-kkarte--leer" not in k.get("class", [])]
+    mit_zahl = [k for k in tafel.select(".gr-bnd")
+                if k.get("data-gesamt")]
     assert len(mit_zahl) == 3            # o2 neu, o2 erneuert, Referenz
     for k in mit_zahl:
         assert k.select_one(".gr-kk-nach") is not None, k["data-anbieter"]
 
-    referenz = tafel.select_one('.gr-kkarte[data-anbieter="Vodafone"]')
+    referenz = tafel.select_one('.gr-bnd[data-anbieter="Vodafone"]')
     assert "ab Monat 25: 29,95 € Tarifgrundpreis" in " ".join(
         referenz.select_one(".gr-kk-nach").get_text(" ", strip=True).split())
-    o2 = tafel.select_one('.gr-kkarte[data-anbieter="o2"][data-zustand="neu"]')
+    o2 = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     luecke = o2.select_one(".gr-kk-nach--luecke")
     assert luecke is not None
     assert "ab Monat 25: nicht belegt" in " ".join(luecke.get_text(" ", strip=True).split())

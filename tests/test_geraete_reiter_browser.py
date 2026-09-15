@@ -396,7 +396,7 @@ def _seite(tmp_path_factory):
         browser.close()
 
 
-def _sichtbare_zeilen(seite):
+def _sichtbare_zeilen(seite, wurzel="#tafel-tco"):
     """Was der Leser WIRKLICH sieht, nicht was das Attribut sagt.
 
     Die erste Fassung zaehlte `:not([hidden])`. Damit war sie blind fuer den
@@ -404,15 +404,18 @@ def _sichtbare_zeilen(seite):
     `[hidden]{display:none}` des Browsers, und nach "alle anzeigen" standen
     weggefilterte Zeilen weiter in der Tabelle - Helfer sagte 10, der
     Browser zeigte 13.
+
+    Seit O2 (11.09.2026) lebt die Alarmtabelle auf dem Wettbewerbs-Radar -
+    die Wurzel ist deshalb ein Parameter ('#wr-alarme' dort).
     """
     return seite.eval_on_selector_all(
-        "#tafel-tco .gr-a-zeile",
+        f"{wurzel} .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
 
 
-def _sichtbare_marken(seite):
+def _sichtbare_marken(seite, wurzel="#tafel-tco"):
     return seite.eval_on_selector_all(
-        "#tafel-tco .gr-a-zeile",
+        f"{wurzel} .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
         "      .map(x => x.dataset.marke)")
 
@@ -455,12 +458,13 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     assert _seite.eval_on_selector_all(
         "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
         "e => e.length") == 0
-    # ZWEI Tabellen tragen diese Klasse: die Alarme in der Hauptansicht und
-    # der flache Katalog in Reiter 2. Sie teilen sich Aussehen und
-    # Filterlogik bewusst - eine zweite Kopie waere eine zweite Stelle, an
-    # der die Kaskadenfalle mit `hidden` repariert werden muesste.
+    # O2 (11.09.2026): die Alarmtabelle ist AUS der Vergleichsansicht auf
+    # den Wettbewerbs-Radar gezogen - hier steht keine `.gr-alarm`-Tabelle
+    # mehr. Der flache Katalog in Reiter 2 teilt sich Aussehen und
+    # Filterlogik weiterhin mit ihr (auf dem Radar), und genau das haelt
+    # `test_wettbewerbsradar_alarme.py` am neuen Ort fest.
     assert _seite.eval_on_selector_all("#tafel-tco .gr-alarm",
-                                       "e => e.length") == 1
+                                       "e => e.length") == 0
 
 
 def test_kein_gedrehter_text_auf_der_ganzen_seite(_seite):
@@ -580,38 +584,32 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
 # Filter, Suche, Aufklapper
 # --------------------------------------------------------------------------
 
+def _radar_url(seite):
+    """Die Adresse der Radar-Seite desselben Servers - die Alarmtabelle
+    steht seit O2 (11.09.2026) dort, nicht mehr in der Vergleichsansicht."""
+    return seite.url.rsplit("/", 1)[0] + "/wettbewerbsradar.html"
+
+
 def _frisch(seite):
-    """Ein unberuehrter Ausgangszustand.
+    """Ein unberuehrter Ausgangszustand der GERAETESEITE.
 
     Die Fixture hat Modulgueltigkeit, und "alle anzeigen" ist eine Klasse an
     der Tabelle, die kein Filter zuruecknimmt. Ein Test, der danach laeuft,
-    misst sonst eine Seite, die ein anderer aufgeklappt hat.
+    misst sonst eine Seite, die ein anderer aufgeklappt hat. Seit O2 kann
+    dieselbe Seite auch die RADAR-Seite zeigen (die Alarmtests dort) -
+    deshalb `goto` auf die volle Adresse statt `reload`, das trifft immer
+    die richtige Seite.
     """
-    seite.reload(wait_until="load")
+    seite.goto(seite.url.rsplit("/", 1)[0] + "/geraete.html",
+               wait_until="load")
     seite.click(".gr-reiter button[data-tafel='tafel-tco']")
-    # DIE ALARMTABELLE STEHT SEIT PHASE R IN EINEM AUFKLAPPER, UND SEIT
-    # BRIEF_FADEN (05.09.2026) STECKT DIESER AUFKLAPPER IN EINEM WEITEREN
-    # ("Details", `#gr-details`). Ein `<details>` verbirgt seine Kinder per
-    # UA-Regel (`details:not([open]) > *:not(summary){display:none}`) -
-    # das gilt fuer NACHFAHREN transitiv: ein offenes `#gr-alarme` bleibt
-    # unsichtbar, solange sein Elternelement zu ist. Beide werden deshalb
-    # geoeffnet, nicht nur das innere.
-    for kennung in ("gr-details", "gr-alarme"):
-        auf = seite.query_selector(f"#{kennung}")
-        if auf is not None:
-            seite.evaluate(
-                f"document.getElementById('{kennung}').open = true")
-    # DIE ANBIETERKARTEN STEHEN SEIT OPTIK-6 (09.09.2026) IN EINER EIGENEN
-    # Klappe je Modellblock - dieselbe Transitivitaet wie oben: die Karte
-    # selbst ist kein `<details>`, aber sie bleibt unsichtbar, solange die
-    # Klappe zu ist. Tests, die Karten LESEN (data-Attribute), braucht das
-    # nicht; Tests, die sie BEDIENEN (`select_option` auf die Sortierung
-    # braucht ein sichtbares Element), schon. Geoeffnet wird nur die
-    # Klappe DES SICHTBAREN Modellblocks.
-    seite.evaluate(
-        """() => document.querySelectorAll(
-             '.gr-tmodell:not([hidden]) details.gr-karten-auf')
-           .forEach(k => { k.open = true; })""")
+    seite.wait_for_timeout(60)
+
+
+def _radar_frisch(seite):
+    """Dasselbe fuer die RADAR-Seite: die Alarmtabelle lebt seit O2 dort
+    (ausserhalb der Reiter-Mechanik - kein Klick noetig)."""
+    seite.goto(_radar_url(seite), wait_until="load")
     seite.wait_for_timeout(60)
 
 
@@ -626,10 +624,10 @@ def test_ohne_filter_greift_der_zeilendeckel(_seite):
     die 15 festhaelt, haette die Korrektur als Fehler gemeldet.
     """
     from telco_radar.report.geraete_alarme import SICHTBAR_MAX
-    _frisch(_seite)
-    gesamt = _seite.eval_on_selector_all("#tafel-tco .gr-a-zeile", "e => e.length")
+    _radar_frisch(_seite)
+    gesamt = _seite.eval_on_selector_all("#wr-alarme .gr-a-zeile", "e => e.length")
     assert gesamt > SICHTBAR_MAX, "die Fixture reisst den Deckel nicht"
-    assert _sichtbare_zeilen(_seite) == SICHTBAR_MAX
+    assert _sichtbare_zeilen(_seite, "#wr-alarme") == SICHTBAR_MAX
     assert _seite.query_selector("#gr-mehr") is not None
 
 
@@ -637,17 +635,17 @@ def test_der_markenfilter_laesst_nur_die_passende_zeile(_seite):
     """Zwei Geraete, zwei Hersteller - so trennt der Filter wirklich. Ein
     Fixture, in dem beide Marken ueberall vorkommen, koennte gruen sein,
     ohne dass der Filter etwas tut."""
-    _frisch(_seite)
-    _seite.select_option("#tafel-tco [data-filter='marke']", "Samsung")
+    _radar_frisch(_seite)
+    _seite.select_option("#wr-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
-    marken = _sichtbare_marken(_seite)
+    marken = _sichtbare_marken(_seite, "#wr-alarme")
     assert marken, "keine Zeile sichtbar - der Test misst nichts"
     assert set(marken) == {"Samsung"}, marken
     # Gegenprobe: ohne Filter sind BEIDE Marken da, sonst traefe der Filter
     # eine Fixture, die ohnehin nur Samsung kennt.
-    _seite.select_option("#tafel-tco [data-filter='marke']", "")
+    _seite.select_option("#wr-alarme [data-filter='marke']", "")
     _seite.wait_for_timeout(60)
-    assert set(_sichtbare_marken(_seite)) == {"Apple", "Samsung"}
+    assert set(_sichtbare_marken(_seite, "#wr-alarme")) == {"Apple", "Samsung"}
 
 
 def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
@@ -658,28 +656,28 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
     # dass der Test davor "Samsung" gewaehlt hatte - einzeln ausgefuehrt fiel
     # sie durch, und zwei Tests weiter unten steht der Kommentar, warum man
     # das nicht tut.
-    _frisch(_seite)
-    _seite.select_option("#tafel-tco [data-filter='marke']", "Samsung")
+    _radar_frisch(_seite)
+    _seite.select_option("#wr-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
     an = _seite.eval_on_selector(
-        "#tafel-tco [data-filter='marke']",
+        "#wr-alarme [data-filter='marke']",
         "e => e.closest('label').classList.contains('gr-filter--an')")
     assert an is True
     farbe = _seite.eval_on_selector(
-        "#tafel-tco [data-filter='marke']",
+        "#wr-alarme [data-filter='marke']",
         "e => getComputedStyle(e.closest('label')).backgroundColor")
     assert farbe == "rgb(230, 0, 0)", farbe
 
 
 def test_die_suche_grenzt_ein(_seite):
-    _frisch(_seite)
-    vorher = _sichtbare_zeilen(_seite)
-    _seite.fill("#tafel-tco [data-filter='suche']", "medimax")
+    _radar_frisch(_seite)
+    vorher = _sichtbare_zeilen(_seite, "#wr-alarme")
+    _seite.fill("#wr-alarme [data-filter='suche']", "medimax")
     _seite.wait_for_timeout(60)
-    nachher = _sichtbare_zeilen(_seite)
+    nachher = _sichtbare_zeilen(_seite, "#wr-alarme")
     assert 0 < nachher < vorher, (vorher, nachher)
     treffer = _seite.eval_on_selector_all(
-        "#tafel-tco .gr-a-zeile",
+        "#wr-alarme .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
         "      .map(x => x.textContent.toLowerCase().includes('medimax'))")
     assert all(treffer), "eine Zeile ohne den Suchbegriff ist sichtbar"
@@ -688,11 +686,12 @@ def test_die_suche_grenzt_ein(_seite):
 def test_eine_leere_auswahl_zeigt_einen_satz_statt_einer_leeren_flaeche(_seite):
     """Der Befund vom 29.08.2026, im Browser gesehen und nicht im HTML: eine
     leere Tabelle ohne Erklaerung liest sich als kaputte Seite."""
-    _seite.fill("#tafel-tco [data-filter='suche']", "gibtesnicht")
+    _radar_frisch(_seite)
+    _seite.fill("#wr-alarme [data-filter='suche']", "gibtesnicht")
     _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 0
-    assert _seite.eval_on_selector("#tafel-tco .gr-a-leer", "e => !e.hidden") is True
-    _seite.fill("#tafel-tco [data-filter='suche']", "")
+    assert _sichtbare_zeilen(_seite, "#wr-alarme") == 0
+    assert _seite.eval_on_selector("#wr-alarme .gr-a-leer", "e => !e.hidden") is True
+    _seite.fill("#wr-alarme [data-filter='suche']", "")
 
 
 def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
@@ -701,8 +700,8 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     # Der eigene Ausgangszustand, nicht der des vorigen Tests: ein Test, der
     # auf dem Aufraeumen eines anderen sitzt, faellt aus, sobald der andere
     # ausfaellt - und meldet dann etwas, das mit ihm nichts zu tun hat.
-    _frisch(_seite)
-    zeile = "#tafel-tco .gr-a-zeile:not([hidden])"
+    _radar_frisch(_seite)
+    zeile = "#wr-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
     assert _seite.eval_on_selector(aufklapper, "e => e.offsetParent") is None
     _seite.click(f"{zeile} .gr-a-modell")
@@ -727,15 +726,15 @@ def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
     Apple-Zeilen mitten in der Tabelle, waehrend das `hidden`-Attribut
     korrekt sass.
     """
-    _frisch(_seite)
+    _radar_frisch(_seite)
     mehr = _seite.query_selector("#gr-mehr")
     if mehr is not None:
         mehr.click()
         _seite.wait_for_timeout(60)
 
-    _seite.select_option("#tafel-tco [data-filter='marke']", "Samsung")
+    _seite.select_option("#wr-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
-    marken = _sichtbare_marken(_seite)
+    marken = _sichtbare_marken(_seite, "#wr-alarme")
     assert marken, "keine Zeile sichtbar - der Test misst nichts"
     assert set(marken) == {"Samsung"}, marken
 
@@ -743,11 +742,11 @@ def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
 def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     """Sonst haengt eine Anbieterliste unter einer Zeile, die nicht mehr da
     ist - dieselbe Kaskadenfalle wie eine Ebene darueber."""
-    _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
-    _seite.select_option("#tafel-tco [data-filter='marke']", "")
-    _seite.fill("#tafel-tco [data-filter='suche']", "")
-    _frisch(_seite)
-    zeile = "#tafel-tco .gr-a-zeile:not([hidden])"
+    _radar_frisch(_seite)
+    _seite.select_option("#wr-alarme [data-filter='marke']", "")
+    _seite.fill("#wr-alarme [data-filter='suche']", "")
+    _radar_frisch(_seite)
+    zeile = "#wr-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
     # Der Klick TOGGELT. Die Fixture hat Modulgueltigkeit, ein Test davor kann
     # denselben Aufklapper schon geoeffnet haben - dann klappt ein blinder
@@ -760,11 +759,11 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     assert _seite.eval_on_selector(
         aufklapper, "e => getComputedStyle(e).display") != "none"
 
-    _seite.fill("#tafel-tco [data-filter='suche']", "gibtesnichtwirklich")
+    _seite.fill("#wr-alarme [data-filter='suche']", "gibtesnichtwirklich")
     _seite.wait_for_timeout(60)
     assert _seite.eval_on_selector(
         aufklapper, "e => getComputedStyle(e).display") == "none"
-    _seite.fill("#tafel-tco [data-filter='suche']", "")
+    _seite.fill("#wr-alarme [data-filter='suche']", "")
 
 
 def test_eine_suche_ueber_eine_zunaechst_versteckte_zeile_zeigt_sie(_seite):
@@ -786,25 +785,25 @@ def test_eine_suche_ueber_eine_zunaechst_versteckte_zeile_zeigt_sie(_seite):
     Gegenteil - eine Suche mit genau einem Treffer, die "kein Treffer"
     zeigt - und hielt damit den Fehler fest, den B2 behebt.
     """
-    _frisch(_seite)
+    _radar_frisch(_seite)
     rest = _seite.eval_on_selector_all(
-        "#tafel-tco .gr-a-rest.gr-a-zeile", "e => e.length")
+        "#wr-alarme .gr-a-rest.gr-a-zeile", "e => e.length")
     assert rest, "die Fixture hat keine Zeilen hinter 'alle anzeigen'"
     suchwort = _seite.eval_on_selector(
-        "#tafel-tco .gr-a-rest.gr-a-zeile .gr-a-modell",
+        "#wr-alarme .gr-a-rest.gr-a-zeile .gr-a-modell",
         "e => e.textContent.trim()")
-    _seite.fill("#tafel-tco [data-filter='suche']", suchwort)
+    _seite.fill("#wr-alarme [data-filter='suche']", suchwort)
     _seite.wait_for_timeout(60)
-    assert _sichtbare_zeilen(_seite) == 1, (
+    assert _sichtbare_zeilen(_seite, "#wr-alarme") == 1, (
         "der einzige Treffer der Suche bleibt versteckt")
     assert _seite.eval_on_selector(
-        "#tafel-tco .gr-a-leer", "e => getComputedStyle(e).display") == "none"
+        "#wr-alarme .gr-a-leer", "e => getComputedStyle(e).display") == "none"
     gefundenes_modell = _seite.eval_on_selector(
-        "#tafel-tco .gr-a-zeile:not([hidden]) .gr-a-modell",
+        "#wr-alarme .gr-a-zeile:not([hidden]) .gr-a-modell",
         "e => e.textContent.trim()")
     assert gefundenes_modell == suchwort, (
         "die sichtbare Zeile ist nicht die gesuchte")
-    _seite.fill("#tafel-tco [data-filter='suche']", "")
+    _seite.fill("#wr-alarme [data-filter='suche']", "")
 
 
 def test_kein_aufklapper_steht_offen(_seite):
@@ -818,9 +817,10 @@ def test_kein_aufklapper_steht_offen(_seite):
     vermass. Die Hoehenmessung allein ersetzt ihn nicht: sie laeuft auf einer
     Fixture, in der ein offenes `<details>` fast nichts kostet.
     """
-    # NICHT ueber `_frisch`: das oeffnet den Alarm-Aufklapper absichtlich,
-    # und dieser Test misst genau den Auslieferungszustand.
-    _seite.reload(wait_until="load")
+    # NICHT ueber `_frisch`, aber mit expliziter Adresse: die gemeinsame
+    # Seite kann nach einem Alarmtest gerade die RADAR-Seite zeigen.
+    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html",
+                wait_until="load")
     _seite.wait_for_timeout(60)
     for tid in ("tafel-tco", "tafel-katalog",
                 "tafel-verlauf", "tafel-portfolio"):
@@ -1237,8 +1237,8 @@ def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
 
 
 @pytest.mark.parametrize("tafel,knopf,schluessel", [
-    ("tafel-tco", "euro", "sEuro"),
-    ("tafel-tco", "prozent", "sProzent"),
+    ("wr-alarme", "euro", "sEuro"),
+    ("wr-alarme", "prozent", "sProzent"),
     ("tafel-katalog", "preis", "sPreis"),
 ])
 def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
@@ -1249,10 +1249,16 @@ def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
     Sortiert wird nach dem ROHWERT an der Zeile, nicht nach dem Zelltext:
     "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €", und ein
     Sortierer, der die Zelle liest, stellt den teuersten Preis nach vorn und
-    sieht dabei richtig aus."""
-    _frisch(_seite)
-    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
-    _seite.wait_for_timeout(80)
+    sieht dabei richtig aus.
+
+    Seit O2 (11.09.2026) lebt die Alarmtabelle auf dem Wettbewerbs-Radar
+    ('wr-alarme'); der Katalog bleibt auf der Geraeteseite."""
+    if tafel == "wr-alarme":
+        _radar_frisch(_seite)
+    else:
+        _frisch(_seite)
+        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.wait_for_timeout(80)
 
     def sichtbare_werte():
         return _seite.eval_on_selector_all(
@@ -1300,17 +1306,17 @@ def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
     zwoelf groessten PROZENTwerte, untereinander nach Euro geordnet - eine
     Rangliste, die es nicht gibt, und der groesste Euro-Abstand stuende
     nicht darunter."""
-    _frisch(_seite)
+    _radar_frisch(_seite)
 
     def sichtbar(schluessel):
         return _seite.eval_on_selector_all(
-            "#tafel-tco .gr-a-zeile",
+            "#wr-alarme .gr-a-zeile",
             "(e, k) => e.filter(x => getComputedStyle(x).display !== 'none')"
             "           .map(x => parseFloat(x.dataset[k]))", schluessel)
 
     def alle(schluessel):
         return _seite.eval_on_selector_all(
-            "#tafel-tco .gr-a-zeile",
+            "#wr-alarme .gr-a-zeile",
             "(e, k) => e.map(x => parseFloat(x.dataset[k]))", schluessel)
 
     # Gegenprobe: der Deckel muss ueberhaupt greifen, sonst ist der Fall
@@ -1322,7 +1328,7 @@ def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
     assert nach_prozent != sorted(alle("sEuro"), reverse=True), (
         "Prozent und Euro ordnen gleich - der Fall ist nicht ausloesbar")
 
-    _seite.click('#tafel-tco .gr-sort[data-sort="euro"]')
+    _seite.click('#wr-alarme .gr-sort[data-sort="euro"]')
     _seite.wait_for_timeout(150)
     oben = sichtbar("sEuro")
     assert oben, "keine sichtbare Zeile nach dem Sortieren"
@@ -1658,7 +1664,7 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
 # Filterzustand und gelten fuer BEIDE Tabellen des echten Bestands.
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("tafel", ["tafel-tco", "tafel-katalog"])
+@pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
 def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
     """B7 (Runde 2): fuenf neue Tests der ersten Nachbesserung waren alle
     B5-Tests - keiner hielt B7 selbst. Eine Rueckabwicklung (Name wieder
@@ -1671,9 +1677,12 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
     ausserhalb des Ankers), dieser Test faellt (`vorText` ist dann der
     Anbietername statt eines leeren Strings).
     """
-    _frisch(_seite)
-    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
-    _seite.wait_for_timeout(80)
+    if tafel == "wr-alarme":
+        _radar_frisch(_seite)
+    else:
+        _frisch(_seite)
+        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.wait_for_timeout(80)
     ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
       (a) => {
         var zelle = a.closest('td');
@@ -1690,7 +1699,7 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
     assert ergebnis["ankerText"], f"{tafel}: der Anker ist leer"
 
 
-@pytest.mark.parametrize("tafel", ["tafel-tco", "tafel-katalog"])
+@pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
 def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, tafel):
     """B4: `.src-table a` (Spezifitaet 0-1-1) schlug `.gr-a-quelle`
     (0-1-0) im Katalog - der Name erbte 10 px, Grossbuchstaben, Fettschrift,
@@ -1703,9 +1712,12 @@ def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, taf
     Katalog schlaegt danach wieder `.src-table a` (fontSize 10px statt
     14px), dieser Test faellt.
     """
-    _frisch(_seite)
-    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
-    _seite.wait_for_timeout(80)
+    if tafel == "wr-alarme":
+        _radar_frisch(_seite)
+    else:
+        _frisch(_seite)
+        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.wait_for_timeout(80)
     link = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
       (a) => ({
         fontSize: getComputedStyle(a).fontSize,
@@ -1723,7 +1735,7 @@ def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, taf
         "kein dauerhafter Hinweis auf einen Link ohne Hover: " + str(link))
 
 
-@pytest.mark.parametrize("tafel", ["tafel-tco", "tafel-katalog"])
+@pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
 def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, tafel):
     """B5: der `keydown`-Handler auf der Zeile rief fuer Enter/Space
     `preventDefault()` auf ALLEM innerhalb `.gr-a-zeile` auf - ohne den
@@ -1734,9 +1746,12 @@ def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, t
     `keydown`-Handler in `app.js` entfernt, dieser Test faellt
     (`defaultPrevented` wird `true`).
     """
-    _frisch(_seite)
-    _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
-    _seite.wait_for_timeout(80)
+    if tafel == "wr-alarme":
+        _radar_frisch(_seite)
+    else:
+        _frisch(_seite)
+        _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
+        _seite.wait_for_timeout(80)
     ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
       (el) => {
         el.focus();
@@ -2061,39 +2076,31 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
 # PHASE R - die TCO-Hauptansicht im echten Browser (04.09.2026)
 #
 # Diese Faelle stehen hier und nicht im Modultest, weil sie erst im Browser
-# entstehen: die Reihenfolge der Karten ist eine JS-Sortierung, und die
-# Modellauswahl blendet um, ohne zu laden. Ein HTML-Test saehe bei beiden
-# nur Markup.
+# entstehen: die Modellauswahl blendet um, ohne zu laden. Ein HTML-Test
+# saehe dabei nur Markup.
 #
 # DIE BALKENLAENGE (G1) IST SEIT BRIEF_FADEN (05.09.2026) NICHT MEHR HIER:
 # G1 wird in dieser Ansicht nicht mehr gerendert (Kriterium 1), und seine
 # Geometrie ist ohnehin SERVERGERECHNET, keine Browser-Layoutfrage - die
 # Zusicherung steht jetzt statisch in
 # `tests/test_geraete_tco_hauptansicht.py::test_die_balkenlaenge_entspricht_dem_betrag`.
+#
+# O2 (11.09.2026): die Karten sind TABILLENZEILEN geworden (`.gr-bnd`), und
+# die JS-Sortierung samt Sortier-/Filter-Control ist entfallen (§4
+# Entscheidung 3) - die Zeilen stehen serverseitig nach TCO-24. Geprueft
+# wird jetzt ebendiese Ordnung im Browser.
 # ==========================================================================
 
-def test_die_karten_stehen_in_der_reihenfolge_des_monatsmasses(_seite):
-    """A5.3: Ø/Monat ist das EINZIGE Mass, das ueber Laufzeiten hinweg
-    sortieren darf - und es ist die Vorbelegung."""
+def test_die_zeilen_stehen_nach_tco24_sortiert(_seite):
+    """Der Entwurf sortiert die Bandliste aufsteigend nach TCO-24 - im
+    Browser nachgemessen, nicht nur im Markup (ein Server-Sortierfehler
+    stuende auch im Markup, aber der Blick gehoert dazu)."""
     _frisch(_seite)
     werte = _seite.evaluate("""() => Array.from(
-      document.querySelectorAll('.gr-tmodell:not([hidden]) .gr-kkarte'))
-        .map(k => parseFloat(k.getAttribute('data-schnitt')))
+      document.querySelectorAll('#gr-bndliste .gr-bnd[data-gesamt]'))
+        .map(z => parseFloat(z.getAttribute('data-gesamt')))
         .filter(v => !isNaN(v))""")
-    assert len(werte) >= 2
-    assert werte == sorted(werte), werte
-
-
-def test_die_sortierung_ordnet_nach_dem_rohwert(_seite):
-    """Sortiert wird nach `data-`-Attribut, nie nach dem Zelltext:
-    "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €"."""
-    _frisch(_seite)
-    _seite.select_option(".gr-tmodell:not([hidden]) [data-sortiere]", "einmalig")
-    _seite.wait_for_timeout(80)
-    werte = _seite.evaluate("""() => Array.from(
-      document.querySelectorAll('.gr-tmodell:not([hidden]) .gr-kkarte'))
-        .map(k => parseFloat(k.getAttribute('data-einmalig')))
-        .filter(v => !isNaN(v))""")
+    assert len(werte) >= 2, "die Fixture braucht mindestens zwei Zeilen"
     assert werte == sorted(werte), werte
 
 
@@ -2125,53 +2132,47 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
         f"Graph zeigt {zeilen}, der Datenknoten sagt {erwartete}"
 
 
-def test_jede_karte_mit_zahl_beantwortet_die_leitfrage(_seite):
-    """A5.2 ist eine PFLICHTZEILE - auch und gerade bei 36 Monaten
-    Bindung."""
+def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):
+    """A5.2 ist eine PFLICHTZEILE - auch und gerade bei 36 Monaten Bindung;
+    seit O2 steht sie im Rechenweg-Aufklapper der Zeile."""
     _frisch(_seite)
     fehlend = _seite.evaluate("""() => Array.from(
-      document.querySelectorAll('.gr-tmodell:not([hidden]) .gr-kkarte'))
-        .filter(k => k.getAttribute('data-gesamt')
-                     && !k.querySelector('.gr-kk-24'))
-        .map(k => k.getAttribute('data-anbieter'))""")
+      document.querySelectorAll('.gr-tmodell:not([hidden]) .gr-bnd'))
+        .filter(z => z.getAttribute('data-gesamt')
+                     && !z.querySelector('.gr-kk-24'))
+        .map(z => z.getAttribute('data-anbieter'))""")
     assert fehlend == []
 
 
 # ==========================================================================
-# OPTIK-6 (09.09.2026): die Anbieterkarten hinter EINER Klappe
+# O2 (11.09.2026): die Bündel-Zeilen - Nachfolger der OPTIK-6-Klappe
 #
-# Der TCO-Reiter mass am echten Bestand 4732 px gegen das Limit von 3000
-# (`pruefe_portal.py` 11b); die Karten des Vorgabemodells belegen allein
-# 2749 px, und ihre Zahl waechst mit jedem Buendel. Sie stehen seither in
-# einer standardmaessig GESCHLOSSENEN Klappe je Modellblock - 11b misst
-# den Anfangszustand, und dieser Abschnitt hier misst das, was 11b NICHT
-# messen kann: dass die Klappe wirklich zu startet und dass ihr Inhalt
-# beim Oeffnen ohne EINEN Netzwerkabruf sichtbar wird (statisch im
-# Dokument, reines UI). Beide Tests sind NEU - die Klappe existierte vor
-# OPTIK-6 nicht, ein rot-vor/hinter-Schema greift nicht.
+# Die Klappe ist entfallen (die Karte ist eine Zeile geworden, jede mit
+# ihrem EIGENEN kleinen Aufklapper; Sortier- und Anbieterfilter-Controls
+# sind mit ihr gegangen, §4 Entscheidung 3). Was von den OPTIK-6-Tests
+# bleibt, ist das, was 11b NICHT messen kann: dass die Zeilen geschlossen
+# starten (kein `open`-Attribut im HTML) und dass ihr Öffnen ohne EINEN
+# Netzwerkabruf sichtbar wird (statisch im Dokument, reines UI).
 # ==========================================================================
 
-def test_die_kartenklappe_startet_geschlossen(_seite):
-    """Der Anfangszustand ist der, den 11b misst: waere die Klappe im HTML
-    offen (`open`-Attribut), stuende der ganze Kartenbestand wieder in der
-    Anfangshoehe - die Kompaktheit waere nur gerendert, nicht gebaut."""
-    _seite.reload(wait_until="load")
+def test_die_buendelzeilen_starten_geschlossen(_seite):
+    """Der Anfangszustand ist der, den 11b misst: stünde eine Zeile im HTML
+    offen (`open`-Attribut), klaffte ihr Rechenweg in der Anfangshöhe -
+    die Kompaktheit wäre nur gerendert, nicht gebaut."""
+    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html",
+                wait_until="load")
     _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
     _seite.wait_for_timeout(60)
     zustand = _seite.evaluate("""() => {
-      const block = document.querySelector('.gr-tmodell:not([hidden])');
-      if (!block) return null;
-      const klappe = block.querySelector('details.gr-karten-auf');
-      if (!klappe) return null;
-      return {offen: klappe.open,
-              karten: klappe.querySelectorAll('.gr-kkarte').length};
+      const zeilen = document.querySelectorAll('#gr-bndliste .gr-bnd');
+      return {zahl: zeilen.length,
+              offen: [...zeilen].filter(z => z.open).length};
     }""")
-    assert zustand is not None, "kein Modellblock mit Kartenklappe"
-    assert zustand["offen"] is False, "die Klappe startet offen"
-    assert zustand["karten"] > 0, "die Klappe traegt keine Karte"
+    assert zustand["zahl"] > 0, "keine Bündelzeile im Dokument"
+    assert zustand["offen"] == 0, "Zeilen starten offen"
 
 
-def test_die_kartenklappe_oeffnet_ohne_netzwerk(_seite):
+def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
     """E1 + Aufklapp-Pflicht aus dem Auftrag: alles bleibt im Dokument
     erreichbar, und das Oeffnen ist reines UI - kein Nachladen, keine
     Serverinteraktion. Jede Anfrage, die waehrend des Oeffnens entsteht,
@@ -2183,9 +2184,7 @@ def test_die_kartenklappe_oeffnet_ohne_netzwerk(_seite):
     falsch rot machen. Fuer die Zusicherung "kein Nachladen von Inhalten"
     ist der Ursprung der scharfe Massstab - Inhalte laegen unter der
     eigenen Adresse."""
-    _seite.reload(wait_until="load")
-    _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
-    _seite.wait_for_timeout(60)
+    _frisch(_seite)
     ursprung = _seite.url.rsplit("/", 1)[0]
 
     anfragen: list[str] = []
@@ -2197,53 +2196,24 @@ def test_die_kartenklappe_oeffnet_ohne_netzwerk(_seite):
     _seite.on("request", _zaehle)
     try:
         ergebnis = _seite.evaluate("""() => {
-          const klappe = document.querySelector(
-            '.gr-tmodell:not([hidden]) details.gr-karten-auf');
-          if (!klappe) return null;
-          klappe.open = true;
-          const karte = klappe.querySelector('.gr-kkarte');
-          return {sichtbar: !!karte.offsetParent,
-                  hoehe: Math.round(karte.getBoundingClientRect().height)};
+          const z = document.querySelector('#gr-bndliste .gr-bnd');
+          if (!z) return null;
+          z.open = true;
+          const rw = z.querySelector('.gr-bnd-rw');
+          return {sichtbar: !!rw.offsetParent,
+                  hoehe: Math.round(rw.getBoundingClientRect().height)};
         }""")
         _seite.wait_for_timeout(200)
     finally:
         _seite.remove_listener("request", _zaehle)
         # Den Ausgangszustand zurueckgeben: die Seite hat Modulgueltigkeit,
-        # und ein spaeterer Test misst sonst eine aufgeklappte Klappe.
-        _seite.evaluate("""() => document.querySelectorAll(
-              'details.gr-karten-auf').forEach(k => { k.open = false; })""")
-    assert ergebnis is not None, "keine Kartenklappe im Modellblock"
-    assert ergebnis["sichtbar"], "die Karte bleibt nach dem Oeffnen unsichtbar"
-    assert ergebnis["hoehe"] > 100, \
-        f"die Karte hat nach dem Oeffnen nur {ergebnis['hoehe']} px Hoehe"
+        # und ein spaeterer Test misst sonst eine aufgeklappte Zeile.
+        _seite.evaluate(
+            "() => document.querySelectorAll('.gr-bnd')"
+            ".forEach(z => { z.open = false; })")
+    assert ergebnis is not None, "keine Bündelzeile im Modellblock"
+    assert ergebnis["sichtbar"], "der Rechenweg bleibt unsichtbar"
+    assert ergebnis["hoehe"] > 60, \
+        f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
     assert anfragen == [], \
         f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
-
-
-def test_der_anbieterfilter_wirkt_auch_in_der_klappe(_seite):
-    """Der Anbieterfilter war seit Phase R (04.09.2026) von keinem Test
-    bedient (diff-reviewer OPTIK-6) - und seit OPTIK-6 steht er in der
-    Kartenklappe. Beides deckt dieser Test: Klappe auf, Filter auf einen
-    Anbieter, nur dessen Karten bleiben, Gegenprobe ohne Filter."""
-    _frisch(_seite)
-    anbieter = _seite.evaluate(
-        """() => document.querySelector(
-              '.gr-tmodell:not([hidden]) [data-anbieterfilter] option[value]:not([value=""])')
-            ?.value || ''""")
-    assert anbieter, "die Fixture kennt keinen Anbieter im Filter"
-    _seite.select_option(
-        ".gr-tmodell:not([hidden]) [data-anbieterfilter]", anbieter)
-    _seite.wait_for_timeout(80)
-    namen = _seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden]) .gr-kkarte:not([hidden])",
-        "e => [...new Set(e.map(k => k.dataset.anbieter))]")
-    assert set(namen) == {anbieter}, namen
-    # Gegenprobe: ohne Filter sind WENIGSTENS zwei Anbieter sichtbar -
-    # sonst traefe der Filter eine Fixture, die ohnehin nur einen kennt.
-    _seite.select_option(
-        ".gr-tmodell:not([hidden]) [data-anbieterfilter]", "")
-    _seite.wait_for_timeout(80)
-    alle = _seite.eval_on_selector_all(
-        ".gr-tmodell:not([hidden]) .gr-kkarte:not([hidden])",
-        "e => [...new Set(e.map(k => k.dataset.anbieter))]")
-    assert len(set(alle)) >= 2, alle
