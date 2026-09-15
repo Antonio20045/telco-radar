@@ -2731,6 +2731,32 @@ b,strong{font-weight:700}
 .gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
   border:1px solid var(--rule);background:var(--paper-2)}
 
+/* SQ67 (15.09.2026): Das Klapplabel nennt die HANDLUNG und ist keine
+   Kleinheit am Blockende mehr. 15 px Sans fett liegt ueber jeder Zahl der
+   Steuerleiste (12/13 px) und jedem `.gr-a-klein` - der Toggle ist das
+   groesste Bedienelement des Blocks, nicht sein Randnotiz-Stil. */
+.gr-karten-auf>summary{font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;padding:10px 0;color:var(--ink)}
+.gr-karten-auf>summary:hover{color:var(--red-deep)}
+
+/* SQ67: Das Glossar am Ende der Vergleichstafel - je Begriff eine Zeile,
+   Begriff in Sans fett links, Definition in Serife rechts. Linien statt
+   Kasten (Hausregel); auf dem Telefon untereinander statt nebeneinander. */
+.gr-glossar{margin-top:26px}
+.gr-glossar-liste{margin:0}
+.gr-glossar-eintrag{display:grid;grid-template-columns:230px 1fr;gap:14px;
+  padding:10px 0;border-top:1px solid var(--rule-2)}
+.gr-glossar-eintrag dt{font-family:var(--sans);font-weight:700;font-size:13px;
+  color:var(--ink);margin:0}
+.gr-glossar-eintrag dd{margin:0;font-size:15px;line-height:1.5;
+  color:var(--ink-2)}
+.gr-glossar-link{margin:2px 0 18px;font-family:var(--sans);font-size:12.5px}
+.gr-glossar-link a{color:var(--red);font-weight:700;
+  text-decoration:underline;text-underline-offset:3px}
+@media (max-width:900px){
+  .gr-glossar-eintrag{grid-template-columns:1fr;gap:3px}
+}
+
 /* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
    Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
    SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`
@@ -2774,6 +2800,15 @@ b,strong{font-weight:700}
 .gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
 .gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
   color:var(--ink-2)}
+/* SQ67: Die Paradox-Zeile unter „Gerät X € / mit Tarif Y €". Zurueck-
+   genommen (13,5 px, grau), aber im Lesefluss und ohne Klick sichtbar -
+   sie erklaert die beiden Zahlen ueber ihr, sie konkurriert nicht mit
+   ihnen. Nicht unter 12 px: Vorlagenregel 2 dieser Seite.
+   Die Regel steht HINTER `.gr-kk-zweit` (beide Selektoren 0,1,0, das
+   Element traegt beide Klassen): weiter oben gewann die 16-px-Serife
+   der Zweitzahl, die zurueckgenommene Stimme war wirkungslos - gefun-
+   den in der Browser-Messung, nicht im Quelltext. */
+.gr-kk-paradox{font-size:13.5px;line-height:1.45;color:var(--ink-3)}
 .gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
 /* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur

@@ -480,16 +480,31 @@
      diesem Anbieter nicht gemessen, steht die benannte Lücke (der
      Marktpreis eines fremden Anbieters steht, wo es ihn gibt, in der
      eff-Zeile weiter unten mit Namen). #}
+  {# SQ67 (15.09.2026): DIE PARADOX-ZEILE. "Gerät 999 €, mit Tarif 941 €"
+     - die mit-Tarif-Zahl kann HOEHER liegen (Barpreis plus Tarifmonate,
+     Vodafone-Referenz) wie NIEDRIGER (finanziertes Gerät im Buendel,
+     o2) - fuer die Zielgruppe ohne Erklärung ein Widerspruch der Karte
+     gegen sich selbst. EIN kurzer Satz direkt unter den zwei Preisen,
+     mit dem Zeitraum, der die Zahl traegt (`k.laufzeit`, dasselbe Feld
+     wie das TCO-Label). Der Finanzierungs-Zweig nennt bewusst kein
+     "Gerätepreis": auf der congstar-Karte ist das Wort vor dem Rechenweg
+     verboten, weil die Karte dort KEINEN behaupten darf
+     (test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis). #}
   {% if k.geraetepreis is not none and k.geraetepreis_art == "finanzierung" %}
   <p class="gr-kk-leit"><b>Finanzierung gesamt</b> <span>{{ k.geraetepreis | euro }}</span></p>
   <p class="gr-kk-zweit">Zuzahlung und alle Geräteraten · tarifabhängig</p>
   <p class="gr-kk-zweit">Gerät ohne Vertrag: bei {{ k.anbieter }} nicht
   erhoben</p>
   <p class="gr-kk-zweit">mit Tarif: <b>{{ k.label }}</b> {{ k.gesamt | euro }}</p>
+  <p class="gr-kk-zweit gr-kk-paradox">„mit Tarif“ = {{ k.laufzeit }}
+  Monatsraten für Tarif und Gerät zusammen – deshalb ein anderer Betrag
+  als die Finanzierung gesamt</p>
   <p class="gr-kk-omonat">Ø {{ k.schnitt_monat | euro }}/Monat</p>
   {% elif k.geraetepreis is not none %}
   <p class="gr-kk-leit"><b>Gerätepreis</b> <span>{{ k.geraetepreis | euro }}</span></p>
   <p class="gr-kk-zweit">mit Tarif: <b>{{ k.label }}</b> {{ k.gesamt | euro }}</p>
+  <p class="gr-kk-zweit gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.laufzeit }}
+  Monate Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
   <p class="gr-kk-omonat">Ø {{ k.schnitt_monat | euro }}/Monat</p>
   {% else %}
   <p class="gr-kk-leit"><b>{{ k.label }}</b> <span>{{ k.gesamt | euro }}</span></p>
@@ -807,6 +822,12 @@
     {% endif %}
   </div>
 
+  {# SQ67 (15.09.2026): der EINE sichtbare Weg zum Glossar - kein Satz,
+     nur der Verweis. Steht direkt unter der Auswahl, weil die vier
+     Begriffe genau die Felder benennen, die diese Auswahl steuern. #}
+  <p class="gr-glossar-link"><a href="#gr-glossar">Begriffe erklärt:
+  TCO-24, Tarifband, Bündel, Abweichung zu Vodafone</a></p>
+
   {# --- 2.-5. Je Modell: Antwortzeile, Zeitreihe (G0), Tarifband-Graph
          (GRAPH-1), Anbieterkarten ---------------------------------------- #}
   {% for m in geraete.tco.modelle %}
@@ -1004,9 +1025,16 @@
            Referenzrechnung, Leerkarten und Haendler zusammen; die
            Angebotszahl darueber (`gr-mband`) meint eine andere Menge. #}
     {% set haendler_namen = ("Amazon", "Expert", "Saturn") %}
+    {# SQ67 (15.09.2026): Das Klapplabel nennt die HANDLUNG und die Zahl -
+       "Anbieterkarten (22)" war ein Etikett ueber einem Bedienelement,
+       dessen Wirkung niemand beschrieb (PM-Befund: "klein am Blockende").
+       Die Zahl steht als nackter Text DIREKT vor dem Wort (kein
+       zwischengeschaltetes Tag - das Abnahmekriterium greift die Zeile
+       per grep an den Quelltext), deshalb setzt app.js seitdem den
+       GESAMTEN Labeltext neu statt nur ein Zahl-Span; der Wortlaut steht
+       an beiden Stellen identisch, ein Test haelt sie zusammen. #}
     <details class="gr-auf gr-karten-auf">
-      <summary>Anbieterkarten (<span class="gr-kzahl">{{ m.karten | length
-        + haendler_namen | length }}</span>)</summary>
+      <summary>{{ m.karten | length + haendler_namen | length }} Anbieterangebote anzeigen</summary>
       <div class="gr-ksteuer">
         <label>Sortierung <select data-sortiere>
           <option value="schnitt">Ø je Monat, aufsteigend</option>
@@ -1278,6 +1306,56 @@
   </div>
   {% endif %}
   </details>
+
+  {# --- Das Glossar (SQ67, 15.09.2026): vier Begriffe, je EIN Satz.
+
+         Die Zielgruppe sind Device-Einkaeufer, keine Endkunden - aber
+         "TCO-24", "Tarifband", "Buendel" und das Abweichungs-Vorzeichen
+         kehren auf jeder Karte wieder, und wer sie nicht kennt, liest die
+         Zahlen falsch statt nur ungenau. Das ist keine Rueckkehr der am
+         03.09.2026 geloeschten Erklaersektionen: jene kommentierten die
+         DATENPFLEGE ("warum liefert wer nichts"), diese definieren die
+         FACHBEGRIFFE der Zahlen, die ueber ihnen stehen - und stehen als
+         eigener Abschnitt AM ENDE der Tafel, nicht im Lesefluss.
+
+         Sichtbar, keine Aufklappung: der Auftrag verlangt ein SICHTBARES
+         Glossar, erreichbar ueber den Link unter der Modell-Auswahl. Die
+         Saetze sind Definitionen, keine Methodenabsaetze - der Rechenweg
+         steht je Karte im eigenen Aufklapper. #}
+  <section class="gr-glossar" id="gr-glossar">
+    <h2 class="rubrik">Begriffe erklärt</h2>
+    <dl class="gr-glossar-liste">
+      <div class="gr-glossar-eintrag">
+        <dt>TCO-24</dt>
+        <dd>Die Gesamtkosten über 24 Monate – Zuzahlung und Geräteraten
+        plus Tarifkosten plus Anschlusspreis, abzüglich der beim Namen
+        genannten Boni; 24 Monate sind der Rechnungshorizont, nicht die
+        Laufzeit jedes Angebots (längere Bindungen tragen ihr TCO im
+        Etikett, etwa TCO-36).</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Tarifband</dt>
+        <dd>Die Größe des Datenvolumens eines Tarifs in drei Stufen –
+        klein bis 20 GB, mittel 21 bis 60 GB, groß darüber –; eine Linie
+        oder Karte je Anbieter, der im gewählten Band ein Bündel führt,
+        während unbegrenzte Tarife und Tarife ohne erhobenes Volumen ohne
+        Tarifband stehen.</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Bündel</dt>
+        <dd>Gerät und Tarif, die ein Anbieter nur zusammen verkauft – der
+        genannte Monatspreis gilt für beides, weshalb ein Gerätepreis ohne
+        Vertrag bei diesem Anbieter nicht messbar ist.</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Abweichungs-Vorzeichen (+/−) zu Vodafone</dt>
+        <dd>Minus heißt: das Angebot ist günstiger als die
+        Vodafone-Referenz für dasselbe Gerät – der für uns ungünstige
+        Fall; Plus heißt: es ist teurer. Die Abweichung ist
+        Anbieter-TCO minus Vodafone-Referenz, geteilt durch die Referenz.</dd>
+      </div>
+    </dl>
+  </section>
   <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 </section>
 </div>

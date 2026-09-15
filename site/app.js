@@ -911,7 +911,12 @@ var TelcoFrage = (function () {
     var behaelter = block.querySelector('.gr-karten');
     var sortiere = block.querySelector('[data-sortiere]');
     var filter = block.querySelector('[data-anbieterfilter]');
-    var zahlEl = block.querySelector('.gr-kzahl');
+    /* SQ67 (15.09.2026): Das Klapplabel nennt die HANDLUNG ("22
+     * Anbieterangebote anzeigen"). Die Zahl steht ohne einschliessendes
+     * Tag direkt im Text (das Abnahmekriterium greift sie per grep am
+     * Quelltext), deshalb wird hier der GESAMTE Labeltext neu gesetzt und
+     * nicht mehr nur ein Zahl-Span - derselbe Wortlaut wie im Template. */
+    var label = block.querySelector('.gr-karten-auf > summary');
     if (!behaelter) return;
     var karten = Array.prototype.slice.call(
       behaelter.querySelectorAll('.gr-kkarte'));
@@ -954,10 +959,11 @@ var TelcoFrage = (function () {
     }
     sortiert.filter(function (k) { return !k.getAttribute('data-band'); })
             .forEach(stelle);
-    if (zahlEl) {
-      zahlEl.textContent = sichtbar === karten.length
+    if (label) {
+      label.textContent = (sichtbar === karten.length
         ? String(karten.length)
-        : sichtbar + ' von ' + karten.length;
+        : sichtbar + ' von ' + karten.length)
+        + ' Anbieterangebote anzeigen';
     }
   }
 

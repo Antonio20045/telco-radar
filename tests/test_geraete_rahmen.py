@@ -188,9 +188,14 @@ def test_die_anbieterkarten_stehen_in_einer_geschlossenen_klappe(tmp_path):
         # Regel wie bei der Legende der alten Positionskarte: eine Klammer,
         # die anders zaehlt als der Bestand darunter, ist der Fehlertyp
         # "153 Preispunkte aus 348 Listungen".
+        # SQ67 (15.09.2026): Das Label nennt die HANDLUNG ("22
+        # Anbieterangebote anzeigen") statt der Klammerform
+        # "Anbieterkarten (22)" - angepasst ist nur das Muster, die
+        # Zaehlung gegen die Karten der Klappe bleibt.
         summary = klappe.select_one("summary")
         assert summary is not None
-        treffer = re.search(r"\((\d+)\)", summary.get_text())
+        treffer = re.search(r"(\d+)\s+Anbieter[a-zäöü]* anzeigen",
+                            summary.get_text())
         assert treffer, f"Ueberschrift ohne Zahl: {summary.get_text()!r}"
         assert int(treffer.group(1)) == len(karten), \
             (f"{block.get('data-modell')}: Ueberschrift zaehlt "
