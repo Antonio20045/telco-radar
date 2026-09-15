@@ -20,6 +20,15 @@ nie etwas. Er ist die Chronik der Messungen, nicht das Bild des Marktes.
        Zustandsworts in der Farbe ("mitternacht erneuert" -> "mitternacht",
        "titanium black gebraucht" -> "titanium black", und so fort).
 
+    3. Dieselbe Farbe steht in zwei Schreibweisen (RV-2, Review vom
+       09.09.2026): "Tiefblau Saturn" neben "tiefblau Telekom" liest sich
+       wie ein Datenfehler, obwohl es zwei Läden sind. Der Zwillings-
+       Schluessel faltet Gross/klein schon - die ANZEIGE tat es nicht.
+       `_mit_einheitlicher_schreibweise` gibt jeder gefalteten Farbe eine
+       Schreibweise im ganzen Bestand; zusammengefasst werden Zeilen
+       deswegen keine (siehe unten: eine echte Farbvariante ist kein
+       Zwilling - und zwei Läden schon gar nicht).
+
 Was der Zustand in der Farbe NICHT ist: die einzige Fundstelle. Ueber alle
 370 sichtbaren Listungen gemessen traegt keine einzige ihr Kennzeichen nur
 dort - alle zehn nennen es zusaetzlich im Titel ("Apple iPhone 14
@@ -141,7 +150,8 @@ from typing import Optional
 
 from ..analyze.geraete_store import STATUS_AKTIV
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
-                             ohne_zustandswort, zustand_aus_feldern)
+                             normalisiere, ohne_zustandswort,
+                             zustand_aus_feldern)
 
 # Die zwei Felder, aus denen Anzeige und Export ihre Farbe bauen - beide mit
 # demselben Ausdruck `farbe_normalisiert or farbe_roh`
@@ -156,10 +166,11 @@ FARBFELDER = ("farbe_normalisiert", "farbe_roh")
 def bereinige(eintraege: list[dict]) -> list[dict]:
     """Der Bestand, wie er ANGEZEIGT und EXPORTIERT wird.
 
-    Zwei Schritte in dieser Reihenfolge: erst faellt das Zustandswort aus
-    der Farbe, dann werden Zwillinge zusammengefasst. Die Reihenfolge
-    traegt die zweite Haelfte - vor Schritt 1 sind "mitternacht erneuert"
-    und "mitternacht" zwei Farben und damit zwei Listungen.
+    Drei Schritte in dieser Reihenfolge: erst faellt das Zustandswort aus
+    der Farbe, dann bekommt jede Farbe EINE Schreibweise, dann werden
+    Zwillinge zusammengefasst. Die Reihenfolge traegt die letzte Haelfte -
+    vor Schritt 1 sind "mitternacht erneuert" und "mitternacht" zwei Farben
+    und damit zwei Listungen.
 
     Gibt KOPIEN zurueck; die uebergebenen dicts werden nicht veraendert
     (siehe Modulkopf: eine geaenderte Farbe im Store setzt Listungsdauer und
@@ -171,7 +182,8 @@ def bereinige(eintraege: list[dict]) -> list[dict]:
     sieht.
     """
     sauber = [_mit_sauberer_farbe(e) for e in eintraege]
-    return _ohne_zwillinge(sauber)
+    einheitlich = _mit_einheitlicher_schreibweise(sauber)
+    return _ohne_zwillinge(einheitlich)
 
 
 def _mit_sauberer_farbe(eintrag: dict) -> dict:
@@ -216,6 +228,76 @@ def _mit_sauberer_farbe(eintrag: dict) -> dict:
         if wert:
             kopie[feld] = ohne_zustandswort(wert)
     return kopie
+
+
+def _anzeigefarbe(eintrag: dict) -> str:
+    """Die Farbe, die jeder Verbraucher liest: `farbe_normalisiert or farbe_roh`.
+
+    Derselbe Ausdruck wie in `geraete_view.katalogzeilen()`,
+    `geraete_vergleich._angebot()` und `geraete_export.aktuell_csv()`. Die
+    Schreibweisen-Faltung muss genau die Stelle erreichen, die alle vier
+    lesen - sonst zeigt der Katalog eine Schreibweise und der Export die
+    andere, und der Befund waere nicht behoben, nur verschoben.
+    """
+    return eintrag.get("farbe_normalisiert") or eintrag.get("farbe_roh") or ""
+
+
+def _mit_einheitlicher_schreibweise(eintraege: list[dict]) -> list[dict]:
+    """JE gefalteter Farbe EINE Schreibweise im ganzen Bestand (RV-2).
+
+    Der Fall, der das noetig gemacht hat (Review vom 09.09.2026, Befund 2):
+    dasselbe iPhone 17 Pro 256 GB stand in der Katalogtabelle als
+    "Tiefblau Saturn↗" neben "tiefblau Telekom↗". Das sind zwei LAEDEN mit
+    zwei Preisen - zwei Zeilen, und die bleiben zwei, denn zwei Angebote
+    verschiedener Läden zu einer Zeile zu falten löschte einen wahren Preis
+    (Modulkopf: "Die Falle: eine echte Farbvariante ist kein Zwilling").
+    Was die zwei Zeilen zum vermeintlichen Datenfehler machte, war die
+    SCHREIBWEISE: dieselbe Farbe stand zweimal da, einmal groß- und einmal
+    kleingeschrieben, und der Erklärtext über der Tabelle verspricht
+    "Zwei Schreibweisen derselben Listung stehen dabei als eine Zeile".
+    Gefaltet wird deshalb die Schreibweise, nicht die Zeile: Nach diesem
+    Schritt zeigt der ganze Bestand jede Farbe in genau einer Form.
+
+    Gefaltet wird über `normalisiere` (Groß/klein, Umlaute, Trennzeichen)
+    und NICHT über `farbschluessel`: Der Zwillings-Schluessel streicht auch
+    Kürzel ("pistachio bk" -> "pistachio"), und das ist dort richtig - als
+    ANZEIGE versteckte es die zweite o2-Listung, die es wirklich gibt (der
+    Doppelpreis vom 31.08.2026). Zwei verschiedene Farben bleiben zwei
+    Schreibweisen; nur Varianten, die sich allein in Groß-/Kleinschreibung,
+    Umlauten oder Trennern unterscheiden, werden eine.
+
+    Welche Schreibweise stehen bleibt, entscheidet der Bestand selbst: die
+    haeufigste gewinnt, bei Gleichstand die alphabetisch kleinere. Beides
+    ist deterministisch und haengt an keinem Datum - dieselbe Eingabe
+    liefert immer dieselbe Ausgabe (K-1-Lehre: keine Zeit- oder
+    Tagesabhaengigkeit in der Faltung).
+
+    Auch hier gilt: geschrieben wird in die KOPIEN aus Schritt 1, nie in
+    den Store - dieselbe Begruendung wie oben, eine andere Schreibweise in
+    `geraete_db.json` wuerde die `sku_id`-Stabilitaet gefaehrden. Und
+    geschrieben wird in das Feld, aus dem die Anzeige KAM: die Faltung
+    darf an `farbe_normalisiert` nichts als kanonisch ausweisen, was nicht
+    aus `config/farben.yaml` kommt.
+    """
+    haefigkeit: dict[str, dict[str, int]] = {}
+    for eintrag in eintraege:
+        anzeige = _anzeigefarbe(eintrag)
+        if anzeige:
+            schluessel = normalisiere(anzeige)
+            haefigkeit.setdefault(schluessel, {})
+            haefigkeit[schluessel][anzeige] = haefigkeit[schluessel].get(anzeige, 0) + 1
+    vertreter = {s: min(v.items(), key=lambda kv: (-kv[1], kv[0]))[0]
+                 for s, v in haefigkeit.items()}
+    for eintrag in eintraege:
+        anzeige = _anzeigefarbe(eintrag)
+        neu = vertreter.get(normalisiere(anzeige)) if anzeige else None
+        if neu is None or neu == anzeige:
+            continue
+        if eintrag.get("farbe_normalisiert"):
+            eintrag["farbe_normalisiert"] = neu
+        else:
+            eintrag["farbe_roh"] = neu
+    return eintraege
 
 
 def _ohne_zwillinge(eintraege: list[dict]) -> list[dict]:
