@@ -103,8 +103,20 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                       jetzt: Optional[datetime] = None,
                       frist_sekunden: Optional[float] = FRIST_STANDARD,
-                      hole: Optional[Callable] = None) -> dict:
-    """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck."""
+                      hole: Optional[Callable] = None,
+                      referenz_anbieter: Optional[set] = None) -> dict:
+    """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck.
+
+    `referenz_anbieter` grenzt die SIM-only-Referenzstufe ein (Menge von
+    Anbieternamen wie im Tarifbestand). Der naechtliche Gesamtlauf ruft
+    OHNE den Parameter und erneuert den Massstab fuer alle Anbieter wie
+    bisher. Ein Lokallauf EINES Anbieters (scripts/lokallauf_*.py) uebergibt
+    seinen Namen - dann wird auch die 1&1-SIM-only-Messung (S-5) nur
+    ausgefuehrt, wenn 1&1 selbst im Scope liegt, und der Store traegt
+    heutige Daten NUR an die Referenzen dieses Anbieters ein. Der Lauf
+    vom 15.09.2026 hat ohne diesen Scope 35 Fremd-Referenzen neu datiert
+    und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
+    """
     beginn = time.monotonic()
     jetzt = jetzt or datetime.now(timezone.utc)
     root = Path(root)
@@ -303,7 +315,17 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             # TEILBESTAND schreiben, der die Fremd-Referenzen beim
             # Ersetzen loescht.
             try:
-                simonly_refs, simonly_protokoll = sammle_simonly(hole, heute)
+                # Der Scope entscheidet auch ueber DIESEN Abruf: ein
+                # Lokallauf, der 1&1 nicht misst, ruft 1&1 auch nicht ab
+                # (Befund Runde 2: 10 Requests an 1und1.de aus dem
+                # Telekom-Lauf vom 15.09.2026).
+                if referenz_anbieter is not None \
+                        and SIMONLY_ANBIETER not in referenz_anbieter:
+                    simonly_refs = []
+                    simonly_protokoll = {}
+                else:
+                    simonly_refs, simonly_protokoll = sammle_simonly(
+                        hole, heute)
             except Exception as exc:                 # noqa: BLE001
                 simonly_refs = []
                 log.warning("1&1 SIM-only-Messung gescheitert (%s) - die "
@@ -338,7 +360,8 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
             # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
             # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
-            _, entfernt = tco.ersetze_referenzen(referenzen, heute)
+            _, entfernt = tco.ersetze_referenzen(referenzen, heute,
+                                                 anbieter=referenz_anbieter)
             if entfernt:
                 log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
                          "entfernt", entfernt)

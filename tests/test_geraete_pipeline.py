@@ -788,3 +788,43 @@ def test_gescheiterte_simonly_messung_laesst_den_bestand_stehen(tmp_path):
         "https://www.1und1.de/handytarife"
     assert nach_name["1&1 All-Net-Flat S"]["anschlusspreis"] is None
     assert len(tco["sim_only"]) == 2
+
+
+def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
+        tmp_path, monkeypatch):
+    """Befund Runde 2 (15.09.2026): der Telekom-Lokallauf datierte 35
+    Fremd-Referenzen neu und rief dafuer 1&1 ab. `referenz_anbieter`
+    schliesst BEIDES: kein Schreibzug auf Fremde, kein Abruf bei Fremden.
+
+    Gegenprobe im selben Test: der erste Lauf OHNE Scope datiert beide
+    Anbieter - nur der Scope haelt den 1&1-Eintrag zurueck, nicht etwa
+    eine Eigenschaft der Fixture."""
+    from telco_radar.collect import tarif_einsundeins_simonly
+    monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
+    root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
+
+    # Erster Lauf ohne Scope (die 1&1-Seite ist hier nicht einmal
+    # erreichbar - die Messung schlaegt fehl, die Bestandsableitung
+    # bleibt, beide Referenzen entstehen mit dem Laufdatum).
+    run_geraete_stage(root, {}, "2026-09-14", jetzt=_jetzt(), hole=_hole())
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    vorher = {r["tarif_name"]: r for r in tco["sim_only"]}
+    assert vorher["1&1 All-Net-Flat S"]["last_verified"] == "2026-09-14"
+    assert vorher["MagentaMobil L"]["last_verified"] == "2026-09-14"
+
+    # Zweiter Lauf MIT Scope auf Telekom - und mit Recorder an `hole`:
+    # kein einziger Abruf darf hinausgehen, der nicht Telekom/Medimax
+    # gilt (insbesondere keiner gegen 1und1.de).
+    abrufe: list = []
+    run_geraete_stage(root, {}, "2026-09-15", jetzt=_jetzt(),
+                      hole=_hole(protokoll=abrufe),
+                      referenz_anbieter={"Telekom"})
+    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    nachher = {r["tarif_name"]: r for r in tco["sim_only"]}
+    # Der Fremde bleibt bytegleich auf seinem alten Stand - kein
+    # last_verified von heute, keine neue Ableitung, keine Loeschung.
+    assert nachher["1&1 All-Net-Flat S"] == vorher["1&1 All-Net-Flat S"]
+    assert nachher["MagentaMobil L"]["last_verified"] == "2026-09-15"
+    assert not [url for url in abrufe if "1und1" in url]
