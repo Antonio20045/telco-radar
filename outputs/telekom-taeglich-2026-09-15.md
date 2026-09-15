@@ -38,13 +38,16 @@ Dazu der separate Geräte-Beleg `outputs/beleg-telekom-geraete-2026-09-15.json`
 — **17 Requests, alle `200 OK`, alle ehrlich** (`alle_ehrlich: true`),
 derselbe Protokollhaken: robots.txt (301→`/content/robots`, 200),
 Geraetekategorie `…/shop/geraete/smartphones/ohne-vertrag`, fünf
-Bündel-Einstiege `…/smartphones?tariffId=MF_1777x` — dazu 10 Abrufe gegen
-`1und1.de`/`mobile.1und1.de`: die SIM-only-Referenzen, die
-`run_geraete_stage()` als Teil der dokumentierten Stage seit dem 09.09.
-mitliest (7 Tarifdetails, „45 SIM-only-Referenzen aus 56 Tarifen"). Kein
-Konfigurations- oder Codeeingriff an anderen Anbietern; der globale UA in
-`config/settings.yaml` ist unangetastet (Per-Anbieter-Override nur Telekom,
-siehe Skript-Docstring).
+Bündel-Einstiege `…/smartphones?tariffId=MF_1777x` — dazu **10 Abrufe gegen
+`1und1.de`/`mobile.1und1.de` (www: 2, mobile: 8). Diese Abrufe waren die
+Scope-Verletzung des Laufs** — verursacht durch `sammle_simonly()` in
+`run_geraete_stage()`, das seit dem 09.09. fester Bestandteil der Stage ist
+und im Lokallauf ohne Anbieterbegrenzung lief (7 Tarifdetails,
+„45 SIM-only-Referenzen aus 56 Tarifen"). Sie sind geschehen und bleiben
+hier dokumentiert; bereinigt und behoben ist die Folge — siehe
+„Nachbesserung Runde 2". Kein Konfigurations- oder Codeeingriff an anderen
+Anbietern; der globale UA in `config/settings.yaml` ist unangetastet
+(Per-Anbieter-Override nur Telekom, siehe Skript-Docstring).
 
 ## Messbilanz (Kriterium 2) — ausschließlich echte Beobachtungen
 
@@ -70,6 +73,15 @@ Bestand 605, 66,2 s; Buendel: 35 von 35 Rohsaetzen uebernommen (0 neu),
 45 SIM-only-Referenzen aus 56 Tarifen
 ```
 
+> **Korrektur (Runde 2):** Die Zahl „45 SIM-only-Referenzen aus 56
+> Tarifen" war die Protokollzeile der Stage — sie misst die ABGELEITETE
+> Menge, nicht den berechtigten Schreibumfang dieses Laufs. Nach der
+> Bereinigung tragen **10 Referenzen (Telekom)** heutige Daten; die
+> übrigen **35 Fremd-Referenzen** (1&1 7, Vodafone 5, congstar 10,
+> o2 13) wurden vom Lauf zu Unrecht neu datiert — 28 davon ohne jeden
+> Abruf (reine Bestandsableitung), 7 (1&1) über 10 Abrufe gegen
+> 1und1.de. Siehe „Nachbesserung Runde 2".
+
 | Beobachtung | Detail |
 |---|---|
 | **Preisänderung** | Apple iPhone 17 256 GB violett: **948,60 → 1096,20 €** (+147,60 €, +15,6 %). Vorheriger bestätigter Punkt dieser SKU in der Telekom-Reihe: 2026-09-05 (am 09.09. unverändert bestätigt). Neuer Punkt `datum: 2026-09-15` mit Beleg-URL (`…/shop/geraet/apple/apple-iphone-17/lavendel-256-gb…`) und `verfuegbarkeit: lieferbar` |
@@ -90,6 +102,15 @@ einen Lauf.
  data/state/geraete_tco.json       | 336 +/- (35 Bündel + Referenzen, Datum heute)
  data/state/geraete_tco_historie.jsonl | +35 (Messtag 2026-09-15, idempotent)
 ```
+
+> **Korrektur (Runde 2):** Die Zeile `geraete_tco.json` galt ursprünglich
+> „35 Bündel + Referenzen". Nach der Bereinigung zählt der Diff gegen
+> `origin/main` **45 geänderte Einträge, alle Telekom**: 35 Bündel
+> (`abgerufen_am`/`last_verified` 09.09.→15.09., dazu 30 `quelle_url` mit
+> neuem `&forwardTradeInApplied=false`-Parameter) und 10 SIM-only-
+> Referenzen. **Kein Nicht-Telekom-Eintrag ist mehr verändert** — die
+> ursprünglich 35 Fremd-Änderungen sind auf den Basisstand
+> (`9dd8d59`) zurückgesetzt.
 
 ## Render + keyword-index (Kriterium 3)
 
@@ -149,10 +170,139 @@ outputs/beleg-telekom-geraete-2026-09-15.json,
 outputs/telekom-taeglich-2026-09-15.md
 ```
 
+Dazu in Runde 2 (Nachbesserungs-Artefakte, eigene Commits):
+
+```
+data/state/geraete_tco.json          (Bereinigung der 35 Fremd-Einträge)
+scripts/lokallauf_telekom.py         (Scope + Lauf-Manifest)
+src/telco_radar/analyze/tco_store.py (Anbieter-Scope am Referenz-Store)
+src/telco_radar/geraete_pipeline.py  (referenz_anbieter-Parameter)
+tests/test_geraete_pipeline.py, tests/test_tco_model.py (jeweils 1 neuer Test)
+outputs/beleg-telekom-lokallauf-2026-09-15-run.json (nachgetragener Manifest)
+outputs/telekom-taeglich-2026-09-15.md (dieser Bericht)
+site/geraete.html                     (Neu-Render nach Bereinigung)
+```
+
 Vor dem Commit geprüft: Diff nur auf die genannten Pfade, Branch
 `openclaw/ticket-telekom-taeglich-20260915` (Basis `origin/main`), Status
 sonst sauber, kein `uv.lock`, kein Stash-Rest. Gepusht wird ausschließlich
 dieser Branch; kein Merge nach `main`, kein Deploy, kein Hook-Curl.
+
+## Nachbesserung Runde 2 (15.09.2026, nach der Abnahme)
+
+Der Lauf bleibt **genau ein Messpunkt** — kein zweiter Abruf irgendeiner
+Art ist erfolgt: beide Beleg-Dateien sind byte-identisch mit Commit
+`316eb69` (SHA-256 im Lauf-Manifest, s. u.), es wurde ausschließlich
+lokaler State, Code und der Bericht angefasst.
+
+### Ursache — zwei Stellen in `run_geraete_stage()`
+
+Der Schreibpfad des Telefons der Fremd-Änderungen (nachgegangen in
+`src/telco_radar/geraete_pipeline.py` und `analyze/tco_store.py`):
+
+1. **Der 1&1-Abruf:** `sammle_simonly(hole, heute)` (S-5, 09.09.) lief
+   als fester Teil der Referenzstufe — ohne Anbieterbegrenzung. Das sind
+   die 10 Requests gegen `www.1und1.de` (2) und `mobile.1und1.de` (8);
+   sie lieferten 7 frische 1&1-Referenzen mit `abgerufen_am: 2026-09-15`.
+2. **Das Neu-Datieren der Fremden:** die Referenzstufe leitet ihren
+   Maßstab aus dem GESAMTEN `tarife.jsonl` ab (`aus_bestand(bestand)`,
+   alle 56 Tarife) und `ersetze_referenzen(referenzen, heute)` frischt
+   via `setze_referenzen()` **jeden** Eintrag mit `last_verified: heute`
+   auf — auch die 28 (o2 13, congstar 10, Vodafone 5), deren Anbieter in
+   diesem Lauf weder drankam noch abgerufen wurde. Kein Konfigurations-
+   oder Codeeingriff — aber ein Schreibzug auf fremde Bestandsdaten.
+
+Die Kopplung ist **Design**, nicht Versehen: die SIM-only-Referenzen sind
+EIN global abgeleiteter Maßstab („Heute gibt es genau eine Quelle",
+Doku in `tco_store.ersetze_referenzen`). Ein einfaches Wegfiltern der
+Fremden aus der Ersetzungsmenge hätte sie **gelöscht** — der
+`veraltet`-Zweig von `ersetze_referenzen` nimmt alles weg, was nicht in
+der Menge steht. Deshalb wurde die Begrenzung als expliziter
+Anbieter-Scope gebaut und nicht als Filter davor.
+
+### Behoben — Ursache, nicht Symptom
+
+| Stelle | Änderung |
+|---|---|
+| `analyze/tco_store.py` | `setze_referenzen`/`ersetze_referenzen` tragen einen optionalen `anbieter`-Scope (Menge von Anbieternamen): Fremde werden weder aufgefrischt noch datiert noch als veraltet entfernt. Default `None` = alle — der nächtliche Gesamtlauf (`geraete.yml`, `pipeline.py`) rechnet exakt wie bisher |
+| `geraete_pipeline.py` | `run_geraete_stage(…, referenz_anbieter=None)`; bei gesetztem Scope ohne 1&1 wird `sammle_simonly()` **nicht aufgerufen** (kein Netz-Abruf bei Fremden) |
+| `scripts/lokallauf_telekom.py` | ruft die Stage mit `referenz_anbieter={"Telekom"}`; schreibt zudem einen Lauf-Manifest (s. u.) |
+
+Neue Tests (beide grün, Gegenprobe jeweils im selben Test):
+`tests/test_geraete_pipeline.py::test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab`
+(Stage: 1&1-Eintrag bytegleich auf altem Stand, kein 1und1-Abruf im
+Recorder; vorheriger Lauf ohne Scope datiert beide — beweist, dass der
+Scope der Grund ist) und
+`tests/test_tco_model.py::test_der_scope_veraendert_und_loescht_keine_fremdanbieter`
+(Store: fremde Referenz bleibt bei Scoped-Ersetzung stehen, ohne Scope
+wird dieselbe Menge sie löschen).
+
+**Offen, bewusst nicht angefasst:** die drei weiteren Lokallauf-Skripte
+(`lokallauf_congstar.py`, `lokallauf_saturn.py`, `lokallauf_einsundeins.py`)
+haben denselben Schreibpfad und können denselben Befund erzeugen. Der Fix
+ist generisch; die Umstellung der drei Skripte ist ein eigener Schritt
+(je Skript eine Zeile plus Blick auf den jeweilig richtigen
+Anbieternamen) und gehört nicht in diese Bereinigung.
+
+### Revert-Umfang (Kriterium 2, Beleg)
+
+`data/state/geraete_tco.json`: die **35 Fremd-Einträge** in `sim_only`
+wurden auf den exakten Basisstand (`9dd8d59`) zurückgesetzt — die
+Basis-Dicts, nicht Feldpflege. Zählung des Diffs `origin/main..HEAD`
+nach Anbieter danach:
+
+```
+sim_only: geaendert=10  neu=0 weg=0 -> {'telekom': 10}
+buendel:  geaendert=35  neu=0 weg=0 -> {'telekom': 35}
+```
+
+Telekom-Änderungen bleiben vollständig erhalten, einschließlich der
+echten Preisbeobachtung (iPhone 17 256 GB violett, 948,60 → 1.096,20 €,
+Preispunkt in `geraete_preise.jsonl` unberührt) und der 35
+Bündel-Messungen. `updated: "2026-09-15"` bleibt stehen — Telekom wurde
+heute tatsächlich geschrieben.
+
+### „Genau einmal" belegbar (Kriterium 4)
+
+Neu: `outputs/beleg-telekom-lokallauf-2026-09-15-run.json` — Run-ID
+(UUID), Start-/Endzeit, Exit-Status, SHA-256 beider Beleg-Dateien,
+`nachgetragen: true` mit Begründung. Ehrlich abgeleitet: Start/Ende sind
+**null** — der Lauf von Runde 1 erfasste keine Zeitstempel, die einzige
+exakte Kante ist Commit `316eb69` (AuthorDate 2026-09-15T04:46:36Z), der
+nach Lauf, Render und Suite gesetzt wurde; jede genauere Angabe wäre
+geraten. Künftige Läufe schreiben ihren Manifest selbst
+(`_schreibe_manifest` im Skript, mit `exit_status` auch im Crash-Fall).
+
+### Render und Suite nach der Bereinigung
+
+- Neu gerendert mit `load_config(root)` (CLAUDE.md §7).
+  `site/data/keyword-index.json`: **0 Zeilen Diff gegen `origin/main`**.
+- Der Preismarker `1.096,20` steht weiterhin auf `site/geraete.html`
+  (18 Vorkommen); die Bereinigung hat ihn nicht gekippt. Vom Neu-Rendern
+  geändert wurde allein `site/geraete.html` (die SIM-only-Tabelle zeigt
+  Abrufdaten).
+- Vollsuite an HEAD und am unveränderten Basisbaum `9dd8d59`
+  (Temp-Worktree):
+
+```
+Basis 9dd8d59: 1 failed, 2941 passed, 12 skipped in 351.02s
+HEAD (Runde 2): 1 failed, 2943 passed, 12 skipped in 350.88s
+               (Differenz +2 passed = die zwei neuen Scope-Tests)
+```
+
+  Der einzige Failed ist auf BEIDEN Bäumen derselbe Test mit demselben
+  Fehlerbild:
+  `tests/test_geraete_lifecycle.py::test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen`,
+  `AssertionError: 52` (`assert len(unbewegt) >= 80`) — der im
+  CLAUDE.md-Kontext bekannte, datenstandsbedingte vorbestehende Aussetzer,
+  in Runde 1 am Basisbaum identisch nachgewiesen. **Die zwei
+  Promo-Screenshot-Roten aus Runde 1 sind diesmal auf beiden Bäumen
+  grün** (an HEAD nachgemessen: `3 passed, 20 deselected`). Warum sie in
+  Runde 1 fielen und heute nicht mehr, ist von hier aus nicht rekonstruierbar —
+  auf beiden Bäumen verhalten sie sich identisch, und zählen dürfen sie nach
+  Auftrag nur als dokumentierte vorbestehende Rote. Kein neuer Roter kommt aus
+  der Nachbesserung; die Bereinigung hat das Fehlerbild des Lifecycle-Tests
+  nicht verändert.
 
 ## Fazit
 
@@ -164,3 +314,11 @@ ohne Browser aus. Suite ohne neue Regression (der dritte Rote ist am Basisbaum
 identisch reproduziert), `keyword-index.json` exakt auf Basis. Die Zeitreihe
 ist damit nach den zwei kontingentbedingten Lücken wieder lückenlos
 fortgeschrieben.
+
+Runde 2 hat den Lauf auf seinen berechtigten Umfang zurückgeschnitten: Die
+Messwerte selbst (Tarife, Preispunkt, Bündel, Auslistungen) bleiben — sie
+sind Telekom-Beobachtungen aus diesem einen Lauf. Was weg ist, ist nur die
+Kollateralschreiberei: 35 ohne Berechtigung neu datierte Fremd-Referenzen,
+zurückgesetzt auf den Basisstand, plus die Ursache im Code behoben. Der
+Messpunkt bleibt **genau einer** — kein zweiter Abruf, beide Belege
+byte-identisch mit dem ersten Commit.

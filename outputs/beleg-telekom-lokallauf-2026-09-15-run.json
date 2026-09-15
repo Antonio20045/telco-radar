@@ -1,0 +1,23 @@
+{
+  "run_id": "38fe1f68-4a85-4e55-9d02-71ca76772c77",
+  "datum": "2026-09-15",
+  "nachgetragen": true,
+  "nachtrag_grund": "Nachgetragen in Runde 2 (15.09.2026): der Lauf von Runde 1 (Commit 316eb69) hat keinen Lauf-Manifest geschrieben - die Manifest-Funktion entstand erst aus Befund 2 dieser Runde. Die run_id wurde bei der Nachbereitung ERZEUGT, nicht vom Lauf vergeben; sie identifiziert den Lauf eindeutig, sie ist kein Zeuge seiner selbst.",
+  "start_utc": null,
+  "ende_utc": null,
+  "zeitstempel_hinweis": "Nicht erfassbar und deshalb nicht angegeben - nichts erfinden. Exakte Kanten aus vorhandenen Belegen: Der Lauf von Runde 1 protokollierte keine Start-/Endzeit. Einzige exakte Zeitkante ist Commit 316eb69, AuthorDate 2026-09-15T04:46:36Z (07:46:36 +0300); er wurde NACH dem Lauf, dem Neu-Rendern und der Testsuite gesetzt (Suite laut Bericht Runde 1: 288,93 s). Die Gerätestufe des Laufs selbst ist mit 66,2 s belegt (T2-Bilanz im Bericht). start_utc/ende_utc liegen also einige Minuten vor 04:46:36Z; jede genauere Angabe waere geraten. Kuenftige Laeufe schreiben diese Felder selbst (scripts/lokallauf_telekom.py, _schreibe_manifest).",
+  "exit_status": 0,
+  "exit_status_herkunft": "Abgeleitet, nicht gemessen: beide Laufzeitbelege wurden vollstaendig geschrieben (T1: 11 Requests, T2: 17 Requests, alle_ehrlich je true), der Abschlussbericht Runde 1 dokumentiert einen fehlerfreien Durchlauf beider Stufen.",
+  "belege": {
+    "beleg-telekom-lokallauf": {
+      "datei": "beleg-telekom-lokallauf-2026-09-15.json",
+      "sha256": "20091f3b73c2673a01dc063ee3efd1d9d8a0c220969addca0e3d92824ab4bf05",
+      "byte_identisch_mit_commit": "316eb69"
+    },
+    "beleg-telekom-geraete": {
+      "datei": "beleg-telekom-geraete-2026-09-15.json",
+      "sha256": "1858d056ed43ae1111b70051613fd07762e34220c94a6723875f379d49c5229c",
+      "byte_identisch_mit_commit": "316eb69"
+    }
+  }
+}
