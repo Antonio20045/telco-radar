@@ -186,13 +186,28 @@ def test_die_vertragsachse_rechnet_fuer_sich():
 
 def test_refurbished_schluckt_den_neupreis_nicht():
     """Dieselbe Lehre wie bei der Positionskarte: ohne den Zustand im
-    Schluessel meldete die Seite einen Preisvorteil, den es nicht gibt."""
+    Schluessel meldete die Seite einen Preisvorteil, den es nicht gibt.
+
+    O3 (D2): der dritte Assert war `... or True` und prüfte nichts - als
+    echter Assert wäre er IMMER rot gefallen, denn `vergleich()` filtert
+    nicht vergleichbare Zustände VOR den Zeilen heraus (geraete_vergleich,
+    `VERGLEICHBARE_ZUSTAENDE`): die refurbished-Konkurrenz taucht in der
+    NEU-Zeile gar nicht erst auf. Das Herauszufiltern IST die Zusicherung;
+    die Gegenprobe im selben Test beweist, dass der Fall unterscheidbar
+    ist (CLAUDE.md §6: ein Test, dessen Fixture den Fall nicht auslösen
+    kann, beweist nichts)."""
     v = vergleich([_e("Vodafone", preis=1349.9),
                    _e("o2", preis=699.0, zustand="refurbished")], _KATALOG)
     zeilen = {z["zustand"]: z for z in v["zeilen"]}
     assert zeilen["neu"]["anzahl_guenstiger"] == 0
-    assert "refurbished" in zeilen or True
+    assert set(zeilen) == {"neu"}, \
+        f"nicht vergleichbare Zustände stehen in den Zeilen: {sorted(zeilen)}"
     assert all(z["anzahl_guenstiger"] == 0 for z in v["zeilen"])
+    # GEGENPROBE: derselbe o2-Preis ALS NEU wird sehr wohl gezählt - ohne
+    # sie prüfte der Test nur, dass eine gefilterte Menge leer ist.
+    kontrolle = vergleich([_e("Vodafone", preis=1349.9),
+                           _e("o2", preis=699.0)], _KATALOG)
+    assert kontrolle["zeilen"][0]["anzahl_guenstiger"] == 1
 
 
 def test_ein_laden_unter_zwei_marken_zaehlt_einmal():
