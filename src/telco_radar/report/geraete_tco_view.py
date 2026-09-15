@@ -230,6 +230,18 @@ def _vergleichbar(zeile: dict) -> bool:
             and not zeile["delta_luecken"])
 
 
+# O2 (11.09.2026): die Sortierung der Bündel-ZEILEN - der Entwurf führt
+# die Bandliste aufsteigend nach TCO-24. Karten ohne Zahl stehen hinten
+# (sie sind kein Angebot, sondern eine Lücke), die Näherung hinter den
+# echten Angeboten desselben Preises - dieselbe Rangfolge-Idee wie
+# `geraete_tco_karten._rang`, nur auf das eine Mass der Zeilen gebracht.
+def _zeilen_rang(karte: dict) -> tuple:
+    return (not karte["belastbar"],
+            karte["naeherung"],
+            karte["gesamt"] if karte["gesamt"] is not None else 9e9,
+            karte["anbieter"])
+
+
 def _wesentlich(differenz: float, bezug: float) -> bool:
     """Ist der Abstand eine Meldung wert? ODER, nicht UND - wie nebenan.
 
@@ -715,6 +727,35 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             tid = (k.get("tarif_id") or "").strip()
             k["band"] = band_je_tarif.get(tid)
             k["band_gb_text"] = geraete_tco_band.gb_text(gb_je_tarif.get(tid))
+            # O2 (11.09.2026): das kompakte Δ der ZEILE - dieselbe Stelle
+            # und dieselbe Formatierung wie am Graphen (`delta_text`),
+            # damit Tabelle und Balken dieselbe Zeichenkette tragen. Der
+            # volle Delta-Satz (mit Referenz-Tarif und Datum) steht im
+            # Rechenweg-Aufklapper der Zeile.
+            k["delta_kurz"] = (
+                geraete_tco_band.delta_text(
+                    k["delta"].get("betrag"), k["delta"].get("prozent"))
+                if k.get("delta") else None)
+        # O2: die Zeilen der Tabelle - serverseitig sortiert (nach TCO-24
+        # aufsteigend, wie der Entwurf), Karten ohne Zahl hinten. Die
+        # Vorlage sortiert nichts: ein Renderer, der ordnet, ist eine
+        # zweite Sortierung fuer dieselbe Liste.
+        #
+        # LEERKARTEN STEHEN NICHT DARIN (Auftrag 2): die Platzhalter der
+        # vier Festanbieter ohne Bündel (`_leere_karte`, erkennbar an der
+        # leeren `sku_id`) sind gefallen - die EINE Legendenzeile des
+        # Graphen nennt dieselben Anbieter je Band ("Kein Bündel in diesem
+        # Band: Telekom, 1&1"). Ein echtes Bündel OHNE belastbare Zahl
+        # bleibt dagegen eine Zeile: es existiert, und sein Grund steht in
+        # seinem Rechenweg. Die NAEHERUNG bleibt ebenfalls eine Zeile -
+        # sie ist kein Platzhalter, sondern der Massstab des Modells, und
+        # `_referenzkarte` baut absichtlich auf `_leere_karte` auf (ihre
+        # `sku_id` ist leer, WEIL sie kein Bündel ist).
+        echte = [k for k in modell["karten"] if k.get("sku_id") or k["naeherung"]]
+        modell["zeilen_band"] = sorted(
+            (k for k in echte if k.get("band")), key=_zeilen_rang)
+        modell["zeilen_ohne_band"] = sorted(
+            (k for k in echte if not k.get("band")), key=_zeilen_rang)
         # GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): Geraet x Tarifniveau, eine
         # Linie je Anbieter mit echtem Buendel in diesem Band
         # (AUFTRAG_GERAETESEITE.md §2a/§7). Eigener Baustein, eigene Datei -
@@ -769,6 +810,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 "chip": b["chip"], "unterzeile": b["unterzeile"],
                 "zeilen": b["balken"]["zeilen"],
                 "luecke_text": b["balken"]["luecke_text"],
+                # O2: der Titel der Bündel-Tabelle je Band - in Python
+                # gebaut, `app.js` setzt ihn nur (kein zweiter Satzbaumeister
+                # im Browser, dieselbe Regel wie `luecke_text`).
+                "bnd_titel": (f"Alle Bündel im Band {b['label']} – "
+                              f"{modell['titel']}"),
             } for b in modell.get("baender") or []},
             "band_leer": modell.get("band_leer"),
         } for modell in modelle["modelle"]],

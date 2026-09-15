@@ -776,6 +776,13 @@ def _referenzkarte(ref: dict) -> dict:
         # dem Feld, das "hier gibt es nichts" bedeutet.
         "leer_grund": "",
         "tarif": ref["tarif"],
+        # P1/UX-1, nachgetragen mit O2: DIE TARIF-ID MIT - ohne sie bekam
+        # die Referenzkarte KEIN Band (band_je_tarif schluesselt auf die
+        # tarif_id) und stand in der Gruppe "Ohne Tarifband", obwohl ihr
+        # Tarif eines hat. Am echten Bestand fiel es nicht auf (Vodafone
+        # hat dort ueberall echte Buendel); die Zustands-Fixture traegt
+        # eine Naeherung, und an ihr hielt der neue Zeilen-Test es fest.
+        "tarif_id": ref.get("tarif_id", ""),
         # TICKET TCO24-1: die Leitzahl ist IMMER TCO-24 - `ref["monate"]`
         # und `ref["tarif_monate"]` sind seit `_vodafone_referenz` beide
         # der feste Horizont (`TCO_HORIZONT`), keine variable Fensterzahl
