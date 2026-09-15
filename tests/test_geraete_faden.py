@@ -160,27 +160,31 @@ def test_haendler_ohne_zeitreihe_nennen_den_beginn_der_beschaffung(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# Kriterium 6: die Reiterleiste traegt nur zwei Knoepfe
+# Kriterium 6: die Reiterleiste (O3: drei Tafeln + der Radar-Link)
 # --------------------------------------------------------------------------
 
-def test_die_reiterleiste_traegt_nur_vergleich_und_katalog(tmp_path):
+def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
+    """O3 (STRATEGIE_GERAETE_OPTIK §3): vier Einträge nach dem Entwurf -
+    drei echte Tafeln, der Radar als LINK (kein data-tafel: er wäre ein
+    toter Tab, der Umschalter fände kein Ziel-Element)."""
     s = _baue(tmp_path)
     knoepfe = s.select(".gr-reiter button[data-tafel]")
     beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True))
                       for k in knoepfe]
     assert beschriftungen == [
         ("tafel-tco", "Vergleich"),
+        ("tafel-verlauf", "Preisverlauf"),
         ("tafel-katalog", "Gerätekatalog"),
     ]
+    link = s.select_one(".gr-reiter a[href$='wettbewerbsradar.html']")
+    assert link is not None
+    assert link.get("data-tafel") is None
 
 
-def test_die_ungeknopften_tafeln_bleiben_im_dokument_stehen(tmp_path):
-    """"Nicht geloescht, nur nicht mehr verlinkt" - ihr Markup bleibt, nur
-    kein Knopf zeigt mehr darauf."""
+def test_die_portfolio_tafel_ist_weg(tmp_path):
+    """O3 (§5.2): die Portfolio-Tafel ist GANZ weg - Container und
+    Abschnitte stehen auf dem Wettbewerbs-Radar. Eine leer stehende
+    Tafel wäre die nächste Waise."""
     s = _baue(tmp_path)
-    assert s.select_one("#tafel-verlauf") is not None
-    assert s.select_one("#tafel-portfolio") is not None
-    # Kein Knopf in der Reiterleiste zeigt mehr auf sie.
-    ziele = {k.get("data-tafel") for k in s.select(".gr-reiter button[data-tafel]")}
-    assert "tafel-verlauf" not in ziele
-    assert "tafel-portfolio" not in ziele
+    assert s.select_one("#tafel-portfolio") is None
+    assert "Wie lange ein Gerät im Markt lebt" not in s.get_text()

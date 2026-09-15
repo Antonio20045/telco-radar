@@ -403,7 +403,7 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
 
 
 def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
-          alarme: dict | None = None) -> dict:
+          alarme: dict | None = None, portfolio: dict | None = None) -> dict:
     """Alles fuer wettbewerbsradar.html.
 
     `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts
@@ -447,6 +447,22 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
         "ohne_vodafone": ohne,
         "ohne_vodafone_gesamt": (vergleich_ohne_vertrag or {}).get(
             "ohne_vodafone_gesamt", len(ohne)),
+        # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
+        # Wochenkarte) - als GANZES durchgereicht, keine zweite Rechnung;
+        # `render_site` baut das Dict aus denselben Feldern, die die alte
+        # Tafel #tafel-portfolio las (Antonios Entscheidung, Strategie
+        # §5.2: Portfolio-Fragen gehören auf die Portfolio-Seite).
+        "portfolio": portfolio if portfolio is not None else _portfolio_leer(),
+    }
+
+
+def _portfolio_leer() -> dict:
+    """Der Notzustand der Portfolio-Abschnitte - dieselben Schlüssel wie
+    das Dict aus `render_site`, damit die Vorlage nie auf ein fehlendes
+    Feld trifft (derselbe Grund wie bei `_alarme_leer`)."""
+    return {
+        "lifecycle": None, "auffaellig": None,
+        "lifecycle_sichtbar": 0, "nachfolger_sichtbar": 0, "fenster_tage": 0,
     }
 
 
@@ -466,4 +482,5 @@ def leer() -> dict:
             "hat_daten": False, "hat_vergleichbare_zeilen": False,
             "anbieter_erwartet": list(NETZ_WETTBEWERBER),
             "alarme": _alarme_leer(),
-            "ohne_vodafone": [], "ohne_vodafone_gesamt": 0}
+            "ohne_vodafone": [], "ohne_vodafone_gesamt": 0,
+            "portfolio": _portfolio_leer()}

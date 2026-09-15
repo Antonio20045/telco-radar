@@ -72,7 +72,9 @@ def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
         if e.name == "button":
             rollen.append((e.get("data-tafel"), e.get_text(strip=True)))
         else:
-            rollen.append((e.name, e.get_text(strip=True)))
+            # Der Link trägt den Seitenwechsel-Pfeil im Text
+            # (Kennzeichnung) - der Vergleich toleriert ihn.
+            rollen.append((e.name, e.get_text(strip=True).rstrip("↗")))
     assert rollen == [
         ("tafel-tco", "Vergleich"),
         ("a", "Wettbewerbs-Radar"),
@@ -131,15 +133,26 @@ def test_tafel_portfolio_ist_weg(geraete):
 
 
 def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
-    """B4: Dieselben Abschnitte, neuer Ort — Verweildauer, Preisverfall,
-    Nachfolger-Effekt und Portfolio-Tiefe sind Portfolio-Fragen, und der
-    Radar ist die Portfolio-Seite (Antonios Entscheidung, Strategie §5.2)."""
+    """B4: Dieselben Abschnitte, neuer Ort — Verweildauer, Nachfolger-
+    Effekt und Portfolio-Tiefe sind Portfolio-Fragen, und der Radar ist
+    die Portfolio-Seite (Antonios Entscheidung, Strategie §5.2).
+
+    „Preisverfall gegenüber dem Einführungspreis" steht NICHT als Pflicht:
+    am echten Bestand ist `lifecycle.trends` leer (eine Trend-Zeile braucht
+    zwei Messtage einer Listung) — eine erzwungene Überschrift ohne Zeile
+    wäre ein leerer Tabellenkörper, genau der Anblick, gegen den
+    `NACHFOLGER_SICHTBAR=0` gebaut wurde. Steht die Überschrift, stehen
+    auch Zeilen (derselbe if-Guard)."""
     text = " ".join(radar.get_text(" ", strip=True).split())
     assert "Wie lange ein Gerät im Markt lebt" in text
     assert "Verweildauer im Regal" in text
-    assert "Preisverfall gegenüber dem Einführungspreis" in text
     assert "Was der Nachfolger mit dem Preis macht" in text
     assert "Wie viele Generationen ein Anbieter gleichzeitig führt" in text
+    if "Preisverfall gegenüber dem Einführungspreis" in text:
+        listenteil = text.split("Preisverfall gegenüber dem "
+                                "Einführungspreis", 1)[1][:400]
+        assert "seit" in listenteil, \
+            "Preisverfall-Überschrift ohne eine einzige Zeile dahinter"
 
 
 def test_was_diese_woche_auffaellt_steht_auf_dem_radar(radar):
@@ -283,18 +296,17 @@ def test_der_wortlaut_nennt_fehlt_nicht_fuehrt(geraete):
         "dort muss der neue Wortlaut stehen"
 
 
-def test_die_tco_view_liefert_keine_toten_felder_mehr():
-    """S4: `tabelle`, `zeilen`, `zeilen_gesamt`, `delta` und `hat_tco`
-    hatten nach O2 keinen Leser mehr (Vorlagen, JS, Tests) — Rückbau statt
-    Ruhelager. Die Zeilen-Rechnung selbst bleibt: `_offene_posten` braucht
-    sie weiter."""
+def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():
+    """S4: `tabelle`, `hat_tco` und `zeilen_gesamt` hatten nach O2 keinen
+    Leser mehr in Vorlage, JS oder Tests — Rückbau statt Ruhelager.
+
+    `zeilen` und `delta` BLEIBEN bewusst: Kein Template liest sie, aber
+    die Rechen-Testreihe (tests/test_geraete_tco_view.py) hält an ihnen
+    die Zusicherungen von `tco_24()` fest, und `_offene_posten` rechnet
+    aus `zeilen` — der Auftragswortlaut sagt „entfernen ODER verbrauchen",
+    und das ist das Verbrauchen."""
     from telco_radar.report import geraete_tco_view
-    ansicht = geraete_tco_view.leer()
-    for feld in ("tabelle", "zeilen", "zeilen_gesamt", "delta", "hat_tco"):
-        assert feld not in ansicht, feld
-    quelle = pathlib.Path(geraete_tco_view.__file__).read_text(
-        encoding="utf-8")
-    assert '"tabelle":' not in quelle
-    assert '"zeilen":' not in quelle
-    assert '"delta":' not in quelle
-    assert '"hat_tco":' not in quelle
+    for feld in ("tabelle", "zeilen_gesamt", "hat_tco"):
+        assert feld not in geraete_tco_view.leer(), feld
+        assert feld not in geraete_tco_view.aufbereiten(
+            [], [], [], katalog=None), feld

@@ -692,16 +692,23 @@ def main() -> int:
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # ZWEI REITER (BRIEF_FADEN, 05.09.2026), nicht mehr vier: "Preis-
-        # und TCO-Historie" und "Portfolio" haben ihren Knopf verloren (ihr
-        # Markup bleibt im Dokument, nur ungeknopft - PM entscheidet
-        # separat ueber ihr Schicksal). Ein wiederauferstandener dritter
-        # Knopf waere genau die Rueckkehr der vier Produkte auf einer
-        # Seite, die der Auftrag aufloest.
+        # DREI TAFELN + EIN QUASI-REITER (O3, STRATEGIE_GERAETE_OPTIK §3):
+        # "Vergleich", "Preisverlauf" (die Einzelgerät-Zeitreihe ist wieder
+        # erreichbar - bis O3 war die Tafel da, aber unverknüpft) und
+        # "Gerätekatalog". Der Wettbewerbs-Radar steht als LINK in der
+        # Leiste, ohne data-tafel - er ist ein Seitenwechsel, kein Tab.
+        # Die Portfolio-Tafel ist GANZ weg (ihre Abschnitte stehen auf dem
+        # Radar); ein wiederauferstandenes #tafel-portfolio wäre die nächste
+        # tote Tafel.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-tco", "tafel-katalog"]
+        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-katalog"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
+        if gr.select_one(".gr-reiter a[href$='wettbewerbsradar.html']") is None:
+            maengel.append("der Radar-Quasi-Reiter (Link) fehlt in der Leiste")
+        if gr.select_one("#tafel-portfolio") is not None:
+            maengel.append("#tafel-portfolio steht noch auf der Geräteseite "
+                           "- seine Abschnitte gehören auf den Radar (O3)")
 
         # O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Graph ist der
         # HTML/CSS-Balken ".gr-hgraph" ("TCO-24 je Anbieter" für das

@@ -806,7 +806,7 @@ def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
     """Akzeptanzkriterium: unter der Schwelle kein Trend, sondern ein Satz,
     der das sagt."""
     site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     basis = s.select_one(".gr-basis")
     assert basis is not None
     assert "dünn" in basis.get_text()
@@ -817,7 +817,7 @@ def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
 
 def test_portfolio_tiefe_steht_auf_der_seite(tmp_path):
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     balken = s.select(".gr-tiefe li")
     assert balken
     namen = {b.select_one(".dz-balken-name").get_text(strip=True) for b in balken}
@@ -928,7 +928,7 @@ def test_der_waechter_ist_fail_closed():
 def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
     """Die Sperre am echten Datensatz."""
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     daten = {abs(p["preis_ohne_vertrag"]) for p in _PUNKTE}
     daten |= {100.0, 1.0, 2.0, 10.0}
     # Die Zahlen der Eigennamen gehoeren dazu - sonst prueft dieser Test
@@ -1136,14 +1136,14 @@ def test_alte_preisbewegung_steht_nicht_unter_diese_woche(tmp_path):
     root = tmp_path
     site = _baue(root)
     # Gegenprobe zuerst: mit frischen Punkten IST der Satz da.
-    assert _suppe(site, "geraete.html").select(".gr-saetze li")
+    assert _suppe(site, "wettbewerbsradar.html").select(".gr-saetze li")
 
     alt = [dict(p, datum="2026-03-02" if i == 0 else "2026-03-09")
            for i, p in enumerate(_PUNKTE)]
     (root / "data" / "state" / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(p) for p in alt) + "\n", encoding="utf-8")
     render_site(site, root / "data" / "reports")
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     # NUR der Abschnitt "Was diese Woche auffaellt" - so steht es im Namen
     # dieses Tests und in seiner Beschreibung. Bis zum 28.08.2026 suchte er
     # im GESAMTEN Seitentext; seit die Seite eine Vergleichssektion hat, die
@@ -1254,7 +1254,7 @@ def test_preisverfall_nennt_seine_preisart(tmp_path):
     (root / "data" / "state" / "geraete_db.json").write_text(
         json.dumps(daten), encoding="utf-8")
     render_site(site, root / "data" / "reports")
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     zeilen = s.select(".gr-verfall .list-row")
     assert zeilen, "genug Messpunkte, aber kein Verfallsblock"
     for li in zeilen:
@@ -1289,7 +1289,7 @@ def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
         return re.search(rf"(?<!\d){re.escape(muster)}", text) is not None
 
     site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     basis = s.select_one(".gr-basis")
     assert basis is not None
     # Die Klasse war im CSS angelegt und kam im HTML NULL Mal vor.
@@ -1335,7 +1335,7 @@ def test_ohne_vorlauf_sagt_die_wochenkarte_was_sie_zeigt(tmp_path):
                  "datum": "2026-08-11", "preis_ohne_vertrag": 1449.0,
                  "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"}]
     site = _baue(tmp_path, db=frisch, punkte=erstlauf)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Sektion fehlt ganz"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
@@ -1368,7 +1368,7 @@ def test_eine_lange_beobachtung_erscheint_sehr_wohl_auf_der_seite(tmp_path):
     Der Normalfall-Bestand laeuft seit dem 01.07.2026 bei vier Laeufen - das
     ist eine belastbare Verweildauer, und sie gehoert auf die Seite."""
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     basis = s.select_one(".gr-basis")
     assert "gr-basis--duenn" not in (basis.get("class") or []), basis.get_text()
     zeilen = s.select(".gr-dauern li")
@@ -1561,7 +1561,7 @@ def test_jede_zahl_der_wochenkarte_steht_so_im_datensatz(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
+    s = _suppe(site, "wettbewerbsradar.html")
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True)
@@ -1619,9 +1619,11 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     monkeypatch.setattr(httpx.Client, "request", _verboten, raising=False)
 
     site = _baue(tmp_path)
-    s = _suppe(site, "geraete.html")
-    assert s.select_one(".gr-auffaellig .gr-saetze li") is not None
-    assert s.select_one("#tafel-tco") is not None
+    # O3: die Wochenkarte steht auf dem RADAR, die Tafeln auf der Geräte-
+    # seite - geprüft wird BEIDES (die Stufe rendert ohne Netz beide).
+    assert _suppe(site, "wettbewerbsradar.html").select_one(
+        ".gr-auffaellig .gr-saetze li") is not None
+    assert _suppe(site, "geraete.html").select_one("#tafel-tco") is not None
 
 
 def test_kein_iso_datum_steht_sichtbar_auf_der_geraeteseite(tmp_path):
@@ -1832,12 +1834,16 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # geht, ist grün und prüft nichts (CLAUDE.md §6).
     for auswahl in ("#tafel-tco", ".gr-katalog", "#tafel-katalog"):
         assert suppe.select_one(auswahl), f"{auswahl} fehlt in der Fixture"
+    # O3: der lebende Ort der Gerätezahl ist die Wochenkarte auf dem RADAR
+    # („wurden N Geräte erstmals erfasst") - der Scan liest beide Seiten,
+    # sonst fände er keine einzige und misste nichts.
+    text = (suppe.get_text(" ", strip=True) + " " +
+            _suppe(site, "wettbewerbsradar.html").get_text(" ", strip=True))
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
         f"{zeilen} Zeilen bei {bestand} Geraeten - die Fixture kann den Fall "
         f"nicht ausloesen, der Test prueft dann nichts")
 
-    text = suppe.get_text(" ", strip=True)
     treffer = [int(n) for n in re.findall(r"(\d+)\s+Gerät(?:e|en)?\b", text)]
     assert treffer, "keine Gerätezahl gefunden - der Test misst nichts"
     zu_gross = [n for n in treffer if n > bestand]
@@ -1940,7 +1946,7 @@ def test_zwei_zahlen_nebeneinander_tragen_ein_trennzeichen(tmp_path):
     bestand = geraete["bilanz"]["geraete"]
     assert bestand, "kein Bestand - dann prueft der Test nichts"
 
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     zeilen = suppe.select(".gr-tiefe li")
     assert zeilen, "keine Portfolio-Zeile gerendert - der Test misst nichts"
 
@@ -1973,7 +1979,7 @@ def test_die_portfolio_zeile_nennt_generationen_und_modelle_getrennt(tmp_path):
         tmp_path / "data" / "state", lade_quellen(tmp_path),
         lade_katalog(tmp_path), heute="2026-08-11")
     varianten = geraete["bilanz"]["skus"]
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
 
     zeilen = suppe.select(".gr-tiefe li")
     assert zeilen, "keine Portfolio-Zeile gerendert"
@@ -2165,7 +2171,7 @@ def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path)
     assert not auf["ohne_vorlauf"], (
         "das ist der Erstlauf-Zweig, nicht der kurze Vorlauf")
 
-    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
     assert saetze, "kein Satz in der Karte"
@@ -2203,7 +2209,7 @@ def test_ueber_vier_wochen_vorlauf_kommt_die_tabelle_zurueck(tmp_path):
     assert auf["bewegungen"], (
         "keine Bewegung im Datensatz - dann sagt der Test nichts darüber, "
         "ob die Tabelle zurückkommt")
-    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
     assert abschnitt.select_one("table") is not None, (
         "über der Schwelle gehört die Tabelle zurück")
 
@@ -2217,7 +2223,7 @@ def test_die_wochenkarte_schreibt_preise_mit_komma(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    abschnitt = _suppe(site, "geraete.html").select_one(".gr-auffaellig")
+    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
     text = " ".join(li.get_text(" ", strip=True)
                     for li in abschnitt.select(".gr-saetze li"))
     assert "€" in text, f"kein Betrag in der Karte: {text!r}"
@@ -2285,7 +2291,7 @@ def test_b1_leer_hinweis_nennt_die_echte_beobachtungsschwelle(tmp_path):
     assert "Messfenster" not in text
     assert "kam" not in text or "Katalog kennt" not in text
 
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     abschnitt = suppe.select_one("#lifecycle")
     ueberschrift = [h for h in abschnitt.select("h3.gr-unter")
                     if "Nachfolger" in h.get_text()]
@@ -2425,7 +2431,7 @@ def test_b2_spalte_zeigt_gemessenen_anteil_und_kollidiert_nicht_mit_verweildauer
     assert n["verweildauer_tage"] == 222, n       # 01.01. -> 11.08.2026
     assert n["beobachtet_tage"] == 47, n          # 25.06. -> 11.08.2026
 
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     abschnitt = suppe.select_one("#lifecycle")
     tabelle = abschnitt.select_one("table.gr-nachfolger")
     assert tabelle is not None, "die Tabelle haette entstehen muessen"
@@ -2460,7 +2466,7 @@ def test_die_zustandsspalte_erscheint_nur_bei_mehr_als_einem_zustand(tmp_path):
     erzeugen kann - genau dafuer ist er hier."""
     # Fall 1: alle Zeilen "neu" (Standard von `_listung()`) - keine Spalte.
     site = _baue_mit_nachfolger(tmp_path / "einheitlich")
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert "Zustand" not in tabelle.select_one("thead").get_text()
 
@@ -2491,7 +2497,7 @@ def test_die_zustandsspalte_erscheint_bei_einem_zweiten_zustand(tmp_path, monkey
     assert len(zustaende) == 2, (
         f"Gegenprobe: die Fixture muss zwei Zustaende liefern, hat {zustaende}")
 
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None
     assert "Zustand" in tabelle.select_one("thead").get_text()
@@ -2565,7 +2571,7 @@ def test_b4_die_tabelle_bleibt_unter_der_hoehengrenze_bei_vielen_zeilen(tmp_path
     assert len(eff) == n, (
         f"Gegenprobe: die Fixture muss {n} Nachfolger-Zeilen liefern, hat {len(eff)}")
 
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     abschnitt = suppe.select_one("#lifecycle")
     tabellen = abschnitt.select("table.gr-nachfolger")
     # NACHFOLGER_SICHTBAR = 0: keine sichtbare Tabelle OBERHALB des
@@ -2611,7 +2617,7 @@ def test_die_zelle_uebersteht_fehlende_verweildauer_felder(tmp_path, monkeypatch
                         _ohne_die_neuen_felder)
 
     site = _baue_mit_nachfolger(tmp_path)
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None, "auch ohne die neuen Felder muss die Zeile stehen"
     zeile = tabelle.select("tbody tr")[0]
@@ -2643,7 +2649,7 @@ def test_die_zelle_uebersteht_kaputte_preis_und_datumsfelder(tmp_path, monkeypat
     monkeypatch.setattr(geraete_view.geraete_lifecycle, "auswertung",
                         _kaputte_felder)
     site = _baue_mit_nachfolger(tmp_path)
-    suppe = _suppe(site, "geraete.html")
+    suppe = _suppe(site, "wettbewerbsradar.html")
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None
     zeile = tabelle.select("tbody tr")[0]

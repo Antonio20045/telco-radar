@@ -1,0 +1,252 @@
+{# Die Bündel-ZEILEN als Teilvorlage (O3, STRATEGIE_GERAETE_OPTIK §3,
+   15.09.2026) - EIN Makro, ZWEI Verwender: die Vergleichsansicht der
+   Geräteseite (rendert das Vorgabemodell serverseitig) und das
+   Bündel-Fragment `geraete_buendel_fragment.html.j2` (alle übrigen
+   Modelle, lazy geladen). Zwei Kopien dieses Markups wären die nächste
+   Stelle, an der Zeile und Fragment auseinanderlaufen, ohne dass ein Test
+   rot wird - dieselbe Regel wie die Übersetzungs-Linkbeschriftung.
+
+   Die Zeile selbst ist seit O2 unverändert: Fünf Kernangaben offen, ALLES
+   weitere im EINEN Rechenweg-Aufklapper (A6: kein Datenverlust). O3 fügt
+   NUR den numerischen Δ-Sortierschlüssel hinzu (`data-delta`, Punkt C). #}
+{% macro buendelzeile(k) %}
+<details class="gr-bnd{% if not k.belastbar %} gr-bnd--leer{% endif %}"
+         data-anbieter="{{ k.anbieter }}"
+         {% if k.band %}data-band="{{ k.band }}"{% endif %}
+         data-zustand="{{ k.zustand }}"
+         data-laufzeit="{{ k.laufzeit or 0 }}"
+         data-schnitt="{{ k.schnitt_monat if k.schnitt_monat is not none else '' }}"
+         data-gesamt="{{ k.gesamt if k.gesamt is not none else '' }}"
+         {# C: Δ als ZAHL mit Vorzeichen (negativ = günstiger als die
+            Vodafone-Referenz) - der sichtbare Text derselben Spalte ist
+            `delta_kurz` und bleibt die einzige Formatierung. Zeilen ohne
+            Δ (Referenz, Näherung, eigene Angebote) tragen den leeren
+            Wert und sortieren ans Ende. Fällt die Laufzeit auseinander,
+            steht der Euro-Betrag auf None und der monatliche ist der
+            ehrlichere Schlüssel (A5.3: das einzige Maß über Laufzeiten
+            hinweg). #}
+         data-delta="{% if k.delta %}{{ k.delta.betrag if k.delta.betrag is not none else k.delta.monatlich }}{% endif %}"
+         data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}">
+  <summary>
+    <span class="gr-bnd-an"><span class="gr-bnd-name">{{ k.anbieter }}</span>{%
+      if k.zustand_etikett %} <span class="gr-kk-marke gr-kk-marke--zustand">{{
+      k.zustand_etikett }}</span>{% endif %}{%
+      if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
+      elif k.eigen and k.belastbar %} <span class="gr-kk-marke">unser Angebot</span>{%
+      endif %}</span>
+    <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
+      {{ k.band_gb_text }}{% endif %}</span>
+    {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
+       Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
+    <span class="gr-bnd-tco">{% if k.belastbar %}{{ k.gesamt | euro }} <em
+      class="gr-bnd-label">{{ k.label }}</em>{% else %}<span class="gr-t-luecke"
+      >keine belastbare Zahl</span>{% endif %}</span>
+    <span class="gr-bnd-delta">{% if k.naeherung %}Referenz{% elif
+      k.eigen and k.belastbar %}Referenz{% elif k.delta_kurz %}{{ k.delta_kurz
+      }}{% else %}–{% endif %}</span>
+    {# Der Gerätepreis ohne Vertrag ist die ZWEITE Zahl (§3): nur der eigene
+       Barpreis heisst "Gerätepreis", die tarifabhängige Summe aus Zuzahlung
+       und allen Raten heisst "Finanzierung gesamt" (P1/TCO-1) - die Spalte
+       sagt die Zahl beim Namen, statt beide "Gerät" zu nennen. #}
+    <span class="gr-bnd-bar">{% if k.geraetepreis is not none and
+      k.geraetepreis_art == 'barpreis' %}{{ k.geraetepreis | euro }}{% elif
+      k.geraetepreis is not none %}{{ k.geraetepreis | euro }} <em
+      class="gr-bnd-label gr-bnd-label--fin">Finanzierung gesamt</em>{% else
+      %}–{% endif %}</span>
+    <span class="gr-bnd-chev" aria-hidden="true"></span>
+  </summary>
+  <div class="gr-bnd-rw">
+  {% if k.belastbar %}
+    <p class="gr-bnd-rw-z">{{ k.label }} {{ k.gesamt | euro }} · Ø {{
+      k.schnitt_monat | euro }}/Monat</p>
+    {% if k.geraetepreis_art == 'finanzierung' or k.geraetepreis is none %}
+    <p class="gr-bnd-rw-bar">Gerät ohne Vertrag: bei {{ k.anbieter }} nicht
+    erhoben{% if k.geraetepreis_art == 'finanzierung' %} – die Finanzierung
+    gilt nur im Tarifbund dieses Angebots{% endif %}</p>
+    {% endif %}
+    {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
+       Ø-Werte, in denen verschieden viele Tarifmonate stecken. #}
+    {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}
+    <p class="gr-kk-basis">darin {{ k.tarif_bindung }} von {{ k.laufzeit }}
+    Monaten Tarif – so lange bindet er</p>
+    {% endif %}
+
+    <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
+      k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
+      k.raten_laufzeit or k.laufzeit }} Monate{% if k.raten_laufzeit and
+      k.raten_laufzeit > k.laufzeit %} ({{ k.laufzeit }} davon in der
+      TCO-{{ k.laufzeit }}){% endif %}{% if k.zuzahlung is not none %} · Gerät
+      einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
+      none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
+      %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
+      Gerät einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.rate is not none
+      %} · {% if k.raten_summe is not none %}{{ k.raten_summe | euro }} in
+      {% endif %}{{ k.raten_laufzeit }} Raten à {{ k.rate | euro }}{% endif %}{%
+      if k.anschlusspreis is not none %} · Anschlusspreis {{
+      k.anschlusspreis | euro }}{% endif %}{% endif %}</p>
+
+    {# A5.2, PFLICHTZEILE: Antonios Leitfrage, woertlich beantwortet - auch
+       und gerade bei 36 Monaten Bindung. #}
+    {% if k.gezahlt_nach_24 is not none %}
+    {# "DANACH", NICHT "DAVON": die offenen Raten sind der Rest der
+       Gesamtsumme, kein Teil der genannten 24-Monats-Zahlung. #}
+    <p class="gr-kk-24">nach 24 Monaten gezahlt: <b>{{ k.gezahlt_nach_24 | euro
+      }}</b>{% if k.offen_nach_24 %} · danach noch offen: {{ k.offen_nach_24 | euro
+      }}{% if k.offene_raten %} ({{ k.offene_raten }} {{ 'Monatsraten' if
+      k.buendel_monatlich is not none else 'Geräteraten' }}){% endif %}{%
+      endif %}</p>
+    {% endif %}
+
+    {% if k.eff_ohne_geraet is not none %}
+    <p class="gr-kk-eff">eff. {{ k.eff_ohne_geraet | euro }}/M. ohne Gerät
+      <span class="gr-a-klein">Ø/Monat minus Gerätebarpreis {{
+      k.eff_basis.betrag | euro }} geteilt durch {{ k.laufzeit }} Monate{%
+      if k.eff_basis.fremd %}; der Barpreis ist der von {{ k.eff_basis.anbieter
+      }}, {{ k.anbieter }} verkauft dieses Gerät nicht ohne Vertrag{% endif
+      %}</span></p>
+    {% endif %}
+
+    {# F5, PFLICHTZEILE "ab Monat 25" (Katalog D, B.2): eine Zahl, wo das
+       Pflichtdokument eine Preisphase nach der Mindestlaufzeit nennt - sonst
+       die BENANNTE Luecke. #}
+    {% if k.nach_bindung is not none and k.tarif_bindung %}
+    <p class="gr-kk-nach">ab Monat {{ k.tarif_bindung + 1 }}: {{
+      k.nach_bindung | euro }} Tarifgrundpreis</p>
+    {% elif k.tarif_bindung or k.laufzeit %}
+    <p class="gr-kk-nach gr-kk-nach--luecke">ab Monat {{ (k.tarif_bindung or
+      k.laufzeit) + 1 }}: nicht belegt – {% if k.tarif_id %}die Tarifquelle
+      nennt keine Preisphase nach der Mindestlaufzeit{% else %}der Tarif steht
+      nicht im Tarifbestand{% endif %}</p>
+    {% endif %}
+
+    {% for b in k.boni %}
+    <p class="gr-kk-bonus">Bonus −{{ b.betrag | euro }} ({{ b.name }})</p>
+    {% endfor %}
+
+    {% if k.delta %}
+    {# Der VOLLSTÄNDIGE Delta-Satz mit Referenz-Tarif und -Datum - die Zeile
+       darüber trägt nur das kompakte Δ (derselbe Text wie der Graph). #}
+    <p class="gr-kk-delta{% if k.delta.guenstiger %} gr-kk-delta--unter{% endif %}">{%
+      if k.zustand_etikett %}{{ k.zustand_etikett }}: {% endif %}{%
+      if k.delta.betrag is not none %}{{ k.delta.abstand | euro }}{% if
+      k.delta.prozent %} ({{ '%.1f'|format(k.delta.prozent)|replace('.', ',') }} %){%
+      endif %}{% else %}{{ k.delta.abstand | euro }} je Monat{% endif %}
+      {{ 'günstiger' if k.delta.guenstiger else 'teurer' }} als die
+      Vodafone-Referenz ({{ k.delta.referenz_tarif }}{% if k.delta.referenz_datum
+      %}, Stand {{ k.delta.referenz_datum | date_de }}{% endif %})</p>
+    {% endif %}
+
+    {# Der Rechenweg. Jede Zahl der Zeile ist hier nachlesbar, samt dem, was
+       NICHT drinsteht. #}
+    <ul class="gr-tposten">
+      {% for p in k.bestandteile %}
+      <li><span>{{ p.name }}</span><em>{{ p.betrag | euro }}</em></li>
+      {% endfor %}
+      {% for l in k.luecken %}
+      <li class="gr-tposten--luecke"><span>{{ l }}</span><em>nicht gemessen</em></li>
+      {% endfor %}
+    </ul>
+    {# DIE NACH-LAUFZEIT-LUECKE WIRD BENANNT, NICHT VERSCHWIEGEN. #}
+    {% if k.nach_bindung is none and k.tarif_bindung %}
+    <p class="gr-basis--duenn">Was der Tarif ab Monat {{ k.tarif_bindung + 1
+      }} kostet, weist die Quelle nicht aus – deshalb steht dazu keine Zahl
+      auf der Zeile.</p>
+    {% endif %}
+    {% if k.ab_preis %}
+    <p class="gr-basis--duenn">Monatspreis „ab“ – der Anbieter nennt ihn für
+      den günstigsten Tarif dieses Geräts.</p>
+    {% endif %}
+    {# DIE REFERENZ NENNT IHRE EIGENE BINDUNG (F-R2-2) und F1, STUFE 1. #}
+    {% if k.naeherung %}
+    <p class="gr-kk-hinweis">Referenzrechnung, kein Angebot: der
+    Vodafone-Bündelpreis zu diesem Gerät ist noch nicht erhoben – gerechnet
+    aus dem eigenen Barpreis des Geräts und dem Tarifgrundpreis aus dem
+    Produktinformationsblatt für {{ k.referenz.tarif_monate }} Monate
+    Mindestlaufzeit. Beide belegt, die Summe ist unsere.{% if
+    k.referenz.fortgeschrieben %} Für einen Teil der Laufzeit nennt das
+    Blatt keinen Preis; dort gilt der zuletzt belegte fort.{% endif %}</p>
+    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate
+    Tarifbindung; das Gerät ist bar gekauft und bindet nicht{% if k.fenster
+    and k.fenster != k.laufzeit %} – die Angebote daneben binden {{ k.fenster
+    }} Monate, das Euro-Delta rechnet sie gegen diese Summe{% endif %}.
+    Enthalten sind der Barpreis und alle fest anfallenden Kosten der
+    Tarifbindung; nicht enthalten sind Versand, Nutzungsentgelte über den
+    Tarif hinaus und jeder Bonus, der hier nicht beim Namen steht.</p>
+    {% else %}
+    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet. #}
+    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate{% if
+      k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
+      k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
+      Geräteraten laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind alle
+      fest anfallenden Kosten der ersten {{ k.laufzeit }} Monate{% if
+      k.offen_nach_24 %}; was danach noch läuft, steht als offener Betrag auf
+      der Zeile{% endif %}. Nicht enthalten sind Versand,
+      Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
+      beim Namen steht.</p>
+    {% endif %}
+    {% if k.quelle_url %}<p class="gr-basis--duenn"><a href="{{ k.quelle_url }}"
+      rel="nofollow noopener" target="_blank">Beleg {{ k.anbieter }}</a>{%
+      if k.abgerufen_am %} · abgerufen {{ k.abgerufen_am | date_de }}{% endif
+      %}{% if k.tarif_quelle_url %} · <a href="{{ k.tarif_quelle_url }}"
+      rel="nofollow noopener" target="_blank">Tarifbeleg</a>{% endif %}</p>{% endif %}
+
+  {% else %}
+  {# B.2.5: ein Anbieter ohne Zahl steht DA, mit seinem Grund. #}
+    <p class="gr-kk-luecke">{{ k.leer_grund }}</p>
+    {% if k.quelle_url %}<p class="gr-basis--duenn"><a href="{{ k.quelle_url }}"
+      rel="nofollow noopener" target="_blank">Beleg {{ k.anbieter }}</a>{%
+      if k.abgerufen_am %} · abgerufen {{ k.abgerufen_am | date_de }}{% endif
+      %}</p>{% endif %}
+  {% endif %}
+  </div>
+</details>
+{% endmacro %}
+
+
+{# Die ZEILEN-GRUPPE EINES MODELLS (Bandliste + „Ohne Tarifband" +
+   Händlerzeilen) - seit O3 dasselbe Makro für Seite und Fragment.
+
+   `ids` setzt die Anker, die app.js und die O2-Tests am SERVER-gerenderten
+   Vorgabemodell kennen (`#gr-bndliste`, `#gr-ohneband`). Das Fragment
+   rendert OHNE ids: 87 Kopien derselben id wären ein ungültiges
+   Dokument, und der Modellwechsel adressiert seine Knoten über
+   `#gr-bnd-gruppe`. #}
+{% macro buendelgruppe(m, ids=false) %}
+      <div class="gr-bndliste"{% if ids %} id="gr-bndliste"{% endif %}>
+        {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
+      </div>
+
+      {# OHNE TARIFBAND (§ 7): unbegrenzte Tarife und Tarife ohne erhobenes
+         Datenvolumen gehören zu keinem der drei Bänder - sie stehen als
+         klar getrennte Gruppe UNTER der Bandliste, nicht heimlich in einem
+         Band (P1/UX-1, jetzt in Zeilenform). Dazu die Händler-Barpreise:
+         Händler ohne Tarifbündel verkaufen das Gerät ohne Vertrag - eine
+         kompakte Zeile MIT Beleg und Abrufdatum, was die Händlerkarte trug.
+         Händler OHNE Preis (Amazon, Expert) stehen nicht als leere Karten:
+         die Legendenzeile des Graphen nennt sie mit dem Beginn ihrer
+         Beschaffung. #}
+      {% set haendler_mit_preis = m.haendler_ohne_buendel.items()
+        | selectattr('1') | list %}
+      {% if m.zeilen_ohne_band or haendler_mit_preis %}
+      <div class="gr-ohneband"{% if ids %} id="gr-ohneband"{% endif %}>
+        <h4 class="gr-ohneband-kopf">Ohne Tarifband</h4>
+        <p class="gr-erklaer gr-basis--duenn">Unbegrenzte Tarife und Tarife
+        ohne erhobenes Datenvolumen gehören zu keinem der drei Bänder
+        (§ 7) – sie stehen hier, nicht heimlich in einem Band.</p>
+        <div class="gr-bnd-kopf gr-bnd-kopf--ohne" aria-hidden="true">
+          <span>Anbieter</span><span>Tarif · Volumen</span><span>TCO-24</span>
+          <span>Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
+        </div>
+        <div class="gr-bndliste">
+          {% for k in m.zeilen_ohne_band %}{{ buendelzeile(k) }}{% endfor %}
+        </div>
+        {% for h, eintrag in haendler_mit_preis %}
+        <p class="gr-haendlerzeile"><b>{{ h }}</b> {{ eintrag.preis | euro }}
+        ohne Vertrag{% if eintrag.quelle_url %} · <a
+          href="{{ eintrag.quelle_url }}" rel="nofollow noopener"
+          target="_blank">Beleg</a>{% endif %}{% if eintrag.abgerufen_am %}
+          · abgerufen {{ eintrag.abgerufen_am | date_de }}{% endif %}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+{% endmacro %}

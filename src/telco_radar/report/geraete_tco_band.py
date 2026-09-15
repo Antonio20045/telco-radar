@@ -385,12 +385,19 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
 
 
 def _unterzeile(balken: dict) -> str:
-    """Die EINE Chart-Chrome-Zeile unter dem Graph-Titel."""
+    """Die EINE Chart-Chrome-Zeile unter dem Graph-Titel.
+
+    O3 (15.09.2026): „Vodafone FEHLT in diesem Band" nach dem Wortlaut des
+    freigegebenen Entwurfs (docs/entwuerfe/geraete-optik-2026-09-11/
+    entwurf.html, `unterzeile` im Datenblock) statt „FÜHRT kein Bündel in
+    diesem Band" - ein Band ohne eigene Referenz ist eine Lücke der
+    Erhebung, keine Feststellung über das Sortiment.
+    """
     if balken["referenz_da"]:
         return ("Günstigstes Bündel je Anbieter im gewählten Band · "
                 "Δ = Abstand zur Vodafone-Referenz")
     return ("Günstigstes Bündel je Anbieter im gewählten Band · Vodafone "
-            "führt kein Bündel in diesem Band – keine Δ-Angabe")
+            "fehlt in diesem Band – keine Δ-Angabe")
 
 
 # Der Leerlauf des Graphen für ein Modell ohne ein einziges Band - der

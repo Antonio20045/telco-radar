@@ -2014,6 +2014,27 @@ b,strong{font-weight:700}
 .gr-reiter button:hover{color:var(--ink)}
 .gr-reiter button[aria-selected="true"]{color:var(--ink);
   border-bottom-color:var(--red)}
+/* O3 (B1): der Radar-Quasi-Reiter - optisch ein Reiter dieser Leiste,
+   inhaltlich ein LINK auf eine andere Seite. Der Pfeil ↗ macht den
+   Seitenwechsel erkennbar (derselbe Code wie an den Quelllinks der
+   Katalogzeilen); er bekommt KEIN aria-selected und kein data-tafel,
+   denn er ist nie "aktiv" und schaltet keine Tafel um. */
+.gr-reiter .gr-reiter-seite{font-family:var(--sans);font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  border-bottom:3px solid transparent;padding:11px 18px;margin-bottom:-1px}
+.gr-reiter .gr-reiter-seite:hover{color:var(--ink)}
+.gr-reiter-pfeil{font-size:11px}
+/* O3 (B3): der ehrliche Untertitel nach dem Entwurf - Fließtext unter dem
+   Zeitungskopf, keine zweite Überschrift. Der Schwesterseiten-Satz ist auf
+   dem Telefon weggeblendet: derselbe Weg steht als Quasi-Reiter direkt
+   darunter, und die Leitantwort geht vor (Kriterium 11c). */
+.gr-untertitel{margin:10px 0 0;max-width:68ch;font-size:14.5px;
+  line-height:1.5;color:var(--ink-2)}
+.gr-untertitel a{color:var(--red);
+  border-bottom:1px solid rgba(230,0,0,.3);text-decoration:none}
+
+}
 /* Die Tafel: heller als das Newsprint ringsum, mit Haarlinie statt Schatten.
    Der Auftrag sagt "weisse Karte auf hellgrauem Grund"; im Farbraum dieser
    Site heisst das --paper-2 auf --paper. Typografie und Farbwelt bleiben
@@ -2708,7 +2729,6 @@ b,strong{font-weight:700}
 .gr-hgraph-wie{margin:10px 0 0}
 .gr-tco-fussnote{margin:14px 0 0;font-family:var(--sans);font-size:12px;
   color:var(--ink-4)}
-.gr-karten-hinweis{font-style:italic}
 
 /* --------------------------------------------------------------------
    O2 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): die Bündel-Zeilen.
@@ -2734,6 +2754,19 @@ b,strong{font-weight:700}
 .gr-bnd-kopf{font-family:var(--sans);font-size:12px;color:var(--ink-4);
   text-transform:uppercase;letter-spacing:.04em;padding:0 6px 6px 9px;
   border-bottom:1px solid var(--rule-2)}
+/* O3 (Auftrag C): die Sortierknöpfe des Kopfs erben dessen Typografie
+   vollständig - kein eigener Knopf-Look, sie SIND die Spaltenbeschriftung.
+   Der aktive Zustand ist ein Richtungspfeil, kein Farbwechsel; bewusst
+   gilt das nur am SCHIRM: mobil ist der Kopf versteckt (Zeilen stapeln),
+   und die Sortierung ist ein Werkzeug des Vergleichens, nicht des
+   ersten Lesens. */
+.gr-bsort{appearance:none;background:none;border:0;margin:0;padding:0;
+  cursor:pointer;font:inherit;text-transform:inherit;
+  letter-spacing:inherit;color:inherit}
+.gr-bsort:hover{text-decoration:underline;text-underline-offset:3px}
+.gr-bsort:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.gr-bsort.ist-auf::after{content:" ↑";color:var(--ink-3)}
+.gr-bsort.ist-ab::after{content:" ↓";color:var(--ink-3)}
 .gr-bnd-kopf span:nth-child(3),.gr-bnd-kopf span:nth-child(4),
 .gr-bnd-kopf span:nth-child(5){text-align:right}
 .gr-bnd{border-bottom:1px solid var(--rule);border-left:3px solid
@@ -3059,6 +3092,13 @@ b,strong{font-weight:700}
    das Vorzeichen der Abweichung und der Gruppenkopf je Geraet. */
 .wr-sektion{margin:0 0 34px}
 .wr-gruppe{margin:0 0 22px;padding-top:14px;border-top:1px solid var(--rule-2)}
+/* O3 (B5): der Querlink je Radar-Geräteblock - zurück in die Vergleichs-
+   ansicht desselben Modells. Kleines Etikett unterm Gruppentitel, kein
+   Knopf: er ist ein Weg, kein Bedienelement der Tabelle. */
+.wr-quer{display:inline-block;margin:0 0 8px;font-family:var(--sans);
+  font-size:12px;letter-spacing:.03em;color:var(--red);text-decoration:none;
+  border-bottom:1px solid rgba(230,0,0,.3)}
+.wr-quer:hover{border-bottom-color:var(--red)}
 .wr-gruppenkopf{margin:0 0 6px;font-family:var(--serif);font-size:19px;
   font-weight:700}
 .wr-basis{margin:0 0 8px;font-family:var(--sans);font-size:12.5px;
@@ -3077,3 +3117,22 @@ b,strong{font-weight:700}
 .wr-status--kein_buendel .wr-prozent,
 .wr-status--nicht_vergleichbar .wr-prozent{color:var(--ink-4);font-weight:400;
   font-style:italic}
+
+
+
+/* O3-Falzrechnung (390 px): der Untertitel kostet am Telefon 44 px, der
+   vierte Reiter-Eintrag weitere - die Leitantwort (A1: erste Balkenzeile
+   über der Falz, Kriterium 11c) geht vor. Dieselbe Entscheidung wie O1
+   für den Radar-Link („43 px Falz - die Leitantwort geht vor"): der
+   Untertitel steht am SCHIRM vollständig (dort, wo der Entwurf ihn
+   zeigt); am Telefon ist er versteckt statt gekürzt - ein halber Satz
+   wäre schlimmer als keiner, und der Quasi-Reiter daneben führt
+   denselben Weg. Die Reiterleiste rollt IN SICH statt zu umbrechen
+   (dieselbe Hausregel wie `.gr-scroll`: zwei Zeilen kosteten 42 px).
+   Basis zum Vergleich: erste Balkenzeile bei 812 px. */
+@media (max-width:700px){
+  .gr-untertitel{display:none}
+  .gr-reiter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
+    padding:9px 10px;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+}

@@ -159,12 +159,13 @@ def seite(ctx):
 
 
 def _zeilen_anbieter(s):
-    """Die Anbieter der sichtbaren Bündelzeilen — `hidden` wird im JS
-    gefiltert, nicht im Selektor (dann greift derselbe Helfer auch für
-    frisch injizierte Zeilen ohne erneutes Selektor-Basteln)."""
+    """Die Anbieter ALLER Bündelzeilen des gewählten Modells - OHNE
+    hidden-Filter: die Bandwahl versteckt Zeilen anderer Bänder, und der
+    Test misst die EIGENTÜMERSCHAFT der Zeilen (gehören sie zum gewählten
+    Modell?), nicht ihre Sichtbarkeit im aktuellen Band."""
     return s.eval_on_selector_all(
         "#gr-buendel .gr-bnd",
-        "e => e.filter(z => !z.hidden).map(z => z.dataset.anbieter)")
+        "e => e.map(z => z.dataset.anbieter)")
 
 
 # --------------------------------------------------------------------------
@@ -182,9 +183,12 @@ def test_der_modellwechsel_zeigt_die_eigenen_zeilen(seite, mid, erwartet):
     anbieter = set(_zeilen_anbieter(seite))
     assert anbieter == erwartet, \
         f"{mid}: {sorted(anbieter)} statt {sorted(erwartet)}"
+    # Der Tabellentitel nennt das GEWÄHLTE Gerät (die Fixture kennt die
+    # Katalogeinträge nicht - der Titel trägt dann die device-id, die
+    # enthält den Modell-Slug immer).
     titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
     assert mid.split("-256")[0].replace("-", " ") in " ".join(
-        titel.lower().split()) or titel.strip(), titel
+        titel.lower().split()), titel
 
 
 def test_zurueck_zur_vorgabe_zeigt_die_vorgabezeilen(seite):
@@ -244,25 +248,31 @@ def test_der_querlink_des_radars_deep_linket(ctx):
 def test_die_sortierung_ordnet_ohne_reload(seite):
     """C: TCO-24 (Server-Default, bleibt), Δ und Anbieter sortierbar per
     Kopfknopf — ohne Reload. Ein gesetztes window-Flag überlebt nur ohne
-    Navigation."""
+    Navigation. Gemessen wird die BANDLISTE (`#gr-bndliste`): die
+    Ohne-Band-Gruppe darunter ist eine eigene Liste mit eigenem Kopf."""
     seite.evaluate("window.__o3_kein_reload = 1")
     # Voraussetzung: mehr als eine sichtbare Zeile, Default nach TCO-24
     werte = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd:not([hidden])",
+        "#gr-bndliste .gr-bnd:not([hidden])",
         "e => e.map(z => parseFloat(z.dataset.gesamt))")
     assert len([w for w in werte if w is not None]) >= 2
     assert werte == sorted(werte), "Server-Vorsortierung nach TCO-24 fehlt"
 
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='anbieter']")
     seite.wait_for_timeout(120)
-    namen = [a for a in _zeilen_anbieter(seite)]
-    assert namen == sorted(namen), \
+    namen = seite.eval_on_selector_all(
+        "#gr-bndliste .gr-bnd:not([hidden])",
+        "e => e.map(z => z.dataset.anbieter)")
+    # localeCompare('de') im Browser - alphabetisch, nicht nach Codepoint
+    # (sonst stünde 'Vodafone' vor 'congstar'; Python sorted() misst das
+    # anders als der Leser liest).
+    assert namen == sorted(namen, key=str.lower), \
         f"Anbieter-Sortierung greift nicht: {namen}"
 
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
     seite.wait_for_timeout(120)
     werte = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd:not([hidden])",
+        "#gr-bndliste .gr-bnd:not([hidden])",
         "e => e.map(z => parseFloat(z.dataset.gesamt))")
     assert werte == sorted(werte), "TCO-Sortierung greift nicht"
     assert seite.evaluate("window.__o3_kein_reload") == 1, \
@@ -275,7 +285,7 @@ def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(seite):
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='delta']")
     seite.wait_for_timeout(120)
     deltas = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd:not([hidden])",
+        "#gr-bndliste .gr-bnd:not([hidden])",
         "e => e.map(z => z.dataset.delta === '' ? null : "
         "parseFloat(z.dataset.delta))")
     zahlwerte = [d for d in deltas if d is not None]

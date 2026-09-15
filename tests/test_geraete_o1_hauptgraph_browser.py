@@ -476,27 +476,34 @@ def test_bandwechsel_baut_die_zeilen_aus_dem_json(seite):
     assert zurueck == vorher
 
 
-def test_modellwechsel_versteckt_die_buendel_tabelle(seite):
-    """Die 88-fache Wiederholung der Modellblöcke entfällt - die Bündel-
-    Tabelle mit ihren Rechenwegen (seit O2 die Kartenform) steht nur für
-    das Vorgabegerät. Bei anderem Gerät benennt die Tafel das ehrlich;
-    die Werte je Band zeigt der Graph aus dem JSON-Knoten."""
+def test_modellwechsel_zeigt_die_zeilen_des_geraets(seite):
+    """O3 (S3, Auflage des O2-Evaluators): die Bündel-Tabelle gehört zum
+    GEWÄHLTEN Modell - der Wechsel setzt die Zeilen des anderen Geräts
+    ein (aus dem Fragment), und der Weg zurück stellt die Server-Ausgabe
+    wieder her. Bis O3 versteckte sich die Tabelle bei fremdem Modell
+    (19 von 423 Zeilen am echten Bestand erreichbar); der alte Test hier
+    nagelte genau dieses Verstecken fest."""
     tabelle = seite.query_selector("#gr-buendel")
     assert tabelle.is_visible(), "beim Vorgabemodell steht die Tabelle offen"
     seite.select_option("#gr-modell", "samsung-galaxy-s26-256")
-    seite.wait_for_timeout(120)
-    assert not tabelle.is_visible(), \
-        "die Tabelle zeigt sonst fremde Bündel als aktuelle"
-    hinweis = seite.query_selector("#gr-karten-hinweis")
-    assert hinweis is not None and hinweis.is_visible()
+    seite.wait_for_timeout(300)
+    assert tabelle.is_visible(), \
+        "die Tabelle gehört inzwischen zum gewählten Modell (O3/S3)"
+    anbieter = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
+    assert set(anbieter) == {"1&1"}, anbieter
+    assert seite.query_selector("#gr-karten-hinweis") is None, \
+        "der Vorgabegerät-Hinweis ist mit S3 ersatzlos entfallen"
     # Der Graph des gewählten Geräts steht weiterhin (aus dem JSON-Knoten).
     zeilen = seite.eval_on_selector_all(
         "#tafel-tco .gr-bz", "e => e.length")
     assert zeilen, "der Graph des gewählten Modells hat keine Zeilen"
-    # Zurueck auf die Vorgabe: die Tabelle wieder da.
+    # Zurueck auf die Vorgabe: dieselben Anbieter wie der Server-Render.
     seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
-    seite.wait_for_timeout(120)
-    assert tabelle.is_visible()
+    seite.wait_for_timeout(300)
+    anbieter = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
+    assert set(anbieter) == {"o2", "Vodafone", "congstar"}, anbieter
 
 
 def test_keine_schrift_unter_zwoelf_pixel_im_graph(seite):
