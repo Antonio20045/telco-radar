@@ -2800,6 +2800,16 @@ b,strong{font-weight:700}
   font-variant-numeric:tabular-nums}
 .gr-bnd-rw-bar{margin:0 0 6px;font-family:var(--sans);font-size:12px;
   color:var(--ink-4)}
+/* SQ67 (15.09.2026), an den Zeilen-Ort portiert: die Paradox-Zeile im
+   Rechenweg, direkt unter den zwei Zahlen der Zeile (TCO und Geräte-
+   preis/Finanzierung). Zurueckgenommen (13,5 px, grau), aber im Lesefluss
+   des geoeffneten Rechenwegs - sie erklaert die beiden Zahlen ueber ihr,
+   sie konkurriert nicht mit ihnen. Nicht unter 12 px: Vorlagenregel 2
+   dieser Seite. In der Vor-O1-Kartenfassung stand die Regel HINTER
+   `.gr-kk-zweit` (gleiche Spezifitaet, spaeter gewinnt) - die Klasse
+   gibt es in der Zeilenform nicht mehr, die Regel steht fuer sich. */
+.gr-kk-paradox{margin:0 0 8px;font-size:13.5px;line-height:1.45;
+  color:var(--ink-3)}
 /* Die Gruppe ohne Tarifband (§ 7): klar getrennt UNTER der Bandliste -
    eigene Überschrift, eigene Haarlinie, keine Kartenmischung. */
 .gr-ohneband{margin-top:18px;border-top:2px solid var(--rule);
@@ -2930,6 +2940,22 @@ b,strong{font-weight:700}
 .gr-tafel-details > summary{font-family:var(--sans);font-size:13px;
   font-weight:600;letter-spacing:.02em;cursor:pointer;color:var(--ink-2)}
 .gr-tafel-details .gr-chips{margin-top:12px}
+
+/* SQ67 (15.09.2026), mit der Tafel portiert: Das Glossar am Ende der
+   Vergleichsansicht - je Begriff eine Zeile, Begriff in Sans fett links,
+   Definition in Serife rechts. Linien statt Kasten (Hausregel); auf dem
+   Telefon untereinander statt nebeneinander. */
+.gr-glossar{margin-top:26px}
+.gr-glossar-liste{margin:0}
+.gr-glossar-eintrag{display:grid;grid-template-columns:230px 1fr;gap:14px;
+  padding:10px 0;border-top:1px solid var(--rule-2)}
+.gr-glossar-eintrag dt{font-family:var(--sans);font-weight:700;font-size:13px;
+  color:var(--ink);margin:0}
+.gr-glossar-eintrag dd{margin:0;font-size:15px;line-height:1.5;
+  color:var(--ink-2)}
+@media (max-width:900px){
+  .gr-glossar-eintrag{grid-template-columns:1fr;gap:3px}
+}
 
 /* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
    stehen deshalb im Kopf der Hauptansicht, nicht in einem eigenen Reiter. */

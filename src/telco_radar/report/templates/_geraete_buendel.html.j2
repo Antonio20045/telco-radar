@@ -71,6 +71,28 @@
     erhoben{% if k.geraetepreis_art == 'finanzierung' %} – die Finanzierung
     gilt nur im Tarifbund dieses Angebots{% endif %}</p>
     {% endif %}
+    {# SQ67 (15.09.2026), an den Zeilen-Ort portiert (O2): DIE PARADOX-
+       ZEILE. Die Summary zeigt zwei Zahlen nebeneinander - die TCO
+       ("mit Tarif") und den Gerätepreis ohne Vertrag bzw. die
+       Finanzierung gesamt - und die mit-Tarif-Zahl kann HOEHER liegen
+       (Barpreis plus Tarifmonate, Vodafone-Referenz) wie NIEDRIGER
+       (finanziertes Gerät im Bündel, o2). EIN kurzer Satz, mit dem
+       Zeitraum, der die Zahl trägt (`k.laufzeit`, dasselbe Feld wie das
+       TCO-Label - TCO-36-Zeilen sagen 36, nicht 24). Der Finanzierungs-
+       Zweig nennt bewusst kein "Gerätepreis": auf der congstar-Zeile ist
+       das Wort verboten, weil sie dort KEINEN behaupten darf. Bis O2
+       stand der Satz im Lesefluss der Karte; die Zeilenform hat fünf
+       Kernangaben offen und ALLES weitere im EINEN Rechenweg (A6) - die
+       Begriffe selber erklärt die Antwortzeile über dem Graph schon
+       ohne Klick. #}
+    {% if k.geraetepreis is not none and k.geraetepreis_art == 'finanzierung' %}
+    <p class="gr-kk-paradox">„mit Tarif“ = {{ k.laufzeit }} Monatsraten für
+    Tarif und Gerät zusammen – deshalb ein anderer Betrag als die
+    Finanzierung gesamt</p>
+    {% elif k.geraetepreis is not none %}
+    <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.laufzeit }} Monate
+    Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
+    {% endif %}
     {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
        Ø-Werte, in denen verschieden viele Tarifmonate stecken. #}
     {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}

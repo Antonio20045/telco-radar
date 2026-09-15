@@ -850,10 +850,12 @@ var TelcoFrage = (function () {
    * und `#verlauf`, `#katalog`, `#tco` stehen als Sprungziele in Mails und
    * Lesezeichen. `#tafel-alarme` gibt es nicht mehr - ein solcher Link
    * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
-   * scheinbar nicht bewegt. */
+   * scheinbar nicht bewegt. Dasselbe gilt seit O3 für `#lifecycle`: die
+   * Portfolio-Tafel ist von der Geräteseite WEG (ihre Abschnitte stehen
+   * auf wettbewerbsradar.html) - ein Hash kann keine andere Seite laden,
+   * der Link bleibt deshalb auf der Hauptansicht, ohne Ziel-Tab. */
   var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
-             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
-             'lifecycle': 'tafel-portfolio'};
+             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf'};
   function ausHash() {
     var id = (location.hash || '').replace(/^#/, '');
     if (!id) return;
@@ -865,133 +867,16 @@ var TelcoFrage = (function () {
   window.addEventListener('hashchange', ausHash);
 })();
 
-/* Die Anbieterkarten der Hauptansicht: Modellauswahl, Sortierung, Filter -
- * und seit P1 (UX-1, 11.09.2026) DIE BANDWAHL: Die Klappe zeigt die Karten
- * des gewaehlten Tarifbands, Karten ohne Band bleiben als eigene markierte
- * Gruppe stehen ("Ohne Tarifband", §7), Karten anderer Baender werden
- * VERSTECKT, nicht entfernt.
+/* O2 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): die Bündel-Zeilen.
  *
- * ES WIRD NICHTS GERECHNET. Die Betraege stehen als `data-`-Attribute an
- * der Karte, gerechnet hat sie `tco_model` - eine Sortierung, die den Wert
- * aus dem sichtbaren Text liest, sortierte "1.099,90" vor "199,00"
- * (derselbe Fehler wie in der Alarmtabelle am 30.08.2026).
+ * Bis O2 sortierte dieser Block die Anbieterkarten der Klappe im Browser.
+ * Die Karten sind Tabellenzeilen geworden: sie stehen SERVERSEITIG nach
+ * TCO-24 sortiert (`geraete_tco_view._zeilen_rang`), der Anbieterfilter
+ * ist entfallen (§4 Entscheidung 3). O3 bringt die SORTIERUNG der Zeilen
+ * zurück (Auftrag C: TCO-24, Δ, Anbieter - ohne Reload), unten im
+ * Graph-Block; die Bandwahl versteckt Zeilen anderer Bänder - derselbe
+ * Handler wie für die Balken.
  */
-(function () {
-  var wahl = document.getElementById('gr-modell');
-  var bandwahl = document.getElementById('gr-band');
-  var bloecke = document.querySelectorAll('.gr-tmodell');
-  if (!bloecke.length) return;
-
-  function zahl(el, feld) {
-    var wert = parseFloat(el.getAttribute('data-' + feld));
-    return isNaN(wert) ? Infinity : wert;
-  }
-
-  function vergleiche(art) {
-    return function (a, b) {
-      /* Karten ohne Zahl stehen immer hinten - sie sind kein guenstigstes
-       * Angebot, sondern eine Luecke. */
-      var leerA = a.classList.contains('gr-kkarte--leer') ? 1 : 0;
-      var leerB = b.classList.contains('gr-kkarte--leer') ? 1 : 0;
-      if (leerA !== leerB) return leerA - leerB;
-      /* Gesamtkosten NUR innerhalb einer Laufzeitgruppe (A5.4): ueber
-       * Laufzeiten hinweg verglich die Summe die Bindung, nicht den
-       * Preis. Deshalb erst nach Laufzeit, dann nach Betrag. */
-      if (art === 'gesamt') {
-        var lA = zahl(a, 'laufzeit'), lB = zahl(b, 'laufzeit');
-        if (lA !== lB) return lA - lB;
-        return zahl(a, 'gesamt') - zahl(b, 'gesamt');
-      }
-      if (art === 'einmalig') return zahl(a, 'einmalig') - zahl(b, 'einmalig');
-      return zahl(a, 'schnitt') - zahl(b, 'schnitt');
-    };
-  }
-
-  function ordneBlock(block) {
-    var behaelter = block.querySelector('.gr-karten');
-    var sortiere = block.querySelector('[data-sortiere]');
-    var filter = block.querySelector('[data-anbieterfilter]');
-    var zahlEl = block.querySelector('.gr-kzahl');
-    if (!behaelter) return;
-    var karten = Array.prototype.slice.call(
-      behaelter.querySelectorAll('.gr-kkarte'));
-    var gruppe = behaelter.querySelector('.gr-kband-gruppe');
-    var art = sortiere ? sortiere.value : 'schnitt';
-    var band = bandwahl ? bandwahl.value : '';
-    var nur = filter ? filter.value : '';
-    var sortiert = karten.slice().sort(vergleiche(art));
-
-    function passt(k) {
-      var kband = k.getAttribute('data-band');
-      /* Ohne Bandauswahl (Modell ohne Baender) steht alles offen; mit
-       * Auswahl gehoeren die Karten OHNE Band zur markierten Gruppe - sie
-       * werden nie ins Band einsortiert und nie weggefiltert, nur Karten
-       * ANDERER Baender verschwinden. */
-      var bandein = !band || !kband || kband === band;
-      var anbieter = !nur || k.getAttribute('data-anbieter') === nur;
-      return bandein && anbieter;
-    }
-
-    var sichtbar = 0;
-    function stelle(k) {
-      var ok = passt(k);
-      k.hidden = !ok;
-      if (ok) { behaelter.appendChild(k); sichtbar++; }
-    }
-    /* ERST die Karten des Bands (sortiert), DANN der Trenner, DANN die
-     * eigene Gruppe ohne Band (sortiert) - die Gruppe trennt, sie sortiert
-     * nichts ein. Versteckte Karten behalten ihre Position im Dokument. */
-    sortiert.filter(function (k) { return k.getAttribute('data-band'); })
-            .forEach(stelle);
-    if (gruppe) {
-      /* Der Trenner steht nur da, wo er etwas trennt: ohne Bandauswahl
-       * oder ohne eine sichtbare Karte dahinter waere er ein Etikett
-       * ueber nichts. */
-      gruppe.hidden = !band || !sortiert.some(function (k) {
-        return !k.getAttribute('data-band') && passt(k);
-      });
-      behaelter.appendChild(gruppe);
-    }
-    sortiert.filter(function (k) { return !k.getAttribute('data-band'); })
-            .forEach(stelle);
-    if (zahlEl) {
-      zahlEl.textContent = sichtbar === karten.length
-        ? String(karten.length)
-        : sichtbar + ' von ' + karten.length;
-    }
-  }
-
-  function ordneAlle() {
-    Array.prototype.forEach.call(bloecke, ordneBlock);
-  }
-
-  if (wahl) {
-    wahl.addEventListener('change', function () {
-      /* O1 (11.09.2026): nur noch EIN Modellblock steht im Dokument - das
-       * Umschalten von 88 Bloecken ist dem Graph-Wechsel aus
-       * #gr-graph-daten gewichen. Diese Klappe ordnet nur ihre Karten;
-       * dass sie bei anderem Modell ganz versteckt wird, entscheidet der
-       * Graph-Block unten. */
-      ordneAlle();
-    });
-  }
-  /* DIE BANDWAHL STEUERT DIE KARTEN MIT (P1/UX-1): dasselbe Feld, das die
-   * Band-Panels umschaltet, ordnet die Kartenklappe - zwei Stellen, eine
-   * Auswahl. */
-  if (bandwahl) bandwahl.addEventListener('change', ordneAlle);
-
-  Array.prototype.forEach.call(bloecke, function (block) {
-    var sortiere = block.querySelector('[data-sortiere]');
-    var filter = block.querySelector('[data-anbieterfilter]');
-    if (sortiere) sortiere.addEventListener('change', function () {
-      ordneBlock(block);
-    });
-    if (filter) filter.addEventListener('change', function () {
-      ordneBlock(block);
-    });
-  });
-  ordneAlle();
-})();
 /* O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Graph - "TCO-24 je
  * Anbieter" für das gewählte Modell × Tarifband.
  *
@@ -1004,10 +889,9 @@ var TelcoFrage = (function () {
  * Zeichenketten (Wert, Δ, Legende) entstehen in Python, hier werden sie
  * nur gesetzt.
  *
- * Die Bündel-Karten stehen bewusst nur für das Vorgabegerät - O2 baut sie
- * zu Tabellenzeilen um. Bei anderem Modell versteckt sich die Kartenklappe
- * und ein Hinweis verweist auf «Alle Bündel als Tabelle», die auf das
- * gewählte Modell gefiltert wird (data-modell an jeder Zeile).
+ * O3 (15.09.2026): Auch die Bündel-ZEILEN folgen inzwischen dem Modell -
+ * als fertiges Markup aus dem Fragment `data/geraete-buendel.html`
+ * (siehe `setzeBuendel` unten), nicht als zweite Kartenkopie im Browser.
  */
 (function () {
   var modellwahl = document.getElementById('gr-modell');
@@ -1112,11 +996,17 @@ var TelcoFrage = (function () {
     }
   }
 
-  function filtereTabelle(mid, alles) {
+  function stelleZeilen(band) {
+    /* O2: die Bündel-Zeilen folgen der Bandwahl - Zeilen ANDERER Bänder
+     * werden versteckt, nicht entfernt. Die Zeilen OHNE Band stehen in
+     * der eigenen Gruppe darunter und haengen an keiner Auswahl an.
+     * O3: der Selektor geht über den MONTAGEPUNKT `#gr-bnd-gruppe` statt
+     * über `#gr-bndliste` - seit dem Modellwechsel stehen dort auch die
+     * injizierten Zeilen aus dem Fragment (ohne eigene ids). */
     var zeilen = document.querySelectorAll(
-      '#gr-tco-tabelle .gr-tzeile[data-modell]');
+      '#gr-bnd-gruppe .gr-bnd[data-band]');
     Array.prototype.forEach.call(zeilen, function (z) {
-      z.hidden = !alles && z.getAttribute('data-modell') !== mid;
+      z.hidden = !!band && z.getAttribute('data-band') !== band;
     });
   }
 
@@ -1131,6 +1021,186 @@ var TelcoFrage = (function () {
       bandwahl.value = erlaubt[0];
     }
   }
+
+  /* O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): die Bündel-Zeilen für
+   * JEDES Modell - der S3-Befund des O2-Evaluators war, dass der
+   * Modell-Umschalter Zeilen nur fürs Vorgabegerät zeigte (19 von 423).
+   *
+   * Drei Bauteile, kein Renderer: das Fragment
+   * `data/geraete-buendel.html` trägt die Zeilen-Gruppe jedes Nicht-
+   * Vorgabemodells (serverseitig aus DEMSELBEN Makro wie die Seite),
+   * dieser Block holt es beim ERSTEN Modellwechsel (eine Anfrage, dann
+   * Cache) und setzt die Gruppe des gewählten Modells in den Montage-
+   * punkt `#gr-bnd-gruppe` ein. Fürs Vorgabemodell steht der Original-
+   * zustand der Seite bereit (Klon vom ersten Aufruf) - der Weg zurück
+   * nach zwei Wechseln zeigt exakt die Server-Ausgabe. Nichts wird im
+   * Browser gerechnet oder formatiert: alle Zeichenketten kommen fertig.
+   */
+  var fragmentLager = null;
+  var fragmentVersprechen = null;
+  var vorgabeGruppe = null;
+  var wechselFolge = 0;
+  var zuletztModell = null;
+
+  /* S2-Fix (O3-Evaluation): der Vorgabe-Zustand wird HIER geklont, beim
+   * Laden, VOR jedem ersten `setzeBuendel`-Durchlauf. Bis zur O3-Fix-
+   * runde klonte der Vorgabe-Zweig ihn erst im eigenen Durchlauf - bei
+   * einem Deep-Link auf ein FREMDmodell (genau das, was jeder der 88
+   * Radar-Querlinks tut) war der erste Durchlauf fremd, der Montagepunkt
+   * trug fremde Zeilen, und der Rückwechsel klonte DIESE als "Vorgabe":
+   * Titel und Graph sagten Vorgabegerät, die Tabelle zeigte die eine
+   * Zeile des Deep-Link-Geräts (am echten Bestand: a56, 664,75 €, statt
+   * der 19 Zeilen des iPhone 17 Pro). Der Klon steht jetzt fest, bevor
+   * irgendein Wechsel den Montagepunkt anfassen kann. */
+  (function () {
+    var anfangsGruppe = element('gr-bnd-gruppe');
+    if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
+  })();
+
+  function holeFragment() {
+    if (fragmentLager) return Promise.resolve(fragmentLager);
+    if (!fragmentVersprechen) {
+      fragmentVersprechen = fetch('data/geraete-buendel.html')
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.text();
+        })
+        .then(function (t) {
+          var doc = new DOMParser().parseFromString(t, 'text/html');
+          fragmentLager = {};
+          Array.prototype.forEach.call(
+            doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
+            function (l) {
+              fragmentLager[l.getAttribute('data-modell')] = l;
+            });
+          return fragmentLager;
+        });
+    }
+    return fragmentVersprechen;
+  }
+
+  function gruppeLeeren(gruppe) {
+    while (gruppe.firstChild) gruppe.removeChild(gruppe.firstChild);
+  }
+
+  function setzeBndTitel(m, band) {
+    var titel = element('gr-bnd-titel');
+    if (!titel) return;
+    if (band && band.bnd_titel) titel.textContent = band.bnd_titel;
+    else if (m.bnd_titel_ohne) titel.textContent = m.bnd_titel_ohne;
+  }
+
+  function leerSatz(gruppe, text) {
+    var p = document.createElement('p');
+    p.className = 'gr-erklaer';
+    p.textContent = text;
+    gruppe.appendChild(p);
+  }
+
+  function setzeBuendel(m, band, bandKey) {
+    var gruppe = element('gr-bnd-gruppe');
+    if (!gruppe) return;
+    var fertig = function (knoten, fehler) {
+      gruppeLeeren(gruppe);
+      if (knoten) {
+        var klon = document.importNode(knoten, true);
+        while (klon.firstChild) gruppe.appendChild(klon.firstChild);
+      } else if (fehler) {
+        leerSatz(gruppe, 'Die Bündel-Zeilen dieses Geräts konnten nicht ' +
+                         'geladen werden – der Graph oben nennt je Tarif' +
+                         'band die Werte aller Anbieter.');
+      } else {
+        leerSatz(gruppe, 'Für dieses Gerät steht noch keine Bündel-Zeile ' +
+                         'da – der Graph oben nennt je Tarifband, welche ' +
+                         'Anbieter eine Zahl tragen.');
+      }
+      setzeBndTitel(m, band);
+      stelleZeilen(bandKey);
+      wendeSortierungAn();
+    };
+    if (m.id === vorgabe) {
+      fertig(vorgabeGruppe, false);
+      return;
+    }
+    var meineFolge = ++wechselFolge;
+    holeFragment().then(function (lager) {
+      if (meineFolge !== wechselFolge) return;
+      fertig(lager ? lager[m.id] : null, false);
+    }, function () {
+      if (meineFolge !== wechselFolge) return;
+      fertig(null, true);
+    });
+  }
+
+  /* O3 (C, Sichttest-Punkt aus §2): die sortierbare Bündeltabelle. Die
+   * Server-Vorsortierung nach TCO-24 (O2) bleibt der Ausgangszustand -
+   * `sortierung.key === null` heißt "Ordnung, wie sie kam". Sortiert
+   * werden die KNOTEN (data-gesamt, data-delta als Zahl, data-anbieter
+   * als Text), ohne Reload und ohne neue Anfrage; ein gesetztes window-
+   * Flag überlebt das (der Browser-Test hält es dagegen). Zeilen OHNE
+   * Wert für den gewählten Schlüssel wandern ans ENDE, auch bei
+   * absteigender Sortierung - eine Zeile ohne Δ ist keine besonders
+   * kleine Abweichung. */
+  var sortierung = {key: null, richtung: 1};
+  var sortierKnoepfe = document.querySelectorAll('#gr-buendel .gr-bsort');
+
+  function sortierWert(z) {
+    if (sortierung.key === 'anbieter') {
+      return z.getAttribute('data-anbieter') || '';
+    }
+    var attr = sortierung.key === 'tco' ? 'data-gesamt' : 'data-delta';
+    var roh = z.getAttribute(attr);
+    if (roh === null || roh === '') return null;
+    var zahl = parseFloat(roh);
+    return isNaN(zahl) ? null : zahl;
+  }
+
+  function wendeSortierungAn() {
+    if (!sortierung.key) return;
+    var richt = sortierung.richtung;
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-buendel .gr-bndliste'),
+      function (liste) {
+        var zeilen = Array.prototype.filter.call(
+          liste.children,
+          function (k) {
+            return k.classList && k.classList.contains('gr-bnd');
+          });
+        zeilen.sort(function (a, b) {
+          var ka = sortierWert(a), kb = sortierWert(b);
+          if (ka === null && kb === null) return 0;
+          if (ka === null) return 1;
+          if (kb === null) return -1;
+          if (typeof ka === 'string' || typeof kb === 'string') {
+            return ka.localeCompare(kb, 'de') * richt;
+          }
+          return (ka - kb) * richt;
+        });
+        zeilen.forEach(function (z) { liste.appendChild(z); });
+      });
+  }
+
+  function markiereSortierung() {
+    Array.prototype.forEach.call(sortierKnoepfe, function (knopf) {
+      var aktiv = knopf.getAttribute('data-bsort') === sortierung.key;
+      knopf.classList.toggle('ist-auf', aktiv && sortierung.richtung > 0);
+      knopf.classList.toggle('ist-ab', aktiv && sortierung.richtung < 0);
+    });
+  }
+
+  Array.prototype.forEach.call(sortierKnoepfe, function (knopf) {
+    knopf.addEventListener('click', function () {
+      var key = knopf.getAttribute('data-bsort');
+      if (sortierung.key === key) {
+        sortierung.richtung = -sortierung.richtung;
+      } else {
+        sortierung.key = key;
+        sortierung.richtung = 1;
+      }
+      markiereSortierung();
+      wendeSortierungAn();
+    });
+  });
 
   function baueGraph() {
     var m = modellDat(modellwahl.value);
@@ -1182,20 +1252,39 @@ var TelcoFrage = (function () {
       }
     }
 
-    /* Die Kartenklappe gehört zum Vorgabegerät (siehe Blockkopf); bei
-     * anderem Modell versteckt sie sich, statt fremde Karten als aktuelle
-     * zu zeigen, und die Bündel-Tabelle schneidet sich auf das gewählte
-     * Gerät zu. */
-    var istVorgabe = m.id === vorgabe;
-    var klappe = document.querySelector('.gr-karten-auf');
-    if (klappe) klappe.hidden = !istVorgabe;
-    var hinweis = element('gr-karten-hinweis');
-    if (hinweis) hinweis.hidden = istVorgabe;
-    filtereTabelle(m.id, istVorgabe);
+    /* O3 (S3): die Bündel-Tabelle gehört zum GEWÄHLTEN Modell - beim
+     * Modellwechsel werden ihre Zeilen eingesetzt (Fragment bzw. Vorgabe-
+     * Klon, siehe `setzeBuendel`), beim Bandwechsel bleiben sie stehen
+     * und nur Titel und Bandfilter folgen (offene Rechenwege eines
+     * Bandwechsels bleiben sonst auf, ein Modellwechsel setzt sie
+     * berechtigt zurück). */
+    var bandKey = band ? bandwahl.value : '';
+    if (m.id !== zuletztModell) {
+      zuletztModell = m.id;
+      setzeBuendel(m, band, bandKey);
+    } else {
+      setzeBndTitel(m, band);
+      stelleZeilen(bandKey);
+    }
   }
 
   modellwahl.addEventListener('change', baueGraph);
   if (bandwahl) bandwahl.addEventListener('change', baueGraph);
+
+  /* O3 (B5): der Deep-Link der Radar-Querlinks - `?modell=<id>` öffnet
+   * die Seite MIT diesem Modell. Eine id, die der Selektor nicht kennt,
+   * wird still verworfen: der Link landet auf dem Vorgabegerät, nicht
+   * auf einer leeren Auswahl (dieselbe Regel wie die alten Hash-Ziele). */
+  try {
+    var wunsch = new URLSearchParams(location.search).get('modell');
+    if (wunsch && wunsch !== modellwahl.value) {
+      var bekannt = Array.prototype.some.call(
+        modellwahl.options,
+        function (o) { return o.value === wunsch; });
+      if (bekannt) modellwahl.value = wunsch;
+    }
+  } catch (e) { /* ältere Browser: der Link fällt aufs Vorgabegerät */ }
+
   baueGraph();
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
@@ -1430,7 +1519,12 @@ function grFilterleiste(tafelId, mehrId) {
   }
 }
 
-grFilterleiste('tafel-tco', 'gr-mehr');
+/* O2 (11.09.2026): die Alarmtabelle lebt auf dem WETTBEWERBS-RADAR
+   (#wr-alarme) - dieselbe Mechanik (Filter, Suche, Sortierung, Deckel,
+   Aufklapper), derselbe Initialisierer, nur ein anderer Behaelter. Auf
+   geraete.html existiert #wr-alarme nicht, der Aufruf kehrt sofort
+   zurueck (Guard am Funktionskopf). */
+grFilterleiste('wr-alarme', 'gr-mehr');
 grFilterleiste('tafel-katalog', 'gr-kmehr');
 
 /* =========================================================================
