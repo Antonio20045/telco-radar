@@ -1,0 +1,171 @@
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  7%]
+........................................................................ [  9%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+.............................F.......................................... [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 36%]
+................................................................s....... [ 38%]
+....................................................................ssss [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+....................................................s................... [ 57%]
+..............................s......................................... [ 60%]
+..................................................ssss.................. [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+...................................                                      [100%]
+=================================== FAILURES ===================================
+___________ test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen ____________
+
+    @pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
+    def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
+        """Der Waechter fuer den Zustand von MORGEN.
+    
+        Vor dem 31.08.2026 ergab derselbe simulierte Nachtlauf 85 Zeilen
+        Verweildauer (alle "21 Tage", 11 unterscheidbare Texte, zwoelfmal
+        dasselbe Geraet beim selben Haendler) und 85 Zeilen Preisverfall (alle
+        "+0,0 %") - genau die zwei Bildschirmseiten, deren Abschaffung der
+        Kommentarblock ueber `MIND_TERMINE_JE_GERAET` beschreibt.
+        """
+        alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
+        a = auswertung(alle, punkte, katalog, heute="2026-08-31",
+                       laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
+    
+        # Der Fall traete ohne die Zusicherungen wirklich ein: es GIBT genug
+        # aktive Listungen mit 21 Tagen Spanne und unbewegtem Preis.
+        kandidaten = [e for e in alle
+                      if e.get("status") == STATUS_AKTIV
+                      and listungsdauer(e) is not None
+                      and listungsdauer(e) >= MIND_TAGE_JE_GERAET]
+        assert len(kandidaten) >= 80, len(kandidaten)
+        unbewegt = [e for e in kandidaten
+                    if preisverfall(e) and preisverfall(e)["absolut"] == 0]
+>       assert len(unbewegt) >= 80, len(unbewegt)
+E       AssertionError: 52
+E       assert 52 >= 80
+E        +  where 52 = len([{'abgerufen_am': '2026-09-13', 'anbieter': 'ALDI TALK', 'anbieter_typ': 'discount', 'confidence': 'hoch', ...}, {'abg...abgerufen_am': '2026-09-13', 'anbieter': 'mobilcom-debitel', 'anbieter_typ': 'handel', 'confidence': 'hoch', ...}, ...])
+
+tests/test_geraete_lifecycle.py:963: AssertionError
+=============================== warnings summary ===============================
+tests/test_collect.py::test_rss_falls_back_to_human_readable_date
+  /Users/antonio/Library/Python/3.9/lib/python/site-packages/feedparser/util.py:95: DeprecationWarning: To avoid breaking existing software while fixing issue 310, a temporary mapping has been created from `updated_parsed` to `published_parsed` if `updated_parsed` doesn't exist. This fallback will be removed in a future version of feedparser.
+    warnings.warn(
+
+tests/test_redaktion_kontinuitaet.py: 66 warnings
+  /Users/antonio/Library/Python/3.9/lib/python/site-packages/httpx/_config.py:51: DeprecationWarning: `verify=<str>` is deprecated. Use `verify=ssl.create_default_context(cafile=...)` or `verify=ssl.create_default_context(capath=...)` instead.
+    warnings.warn(message, DeprecationWarning)
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/lieferzeit.py:278: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html or "", "html.parser")
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/aenderungen.py:166: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html, "html.parser")
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/tarif_crawler.py:266: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html or "", "html.parser")
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/tarif_ldjson.py:132: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html or "", "html.parser")
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/tarif_telekom_kacheln.py:176: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html or "", "html.parser")
+
+tests/test_vorsortierung.py::test_die_bilanz_steht_im_bericht_json
+  /Users/antonio/.openclaw/worktrees/dd28982e805b7ec3/ticket-rv2/src/telco_radar/collect/tarif_kacheln.py:298: XMLParsedAsHTMLWarning: It looks like you're using an HTML parser to parse an XML document.
+  
+  Assuming this really is an XML document, what you're doing might work, but you should know that using an XML parser will be more reliable. To parse this document as XML, make sure you have the Python package 'lxml' installed, and pass the keyword argument `features="xml"` into the BeautifulSoup constructor.
+  
+  If you want or need to use an HTML parser on this document, you can make this warning go away by filtering it. To do that, run this code before calling the BeautifulSoup constructor:
+  
+      from bs4 import XMLParsedAsHTMLWarning
+      import warnings
+  
+      warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+  
+    suppe = BeautifulSoup(html or "", "html.parser")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_geraete_lifecycle.py::test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen
+1 failed, 2975 passed, 12 skipped, 73 warnings in 362.71s (0:06:02)
