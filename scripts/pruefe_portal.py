@@ -730,10 +730,12 @@ def main() -> int:
             maengel.append("G2 (Preis-/TCO-Historie) fehlt im Historie-Reiter")
 
         # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
-        # beantwortet. Sie steht an JEDER Karte mit einer Zahl.
-        if start is not None and start.select(".gr-kkarte") \
-                and not start.select(".gr-kk-24"):
-            maengel.append("keine Karte beantwortet 'nach 24 Monaten gezahlt'")
+        # beantwortet. Seit O2 (11.09.2026) steht sie im Rechenweg-Aufklapper
+        # JEDER Bündel-Zeile mit einer Zahl.
+        if start is not None and start.select(".gr-bnd[data-gesamt]") \
+                and not start.select(".gr-bnd .gr-kk-24"):
+            maengel.append("keine Bündelzeile beantwortet "
+                           "'nach 24 Monaten gezahlt'")
         # KEIN Mangel, wenn der Datensatz fehlt: die Vorlage rendert ihn nur
         # bei `verlauf.hat_daten`, und das rechnet auf den GEPRUEFTEN
         # Eintraegen. Ein Bestand, der nur gebrauchte Geraete oder nur
@@ -751,7 +753,17 @@ def main() -> int:
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        zeilen = gr.select("#tafel-tco .gr-a-zeile")
+        # O2 (11.09.2026): die Alarmtabelle steht auf dem WETTBEWERBS-RADAR
+        # - dieselbe Pruefung, der neue Ort. `gr` bleibt die Geraeteseite
+        # fuer alles Strukturelle daruber; die Beleg- und Kachel-Zaehlung
+        # liest die Radarseite.
+        radar_seite = None
+        radar_pfad = site / "wettbewerbsradar.html"
+        if radar_pfad.exists():
+            radar_seite = BeautifulSoup(radar_pfad.read_text("utf-8"),
+                                        "html.parser")
+        zeilen = (radar_seite.select("#wr-alarme .gr-a-zeile")
+                  if radar_seite is not None else [])
         if not zeilen:
             # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
             # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
@@ -778,7 +790,8 @@ def main() -> int:
             # Jede Zeile hat ihren Aufklapper, und der zeigt mehr als einen
             # Anbieter - sonst waere der Klick eine Handlung ohne Ergebnis.
             ohne_aufklapper = [z for z in zeilen
-                               if gr.find(id=z.get("data-auf")) is None]
+                               if radar_seite.find(
+                                   id=z.get("data-auf")) is None]
             if ohne_beleg:
                 maengel.append(f"{len(ohne_beleg)} Alarmzeilen ohne Beleg")
             if ohne_aufklapper:
@@ -787,15 +800,16 @@ def main() -> int:
             # Die vier Kacheln zaehlen genau die verglichenen Kombinationen.
             # Eine Kachel, die anders zaehlt als der Satz darunter, ist der
             # Fehlertyp aus CLAUDE.md 6.
-            kacheln = gr.select(".gr-chips .gr-chip b")
+            kacheln = radar_seite.select(".gr-chips .gr-chip b")
             summe = sum(int(k.get_text(strip=True)) for k in kacheln
                         if k.get_text(strip=True).isdigit())
             # `start` kann None sein - dann ist die Tafel umbenannt worden,
             # und das ist ein Durchfaller, kein Absturz. Die erste Fassung
             # rief hier `.get_text()` darauf auf und riss das ganze Skript
             # mit einem AttributeError ab.
-            satz = (" ".join(start.get_text(" ", strip=True).split())
-                    if start is not None else "")
+            alarm_abschnitt = radar_seite.select_one("#wr-alarme")
+            satz = (" ".join(alarm_abschnitt.get_text(" ", strip=True).split())
+                    if alarm_abschnitt is not None else "")
             if len(kacheln) != 4:
                 maengel.append(f"{len(kacheln)} statt 4 Alarm-Chips")
             elif f"{summe} Modelle mit ihren Speichergrößen" not in satz:
