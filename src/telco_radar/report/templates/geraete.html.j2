@@ -480,16 +480,31 @@
      diesem Anbieter nicht gemessen, steht die benannte Lücke (der
      Marktpreis eines fremden Anbieters steht, wo es ihn gibt, in der
      eff-Zeile weiter unten mit Namen). #}
+  {# SQ67 (15.09.2026): DIE PARADOX-ZEILE. "Gerät 999 €, mit Tarif 941 €"
+     - die mit-Tarif-Zahl kann HOEHER liegen (Barpreis plus Tarifmonate,
+     Vodafone-Referenz) wie NIEDRIGER (finanziertes Gerät im Buendel,
+     o2) - fuer die Zielgruppe ohne Erklärung ein Widerspruch der Karte
+     gegen sich selbst. EIN kurzer Satz direkt unter den zwei Preisen,
+     mit dem Zeitraum, der die Zahl traegt (`k.laufzeit`, dasselbe Feld
+     wie das TCO-Label). Der Finanzierungs-Zweig nennt bewusst kein
+     "Gerätepreis": auf der congstar-Karte ist das Wort vor dem Rechenweg
+     verboten, weil die Karte dort KEINEN behaupten darf
+     (test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis). #}
   {% if k.geraetepreis is not none and k.geraetepreis_art == "finanzierung" %}
   <p class="gr-kk-leit"><b>Finanzierung gesamt</b> <span>{{ k.geraetepreis | euro }}</span></p>
   <p class="gr-kk-zweit">Zuzahlung und alle Geräteraten · tarifabhängig</p>
   <p class="gr-kk-zweit">Gerät ohne Vertrag: bei {{ k.anbieter }} nicht
   erhoben</p>
   <p class="gr-kk-zweit">mit Tarif: <b>{{ k.label }}</b> {{ k.gesamt | euro }}</p>
+  <p class="gr-kk-zweit gr-kk-paradox">„mit Tarif“ = {{ k.laufzeit }}
+  Monatsraten für Tarif und Gerät zusammen – deshalb ein anderer Betrag
+  als die Finanzierung gesamt</p>
   <p class="gr-kk-omonat">Ø {{ k.schnitt_monat | euro }}/Monat</p>
   {% elif k.geraetepreis is not none %}
   <p class="gr-kk-leit"><b>Gerätepreis</b> <span>{{ k.geraetepreis | euro }}</span></p>
   <p class="gr-kk-zweit">mit Tarif: <b>{{ k.label }}</b> {{ k.gesamt | euro }}</p>
+  <p class="gr-kk-zweit gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.laufzeit }}
+  Monate Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
   <p class="gr-kk-omonat">Ø {{ k.schnitt_monat | euro }}/Monat</p>
   {% else %}
   <p class="gr-kk-leit"><b>{{ k.label }}</b> <span>{{ k.gesamt | euro }}</span></p>

@@ -2782,6 +2782,15 @@ b,strong{font-weight:700}
 .gr-kk-leit span{font-family:var(--serif);font-size:27px;line-height:1.1}
 .gr-kk-zweit{margin:0 0 8px;font-family:var(--serif);font-size:16px;
   color:var(--ink-2)}
+/* SQ67: Die Paradox-Zeile unter „Gerät X € / mit Tarif Y €". Zurueck-
+   genommen (13,5 px, grau), aber im Lesefluss und ohne Klick sichtbar -
+   sie erklaert die beiden Zahlen ueber ihr, sie konkurriert nicht mit
+   ihnen. Nicht unter 12 px: Vorlagenregel 2 dieser Seite.
+   Die Regel steht HINTER `.gr-kk-zweit` (beide Selektoren 0,1,0, das
+   Element traegt beide Klassen): weiter oben gewann die 16-px-Serife
+   der Zweitzahl, die zurueckgenommene Stimme war wirkungslos - gefun-
+   den in der Browser-Messung, nicht im Quelltext. */
+.gr-kk-paradox{font-size:13.5px;line-height:1.45;color:var(--ink-3)}
 .gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
 .gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
 /* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
