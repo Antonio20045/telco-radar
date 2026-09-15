@@ -544,3 +544,145 @@ def test_am_echten_bestand_bleibt_die_klammerfarbe_unversehrt():
     ausgeliefert."""
     farben = {e.get("farbe_roh") for e in bereinige(_echter_bestand())}
     assert "Silver Shadow (Enterprise Edition)" in farben
+
+
+# --------------------------------------------------------------------------
+# Die Schreibweisen-Faltung (RV-2, Review vom 09.09.2026)
+#
+# Der Review-Befund: "Tiefblau Saturn↗" neben "tiefblau Telekom↗" in der
+# Katalogtabelle desselben Geraets - der Erklaertext darueber verspricht
+# "Zwei Schreibweisen derselben Listung stehen dabei als eine Zeile", und
+# zwei Zeilen, deren Farben sich nur in der Grossschreibung unterscheiden,
+# lesen sich wie ein Datenfehler. Zusammengefuehrt wird die SCHREIBWEISE,
+# nicht die Zeile: Saturn und Telekom sind zwei Laeden mit zwei Preisen,
+# und zwei Angebote zu einer Zeile zu falten loeschte einen wahren Preis.
+# --------------------------------------------------------------------------
+
+def _rv2_zeile(anbieter, farbe, preis, url):
+    return _e(anbieter=anbieter, gid="apple-iphone-17-pro", speicher=256,
+              farbe_roh=farbe, farbe_norm=None, zustand="neu", preis=preis,
+              url=url, abgerufen="2026-09-09",
+              titel=f"Apple iPhone 17 Pro 256 GB {farbe}",
+              kennung=f"{anbieter}--rv2")
+
+
+def test_dieselbe_farbe_steht_in_nur_noch_einer_schreibweise_da():
+    """DER Fall des Reviews, wortgleich gestellt: iPhone 17 Pro 256 GB,
+    Saturn "Tiefblau" gegen Telekom "tiefblau". Beide Zeilen bleiben
+    stehen (zwei Laeden, zwei Preise - die Gegenprobe dazu steht einen
+    Test tiefer), aber die Farbe steht danach genau EINMAL da: dieselbe
+    Schreibweise auf jeder Zeile. Vor der Faltung stand das Paar als
+    {"Tiefblau", "tiefblau"} im Bestand."""
+    saturn = _rv2_zeile("Saturn", "Tiefblau", 1179.0,
+                        "https://www.saturn.de/de/product/iphone-17-pro-tiefblau")
+    telekom = _rv2_zeile("Telekom", "tiefblau", 1197.0,
+                         "https://www.telekom.de/shop/geraet/apple/iphone-17-pro/tiefblau-256-gb")
+    fertig = bereinige([saturn, telekom])
+    # Zwei Laeden bleiben zwei Zeilen - hier wird keine Zeile geloescht.
+    assert len(fertig) == 2
+    assert sorted(e["preis_ohne_vertrag"] for e in fertig) == [1179.0, 1197.0]
+    # ... aber die Farbe steht nur noch in EINER Schreibweise da.
+    assert {(e["farbe_normalisiert"] or e["farbe_roh"]) for e in fertig} \
+        == {"Tiefblau"}
+
+
+def test_die_schreibweisen_variante_wird_zur_einen_zeile_zusammengefuehrt():
+    """Gegenprobe 1: dieselbe LISTUNG (gleicher Laden, gleiche Adresse,
+    gleicher Preis), nur die Schreibweise der Farbe hat sich zwischen zwei
+    Craeulen geaendert - das ist EINE Zeile. Die Zusammenfuehrung selbst
+    laeuft ueber den Zwillings-Schluessel, dessen `farbschluessel` Gross
+    und Klein laengst faltet; die Faltung sorgt dafuer, dass der
+    Ueberlebende nicht je nach Sieger mal "Tiefblau" und mal "tiefblau"
+    heisst."""
+    alt = _rv2_zeile("Saturn", "Tiefblau", 1179.0,
+                     "https://www.saturn.de/de/product/iphone-17-pro")
+    neu = _rv2_zeile("Saturn", "tiefblau", 1179.0,
+                     "https://www.saturn.de/de/product/iphone-17-pro")
+    (fertig,) = bereinige([alt, neu])
+    assert fertig["quelle_url"] == alt["quelle_url"]
+    assert (fertig["farbe_normalisiert"] or fertig["farbe_roh"]) == "Tiefblau"
+
+
+def test_verschiedene_farben_werden_nicht_zusammengefaltet():
+    """Gegenprobe 2: Faltung ist KEIN Merge. "Tiefblau" und "kosmisch
+    orange" sind zwei Farben und bleiben zwei Schreibweisen und zwei
+    Zeilen - auch congstars "Deep Blue" fuer dasselbe Geraet bleibt seine
+    eigene Farbe neben "Tiefblau" (Marketingname gegen Farbwort). Die
+    Faltung hebt NUR Schreibweisen auf, die `normalisiere` ineinander
+    ueberfuehrt."""
+    a = _rv2_zeile("Saturn", "Tiefblau", 1179.0, "https://a.de/1")
+    b = _rv2_zeile("Telekom", "tiefblau", 1197.0, "https://b.de/2")
+    c = _rv2_zeile("congstar", "Deep Blue", 1225.0, "https://c.de/3")
+    d = _rv2_zeile("o2", "kosmisch orange", 999.0, "https://d.de/4")
+    fertig = bereinige([a, b, c, d])
+    assert len(fertig) == 4
+    farben = sorted((e["farbe_normalisiert"] or e["farbe_roh"]) for e in fertig)
+    assert farben == ["Deep Blue", "Tiefblau", "Tiefblau", "kosmisch orange"]
+
+
+def test_die_faltung_greift_nicht_nach_kuerzeln():
+    """`farbschluessel` streicht Kuerzel ("pistachio bk" -> "pistachio"),
+    damit der Zwillings-Merge den o2-Doppelpreis vom 31.08.2026 als
+    Widerspruch SELBEN Namens erkennt. Die ANZEIGE darf genau das NICHT
+    tun: "pistachio bk" ist eine Listung, die es gibt, und wer ihre
+    Schreibweise auf "pistachio" faltete, versteckte die zweite Zeile
+    statt sie zu zeigen."""
+    a = _rv2_zeile("o2", "pistachio", 811.0, "https://o2.de/gleich")
+    b = _rv2_zeile("o2", "pistachio bk", 667.0, "https://o2.de/gleich")
+    fertig = bereinige([a, b])
+    assert len(fertig) == 2
+    assert sorted((e["farbe_normalisiert"] or e["farbe_roh"]) for e in fertig) \
+        == ["pistachio", "pistachio bk"]
+
+
+def test_die_faltung_laesst_eingabe_und_zeilenzahl_unangetastet():
+    """Zusicherung des Tickets: Messdaten unberuehrt, gefaltet wird erst
+    beim Merge. Die Eingabe-dicts bleiben unveraendert (Store-Schutz, siehe
+    Modulkopf), und kein Laeden-Paar faellt einer Faltung zum Opfer."""
+    eingabe = [
+        _rv2_zeile("Saturn", "Tiefblau", 1179.0, "https://a.de/1"),
+        _rv2_zeile("Telekom", "tiefblau", 1197.0, "https://b.de/2"),
+        _rv2_zeile("Vodafone", "TIEFBLAU", 1199.9, "https://c.de/3"),
+    ]
+    vorher = deepcopy(eingabe)
+    fertig = bereinige(eingabe)
+    assert eingabe == vorher
+    assert len(fertig) == 3
+
+
+def test_am_echten_bestand_hat_jede_farbe_eine_schreibweise():
+    """Die Invariante gegen den echten Bestand: kein `normalisiere`-
+    Schluessel darf danach mit zwei Schreibweisen vertreten sein, und die
+    Zeilenzahl darf sich nicht aendern - die Faltung fasst Zeilen DESHALB
+    nicht zusammen, weil zwei Zeilen derselben Farbe zwei Laeden sein
+    koennen. Vor dem Fix standen 28 Schluessel in zwei Schreibweisen da
+    (gemessen am Bestand vom 14.09.2026, u. a. "Deep Blue"/"deep blue",
+    "Space Schwarz"/"space schwarz", "Glacier Blue"/"Glacier blue")."""
+    from telco_radar.geraete_model import normalisiere
+    sichtbar = _echter_bestand()
+    fertig = bereinige(sichtbar)
+    assert len(fertig) == len(sichtbar)
+    je_schluessel = {}
+    for e in fertig:
+        anzeige = e.get("farbe_normalisiert") or e.get("farbe_roh") or ""
+        if anzeige:
+            je_schluessel.setdefault(normalisiere(anzeige), set()).add(anzeige)
+    doppelt = {k: v for k, v in je_schluessel.items() if len(v) > 1}
+    assert doppelt == {}
+
+
+def test_der_katalog_zeigt_den_concrete_fall_mit_einer_schreibweise():
+    """Der konkrete Fall des Reviews durch die TISCHE, nicht nur durch den
+    Merge: `katalogzeilen()` baut die Zeilen von Reiter 2, und seine
+    Farbspalte ist es, in der "Tiefblau Saturn" neben "tiefblau Telekom"
+    stand. Nach der Faltung zeigen alle Zeilen desselben Geraets dieselbe
+    Schreibweise - die Tabelle widerspricht ihrem Erklaertext nicht mehr."""
+    from telco_radar.report.geraete_view import katalogzeilen
+    saturn = _rv2_zeile("Saturn", "Tiefblau", 1179.0,
+                        "https://www.saturn.de/de/product/iphone-17-pro-tiefblau")
+    telekom = _rv2_zeile("Telekom", "tiefblau", 1197.0,
+                         "https://www.telekom.de/shop/geraet/apple/iphone-17-pro/tiefblau-256-gb")
+    zeilen = katalogzeilen(bereinige([saturn, telekom]),
+                           lade_katalog(_WURZEL))
+    assert len(zeilen) == 2
+    assert {z["farbe"] for z in zeilen} == {"Tiefblau"}
