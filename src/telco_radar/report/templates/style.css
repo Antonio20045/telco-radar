@@ -2826,6 +2826,13 @@ b,strong{font-weight:700}
   .gr-bnd-tarif{grid-area:tar}
   .gr-bnd-bar{grid-area:bar;text-align:right}
   .gr-bnd-delta{grid-area:dl}
+  /* O3-Evaluation S4: der Kopf ist hier versteckt - die Delta-ZEILE des
+     Stapels stünde damit als zweiter nackter Euro-Betrag neben dem
+     Geraet-ohne-Vertrag-Wert. Das Delta-Praefix erklaert sie mit einem
+     Zeichen (dieselbe Benennung wie die Desktop-Spalte "Δ zu Vodafone");
+     vor "Referenz" und "–" steht es nicht, die Klasse setzt das Makro. */
+  .gr-bnd-delta--wert::before{content:"Δ ";font-family:var(--sans);
+    color:var(--ink-4)}
   .gr-bnd-chev{grid-area:chev}
   .gr-bnd-rw{margin:0 0 12px;padding:10px 12px}
 }
@@ -3125,9 +3132,11 @@ b,strong{font-weight:700}
    über der Falz, Kriterium 11c) geht vor. Dieselbe Entscheidung wie O1
    für den Radar-Link („43 px Falz - die Leitantwort geht vor"): der
    Untertitel steht am SCHIRM vollständig (dort, wo der Entwurf ihn
-   zeigt); am Telefon ist er versteckt statt gekürzt - ein halber Satz
-   wäre schlimmer als keiner, und der Quasi-Reiter daneben führt
-   denselben Weg. Die Reiterleiste rollt IN SICH statt zu umbrechen
+   zeigt); am TELEFON ist der GANZE Untertitel versteckt, nicht nur sein
+   Schwesterseiten-Satz - ein halber Satz wäre schlimmer als keiner. Was
+   mobil bleibt, ist der Weg zum Radar als Quasi-Reiter; WAS die Seite
+   misst, steht am Telefon im „Wie gerechnet?"-Aufklapper unter dem
+   Graphen (dort steht die Formel samt Begriff). Die Reiterleiste rollt IN SICH statt zu umbrechen
    (dieselbe Hausregel wie `.gr-scroll`: zwei Zeilen kosteten 42 px).
    Basis zum Vergleich: erste Balkenzeile bei 812 px. */
 @media (max-width:700px){

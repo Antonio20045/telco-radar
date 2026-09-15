@@ -172,6 +172,37 @@ def _zeilen_anbieter(s):
 # A (S3): Modellwechsel zeigt EIGENE Zeilen
 # --------------------------------------------------------------------------
 
+def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
+    """S2 (O3-Evaluation): der Vorgabe-Klon wurde bislang erst IM Vorgabe-
+    Durchlauf von `setzeBuendel` gezogen - bei einem Deep-Link auf ein
+    FREMDmodell (genau das, was jeder der 88 Radar-Querlinks tut) war der
+    erste Durchlauf fremd, und der Rückwechsel klonte dann die FREMDEN
+    Zeilen als „Vorgabe". Der Evaluationsfall am echten Bestand: Deep-Link
+    auf samsung-galaxy-a56-128, Rückkehr zum Vorgabegerät - Titel und
+    Graph sagten iPhone 17 Pro, die Tabelle zeigte die EINE a56-Zeile
+    (664,75 €), die 19 Zeilen des Vorgabegeräts fehlten. Hier dieselbe
+    Kombination an der Fixture: Zeilenzahl UND Werte müssen nach dem
+    Rückweg dem Server-Stand des Vorgabemodells entsprechen."""
+    ursprung = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
+    assert len(ursprung) == 4, \
+        f"die Vorgabe-Fixture trägt 4 Zeilen, nicht {len(ursprung)}"
+    # Der Deep-Link, wie ihn jeder Radar-Querlink setzt:
+    seite.goto(seite.url + "?modell=samsung-galaxy-s26-256",
+               wait_until="networkidle")
+    seite.wait_for_timeout(300)
+    fremd = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
+    assert len(fremd) == 1, f"Deep-Link zeigt nicht das Fremdmodell: {fremd}"
+    # Rückkehr zum Vorgabegerät - der eine Schritt, der den Klon brauchte:
+    seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
+    seite.wait_for_timeout(300)
+    danach = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
+    assert danach == ursprung, \
+        f"Rückweg nach Deep-Link: {danach} statt dem Vorgabe-Stand {ursprung}"
+
+
 @pytest.mark.parametrize("mid,erwartet", sorted(_ERWARTET.items()))
 def test_der_modellwechsel_zeigt_die_eigenen_zeilen(seite, mid, erwartet):
     """S3, die Evaluator-Auflage: Für JEDES wählbare Gerät stehen seine

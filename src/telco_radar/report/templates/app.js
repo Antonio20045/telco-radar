@@ -1042,6 +1042,21 @@ var TelcoFrage = (function () {
   var wechselFolge = 0;
   var zuletztModell = null;
 
+  /* S2-Fix (O3-Evaluation): der Vorgabe-Zustand wird HIER geklont, beim
+   * Laden, VOR jedem ersten `setzeBuendel`-Durchlauf. Bis zur O3-Fix-
+   * runde klonte der Vorgabe-Zweig ihn erst im eigenen Durchlauf - bei
+   * einem Deep-Link auf ein FREMDmodell (genau das, was jeder der 88
+   * Radar-Querlinks tut) war der erste Durchlauf fremd, der Montagepunkt
+   * trug fremde Zeilen, und der Rückwechsel klonte DIESE als "Vorgabe":
+   * Titel und Graph sagten Vorgabegerät, die Tabelle zeigte die eine
+   * Zeile des Deep-Link-Geräts (am echten Bestand: a56, 664,75 €, statt
+   * der 19 Zeilen des iPhone 17 Pro). Der Klon steht jetzt fest, bevor
+   * irgendein Wechsel den Montagepunkt anfassen kann. */
+  (function () {
+    var anfangsGruppe = element('gr-bnd-gruppe');
+    if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
+  })();
+
   function holeFragment() {
     if (fragmentLager) return Promise.resolve(fragmentLager);
     if (!fragmentVersprechen) {
@@ -1104,7 +1119,6 @@ var TelcoFrage = (function () {
       wendeSortierungAn();
     };
     if (m.id === vorgabe) {
-      if (!vorgabeGruppe) vorgabeGruppe = gruppe.cloneNode(true);
       fertig(vorgabeGruppe, false);
       return;
     }
