@@ -154,3 +154,22 @@ BOM, Dezimalkomma) wie bestehende.
   - O1-Restpunkte, an O3 übergeben: Wortlaut „führt kein Bündel" (`geraete_tco_band.py:388`,
     Entwurf sagt „fehlt"); zwei tote `or True`-Asserts (`test_geraete_vergleich.py:194`,
     `test_geraete_anbieterzaehlung.py:65`).
+- **O3 FERTIG** (Branch `claude/optik-o3`, 15.09.2026): S3 geschlossen — für JEDES
+  wählbare Gerät stehen eigene Bündelzeilen (lazy Fragment `site/data/geraete-buendel.html`,
+  87 Container / 404 Zeilen am echten Bestand, aus demselben Makro wie der Server-Block;
+  Hauptseite 1,07 MB / 24 details unverändert — alle Zeilen ins HTML wären +1,17 MB auf
+  ~2,2 MB gewesen). Sortierbare Bündeltabelle (TCO-24/Δ/Anbieter, Server-Default bleibt).
+  Reiterfolge Vergleich | Wettbewerbs-Radar (Link mit Pfeil) | Preisverlauf | Gerätekatalog;
+  `#tafel-verlauf` lebendig (G2 + Zeitreihen-Suche am echten Bestand), `#tafel-portfolio`
+  GANZ weg — Lifecycle und Wochenkarte als Sektionen auf dem Radar (id=lifecycle bleibt
+  Sprungziel); je Radar-Geräteblock Querlink „Dieses Gerät im Vergleich" mit
+  `?modell=`-Deep-Link (vom Selektor beim Laden ausgewertet); tarife.html vom Radar
+  verlinkt; Untertitel nach Entwurfswortlaut (mobil versteckt — Falz 818 < 844, O1-
+  Präzedenz). Restpunkte D1 (Wortlaut „fehlt in diesem Band"), D2 (beide Asserts echt,
+  mit Gegenprobe), D3 (tabelle/hat_tco/zeilen_gesamt entfernt — zeilen/delta haben
+  Testleser und bleiben; gr-karten-hinweis weg). Gemessen: pytest 3014/3 (die drei
+  vorbestehenden), pruefe_portal 17/1 (nur 8b vorbestehend), 11b 2418/1921/1910 px
+  (drei Tafeln), 11c 818 px; Radar mobil 18.387 → 20.398 px (+2.011 durch Portfolio-
+  Sektionen und 88 Querlinks — gemeldet, keine neue Höhengrenze; Geräteseite unverändert
+  ±20 px). Belege: `/tmp/optik-o1-o4/o3/` (baubericht.md, rot-vor-gruen.txt,
+  Screenshots).
