@@ -169,6 +169,41 @@ class TcoDB:
         """Der Massstab fuer ein Buendel dieses Anbieters und Tarifs."""
         return self._referenzen.get(sim_only_id(anbieter, tarif_name))
 
+    def historie_lage(self) -> dict:
+        """Die Lage der Buendel-Historie: seit wann sie laeuft, wie viele
+        Messtage und Buendel stehen (O4, STRATEGIE_GERAETE_OPTIK §3).
+
+        Der ehrliche Satz im Verlaufs-Reiter ("Die TCO-24-Historie je
+        Buendel beginnt mit dem ersten naechtlichen Lauf am …") nennt das
+        ECHTE Datum aus dieser Datei - das '12.09.2026' des Entwurfs ist
+        der Stand des Entwurfstages, keine Wahrheit ueber jeden Bestand.
+        Gelesen wird hier und nicht im Renderer, weil der Pfad dieser
+        Datei hier zuhause ist (derselbe Grund wie bei `historie_path`).
+        Eine fehlende oder leere Datei ist kein Fehler, sondern der
+        Zustand vor dem ersten Lauf.
+        """
+        tage: set[str] = set()
+        ids: set[str] = set()
+        if self.historie_path.exists():
+            try:
+                text = self.historie_path.read_text(encoding="utf-8")
+            except OSError:
+                text = ""
+            for zeile in text.splitlines():
+                zeile = zeile.strip()
+                if not zeile:
+                    continue
+                try:
+                    satz = json.loads(zeile)
+                except json.JSONDecodeError:
+                    continue
+                if satz.get("datum"):
+                    tage.add(str(satz["datum"]))
+                if satz.get("id"):
+                    ids.add(str(satz["id"]))
+        return {"messtage": len(tage), "seit": min(tage) if tage else "",
+                "buendel": len(ids)}
+
     # ------------------------------------------------------------ schreiben
 
     def upsert_buendel(self, buendel, today: str) -> tuple[int, set]:

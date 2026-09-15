@@ -226,7 +226,10 @@ def test_ein_modell_ohne_messreihe_hat_den_ehrlichen_leerzustand(lage):
       const lager = document.querySelector('#gr-g0-lager');
       return {
         svg: !!lager.querySelector('svg.gr-g0'),
-        text: lager.textContent,
+        /* Whitespace normalisieren: der Satz steht im HTML auf
+         * mehreren Zeilen, und 'keine\n  Preishistorie' ist kein
+         * Substring. */
+        text: lager.textContent.replace(/\s+/g, ' '),
       };
     }""")
     assert not box["svg"], "SVG für ein Modell ohne Messpunkte"

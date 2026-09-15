@@ -84,6 +84,37 @@ SPALTEN_HISTORIE = [
     "Preis EUR", "Preisart", "Tarifreferenz", "Verfuegbarkeit", "Quelle",
 ]
 
+# O4 (STRATEGIE_GERAETE_OPTIK §3): der TCO-Gesamtexport. Die Spalten der
+# Bündel-Zeile stehen im Auftrag; drei kommen ehrlich dazu:
+#   * "Art" - die Datei trägt Bündel- UND SIM-only-Zeilen, und zwei
+#     Zeilentypen ohne Unterscheidungsmerkmal sind in Excel eine Tabelle,
+#     die man nicht filtern kann.
+#   * "Zustand" - ein erneuertes Gerät ist ein anderer Preis (B1). Ohne
+#     die Spalte stünde ein Gebrauchtpreis als Neupreis in der Datei -
+#     derselbe Fehlertyp, der aktuell_csv die ZustandsABLEITUNG brachte.
+#   * "Bündel/Monat EUR" - 1&1 nennt EINEN Monatsbetrag für Tarif und
+#     Gerät (§ 13.2 der Strategie). Ihn auf Tarif/Monat oder Geräterate
+#     zu verteilen wäre eine Rechnung dieses Projekts und keine Angabe
+#     des Anbieters; ohne die Spalte wäre die Zeile stumm.
+SPALTEN_TCO = [
+    "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
+    "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
+    "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
+    "TCO-24 EUR", "Abgerufen am", "Quelle",
+]
+
+# O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
+# EINER Datei. Die Abweichungsspalte ist der KONSUMENT derselben Rechnung,
+# die die Radar-Seite zeigt (`report/wettbewerbsradar.py`): diese Datei
+# rechnet keine einzige Prozentzahl selbst, sie liest sie aus der
+# Aufbereitung, die auch die Seite rendert - zwei Rechnungen fuer dieselbe
+# Zahl sind zwei Zahlen (CLAUDE.md §6).
+SPALTEN_RADAR = [
+    "Art", "Modell", "Hersteller", "Speicher GB", "Anbieter", "Tarif",
+    "Tarifband", "Status", "Abweichung %", "Wettbewerber-Preis EUR",
+    "Vodafone-Preis EUR", "Preisart", "Grund", "Abgerufen am", "Quelle",
+]
+
 
 def _zahl(wert) -> str:
     """Dezimalkomma, zwei Stellen - oder leer.
@@ -118,6 +149,91 @@ def _schreibe(spalten: list, zeilen: list) -> str:
     schreiber.writerow(spalten)
     schreiber.writerows(zeilen)
     return puffer.getvalue()
+
+
+def _prozent(wert) -> str:
+    """Eine Prozentzahl mit Dezimalkomma, einer Stelle - oder leer.
+
+    Dasselbe Mass wie die Seite: eine Stelle reicht fuer 'um 10 % teurer',
+    und mehr Stellen waeren eine Genauigkeit, die die Messung nicht hat.
+    """
+    if wert is None:
+        return ""
+    try:
+        return f"{float(wert):.1f}".replace(".", ",")
+    except (TypeError, ValueError):
+        return ""
+
+
+def tco_csv(zeilen: dict) -> tuple[str, int]:
+    """Der TCO-Bestand als CSV - eine Zeile je Bündel, plus SIM-only.
+
+    `zeilen` kommt aus `geraete_tco_view.aufbereiten()["export"]`: WERTE
+    (Modellname, Band, TCO-24 aus `tco_24`) sind dort aufgelöst, hier wird
+    nur FORM gemacht - Dezimalkomma, Semikolon, leere Zelle fuer eine
+    Lücke. Die SIM-only-Zeilen tragen ihre TCO-24 als `ueber_horizont`
+    (Tarif × 24), gerechnet in derselben Funktion, die auch die Tafel
+    fuettert.
+    """
+    ausgabe = []
+    for z in (zeilen or {}).get("buendel", []):
+        ausgabe.append([
+            "Bündel",
+            z.get("modell", ""), z.get("speicher", "") or "",
+            z.get("anbieter", ""), z.get("anbieter_typ", ""),
+            z.get("tarif", ""), z.get("band", ""), z.get("zustand", ""),
+            _zahl(z.get("zuzahlung")), _zahl(z.get("tarif_monatlich")),
+            _zahl(z.get("geraet_monatsrate")),
+            _zahl(z.get("buendel_monatlich")),
+            z.get("laufzeit", "") or "", _zahl(z.get("anschlusspreis")),
+            _zahl(z.get("tco24")), z.get("abgerufen_am", ""),
+            z.get("quelle_url", ""),
+        ])
+    for z in (zeilen or {}).get("sim_only", []):
+        ausgabe.append([
+            "SIM-only", "", "", z.get("anbieter", ""),
+            z.get("anbieter_typ", ""), z.get("tarif", ""), z.get("band", ""),
+            "", "", _zahl(z.get("tarif_monatlich")), "", "", "",
+            _zahl(z.get("anschlusspreis")), _zahl(z.get("tco24")),
+            z.get("abgerufen_am", ""), z.get("quelle_url", ""),
+        ])
+    return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)
+
+
+def radar_csv(view: dict) -> tuple[str, int]:
+    """Der Wettbewerbs-Radar als CSV - Netzbetreiber-TCO und Händlerpreis.
+
+    `view` ist die Aufbereitung aus `report/wettbewerbsradar.radar()` -
+    dieselbe, die die Seite rendert. Die Abweichungsspalte wird daraus
+    GELESEN und nicht hier gerechnet: die eine Division steht in
+    `wettbewerbsradar._paar_zeile`/`_zeile_fuer_anbieter`/`haendler_zeilen`,
+    und ein Export, der sie nachrechnet, kann von der Seite abweichen,
+    ohne dass es ein Test sieht. Nicht vergleichbare Zeilen stehen mit
+    ihrem STATUS statt einer Zahl - der Export schreibt den Bestand, die
+    Ansicht kappt ihn.
+    """
+    ausgabe = []
+    for g in (view or {}).get("gruppen", []):
+        for z in g.get("zeilen", []):
+            ausgabe.append([
+                "Netzbetreiber TCO-24", g.get("titel", ""),
+                g.get("hersteller", ""), g.get("speicher", "") or "",
+                z.get("anbieter", ""), z.get("tarif", ""),
+                z.get("band_label", ""), z.get("status", ""),
+                _prozent(z.get("prozent")), _zahl(z.get("gesamt")),
+                _zahl(z.get("vf_gesamt")), "TCO-24",
+                z.get("grund", ""), z.get("abgerufen_am", ""),
+                z.get("quelle_url", ""),
+            ])
+    for z in (view or {}).get("haendler", []):
+        ausgabe.append([
+            "Händler Barpreis", z.get("modell", ""), z.get("hersteller", ""),
+            z.get("speicher", "") or "", z.get("anbieter", ""), "", "", "",
+            _prozent(z.get("prozent")), _zahl(z.get("preis")),
+            _zahl(z.get("vodafone_preis")), "Gerätepreis ohne Vertrag", "",
+            z.get("abgerufen_am", ""), z.get("url", ""),
+        ])
+    return _schreibe(SPALTEN_RADAR, ausgabe), len(ausgabe)
 
 
 def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
@@ -183,14 +299,22 @@ def historie_csv(punkte: list, eintraege: list, katalog) -> tuple[str, int]:
 
 
 def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
-                     stand: str = "") -> dict:
-    """Beide Dateien nach `site/exporte/`. Gibt die Angaben fuer die Seite.
+                     stand: str = "", tco: dict | None = None,
+                     radar: dict | None = None) -> dict:
+    """Alle Export-Dateien nach `site/exporte/`. Gibt die Angaben fuer die Seite.
 
     `eintraege` ist der FERTIG gepruefte und bereinigte Bestand, also
     dieselbe Menge, aus der die Seite ihre Preisaussagen baut. Eine leere
-    Liste ist ein zulaessiger Fall - dann entstehen beide Dateien mit ihrer
+    Liste ist ein zulaessiger Fall - dann entstehen die Dateien mit ihrer
     Kopfzeile, und die Seite nennt daneben eine Null. Ein fehlender Download
     waere die schlechtere Auskunft als ein leerer.
+
+    O4 (STRATEGIE_GERAETE_OPTIK §3) kommen zwei Dateien dazu:
+    `geraete-tco.csv` aus `tco` (die aufgeloesten Zeilen aus
+    `geraete_tco_view.aufbereiten()["export"]`) und `wettbewerbsradar.csv`
+    aus `radar` (die FERTIGE Radar-Aufbereitung - dieselbe Rechnung wie
+    die Seite, hier nur formatiert). Beide duerfen leer sein: dann entstehen
+    die Dateien mit Kopfzeile und Null Zeilen, wie bei allen anderen.
 
     Die Zeilenzahl steht NEBEN dem Link, nicht nur in der Datei: wer einen
     Export herunterlaedt, will vorher wissen, ob er sich lohnt - und ein
@@ -204,16 +328,28 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
     (ordner / "geraete-aktuell.csv").write_text(inhalt_a, encoding=KODIERUNG)
     (ordner / "geraete-historie.csv").write_text(inhalt_h, encoding=KODIERUNG)
 
+    inhalt_t, zeilen_t = tco_csv(tco or {})
+    (ordner / "geraete-tco.csv").write_text(inhalt_t, encoding=KODIERUNG)
+    inhalt_r, zeilen_r = radar_csv(radar or {})
+    (ordner / "wettbewerbsradar.csv").write_text(inhalt_r,
+                                                 encoding=KODIERUNG)
+
     return {
         "stand": stand,
         "aktuell": {"datei": "exporte/geraete-aktuell.csv", "zeilen": zeilen_a,
                     "bytes": len(inhalt_a.encode(KODIERUNG))},
         "historie": {"datei": "exporte/geraete-historie.csv", "zeilen": zeilen_h,
                      "bytes": len(inhalt_h.encode(KODIERUNG))},
+        "tco": {"datei": "exporte/geraete-tco.csv", "zeilen": zeilen_t,
+                "bytes": len(inhalt_t.encode(KODIERUNG))},
+        "radar": {"datei": "exporte/wettbewerbsradar.csv", "zeilen": zeilen_r,
+                  "bytes": len(inhalt_r.encode(KODIERUNG))},
     }
 
 
 def leer() -> dict:
     return {"stand": "",
             "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
-            "historie": {"datei": "", "zeilen": 0, "bytes": 0}}
+            "historie": {"datei": "", "zeilen": 0, "bytes": 0},
+            "tco": {"datei": "", "zeilen": 0, "bytes": 0},
+            "radar": {"datei": "", "zeilen": 0, "bytes": 0}}

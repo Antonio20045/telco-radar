@@ -181,17 +181,25 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
                       probe[idx["Geräterate EUR"]])
                   and b.get("buendel_monatlich") == _zahl(
                       probe[idx["Bündel/Monat EUR"]])]
-    assert len(kandidaten) == 1, (
-        f"Stichprobe nicht eindeutig im Store: {len(kandidaten)} Kandidaten")
-    satz = kandidaten[0]
-    erwartet = tco_24(Buendel(**{
-        k: v for k, v in satz.items()
-        if k in Buendel.__dataclass_fields__}))
-    assert erwartet.belastbar, (
-        f"Stichprobe {probe} trägt eine Zahl, obwohl tco_24 unbelastbar ist")
+    # 1&1 führt denselben Tarif mit denselben Beträgen zu MEHREREN
+    # Geräten - die Zeile ist über die Beträge nicht eindeutig, aber alle
+    # Kandidaten rechnen dieselbe TCO (gleiche Preisfelder). Verlangt wird
+    # genau das: EIN Wert über alle Kandidaten, und der in der Zelle.
+    assert kandidaten, "Stichprobe trifft keinen Satz des Stores"
+    werte = set()
+    for satz in kandidaten:
+        erg = tco_24(Buendel(**{
+            k: v for k, v in satz.items()
+            if k in Buendel.__dataclass_fields__}))
+        assert erg.belastbar, (
+            f"Stichprobe {probe} trägt eine Zahl, obwohl tco_24 "
+            "unbelastbar ist")
+        werte.add(erg.gesamt)
+    assert len(werte) == 1, (
+        f"Kandidaten der Stichprobe rechnen verschiedene TCO: {werte}")
     assert float(probe[idx["TCO-24 EUR"]].replace(".", "")
                  .replace(",", ".")) == pytest.approx(
-        erwartet.gesamt, abs=0.005), (
+        werte.pop(), abs=0.005), (
         f"TCO-24 der Stichprobe {probe} stimmt nicht mit tco_24() überein")
 
 

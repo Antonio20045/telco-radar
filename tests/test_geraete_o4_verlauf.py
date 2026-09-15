@@ -149,10 +149,15 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     if not tage:
         pytest.skip("keine TCO-Historie im Bestand")
     seit = min(tage)
-    tag, monat, jahr = seit.split("-")
-    assert f"{int(tag)}.{int(monat)}.{jahr}" in text, (
+    # Dasselbe Format wie der date_de-Filter der Seite: "12. September 2026"
+    from datetime import datetime
+    MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+              "August", "September", "Oktober", "November", "Dezember"]
+    d = datetime.fromisoformat(seit)
+    erwartet = f"{d.day}. {MONATE[d.month - 1]} {d.year}"
+    assert erwartet in text, (
         f"Der Verlaufs-Reiter nennt nicht den echten Beginn {seit} "
-        "der TCO-Historie")
+        f"der TCO-Historie ({erwartet!r} fehlt)")
 
 
 def test_der_alte_falsche_satz_ist_weg(geraete):

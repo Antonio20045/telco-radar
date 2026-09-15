@@ -775,7 +775,18 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                        "von": punkte[0][0].isoformat(),
                        "bis": punkte[-1][0].isoformat(),
                        "von_de": punkte[0][0].strftime("%d.%m.%Y"),
-                       "bis_de": punkte[-1][0].strftime("%d.%m.%Y")})
+                       "bis_de": punkte[-1][0].strftime("%d.%m.%Y"),
+                       # O4 (STRATEGIE_GERAETE_OPTIK §3): die BETRAEGE der
+                       # Reihe - fuer die Wertetabelle unter der Grafik
+                       # (Entwurf §2: "Werte des Verlaufs als Tabelle").
+                       # Erst- und Letztpreis aus denselben Punkten, die
+                       # auch gezeichnet werden, plus ihrer Differenz -
+                       # keine zweite Menge und kein eigener Rundungsweg
+                       # (derselbe Fehlertyp wie zwei Rechnungen fuer
+                       # dieselbe Zahl).
+                       "von_preis": punkte[0][1],
+                       "bis_preis": punkte[-1][1],
+                       "delta": round(punkte[-1][1] - punkte[0][1], 2)})
 
     # F-4e: PLATZIERUNG DER BESCHRIFTUNGEN - jede gegen die Geometrie des
     # ganzen Bildes. Eine Kandidatenbox (geschaetzte Textbreite bei 12 px

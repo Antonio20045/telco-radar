@@ -453,6 +453,12 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
         # Tafel #tafel-portfolio las (Antonios Entscheidung, Strategie
         # §5.2: Portfolio-Fragen gehören auf die Portfolio-Seite).
         "portfolio": portfolio if portfolio is not None else _portfolio_leer(),
+        # O4: der Radar-Export. Der Notzustand steht HIER (die Vorlage darf
+        # nie auf einen fehlenden Schluessel treffen, dieselbe Lehre wie bei
+        # `_alarme_leer`); `render_site` ueberschreibt ihn nach dem Schreiben
+        # der Datei mit deren ECHTEN Angaben - Zeilenzahl und Groesse
+        # kommen aus der Datei, nicht aus einer Rechnung.
+        "export": {"datei": "", "zeilen": 0, "bytes": 0},
     }
 
 
@@ -483,4 +489,7 @@ def leer() -> dict:
             "anbieter_erwartet": list(NETZ_WETTBEWERBER),
             "alarme": _alarme_leer(),
             "ohne_vodafone": [], "ohne_vodafone_gesamt": 0,
-            "portfolio": _portfolio_leer()}
+            "portfolio": _portfolio_leer(),
+            # O4: der Radar-Export - Notzustand mit denselben Schlüsseln,
+            # damit die Vorlage nie auf ein fehlendes Feld trifft.
+            "export": {"datei": "", "zeilen": 0, "bytes": 0}}
