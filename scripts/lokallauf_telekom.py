@@ -198,6 +198,44 @@ def _schreibe_beleg(root: Path, name: str, datum: str, beleg: list,
     return beleg_datei
 
 
+def _schreibe_manifest(root: Path, datum: str, run_id: str,
+                       beginn: datetime, log, exit_status: int,
+                       beleg_namen: tuple) -> Path:
+    """Den Lauf-Manifest schreiben - der unveranderliche Nachweis, dass
+    dieser Lauf GENAU EINMAL gelaufen ist (Befund Runde 2, 15.09.2026:
+    ohne ihn waere die Tagesdatei bei einer Wiederholung desselben Tags
+    ueberschreibbar, und nichts wiese die Doppelung nach).
+
+    Run-ID (UUID), Start/Ende in UTC, Exit-Status und SHA-256 der
+    Beleg-Dateien dieses Laufs. Bei einem Crash schreibt der finally-Pfad
+    den Manifest mit exit_status=1, BEVOR die Exception weiterreicht -
+    ein gescheiterter Lauf hat genauso einen Nachweis wie ein gelungener.
+    """
+    import hashlib
+    manifest = {
+        "run_id": run_id,
+        "start_utc": beginn.isoformat(),
+        "ende_utc": datetime.now(timezone.utc).isoformat(),
+        "exit_status": exit_status,
+        "nachgetragen": False,
+        "belege": {},
+    }
+    for name in beleg_namen:
+        pfad = root / "outputs" / f"{name}-{datum}.json"
+        if pfad.exists():
+            manifest["belege"][name] = {
+                "datei": pfad.name,
+                "sha256": hashlib.sha256(pfad.read_bytes()).hexdigest(),
+            }
+    manifest_datei = root / "outputs" / f"beleg-telekom-lokallauf-{datum}-run.json"
+    manifest_datei.parent.mkdir(parents=True, exist_ok=True)
+    manifest_datei.write_text(json.dumps(manifest, ensure_ascii=False,
+                                         indent=2) + "\n", encoding="utf-8")
+    log.info("Lauf-Manifest geschrieben: %s (exit_status=%d)", manifest_datei,
+             exit_status)
+    return manifest_datei
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=".")
@@ -219,47 +257,69 @@ def main() -> None:
     http_cfg = cfg.settings.get("http", {})
     heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     beleg: list[dict] = []
+    import uuid
+    run_id = str(uuid.uuid4())
+    beginn = datetime.now(timezone.utc)
+    exit_status = 0
 
-    # --- T1: Tarife, mit Laufzeitbeleg ------------------------------------
-    log.info("=== T1: Telekom-Tarife (Pflichtdokumente + Shop-Kacheln) ===")
-    tarif_crawler.lade_quellen = _nur_telekom_tarife(tarif_crawler.lade_quellen)
-    items, bilanz_tarife = tarif_crawler.sammle(
-        root, http_cfg, hole=_hole_mit_beleg(beleg))
-    log.info("T1-Bilanz: %s", bilanz_tarife)
-    log.info("Meldungen: %d", len(items))
-
-    # --- Laufzeitbeleg (T1) ------------------------------------------------ #
-    # Kriterium 2/3 des Auftrags: nicht Code-Plausibilitaet, sondern die
-    # tatsaechlich beim echten Abruf gesendete Kennung, gemessen an
-    # `resp.request.headers`. Ehrlich heisst hier: beginnt mit
-    # "TelcoRadar/1.0" - alles andere ist eine Browser- oder sonstige
-    # Fremdkennung und wird als Befund ausgewiesen, nicht verschwiegen.
-    _schreibe_beleg(root, "beleg-telekom-lokallauf", heute, beleg, log)
-
-    # --- T2: Geraete, seit B2 mit eigenem Laufzeitbeleg ---------------------
-    log.info("=== T2: Telekom-Geraetekategorie ===")
-    beleg_t2: list[dict] = []
-    from telco_radar.collect import http as _http_mod
-    # Der Haken wird VOR dem Patchen gebaut: seine Closure haelt dann den
-    # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
-    # auf sich selbst zeigen lassen.
-    _patch_fetch = _hole_mit_beleg(beleg_t2)
-    _echter_fetch = _http_mod.fetch
-    _http_mod.fetch = _patch_fetch
     try:
-        geraete_pipeline.lade_quellen = _nur_telekom_geraete(
-            geraete_config.lade_quellen)
-        bilanz_geraete = geraete_pipeline.run_geraete_stage(
-            root, http_cfg, heute, frist_sekunden=args.frist)
-    finally:
-        _http_mod.fetch = _echter_fetch
-    log.info("T2-Bilanz: %s", {k: v for k, v in bilanz_geraete.items()
-                               if k not in ("unbekannte_titel",
-                                            "unbekannte_farben")})
-    _schreibe_beleg(root, "beleg-telekom-geraete", heute, beleg_t2, log)
+        # --- T1: Tarife, mit Laufzeitbeleg --------------------------------
+        log.info("=== T1: Telekom-Tarife (Pflichtdokumente + Shop-Kacheln) ===")
+        tarif_crawler.lade_quellen = _nur_telekom_tarife(
+            tarif_crawler.lade_quellen)
+        items, bilanz_tarife = tarif_crawler.sammle(
+            root, http_cfg, hole=_hole_mit_beleg(beleg))
+        log.info("T1-Bilanz: %s", bilanz_tarife)
+        log.info("Meldungen: %d", len(items))
 
-    log.info("Fertig. Jetzt rendern (report.html.render_site) und committen -"
-             " dieses Skript tut beides bewusst nicht.")
+        # --- Laufzeitbeleg (T1) -------------------------------------------- #
+        # Kriterium 2/3 des Auftrags: nicht Code-Plausibilitaet, sondern die
+        # tatsaechlich beim echten Abruf gesendete Kennung, gemessen an
+        # `resp.request.headers`. Ehrlich heisst hier: beginnt mit
+        # "TelcoRadar/1.0" - alles andere ist eine Browser- oder sonstige
+        # Fremdkennung und wird als Befund ausgewiesen, nicht verschwiegen.
+        _schreibe_beleg(root, "beleg-telekom-lokallauf", heute, beleg, log)
+
+        # --- T2: Geraete, seit B2 mit eigenem Laufzeitbeleg -----------------
+        log.info("=== T2: Telekom-Geraetekategorie ===")
+        beleg_t2: list[dict] = []
+        from telco_radar.collect import http as _http_mod
+        # Der Haken wird VOR dem Patchen gebaut: seine Closure haelt dann den
+        # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
+        # auf sich selbst zeigen lassen.
+        _patch_fetch = _hole_mit_beleg(beleg_t2)
+        _echter_fetch = _http_mod.fetch
+        _http_mod.fetch = _patch_fetch
+        try:
+            geraete_pipeline.lade_quellen = _nur_telekom_geraete(
+                geraete_config.lade_quellen)
+            # referenz_anbieter={"Telekom"}: der Lauf schreibt NUR Telekom in
+            # die SIM-only-Referenzen und ruft die 1&1-SIM-only-Messung nicht
+            # auf (Befund Runde 2, 15.09.2026: ohne den Scope datierte der
+            # Lauf 35 Fremd-Referenzen neu und lud 1&1). Der Name ist der
+            # Anbietername aus dem Tarifbestand (tarife.jsonl), nicht der
+            # aus geraete_quellen.yaml - beide sind hier "Telekom".
+            bilanz_geraete = geraete_pipeline.run_geraete_stage(
+                root, http_cfg, heute, frist_sekunden=args.frist,
+                referenz_anbieter={"Telekom"})
+        finally:
+            _http_mod.fetch = _echter_fetch
+        log.info("T2-Bilanz: %s", {k: v for k, v in bilanz_geraete.items()
+                                   if k not in ("unbekannte_titel",
+                                                "unbekannte_farben")})
+        _schreibe_beleg(root, "beleg-telekom-geraete", heute, beleg_t2, log)
+
+        log.info("Fertig. Jetzt rendern (report.html.render_site) und "
+                 "committen - dieses Skript tut beides bewusst nicht.")
+    except BaseException:
+        exit_status = 1
+        raise
+    finally:
+        # Der Manifest gehoert zu JEDEM Lauf - auch zum gescheiterten
+        # (exit_status=1). Ein Nachtrag von Hand, wie ihn Runde 2 fuer den
+        # Lauf vom 15.09.2026 leisten musste, soll nicht wieder noetig sein.
+        _schreibe_manifest(root, heute, run_id, beginn, log, exit_status,
+                           ("beleg-telekom-lokallauf", "beleg-telekom-geraete"))
 
 
 if __name__ == "__main__":       # pragma: no cover

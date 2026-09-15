@@ -463,6 +463,44 @@ def test_der_bestand_nimmt_buendel_und_referenzen_auf(tmp_path):
     assert db.referenz("o2", "o2 Mobile M")["tarif_sim_only_monatlich"] == 19.99
 
 
+def test_der_scope_veraendert_und_loescht_keine_fremdanbieter(tmp_path):
+    """Befund Runde 2 (15.09.2026): ein Lauf EINES Anbieters datierte 35
+    Fremd-Referenzen. Der Scope schraenkt AUFFRISCHEN und WEGNEHMEN auf
+    seinen Anbieter ein - ein fremder Bestandssatz bleibt bytegleich
+    stehen, auch wenn er in der Ersetzungsmenge fehlt. Gegenprobe im
+    selben Test: ohne Scope loescht dieselbe Menge ihn (dokumentierte
+    Ersetzungs-Semantik)."""
+    db = TcoDB(tmp_path / "geraete_tco.json")
+    telekom = _referenz(
+        anbieter="Telekom", tarif_name="MagentaMobil L",
+        tarif_id="telekom:magentamobil-l",
+        quelle_url="https://www.telekom.de/pib/magentamobil-l",
+        tarif_sim_only_monatlich=59.95)
+    db.setze_referenzen([_referenz(), telekom], "2026-09-14")
+    fremd_vorher = {r["id"]: r for r in db.referenzen()}[_referenz().id]
+
+    # Scoped-Ersetzung NUR mit dem Telekom-Satz in der Menge - die o2-
+    # Referenz fehlt, darf dadurch weder datiert noch entfernt werden.
+    _, entfernt = db.ersetze_referenzen(
+        [_referenz(
+            anbieter="Telekom", tarif_name="MagentaMobil L",
+            tarif_id="telekom:magentamobil-l",
+            quelle_url="https://www.telekom.de/pib/magentamobil-l",
+            tarif_sim_only_monatlich=49.95)],
+        "2026-09-15", anbieter={"Telekom"})
+    nachher = {r["id"]: r for r in db.referenzen()}
+    assert entfernt == 0
+    assert nachher[_referenz().id] == fremd_vorher
+    assert nachher[telekom.id]["last_verified"] == "2026-09-15"
+    assert nachher[telekom.id]["tarif_sim_only_monatlich"] == 49.95
+
+    # Gegenprobe: OHNE Scope loescht dieselbe Menge den Fremden -
+    # genau deshalb gehoert der Scope in jeden Einzelanbieter-Lauf.
+    _, entfernt_ohne = db.ersetze_referenzen([telekom], "2026-09-15")
+    assert entfernt_ohne == 1
+    assert _referenz().id not in {r["id"] for r in db.referenzen()}
+
+
 def test_derselbe_lauf_zweimal_legt_kein_zweites_buendel_an(tmp_path):
     db = TcoDB(tmp_path / "geraete_tco.json")
     db.upsert_buendel([_buendel()], "2026-09-03")
