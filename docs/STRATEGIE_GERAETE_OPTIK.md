@@ -183,3 +183,39 @@ BOM, Dezimalkomma) wie bestehende.
     (::before, Referenzzeilen ohne), Kommentare zur Untertitel-Ausblendung ehrlich
     (GANZER Untertitel mobil weg, mit Falz-Zahlen). Bericht:
     `/tmp/optik-o1-o4/o3/evaluator.md`.
+- **Zwischen-Merge origin** (`cc7c552`, 16.09.2026): Telekom-Tageslauf 15.09.
+  (Pipeline-Ebene, sauber automergt) + SQ67 auf die O1–O3-Struktur portiert
+  (K1 Klapplabel → die zwei mengentragenden Aufklapper; K2 Paradox-Zeile →
+  Rechenweg-Aufklapper je Bündelzeile; K3 Glossar → sichtbarer Abschnitt am
+  Tafelende, Link in der Graph-Fußnote). Suite 3024/3/14.
+- **O4 FERTIG** (Merge `61fb768`, 16.09.2026): G0-Barpreis-Zeitreihe im
+  Verlaufs-Reiter angebunden (servergerendertes SVG des Vorgabemodells + 87
+  Fragment-Blöcke aus demselben Makro; Messtag-Schwellen und Leerzustände als
+  Sätze; TCO-Historie-Satz mit echtem Startdatum aus `TcoDB.historie_lage()`).
+  `geraete-tco.csv`: 648 Bündel + 45 SIM-only == Store exakt, Band-Spalte
+  (Bändel-ohne-Band als ehrliche Lücke), BOM/Semikolon/Dezimalkomma, **der
+  Export filtert nicht selbst** (refurbished/ohne Band drin). Export-Links
+  EINMAL zentral: Kopfzeile Geräteseite 3, Radar 1, 0 Dubletten, alte
+  gr-werkzeug-Blöcke weg (mobil bewusst weggeblendet — Falz 810/844).
+  `wettbewerbsradar.csv`: 365 Zeilen = 321 TCO + 44 Händler-Barpreis in EINER
+  Datei, `Abweichung %` als Konsument von `radar()` (Code-Check: keine eigene
+  Division). Konfliktlösung des O4-Merges: SQ67-Glossar bleibt am Tafelende,
+  der alte Exportknoepfe-Block fällt der Zentralisierung zum Opfer.
+  Gemessen: pytest auf finalem main **3054/3/14** (nur die vorbestehenden),
+  pruefe_portal 17/1 (8b vorbestehend), 11b 2844/2449/1922 px, 11c 818 px.
+  Belege: `/tmp/optik-o1-o4/o4/` (baubericht.md, evaluator.md, rot-vor-gruen.txt,
+  r2-Screenshots + r2-dom.json; Runde 1 der Screenshots war wertlos — beide
+  Stände liefen versehentlich mit dem Code des Haupt-Worktrees — verworfen und
+  in runde1-verworfen/ dokumentiert).
+  - Evaluator: **BESTANDEN — 9/9 Kriterien, kein S1, kein S2.** S3 (keine
+    Blocker): wettbewerbsradar.csv ohne die 48 Alarm-Zeilen (Name deckt 2 von
+    4 Zahlensektionen — künftige Erweiterung); fünf Test-Zähler ohne
+    Leer-Bestands-Sicherung (je eine assert-Zeile); 11b-Luft tco 156 px
+    (kippt nur bei NEUEN Sektionen, z.B. Phase T). S4: Commit-Message „646"
+    vs. Store 648 (Bauzeitpunkt), „7 Messtage" doppelt im selben Block,
+    5 Zustand-Zellen leer statt „unbekannt".
+- **O1–O4 DAMIT VOLLSTÄNDIG.** Antonios Push-Freigabe steht (15.09., abends);
+  der Render-Kommitt „Seite neu gebaut" wird nachgezogen, dann Push + Deploy-
+  Kontrolle. Nachfolge-Themen: P3 (Bandabdeckung), P5 (TCO-Zeitachse ab
+  ≥3 Messtagen), E-S2 (1&1 per Playwright), Alarm-Zeilen im Radar-Export,
+  Test-Leer-Sicherungen.
