@@ -41,7 +41,14 @@
     <span class="gr-bnd-tco">{% if k.belastbar %}{{ k.gesamt | euro }} <em
       class="gr-bnd-label">{{ k.label }}</em>{% else %}<span class="gr-t-luecke"
       >keine belastbare Zahl</span>{% endif %}</span>
-    <span class="gr-bnd-delta">{% if k.naeherung %}Referenz{% elif
+    {# `gr-bnd-delta--wert` nur für ZAHLEN-Werte: mobil ist der Spaltenkopf
+       versteckt, und eine nackter zweiter Euro-Betrag neben „Gerät ohne
+       Vertrag" wäre mehrdeutig - das Δ-Präfix (CSS, mobil) erklärt die
+       Zahl mit einem Zeichen. Vor „Referenz" und „–" stünde es falsch
+       (O3-Evaluation S4). #}
+    <span class="gr-bnd-delta{% if not k.naeherung and not (k.eigen and
+      k.belastbar) and k.delta_kurz %} gr-bnd-delta--wert{% endif %}">{% if
+      k.naeherung %}Referenz{% elif
       k.eigen and k.belastbar %}Referenz{% elif k.delta_kurz %}{{ k.delta_kurz
       }}{% else %}–{% endif %}</span>
     {# Der Gerätepreis ohne Vertrag ist die ZWEITE Zahl (§3): nur der eigene
