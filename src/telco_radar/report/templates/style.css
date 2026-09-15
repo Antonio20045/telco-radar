@@ -333,6 +333,14 @@ b,strong{font-weight:700}
 .ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
   padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
   line-height:1.5;color:var(--ink-2)}
+/* E3C (RV-3): die Altersaussage ("X Tage ohne Aktualisierung") fuehrt den
+   Hinweis - der Review vom 12.09. las eine 15 Tage alte Redaktion hinter
+   einem Fließtextsatz, der "eher nicht auffiel". Ohne diese Zeile waere
+   die Kennzeichnung nur ein weiterer Satz im Kasten. Nur im Ausfall-Fall
+   auf der Seite, normale Wochen sehen die Regel nie. */
+.ausfall-hinweis .ausfall-alter{display:block;color:var(--red);
+  font-size:14px;font-weight:700;letter-spacing:.01em;
+  text-transform:uppercase;margin-bottom:2px}
 
 
 /* ================================================  MELDUNGEN (Ressort) == */

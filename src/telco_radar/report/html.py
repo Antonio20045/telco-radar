@@ -6,7 +6,7 @@ import json
 import logging
 import re
 import shutil
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -92,12 +92,34 @@ def _redaktion_ausfall_ctx(report: dict) -> dict | None:
     `pipeline.run()` traegt das Feld nur ein, wenn es selbst die letzte
     gueltige Redaktion uebernommen hat (siehe
     analyze/redaktion_kontinuitaet.py) - hier wird es nur noch angezeigt.
+
+    E3C (RV-3): dazu das ALTER der Redaktion in Tagen. Gerechnet wird das
+    `date` DIESSES Berichts gegen `redaktion_ausfall.stand` - beide stehen
+    im Bericht, NIEMALS wird date.today() herangezogen: eine Wanduhr-Rechnung
+    verschoebe die Tageszahl bei jedem Rebuild, ohne dass sich der Inhalt
+    aendert (K-1-Lehre, EVAL_k1-testb4a). `letzte_gueltige_redaktion()`
+    nimmt nur fruehere Daten, das Alter ist also mindestens 1; ist es
+    trotzdem nicht berechenbar, bleibt die Altersaussage aus (fail-closed)
+    und der Hinweis sagt wie bisher nur das Datum.
     """
     ausfall = report.get("redaktion_ausfall")
     if not ausfall:
         return None
-    return {"stand_de": _fmt_date_de(ausfall.get("stand", "")),
-            "grund": ausfall.get("grund", "")}
+    stand = ausfall.get("stand", "")
+    try:
+        alter_tage = (date.fromisoformat(report["date"])
+                      - date.fromisoformat(stand)).days
+    except (KeyError, ValueError, TypeError):
+        alter_tage = None
+    alter_de = None
+    if alter_tage is not None and alter_tage >= 1:
+        alter_de = (f"{alter_tage} Tag ohne Aktualisierung"
+                    if alter_tage == 1
+                    else f"{alter_tage} Tage ohne Aktualisierung")
+    return {"stand_de": _fmt_date_de(stand),
+            "grund": ausfall.get("grund", ""),
+            "alter_tage": alter_tage,
+            "alter_de": alter_de}
 
 
 def _env() -> Environment:

@@ -283,6 +283,124 @@ def test_meldungenseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# 2b. E3C (RV-3): der Ausfall-Hinweis nennt das ALTER, nicht nur ein Datum
+# --------------------------------------------------------------------------- #
+
+def _schreibe_ausfall_runde(reports: Path, *, stand: str, ausgabe: str):
+    """Eine Archivwoche mit echter Redaktion plus eine leere Runde, die sie
+    uebernimmt - so wie pipeline.py es schreibt. Zurueck kommt der Pfad der
+    Ausfall-Runde."""
+    (reports / f"{stand}.json").write_text(
+        json.dumps(_bericht(stand)), encoding="utf-8")
+    ausfall = {"stand": stand,
+               "grund": "eine voruebergehende Störung des Analyse-Dienstes"}
+    leer = _bericht(ausgabe, highlights=[], redaktion_ausfall=ausfall)
+    leer["regions"] = json.loads(
+        (reports / f"{stand}.json").read_text())["regions"]
+    leer["run"]["editor_used"] = False
+    (reports / f"{ausgabe}.json").write_text(json.dumps(leer), encoding="utf-8")
+
+
+def test_ausfall_hinweis_nennt_das_alter_in_tagen(tmp_path):
+    """E3C: 'Stand: 28. August' ist ein Datum, keine Altersaussage. Der
+    Review vom 12.09. hat eine 15 Tage alte Redaktion gelesen, ohne dass
+    irgendeine Stelle der Seite die Tageszahl sagte. Der Hinweis muss
+    'X Tage ohne Aktualisierung' sagen - auf der Titelseite (beide Bloecke)
+    und auf meldungen.html."""
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    # 28.08. -> 11.09. sind 14 Tage: der Live-Befund des Reviews.
+    _schreibe_ausfall_runde(reports, stand="2026-08-28", ausgabe="2026-09-11")
+
+    site = tmp_path / "site"
+    render_site(site, reports)
+
+    index = (site / "index.html").read_text(encoding="utf-8")
+    meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
+    assert "14 Tage ohne Aktualisierung" in index
+    assert "14 Tage ohne Aktualisierung" in meldungen
+    # Die Aussage steht unuebersehbar IM Hinweis, nicht irgendwo daneben.
+    assert "ausfall-alter" in index
+    assert "ausfall-alter" in meldungen
+
+
+def test_die_tagesrechnung_zaehlt_zwei_feste_daten_nicht_die_uhr():
+    """K-1-Lehre (EVAL_k1-testb4a): eine Altersrechnung gegen date.today()
+    verschaebe die Zahl bei jedem Rebuild, ohne dass sich der Inhalt
+    aendert. Gerechnet wird report.date gegen redaktion_ausfall.stand -
+    zwei feste Daten aus dem Bericht, keine Systemzeit noetig."""
+    from telco_radar.report.html import _redaktion_ausfall_ctx
+    ctx = _redaktion_ausfall_ctx({
+        "date": "2026-09-11",
+        "redaktion_ausfall": {"stand": "2026-08-28", "grund": "x"}})
+    assert ctx["alter_tage"] == 14
+    assert ctx["alter_de"] == "14 Tage ohne Aktualisierung"
+    # Ein Tag Abstand im Singular, kein "1 Tage".
+    ctx_ein = _redaktion_ausfall_ctx({
+        "date": "2026-08-02",
+        "redaktion_ausfall": {"stand": "2026-08-01", "grund": "x"}})
+    assert ctx_ein["alter_de"] == "1 Tag ohne Aktualisierung"
+    # Kaputtes Datum: keine Altersaussage (fail-closed), kein Crash.
+    ctx_kaputt = _redaktion_ausfall_ctx({
+        "date": "2026-09-11",
+        "redaktion_ausfall": {"stand": "kein-datum", "grund": "x"}})
+    assert ctx_kaputt["alter_tage"] is None
+    assert ctx_kaputt["alter_de"] is None
+
+
+def test_kicker_und_kopf_machen_die_alters_ausnahme_sichtbar(tmp_path):
+    """Abnahmekriterium 2: Der Kicker 'Ausgabe vom 11. September' ueber
+    Meldungen vom 28.08. war die Falschauszeichnung des Reviews. Der Kopf
+    darf das Render-Datum behalten (E3C entschied Option 2 gegen eine
+    Absenkung), aber er verschweigt die Ausnahme nicht: DOM-Messung gegen
+    Kopf- und Blockdatum in einem Ausfall-Fall."""
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    _schreibe_ausfall_runde(reports, stand="2026-08-28", ausgabe="2026-09-11")
+
+    site = tmp_path / "site"
+    render_site(site, reports)
+
+    from bs4 import BeautifulSoup
+    meldungen = BeautifulSoup(
+        (site / "meldungen.html").read_text(encoding="utf-8"), "html.parser")
+    kicker = meldungen.select_one(".page-kicker")
+    hinweis = meldungen.select_one(".ausfall-hinweis")
+    assert kicker is not None and hinweis is not None
+
+    kicker_text = kicker.get_text(" ", strip=True)
+    hinweis_text = hinweis.get_text(" ", strip=True)
+    # Der Kopf nennt das Render-Datum UND den aelteren Meldungsstand.
+    assert "11. September 2026" in kicker_text
+    assert "28. August 2026" in kicker_text
+    # Der Block darunter nennt denselben Stand - Kopf und Block widersprechen
+    # sich nicht, der Kopf verschweigt das Alter nicht mehr.
+    assert "28. August 2026" in hinweis_text
+
+    # Der Seitentitel der Titelseite traegt dieselbe Ausnahme sichtbar.
+    index = BeautifulSoup(
+        (site / "index.html").read_text(encoding="utf-8"), "html.parser")
+    titel = index.find("title").get_text()
+    assert "28. August 2026" in titel
+
+
+def test_normale_woche_traegt_keine_altersaussage(tmp_path):
+    """Ohne Ausfall bleibt alles beim alten Text - kein 'Tage ohne
+    Aktualisierung' auf einer normalen Woche (Kriterium 5: Inhalte
+    ausserhalb des Ausfall-Bausteins unveraendert)."""
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    (reports / "2026-08-10.json").write_text(
+        json.dumps(_bericht("2026-08-10")), encoding="utf-8")
+    site = tmp_path / "site"
+    render_site(site, reports)
+    for seite in ("index.html", "meldungen.html"):
+        html = (site / seite).read_text(encoding="utf-8")
+        assert "ohne Aktualisierung" not in html
+        assert "ausfall-alter" not in html
+
+
+# --------------------------------------------------------------------------- #
 # 3. pipeline.run() mit quellen=[] - die im Brief verlangte Simulation
 # --------------------------------------------------------------------------- #
 
