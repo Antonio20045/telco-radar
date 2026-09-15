@@ -822,6 +822,12 @@
     {% endif %}
   </div>
 
+  {# SQ67 (15.09.2026): der EINE sichtbare Weg zum Glossar - kein Satz,
+     nur der Verweis. Steht direkt unter der Auswahl, weil die vier
+     Begriffe genau die Felder benennen, die diese Auswahl steuern. #}
+  <p class="gr-glossar-link"><a href="#gr-glossar">Begriffe erklärt:
+  TCO-24, Tarifband, Bündel, Abweichung zu Vodafone</a></p>
+
   {# --- 2.-5. Je Modell: Antwortzeile, Zeitreihe (G0), Tarifband-Graph
          (GRAPH-1), Anbieterkarten ---------------------------------------- #}
   {% for m in geraete.tco.modelle %}
@@ -1300,6 +1306,56 @@
   </div>
   {% endif %}
   </details>
+
+  {# --- Das Glossar (SQ67, 15.09.2026): vier Begriffe, je EIN Satz.
+
+         Die Zielgruppe sind Device-Einkaeufer, keine Endkunden - aber
+         "TCO-24", "Tarifband", "Buendel" und das Abweichungs-Vorzeichen
+         kehren auf jeder Karte wieder, und wer sie nicht kennt, liest die
+         Zahlen falsch statt nur ungenau. Das ist keine Rueckkehr der am
+         03.09.2026 geloeschten Erklaersektionen: jene kommentierten die
+         DATENPFLEGE ("warum liefert wer nichts"), diese definieren die
+         FACHBEGRIFFE der Zahlen, die ueber ihnen stehen - und stehen als
+         eigener Abschnitt AM ENDE der Tafel, nicht im Lesefluss.
+
+         Sichtbar, keine Aufklappung: der Auftrag verlangt ein SICHTBARES
+         Glossar, erreichbar ueber den Link unter der Modell-Auswahl. Die
+         Saetze sind Definitionen, keine Methodenabsaetze - der Rechenweg
+         steht je Karte im eigenen Aufklapper. #}
+  <section class="gr-glossar" id="gr-glossar">
+    <h2 class="rubrik">Begriffe erklärt</h2>
+    <dl class="gr-glossar-liste">
+      <div class="gr-glossar-eintrag">
+        <dt>TCO-24</dt>
+        <dd>Die Gesamtkosten über 24 Monate – Zuzahlung und Geräteraten
+        plus Tarifkosten plus Anschlusspreis, abzüglich der beim Namen
+        genannten Boni; 24 Monate sind der Rechnungshorizont, nicht die
+        Laufzeit jedes Angebots (längere Bindungen tragen ihr TCO im
+        Etikett, etwa TCO-36).</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Tarifband</dt>
+        <dd>Die Größe des Datenvolumens eines Tarifs in drei Stufen –
+        klein bis 20 GB, mittel 21 bis 60 GB, groß darüber –; eine Linie
+        oder Karte je Anbieter, der im gewählten Band ein Bündel führt,
+        während unbegrenzte Tarife und Tarife ohne erhobenes Volumen ohne
+        Tarifband stehen.</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Bündel</dt>
+        <dd>Gerät und Tarif, die ein Anbieter nur zusammen verkauft – der
+        genannte Monatspreis gilt für beides, weshalb ein Gerätepreis ohne
+        Vertrag bei diesem Anbieter nicht messbar ist.</dd>
+      </div>
+      <div class="gr-glossar-eintrag">
+        <dt>Abweichungs-Vorzeichen (+/−) zu Vodafone</dt>
+        <dd>Minus heißt: das Angebot ist günstiger als die
+        Vodafone-Referenz für dasselbe Gerät – der für uns ungünstige
+        Fall; Plus heißt: es ist teurer. Die Abweichung ist
+        Anbieter-TCO minus Vodafone-Referenz, geteilt durch die Referenz.</dd>
+      </div>
+    </dl>
+  </section>
   <div class="gr-werkzeug">{{ exportknoepfe() }}</div>
 </section>
 </div>

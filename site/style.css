@@ -2739,6 +2739,24 @@ b,strong{font-weight:700}
   cursor:pointer;padding:10px 0;color:var(--ink)}
 .gr-karten-auf>summary:hover{color:var(--red-deep)}
 
+/* SQ67: Das Glossar am Ende der Vergleichstafel - je Begriff eine Zeile,
+   Begriff in Sans fett links, Definition in Serife rechts. Linien statt
+   Kasten (Hausregel); auf dem Telefon untereinander statt nebeneinander. */
+.gr-glossar{margin-top:26px}
+.gr-glossar-liste{margin:0}
+.gr-glossar-eintrag{display:grid;grid-template-columns:230px 1fr;gap:14px;
+  padding:10px 0;border-top:1px solid var(--rule-2)}
+.gr-glossar-eintrag dt{font-family:var(--sans);font-weight:700;font-size:13px;
+  color:var(--ink);margin:0}
+.gr-glossar-eintrag dd{margin:0;font-size:15px;line-height:1.5;
+  color:var(--ink-2)}
+.gr-glossar-link{margin:2px 0 18px;font-family:var(--sans);font-size:12.5px}
+.gr-glossar-link a{color:var(--red);font-weight:700;
+  text-decoration:underline;text-underline-offset:3px}
+@media (max-width:900px){
+  .gr-glossar-eintrag{grid-template-columns:1fr;gap:3px}
+}
+
 /* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
    Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
    SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`

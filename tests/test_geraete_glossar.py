@@ -8,6 +8,8 @@
      ein Widerspruch der Karte gegen sich selbst (die mit-Tarif-Zahl kann
      hoeher wie niedriger liegen). Ein kurzer Satz direkt darunter, mit dem
      Zeitraum, der die Zahl traegt.
+  3. Das Glossar: vier wiederkehrende Fachbegriffe, je ein Satz, sichtbar
+     am Ende der Vergleichstafel und ueber einen Link erreichbar.
 
 Alle Tests dieser Datei sind NEU - rot-vor gilt nicht, der alte Stand kannte
 keines der Merkmale. Dieselbe Fixture wie `test_geraete_rahmen` (o2 neu und
@@ -20,6 +22,9 @@ from __future__ import annotations
 import re
 
 from test_geraete_tco_zustand import _baue
+
+BEGRIFFE = {"TCO-24", "Tarifband", "Bündel",
+            "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
 
 
 # --------------------------------------------------------------------------
@@ -126,3 +131,57 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihres_labels(tmp_path):
             or f"{treffer.group(1)} Monatsraten" in fluss, (
             f"Karte {karte.get('data-anbieter')}: Label "
             f"{treffer.group(0)}, aber Erklaerzeile {fluss!r}")
+
+
+# --------------------------------------------------------------------------
+# 3. Das Glossar
+# --------------------------------------------------------------------------
+
+def test_das_glossar_erklaert_die_vier_begriffe(tmp_path):
+    """Vier Begriffe, je EIN Satz - sichtbar (keine Aufklappung) am Ende
+    der Vergleichstafel, erreichbar ueber den Link unter der Auswahl."""
+    s = _baue(tmp_path)
+    glossar = s.select_one("section#gr-glossar")
+    assert glossar is not None, "kein Glossar auf der Seite"
+    assert glossar.select_one("details") is None, \
+        "das Glossar steckt in einer Aufklappung"
+    assert glossar.select_one("h2").get_text(strip=True) == "Begriffe erklärt"
+
+    erklaert = {
+        dt.get_text(" ", strip=True):
+            dt.find_next_sibling("dd").get_text(" ", strip=True)
+        for dt in glossar.select("dt")}
+    assert set(erklaert) == BEGRIFFE, \
+        f"andere Begriffe als im Auftrag: {sorted(erklaert)}"
+    for name, satz in erklaert.items():
+        assert len(satz) > 40, f"{name}: kein Erklärsatz, nur ein Wort"
+
+    # Die Saetze sagen das, was die Module rechnen - keine freie Erfindung.
+    assert "24 Monate" in erklaert["TCO-24"], erklaert["TCO-24"]
+    assert "20 GB" in erklaert["Tarifband"] \
+        and "60 GB" in erklaert["Tarifband"], erklaert["Tarifband"]
+    vorzeichen = erklaert["Abweichungs-Vorzeichen (+/−) zu Vodafone"]
+    assert "Minus" in vorzeichen and "Plus" in vorzeichen, vorzeichen
+
+    # Der sichtbare Weg dorthin: ein Link unter der Modell-Auswahl, kein
+    # Anker, den nur wer die URL kennt findet.
+    link = s.select_one('a[href="#gr-glossar"]')
+    assert link is not None, "kein Link auf das Glossar"
+    assert "Begriffe erklärt" in link.get_text()
+    assert link.find_parent("details") is None, \
+        "der Glossar-Link steckt in einer Aufklappung"
+
+
+def test_das_glossar_steht_nicht_im_lesefluss_vor_den_zahlen(tmp_path):
+    """Das Glossar steht AM ENDE der Vergleichstafel - hinter den
+    Modellbloecken, nicht zwischen Auswahl und Antwortzeile. Antonio hat am
+    03.09.2026 die Erklaersektionen der Lesefluss-Mitte geloescht; das
+    Glossar ist deren bewusste, beauftragte Rueckkehr am Rand, nicht in
+    der Mitte."""
+    s = _baue(tmp_path)
+    tafel = s.select_one("#tafel-tco")
+    html = str(tafel)
+    assert html.index('id="gr-glossar"') > html.index("gr-tmodell"), \
+        "das Glossar steht vor den Modellbloecken"
+    assert html.index("gr-glossar-link") < html.index("gr-tmodell"), \
+        "der Glossar-Link steht nicht im Kopf der Tafel"
