@@ -2731,6 +2731,14 @@ b,strong{font-weight:700}
 .gr-ksteuer select{font-family:var(--sans);font-size:13px;padding:4px 6px;
   border:1px solid var(--rule);background:var(--paper-2)}
 
+/* SQ67 (15.09.2026): Das Klapplabel nennt die HANDLUNG und ist keine
+   Kleinheit am Blockende mehr. 15 px Sans fett liegt ueber jeder Zahl der
+   Steuerleiste (12/13 px) und jedem `.gr-a-klein` - der Toggle ist das
+   groesste Bedienelement des Blocks, nicht sein Randnotiz-Stil. */
+.gr-karten-auf>summary{font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;padding:10px 0;color:var(--ink)}
+.gr-karten-auf>summary:hover{color:var(--red-deep)}
+
 /* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
    Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
    SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`

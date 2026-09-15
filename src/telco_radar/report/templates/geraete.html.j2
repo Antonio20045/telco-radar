@@ -1004,9 +1004,16 @@
            Referenzrechnung, Leerkarten und Haendler zusammen; die
            Angebotszahl darueber (`gr-mband`) meint eine andere Menge. #}
     {% set haendler_namen = ("Amazon", "Expert", "Saturn") %}
+    {# SQ67 (15.09.2026): Das Klapplabel nennt die HANDLUNG und die Zahl -
+       "Anbieterkarten (22)" war ein Etikett ueber einem Bedienelement,
+       dessen Wirkung niemand beschrieb (PM-Befund: "klein am Blockende").
+       Die Zahl steht als nackter Text DIREKT vor dem Wort (kein
+       zwischengeschaltetes Tag - das Abnahmekriterium greift die Zeile
+       per grep an den Quelltext), deshalb setzt app.js seitdem den
+       GESAMTEN Labeltext neu statt nur ein Zahl-Span; der Wortlaut steht
+       an beiden Stellen identisch, ein Test haelt sie zusammen. #}
     <details class="gr-auf gr-karten-auf">
-      <summary>Anbieterkarten (<span class="gr-kzahl">{{ m.karten | length
-        + haendler_namen | length }}</span>)</summary>
+      <summary>{{ m.karten | length + haendler_namen | length }} Anbieterangebote anzeigen</summary>
       <div class="gr-ksteuer">
         <label>Sortierung <select data-sortiere>
           <option value="schnitt">Ø je Monat, aufsteigend</option>
