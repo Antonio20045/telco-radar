@@ -65,46 +65,11 @@ log = logging.getLogger(__name__)
 # nichts miteinander zu tun haben.
 EIGEN = "vodafone"
 
-# Hoechstens so viele TCO-Zeilen ohne Aufklappen. Die Seite steht unter
-# einem Hoehenbudget von 3000 px je Reiter (`pruefe_portal.py` Kriterium
-# 11b), und ein Deckel in Zeilen ist immer nur ein Stellvertreter fuer eine
-# Grenze in Pixeln (CLAUDE.md § 6) - deshalb misst 11b die WIRKLICH
-# ausgelieferte Seite und nicht diese Zahl.
-#
-# BIS ZUM 04.09.2026 STANDEN HIER 20 UND 12, und die Rechnung daneben
-# schaetzte eine Zeile auf 84 px. Beides war an einer Tafel OHNE Buendel
-# kalibriert. Mit den ersten 62 Buendeln riss der Reiter das Budget:
-# an der echten Seite nachgemessen (37 Referenzen, Chromium 1440x900)
-#
-#     Zeilen  Referenzen   tafel-tco
-#         20          12      4604 px   <- Budget gerissen
-#         12          12      3824 px
-#          9           4      2997 px   <- 3 px Luft, zu knapp
-#          8           4      2900 px   <- gewaehlt
-#
-# Eine TCO-Zeile misst mit ihrem zugeklappten Aufklapper rund 97 px, eine
-# Referenzzeile rund 67 - nicht 84 und 38. Die Schaetzung von damals ist
-# durch die Messung ersetzt.
-#
-# WARUM DIE REFERENZEN MITGEBEN MUSSTEN: mit den zwoelf offenen Referenzen
-# passen genau DREI Buendel unter das Budget, und eine Tafel mit dem Titel
-# "Was ein Geraet ueber 24 Monate kostet" beantwortet mit drei von 62
-# Zeilen ihre eigene Frage nicht. Vor dieser Phase WAREN die Referenzen der
-# Inhalt der Tafel - es gab nichts anderes; jetzt sind sie der Massstab
-# hinter den Zahlen. Geloescht ist nichts: die uebrigen stehen im
-# Aufklapper, der schon vorher dreizehn von ihnen trug.
-#
-# NULL geht dabei nicht: die Vorlage haengt Ueberschrift, Erklaersatz UND
-# den Aufklapper an `{% if geraete.tco.referenzen %}`. Bei 0 verschwaende
-# nicht die offene Tabelle, sondern der ganze Abschnitt samt allen Belegen.
-#
-# Das ist eine Notbremse, keine Loesung: die Tafel braucht Platz fuer ihre
-# Buendel, und den schafft nur ein Umbau ihres Aufbaus (Phase R).
-SICHTBAR_MAX = 8
-
 # Hoechstens so viele SIM-only-Referenzen offen; der Rest steht zugeklappt
-# darunter und ist NICHT geloescht. Gemessen: rund 67 px je Zeile, siehe
-# die Tabelle bei `SICHTBAR_MAX`.
+# darunter und ist NICHT geloescht. Gemessen: rund 67 px je Zeile (die
+# Messhistorie des ehemaligen Zeilen-Deckels steht in der Git-Historie -
+# seit O2 sind die Bündelzeilen je Modell ungekappt, und das Rückgabefeld
+# `zeilen` ist keine Anzeigeliste mehr, sondern Rechen-Grundlage).
 REFERENZEN_SICHTBAR = 4
 
 # Welche Phase welchen fehlenden Posten liefert. Die Tafel nennt sie, damit
@@ -817,34 +782,29 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                               f"{modell['titel']}"),
             } for b in modell.get("baender") or []},
             "band_leer": modell.get("band_leer"),
+            # O3: der Titel der Bündel-Tabelle für den Fall OHNE Band -
+            # derselbe Satz, den die Vorlage für ein band-loses Vor-
+            # gabemodell rendert, hier als fertige Zeichenkette für den
+            # Modellwechsel (kein zweiter Satzbaumeister im Browser;
+            # dieselbe Regel wie `bnd_titel` je Band).
+            "bnd_titel_ohne": f"Alle Bündel – {modell['titel']}",
         } for modell in modelle["modelle"]],
     }
 
-    # DIE TABELLE ALLER BUENDEL KOMMT AUS DENSELBEN KARTEN wie die
-    # Hauptansicht - nicht aus einer zweiten Rechnung.
+    # DIE TABELLE ALLER BUENDEL gab es bis O2 als eigenes Rückgabefeld
+    # (`tabelle`) - seit O2 zeigen die Bündel-ZEILEN je Modell dieselben
+    # Karten, und seit O3 (S3) für jedes wählbare Gerät. Das Feld hatte
+    # danach keinen Leser mehr in Vorlage oder app.js und ist ENTFERNT
+    # (O2-Evaluator S4); dasselbe gilt für `hat_tco` und `zeilen_gesamt`.
     #
-    # Bis zum 04.09.2026 stand hier `zeilen` aus `tco_24()`, und damit
-    # trug derselbe Reiter dasselbe Buendel mit ZWEI Gesamtsummen und zwei
-    # "Ø je Monat": die Karte "TCO-36 652,75 € · Ø 18,13 €", die Tabelle
-    # darunter "TCO 24 Monate 568,75 € · Ø 23,70 €". Zwei Rechnungen fuer
-    # dieselbe Zahl sind zwei Zahlen (CLAUDE.md § 6). `zeilen` bleibt als
-    # Datenlage-Auskunft (`hat_tco`, `_offene_posten`) - gezeigt wird sie
-    # nicht mehr.
-    #
-    # Die Referenzrechnungen stehen NICHT darin: sie sind kein Buendel,
-    # sondern der Massstab daneben.
-    tabelle = [k for m in modelle["modelle"] for k in m["karten"]
-               if k["belastbar"] and not k["naeherung"]]
-    tabelle.sort(key=lambda k: (k["schnitt_monat"] or 9e9, k["geraet"],
-                                k["anbieter"]))
+    # `zeilen` und `delta` BLEIBEN: kein Template liest sie, aber die
+    # Rechen-Testreihe (tests/test_geraete_tco_view.py) hält an ihnen die
+    # Zusicherungen von `tco_24()` fest (Restbetrag, Geräteanteil,
+    # Delta-Lücken) - verbrauchen statt entfernen (Auftragswortlaut O3/D3).
+    # `zeilen` ist zugleich die Datenlage von `_offene_posten`.
 
     return {
-        # "Es gibt eine TCO zu zeigen" - nicht "es gibt Geraetedaten".
-        # Die zwei auseinanderzuhalten ist der Grund, warum die Tafel heute
-        # ihren Leerzustand kennt.
-        "hat_tco": any(z["belastbar"] for z in zeilen),
-        "zeilen": zeilen[:SICHTBAR_MAX],
-        "zeilen_gesamt": len(zeilen),
+        "zeilen": zeilen,
         "delta": _delta(zeilen),
         "bereitschaft": bereit,
         # B6: "unlesbar" ist NICHT "noch nichts gefunden". `TcoDB` trennt
@@ -877,7 +837,6 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Auskunft ueber die Datenlage, nur nicht mehr der Inhalt der
         # Tafel.
         "modelle": modelle["modelle"],
-        "tabelle": tabelle,
         "modell_vorgabe": modelle["vorgabe"],
         "modelle_gesamt": modelle["gesamt"],
         # O1: der JSON-Knoten für den Selektor (siehe oben) - None im
@@ -906,12 +865,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
 
 def leer() -> dict:
     """Der Zustand ohne lesbare Geraetedatenbank."""
-    return {"hat_tco": False, "zeilen": [], "zeilen_gesamt": 0,
-            "delta": [], "bereitschaft": [], "lesbar": True,
+    return {"zeilen": [], "delta": [],
+            "bereitschaft": [], "lesbar": True,
             "offene_posten": _offene_posten([]),
             "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
             "horizont": TCO_HORIZONT,
-            "modelle": [], "tabelle": [], "modell_vorgabe": "",
+            "modelle": [], "modell_vorgabe": "",
             "modelle_gesamt": 0, "ohne_zuordnung": [], "graph_daten": None,
             "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),

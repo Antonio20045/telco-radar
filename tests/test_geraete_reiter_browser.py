@@ -520,12 +520,11 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
 # --------------------------------------------------------------------------
 
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
-    """BRIEF_FADEN (05.09.2026): NUR NOCH ZWEI Knoepfe in `.gr-reiter"" -
-    "Preis- und TCO-Historie" und "Portfolio" haben ihren verloren. Dieser
-    Test prueft den KLICK-Mechanismus und laeuft deshalb nur noch ueber die
-    zwei wirklich klickbaren Reiter; dass die zwei uebrigen Tafeln ohne
-    Klick weiterhin einzeln umblendbar sind, haelt die Gegenprobe danach."""
-    for tid in ("tafel-katalog", "tafel-tco"):
+    """O3 (STRATEGIE_GERAETE_OPTIK §3): DREI klickbare Tafeln in
+    `.gr-reiter` - der Verlaufs-Reiter ist zurück (die Einzelgerät-
+    Zeitreihe war fertig gebaut und unerreichbar). Der vierte Eintrag ist
+    der Radar-LINK; dass er KEIN Tab ist, hält der nächste Test."""
+    for tid in ("tafel-katalog", "tafel-tco", "tafel-verlauf"):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
@@ -537,43 +536,51 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
         assert aktiv == [tid], "genau ein Reiter ist ausgewaehlt"
 
 
-def test_die_reiterleiste_hat_nur_noch_zwei_knoepfe(_seite):
+def test_die_reiterleiste_traegt_drei_knoepfe_und_den_radar_link(_seite):
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]",
         "e => e.map(x => x.getAttribute('data-tafel'))")
-    assert knoepfe == ["tafel-tco", "tafel-katalog"]
+    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
         ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
-    assert beschriftung == ["Vergleich", "Gerätekatalog"]
+    assert beschriftung == ["Vergleich", "Preisverlauf", "Gerätekatalog"]
+    # Der Quasi-Reiter: ein LINK auf eine andere Seite, deutlich als
+    # Seitenwechsel erkennbar (Pfeil), ohne data-tafel.
+    link = _seite.eval_on_selector(
+        ".gr-reiter a", "e => ({href: e.getAttribute('href'), "
+                        "pfeil: !!e.querySelector('.gr-reiter-pfeil'), "
+                        "tafel: e.getAttribute('data-tafel')})")
+    assert link["href"].endswith("wettbewerbsradar.html"), link
+    assert link["pfeil"], "der Radar-Reiter trägt keinen Pfeil"
+    assert link["tafel"] is None, "der Radar-Link darf kein Tab sein"
     _zeige_tafel(_seite, "tafel-tco")
 
 
-def test_die_ungeknopften_tafeln_bleiben_im_dokument(_seite):
-    """"Nicht geloescht, nur nicht mehr verlinkt": ihr Markup steht weiter
-    im HTML und laesst sich weiterhin einzeln zeigen - nur ohne Knopf."""
-    _zeige_tafel(_seite, "tafel-verlauf")
+def test_die_portfolio_tafel_ist_weg_der_verlauf_ist_verknuepft(_seite):
+    """O3 (S4/§5.2): die zwei ehemaligen Waisen sind verschieden entschieden
+    - `#tafel-verlauf` ist wieder verknüpft (lebendig), `#tafel-portfolio`
+    ist GANZ weg (seine Abschnitte stehen auf dem Wettbewerbs-Radar)."""
+    _seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
     _seite.wait_for_timeout(60)
     sichtbar = _seite.eval_on_selector_all(
         ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
     assert sichtbar == ["tafel-verlauf"]
 
-    _zeige_tafel(_seite, "tafel-portfolio")
-    _seite.wait_for_timeout(60)
-    sichtbar = _seite.eval_on_selector_all(
-        ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
-    assert sichtbar == ["tafel-portfolio"]
+    assert _seite.evaluate(
+        "() => !document.getElementById('tafel-portfolio')"), \
+        "#tafel-portfolio steht noch auf der Geräteseite"
     _zeige_tafel(_seite, "tafel-tco")
 
 
 @pytest.mark.parametrize("tid", ["tafel-tco", "tafel-katalog",
-                                 "tafel-verlauf", "tafel-portfolio"])
+                                 "tafel-verlauf"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch.
 
-    BRIEF_FADEN (05.09.2026): "tafel-verlauf" und "tafel-portfolio" tragen
-    keinen Knopf mehr - gezeigt wird ueber `_zeige_tafel` statt Klick, die
-    Hoehenzusicherung gilt unveraendert fuer beide, weil ihr Markup steht."""
+    O3: "tafel-portfolio" ist weg (Radar-Seite); die Hoehenzusicherung gilt
+    fuer die drei Tafeln dieser Seite - der Radar misst seine eigene Hoehe
+    im wettbewerbsradar-Test."""
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate("document.documentElement.scrollHeight")

@@ -56,13 +56,26 @@ def seite(tmp_path_factory) -> BeautifulSoup:
 def test_keine_dropdown_option_nennt_eine_anbieterzahl_mehr(seite):
     """O1-Auftrag Punkt 6: '- N Anbieter'-Suffixe entfallen. Am echten
     Bestand stehen 80+ Optionen - keine darf die alte Doppelzaehlung
-    zurueckbringen."""
+    zurueckbringen.
+
+    O3 (D2): der letzte Assert war `... or True` und prüfte nichts - als
+    echter wäre er immer rot gefallen, denn value ist die Modell-ID und
+    der Text der Titel (zwei verschiedene Dinge, seit O1). Die echte
+    Zusicherung dahinter: JEDE Option trägt einen nicht-leeren, EIN-
+    DEUTIGEN value - der O3-Deep-Link `?modell=<id>` und die Querlinks
+    des Radars wählen darüber EIN Modell; eine doppelte ID nähme der
+    Browser als erste, und der Link zeigte ein anderes Gerät, als sein
+    Radar-Block versprach."""
     optionen = seite.select("#gr-modell option")
     assert len(optionen) >= 3, "am echten Bestand stehen mehr Modelle"
     for opt in optionen:
         assert not _OPTION_RE.search(opt.get_text()), \
             f"Option traegt noch eine Anbieterzahl: {opt.get_text()!r}"
-        assert opt.get("value") == opt.get_text().strip() or True
+    werte = [opt.get("value") for opt in optionen]
+    assert all(werte), "eine Option ohne value"
+    assert len(werte) == len(set(werte)), \
+        f"Modell-IDs im Selektor nicht eindeutig: " \
+        f"{sorted(v for v in werte if werte.count(v) > 1)[:3]}"
 
 
 def test_die_vorgabe_des_dropdowns_ist_die_leitfrage(seite):

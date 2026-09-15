@@ -1282,9 +1282,20 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Navigation und behauptete eine Antwort, die sie nicht hat.
     from . import wettbewerbsradar as _wettbewerbsradar_mod
     try:
+        # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
+        # Wochenkarte) - dieselben Felder, die die alte Tafel
+        # `#tafel-portfolio` las; der Radar trägt sie als Sektionen.
+        _portfolio = {
+            "lifecycle": geraete["lifecycle"],
+            "auffaellig": geraete["auffaellig"],
+            "lifecycle_sichtbar": geraete["lifecycle_sichtbar"],
+            "nachfolger_sichtbar": geraete["nachfolger_sichtbar"],
+            "fenster_tage": geraete["fenster_tage"],
+        }
         wettbewerbsradar_view = _wettbewerbsradar_mod.radar(
             geraete["tco"], geraete["vergleich"]["ohne_vertrag"],
-            geraete["quellenlage"], alarme=geraete["alarme"])
+            geraete["quellenlage"], alarme=geraete["alarme"],
+            portfolio=_portfolio)
     except Exception as exc:  # noqa: BLE001
         log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)
@@ -1924,6 +1935,20 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     (site_dir / "geraete.html").write_text(
         env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
         encoding="utf-8")
+    # O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): das Bündel-Fragment -
+    # die Zeilen-Gruppe eines jeden NICHT-Vorgabemodells, aus DEMSELBEN
+    # Makro wie der Server-Block der Seite. Die Seite bleibt bei ~1,1 MB
+    # und ihren 24 Aufklappern; das Fragment (am echten Bestand rund
+    # 1,2 MB, 404 Zeilen) wird erst beim ersten Modellwechsel geladen.
+    # Es liegt unter site/data/ wie die CSV-Exporte - ein LADEGUT, kein
+    # Dokument: keine Navigation, kein Titel, kein eigener Inhalt.
+    _tco = geraete.get("tco") or {}
+    if _tco.get("modelle"):
+        (site_dir / "data").mkdir(exist_ok=True)
+        (site_dir / "data" / "geraete-buendel.html").write_text(
+            env.get_template("geraete_buendel_fragment.html.j2").render(
+                modelle=_tco["modelle"], vorgabe=_tco["modell_vorgabe"]),
+            encoding="utf-8")
     (site_dir / "geraete-quellen.html").write_text(
         env.get_template("geraete_quellen.html.j2").render(
             prefix="", geraete=geraete),

@@ -1,0 +1,26 @@
+{# Das Bündel-Fragment (O3/S3, STRATEGIE_GERAETE_OPTIK §3, 15.09.2026).
+
+   KEIN base, keine Navigation, kein eigener Inhalt: diese Datei ist ein
+   LADEGUT. Sie enthält die Bündelzeilen-Gruppe eines jeden wählbaren
+   Modells - bis O2 zeigte der Modell-Umschalter Zeilen nur für das
+   Vorgabegerät (19 von 423 am echten Bestand), weil alle 88 Modellblöcke
+   vor O1 die Seite auf 3,9 MB gebracht hatten und O1 sie auf EINEN
+   serverseitigen Block reduzierte.
+
+   Der Kompromiss dieses Weges, gemessen statt geraten:
+     - ALLE Zeilen aller Modelle ins HTML: +1,17 MB (2.759 Bytes je Zeile
+       × 423), die Seite verdoppelt sich auf ~2,2 MB und trägt ~450
+       <details> - der O1-Erfolg (1,5 MB, 29 details) wäre rückgängig.
+     - Client-RENDERN aus JSON: eine zweite Kopie aller Kartenfelder im
+       Browser - der Weg, den der O1-Kommentar ausdrücklich verworfen hat.
+     - DIESER Weg (lazy Fragment): die Seite bleibt bei ~1,1 MB und ihren
+       24 details; das Fragment (ein weiteres Mal dasselbe Makro, aus
+       `_geraete_buendel.html.j2`) wird beim ERSTEN Modellwechsel geholt -
+       eine Anfrage, dann Cache. Der Netzwerk-Test des Rechenweg-Aufklapp-
+       ers bleibt grün, denn der Klick auf eine Zeile lädt weiterhin nichts.
+
+   Das VORGABEMODELL steht NICHT hierin - seine Zeilen rendert die Seite
+   selbst (First Paint ohne jede Anfrage, lesbar ohne JavaScript). #}
+{% from "_geraete_buendel.html.j2" import buendelgruppe %}
+{% for m in modelle %}{% if m.id != vorgabe %}<div class="gr-bnd-lager" data-modell="{{ m.id }}">{{ buendelgruppe(m) }}</div>
+{% endif %}{% endfor %}

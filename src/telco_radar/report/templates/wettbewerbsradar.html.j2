@@ -253,7 +253,12 @@
   Dazu congstar – Zweitmarke im Telekom-Netz, kein eigener Netzbetreiber:
   congstar-Zeilen stehen nur bei Geräten, die congstar selbst im Bündel
   führt; die Discount-Marke führt kein Vollsortiment, deshalb keine
-  Leerzeile bei den übrigen Geräten.</p>
+  Leerzeile bei den übrigen Geräten.
+  {# O3 (B6): die Tarifübersicht war bis hierher eine Waise - erreichbar
+     nur über die Fußnote der Geräteseite. Der Radar vergleicht in
+     Tarifbändern; der Weg zu deren Quelle gehört auf diese Seite. #}
+  Welche Datenvolumen in welches Band fallen, steht in der
+  <a href="{{ prefix }}tarife.html">Tarifübersicht</a>.</p>
 
   {% macro wr_zeile(z) %}
   <tr class="wr-zeile wr-status--{{ z.status }}">
@@ -278,6 +283,15 @@
   {% macro wr_gruppe(g) %}
   <div class="wr-gruppe">
     <h3 class="wr-gruppenkopf">{{ g.titel }}{% if g.speicher %} · {{ g.speicher }} GB{% endif %}</h3>
+    {# O3 (B5): der Querlink zurück in die Vergleichsansicht DIESES
+       Geräts - der Radar hatte bis O3 keinen einzigen eingehenden
+       Querverweis pro Gerät. `g.id` ist dieselbe Modell-ID, die der
+       Selektor der Geräteseite trägt (beide kommen aus
+       `geraete_tco_karten.modelle()`); `app.js` wertet ?modell= beim
+       Laden aus. Der Pfeil → ist derselbe Richtungscode wie der
+       Schwesterseiten-Link der Geräteseite (↗ wäre ein externer). #}
+    <a class="wr-quer" href="{{ prefix }}geraete.html?modell={{ g.id }}"
+      >Dieses Gerät im Vergleich&nbsp;→</a>
     {% if g.vodafone %}
     <p class="wr-basis">Vodafone-Basis: <b>{{ '%.2f'|format(g.vodafone.gesamt) }} €</b> TCO-24
       ({{ g.vodafone.tarif }}, Band {{ g.vodafone.band_label }}{% if g.vodafone.naeherung %}, gerechnete Näherung{% endif %})
@@ -383,6 +397,224 @@
     {% endif %}
     </div>
   </details>
+</section>
+{% endif %}
+
+{# ==========================================================================
+   O3 (B4, STRATEGIE_GERAETE_OPTIK §3 + §5.2, 15.09.2026): die Portfolio-
+   Abschnitte der Geräteseite - hierher gezogen, nicht kopiert. Bis O3
+   standen sie in der unverknüpften Tafel `#tafel-portfolio` der Geräte-
+   seite (seit BRIEF_FADEN ohne Knopf, seit O3 GANZ weg): Verweildauer,
+   Preisverfall, Nachfolger-Effekt und Portfolio-Tiefe sind Portfolio-
+   Fragen, und der Radar ist die Portfolio-Seite („wo sind wir zu teuer")
+   - Antonios Entscheidung, Strategie §5.2, KEIN vierter Reiter auf der
+   Geräteseite.
+
+   Höhenbewusst (Auftragswortlaut: „Aufklapper erlaubt, Vorzug zugeklappt"):
+   die Wochenkarte der Preisbewegungen steht als EINER zugeklappter
+   Aufklapper; die Lifecycle-Listen behalten ihre bestehenden Deckel aus
+   `geraete_view` (LIFECYCLE_SICHTBAR / NACHFOLGER_SICHTBAR=0 - der
+   Nachfolger steht komplett im Aufklapper). #}
+{% set port = wettbewerbsradar.portfolio %}
+{% if port and port.auffaellig and port.auffaellig.hat_daten %}
+<section class="wr-sektion gr-auffaellig" id="wr-bewegungen">
+  <details class="gr-auf">
+    <summary>Was diese Woche auffällt – letzte {{ port.fenster_tage }}
+      Tage ({{ port.auffaellig.bewegungen | length }}
+      {{ 'Bewegung' if port.auffaellig.bewegungen | length == 1
+         else 'Bewegungen' }})</summary>
+    <div class="gr-auffaellig-karte">
+      <ul class="gr-saetze">
+        {% for s in port.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% if port.auffaellig.bewegungen %}
+    <div class="gr-scroll">
+    <table class="src-table gr-tabelle">
+      <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
+        <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
+        <th>Beleg</th></tr></thead>
+      <tbody>
+        {% for b in port.auffaellig.bewegungen %}
+        <tr>
+          <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
+          <td class="num">{{ b.von | euro }}</td>
+          <td class="num">{{ b.auf | euro }}</td>
+          <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
+            {{ '%+.2f'|format(b.delta) }} €</td>
+          <td>{{ b.datum | date_de }}</td>
+          <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% endif %}
+  </details>
+</section>
+{% endif %}
+
+{# Eine Zeile der Nachfolger-Tabelle. Macro statt Kopie, weil die Zeile
+   zweimal steht (sichtbar / hinter dem Aufklapper, wie bei `dauern` und
+   `trends`) und jedes Feld einzeln gegen ein FEHLENDES Gegenstueck
+   abgesichert ist (B8 der Zurueckweisung vom 31.08.2026): `nach`/`prozent`
+   kommen per `.get(...)` mit leerem Dict als Rueckfall, ein Prozentwert
+   wird nur formatiert, wenn er wirklich da ist, und `marktstart` durchlaeuft
+   den Datumsfilter nur, wenn er gesetzt ist - sonst wirft `date_de`
+   (`datetime.fromisoformat`) auf `None`. #}
+{% macro nachfolgerzeile(n, zustand_spalte) %}
+  <tr><td>{{ n.modell }}</td>
+    <td>{{ n.get('anbieter') or '–' }}</td>
+    {% if zustand_spalte %}<td>{{ n.get('zustand') or '–' }}</td>{% endif %}
+    <td>{{ n.nachfolger_modell }}{% if n.marktstart %}, {{ n.marktstart | date_de }}{% endif %}</td>
+    <td class="num">{% if n.basis %}{{ '%.0f'|format(n.basis) }} €{% else %}–{% endif %}</td>
+    {% set nach = n.get('nach') or {} %}
+    {% set prozent = n.get('prozent') or {} %}
+    {% for tage in [30, 60, 90] %}
+    {% set wert = nach.get(tage) %}
+    {% set proz = prozent.get(tage) %}
+    <td class="num">{% if wert %}{{ '%.0f'|format(wert) }} €{% if proz is not none %}
+      <span class="gr-klein">{{ '%+.1f'|format(proz) }} %</span>{% endif %}{% else %}–{% endif %}</td>
+    {% endfor %}
+    {% set vt = n.get('verweildauer_tage') %}
+    {% set bt = n.get('beobachtet_tage') %}
+    {% set ng = n.get('noch_gelistet') %}
+    <td>{% if vt is not none %}{{ vt }} {{ 'Tag' if vt == 1 else 'Tage' }} seit Marktstart{% if n.get('verweildauer_untergrenze') and bt is not none %} <span class="gr-klein">davon {{ bt }} {{ 'Tag' if bt == 1 else 'Tage' }} gemessen</span>{% endif %}{% if ng is sameas false %} <span class="gr-klein">ausgelistet</span>{% elif ng is none %} <span class="gr-klein">Status unbekannt</span>{% endif %}{% else %}–{% endif %}</td>
+  </tr>
+{% endmacro %}
+
+{% if port and port.lifecycle and (port.lifecycle.hinweis or port.lifecycle.portfolio
+                                  or port.lifecycle.dauern or port.lifecycle.trends
+                                  or port.lifecycle.nachfolger) %}
+{# Die id `lifecycle` ist das alte Sprungziel der Geräteseite - sie lebt
+   hier weiter (dasselbe Stück Inhalt, neuer Ort), genau wie die
+   Weiterleitungs-Dateinamen der Umbenennung vom 06.08.2026. #}
+<section class="wr-sektion gr-lifecycle" id="lifecycle">
+  <h2 class="rubrik">Wie lange ein Gerät im Markt lebt</h2>
+  <p class="gr-basis{{ ' gr-basis--duenn' if port.lifecycle.duenn }}">{{ port.lifecycle.hinweis }}</p>
+
+  {% if port.lifecycle.portfolio %}
+  <h3 class="gr-unter">Wie viele Generationen ein Anbieter gleichzeitig führt</h3>
+  <p class="gr-erklaer">Ein Wettbewerber, der das Vorjahresmodell im Regal
+  lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
+  Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17 Pro Max
+  sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz.</p>
+  {# BEIDE ZAHLEN TRAGEN IHR WORT und zwischen ihnen steht ein sichtbares
+     Trennzeichen - bis zum 30.08.2026 verschmolzen sie im Browser zu
+     „2454 Modelle" (26-px-Rasterspalte, keine Flex); die ganze Geschichte
+     steht in der Git-Historie der Geräteseite. #}
+  <ul class="dz-balken gr-tiefe">
+    {% set tiefstes = port.lifecycle.portfolio[0].generationen or 1 %}
+    {% for t in port.lifecycle.portfolio %}
+    <li{% if t.eigen %} class="gr-eigen"{% endif %}>
+      <span class="dz-balken-name">{{ t.anbieter }}</span>
+      <span class="dz-balken-spur"><span class="dz-balken-fuell"
+        style="width:{{ (100 * t.generationen / tiefstes) | round | int }}%"></span></span>
+      <span class="dz-balken-n gr-tiefe-n"><span class="gr-tiefe-gen">{{
+        t.generationen }} {{ 'Generation' if t.generationen == 1 else 'Generationen'
+        }}</span> · <span class="gr-tiefe-mod">{{ t.modelle_anzahl }} {{
+        'Modell' if t.modelle_anzahl == 1 else 'Modelle' }}</span></span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if port.lifecycle.dauern %}
+  {# DER DECKEL STEHT IM MODUL (`geraete_view.LIFECYCLE_SICHTBAR`), nicht
+     hier - der Rest ist zugeklappt, nicht geloescht. #}
+  {% set sichtbar = port.lifecycle_sichtbar %}
+  <h3 class="gr-unter">Verweildauer im Regal</h3>
+  <ul class="list-card gr-dauern">
+    {% for d in port.lifecycle.dauern[:sichtbar] %}
+    <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
+      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% if port.lifecycle.dauern | length > sichtbar %}
+  <details class="gr-mehrliste"><summary>{{ port.lifecycle.dauern | length - sichtbar }} weitere</summary>
+  <ul class="list-card gr-dauern">
+    {% for d in port.lifecycle.dauern[sichtbar:] %}
+    <li class="list-row"><span class="list-row-date">{{ d.tage }} Tage</span>
+      {{ d.modell }} bei {{ d.anbieter }}{% if d.status != 'aktiv' %} ({{ d.status }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+  </details>
+  {% endif %}
+  {% endif %}
+
+  {% if port.lifecycle.trends %}
+  {% set sichtbar = port.lifecycle_sichtbar %}
+  <h3 class="gr-unter">Preisverfall gegenüber dem Einführungspreis</h3>
+  <ul class="list-card gr-verfall">
+    {% for v in port.lifecycle.trends[:sichtbar] %}
+    <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
+      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
+      <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
+    {% endfor %}
+  </ul>
+  {% if port.lifecycle.trends | length > sichtbar %}
+  <details class="gr-mehrliste"><summary>{{ port.lifecycle.trends | length - sichtbar }} weitere</summary>
+  <ul class="list-card gr-verfall">
+    {% for v in port.lifecycle.trends[sichtbar:] %}
+    <li class="list-row"><span class="list-row-date">{{ '%+.1f'|format(v.prozent) }} %</span>
+      {{ v.modell }} bei {{ v.anbieter }}: {{ v.erstpreis | euro }}
+      (seit {{ v.erstpreis_am | date_de }}) auf {{ v.aktuell | euro }}
+      <span class="gr-klein">{{ 'ohne Vertrag' if v.art == 'ohne_vertrag' else 'Zuzahlung im Bündel' }}</span></li>
+    {% endfor %}
+  </ul>
+  </details>
+  {% endif %}
+  {% endif %}
+
+  {% if port.lifecycle.nachfolger %}
+  <h3 class="gr-unter">Was der Nachfolger mit dem Preis macht</h3>
+  {# Die Sektion STELLT die Frage, sie beantwortet sie nicht vorab (B6 der
+     Zurueckweisung vom 31.08.2026): „bei Vodafone meist direkt ersetzt"
+     war unbelegt und vom eigenen Bestand widerlegt. Die Spalte heisst
+     bewusst NICHT „Verweildauer" - die Liste darüber misst LISTUNGSDAUER,
+     diese Zelle die Zeit SEIT EINEM KATALOGDATUM; beide können um den
+     Faktor 30 auseinanderliegen. #}
+  <p class="gr-erklaer">Bleibt ein Vorjahresmodell nach dem Start seines
+  Nachfolgers als günstiger Einstieg im Regal, oder wird es ersetzt – bei
+  uns wie beim Wettbewerb? Die Spalte „Seit dem Nachfolger“ zählt die Tage
+  seit dessen Marktstart. Wo die eigene Beobachtung erst später begann,
+  steht daneben, wie viele dieser Tage wirklich gemessen sind – der Rest ist
+  eine Annahme aus dem Katalogdatum, keine Messung.</p>
+  {# DER DECKEL STEHT IM MODUL (`geraete_view.NACHFOLGER_SICHTBAR` = 0):
+     die GESAMTE Tabelle steht in EINEM Aufklapper; ist `sichtbar` groesser
+     als der Bestand, entfaellt der Aufklapper (derselbe Codepfad traegt
+     beide Faelle). #}
+  {% set sichtbar = port.nachfolger_sichtbar %}
+  {% set gesamt = port.lifecycle.nachfolger %}
+  {% set zustaende = gesamt | map(attribute='zustand') | select | unique | list %}
+  {% set zustand_spalte = zustaende | length > 1 %}
+  {% macro nachfolgertabelle(zeilen) %}
+  <div class="gr-scroll">
+  <table class="src-table gr-nachfolger">
+    <thead><tr><th>Gerät</th><th>Anbieter</th>{% if zustand_spalte %}<th>Zustand</th>{% endif %}
+      <th>Nachfolger ab</th><th class="num">vorher</th>
+      <th class="num">+30 Tage</th><th class="num">+60</th><th class="num">+90</th>
+      <th>Seit dem Nachfolger</th></tr></thead>
+    <tbody>
+      {% for n in zeilen %}{{ nachfolgerzeile(n, zustand_spalte) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endmacro %}
+  {% if gesamt | length <= sichtbar %}
+  {{ nachfolgertabelle(gesamt) }}
+  {% else %}
+  {% if sichtbar %}{{ nachfolgertabelle(gesamt[:sichtbar]) }}{% endif %}
+  <details class="gr-mehrliste"><summary>{{ gesamt | length - sichtbar }}
+    {{- ' weitere' if sichtbar else ' Zeilen' }}</summary>
+  {{ nachfolgertabelle(gesamt[sichtbar:]) }}
+  </details>
+  {% endif %}
+  {% elif port.lifecycle.nachfolger_hinweis %}
+  <h3 class="gr-unter">Was der Nachfolger mit dem Preis macht</h3>
+  <p class="gr-erklaer">{{ port.lifecycle.nachfolger_hinweis }}</p>
+  {% endif %}
 </section>
 {% endif %}
 

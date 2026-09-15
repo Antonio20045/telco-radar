@@ -263,19 +263,26 @@ def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
     assert danach == ohne, danach
 
 
-def test_der_modellwechsel_versteckt_die_zeilen(seite):
-    """Die Tabelle mit Rechenwegen steht für das Vorgabegerät (O1-Kommentar:
-    ein JS-Vollrenderer aller 88 Modelle wäre Wegwerf-Arbeit). Bei anderem
-    Modell versteckt sie sich, und der Hinweis sagt, wo die Zahlen stehen."""
+def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
+    """O3 (S3): die Tabelle mit Rechenwegen gehört zum GEWÄHLTEN Modell -
+    der Wechsel setzt die Zeilen des anderen Geräts ein (aus dem Fragment,
+    `data/geraete-buendel.html`), statt sich zu verstecken. Bis O3 tat sie
+    genau das; die O2-Fassung dieses Tests nagelte das Verstecken fest."""
     sichtbar = seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     assert sichtbar, "beim Vorgabemodell steht die Tabelle offen da"
     auswahl = seite.eval_on_selector_all(
         "#gr-modell option", "e => e.map(o => o.value)")
-    seite.select_option("#gr-modell", auswahl[1])
-    seite.wait_for_timeout(250)
-    assert seite.eval_on_selector("#gr-buendel", "e => e.hidden") is True
-    hinweis = seite.eval_on_selector("#gr-karten-hinweis", "e => !e.hidden")
-    assert hinweis, "der Hinweis fehlt bei fremdem Modell"
+    fremd = [o for o in auswahl if o != auswahl[0]]
+    assert fremd, "die Fixture braucht ein zweites Modell"
+    seite.select_option("#gr-modell", fremd[0])
+    seite.wait_for_timeout(300)
+    assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
+    anbieter = seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
+    assert set(anbieter) == {"1&1"}, anbieter
+    assert seite.evaluate(
+        "() => !document.getElementById('gr-karten-hinweis')"), \
+        "der Vorgabegerät-Hinweis ist mit S3 entfallen"
 
 
 def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
