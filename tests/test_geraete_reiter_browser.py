@@ -841,10 +841,28 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     Die Zusicherung stand als Kommentar in `geraete_view`, ihr Test hing an
     der Legende der geloeschten Grafik - und war damit vom 30.08.2026 an
     unbelegt.
+
+    Seit O2 (11.09.2026) leben die Datums an ZWEI Orten, und der Test
+    haelt beide fest: die ALARMTABELLE (Listungs-Datum, in der Fixture der
+    11.08.) ist auf wettbewerbsradar.html umgezogen und traegt es weiterhin
+    SICHTBAR; die Buendel-Zeilen der Geraeteseite tragen ihres (4.09.) im
+    Rechenweg-Aufklapper - der Test oeffnet die Klappen dafuer und nimmt
+    sie danach zurueck, denn die Fixture hat Modulgueltigkeit und ein
+    anderer Test misst `details[open] == 0`.
     """
+    _radar_frisch(_seite)
+    radar_text = _seite.eval_on_selector("body", "e => e.innerText")
+    assert "11. August 2026" in radar_text, (
+        "das Abrufdatum der Listungen fehlt auf dem Wettbewerbs-Radar")
+
     _frisch(_seite)
+    _seite.evaluate("() => document.querySelectorAll("
+                    "'#tafel-tco details').forEach(d => d.open = true)")
     text = _seite.eval_on_selector("body", "e => e.innerText")
-    assert "11. August 2026" in text, "das Abrufdatum der Listungen fehlt"
+    _seite.evaluate("() => document.querySelectorAll("
+                    "'#tafel-tco details').forEach(d => d.open = false)")
+    assert "4. September 2026" in text, (
+        "das Abrufdatum der Bündel fehlt auf der Geräteseite")
 
 
 # --------------------------------------------------------------------------

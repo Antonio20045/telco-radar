@@ -1503,14 +1503,16 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     Portals schreibt deutsche Daten, diese Sektion tat es zuerst nicht.
     Beim ANSEHEN des Screenshots aufgefallen, nicht im Test."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "geraete.html")
+    seiten = [_suppe(site, "geraete.html"), _suppe(site, "wettbewerbsradar.html")]
     gemessen = 0
-    for datum in s.select("#tafel-tco .gr-a-klein, #tafel-tco .gr-a-liste span"):
-        text = datum.get_text(strip=True)
-        if not text or not text[0].isdigit():
-            continue
-        gemessen += 1
-        assert "-" not in text, f"ISO-Datum auf der Seite: {text!r}"
+    for s in seiten:
+        for datum in s.select(".gr-a-klein, .gr-a-liste span, .gr-bnd-rw, "
+                              ".gr-haendlerzeile"):
+            text = datum.get_text(strip=True)
+            if not text or not text[0].isdigit():
+                continue
+            gemessen += 1
+            assert "-" not in text, f"ISO-Datum auf der Seite: {text!r}"
     assert gemessen, "kein einziges Datum gemessen - der Test prueft nichts"
 
 
@@ -2058,8 +2060,9 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
     assert int(aufklapper["colspan"]) == len(koepfe), (
         f"colspan {aufklapper['colspan']} zu {len(koepfe)} Spalten")
 
-    # Der Katalog behaelt sie - mit EINEM Wort je Zustand.
-    katalog = suppe.select_one("#gr-katalogtabelle")
+    # Der Katalog (auf der GERAETESEITE) behaelt sie - mit EINEM Wort je
+    # Zustand.
+    katalog = _suppe(site, "geraete.html").select_one("#gr-katalogtabelle")
     assert katalog, "Katalogtabelle fehlt"
     kkoepfe = [th.get_text(" ", strip=True).lower() for th in katalog.select("thead th")]
     assert any("verfügbar" in k for k in kkoepfe), kkoepfe
@@ -2686,6 +2689,6 @@ def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
     """Solange o2 und Vodafone in derselben Spalte stehen, ist "ausschliesslich
     Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat."""
     site = _baue(tmp_path)
-    text = (site / "geraete.html").read_text(encoding="utf-8")
+    text = (site / "wettbewerbsradar.html").read_text(encoding="utf-8")
     assert "ausschließlich Neugeräte ohne Vertrag" not in text
     assert "nicht dasselbe wie ein Barpreis" in text

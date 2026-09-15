@@ -171,11 +171,17 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
 
 def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
     """Der Umzug, nicht die Kopie: auf geraete.html bleibt nichts von der
-    Tabelle - keine Zeile, keine Kacheln, kein Filter."""
+    Tabelle - keine Zeile, keine Kacheln, kein Filter. (`.gr-a-zeile` wird
+    auf die VERGLEICHSANSicht geprüft: der Gerätekatalog derselben Seite
+    trägt die Klasse zu Recht - dieselbe Tabellenmechanik.)"""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
-    for marker in ("#wr-alarme", ".gr-a-zeile", ".gr-chips", "#gr-alarme"):
+    for marker in ("#wr-alarme", ".gr-chips", "#gr-alarme"):
         assert geraete.select_one(marker) is None, marker
+    tafel = geraete.select_one("#tafel-tco")
+    assert tafel is not None
+    assert tafel.select_one(".gr-a-zeile") is None, \
+        "Alarmzeilen stehen noch in der Vergleichsansicht"
 
 
 # --------------------------------------------------------------------------

@@ -401,13 +401,23 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     benannte Lücke, weil congstar dazu nichts gemessen hat."""
     _seite.select_option("#gr-band", "mittel")
     _seite.wait_for_timeout(120)
+    # Der Rechenweg steht im geschlossenen Aufklapper - innerText zeigt ihn
+    # nur, wenn die Zeile offen ist (Transitivitaet der <details>-Regel).
     congstar = _seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar']"
         "[data-band='mittel']",
-        """e => ({
-             bar: e.querySelector('.gr-bnd-bar').textContent,
-             text: e.innerText,
-             gesamt: e.getAttribute('data-gesamt') })""")
+        """e => {
+          e.open = true;
+          const rw = e.querySelector('.gr-bnd-rw');
+          return {
+            bar: e.querySelector('.gr-bnd-bar').textContent,
+            summary: e.querySelector('summary').innerText,
+            rw: rw ? rw.innerText : '',
+            gesamt: e.getAttribute('data-gesamt') };
+        }""")
+    _seite.evaluate(
+        "() => document.querySelectorAll('.gr-bnd')"
+        ".forEach(z => { z.open = false; })")
     # 1,00 € Zuzahlung + 36 x 25,00 € Raten - die Spalte heißt die Zahl
     # beim Namen (Finanzierung), nicht "Gerätepreis".
     assert "Finanzierung" in congstar["bar"], congstar["bar"]
@@ -415,10 +425,10 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     assert "Gerätepreis" not in congstar["bar"], congstar["bar"]
     # Die Zeile behauptet keinen REINEN Gerätepreis ohne Vertrag - die
     # Lücke steht im Rechenweg benannt da.
-    assert "nicht erhoben" in congstar["text"], (
-        "die Zeile nennt die Lücke beim Gerätepreis ohne Vertrag nicht")
+    assert "nicht erhoben" in congstar["rw"], (
+        "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht")
     # Die TCO-24 bleibt die zweite, getrennte Zahl.
-    assert "TCO-24" in congstar["text"] and "1.177,00" in congstar["text"]
+    assert "TCO-24" in congstar["summary"] and "1.177,00" in congstar["summary"]
 
 
 def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
