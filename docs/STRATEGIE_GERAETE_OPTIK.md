@@ -173,3 +173,13 @@ BOM, Dezimalkomma) wie bestehende.
   Sektionen und 88 Querlinks — gemeldet, keine neue Höhengrenze; Geräteseite unverändert
   ±20 px). Belege: `/tmp/optik-o1-o4/o3/` (baubericht.md, rot-vor-gruen.txt,
   Screenshots).
+  - Evaluator: **BESTANDEN MIT AUFLAGEN** (9/9 Kriterien, kein S1). **S2** gefunden und
+    behoben (`3f8e946`, Merge `ee7adb1`): der Vorgabe-Klon wurde erst im Vorgabe-Zweig
+    gezogen — Deep-Link auf ein Fremdmodell (jeder der 88 Radar-Querlinks) + Rückwechsel
+    zum Vorgabemodell zeigte die FREMDEN Zeilen unter dem Vorgabe-Titel (Repro: a56 →
+    Rückwechsel, die eine 664,75-€-Zeile blieb stehen). Klon jetzt bei der Initialisierung;
+    Lückenschließ-Test `test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen`
+    (rot: 1 Zeile statt 4). Zwei S4 mit erledigt: Δ-Wertzellen mobil mit „Δ "-Präfix
+    (::before, Referenzzeilen ohne), Kommentare zur Untertitel-Ausblendung ehrlich
+    (GANZER Untertitel mobil weg, mit Falz-Zahlen). Bericht:
+    `/tmp/optik-o1-o4/o3/evaluator.md`.
