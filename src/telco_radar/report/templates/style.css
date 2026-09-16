@@ -3195,3 +3195,152 @@ b,strong{font-weight:700}
   .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
     padding:9px 10px;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
 }
+
+/* =====================================================================
+   E2 (16.09.2026): die TCO-ZEITREIHE der Hauptansicht (AUFTRAG_GERAETE_
+   EINE_SEITE_V2 §1a). Portiert aus dem genehmigten Prototyp (entwurf-v2)
+   in die Klassennamen der Seite: gr-zr-* statt v2-*. Linien statt Kaesten
+   (Hausregel): keine Flaeche, kein Schatten, kein Radius; Rot ist Akzent
+   und markiert NUR das eigene Angebot.
+
+   ZWEI fertige SVG-Varianten (breit/schmal) stehen im Dokument, ein
+   Mediaquery zeigt genau eines - display:none nimmt das andere auch aus
+   dem Accessibility-Baum. Der Browser rechnet keine Geometrie: beide
+   Bilder kommen fertig aus geraete_zeitreihe.py. */
+.gr-zr-wahl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;
+  padding-bottom:14px}
+.gr-zr-feld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.gr-zr-feld--suche{flex:1 1 340px;position:relative}
+.gr-zr-feld>label{font-family:var(--sans);font-size:12px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-3)}
+.gr-zr-suchfeld{display:flex;align-items:center;gap:10px;border:1px solid var(--rule);
+  background:var(--paper)}
+.gr-zr-suchfeld input{flex:1;min-width:0;font-family:var(--serif);font-size:16px;
+  padding:8px 10px;border:0;background:transparent;color:var(--ink)}
+.gr-zr-suchfeld input:focus{outline:2px solid var(--red);outline-offset:-2px}
+.gr-zr-treffer{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  padding:0 10px 0 0;white-space:nowrap}
+.gr-zr-vorschau{position:absolute;left:0;right:0;top:100%;z-index:40;
+  background:var(--paper-2);border:1px solid var(--rule);border-top:0;
+  box-shadow:0 10px 24px rgba(20,18,15,.10)}
+.gr-zr-vorschau:empty{display:none}
+.gr-zr-vorschau button{display:flex;justify-content:space-between;gap:10px;
+  width:100%;text-align:left;font:inherit;font-family:var(--serif);
+  font-size:15px;padding:8px 12px;border:0;border-bottom:1px solid var(--rule-2);
+  background:transparent;color:var(--ink);cursor:pointer}
+.gr-zr-vorschau button:last-child{border-bottom:0}
+.gr-zr-vorschau button:hover,.gr-zr-vorschau button:focus-visible{
+  background:var(--paper-3)}
+.gr-zr-vorschau .gr-zr-v-titel{font-weight:600}
+.gr-zr-vorschau .gr-zr-v-meta{font-family:var(--sans);font-size:12px;
+  color:var(--ink-3);white-space:nowrap}
+.gr-zr-baender{display:flex;border:1px solid var(--rule)}
+.gr-zr-baender button{font-family:var(--sans);font-size:12.5px;font-weight:700;
+  letter-spacing:.02em;padding:8px 14px;border:0;border-right:1px solid var(--rule);
+  background:transparent;color:var(--ink);cursor:pointer}
+.gr-zr-baender button:last-child{border-right:0}
+.gr-zr-baender button small{display:block;font-weight:600;font-size:12px;
+  color:var(--ink-4)}
+.gr-zr-baender button[aria-pressed="true"]{background:var(--red);color:var(--paper-2)}
+.gr-zr-baender button[aria-pressed="true"] small{color:var(--paper-3)}
+.gr-zr-baender button:disabled{opacity:.38;cursor:default}
+.gr-zr-baender button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.gr-zr-kacheln{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:16px}
+.gr-zr-kacheln button{display:flex;align-items:baseline;gap:8px;
+  font-family:var(--serif);font-size:14.5px;padding:6px 12px;
+  border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  cursor:pointer}
+.gr-zr-kacheln button .gr-zr-k-meta{font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-zr-kacheln button:hover,.gr-zr-kacheln button:focus-visible{
+  border-color:var(--ink-3)}
+.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--ink);
+  border-width:1.5px}
+.gr-zr-antwort{margin:0 0 10px;padding:12px 0 0;border-top:3px solid var(--ink);
+  font-size:19px;line-height:1.42}
+.gr-zr-antwort .gr-zr-zahl{font-weight:700;font-variant-numeric:lining-nums}
+.gr-zr-rechnung{margin:0 0 12px}
+.gr-zr-rechnung>summary{font-family:var(--sans);font-size:12px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.gr-zr-kopf{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
+  margin:0 0 6px}
+.gr-zr-messtage{font-family:var(--sans);font-size:12px;font-weight:600;
+  letter-spacing:.04em;color:var(--ink-3)}
+.gr-zr-legende{display:flex;flex-wrap:wrap;gap:5px 18px;margin:2px 0 10px;
+  font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.gr-zr-legende span{display:inline-flex;align-items:center;gap:6px;
+  white-space:nowrap}
+.gr-zr-legende i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.gr-zr-leg-ab{color:var(--ink-4);font-weight:600}
+.gr-zr-bild{margin:2px 0 4px}
+/* SPEZIFITAET: die Umschalt-Regeln muessen DIESELBE Spezifitaet tragen wie
+   die Basisform (0,1,1) - sonst schlaegt display:block der Basis das
+   display:none der Variante, beide Bilder stapeln sich, und die Tafel
+   waere um das zweite SVG zu hoch (gemessen: 1622 statt 478 px Bildhoehe,
+   Kriterium 11b gerissen). Dieselbe Fehlerklasse wie der --anb-Rueckfall
+   in der G1-Zeit: eine Regel nie ALS EINZIGE auf dieselben Elemente
+   stellen. */
+.gr-zr-bild svg{width:100%;height:auto;display:block}
+.gr-zr-bild svg.gr-zr--schmal{display:none}
+.gr-zr-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-zr-achse{font-family:var(--sans-system);font-size:12px;fill:var(--ink-4)}
+.gr-zr-xtick{font-family:var(--sans-system);font-size:12.5px;fill:var(--ink-3)}
+.gr-zr-linie{fill:none;stroke-width:2.4;stroke-linejoin:round}
+.gr-zr-punkt{stroke:var(--paper-2);stroke-width:1.6}
+.gr-zr-ende{stroke-width:2.6}
+.gr-zr-wert{font-family:var(--sans-system);font-size:13.5px;font-weight:700;
+  fill:var(--ink)}
+.gr-zr-wert--erst{font-size:10.5px;font-weight:600;fill:var(--ink-4)}
+.gr-zr-name{font-family:var(--sans-system);font-size:15px;font-weight:700}
+.gr-zr-chip{font-family:var(--sans-system);font-size:10px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
+.gr-zr-datum{font-family:var(--sans-system);font-size:10.5px;fill:var(--ink-4)}
+.gr-zr-pfeil{fill:var(--ink-4)}
+.gr-zr-bild svg a{cursor:pointer}
+.gr-zr-bild svg a:hover .gr-zr-name{fill:var(--red)}
+.gr-zr-bild svg a:hover .gr-zr-pfeil{fill:var(--red)}
+.gr-zr-hinweis{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  margin:2px 0 0}
+.gr-zr-keine{font-family:var(--sans);font-size:13px;color:var(--ink-3);
+  margin:6px 0 0}
+
+/* Auf dem Telefon: die SCHMALE Variante (eigene Ränder, keine Erst-Werte-
+   Labels im Bild - sie stehen als "ab"-Werte in der Legende). Verdichtet
+   wird NUR an den gr-zr-eigenen Elementen; 11c geht vor (§3.2: notfalls
+   Kachelzeile knapper - deshalb einzeilig-rollende Kacheln). */
+@media (max-width:700px){
+  .gr-zr-wahl{gap:8px;padding-bottom:10px}
+  .gr-zr-feld--suche{flex-basis:100%;gap:3px}
+  .gr-zr-feld:not(.gr-zr-feld--suche){flex-direction:row;align-items:center;
+    gap:8px}
+  .gr-zr-feld:not(.gr-zr-feld--suche)>label{flex:none;margin:0}
+  .gr-zr-suchfeld input{padding:6px 9px;font-size:15px}
+  .gr-zr-treffer{padding:0 8px 0 0;font-size:10.5px}
+  .gr-zr-baender{width:100%}
+  .gr-zr-baender button{flex:1 1 0;padding:6px 2px;font-size:11.5px;
+    text-align:center}
+  .gr-zr-baender button small{font-size:8.5px}
+  .gr-zr-kacheln{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:8px;gap:6px}
+  .gr-zr-kacheln button{flex:0 0 auto;white-space:nowrap}
+  /* 11c geht vor (§3.2): am echten Bestand mass der Graphkopf mit den
+     alten Abstaenden 854 von 844 px - diese vier Abstriche bringen ihn
+     auf 840. Gemessen, nicht geraten. */
+  .gr-zr-antwort{font-size:15.5px;line-height:1.4;padding-top:7px;margin-bottom:2px}
+  .gr-zr-rechnung{margin-bottom:4px}
+  .gr-zr-kopf{margin:0 0 2px}
+  .gr-zr-legende{font-size:10.5px;gap:3px 12px;margin-bottom:6px}
+  .gr-zr-legende i{width:8px;height:8px}
+  .gr-zr-messtage{font-size:10px}
+  .gr-zr-bild svg.gr-zr--breit{display:none}
+  .gr-zr-bild svg.gr-zr--schmal{display:block}
+  .gr-zr-hinweis{font-size:10px}
+}
+/* Breit: das Bild zeigt die Werte (grosser letzter, kleiner erster), der
+   Wert-Span der Legende weicht (eine Zahl steht je Ort genau EINMAL).
+   Schmal: umgekehrt - das Bild bleibt kollisionsfrei, die Legende traegt
+   "ab/zuletzt" (siehe geraete_zeitreihe._svg). */
+.gr-zr-leg-wert{color:var(--ink-4);font-weight:600}
+@media (min-width:701px){
+  .gr-zr-leg-wert{display:none}
+}

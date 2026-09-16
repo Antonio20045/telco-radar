@@ -22,8 +22,9 @@ import yaml
 
 from telco_radar.report.html import render_site
 
-from test_geraete_o1_hauptgraph_browser import (
+from test_geraete_browser_fixture import (
     HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 # (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
@@ -147,7 +148,7 @@ def _oeffne_verlauf(wurzel, seite, modell=None):
     (der Selektor ist im Verlaufs-Reiter nicht sichtbar)."""
     seite.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
     if modell:
-        seite.select_option("#gr-modell", modell)
+        waehle_modell(seite, modell)
         seite.wait_for_timeout(500)
     seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
     seite.wait_for_timeout(120)
@@ -202,7 +203,7 @@ def test_der_rueckwechsel_zeigt_das_vorgabemodell_wieder(lage):
     _oeffne_verlauf(wurzel, seite, modell="google-pixel-11-128")
     seite.click('.gr-reiter [data-tafel="tafel-tco"]')
     seite.wait_for_timeout(120)
-    seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
+    waehle_modell(seite, "apple-iphone-17-pro-256")
     seite.wait_for_timeout(400)
     seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
     seite.wait_for_timeout(120)
@@ -219,18 +220,23 @@ def test_der_rueckwechsel_zeigt_das_vorgabemodell_wieder(lage):
 def test_ein_modell_ohne_messreihe_hat_den_ehrlichen_leerzustand(lage):
     """Kein Diagramm unter der Messtag-Schwelle, kein herbeigelogener
     Punkt: ein Modell ohne jeden Barpreis-Messpunkt zeigt den Satz, kein
-    SVG."""
-    wurzel, seite = lage
-    _oeffne_verlauf(wurzel, seite, modell="google-pixel-11-128")
-    box = seite.evaluate("""() => {
-      const lager = document.querySelector('#gr-g0-lager');
-      return {
-        svg: !!lager.querySelector('svg.gr-g0'),
-        /* Whitespace normalisieren: der Satz steht im HTML auf
-         * mehreren Zeilen, und 'keine\n  Preishistorie' ist kein
-         * Substring. */
-        text: lager.textContent.replace(/\s+/g, ' '),
-      };
-    }""")
-    assert not box["svg"], "SVG für ein Modell ohne Messpunkte"
-    assert "keine Preishistorie" in box["text"], box["text"][:200]
+    SVG.
+
+    E2-Anmerkung: über die ModellWAHL ist dieser Block heute nicht mehr
+    erreichbar - die Wahl listet nur Modelle mit Bündel-Band, und das
+    band-lose Modell (Bündel ohne erhobenes Volumen) ist keins davon.
+    Geprüft wird der Fragment-Knoten, den app.js einsetzen würde (via HTTP
+    vom Server der Fixture - eine statische Datei braucht keinen zweiten
+    Browser-Kontext): selbes Makro, selbe Aussage."""
+    from urllib.request import urlopen
+    from bs4 import BeautifulSoup
+    wurzel, _seite = lage
+    roh = urlopen(f"{wurzel}/data/geraete-buendel.html", timeout=10) \
+        .read().decode("utf-8")
+    lager = BeautifulSoup(roh, "html.parser").select_one(
+        '.gr-g0-lager[data-modell="google-pixel-11-128"]')
+    assert lager is not None, "G0-Lager des bandlosen Modells fehlt"
+    assert lager.select_one("svg.gr-g0") is None, \
+        "SVG für ein Modell ohne Messpunkte"
+    text = " ".join(lager.get_text(" ", strip=True).split())
+    assert "keine Preishistorie" in text, text[:200]

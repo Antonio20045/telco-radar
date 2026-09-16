@@ -28,8 +28,9 @@ import yaml
 
 from telco_radar.report.html import render_site
 
-from test_geraete_o1_hauptgraph_browser import (
+from test_geraete_browser_fixture import (
     HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 # Die O1-Lage PLUS einer unbegrenzten Zeile am Vorgabemodell (o2) und
 # einer zweiten Zeile im Band Klein (Telekom) - genug Zeilen, um Stapel,
@@ -163,19 +164,21 @@ def telefon(_browser_seite):
 
 @pytest.mark.parametrize("fixture_name", ["seite", "telefon"])
 def test_hoechstens_ein_aufklapper_ueber_der_falz(fixture_name, request):
-    """O2 hält A1 von O1: über der Falz steht höchstens der EINE 'Wie
-    gerechnet?'-Aufklapper des Graphen - die Zeilen-Aufklapper rücken
-    darunter (der Graph samt Antwortzeile ist höher als die Falz)."""
+    """O2 hielt A1 von O1; E2 verschiebt die Grenze um eine Kategorie: die
+    Bündel-ZEILEN sind Aufklapper des INHALTS (§3.1b) und dürfen über die
+    Falz ragen - Erklärlast darf es nicht. Über der Falz bleibt höchstens
+    der EINE Rechenschafts-Aufklapper 'So gerechnet'."""
     s = request.getfixturevalue(fixture_name)
     falz = s.viewport_size["height"]
     ueber = s.evaluate("""(falz) => Array.from(
         document.querySelectorAll('#tafel-tco details'))
         .filter(d => {
+          if (d.classList.contains('gr-bnd')) return false;
           const b = d.getBoundingClientRect();
           return b.height > 0 && b.top < falz;
         }).map(d => d.className)""", falz)
     assert len(ueber) <= 1, \
-        f"{len(ueber)} Aufklapper über der Falz ({falz} px): {ueber}"
+        f"{len(ueber)} Erklär-Aufklapper über der Falz ({falz} px): {ueber}"
 
 
 @pytest.mark.parametrize("fixture_name", ["seite", "telefon"])
@@ -230,7 +233,7 @@ def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
     klein = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd[data-band='klein']:not([hidden])",
         "e => e.map(z => z.dataset.anbieter)")
-    seite.select_option("#gr-band", "mittel")
+    waehle_band(seite, "mittel")
     seite.wait_for_timeout(120)
     verdeckt = seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-band='klein']",
@@ -255,7 +258,7 @@ def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
     ohne = seite.eval_on_selector_all(
         "#gr-ohneband .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
     assert ohne, "die Fixture trägt keine Zeile ohne Band"
-    seite.select_option("#gr-band", "mittel")
+    waehle_band(seite, "mittel")
     seite.wait_for_timeout(120)
     danach = seite.eval_on_selector_all(
         "#gr-ohneband .gr-bnd:not([hidden])",
@@ -270,11 +273,15 @@ def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
     genau das; die O2-Fassung dieses Tests nagelte das Verstecken fest."""
     sichtbar = seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     assert sichtbar, "beim Vorgabemodell steht die Tabelle offen da"
-    auswahl = seite.eval_on_selector_all(
-        "#gr-modell option", "e => e.map(o => o.value)")
-    fremd = [o for o in auswahl if o != auswahl[0]]
+    # E2: die waehlbaren Modelle stehen im Zeitreihen-Knoten (erlaubt).
+    auswahl = seite.eval_on_selector(
+        "#gr-zeitreihe-daten",
+        "k => Object.keys(JSON.parse(k.textContent).erlaubt)")
+    vorgabe = seite.eval_on_selector(
+        "#gr-zeitreihe-daten", "k => JSON.parse(k.textContent).vorgabe")
+    fremd = [o for o in auswahl if o != vorgabe]
     assert fremd, "die Fixture braucht ein zweites Modell"
-    seite.select_option("#gr-modell", fremd[0])
+    waehle_modell(seite, fremd[0])
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     anbieter = seite.eval_on_selector_all(

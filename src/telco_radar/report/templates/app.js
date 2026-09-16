@@ -893,175 +893,126 @@ var TelcoFrage = (function () {
  * als fertiges Markup aus dem Fragment `data/geraete-buendel.html`
  * (siehe `setzeBuendel` unten), nicht als zweite Kartenkopie im Browser.
  */
+/* E2 (AUFTRAG_GERAETE_EINE_SEITE_V2, 16.09.2026): die Steuerung der
+ * TCO-ZEITREIHE. Dieser Block ist ein MONTAGEUR, kein Renderer: Antwort-
+ * Satz, Messtag-Zeile, Legende, beide SVG-Varianten und Lueckensatz
+ * kommen als FERTIGES Markup aus dem Fragment `data/geraete-zeitreihe.html`
+ * (serverseitig aus demselben Makro wie der First Paint) und werden hier
+ * nur eingesetzt. Kein Zahlbetrag geht je durch JavaScript - der JSON-
+ * Knoten #gr-zeitreihe-daten traegt Titel, Zaehlungen und Erlaubnis.
+ *
+ * Suchfeld (§1b, genehmigt): Live-Vorschau ab 2 Zeichen, hoechstens 8
+ * Treffer, klickbar vor vollstaendiger Eingabe; die Reihenfolge kommt
+ * fertig und deterministisch aus Python (Bandabdeckung vor Auslaufware).
+ */
 (function () {
-  var modellwahl = document.getElementById('gr-modell');
-  var bandwahl = document.getElementById('gr-band');
-  var knoten = document.getElementById('gr-graph-daten');
-  if (!modellwahl || !knoten) return;
+  var knoten = document.getElementById('gr-zeitreihe-daten');
+  var zrGruppe = document.getElementById('gr-zr-gruppe');
+  if (!knoten || !zrGruppe) return;
   var daten;
   try {
     daten = JSON.parse(knoten.textContent);
   } catch (e) {
     return;
   }
-  if (!daten || !daten.modelle || !daten.modelle.length) return;
-  var vorgabe = daten.vorgabe || daten.modelle[0].id;
+  if (!daten || !daten.vorgabe) return;
+
+  var BAND_KEYS = ['klein', 'mittel', 'gross'];
+  var zustand = { modell: daten.vorgabe,
+                  band: daten.start_band || 'klein' };
 
   function element(id) { return document.getElementById(id); }
 
-  function modellDat(id) {
-    for (var i = 0; i < daten.modelle.length; i++) {
-      if (daten.modelle[i].id === id) return daten.modelle[i];
+  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Querlinks des Radars
+     nutzen ?modell=). Eine unbekannte id faellt still aufs Startgeraet
+     zurueck - derselbe Grundsatz wie zuvor. */
+  try {
+    var params = new URLSearchParams(location.search);
+    var wunschM = params.get('modell');
+    var wunschB = params.get('band');
+    if (wunschM && (daten.erlaubt[wunschM] || []).length) {
+      zustand.modell = wunschM;
     }
-    return null;
-  }
-
-  function baueZeile(z) {
-    var zeile = document.createElement('div');
-    zeile.className = 'gr-bz gr-anb--' + z.slug +
-      (z.eigen ? ' gr-bz--eigen' : '');
-    zeile.setAttribute('data-anbieter', z.anbieter);
-    zeile.setAttribute('data-tco', String(z.gesamt));
-
-    var name = document.createElement('div');
-    name.className = 'gr-bz-name';
-    var an = document.createElement('span');
-    an.className = 'gr-bz-anbieter';
-    an.textContent = z.anbieter;
-    name.appendChild(an);
-    if (z.eigen) {
-      var chip = document.createElement('span');
-      chip.className = 'gr-bz-chip';
-      chip.textContent = 'unser Angebot';
-      name.appendChild(chip);
-    }
-    var tarif = document.createElement('span');
-    tarif.className = 'gr-bz-tarif';
-    tarif.textContent = z.tarif + (z.gb ? ' · ' + z.gb : '');
-    name.appendChild(tarif);
-    zeile.appendChild(name);
-
-    var spur = document.createElement('div');
-    spur.className = 'gr-bz-spur';
-    var fill = document.createElement('div');
-    fill.className = 'gr-bz-fill';
-    fill.style.width = z.breite + '%';
-    spur.appendChild(fill);
-    zeile.appendChild(spur);
-
-    var wert = document.createElement('div');
-    wert.className = 'gr-bz-wert';
-    var tco = document.createElement('span');
-    tco.className = 'gr-bz-tco';
-    tco.textContent = z.gesamt_text;
-    wert.appendChild(tco);
-    var neben = document.createElement('span');
-    if (z.referenz) {
-      neben.className = 'gr-bz-ref';
-      neben.textContent = 'Referenz';
-    } else if (z.delta_text) {
-      neben.className = 'gr-bz-delta';
-      neben.textContent = z.delta_text;
-    }
-    if (neben.className) wert.appendChild(neben);
-    zeile.appendChild(wert);
-    return zeile;
-  }
-
-  function setzeAntwort(a) {
-    var paare = [
-      ['gr-antwort-block-geraet', 'gr-antwort-geraet',
-       'gr-antwort-geraet-anbieter', a.geraetepreis,
-       a.geraetepreis_anbieter],
-      ['gr-antwort-block-tarif', 'gr-antwort-tarif',
-       'gr-antwort-tarif-anbieter', a.tarif_gesamt, a.tarif_anbieter],
-    ];
-    var mindEins = false;
-    paare.forEach(function (p) {
-      var block = element(p[0]), zahl = element(p[1]),
-          anbieter = element(p[2]);
-      if (!block || !zahl || !anbieter) return;
-      block.hidden = p[3] == null;
-      if (p[3] != null) {
-        mindEins = true;
-        zahl.textContent = p[3];
-        anbieter.textContent = '(' + (p[4] || '') + ')';
+    if (wunschB && BAND_KEYS.indexOf(wunschB) > -1 &&
+        (daten.erlaubt[zustand.modell] || []).indexOf(wunschB) > -1) {
+      zustand.band = wunschB;
+    } else {
+      var erlaubtStart = daten.erlaubt[zustand.modell] || [];
+      if (erlaubtStart.indexOf(zustand.band) === -1 && erlaubtStart.length) {
+        zustand.band = erlaubtStart[0];
       }
-    });
-    if (element('gr-antwort-erklaer')) {
-      element('gr-antwort-erklaer').hidden = !mindEins;
     }
-    if (element('gr-antwort-leer')) {
-      element('gr-antwort-leer').hidden = mindEins;
+  } catch (e) { /* aeltere Browser: Startzustand bleibt */ }
+
+  /* --- Das Zeitreihen-Fragment: ALLE Paare, auch der Startzustand. Der
+     Rueckweg nach einem Wechsel hat damit genau EINE Quelle - der alte
+     Vorgabe-Klon (der bei einem Deep-Link Fremdes als "Vorgabe" einfrieren
+     liess, S2) entfaellt fuer den Graphen komplett. */
+  var zrLager = null;
+  var zrVersprechen = null;
+  function holeZr() {
+    if (zrLager) return Promise.resolve(zrLager);
+    if (!zrVersprechen) {
+      zrVersprechen = fetch('data/geraete-zeitreihe.html')
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.text();
+        })
+        .then(function (txt) {
+          var doc = new DOMParser().parseFromString(txt, 'text/html');
+          zrLager = {};
+          Array.prototype.forEach.call(
+            doc.querySelectorAll('.gr-zr-lager[data-modell]'),
+            function (l) {
+              zrLager[l.getAttribute('data-modell') + '::' +
+                      l.getAttribute('data-band')] = l;
+            });
+          return zrLager;
+        });
     }
+    return zrVersprechen;
   }
 
-  function stelleZeilen(band) {
-    /* O2: die Bündel-Zeilen folgen der Bandwahl - Zeilen ANDERER Bänder
-     * werden versteckt, nicht entfernt. Die Zeilen OHNE Band stehen in
-     * der eigenen Gruppe darunter und haengen an keiner Auswahl an.
-     * O3: der Selektor geht über den MONTAGEPUNKT `#gr-bnd-gruppe` statt
-     * über `#gr-bndliste` - seit dem Modellwechsel stehen dort auch die
-     * injizierten Zeilen aus dem Fragment (ohne eigene ids). */
-    var zeilen = document.querySelectorAll(
-      '#gr-bnd-gruppe .gr-bnd[data-band]');
-    Array.prototype.forEach.call(zeilen, function (z) {
-      z.hidden = !!band && z.getAttribute('data-band') !== band;
+  var zrFolge = 0;
+  function setzeGraph(modell, band) {
+    var folge = ++zrFolge;
+    holeZr().then(function (lager) {
+      if (folge !== zrFolge) return;
+      var block = lager && lager[modell + '::' + band];
+      while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
+      if (block) {
+        var klon = document.importNode(block, true);
+        while (klon.firstChild) zrGruppe.appendChild(klon.firstChild);
+      } else if (lager) {
+        var p = document.createElement('p');
+        p.className = 'gr-zr-keine';
+        p.textContent = 'Der Graph dieses Geräts konnte nicht geladen ' +
+                        'werden – die Bündel-Zeilen darunter nennen die ' +
+                        'Werte aller Anbieter.';
+        zrGruppe.appendChild(p);
+      }
+    }, function () {
+      if (folge !== zrFolge) return;
+      /* Das Fragment ist unerreichbar: der SERVER-Startzustand bleibt
+         stehen, statt einer leeren Flaeche. */
     });
   }
 
-  function wendeBandOptionenAn(m) {
-    if (!bandwahl) return;
-    var erlaubt = m && m.baender ? Object.keys(m.baender) : [];
-    Array.prototype.forEach.call(bandwahl.options, function (o) {
-      o.disabled = erlaubt.indexOf(o.value) === -1;
-    });
-    var aktuell = bandwahl.options[bandwahl.selectedIndex];
-    if ((!aktuell || aktuell.disabled) && erlaubt.length) {
-      bandwahl.value = erlaubt[0];
-    }
-  }
-
-  /* O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): die Bündel-Zeilen für
-   * JEDES Modell - der S3-Befund des O2-Evaluators war, dass der
-   * Modell-Umschalter Zeilen nur fürs Vorgabegerät zeigte (19 von 423).
-   *
-   * Drei Bauteile, kein Renderer: das Fragment
-   * `data/geraete-buendel.html` trägt die Zeilen-Gruppe jedes Nicht-
-   * Vorgabemodells (serverseitig aus DEMSELBEN Makro wie die Seite),
-   * dieser Block holt es beim ERSTEN Modellwechsel (eine Anfrage, dann
-   * Cache) und setzt die Gruppe des gewählten Modells in den Montage-
-   * punkt `#gr-bnd-gruppe` ein. Fürs Vorgabemodell steht der Original-
-   * zustand der Seite bereit (Klon vom ersten Aufruf) - der Weg zurück
-   * nach zwei Wechseln zeigt exakt die Server-Ausgabe. Nichts wird im
-   * Browser gerechnet oder formatiert: alle Zeichenketten kommen fertig.
-   */
+  /* --- Die Buendel-Zeilen und der G0-Block folgen dem Modell (O3/O4,
+     unveraendert): Fragment, Klon des Anfangszustands, eigene Folgen. */
   var fragmentLager = null;
   var fragmentVersprechen = null;
   var vorgabeGruppe = null;
-  /* O4: dasselbe Lager-Konzept für den G0-Block des Verlaufs-Reiters -
-   * eigene Map, eigener Vorgabe-Klon, derselbe Satz Regeln. */
   var g0Lager = null;
   var vorgabeG0 = null;
   var wechselFolge = 0;
+  var g0Folge = 0;
   var zuletztModell = null;
+  var vorgabe = daten.vorgabe;
 
-  /* S2-Fix (O3-Evaluation): der Vorgabe-Zustand wird HIER geklont, beim
-   * Laden, VOR jedem ersten `setzeBuendel`-Durchlauf. Bis zur O3-Fix-
-   * runde klonte der Vorgabe-Zweig ihn erst im eigenen Durchlauf - bei
-   * einem Deep-Link auf ein FREMDmodell (genau das, was jeder der 88
-   * Radar-Querlinks tut) war der erste Durchlauf fremd, der Montagepunkt
-   * trug fremde Zeilen, und der Rückwechsel klonte DIESE als "Vorgabe":
-   * Titel und Graph sagten Vorgabegerät, die Tabelle zeigte die eine
-   * Zeile des Deep-Link-Geräts (am echten Bestand: a56, 664,75 €, statt
-   * der 19 Zeilen des iPhone 17 Pro). Der Klon steht jetzt fest, bevor
-   * irgendein Wechsel den Montagepunkt anfassen kann. */
   (function () {
     var anfangsGruppe = element('gr-bnd-gruppe');
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
-    /* O4: der G0-Klon derselben Lektion - wird er erst im Vorgabe-Durchlauf
-     * gezogen, klont ein Deep-Link-Rückweg die FREMDEN Zeilen als
-     * "Vorgabe" (derselbe Fehler wie S2 bei den Bündel-Zeilen). */
     var anfangsG0 = element('gr-g0-lager');
     if (anfangsG0) vorgabeG0 = anfangsG0.cloneNode(true);
   })();
@@ -1074,16 +1025,14 @@ var TelcoFrage = (function () {
           if (!r.ok) throw new Error(r.status);
           return r.text();
         })
-        .then(function (t) {
-          var doc = new DOMParser().parseFromString(t, 'text/html');
+        .then(function (txt) {
+          var doc = new DOMParser().parseFromString(txt, 'text/html');
           fragmentLager = {};
           Array.prototype.forEach.call(
             doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
             function (l) {
               fragmentLager[l.getAttribute('data-modell')] = l;
             });
-          /* O4: die G0-Blöcke stehen imSELBEN Fragment - eine Anfrage,
-           * zwei Montagepunkte. */
           g0Lager = {};
           Array.prototype.forEach.call(
             doc.querySelectorAll('.gr-g0-lager[data-modell]'),
@@ -1100,11 +1049,13 @@ var TelcoFrage = (function () {
     while (gruppe.firstChild) gruppe.removeChild(gruppe.firstChild);
   }
 
-  function setzeBndTitel(m, band) {
+  function setzeBndTitel(mid, band) {
     var titel = element('gr-bnd-titel');
     if (!titel) return;
-    if (band && band.bnd_titel) titel.textContent = band.bnd_titel;
-    else if (m.bnd_titel_ohne) titel.textContent = m.bnd_titel_ohne;
+    var m = daten.bnd_titel[mid] || {};
+    if (band && m[band]) titel.textContent = m[band];
+    else if (daten.bnd_titel_ohne[mid]) titel.textContent =
+      daten.bnd_titel_ohne[mid];
   }
 
   function leerSatz(gruppe, text) {
@@ -1114,13 +1065,13 @@ var TelcoFrage = (function () {
     gruppe.appendChild(p);
   }
 
-  function setzeBuendel(m, band, bandKey) {
+  function setzeBuendel(mid, bandKey) {
     var gruppe = element('gr-bnd-gruppe');
     if (!gruppe) return;
-    var fertig = function (knoten, fehler) {
+    var fertig = function (knotenB, fehler) {
       gruppeLeeren(gruppe);
-      if (knoten) {
-        var klon = document.importNode(knoten, true);
+      if (knotenB) {
+        var klon = document.importNode(knotenB, true);
         while (klon.firstChild) gruppe.appendChild(klon.firstChild);
       } else if (fehler) {
         leerSatz(gruppe, 'Die Bündel-Zeilen dieses Geräts konnten nicht ' +
@@ -1131,72 +1082,51 @@ var TelcoFrage = (function () {
                          'da – der Graph oben nennt je Tarifband, welche ' +
                          'Anbieter eine Zahl tragen.');
       }
-      setzeBndTitel(m, band);
+      setzeBndTitel(mid, bandKey);
       stelleZeilen(bandKey);
       wendeSortierungAn();
     };
-    if (m.id === vorgabe) {
+    if (mid === vorgabe) {
       fertig(vorgabeGruppe, false);
       return;
     }
     var meineFolge = ++wechselFolge;
     holeFragment().then(function (lager) {
       if (meineFolge !== wechselFolge) return;
-      fertig(lager ? lager[m.id] : null, false);
+      fertig(lager ? lager[mid] : null, false);
     }, function () {
       if (meineFolge !== wechselFolge) return;
       fertig(null, true);
     });
   }
 
-  /* O4: der G0-Block des Verlaufs-Reiters folgt demselben Modell wie
-   * die Bündel-Zeilen - aus demSELBEN Fragment (keine zweite Anfrage),
-   * als fertiges Markup eingesetzt (kein Client-Renderer: das SVG und
-   * die Wertetabelle entstehen serverseitig aus DEMSELBEN Makro wie der
-   * First Paint des Vorgabemodells).
-   *
-   * EIGENE Folgen-Nummer: teilt er die von `setzeBuendel`, wirft jeder
-   * Wechsel die noch laufende Bündel-Antwort weg (und umgekehrt) - zwei
-   * Montagepunkte, zwei Guards. Beim ERSTEN Wechsel ist das Fragment
-   * noch nicht da: der Nicht-Vorgabe-Zweig wartet auf dieselbe Anfrage
-   * wie die Bündel-Zeilen, statt leer zu bleiben. */
-  var g0Folge = 0;
-
-  function fuelleG0(knoten) {
+  function fuelleG0(knotenB) {
     var lager = element('gr-g0-lager');
     if (!lager) return;
     while (lager.firstChild) lager.removeChild(lager.firstChild);
-    if (knoten) {
-      var klon = document.importNode(knoten, true);
+    if (knotenB) {
+      var klon = document.importNode(knotenB, true);
       while (klon.firstChild) lager.appendChild(klon.firstChild);
     }
   }
 
-  function setzeG0(m) {
+  function setzeG0(mid) {
     if (!element('gr-g0-lager')) return;
-    if (m.id === vorgabe) {
+    if (mid === vorgabe) {
       fuelleG0(vorgabeG0);
       return;
     }
     var meineFolge = ++g0Folge;
     holeFragment().then(function () {
       if (meineFolge !== g0Folge) return;
-      fuelleG0(g0Lager ? g0Lager[m.id] : null);
+      fuelleG0(g0Lager ? g0Lager[mid] : null);
     }, function () {
       if (meineFolge !== g0Folge) return;
       fuelleG0(null);
     });
   }
 
-  /* O3 (C, Sichttest-Punkt aus §2): die sortierbare Bündeltabelle. Die
-   * Server-Vorsortierung nach TCO-24 (O2) bleibt der Ausgangszustand -
-   * `sortierung.key === null` heißt "Ordnung, wie sie kam". Sortiert
-   * werden die KNOTEN (data-gesamt, data-delta als Zahl, data-anbieter
-   * als Text), ohne Reload und ohne neue Anfrage; ein gesetztes window-
-   * Flag überlebt das (der Browser-Test hält es dagegen). Zeilen OHNE
-   * Wert für den gewählten Schlüssel wandern ans ENDE, auch bei
-   * absteigender Sortierung - eine Zeile ohne Δ ist keine besonders
-   * kleine Abweichung. */
+  /* O2/C: die sortierbare Buendeltabelle - unveraendert. */
   var sortierung = {key: null, richtung: 1};
   var sortierKnoepfe = document.querySelectorAll('#gr-buendel .gr-bsort');
 
@@ -1222,15 +1152,15 @@ var TelcoFrage = (function () {
           function (k) {
             return k.classList && k.classList.contains('gr-bnd');
           });
-        zeilen.sort(function (a, b) {
-          var ka = sortierWert(a), kb = sortierWert(b);
-          if (ka === null && kb === null) return 0;
-          if (ka === null) return 1;
-          if (kb === null) return -1;
-          if (typeof ka === 'string' || typeof kb === 'string') {
-            return ka.localeCompare(kb, 'de') * richt;
+        zeilen.sort(function (x, y) {
+          var kx = sortierWert(x), ky = sortierWert(y);
+          if (kx === null && ky === null) return 0;
+          if (kx === null) return 1;
+          if (ky === null) return -1;
+          if (typeof kx === 'string' || typeof ky === 'string') {
+            return kx.localeCompare(ky, 'de') * richt;
           }
-          return (ka - kb) * richt;
+          return (kx - ky) * richt;
         });
         zeilen.forEach(function (z) { liste.appendChild(z); });
       });
@@ -1258,91 +1188,191 @@ var TelcoFrage = (function () {
     });
   });
 
-  function baueGraph() {
-    var m = modellDat(modellwahl.value);
-    if (!m) return;
+  function stelleZeilen(band) {
+    var zeilen = document.querySelectorAll(
+      '#gr-bnd-gruppe .gr-bnd[data-band]');
+    Array.prototype.forEach.call(zeilen, function (z) {
+      z.hidden = !!band && z.getAttribute('data-band') !== band;
+    });
+  }
 
-    var titel = element('gr-tco-titel');
-    if (titel) titel.textContent = m.titel;
-    setzeAntwort(m.antwort || {});
+  /* --- Die Wahl: Band-Knoepfe, Kacheln, Suchfeld --------------------- */
+  function markiereBaender() {
+    var erlaubt = daten.erlaubt[zustand.modell] || [];
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-zr-baender button[data-band]'),
+      function (k) {
+        var band = k.getAttribute('data-band');
+        k.disabled = erlaubt.indexOf(band) === -1;
+        k.setAttribute('aria-pressed', band === zustand.band ? 'true'
+                                                             : 'false');
+      });
+  }
 
-    var liste = element('gr-balkenliste');
-    var chip = element('gr-bandchip');
-    var unter = element('gr-hgraph-unter');
-    var luecke = element('gr-lueckenzeile');
-    wendeBandOptionenAn(m);
-    var band = (m.baender || {})[bandwahl ? bandwahl.value : ''];
-    if (liste) {
-      while (liste.firstChild) liste.removeChild(liste.firstChild);
-    }
-    if (band) {
-      if (chip) chip.textContent = band.chip;
-      if (unter) unter.textContent = band.unterzeile;
-      if (luecke) {
-        luecke.textContent = band.luecke_text || '';
-        luecke.hidden = !band.luecke_text;
-      }
-      if (liste) {
-        band.zeilen.forEach(function (z) {
-          liste.appendChild(baueZeile(z));
-        });
-      }
-    } else {
-      /* Ein Modell ohne ein einziges Band: der ehrliche Leerzustand -
-       * derselbe Satz, den die Vorlage für ein band-loses Vorgabemodell
-       * rendert (eine Quelle: geraete_tco_band.BAND_LEER_TEXT). Er steht
-       * im eigenen .gr-hgraph-leer-Element und nicht in der Unterzeile,
-       * weil die auf dem Telefon versteckt ist (A1: Falz vor Chrome). */
-      if (chip) chip.textContent = '';
-      if (unter) unter.textContent = '';
-      if (luecke) {
-        luecke.textContent = '';
-        luecke.hidden = true;
-      }
-      if (liste) {
-        var leer = document.createElement('p');
-        leer.className = 'gr-hgraph-leer';
-        leer.textContent = m.band_leer ||
-          'Für dieses Gerät liegt kein Bündel vor.';
-        liste.appendChild(leer);
-      }
-    }
+  function markiereKacheln() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
+      function (k) {
+        k.setAttribute('aria-pressed',
+                       k.getAttribute('data-modell') === zustand.modell
+                         ? 'true' : 'false');
+      });
+  }
 
-    /* O3 (S3): die Bündel-Tabelle gehört zum GEWÄHLTEN Modell - beim
-     * Modellwechsel werden ihre Zeilen eingesetzt (Fragment bzw. Vorgabe-
-     * Klon, siehe `setzeBuendel`), beim Bandwechsel bleiben sie stehen
-     * und nur Titel und Bandfilter folgen (offene Rechenwege eines
-     * Bandwechsels bleiben sonst auf, ein Modellwechsel setzt sie
-     * berechtigt zurück). */
-    var bandKey = band ? bandwahl.value : '';
-    if (m.id !== zuletztModell) {
-      zuletztModell = m.id;
-      setzeBuendel(m, band, bandKey);
-      setzeG0(m);
-    } else {
-      setzeBndTitel(m, band);
-      stelleZeilen(bandKey);
+  function setzeSuchfeld() {
+    var feld = element('gr-zr-suche');
+    if (feld) feld.value = daten.titel[zustand.modell] || '';
+    var treffer = element('gr-zr-treffer');
+    if (treffer) {
+      var n = (daten.erlaubt[zustand.modell] || []).length;
+      treffer.textContent = n ? n + (n === 1 ? ' Band' : ' Bänder')
+                              : daten.modelle_gesamt + ' Modelle';
     }
   }
 
-  modellwahl.addEventListener('change', baueGraph);
-  if (bandwahl) bandwahl.addEventListener('change', baueGraph);
-
-  /* O3 (B5): der Deep-Link der Radar-Querlinks - `?modell=<id>` öffnet
-   * die Seite MIT diesem Modell. Eine id, die der Selektor nicht kennt,
-   * wird still verworfen: der Link landet auf dem Vorgabegerät, nicht
-   * auf einer leeren Auswahl (dieselbe Regel wie die alten Hash-Ziele). */
-  try {
-    var wunsch = new URLSearchParams(location.search).get('modell');
-    if (wunsch && wunsch !== modellwahl.value) {
-      var bekannt = Array.prototype.some.call(
-        modellwahl.options,
-        function (o) { return o.value === wunsch; });
-      if (bekannt) modellwahl.value = wunsch;
+  function waehle(modell, band) {
+    var erlaubt = daten.erlaubt[modell] || [];
+    if (!erlaubt.length) return;
+    zustand.modell = modell;
+    if (band && erlaubt.indexOf(band) > -1) {
+      zustand.band = band;
+    } else if (erlaubt.indexOf(zustand.band) === -1) {
+      zustand.band = erlaubt[0];
     }
-  } catch (e) { /* ältere Browser: der Link fällt aufs Vorgabegerät */ }
+    markiereBaender();
+    markiereKacheln();
+    setzeSuchfeld();
+    setzeGraph(zustand.modell, zustand.band);
+    setzeBndTitel(zustand.modell, zustand.band);
+    stelleZeilen(zustand.band);
+    if (zustand.modell !== zuletztModell) {
+      zuletztModell = zustand.modell;
+      setzeBuendel(zustand.modell, zustand.band);
+      setzeG0(zustand.modell);
+    }
+    try {
+      history.replaceState(null, '',
+        '?modell=' + encodeURIComponent(zustand.modell) +
+        '&band=' + zustand.band);
+    } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
+  }
 
-  baueGraph();
+  Array.prototype.forEach.call(
+    document.querySelectorAll('#gr-zr-baender button[data-band]'),
+    function (k) {
+      k.addEventListener('click', function () {
+        if (k.disabled) return;
+        waehle(zustand.modell, k.getAttribute('data-band'));
+      });
+    });
+
+  Array.prototype.forEach.call(
+    document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
+    function (k) {
+      k.addEventListener('click', function () {
+        waehle(k.getAttribute('data-modell'), null);
+      });
+    });
+
+  /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
+     auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
+  function trefferListe(eingabe) {
+    var tokens = eingabe.toLowerCase().split(/\s+/).filter(Boolean);
+    return daten.suchindex.filter(function (s) {
+      var worte = (s.titel || '').toLowerCase().split(/[\s·]+/).filter(Boolean);
+      return tokens.every(function (t) {
+        return worte.some(function (w) { return w.indexOf(t) === 0; });
+      });
+    }).slice(0, 8);
+  }
+
+  function vorschau(wert) {
+    var box = element('gr-zr-vorschau');
+    var treffer = element('gr-zr-treffer');
+    if (!box) return;
+    if (wert.trim().length < 2) { box.textContent = ''; return; }
+    var liste = trefferListe(wert.trim());
+    if (treffer) {
+      treffer.textContent = liste.length
+        ? liste.length + ' Treffer'
+        : 'kein Treffer';
+    }
+    box.textContent = '';
+    liste.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'option');
+      b.setAttribute('data-modell', s.id);
+      var titel = document.createElement('span');
+      titel.className = 'gr-zr-v-titel';
+      titel.textContent = s.titel;
+      var meta = document.createElement('span');
+      meta.className = 'gr-zr-v-meta';
+      /* Die GB-Stufe steht schon im Titel - sie noch einmal in die Meta-
+         Zeile zu setzen hiesse dieselbe Zahl zweimal in einer Zeile. */
+      meta.textContent = s.anbieter_zahl + ' Anbieter · ' +
+        (s.band_zahl === 1 ? '1 Band' : s.band_zahl + ' Bänder');
+      b.appendChild(titel);
+      b.appendChild(meta);
+      b.addEventListener('mousedown', function (ev) {
+        ev.preventDefault();
+        waehle(s.id, null);
+      });
+      box.appendChild(b);
+    });
+  }
+
+  var feld = element('gr-zr-suche');
+  if (feld) {
+    feld.addEventListener('input', function () { vorschau(feld.value); });
+    feld.addEventListener('focus', function () { vorschau(feld.value); });
+    feld.addEventListener('blur', function () {
+      setTimeout(function () {
+        var box = element('gr-zr-vorschau');
+        if (box) box.textContent = '';
+      }, 150);
+    });
+    feld.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') {
+        var box = element('gr-zr-vorschau');
+        if (box) box.textContent = '';
+      }
+      if (ev.key === 'Enter') {
+        var erster = element('gr-zr-vorschau') &&
+                     element('gr-zr-vorschau').querySelector('button');
+        if (erster) {
+          ev.preventDefault();
+          waehle(erster.getAttribute('data-modell'), null);
+        }
+      }
+    });
+  }
+
+  /* --- Start: der Server-Zustand steht da; dieser Aufruf setzt nur die
+     Markierungen und blendet die Zeilen des gewaehlten Bands ein. */
+  markiereBaender();
+  markiereKacheln();
+  setzeSuchfeld();
+  stelleZeilen(zustand.band);
+  /* zuletztModell beschreibt, WAS IM DOM STEHT - und das ist am Anfang
+     der SERVER-First-Paint, also das Startmodell (vorgabe), NICHT der
+     Deep-Link-Wunsch. Stand es auf dem Wunsch, traf der erste waehle()-
+     Aufruf auf "bereits gewechselt" und liess die Buendel-Zeilen des
+     Startmodells stehen, waehrend Graph und Antwort schon das Deep-Link-
+     Geraet zeigten (gemessen am o3-Rueckwechseltest: 4 Zeilen des
+     Startmodells unter einem s26-Deep-Link). */
+  zuletztModell = vorgabe;
+  try {
+    history.replaceState(null, '',
+      '?modell=' + encodeURIComponent(zustand.modell) +
+      '&band=' + zustand.band);
+  } catch (e) { /* offline */ }
+  /* Ein Deep-Link auf ein ANDERES Geraet als den Server-Startzustand
+     braucht den ersten Fragmentabruf - sonst zeigten Graph und Tabelle
+     das Startgeraet, obwohl die URL ein anderes nennt. */
+  if (zustand.modell !== vorgabe) {
+    waehle(zustand.modell, zustand.band);
+  }
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
  *

@@ -1,0 +1,297 @@
+"""E2: die Zeitreihen-Hauptansicht im echten Chromium - Falz, Suche,
+Band-Wahl, Deep-Link, Konsole. Dieselbe Bauform wie
+`tests/test_geraete_o1_hauptgraph_browser.py` (eigener Server auf
+127.0.0.1, kein file://, Chromium an beiden bekannten Orten).
+
+Abnahmekriterien des E2-Auftrags als Messung:
+  - 390x844: Antwort-Satz UND Graphkopf (Messtag-Zeile) oberhalb der Falz,
+    kein Querscroll (scrollWidth <= 390).
+  - Null JavaScript-Konsolenfehler.
+  - Suchfeld: Live-Vorschau ab 2 Zeichen, hoechstens 8 Treffer, klickbar
+    vor vollstaendiger Eingabe (Antonios Beispiel: "iphone 17").
+  - Band-Wahl und Deep-Link ?modell=&band= wechseln den Graphen - ohne
+    dass der Client eine Zahl rechnet (alle Werte kommen fertig).
+"""
+from __future__ import annotations
+
+import contextlib
+import functools
+import glob
+import http.server
+import json
+import pathlib
+import socket
+import threading
+
+import pytest
+
+from telco_radar.report.html import render_site
+
+from test_geraete_zeitreihe_ansicht import HEUTE, _baue
+
+
+def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
+    root, state = _baue(tmp_path)
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / f"{HEUTE}.json").write_text(json.dumps({
+        "date": HEUTE, "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
+    site = root / "site"
+    render_site(site, reports)
+    return site
+
+
+def _chromium():
+    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+                   str(pathlib.Path.home() / ".cache/ms-playwright"
+                       / "chromium*/chrome-linux*/chrome"),
+                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+        treffer = sorted(glob.glob(muster))
+        if treffer:
+            return treffer[-1]
+    return None
+
+
+@contextlib.contextmanager
+def _server(site: pathlib.Path):
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
+                                directory=str(site))
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        yield f"http://127.0.0.1:{port}"
+    finally:
+        httpd.shutdown()
+
+
+@pytest.fixture(scope="module")
+def _browser_seite(tmp_path_factory):
+    sync_playwright = pytest.importorskip(
+        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+    site = _baue_site(tmp_path_factory.mktemp("zrbrowser"))
+    exe = _chromium()
+    with _server(site) as basis, sync_playwright() as p:
+        browser = (p.chromium.launch(executable_path=exe) if exe
+                   else p.chromium.launch())
+        yield browser, basis
+        browser.close()
+
+
+@contextlib.contextmanager
+def _ansicht(_browser_seite, breite=1440, hoehe=900):
+    browser, basis = _browser_seite
+    fehler = []
+    s = browser.new_page(viewport={"width": breite, "height": hoehe})
+    s.on("console", lambda m: fehler.append(m.text) if m.type == "error"
+         else None)
+    s.on("pageerror", lambda e: fehler.append(str(e)))
+    s.goto(f"{basis}/geraete.html", wait_until="load")
+    s.wait_for_timeout(250)
+    try:
+        yield s, fehler
+    finally:
+        s.close()
+
+
+@pytest.fixture
+def schreibtisch(_browser_seite):
+    with _ansicht(_browser_seite) as paar:
+        yield paar
+
+
+@pytest.fixture
+def telefon(_browser_seite):
+    with _ansicht(_browser_seite, 390, 844) as paar:
+        yield paar
+
+
+# --------------------------------------------------------------------------
+# Die Falz auf dem Telefon (Kriterium 11c, hier an der Fixture)
+# --------------------------------------------------------------------------
+
+def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
+    s, _ = telefon
+    box = s.evaluate("""() => {
+      const a = document.querySelector('#tafel-tco .gr-zr-antwort');
+      const m = document.querySelector('#tafel-tco .gr-zr-messtage');
+      return {antwort: a ? Math.round(a.getBoundingClientRect().bottom) : null,
+              kopf: m ? Math.round(m.getBoundingClientRect().bottom) : null,
+              quer: Math.max(document.documentElement.scrollWidth,
+                             document.body.scrollWidth)};
+    }""")
+    assert box["antwort"] is not None, "der Antwort-Satz fehlt"
+    assert box["antwort"] <= 844, f"Antwort-Satz endet bei {box['antwort']} px"
+    assert box["kopf"] is not None and box["kopf"] <= 844, \
+        f"der Graphkopf endet bei {box['kopf']} px"
+    assert box["quer"] <= 391, f"Seite {box['quer']} px breit"
+
+
+def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
+    """§3.2: 'mobil die Falz nachmessen - Kriterium 11c geht vor, notfalls
+    Kachelzeile knapper.' Die Messung steht hier, damit 'knapper' eine
+    Zahl ist."""
+    s, _ = telefon
+    hoehe = s.evaluate("""() => {
+      const k = document.querySelector('#tafel-tco .gr-zr-kacheln');
+      return k ? Math.round(k.getBoundingClientRect().height) : 0;
+    }""")
+    assert hoehe <= 96, f"Kachelzeile {hoehe} px hoch auf 390 px"
+
+
+# --------------------------------------------------------------------------
+# Konsole
+# --------------------------------------------------------------------------
+
+def test_keine_javascript_fehler_auf_der_startansicht(schreibtisch):
+    s, fehler = schreibtisch
+    assert fehler == [], f"Konsolenfehler: {fehler[:3]}"
+
+
+# --------------------------------------------------------------------------
+# Das Suchfeld - Antonios Beispiel
+# --------------------------------------------------------------------------
+
+def test_die_vorschau_kommt_ab_zwei_zeichen_und_bleibt_klein(schreibtisch):
+    s, _ = schreibtisch
+    feld = s.query_selector("#gr-zr-suche")
+    feld.fill("i")
+    s.wait_for_timeout(120)
+    assert s.query_selector_all("#gr-zr-vorschau button") == []
+    feld.fill("iphone 17")
+    s.wait_for_timeout(200)
+    treffer = s.query_selector_all("#gr-zr-vorschau button")
+    assert 1 <= len(treffer) <= 8
+    text = treffer[0].inner_text()
+    assert "iPhone 17 Pro" in text and "GB" in text
+
+
+def test_der_vorschau_treffer_ist_vor_vollstaendiger_eingabe_klickbar(
+        schreibtisch):
+    s, _ = schreibtisch
+    vorher = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                "e => e.textContent")
+    s.fill("#gr-zr-suche", "iph")
+    s.wait_for_timeout(150)
+    s.click("#gr-zr-vorschau button")
+    s.wait_for_timeout(400)
+    nachher = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                 "e => e.textContent")
+    assert vorher != nachher or "iPhone 17 Pro" in nachher
+    assert "iPhone 17 Pro" in nachher
+
+
+def test_die_kachel_waehlt_das_geraet(schreibtisch):
+    s, _ = schreibtisch
+    s.click("#gr-zr-kacheln button")
+    s.wait_for_timeout(400)
+    assert "iPhone 17 Pro" in s.eval_on_selector(
+        "#tafel-tco .gr-zr-antwort", "e => e.textContent")
+
+
+# --------------------------------------------------------------------------
+# Band-Wahl und Deep-Link
+# --------------------------------------------------------------------------
+
+def test_der_bandwechsel_liefert_den_graphen_des_bandes(schreibtisch):
+    s, _ = schreibtisch
+    vor = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
+                                 "es => es.map(e => e.getAttribute('cx'))")
+    s.click("#gr-zr-baender button[data-band='mittel']")
+    s.wait_for_timeout(400)
+    nach = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
+                                  "es => es.map(e => e.getAttribute('cx'))")
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                 "e => e.textContent")
+    assert "Mittel" in antwort
+    assert len(nach) < len(vor) or vor != nach
+
+
+def test_der_deep_link_setzt_modell_und_band(_browser_seite):
+    browser, basis = _browser_seite
+    s = browser.new_page(viewport={"width": 1440, "height": 900})
+    try:
+        s.goto(f"{basis}/geraete.html?modell=samsung-galaxy-s26-256"
+               f"&band=klein", wait_until="load")
+        s.wait_for_timeout(450)
+        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                     "e => e.textContent")
+        assert "Galaxy S26" in antwort and "Klein" in antwort
+        url = s.url
+        assert "modell=samsung-galaxy-s26-256" in url
+    finally:
+        s.close()
+
+
+def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
+    """Alle NICHT-Startzustaende kommen aus dem lazy Fragment - der
+    Server-Block bleibt auf das Startpaar beschränkt (O1-Größenregel)."""
+    s, _ = schreibtisch
+    s.fill("#gr-zr-suche", "galaxy")
+    s.wait_for_timeout(200)
+    s.click("#gr-zr-vorschau button")
+    s.wait_for_timeout(450)
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                 "e => e.textContent")
+    assert "Galaxy S26" in antwort
+    assert s.query_selector("#tafel-tco svg.gr-zr circle.gr-zr-punkt")
+
+
+# --------------------------------------------------------------------------
+# Die Schrift im Graphen
+# --------------------------------------------------------------------------
+
+def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(
+        schreibtisch):
+    """Die 12-px-Regel der Seite gilt den LESSENDEN Labels (Werte, Namen,
+    Achsen, Ticks). Die Meta-Etiketten des genehmigten Prototyps (kleiner
+    Erst-Wert, "unser Angebot"-Chip, Abrufdatum am Linienende) stehen
+    bewusst bei 10-11 px - sie wiederholen bzw. stützen, sie tragen keine
+    einzige Information allein."""
+    s, _ = schreibtisch
+    befund = s.evaluate("""() => {
+      const svg = [...document.querySelectorAll('#tafel-tco svg.gr-zr')]
+        .find(e => e.getBoundingClientRect().width > 0);
+      if (!svg) return null;
+      const pflicht = '.gr-zr-wert:not(.gr-zr-wert--erst), .gr-zr-name, ' +
+                      '.gr-zr-achse, .gr-zr-xtick';
+      const neben = '.gr-zr-wert--erst, .gr-zr-chip, .gr-zr-datum';
+      const px = (sel) => [...svg.querySelectorAll(sel)].map(t => ({
+        text: t.textContent.trim().slice(0, 16),
+        px: parseFloat(window.getComputedStyle(t).fontSize)})
+      ).filter(t => t.text);
+      return {pflicht: px(pflicht).filter(t => t.px < 12),
+              neben: px(neben).filter(t => t.px < 10)};
+    }""")
+    assert befund is not None, "kein sichtbares SVG"
+    assert befund["pflicht"] == [], f"Lesende Schrift unter 12 px: {befund['pflicht'][:4]}"
+    assert befund["neben"] == [], f"Meta-Etikett unter 10 px: {befund['neben'][:4]}"
+
+
+# --------------------------------------------------------------------------
+# Wahl-Helfer fuer die uebrigen Geraete-Browsertests (E2): der alte
+# Modell-<select> ist weg - Modellwahl ueber das Suchfeld (Enter waehlt den
+# ersten Treffer; Titel sind eindeutig), Bandwahl ueber die Knoepfe. Beide
+# Wege sind die echten Bedienelemente der Seite, keine Testklopfer.
+# --------------------------------------------------------------------------
+
+def waehle_modell(s, mid: str) -> None:
+    titel = s.eval_on_selector(
+        "#gr-zeitreihe-daten",
+        "k => JSON.parse(k.textContent).titel[" + json.dumps(mid) + "]")
+    assert titel, f"Modell {mid} kennt der Knoten nicht"
+    s.fill("#gr-zr-suche", "")
+    s.type("#gr-zr-suche", titel)
+    s.press("#gr-zr-suche", "Enter")
+    s.wait_for_timeout(500)
+
+
+def waehle_band(s, band: str) -> None:
+    s.click(f"#gr-zr-baender button[data-band='{band}']")
+    s.wait_for_timeout(500)

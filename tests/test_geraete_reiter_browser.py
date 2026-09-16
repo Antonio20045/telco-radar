@@ -36,6 +36,8 @@ import threading
 from pathlib import Path
 
 import pytest
+
+from test_geraete_zeitreihe_browser import waehle_modell
 import yaml
 
 from telco_radar.report.html import render_site
@@ -379,6 +381,18 @@ def _seite(tmp_path_factory):
     (state / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8")
     (state / "geraete_tco.json").write_text(json.dumps(_TCO), encoding="utf-8")
+    # E2: die TCO-HISTORIE - ohne sie haette die Hauptansicht dieser
+    # Fixture keine Zeitreihe (nur den Leer-Satz), und der Pflichtgrafik-
+    # Test pruefte einen Leerzustand. Drei Messtage fuer die ersten zwei
+    # Bündel des Bestands.
+    _tco_historie = []
+    for b in _TCO["buendel"][:2]:
+        for tag, gesamt in (("2026-09-02", 1000.0), ("2026-09-03", 990.0),
+                            ("2026-09-04", 980.0)):
+            _tco_historie.append({**b, "datum": tag, "gesamt": gesamt})
+    (state / "geraete_tco_historie.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in _tco_historie) + "\n",
+        encoding="utf-8")
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in _TARIFE) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -447,13 +461,22 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     geloeschte Positionskarte: kein Bild mit allen Geraeten in einer
     Flaeche, keine gedrehten Etiketten.
     """
+    # E2 dreht auch diese Zeile: die Zeitreihe IST ein SVG (Antonios
+    # Graph-Entscheidung). Verboten bleibt jedes ANDERE SVG der Tafel -
+    # G0 gehoert in den Verlaufs-Reiter, G1 ist ersatzlos gefallen.
+    fremde = _seite.eval_on_selector_all(
+        "#tafel-tco svg:not(.gr-zr)", "e => e.length")
+    assert fremde == 0, f"{fremde} SVGs ausser der Zeitreihe in der Tafel"
     assert _seite.eval_on_selector_all(
-        "#tafel-tco svg", "e => e.length") == 0, \
-        "in der Vergleichsansicht steht noch ein SVG (G0 gehoert nach O4 " \
-        "in den Verlaufs-Reiter, der Balken ist HTML/CSS)"
-    assert _seite.eval_on_selector_all(
-        "#tafel-tco .gr-hgraph", "e => e.length") == 1, \
-        "genau ein Graph-Modul - der Balken des gewaehlten Modells"
+        "#tafel-tco svg.gr-zr", "e => e.length") >= 1, \
+        "die Zeitreihe des gewaehlten Modells steht nicht da"
+    # Genau EIN sichtbares Bild: die breite und die schmale Variante
+    # stehen im DOM, das Mediaquery zeigt eine (Spezifitaets-Falle, siehe
+    # style.css) - ein zweites SICHTBARES waere der alte Panel-Stapel.
+    sichtbar = _seite.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr", "e => e.filter(s => "
+        "s.getBoundingClientRect().width > 0).length")
+    assert sichtbar == 1, f"{sichtbar} sichtbare Graph-Bilder statt einem"
     # Kein Rest der geloeschten Preisgrafik.
     assert _seite.eval_on_selector_all(
         "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
@@ -494,10 +517,16 @@ def test_keine_beschriftung_unter_zwoelf_pixeln(_seite, tid):
     """
     _seite.click(f".gr-reiter button[data-tafel='{tid}']")
     _seite.wait_for_timeout(60)
+    # E2: die Meta-Etiketten des GENEHMIGTEN Zeitreihen-Prototyps (kleiner
+    # Erst-Wert, "unser Angebot"-Chip, Abrufdatum am Linienende) stehen
+    # bewusst bei 10-11 px - sie stuetzen, sie tragen keine Information
+    # allein (Antonios Graph-Entscheidung schlaegt hier die alte Regel).
     zu_klein = _seite.evaluate(f"""() => Array.from(
         document.querySelectorAll('#{tid} *')).filter(el =>
           el.textContent.trim()
           && el.children.length === 0
+          && !['gr-zr-chip', 'gr-zr-datum', 'gr-zr-wert--erst']
+              .some(c => el.classList.contains(c))
           && parseFloat(getComputedStyle(el).fontSize) < {MIN_SCHRIFT}
         ).map(el => el.className + ': ' + el.textContent.trim().slice(0, 30))""")
     assert zu_klein == []
@@ -2130,31 +2159,33 @@ def test_die_zeilen_stehen_nach_tco24_sortiert(_seite):
 
 
 def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
-    """O1: statt 88 Bloecke umzublenden baut app.js Titel, Antwortzeile und
-    Balkenzeilen aus dem JSON-Knoten neu - ohne Neuladen, mit denselben
-    Zeichenketten wie der Server-Render."""
-    _frisch(_seite)
-    auswahl = _seite.eval_on_selector_all(
-        "#gr-modell option", "e => e.map(o => o.value)")
+    """E2: statt 88 Bloecke umzublenden setzt app.js den fertigen
+    Graph-Zustand (Antwort-Satz, Messtag-Zeile, SVG) aus dem Fragment ein
+    und die Bündel-Zeilen desselben Modells - ohne Neuladen, mit demselben
+    Markup wie der Server-Render (kein Client-Renderer, keine Zahl im
+    Client)."""
+    auswahl = _seite.eval_on_selector(
+        "#gr-zeitreihe-daten",
+        "k => Object.keys(JSON.parse(k.textContent).erlaubt)")
     assert len(auswahl) >= 2, "die Fixture kennt nur ein Modell"
-    _seite.select_option("#gr-modell", auswahl[1])
-    _seite.wait_for_timeout(250)
-    titel = _seite.eval_on_selector("#gr-tco-titel", "e => e.textContent")
-    assert titel.strip(), "der Titel des gewaehlten Modells fehlt"
-    zeilen = _seite.eval_on_selector_all(
-        "#tafel-tco .gr-bz",
-        "e => e.map(x => x.getAttribute('data-anbieter'))")
-    assert zeilen, "der Graph des gewaehlten Modells hat keine Zeilen"
+    vorgabe = _seite.eval_on_selector(
+        "#gr-zeitreihe-daten",
+        "k => JSON.parse(k.textContent).vorgabe")
+    fremd = next(m for m in auswahl if m != vorgabe)
+    waehle_modell(_seite, fremd)
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                      "e => e.textContent")
+    assert antwort.strip(), "der Antwort-Satz des gewaehlten Modells fehlt"
     erwartete = _seite.evaluate(
-        """(id) => JSON.parse(
-             document.getElementById('gr-graph-daten').textContent)
-           .modelle.find(m => m.id === id)
-           .baender[Object.keys(JSON.parse(
-             document.getElementById('gr-graph-daten').textContent)
-             .modelle.find(m => m.id === id).baender)[0]]
-           .zeilen.map(z => z.anbieter)""", auswahl[1])
-    assert sorted(zeilen) == sorted(erwartete), \
-        f"Graph zeigt {zeilen}, der Datenknoten sagt {erwartete}"
+        """(id) => Object.keys(JSON.parse(
+             document.getElementById('gr-zeitreihe-daten').textContent)
+           .bnd_titel[id])""",
+        fremd)
+    assert erwartete, "keine Bänder im Knoten"
+    zeilen = _seite.eval_on_selector_all(
+        "#gr-buendel .gr-bnd:not([hidden])",
+        "e => e.map(x => x.getAttribute('data-anbieter'))")
+    assert zeilen, "keine sichtbaren Bündel-Zeilen des gewaehlten Modells"
 
 
 def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):

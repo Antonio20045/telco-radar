@@ -23,6 +23,7 @@ import pytest
 import yaml
 
 from telco_radar.report.html import render_site
+from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-08"
@@ -168,44 +169,50 @@ def _seite(tmp_path_factory):
 
 
 def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):
-    modellwahl = _seite.query_selector("#gr-modell")
-    bandwahl = _seite.query_selector("#gr-band")
-    assert modellwahl is not None, "Geräteauswahl fehlt"
-    assert bandwahl is not None, "Tarifband-Auswahl fehlt"
+    """E2: die Wahl-Leiste traegt Suchfeld und Band-Knoepfe nebeneinander -
+    dieselbe Invariante (beide Bedienelemente sichtbar, kein Umschalten
+    noetig), die neuen Orte."""
+    modellwahl = _seite.query_selector("#gr-zr-suche")
+    bandwahl = _seite.query_selector("#gr-zr-baender")
+    assert modellwahl is not None, "Gerätesuche fehlt"
+    assert bandwahl is not None, "Tarifband-Knöpfe fehlen"
     assert modellwahl.is_visible()
     assert bandwahl.is_visible()
 
-    optionen = _seite.eval_on_selector_all(
-        "#gr-band option", "(es) => es.map(e => e.value)")
-    assert set(optionen) == {"klein", "mittel", "gross"}
+    knoepfe = _seite.eval_on_selector_all(
+        "#gr-zr-baender button", "(es) => es.map(e => e.dataset.band)")
+    assert set(knoepfe) == {"klein", "mittel", "gross"}
     # "Groß" hat fuer dieses Modell kein Buendel und ist deshalb DEAKTIVIERT
-    # (Aufgabe 1: "nur Bänder anbieten, für die Bündel existieren"), aber
-    # weiterhin als Option vorhanden.
+    # (Angebot, nicht Existenz der Option) - dieselbe Regel wie am alten
+    # <select>, jetzt an den Knoepfen.
     disabled = _seite.eval_on_selector_all(
-        "#gr-band option", "(es) => es.filter(e => e.disabled).map(e => e.value)")
-    assert disabled == ["gross"]
+        "#gr-zr-baender button",
+        "(es) => es.filter(e => e.disabled).map(e => e.dataset.band)")
+    assert disabled == ["gross"], disabled
 
 
 def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
-    """O1: statt Band-Panels umzublenden baut app.js die Balkenzeilen aus
-    dem JSON-Knoten neu - derselbe Nutzereffekt, eine Datenquelle."""
-    # Ausgangslage: das erste verfuegbare Band (Klein, o2) ist gerendert.
-    chip = _seite.eval_on_selector("#gr-bandchip", "(e) => e.textContent")
-    assert "Klein" in chip, chip
-    text_klein = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
-                                         "(e) => e.textContent")
-    assert "o2" in text_klein
+    """E2: statt Band-Panels umzublenden oder Balkenzeilen im Browser zu
+    bauen, setzt app.js den fertigen Graph-Zustand des gewählten Bands
+    (Antwort-Satz, Messtag-Zeile, SVG) aus dem Fragment ein - derselbe
+    Nutzereffekt, eine Quelle, keine Zahl im Client."""
+    # Ausgangslage: das erste verfuegbare Band (Klein) ist gerendert.
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                      "(e) => e.textContent")
+    assert "Klein" in antwort, antwort
 
-    # Umschalten auf Mittel (Vodafone).
-    _seite.select_option("#gr-band", "mittel")
-    _seite.wait_for_timeout(250)
-    chip = _seite.eval_on_selector("#gr-bandchip", "(e) => e.textContent")
-    assert "Mittel" in chip, chip
-    text_mittel = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
-                                          "(e) => e.textContent")
-    assert "Vodafone" in text_mittel
-    # Die Panels des alten Bands existieren nicht mehr im Dokument - der
-    # Graph ist EIN Modul, kein Stapel verdeckter Panels (A2).
+    # Umschalten auf Mittel.
+    waehle_band(_seite, "mittel")
+    _seite.wait_for_timeout(400)
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                      "(e) => e.textContent")
+    assert "Mittel" in antwort, antwort
+    knopf = _seite.eval_on_selector(
+        "#gr-zr-baender button[data-band='mittel']",
+        "e => e.getAttribute('aria-pressed')")
+    assert knopf == "true", "der Mittel-Knopf ist nicht gedrückt"
+    # Die Panels des alten Bands existieren nicht mehr - der Graph ist
+    # EIN Zustand, kein Stapel verdeckter Panels (A2 weiter).
     assert _seite.eval_on_selector_all(
         "#tafel-tco .gr-tband", "e => e.length") == 0, \
         "die alten Band-Panels stehen noch im Dokument"
