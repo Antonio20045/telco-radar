@@ -230,11 +230,45 @@ Baubericht begründen — kein erneuter Abnahme-Entwurf):**
 
 ## 7. Der Prozess der nächsten Session (Workflows, autonom bis live)
 
-**Grundprinzip (Antonio, 16.09.):** Pro Phase EIN Workflow, der komplette
-Pipeline läuft — Bau → Prüfung → Fix → Abnahme — und die nächste Session arbeitet
-die Phasen autonom durch, bis die Seite live ist. Antonio will Ergebnisse sehen,
-nicht gefragt werden (Ausnahme: §3-Entscheidungen sind getroffen; nur bei
-SINN-Entscheidungen der Reiter gilt: begründen und bauen).
+### 7.0 Die ROLLE der nächsten Session: LEAN LEAD (Antonios Vorgabe, 16.09.)
+
+**Die Session ist eine Orchestrierungs-Instanz — kein Bauer.** Ihre Aufgabe:
+dynamische Workflows erstellen und laufen lassen. Sie verändert selbst NICHTS.
+
+| Die Session (Lean Lead) tut das | Sie tut NICHT das |
+|---|---|
+| Workflows entwerfen, starten, überwachen (Workflow-Tool; Agenten mit frischem Kontext je Aufgabe) | Selbst Code schreiben, Templates/Config editieren, Dateien umbauen |
+| Aufgaben-Prompts präzise formulieren (mit §1/§3/§4/§9 als Quelle) | Ganze Dateien/Module in den eigenen Kontext lesen — Subagenten lesen und melden Resümee + Messwerte |
+| Agenten-Berichte bewerten, S1/S2-Befunde an Fix-Agenten zurückweisen | Selbst reparieren, „nur schnell die eine Zeile" — diese eine Zeile gehört dem Bau-Agenten |
+| Abnahme: KURZE eigene DOM-Stichproben (ein Playwright-15-Zeiler gegen die gerenderte Seite), Testsuite starten, Commit-Hygiene prüfen | Sich durch Codecdurchgänge/Reviews arbeiten — dafür gibt es die Prüf-Agenten |
+| Phasen nacheinander autonom durchziehen bis live; Commits/Merges abnehmen; am Ende Antonio berichten | Rückfragen an Antonio, außer die Seite ist kaputt/unklar auf eine Weise, die bauen verhindert |
+
+**Warum diese Rolle (Antonios Worte):** „Du sollst als Lean Lead arbeiten, damit
+dein Kontext klein bleibt — an Subagenten delegieren und Workflows laufen lassen."
+Und: „Zur Kontrolle sollte das immer ein anderer Agent machen, nicht du — ein
+Agent, der nichts gebaut hat." Die Session, die alles selbst liest und baut,
+verliert den Überblick (der 16.09. ist das Beweisstück: drei Fehlinterpretationen
+in einem Tag); die Session, die nur orchestriert, behält Urteilsfähigkeit für die
+Abnahmen — und die Übergabe an die übernächste Session bleibt klein.
+
+**Praktische Leitplanken für den Lead-Betrieb:**
+- Ein Workflow pro Phase (Muster unten). Agenten bekommen: präzisen Auftrag,
+  Datei-Pfade, Regeln aus §4, und die Anweisung, Berichte kurz und mit Messwerten
+  zu schreiben (Zahlen, px, Sekunden, Commit-Hashes — keine Romane).
+- Prüf-Agenten starten IMMER mit frischem Kontext und OHNE die Begründung des
+  Bauers; sie sehen Screenshots selbst an (neue Dateinamen, §6) und messen DOM.
+- Der Lead misst nur punktuell selbst nach (Stichprobe, nicht Fläche) — genug,
+  um Agenten-Meldungen zu verifizieren, wenig genug, um den Kontext klein zu
+  halten.
+- Phasenübergang erst, wenn Abnahme grün: Suite komplett, pruefe_portal,
+  DOM-Stichprobe, Do-Not-Liste geprüft.
+
+### Grundprinzip (Antonio, 16.09.): Pro Phase EIN Workflow
+
+Der komplette Pipeline läuft — Bau → Prüfung → Fix → Abnahme — und die nächste
+Session arbeitet die Phasen autonom durch, bis die Seite live ist. Antonio will
+Ergebnisse sehen, nicht gefragt werden (Ausnahme: §3-Entscheidungen sind
+getroffen; nur bei SINN-Entscheidungen der Reiter gilt: begründen und bauen).
 
 **Workflow-Muster je Phase (etabliert am 16.09., funktioniert):**
 1. **Bau-Agent:** eigener Branch `claude/<phase>` (Worktree), rot-vor-grün zuerst
