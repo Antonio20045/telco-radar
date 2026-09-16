@@ -1,0 +1,3197 @@
+/* =========================================================================
+   Telco Radar — Vodafone Product and Services Insights
+   ZEITUNGSAUSGABE (Etappe 4 des Redesigns, 06.08.2026).
+
+   Vorher: heller Cream-Canvas, roter Sticky-Topbar, grosse abgerundete
+   Karten mit Schatten, Rot als Flaechenfarbe ("Design-Modernisierung Juli
+   2026"). Das las sich wie ein Dashboard, nicht wie eine Zeitung.
+
+   Jetzt: Zeitungssatz im Sinn von WSJ/FT. Die Regeln, die das tragen:
+     1. SERIFE fuer alles, was gelesen wird (Schlagzeile, Fliesstext).
+        Grotesk (Franklin) nur fuer Etiketten: Rubriken, Datumszeilen,
+        Meta-Angaben, Navigation. Nie umgekehrt.
+     2. LINIEN statt Kaesten. Keine Schatten, kein Radius ueber 2px.
+        Hierarchie entsteht durch Linienstaerke (3px Rubrik, 1px Trenner,
+        Haarlinie in --rule) und durch Schriftgrad, nicht durch Farbe.
+     3. ROT ist Akzent, keine Flaeche. Vodafone-Rot markiert Rubriken,
+        Dringlichkeit und Links - es traegt keine Kopfzeile mehr.
+     4. NEWSPRINT statt Weiss: --paper ist leicht warm, Text ist nie
+        reines Schwarz. Das nimmt dem Bildschirm die Haerte.
+     5. DICHTE ist erwuenscht. Eine Zeitung zeigt viel auf wenig Raum;
+        Weissraum steht zwischen Rubriken, nicht zwischen Zeilen.
+
+   Die promo-* Regeln am Dateiende sind ein eigener Anwendungsfall und
+   bleiben unveraendert - sie erben nur die neue Typografie.
+   ========================================================================= */
+:root{
+  /* Newsprint */
+  --paper:#f6f4ee; --paper-2:#fffdf8; --paper-3:#efece3;
+  --ink:#14120f; --ink-2:#33302a; --ink-3:#5e594f; --ink-4:#8a8479;
+  --rule:#d6d1c4; --rule-2:#e6e2d8; --rule-ink:#14120f;
+  --red:#e60000; --red-deep:#a30000; --red-wash:#fdf0ee;
+  /* Dringlichkeit - gedeckt, damit fuenf Stufen nebeneinander nicht schreien */
+  --r5:#c8102e; --r4:#b06a00; --r3:#2f5c8f; --r2:#7d786e;
+  /* Die vier Alarmstufen des Geraeteradars. Sie sind eine Einteilung des
+     PREISABSTANDS, keine zweite Dringlichkeitsskala - deshalb eigene Namen.
+     Rot ist hier Vodafone-Rot, weil "kritisch" heisst: wir liegen zurueck. */
+  --al-kritisch:#e60000; --al-mittel:#c47f00;
+  --al-gering:#217a3c;   --al-bestpreis:#2b5bd7;
+  --al-mittel-hell:#fbf1de; --al-gering-hell:#e9f3ec;
+
+  --wrap:1240px; --wrap-text:700px;
+  --serif:'Source Serif 4','Source Serif Pro',Charter,'Bitstream Charter',
+          'Liberation Serif',Georgia,'Times New Roman',serif;
+  --sans:'Libre Franklin','Helvetica Neue','Liberation Sans',Helvetica,Arial,sans-serif;
+  /* F-4e (Optik-Schritt 5, 09.09.2026): die Sans-Schrift DES SYSTEMS - ohne
+     den Webfont. Graph-Beschriftungen sollen nicht davon abhaengen, ob
+     Google Fonts laedt; "Libre Franklin" wird ohnehin nur in 600/700/800
+     geliefert, die 12-px-Beschriftungen liefen also schon auf dem
+     Rueckfall. Angewandt auf die "Serie startet"-Annotationen, die
+     Spannen-Annotation der Y-Achse (F-4c) und die G2-Ereignispfeile (die
+     als einzige Graph-Klasse bisher gar keine Schriftregel trugen und
+     die Koerperserbe erbten). */
+  --sans-system:'Helvetica Neue','Liberation Sans',Helvetica,Arial,
+                system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--serif);font-size:17px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;font-kerning:normal;
+  font-variant-numeric:oldstyle-nums;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+.wrap-narrow{max-width:920px;margin:0 auto;padding:0 28px}
+main{padding-bottom:64px}
+b,strong{font-weight:700}
+
+/* Etikettenschrift: alles, was benennt statt erzaehlt. */
+.kicker,.page-kicker,.subnav a,.usecases .uc,.meta,.rubrik,
+.stat span,.tile span,.ex-op,.ex-reg,.comp-badge,.kbadge,.chip,
+.suche-filter,.promo-filter,.dsk-art,.dsk-meta,
+.rowtable-head,.step-name,.col-model,.card-sub,.foot-inner,
+.gr-knopf,.gr-filter label,.gr-unter,.gr-hersteller,.gr-legende{
+  font-family:var(--sans);
+}
+
+/* =======================================================  MASTHEAD  ===== */
+.topbar{background:var(--paper);border-bottom:1px solid var(--rule)}
+.topbar-inner{max-width:var(--wrap);margin:0 auto;padding:0 28px;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;
+  border-bottom:1px solid var(--rule-2);min-height:74px}
+/* Der Zeitungskopf steht MITTIG - das ist das eine Element, an dem man eine
+   Zeitung ohne Lesen erkennt. */
+.brand{grid-column:2;display:flex;align-items:center;gap:11px;justify-content:center}
+/* Das Vodafone-Logo ist die rote Sprechmarke und wird NICHT eingefaerbt und
+   NICHT in eine Flaeche gesetzt. Am 06.08.2026 stand hier ein roter Kasten
+   mit `filter:brightness(0) invert(1)` - uebrig blieb ein roter Klotz mit
+   weissem Fleck. Das Logo steht frei auf dem Papier, wie in jedem
+   Zeitungskopf. */
+.brand-logo-wrap{display:flex;align-items:center;justify-content:center;
+  flex-shrink:0}
+.brand-logo{display:block;width:30px;height:30px;object-fit:contain}
+.brand-name{font-family:var(--serif);font-size:29px;font-weight:700;
+  letter-spacing:-.4px;color:var(--ink);white-space:nowrap}
+.brand-name em{font-style:italic;font-weight:600}
+/* Der Mittelteil des Namens ("Product and Services") steht kleiner - eine
+   Zeile, dieselbe Serife, derselbe kursive Akzent am Ende. Der Grund ist
+   gemessen, nicht dekorativ: der volle Name in EINER Groesse ist 475 px
+   breit, und in einen Kopf, dessen rechte Spalte (Anwendungsfaelle plus
+   Suchzeile) 483 der 1184 px belegt, passt das nicht hinein - der Kopf sass
+   169 px links der Mitte (vorher 38) und lief auf dem Telefon 61 px aus dem
+   Bild. Mit .58em sind es 373 px, mobil 307 px: kein Ueberlauf mehr, und mit
+   der schmaleren Suchzeile (siehe unten) liegt der Versatz bei 67 px. Wer
+   die Groesse anhebt, misst beides nach - scripts/pruefe_portal.py,
+   Kriterium 12, und tests/test_marke.py. */
+.brand-name .brand-zusatz{font-size:.58em;letter-spacing:0}
+.topbar-right{grid-column:3;display:flex;align-items:center;gap:18px;
+  justify-content:flex-end}
+.usecases{display:flex;gap:16px;order:-1}
+.usecases .uc{font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-4);padding-bottom:2px;white-space:nowrap;
+  border-bottom:2px solid transparent}
+.usecases .uc:hover{color:var(--ink)}
+.usecases .uc.active{color:var(--ink);border-bottom-color:var(--red)}
+
+/* Rubrikleiste: die schwere Linie oben ist der Bund der Ausgabe. */
+.subbar{max-width:var(--wrap);margin:0 auto;padding:0 28px;
+  display:flex;gap:0;overflow-x:auto;border-top:3px solid var(--rule-ink)}
+.subnav a{padding:11px 20px;font-size:11.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--ink-2);
+  white-space:nowrap;border-right:1px solid var(--rule-2)}
+.subnav a:first-child{padding-left:0}
+.subnav a:hover{color:var(--red)}
+.subnav a.on{color:var(--red)}
+.subbar::-webkit-scrollbar{display:none}
+/* Bei 390 px endet die Navigation mitten im Wort ("DIFFERENZIER…"), ohne
+   dass irgendetwas verraet, dass sie seitlich weitergeht - gemessen am
+   08.08.2026 im Mobilaufmass. Ein weicher Rand rechts sagt es, ohne einen
+   Satz dafuer zu brauchen: er ist genau dann da, wenn noch etwas kommt.
+   `background-attachment:local` macht das - die zweite Flaeche haengt am
+   Inhalt, die aeussere am Rahmen, und beide loeschen sich am Ende der
+   Scrollstrecke gegenseitig aus.
+
+   Der Umbruch in zwei Zeilen waere die Alternative gewesen; er kostet aber
+   auf jedem Geraet eine Zeile Hoehe, damit auf einem die Andeutung stimmt. */
+@media (max-width:760px){
+  .subbar{
+    background-image:
+      linear-gradient(to right, var(--paper), var(--paper)),
+      linear-gradient(to left, var(--paper), var(--paper)),
+      linear-gradient(to right, rgba(20,18,15,.16), rgba(20,18,15,0)),
+      linear-gradient(to left, rgba(20,18,15,.16), rgba(20,18,15,0));
+    background-position:left center,right center,left center,right center;
+    background-repeat:no-repeat;
+    background-size:22px 100%,22px 100%,14px 100%,14px 100%;
+    background-attachment:local,local,scroll,scroll;
+  }
+  .subnav a{padding:11px 14px}
+}
+
+
+/* Suche: eine Linie, kein Feld. */
+.gsearch{position:relative;width:210px;max-width:100%}
+.gsearch-input{width:100%;border:none;border-bottom:1px solid var(--ink-4);
+  background:none;padding:5px 26px 5px 0;font-family:var(--sans);font-size:12px;
+  color:var(--ink)}
+.gsearch-input::placeholder{color:var(--ink-4)}
+.gsearch-input:focus{outline:none;border-bottom-color:var(--red)}
+.gsearch-btn{position:absolute;top:0;right:0;bottom:0;width:22px;border:none;
+  background:none;padding:0;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--ink-3)}
+.gsearch-btn:hover{color:var(--red)}
+/* In der einzeiligen Kopfleiste teilt sich die Suchzeile den Platz mit dem
+   Zeitungskopf, und der ist seit dem laengeren Namen 373 statt 214 px breit.
+   Die rechte Spalte bestimmt ueber ihre Mindestbreite, wie weit der Kopf aus
+   der Mitte rutscht: mit 210 px sind es 117, mit 160 px noch 67 px. Der
+   Platzhalter "Im Archiv suchen ..." misst 108 px und braucht mit dem Knopf
+   134 - 160 px lassen ihm 26 px Luft. Unter 900 px steht die Suchzeile auf
+   einer eigenen Reihe und konkurriert mit nichts; dort bleiben es 210. */
+@media (min-width:901px){
+  .gsearch{width:160px}
+}
+
+@media (max-width:900px){
+  .topbar-inner{grid-template-columns:1fr;justify-items:center;gap:10px;padding:14px 20px}
+  .brand,.topbar-right{grid-column:1}
+  .topbar-right{flex-wrap:wrap;justify-content:center}
+  /* Der Name DARF hier umbrechen - und das ist der eigentliche Fix, nicht die
+     Schriftgroesse.
+
+     Bis zum 12.08.2026 stand hier nur `font-size:24px`, und `white-space:
+     nowrap` aus der Grundregel blieb stehen. Die Breite war damit gegen eine
+     GEMESSENE Zahl kalibriert (307 px) - gemessen allerdings in einer
+     Sandbox, in der Google Fonts nicht laden. In GitHub Actions laedt die
+     echte Source Serif 4, sie ist breiter als die Rueckfallschrift, und die
+     Seite lief waagerecht aus dem Bild: CI-Lauf #159 auf `main` fiel mit
+     genau diesen vier Schuldigen durch (.brand, .brand-name, em,
+     .topbar-right).
+
+     Eine Kalibrierung auf eine Schrift ist keine Loesung, sondern eine
+     Wette. Mit `white-space:normal` haengt die Mindestbreite des Kopfes nur
+     noch am LAENGSTEN WORT ("Insights", rund 100 px) statt am ganzen Namen -
+     und damit passt er auf jedes Telefon, egal welche Serife wirklich
+     ankommt. `min-width:0` nimmt Grid- und Flex-Kindern zusaetzlich das
+     voreingestellte `min-width:auto`, mit dem sie sich weigern, unter ihre
+     Inhaltsbreite zu schrumpfen. */
+  .brand-name{font-size:24px;white-space:normal;text-align:center;
+    text-wrap:balance}
+  .brand{flex-wrap:wrap;justify-content:center;max-width:100%;min-width:0}
+  .topbar-inner > *{min-width:0;max-width:100%}
+}
+
+
+/* =============================================  TITELSEITENRASTER  ===== */
+/* Vier Gewichtsstufen statt zwei. Die Struktur, nicht die Schriftart, macht
+   eine Zeitungsseite: eine Geschichte dominiert, zwei sind mittel, vier sind
+   klein, sieben sind Zeilen. Bis zum 06.08.2026 gab es hier einen Aufmacher,
+   drei gleich grosse Anreisser und dann Fliesstext - zwei Stufen, und
+   oberhalb der Falz standen vier Geschichten. Jetzt elf. */
+.front-oben{display:grid;grid-template-columns:minmax(0,1fr) 292px;
+  gap:0 34px;padding-top:14px}
+.front-haupt{min-width:0;padding-right:34px;border-right:1px solid var(--rule)}
+.front-wichtig{min-width:0}
+@media (max-width:1040px){
+  .front-oben{grid-template-columns:1fr;gap:0}
+  .front-haupt{padding-right:0;border-right:none}
+  .front-wichtig{margin-top:26px;padding-top:0}
+}
+
+/* Reihen: gleich breite Spalten mit Spaltenlinie, kein Abstand als Trenner. */
+.reihe{display:grid;gap:0 26px;padding:18px 0;
+  border-top:1px solid var(--rule)}
+.reihe-zwei{grid-template-columns:repeat(2,minmax(0,1fr))}
+.reihe-vier{grid-template-columns:repeat(4,minmax(0,1fr));gap:0 20px}
+.reihe .stueck{padding-right:26px;border-right:1px solid var(--rule-2);min-width:0}
+.reihe-vier .stueck{padding-right:20px}
+.reihe .stueck:last-child{border-right:none;padding-right:0}
+.stueck a{display:flex;flex-direction:column}
+.stueck-bild{display:block;margin-bottom:10px}
+.stueck-bild img{display:block;width:100%;height:auto;aspect-ratio:16/10;
+  object-fit:cover;background:var(--paper-3)}
+.reihe-vier .stueck-bild img{aspect-ratio:3/2}
+.stueck-kicker{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px}
+.stueck-titel{font-weight:600;color:var(--ink);letter-spacing:-.012em}
+.stueck-mittel .stueck-titel{font-size:22px;line-height:1.24}
+.stueck-klein .stueck-titel{font-size:15.5px;line-height:1.3}
+.stueck-anriss{margin-top:7px;font-size:15px;line-height:1.5;color:var(--ink-3)}
+.stueck a:hover .stueck-titel{color:var(--red)}
+@media (max-width:820px){
+  .reihe-zwei,.reihe-vier{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .reihe .stueck:nth-child(2n){border-right:none;padding-right:0}
+  .reihe .stueck{padding-bottom:16px}
+}
+@media (max-width:520px){
+  .reihe-zwei,.reihe-vier{grid-template-columns:1fr}
+  .reihe .stueck{border-right:none;padding-right:0}
+}
+
+/* "Was wichtig ist": die nummerierte Digest-Spalte. Bewusst ohne Bilder -
+   sie ist der Gegenpol zu den Bildpositionen, nicht deren Wiederholung. */
+.wichtig-liste{list-style:none;margin:0;padding:0;counter-reset:wz}
+.wichtig-zeile{counter-increment:wz;padding:11px 0;
+  border-bottom:1px solid var(--rule-2)}
+.wichtig-zeile:first-child{padding-top:2px}
+.wichtig-zeile a{display:grid;grid-template-columns:22px minmax(0,1fr);gap:0 10px}
+.wichtig-zeile a::before{content:counter(wz);font-family:var(--sans);font-size:11px;
+  font-weight:800;color:var(--red);line-height:1.5;
+  font-variant-numeric:lining-nums;grid-row:span 2}
+.wichtig-kicker{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4);
+  margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wichtig-titel{font-size:15.5px;line-height:1.32;font-weight:600;color:var(--ink)}
+.wichtig-zeile a:hover .wichtig-titel{color:var(--red)}
+
+
+/* ======================================================  AUFMACHER  ==== */
+/* Der eine Block, der gross sein darf. Bild, Schlagzeile, Vorspann - er
+   nimmt die obere Haelfte der Titelseite ein. Vorher standen hier sechs
+   gleich grosse Kaesten nebeneinander, und keiner davon war die Nachricht. */
+.aufmacher{padding:0 0 18px;
+  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  grid-template-areas:"kicker kicker" "titel bild" "text bild";
+  /* Die dritte Zeile schluckt die Resthoehe. Ohne das verteilt der Browser
+     die Hoehe des ueber zwei Zeilen gespannten Bildes auf beide Textzeilen,
+     und zwischen einer kurzen Schlagzeile und dem Vorspann klafft eine
+     Luecke - sichtbar, sobald der Analyst wirklich kurze Schlagzeilen
+     schreibt ("o2 senkt Unlimited-Preis dauerhaft"). */
+  grid-template-rows:auto auto 1fr;
+  gap:0 44px;align-items:start}
+.aufmacher > .page-kicker{grid-area:kicker;margin-bottom:14px}
+.aufmacher :is(h1,h2){grid-area:titel;margin:0 0 18px;font-family:var(--serif);
+  font-weight:700;line-height:1.06;letter-spacing:-.02em;color:var(--ink);
+  /* Der Grad haengt an der Laenge: eine vom Analysten geschriebene
+     Schlagzeile ist kurz und darf gross stehen; ein Zusammenfassungssatz
+     als Rueckfall ist lang und wuerde in 52px acht Zeilen hoch. */
+  font-size:clamp(25px,2.4vw,33px);max-width:26ch}
+.aufmacher.kurz :is(h1,h2){font-size:clamp(31px,3.5vw,44px);max-width:17ch;line-height:1.03}
+.aufmacher :is(h1,h2) a:hover{color:var(--red)}
+.aufmacher-bild{grid-area:bild;margin:0}
+.aufmacher-bild img{display:block;width:100%;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+.aufmacher-bild figcaption{margin-top:7px;font-family:var(--sans);font-size:9.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.aufmacher-text{grid-area:text;min-width:0}
+.aufmacher-vorspann{margin:0 0 14px;font-size:17.5px;line-height:1.48;
+  color:var(--ink-2)}
+.aufmacher-meta{margin:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-family:var(--sans);font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--ink-4)}
+.aufmacher-meta b{color:var(--ink);font-weight:800}
+.aufmacher-meta a{color:var(--red);border-bottom:1px solid var(--red);padding-bottom:1px}
+/* Ohne Bild wird der Aufmacher einspaltig - kein Platzhalter, kein Loch. */
+.aufmacher.ohne-bild{grid-template-columns:1fr;
+  grid-template-areas:"kicker" "titel" "text"}
+.aufmacher.ohne-bild :is(h1,h2){max-width:22ch;font-size:clamp(31px,3.8vw,46px)}
+.aufmacher.ohne-bild .aufmacher-vorspann{max-width:62ch}
+@media (max-width:900px){
+  .aufmacher{grid-template-columns:1fr;
+    grid-template-areas:"kicker" "titel" "bild" "text";gap:0}
+  .aufmacher-bild{margin:0 0 18px}
+  .aufmacher :is(h1,h2){margin-bottom:14px}
+}
+
+/* Zeile mit den Kennzahlen ueber dem Bericht - ersetzt eine eigene Rubrik. */
+.berichtszeile{margin:-6px 0 18px;font-family:var(--sans);font-size:10.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.berichtszeile b{color:var(--ink);font-weight:800}
+.archivhinweis{margin:22px 0 -6px;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.archivhinweis a{color:var(--red);border-bottom:1px solid var(--red)}
+
+/* E3B, 05.09.2026: Hinweis, dass eine leere Bewertungsrunde die letzte
+   gueltige Redaktion zeigt (analyze/redaktion_kontinuitaet.py) - dieselbe
+   Bauform wie .ueb-hinweis (eigener Untergrund, Linie links, vor dem
+   Inhalt), weil beide dasselbe tun: dem Leser VOR dem Text sagen, was er
+   liest. */
+.ausfall-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
+  padding:10px 14px;margin:0 0 16px;font-family:var(--sans);font-size:12px;
+  line-height:1.5;color:var(--ink-2)}
+
+
+/* ================================================  MELDUNGEN (Ressort) == */
+/* Alle Meldungen der Woche, nach Ressort gegliedert und innerhalb
+   gewichtet. Vorher: 193 identische Bloecke a ~150 px Hoehe untereinander -
+   eine Datenbankausgabe. Jetzt je Ressort ein Aufmacher, zwei mittlere und
+   der Rest als zweispaltige Zeilen mit Vorschaubild. Eine Zeile ist jetzt
+   ~72 px hoch statt ~150. */
+/* Der Seitenkopf ist einspaltig, seit der Filter daneben weg ist
+   (07.08.2026). Knapp gehalten: jedes Pixel hier schiebt die
+   Ressortuebersicht unter die Falz, und die soll ohne Scrollen vollstaendig
+   sichtbar sein. */
+.meldungen-kopf{padding:18px 0 0}
+.meldungen-kopf h1{margin:0;font-family:var(--serif);font-weight:700;
+  font-size:clamp(26px,3vw,34px);line-height:1.04;letter-spacing:-.022em}
+
+/* ---- Ressortuebersicht: sieben Kacheln, alle ueber der Falz.
+   Vier plus drei bei 1240 px Satzbreite. Die Hoehe der ersten Reihe ist die
+   Groesse, an der Abnahmekriterium 3 haengt (Oberkante der letzten Kachel
+   unter 900 px bei 1440x900) - wer hier Luft ergaenzt, misst nach. */
+.ressort-kacheln{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;margin:14px 0 0;border-top:3px solid var(--rule-ink)}
+.rkachel{display:flex;flex-direction:column;min-width:0;
+  padding:10px 18px 12px;border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+.rkachel:nth-child(4n){border-right:none;padding-right:0}
+.rkachel:nth-child(4n+1){padding-left:0}
+/* Sieben Kacheln in einem Viererraster lassen den achten Platz frei - die
+   letzte darf dort keine Linie ins Leere ziehen. */
+.rkachel:last-child{border-right:none}
+.rkachel .rubrik{margin-bottom:9px}
+.rk-stueck{padding:7px 0;border-top:1px solid var(--rule-2)}
+.rk-stueck:first-of-type{border-top:none;padding-top:0}
+.rk-stueck a{display:flex;gap:10px;align-items:flex-start}
+.rk-text{min-width:0;flex:1;display:flex;flex-direction:column}
+.rk-titel{font-size:14px;line-height:1.25;font-weight:600;color:var(--ink)}
+.rk-stueck a:hover .rk-titel{color:var(--red)}
+.rk-meta{margin-top:4px;font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-bild{flex:0 0 66px;order:2}
+.rk-bild img{display:block;width:100%;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+/* Der Ressortaufmacher der Kachel: Bild ueber der Zeile, nicht daneben. */
+.rk-lead a{flex-direction:column;gap:7px}
+.rk-lead .rk-bild{flex:none;order:0;width:100%}
+.rk-lead .rk-bild img{aspect-ratio:16/9}
+.rk-lead .rk-titel{font-size:17px;line-height:1.2;font-weight:700;
+  letter-spacing:-.012em}
+.rkachel-alle{margin-top:auto;padding-top:9px;font-family:var(--sans);
+  font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--red)}
+.rkachel-alle:hover{border-bottom:1px solid var(--red)}
+
+/* ---- Die Tiefe: je Ressort ein <details> mit ALLEN Meldungen. */
+.ressort-tiefe{margin-top:34px;border-top:3px solid var(--rule-ink)}
+.mressort{border-bottom:1px solid var(--rule)}
+.mressort>summary{display:flex;align-items:baseline;gap:12px;cursor:pointer;
+  padding:11px 0;list-style:none;margin:0}
+.mressort>summary::-webkit-details-marker{display:none}
+.mressort>summary::marker{content:""}
+.mressort>summary:hover h2{color:var(--red)}
+/* Bis zum 08.08.2026 standen hier zwei Angaben nebeneinander: "29 Meldungen"
+   und das Wort "oeffnen". Das Wort erklaerte die Bedienung eines Elements,
+   das sich selbst erklaert - geblieben ist die Zahl, das Dreieck traegt die
+   Aufforderung. */
+.mressort>summary::after{content:"▾";font-size:11px;color:var(--red);
+  flex:0 0 auto;line-height:1}
+.mressort[open]>summary::after{content:"▴";color:var(--ink-4)}
+.mressort[open]{padding-bottom:22px}
+.mressort .rubrik{margin-bottom:0;border-top:none;padding-top:0}
+
+/* Aufmacher des Ressorts + zwei mittlere daneben. */
+.mressort-oben{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+  gap:0 30px;margin-top:8px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.mlead a,.mzwei a{display:flex;flex-direction:column}
+.mlead-bild{display:block;margin-bottom:10px}
+/* 2:1 statt 16:9 - der Ressortaufmacher steht neben einer Spalte mit vier
+   kleineren Meldungen, und bei 16:9 endete die rechte Spalte 150 px vor der
+   linken. Ein flacherer Anschnitt ist ohnehin die Zeitungsform. */
+.mlead-bild img{display:block;width:100%;height:auto;aspect-ratio:2/1;
+  object-fit:cover;background:var(--paper-3)}
+.mlead-titel{font-size:24px;line-height:1.2;font-weight:700;
+  letter-spacing:-.016em;color:var(--ink)}
+.mlead-anriss{margin-top:8px;font-size:15.5px;line-height:1.5;color:var(--ink-2)}
+.mlead a:hover .mlead-titel{color:var(--red)}
+.mmittel{display:flex;flex-direction:column;min-width:0;
+  border-left:1px solid var(--rule);padding-left:30px}
+.mzwei{padding:0 0 14px;margin-bottom:14px;border-bottom:1px solid var(--rule-2)}
+.mzwei:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.mzwei a{flex-direction:row;gap:14px;align-items:flex-start}
+.mzwei-bild{flex:0 0 116px}
+.mzwei-bild img{display:block;width:100%;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+.mzwei-text{min-width:0;display:flex;flex-direction:column}
+.mzwei-titel{font-size:16.5px;line-height:1.28;font-weight:600;color:var(--ink)}
+.mzwei a:hover .mzwei-titel{color:var(--red)}
+
+/* Die Zeilen: zwei Spalten, kleines Bild, halbe Bauhoehe. */
+.mzeilen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 34px;margin-top:4px}
+.mz{border-bottom:1px solid var(--rule-2)}
+/* Das Vorschaubild steht RECHTS. Bei einer Liste, in der zwei Drittel der
+   Zeilen ein Bild haben und ein Drittel nicht, liefe die Schriftkante sonst
+   im Zickzack - mit dem Bild rechts beginnt jede Zeile an derselben Stelle,
+   und die fehlenden Bilder fallen auf der rechten Seite kaum auf. */
+.mz a{display:flex;gap:13px;align-items:flex-start;padding:11px 0}
+.mz-bild{flex:0 0 84px;order:2}
+.mz-bild img{display:block;width:100%;height:auto;aspect-ratio:4/3;
+  object-fit:cover;background:var(--paper-3)}
+.mz-text{min-width:0;flex:1;display:flex;flex-direction:column}
+.mz-titel{font-size:15px;line-height:1.3;font-weight:600;color:var(--ink)}
+.mz a:hover .mz-titel{color:var(--red)}
+.mz-meta,.mzwei .mz-meta{margin-top:5px;display:flex;align-items:center;gap:7px;
+  font-family:var(--sans);font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ink-4)}
+.mz-rel{display:inline-block;min-width:15px;text-align:center;padding:1px 4px;
+  color:#fff;background:var(--r2);font-weight:800;
+  font-variant-numeric:lining-nums;flex-shrink:0}
+.mz-rel.r5{background:var(--r5)}.mz-rel.r4{background:var(--r4)}
+.mz-rel.r3{background:var(--r3)}
+@media (max-width:1100px){
+  .ressort-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rkachel:nth-child(4n){border-right:1px solid var(--rule);padding-right:18px}
+  .rkachel:nth-child(4n+1){padding-left:18px}
+  .rkachel:nth-child(2n){border-right:none;padding-right:0}
+  .rkachel:nth-child(2n+1){padding-left:0}
+}
+@media (max-width:900px){
+  .mressort-oben{grid-template-columns:1fr;gap:20px 0}
+  .mmittel{border-left:none;padding-left:0;border-top:1px solid var(--rule);
+    padding-top:16px}
+  .mzeilen{grid-template-columns:1fr;gap:0}
+}
+@media (max-width:620px){
+  .ressort-kacheln{grid-template-columns:1fr}
+  .rkachel{border-right:none;padding-left:0;padding-right:0}
+  .rkachel:nth-child(4n),.rkachel:nth-child(4n+1),
+  .rkachel:nth-child(2n),.rkachel:nth-child(2n+1){
+    border-right:none;padding-left:0;padding-right:0}
+}
+
+/* ==================================================  RUBRIKEN & TITEL  === */
+/* Rubrikleiste ueber einem Block: Linie + Etikett, wie im Zeitungssatz. */
+.rubrik{display:flex;align-items:center;gap:12px;margin:0 0 18px;
+  border-top:2px solid var(--rule-ink);padding-top:8px}
+.rubrik h2,.card-head h2,.rubrik h3{font-family:var(--sans);font-size:11.5px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--ink);margin:0}
+.rubrik a,.card-head a{margin-left:auto;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--red)}
+.rubrik a:hover,.card-head a:hover{color:var(--red-deep)}
+
+.page-hero{padding:34px 0 20px}
+.page-hero.wide{max-width:none}
+.page-hero-row{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:24px;flex-wrap:wrap}
+.page-kicker{margin:0 0 10px;color:var(--red);font-size:10.5px;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase}
+/* Die Schlagzeile. Enge Durchschuss, negatives Sperren - so setzt eine
+   Zeitung, und nur so wirkt eine grosse Serife nicht wie ein Plakat. */
+.page-hero h1{margin:0;font-family:var(--serif);font-weight:700;
+  font-size:clamp(34px,5.2vw,58px);line-height:1.03;letter-spacing:-.022em;
+  color:var(--ink);max-width:16ch}
+.page-hero.wide h1{max-width:20ch}
+
+/* "Neu seit der letzten Ausgabe" - die Spalte neben der Ueberschrift der
+   Dauerseiten. Sie ersetzt eine einzelne Datumszeile in einem sonst leeren
+   Drittel (report/seit.py). Rechtsbuendig und schmal: sie soll die
+   Ueberschrift nicht bedraengen, sondern die Zeile darunter fuellen. */
+.seit{text-align:right;max-width:260px;font-family:var(--sans)}
+.seit-kopf{margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-4)}
+.seit-liste{list-style:none;margin:0;padding:0;
+  border-top:1px solid var(--rule-2)}
+.seit-liste li{border-bottom:1px solid var(--rule-2)}
+.seit-liste a{display:block;padding:5px 0;font-size:12.5px;color:var(--ink-2)}
+.seit-liste a:hover{color:var(--red)}
+.seit-liste b{font-family:var(--serif);font-size:16px;color:var(--ink)}
+.seit-stand{margin:7px 0 0;font-size:10.5px;color:var(--ink-4)}
+@media (max-width:760px){
+  .seit{text-align:left;max-width:none;margin-top:14px}
+}
+.page-date{font-family:var(--sans);font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  white-space:nowrap;padding-bottom:6px}
+/* Der Vorspann ("deck") steht kursiv - klassische Zeitungskonvention. */
+.page-lead{margin:16px 0 0;max-width:62ch;font-size:19px;line-height:1.5;
+  font-style:italic;color:var(--ink-2)}
+.page-lead b{font-style:normal;font-weight:700;color:var(--ink)}
+.page-lead a{color:var(--red);border-bottom:1px solid rgba(230,0,0,.3)}
+@media (max-width:640px){.page-hero{padding-top:22px}.page-lead{font-size:17px}}
+
+/* =============================================  SEITENRASTER (Front)  === */
+/* Hauptspalte + Rail mit Spaltenlinie dazwischen - das Zeitungsraster. */
+/* Der Wochenbericht steht seit dem 07.08.2026 ueber die volle Satzbreite -
+   die Beistellspalte "Zahlen der Woche" ist weg, und eine leere Rail neben
+   zweispaltigem Fliesstext liest sich als Fehler. */
+.frontpage{margin-top:38px}
+.frontpage-main{min-width:0}
+@media (max-width:1000px){
+}
+
+/* ======================================================  INFOKASTEN  ==== */
+/* "Zahlen der Woche": der klassische boxed sidebar einer Zeitung. */
+.tile-grid,.region-tiles{display:grid;gap:0;margin:0;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  border-top:1px solid var(--rule)}
+.tile,.region-tile{padding:14px 16px 15px;border-bottom:1px solid var(--rule);
+  border-right:1px solid var(--rule);background:var(--paper-2)}
+.tile:last-child,.region-tile:last-child{border-right:1px solid var(--rule)}
+.tile b,.region-tile b{display:block;font-family:var(--serif);font-size:29px;
+  font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--ink);
+  font-variant-numeric:lining-nums}
+.tile b.txt{font-size:19px;line-height:1.2}
+.tile span,.region-tile span{display:block;margin-top:5px;font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+.tile.accent b{color:var(--r5)}
+.tile.tint{background:var(--paper-3)}
+/* Im Rail stehen die Zahlen untereinander, nicht nebeneinander. */
+
+/* ==========================================================  FLIESSTEXT  = */
+.prose{font-size:17.5px;line-height:1.5;color:var(--ink-2);max-width:var(--wrap-text)}
+/* Der Wochenbericht laeuft zweispaltig - wie der Fliesstext jeder Zeitung.
+   `column-span:all` auf den Abschnittsleisten haelt die Gliederung ueber
+   beide Spalten sichtbar, statt sie mitten in einer Spalte zu vergraben. */
+@media (min-width:900px){
+  .prose-zwei{columns:2;column-gap:34px;column-rule:1px solid var(--rule);
+    max-width:none;font-size:17px}
+  .prose-zwei h2{column-span:all}
+  .prose-zwei p,.prose-zwei li{break-inside:avoid-column}
+}
+.prose h2{font-family:var(--sans);font-size:11.5px;font-weight:800;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink);
+  margin:38px 0 14px;padding-top:8px;border-top:2px solid var(--rule-ink)}
+.prose h2:first-child{margin-top:0}
+.prose h3{font-family:var(--serif);font-size:21px;font-weight:700;
+  margin:26px 0 8px;letter-spacing:-.012em;color:var(--ink)}
+.prose p{margin:0 0 15px}
+/* Initial - die Zeitungsgeste schlechthin, aber nur einmal und nur auf der
+   Titelseite. Der :not(:has(...))-Schutz ist nicht kosmetisch: der erste
+   Absatz der Differenzierungsseite beginnt fett mit "KI und digitale
+   Dienste", und daraus machte das Initial ein grosses K mit einem
+   verwaisten "I und digitale Dienste" daneben. */
+.frontpage-main .prose p:first-of-type:not(:has(> strong:first-child))::first-letter{
+  float:left;font-size:44px;line-height:.82;font-weight:700;
+  padding:4px 7px 0 0;color:var(--ink)}
+.prose strong{color:var(--ink);font-weight:700}
+.prose a{color:var(--ink);border-bottom:1px solid var(--red);
+  padding-bottom:.5px}
+.prose a:hover{color:var(--red)}
+.prose ul,.prose ol{margin:0 0 15px;padding-left:20px}
+.prose li{margin:0 0 8px}
+.prose li::marker{color:var(--red)}
+.prose blockquote{margin:20px 0;padding:4px 0 4px 18px;
+  border-left:3px solid var(--red);font-style:italic;color:var(--ink)}
+/* Die Aufzaehlung "Auf einen Blick" darf zweispaltig laufen - kurze Zeilen,
+   viel Inhalt, genau wofuer der Spaltensatz da ist. NICHT aber innerhalb
+   von `.prose-zwei`: geschachtelte Spalten ergaben am 06.08.2026 drei
+   Spalten zu je 24 Zeichen, in denen jedes zweite Wort umbrach. */
+@media (min-width:900px){
+  .prose:not(.prose-zwei) > h2:first-child + ul{columns:2;column-gap:34px;
+    column-rule:1px solid var(--rule)}
+  .prose:not(.prose-zwei) > h2:first-child + ul li{break-inside:avoid}
+}
+
+/* ================================================  INHALTSVERZEICHNIS  == */
+/* "In dieser Ausgabe" - Sprungnavigation ueber die Berichtsabschnitte.
+   Anker setzt html.py (_anchor_headings) nach der Sanitisierung. */
+.toc{margin:0 0 26px;padding:14px 0 0;border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;gap:0}
+.toc a{font-family:var(--sans);font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);
+  padding:3px 12px;border-right:1px solid var(--rule)}
+.toc a:first-child{padding-left:0}
+.toc a:hover{color:var(--red)}
+.prose h2[id]{scroll-margin-top:24px}
+
+/* ==========================================  THEMENRADAR (Balkenzeile) == */
+.bento-bar{margin:0 0 13px}
+.bento-bar-top{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;margin-bottom:5px}
+.bento-bar-top b{font-size:15px;font-weight:600}
+.bento-bar-top span{font-family:var(--sans);font-size:11px;font-weight:700;
+  color:var(--ink-4);font-variant-numeric:lining-nums}
+.bento-bar-track{height:5px;background:var(--rule-2)}
+.bento-bar-fill{display:block;height:100%;background:var(--ink)}
+
+/* ================================================  KARTEN / ABSCHNITTE == */
+/* "card" heisst hier nicht mehr Kasten, sondern Abschnitt mit Rubrikleiste. */
+.card{background:none;padding:0;margin:34px 0 0}
+.card + .card{margin-top:34px}
+.card-head{display:flex;align-items:center;gap:12px;margin:0 0 16px;
+  border-top:2px solid var(--rule-ink);padding-top:8px}
+/* Unterzeile einer Rubrik. BEWUSST keine Versalien: hier stehen ganze
+   Saetze, und vier Zeilen Grossbuchstaben liest niemand. */
+.card-sub{margin:-8px 0 16px;font-family:var(--serif);font-size:15px;
+  font-style:italic;font-weight:400;letter-spacing:0;text-transform:none;
+  color:var(--ink-3);max-width:72ch;line-height:1.5}
+.card-sub code{font-family:var(--mono);font-size:13px;font-style:normal}
+.card.tan{background:var(--paper-3);padding:22px 24px;margin-top:34px}
+.card.tan .card-head{border-top-color:var(--ink);margin-top:0}
+.empty-note{font-size:16px;color:var(--ink-3);background:var(--paper-3);
+  padding:16px 18px;border-left:3px solid var(--red)}
+.muted-note{font-size:14.5px;color:var(--ink-3);line-height:1.55}
+
+/* ========================================================  ABZEICHEN  === */
+.chip,.kbadge{display:inline-block;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);
+  border:1px solid var(--rule);padding:2px 7px;white-space:nowrap}
+.rel-badge{display:inline-block;font-family:var(--sans);font-size:10px;
+  font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;
+  color:#fff;background:var(--r2)}
+.rel-badge.r5{background:var(--r5)}.rel-badge.r4{background:var(--r4)}
+.rel-badge.r3{background:var(--r3)}.rel-badge.r2,.rel-badge.r0{background:var(--r2)}
+.sdot{width:8px;height:8px;display:inline-block;border-radius:50%}
+.sdot.ok{background:#1a7f4b}.sdot.empty{background:var(--r4)}
+.sdot.fail{background:var(--r5)}.sdot.quarantaene{background:var(--ink-4)}
+/* Die "neu"-Marke. Bis zum 08.08.2026 ein gefuellter Farbblock - Rot (und
+   erst recht zwoelf Hebelfarben) als Flaeche widerspricht der Designsprache
+   (CLAUDE.md §5). Jetzt eine Haarlinien-Kontur in Rot. */
+.dz-new{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--red);border:1px solid currentColor;
+  padding:1px 5px}
+/* Zaehlwert bzw. Zusatz am Ende einer Rubrikleiste - EINE Form fuer die
+   ganze Website. Bis zum 08.08.2026 gab es dafuer drei Klassen in drei
+   Groessen (count-badge 10px, rubrik-zusatz 10px in Versalien, dazu
+   Inline-Styles auf der Quellenseite); nebeneinander gelesen wirkte jede
+   Zahl wie eine eigene Auszeichnung. Zwei Namen, eine Form: `rubrik-zahl`
+   traegt eine Zahl, `rubrik-zusatz` eine Einordnung ohne Zahl. */
+.rubrik-zahl,.rubrik-zusatz{margin-left:auto;font-family:var(--sans);
+  font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink-4)}
+/* In einer laufenden Metazeile steht der Wert MITTEN im Satz, nicht am
+   rechten Rand - `margin-left:auto` schoebe dort alles Folgende weg. */
+.aufmacher-meta .rubrik-zahl{margin-left:0}
+
+/* ============================================  WER WAS HAT (Luecken) ==== */
+/* Die Gegenfrage der Differenzierungs-Seite. Eine Tabelle, kein Kartenraster:
+   hier geht es um Vollstaendigkeit ueber zwoelf Zeilen, nicht um Gewichtung -
+   und eine Zeile, die "noch nicht erfasst" sagt, darf genauso viel Platz
+   bekommen wie eine mit Inhalt. */
+.dz-luecken{margin:44px 0}
+.dz-luecken-lead{margin:10px 0 14px;max-width:70ch;font-size:16px;
+  color:var(--ink-2)}
+.dz-fleck-liste{list-style:none;margin:0 0 22px;padding:0;
+  border-top:1px solid var(--rule-2)}
+.dz-fleck-liste li{border-bottom:1px solid var(--rule-2)}
+.dz-fleck-liste a{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;
+  padding:9px 0}
+.dz-fleck-label{font-family:var(--serif);font-size:18px;font-weight:700;
+  color:var(--ink)}
+.dz-fleck-n{font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.05em;color:var(--red)}
+.dz-fleck-wer{font-family:var(--sans);font-size:11.5px;color:var(--ink-4);
+  margin-left:auto}
+.dz-vergleich .col-kept i{font-style:normal;color:var(--ink-4);font-size:11px}
+@media (max-width:640px){.dz-fleck-wer{margin-left:0;flex-basis:100%}}
+
+/* ================================================  IN ZWEI MINUTEN ====== */
+/* Der kurze Weg durch die Ausgabe - in der rechten Spalte ueber "Was
+   wichtig ist", seit dem 09.08.2026. Bewusst KEIN Kasten mit Hintergrund:
+   die Designsprache dieser Seite kennt keine Flaechen, die Hierarchie kommt
+   aus der Linienstaerke. Eine 3px-Rubrikleiste oben und eine Haarlinie je
+   Zeile - dieselbe Bauform wie die Ressorts.
+
+   Die Masse sind die der Spalte, nicht die der Seite: 18px Serife ueber die
+   volle Satzbreite waren an dieser Stelle der Grund, warum der Kasten die
+   Titelseite verdraengt hat. */
+.kurzpfad{margin:0 0 22px;border-top:3px solid var(--rule-ink);padding-top:0}
+.kurzpfad .rubrik{margin-bottom:2px}
+.kurzpfad-liste{list-style:none;margin:0;padding:0;
+  counter-reset:kurzpfad}
+.kurzpfad-zeile{counter-increment:kurzpfad;padding:9px 0 9px 20px;
+  border-bottom:1px solid var(--rule-2);position:relative}
+.kurzpfad-zeile:last-child{border-bottom:none;padding-bottom:2px}
+.kurzpfad-zeile::before{content:counter(kurzpfad);position:absolute;left:0;
+  top:10px;font-family:var(--sans);font-size:11px;font-weight:800;
+  color:var(--red);font-variant-numeric:lining-nums}
+.kurzpfad-satz{margin:0;font-family:var(--serif);font-size:14.5px;
+  line-height:1.38;color:var(--ink)}
+/* Der Beleg haengt im Satz, nicht darunter: eine eigene Zeile je Eintrag
+   machte aus drei Zeilen wieder drei Bloecke. */
+.kurzpfad-beleg{margin-left:6px;font-family:var(--sans);font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  white-space:nowrap}
+.kurzpfad-beleg a{color:var(--ink-4)}
+.kurzpfad-beleg a:hover{color:var(--red)}
+
+/* Der Satz, der aus einer Meldung eine Konsequenz macht (analyze/ctm.py).
+   Er traegt eine eigene Marke, damit er nicht als weitere Zusammenfassung
+   gelesen wird - und er steht nur da, wenn er die Pruefung gegen den
+   Originaltext bestanden hat (analyze/faithfulness.py). */
+.ctm-satz{margin:8px 0 0;font-family:var(--serif);font-size:15px;
+  line-height:1.45;color:var(--ink-2);border-left:2px solid var(--red);
+  padding-left:12px}
+.ctm-marke{display:block;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--red);margin-bottom:2px}
+.mz .ctm-satz{font-size:13.5px;margin:0 0 10px}
+
+/* Die weiteren Belege eines Ereignisses (analyze/clustering.py). Bewusst
+   klein und unter der Meldung: sie sind der Nachweis, dass mehrere
+   Redaktionen dieselbe Sache melden, nicht eine zweite Meldung. */
+.mz-belege{margin:2px 0 10px;padding-left:0;font-family:var(--sans);
+  font-size:11.5px;color:var(--ink-4)}
+.mz-belege a{color:var(--ink-3);text-decoration:underline;
+  text-decoration-color:var(--rule-2)}
+.mz-belege a:hover{color:var(--red)}
+
+/* =====================================================  UEBERSETZUNG = */
+/* Der rote Link zur vollstaendigen Uebersetzung. "Sichtbar, aber nicht
+   marktschreierisch": er traegt das Rot des Hauses (--red, NICHT ein
+   zweites), steht aber in Grotesk und klein - er ist ein Angebot neben der
+   Meldung, keine Schlagzeile. Der Pfeil sagt ohne ein Wort, dass es
+   weitergeht.
+
+   Kein `target="_blank"`: das hier ist die eigene Seite. Der Link zur
+   Originalquelle darueber behaelt seins - der Unterschied ist gewollt und
+   der einzige sichtbare Hinweis darauf, dass eins nach draussen fuehrt. */
+.ueb-link{margin:2px 0 10px;font-family:var(--sans);font-size:11.5px;
+  font-weight:600;letter-spacing:.02em}
+/* `display:inline` ist hier kein Feinschliff, sondern eine Reparatur.
+   Die Kartenvorlagen wickeln ihre ganze Karte in einen Link und formen ihn
+   als Flexbox: `.mlead a,.mzwei a{display:flex;flex-direction:column}`
+   (Z. 387), `.mz a{display:flex;gap:13px;padding:11px 0}` (Z. 418) und
+   `.stueck a{display:flex;flex-direction:column}` (Z. 217). Das sind
+   Nachfahren-Selektoren, und der rote Link steht INNERHALB dieser Karten -
+   er hat ihre Regeln also mitgeerbt. Gemessen am 15.08.2026 auf
+   meldungen.html: der Link der Aufmacher-Karte war 38 px hoch statt 20, weil
+   Text und Pfeil als zwei Flex-Kinder UNTEREINANDER standen; auf den
+   mittleren Karten trieb `gap:14px` den Pfeil weit vom Wort, auf den Zeilen
+   kam `padding:11px 0` dazu. Der Pfeil, der laut Fussnote "an das Wort"
+   gehoert, stand seit der Auslieferung des Feature auf einer eigenen Zeile.
+   Deshalb wird `display` hier ausdruecklich gesetzt und `gap`/`padding`
+   zurueckgeholt - gleiche Spezifitaet, aber weiter unten im Stylesheet. */
+.ueb-link a{display:inline;gap:0;padding:0 0 1px;
+  color:var(--red);text-decoration:none;
+  border-bottom:1px solid var(--red-wash)}
+.ueb-link a:hover{border-bottom-color:var(--red)}
+/* Der Pfeil gehoert an das Wort, nicht daneben: als Leerzeichen im
+   content stand er mit dem letter-spacing der Zeile sichtbar ab. */
+.ueb-link a::after{content:"\2192";margin-left:.35em;
+  letter-spacing:0;display:inline-block}
+.aufmacher .ueb-link{margin-top:6px;font-size:12.5px}
+
+/* Die Uebersetzungsseite selbst. Satzbreite wie ein Artikel, nicht wie ein
+   Raster: hier wird gelesen, und zwar am Stueck. */
+.ueb{max-width:none}
+.ueb-rubrik{font-family:var(--sans);font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--red);
+  border-bottom:3px solid var(--red);padding-bottom:5px;margin:0 0 14px}
+.ueb-titel{font-family:var(--serif);font-size:34px;line-height:1.15;
+  font-weight:600;margin:0 0 8px;max-width:22em}
+.ueb-meta{font-family:var(--sans);font-size:11.5px;color:var(--ink-4);
+  margin:0 0 18px}
+/* Der Hinweis steht OBEN und wird nicht uebersehen: eigener Untergrund,
+   Linie links, vor dem ersten Absatz des Textes. Wer hier landet, muss
+   ohne Scrollen wissen, was er liest. */
+.ueb-hinweis{background:var(--red-wash);border-left:3px solid var(--red);
+  padding:14px 16px;margin:0 0 26px}
+.ueb-hinweis p{margin:0;font-family:var(--serif);font-size:14px;
+  line-height:1.5;color:var(--ink-2)}
+.ueb-original{margin-top:8px !important}
+.ueb-original a{color:var(--red-deep);font-weight:600}
+.ueb-otitel{display:block;font-family:var(--sans);font-size:11px;
+  color:var(--ink-4);margin-top:3px;font-style:italic}
+.ueb-text{max-width:34em}
+.ueb-text p{font-family:var(--serif);font-size:17px;line-height:1.62;
+  margin:0 0 17px;color:var(--ink)}
+.ueb-fuss{margin:30px 0 0;padding-top:12px;border-top:1px solid var(--rule-2);
+  font-family:var(--sans);font-size:11px;color:var(--ink-4)}
+@media (max-width:700px){
+  .ueb-titel{font-size:26px}
+  .ueb-text p{font-size:16px}
+}
+
+/* ==========================================================  AUFKLAPPER = */
+.evidence{margin-top:30px;border-top:2px solid var(--rule-ink)}
+.evidence > summary{list-style:none;cursor:pointer;padding:12px 0;
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  font-family:var(--sans);font-size:11.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink)}
+.evidence > summary::-webkit-details-marker{display:none}
+.evidence > summary small{font-size:10px;font-weight:600;letter-spacing:.08em;
+  color:var(--ink-4)}
+.evidence > summary::after{content:"+";font-family:var(--sans);font-size:16px;
+  color:var(--red);line-height:1}
+.evidence[open] > summary::after{content:"–"}
+.evidence-body{padding:6px 0 22px}
+
+/* ==================================================  FILTER / EXPLORER == */
+.filters{display:flex;gap:0;flex-wrap:wrap;margin:0 0 16px;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.filters input,.filters select{font-family:var(--sans);font-size:12px;
+  color:var(--ink);background:none;border:none;
+  border-right:1px solid var(--rule-2);padding:10px 14px 10px 0;margin-right:14px}
+.filters input{flex:1;min-width:180px}
+.filters > *:last-child{border-right:none;margin-right:0}
+.filters input:focus,.filters select:focus{outline:none;color:var(--red)}
+.filters input::placeholder{color:var(--ink-4)}
+
+.explorer{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);
+  gap:0 28px;border-top:1px solid var(--rule)}
+.ex-list{max-height:560px;overflow-y:auto;border-right:1px solid var(--rule);
+  padding-right:20px}
+.ex-row{padding:12px 0;border-bottom:1px solid var(--rule-2);cursor:pointer}
+.ex-row:hover .ex-title{color:var(--red)}
+.ex-row.active{border-left:3px solid var(--red);padding-left:11px;
+  margin-left:-14px}
+.ex-row-top{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.ex-dot{width:7px;height:7px;flex-shrink:0;background:var(--r2)}
+.ex-dot.r5{background:var(--r5)}.ex-dot.r4{background:var(--r4)}
+.ex-dot.r3{background:var(--r3)}
+.ex-op{font-size:9.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--ink-2);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.ex-reg{font-size:9.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--ink-4);margin-left:auto;white-space:nowrap}
+.ex-title{font-size:14.5px;line-height:1.38;color:var(--ink)}
+.ex-detail{padding:16px 0 0;min-width:0}
+.ex-detail-empty{font-family:var(--sans);font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.ex-d-top{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.ex-detail h3{margin:0 0 10px;font-size:25px;line-height:1.2;font-weight:700;
+  letter-spacing:-.015em}
+.ex-detail h3 a:hover{color:var(--red)}
+.ex-d-meta{margin:0 0 12px;font-family:var(--sans);font-size:10.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.ex-d-meta b{color:var(--ink-2);font-weight:800}
+.ex-d-sum{margin:0 0 16px;font-size:17px;line-height:1.58;color:var(--ink-2)}
+.source-link{display:inline-block;font-family:var(--sans);font-size:10.5px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--red);
+  border-bottom:1px solid var(--red);padding-bottom:2px}
+.ex-count{margin:14px 0 0;font-family:var(--sans);font-size:10.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+/* Der Weg zu allen Meldungen ist Navigation, keine Ankuendigung: rot ja,
+   aber ohne den Unterstrich, mit dem ein `source-link` sonst auf eine
+   Originalquelle zeigt. */
+.front-wichtig .ex-count .source-link{border-bottom:none;padding-bottom:0;
+  font-weight:700}
+.front-wichtig .ex-count .source-link:hover{border-bottom:1px solid var(--red)}
+@media (max-width:880px){
+  .explorer{grid-template-columns:1fr}
+  .ex-list{max-height:340px;border-right:none;padding-right:0;
+    border-bottom:1px solid var(--rule)}
+}
+
+/* ===============================================  TABELLEN / ZEILEN  ==== */
+.rowtable{border-top:1px solid var(--rule)}
+.rowtable-head{display:flex;gap:16px;padding:8px 0;font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  border-bottom:1px solid var(--rule)}
+.rowtable-row{display:flex;gap:16px;padding:11px 0;
+  border-bottom:1px solid var(--rule-2);align-items:baseline;font-size:15px}
+.col-region,.col-src-name{flex:1 1 40%;font-weight:600;min-width:0}
+.col-flex,.col-kept,.col-src-count{flex:0 0 108px;font-variant-numeric:lining-nums;
+  color:var(--ink-3)}
+.col-kept{color:var(--ink);font-weight:700}
+.col-model,.col-src-type{flex:0 0 150px;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4);text-align:right}
+@media (max-width:700px){
+  .rowtable-head{display:none}
+  .rowtable-row{flex-wrap:wrap;gap:6px 14px}
+  .col-region,.col-src-name{flex:1 1 100%}
+  .col-model,.col-src-type{text-align:left}
+}
+.list-card{border-top:1px solid var(--rule)}
+.list-row{display:flex;gap:18px;padding:12px 0;align-items:baseline;
+  border-bottom:1px solid var(--rule-2)}
+.list-row:hover .list-row-date{color:var(--red)}
+.list-row-date{flex:1 1 auto;font-size:17px;font-weight:600}
+/* Eine Zahl je Archivzeile, in derselben leisen Form wie jeder andere
+   Zaehlwert der Website. Daneben stand bis zum 08.08.2026 noch "3447
+   gesammelt" - eine Transparenzzahl, die auf die Quellenseite gehoert. */
+.list-row-new{font-family:var(--sans);font-size:11px;font-weight:600;
+  letter-spacing:.02em;color:var(--ink-4);flex:0 0 auto;
+  font-variant-numeric:lining-nums}
+.src-table{width:100%;border-collapse:collapse;font-size:14px}
+.src-table th{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);text-align:left;
+  padding:7px 8px;border-bottom:1px solid var(--rule)}
+.src-table td{padding:8px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+.src-table td.num,.src-table th.num{text-align:right;font-variant-numeric:lining-nums}
+.src-table a{color:var(--red);font-family:var(--sans);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em}
+.log-legend{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 14px;
+  font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ink-4)}
+.log-legend .s{display:flex;align-items:center;gap:6px}
+.step-grid{display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  border-top:1px solid var(--rule)}
+.step-grid > div{padding:13px 16px 14px 0;border-bottom:1px solid var(--rule-2);
+  border-right:1px solid var(--rule-2)}
+.step-dur{font-family:var(--serif);font-size:22px;font-weight:700;
+  font-variant-numeric:lining-nums;line-height:1.1}
+.step-name{font-size:9.5px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-4);margin:4px 0 5px}
+.step-detail{font-size:13.5px;color:var(--ink-3);line-height:1.45}
+
+/* ==============================================  QUELLEN (Transparenz) == */
+.region-card-list{display:grid;gap:0;margin-top:26px}
+.region-card{padding:18px 0 6px;border-top:1px solid var(--rule)}
+.region-card h2{font-family:var(--sans);font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.12em;margin:0 0 12px;color:var(--ink)}
+.region-card h2 span{color:var(--ink-4);font-weight:600;letter-spacing:.08em}
+.op-grid{display:grid;gap:0 30px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.op-row{border-bottom:1px solid var(--rule-2)}
+.op-row-line{display:flex;justify-content:space-between;gap:14px;padding:7px 0;
+  align-items:baseline}
+.op-row-line:hover .op-row-name{color:var(--red)}
+.op-row-name{font-size:14.5px;font-weight:600;min-width:0}
+.op-row-type{font-family:var(--sans);font-size:9.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  white-space:nowrap;flex-shrink:0}
+.op-row-note{display:block;padding:0 0 7px;font-family:var(--sans);font-size:9.5px;
+  color:var(--ink-4);font-style:italic}
+.pill-cloud{display:flex;flex-wrap:wrap;gap:0}
+.pill-cloud a{font-size:13.5px;color:var(--ink-2);padding:3px 12px;
+  border-right:1px solid var(--rule)}
+.pill-cloud a:first-child{padding-left:0}
+.pill-cloud a:hover{color:var(--red)}
+
+/* ======================================  WETTBEWERBER / DEUTSCHLAND  ==== */
+.comp-list{display:grid;gap:0;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.comp-card{padding:16px 24px 20px 0;border-top:1px solid var(--rule);
+  border-right:1px solid var(--rule);margin-right:24px}
+.comp-card:last-child{border-right:none;margin-right:0}
+.comp-card-head{margin-bottom:10px}
+.comp-card h2{font-family:var(--serif);font-size:22px;font-weight:700;margin:0 0 7px;
+  letter-spacing:-.015em;text-transform:none}
+.comp-badges{display:flex;gap:8px;flex-wrap:wrap}
+.comp-badge{font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--ink-4)}
+.comp-badge.accent{color:var(--red)}
+.comp-summary{margin:0 0 12px;font-size:15.5px;line-height:1.55;color:var(--ink-2)}
+.comp-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.comp-tag{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);
+  border:1px solid var(--rule);padding:2px 6px}
+.comp-moves-title{margin:0 0 7px;font-family:var(--sans);font-size:9.5px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+.comp-items{display:flex;flex-direction:column}
+.comp-item{padding:8px 0;border-top:1px solid var(--rule-2)}
+.comp-item-cat{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--red);margin-bottom:3px}
+.comp-item a{font-size:14.5px;line-height:1.4}
+.comp-item a:hover{color:var(--red)}
+
+/* ================================  WETTBEWERB (Dauerseite mit Chronik) == */
+/* Telekom, O2 und 1&1 ueber die Wochen. Die Seite hat zwei Ebenen, und die
+   zweite traegt sie: oben die Lage in einem Absatz, darunter die CHRONIK -
+   jede Meldung seit Beobachtungsbeginn, nach Monaten.
+
+   Umbau am 08.08.2026. Die Seite war 6777 px hoch - sieben Bildschirme, und
+   der zweite Wettbewerber begann erst nach dreien. Antonio: "mach Wettbewerb
+   das Layout besser, sodass man nicht so viel runterscrollen muss." Drei
+   Stellschrauben, keine davon streicht Inhalt:
+     1. Die Chronik steht in ZWEI Spalten. Eine Chronikzeile ist schmal
+        gesetzt und braucht keine 1180 px Satzbreite.
+     2. Der laufende Monat zeigt zwoelf Meldungen, der Rest liegt einen
+        Klick tiefer (report/wettbewerb._OFFEN_JE_MONAT).
+     3. Der Themenverlauf reicht drei statt vier Ausgaben zurueck.
+   Dazu traegt der NAME jetzt den Abschnitt, statt als Etikett darueber zu
+   stehen. */
+.wb{margin-top:40px}
+/* Der erste Abschnitt haengt direkt am Seitenkopf - dort ist der Abstand
+   schon durch dessen Sprungnavigation gesetzt. */
+.wb--erste{margin-top:6px}
+/* Der Kopf eines Wettbewerbers: Name gross in Serife, die Zahl der Chronik
+   als leises Etikett am rechten Rand. Dieselbe Bauform wie der Markenkopf
+   der Promo Uebersicht (.pmarke-kopf) - beide Seiten beantworten dieselbe
+   Frage "wer", und beide sollen den Namen zuerst zeigen. */
+.wb-kopf{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  margin:0 0 18px;padding-top:9px;border-top:3px solid var(--rule-ink)}
+.wb-name{margin:0;font-family:var(--serif);font-size:clamp(28px,3vw,38px);
+  line-height:1.03;font-weight:700;letter-spacing:-.024em;color:var(--ink)}
+.wb-kopf .rubrik-zahl{margin-left:auto}
+.wb-lage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
+  gap:0 34px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.wb-lage--einspaltig{grid-template-columns:1fr}
+.wb-profil{min-width:0}
+.wb-summary{margin:0;font-size:18px;line-height:1.55;color:var(--ink-2);
+  max-width:68ch}
+/* Der Themenverlauf: eine Zeile je Ausgabe, neueste oben. Er ersetzt den
+   Satz "das beschaeftigt sie seit Wochen" - man sieht die Verschiebung, statt
+   sie behauptet zu bekommen. */
+.wb-themen{margin-top:16px;border-top:1px solid var(--rule-2)}
+.wb-themenzeile{display:grid;grid-template-columns:118px minmax(0,1fr);
+  gap:0 14px;padding:8px 0;border-bottom:1px solid var(--rule-2);
+  align-items:baseline}
+.wb-themendatum{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  white-space:nowrap}
+.wb-tags{display:flex;flex-wrap:wrap;gap:5px}
+.wb-aktionen{min-width:0;padding-left:34px;border-left:1px solid var(--rule)}
+.wb-spaltentitel{margin:0 0 9px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.wb-aktionsliste{list-style:none;margin:0;padding:0}
+.wb-aktion{padding:8px 0;border-top:1px solid var(--rule-2)}
+.wb-aktion:first-child{border-top:none;padding-top:0}
+.wb-aktion a{display:flex;flex-direction:column}
+.wb-aktion-titel{font-size:14.5px;line-height:1.3;font-weight:600;color:var(--ink)}
+.wb-aktion a:hover .wb-aktion-titel{color:var(--red)}
+.wb-aktion-meta{margin-top:3px;font-family:var(--sans);font-size:9px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4)}
+.wb-mehr{margin:11px 0 0;font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em}
+.wb-mehr a{color:var(--red)}
+.wb-leer,.wb-marken{margin:0;font-family:var(--sans);font-size:9.5px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-4);
+  line-height:1.6}
+.wb-marken{margin-top:12px;padding-top:9px;border-top:1px solid var(--rule-2)}
+.wb-leer a{color:var(--red)}
+
+/* ---- die Chronik */
+.wb-chronik{margin-top:20px}
+.wb-monat{display:flex;align-items:baseline;gap:12px;margin:0 0 4px;
+  font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--ink);border-bottom:1px solid var(--rule-ink);
+  padding-bottom:6px}
+.wb-monat span{margin-left:auto;font-weight:700;color:var(--ink-4);
+  font-variant-numeric:lining-nums}
+/* Zwei Spalten. Eine Chronikzeile traegt eine Schlagzeile und einen Satz -
+   ueber die volle Satzbreite gesetzt verbrauchte sie 86 px Hoehe fuer zwei
+   halbleere Zeilen, und dreissig davon waren 2600 px. */
+.wb-liste{list-style:none;margin:0;padding:0;columns:2;column-gap:40px}
+.wb-zeile{break-inside:avoid;-webkit-column-break-inside:avoid;
+  padding:9px 0 10px;border-bottom:1px solid var(--rule-2)}
+/* Datum, Ressort und Quelle als eine leise Kopfzeile ueber der Schlagzeile.
+   Jede Zeile traegt ihr Datum selbst - in zwei Spalten kann eine
+   Tagesgruppe am Spaltenrand zerreissen (siehe _chronik_eintrag). */
+.wb-zeile-kopf{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  margin-bottom:3px}
+.wb-tag{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  color:var(--ink-4);font-variant-numeric:lining-nums;white-space:nowrap}
+.wb-ressort{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--red);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wb-titel{display:block;font-size:15.5px;line-height:1.3;font-weight:600;
+  color:var(--ink)}
+.wb-titel:hover{color:var(--red)}
+/* Die Einordnung auf zwei Zeilen begrenzt: sie ergaenzt die Schlagzeile, sie
+   ersetzt den Artikel nicht - und drei Zeilen Fliesstext je Chronikeintrag
+   waeren wieder die Hoehe, die diesen Umbau ausgeloest hat. */
+.wb-note{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin-top:3px;font-size:14px;line-height:1.42;
+  color:var(--ink-3)}
+.wb-quelle{margin-left:auto;font-family:var(--sans);font-size:8.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-4);white-space:nowrap}
+/* Der Rest des laufenden Monats. Kein eigener Zaehler in Worten - die Zahl
+   ueber der Liste nennt den ganzen Monat, hier steht nur, wie viele davon
+   noch nicht zu sehen sind. */
+.wb-mehr-monat{margin-top:2px}
+.wb-mehr-monat > summary{list-style:none;cursor:pointer;padding:9px 0;
+  font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+.wb-mehr-monat > summary::-webkit-details-marker{display:none}
+.wb-mehr-monat > summary::after{content:" +"}
+.wb-mehr-monat[open] > summary::after{content:" –"}
+/* Aeltere Monate klappen zu. Ohne das waechst die Seite mit jeder Ausgabe um
+   rund 30 Zeilen je Wettbewerber - nach einem Jahr waere sie unlesbar, und
+   der laufende Monat, um den es meistens geht, staende ganz oben in einem
+   Meer aus Archiv. */
+.wb-aelter{margin-top:18px;border-top:1px solid var(--rule)}
+.wb-aelter > summary{list-style:none;cursor:pointer;display:flex;
+  align-items:baseline;gap:12px;padding:10px 0;font-family:var(--sans);
+  font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--ink-2)}
+.wb-aelter > summary::-webkit-details-marker{display:none}
+.wb-aelter > summary span{margin-left:auto;font-weight:600;color:var(--ink-4)}
+.wb-aelter > summary::after{content:"+";font-size:16px;color:var(--red);line-height:1}
+.wb-aelter[open] > summary::after{content:"–"}
+.wb-aelter > summary:hover{color:var(--red)}
+@media (max-width:900px){
+  .wb-lage{grid-template-columns:1fr;gap:22px 0}
+  .wb-aktionen{padding-left:0;border-left:none;padding-top:16px;
+    border-top:1px solid var(--rule)}
+  /* Unter 900 px ist eine Spalte 400 px breit - dort trennt die zweite
+     Spalte nicht mehr, sie zerhackt. */
+  .wb-liste{columns:1}
+}
+
+/* ---- der Kurzverweis auf der Titelseite */
+/* Drei Zeilen statt drei Karten: die Detailtiefe steht auf wettbewerb.html,
+   hier steht nur, wo jeder gerade steht. */
+.wb-kurz{list-style:none;margin:0;padding:0}
+.wb-kurz-zeile{border-bottom:1px solid var(--rule-2)}
+.wb-kurz-zeile a{display:grid;grid-template-columns:170px minmax(0,1fr);
+  gap:0 20px;padding:10px 0;align-items:baseline}
+.wb-kurz-name{font-family:var(--sans);font-size:10.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink)}
+.wb-kurz-satz{font-size:15.5px;line-height:1.5;color:var(--ink-2)}
+.wb-kurz-zeile a:hover .wb-kurz-name{color:var(--red)}
+@media (max-width:700px){
+  .wb-kurz-zeile a{grid-template-columns:1fr;gap:4px 0}
+}
+
+/* ==============================================  THEMENSEITEN (temp.) === */
+/* Ein Ereignis, eine Seite, solange etwas nachkommt. Es gibt hier absichtlich
+   keine eigene Formensprache: Kopf, Aufmacher und zweite Reihe sind die der
+   Titelseite, neu ist nur die Zeilenliste darunter und das Band, das von der
+   Titelseite hierher zeigt. Eine temporaere Seite, die anders aussieht als
+   der Rest, sieht aus wie ein Fehler. */
+
+/* Das Band unter der dritten Reihe. Eine Linie, kein Kasten - es soll die
+   Titelseite nicht unterbrechen, sondern sie fortsetzen. */
+.fokusband{border-top:3px solid var(--rule-ink);margin-top:2px}
+/* Ueber dem Aufmacher zaehlt jede Zeile: das Band traegt die Linie der
+   Rubrikleisten, aber keinen zusaetzlichen Abstand nach oben. */
+.fokusband--oben{margin:0 0 14px}
+.fokusband--oben a{padding:9px 0}
+.fokusband a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:0 16px;align-items:baseline;padding:11px 0;
+  border-bottom:1px solid var(--rule-2)}
+.fokusband-kicker{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--red)}
+.fokusband-titel{font-size:17px;line-height:1.3;font-weight:700;color:var(--ink);
+  letter-spacing:-.012em}
+.fokusband-zahl{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4);
+  white-space:nowrap}
+.fokusband a:hover .fokusband-titel{color:var(--red)}
+@media (max-width:640px){
+  .fokusband a{grid-template-columns:1fr;gap:3px 0}
+}
+
+.tm-kopf{padding-bottom:6px}
+.tm-lage{margin:14px 0 0;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink-4)}
+.tm-lage b{color:var(--ink);font-weight:800;font-variant-numeric:lining-nums}
+.tm-aufmacher{border-top:3px solid var(--rule-ink);padding-top:18px}
+
+/* Die Zeilenliste: alles, was nicht Aufmacher oder zweite Reihe ist - und
+   zwar vollstaendig. Eine Themenseite, die eine Auswahl zeigt, verfehlt
+   ihren Zweck ("alle Meldungen zu diesem Thema"). */
+.tm-alle,.tm-aktionen{margin-top:34px}
+.tm-liste{list-style:none;margin:0;padding:0}
+.tm-zeile{display:grid;grid-template-columns:118px minmax(0,1fr);gap:0 20px;
+  padding:14px 0;border-bottom:1px solid var(--rule-2)}
+.tm-datum{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  letter-spacing:.06em;color:var(--ink-4);font-variant-numeric:lining-nums;
+  padding-top:4px}
+.tm-text{min-width:0;display:flex;flex-direction:column}
+.tm-titel{font-size:17px;line-height:1.32;font-weight:600;color:var(--ink);
+  letter-spacing:-.01em}
+.tm-titel:hover{color:var(--red)}
+.tm-anriss{margin-top:5px;font-size:15px;line-height:1.5;color:var(--ink-3);
+  max-width:70ch}
+.tm-quelle{margin-top:6px;font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+
+.tm-aktionsliste{list-style:none;margin:0;padding:0;display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));gap:0 30px}
+.tm-aktion{border-bottom:1px solid var(--rule-2)}
+.tm-aktion a{display:flex;flex-direction:column;padding:10px 0}
+.tm-aktion-marke{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:4px}
+.tm-aktion-titel{font-size:15.5px;line-height:1.35;font-weight:600;color:var(--ink)}
+.tm-aktion a:hover .tm-aktion-titel{color:var(--red)}
+@media (max-width:820px){
+  .tm-zeile{grid-template-columns:1fr;gap:4px 0}
+  .tm-datum{padding-top:0}
+  .tm-aktionsliste{grid-template-columns:1fr}
+}
+
+/* =========================================================  DOSSIER  ==== */
+/* Die Suchseite (suche.html). Sie ist keine Trefferliste, sondern eine
+   Ausgabe zu EINEM Begriff: Kopf, Ueberblick, Aufmacher, Chronik. Deshalb
+   erbt sie die Bauformen der Zeitungsseiten (Rubrikleiste, Kartenraster,
+   Balken des Marktbilds) und bringt nur das mit, was es dort nicht gibt.
+
+   Bis zum 08.08.2026 fuehrte die Suche auf meldungen.html und zeigte ihre
+   Treffer als graue Textzeilen am Fuss dieser Seite - Antonio: "Das UI ist
+   total beschissen. Ich verstehe nicht, warum ich da weitergeleitet werde."
+   Die Klassen .suche-card/.gs-item-* dieser Fassung sind weg; was bleibt,
+   ist die Filterzeile (.suche-filter), weil sie unveraendert taugt. */
+.dossier-kopf{padding-bottom:12px}
+.dossier-kopf h1{font-size:clamp(34px,5vw,62px);letter-spacing:-.03em;
+  max-width:none;overflow-wrap:anywhere}
+.dossier-form{display:flex;align-items:center;gap:12px;margin:22px 0 0;
+  border-bottom:2px solid var(--rule-ink);padding-bottom:8px}
+.dossier-input{flex:1;min-width:0;border:none;background:none;
+  font-family:var(--serif);font-size:clamp(19px,2.2vw,26px);color:var(--ink)}
+.dossier-input:focus{outline:none}
+.dossier-input::placeholder{color:var(--ink-4)}
+.dossier-btn{border:none;background:none;color:var(--ink-3);cursor:pointer;
+  padding:0;display:flex;align-items:center}
+.dossier-btn:hover{color:var(--red)}
+/* Die drei Zahlen, die alles Weitere einordnen: Treffer, Zeitraum, Quellen. */
+.dossier-bilanz{margin:10px 0 0;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+.dossier-bilanz:empty{margin:0}
+
+/* Die Ankunft ohne Begriff. Kein Satz, der zum Tippen auffordert - eine
+   Liste dessen, worueber das Archiv ueberhaupt etwas weiss. */
+.dossier-start[hidden]{display:none}
+.dossier-start{margin-top:34px}
+.dossier-chips{display:flex;flex-wrap:wrap;gap:10px 12px}
+.dossier-chip{font-family:var(--sans);font-size:11px;font-weight:700;
+  letter-spacing:.03em;color:var(--ink-2);border:1px solid var(--rule);
+  padding:7px 13px}
+.dossier-chip:hover{color:var(--red);border-color:var(--red)}
+
+.dossier-analyse[hidden]{display:none}
+.dossier-analyse{margin-top:34px}
+.dossier-analyse-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 40px}
+
+.dossier-lead{margin-top:30px}
+.dossier-monat{margin-top:40px}
+.dossier-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 30px;align-items:start}
+.dossier-zeilen{margin-top:22px;border-top:1px solid var(--rule)}
+
+/* Eine Trefferkarte. Gleiche Felder an gleicher Stelle, egal ob der Treffer
+   aus einer Ausgabe, aus der Differenzierung oder aus den Aktionen kommt -
+   Vergleichen heisst Gleiches nebeneinander legen. */
+.dsk{display:flex;flex-direction:column;min-width:0;
+  border-top:1px solid var(--rule);padding-top:10px}
+.dsk-text{display:flex;flex-direction:column;flex:1;min-width:0}
+/* JEDE Karte traegt ein Motiv - Bild oder Schriftkachel. Nie ein leerer
+   Kasten und nie eine Platzhalterfarbe: `loading="lazy"` laesst ein Bild
+   ausserhalb des Sichtfensters ungeladen, und eine CSS-Flaeche dahinter
+   sieht dann aus wie ein kaputtes Bild (der Befund vom 08.08.2026 auf der
+   Promo Uebersicht, 31 von 36 Bildern). */
+.dsk-motiv{display:block;margin-bottom:9px}
+.dsk-motiv img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:center}
+.dsk-kachel{display:block;padding:2px 0 10px;border-bottom:1px solid var(--rule);
+  font-family:var(--serif);font-size:clamp(19px,1.8vw,24px);line-height:1.1;
+  font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.dsk-kopf{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 6px}
+.dsk-art{font-family:var(--sans);font-size:8.5px;font-weight:800;
+  letter-spacing:.11em;text-transform:uppercase;padding:2px 6px;color:#fff;
+  background:var(--ink-4)}
+.dsk-art.bericht{background:var(--r3)}
+.dsk-art.differenzierung{background:var(--red)}
+.dsk-art.promo{background:var(--r4)}
+.dsk-meta{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.dsk-status{font-family:var(--sans);font-size:8.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  border:1px solid var(--rule);padding:1px 5px}
+.dsk-titel{display:block;font-family:var(--serif);font-size:17px;line-height:1.32;
+  font-weight:600;letter-spacing:-.012em;color:var(--ink)}
+.dsk-titel:hover{color:var(--red)}
+.dsk-anriss{margin:7px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+.dsk mark{background:#fbe9a7;color:inherit}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+.dsk-text > :nth-last-child(2){margin-bottom:auto}
+.dsk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:14px;
+  margin:13px 0 0;padding-top:7px;border-top:1px solid var(--rule-2)}
+.dsk-quelle,.dsk-kontext{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.dsk-kontext{color:var(--ink-3)}
+.dsk-quelle:hover,.dsk-kontext:hover{color:var(--red)}
+
+/* Der Aufmacher des Dossiers: Bild und Text nebeneinander, damit die
+   staerkste Antwort auf die Suche oberhalb der Falz ganz zu sehen ist. */
+.dsk--lead{flex-direction:row;gap:30px;border-top-width:3px;
+  border-top-color:var(--rule-ink);padding-top:14px}
+.dsk--lead .dsk-motiv{flex:0 0 55%;margin-bottom:0}
+.dsk--lead .dsk-titel{font-size:clamp(24px,2.9vw,34px);line-height:1.14;
+  font-weight:700;letter-spacing:-.028em}
+.dsk--lead .dsk-anriss{font-size:16.5px;margin-top:11px}
+/* Ohne belegtes Bild kippt der Aufmacher in eine Spalte: eine Schriftkachel
+   ueber 55 % Breite ist keine halbe Seite Motiv, sondern eine halbe Seite
+   Leere. Die Kachel steht dann als breite Absenderzeile ueber der
+   Schlagzeile - ein Motiv bleibt es. */
+.dsk--lead.ohne-bild{flex-direction:column;gap:0}
+.dsk--lead.ohne-bild .dsk-motiv{flex:none;margin-bottom:10px}
+.dsk--lead.ohne-bild .dsk-kachel{font-size:clamp(22px,2.4vw,30px)}
+
+/* Die Zeile: derselbe Treffer, nur ohne Motiv und ohne Anriss. Ab dem
+   siebten Treffer eines Monats - eine dritte Kachelreihe traegt nichts mehr
+   bei, eine Zeile ist schneller gelesen. Drei Spalten, damit hundert Zeilen
+   untereinander eine Chronik ergeben und keine hundert Absaetze. */
+.dsk--zeile{border-top:none;border-bottom:1px solid var(--rule-2);padding:8px 0}
+.dsk--zeile .dsk-text{display:grid;grid-template-columns:270px 1fr auto;
+  align-items:baseline;gap:8px 20px}
+.dsk--zeile .dsk-kopf{margin:0}
+.dsk--zeile .dsk-titel{font-size:15.5px;line-height:1.35}
+.dsk--zeile .dsk-fuss{border:none;margin:0;padding:0;gap:12px;justify-content:flex-end}
+
+.suche-filter-n{font-variant-numeric:lining-nums;color:var(--ink-4)}
+.suche-filter.on .suche-filter-n{color:var(--red)}
+
+@media (max-width:1000px){
+  .dossier-analyse-raster,.dossier-raster{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dsk--lead{flex-direction:column;gap:0}
+  .dsk--lead .dsk-motiv{flex:none;margin-bottom:11px}
+}
+@media (max-width:640px){
+  .dossier-analyse-raster,.dossier-raster{grid-template-columns:1fr}
+  .dsk--zeile{flex-direction:column;gap:4px}
+  .dsk--zeile .dsk-kopf{flex:none}
+}
+
+/* ===================================================  DIFFERENZIERUNG === */
+/* Das Inspirations-Radar. Zweiter Umbau am 08.08.2026, und er behebt genau
+   das, was der erste offen liess: die Seite war eine 9060 px hohe Wand aus
+   77 gleich grossen Textkaertchen ohne ein einziges Bild. Antonio: "total
+   unuebersichtlich ... keine Bilder ... viel besser sein analytisch."
+
+   Vier Regeln tragen die neue Fassung:
+     1. JEDE KARTE HAT EIN MOTIV - Bild oder Schriftkachel, nie ein leerer
+        Kasten (dieselbe Regel wie auf der Promo Uebersicht).
+     2. GEWICHTUNG statt Gleichverteilung: je Hebel ein Aufmacher, dann
+        Karten, dann Zeilen. Gleich grosse Kaertchen behaupten, dass alle 77
+        Beispiele gleich wichtig sind.
+     3. DAS MARKTBILD STEHT VOR DEN BEISPIELEN - Balken, keine Kaesten.
+     4. Die Hebel-Farbe (--c) traegt genau zwei Linien: die 3px-Rubrikleiste
+        und die Oberkante des Aufmachers. Keine Flaeche (CLAUDE.md §5). */
+.dz-nav{margin:34px 0 0}
+.dz-radar{margin-top:34px}
+.dz-hebel{margin-top:44px;scroll-margin-top:16px}
+.dz-rubrik{border-top-width:3px;border-top-color:var(--c,var(--rule-ink))}
+.dz-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:26px 30px;align-items:start}
+
+/* Die Lage aus dem Bericht: der Einstieg in die Seite, nicht ihr Anhang. */
+.dz-lage{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+.dz-lage .prose{max-width:80ch}
+.dz-lage .prose p{font-size:19px;line-height:1.55;color:var(--ink-2)}
+
+/* Das gerechnete Marktbild - drei Spalten, drei Fragen. */
+.dz-marktbild{margin-top:40px}
+.dz-mb-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px 40px}
+.dz-mb-titel{margin:0 0 12px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
+/* Balken statt Diagramm: eine Zeile je Wert, die Fuellung relativ zum
+   groessten. Kein Chart-Skript, keine Achsen - es geht um die Rangfolge. */
+.dz-balken{list-style:none;margin:0;padding:0}
+.dz-balken li{display:grid;grid-template-columns:1fr 74px 26px;align-items:center;
+  gap:10px;padding:5px 0;border-bottom:1px solid var(--rule-2)}
+.dz-balken-name{font-size:14px;line-height:1.25;color:var(--ink-2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-balken-spur{display:block;height:4px;background:var(--rule-2)}
+.dz-balken-fuell{display:block;height:100%;background:var(--c,var(--ink-3))}
+.dz-balken-n{font-family:var(--sans);font-size:11px;font-weight:700;
+  text-align:right;color:var(--ink-4);font-variant-numeric:lining-nums}
+
+.dz-anbieter{list-style:none;margin:0;padding:0;counter-reset:dzr}
+.dz-anbieter li{padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.dz-anbieter-name{display:block;font-family:var(--serif);font-size:15.5px;
+  font-weight:700;letter-spacing:-.012em;color:var(--ink)}
+/* Nicht die ZAHL der Hebel, sondern ihre Namen: "wer breit aufgestellt ist"
+   beantwortet sich durch die Aufzaehlung, nicht durch eine Ziffer. */
+.dz-anbieter-hebel{display:block;margin-top:2px;font-family:var(--sans);
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--ink-4)}
+
+/* Das Musterband unter den drei gerechneten Spalten: geschriebene Saetze
+   brauchen Satzbreite, keine 370-px-Spalte. Zwei Spalten bei 1240 px, damit
+   vier Muster nicht zu vier Bildschirmzeilen werden. */
+.dz-muster-band{margin-top:26px;padding-top:18px;border-top:1px solid var(--rule)}
+.dz-muster{list-style:none;margin:0;padding:0;columns:2;column-gap:44px}
+.dz-muster li{break-inside:avoid;padding:8px 0;
+  border-bottom:1px solid var(--rule-2);
+  font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+.dz-muster b{color:var(--ink)}
+.dz-muster a{color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.dz-muster a:hover{color:var(--red)}
+
+/* Was ein Hebel BEDEUTET (steht fest) und was an ihm gerade auffaellt
+   (kommt aus dem Bericht). Zwei Saetze, zwei Rollen, zwei Grade. */
+.dz-hebel-was{margin:0 0 4px;max-width:78ch;font-size:15.5px;line-height:1.5;
+  color:var(--ink-2)}
+.dz-hebel-einordnung{margin:0 0 6px;max-width:78ch;font-size:14.5px;
+  line-height:1.5;font-style:italic;color:var(--ink-3)}
+.dz-hebel-oben{margin:18px 0 26px}
+.dz-zeilen{margin-top:24px;border-top:1px solid var(--rule)}
+.dz-mehr{margin-top:6px}
+.dz-mehr > summary{font-family:var(--sans);font-size:9.5px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);
+  cursor:pointer;padding:9px 0;list-style:none}
+.dz-mehr > summary::-webkit-details-marker{display:none}
+.dz-mehr > summary::after{content:' ▾'}
+.dz-mehr[open] > summary::after{content:' ▴'}
+.dz-mehr > summary:hover{color:var(--red)}
+.dz-mehr .dz-zeilen{margin-top:0;border-top:none}
+
+.dzk{display:flex;flex-direction:column;min-width:0;
+  border-top:1px solid var(--rule);padding-top:10px}
+.dzk-text{display:flex;flex-direction:column;flex:1;min-width:0}
+/* Motiv: das Bild der Originalseite oder die Schriftkachel mit dem Absender.
+   Keine Platzhalterfarbe hinter dem Bild - mit `loading="lazy"` malt der
+   Browser sie, bevor das Bild da ist, und das sieht aus wie ein Ladefehler. */
+.dzk-motiv{display:block;margin-bottom:9px}
+.dzk-motiv img{display:block;width:100%;height:auto;aspect-ratio:16/9;
+  object-fit:cover;object-position:center}
+.dzk-kachel{display:block;padding:2px 0 10px;border-bottom:1px solid var(--rule);
+  font-family:var(--serif);font-size:clamp(18px,1.7vw,23px);line-height:1.1;
+  font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.dzk-kopf{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 7px}
+.dzk-op{font-family:var(--serif);font-size:15px;font-weight:700;
+  letter-spacing:-.01em;color:var(--ink)}
+.dzk-reg{font-family:var(--sans);font-size:9px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+/* Die Hauptzeile: der Satz, der sagt, WAS der Anbieter tut. Serife, weil er
+   gelesen und nicht ueberflogen wird. */
+.dzk-what{display:block;font-family:var(--serif);font-size:17px;line-height:1.34;
+  font-weight:600;letter-spacing:-.012em;color:var(--ink)}
+.dzk-what:hover{color:var(--red)}
+.dzk-why{margin:8px 0 0;font-size:14.5px;line-height:1.5;color:var(--ink-3)}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. */
+.dzk-text > :nth-last-child(2){margin-bottom:auto}
+.dzk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+  margin:14px 0 0;padding-top:8px;border-top:1px solid var(--rule-2)}
+.dzk-hebel{font-family:var(--sans);font-size:9px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--c,var(--red))}
+.dzk-quelle{font-family:var(--sans);font-size:9px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+.dzk-quelle:hover{color:var(--red)}
+
+.dzk--gross{border-top-width:2px;border-top-color:var(--c,var(--rule-ink));
+  padding-top:13px}
+.dzk--gross .dzk-what{font-size:21px;line-height:1.22;letter-spacing:-.018em;
+  font-weight:700}
+.dzk--gross .dzk-why{font-size:15px;margin-top:9px}
+
+/* Der Aufmacher eines Hebels: Motiv und Text nebeneinander. Er traegt den
+   Abschnitt, deshalb steht sein Motiv gross - und deshalb waehlt
+   `_gewichten()` dafuer das juengste Beispiel MIT Bild. */
+.dzk--lead{flex-direction:row;gap:30px;border-top-width:2px;
+  border-top-color:var(--c,var(--rule-ink));padding-top:13px}
+.dzk--lead .dzk-motiv{flex:0 0 46%;margin-bottom:0}
+.dzk--lead .dzk-what{font-size:clamp(21px,2.3vw,27px);line-height:1.16;
+  font-weight:700;letter-spacing:-.024em}
+.dzk--lead .dzk-why{font-size:15.5px;margin-top:10px}
+/* Siehe .dsk--lead.ohne-bild: eine Schriftkachel ueber 46 % Breite laesst
+   darunter eine leere halbe Spalte stehen. */
+.dzk--lead.ohne-bild{flex-direction:column;gap:0}
+.dzk--lead.ohne-bild .dzk-motiv{flex:none;margin-bottom:10px}
+.dzk--lead.ohne-bild .dzk-kachel{font-size:clamp(21px,2.2vw,28px)}
+
+.dzk--zeile{border-top:none;border-bottom:1px solid var(--rule-2);padding:8px 0}
+.dzk--zeile .dzk-text{display:grid;grid-template-columns:240px 1fr auto;
+  align-items:baseline;gap:8px 20px}
+.dzk--zeile .dzk-kopf{margin:0}
+.dzk--zeile .dzk-what{font-size:15px;line-height:1.35;font-weight:600}
+.dzk--zeile .dzk-fuss{border:none;margin:0;padding:0;justify-content:flex-end}
+
+@media (max-width:1000px){
+  .dz-raster,.dz-mb-raster{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dzk--lead{flex-direction:column;gap:0}
+  .dzk--lead .dzk-motiv{flex:none;margin-bottom:11px}
+}
+@media (max-width:640px){
+  .dz-raster,.dz-mb-raster{grid-template-columns:1fr}
+  .dzk--zeile{flex-direction:column;gap:4px}
+  .dzk--zeile .dzk-kopf{flex:none}
+}
+
+.dz-essay{margin-top:44px}
+.dz-foot{margin:30px 0 0;padding-top:14px;border-top:1px solid var(--rule);
+  font-size:14px;font-style:italic;color:var(--ink-3);max-width:75ch}
+
+/* ==========================================================  IMPRESSUM  = */
+.foot{margin-top:60px;border-top:3px solid var(--rule-ink);padding:18px 0 40px}
+.foot-inner{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.13em;color:var(--ink-4)}
+/* Die Pflichtlinks stehen in derselben Etikettenzeile, nicht als zweite
+   Zeile darunter: sie sind Teil des Absenders, nicht ein eigener Abschnitt.
+   Auf schmalen Geraeten bricht der Flex-Umbruch sie von selbst um. */
+.foot-recht{display:inline-flex;gap:14px;margin-left:14px}
+.foot-recht a{color:var(--ink-4);text-decoration:none;border-bottom:1px solid var(--rule-2)}
+.foot-recht a:hover{color:var(--red);border-bottom-color:var(--red)}
+
+/* ---------------------------------------------- Impressum / Datenschutz -
+   Zwei Seiten, ein Satzspiegel. Fliesstext in der Serife, eine Spalte,
+   Zeilenlaenge gedeckelt - hier wird gelesen, nicht ueberflogen. */
+.rechtstext{max-width:70ch;margin:0 auto;padding-top:8px}
+.rechtstext h1{font-size:40px;line-height:1.1;margin:0 0 24px}
+.rechtstext-body{font-size:16.5px;line-height:1.62;color:var(--ink-2)}
+.rechtstext-body h2{font-size:22px;margin:34px 0 10px;line-height:1.2}
+.rechtstext-body h3{font-size:17px;margin:24px 0 8px}
+.rechtstext-body p{margin:0 0 14px}
+.rechtstext-body ul,.rechtstext-body ol{margin:0 0 16px;padding-left:22px}
+.rechtstext-body li{margin-bottom:7px}
+.rechtstext-body a{color:var(--red)}
+/* Die offene Stelle: rote Haarlinie links, kein Kasten. Linien statt
+   Kaesten ist die Regel der ganzen Seite, und eine Warnung ist kein Grund,
+   sie zu brechen. */
+.rechtstext-luecke{border-left:3px solid var(--red);padding:10px 0 10px 14px;
+  margin:0 0 26px;font-size:15px;line-height:1.5;color:var(--ink-2)}
+
+/* =========================================================================
+   Promo Übersicht (eigener Farbraum: promo-* Namen bleiben eigenständig)
+   ========================================================================= */
+.stat-inline-row{display:flex;align-items:baseline;gap:28px;margin-top:20px;flex-wrap:wrap}
+.stat-inline{display:flex;align-items:baseline;gap:8px}
+.stat-inline b{font-size:26px;font-weight:700;font-variant-numeric:lining-nums}
+.stat-inline span{font-family:var(--sans);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-4)}
+/* ======================================================  PROMO  ========= */
+/* Wer wirbt gerade womit. Dieselbe Designsprache wie die Marktrecherche -
+   Newsprint, Serife, Linien statt Kaesten, Rot als Akzent.
+
+   Der Umbau vom 08.08.2026 betrifft die GLIEDERUNG, nicht die Optik: die
+   Seite hatte oben ein Kartenraster ("die staerkste Aktion je Wettbewerber")
+   und unten dieselben Marken noch einmal als dreispaltige Zeilenwand mit
+   einer Meta-Zeile unter jeder Zeile. Zwei Darstellungen derselben Sache,
+   und die untere war reines Rauschen. Jetzt gibt es EINEN Ort je Marke: ihre
+   Rubrikleiste, darunter ihre Aktionen in einem Raster - die staerkste
+   gross, die uebrigen klein, sonst identisch. Das Gewicht kommt aus der
+   Flaeche, nicht aus einer zweiten Bauform. */
+
+/* ---- die Lage: was der Markt gerade faehrt */
+/* Die Balken zaehlen MARKEN, nicht Angebote: sechs Aktionen einer Marke sind
+   eine Kampagne, sechs Aktionen sechs verschiedener Marken sind ein Trend.
+   Schmale Leiste, hoechstens fuenf Zeilen - sie ordnet die Seite ein, sie
+   ist nicht ihr Inhalt. */
+.promo-lage{max-width:430px;margin:26px 0 0;padding-top:14px;
+  border-top:3px solid var(--rule-ink)}
+.lage-titel{margin:0 0 9px;font-family:var(--sans);font-size:10px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--red)}
+.lage-zeile{display:grid;grid-template-columns:minmax(0,1fr) 62px auto;
+  align-items:center;gap:0 12px;padding:4px 0}
+.lage-label{font-size:14px;color:var(--ink-2);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.lage-track{display:block;height:4px;background:var(--paper-3)}
+.lage-fill{display:block;height:100%;background:var(--red)}
+.lage-zahl{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  color:var(--ink-4);white-space:nowrap}
+
+/* ---- der Markenblock: ein Markenkopf, ein Raster */
+/* Der Markenname ist die Ueberschrift dieses Blocks und wird auch so
+   gesetzt: Serife, gross, schwarz. Als 11,5-px-Grotesketikett (Stand bis
+   08.08.2026) war er kleiner als jede Schlagzeile unter ihm - auf einer
+   Seite, die nach Anbietern gegliedert ist, das falsche Gewicht. Die Linie
+   darueber traegt weiterhin die Tier-Farbe, sie ordnet ohne zu schreien. */
+.pmarke{margin-top:46px}
+.pmarke-kopf{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  margin:0 0 16px;padding-top:9px;border-top:3px solid var(--c,var(--rule-ink))}
+.pmarke-name{margin:0;font-family:var(--serif);font-size:clamp(26px,2.6vw,34px);
+  line-height:1.05;font-weight:700;letter-spacing:-.022em;color:var(--ink)}
+.pmarke-name a:hover{color:var(--red)}
+.pmarke-zusatz{margin-left:auto;font-family:var(--sans);font-size:9.5px;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-4);white-space:nowrap}
+
+/* Vier Spalten, die staerkste Aktion ueber zwei. Damit steht das Gewicht im
+   Raster und nicht in einer eigenen Bauform - eine Zeitungsseite entsteht
+   aus einem Raster mit Gewichtung (CLAUDE.md §5). */
+/* Die Karten einer Reihe sind gleich hoch (Rastervoreinstellung `stretch`),
+   und ihr Fuss steht unten (`.pk-fuss{margin-top:auto}`). Damit liegen die
+   Trennlinien einer Reihe auf einer Hoehe.
+
+   Bis zum 16.08.2026 stand hier `align-items:start` - jede Karte so hoch
+   wie ihr Inhalt. Der Gedanke dahinter war richtig (kein Loch INNERHALB
+   einer Karte), die Rechnung ging nur nicht auf: mit unterschiedlich hohen
+   Motiven fing jede Schlagzeile einer Reihe auf einer anderen Hoehe an, und
+   die naechste Reihe stand versetzt darunter. Die Ursache war nicht die
+   Ausrichtung, sondern die Motivhoehe - die ist jetzt fest, und damit
+   bleibt zwischen Schlagzeile und Fuss auch bei gedehnter Karte nur noch
+   der Unterschied zwischen ein- und zweizeiligem Fuss. */
+.promo-karten{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:24px 26px}
+.pkarte{display:flex;flex-direction:column;min-width:0;
+  border-top:1px solid var(--rule);padding-top:10px}
+/* Die staerkste Aktion nimmt zwei Spalten - und mit Motiv auch zwei Zeilen.
+   Nur ueber zwei Spalten stand rechts neben ihr eine halbe Seite Weissraum,
+   weil zwei kleine Karten nie so hoch werden wie eine grosse mit Bild und
+   Absatz. Ohne Motiv gilt das Gegenteil: zwei Zeilen fuellt eine
+   Schriftkachel nicht, sie stuende in einem leeren Feld. */
+.pkarte--gross{grid-column:span 2;
+  border-top:2px solid var(--c,var(--rule-ink));padding-top:12px}
+.pkarte--hoch{grid-row:span 2}
+.pk-flaeche{display:flex;flex-direction:column;flex:1}
+/* Die feste Motivflaeche: 16:9, volle Kartenbreite, fuer JEDE Form eines
+   Motivs - Bild, Banner, Schriftkachel. Sie ist der Grund, warum die Reihen
+   dieses Rasters ueberhaupt buendig stehen. */
+.pk-bild{display:block;margin-bottom:9px;aspect-ratio:16/9;overflow:hidden}
+/* KEINE Platzhalterfarbe hinter dem Bild. Sie stand hier bis zum 08.08.2026
+   und war die Ursache des "leeren Bildkastens", den Antonio auf der
+   simplytel-Karte sah: `loading="lazy"` laesst ein Bild ausserhalb des
+   Sichtfensters ungeladen, und der Browser malt dann die CSS-Flaeche - ein
+   grauer 16:9-Kasten, der wie ein kaputtes Bild aussieht. Gemessen an der
+   fertigen Seite waren das 31 von 36 Bildern, solange nicht gescrollt wurde
+   (und in jedem Screenshot/Ausdruck dauerhaft). Ohne Fuellung bleibt an der
+   Stelle Zeitungspapier - nichts behauptet dort ein Bild. */
+.pk-bild img{display:block;width:100%;height:100%;
+  object-fit:cover;object-position:center}
+/* Ein Werbebanner wird nicht beschnitten, sondern ganz gezeigt: es traegt
+   seine Aussage ueber die volle Breite, und der 16:9-Ausschnitt schneidet
+   genau sie weg (simplytel: 1280x410, uebrig blieb blaue Flaeche). Es steht
+   dafuer VOLLSTAENDIG in derselben Flaeche wie jedes andere Motiv - bis zum
+   16.08.2026 bekam es gar keine und war dadurch 46 statt 156 px hoch, also
+   die Haelfte des Grundes, warum die Reihen versetzt standen. */
+.pk-bild--banner img{object-fit:contain}
+.pk-bildquelle{display:block;margin-top:4px;font-family:var(--sans);
+  font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--ink-4)}
+/* Ohne belegtes Motiv KEIN grauer Kasten - der sah aus wie ein Ladefehler.
+   Stattdessen die Kernzahl des Angebots gross gesetzt ("20 GB · 6,99 €"):
+   sie sagt in zwei Zahlen, worum es geht, und unterscheidet zwei Marken.
+   Die Mechanik stand hier bis zum 08.08.2026 - vier Marken fahren dieselbe,
+   also standen vier identische Kacheln nebeneinander. */
+/* Die Kachel steht in DERSELBEN 16:9-Flaeche wie ein Bild - anders stehen
+   die Reihen nicht buendig, und genau daran ist die Fassung vom 08.08.2026
+   gescheitert. Der Einwand von damals ("mit Bildmass reserviert sie 324 px
+   fuer zwei Zeilen Text und sieht aus wie ein leerer Kasten") bleibt
+   richtig und wird hier anders beantwortet: die Zeilen sitzen UNTEN an der
+   Trennlinie, nicht oben in der Mitte des Feldes, und die Zahl fuellt die
+   Flaeche. */
+.pk-bild--typo{display:flex;flex-direction:column;justify-content:center;
+  gap:6px;padding:12px 14px;border:1px solid var(--rule-2);
+  background:rgba(20,18,14,.028)}
+.pk-typo-zahl{font-family:var(--serif);font-size:clamp(30px,4vw,52px);
+  line-height:1.02;font-weight:700;letter-spacing:-.03em;color:var(--ink);
+  font-variant-numeric:lining-nums;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden}
+.pk-typo-mechanik{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--ink-4)}
+/* Dieselbe Kachel im Kartenformat der kleinen Spalten. Sie ist seit dem
+   08.08.2026 der Regelfall und nicht die Ausnahme: von 77 Karten der
+   Ausgabe vom 8.8. hatten 37 kein belegbares Motiv, und leer gelassen
+   rissen sie in jede Rasterzeile eine Luecke. Kleiner gesetzt (die Spalte
+   ist 296 px breit) und mit einer Haarlinie statt der 1px-Linie - sonst
+   traegt eine Reihe aus vier Kacheln mehr Striche als Text. */
+.pk-bild--typo-klein{padding:10px 12px}
+.pk-bild--typo-klein .pk-typo-zahl{font-size:clamp(20px,1.8vw,25px);
+  letter-spacing:-.02em}
+.pk-bild--typo-klein .pk-typo-mechanik{font-size:8.5px;letter-spacing:.09em}
+/* Zwei Zeilen, und die zweite ist reserviert (`min-height`): eine einzeilige
+   Schlagzeile neben einer zweizeiligen verschoebe sonst den ganzen Rest der
+   Karte um 20 px nach oben. Drei Zeilen sind auf 277 px Breite selten und
+   werden gekappt - die vollstaendige Schlagzeile steht hinter dem Link. */
+.pk-titel{font-family:var(--serif);font-size:15.5px;line-height:1.3;
+  font-weight:600;letter-spacing:-.01em;color:var(--ink);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;min-height:calc(2 * 1.3em)}
+.pkarte--gross .pk-titel{font-size:24px;line-height:1.16;font-weight:700;
+  letter-spacing:-.02em;-webkit-line-clamp:3;min-height:0}
+.pk-flaeche:hover .pk-titel{color:var(--red)}
+.pk-text{margin-top:8px;font-size:15px;line-height:1.48;color:var(--ink-3);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden}
+/* Der Fuss steht buendig am unteren Kartenrand - sonst laege die Haarlinie
+   in jeder Karte einer Reihe auf einer anderen Hoehe. `margin-top:auto`
+   schiebt ihn dorthin, und weil die Karten einer Rasterreihe gleich hoch
+   sind, liegen die Linien einer Reihe damit auf EINER Hoehe. */
+.pk-fuss{display:flex;align-items:center;flex-wrap:wrap;gap:7px 9px;
+  margin:12px 0 0;padding-top:8px;border-top:1px solid var(--rule-2);
+  margin-top:auto}
+/* Die Mechanik als Umriss-Chip: sie benennt die Angebotsart, sie ist keine
+   Dringlichkeit - eine gefuellte Flaeche waere hier lauter als die Sache. */
+.pmech{padding:2px 6px;border:1px solid var(--rule);font-family:var(--sans);
+  font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-3);white-space:nowrap}
+.pk-frist,.pk-flag{font-family:var(--sans);font-size:8.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4);
+  white-space:nowrap}
+.pk-flag--neu{color:var(--red)}
+/* "wichtig" ersetzt den nackten Score auf jeder Karte. Der Score ist eine
+   Rechnung mit fuenf Achsen; als Zahl neben einer Ueberschrift behauptet er
+   eine Genauigkeit, die niemand nachvollzieht. Die Methodik erklaert ihn. */
+.pk-wichtig{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);
+  font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--red)}
+.pk-wichtig::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--red)}
+.pkarte--fading{opacity:.64}
+/* Vodafone selbst - Vergleichsanker, nicht Wettbewerber. */
+.pmarke--eigen{margin-top:46px}
+
+@media (max-width:1100px){
+  .promo-karten{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  .promo-karten{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pkarte--gross{grid-column:span 2}
+  .pkarte--hoch{grid-row:span 1}
+}
+@media (max-width:560px){
+  .promo-karten{grid-template-columns:1fr}
+  .pkarte--gross{grid-column:span 1}
+  .pkarte--hoch{grid-row:span 1}
+  .pkarte--gross .pk-titel{font-size:21px}
+}
+
+.promo-ruhe{margin:34px 0 0;padding-top:12px;border-top:1px solid var(--rule);
+  font-size:14px;line-height:1.6;color:var(--ink-3)}
+.promo-ruhe b{font-family:var(--sans);font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2)}
+.promo-ruhe a{color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.promo-ruhe a:hover{color:var(--red)}
+
+/* ---- die Tiefe */
+.promo-tiefe{margin-top:40px}
+.promo-method{border-top:2px solid var(--rule-ink)}
+.promo-method > summary{list-style:none;cursor:pointer;padding:12px 0;
+  font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.11em;color:var(--ink)}
+.promo-method > summary:hover{color:var(--red)}
+.promo-method > summary::-webkit-details-marker{display:none}
+.promo-method-body{padding:6px 0 20px;font-size:15px;line-height:1.6;
+  color:var(--ink-2);max-width:var(--wrap-text)}
+.promo-method-caveat{font-style:italic;color:var(--ink-3)}
+
+/* ==========================================================  DRUCK  ===== */
+@media print{
+  .topbar,.subbar,.foot,.evidence,.filters{display:none}
+  body{background:#fff;font-size:11pt}
+  .prose{max-width:none;columns:2;column-gap:28px}
+}
+
+/* ==============================================  LIEFERZEIT-RADAR ======= */
+/* Eine Tabelle, weil es um Vergleichbarkeit ueber Zeilen und Spalten geht -
+   nicht um Gewichtung. Jede Zelle traegt ihre eigene Gegenprobe mit:
+   Originaltext, Messzeitpunkt, Belegstufe. Es gibt keine oeffentliche
+   Quelle, gegen die jemand diese Zahlen pruefen koennte; also liefert die
+   Seite den Beleg gleich mit. */
+.lz-tabelle{margin:26px 0 34px;border-top:3px solid var(--rule-ink)}
+.lz-kopf,.lz-zeile{display:grid;
+  grid-template-columns:minmax(160px,1.1fr) repeat(auto-fit,minmax(150px,1fr));
+  gap:0 18px;align-items:start}
+.lz-kopf{padding:9px 0;border-bottom:1px solid var(--rule);
+  font-family:var(--sans);font-size:10.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-4)}
+.lz-zeile{padding:14px 0;border-bottom:1px solid var(--rule-2)}
+.lz-produkt b{font-family:var(--serif);font-size:17px;display:block}
+.lz-produkt i{font-family:var(--sans);font-size:11px;font-style:normal;
+  color:var(--ink-4)}
+.lz-feld{display:block}
+.lz-wert{font-family:var(--serif);font-size:19px;font-weight:700;
+  display:block;color:var(--ink)}
+.lz-wert.lz-sofort{color:#2f6b3a}
+.lz-wert.lz-verzoegert{color:var(--r4)}
+.lz-wert.lz-nein{color:var(--red)}
+.lz-roh{display:block;font-family:var(--sans);font-size:11px;
+  color:var(--ink-3);margin-top:2px}
+.lz-quelle{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4);margin-top:3px}
+.lz-quelle a{color:var(--ink-3)}
+.lz-leer{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.lz-engpass{border-left:2px solid var(--red);padding-left:10px}
+.lz-verlauf{display:flex;gap:3px;margin-top:6px}
+.lz-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
+  display:inline-block}
+.lz-punkt.lz-sofort{background:#2f6b3a}
+.lz-punkt.lz-verzoegert{background:var(--r4)}
+.lz-punkt.lz-nein{background:var(--red)}
+.lz-grenzen{margin:34px 0}
+@media (max-width:760px){
+  .lz-kopf{display:none}
+  .lz-zeile{grid-template-columns:1fr;gap:10px}
+  .lz-feld::before{content:attr(data-anbieter)}
+}
+
+/* ==================================================  VERLAUF (Trend) ==== */
+/* Was waechst, was kippt. Balken statt Linien: es geht um den Vergleich
+   zwischen Monaten, nicht um eine stetige Kurve - und ein Balkengitter
+   traegt zwoelf Hebel nebeneinander, ohne dass eine Legende noetig wird. */
+.dz-verlauf{margin:44px 0}
+.vl-bewegung{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 22px}
+.vl-move{display:block;padding:9px 14px 9px 12px;border-left:3px solid var(--rule);
+  min-width:180px}
+.vl-move.vl-auf{border-left-color:#2f6b3a}
+.vl-move.vl-ab{border-left-color:var(--red)}
+.vl-move-label{display:block;font-family:var(--serif);font-size:17px;
+  font-weight:700;color:var(--ink)}
+.vl-move-delta{display:block;font-family:var(--sans);font-size:11.5px;
+  font-weight:700;margin-top:2px}
+.vl-auf .vl-move-delta{color:#2f6b3a}
+.vl-ab .vl-move-delta{color:var(--red)}
+.vl-move-detail{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4)}
+.vl-gitter{border-top:1px solid var(--rule)}
+.vl-kopf,.vl-zeile{display:grid;
+  grid-template-columns:minmax(140px,1.2fr) repeat(auto-fit,minmax(38px,1fr));
+  gap:0 6px;align-items:end}
+.vl-kopf{padding:6px 0;font-family:var(--sans);font-size:10px;
+  font-weight:700;letter-spacing:.05em;color:var(--ink-4);
+  border-bottom:1px solid var(--rule-2)}
+.vl-monat{text-align:center}
+.vl-monat.vl-duenn{color:var(--rule)}
+.vl-zeile{padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.vl-name{font-family:var(--sans);font-size:12px;color:var(--ink-2);
+  align-self:center}
+.vl-zelle{display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;height:42px;position:relative}
+.vl-balken{display:block;width:14px;background:var(--ink-3);min-height:1px}
+.vl-zahl{font-family:var(--sans);font-size:9.5px;color:var(--ink-4);
+  margin-top:2px}
+@media (max-width:640px){
+  .vl-kopf,.vl-zeile{grid-template-columns:minmax(90px,1fr) repeat(auto-fit,minmax(26px,1fr))}
+  .vl-balken{width:9px}
+}
+
+/* Die Differenzierungs-Hebel je Wettbewerber (report/wettbewerb.py).
+   Zusammen mit Lage, Aktionen und Chronik ergibt das den Steckbrief - der
+   Teil, den kommerzielle Werkzeuge als "Battlecard" verkaufen, hier aber aus
+   vorhandenen Daten abgeleitet statt gepflegt. */
+.wb-hebel{margin-top:18px;border-top:1px solid var(--rule-2);padding-top:12px}
+.wb-hebelliste{list-style:none;margin:6px 0 0;padding:0}
+.wb-hebelliste li{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;
+  padding:5px 0;border-bottom:1px solid var(--rule-2)}
+.wb-hebelliste > li > a{font-family:var(--sans);font-size:12px;font-weight:700;
+  color:var(--ink-2)}
+.wb-hebelliste > li > a:hover{color:var(--red)}
+.wb-hebel-n{font-family:var(--sans);font-size:10px;font-weight:700;
+  color:var(--ink-4)}
+.wb-hebel-beispiel{flex-basis:100%;font-family:var(--serif);font-size:14px;
+  color:var(--ink-3)}
+.wb-hebel-beispiel a{color:var(--ink-3)}
+.wb-hebel-beispiel a:hover{color:var(--red)}
+.wb-flanken{margin:10px 0 0;font-family:var(--sans);font-size:11.5px;
+  color:var(--ink-4)}
+
+/* =============================================  FRUEHWARN-BOARD ========= */
+/* Die Fragen, die dauerhaft offen sind. Bewusst eine ruhige Form: das Board
+   steht ueber der Titelseite und darf sie nicht ueberstrahlen - es ordnet,
+   es meldet nicht. Farbe traegt nur der Zustandspunkt. */
+.fwb{margin:0 0 34px;border-top:3px solid var(--rule-ink)}
+.fwb-gitter{display:grid;gap:0 30px;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.fwb-frage{padding:12px 0 14px;border-bottom:1px solid var(--rule-2)}
+.fwb-titel{margin:0;font-family:var(--serif);font-size:17px;font-weight:700;
+  line-height:1.3;color:var(--ink)}
+.fwb-warum{margin:4px 0 8px;font-family:var(--sans);font-size:11.5px;
+  line-height:1.45;color:var(--ink-4)}
+.fwb-liste{list-style:none;margin:0;padding:0}
+.fwb-ind{display:grid;grid-template-columns:10px 1fr auto;gap:0 8px;
+  align-items:baseline;padding:3px 0}
+.fwb-punkt{width:7px;height:7px;border-radius:50%;background:var(--rule);
+  display:inline-block;align-self:center}
+.fwb-ind.fwb-aktiv .fwb-punkt{background:var(--red)}
+.fwb-ind.fwb-beobachtet .fwb-punkt{background:var(--r4)}
+.fwb-name{font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.fwb-zustand{font-family:var(--sans);font-size:9.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
+.fwb-ind.fwb-aktiv .fwb-zustand{color:var(--red)}
+.fwb-beleg{grid-column:2 / -1;font-family:var(--serif);font-size:13px;
+  line-height:1.35;color:var(--ink-3);margin:1px 0 4px}
+.fwb-beleg a{color:var(--ink-3)}
+.fwb-beleg a:hover{color:var(--red)}
+.fwb-beleg i{display:block;font-style:normal;font-family:var(--sans);
+  font-size:10px;color:var(--ink-4)}
+
+/* --- Tarife: Effektivpreis und Positionskarte -------------------------- */
+/* Linien statt Kaesten, Serife fuer Zahlen, Grotesk fuer Etiketten - wie
+   ueberall. Rot bleibt Akzent: es markiert den eigenen Konzern und die
+   Fair-Value-Linie, sonst nichts. */
+.t-bilanz{margin:24px 0 30px;border-top:3px solid var(--rule-ink);
+  padding-top:14px}
+.t-bilanz-reihe{display:flex;flex-wrap:wrap;gap:34px;margin:12px 0 10px}
+.t-kennzahl b{font-family:var(--serif);font-size:30px;line-height:1;
+  display:block}
+.t-kennzahl span{font-family:var(--sans);font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.t-hinweis{font-size:13.5px;line-height:1.5;color:var(--ink-2);
+  max-width:64ch}
+
+.t-karte{margin:30px 0 34px;border-top:3px solid var(--rule-ink);
+  padding-top:14px}
+.t-erklaer{font-size:14px;line-height:1.55;color:var(--ink-2);
+  max-width:66ch;margin:8px 0 14px}
+.t-svg{width:100%;height:auto;max-width:760px;display:block}
+.t-achse{stroke:var(--ink-3);stroke-width:1}
+.t-raster{stroke:var(--rule-2);stroke-width:1}
+.t-tick{font-family:var(--sans);font-size:10px;fill:var(--ink-4)}
+.t-achsname{font-family:var(--sans);font-size:10px;fill:var(--ink-3);
+  letter-spacing:.05em;text-transform:uppercase}
+.t-fair{stroke:var(--red);stroke-width:1.5;stroke-dasharray:5 4;opacity:.75}
+.t-punkt{fill:var(--ink-2);opacity:.72}
+.t-punkt--eigen{fill:var(--red);opacity:1}
+.t-legende{display:flex;flex-wrap:wrap;gap:14px;list-style:none;padding:0;
+  margin:10px 0 0;font-family:var(--sans);font-size:11px;color:var(--ink-3)}
+
+.t-liste{margin:30px 0;border-top:3px solid var(--rule-ink);padding-top:14px}
+.t-zeile{padding:16px 0;border-bottom:1px solid var(--rule-2)}
+.t-zeile--eigen{border-left:3px solid var(--red);padding-left:12px}
+.t-kopf{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.t-anbieter{font-family:var(--sans);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+.t-name{font-family:var(--serif);font-size:20px;margin:0}
+.t-name a{color:inherit;text-decoration:none}
+.t-name a:hover{color:var(--red)}
+.t-referenz{flex-basis:100%;margin:0;font-family:var(--sans);font-size:11px;
+  color:var(--ink-3)}
+.t-referenz a{color:inherit}
+.t-werte{display:flex;flex-wrap:wrap;gap:30px;margin:10px 0 6px}
+.t-wert b{font-family:var(--serif);font-size:22px;display:block;line-height:1.1}
+.t-wert i{font-style:normal;font-family:var(--sans);font-size:10.5px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-4)}
+.t-flags{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;padding:0;
+  margin:8px 0 0;font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.t-flag::before{content:"·";margin-right:6px;color:var(--ink-4)}
+.t-flag--gut::before{content:"+";color:var(--ink-3)}
+.t-flag--schlecht::before{content:"−";color:var(--red)}
+.t-luecke{font-size:12.5px;line-height:1.5;color:var(--ink-3);
+  margin:8px 0 0;max-width:70ch}
+.t-grenzen{margin:30px 0;border-top:1px solid var(--rule);padding-top:12px}
+.t-grenzen ul{max-width:70ch;font-size:13.5px;line-height:1.6;
+  color:var(--ink-2)}
+.t-leer p{max-width:60ch;color:var(--ink-2)}
+
+@media (max-width:640px){
+  .t-bilanz-reihe{gap:22px}
+  .t-werte{gap:20px}
+  .t-kennzahl b{font-size:24px}
+}
+
+/* --- Der Foliensatz-Verweis. Eine Zeile, kein Kasten. ------------------ */
+/* Seit dem 09.08.2026 am FUSS des Berichts statt ueber der Titelseite -
+   deshalb liegt die Linie jetzt oben statt unten: sie trennt den Verweis
+   vom letzten Absatz des Berichts, nicht von der Ausgabe darunter. */
+.folienlink{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
+  margin:26px 0 0;padding-top:12px;border-top:1px solid var(--rule-2)}
+.folienlink a{color:var(--red);text-decoration:none;font-weight:600;
+  text-transform:uppercase;letter-spacing:.09em}
+.folienlink a:hover{text-decoration:underline}
+.folienlink span{color:var(--ink-4);margin-left:8px}
+
+/* --- Frag das Archiv --------------------------------------------------- */
+.frag-archiv{margin:22px 0 30px;border-top:3px solid var(--rule-ink);
+  padding-top:12px}
+.fa-hinweis,.fa-leer{font-size:13.5px;line-height:1.55;color:var(--ink-2);
+  max-width:66ch;margin:8px 0 14px}
+.fa-liste{list-style:none;counter-reset:fa;padding:0;margin:0}
+.fa-beleg{counter-increment:fa;position:relative;padding:12px 0 12px 38px;
+  border-bottom:1px solid var(--rule-2)}
+.fa-beleg::before{content:counter(fa);position:absolute;left:0;top:14px;
+  font-family:var(--sans);font-size:11px;font-weight:700;color:var(--red)}
+.fa-beleg b{font-family:var(--serif);font-size:17px;display:block;
+  line-height:1.3}
+.fa-beleg span{display:block;font-size:13.5px;line-height:1.5;
+  color:var(--ink-2);margin:3px 0 4px}
+.fa-beleg i{font-style:normal;font-family:var(--sans);font-size:10.5px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-4)}
+.fa-beleg a{font-family:var(--sans);font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--red);text-decoration:none;
+  margin-left:10px}
+.fa-beleg a:hover{text-decoration:underline}
+
+/* --- Geraete- und Preisradar ------------------------------------------- */
+/* Die Positionskarte ist ein gerechnetes SVG (report/geraete_view._karte),
+   keine Bibliothek - dieselbe Bauform wie die Tarifkarte. Hier steht nur,
+   wie sie aussieht; WO die Punkte sitzen, entscheidet Python. */
+.gr-karte,.gr-auffaellig,.gr-matrix,.gr-lifecycle,
+.gr-quellen,.gr-methode,.gr-leer{margin:26px 0 34px}
+.gr-erklaer,.gr-legende,.gr-basis,.gr-ruhe{font-size:13.5px;line-height:1.6;
+  color:var(--ink-2);max-width:74ch;margin:8px 0 14px}.gr-unter{font-family:var(--sans);font-size:11.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);margin:22px 0 6px;
+  padding-top:10px;border-top:1px solid var(--rule-2)}
+.gr-klein{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+  display:block}
+
+/* Reiter.
+   KEINE SCHRIFT UNTER 12 PX in den Regeln von REITER 1 (bis einschliesslich
+   `.gr-a-liste`). Der Auftrag sagt das als hartes Verbot, und
+   `test_keine_beschriftung_unter_zwoelf_pixeln` misst es im gerenderten
+   Dokument. Die erste Fassung dieser Regeln hatte 10,5 px Etiketten -
+   dieselbe Groesse, mit der die geloeschte Grafik ihre 236 unlesbaren Texte
+   gesetzt hat.
+
+   Weiter unten NICHT: `.gr-hersteller` und `.gr-spanne` gehoeren der
+   SKU-Matrix und der Quellenseite. Ein Regex-Durchlauf hat sie am
+   30.08.2026 versehentlich mit hochgezogen, und das ist die falsche
+   Richtung - derselbe Auftrag verlangt die Typografie der bestehenden Site
+   unveraendert. Wer Reiter 2 und 3 baut (B5/B6), entscheidet ueber ihre
+   Schriftgroessen im Zuge dieses Umbaus, nicht per Suchen-und-Ersetzen.
+   Alle Tafeln stehen fertig im HTML; der Reiter blendet um, er laedt nicht
+   neu. Die Leiste ist eine Linie mit einem dicken Strich unter dem aktiven
+   Reiter - kein Kasten, kein Radius, kein Schatten (Regel 2 des Redesigns). */
+.gr-reiter{display:flex;flex-wrap:wrap;gap:0;margin:26px 0 0;
+  border-bottom:1px solid var(--rule)}
+.gr-reiter button{font-family:var(--sans);font-size:12px;letter-spacing:.07em;
+  text-transform:uppercase;background:none;color:var(--ink-3);cursor:pointer;
+  border:0;border-bottom:3px solid transparent;padding:11px 18px;margin-bottom:-1px}
+.gr-reiter button:hover{color:var(--ink)}
+.gr-reiter button[aria-selected="true"]{color:var(--ink);
+  border-bottom-color:var(--red)}
+/* O3 (B1): der Radar-Quasi-Reiter - optisch ein Reiter dieser Leiste,
+   inhaltlich ein LINK auf eine andere Seite. Der Pfeil ↗ macht den
+   Seitenwechsel erkennbar (derselbe Code wie an den Quelllinks der
+   Katalogzeilen); er bekommt KEIN aria-selected und kein data-tafel,
+   denn er ist nie "aktiv" und schaltet keine Tafel um. */
+.gr-reiter .gr-reiter-seite{font-family:var(--sans);font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  border-bottom:3px solid transparent;padding:11px 18px;margin-bottom:-1px}
+.gr-reiter .gr-reiter-seite:hover{color:var(--ink)}
+.gr-reiter-pfeil{font-size:11px}
+/* O3 (B3): der ehrliche Untertitel nach dem Entwurf - Fließtext unter dem
+   Zeitungskopf, keine zweite Überschrift. Der Schwesterseiten-Satz ist auf
+   dem Telefon weggeblendet: derselbe Weg steht als Quasi-Reiter direkt
+   darunter, und die Leitantwort geht vor (Kriterium 11c). */
+.gr-untertitel{margin:10px 0 0;max-width:68ch;font-size:14.5px;
+  line-height:1.5;color:var(--ink-2)}
+.gr-untertitel a{color:var(--red);
+  border-bottom:1px solid rgba(230,0,0,.3);text-decoration:none}
+
+}
+/* Die Tafel: heller als das Newsprint ringsum, mit Haarlinie statt Schatten.
+   Der Auftrag sagt "weisse Karte auf hellgrauem Grund"; im Farbraum dieser
+   Site heisst das --paper-2 auf --paper. Typografie und Farbwelt bleiben
+   damit unveraendert, wie derselbe Auftrag zwei Zeilen weiter verlangt. */
+.gr-tafel{background:var(--paper-2);border:1px solid var(--rule-2);
+  border-top:0;padding:22px 22px 26px}
+.gr-tafel--aus{display:none}
+
+/* Die vier Kennzahl-Kacheln. Sie ersetzen die fuenf Betriebskacheln
+   ("59 Geraete beobachtet") - eine Zahl, die zu keiner Handlung fuehrt,
+   gehoert nicht an den besten Platz der Seite. */
+.gr-kacheln{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border-top:3px solid var(--rule-ink);margin:0 0 22px}
+.gr-kachel{padding:14px 18px 16px;border-right:1px solid var(--rule-2)}
+.gr-kachel:last-child{border-right:0}
+.gr-kachel b{display:block;font-family:var(--serif);font-size:34px;
+  line-height:1.1;font-variant-numeric:lining-nums}
+.gr-kachel span{display:block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.05em;color:var(--ink-3);margin-top:3px}
+.gr-kachel em{display:block;font-family:var(--sans);font-size:12px;
+  font-style:normal;color:var(--ink-4);margin-top:2px}
+.gr-kachel--kritisch b{color:var(--al-kritisch)}
+.gr-kachel--mittel b{color:var(--al-mittel)}
+.gr-kachel--gering b{color:var(--al-gering)}
+.gr-kachel--bestpreis b{color:var(--al-bestpreis)}
+
+/* Filterleiste. Ein aktiver Filter ist rot hinterlegt - er veraendert, was
+   die Tabelle darunter zeigt, und das muss man sehen, ohne die Auswahl zu
+   lesen. Voreingestellt und damit rot: Zustand neu, Preisart ohne Vertrag. */
+.gr-filter{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin:0 0 14px}
+.gr-filter label{font-family:var(--sans);font-size:12px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-4);display:flex;gap:6px;
+  align-items:center;border:1px solid var(--rule);padding:4px 8px}
+.gr-filter label.gr-filter--an{background:var(--red);border-color:var(--red);
+  color:var(--paper-2)}
+.gr-filter select{font-family:var(--sans);font-size:12px;color:var(--ink);
+  background:var(--paper-2);border:0;padding:2px 4px;
+  text-transform:none;letter-spacing:0}
+.gr-filter--an select{background:var(--red);color:var(--paper-2)}
+
+/* Suchfeld links, Knoepfe rechts. */
+.gr-werkzeug{display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  justify-content:space-between;margin:0 0 12px}
+.gr-suche{font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--paper-2);border:1px solid var(--rule);padding:7px 10px;
+  min-width:260px;flex:1 1 260px;max-width:420px}
+.gr-knopf{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;background:none;color:var(--ink-3);cursor:pointer;
+  border:1px solid var(--rule);padding:7px 13px;text-decoration:none;
+  display:inline-block}
+.gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
+.gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
+/* O4: die Export-Knoepfe in der Kopfzeile der Geraete- und der Radar-
+   Seite (page-hero-row, flex-end/space-between). flex:none, damit sie
+   neben dem Datum stehen statt es zu verdraengen; mobil umbricht die
+   Zeile ohnehin (flex-wrap). */
+.page-hero-row .gr-export-knoepfe{flex:none;max-width:100%}
+/* AUF DEM TELEFON IST DIE GANZE KNOPFREIHE weggeblendet (O4, 15.09.2026) -
+   derselbe Praezedenz wie O3, das den UNTERTITEL komplett wegblendet: die
+   drei Knoepfe brauchen gewrappt 77 px, die erste Balkenzeile der
+   Leitzahl endete am echten Bestand bei 810 von 844 px Falz - mit
+   Knöpfen 887. Kriterium 11c (Leitantwort ueber der Falz) geht vor die
+   Platzierung des Entwurfs, der eine Desktop-Kopfzeile zeichnet. Der
+   CSV-Download ist ohnehin ein Excel-Workflow des Schreibtischs; die
+   Dateien bleiben unter ihrer URL erreichbar. */
+@media (max-width:900px){
+  .page-hero-row .gr-export-knoepfe{display:none}
+}
+
+/* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
+   Alarmtabelle - dieselbe Seite, dieselben Spaltenkoepfe -, hat aber eine
+   eigene Klassenfamilie: die zwei Tabellen beantworten verschiedene Fragen
+   und werden getrennt gedeckelt. */
+.gr-ttab{width:100%;border-collapse:collapse;margin:18px 0 0}
+.gr-ttab th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);text-align:left;font-weight:400;
+  padding:0 10px 7px 0;border-bottom:1px solid var(--rule)}
+.gr-ttab td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule-2);
+  vertical-align:top;font-size:14px}
+.gr-t-anbieter{font-family:var(--serif);font-size:15px;font-weight:600;
+  display:block}
+/* Die Leitzahl (E2): TCO-24 gross, Ø/Monat daneben klein. */
+.gr-t-leit{font-family:var(--serif);font-size:19px;font-weight:700;
+  white-space:nowrap}
+/* Eine Luecke sieht NICHT aus wie eine Zahl. Sie steht in der Grotesk der
+   Etiketten, nicht in der Serife der Betraege - wer die Spalte ueberfliegt,
+   soll sie nicht fuer einen kleinen Preis halten. */
+.gr-t-luecke{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+.gr-tzeile--eigen .gr-t-anbieter{color:var(--red)}
+.gr-tdetail td{padding:0 0 11px;border-bottom:1px solid var(--rule-2)}
+.gr-tdetail summary{font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4);
+  cursor:pointer}
+.gr-tdetail summary:hover{color:var(--ink)}
+.gr-tposten{list-style:none;margin:9px 0 0;padding:0;font-size:13.5px}
+.gr-tposten li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
+  border-bottom:1px solid var(--rule-2)}
+.gr-tposten li:last-child{border-bottom:0}
+.gr-tposten em{font-style:normal;margin-left:auto;color:var(--ink-3)}
+.gr-tposten--luecke em,.gr-tposten--offen em{color:var(--ink-4);
+  font-family:var(--sans);font-size:12px}
+.gr-tposten--offen{margin-top:4px}
+.gr-tueber{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);font-weight:400;
+  margin:26px 0 0;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+/* Das Euro-Delta gegen uns. Rot heisst hier NICHT "schlecht", sondern
+   "guenstiger als wir" - dieselbe Bedeutung wie in der Alarmtabelle. */
+.gr-tdelta{margin:18px 0 0;border-left:3px solid var(--rule);padding-left:13px}
+.gr-tdelta-zeile{font-size:13.5px;line-height:1.6;margin:0 0 5px}
+.gr-tdelta-zeile b{font-family:var(--serif);font-size:17px}
+.gr-tdelta--unter{border-left:0}
+.gr-tdelta--unter b{color:var(--red)}
+
+/* Die Alarmtabelle. */
+.gr-alarm{width:100%;border-collapse:collapse}
+.gr-alarm th{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-4);text-align:left;font-weight:400;
+  padding:0 10px 7px 0;border-bottom:1px solid var(--rule)}
+.gr-alarm td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule-2);
+  vertical-align:top;font-size:14px}
+.gr-alarm tbody tr{cursor:pointer}
+.gr-alarm tbody tr:hover{background:var(--paper-3)}
+.gr-a-modell{font-family:var(--serif);font-size:16px;font-weight:600;
+  display:block}
+.gr-a-klein{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  display:block;margin-top:2px}
+/* Unser Preis rot, sobald jemand unterbietet - sonst neutral dunkel. */
+.gr-a-unser{font-family:var(--serif);font-size:15px;font-weight:600;
+  color:var(--ink)}
+.gr-a-unser--zurueck{color:var(--red)}
+.gr-a-fremd{font-family:var(--serif);font-size:15px;font-weight:600;
+  color:var(--al-gering)}
+/* Prozent gross, Euro klein: 15 Euro sind bei 200 Euro viel und bei 2000
+   Euro nichts. Der Prozentsatz ist die vergleichbare Zahl. */
+.gr-a-prozent{font-family:var(--serif);font-size:19px;font-weight:700;
+  display:block;line-height:1.15}
+.gr-a-euro{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  display:block;margin-top:2px}
+/* B7 (31.08.2026, Runde 2 der Zurueckweisung): der Anbietername TRAEGT
+   den Link, statt neben einem nackten Pfeil zu stehen. Bis dahin war nur
+   der Pfeil klickbar, der Name reine Textzelle - fuer ein Auge ohne den
+   `title` unsichtbar, dass die Zeile ueberhaupt einen Link hat.
+
+   B4 der Zurueckweisung hat zwei Fehler der ersten Fassung gemessen, in
+   entgegengesetzte Richtungen:
+
+   1. IM KATALOG (Reiter 2, `.src-table gr-alarm`) SCHLUG `.src-table a`
+      (Spezifitaet 0-1-1) `.gr-a-quelle` (0-1-0). Weil der Name jetzt IM
+      Anker steht, erbte er die ganze fremde Regel: 10 px, Grossbuchstaben,
+      Fettschrift, Rot - "MOBILCOM-DEBITEL". `.gr-alarm a.gr-a-quelle`
+      (0-2-1) schlaegt `.src-table a` unabhaengig von der Reihenfolge im
+      Stylesheet, UND `font:inherit` mitsamt `text-transform`/
+      `letter-spacing` setzt jede Eigenschaft zurueck, die `.src-table a`
+      setzt - sonst gewinnt die Spezifitaet nur EINEN Kampf (Farbe) und
+      verliert den Rest der Eigenschaften einzeln (die Kaskade wirkt je
+      EIGENSCHAFT, nicht je Regel).
+   2. IN DER ALARMTABELLE (Reiter 1, nur `.gr-alarm`, kein `.src-table`)
+      gewann `color:inherit` unbestritten - und `text-decoration:none` galt
+      bis zum Hover. Ohne Maus blieb dort NUR der Pfeil als Hinweis auf
+      einen Link: B7s urspruengliche Beschwerde, unveraendert. Eine
+      staendige, aber gedaempfte Unterstreichung (nicht die rote
+      Akzentfarbe - das waere in einer Tabelle voller Zeilen zu laut) ist
+      jetzt die Grundzusicherung; sie faerbt sich beim Hover um. */
+.gr-alarm a.gr-a-quelle{color:inherit;font:inherit;text-transform:none;
+  letter-spacing:normal;text-decoration:underline;
+  text-decoration-color:var(--ink-4);text-decoration-thickness:1px;
+  text-underline-offset:2px}
+.gr-alarm a.gr-a-quelle:hover{color:var(--red);text-decoration-color:var(--red)}
+.gr-a-pfeil{color:var(--ink-4);margin-left:5px;text-decoration:none}
+.gr-alarm a.gr-a-quelle:hover .gr-a-pfeil{color:var(--red)}
+.gr-a-warnung{display:block;font-family:var(--sans);font-size:12px;
+  color:var(--al-mittel);margin-top:3px}
+
+/* Die Pille ersetzt jede Legende - die Zeile sagt selbst, wie schlimm sie
+   ist. Abgerundete Ecken sind hier die einzige Ausnahme von Regel 2; ohne
+   sie liest sich das Etikett als Tabellenzelle, nicht als Einstufung. */
+.gr-pille{display:inline-block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;
+  border-radius:11px;white-space:nowrap}
+.gr-pille--kritisch{background:var(--al-kritisch);color:var(--paper-2)}
+.gr-pille--mittel{background:var(--al-mittel-hell);color:var(--al-mittel)}
+.gr-pille--gering{background:var(--al-gering-hell);color:var(--al-gering)}
+.gr-pille--bestpreis{background:var(--al-gering-hell);color:var(--al-bestpreis)}
+.gr-pille--ja{background:var(--al-gering-hell);color:var(--al-gering)}
+.gr-pille--nein{background:var(--red-wash);color:var(--red-deep)}
+.gr-pille--unklar{background:var(--paper-3);color:var(--ink-3)}
+
+/* Die Zeilen jenseits von SICHTBAR_MAX stehen fertig im HTML und sind
+   ausgeblendet - "alle anzeigen" braucht kein Netz und keinen Reload.
+   
+   `:not([hidden])` ist hier KEINE Feinheit, sondern der ganze Punkt. Eine
+   Autorenregel schlaegt das `[hidden]{display:none}` des Browsers - Ursprung
+   geht vor Spezifitaet -, und ohne diesen Zusatz zeigte die Tabelle nach
+   "alle anzeigen" die weggefilterten Zeilen weiter an: aufgeklappt auf 20
+   Zeilen, gefiltert auf Samsung, standen drei Apple-Zeilen mitten drin. Das
+   `hidden`-Attribut sass richtig, nur sah man es nicht. */
+/* SORTIERBARE SPALTENKOEPFE (30.08.2026).
+
+   Ein Knopf, der wie eine Ueberschrift aussieht: dieselbe Schrift, dieselbe
+   Farbe, dieselbe Groesse wie der `<th>`-Text vorher - ein Kasten oder eine
+   Farbe je Kopfzelle waeren sieben neue Auszeichnungen in einer Tabelle,
+   die von ihrer Ruhe lebt. Dass er anklickbar ist, sagt der Zeiger und der
+   Pfeil, den die sortierte Spalte traegt.
+
+   Die Richtung steht als `aria-sort` am Knopf, nicht nur als Pfeil: ein
+   Screenreader liest die Tabelle sonst in einer Ordnung, die er nicht
+   benennen kann. */
+.gr-sort{font:inherit;color:inherit;background:none;border:0;padding:0;
+  cursor:pointer;letter-spacing:inherit;text-transform:inherit;
+  text-align:inherit}
+.gr-sort:hover{color:var(--red)}
+.gr-sort:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.gr-sort[aria-sort]::after{content:" \2193";font-size:.9em}
+.gr-sort[aria-sort="ascending"]::after{content:" \2191"}
+/* Der zweite Knopf im Kopf "Unterschied": dieselbe Groesse sortiert nach
+   Euro statt nach Prozent. Er steht kleiner da, weil er die zweite Frage
+   beantwortet, nicht die erste. */
+/* KEINE Verkleinerung. Der zweite Knopf stand mit `.92em` bei 11,04 px und
+   fiel damit unter die 12-px-Grenze, die `pruefe_portal.py` Kriterium 11 und
+   `test_keine_beschriftung_unter_zwoelf_pixeln` fuer JEDE Beschriftung der
+   Seite ziehen. Dass er die zweite Frage beantwortet, sagt seine Farbe. */
+.gr-sort--zweit{color:var(--ink-4)}
+.gr-sort-trenner{margin:0 5px;color:var(--ink-4)}
+
+.gr-a-rest{display:none}
+.gr-alarm--alle .gr-a-rest.gr-a-zeile:not([hidden]){display:table-row}
+
+/* Der Aufklapper unter einer Zeile: alle Anbieter dieses Geraets. */
+.gr-a-auf{display:none}
+/* Dieselbe Falle: ein geoeffneter Aufklapper blieb stehen, wenn seine Zeile
+   weggefiltert wurde - eine Anbieterliste unter einer Zeile, die nicht mehr
+   da ist. */
+.gr-a-auf--an:not([hidden]),
+.gr-alarm--alle .gr-a-auf--an:not([hidden]){display:table-row}
+.gr-a-auf td{background:var(--paper-3);padding:12px 14px}
+.gr-a-liste{list-style:none;margin:0;padding:0;font-size:13.5px}
+.gr-a-liste li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
+  border-bottom:1px solid var(--rule-2)}
+.gr-a-liste li:last-child{border-bottom:0}
+.gr-a-liste .gr-a-eigen{font-weight:600;color:var(--red)}
+.gr-a-liste a{color:var(--red);text-decoration:none}
+.gr-a-liste a:hover{text-decoration:underline}
+
+@media (max-width:760px){
+  .gr-kacheln{grid-template-columns:repeat(2,1fr)}
+  .gr-kachel{border-bottom:1px solid var(--rule-2)}
+  .gr-tafel{padding:16px 14px 20px}
+  .gr-alarm{min-width:700px}
+  .gr-alarm-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Die drei Tabellen des TCO-Reiters rollen IN ihrem `gr-scroll`-Behaelter
+     und bekommen dafuer ihre Mindestbreite. Gestaucht waere bei zweien die
+     BELEGSPALTE unlesbar, und der Beleg ist der Grund, warum die Zahl
+     dasteht; `--bereit` hat keine und braucht die Breite nur fuer ihre vier
+     Spalten.
+
+     Natuerliche Breite auf 390 px gemessen, jede einzeln: `--bereit` 437
+     (sie war es, die den Vorzustand auf 480 px Rechtskante schob),
+     `--simonly` 403, `--leit` 436. `--leit` rendert erst, wenn Phase 4
+     Buendel liefert - der Wert stammt aus einem gestellten Bestand. */
+  .gr-ttab--simonly{min-width:520px}
+  .gr-ttab--bereit{min-width:440px}
+  .gr-ttab--leit{min-width:560px}
+}
+
+/* Was auffaellt */
+.gr-auffaellig-karte{border-top:3px solid var(--rule-ink);padding-top:12px}
+.gr-saetze{list-style:none;padding:0;margin:0}
+.gr-saetze li{font-family:var(--serif);font-size:17px;line-height:1.4;
+  padding:9px 0;border-bottom:1px solid var(--rule-2)}
+.gr-delta--runter{color:var(--r3)}
+.gr-delta--rauf{color:var(--r5)}
+.gr-tabelle{margin-top:14px}
+
+/* SKU-Matrix */
+.gr-matrix-scroll,.gr-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* Der Behaelter KOSTET 14 px, und das ist gemessen statt uebersehen:
+   `overflow-x:auto` macht aus ihm einen eigenen Block-Formatting-Context,
+   also kollabiert der Aussenabstand der Tabelle nicht mehr mit dem des
+   Absatzes darueber. Der Abstand springt von 18 auf 32 px; der TCO-Reiter
+   stand danach auf 1440 px bei 2641 statt 2627 px.
+   Bewusst NICHT weggeraeumt: die Gegenrechnung (`margin-top` an den
+   Behaelter, 0 an die erste Tabelle) traefe `.gr-scroll` auch dort, wo es
+   eine `.src-table` haelt, und verschoebe eine Seite, um die es hier nicht
+   geht. 2641 von 3000 (Kriterium 11b) sind Luft genug; auf 390 px ist der
+   Reiter durch die Behaelter ohnehin 209 px KUERZER. Wer den TCO-Reiter
+   einmal nahe an den Deckel bringt, hat hier drei Behaelter mal 14 px
+   liegen. */
+/* Eine breite Tabelle rollt IN SICH, nie die ganze Seite. Ohne diese zwei
+   Behaelter schob die Bewegungstabelle auf 390 px die komplette Seite nach
+   rechts - und eine Seite, die waagerecht rollt, ist auf dem Telefon
+   unbenutzbar. */
+.gr-scroll .src-table{min-width:520px}
+/* Lange Bezeichner ("application/ld+json") brechen, statt die Seite zu
+   verbreitern - auf 390 px war das der zweite Grund fuer waagerechtes
+   Rollen, und er sass nicht in einer Tabelle, sondern in einem <code>. */
+.gr-methode code,.gr-quellen code,.gr-grund code{overflow-wrap:break-word}
+/* `.list-row` ist ein FLEX-Container: jedes Inline-Kind wird ein eigenes
+   Flex-Element. Drei <code>-Bausteine im Fliesstext sind dort als drei
+   Spalten gelandet und mitten im Wort umgebrochen ("application/ld+ json").
+   Der Beschreibungstext steht deshalb in EINEM span - und weil
+   `.list-row-date` sonst waechst (flex:1 1 auto) und den Text nach rechts
+   drueckt, bekommt das Etikett hier eine feste Breite. */
+.gr-methodenliste .list-row-date{flex:0 0 130px;font-family:var(--mono);
+  font-size:13px}
+.gr-methodenliste .list-row>span:not(.list-row-date){flex:1 1 auto;
+  text-align:left;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+.gr-matrix-tabelle{min-width:640px}
+.gr-modell{text-align:left;font-family:var(--serif);font-size:15px;
+  font-weight:600;white-space:nowrap}
+.gr-hersteller{display:block;font-family:var(--sans);font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4)}
+.gr-zelle b{font-family:var(--serif);font-size:16px}
+.gr-spanne{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4)}
+.gr-zelle--leer{color:var(--ink-4)}
+.gr-strich{color:var(--rule)}
+.gr-varianten summary{font-family:var(--sans);font-size:12px}
+.gr-variantenzeile{font-size:13px;line-height:1.6;margin:6px 0}
+.gr-variante{display:block;color:var(--ink-2);padding-left:12px}
+
+/* Quellenseite */
+.gr-grund{font-size:12.5px;line-height:1.5;color:var(--ink-2);max-width:52ch}
+.gr-einstiege{display:block;font-family:var(--sans);font-size:10.5px;
+  color:var(--ink-4);margin-top:4px}
+.gr-einstiege a{color:var(--ink-3);text-decoration:none}
+.gr-einstiege a:hover{text-decoration:underline}
+.gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
+.gr-basis--duenn{color:var(--r4)}
+
+/* --- Wer ist guenstiger als Vodafone? (G2, 28.08.2026) ------------------
+   ZUR FARBE, nachgesehen am gerenderten Bild statt behauptet: in diesem
+   Portal sind LINKS rot (Designsprache "Zeitungsausgabe": Rot markiert
+   Rubriken, Dringlichkeit und Links). Beide Preise dieser Tabelle sind
+   Links, also stehen beide rot da - das ist die Hausregel und kein
+   Sonderweg. Was Vodafone auszeichnet, ist deshalb nicht die Schriftfarbe,
+   sondern die 3px-Linie links an seiner Spalte.
+   Kein Wert wird eingefaerbt, um ihn zu bewerten: ein guenstigerer
+   Wettbewerber bekommt kein Gruen und kein Warnzeichen. Die Seite
+   beobachtet, sie empfiehlt nicht. */
+.gr-vergleich{margin:34px 0 0}.gr-v-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+  letter-spacing:.03em}.gr-v-datum{display:block;font-family:var(--sans);font-size:10px;
+  color:var(--ink-4)}.gr-v-prozent{font-family:var(--sans);font-size:10.5px;color:var(--ink-3)}.gr-v-liste{list-style:none;margin:6px 0 0;padding:0}
+.gr-v-liste li{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
+  padding:5px 0;border-top:1px solid var(--rule-2);font-size:13px}
+.gr-v-liste li .gr-v-name{display:inline;min-width:12ch}
+.gr-v-liste li .gr-v-datum{display:inline}
+.gr-vergleich-luecke{margin-top:20px;border-top:1px solid var(--rule);
+  padding-top:12px}/* --- Gesamtexport ------------------------------------------------------ */
+/* Die Geraetespalte der SKU-Matrix bleibt beim Waagerechtscrollen stehen.
+   Mit zwei Anbietern war das entbehrlich; ab vier - und erst recht ab acht -
+   scrollt man sonst eine Zeile nach rechts und weiss nicht mehr, zu welchem
+   Geraet sie gehoert. `--paper` als Hintergrund ist Pflicht: ohne ihn
+   scheinen die Zellen darunter durch die klebende Spalte hindurch. */
+.gr-matrix-tabelle th[scope=row]{position:sticky;left:0;z-index:1;
+  background:var(--paper)}
+
+.gr-export{margin:34px 0 0}@media (max-width:720px){}
+
+@media (max-width:720px){` stand hier bis zum 11.08.2026
+     und war die schaerfste Fassung des Grundfehlers: die SVG wurde auf
+     Containerbreite gestaucht, 8 px wurden real 2,7. Jetzt wird gerollt
+     statt gestaucht, also bleibt die Schrift bei 10 px. */
+}
+
+/* =========================================================================
+   NEWSLETTER-ANMELDUNG
+   =========================================================================
+   Dieselbe Designsprache wie der Rest: Linien statt Kaesten, Serife fuer
+   alles, was gelesen wird, Grotesk nur fuer Etiketten. Der einzige
+   Unterschied ist, dass hier jemand etwas TUT - also brauchen die
+   Bedienelemente eine erkennbare Flaeche, und nur sie. */
+.nl{max-width:70ch;margin:0 auto}
+.nl h1{font-size:40px;line-height:1.1;margin:0 0 14px}
+.nl-lead{font-size:17px;line-height:1.6;color:var(--ink-2);margin:0 0 30px;max-width:60ch}
+
+/* Die Veroeffentlichungsschwelle, sichtbar. Rote Haarlinie links wie bei
+   den Rechtstexten - eine Sperre ist kein Grund, die Kastenregel zu
+   brechen. */
+.nl-gesperrt{border-left:3px solid var(--red);padding:11px 0 11px 14px;
+  margin:0 0 28px;font-size:15px;line-height:1.5;color:var(--ink-2)}
+
+.nl-form{margin:0}
+/* Die Rubrikleiste gehoert an die LEGENDE, nicht ans Fieldset. Ein
+   `border-top` auf dem Fieldset laeuft durch die Legende hindurch - im
+   Screenshot vom 11.08.2026 war jede Ueberschrift durchgestrichen. Ein
+   `<legend>` sitzt per Voreinstellung IN der Rahmenlinie ihres Fieldsets;
+   das ist keine Randerscheinung, sondern die einzige Stelle im ganzen
+   Stylesheet, an der das ueberhaupt vorkommt. */
+.nl-block{border:0;padding:0 0 4px;margin:26px 0 0}
+.nl-block legend{float:left;width:100%;padding:12px 0 0;
+  border-top:3px solid var(--rule-ink)}
+.nl-block legend + *{clear:both}
+.nl-hinweis{margin:8px 0 14px;font-size:13.5px;line-height:1.5;
+  color:var(--ink-3);max-width:70ch}
+
+.nl-optionen{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:16px}
+.nl-opt{display:inline-flex;align-items:baseline;gap:7px;font-size:15px;
+  line-height:1.4;cursor:pointer}
+.nl-opt input{accent-color:var(--red);flex:none;transform:translateY(1px)}
+
+.nl-feld{font:400 15px/1.4 inherit;padding:9px 11px;border:1px solid var(--rule-ink);
+  background:#fff;color:var(--ink);min-width:0}
+.nl-feld--breit{width:100%;max-width:34ch;display:block;margin-bottom:18px}
+.nl-feld:focus{outline:2px solid var(--red);outline-offset:1px}
+.nl-stichwort-zeile{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.nl-stichwort-zeile .nl-feld{flex:1 1 22ch}
+
+.nl-btn{font:700 14px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
+  padding:13px 26px;border:0;background:var(--red);color:#fff;cursor:pointer}
+.nl-btn:hover{background:#c00}
+.nl-btn:disabled{background:var(--ink-4);cursor:not-allowed}
+.nl-btn-klein{font:700 12px/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
+  padding:0 16px;border:1px solid var(--rule-ink);background:transparent;
+  color:var(--ink);cursor:pointer}
+.nl-btn-klein:hover{border-color:var(--red);color:var(--red)}
+
+/* Die Trefferzahl-Vorschau - die wirksamste Einzelmassnahme gegen
+   Abo-Muedigkeit, weil sie das Problem loest, bevor es Mails erzeugt. */
+.nl-vorschau{margin:0 0 10px;font:600 12.5px/1.4 var(--sans);color:var(--ink-3);
+  min-height:1.2em}
+.nl-vorschau--warn{color:var(--red)}
+.nl-vorschau--null{color:var(--ink-4)}
+
+.nl-chips{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+.nl-chip{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;
+  border:1px solid var(--rule-ink);padding:4px 6px 4px 10px}
+.nl-chip-weg{border:0;background:none;font-size:17px;line-height:1;cursor:pointer;
+  color:var(--ink-3);padding:0 3px}
+.nl-chip-weg:hover{color:var(--red)}
+
+.nl-consent{display:flex;gap:10px;align-items:flex-start;margin:4px 0 10px;
+  font-size:14.5px;line-height:1.55;color:var(--ink-2);cursor:pointer}
+.nl-consent input{accent-color:var(--red);flex:none;margin-top:4px}
+.nl-consent-text{max-width:64ch}
+/* Absaetze, nicht `white-space:pre-line`: der Umbruch gehoert dem Browser,
+   nicht der Quelldatei (siehe newsletter_seite.einwilligung_absaetze). */
+.nl-consent-p{display:block}
+.nl-consent-p + .nl-consent-p{margin-top:9px}
+.nl-fein{margin:0 0 20px;font-size:12.5px;line-height:1.5;color:var(--ink-4)}
+.nl-status{margin:12px 0 0;font:600 14px/1.5 var(--sans);min-height:1.4em}
+.nl-status--ok{color:#146b3a}
+.nl-status--warn{color:var(--red)}
+
+/* Der Honeypot. KEIN `display:none` und kein `type=hidden` - Skripte fuellen
+   versteckte Felder gezielt NICHT aus. Aus dem Bild geschoben wird es von
+   ihnen ausgefuellt und von Menschen nie gesehen. `aria-hidden` haelt es
+   zusaetzlich von Screenreadern fern, damit es niemanden verwirrt, der die
+   Seite hoert. */
+.nl-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+
+.nl--abschluss{padding-top:6vh}
+.nl-weiter{font:700 15px/1.4 var(--sans);margin-top:26px}
+.nl-weiter a{color:var(--red);text-decoration:none}
+
+@media (max-width:640px){
+  .nl h1{font-size:30px}
+  .nl-optionen{gap:6px 14px}
+  .nl-btn{width:100%}
+}
+
+/* Newsletter-Abschnitt der Quellenseite. Nur Zahlen - die Warnung ist eine
+   Haarlinie, kein Kasten, wie ueberall sonst auf diesen Seiten. */
+.nl-prot-warn{border-left:3px solid var(--red);padding:8px 0 8px 13px;margin:0 0 16px}
+.nl-prot-warn p{margin:0 0 5px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+.nl-prot-warn p:last-child{margin-bottom:0}
+.nl-prot-rot{color:var(--red);font-weight:700}
+.nl-prot-fuss{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-4)}
+
+/* Reiter 3: Preisverlauf.
+   KEINE SCHRIFT UNTER 12 PX, und das gilt hier auch fuer die SVG-Texte -
+   die geloeschte Grafik setzte ihre Achsen mit 10,5 px und war deshalb
+   unlesbar. Kein `transform:rotate` in diesem ganzen Block: passt eine
+   Datumsmarke nicht hin, laesst `beschriftung()` in app.js sie weg. */
+.gr-verlauf{margin:34px 0 0}
+.gr-vsuche{position:relative;max-width:520px;margin:0 0 14px}
+.gr-vlabel{display:block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 4px}
+.gr-vfeld{width:100%;font-family:var(--serif);font-size:16px;padding:9px 11px;
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
+.gr-vfeld:focus{outline:2px solid var(--red);outline-offset:1px}
+.gr-vtreffer{position:absolute;z-index:5;left:0;right:0;margin:2px 0 0;
+  padding:0;list-style:none;background:var(--paper-2);
+  border:1px solid var(--rule);max-height:300px;overflow-y:auto}
+.gr-vtreffer-zeile{padding:8px 11px;font-size:15px;cursor:pointer;
+  border-bottom:1px solid var(--rule-2)}
+.gr-vtreffer-zeile:last-child{border-bottom:0}
+.gr-vtreffer-zeile:hover,.gr-vtreffer-zeile:focus{background:var(--paper-3);
+  outline:none}
+
+.gr-vsteuer{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
+  margin:0 0 16px}
+.gr-vgruppe{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.gr-vknopf{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
+  padding:7px 12px;border:1px solid var(--rule);background:var(--paper-2);
+  color:var(--ink-2);cursor:pointer}
+.gr-vknopf.is-aktiv{background:var(--red);border-color:var(--red);color:#fff}
+.gr-vdatum{font-family:var(--sans);font-size:12px;padding:6px 8px;
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
+
+.gr-vkacheln{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--rule-2);border-top:1px solid var(--rule-ink);
+  border-bottom:1px solid var(--rule);margin:0 0 18px}
+.gr-vkachel{background:var(--paper);padding:12px 14px}
+.gr-vkachel b{display:block;font-family:var(--serif);font-size:24px;
+  line-height:1.1;font-variant-numeric:lining-nums}
+.gr-vkachel span{display:block;font-family:var(--sans);font-size:12px;
+  letter-spacing:.05em;color:var(--ink-3);margin:3px 0 0}
+
+.gr-vbild{margin:0 0 10px;overflow-x:auto}
+.gr-vsvg{width:100%;min-width:640px;height:auto;display:block}
+.gr-vraster{stroke:var(--rule-2);stroke-width:1}
+.gr-vachse{font-family:var(--sans);font-size:12px;fill:var(--ink-3)}
+.gr-vlinie{stroke-linejoin:round;stroke-linecap:round}
+.gr-vpunkt{stroke:var(--paper);stroke-width:1.5}
+/* Ein Punkt, der auf einem fremden Punkt sitzt, wird ein Ring - der darunter
+   bleibt sichtbar. Die Farbe steht am Element (sie ist ein Datenwert je
+   Anbieter), die Strichstaerke hier. */
+.gr-vpunkt--ring{stroke-width:2.5}
+/* Eine Linie, die hinter einer anderen liegt (weniger als zwei Prozent der
+   Preisspanne Abstand), wird gestrichelt gezeichnet und bekommt ein Etikett
+   an ihrem Ende - auf ihrer WAHREN Hoehe, nicht daneben. Am Pixel 10 Pro
+   lagen Vodafone (1099,90 EUR) und mobilcom-debitel (1099,00 EUR) 90 Cent
+   auseinander: die Legende nannte drei Anbieter, das Bild zeigte zwei
+   Linien. Die Schriftgroesse ist dieselbe wie an der Achse - Kriterium 11
+   von `pruefe_portal.py` laesst nichts unter 12 px zu. */
+.gr-vetikett{font-family:var(--sans);font-size:12px;font-weight:600}
+/* Der Bestpreis-Stempel. 12 px ist die Untergrenze der Seite - Kriterium 11
+   von `pruefe_portal.py` misst sie im GERENDERTEN SVG, nicht im Quelltext. */
+.gr-vbest{stroke-width:1.5;stroke-dasharray:3 3;fill:none}
+.gr-vbestmarke{font-family:var(--sans);font-size:12px;font-weight:600}
+.gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
+  font-family:var(--sans);font-size:12px;color:var(--ink-2)}
+.gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
+.gr-vlegende-punkt{width:11px;height:11px;border-radius:50%;display:inline-block}
+.gr-vtabelle table{width:100%}
+.gr-veigen{background:var(--red-wash)}
+
+@media (max-width:760px){
+  .gr-vkacheln{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Der dritte Verfuegbarkeitszustand. "unbekannt" heisst, dass die Quelle
+   nichts gesagt hat - das ist keine schlechte Nachricht und darf nicht wie
+   eine aussehen. Bei o2 traegt jede der 68 Zeilen diesen Wert; in Alarmrot
+   waere die halbe Katalogtabelle rot, ohne dass irgendetwas fehlt. */
+.gr-pille--unbekannt{background:var(--paper-3);color:var(--ink-3);
+  border:1px solid var(--rule)}
+
+/* Der eigene Anbieter in der Portfolio-Tiefe. Die Farbe steht HIER und nicht
+   als `style="background:#e60000"` in der Vorlage: `#e60000` war damit an
+   einer vierten Stelle hartkodiert, waehrend `var(--red)` genau dafuer da
+   ist. */
+.gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
+
+/* DIE PORTFOLIO-ZEILE HAT IHRE EIGENE RASTERSPALTE (30.08.2026).
+
+   `.dz-balken li` teilt sich `1fr 74px 26px` - und die 26 px sind fuer EINE
+   Zahl gedacht ("8"). Die Portfolio-Tiefe setzte dort zwei Zahlen hinein,
+   die Generationen und die Modelle, und die zweite steckte in einem
+   `rubrik-zusatz`. Dessen `margin-left:auto` wirkt nur im Flex- oder
+   Grid-Kontext; als inline-Element in einem 26-px-Kasten stand sie
+   unmittelbar hinter der ersten, ohne ein Zeichen dazwischen. Der Leser sah
+   "2454 Modelle", wo 24 Generationen und 54 Modelle gemeint waren.
+
+   Die Spalte ist jetzt so breit, dass beide Zahlen MIT ihrem Wort
+   hineinpassen; `white-space:nowrap` haelt "24 Generationen · 54 Modelle" in
+   einer Zeile, damit der Mittelpunkt nicht ans Zeilenende faellt und die
+   zwei Zahlen wieder untereinander stehen. */
+/* DER BALKEN BEKOMMT DEN FREIEN PLATZ, nicht der Name.
+
+   `.dz-balken li` gibt dem Namen `1fr` und dem Balken feste 74 px - richtig
+   fuer eine Liste mit langen Bezeichnungen, falsch hier: die vier
+   Anbieternamen sind kurz, und in 74 px sind 24 gegen 20 Generationen drei
+   Pixel Unterschied. Antonios Befund "die vier Balken sind fast gleich lang
+   und sagen nichts" gilt auch nach der Zahlenkorrektur, solange die Spur so
+   schmal ist. Jetzt traegt der Name, was er braucht, und der Balken den
+   Rest. */
+.gr-tiefe li{grid-template-columns:minmax(120px,190px) minmax(0,1fr) minmax(0,auto)}
+.gr-tiefe .dz-balken-spur{height:9px}
+.gr-tiefe-n{white-space:nowrap;text-align:right}
+.gr-tiefe-gen{font-weight:700;color:var(--ink-2)}
+.gr-tiefe-mod{font-weight:600;color:var(--ink-4)}
+.gr-tiefe .gr-eigen .gr-tiefe-gen{color:var(--red)}
+@media (max-width:560px){
+  /* Auf dem Telefon bricht die Zeile unter den Balken um, statt die zwei
+     Zahlen zu stauchen - gerollt statt gestaucht, dieselbe Regel wie bei
+     der geloeschten Positionskarte. */
+  .gr-tiefe li{grid-template-columns:1fr 74px}
+  .gr-tiefe-n{grid-column:1 / -1;text-align:left}
+}
+
+/* ===================================================================
+   PHASE R - die TCO-Hauptansicht der Geraeteseite (04.09.2026)
+
+   Eine Anbieterfarbe, ueberall dieselbe (C.3): `gr-anb--<slug>` faerbt
+   die Karte, den Balken in G1 und die Linie in G2. Die Kostenart
+   unterscheidet sich in der DECKKRAFT, nicht in der Farbe - sonst
+   braeuchte jede Kombination aus Anbieter und Posten einen eigenen Ton,
+   und die Legende waere laenger als die Grafik.
+   =================================================================== */
+.gr-anb--o2{--anb:#0019a5}
+.gr-anb--1-1{--anb:#00589e}
+.gr-anb--telekom{--anb:#e20074}
+.gr-anb--vodafone{--anb:#e60000}
+.gr-anb--congstar{--anb:#f5a800}
+.gr-anb--mobilcom-debitel{--anb:#6b4f9e}
+.gr-anb--freenet{--anb:#6b4f9e}
+.gr-anb--aldi-talk{--anb:#00447c}
+.gr-anb--medimax{--anb:#8a8f00}
+.gr-anb--electronicpartner{--anb:#00736b}
+/* KEIN `--anb`-Vorgabewert AUF diesen Elementen: sie tragen die
+   Anbieterklasse selbst, beide Regeln haetten dieselbe Spezifitaet, und
+   die spaetere gewaenne - alle Balken standen damit grau da, obwohl die
+   Anbieterfarbe definiert war. Der Rueckfall gehoert deshalb in das
+   `var()` an der Verwendungsstelle. */
+
+/* Modell-Selector und Ergebnisband */
+.gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin:16px 0 12px;padding-bottom:12px;border-bottom:2px solid var(--rule-ink)}
+.gr-msel label{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+/* `min-width:0` UND `max-width:100%`: ein `<select>` nimmt sonst die
+   Breite seiner laengsten Option an ("Samsung Galaxy Z Fold8 Ultra 256 GB
+   – 3 Anbieter"), und ein Flex-Kind hat voreingestellt `min-width:auto`.
+   Auf 390 px lief die Seite damit 429 px breit - dieselbe Fehlerklasse
+   wie beim Zeitungskopf am 11.08.2026. */
+.gr-msel select{font-family:var(--sans);font-size:14px;padding:6px 8px;
+  border:1px solid var(--rule);background:var(--paper-2);max-width:100%;
+  min-width:0;flex:1 1 240px}
+/* GROSS UND SOFORT (BRIEF_FADEN, 05.09.2026): die Geraeteauswahl ist die
+   erste Handlung der Seite, direkt unter der Reiterleiste - nichts steht
+   mehr davor. Label und Select treten dafuer groesser auf als jedes
+   andere Bedienelement dieser Tafel. */
+.gr-msel--gross{padding-bottom:16px;margin-top:6px}
+.gr-msel--gross label{font-size:13px}
+.gr-msel--gross select{font-family:var(--serif);font-size:20px;
+  padding:10px 12px;flex:1 1 320px}
+.gr-mband{margin:0 0 12px}
+
+/* GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): die Tarifband-Auswahl steht NEBEN
+   der Geraeteauswahl - zwei `.gr-msel-feld` statt Label/Select direkt als
+   Flex-Kinder von `.gr-msel`, damit jedes Feld seine Unterzeile
+   (`.gr-a-klein`) mitnimmt und trotzdem umbricht wie zuvor. */
+.gr-msel--zwei{align-items:flex-start}
+.gr-msel-feld{display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  flex:1 1 320px;min-width:0}
+.gr-msel-feld .gr-a-klein{flex-basis:100%}
+.gr-tband-block{margin:12px 0}
+.gr-tband-kopf{font-family:var(--sans);font-size:13px;font-weight:700;
+  letter-spacing:.02em;color:var(--ink-3);margin:0 0 6px}
+/* P1 (UX-5, 11.09.2026): die exakten TCO-24-Werte je Anbieter ALS TEXT
+   unter dem Band-Chart - der Hover-Tooltip existiert am Telefon nicht.
+   Eine Zeile je Anbieter: Name (mit Tarif und GB) links, Betrag rechts,
+   in der Anbieterfarbe des Charts; Linien statt Kasten (Hausregel). */
+.gr-tband-werte{margin:6px 0 2px;padding:0;display:grid;gap:0}
+.gr-tband-wert{display:flex;justify-content:space-between;gap:16px;
+  align-items:baseline;padding:5px 0 4px;border-top:1px solid var(--rule-2);
+  font-family:var(--sans)}
+.gr-tband-wert:first-child{border-top:none}
+.gr-tband-wert dt{font-size:13px;font-weight:700;color:var(--anb,#57534a);
+  margin:0;min-width:0}
+.gr-tband-wert dd{margin:0;font-family:var(--serif);font-size:16px;
+  font-weight:700;white-space:nowrap}
+.gr-tband-wert--eigen dt::after{content:" · unser Angebot";
+  font-weight:400;font-size:12px;color:var(--ink-4)}
+.gr-hgraph{margin:6px 0 22px;border-top:1px solid var(--rule-ink);
+  padding-top:12px}
+.gr-hgraph-kopf{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin:0 0 2px}
+.gr-hgraph-titel{font-family:var(--sans);font-size:13.5px;font-weight:700;
+  letter-spacing:.02em;color:var(--ink);margin:0}
+.gr-bandchip{font-family:var(--sans);font-size:12px;color:var(--ink-3);
+  background:var(--paper-3);padding:2px 8px}
+.gr-hgraph-unter{margin:2px 0 10px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-balkenliste{margin:0}
+.gr-bz{display:grid;grid-template-columns:minmax(150px,200px) 1fr 205px;
+  gap:2px 16px;align-items:center;padding:6px 0 5px;
+  border-bottom:1px solid var(--rule-2)}
+.gr-bz:last-child{border-bottom:none}
+.gr-bz-name{min-width:0}
+.gr-bz-anbieter{font-family:var(--sans);font-size:13.5px;font-weight:700;
+  color:var(--ink)}
+.gr-bz-chip{font-family:var(--sans);font-size:12px;font-weight:600;
+  color:var(--red);border:1px solid var(--red);padding:0 6px;
+  margin-left:7px;white-space:nowrap}
+.gr-bz-tarif{display:block;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.gr-bz-spur{position:relative;height:14px;min-width:0}
+.gr-bz-fill{position:absolute;left:0;top:0;height:14px;
+  background:var(--ink-4)}
+.gr-bz--eigen .gr-bz-fill{background:var(--red)}
+.gr-bz-wert{text-align:right;min-width:0}
+.gr-bz-tco{font-family:var(--serif);font-size:16.5px;font-weight:700;
+  font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.gr-bz-delta{display:block;font-family:var(--sans);font-size:12px;
+  color:var(--ink-3);font-variant-numeric:tabular-nums}
+.gr-bz-ref{display:block;font-family:var(--sans);font-size:12px;
+  font-weight:600;color:var(--red)}
+.gr-lueckenzeile{margin:12px 0 0;padding-top:10px;
+  border-top:1px solid var(--rule);font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-hgraph-leer{margin:2px 0 8px;font-family:var(--sans);font-size:12.5px;
+  color:var(--ink-3)}
+.gr-hgraph-wie{margin:10px 0 0}
+.gr-tco-fussnote{margin:14px 0 0;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+
+/* --------------------------------------------------------------------
+   O2 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): die Bündel-Zeilen.
+   Jedes Bündel des gewählten Modells ist EINE Zeile mit fünf Kernangaben
+   (Anbieter, Tarif · Volumen, TCO-24, Δ, Gerät ohne Vertrag) und EINEM
+   schmalen Rechenweg-Aufklapper - Form nach dem freigegebenen Entwurf
+   (`.bnd` in docs/entwuerfe/geraete-optik-2026-09-11/entwurf.html).
+   Linien statt Kasten: die Zeile trennt eine Haarlinie, die Anbieterfarbe
+   sitzt als 3px-Balken am linken Rand (dieselbe Farbe wie am Graphen).
+   -------------------------------------------------------------------- */
+.gr-buendel{margin:6px 0 26px;border-top:1px solid var(--rule-ink);
+  padding-top:12px}
+.gr-buendel[hidden]{display:none}
+.gr-bnd-titel{font-family:var(--serif);font-size:17px;font-weight:700;
+  margin:0 0 6px}
+.gr-bnd-kopf,.gr-bnd summary{
+  display:grid;gap:0 14px;
+  grid-template-columns:132px minmax(0,1fr) 118px 138px 128px 18px;
+  align-items:baseline}
+/* 12px, nicht 11.5px wie die Seitenetiketten: die Bündel-Tabelle steht
+   im Reiter 1, und der kennt keine Schrift unter 12px
+   (`test_keine_beschriftung_unter_zwoelf_pixeln`). */
+.gr-bnd-kopf{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  text-transform:uppercase;letter-spacing:.04em;padding:0 6px 6px 9px;
+  border-bottom:1px solid var(--rule-2)}
+/* O3 (Auftrag C): die Sortierknöpfe des Kopfs erben dessen Typografie
+   vollständig - kein eigener Knopf-Look, sie SIND die Spaltenbeschriftung.
+   Der aktive Zustand ist ein Richtungspfeil, kein Farbwechsel; bewusst
+   gilt das nur am SCHIRM: mobil ist der Kopf versteckt (Zeilen stapeln),
+   und die Sortierung ist ein Werkzeug des Vergleichens, nicht des
+   ersten Lesens. */
+.gr-bsort{appearance:none;background:none;border:0;margin:0;padding:0;
+  cursor:pointer;font:inherit;text-transform:inherit;
+  letter-spacing:inherit;color:inherit}
+.gr-bsort:hover{text-decoration:underline;text-underline-offset:3px}
+.gr-bsort:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.gr-bsort.ist-auf::after{content:" ↑";color:var(--ink-3)}
+.gr-bsort.ist-ab::after{content:" ↓";color:var(--ink-3)}
+.gr-bnd-kopf span:nth-child(3),.gr-bnd-kopf span:nth-child(4),
+.gr-bnd-kopf span:nth-child(5){text-align:right}
+.gr-bnd{border-bottom:1px solid var(--rule);border-left:3px solid
+  var(--anb,#57534a);margin:0 0 0}
+.gr-bnd summary{cursor:pointer;list-style:none;padding:9px 6px 9px 6px;
+  font-variant-numeric:tabular-nums;line-height:1.45}
+.gr-bnd summary::-webkit-details-marker{display:none}
+.gr-bnd summary:hover{background:var(--paper-2)}
+.gr-bnd summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.gr-bnd-name{font-weight:700;color:var(--anb,#57534a)}
+.gr-bnd-tarif{font-family:var(--serif);font-size:13px;color:var(--ink-2);
+  min-width:0}
+.gr-bnd-tco{text-align:right;font-family:var(--serif);font-size:15px;
+  font-weight:650}
+/* 12px - siehe .gr-bnd-kopf: Reiter-1-Regel, keine Ausnahme für Etiketten
+   an der Zahl selbst. */
+.gr-bnd-label{font-family:var(--sans);font-style:normal;font-size:12px;
+  color:var(--ink-4);margin-left:3px;white-space:nowrap}
+.gr-bnd-label--fin{display:block;margin:0}
+.gr-bnd-delta,.gr-bnd-bar{text-align:right;font-family:var(--sans);
+  font-size:13px;color:var(--ink-2)}
+.gr-bnd-delta{white-space:nowrap}
+.gr-bnd-chev{text-align:right;color:var(--ink-4);font-family:var(--sans)}
+.gr-bnd:not([open]) .gr-bnd-chev::before{content:"+"}
+.gr-bnd[open] .gr-bnd-chev::before{content:"−"}
+.gr-bnd-rw{margin:0 6px 12px;padding:10px 14px;background:var(--paper-2);
+  border-left:1px solid var(--rule-2);border-right:1px solid var(--rule-2);
+  border-bottom:1px solid var(--rule-2);font-size:13px;color:var(--ink-2);
+  max-width:82ch}
+.gr-bnd-rw-z{margin:0 0 6px;color:var(--ink);font-weight:550;
+  font-variant-numeric:tabular-nums}
+.gr-bnd-rw-bar{margin:0 0 6px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+/* SQ67 (15.09.2026), an den Zeilen-Ort portiert: die Paradox-Zeile im
+   Rechenweg, direkt unter den zwei Zahlen der Zeile (TCO und Geräte-
+   preis/Finanzierung). Zurueckgenommen (13,5 px, grau), aber im Lesefluss
+   des geoeffneten Rechenwegs - sie erklaert die beiden Zahlen ueber ihr,
+   sie konkurriert nicht mit ihnen. Nicht unter 12 px: Vorlagenregel 2
+   dieser Seite. In der Vor-O1-Kartenfassung stand die Regel HINTER
+   `.gr-kk-zweit` (gleiche Spezifitaet, spaeter gewinnt) - die Klasse
+   gibt es in der Zeilenform nicht mehr, die Regel steht fuer sich. */
+.gr-kk-paradox{margin:0 0 8px;font-size:13.5px;line-height:1.45;
+  color:var(--ink-3)}
+/* Die Gruppe ohne Tarifband (§ 7): klar getrennt UNTER der Bandliste -
+   eigene Überschrift, eigene Haarlinie, keine Kartenmischung. */
+.gr-ohneband{margin-top:18px;border-top:2px solid var(--rule);
+  padding-top:10px}
+.gr-ohneband-kopf{font-family:var(--sans);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 2px}
+.gr-haendlerzeile{margin:6px 0 0;padding:7px 6px;font-size:13px;
+  color:var(--ink-2);border-top:1px solid var(--rule);
+  font-variant-numeric:tabular-nums}
+.gr-haendlerzeile b{color:var(--ink);font-weight:700}
+
+/* Auf dem Telefon werden die Zeilen GESTAPELT, nicht gequetscht (derselbe
+   Grundsatz wie am Graphen): Anbieter und TCO oben, Tarif und Gerät darunter,
+   Delta und Chevron in der dritten Reihe. Die Zahlenspalten richten sich
+   rechts aus, weil sie unten rechts im Stapel landen. */
+@media (max-width:900px){
+  .gr-bnd-kopf{display:none}
+  .gr-bnd{border-left-width:3px}
+  .gr-bnd summary{
+    grid-template-columns:1fr auto;row-gap:3px;
+    grid-template-areas:"an tco" "tar bar" "dl chev"}
+  .gr-bnd-an{grid-area:an;min-width:0}
+  .gr-bnd-tco{grid-area:tco;text-align:right}
+  .gr-bnd-tarif{grid-area:tar}
+  .gr-bnd-bar{grid-area:bar;text-align:right}
+  .gr-bnd-delta{grid-area:dl}
+  /* O3-Evaluation S4: der Kopf ist hier versteckt - die Delta-ZEILE des
+     Stapels stünde damit als zweiter nackter Euro-Betrag neben dem
+     Geraet-ohne-Vertrag-Wert. Das Delta-Praefix erklaert sie mit einem
+     Zeichen (dieselbe Benennung wie die Desktop-Spalte "Δ zu Vodafone");
+     vor "Referenz" und "–" steht es nicht, die Klasse setzt das Makro. */
+  .gr-bnd-delta--wert::before{content:"Δ ";font-family:var(--sans);
+    color:var(--ink-4)}
+  .gr-bnd-chev{grid-area:chev}
+  .gr-bnd-rw{margin:0 0 12px;padding:10px 12px}
+}
+/* Der Leer-Satz der Antwortzeile steht INNERHALB von .gr-antwort, die
+   ihre eigene 3px-Linie trägt - hier kein zweiter Rahmen. */
+.gr-antwort .gr-antwort--leer{border-top:none;padding:0 0 10px;margin:0}
+
+
+/* Die eine Antwortzeile - jetzt die LEITZAHL der Seite (BRIEF F-4a,
+   05.09.2026, hoechste Prioritaet: "sie ist der Grund, warum die Seite
+   existiert"). Vorher 19px Fliesstext, kleiner als die Karten-Leitzahl
+   (27px) - genau das war der Befund ("geht unter dem Chart unter").
+   Jetzt groesser als jede Kartenzahl (32px), weil diese EINE Zeile ueber
+   der ganzen Tafel steht, nicht neben 66 Anbieterkarten. Linien statt
+   Kasten (Hausregel: "keine Schatten, kein Radius"): eine eigene
+   3px-Rubriklinie grenzt sie ab, keine Flaeche. */
+.gr-antwort{margin:0 0 20px;padding:16px 0 2px;border-top:3px solid var(--ink)}
+.gr-antwort-reihe{display:flex;flex-wrap:wrap;gap:6px 40px;margin:0}
+.gr-antwort-leit{margin:0;display:flex;flex-direction:column;gap:3px;
+  min-width:0}
+.gr-antwort-leit b{font-family:var(--sans);font-size:12px;
+  letter-spacing:.07em;text-transform:uppercase;font-weight:600;
+  color:var(--ink-3)}
+/* `.gr-antwort-zahlzeile` blockifiziert im Flex-Kontext (direktes Kind von
+   `.gr-antwort-leit`); Zahl und Anbieter darin bleiben inline und teilen
+   sich die Grundlinie - dieselbe Bauform wie `.gr-kk-leit`, nur mit einem
+   dritten Element (Anbieter) daneben statt einer zweiten Zeile. */
+.gr-antwort-zahl{font-family:var(--serif);font-size:32px;font-weight:700;
+  line-height:1.1;color:var(--ink)}
+.gr-antwort-anbieter{font-family:var(--sans);font-size:14px;
+  color:var(--ink-3)}
+/* Die Erklaerzeile (Vision-Befund 8, F-4a): "guenstig mit Tarif: X €" ist
+   fuer Laien mehrdeutig (teurer? guenstiger?) - dieser eine Satz
+   unterscheidet die zwei Begriffe. Kein Methodenabsatz: sans, klein,
+   gedaempft, wie jede andere Nebenzeile dieser Tafel (`.gr-a-klein`). */
+.gr-antwort-erklaer{margin:10px 0 0;font-family:var(--sans);
+  font-size:12.5px;line-height:1.4;color:var(--ink-3)}
+.gr-antwort--leer{border-top:1px solid var(--rule);padding:12px 0;
+  margin:0 0 16px;font-family:var(--sans);font-size:13px;
+  color:var(--ink-3);font-style:italic}
+
+/* Mobil: Zeilen gestapelt statt gestaucht - Name und Wert teilen sich die
+   erste Zeile, die Balkenspur läuft darunter über die volle Breite. Kein
+   Querscroll, keine Schrift unter 12 px (Hausregeln der Vorlage). */
+@media (max-width:640px){
+  .gr-bz{grid-template-columns:1fr auto;
+    grid-template-areas:"name wert" "spur spur";row-gap:2px;padding:2px 0 2px}
+  .gr-bz-name{grid-area:name}
+  .gr-bz-wert{grid-area:wert}
+  .gr-bz-spur{grid-area:spur}
+  .gr-bz-chip{margin-left:5px}
+  .gr-bz-tco{font-size:15px}
+  /* O1/A1: die beste Zeile muss OHNE Scrollen im Bild stehen. Dafür rücken
+     auf dem Telefon alles, was vor ihr steht, auf sein Maß: Auswahl und
+     Antwortzeile verlieren ihre Schreibtischgröße (Desktop unverändert -
+     dort steht die Falz bei 900 px mit Luft), die Chart-Chrome-Zeile
+     entfällt ganz (ihre Δ-Erklärung steht in "Wie gerechnet?"), und der
+     Modelltitel rückt näher. Gemessen am 390x844-Telefon: Header+Hero+
+     Reiter kosten 465 px - der Rest gehört der Leitantwort.
+     Nachschärfung vom 11.09.2026 abends: am ECHTEN Bestand endete die
+     erste Balkenzeile bei 862 von 844 px - die Fixture-Antwortzeile ist
+     eine Zeile kürzer, weil ihre Anbieternamen ("(o2)") neben die Zahl
+     passen, während "(congstar)" am echten Stand unter die Zahl bricht.
+     Die Zeile bleibt dominanter als alles andere auf der Tafel (20 px
+     Serife gegen 15 px Graphwerte), aber ihr Zeilenmaß gehört der Falz;
+     das Falzmaß am echten Bestand nagelt Kriterium 11 von
+     pruefe_portal.py. */
+  .gr-msel{margin:4px 0 4px;padding-bottom:4px;gap:5px}
+  .gr-msel--gross{padding-bottom:4px;margin-top:0}
+  .gr-msel--gross select{font-family:var(--sans);font-size:15px;
+    padding:5px 8px}
+  .gr-msel-feld{flex-basis:100%;gap:6px}
+  .gr-msel-feld select{flex-basis:170px}
+  .gr-tueber{margin-top:2px}
+  .gr-antwort{padding:6px 0 2px;margin:0 0 6px}
+  /* Der Spalt zwischen den zwei Zahlen ist auf dem Telefon kleiner als auf
+     dem Schreibtisch: er gibt den Bloecken die Breite, die der Anbieter in
+     Klammern braucht, um NEBEN der Zahl zu stehen. Bricht er darunter
+     (langer Discounter-Name), bleibt die Zeile trotzdem ueber der Falz -
+     das Falzmass laesst beide Faelle zu, gemessen am echten Bestand. */
+  .gr-antwort-reihe{gap:4px 12px}
+  .gr-antwort-leit{flex:1 1 44%;min-width:0}
+  .gr-antwort-zahl{font-size:20px;line-height:1.2}
+  .gr-antwort-anbieter{font-size:12.5px}
+  .gr-antwort-erklaer{margin-top:3px;font-size:12px}
+  .gr-hgraph{margin:0 0 12px;padding-top:4px}
+  .gr-hgraph-kopf{margin-bottom:0}
+  .gr-hgraph-unter{display:none}
+}
+
+/* Die Details-Aufklappung (BRIEF_FADEN): Ampel-Kacheln und
+   Analysten-Tabellen sind hier zusammengefasst, damit sie nicht mehr im
+   Lesefluss zwischen Auswahl und Anbieterkarten stehen. */
+.gr-tafel-details{margin-top:8px}
+.gr-tafel-details > summary{font-family:var(--sans);font-size:13px;
+  font-weight:600;letter-spacing:.02em;cursor:pointer;color:var(--ink-2)}
+.gr-tafel-details .gr-chips{margin-top:12px}
+
+/* SQ67 (15.09.2026), mit der Tafel portiert: Das Glossar am Ende der
+   Vergleichsansicht - je Begriff eine Zeile, Begriff in Sans fett links,
+   Definition in Serife rechts. Linien statt Kasten (Hausregel); auf dem
+   Telefon untereinander statt nebeneinander. */
+.gr-glossar{margin-top:26px}
+.gr-glossar-liste{margin:0}
+.gr-glossar-eintrag{display:grid;grid-template-columns:230px 1fr;gap:14px;
+  padding:10px 0;border-top:1px solid var(--rule-2)}
+.gr-glossar-eintrag dt{font-family:var(--sans);font-weight:700;font-size:13px;
+  color:var(--ink);margin:0}
+.gr-glossar-eintrag dd{margin:0;font-size:15px;line-height:1.5;
+  color:var(--ink-2)}
+@media (max-width:900px){
+  .gr-glossar-eintrag{grid-template-columns:1fr;gap:3px}
+}
+
+/* Die Alarme als Chips (H4). Sie SIND Preis-Historie-Ereignisse und
+   stehen deshalb im Kopf der Hauptansicht, nicht in einem eigenen Reiter. */
+.gr-chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;
+  margin:0 0 16px}
+.gr-chip{font-family:var(--sans);font-size:12px;padding:5px 10px;
+  border:1px solid var(--rule);background:var(--paper-2)}
+.gr-chip b{font-family:var(--serif);font-size:16px;margin-right:4px}
+.gr-chip em{font-style:normal;color:var(--ink-4);margin-left:4px}
+.gr-chip--kritisch b{color:var(--al-kritisch)}
+.gr-chip--mittel b{color:var(--al-mittel)}
+.gr-chip--gering b{color:var(--al-gering)}
+.gr-chip--bestpreis b{color:var(--al-bestpreis)}
+
+/* DER BLOCK HEISST `gr-tmodell` UND NICHT `gr-modell`, und das ist keine
+   Geschmacksfrage: `.gr-modell` gibt es seit dem 30.08.2026 in der
+   SKU-Matrix, und es traegt `white-space:nowrap`. Als `.gr-modell`
+   gesetzt erbte jede Karte darin das Umbruchverbot - jede Zeile stand
+   auf EINER Zeile, die min-content-Breite war 1346 px, und die Seite
+   lief auf dem Telefon 1389 px breit statt 390. Im HTML war davon nichts
+   zu sehen; gemessen wurde es im Browser. */
+.gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
+  border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
+/* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
+   damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
+.gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
+  font-weight:700}
+/* 12 px, nicht 11: kein Text unter zwoelf Pixeln (Hausregel seit dem
+   30.08.2026, `test_keine_beschriftung_unter_zwoelf_pixeln`). */
+.gr-g1-delta{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g1-zustand{font-family:var(--sans);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;fill:var(--red,#e60000)}
+.gr-t-zustand{color:var(--red,#e60000);font-weight:700}
+.gr-kk-bau,.gr-kk-24,.gr-kk-eff,.gr-kk-nach,.gr-kk-bonus,.gr-kk-hinweis,
+.gr-kk-luecke{margin:0 0 5px;font-size:13px;line-height:1.45}
+/* Der Satz unter der Zweitzahl sagt, WORAUS das Ø besteht. Er gehoert zur
+   Zahl und nicht zu den Bausteinen - Grotesk, klein, aber nicht unter
+   12 px (Hausregel seit 30.08.2026). Ohne eigene Regel erbte er die
+   Serife der Karte und stand so gross wie die Leitzahl daneben. */
+/* .gr-kk-omonat: die Ø/Monat-Zeile, seit A-R5 (BRIEF_RAHMEN2) die dritte
+   statt die zweite Zahl der Karte - dieselbe zurueckgenommene Stimme wie
+   die Bindungszeile daneben. */
+.gr-kk-basis{margin:-4px 0 8px;font-family:var(--sans);
+  font-size:12px;line-height:1.4;color:var(--ink-4)}
+.gr-kk-24 b{font-weight:600}
+.gr-kk-eff .gr-a-klein{display:block}
+.gr-kk-hinweis,.gr-kk-luecke{color:var(--ink-3);font-style:italic}
+/* Die benannte Nach-Laufzeit-Luecke (F5) steht in derselben Stimme wie die
+   uebrigen Luecken der Karte - kursiv, zurueckgenommen, aber da. */
+.gr-kk-nach--luecke{color:var(--ink-3);font-style:italic}
+.gr-kk-delta{margin:6px 0 6px;font-family:var(--sans);font-size:12.5px;
+  font-weight:600;color:var(--al-kritisch)}
+.gr-kk-delta--unter{color:var(--al-bestpreis)}
+/* G1 und G2 */
+.gr-grafik{margin:0 0 18px;padding:0}
+.gr-grafik figcaption{font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);margin-top:6px;line-height:1.5}
+.gr-g1,.gr-g2,.gr-g0,.gr-tcoband{display:block;width:100%;height:auto}
+
+/* G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026). Dieselbe
+   Bauform wie G2 (Raster, Achse, Linie, Punkt, Legende); eigene Klassen,
+   weil G0 zusaetzlich eine Sammelluecke UND einzelne Punkte kennt, die G2
+   nicht zeichnet. */
+.gr-g0-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g0-raster--x{stroke-dasharray:2 4}
+.gr-g0-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+/* F-4c (09.09.2026): die Spannen-Annotation der Y-Achse - "Spanne: ~150 €"
+   ueber der Zeichenflaeche. System-Sans (F-4e), gleiche Groesse wie die
+   Achsenmarken, aber dunkler (sie sagt etwas UEBER die Achse, sie ist
+   keine Achsenmarke). */
+.gr-g0-spanne{font-family:var(--sans-system);font-size:12px;
+  fill:var(--ink-3)}
+/* F-4d (09.09.2026): die eigene Reihe mit MEHR GEWICHT - rot ist auf
+   diesem Portal die Farbe des eigenen Angebots, mit gleicher
+   Strichstaerke las sich Telekom-Magenta daneben als zweite rote Linie.
+   Dieselbe Auszeichnung wie im interaktiven Chart (app.js,
+   `r.eigen ? 3 : 2`). */
+.gr-g0-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g0-linie--eigen{stroke-width:3}
+.gr-g0-punkt{fill:var(--anb,#57534a)}
+/* Ein Anbieter mit nur EINEM Punkt traegt keine Linie - der Punkt ist
+   etwas groesser (siehe `_symbol` in `geraete_tco_grafik`) und bekommt
+   einen Rand in Papierfarbe, damit er auch dann auffaellt, wenn eine
+   bewegte Linie eines anderen Anbieters an ihm vorbeilaeuft. */
+.gr-g0-punkt--einzeln{stroke:var(--paper);stroke-width:1.5}
+/* F-4b (09.09.2026): jedes Symbol ausser dem Kreis ist gefuellt wie der
+   Kreis; der RING ist ein offener Kreis mit Strich in Anbieterfarbe.
+   Diese Regel steht NACH der Einzel-Punkt-Regel, damit der Papier-Halo
+   dem Ring seinen Strich nicht ueberschreibt - gleiche Spezifitaet,
+   die spatere gewinnt. */
+.gr-g0-punkt--ring{fill:none;stroke:var(--anb,#57534a);stroke-width:2.4}
+/* Das Legenden-Symbol (F-4b): `<use>` aus den defs derselben Grafik -
+   Fuellung vom referenzierenden Element, genau wie am Datenpunkt. */
+.gr-g0-legendesymbol{fill:var(--anb,#57534a)}
+.gr-g0-legendesymbol--ring{fill:none;stroke:var(--anb,#57534a);
+  stroke-width:2.4}
+/* Die Beschriftung des Einzelpunkts (BRIEF_FADEN, 05.09.2026): "Serie
+   startet" statt eines nackten Punkts, der wie "keine Werte" aussieht. 12
+   px, keine Zeile darf kleiner sein (Hausregel seit 30.08.2026) - und
+   seit F-4e (09.09.2026) in der Sans-Schrift des SYSTEMS statt des
+   Webfonts. */
+.gr-g0-einzeln{font-family:var(--sans-system);font-size:12px;
+  fill:var(--anb,#57534a)}
+.gr-g0-legende{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+/* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
+   sie darf nicht lauter sein als die Linien selbst. */
+.gr-g0-luecke{fill:var(--ink);opacity:.05}
+/* O4: der G0-Block im Verlaufs-Reiter - Titel in der Etiketten-
+   Typografie der Seite (Grotesk-Label, dieselbe Familie wie die
+   Rubrik-Zeile darunter), damit er nicht mit der Serifen-Rubrik
+   konkurriert. */
+.gr-g0-block{margin:0 0 20px}
+.gr-g0-titel{margin:0 0 8px;font-family:var(--sans);font-size:12px;
+  font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3)}
+.gr-g0-chrome{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  margin-top:6px}
+/* A-R3: die drei Haendler als Legenden-Eintrag OHNE Linie - dieselbe
+   Stimme wie eine leere Karte (`.gr-kk-luecke`), aber ausserhalb des
+   SVG, weil sie keinen Messpunkt tragen. */
+.gr-g0-haendler{list-style:none;margin:8px 0 0;padding:0;display:flex;
+  flex-wrap:wrap;gap:3px 16px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
+.gr-g0-haendler-name{font-weight:700;margin-right:4px}
+.gr-g0-haendler-vermerk{font-style:italic}
+.gr-g1-gruppe{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;fill:var(--ink-3)}
+.gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
+  fill:var(--ink)}
+.gr-g1-ref-etikett{font-weight:400;font-size:12px;fill:var(--ink-4)}
+.gr-g1-tarif{font-family:var(--serif);font-size:12px;fill:var(--ink-3)}
+.gr-g1-betrag{font-family:var(--serif);font-size:13px;fill:var(--ink)}
+/* Der Betrag steht regelmaessig UEBER der gestrichelten Referenzlinie (die
+   Referenz ist meist der teuerste Balken, und seit dem Delta am Balken ist
+   der Text laenger). Ein Halo in Papierfarbe haelt die Ziffern lesbar,
+   statt die Linie durch sie hindurchlaufen zu lassen. */
+.gr-g1-betrag{paint-order:stroke;stroke:var(--paper);stroke-width:4px;
+  stroke-linejoin:round}
+.gr-g1-null{stroke:var(--rule-ink);stroke-width:1.5}
+.gr-g1-ref{stroke:var(--al-kritisch);stroke-width:1.5;stroke-dasharray:5 4}
+.gr-g1-reftext{font-family:var(--sans);font-size:12px;fill:var(--al-kritisch)}
+.gr-g1-seg{fill:var(--anb,#57534a)}
+.gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
+  stroke-dasharray:3 3}
+.gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
+.gr-g2-raster--x{stroke-dasharray:2 4}
+.gr-g2-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
+.gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
+.gr-g2-punkt{fill:var(--anb,#57534a)}
+/* F-4e (09.09.2026): die Ereignispfeile trugen ALS EINZIGE Graph-Klasse
+   keine Schriftregel und erbten die Koerperserbe des Portals - dieselbe
+   Sans-Schrift des Systems wie die uebrigen Graph-Beschriftungen. */
+.gr-g2-marker{font-family:var(--sans-system);font-size:12px;fill:var(--ink-3)}
+.gr-g2-legende{font-family:var(--sans);font-size:12px;
+  fill:var(--anb,#57534a)}
+
+/* KEINE SCHRIFT UNTER 12 PIXELN, auch nicht im SVG. Die Regel gilt auf
+   dieser Seite seit dem 30.08.2026 und wird im echten Chromium gemessen:
+   passt ein Name nicht hin, fallen Eintraege und nicht Buchstaben. Die
+   linke Spalte von G1 ist deshalb 300 px breit - der laengste Tarifname
+   des Bestands misst dort 12 px hoch rund 277 px. */
+
+/* Auf dem Telefon wird GEROLLT, nicht gestaucht: eine Grafik mit 1180 px
+   Zeichenbreite auf 390 px zu skalieren ergibt 3,5 px hohe Schrift
+   (Befund vom 11.08.2026 zur geloeschten Positionskarte). */
+@media (max-width:900px){
+  .gr-grafik{overflow-x:auto}
+  .gr-g1,.gr-g2,.gr-g0,.gr-tcoband{width:1180px;max-width:none}
+}
+
+/* Wettbewerbs-Radar (RAD-1, 08.09.2026). Reuse-first: `.src-table`,
+   `.gr-scroll`, `.gr-erklaer`, `.gr-auf`, `.rubrik`, `.page-hero` tragen
+   die Seite schon; hier stehen nur die Zusaetze, die es sonst nicht gibt -
+   das Vorzeichen der Abweichung und der Gruppenkopf je Geraet. */
+.wr-sektion{margin:0 0 34px}
+.wr-gruppe{margin:0 0 22px;padding-top:14px;border-top:1px solid var(--rule-2)}
+/* O3 (B5): der Querlink je Radar-Geräteblock - zurück in die Vergleichs-
+   ansicht desselben Modells. Kleines Etikett unterm Gruppentitel, kein
+   Knopf: er ist ein Weg, kein Bedienelement der Tabelle. */
+.wr-quer{display:inline-block;margin:0 0 8px;font-family:var(--sans);
+  font-size:12px;letter-spacing:.03em;color:var(--red);text-decoration:none;
+  border-bottom:1px solid rgba(230,0,0,.3)}
+.wr-quer:hover{border-bottom-color:var(--red)}
+.wr-gruppenkopf{margin:0 0 6px;font-family:var(--serif);font-size:19px;
+  font-weight:700}
+.wr-basis{margin:0 0 8px;font-family:var(--sans);font-size:12.5px;
+  color:var(--ink-3)}
+.wr-basis--leer{color:var(--ink-4);font-style:italic}
+.wr-basis a{color:var(--red)}
+.wr-tabelle td,.wr-tabelle th{font-size:12.5px}
+.wr-tarif{font-family:var(--sans);color:var(--ink-2)}
+.wr-prozent{font-variant-numeric:lining-nums;font-weight:700}
+.wr-prozent--negativ{color:var(--al-kritisch)}
+.wr-prozent--positiv{color:var(--al-bestpreis)}
+.wr-beleg{font-family:var(--sans);font-size:10.5px;color:var(--ink-4)}
+.wr-beleg a{color:var(--red)}
+.wr-grund{color:var(--ink-4);font-style:italic}
+.wr-status--band_mismatch .wr-prozent,
+.wr-status--kein_buendel .wr-prozent,
+.wr-status--nicht_vergleichbar .wr-prozent{color:var(--ink-4);font-weight:400;
+  font-style:italic}
+
+
+
+/* O3-Falzrechnung (390 px): der Untertitel kostet am Telefon 44 px, der
+   vierte Reiter-Eintrag weitere - die Leitantwort (A1: erste Balkenzeile
+   über der Falz, Kriterium 11c) geht vor. Dieselbe Entscheidung wie O1
+   für den Radar-Link („43 px Falz - die Leitantwort geht vor"): der
+   Untertitel steht am SCHIRM vollständig (dort, wo der Entwurf ihn
+   zeigt); am TELEFON ist der GANZE Untertitel versteckt, nicht nur sein
+   Schwesterseiten-Satz - ein halber Satz wäre schlimmer als keiner. Was
+   mobil bleibt, ist der Weg zum Radar als Quasi-Reiter; WAS die Seite
+   misst, steht am Telefon im „Wie gerechnet?"-Aufklapper unter dem
+   Graphen (dort steht die Formel samt Begriff). Die Reiterleiste rollt IN SICH statt zu umbrechen
+   (dieselbe Hausregel wie `.gr-scroll`: zwei Zeilen kosteten 42 px).
+   Basis zum Vergleich: erste Balkenzeile bei 812 px. */
+@media (max-width:700px){
+  .gr-untertitel{display:none}
+  .gr-reiter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
+    padding:9px 10px;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+}
