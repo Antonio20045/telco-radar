@@ -219,3 +219,15 @@ BOM, Dezimalkomma) wie bestehende.
   Kontrolle. Nachfolge-Themen: P3 (Bandabdeckung), P5 (TCO-Zeitachse ab
   ≥3 Messtagen), E-S2 (1&1 per Playwright), Alarm-Zeilen im Radar-Export,
   Test-Leer-Sicherungen.
+- **NACHTRAG 16.09.2026: Antonio hat nach dem Live-Ansehen DIE ZWEI
+  UNTERSEITEN KASSIERT** (§4.2 Option A — der dort vorgesehene
+  Wieder-Vorlage-Fall ist eingetreten): „Wieso gibt es jetzt zwei Unterseiten:
+  Geräte und Wettbewerbsradar? Das ist absolute Scheiße." Dazu zwei weitere
+  Befunde: die Leitfrage („was kostet es den Kunden, Gerät X bei Anbieter Y
+  mit Tarifband Z zu finanzieren — gibt es die Kombination überhaupt?") muss
+  auf Anhieb beantwortet sein, und **jeder Balken des Graphen braucht seinen
+  Beleg-Link** („man kann hier nirgendwo auf den Link drücken, auf eine
+  Quelle … absolut intransparent"). **Der Folgeauftrag steht ausgearbeitet in
+  `AUFTRAG_GERAETE_EINE_SEITE.md` (Repo-Wurzel) — dort anfangen.** O1–O4
+  bleiben als Baustände Bestand (Zeilenstruktur, Fragment-Infrastruktur,
+  Exporte, Evaluationskette); zusammengeführt wird sie in dem neuen Auftrag.
