@@ -85,10 +85,14 @@ def _browser_seite(tmp_path_factory):
 
 
 @contextlib.contextmanager
-def _ansicht(_browser_seite, breite=1440, hoehe=900):
+def _ansicht(_browser_seite, breite=1440, hoehe=900, touch=False):
     browser, basis = _browser_seite
     fehler = []
-    s = browser.new_page(viewport={"width": breite, "height": hoehe})
+    # touch=True (E2-F3): erst ein Kontext mit has_touch kann tap() senden -
+    # die Mobil-Tests gehen den echten Fingerweg, nicht den Mausklick.
+    context = browser.new_context(viewport={"width": breite, "height": hoehe},
+                                  has_touch=touch)
+    s = context.new_page()
     s.on("console", lambda m: fehler.append(m.text) if m.type == "error"
          else None)
     s.on("pageerror", lambda e: fehler.append(str(e)))
@@ -97,7 +101,7 @@ def _ansicht(_browser_seite, breite=1440, hoehe=900):
     try:
         yield s, fehler
     finally:
-        s.close()
+        context.close()
 
 
 @pytest.fixture
@@ -108,7 +112,7 @@ def schreibtisch(_browser_seite):
 
 @pytest.fixture
 def telefon(_browser_seite):
-    with _ansicht(_browser_seite, 390, 844) as paar:
+    with _ansicht(_browser_seite, 390, 844, touch=True) as paar:
         yield paar
 
 
@@ -185,6 +189,78 @@ def test_der_vorschau_treffer_ist_vor_vollstaendiger_eingabe_klickbar(
                                  "e => e.textContent")
     assert vorher != nachher or "iPhone 17 Pro" in nachher
     assert "iPhone 17 Pro" in nachher
+
+
+def test_auftippen_und_schreiben_ersetzt_die_vorbelegung(schreibtisch):
+    """E2-F2: das Suchfeld traegt den Titel des Startgeraets als
+    Vorbelegung. Antonios Weg - Feld antippen, „pixel 11" schreiben - muss
+    beim ERSTEN Versuch die Vorschau liefern. Vor dem Fix stand der Cursor
+    am Ende: Tippen haengte an („Apple iPhone 17 Pro 256 GBpixel 11"),
+    die Vorschau meldete „kein Treffer"."""
+    s, _ = schreibtisch
+    s.click("#gr-zr-suche")
+    value, von, bis = s.eval_on_selector(
+        "#gr-zr-suche",
+        "e => [e.value, e.selectionStart, e.selectionEnd]")
+    assert von == 0 and bis == len(value), \
+        f"Fokus markiert nicht die Vorbelegung: [{von},{bis}] von {len(value)}"
+    s.type("#gr-zr-suche", "galaxy")
+    s.wait_for_timeout(200)
+    value = s.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert value == "galaxy", f"Tippen hat nicht ersetzt: {value!r}"
+    treffer = s.eval_on_selector("#gr-zr-treffer", "e => e.textContent")
+    assert "kein Treffer" not in treffer, \
+        "die ersetzte Eingabe findet nichts - der erste Versuch scheitert"
+
+
+def test_die_unveraenderte_vorbelegung_oeffnet_die_vorschau_nicht(telefon):
+    """E2-F3 (Mitgift): Fokus allein darf die Liste nicht oeffnen - ihre
+    Treffer waeren das aktuelle Geraet allein, und auf dem Telefon
+    verdeckt sie die Band-Knoepfe, bevor ueberhaupt getippt wurde."""
+    s, _ = telefon
+    s.click("#gr-zr-suche")
+    s.wait_for_timeout(250)
+    assert s.query_selector_all("#gr-zr-vorschau button") == []
+
+
+def test_nach_der_auswahl_ist_die_vorschau_zu(telefon):
+    """E2-F3: auf dem Telefon blieb die Trefferliste nach dem Antippen
+    offen (191 px) und verdeckte Klein/Mittel/Groß komplett - der
+    Band-Klick schlug 60-mal am Overlay fehl. Eine Wahl schließt die
+    Liste, auf jedem Geraet gleich."""
+    s, _ = telefon
+    s.fill("#gr-zr-suche", "iph")
+    s.wait_for_timeout(200)
+    assert s.query_selector_all("#gr-zr-vorschau button"), \
+        "die Vorschau oeffnet nicht - der Test misst seinen eigenen Vorweg"
+    s.tap("#gr-zr-vorschau button")
+    s.wait_for_timeout(500)
+    hoehe = s.eval_on_selector("#gr-zr-vorschau",
+                               "e => Math.round(e.getBoundingClientRect()"
+                               ".height)")
+    assert hoehe == 0, f"die Vorschau steht offen ({hoehe} px) nach Auswahl"
+    # Der Band-Knopfe muss ohne Umweg treffbar sein: der Klick wartet
+    # kurze Zeit - ein Overlay davor waere der Timeout.
+    s.tap("#gr-zr-baender button[data-band='mittel']", timeout=4000)
+    s.wait_for_timeout(500)
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                 "e => e.textContent")
+    assert "Mittel" in antwort
+
+
+def test_ausstapschliesst_die_vorschau(telefon):
+    """Der Tap daneben ist der intuitve Weg, eine offene Liste zu schliessen
+    - er darf nicht vom blur-Timing abhaengen (E2-F3)."""
+    s, _ = telefon
+    s.fill("#gr-zr-suche", "iph")
+    s.wait_for_timeout(200)
+    assert s.query_selector_all("#gr-zr-vorschau button")
+    s.tap(".gr-zr-antwort")
+    s.wait_for_timeout(250)
+    hoehe = s.eval_on_selector("#gr-zr-vorschau",
+                               "e => Math.round(e.getBoundingClientRect()"
+                               ".height)")
+    assert hoehe == 0, "Tap daneben laesst die Vorschau offen"
 
 
 def test_die_kachel_waehlt_das_geraet(schreibtisch):

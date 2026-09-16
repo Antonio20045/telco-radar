@@ -1230,7 +1230,19 @@ var TelcoFrage = (function () {
     }
   }
 
+  /* EINE Wahl beendet die Suche - egal ob der Treffer per Klick, Enter,
+     Kachel oder Band gewaehlt wurde. Die offene Vorschau verdeckte auf
+     dem Telefon die Band-Knoepfe und die Kacheln komplett (E2-F3: der
+     Band-Klick schlug 60-mal am Overlay fehl), und der alte blur-Timer
+     feuerte nach der Auswahl oft nicht - der mousedown-Handler der
+     Eintraege ruft preventDefault und haelt damit den Fokus. */
+  function schliesseVorschau() {
+    var box = element('gr-zr-vorschau');
+    if (box) box.textContent = '';
+  }
+
   function waehle(modell, band) {
+    schliesseVorschau();
     var erlaubt = daten.erlaubt[modell] || [];
     if (!erlaubt.length) return;
     zustand.modell = modell;
@@ -1325,17 +1337,37 @@ var TelcoFrage = (function () {
   var feld = element('gr-zr-suche');
   if (feld) {
     feld.addEventListener('input', function () { vorschau(feld.value); });
-    feld.addEventListener('focus', function () { vorschau(feld.value); });
+    feld.addEventListener('focus', function () {
+      /* E2-F2: Das Feld traegt den Titel des gewaehlten Geraets als
+         Vorbelegung - Antippen und Schreiben soll ERSETZEN (Antonios
+         Weg: „pixel 11 tippen"), nicht anhaengen. Der Fokus markiert
+         deshalb die ganze Vorbelegung; das erste Zeichen loescht sie. */
+      try { feld.setSelectionRange(0, feld.value.length); } catch (e) {}
+      /* Die UNVERAENDERTE Vorbelegung oeffnet die Vorschau nicht: ihre
+         Trefferliste waere das aktuelle Geraet allein, und auf dem
+         Telefon wuerde sie nur die Band-Knoepfe verdecken (E2-F3). Erst
+         eigene Eingabe (oder der Fokus nach einer Suche ohne Wahl)
+         oeffnet sie. */
+      if (feld.value !== (daten.titel[zustand.modell] || '')) {
+        vorschau(feld.value);
+      }
+    });
+    /* EIN Tap ausserhalb von Feld und Vorschau schliesst die Liste - er
+       darf nicht vom blur-Timing abhaengen. Capture: der Closer steht
+       damit VOR jedem Klick-Handler des Ziels (E2-F3). */
+    document.addEventListener('pointerdown', function (ev) {
+      var ziel = ev.target;
+      if (feld.contains(ziel)) return;
+      var box = element('gr-zr-vorschau');
+      if (box && box.contains(ziel)) return;
+      schliesseVorschau();
+    }, true);
     feld.addEventListener('blur', function () {
-      setTimeout(function () {
-        var box = element('gr-zr-vorschau');
-        if (box) box.textContent = '';
-      }, 150);
+      setTimeout(schliesseVorschau, 150);
     });
     feld.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape') {
-        var box = element('gr-zr-vorschau');
-        if (box) box.textContent = '';
+        schliesseVorschau();
       }
       if (ev.key === 'Enter') {
         var erster = element('gr-zr-vorschau') &&
