@@ -33,6 +33,16 @@ from telco_radar.report.html import render_site
 
 from test_geraete_tco_zustand import HEUTE, _baue
 
+
+def _zr_fragment(tmp_path: pathlib.Path) -> list:
+    """Die Zeitreihen-Lager des gerenderten Fragments - _baue_ohne_band
+    rendert nach <tmp>/ohne_band/site, das Fragment liegt daneben."""
+    fragment = (tmp_path / "ohne_band" / "site" / "data"
+                / "geraete-zeitreihe.html")
+    assert fragment.exists(), "Zeitreihen-Fragment fehlt"
+    return BeautifulSoup(fragment.read_text(encoding="utf-8"),
+                         "html.parser").select(".gr-zr-lager")
+
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -322,22 +332,19 @@ def test_die_referenz_nennt_ihre_naehrung_im_rechenweg(tmp_path):
 # Auftrag 2 - "Beschaffung läuft" und leere Platzhalter weg
 # --------------------------------------------------------------------------
 
-def test_beschaffung_laeuft_steht_genau_einmal_als_legende(tmp_path):
-    """Die Graph-Legendenzeile aus O1 trägt die Information - die
-    Platzhalterkarten (Amazon/Expert) fallen. Im gerenderten Fließtext
-    (ohne den JSON-Knoten, der das Umschalten versorgt) steht der Satz
-    genau EINMAL."""
+def test_beschaffung_laeuft_steht_nicht_mehr_in_der_leseflaeche(tmp_path):
+    """E2 (§3.1 + Antonio 9b.7): die 'Beschaffung läuft'-Legende der
+    Balkenform ist gefallen - ein Händler ohne Preis ist kein Bündel-
+    Anbieter und steht nicht einzeln da. Die Auskunft lebt auf
+    geraete-quellen.html; der Katalog zeigt die Listungen."""
     s = _baue_ohne_band(tmp_path)
     kopie = BeautifulSoup(str(s), "html.parser")
     for k in kopie.select("script"):
         k.decompose()
     text = kopie.get_text(" ")
-    assert text.count("Beschaffung läuft") == 1, (
-        f"'Beschaffung läuft' steht {text.count('Beschaffung läuft')}× "
-        "im Lesefluss")
-    # Und die Legende ist es, nicht eine Karte:
-    legende = s.select_one(".gr-lueckenzeile")
-    assert "Beschaffung läuft" in _text(legende)
+    assert "Beschaffung läuft" not in text
+    for name in ("Amazon", "Expert"):
+        assert name not in text, f"{name} steht einzeln in der Lesefläche"
 
 
 def test_keine_leeren_platzhalterkarten_mehr(tmp_path):
@@ -354,22 +361,23 @@ def test_keine_leeren_platzhalterkarten_mehr(tmp_path):
     assert ". ." not in legende
 
 
-def test_die_legende_des_json_knotens_bleibt_fuer_das_umschalten(tmp_path):
-    """Der JSON-Knoten #gr-graph-daten versorgt das Modell-/Band-Umschalten
-    - sein `luecke_text` je Band ist DIE Legende für jeden anderen Zustand
-    und bleibt deshalb stehen (Auftrag 2: 'DARF er bleiben'). Gezählt: je
-    Modell und Band EIN Satz, nicht je Anbieter."""
+def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(
+        tmp_path):
+    """E2: das Modell-/Band-Umschalten versorgt das lazy Fragment
+    `data/geraete-zeitreihe.html` - JEDES (Modell, Band) trägt seinen
+    Lückensatz dort (und der Server-Startzustand seinen auf der Seite).
+    Dieselbe Regel wie O1, am neuen Ort: EIN Satz je Paar, nicht je
+    Anbieter; Alternativ-Bänder mit Betrag in Klammern, gruppiert."""
     s = _baue_ohne_band(tmp_path)
-    knoten = json.loads(
-        s.select_one("#gr-graph-daten").get_text())
-    saetze = [b["luecke_text"]
-              for m in knoten["modelle"]
-              for b in (m.get("baender") or {}).values()
-              if b.get("luecke_text")]
-    assert saetze, "der JSON-Knoten trägt keine Legenden"
-    for satz in saetze:
-        assert satz.count("Kein Bündel") <= 1
-        assert "·" in satz, "die Legende gruppiert nach Grund, sie listet nicht"
+    zustand = _zr_fragment(tmp_path)
+    assert zustand, "das Zeitreihen-Fragment trägt keine Paare"
+    for lager in zustand:
+        satz = _text(lager.select_one(".gr-lueckenzeile"))
+        if not satz:
+            continue
+        assert satz.count("Kein Bündel") <= 1, satz
+        assert ", " in satz or "·" in satz, \
+            "der Sammelsatz gruppiert, er listet nicht je Anbieter"
 
 
 # --------------------------------------------------------------------------
@@ -413,11 +421,13 @@ def test_haendler_barpreise_stehen_kompakt_mit_beleg(tmp_path):
     assert "ohne Vertrag" in saturn
     assert zeilen[0].select_one("a[href]") is not None, "ohne Beleglink"
     assert "abgerufen" in saturn
-    # Amazon und Expert: kein Preis, keine Zeile - die Legende nennt sie.
+    # Amazon und Expert: kein Preis, keine Zeile - und seit E2 auch keine
+    # Einzelnennung in einer Legende (Antonio 9b.7: nichts heisst nicht
+    # einzeln). Der Lückensatz nennt nur den Bündel-Anbieterkreis.
     assert "Amazon" not in _text(gruppe)
     assert "Expert" not in _text(gruppe)
-    legende = _text(s.select_one(".gr-lueckenzeile"))
-    assert "Amazon" in legende and "Expert" in legende
+    tafel_text = _text(s.select_one("#tafel-tco"))
+    assert "Amazon" not in tafel_text and "Expert" not in tafel_text
 
 
 def test_die_bandliste_traegt_ihr_band_als_attribut(tmp_path):

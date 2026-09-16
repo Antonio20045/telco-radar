@@ -88,24 +88,25 @@ def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     O3-Struktur sind das der Tarifmassstab und seine innere Klappe; die
     Kartenklappe, fuer die SQ67 die Regel erfand, ist mit O2 gefallen."""
     s = _baue_mit_referenzen(tmp_path, weitere=4)
-    klappe = s.select_one("details#gr-massstab")
+    # E2 (§3.1c): die zwei Fuss-Aufklapper (Massstab, Datenlage) sind EIN
+    # Aufklapper "Massstab & Datenlage" - der NAME ist Antonios Wortlaut
+    # und traegt keine Zahl. Die SQ67-Regel (Zahl + Handlung) lebt an der
+    # Stelle weiter, an der sie erfunden wurde: die Zahl steht im ersten
+    # Satz des Inhalts und zaehlt die Zeilen beider Tabellen.
+    klappe = s.select_one("details#gr-massstab-datenlage")
     assert klappe is not None, \
         "die Fixture traegt keine Massstabs-Klappe (keine Referenzen)"
     summary = klappe.select_one("summary")
     text = re.sub(r"\s+", " ", summary.get_text(" ", strip=True))
-    treffer = re.search(r"(\d+)\s+Tarife\s+anzeigen", text)
-    assert treffer, f"Label ohne Zahl und Handlung: {text!r}"
-    # Die Zahl meint die GEZEICHNETE Menge: alle Zeilen beider Tabellen
-    # der Klappe (offen + "weitere"), dieselbe Regel wie bei der alten
-    # Kartenklappe - eine Klammer, die anders zaehlt als der Bestand
-    # darunter, ist der Fehlertyp "153 Preispunkte aus 348 Listungen".
+    assert text == "Maßstab & Datenlage", f"falscher Klapname: {text!r}"
+    inhalt = " ".join(klappe.get_text(" ", strip=True).split())
+    treffer = re.search(r"(\d+)\s+Tarife\s+aus\s+den", inhalt)
+    assert treffer, f"keine Tarifzahl im Inhalt: {inhalt[:120]!r}"
     zeilen = klappe.select("table.gr-ttab--simonly tbody tr")
     assert zeilen, "Klappe ohne Tabellenzeilen - der Test prueft nichts"
     assert int(treffer.group(1)) == len(zeilen), (
-        f"{text!r} zaehlt {treffer.group(1)}, die Klappe traegt "
+        f"der Satz zaehlt {treffer.group(1)}, die Klappe traegt "
         f"{len(zeilen)} Tarifzeilen")
-    assert "Tarife anzeigen" in str(summary), \
-        "der Wortlaut steht nicht im Quelltext der Seite"
 
 
 def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
@@ -114,7 +115,7 @@ def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
     ein Etikett ohne Handlung. Die Zahl muss die Zeilen der EIGENEN
     Tabelle zaehlen, nicht die Gesamtmenge der aeusseren Klappe."""
     s = _baue_mit_referenzen(tmp_path, weitere=4)
-    klappe = s.select_one("details#gr-massstab")
+    klappe = s.select_one("details#gr-massstab-datenlage")
     innere = klappe.select("details.gr-auf summary")
     texte = [re.sub(r"\s+", " ", t.get_text(" ", strip=True))
              for t in innere]
@@ -237,64 +238,33 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihres_labels(tmp_path):
 # 3. Das Glossar
 # --------------------------------------------------------------------------
 
-def test_das_glossar_erklaert_die_vier_begriffe(tmp_path):
-    """Vier Begriffe, je EIN Satz - sichtbar (keine Aufklappung) am Ende
-    der Vergleichsansicht, erreichbar ueber den Link in der Graph-
-    Fussnote (seit der Portierung; unter der Modell-Auswahl stand seit
-    A1 nichts mehr, und die erste Balkenzeile liegt an der Telefon-Falz
-    schon knapp - pruefe_portal 11c)."""
+def test_das_glossar_ist_endgueltig_weg(tmp_path):
+    """Antonio (16.09.2026, §3.1 AUFTRAG_GERAETE_EINE_SEITE_V2): „Ich will
+    den Abschnitt Begriffe erklärt: weg." - das Glossar ist ENDE, ebenso
+    der 'Wie gerechnet?'-Block; genau DREI Rest-Aufklapper bleiben
+    (Rechenschaftssatz, Rechenweg je Anbieterzeile, Fuss 'Massstab &
+    Datenlage'). Die vier Begriffe leben dort, wo sie gelesen werden:
+    TCO-24 loest der Antwort-Satz selbst auf (§4.9), das Band nennt die
+    Wahl-Leiste mit ihrer GB-Spanne."""
     s = _baue(tmp_path)
-    glossar = s.select_one("section#gr-glossar")
-    assert glossar is not None, "kein Glossar auf der Seite"
-    assert glossar.select_one("details") is None, \
-        "das Glossar steckt in einer Aufklappung"
-    assert glossar.select_one("h2").get_text(strip=True) == "Begriffe erklärt"
-
-    erklaert = {
-        dt.get_text(" ", strip=True):
-            dt.find_next_sibling("dd").get_text(" ", strip=True)
-        for dt in glossar.select("dt")}
-    assert set(erklaert) == BEGRIFFE, \
-        f"andere Begriffe als im Auftrag: {sorted(erklaert)}"
-    for name, satz in erklaert.items():
-        assert len(satz) > 40, f"{name}: kein Erklärsatz, nur ein Wort"
-
-    # Die Saetze sagen das, was die Module rechnen - keine freie Erfindung.
-    assert "24 Monate" in erklaert["TCO-24"], erklaert["TCO-24"]
-    assert "20 GB" in erklaert["Tarifband"] \
-        and "60 GB" in erklaert["Tarifband"], erklaert["Tarifband"]
-    vorzeichen = erklaert["Abweichungs-Vorzeichen (+/−) zu Vodafone"]
-    assert "Minus" in vorzeichen and "Plus" in vorzeichen, vorzeichen
-
-    # Der SICHTBARE Weg dorthin: der Link in der Graph-Fussnote, ohne
-    # Klick erreichbar und ausserhalb jeder Aufklappung. Der Verweis im
-    # "Wie gerechnet?" des Graphen ist der zweite Weg (im Aufklapper).
-    link = s.select_one(".gr-tco-fussnote a[href='#gr-glossar']")
-    assert link is not None, \
-        "kein Glossar-Link in der Graph-Fussnote (der sichtbare Weg)"
-    assert "Begriffe erklärt" in link.get_text()
-    assert link.find_parent("details") is None, \
-        "der Glossar-Link der Fussnote steckt in einer Aufklappung"
-    alle = s.select('a[href="#gr-glossar"]')
-    assert len(alle) >= 2, \
-        "erwartet: Fussnoten-Link plus Verweis im 'Wie gerechnet?'"
+    assert s.select_one("section#gr-glossar") is None, \
+        "das Glossar ist zurueckgekehrt"
+    text = s.select_one("#tafel-tco").get_text(" ", strip=True)
+    assert "Begriffe erklärt" not in text
+    assert "Wie gerechnet?" not in text
 
 
-def test_das_glossar_steht_nicht_im_lesefluss_vor_den_zahlen(tmp_path):
-    """Das Glossar steht AM ENDE der Vergleichsansicht - hinter den
-    Modellbloecken, nicht zwischen Auswahl und Antwortzeile. Antonio hat
-    am 03.09.2026 die Erklaersektionen der Lesefluss-Mitte geloescht; das
-    Glossar ist deren bewusste, beauftragte Rueckkehr am Rand, nicht in
-    der Mitte. Der LINK steht in der Graph-Fussnote - nach dem Graphen,
-    vor dem Glossar, und nirgends zwischen Auswahl und erster Zahl."""
+def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(
+        tmp_path):
+    """Was das Glossar trug, steht jetzt am ORT seiner Zahl: TCO-24 im
+    Antwort-Satz aufgeloest, das Tarifband mit GB-Spanne an der Wahl -
+    keine zweite Definition derselben Worte auf der Seite."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    html = str(tafel)
-    assert html.index('id="gr-glossar"') > html.index("gr-tmodell"), \
-        "das Glossar steht vor den Modellbloecken"
-    assert html.index("gr-tco-fussnote") < html.index('id="gr-glossar"'), \
-        "der Glossar-Link steht nicht vor dem Glossar"
-    # Und er steht NICHT zwischen Modell-Auswahl und Modellblock - dort
-    # steht seit A1 nichts mehr (11c: die erste Balkenzeile an der Falz).
-    assert html.index("gr-tco-fussnote") > html.index("gr-tmodell"), \
-        "der Glossar-Link steht oberhalb des Graphen"
+    antwort = tafel.select_one(".gr-zr-antwort").get_text(" ", strip=True)
+    assert "über 24 Monate (TCO-24)" in antwort
+    knoepfe = {k.get_text(" ", strip=True): k
+               for k in tafel.select("#gr-zr-baender button")}
+    assert any("20 GB" in text for text in knoepfe), \
+        "die Band-Knöpfe nennen keine GB-Spanne"
+    assert any("60 GB" in text for text in knoepfe), knoepfe.keys()

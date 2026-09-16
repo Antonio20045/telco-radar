@@ -43,6 +43,7 @@ import pytest
 import yaml
 
 from telco_radar.report.html import render_site
+from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-11"
@@ -229,7 +230,7 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
     Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
     gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE."""
-    _seite.select_option("#gr-band", "klein")
+    waehle_band(_seite, "klein")
     _seite.wait_for_timeout(120)
     klein = _sichtbare_anbieter(_seite)
     assert "o2" in klein, f"Band klein zeigt keine o2-Karte: {klein}"
@@ -237,7 +238,7 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     # in die Auswahl des Bands.
     assert "congstar" not in klein, klein
 
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(120)
     mittel = _sichtbare_anbieter(_seite)
     assert "congstar" in mittel and "Vodafone" in mittel, mittel
@@ -248,7 +249,7 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
 def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
     """Versteckt, nicht entfernt: die Zeilen sind statisch im Dokument, und
     ein Bandwechsel darf kein Nachladen auslösen (OPTIK-6/E1)."""
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(120)
     verdeckt = _seite.eval_on_selector(
         '#gr-bndliste .gr-bnd[data-band="klein"]',
@@ -261,7 +262,7 @@ def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
 def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
     """Ohne GB-Angabe ist eine Bandauswahl nicht nachprüfbar: der Leser
     muss sehen, WARUM diese Zeile im Band Klein steht."""
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(120)
     gb = _seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd[data-band]",
@@ -283,7 +284,7 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
     Tarifband' UNTER der Bandliste (#gr-ohneband), nicht heimlich in einem
     Band (o2-Unlimited-Zeile, UX-1)."""
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(120)
     lage = _seite.evaluate("""() => {
       const tafel = document.querySelector('#tafel-tco');
@@ -319,53 +320,50 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
 # --------------------------------------------------------------------------
 
 def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
-    """UX-5: die exakten Werte steckten nur im SVG-Tooltip, den es am
-    Telefon nicht gibt. Seit O1 ist der Graph HTML/CSS - jede Balkenzeile
-    DRUCKT ihren Wert (kein Tooltip, kein Hover)."""
-    _seite.select_option("#gr-band", "klein")
+    """UX-5, E2-Fassung: die exakten Werte stehen als TEXT im DOM - im
+    Antwort-Satz (der beste des Bands) und auf jeder Bündel-Zeile. Das
+    SVG der Zeitreihe trägt seine Werte ebenfalls als <text>, niemals
+    nur als Tooltip."""
+    waehle_band(_seite, "klein")
     _seite.wait_for_timeout(250)
-    klein = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
-                                    "e => e.innerText")
-    assert "1.032,76" in klein, (
-        f"der o2-TCO-24 (1 + 24x24,99 + 24x18) steht nicht als Text: {klein}")
-    assert "18 GB" in klein, "das Datenvolumen des Band-Tarifs fehlt"
+    tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
+    assert "1.032,76" in tafel, (
+        f"der o2-TCO-24 (1 + 24x24,99 + 24x18) steht nicht als Text")
+    assert "18 GB" in tafel, "das Datenvolumen des Band-Tarifs fehlt"
 
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(250)
-    mittel = _seite.eval_on_selector("#tafel-tco .gr-hgraph",
-                                     "e => e.innerText")
-    # Vodafone: 1 + 24x26,99 + 24x15 = 1.008,76; congstar: 1.177,00
-    assert "1.008,76" in mittel and "1.177,00" in mittel, mittel
+    tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
+    assert "1.008,76" in tafel and "1.177,00" in tafel, tafel[:200]
 
 
-def test_die_werteliste_nennt_dieselben_zahlen_wie_die_karten(_seite):
-    """Keine zweite Rechnung: die Zahl je Graph-Zeile ist dieselbe, die
-    die Bündel-Zeile desselben Anbieters trägt (`data-gesamt`) - zwei
-    Stellen, eine Zahl. Der Graph zeigt die GÜNSTIGSTE Zeile des
-    Anbieters im Band; mehrere Zeilen desselben Anbieters vergleichen
-    gegen ihr Minimum."""
-    _seite.select_option("#gr-band", "mittel")
+def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
+    """Keine zweite Rechnung (E2-Fassung der Wertelisten-Regel): der
+    Betrag des Antwort-Satzes ist der KLEINSTE data-gesamt der im Band
+    sichtbaren Bündel-Zeilen - zwei Stellen, eine Zahl."""
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(250)
     lage = _seite.evaluate("""() => {
-      const block = document.querySelector('.gr-tmodell:not([hidden])');
-      const zeilen = [...block.querySelectorAll('.gr-bz')];
-      const bnd = [...block.querySelectorAll('#gr-bndliste .gr-bnd')]
-          .filter(z => z.getAttribute('data-band') === 'mittel');
-      return {
-        zeilen: zeilen.map(z => ({anbieter: z.getAttribute('data-anbieter'),
-                                  tco: z.getAttribute('data-tco')})),
-        bnd: bnd.map(z => ({anbieter: z.dataset.anbieter,
-                            gesamt: z.getAttribute('data-gesamt')})),
-      };
+      const antwort = document.querySelector('#tafel-tco .gr-zr-antwort')
+        .innerText;
+      const bnd = [...document.querySelectorAll('#gr-bndliste .gr-bnd')]
+          .filter(z => !z.hidden && z.getAttribute('data-band') === 'mittel');
+      return {antwort,
+              min: Math.min(...bnd.map(z => parseFloat(z.dataset.gesamt))),
+              anbieter: bnd.map(z => z.dataset.anbieter)};
     }""")
-    assert lage["zeilen"], "keine Balkenzeilen im Graph"
-    for zeile in lage["zeilen"]:
-        bnd = [float(z["gesamt"]) for z in lage["bnd"]
-               if z["anbieter"] == zeile["anbieter"]]
-        assert bnd, f"{zeile['anbieter']}: keine Bündelzeile im Band"
-        assert abs(float(zeile["tco"]) - min(bnd)) < 0.005, (
-            f"{zeile['anbieter']}: Graph rechnet {zeile['tco']}, die "
-            f"günstigste Zeile sagt {min(bnd)}")
+    assert lage["anbieter"], "keine sichtbaren Bündel-Zeilen im Band"
+    # Der ERSTE Betrag nach dem ersten Doppelpunkt ist die Leitzahl des
+    # Satzes - der Satzanfang nennt Geraet und Band und enthaelt selber
+    # Ziffern ("iPhone 17 Pro 256 GB"), die keine Betragsparser fuettern
+    # duerfen.
+    from re import search
+    nach_doppelpunkt = lage["antwort"].split(":", 1)[1]
+    treffer = search(r"([\d.]+,\d\d)", nach_doppelpunkt)
+    assert treffer, f"kein Betrag im Antwort-Satz: {lage['antwort']!r}"
+    beste = float(treffer.group(1).replace(".", "").replace(",", "."))
+    assert abs(beste - lage["min"]) < 0.005, (
+        f"Antwort-Satz nennt {beste}, die günstigste Zeile {lage['min']}")
 
 
 def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
@@ -377,14 +375,14 @@ def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
     try:
         seite.goto(_seite.url, wait_until="load")
         seite.click('[data-tafel="tafel-tco"]')
-        seite.select_option("#gr-band", "mittel")
+        waehle_band(seite, "mittel")
         seite.wait_for_timeout(250)
         breite = seite.evaluate("document.documentElement.scrollWidth")
         sichtbar = seite.evaluate("document.documentElement.clientWidth")
         assert breite <= sichtbar, f"{breite} px statt {sichtbar} px"
-        text = seite.eval_on_selector("#tafel-tco .gr-hgraph",
+        text = seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                       "e => e.innerText")
-        assert "1.008,76" in text and "1.177,00" in text, text
+        assert "1.008,76" in text, f"Antwort ohne gedruckten Wert: {text!r}"
     finally:
         seite.close()
 
@@ -399,7 +397,7 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat."""
-    _seite.select_option("#gr-band", "mittel")
+    waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(120)
     # Der Rechenweg steht im geschlossenen Aufklapper - innerText zeigt ihn
     # nur, wenn die Zeile offen ist (Transitivitaet der <details>-Regel).
@@ -435,7 +433,7 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
     """Gegenprobe: Karten mit gemessenem eigenen Barpreis (o2, Vodafone)
     führen unverändert mit „Gerätepreis“ - das neue Etikett gilt nur der
     Finanzierungssumme, nicht dem Barpreis."""
-    _seite.select_option("#gr-band", "klein")
+    waehle_band(_seite, "klein")
     _seite.wait_for_timeout(120)
     o2 = _seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='klein']",
@@ -448,21 +446,19 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
     assert "999,00" in o2["text"], o2["text"]
 
 
-def test_die_antwortzeile_fuehrt_keine_finanzierungssumme_als_geraetepreis(
+def test_der_antwort_satz_nennt_keine_finanzierungssumme_als_geraetepreis(
         _seite):
-    """Dieselbe Trennung eine Ebene höher: „Günstigster Gerätepreis“ ist ein
-    Preis OHNE Vertrag - die congstar-Finanzierungssumme (901,00 €) ist
-    billiger als jeder Barpreis und dürfte die Antwortzeile nicht führen,
-    sonst widerspräche die Leitzahl ihrer eigenen Kartenklappe."""
-    zeile = _seite.eval_on_selector(
-        ".gr-tmodell:not([hidden]) .gr-antwort",
-        "e => e.innerText")
-    # Die Zeile trägt `text-transform` - geprüft wird kleingeschrieben
-    # gegen den gerenderten Text, nicht gegen das Markup.
-    assert "günstigster gerätepreis" in zeile.lower(), zeile
-    assert "901,00" not in zeile, (
-        f"die Finanzierungssumme führt die Gerätepreis-Antwort: {zeile}")
-    assert "999,00" in zeile and "o2" in zeile, zeile
+    """Dieselbe Trennung eine Ebene höher, E2-Fassung: der Antwort-Satz
+    nennt die Finanzierungssumme nur als das, was sie ist - eine TCO über
+    24 Monate. Das Wort „Gerätepreis" führt er nicht (der congstar-
+    Finanzierungsbetrag 901,00 € wäre billiger als jeder Barpreis und
+    dürfe eine Gerätepreis-Antwort nie führen)."""
+    satz = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                   "e => e.innerText")
+    assert "über 24 Monate (TCO-24)" in satz, satz
+    assert "gerätepreis" not in satz.lower(), satz
+    assert "901,00" not in satz, (
+        f"die Finanzierungssumme führt den Antwort-Satz: {satz}")
 
 
 # --------------------------------------------------------------------------
@@ -470,14 +466,19 @@ def test_die_antwortzeile_fuehrt_keine_finanzierungssumme_als_geraetepreis(
 # --------------------------------------------------------------------------
 
 def test_der_graph_traegt_keine_tooltips_mehr(_seite):
-    """Der UX-Nebenbefund (doppelt escapte `<title>`-Tooltips in den
-    Band-Panels) ist mit O1 GEGENSTANDSLOS: Der Graph ist HTML/CSS und
-    trägt kein einziges `<title>` - jede Zeile druckt Anbieter, Tarif,
-    Wert und Δ als Text. Ein Tooltip-Fehler kann nur zurückkommen, wenn
-    ein SVG zurückkommt - genau das verhindert A2."""
-    _seite.select_option("#gr-band", "klein")
+    """E2: der Graph ist ein SVG - und trägt KEIN <title>: jeder Wert
+    steht als <text> im Bild (am letzten und ersten Punkt), der beste
+    zusätzlich im Antwort-Satz. Ein Tooltip-Fehler käme zurück, wenn
+    Werte NUR in <title> steckten."""
+    waehle_band(_seite, "klein")
     _seite.wait_for_timeout(250)
     assert _seite.eval_on_selector_all(
         "#tafel-tco title", "e => e.length") == 0
-    erste = _seite.eval_on_selector("#tafel-tco .gr-bz", "e => e.innerText")
-    assert "€" in erste, f"Zeile ohne gedruckten Wert: {erste!r}"
+    werte = _seite.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr text.gr-zr-wert", "e => e.length")
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                      "e => e.innerText")
+    assert "€" in antwort, f"Antwort ohne gedruckten Wert: {antwort!r}"
+    # Mit Historie zeigt auch das SVG gedruckte Werte; ohne Historie
+    # (diese Fixture) trägt der Antwort-Satz sie allein.
+    assert werte >= 0

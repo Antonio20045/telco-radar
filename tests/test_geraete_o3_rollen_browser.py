@@ -23,8 +23,9 @@ import yaml
 
 from telco_radar.report.html import render_site
 
-from test_geraete_o1_hauptgraph_browser import (
+from test_geraete_browser_fixture import (
     HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 # DREI Modelle mit eigenen Bündeln — je Modell eine andere Anbietermenge,
 # damit der Test misst, dass die Zeilen MITGEWECHSELT werden (S3), nicht
@@ -187,15 +188,18 @@ def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
         "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
     assert len(ursprung) == 4, \
         f"die Vorgabe-Fixture trägt 4 Zeilen, nicht {len(ursprung)}"
-    # Der Deep-Link, wie ihn jeder Radar-Querlink setzt:
-    seite.goto(seite.url + "?modell=samsung-galaxy-s26-256",
+    # Der Deep-Link, wie ihn jeder Radar-Querlink setzt. Die URL wird NEU
+    # gebaut: seit E2 schreibt die Seite ihren Zustand als ?modell=&band=
+    # zurück, und ein Anhängen hinter die bestehende Query ließe den
+    # ERSTEN modell-Parameter gewinnen.
+    seite.goto(seite.url.split("?")[0] + "?modell=samsung-galaxy-s26-256",
                wait_until="networkidle")
     seite.wait_for_timeout(300)
     fremd = seite.eval_on_selector_all(
         "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
     assert len(fremd) == 1, f"Deep-Link zeigt nicht das Fremdmodell: {fremd}"
     # Rückkehr zum Vorgabegerät - der eine Schritt, der den Klon brauchte:
-    seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
+    waehle_modell(seite, "apple-iphone-17-pro-256")
     seite.wait_for_timeout(300)
     danach = seite.eval_on_selector_all(
         "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)")
@@ -208,7 +212,7 @@ def test_der_modellwechsel_zeigt_die_eigenen_zeilen(seite, mid, erwartet):
     """S3, die Evaluator-Auflage: Für JEDES wählbare Gerät stehen seine
     eigenen Bündelzeilen da — nicht die des Vorgabegeräts, nicht eine
     Fehlermeldung, nicht versteckt."""
-    seite.select_option("#gr-modell", mid)
+    waehle_modell(seite, mid)
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     anbieter = set(_zeilen_anbieter(seite))
@@ -226,9 +230,9 @@ def test_zurueck_zur_vorgabe_zeigt_die_vorgabezeilen(seite):
     """Der Weg zurück darf kein Modell 'stehen lassen': nach zwei Wechseln
     steht wieder der Original-Inhalt der Seite (aus dem Cache, ohne neue
     Anfrage)."""
-    seite.select_option("#gr-modell", "samsung-galaxy-s26-256")
+    waehle_modell(seite, "samsung-galaxy-s26-256")
     seite.wait_for_timeout(250)
-    seite.select_option("#gr-modell", "apple-iphone-17-pro-256")
+    waehle_modell(seite, "apple-iphone-17-pro-256")
     seite.wait_for_timeout(250)
     assert set(_zeilen_anbieter(seite)) == _ERWARTET[
         "apple-iphone-17-pro-256"]
@@ -243,10 +247,12 @@ def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
         s.goto(f"{wurzel}/geraete.html?modell=google-pixel-11-256",
                wait_until="networkidle")
         s.wait_for_timeout(300)
-        assert s.eval_on_selector("#gr-modell", "e => e.value") == \
-            "google-pixel-11-256"
-        titel = s.eval_on_selector("#gr-tco-titel", "e => e.textContent")
-        assert "pixel" in titel.lower(), titel
+        # E2: der Wert steht nicht mehr in einem <select>, sondern im
+        # Zeitreihen-Knoten UND in der URL (Deep-Link wird zurueckgeschrieben).
+        assert "modell=google-pixel-11-256" in s.url
+        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
+                                     "e => e.textContent")
+        assert "Pixel 11" in antwort, antwort
         assert set(_zeilen_anbieter(s)) == _ERWARTET["google-pixel-11-256"]
     finally:
         s.close()
@@ -267,7 +273,12 @@ def test_der_querlink_des_radars_deep_linket(ctx):
         s.goto(ziel, wait_until="networkidle")
         s.wait_for_timeout(300)
         gewollt = ziel.split("modell=", 1)[1]
-        assert s.eval_on_selector("#gr-modell", "e => e.value") == gewollt
+        assert f"modell={gewollt}" in s.url
+        # Der Antwort-Satz nennt das Geraet OHNE Hersteller-Praefix und
+        # GB-Zahl ("iPhone 17 Pro") - die starke Aussage ist ohnehin die
+        # Zeilenmenge: die Tabelle zeigt das GERAET des Links.
+        assert set(_zeilen_anbieter(s)) == _ERWARTET[gewollt], \
+            (gewollt, sorted(_zeilen_anbieter(s)))
     finally:
         s.close()
 
@@ -388,12 +399,12 @@ def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
         s.goto(f"{wurzel}/geraete.html", wait_until="load")
         s.wait_for_timeout(400)
         box = s.evaluate("""() => {
-          const e = document.querySelector('#tafel-tco .gr-bz');
+          const e = document.querySelector('#tafel-tco .gr-zr-antwort');
           if (!e) return null;
           return Math.round(e.getBoundingClientRect().bottom);
         }""")
         assert box is not None and box <= 844, \
-            f"die erste Balkenzeile endet bei {box} px (Falz 844)"
+            f"der Antwort-Satz endet bei {box} px (Falz 844)"
     finally:
         s.close()
 

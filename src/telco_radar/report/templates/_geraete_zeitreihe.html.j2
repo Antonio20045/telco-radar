@@ -1,0 +1,52 @@
+{# Der Zeitreihen-Block der Hauptansicht (E2, AUFTRAG_GERAETE_EINE_SEITE_V2
+   §1a, 16.09.2026) - JEIN Makro, zwei Montageorte, EINE Quelle:
+   der Startzustand rendert der Server hier in die Seite (First Paint ohne
+   JavaScript), jedes andere (Modell x Band) steht im lazy Fragment
+   `site/data/geraete-zeitreihe.html` und wird von app.js als FERTIGES
+   Markup eingesetzt - kein Client-Renderer, keine zweite Zahlenquelle.
+   Alle Zeichenketten (Antwort-Satz, Messtag-Zeile, Legende, beide
+   SVG-Varianten, Lueckensatz) entstehen in `report/geraete_zeitreihe.py`.
+
+   Der Aufbau folgt dem von Antonio angesehenen und genehmigten Prototyp
+   (entwurf-v2.html): Antwort-Satz, EINE Zeile Rechenschaft als
+   Aufklapper, Graphkopf mit Messtag-Zeile und Legende, der Graph, der
+   Lueckensatz. Nichts dazwischen, nichts danach ausser den Bündel-Zeilen
+   (die stehen im aufrufenden Template, sie sind kein Teil dieses Blocks).
+
+   Die IDs (gr-zr-antwort & Co.) stehen genau EINMAL im aktiven Zustand:
+   der Montagepunkt wird beim Wechsel geleert, bevor der neue Block
+   eingehängt wird. #}
+{% macro paarblock(p) %}
+  <p class="gr-zr-antwort" id="gr-zr-antwort">{{ p.antwort_html | safe }}</p>
+  {# (a) Der Rechenschaftssatz - EINE Zeile unter dem Antwort-Satz, als
+     Aufklapper (§3.1). Er nennt die Formel der Leitzahl und den Beleg des
+     günstigsten Angebots mit Link und Abrufdatum - Antonios
+     Transparenz-Befund vom Morgen („man kann hier nirgendwo auf den Link
+     drücken") am wichtigsten Ort der Tafel. #}
+  {% if p.rechnung_html %}
+  <details class="gr-auf gr-zr-rechnung">
+    <summary>So gerechnet</summary>
+    <p class="gr-basis--duenn">{{ p.rechnung_html | safe }}</p>
+  </details>
+  {% endif %}
+  <section class="gr-zr-graph" aria-label="TCO-24 je Messtag und Anbieter">
+    <div class="gr-zr-kopf">
+      <span class="gr-zr-messtage" id="gr-zr-messtag">{{ p.messtage_text }}</span>
+    </div>
+    {% if p.svg_breit %}
+    {{ p.legende_html | safe }}
+    <div class="gr-zr-bild" id="gr-zr-bild">{{ p.svg_breit | safe }}{{
+      p.svg_schmal | safe }}</div>
+    <p class="gr-zr-hinweis">Ein fehlender Punkt heißt: dieser Anbieter
+    hatte an dem Tag kein Bündel in diesem Band — Linien verbinden nur
+    echte Messungen.</p>
+    {% else %}
+    {# Der ehrliche Leer-Satz: Historie und Karten sind zwei Zeitreihen,
+       und eine Kurve aus einem Stand wäre erfunden. #}
+    <p class="gr-zr-keine">{{ p.leer_text }}</p>
+    {% endif %}
+    {% if p.luecke_text %}
+    <p class="gr-lueckenzeile" id="gr-zr-luecke">{{ p.luecke_text }}</p>
+    {% endif %}
+  </section>
+{% endmacro %}

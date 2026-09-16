@@ -25,6 +25,8 @@ from __future__ import annotations
 
 import pytest
 
+from bs4 import BeautifulSoup
+
 from test_geraete_tco_zustand import _baue
 
 
@@ -32,20 +34,23 @@ from test_geraete_tco_zustand import _baue
 # Kriterium 1: G0 ist die einzige Grafik je Modellblock
 # --------------------------------------------------------------------------
 
-def test_g1_steht_nicht_mehr_im_dokument(tmp_path):
-    """O1 (11.09.2026) dreht die Regel ein zweites Mal: G0 (die je-Modell-
-    Zeitreihe) verlaesst DIESE Ansicht ebenfalls und wandert in O4 in den
-    Verlaufs-Reiter - der EINE Graph ist der HTML/CSS-Balken. In der
-    Vergleichsansicht steht deshalb KEIN SVG mehr; `m.zeitreihe` wird in
-    `geraete_tco_view.aufbereiten()` weiterhin gefuellt (Kappe im Template,
-    dieselbe wie bei G1)."""
+def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
+    """E2 (16.09.2026) dreht die Regel ein drittes Mal - diesmal auf
+    Antonios ausdrueckliche Entscheidung (AUFTRAG_GERAETE_EINE_SEITE_V2
+    §1a): der EINE Graph der Vergleichsansicht ist DIE TCO-ZEITREIHE, ein
+    SVG-Koordinatensystem mit Punkten je Messung. Die Balkenform (O1) ist
+    ERSETZT: .gr-hgraph und .gr-bz sind Reste, G1 bleibt verboten; G0
+    wohnt weiter im Verlaufs-Reiter."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select("svg.gr-g1") == []
-    assert tafel.select("svg") == [], \
-        "in der Vergleichsansicht steht noch ein SVG"
-    assert len(tafel.select(".gr-hgraph")) == 1, \
-        "genau ein Graph-Modul (der Balken)"
+    for rest in (".gr-hgraph", ".gr-bz", ".gr-balkenliste"):
+        assert tafel.select(rest) == [], f"Rest der Balkenform: {rest}"
+    assert tafel.select_one("svg.gr-g0") is None
+    svgs = tafel.select("svg.gr-zr")
+    assert svgs, "die Zeitreihe fehlt"
+    for svg in svgs:
+        assert svg.select("circle.gr-zr-punkt"), "SVG ohne Messpunkte"
 
 
 # --------------------------------------------------------------------------
@@ -53,34 +58,35 @@ def test_g1_steht_nicht_mehr_im_dokument(tmp_path):
 # --------------------------------------------------------------------------
 
 def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
+    """E2: dieselbe Invariante am neuen Aufbau - Wahl-Leiste, dann der
+    Antwort-Satz, dann der Graph (§4.2: nichts dazwischen)."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    auswahl = tafel.select_one(".gr-msel")
-    assert auswahl is not None, "die Geraeteauswahl fehlt"
-
-    block = tafel.select_one(".gr-tmodell")
-    kinder = [k for k in block.find_all(recursive=False)]
-    antwort = block.select_one(".gr-antwort")
-    graph = block.select_one(".gr-hgraph")
-    assert antwort is not None, "die Antwortzeile fehlt"
+    auswahl = tafel.select_one("#gr-zr-wahl")
+    assert auswahl is not None, "die Wahl-Leiste fehlt"
+    antwort = tafel.select_one(".gr-zr-antwort")
+    graph = tafel.select_one(".gr-zr-graph")
+    assert antwort is not None, "der Antwort-Satz fehlt"
     assert graph is not None, "der Zeitreihen-Graph fehlt"
-    assert kinder.index(antwort) < kinder.index(graph), \
-        "die Antwortzeile steht nicht vor dem Graphen"
-
-    # Die Auswahl steht VOR dem Modellblock (und damit vor der Antwortzeile
-    # und dem Graphen darin) - derselbe DOM-Baum, verglichen ueber die
-    # Position im vollstaendigen Text.
     text = str(tafel)
-    assert text.index('class="gr-msel') < text.index('class="gr-antwort')
+    assert text.index('id="gr-zr-wahl"') < \
+        text.index('class="gr-zr-antwort"') < \
+        text.index('class="gr-zr-graph"')
 
 
-def test_antwortzeile_nennt_beide_preise_mit_anbieter(tmp_path):
+def test_der_antwort_satz_nennt_anbieter_und_loest_tco24_auf(tmp_path):
+    """E2 ersetzt die zwei Leitzahlen der alten Antwortzeile durch den
+    EINEN Antwort-Satz des Prototyps: Geraet, Band, bester Anbieter,
+    TCO-24 - und das Wort TCO-24 wird im Satz selbst aufgeloest (§4.9).
+    Der Geraetepreis ohne Vertrag steht weiterhin auf jeder Bündel-Zeile."""
     s = _baue(tmp_path)
-    zeile = s.select_one("#tafel-tco .gr-antwort")
-    text = zeile.get_text(" ", strip=True)
-    assert "Günstigster Gerätepreis" in text
-    assert "günstig mit Tarif" in text
-    assert "(o2)" in text, f"kein Anbieter in der Antwortzeile: {text}"
+    satz = s.select_one("#tafel-tco .gr-zr-antwort")
+    assert satz is not None, "der Antwort-Satz fehlt"
+    text = " ".join(satz.get_text(" ", strip=True).split())
+    assert "über 24 Monate (TCO-24)" in text, text
+    assert "€" in text
+    assert any(a in text for a in ("o2", "Vodafone", "1&1", "congstar")), \
+        f"kein Anbieter im Antwort-Satz: {text}"
 
 
 # --------------------------------------------------------------------------
@@ -117,12 +123,15 @@ def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
     hinter einer eigenen, geschlossenen Aufklappung."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    massstab = tafel.select_one("#gr-massstab")
-    if massstab is None:
+    # E2: der Massstab wohnt im EINEN Fuss-Aufklapper "Massstab &
+    # Datenlage" (§3.1c) - zwei eigene Aufklapper waeren die Verdopplung.
+    massstab = tafel.select_one("#gr-massstab-datenlage")
+    if massstab is None or massstab.select_one(".gr-ttab--simonly") is None:
         pytest.skip("keine Referenzen im Bestand der Fixture")
     assert massstab.name == "details"
     assert massstab.get("open") is None, "die Aufklappung ist offen"
-    assert massstab.select_one(".gr-ttab--simonly") is not None
+    assert tafel.select_one("#gr-massstab") is None, \
+        "der Massstab steht doppelt (alter Aufklapper zurueckgekehrt)"
 
 
 def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
@@ -146,17 +155,21 @@ def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
 # (die Rechnung selbst: tests/test_geraete_zeitreihe.py)
 # --------------------------------------------------------------------------
 
-def test_haendler_ohne_zeitreihe_nennen_den_beginn_der_beschaffung(tmp_path):
-    """O2: die Händler ohne Preis stehen in der EINEN Legendenzeile unter
-    dem Graphen (nicht mehr als eigene Karten) - mit dem Beginn der
-    Beschaffung, ohne erfundene Zahl."""
+def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
+    """E2 (Antonio 9b.7 + §3.1): die 'Beschaffung läuft'-Legende ist mit
+    der Balkenform gefallen. Ein Händler OHNE Preis ist kein Bündel-
+    Anbieter - er steht nicht einzeln da (die Quellenseite nennt die
+    Beschaffung, der Katalog die Listungen). Der Lückensatz unter dem
+    Graphen nennt NUR den Anbieterkreis der Bündel."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    legende = tafel.select_one(".gr-lueckenzeile")
-    assert legende is not None, "die Legendenzeile fehlt"
-    text = " ".join(legende.get_text(" ", strip=True).split())
-    assert "Beschaffung läuft seit" in text
-    assert "€" not in text
+    kopie = BeautifulSoup(str(tafel), "html.parser")
+    for k in kopie.select("script"):
+        k.decompose()
+    text = kopie.get_text(" ")
+    assert "Beschaffung läuft" not in text
+    for name in ("Amazon", "Expert"):
+        assert name not in text, f"{name} steht einzeln in der Lesefläche"
 
 
 # --------------------------------------------------------------------------

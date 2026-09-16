@@ -674,6 +674,20 @@ an dieser Begründung ändert die Revision nichts.
 
 ## 4. Design-Regeln für den Graphen — benannte Form statt „besser machen"
 
+> **ÜBERHOLT DURCH ANTONIOS GRAPH-ENTSCHEIDUNG (16.09.2026 abends,
+> AUFTRAG_GERAETE_EINE_SEITE_V2.md §1a):** Die Empfehlung dieses Abschnitts
+> („Ergebnisliste statt Balkendiagramm", Inline-Längenband als einzige
+> grafische Form, P5-TCO-Zeitachse auf später vertagt) ist KASSIERT. Antonio
+> hat den Graph selbst bestimmt und den Prototyp ausdrücklich genehmigt:
+> **EIN Koordinatensystem, Y = TCO-24 in €, X = das DATUM mit den echten
+> Messtage als Ticks, je Anbieter eine Linie mit einem Punkt je Messung,
+> nichts interpoliert.** P5 ist damit EINGELÖST — die Zeitreihe wächst
+> automatisch mit den Messtagen. Die fünf Bedingungen unten bleiben als
+> Prüfmaßstab gelten (Beleg-Link je Anbieter, gedruckte Werte, mobile Falz),
+> nur Bedingung 5 kehrt sich um: die Zeitreihe IST die Antwortform der
+> Hauptansicht; die Liste (Bündel-Zeilen) ergänzt SIE, nicht umgekehrt.
+> Der Text darunter steht als historische Befundlage, nicht als Bauanweisung.
+
 **Befundlage (R1).** Keiner von neun untersuchten Anbietern (Check24, Verivox,
 heise/TARIFFUXX, idealo, Finanztip, Telekom, o2, WhistleOut, Apple) zeigt
 „Gerät × Anbieter × Tarif" als eigenständiges Diagramm. Der Standard ist die
@@ -1090,3 +1104,32 @@ S1/S2-Befund abgelehnt; S3/S4 nach Ermessen eingearbeitet.
 | PM-6 | EINE Seite zu schwer / Aufklapper-Wüste | Lazy-Nachladen aller Neben-Tafeln, Seitengewicht als Messzahl mit Obergrenze im Protokoll, Wireframe-Summen vor Bau | §9a Nr. 6, E3-Baustein „Gewicht und Lazy" |
 | PM-7 | Vorschau zeigt Auslaufware statt aktueller Geräte | Deterministische Vorschau-Sortierung (aktuelle Listungen + Bandabdeckung zuerst); Kacheln Antonio in E1-Freigabe aktiv vorlegen | §9a Nr. 7, E2-Baustein + Test, §9 Nr. 8 |
 | PM-8 | Wartung stirbt mit dem Orchestrierungsprozess | Betriebsmodus ohne Agenten definiert (fünf Sichttest-Fragen live + drei Protokollzeilen) und in §10 verankert | §9a Nr. 8, E6-Abnahme, §10 |
+
+---
+
+## Änderungsprotokoll (E2-Bau, 2026-09-16 Nacht)
+
+Dieses Protokoll hängt an die Revision vom 16.09. an und ordnet die Strategie
+der AUFTRAG_GERAETE_EINE_SEITE_V2.md unter (dort §8: „Rahmen für Phasen-
+abfolgen, Details teils überholt"). Die nächste Session liest zuerst die
+Auftragsdatei; diese Strategie bleibt Quelle für Höhenbudgets (§6), Sichttest-
+Fragen und die E4-/E5-Detailplanung, soweit die Auftragsdatei sie nicht
+ersetzt.
+
+**Was kassiert ist (durch Antonios Entscheidungen vom 16.09., §1/§3 der
+Auftragsdatei):**
+
+| Strategie-Hier | Nachtrag | Quelle |
+|---|---|---|
+| §4 „Ergebnisliste statt Balkendiagramm", Inline-Längenband als einzige Graph-Form | ERSETZT durch die TCO-ZEITREIHE (SVG-Koordinatensystem, Y = TCO-24 €, X = Datum mit echten Messtagen; Prototyp entwurf-v2.html von Antonio angesehen und genehmigt). Der Korrektur-Kasten oben in §4 sagt dasselbe am Ort der alten Empfehlung | Auftrag §1a |
+| §8 „P5-TCO-Zeitachse als eigener später Schritt" (Vertagung) | EINGELÖST — der genehmigte Graph IST die Zeitachse; sie wächst mit jedem Messtag aus `geraete_tco_historie.jsonl` (seit 12.09.2026, nächtlich). P5 braucht keinen eigenen Schritt mehr | Auftrag §7 „Bewusst NICHT" |
+| §3 „Bau-Phasen E1–E6" (diese Datei als führende Phasenliste) | Die führende Phasenliste ist §7 der AUFTRAGSDATEI (E2 Hauptansicht produktiv → E3 Eine Seite + Sinn → E4 Auto-Erkennung → E5 Rest → E6 Livegang). Die hiesigen Phasenabschnitte bleiben Detailplanung (E4/E5), E1 ist mit dem Prototyp abgeschlossen | Auftrag §7 |
+| §4 Bedingung 5 („der Graph ergänzt die Liste, er ersetzt sie nicht") | Umgekehrt: in der Hauptansicht ist die Zeitreihe die Antwortform; die Bündel-ZEILEN bleiben darunter als Rechenweg-Träger (§3.1b) — Struktur `STRATEGIE_GERAETE_OPTIK` §7 bleibt Bestand | Auftrag §3.1, §8 |
+| E2-Baustein „Antwort-Band: drei prominenteste Zahlen" (CC-S2c) | Der Antwort-SATZ des Prototyps führt (bester Anbieter, TCO-24, Ø €/Monat, Vodafone-Bezug in einem Satz); die Ableitungsregel bleibt: das Band rechnet selbst nichts | Auftrag §1a + §4.9 |
+| E2-Abnahme „Ergebnisliste" | Abnahme ist: Leitfrage in ≤ 12 s ohne Erklärung beantwortet; Kriterium 11c auf die Zeitreihe umgestellt; Suite grün; `pruefe_portal` außer 8b grün | Auftrag §7 E2 |
+
+**Was unverändert gilt:** §6 (Höhen- und Falzbudgets, umgerechnet auf die
+Zeitreihen-Hauptansicht), §5/E4 (Auto-Erkennung samt CC-S2d-Entscheidung),
+PM-1 bis PM-8, §9/§9a. Der Fünf-Punkte-Maßstab aus §4 bleibt Prüfmaßstab
+für JEDE künftige Graph-Form (gedruckte Werte, Beleg je Einheit, mobile
+Falz) — nur die Ergebnislisten-Empfehlung selbst ist gefallen.

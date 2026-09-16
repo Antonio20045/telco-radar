@@ -832,7 +832,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
               if historie is not None else [])
     g2 = geraete_tco_grafik.historie(reihen)
 
-    # ---- O1: der JSON-Knoten für den Selektor --------------------------
+    # ---- O1: der Balken-Datenknoten (seit E2 ohne Leser im Template) ---
+    # E2-Anmerkung: der KNOTEN #gr-graph-daten ist mit der Balkenansicht
+    # gefallen (der Zeitreihen-Umschalter liest #gr-zeitreihe-daten); das
+    # FELD bleibt gefuellt - die Balken-Rechnung lebt weiter im Code, und
+    # der Rueckbau toter Felder ist E5-Arbeit (nicht E2).
     #
     # Die Vergleichsansicht rendert NUR das Vorgabemodell serverseitig -
     # die 88-fache Wiederholung der Modellblöcke entfällt (HTML 3,9 MB →
@@ -933,7 +937,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "modelle": modelle["modelle"],
         "modell_vorgabe": modelle["vorgabe"],
         "modelle_gesamt": modelle["gesamt"],
-        # O1: der JSON-Knoten für den Selektor (siehe oben) - None im
+        # Der Balken-Datenblock (siehe oben, seit E2 ohne Template-Leser) - None im
         # Leerzustand, die Vorlage rendert ihn nur mit Modellen.
         "graph_daten": graph_daten,
         # EINE Quelle fuer den Beginn der Händler-Beschaffung (Vorlage und

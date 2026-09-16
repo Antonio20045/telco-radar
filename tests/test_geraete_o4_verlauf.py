@@ -49,13 +49,15 @@ def vorgabe(geraete) -> dict:
     Der Test liest die Erwartung aus demselben Knoten, aus dem auch der
     Modell-Umschalter liest: dieselbe Quelle, keine zweite Berechnung.
     """
-    knoten = geraete.select_one("#gr-graph-daten")
-    assert knoten is not None, "JSON-Knoten #gr-graph-daten fehlt"
+    # E2: der Modell-Umschalter liest #gr-zeitreihe-daten (Titel und
+    # Erlaubnis, keine Zahlen); der alte Balken-Knoten #gr-graph-daten ist
+    # mit der Balkenansicht gefallen.
+    knoten = geraete.select_one("#gr-zeitreihe-daten")
+    assert knoten is not None, "JSON-Knoten #gr-zeitreihe-daten fehlt"
     daten = json.loads(knoten.get_text())
-    assert daten["modelle"], "kein Modell im Bestand"
-    naechste = [m for m in daten["modelle"] if m["id"] == daten["vorgabe"]]
-    assert len(naechste) == 1, "Vorgabemodell nicht unter den Modellen"
-    return naechste[0]
+    assert daten["vorgabe"], "kein Startmodell im Knoten"
+    return {"id": daten["vorgabe"],
+            "titel": daten["titel"][daten["vorgabe"]]}
 
 
 # --------------------------------------------------------------------------
@@ -84,12 +86,17 @@ def test_g0_folgt_dem_vorgabemodell_mit_titel(geraete, vorgabe):
         f"{titel.get_text(' ', strip=True)!r}")
 
 
-def test_kein_svg_in_der_vergleichsansicht(geraete):
-    """Kriterium 11 bleibt: die Vergleichsansicht trägt HTML/CSS-Balken,
-    kein SVG. G0 wohnt im Verlaufs-Reiter."""
+def test_nur_die_zeitreihe_ist_svg_in_der_vergleichsansicht(geraete):
+    """E2 dreht die alte Regel um: die Vergleichsansicht TRÄGT ein SVG -
+    die TCO-Zeitreihe (Antonios Graph-Entscheidung). G0 bleibt der
+    Verlaufs-Reiter; die Zeitreihe ist der EINZIGE SVG-Block der Tafel."""
     tco = geraete.select_one("#tafel-tco")
     assert tco is not None
-    assert tco.select_one("svg") is None
+    svgs = tco.select("svg")
+    assert svgs, "die Zeitreihe (svg.gr-zr) fehlt"
+    for svg in svgs:
+        assert "gr-zr" in (svg.get("class") or []), (
+            "SVG ausser der Zeitreihe in der Vergleichsansicht")
 
 
 def test_g0_wertetabelle_traegt_die_reihen_der_grafik(geraete):
@@ -178,15 +185,17 @@ def test_das_fragment_traegt_g0_fuer_jedes_nicht_vorgabemodell(
     """Die G0-Blöcke aller übrigen Modelle stehen im lazy Fragment - dieselbe
     Bauform wie die Bündel-Zeilen seit O3: die Hauptseite bleibt klein, der
     Modellwechsel holt eine Datei und setzt fertiges Markup."""
-    knoten = geraete.select_one("#gr-graph-daten")
+    knoten = geraete.select_one("#gr-zeitreihe-daten")
     daten = json.loads(knoten.get_text())
     fragment = (site / "data" / "geraete-buendel.html")
     assert fragment.exists(), "Bündel-Fragment fehlt"
     suppe = BeautifulSoup(fragment.read_text(encoding="utf-8"),
                           "html.parser")
     ids = [l.get("data-modell") for l in suppe.select(".gr-g0-lager")]
-    erwartet = [m["id"] for m in daten["modelle"]
-                if m["id"] != daten["vorgabe"]]
+    # E2: "Vorgabe" des Fragments ist der ZEITREIHEN-Startzustand - dieselbe
+    # Wahl wie der Server-First-Paint (Graph und G0 folgen demselben Modell).
+    erwartet = [mid for mid in daten["titel"]
+                if mid != daten["vorgabe"]]
     assert len(ids) == len(erwartet), (
         f"{len(ids)} G0-Blöcke im Fragment, erwartet {len(erwartet)}")
     assert set(ids) == set(erwartet)

@@ -90,18 +90,15 @@ def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
         "der Radar-Reiter trägt keine Seitenwechsel-Kennzeichnung"
 
 
-def test_der_untertitel_traegt_den_entwurfswortlaut(geraete):
-    """B3: Untertitel nach Entwurf — der Satz sagt, was die Seite misst
-    (TCO-24 über 24 Monate) und nennt die Schwesterseite beim Namen."""
-    satz = geraete.select_one(".gr-untertitel")
-    assert satz is not None, "der Untertitel fehlt unter dem Zeitungskopf"
-    gesamt = " ".join(satz.get_text(" ", strip=True).split())
-    assert "Alle Anbieter eines Modells im gewählten Tarifband" in gesamt
-    assert "TCO-24" in gesamt
-    assert "Gesamtkosten über 24 Monate" in gesamt
-    link = geraete.select_one("a[href$='wettbewerbsradar.html']")
-    assert link is not None
-    assert "Wettbewerbs-Radar" in link.get_text(strip=True)
+def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):
+    """E2 (§4.2) loeste den Untertitel („Alle Anbieter eines Modells im
+    gewaehlten Tarifband …"): zwischen Zeitungskopf und Reiterleiste bzw.
+    Wahl-Leiste steht KEIN erklaerender Absatz mehr - der Antwort-Satz
+    loest TCO-24 selbst auf, der Radar-Weg steht als Quasi-Reiter. Dieser
+    Test haelt die Regel statt des Wortlauts."""
+    assert geraete.select_one(".gr-untertitel") is None, \
+        "der Untertitel ist zurueckgekehrt (E2 loest ihn)"
+    assert geraete.select_one("#gr-zr-wahl") is not None
 
 
 def test_der_verlaufs_reiter_fuehrt_auf_eine_lebendige_tafel(geraete):
@@ -172,8 +169,10 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     dem Vorgabegerät und zeigt ein anderes Gerät, als der Link verspricht.
     Die Gegenprobe ist Teil des Tests (CLAUDE.md §6: ein Lookup, der nichts
     trifft, ist grün und prüft nichts)."""
-    ids_selektor = {o.get("value")
-                    for o in geraete.select("#gr-modell option")}
+    # E2: der Selektor ist das Suchfeld; wählbar ist, was der Zeitreihen-
+    # Knoten als erlaubt traegt (derselben Quelle, aus der app.js waehlt).
+    ids_selektor = set(json.loads(
+        geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"])
     links = radar.select("a[href^='geraete.html?modell=']")
     assert links, "kein Querlink auf dem Radar"
     assert "Dieses Gerät im Vergleich" in links[0].get_text(strip=True)
@@ -230,7 +229,7 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site,
     # Das Vorgabemodell steht SCHON auf der Seite - im Fragment würde es
     # doppelt (52 KB am echten Bestand).
     vorgabe = json.loads(
-        geraete.select_one("#gr-graph-daten").text)["vorgabe"]
+        geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
     ids = {c.get("data-modell") for c in container}
     assert vorgabe not in ids, "das Vorgabemodell steht doppelt"
     zeilen = lager.select(".gr-bnd")
@@ -281,19 +280,23 @@ def test_der_karten_hinweis_ist_weg(geraete):
     assert "Vorgabegerät" not in geraete.get_text()
 
 
-def test_der_wortlaut_nennt_fehlt_nicht_fuehrt(geraete):
-    """D1: Entwurf-Wortlaut „Vodafone fehlt in diesem Band – keine
-    Δ-Angabe" statt „führt kein Bündel in diesem Band"."""
-    knoten = geraete.select_one("#gr-graph-daten")
-    daten = json.loads(knoten.text)
-    unterzeilen = [b["unterzeile"] for m in daten["modelle"]
-                   for b in (m.get("baender") or {}).values()]
-    assert unterzeilen, "keine Band-Unterzeile im Datenknoten"
-    for z in unterzeilen:
-        assert "führt kein Bündel" not in z, z
-    assert any("fehlt in diesem Band" in z for z in unterzeilen), \
-        "am echten Bestand gibt es Bänder ohne Vodafone-Referenz - " \
-        "dort muss der neue Wortlaut stehen"
+def test_der_lueckenwortlaut_ist_der_genehmigte_sammelsatz(site, geraete):
+    """E2 ersetzt den D1-Wortlaut („Vodafone fehlt in diesem Band – keine
+    Δ-Angabe", Balkenzeit) durch Antonios 9b.7/§4.5: EIN Sammelsatz unter
+    dem Graphen, fehlende Anbieter MIT NAMEN, Alternativ-Bänder samt
+    Betrag in Klammern - und was gar nichts hat, nur EIN Mal im selben
+    Satz. Geprüft am Server-Startzustand UND am Zeitreihen-Fragment (die
+    Lücken aller übrigen Paare stehen nur dort)."""
+    quellen = [geraete.get_text(" ", strip=True)]
+    fragment = site / "data" / "geraete-zeitreihe.html"
+    assert fragment.exists(), "Zeitreihen-Fragment fehlt"
+    quellen.append(fragment.read_text(encoding="utf-8"))
+    for text in quellen:
+        assert "führt kein Bündel" not in text, "alter Wortlaut ist zurück"
+    gesamt = " ".join(quellen)
+    assert "Kein Bündel in diesem Band:" in gesamt, \
+        "der Sammelsatz fehlt am echten Bestand"
+    assert "gar nicht im Bündel" in gesamt
 
 
 def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():
