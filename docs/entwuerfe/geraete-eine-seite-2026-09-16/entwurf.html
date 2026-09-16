@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entwurf · EINE Geräteseite — Gerät × Anbieter × Tarifband</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,600&family=Libre+Franklin:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   E1-Entwurf „EINE Geräteseite", 16.09.2026.
+   Design-Sprache: Zeitungsausgabe der Live-Site (style.css übernommen):
+   Newsprint #f6f4ee, Source Serif 4 für Lesetext, Libre Franklin nur für
+   Etiketten, Linien statt Kästen (3px Rubrik, 1px Trenner, Haarlinie),
+   Rot NUR Akzent, kein Schatten, kein Radius, kein Dark-Mode.
+   Alle Zahlen aus zahlen.json (Stand 15.09.2026, aus data/state).
+   ===================================================================== */
+:root{
+  --paper:#f6f4ee; --paper-2:#fffdf8; --paper-3:#efece3;
+  --ink:#14120f; --ink-2:#33302a; --ink-3:#5e594f; --ink-4:#8a8479;
+  --rule:#d6d1c4; --rule-2:#e6e2d8; --rule-ink:#14120f;
+  --red:#e60000; --red-deep:#a30000; --red-wash:#fdf0ee;
+  --al-kritisch:#e60000; --al-mittel:#c47f00;
+  --al-gering:#217a3c;   --al-bestpreis:#2b5bd7;
+  --wrap:1180px;
+  --serif:'Source Serif 4','Source Serif Pro',Charter,'Bitstream Charter',
+          'Liberation Serif',Georgia,'Times New Roman',serif;
+  --sans:'Libre Franklin','Helvetica Neue','Liberation Sans',Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+     font-family:var(--serif);font-size:16px;line-height:1.5}
+a{color:inherit}
+.zahlen{font-variant-numeric:tabular-nums}
+
+/* ---------- Entwurfsbanner ---------- */
+.banner{background:var(--paper-3);color:var(--ink-2);font-family:var(--sans);
+        font-size:11px;text-align:center;padding:5px 16px;
+        border-bottom:1px solid var(--rule)}
+
+/* ---------- Nav (Platzhalter in Live-Breite) ---------- */
+.nav{background:var(--paper);border-bottom:1px solid var(--rule);padding:10px 20px 0}
+.nav-in{max-width:var(--wrap);margin:0 auto}
+.nav-marke{font-family:var(--sans);font-size:11px;font-weight:800;
+           letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.nav-marke b{color:var(--ink)}
+.nav-links{display:flex;flex-wrap:wrap;gap:2px 18px;margin-top:6px}
+.nav-links a{font-family:var(--sans);font-size:12px;font-weight:700;
+            text-decoration:none;color:var(--ink-2);padding:6px 0 8px;
+            border-bottom:3px solid transparent}
+.nav-links a.aktiv{color:var(--ink);border-bottom-color:var(--red)}
+.nav-links .nav-note{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+                     padding:8px 0;align-self:center}
+
+/* ---------- Kopf ---------- */
+.kopf{max-width:var(--wrap);margin:0 auto;padding:22px 20px 0}
+.kopf-zeile{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+            align-items:flex-end}
+h1{font-size:30px;line-height:1.18;font-weight:700;margin:0}
+.kopf-datum{font-family:var(--sans);font-size:11.5px;font-weight:700;
+            text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);
+            margin:8px 0 0}
+.exporte{display:flex;gap:8px;flex-wrap:wrap}
+.knopf{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:700;
+       color:var(--ink);background:var(--paper-2);border:1px solid var(--rule);
+       padding:6px 11px;text-decoration:none}
+.knopf:hover{background:var(--paper-3)}
+
+/* ---------- Reiter ---------- */
+.reiter{max-width:var(--wrap);margin:14px auto 0;padding:0 20px;
+        display:flex;gap:2px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.reiter a{font-family:var(--sans);font-size:13px;font-weight:700;text-decoration:none;
+          color:var(--ink-2);padding:8px 13px 9px;border-bottom:3px solid transparent}
+.reiter a.aktiv{color:var(--ink);border-bottom-color:var(--red)}
+.reiter .reiter-hinweis{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);
+                        align-self:center;padding:0 0 0 10px}
+
+/* ---------- Tafeln ---------- */
+.tafel{max-width:var(--wrap);margin:0 auto;padding:20px 20px 8px}
+.tafel-kopf{border-top:3px solid var(--rule-ink);padding-top:8px;margin-bottom:14px;
+            display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.tafel-kopf h2{font-size:20px;font-weight:700;margin:0}
+.tafel-kopf .tafel-note{font-family:var(--sans);font-size:11px;color:var(--ink-4)}
+
+/* ---------- Auswahl: Suchfeld + Band ---------- */
+.wahl{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:14px;align-items:start}
+.suche{position:relative}
+.suche label,.band-feld label{display:block;font-family:var(--sans);font-size:10px;
+     font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);
+     margin-bottom:5px}
+.suche-feld{display:flex;border:1px solid var(--rule)}
+.suche-feld input{flex:1;min-width:0;font:inherit;font-size:15px;padding:9px 11px;
+     border:0;background:var(--paper-2);color:var(--ink)}
+.suche-feld input:focus{outline:2px solid var(--red);outline-offset:-2px}
+.suche-feld .suche-hinweis{font-family:var(--sans);font-size:11px;color:var(--ink-4);
+     padding:0 10px;display:flex;align-items:center;background:var(--paper-2);
+     border-left:1px solid var(--rule)}
+.vorschau{position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--paper-2);
+     border:1px solid var(--rule);border-top:0;max-height:340px;overflow:auto}
+.vorschau:empty{display:none}
+.vorschau button{display:flex;justify-content:space-between;gap:10px;width:100%;
+     text-align:left;font:inherit;font-size:14px;padding:8px 11px;border:0;
+     background:none;border-bottom:1px solid var(--rule-2);cursor:pointer}
+.vorschau button:hover,.vorschau button:focus-visible{background:var(--paper-3)}
+.vorschau .v-titel{font-weight:600}
+.vorschau .v-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-3);
+     white-space:nowrap;align-self:center}
+.baender{display:flex;border:1px solid var(--rule)}
+.baender button{font-family:var(--sans);font-size:12.5px;font-weight:700;padding:9px 13px;
+     border:0;background:var(--paper-2);color:var(--ink-2);cursor:pointer;
+     border-right:1px solid var(--rule);text-align:left}
+.baender button:last-child{border-right:0}
+.baender button small{display:block;font-weight:600;font-size:10px;color:var(--ink-4)}
+.baender button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.baender button[aria-pressed="true"] small{color:var(--paper-3)}
+.baender button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+
+/* ---------- Antwort-Band + Rechenschaftssatz (EIN Block) ---------- */
+.antwort{border-top:3px solid var(--rule-ink);border-bottom:1px solid var(--rule);
+     padding:10px 0 9px;margin-top:14px}
+.antwort-satz{font-size:19px;line-height:1.35;font-weight:600;margin:0}
+.antwort-satz .band-name{font-family:var(--sans);font-size:12.5px;font-weight:800;
+     letter-spacing:.02em;color:var(--red);white-space:nowrap}
+.rechnung{font-size:13px;color:var(--ink-3);margin:5px 0 0;font-style:italic}
+
+/* ---------- Ergebnisliste ---------- */
+.ergebnis{margin:0}
+.ergebnis-kopf{display:grid;gap:0 14px;grid-template-columns:150px 1fr 128px 205px;
+     font-family:var(--sans);font-size:10px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.06em;color:var(--ink-4);padding:8px 6px 5px;
+     border-bottom:1px solid var(--rule)}
+.zeile{border-bottom:1px solid var(--rule-2)}
+.zeile summary{display:grid;gap:2px 14px;grid-template-columns:150px 1fr 128px 205px;
+     align-items:center;padding:10px 6px;cursor:pointer;list-style:none}
+.zeile summary::-webkit-details-marker{display:none}
+.zeile summary:hover{background:var(--paper-3)}
+.zeile summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.z-schnitt{font-size:21px;font-weight:700;line-height:1.1}
+.z-schnitt small{display:block;font-family:var(--sans);font-size:9.5px;font-weight:700;
+     color:var(--ink-4);letter-spacing:.05em;margin-top:2px}
+.z-band{display:block;height:5px;background:var(--paper-3);margin-top:6px;
+     position:relative}
+.z-band i{position:absolute;left:0;top:0;bottom:0;background:var(--ink-3)}
+.z-name{min-width:0}
+.z-anbieter{font-family:var(--sans);font-size:14px;font-weight:800}
+.z-tarif{font-size:13.5px;color:var(--ink-2)}
+.z-zwei{font-family:var(--sans);font-size:11px;color:var(--ink-3);margin-top:3px}
+.z-tco .tco{font-size:16.5px;font-weight:700;display:block}
+.z-tco .delta{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);display:block}
+.z-tco .delta.negativ{color:var(--al-gering)}
+.z-beleg{font-family:var(--sans);font-size:11px;color:var(--ink-3);text-align:right}
+.z-beleg a{text-decoration:none;font-weight:800;color:var(--red);font-size:12.5px}
+.z-beleg .termin{display:block;color:var(--ink-4);margin-top:2px}
+.chev{font-family:var(--sans);color:var(--ink-4);font-size:11px}
+details.zeile:not([open]) .chev::before{content:"+ Rechenweg"}
+details.zeile[open] .chev::before{content:"− Rechenweg"}
+
+/* Vodafone-Zeile: Emphasis über Linie und Etikett, nicht über Fläche */
+.zeile.ist-vf{border-left:3px solid var(--red);padding-left:8px;margin-left:-11px}
+.zeile.ist-vf summary{grid-template-columns:150px 1fr 128px 205px}
+.vf-chip{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:800;
+     letter-spacing:.05em;color:var(--red);border:1px solid var(--red);
+     padding:1px 6px;margin-left:7px;vertical-align:2px;text-transform:uppercase}
+.nahe-chip{display:inline-block;font-family:var(--sans);font-size:9px;font-weight:700;
+     color:var(--ink-4);border:1px solid var(--rule);padding:1px 6px;margin-left:6px;
+     vertical-align:2px}
+
+/* Rechenweg je Bündelzeile (Rest-Aufklapper Nr. 3) */
+.rw{margin:0 6px 12px;padding:10px 14px;background:var(--paper-2);
+    border-left:3px solid var(--rule)}
+.rw-summe{font-size:14.5px;font-weight:600;margin:0 0 5px}
+.rw-posten{font-family:var(--sans);font-size:12px;color:var(--ink-2);margin:0 0 2px;
+     display:flex;justify-content:space-between;gap:12px;max-width:520px}
+.rw-rest{font-size:12.5px;color:var(--ink-3);margin:6px 0 0;font-style:italic}
+
+/* Lücken-Zeilen: benannt, im selben Rhythmus */
+.luecke{border-bottom:1px solid var(--rule-2);padding:9px 6px;
+     display:grid;gap:2px 14px;grid-template-columns:150px 1fr 128px 205px;align-items:center}
+.l-anbieter{font-family:var(--sans);font-size:14px;font-weight:800;color:var(--ink-3)}
+.l-grund{font-size:13.5px;color:var(--ink-3)}
+.l-alt{font-family:var(--sans);font-size:11px;color:var(--ink-4);margin-top:2px}
+.l-alt b{color:var(--ink-2);font-weight:700}
+.l-strich{height:5px;background:repeating-linear-gradient(90deg,var(--rule) 0 5px,transparent 5px 10px)}
+
+/* ---------- Band-Matrix ---------- */
+.matrix{margin:16px 0 4px}
+.matrix h3{font-family:var(--sans);font-size:10.5px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.07em;color:var(--ink-3);margin:0 0 7px}
+.matrix table{border-collapse:collapse;width:100%}
+.matrix th{font-family:var(--sans);font-size:10.5px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.04em;color:var(--ink-2);text-align:right;padding:5px 8px;
+     border-bottom:1px solid var(--rule);cursor:pointer}
+.matrix th:first-child{text-align:left}
+.matrix th small{display:block;font-weight:600;color:var(--ink-4);text-transform:none;
+     letter-spacing:0}
+.matrix th.aktiv{color:var(--red)}
+.matrix td{font-size:13.5px;text-align:right;padding:6px 8px;
+     border-bottom:1px solid var(--rule-2)}
+.matrix td:first-child{font-family:var(--sans);font-size:12.5px;font-weight:700;text-align:left}
+.matrix td.besetzt{font-weight:600}
+.matrix td.leer{color:var(--ink-4)}
+.matrix td.aktiv{background:var(--paper-3)}
+.matrix td .m-leer-grund{font-family:var(--sans);font-size:10px;color:var(--ink-4)}
+
+/* ---------- Fuß-Aufklapper Maßstab & Datenlage (Rest Nr. 2) ---------- */
+details.massstab{margin-top:14px;border-top:1px solid var(--rule);padding-top:8px}
+details.massstab summary{cursor:pointer;font-family:var(--sans);font-size:11.5px;
+     font-weight:800;color:var(--ink-2);list-style:none}
+details.massstab summary::before{content:"+ ";color:var(--ink-4)}
+details.massstab[open] summary::before{content:"− "}
+details.massstab div{font-size:13.5px;color:var(--ink-2);max-width:76ch;padding-top:6px}
+
+/* ---------- Beispielblock Pixel (feste Leitfrage) ---------- */
+.beispiel{border-top:3px solid var(--ink);margin-top:26px;padding-top:10px}
+.beispiel-frage{font-size:16px;font-style:italic;color:var(--ink-2);margin:0 0 10px}
+.beispiel-frage b{font-style:normal}
+
+/* ---------- Radar-Wireframe ---------- */
+.wire{display:grid;grid-template-columns:200px 1fr;gap:14px;border-bottom:1px solid var(--rule-2);
+      padding:10px 6px;align-items:baseline}
+.wire-name{font-family:var(--sans);font-size:12.5px;font-weight:800}
+.wire-name small{display:block;font-weight:600;font-size:10.5px;color:var(--ink-4)}
+.wire-koerper{font-size:13px;color:var(--ink-2)}
+.wire-hoehe{font-family:var(--sans);font-size:10.5px;color:var(--ink-4);white-space:nowrap}
+.platzhalter{border:1px dashed var(--rule);background:var(--paper-2);padding:8px 12px;
+     font-family:var(--sans);font-size:11.5px;color:var(--ink-4)}
+.summentafel{border-collapse:collapse;margin-top:12px;width:100%}
+.summentafel th{font-family:var(--sans);font-size:10px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.05em;color:var(--ink-3);text-align:right;padding:4px 8px;
+     border-bottom:1px solid var(--rule)}
+.summentafel th:first-child{text-align:left}
+.summentafel td{font-size:13px;text-align:right;padding:4px 8px;
+     border-bottom:1px solid var(--rule-2)}
+.summentafel td:first-child{text-align:left;font-family:var(--sans);font-size:12px;font-weight:700}
+.summentafel tr.summe td{border-top:2px solid var(--rule-ink);border-bottom:0;font-weight:700}
+
+/* Alarm-/Abweichungstabellen */
+.tabelle{width:100%;border-collapse:collapse}
+.tabelle th{font-family:var(--sans);font-size:10px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.05em;color:var(--ink-3);text-align:left;padding:5px 8px 5px 0;
+     border-bottom:1px solid var(--rule)}
+.tabelle td{font-size:13.5px;padding:7px 8px 7px 0;border-bottom:1px solid var(--rule-2);
+     color:var(--ink-2)}
+.tabelle td:first-child{color:var(--ink);font-weight:600}
+.tabelle .stufe{font-family:var(--sans);font-size:10px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.03em;padding:1px 6px;border:1px solid currentColor;white-space:nowrap}
+.st-k{color:var(--al-kritisch)} .st-m{color:var(--al-mittel)}
+.st-g{color:var(--al-gering)}   .st-b{color:var(--al-bestpreis)}
+.deckel{font-family:var(--sans);font-size:12px;font-weight:700;color:var(--red);
+     background:none;border:0;border-top:2px solid var(--rule);padding:9px 0 2px;
+     cursor:pointer;width:100%;text-align:left}
+.kacheln{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.kachel{border:1px solid var(--rule);background:var(--paper-2);padding:7px 12px 8px;min-width:104px}
+.kachel b{display:block;font-size:20px;font-weight:700}
+.kachel span{font-family:var(--sans);font-size:10px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.04em;color:var(--ink-3)}
+
+/* ---------- Platzhalter-Tafeln ---------- */
+.platz-tafel p{font-size:14px;color:var(--ink-2);margin:6px 0;max-width:76ch}
+
+/* ---------- Falz-Rechnung ---------- */
+.falz{margin-top:18px;border:1px solid var(--rule);background:var(--paper-2);padding:12px 14px}
+.falz h3{font-family:var(--sans);font-size:11px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.06em;margin:0 0 8px;color:var(--ink-2)}
+.falz table{border-collapse:collapse}
+.falz td,.falz th{font-size:12.5px;text-align:right;padding:3px 10px 3px 0}
+.falz td:first-child,.falz th:first-child{text-align:left;font-family:var(--sans);
+     font-size:11.5px;font-weight:700}
+.falz .falz-summe td{border-top:2px solid var(--rule-ink);font-weight:700;border-bottom:0}
+
+/* ---------- Drei Rest-Aufklapper: Kennzeichnung ---------- */
+.reste{margin-top:26px;border-top:3px solid var(--red);padding-top:10px}
+.reste h3{font-family:var(--sans);font-size:12px;font-weight:800;text-transform:uppercase;
+     letter-spacing:.06em;color:var(--red);margin:0 0 6px}
+.reste p{font-size:13.5px;color:var(--ink-2);margin:0 0 10px;max-width:82ch}
+
+/* ---------- Fuß ---------- */
+.fuss{max-width:var(--wrap);margin:26px auto 0;padding:14px 20px 40px;
+      border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+.fuss p{margin:0 0 7px;max-width:88ch}
+
+/* ---------- Mobil ----------
+   Falz-Regel (Strategie §6, 11c): Vorlauf bis Zeilenbeginn ≤ 770 px,
+   erste Anbieterzeile endet ≤ 844 px. Alle Kürzungen hier sind
+   Stellschrauben aus §6: Nav-Kompaktmodus, Export-Knöpfe als EINE
+   kompakte Zeile, Untertitel/Notizen weg. Gemessene Werte stehen in
+   der Falz-Rechnung am Ende der Vergleichstafel. */
+@media (max-width:640px){
+  .banner{font-size:9.5px;padding:3px 10px;white-space:nowrap;overflow:hidden;
+          text-overflow:ellipsis}
+  .nav{padding:7px 14px 0}
+  .nav-marke{font-size:9.5px}
+  .nav-links{gap:1px 12px;margin-top:4px}
+  .nav-links a{font-size:11px;padding:4px 0 6px}
+  .nav-links .nav-note{display:none}
+  .kopf{padding:12px 14px 0}
+  h1{font-size:20px}
+  .kopf-datum{font-size:10px;margin-top:5px}
+  .exporte{order:3;width:100%;margin-top:8px}
+  .exporte .knopf{flex:1;text-align:center;padding:5px 4px;font-size:11px}
+  .reiter{padding:0 14px;margin:8px auto 0}
+  .reiter a{font-size:11.5px;padding:6px 8px 7px}
+  .reiter .reiter-hinweis{display:none}
+  .tafel{padding:12px 14px 6px}
+  .tafel-kopf h2{font-size:16px}
+  .tafel-kopf .tafel-note{display:none}
+  .wahl{grid-template-columns:1fr;gap:8px}
+  .suche label,.band-feld label{margin-bottom:3px;font-size:9px}
+  .suche-feld input{padding:8px 9px;font-size:14px}
+  .baender{width:100%}
+  .baender button{flex:1;padding:7px 5px;font-size:11.5px}
+  .baender button small{font-size:9px}
+  .antwort{padding:8px 0 7px;margin-top:8px}
+  .antwort-satz{font-size:14.5px}
+  .rechnung{font-size:11.5px;margin-top:3px}
+  .ergebnis-kopf{display:none}
+  .zeile summary{grid-template-columns:1fr auto;grid-template-areas:
+     "schnitt tco" "name name" "beleg beleg";row-gap:4px;padding:9px 2px}
+  .z-schnitt{grid-area:schnitt;font-size:19px}
+  .z-name{grid-area:name}
+  .z-tco{grid-area:tco;text-align:right}
+  .z-beleg{grid-area:beleg;text-align:left;display:flex;gap:10px;align-items:center}
+  .z-beleg .termin{margin-top:0}
+  .chev{display:none}
+  .luecke{grid-template-columns:1fr;row-gap:3px;padding:8px 2px}
+  .l-alt{display:block;margin-top:2px}
+  .matrix td,.matrix th{padding:6px 5px}
+  .wire{grid-template-columns:1fr;gap:4px}
+  .wire-hoehe{order:3}
+}
+</style>
+</head>
+<body>
+
+<p class="banner">Statischer Klick-Entwurf (E1) · 16.09.2026 · EINE Geräteseite — alle Zahlen aus
+<code>zahlen.json</code> (Bestand 15.09.2026, aus <code>data/state</code> reproduziert) ·
+kein Produktionscode · Reiter zeigen die Zielstruktur, Inhalte stehen untereinander</p>
+
+<!-- Nav-Platzhalter in Live-Breite (Zielgeometrie, kein Produktionscode) -->
+<nav class="nav" aria-label="Hauptnavigation (Platzhalter)">
+  <div class="nav-in">
+    <div class="nav-marke"><b>Vodafone Product and Services Insights</b> · Entwirf die Nav der Zielseite</div>
+    <div class="nav-links">
+      <a href="#">Diese Woche</a><a href="#">Meldungen</a><a href="#">Differenzierung</a>
+      <a href="#" class="aktiv">Geräte</a><a href="#">Wettbewerb</a><a href="#">Quellen</a>
+      <a href="#">Newsletter</a>
+      <span class="nav-note">7 Einträge — „Wettbewerbs-Radar" entfällt mit dieser Seite</span>
+    </div>
+  </div>
+</nav>
+
+<header class="kopf">
+  <div class="kopf-zeile">
+    <div>
+      <h1>Gerät im Tarifvergleich</h1>
+      <p class="kopf-datum">Preise vom 15. September 2026 · 88 Modelle · 5 Anbieter im Vergleich</p>
+    </div>
+    <div class="exporte">
+      <a class="knopf" href="https://telco-radar.onrender.com/exporte/geraete-tco.csv">TCO-24&nbsp;(CSV)</a>
+      <a class="knopf" href="https://telco-radar.onrender.com/exporte/wettbewerbsradar.csv">Radar&nbsp;(CSV)</a>
+      <a class="knopf" href="https://telco-radar.onrender.com/exporte/geraete-aktuell.csv">Barpreise&nbsp;(CSV)</a>
+    </div>
+  </div>
+</header>
+
+<nav class="reiter" aria-label="Tafeln der EINEN Seite">
+  <a class="aktiv" href="#tafel-vergleich" aria-current="page">Vergleich</a>
+  <a href="#tafel-radar">Radar</a>
+  <a href="#tafel-verlauf">Preisverlauf</a>
+  <a href="#tafel-katalog">Gerätekatalog</a>
+  <span class="reiter-hinweis">vier Tafeln auf EINER Seite — im Entwurf untereinander</span>
+</nav>
+
+<!-- =================== TAfel 1: VERGLEICH =================== -->
+<main>
+<section class="tafel" id="tafel-vergleich" aria-label="Vergleich">
+  <div class="tafel-kopf">
+    <h2>Was kostet das Gerät bei wem — und gibt es die Kombination dort überhaupt?</h2>
+    <span class="tafel-note">Leitfrage: Gerät × Anbieter × Tarifband · Leitzahl Ø&nbsp;€/Monat über die Bindung</span>
+  </div>
+
+  <div class="wahl">
+    <div class="suche">
+      <label for="suchfeld">Modell suchen</label>
+      <div class="suche-feld">
+        <input id="suchfeld" type="text" autocomplete="off" spellcheck="false"
+               placeholder="z. B. „google pixel“ oder „iphone 17“" aria-describedby="suche-treffer">
+        <span class="suche-hinweis" id="suche-treffer">88 Modelle</span>
+      </div>
+      <div class="vorschau" id="vorschau" role="listbox" aria-label="Modell-Vorschau"></div>
+    </div>
+    <div class="band-feld">
+      <label id="band-label">Tarifband</label>
+      <div class="baender" role="group" aria-labelledby="band-label" id="band-wahl">
+        <button type="button" data-band="klein" aria-pressed="true">Klein<small>bis 20 GB</small></button>
+        <button type="button" data-band="mittel" aria-pressed="false">Mittel<small>21–60 GB</small></button>
+        <button type="button" data-band="gross" aria-pressed="false">Groß<small>über 60 GB</small></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="antwort" id="antwort"></div>
+
+  <div class="ergebnis" id="ergebnis"></div>
+
+  <div class="matrix" id="matrix"></div>
+
+  <details class="massstab">
+    <summary>Maßstab &amp; Datenlage</summary>
+    <div id="massstab"></div>
+  </details>
+
+  <!-- Falz-Rechnung: E1-Abnahme, Werte nach Browsermessung eingetragen -->
+  <div class="falz" id="falz-rechnung">
+    <h3>Falz-Rechnung Vergleichsansicht · 390 × 844 (im Entwurf gemessen, Playwright/Chromium)</h3>
+    <table>
+      <tr><th>Posten</th><th>Ende px</th><th>Höhe px</th></tr>
+      <tr><td>Entwurfsbanner + Nav (Platzhalter)</td><td class="zahlen">141</td><td class="zahlen">141</td></tr>
+      <tr><td>Kopf (H1 · Datum · Export-Zeile)</td><td class="zahlen">264</td><td class="zahlen">123</td></tr>
+      <tr><td>Reiterleiste</td><td class="zahlen">306</td><td class="zahlen">42</td></tr>
+      <tr><td>Tafel-Kopf (Leitfrage, Note mobil weg)</td><td class="zahlen">377</td><td class="zahlen">59</td></tr>
+      <tr><td>Suchfeld + Band-Wahl</td><td class="zahlen">512</td><td class="zahlen">121</td></tr>
+      <tr><td>Antwort-Band + Rechenschaftssatz (EIN Block)</td><td class="zahlen">653</td><td class="zahlen">132</td></tr>
+      <tr class="falz-summe"><td>Vorlauf bis Zeilenbeginn (Grenze 770)</td><td class="zahlen">653</td><td class="zahlen">—</td></tr>
+      <tr><td>erste Anbieterzeile (gestapelt)</td><td class="zahlen">791</td><td class="zahlen">138</td></tr>
+      <tr class="falz-summe"><td>Unterkante erste Zeile (Grenze 844)</td><td class="zahlen">791</td><td class="zahlen">—</td></tr>
+    </table>
+    <p style="font-size:11.5px;color:var(--ink-4);margin:8px 0 0;font-family:var(--sans)">
+      Desktop 1440 × 900 zum Vergleich: Antwort-Band endet 485, erste Zeile 600, zweite 686 —
+      4 Anbieterzeilen über der Falz. Kein &lt;details&gt; und kein Erklärabsatz zwischen Band-Wahl
+      und erster Zeile. Seite horizontal unverrollt (390 / 1440).</p>
+  </div>
+</section>
+
+<!-- Fester Beispielblock: Antonios Leitfrage -->
+<section class="tafel beispiel" id="beispiel-pixel" aria-label="Beispiel: die Leitfrage">
+  <div class="tafel-kopf">
+    <h2>Beispiel: Antonios Leitfrage</h2>
+    <span class="tafel-note">„Was kostet es den Kunden bei der Telekom, ein Google Pixel 11 Pro zu finanzieren — mit einem mittleren Tarif?“</span>
+  </div>
+  <p class="beispiel-frage"><b>Google Pixel 11 Pro · 256 GB</b> — Band <b>Mittel</b> voreingestellt.
+     Die Antwort steht in der ersten Zeile und in der benannten Lücke darunter.</p>
+  <div class="baender" role="group" aria-label="Band für das Beispiel" id="band-beispiel" style="margin-bottom:12px">
+    <button type="button" data-band="klein" aria-pressed="false">Klein<small>bis 20 GB</small></button>
+    <button type="button" data-band="mittel" aria-pressed="true">Mittel<small>21–60 GB</small></button>
+    <button type="button" data-band="gross" aria-pressed="false">Groß<small>über 60 GB</small></button>
+  </div>
+  <div class="antwort" id="antwort-beispiel"></div>
+  <div class="ergebnis" id="ergebnis-beispiel"></div>
+  <div class="matrix" id="matrix-beispiel"></div>
+</section>
+
+<!-- =================== TAfel 2: RADAR (Höhen-Wireframe) =================== -->
+<section class="tafel" id="tafel-radar" aria-label="Radar">
+  <div class="tafel-kopf">
+    <h2>Radar — wo ist Vodafone teurer als der Wettbewerb?</h2>
+    <span class="tafel-note">Höhen-Wireframe: Ziel-Höhen je Sektion, zwei Sektionen mit echten Zeilen</span>
+  </div>
+
+  <div class="kacheln" id="alarm-kacheln"></div>
+
+  <div class="wire">
+    <div class="wire-name">Preis-Alarme<small>Barpreis-Abstand je Modell</small></div>
+    <div class="wire-koerper">
+      <table class="tabelle" id="alarm-tabelle"></table>
+      <button type="button" class="deckel" id="alarm-deckel">alle 48 Alarme anzeigen</button>
+    </div>
+    <div class="wire-hoehe">Ziel 1.150 / 1.900 px<br>mobil: zu, mit Menge</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">TCO-Abweichung<small>Vodafone gegen den Wettbewerb</small></div>
+    <div class="wire-koerper">
+      <table class="tabelle" id="abweichung-tabelle"></table>
+      <button type="button" class="deckel" id="abweichung-deckel"></button>
+    </div>
+    <div class="wire-hoehe">Ziel 700 / 1.100 px</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">Händler-Barpreis<small>Handel und Discount</small></div>
+    <div class="wire-koerper"><div class="platzhalter">12 sichtbare Zeilen + Aufklapper „alle Händler anzeigen“
+      — Deckel besteht heute (O4). Inhalt wie Live-Seite, hier nur Höhen-Platzhalter.</div></div>
+    <div class="wire-hoehe">Ziel 600 / 1.000 px<br>mobil: zu, mit Menge</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">Bei Wettbewerbern gelistet<small>Sortiments-Lücken</small></div>
+    <div class="wire-koerper"><div class="platzhalter">zugeklappt (besteht heute) — auf der EINEN Seite unverändert</div></div>
+    <div class="wire-hoehe">Ziel 187 / 287 px</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">Wochenkarte<small>Was diese Woche auffällt</small></div>
+    <div class="wire-koerper"><div class="platzhalter">Summary-Zeile (besteht heute)</div></div>
+    <div class="wire-hoehe">Ziel 26 / 53 px</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">Lifecycle<small>Verweildauer · Preisverfall · Nachfolger</small></div>
+    <div class="wire-koerper"><div class="platzhalter">LIFECYCLE_SICHTBAR-Deckel (besteht) + Aufklapper — mobil default-zugeklappt</div></div>
+    <div class="wire-hoehe">Ziel 450 / 79 px</div>
+  </div>
+
+  <div class="wire">
+    <div class="wire-name">Nicht erhebbar<small>Amazon · Expert · Euronics</small></div>
+    <div class="wire-koerper"><div class="platzhalter">zugeklappter Aufklapper (besteht heute)</div></div>
+    <div class="wire-hoehe">Ziel 26 / 79 px</div>
+  </div>
+
+  <table class="summentafel" aria-label="Summenrechnung der Radar-Tafel">
+    <tr><th>Sektion</th><th>Ziel 1440</th><th>Ziel 390</th></tr>
+    <tr><td>Kopf (1 Satz + Export)</td><td class="zahlen">180</td><td class="zahlen">260</td></tr>
+    <tr><td>Preis-Alarme</td><td class="zahlen">1.150</td><td class="zahlen">79 (zu, mit Menge)</td></tr>
+    <tr><td>TCO-Abweichung</td><td class="zahlen">700</td><td class="zahlen">1.100</td></tr>
+    <tr><td>Händler-Barpreis</td><td class="zahlen">600</td><td class="zahlen">79 (zu, mit Menge)</td></tr>
+    <tr><td>Bei Wettbewerbern gelistet</td><td class="zahlen">187</td><td class="zahlen">287</td></tr>
+    <tr><td>Wochenkarte</td><td class="zahlen">26</td><td class="zahlen">53</td></tr>
+    <tr><td>Lifecycle</td><td class="zahlen">450</td><td class="zahlen">79 (zu)</td></tr>
+    <tr><td>Nicht erhebbar</td><td class="zahlen">26</td><td class="zahlen">79 (zu)</td></tr>
+    <tr><td>Nav/Footer/Padding</td><td class="zahlen">370</td><td class="zahlen">600</td></tr>
+    <tr class="summe"><td>Summe (Grenze 2.900 / 2.950)</td><td class="zahlen">≈ 2.800</td><td class="zahlen">≈ 2.620</td></tr>
+  </table>
+</section>
+
+<!-- =================== TAfel 3+4: VERLAUF / KATALOG =================== -->
+<section class="tafel platz-tafel" id="tafel-verlauf" aria-label="Preisverlauf (Platzhalter)">
+  <div class="tafel-kopf"><h2>Preisverlauf</h2>
+    <span class="tafel-note">Platzhalter-Reiter — Struktur wie Live-Seite</span></div>
+  <p>Barpreis-Zeitreihe je Modell (G0): 4 Messtage seit dem 12.09.2026, 472 Bündel-Sätze in der Historie — die Kurven entstehen mit jedem nächtlichen Lauf.</p>
+  <p>Ein Diagramm je Modell ab 4 Messtagen; darunter die Wertetabelle mit Beleg je Messpunkt.</p>
+  <p>Auswahl über dieselbe Vorschau wie der Vergleich — ein Modell, ein Verlauf, kein zweiter Suchmechanismus.</p>
+</section>
+
+<section class="tafel platz-tafel" id="tafel-katalog" aria-label="Gerätekatalog (Platzhalter)">
+  <div class="tafel-kopf"><h2>Gerätekatalog</h2>
+    <span class="tafel-note">Platzhalter-Reiter — Struktur wie Live-Seite</span></div>
+  <p>568 Listungen im Bestand, 88 Modelle mit mindestens einem Bündel, 45 SIM-only-Referenzen als Maßstab.</p>
+  <p>Flache Tabelle Modell × Anbieter × Zustand, sortierbar; Barpreise und Bündel getrennt ausgewiesen.</p>
+  <p>Neue Modelle legt der nächtliche Lauf selbst an (Phase E4) — ab 2 Messtagen erscheinen sie hier und in der Vorschau.</p>
+</section>
+
+<!-- Drei bewusste Rest-Aufklapper: Wortlaut-Abweichung zur Freigabe -->
+<section class="tafel reste" aria-label="Drei Rest-Aufklapper">
+  <h3>Drei bewusste Rest-Aufklapper — Abweichung von „alle Unterkommentare weg“</h3>
+  <p>Antonio sagte: „Die Unterkommentare, alle weg.“ Dieser Entwurf behält drei Reste und legt sie
+     ausdrücklich zur Freigabe vor — nichts wird still behalten:</p>
+  <p><b>1 · Rechenschaftssatz</b> (sichtbar, eine Zeile über der Liste): „So gerechnet: …“ — ohne ihn
+     wäre die Leitzahl unbelegt. <b>2 · „Maßstab &amp; Datenlage“</b> (ein zugeklappter Fuß-Aufklapper
+     am Ende der Vergleichsansicht): Bänder, Messtakt, Näherungs-Regel. <b>3 · Rechenweg-Aufklapper
+     je Bündelzeile</b> (+ vor jeder Zeile): Posten, Restbeträge, Beleg — Antonios eigene
+     „intransparent“-Kritik wird damit je Zeile beantwortet.</p>
+</section>
+</main>
+
+<footer class="fuss">
+  <p><b>Maßstab:</b> Ø €/Monat = alle einmaligen und monatlichen Kosten über die Bindung, abzüglich
+     Boni, geteilt durch die Laufzeit. TCO-24 daneben als Gesamtsumme. Gerätepreis ohne Vertrag und
+     Bündel sind zwei Zahlen und werden nie vermischt.</p>
+  <p><b>Datenstand:</b> 15.09.2026 · 88 Modelle · 276 von 850 Kombinationen (Modell × Band × Anbieter)
+     besetzt · Händler ohne Tarifbündel: Amazon, Expert, Saturn (Saturn-Preis steht als Barpreis im
+     Modellkopf). Alle Zahlen nachts gemessen, jede Zeile verlinkt ihr Angebot.</p>
+  <p><b>Alt-URL:</b> <a href="wettbewerbsradar.html">wettbewerbsradar.html</a> leitet künftig auf
+     diese Seite weiter (Meta-Refresh, Muster der alten Dateinamen) — die Weiterleitungs-Datei liegt
+     beispielhaft neben diesem Entwurf.</p>
+</footer>
+
+<script>
+/* =====================================================================
+   E1-Prototyp. Liest zahlen.json (aus data/state reproduziert, Stand
+   15.09.2026) und rendert Vergleichsansicht, festen Pixel-Beispielblock
+   und die zwei echten Radar-Sektionen. Das Antwort-Band ist REINE
+   ABLEITUNG aus denselben Zeilen, die die Liste rendert — es führt
+   keine eigene Rechnung (Strategie E2, „rot-vor-grün" test_ergebnis-
+   liste.test_antwortband_rechnet_aus_den_zeilen).
+   ===================================================================== */
+const BAND_TEXT = {klein:"Band Klein (bis 20 GB)", mittel:"Band Mittel (21–60 GB)",
+                   gross:"Band Groß (über 60 GB)"};
+const BAND_KURZ = {klein:"Klein", mittel:"Mittel", gross:"Groß"};
+let Z = null;
+
+const fmtEuro = s => s;   // Beträge kommen fertig formatiert aus zahlen.json
+const $ = id => document.getElementById(id);
+
+/* ---------- Antwort-Band: Ableitung aus den Zeilen ---------- */
+function antwortBand(mod, band) {
+  const b = mod.baender[band]; if (!b) return null;
+  const angebote = b.zeilen.filter(z => !z.naeherung && z.tco24 !== null);
+  const schnitte = angebote.map(z => z.schnitt).filter(v => v != null);
+  const tcos = angebote.map(z => z.tco24).filter(v => v != null);
+  const M = Z.anbieter.length;
+  const N = angebote.length;
+  const minS = Math.min(...schnitte), maxS = Math.max(...schnitte);
+  // schnitt_text trägt „€/M." - im Satz steht die Einheit GENAU EINMAL am Ende
+  const num = v => fmtEuro(angebote.find(z => z.schnitt === v).schnitt_text)
+                    .replace(" €/M.", "");
+  const spanne = minS === maxS ? num(minS) : num(minS) + "–" + num(maxS);
+  const ab = tcos.length ? fmtEuro(angebote.reduce((a,z)=>z.tco24<a.tco24?z:a).tco24_text) : "—";
+  return {N, M, spanne, ab};
+}
+
+/* ---------- Eine Anbieterzeile ---------- */
+function zeileHtml(z, maxTco) {
+  const breit = maxTco ? Math.max(4, Math.round(z.tco24 / maxTco * 100)) : 0;
+  const mon = z.monatlich != null
+    ? (z.bnd_preis ? "Bündelpreis " : "monatlich ")
+      + z.monatlich.toLocaleString("de-DE",{minimumFractionDigits:2}) + " €"
+    : "monatlich —";
+  const einmal = z.einmalig
+    ? "einmalig " + z.einmalig.toLocaleString("de-DE",{minimumFractionDigits:2}) + " €" : "einmalig 0,00 €";
+  const delta = z.referenz ? '<span class="delta">Referenz</span>'
+    : z.delta_text ? `<span class="delta ${z.delta_euro < 0 ? "negativ" : ""}">Δ ${z.delta_text}</span>` : "";
+  const posten = z.bestandteile.map(p =>
+      `<p class="rw-posten"><span>${p.name}</span><span class="zahlen">${(p.betrag||0).toLocaleString("de-DE",{minimumFractionDigits:2})} €</span></p>`).join("");
+  const rest = z.offen_nach_24
+    ? `Nach Monat 24 noch ${z.offen_nach_24.toLocaleString("de-DE",{minimumFractionDigits:2})} € offen`
+      + (z.offene_raten ? ` (${z.offene_raten} Geräteraten)` : "")
+      + " — getrennt ausgewiesen, nicht in der Leitzahl." : "";
+  return `<details class="zeile${z.referenz ? " ist-vf" : ""}">
+    <summary>
+      <span class="z-schnitt zahlen">${z.schnitt_text.replace(" €/M.","")}<small>Ø € / MONAT</small>
+        <span class="z-band"><i style="width:${breit}%"></i></span></span>
+      <span class="z-name">
+        <span class="z-anbieter">${z.anbieter}${z.referenz && !z.naeherung ? '<span class="vf-chip">unser Angebot</span>' : ""}${z.naeherung ? '<span class="nahe-chip">Maßstab, kein Angebot</span>' : ""}</span>
+        <span class="z-tarif">${z.tarif}${z.gb ? " · " + z.gb : ""}${z.zustand ? " · " + z.zustand : ""}</span>
+        <span class="z-zwei zahlen">${mon} + ${einmal}</span>
+      </span>
+      <span class="z-tco zahlen"><span class="tco">${z.tco24_text}</span>${delta}</span>
+      <span class="z-beleg"><a href="${z.url}" target="_blank" rel="noopener">Beleg ↗</a>
+        <span class="termin">gemessen ${z.messtermin}</span></span>
+      <span class="chev"></span>
+    </summary>
+    <div class="rw">
+      <p class="rw-summe zahlen">TCO-24 ${z.tco24_text} = Ø ${z.schnitt_text} × Bindung</p>
+      ${posten}
+      ${rest ? `<p class="rw-rest">${rest}</p>` : ""}
+      <p class="rw-rest zahlen">Beleg: <a href="${z.url}" target="_blank" rel="noopener">${z.url}</a> · abgerufen ${z.messtermin}</p>
+    </div>
+  </details>`;
+}
+
+/* ---------- Lücken-Zeile ---------- */
+function lueckeHtml(l) {
+  const alt = l.alternativ.length
+    ? ` · verfügbar in ` + l.alternativ.map(a => `<b>${BAND_KURZ[a.band]} ${a.tco_text}</b>`).join(" · ") : "";
+  return `<div class="luecke">
+    <span class="l-anbieter">${l.anbieter}</span>
+    <span><span class="l-grund">${l.grund}</span><span class="l-alt">${alt ? alt.replace(" · verfügbar in ", "verfügbar in ") : ""}</span>
+      <span class="l-strich" style="display:block;margin-top:5px"></span></span>
+    <span></span><span></span>
+  </div>`;
+}
+
+/* ---------- Ergebnisliste + Antwort + Matrix ---------- */
+function renderVergleich(modId, band, prefix) {
+  const mod = Z.modelle[modId];
+  const target = prefix ? $("ergebnis-beispiel") : $("ergebnis");
+  const aTarget = prefix ? $("antwort-beispiel") : $("antwort");
+  const mTarget = prefix ? $("matrix-beispiel") : $("matrix");
+  const b = mod.baender[band];
+  if (!b) {
+    aTarget.innerHTML = `<p class="antwort-satz">${mod.titel} · ${BAND_TEXT[band]}: kein Bündel in diesem Band.</p>
+      <p class="rechnung">So gerechnet: alle einmaligen und monatlichen Kosten über die Bindung, abzüglich Boni, geteilt durch die Laufzeit.</p>`;
+    target.innerHTML = "";
+    mTarget.innerHTML = "";
+    return;
+  }
+  const a = antwortBand(mod, band);
+  const bandName = BAND_TEXT[band].replace(" (", " · ").replace(")", "");
+  aTarget.innerHTML = `
+    <p class="antwort-satz">${mod.titel} · <span class="band-name">${bandName}</span>:
+      ${a.N} von ${a.M} Anbietern führen es · Ø ${a.spanne} €/Monat · TCO-24 ab ${a.ab}</p>
+    <p class="rechnung">So gerechnet: alle einmaligen und monatlichen Kosten über die Bindung, abzüglich Boni,
+      geteilt durch die Laufzeit — jede Zeile verlinkt das nächtlich gemessene Angebot.</p>`;
+  const maxTco = Math.max(...b.zeilen.map(z => z.tco24 || 0));
+  target.innerHTML =
+    `<div class="ergebnis-kopf"><span>Ø €/Monat</span><span>Anbieter · Tarif · Band</span>
+      <span>TCO-24 · Δ</span><span style="text-align:right">Beleg · Messung</span></div>` +
+    b.zeilen.map(z => zeileHtml(z, maxTco)).join("") +
+    b.luecken.map(lueckeHtml).join("");
+  renderMatrix(mod, band, mTarget, prefix);
+}
+
+function renderMatrix(mod, band, target, prefix) {
+  const zeilen = Z.anbieter.map(an => {
+    const zellen = ["klein","mittel","gross"].map(bk => {
+      const bb = mod.baender[bk];
+      const z = bb && bb.zeilen.find(x => x.anbieter === an && !x.naeherung);
+      const l = bb && bb.luecken.find(x => x.anbieter === an);
+      const kurz = bk === band ? " aktiv" : "";
+      if (z) return `<td class="besetzt zahlen${kurz}" title="${z.tarif}">${z.tco24_text}</td>`;
+      if (mod.baender[bk]) return `<td class="leer${kurz}">—<span class="m-leer-grund"> ${l ? l.grund.replace("kein Bündel in diesem Band","Band-Lücke").replace("kein Bündel erhoben","kein Bündel") : ""}</span></td>`;
+      return `<td class="leer${kurz}">·</td>`;
+    }).join("");
+    return `<tr><td>${an}</td>${zellen}</tr>`;
+  }).join("");
+  const kopf = ["klein","mittel","gross"].map(bk =>
+    `<th data-band="${bk}" class="${bk===band?"aktiv":""}">${BAND_KURZ[bk]}<small>${Z.baender_meta[bk].bereich}</small></th>`).join("");
+  target.innerHTML = `<h3>Alle drei Bänder im Überblick — ${mod.titel} (TCO-24 je Zelle)</h3>
+    <table><thead><tr><th>Anbieter</th>${kopf}</tr></thead><tbody>${zeilen}</tbody></table>
+    <p class="rechnung" style="margin-top:6px">„—“ = benannte Lücke mit Grund in der Liste · „·“ = Band bei diesem Modell nicht erhoben · Spaltenkopf wechselt das Band</p>`;
+  target.querySelectorAll("th[data-band]").forEach(th =>
+    th.addEventListener("click", () => setBand(th.dataset.band, prefix)));
+}
+
+/* ---------- Band-Schalter ---------- */
+function setBand(band, prefix) {
+  const gruppe = prefix ? $("band-beispiel") : $("band-wahl");
+  gruppe.querySelectorAll("button").forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.band === band ? "true" : "false"));
+  renderVergleich(prefix ? "google-pixel-11-pro-256" : zustand.modell, band, prefix);
+}
+
+/* ---------- Suchfeld mit Live-Vorschau ---------- */
+const zustand = {modell: "apple-iphone-17-pro-256", band: "klein"};
+
+function treffer(eingabe) {
+  const tokens = eingabe.toLowerCase().split(/\s+/).filter(Boolean);
+  return Z.suchindex.filter(s => {
+    const worte = s.titel.toLowerCase().split(/[\s·]+/).filter(Boolean);
+    return tokens.every(t => worte.some(w => w.startsWith(t)));
+  }).slice(0, 8);
+}
+
+function vorschauZeigen(wert) {
+  const box = $("vorschau");
+  if (wert.trim().length < 2) { box.innerHTML = ""; return; }
+  const liste = treffer(wert.trim());
+  $("suche-treffer").textContent = liste.length ? liste.length + " Treffer" : "kein Treffer";
+  box.innerHTML = liste.map(s =>
+    `<button type="button" role="option" data-id="${s.id}">
+       <span class="v-titel">${s.titel}</span>
+       <span class="v-meta">${s.speicher ? s.speicher + " GB · " : ""}${s.anbieter_zahl} Anbieter · ${s.band_zahl} Bänder</span>
+     </button>`).join("");
+  box.querySelectorAll("button").forEach(b => b.addEventListener("mousedown", ev => {
+    ev.preventDefault();
+    waehleModell(b.dataset.id);
+  }));
+}
+
+function waehleModell(id) {
+  zustand.modell = id;
+  $("vorschau").innerHTML = "";
+  $("suchfeld").value = Z.modelle[id].titel;
+  $("suche-treffer").textContent = Z.modelle[id].anbieter_zahl + " Anbieter";
+  renderVergleich(id, zustand.band, false);
+  history.replaceState(null, "", "?modell=" + encodeURIComponent(id) + "&band=" + zustand.band);
+}
+
+/* ---------- Radar: zwei echte Sektionen ---------- */
+function renderRadar() {
+  const stufe = {Kritisch:"st-k", Mittel:"st-m", Gering:"st-g", Bestpreis:"st-b"};
+  $("alarm-kacheln").innerHTML = Z.alarme.kacheln.map(k =>
+    `<div class="kachel"><b class="zahlen">${k.zahl}</b><span>${k.name}</span></div>`).join("");
+  $("alarm-tabelle").innerHTML =
+    `<thead><tr><th>Modell</th><th>Stufe</th><th>Unser Preis</th><th>Günstigster</th><th>Abstand</th></tr></thead><tbody>` +
+    Z.alarme.zeilen8.map(z =>
+      `<tr><td>${z.modell}</td><td><span class="stufe ${stufe[z.stufe]}">${z.stufe}</span></td>
+       <td class="zahlen">${z.unser_text}</td>
+       <td><a href="${z.url}" target="_blank" rel="noopener" style="color:var(--red);text-decoration:none;font-weight:700">${z.bester}</a>
+           <span class="zahlen"> ${z.bester_preis_text}</span></td>
+       <td class="zahlen">${z.euro_text} · ${z.prozent.toLocaleString("de-DE")} %</td></tr>`).join("") +
+    `</tbody>`;
+  $("alarm-deckel").textContent = `alle ${Z.alarme.gesamt} Alarme anzeigen`;
+  $("abweichung-tabelle").innerHTML =
+    `<thead><tr><th>Modell · Band</th><th>Wettbewerber</th><th>TCO-24</th><th>unser TCO-24</th><th>Δ</th></tr></thead><tbody>` +
+    Z.abweichung.zeilen12.map(p =>
+      `<tr><td>${p.modell} · ${p.band}</td>
+       <td><a href="${p.url}" target="_blank" rel="noopener" style="color:var(--red);text-decoration:none;font-weight:700">${p.anbieter}</a></td>
+       <td class="zahlen">${p.tco_text}</td><td class="zahlen">${p.vf_text}</td>
+       <td class="zahlen">${p.prozent.toLocaleString("de-DE")} %</td></tr>`).join("") +
+    `</tbody>`;
+  $("abweichung-deckel").textContent =
+    `alle ${Z.abweichung.paare_gesamt} Paare anzeigen — Δ % aufsteigend, stärkste Benachteiligung zuerst (unveränderlich)`;
+}
+
+/* ---------- Maßstab & Datenlage ---------- */
+function renderMassstab() {
+  const k = Z.kopf;
+  $("massstab").innerHTML = `
+    <p>Bänder aus den erhobenen Datenvolumina: Klein bis 20 GB · Mittel 21–60 GB · Groß über 60 GB;
+       unbegrenzte Tarife bleiben außerhalb. TCO-24 = Zuzahlung + Anschlusspreis + Tarif- und
+       Geräteraten bis Monat 24; Raten darüber als eigener Restbetrag je Zeile.</p>
+    <p>Bestand: ${k.modelle} Modelle mit Bündel · ${k.baender.klein} in Klein, ${k.baender.mittel} in Mittel,
+       ${k.baender.gross} in Groß · ${k.zellen.besetzt} von ${k.zellen.gesamt} Kombinationen
+       (Modell × Band × Anbieter) besetzt · Lücken: ${k.leer.kein_buendel} kein Bündel,
+       ${k.leer.band_luecke} Band-Lücke, ${k.leer.nur_erneuert} nur erneuerte Geräte.</p>
+    <p>Messung: nächtlicher Lauf (${Z.abgerufen_bis}), jede Zeile trägt Messtermin und Beleg-Link.
+       Vodafone ohne eigenes Bündel im Band = gerechneter Maßstab (Barkauf + günstigster belegter
+       Eigen-Tarif), gekennzeichnet als „Maßstab, kein Angebot“.</p>`;
+}
+
+/* ---------- Start ---------- */
+async function start() {
+  Z = await (await fetch("zahlen.json")).json();
+  $("suche-treffer").textContent = Z.kopf.modelle + " Modelle";
+
+  const params = new URLSearchParams(location.search);
+  const mParam = params.get("modell"), bParam = params.get("band");
+  if (mParam && Z.modelle[mParam]) zustand.modell = mParam;
+  if (["klein","mittel","gross"].includes(bParam)) zustand.band = bParam;
+
+  $("suchfeld").value = Z.modelle[zustand.modell].titel;
+  $("band-wahl").querySelectorAll("button").forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.band === zustand.band ? "true" : "false"));
+  $("band-wahl").addEventListener("click", ev => {
+    const k = ev.target.closest("button[data-band]"); if (k) setBand(k.dataset.band, false);
+  });
+  $("band-beispiel").addEventListener("click", ev => {
+    const k = ev.target.closest("button[data-band]"); if (k) setBand(k.dataset.band, true);
+  });
+
+  const feld = $("suchfeld");
+  feld.addEventListener("input", () => vorschauZeigen(feld.value));
+  feld.addEventListener("focus", () => vorschauZeigen(feld.value));
+  feld.addEventListener("blur", () => setTimeout(() => { $("vorschau").innerHTML = ""; }, 150));
+  feld.addEventListener("keydown", ev => { if (ev.key === "Escape") $("vorschau").innerHTML = ""; });
+
+  renderVergleich(zustand.modell, zustand.band, false);
+  renderVergleich("google-pixel-11-pro-256", "mittel", true);
+  renderRadar();
+  renderMassstab();
+}
+start();
+</script>
+</body>
+</html>
