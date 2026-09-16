@@ -1945,7 +1945,13 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         wettbewerbsradar_view["export"] = geraete["export"]["radar"]
 
     (site_dir / "geraete.html").write_text(
-        env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
+        # E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): die Geräteseite ist EINE
+        # Seite mit vier Reitern; der Radar-Reiter und der Sortiments-
+        # Aufklapper des Katalog-Reiters lesen denselben `wettbewerbsradar`-
+        # Kontext wie die Schwesterseite - EINE Berechnung (`radar()`),
+        # zwei Vorlagen, keine zweite Rechnung für dieselbe Zahl.
+        env.get_template("geraete.html.j2").render(
+            prefix="", geraete=geraete, wettbewerbsradar=wettbewerbsradar_view),
         encoding="utf-8")
     # O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): das Bündel-Fragment -
     # die Zeilen-Gruppe eines jeden NICHT-Vorgabemodells, aus DEMSELBEN

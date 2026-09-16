@@ -173,25 +173,28 @@ def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# Kriterium 6: die Reiterleiste (O3: drei Tafeln + der Radar-Link)
+# Kriterium 6: die Reiterleiste (E3: vier echte Tafeln auf EINER Seite)
 # --------------------------------------------------------------------------
 
 def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
-    """O3 (STRATEGIE_GERAETE_OPTIK §3): vier Einträge nach dem Entwurf -
-    drei echte Tafeln, der Radar als LINK (kein data-tafel: er wäre ein
-    toter Tab, der Umschalter fände kein Ziel-Element)."""
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): vier echte Tafeln in der
+    Folge Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war
+    der Radar ein Link auf wettbewerbsradar.html (O3-Quasi-Reiter); der
+    wird durch die Tafel DIESER Seite ersetzt - deshalb darf kein Link
+    mehr in der Leiste stehen (der Umschalter würde sonst neben der
+    Tafel noch einen Seitenwechsel anbieten)."""
     s = _baue(tmp_path)
     knoepfe = s.select(".gr-reiter button[data-tafel]")
     beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True))
                       for k in knoepfe]
     assert beschriftungen == [
         ("tafel-tco", "Vergleich"),
+        ("tafel-radar", "Radar"),
         ("tafel-verlauf", "Preisverlauf"),
         ("tafel-katalog", "Gerätekatalog"),
     ]
-    link = s.select_one(".gr-reiter a[href$='wettbewerbsradar.html']")
-    assert link is not None
-    assert link.get("data-tafel") is None
+    assert s.select_one(".gr-reiter a") is None, \
+        "die Reiterleiste trägt noch einen Link (E3: vier Tafeln)"
 
 
 def test_die_portfolio_tafel_ist_weg(tmp_path):

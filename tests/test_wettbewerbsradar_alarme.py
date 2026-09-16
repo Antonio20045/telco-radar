@@ -1,11 +1,14 @@
-"""O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle und der
-Aufklapper "Bei Wettbewerbern gelistet, bei Vodafone nicht" wandern von der
-Vergleichsansicht der Geräteseite auf den Wettbewerbs-Radar.
+"""O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle wandert
+von der Vergleichsansicht der Geräteseite auf den Wettbewerbs-Radar.
 
-Begründung des Auftrags: die Radar-Seite sortiert Geräte nach Abweichung zu
-Vodafone - die Alarmtabelle ist dieselbe Aussicht im Detail (Barpreis), und
-"Bei Wettbewerbern gelistet" ist dieselbe Frage über das Sortiment. Auf
-geraete.html bleibt keins von beidem (nicht doppelt).
+E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d, 17.09.2026) korrigiert den Ort des
+Sortiments-Aufklappers "Bei Wettbewerbern gelistet, bei Vodafone nicht":
+Er steht jetzt IM GERÄTEKATALOG-REITER der Geräteseite - im Vier-Reiter-
+Gerüst der EINEN Seite ist der Katalog der Sortiments-Reiter, und "nur bei
+Wettbewerbern im Regal" ist die Komplementäraussage zu dessen Tabelle
+(S1/S3), keine Radar-Frage. Auf der Schwesterseite bleibt er weg: umgezogen,
+nicht kopiert (§4.6). Die Alarmtabelle bleibt Radar-Inhalt (E3 Schritt 2
+montiert sie in den Radar-Reiter derselben Seite).
 
 Gemessen wird am gerenderten Paar (beide Seiten derselben Site), damit der
 Test auch den Umzug selbst hält: weg von der einen, da auf der anderen.
@@ -185,26 +188,39 @@ def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# "Bei Wettbewerbern gelistet" auf dem Radar
+# "Bei Wettbewerbern gelistet" - E3: im Gerätekatalog-Reiter der EINEN Seite
 # --------------------------------------------------------------------------
 
-def test_bei_wettbewerbern_gelistet_steht_auf_dem_radar(tmp_path):
+def test_bei_wettbewerbern_gelistet_steht_im_geraetekatalog(tmp_path):
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): EINE Seite, vier Reiter -
+    der Sortiments-Aufklapper steht im KATALOG-Reiter („nur bei
+    Wettbewerbern im Regal" ist die Komplementäraussage zu dessen
+    Tabelle) und nicht mehr auf der Schwesterseite: umgezogen, nicht
+    kopiert (§4.6)."""
     seiten = _seite(tmp_path)
-    radar = _suppe(seiten, "wettbewerbsradar.html")
-    abschnitt = radar.select_one(".gr-vergleich-luecke")
+    geraete = _suppe(seiten, "geraete.html")
+    abschnitt = geraete.select_one("#gr-sortiment")
     assert abschnitt is not None, "der Sortiments-Aufklapper fehlt"
+    assert geraete.select_one("#tafel-katalog #gr-sortiment") is not None, (
+        "der Aufklapper steht außerhalb des Katalog-Reiters")
     text = _text(abschnitt)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "iPhone 15" in text, "das nur-wettbewerbliche Gerät fehlt"
     assert "829,00" in text, "ohne ab-Preis ist die Zeile keine Aussage"
-    assert abschnitt.select_one("a[href]"), "ohne Beleglink"
+    link = abschnitt.select_one("a[href]")
+    assert link, "ohne Beleglink"
+    assert "↗" in link.get_text(), "Beleglink ohne ↗ (E3/S4 Beleg-Stil)"
 
 
-def test_die_geraeteseite_traegt_den_aufklapper_nicht_mehr(tmp_path):
+def test_der_aufklapper_steht_nicht_zweite_mal_auf_dem_radar(tmp_path):
+    """E3: die Schwesterseite trägt den Aufklapper NICHT mehr - dieselbe
+    Aussage an zwei Orten wäre die Doppel-Darstellung aus §4.6 (bis E3
+    stand er dort als eigene Sektion)."""
     seiten = _seite(tmp_path)
-    geraete = _suppe(seiten, "geraete.html")
-    assert geraete.select_one(".gr-vergleich-luecke") is None
-    assert "Bei Wettbewerbern gelistet" not in geraete.get_text(" ")
+    radar = _suppe(seiten, "wettbewerbsradar.html")
+    assert radar.select_one("#gr-sortiment") is None
+    assert radar.select_one(".gr-vergleich-luecke") is None
+    assert "Bei Wettbewerbern gelistet" not in radar.get_text(" ")
 
 
 # --------------------------------------------------------------------------

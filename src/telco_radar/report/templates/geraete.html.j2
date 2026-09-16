@@ -132,12 +132,19 @@
 {% if geraete.hat_daten %}
 
 {# --- Reiterleiste ---------------------------------------------------- #}
-{# VIER EINTRÄGE, DREI TAFELN (O3, STRATEGIE_GERAETE_OPTIK §3, nach dem
-   Entwurf): "Vergleich", "Preisverlauf" und "Gerätekatalog" sind echte
-   Tafeln DIESER Seite; "Wettbewerbs-Radar" ist ein LINK auf eine andere
-   Seite - als Quasi-Reiter mit Pfeil, deutlich als Seitenwechsel
-   erkennbar, und OHNE data-tafel (der Umschalter würde sonst nach einem
-   Ziel-Tab suchen, das es nicht gibt).
+{# VIER REITER, VIER TAFELN, EINE SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
+   §1d): Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war der
+   Radar ein QUASI-Reiter - ein Link auf wettbewerbsradar.html mit Pfeil
+   als Seitenwechsel (O3). Antonios Wortlaut („Wieso kannst du nicht
+   einfach Geräte-Unterseite, darunter dann verschiedene Unterseiten/
+   Reiter … statt dass man 30 Minuten scrollt") dreht das um: der Radar
+   wird eine Tafel DIESER Seite, die Schwesterseite hört später auf zu
+   existieren (Redirect und Navigation zieht E5; der Fußlink unten
+   bleibt bis dahin der zweite Weg zu ihr).
+
+   Bis O3 (BRIEF_FADEN, 05.09.2026) standen hier zwei Knöpfe:
+   "Preis- und TCO-Historie" und "Portfolio" hatten ihren verloren, ihre
+   Tafeln blieben unverknüpft im Dokument. O3 löst beides: der
 
    Bis O3 (BRIEF_FADEN, 05.09.2026) standen hier zwei Knöpfe:
    "Preis- und TCO-Historie" und "Portfolio" hatten ihren verloren, ihre
@@ -150,9 +157,8 @@
 <nav class="gr-reiter" role="tablist" aria-label="Ansichten des Geräteradars">
   <button type="button" role="tab" aria-selected="true"
           aria-controls="tafel-tco" data-tafel="tafel-tco">Vergleich</button>
-  <a class="gr-reiter-seite" href="{{ prefix }}wettbewerbsradar.html"
-     >Wettbewerbs-Radar<span class="gr-reiter-pfeil"
-     aria-hidden="true">↗</span></a>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-radar" data-tafel="tafel-radar">Radar</button>
   <button type="button" role="tab" aria-selected="false"
           aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Preisverlauf</button>
   <button type="button" role="tab" aria-selected="false"
@@ -199,7 +205,8 @@
     <td>{{ r.monatlich | euro }}</td>
     <td>{{ r.ueber_horizont | euro }}</td>
     <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
-          rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}</a>{%
+          rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}<span
+          class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
         else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
         {% if r.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
           r.abgerufen_am | date_de }}</span>{% endif %}</td>
@@ -339,9 +346,12 @@
     <div class="gr-bnd-kopf">
       <span><button type="button" class="gr-bsort" data-bsort="anbieter"
         >Anbieter</button></span><span>Tarif · Volumen</span><span><button
-        type="button" class="gr-bsort" data-bsort="tco"
+        type="button" class="gr-bsort" data-bsort="tco" aria-label=
+        "nach Gesamtkosten über 24 Monate (TCO-24) sortieren"
         >TCO-24</button></span><span><button type="button" class="gr-bsort"
-        data-bsort="delta">Δ zu Vodafone</button></span><span>Gerät ohne
+        data-bsort="delta" aria-label=
+        "nach Abstand über oder unter der Vodafone-Referenz sortieren"
+        >Δ zu Vodafone</button></span><span>Gerät ohne
         Vertrag</span><span></span>
     </div>
     <div id="gr-bnd-gruppe">{{ buendelgruppe(m, ids=true) }}</div>
@@ -422,7 +432,40 @@
 </section>
 </div>
 
-{# --- Reiter 2: Geraetekatalog ----------------------------------------
+{# --- Reiter 2: Radar ---------------------------------------------------
+   E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): Platzhalter-Gerüst. Die
+   Tafel gehört zu VIER-Reiter-Gerüst derselben Seite; ihr INHALT baut
+   E3 Schritt 2 („Radar-Tafel") aus den Sektionen der bisherigen
+   Schwesterseite wettbewerbsradar.html:
+
+     * Abweichung TCO je Modell - DIE Modell-Liste (S2: klarer Titel
+       „Alle Modelle nach Abweichung zu Vodafone", alle Zeilen,
+       sortierbar, je Modell ein Sprung in die Zeitreihe des Vergleichs-
+       Reiters),
+     * Alarme (Barpreis ohne Vertrag, Warnstufen),
+     * Händler = Gerätepreis ohne Finanzierung als EIGENER, gleich-
+       wertiger Abschnitt (S3), mit je EINEM Satz, was er misst.
+
+   Der Sortiments-Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone
+   nicht" steht NICHT hier - er wohnt seit E3 im Gerätekatalog (dieselbe
+   Sortiments-Frage wie die Tabelle dort; eine zweite Kopie wäre §4.6).
+   Der Datenkontext der Tafel heißt `wettbewerbsradar` (dasselbe Dict,
+   das auch die Schwesterseite rendert, von render_site übergeben).
+
+   Der h2 und der Satz darunter sind der BLEIBENDE Kopf der Tafel (S1:
+   jeder Reiter beantwortet EINE Frage in Titel und einem Satz) - der
+   Inhalt montiert UNTER ihnen in #gr-radar-inhalt. #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
+<section class="gr-radar" id="radar">
+  <h2 class="rubrik">Alle Modelle nach Abweichung zu Vodafone</h2>
+  <p class="gr-erklaer">Um wie viel jedes Modell über oder unter der
+  Vodafone-Referenz liegt – beim Gerätepreis ohne Vertrag und bei den
+  Gesamtkosten über 24 Monate (TCO-24).</p>
+  <div id="gr-radar-inhalt"></div>
+</section>
+</div>
+
+{# --- Reiter 3: Geraetekatalog ----------------------------------------
    (Die CSV-Knoepfe standen bis O4 je Reiter oben in einem `gr-werkzeug`-
    DIV; sie stehen EINMAL in der Kopfzeile - siehe den Kommentar dort.) #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
@@ -435,8 +478,9 @@
 <section class="gr-katalog" id="katalog">
   <h2 class="rubrik">Was wo im Regal steht
     <span class="rubrik-zahl">{{ geraete.katalogtabelle | length }}</span></h2>
-  <p class="gr-erklaer">Eine Zeile je Gerät, Speichergröße, Farbe und
-  Anbieter – mit Preis, Zustand, Verfügbarkeit, Quelle und Abrufdatum.
+  <p class="gr-erklaer">Welche Geräte stehen bei wem im Regal: eine Zeile
+  je Gerät, Speichergröße, Farbe und Anbieter – mit Preis, Zustand,
+  Verfügbarkeit, Quelle und Abrufdatum.
   Hier steht der ganze Bestand, auch gebrauchte Geräte und Zuzahlungen:
   was aus dem Preisvergleich fällt, verschwindet nicht, es wird nur nicht
   gegen etwas gerechnet, das es nicht ist. Zwei Schreibweisen derselben
@@ -600,11 +644,59 @@
   <p class="gr-erklaer"><button type="button" class="gr-mehr" id="gr-kmehr">alle
     {{ geraete.katalogtabelle | length }} Zeilen zeigen</button></p>
   {% endif %}
+
+  {# E3: DER SORTIMENTS-AUFKLAPPER wohnt im Katalog-Reiter. Er stand bis
+     E3 als eigene Sektion auf wettbewerbsradar.html (dorthin hatte ihn
+     O2 aus der damals gefallenen Portfolio-Tafel gezogen). Im Vier-
+     Reiter-Gerüst der EINEN Seite (§1d) ist der Katalog der Sortiments-
+     Reiter - „diese Geräte stehen NUR bei Wettbewerbern im Regal" ist
+     die Komplementäraussage zu der Tabelle darüber, keine Radar-Frage
+     (der Radar fragt nach Abweichungen zu Vodafone-PREISEN, S2/S3). Eine
+     zweite Kopie auf dem Radar wäre §4.6 - deshalb steht er HIER und
+     nur hier. Der Anker heißt neu #gr-sortiment; #tafel-portfolio bleibt
+     verboten (O3-Regel: keine wiederauferstandene, unverknüpfte Tafel).
+     Daten: derselbe `wettbewerbsradar`-Kontext wie auf der Schwester-
+     seite - EINE Berechnung (`radar()`), zwei Vorlagen. #}
+  {% if wettbewerbsradar.ohne_vodafone %}
+  <p class="gr-erklaer gr-sortiment-satz">Diese Geräte führen nur
+  Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt
+  den günstigsten Anbieter, der sie führt.</p>
+  <details class="gr-auf" id="gr-sortiment">
+    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+      ({{ wettbewerbsradar.ohne_vodafone_gesamt }})</summary>
+    <ul class="gr-v-liste">
+      {% for l in wettbewerbsradar.ohne_vodafone %}
+      <li><span class="szl">{{ l.modell }}</span>
+        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
+        <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
+        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
+          else 'Anbieter' }}</span>
+        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden
+          }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if wettbewerbsradar.ohne_vodafone_gesamt >
+       wettbewerbsradar.ohne_vodafone | length %}
+    <p class="gr-v-meta">{{ wettbewerbsradar.ohne_vodafone_gesamt }} insgesamt.</p>
+    {% endif %}
+  </details>
+  {% endif %}
 </section>
 </div>
 
 {# --- Reiter 4: Preisverlauf ------------------------------------------
-   Das EINZIGE Diagramm der Seite, und es zeigt genau EIN Geraet.
+   E3 (S1-ENTSCHEIDUNG): UMGEWIDMET zum BARPREIS-Verlauf. Bis E2 hieß die
+   Tafel „Preis- und TCO-Historie" - seit E2 ist die TCO-Zeitreihe aber
+   die HAUPTansicht des Vergleichs-Reiters. Zwei Reiter, dieselbe Frage
+   zu stellen, wäre Doppel-Darstellung (§4.6/4.8); der Reiter fragt
+   deshalb bewusst ANDERS: Wie hat sich der BARPREIS eines Geräts
+   entwickelt - ohne Tarif, ohne Bindung, reine Euro über der Zeit.
+   Seine Bausteine messen alle genau das (G0 = Barpreis je Modell, G2 =
+   Barpreis-Änderungen, die Auswahl unten = Barpreis je Gerät); der
+   TCO-Historie-Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist mit
+   der Umwidmung gefallen - die Kurve existiert seit E2, und ihre
+   Messtage nennt die Zeitreihe selbst.
 
    Die Reihenfolge von oben nach unten ist vorgegeben und nicht verhandelbar:
    Suchfeld -> Zeitraum -> vier Kacheln -> Diagramm -> Tabelle. Solange kein
@@ -636,17 +728,20 @@
 {% endif %}
 
 <section class="gr-verlauf" id="verlauf">
-  <h2 class="rubrik">Wie sich ein Preis entwickelt hat</h2>
+  <h2 class="rubrik">Wie sich der Barpreis eines Geräts entwickelt hat</h2>
 
   {# Der Effektivpreis-Gedanke als ERKLAERUNG, nicht als Zahl. Handyhase und
      Finanztip rechnen ihn aus Geraetepreis, Tarif und Boni zusammen - genau
      die Posten, die diesem Radar heute fehlen. Eine eigene Zahl daraus waere
      geraten; der Satz sagt stattdessen, was die Kurve NICHT zeigt, und
-     verweist auf die Tafel, die die Frage beantworten wird. #}
-  <p class="gr-erklaer">Die Kurve zeigt den Gerätepreis, nicht die
-  Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif und
-  Anschlusspreis. Was davon schon gemessen ist, steht im Reiter
-  „Vergleich“.</p>
+     verweist auf die Tafel, die die Frage beantworten wird. Seit der E3-
+     Umwidmung benennt er zugleich die Grenze dieses Reiters: BARPREIS
+     hier, Gesamtkosten über 24 Monate (TCO-24) im Vergleichs-Reiter -
+     zwei Reiter, zwei Fragen (§4.6). #}
+  <p class="gr-erklaer">Die Kurve zeigt den Barpreis ohne Vertrag, nicht
+  die Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif
+  und Anschlusspreis. Die Gesamtkosten über 24 Monate (TCO-24) stehen im
+  Reiter „Vergleich“.</p>
 
   {# --- G2: die Historie, servergerendert ----------------------------- #}
   {% if geraete.tco.g2.svg %}
@@ -705,7 +800,8 @@
         <td>{{ r.delta | euro }}</td>
         <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
           rel="nofollow noopener" target="_blank">{{ r.quelle_url | domain
-          }}</a>{% else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}</td>
+          }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
+          else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}</td>
       </tr>
       {% endfor %}
       </tbody>
@@ -722,32 +818,15 @@
   Lauf misst weiter; der nächste Punkt entsteht mit dem nächsten Lauf.</p>
   {% endif %}
 
-  {# Die TCO-24-HISTORIE JE BÜNDEL, ehrlich benannt (O4, Entwurf §2).
-
-     Bis O4 behauptete dieser Satz, der Bündelbestand kenne je Bündel
-     "genau einen Stand" - seit dem 12.09.2026 schreibt jeder nächtliche
-     Lauf seine Messung nach `geraete_tco_historie.jsonl`, und der Satz
-     wäre von der Datei widerlegt. Jetzt nennt er das ECHTE Startdatum und
-     die Zahl der Messtage aus `TcoDB.historie_lage()` - kein festgeschrie-
-     benes Datum, das an einem anderen Bestand zur Behauptung wird.
-
-     Eine KURVE daraus steht weiterhin nicht: P5 (die TCO-Zeitachse) ist
-     ein eigener, noch offener Schritt - zwei Messtage sind keine Reihe,
-     und "ein Slot, ein Graph" gilt (Strategie §4.1). #}
-  {% if geraete.tco.historie_lage.seit %}
-  <p class="gr-erklaer gr-basis--duenn">Die TCO-24-Historie je Bündel
-  beginnt mit dem ersten nächtlichen Lauf am {{
-  geraete.tco.historie_lage.seit | date_de }} und wächst mit jedem Lauf
-  ({{ geraete.tco.historie_lage.messtage }}
-  {{ 'Messtag' if geraete.tco.historie_lage.messtage == 1
-     else 'Messtage' }}, {{
-  geraete.tco.historie_lage.buendel }} Bündel bisher). Eine Kurve der
-  Gesamtkosten entsteht daraus, sobald genügend Messtage daliegen.</p>
-  {% else %}
-  <p class="gr-erklaer gr-basis--duenn">Einen Verlauf der Gesamtkosten gibt
-  es noch nicht: die Historie je Bündel beginnt mit dem ersten nächtlichen
-  Lauf, der sie schreibt.</p>
-  {% endif %}
+  {# E3 (S1): DER TCO-HISTORIE-ABSATZ IST GEFALLEN. Bis E2 kündigte er
+     hier eine Kurve der Gesamtkosten an („entsteht, sobald genügend
+     Messtage daliegen") - seit E2 IST diese Kurve die Zeitreihe des
+     Vergleichs-Reiters, und ihre echten Messtage nennt deren Messtag-
+     Zeile selbst. Dieselbe Ankündigung in diesem Reiter zu wiederholen
+     wäre die Doppel-Darstellung aus §4.6/4.8 - und verwischte die Grenze,
+     die diesen Reiter vom Vergleichs-Reiter trennt (Barpreis hier,
+     TCO-24 dort). `geraete.tco.historie_lage` bleibt gerechnet; sein
+     einziger Vorlagen-Leser war dieser Absatz. #}
 
   {% if not geraete.verlauf.hat_daten %}
   <p class="gr-erklaer gr-basis--duenn">Für den Preisverlauf liegen noch keine

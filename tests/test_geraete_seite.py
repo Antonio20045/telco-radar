@@ -1481,21 +1481,23 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
 
 
 def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
-    """O2 (11.09.2026): der Aufklapper ist eine Sortiments-Aussage - dieselbe
-    Frage, die der Wettbewerbs-Radar stellt - und steht deshalb dort. Der
-    Pin hier verhindert die stille Rueckkehr auf die Geraeteseite."""
+    """E3 (17.09.2026): der Aufklapper ist eine Sortiments-Aussage - im
+    Vier-Reiter-Gerüst der EINEN Seite (§1d) gehört sie in den KATALOG-
+    Reiter der Geräteseite, als Komplement zur Tabelle darüber. Der Pin
+    hier verhindert die stille Rückkehr auf die Schwesterseite (bis E3
+    stand er dort, O2-Entscheidung) und zugleich jede zweite Kopie."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    radar = _suppe(site, "wettbewerbsradar.html")
-    luecke = radar.select_one(".gr-vergleich-luecke")
+    geraete = _suppe(site, "geraete.html")
+    luecke = geraete.select_one("#gr-sortiment")
     assert luecke is not None
     text = luecke.get_text(" ", strip=True)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "Galaxy S25 Ultra" in text
-    assert any(el.get("id") == "wr-gelistet" for el in luecke.parents), (
-        "der Aufklapper steht nicht im Radar-Abschnitt 'wr-gelistet'")
-    geraete = _suppe(site, "geraete.html")
-    assert geraete.select_one(".gr-vergleich-luecke") is None, \
-        "der Aufklapper steht noch auf der Geraeteseite"
+    assert any(el.get("id") == "tafel-katalog" for el in luecke.parents), (
+        "der Aufklapper steht nicht im Katalog-Reiter")
+    radar = _suppe(site, "wettbewerbsradar.html")
+    assert radar.select_one(".gr-vergleich-luecke") is None, \
+        "der Aufklapper steht noch auf der Schwesterseite (E3: umgezogen)"
 
 
 def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):

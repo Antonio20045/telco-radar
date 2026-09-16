@@ -565,23 +565,21 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
         assert aktiv == [tid], "genau ein Reiter ist ausgewaehlt"
 
 
-def test_die_reiterleiste_traegt_drei_knoepfe_und_den_radar_link(_seite):
+def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
+    """E3 (§1d): vier echte Tafeln - der O3-Quasi-Reiter (Link auf
+    wettbewerbsradar.html) ist der Tafel dieser Seite gewichen."""
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]",
         "e => e.map(x => x.getAttribute('data-tafel'))")
-    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-katalog"]
+    assert knoepfe == ["tafel-tco", "tafel-radar", "tafel-verlauf",
+                       "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
         ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
-    assert beschriftung == ["Vergleich", "Preisverlauf", "Gerätekatalog"]
-    # Der Quasi-Reiter: ein LINK auf eine andere Seite, deutlich als
-    # Seitenwechsel erkennbar (Pfeil), ohne data-tafel.
-    link = _seite.eval_on_selector(
-        ".gr-reiter a", "e => ({href: e.getAttribute('href'), "
-                        "pfeil: !!e.querySelector('.gr-reiter-pfeil'), "
-                        "tafel: e.getAttribute('data-tafel')})")
-    assert link["href"].endswith("wettbewerbsradar.html"), link
-    assert link["pfeil"], "der Radar-Reiter trägt keinen Pfeil"
-    assert link["tafel"] is None, "der Radar-Link darf kein Tab sein"
+    assert beschriftung == ["Vergleich", "Radar", "Preisverlauf",
+                            "Gerätekatalog"]
+    links = _seite.eval_on_selector_all(
+        ".gr-reiter a", "e => e.length")
+    assert links == 0, "die Reiterleiste trägt noch einen Link (E3: Tafel)"
     _zeige_tafel(_seite, "tafel-tco")
 
 
@@ -601,15 +599,14 @@ def test_die_portfolio_tafel_ist_weg_der_verlauf_ist_verknuepft(_seite):
     _zeige_tafel(_seite, "tafel-tco")
 
 
-@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-katalog",
+@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-radar", "tafel-katalog",
                                  "tafel-verlauf"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch.
 
-    O3: "tafel-portfolio" ist weg (Radar-Seite); die Hoehenzusicherung gilt
-    fuer die drei Tafeln dieser Seite - der Radar misst seine eigene Hoehe
-    im wettbewerbsradar-Test."""
+    E3: die Radar-Tafel steht mit auf dieser Seite; ihr Platzhalter-
+    Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2)."""
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate("document.documentElement.scrollHeight")

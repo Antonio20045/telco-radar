@@ -62,32 +62,30 @@ def radar(site) -> BeautifulSoup:
 # --------------------------------------------------------------------------
 
 def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
-    """Der Entwurf führt vier Einträge; der Radar ist ein LINK auf eine
-    andere Seite, kein Tab dieser Seite. Ein `data-tafel` am Radar-Link
-    würde ihn zum toten Tab machen: der Umschalter würde nach einem
-    Ziel-Element suchen, das es nicht gibt."""
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ersetzt den O3-Quasi-Reiter
+    (Link auf wettbewerbsradar.html) durch eine echte Tafel DIESER Seite:
+    vier Knöpfe in der Folge Vergleich · Radar · Preisverlauf ·
+    Gerätekatalog, kein Link mehr in der Leiste. Der Umschalter kennt
+    jeden Knopf; der Weg zur Schwesterseite bleibt bis zu ihrem Redirect
+    (E5) der Fußlink am Seitenende."""
     eintraege = geraete.select(".gr-reiter > *")
-    rollen = []
-    for e in eintraege:
-        if e.name == "button":
-            rollen.append((e.get("data-tafel"), e.get_text(strip=True)))
-        else:
-            # Der Link trägt den Seitenwechsel-Pfeil im Text
-            # (Kennzeichnung) - der Vergleich toleriert ihn.
-            rollen.append((e.name, e.get_text(strip=True).rstrip("↗")))
+    rollen = [(e.get("data-tafel"), e.get_text(strip=True))
+              for e in eintraege if e.name == "button"]
     assert rollen == [
         ("tafel-tco", "Vergleich"),
-        ("a", "Wettbewerbs-Radar"),
+        ("tafel-radar", "Radar"),
         ("tafel-verlauf", "Preisverlauf"),
         ("tafel-katalog", "Gerätekatalog"),
     ], rollen
-    radar_link = geraete.select_one(".gr-reiter a[href$='wettbewerbsradar.html']")
-    assert radar_link is not None, "der Radar-Quasi-Reiter fehlt"
-    # DEUTLICH ALS SEITENWECHSEL erkennbar (Auftrag B1): ein Pfeil im
-    # Linktext, nicht nur eine andere Farbe.
-    assert radar_link.get_text(strip=True) != "Wettbewerbs-Radar" or \
-        radar_link.select_one(".gr-reiter-pfeil"), \
-        "der Radar-Reiter trägt keine Seitenwechsel-Kennzeichnung"
+    assert geraete.select_one(".gr-reiter a") is None, \
+        "die Reiterleiste trägt noch einen Link statt der vier Tafeln"
+    # Die RADAR-TAFEL existiert und ist lebendig verknüpft: Knopf UND
+    # Panel, kein toter Tab-Body (die O3-Lektion, jetzt für die vierte
+    # Tafel - ihr Inhalt montiert E3 Schritt 2 in #gr-radar-inhalt).
+    assert geraete.select_one("#tafel-radar") is not None, \
+        "#tafel-radar fehlt"
+    assert geraete.select_one("#gr-radar-inhalt") is not None, \
+        "der Montagepunkt #gr-radar-inhalt fehlt"
 
 
 def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):

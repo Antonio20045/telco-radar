@@ -381,38 +381,14 @@
   {% endif %}
 </section>
 
-{# O2 (11.09.2026): der Sortiments-Aufklapper - welche Geräte der
-   Wettbewerb führt, die Vodafone nicht führt. Er stand bis O2 im
-   Portfolio-Block der Geraeteseite; er ist eine Sortiments-Aussage und
-   damit dieselbe Frage, die der Radar über den Preis stellt. #}
-{% if wettbewerbsradar.ohne_vodafone %}
-<section class="wr-sektion" id="wr-gelistet">
-  <h2 class="rubrik">Bei Wettbewerbern gelistet, bei Vodafone nicht</h2>
-  <p class="gr-erklaer">Diese Geräte führt mindestens ein beobachteter
-  Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt den
-  günstigsten Anbieter, der sie führt.</p>
-  <details class="evidence gr-vergleich-luecke">
-    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
-      ({{ wettbewerbsradar.ohne_vodafone_gesamt }})</summary>
-    <div class="evidence-body">
-    <ul class="gr-v-liste">
-      {% for l in wettbewerbsradar.ohne_vodafone %}
-      <li><span class="szl">{{ l.modell }}</span>
-        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-        <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
-        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
-          else 'Anbieter' }}</span>
-        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% if wettbewerbsradar.ohne_vodafone_gesamt > wettbewerbsradar.ohne_vodafone|length %}
-    <p class="gr-v-meta">{{ wettbewerbsradar.ohne_vodafone_gesamt }} insgesamt.</p>
-    {% endif %}
-    </div>
-  </details>
-</section>
-{% endif %}
+{# E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): der Sortiments-Aufklapper
+   „Bei Wettbewerbern gelistet, bei Vodafone nicht" ist von HIER in den
+   GERÄTEKATALOG-Reiter von geraete.html gezogen (dort, Anker
+   #gr-sortiment). Im Vier-Reiter-Gerüst der EINEN Seite ist der Katalog
+   der Sortiments-Reiter - „nur bei Wettbewerbern im Regal" ist die
+   Komplementäraussage zu dessen Tabelle, keine Radar-Frage (S2/S3). Hier
+   bliebe er eine zweite Kopie derselben Aussage (§4.6). Diese Seite
+   selbst hört alsbald ganz auf zu existieren (Redirect, E5). #}
 
 {# ==========================================================================
    O3 (B4, STRATEGIE_GERAETE_OPTIK §3 + §5.2, 15.09.2026): die Portfolio-
