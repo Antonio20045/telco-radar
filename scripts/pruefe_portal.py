@@ -232,38 +232,41 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
              "11b. Reiterhoehen: " + ", ".join(gemessen) + " px"
              + (f" - ZU HOCH: {'; '.join(zu_hoch)}" if zu_hoch else ""))
 
-    # O1/A1 (11.09.2026 abends): DIE ERSTE ZEILE DES GRAPHEN UEBER DER
-    # TELEFON-FALZ - am ECHTEN Bestand gemessen, nicht an der Fixture der
-    # Browsertests. Deren Antwortzeile ist eine Zeile kuerzer: Ihre
-    # Anbieternamen ("(o2)") passen neben die Zahl, waehrend "(congstar)"
-    # am echten Stand unter die Zahl bricht. Gemessen am 11.09.2026 endete
-    # die erste Balkenzeile deshalb am echten Bestand bei 862 von 844 px,
-    # waehrend der Fixture-Test gruen lief - eine Falz, die nur die Fixture
-    # kennt, ist keine. Ohne Graphzeile (Vorgabegeraet ohne Band) entfaellt
-    # die Messung ohne Mangel: ein Leerzustand hat keine Falzfrage.
+    # E2 (16.09.2026): DIE ANTWORT DER HAUPTANSICHT UEBER DER TELEFON-FALZ
+    # - am ECHTEN Bestand gemessen, nicht an der Fixture der Browsertests
+    # (deren kuerzere Namen lassen die Zeilen niedriger enden). Gemessen
+    # wird der ANTWORT-SATZ und der GRAPHKOPF (Messtag-Zeile): wer ein
+    # Geraet waehlt, muss ohne Scrollen lesen, was es kostet und welche
+    # Tage der Graph zeigt - der Graph selbst beginnt unterhalb. Ohne
+    # Antwort-Satz (Seite ohne jeden Bestand) entfaellt die Messung ohne
+    # Mangel: ein Leerzustand hat keine Falzfrage.
     mobil = seite.context.browser.new_page(
         viewport={"width": _MOBIL_BREITE, "height": 844})
     try:
         mobil.goto(f"{wurzel}/geraete.html", wait_until="load")
         mobil.wait_for_timeout(300)
         box = mobil.evaluate("""() => {
-          const e = document.querySelector('#tafel-tco .gr-bz');
-          if (!e) return null;
-          const r = e.getBoundingClientRect();
-          return {endet: Math.round(r.bottom),
+          const a = document.querySelector('#tafel-tco .gr-zr-antwort');
+          const k = document.querySelector('#tafel-tco .gr-zr-messtage');
+          if (!a) return null;
+          return {antwort: Math.round(a.getBoundingClientRect().bottom),
+                  kopf: k ? Math.round(k.getBoundingClientRect().bottom) : null,
                   quer: Math.max(document.documentElement.scrollWidth,
                                  document.body.scrollWidth)};
         }""")
         if box:
             quer = box["quer"] <= _MOBIL_BREITE + 1
-            b.prueft(box["endet"] <= 844 and quer,
-                     f"11c. Graphfalz (Telefon {_MOBIL_BREITE}x844): erste "
-                     f"Balkenzeile endet bei {box['endet']} px (Falz 844)"
+            ok = box["antwort"] <= 844 and (box["kopf"] is None
+                                            or box["kopf"] <= 844) and quer
+            b.prueft(ok,
+                     f"11c. Graphfalz (Telefon {_MOBIL_BREITE}x844): "
+                     f"Antwort-Satz endet bei {box['antwort']} px, Graphkopf "
+                     f"bei {box['kopf']} px (Falz 844)"
                      + ("" if quer
                         else f", Seite {box['quer']} px breit"))
         else:
-            b.prueft(None, "11c. Graphfalz (Telefon): Graph ohne Zeile "
-                           "(Vorgabegerät ohne Band)")
+            b.prueft(None, "11c. Graphfalz (Telefon): Hauptansicht ohne "
+                           "Antwort-Satz (kein Bestand)")
     finally:
         mobil.close()
 
@@ -656,10 +659,17 @@ def main() -> int:
     # zurueckgerechnet); jetzt prueft es, dass sie WEG ist und dass die
     # Tabelle, die sie ersetzt, ihre Belege traegt.
     #
-    # Die drei Verbote aus Abschnitt 0 des Auftrags (kein gedrehter Text,
-    # keine Schrift unter 12 px, keine mit "..." abgeschnittene Beschriftung)
-    # werden im echten Chromium gemessen - `tests/test_geraete_reiter_browser.py`.
-    # Hier steht die strukturelle Haelfte, die am ausgelieferten HTML haengt.
+    # E2 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1a, 16.09.2026): DIE HAUPTANSICHT
+    # IST DIE TCO-ZEITREIHE - ein SVG-Koordinatensystem mit Y=EUR-Ticks,
+    # X=echten Messtagen, je Anbieter eine Linie mit einem Punkt je
+    # Messung (Antonio: „Den Graphen finde ich gut."). Bis E2 pruefte
+    # dieses Kriterium den HTML/CSS-Balken (O1) und verbot JEDES SVG in
+    # der Vergleichsansicht - die Erwartung folgt dem Auftrag, nicht
+    # umgekehrt. Die drei Verbote aus Abschnitt 0 des alten Auftrags (kein
+    # gedrehter Text, keine Schrift unter 12 px, keine "..."-Beschriftung)
+    # werden im echten Chromium gemessen -
+    # `tests/test_geraete_reiter_browser.py` und
+    # `tests/test_geraete_zeitreihe_browser.py`.
     gr_datei = site / "geraete.html"
     if not gr_datei.exists():
         # KEIN "uebersprungen": render_site() erzeugt diese Seite immer,
@@ -671,20 +681,6 @@ def main() -> int:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
         maengel = []
 
-        # BRIEF_FADEN (05.09.2026): DIE HAUPTANSICHT ANTWORTET MIT EINER
-        # ZAHL UND EINEM GRAPHEN.
-        #
-        # Bis zum 04.09.2026 stand hier die umgekehrte Regel ("die
-        # Startansicht traegt kein Diagramm"), richtig solange die
-        # Startansicht die Alarmtabelle war. Phase R drehte das um und
-        # verlangte ZWEI Grafiken (G0 und G1). BRIEF_FADEN dreht ein
-        # zweites Mal: G1 verlaesst die Ansicht wieder - "ein Graph, keine
-        # Konkurrenz-Visualisierungen" (Antonio, 05.09.2026 nachmittags).
-        # G0 (die Zeitreihe) bleibt die EINZIGE Grafik je Modellblock.
-        #
-        # Was BLEIBT, ist die Regel gegen die geloeschte Positionskarte:
-        # keine Ansicht mit 114 gedrehten Etiketten und 248 Punkten in
-        # einem Bild.
         start = gr.select_one("#tafel-tco")
         if start is None:
             maengel.append("die Hauptansicht 'Vergleich' fehlt")
@@ -710,24 +706,25 @@ def main() -> int:
             maengel.append("#tafel-portfolio steht noch auf der Geräteseite "
                            "- seine Abschnitte gehören auf den Radar (O3)")
 
-        # O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): DER EINE Graph ist der
-        # HTML/CSS-Balken ".gr-hgraph" ("TCO-24 je Anbieter" für das
-        # gewählte Modell x Band). G0 (die je-Modell-Zeitreihe) und G1
-        # (der SVG-Balkenvergleich) sind aus dieser Ansicht ENTFERNT -
-        # G0 wandert in O4 in den Verlaufs-Reiter; ihre Rechnungen bleiben
-        # im Code (`m.zeitreihe`/`m.svg` werden weiter gefüllt). Bis O1
-        # prüfte dieses Kriterium "svg.gr-g0 vorhanden" - die Erwartung
-        # folgt hiermit dem Auftrag, nicht umgekehrt.
-        if start is not None and start.select_one(".gr-hgraph") is None:
-            maengel.append("der Balkengraph (TCO-24 je Anbieter) fehlt in "
-                           "der Hauptansicht")
-        if start is not None and start.select_one("svg.gr-g0") is not None:
-            maengel.append("G0 (die Zeitreihe) steht noch in der "
-                           "Vergleichsansicht - sie gehört in den "
-                           "Verlaufs-Reiter (O4)")
-        if start is not None and start.select("svg"):
-            maengel.append("in der Vergleichsansicht steht noch ein SVG "
-                           "- der Graph ist HTML/CSS-Balken (O1)")
+        # E2: DER EINE Graph der Hauptansicht ist DIE ZEITREIHE - SVG mit
+        # Koordinatensystem, Punkten je Messung und echten Messtag-Ticks.
+        # Die Balkenform (O1) ist ersetzt, nicht daneben gestellt: ihre
+        # Reste (.gr-hgraph, .gr-bz, .gr-balkenliste) sind verboten.
+        if start is not None and start.select_one("svg.gr-zr") is None:
+            maengel.append("die TCO-Zeitreihe (svg.gr-zr) fehlt in der "
+                           "Hauptansicht (E2)")
+        if start is not None:
+            svg = start.select_one("svg.gr-zr")
+            if svg is not None:
+                if not svg.select("circle.gr-zr-punkt"):
+                    maengel.append("der Zeitreihen-Graph trägt keine "
+                                   "Messpunkte")
+                if not svg.select("text.gr-zr-xtick"):
+                    maengel.append("die X-Achse trägt keine Messtag-Ticks")
+            for tot in (".gr-hgraph", ".gr-balkenliste", ".gr-bz",
+                        ".gr-msel", ".gr-antwort-leit"):
+                if start.select(tot):
+                    maengel.append(f"Rest der bis E2 ersetzten Form: {tot}")
         verlaufflaeche = gr.select_one("#tafel-verlauf")
         if verlaufflaeche is not None and \
                 verlaufflaeche.select_one("svg.gr-g2") is None and \
@@ -849,8 +846,7 @@ def main() -> int:
             b.prueft(not maengel,
                      f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
                      f"{len(kacheln)} Chips ueber {summe} Vergleichen, "
-                     f"der Balkengraph steht, kein SVG in der "
-                     f"Vergleichsansicht"
+                     f"die TCO-Zeitreihe steht in der Hauptansicht"
                      if not maengel else
                      "11. Geraeteradar: " + "; ".join(maengel[:5]))
 
