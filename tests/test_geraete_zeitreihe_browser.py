@@ -319,6 +319,53 @@ def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
     assert s.query_selector("#tafel-tco svg.gr-zr circle.gr-zr-punkt")
 
 
+# Die Bündel-Tabelle unter dem Graph - Titel und Zeilen meinen dasselbe Band
+# (Wahrheitstest zur QA-Zurückweisung E2-F1, 17.09.2026)
+# --------------------------------------------------------------------------
+
+def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
+        schreibtisch):
+    """E2-F1 wurde mit dieser Messung ZURÜCKGEWIESEN: der QA las `innerText`
+    über ALLE .gr-bnd-Zeilen (auch die per `hidden` versteckten - innerText
+    fällt auf display:none-Elemente auf textContent zurück) und zählte
+    DOM-Reihenfolge statt Sichtbarkeit. Gemessen mit offsetParent: im
+    Band-Zustand sind genau die Zeilen sichtbar, deren data-band dem
+    gewählten Band entspricht - plus die eigenüberschriebene Gruppe
+    „Ohne Tarifband" (§7: unbegrenzte Tarife stehen bewusst UNTER dem
+    Bandblock, nicht heimlich in einem Band). Dieser Test nagelt die
+    Zusicherung fest, damit der Filter nicht still entfallen kann."""
+    s, _ = schreibtisch
+    s.click("#gr-zr-baender button[data-band='mittel']")
+    s.wait_for_timeout(500)
+    titel = s.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
+    assert "Band Mittel" in titel
+    zeilen = s.evaluate("""() => Array.from(
+      document.querySelectorAll('#gr-bnd-gruppe .gr-bnd')).map(z => ({
+        band: z.getAttribute('data-band'),
+        sichtbar: !!(z.offsetParent || z.getClientRects().length),
+        ohneband: !!z.closest('.gr-ohneband')}))""")
+    assert zeilen, "keine Bündel-Zeilen im DOM"
+    sichtbar = [z for z in zeilen if z["sichtbar"]]
+    assert sichtbar, "im Band-Zustand ist keine Zeile sichtbar"
+    # JEDE sichtbare Zeile MIT data-band gehört zum gewählten Band - der
+    # Titel „Alle Bündel im Band Mittel" darf nichts anderes überstehen
+    # haben. Zeilen OHNE data-band sind die §7-Gruppe „Ohne Tarifband".
+    for z in sichtbar:
+        if z["ohneband"]:
+            assert z["band"] is None, \
+                "eine Band-Zeile steht in der Ohne-Band-Gruppe"
+        else:
+            assert z["band"] == "mittel", \
+                f"sichtbare Zeile mit data-band={z['band']!r} unter " \
+                f"dem Titel 'Band Mittel'"
+    # und umgekehrt: jede Zeile eines ANDEREN Bands ist wirklich weg
+    for z in zeilen:
+        if z["band"] not in (None, "mittel"):
+            assert not z["sichtbar"], \
+                f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
+
+
+# --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # Die Schrift im Graphen
 # --------------------------------------------------------------------------
