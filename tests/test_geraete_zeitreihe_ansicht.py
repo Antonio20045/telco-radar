@@ -324,6 +324,25 @@ def test_der_antwort_satz_nennt_die_vodafone_referenz(ansicht):
     assert "Vodafone" in text and "1.105,00 €" in text
 
 
+def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
+    # Der Startzustand laeuft durch den Referenz-Zweig (1&1 am
+    # guenstigsten, Vodafone-Referenz im selben Satz) - genau der
+    # Pfad, der live auf ").." endete: die Anhaengsel in
+    # _antwort_html schliessen den Satz selbst, der Abschluss der
+    # Funktion setzte einen ZWEITEN Punkt dahinter. Der Satzschluss-
+    # punkt steht genau EINMAL, an keiner Stelle ein "..".
+    saetze = {f"{p['modell']}/{p['band']}":
+              __import__("re").sub(r"<[^>]+>", "", p["antwort_html"]).strip()
+              for p in ansicht["paare"]}
+    # Scharfheits-Beweis: die Fixture enthaelt wirklich einen Satz
+    # mit Referenz-Anhaengsel (sonst pruefte der Test einen leeren Fall).
+    assert any("Vodafone-Referenz" in s for s in saetze.values())
+    for schluessel, text in saetze.items():
+        assert text.endswith("."), schluessel
+        assert not text.endswith(".."), schluessel
+        assert ").." not in text, schluessel
+
+
 def test_die_messtagzeile_nennt_die_echte_spanne(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     assert paar["messtage_text"] == \

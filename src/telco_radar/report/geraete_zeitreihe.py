@@ -290,7 +290,11 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
                      f"({_euro(zweit['gesamt'])}).")
     elif eigen is None:
         satz += " — Vodafone führt in diesem Band kein Bündel."
-    return satz + "."
+    # Der Satzschlusspunkt gehoert GENAU HIERHER - die Anhaengsel oben
+    # schliessen ihren Teil teils selbst mit ".". Er wird deshalb nur
+    # gesetzt, wenn er nicht schon da ist; ein bedingungsloses "+ ".""
+    # machte daraus ").." (Abnahme 17.09.: 133 von 169 Bloecken).
+    return satz if satz.endswith(".") else satz + "."
 
 
 def _schnitt(karte: dict) -> str:
