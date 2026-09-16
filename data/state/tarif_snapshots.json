@@ -59,7 +59,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -88,13 +88,14 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
    "bis|50mb",
    "grundgebühr etwa zwischen und|10€",
    "hier meist zwischen und|15€",
+   "l zum preis von|12.99€",
    "m zum preis von|9.99€",
    "mit bis zu|50mb",
    "mobilfunknetz mit bis zu|50mb",
@@ -122,7 +123,7 @@
    "|80gb",
    "|9.99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -156,20 +157,20 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
    "in|1gb",
    "jeden monat bis zu|30gb",
-   "|10.99€",
    "|10gb",
+   "|11.99€",
    "|14.99€",
+   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
    "|216€",
-   "|264€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -180,13 +181,12 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.premiumsim.de/": {
   "werte": [
    "ab|19.99€",
    "dsl ab|19.99€",
-   "sichern ab|54.99€",
    "|0€",
    "|10.99€",
    "|10gb",
@@ -208,10 +208,13 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
+   "allnet flat|10gb",
+   "allnet flat|25gb",
+   "allnet flat|40gb",
    "beträgt die laufzeit bis|24monate",
    "dir tarife mit mindestens|40gb",
    "durchschnittsnutzer|50gb",
@@ -219,42 +222,60 @@
    "einen tarif mit mindestens|5gb",
    "einigen prepaidtarifen bis zu|79.99€",
    "langfristige verträge z. b.|24monate",
+   "max.|300mb",
+   "max.|50mb",
+   "monate laufzeit anschlusspreis|19.99€",
+   "monate laufzeit anschlusspreis|29.99€",
    "nutzung erfordert nur bis|2gb",
    "vielnutzer|50gb",
-   "wenignutzer|15gb"
+   "wenignutzer|15gb",
+   "|0€",
+   "|14.99€",
+   "|24monate",
+   "|29.99€",
+   "|39.99€",
+   "|42%",
+   "|46%",
+   "|47%",
+   "|50%",
+   "|54%",
+   "|54.99€",
+   "|59.99€",
+   "|99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
    "du innerhalb der ersten|19monate",
+   "max.|100mb",
    "max.|50mb",
    "monat laufzeit anschlusspreis|19.99€",
    "monate laufzeit anschlusspreis|0€",
    "normal surfer|40gb",
    "viel surfer|280gb",
    "wenig surfer|10gb",
-   "|19.99€",
    "|1monat",
    "|24.99€",
    "|24monate",
    "|29.99€",
-   "|33%",
-   "|40%",
+   "|39.99€",
    "|50%",
    "|60%",
    "|99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
    "fußnote zu|40€",
+   "statt|995€",
    "|0€",
    "|12monate",
    "|1399€",
    "|1899€",
    "|2999€",
+   "|299€",
    "|40€",
    "|499€",
    "|6999€",
@@ -262,12 +283,13 @@
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
    "als monatliche gutschrift von|8.34€",
    "als option dazubuchen für|3.99€",
+   "auf deinen vodafone mobil-tarif.|24monate",
    "außerhalb der eu. mit|2gb",
    "bei uns nur einmal|1€",
    "beim tarifpreis.|24monate",
@@ -281,6 +303,7 @@
    "daten-geschwindigkeit um bis zu|0.03mb",
    "dauerhaft|49.99€",
    "deinen tarifpreis verteilt auf|12monate",
+   "dem angebot bekommst du|3monate",
    "den einmalpreis und oder|36monat",
    "den tarifpreis du zahlst|24.99€",
    "der einmalige anschlusspreis von|39.99€",
@@ -315,6 +338,8 @@
    "gigamobil young s|50gb",
    "gigamobil young xs|6gb",
    "google ai pro|6monate",
+   "google one mit|200gb",
+   "haben. das angebot umfasst|6monate",
    "hardware-bonus|200€",
    "im gigamobil l mit|280gb",
    "im gigamobil l mit|77gb",
@@ -331,6 +356,7 @@
    "lang. das sind insgesamt|200€",
    "m gb zusätzlich insgesamt|100gb",
    "m gb zusätzlich insgesamt|200gb",
+   "mit dem angebot bekommst|2monate",
    "mit einem datenvolumen von|107gb",
    "mit einem datenvolumen von|135gb",
    "mit einem mindestwert von|1€",
@@ -348,9 +374,13 @@
    "monate lang jeden monat|20€",
    "monate lang jeden monat|5€",
    "monatliche abogebühr von derzeit|21.99€",
+   "nach ablauf der kostenlosen|2monate",
+   "nach ablauf der kostenlosen|3monate",
    "neu abschließt bekommst du|200€",
+   "one mit gb-abo für|6monate",
    "rabatt entfällt automatisch nach|24monate",
    "rabatte entfallen automatisch nach|24monate",
+   "recommerce. dann bekommst du|12monate",
    "reisen dafür bekommst du|2gb",
    "s gb zusätzlich insgesamt|100gb",
    "s gb zusätzlich insgesamt|110gb",
@@ -363,7 +393,9 @@
    "smartphone dazubuchen und|200€",
    "smartphone-akkus ist weniger als|80%",
    "solange der mobilfunk-vertrag besteht|50.95€",
+   "sparst du|200€",
    "sparst weitere|25%",
+   "spotify premium für|3monate",
    "standardpreis|39.99€",
    "statt|15gb",
    "statt|30gb",
@@ -381,6 +413,7 @@
    "vodafone mobil l|120gb",
    "von uns bis zu|12monate",
    "wenn du|80%",
+   "werden. nach ablauf der|6monate",
    "xiaomi redmi note pro|256gb",
    "xs bis m mit|24monate",
    "xs gb zusätzlich insgesamt|20gb",
@@ -388,6 +421,7 @@
    "xs gb zusätzlich insgesamt|26gb",
    "xs gb zusätzlich insgesamt|28gb",
    "x|15€",
+   "youtube premium für|2monate",
    "zahlst du im monat|59.45€",
    "zahlst du im monat|68.45€",
    "zusätzliches datenvolumen freischalten jeweils|250mb",
@@ -402,6 +436,7 @@
    "|12.49€",
    "|12.66€",
    "|120gb",
+   "|120€",
    "|12monate",
    "|12€",
    "|135gb",
@@ -414,6 +449,7 @@
    "|18gb",
    "|19.99€",
    "|1monat",
+   "|1€",
    "|20%",
    "|20gb",
    "|20€",
@@ -436,7 +472,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -455,6 +491,6 @@
    "|30€",
    "|5€"
   ],
-  "stand": "2026-09-11"
+  "stand": "2026-09-16"
  }
 }
