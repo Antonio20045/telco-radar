@@ -8,6 +8,19 @@
    inline im HTML eingebettet (id="gr-zahlen") — kein fetch, der Entwurf
    läuft per Doppelklick (file://); der Antwort-Satz ist reine Ableitung
    aus denselben Zeilen, die der Graph rendert — keine zweite Rechnung.
+
+   Zentrum-Überarbeitung (16.09.2026, abends): Der Graph ist das größte
+   Element der Tafel, nicht ihre Fußnote. Form A = Balkenhöhe 50 px,
+   Segmentwerte GEDRUCKT im Segment (zu schmale Segmente tragen ihren
+   Betrag über dem Balken, Haarlinie am Segment), TCO-24 in 27-px-Serife
+   am Balkenende IM Bild, rote Vodafone-Referenzlinie als EINE vertikale
+   Linie durch alle Balkenzeilen mit Label an der Linie. Form B = Spur
+   44 px, Monatszahl 26 px am Balken. Form C = SVG in Balkenbreite und
+   mindestens 340 px Höhe (die alte Fassung maß 300 px intrinsische
+   SVG-Breite — daher die Miniatur). Positionierungen, die von der
+   rendered Breite abhängen, misst messeGraph() NACH dem Einfügen
+   (offsetWidth) — die Y-Achse gehört dem Preis, die X-Achse hier dem
+   Betrag: nichts wird verschoben, nur beschriftet.
    ===================================================================== */
 (function () {
   "use strict";
@@ -165,50 +178,67 @@
 
   /* ---------------- Bestandteile → Segmente (Form A) ------------------ */
   function segmente(z) {
-    var einmalig = 0, raten = 0, tarif = 0, bündel = 0;
+    var einmalig = 0, raten = 0, tarif = 0, buendel = 0;
     z.bestandteile.forEach(function (p) {
       var n = p.name, v = p.betrag || 0;
       if (n === "Gerätezuzahlung" || n === "Anschlusspreis") einmalig += v;
       else if (n.indexOf("Geräteraten") === 0) raten += v;
-      else if (n.indexOf("Bündelpreis") === 0) bündel += v;
+      else if (n.indexOf("Bündelpreis") === 0) buendel += v;
       else if (n.indexOf("Tarif über") === 0) tarif += v;
     });
     var posten = [];
     if (einmalig) posten.push(["einmalig", einmalig, "einmalig"]);
     if (raten) posten.push(["Geräteraten bis 24", raten, "raten"]);
     if (tarif) posten.push(["Tarif bis 24", tarif, "tarif"]);
-    if (bündel) posten.push(["Bündel-Monatsbeiträge bis 24", bündel, "bündel"]);
-    return { liste: posten, summe: einmalig + raten + tarif + bündel };
+    if (buendel) posten.push(["Bündelbeiträge bis 24", buendel, "buendel"]);
+    return { liste: posten, summe: einmalig + raten + tarif + buendel };
   }
 
-  /* ---------------- Form A: gestapelter Balken je Anbieter ------------ */
+  /* ---------------- Form A: gestapelter Balken je Anbieter ------------
+     Das Zentrum der Tafel: Balkenhöhe 50 px, volle Spurbreite, Werte im
+     Bild. Die Spalten der Zeilen sind FIX (200px · 1fr · 190px), deshalb
+     liegt die Spur jeder Zeile pixelgleich — EINE Referenzlinie im
+     Container trifft den Balken jeder Zeile am selben Betrag. Die Linie
+     sitzt mit width:2px/margin-left:-1px MITTLIG auf ihrer Marke und
+     bleibt so auch bei 100 % Spurausnutzung sichtbar innen. */
   function formA(mod, band) {
     var b = mod.baender[band];
     var zeilen = b.zeilen.slice().sort(function (x, y) { return x.tco24 - y.tco24; });
     var vf = b.zeilen.filter(function (z) { return z.referenz; })[0] || null;
-    var maxT = Math.max.apply(null, zeilen.map(function (z) { return z.tco24; })) * 1.03;
-    var refPct = vf ? (vf.tco24 / maxT * 100) : null;
+    var maxT = Math.max.apply(null, zeilen.map(function (z) { return z.tco24; }));
+    var hatBuendel = zeilen.some(function (z) {
+      return segmente(z).liste.some(function (s) { return s[2] === "buendel"; });
+    });
+    var refF = vf ? vf.tco24 / maxT : null;
+
     var html = "<div class='v2-legende'>" +
-      "<span><i style='background:#d8d2c3'></i>einmalig</span>" +
-      "<span><i style='background:#8a8479'></i>Geräteraten bis 24</span>" +
-      "<span><i style='background:#33302a'></i>Tarif bis 24</span>" +
+      "<span><i class='v2-l-einmalig'></i>einmalig</span>" +
+      "<span><i class='v2-l-raten'></i>Geräteraten bis 24</span>" +
+      "<span><i class='v2-l-tarif'></i>Tarif bis 24</span>" +
+      (hatBuendel ? "<span><i class='v2-l-buendel'></i>Bündelbeiträge bis 24</span>" : "") +
       (vf ? "<span><i class='v2-l-ref'></i>Vodafone-Referenz</span>" : "") +
-      "</div><div class='v2-a-liste'>";
+      "</div><div class='v2-a-liste'" +
+      (refF !== null ? " style='--v2-ref-f:" + refF.toFixed(4) + "'" : "") + ">" +
+      (refF !== null
+        ? "<div class='v2-a-refline' aria-hidden='true'></div>" +
+          "<div class='v2-a-reflabel'>Vodafone " + vf.tco24_text + "</div>"
+        : "");
     zeilen.forEach(function (z) {
       var seg = segmente(z);
       var pos = 0, segs = "";
       seg.liste.forEach(function (s) {
         var w = s[1] / maxT * 100;
         segs += "<div class='v2-a-seg v2-a-seg--" + s[2] +
-          "' style='left:" + pos.toFixed(2) + "%;width:" + w.toFixed(2) + "%'></div>";
+          "' style='left:" + pos.toFixed(2) + "%;width:" + w.toFixed(2) + "%'>" +
+          "<span class='v2-a-segwert'>" + euro(s[1]) + "</span></div>";
         pos += w;
       });
-      var posten = seg.liste.map(function (s) {
-        return "<b>" + euro(s[1]) + "</b> " + s[0];
-      }).join(" · ");
+      var endPct = z.tco24 / maxT * 100;
+      segs += "<span class='v2-a-tco v2-zahl' data-end='" + endPct.toFixed(2) +
+        "' style='left:" + endPct.toFixed(2) + "%'>" + z.tco24_text + "</span>";
       var delta = z.referenz
-        ? "<span class='gr-bz-ref'>Referenz</span>"
-        : (z.delta_text ? "<span>" + z.delta_text + "</span>" : "");
+        ? "<span class='v2-a-ref'>Referenz</span>"
+        : (z.delta_text ? "<span class='v2-a-delta v2-zahl'>" + z.delta_text + "</span>" : "");
       html +=
         "<div class='v2-a-zeile" + (z.referenz ? " v2-a-zeile--eigen" : "") + "'>" +
         "<div class='v2-a-name'>" +
@@ -216,27 +246,24 @@
         (z.referenz ? "<span class='v2-a-chip'>unser Angebot</span>" : "") +
         "<span class='v2-a-tarif'>" + z.tarif + (z.gb ? " · " + z.gb : "") +
         "</span></div>" +
-        "<div class='v2-a-spurwrap'><div class='v2-a-spur'>" + segs +
-        (refPct !== null
-          ? "<div class='v2-a-refline' style='left:" + refPct.toFixed(2) + "%'></div>"
-          : "") +
-        "</div><div class='v2-a-posten v2-zahl'>" + posten + "</div></div>" +
-        "<div class='v2-a-wert'><span class='v2-a-tco v2-zahl'>" + z.tco24_text +
-        "</span><span class='v2-a-delta'>" + delta + "</span>" +
-        belegZeile(z) + "</div>" +
+        "<div class='v2-a-spur'>" + segs + "</div>" +
+        "<div class='v2-a-wert'>" + delta + belegZeile(z) + "</div>" +
         "</div>";
     });
     return html + "</div>";
   }
 
-  /* ---------------- Form B: Ø €/Monat (Live-Klassen .gr-bz) ----------- */
+  /* ---------------- Form B: Ø €/Monat (Live-Klassen .gr-bz) -----------
+     Gleiche Größenordnung wie Form A: Spur 44 px hoch, die Monatszahl in
+     26-px-Serife am Balkenende im Bild (weiß auf dem Live-Fill; der Fill
+     ist 44 px hoch, die Zahl Large-Text-kontrastsicher). */
   function formB(mod, band) {
     var b = mod.baender[band];
     var zeilen = b.zeilen.slice().sort(function (x, y) { return x.tco24 - y.tco24; });
     var maxS = Math.max.apply(null, zeilen.map(function (z) { return z.schnitt; }));
     var html = "<div class='gr-balkenliste'>";
     zeilen.forEach(function (z) {
-      var w = Math.max(4, Math.round(z.schnitt / maxS * 100));
+      var w = Math.max(4, z.schnitt / maxS * 100);
       html +=
         "<div class='gr-bz" + (z.referenz ? " gr-bz--eigen gr-anb--" + ANB_SLUG[z.anbieter] : "") +
         "' data-anbieter='" + z.anbieter + "' data-tco='" + z.tco24 + "'>" +
@@ -244,19 +271,24 @@
         (z.referenz ? "<span class='gr-bz-chip'>unser Angebot</span>" : "") +
         "<span class='gr-bz-tarif'>" + z.tarif + (z.gb ? " · " + z.gb : "") +
         "</span></div>" +
-        "<div class='gr-bz-spur'><div class='gr-bz-fill' style='width:" + w + "%'></div></div>" +
-        "<div class='gr-bz-wert'><span class='gr-bz-tco v2-zahl'>" +
-        z.schnitt_text.replace(" €/M.", "") + " €/M.</span>" +
-        "<span class='gr-bz-delta v2-zahl'>TCO-24 " + z.tco24_text + "</span>" +
+        "<div class='gr-bz-spur'><div class='gr-bz-fill' style='width:" + w + "%'></div>" +
+        "<span class='v2-b-zahl v2-zahl' data-end='" + w.toFixed(2) +
+        "' style='left:" + w.toFixed(2) + "%'>" +
+        z.schnitt_text.replace(" €/M.", "") + " €/M.</span></div>" +
+        "<div class='gr-bz-wert'><span class='gr-bz-tco v2-zahl'>TCO-24 " + z.tco24_text + "</span>" +
         (z.referenz ? "<span class='gr-bz-ref'>Referenz</span>"
-          : (z.delta_text ? "<span class='gr-bz-delta'>" + z.delta_text + "</span>" : "")) +
+          : (z.delta_text ? "<span class='gr-bz-delta v2-zahl'>" + z.delta_text + "</span>" : "")) +
         belegZeile(z) + "</div></div>";
     });
     return html + "</div>";
   }
 
-  /* ---------------- Form C: Band-Kurve (SVG, Anbieterfarben live) ----- */
-  function formC(mod, bandAktiv) {
+  /* ---------------- Form C: Band-Kurve (SVG, Anbieterfarben live) -----
+     Breite wird GEMESSEN (Platzhalter), Höhe = max(340, 40 % der Breite):
+     die alte Fassung hatte nur die viewBox (360×330) als intrinsische
+     Größe → 300 px breite Miniatur. Schriftgrößen stehen in viewBox-
+     Einheiten, die 1:1 gerendert werden. */
+  function formC(mod, bandAktiv, W) {
     var bands = ["klein", "mittel", "gross"];
     var anbieter = Object.keys(ANB_FARBE).filter(function (a) {
       return bands.some(function (bk) {
@@ -275,7 +307,8 @@
           maxT = Math.max(maxT, z.tco24); }
       });
     });
-    var W = 360, H = 330, L = 10, R = 86, T = 26, B = 64;
+    var H = Math.max(340, Math.round(W * 0.40));
+    var L = 14, R = Math.max(96, Math.round(W * 0.15)), T = 30, B = 64;
     var pw = W - L - R, ph = H - T - B;
     var X = { klein: L + pw * 0.10, mittel: L + pw * 0.50, gross: L + pw * 0.90 };
     var ymax = maxT * 1.08;
@@ -283,41 +316,40 @@
     function txt(v) { return v.toLocaleString("de-DE", { maximumFractionDigits: 0 }) + " €"; }
 
     var svg = "<div class='v2-kurve-wrap'><svg viewBox='0 0 " + W + " " + H +
-      "' role='img' aria-label='TCO-24 je Tarifband und Anbieter'>";
+      "' width='" + W + "' role='img' aria-label='TCO-24 je Tarifband und Anbieter'>";
     // Raster: 4 Haarlinien mit Beschriftung
     for (var g = 0; g <= 3; g++) {
       var v = ymax * g / 3, y = Y(v);
       svg += "<line class='v2-kurve-raster' x1='" + L + "' y1='" + y.toFixed(1) +
         "' x2='" + (W - R) + "' y2='" + y.toFixed(1) + "'></line>";
       if (g > 0)
-        svg += "<text class='v2-kurve-achse' x='" + (W - R + 6) + "' y='" +
-          (y + 3.5).toFixed(1) + "'>" + txt(v) + "</text>";
+        svg += "<text class='v2-kurve-achse' x='" + (W - R + 8) + "' y='" +
+          (y + 4.5).toFixed(1) + "'>" + txt(v) + "</text>";
     }
     bands.forEach(function (bk) {
       var aktiv = bk === bandAktiv;
       svg += "<text class='v2-kurve-achse" + (aktiv ? " v2-kurve-band--aktiv" : "") +
         "' x='" + X[bk].toFixed(1) +
-        "' y='" + (H - B + 22) + "' text-anchor='middle' style='font-weight:700'>" +
+        "' y='" + (H - B + 26) + "' text-anchor='middle' style='font-weight:700'>" +
         BAND_KURZ[bk] + "</text>" +
         "<text class='v2-kurve-achse' x='" + X[bk].toFixed(1) + "' y='" +
-        (H - B + 36) + "' text-anchor='middle'>" + BAND_BEREICH[bk] + "</text>";
+        (H - B + 44) + "' text-anchor='middle'>" + BAND_BEREICH[bk] + "</text>";
       svg += "<line class='v2-kurve-raster" + (aktiv ? " v2-kurve-aktiv" : "") +
         "' x1='" + X[bk].toFixed(1) +
         "' y1='" + T + "' x2='" + X[bk].toFixed(1) + "' y2='" + (T + ph) + "'></line>";
     });
-    // Linien + Punkte + Werte; Endnamen mit Mindestabstand (12 px) -
+    // Linien + Punkte + Werte; Endnamen mit Mindestabstand -
     // die Lehre von der Positionskarte: das Etikett gehört auf die wahre Höhe.
     var enden = [];
     anbieter.forEach(function (a) {
       var farbe = ANB_FARBE[a];
-      var dash = a === "Telekom" ? " stroke-dasharray='2.5 3'" : "";
+      var dash = a === "Telekom" ? " stroke-dasharray='3 4'" : "";
       var lastBk = null;
       bands.forEach(function (bk) {
         if (punkte[a][bk] === undefined) return;
         if (lastBk !== null) {
-          var x1 = X[lastBk], y1 = Y(punkte[a][lastBk]);
-          svg += "<line class='v2-kurve-linie' x1='" + x1.toFixed(1) + "' y1='" +
-            y1.toFixed(1) + "' x2='" + X[bk].toFixed(1) + "' y2='" +
+          svg += "<line class='v2-kurve-linie' x1='" + X[lastBk].toFixed(1) + "' y1='" +
+            Y(punkte[a][lastBk]).toFixed(1) + "' x2='" + X[bk].toFixed(1) + "' y2='" +
             Y(punkte[a][bk]).toFixed(1) + "' stroke='" + farbe + "'" + dash + "></line>";
         }
         lastBk = bk;
@@ -344,16 +376,16 @@
       var belegt = [];
       function frei(yy) {
         return !belegt.some(function (r) {
-          return Math.abs(r - yy) < 12.5;
+          return Math.abs(r - yy) < 14;
         });
       }
       liste.forEach(function (p, i) {
-        var drueber = p.y - 10, drunter = p.y + 17;
+        var drueber = p.y - 12, drunter = p.y + 19;
         var yy = i % 2 === 0 ? drueber : drunter;
         if (!frei(yy)) yy = frei(drueber) ? drueber : drunter;
         var schieber = 0;
         while (!frei(yy) && schieber < 4) {
-          yy += (yy > p.y ? 12.5 : -12.5);
+          yy += (yy > p.y ? 14 : -14);
           schieber++;
         }
         belegt.push(yy);
@@ -373,29 +405,94 @@
         if (v === undefined) return;
         var x = X[bk], y = Y(v);
         svg += "<circle class='v2-kurve-punkt' cx='" + x.toFixed(1) + "' cy='" +
-          y.toFixed(1) + "' r='4' fill='" + farbe + "'></circle>";
+          y.toFixed(1) + "' r='5' fill='" + farbe + "'></circle>";
       });
     });
     // Endnamen als Beleg-Link (der Beleg gehört zum ANBIETER, nicht je
-    // Punkt), Abrufdatum darunter - Mindestabstand 23 px für das Zweizeiler-
+    // Punkt), Abrufdatum darunter - Mindestabstand 28 px für das Zweizeiler-
     // Block, Etikett bleibt auf wahrer Höhe des Linienendes.
     enden.sort(function (p, q) { return p.y - q.y; });
     var letzteY = -99;
     enden.forEach(function (e) {
-      var y = Math.max(e.y, letzteY + 23);
+      var y = Math.max(e.y, letzteY + 28);
       letzteY = y;
       svg += "<a href='" + esc(e.z.url) + "' target='_blank' rel='noopener'" +
         " class='v2-kurve-link' role='link'" +
         " aria-label='Beleg bei " + esc(e.a) + " öffnen'>" +
-        "<text class='v2-kurve-name' x='" + (X[e.bk] + 10).toFixed(1) +
-        "' y='" + (y + 4).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" + e.a +
+        "<text class='v2-kurve-name' x='" + (X[e.bk] + 12).toFixed(1) +
+        "' y='" + (y + 5).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" + e.a +
         "<tspan class='v2-kurve-pfeil'> ↗</tspan></text></a>" +
-        "<text class='v2-kurve-datum' x='" + (X[e.bk] + 10).toFixed(1) +
-        "' y='" + (y + 15).toFixed(1) + "'>" + datumKurz(e.z.messtermin) + "</text>";
+        "<text class='v2-kurve-datum' x='" + (X[e.bk] + 12).toFixed(1) +
+        "' y='" + (y + 19).toFixed(1) + "'>" + datumKurz(e.z.messtermin) + "</text>";
     });
     svg += "</svg></div>";
     svg += "<p class='v2-kurve-hinweis'>TCO-24 je Tarifband · ein fehlender Punkt heißt: dieser Anbieter führt das Gerät in dem Band nicht im Bündel (Namen in der Zeile unter dem Graph je gewähltem Band).</p>";
     return svg;
+  }
+
+  /* ---------------- Nachmessen: Beschriftung am gerenderten Bild -------
+     Alles, was von der Spurbreite abhängt, wird hier NACH dem Einfügen
+     entschieden (offsetWidth zwingt das Layout). Nie verschoben wird ein
+     Wert von seinem Betrag - die X-Achse gehört dem Betrag wie die Y-Achse
+     dem Preis; verschoben wird nur die BESCHRIFTUNG, mit Haarlinie am Ort
+     der Wahrheit. */
+  function messeGraph() {
+    var mobil = window.matchMedia("(max-width:640px)").matches;
+    var schwelleSeg = mobil ? 58 : 90;
+
+    /* Form A */
+    document.querySelectorAll("#v2-graph .v2-a-zeile").forEach(function (zeile) {
+      var spur = zeile.querySelector(".v2-a-spur");
+      if (!spur) return;
+      var spurW = spur.clientWidth;
+      var tco = spur.querySelector(".v2-a-tco");
+      var segs = spur.querySelectorAll(".v2-a-seg");
+      var letztes = segs.length ? segs[segs.length - 1] : null;
+      var tcoW = tco ? tco.offsetWidth : 0;
+      var tcoAussen = false;
+      // 1) TCO: passt nicht ins letzte Segment → daneben (außen, Ink).
+      //    Innen bleibt weiß - das letzte Segment ist immer Tarif oder
+      //    Bündel (dunkel); ein helleres letztes Segment gibt es im
+      //    Bestand nicht (TCO ohne Tarif-/Bündelanteil ist kein Bündel).
+      if (tco && letztes) {
+        var endF = parseFloat(tco.dataset.end) / 100;
+        if (letztes.offsetWidth < tcoW + 12 &&
+            (spurW - spurW * endF) >= tcoW + 10) {
+          tco.classList.add("v2-a-tco--aussen");
+          tcoAussen = true;
+        }
+      }
+      // 2) Segmentwerte: zu schmal (< Schwelle) oder breiter als das
+      //    Segment oder Kollision mit dem TCO im letzten Segment →
+      //    Betrag ÜBER dem Balken, Haarlinie am Segmentanfang.
+      segs.forEach(function (seg) {
+        var wert = seg.querySelector(".v2-a-segwert");
+        if (!wert) return;
+        var w = seg.offsetWidth;
+        var kollidiert = seg === letztes && tco && !tcoAussen &&
+          (w - (tcoW + 14) < wert.offsetWidth + 10);
+        if (w < schwelleSeg || wert.offsetWidth > w - 8 || kollidiert) {
+          seg.classList.add("v2-a-seg--drueber");
+          // Beschriftung klemmen: darf die Spur nicht seitlich verlassen
+          if (seg.offsetLeft + wert.offsetWidth > spurW - 2)
+            seg.classList.add("v2-a-seg--drueber--rechts");
+        }
+      });
+    });
+
+    /* Form B */
+    document.querySelectorAll("#v2-graph .gr-bz-spur").forEach(function (spur) {
+      var zahl = spur.querySelector(".v2-b-zahl");
+      var fill = spur.querySelector(".gr-bz-fill");
+      if (!zahl || !fill) return;
+      var spurW = spur.clientWidth;
+      var zahlW = zahl.offsetWidth;
+      var endF = parseFloat(zahl.dataset.end) / 100;
+      if (fill.offsetWidth < zahlW + 12 &&
+          (spurW - spurW * endF) >= zahlW + 10) {
+        zahl.classList.add("v2-b-zahl--aussen");
+      }
+    });
   }
 
   /* ---------------- Render -------------------------------------------- */
@@ -405,7 +502,15 @@
     lueckenSatz(mod, zustand.band);
     if (zustand.form === "A") $("v2-graph").innerHTML = formA(mod, zustand.band);
     else if (zustand.form === "B") $("v2-graph").innerHTML = formB(mod, zustand.band);
-    else $("v2-graph").innerHTML = formC(mod, zustand.band);
+    else {
+      // Form C braucht die gerenderte Breite (Platzhalter messen, dann
+      // bauen) - die viewBox steht in px und wird 1:1 ausgeliefert.
+      $("v2-graph").innerHTML = "<div class='v2-kurve-wrap'></div>";
+      var platz = $("v2-graph").firstElementChild;
+      var w = platz.clientWidth || 960;
+      platz.innerHTML = formC(mod, zustand.band, w);
+    }
+    messeGraph();
     $("v2-form-name").textContent = FORMEN[zustand.form];
     document.querySelectorAll("#v2-formwahl .v2-formknopf").forEach(function (b) {
       b.setAttribute("aria-pressed", b.dataset.form === zustand.form ? "true" : "false");
@@ -510,6 +615,14 @@
         var erster = $("v2-vorschau").querySelector("button");
         if (erster) { ev.preventDefault(); waehleModell(erster.dataset.id); }
       }
+    });
+
+    // Die Beschriftung hängt an der gerenderten Breite: bei Resize neu
+    // rechnen (entprellt) - nur die Platzierung, nie die Zahlen.
+    var resizeTimer = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(render, 160);
     });
 
     render();
