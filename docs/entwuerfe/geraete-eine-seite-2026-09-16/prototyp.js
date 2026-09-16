@@ -1,61 +1,49 @@
 /* =====================================================================
-   prototyp.js — Entwurf v2 „EINE Geräteseite" (16.09.2026)
+   prototyp.js — Entwurf v2 „EINE Geräteseite" (16.09.2026, Nacht)
    Nur Reiter-Umschalten (derselbe Mechanismus wie app.js: data-tafel +
-   .gr-tafel--aus), Suchfeld-Live-Vorschau (Verhalten 1:1 aus Entwurf v1,
-   Antonios einziger Lob: ab 2 Zeichen, ≤ 8 Treffer, Modellname + GB,
-   klickbar vor vollständiger Eingabe), Band-Wahl und Graph-Form-Umschalter.
-   Kein Live-app.js. Alle Zahlen aus zahlen.json (Bestand 15.09.2026),
-   inline im HTML eingebettet (id="gr-zahlen") — kein fetch, der Entwurf
-   läuft per Doppelklick (file://); der Antwort-Satz ist reine Ableitung
-   aus denselben Zeilen, die der Graph rendert — keine zweite Rechnung.
+   .gr-tafel--aus) und Suchfeld-Live-Vorschau (Verhalten 1:1 aus Entwurf
+   v1). Kein Live-app.js. Alle Zahlen aus zahlen.json (Bestand 15.09.2026)
+   inklusive Feld `historie` (TCO-Zeitreihe 12.–15.09. aus
+   geraete_tco_historie.jsonl, gezogen von historie_sammeln.py), inline
+   im HTML eingebettet (id="gr-zahlen") — kein fetch, der Entwurf läuft
+   per Doppelklick (file://).
 
-   Zentrum-Überarbeitung (16.09.2026, abends): Der Graph ist das größte
-   Element der Tafel, nicht ihre Fußnote. Form A = Balkenhöhe 50 px,
-   Segmentwerte GEDRUCKT im Segment (zu schmale Segmente tragen ihren
-   Betrag über dem Balken, Haarlinie am Segment), TCO-24 in 27-px-Serife
-   am Balkenende IM Bild, rote Vodafone-Referenzlinie als EINE vertikale
-   Linie durch alle Balkenzeilen mit Label an der Linie. Form B = Spur
-   44 px, Monatszahl 26 px am Balken. Form C = SVG in Balkenbreite und
-   mindestens 340 px Höhe (die alte Fassung maß 300 px intrinsische
-   SVG-Breite — daher die Miniatur). Positionierungen, die von der
-   rendered Breite abhängen, misst messeGraph() NACH dem Einfügen
-   (offsetWidth) — die Y-Achse gehört dem Preis, die X-Achse hier dem
-   Betrag: nichts wird verschoben, nur beschriftet.
+   DER EINE GRAPH ist die TCO-ZEITREIHE (Antonios Entscheidung, 16.09.):
+   „Y-Achse ist Euro-Kosten, X-Achse ist das DATUM. Ich möchte die
+   verschiedenen Messtage sehen — an welchen Tagen haben sie die Preise
+   runtergemacht, an welchen hoch." Kein Formen-Umschalter mehr, keine
+   Stapelbalken, keine Band-Kurve. X-Skala ist die ECHTE Datumsdistanz
+   (keine ordinale Achse — derselbe Befund, der die alte Live-Grafik
+   falsch machte), und eine Linie verbindet nur ECHTE Messungen: fehlt
+   einem Anbieter ein Messtag, fehlt der Punkt — nichts interpoliert.
    ===================================================================== */
 (function () {
   "use strict";
 
   var BAND_KURZ = { klein: "Klein", mittel: "Mittel", gross: "Groß" };
   var BAND_BEREICH = null;            // aus zahlen.json (baender_meta)
-  var ANB_SLUG = {                    // Klassen der Live-CSS (gr-anb--*)
-    "Vodafone": "vodafone", "Telekom": "telekom", "o2": "o2",
-    "1&1": "1-1", "congstar": "congstar"
-  };
   var ANB_FARBE = {                   // dieselben Werte wie --anb in style.css
-    "Vodafone": "#e60000", "Telekom": "#e20074", "o2": "#0019a5",
+    "Telekom": "#e20074", "Vodafone": "#e60000", "o2": "#0019a5",
     "1&1": "#00589e", "congstar": "#f5a800"
   };
-  var FORMEN = {
-    A: "A · Zusammensetzung des TCO-24 je Anbieter",
-    B: "B · Ø €/Monat je Anbieter, TCO-24 daneben",
-    C: "C · TCO-24 über die drei Bänder je Anbieter"
-  };
+  var ANB_REIHENFOLGE = ["Telekom", "Vodafone", "o2", "1&1", "congstar"];
 
   var Z = null;
-  /* Startzustand = der VOLLSTE Graph des Bestands, damit der erste Blick
-     einen Vergleich zeigt, keine Einzelzeile. Gemessen über alle
-     (Modell × Band) in #gr-zahlen: Drei Kombinationen haben 4 Zeilen —
-     Z Fold8 klein, iPhone 17 klein, iPhone 17 Pro klein (je inkl.
-     Vodafone-Referenz). Genommen ist Z Fold8 klein, weil dort die
-     Referenzlinie bei 83,9 % MITTENDRIN steht (iPhone 17: 98,2 %,
-     iPhone 17 Pro: 99,3 %, also am rechten Rand) und die Balkenlängen
-     von 73,8 bis 100 % streuen — ein lesbarer Vergleich. Pixel 11 Pro
-     bleibt über Suchfeld + Band erreichbar (2 Handgriffe). */
-  var zustand = { modell: "samsung-galaxy-z-fold8-256", band: "klein", form: "A" };
+  /* Startzustand nach Koordinator-Regel: die meisten ANBIETER in der
+     Historie, bei Gleichstand die meisten PUNKTE. Gemessen von
+     historie_sammeln.py über alle (Modell × Band):
+       4 Anbieter · 13 Punkte: apple-iphone-17-pro-256 · klein  <- DAS
+       4 Anbieter · 10 Punkte: samsung-galaxy-z-fold8-256 · klein
+     (13 statt 16 Punkte heißt: ein Anbieter fehlt an Messtagen — genau
+     die Aussage, die dieser Graph führen soll.) */
+  var zustand = { modell: "apple-iphone-17-pro-256", band: "klein" };
 
   function $(id) { return document.getElementById(id); }
   function euro(n) {
     return n.toLocaleString("de-DE", { minimumFractionDigits: 2 }) + " €";
+  }
+  function euro0(n) {
+    return n.toLocaleString("de-DE", { maximumFractionDigits: 0 }) + " €";
   }
   function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
@@ -68,20 +56,15 @@
        "August", "September", "Oktober", "November", "Dezember"][t.getMonth()] +
       " " + t.getFullYear();
   }
-  function datumKurz(iso) {        // „15.09.2026" (Form C, unter dem Endnamen)
+  function datumKurz(iso) {        // „15.09.2026" (unter dem Endnamen)
     return iso.slice(8, 10) + "." + iso.slice(5, 7) + "." + iso.slice(0, 4);
   }
-  /* Beleg je Graphzeile: nur das Datum, daneben EIN ↗-Link auf die
-     Anbieter-/Tarifseite aus zahlen.json (url + messtermin je Zeile). */
-  function belegZeile(z) {
-    return "<span class='v2-beleg'><span class='v2-beleg-datum'>" +
-      datumDe(z.messtermin) + "</span> <a class='v2-beleg-link' href='" +
-      esc(z.url) + "' target='_blank' rel='noopener' title='Beleg bei " +
-      esc(z.anbieter) + " öffnen' aria-label='Beleg bei " + esc(z.anbieter) +
-      " öffnen (abgerufen " + datumDe(z.messtermin) + ")'>↗</a></span>";
+  function tagMonat(iso) {         // „12.9." (X-Achsen-Tick, echtes Format)
+    return parseInt(iso.slice(8, 10), 10) + "." +
+           parseInt(iso.slice(5, 7), 10) + ".";
   }
   function kurzName(mod) {
-    // „Google Pixel 11 Pro 256 GB" → „Pixel 11 Pro" (Antonios Satz sagt Pixel 11 Pro)
+    // „Apple iPhone 17 Pro 256 GB" → „iPhone 17 Pro"
     return mod.titel
       .replace(mod.hersteller + " ", "")
       .replace(new RegExp(" " + mod.speicher + " GB$"), "");
@@ -131,7 +114,7 @@
         "</b> über 24 Monate (TCO-24), Ø <b class='v2-zahl'>" +
         best.schnitt_text.replace(" €/M.", "") + " €/Monat</b> (" +
         best.tarif + (best.gb ? " · " + best.gb : "") + ").";
-      if (zweit && !vfNur(zeilen)) {
+      if (zweit && zeilen.length > 1) {
         satz += " Nächster Anbieter: " + zweit.anbieter + " (" +
           zweit.tco24_text + ").";
       }
@@ -151,7 +134,6 @@
     }
     return satz;
   }
-  function vfNur(zeilen) { return zeilen.length === 1; }
 
   /* ---------------- Lücken-Zeile: EIN Satz, keine je-Anbieter-Zeilen - */
   function lueckenSatz(mod, band) {
@@ -167,8 +149,6 @@
     var teile = [];
     if (bandLuecke.length)
       teile.push("Kein Bündel in diesem Band: " + bandLuecke.map(function (l) {
-        // Nur Anbieter MIT Alternativ-Zahl kriegen die Klammer - so bleibt
-        // die Leitfrage-Antwort ohne Bandwechsel komplett.
         var name = l.anbieter;
         if (l.alternativ && l.alternativ.length) {
           name += " (" + l.alternativ.map(function (alt) {
@@ -185,350 +165,214 @@
     el.hidden = false;
   }
 
-  /* ---------------- Bestandteile → Segmente (Form A) ------------------ */
-  function segmente(z) {
-    var einmalig = 0, raten = 0, tarif = 0, buendel = 0;
-    z.bestandteile.forEach(function (p) {
-      var n = p.name, v = p.betrag || 0;
-      if (n === "Gerätezuzahlung" || n === "Anschlusspreis") einmalig += v;
-      else if (n.indexOf("Geräteraten") === 0) raten += v;
-      else if (n.indexOf("Bündelpreis") === 0) buendel += v;
-      else if (n.indexOf("Tarif über") === 0) tarif += v;
+  /* ---------------- Der EINE Graph: TCO-Zeitreihe ----------------------
+     Y = TCO-24 in € (Ticks mit Beträgen, Haarlinien-Raster), X = das
+     DATUM in echter Distanz. Je Anbieter eine Linie mit PUNKT je
+     Messung; Wert-Label am LETZTEN Punkt (groß) und am ersten (klein);
+     Vodafone rot mit „unser Angebot"-Etikett; letzte Messung mit
+     kräftigerem Punkt. Beleg-Link (↗ + Datum) am Linienende. Breite
+     wird am Platzhalter GEMESSEN, die viewBox steht in px und rendert
+     1:1. */
+  function zeitreihe(mid, mod, band, W) {
+    var serienAlle = (Z.historie && Z.historie.serien[mid]) || {};
+    var serien = serienAlle[band] || {};
+    var anbieter = ANB_REIHENFOLGE.filter(function (a) {
+      return serien[a] && serien[a].length;
     });
-    var posten = [];
-    if (einmalig) posten.push(["einmalig", einmalig, "einmalig"]);
-    if (raten) posten.push(["Geräteraten bis 24", raten, "raten"]);
-    if (tarif) posten.push(["Tarif bis 24", tarif, "tarif"]);
-    if (buendel) posten.push(["Bündelbeiträge bis 24", buendel, "buendel"]);
-    return { liste: posten, summe: einmalig + raten + tarif + buendel };
-  }
+    if (!anbieter.length) {
+      return "<p class='v2-keine-serie'>Für " + esc(kurzName(mod)) +
+        " im Band " + BAND_KURZ[band] +
+        " liegt erst der Stand vom " + datumDe(Z.stand) +
+        " vor — die Zeitreihe wächst mit jedem Messtag (Historie seit dem " +
+        (Z.historie && Z.historie.messtage ?
+          datumDe(Z.historie.messtage[0]) : "12. September 2026") + ").</p>";
+    }
+    var mobil = W < 640;
 
-  /* ---------------- Form A: gestapelter Balken je Anbieter ------------
-     Das Zentrum der Tafel: Balkenhöhe 50 px, volle Spurbreite, Werte im
-     Bild. Die Spalten der Zeilen sind FIX (200px · 1fr · 190px), deshalb
-     liegt die Spur jeder Zeile pixelgleich — EINE Referenzlinie im
-     Container trifft den Balken jeder Zeile am selben Betrag. Die Linie
-     sitzt mit width:2px/margin-left:-1px MITTLIG auf ihrer Marke und
-     bleibt so auch bei 100 % Spurausnutzung sichtbar innen. */
-  function formA(mod, band) {
-    var b = mod.baender[band];
-    var zeilen = b.zeilen.slice().sort(function (x, y) { return x.tco24 - y.tco24; });
-    var vf = b.zeilen.filter(function (z) { return z.referenz; })[0] || null;
-    var maxT = Math.max.apply(null, zeilen.map(function (z) { return z.tco24; }));
-    var hatBuendel = zeilen.some(function (z) {
-      return segmente(z).liste.some(function (s) { return s[2] === "buendel"; });
-    });
-    var refF = vf ? vf.tco24 / maxT : null;
-
-    var html = "<div class='v2-legende'>" +
-      "<span><i class='v2-l-einmalig'></i>einmalig</span>" +
-      "<span><i class='v2-l-raten'></i>Geräteraten bis 24</span>" +
-      "<span><i class='v2-l-tarif'></i>Tarif bis 24</span>" +
-      (hatBuendel ? "<span><i class='v2-l-buendel'></i>Bündelbeiträge bis 24</span>" : "") +
-      (vf ? "<span><i class='v2-l-ref'></i>Vodafone-Referenz</span>" : "") +
-      "</div><div class='v2-a-liste'" +
-      (refF !== null ? " style='--v2-ref-f:" + refF.toFixed(4) + "'" : "") + ">" +
-      (refF !== null
-        ? "<div class='v2-a-refline' aria-hidden='true'></div>" +
-          "<div class='v2-a-reflabel'>Vodafone " + vf.tco24_text + "</div>"
-        : "");
-    zeilen.forEach(function (z) {
-      var seg = segmente(z);
-      var pos = 0, segs = "";
-      seg.liste.forEach(function (s) {
-        var w = s[1] / maxT * 100;
-        segs += "<div class='v2-a-seg v2-a-seg--" + s[2] +
-          "' style='left:" + pos.toFixed(2) + "%;width:" + w.toFixed(2) + "%'>" +
-          "<span class='v2-a-segwert'>" + euro(s[1]) + "</span></div>";
-        pos += w;
-      });
-      var endPct = z.tco24 / maxT * 100;
-      segs += "<span class='v2-a-tco v2-zahl' data-end='" + endPct.toFixed(2) +
-        "' style='left:" + endPct.toFixed(2) + "%'>" + z.tco24_text + "</span>";
-      var delta = z.referenz
-        ? "<span class='v2-a-ref'>Referenz</span>"
-        : (z.delta_text ? "<span class='v2-a-delta v2-zahl'>" + z.delta_text + "</span>" : "");
-      html +=
-        "<div class='v2-a-zeile" + (z.referenz ? " v2-a-zeile--eigen" : "") + "'>" +
-        "<div class='v2-a-name'>" +
-        "<span class='v2-a-anbieter'>" + z.anbieter + "</span>" +
-        (z.referenz ? "<span class='v2-a-chip'>unser Angebot</span>" : "") +
-        "<span class='v2-a-tarif'>" + z.tarif + (z.gb ? " · " + z.gb : "") +
-        "</span></div>" +
-        "<div class='v2-a-spur'>" + segs + "</div>" +
-        "<div class='v2-a-wert'>" + delta + belegZeile(z) + "</div>" +
-        "</div>";
-    });
-    return html + "</div>";
-  }
-
-  /* ---------------- Form B: Ø €/Monat (Live-Klassen .gr-bz) -----------
-     Gleiche Größenordnung wie Form A: Spur 44 px hoch, die Monatszahl in
-     26-px-Serife am Balkenende im Bild (weiß auf dem Live-Fill; der Fill
-     ist 44 px hoch, die Zahl Large-Text-kontrastsicher). */
-  function formB(mod, band) {
-    var b = mod.baender[band];
-    var zeilen = b.zeilen.slice().sort(function (x, y) { return x.tco24 - y.tco24; });
-    var maxS = Math.max.apply(null, zeilen.map(function (z) { return z.schnitt; }));
-    var html = "<div class='gr-balkenliste'>";
-    zeilen.forEach(function (z) {
-      var w = Math.max(4, z.schnitt / maxS * 100);
-      html +=
-        "<div class='gr-bz" + (z.referenz ? " gr-bz--eigen gr-anb--" + ANB_SLUG[z.anbieter] : "") +
-        "' data-anbieter='" + z.anbieter + "' data-tco='" + z.tco24 + "'>" +
-        "<div class='gr-bz-name'><span class='gr-bz-anbieter'>" + z.anbieter + "</span>" +
-        (z.referenz ? "<span class='gr-bz-chip'>unser Angebot</span>" : "") +
-        "<span class='gr-bz-tarif'>" + z.tarif + (z.gb ? " · " + z.gb : "") +
-        "</span></div>" +
-        "<div class='gr-bz-spur'><div class='gr-bz-fill' style='width:" + w + "%'></div>" +
-        "<span class='v2-b-zahl v2-zahl' data-end='" + w.toFixed(2) +
-        "' style='left:" + w.toFixed(2) + "%'>" +
-        z.schnitt_text.replace(" €/M.", "") + " €/M.</span></div>" +
-        "<div class='gr-bz-wert'><span class='gr-bz-tco v2-zahl'>TCO-24 " + z.tco24_text + "</span>" +
-        (z.referenz ? "<span class='gr-bz-ref'>Referenz</span>"
-          : (z.delta_text ? "<span class='gr-bz-delta v2-zahl'>" + z.delta_text + "</span>" : "")) +
-        belegZeile(z) + "</div></div>";
-    });
-    return html + "</div>";
-  }
-
-  /* ---------------- Form C: Band-Kurve (SVG, Anbieterfarben live) -----
-     Breite wird GEMESSEN (Platzhalter), Höhe = max(340, 40 % der Breite):
-     die alte Fassung hatte nur die viewBox (360×330) als intrinsische
-     Größe → 300 px breite Miniatur. Schriftgrößen stehen in viewBox-
-     Einheiten, die 1:1 gerendert werden. */
-  function formC(mod, bandAktiv, W) {
-    var bands = ["klein", "mittel", "gross"];
-    var anbieter = Object.keys(ANB_FARBE).filter(function (a) {
-      return bands.some(function (bk) {
-        var b = mod.baender[bk];
-        return b && b.zeilen.some(function (z) { return z.anbieter === a; });
+    // Union der Messtage DIESER (Modell, Band)-Serien — die X-Achse zeigt
+    // nur Tage, an denen wirklich gemessen wurde.
+    var tage = [], gesehen = {};
+    anbieter.forEach(function (a) {
+      serien[a].forEach(function (p) {
+        if (!gesehen[p[0]]) { gesehen[p[0]] = 1; tage.push(p[0]); }
       });
     });
-    var punkte = {};   // anbieter -> {band: tco24}
-    var zeilenC = {};  // anbieter -> {band: zeile} (für Beleg am Linienende)
-    var maxT = 0;
-    anbieter.forEach(function (a) { punkte[a] = {}; zeilenC[a] = {};
-      bands.forEach(function (bk) {
-        var b = mod.baender[bk];
-        var z = b && b.zeilen.filter(function (x) { return x.anbieter === a; })[0];
-        if (z) { punkte[a][bk] = z.tco24; zeilenC[a][bk] = z;
-          maxT = Math.max(maxT, z.tco24); }
-      });
-    });
-    var H = Math.max(340, Math.round(W * 0.40));
-    var L = 14, R = Math.max(96, Math.round(W * 0.15)), T = 30, B = 64;
+    tage.sort();
+
+    var H = Math.max(mobil ? 340 : 420, Math.round(W * 0.42));
+    var L = 58, R = mobil ? 96 : 158, T = 18, B = 46;
     var pw = W - L - R, ph = H - T - B;
-    var X = { klein: L + pw * 0.10, mittel: L + pw * 0.50, gross: L + pw * 0.90 };
-    var ymax = maxT * 1.08;
-    function Y(v) { return T + (1 - v / ymax) * ph; }
-    function txt(v) { return v.toLocaleString("de-DE", { maximumFractionDigits: 0 }) + " €"; }
+
+    function tMs(iso) { return new Date(iso + "T00:00:00").getTime(); }
+    var t0 = tMs(tage[0]), t1 = tMs(tage[tage.length - 1]);
+    function X(iso) {
+      if (t1 === t0) return L + pw / 2;
+      return L + (tMs(iso) - t0) / (t1 - t0) * pw;
+    }
+
+    var werte = [];
+    anbieter.forEach(function (a) {
+      serien[a].forEach(function (p) { werte.push(p[1]); });
+    });
+    var ymin = Math.min.apply(null, werte), ymax = Math.max.apply(null, werte);
+    var span = (ymax - ymin) || Math.max(ymax * 0.05, 1);
+    var y0 = Math.max(0, ymin - span * 0.12), y1 = ymax + span * 0.12;
+    function Y(v) { return T + (1 - (v - y0) / (y1 - y0)) * ph; }
+
+    // Y-Ticks: „runde" Beträge (1-2-2.5-5-10-Stufen), Beschriftung in €
+    function niceStep(r) {
+      var p = Math.pow(10, Math.floor(Math.log(r) / Math.LN10));
+      var n = r / p;
+      return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p;
+    }
+    var step = niceStep((y1 - y0) / 4);
 
     var svg = "<div class='v2-kurve-wrap'><svg viewBox='0 0 " + W + " " + H +
-      "' width='" + W + "' role='img' aria-label='TCO-24 je Tarifband und Anbieter'>";
-    // Raster: 4 Haarlinien mit Beschriftung
-    for (var g = 0; g <= 3; g++) {
-      var v = ymax * g / 3, y = Y(v);
-      svg += "<line class='v2-kurve-raster' x1='" + L + "' y1='" + y.toFixed(1) +
-        "' x2='" + (W - R) + "' y2='" + y.toFixed(1) + "'></line>";
-      if (g > 0)
-        svg += "<text class='v2-kurve-achse' x='" + (W - R + 8) + "' y='" +
-          (y + 4.5).toFixed(1) + "'>" + txt(v) + "</text>";
+      "' width='" + W + "' role='img' aria-label='TCO-24 je Messtag und Anbieter: " +
+      esc(anbieter.join(", ")) + "'>";
+    var v = Math.ceil(y0 / step) * step;
+    while (v <= y1 + 0.01) {
+      var y = Y(v);
+      svg += "<line class='v2-kurve-raster' x1='" + L + "' y1='" +
+        y.toFixed(1) + "' x2='" + (W - R) + "' y2='" + y.toFixed(1) +
+        "'></line>" +
+        "<text class='v2-kurve-achse' x='" + (L - 8) + "' y='" +
+        (y + 4).toFixed(1) + "' text-anchor='end'>" + euro0(v) + "</text>";
+      v += step;
     }
-    bands.forEach(function (bk) {
-      var aktiv = bk === bandAktiv;
-      svg += "<text class='v2-kurve-achse" + (aktiv ? " v2-kurve-band--aktiv" : "") +
-        "' x='" + X[bk].toFixed(1) +
-        "' y='" + (H - B + 26) + "' text-anchor='middle' style='font-weight:700'>" +
-        BAND_KURZ[bk] + "</text>" +
-        "<text class='v2-kurve-achse' x='" + X[bk].toFixed(1) + "' y='" +
-        (H - B + 44) + "' text-anchor='middle'>" + BAND_BEREICH[bk] + "</text>";
-      svg += "<line class='v2-kurve-raster" + (aktiv ? " v2-kurve-aktiv" : "") +
-        "' x1='" + X[bk].toFixed(1) +
-        "' y1='" + T + "' x2='" + X[bk].toFixed(1) + "' y2='" + (T + ph) + "'></line>";
+    // X-Ticks: jeder ECHTE Messtag, deutsches Kurzformat „12.9."
+    tage.forEach(function (tag) {
+      var x = X(tag);
+      svg += "<line class='v2-kurve-raster' x1='" + x.toFixed(1) +
+        "' y1='" + T + "' x2='" + x.toFixed(1) + "' y2='" + (T + ph) +
+        "'></line>" +
+        "<text class='v2-kurve-achse' x='" + x.toFixed(1) + "' y='" +
+        (H - B + 22) + "' text-anchor='middle'>" + tagMonat(tag) + "</text>";
     });
-    // Linien + Punkte + Werte; Endnamen mit Mindestabstand -
-    // die Lehre von der Positionskarte: das Etikett gehört auf die wahre Höhe.
-    var enden = [];
+
+    // Linien + Punkte (nur echte Messungen; Lücken bleiben Lücken)
     anbieter.forEach(function (a) {
       var farbe = ANB_FARBE[a];
-      var dash = a === "Telekom" ? " stroke-dasharray='3 4'" : "";
-      var lastBk = null;
-      bands.forEach(function (bk) {
-        if (punkte[a][bk] === undefined) return;
-        if (lastBk !== null) {
-          svg += "<line class='v2-kurve-linie' x1='" + X[lastBk].toFixed(1) + "' y1='" +
-            Y(punkte[a][lastBk]).toFixed(1) + "' x2='" + X[bk].toFixed(1) + "' y2='" +
-            Y(punkte[a][bk]).toFixed(1) + "' stroke='" + farbe + "'" + dash + "></line>";
-        }
-        lastBk = bk;
+      var pfad = "";
+      serien[a].forEach(function (p, i) {
+        pfad += (i ? "L" : "M") + X(p[0]).toFixed(1) + " " +
+                Y(p[1]).toFixed(1) + " ";
       });
-      var letzter = bands.filter(function (bk) { return punkte[a][bk] !== undefined; }).pop();
-      enden.push({ a: a, bk: letzter, y: Y(punkte[a][letzter]),
-        z: zeilenC[a][letzter] });
-    });
-    // Werte an den Punkten (immer gedruckt), kollisionsfrei je Spalte:
-    // Kandidaten über/unter dem Punkt, gierig die freie Seite gewählt -
-    // bei drei nahe beieinander liegenden Preisen einer Spalte reicht
-    // ein fester Wechsel nicht (Befund am Pixel-11-Pro-Fall, Band Klein).
-    var spalten = {};
-    anbieter.forEach(function (a) {
-      bands.forEach(function (bk) {
-        var v = punkte[a][bk];
-        if (v === undefined) return;
-        (spalten[bk] = spalten[bk] || []).push({ a: a, v: v, y: Y(v) });
+      if (serien[a].length > 1)
+        svg += "<path class='v2-kurve-linie' d='" + pfad.trim() +
+          "' stroke='" + farbe + "'></path>";
+      serien[a].forEach(function (p, i) {
+        var letzte = i === serien[a].length - 1;
+        svg += "<circle class='v2-kurve-punkt" + (letzte ? " v2-kurve-ende" : "") +
+          "' cx='" + X(p[0]).toFixed(1) + "' cy='" + Y(p[1]).toFixed(1) +
+          "' r='" + (letzte ? 6 : 4.5) + "' fill='" + farbe + "'></circle>";
       });
     });
-    var werte = [];
-    bands.forEach(function (bk) {
-      var liste = (spalten[bk] || []).sort(function (p, q) { return p.y - q.y; });
+
+    // Wert-Labels: LETZTER Punkt je Anbieter groß (links vom Punkt, im
+    // Plotraum — rechts beginnen die Endnamen), ERSTER Punkt klein
+    // (rechts daneben). Kollisionsfrei je Tagesspalte: Kandidaten
+    // über/unter dem Punkt, gierig die freie Seite — dieselbe Rechnung
+    // wie in der alten Band-Kurve, nur jetzt je X-Position.
+    function label(liste, klass, dx, ank) {
       var belegt = [];
-      function frei(yy) {
-        return !belegt.some(function (r) {
-          return Math.abs(r - yy) < 14;
-        });
-      }
+      liste.sort(function (p, q) { return p.y - q.y; });
       liste.forEach(function (p, i) {
-        var drueber = p.y - 12, drunter = p.y + 19;
+        var drueber = p.y - 11, drunter = p.y + 18;
         var yy = i % 2 === 0 ? drueber : drunter;
-        if (!frei(yy)) yy = frei(drueber) ? drueber : drunter;
-        var schieber = 0;
-        while (!frei(yy) && schieber < 4) {
-          yy += (yy > p.y ? 14 : -14);
-          schieber++;
+        function frei(t) {
+          return !belegt.some(function (r) { return Math.abs(r - t) < (mobil ? 15 : 13); });
         }
+        if (!frei(yy)) yy = frei(drueber) ? drueber : drunter;
+        var s = 0;
+        while (!frei(yy) && s < 5) { yy += (yy > p.y ? 15 : -15); s++; }
         belegt.push(yy);
-        werte.push({ a: p.a, bk: bk, v: p.v, yy: yy });
+        svg += "<text class='" + klass + "' x='" + (p.x + dx).toFixed(1) +
+          "' y='" + yy.toFixed(1) + "' text-anchor='" + ank + "'>" +
+          p.text + "</text>";
       });
-    });
-    werte.forEach(function (w) {
-      var x = X[w.bk];
-      svg += "<text class='v2-kurve-wert' x='" + x.toFixed(1) + "' y='" +
-        w.yy.toFixed(1) + "' text-anchor='middle'>" +
-        w.v.toLocaleString("de-DE", { maximumFractionDigits: 0 }) + "</text>";
-    });
+    }
+    var letzteP = [], ersteP = [];
     anbieter.forEach(function (a) {
-      var farbe = ANB_FARBE[a];
-      bands.forEach(function (bk) {
-        var v = punkte[a][bk];
-        if (v === undefined) return;
-        var x = X[bk], y = Y(v);
-        svg += "<circle class='v2-kurve-punkt' cx='" + x.toFixed(1) + "' cy='" +
-          y.toFixed(1) + "' r='5' fill='" + farbe + "'></circle>";
-      });
+      var s = serien[a];
+      var l = s[s.length - 1], e = s[0];
+      letzteP.push({ x: X(l[0]), y: Y(l[1]), text: euro0(l[1]) });
+      if (s.length > 1)
+        ersteP.push({ x: X(e[0]), y: Y(e[1]), text: euro0(e[1]) });
     });
-    // Endnamen als Beleg-Link (der Beleg gehört zum ANBIETER, nicht je
-    // Punkt), Abrufdatum darunter - Mindestabstand 28 px für das Zweizeiler-
-    // Block, Etikett bleibt auf wahrer Höhe des Linienendes.
+    label(letzteP, "v2-kurve-wert", -10, "end");
+    if (!mobil) label(ersteP, "v2-kurve-wert v2-kurve-wert--erst", 10, "start");
+
+    // Endnamen als Beleg-Link (↗ + Abrufdatum darunter), Vodafone mit
+    // „unser Angebot"-Etikett. URL aus der Zeile des Stichtags — derselbe
+    // Beleg, den die Tabelle nennt.
+    var zeilen = (mod.baender[band] || {}).zeilen || [];
+    var urlJe = {};
+    zeilen.forEach(function (z) { urlJe[z.anbieter] = z.url; });
+    var enden = anbieter.map(function (a) {
+      var s = serien[a];
+      return { a: a, y: Y(s[s.length - 1][1]), x: X(s[s.length - 1][0]) };
+    });
     enden.sort(function (p, q) { return p.y - q.y; });
     var letzteY = -99;
     enden.forEach(function (e) {
-      var y = Math.max(e.y, letzteY + 28);
+      var y = Math.max(e.y, letzteY + 46);
       letzteY = y;
-      svg += "<a href='" + esc(e.z.url) + "' target='_blank' rel='noopener'" +
+      var url = urlJe[e.a] || "#";
+      svg += "<a href='" + esc(url) + "' target='_blank' rel='noopener'" +
         " class='v2-kurve-link' role='link'" +
         " aria-label='Beleg bei " + esc(e.a) + " öffnen'>" +
-        "<text class='v2-kurve-name' x='" + (X[e.bk] + 12).toFixed(1) +
-        "' y='" + (y + 5).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" + e.a +
-        "<tspan class='v2-kurve-pfeil'> ↗</tspan></text></a>" +
-        "<text class='v2-kurve-datum' x='" + (X[e.bk] + 12).toFixed(1) +
-        "' y='" + (y + 19).toFixed(1) + "'>" + datumKurz(e.z.messtermin) + "</text>";
+        "<text class='v2-kurve-name' x='" + (e.x + 12).toFixed(1) +
+        "' y='" + (y + 4).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" +
+        e.a + "<tspan class='v2-kurve-pfeil'> ↗</tspan></text></a>" +
+        (e.a === "Vodafone" ?
+          "<text class='v2-kurve-chip' x='" + (e.x + 12).toFixed(1) +
+          "' y='" + (y + 16).toFixed(1) + "'>unser Angebot</text>" : "") +
+        "<text class='v2-kurve-datum' x='" + (e.x + 12).toFixed(1) +
+        "' y='" + (y + (e.a === "Vodafone" ? 29 : 16)).toFixed(1) + "'>" +
+        datumKurz(serien[e.a][serien[e.a].length - 1][0]) + "</text>";
     });
     svg += "</svg></div>";
-    svg += "<p class='v2-kurve-hinweis'>TCO-24 je Tarifband · ein fehlender Punkt heißt: dieser Anbieter führt das Gerät in dem Band nicht im Bündel (Namen in der Zeile unter dem Graph je gewähltem Band).</p>";
+    svg += "<p class='v2-kurve-hinweis'>TCO-24 je Messtag · ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag kein Bündel in diesem Band (Linien verbinden nur echte Messungen).</p>";
     return svg;
   }
 
-  /* ---------------- Nachmessen: Beschriftung am gerenderten Bild -------
-     Alles, was von der Spurbreite abhängt, wird hier NACH dem Einfügen
-     entschieden (offsetWidth zwingt das Layout). Nie verschoben wird ein
-     Wert von seinem Betrag - die X-Achse gehört dem Betrag wie die Y-Achse
-     dem Preis; verschoben wird nur die BESCHRIFTUNG, mit Haarlinie am Ort
-     der Wahrheit. */
-  function messeGraph() {
+  /* ---------------- Legende: EINE Zeile über dem Diagramm -------------
+     Anbieternamen mit Farb-Punkt, Vodafone rot und benannt. Mobil stehen
+     die ERSTEN Werte hier (dort sind die kleinen Erst-Punkte-Labels
+     ausgelassen, um Kollisionen auf 390 px zu vermeiden). */
+  function legende(mid, band) {
+    var serien = ((Z.historie && Z.historie.serien[mid]) || {})[band] || {};
+    var anbieter = ANB_REIHENFOLGE.filter(function (a) {
+      return serien[a] && serien[a].length;
+    });
+    if (!anbieter.length) return "";
     var mobil = window.matchMedia("(max-width:640px)").matches;
-    var schwelleSeg = mobil ? 58 : 90;
+    return "<div class='v2-legende'>" + anbieter.map(function (a) {
+      var zusatz = "";
+      if (mobil && serien[a][0])
+        zusatz = " <span class='v2-legende-ab'>ab " + euro0(serien[a][0][1]) + "</span>";
+      if (a === "Vodafone") zusatz += " <span class='v2-legende-ab'>· unser Angebot</span>";
+      return "<span><i style='background:" + ANB_FARBE[a] + "'></i>" +
+        a + zusatz + "</span>";
+    }).join("") + "</div>";
+  }
 
-    /* Form A */
-    document.querySelectorAll("#v2-graph .v2-a-zeile").forEach(function (zeile) {
-      var spur = zeile.querySelector(".v2-a-spur");
-      if (!spur) return;
-      var spurW = spur.clientWidth;
-      var tco = spur.querySelector(".v2-a-tco");
-      var segs = spur.querySelectorAll(".v2-a-seg");
-      var letztes = segs.length ? segs[segs.length - 1] : null;
-      var tcoW = tco ? tco.offsetWidth : 0;
-      var tcoAussen = false;
-      // 1) TCO: passt nicht ins letzte Segment → daneben (außen, Ink).
-      //    Innen bleibt weiß - das letzte Segment ist immer Tarif oder
-      //    Bündel (dunkel); ein helleres letztes Segment gibt es im
-      //    Bestand nicht (TCO ohne Tarif-/Bündelanteil ist kein Bündel).
-      if (tco && letztes) {
-        var endF = parseFloat(tco.dataset.end) / 100;
-        if (letztes.offsetWidth < tcoW + 12 &&
-            (spurW - spurW * endF) >= tcoW + 10) {
-          tco.classList.add("v2-a-tco--aussen");
-          tcoAussen = true;
-        }
-      }
-      // 2) Segmentwerte: MINI-Segmente (< 10 px gerendert, z.B. die
-      //    1,00-€-Zuzahlung an einem 2.131,66-€-Balken) docken ihr Label
-      //    bündig am Segmentanfang an — beim Erstsegment also am
-      //    SPURSTART, nie weiter links schwebend — mit kräftiger
-      //    Haarlinie zum Segment: der Betrag muss erkennbar zum Balken
-      //    gehören. Schmale Segmente (bis zur Schwelle) oder breitere
-      //    Beschriftung oder Kollision mit dem TCO im letzten Segment →
-      //    Betrag ÜBER dem Balken, Haarlinie am Segmentanfang.
-      segs.forEach(function (seg) {
-        var wert = seg.querySelector(".v2-a-segwert");
-        if (!wert) return;
-        var w = seg.offsetWidth;
-        if (w < 10) {
-          seg.classList.add("v2-a-seg--mini");
-        } else {
-          var kollidiert = seg === letztes && tco && !tcoAussen &&
-            (w - (tcoW + 14) < wert.offsetWidth + 10);
-          if (w < schwelleSeg || wert.offsetWidth > w - 8 || kollidiert) {
-            seg.classList.add("v2-a-seg--drueber");
-            // Beschriftung klemmen: darf die Spur nicht seitlich verlassen
-            if (seg.offsetLeft + wert.offsetWidth > spurW - 2)
-              seg.classList.add("v2-a-seg--drueber--rechts");
-          }
-        }
-      });
-      // 3) Andock-Kontrolle: Ein Label (mini oder drueber) darf weder in
-      //    die Namensspalte links ragen noch die Wertspalte rechts
-      //    schneiden - die Grid-Spalten trennen sie um 14 px von der
-      //    Spur; gemessen statt geglaubt, und im Fall der Fälle dockt
-      //    das Label hart am Spurstart an.
-      var nameBox = zeile.querySelector(".v2-a-name").getBoundingClientRect();
-      var wertBox = zeile.querySelector(".v2-a-wert").getBoundingClientRect();
-      spur.querySelectorAll(".v2-a-seg--mini,.v2-a-seg--drueber").forEach(function (seg) {
-        var wb = seg.querySelector(".v2-a-segwert").getBoundingClientRect();
-        var trifftNamen = wb.left < nameBox.right + 2 &&
-          wb.bottom > nameBox.top && wb.top < nameBox.bottom;
-        var trifftWert = wb.right > wertBox.left - 2 &&
-          wb.bottom > wertBox.top && wb.top < wertBox.bottom;
-        if (trifftNamen || trifftWert) {
-          seg.querySelector(".v2-a-segwert").style.left = "0px";
-          seg.classList.remove("v2-a-seg--drueber--rechts");
-        }
+  /* ---------------- Messtag-Zeile im Graphkopf ------------------------
+     Die ECHTE Spanne der Tage, die dieser Graph zeigt. */
+  function messtagZeile(mid, band) {
+    var serien = ((Z.historie && Z.historie.serien[mid]) || {})[band] || {};
+    var tage = [];
+    var gesehen = {};
+    Object.keys(serien).forEach(function (a) {
+      serien[a].forEach(function (p) {
+        if (!gesehen[p[0]]) { gesehen[p[0]] = 1; tage.push(p[0]); }
       });
     });
-
-    /* Form B */
-    document.querySelectorAll("#v2-graph .gr-bz-spur").forEach(function (spur) {
-      var zahl = spur.querySelector(".v2-b-zahl");
-      var fill = spur.querySelector(".gr-bz-fill");
-      if (!zahl || !fill) return;
-      var spurW = spur.clientWidth;
-      var zahlW = zahl.offsetWidth;
-      var endF = parseFloat(zahl.dataset.end) / 100;
-      if (fill.offsetWidth < zahlW + 12 &&
-          (spurW - spurW * endF) >= zahlW + 10) {
-        zahl.classList.add("v2-b-zahl--aussen");
-      }
-    });
+    if (!tage.length) return "";
+    tage.sort();
+    return "Messtage: " + tagMonat(tage[0]) + " bis " + tagMonat(tage[tage.length - 1]) +
+      " (" + tage.length + (tage.length === 1 ? " Messung" : " Messungen") + ")";
   }
 
   /* ---------------- Render -------------------------------------------- */
@@ -536,23 +380,16 @@
     var mod = Z.modelle[zustand.modell];
     $("v2-antwort").innerHTML = antwortSatz(mod, zustand.band);
     lueckenSatz(mod, zustand.band);
-    if (zustand.form === "A") $("v2-graph").innerHTML = formA(mod, zustand.band);
-    else if (zustand.form === "B") $("v2-graph").innerHTML = formB(mod, zustand.band);
-    else {
-      // Form C braucht die gerenderte Breite (Platzhalter messen, dann
-      // bauen) - die viewBox steht in px und wird 1:1 ausgeliefert.
-      $("v2-graph").innerHTML = "<div class='v2-kurve-wrap'></div>";
-      var platz = $("v2-graph").firstElementChild;
-      var w = platz.clientWidth || 960;
-      platz.innerHTML = formC(mod, zustand.band, w);
-    }
-    messeGraph();
-    $("v2-form-name").textContent = FORMEN[zustand.form];
-    document.querySelectorAll("#v2-formwahl .v2-formknopf").forEach(function (b) {
-      b.setAttribute("aria-pressed", b.dataset.form === zustand.form ? "true" : "false");
-    });
+    // Der Graph braucht die gerenderte Breite (Platzhalter messen, dann
+    // bauen) - die viewBox steht in px und wird 1:1 ausgeliefert.
+    $("v2-graph").innerHTML = legende(zustand.modell, zustand.band) +
+      "<div class='v2-kurve-wrap'></div>";
+    var platz = $("v2-graph").querySelector(".v2-kurve-wrap");
+    var w = platz.clientWidth || 960;
+    platz.outerHTML = zeitreihe(zustand.modell, mod, zustand.band, w);
+    $("v2-messtage").textContent = messtagZeile(zustand.modell, zustand.band);
     history.replaceState(null, "", "?modell=" + encodeURIComponent(zustand.modell) +
-      "&band=" + zustand.band + "&form=" + zustand.form);
+      "&band=" + zustand.band);
   }
 
   /* ---------------- Suchfeld (Verhalten 1:1 aus Entwurf v1) ------------ */
@@ -615,12 +452,9 @@
     $("v2-treffer").textContent = Z.kopf.modelle + " Modelle";
 
     var params = new URLSearchParams(location.search);
-    var m = params.get("modell"), b = params.get("band"), f = params.get("form");
+    var m = params.get("modell"), b = params.get("band");
     if (m && Z.modelle[m]) zustand.modell = m;
     if (["klein", "mittel", "gross"].indexOf(b) > -1) zustand.band = b;
-    if (["A", "B", "C"].indexOf(f) > -1) zustand.form = f;
-    var hash = (location.hash || "").replace(/^#form-/, "");
-    if (["A", "B", "C"].indexOf(hash) > -1) zustand.form = hash;
 
     $("v2-suchfeld").value = Z.modelle[zustand.modell].titel;
     setBandKnopf();
@@ -630,12 +464,6 @@
       if (!k) return;
       zustand.band = k.dataset.band;
       setBandKnopf();
-      render();
-    });
-    $("v2-formwahl").addEventListener("click", function (ev) {
-      var k = ev.target.closest("button[data-form]");
-      if (!k) return;
-      zustand.form = k.dataset.form;
       render();
     });
 
@@ -653,8 +481,8 @@
       }
     });
 
-    // Die Beschriftung hängt an der gerenderten Breite: bei Resize neu
-    // rechnen (entprellt) - nur die Platzierung, nie die Zahlen.
+    // Die Breite hängt am Viewport: bei Resize neu rechnen (entprellt) -
+    // nur die Platzierung, nie die Zahlen.
     var resizeTimer = null;
     window.addEventListener("resize", function () {
       clearTimeout(resizeTimer);
@@ -668,8 +496,7 @@
   // Zahlen liegen inline im Dokument: <script type="application/json"
   // id="gr-zahlen"> VOR diesem Script. Kein fetch — unter file:// blockiert
   // die Same-Origin-Politik fetch(), und der lokale http-Server wird vom
-  // System wiederholt gekillt. Gleiches Objekt, gleiche Weiterverarbeitung
-  // wie vorher im fetch-Pfad (Z = j; start();).
+  // System wiederholt gekillt.
   Z = JSON.parse(document.getElementById("gr-zahlen").textContent);
   start();
 })();
