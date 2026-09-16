@@ -73,12 +73,8 @@ BREIT_W, BREIT_MIN_H = 1136, 420
 SCHMAL_W, SCHMAL_MIN_H = 358, 380
 
 # Hoechstens so viele Kacheln als Schnelleingang (§3.2: „4–6 häufigste
-# Geräte"); die Zahl ist eine Obergrenze, nicht ein Soll.
+# Geräte"); die Zahl ist eine Obergrenze, kein Soll.
 KACHELN_MAX = 6
-
-# Die Live-Vorschau zeigt hoechstens so viele Treffer (§1b: „≤ 8 Treffer,
-# kein Dropdown mit Riesenliste").
-VORSCHAU_MAX = 8
 
 
 def _euro(betrag) -> str:
@@ -697,6 +693,13 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
     # Der Suchindex: deterministisch vorsortiert (Bandabdeckung vor
     # Auslaufware, dann Anbieterzahl, dann Titel) - PM-7. Der JS-Teil
     # filtert nur, er sortiert nicht.
+    # Der Vorrat ist KOMPLETT: jedes Modell mit erlaubtem Band steht im
+    # Knoten (am echten Bestand 88, rund 9 KB). Die 8er-Kappung aus §1b
+    # („≤ 8 Treffer, kein Dropdown mit Riesenliste") gilt der ANZEIGE und
+    # liegt allein in app.js - ein Deckel am Vorrat waere eine Auswahl nach
+    # Listenposition und versteckte ganze Marken hinter dem Suchfeld (B1,
+    # QA 17.09.2026; dieselbe Fehlerklasse wie der Scan-Deckel der
+    # Uebersetzungsstufe, CLAUDE.md §6).
     index_modelle = []
     for modell in modelle:
         bands = erlaubt.get(modell["id"]) or []
@@ -712,7 +715,7 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
         })
     index_modelle.sort(key=lambda m: (-m["band_zahl"], -m["anbieter_zahl"],
                                       m["titel"]))
-    suchindex = index_modelle[:VORSCHAU_MAX * 4]   # Vorrat fuer die Filter
+    suchindex = index_modelle
 
     # Die Kacheln: die haeufigsten Geraete - dasselbe Mass wie der
     # Startzustand (Anbieter, dann Punkte), ueber alle Bänder je Modell.

@@ -402,6 +402,92 @@ def test_der_suchindex_ist_deterministisch_vorsortiert(ansicht):
     assert len(idx) == 2               # zwei Modelle mit Karten/Zeilen
 
 
+def _erweitere_um_modelle(root, n: int) -> None:
+    """Haengt n zusaetzliche EIN-Band-Modelle an den Bestand (B1-Test).
+
+    Jedes bekommt Katalogeintrag, Listung, Bündel und Tarif - es zaehlt
+    damit als Modell mit erlaubtem Band und MUSS im Suchindex stehen, egal
+    wie weit hinten es sortiert ist."""
+    katalog = yaml.safe_load(
+        (root / "config" / "geraete_katalog.yaml").read_text(encoding="utf-8"))
+    db = json.loads(
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8"))
+    tarife = [json.loads(z) for z in
+              (root / "data" / "state" / "tarife.jsonl")
+              .read_text(encoding="utf-8").splitlines() if z.strip()]
+    for i in range(n):
+        device_id = f"samsung-galaxy-x{i}"
+        sku = f"{device_id}-256gb-schwarz"
+        katalog["geraete"].append(
+            {"hersteller": "Samsung", "modell": f"Galaxy X{i}",
+             "generation": i, "marktstart": "2026-01-30", "speicher": [256],
+             "segment": "budget"})
+        db["listungen"].append({
+            "id": f"o2--{sku}", "sku_id": sku, "device_id": device_id,
+            "anbieter": "o2", "anbieter_typ": "netzbetreiber", "netz": "o2",
+            "speicher_gb": 256, "farbe_roh": "Schwarz",
+            "farbe_normalisiert": "schwarz", "zustand": "neu",
+            "first_seen": "2026-09-01", "last_verified": HEUTE,
+            "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": 299.0,
+            "erstpreis": 299.0, "erstpreis_art": "ohne_vertrag",
+            "erstpreis_am": "2026-09-01",
+            "quelle_url": f"https://example.de/o2/{device_id}",
+            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
+            "confidence": "hoch", "einstiege": ["https://example.de/l"]})
+        tco["buendel"].append({
+            "id": f"buendel--o2--{sku}--x{i}:klein", "sku_id": sku,
+            "anbieter": "o2", "tarif_name": f"X{i} Klein",
+            "tarif_id": f"x{i}:klein", "tarif_id_guete": "hoch",
+            "tarif_monatlich": 20.0, "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 15.0, "laufzeit_monate": 24,
+            "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+            "quelle_url": f"https://example.de/o2/{device_id}",
+            "abgerufen_am": HEUTE, "first_seen": HEUTE,
+            "last_verified": HEUTE})
+        tarife.append({
+            "anbieter": "o2", "name": f"X{i} Klein", "tarif_id": f"x{i}:klein",
+            "art": "mobilfunk", "grundgebuehr": 20.0, "laufzeit_monate": 24,
+            "datenvolumen_gb": 10,
+            "preisphasen": [{"von_monat": 1, "bis_monat": None,
+                             "betrag": 20.0}],
+            "dokument_url": f"https://example.de/pib/x{i}",
+            "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})
+    (root / "config" / "geraete_katalog.yaml").write_text(
+        yaml.safe_dump(katalog, allow_unicode=True, sort_keys=False),
+        encoding="utf-8")
+    (root / "data" / "state" / "geraete_db.json").write_text(
+        json.dumps(db), encoding="utf-8")
+    (root / "data" / "state" / "geraete_tco.json").write_text(
+        json.dumps(tco), encoding="utf-8")
+    (root / "data" / "state" / "tarife.jsonl").write_text(
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+
+
+def test_der_suchindex_traegt_jedes_modell_mit_band(tmp_path):
+    """B1 (QA 17.09.2026): der Suchindex ist der VORRAT, nicht die Vorschau.
+
+    Bis zum Fix kappte ihn `VORSCHAU_MAX * 4 = 32` Eintraege nach Band- und
+    Anbieterzahl - am echten Bestand fehlten 56 von 88 Modellen hinter dem
+    genehmigten Suchfeld (ganze Marken, die Galaxy-A-Reihe; 'motorola' ->
+    'kein Treffer'). Die 8er-Kappung gilt der ANZEIGE (app.js), nie dem
+    Vorrat - derselbe Fehler wie der Scan-Deckel der Uebersetzung (§6).
+    2 Bestandsmodelle + 40 gestellte: alle 42 muessen im Knoten stehen,
+    auch das alphabetisch letzte."""
+    root, state = _baue(tmp_path)
+    _erweitere_um_modelle(root, 40)
+    g = geraete_view.aufbereiten(state, lade_quellen(root), lade_katalog(root),
+                                 heute=HEUTE)
+    a = geraete_zeitreihe.aufbereiten(state, g["tco"])
+    idx = a["daten"]["suchindex"]
+    ids = {e["id"] for e in idx}
+    assert len(idx) == 42, \
+        f"Suchindex haelt {len(idx)} von 42 Modellen mit Band bereit"
+    assert "samsung-galaxy-x39-256" in ids, \
+        "das hinterste Modell fehlt - ein Vorratsdeckel waehlt nach Listenposition"
+
+
 def test_der_client_knoten_traegt_keine_preise(ansicht):
     daten = json.dumps(ansicht["daten"], ensure_ascii=False)
     assert "€" not in daten, "keine Beträge im Client-Knoten"
