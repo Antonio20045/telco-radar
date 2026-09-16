@@ -34,6 +34,29 @@
   function euro(n) {
     return n.toLocaleString("de-DE", { minimumFractionDigits: 2 }) + " €";
   }
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function datumDe(iso) {          // „15. September 2026" (Live-Schreibweise)
+    var t = new Date(iso + "T00:00:00");
+    return t.getDate() + ". " +
+      ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+       "August", "September", "Oktober", "November", "Dezember"][t.getMonth()] +
+      " " + t.getFullYear();
+  }
+  function datumKurz(iso) {        // „15.09.2026" (Form C, unter dem Endnamen)
+    return iso.slice(8, 10) + "." + iso.slice(5, 7) + "." + iso.slice(0, 4);
+  }
+  /* Beleg je Graphzeile: nur das Datum, daneben EIN ↗-Link auf die
+     Anbieter-/Tarifseite aus zahlen.json (url + messtermin je Zeile). */
+  function belegZeile(z) {
+    return "<span class='v2-beleg'><span class='v2-beleg-datum'>" +
+      datumDe(z.messtermin) + "</span> <a class='v2-beleg-link' href='" +
+      esc(z.url) + "' target='_blank' rel='noopener' title='Beleg bei " +
+      esc(z.anbieter) + " öffnen' aria-label='Beleg bei " + esc(z.anbieter) +
+      " öffnen (abgerufen " + datumDe(z.messtermin) + ")'>↗</a></span>";
+  }
   function kurzName(mod) {
     // „Google Pixel 11 Pro 256 GB" → „Pixel 11 Pro" (Antonios Satz sagt Pixel 11 Pro)
     return mod.titel
@@ -82,7 +105,7 @@
       satz = "Beim " + name + " im Band " + BAND_KURZ[band] + bereich +
         " führt " + (zeilen.length === 1 ? "nur " : "") +
         "Vodafone: <b class='v2-zahl'>" + best.tco24_text +
-        "</b> über 24 Monate, Ø <b class='v2-zahl'>" +
+        "</b> über 24 Monate (TCO-24), Ø <b class='v2-zahl'>" +
         best.schnitt_text.replace(" €/M.", "") + " €/Monat</b> (" +
         best.tarif + (best.gb ? " · " + best.gb : "") + ").";
       if (zweit && !vfNur(zeilen)) {
@@ -92,7 +115,7 @@
     } else {
       satz = "Beim " + name + " im Band " + BAND_KURZ[band] + bereich +
         " ist " + best.anbieter + " am günstigsten: <b class='v2-zahl'>" +
-        best.tco24_text + "</b> über 24 Monate, Ø <b class='v2-zahl'>" +
+        best.tco24_text + "</b> über 24 Monate (TCO-24), Ø <b class='v2-zahl'>" +
         best.schnitt_text.replace(" €/M.", "") + " €/Monat</b> (" +
         best.tarif + (best.gb ? " · " + best.gb : "") + ")";
       if (vf) {
@@ -112,17 +135,28 @@
     var b = mod.baender[band];
     var el = $("v2-luecke");
     if (!b || b.luecken.length === 0) { el.hidden = true; return; }
+    var bandWort = { klein: "klein", mittel: "mittel", gross: "groß" };
     var bandLuecke = [], keinBuendel = [];
     b.luecken.forEach(function (l) {
       (l.grund === "kein Bündel in diesem Band" ? bandLuecke : keinBuendel)
-        .push(l.anbieter);
+        .push(l);
     });
     var teile = [];
     if (bandLuecke.length)
-      teile.push("Kein Bündel in diesem Band: " + bandLuecke.join(", ") + ".");
+      teile.push("Kein Bündel in diesem Band: " + bandLuecke.map(function (l) {
+        // Nur Anbieter MIT Alternativ-Zahl kriegen die Klammer - so bleibt
+        // die Leitfrage-Antwort ohne Bandwechsel komplett.
+        var name = l.anbieter;
+        if (l.alternativ && l.alternativ.length) {
+          name += " (" + l.alternativ.map(function (alt) {
+            return bandWort[alt.band] + " " + alt.tco_text;
+          }).join(" · ") + ")";
+        }
+        return name;
+      }).join(", ") + ".");
     if (keinBuendel.length)
-      teile.push(keinBuendel.join(", ") + " " +
-        (keinBuendel.length === 1 ? "führt" : "führen") +
+      teile.push(keinBuendel.map(function (l) { return l.anbieter; }).join(", ") +
+        " " + (keinBuendel.length === 1 ? "führt" : "führen") +
         " das Gerät gar nicht im Bündel.");
     el.textContent = teile.join(" ");
     el.hidden = false;
@@ -187,7 +221,8 @@
           : "") +
         "</div><div class='v2-a-posten v2-zahl'>" + posten + "</div></div>" +
         "<div class='v2-a-wert'><span class='v2-a-tco v2-zahl'>" + z.tco24_text +
-        "</span><span class='v2-a-delta'>" + delta + "</span></div>" +
+        "</span><span class='v2-a-delta'>" + delta + "</span>" +
+        belegZeile(z) + "</div>" +
         "</div>";
     });
     return html + "</div>";
@@ -214,13 +249,13 @@
         "<span class='gr-bz-delta v2-zahl'>TCO-24 " + z.tco24_text + "</span>" +
         (z.referenz ? "<span class='gr-bz-ref'>Referenz</span>"
           : (z.delta_text ? "<span class='gr-bz-delta'>" + z.delta_text + "</span>" : "")) +
-        "</div></div>";
+        belegZeile(z) + "</div></div>";
     });
     return html + "</div>";
   }
 
   /* ---------------- Form C: Band-Kurve (SVG, Anbieterfarben live) ----- */
-  function formC(mod) {
+  function formC(mod, bandAktiv) {
     var bands = ["klein", "mittel", "gross"];
     var anbieter = Object.keys(ANB_FARBE).filter(function (a) {
       return bands.some(function (bk) {
@@ -229,12 +264,14 @@
       });
     });
     var punkte = {};   // anbieter -> {band: tco24}
+    var zeilenC = {};  // anbieter -> {band: zeile} (für Beleg am Linienende)
     var maxT = 0;
-    anbieter.forEach(function (a) { punkte[a] = {};
+    anbieter.forEach(function (a) { punkte[a] = {}; zeilenC[a] = {};
       bands.forEach(function (bk) {
         var b = mod.baender[bk];
         var z = b && b.zeilen.filter(function (x) { return x.anbieter === a; })[0];
-        if (z) { punkte[a][bk] = z.tco24; maxT = Math.max(maxT, z.tco24); }
+        if (z) { punkte[a][bk] = z.tco24; zeilenC[a][bk] = z;
+          maxT = Math.max(maxT, z.tco24); }
       });
     });
     var W = 360, H = 330, L = 10, R = 86, T = 26, B = 64;
@@ -256,12 +293,15 @@
           (y + 3.5).toFixed(1) + "'>" + txt(v) + "</text>";
     }
     bands.forEach(function (bk) {
-      svg += "<text class='v2-kurve-achse' x='" + X[bk].toFixed(1) +
+      var aktiv = bk === bandAktiv;
+      svg += "<text class='v2-kurve-achse" + (aktiv ? " v2-kurve-band--aktiv" : "") +
+        "' x='" + X[bk].toFixed(1) +
         "' y='" + (H - B + 22) + "' text-anchor='middle' style='font-weight:700'>" +
         BAND_KURZ[bk] + "</text>" +
         "<text class='v2-kurve-achse' x='" + X[bk].toFixed(1) + "' y='" +
         (H - B + 36) + "' text-anchor='middle'>" + BAND_BEREICH[bk] + "</text>";
-      svg += "<line class='v2-kurve-raster' x1='" + X[bk].toFixed(1) +
+      svg += "<line class='v2-kurve-raster" + (aktiv ? " v2-kurve-aktiv" : "") +
+        "' x1='" + X[bk].toFixed(1) +
         "' y1='" + T + "' x2='" + X[bk].toFixed(1) + "' y2='" + (T + ph) + "'></line>";
     });
     // Linien + Punkte + Werte; Endnamen mit Mindestabstand (12 px) -
@@ -282,7 +322,8 @@
         lastBk = bk;
       });
       var letzter = bands.filter(function (bk) { return punkte[a][bk] !== undefined; }).pop();
-      enden.push({ a: a, bk: letzter, y: Y(punkte[a][letzter]) });
+      enden.push({ a: a, bk: letzter, y: Y(punkte[a][letzter]),
+        z: zeilenC[a][letzter] });
     });
     // Werte an den Punkten (immer gedruckt), kollisionsfrei je Spalte:
     // Kandidaten über/unter dem Punkt, gierig die freie Seite gewählt -
@@ -334,13 +375,22 @@
           y.toFixed(1) + "' r='4' fill='" + farbe + "'></circle>";
       });
     });
+    // Endnamen als Beleg-Link (der Beleg gehört zum ANBIETER, nicht je
+    // Punkt), Abrufdatum darunter - Mindestabstand 23 px für das Zweizeiler-
+    // Block, Etikett bleibt auf wahrer Höhe des Linienendes.
     enden.sort(function (p, q) { return p.y - q.y; });
     var letzteY = -99;
     enden.forEach(function (e) {
-      var y = Math.max(e.y, letzteY + 13);
+      var y = Math.max(e.y, letzteY + 23);
       letzteY = y;
-      svg += "<text class='v2-kurve-name' x='" + (X[e.bk] + 10).toFixed(1) +
-        "' y='" + (y + 4).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" + e.a + "</text>";
+      svg += "<a href='" + esc(e.z.url) + "' target='_blank' rel='noopener'" +
+        " class='v2-kurve-link' role='link'" +
+        " aria-label='Beleg bei " + esc(e.a) + " öffnen'>" +
+        "<text class='v2-kurve-name' x='" + (X[e.bk] + 10).toFixed(1) +
+        "' y='" + (y + 4).toFixed(1) + "' fill='" + ANB_FARBE[e.a] + "'>" + e.a +
+        "<tspan class='v2-kurve-pfeil'> ↗</tspan></text></a>" +
+        "<text class='v2-kurve-datum' x='" + (X[e.bk] + 10).toFixed(1) +
+        "' y='" + (y + 15).toFixed(1) + "'>" + datumKurz(e.z.messtermin) + "</text>";
     });
     svg += "</svg></div>";
     svg += "<p class='v2-kurve-hinweis'>TCO-24 je Tarifband · ein fehlender Punkt heißt: dieser Anbieter führt das Gerät in dem Band nicht im Bündel (Namen in der Zeile unter dem Graph je gewähltem Band).</p>";
@@ -354,7 +404,7 @@
     lueckenSatz(mod, zustand.band);
     if (zustand.form === "A") $("v2-graph").innerHTML = formA(mod, zustand.band);
     else if (zustand.form === "B") $("v2-graph").innerHTML = formB(mod, zustand.band);
-    else $("v2-graph").innerHTML = formC(mod);
+    else $("v2-graph").innerHTML = formC(mod, zustand.band);
     $("v2-form-name").textContent = FORMEN[zustand.form];
     document.querySelectorAll("#v2-formwahl .v2-formknopf").forEach(function (b) {
       b.setAttribute("aria-pressed", b.dataset.form === zustand.form ? "true" : "false");
@@ -383,7 +433,9 @@
       return "<button type='button' role='option' data-id='" + s.id + "'>" +
         "<span class='v2-v-titel'>" + s.titel + "</span>" +
         "<span class='v2-v-meta'>" + (s.speicher ? s.speicher + " GB · " : "") +
-        s.anbieter_zahl + " Anbieter · " + s.band_zahl + " Bänder</span></button>";
+        s.anbieter_zahl + " Anbieter · " +
+        (s.band_zahl === 1 ? "1 Band" : s.band_zahl + " Bänder") +
+        "</span></button>";
     }).join("");
     box.querySelectorAll("button").forEach(function (b) {
       b.addEventListener("mousedown", function (ev) {

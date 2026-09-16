@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vodafone Product and Services Insights · Gerätepreise im Vergleich · Entwurf v2</title>
+  <title>Vodafone Product and Services Insights · Gerätepreise im Vergleich</title>
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +128,33 @@
 .v2-kurve-hinweis{font-family:var(--sans);font-size:11px;color:var(--ink-4);
   margin:4px 0 0}
 
+/* Beleg je Graphzeile: Abrufdatum (Bauform .gr-a-klein, nur Datum ohne
+   Wort) plus EIN dezenter ↗-Link am Zeilenende - Stil der Live-Quellinks:
+   gedämpfte Farbe, gedämpfte Unterstreichung, Rot erst beim Hover. Eine
+   Zeile, kein Umbruch auch auf 390 px. */
+.v2-beleg{display:block;font-family:var(--sans);font-size:11px;
+  color:var(--ink-4);margin-top:3px;white-space:nowrap}
+.v2-beleg-link{color:var(--ink-4);text-decoration:underline;
+  text-decoration-color:var(--ink-4);text-decoration-thickness:1px;
+  text-underline-offset:2px;display:inline-block;
+  padding:1px 1px 1px 3px;margin-left:-3px}
+.v2-beleg-link:hover{color:var(--red);text-decoration-color:var(--red)}
+
+/* Form C: der Beleg gehört zum ANBIETER (Linienende), nicht je Punkt -
+   Endname als SVG-Anker mit Pfeil, Abrufdatum darunter. Rot beim Hover
+   wie überall. */
+#v2-graph svg a{cursor:pointer}
+#v2-graph svg a:hover .v2-kurve-name{fill:var(--red)}
+#v2-graph svg a:hover .v2-kurve-pfeil{fill:var(--red)}
+.v2-kurve-pfeil{fill:var(--ink-4)}
+.v2-kurve-datum{font-family:var(--sans-system);font-size:9.5px;
+  fill:var(--ink-4)}
+/* Gewähltes Band im Bild hervorgehoben, damit Antwort-Satz und Kurve
+   nicht auseinanderlaufen: kräftigere Achse an der x-Position, Band-Label
+   in Rot (Rot ist Akzent - wie der gewählte Band-Knopf darüber). */
+.v2-kurve-aktiv{stroke:var(--ink-3);stroke-width:1.4}
+.v2-kurve-band--aktiv{fill:var(--red)}
+
 /* Deckel-Aufklapper im Radar (Details statt Knopf+JS). */
 .v2-deckel{margin:10px 0 0}
 #tafel-radar .wr-sektion{margin:0 0 30px}
@@ -169,6 +196,8 @@
   .v2-a-posten{font-size:10px;margin-top:2px;line-height:1.3}
   .v2-a-tco{font-size:14.5px}
   .v2-a-delta{font-size:10.5px}
+  .v2-beleg{font-size:10px;margin-top:2px}
+  .v2-beleg-link{padding:2px 1px 2px 4px;margin-left:-4px}
 }
 </style>
 </head>
