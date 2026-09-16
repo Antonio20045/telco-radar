@@ -83,24 +83,24 @@ def test_die_referenzzeile_behauptet_keine_36_monate(tmp_path):
 def test_die_tafel_spricht_katalog_d(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    # O1 (11.09.2026): die gr-mband-Zeile ist entfallen (fuenf Zaehlsysteme
-    # -> EINE Fussnote). Die Etikett-Zusicherung des Katalogs D lebt im
-    # Graphen: der Titel nennt TCO-24, und kein "TCO-36" steht in der
-    # Tafel. Eine SPANNE nennt der Graph nicht mehr - jede Zeile eine Zahl.
-    graph_titel = tafel.select_one(".gr-hgraph-titel")
-    assert graph_titel is not None and graph_titel.get_text(strip=True) == \
-        "TCO-24 je Anbieter"
-    # "Gesamtkosten" ist seit O1 als WORT in der Begriffslegende des
-    # Graphen erlaubt ("TCO-24 = Gesamtkosten über 24 Monate") - verboten
-    # bleibt es als ETIKETT einer Zahl. Gemessen wird deshalb ohne die
-    # Wie-gerechnet-Aufklappung.
+    # E2: der Graph-Titel ist gefallen - die Etikett-Zusicherung des
+    # Katalogs D lebt im ANTWORT-SATZ: er nennt TCO-24 aufgeloest ("über
+    # 24 Monate (TCO-24)"), und kein "TCO-36" steht in der Tafel.
+    antwort = tafel.select_one(".gr-zr-antwort")
+    assert antwort is not None, "der Antwort-Satz fehlt"
+    assert "über 24 Monate (TCO-24)" in \
+        " ".join(antwort.get_text(" ", strip=True).split())
     kopie = BeautifulSoup(str(tafel), "html.parser")
-    for d in kopie.select("details.gr-hgraph-wie"):
+    for d in kopie.select("details.gr-zr-rechnung"):
         d.decompose()
     tafel_text = kopie.get_text(" ")
     assert "TCO-24" in tafel_text and "TCO-36" not in tafel_text \
         and "Gesamtkosten" not in tafel_text
-    assert tafel.select_one("h3.gr-tueber").get_text(strip=True) == "Apple iPhone 15 128 GB"
+    # Das Modell nennt der Titel der Bündel-Tabelle (der eigene Modell-
+    # Titelblock ist mit der Zeitreihe gefallen).
+    titel = tafel.select_one("#gr-bnd-titel")
+    assert titel is not None and \
+        "Apple iPhone 15 128 GB" in titel.get_text(strip=True)
     # O2 (11.09.2026): Sortier- und Anbieterfilter-Controls sind entfallen
     # (§4 Entscheidung 3: bei 4-7 Zeilen je Bandliste erübrigen sie sich) -
     # die Zeilen stehen serverseitig nach TCO-24.

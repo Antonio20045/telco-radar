@@ -1,0 +1,19 @@
+{# Das Zeitreihen-Fragment (E2, 16.09.2026) - LADEGUT, kein Dokument:
+   keine Navigation, kein Titel, kein eigener Inhalt. Es traegt den
+   Graph-Zustand eines jeden (Modell x Band) der Hauptansicht, aus
+   DEMSELBEN Makro wie der Server-First-Paint (`_geraete_zeitreihe.html
+   .j2`) - der Client setzt fertiges Markup ein, er rendert nichts.
+
+   Warum eine EIGENE Datei neben `geraete-buendel.html`: der BANDWECHSEL
+   braucht nur diesen Zustand - er wuerde sonst die 1,8 MB Bündel-Zeilen
+   mitladen, obwohl sich für sie nichts geändert hat. Zwei kleine Anfragen
+   (eine je Montagepunkt) statt einer grossen.
+
+   ALLE Paare stehen hier, auch der Startzustand: der Rueckweg nach einem
+   Wechsel hat damit genau EINE Quelle. Der O3-Vorgabe-Klon („klone den
+   Server-Zustand vor dem ersten Wechsel") entfaellt - er war genau die
+   Stelle, an der ein Deep-Link die fremden Zeilen als "Vorgabe" einfrieren
+   liess (S2-Befund). #}
+{% from "_geraete_zeitreihe.html.j2" import paarblock %}
+{% for p in paare %}<div class="gr-zr-lager" data-modell="{{ p.modell }}" data-band="{{ p.band }}">{{ paarblock(p) }}</div>
+{% endfor %}

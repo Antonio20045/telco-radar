@@ -42,7 +42,8 @@ from typing import Optional
 
 from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
-               geraete_tco_view, geraete_vergleich, geraete_verlauf)
+               geraete_tco_view, geraete_vergleich, geraete_verlauf,
+               geraete_zeitreihe)
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
 from ..tarif_bezug import Tarifbestand
@@ -1130,6 +1131,7 @@ def leer(fehler: str = "") -> dict:
         "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
+        "zeitreihe": geraete_zeitreihe.leer(),
         "katalogtabelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
@@ -1408,26 +1410,37 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     alarme = geraete_alarme.zeilen(vergleich["ohne_vertrag"],
                                    pruefung.get("auffaellig"))
 
+    # E2 (16.09.2026): die TCO-ZEITREIHE der Hauptansicht - eigene
+    # Aufbereitung (Modell x Band x Anbieter x Messtag aus der rohen
+    # Historie) aus DEMSELBEN tco-Dict wie die Bündel-Zeilen (keine zweite
+    # Rechnung für dieselben Zahlen), eigener Fehlertopf: ein kaputter
+    # Graph darf die GERAETESEITE nicht kosten, die übrigen Reiter bleiben
+    # lesbar (dieselbe Auffanglogik wie beim Export weiter unten).
+    tco = geraete_tco_view.aufbereiten(
+        tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
+        lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
+        historie=historie,
+        # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
+        # Store traegt ihn nicht) und die Lage der Buendel-Historie
+        # fuer den ehrlichen Satz im Verlaufs-Reiter.
+        anbieter_typen={a.name: a.typ for a in quellen.anbieter},
+        tco_historie=tco_db.historie_lage())
+    try:
+        zeitreihe = geraete_zeitreihe.aufbereiten(state_dir, tco)
+    except Exception as exc:                       # noqa: BLE001
+        log.error("Zeitreihen-Aufbereitung gescheitert: %s: %s",
+                  type(exc).__name__, exc)
+        zeitreihe = geraete_zeitreihe.leer()
+
     return {
+        "tco": tco,
+        "zeitreihe": zeitreihe,
         # Der Verlauf rechnet auf `belastbar`, nicht auf `sichtbar`: ein
         # falsch gespeicherter Gebrauchtpreis in derselben Kurve ist ein
-        # zweites Produkt in einer Linie, und der Sprung dazwischen saehe aus
-        # wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das den
-        # Unterschied zwischen "577-899 EUR" und "850-899 EUR".
+        # zweites Produkt in einer Linie, und der Sprung dazwischen saehe
+        # aus wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das
+        # den Unterschied zwischen "577-899 EUR" und "850-899 EUR".
         "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
-        # Der TCO-Reiter rechnet auf `belastbar` wie der Verlauf: eine
-        # Bereitschaftszahl, die einen falsch gespeicherten Gebrauchtpreis
-        # mitzaehlt, behauptet eine Messung, die der Vergleich schon
-        # verworfen hat.
-        "tco": geraete_tco_view.aufbereiten(
-            tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
-            lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
-            historie=historie,
-            # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
-            # Store traegt ihn nicht) und die Lage der Buendel-Historie
-            # fuer den ehrlichen Satz im Verlaufs-Reiter.
-            anbieter_typen={a.name: a.typ for a in quellen.anbieter},
-            tco_historie=tco_db.historie_lage()),
         # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
         # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
         # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau

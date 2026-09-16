@@ -70,40 +70,23 @@ def test_der_waechter_prueft_wirklich_etwas(tmp_path):
     assert gefunden["Referenzrechnung, kein Angebot"] >= 1, gefunden
 
 
-def test_wie_gerechnet_steht_hoechstens_einmal_je_modellblock(tmp_path):
-    """BRIEF_RAHMEN2 (05.09.2026, Befund 2): 'Wie gerechnet?' stand
-    zweimal - einmal seitenweit ueber der Kennzahlenreihe (`#gr-tco-wie`),
-    einmal je Modell unter dem Zeitreihen-Graph. Die obere ist ERSATZLOS
-    gestrichen, die untere bleibt (sie ist beim Graphen richtig
-    platziert): GENAU EINE Aufklappung dieses Namens je Modellblock, keine
-    ausserhalb.
-
-    BRIEF_RAHMEN2_R3 (05.09.2026): die Fixture traegt seitdem zusaetzlich
-    einen GRAPHLOSEN Block (`graphloses_modell=True`) - drei echte
-    Modellbloecke im Bestand haben keinen Zeitreihen-Graphen und trugen
-    deshalb GAR KEINE Aufklappung. `== 1` gilt seitdem fuer beide Arten
-    von Block."""
-    s = _baue(tmp_path, graphloses_modell=True)
+def test_wie_gerechnet_ist_weg_so_gerechnet_steht_genau_einmal(tmp_path):
+    """E2 (§3.1, Antonio 16.09.): 'Wie gerechnet?' ist ENDE - was bleibt,
+    ist der EINE Rechenschafts-Aufklapper 'So gerechnet' unter dem
+    Antwort-Satz des Startzustands. Dazu der Rechenweg je Bündel-Zeile
+    (b) und der Fuss-Aufklapper (c): genau drei Aufklapper-Typen, kein
+    vierter im Lesefluss."""
+    s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    assert tafel.select_one("#gr-tco-wie") is None, \
-        "die seitenweite 'Wie gerechnet?'-Aufklappung ist nicht mehr da"
-
-    modellbloecke = tafel.select(".gr-tmodell")
-    assert modellbloecke, "der Test prueft nichts ohne Modellblock"
-    for block in modellbloecke:
-        wie_gerechnet = [d for d in block.select("details.gr-auf")
-                         if d.select_one("summary").get_text(strip=True)
-                         == "Wie gerechnet?"]
-        assert len(wie_gerechnet) == 1, \
-            f"{block.get('data-modell')}: {len(wie_gerechnet)} statt 1"
-
-    # Ausserhalb jedes Modellblocks, aber innerhalb der Tafel, darf keine
-    # weitere "Wie gerechnet?"-Aufklappung stehen - sonst waere die
-    # Verdopplung nur verschoben, nicht behoben.
-    ausserhalb = _ohne_details_ausser(tafel, modellbloecke)
-    assert "Wie gerechnet?" not in ausserhalb
-    # Die alte Buendel-Sicht-Ueberschrift ist weg, nicht umbenannt.
-    assert "Was ein Gerät mit Tarif wirklich kostet" not in str(s)
+    assert "Wie gerechnet?" not in tafel.get_text(" ")
+    rechnung = tafel.select("details.gr-zr-rechnung")
+    assert len(rechnung) == 1, \
+        f"{len(rechnung)} Rechenschafts-Aufklapper statt genau einem"
+    assert rechnung[0].select_one("summary").get_text(strip=True) == \
+        "So gerechnet"
+    assert "TCO-24" in rechnung[0].get_text(" ")
+    # Die alte seitenweite Aufklappung bleibt verboten.
+    assert tafel.select_one("#gr-tco-wie") is None
 
 
 def _ohne_details_ausser(tafel: BeautifulSoup, modellbloecke) -> str:
@@ -114,52 +97,21 @@ def _ohne_details_ausser(tafel: BeautifulSoup, modellbloecke) -> str:
     return kopie.get_text(" ")
 
 
-def test_ein_block_ohne_graph_traegt_trotzdem_eine_wie_gerechnet_aufklappung(tmp_path):
-    """BRIEF_RAHMEN2_R3 (05.09.2026) fand 3 von 59 Modellbloecken ohne
-    Aufklappung. O1 (11.09.2026) hat den Fall umgedreht: Es steht nur noch
-    der EINE Modellblock der Vorgabe im Dokument, und die
-    "Wie gerechnet?"-Aufklappung haengt am GRAPHEN. Ein Modell ohne ein
-    einziges Band steht im Dropdown UND im JSON-Knoten mit seinem
-    Leerlauf-Satz - der Wechsel dorthin ist derselbe Pfad wie jeder andere
-    Modellwechsel, und der Leerlauf ist der ehrliche Zustand statt einer
-    Aufklappung ueber nichts."""
+def test_ein_modell_ohne_band_ist_nicht_waehlbar(tmp_path):
+    """E2: mit O1 stand nur der Vorgabeblock im Dokument; die Zeitreihe
+    geht weiter - ein Modell OHNE Bündel-Band hat keinen Graph-Zustand und
+    keine Band-Zeilen, es ist in der Wahl nicht vorhanden (erlaubt leer).
+    Der Leerlauf-Satz für Paare ohne Messreihe steht je Paar im Fragment."""
     import json
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
+    assert tafel.select_one(".gr-tmodell") is None, \
+        "der Modellblock-Div ist mit der Zeitreihe gefallen"
+    knoten = json.loads(
+        s.select_one("#gr-zeitreihe-daten").get_text())
+    assert knoten["erlaubt"].get("apple-iphone-16-pro-max-256") in \
+        (None, []), "das bandlose Modell duerfte nicht wählbar sein"
 
-    assert s.select_one(
-        '.gr-tmodell[data-modell="apple-iphone-16-pro-max-256"]') is None, \
-        "mit O1 steht nur der Vorgabeblock im Dokument (die 88-fache " \
-        "Wiederholung entfaellt)"
-
-    option = s.select_one(
-        '#gr-modell option[value="apple-iphone-16-pro-max-256"]')
-    assert option is not None, "das band-lose Modell fehlt im Dropdown"
-    knoten = json.loads(tafel.select_one("#gr-graph-daten").get_text())
-    im_json = [m for m in knoten["modelle"]
-               if m["id"] == "apple-iphone-16-pro-max-256"]
-    assert im_json and im_json[0]["band_leer"], \
-        "der Leerlauf-Satz fehlt im JSON-Knoten"
-
-    vorgabe = tafel.select_one(".gr-tmodell")
-    wie_gerechnet = [d for d in vorgabe.select("details.gr-auf")
-                     if d.select_one("summary").get_text(strip=True)
-                     == "Wie gerechnet?"]
-    assert len(wie_gerechnet) == 1
-    kinder = [k for k in vorgabe.find_all(recursive=False)]
-    tabelle = vorgabe.select_one("#gr-buendel")
-    assert tabelle is not None, "die Bündel-Tabelle fehlt"
-    # Die Aufklappung steht IM Graph-Modul, die Tabelle DANACH - beide sind
-    # direkte Kinder des Modellblocks, in dieser Reihenfolge (O2: die
-    # Kartenklappe ist die offene Tabelle geworden).
-    hgraph = vorgabe.select_one(".gr-hgraph")
-    assert wie_gerechnet[0].find_parent("section", class_="gr-hgraph") is hgraph
-    assert kinder.index(hgraph) < kinder.index(tabelle)
-
-
-# --------------------------------------------------------------------------
-# O2 (11.09.2026): die Bündel-Zeilen - Kartenklappe und Karten sind weg
-# --------------------------------------------------------------------------
 
 def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
     """O2 ersetzt die OPTIK-6-Klappe: jede Karte ist EINE Zeile mit EINEM
@@ -169,8 +121,10 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
     assert tafel is not None
-    block = tafel.select_one(".gr-tmodell")
-    assert block is not None, "der Test prüft nichts ohne Modellblock"
+    # E2: die Tabelle hängt an ihrem eigenen Abschnitt, nicht mehr am
+    # Modellblock-Div (der ist mit der Zeitreihe gefallen).
+    block = tafel.select_one("#gr-buendel")
+    assert block is not None, "der Test prüft nichts ohne Bündel-Abschnitt"
     assert block.select_one("details.gr-karten-auf") is None, \
         "die Kartenklappe steht noch"
     assert not block.select(".gr-kkarte"), "Karten stehen noch"
@@ -193,52 +147,34 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
 # Kriterium 2: Haendler als benannte Luecke
 # --------------------------------------------------------------------------
 
-def test_haendler_ohne_preis_stehen_nur_in_der_legende(tmp_path):
-    """O2: die 'Beschaffung läuft'-Platzhalterkarten fallen - die
-    Legendenzeile aus O1 trägt dieselbe Information (Auftrag 2). Amazon und
-    Expert stehen also NUR dort, nirgends als Karte oder Zeile mit
-    'Beschaffung läuft'-Satz."""
+def test_haendler_ohne_preis_stehen_nicht_einzeln(tmp_path):
+    """E2 (Antonio 9b.7): die 'Beschaffung läuft'-Legende der Balkenform
+    ist gefallen. Amazon und Expert stehen weder als Karte/Zeile noch in
+    einer Legende der Hauptansicht - die Quellenseite nennt die
+    Beschaffung, der Katalog die Listungen."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     kopie = BeautifulSoup(str(tafel), "html.parser")
     for k in kopie.select("script"):
         k.decompose()
     text = kopie.get_text(" ")
+    assert "Beschaffung läuft" not in text
     for name in HAENDLER:
-        assert name in text, f"{name} fehlt ganz"
-    assert text.count("Beschaffung läuft") == 1, \
-        "der Satz steht mehrfach da - die Legende trägt ihn allein"
+        assert name not in text, f"{name} steht einzeln in der Lesefläche"
     assert not tafel.select(".gr-kkarte--haendler"), \
         "Händlerplatzhalterkarten stehen noch"
 
 
-def test_haendler_stehen_je_modell_als_legende_ohne_linie(tmp_path):
-    """O1 (11.09.2026): die drei 'Beschaffung läuft'-Einzelsaetze am
-    Zeitreihen-Block sind EINE Legendenzeile unter dem Graphen - dieselbe
-    Zeile, die auch fehlende Buendel-Anbieter nennt (A3). Keine Linie,
-    kein Balken, kein erfundener Wert."""
+def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
+    """Der Lückensatz unter dem Graphen nennt ausschließlich den Anbieter-
+    kreis der Bündel (Telekom, Vodafone, o2, 1&1, congstar) - keine
+    Händler, keine je-Anbieter-Zeilen, kein SVG in der Legende."""
     s = _baue(tmp_path)
-    for modell in s.select("#tafel-tco .gr-tmodell"):
-        legende = modell.select_one(".gr-lueckenzeile")
-        assert legende is not None, "die Legendenzeile fehlt unter dem Graphen"
+    for legende in s.select("#tafel-tco .gr-lueckenzeile"):
         text = " ".join(legende.get_text(" ", strip=True).split())
         for name in HAENDLER:
-            assert name in text, f"{name} fehlt in der Legendenzeile"
-        assert text.count("Beschaffung läuft") == 1
-        assert "€" not in text
+            assert name not in text, f"{name} steht in der Lücken-Zeile"
         assert legende.find("svg") is None
-
-
-def test_keine_balkengrafik_zeichnet_einen_haendler():
-    """G1 (der Balken-SVG) bleibt inhaltlich unangetastet - die drei
-    Haendler duerfen darin nicht als Balken auftauchen, auch nicht mit
-    Laenge null (das laese sich als "kostenlos")."""
-    from telco_radar.report import geraete_tco_grafik as grafik
-    from test_geraete_tco_zustand import _modell
-
-    svg = grafik.balken(_modell())
-    for name in HAENDLER:
-        assert name not in svg
 
 
 # --------------------------------------------------------------------------

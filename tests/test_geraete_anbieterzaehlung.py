@@ -66,30 +66,44 @@ def test_keine_dropdown_option_nennt_eine_anbieterzahl_mehr(seite):
     des Radars wählen darüber EIN Modell; eine doppelte ID nähme der
     Browser als erste, und der Link zeigte ein anderes Gerät, als sein
     Radar-Block versprach."""
-    optionen = seite.select("#gr-modell option")
-    assert len(optionen) >= 3, "am echten Bestand stehen mehr Modelle"
-    for opt in optionen:
-        assert not _OPTION_RE.search(opt.get_text()), \
-            f"Option traegt noch eine Anbieterzahl: {opt.get_text()!r}"
-    werte = [opt.get("value") for opt in optionen]
-    assert all(werte), "eine Option ohne value"
-    assert len(werte) == len(set(werte)), \
-        f"Modell-IDs im Selektor nicht eindeutig: " \
-        f"{sorted(v for v in werte if werte.count(v) > 1)[:3]}"
-
-
-def test_die_vorgabe_des_dropdowns_ist_die_leitfrage(seite):
-    """Was das Dropdown ohne Klick zeigt, entscheidet `modell_vorgabe` -
-    am echten Bestand das Leitfragegeraet (G3 der Abnahme). Der JSON-Knoten
-    traeg dieselbe Vorgabe: app.js und Server starten im selben Modell."""
-    selektiert = [o for o in seite.select("#gr-modell option")
-                  if o.has_attr("selected")]
-    assert len(selektiert) == 1
-    knoten = seite.select_one("#gr-graph-daten")
-    assert knoten is not None, "der JSON-Knoten fuer den Selektor fehlt"
+    # E2: der Selektor ist das Suchfeld - waehlbar ist, was der Zeitreihen-
+    # Knoten als erlaubt traegt. Dieselben Zusicherungen am neuen Ort:
+    # keine Anbieterzahl im NAMEN, eindeutige IDs fuer den Deep-Link.
     import json
-    vorgabe = json.loads(knoten.text)["vorgabe"]
-    assert vorgabe == selektiert[0]["value"]
+    knoten = json.loads(
+        seite.select_one("#gr-zeitreihe-daten").get_text())
+    ids = list(knoten["erlaubt"])
+    assert len(ids) >= 3, "am echten Bestand stehen mehr Modelle"
+    assert all(ids), "eine Modell-ID ist leer"
+    assert len(ids) == len(set(ids)), \
+        f"Modell-IDs nicht eindeutig: " \
+        f"{sorted(v for v in ids if ids.count(v) > 1)[:3]}"
+    titel = knoten["titel"]
+    for mid in ids:
+        assert not _OPTION_RE.search(titel.get(mid, "")), \
+            f"Titel traegt noch eine Anbieterzahl: {titel.get(mid)!r}"
+
+
+def test_der_startzustand_ist_derselbe_im_knoten_und_im_serverblock(seite):
+    """E2: was ohne Klick da steht, entscheidet der ZEITREIHEN-Startzustand
+    (`geraete_zeitreihe.aufbereiten`: die meisten Anbieter, dann Punkte -
+    aus den Daten). Der JSON-Knoten traegt dieselbe Vorgabe wie der
+    Server-First-Paint: app.js und Server starten im selben Modell."""
+    import json
+    knoten = json.loads(
+        seite.select_one("#gr-zeitreihe-daten").get_text())
+    vorgabe = knoten["vorgabe"]
+    assert vorgabe and vorgabe in knoten["erlaubt"], \
+        "die Start-Vorgabe ist kein wählbares Modell"
+    titel = knoten["titel"][vorgabe]
+    antwort = seite.select_one("#tafel-tco .gr-zr-antwort")
+    assert antwort is not None, "der Server-Startblock fehlt"
+    # Der Antwort-Satz nennt das Startgeraet beim Kurznamen - der Titel
+    # ist "Hersteller Modell Speicher GB"; geprueft wird das Modellstück.
+    modell_stueck = " ".join(titel.split()[1:-2]) if titel.split()[-1] == \
+        "GB" else titel
+    assert modell_stueck in antwort.get_text(" ", strip=True), \
+        f"Server-Block nennt nicht das Startgeraet {titel!r}"
 
 
 def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
@@ -100,15 +114,16 @@ def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
     s = _baue(tmp_path, graphloses_modell=True)
     graphlos = "apple-iphone-16-pro-max-256"
 
-    option = s.select_one(f'#gr-modell option[value="{graphlos}"]')
-    assert option is not None, f"{graphlos} fehlt im Dropdown"
-    assert not _OPTION_RE.search(option.get_text())
-
-    # Der Modellblock des Vorgabegeraets traegt keinen Chart-SVG mehr -
-    # der Graph ist HTML/CSS-Balken (A2), G0 wandert in O4 in den
-    # Verlaufs-Reiter.
-    assert not s.select("#tafel-tco svg"), \
-        "in der Vergleichsansicht steht noch ein SVG"
+    # E2: ein Modell ohne Bündel-Band ist in der Zeitreihen-Ansicht nicht
+    # wählbar (erlaubt leer) - es hat keinen Graph-Zustand und keine
+    # Band-Zeilen. Der Katalog zeigt seine Listungen; die Modell-Liste der
+    # Seite kommt mit E3 (S2: die Abweichungstabelle).
+    import json
+    knoten = json.loads(
+        s.select_one("#gr-zeitreihe-daten").get_text())
+    assert knoten["erlaubt"].get(graphlos) in (None, []), \
+        "das bandlose Modell duerfte nicht wählbar sein"
+    assert graphlos not in {e["id"] for e in knoten["suchindex"]}
 
 # --------------------------------------------------------------------------
 # Die eine Rechnung: `zeitreihe()` liefert ihre Reihenzahl als Feld

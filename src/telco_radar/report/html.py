@@ -1957,10 +1957,31 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     _tco = geraete.get("tco") or {}
     if _tco.get("modelle"):
         (site_dir / "data").mkdir(exist_ok=True)
+        # E2: `vorgabe` ist der ZEITREIHEN-Startzustand - der Server-
+        # First-Paint (Seite) zeigt genau DIESER Modellblock, das Fragment
+        # traegt alle uebrigen. Bis E2 war es die Bündel-Vorgabe; seit
+        # Graph und Tabelle demselben Start folgen, muesste das Fragment
+        # sonst die Gruppe des Startmodells doppelt vermissen lassen.
+        _zr_start = ((geraete.get("zeitreihe") or {}).get("start") or {})
+        _start_modell = _zr_start.get("modell") or _tco["modell_vorgabe"]
         (site_dir / "data" / "geraete-buendel.html").write_text(
             env.get_template("geraete_buendel_fragment.html.j2").render(
-                modelle=_tco["modelle"], vorgabe=_tco["modell_vorgabe"]),
+                modelle=_tco["modelle"], vorgabe=_start_modell),
             encoding="utf-8")
+        # E2 (16.09.2026): das ZEITREIHEN-Fragment - der Graph-Zustand
+        # jedes (Modell x Band) der Hauptansicht, aus DEMSELBEN Makro wie
+        # der Server-First-Paint. EINE eigene Datei neben den Bündel-Zeilen:
+        # der BANDWECHSEL laedt nur diesen Zustand und nicht 1,8 MB Zeilen
+        # mit, die sich nicht geaendert haben. ALLE Paare stehen hier,
+        # auch der Startzustand - der Rueckweg hat damit genau EINE Quelle
+        # (kein Vorgabe-Klon, keine S2-Falle).
+        _zr = geraete.get("zeitreihe") or {}
+        if _zr.get("paare"):
+            (site_dir / "data" / "geraete-zeitreihe.html").write_text(
+                env.get_template(
+                    "geraete_zeitreihe_fragment.html.j2").render(
+                    paare=_zr["paare"]),
+                encoding="utf-8")
     (site_dir / "geraete-quellen.html").write_text(
         env.get_template("geraete_quellen.html.j2").render(
             prefix="", geraete=geraete),

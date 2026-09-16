@@ -403,6 +403,20 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
         tarife.append(ohne)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+    # E2 (16.09.2026): die TCO-HISTORIE - ohne sie haette die Hauptansicht
+    # der Fixture keine Zeitreihe (nur den Leer-Satz), und jeder Test, der
+    # den Graphen prueft, prueft einen Leerzustand. Drei Messtage fuer das
+    # NEUE o2-Buendel (Band mittel, 50 GB); das erneuerte und das 1&1-
+    # Bündel haben absichtlich keinen Punkt - genau die Luecke, die der
+    # Graph fuehren soll.
+    neu_b = _buendel(SKU_NEU, 20.0, zustand="neu")
+    historie = []
+    for tag, gesamt in (("2026-09-02", 961.76), ("2026-09-03", 961.76),
+                        ("2026-09-04", 951.76)):
+        historie.append({**_speicherform(neu_b), "id": neu_b.id,
+                         "datum": tag, "gesamt": gesamt})
+    (state / "geraete_tco_historie.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in historie) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / f"{HEUTE}.json").write_text(json.dumps({
