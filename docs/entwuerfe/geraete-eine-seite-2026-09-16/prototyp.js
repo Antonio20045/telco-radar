@@ -4,9 +4,10 @@
    .gr-tafel--aus), Suchfeld-Live-Vorschau (Verhalten 1:1 aus Entwurf v1,
    Antonios einziger Lob: ab 2 Zeichen, ≤ 8 Treffer, Modellname + GB,
    klickbar vor vollständiger Eingabe), Band-Wahl und Graph-Form-Umschalter.
-   Kein Live-app.js. Alle Zahlen aus zahlen.json (Bestand 15.09.2026);
-   der Antwort-Satz ist reine Ableitung aus denselben Zeilen, die der
-   Graph rendert — keine zweite Rechnung.
+   Kein Live-app.js. Alle Zahlen aus zahlen.json (Bestand 15.09.2026),
+   inline im HTML eingebettet (id="gr-zahlen") — kein fetch, der Entwurf
+   läuft per Doppelklick (file://); der Antwort-Satz ist reine Ableitung
+   aus denselben Zeilen, die der Graph rendert — keine zweite Rechnung.
    ===================================================================== */
 (function () {
   "use strict";
@@ -515,7 +516,11 @@
   }
 
   reiterAn();
-  fetch("zahlen.json").then(function (r) { return r.json(); }).then(function (j) {
-    Z = j; start();
-  });
+  // Zahlen liegen inline im Dokument: <script type="application/json"
+  // id="gr-zahlen"> VOR diesem Script. Kein fetch — unter file:// blockiert
+  // die Same-Origin-Politik fetch(), und der lokale http-Server wird vom
+  // System wiederholt gekillt. Gleiches Objekt, gleiche Weiterverarbeitung
+  // wie vorher im fetch-Pfad (Z = j; start();).
+  Z = JSON.parse(document.getElementById("gr-zahlen").textContent);
+  start();
 })();
