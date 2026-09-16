@@ -118,12 +118,22 @@
    Haarlinie am Segmentanfang - der Betrag bleibt an seinem Ort, nur die
    Schrift weicht aus (messeGraph() entscheidet an der gerenderten
    Breite, nie an einer Faustformel über Prozent). */
-.v2-a-seg--drueber .v2-a-segwert{position:absolute;bottom:calc(100% + 4px);
+.v2-a-seg--drueber .v2-a-segwert{position:absolute;bottom:calc(100% + 3px);
   left:0;color:var(--ink-2);padding:0}
-.v2-a-seg--drueber::after{content:"";position:absolute;left:min(7px,50%);
-  bottom:100%;width:0;height:5px;border-left:1px solid var(--ink-4)}
+.v2-a-seg--drueber::after{content:"";position:absolute;left:min(4px,50%);
+  bottom:100%;width:0;height:7px;border-left:1px solid var(--ink-3)}
 .v2-a-seg--drueber--rechts .v2-a-segwert{left:auto;right:0}
-.v2-a-seg--drueber--rechts::after{left:auto;right:min(7px,50%)}
+.v2-a-seg--drueber--rechts::after{left:auto;right:min(4px,50%)}
+/* MINI-Segment (< 10 px gerendert, z.B. 1,00 € Zuzahlung an einem
+   2.131,66-€-Balken): Das Label dockt BÜNDIG am Segmentanfang an - beim
+   Erstsegment also am Spurstart - und die Haarlinie ist kräftig genug,
+   den Betrag erkennbar an den Balken zu binden; nichts schwebt isoliert
+   über leerem Papier. messeGraph() klemmt das Label zusätzlich zwischen
+   die Spurgrenzen (kein Raggen in die Namensspalte). */
+.v2-a-seg--mini .v2-a-segwert{position:absolute;bottom:calc(100% + 3px);
+  left:0;color:var(--ink-2);padding:0}
+.v2-a-seg--mini::after{content:"";position:absolute;left:0;bottom:100%;
+  width:0;height:8px;border-left:1px solid var(--ink-3)}
 /* TCO-24 in 27-px-Serife AM BALOKENENDE, im Bild: rechtsbündig ins
    letzte (dunkle) Segment geklebt. Passt die Zahl nicht ins letzte
    Segment und ist rechts Platz, steht sie neben dem Balkenende in Ink
@@ -267,7 +277,8 @@
   .v2-a-tarif{font-size:11px}
   .v2-a-seg{height:46px}
   .v2-a-segwert{font-size:13.5px;padding:0 6px}
-  .v2-a-seg--drueber .v2-a-segwert{font-size:11.5px}
+  .v2-a-seg--drueber .v2-a-segwert,
+  .v2-a-seg--mini .v2-a-segwert{font-size:11.5px}
   .v2-a-tco{font-size:26px;padding:2px 7px 2px 0}
   .v2-a-delta{font-size:14px}
   .v2-a-reflabel{top:-24px;font-size:10.5px;padding:0 5px}
@@ -384,8 +395,8 @@
     <div class="v2-feld">
       <label id="v2-band-label">Tarifband</label>
       <div class="v2-baender" role="group" aria-labelledby="v2-band-label" id="v2-baender">
-        <button type="button" data-band="klein" aria-pressed="false">Klein<small>bis 20 GB</small></button>
-        <button type="button" data-band="mittel" aria-pressed="true">Mittel<small>21 bis 60 GB</small></button>
+        <button type="button" data-band="klein" aria-pressed="true">Klein<small>bis 20 GB</small></button>
+        <button type="button" data-band="mittel" aria-pressed="false">Mittel<small>21 bis 60 GB</small></button>
         <button type="button" data-band="gross" aria-pressed="false">Groß<small>über 60 GB</small></button>
       </div>
     </div>

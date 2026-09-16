@@ -42,7 +42,16 @@
   };
 
   var Z = null;
-  var zustand = { modell: "google-pixel-11-pro-256", band: "mittel", form: "A" };
+  /* Startzustand = der VOLLSTE Graph des Bestands, damit der erste Blick
+     einen Vergleich zeigt, keine Einzelzeile. Gemessen über alle
+     (Modell × Band) in #gr-zahlen: Drei Kombinationen haben 4 Zeilen —
+     Z Fold8 klein, iPhone 17 klein, iPhone 17 Pro klein (je inkl.
+     Vodafone-Referenz). Genommen ist Z Fold8 klein, weil dort die
+     Referenzlinie bei 83,9 % MITTENDRIN steht (iPhone 17: 98,2 %,
+     iPhone 17 Pro: 99,3 %, also am rechten Rand) und die Balkenlängen
+     von 73,8 bis 100 % streuen — ein lesbarer Vergleich. Pixel 11 Pro
+     bleibt über Suchfeld + Band erreichbar (2 Handgriffe). */
+  var zustand = { modell: "samsung-galaxy-z-fold8-256", band: "klein", form: "A" };
 
   function $(id) { return document.getElementById(id); }
   function euro(n) {
@@ -462,20 +471,47 @@
           tcoAussen = true;
         }
       }
-      // 2) Segmentwerte: zu schmal (< Schwelle) oder breiter als das
-      //    Segment oder Kollision mit dem TCO im letzten Segment →
+      // 2) Segmentwerte: MINI-Segmente (< 10 px gerendert, z.B. die
+      //    1,00-€-Zuzahlung an einem 2.131,66-€-Balken) docken ihr Label
+      //    bündig am Segmentanfang an — beim Erstsegment also am
+      //    SPURSTART, nie weiter links schwebend — mit kräftiger
+      //    Haarlinie zum Segment: der Betrag muss erkennbar zum Balken
+      //    gehören. Schmale Segmente (bis zur Schwelle) oder breitere
+      //    Beschriftung oder Kollision mit dem TCO im letzten Segment →
       //    Betrag ÜBER dem Balken, Haarlinie am Segmentanfang.
       segs.forEach(function (seg) {
         var wert = seg.querySelector(".v2-a-segwert");
         if (!wert) return;
         var w = seg.offsetWidth;
-        var kollidiert = seg === letztes && tco && !tcoAussen &&
-          (w - (tcoW + 14) < wert.offsetWidth + 10);
-        if (w < schwelleSeg || wert.offsetWidth > w - 8 || kollidiert) {
-          seg.classList.add("v2-a-seg--drueber");
-          // Beschriftung klemmen: darf die Spur nicht seitlich verlassen
-          if (seg.offsetLeft + wert.offsetWidth > spurW - 2)
-            seg.classList.add("v2-a-seg--drueber--rechts");
+        if (w < 10) {
+          seg.classList.add("v2-a-seg--mini");
+        } else {
+          var kollidiert = seg === letztes && tco && !tcoAussen &&
+            (w - (tcoW + 14) < wert.offsetWidth + 10);
+          if (w < schwelleSeg || wert.offsetWidth > w - 8 || kollidiert) {
+            seg.classList.add("v2-a-seg--drueber");
+            // Beschriftung klemmen: darf die Spur nicht seitlich verlassen
+            if (seg.offsetLeft + wert.offsetWidth > spurW - 2)
+              seg.classList.add("v2-a-seg--drueber--rechts");
+          }
+        }
+      });
+      // 3) Andock-Kontrolle: Ein Label (mini oder drueber) darf weder in
+      //    die Namensspalte links ragen noch die Wertspalte rechts
+      //    schneiden - die Grid-Spalten trennen sie um 14 px von der
+      //    Spur; gemessen statt geglaubt, und im Fall der Fälle dockt
+      //    das Label hart am Spurstart an.
+      var nameBox = zeile.querySelector(".v2-a-name").getBoundingClientRect();
+      var wertBox = zeile.querySelector(".v2-a-wert").getBoundingClientRect();
+      spur.querySelectorAll(".v2-a-seg--mini,.v2-a-seg--drueber").forEach(function (seg) {
+        var wb = seg.querySelector(".v2-a-segwert").getBoundingClientRect();
+        var trifftNamen = wb.left < nameBox.right + 2 &&
+          wb.bottom > nameBox.top && wb.top < nameBox.bottom;
+        var trifftWert = wb.right > wertBox.left - 2 &&
+          wb.bottom > wertBox.top && wb.top < wertBox.bottom;
+        if (trifftNamen || trifftWert) {
+          seg.querySelector(".v2-a-segwert").style.left = "0px";
+          seg.classList.remove("v2-a-seg--drueber--rechts");
         }
       });
     });
